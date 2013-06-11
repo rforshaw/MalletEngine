@@ -1,0 +1,80 @@
+package com.linxonline.mallet.event ;
+
+import java.util.ArrayList ;
+
+public class EventQueue
+{
+	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
+	private final ArrayList<EventFilter> filters = new ArrayList<EventFilter>() ;
+	private final ArrayList<Event> optimisedEvents = new ArrayList<Event>() ;
+	private final EventMessenger messenger = new EventMessenger() ;
+
+	public void addEventHandler( final EventHandler _handler )
+	{
+		handlers.add( _handler ) ;
+	}
+
+	public void removeEventHandler( final EventHandler _handler )
+	{
+		handlers.remove( _handler ) ;
+	}
+
+	public void addEventFilter( final EventFilter _filter )
+	{
+		filters.add( _filter ) ;
+	}
+
+	public void removeEventFilter( final EventFilter _filter )
+	{
+		filters.remove( _filter ) ;
+	}
+
+	public void addEvent( final Event _event )
+	{
+		messenger.addEvent( _event ) ;
+	}
+
+	public void update()
+	{
+		messenger.refreshEvents() ;
+		final int filterSize = filters.size() ;
+		if( filterSize > 0 )
+		{
+			for( int i = 0; i < filterSize; ++i )
+			{
+				filters.get( i ).filter( messenger, optimisedEvents ) ;
+			}
+		}
+		else
+		{
+			optimisedEvents.addAll( messenger.getEvents() ) ;
+		}
+
+		final int eventSize = optimisedEvents.size() ;
+		final int handlerSize = handlers.size() ;
+		for( int i = 0; i < eventSize; ++i )
+		{
+			for( int j = 0; j < handlerSize; ++j )
+			{
+				handlers.get( j ).processEvent( optimisedEvents.get( i ) ) ;
+			}
+		}
+		optimisedEvents.clear() ;
+	}
+
+	public void clearHandlers()
+	{
+		handlers.clear() ;
+	}
+	
+	public void clearEvents()
+	{
+		messenger.clearEvents() ;
+		optimisedEvents.clear() ;
+	}
+	
+	public boolean hasEvents()
+	{
+		return messenger.hasEvents() ;
+	}
+}

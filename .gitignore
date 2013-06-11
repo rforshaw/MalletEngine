@@ -1,0 +1,6 @@
+build/*
+libs/*
+
+*.jar
+*.class
+*.apk
