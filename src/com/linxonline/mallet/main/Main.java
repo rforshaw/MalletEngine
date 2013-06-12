@@ -1,15 +1,11 @@
 package com.linxonline.mallet.main ;
 
-import com.linxonline.mallet.util.tools.* ;
-import com.linxonline.mallet.io.serialisation.* ;
-import  com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.game.* ;
-import com.linxonline.mallet.system.* ;
-import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.system.* ;
+import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.renderer.DrawFactory ;
 
 /*===========================================*/
 // Main
@@ -21,21 +17,33 @@ public class Main
 	{
 		loadFileSystem() ;
 
-		DefaultSystem system = new DefaultSystem() ;
-		//GLDefaultSystem system = new GLDefaultSystem() ;
+		final DefaultSystem system = new DefaultSystem() ;
 		system.initSystem() ;
-		system.setDisplayDimensions( new Vector2( 800, 600 ) ) ;
-		system.setRenderDimensions( new Vector2( 800, 600 ) ) ;
-		system.setCameraPosition( new Vector3( 400.0f, 300.0f, 0.0f ) ) ;
+		system.setDisplayDimensions( new Vector2( 640, 480 ) ) ;
+		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
+		system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 
-		GameSystem game = new GameSystem() ;
-		GameState state = new GameState( "DEFAULT" ) ;
-
+		final GameSystem game = new GameSystem() ;
 		game.setSystem( system ) ;
-		game.addGameState( state ) ;
-		game.setDefaultGameState( "DEFAULT" ) ;
+		game.addGameState( new GameState( "DEFAULT" )
+		{
+			// Called when state is started.
+			public void initGame()
+			{
+				// Add a texture to the render system
+				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 		// Texture Location
+																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
+																new Vector2( -32, -32 ), 		// Offset
+																new Vector2( 64, 64 ),			// Dimension, how large - scaled
+																null,							// fill, texture repeat
+																null,							// clip
+																null,							// clip offset
+																10 ) ) ;							// layer
+			}
+		} ) ;
 
-		game.runSystem() ;
+		game.setDefaultGameState( "DEFAULT" ) ;
+		game.runSystem() ;							// Begin running the game-loop
 	}
 	
 	private static void loadFileSystem()
