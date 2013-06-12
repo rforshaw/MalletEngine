@@ -10,6 +10,8 @@ games in my spare time.
 
 COMPILING
 
+Requires Java 6 JDK & Ant
+
 ant clean
 ant -f Build.xml
 
