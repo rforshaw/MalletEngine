@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_button_component.html" title="com.linxonline.mallet.entity.ButtonComponent" alt="" coords="644,5,932,35"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_check_box_component.html" title="com.linxonline.mallet.entity.CheckBoxComponent" alt="" coords="632,59,944,88"/>
+<area shape="rect" id="node9" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_text_area_component.html" title="com.linxonline.mallet.entity.TextAreaComponent" alt="" coords="636,112,940,141"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_component.html" title="com.linxonline.mallet.entity.Component" alt="" coords="5,59,256,88"/>
+</map>
