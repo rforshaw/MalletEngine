@@ -10,37 +10,22 @@ public final class Sound extends Resource
 {
 	private static final String type = "SOUND" ;
 
-	public SoundInterface sound = null ;
+	private final SoundInterface buffer ;
 
-	public Sound( SoundInterface _sound )
+	public Sound( SoundInterface _buffer )
 	{
-		sound = _sound ;
+		buffer = _buffer ;
 	}
 
-	public final void play()
+	public <T> T getSoundBuffer( final Class<T> _type )
 	{
-		sound.play() ;
-	}
-	
-	public final void playLoop()
-	{
-		sound.playLoop() ;
-	}
-	
-	public final void pause()
-	{
-		sound.pause() ;
-	}
-	
-	public final void stop()
-	{
-		sound.stop() ;
+		return _type.cast( buffer ) ;
 	}
 
 	@Override
 	public void destroy()
 	{
-		sound.destroy() ;
+		buffer.destroy() ;
 	}
 
 	@Override

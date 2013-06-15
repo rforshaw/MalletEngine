@@ -17,9 +17,9 @@ public class ALSASourceGenerator implements SourceGenerator
 			return null ;
 		}
 
-		final ALSASound alsaSound = ( ALSASound )_sound.sound ;		// Assumes Sound contains an ALSASound reference
+		final ALSASound alsaSound = _sound.getSoundBuffer( ALSASound.class ) ;	// Assumes Sound contains an ALSASound reference
 		final AL openAL = alsaSound.getOpenAL() ;
-		final int[] buffer = alsaSound.buffer ;
+		final int[] buffer = alsaSound.getBufferID() ;
 
 		int[] source = new int[1] ;
 		openAL.alGenSources( 1, source, 0 ) ;	

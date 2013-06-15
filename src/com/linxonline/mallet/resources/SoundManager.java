@@ -23,15 +23,10 @@ public class SoundManager extends AbstractManager
 	@Override
 	protected Sound createResource( final String _file )
 	{
-		final ALSASound sound = new ALSASound() ;
 		final int[] buffer = initBuffer( _file ) ;
 		if( buffer != null )
 		{
-			sound.source = initSource( buffer ) ;
-			sound.buffer = buffer ;
-			sound.setOpenAL( openAL ) ;
-
-			return new Sound( sound ) ;
+			return new Sound( new ALSASound( buffer, openAL ) ) ;
 		}
 
 		return null ;
