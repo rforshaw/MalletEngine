@@ -125,7 +125,7 @@ public class AudioSystem implements EventHandler
 			{
 				passIDToCallback( sound.id, _audio ) ;
 				storeActiveSound( sound ) ;
-				sound.source.play() ;
+				sound.play() ;
 			}
 			return ;
 		}
@@ -136,28 +136,27 @@ public class AudioSystem implements EventHandler
 	**/
 	protected void modifyAudio( final Settings _settings, final ActiveSound _sound )
 	{
-		final AudioSource source = _sound.source ;
 		final int type = _settings.getInteger( MODIFY_AUDIO, -1 ) ;
 		switch( type )
 		{
 			case ModifyAudio.PLAY :
 			{
-				source.play() ;
+				_sound.play() ;
 				break ;
 			}
 			case ModifyAudio.STOP :
 			{
-				source.stop() ;
+				_sound.stop() ;
 				break ;
 			}
 			case ModifyAudio.PAUSE :
 			{
-				source.pause() ;
+				_sound.pause() ;
 				break ;
 			}
 			case ModifyAudio.LOOP_CONTINUOSLY :
 			{
-				source.playLoop() ;
+				_sound.playLoop() ;
 				break ;
 			}
 			case ModifyAudio.LOOP_SET :
@@ -264,10 +263,10 @@ public class AudioSystem implements EventHandler
 
 	private class ActiveSound
 	{
-		private ArrayList<PlaybackInterface> playbacks = new ArrayList<PlaybackInterface>() ;
-		public AudioSource source = null ;
-		public Sound sound = null ;
-		public int id = -1 ;
+		private final ArrayList<PlaybackInterface> playbacks = new ArrayList<PlaybackInterface>() ;
+		private final AudioSource source ;
+		private final Sound sound ;
+		private int id = -1 ;
 
 		public ActiveSound( final int _id, final AudioSource _source, final Sound _sound )
 		{
@@ -291,11 +290,67 @@ public class AudioSystem implements EventHandler
 				playbacks.remove( _playback ) ;
 			}
 		}
-		
+
+		public void play()
+		{
+			source.play() ;
+		}
+
+		public void playLoop()
+		{
+			source.playLoop() ;
+		}
+
+		public void pause()
+		{
+			final int length = playbacks.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				playbacks.get( i ).endPlayback( PlaybackInterface.PAUSE_PLAYBACK ) ;
+			}
+
+			source.pause() ;
+		}
+
+		public void stop()
+		{
+			final int length = playbacks.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				playbacks.get( i ).endPlayback( PlaybackInterface.STOP_PLAYBACK ) ;
+			}
+
+			source.stop() ;
+		}
+
 		public boolean update()
 		{
-			//System.out.println( source.getCurrentTime() ) ;
-			return !( source.isPlaying() ) ;
+			updatePlaybackTimes() ;
+			final boolean isPlaying = source.isPlaying() ;
+			if( isPlaying == false )
+			{
+				finishPlaybacks() ;
+			}
+
+			return !isPlaying ;
+		}
+
+		private void updatePlaybackTimes()
+		{
+			final int length = playbacks.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				playbacks.get( i ).updatePlayback( source.getCurrentTime() ) ;
+			}
+		}
+		
+		private void finishPlaybacks()
+		{
+			final int length = playbacks.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				playbacks.get( i ).endPlayback( PlaybackInterface.FINISHED_PLAYBACK ) ;
+			}
 		}
 
 		public void destroy()

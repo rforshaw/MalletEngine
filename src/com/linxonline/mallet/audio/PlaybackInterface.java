@@ -5,6 +5,10 @@ package com.linxonline.mallet.audio ;
 **/
 public interface PlaybackInterface
 {
+	public final static int FINISHED_PLAYBACK = 0 ;
+	public final static int STOP_PLAYBACK = 10 ;
+	public final static int PAUSE_PLAYBACK = 20 ;
+
 	/**
 		Informs when the AudioSource has begun playing
 	**/
@@ -18,5 +22,5 @@ public interface PlaybackInterface
 	/**
 		Informs when the AudioSource has stopped playing
 	**/
-	public void endPlayback() ;
+	public void endPlayback( final int _type ) ;
 }

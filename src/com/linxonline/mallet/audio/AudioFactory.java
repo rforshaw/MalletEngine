@@ -3,6 +3,8 @@ package com.linxonline.mallet.audio ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.audio.ModifyAudio ;
+import com.linxonline.mallet.audio.PlaybackInterface ;
 
 public class AudioFactory
 {
@@ -19,6 +21,16 @@ public class AudioFactory
 		audio.addInteger( REQUEST_TYPE, RequestType.CREATE_AUDIO ) ;
 		if( _file != null ) { audio.addString( AUDIO_FILE, _file ) ; }
 		if( _inter != null ) { audio.addObject( ID_REQUEST, _inter ) ; }
+		return new Event( AUDIO, audio ) ;
+	}
+	
+	public static Event createPlayback( final int _id, final PlaybackInterface _playback )
+	{
+		final Settings audio = new Settings() ;
+		audio.addInteger( REQUEST_TYPE, RequestType.MODIFY_EXISTING_AUDIO ) ;
+		audio.addInteger( "ID", _id ) ;
+		audio.addInteger( "MODIFY_AUDIO", ModifyAudio.ADD_PLAYBACK ) ;
+		if( _playback != null ) { audio.addObject( "PLAYBACK_REQUEST", _playback ) ; }
 		return new Event( AUDIO, audio ) ;
 	}
 }

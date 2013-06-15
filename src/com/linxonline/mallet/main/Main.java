@@ -2,9 +2,11 @@ package com.linxonline.mallet.main ;
 
 import com.linxonline.mallet.game.* ;
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.system.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 
 /*===========================================*/
@@ -33,11 +35,11 @@ public class Main
 				// Add a texture to the render system
 				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 		// Texture Location
 																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																new Vector2( -32, -32 ), 		// Offset
-																new Vector2( 64, 64 ),			// Dimension, how large - scaled
-																null,							// fill, texture repeat
-																null,							// clip
-																null,							// clip offset
+																new Vector2( -32, -32 ), 			// Offset
+																new Vector2( 64, 64 ),				// Dimension, how large - scaled
+																null,								// fill, texture repeat
+																null,								// clip
+																null,								// clip offset
 																10 ) ) ;							// layer
 			}
 		} ) ;
