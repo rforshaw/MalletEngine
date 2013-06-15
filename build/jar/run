@@ -14,6 +14,6 @@ do
   CLASSPATH=${CLASSPATH}:${i}
 done
 
-X_ARGS="-Dsun.java2d.noddraw=true -Dsun.java2d.opengl=false"
+X_ARGS="-Dsun.java2d.noddraw=true -Dsun.java2d.opengl=true"
 
 java -classpath $CLASSPATH $X_ARGS com.linxonline.mallet.main.Main $@

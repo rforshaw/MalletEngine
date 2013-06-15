@@ -9,4 +9,4 @@ for /R ./ %%a in (*.jar) do (
 set CLASSPATH=!CLASSPATH!"
 echo !CLASSPATH!
 
-java -Dsun.java2d.noddraw=true -Dsun.java2d.opengl=false com.linxonline.mallet.main.Main
+java -Dsun.java2d.noddraw=true -Dsun.java2d.opengl=true com.linxonline.mallet.main.Main
