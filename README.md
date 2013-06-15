@@ -10,6 +10,8 @@ games in my spare time.
 
 COMPILING
 
+Requires Java 6 JDK & Ant
+
 ant clean
 ant -f Build.xml
 
@@ -30,7 +32,9 @@ Linux &amp; Mac
 
 Windows
 
-I have yet to write a concise script for Windows based machines.
+You will need to make sure you have openAL installed. You can get it from : http://connect.creativelabs.com/openal/Downloads/oalinst.zip
+
+run.bat
 
 
 Android &amp; iOS support?

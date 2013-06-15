@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_handler.html" title="com.linxonline.mallet.input.InputHandler" alt="" coords="32,19,285,48"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_controller.html" title="com.linxonline.mallet.input.InputController" alt="" coords="361,5,625,35"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_state.html" title="com.linxonline.mallet.input.InputState" alt="" coords="373,59,613,88"/>
+<area shape="rect" id="node6" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_system_interface.html" title="com.linxonline.mallet.input.InputSystemInterface" alt="" coords="7,85,311,115"/>
+<area shape="rect" id="node9" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_system.html" title="com.linxonline.mallet.input.InputSystem" alt="" coords="367,112,620,141"/>
+</map>

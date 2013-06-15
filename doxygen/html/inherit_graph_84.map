@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.SystemInterface" alt="" coords="5,32,296,61"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1_default_system.html" title="com.linxonline.mallet.system.DefaultSystem" alt="" coords="352,5,635,35"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1_g_l_default_system.html" title="com.linxonline.mallet.system.GLDefaultSystem" alt="" coords="344,59,643,88"/>
+</map>
