@@ -23,7 +23,7 @@ public class Main
 		final GLDefaultSystem system = new GLDefaultSystem() ;			// OpenGL backend
 
 		system.initSystem() ;
-		system.setDisplayDimensions( new Vector2( 640, 480 ) ) ;
+		system.setDisplayDimensions( new Vector2( 320, 240 ) ) ;
 		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
 		system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 
@@ -39,7 +39,7 @@ public class Main
 																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
 																new Vector2( -32, -32 ), 			// Offset
 																new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																null,								// fill, texture repeat
+																null,			// fill, texture repeat
 																null,								// clip
 																null,								// clip offset
 																10 ) ) ;							// layer

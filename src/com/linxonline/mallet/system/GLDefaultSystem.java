@@ -1,10 +1,10 @@
 package com.linxonline.mallet.system ;
 
 import javax.swing.JFrame ;
-import java.awt.Graphics2D ;
 import java.awt.image.BufferedImage ;
 import java.awt.Point ;
 import java.awt.Dimension ;
+import java.awt.Insets ;
 
 import com.linxonline.mallet.audio.alsa.* ;
 import com.linxonline.mallet.audio.* ;
@@ -110,7 +110,21 @@ public class GLDefaultSystem implements SystemInterface
 	
 	public void setDisplayDimensions( final Vector2 _display )
 	{
+		final JFrame temp = new JFrame() ;
+		temp.pack() ;
+
+		final Insets insets = temp.getInsets() ;
+		final Dimension dim = new Dimension( insets.left + insets.right + ( int )_display.x,
+										  insets.top + insets.bottom + ( int )_display.y ) ;
+
+		//System.out.println( "Set Display: " + _display ) ;
+		frame.setVisible( false ) ;
 		renderer.setDisplayDimensions( ( int )_display.x, ( int )_display.y ) ;
+		frame.setMinimumSize( dim ) ;
+		frame.setSize( dim ) ;
+		frame.validate() ;
+		frame.setVisible( true ) ;
+		//System.out.println( "FrameW: " + frame.getWidth() + " FrameH: " + frame.getHeight() ) ;
 	}
 
 	public void setRenderDimensions( final Vector2 _render )

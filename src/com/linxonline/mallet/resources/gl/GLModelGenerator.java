@@ -10,9 +10,12 @@ public class GLModelGenerator
 {
 	private final static GLModelManager models = new GLModelManager() ;
 
-	public static Model genPlaneModel( final String _name, 
-									   final int _width, 
-									   final int _height )
+	public static Model genPlaneModel( final String _name, final Vector2 _dim )
+	{
+		return genPlaneModel( _name, _dim, new Vector2( 1.0f, 1.0f ) ) ;
+	}
+
+	public static Model genPlaneModel( final String _name, final Vector2 _dim, final Vector2 _uv )
 	{
 		Model model = ( Model )models.get( _name ) ;
 		if( model != null )
@@ -24,15 +27,15 @@ public class GLModelGenerator
 		geometry.addVertex( new Vector3( 0, 0, 0 ),
 							new Vector3( 0, 0, 1 ),
 							new Vector2( 0, 0 ) ) ;
-		geometry.addVertex( new Vector3( _width, 0, 0 ),
+		geometry.addVertex( new Vector3( _dim.x, 0, 0 ),
 							new Vector3( 0, 0, 1 ),
-							new Vector2( 1, 0 ) ) ;
-		geometry.addVertex( new Vector3( 0, _height, 0 ),
+							new Vector2( _uv.x, 0 ) ) ;
+		geometry.addVertex( new Vector3( 0, _dim.y, 0 ),
 							new Vector3( 0, 0, 1 ),
-							new Vector2( 0, 1 ) ) ;
-		geometry.addVertex( new Vector3( _width, _height, 0 ),
+							new Vector2( 0, _uv.y ) ) ;
+		geometry.addVertex( new Vector3( _dim.x, _dim.y, 0 ),
 							new Vector3( 0, 0, 1 ),
-							new Vector2( 1, 1 ) ) ;
+							new Vector2( _uv.x, _uv.y ) ) ;
 
 		geometry.addIndices( 0 ) ;
 		geometry.addIndices( 1 ) ;
