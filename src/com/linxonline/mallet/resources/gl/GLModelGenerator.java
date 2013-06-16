@@ -8,12 +8,13 @@ import com.linxonline.mallet.maths.* ;
 
 public class GLModelGenerator
 {
+	private final static GLModelManager models = new GLModelManager() ;
+
 	public static Model genPlaneModel( final String _name, 
 									   final int _width, 
 									   final int _height )
 	{
-		/*ResourceManager resources = ResourceManager.getResourceManager() ;
-		Model model = resources.getModel( _name ) ;
+		Model model = ( Model )models.get( _name ) ;
 		if( model != null )
 		{
 			return model ;
@@ -41,16 +42,10 @@ public class GLModelGenerator
 		geometry.addIndices( 3 ) ;
 		
 		model = new Model( geometry ) ;
-
-		GLModelManager modelManager = ( GLModelManager )resources.modelManager ;
-		if( modelManager != null )
-		{
-			modelManager.bind( geometry ) ;
-			modelManager.add( _name, model ) ;
-		}
+		models.bind( geometry ) ;
+		models.add( _name, model ) ;
 
 		model.register() ;
-		return model ;*/
-		return null ;
+		return model ;
 	}
 }

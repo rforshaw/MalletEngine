@@ -25,7 +25,7 @@ import com.linxonline.mallet.maths.* ;
 public class GLDefaultSystem implements SystemInterface
 {
 	protected JFrame frame = null ;
-	protected String titleName = new String( "Mallet Engine" ) ;
+	protected String titleName = new String( "GL Mallet Engine" ) ;
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
 	protected GLRenderer renderer = new GLRenderer() ;
 	public EventSystem eventSystem = new EventSystem() ;
@@ -44,8 +44,8 @@ public class GLDefaultSystem implements SystemInterface
 
 		frame = new JFrame( titleName ) ;
 		frame.createBufferStrategy( 1 ) ;
-		frame.setCursor( frame.getToolkit().createCustomCursor( new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), 
-																new Point( 0, 0 ), "null" ) ) ;
+		//frame.setCursor( frame.getToolkit().createCustomCursor( new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), 
+		//														new Point( 0, 0 ), "null" ) ) ;
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
 		frame.setIgnoreRepaint( true ) ;
 
@@ -102,15 +102,6 @@ public class GLDefaultSystem implements SystemInterface
 	}
 
 	/*RENDER*/
-	public void addRenderContainer( final RenderContainer _container )
-	{
-		renderer.addRenderContainer( _container ) ;
-	}
-
-	public void removeRenderContainer( final RenderContainer _container )
-	{
-		renderer.removeRenderContainer( _container ) ;
-	}
 
 	public void setTitleName( final String _titleName )
 	{
@@ -127,14 +118,14 @@ public class GLDefaultSystem implements SystemInterface
 		renderer.setRenderDimensions( ( int )_render.x, ( int )_render.y ) ;
 	}
 
-	public RenderInterface getRenderInterface()
-	{
-		return renderer ;
-	}
-
 	public void setCameraPosition( final Vector3 _camera )
 	{
 		renderer.setCameraPosition( _camera ) ;
+	}
+
+	public RenderInterface getRenderInterface()
+	{
+		return renderer ;
 	}
 
 	/*AUDIO SOURCE GENERATOR*/

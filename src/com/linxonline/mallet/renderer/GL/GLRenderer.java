@@ -10,6 +10,7 @@ import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
 import javax.media.opengl.glu.GLU ;
 
+import com.linxonline.mallet.resources.gl.* ;
 import com.linxonline.mallet.physics.AABB ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
@@ -20,29 +21,29 @@ import com.linxonline.mallet.resources.texture.* ;
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
 	private static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+	protected final static GLTextureManager textures = new GLTextureManager() ;
 
-	public RenderInfo renderInfo = new RenderInfo( new Vector2( 800, 600 ), 
-												   new Vector2( 800, 600 ), 
-												   new Vector3( 0, 0, 0 ) ) ; 
-
-	private ArrayList<RenderContainer> content = new ArrayList<RenderContainer>() ;
+	private int numID = 0 ;
 	private static GLCanvas canvas = null ;
 	private JFrame frame = null ;
 
-	//private AABB viewArea = new AABB() ;
-	private Vector2 halfRenderDimensions = new Vector2( 0, 0 ) ;
-	private Vector2 containerPos = new Vector2( 0, 0 ) ;
-
+	private Vector2 pos = new Vector2() ;
 	private Vector3 cameraPosition = null ;
 	private Vector2 renderDimensions = null ;
 	private Vector2 displayDimensions = null ;
-	
+
+	protected GL2 gl = null ;
+	protected DrawInterface drawShape = null ;
+	protected DrawInterface drawTexture = null ;
+	protected DrawInterface drawText = null ;
+
 	private int textureID = 0 ;
 	private int indexID = 0 ;
 	
 	public GLRenderer()
 	{
 		initGraphics() ;
+		initDrawCalls() ;
 	}
 
 	private void initGraphics()
@@ -55,6 +56,127 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		canvas.setAutoSwapBufferMode( false ) ;
 		canvas.addGLEventListener( this ) ;
 	}
+
+	private void initDrawCalls()
+	{
+		drawShape = new DrawInterface()
+		{
+			public void draw( final Settings _settings, final Vector2 _position ) 
+			{
+				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+
+				gl.glPushMatrix() ;
+					gl.glTranslatef( _position.x + offset.x, _position.y + offset.y, 0.0f ) ;
+					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
+
+					final Line line = ( Line )_settings.getObject( "DRAWLINE", Line.class, null ) ;
+					if( line != null )
+					{
+						gl.glBegin( GL2.GL_LINES ) ;
+							gl.glVertex2f( line.start.x, line.start.y ) ;
+							gl.glVertex2f( line.end.x, line.end.y ) ;
+						gl.glEnd() ;
+					}
+
+					Shape shape = ( Shape )_settings.getObject( "DRAWLINES", Shape.class, null ) ;
+					if( shape != null )
+					{
+						final int size = shape.indicies.size() ;
+						for( int i = 0; i < size; i += 2 )
+						{
+							final Vector2 start = shape.points.get( shape.indicies.get( i ) ) ;
+							final Vector2 end = shape.points.get( shape.indicies.get( i + 1 ) ) ;
+
+							gl.glBegin( GL2.GL_LINES ) ;
+								gl.glColor3f( 1.0f, 1.0f, 1.0f ) ;
+								gl.glVertex2f( start.x, start.y ) ;
+								gl.glVertex2f( end.x, end.y ) ;
+							gl.glEnd() ;
+						}
+					}
+
+					shape = ( Shape )_settings.getObject( "POINTS", Shape.class, null ) ;
+					if( shape != null )
+					{
+						final int size = shape.indicies.size() ;
+						for( int i = 0; i < size; ++i )
+						{
+							final Vector2 point = shape.points.get( shape.indicies.get( i ) ) ;
+							gl.glBegin( GL2.GL_POINT ) ;
+								gl.glColor3f( 1.0f, 0.0f, 0.0f ) ;
+								gl.glVertex2f( point.x, point.y ) ;
+							gl.glEnd() ;
+						}
+					}
+				gl.glPopMatrix() ;
+			}
+		} ;
+		
+		drawTexture = new DrawInterface()
+		{
+			public void draw( final Settings _settings, final Vector2 _position ) 
+			{
+				Texture texture = _settings.getObject( "TEXTURE", Texture.class, null ) ;
+				if( texture != null )
+				{
+					final GLImage image = texture.getImage( GLImage.class ) ;
+					if( image.textureID != textureID )
+					{
+						textureID = image.textureID ;
+						gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
+					}
+				}
+				else
+				{
+					final String file = _settings.getString( "FILE", null ) ;
+					if( ( texture = loadTexture( file ) ) != null )
+					{
+						final String dim = _settings.getString( "DIM", null ) ;
+						final Vector2 dimension = _settings.getObject( "DIM", Vector2.class, null ) ;
+						_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( dim, ( int )dimension.x, ( int )dimension.y ) ) ;
+					}
+				}
+
+				final Model model = _settings.getObject( "MODEL", Model.class, null ) ;
+				if( model == null )
+				{
+					// If we can't map the texture to a plane, then no point in rendering.
+					return ;
+				}
+
+				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+
+				gl.glPushMatrix() ;
+					gl.glTranslatef( _position.x + offset.x, _position.y + offset.y, 0.0f ) ;
+					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
+
+					if( geometry.indexID != indexID )
+					{
+						indexID = geometry.indexID ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					}
+
+					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+
+					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+				gl.glPopMatrix() ;
+			}
+		} ;
+
+		drawText = new DrawInterface()
+		{
+			public void draw( final Settings _settings, final Vector2 _position ) 
+			{
+				System.out.println( "Draw Text" ) ;
+			}
+		} ;
+	}
 	
 	public void hookToWindow( final JFrame _frame )
 	{
@@ -62,7 +184,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		frame.add( canvas ) ;
 		frame.pack() ;
 	}
-	
+
+	@Override
 	public void init( GLAutoDrawable _drawable )
 	{
 		GL2 gl = _drawable.getGL().getGL2() ;
@@ -92,54 +215,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 	}
 
-	public void setRenderDimensions( final int _width, final int _height )
-	{
-		halfRenderDimensions.x = _width / 2 ;
-		halfRenderDimensions.y = _height / 2 ;
-
-		//viewArea = new AABB( -( halfRenderDimensions.x + 100 ), -( halfRenderDimensions.y + 100 ),
-		//					  halfRenderDimensions.x + 100, halfRenderDimensions.y + 100 ) ;
-
-		renderInfo.setRenderDimensions( new Vector2( _width, _height ) ) ;
-		renderDimensions = renderInfo.getRenderDimensions() ;
-	}
-
-	public void setDisplayDimensions( final int _width, final int _height )
-	{
-		renderInfo.setDisplayDimensions( new Vector2( _width, _height ) ) ;
-		canvas.setSize( _width, _height ) ;
-	}
-
-	public void setCameraPosition( final Vector3 _position )
-	{
-		renderInfo.setCameraPosition( _position ) ;
-	}
-
-	public void addRenderContainer( final RenderContainer _container )
-	{
-		if( exists( _container ) == true )
-		{
-			return ;
-		}
-
-		insert( _container ) ;
-	}
-
-	public void removeRenderContainer( final RenderContainer _container )
-	{
-		if( exists( _container ) == true )
-		{
-			content.remove( _container ) ;
-		}
-	}
-
-	// GLEventListener - Not specifically used
+	@Override
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height ) {}
 
-	// GLEventListener - Not specifically used
-	public void displayChanged( GLAutoDrawable _drawable, boolean _modeChanged, boolean _deviceChanged ) {}
-
-	// GLEventListener - Not specifically used
+	@Override
 	public void dispose( GLAutoDrawable _drawable ) {}
 
 	public void draw()
@@ -151,16 +230,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return ;
 		}
 
-		//viewArea.moveAABB( cameraPosition.x - halfRenderDimensions.x, 
-		//				   cameraPosition.y - halfRenderDimensions.y ) ;
-
+		updateEvents() ;
 		canvas.display() ;
 	}
 
-	// GLEventListener Starts the rendering
+	@Override
 	public void display( GLAutoDrawable _drawable )
 	{
-		GL2 gl = _drawable.getGL().getGL2() ;
+		gl = _drawable.getGL().getGL2() ;
 
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
@@ -169,38 +246,23 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glPushMatrix() ;
 			gl.glTranslatef( cameraPosition.x, cameraPosition.y, 0.0f ) ;
-			render( gl ) ;
+			render() ;
 		gl.glPopMatrix() ;
 
 		gl.glFlush() ;
 		canvas.swapBuffers() ;
 	}
 
-	private void render( GL2 _gl )
+	protected void render()
 	{
-		for( RenderContainer container : content )
-		{
-			containerPos.setXY( container.position.x, container.position.y ) ;
-			//if( isWithinBounds( containerPos ) == false )
-			//{
-			//	continue ;
-			//}
+		final int length = content.size() ;
+		RenderData data = null ;
 
-			for( Integer type : container.enabledTypes )
-			{
-				if( type == RenderContainer.MODEL_TYPE )
-				{
-					drawModel( _gl, container ) ;
-				}
-				else if( type == RenderContainer.TEXT_TYPE )
-				{
-					//drawString( _gl, container ) ;
-				}
-				else if( type == RenderContainer.GEOMETRIC_TYPE )
-				{
-					drawShapes( _gl, container ) ;
-				}
-			}
+		for( int i = 0; i < length; ++i )
+		{
+			data = content.get( i ) ;
+			pos.setXY( data.position.x, data.position.y ) ;
+			data.drawCall.draw( data.drawData, pos ) ;
 		}
 	}
 
@@ -265,140 +327,36 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		_gl.glPopMatrix() ;
 	}
 
-	private void drawModel( GL2 _gl, RenderContainer _container )
+	@Override
+	protected void createTexture( final Settings _draw )
 	{
-		final Settings settings = _container.settings ;
-		final Model model = settings.getObject( "MODEL", Model.class, null ) ;
-		if( model == null )
+		System.out.println( "Creating Texture" ) ;
+		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final int layer = _draw.getInteger( "LAYER", -1 ) ;
+
+		if( position != null )
 		{
-			// Model Doesn't exist, no need to render.
-			return ;
+			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			data.drawCall = drawTexture ;
+			insert( data ) ;
 		}
-
-		final Texture texture = settings.getObject( "TEXTURE", Texture.class, null ) ;
-		if( texture != null )
-		{
-			final GLImage image = texture.getImage( GLImage.class ) ;
-			if( image.textureID != textureID )
-			{
-				textureID = image.textureID ;
-				_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
-			}
-		}
-
-		final Vector3 position = _container.position ;
-		final float rotation = ( float )Math.toDegrees( settings.getFloat( "ROTATE", 0.0f ) ) ;
-		final Vector2 offset = settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
-		final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
-
-		_gl.glPushMatrix() ;
-			_gl.glTranslatef( position.x, position.y, 0.0f ) ;
-			_gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-			_gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
-
-			if( geometry.indexID != indexID )
-			{
-				indexID = geometry.indexID ;
-				_gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
-				_gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
-			}
-
-			_gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-			_gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-			_gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-			_gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
-		_gl.glPopMatrix() ;
 	}
 
-	public void sort()
-	{
-		content = quicksort( content ) ;
-	}
+	@Override
+	protected void createGeometry( final Settings _draw ) {}
 
-	public void clear()
-	{
-		content.clear() ;
-	}
+	@Override
+	protected void createText( final Settings _draw ) {}
+
+	public void sort() {}
 
 	public static GLCanvas getCanvas()
 	{
 		return canvas ;
 	}
-	
-	/*private boolean isWithinBounds( final Vector2 _position )
+
+	private Texture loadTexture( final String _file )
 	{
-		return viewArea.intersectByPosition( _position ) ;
-	}*/
-	
-	private void insert( final RenderContainer _container )
-	{
-		try
-		{
-			final int layer1 = _container.settings.getInteger( "LAYER" ) ;
-			int layer2 = 0 ;
-
-			for( RenderContainer container : content )
-			{
-				layer2 = container.settings.getInteger( "LAYER" ) ;
-
-				if( layer1 <= layer2 )
-				{
-					int index = content.indexOf( container ) ;
-					content.add( index, _container ) ;
-					return ;
-				}
-			}
-		}
-		catch( NullPointerException _ex ) {}
-
-		content.add( _container ) ;
+		return _file != null ? ( Texture )textures.get( _file ) : null ;
 	}
-
-	private ArrayList<RenderContainer> quicksort( ArrayList<RenderContainer> _contents )
-	{
-		final int size = _contents.size() ;
-		if( size <= 1 )
-		{
-			return _contents ;
-		}
-		
-		int layer = 0 ;
-		final int pivot = _contents.get( size / 2 ).settings.getInteger( "LAYER" ) ;
-		RenderContainer pivotContainer = _contents.get( size / 2 ) ;
-		_contents.remove( pivot ) ;
-		
-		ArrayList<RenderContainer> less = new ArrayList<RenderContainer>() ;
-		ArrayList<RenderContainer> greater = new ArrayList<RenderContainer>() ;
-		
-		for( RenderContainer container : _contents )
-		{
-			layer = container.settings.getInteger( "LAYER" ) ;
-			if( layer <= pivot )
-			{
-				less.add( container ) ;
-			}
-			else
-			{
-				greater.add( container ) ;
-			}
-		}
-		
-		less = quicksort( less ) ;
-		greater = quicksort( greater ) ;
-
-		less.add( pivotContainer ) ;
-		less.addAll( greater ) ;
-		return less ;
-	}
-
-	private final boolean exists( final RenderContainer _container )
-	{
-		return content.contains( _container ) ;
-	}
-
-	protected void createTexture( final Settings _draw ) {}
-	protected void createGeometry( final Settings _draw ) {}
-	protected void createText( final Settings _draw ) {}
-	
 }

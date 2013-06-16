@@ -19,7 +19,9 @@ public class Main
 	{
 		loadFileSystem() ;
 
-		final DefaultSystem system = new DefaultSystem() ;
+		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D backend
+		final GLDefaultSystem system = new GLDefaultSystem() ;			// OpenGL backend
+
 		system.initSystem() ;
 		system.setDisplayDimensions( new Vector2( 640, 480 ) ) ;
 		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
