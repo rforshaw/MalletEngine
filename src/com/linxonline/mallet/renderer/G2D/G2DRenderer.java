@@ -307,7 +307,6 @@ public class G2DRenderer extends Basic2DRender
 			graphics.scale( scale.x, scale.y ) ;
 			graphics.translate( camera.x, camera.y ) ;
 
-			System.out.println( camera ) ;
 			updateEvents() ;
 			render() ;
 		}

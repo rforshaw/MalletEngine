@@ -8,25 +8,17 @@ import com.linxonline.mallet.resources.texture.* ;
 
 public class ResourceManager
 {
-	protected static ResourceManager resourceManager = null ;				// Singleton class, should be the only one!
+	protected static ResourceManager resourceManager = new ResourceManager() ;
 	protected final LanguageManager languageManager = new LanguageManager() ;
 	protected Settings config = new Settings() ;							// Global Game Settings.
 
-	// Should specify at Start up - Main
-	public FileSystem fileSystem = null ;
-	
-	// Must be set by the System - DefaultSystem etc.
-	public ManagerInterface spriteManager = null ;
+	public FileSystem fileSystem = null ;									// Should specify at Start up - Main
+	public ManagerInterface spriteManager = null ; 							// Must be set by the System - DefaultSystem etc.
 	
 	protected ResourceManager() {}
 
 	public static synchronized ResourceManager getResourceManager()
 	{
-		if( resourceManager == null )
-		{
-			resourceManager = new ResourceManager() ;
-		}
-	
 		return resourceManager ;
 	}
 
@@ -34,83 +26,82 @@ public class ResourceManager
 
 	public Sprite getSprite( final String _file )
 	{
-		if( spriteManager == null )
+		if( resourceManager.spriteManager == null )
 		{
 			System.out.println( "Sprite Manager doesn't exist" ) ;
 			return null ;
 		}
 
-		final Sprite sprite = ( Sprite )spriteManager.get( _file ) ;
-		return sprite ;
+		return ( Sprite )resourceManager.spriteManager.get( _file ) ;
 	}
 
 	/* Language Manager - Enables multi-langauge games */
 
-	public String getText( final String _keyword )
+	public static String getText( final String _keyword )
 	{
-		return languageManager.getText( _keyword ) ;
+		return resourceManager.languageManager.getText( _keyword ) ;
 	}
 
-	public void setLanguage( final String _language )
+	public static void setLanguage( final String _language )
 	{
-		languageManager.setLanguage( _language ) ;
+		resourceManager.languageManager.setLanguage( _language ) ;
 	}
 	
-	public boolean loadLanguageFile( final String _file )
+	public static boolean loadLanguageFile( final String _file )
 	{
-		return languageManager.loadLanguageFile( _file ) ;
+		return resourceManager.languageManager.loadLanguageFile( _file ) ;
 	}
 	
-	public boolean containsLanguageFile( final String _file )
+	public static boolean containsLanguageFile( final String _file )
 	{
-		return languageManager.containsLanguageFile( _file ) ;
+		return resourceManager.languageManager.containsLanguageFile( _file ) ;
 	}
 
 	/* Game System Settings */
 
-	public Settings getConfig()
+	public static Settings getConfig()
 	{
-		return config ;
+		return resourceManager.config ;
 	}
 
-	public void setConfig( Settings _config )
+	public static void setConfig( Settings _config )
 	{
-		config = _config ;
+		resourceManager.config = _config ;
 	}
 
 	/* File System */
-	public void setFileSystem( final FileSystem _fileSystem )
+	public static void setFileSystem( final FileSystem _fileSystem )
 	{
-		fileSystem = _fileSystem ;
+		resourceManager.fileSystem = _fileSystem ;
 	}
 	
-	public FileSystem getFileSystem()
+	public static FileSystem getFileSystem()
 	{
-		return fileSystem ;
+		return resourceManager.fileSystem ;
 	}
 
 	/**
 		Clear all allocated resources
 		irrelevant of references.
 	**/
-	public void clear()
+	public static void clear()
 	{
-		spriteManager.clear() ;
-		languageManager.clear() ;
+		resourceManager.spriteManager.clear() ;
+		resourceManager.languageManager.clear() ;
 	}
 
 	/**
 		Remove unused resources
 	**/
-	public void clean()
+	public static void clean()
 	{
-		spriteManager.clean() ;
+		resourceManager.spriteManager.clean() ;
 	}
 	
 	/**
 		Clear resources and shutdown connections with Sound System
 	**/
-	public void shutdown()
+	public static void shutdown()
 	{
 		clear() ;
 		//soundManager.shutdown() ;

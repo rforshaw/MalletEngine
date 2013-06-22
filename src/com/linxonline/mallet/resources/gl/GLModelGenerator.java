@@ -23,7 +23,7 @@ public class GLModelGenerator
 			return model ;
 		}
 
-		GLGeometry geometry = new GLGeometry( 6, 4 ) ;
+		final GLGeometry geometry = new GLGeometry( 6, 4 ) ;
 		geometry.addVertex( new Vector3( 0, 0, 0 ),
 							new Vector3( 0, 0, 1 ),
 							new Vector2( 0, 0 ) ) ;
@@ -46,6 +46,7 @@ public class GLModelGenerator
 		
 		model = new Model( geometry ) ;
 		models.bind( geometry ) ;
+
 		models.add( _name, model ) ;
 
 		model.register() ;

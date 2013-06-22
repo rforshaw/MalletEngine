@@ -8,7 +8,7 @@ public final class Ratio
 	private int ratioA = 0 ;
 	private int ratioB = 0 ;
 
-	public Ratio( final int _a, final int _b )
+	private Ratio( final int _a, final int _b )
 	{
 		ratioA = _a ;
 		ratioB = _b ;

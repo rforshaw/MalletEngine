@@ -154,26 +154,25 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final String file = _settings.getString( "FILE", null ) ;
 					if( ( texture = loadTexture( file ) ) != null )
 					{
-						_settings.addObject( "TEXTURE", texture ) ;
-						String fill = _settings.getString( "FILL", null ) ;
 						Vector2 fillDim = _settings.getObject( "FILL", Vector2.class, null ) ;
-
-						String dim = _settings.getString( "DIM", null ) ;
 						Vector2 dimension = _settings.getObject( "DIM", Vector2.class, null ) ;
 						if( dimension == null )
 						{
 							dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
-							dim = dimension.toString() ;
 						}
 
 						if( fillDim == null )
 						{
-							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( dim, dimension ) ) ;
+							final String name = dimension.toString() ;
+							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
+							_settings.addObject( "TEXTURE", texture ) ;
 						}
 						else
 						{
 							final Vector2 div = Vector2.divide( fillDim, dimension ) ;
-							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( fill + dim, fillDim, div ) ) ;
+							final String name = fillDim.toString() + dimension.toString() ;
+							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, div ) ) ;
+							_settings.addObject( "TEXTURE", texture ) ;
 						}
 					}
 				}
