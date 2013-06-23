@@ -2,6 +2,11 @@ package com.linxonline.mallet.util.inspect ;
 
 import com.linxonline.mallet.maths.Ratio ;
 
+/**
+	Store the information about a particular state a screen can cope with.
+	With vanilla Java refreshRate of 0, means unknown, and bitDepth of -1 
+	means either multi-depth supported, or unknown.
+**/
 public class ScreenMode
 {
 	private final int width ;

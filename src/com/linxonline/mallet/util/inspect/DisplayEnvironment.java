@@ -8,6 +8,9 @@ public class DisplayEnvironment
 {
 	public DisplayEnvironment() {}
 
+	/**
+		Returns the detected screens located on the running device.
+	**/
 	public Screen[] getScreens()
 	{
 		final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment() ;

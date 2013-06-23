@@ -2,6 +2,10 @@ package com.linxonline.mallet.util.inspect ;
 
 import java.util.ArrayList ;
 
+/**
+	Screens contains the information about a specific screen 
+	connected to the computer.
+**/
 public class Screen
 {
 	private final String id ;
@@ -12,8 +16,22 @@ public class Screen
 		id = _id ;
 		modes = _modes ;
 	}
-	
-	public ScreenMode[] getScreenModes() { return modes ; }
+
+	/**
+		Returns the unique identifier for this screen
+	**/
+	public String getID()
+	{
+		return id ;
+	}
+
+	/**
+		Returns a list of different modes the screen can be placed in.
+	**/
+	public ScreenMode[] getScreenModes()
+	{
+		return modes ;
+	}
 
 	@Override
 	public String toString()
