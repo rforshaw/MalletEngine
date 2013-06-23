@@ -14,7 +14,7 @@ import com.linxonline.mallet.resources.sound.* ;
 	// Get Sound ID
 // Modify running sound
 
-public class AudioSystem implements EventHandler
+public class AudioSystem extends EventUpdater
 {
 	private static final String[] EVENT_TYPES = { "AUDIO" } ;
 	private static final String REQUEST_TYPE = "REQUEST_TYPE" ;
@@ -61,19 +61,6 @@ public class AudioSystem implements EventHandler
 		removeActiveSounds() ;
 	}
 
-	protected void updateEvents()
-	{
-		messenger.refreshEvents() ;
-		final int eventSize = messenger.size() ;
-		Event event = null ;
-
-		for( int i = 0; i < eventSize; ++i )
-		{
-			event = messenger.getAt( i ) ;
-			useEventInAudio( event ) ;
-		}
-	}
-
 	protected void updateActiveSounds()
 	{
 		final int size = activeSounds.size() ;
@@ -91,7 +78,7 @@ public class AudioSystem implements EventHandler
 		}
 	}
 
-	protected void useEventInAudio( final Event _event )
+	protected void useEvent( final Event _event )
 	{
 		final Settings audio = ( Settings )_event.getVariable() ;
 		final int type = audio.getInteger( REQUEST_TYPE, -1 ) ;
@@ -238,11 +225,9 @@ public class AudioSystem implements EventHandler
 	@Override
 	public final void processEvent( final Event _event )
 	{
-		// Only add the Event to the message pool,
-		// if an AudioSource can be created.
 		if( sourceGenerator != null )
 		{
-			messenger.addEvent( _event ) ;
+			super.processEvent( _event ) ;
 		}
 	}
 

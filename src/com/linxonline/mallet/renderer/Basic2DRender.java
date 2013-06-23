@@ -9,7 +9,7 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.texture.* ;
 
-public abstract class Basic2DRender implements RenderInterface
+public abstract class Basic2DRender extends EventUpdater implements RenderInterface
 {
 	protected static final int ALIGN_LEFT = 0 ;
 	protected static final int ALIGN_RIGHT = 1 ;
@@ -55,17 +55,6 @@ public abstract class Basic2DRender implements RenderInterface
 
 	@Override
 	public abstract void draw() ;
-
-	protected void updateEvents()
-	{
-		messenger.refreshEvents() ;
-		final int eventSize = messenger.size() ;
-
-		for( int i = 0; i < eventSize; ++i )
-		{
-			useEvent( messenger.getAt( i ) ) ;
-		}
-	}
 
 	protected void useEvent( final Event _event )
 	{
@@ -185,12 +174,6 @@ public abstract class Basic2DRender implements RenderInterface
 		}
 
 		content.add( _data ) ;
-	}
-
-	@Override
-	public final void processEvent( final Event _event )
-	{
-		messenger.addEvent( _event ) ;
 	}
 
 	@Override
