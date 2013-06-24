@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;
@@ -36,13 +35,11 @@ public class DrawFactory
 										final Vector2 _clipOffset,	// Not needed
 										final int _layer )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final Settings settings = new Settings() ;
 
 		settings.addInteger( REQUEST_TYPE, DrawRequestType.CREATE_DRAW ) ;
 		settings.addInteger( TYPE, DrawRequestType.TEXTURE ) ;
 
-		//if( _file != null ) { settings.addObject( TEXTURE, resources.getTexture( _file ) ) ; }
 		if( _file != null ) { settings.addString( "FILE", _file ) ; }
 		if( _dim != null ) { settings.addObject( DIM, _dim ) ; }
 		if( _fill != null ) { settings.addObject( FILL, _fill ) ; }
@@ -62,7 +59,6 @@ public class DrawFactory
 										final Vector2 _clipOffset,	// Not needed
 										final int _layer )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final Settings settings = new Settings() ;
 
 		settings.addInteger( REQUEST_TYPE, DrawRequestType.CREATE_DRAW ) ;
@@ -89,7 +85,6 @@ public class DrawFactory
 										final Vector2 _clipOffset,	// Not needed
 										final int _layer )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final Settings settings = new Settings() ;
 
 		settings.addInteger( REQUEST_TYPE, DrawRequestType.CREATE_DRAW ) ;
@@ -114,7 +109,6 @@ public class DrawFactory
 										final int _layer,
 										final int _alignment )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final Settings settings = new Settings() ;
 
 		settings.addInteger( REQUEST_TYPE, DrawRequestType.CREATE_DRAW ) ;

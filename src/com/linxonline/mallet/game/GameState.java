@@ -18,6 +18,7 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.physics.* ;
+import com.linxonline.mallet.animation.* ;
 
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;
@@ -41,14 +42,15 @@ public class GameState extends State implements HookEntity
 	protected final HashMap<Integer, UpdateInterface> updateModes = new HashMap<Integer, UpdateInterface>() ;
 	protected UpdateInterface currentUpdate = null ;						// Current Running Mode
 
-	protected SystemInterface system = null ;									// Provides access to Root systems
-	protected final AudioSystem audioSystem = new AudioSystem() ;				// Must specify a SourceGenerator
-	protected final EntitySystem entitySystem = new EntitySystem( this ) ;
-	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
-
 	protected final InputState inputSystem = new InputState() ;					// Internal Input System
 	protected final EventSystem eventSystem = new EventSystem() ;				// Internal Event System
 	protected final EventController eventController = new EventController() ;	// Used to process Events
+
+	protected SystemInterface system = null ;									// Provides access to Root systems
+	protected final AudioSystem audioSystem = new AudioSystem() ;				// Must specify a SourceGenerator
+	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
+	protected final EntitySystem entitySystem = new EntitySystem( this ) ;
+	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
 
 	protected boolean draw = true ;										// Used to force a Draw
 	protected double updateAccumulator = 0.0f ;							// Current dt update
@@ -293,6 +295,7 @@ public class GameState extends State implements HookEntity
 	{
 		eventSystem.addEventHandler( eventController ) ;
 		eventSystem.addEventHandler( audioSystem ) ;
+		eventSystem.addEventHandler( animationSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface() ) ;
 
 		system.addEventHandler( eventController ) ;
@@ -338,6 +341,7 @@ public class GameState extends State implements HookEntity
 					
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
+					animationSystem.update( DEFAULT_TIMESTEP ) ;
 					audioSystem.update( DEFAULT_TIMESTEP ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
