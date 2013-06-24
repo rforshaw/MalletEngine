@@ -29,10 +29,8 @@ public class SpriteManager extends AbstractManager
 		ResourceManager resources = ResourceManager.getResourceManager() ;
 		ArrayList<String> texts = TextReader.getTextFile( _file ) ;
 
-		Sprite sprite = new Sprite() ;
-
 		int framerate = Integer.parseInt( texts.get( 0 ) ) ;
-		sprite.framerate = framerate ;
+		Sprite sprite = new Sprite( framerate ) ;
 
 		final int length = texts.size() ;
 		for( int i = 1; i < length; ++i )

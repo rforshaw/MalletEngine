@@ -187,7 +187,8 @@ public class AudioSystem extends EventUpdater
 		final AudioSource source = sourceGenerator.createAudioSource( sound ) ;
 		if( source != null )
 		{
-			final ActiveSound active = new ActiveSound( numID, source, sound ) ;
+			// Increment numID, so next ActiveSource will have a unique ID
+			final ActiveSound active = new ActiveSound( numID++, source, sound ) ;
 			return active ;
 		}
 

@@ -7,10 +7,18 @@ import com.linxonline.mallet.resources.Resource ;
 public final class Sprite extends Resource
 {
 	private static final String type = "SPRITE" ;
-	public int framerate = 30 ;
+	public final int framerate ;
 	public final ArrayList<String> textures = new ArrayList<String>() ;
 
-	public Sprite() {}
+	public Sprite()
+	{
+		framerate = 30 ;
+	}
+
+	public Sprite( final int _framerate )
+	{
+		framerate = _framerate ;
+	}
 
 	public void addTexture( String _texture )
 	{
