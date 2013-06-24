@@ -2,6 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventUpdater ;
+import com.linxonline.mallet.util.settings.Settings ;
 
 public class AnimationSystem extends EventUpdater
 {
@@ -27,8 +28,22 @@ public class AnimationSystem extends EventUpdater
 		
 		switch( type )
 		{
-			case AnimRequestType.
+			case AnimRequestType.CREATE_ANIMATION :
+			{
+				createAnimation( anim ) ;
+				break ;
+			}
+			case AnimRequestType.MODIFY_EXISTING_ANIMATION :
+			{
+				
+				break ;
+			}
 		}
+	}
+
+	protected void createAnimation( final Settings _anim )
+	{
+		
 	}
 
 	@Override
