@@ -20,7 +20,16 @@ public class AnimationSystem extends EventUpdater
 
 	protected void removeAnimations() {}
 	
-	protected void useEvent( final Event _event ) {}
+	protected void useEvent( final Event _event )
+	{
+		final Settings anim = ( Settings )_event.getVariable() ;
+		final int type = anim.getInteger( "REQUEST_TYPE", -1 ) ;
+		
+		switch( type )
+		{
+			case AnimRequestType.
+		}
+	}
 
 	@Override
 	public final void passEvent( final Event _event ) {}

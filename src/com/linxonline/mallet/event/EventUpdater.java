@@ -1,5 +1,9 @@
 package com.linxonline.mallet.event ;
 
+/**
+	Used by the Audio, Renderer & Animation systems.
+	Deals with the same Event updating code that they all need.
+**/
 public abstract class EventUpdater implements EventHandler
 {
 	private final EventMessenger messenger = new EventMessenger() ;
