@@ -8,33 +8,23 @@ import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.sound.* ;
+import com.linxonline.mallet.util.SystemRoot ;
 
 // Play Sound
 	// Set callback on Sound
 	// Get Sound ID
 // Modify running sound
 
-public class AudioSystem extends EventUpdater
+public class AudioSystem extends SystemRoot<ActiveSound>
 {
 	private static final String[] EVENT_TYPES = { "AUDIO" } ;
-	private static final String REQUEST_TYPE = "REQUEST_TYPE" ;
-	private static final String AUDIO_FILE = "AUDIO_FILE" ;
-	private static final String MODIFY_AUDIO = "MODIFY_AUDIO" ;
-	private static final String PLAYBACK_REQUEST = "PLAYBACK_REQUEST" ;
-	private static final String ID_REQUEST = "ID_REQUEST" ;
-	private static final String ID = "ID" ;
-
-	private int numID = 0 ;
 
 	protected final static SoundManager soundManager = new SoundManager() ;
 
-	private final HashMap<Integer, ActiveSound> sounds = new HashMap<Integer, ActiveSound>() ;
-	private final ArrayList<ActiveSound> activeSounds = new ArrayList<ActiveSound>() ;
-	private final ArrayList<ActiveSound> removeSounds = new ArrayList<ActiveSound>() ;
-
-	private final EventMessenger messenger = new EventMessenger() ;
 	private SourceGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
-	private AddEventInterface eventSystem = null ;					// Used to pass Events to designated EventSystem.
+	
+
+	private int numID = 0 ;
 
 	public AudioSystem() {}
 
@@ -54,34 +44,26 @@ public class AudioSystem extends EventUpdater
 		sourceGenerator = _generator ;
 	}
 
-	public void update( final float _dt )
+	@Override
+	protected void updateSource( final ActiveSound _source, final float _dt )
 	{
-		updateEvents() ;
-		updateActiveSounds() ;
-		removeActiveSounds() ;
-	}
-
-	protected void updateActiveSounds()
-	{
-		final int size = activeSounds.size() ;
-		ActiveSound sound = null ;
-
-		for( int i = 0; i < size; ++i )
+		if( _source.update() == true )
 		{
-			sound = activeSounds.get( i ) ;
-			// If ActiveSound has finished playing,
-			// place in removal pool
-			if( sound.update() == true )
-			{
-				removeSounds.add( sound ) ;
-			}
+			removeSources.add( _source ) ;
 		}
 	}
 
+	@Override
+	protected void destroySource( final ActiveSound _source )
+	{
+		_source.destroy() ;
+	}
+
+	@Override
 	protected void useEvent( final Event _event )
 	{
 		final Settings audio = ( Settings )_event.getVariable() ;
-		final int type = audio.getInteger( REQUEST_TYPE, -1 ) ;
+		final int type = audio.getInteger( "REQUEST_TYPE", -1 ) ;
 
 		switch( type )
 		{
@@ -93,9 +75,9 @@ public class AudioSystem extends EventUpdater
 			case RequestType.MODIFY_EXISTING_AUDIO :
 			{
 				final int id = audio.getInteger( "ID", -1 ) ;
-				if( sounds.containsKey( id ) == true )
+				if( sources.containsKey( id ) == true )
 				{
-					modifyAudio( audio, sounds.get( id ) ) ;
+					modifyAudio( audio, sources.get( id ) ) ;
 				}
 				break ;
 			}
@@ -104,14 +86,14 @@ public class AudioSystem extends EventUpdater
 
 	protected void creatAudio( final Settings _audio )
 	{
-		final String file = _audio.getString( AUDIO_FILE, null ) ;
+		final String file = _audio.getString( "AUDIO_FILE", null ) ;
 		if( file != null )
 		{
 			final ActiveSound sound = createActiveSound( file ) ;
 			if( sound != null )
 			{
 				passIDToCallback( sound.id, _audio ) ;
-				storeActiveSound( sound ) ;
+				storeSource( sound, sound.id ) ;
 				sound.play() ;
 			}
 			return ;
@@ -123,7 +105,7 @@ public class AudioSystem extends EventUpdater
 	**/
 	protected void modifyAudio( final Settings _settings, final ActiveSound _sound )
 	{
-		final int type = _settings.getInteger( MODIFY_AUDIO, -1 ) ;
+		final int type = _settings.getInteger( "MODIFY_AUDIO", -1 ) ;
 		switch( type )
 		{
 			case ModifyAudio.PLAY :
@@ -154,7 +136,7 @@ public class AudioSystem extends EventUpdater
 			}
 			case ModifyAudio.ADD_PLAYBACK :
 			{
-				final PlaybackInterface playback = _settings.getObject( PLAYBACK_REQUEST, PlaybackInterface.class, null ) ;
+				final PlaybackInterface playback = _settings.getObject( "PLAYBACK_REQUEST", PlaybackInterface.class, null ) ;
 				if( playback != null )
 				{
 					_sound.addPlayback( playback ) ;
@@ -163,7 +145,7 @@ public class AudioSystem extends EventUpdater
 			}
 			case ModifyAudio.REMOVE_PLAYBACK :
 			{
-				final PlaybackInterface playback = _settings.getObject( PLAYBACK_REQUEST, PlaybackInterface.class, null ) ;
+				final PlaybackInterface playback = _settings.getObject( "PLAYBACK_REQUEST", PlaybackInterface.class, null ) ;
 				if( playback != null )
 				{
 					_sound.removePlayback( playback ) ;
@@ -171,12 +153,6 @@ public class AudioSystem extends EventUpdater
 				break ;
 			}
 		}
-	}
-
-	protected void storeActiveSound( final ActiveSound _sound )
-	{
-		activeSounds.add( _sound ) ;
-		sounds.put( _sound.id, _sound ) ;
 	}
 
 	protected ActiveSound createActiveSound( final String _file )
@@ -201,26 +177,11 @@ public class AudioSystem extends EventUpdater
 	**/
 	protected void passIDToCallback( final int _id, final Settings _audio )
 	{
-		final IDInterface idInterface = _audio.getObject( ID_REQUEST, IDInterface.class, null ) ;
+		final IDInterface idInterface = _audio.getObject( "ID_REQUEST", IDInterface.class, null ) ;
 		if( idInterface != null )
 		{
 			idInterface.recievedID( _id ) ;
 		}
-	}
-
-	/**
-		Remove ActiveSounds from the removeSounds array.
-	**/
-	protected void removeActiveSounds()
-	{
-		// Remove Completed Sounds
-		for( final ActiveSound remove : removeSounds )
-		{
-			remove.destroy() ;
-			activeSounds.remove( remove ) ;
-		}
-
-		removeSounds.clear() ;
 	}
 
 	@Override
@@ -233,116 +194,8 @@ public class AudioSystem extends EventUpdater
 	}
 
 	@Override
-	public final void passEvent( final Event _event )
-	{
-		if( eventSystem != null )
-		{
-			eventSystem.addEvent( _event ) ;
-		}
-	}
-
-	@Override
 	public final String[] getWantedEventTypes()
 	{
 		return EVENT_TYPES ;
-	}
-
-	private class ActiveSound
-	{
-		private final ArrayList<PlaybackInterface> playbacks = new ArrayList<PlaybackInterface>() ;
-		private final AudioSource source ;
-		private final Sound sound ;
-		private int id = -1 ;
-
-		public ActiveSound( final int _id, final AudioSource _source, final Sound _sound )
-		{
-			id = _id ;
-			source = _source ;
-			sound = _sound ;
-		}
-
-		public void addPlayback( final PlaybackInterface _playback )
-		{
-			if( playbacks.contains( _playback ) == false )
-			{
-				playbacks.add( _playback ) ;
-			}
-		}
-
-		public void removePlayback( final PlaybackInterface _playback )
-		{
-			if( playbacks.contains( _playback ) == true )
-			{
-				playbacks.remove( _playback ) ;
-			}
-		}
-
-		public void play()
-		{
-			source.play() ;
-		}
-
-		public void playLoop()
-		{
-			source.playLoop() ;
-		}
-
-		public void pause()
-		{
-			final int length = playbacks.size() ;
-			for( int i = 0; i < length; ++i )
-			{
-				playbacks.get( i ).endPlayback( PlaybackInterface.PAUSE_PLAYBACK ) ;
-			}
-
-			source.pause() ;
-		}
-
-		public void stop()
-		{
-			final int length = playbacks.size() ;
-			for( int i = 0; i < length; ++i )
-			{
-				playbacks.get( i ).endPlayback( PlaybackInterface.STOP_PLAYBACK ) ;
-			}
-
-			source.stop() ;
-		}
-
-		public boolean update()
-		{
-			updatePlaybackTimes() ;
-			final boolean isPlaying = source.isPlaying() ;
-			if( isPlaying == false )
-			{
-				finishPlaybacks() ;
-			}
-
-			return !isPlaying ;
-		}
-
-		private void updatePlaybackTimes()
-		{
-			final int length = playbacks.size() ;
-			for( int i = 0; i < length; ++i )
-			{
-				playbacks.get( i ).updatePlayback( source.getCurrentTime() ) ;
-			}
-		}
-		
-		private void finishPlaybacks()
-		{
-			final int length = playbacks.size() ;
-			for( int i = 0; i < length; ++i )
-			{
-				playbacks.get( i ).endPlayback( PlaybackInterface.FINISHED_PLAYBACK ) ;
-			}
-		}
-
-		public void destroy()
-		{
-			source.destroySource() ;
-			sound.unregister() ;
-		}
 	}
 }

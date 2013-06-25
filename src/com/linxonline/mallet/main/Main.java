@@ -9,8 +9,6 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 
-import com.linxonline.mallet.util.inspect.* ;
-
 /*===========================================*/
 // Main
 // Test Main
@@ -48,14 +46,6 @@ public class Main
 			}
 		} ) ;
 
-		final DisplayEnvironment display = new DisplayEnvironment() ;
-		final Screen[] screens = display.getScreens() ;
-		
-		for( int i = 0; i < screens.length; i++ )
-		{
-			System.out.println( screens[i] ) ;
-		}
-		
 		game.setDefaultGameState( "DEFAULT" ) ;
 		game.runSystem() ;							// Begin running the game-loop
 	}

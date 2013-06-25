@@ -7,6 +7,7 @@ package com.linxonline.mallet.event ;
 public abstract class EventUpdater implements EventHandler
 {
 	private final EventMessenger messenger = new EventMessenger() ;
+	protected AddEventInterface eventSystem = null ;					// Used to pass Events to designated EventSystem.
 
 	protected abstract void useEvent( final Event _event ) ;
 
@@ -25,5 +26,13 @@ public abstract class EventUpdater implements EventHandler
 	public void processEvent( final Event _event )
 	{
 		messenger.addEvent( _event ) ;
+	}
+	
+	@Override
+	public void passEvent( final Event _event )
+	{
+		// If we are passing an Event, we'll want to know if the EventSystem is null,
+		// So crash!
+		eventSystem.addEvent( _event ) ;
 	}
 }

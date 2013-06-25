@@ -11,6 +11,8 @@ import com.linxonline.mallet.resources.texture.* ;
 
 public abstract class Basic2DRender extends EventUpdater implements RenderInterface
 {
+	protected static final String[] EVENT_TYPES = { "DRAW", "CAMERA" } ;
+
 	protected static final int ALIGN_LEFT = 0 ;
 	protected static final int ALIGN_RIGHT = 1 ;
 	protected static final int ALIGN_CENTRE = 2 ;
@@ -18,12 +20,6 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final String BLANK_TEXT = "" ;
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
-
-	protected final static String REQUEST_TYPE = "REQUEST_TYPE" ;
-	protected final static String TYPE = "TYPE" ;
-	protected final static String POS = "POS" ;
-	protected final static String ACC = "ACC" ;
-	protected static final String[] EVENT_TYPES = { "DRAW", "CAMERA" } ;
 
 	protected final ArrayList<RenderData> content = new ArrayList<RenderData>() ;
 	protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;
@@ -71,17 +67,17 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected void useEventInCamera( final Event _event )
 	{
 		final Settings camera = ( Settings )_event.getVariable() ;
-		final int type = camera.getInteger( REQUEST_TYPE, -1 ) ;
+		final int type = camera.getInteger( "REQUEST_TYPE", -1 ) ;
 		switch( type )
 		{
 			case CameraRequestType.SET_CAMERA_POSITION :
 			{
-				renderInfo.setCameraPosition( camera.getObject( POS, Vector3.class, null ) ) ;
+				renderInfo.setCameraPosition( camera.getObject( "POS", Vector3.class, null ) ) ;
 				break ;
 			}
 			case CameraRequestType.UPDATE_CAMERA_POSITION :
 			{
-				renderInfo.addToCameraPosition( camera.getObject( ACC, Vector3.class, null ) ) ;
+				renderInfo.addToCameraPosition( camera.getObject( "ACC", Vector3.class, null ) ) ;
 				break ;
 			}
 		}
@@ -90,7 +86,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected void useEventInDraw( final Event _event )
 	{
 		final Settings draw = ( Settings )_event.getVariable() ;
-		final int type = draw.getInteger( REQUEST_TYPE, -1 ) ;
+		final int type = draw.getInteger( "REQUEST_TYPE", -1 ) ;
 
 		switch( type )
 		{
