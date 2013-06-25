@@ -50,7 +50,11 @@ public class AnimationSystem extends SystemRoot<Animation>
 			}
 			case AnimRequestType.MODIFY_EXISTING_ANIMATION :
 			{
-				modifyAnimation( anim ) ;
+				final Animation animation = getSource( anim.getInteger( "ID", -1 ) ) ;
+				if( animation != null )
+				{
+					modifyAnimation( anim, animation ) ;
+				}
 				break ;
 			}
 		}
@@ -72,7 +76,25 @@ public class AnimationSystem extends SystemRoot<Animation>
 		}
 	}
 
-	protected void modifyAnimation( final Settings _anim ) {}
+	protected void modifyAnimation(  final Settings _settings, final Animation _animation )
+	{
+		final int type = _settings.getInteger( "MODIFY_ANIMATION", -1 ) ;
+		switch( type )
+		{
+			case ModifyAnimation.PLAY :
+			{
+				break ;
+			}
+			case ModifyAnimation.STOP :
+			{
+				break ;
+			}
+			case ModifyAnimation.PAUSE :
+			{
+				break ;
+			}
+		}
+	}
 
 	/**
 		Pass the ActiveSound ID to the IDInterface provided.

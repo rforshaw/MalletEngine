@@ -14,7 +14,6 @@ import java.awt.image.BufferStrategy ;
 import java.awt.image.BufferedImage ;
 import java.awt.geom.AffineTransform ;
 
-import com.linxonline.mallet.util.capture.DesktopCaptureScreen ;
 import com.linxonline.mallet.resources.TextureManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.maths.* ;

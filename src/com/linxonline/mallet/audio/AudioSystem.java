@@ -74,10 +74,10 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			}
 			case RequestType.MODIFY_EXISTING_AUDIO :
 			{
-				final int id = audio.getInteger( "ID", -1 ) ;
-				if( sources.containsKey( id ) == true )
+				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
+				if( sound != null )
 				{
-					modifyAudio( audio, sources.get( id ) ) ;
+					modifyAudio( audio, sound ) ;
 				}
 				break ;
 			}

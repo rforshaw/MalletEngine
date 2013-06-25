@@ -28,6 +28,11 @@ public abstract class SystemRoot<T> extends EventUpdater
 		removeSources() ;
 	}
 
+	protected T getSource( final int _key )
+	{
+		return sources.get( _key ) ;
+	}
+	
 	protected void storeSource( final T _source, final int _id )
 	{
 		activeSources.add( _source ) ;
