@@ -25,13 +25,6 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 
 public class GameState extends State implements HookEntity
 {
-	protected static final String CAMERA = "CAMERA" ;
-	protected static final String COLLISIONCOMPONENT = "COLLISIONCOMPONENT" ;
-	protected static final String RENDERCOMPONENT = "RENDERCOMPONENT" ;
-	protected static final String INPUTCOMPONENT = "INPUTCOMPONENT" ;
-	protected static final String EVENTCOMPONENT = "EVENTCOMPONENT" ;
-	protected static final String QUERYCOMPONENT = "QUERYCOMPONENT" ;
-
 	public static final int GAME_MODE = 1 ;								// Update Logic & Render on a recurring basis
 	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input
 
@@ -147,14 +140,14 @@ public class GameState extends State implements HookEntity
 	{
 		ArrayList<Component> components = null ;
 
-		components = _entity.getComponentByGroup( COLLISIONCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			CollisionComponent coll = ( CollisionComponent )comp ;
 			collisionSystem.add( coll.hull ) ;
 		}
 
-		components = _entity.getComponentByGroup( RENDERCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "RENDERCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
@@ -166,14 +159,14 @@ public class GameState extends State implements HookEntity
 			render.addDrawCalls() ;
 		}
 
-		components = _entity.getComponentByGroup( INPUTCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			InputHandler component = ( InputHandler )comp ;
 			inputSystem.addInputHandler( component ) ;
 		}
 
-		components = _entity.getComponentByGroup( EVENTCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
@@ -182,7 +175,7 @@ public class GameState extends State implements HookEntity
 			eventSystem.addEventHandler( controller ) ;
 		}
 
-		components = _entity.getComponentByGroup( QUERYCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			QueryComponent component = ( QueryComponent )comp ;
@@ -200,14 +193,14 @@ public class GameState extends State implements HookEntity
 	{
 		ArrayList<Component> components = null ;
 
-		components = _entity.getComponentByGroup( COLLISIONCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			CollisionComponent coll = ( CollisionComponent )comp ;
 			collisionSystem.remove( coll.hull ) ;
 		}
 
-		components = _entity.getComponentByGroup( RENDERCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "RENDERCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			final RenderComponent render = ( RenderComponent )comp ;
@@ -219,14 +212,14 @@ public class GameState extends State implements HookEntity
 			eventSystem.removeEventHandler( controller ) ;
 		}
 
-		components = _entity.getComponentByGroup( INPUTCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			InputHandler component = ( InputHandler )comp ;
 			inputSystem.removeInputHandler( component ) ;
 		}
 
-		components = _entity.getComponentByGroup( EVENTCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
@@ -235,7 +228,7 @@ public class GameState extends State implements HookEntity
 			eventSystem.removeEventHandler( controller ) ;
 		}
 
-		components = _entity.getComponentByGroup( QUERYCOMPONENT ) ;
+		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
 		for( Component comp : components )
 		{
 			QueryComponent component = ( QueryComponent )comp ;
