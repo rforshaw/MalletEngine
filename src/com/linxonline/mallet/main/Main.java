@@ -8,6 +8,7 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.util.SourceCallback ;
 
 /*===========================================*/
 // Main
@@ -43,6 +44,19 @@ public class Main
 																null,								// clip
 																null,								// clip offset
 																10 ) ) ;							// layer
+			
+				eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
+				{
+					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
+					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
+
+					public void start() { System.out.println( "Source began playing" ) ; }
+					public void pause() { System.out.println( "Source has been paused" ) ; }
+					public void stop() { System.out.println( "Source has been stopped" ) ; }
+
+					public void update( final float _dt ) { System.out.println( _dt ) ; }
+					public void finished() { System.out.println( "Source has finished" ) ; }
+				} ) ) ;
 			}
 		} ) ;
 

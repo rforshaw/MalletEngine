@@ -5,10 +5,11 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.sound.Sound ;
+import com.linxonline.mallet.util.SourceCallback ;
 
 public class ActiveSound
 {
-	private final ArrayList<PlaybackInterface> playbacks = new ArrayList<PlaybackInterface>() ;
+	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	private final AudioSource source ;
 	private final Sound sound ;
 	public final int id ;
@@ -20,86 +21,97 @@ public class ActiveSound
 		sound = _sound ;
 	}
 
-	public void addPlayback( final PlaybackInterface _playback )
+	public void addCallback( final SourceCallback _callback )
 	{
-		if( playbacks.contains( _playback ) == false )
+		if( callbacks.contains( _callback ) == false )
 		{
-			playbacks.add( _playback ) ;
+			callbacks.add( _callback ) ;
+			_callback.recieveID( id ) ;
 		}
 	}
 
-	public void removePlayback( final PlaybackInterface _playback )
+	public void removeCallback( final SourceCallback _callback )
 	{
-		if( playbacks.contains( _playback ) == true )
+		if( callbacks.contains( _callback ) == true )
 		{
-			playbacks.remove( _playback ) ;
+			callbacks.remove( _callback ) ;
+			_callback.callbackRemoved() ;
 		}
 	}
 
 	public void play()
 	{
 		source.play() ;
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).start() ;
+		}
 	}
 
 	public void playLoop()
 	{
 		source.playLoop() ;
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).start() ;
+		}
 	}
 
 	public void pause()
 	{
-		final int length = playbacks.size() ;
+		source.pause() ;
+		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			playbacks.get( i ).endPlayback( PlaybackInterface.PAUSE_PLAYBACK ) ;
+			callbacks.get( i ).pause() ;
 		}
-
-		source.pause() ;
 	}
 
 	public void stop()
 	{
-		final int length = playbacks.size() ;
+		source.stop() ;
+		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			playbacks.get( i ).endPlayback( PlaybackInterface.STOP_PLAYBACK ) ;
+			callbacks.get( i ).stop() ;
 		}
-
-		source.stop() ;
 	}
 
 	public boolean update()
 	{
-		updatePlaybackTimes() ;
+		updateCallbacks() ;
 		final boolean isPlaying = source.isPlaying() ;
 		if( isPlaying == false )
 		{
-			finishPlaybacks() ;
+			finished() ;
 		}
 
 		return !isPlaying ;
 	}
 
-	private void updatePlaybackTimes()
+	private void updateCallbacks()
 	{
-		final int length = playbacks.size() ;
+		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			playbacks.get( i ).updatePlayback( source.getCurrentTime() ) ;
+			callbacks.get( i ).update( source.getCurrentTime() ) ;
 		}
 	}
 	
-	private void finishPlaybacks()
+	private void finished()
 	{
-		final int length = playbacks.size() ;
+		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			playbacks.get( i ).endPlayback( PlaybackInterface.FINISHED_PLAYBACK ) ;
+			callbacks.get( i ).finished() ;
 		}
 	}
 
 	public void destroy()
 	{
+		callbacks.clear() ;
 		source.destroySource() ;
 		sound.unregister() ;
 	}

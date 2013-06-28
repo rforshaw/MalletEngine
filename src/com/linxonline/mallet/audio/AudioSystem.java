@@ -9,6 +9,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.util.SystemRoot ;
+import com.linxonline.mallet.util.SourceCallback ;
 
 // Play Sound
 	// Set callback on Sound
@@ -20,11 +21,8 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	private static final String[] EVENT_TYPES = { "AUDIO" } ;
 
 	protected final static SoundManager soundManager = new SoundManager() ;
-
-	private SourceGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
-	
-
-	private int numID = 0 ;
+	protected SourceGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
+	protected int numID = 0 ;
 
 	public AudioSystem() {}
 
@@ -92,7 +90,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			final ActiveSound sound = createActiveSound( file ) ;
 			if( sound != null )
 			{
-				passIDToCallback( sound.id, _audio ) ;
+				addCallbackToSound( sound, _audio ) ;
 				storeSource( sound, sound.id ) ;
 				sound.play() ;
 			}
@@ -136,19 +134,19 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			}
 			case ModifyAudio.ADD_PLAYBACK :
 			{
-				final PlaybackInterface playback = _settings.getObject( "PLAYBACK_REQUEST", PlaybackInterface.class, null ) ;
-				if( playback != null )
+				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
+				if( callback != null )
 				{
-					_sound.addPlayback( playback ) ;
+					_sound.addCallback( callback ) ;
 				}
 				break ;
 			}
 			case ModifyAudio.REMOVE_PLAYBACK :
 			{
-				final PlaybackInterface playback = _settings.getObject( "PLAYBACK_REQUEST", PlaybackInterface.class, null ) ;
-				if( playback != null )
+				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
+				if( callback != null )
 				{
-					_sound.removePlayback( playback ) ;
+					_sound.removeCallback( callback ) ;
 				}
 				break ;
 			}
@@ -157,9 +155,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 
 	protected ActiveSound createActiveSound( final String _file )
 	{
-		//final ResourceManager resource = ResourceManager.getResourceManager() ;
 		final Sound sound = ( Sound )soundManager.get( _file ) ;
-
 		final AudioSource source = sourceGenerator.createAudioSource( sound ) ;
 		if( source != null )
 		{
@@ -175,12 +171,12 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 		Pass the ActiveSound ID to the IDInterface provided.
 		Currently called when ActiveSound is created
 	**/
-	protected void passIDToCallback( final int _id, final Settings _audio )
+	protected void addCallbackToSound( final ActiveSound _sound, final Settings _audio )
 	{
-		final IDInterface idInterface = _audio.getObject( "ID_REQUEST", IDInterface.class, null ) ;
-		if( idInterface != null )
+		final SourceCallback callback = _audio.getObject( "CALLBACK", SourceCallback.class, null ) ;
+		if( callback != null )
 		{
-			idInterface.recievedID( _id ) ;
+			_sound.addCallback( callback ) ;
 		}
 	}
 
