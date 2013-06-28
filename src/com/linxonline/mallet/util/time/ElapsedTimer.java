@@ -11,6 +11,10 @@ public abstract class ElapsedTimer
 
 	public ElapsedTimer() {}
 
+	/**
+		If the Operating System does not support the DefaultTimer, 
+		you can substitute your own.
+	**/
 	public static void setTimer( final TimerInterface _time )
 	{
 		time = _time ;

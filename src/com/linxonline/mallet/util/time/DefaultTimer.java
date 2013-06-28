@@ -14,11 +14,11 @@ public class DefaultTimer implements TimerInterface
 	public final double getElapsedTimeInNanoSeconds()
 	{
 		nanoseconds = ( double )getLongElapsedTime() * 0.000000001 ;
-		seconds += nanoseconds ;
-		while( seconds >= 1.0f )
+		seconds += nanoseconds ;		// Accumulate the nanoseconds
+		while( seconds >= 1.0f )		// Once it reaches atleast 1 second store it 
 		{
 			seconds -= 1.0f ;
-			totalTimeSeconds++ ;
+			++totalTimeSeconds ;
 		}
 
 		return nanoseconds ;
