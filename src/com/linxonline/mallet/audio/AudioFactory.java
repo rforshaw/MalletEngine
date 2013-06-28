@@ -8,7 +8,7 @@ import com.linxonline.mallet.audio.ModifyAudio ;
 public class AudioFactory
 {
 	public AudioFactory() {}
-	
+
 	public static Event createAudio( final String _file, final SourceCallback _callback )
 	{
 		final Settings audio = new Settings() ;
@@ -17,13 +17,23 @@ public class AudioFactory
 		if( _callback != null ) { audio.addObject( "CALLBACK", _callback ) ; }
 		return new Event( "AUDIO", audio ) ;
 	}
-	
-	public static Event createCallback( final int _id, final SourceCallback _callback )
+
+	public static Event createAddCallback( final int _id, final SourceCallback _callback )
 	{
 		final Settings audio = new Settings() ;
 		audio.addInteger( "REQUEST_TYPE", RequestType.MODIFY_EXISTING_AUDIO ) ;
 		audio.addInteger( "ID", _id ) ;
-		audio.addInteger( "MODIFY_AUDIO", ModifyAudio.ADD_PLAYBACK ) ;
+		audio.addInteger( "MODIFY_AUDIO", ModifyAudio.ADD_CALLBACK ) ;
+		if( _callback != null ) { audio.addObject( "CALLBACK", _callback ) ; }
+		return new Event( "AUDIO", audio ) ;
+	}
+
+	public static Event createRemoveCallback( final int _id, final SourceCallback _callback )
+	{
+		final Settings audio = new Settings() ;
+		audio.addInteger( "REQUEST_TYPE", RequestType.MODIFY_EXISTING_AUDIO ) ;
+		audio.addInteger( "ID", _id ) ;
+		audio.addInteger( "MODIFY_AUDIO", ModifyAudio.REMOVE_CALLBACK ) ;
 		if( _callback != null ) { audio.addObject( "CALLBACK", _callback ) ; }
 		return new Event( "AUDIO", audio ) ;
 	}

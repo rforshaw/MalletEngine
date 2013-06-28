@@ -6,7 +6,7 @@ import java.util.HashMap ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.AddEventInterface ;
 import com.linxonline.mallet.util.SystemRoot ;
-import com.linxonline.mallet.util.id.IDInterface ;
+import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.SpriteManager ;
 import com.linxonline.mallet.resources.texture.Sprite ;
@@ -70,7 +70,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 			if( anim != null )
 			{
 				passEvent( event ) ;
-				passIDToCallback( anim.id, _anim ) ;
+				addCallbackToAnimation( anim, _anim ) ;
 				storeSource( anim, anim.id ) ;
 			}
 		}
@@ -100,12 +100,12 @@ public class AnimationSystem extends SystemRoot<Animation>
 		Pass the ActiveSound ID to the IDInterface provided.
 		Currently called when ActiveSound is created
 	**/
-	protected void passIDToCallback( final int _id, final Settings _anim )
+	protected void addCallbackToAnimation( final Animation _animation, final Settings _anim )
 	{
-		final IDInterface idInterface = _anim.getObject( "ID_REQUEST", IDInterface.class, null ) ;
-		if( idInterface != null )
+		final SourceCallback callback = _anim.getObject( "CALLBACK", SourceCallback.class, null ) ;
+		if( callback != null )
 		{
-			idInterface.recievedID( _id ) ;
+			//_animation.addCallback( callback ) ;
 		}
 	}
 

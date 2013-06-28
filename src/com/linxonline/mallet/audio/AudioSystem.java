@@ -4,7 +4,6 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.sound.* ;
@@ -92,7 +91,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			{
 				addCallbackToSound( sound, _audio ) ;
 				storeSource( sound, sound.id ) ;
-				sound.play() ;
+				sound.play() ;						// Assumed that sound will want to be played immediately.
 			}
 			return ;
 		}
@@ -132,7 +131,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 				// before stopping.
 				break ;
 			}
-			case ModifyAudio.ADD_PLAYBACK :
+			case ModifyAudio.ADD_CALLBACK :
 			{
 				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
 				if( callback != null )
@@ -141,7 +140,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 				}
 				break ;
 			}
-			case ModifyAudio.REMOVE_PLAYBACK :
+			case ModifyAudio.REMOVE_CALLBACK :
 			{
 				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
 				if( callback != null )

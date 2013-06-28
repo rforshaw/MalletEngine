@@ -12,6 +12,6 @@ public class ModifyAudio
 	public static final int LOOP_CONTINUOSLY = 40 ;
 	public static final int LOOP_SET = 50 ;
 	
-	public static final int ADD_PLAYBACK = 60 ;
-	public static final int REMOVE_PLAYBACK = 70 ;
+	public static final int ADD_CALLBACK = 60 ;
+	public static final int REMOVE_CALLBACK = 70 ;
 }

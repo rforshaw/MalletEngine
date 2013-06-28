@@ -91,15 +91,22 @@ public class ActiveSound
 		return !isPlaying ;
 	}
 
+	/**
+		Update registered callbacks with the sources current time position.
+	**/
 	private void updateCallbacks()
 	{
+		final float sourceDT = source.getCurrentTime() ;
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			callbacks.get( i ).update( source.getCurrentTime() ) ;
+			callbacks.get( i ).update( sourceDT ) ;
 		}
 	}
-	
+
+	/**
+		Called when Audio Source has finished playing.
+	**/
 	private void finished()
 	{
 		final int length = callbacks.size() ;
@@ -109,8 +116,17 @@ public class ActiveSound
 		}
 	}
 
+	/**
+		Call when Audio Source is to be cleaned up and resources unregistered.
+	**/
 	public void destroy()
 	{
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			callbacks.get( i ).callbackRemoved() ;
+		}
+
 		callbacks.clear() ;
 		source.destroySource() ;
 		sound.unregister() ;
