@@ -9,6 +9,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.tools.ogg.OGG ;
 
 /*===========================================*/
 // Main
@@ -44,8 +45,8 @@ public class Main
 																null,								// clip
 																null,								// clip offset
 																10 ) ) ;							// layer
-			
-				eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
+
+				/*eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
 				{
 					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
@@ -56,7 +57,7 @@ public class Main
 
 					public void update( final float _dt ) { System.out.println( _dt ) ; }
 					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;
+				} ) ) ;*/
 			}
 		} ) ;
 
@@ -71,5 +72,7 @@ public class Main
 		fileSystem.scanBaseDirectory() ;
 		
 		resource.setFileSystem( fileSystem ) ;
+		
+		OGG ogg = new OGG( "base/audio/0.ogg" ) ;
 	}
 }
