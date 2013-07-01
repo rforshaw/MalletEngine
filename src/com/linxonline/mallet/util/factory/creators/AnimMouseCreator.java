@@ -9,17 +9,9 @@ import com.linxonline.mallet.maths.* ;
 
 public class AnimMouseCreator extends Creator<Entity>
 {
-	private static final String ANIMMOUSE = "ANIMMOUSE" ;
-	private static final String MOUSE = "MOUSE" ;
-	private static final String DEFAULT = "DEFAULT" ;
-	private static final String LAYER = "LAYER" ;
-	private static final String OFFSET = "OFFSET" ;
-	private static final String FILL = "FILL" ;
-	private static final String DIM = "DIM" ;
-	
 	public AnimMouseCreator()
 	{
-		setType( ANIMMOUSE ) ;
+		setType( "ANIMMOUSE" ) ;
 	}
 
 	@Override
@@ -39,15 +31,15 @@ public class AnimMouseCreator extends Creator<Entity>
 
 		sprite.add( DrawFactory.createTexture( null,
 												entity.position,
-											   _mouse.getObject( OFFSET, Vector2.class, null ),
-											   _mouse.getObject( DIM, Vector2.class, null ),
-											   _mouse.getObject( FILL, Vector2.class, null ), 
+											   _mouse.getObject( "OFFSET", Vector2.class, null ),
+											   _mouse.getObject( "DIM", Vector2.class, null ),
+											   _mouse.getObject( "FILL", Vector2.class, null ), 
 											    null,		// Clip View 
 											    null,		// Clip Offset
-											   _mouse.getInteger( LAYER, 100 ) ) ) ;
+											   _mouse.getInteger( "LAYER", 100 ) ) ) ;
 
-		sprite.addSprite( resources.getSprite( _mouse.getString( MOUSE, null ) ), DEFAULT ) ;
-		sprite.setSpriteByName( DEFAULT ) ;
+		sprite.addSprite( resources.getSprite( _mouse.getString( "MOUSE", null ) ), "DEFAULT" ) ;
+		sprite.setSpriteByName( "DEFAULT" ) ;
 
 		entity.addComponent( sprite ) ;
 		entity.addComponent( mouse ) ;
