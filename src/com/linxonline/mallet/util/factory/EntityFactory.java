@@ -12,7 +12,7 @@ import com.linxonline.mallet.io.reader.RFReader ;
 	Assumes each Creator also parses the Settings object
 	passed to it.
 **/
-public class EntityFactory extends Factory
+public class EntityFactory extends Factory<Entity>
 {
 	/**public void  addCreator()**/
 	/**public boolean  removeCreator()**/
@@ -45,7 +45,7 @@ public class EntityFactory extends Factory
 
 	public Entity createEntity( final Settings _entity )
 	{
-		final Entity entity = ( Entity )create( _entity ) ;
+		final Entity entity = create( _entity ) ;
 		return entity != null ? entity : new Entity() ;
 	}
 }

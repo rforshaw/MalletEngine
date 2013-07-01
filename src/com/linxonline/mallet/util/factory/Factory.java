@@ -9,12 +9,13 @@ import com.linxonline.mallet.util.settings.Settings ;
 	Used by passing a Settings object to create(), which must 
 	contain a Key = TYPE with the value as a String.
 **/
-public class Factory implements FactoryInterface
+public class Factory<T> implements FactoryInterface<T>
 {
 	protected static final String TYPE = "TYPE" ;
-	protected HashMap<String, CreatorInterface> creators = new HashMap<String, CreatorInterface>() ;
+	protected final HashMap<String, CreatorInterface<T>> creators = new HashMap<String, CreatorInterface<T>>() ;
 
-	public void addCreator( final CreatorInterface _creator )
+	@Override
+	public void addCreator( final CreatorInterface<T> _creator )
 	{
 		final String type = _creator.getType() ;
 		if( exists( type ) == true )
@@ -26,11 +27,13 @@ public class Factory implements FactoryInterface
 		creators.put( type, _creator ) ;
 	}
 
-	public boolean removeCreator( final CreatorInterface _creator )
+	@Override
+	public boolean removeCreator( final CreatorInterface<T> _creator )
 	{
 		return removeCreator( _creator.getType() ) ;
 	}
 
+	@Override
 	public boolean removeCreator( final String _type )
 	{
 		if( exists( _type ) == true )
@@ -42,14 +45,15 @@ public class Factory implements FactoryInterface
 		return false ;
 	}
 
-	public Object create( final Settings _setting )
+	@Override
+	public T create( final Settings _setting )
 	{
 		final String type = _setting.getString( TYPE, null ) ;
 		if( type != null )
 		{
 			if( exists( type ) == true )
 			{
-				return creators.get( type ).create( _setting ) ;
+				return ( T )creators.get( type ).create( _setting ) ;
 			}
 		}
 

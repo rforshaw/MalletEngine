@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.factory.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class AnimMouseCreator extends Creator
+public class AnimMouseCreator extends Creator<Entity>
 {
 	private static final String ANIMMOUSE = "ANIMMOUSE" ;
 	private static final String MOUSE = "MOUSE" ;
@@ -23,7 +23,7 @@ public class AnimMouseCreator extends Creator
 	}
 
 	@Override
-	public Object create( final Settings _mouse )
+	public Entity create( final Settings _mouse )
 	{
 		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final Settings config = resources.getConfig() ;
