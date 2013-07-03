@@ -15,67 +15,55 @@ public class OGG
 	public OGG( final String _file )
 	{
 		final FileSystem fileSystem = ResourceManager.getResourceManager().getFileSystem() ;
-		final byte[] stream = fileSystem.getResourceRaw( "base/audio/0.ogg" ) ;
+		final byte[] stream = fileSystem.getResourceRaw( _file ) ;
 		createPages( stream ) ;
 	}
 
 	private void createPages( final byte[] _stream )
 	{
+		final ByteArrayOutputStream out = new ByteArrayOutputStream() ;
+		boolean end = false ;
 		int pos = 0 ;
-		boolean go = false ;
-
-		do
+		
+		while( end == false )
 		{
 			final String header = new String( ConvertBytes.toBytes( _stream, pos, 4 ) ) ;
-			final int version = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;
-			final int hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] ;
+
+			final int version = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] & 0xff ;	// unsigned byte
+			final int hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] & 0xff ;		// unsigned byte
 			final long gPosition = ConvertBytes.toLong( _stream, pos += 1, 8 ) ;
 			final int bSN = ConvertBytes.toInt( _stream, pos += 8, 4 ) ;
 			final int pSeq = ConvertBytes.toInt( _stream, pos += 4, 4 ) ;
 			final int checksum = ConvertBytes.toInt( _stream, pos += 4, 4 ) ;
-			final int pSeg = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;
+			final int pSeg = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] & 0xff ;		// unsigned byte
 			final byte[] segTable = ConvertBytes.toBytes( _stream, pos += 1, pSeg ) ;
 
-			final ByteArrayOutputStream output = new ByteArrayOutputStream() ;
 			try
 			{
-				output.write( ConvertBytes.toBytes( _stream, pos += pSeg, segTable[0] ) ) ;
-				for( int i = 1; i < segTable.length; i++ )
+				pos += pSeg ;
+				for( int i = 0; i < pSeg; i++ )
 				{
-					output.write( ConvertBytes.toBytes( _stream, pos += segTable[i - 1], segTable[i] ) ) ;
+					final int length = ( segTable[i] & 0xff ) ; 
+					out.write( ConvertBytes.toBytes( _stream, pos, length ) ) ;
+					pos += length ;
 				}
-				pos += segTable[segTable.length - 1] ;
 			}
 			catch( IOException ex )
 			{
 				ex.printStackTrace() ;
 			}
 
-			final byte[] data = output.toByteArray() ;
-			pages.add( new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ) ;
+			final byte[] data = out.toByteArray() ;
+			System.out.println( "Data: " + new String( data ) ) ;
+			System.out.println() ;
+			out.reset() ;
 
-			System.out.println( header ) ;
-			System.out.println( "Version: " + version ) ;
-			System.out.println( "Header Type: " + hType ) ;
-			System.out.println( "Granual Position: " + gPosition ) ;
-			System.out.println( "Bitstream Serial Number: " + bSN ) ;
-			System.out.println( "Page Seq: " + pSeq ) ;
-			System.out.println( "Checksum: " + checksum ) ;
-			System.out.println( "Page Seg: " + pSeg ) ;
-			System.out.println( "Data : " + new String( data ) ) ;
-			
-			final String nextHeader = new String( ConvertBytes.toBytes( _stream, pos, 4 ) ) ;
-			System.out.println( "Next Header: " + nextHeader ) ;
-			if( nextHeader.contains( "OggS" ) == true )
+			pages.add( new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ) ;
+			if( hType == 4 ) // 4 represents end of file, 0 means progressing & 2 represents start.
 			{
-				go = true ;
-			}
-			else
-			{
-				go = false ;
+				end = true ;
 			}
 		}
-		while( go == true ) ;
 	}
 
 	public class Page
