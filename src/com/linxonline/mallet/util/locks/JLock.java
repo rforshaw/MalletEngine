@@ -3,7 +3,7 @@ package com.linxonline.mallet.util.locks ;
 /**
 	Thread locking implemented via Java's notifyAll() and wait() functionality.
 **/
-public interface JLock
+public class JLock
 {
 	private final Object lock = new Object() ;
 
@@ -19,10 +19,7 @@ public interface JLock
 	{
 		synchronized( lock )
 		{
-			try
-			{
-				lock.wait()
-			}
+			try { lock.wait() ; }
 			catch( InterruptedException ex ) {}
 		}
 	}
