@@ -331,7 +331,7 @@ public class GameState extends State implements HookEntity
 				{
 					//System.out.println( 1.0f / updateAccumulator ) ;
 					eventController.update() ;
-					
+
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
 					animationSystem.update( DEFAULT_TIMESTEP ) ;
@@ -370,7 +370,7 @@ public class GameState extends State implements HookEntity
 					//System.out.println( 1.0f / updateAccumulator ) ;
 					final float dt = ( float )updateAccumulator ;
 					eventController.update() ;
-					
+
 					audioSystem.update( dt ) ;
 					collisionSystem.update( dt ) ;
 					entitySystem.update( dt ) ;
