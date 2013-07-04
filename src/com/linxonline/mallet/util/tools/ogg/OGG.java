@@ -4,19 +4,27 @@ import java.util.ArrayList ;
 import java.io.ByteArrayOutputStream ;
 import java.io.IOException ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
-import com.linxonline.mallet.io.filesystem.FileSystem ;
+import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 public class OGG
 {
 	public final ArrayList<Page> pages = new ArrayList<Page>() ;
 
-	public OGG( final String _file )
+	public static OGG readOGG( final String _file )
 	{
-		final FileSystem fileSystem = ResourceManager.getResourceManager().getFileSystem() ;
-		final byte[] stream = fileSystem.getResourceRaw( _file ) ;
-		createPages( stream ) ;
+		final byte[] stream = ByteReader.readBytes( _file ) ;
+		if( stream != null )
+		{
+			return new OGG( stream ) ;
+		}
+
+		return null ;
+	}
+
+	public OGG( final byte[] _stream )
+	{
+		createPages( _stream ) ;
 	}
 
 	private void createPages( final byte[] _stream )
@@ -24,7 +32,7 @@ public class OGG
 		final ByteArrayOutputStream out = new ByteArrayOutputStream() ;
 		boolean end = false ;
 		int pos = 0 ;
-		
+
 		while( end == false )
 		{
 			final String header = new String( ConvertBytes.toBytes( _stream, pos, 4 ) ) ;
@@ -54,8 +62,6 @@ public class OGG
 			}
 
 			final byte[] data = out.toByteArray() ;
-			System.out.println( "Data: " + new String( data ) ) ;
-			System.out.println() ;
 			out.reset() ;
 
 			pages.add( new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ) ;
@@ -63,40 +69,6 @@ public class OGG
 			{
 				end = true ;
 			}
-		}
-	}
-
-	public class Page
-	{
-		final String header ;
-		final int version ;
-		final int hType ;
-		final long gPosition ;
-		final int bSN ;
-		final int pSeq ;
-		final int checksum ;
-		final int pSeg ;
-		final byte[] data ;
-
-		Page( final String _header, 
-			  final int _version,
-			  final int _hType, 
-			  final long _gPosition, 
-			  final int _bSN, 
-			  final int _pSeq, 
-			  final int _checksum, 
-			  final int _pSeg,
-			  final byte[] _data )
-		{
-			header = _header ;
-			version = _version ;
-			hType = _hType ;
-			gPosition = _gPosition ;
-			bSN = _bSN ;
-			pSeq = _pSeq ;
-			checksum = _checksum ;
-			pSeg = _pSeg ;
-			data = _data ;
 		}
 	}
 }

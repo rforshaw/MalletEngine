@@ -3,7 +3,9 @@ package com.linxonline.mallet.util.locks ;
 import java.util.HashMap ;
 
 /**
-	Allows you to create a Lock that can be accessed globally.
+	Allows you to create a Lock that has global access.
+	This should be used carefully, as you may cause systems to become 
+	tightly coupled.
 **/
 public class Locks
 {

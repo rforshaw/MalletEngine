@@ -9,7 +9,9 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
+
 import com.linxonline.mallet.util.tools.ogg.OGG ;
+import com.linxonline.mallet.util.tools.ogg.Vorbis ;
 
 /*===========================================*/
 // Main
@@ -70,9 +72,12 @@ public class Main
 		final ResourceManager resource = ResourceManager.getResourceManager() ;
 		final DesktopFileSystem fileSystem = new DesktopFileSystem() ;
 		fileSystem.scanBaseDirectory() ;
-		
+
 		resource.setFileSystem( fileSystem ) ;
-		
-		//OGG ogg = new OGG( "base/audio/0.ogg" ) ;
+
+		final OGG ogg = OGG.readOGG( "base/audio/0.ogg" ) ;
+
+		final Vorbis vorb = new Vorbis() ;
+		vorb.decode( ogg ) ;
 	}
 }

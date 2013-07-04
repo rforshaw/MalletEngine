@@ -5,8 +5,10 @@ import java.io.* ;
 
 import com.linxonline.mallet.resources.* ;
 
-public abstract class WriteFile
+public class WriteFile
 {
+	private WriteFile() {}
+
 	final static ResourceManager resources = ResourceManager.getResourceManager() ;
 
 	/**

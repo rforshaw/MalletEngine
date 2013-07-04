@@ -5,19 +5,19 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.resources.* ;
 
-public abstract class TextReader
+public class TextReader
 {
-	public TextReader() {}
+	private TextReader() {}
 	
 	/**
 		Returns an array of strings, one string per line.
 	*/
-	static public ArrayList<String> getTextFile( final String _file )
+	public static ArrayList<String> getTextFile( final String _file )
 	{
 		return readFile( _file ) ;
 	}
 	
-	static private ArrayList<String> readFile( final String _file )
+	private static ArrayList<String> readFile( final String _file )
 	{
 		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final ArrayList<String> textFile = new ArrayList<String>() ;
