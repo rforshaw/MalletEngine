@@ -105,7 +105,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 		final SourceCallback callback = _anim.getObject( "CALLBACK", SourceCallback.class, null ) ;
 		if( callback != null )
 		{
-			//_animation.addCallback( callback ) ;
+			_animation.addCallback( callback ) ;
 		}
 	}
 

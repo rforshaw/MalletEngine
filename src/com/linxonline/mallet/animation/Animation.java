@@ -1,11 +1,15 @@
 package com.linxonline.mallet.animation ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.SourceCallback ;
 
 public class Animation
 {
+	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	public final int id ;
 	private final Sprite sprite ;
 	private final Event event ;
@@ -26,6 +30,24 @@ public class Animation
 		changeTexture( event, sprite ) ;
 	}
 
+	public void addCallback( final SourceCallback _callback )
+	{
+		if( callbacks.contains( _callback ) == false )
+		{
+			callbacks.add( _callback ) ;
+			_callback.recieveID( id ) ;
+		}
+	}
+
+	public void removeCallback( final SourceCallback _callback )
+	{
+		if( callbacks.contains( _callback ) == true )
+		{
+			callbacks.remove( _callback ) ;
+			_callback.callbackRemoved() ;
+		}
+	}
+	
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
 		final Settings settings = ( Settings )_event.getVariable() ;
@@ -44,8 +66,19 @@ public class Animation
 			elapsedTime -= frameDelta ;
 			frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
 		}
+
+		updateCallbacks() ;
 	}
 
+	private void updateCallbacks()
+	{
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).update( ( float )frame ) ;
+		}
+	}
+	
 	public void destroy()
 	{
 		sprite.unregister() ;
