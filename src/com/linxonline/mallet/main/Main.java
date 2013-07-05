@@ -75,9 +75,16 @@ public class Main
 
 		resource.setFileSystem( fileSystem ) ;
 
-		final OGG ogg = OGG.readOGG( "base/audio/0.ogg" ) ;
-
-		final Vorbis vorb = new Vorbis() ;
-		vorb.decode( ogg ) ;
+		try
+		{
+			final OGG ogg = OGG.readOGG( "base/audio/0.ogg" ) ;
+			final Vorbis vorb = new Vorbis() ;
+			vorb.decode( ogg ) ;
+			System.out.println( vorb ) ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
 	}
 }

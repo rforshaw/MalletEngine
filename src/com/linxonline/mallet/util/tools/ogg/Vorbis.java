@@ -1,6 +1,7 @@
 package com.linxonline.mallet.util.tools.ogg ;
 
 import java.util.ArrayList ;
+import java.lang.Exception ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 
@@ -15,45 +16,33 @@ public class Vorbis
 
 	private ArrayList<VorbisHeader> headers = new ArrayList<VorbisHeader>() ;
 
+	private int version = -1 ;
+	private int audioChannels = 0 ;
+	private int sampleRate = 0 ;
+	private int bitrateMax = 0 ;
+	private int bitrateNom = 0 ;
+	private int bitrateMin = 0 ;
+	private int blocksize0 = 0 ;
+	private int blocksize1 = 0 ;
+
+	private String vendor = null ;
+	private final ArrayList<String> statements = new ArrayList<String>() ;
+	
 	public Vorbis() {}
 
-	public void decode( final OGG _ogg )
+	public void decode( final OGG _ogg ) throws Exception
 	{
 		for( final Page page : _ogg.pages )
 		{
-			if( identifyHeaders( page ) >= 3 )
+			if( headers.size() < 3 )
 			{
-				break ;
-			}
-		}
-
-		for( final VorbisHeader header : headers )
-		{
-			switch( header.headerType )
-			{
-				case ID_HEADER_TYPE :
-				{
-					System.out.println( "Identification Header Type" ) ;
-					decodeIDHeader( header ) ;
-					break ;
-				}
-				case COMMENT_HEADER_TYPE :
-				{
-					System.out.println( "Comment Header Type" ) ;
-					decodeCommentHeader( header ) ;
-					break ;
-				}
-				case SETUP_HEADER_TYPE :
-				{
-					System.out.println( "Setup Header Type" ) ;
-					decodeSetupHeader( header ) ;
-					break ;
-				}
+				decodeHeaders( page )  ;
 			}
 		}
 	}
 
-	private int identifyHeaders( final Page _page )
+
+	private void decodeHeaders( final Page _page ) throws Exception
 	{
 		final byte[] stream = _page.data ;
 		for( int i = 0; i < stream.length; i++ )
@@ -68,84 +57,175 @@ public class Vorbis
 				{
 					// Package Type is one byte before vorbis.
 					final int packageType = ConvertBytes.toBytes( stream, i - 1, 1 )[0] ;
-					headers.add( new VorbisHeader( packageType, i += 6, _page ) ) ;
+					final VorbisHeader header = new VorbisHeader( packageType, i += 6, _page ) ;
+					headers.add( header ) ;
+
+					// Skip bytes part of the current header
+					// Required so we don't accidentally find 'vorbis' within the comment header
+					i = decodeHeaderType( header ) ;
 				}
 			}
 		}
-
-		return headers.size() ;
 	}
 
-	private void decodeIDHeader( final VorbisHeader _header )
+	private int decodeHeaderType( final VorbisHeader _header ) throws Exception
+	{
+		switch( _header.headerType )
+		{
+			case ID_HEADER_TYPE :
+			{
+				return decodeIDHeader( _header ) ;
+			}
+			case COMMENT_HEADER_TYPE :
+			{
+				return decodeCommentHeader( _header ) ;
+			}
+			case SETUP_HEADER_TYPE :
+			{
+				return decodeSetupHeader( _header ) ;
+			}
+		}
+
+		// The first page or so, should contain all Vorbis Header details.
+		// This should never be thrown, unless the ogg is corrupt.
+		throw new Exception( "Failed to decode header." )  ;
+	}
+
+	private int decodeIDHeader( final VorbisHeader _header ) throws Exception
 	{
 		int pos = _header.start ;
 		final byte[] stream = _header.page.data ;
 
 		ConvertBytes.flipEndian( stream, pos, 4 ) ;
-		final int version = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Version: " + version ) ;
+		version = ConvertBytes.toInt( stream, pos, 4 ) ;
 
-		final int channels = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] & 0xff ;	// unsigned byte
-		System.out.println( "Audio Channels: " + channels ) ;
+		audioChannels = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] & 0xff ;	// unsigned byte
 
 		ConvertBytes.flipEndian( stream, pos += 1, 4 ) ;
-		final int sampleRate = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Sample Rate: " + sampleRate ) ;
+		sampleRate = ConvertBytes.toInt( stream, pos, 4 ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		final int bitrateMax = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Bitrate Max: " + bitrateMax ) ;
+		bitrateMax = ConvertBytes.toInt( stream, pos, 4 ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		final int bitrateNom = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Bitrate Nominal: " + bitrateNom ) ;
+		bitrateNom = ConvertBytes.toInt( stream, pos, 4 ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		final int bitrateMin = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Bitrate Min: " + bitrateMin ) ;
+		bitrateMin = ConvertBytes.toInt( stream, pos, 4 ) ;
 
 		final byte blocksize = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] ; // unsigned byte
-		System.out.println( "Blocksize: " + blocksize ) ;
+		blocksize0 = ( blocksize & 0x0F ) ;
+		blocksize1 = ( ( blocksize & 0xF0 ) >> 4 ) ;
 
-		final int blocksize0 = ( ( blocksize & 0x0F ) & 0xff )* ( ( blocksize & 0x0F ) & 0xff ) ;
-		System.out.println( "B0: " + blocksize0 ) ;
-		final int blocksize1 = ( ( blocksize >> 4 ) & 0xff ) * ( ( blocksize >> 4 ) & 0xff ) ;
-		System.out.println( "B1: " + blocksize1 ) ;
+		blocksize0 *= blocksize0 ;
+		blocksize1 *= blocksize1 ;
 
-		//final boolean framing = ConvertBytes.toBoolean( stream, pos += 1, 1 ) ;
-		//System.out.println( "Framing: " + framing ) ;
+		final byte framing = ConvertBytes.toBytes( stream, pos += 1, 1 )[0] ;
+		if( framing != 1 )
+		{
+			throw new Exception( "Identification End Frame not suitable." ) ;
+		}
+
+		return pos ;
 	}
 
-	private void decodeCommentHeader( final VorbisHeader _header )
+	private int decodeCommentHeader( final VorbisHeader _header ) throws Exception
 	{
 		int pos = _header.start ;
 		final byte[] stream = _header.page.data ;
 
 		ConvertBytes.flipEndian( stream, pos, 4 ) ;
 		final int vendorLength = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Vendor Length: " + vendorLength ) ;
-
-		final String vendor = new String( ConvertBytes.toBytes( stream, pos += 4, vendorLength ) ) ;
-		System.out.println( "Vendor: " + vendor ) ;
+		vendor = new String( ConvertBytes.toBytes( stream, pos += 4, vendorLength ) ) ;
 
 		ConvertBytes.flipEndian( stream, pos += vendorLength, 4 ) ;
 		final int iterate = ConvertBytes.toInt( stream, pos, 4 ) ;
-		System.out.println( "Iterate: " + iterate ) ;
-		
+
 		int length = 4 ; // Set to 4 to offset the iterate variable
 		for( int i = 0; i < iterate; i++ )
 		{
 			ConvertBytes.flipEndian( stream, pos += length, 4 ) ;
 			length = ConvertBytes.toInt( stream, pos, 4 ) ;
-			System.out.println( "Length: " + length ) ;
-			
-			final String statement = new String( ConvertBytes.toBytes( stream, pos += 4, length ) ) ;
-			System.out.println( "Statement: " + statement ) ;
+			statements.add( new String( ConvertBytes.toBytes( stream, pos += 4, length ) ) ) ;
 		}
 
+		// The last string doesn't increment the pos by its length
+		pos += length ;
+
+		final byte framing = ConvertBytes.toBytes( stream, pos, 1 )[0] ;
+		if( framing != 1 )
+		{
+			throw new Exception( "Comment End Frame not suitable." ) ;
+		}
+
+		return pos ;
 	}
 
-	private void decodeSetupHeader( final VorbisHeader _header ) {}
+	private int decodeSetupHeader( final VorbisHeader _header ) throws Exception
+	{
+		int pos = _header.start ;
+		final byte[] stream = _header.page.data ;
+		
+		final int codebookCount = ( ConvertBytes.toBytes( stream, pos, 1 )[0] & 0xff ) + 1 ;	// unsigned byte
+		System.out.println( "Codebooks Count: " + codebookCount ) ;
+		decodeCodebooks( pos += 1, codebookCount, stream ) ;
+
+		return pos ;
+	}
+
+	private int decodeCodebooks( int _pos, final int _count, final byte[] _stream ) throws Exception
+	{
+		final byte[] syncPattern = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
+
+		ConvertBytes.flipEndian( _stream, _pos += 3, 2 ) ;
+		final byte[] dimBytes = ConvertBytes.toBytes( _stream, _pos, 2 ) ;
+		final int dimensions = dimBytes[0] << 8 | dimBytes[1];
+		System.out.println( "Dimensions: " + dimensions ) ;
+
+		ConvertBytes.flipEndian( _stream, _pos += 2, 3 ) ;
+		final byte[] entryBytes = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
+		final int entries = entryBytes[0] << 16 | entryBytes[1] << 8 | entryBytes[2];
+		System.out.println( "Entries: " + entries ) ;
+
+		
+		final byte orderedFlag = ConvertBytes.toBytes( _stream, _pos += 3, 1 )[0] ;
+		System.out.println( "Ordered Flag: " + orderedFlag ) ;
+
+		final byte sparseFlag = ConvertBytes.toBytes( _stream, _pos += 1, 1 )[0] ;
+
+		/*if( sparseFlag == 1 )
+		{
+			throw new Exception( "Sparsing not implemented, yet." ) ;
+		}
+		else
+		{
+			final int codewordLength = ( ConvertBytes.toBytes( _stream, _pos += 1, 1 )[0] & 0xff ) + 1 ;		// unsigned byte
+			System.out.println( "Codeword Length: " + codewordLength ) ;
+		}*/
+		
+		return _pos ;
+	}
+	
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "Version: "     + version       + "\n" ) ;
+		buffer.append( "Channels: "    + audioChannels + "\n" ) ;
+		buffer.append( "Sample Rate: " + sampleRate    + "\n" ) ;
+		buffer.append( "Bitrate Max: " + bitrateMax    + "\n" ) ;
+		buffer.append( "Bitrate Nom: " + bitrateNom    + "\n" ) ;
+		buffer.append( "Bitrate Min: " + bitrateMin    + "\n" ) ;
+		buffer.append( "Blocksize 0: " + blocksize0    + "\n" ) ;
+		buffer.append( "Blocksize 1: " + blocksize1    + "\n" ) ;
+
+		buffer.append( "Vendor: " + vendor + "\n" ) ;
+		for( String statement : statements )
+		{
+			buffer.append( "Statement: " + statement + "\n" ) ;
+		}
+
+		return buffer.toString() ;
+	}
 
 	/**
 		Contains the information required to quickly decode the headers.
