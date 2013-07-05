@@ -14,6 +14,9 @@ public class Animation
 	private final Sprite sprite ;
 	private final Event event ;
 
+	private boolean play = false ;
+	private boolean stop = false ;
+	
 	private float elapsedTime = 0.0f ;
 	private int frame = 0 ;						// Current frame 
 	private final float frameDelta ;				// Amount of time that needs to elapse before next frame
@@ -47,6 +50,38 @@ public class Animation
 			_callback.callbackRemoved() ;
 		}
 	}
+
+	public void play()
+	{
+		play = true ;
+		stop = false ;
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).start() ;
+		}
+	}
+
+	public void pause()
+	{
+		play = false ;
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).pause() ;
+		}
+	}
+
+	public void stop()
+	{
+		play = false ;
+		stop = true ;
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).stop() ;
+		}
+	}
 	
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
@@ -59,15 +94,21 @@ public class Animation
 
 	public void update( final float _dt )
 	{
-		elapsedTime += _dt ;
-		if( elapsedTime >= frameDelta )
+		if( play == true )
 		{
-			changeTexture( event, sprite ) ;
-			elapsedTime -= frameDelta ;
-			frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
+			elapsedTime += _dt ;
+			if( elapsedTime >= frameDelta )
+			{
+				changeTexture( event, sprite ) ;
+				elapsedTime -= frameDelta ;
+				frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
+			}
 		}
 
-		updateCallbacks() ;
+		if( stop == false )
+		{
+			updateCallbacks() ;
+		}
 	}
 
 	private void updateCallbacks()

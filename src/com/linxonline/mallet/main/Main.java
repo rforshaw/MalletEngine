@@ -9,6 +9,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.animation.AnimationFactory ;
 
 import com.linxonline.mallet.util.tools.ogg.OGG ;
 import com.linxonline.mallet.util.tools.ogg.Vorbis ;
@@ -39,14 +40,37 @@ public class Main
 			public void initGame()
 			{
 				// Add a texture to the render system
-				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 		// Texture Location
-																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																new Vector2( -32, -32 ), 			// Offset
-																new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																null,								// fill, texture repeat
-																null,								// clip
-																null,								// clip offset
-																10 ) ) ;							// layer
+				/*eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
+																	new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
+																	new Vector2( -32, -32 ), 			// Offset
+																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
+																	null,								// fill, texture repeat
+																	null,								// clip
+																	null,								// clip offset
+																	10 ) ) ;							// layer
+*/
+				// Add a anim to animation system
+				// indirectly adds texture to render system
+				eventSystem.addEvent( AnimationFactory.createAnimation( "base/anim/moomba.anim", 			// Animation Location
+																		 new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
+																		 new Vector2( -32, -32 ), 			// Offset
+																		 new Vector2( 64, 64 ),				// Dimension, how large - scaled
+																		 null,								// fill, texture repeat
+																		 null,								// clip
+																		 null,								// clip offset
+																		 10,								// layer
+																		 new SourceCallback()
+				{
+					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
+					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
+
+					public void start() { System.out.println( "Source began playing" ) ; }
+					public void pause() { System.out.println( "Source has been paused" ) ; }
+					public void stop() { System.out.println( "Source has been stopped" ) ; }
+
+					public void update( final float _dt ) { /*System.out.println( _dt ) ;*/ }
+					public void finished() { System.out.println( "Source has finished" ) ; }
+				} ) ) ;
 
 				/*eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
 				{
@@ -75,7 +99,7 @@ public class Main
 
 		resource.setFileSystem( fileSystem ) ;
 
-		try
+		/*try
 		{
 			final OGG ogg = OGG.readOGG( "base/audio/0.ogg" ) ;
 			final Vorbis vorb = new Vorbis() ;
@@ -85,6 +109,6 @@ public class Main
 		catch( Exception ex )
 		{
 			ex.printStackTrace() ;
-		}
+		}*/
 	}
 }

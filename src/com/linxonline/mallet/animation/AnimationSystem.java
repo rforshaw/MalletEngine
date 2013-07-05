@@ -72,6 +72,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 				passEvent( event ) ;
 				addCallbackToAnimation( anim, _anim ) ;
 				storeSource( anim, anim.id ) ;
+				anim.play() ;						// Assumed that animation will want to be played immediately.
 			}
 		}
 	}
@@ -83,14 +84,17 @@ public class AnimationSystem extends SystemRoot<Animation>
 		{
 			case ModifyAnimation.PLAY :
 			{
+				_animation.play() ;
 				break ;
 			}
 			case ModifyAnimation.STOP :
 			{
+				_animation.stop() ;
 				break ;
 			}
 			case ModifyAnimation.PAUSE :
 			{
+				_animation.pause() ;
 				break ;
 			}
 		}
