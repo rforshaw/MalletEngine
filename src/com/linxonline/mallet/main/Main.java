@@ -43,7 +43,7 @@ public class Main
 																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
 																new Vector2( -32, -32 ), 			// Offset
 																new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																null,			// fill, texture repeat
+																null,								// fill, texture repeat
 																null,								// clip
 																null,								// clip offset
 																10 ) ) ;							// layer
