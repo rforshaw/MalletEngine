@@ -105,10 +105,7 @@ public class Animation
 			}
 		}
 
-		if( stop == false )
-		{
-			updateCallbacks() ;
-		}
+		updateCallbacks() ;
 	}
 
 	private void updateCallbacks()
@@ -116,7 +113,7 @@ public class Animation
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			callbacks.get( i ).update( ( float )frame ) ;
+			callbacks.get( i ).update( ( float )frame * frameDelta ) ;
 		}
 	}
 	
