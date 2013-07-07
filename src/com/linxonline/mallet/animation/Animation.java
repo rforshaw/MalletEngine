@@ -6,17 +6,18 @@ import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.id.IDInterface ;
 
-public class Animation
+public class Animation implements IDInterface
 {
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	public final int id ;
 	private final Sprite sprite ;
 	private final Event event ;
+	public int renderID = -1 ;
 
 	private boolean play = false ;
-	private boolean stop = false ;
-	
+
 	private float elapsedTime = 0.0f ;
 	private int frame = 0 ;						// Current frame 
 	private final float frameDelta ;				// Amount of time that needs to elapse before next frame
@@ -33,12 +34,28 @@ public class Animation
 		changeTexture( event, sprite ) ;
 	}
 
+	/**
+		Render ID
+	**/
+	public void recievedID( final int _id )
+	{
+		renderID = _id ;
+
+		// Only call recieveID() once we have acquired the render ID.
+		// Else making modifications will become hard!
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).recieveID( id ) ;
+		}
+	}
+
 	public void addCallback( final SourceCallback _callback )
 	{
 		if( callbacks.contains( _callback ) == false )
 		{
 			callbacks.add( _callback ) ;
-			_callback.recieveID( id ) ;
+			if( renderID > -1 ) { _callback.recieveID( id ) ; }
 		}
 	}
 
@@ -54,7 +71,6 @@ public class Animation
 	public void play()
 	{
 		play = true ;
-		stop = false ;
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
@@ -75,7 +91,8 @@ public class Animation
 	public void stop()
 	{
 		play = false ;
-		stop = true ;
+		frame = 0 ;
+
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
@@ -103,9 +120,8 @@ public class Animation
 				elapsedTime -= frameDelta ;
 				frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
 			}
+			updateCallbacks() ;
 		}
-
-		updateCallbacks() ;
 	}
 
 	private void updateCallbacks()

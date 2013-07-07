@@ -17,6 +17,7 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.resources.gl.* ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.util.id.IDInterface ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
@@ -322,6 +323,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;
 		}

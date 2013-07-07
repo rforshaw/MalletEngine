@@ -44,10 +44,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	@Override
 	protected void updateSource( final ActiveSound _source, final float _dt )
 	{
-		if( _source.update() == true )
-		{
-			removeSources.add( _source ) ;
-		}
+		_source.update() ;
 	}
 
 	@Override
@@ -75,6 +72,15 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 				if( sound != null )
 				{
 					modifyAudio( audio, sound ) ;
+				}
+				break ;
+			}
+			case RequestType.REMOVE_AUDIO :
+			{
+				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
+				if( sound != null )
+				{
+					removeSources.add( sound ) ;
 				}
 				break ;
 			}

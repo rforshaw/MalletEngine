@@ -14,6 +14,7 @@ import java.awt.image.BufferStrategy ;
 import java.awt.image.BufferedImage ;
 import java.awt.geom.AffineTransform ;
 
+import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.resources.TextureManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.maths.* ;
@@ -345,6 +346,7 @@ public class G2DRenderer extends Basic2DRender
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;
 		}
@@ -359,6 +361,7 @@ public class G2DRenderer extends Basic2DRender
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
 			data.drawCall = drawShape ;
 			insert( data ) ;
 		}
@@ -373,6 +376,7 @@ public class G2DRenderer extends Basic2DRender
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
 			data.drawCall = drawText ;
 			insert( data ) ;
 		}

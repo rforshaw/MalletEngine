@@ -18,6 +18,14 @@ public class AudioFactory
 		return new Event( "AUDIO", audio ) ;
 	}
 
+	public static Event removeAudio( final int _id )
+	{
+		final Settings audio = new Settings() ;
+		audio.addInteger( "REQUEST_TYPE", RequestType.REMOVE_AUDIO ) ;
+		audio.addInteger( "ID", _id ) ;
+		return new Event( "AUDIO", audio ) ;
+	}
+	
 	public static Event createAddCallback( final int _id, final SourceCallback _callback )
 	{
 		final Settings audio = new Settings() ;

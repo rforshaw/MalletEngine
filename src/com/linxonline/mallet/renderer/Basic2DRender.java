@@ -191,11 +191,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected class RenderData
 	{
-		public int id = -1 ;
-		public int type = 0 ;
-		public int layer = 0 ;
-		public Vector3 position = null ;
-		public Settings drawData = null ;
+		public final int id ;
+		public final int type ;
+		public final int layer ;
+		public final Vector3 position ;
+		public final Settings drawData ;
 
 		public DrawInterface drawCall = null ;
 
@@ -210,8 +210,6 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			layer = _layer ;
 			drawData = _draw ;
 			position = _position ;
-
-			drawData.addInteger( "ID", _id ) ;
 		}
 	}
 

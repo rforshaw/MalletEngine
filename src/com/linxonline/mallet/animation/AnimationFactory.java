@@ -30,4 +30,21 @@ public class AnimationFactory
 
 		return new Event( "ANIMATION", settings ) ;
 	}
+
+	public static Event removeAnimation( final int _id )
+	{
+		final Settings anim = new Settings() ;
+		anim.addInteger( "REQUEST_TYPE", AnimRequestType.REMOVE_ANIMATION ) ;
+		anim.addInteger( "ID", _id ) ;
+		return new Event( "ANIMATION", anim ) ;
+	}
+
+	public static Event modifyAnimation( final int _id, final int _modifyType )
+	{
+		final Settings anim = new Settings() ;
+		anim.addInteger( "REQUEST_TYPE", AnimRequestType.MODIFY_EXISTING_ANIMATION ) ;
+		anim.addInteger( "ID", _id ) ;
+		anim.addInteger( "MODIFY_ANIMATION", _modifyType ) ;
+		return new Event( "ANIMATION", anim ) ;
+	}
 }

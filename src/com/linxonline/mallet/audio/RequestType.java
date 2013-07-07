@@ -4,4 +4,5 @@ public class RequestType
 {
 	public static final int CREATE_AUDIO = 10 ;
 	public static final int MODIFY_EXISTING_AUDIO = 20 ;
+	public static final int REMOVE_AUDIO = 30 ;
 }

@@ -10,6 +10,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.SpriteManager ;
 import com.linxonline.mallet.resources.texture.Sprite ;
+import com.linxonline.mallet.renderer.DrawFactory ;
 
 public class AnimationSystem extends SystemRoot<Animation>
 {
@@ -57,6 +58,16 @@ public class AnimationSystem extends SystemRoot<Animation>
 				}
 				break ;
 			}
+			case AnimRequestType.REMOVE_ANIMATION :
+			{
+				final Animation animation = getSource( anim.getInteger( "ID", -1 ) ) ;
+				if( animation != null )
+				{
+					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
+					removeSources.add( animation ) ;
+				}
+				break ;
+			}
 		}
 	}
 
@@ -69,6 +80,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 			final Animation anim = new Animation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
 			if( anim != null )
 			{
+				DrawFactory.insertIDCallback( event, anim ) ;
 				passEvent( event ) ;
 				addCallbackToAnimation( anim, _anim ) ;
 				storeSource( anim, anim.id ) ;
