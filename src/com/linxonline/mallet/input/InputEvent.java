@@ -43,9 +43,7 @@ public final class InputEvent
 	**/
 	public InputEvent( final int _type, final int _x, final int _y )
 	{
-		inputType = _type ;
-		mouseX = _x ;
-		mouseY = _y ;
+		setInput( _type, _x, _y ) ;
 	}
 
 	/**
@@ -53,9 +51,7 @@ public final class InputEvent
 	**/
 	public InputEvent( final int _type, final float _x, final float _y )
 	{
-		inputType = _type ;
-		mouseX = ( int )_x ;
-		mouseY = ( int )_y ;
+		setInput( _type, _x, _y ) ;
 	}
 	
 	/**
@@ -63,11 +59,30 @@ public final class InputEvent
 	**/
 	public InputEvent( final int _type, final char _key, final int _keycode )
 	{
+		setInput( _type, _key, _keycode ) ;
+	}
+
+	public void setInput( final int _type, final int _x, final int _y )
+	{
+		inputType = _type ;
+		mouseX = _x ;
+		mouseY = _y ;
+	}
+
+	public void setInput( final int _type, final float _x, final float _y )
+	{
+		inputType = _type ;
+		mouseX = ( int )_x ;
+		mouseY = ( int )_y ;
+	}
+
+	public void setInput( final int _type, final char _key, final int _keycode )
+	{
 		inputType = _type ;
 		key = _key ;
 		keycode = _keycode ;
 	}
-
+	
 	public final int getInputType()
 	{
 		return inputType ;

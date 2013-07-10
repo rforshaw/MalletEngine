@@ -22,6 +22,7 @@ public class InputSystem implements InputSystemInterface,
 									MouseWheelListener
 {
 	public InputAdapterInterface inputAdapter = null ;
+	private InputCache cache = new InputCache( 1 ) ;
 	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
 	private HashMap<Integer, KeyState> keyboardState = new HashMap<Integer, KeyState>() ;
 	private ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
@@ -70,7 +71,7 @@ public class InputSystem implements InputSystemInterface,
 			{
 				// Clone Input Event incase KeyState is changed
 				// before game logic has processed it.
-				final InputEvent input = new InputEvent() ;
+				final InputEvent input = cache.getInput() ;
 				input.clone( keyState.input ) ;
 				for( int j = 0; j < handlerSize; ++j )
 				{
@@ -213,9 +214,8 @@ public class InputSystem implements InputSystemInterface,
 		screenMousePosition.x =  _mousePosition.x ;
 		screenMousePosition.y =  _mousePosition.y ;
 
-		final InputEvent input = new InputEvent( _inputType, 
-												( int )screenMousePosition.x, 
-												( int )screenMousePosition.y ) ;
+		final InputEvent input = cache.getInput() ;
+		input.setInput( _inputType, screenMousePosition.x, screenMousePosition.y ) ;
 		mouseInputs.add( input ) ;
 	}
 

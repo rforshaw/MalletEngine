@@ -69,7 +69,7 @@ public class Main
 					public void pause() { System.out.println( "Source has been paused" ) ; }
 					public void stop() { System.out.println( "Source has been stopped" ) ; }
 
-					public void update( final float _dt ) { System.out.println( _dt ) ; }
+					public void update( final float _dt ) { /*System.out.println( _dt ) ;*/ }
 					public void finished() { System.out.println( "Source has finished" ) ; }
 				} ) ) ;
 
