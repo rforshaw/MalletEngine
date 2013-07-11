@@ -42,4 +42,9 @@ public abstract class ElapsedTimer
 
 		return time.getTotalElapsedTimeInSeconds() ;
 	}
+
+	public static final double getRemainderInNanoSeconds()
+	{
+		return time.getRemainderInNanoSeconds() ;
+	}
 }

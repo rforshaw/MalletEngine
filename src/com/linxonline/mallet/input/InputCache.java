@@ -7,37 +7,42 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 public class InputCache
 {
 	private final LinkedList<InputTime> cache = new LinkedList<InputTime>() ;
-	private long reuseTime = 0L ;
+	private float reuseTime = 0.0f ;
 	private int currentPos = 0 ;
 
-	public InputCache( final int _seconds )
+	// Reduce temporaries
+	private InputTime inputTime = null ;
+
+	public InputCache( final float _reuseTime )
 	{
-		addNewInput( ElapsedTimer.getTotalElapsedTimeInSeconds(), new InputEvent() ) ;
-		reuseTime = _seconds ;
+		addNewInput( 0, 0.0f, new InputEvent() ) ;
+		reuseTime = _reuseTime ;
 	}
 
 	public InputEvent getInput()
 	{
-		System.out.println( cache.size() ) ;
 		if( currentPos >= cache.size() )
 		{
 			currentPos = 0 ;
 		}
 
 		final long timestamp = ElapsedTimer.getTotalElapsedTimeInSeconds() ;
-		final InputTime inputTime = cache.get( currentPos ) ;
-		final long diff = timestamp - inputTime.timestamp ;
+		final double remainder = ElapsedTimer.getRemainderInNanoSeconds() ;
 
-		System.out.println( "Diff: " + diff ) ;
-		
-		if( diff >= reuseTime  )
+		inputTime = cache.get( currentPos ) ;
+		float diff = ( float )( timestamp - inputTime.timestamp ) ;
+		diff += ( float )( remainder - inputTime.remainder ) ;
+
+		if( diff >= reuseTime )
 		{
 			++currentPos ;
 			inputTime.timestamp = timestamp ;
+			inputTime.remainder = remainder ;
 			return inputTime.input ;
 		}
 
-		return insertNewInput( currentPos++, timestamp, new InputEvent() ).input ;
+		// InputEvent isn't available, create a new one then.
+		return insertNewInput( currentPos++, timestamp, remainder, new InputEvent() ).input ;
 	}
 
 	public void trimToSize( final int _trim )
@@ -54,16 +59,16 @@ public class InputCache
 		return cache.size() ;
 	}
 
-	private InputTime insertNewInput( final int _pos, final long _timestamp, final InputEvent _input )
+	private InputTime insertNewInput( final int _pos, final long _timestamp, final double _remiander, final InputEvent _input )
 	{
-		final InputTime inputTime = new InputTime( _timestamp, _input ) ;
+		final InputTime inputTime = new InputTime( _timestamp, _remiander, _input ) ;
 		cache.add( _pos, inputTime ) ;
 		return inputTime ;
 	}
 
-	private InputTime addNewInput( final long _timestamp, final InputEvent _input )
+	private InputTime addNewInput( final long _timestamp, final double _remiander, final InputEvent _input )
 	{
-		final InputTime inputTime = new InputTime( _timestamp, _input ) ;
+		final InputTime inputTime = new InputTime( _timestamp, _remiander, _input ) ;
 		cache.add( inputTime ) ;
 		return inputTime ;
 	}
@@ -71,11 +76,13 @@ public class InputCache
 	public class InputTime
 	{
 		public long timestamp ;
+		public double remainder ;
 		public final InputEvent input ;
 
-		public InputTime( final long _timestamp, final InputEvent _input )
+		public InputTime( final long _timestamp, final double _remiander, final InputEvent _input )
 		{
 			timestamp = _timestamp ;
+			remainder = _remiander ;
 			input = _input ;
 		}
 	}

@@ -22,7 +22,7 @@ public class InputSystem implements InputSystemInterface,
 									MouseWheelListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private InputCache cache = new InputCache( 1 ) ;
+	private InputCache cache = new InputCache( 0.25f ) ;
 	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
 	private HashMap<Integer, KeyState> keyboardState = new HashMap<Integer, KeyState>() ;
 	private ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;

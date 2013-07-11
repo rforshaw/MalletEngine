@@ -11,6 +11,7 @@ public class DefaultTimer implements TimerInterface
 
 	public DefaultTimer() {}
 
+	@Override
 	public final double getElapsedTimeInNanoSeconds()
 	{
 		nanoseconds = ( double )getLongElapsedTime() * 0.000000001 ;
@@ -24,11 +25,19 @@ public class DefaultTimer implements TimerInterface
 		return nanoseconds ;
 	}
 
+	@Override
 	public final long getTotalElapsedTimeInSeconds()
 	{
 		return totalTimeSeconds ;
 	}
 
+	@Override
+	public final double getRemainderInNanoSeconds()
+	{
+		return seconds ;
+	}
+	
+	
 	private final long getLongElapsedTime()
 	{
 		oldTime = currentTime ;

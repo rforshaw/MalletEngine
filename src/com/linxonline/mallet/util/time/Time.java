@@ -16,4 +16,9 @@ public class Time
 	{
 		return ElapsedTimer.getTotalElapsedTimeInSeconds() ;
 	}
+
+	public static final double getRemainderInNanoSeconds()
+	{
+		return ElapsedTimer.getRemainderInNanoSeconds() ;
+	}
 }
