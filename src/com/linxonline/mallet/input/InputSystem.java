@@ -6,6 +6,7 @@ import java.util.Collection ;
 import java.awt.event.* ;
 import java.io.* ;
 
+import com.linxonline.mallet.util.pools.TimePool ;
 import com.linxonline.mallet.maths.Vector2 ;
 
 /*==============================================================*/
@@ -22,14 +23,18 @@ public class InputSystem implements InputSystemInterface,
 									MouseWheelListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private InputCache cache = new InputCache( 0.25f ) ;
+	private final TimePool<InputEvent> cache ;
 	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
 	private HashMap<Integer, KeyState> keyboardState = new HashMap<Integer, KeyState>() ;
 	private ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
 	private Vector2 mousePosition = new Vector2( 0, 0 ) ;
 	private Vector2 screenMousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem() {}
+	public InputSystem()
+	{
+		final Class<InputEvent> clazz = ( Class<InputEvent> )new InputEvent().getClass() ;
+		cache = new TimePool<InputEvent>( 0.25f, clazz ) ;
+	}
 
 	public void addInputHandler( final InputHandler _handler )
 	{
@@ -71,7 +76,7 @@ public class InputSystem implements InputSystemInterface,
 			{
 				// Clone Input Event incase KeyState is changed
 				// before game logic has processed it.
-				final InputEvent input = cache.getInput() ;
+				final InputEvent input = cache.get() ;
 				input.clone( keyState.input ) ;
 				for( int j = 0; j < handlerSize; ++j )
 				{
@@ -214,7 +219,7 @@ public class InputSystem implements InputSystemInterface,
 		screenMousePosition.x =  _mousePosition.x ;
 		screenMousePosition.y =  _mousePosition.y ;
 
-		final InputEvent input = cache.getInput() ;
+		final InputEvent input = cache.get() ;
 		input.setInput( _inputType, screenMousePosition.x, screenMousePosition.y ) ;
 		mouseInputs.add( input ) ;
 	}
