@@ -4,7 +4,7 @@ import java.util.LinkedList ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
-public class TimePool<T>
+public class TimePool<T> implements PoolInterface<T>
 {
 	private final LinkedList<TimeWrapper> pool = new LinkedList<TimeWrapper>() ;	// Pool of objects that will be used.
 	private final Class<T> objectCreator ;						// Used to create T type instances.
@@ -23,10 +23,12 @@ public class TimePool<T>
 		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
 
 	}
-
+	
+	@Override
 	public T get()
 	{
 		//System.out.println( pool.size() ) ;
+		// Ensure currentPos is within the pool limits.
 		if( currentPos >= pool.size() ) { currentPos = 0 ; }
 
 		final long seconds = ElapsedTimer.getTotalElapsedTimeInSeconds() ;
@@ -53,24 +55,41 @@ public class TimePool<T>
 		return null ;
 	}
 
+	@Override
 	public int size()
 	{
 		return pool.size() ;
 	}
 
+	@Override
+	public void trimTo( final int _size )
+	{
+		while( pool.size() > _size )
+		{
+			pool.pop() ;
+		}
+	}
+
+	/**
+		Adds T onto the end of pool.
+	**/
 	private void add( final long _seconds, final double _remainder, final T _t )
 	{
 		final TimeWrapper wrapper = new TimeWrapper( _seconds, _remainder, _t ) ;
 		pool.add( wrapper ) ;
 	}
 
+	/**
+		Insert T into specified location of pool.
+		Pushes everything from that position to the right by 1.
+	**/
 	private TimeWrapper insert( final int _insert, final long _seconds, final double _remainder, final T _t )
 	{
 		final TimeWrapper wrapper = new TimeWrapper( _seconds, _remainder, _t ) ;
 		pool.add( _insert, wrapper ) ;
 		return wrapper ;
 	}
-	
+
 	protected class TimeWrapper<T>
 	{
 		public long seconds ;
