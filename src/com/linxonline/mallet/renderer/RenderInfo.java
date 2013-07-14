@@ -6,6 +6,7 @@ import com.linxonline.mallet.input.InputAdapterInterface ;
 
 public final class RenderInfo implements InputAdapterInterface
 {
+	private boolean holdToRenderRatio = true ;
 	private Vector2 displayDimensions = null ;
 	private Vector2 renderDimensions = null ;
 	private Vector3 cameraPosition = null ;
@@ -24,21 +25,33 @@ public final class RenderInfo implements InputAdapterInterface
 		cameraPosition = _cameraPosition ;
 		updateInfo() ;
 	}
-	
+
 	private void updateInfo()
 	{
 		ratioRtoD = Vector2.divide( displayDimensions, renderDimensions ) ;
-		if( ratioRtoD.x < ratioRtoD.y )
+		if( holdToRenderRatio == true )
 		{
-			scaleRtoD.x = ratioRtoD.x ;
-			scaleRtoD.y = ratioRtoD.x ;
+			// Choose a scaling Ratio that allows the renderDimensions to keep 
+			// its aspect-ratio, but fill the display as much as possible 
+			if( ratioRtoD.x < ratioRtoD.y )
+			{
+				scaleRtoD.x = ratioRtoD.x ;
+				scaleRtoD.y = ratioRtoD.x ;
+			}
+			else
+			{
+				scaleRtoD.x = ratioRtoD.y ;
+				scaleRtoD.y = ratioRtoD.y ;
+			}
 		}
 		else
 		{
-			scaleRtoD.x = ratioRtoD.y ;
+			// Don't care about holding the renderDimensions natural aspect-ratio
+			// just fill the display
+			scaleRtoD.x = ratioRtoD.x ;
 			scaleRtoD.y = ratioRtoD.y ;
 		}
-		
+
 		scaledRenderDimensions.x = renderDimensions.x * scaleRtoD.x ;
 		scaledRenderDimensions.y = renderDimensions.y * scaleRtoD.y ;
 		screenOffset = Vector2.multiply( Vector2.subtract( displayDimensions, scaledRenderDimensions ), 0.5f ) ;
@@ -63,10 +76,13 @@ public final class RenderInfo implements InputAdapterInterface
 	
 	public Vector2 convertInputToRender( final Vector2 _input )
 	{
-		return new Vector2( convertInputToRenderX( _input.x ), 
-							convertInputToRenderY( _input.y ) ) ;
+		return new Vector2( convertInputToRenderX( _input.x ), convertInputToRenderY( _input.y ) ) ;
 	}
-	
+
+	/**
+		Check to see if the position is located within the Scaled Render Dimensions.
+		The renderDimensions could be 640x480, but the display 1024x768.
+	**/
 	public boolean isInScreen( final Vector2 _position )
 	{
 		if( ( _position.x < 0 )|| ( _position.x > scaledRenderDimensions.x )
@@ -77,24 +93,36 @@ public final class RenderInfo implements InputAdapterInterface
 		
 		return true ;
 	}
-	
+
 	public void setCameraPosition( final Vector3 _cameraPosition )
 	{
 		cameraPosition = _cameraPosition ;
 	}
 
+	/**
+		Used to set the dimensions of the Window that the program will render into.
+	**/
 	public void setDisplayDimensions( final Vector2 _displayDimension )
 	{
 		displayDimensions = _displayDimension ;
 		updateInfo() ;
 	}
 
+	/**
+		Set the Dimensions of the canvas in which things will be rendered onto.
+	**/
 	public void setRenderDimensions( final Vector2 _renderDimensions )
 	{
 		renderDimensions =_renderDimensions ;
 		updateInfo() ;
 	}
 
+	public void setKeepRenderRatio( final boolean _ratio )
+	{
+		holdToRenderRatio = _ratio ;
+		updateInfo() ;
+	}
+	
 	public void addToCameraPosition( final Vector3 _acc )
 	{
 		cameraPosition.add( _acc ) ;
@@ -135,9 +163,11 @@ public final class RenderInfo implements InputAdapterInterface
 	{
 		return scaleRtoD ;
 	}
-	
+
 	private void updateRealCameraPosition()
 	{
+		// Place the position of the camera in the center.
+		// Focal point will be located at the cross-roads of the renderDimensions
 		realCameraPosition.x = -cameraPosition.x + ( renderDimensions.x / 2 ) ;
 		realCameraPosition.y = -cameraPosition.y + ( renderDimensions.y / 2 ) ;
 	}

@@ -31,12 +31,7 @@ public class DefaultSystem implements SystemInterface
 	public EventSystem eventSystem = new EventSystem() ;
 	public InputSystem inputSystem = new InputSystem() ;
 
-	public DefaultSystem()
-	{
-		// Initiliase the Resource System with Java based Managers
-		ResourceManager resource = ResourceManager.getResourceManager() ;
-		resource.spriteManager = new SpriteManager() ;
-	}
+	public DefaultSystem() {}
 
 	public void initSystem()
 	{

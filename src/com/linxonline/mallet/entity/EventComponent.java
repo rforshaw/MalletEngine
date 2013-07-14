@@ -24,6 +24,12 @@ public class EventComponent extends Component
 		initEventProcessor() ;
 	}
 
+	public EventComponent( final String _name )
+	{
+		super( _name, "EVENTCOMPONENT" ) ;
+		initEventProcessor() ;
+	}
+	
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
@@ -34,6 +40,19 @@ public class EventComponent extends Component
 	{
 		sendToEntity = _send ;
 	}
+
+	/**
+		Allows an extended component to send Events as 
+		soon as it is added to the Game State.
+	**/
+	public void sendInitialEvents() {}
+
+	/**
+		Allows the extended component to send Events as it 
+		is being removed from the Game State.
+		These events should not expect a reply.
+	**/
+	public void sendFinishEvents() {}
 
 	public void update( final float _dt )
 	{

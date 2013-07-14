@@ -23,18 +23,14 @@ public class InputSystem implements InputSystemInterface,
 									MouseWheelListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private final TimePool<InputEvent> cache ;
+	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 0.25f, InputEvent.class ) ;
 	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
 	private HashMap<Integer, KeyState> keyboardState = new HashMap<Integer, KeyState>() ;
 	private ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
 	private Vector2 mousePosition = new Vector2( 0, 0 ) ;
 	private Vector2 screenMousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem()
-	{
-		final Class<InputEvent> clazz = ( Class<InputEvent> )new InputEvent().getClass() ;
-		cache = new TimePool<InputEvent>( 0.25f, clazz ) ;
-	}
+	public InputSystem() {}
 
 	public void addInputHandler( final InputHandler _handler )
 	{

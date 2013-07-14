@@ -11,6 +11,10 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 
+import com.linxonline.mallet.util.factory.creators.ImageCreator ;
+import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
+import com.linxonline.mallet.util.settings.Settings ;
+
 import com.linxonline.mallet.util.tools.ogg.OGG ;
 import com.linxonline.mallet.util.tools.ogg.Vorbis ;
 
@@ -39,8 +43,19 @@ public class Main
 			// Called when state is started.
 			public void initGame()
 			{
-				// Add a texture to the render system
-				/*eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
+				//renderTextureExample() ;
+				//renderAnimationExample() ;
+				//playAudioExample() ;
+				createEntityExample() ;
+				createMouseAnimExample() ;
+			}
+
+			/**
+				Add a texture and render directly to the renderer
+			**/
+			public void renderTextureExample()
+			{
+				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
 																	new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
 																	new Vector2( -32, -32 ), 			// Offset
 																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
@@ -48,9 +63,13 @@ public class Main
 																	null,								// clip
 																	null,								// clip offset
 																	10 ) ) ;							// layer
-*/
-				// Add a anim to animation system
-				// indirectly adds texture to render system
+			}
+
+			/**
+				Add an animation directly to the animation system
+			**/
+			public void renderAnimationExample()
+			{
 				eventSystem.addEvent( AnimationFactory.createAnimation( "base/anim/moomba.anim", 			// Animation Location
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
 																		 new Vector2( -32, -32 ), 			// Offset
@@ -69,11 +88,17 @@ public class Main
 					public void pause() { System.out.println( "Source has been paused" ) ; }
 					public void stop() { System.out.println( "Source has been stopped" ) ; }
 
-					public void update( final float _dt ) { /*System.out.println( _dt ) ;*/ }
+					public void update( final float _dt ) { System.out.println( _dt ) ; }
 					public void finished() { System.out.println( "Source has finished" ) ; }
 				} ) ) ;
+			}
 
-				/*eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
+			/**
+				Play audio file directly to the audio system
+			**/
+			public void playAudioExample()
+			{
+				eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
 				{
 					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
@@ -84,7 +109,35 @@ public class Main
 
 					public void update( final float _dt ) { System.out.println( _dt ) ; }
 					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;*/
+				} ) ) ;
+			}
+
+		
+			/**
+				Create an Entity using the ImageCreator and add 
+				it to the Game State
+			**/
+			public void createEntityExample()
+			{
+				final Settings image = new Settings() ;
+				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
+				image.addString( "POS", "0, 0" ) ;
+				image.addString( "DIM", "128, 128" ) ;
+				image.addString( "OFFSET", "-64, -64" ) ;
+
+				final ImageCreator creator = new ImageCreator() ;
+				addEntity( creator.create( image ) ) ;
+			}
+
+			public void createMouseAnimExample()
+			{
+				final Settings mouse = new Settings() ;
+				mouse.addString( "ANIM", "base/anim/moomba.anim" ) ;
+				mouse.addObject( "DIM", new Vector2( 32, 32 ) ) ;
+				mouse.addObject( "OFFSET", new Vector2( -16, -16 ) ) ;
+
+				final AnimMouseCreator creator = new AnimMouseCreator() ;
+				addEntity( creator.create( mouse ) ) ;
 			}
 		} ) ;
 

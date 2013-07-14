@@ -147,18 +147,6 @@ public class GameState extends State implements HookEntity
 			collisionSystem.add( coll.hull ) ;
 		}
 
-		components = _entity.getComponentByGroup( "RENDERCOMPONENT" ) ;
-		for( Component comp : components )
-		{
-			final EventComponent e = ( EventComponent )comp ;
-			final EventController controller = e.getEventController() ;
-			controller.setAddEventInterface( eventSystem ) ;
-			eventSystem.addEventHandler( controller ) ;
-
-			RenderComponent render = ( RenderComponent )comp ;
-			render.addDrawCalls() ;
-		}
-
 		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
@@ -173,6 +161,8 @@ public class GameState extends State implements HookEntity
 			final EventController controller = e.getEventController() ;
 			controller.setAddEventInterface( eventSystem ) ;
 			eventSystem.addEventHandler( controller ) ;
+
+			e.sendInitialEvents() ;
 		}
 
 		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
@@ -200,18 +190,6 @@ public class GameState extends State implements HookEntity
 			collisionSystem.remove( coll.hull ) ;
 		}
 
-		components = _entity.getComponentByGroup( "RENDERCOMPONENT" ) ;
-		for( Component comp : components )
-		{
-			final RenderComponent render = ( RenderComponent )comp ;
-			render.removeDrawCalls() ;
-
-			final EventComponent e = ( EventComponent )comp ;
-			final EventController controller = e.getEventController() ;
-			controller.setAddEventInterface( null ) ;
-			eventSystem.removeEventHandler( controller ) ;
-		}
-
 		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
 		for( Component comp : components )
 		{
@@ -223,6 +201,8 @@ public class GameState extends State implements HookEntity
 		for( Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
+			e.sendFinishEvents() ;
+
 			final EventController controller = e.getEventController() ;
 			controller.setAddEventInterface( null ) ;
 			eventSystem.removeEventHandler( controller ) ;
@@ -237,6 +217,7 @@ public class GameState extends State implements HookEntity
 
 		// Unregister any Resources this Component may have acquired.
 		_entity.clear() ;
+
 		// Update the Event System so other systems can process them asap.
 		eventSystem.update() ;
 	}

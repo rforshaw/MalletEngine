@@ -31,12 +31,7 @@ public class GLDefaultSystem implements SystemInterface
 	public EventSystem eventSystem = new EventSystem() ;
 	public InputSystem inputSystem = new InputSystem() ;
 
-	public GLDefaultSystem()
-	{
-		// Initiliase the Resource System with Java based Managers
-		ResourceManager resource = ResourceManager.getResourceManager() ;
-		resource.spriteManager = new SpriteManager() ;
-	}
+	public GLDefaultSystem() {}
 
 	public void initSystem()
 	{

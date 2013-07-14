@@ -1,7 +1,7 @@
 package com.linxonline.mallet.util.factory.creators ;
 
 import com.linxonline.mallet.resources.ResourceManager ;
-import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.* ;
 import com.linxonline.mallet.entity.* ;
@@ -25,23 +25,21 @@ public class AnimMouseCreator extends Creator<Entity>
 		final Entity entity = new Entity( "MOUSE" ) ;
 		entity.position = new Vector3( width, height, 0 ) ;
 
-		SpriteComponent sprite = new SpriteComponent() ;
+		AnimComponent anim = new AnimComponent() ;
 		EventComponent event = new EventComponent() ;
 		MouseComponent mouse = new MouseComponent() ;
 
-		sprite.add( DrawFactory.createTexture( null,
-												entity.position,
-											   _mouse.getObject( "OFFSET", Vector2.class, null ),
-											   _mouse.getObject( "DIM", Vector2.class, null ),
-											   _mouse.getObject( "FILL", Vector2.class, null ), 
-											    null,		// Clip View 
-											    null,		// Clip Offset
-											   _mouse.getInteger( "LAYER", 100 ) ) ) ;
+		anim.addAnimation( "DEFAULT", AnimationFactory.createAnimation( _mouse.getString( "ANIM", null ),
+																		 entity.position,
+																		_mouse.getObject( "OFFSET", Vector2.class, null ),
+																		_mouse.getObject( "DIM", Vector2.class, null ),
+																		_mouse.getObject( "FILL", Vector2.class, null ), 
+																		 null,		// Clip View 
+																		 null,		// Clip Offset
+																		_mouse.getInteger( "LAYER", 100 ), anim ) ) ;
+		anim.setDefaultAnim( "DEFAULT" ) ;
 
-		sprite.addSprite( resources.getSprite( _mouse.getString( "MOUSE", null ) ), "DEFAULT" ) ;
-		sprite.setSpriteByName( "DEFAULT" ) ;
-
-		entity.addComponent( sprite ) ;
+		entity.addComponent( anim ) ;
 		entity.addComponent( mouse ) ;
 		entity.addComponent( event ) ;
 

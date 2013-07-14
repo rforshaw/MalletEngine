@@ -28,7 +28,7 @@ public class RenderComponent extends EventComponent
 
 	public RenderComponent()
 	{
-		super( "RENDER", "RENDERCOMPONENT" ) ;
+		super( "RENDER" ) ;
 	}
 
 	public RenderComponent( final String _name, final String _group )
@@ -46,7 +46,8 @@ public class RenderComponent extends EventComponent
 		content.remove( _draw ) ;
 	}
 
-	public void addDrawCalls()
+	@Override
+	public void sendInitialEvents()
 	{
 		final int length = content.size() ;
 		for( int i = 0; i < length; ++i )
@@ -55,7 +56,8 @@ public class RenderComponent extends EventComponent
 		}
 	}
 
-	public void removeDrawCalls()
+	@Override
+	public void sendFinishEvents()
 	{
 		final int length = content.size() ;
 		Settings draw = null ;

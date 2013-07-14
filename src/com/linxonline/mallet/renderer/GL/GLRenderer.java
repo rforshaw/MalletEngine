@@ -46,6 +46,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
+		
+		renderInfo.setKeepRenderRatio( false ) ;
 	}
 
 	private void initGraphics()
@@ -261,7 +263,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 	
 	@Override
-	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height ) {}
+	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
+	{
+		renderInfo.setDisplayDimensions( new Vector2( _width, _height ) ) ;
+		resize() ;
+	}
 
 	@Override
 	public void dispose( GLAutoDrawable _drawable ) {}

@@ -8,31 +8,17 @@ import com.linxonline.mallet.resources.texture.* ;
 
 public class ResourceManager
 {
-	protected static ResourceManager resourceManager = new ResourceManager() ;
+	protected static final ResourceManager resourceManager = new ResourceManager() ;
 	protected final LanguageManager languageManager = new LanguageManager() ;
 	protected Settings config = new Settings() ;							// Global Game Settings.
 
 	public FileSystem fileSystem = null ;									// Should specify at Start up - Main
-	public ManagerInterface spriteManager = null ; 							// Must be set by the System - DefaultSystem etc.
-	
+
 	protected ResourceManager() {}
 
 	public static synchronized ResourceManager getResourceManager()
 	{
 		return resourceManager ;
-	}
-
-	/* Retrieve Resource */
-
-	public Sprite getSprite( final String _file )
-	{
-		if( resourceManager.spriteManager == null )
-		{
-			System.out.println( "Sprite Manager doesn't exist" ) ;
-			return null ;
-		}
-
-		return ( Sprite )resourceManager.spriteManager.get( _file ) ;
 	}
 
 	/* Language Manager - Enables multi-langauge games */
@@ -86,25 +72,20 @@ public class ResourceManager
 	**/
 	public static void clear()
 	{
-		resourceManager.spriteManager.clear() ;
 		resourceManager.languageManager.clear() ;
 	}
 
 	/**
 		Remove unused resources
 	**/
-	public static void clean()
-	{
-		resourceManager.spriteManager.clean() ;
-	}
-	
+	public static void clean() {}
+
 	/**
 		Clear resources and shutdown connections with Sound System
 	**/
 	public static void shutdown()
 	{
 		clear() ;
-		//soundManager.shutdown() ;
 	}
 
 	public Object clone() throws CloneNotSupportedException
