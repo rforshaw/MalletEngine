@@ -119,7 +119,7 @@ public class DrawFactory
 
 	public static void insertIDCallback( final Event _event, final IDInterface _callback )
 	{
-		final Settings sets = _event.getVariable( Settings.class ) ;
+		final Settings sets = ( Settings )_event.getVariable() ;
 		sets.addObject( "CALLBACK", _callback ) ;
 	}
 	

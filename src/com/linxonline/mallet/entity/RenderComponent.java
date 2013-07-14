@@ -65,7 +65,7 @@ public class RenderComponent extends EventComponent
 		for( int i = 0; i < length; ++i )
 		{
 			event = content.get( i ) ;
-			draw = event.getVariable( Settings.class ) ;
+			draw = ( Settings )event.getVariable() ;
 			draw.addInteger( REQUEST_TYPE, DrawRequestType.REMOVE_DRAW ) ;
 			passEvent( event ) ;
 		}
@@ -78,6 +78,6 @@ public class RenderComponent extends EventComponent
 
 	public Settings getDrawAt( final int _pos )
 	{
-		return content.get( _pos ).getVariable( Settings.class ) ;
+		return ( Settings )content.get( _pos ).getVariable() ;
 	}
 }

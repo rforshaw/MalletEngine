@@ -102,7 +102,7 @@ public class Animation implements IDInterface
 	
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
-		final Settings settings = _event.getVariable( Settings.class ) ;
+		final Settings settings = ( Settings )_event.getVariable() ;
 		final String file = sprite.getTexture( frame ) ;
 
 		settings.addString( "FILE", file ) ;

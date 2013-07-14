@@ -50,9 +50,6 @@ public class Main
 				//playAudioExample() ;
 				createEntityExample() ;
 				createMouseAnimExample() ;
-				
-				final Event event = new Event( "TEST", "TEST AGAIN!" ) ;
-				Integer num = ( Integer )event.getVariable() ;
 			}
 
 			/**

@@ -56,7 +56,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	@Override
 	protected void useEvent( final Event _event )
 	{
-		final Settings audio = _event.getVariable( Settings.class ) ;
+		final Settings audio = ( Settings )_event.getVariable() ;
 		final int type = audio.getInteger( "REQUEST_TYPE", -1 ) ;
 
 		switch( type )

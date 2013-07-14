@@ -5,14 +5,14 @@ package com.linxonline.mallet.event ;
 // Used to store relevant data to pass to 
 // other objects. 
 /*===========================================*/
-public final class Event
+public final class Event<T>
 {
 	public static final String[] NONE_EVENT_TYPES = { "NONE" } ;
 	public static final String[] ALL_EVENT_TYPES = { "ALL" } ;
 
 	private int hashCode = 0 ;
 	private String eventType = null ;
-	private Object variable = null ;
+	private T variable = null ;
 
 	public Event()
 	{
@@ -20,7 +20,7 @@ public final class Event
 		hashCode = eventType.hashCode() ;
 	}
 
-	public Event( final String _eventType, final Object _object )
+	public Event( final String _eventType, final T _object )
 	{
 		setEvent( _eventType, _object ) ;
 	}
@@ -52,7 +52,7 @@ public final class Event
 	/**
 		Enables an Event to be reused.
 	**/
-	public final void setEvent( final String _eventType, final Object _object )
+	public final void setEvent( final String _eventType, final T _object )
 	{
 		eventType = _eventType ;
 		variable = _object ;
@@ -64,7 +64,7 @@ public final class Event
 		return eventType ;
 	}
 
-	public final Object getVariable()
+	public final T getVariable()
 	{
 		return variable ;
 	}
