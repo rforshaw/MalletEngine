@@ -3,6 +3,14 @@ package com.linxonline.mallet.event ;
 import java.io.Serializable ;
 import java.util.ArrayList ;
 
+/**
+	Double buffer effectively, prevents events from being added to 
+	an array that is being processed, reduces the chance of an infinite loop or crash.
+
+	Use in order:
+		refreshEvents() ;
+		process Events
+**/
 /*====================================================*/
 // Used to prevent new events tampering with old events
 // while they are being processed. Entity uses this for 
@@ -42,13 +50,16 @@ public final class EventMessenger implements Serializable
 	{
 		return ( events.size() > 0 ) || ( newEvents.size() > 0 ) ? true : false ;
 	}
-	
+
+	/**
+		Swap the buffers and clear the old active buffer.
+	**/
 	public final void refreshEvents()
 	{
-		final ArrayList<Event> pointer = events ;
+		final ArrayList<Event> oldEvents = events ;
 
 		events = newEvents ;
-		newEvents = pointer ;
+		newEvents = oldEvents ;
 		newEvents.clear() ;
 	}
 

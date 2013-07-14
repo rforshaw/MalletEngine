@@ -23,7 +23,6 @@ import com.linxonline.mallet.system.* ;
 public class RenderComponent extends EventComponent
 {
 	private final static String REQUEST_TYPE = "REQUEST_TYPE" ;
-
 	private final ArrayList<Event> content = new ArrayList<Event>() ;
 
 	public RenderComponent()
@@ -66,7 +65,7 @@ public class RenderComponent extends EventComponent
 		for( int i = 0; i < length; ++i )
 		{
 			event = content.get( i ) ;
-			draw = ( Settings )event.getVariable() ;
+			draw = event.getVariable( Settings.class ) ;
 			draw.addInteger( REQUEST_TYPE, DrawRequestType.REMOVE_DRAW ) ;
 			passEvent( event ) ;
 		}
@@ -79,6 +78,6 @@ public class RenderComponent extends EventComponent
 
 	public Settings getDrawAt( final int _pos )
 	{
-		return ( Settings )content.get( _pos ).getVariable() ;
+		return content.get( _pos ).getVariable( Settings.class ) ;
 	}
 }

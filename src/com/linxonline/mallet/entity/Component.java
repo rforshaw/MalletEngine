@@ -9,10 +9,10 @@ import com.linxonline.mallet.event.* ;
 
 public abstract class Component implements SerialisableForm
 {
-	protected final EventController componentEvents = new EventController() ;
-	protected Entity parent = null ;
-	private String name ;
-	private String group ;
+	protected final EventController componentEvents = new EventController() ;	// Handles events from parent
+	protected Entity parent = null ;											// Owner of this component
+	private String name ;														// Componets name, isn't unique
+	private String group ;														// Componets group name, 
 
 	private int nameID = -1 ;
 	private int groupID = -1 ;
@@ -40,6 +40,10 @@ public abstract class Component implements SerialisableForm
 		parent = _parent ;
 	}
 
+	/**
+		If overriding, you must call super.update( _dt ), 
+		else componentEvents will not be updated.
+	**/
 	public void update( final float _dt )
 	{
 		componentEvents.update() ;

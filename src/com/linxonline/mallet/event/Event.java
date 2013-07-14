@@ -66,8 +66,16 @@ public final class Event implements Serializable
 		return eventType ;
 	}
 
-	public final Object getVariable()
+	/**
+		Should be considered deprecated.
+	**/
+	/*public final Object getVariable()
 	{
 		return variable ;
+	}*/
+
+	public final <T> T getVariable( final Class<T> _type )
+	{
+		return _type.cast( variable ) ;
 	}
 }

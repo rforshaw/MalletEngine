@@ -66,7 +66,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void useEventInCamera( final Event _event )
 	{
-		final Settings camera = ( Settings )_event.getVariable() ;
+		final Settings camera = _event.getVariable( Settings.class ) ;
 		final int type = camera.getInteger( "REQUEST_TYPE", -1 ) ;
 		switch( type )
 		{
@@ -85,7 +85,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	
 	protected void useEventInDraw( final Event _event )
 	{
-		final Settings draw = ( Settings )_event.getVariable() ;
+		final Settings draw = _event.getVariable( Settings.class ) ;
 		final int type = draw.getInteger( "REQUEST_TYPE", -1 ) ;
 
 		switch( type )

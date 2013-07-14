@@ -23,6 +23,9 @@ public class EventController implements EventHandler
 
 	public EventController() {}
 
+	/**
+		Add an Event Processor to begin reading the event stream.
+	**/
 	public void addEventProcessor( final EventProcessor _processor )
 	{
 		if( _processor != null )
@@ -36,11 +39,18 @@ public class EventController implements EventHandler
 		addInterface = _addInterface ;
 	}
 	
+	/**
+		Define what type of events this controller should be interested in.
+	**/
 	public void setWantedEventTypes( final String[] _types )
 	{
 		wantedTypes = _types ;
 	}
 
+	/**
+		Should not be overriden.
+		Adds events to messenger and will process them at the appropriate time.
+	**/
 	public void processEvent( final Event _event )
 	{
 		messenger.addEvent( _event ) ;
@@ -65,7 +75,9 @@ public class EventController implements EventHandler
 		}
 	}
 
-	// Pass Event back to an EventSystem
+	/**
+		Pass Event back to an EventSystem defined by addInterface.
+	**/
 	public void passEvent( final Event _event )
 	{
 		if( addInterface != null )
