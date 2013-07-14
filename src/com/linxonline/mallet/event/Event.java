@@ -1,13 +1,11 @@
 package com.linxonline.mallet.event ;
 
-import java.io.Serializable ;
-
 /*===========================================*/
 // Event
 // Used to store relevant data to pass to 
 // other objects. 
 /*===========================================*/
-public final class Event implements Serializable
+public final class Event
 {
 	public static final String[] NONE_EVENT_TYPES = { "NONE" } ;
 	public static final String[] ALL_EVENT_TYPES = { "ALL" } ;
@@ -66,13 +64,10 @@ public final class Event implements Serializable
 		return eventType ;
 	}
 
-	/**
-		Should be considered deprecated.
-	**/
-	/*public final Object getVariable()
+	public final Object getVariable()
 	{
 		return variable ;
-	}*/
+	}
 
 	public final <T> T getVariable( final Class<T> _type )
 	{

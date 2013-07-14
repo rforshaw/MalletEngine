@@ -11,6 +11,8 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 
+import com.linxonline.mallet.event.Event ;
+
 import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -48,6 +50,9 @@ public class Main
 				//playAudioExample() ;
 				createEntityExample() ;
 				createMouseAnimExample() ;
+				
+				final Event event = new Event( "TEST", "TEST AGAIN!" ) ;
+				Integer num = ( Integer )event.getVariable() ;
 			}
 
 			/**
