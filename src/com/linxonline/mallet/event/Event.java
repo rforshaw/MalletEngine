@@ -68,9 +68,4 @@ public final class Event<T>
 	{
 		return variable ;
 	}
-
-	public final <T> T getVariable( final Class<T> _type )
-	{
-		return _type.cast( variable ) ;
-	}
 }

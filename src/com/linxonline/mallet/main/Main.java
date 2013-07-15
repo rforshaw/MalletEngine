@@ -114,7 +114,6 @@ public class Main
 				} ) ) ;
 			}
 
-		
 			/**
 				Create an Entity using the ImageCreator and add 
 				it to the Game State
@@ -131,6 +130,9 @@ public class Main
 				addEntity( creator.create( image ) ) ;
 			}
 
+			/**
+				Create an Entity that follows the mouse
+			**/
 			public void createMouseAnimExample()
 			{
 				final Settings mouse = new Settings() ;
