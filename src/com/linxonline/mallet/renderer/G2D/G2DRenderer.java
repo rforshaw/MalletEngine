@@ -399,12 +399,19 @@ public class G2DRenderer extends Basic2DRender
 		return canvas ;
 	}
 
+	@Override
+	public void clear()
+	{
+		super.clear() ;
+		numID = 0 ;
+	}
+
 	private void initCanvasBuffer( final int _size )
 	{
 		canvas.createBufferStrategy( _size ) ;
 		buffer = canvas.getBufferStrategy() ;
 	}
-	
+
 	private Texture loadTexture( final String _file )
 	{
 		return _file != null ? ( Texture )textures.get( _file ) : null ;

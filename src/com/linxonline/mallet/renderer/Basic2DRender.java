@@ -147,7 +147,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected abstract void createTexture( final Settings _draw ) ;
 	protected abstract void createGeometry( final Settings _draw ) ;
 	protected abstract void createText( final Settings _draw ) ;
-	
+
 	protected void passIDToCallback( final int _id, final IDInterface _idInterface )
 	{
 		if( _idInterface != null )
@@ -210,6 +210,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			layer = _layer ;
 			drawData = _draw ;
 			position = _position ;
+			drawData.addInteger( "ID", _id ) ;
 		}
 	}
 

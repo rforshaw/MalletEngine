@@ -90,14 +90,6 @@ public class InputSystem implements InputSystemInterface,
 		final int inputSize = mouseInputs.size() ;
 		final int handlerSize = handlers.size() ;
 
-		// If there are no Inputs, add the last mouse position to queue.
-		// Ensure position is updated with correct viewport dimensions.
-		/*if( mouseInputs.size() == 0 )
-		{
-			updateMouse( InputEvent.MOUSE_MOVED, mousePosition ) ;
-			return ;
-		}*/
-
 		InputEvent event = null ;
 		InputHandler handler = null ;
 

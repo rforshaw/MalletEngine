@@ -217,7 +217,6 @@ public class ButtonComponent extends InputComponent
 				return true ;
 			}
 		}
-
 		return false ;
 	}
 
