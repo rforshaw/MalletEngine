@@ -76,16 +76,16 @@ public class CheckBoxComponent extends InputComponent
 		for( int i = 0; i < size; ++i )
 		{
 			input = inputs.get( i ) ;
-			if( input.inputType == InputEvent.MOUSE_MOVED ||
-				input.inputType == InputEvent.TOUCH_MOVE )
+			if( input.inputType == InputType.MOUSE_MOVED ||
+				input.inputType == InputType.TOUCH_MOVE )
 			{
 				mouse.x = input.mouseX ;
 				mouse.y = input.mouseY ;
 				continue ;
 			}
 
-			if( input.inputType == InputEvent.MOUSE1_PRESSED ||
-				input.inputType == InputEvent.TOUCH_DOWN )
+			if( input.inputType == InputType.MOUSE1_PRESSED ||
+				input.inputType == InputType.TOUCH_DOWN )
 			{
 				mouse.x = input.mouseX ;
 				mouse.y = input.mouseY ;
@@ -99,8 +99,8 @@ public class CheckBoxComponent extends InputComponent
 				}
 			}
 
-			if( input.inputType == InputEvent.MOUSE1_RELEASED ||
-				input.inputType == InputEvent.TOUCH_UP )
+			if( input.inputType == InputType.MOUSE1_RELEASED ||
+				input.inputType == InputType.TOUCH_UP )
 			{
 				if( intersect( mouse.x, mouse.y, boxDim ) == true )
 				{

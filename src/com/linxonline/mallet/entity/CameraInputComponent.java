@@ -51,13 +51,13 @@ public class CameraInputComponent extends Component implements InputHandler
 	
 	public void passInputEvent( final InputEvent _event )
 	{
-		final int type = _event.getInputType() ;
-		if( type == InputEvent.KEYBOARD_PRESSED )
+		final InputType type = _event.getInputType() ;
+		if( type == InputType.KEYBOARD_PRESSED )
 		{
 			pressed( _event ) ;
 		}
 
-		if( ( type == InputEvent.KEYBOARD_RELEASED ) )
+		if( ( type == InputType.KEYBOARD_RELEASED ) )
 		{
 			released( _event ) ;
 		}
@@ -65,7 +65,7 @@ public class CameraInputComponent extends Component implements InputHandler
 
 	private final void pressed( final InputEvent _event )
 	{
-		final char key = _event.key ;
+		final char key = _event.getKeyCharacter() ;
 
 		if( key == 'w' )
 		{
@@ -90,7 +90,7 @@ public class CameraInputComponent extends Component implements InputHandler
 
 	private final void released( final InputEvent _event )
 	{
-		final char key = _event.key ;
+		final char key = _event.getKeyCharacter() ;
 
 		if( key == 'w' )
 		{

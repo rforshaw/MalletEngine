@@ -23,7 +23,7 @@ public class MouseComponent extends Component
 	@Override
 	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
 	{
-		System.out.println( "Setting input Adapter: " + _adapter ) ;
+		//System.out.println( "Setting input Adapter: " + _adapter ) ;
 		inputAdapter = _adapter ;
 	}
 
@@ -37,10 +37,10 @@ public class MouseComponent extends Component
 
 	public void passInputEvent( final InputEvent _event )
 	{
-		final int eventType = _event.getInputType() ;
+		final InputType eventType = _event.getInputType() ;
 
-		if( eventType == InputEvent.MOUSE_MOVED ||
-			eventType == InputEvent.TOUCH_MOVE )
+		if( eventType == InputType.MOUSE_MOVED ||
+			eventType == InputType.TOUCH_MOVE )
 		{
 			mouse.setXY( _event.mouseX, _event.mouseY ) ;
 		}

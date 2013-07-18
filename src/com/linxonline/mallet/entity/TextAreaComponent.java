@@ -127,16 +127,16 @@ public class TextAreaComponent extends InputComponent
 			event = inputs.get( i ) ;
 			updateKeyboardInputs( event ) ;
 
-			if( event.inputType == InputEvent.MOUSE_MOVED ||
-				event.inputType == InputEvent.TOUCH_MOVE )
+			if( event.inputType == InputType.MOUSE_MOVED ||
+				event.inputType == InputType.TOUCH_MOVE )
 			{
 				mouseX = ( int )event.mouseX ;
 				mouseY = ( int )event.mouseY ;
 				continue ;
 			}
 
-			if( event.inputType == InputEvent.MOUSE1_PRESSED ||
-				event.inputType == InputEvent.TOUCH_DOWN )
+			if( event.inputType == InputType.MOUSE1_PRESSED ||
+				event.inputType == InputType.TOUCH_DOWN )
 			{
 				mouseX = ( int )event.mouseX ;
 				mouseY = ( int )event.mouseY ;
@@ -166,14 +166,14 @@ public class TextAreaComponent extends InputComponent
 			return ;
 		}
 
-		if( _event.inputType == InputEvent.KEYBOARD_PRESSED )
+		if( _event.inputType == InputType.KEYBOARD_PRESSED )
 		{
-			final int keycode = _event.getKeyCode() ;
-			if( keycode == InputEvent.SHIFT || keycode == InputEvent.CTRL ||
-				keycode == InputEvent.ALT || keycode == InputEvent.ALTGROUP ||
-				keycode == InputEvent.BACKSPACE || keycode == InputEvent.ENTER )
+			final KeyCode keycode = _event.getKeyCode() ;
+			if( keycode == KeyCode.SHIFT || keycode == KeyCode.CTRL ||
+				keycode == KeyCode.ALT || keycode == KeyCode.ALTGROUP ||
+				keycode == KeyCode.BACKSPACE || keycode == KeyCode.ENTER )
 			{
-				if( keycode == InputEvent.BACKSPACE )
+				if( keycode == KeyCode.BACKSPACE )
 				{
 					final int length = buffer.length() ;
 					if( length > 0 )
@@ -182,7 +182,7 @@ public class TextAreaComponent extends InputComponent
 						setText( buffer.toString() ) ;
 					}
 				}
-				else if( keycode == InputEvent.ENTER )
+				else if( keycode == KeyCode.ENTER )
 				{
 					eventComponent.passEvent( returnEvent ) ;
 				}

@@ -114,16 +114,16 @@ public class ButtonComponent extends InputComponent
 		for( int i = 0; i < size; ++i )
 		{
 			event = inputs.get( i ) ;
-			if( event.inputType == InputEvent.MOUSE_MOVED ||
-				event.inputType == InputEvent.TOUCH_MOVE )
+			if( event.inputType == InputType.MOUSE_MOVED ||
+				event.inputType == InputType.TOUCH_MOVE )
 			{
 				mouseX = ( int )event.mouseX ;
 				mouseY = ( int )event.mouseY ;
 				continue ;
 			}
 
-			if( event.inputType == InputEvent.MOUSE1_PRESSED ||
-				event.inputType == InputEvent.TOUCH_DOWN )
+			if( event.inputType == InputType.MOUSE1_PRESSED ||
+				event.inputType == InputType.TOUCH_DOWN )
 			{
 				mouseX = ( int )event.mouseX ;
 				mouseY = ( int )event.mouseY ;
@@ -136,8 +136,8 @@ public class ButtonComponent extends InputComponent
 				}
 			}
 
-			if( event.inputType == InputEvent.MOUSE1_RELEASED ||
-				event.inputType == InputEvent.TOUCH_UP )
+			if( event.inputType == InputType.MOUSE1_RELEASED ||
+				event.inputType == InputType.TOUCH_UP )
 			{
 				isPressed = false ;
 				mouseX = ( int )event.mouseX ;

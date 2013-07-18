@@ -12,6 +12,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 
 import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.input.KeyCode ;
 
 import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;

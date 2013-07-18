@@ -46,18 +46,18 @@ public class KeyInputComponent extends InputComponent
 	{
 		switch( _input.inputType )
 		{
-			case InputEvent.KEYBOARD_PRESSED :
+			case KEYBOARD_PRESSED :
 			{
-				final Character key = Character.valueOf( _input.key ) ;
+				final Character key = Character.valueOf( _input.getKeyCharacter() ) ;
 				if( keys.containsKey( key ) == true )
 				{
 					keys.get( key ).callPressed() ;
 				}
 				break ;
 			}
-			case InputEvent.KEYBOARD_RELEASED :
+			case KEYBOARD_RELEASED :
 			{
-				final Character key = Character.valueOf( _input.key ) ;
+				final Character key = Character.valueOf( _input.getKeyCharacter() ) ;
 				if( keys.containsKey( key ) == true )
 				{
 					keys.get( key ).callReleased() ;

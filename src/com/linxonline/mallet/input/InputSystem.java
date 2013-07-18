@@ -24,12 +24,15 @@ public class InputSystem implements InputSystemInterface,
 {
 	public InputAdapterInterface inputAdapter = null ;
 	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 0.25f, InputEvent.class ) ;
-	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
-	private HashMap<Integer, KeyState> keyboardState = new HashMap<Integer, KeyState>() ;
-	private ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
-	private Vector2 mousePosition = new Vector2( 0, 0 ) ;
-	private Vector2 screenMousePosition = new Vector2( 0, 0 ) ;
 
+	private final ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
+
+	private final HashMap<KeyCode, KeyState> keyboardState = new HashMap<KeyCode, KeyState>() ;
+	private final ArrayList<KeyState> activeKeyStates = new ArrayList<KeyState>() ;
+
+	private final ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
+	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
+	
 	public InputSystem() {}
 
 	public void addInputHandler( final InputHandler _handler )
@@ -62,27 +65,25 @@ public class InputSystem implements InputSystemInterface,
 
 	private void passKeyInputs()
 	{
-		final Collection<KeyState> keybaord = keyboardState.values() ;
 		final int handlerSize = handlers.size() ;
+		final int stateSize = activeKeyStates.size() ;
+
 		InputHandler handler = null ;
+		KeyState state = null ;
 
-		for( final KeyState keyState : keybaord )
+		for( int i = 0; i < stateSize; i++ )
 		{
-			if( keyState.changed == true )
+			state = activeKeyStates.get( i ) ;
+			final InputEvent input = cache.get() ;
+			input.clone( state.input ) ;
+			for( int j = 0; j < handlerSize; ++j )
 			{
-				// Clone Input Event incase KeyState is changed
-				// before game logic has processed it.
-				final InputEvent input = cache.get() ;
-				input.clone( keyState.input ) ;
-				for( int j = 0; j < handlerSize; ++j )
-				{
-					handler = handlers.get( j ) ;
-					handler.passInputEvent( input ) ;
-				}
+				handler = handlers.get( j ) ;
+				handler.passInputEvent( input ) ;
 			}
-
-			keyState.changed = false ;
 		}
+
+		activeKeyStates.clear() ;
 	}
 
 	private void passMouseInputs()
@@ -110,7 +111,7 @@ public class InputSystem implements InputSystemInterface,
 	{
 		if( _event.getID() == KeyEvent.KEY_PRESSED )
 		{
-			updateKey( InputEvent.KEYBOARD_PRESSED, _event ) ;
+			updateKey( InputType.KEYBOARD_PRESSED, _event ) ;
 		}
 	}
 
@@ -118,7 +119,7 @@ public class InputSystem implements InputSystemInterface,
 	{
 		if( _event.getID() == KeyEvent.KEY_RELEASED )
 		{
-			updateKey( InputEvent.KEYBOARD_RELEASED, _event ) ;
+			updateKey( InputType.KEYBOARD_RELEASED, _event ) ;
 		}
 	}
 
@@ -139,14 +140,14 @@ public class InputSystem implements InputSystemInterface,
 			mousePosition.x = _event.getX() ;
 			mousePosition.y = _event.getY() ;
 
-			updateMouse( InputEvent.MOUSE1_PRESSED, mousePosition ) ;
+			updateMouse( InputType.MOUSE1_PRESSED, mousePosition ) ;
 		}
 		else if( button == MouseEvent.BUTTON2 )
 		{
 			mousePosition.x = _event.getX() ;
 			mousePosition.y = _event.getY() ;
 
-			updateMouse( InputEvent.MOUSE2_PRESSED, mousePosition ) ;
+			updateMouse( InputType.MOUSE2_PRESSED, mousePosition ) ;
 		}
 	}
 
@@ -159,14 +160,14 @@ public class InputSystem implements InputSystemInterface,
 			mousePosition.x = _event.getX() ;
 			mousePosition.y = _event.getY() ;
 
-			updateMouse( InputEvent.MOUSE1_RELEASED, mousePosition ) ;
+			updateMouse( InputType.MOUSE1_RELEASED, mousePosition ) ;
 		}
 		else if( button == MouseEvent.BUTTON2 )
 		{
 			mousePosition.x = _event.getX() ;
 			mousePosition.y = _event.getY() ;
 
-			updateMouse( InputEvent.MOUSE2_RELEASED, mousePosition ) ;
+			updateMouse( InputType.MOUSE2_RELEASED, mousePosition ) ;
 		}
 	}
 
@@ -175,7 +176,7 @@ public class InputSystem implements InputSystemInterface,
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
 
-		updateMouse( InputEvent.MOUSE_MOVED, mousePosition ) ;
+		updateMouse( InputType.MOUSE_MOVED, mousePosition ) ;
 	}
 
 	public void mouseMoved( MouseEvent _event )
@@ -183,54 +184,54 @@ public class InputSystem implements InputSystemInterface,
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
 
-		updateMouse( InputEvent.MOUSE_MOVED, mousePosition ) ;
+		updateMouse( InputType.MOUSE_MOVED, mousePosition ) ;
 	}
 
 	public void mouseWheelMoved( MouseWheelEvent _event )
 	{
 		updateMouseWheel( _event ) ;
 	}
-	
+
 	private synchronized void updateMouseWheel( MouseWheelEvent _event )
 	{
 		final int scroll = _event.getWheelRotation() ;
-		InputEvent input = new InputEvent( InputEvent.SCROLL_WHEEL, 
-											scroll, 
-											scroll ) ;
+		final InputEvent input = new InputEvent( InputType.SCROLL_WHEEL, scroll, scroll ) ;
 		mouseInputs.add( input ) ;
 	}
 	
-	private synchronized void updateMouse( final int _inputType, final Vector2 _mousePosition )
+	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
 	{
-		// Used to convert raw mouse position to game mouse position.
-		// Moved to InputComponent or InputHandler, etc to do
-		screenMousePosition.x =  _mousePosition.x ;
-		screenMousePosition.y =  _mousePosition.y ;
-
 		final InputEvent input = cache.get() ;
-		input.setInput( _inputType, screenMousePosition.x, screenMousePosition.y ) ;
+		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
 	}
 
-	private synchronized void updateKey( final int _inputType, final KeyEvent _event )
+	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )
 	{
-		final int keycode = _event.getKeyCode() ;
+		KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
+		if( keycode == KeyCode.NONE )
+		{
+			keycode = isSpecialKeyDown( _event ) ;
+		}
+
 		if( keyboardState.containsKey( keycode ) == true )
 		{
-			changeKey( _inputType, _event ) ;
+			changeKey( _inputType, keycode, _event ) ;
 			return ;
 		}
 
 		// Create new Key if it doesn't exist.
-		InputEvent input = new InputEvent( _inputType, _event.getKeyChar(), _event.getKeyCode() ) ;
+		final InputEvent input = new InputEvent( _inputType, keycode ) ;
 		input.isActionKey = _event.isActionKey() ;
-		keyboardState.put( keycode, new KeyState( input, true ) ) ;
+
+		final KeyState state = new KeyState( input, true ) ;
+		keyboardState.put( keycode, state ) ;
+		activeKeyStates.add( state ) ;
 	}
 
-	private void changeKey( final int _inputType, final KeyEvent _event )
+	private void changeKey( final InputType _inputType, final KeyCode _keycode, final KeyEvent _event )
 	{
-		final int keycode = _event.getKeyCode() ;
-		final KeyState state = keyboardState.get( keycode ) ;
+		final KeyState state = keyboardState.get( _keycode ) ;
 		if( state.input.inputType != _inputType )			// If the Input Type has changed
 		{
 			final long eventTimeStamp = _event.getWhen() ;
@@ -238,35 +239,32 @@ public class InputSystem implements InputSystemInterface,
 
 			// Timestamp check is done, due to Linux Input Bug
 			// Causes endless Inputs to be sent, this filters duplicates.
-			if( _inputType == InputEvent.KEYBOARD_PRESSED )
+			if( _inputType == InputType.KEYBOARD_PRESSED )
 			{
 				dt = eventTimeStamp - state.pressedTimeStamp ;
 			}
-			else if( _inputType == InputEvent.KEYBOARD_RELEASED )
+			else if( _inputType == InputType.KEYBOARD_RELEASED )
 			{
 				dt = eventTimeStamp - state.releasedTimeStamp ;
 			}
 
 			if( dt > 0L )
 			{
-				final InputEvent input = new InputEvent( _inputType, _event.getKeyChar(), keycode ) ;
-				input.isActionKey = _event.isActionKey() ;
-
+				activeKeyStates.add( state ) ;
 				state.changed = true ;
-				state.input = input ;
 
-				if( _inputType == InputEvent.KEYBOARD_PRESSED )
+				if( _inputType == InputType.KEYBOARD_PRESSED )
 				{
 					state.pressedTimeStamp = eventTimeStamp ;
 				}
-				else if( _inputType == InputEvent.KEYBOARD_RELEASED )
+				else if( _inputType == InputType.KEYBOARD_RELEASED )
 				{
 					state.releasedTimeStamp = eventTimeStamp ;
 				}
 			}
 		}
 	}
-
+	
 	public void clearHandlers()
 	{
 		handlers.clear() ;
@@ -276,6 +274,7 @@ public class InputSystem implements InputSystemInterface,
 	{
 		mouseInputs.clear() ;
 		keyboardState.clear() ;
+		activeKeyStates.clear() ;
 	}
 
 	private final boolean exists( final InputHandler _handler )
@@ -283,33 +282,29 @@ public class InputSystem implements InputSystemInterface,
 		return handlers.contains( _handler ) ;
 	}
 
-	private final boolean isSpecialKeysDown( final KeyEvent _event )
+	private final KeyCode isSpecialKeyDown( final KeyEvent _event )
 	{
 		if( _event.isShiftDown() == true )
 		{
-			return true ;
+			return KeyCode.SHIFT ;
+		}
+		else if( _event.isControlDown() == true )
+		{
+			return KeyCode.CTRL ;
+		}
+		else if( _event.isAltDown() == true )
+		{
+			return KeyCode.ALT ;
+		}
+		else if( _event.isAltGraphDown() == true )
+		{
+			return KeyCode.ALTGROUP ;
+		}
+		else if( _event.isMetaDown() == true )
+		{
+			return KeyCode.META ;
 		}
 
-		if( _event.isControlDown() == true )
-		{
-			return true ;
-		}
-
-		if( _event.isAltDown() == true )
-		{
-			return true ;
-		}
-		
-		if( _event.isAltGraphDown() == true )
-		{
-			return true ;
-		}
-		
-		if( _event.isMetaDown() == true )
-		{
-			return true ;
-		}
-		
-		return false ;
+		return KeyCode.NONE ;
 	}
 }
