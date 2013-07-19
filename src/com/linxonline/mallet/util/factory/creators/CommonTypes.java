@@ -1,7 +1,7 @@
 package com.linxonline.mallet.util.factory.creators ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.maths.* ;
 
 public class CommonTypes
@@ -22,10 +22,8 @@ public class CommonTypes
 
 		if( percentage != null )
 		{
-			final ResourceManager resource = ResourceManager.getResourceManager() ;
-			final Settings config = resource.getConfig() ;
-			final int renderWidth = config.getInteger( "RENDERWIDTH", 800 ) ;
-			final int renderHeight = config.getInteger( "RENDERHEIGHT", 600 ) ;
+			final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
+			final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 600 ) ;
 
 			position.x = ( renderWidth / 100.0f ) * percentage.x ;
 			position.y = ( renderHeight / 100.0f ) * percentage.y ;

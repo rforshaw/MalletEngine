@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;

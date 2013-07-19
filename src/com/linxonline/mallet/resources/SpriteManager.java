@@ -26,7 +26,6 @@ public class SpriteManager extends AbstractManager
 
 	protected Sprite loadSprite( final String _file )
 	{
-		ResourceManager resources = ResourceManager.getResourceManager() ;
 		ArrayList<String> texts = TextReader.getTextFile( _file ) ;
 
 		int framerate = Integer.parseInt( texts.get( 0 ) ) ;

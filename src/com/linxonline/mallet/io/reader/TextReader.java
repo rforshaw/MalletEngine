@@ -3,7 +3,7 @@ package com.linxonline.mallet.io.reader ;
 import java.io.* ;
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 public class TextReader
 {
@@ -19,12 +19,11 @@ public class TextReader
 	
 	private static ArrayList<String> readFile( final String _file )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final ArrayList<String> textFile = new ArrayList<String>() ;
 
 		try
 		{
-			String txt = resources.getFileSystem().getResourceAsString( _file ) ;
+			String txt = GlobalFileSystem.getResourceAsString( _file ) ;
 			if( txt == null )
 			{
 				return null ;

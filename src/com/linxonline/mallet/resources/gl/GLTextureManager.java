@@ -9,6 +9,7 @@ import java.io.* ;
 
 import java.nio.* ;
 
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.gl.* ;
@@ -23,8 +24,7 @@ public class GLTextureManager extends TextureManager
 	{
 		try
 		{
-			final ResourceManager resources = ResourceManager.getResourceManager() ;
-			final byte[] image = resources.getFileSystem().getResourceRaw( _file ) ;
+			final byte[] image = GlobalFileSystem.getResourceRaw( _file ) ;
 			final InputStream in = new ByteArrayInputStream( image ) ;
 
 			return bind( ImageIO.read( in ) ) ;

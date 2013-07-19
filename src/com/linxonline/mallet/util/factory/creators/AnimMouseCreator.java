@@ -1,8 +1,8 @@
 package com.linxonline.mallet.util.factory.creators ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.factory.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.maths.* ;
@@ -17,10 +17,8 @@ public class AnimMouseCreator extends Creator<Entity>
 	@Override
 	public Entity create( final Settings _mouse )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
-		final Settings config = resources.getConfig() ;
-		final int width = config.getInteger( "RENDERWIDTH", 0 ) / 2 ;
-		final int height = config.getInteger( "RENDERHEIGHT", 0 ) / 2 ;
+		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 0 ) / 2 ;
+		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 0 ) / 2 ;
 
 		final Entity entity = new Entity( "MOUSE" ) ;
 		entity.position = new Vector3( width, height, 0 ) ;

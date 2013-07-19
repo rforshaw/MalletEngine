@@ -1,25 +1,26 @@
 package com.linxonline.mallet.main ;
 
-import com.linxonline.mallet.game.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.system.* ;
-import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.id.IDInterface ;
-import com.linxonline.mallet.renderer.DrawFactory ;
-import com.linxonline.mallet.util.SourceCallback ;
+
+import com.linxonline.mallet.game.GameSystem ;
+import com.linxonline.mallet.game.GameState ;
+
+import com.linxonline.mallet.system.GLDefaultSystem ;
+import com.linxonline.mallet.system.DefaultSystem ;
+
+import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+
 import com.linxonline.mallet.animation.AnimationFactory ;
+import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.audio.AudioFactory ;
 
-import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.input.KeyCode ;
+import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.id.IDInterface ;
 
-import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
+import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
-
-import com.linxonline.mallet.util.tools.ogg.OGG ;
-import com.linxonline.mallet.util.tools.ogg.Vorbis ;
 
 /*===========================================*/
 // Main
@@ -31,8 +32,8 @@ public class Main
 	{
 		loadFileSystem() ;
 
-		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D backend
-		final GLDefaultSystem system = new GLDefaultSystem() ;			// OpenGL backend
+		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
+		final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
 
 		system.initSystem() ;
 		system.setDisplayDimensions( new Vector2( 320, 240 ) ) ;
@@ -149,25 +150,12 @@ public class Main
 		game.setDefaultGameState( "DEFAULT" ) ;
 		game.runSystem() ;							// Begin running the game-loop
 	}
-	
+
 	private static void loadFileSystem()
 	{
-		final ResourceManager resource = ResourceManager.getResourceManager() ;
 		final DesktopFileSystem fileSystem = new DesktopFileSystem() ;
-		fileSystem.scanBaseDirectory() ;
 
-		resource.setFileSystem( fileSystem ) ;
-
-		/*try
-		{
-			final OGG ogg = OGG.readOGG( "base/audio/0.ogg" ) ;
-			final Vorbis vorb = new Vorbis() ;
-			vorb.decode( ogg ) ;
-			System.out.println( vorb ) ;
-		}
-		catch( Exception ex )
-		{
-			ex.printStackTrace() ;
-		}*/
+		GlobalFileSystem.setFileSystem( fileSystem ) ;
+		GlobalFileSystem.scanBaseDirectory() ;
 	}
 }

@@ -3,13 +3,11 @@ package com.linxonline.mallet.io.writer ;
 import java.util.ArrayList ;
 import java.io.* ;
 
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 public class WriteFile
 {
 	private WriteFile() {}
-
-	final static ResourceManager resources = ResourceManager.getResourceManager() ;
 
 	/**
 		Writes each String of ArrayList to a new line of txt file.
@@ -37,6 +35,6 @@ public class WriteFile
 		}
 
 		
-		return resources.getFileSystem().writeResourceAsString( _file, _data ) ;
+		return GlobalFileSystem.writeResourceAsString( _file, _data ) ;
 	}
 }

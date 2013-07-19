@@ -1,7 +1,6 @@
 package com.linxonline.mallet.io.reader ;
 
-import com.linxonline.mallet.resources.ResourceManager ;
-import com.linxonline.mallet.io.filesystem.FileSystem ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.ResourceCallback ;
 
 /**
@@ -16,8 +15,7 @@ public class ByteReader
 	**/
 	public static byte[] readBytes( final String _file )
 	{
-		final FileSystem fileSystem = ResourceManager.getResourceManager().getFileSystem() ;
-		return fileSystem.getResourceRaw( _file ) ;
+		return GlobalFileSystem.getResourceRaw( _file ) ;
 	}
 
 	/**
@@ -26,7 +24,6 @@ public class ByteReader
 	**/
 	public static boolean readBytes( final String _file, final ResourceCallback _callback )
 	{
-		final FileSystem fileSystem = ResourceManager.getResourceManager().getFileSystem() ;
-		return fileSystem.getResourceRaw( _file, _callback ) ;
+		return GlobalFileSystem.getResourceRaw( _file, _callback ) ;
 	}
 }

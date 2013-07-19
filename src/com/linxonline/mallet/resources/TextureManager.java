@@ -3,7 +3,8 @@ package com.linxonline.mallet.resources ;
 import javax.imageio.* ;
 import java.io.* ;
 
-import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.resources.texture.* ;
 
 public class TextureManager extends AbstractManager
@@ -26,15 +27,14 @@ public class TextureManager extends AbstractManager
 
 	protected Texture loadTexture( final String _file )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
 		final String file = redirectResourceLocation( _file ) ;
 
 		try
 		{
-			byte[] image = resources.getFileSystem().getResourceRaw( file ) ;
+			byte[] image = GlobalFileSystem.getResourceRaw( file ) ;
 			if( image == null )
 			{
-				image = resources.getFileSystem().getResourceRaw( _file ) ;
+				image = GlobalFileSystem.getResourceRaw( _file ) ;
 			}
 
 			InputStream in = new ByteArrayInputStream( image ) ;
@@ -50,11 +50,8 @@ public class TextureManager extends AbstractManager
 
 	protected String redirectResourceLocation( final String _file )
 	{
-		final ResourceManager resources = ResourceManager.getResourceManager() ;
-		final Settings config = resources.getConfig() ;
-
 		String file = _file ;
-		final int diff = config.getInteger( "DISPLAYWIDTH", 800 ) / config.getInteger( "RENDERWIDTH", 800 ) ;
+		final int diff = GlobalConfig.getInteger( "DISPLAYWIDTH", 800 ) / GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
 		if( diff >= 2 )
 		{
 			StringBuilder builder = new StringBuilder( _file ) ;
