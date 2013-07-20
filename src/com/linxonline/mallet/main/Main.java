@@ -40,8 +40,7 @@ public class Main
 		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
 		system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 
-		final GameSystem game = new GameSystem() ;
-		game.setSystem( system ) ;
+		final GameSystem game = new GameSystem( system ) ;
 		game.addGameState( new GameState( "DEFAULT" )
 		{
 			// Called when state is started.
@@ -150,7 +149,6 @@ public class Main
 		game.setDefaultGameState( "DEFAULT" ) ;
 		game.runSystem() ;							// Begin running the game-loop
 
-		System.out.println( "SHUTDOWN" ) ;
 		system.shutdownSystem() ;
 	}
 

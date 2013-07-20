@@ -13,6 +13,11 @@ public final class GameSystem
 
 	public GameSystem() {}
 
+	public GameSystem( final SystemInterface _system )
+	{
+		setSystem( _system ) ;
+	}
+
 	public final void runSystem()
 	{
 		double dt = 0.0f ;

@@ -77,7 +77,6 @@ public class DefaultSystem implements SystemInterface
 
 	public void shutdownSystem()
 	{
-		System.out.println( "Shutting Down" ) ;
 		sourceGenerator.shutdownGenerator() ;
 	}
 
