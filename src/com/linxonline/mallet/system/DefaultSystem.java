@@ -1,5 +1,7 @@
 package com.linxonline.mallet.system ;
 
+import java.awt.event.WindowListener ;
+import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 import java.awt.image.BufferedImage ;
 import java.awt.Point ;
@@ -35,15 +37,25 @@ public class DefaultSystem implements SystemInterface
 
 	public void initSystem()
 	{
-		inputSystem.inputAdapter = renderer.renderInfo ;
+		sourceGenerator.startGenerator() ;							// Initialise Sound System
+		inputSystem.inputAdapter = renderer.renderInfo ;			// Hook up Input Adapter
 
-		frame = new JFrame( titleName ) ;
+		frame = new JFrame( titleName ) ;							// Initialise Window
 		frame.createBufferStrategy( 1 ) ;
-		//frame.setCursor( frame.getToolkit().createCustomCursor( new BufferedImage( 1, 1, BufferedImage.TYPE_INT_ARGB ), 
-		//														new Point( 0, 0 ), "null" ) ) ;
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
 		frame.setIgnoreRepaint( true ) ;
 
+		frame.addWindowListener( new WindowListener()
+		{
+			public void windowActivated( final WindowEvent _event ) {}
+			public void windowClosed( final WindowEvent _event ) {}
+			public void windowClosing( final WindowEvent _event ) { shutdownSystem() ; }
+			public void windowDeactivated( final WindowEvent _event ) {}
+			public void windowDeiconified( final WindowEvent _event ) {}
+			public void windowIconified( final WindowEvent _event ) {}
+			public void windowOpened( final WindowEvent _event ) {}
+		} ) ;
+		
 		renderer.hookToFrame( frame ) ;
 
 		// Hook Input System with GUI Canvas
@@ -63,7 +75,11 @@ public class DefaultSystem implements SystemInterface
 
 	public void stopSystem() {}
 
-	public void shutdownSystem() {}
+	public void shutdownSystem()
+	{
+		System.out.println( "Shutting Down" ) ;
+		sourceGenerator.shutdownGenerator() ;
+	}
 
 	/*INPUT HOOK*/
 	public void addInputHandler( final InputHandler _handler )
