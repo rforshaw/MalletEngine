@@ -5,6 +5,7 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.input.KeyInputListener ;
+import com.linxonline.mallet.input.KeyCode ;
 
 /**
 	Provides a convient method to process particular logic based an a key value.
@@ -12,32 +13,40 @@ import com.linxonline.mallet.input.KeyInputListener ;
 **/
 public class KeyInputComponent extends InputComponent
 {
-	private final HashMap<Character, Key> keys = new HashMap<Character, Key>() ;
+	private final HashMap<KeyCode, Key> keys = new HashMap<KeyCode, Key>() ;
 
 	public KeyInputComponent()
 	{
 		super() ;
 	}
 
-	public void registerKey( final char _key, final KeyInputListener _listener )
+	public KeyInputComponent( final String _name )
 	{
-		final Character key = Character.valueOf( _key ) ;
-		if( keys.containsKey( key ) == true )
+		super( _name, "INPUTCOMPONENT" ) ;
+	}
+	
+	public KeyInputComponent( final String _name, final String _group )
+	{
+		super( _name, _group ) ;
+	}
+	
+	public void registerKey( final KeyCode _key, final KeyInputListener _listener )
+	{
+		if( keys.containsKey( _key ) == true )
 		{
-			keys.get( key ).add( _listener ) ;
+			keys.get( _key ).add( _listener ) ;
 		}
 		else
 		{
-			keys.put( key, new Key( _listener ) ) ;
+			keys.put( _key, new Key( _listener ) ) ;
 		}
 	}
 
-	public void unregisterKey( final char _key )
+	public void unregisterKey( final KeyCode _key )
 	{
-		final Character key = Character.valueOf( _key ) ;
-		if( keys.containsKey( key ) == true )
+		if( keys.containsKey( _key ) == true )
 		{
-			keys.remove( key ) ;
+			keys.remove( _key ) ;
 		}
 	}
 
@@ -48,19 +57,17 @@ public class KeyInputComponent extends InputComponent
 		{
 			case KEYBOARD_PRESSED :
 			{
-				final Character key = Character.valueOf( _input.getKeyCharacter() ) ;
-				if( keys.containsKey( key ) == true )
+				if( keys.containsKey( _input.keycode ) == true )
 				{
-					keys.get( key ).callPressed() ;
+					keys.get( _input.keycode ).callPressed() ;
 				}
 				break ;
 			}
 			case KEYBOARD_RELEASED :
 			{
-				final Character key = Character.valueOf( _input.getKeyCharacter() ) ;
-				if( keys.containsKey( key ) == true )
+				if( keys.containsKey( _input.keycode ) == true )
 				{
-					keys.get( key ).callReleased() ;
+					keys.get( _input.keycode ).callReleased() ;
 				}
 				break ;
 			}

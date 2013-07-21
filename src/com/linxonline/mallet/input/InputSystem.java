@@ -76,6 +76,7 @@ public class InputSystem implements InputSystemInterface,
 			state = activeKeyStates.get( i ) ;
 			final InputEvent input = cache.get() ;
 			input.clone( state.input ) ;
+
 			for( int j = 0; j < handlerSize; ++j )
 			{
 				handler = handlers.get( j ) ;
@@ -126,9 +127,7 @@ public class InputSystem implements InputSystemInterface,
 	public void keyTyped( KeyEvent _event ) {}
 
 	public void mouseClicked( MouseEvent _event ) {}
-
 	public void mouseEntered( MouseEvent _event ) {}
-
 	public void mouseExited( MouseEvent _event ) {}
 
 	public void mousePressed( MouseEvent _event )
@@ -253,6 +252,8 @@ public class InputSystem implements InputSystemInterface,
 				activeKeyStates.add( state ) ;
 				state.changed = true ;
 
+				state.input.inputType = _inputType ;
+
 				if( _inputType == InputType.KEYBOARD_PRESSED )
 				{
 					state.pressedTimeStamp = eventTimeStamp ;
@@ -284,27 +285,16 @@ public class InputSystem implements InputSystemInterface,
 
 	private final KeyCode isSpecialKeyDown( final KeyEvent _event )
 	{
-		if( _event.isShiftDown() == true )
+		final int keycode = _event.getKeyCode() ;
+		switch( keycode )
 		{
-			return KeyCode.SHIFT ;
+			case KeyEvent.VK_CONTROL   : return KeyCode.CTRL ;
+			case KeyEvent.VK_ALT 	   : return KeyCode.ALT ;
+			case KeyEvent.VK_SHIFT     : return KeyCode.SHIFT ;
+			case KeyEvent.VK_META      : return KeyCode.META ;
+			case KeyEvent.VK_ALT_GRAPH : return KeyCode.ALTGROUP ;
 		}
-		else if( _event.isControlDown() == true )
-		{
-			return KeyCode.CTRL ;
-		}
-		else if( _event.isAltDown() == true )
-		{
-			return KeyCode.ALT ;
-		}
-		else if( _event.isAltGraphDown() == true )
-		{
-			return KeyCode.ALTGROUP ;
-		}
-		else if( _event.isMetaDown() == true )
-		{
-			return KeyCode.META ;
-		}
-
+		
 		return KeyCode.NONE ;
 	}
 }

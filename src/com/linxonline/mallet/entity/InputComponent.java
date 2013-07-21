@@ -14,6 +14,11 @@ public abstract class InputComponent extends Component implements InputHandler
 		super( "INPUT", "INPUTCOMPONENT" ) ;
 	}
 
+	public InputComponent( final String _name )
+	{
+		super( _name, "INPUTCOMPONENT" ) ;
+	}
+	
 	public InputComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;

@@ -30,6 +30,11 @@ public class RenderComponent extends EventComponent
 		super( "RENDER" ) ;
 	}
 
+	public RenderComponent( final String _name )
+	{
+		super( _name ) ;
+	}
+	
 	public RenderComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
