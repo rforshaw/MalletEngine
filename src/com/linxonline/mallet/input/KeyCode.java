@@ -1,5 +1,12 @@
 package com.linxonline.mallet.input ;
 
+/**
+	Provides engine specific implementation of keycodes.
+	Because the keycodes used by the operating-system is unknown until
+	runtime, the engine provides its own identifiers.
+	It is the responsibility of the Input System to convert O/S keycodes 
+	to Mallet Engine keycodes.
+**/
 public enum KeyCode
 {
 	NONE,
@@ -18,9 +25,16 @@ public enum KeyCode
 	PERCENTAGE( '%' ), LESS_THAN( '<' ), GREATER_THAN( '>' ), TIDEL( '~' ), QUOTATION( '\"' ),
 	CURLY_BRACKET_OPEN( '{' ), CURLY_BRACKET_CLOSED( '}' ), SQUARE_BRACKET_OPEN( '[' ), SQUARE_BRACKET_CLOSED( ']' ),
 	ASTERIK( '*' ), HASH_TAG( '#' ), FULL_STOP( '.' ), COMMA( ',' ), APOSTRAPHE( '\'' ), AMPERSAND( '&' ), AT( '@' ),
-	COLON( ':' ), SEMICOLON( ';' ), CIRCUMFLEX( '^' ), EQUALS( '=' ), PLUS( '+' ), MINUS( '-' ),
+	COLON( ':' ), SEMICOLON( ';' ), CIRCUMFLEX( '^' ), EQUALS( '=' ), PLUS( '+' ), MINUS( '-' ), 
+	FORWARD_SLASH( '/' ), BACKWARD_SLASH( '\\' ), BRACKET_OPEN( '(' ), BRACKET_CLOSED( ')' ),
 
-	SHIFT, CTRL, ALT, ALTGROUP, META, BACKSPACE, ENTER ;
+	UP, DOWN, LEFT, RIGHT,
+
+	F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+	DELETE, HOME, END, PAGE_UP, PAGE_DOWN, PRINT_SCREEN, SCROLL_LOCK, INSERT,
+	ESCAPE, SHIFT, CTRL, ALT, ALTGROUP, META, BACKSPACE, ENTER, TAB, CAPS_LOCK, WINDOWS,
+
+	NUM_LOCK, NUMPAD0, NUMPAD1, NUMPAD2, NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9 ;
 
 	public final char character ;
 
@@ -34,6 +48,9 @@ public enum KeyCode
 		character = _character ;
 	}
 
+	/**
+		Returns the keycode that matches _char.
+	**/
 	public static KeyCode getKeyCode( final char _char )
 	{
 		switch( _char )
@@ -77,6 +94,10 @@ public enum KeyCode
 			case '=' : return EQUALS ;
 			case '+' : return PLUS ;
 			case '-' : return MINUS ;
+			case '/' : return FORWARD_SLASH ;
+			case '\\': return BACKWARD_SLASH ;
+			case '(' : return BRACKET_OPEN ;
+			case ')' : return BRACKET_CLOSED ;
 			/* LOWERCASE LETTERS */
 			case 'a' : return a ;
 			case 'b' : return b ;

@@ -2,7 +2,6 @@ package com.linxonline.mallet.input ;
 
 public final class InputEvent
 {
-	// Class variables
 	public InputType inputType ;
 	public KeyCode keycode ;
 
