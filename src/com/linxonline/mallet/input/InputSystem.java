@@ -264,7 +264,7 @@ public class InputSystem implements InputSystemInterface,
 			}
 		}
 	}
-	
+
 	public void clearHandlers()
 	{
 		handlers.clear() ;
@@ -303,6 +303,12 @@ public class InputSystem implements InputSystemInterface,
 		else if( _event.isMetaDown() == true )
 		{
 			return KeyCode.META ;
+		}
+
+		final int keycode = _event.getKeyCode() ;
+		if( keycode == KeyEvent.VK_BACK_SPACE )
+		{
+			return KeyCode.BACKSPACE ;
 		}
 
 		return KeyCode.NONE ;
