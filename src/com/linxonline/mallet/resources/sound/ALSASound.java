@@ -18,13 +18,12 @@ public class ALSASound implements SoundInterface
 		return buffer ;
 	}
 
+	/**
+		Destroy OpenAL buffer.
+		Shouldn't be called if sources are still active.
+	**/
 	public void destroy()
 	{
 		openAL.alDeleteBuffers( 1, buffer, 0 ) ;
-	}
-
-	public AL getOpenAL()
-	{
-		return openAL ;
 	}
 }

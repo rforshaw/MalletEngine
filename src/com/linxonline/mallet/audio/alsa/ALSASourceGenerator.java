@@ -1,14 +1,49 @@
 package com.linxonline.mallet.audio.alsa ;
 
 import com.jogamp.openal.* ;
+import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.sound.* ;
 
 public class ALSASourceGenerator implements SourceGenerator
 {
+	private AL openAL = null ;
+
 	public ALSASourceGenerator() {}
 
+	public boolean startGenerator()
+	{
+		try
+		{
+			ALut.alutInit() ;
+			openAL = ALFactory.getAL() ;
+			openAL.alGetError() ;
+		}
+		catch( ALException ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
+		}
+
+		return true ;
+	}
+	
+	public boolean shutdownGenerator()
+	{
+		try
+		{
+			ALut.alutExit() ;
+		}
+		catch( ALException ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
+		}
+
+		return true ;
+	}
+	
 	public AudioSource createAudioSource( final Sound _sound )
 	{
 		if( _sound == null )
@@ -18,7 +53,6 @@ public class ALSASourceGenerator implements SourceGenerator
 		}
 
 		final ALSASound alsaSound = _sound.getSoundBuffer( ALSASound.class ) ;	// Assumes Sound contains an ALSASound reference
-		final AL openAL = alsaSound.getOpenAL() ;
 		final int[] buffer = alsaSound.getBufferID() ;
 
 		int[] source = new int[1] ;

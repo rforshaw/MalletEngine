@@ -40,8 +40,7 @@ public class Main
 		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
 		system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 
-		final GameSystem game = new GameSystem() ;
-		game.setSystem( system ) ;
+		final GameSystem game = new GameSystem( system ) ;
 		game.addGameState( new GameState( "DEFAULT" )
 		{
 			// Called when state is started.
@@ -49,7 +48,7 @@ public class Main
 			{
 				//renderTextureExample() ;
 				//renderAnimationExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 				createEntityExample() ;
 				createMouseAnimExample() ;
 			}
@@ -102,7 +101,7 @@ public class Main
 			**/
 			public void playAudioExample()
 			{
-				eventSystem.addEvent( AudioFactory.createAudio( "base/audio/0.wav", new SourceCallback()
+				eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
 				{
 					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
@@ -149,6 +148,8 @@ public class Main
 
 		game.setDefaultGameState( "DEFAULT" ) ;
 		game.runSystem() ;							// Begin running the game-loop
+
+		system.shutdownSystem() ;
 	}
 
 	private static void loadFileSystem()

@@ -90,24 +90,11 @@ public class SoundManager extends AbstractManager
 	
 	private void initSoundBackend()
 	{
-		try
-		{
-			ALut.alutInit() ;
-			openAL = ALFactory.getAL() ;
-			openAL.alGetError() ;
-		}
-		catch( ALException _ex )
-		{
-			_ex.printStackTrace() ;
-		}
-		
+		openAL = ALFactory.getAL() ;
 		openAL.alListener3f( AL.AL_POSITION, position.x, position.y, position.z ) ;
 		openAL.alListener3f( AL.AL_VELOCITY, velocity.x, velocity.y, velocity.z ) ;
 		openAL.alListenerfv( AL.AL_ORIENTATION, orientation, 0 ) ;
 	}
 
-	public void shutdown()
-	{
-		//AL.destroy() ;
-	}
+	public void shutdown() {}
 }

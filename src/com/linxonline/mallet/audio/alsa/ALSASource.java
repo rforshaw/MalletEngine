@@ -61,6 +61,10 @@ public class ALSASource implements AudioSource
 		return getBufferTime() ;
 	}
 
+	/**
+		Destory OpenAL source.
+		Doesn't destroy OpenAL buffer.
+	**/
 	public void destroySource()
 	{
 		stop() ;
