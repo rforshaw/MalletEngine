@@ -41,7 +41,14 @@ public final class Vector3
 		y = _y ;
 		z = _z ;
 	}
-	
+
+	public void setXYZ( final Vector3 _vec )
+	{
+		x = _vec.x ;
+		y = _vec.y ;
+		z = _vec.z ;
+	}
+
 	public final void add( final Vector3 _vec )
 	{
 		x += _vec.x ;
