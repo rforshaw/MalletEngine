@@ -28,7 +28,7 @@ public abstract class ConfigParser
 			_dest.addInteger( "RENDERWIDTH", Integer.parseInt( var ) ) ;
 		}
 		catch( Exception _ex ) {}
-		
+
 		try
 		{
 			var = _src.getString( "RENDERHEIGHT" ) ;
@@ -59,9 +59,6 @@ public abstract class ConfigParser
 		{
 			_dest.addInteger( "MODE", GameState.APPLICATION_MODE ) ;
 		}
-
-		var = _src.getString( "CACHE", "false" ) ;
-		_dest.addBoolean( "CACHE", Boolean.valueOf( var ) ) ;
 
 		return _dest ;
 	}

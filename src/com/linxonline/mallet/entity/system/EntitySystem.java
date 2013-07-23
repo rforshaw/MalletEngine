@@ -19,7 +19,7 @@ public class EntitySystem implements EntitySystemInterface
 	protected final QuerySystem querySystem = new QuerySystem() ;
 	protected final Settings hashQuery = new Settings() ;
 
-	protected EntityUpdateInterface entities = new DefaultUpdate() ;
+	protected EntityUpdateInterface entities = new DefaultMTUpdate() ;
 	protected final ArrayList<Entity> entitiesToAdd = new ArrayList<Entity>() ;
 	protected final ArrayList<Entity> cleanup = new ArrayList<Entity>() ;
 
