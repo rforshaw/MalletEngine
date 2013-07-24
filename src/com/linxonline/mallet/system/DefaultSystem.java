@@ -34,16 +34,17 @@ public class DefaultSystem implements SystemInterface
 	public EventSystem eventSystem = new EventSystem() ;
 	public InputSystem inputSystem = new InputSystem() ;
 
-	public DefaultSystem() {}
+	public DefaultSystem()
+	{
+		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+	}
 
 	public void initSystem()
 	{
-		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
-
 		sourceGenerator.startGenerator() ;							// Initialise Sound System
-		inputSystem.inputAdapter = renderer.renderInfo ;			// Hook up Input Adapter
+		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
-		frame = new JFrame( titleName ) ;							// Initialise Window
+		frame = new JFrame( titleName ) ;								// Initialise Window
 		frame.createBufferStrategy( 1 ) ;
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
 		frame.setIgnoreRepaint( true ) ;

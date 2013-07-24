@@ -8,6 +8,7 @@ import java.awt.Point ;
 import java.awt.Dimension ;
 import java.awt.Insets ;
 
+import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.audio.alsa.* ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.* ;
@@ -33,14 +34,17 @@ public class GLDefaultSystem implements SystemInterface
 	public EventSystem eventSystem = new EventSystem() ;
 	public InputSystem inputSystem = new InputSystem() ;
 
-	public GLDefaultSystem() {}
+	public GLDefaultSystem()
+	{
+		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+	}
 
 	public void initSystem()
 	{
 		sourceGenerator.startGenerator() ;							// Initialise Sound System
-		inputSystem.inputAdapter = renderer.renderInfo ;			// Hook up Input Adapter
+		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
-		frame = new JFrame( titleName ) ;							// Initialise Window
+		frame = new JFrame( titleName ) ;								// Initialise Window
 		frame.createBufferStrategy( 1 ) ;
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
 		frame.setIgnoreRepaint( true ) ;
@@ -69,7 +73,7 @@ public class GLDefaultSystem implements SystemInterface
 		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
 		frame.validate() ;
 		frame.setVisible( true ) ;
-		
+
 		draw() ; 													// Ensure OpenGL Context gets initialised.
 	}
 
