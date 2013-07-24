@@ -16,6 +16,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.util.locks.* ;
 
 /*===========================================*/
 // DefaultSystem
@@ -37,6 +38,8 @@ public class DefaultSystem implements SystemInterface
 
 	public void initSystem()
 	{
+		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+
 		sourceGenerator.startGenerator() ;							// Initialise Sound System
 		inputSystem.inputAdapter = renderer.renderInfo ;			// Hook up Input Adapter
 

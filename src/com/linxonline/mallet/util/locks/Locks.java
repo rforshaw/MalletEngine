@@ -38,6 +38,18 @@ public class Locks
 
 	public synchronized LockInterface getLock( final String _key )
 	{
-		return locks.get( _key ) ;
+		if( locks.containsKey( _key ) )
+		{
+			return locks.get( _key ) ;
+		}
+
+		final LockInterface fail = new LockInterface()
+		{
+			public void lock() { System.out.println( "Fail-safe lock." ) ; }
+			public void unlock() { System.out.println( "Fail-safe unlock." ) ; }
+		} ;
+
+		addLock( _key, fail ) ;
+		return fail ;
 	}
 }

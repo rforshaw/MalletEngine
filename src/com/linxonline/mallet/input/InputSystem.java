@@ -8,6 +8,7 @@ import java.io.* ;
 
 import com.linxonline.mallet.util.pools.TimePool ;
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.util.locks.* ;
 
 /**
 	Input System is designed to use Java's built in input listeners, 
@@ -223,6 +224,8 @@ public class InputSystem implements InputSystemInterface,
 		final InputEvent input = cache.get() ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
+
+		Locks.getLocks().getLock( "APPLICATION_LOCK" ).unlock() ;
 	}
 
 	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )

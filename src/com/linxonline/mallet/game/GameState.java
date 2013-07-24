@@ -19,6 +19,7 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.physics.* ;
 import com.linxonline.mallet.animation.* ;
+import com.linxonline.mallet.util.locks.* ;
 
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;
@@ -337,8 +338,14 @@ public class GameState extends State implements HookEntity
 			@Override
 			public void update( final double _dt )
 			{
-				final boolean hasInput = inputSystem.hasInputs() ;
-				final boolean hasEvents = eventSystem.hasEvents() ;
+				boolean hasInput = inputSystem.hasInputs() ;
+				boolean hasEvents = eventSystem.hasEvents() ;
+				if( ( hasInput == false ) && ( hasEvents == false ) )
+				{
+					Locks.getLocks().getLock( "APPLICATION_LOCK" ).lock() ;
+					hasInput = inputSystem.hasInputs() ;
+					hasEvents = eventSystem.hasEvents() ;
+				}
 
 				// Update as fast as the computer can manage.
 				inputSystem.update() ;
