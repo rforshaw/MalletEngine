@@ -19,7 +19,7 @@ public abstract class SystemRoot<T> extends EventUpdater
 	**/
 	protected final HashMap<Integer, T> sources = new HashMap<Integer, T>() ;
 	protected final ArrayList<T> activeSources = new ArrayList<T>() ;
-	protected final ArrayList<T> removeSources = new ArrayList<T>() ;
+	protected final ArrayList<RemoveSource> removeSources = new ArrayList<RemoveSource>() ;
 
 	public void update( final float _dt )
 	{
@@ -50,10 +50,11 @@ public abstract class SystemRoot<T> extends EventUpdater
 
 	protected void removeSources()
 	{
-		for( final T remove : removeSources )
+		for( final RemoveSource remove : removeSources )
 		{
-			destroySource( remove ) ;
-			activeSources.remove( remove ) ;
+			destroySource( remove.source ) ;
+			activeSources.remove( remove.source ) ;
+			sources.remove( remove.id ) ;
 		}
 
 		removeSources.clear() ;
@@ -68,4 +69,16 @@ public abstract class SystemRoot<T> extends EventUpdater
 		Used to unregister resources that the source might be accessing.
 	**/
 	protected abstract void destroySource( final T _source ) ;
+
+	protected class RemoveSource
+	{
+		public int id ;
+		public T source ;
+
+		public RemoveSource( final int _id, final T _source )
+		{
+			id = _id ;
+			source = _source ;
+		}
+	}
 }

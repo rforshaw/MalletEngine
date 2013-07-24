@@ -77,10 +77,11 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			}
 			case RequestType.REMOVE_AUDIO :
 			{
-				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
+				final int id = audio.getInteger( "ID", -1 ) ;
+				final ActiveSound sound = getSource( id ) ;
 				if( sound != null )
 				{
-					removeSources.add( sound ) ;
+					removeSources.add( new RemoveSource( id, sound ) ) ;
 				}
 				break ;
 			}

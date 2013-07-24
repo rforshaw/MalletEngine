@@ -127,7 +127,7 @@ public class GLDefaultSystem implements SystemInterface
 
 		final Insets insets = temp.getInsets() ;
 		final Dimension dim = new Dimension( insets.left + insets.right + ( int )_display.x,
-										  insets.top + insets.bottom + ( int )_display.y ) ;
+											insets.top + insets.bottom + ( int )_display.y ) ;
 
 		//System.out.println( "Set Display: " + _display ) ;
 		frame.setVisible( false ) ;

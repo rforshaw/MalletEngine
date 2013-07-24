@@ -60,11 +60,12 @@ public class AnimationSystem extends SystemRoot<Animation>
 			}
 			case AnimRequestType.REMOVE_ANIMATION :
 			{
-				final Animation animation = getSource( anim.getInteger( "ID", -1 ) ) ;
+				final int id = anim.getInteger( "ID", -1 ) ;
+				final Animation animation = getSource( id ) ;
 				if( animation != null )
 				{
 					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
-					removeSources.add( animation ) ;
+					removeSources.add( new RemoveSource( id, animation ) ) ;
 				}
 				break ;
 			}
