@@ -4,12 +4,15 @@ import java.util.LinkedList ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
+/**
+	Provides a cache of objects based on time elapsed.
+*/
 public class TimePool<T> implements PoolInterface<T>
 {
 	private final LinkedList<TimeWrapper> pool = new LinkedList<TimeWrapper>() ;	// Pool of objects that will be used.
-	private final Class<T> objectCreator ;						// Used to create T type instances.
-	private float wait = 0.0f ;									// The amount of time an object can be used for without being reused.
-	private int currentPos = 0 ;								// Current location within pool.
+	private final Class<T> objectCreator ;										// Used to create T type instances.
+	private float wait = 0.0f ;													// The amount of time an object can be used for without being reused.
+	private int currentPos = 0 ;													// Current location within pool.
 
 	private TimeWrapper<T> temp = null ;
 
@@ -27,7 +30,6 @@ public class TimePool<T> implements PoolInterface<T>
 	@Override
 	public T get()
 	{
-		//System.out.println( pool.size() ) ;
 		// Ensure currentPos is within the pool limits.
 		if( currentPos >= pool.size() ) { currentPos = 0 ; }
 
@@ -47,6 +49,7 @@ public class TimePool<T> implements PoolInterface<T>
 
 		try
 		{
+			// Create new instance if one is not suitable to return.
 			return ( T )insert( currentPos++, seconds, remainder, objectCreator.newInstance() ).obj ;
 		}
 		catch( InstantiationException ex ) { ex.printStackTrace() ; }
@@ -92,8 +95,8 @@ public class TimePool<T> implements PoolInterface<T>
 
 	protected class TimeWrapper<T>
 	{
-		public long seconds ;
-		public double remainder ;
+		public long seconds ;		// Total time elapsed in seconds
+		public double remainder ;	// Defines the nano-seconds elapsed that is yet a second.
 		public final T obj ;
 
 		public TimeWrapper( final long _seconds, final double _remainder, final T _obj )

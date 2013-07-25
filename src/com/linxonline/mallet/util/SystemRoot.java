@@ -10,13 +10,16 @@ import com.linxonline.mallet.event.EventUpdater ;
 	Deals with generic updating & storage of sources, 
 	allows the Audio, Animations systems to deal with 
 	the important stuff.
-**/
+	A source should only ever be removed is specifically 
+	instructed to do so. Else the system should continue 
+	to update.
+*/
 public abstract class SystemRoot<T> extends EventUpdater
 {
 	/**
 		The HashMap and ArrayList should be replaced with a more structure 
 		that provides effecient iteration & searching capabilites.
-	**/
+	*/
 	protected final HashMap<Integer, T> sources = new HashMap<Integer, T>() ;
 	protected final ArrayList<T> activeSources = new ArrayList<T>() ;
 	protected final ArrayList<RemoveSource> removeSources = new ArrayList<RemoveSource>() ;
@@ -26,6 +29,21 @@ public abstract class SystemRoot<T> extends EventUpdater
 		updateEvents() ;
 		updateSources( _dt ) ;
 		removeSources() ;
+	}
+
+	/**
+		Remove all sources.
+	*/
+	public void clear()
+	{
+		removeSources() ;						// Remove the dead sources
+		final int size = activeSources.size() ;	// Remove the active sources 
+		for( int i = 0; i < size; ++i )
+		{
+			destroySource( activeSources.get( i ) ) ;
+		}
+		activeSources.clear() ;
+		sources.clear() ;
 	}
 
 	protected T getSource( final int _key )
@@ -62,12 +80,12 @@ public abstract class SystemRoot<T> extends EventUpdater
 
 	/**
 		Used for custom update code, allows source to be removed from updating, etc.
-	**/
+	*/
 	protected abstract void updateSource( final T _source, final float _dt ) ;
 
 	/**
-		Used to unregister resources that the source might be accessing.
-	**/
+		Used to unregister custom resources that the source might be accessing.
+	*/
 	protected abstract void destroySource( final T _source ) ;
 
 	protected class RemoveSource

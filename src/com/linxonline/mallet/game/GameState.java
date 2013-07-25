@@ -27,25 +27,26 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 public class GameState extends State implements HookEntity
 {
 	public static final int GAME_MODE = 1 ;								// Update Logic & Render on a recurring basis
-	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input
+	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input/events
 
 	protected float DEFAULT_TIMESTEP = 1.0f / 120.0f ;
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;
 
 	protected final HashMap<Integer, UpdateInterface> updateModes = new HashMap<Integer, UpdateInterface>() ;
-	protected UpdateInterface currentUpdate = null ;						// Current Running Mode
+	protected UpdateInterface currentUpdate = null ;								// Current Running Mode
 
 	protected final InputState inputSystem = new InputState() ;					// Internal Input System
-	protected final EventSystem eventSystem = new EventSystem() ;				// Internal Event System
-	protected final EventController eventController = new EventController() ;	// Used to process Events
+	protected final EventSystem eventSystem = new EventSystem() ;					// Internal Event System
+	protected final EventController eventController = new EventController() ;		// Used to process Events
 
-	protected SystemInterface system = null ;									// Provides access to Root systems
-	protected final AudioSystem audioSystem = new AudioSystem() ;				// Must specify a SourceGenerator
+	protected SystemInterface system = null ;										// Provides access to Root systems
+	protected final AudioSystem audioSystem = new AudioSystem() ;					// Must specify a SourceGenerator
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final EntitySystem entitySystem = new EntitySystem( this ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
 
+	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
 	protected double updateAccumulator = 0.0f ;							// Current dt update
 	protected double renderAccumulator = 0.0f ;							// Current dt render
@@ -57,32 +58,45 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		Initialise the Game related content here.
-		Load resources, entities, etc.
-	**/
+		Add content here.
+		Create entities, load resources, etc.
+	*/
 	public void initGame() {}
+
+	/**
+		Set any content required on resume after the state was paused.
+	*/
+	public void resumeGame() {}
 
 	@Override
 	public void startState( final Settings _package )
 	{
 		hookHandlerSystems() ;
-		initGame() ;
+		if( paused == false )
+		{
+			initGame() ;
+		}
+		else if( paused == true )
+		{
+			paused = false ;
+			reconnectEntities() ;
+			resumeGame() ;
+		}
 	}
 
 	@Override
 	public Settings shutdownState()
 	{
-		system.clear() ;
-		system.clearInputs() ;
-		inputSystem.clearInputs() ;
-		unhookHandlerSystems() ;
+		unhookHandlerSystems() ;		// Prevent system from recieving external events
+		clear() ;					// Remove all content
 		return null ;
 	}
 
 	@Override
 	public Settings pauseState()
 	{
-		unhookHandlerSystems() ;
+		unhookHandlerSystems() ;		// Prevent system from recieving external events
+		paused = true ;
 		return null ;
 	}
 
@@ -95,6 +109,10 @@ public class GameState extends State implements HookEntity
 		}
 	}
 
+	/**
+		Add entities at the most opportune moment.
+		Should be used during game-logic update.
+	*/
 	public final void addEntities( final ArrayList<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
@@ -103,6 +121,10 @@ public class GameState extends State implements HookEntity
 		}
 	}
 
+	/**
+		Add entities straight away.
+		Should be used before the first game-logic update.
+	*/
 	public final void addEntitiesNow( final ArrayList<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
@@ -111,6 +133,27 @@ public class GameState extends State implements HookEntity
 		}
 	}
 
+	/**
+		Add an entity at the most opportune moment.
+		Should be used during game-logic update.
+	*/
+	public final void addEntity( final Entity _entity )
+	{
+		entitySystem.addEntity( _entity ) ;
+	}
+
+	/**
+		Add an entity straight away.
+		Should be used before the first game-logic update.
+	*/
+	public final void addEntityNow( final Entity _entity )
+	{
+		entitySystem.addEntityNow( _entity ) ;
+	}
+
+	/**
+		Remove entities at the most opportune moment.
+	*/
 	public final void removeEntities( final ArrayList<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
@@ -119,16 +162,9 @@ public class GameState extends State implements HookEntity
 		}
 	}
 
-	public final void addEntity( final Entity _entity )
-	{
-		entitySystem.addEntity( _entity ) ;
-	}
-
-	public final void addEntityNow( final Entity _entity )
-	{
-		entitySystem.addEntityNow( _entity ) ;
-	}
-
+	/**
+		Remove an entity at the most opportune moment.
+	*/
 	public final void removeEntity( final Entity _entity )
 	{
 		entitySystem.removeEntity( _entity ) ;
@@ -136,7 +172,7 @@ public class GameState extends State implements HookEntity
 
 	/**
 		Hook Entity into relevant systems.
-	**/
+	*/
 	public void hookEntity( final Entity _entity )
 	{
 		ArrayList<Component> components = null ;
@@ -179,7 +215,7 @@ public class GameState extends State implements HookEntity
 
 	/**
 		Unhook Entity from systems.
-	**/
+	*/
 	public void unhookEntity( final Entity _entity )
 	{
 		ArrayList<Component> components = null ;
@@ -226,7 +262,7 @@ public class GameState extends State implements HookEntity
 	/**
 		Force the Game State to call system.draw(), on next update.
 		Not necessarily used by all UpdateInterface types.
-	**/
+	*/
 	protected final void forceDraw()
 	{
 		draw = true ;
@@ -234,7 +270,7 @@ public class GameState extends State implements HookEntity
 
 	/**
 		Informs the Game State which Mode it is running in.
-	**/
+	*/
 	public final void setMode( final int _mode )
 	{
 		final Integer mode = new Integer( _mode ) ;
@@ -254,6 +290,10 @@ public class GameState extends State implements HookEntity
 		DEFAULT_FRAMERATE = 1.0f / _framerate ;
 	}
 
+	/**
+		Provides access to the renderer.
+		Audio source generator, inputs and the root event system.
+	*/
 	public final void setSystem( final SystemInterface _system )
 	{
 		system = _system ;
@@ -261,11 +301,9 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		Hook-up the rellevant handlers to the appropriate systems.
-		GameState.inputSystem to System.inputSystem
-		GameState to GameState.eventSystem
-		GameState to System.eventSystem
-	**/
+		Enable event-based systems to recieve events.
+		Also hooks-up the inputSystem.
+	*/
 	protected void hookHandlerSystems()
 	{
 		eventSystem.addEventHandler( eventController ) ;
@@ -278,14 +316,15 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		unHook the rellevant handlers from the appropriate systems.
-		GameState.inputSystem from System.inputSystem
-		GameState from GameState.eventSystem
-		GameState from System.eventSystem
-	**/
+		Prevent event-based system from recieving events.
+		Important when state in not being used.
+		Also unhooks the inputSystem.
+	*/
 	protected void unhookHandlerSystems()
 	{
 		eventSystem.removeEventHandler( eventController ) ;
+		eventSystem.removeEventHandler( audioSystem ) ;
+		eventSystem.removeEventHandler( animationSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
 		eventSystem.removeHandlersNow() ;
 
@@ -294,12 +333,32 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
+		Reconnect entities to state systems.
+		Called at startState if the state was previously paused.
+	*/
+	protected void reconnectEntities()
+	{
+		final ArrayList<Entity> entities = entitySystem.getEntities() ;
+		for( final Entity entity : entities )
+		{
+			hookEntity( entity ) ;
+		}
+	}
+
+	/**
 		Initialise the default modes: GAME_MODE and APPLICATION_MODE
 		currentUpdate = GAME_MODE, by default.
-	**/
+	*/
 	protected void initModes()
 	{
-		UpdateInterface gameUpdate = new UpdateInterface()
+		initGameMode() ;
+		initApplicationMode() ;
+		setMode( GAME_MODE ) ;
+	}
+
+	protected void initGameMode()
+	{
+		final UpdateInterface gameUpdate = new UpdateInterface()
 		{
 			@Override
 			public void update( final double _dt )
@@ -332,8 +391,11 @@ public class GameState extends State implements HookEntity
 			}
 		} ;
 		updateModes.put( GAME_MODE, gameUpdate ) ;
+	}
 
-		UpdateInterface applicationUpdate = new UpdateInterface()
+	protected void initApplicationMode()
+	{
+		final UpdateInterface applicationUpdate = new UpdateInterface()
 		{
 			@Override
 			public void update( final double _dt )
@@ -371,12 +433,30 @@ public class GameState extends State implements HookEntity
 		} ;
 
 		updateModes.put( APPLICATION_MODE, applicationUpdate ) ;
-		setMode( GAME_MODE ) ;
+	}
+
+	/**
+		Guarantees that all systems the state uses will be blank.
+		
+	*/
+	protected void clear()
+	{
+		system.clear() ;				// Clears the Renderer
+
+		eventSystem.clearEvents() ;
+		eventSystem.clearHandlers() ;
+
+		inputSystem.clearInputs() ;
+		inputSystem.clearHandlers() ;
+
+		audioSystem.clear() ;
+		entitySystem.clear() ;
+		animationSystem.clear() ;
 	}
 
 	/**
 		Allows the developer to create their own update modes.
-	**/
+	*/
 	protected interface UpdateInterface
 	{
 		public void update( final double _dt ) ;

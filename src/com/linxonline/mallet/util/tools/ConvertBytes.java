@@ -17,7 +17,7 @@ import java.nio.ByteOrder ;
 	Use flipEndian to change the endianese of a byte-stream or sub-set of a byte-stream.
 	If the byte-stream contains multiple variables, then the variable positions will also
 	be invereted.
-**/
+*/
 public class ConvertBytes
 {
 	public static final int LITTLE_ENDIAN = 1 ;
@@ -25,7 +25,7 @@ public class ConvertBytes
 
 	/**
 		Returns the platforms native Endianese
-	**/
+	*/
 	public static int nativeOrder()
 	{
 		// If BIG_ENDIAN return BIG_ENDIAN else return LITTLE_ENDIAN
@@ -202,7 +202,7 @@ public class ConvertBytes
 
 	/**
 		Modifies passed in byte-stream, returns the same stream.
-	**/
+	*/
 	public static byte[] flipEndian( final byte[] _bytes )
 	{
 		final int length = _bytes.length ;
@@ -219,7 +219,7 @@ public class ConvertBytes
 
 	/**
 		Allows you to flip the endian of a defined part of the byte-stream.
-	**/
+	*/
 	public static byte[] newflipEndian( final byte[] _bytes, final int _offset, final int _length )
 	{
 		final byte[] bytes = new byte[_length] ;
@@ -234,7 +234,7 @@ public class ConvertBytes
 	/**
 		Modifies passed in byte-stream, returns the same stream.
 		Allows you to flip the endian of a defined part of the byte-stream.
-	**/
+	*/
 	public static byte[] flipEndian( final byte[] _bytes, final int _offset, final int _length )
 	{
 		final int halfLength = _length / 2 ;
@@ -262,7 +262,7 @@ public class ConvertBytes
 
 	/**
 		Requires at length 4 bytes
-	**/
+	*/
 	public static int toInteger( final byte[] _bytes )
 	{
 		return _bytes[0] << 24 | 
@@ -273,7 +273,7 @@ public class ConvertBytes
 
 	/**
 		Requires at length 2 bytes
-	**/
+	*/
 	public static short toShort( final byte[] _bytes )
 	{
 		return ( short )( ( _bytes[0] << 8 ) | ( _bytes[1] ) ) ;

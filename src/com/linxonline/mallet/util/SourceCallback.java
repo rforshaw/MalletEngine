@@ -8,7 +8,7 @@ package com.linxonline.mallet.util ;
 	This callback should not be used to do any specfic logic processing. 
 	It should at most set a few flags or send an Event. Logic processing 
 	should be done during an Entity's or the Game States update cycle.
-**/
+*/
 public interface SourceCallback
 {
 	public void recieveID( final int _id ) ;		// Passes source ID

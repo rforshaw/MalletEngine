@@ -48,9 +48,9 @@ public class Main
 			{
 				//renderTextureExample() ;
 				//renderAnimationExample() ;
-				playAudioExample() ;
-				//createEntityExample() ;
-				//createMouseAnimExample() ;
+				//playAudioExample() ;
+				createEntityExample() ;
+				createMouseAnimExample() ;
 			}
 
 			/**
@@ -101,7 +101,7 @@ public class Main
 			**/
 			public void playAudioExample()
 			{
-				eventSystem.addEvent( AudioFactory.createAudio( "base/audio/recognition.wav", new SourceCallback()
+				eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
 				{
 					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
