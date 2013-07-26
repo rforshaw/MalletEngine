@@ -54,8 +54,6 @@ public class GLDefaultSystem implements SystemInterface
 		} ) ;
 
 		renderer.hookToWindow( frame ) ;
-
-		// Hook Input System to GUI Canvas
 		renderer.getCanvas().addMouseListener( inputSystem ) ;
 		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;
 		renderer.getCanvas().addMouseWheelListener( inputSystem ) ;
@@ -63,7 +61,6 @@ public class GLDefaultSystem implements SystemInterface
 	}
 
 	public void startSystem() {}
-
 	public void stopSystem() {}
 
 	public void shutdownSystem()

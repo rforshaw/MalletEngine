@@ -52,7 +52,7 @@ public class DefaultSystem implements SystemInterface
 			public void windowIconified( final WindowEvent _event ) {}
 			public void windowOpened( final WindowEvent _event ) {}
 		} ) ;
-		
+
 		renderer.hookToFrame( frame ) ;
 
 		// Hook Input System with GUI Canvas
