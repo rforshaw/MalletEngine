@@ -4,15 +4,10 @@ import java.awt.event.WindowListener ;
 import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 import java.awt.image.BufferedImage ;
-import java.awt.Point ;
-import java.awt.Dimension ;
-import java.awt.Insets ;
 
 import com.linxonline.mallet.util.locks.* ;
-import com.linxonline.mallet.audio.alsa.* ;
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.gl.* ;
+import com.linxonline.mallet.audio.alsa.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -27,12 +22,13 @@ import com.linxonline.mallet.maths.* ;
 
 public class GLDefaultSystem implements SystemInterface
 {
-	protected JFrame frame = null ;
 	protected String titleName = new String( "GL Mallet Engine" ) ;
-	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
-	protected GLRenderer renderer = new GLRenderer() ;
-	public EventSystem eventSystem = new EventSystem() ;
-	public InputSystem inputSystem = new InputSystem() ;
+
+	protected final ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
+	protected final GLRenderer renderer = new GLRenderer() ;
+
+	public final EventSystem eventSystem = new EventSystem() ;
+	public final InputSystem inputSystem = new InputSystem() ;
 
 	public GLDefaultSystem()
 	{
@@ -41,14 +37,11 @@ public class GLDefaultSystem implements SystemInterface
 
 	public void initSystem()
 	{
-		sourceGenerator.startGenerator() ;							// Initialise Sound System
+		renderer.start() ;
+		sourceGenerator.startGenerator() ;
 		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
-		frame = new JFrame( titleName ) ;								// Initialise Window
-		frame.createBufferStrategy( 1 ) ;
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
-		frame.setIgnoreRepaint( true ) ;
-
+		final JFrame frame = new JFrame( titleName ) ;				// Initialise Window
 		frame.addWindowListener( new WindowListener()
 		{
 			public void windowActivated( final WindowEvent _event ) {}
@@ -62,19 +55,11 @@ public class GLDefaultSystem implements SystemInterface
 
 		renderer.hookToWindow( frame ) ;
 
-		// Hook Input System with GUI Canvas
+		// Hook Input System to GUI Canvas
 		renderer.getCanvas().addMouseListener( inputSystem ) ;
 		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;
 		renderer.getCanvas().addMouseWheelListener( inputSystem ) ;
 		renderer.getCanvas().addKeyListener( inputSystem ) ;
-
-		final Vector2 display = renderer.renderInfo.getDisplayDimensions() ;
-		frame.setSize( ( int )display.x, ( int )display.y ) ;
-		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
-		frame.validate() ;
-		frame.setVisible( true ) ;
-
-		draw() ; 													// Ensure OpenGL Context gets initialised.
 	}
 
 	public void startSystem() {}
@@ -84,6 +69,7 @@ public class GLDefaultSystem implements SystemInterface
 	public void shutdownSystem()
 	{
 		sourceGenerator.shutdownGenerator() ;
+		renderer.shutdown() ;
 	}
 
 	/*INPUT HOOK*/
@@ -122,21 +108,7 @@ public class GLDefaultSystem implements SystemInterface
 	
 	public void setDisplayDimensions( final Vector2 _display )
 	{
-		final JFrame temp = new JFrame() ;
-		temp.pack() ;
-
-		final Insets insets = temp.getInsets() ;
-		final Dimension dim = new Dimension( insets.left + insets.right + ( int )_display.x,
-											insets.top + insets.bottom + ( int )_display.y ) ;
-
-		//System.out.println( "Set Display: " + _display ) ;
-		frame.setVisible( false ) ;
 		renderer.setDisplayDimensions( ( int )_display.x, ( int )_display.y ) ;
-		frame.setMinimumSize( dim ) ;
-		frame.setSize( dim ) ;
-		frame.validate() ;
-		frame.setVisible( true ) ;
-		//System.out.println( "FrameW: " + frame.getWidth() + " FrameH: " + frame.getHeight() ) ;
 	}
 
 	public void setRenderDimensions( final Vector2 _render )
@@ -158,21 +130,6 @@ public class GLDefaultSystem implements SystemInterface
 	public SourceGenerator getSourceGenerator()
 	{
 		return sourceGenerator ;
-	}
-	
-	public void clear()
-	{
-		renderer.clear() ;
-	}
-
-	public void clearInputs()
-	{
-		inputSystem.clearInputs() ;
-	}
-
-	public void clearEvents()
-	{
-		eventSystem.clearEvents() ;
 	}
 
 	public boolean update()

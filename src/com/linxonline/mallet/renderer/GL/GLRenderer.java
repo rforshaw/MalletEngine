@@ -42,14 +42,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	private int textureID = 0 ;
 	private int indexID = 0 ;
 	
-	public GLRenderer()
+	public GLRenderer() {}
+
+	@Override
+	public void start()
 	{
 		initGraphics() ;
 		initDrawCalls() ;
-		
+
 		renderInfo.setKeepRenderRatio( false ) ;
 	}
 
+	@Override
+	public void shutdown() {}
+	
 	private void initGraphics()
 	{
 		GLProfile glProfile = GLProfile.getDefault() ;
@@ -74,6 +80,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
+		final JFrame temp = new JFrame() ;
+		temp.pack() ;
+
+		final Insets insets = temp.getInsets() ;
+		final int dimX = insets.left + insets.right + _width ;
+		final int dimY = insets.top + insets.bottom + _height ;
+		final Dimension dim = new Dimension( dimX, dimY ) ;
+
+		frame.setMinimumSize( dim ) ;
+		frame.setSize( dim ) ;
+		frame.validate() ;
+
 		super.setDisplayDimensions( _width, _height ) ;
 		canvas.setSize( _width, _height ) ;
 
@@ -223,8 +241,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public void hookToWindow( final JFrame _frame )
 	{
 		frame = _frame ;
+		frame.createBufferStrategy( 1 ) ;
+		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
+		frame.setIgnoreRepaint( true ) ;
+
 		frame.add( canvas ) ;
 		frame.pack() ;
+		
+		final Vector2 display = renderInfo.getDisplayDimensions() ;
+		frame.setSize( ( int )display.x, ( int )display.y ) ;
+		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
+		frame.validate() ;
+		frame.setVisible( true ) ;
+
+		draw() ;
 	}
 
 	@Override

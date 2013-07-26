@@ -32,6 +32,12 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	public Basic2DRender() {}
 
 	@Override
+	public abstract void start() ;
+	
+	@Override
+	public abstract void shutdown() ;
+
+	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
 		renderInfo.setRenderDimensions( new Vector2( _width, _height ) ) ;

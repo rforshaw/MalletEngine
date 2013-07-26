@@ -6,7 +6,7 @@ import com.linxonline.mallet.util.settings.* ;
 
 public final class StateMachine
 {
-	private ArrayList<State> states = new ArrayList<State>() ;
+	private final ArrayList<State> states = new ArrayList<State>() ;
 	private State currentState = null ;
 	private State defaultState = null ;
 
@@ -83,7 +83,7 @@ public final class StateMachine
 			currentState.startState( pack ) ;
 		}
 	}
-	
+
 	private final State getState( final String _name )
 	{
 		for( State state : states )
@@ -93,23 +93,15 @@ public final class StateMachine
 				return state ;
 			}
 		}
-		
+
 		return null ;
 	}
 
 	private final boolean exists( final String _name )
 	{
-		for( State state : states )
-		{
-			if( _name.equals( state.name ) == true )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
+		return getState( _name ) != null ? true : false ;
 	}
-	
+
 	private final boolean exists( State _state )
 	{
 		return states.contains( _state ) ;

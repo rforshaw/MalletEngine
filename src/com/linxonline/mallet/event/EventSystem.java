@@ -57,7 +57,7 @@ public final class EventSystem implements AddEventInterface
 	}
 
 	/**
-		Removes the EventHandler now, no questions asked.
+		Remove the EventHandlers queued for removal now.
 	**/
 	public void removeHandlersNow()
 	{

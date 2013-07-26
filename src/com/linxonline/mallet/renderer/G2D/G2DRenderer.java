@@ -13,6 +13,8 @@ import java.awt.TexturePaint ;
 import java.awt.image.BufferStrategy ;
 import java.awt.image.BufferedImage ;
 import java.awt.geom.AffineTransform ;
+import java.awt.Dimension ;
+import java.awt.Insets ;
 
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.resources.TextureManager ;
@@ -54,8 +56,13 @@ public class G2DRenderer extends Basic2DRender
 	public G2DRenderer()
 	{
 		canvas.setIgnoreRepaint( true ) ;
-		initDrawCalls() ;
 	}
+
+	@Override
+	public void start() { initDrawCalls() ; }
+
+	@Override
+	public void shutdown() {}
 
 	private void initDrawCalls()
 	{
@@ -278,6 +285,33 @@ public class G2DRenderer extends Basic2DRender
 		} ;
 	}
 
+	@Override
+	public void setDisplayDimensions( final int _width, final int _height )
+	{
+		final JFrame temp = new JFrame() ;
+		temp.pack() ;
+
+		final Insets insets = temp.getInsets() ;
+		final int dimX = insets.left + insets.right + _width ;
+		final int dimY = insets.top + insets.bottom + _height ;
+		final Dimension dim = new Dimension( dimX, dimY ) ;
+
+		frame.setMinimumSize( dim ) ;
+		frame.setSize( dim ) ;
+		frame.validate() ;
+
+		frame.setVisible( false ) ;
+		frame.setResizable( true ) ;
+
+		super.setDisplayDimensions( _width, _height ) ;
+		frame.setMinimumSize( dim ) ;
+		frame.setSize( dim ) ;
+		frame.validate() ;
+
+		frame.setResizable( false ) ;
+		frame.setVisible( true ) ;
+	}
+	
 	/**Render Content**/
 
 	@Override
@@ -388,10 +422,18 @@ public class G2DRenderer extends Basic2DRender
 	public void hookToFrame( final JFrame _frame )
 	{
 		frame = _frame ;
+		frame.createBufferStrategy( 1 ) ;
+		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
+		frame.setIgnoreRepaint( true ) ;
+
 		frame.add( canvas ) ;
 		frame.pack() ;
 
 		initCanvasBuffer( 2 ) ;
+		
+		frame.validate() ;
+		frame.setResizable( false ) ;
+		frame.setVisible( true ) ;
 	}
 
 	public Canvas getCanvas()

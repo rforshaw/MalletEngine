@@ -441,8 +441,6 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void clear()
 	{
-		system.clear() ;				// Clears the Renderer
-
 		eventSystem.clearEvents() ;
 		eventSystem.clearHandlers() ;
 
@@ -452,6 +450,7 @@ public class GameState extends State implements HookEntity
 		audioSystem.clear() ;
 		entitySystem.clear() ;
 		animationSystem.clear() ;
+		system.getRenderInterface().clear() ;
 	}
 
 	/**

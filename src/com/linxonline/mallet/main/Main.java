@@ -32,8 +32,8 @@ public class Main
 	{
 		loadFileSystem() ;
 
-		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
-		final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
+		final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
+		//final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
 
 		system.initSystem() ;
 		system.setDisplayDimensions( new Vector2( 320, 240 ) ) ;
