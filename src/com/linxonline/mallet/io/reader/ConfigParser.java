@@ -5,21 +5,19 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.game.GameState ;
 
-public abstract class ConfigParser
+public class ConfigParser
 {
-	private static boolean initDefault = false ;
-	private final static ArrayList<ParseInterface> parsers = new ArrayList<ParseInterface>() ;
+	private final ArrayList<ParseInterface> parsers = new ArrayList<ParseInterface>() ;
 
-	public ConfigParser() {}
+	public ConfigParser() { init() ; }
 
-	public static void addParser( final ParseInterface _parse )
+	public void addParser( final ParseInterface _parse )
 	{
 		parsers.add( _parse ) ;
 	}
 
-	public static Settings parseSettings( final Settings _src, Settings _dest )
+	public Settings parseSettings( final Settings _src, Settings _dest )
 	{
-		if( initDefault == false ) { init() ; }
 		if( _src == null ) { return _dest ; }
 		if( _dest == null ) { _dest = new Settings() ; }
 
@@ -31,7 +29,7 @@ public abstract class ConfigParser
 		return _dest ;
 	}
 
-	private static void init()
+	private void init()
 	{
 		parsers.add( new ParseInterface()
 		{
