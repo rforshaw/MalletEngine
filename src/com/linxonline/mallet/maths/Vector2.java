@@ -31,6 +31,12 @@ public final class Vector2
 		y = _y ;
 	}
 
+	public void setXY( final Vector2 _vec )
+	{
+		x = _vec.x ;
+		y = _vec.y ;
+	}
+	
 	public final void add( final float _x, final float _y )
 	{
 		x += _x ;

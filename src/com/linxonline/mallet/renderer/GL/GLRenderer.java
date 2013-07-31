@@ -210,8 +210,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 
 				gl.glPushMatrix() ;
-					gl.glTranslatef( _position.x + offset.x, _position.y + offset.y, 0.0f ) ;
+					
+					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
+					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
 					if( geometry.indexID != indexID )
 					{

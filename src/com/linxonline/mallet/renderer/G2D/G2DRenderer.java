@@ -300,7 +300,7 @@ public class G2DRenderer extends Basic2DRender
 		frame.setSize( dim ) ;
 		frame.validate() ;
 
-		frame.setVisible( false ) ;
+		//frame.setVisible( false ) ;
 		frame.setResizable( true ) ;
 
 		super.setDisplayDimensions( _width, _height ) ;
@@ -308,7 +308,7 @@ public class G2DRenderer extends Basic2DRender
 		frame.setSize( dim ) ;
 		frame.validate() ;
 
-		frame.setResizable( false ) ;
+		//frame.setResizable( false ) ;
 		frame.setVisible( true ) ;
 	}
 	
