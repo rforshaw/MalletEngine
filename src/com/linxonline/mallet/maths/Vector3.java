@@ -64,33 +64,28 @@ public final class Vector3
 		z -= _z ;
 	}
 
-	public final void multiply( final Vector3 _vec )
-	{
-		multiply( _vec.x, _vec.y, _vec.z ) ;
-	}
-
 	public final void multiply( final float _scalar )
 	{
-		multiply( _scalar, _scalar, _scalar ) ;
+		x *= _scalar ;
+		y *= _scalar ;
+		z *= _scalar ;
 	}
 
-	public final void multiply( final float _x, final float _y, final float _z )
+	public final void divide( final float _scalar )
 	{
-		x *= _x ;
-		y *= _y ;
-		z *= _z ;
+		x /= _scalar ;
+		y /= _scalar ;
+		z /= _scalar ;
 	}
 
-	public static final float dot( final Vector3 _vec1, final Vector3 _vec2 )
-	{
-		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) + ( _vec1.z * _vec2.z ) ;
-	}
-	
 	public final float length()
 	{
 		return ( float )Math.sqrt( ( x * x ) + ( y * y ) + ( z * z ) ) ;
 	}
 
+	/**
+		Unit vector
+	*/
 	public final void normalise()
 	{
 		final float length = length() ;
@@ -134,6 +129,22 @@ public final class Vector3
 		return new Vector3( _vec1.x - _vec2.x, _vec1.y - _vec2.y, _vec1.z - _vec2.z ) ;
 	}
 
+	/**
+		Scalar Product
+	*/
+	public static final float multiply( final Vector3 _vec1, final Vector3 _vec2 )
+	{
+		return ( ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) + ( _vec1.z * _vec2.z ) ) ;
+	}
+
+	/**
+		Dot Product
+	*/
+	public static final float dot( final Vector3 _vec1, final Vector3 _vec2 )
+	{
+		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) + ( _vec1.z * _vec2.z ) ;
+	}
+
 	public static final float distance( final Vector3 _vec1, final Vector3 _vec2 )
 	{
 		float tmp1 = ( _vec2.x - _vec1.x ) ;
@@ -141,26 +152,6 @@ public final class Vector3
 		float tmp3 = ( _vec2.z - _vec1.z ) ;
 
 		return ( float )Math.sqrt( ( tmp1 * tmp1 ) + ( tmp2 * tmp2 ) + ( tmp3 * tmp3 ) ) ;
-	}
-
-	public static final float multiply( final Vector3 _vec1, final Vector3 _vec2 )
-	{
-		return ( ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) + ( _vec1.z * _vec2.z ) ) ;
-	}
-
-	public static final Vector3 multiply( final Vector3 _vec1, final float _scalar )
-	{
-		return new Vector3( _vec1.x * _scalar, _vec1.y * _scalar, _vec1.z * _scalar ) ;
-	}
-
-	public static final Vector3 divide( final Vector3 _vec1, final Vector3 _vec2 )
-	{
-		return new Vector3( _vec1.x / _vec2.x, _vec1.y / _vec2.y, _vec1.z / _vec2.z ) ;
-	}
-
-	public static final Vector3 divide( final Vector3 _vec1, final float _scalar )
-	{
-		return new Vector3( _vec1.x / _scalar, _vec1.y / _scalar, _vec1.z / _scalar ) ;
 	}
 
 	public static final Vector3 parseVector3( final String _text )

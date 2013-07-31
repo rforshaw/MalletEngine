@@ -57,18 +57,14 @@ public final class Vector2
 
 	public final void multiply( final float _scalar )
 	{
-		multiply( _scalar, _scalar ) ;
+		x *= _scalar ;
+		y *= _scalar ;
 	}
 
-	public final void multiply( final Vector2 _vec )
+	public final void divide( final float _scalar )
 	{
-		multiply( _vec.x, _vec.y ) ;
-	}
-
-	public final void multiply( final float _x, final float _y )
-	{
-		x *= _x ;
-		y *= _y ;
+		x /= _scalar ;
+		y /= _scalar ;
 	}
 
 	public final float length()
@@ -101,7 +97,10 @@ public final class Vector2
 	{
 		return new String( "X:" + x + " Y: " + y ) ;
 	}
-	
+
+	/**
+		Dot Product
+	*/
 	public static final float dot( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) ;
@@ -130,21 +129,23 @@ public final class Vector2
 		return new Vector2( _vec1.x * _scalar, _vec1.y * _scalar ) ;
 	}
 
+	/**
+		Scalar Product
+	*/
 	public static final float multiply( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		return ( ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) ) ;
 	}
-
-	public static final Vector2 divide( final Vector2 _vec1, final float _scalar )
-	{
-		return new Vector2( _vec1.x / _scalar, _vec1.y / _scalar ) ;
-	}
-
+	
+	/**
+		Convience function - used for variables masquerading as vectors but are really 2 scalars.
+		Shouldn't be used by anyone sensible. Used by RenderInfo.
+	*/
 	public static final Vector2 divide( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		return new Vector2( _vec1.x / _vec2.x, _vec1.y / _vec2.y ) ;
 	}
-
+	
 	public static final Vector2 parseVector2( final String _text )
 	{
 		if( _text == null ) { return null ; }
