@@ -300,8 +300,8 @@ public class G2DRenderer extends Basic2DRender
 		frame.setSize( dim ) ;
 		frame.validate() ;
 
-		//frame.setVisible( false ) ;
-		frame.setResizable( true ) ;
+		frame.setVisible( false ) ;
+		//frame.setResizable( true ) ;
 
 		super.setDisplayDimensions( _width, _height ) ;
 		frame.setMinimumSize( dim ) ;

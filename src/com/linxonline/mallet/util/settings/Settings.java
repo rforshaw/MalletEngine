@@ -117,7 +117,7 @@ public final class Settings
 
 		return _default ;
 	}
-	
+
 	public final int getInteger( final String _name ) throws NullPointerException
 	{
 		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
@@ -141,7 +141,7 @@ public final class Settings
 
 		return _default ;
 	}
-	
+
 	public final float getFloat( final String _name ) throws NullPointerException
 	{
 		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
@@ -165,7 +165,7 @@ public final class Settings
 
 		return _default ;
 	}
-	
+
 	public final String getString( final String _name ) throws NullPointerException
 	{
 		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
@@ -177,7 +177,7 @@ public final class Settings
 
 		throw exception ;
 	}
-	
+
 	public final String getString( final String _name, final String _default )
 	{
 		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
@@ -189,7 +189,7 @@ public final class Settings
 
 		return _default ;
 	}
-	
+
 	public final Object getObject( final String _name ) throws NullPointerException
 	{
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
@@ -201,7 +201,7 @@ public final class Settings
 
 		throw exception ;
 	}
-	
+
 	public final Object getObject( final String _name, final Object _default )
 	{
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
@@ -225,7 +225,7 @@ public final class Settings
 
 		return _default ;
 	}
-	
+
 	private final VariableInterface getVariable( final String _name, final int _type )
 	{
 		inter = variables.get( _name ) ;
@@ -239,7 +239,7 @@ public final class Settings
 
 		return null ;
 	}
-	
+
 	public final ArrayList<String> toArrayString()
 	{
 		final Collection<VariableInterface> collection = variables.values() ;

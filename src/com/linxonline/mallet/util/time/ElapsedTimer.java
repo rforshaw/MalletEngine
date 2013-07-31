@@ -14,7 +14,7 @@ public abstract class ElapsedTimer
 	/**
 		If the Operating System does not support the DefaultTimer, 
 		you can substitute your own.
-	**/
+	*/
 	public static void setTimer( final TimerInterface _time )
 	{
 		time = _time ;
@@ -22,7 +22,7 @@ public abstract class ElapsedTimer
 
 	/**
 		Must only be called by game loop
-	**/
+	*/
 	public static final double getElapsedTimeInNanoSeconds()
 	{
 		if( time == null )
