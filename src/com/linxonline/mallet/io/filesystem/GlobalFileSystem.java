@@ -1,5 +1,10 @@
 package com.linxonline.mallet.io.filesystem ;
 
+/**
+	Provides global access point to the FileSystem.
+	Must be setFileSystem() must be called before game 
+	begin running.
+*/
 public class GlobalFileSystem
 {
 	private static FileSystem fileSystem = null ;
@@ -10,7 +15,7 @@ public class GlobalFileSystem
 	{
 		fileSystem = _system ;
 	}
-	
+
 	public static void scanBaseDirectory()
 	{
 		fileSystem.scanBaseDirectory() ;
@@ -33,7 +38,7 @@ public class GlobalFileSystem
 		Doesn't block calling Thread, when resource has started reading,
 		it'll call ResourceCallback.
 		Return boolean informs whether it successfully started reading.
-	**/
+	*/
 	public static boolean getResourceRaw( final String _file, final ResourceCallback _callback )
 	{
 		return fileSystem.getResourceRaw( _file, _callback ) ;
@@ -46,7 +51,7 @@ public class GlobalFileSystem
 
 	/**
 		Blocks calling Thread
-	**/
+	*/
 	public static boolean writeResourceAsString( final String _file, final String _data )
 	{
 		return fileSystem.writeResourceAsString( _file, _data ) ;

@@ -4,10 +4,12 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 /**
 	ByteInput is a simple byte reader.
-	
+
 	It assumes the developer knows in what order to read the
 	format. Allowing it to be exceptionally quick and verbose free.
-**/
+
+	ByteInput increments automatically by the amount of bytes read.
+*/
 public class ByteInput implements SerialiseInput
 {
 	private byte[] stream = null ;
@@ -23,48 +25,77 @@ public class ByteInput implements SerialiseInput
 		return new ByteInput( _stream ) ;
 	}
 
+	/**
+		Read a 4 byte integer
+	*/
 	public int readInt()
 	{
 		return ConvertBytes.toInt( stream, increment( 4 ), 4 ) ;
 	}
 
+	/**
+		Read 1 byte
+	*/
 	public byte readByte()
 	{
 		final byte[] b = new byte[1] ;
 		return b[0] ;
 	}
 
+	/**
+		Read a 2 byte char
+	*/
 	public char readChar()
 	{
 		return ConvertBytes.toChar( stream, increment( 2 ), 2 ) ;
 	}
 
+	/**
+		Read a 8 byte long
+	*/
 	public long readLong()
 	{
 		return ConvertBytes.toLong( stream, increment( 8 ), 8 ) ;
 	}
 
+	/**
+		Read a 4 byte float
+	*/
 	public float readFloat()
 	{
 		return ConvertBytes.toFloat( stream, increment( 4 ), 4 ) ;
 	}
 
+	/**
+		Read a 4 byte double
+	*/
 	public double readDouble()
 	{
 		return ConvertBytes.toDouble( stream, increment( 8 ), 8 ) ;
 	}
 
+	/**
+		Read a 4 byte integer to denote string length.
+		Read X bytes and convert to String.
+	*/
 	public String readString()
 	{
 		final int length = readInt() ;
 		return new String( ConvertBytes.toBytes( stream, increment( length ), length ) ) ;
 	}
 
+	/**
+		Read a 1 byte boolean
+	*/
 	public boolean readBoolean()
 	{
 		return ConvertBytes.toBoolean( stream, increment( 1 ), 0 ) ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 4-bytes to an int.
+	*/
 	public int[] readInts()
 	{
 		final int length = readInt() ;
@@ -78,12 +109,21 @@ public class ByteInput implements SerialiseInput
 		return ints ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		return byte array denoted by length.
+	*/
 	public byte[] readBytes()
 	{
 		final int length = readInt() ;
 		return ConvertBytes.toBytes( stream, increment( length ), length ) ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 2-bytes to a char.
+		Store results in an array.
+	*/
 	public char[] readChars()
 	{
 		final int length = readInt() ;
@@ -97,6 +137,11 @@ public class ByteInput implements SerialiseInput
 		return chars ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 8-bytes to a long.
+		Store results in an array.
+	*/
 	public long[] readLongs()
 	{
 		final int length = readInt() ;
@@ -110,6 +155,11 @@ public class ByteInput implements SerialiseInput
 		return longs ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 4-bytes to a float.
+		Store results in an array.
+	*/
 	public float[] readFloats()
 	{
 		final int length = readInt() ;
@@ -123,6 +173,11 @@ public class ByteInput implements SerialiseInput
 		return floats ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 4-bytes to a double.
+		Store results in an array.
+	*/
 	public double[] readDoubles()
 	{
 		final int length = readInt() ;
@@ -149,6 +204,11 @@ public class ByteInput implements SerialiseInput
 		return strings ;
 	}
 
+	/**
+		Read a 4 byte integer to denote array length.
+		Iterate array length convert 1-byte to a boolean.
+		Store results in an array.
+	*/
 	public boolean[] readBooleans()
 	{
 		final int length = readInt() ;
