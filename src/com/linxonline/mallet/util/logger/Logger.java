@@ -10,7 +10,7 @@ package com.linxonline.mallet.util.logger ;
 	If Logger.verbosity = 10, any call with _verbosity <= 10 
 	will not be printed.
 **/
-public abstract class Logger
+public class Logger
 {
 	private static int verbosity = 0 ; // Used to determine what should be printed.
 

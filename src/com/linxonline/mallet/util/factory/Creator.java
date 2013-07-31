@@ -2,6 +2,9 @@ package com.linxonline.mallet.util.factory ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
+/**
+	Implements setType and getType.
+*/
 public abstract class Creator<T> implements CreatorInterface<T>
 {
 	protected String type = null ;
