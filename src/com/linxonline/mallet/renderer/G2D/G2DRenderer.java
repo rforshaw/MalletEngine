@@ -301,14 +301,14 @@ public class G2DRenderer extends Basic2DRender
 		frame.validate() ;
 
 		frame.setVisible( false ) ;
-		frame.setResizable( true ) ;
+		//frame.setResizable( true ) ;
 
 		super.setDisplayDimensions( _width, _height ) ;
 		frame.setMinimumSize( dim ) ;
 		frame.setSize( dim ) ;
 		frame.validate() ;
 
-		frame.setResizable( false ) ;
+		//frame.setResizable( false ) ;
 		frame.setVisible( true ) ;
 	}
 	

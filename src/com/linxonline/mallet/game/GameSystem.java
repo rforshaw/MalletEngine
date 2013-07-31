@@ -27,7 +27,6 @@ public final class GameSystem
 		{
 			dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 			running = update( dt ) ;
-			Thread.yield() ;
 		}
 	}
 
