@@ -6,8 +6,8 @@ public class Matrix3
 		* Ordered by row, if directly using write it down.
 		* [] = array location, () = row, column
 		* (0, 0)[0], (0, 1)[1], (0, 2)[2]
-		* (1, 0)[3], (0, 1)[4], (0, 2)[5]
-		* (2, 0)[6], (0, 1)[7], (0, 2)[8]
+		* (1, 0)[3], (1, 1)[4], (1, 2)[5]
+		* (2, 0)[6], (2, 1)[7], (2, 2)[8]
 	*/
 	public final float[] matrix = new float[9] ;
 
@@ -51,21 +51,60 @@ public class Matrix3
 		setRow( 0.0f, 0.0f, 1.0f, 2 ) ;
 	}
 
+	public void translate( final float _x, final float _y )
+	{
+		final Matrix3 t = Matrix3.createIdentity() ;
+		t.setTranslate( _x, _y ) ;
+		multiply( t ) ;
+	}
+	
+	public void setTranslate( final Vector2 _vec )
+	{
+		setTranslate( _vec.x, _vec.y ) ;
+	}
+
+	public void setTranslate( final float _x, final float _y )
+	{
+		set( _x, 0, 2 ) ;	//	_x |  v |  v
+		set( _y, 1, 2 ) ;	//	 v | _y |  v
+	}
+
+	public void scale( final float _x, final float _y )
+	{
+		final Matrix3 s = Matrix3.createIdentity() ;
+		s.setScale( _x, _y ) ;
+		multiply( s ) ;
+	}
+	
 	public void setScale( final float _scale )
 	{
-		setScale( _scale, _scale, _scale ) ;
+		setScale( _scale, _scale ) ;
 	}
 
-	public void setScale( final Vector3 _vec )
+	public void rotate( final float _theta )
 	{
-		setScale( _vec.x, _vec.y, _vec.z ) ;
+		final Matrix3 r = Matrix3.createIdentity() ;
+		r.setRotate( _theta ) ;
+		multiply( r ) ;
 	}
 
-	public void setScale( final float _x, final float _y, final float _z )
+	public void setRotate( final float _theta )
+	{
+		final float cos = ( float )Math.cos( _theta ) ;
+		final float sin = ( float )Math.sin( _theta ) ;
+		set( cos, 0, 0 ) ; set( -sin, 0, 1 ) ;
+		set( sin, 1, 0 ) ; set(  cos, 1, 1 ) ;
+	}
+
+	public void setScale( final Vector2 _vec )
+	{
+		setScale( _vec.x, _vec.y ) ;
+	}
+
+	public void setScale( final float _x, final float _y )
 	{
 		set( _x, 0, 0 ) ;	//	_x |  v |  v
 		set( _y, 1, 1 ) ;	//	 v | _y |  v
-		set( _z, 2, 2 ) ;	//	 v |  v | _z
 	}
 
 	public void multiply( final Matrix3 _mat )
@@ -93,7 +132,7 @@ public class Matrix3
 		t[0] = matrix[0] + _mat.matrix[0] ; t[1] = matrix[1] + _mat.matrix[1] ; t[2] = matrix[2] + _mat.matrix[2] ;
 		t[3] = matrix[3] + _mat.matrix[3] ; t[4] = matrix[4] + _mat.matrix[4] ; t[5] = matrix[5] + _mat.matrix[5] ;
 		t[6] = matrix[6] + _mat.matrix[6] ; t[7] = matrix[7] + _mat.matrix[7] ; t[8] = matrix[8] + _mat.matrix[8] ;
-		copy( t, matrix ) ;
+		Matrix3.copy( t, matrix ) ;
 	}
 	
 	public void subtract( final Matrix3 _mat )
@@ -102,9 +141,9 @@ public class Matrix3
 		t[0] = matrix[0] - _mat.matrix[0] ; t[1] = matrix[1] - _mat.matrix[1] ; t[2] = matrix[2] - _mat.matrix[2] ;
 		t[3] = matrix[3] - _mat.matrix[3] ; t[4] = matrix[4] - _mat.matrix[4] ; t[5] = matrix[5] - _mat.matrix[5] ;
 		t[6] = matrix[6] - _mat.matrix[6] ; t[7] = matrix[7] - _mat.matrix[7] ; t[8] = matrix[8] - _mat.matrix[8] ;
-		copy( t, matrix ) ;
+		Matrix3.copy( t, matrix ) ;
 	}
-	
+
 	public void invert()
 	{
 		final float d = ( ( matrix[6] * matrix[1] * matrix[5] ) - ( matrix[6] * matrix[2] * matrix[4] ) - 
@@ -141,7 +180,7 @@ public class Matrix3
 	public float[] toArray()
 	{
 		final float[] t = new float[9] ;
-		copy( matrix, t ) ;
+		Matrix3.copy( matrix, t ) ;
 		return t ;
 	}
 	
@@ -172,23 +211,30 @@ public class Matrix3
 		matrix[( _row * 3) + _col] = _val ;
 	}
 
+	public static Matrix3 createIdentity()
+	{
+		final Matrix3 iden = new Matrix3() ;
+		iden.setIdentity() ;
+		return iden ;
+	}
+	
 	public static Matrix3 transpose( final Matrix3 _a, final Matrix3 _result )
 	{
-		copy( _a.matrix, _result.matrix ) ;
+		Matrix3.copy( _a.matrix, _result.matrix ) ;
 		_result.transpose() ;
 		return _result ;
 	}
 
 	public static Matrix3 invert( final Matrix3 _a, final Matrix3 _result )
 	{
-		copy( _a.matrix, _result.matrix ) ;
+		Matrix3.copy( _a.matrix, _result.matrix ) ;
 		_result.invert() ;
 		return _result ;
 	}
 
 	public static Matrix3 multiply( final Matrix3 _a, final Matrix3 _b, final Matrix3 _result )
 	{
-		copy( _a.matrix, _result.matrix ) ;
+		Matrix3.copy( _a.matrix, _result.matrix ) ;
 		_result.multiply( _b ) ;
 		return _result ;
 	}
@@ -204,14 +250,14 @@ public class Matrix3
 
 	public static Matrix3 add( final Matrix3 _a, final Matrix3 _b, final Matrix3 _result )
 	{
-		copy( _a.matrix, _result.matrix ) ;
+		Matrix3.copy( _a.matrix, _result.matrix ) ;
 		_result.add( _b ) ;
 		return _result ;
 	}
 	
 	public static Matrix3 subtract( final Matrix3 _a, final Matrix3 _b, final Matrix3 _result )
 	{
-		copy( _a.matrix, _result.matrix ) ;
+		Matrix3.copy( _a.matrix, _result.matrix ) ;
 		_result.subtract( _b ) ;
 		return _result ;
 	}
