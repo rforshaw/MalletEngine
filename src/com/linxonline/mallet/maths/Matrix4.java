@@ -188,9 +188,12 @@ public class Matrix4
 		t[15] = ( ( matrix[1] * matrix[6]  * matrix[11] ) + ( matrix[1] * matrix[7]  * matrix[10] ) - ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - (  matrix[9] * matrix[2] * matrix[7]  ) - (  matrix[9] * matrix[3] * matrix[6]  ) ) ;
 
 		final float d = ( ( matrix[0] * t[0] ) + ( matrix[4] * t[1] ) + ( matrix[8] * t[2] ) + ( matrix[12] * t[3] ) ) ;
-		for( int i = 0; i < t.length; i++ )
+		for( int i = 0; i < t.length; i += 4 )
 		{
 			t[i] /= d ;
+			t[i + 1] /= d ;
+			t[i + 2] /= d ;
+			t[i + 3] /= d ;
 		}
 
 		Matrix4.copy( t, matrix ) ;
