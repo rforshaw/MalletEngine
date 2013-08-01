@@ -1,5 +1,8 @@
 package com.linxonline.mallet.maths ;
 
+/**
+	Designed for 2D transformations.
+*/
 public class Matrix3
 {
 	/**
@@ -65,8 +68,9 @@ public class Matrix3
 
 	public void setTranslate( final float _x, final float _y )
 	{
-		set( _x, 0, 2 ) ;	//	_x |  v |  v
-		set( _y, 1, 2 ) ;	//	 v | _y |  v
+		set( _x, 0, 2 ) ;	//	[1 | 0 | _x]
+		set( _y, 1, 2 ) ;	//	[0 | 1 | _y]
+							//	[0 | 0 |  1]
 	}
 
 	public void scale( final float _x, final float _y )
@@ -92,8 +96,10 @@ public class Matrix3
 	{
 		final float cos = ( float )Math.cos( _theta ) ;
 		final float sin = ( float )Math.sin( _theta ) ;
-		set( cos, 0, 0 ) ; set( -sin, 0, 1 ) ;
-		set( sin, 1, 0 ) ; set(  cos, 1, 1 ) ;
+		// Technically a rotation around the Z-axis
+		set(  cos, 0, 0 ) ; set( sin, 0, 1 ) ;	//	[ cos | sin |  0]
+		set( -sin, 1, 0 ) ; set( cos, 1, 1 ) ;	//	[-sin | cos |  0]
+												//	[  0  |   0  |  1]
 	}
 
 	public void setScale( final Vector2 _vec )
@@ -103,8 +109,9 @@ public class Matrix3
 
 	public void setScale( final float _x, final float _y )
 	{
-		set( _x, 0, 0 ) ;	//	_x |  v |  v
-		set( _y, 1, 1 ) ;	//	 v | _y |  v
+		set( _x, 0, 0 ) ;	//	[_x |  0 |  0]
+		set( _y, 1, 1 ) ;	//	[ v | _y |  0]
+							//	[ 0 |  0 |  1]
 	}
 
 	public void multiply( final Matrix3 _mat )
@@ -239,13 +246,51 @@ public class Matrix3
 		return _result ;
 	}
 
+	/**
+		Stores transformation in _result.
+	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix3 _b, final Vector3 _result )
 	{
-		_result.x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( _a.y * _b.matrix[2] ) ;
-		_result.y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( _a.y * _b.matrix[5] ) ;
-		_result.z = ( _a.x * _b.matrix[6] ) + ( _a.y * _b.matrix[7] ) + ( _a.y * _b.matrix[8] ) ;
+		_result.x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( _a.z * _b.matrix[2] ) ;
+		_result.y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( _a.z * _b.matrix[5] ) ;
+		_result.z = ( _a.x * _b.matrix[6] ) + ( _a.y * _b.matrix[7] ) + ( _a.z * _b.matrix[8] ) ;
 
 		return _result ;
+	}
+
+	/**
+		Stores transformation in original Vector3 - _a
+	*/
+	public static Vector3 multiply( final Vector3 _a, final Matrix3 _b )
+	{
+		final float x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( _a.z * _b.matrix[2] ) ;
+		final float y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( _a.z * _b.matrix[5] ) ;
+		final float z = ( _a.x * _b.matrix[6] ) + ( _a.y * _b.matrix[7] ) + ( _a.z * _b.matrix[8] ) ;
+
+		_a.setXYZ( x, y, z ) ;
+		return _a ;
+	}
+
+	/**
+		Stores transformation in _result.
+	*/
+	public static Vector2 multiply( final Vector2 _a, final Matrix3 _b, final Vector2 _result )
+	{
+		_result.x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( 1.0f * _b.matrix[2] ) ;
+		_result.y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( 1.0f * _b.matrix[5] ) ;
+		return _result ;
+	}
+
+	/**
+		Stores transformation in original Vector2 - _a
+	*/
+	public static Vector2 multiply( final Vector2 _a, final Matrix3 _b )
+	{
+		final float x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( 1.0f * _b.matrix[2] ) ;
+		final float y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( 1.0f * _b.matrix[5] ) ;
+
+		_a.setXY( x, y ) ;
+		return _a ;
 	}
 
 	public static Matrix3 add( final Matrix3 _a, final Matrix3 _b, final Matrix3 _result )
@@ -264,6 +309,6 @@ public class Matrix3
 
 	private static void copy( final float[] _from, final float[] _to )
 	{
-		System.arraycopy( _from, 0, _to, 0, _to.length ) ;
+		System.arraycopy( _from, 0, _to, 0, 9 ) ;
 	}
 }
