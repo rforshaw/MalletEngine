@@ -171,7 +171,7 @@ public class Matrix3
 	{
 		matrix[( _row * 3) + _col] = _val ;
 	}
-	
+
 	public static Matrix3 transpose( final Matrix3 _a, final Matrix3 _result )
 	{
 		copy( _a.matrix, _result.matrix ) ;
