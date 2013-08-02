@@ -8,9 +8,9 @@ public class Matrix4
 	/**
 		* Ordered by row, if directly using write it down.
 		* [] = array location, () = row, column
-		*  (0, 0)[0],  (0, 1)[1],  (0, 2)[2],  (0, 3)[3]
-		*  (1, 0)[4],  (1, 1)[5],  (1, 2)[6],  (1, 3)[7]
-		*  (2, 0)[8],  (2, 1)[9], (2, 2)[10], (2, 3)[11]
+		* (0, 0)[ 0], (0, 1)[ 1], (0, 2)[ 2], (0, 3)[ 3]
+		* (1, 0)[ 4], (1, 1)[ 5], (1, 2)[ 6], (1, 3)[ 7]
+		* (2, 0)[ 8], (2, 1)[ 9], (2, 2)[10], (2, 3)[11]
 		* (3, 0)[12], (3, 1)[13], (3, 2)[14], (3, 3)[15]
 	*/
 	public final float[] matrix = new float[16] ;
@@ -99,15 +99,38 @@ public class Matrix4
 	
 	public void rotate( final float _theta )
 	{
-		final Matrix4 r = Matrix4.createIdentity() ;
-		r.setRotate( _theta ) ;
-		multiply( r ) ;
+		final Matrix4 rX = Matrix4.createIdentity() ;
+		rX.setRotateX( _theta ) ;
+		multiply( rX ) ;
+		
+		final Matrix4 rY = Matrix4.createIdentity() ;
+		rY.setRotateX( _theta ) ;
+		multiply( rY ) ;
+		
+		final Matrix4 rZ = Matrix4.createIdentity() ;
+		rZ.setRotateX( _theta ) ;
+		multiply( rZ ) ;
 	}
 
-	/**
-		TODO : Allow rotation around X & Y too.
-	*/
-	public void setRotate( final float _theta )
+	public void setRotateX( final float _theta )
+	{
+		final float cos = ( float )Math.cos( _theta ) ;
+		final float sin = ( float )Math.sin( _theta ) ;
+		set( cos, 1, 1 ) ; set( -sin, 1, 2 ) ;	//	[cos | -sin |  0]
+		set( sin, 2, 1 ) ; set(  cos, 2, 2 ) ;	//	[sin |  cos |  0]
+												//	[ 0  |   0  |  1]
+	}
+
+	public void setRotateY( final float _theta )
+	{
+		final float cos = ( float )Math.cos( _theta ) ;
+		final float sin = ( float )Math.sin( _theta ) ;
+		set( cos, 0, 0 ) ; set( sin, 0, 2 ) ;	//	[cos | -sin |  0]
+		set( -sin, 2, 0 ) ; set(  cos, 2, 2 ) ;	//	[sin |  cos |  0]
+												//	[ 0  |   0  |  1]
+	}
+
+	public void setRotateZ( final float _theta )
 	{
 		final float cos = ( float )Math.cos( _theta ) ;
 		final float sin = ( float )Math.sin( _theta ) ;
@@ -199,10 +222,10 @@ public class Matrix4
 	
 	public String toString()
 	{
-		final String row1 = "[" + matrix[0] +  "|" + matrix[1] +  "|" + matrix[2]  +  "|" + matrix[3]   + "]\n" ;
-		final String row2 = "[" + matrix[4] +  "|" + matrix[5] +  "|" + matrix[6]  +  "|" + matrix[7]   +"]\n" ;
-		final String row3 = "[" + matrix[8] +  "|" + matrix[9] +  "|" + matrix[10]  + "|" + matrix[11]  +"]\n" ;
-		final String row4 = "[" + matrix[12] + "|" + matrix[13] + "|" + matrix[14]  + "|" + matrix[15]  +"]\n" ;
+		final String row1 = "[" + matrix[0] +  "|" + matrix[1] +  "|" + matrix[2]  +  "|" + matrix[3]  + "]\n" ;
+		final String row2 = "[" + matrix[4] +  "|" + matrix[5] +  "|" + matrix[6]  +  "|" + matrix[7]  + "]\n" ;
+		final String row3 = "[" + matrix[8] +  "|" + matrix[9] +  "|" + matrix[10]  + "|" + matrix[11] + "]\n" ;
+		final String row4 = "[" + matrix[12] + "|" + matrix[13] + "|" + matrix[14]  + "|" + matrix[15] + "]\n" ;
 		return row1 + row2 + row3 ;
 	}
 
