@@ -6,6 +6,16 @@ package com.linxonline.mallet.maths ;
 public class Matrix3
 {
 	/**
+		Matrix3 functions are guaranteed to be called hundreds if 
+		not thousands of times a second in a typical game-loop.
+		To reduce the amount of temporary objects that would appear 
+		via translate, scale, and rotate calls, temp is used instead.
+		Each Matrix3 will consume double its normal space.
+		If only we could store the float-array on the stack!
+	*/
+	private final Matrix3 temp = Matrix3.createIdentity() ;
+
+	/**
 		* Ordered by row, if directly using write it down.
 		* [] = array location, () = row, column
 		* (0, 0)[0], (0, 1)[1], (0, 2)[2]
@@ -56,9 +66,9 @@ public class Matrix3
 
 	public void translate( final float _x, final float _y )
 	{
-		final Matrix3 t = Matrix3.createIdentity() ;
-		t.setTranslate( _x, _y ) ;
-		multiply( t ) ;
+		temp.setTranslate( _x, _y ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
 	}
 	
 	public void setTranslate( final Vector2 _vec )
@@ -75,31 +85,14 @@ public class Matrix3
 
 	public void scale( final float _x, final float _y )
 	{
-		final Matrix3 s = Matrix3.createIdentity() ;
-		s.setScale( _x, _y ) ;
-		multiply( s ) ;
+		temp.setScale( _x, _y ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
 	}
 	
 	public void setScale( final float _scale )
 	{
 		setScale( _scale, _scale ) ;
-	}
-
-	public void rotate( final float _theta )
-	{
-		final Matrix3 r = Matrix3.createIdentity() ;
-		r.setRotate( _theta ) ;
-		multiply( r ) ;
-	}
-
-	public void setRotate( final float _theta )
-	{
-		final float cos = ( float )Math.cos( _theta ) ;
-		final float sin = ( float )Math.sin( _theta ) ;
-		// Technically a rotation around the Z-axis
-		set(  cos, 0, 0 ) ; set( sin, 0, 1 ) ;	//	[ cos | sin |  0]
-		set( -sin, 1, 0 ) ; set( cos, 1, 1 ) ;	//	[-sin | cos |  0]
-												//	[  0  |   0  |  1]
 	}
 
 	public void setScale( final Vector2 _vec )
@@ -112,6 +105,23 @@ public class Matrix3
 		set( _x, 0, 0 ) ;	//	[_x |  0 |  0]
 		set( _y, 1, 1 ) ;	//	[ v | _y |  0]
 							//	[ 0 |  0 |  1]
+	}
+	
+	public void rotate( final float _theta )
+	{
+		temp.setRotate( _theta ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
+	}
+
+	public void setRotate( final float _theta )
+	{
+		final float cos = ( float )Math.cos( _theta ) ;
+		final float sin = ( float )Math.sin( _theta ) ;
+		// Technically a rotation around the Z-axis
+		set(  cos, 0, 0 ) ; set( sin, 0, 1 ) ;	//	[ cos | sin |  0]
+		set( -sin, 1, 0 ) ; set( cos, 1, 1 ) ;	//	[-sin | cos |  0]
+												//	[  0  |  0  |  1]
 	}
 
 	public void multiply( final Matrix3 _mat )
@@ -135,20 +145,22 @@ public class Matrix3
 
 	public void add( final Matrix3 _mat )
 	{
-		final float[] t = new float[9] ;
+		final float[] t = temp.matrix ;
 		t[0] = matrix[0] + _mat.matrix[0] ; t[1] = matrix[1] + _mat.matrix[1] ; t[2] = matrix[2] + _mat.matrix[2] ;
 		t[3] = matrix[3] + _mat.matrix[3] ; t[4] = matrix[4] + _mat.matrix[4] ; t[5] = matrix[5] + _mat.matrix[5] ;
 		t[6] = matrix[6] + _mat.matrix[6] ; t[7] = matrix[7] + _mat.matrix[7] ; t[8] = matrix[8] + _mat.matrix[8] ;
 		Matrix3.copy( t, matrix ) ;
+		temp.setIdentity() ;
 	}
 	
 	public void subtract( final Matrix3 _mat )
 	{
-		final float[] t = new float[9] ;
+		final float[] t = temp.matrix ;
 		t[0] = matrix[0] - _mat.matrix[0] ; t[1] = matrix[1] - _mat.matrix[1] ; t[2] = matrix[2] - _mat.matrix[2] ;
 		t[3] = matrix[3] - _mat.matrix[3] ; t[4] = matrix[4] - _mat.matrix[4] ; t[5] = matrix[5] - _mat.matrix[5] ;
 		t[6] = matrix[6] - _mat.matrix[6] ; t[7] = matrix[7] - _mat.matrix[7] ; t[8] = matrix[8] - _mat.matrix[8] ;
 		Matrix3.copy( t, matrix ) ;
+		temp.setIdentity() ;
 	}
 
 	public void invert()

@@ -6,6 +6,16 @@ package com.linxonline.mallet.maths ;
 public class Matrix4
 {
 	/**
+		Matrix4 functions are guaranteed to be called hundreds if 
+		not thousands of times a second in a typical game-loop.
+		To reduce the amount of temporary objects that would appear 
+		via translate, scale, and rotate calls, temp is used instead.
+		Each Matrix4 will consume double its normal space.
+		If only we could store the float-array on the stack!
+	*/
+	private final Matrix4 temp = Matrix4.createIdentity() ;
+
+	/**
 		* Ordered by row, if directly using write it down.
 		* [] = array location, () = row, column
 		* (0, 0)[ 0], (0, 1)[ 1], (0, 2)[ 2], (0, 3)[ 3]
@@ -54,9 +64,9 @@ public class Matrix4
 
 	public void translate( final float _x, final float _y, final float _z )
 	{
-		final Matrix4 t = Matrix4.createIdentity() ;
-		t.setTranslate( _x, _y, _z ) ;
-		multiply( t ) ;
+		temp.setTranslate( _x, _y, _z ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
 	}
 	
 	public void setTranslate( final Vector3 _vec )
@@ -74,9 +84,9 @@ public class Matrix4
 
 	public void scale( final float _x, final float _y, final float _z )
 	{
-		final Matrix4 s = Matrix4.createIdentity() ;
-		s.setScale( _x, _y, _z ) ;
-		multiply( s ) ;
+		temp.setScale( _x, _y, _z ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
 	}
 	
 	public void setScale( final float _scale )
@@ -99,17 +109,17 @@ public class Matrix4
 	
 	public void rotate( final float _theta )
 	{
-		final Matrix4 rX = Matrix4.createIdentity() ;
-		rX.setRotateX( _theta ) ;
-		multiply( rX ) ;
-		
-		final Matrix4 rY = Matrix4.createIdentity() ;
-		rY.setRotateX( _theta ) ;
-		multiply( rY ) ;
-		
-		final Matrix4 rZ = Matrix4.createIdentity() ;
-		rZ.setRotateX( _theta ) ;
-		multiply( rZ ) ;
+		temp.setRotateX( _theta ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
+
+		temp.setRotateX( _theta ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
+
+		temp.setRotateX( _theta ) ;
+		multiply( temp ) ;
+		temp.setIdentity() ;
 	}
 
 	public void setRotateX( final float _theta )
@@ -169,7 +179,7 @@ public class Matrix4
 
 	public void invert()
 	{
-		final float[] t = new float[16] ;
+		final float[] t = temp.matrix ;
 		t[0] = ( (  matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) + ( matrix[9] * matrix[7] * matrix[14] ) + ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
 		t[1] = ( ( -matrix[1] * matrix[10] * matrix[15] ) + ( matrix[1] * matrix[11] * matrix[14] ) + ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) + ( matrix[13] * matrix[3] * matrix[10] ) ) ;
 		t[2] = ( (  matrix[1] * matrix[ 6] * matrix[15] ) - ( matrix[1] * matrix[ 7] * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) + ( matrix[5] * matrix[3] * matrix[14] ) + ( matrix[13] * matrix[2] * matrix[ 7] ) - ( matrix[13] * matrix[3] * matrix[ 6] ) ) ;
@@ -200,6 +210,7 @@ public class Matrix4
 		}
 
 		Matrix4.copy( t, matrix ) ;
+		temp.setIdentity() ;
 	}
 
 	public void transpose()
