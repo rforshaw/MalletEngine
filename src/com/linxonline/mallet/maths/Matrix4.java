@@ -144,48 +144,28 @@ public class Matrix4
 		setRow( a30, a31, a32, a33, 3 ) ;
 	}
 
-	public void add( final Matrix4 _mat )
-	{
-		final float[] t = new float[16] ;
-		t[0] = matrix[0] + _mat.matrix[0] ; t[1] = matrix[1] + _mat.matrix[1] ; t[2] = matrix[2] + _mat.matrix[2] ;
-		t[3] = matrix[3] + _mat.matrix[3] ; t[4] = matrix[4] + _mat.matrix[4] ; t[5] = matrix[5] + _mat.matrix[5] ;
-		t[6] = matrix[6] + _mat.matrix[6] ; t[7] = matrix[7] + _mat.matrix[7] ; t[8] = matrix[8] + _mat.matrix[8] ;
-		Matrix4.copy( t, matrix ) ;
-	}
-	
-	public void subtract( final Matrix4 _mat )
-	{
-		final float[] t = new float[16] ;
-		t[0] = matrix[0] - _mat.matrix[0] ; t[1] = matrix[1] - _mat.matrix[1] ; t[2] = matrix[2] - _mat.matrix[2] ; t[8] = matrix[8] - _mat.matrix[8] ;
-		t[3] = matrix[3] - _mat.matrix[3] ; t[4] = matrix[4] - _mat.matrix[4] ; t[5] = matrix[5] - _mat.matrix[5] ; t[8] = matrix[8] - _mat.matrix[8] ;
-		t[6] = matrix[6] - _mat.matrix[6] ; t[7] = matrix[7] - _mat.matrix[7] ; t[8] = matrix[8] - _mat.matrix[8] ; t[8] = matrix[8] - _mat.matrix[8] ;
-		t[6] = matrix[6] - _mat.matrix[6] ; t[7] = matrix[7] - _mat.matrix[7] ; t[8] = matrix[8] - _mat.matrix[8] ; t[8] = matrix[8] - _mat.matrix[8] ;
-		Matrix4.copy( t, matrix ) ;
-	}
-
 	public void invert()
 	{
 		final float[] t = new float[16] ;
-		t[0]  = ( ( matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) - ( matrix[9] * matrix[7] * matrix[14] ) - ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
-		t[1]  = ( ( matrix[1] * matrix[10] * matrix[15] ) - ( matrix[1] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) - ( matrix[13] * matrix[3] * matrix[10] ) ) ;
-		t[2]  = ( ( matrix[1] * matrix[6]  * matrix[15] ) - ( matrix[1] * matrix[7]  * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) - ( matrix[5] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[7]  ) - ( matrix[13] * matrix[3] * matrix[6]  ) ) ;
-		t[3]  = ( ( matrix[1] * matrix[6]  * matrix[11] ) + ( matrix[1] * matrix[7]  * matrix[10] ) - ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - (  matrix[9] * matrix[2] * matrix[7]  ) - (  matrix[9] * matrix[3] * matrix[6]  ) ) ;
+		t[0] = ( (  matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) + ( matrix[9] * matrix[7] * matrix[14] ) + ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
+		t[1] = ( ( -matrix[1] * matrix[10] * matrix[15] ) + ( matrix[1] * matrix[11] * matrix[14] ) + ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) + ( matrix[13] * matrix[3] * matrix[10] ) ) ;
+		t[2] = ( (  matrix[1] * matrix[ 6] * matrix[15] ) - ( matrix[1] * matrix[ 7] * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) + ( matrix[5] * matrix[3] * matrix[14] ) + ( matrix[13] * matrix[2] * matrix[ 7] ) - ( matrix[13] * matrix[3] * matrix[ 6] ) ) ;
+		t[3] = ( ( -matrix[1] * matrix[ 6] * matrix[11] ) + ( matrix[1] * matrix[ 7] * matrix[10] ) + ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - ( matrix[ 9] * matrix[2] * matrix[ 7] ) + ( matrix[ 9] * matrix[3] * matrix[ 6] ) ) ;
 
-		// NOT CALCULATED YET 
-		t[4]  = ( ( matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) - ( matrix[9] * matrix[7] * matrix[14] ) - ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
-		t[5]  = ( ( matrix[1] * matrix[10] * matrix[15] ) - ( matrix[1] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) - ( matrix[13] * matrix[3] * matrix[10] ) ) ;
-		t[6]  = ( ( matrix[1] * matrix[6]  * matrix[15] ) - ( matrix[1] * matrix[7]  * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) - ( matrix[5] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[7]  ) - ( matrix[13] * matrix[3] * matrix[6]  ) ) ;
-		t[7]  = ( ( matrix[1] * matrix[6]  * matrix[11] ) + ( matrix[1] * matrix[7]  * matrix[10] ) - ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - (  matrix[9] * matrix[2] * matrix[7]  ) - (  matrix[9] * matrix[3] * matrix[6]  ) ) ;
+		t[ 4] = ( ( -matrix[4] * matrix[10] * matrix[15] ) + ( matrix[4] * matrix[11] * matrix[14] ) + ( matrix[8] * matrix[6] * matrix[15] ) - ( matrix[8] * matrix[ 7] * matrix[14] ) - ( matrix[12] * matrix[6] * matrix[11] ) + ( matrix[12] * matrix[ 7] * matrix[10] ) ) ;
+		t[ 5] = ( (  matrix[0] * matrix[10] * matrix[15] ) - ( matrix[0] * matrix[11] * matrix[14] ) - ( matrix[8] * matrix[2] * matrix[15] ) + ( matrix[8] * matrix[ 3] * matrix[14] ) + ( matrix[12] * matrix[2] * matrix[11] ) - ( matrix[12] * matrix[ 3] * matrix[10] ) ) ;
+		t[ 6] = ( ( -matrix[0] * matrix[ 6] * matrix[15] ) + ( matrix[0] * matrix[ 7] * matrix[14] ) + ( matrix[4] * matrix[2] * matrix[15] ) - ( matrix[4] * matrix[ 3] * matrix[14] ) - ( matrix[12] * matrix[2] * matrix[10] ) + ( matrix[12] * matrix[ 3] * matrix[ 6] ) ) ;
+		t[ 7] = ( (  matrix[0] * matrix[ 6] * matrix[11] ) - ( matrix[0] * matrix[10] * matrix[10] ) - ( matrix[4] * matrix[2] * matrix[11] ) + ( matrix[4] * matrix[ 3] * matrix[10] ) + ( matrix[ 8] * matrix[2] * matrix[10] ) - ( matrix[ 8] * matrix[ 3] * matrix[ 6] ) ) ;
 
-		t[8]  = ( ( matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) - ( matrix[9] * matrix[7] * matrix[14] ) - ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
-		t[9]  = ( ( matrix[1] * matrix[10] * matrix[15] ) - ( matrix[1] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) - ( matrix[13] * matrix[3] * matrix[10] ) ) ;
-		t[10] = ( ( matrix[1] * matrix[6]  * matrix[15] ) - ( matrix[1] * matrix[7]  * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) - ( matrix[5] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[7]  ) - ( matrix[13] * matrix[3] * matrix[6]  ) ) ;
-		t[11] = ( ( matrix[1] * matrix[6]  * matrix[11] ) + ( matrix[1] * matrix[7]  * matrix[10] ) - ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - (  matrix[9] * matrix[2] * matrix[7]  ) - (  matrix[9] * matrix[3] * matrix[6]  ) ) ;
+		t[ 8] = ( (  matrix[4] * matrix[ 9] * matrix[15] ) - ( matrix[4] * matrix[11] * matrix[13] ) - ( matrix[8] * matrix[5] * matrix[15] ) + ( matrix[8] * matrix[10] * matrix[13] ) + ( matrix[12] * matrix[5] * matrix[11] ) - ( matrix[12] * matrix[10] * matrix[ 9] ) ) ;
+		t[ 9] = ( ( -matrix[0] * matrix[ 9] * matrix[15] ) + ( matrix[0] * matrix[11] * matrix[13] ) + ( matrix[8] * matrix[1] * matrix[15] ) - ( matrix[8] * matrix[ 3] * matrix[13] ) - ( matrix[12] * matrix[1] * matrix[11] ) + ( matrix[12] * matrix[ 3] * matrix[ 9] ) ) ;
+		t[10] = ( (  matrix[0] * matrix[ 5] * matrix[15] ) - ( matrix[0] * matrix[10] * matrix[13] ) - ( matrix[4] * matrix[1] * matrix[15] ) + ( matrix[4] * matrix[ 3] * matrix[13] ) + ( matrix[12] * matrix[1] * matrix[10] ) - ( matrix[12] * matrix[ 3] * matrix[ 5] ) ) ;
+		t[11] = ( ( -matrix[0] * matrix[ 5] * matrix[11] ) + ( matrix[0] * matrix[10] * matrix[ 9] ) + ( matrix[4] * matrix[1] * matrix[11] ) - ( matrix[4] * matrix[ 3] * matrix[ 9] ) - ( matrix[ 8] * matrix[1] * matrix[10] ) + ( matrix[ 8] * matrix[ 3] * matrix[ 5] ) ) ;
 
-		t[12] = ( ( matrix[5] * matrix[10] * matrix[15] ) - ( matrix[5] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[6] * matrix[15] ) - ( matrix[9] * matrix[7] * matrix[14] ) - ( matrix[13] * matrix[6] * matrix[11] ) - ( matrix[13] * matrix[7] * matrix[10] ) ) ;
-		t[13] = ( ( matrix[1] * matrix[10] * matrix[15] ) - ( matrix[1] * matrix[11] * matrix[14] ) - ( matrix[9] * matrix[2] * matrix[15] ) - ( matrix[9] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[11] ) - ( matrix[13] * matrix[3] * matrix[10] ) ) ;
-		t[14] = ( ( matrix[1] * matrix[6]  * matrix[15] ) - ( matrix[1] * matrix[7]  * matrix[14] ) - ( matrix[5] * matrix[2] * matrix[15] ) - ( matrix[5] * matrix[3] * matrix[14] ) - ( matrix[13] * matrix[2] * matrix[7]  ) - ( matrix[13] * matrix[3] * matrix[6]  ) ) ;
-		t[15] = ( ( matrix[1] * matrix[6]  * matrix[11] ) + ( matrix[1] * matrix[7]  * matrix[10] ) - ( matrix[5] * matrix[2] * matrix[11] ) - ( matrix[5] * matrix[3] * matrix[10] ) - (  matrix[9] * matrix[2] * matrix[7]  ) - (  matrix[9] * matrix[3] * matrix[6]  ) ) ;
+		t[12] = ( ( -matrix[4] * matrix[ 9] * matrix[14] ) + ( matrix[4] * matrix[10] * matrix[13] ) + ( matrix[8] * matrix[5] * matrix[14] ) - ( matrix[8] * matrix[ 6] * matrix[13] ) - ( matrix[12] * matrix[5] * matrix[10] ) + ( matrix[12] * matrix[ 6] * matrix[ 9] ) ) ;
+		t[13] = ( (  matrix[0] * matrix[ 9] * matrix[14] ) - ( matrix[0] * matrix[10] * matrix[13] ) - ( matrix[8] * matrix[1] * matrix[14] ) + ( matrix[8] * matrix[ 2] * matrix[13] ) + ( matrix[12] * matrix[1] * matrix[10] ) - ( matrix[12] * matrix[ 2] * matrix[ 9] ) ) ;
+		t[14] = ( ( -matrix[0] * matrix[ 5] * matrix[14] ) + ( matrix[0] * matrix[ 6] * matrix[13] ) + ( matrix[4] * matrix[1] * matrix[14] ) - ( matrix[4] * matrix[ 2] * matrix[13] ) - ( matrix[12] * matrix[1] * matrix[ 6] ) + ( matrix[12] * matrix[ 2] * matrix[ 5] ) ) ;
+		t[15] = ( (  matrix[0] * matrix[ 5] * matrix[10] ) - ( matrix[0] * matrix[ 6] * matrix[ 9] ) - ( matrix[4] * matrix[1] * matrix[10] ) + ( matrix[4] * matrix[ 2] * matrix[ 9] ) + ( matrix[ 8] * matrix[1] * matrix[ 6] ) - ( matrix[ 8] * matrix[ 2] * matrix[ 5] ) ) ;
 
 		final float d = ( ( matrix[0] * t[0] ) + ( matrix[4] * t[1] ) + ( matrix[8] * t[2] ) + ( matrix[12] * t[3] ) ) ;
 		for( int i = 0; i < t.length; i += 4 )
@@ -202,15 +182,12 @@ public class Matrix4
 	public void transpose()
 	{
 		float t ;
-		t = matrix[1] ; matrix[1] = matrix[3] ; matrix[3] = t ;
-		t = matrix[2] ; matrix[2] = matrix[6] ; matrix[6] = t ;
-		t = matrix[5] ; matrix[5] = matrix[7] ; matrix[7] = t ;
-	}
-	
-	public float determinant()
-	{
-		return ( matrix[0] * matrix[4] * matrix[8] ) - ( matrix[0] * matrix[5] * matrix[7] ) + ( matrix[3] * matrix[7] * matrix[2] ) - 
-			   ( matrix[0] * matrix[1] * matrix[8] ) + ( matrix[6] * matrix[1] * matrix[4] ) - ( matrix[6] * matrix[4] * matrix[2] ) ;
+		t = matrix[ 1] ; matrix[ 1] = matrix[ 4] ; matrix[ 4] = t ;
+		t = matrix[ 2] ; matrix[ 2] = matrix[ 8] ; matrix[ 8] = t ;
+		t = matrix[ 3] ; matrix[ 3] = matrix[12] ; matrix[12] = t ;
+		t = matrix[ 6] ; matrix[ 6] = matrix[ 9] ; matrix[ 9] = t ;
+		t = matrix[ 7] ; matrix[ 7] = matrix[13] ; matrix[13] = t ;
+		t = matrix[11] ; matrix[11] = matrix[14] ; matrix[14] = t ;
 	}
 
 	public float[] toArray()
@@ -283,9 +260,15 @@ public class Matrix4
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
-		_result.x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( _a.z * _b.matrix[2] ) ;
-		_result.y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( _a.z * _b.matrix[5] ) ;
-		_result.z = ( _a.x * _b.matrix[6] ) + ( _a.y * _b.matrix[7] ) + ( _a.z * _b.matrix[8] ) ;
+		_result.x = _a.x * _b.matrix[ 0] + _a.y * _b.matrix[ 1] + _a.z * _b.matrix[ 2] + 1.0f * _b.matrix[ 3] ;
+		_result.y = _a.x * _b.matrix[ 4] + _a.y * _b.matrix[ 5] + _a.z * _b.matrix[ 6] + 1.0f * _b.matrix[ 7] ;
+		_result.z = _a.x * _b.matrix[ 8] + _a.y * _b.matrix[ 9] + _a.z * _b.matrix[10] + 1.0f * _b.matrix[11] ;
+
+		final float w = _a.x * _b.matrix[12] + _a.y * _b.matrix[13] + _a.z * _b.matrix[14] + 1.0f * _b.matrix[15] ;
+
+		_result.x /= w ;
+		_result.y /= w ;
+		_result.z /= w ;
 
 		return _result ;
 	}
@@ -295,52 +278,17 @@ public class Matrix4
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
 	{
-		final float x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( _a.z * _b.matrix[2] ) ;
-		final float y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( _a.z * _b.matrix[5] ) ;
-		final float z = ( _a.x * _b.matrix[6] ) + ( _a.y * _b.matrix[7] ) + ( _a.z * _b.matrix[8] ) ;
+		final float x = _a.x * _b.matrix[ 0] + _a.y * _b.matrix[ 1] + _a.z * _b.matrix[ 2] + 1.0f * _b.matrix[ 3] ;
+		final float y = _a.x * _b.matrix[ 4] + _a.y * _b.matrix[ 5] + _a.z * _b.matrix[ 6] + 1.0f * _b.matrix[ 7] ;
+		final float z = _a.x * _b.matrix[ 8] + _a.y * _b.matrix[ 9] + _a.z * _b.matrix[10] + 1.0f * _b.matrix[11] ;
+		final float w = _a.x * _b.matrix[12] + _a.y * _b.matrix[13] + _a.z * _b.matrix[14] + 1.0f * _b.matrix[15] ;
 
-		_a.setXYZ( x, y, z ) ;
+		_a.setXYZ( x / w, y / w, z / w ) ;
 		return _a ;
-	}
-
-	/**
-		Stores transformation in _result.
-	*/
-	public static Vector2 multiply( final Vector2 _a, final Matrix4 _b, final Vector2 _result )
-	{
-		_result.x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( 1.0f * _b.matrix[2] ) ;
-		_result.y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( 1.0f * _b.matrix[5] ) ;
-		return _result ;
-	}
-
-	/**
-		Stores transformation in original Vector2 - _a
-	*/
-	public static Vector2 multiply( final Vector2 _a, final Matrix4 _b )
-	{
-		final float x = ( _a.x * _b.matrix[0] ) + ( _a.y * _b.matrix[1] ) + ( 1.0f * _b.matrix[2] ) ;
-		final float y = ( _a.x * _b.matrix[3] ) + ( _a.y * _b.matrix[4] ) + ( 1.0f * _b.matrix[5] ) ;
-
-		_a.setXY( x, y ) ;
-		return _a ;
-	}
-
-	public static Matrix4 add( final Matrix4 _a, final Matrix4 _b, final Matrix4 _result )
-	{
-		Matrix4.copy( _a.matrix, _result.matrix ) ;
-		_result.add( _b ) ;
-		return _result ;
-	}
-	
-	public static Matrix4 subtract( final Matrix4 _a, final Matrix4 _b, final Matrix4 _result )
-	{
-		Matrix4.copy( _a.matrix, _result.matrix ) ;
-		_result.subtract( _b ) ;
-		return _result ;
 	}
 
 	private static void copy( final float[] _from, final float[] _to )
 	{
-		System.arraycopy( _from, 0, _to, 0, 9 ) ;
+		System.arraycopy( _from, 0, _to, 0, 16 ) ;
 	}
 }
