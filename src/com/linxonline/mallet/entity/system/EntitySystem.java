@@ -15,11 +15,11 @@ import com.linxonline.mallet.entity.* ;
 **/
 public class EntitySystem implements EntitySystemInterface
 {
-	protected final HookEntity state ;
-	protected final QuerySystem querySystem = new QuerySystem() ;
-	protected final Settings hashQuery = new Settings() ;
+	protected final HookEntity state ;											// Interface to Game State hook functions
+	protected final QuerySystem querySystem = new QuerySystem() ;					// Should be thread safe
+	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 
-	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;
+	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
 	protected final ArrayList<Entity> entitiesToAdd = new ArrayList<Entity>() ;
 	protected final ArrayList<Entity> cleanup = new ArrayList<Entity>() ;
 
@@ -171,14 +171,18 @@ public class EntitySystem implements EntitySystemInterface
 		return querySystem.queryForEntity( "HASHMAP", hashQuery ) ;
 	}
 
+	/**
+		Does the actual hard work of adding the entity to the 
+		required systems.
+	*/
 	private void injectEntity( final Entity _entity )
 	{
 		ensureEntityNameIsUnique( _entity ) ;
-		state.hookEntity( _entity ) ;
-		entities.addEntity( _entity ) ;
-		querySystem.addEntity( _entity ) ;
+		state.hookEntity( _entity ) ;			// Hook the Entity components to required systems
+		entities.addEntity( _entity ) ;			// Add Entity to Entities update list
+		querySystem.addEntity( _entity ) ;		// Add Entity to the Query System
 	}
-	
+
 	/**
 		Used to ensure entity has a unique name.
 		If the name already exists, it will add a number to the name

@@ -39,11 +39,13 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 		final int entitiesLength = entities.size() ;
 		if( threadLength > entitiesLength )
 		{
+			// You should never have more threads than entities,
+			// Else don't have more threads than entities.
 			threadLength = entitiesLength ;
 		}
 
 		int start = 0 ;
-		int range = entitiesLength / threadLength ;
+		int range = entitiesLength / threadLength ; 	// Split the entities between the threads.
 
 		EntityThread thread = null ;
 		for( int i = 0; i < threadLength; ++i )

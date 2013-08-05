@@ -4,6 +4,10 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.entity.* ;
 
+/**
+	Allow the default Entity System to be completely 
+	rewritten without much issue.
+*/
 public interface EntitySystemInterface
 {
 	public void addEntity( final Entity _entity ) ;					// Add Entity at the appropriate time

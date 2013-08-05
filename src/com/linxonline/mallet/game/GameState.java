@@ -43,7 +43,7 @@ public class GameState extends State implements HookEntity
 	protected SystemInterface system = null ;										// Provides access to Root systems
 	protected final AudioSystem audioSystem = new AudioSystem() ;					// Must specify a SourceGenerator
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
-	protected final EntitySystem entitySystem = new EntitySystem( this ) ;
+	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
 
 	protected boolean paused = false ;									// Determine whether state was paused.
