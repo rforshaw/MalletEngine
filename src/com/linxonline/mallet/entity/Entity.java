@@ -133,14 +133,11 @@ public final class Entity implements SerialisableForm
 	public final void update( final float _dt )
 	{
 		eventSystem.update() ;
-		Component component = null ;
-
 		// Update Components
 		final int size = components.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			component = components.get( i ) ;
-			component.update( _dt ) ;
+			components.get( i ).update( _dt ) ;
 		}
 	}
 
@@ -151,14 +148,35 @@ public final class Entity implements SerialisableForm
 	**/
 	public final Component getComponentByName( final String _name )
 	{
-		final int nameID = _name.hashCode() ;
 		final int size = components.size() ;
 		Component component = null ;
 
 		for( int i = 0; i < size; ++i )
 		{
 			component = components.get( i ) ;
-			if( component.isNameID( nameID ) == true )
+			if( component.isName( _name ) == true )
+			{
+				return component ;
+			}
+		}
+
+		return null ;
+	}
+
+	/**
+		Get a Component with the designated name.
+		If there is more than one component with that name,
+		then it will return the first one it finds.
+	**/
+	public final Component getComponentByNameID( final int _nameID )
+	{
+		final int size = components.size() ;
+		Component component = null ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			component = components.get( i ) ;
+			if( component.isNameID( _nameID ) == true )
 			{
 				return component ;
 			}
@@ -172,12 +190,27 @@ public final class Entity implements SerialisableForm
 	**/
 	public final ArrayList<Component> getComponentsByName( final String _name )
 	{
-		final int nameID = _name.hashCode() ;
 		final ArrayList<Component> group = new ArrayList<Component>() ;
-
 		for( Component component : components )
 		{
-			if( component.isNameID( nameID ) == true )
+			if( component.isName( _name ) == true )
+			{
+				group.add( component ) ;
+			}
+		}
+
+		return group ;
+	}
+
+	/**
+		Return all the components with the designated nameID
+	**/
+	public final ArrayList<Component> getComponentsByNameID( final int _nameID )
+	{
+		final ArrayList<Component> group = new ArrayList<Component>() ;
+		for( Component component : components )
+		{
+			if( component.isNameID( _nameID ) == true )
 			{
 				group.add( component ) ;
 			}
@@ -198,7 +231,26 @@ public final class Entity implements SerialisableForm
 
 		for( final Component component : components )
 		{
-			if( component.isGroupID( groupID ) == true )
+			if( component.isGroup( _group ) == true )
+			{
+				group.add( component ) ;
+			}
+		}
+
+		return group ;
+	}
+
+	/**
+		Get the Components that have the same Group name and return them in 
+		an ArrayList.
+		NOTE: A new ArrayList is created each time this function is called.
+	**/
+	public final ArrayList<Component> getComponentByGroupID( final int _groupID )
+	{
+		final ArrayList<Component> group = new ArrayList<Component>() ;
+		for( final Component component : components )
+		{
+			if( component.isGroupID( _groupID ) == true )
 			{
 				group.add( component ) ;
 			}
