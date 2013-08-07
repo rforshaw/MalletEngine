@@ -8,6 +8,8 @@ import com.linxonline.mallet.util.id.IDInterface ; 			// IDInterface to folder a
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.util.sort.QuickSort ;
+import com.linxonline.mallet.util.sort.SortInterface ;
 
 public abstract class Basic2DRender extends EventUpdater implements RenderInterface
 {
@@ -21,7 +23,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
 
-	protected final ArrayList<RenderData> content = new ArrayList<RenderData>() ;
+	protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;
 	protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;
 
 	private final EventMessenger messenger = new EventMessenger() ;
@@ -187,7 +189,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		return EVENT_TYPES ;
 	}
 
-	public void sort() {}
+	public void sort() 
+	{
+		content = QuickSort.quicksort( content ) ;
+	}
 
 	public void clear()
 	{
@@ -195,7 +200,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		hashedContent.clear() ;
 	}
 
-	protected class RenderData
+	protected class RenderData implements SortInterface
 	{
 		public final int id ;
 		public final int type ;
@@ -218,6 +223,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			position = _position ;
 			drawData.addInteger( "ID", _id ) ;
 		}
+
+		public int sortValue() { return layer ; }
 	}
 
 	protected interface DrawInterface
