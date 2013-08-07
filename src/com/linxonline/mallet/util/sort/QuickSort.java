@@ -23,19 +23,20 @@ public class QuickSort
 
 		return null ;
 	}
-	
+
 	private static <T> ArrayList<T> sort( ArrayList<T> _contents )
 	{
-		final int size = _contents.size() ;
+		int size = _contents.size() ;
 		final int halfSize = size / 2 ;
 
 		final SortInterface pivot = ( SortInterface )_contents.get( halfSize ) ;
+		_contents.remove( pivot ) ;
 
 		ArrayList<T> less = new ArrayList<T>() ;
 		ArrayList<T> greater = new ArrayList<T>() ;
 
+		--size ;
 		final int pivotPoint = pivot.sortValue() ;
-		_contents.remove( pivotPoint ) ;
 
 		for( int i = 0; i < size; i++ )
 		{
