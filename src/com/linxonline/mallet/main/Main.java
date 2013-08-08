@@ -7,11 +7,16 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.game.GameSystem ;
 import com.linxonline.mallet.game.GameState ;
 
+import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GLDefaultSystem ;
 import com.linxonline.mallet.system.DefaultSystem ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+
+import com.linxonline.mallet.io.reader.ConfigParser ;
+import com.linxonline.mallet.io.reader.ConfigReader ;
 
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
@@ -32,17 +37,16 @@ import com.linxonline.mallet.util.settings.Settings ;
 /*===========================================*/
 public class Main
 {
+	private final static String BASE_CONFIG = "base/config.cfg" ;
+
 	public static void main( String _args[] )
 	{
 		loadFileSystem() ;
-
-		final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
-		//final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
+		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
+		final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
 
 		system.initSystem() ;
-		system.setDisplayDimensions( new Vector2( 320, 240 ) ) ;
-		system.setRenderDimensions( new Vector2( 640, 480 ) ) ;
-		system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+		loadConfig( system ) ;
 
 		final GameSystem game = new GameSystem( system ) ;
 		game.addGameState( new GameState( "DEFAULT" )
@@ -158,9 +162,23 @@ public class Main
 
 	private static void loadFileSystem()
 	{
-		final DesktopFileSystem fileSystem = new DesktopFileSystem() ;
-
-		GlobalFileSystem.setFileSystem( fileSystem ) ;
+		GlobalFileSystem.setFileSystem( new DesktopFileSystem() ) ;
 		GlobalFileSystem.scanBaseDirectory() ;
+	}
+
+	private static void loadConfig( final SystemInterface _system )
+	{
+		final ConfigParser parser = new ConfigParser() ;
+		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
+
+		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
+		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
+
+		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
+		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
+
+		_system.setDisplayDimensions( new Vector2( displayWidth, displayHeight ) ) ;
+		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
+		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 	}
 }
