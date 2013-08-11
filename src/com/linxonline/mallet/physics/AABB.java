@@ -13,7 +13,7 @@ public final class AABB
 	public AABB() {}
 
 	public AABB( final Vector2 _min, final Vector2 _max, 
-				 final Vector2 _offset, final Vector2 _pos )
+				 final Vector2 _pos, final Vector2 _offset )
 	{
 		if( _min != null ) { min.setXY( _min.x, _min.y ) ; }
 		if( _max != null ) { max.setXY( _max.x, _max.y ) ; }

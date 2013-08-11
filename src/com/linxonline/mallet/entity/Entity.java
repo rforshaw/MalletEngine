@@ -23,7 +23,7 @@ import com.linxonline.mallet.event.* ;
 public final class Entity implements SerialisableForm
 {
 	private final ArrayList<Component> components = new ArrayList<Component>() ;
-	private EventSystem eventSystem = new EventSystem() ;			// Component Event System
+	private EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
 	public String name = null ;										// A Unique identifier of this Entity
 	public String family = null ;									// What type/family is this Entity apart of

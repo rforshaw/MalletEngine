@@ -4,11 +4,17 @@ import java.util.ArrayList ;
 
 public class EventQueue
 {
+	public final String name ;
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventFilter> filters = new ArrayList<EventFilter>() ;
 	private final ArrayList<Event> optimisedEvents = new ArrayList<Event>() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
+	public EventQueue( final String _name )
+	{
+		name = _name ;
+	}
+	
 	public void addEventHandler( final EventHandler _handler )
 	{
 		handlers.add( _handler ) ;
@@ -52,6 +58,7 @@ public class EventQueue
 
 		final int eventSize = optimisedEvents.size() ;
 		final int handlerSize = handlers.size() ;
+
 		for( int i = 0; i < eventSize; ++i )
 		{
 			for( int j = 0; j < handlerSize; ++j )
@@ -59,6 +66,7 @@ public class EventQueue
 				handlers.get( j ).processEvent( optimisedEvents.get( i ) ) ;
 			}
 		}
+
 		optimisedEvents.clear() ;
 	}
 

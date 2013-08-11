@@ -12,10 +12,15 @@ public class CollisionComponent extends Component implements CollisionCallback
 		super( "COLLISION", "COLLISIONCOMPONENT" ) ;
 	}
 
-	// Must be added to Entity before called!
-	public void init( final Vector2 _min, final Vector2 _max, final Vector2 _offset )
+	public CollisionComponent( final String _name )
 	{
-		hull = new Box2D( new AABB( _min, _max, null, _offset ) ) ;
+		super( _name, "COLLISIONCOMPONENT" ) ;
+	}
+
+	// Must be added to Entity before called!
+	public void init( final Vector2 _min, final Vector2 _max, final Vector2 _position, final Vector2 _offset )
+	{
+		hull = new Box2D( new AABB( _min, _max, _position, _offset ) ) ;
 	}
 
 	@Override
@@ -27,6 +32,7 @@ public class CollisionComponent extends Component implements CollisionCallback
 
 	public void update( final float _dt )
 	{
+		super.update( _dt ) ;
 		final int size = hull.getContactSize() ;
 		if( size > 0 )
 		{

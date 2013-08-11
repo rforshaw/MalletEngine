@@ -10,6 +10,7 @@ public final class OBB
 	public static final int BOTTOM_LEFT = 2 ;
 	public static final int BOTTOM_RIGHT = 3 ;
 
+	public float rotation = 0.0f ;
 	public Vector2 position = new Vector2() ;
 	public Vector2 offset = new Vector2() ;
 
@@ -31,6 +32,7 @@ public final class OBB
 		points[TOP_RIGHT] = new Vector2( _aabb.max.x, _aabb.min.y ) ;
 		points[BOTTOM_LEFT] = new Vector2( _aabb.min.x, _aabb.max.y ) ;
 		points[BOTTOM_RIGHT] = new Vector2( _aabb.max.x, _aabb.max.y ) ;
+		offset.setXY( _aabb.offset ) ;
 		init() ;
 	}
 
@@ -107,23 +109,20 @@ public final class OBB
 	/**
 		NEEDS TO BE REIMPLEMENTED
 	**/
-	public final void setRotation( final Vector2 _point, final float _theta )
+	public final void setRotation( final float _theta )
 	{
-		final float cosAngle = ( float )Math.cos( _theta ) ;
-		final float sinAngle = ( float )Math.sin( _theta ) ;
+		final float diff = _theta - rotation ;
+		final float cosAngle = ( float )Math.cos( diff ) ;
+		final float sinAngle = ( float )Math.sin( diff ) ;
+		rotation = _theta ;
 
-		float x = ( _point.x * cosAngle ) - ( _point.y * sinAngle ) ;
-		float y = ( _point.y * cosAngle ) + ( _point.x * sinAngle ) ;
-
-		final Vector2 translate = new Vector2( x, y ) ;
 		Vector2 point = null ;
-
 		for( int i = 0; i < points.length; ++i )
 		{
 			point = points[i] ;
-			x = ( ( ( point.x + _point.x ) * cosAngle ) - ( ( point.y + _point.y ) * sinAngle ) ) - translate.x ;
-			y = ( ( ( point.y + _point.y ) * cosAngle ) + ( ( point.x + _point.x ) * sinAngle ) ) - translate.y ;
-			point.setXY( x, y ) ;
+			final float x2 = ( ( point.x + offset.x ) * cosAngle ) - ( ( point.y + offset.y ) * sinAngle ) - offset.x ;
+			final float y2 = ( ( point.y + offset.y ) * cosAngle ) + ( ( point.x + offset.x ) * sinAngle ) - offset.y ;
+			point.setXY( x2, y2 ) ;
 		}
 	}
 

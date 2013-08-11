@@ -20,5 +20,9 @@ public class Box2D extends Hull
 		obb.setPosition( _x, _y ) ;
 	}
 
-	public void setRotation( final float _theta ) {}
+	public void setRotation( final float _theta )
+	{
+		obb.setRotation( _theta ) ;
+		aabb.setDimensionsFromOBB( obb ) ;
+	}
 }

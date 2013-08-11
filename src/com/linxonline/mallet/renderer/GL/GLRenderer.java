@@ -148,7 +148,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 							final Vector2 point = shape.points.get( shape.indicies.get( i ) ) ;
 							gl.glBegin( GL2.GL_POINT ) ;
 								gl.glColor3f( 1.0f, 0.0f, 0.0f ) ;
-								gl.glVertex2f( point.x, point.y ) ;
+								gl.glVertex2f( point.x + offset.x, point.y + offset.y ) ;
 							gl.glEnd() ;
 						}
 					}

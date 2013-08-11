@@ -20,6 +20,9 @@ public final class CollisionCheck
 		final OBB box1 = _box1.obb ;
 		final OBB box2 = _box2.obb ;
 
+		box1.updateAxesAndEdges() ;
+		box2.updateAxesAndEdges() ;
+
 		final Vector2 bC1 = _box1.aabb.getAbsoluteCenter() ;
 		final Vector2 bC2 = _box2.aabb.getAbsoluteCenter() ;
 

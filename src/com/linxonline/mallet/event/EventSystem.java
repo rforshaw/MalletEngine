@@ -7,14 +7,23 @@ import java.util.HashMap ;
 public final class EventSystem implements AddEventInterface
 {
 	// Replace HashMap with something easier to traverse.
+	private final String name ;
 	private final HashMap<String, EventQueue> eventQueues = new HashMap<String, EventQueue>() ;
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventHandler> toBeRemoved = new ArrayList<EventHandler>() ;
 
 	public EventSystem()
 	{
+		name = "NONE" ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		eventQueues.put( Event.ALL_EVENT_TYPES[0], new EventQueue() ) ;
+		eventQueues.put( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
+	}
+
+	public EventSystem( final String _name )
+	{
+		name = _name ;
+		// Guarantee an ALL_EVENT_TYPES Queue.
+		eventQueues.put( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
 	}
 
 	/**
@@ -35,8 +44,9 @@ public final class EventSystem implements AddEventInterface
 		{
 			if( eventQueues.containsKey( type ) == false )
 			{
-				eventQueues.put( type, new EventQueue() ) ;
+				eventQueues.put( type, new EventQueue( type ) ) ;
 			}
+
 			eventQueues.get( type ).addEventHandler( _handler ) ;
 		}
 
@@ -72,6 +82,7 @@ public final class EventSystem implements AddEventInterface
 	public final void addEvent( final Event _event )
 	{
 		final String key = _event.getEventType() ;
+		//System.out.println( name + " " + key ) ;
 		if( eventQueues.containsKey( key ) == true )
 		{
 			eventQueues.get( key ).addEvent( _event ) ;

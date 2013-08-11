@@ -75,15 +75,16 @@ public class Graphics2DDraw
 								  final Vector2 _position )
 	{
 		final Shape shape = _settings.getObject( "POINTS", Shape.class, null ) ;
+		final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
 		if( shape != null )
 		{
 			for( final Integer index : shape.indicies )
 			{
 				final Vector2 point = shape.points.get( index ) ;
-				_graphics.drawLine( ( int )( point.x + _position.x ),
-									( int )( point.y + _position.y ),
-									( int )( point.x + _position.x ),
-									( int )( point.y + _position.y ) ) ;
+				_graphics.drawLine( ( int )( point.x + _position.x + offset.x ),
+									( int )( point.y + _position.y + offset.y ),
+									( int )( point.x + _position.x + offset.x ),
+									( int )( point.y + _position.y + offset.y ) ) ;
 			}
 		}
 	}
