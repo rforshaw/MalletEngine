@@ -6,6 +6,7 @@ public final class CollisionCheck
 {
 	private static final Vector2 toCenter = new Vector2() ;
 	private static final Vector2 axis = new Vector2() ;
+	private static final Vector2[] axes = new Vector2[4] ;
 
 	public static final boolean intersectByAABB( final Box2D _box1, final Box2D _box2 )
 	{
@@ -25,17 +26,19 @@ public final class CollisionCheck
 
 		final Vector2 bC1 = _box1.aabb.getAbsoluteCenter() ;
 		final Vector2 bC2 = _box2.aabb.getAbsoluteCenter() ;
-
 		toCenter.x = bC2.x - bC1.x ;
 		toCenter.y = bC2.y - bC1.y ;
 
-		//System.out.println( "CentreX: " + toCenter.x + "CentreY:" + toCenter.y ) ;
-		final Vector2[] axes = box1.axes ;
+		// Make it easy to loop through axes from box1 and box2
+		axes[0] = box1.axes[0] ;
+		axes[1] = box1.axes[1] ;
+		axes[2] = box2.axes[0] ;
+		axes[3] = box2.axes[1] ;
 
 		int index = 0 ;
 		float bestOverlap = penetrationOnAxis( box1, box2, axes[index], toCenter ) ;
 
-		for( int i = 1; i < axes.length; ++i )
+		for( int i = 1; i < axes.length; i++ )
 		{
 			//System.out.println( i ) ;
 			float result = penetrationOnAxis( box1, box2, axes[i], toCenter ) ;
@@ -73,7 +76,6 @@ public final class CollisionCheck
 	{
 		final float projectA = transformToAxis( _obbA, _axis ) ;
 		final float projectB = transformToAxis( _obbB, _axis ) ;
-
 		final float distance = Math.abs( Vector2.multiply( _toCenter, _axis ) ) ;
 
 		return projectA + projectB - distance ;
@@ -81,24 +83,17 @@ public final class CollisionCheck
 
 	private static final float transformToAxis( final OBB _obb, final Vector2 _axis )
 	{
-		float dp = ( _obb.points[0].x * _axis.x ) + ( _obb.points[0].y * _axis.y ) ;
+		float dp = Vector2.dot( _obb.points[0], _axis ) ;
 		float max = dp ;
 		float min = dp ;
 
 		for( int i = 1; i < _obb.points.length; ++i )
 		{
-			dp = ( _obb.points[i].x * _axis.x ) + ( _obb.points[i].y * _axis.y ) ;
-
-			if( dp > max )
-			{
-				max = dp ;
-			}
-			else if( dp < min )
-			{
-				min = dp ;
-			}
+			dp = Vector2.dot( _obb.points[i], _axis ) ;
+			if( dp > max ) { max = dp ; }
+			else if( dp < min ) { min = dp ; }
 		}
 
-		return ( max - min ) * 0.5f;
+		return ( max - min ) * 0.5f ;
 	}
 }

@@ -137,6 +137,11 @@ public class Vector2
 		return ( ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) ) ;
 	}
 	
+	public static final float cross( final Vector2 _vec1, final Vector2 _vec2 )
+	{
+		return ( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ;
+	}
+	
 	/**
 		Convience function - used for variables masquerading as vectors but are really 2 scalars.
 		Shouldn't be used by anyone sensible. Used by RenderInfo.

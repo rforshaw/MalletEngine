@@ -15,7 +15,7 @@ public final class OBB
 	public Vector2 offset = new Vector2() ;
 
 	public Vector2[] points = new Vector2[4] ;
-	public Vector2[] axes = new Vector2[4] ;
+	public Vector2[] axes = new Vector2[2] ;
 
 	public OBB()
 	{
@@ -132,17 +132,9 @@ public final class OBB
 		axes[0].x = -( points[TOP_RIGHT].y - points[TOP_LEFT].y ) ;
 		axes[0].normalise() ;
 
-		axes[1].y = points[BOTTOM_RIGHT].x - points[BOTTOM_LEFT].x ;
-		axes[1].x = -( points[BOTTOM_RIGHT].y - points[BOTTOM_LEFT].y ) ;
+		axes[1].y = points[TOP_RIGHT].x - points[BOTTOM_RIGHT].x ;
+		axes[1].x = -( points[TOP_RIGHT].y - points[BOTTOM_RIGHT].y ) ;
 		axes[1].normalise() ;
-
-		axes[2].y = points[TOP_RIGHT].x - points[BOTTOM_RIGHT].x ;
-		axes[2].x = -( points[TOP_RIGHT].y - points[BOTTOM_RIGHT].y ) ;
-		axes[2].normalise() ;
-
-		axes[3].y = points[TOP_LEFT].x - points[BOTTOM_LEFT].x ;
-		axes[3].x = -( points[TOP_LEFT].y - points[BOTTOM_LEFT].y ) ;
-		axes[3].normalise() ;
 	}
 
 	private final void init()
@@ -153,20 +145,10 @@ public final class OBB
 		point.y = points[TOP_RIGHT].y - points[TOP_LEFT].y ;
 		axes[0] = new Vector2( point.y, -point.x ) ;
 		axes[0].normalise() ;
-		
-		point.x = points[BOTTOM_RIGHT].x - points[BOTTOM_LEFT].x ;
-		point.y = points[BOTTOM_RIGHT].y - points[BOTTOM_LEFT].y ;
-		axes[1] = new Vector2( point.y, -point.x ) ;
-		axes[1].normalise() ;
 
 		point.x = points[TOP_RIGHT].x - points[BOTTOM_RIGHT].x ;
 		point.y = points[TOP_RIGHT].y - points[BOTTOM_RIGHT].y ;
-		axes[2] = new Vector2( point.y, -point.x ) ;
-		axes[2].normalise() ;
-
-		point.x = points[TOP_LEFT].x - points[BOTTOM_LEFT].x ;
-		point.y = points[TOP_LEFT].y - points[BOTTOM_LEFT].y ;
-		axes[3] = new Vector2( point.y, -point.x ) ;
-		axes[3].normalise() ;
+		axes[1] = new Vector2( point.y, -point.x ) ;
+		axes[1].normalise() ;
 	}
 }

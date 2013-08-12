@@ -145,6 +145,16 @@ public class Vector3
 		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) + ( _vec1.z * _vec2.z ) ;
 	}
 
+	/**
+		Cross Product
+	*/
+	public static final Vector3 cross( final Vector3 _vec1, final Vector3 _vec2 )
+	{
+		return new Vector3( ( _vec1.y * _vec2.z ) - ( _vec1.z * _vec2.y ),
+							( _vec1.z * _vec2.x ) - ( _vec1.x * _vec2.z ),
+							( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ) ;
+	}
+	
 	public static final float distance( final Vector3 _vec1, final Vector3 _vec2 )
 	{
 		float tmp1 = ( _vec2.x - _vec1.x ) ;
