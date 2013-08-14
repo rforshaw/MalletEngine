@@ -44,7 +44,7 @@ public final class CollisionCheck
 			float result = penetrationOnAxis( box1, box2, axes[i], toCenter ) ;
 			if( result < 0.0f )
 			{
-				//System.out.println( "Failed SATs: " + i ) ;
+				//System.out.println( "Failed SATs: " + result ) ;
 				return ;
 			}
 			else if( result < bestOverlap )

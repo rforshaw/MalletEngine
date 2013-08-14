@@ -21,6 +21,7 @@ public class CollisionComponent extends Component implements CollisionCallback
 	public void init( final Vector2 _min, final Vector2 _max, final Vector2 _position, final Vector2 _offset )
 	{
 		hull = new Box2D( new AABB( _min, _max, _position, _offset ) ) ;
+		hull.setCollisionCallback( this ) ;
 	}
 
 	@Override
@@ -47,5 +48,6 @@ public class CollisionComponent extends Component implements CollisionCallback
 		hull.setRotation( _theta ) ;
 	}
 
+	@Override
 	public void collisionCallback( final ContactPoint _point ) {}
 }

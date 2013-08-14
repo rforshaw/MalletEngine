@@ -114,7 +114,9 @@ public final class AABB
 
 	public Vector2 getAbsoluteCenter()
 	{
-		return new Vector2( position.x + offset.x, position.y + offset.y ) ;
+		final float centerX = ( max.x + min.x ) * 0.5f ;
+		final float centerY = ( max.y + min.y ) * 0.5f ;
+		return new Vector2( position.x + offset.x + centerX, position.y + offset.y + centerY ) ;
 	}
 
 	public String toString()

@@ -34,4 +34,16 @@ public class DisplayEnvironment
 
 		return screens ;
 	}
+	
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		Screen[] screens = getScreens() ;
+		for( final Screen screen : screens )
+		{
+			buffer.append( screen.toString() + "\n" ) ;
+		}
+
+		return buffer.toString() ;
+	}
 }
