@@ -2,20 +2,28 @@ package com.linxonline.mallet.renderer.GL ;
 
 import java.awt.image.BufferedImage ;
 
-import com.linxonline.mallet.renderer.G2D.G2DImage ;
+import com.linxonline.mallet.resources.texture.ImageInterface ;
 
-public class GLImage extends G2DImage
+public class GLImage implements ImageInterface
 {
 	public int textureID = 0 ;
+	private final int width ;
+	private final int height ;
 
-	public GLImage( int _textureID, BufferedImage _bufferedImage )
+	public GLImage( int _textureID, final int _width, final int _height )
 	{
-		super( _bufferedImage ) ;
 		textureID = _textureID ;
+		width = _width ;
+		height = _height ;
 	}
-	
-	public void clearSourceImage()
+
+	public final int getWidth()
 	{
-		bufferedImage = null ;
+		return width ;
+	}
+
+	public final int getHeight()
+	{
+		return height ;
 	}
 }

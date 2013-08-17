@@ -36,7 +36,7 @@ public class GLTextureManager extends TextureManager
 		return null ;
 	}
 
-	public Texture bind( BufferedImage _image )
+	public Texture bind( final BufferedImage _image )
 	{
 		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
@@ -51,32 +51,33 @@ public class GLTextureManager extends TextureManager
 		final int textureID = glGenTextures( gl ) ;
 		gl.glBindTexture( GL2.GL_TEXTURE_2D, textureID ) ;
 
-		final ByteBuffer buffer = convertImageData( _image ) ;
-
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT ) ;
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT ) ;
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR ) ;
 		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR ) ;
 
+		final int width = _image.getWidth() ;
+		final int height = _image.getHeight() ;
+		
 		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
 						 0, 
 						 GL2.GL_RGBA, 
-						 _image.getWidth(), 
-						 _image.getHeight(), 
+						 width, 
+						 height, 
 						 0, 
 						 GL2.GL_RGBA, 
 						 GL2.GL_UNSIGNED_BYTE, 
-						 buffer ) ;
+						 convertImageData( _image ) ) ;
 
 		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
 
 		GLRenderer.getCanvas().getContext().release() ;
-		return new Texture( new GLImage( textureID, _image ) ) ;
+		return new Texture( new GLImage( textureID, width, height ) ) ;
 	}
 
 	// Massage the Data so OpenGL can read it.
 	// More Efficient way?
-	private ByteBuffer convertImageData( BufferedImage _image )
+	private ByteBuffer convertImageData( final BufferedImage _image )
 	{
 		final ColorModel glAlphaColorModel = new ComponentColorModel( ColorSpace.getInstance( ColorSpace.CS_sRGB ), 
 																	  new int[] { 8, 8, 8, 8 },
@@ -91,12 +92,9 @@ public class GLTextureManager extends TextureManager
 																	  4, 
 																	  null ) ;
 
-		final BufferedImage texImage = new BufferedImage( glAlphaColorModel, 
-														  raster, 
-														  true, 
-														  null ) ;
+		final BufferedImage texImage = new BufferedImage( glAlphaColorModel, raster, true, null ) ;
 
-		// copy the source image into the produced image
+		// Draw _image into new BufferedImage texImage.
 		final Graphics g = texImage.getGraphics() ;
 		g.drawImage( _image, 0, 0, null ) ;
 
