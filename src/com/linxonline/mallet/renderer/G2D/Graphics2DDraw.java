@@ -15,6 +15,9 @@ public class Graphics2DDraw
 	private static final String BLANK_TEXT = "" ;
 	private static final Polygon polygon = new Polygon() ;
 
+	/**
+		Draw a line, defining the start and end locations.
+	*/
 	public static void drawLine( final Graphics2D _graphics,
 								final Settings _settings,
 								final Vector2 _position )
@@ -29,6 +32,9 @@ public class Graphics2DDraw
 		}
 	}
 
+	/**
+		Draw a set of lines, starting from the last point drawn.
+	*/
 	public static void drawLines( final Graphics2D _graphics,
 								 final Settings _settings,
 								 final Vector2 _position )
@@ -50,6 +56,9 @@ public class Graphics2DDraw
 		}
 	}
 
+	/**
+		Draw a filled polygon, starting from the last point drawn.
+	*/
 	public static void drawPolygon( final Graphics2D _graphics,
 								   final Settings _settings,
 								   final Vector2 _position )
@@ -70,6 +79,9 @@ public class Graphics2DDraw
 		}
 	}
 
+	/**
+		Draw the list of points definied.
+	*/
 	public static void drawPoints( final Graphics2D _graphics,
 								  final Settings _settings,
 								  final Vector2 _position )
@@ -89,6 +101,9 @@ public class Graphics2DDraw
 		}
 	}
 
+	/**
+		Define the region of space that is allowed to be drawn on.
+	*/
 	public static void setClip( final Graphics2D _graphics,
 							   final Settings _settings,
 							   final Vector2 _position )
@@ -102,7 +117,11 @@ public class Graphics2DDraw
 			_graphics.setClip( ( int )position.x, ( int )position.y, ( int )( clip.x ), ( int )( clip.y ) ) ;
 		}
 	}
-	
+
+	/**
+		Define the colour to use when rendering objects affected by it.
+		Textures are not affected by this.
+	*/
 	public static void setGraphicsColour( final Graphics2D _graphics, final Settings _settings )
 	{
 		final MalletColour colour = _settings.getObject( "COLOUR", MalletColour.class, null ) ;

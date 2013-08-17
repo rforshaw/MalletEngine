@@ -267,36 +267,134 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
 				}
 
+				final int height = fm.getHeight() ;
+				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
+				String[] words = _settings.getObject( "WORDS", String[].class, null ) ;
+				if( words == null )
+				{
+					words = optimiseText( fm, text, _position, lineWidth ) ;
+					_settings.addObject( "WORDS", words ) ;
+					_settings.addInteger( "TEXTWIDTH", -1 ) ;
+				}
+
+				final int alignment = _settings.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
-	
+				final Vector2 currentPos = new Vector2( _position ) ;
+
 				gl.glPushMatrix() ;
-					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
+					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+					gl.glTranslatef( currentPos.x, currentPos.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					final int length = text.length() ;
-					for( int i = 0; i < length; ++i )
+					final int size = words.length ;
+					for( int i = 0; i < size; ++i )
 					{
-						final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
-						final GLGeometry geometry = glyph.getGLGeometry() ;
+						renderText( words[i], fm ) ;
+						gl.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
+					}
+				gl.glPopMatrix() ;
+			}
 
-						if( geometry.indexID != indexID )
-						{
-							indexID = geometry.indexID ;
-							gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
-							gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
-						}
+			private void renderText( final String _text, final GLFontMap _fm )
+			{
+				final int length = _text.length() ;
+				for( int i = 0; i < length; ++i )
+				{
+					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
+					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-						gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-						gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-						gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-						gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
-						gl.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
+					if( geometry.indexID != indexID )
+					{
+						indexID = geometry.indexID ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
-				gl.glPopMatrix() ;
+					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+
+					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+					gl.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
+				}
+			}
+
+			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector2 _position, final int _lineWidth )
+			{
+				int length = 0 ;
+				float wordWidth = 0.0f ;
+				final Vector2 currentPos = new Vector2( _position.x, _position.y ) ;
+				String[] words = _text.split( "(?<= )" ) ;
+
+				final ArrayList<String> txt = new ArrayList<String>() ;
+				final StringBuilder buffer = new StringBuilder() ;
+
+				String word = null ;
+				for( int i = 0; i < words.length; ++i )
+				{
+					word = words[i] ;
+					wordWidth = _fm.stringWidth( word ) ;
+
+					if( word.contains( "<br>" ) == true )
+					{
+						if( length > 0 )
+						{
+							txt.add( buffer.toString() ) ;
+							buffer.delete( 0, length ) ;
+						}
+						else
+						{
+							txt.add( "" ) ;
+						}
+
+						currentPos.x = _position.x ;
+						continue ;
+					}
+					else if( currentPos.x + wordWidth >= _lineWidth )
+					{
+						txt.add( buffer.toString() ) ;
+						buffer.delete( 0, length ) ;
+						currentPos.x = _position.x ;
+					}
+
+					currentPos.x += wordWidth ;
+					buffer.append( word ) ;
+					length = buffer.length() ;
+				}
+
+				if( length > 0 )
+				{
+					txt.add( buffer.toString() ) ;
+					buffer.delete( 0, length ) ;
+				}
+
+				words = new String[txt.size()] ;
+				words = txt.toArray( words ) ;
+				return words ;
+			}
+			
+			private void setTextAlignment( final int _alignment, final Vector2 _position, final int _wordWidth )
+			{
+				//System.out.println( "WORD WIDTH: " + _wordWidth ) ;
+				switch( _alignment )
+				{
+					case ALIGN_RIGHT :
+					{
+						_position.x -= _wordWidth ;
+						break ;
+					}
+					case ALIGN_CENTRE :
+					{
+						_position.x -= _wordWidth / 2 ;
+						break ;
+					}
+					default:
+					{
+						return ;
+					}
+				}
 			}
 		} ;
 	}

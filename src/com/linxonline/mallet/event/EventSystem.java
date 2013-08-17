@@ -9,6 +9,8 @@ public final class EventSystem implements AddEventInterface
 	// Replace HashMap with something easier to traverse.
 	private final String name ;
 	private final HashMap<String, EventQueue> eventQueues = new HashMap<String, EventQueue>() ;
+	private final ArrayList<EventQueue> queues = new ArrayList<EventQueue>() ;
+
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventHandler> toBeRemoved = new ArrayList<EventHandler>() ;
 
@@ -16,14 +18,14 @@ public final class EventSystem implements AddEventInterface
 	{
 		name = "NONE" ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		eventQueues.put( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
+		addEventQueue( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
 	}
 
 	public EventSystem( final String _name )
 	{
 		name = _name ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		eventQueues.put( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
+		addEventQueue( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
 	}
 
 	/**
@@ -44,7 +46,7 @@ public final class EventSystem implements AddEventInterface
 		{
 			if( eventQueues.containsKey( type ) == false )
 			{
-				eventQueues.put( type, new EventQueue( type ) ) ;
+				addEventQueue( type, new EventQueue( type ) ) ;
 			}
 
 			eventQueues.get( type ).addEventHandler( _handler ) ;
@@ -72,11 +74,14 @@ public final class EventSystem implements AddEventInterface
 	public void removeHandlersNow()
 	{
 		final int size = toBeRemoved.size() ;
-		for( int i = 0; i < size; ++i )
+		if( size > 0 )
 		{
-			remove( toBeRemoved.get( i ) ) ;
+			for( int i = 0; i < size; ++i )
+			{
+				remove( toBeRemoved.get( i ) ) ;
+			}
+			toBeRemoved.clear() ;
 		}
-		toBeRemoved.clear() ;
 	}
 
 	public final void addEvent( final Event _event )
@@ -97,13 +102,19 @@ public final class EventSystem implements AddEventInterface
 	public final void update()
 	{
 		removeHandlersNow() ;
-		final Collection<EventQueue> queues = eventQueues.values() ;
-		for( final EventQueue queue : queues )
+		final int size = queues.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			queue.update() ;
+			queues.get( i ).update() ;
 		}
 	}
 
+	protected void addEventQueue( final String _queueName, final EventQueue _queue )
+	{
+		eventQueues.put( _queueName, _queue ) ;
+		queues.add( _queue ) ;
+	}
+	
 	private void remove( final EventHandler _handler )
 	{
 		final String[] types = _handler.getWantedEventTypes() ;
@@ -121,19 +132,20 @@ public final class EventSystem implements AddEventInterface
 	{
 		handlers.clear() ;
 		toBeRemoved.clear() ;
-		final Collection<EventQueue> queues = eventQueues.values() ;
-		for( final EventQueue queue : queues )
+
+		final int size = queues.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			queue.clearHandlers() ;
+			queues.get( i ).clearHandlers() ;
 		}
 	}
 
 	public final void clearEvents()
 	{
-		final Collection<EventQueue> queues = eventQueues.values() ;
-		for( final EventQueue queue : queues )
+		final int size = queues.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			queue.clearEvents() ;
+			queues.get( i ).clearEvents() ;
 		}
 	}
 

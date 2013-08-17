@@ -11,6 +11,12 @@ import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.sort.QuickSort ;
 import com.linxonline.mallet.util.sort.SortInterface ;
 
+/**
+	Implements the boiler plate code required by most 2D renderers.
+	Handles the event calls for drawing objects to the screen.
+	
+	Use G2DRenderer or GLRenderer as an example on how to extend this class. 
+*/
 public abstract class Basic2DRender extends EventUpdater implements RenderInterface
 {
 	protected static final String[] EVENT_TYPES = { "DRAW", "CAMERA" } ;

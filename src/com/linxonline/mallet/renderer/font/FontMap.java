@@ -9,10 +9,12 @@ public class FontMap
 
 	public final Glyph[] glyphs ;			// Data needed to render the glyphs available
 	public final Texture texture ;			// Rendered glyph
+	public final int height ;
 
-	public FontMap( final Glyph[] _glyphs, final Texture _texture )
+	public FontMap( final Glyph[] _glyphs, final Texture _texture, final int _height )
 	{
 		texture = _texture ;
+		height = _height ;
 
 		// Sort the glyphs
 		final Glyph[] temp = QuickSort.quicksort( _glyphs ) ;
@@ -43,6 +45,8 @@ public class FontMap
 		return FAILED_GLYPH ;
 	}
 
+	public int getHeight() { return height ; }
+	
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

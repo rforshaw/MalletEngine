@@ -21,6 +21,10 @@ public final class AABB
 		if( _pos != null ) { position.setXY( _pos.x, _pos.y ) ; }
 	}
 
+	/**
+		Calculate the dimensions of the AABB from the OBB.
+		Also apply the OBB's position and offset to the AABB.
+	*/
 	public void setFromOBB( final OBB _obb )
 	{
 		position.setXY( _obb.position.x, _obb.position.y ) ;
@@ -28,6 +32,10 @@ public final class AABB
 		setDimensionsFromOBB( _obb ) ;
 	}
 
+	/**
+		Calculate the dimensions of the AABB from the OBB.
+		Doesn't apply the OBB's position and offset to the AABB.
+	*/
 	public void setDimensionsFromOBB( final OBB _obb )
 	{
 		min.setXY( _obb.points[0].x, _obb.points[0].y ) ;
@@ -67,6 +75,9 @@ public final class AABB
 		position.add( _x, _y ) ;
 	}
 
+	/**
+		Determine if the point defined is located within the AABB.
+	*/
 	public boolean intersectPoint( final float _x, final float _y )
 	{
 		final float x = position.x + offset.x ;

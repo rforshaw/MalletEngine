@@ -65,7 +65,7 @@ public class GLFontGenerator
 		}
 
 		// Create a GLFontMap and wrap it around a FontMap
-		return new GLFontMap( new FontMap( glyphs, manager.bind( buffer ) ) ) ;
+		return new GLFontMap( new FontMap( glyphs, manager.bind( buffer ), metrics.getHeight() ) ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )

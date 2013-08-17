@@ -50,7 +50,7 @@ public class G2DFontGenerator
 			width += advance ;
 		}
 
-		return new FontMap( glyphs, new Texture( new G2DImage( buffer ) ) ) ;
+		return new FontMap( glyphs, new Texture( new G2DImage( buffer ) ), metrics.getHeight() ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )

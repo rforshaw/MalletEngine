@@ -6,9 +6,9 @@ import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {
-	public int textureID = 0 ;
-	private final int width ;
-	private final int height ;
+	public int textureID = 0 ;				// Buffer ID for openGL
+	private final int width ;				// Width of texture
+	private final int height ;				// Height of texture
 
 	public GLImage( int _textureID, final int _width, final int _height )
 	{

@@ -53,21 +53,28 @@ public class EventQueue
 		}
 		else
 		{
-			optimisedEvents.addAll( messenger.getEvents() ) ;
+			final ArrayList<Event> events = messenger.getEvents() ;
+			final int size = events.size() ;
+			if( size > 0 )
+			{
+				optimisedEvents.addAll( events ) ;
+			}
 		}
 
 		final int eventSize = optimisedEvents.size() ;
 		final int handlerSize = handlers.size() ;
 
-		for( int i = 0; i < eventSize; ++i )
+		if( eventSize > 0 )
 		{
-			for( int j = 0; j < handlerSize; ++j )
+			for( int i = 0; i < eventSize; ++i )
 			{
-				handlers.get( j ).processEvent( optimisedEvents.get( i ) ) ;
+				for( int j = 0; j < handlerSize; ++j )
+				{
+					handlers.get( j ).processEvent( optimisedEvents.get( i ) ) ;
+				}
 			}
+			optimisedEvents.clear() ;
 		}
-
-		optimisedEvents.clear() ;
 	}
 
 	public void clearHandlers()

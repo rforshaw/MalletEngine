@@ -57,10 +57,10 @@ public final class EventMessenger implements Serializable
 	public final void refreshEvents()
 	{
 		final ArrayList<Event> oldEvents = events ;
+		oldEvents.clear() ;
 
 		events = newEvents ;
 		newEvents = oldEvents ;
-		newEvents.clear() ;
 	}
 
 	public final void clearEvents()

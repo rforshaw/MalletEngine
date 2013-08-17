@@ -111,8 +111,8 @@ public class Main
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( DrawFactory.createText( "Working Text, Boom!!!! 123", 						// Text
-																new Vector3( -300.0f, -80.0f, 0.0f ),	// Position
+				eventSystem.addEvent( DrawFactory.createText(  "Hello World!", 						// Text
+																new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
 																new Vector2( 0, 0 ), 				// Offset
 																new MalletFont( "Arial", 20 ),		// Mallet Font
 																null,								// Mallet Colour
