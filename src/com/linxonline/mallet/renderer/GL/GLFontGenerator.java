@@ -35,7 +35,7 @@ public class GLFontGenerator
 		final Dimensions dim = determineDimensions( _font, _charsToMap ) ;
 		final float width = dim.width + ( _spacing * length ) ;
 
-		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_INT_ARGB ) ;
+		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_4BYTE_ABGR ) ;
 		final Graphics2D g2D = buffer.createGraphics() ;
 
 		g2D.setFont( _font ) ;

@@ -36,6 +36,11 @@ public class GLTextureManager extends TextureManager
 		return null ;
 	}
 
+	/**
+		Copies the BufferedImage into video memory.
+		Ensure BufferedImage is in 4BYTE_ABGR or INT_ARGB.
+		For best performance use 4BYTE_ABGR.
+	*/
 	public Texture bind( final BufferedImage _image )
 	{
 		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
