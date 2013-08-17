@@ -75,40 +75,59 @@ public class GLTextureManager extends TextureManager
 		return new Texture( new GLImage( textureID, width, height ) ) ;
 	}
 
-	// Massage the Data so OpenGL can read it.
-	// More Efficient way?
+	/**
+		Massage the Data so OpenGL can read it.
+		By default the ImageIO content is stored in a Byte stream,
+		the Font Genorator images are stored in Int streams.
+		For best performance ensure BufferedImage is Byte stream.
+		Other stream types are not supported.
+	*/
 	private ByteBuffer convertImageData( final BufferedImage _image )
 	{
-		final ColorModel glAlphaColorModel = new ComponentColorModel( ColorSpace.getInstance( ColorSpace.CS_sRGB ), 
-																	  new int[] { 8, 8, 8, 8 },
-																	  true, 
-																	  false, 
-																	  Transparency.TRANSLUCENT, 
-																	  DataBuffer.TYPE_BYTE ) ;
+		final DataBuffer buffer = _image.getRaster().getDataBuffer() ;
+		final int type = buffer.getDataType() ;
+		
+		if( type == DataBuffer.TYPE_INT )
+		{
+			final int[] data = ( (  DataBufferInt )  buffer).getData() ;
+			final ByteBuffer imageBuffer = ByteBuffer.allocateDirect( data.length * 4 ) ;
+			imageBuffer.order( ByteOrder.nativeOrder() ) ;
 
-		final WritableRaster raster = Raster.createInterleavedRaster( DataBuffer.TYPE_BYTE,
-																	  _image.getWidth(),
-																	  _image.getHeight(), 
-																	  4, 
-																	  null ) ;
+			for( int i = 0; i < data.length; i++ )
+			{
+				imageBuffer.put( ( byte )( ( data[i] >> 16 ) & 0xFF ) ) ;	// alpha
+				imageBuffer.put( ( byte )( ( data[i] >> 8  ) & 0xFF ) ) ;	// red
+				imageBuffer.put( ( byte )( ( data[i]       ) & 0xFF ) ) ;	// green
+				imageBuffer.put( ( byte )( ( data[i] >> 24 ) & 0xFF ) ) ;	// blue
+			}
 
-		final BufferedImage texImage = new BufferedImage( glAlphaColorModel, raster, true, null ) ;
+			imageBuffer.flip() ;
+			return imageBuffer ;
+		}
+		else if( type == DataBuffer.TYPE_BYTE )
+		{
+			final byte[] data = ( (  DataBufferByte )  buffer).getData() ;
+			byte alpha, red, green, blue ;
+			for( int i = 0; i < data.length; i += 4 )
+			{
+				alpha = data[i + 3] ;
+				red   = data[i + 2] ;
+				green = data[i + 1] ;
+				blue  = data[i] ;
 
-		// Draw _image into new BufferedImage texImage.
-		final Graphics g = texImage.getGraphics() ;
-		g.drawImage( _image, 0, 0, null ) ;
+				data[i]     = alpha ;
+				data[i + 1] = red ;
+				data[i + 2] = green ;
+				data[i + 3] = blue ;
+			}
 
-		// build a byte buffer from the temporary image
-		// that is used by OpenGL to produce a texture.
-		final byte[] data = ( ( DataBufferByte ) texImage.getRaster().getDataBuffer() ).getData() ;
+			final ByteBuffer imageBuffer = ByteBuffer.wrap( data, 0, data.length ) ;
+			return imageBuffer ;
+		}
 
-		final ByteBuffer imageBuffer = ByteBuffer.allocateDirect( data.length ) ;
-		imageBuffer.order( ByteOrder.nativeOrder() ) ;
-		imageBuffer.put( data ) ;
-		imageBuffer.flip() ;
-
-		return imageBuffer;
-}
+		System.out.println( "Failed to determine DataBuffer type." ) ;
+		return null ;
+	}
 	
 	private int glGenTextures( GL2 _gl )
 	{
