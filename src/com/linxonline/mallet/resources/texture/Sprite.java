@@ -6,7 +6,6 @@ import com.linxonline.mallet.resources.Resource ;
 
 public final class Sprite extends Resource
 {
-	private static final String type = "SPRITE" ;
 	public final int framerate ;
 	public final ArrayList<String> textures = new ArrayList<String>() ;
 
@@ -41,6 +40,6 @@ public final class Sprite extends Resource
 	@Override
 	public String type()
 	{
-		return type ;
+		return "SPRITE" ;
 	}
 }

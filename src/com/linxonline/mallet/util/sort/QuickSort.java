@@ -24,6 +24,28 @@ public class QuickSort
 		return null ;
 	}
 
+	public static <T> T[] quicksort( T[] _contents )
+	{
+		final int size = _contents.length ;
+		if( size <= 1 )
+		{
+			return _contents ;
+		}
+		else if( _contents[0] instanceof SortInterface )
+		{
+			final ArrayList<T> array = new ArrayList<T>( size ) ;
+			for( int i = 0; i < size; ++i )
+			{
+				array.add( _contents[i] ) ;
+			}
+
+			return sort( array ).toArray( _contents ) ;
+		}
+
+		return null ;
+	}
+
+	
 	private static <T> ArrayList<T> sort( ArrayList<T> _contents )
 	{
 		int size = _contents.size() ;

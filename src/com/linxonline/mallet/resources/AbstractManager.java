@@ -43,10 +43,10 @@ public abstract class AbstractManager implements ManagerInterface
 		Should be overriden by all classes that extend this class.
 		Called when a resource needs to be created.
 	**/
-	protected Resource createResource( final String _file )
-	{
-		return null ;
-	}
+	protected abstract Resource createResource( final String _file ) ;
+	//{
+	//	return null ;
+	//}
 
 	/**
 		This allow the developer to redirect what resource should be loaded up.

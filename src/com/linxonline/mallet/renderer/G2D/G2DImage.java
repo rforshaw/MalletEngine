@@ -1,14 +1,15 @@
-package com.linxonline.mallet.resources.texture ;
+package com.linxonline.mallet.renderer.G2D ;
 
 import java.awt.image.BufferedImage ;
+import com.linxonline.mallet.resources.texture.ImageInterface ;
 
-public class JavaImage implements ImageInterface
+public class G2DImage implements ImageInterface
 {
 	public BufferedImage bufferedImage = null ;
 	public int width = 0 ;
 	public int height = 0 ;
 
-	public JavaImage( BufferedImage _bufferedImage )
+	public G2DImage( BufferedImage _bufferedImage )
 	{
 		bufferedImage = _bufferedImage ;
 		width = bufferedImage.getWidth() ;

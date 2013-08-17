@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.gl ;
+package com.linxonline.mallet.renderer.GL ;
 
 import java.awt.* ;
 import java.awt.image.* ;
@@ -12,8 +12,7 @@ import java.nio.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.gl.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.texture.Texture ;
 
 public class GLTextureManager extends TextureManager
 {
@@ -37,7 +36,7 @@ public class GLTextureManager extends TextureManager
 		return null ;
 	}
 
-	private Texture bind( BufferedImage _image )
+	public Texture bind( BufferedImage _image )
 	{
 		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;

@@ -20,6 +20,7 @@ import com.linxonline.mallet.io.reader.ConfigReader ;
 
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
 import com.linxonline.mallet.util.sort.* ;
@@ -54,10 +55,11 @@ public class Main
 			// Called when state is started.
 			public void initGame()
 			{
-				//renderTextureExample() ;
+				renderTextureExample() ;
 				//renderAnimationExample() ;
+				renderTextExample() ;
 				//playAudioExample() ;
-				createEntityExample() ;
+				//createEntityExample() ;
 				createMouseAnimExample() ;
 			}
 
@@ -102,6 +104,22 @@ public class Main
 					public void update( final float _dt ) { System.out.println( _dt ) ; }
 					public void finished() { System.out.println( "Source has finished" ) ; }
 				} ) ) ;
+			}
+
+			/**
+				Add text and render directly to the renderer
+			**/
+			public void renderTextExample()
+			{
+				eventSystem.addEvent( DrawFactory.createText( "Working Text, Boom!!!! 123", 						// Text
+																new Vector3( -300.0f, -80.0f, 0.0f ),	// Position
+																new Vector2( 0, 0 ), 				// Offset
+																new MalletFont( "Arial", 20 ),		// Mallet Font
+																null,								// Mallet Colour
+																null,								// clip
+																null,								// clip offset
+																10,									// layer
+																2 ) ) ;								// Text alignment, Centre
 			}
 
 			/**

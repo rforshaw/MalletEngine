@@ -107,7 +107,7 @@ public class G2DRenderer extends Basic2DRender
 				final float rotation = _settings.getFloat( "ROTATE", 0 ) ;
 				transform.rotate( rotation, -offset.x, -offset.y ) ;
 
-				final JavaImage texture = ( JavaImage )temp.image ;
+				final G2DImage texture = ( G2DImage )temp.image ;
 				final Vector2 fill = _settings.getObject( "FILL", Vector2.class, null ) ;
 				if( fill != null )
 				{

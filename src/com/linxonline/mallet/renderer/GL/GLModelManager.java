@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.gl ;
+package com.linxonline.mallet.renderer.GL ;
 
 import javax.media.opengl.* ;
 import java.util.HashMap ;
@@ -11,6 +11,14 @@ import com.linxonline.mallet.resources.model.* ;
 
 public class GLModelManager extends AbstractManager
 {
+	@Override
+	protected Resource createResource( final String _file )
+	{
+		System.out.println( "GLModelManager - createResource() not supported." ) ;
+		System.out.println( "Will be supported once models formats are added." ) ;
+		return null ;
+	}
+
 	public static void bind( GLGeometry _geometry )
 	{
 		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
@@ -27,14 +35,14 @@ public class GLModelManager extends AbstractManager
 		GLRenderer.getCanvas().getContext().release() ;
 	}
 
-	private static int glGenBuffers( GL2 _gl )
+	public static int glGenBuffers( GL2 _gl )
 	{
 		final int[] id = new int[1] ;
 		_gl.glGenBuffers( 1, id, 0 ) ;
 		return id[0] ;
 	}
 
-	private static void bindVBO( final GL2 _gl, final GLGeometry _geometry )
+	public static void bindVBO( final GL2 _gl, final GLGeometry _geometry )
 	{
 		final int vboID = GLModelManager.glGenBuffers( _gl ) ;
 		_gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, vboID ) ;
@@ -51,7 +59,7 @@ public class GLModelManager extends AbstractManager
 		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, vertexBuffer, GL2.GL_STATIC_DRAW ) ;
 	}
 
-	private static void bindIndex( final GL2 _gl, final GLGeometry _geometry )
+	public static void bindIndex( final GL2 _gl, final GLGeometry _geometry )
 	{
 		final int indexID = GLModelManager.glGenBuffers( _gl ) ;
 		_gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;

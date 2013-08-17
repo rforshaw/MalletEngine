@@ -4,7 +4,6 @@ import com.linxonline.mallet.resources.Resource ;
 
 public final class Texture extends Resource
 {
-	private static final String type = "TEXTURE" ;
 	public int width = 0 ;
 	public int height = 0 ;
 	public ImageInterface image = null ;
@@ -37,6 +36,6 @@ public final class Texture extends Resource
 	@Override
 	public String type()
 	{
-		return type ;
+		return "TEXTURE" ;
 	}
 }

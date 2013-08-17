@@ -1,8 +1,9 @@
-package com.linxonline.mallet.renderer ;
+package com.linxonline.mallet.renderer.GL ;
 
 import javax.swing.JFrame ;
 import java.util.ArrayList ;
-import java.awt.* ;
+import java.awt.Insets ;
+import java.awt.Dimension ;
 import java.awt.image.BufferStrategy ;
 import java.awt.geom.AffineTransform ;
 
@@ -10,11 +11,10 @@ import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
 import javax.media.opengl.glu.GLU ;
 
-import com.linxonline.mallet.resources.gl.* ;
 import com.linxonline.mallet.physics.AABB ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.resources.gl.* ;
+import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
@@ -22,7 +22,9 @@ import com.linxonline.mallet.util.id.IDInterface ;
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
 	private static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+
 	protected final static GLTextureManager textures = new GLTextureManager() ;
+	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 
 	private int numID = 0 ;
 	private static GLU glu = new GLU() ;
@@ -155,7 +157,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glPopMatrix() ;
 			}
 		} ;
-		
+
 		drawTexture = new DrawInterface()
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
@@ -192,7 +194,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						{
 							final Vector2 div = Vector2.divide( fillDim, dimension ) ;
 							final String name = fillDim.toString() + dimension.toString() ;
-							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, div ) ) ;
+							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
 							_settings.addObject( "TEXTURE", texture ) ;
 						}
 					}
@@ -235,7 +237,66 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
-				System.out.println( "Draw Text" ) ;
+				final String text = _settings.getString( "TEXT", null ) ;
+				if( text == null )
+				{
+					System.out.println( "No Text, set." ) ;
+					return ;
+				}
+
+				final MalletFont font = _settings.getObject( "FONT", MalletFont.class, null ) ;
+				if( font == null )
+				{
+					System.out.println( "No Font, set." ) ;
+					return ; }
+				else
+				{
+					if( font.font == null )
+					{
+						font.font = fontManager.get( font.fontName, font.size ) ;
+					}
+				}
+
+				final GLFontMap fm = ( GLFontMap )font.font ;
+				if( fm == null ) { return ; }
+
+				final GLImage image = fm.getGLImage() ;
+				if( image.textureID != textureID )
+				{
+					textureID = image.textureID ;
+					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
+				}
+
+				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+	
+				gl.glPushMatrix() ;
+					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
+					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
+					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+
+					final int length = text.length() ;
+					for( int i = 0; i < length; ++i )
+					{
+						final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
+						final GLGeometry geometry = glyph.getGLGeometry() ;
+
+						if( geometry.indexID != indexID )
+						{
+							indexID = geometry.indexID ;
+							gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+							gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+						}
+
+						gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+						gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+						gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+
+						gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+						gl.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
+					}
+
+				gl.glPopMatrix() ;
 			}
 		} ;
 	}
@@ -371,7 +432,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected void createGeometry( final Settings _draw ) {}
 
 	@Override
-	protected void createText( final Settings _draw ) {}
+	protected void createText( final Settings _draw )
+	{
+		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final int layer = _draw.getInteger( "LAYER", -1 ) ;
+
+		if( position != null )
+		{
+			final RenderData data = new RenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			data.drawCall = drawText ;
+			insert( data ) ;
+		}
+	}
 
 	public void sort() {}
 

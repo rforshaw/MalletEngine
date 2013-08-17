@@ -5,15 +5,22 @@ public class MalletFont
 	public static final int PLAIN = 5 ;
 
 	public Object font = null ;
-	public String fontName ;
-	public int style = PLAIN ;
-	public int size = 12 ;
+	public final String fontName ;
+	public final int style ;
+	public final int size ;
 	
 	public MalletFont( final String _name, final int _style, final int _size )
 	{
 		fontName = _name ;
 		style = _style ;
 		size = _size ;
+	}
+	
+	public MalletFont( final String _name, final int _size )
+	{
+		fontName = _name ;
+		size = _size ;
+		style = PLAIN ;
 	}
 	
 	public String getFontName()

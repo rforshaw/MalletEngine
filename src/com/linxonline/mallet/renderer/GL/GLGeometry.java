@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.gl ;
+package com.linxonline.mallet.renderer.GL ;
 
 import java.util.ArrayList ;
 

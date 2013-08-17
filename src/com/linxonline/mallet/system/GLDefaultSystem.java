@@ -13,6 +13,9 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.mallet.renderer.GL.* ;
+
+
 /*===========================================*/
 // DefaultSystem
 // Used to hook up Engine to OS using Java API

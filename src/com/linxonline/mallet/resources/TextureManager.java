@@ -5,7 +5,9 @@ import java.io.* ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
-import com.linxonline.mallet.resources.texture.* ;
+
+import com.linxonline.mallet.resources.texture.Texture ;
+import com.linxonline.mallet.renderer.G2D.G2DImage ;
 
 public class TextureManager extends AbstractManager
 {
@@ -38,7 +40,7 @@ public class TextureManager extends AbstractManager
 			}
 
 			InputStream in = new ByteArrayInputStream( image ) ;
-			return new Texture( new JavaImage( ImageIO.read( in ) ) ) ;
+			return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
 		}
 		catch( IOException _ex )
 		{
