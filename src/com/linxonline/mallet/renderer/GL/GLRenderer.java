@@ -434,6 +434,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
 		gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
 		gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+
+		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
+		{
+			textures.setImageFormat( GL2.GL_ABGR_EXT  ) ;
+		}
 	}
 
 	private void resize()

@@ -16,8 +16,24 @@ import com.linxonline.mallet.resources.texture.Texture ;
 
 public class GLTextureManager extends TextureManager
 {
+	/**
+		Currently two OpenGL image formats are supported: GL_RGBA and GL_ABGR_EXT.
+		It's set to GL_RGBA by default due to the extension potentially not 
+		being available, though unlikely.
+	*/
+	protected int imageFormat = GL2.GL_RGBA ;
+
 	public GLTextureManager() {}
 
+	/**
+		Change the image format used to bind textures.
+		GL_RGBA and GL_ABGR_EXT are supported.
+	*/
+	public void setImageFormat( final int _format )
+	{
+		imageFormat = _format ;
+	}
+	
 	@Override
 	protected Texture loadTexture( final String _file )
 	{
@@ -37,9 +53,9 @@ public class GLTextureManager extends TextureManager
 	}
 
 	/**
-		Copies the BufferedImage into video memory.
-		Ensure BufferedImage is in 4BYTE_ABGR or INT_ARGB.
-		For best performance use 4BYTE_ABGR.
+		Binds the BufferedImage byte-stream into video memory.
+		BufferedImage must be in 4BYTE_ABGR.
+		4BYTE_ABGR removes endinese problems.
 	*/
 	public Texture bind( final BufferedImage _image )
 	{
@@ -63,16 +79,16 @@ public class GLTextureManager extends TextureManager
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
-		
+
 		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
 						 0, 
 						 GL2.GL_RGBA, 
 						 width, 
 						 height, 
 						 0, 
-						 GL2.GL_RGBA, 
+						 imageFormat, 
 						 GL2.GL_UNSIGNED_BYTE, 
-						 convertImageData( _image ) ) ;
+						 getByteBuffer( _image ) ) ;
 
 		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
 
@@ -81,57 +97,48 @@ public class GLTextureManager extends TextureManager
 	}
 
 	/**
-		Massage the Data so OpenGL can read it.
-		By default the ImageIO content is stored in a Byte stream,
-		the Font Genorator images are stored in Int streams.
-		For best performance ensure BufferedImage is Byte stream.
-		Other stream types are not supported.
+		Returns a ByteBuffer of BufferedImage data.
+		Ensure BufferedImage is of 4BYTE_ABGR type.
+		If imageFormat is set to GL_RGBA, byte stream will be converted.
 	*/
-	private ByteBuffer convertImageData( final BufferedImage _image )
+	private ByteBuffer getByteBuffer( final BufferedImage _image )
 	{
 		final DataBuffer buffer = _image.getRaster().getDataBuffer() ;
 		final int type = buffer.getDataType() ;
-		
-		if( type == DataBuffer.TYPE_INT )
-		{
-			final int[] data = ( (  DataBufferInt )  buffer).getData() ;
-			final ByteBuffer imageBuffer = ByteBuffer.allocateDirect( data.length * 4 ) ;
-			imageBuffer.order( ByteOrder.nativeOrder() ) ;
 
-			for( int i = 0; i < data.length; i++ )
-			{
-				imageBuffer.put( ( byte )( ( data[i] >> 16 ) & 0xFF ) ) ;	// alpha
-				imageBuffer.put( ( byte )( ( data[i] >> 8  ) & 0xFF ) ) ;	// red
-				imageBuffer.put( ( byte )( ( data[i]       ) & 0xFF ) ) ;	// green
-				imageBuffer.put( ( byte )( ( data[i] >> 24 ) & 0xFF ) ) ;	// blue
-			}
-
-			imageBuffer.flip() ;
-			return imageBuffer ;
-		}
-		else if( type == DataBuffer.TYPE_BYTE )
+		if( type == DataBuffer.TYPE_BYTE )
 		{
 			final byte[] data = ( (  DataBufferByte )  buffer).getData() ;
-			byte alpha, red, green, blue ;
-			for( int i = 0; i < data.length; i += 4 )
+			if( imageFormat == GL2.GL_RGBA )
 			{
-				alpha = data[i + 3] ;
-				red   = data[i + 2] ;
-				green = data[i + 1] ;
-				blue  = data[i] ;
-
-				data[i]     = alpha ;
-				data[i + 1] = red ;
-				data[i + 2] = green ;
-				data[i + 3] = blue ;
+				convertABGRtoRGBA( data ) ;
 			}
 
-			final ByteBuffer imageBuffer = ByteBuffer.wrap( data, 0, data.length ) ;
-			return imageBuffer ;
+			return ByteBuffer.wrap( data ) ;
 		}
 
 		System.out.println( "Failed to determine DataBuffer type." ) ;
 		return null ;
+	}
+	
+	private byte[] convertABGRtoRGBA( final byte[] _data )
+	{
+		byte alpha, red, green, blue ;
+		final int size = _data.length ;
+		for( int i = 0; i < size; i += 4 )
+		{
+			red   = _data[i + 3] ;
+			green = _data[i + 2] ;
+			blue  = _data[i + 1] ;
+			alpha = _data[i] ;
+
+			_data[i]     = red ;
+			_data[i + 1] = green ;
+			_data[i + 2] = blue ;
+			_data[i + 3] = alpha ;
+		}
+		
+		return _data ;
 	}
 	
 	private int glGenTextures( GL2 _gl )
