@@ -39,8 +39,11 @@ public class TextureManager extends AbstractManager
 				image = GlobalFileSystem.getResourceRaw( _file ) ;
 			}
 
-			InputStream in = new ByteArrayInputStream( image ) ;
-			return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
+			if( image != null )
+			{
+				InputStream in = new ByteArrayInputStream( image ) ;
+				return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
+			}
 		}
 		catch( IOException _ex )
 		{

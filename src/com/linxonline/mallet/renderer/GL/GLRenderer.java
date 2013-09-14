@@ -18,6 +18,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
+import com.linxonline.mallet.util.time.DefaultTimer ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
@@ -31,6 +32,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	private static GLCanvas canvas = null ;
 	private JFrame frame = null ;
 
+	private final DefaultTimer timer = new DefaultTimer() ;
 	private Vector2 pos = new Vector2() ;
 	private Vector3 cameraPosition = null ;
 	private Vector2 renderDimensions = null ;
@@ -51,8 +53,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
-
-		renderInfo.setKeepRenderRatio( false ) ;
 	}
 
 	@Override
@@ -162,42 +162,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
+				
 				Texture texture = _settings.getObject( "TEXTURE", Texture.class, null ) ;
-				if( texture != null )
+				if( texture == null )
 				{
-					final GLImage image = texture.getImage( GLImage.class ) ;
-					if( image.textureID != textureID )
-					{
-						textureID = image.textureID ;
-						gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
-					}
+					texture = loadTexture( _settings ) ;
+					if( texture == null ) { return ; }
 				}
-				else
+				
+				final GLImage image = texture.getImage( GLImage.class ) ;
+				if( image.textureID != textureID )
 				{
-					final String file = _settings.getString( "FILE", null ) ;
-					if( ( texture = loadTexture( file ) ) != null )
-					{
-						Vector2 fillDim = _settings.getObject( "FILL", Vector2.class, null ) ;
-						Vector2 dimension = _settings.getObject( "DIM", Vector2.class, null ) ;
-						if( dimension == null )
-						{
-							dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
-						}
-
-						if( fillDim == null )
-						{
-							final String name = dimension.toString() ;
-							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
-							_settings.addObject( "TEXTURE", texture ) ;
-						}
-						else
-						{
-							final Vector2 div = Vector2.divide( fillDim, dimension ) ;
-							final String name = fillDim.toString() + dimension.toString() ;
-							_settings.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
-							_settings.addObject( "TEXTURE", texture ) ;
-						}
-					}
+					textureID = image.textureID ;
+					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
 				}
 
 				final Model model = _settings.getObject( "MODEL", Model.class, null ) ;
@@ -501,6 +478,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glFlush() ;
 		canvas.swapBuffers() ;
+
+		//timer.getElapsedTimeInNanoSeconds() ;
 	}
 
 	protected void render()
@@ -556,8 +535,32 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		return canvas ;
 	}
 
-	private Texture loadTexture( final String _file )
+	private Texture loadTexture( final Settings _draw )
 	{
-		return _file != null ? ( Texture )textures.get( _file ) : null ;
+		final Texture texture = ( Texture )textures.get( _draw.getString( "FILE", null ) ) ;
+		if( texture == null ) { return null ; }
+		
+		Vector2 fillDim = _draw.getObject( "FILL", Vector2.class, null ) ;
+		Vector2 dimension = _draw.getObject( "DIM", Vector2.class, null ) ;
+		if( dimension == null )
+		{
+			dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
+		}
+
+		if( fillDim == null )
+		{
+			final String name = dimension.toString() ;
+			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
+			_draw.addObject( "TEXTURE", texture ) ;
+		}
+		else
+		{
+			final Vector2 div = Vector2.divide( fillDim, dimension ) ;
+			final String name = fillDim.toString() + dimension.toString() ;
+			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
+			_draw.addObject( "TEXTURE", texture ) ;
+		}
+
+		return texture ;
 	}
 }

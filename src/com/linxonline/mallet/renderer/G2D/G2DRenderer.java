@@ -16,6 +16,7 @@ import java.awt.geom.AffineTransform ;
 import java.awt.Dimension ;
 import java.awt.Insets ;
 
+import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.resources.TextureManager ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -41,6 +42,7 @@ public class G2DRenderer extends Basic2DRender
 	private int numID = 0 ;
 	private BufferStrategy buffer = null ;
 	private JFrame frame = null ;
+	private final DefaultTimer timer = new DefaultTimer() ;
 
 	// Pointers to variables located in RenderInfo
 	protected Vector2 display = null ;
@@ -87,11 +89,8 @@ public class G2DRenderer extends Basic2DRender
 				Texture temp = _settings.getObject( "TEXTURE", Texture.class, null ) ;
 				if( temp == null )
 				{
-					temp = loadTexture( _settings.getString( "FILE", null ) ) ;
-					if( temp == null )
-					{
-						return ;
-					}
+					temp = loadTexture( _settings ) ;
+					if( temp == null ) { return ; }
 				}
 
 				transform.setToIdentity() ;
@@ -354,6 +353,8 @@ public class G2DRenderer extends Basic2DRender
 		{
 			buffer.show() ;
 		}
+
+		//timer.getElapsedTimeInNanoSeconds() ;
 	}
 
 	protected void render()
@@ -454,8 +455,12 @@ public class G2DRenderer extends Basic2DRender
 		buffer = canvas.getBufferStrategy() ;
 	}
 
-	private Texture loadTexture( final String _file )
+	private Texture loadTexture( final Settings _draw )
 	{
-		return _file != null ? ( Texture )textures.get( _file ) : null ;
+		Texture texture = ( Texture )textures.get( _draw.getString( "FILE", null ) ) ;
+		if( texture == null ) { return null ; }
+
+		_draw.addObject( "TEXTURE", texture ) ;
+		return texture ;
 	}
 }

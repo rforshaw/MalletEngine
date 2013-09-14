@@ -32,9 +32,8 @@ public final class GameSystem
 
 	public boolean update( final double _dt )
 	{
-		final boolean running = system.update() ;		// Updates low-level systems - input, event
 		stateMachine.update( _dt ) ;					// Update Game State
-		return running ;
+		return true ;
 	}
 
 	public final void addGameState( final GameState _state )

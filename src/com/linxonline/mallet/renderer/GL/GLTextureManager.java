@@ -40,9 +40,11 @@ public class GLTextureManager extends TextureManager
 		try
 		{
 			final byte[] image = GlobalFileSystem.getResourceRaw( _file ) ;
-			final InputStream in = new ByteArrayInputStream( image ) ;
-
-			return bind( ImageIO.read( in ) ) ;
+			if( image != null )
+			{
+				final InputStream in = new ByteArrayInputStream( image ) ;
+				return bind( ImageIO.read( in ) ) ;
+			}
 		}
 		catch( IOException _ex )
 		{
@@ -120,7 +122,7 @@ public class GLTextureManager extends TextureManager
 		System.out.println( "Failed to determine DataBuffer type." ) ;
 		return null ;
 	}
-	
+
 	private byte[] convertABGRtoRGBA( final byte[] _data )
 	{
 		byte alpha, red, green, blue ;
@@ -137,10 +139,10 @@ public class GLTextureManager extends TextureManager
 			_data[i + 2] = blue ;
 			_data[i + 3] = alpha ;
 		}
-		
+
 		return _data ;
 	}
-	
+
 	private int glGenTextures( GL2 _gl )
 	{
 		final int[] id = new int[1] ;

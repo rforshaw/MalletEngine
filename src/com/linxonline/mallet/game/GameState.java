@@ -363,14 +363,14 @@ public class GameState extends State implements HookEntity
 			@Override
 			public void update( final double _dt )
 			{
-				inputSystem.update() ;
-				eventSystem.update() ;
-
 				// Update Default : 120Hz
 				updateAccumulator += _dt ;
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					//System.out.println( 1.0f / updateAccumulator ) ;
+					system.update() ;			// Update low-level systems
+					inputSystem.update() ;
+					eventSystem.update() ;
+
 					eventController.update() ;
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
@@ -384,9 +384,8 @@ public class GameState extends State implements HookEntity
 				renderAccumulator += _dt ;
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
-					//System.out.println( 1.0f / renderAccumulator ) ;
 					system.draw() ;
-					renderAccumulator = 0.0f ;//-= DEFAULT_FRAMERATE ;
+					renderAccumulator = 0.0f ;
 				}
 			}
 		} ;
@@ -410,6 +409,7 @@ public class GameState extends State implements HookEntity
 				}
 
 				// Update as fast as the computer can manage.
+				system.update() ;
 				inputSystem.update() ;
 				eventSystem.update() ;
 
