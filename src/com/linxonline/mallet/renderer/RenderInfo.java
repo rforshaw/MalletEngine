@@ -170,5 +170,6 @@ public final class RenderInfo implements InputAdapterInterface
 		// Focal point will be located at the cross-roads of the renderDimensions
 		realCameraPosition.x = -cameraPosition.x + ( renderDimensions.x / 2 ) ;
 		realCameraPosition.y = -cameraPosition.y + ( renderDimensions.y / 2 ) ;
+		realCameraPosition.z = -cameraPosition.z ;
 	}
 }

@@ -26,12 +26,17 @@ public class CollisionSystem
 
 	public void update( final float _dt )
 	{
-		// Collision Check
-		for( final Hull hull1 : hulls )
+		Hull hull1 = null ;
+		Hull hull2 = null ;
+		final int size = hulls.size() ;
+		
+		for( int i = 0; i < size; i++ )
 		{
+			hull1 = hulls.get( i ) ;
 			if( hull1.isCollidable() == false ) { continue ; }
-			for( final Hull hull2 : hulls )
+			for( int j = 0; j < size; j++ )
 			{
+				hull2 = hulls.get( j ) ;
 				if( hull1 != hull2 )
 				{
 					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )

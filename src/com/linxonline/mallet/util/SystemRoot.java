@@ -68,8 +68,11 @@ public abstract class SystemRoot<T> extends EventUpdater
 
 	protected void removeSources()
 	{
-		for( final RemoveSource remove : removeSources )
+		final int size = removeSources.size() ;
+		RemoveSource remove = null ;
+		for( int i = 0; i < size; i++ )
 		{
+			remove = removeSources.get( i ) ;
 			destroySource( remove.source ) ;
 			activeSources.remove( remove.source ) ;
 			sources.remove( remove.id ) ;

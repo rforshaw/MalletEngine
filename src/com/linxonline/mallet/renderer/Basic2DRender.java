@@ -60,6 +60,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	@Override
 	public void setCameraPosition( final Vector3 _position )
 	{
+		System.out.println( "SETTING CAMERA POSITION: " + _position ) ;
 		renderInfo.setCameraPosition( _position ) ;
 	}
 

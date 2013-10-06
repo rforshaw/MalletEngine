@@ -22,6 +22,9 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
+	public static final int ORTHOGRAPHIC_MODE = 1 ;
+	public static final int PERSPECTIVE_MODE = 2 ;
+
 	private static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 
 	protected final static GLTextureManager textures = new GLTextureManager() ;
@@ -43,8 +46,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected DrawInterface drawTexture = null ;
 	protected DrawInterface drawText = null ;
 
+	private int viewMode = ORTHOGRAPHIC_MODE ;
 	private int textureID = 0 ;
 	private int indexID = 0 ;
+	
+	private float rotate = 0.0f ;
 	
 	public GLRenderer() {}
 
@@ -406,6 +412,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glEnable( GL.GL_BLEND ) ;
 		gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
+		//gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE ) ;
+		
 		resize() ;
 
 		gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
@@ -418,6 +426,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
+	public void setViewMode( final int _mode )
+	{
+		viewMode = _mode ;
+	}
+	
 	private void resize()
 	{
 		renderDimensions = renderInfo.getRenderDimensions() ;
@@ -427,7 +440,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glLoadIdentity();
 
 		// coordinate system origin at lower left with width and height same as the window
-		glu.gluOrtho2D( 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
+		if( viewMode == ORTHOGRAPHIC_MODE )
+		{
+			
+			glu.gluOrtho2D( 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
+		}
+		else
+		{
+			final Vector2 ratio = renderInfo.getRatioRenderToDisplay() ;
+			glu.gluPerspective( 65.0f, ratio.x, 1.0f, 900.0f ) ;
+			gl.glScalef( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
+			gl.glTranslatef( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ; 	// To shift the camera back to centre 
+		}
 
 		gl.glMatrixMode( GL2.GL_MODELVIEW ) ;
 		gl.glLoadIdentity() ;
@@ -472,7 +496,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glLoadIdentity() ;
 
 		gl.glPushMatrix() ;
-			gl.glTranslatef( cameraPosition.x, cameraPosition.y, 0.0f ) ;
+			gl.glTranslatef( cameraPosition.x, cameraPosition.y, cameraPosition.z ) ;
 			render() ;
 		gl.glPopMatrix() ;
 
@@ -551,6 +575,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			final String name = dimension.toString() ;
 			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
+			//_draw.addObject( "MODEL", GLModelGenerator.genCubeModel( name, dimension ) ) ;
 			_draw.addObject( "TEXTURE", texture ) ;
 		}
 		else
