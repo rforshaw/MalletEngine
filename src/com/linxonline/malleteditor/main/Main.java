@@ -8,8 +8,7 @@ import com.linxonline.mallet.game.GameSystem ;
 import com.linxonline.mallet.game.GameState ;
 
 import com.linxonline.mallet.system.SystemInterface ;
-import com.linxonline.mallet.system.GLDefaultSystem ;
-import com.linxonline.mallet.system.DefaultSystem ;
+import com.linxonline.malleteditor.system.GLEditorSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
@@ -43,8 +42,7 @@ public class Main
 	public static void main( String _args[] )
 	{
 		loadFileSystem() ;
-		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
-		final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
+		final GLEditorSystem system = new GLEditorSystem() ;		// OpenGL & OpenAL backend
 
 		system.initSystem() ;
 		loadConfig( system ) ;

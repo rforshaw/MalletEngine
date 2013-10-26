@@ -34,18 +34,14 @@
 	<target name="compile">
 		<mkdir dir="${engine-classes.dir}"/>
 		<mkdir dir="${editor-classes.dir}"/>
+
 		<javac srcdir="${engine-src.dir}" destdir="${engine-classes.dir}" classpathref="classpath-engine" debug="true"/>
-		<javac srcdir="${editor-src.dir}" destdir="${editor-classes.dir}" classpathref="classpath-editor" debug="true"/>
-	</target>
-
-	<target name="jar" depends="compile">
-		<mkdir dir="${jar.dir}"/>
-		<mkdir dir="${classes.dir}"/>
-
 		<jar destfile="${jar.dir}/${MALLETENGINE}.jar" basedir="${engine-classes.dir}"/>
+
+		<javac srcdir="${editor-src.dir}" destdir="${editor-classes.dir}" classpathref="classpath-editor" debug="true"/>
 		<jar destfile="${jar.dir}/${MALLETEDITOR}.jar" basedir="${editor-classes.dir}"/>
 	</target>
 
-	<target name="clean-build" depends="clean,jar"/>
-	<target name="main" depends="clean,jar"/>
+	<target name="clean-build" depends="clean,compile"/>
+	<target name="main" depends="clean,compile"/>
 </project>

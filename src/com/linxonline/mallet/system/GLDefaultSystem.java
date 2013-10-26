@@ -27,8 +27,8 @@ public class GLDefaultSystem implements SystemInterface
 {
 	protected String titleName = new String( "GL Mallet Engine" ) ;
 
-	protected final ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
-	protected final GLRenderer renderer = new GLRenderer() ;
+	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
+	protected GLRenderer renderer = new GLRenderer() ;
 
 	public final EventSystem eventSystem = new EventSystem() ;
 	public final InputSystem inputSystem = new InputSystem() ;
@@ -44,7 +44,7 @@ public class GLDefaultSystem implements SystemInterface
 		sourceGenerator.startGenerator() ;
 		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
-		final JFrame frame = new JFrame( titleName ) ;				// Initialise Window
+		final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
 		frame.addWindowListener( new WindowListener()
 		{
 			public void windowActivated( final WindowEvent _event ) {}

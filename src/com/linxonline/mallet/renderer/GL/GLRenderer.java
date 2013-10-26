@@ -59,6 +59,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
+		renderInfo.setKeepRenderRatio( false ) ;
 	}
 
 	@Override
@@ -107,7 +108,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		resize() ;
 		canvas.getContext().release() ;
 	}
-	
+
 	private void initDrawCalls()
 	{
 		drawShape = new DrawInterface()
@@ -381,25 +382,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			}
 		} ;
 	}
-	
-	public void hookToWindow( final JFrame _frame )
-	{
-		frame = _frame ;
-		frame.createBufferStrategy( 1 ) ;
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
-		frame.setIgnoreRepaint( true ) ;
-
-		frame.add( canvas ) ;
-		frame.pack() ;
-		
-		final Vector2 display = renderInfo.getDisplayDimensions() ;
-		frame.setSize( ( int )display.x, ( int )display.y ) ;
-		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
-		frame.validate() ;
-		frame.setVisible( true ) ;
-
-		draw() ;
-	}
 
 	@Override
 	public void init( GLAutoDrawable _drawable )
@@ -431,7 +413,31 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		viewMode = _mode ;
 	}
 	
-	private void resize()
+	public void hookToWindow( final JFrame _frame )
+	{
+		frame = _frame ;
+		frame.createBufferStrategy( 1 ) ;
+		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
+		frame.setIgnoreRepaint( true ) ;
+
+		frame.add( canvas ) ;
+		frame.pack() ;
+		
+		final Vector2 display = renderInfo.getDisplayDimensions() ;
+		frame.setSize( ( int )display.x, ( int )display.y ) ;
+		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
+		frame.validate() ;
+		frame.setVisible( true ) ;
+
+		draw() ;
+	}
+	
+	
+	/**
+		OpenGl handles the scaling between the displayDimensions and renderDimensions.
+		renderInfo.setKeepRenderRatio must be false to ensure correct mouse positions.
+	*/
+	protected void resize()
 	{
 		renderDimensions = renderInfo.getRenderDimensions() ;
 		displayDimensions = renderInfo.getDisplayDimensions() ;
@@ -458,7 +464,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glViewport( 0, 0, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 	}
-	
+
 	@Override
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
 	{
@@ -502,8 +508,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glFlush() ;
 		canvas.swapBuffers() ;
-
-		//timer.getElapsedTimeInNanoSeconds() ;
 	}
 
 	protected void render()
