@@ -30,7 +30,7 @@ public class GLDefaultSystem implements SystemInterface
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
 	protected GLRenderer renderer = new GLRenderer() ;
 
-	public final EventSystem eventSystem = new EventSystem() ;
+	public final EventSystem eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
 	public final InputSystem inputSystem = new InputSystem() ;
 
 	public GLDefaultSystem()

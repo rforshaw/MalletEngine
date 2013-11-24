@@ -38,7 +38,11 @@ public class GLEditorSystem extends GLDefaultSystem
 		renderer.hookToWindow( frame ) ;
 		frame.setVisible( false ) ;
 		frame.remove( renderer.getCanvas() ) ;
-		frame.add( new MainPanel( renderer.getCanvas() ) ) ;
+		
+		final MainPanel mainPanel = new MainPanel( renderer.getCanvas() ) ;
+		eventSystem.addEventHandler( mainPanel.getEventController() ) ;
+		
+		frame.add( mainPanel ) ;
 		frame.pack() ;
 		frame.validate() ;
 		frame.setVisible( true ) ;

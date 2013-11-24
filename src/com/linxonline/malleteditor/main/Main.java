@@ -11,6 +11,8 @@ import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.malleteditor.system.GLEditorSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.event.Event ;
+
 import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
@@ -53,108 +55,15 @@ public class Main
 			// Called when state is started.
 			public void initGame()
 			{
-				renderTextureExample() ;
-				//renderAnimationExample() ;
-				renderTextExample() ;
-				//playAudioExample() ;
-				//createEntityExample() ;
 				createMouseAnimExample() ;
 			}
 
-			/**
-				Add a texture and render directly to the renderer
-			**/
-			public void renderTextureExample()
+			@Override
+			public void update( final double _dt )
 			{
-				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
-																	new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																	new Vector2( -32, -32 ), 			// Offset
-																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																	null,								// fill, texture repeat
-																	null,								// clip
-																	null,								// clip offset
-																	10 ) ) ;							// layer
+				super.update( _dt ) ;
 			}
-
-			/**
-				Add an animation directly to the animation system
-			**/
-			public void renderAnimationExample()
-			{
-				eventSystem.addEvent( AnimationFactory.createAnimation( "base/anim/moomba.anim", 			// Animation Location
-																		 new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																		 new Vector2( -32, -32 ), 			// Offset
-																		 new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																		 null,								// fill, texture repeat
-																		 null,								// clip
-																		 null,								// clip offset
-																		 10,								// layer
-																		 new SourceCallback()
-				{
-					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
-
-					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
-
-					public void start() { System.out.println( "Source began playing" ) ; }
-					public void pause() { System.out.println( "Source has been paused" ) ; }
-					public void stop() { System.out.println( "Source has been stopped" ) ; }
-
-					public void update( final float _dt ) { System.out.println( _dt ) ; }
-					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;
-			}
-
-			/**
-				Add text and render directly to the renderer
-			**/
-			public void renderTextExample()
-			{
-				eventSystem.addEvent( DrawFactory.createText(  "Hello World!", 						// Text
-																new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
-																new Vector2( 0, 0 ), 				// Offset
-																new MalletFont( "Arial", 20 ),		// Mallet Font
-																null,								// Mallet Colour
-																null,								// clip
-																null,								// clip offset
-																10,									// layer
-																2 ) ) ;								// Text alignment, Centre
-			}
-
-			/**
-				Play audio file directly to the audio system
-			**/
-			public void playAudioExample()
-			{
-				eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
-				{
-					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
-					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
-
-					public void start() { System.out.println( "Source began playing" ) ; }
-					public void pause() { System.out.println( "Source has been paused" ) ; }
-					public void stop() { System.out.println( "Source has been stopped" ) ; }
-
-					public void update( final float _dt ) { System.out.println( _dt ) ; }
-					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;
-			}
-
-			/**
-				Create an Entity using the ImageCreator and add 
-				it to the Game State
-			**/
-			public void createEntityExample()
-			{
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "0, 0" ) ;
-				image.addString( "DIM", "128, 128" ) ;
-				image.addString( "OFFSET", "-64, -64" ) ;
-
-				final ImageCreator creator = new ImageCreator() ;
-				addEntity( creator.create( image ) ) ;
-			}
-
+			
 			/**
 				Create an Entity that follows the mouse
 			**/
