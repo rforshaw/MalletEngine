@@ -41,6 +41,8 @@ public class GLEditorSystem extends GLDefaultSystem
 		
 		final MainPanel mainPanel = new MainPanel( renderer.getCanvas() ) ;
 		eventSystem.addEventHandler( mainPanel.getEventController() ) ;
+		mainPanel.getEventController().setAddEventInterface( eventSystem ) ;
+		
 		
 		frame.add( mainPanel ) ;
 		frame.pack() ;

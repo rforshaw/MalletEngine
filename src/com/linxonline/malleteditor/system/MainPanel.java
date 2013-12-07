@@ -91,15 +91,27 @@ public class MainPanel extends JPanel
 			public void actionPerformed( ActionEvent _event )
 			{
 				System.out.println( "Open File..." ) ;
+				eventController.passEvent( new Event( "OPEN_FILE", null ) ) ;
 			}
 		} ) ;
 
+		final JMenuItem importFile = fileMenu.add( new JMenuItem( "Import" ) ) ;
+		importFile.addActionListener( new ActionListener()
+		{
+			public void actionPerformed( ActionEvent _event )
+			{
+				System.out.println( "Import File..." ) ;
+				eventController.passEvent( new Event( "IMPORT_FILE", null ) ) ;
+			}
+		} ) ;
+		
 		final JMenuItem save = fileMenu.add( new JMenuItem( "Save" ) ) ;
 		save.addActionListener( new ActionListener()
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
 				System.out.println( "Save File..." ) ;
+				eventController.passEvent( new Event( "SAVE_FILE", null ) ) ;
 			}
 		} ) ;
 
@@ -125,7 +137,7 @@ public class MainPanel extends JPanel
 			@Override
 			public void processEvent( final Event _event )
 			{
-				//System.out.println( "Recieved Event..." ) ;
+				System.out.println( "Recieved Event..." ) ;
 			}
 		} ;
 	}

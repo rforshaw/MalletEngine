@@ -5,7 +5,7 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.game.GameSystem ;
-import com.linxonline.mallet.game.GameState ;
+import com.linxonline.malleteditor.system.EditorState ;
 
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.malleteditor.system.GLEditorSystem ;
@@ -19,18 +19,8 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.reader.ConfigParser ;
 import com.linxonline.mallet.io.reader.ConfigReader ;
 
-import com.linxonline.mallet.animation.AnimationFactory ;
-import com.linxonline.mallet.renderer.DrawFactory ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.audio.AudioFactory ;
-
-import com.linxonline.mallet.util.sort.* ;
-
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.id.IDInterface ;
-
-import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
-import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 /*===========================================*/
@@ -50,34 +40,7 @@ public class Main
 		loadConfig( system ) ;
 
 		final GameSystem game = new GameSystem( system ) ;
-		game.addGameState( new GameState( "DEFAULT" )
-		{
-			// Called when state is started.
-			public void initGame()
-			{
-				createMouseAnimExample() ;
-			}
-
-			@Override
-			public void update( final double _dt )
-			{
-				super.update( _dt ) ;
-			}
-			
-			/**
-				Create an Entity that follows the mouse
-			**/
-			public void createMouseAnimExample()
-			{
-				final Settings mouse = new Settings() ;
-				mouse.addString( "ANIM", "base/anim/moomba.anim" ) ;
-				mouse.addObject( "DIM", new Vector2( 32, 32 ) ) ;
-				mouse.addObject( "OFFSET", new Vector2( -16, -16 ) ) ;
-
-				final AnimMouseCreator creator = new AnimMouseCreator() ;
-				addEntity( creator.create( mouse ) ) ;
-			}
-		} ) ;
+		game.addGameState( new EditorState( "DEFAULT" ) ) ;
 
 		game.setDefaultGameState( "DEFAULT" ) ;
 		game.runSystem() ;							// Begin running the game-loop
