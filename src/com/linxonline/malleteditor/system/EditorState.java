@@ -11,17 +11,24 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Vector2 ;
 
+import com.linxonline.malleteditor.factory.EditorEntityFactory ;
 import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
+import com.linxonline.malleteditor.factory.creators.EditorCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
+
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 public class EditorState extends GameState
 {
-	private final static String[] EVENT_TYPES = { "OPEN_FILE", "IMPORT_FILE", "SAVE_FILE" } ;
+	public final static String[] EVENT_TYPES = { "OPEN_FILE", "IMPORT_FILE", "SAVE_FILE" } ;
+	
+	private final EditorEntityFactory factory = new EditorEntityFactory() ;
 
 	public EditorState( final String _name )
 	{
 		super( _name ) ;
-		InitEventControllers() ;
+		initEventControllers() ;
+		populateEntityFactory() ;
 	}
 
 	public void initGame()
@@ -40,7 +47,7 @@ public class EditorState extends GameState
 		addEntity( creator.create( mouse ) ) ;
 	}
 
-	private void InitEventControllers()
+	private void initEventControllers()
 	{
 		eventController.setWantedEventTypes( EVENT_TYPES ) ;
 		eventController.addEventProcessor( new EventProcessor( "FILE" )
@@ -50,7 +57,9 @@ public class EditorState extends GameState
 			{
 				if( _event.isEventByString( EVENT_TYPES[0] ) == true )
 				{
-					System.out.println( "Open File Request" ) ;
+					final String path = ( String )_event.getVariable() ;
+					System.out.println( "Open File: " + path ) ;
+					addEntities( factory.create( path ) ) ;
 				}
 				else if( _event.isEventByString( EVENT_TYPES[1] ) == true )
 				{
@@ -62,5 +71,10 @@ public class EditorState extends GameState
 				}
 			}
 		} ) ;
+	}
+	
+	private void populateEntityFactory()
+	{
+		factory.addCreator( new EditorCreator() ) ;
 	}
 }

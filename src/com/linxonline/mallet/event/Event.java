@@ -66,6 +66,6 @@ public final class Event<T>
 
 	public final T getVariable()
 	{
-		return variable ;
+		return ( T )variable ;
 	}
 }

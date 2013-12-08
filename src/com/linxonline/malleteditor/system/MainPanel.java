@@ -1,20 +1,24 @@
 package com.linxonline.malleteditor.system ;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
+import java.awt.* ;
+import java.awt.event.* ;
+import javax.swing.* ;
+import javax.swing.event.* ;
+import java.io.File ;
 
 import javax.media.opengl.awt.GLCanvas ;
 
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.Event ;
 
+import com.linxonline.malleteditor.system.EditorState ;
+
 public class MainPanel extends JPanel
 {
-	private EventController eventController = new EventController() ;
-	private JMenuBar menubar = new JMenuBar() ;
-	private JLabel infoLabel = new JLabel( "Info: " );
+	private final static String[] EVENT_TYPES = { "NONE" } ; 
+	private EventController eventController ;
+	private final JMenuBar menubar = new JMenuBar() ;
+	private final JLabel infoLabel = new JLabel( "Info: " );
 	private JList entityList ;
 
 	public MainPanel( final GLCanvas _canvas )
@@ -90,8 +94,18 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Open File..." ) ;
-				eventController.passEvent( new Event( "OPEN_FILE", null ) ) ;
+				final JFileChooser chooser = new JFileChooser() ;
+				chooser.setCurrentDirectory( new File( "." ) ) ;
+				int option = chooser.showOpenDialog( MainPanel.this ) ;
+
+				switch( option )
+				{
+					case JFileChooser.APPROVE_OPTION :
+					{
+						final File file = chooser.getSelectedFile() ;
+						eventController.passEvent( new Event( EditorState.EVENT_TYPES[0], file.getAbsolutePath() ) ) ;
+					}
+				}
 			}
 		} ) ;
 
@@ -100,8 +114,7 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Import File..." ) ;
-				eventController.passEvent( new Event( "IMPORT_FILE", null ) ) ;
+				eventController.passEvent( new Event( EditorState.EVENT_TYPES[1], null ) ) ;
 			}
 		} ) ;
 		
@@ -110,8 +123,7 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Save File..." ) ;
-				eventController.passEvent( new Event( "SAVE_FILE", null ) ) ;
+				eventController.passEvent( new Event( EditorState.EVENT_TYPES[2], null ) ) ;
 			}
 		} ) ;
 
@@ -130,16 +142,15 @@ public class MainPanel extends JPanel
 	{
 		eventController = new EventController()
 		{
-			/**
-				Process Event straight away rather than store it for 
-				future update.
-			*/
+			//	Override processEvent, as storing Events via the 
+			//	EventControllers messenger wont get updated.
 			@Override
 			public void processEvent( final Event _event )
 			{
 				System.out.println( "Recieved Event..." ) ;
 			}
 		} ;
+		eventController.setWantedEventTypes( EVENT_TYPES ) ;
 	}
 
 	public EventController getEventController()
