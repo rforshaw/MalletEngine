@@ -29,14 +29,18 @@ public class EditorCreator extends Creator<Entity>
 		entity.position = new Vector3( position ) ;
 
 		final RenderComponent render = new RenderComponent() ;
-		render.add( DrawFactory.createTexture( _image.getString( "IMAGE", "" ),
-												entity.position,
-											   _image.getObject( "OFFSET", Vector2.class, null ),
-											   _image.getObject( "DIM", Vector2.class, null ),
-											   _image.getObject( "FILL", Vector2.class, null ), 
-											   null,		// Clip View 
-											   null,		// Clip Offset
-											   _image.getInteger( "LAYER", 0 ) ) ) ;
+		final String imagePath = _image.getString( "IMAGE", null ) ;
+		if( imagePath != null )
+		{
+			render.add( DrawFactory.createTexture( imagePath,
+													entity.position,
+													_image.getObject( "OFFSET", Vector2.class, null ),
+													_image.getObject( "DIM", Vector2.class, null ),
+													_image.getObject( "FILL", Vector2.class, null ), 
+													null,		// Clip View 
+													null,		// Clip Offset
+													_image.getInteger( "LAYER", 0 ) ) ) ;
+		}
 
 		entity.addComponent( render ) ;
 		return entity ;

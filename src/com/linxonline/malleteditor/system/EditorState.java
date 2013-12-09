@@ -12,7 +12,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Vector2 ;
 
 import com.linxonline.malleteditor.factory.EditorEntityFactory ;
-import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
+import com.linxonline.malleteditor.factory.creators.EditorMouseCreator ;
 import com.linxonline.malleteditor.factory.creators.EditorCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
 
@@ -38,13 +38,8 @@ public class EditorState extends GameState
 
 	public void createMouseAnimExample()
 	{
-		final Settings mouse = new Settings() ;
-		mouse.addString( "ANIM", "base/anim/moomba.anim" ) ;
-		mouse.addObject( "DIM", new Vector2( 32, 32 ) ) ;
-		mouse.addObject( "OFFSET", new Vector2( -16, -16 ) ) ;
-
-		final AnimMouseCreator creator = new AnimMouseCreator() ;
-		addEntity( creator.create( mouse ) ) ;
+		final EditorMouseCreator creator = new EditorMouseCreator() ;
+		addEntity( creator.create( null ) ) ;
 	}
 
 	private void initEventControllers()

@@ -69,11 +69,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void useEvent( final Event _event )
 	{
-		if( _event.isEventByString( EVENT_TYPES[0] ) == true )
+		if( _event.isEventByString( EVENT_TYPES[0] ) == true )			// DRAW
 		{
 			useEventInDraw( _event ) ;
 		}
-		else if( _event.isEventByString( EVENT_TYPES[1] ) == true )
+		else if( _event.isEventByString( EVENT_TYPES[1] ) == true )		// CAMERA
 		{
 			useEventInCamera( _event ) ;
 		}
