@@ -65,7 +65,7 @@ public class ButtonComponent extends InputComponent
 	public final void setRenderComponent( final RenderComponent _component )
 	{
 		renderComponent = _component ;
-		offset = _component.getDrawAt( 0 ).getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+		offset = _component.getDrawAt( 0 ).getObject( "OFFSET", DEFAULT_OFFSET ) ;
 		setButton( button, 10 ) ;
 	}
 

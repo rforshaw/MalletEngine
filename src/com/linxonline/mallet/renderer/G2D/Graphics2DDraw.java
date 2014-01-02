@@ -22,7 +22,7 @@ public class Graphics2DDraw
 								final Settings _settings,
 								final Vector2 _position )
 	{
-		final Line line = ( Line )_settings.getObject( "DRAWLINE", Line.class, null ) ;
+		final Line line = ( Line )_settings.getObject( "DRAWLINE", null ) ;
 		if( line != null )
 		{
 			_graphics.drawLine( ( int )( line.start.x + _position.x ),
@@ -39,7 +39,7 @@ public class Graphics2DDraw
 								 final Settings _settings,
 								 final Vector2 _position )
 	{
-		final Shape shape = _settings.getObject( "DRAWLINES", Shape.class, null ) ;
+		final Shape shape = _settings.getObject( "DRAWLINES", null ) ;
 		if( shape != null )
 		{
 			final int size = shape.indicies.size() - 1 ;
@@ -63,7 +63,7 @@ public class Graphics2DDraw
 								   final Settings _settings,
 								   final Vector2 _position )
 	{
-		final Shape shape = _settings.getObject( "DRAWPOLYGON", Shape.class, null ) ;
+		final Shape shape = _settings.getObject( "DRAWPOLYGON", null ) ;
 		if( shape != null )
 		{
 			final int size = shape.indicies.size() ;
@@ -86,8 +86,8 @@ public class Graphics2DDraw
 								  final Settings _settings,
 								  final Vector2 _position )
 	{
-		final Shape shape = _settings.getObject( "POINTS", Shape.class, null ) ;
-		final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+		final Shape shape = _settings.getObject( "POINTS", null ) ;
+		final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 		if( shape != null )
 		{
 			for( final Integer index : shape.indicies )
@@ -108,8 +108,8 @@ public class Graphics2DDraw
 							   final Settings _settings,
 							   final Vector2 _position )
 	{
-		final Vector2 clipOffset = _settings.getObject( "CLIPOFFSET", Vector2.class, DEFAULT_OFFSET ) ;
-		final Vector2 clip = _settings.getObject( "CLIP", Vector2.class, null ) ;
+		final Vector2 clipOffset = _settings.getObject( "CLIPOFFSET", DEFAULT_OFFSET ) ;
+		final Vector2 clip = _settings.getObject( "CLIP", null ) ;
 		final Vector2 position = new Vector2( _position.x + clipOffset.x, _position.y + clipOffset.y ) ;
 
 		if( clip != null )
@@ -124,7 +124,7 @@ public class Graphics2DDraw
 	*/
 	public static void setGraphicsColour( final Graphics2D _graphics, final Settings _settings )
 	{
-		final MalletColour colour = _settings.getObject( "COLOUR", MalletColour.class, null ) ;
+		final MalletColour colour = _settings.getObject( "COLOUR", null ) ;
 		if( colour != null )
 		{
 			if( colour.colour == null )

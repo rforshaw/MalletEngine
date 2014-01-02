@@ -78,17 +78,23 @@ public final class Settings
 		variables.put( _name, var ) ;
 	}
 
-	public final void addObject( final String _name, final Object _value )
+	public final <T> void addObject( final String _name, final T _value )
 	{
+		Class<T> clazz = null ;
+		if( _value != null )
+		{
+			clazz = ( Class<T> )_value.getClass() ;
+		}
+
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
 			ObjectVariable var = ( ObjectVariable )inter ;
-			var.setObject( _value ) ;
+			var.setObject( _value, clazz ) ;
 			return ;
 		}
 
-		ObjectVariable var = new ObjectVariable( _name, _value ) ;
+		ObjectVariable<T> var = new ObjectVariable<T>( _name, _value, clazz ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -202,25 +208,17 @@ public final class Settings
 		throw exception ;
 	}
 
-	public final Object getObject( final String _name, final Object _default )
+	public final <T> T getObject( final String _name, final T _default )
 	{
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
-			ObjectVariable var = ( ObjectVariable )inter ;
-			return var.value ;
-		}
-
-		return _default ;
-	}
-
-	public final <T> T getObject( final String _name, final Class<T> _type, final T _default )
-	{
-		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
-		if( inter != null && _type != null )
-		{
-			ObjectVariable var = ( ObjectVariable )inter ;
-			return _type.cast( var.value ) ;
+			final ObjectVariable var = ( ObjectVariable )inter ;
+			final Class clazz = var.clazz ;
+			if( clazz != null )
+			{
+				return ( T )clazz.cast( var.value ) ;
+			}
 		}
 
 		return _default ;

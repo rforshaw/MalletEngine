@@ -43,9 +43,9 @@ public class CheckBoxComponent extends InputComponent
 	public final void setRenderComponent( final RenderComponent _component )
 	{
 		renderComponent = _component ;
-		offset = _component.getDrawAt( 0 ).getObject( "OFFSET", Vector2.class, new Vector2() ) ;
+		offset = _component.getDrawAt( 0 ).getObject( "OFFSET", new Vector2() ) ;
 
-		final Vector3 pos = _component.getDrawAt( 0 ).getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 pos = _component.getDrawAt( 0 ).getObject( "POSITION", null ) ;
 		renderComponent.add( DrawFactory.createTexture( null, pos, offset, null, null, null, null, 11 ) ) ;
 		setBox( defaultBox, 10 ) ;
 	}

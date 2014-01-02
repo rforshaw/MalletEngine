@@ -1,5 +1,6 @@
 package com.linxonline.malleteditor.factory.creators ;
 
+import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.factory.* ;
@@ -7,6 +8,7 @@ import com.linxonline.mallet.util.factory.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.malleteditor.entity.EditorMouseComponent ;
 
 public class EditorMouseCreator extends Creator<Entity>
 {
@@ -25,10 +27,14 @@ public class EditorMouseCreator extends Creator<Entity>
 		entity.position = new Vector3( width, height, 0 ) ;
 
 		final EventComponent event = new EventComponent() ;
-		final MouseComponent mouse = new MouseComponent() ;
+		final EditorMouseComponent mouse = new EditorMouseComponent() ;
+
+		final RenderComponent render = new RenderComponent() ;
+		render.add( CameraFactory.setCameraPositionEvent( mouse.eMouse ) ) ;
 
 		entity.addComponent( mouse ) ;
 		entity.addComponent( event ) ;
+		entity.addComponent( render ) ;
 
 		return entity ;
 	}

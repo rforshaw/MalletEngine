@@ -140,7 +140,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			}
 			case ModifyAudio.ADD_CALLBACK :
 			{
-				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
+				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
 				if( callback != null )
 				{
 					_sound.addCallback( callback ) ;
@@ -149,7 +149,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 			}
 			case ModifyAudio.REMOVE_CALLBACK :
 			{
-				final SourceCallback callback = _settings.getObject( "CALLBACK", SourceCallback.class, null ) ;
+				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
 				if( callback != null )
 				{
 					_sound.removeCallback( callback ) ;
@@ -179,7 +179,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	**/
 	protected void addCallbackToSound( final ActiveSound _sound, final Settings _audio )
 	{
-		final SourceCallback callback = _audio.getObject( "CALLBACK", SourceCallback.class, null ) ;
+		final SourceCallback callback = _audio.getObject( "CALLBACK", null ) ;
 		if( callback != null )
 		{
 			_sound.addCallback( callback ) ;

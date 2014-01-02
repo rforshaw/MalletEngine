@@ -120,8 +120,11 @@ public final class OBB
 		for( int i = 0; i < points.length; ++i )
 		{
 			point = points[i] ;
-			final float x2 = ( ( point.x + offset.x ) * cosAngle ) - ( ( point.y + offset.y ) * sinAngle ) - offset.x ;
-			final float y2 = ( ( point.y + offset.y ) * cosAngle ) + ( ( point.x + offset.x ) * sinAngle ) - offset.y ;
+			final float x = point.x + offset.x ;
+			final float y = point.y + offset.y ;
+			
+			final float x2 = ( x * cosAngle ) - ( y * sinAngle ) - offset.x ;
+			final float y2 = ( y * cosAngle ) + ( x * sinAngle ) - offset.y ;
 			point.setXY( x2, y2 ) ;
 		}
 	}

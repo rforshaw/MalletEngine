@@ -23,7 +23,7 @@ public class EditorCreator extends Creator<Entity>
 		parseImage( _image ) ;
 
 		final String name = _image.getString( "NAME", "IMAGE" ) ;
-		final Vector2 position = _image.getObject( "POS", Vector2.class, OFFSET_ZERO ) ;
+		final Vector2 position = _image.getObject( "POS", OFFSET_ZERO ) ;
 
 		final Entity entity = new Entity( name ) ;
 		entity.position = new Vector3( position ) ;
@@ -34,9 +34,9 @@ public class EditorCreator extends Creator<Entity>
 		{
 			render.add( DrawFactory.createTexture( imagePath,
 													entity.position,
-													_image.getObject( "OFFSET", Vector2.class, null ),
-													_image.getObject( "DIM", Vector2.class, null ),
-													_image.getObject( "FILL", Vector2.class, null ), 
+													_image.<Vector2>getObject( "OFFSET", null ),
+													_image.<Vector2>getObject( "DIM", null ),
+													_image.<Vector2>getObject( "FILL", null ), 
 													null,		// Clip View 
 													null,		// Clip Offset
 													_image.getInteger( "LAYER", 0 ) ) ) ;

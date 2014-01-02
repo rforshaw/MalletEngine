@@ -12,11 +12,11 @@ import com.linxonline.mallet.entity.Entity ;
 public class MouseComponent extends Component 
 							implements InputHandler
 {
-	private InputAdapterInterface inputAdapter = null ;
-	private final Vector2 mouse = new Vector2() ;
-	private boolean mouse1Pressed = false ;
-	private boolean mouse2Pressed = false ;
-	private boolean mouse3Pressed = false ;
+	protected InputAdapterInterface inputAdapter = null ;
+	protected final Vector2 mouse = new Vector2() ;
+	protected boolean mouse1Pressed = false ;
+	protected boolean mouse2Pressed = false ;
+	protected boolean mouse3Pressed = false ;
 
 	public MouseComponent()
 	{
@@ -44,31 +44,16 @@ public class MouseComponent extends Component
 		switch( eventType )
 		{
 			case MOUSE_MOVED     :
-			case TOUCH_MOVE      : updateMousePosition( _event ) ;    break ;
-			case MOUSE1_PRESSED  : setMouse1Button( true ) ;          break ;
-			case MOUSE1_RELEASED : setMouse1Button( false ) ;         break ;
-			case MOUSE2_PRESSED  : setMouse2Button( true ) ;          break ;
-			case MOUSE2_RELEASED : setMouse2Button( false ) ;         break ;
-			case MOUSE3_PRESSED  : setMouse3Button( true ) ;          break ;
-			case MOUSE3_RELEASED : setMouse3Button( false ) ;         break ;
+			case TOUCH_MOVE      : updateMousePosition( _event ) ; break ;
+			case MOUSE1_PRESSED  : mouse1Pressed = true ;          break ;
+			case MOUSE1_RELEASED : mouse1Pressed = false ;         break ;
+			case MOUSE2_PRESSED  : mouse2Pressed = true ;          break ;
+			case MOUSE2_RELEASED : mouse2Pressed = false ;         break ;
+			case MOUSE3_PRESSED  : mouse3Pressed = true ;          break ;
+			case MOUSE3_RELEASED : mouse3Pressed = false ;         break ;
 		}
 	}
-	
-	public void setMouse1Button( final boolean _pressed )
-	{
-		mouse1Pressed = _pressed ;
-	}
-	
-	public void setMouse2Button( final boolean _pressed )
-	{
-		mouse2Pressed = _pressed ;
-	}
-	
-	public void setMouse3Button( final boolean _pressed )
-	{
-		mouse3Pressed = _pressed ;
-	}
-	
+
 	public void updateMousePosition( final InputEvent _event )
 	{
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;

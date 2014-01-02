@@ -116,13 +116,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 
 				gl.glPushMatrix() ;
 					gl.glTranslatef( _position.x + offset.x, _position.y + offset.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 
-					final Line line = ( Line )_settings.getObject( "DRAWLINE", Line.class, null ) ;
+					final Line line = ( Line )_settings.getObject( "DRAWLINE", null ) ;
 					if( line != null )
 					{
 						gl.glBegin( GL2.GL_LINES ) ;
@@ -131,7 +131,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						gl.glEnd() ;
 					}
 
-					Shape shape = ( Shape )_settings.getObject( "DRAWLINES", Shape.class, null ) ;
+					Shape shape = ( Shape )_settings.getObject( "DRAWLINES", null ) ;
 					if( shape != null )
 					{
 						final int size = shape.indicies.size() ;
@@ -148,7 +148,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						}
 					}
 
-					shape = ( Shape )_settings.getObject( "POINTS", Shape.class, null ) ;
+					shape = ( Shape )_settings.getObject( "POINTS", null ) ;
 					if( shape != null )
 					{
 						final int size = shape.indicies.size() ;
@@ -170,7 +170,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
 				
-				Texture texture = _settings.getObject( "TEXTURE", Texture.class, null ) ;
+				Texture texture = _settings.getObject( "TEXTURE", null ) ;
 				if( texture == null )
 				{
 					texture = loadTexture( _settings ) ;
@@ -184,7 +184,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
 				}
 
-				final Model model = _settings.getObject( "MODEL", Model.class, null ) ;
+				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
 				{
 					// If we can't map the texture to a plane, then no point in rendering.
@@ -192,7 +192,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 
 				gl.glPushMatrix() ;
@@ -228,7 +228,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					return ;
 				}
 
-				final MalletFont font = _settings.getObject( "FONT", MalletFont.class, null ) ;
+				final MalletFont font = _settings.getObject( "FONT", null ) ;
 				if( font == null )
 				{
 					System.out.println( "No Font, set." ) ;
@@ -253,7 +253,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
-				String[] words = _settings.getObject( "WORDS", String[].class, null ) ;
+				String[] words = _settings.getObject( "WORDS", null ) ;
 				if( words == null )
 				{
 					words = optimiseText( fm, text, _position, lineWidth ) ;
@@ -263,7 +263,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final int alignment = _settings.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
 				gl.glPushMatrix() ;
@@ -526,13 +526,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	protected void createTexture( final Settings _draw )
 	{
-		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		final int layer = _draw.getInteger( "LAYER", -1 ) ;
 
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
-			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;
 		}
@@ -544,13 +544,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	protected void createText( final Settings _draw )
 	{
-		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		final int layer = _draw.getInteger( "LAYER", -1 ) ;
 
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
-			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawText ;
 			insert( data ) ;
 		}
@@ -568,8 +568,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final Texture texture = ( Texture )textures.get( _draw.getString( "FILE", null ) ) ;
 		if( texture == null ) { return null ; }
 		
-		Vector2 fillDim = _draw.getObject( "FILL", Vector2.class, null ) ;
-		Vector2 dimension = _draw.getObject( "DIM", Vector2.class, null ) ;
+		Vector2 fillDim = _draw.getObject( "FILL", null ) ;
+		Vector2 dimension = _draw.getObject( "DIM", null ) ;
 		if( dimension == null )
 		{
 			dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;

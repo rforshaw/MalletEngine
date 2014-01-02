@@ -29,9 +29,9 @@ public class AnimMouseCreator extends Creator<Entity>
 
 		anim.addAnimation( "DEFAULT", AnimationFactory.createAnimation( _mouse.getString( "ANIM", null ),
 																		 entity.position,
-																		_mouse.getObject( "OFFSET", Vector2.class, null ),
-																		_mouse.getObject( "DIM", Vector2.class, null ),
-																		_mouse.getObject( "FILL", Vector2.class, null ), 
+																		_mouse.<Vector2>getObject( "OFFSET", null ),
+																		_mouse.<Vector2>getObject( "DIM", null ),
+																		_mouse.<Vector2>getObject( "FILL", null ), 
 																		 null,		// Clip View 
 																		 null,		// Clip Offset
 																		_mouse.getInteger( "LAYER", 100 ), anim ) ) ;

@@ -67,9 +67,9 @@ public class GlobalConfig
 		return config.getString( _name, _default ) ;
 	}
 
-	public static <T> T getObject( final String _name, final Class<T> _type, final T _default )
+	public static <T> T getObject( final String _name, final T _default )
 	{
-		return config.getObject( _name, _type, _default ) ;
+		return config.getObject( _name, _default ) ;
 	}
 
 	public static ArrayList<String> toArrayString()

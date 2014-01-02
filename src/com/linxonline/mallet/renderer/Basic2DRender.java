@@ -87,12 +87,12 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			case CameraRequestType.SET_CAMERA_POSITION :
 			{
-				renderInfo.setCameraPosition( camera.getObject( "POS", Vector3.class, null ) ) ;
+				renderInfo.setCameraPosition( camera.<Vector3>getObject( "POS", null ) ) ;
 				break ;
 			}
 			case CameraRequestType.UPDATE_CAMERA_POSITION :
 			{
-				renderInfo.addToCameraPosition( camera.getObject( "ACC", Vector3.class, null ) ) ;
+				renderInfo.addToCameraPosition( camera.<Vector3>getObject( "ACC", null ) ) ;
 				break ;
 			}
 		}

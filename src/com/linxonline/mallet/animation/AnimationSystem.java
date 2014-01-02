@@ -77,7 +77,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 		final String file = _anim.getString( "ANIM_FILE", null ) ;
 		if( file != null )
 		{
-			final Event event = _anim.getObject( "RENDER_EVENT", Event.class, null ) ;
+			final Event event = _anim.getObject( "RENDER_EVENT", null ) ;
 			final Animation anim = new Animation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
 			if( anim != null )
 			{
@@ -119,7 +119,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 	**/
 	protected void addCallbackToAnimation( final Animation _animation, final Settings _anim )
 	{
-		final SourceCallback callback = _anim.getObject( "CALLBACK", SourceCallback.class, null ) ;
+		final SourceCallback callback = _anim.getObject( "CALLBACK", null ) ;
 		if( callback != null )
 		{
 			_animation.addCallback( callback ) ;

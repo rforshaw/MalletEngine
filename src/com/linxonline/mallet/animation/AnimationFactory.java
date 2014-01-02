@@ -21,12 +21,20 @@ public class AnimationFactory
 		final Settings settings = new Settings() ;
 		settings.addInteger( "REQUEST_TYPE", AnimRequestType.CREATE_ANIMATION ) ;
 
-		if( _file != null ) { settings.addString( "ANIM_FILE", _file ) ; }
+		if( _file != null )
+		{
+			settings.addString( "ANIM_FILE", _file ) ;
+		}
+
 		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( null,
 																	 _pos, _offset,
 																	 _dim, _fill, 
 																	 _clip, _clipOffset, _layer ) ) ;
-		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
+
+		if( _callback != null )
+		{
+			settings.addObject( "CALLBACK", _callback ) ;
+		}
 
 		return new Event( "ANIMATION", settings ) ;
 	}

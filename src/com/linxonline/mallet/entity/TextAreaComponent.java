@@ -64,14 +64,14 @@ public class TextAreaComponent extends InputComponent
 	{
 		renderComponent = _component ;
 		renderComponent.getDrawAt( 0 ).addObject( "DRAWLINE", cursor ) ;
-		offset.y = _component.getDrawAt( 0 ).getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ).y ;
-		texture = _component.getDrawAt( 0 ).getObject( "TEXTURE", Texture.class, null ) ;
+		offset.y = _component.getDrawAt( 0 ).getObject( "OFFSET", DEFAULT_OFFSET ).y ;
+		texture = _component.getDrawAt( 0 ).getObject( "TEXTURE", null ) ;
 	}
 
 	public final void setTextComponent( final RenderComponent _component )
 	{
 		textComponent = _component ;
-		offset.x = _component.getDrawAt( 0 ).getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ).x ;
+		offset.x = _component.getDrawAt( 0 ).getObject( "OFFSET", DEFAULT_OFFSET ).x ;
 	}
 
 	@Override

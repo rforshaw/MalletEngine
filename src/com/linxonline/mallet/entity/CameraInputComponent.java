@@ -8,7 +8,8 @@ import com.linxonline.mallet.maths.* ;
 // using the WASD keys.											//
 /*==============================================================*/
 
-public class CameraInputComponent extends Component implements InputHandler
+public class CameraInputComponent extends Component
+										  implements InputHandler
 {
 	protected static final int speed = 400 ;
 	protected boolean forward = false ;
@@ -23,7 +24,7 @@ public class CameraInputComponent extends Component implements InputHandler
 	
 	@Override
 	public void setInputAdapterInterface( final InputAdapterInterface _adapter ) {}
-	
+
 	@Override
 	public void update( final float _dt )
 	{
@@ -51,15 +52,10 @@ public class CameraInputComponent extends Component implements InputHandler
 	
 	public void passInputEvent( final InputEvent _event )
 	{
-		final InputType type = _event.getInputType() ;
-		if( type == InputType.KEYBOARD_PRESSED )
+		switch( _event.getInputType() )
 		{
-			pressed( _event ) ;
-		}
-
-		if( ( type == InputType.KEYBOARD_RELEASED ) )
-		{
-			released( _event ) ;
+			case KEYBOARD_PRESSED  : pressed( _event ) ;  break ;
+			case KEYBOARD_RELEASED : released( _event ) ; break ;
 		}
 	}
 

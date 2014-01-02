@@ -86,7 +86,7 @@ public class G2DRenderer extends Basic2DRender
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
-				Texture temp = _settings.getObject( "TEXTURE", Texture.class, null ) ;
+				Texture temp = _settings.getObject( "TEXTURE", null ) ;
 				if( temp == null )
 				{
 					temp = loadTexture( _settings ) ;
@@ -100,17 +100,17 @@ public class G2DRenderer extends Basic2DRender
 					_position.y -= camera.y ;
 				}
 
-				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				transform.translate( _position.x + offset.x, _position.y + offset.y ) ;
 
 				final float rotation = _settings.getFloat( "ROTATE", 0 ) ;
 				transform.rotate( rotation, -offset.x, -offset.y ) ;
 
 				final G2DImage texture = ( G2DImage )temp.image ;
-				final Vector2 fill = _settings.getObject( "FILL", Vector2.class, null ) ;
+				final Vector2 fill = _settings.getObject( "FILL", null ) ;
 				if( fill != null )
 				{
-					TexturePaint texPaint = _settings.getObject( "TEXTUREPAINT", TexturePaint.class, null ) ;
+					TexturePaint texPaint = _settings.getObject( "TEXTUREPAINT", null ) ;
 					if( texPaint == null )
 					{
 						rect.setSize( texture.width, texture.height ) ;
@@ -131,7 +131,7 @@ public class G2DRenderer extends Basic2DRender
 				}
 
 				// Scale the texture to the request dimensions.
-				final Vector2 dim = _settings.getObject( "DIM", Vector2.class, null ) ;
+				final Vector2 dim = _settings.getObject( "DIM", null ) ;
 				if( dim != null )
 				{
 					final float texWidth = ( float )temp.getWidth() ;
@@ -159,7 +159,7 @@ public class G2DRenderer extends Basic2DRender
 				Graphics2DDraw.setClip( graphics, _settings, _position ) ;
 				Graphics2DDraw.setGraphicsColour( graphics, _settings ) ;
 
-				final MalletFont font = _settings.getObject( "FONT", MalletFont.class, null ) ;
+				final MalletFont font = _settings.getObject( "FONT", null ) ;
 				if( font != null )
 				{
 					if( font.font == null )
@@ -174,13 +174,13 @@ public class G2DRenderer extends Basic2DRender
 
 				_settings.addInteger( "TEXTWIDTH", textWidth ) ;
 
-				final Vector2 offset = _settings.getObject( "OFFSET", Vector2.class, DEFAULT_OFFSET ) ;
+				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final Vector2 position = new Vector2( _position.x + offset.x, _position.y + offset.y ) ;
 				final Vector2 currentPos = new Vector2( position.x, position.y ) ;
 
 				final int lineHeight = fontMetric.getHeight();
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )render.x ) + ( int )position.x ;
-				String[] words = _settings.getObject( "WORDS", String[].class, null ) ;
+				String[] words = _settings.getObject( "WORDS", null ) ;
 				if( words == null )
 				{
 					words = optimiseText( fontMetric, text, position, lineWidth ) ;
@@ -375,13 +375,13 @@ public class G2DRenderer extends Basic2DRender
 	@Override
 	protected void createTexture( final Settings _draw )
 	{
-		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		final int layer = _draw.getInteger( "LAYER", -1 ) ;
 
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
-			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;
 		}
@@ -390,13 +390,13 @@ public class G2DRenderer extends Basic2DRender
 	@Override
 	protected void createGeometry( final Settings _draw )
 	{
-		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		final int layer = _draw.getInteger( "LAYER", -1 ) ;
 
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
-			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawShape ;
 			insert( data ) ;
 		}
@@ -405,13 +405,13 @@ public class G2DRenderer extends Basic2DRender
 	@Override
 	protected void createText( final Settings _draw )
 	{
-		final Vector3 position = _draw.getObject( "POSITION", Vector3.class, null ) ;
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		final int layer = _draw.getInteger( "LAYER", -1 ) ;
 
 		if( position != null )
 		{
 			final RenderData data = new RenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
-			passIDToCallback( data.id, _draw.getObject( "CALLBACK", IDInterface.class, null ) ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawText ;
 			insert( data ) ;
 		}
