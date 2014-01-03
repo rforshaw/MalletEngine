@@ -12,6 +12,7 @@ public final class Event<T>
 
 	private int hashCode = 0 ;
 	private String eventType = null ;
+
 	private T variable = null ;
 
 	public Event()
@@ -55,8 +56,8 @@ public final class Event<T>
 	public final void setEvent( final String _eventType, final T _object )
 	{
 		eventType = _eventType ;
-		variable = _object ;
 		hashCode = eventType.hashCode() ;
+		variable = _object ;
 	}
 
 	public final String getEventType()
@@ -66,6 +67,6 @@ public final class Event<T>
 
 	public final T getVariable()
 	{
-		return ( T )variable ;
+		return variable ;
 	}
 }

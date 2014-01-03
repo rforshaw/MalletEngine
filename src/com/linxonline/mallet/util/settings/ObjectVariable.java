@@ -6,7 +6,6 @@ package com.linxonline.mallet.util.settings ;
 
 public final class ObjectVariable<T> extends VariableInterface
 {
-	public Class<T> clazz ;
 	public T value ;
 
 	public ObjectVariable()
@@ -14,18 +13,22 @@ public final class ObjectVariable<T> extends VariableInterface
 		type = VariableInterface.OBJECT_TYPE ;
 	}
 	
-	public ObjectVariable( final String _name, final T _value, final Class<T> _clazz )
+	public ObjectVariable( final String _name, final T _value )
 	{
 		type = VariableInterface.OBJECT_TYPE ;
 		name = _name ;
-		setObject( _value, _clazz ) ;
+		setObject( _value ) ;
 	}
 
-	public void setObject( final T _value, final Class<T> _clazz )
+	public void setObject( final T _value )
 	{
 		type = VariableInterface.OBJECT_TYPE ;
-		value = _value ;
-		clazz = _clazz ;
+		value = _value ;		// Even if _value is null set value to it.
+	}
+	
+	public T getObject()
+	{
+		return value ;
 	}
 	
 	public String toString()

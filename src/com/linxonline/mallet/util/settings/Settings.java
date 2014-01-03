@@ -80,21 +80,15 @@ public final class Settings
 
 	public final <T> void addObject( final String _name, final T _value )
 	{
-		Class<T> clazz = null ;
-		if( _value != null )
-		{
-			clazz = ( Class<T> )_value.getClass() ;
-		}
-
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
 			ObjectVariable var = ( ObjectVariable )inter ;
-			var.setObject( _value, clazz ) ;
+			var.setObject( _value ) ;
 			return ;
 		}
 
-		ObjectVariable<T> var = new ObjectVariable<T>( _name, _value, clazz ) ;
+		ObjectVariable<T> var = new ObjectVariable<T>( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -208,17 +202,17 @@ public final class Settings
 		throw exception ;
 	}
 
+	/**
+		WARNING: Will attempt to cast to requested type, this is NOT
+		type safe.
+	*/
 	public final <T> T getObject( final String _name, final T _default )
 	{
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
 			final ObjectVariable var = ( ObjectVariable )inter ;
-			final Class clazz = var.clazz ;
-			if( clazz != null )
-			{
-				return ( T )clazz.cast( var.value ) ;
-			}
+			return ( T )var.getObject() ;
 		}
 
 		return _default ;
