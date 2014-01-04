@@ -134,13 +134,14 @@ public class GLDefaultSystem implements SystemInterface
 
 	public boolean update()
 	{
+		renderer.updateState() ;
 		inputSystem.update() ;
 		eventSystem.update() ;
 		return true ; // Informs the Game System whether to continue updating or not.
 	}
 
-	public void draw()
+	public void draw( final float _dt )
 	{
-		renderer.draw() ;
+		renderer.draw( _dt ) ;
 	}
 }

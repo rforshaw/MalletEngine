@@ -48,7 +48,7 @@ public class GLEditorSystem extends GLDefaultSystem
 		frame.pack() ;
 		frame.validate() ;
 		frame.setVisible( true ) ;
-		renderer.draw() ;
+		renderer.draw( 0.0f ) ;
 
 		renderer.getCanvas().addMouseListener( inputSystem ) ;
 		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;

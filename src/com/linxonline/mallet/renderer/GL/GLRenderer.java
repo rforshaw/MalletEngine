@@ -429,7 +429,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		frame.validate() ;
 		frame.setVisible( true ) ;
 
-		draw() ;
+		draw( 0.0f ) ;
 	}
 	
 	
@@ -475,7 +475,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void dispose( GLAutoDrawable _drawable ) {}
 
-	public void draw()
+	public void draw( final float _dt )
 	{
 		cameraPosition = renderInfo.getCameraPosition() ;
 		renderDimensions = renderInfo.getRenderDimensions() ;
@@ -487,6 +487,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return ;
 		}
 
+		accumulatedDeltaTime += _dt ;
 		updateEvents() ;
 		canvas.display() ;
 	}
@@ -512,14 +513,23 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected void render()
 	{
-		final int length = content.size() ;
-		RenderData data = null ;
-
-		for( int i = 0; i < length; ++i )
+		final int currentLength = currentState.size() ;
+		final int oldLength = oldState.size() ;
+		if( ( currentLength - oldLength ) != 0 )
 		{
-			data = content.get( i ) ;
-			pos.setXY( data.position.x, data.position.y ) ;
-			data.drawCall.draw( data.drawData, pos ) ;
+			return ;
+		}
+
+		RenderData current = null ;
+		RenderData old = null ;
+
+		for( int i = 0; i < currentLength; ++i )
+		{
+			current = currentState.getDataAt( i ) ;
+			old = oldState.getDataAt( i ) ;
+
+			CalculateInterpolatedPosition( accumulatedDeltaTime, old, current, pos ) ;
+			current.drawCall.draw( current.drawData, pos ) ;
 		}
 	}
 

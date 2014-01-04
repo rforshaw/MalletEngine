@@ -59,5 +59,5 @@ public interface SystemInterface
 	public SourceGenerator getSourceGenerator() ;
 
 	public boolean update() ;
-	public void draw() ;
+	public void draw( final float _dt ) ;
 }

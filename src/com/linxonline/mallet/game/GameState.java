@@ -29,7 +29,7 @@ public class GameState extends State implements HookEntity
 	public static final int GAME_MODE = 1 ;								// Update Logic & Render on a recurring basis
 	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input/events
 
-	protected float DEFAULT_TIMESTEP = 1.0f / 120.0f ;
+	protected float DEFAULT_TIMESTEP = 1.0f / 30.0f ;
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;
 
@@ -375,7 +375,6 @@ public class GameState extends State implements HookEntity
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
-					animationSystem.update( DEFAULT_TIMESTEP ) ;
 					audioSystem.update( DEFAULT_TIMESTEP ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
@@ -384,8 +383,9 @@ public class GameState extends State implements HookEntity
 				renderAccumulator += _dt ;
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
-					system.draw() ;
-					renderAccumulator = 0.0f ;
+					animationSystem.update( DEFAULT_FRAMERATE ) ;
+					system.draw( DEFAULT_FRAMERATE ) ;
+					renderAccumulator -= DEFAULT_FRAMERATE ;
 				}
 			}
 		} ;
@@ -426,7 +426,7 @@ public class GameState extends State implements HookEntity
 					entitySystem.update( dt ) ;
 					updateAccumulator = 0.0f ;
 
-					system.draw() ;
+					system.draw( 0.0f ) ;
 					draw = false ;
 				}
 			}

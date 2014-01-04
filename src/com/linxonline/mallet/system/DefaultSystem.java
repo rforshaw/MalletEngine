@@ -134,13 +134,14 @@ public class DefaultSystem implements SystemInterface
 
 	public boolean update()
 	{
+		renderer.updateState() ;
 		inputSystem.update() ;
 		eventSystem.update() ;
 		return true ;
 	}
 
-	public void draw()
+	public void draw( final float _dt )
 	{
-		renderer.draw() ;
+		renderer.draw( _dt ) ;
 	}
 }

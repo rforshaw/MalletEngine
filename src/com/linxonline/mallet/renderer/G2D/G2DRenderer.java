@@ -314,7 +314,7 @@ public class G2DRenderer extends Basic2DRender
 	/**Render Content**/
 
 	@Override
-	public void draw()
+	public void draw( final float _dt )
 	{
 		camera = renderInfo.getCameraPosition() ;
 		if( camera == null )
@@ -323,6 +323,7 @@ public class G2DRenderer extends Basic2DRender
 			return ;
 		}
 
+		accumulatedDeltaTime += _dt ;
 		graphics = ( Graphics2D )buffer.getDrawGraphics() ;
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON ) ;
 		graphics.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR ) ;
@@ -359,12 +360,12 @@ public class G2DRenderer extends Basic2DRender
 
 	protected void render()
 	{
-		final int length = content.size() ;
+		final int length = currentState.size() ;
 		RenderData data = null ;
 
 		for( int i = 0; i < length; ++i )
 		{
-			data = content.get( i ) ;
+			data = currentState.getDataAt( i ) ;
 			pos.setXY( data.position.x, data.position.y ) ;
 			data.drawCall.draw( data.drawData, pos ) ;
 		}
