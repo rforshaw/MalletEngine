@@ -360,12 +360,12 @@ public class G2DRenderer extends Basic2DRender
 
 	protected void render()
 	{
-		final int length = currentState.size() ;
+		final int length = state.size() ;
 		RenderData data = null ;
 
 		for( int i = 0; i < length; ++i )
 		{
-			data = currentState.getDataAt( i ) ;
+			data = state.getDataAt( i ) ;
 			pos.setXY( data.position.x, data.position.y ) ;
 			data.drawCall.draw( data.drawData, pos ) ;
 		}

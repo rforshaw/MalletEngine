@@ -30,8 +30,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
 
 	protected float accumulatedDeltaTime = 0.0f ;
-	protected final RenderState oldState = new RenderState() ;
-	protected final RenderState currentState = new RenderState() ;
+	protected float maxAccDeltaTime = 0.0f ;
+
+	protected final RenderState state = new RenderState() ;
 
 	private final EventMessenger messenger = new EventMessenger() ;
 	public  final RenderInfo renderInfo = new RenderInfo( new Vector2( 800, 600 ),
@@ -70,7 +71,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	{
 		// Make a copy of the currentState for interpolation
 		// between frames.
-		oldState.copy( currentState ) ;
+		state.retireCurrentState() ;
 		accumulatedDeltaTime = 0.0f ;
 	}
 
@@ -161,7 +162,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected void removeDraw( final Settings _draw )
 	{
 		final Integer id = _draw.getInteger( "ID", -1 ) ;
-		currentState.remove( id ) ;
+		state.remove( id ) ;
 	}
 
 	protected abstract void createTexture( final Settings _draw ) ;
@@ -178,7 +179,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void insert( final RenderData _data )
 	{
-		currentState.insert( _data.id, _data ) ;
+		state.insert( _data.id, _data ) ;
 	}
 
 	@Override
@@ -192,22 +193,21 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	public void sort() 
 	{
-		currentState.sort() ;
+		state.sort() ;
 	}
 
 	public void clear()
 	{
-		currentState.clear() ;
+		state.clear() ;
 	}
 
-	protected void CalculateInterpolatedPosition( final float _dt, RenderData _old, RenderData _current, Vector2 _position )
+	protected void CalculateInterpolatedPosition( final float _dt, Vector3 _old, Vector3 _current, Vector2 _position )
 	{
-		final Vector3 oldPos = _old.position ;
-		final Vector3 currentPos = _current.position ;
+		final float diff = 1.0f / maxAccDeltaTime ;
+		final float acc = _dt * diff ;
 
-		_position.setXY( currentPos.x - oldPos.x, currentPos.y - oldPos.y ) ;
-		_position.multiply( _dt ) ;
-		_position.setXY( oldPos.x + _position.x, oldPos.y + _position.y ) ;
+		_position.x = _old.x + ( ( _current.x - _old.x ) * acc ) ;
+		_position.y = _old.y + ( ( _current.y - _old.y ) * acc ) ;
 	}
 
 	protected class RenderData implements SortInterface
@@ -259,6 +259,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected class RenderState implements RenderStateInterface<Integer, RenderData>
 	{
+		protected ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;
 		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;
 		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;
 	
@@ -293,19 +294,17 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			}
 		}
 
-		public void copy( RenderStateInterface<Integer, RenderData> _state ) {}
-
-		public void copy( RenderState _state )
+		public void retireCurrentState()
 		{
-			int currentSize = _state.size() ;
-			int oldSize = size() ;
+			int currentSize = content.size() ;
+			int oldSize = oldState.size() ;
 
 			if( oldSize < currentSize )
 			{
 				int toAdd = currentSize - oldSize ;
 				for( int i = 0; i < toAdd; ++i )
 				{
-					add( null, new RenderData() ) ;
+					oldState.add( new Vector3() ) ;
 				}
 			}
 			else if( oldSize > currentSize )
@@ -315,16 +314,34 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			
 			for( int i = 0; i < currentSize; ++i )
 			{
-				getDataAt( i ).copy( _state.getDataAt( i ) ) ;
+				oldState.get( i ).setXYZ( getDataAt( i ).position ) ;
 			}
 		}
 
 		public void clear()
 		{
+			oldState.clear() ;
 			content.clear() ;
 			hashedContent.clear() ;
 		}
 
+		public boolean isAvailable()
+		{
+			return oldState.size() == content.size() ;
+		}
+
+		public void calculatePosition( final float _dt, int _index, Vector2 _position )
+		{
+			final float diff = 1.0f / maxAccDeltaTime ;
+			final float acc = _dt * diff ;
+
+			final Vector3 old = oldState.get( _index ) ;
+			final Vector3 current = content.get( _index ).position ;
+			
+			_position.x = old.x + ( ( current.x - old.x ) * acc ) ;
+			_position.y = old.y + ( ( current.y - old.y ) * acc ) ;
+		}
+		
 		public void sort()
 		{
 			content = QuickSort.quicksort( content ) ;

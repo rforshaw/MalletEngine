@@ -7,7 +7,7 @@ public interface RenderStateInterface<T, V>		// T = ID, V = data
 
 	public void remove( T _id ) ;
 
-	public void copy( RenderStateInterface<T, V> _state ) ;
+	public void retireCurrentState() ;
 	public void clear() ;
 
 	public void sort() ;

@@ -37,7 +37,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	private final DefaultTimer timer = new DefaultTimer() ;
 	private Vector2 pos = new Vector2() ;
+
+	private Vector3 oldCameraPosition = new Vector3() ;
 	private Vector3 cameraPosition = null ;
+
 	private Vector2 renderDimensions = null ;
 	private Vector2 displayDimensions = null ;
 
@@ -59,7 +62,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
-		renderInfo.setKeepRenderRatio( false ) ;
+		//renderInfo.setKeepRenderRatio( false ) ;
 	}
 
 	@Override
@@ -440,7 +443,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected void resize()
 	{
 		renderDimensions = renderInfo.getRenderDimensions() ;
-		displayDimensions = renderInfo.getDisplayDimensions() ;
+		displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
 		gl.glMatrixMode( GL2.GL_PROJECTION );
 		gl.glLoadIdentity();
@@ -448,7 +451,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		// coordinate system origin at lower left with width and height same as the window
 		if( viewMode == ORTHOGRAPHIC_MODE )
 		{
-			
 			glu.gluOrtho2D( 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
 		}
 		else
@@ -462,7 +464,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glMatrixMode( GL2.GL_MODELVIEW ) ;
 		gl.glLoadIdentity() ;
 
-		gl.glViewport( 0, 0, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
+		gl.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 	}
 
 	@Override
@@ -475,11 +478,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void dispose( GLAutoDrawable _drawable ) {}
 
+	@Override
+	public void updateState()
+	{
+		super.updateState() ;
+		oldCameraPosition.setXYZ( cameraPosition ) ;
+	}
+	
 	public void draw( final float _dt )
 	{
 		cameraPosition = renderInfo.getCameraPosition() ;
-		renderDimensions = renderInfo.getRenderDimensions() ;
-		displayDimensions = renderInfo.getDisplayDimensions() ;
+		//renderDimensions = renderInfo.getRenderDimensions() ;
+		//displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
 		if( cameraPosition == null )
 		{
@@ -488,6 +498,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		accumulatedDeltaTime += _dt ;
+		if( accumulatedDeltaTime >= maxAccDeltaTime )
+		{
+			maxAccDeltaTime = accumulatedDeltaTime ;
+		}
+
 		updateEvents() ;
 		canvas.display() ;
 	}
@@ -502,8 +517,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glLoadIdentity() ;
 
+		CalculateInterpolatedPosition( accumulatedDeltaTime, oldCameraPosition, cameraPosition, pos ) ;
+
 		gl.glPushMatrix() ;
-			gl.glTranslatef( cameraPosition.x, cameraPosition.y, cameraPosition.z ) ;
+			gl.glTranslatef( pos.x, pos.y, 0.0f ) ;
 			render() ;
 		gl.glPopMatrix() ;
 
@@ -513,22 +530,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected void render()
 	{
-		final int currentLength = currentState.size() ;
-		final int oldLength = oldState.size() ;
-		if( ( currentLength - oldLength ) != 0 )
+		if( state.isAvailable() == false )
 		{
 			return ;
 		}
 
+		final int currentLength = state.size() ;
 		RenderData current = null ;
-		RenderData old = null ;
 
 		for( int i = 0; i < currentLength; ++i )
 		{
-			current = currentState.getDataAt( i ) ;
-			old = oldState.getDataAt( i ) ;
-
-			CalculateInterpolatedPosition( accumulatedDeltaTime, old, current, pos ) ;
+			current = state.getDataAt( i ) ;
+			state.calculatePosition( accumulatedDeltaTime, i, pos ) ;
 			current.drawCall.draw( current.drawData, pos ) ;
 		}
 	}

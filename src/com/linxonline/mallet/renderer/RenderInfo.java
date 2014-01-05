@@ -47,7 +47,7 @@ public final class RenderInfo implements InputAdapterInterface
 		else
 		{
 			// Don't care about holding the renderDimensions natural aspect-ratio
-			// just fill the display
+			// just fill the display, will cause stretching
 			scaleRtoD.x = ratioRtoD.x ;
 			scaleRtoD.y = ratioRtoD.y ;
 		}
