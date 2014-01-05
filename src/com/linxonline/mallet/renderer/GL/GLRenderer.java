@@ -482,9 +482,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public void draw( final float _dt )
 	{
 		cameraPosition = renderInfo.getCameraPosition() ;
-		//renderDimensions = renderInfo.getRenderDimensions() ;
-		//displayDimensions = renderInfo.getScaledRenderDimensions() ;
-
 		if( cameraPosition == null )
 		{
 			System.out.println( "Camera Not Set" ) ;
