@@ -62,12 +62,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
-		//renderInfo.setKeepRenderRatio( false ) ;
 	}
 
 	@Override
 	public void shutdown() {}
-	
+
 	private void initGraphics()
 	{
 		GLProfile glProfile = GLProfile.getDefault() ;
@@ -434,12 +433,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		draw( 0.0f ) ;
 	}
-	
-	
-	/**
-		OpenGl handles the scaling between the displayDimensions and renderDimensions.
-		renderInfo.setKeepRenderRatio must be false to ensure correct mouse positions.
-	*/
+
 	protected void resize()
 	{
 		renderDimensions = renderInfo.getRenderDimensions() ;
