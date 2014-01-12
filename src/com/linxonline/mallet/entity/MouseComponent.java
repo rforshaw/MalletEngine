@@ -14,6 +14,7 @@ public class MouseComponent extends Component
 {
 	protected InputAdapterInterface inputAdapter = null ;
 	protected final Vector2 mouse = new Vector2() ;
+	protected boolean mouseMoved    = false ;
 	protected boolean mouse1Pressed = false ;
 	protected boolean mouse2Pressed = false ;
 	protected boolean mouse3Pressed = false ;
@@ -43,8 +44,9 @@ public class MouseComponent extends Component
 
 		switch( eventType )
 		{
-			case MOUSE_MOVED     :
-			case TOUCH_MOVE      : updateMousePosition( _event ) ; break ;
+			case MOUSE_MOVED     : 
+			case TOUCH_MOVE      : mouseMoved = true ;
+								   updateMousePosition( _event ) ; break ;
 			case MOUSE1_PRESSED  : mouse1Pressed = true ;          break ;
 			case MOUSE1_RELEASED : mouse1Pressed = false ;         break ;
 			case MOUSE2_PRESSED  : mouse2Pressed = true ;          break ;

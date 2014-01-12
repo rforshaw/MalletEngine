@@ -31,4 +31,20 @@ public class CameraFactory
 		settings.addObject( "ACC", _acc ) ;
 		return new Event( CAMERA, settings ) ;
 	}
+
+	public static Event setCameraScaleEvent( final Vector3 _scale )
+	{
+		final Settings settings = new Settings() ;
+		settings.addInteger( REQUEST_TYPE, CameraRequestType.SET_CAMERA_SCALE ) ;
+		settings.addObject( "SCALE", _scale ) ;
+		return new Event( CAMERA, settings ) ;
+	}
+
+	public static Event updateCameraScaleEvent( final Vector3 _scale )
+	{
+		final Settings settings = new Settings() ;
+		settings.addInteger( REQUEST_TYPE, CameraRequestType.UPDATE_CAMERA_SCALE ) ;
+		settings.addObject( "SCALE", _scale ) ;
+		return new Event( CAMERA, settings ) ;
+	}
 }

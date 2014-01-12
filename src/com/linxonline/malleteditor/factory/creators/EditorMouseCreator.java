@@ -27,10 +27,8 @@ public class EditorMouseCreator extends Creator<Entity>
 		entity.position = new Vector3( width, height, 0 ) ;
 
 		final EventComponent event = new EventComponent() ;
-		final EditorMouseComponent mouse = new EditorMouseComponent() ;
-
 		final RenderComponent render = new RenderComponent() ;
-		render.add( CameraFactory.setCameraPositionEvent( mouse.eMouse ) ) ;
+		final EditorMouseComponent mouse = new EditorMouseComponent( render ) ;
 
 		entity.addComponent( mouse ) ;
 		entity.addComponent( event ) ;

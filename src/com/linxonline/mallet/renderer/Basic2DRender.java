@@ -32,6 +32,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected float accumulatedDeltaTime = 0.0f ;
 	protected float maxAccDeltaTime = 0.0f ;
 
+	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
 	protected final RenderState state = new RenderState() ;
 
 	private final EventMessenger messenger = new EventMessenger() ;
@@ -62,7 +63,6 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	@Override
 	public void setCameraPosition( final Vector3 _position )
 	{
-		System.out.println( "SETTING CAMERA POSITION: " + _position ) ;
 		renderInfo.setCameraPosition( _position ) ;
 	}
 
@@ -106,9 +106,19 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 				renderInfo.addToCameraPosition( camera.<Vector3>getObject( "ACC", null ) ) ;
 				break ;
 			}
+			case CameraRequestType.SET_CAMERA_SCALE :
+			{
+				cameraScale.setXYZ( camera.<Vector3>getObject( "SCALE", null ) ) ;
+				break ;
+			}
+			case CameraRequestType.UPDATE_CAMERA_SCALE :
+			{
+				cameraScale.add( camera.<Vector3>getObject( "SCALE", null ) ) ;
+				break ;
+			}
 		}
 	}
-	
+
 	protected void useEventInDraw( final Event _event )
 	{
 		final Settings draw = ( Settings )_event.getVariable() ;

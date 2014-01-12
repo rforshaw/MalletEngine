@@ -236,8 +236,8 @@ public class InputSystem implements InputSystemInterface,
 			keycode = isSpecialKeyDown( _event ) ;
 		}
 
-		System.out.println( keycode ) ;
-		
+		//System.out.println( keycode ) ;
+
 		if( keyboardState.containsKey( keycode ) == true )
 		{
 			changeKey( _inputType, keycode, _event ) ;

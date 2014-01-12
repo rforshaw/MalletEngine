@@ -512,6 +512,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glPushMatrix() ;
 			gl.glTranslatef( pos.x, pos.y, 0.0f ) ;
+			gl.glScalef( cameraScale.x, cameraScale.y, cameraScale.z ) ;
 			render() ;
 		gl.glPopMatrix() ;
 
