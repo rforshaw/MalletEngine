@@ -29,8 +29,8 @@ public class GameState extends State implements HookEntity
 	public static final int GAME_MODE = 1 ;								// Update Logic & Render on a recurring basis
 	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input/events
 
-	protected float DEFAULT_TIMESTEP = 1.0f / 20.0f ;
-	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;
+	protected float DEFAULT_TIMESTEP = 1.0f / 20.0f ;					// 20Hz
+	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;
 
 	protected final HashMap<Integer, UpdateInterface> updateModes = new HashMap<Integer, UpdateInterface>() ;
@@ -72,15 +72,14 @@ public class GameState extends State implements HookEntity
 	public void startState( final Settings _package )
 	{
 		hookHandlerSystems() ;
-		if( paused == false )
-		{
-			initGame() ;
-		}
-		else if( paused == true )
+		if( paused == true )
 		{
 			paused = false ;
-			reconnectEntities() ;
 			resumeGame() ;
+		}
+		else
+		{
+			initGame() ;
 		}
 	}
 
@@ -88,7 +87,7 @@ public class GameState extends State implements HookEntity
 	public Settings shutdownState()
 	{
 		unhookHandlerSystems() ;		// Prevent system from recieving external events
-		clear() ;					// Remove all content
+		clear() ;						// Remove all content
 		return null ;
 	}
 
@@ -326,23 +325,9 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( audioSystem ) ;
 		eventSystem.removeEventHandler( animationSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
-		eventSystem.removeHandlersNow() ;
 
 		system.removeEventHandler( eventController ) ;
 		system.removeInputHandler( inputSystem ) ;
-	}
-
-	/**
-		Reconnect entities to state systems.
-		Called at startState if the state was previously paused.
-	*/
-	protected void reconnectEntities()
-	{
-		final ArrayList<Entity> entities = entitySystem.getEntities() ;
-		for( final Entity entity : entities )
-		{
-			hookEntity( entity ) ;
-		}
 	}
 
 	/**
@@ -437,7 +422,6 @@ public class GameState extends State implements HookEntity
 
 	/**
 		Guarantees that all systems the state uses will be blank.
-		
 	*/
 	protected void clear()
 	{
