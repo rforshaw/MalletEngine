@@ -38,10 +38,10 @@ public class GameState extends State implements HookEntity
 
 	protected final InputState inputSystem = new InputState() ;										// Internal Input System
 	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;		// Internal Event System
-	protected final EventController eventController = new EventController() ;						// Used to process Events
+	protected final EventController eventController = new EventController() ;						// Used to process Events, gateway between internal eventSystem and root event-system
 
-	protected SystemInterface system = null ;										// Provides access to Root systems
-	protected final AudioSystem audioSystem = new AudioSystem() ;					// Must specify a SourceGenerator
+	protected SystemInterface system = null ;														// Provides access to Root systems
+	protected final AudioSystem audioSystem = new AudioSystem() ;									// Must specify a SourceGenerator
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
