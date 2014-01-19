@@ -8,6 +8,7 @@ import java.io.File ;
 
 import javax.media.opengl.awt.GLCanvas ;
 
+import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.Event ;
 
@@ -15,11 +16,14 @@ import com.linxonline.malleteditor.system.EditorState ;
 
 public class MainPanel extends JPanel
 {
-	private final static String[] EVENT_TYPES = { "NONE" } ; 
+	public final static String[] EVENT_TYPES = { "ADD_ENTITY_TO_LIST" } ; 
+
 	private EventController eventController ;
 	private final JMenuBar menubar = new JMenuBar() ;
 	private final JLabel infoLabel = new JLabel( "Info: " );
-	private JList entityList ;
+
+	private JList entityList = null ;
+	private final DefaultListModel<EntityCell> defaultList = new DefaultListModel<EntityCell>() ;
 
 	public MainPanel( final GLCanvas _canvas )
 	{
@@ -32,20 +36,17 @@ public class MainPanel extends JPanel
 		entityListPanel.add( entityList, BorderLayout.CENTER ) ;
 
 		setLayout( new BorderLayout( 1, 0 ) ) ;
+		add( _canvas, BorderLayout.CENTER ) ;
 		add( menubar,    BorderLayout.NORTH ) ;
 		add( entityListPanel, BorderLayout.WEST  ) ;
 		add( infoLabel,  BorderLayout.SOUTH ) ;
-		add( _canvas, BorderLayout.CENTER ) ;
 	}
 
 	protected void initSideList()
 	{
-		final DefaultListModel<EntityCell> defaultList = new DefaultListModel<EntityCell>() ;
-		defaultList.addElement( new EntityCell() ) ;
-
 		entityList = new JList( defaultList ) ;
 		entityList.setFixedCellWidth( 150 ) ;
-
+		
 		final JPopupMenu entityMenu = new JPopupMenu() ;
 		final JMenuItem addEntity = entityMenu.add( new JMenuItem( "Create Entity" ) ) ;
 		addEntity.addActionListener( new ActionListener()
@@ -56,12 +57,34 @@ public class MainPanel extends JPanel
 			}
 		} ) ;
 
+		final JMenuItem editEntity = entityMenu.add( new JMenuItem( "Edit Entity" ) ) ;
+		editEntity.addActionListener( new ActionListener()
+		{
+			public void actionPerformed( ActionEvent _event )
+			{
+				final EntityCell cell = defaultList.get( entityList.getSelectedIndex() ) ;
+				if( cell != null )
+				{
+					final Entity entity = cell.getEntity() ;
+					System.out.println( "Edit Entity: " + entity.getName() ) ;
+				}
+			}
+		} ) ;
+		
 		final JMenuItem removeEntity = entityMenu.add( new JMenuItem( "Remove Entity" ) ) ;
 		removeEntity.addActionListener( new ActionListener()
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Remove Entity" ) ;
+				final int index = entityList.getSelectedIndex() ;
+				final EntityCell cell = defaultList.get( index ) ;
+				if( cell != null )
+				{
+					final Entity entity = cell.getEntity() ;
+					System.out.println( "Remove Entity: " + entity.getName() ) ;
+					eventController.passEvent( new Event( EditorState.EVENT_TYPES[4], entity ) ) ;
+					defaultList.remove( index ) ;
+				}
 			}
 		} ) ;
 
@@ -70,7 +93,12 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Copy Entity" ) ;
+				final EntityCell cell = defaultList.get( entityList.getSelectedIndex() ) ;
+				if( cell != null )
+				{
+					final Entity entity = cell.getEntity() ;
+					System.out.println( "Copy Entity: " + entity.getName() ) ;
+				}
 			}
 		} ) ;
 
@@ -79,11 +107,31 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				System.out.println( "Paste Entity" ) ;
+				final EntityCell cell = defaultList.get( entityList.getSelectedIndex() ) ;
+				if( cell != null )
+				{
+					final Entity entity = cell.getEntity() ;
+					System.out.println( "Paste Entity: " + entity.getName() ) ;
+				}
 			}
 		} ) ;
 
-		entityList.setComponentPopupMenu( entityMenu ) ;
+		// Open Popup Menu on the closest cell in the list
+		entityList.addMouseListener( new MouseAdapter()
+		{
+			public void mouseClicked( MouseEvent _event )
+			{
+				if( SwingUtilities.isRightMouseButton( _event ) == true )
+				{
+					int index = entityList.locationToIndex( _event.getPoint() ) ;
+					entityList.setSelectedIndex( index ) ;
+					if( entityList.isSelectionEmpty() == false )
+					{
+						entityMenu.show( entityList, _event.getX(), _event.getY() ) ;
+					}
+				}
+			}
+		} ) ;
 	}
 
 	protected void initMenuBar()
@@ -147,7 +195,11 @@ public class MainPanel extends JPanel
 			@Override
 			public void processEvent( final Event _event )
 			{
-				System.out.println( "Recieved Event..." ) ;
+				if( _event.isEventByString( EVENT_TYPES[0] ) == true )
+				{
+					final Entity entity = ( Entity )_event.getVariable() ;
+					defaultList.addElement( new EntityCell( entity ) ) ;
+				}
 			}
 		} ;
 		eventController.setWantedEventTypes( EVENT_TYPES ) ;

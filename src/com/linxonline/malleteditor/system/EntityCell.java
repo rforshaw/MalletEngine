@@ -1,11 +1,23 @@
 package com.linxonline.malleteditor.system ;
 
+import com.linxonline.mallet.entity.Entity ;
+
 public class EntityCell
 {
-	public EntityCell() {}
+	private final Entity entity ;
+
+	public EntityCell( final Entity _entity )
+	{
+		entity = _entity ;
+	}
+
+	public Entity getEntity()
+	{
+		return entity ;
+	}
 
 	public String toString()
 	{
-		return "TEST test TEST" ;
+		return entity.getName() ;
 	}
 }

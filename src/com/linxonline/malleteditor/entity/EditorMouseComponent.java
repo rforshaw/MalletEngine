@@ -45,7 +45,8 @@ public class EditorMouseComponent extends MouseComponent
 		mouseDiff.x = -( mouse.x - oldMouse.x ) ;
 		mouseDiff.y = -( mouse.y - oldMouse.y ) ;
 
-		if( mouse1Pressed == true && mouseMoved == true && moveCamera == true )
+		if( ( mouse1Pressed == true && mouseMoved == true && moveCamera == true ) ||	// CTRL and Mouse 1 to move Camera
+			( mouse2Pressed == true ) )													// Mouse 2 (Scroll button) to move Camera
 		{
 			render.passEvent( cameraMoveEvent ) ;
 		}

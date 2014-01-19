@@ -311,6 +311,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 			if( oldSize < currentSize )
 			{
+				// Add new vector states for interpolation
 				int toAdd = currentSize - oldSize ;
 				for( int i = 0; i < toAdd; ++i )
 				{
@@ -319,7 +320,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			}
 			else if( oldSize > currentSize )
 			{
-				// Remove some RenderData's
+				// Remove vector states
+				int toRemove = oldSize - currentSize ;
+				oldState.subList( 0, toRemove ).clear() ;
 			}
 			
 			for( int i = 0; i < currentSize; ++i )

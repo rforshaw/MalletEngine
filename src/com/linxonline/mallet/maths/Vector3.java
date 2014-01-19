@@ -155,6 +155,9 @@ public class Vector3
 							( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ) ;
 	}
 	
+	/**
+		Calculate the distance between _vec1 and _vec2
+	*/
 	public static final float distance( final Vector3 _vec1, final Vector3 _vec2 )
 	{
 		float tmp1 = ( _vec2.x - _vec1.x ) ;

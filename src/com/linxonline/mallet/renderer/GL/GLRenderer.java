@@ -502,12 +502,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public void display( GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL2() ;
-
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		gl.glLoadIdentity() ;
 
+		// Calculate the current Camera Position based on oldCameraPosition and future cameraPosition
 		CalculateInterpolatedPosition( accumulatedDeltaTime, oldCameraPosition, cameraPosition, pos ) ;
 
 		gl.glPushMatrix() ;
@@ -516,7 +516,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			render() ;
 		gl.glPopMatrix() ;
 
-		gl.glFlush() ;
+		//gl.glFlush() ;
 		canvas.swapBuffers() ;
 	}
 
