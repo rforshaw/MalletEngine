@@ -71,13 +71,23 @@ public class EditorState extends GameState
 				{
 					System.out.println( "Save File Request" ) ;
 				}
-				else if( _event.isEventByString( EVENT_TYPES[3] ) == true )
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "ENTITY" )
+		{
+			@Override
+			public void processEvent( final Event _event )
+			{
+				if( _event.isEventByString( EVENT_TYPES[3] ) == true )
 				{
-					System.out.println( "Add Entity" ) ;
+					// Add Entity to Game State
+					final Entity entity = ( Entity )_event.getVariable() ;
+					addEntity( entity ) ;
 				}
 				else if( _event.isEventByString( EVENT_TYPES[4] ) == true )
 				{
-					System.out.println( "Remove Entity" ) ;
+					// Remove Entity to Game State
 					final Entity entity = ( Entity )_event.getVariable() ;
 					removeEntity( entity ) ;
 				}

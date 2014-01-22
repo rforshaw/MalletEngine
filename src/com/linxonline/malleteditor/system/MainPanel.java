@@ -16,7 +16,7 @@ import com.linxonline.malleteditor.system.EditorState ;
 
 public class MainPanel extends JPanel
 {
-	public final static String[] EVENT_TYPES = { "ADD_ENTITY_TO_LIST" } ; 
+	public final static String[] EVENT_TYPES = { "ADD_ENTITY_TO_LIST", "REMOVE_ENTITY_TO_LIST" } ; 
 
 	private EventController eventController ;
 	private final JMenuBar menubar = new JMenuBar() ;
@@ -81,7 +81,6 @@ public class MainPanel extends JPanel
 				if( cell != null )
 				{
 					final Entity entity = cell.getEntity() ;
-					System.out.println( "Remove Entity: " + entity.getName() ) ;
 					eventController.passEvent( new Event( EditorState.EVENT_TYPES[4], entity ) ) ;
 					defaultList.remove( index ) ;
 				}
@@ -197,8 +196,24 @@ public class MainPanel extends JPanel
 			{
 				if( _event.isEventByString( EVENT_TYPES[0] ) == true )
 				{
+					// Add Entity to List
 					final Entity entity = ( Entity )_event.getVariable() ;
 					defaultList.addElement( new EntityCell( entity ) ) ;
+				}
+				else if( _event.isEventByString( EVENT_TYPES[1] ) == true )
+				{
+					// Remove Entity from List
+					final Entity entity = ( Entity )_event.getVariable() ;
+					final int size = defaultList.size() ;
+					for( int i = 0; i < size; ++i )
+					{
+						final EntityCell cell = defaultList.getElementAt( i ) ;
+						if( entity == cell.getEntity() )
+						{
+							defaultList.remove( i ) ;
+							return ;
+						}
+					}
 				}
 			}
 		} ;

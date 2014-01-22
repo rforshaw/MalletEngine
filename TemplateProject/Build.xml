@@ -1,0 +1,39 @@
+<project name="PROJECT_NAME" basedir="." default="clean-build">
+	<!-- JAR File names -->
+	<property name="NAME"	value="TEMPLATE_NAME"/>
+
+	<!-- Source location -->
+	<property name="src.dir"		value="src"/>
+
+	<!-- Library location -->
+	<property name="lib.dir"		value="lib"/>
+
+	<!-- Compiler locations -->
+	<property name="build.dir"		value="build"/>
+	<property name="classes.dir"	value="${build.dir}/classes"/>
+	<property name="jar.dir"		value="${build.dir}/jar"/>
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${classes.dir}"/>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="${classes.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="true"/>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="${jar.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+	
+		<jar destfile="${jar.dir}/${NAME}.jar" 
+			 basedir="${classes.dir}"/> 
+	</target>
+
+	<target name="clean-build" depends="clean,jar"/>
+	<target name="main" depends="clean,jar"/>
+</project>

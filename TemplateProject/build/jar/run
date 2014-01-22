@@ -1,0 +1,20 @@
+#! /bin/bash
+
+CLASSPATH=jar/gluegen-rt.jar:jar/jogl.all.jar
+
+# Find Jars in root directory
+for i in `ls ./*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+# Find Jars in Jar folder - JOGL, etc..
+for i in `ls ./jar/*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+X_ARGS="-Dsun.java2d.noddraw=true -Dsun.java2d.opengl=true"
+
+java -classpath $CLASSPATH $X_ARGS com.linxonline.mallet.main.Main $@
+#java -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n -classpath $CLASSPATH $X_ARGS com.linxonline.mallet.main.Main $@
