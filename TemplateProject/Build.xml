@@ -1,6 +1,6 @@
 <project name="PROJECT_NAME" basedir="." default="clean-build">
 	<!-- JAR File names -->
-	<property name="NAME"	value="TEMPLATE_NAME"/>
+	<property name="GAME_NAME"	value="TemplateProject"/>
 
 	<!-- Source location -->
 	<property name="src.dir"		value="src"/>
@@ -30,7 +30,7 @@
 		<mkdir dir="${jar.dir}"/>
 		<mkdir dir="${classes.dir}"/>
 	
-		<jar destfile="${jar.dir}/${NAME}.jar" 
+		<jar destfile="${jar.dir}/${GAME_NAME}.jar" 
 			 basedir="${classes.dir}"/> 
 	</target>
 
