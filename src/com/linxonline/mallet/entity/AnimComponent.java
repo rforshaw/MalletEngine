@@ -2,13 +2,14 @@ package com.linxonline.mallet.entity ;
 
 import java.util.HashMap ;
 
-import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.animation.AnimationFactory ;
+import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.event.Event ;
 
 public class AnimComponent extends EventComponent implements SourceCallback
 {
-	private final HashMap<String, Event> animations = new HashMap<String, Event>() ;
+	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
 	private String defaultAnim = null ;
 	private int animationID = -1 ;
 
@@ -17,7 +18,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		super( "ANIM" ) ;
 	}
 
-	public void addAnimation( final String _name, final Event _anim )
+	public void addAnimation( final String _name, final Event<Settings> _anim )
 	{
 		animations.put( _name, _anim ) ;
 	}
@@ -25,6 +26,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	public void removeAnimation( final String _name )
 	{
 		animations.remove( _name ) ;
+	}
+
+	public Event<Settings> getAnimation( final String _name )
+	{
+		return animations.get( _name ) ;
 	}
 
 	public void setDefaultAnim( final String _name )
@@ -38,7 +44,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	public void playAnimation( final String _name )
 	{
 		stopAnimation() ; 								// Stop the previous animation
-		final Event event = animations.get( _name ) ;
+		final Event<Settings> event = animations.get( _name ) ;
 		if( event != null )
 		{
 			passEvent( event ) ;
