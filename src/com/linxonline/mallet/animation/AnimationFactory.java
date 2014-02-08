@@ -8,7 +8,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class AnimationFactory
 {
-	public static Event createAnimation( final String _file,
+	public static Event<Settings> createAnimation( final String _file,
 										 final Vector3 _pos, 
 										 final Vector2 _offset, 			// Not needed
 										 final Vector2 _dim,				// Not needed
@@ -36,23 +36,30 @@ public class AnimationFactory
 			settings.addObject( "CALLBACK", _callback ) ;
 		}
 
-		return new Event( "ANIMATION", settings ) ;
+		return new Event<Settings>( "ANIMATION", settings ) ;
 	}
 
-	public static Event removeAnimation( final int _id )
+	public static Event<Settings> removeAnimation( final int _id )
 	{
 		final Settings anim = new Settings() ;
 		anim.addInteger( "REQUEST_TYPE", AnimRequestType.REMOVE_ANIMATION ) ;
 		anim.addInteger( "ID", _id ) ;
-		return new Event( "ANIMATION", anim ) ;
+		return new Event<Settings>( "ANIMATION", anim ) ;
 	}
 
-	public static Event modifyAnimation( final int _id, final int _modifyType )
+	public static Event<Settings> modifyAnimation( final int _id, final int _modifyType )
 	{
 		final Settings anim = new Settings() ;
 		anim.addInteger( "REQUEST_TYPE", AnimRequestType.MODIFY_EXISTING_ANIMATION ) ;
 		anim.addInteger( "ID", _id ) ;
 		anim.addInteger( "MODIFY_ANIMATION", _modifyType ) ;
-		return new Event( "ANIMATION", anim ) ;
+		return new Event<Settings>( "ANIMATION", anim ) ;
+	}
+
+	public static Event<Settings> amendRotate( final Event<Settings> _event, final float _rotate )
+	{
+		final Settings animSet = _event.getVariable() ;
+		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
+		return DrawFactory.amendRotate( renderEvent, _rotate ) ;
 	}
 }

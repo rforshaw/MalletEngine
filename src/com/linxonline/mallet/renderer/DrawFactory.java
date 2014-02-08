@@ -17,7 +17,7 @@ public class DrawFactory
 		return new Event( "DRAW", draw ) ;
 	}
 
-	public static Event createTexture( 	final String _file,
+	public static Event<Settings> createTexture( 	final String _file,
 										final Vector3 _pos, 
 										final Vector2 _offset, 		// Not needed
 										final Vector2 _dim,			// Not needed
@@ -39,10 +39,10 @@ public class DrawFactory
 		setClip( settings, _clip, _clipOffset ) ;
 		settings.addInteger( "LAYER", _layer ) ;
 
-		return new Event( "DRAW", settings ) ;
+		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
-	public static Event createShape( 	final String _type,
+	public static Event<Settings> createShape( 	final String _type,
 										final Line _line,
 										final Vector3 _pos, 
 										final Vector2 _offset, 		// Not needed
@@ -65,10 +65,10 @@ public class DrawFactory
 		settings.addObject( _type, _line ) ;
 		settings.addInteger( "LAYER", _layer ) ;
 
-		return new Event( "DRAW", settings ) ;
+		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
-	public static Event createShape( 	final String _type,
+	public static Event<Settings> createShape( 	final String _type,
 										final Shape _shape,
 										final Vector3 _pos, 
 										final Vector2 _offset, 		// Not needed
@@ -87,10 +87,10 @@ public class DrawFactory
 		if( _type != null ) { settings.addObject( _type, _shape ) ; }
 		settings.addInteger( "LAYER", _layer ) ;
 
-		return new Event( "DRAW", settings ) ;
+		return new Event<Settings>( "DRAW", settings ) ;
 	}
 	
-	public static Event createText( 	final String _text,
+	public static Event<Settings> createText( 	final String _text,
 										final Vector3 _pos, 
 										final Vector2 _offset, 		// Not needed
 										final MalletFont _font,
@@ -114,10 +114,17 @@ public class DrawFactory
 		settings.addInteger( "LAYER", _layer ) ;
 		settings.addInteger( "ALIGNMENT", _alignment ) ;
 
-		return new Event( "DRAW", settings ) ;
+		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
-	public static void insertIDCallback( final Event _event, final IDInterface _callback )
+	public static Event<Settings> amendRotate( final Event<Settings> _event, final float _rotate )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addFloat( "ROTATE", _rotate ) ;
+		return _event ;
+	}
+	
+	public static void insertIDCallback( final Event<Settings> _event, final IDInterface _callback )
 	{
 		final Settings sets = ( Settings )_event.getVariable() ;
 		sets.addObject( "CALLBACK", _callback ) ;
