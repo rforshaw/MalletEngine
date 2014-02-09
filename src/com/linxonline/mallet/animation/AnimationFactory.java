@@ -60,6 +60,7 @@ public class AnimationFactory
 	{
 		final Settings animSet = _event.getVariable() ;
 		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		return DrawFactory.amendRotate( renderEvent, _rotate ) ;
+		DrawFactory.amendRotate( renderEvent, _rotate ) ;
+		return _event ;
 	}
 }
