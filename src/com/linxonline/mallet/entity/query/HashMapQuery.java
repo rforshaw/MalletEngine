@@ -36,7 +36,7 @@ public class HashMapQuery extends Query
 
 	public void addEntity( final Entity _entity )
 	{
-		final String name = _entity.getName() ;
+		final String name = _entity.id.name ;
 		if( exists( name ) == false )
 		{
 			entities.put( name, _entity ) ;
@@ -45,7 +45,7 @@ public class HashMapQuery extends Query
 
 	public void removeEntity( final Entity _entity )
 	{
-		final String name = _entity.getName() ;
+		final String name = _entity.id.name ;
 		if( exists( name ) == true )
 		{
 			entities.remove( name ) ;

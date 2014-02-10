@@ -29,7 +29,7 @@ public class BasicQuery extends Query
 			for( int i = 0; i < size; ++i )
 			{
 				entity = entities.get( i ) ;
-				if( entity.name.equals( name ) == true )
+				if( entity.id.isName( name ) == true )
 				{
 					return entity ;
 				}

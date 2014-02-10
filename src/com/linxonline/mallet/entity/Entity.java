@@ -4,6 +4,7 @@ import java.util.Collection ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.id.ID ;
 import com.linxonline.mallet.io.serialisation.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
@@ -25,43 +26,25 @@ public final class Entity implements SerialisableForm
 	private final ArrayList<Component> components = new ArrayList<Component>() ;
 	private EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
-	public String name = null ;										// A Unique identifier of this Entity
-	public String family = null ;									// What type/family is this Entity apart of
+	public final ID id ;											// Unique ID for this Entity: Name:Family
 	public Vector3 position = new Vector3( 0.0f, 0.0f, 0.0f ) ;		// Position of Entity in world space
 	public boolean destroy = false ;									// Is the Entity to be destroyed and subsequently removed?
 
 	public Entity()
 	{
-		name = "NONE" ;
-		family = "NONE" ;
+		id = new ID( "NONE", "NONE" ) ;
 	}
 
 	public Entity( final String _name )
 	{
-		name = _name ;
-		family = "NONE" ;
+		id = new ID( _name, "NONE" ) ;
 	}
 
 	public Entity( final String _name, final String _family )
 	{
-		name = _name ;
-		family = _family ;
+		id = new ID( _name, _family ) ;
 	}
 
-	/**
-		Once a name has been set it should not be changed.
-		The Entity System may change an Entitys name to ensure it is unique.
-	**/
-	public void setName( final String _name )
-	{
-		name = _name ;
-	}
-
-	public String getName()
-	{
-		return name ;
-	}
-	
 	public final void setPosition( final float _x, final float _y, final float _z )
 	{
 		position.x = _x ;
@@ -74,24 +57,6 @@ public final class Entity implements SerialisableForm
 		position.x += _x ;
 		position.y += _y ;
 		position.z += _z ;
-	}
-
-	/**
-		returns true if _name equals Entity name
-		false if not
-	**/
-	public final boolean isName( final String _name )
-	{
-		return name.equals( _name ) ;
-	}
-
-	/**
-		returns true if _family equals Entity family
-		false if not
-	**/
-	public final boolean isFamily( final String _family )
-	{
-		return family.equals( _family ) ;
 	}
 
 	/**
@@ -291,8 +256,8 @@ public final class Entity implements SerialisableForm
 	**/
 	public boolean writeObject( final SerialiseOutput _output )
 	{
-		_output.writeString( name ) ;
-		_output.writeString( family ) ;
+		_output.writeString( id.name ) ;
+		_output.writeString( id.group ) ;
 		_output.writeFloat( position.x ) ;
 		_output.writeFloat( position.y ) ;
 		_output.writeFloat( position.z ) ;
@@ -316,8 +281,8 @@ public final class Entity implements SerialisableForm
 	**/
 	public boolean readObject( final SerialiseInput _input )
 	{
-		name = _input.readString() ;
-		family = _input.readString() ;
+		id.setName( _input.readString() ) ;
+		id.setGroup( _input.readString() ) ;
 		position.x = _input.readFloat() ;
 		position.y = _input.readFloat() ;
 		position.z = _input.readFloat() ;

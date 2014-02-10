@@ -66,7 +66,7 @@ public class MainPanel extends JPanel
 				if( cell != null )
 				{
 					final Entity entity = cell.getEntity() ;
-					System.out.println( "Edit Entity: " + entity.getName() ) ;
+					System.out.println( "Edit Entity: " + entity.id.name ) ;
 				}
 			}
 		} ) ;
@@ -96,7 +96,7 @@ public class MainPanel extends JPanel
 				if( cell != null )
 				{
 					final Entity entity = cell.getEntity() ;
-					System.out.println( "Copy Entity: " + entity.getName() ) ;
+					System.out.println( "Copy Entity: " + entity.id.name ) ;
 				}
 			}
 		} ) ;
@@ -110,7 +110,7 @@ public class MainPanel extends JPanel
 				if( cell != null )
 				{
 					final Entity entity = cell.getEntity() ;
-					System.out.println( "Paste Entity: " + entity.getName() ) ;
+					System.out.println( "Paste Entity: " + entity.id.name ) ;
 				}
 			}
 		} ) ;

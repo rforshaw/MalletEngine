@@ -198,7 +198,7 @@ public class EntitySystem implements EntitySystemInterface
 	**/
 	private final void ensureEntityNameIsUnique( final Entity _entity )
 	{
-		final String originalName = _entity.getName() ;
+		final String originalName = _entity.id.name ;
 		String newName = originalName ;
 		int iterations = 1 ;
 
@@ -207,6 +207,6 @@ public class EntitySystem implements EntitySystemInterface
 			newName = originalName + iterations++ ;
 		}
 
-		_entity.setName( newName ) ;
+		_entity.id.setName( newName ) ;
 	}
 }

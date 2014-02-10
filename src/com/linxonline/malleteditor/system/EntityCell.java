@@ -18,6 +18,6 @@ public class EntityCell
 
 	public String toString()
 	{
-		return entity.getName() ;
+		return entity.id.name ;
 	}
 }

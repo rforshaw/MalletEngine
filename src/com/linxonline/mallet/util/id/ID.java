@@ -27,8 +27,20 @@ public class ID
 		groupID = _groupID ;
 	}
 
+	public void setName( final String _name )
+	{
+		name = _name ;
+		nameID = _name.hashCode() ;
+	}
+
+	public void setGroup( final String _group )
+	{
+		group = _group ;
+		groupID = _group.hashCode() ;
+	}
+
 	public boolean isName( final String _name ) { return name.equals( _name ) ; }
-	
+
 	public boolean isNameID( final int _nameID ) { return nameID == _nameID ; }
 
 	public boolean isGroup( final String _group ) { return group.equals( _group ) ; }
