@@ -12,7 +12,6 @@ import com.linxonline.mallet.resources.Resource ;
 **/
 public final class AudioBuffer<T extends SoundInterface> extends Resource
 {
-	private static final String type = "SOUND" ;
 	private final T buffer ;
 
 	public AudioBuffer( T _buffer )
@@ -34,6 +33,6 @@ public final class AudioBuffer<T extends SoundInterface> extends Resource
 	@Override
 	public String type()
 	{
-		return type ;
+		return "SOUND" ;
 	}
 }

@@ -172,14 +172,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
 				
-				Texture texture = _settings.getObject( "TEXTURE", null ) ;
+				Texture<GLImage> texture = _settings.getObject( "TEXTURE", null ) ;
 				if( texture == null )
 				{
 					texture = loadTexture( _settings ) ;
 					if( texture == null ) { return ; }
 				}
 				
-				final GLImage image = texture.getImage( GLImage.class ) ;
+				final GLImage image = texture.getImage() ;
 				if( image.textureID != textureID )
 				{
 					textureID = image.textureID ;

@@ -9,7 +9,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.renderer.G2D.G2DImage ;
 
-public class TextureManager extends AbstractManager
+public class TextureManager extends AbstractManager<Texture>
 {
 	public TextureManager() {}
 

@@ -6,9 +6,10 @@ import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
-	This class is horribly slow, and is really just an example of how to extend the Query class.
-	
-	Shouldn't really be used for anything, expect the most ineffecient search algorithm 
+	This class is horribly slow, and is really 
+	just an example of how to extend the Query class.
+	Shouldn't really be used for anything, expect 
+	the most ineffecient search algorithm 
 **/
 public class BasicQuery extends Query
 {

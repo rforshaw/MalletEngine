@@ -9,9 +9,9 @@ import com.linxonline.mallet.renderer.font.Glyph ;
 
 public class GLFontMap extends Resource
 {
-	public final FontMap fontMap ;
+	public final FontMap<GLImage> fontMap ;
 
-	public GLFontMap( final FontMap _fontMap )
+	public GLFontMap( final FontMap<GLImage> _fontMap )
 	{
 		super() ;
 		fontMap = _fontMap ;
@@ -41,7 +41,7 @@ public class GLFontMap extends Resource
 
 	public GLImage getGLImage()
 	{
-		return fontMap.texture.getImage( GLImage.class ) ;
+		return fontMap.texture.getImage() ;
 	}
 
 	public int getHeight() { return fontMap.getHeight() ; }

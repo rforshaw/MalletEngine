@@ -6,10 +6,11 @@ import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
-	If your not happy with how the QuerySystem works then you can make your own from the ground up.
+	If your not happy with how the QuerySystem works then 
+	you can make your own from the ground up.
 
-	Use this interface if you want to ensure the EntitySystem or anything else can make use of your 
-	new Search System.
+	Use this interface if you want to ensure the EntitySystem
+	or anything else can make use of your new Search System.
 **/
 public interface SearchInterface
 {

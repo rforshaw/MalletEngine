@@ -1,17 +1,19 @@
 package com.linxonline.mallet.renderer.font ;
 
 import com.linxonline.mallet.util.sort.QuickSort ;
-import com.linxonline.mallet.resources.texture.Texture ;
 
-public class FontMap
+import com.linxonline.mallet.resources.texture.Texture ;
+import com.linxonline.mallet.resources.texture.ImageInterface ;
+
+public class FontMap<T extends ImageInterface>
 {
 	public final static Glyph FAILED_GLYPH = new Glyph( '\0', 0, 0 ) ;
 
-	public final Glyph[] glyphs ;			// Data needed to render the glyphs available
-	public final Texture texture ;			// Rendered glyph
+	public final Glyph[] glyphs ;					// Data needed to render the glyphs available
+	public final Texture<T> texture ;				// Rendered glyph
 	public final int height ;
 
-	public FontMap( final Glyph[] _glyphs, final Texture _texture, final int _height )
+	public FontMap( final Glyph[] _glyphs, final Texture<T> _texture, final int _height )
 	{
 		texture = _texture ;
 		height = _height ;
@@ -39,14 +41,20 @@ public class FontMap
 	{
 		if( _code < glyphs.length )
 		{
-			if( glyphs[_code] != null ) { return glyphs[_code] ; }
+			if( glyphs[_code] != null )
+			{
+				return glyphs[_code] ;
+			}
 		}
 
 		return FAILED_GLYPH ;
 	}
 
-	public int getHeight() { return height ; }
-	
+	public int getHeight()
+	{
+		return height ;
+	}
+
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

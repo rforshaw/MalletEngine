@@ -2,13 +2,13 @@ package com.linxonline.mallet.resources.texture ;
 
 import com.linxonline.mallet.resources.Resource ;
 
-public final class Texture extends Resource
+public final class Texture<T extends ImageInterface> extends Resource
 {
 	public int width = 0 ;
 	public int height = 0 ;
-	public ImageInterface image = null ;
+	public T image = null ;
 
-	public Texture( ImageInterface _image )
+	public Texture( T _image )
 	{
 		if( _image != null )
 		{
@@ -28,9 +28,9 @@ public final class Texture extends Resource
 		return height ;
 	}
 	
-	public final <T> T getImage( Class<T> _type )
+	public final T getImage()
 	{
-		return _type.cast( image ) ;
+		return image ;
 	}
 	
 	@Override
