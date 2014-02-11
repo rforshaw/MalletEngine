@@ -1,7 +1,7 @@
 package com.linxonline.mallet.util.time ;
 
 /**
-	Should contain functions in relatio to processing Time.
+	Should contain functions in relation to processing Time.
 	Placing them in appropriate formats, etc.
 
 	A Developer wishing to use the Total Elapsed Time should use this 

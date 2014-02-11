@@ -4,13 +4,13 @@ import java.util.HashMap ;
 import java.util.Set ;
 import java.util.Collection ;
 
-public abstract class AbstractManager implements ManagerInterface
+public abstract class AbstractManager<T extends Resource> implements ManagerInterface<T>
 {
-	protected final HashMap<String, Resource> resources = new HashMap<String, Resource>() ;
+	protected final HashMap<String, T> resources = new HashMap<String, T>() ;
 
 	public AbstractManager() {}
 	
-	public boolean add( final String _key, final Resource _value )
+	public boolean add( final String _key, final T _value )
 	{
 		if( exists( _key ) == true )
 		{
@@ -22,14 +22,14 @@ public abstract class AbstractManager implements ManagerInterface
 		return true ;
 	}
 
-	public Resource get( final String _file )
+	public T get( final String _file )
 	{
 		if( exists( _file ) == true )
 		{
 			return resources.get( _file ) ;
 		}
 
-		Resource resource = createResource( _file ) ;
+		T resource = createResource( _file ) ;
 		if( resource != null )
 		{
 			add( _file, resource ) ;
@@ -43,7 +43,7 @@ public abstract class AbstractManager implements ManagerInterface
 		Should be overriden by all classes that extend this class.
 		Called when a resource needs to be created.
 	**/
-	protected abstract Resource createResource( final String _file ) ;
+	protected abstract T createResource( final String _file ) ;
 
 	/**
 		This allow the developer to redirect what resource should be loaded up.
@@ -70,8 +70,8 @@ public abstract class AbstractManager implements ManagerInterface
 	**/
 	public void clear()
 	{
-		Collection<Resource> res = resources.values() ;
-		for( final Resource resource : res )
+		Collection<T> res = resources.values() ;
+		for( final T resource : res )
 		{
 			resource.destroy() ;
 		}

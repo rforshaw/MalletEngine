@@ -4,7 +4,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.sound.* ;
 
-public class SoundManager extends AbstractManager
+public class SoundManager extends AbstractManager<AudioBuffer>
 {
 	private AudioGenerator generator ;
 

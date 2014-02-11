@@ -9,49 +9,41 @@ public class QuickSort
 		Used to sort RenderContainers based on their LAYER.
 		-10, -4, 0, 1, 5, 11,
 	*/
-	public static <T> ArrayList<T> quicksort( ArrayList<T> _contents )
+	public static <T extends SortInterface> ArrayList<T> quicksort( ArrayList<T> _contents )
 	{
 		final int size = _contents.size() ;
 		if( size <= 1 )
 		{
 			return _contents ;
 		}
-		else if( _contents.get( 0 ) instanceof SortInterface )
-		{
-			return sort( _contents ) ;
-		}
 
-		return null ;
+		return sort( _contents )  ;
 	}
 
-	public static <T> T[] quicksort( T[] _contents )
+	public static <T extends SortInterface> T[] quicksort( T[] _contents )
 	{
 		final int size = _contents.length ;
 		if( size <= 1 )
 		{
 			return _contents ;
 		}
-		else if( _contents[0] instanceof SortInterface )
-		{
-			final ArrayList<T> array = new ArrayList<T>( size ) ;
-			for( int i = 0; i < size; ++i )
-			{
-				array.add( _contents[i] ) ;
-			}
 
-			return sort( array ).toArray( _contents ) ;
+		final ArrayList<T> array = new ArrayList<T>( size ) ;
+		for( int i = 0; i < size; ++i )
+		{
+			array.add( _contents[i] ) ;
 		}
 
-		return null ;
+		return sort( array ).toArray( _contents ) ;
 	}
 
 	
-	private static <T> ArrayList<T> sort( ArrayList<T> _contents )
+	private static <T extends SortInterface> ArrayList<T> sort( ArrayList<T> _contents )
 	{
 		int size = _contents.size() ;
 		final int halfSize = size / 2 ;
 
-		final SortInterface pivot = ( SortInterface )_contents.get( halfSize ) ;
+		final SortInterface pivot = _contents.get( halfSize ) ;
 		_contents.remove( pivot ) ;
 
 		ArrayList<T> less = new ArrayList<T>() ;
@@ -62,7 +54,7 @@ public class QuickSort
 
 		for( int i = 0; i < size; i++ )
 		{
-			final SortInterface s = ( SortInterface )_contents.get( i ) ;
+			final SortInterface s = _contents.get( i ) ;
 			if( s.sortValue() <= pivotPoint )
 			{
 				less.add( ( T )s ) ;
