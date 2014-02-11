@@ -35,7 +35,9 @@ public class Animation implements IDInterface
 	}
 
 	/**
-		Render ID
+		Passes in the render ID for the particular Animation.
+		This id allows the animation to make modifications 
+		to what it renders out.
 	**/
 	public void recievedID( final int _id )
 	{

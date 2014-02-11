@@ -127,7 +127,7 @@ public class DefaultSystem implements SystemInterface
 	}
 
 	/*AUDIO SOURCE GENERATOR*/
-	public SourceGenerator getSourceGenerator()
+	public AudioGenerator getAudioGenerator()
 	{
 		return sourceGenerator ;
 	}

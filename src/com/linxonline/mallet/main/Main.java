@@ -58,7 +58,7 @@ public class Main
 				renderTextureExample() ;
 				//renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 				//createEntityExample() ;
 				createMouseAnimExample() ;
 			}

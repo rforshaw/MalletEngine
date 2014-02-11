@@ -1,6 +1,6 @@
 package com.linxonline.mallet.system ;
 
-import com.linxonline.mallet.audio.SourceGenerator ;
+import com.linxonline.mallet.audio.AudioGenerator ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.event.Event ;
@@ -55,8 +55,8 @@ public interface SystemInterface
 
 	public RenderInterface getRenderInterface() ;
 
-	/*AUDIO SOURCE GENERATOR*/
-	public SourceGenerator getSourceGenerator() ;
+	/*AUDIO GENERATOR*/
+	public AudioGenerator getAudioGenerator() ;
 
 	public boolean update() ;
 	public void draw( final float _dt ) ;

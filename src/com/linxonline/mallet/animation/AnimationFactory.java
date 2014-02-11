@@ -6,6 +6,10 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	Provides an effective way to generate Events
+	for the Animation System.
+*/
 public class AnimationFactory
 {
 	public static Event<Settings> createAnimation( final String _file,

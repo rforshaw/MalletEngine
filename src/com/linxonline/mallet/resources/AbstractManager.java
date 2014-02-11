@@ -44,9 +44,6 @@ public abstract class AbstractManager implements ManagerInterface
 		Called when a resource needs to be created.
 	**/
 	protected abstract Resource createResource( final String _file ) ;
-	//{
-	//	return null ;
-	//}
 
 	/**
 		This allow the developer to redirect what resource should be loaded up.

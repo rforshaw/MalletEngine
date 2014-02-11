@@ -1,5 +1,11 @@
 package com.linxonline.mallet.util.id ;
 
+/**
+	Convenience class to provide name and group-name
+	identifiers for objects.
+	Many of the classes in Mallet Engine require the 
+	ability to identify one object from another.
+*/
 public class ID
 {
 	public String name ;

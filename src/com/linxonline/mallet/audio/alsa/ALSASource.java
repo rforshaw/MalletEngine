@@ -4,6 +4,10 @@ import com.jogamp.openal.* ;
 
 import com.linxonline.mallet.audio.* ;
 
+/**
+	Provides the entry point in manipulating and playing 
+	an audio-stream.
+*/
 public class ALSASource implements AudioSource
 {
 	private AL openAL = null ;

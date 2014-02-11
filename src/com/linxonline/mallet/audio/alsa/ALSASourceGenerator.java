@@ -1,12 +1,15 @@
 package com.linxonline.mallet.audio.alsa ;
 
+import java.io.* ;
+import java.nio.* ;
+
 import com.jogamp.openal.* ;
 import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.sound.* ;
 
-public class ALSASourceGenerator implements SourceGenerator
+public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 {
 	private AL openAL = null ;
 
@@ -18,7 +21,6 @@ public class ALSASourceGenerator implements SourceGenerator
 		{
 			ALut.alutInit() ;
 			openAL = ALFactory.getAL() ;
-			openAL.alGetError() ;
 		}
 		catch( ALException ex )
 		{
@@ -43,8 +45,38 @@ public class ALSASourceGenerator implements SourceGenerator
 
 		return true ;
 	}
-	
-	public AudioSource createAudioSource( final Sound _sound )
+
+	public AudioBuffer<ALSASound> createAudioBuffer( final String _file )
+	{
+		int[] format = new int[1] ;
+		ByteBuffer[] data = new ByteBuffer[1] ;
+		int[] size = new int[1] ;
+		int[] freq = new int[1] ;
+		int[] loop = new int[1] ;
+		
+		try
+		{
+			ALut.alutLoadWAVFile( _file, format, data, size, freq, loop ) ;
+		}
+		catch( ALException _ex )
+		{
+			System.out.println( "Error loading wav file: " + _file ) ;
+			return null ;
+		}
+		
+		int[] buffer = new int[1] ;
+		openAL.alGenBuffers( 1, buffer, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to Generate Buffer" ) ;
+			return null ;
+		}
+		
+		openAL.alBufferData( buffer[0], format[0], data[0], size[0], freq[0] ) ;
+		return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
+	}
+
+	public AudioSource createAudioSource( final AudioBuffer<ALSASound> _sound )
 	{
 		if( _sound == null )
 		{
@@ -52,7 +84,7 @@ public class ALSASourceGenerator implements SourceGenerator
 			return null ;
 		}
 
-		final ALSASound alsaSound = _sound.getSoundBuffer( ALSASound.class ) ;	// Assumes Sound contains an ALSASound reference
+		final ALSASound alsaSound = _sound.getBuffer() ;	// Assumes Sound contains an ALSASound reference
 		final int[] buffer = alsaSound.getBufferID() ;
 
 		int[] source = new int[1] ;

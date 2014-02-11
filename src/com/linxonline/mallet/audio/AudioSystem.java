@@ -20,25 +20,26 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	private static final String[] EVENT_TYPES = { "AUDIO" } ;
 
 	protected final static SoundManager soundManager = new SoundManager() ;
-	protected SourceGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
+	protected AudioGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
 	protected int numID = 0 ;
 
 	public AudioSystem() {}
 
-	public AudioSystem( final SourceGenerator _generator )
+	public AudioSystem( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;
 	}
 
-	public AudioSystem( final AddEventInterface _eventSystem, final SourceGenerator _generator )
+	public AudioSystem( final AddEventInterface _eventSystem, final AudioGenerator _generator )
 	{
 		eventSystem = _eventSystem ;
 		sourceGenerator = _generator ;
 	}
 
-	public void setSourceGenerator( final SourceGenerator _generator )
+	public void setAudioGenerator( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;
+		soundManager.setAudioGenerator( _generator ) ;
 	}
 
 	@Override
@@ -161,7 +162,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 
 	protected ActiveSound createActiveSound( final String _file )
 	{
-		final Sound sound = ( Sound )soundManager.get( _file ) ;
+		final AudioBuffer sound = ( AudioBuffer )soundManager.get( _file ) ;
 		final AudioSource source = sourceGenerator.createAudioSource( sound ) ;
 		if( source != null )
 		{

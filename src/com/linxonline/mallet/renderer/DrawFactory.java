@@ -5,6 +5,11 @@ import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	Provides an effective way to generate Events
+	for the Rendering System.
+	Supports: G2DRenderer, GLRenderer...
+*/
 public class DrawFactory
 {
 	public DrawFactory() {}

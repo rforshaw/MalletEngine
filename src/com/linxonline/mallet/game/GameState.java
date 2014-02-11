@@ -296,7 +296,7 @@ public class GameState extends State implements HookEntity
 	public final void setSystem( final SystemInterface _system )
 	{
 		system = _system ;
-		audioSystem.setSourceGenerator( _system.getSourceGenerator() ) ;
+		audioSystem.setAudioGenerator( _system.getAudioGenerator() ) ;
 	}
 
 	/**

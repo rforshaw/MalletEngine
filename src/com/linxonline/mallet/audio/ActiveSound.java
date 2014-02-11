@@ -4,17 +4,17 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.resources.sound.Sound ;
+import com.linxonline.mallet.resources.sound.AudioBuffer ;
 import com.linxonline.mallet.util.SourceCallback ;
 
 public class ActiveSound
 {
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	private final AudioSource source ;
-	private final Sound sound ;
+	private final AudioBuffer sound ;
 	public final int id ;
 
-	public ActiveSound( final int _id, final AudioSource _source, final Sound _sound )
+	public ActiveSound( final int _id, final AudioSource _source, final AudioBuffer _sound )
 	{
 		id = _id ;
 		source = _source ;

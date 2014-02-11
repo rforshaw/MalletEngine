@@ -2,7 +2,7 @@ package com.linxonline.mallet.audio ;
 
 /**
 	Defines what a Developer can do to modify the AudioSource.
-	Further features like GAIN, PITCH, POSITION, will be soon.
+	Further features like GAIN, PITCH, POSITION, will be added soon.
 **/
 public class ModifyAudio
 {
