@@ -41,7 +41,7 @@ public class TextureManager extends AbstractManager<Texture>
 
 			if( image != null )
 			{
-				InputStream in = new ByteArrayInputStream( image ) ;
+				final InputStream in = new ByteArrayInputStream( image ) ;
 				return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
 			}
 		}
@@ -53,6 +53,12 @@ public class TextureManager extends AbstractManager<Texture>
 		return null ;
 	}
 
+	/**
+		Implemented to display high-res textures when developing
+		an iOS app on a normal computer.
+		Simulates the @2x addition when using Retina display.
+		Should provide flag to prevent automatic usage.
+	*/
 	protected String redirectResourceLocation( final String _file )
 	{
 		String file = _file ;

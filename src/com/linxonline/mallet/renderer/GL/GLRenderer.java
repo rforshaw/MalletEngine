@@ -11,7 +11,6 @@ import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
 import javax.media.opengl.glu.GLU ;
 
-import com.linxonline.mallet.physics.AABB ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;

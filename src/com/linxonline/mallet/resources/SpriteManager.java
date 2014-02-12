@@ -6,14 +6,14 @@ import java.io.* ;
 import com.linxonline.mallet.io.reader.* ;
 import com.linxonline.mallet.resources.texture.* ;
 
-public class SpriteManager extends AbstractManager
+public class SpriteManager extends AbstractManager<Sprite>
 {
 	public SpriteManager() {}
 
 	@Override
 	protected Sprite createResource( final String _file )
 	{
-		Sprite sprite = loadSprite( _file ) ;
+		final Sprite sprite = loadSprite( _file ) ;
 		if( sprite != null )
 		{
 			resources.put( _file, sprite ) ;
@@ -24,6 +24,11 @@ public class SpriteManager extends AbstractManager
 		return null ;
 	}
 
+	/**
+		Load the animation file using the format:
+		Framerate
+		image/location
+	*/
 	protected Sprite loadSprite( final String _file )
 	{
 		ArrayList<String> texts = TextReader.getTextFile( _file ) ;

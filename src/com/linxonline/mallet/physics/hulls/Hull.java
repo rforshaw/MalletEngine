@@ -1,17 +1,20 @@
-package com.linxonline.mallet.physics ;
+package com.linxonline.mallet.physics.hulls ;
 
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.entity.Entity ;
 
+import com.linxonline.mallet.physics.* ;
+
 public abstract class Hull
 {
 	public static final int NO_GROUP = -1 ;
 
-	protected int hullType = HullType.NONE ;
-	private int groupID = NO_GROUP ;											// Defines what Group the Hull is in.
+	protected HullType hullType = HullType.NONE ;
+	private int groupID = NO_GROUP ;												// Defines what Group the Hull is in.
 	private final ArrayList<Integer> collidableGroups = new ArrayList<Integer>() ;	// Defines the Groups the Hull is affected by.
+																					// If no group-specified, collides with everything.
 
 	private final Vector2 accumulatedPenetration = new Vector2() ;
 	public final ContactData contactData = new ContactData() ;
@@ -19,9 +22,11 @@ public abstract class Hull
 	protected boolean collidable = true ; 										// Allows hull to produce Collision Data.
 	protected boolean physical = true ; 										// Allows hull to be affected by a Collision
 	protected CollisionCallback callback = null ;								// Allows Owner to be informed of Collisions
-	protected Entity parent = null ;
 
-	protected Hull() {}
+	protected Hull( final HullType _type )
+	{
+		hullType = _type ;
+	}
 
 	/**
 		Update the Contact Data points.
@@ -50,11 +55,6 @@ public abstract class Hull
 		return accumulatedPenetration ;
 	}
 
-	public int getContactSize()
-	{
-		return contactData.size() ;
-	}
-	
 	public final void setGroupID( final int _groupID )
 	{
 		groupID = _groupID ;
@@ -64,15 +64,10 @@ public abstract class Hull
 	{
 		collidableGroups.add( _groupID ) ;
 	}
-	
+
 	public final void setCollisionCallback( final CollisionCallback _callback )
 	{
 		callback = _callback ;
-	}
-	
-	public final void setParent( final Entity _parent )
-	{
-		parent = _parent ;
 	}
 
 	public abstract void setPosition( final float _x, final float _y ) ;
@@ -82,13 +77,13 @@ public abstract class Hull
 	{
 		collidable = _collidable ;
 	}
-	
+
 	public final void setPhysical( final boolean _physical )
 	{
 		physical = _physical ;
 	}
 
-	public final int getHullType()
+	public final HullType getHullType()
 	{
 		return hullType ;
 	}
@@ -97,23 +92,17 @@ public abstract class Hull
 	{
 		return groupID ;
 	}
-	
-	public final Entity getParent()
-	{
-		return parent ;
-	}
 
 	public final boolean isPhysical()
 	{
 		return physical ;
 	}
-	
+
 	public final boolean isCollidable()
 	{
-		//
 		return collidable ;
 	}
-	
+
 	public final boolean isCollidableWithGroup( final int _groupID )
 	{
 		if( collidableGroups.size() == 0 )
@@ -123,10 +112,5 @@ public abstract class Hull
 		}
 
 		return collidableGroups.contains( _groupID ) ;
-	}
-	
-	protected final void setHullType( final int _hullType )
-	{
-		hullType = _hullType ;
 	}
 }

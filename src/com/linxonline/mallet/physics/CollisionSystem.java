@@ -2,6 +2,8 @@ package com.linxonline.mallet.physics ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.physics.hulls.* ;
+
 public class CollisionSystem
 {
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;

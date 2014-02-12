@@ -1,4 +1,4 @@
-package com.linxonline.mallet.physics ;
+package com.linxonline.mallet.physics.primitives ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 

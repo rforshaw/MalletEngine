@@ -1,6 +1,10 @@
-package com.linxonline.mallet.physics ;
+package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+
+import com.linxonline.mallet.physics.hulls.Hull ;
+import com.linxonline.mallet.physics.primitives.AABB ;
+import com.linxonline.mallet.physics.primitives.OBB ;
 
 public class Box2D extends Hull
 {
@@ -9,7 +13,7 @@ public class Box2D extends Hull
 
 	public Box2D( final AABB _aabb )
 	{
-		setHullType( HullType.BOUNDINGBOX2D ) ;
+		super( HullType.BOUNDINGBOX2D ) ;
 		aabb = _aabb ;
 		obb = new OBB( aabb ) ;
 	}

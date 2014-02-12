@@ -2,6 +2,11 @@ package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 
+import com.linxonline.mallet.physics.primitives.AABB ;
+import com.linxonline.mallet.physics.primitives.OBB ;
+
+import com.linxonline.mallet.physics.hulls.Box2D ;
+
 public final class CollisionCheck
 {
 	private static final Vector2 toCenter = new Vector2() ;
