@@ -29,4 +29,40 @@ public class Box2D extends Hull
 		obb.setRotation( _theta ) ;
 		aabb.setDimensionsFromOBB( obb ) ;
 	}
+
+	@Override
+	public Vector2[] getAxes()
+	{
+		obb.updateAxesAndEdges() ;
+		return obb.axes ;
+	}
+
+	@Override
+	public Vector2 getAbsoluteCenter()
+	{
+		return aabb.getAbsoluteCenter() ;
+	}
+
+	@Override
+	public float projectToAxis( final Vector2 _axis )
+	{
+		float dp = Vector2.dot( obb.points[0], _axis ) ;
+		float max = dp ;
+		float min = dp ;
+
+		for( int i = 1; i < obb.points.length; ++i )
+		{
+			dp = Vector2.dot( obb.points[i], _axis ) ;
+			if( dp > max )
+			{
+				max = dp ;
+			}
+			else if( dp < min )
+			{
+				min = dp ;
+			}
+		}
+
+		return ( max - min ) * 0.5f ;
+	}
 }

@@ -35,7 +35,11 @@ public class CollisionSystem
 		for( int i = 0; i < size; i++ )
 		{
 			hull1 = hulls.get( i ) ;
-			if( hull1.isCollidable() == false ) { continue ; }
+			if( hull1.isCollidable() == false )
+			{
+				continue ;
+			}
+
 			for( int j = 0; j < size; j++ )
 			{
 				hull2 = hulls.get( j ) ;
@@ -43,23 +47,9 @@ public class CollisionSystem
 				{
 					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 					{
-						processCollisionHulls( hull1, hull2 ) ;
+						CollisionCheck.generateContactPoint( hull1, hull2 ) ;
 					}
 				}
-			}
-		}
-	}
-
-	private void processCollisionHulls( final Hull _hull1, 
-										final Hull _hull2 )
-	{
-		if( _hull1.getHullType() == HullType.BOUNDINGBOX2D &&
-			_hull2.getHullType() == HullType.BOUNDINGBOX2D )
-		{
-			if( CollisionCheck.intersectByAABB( ( Box2D )_hull1, ( Box2D )_hull2 ) ||
-				CollisionCheck.intersectByAABB( ( Box2D )_hull2, ( Box2D )_hull1 ) )
-			{
-				CollisionCheck.generateContactPoint( ( Box2D )_hull1, ( Box2D )_hull2 ) ;
 			}
 		}
 	}

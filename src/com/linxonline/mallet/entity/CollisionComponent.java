@@ -40,12 +40,19 @@ public class CollisionComponent extends Component
 		hull.setRotation( _theta ) ;
 	}
 
-	public static CollisionComponent generateBox2D( final Vector2 _min, final Vector2 _max, final Vector2 _position, final Vector2 _offset )
+	public static CollisionComponent generateBox2D( final Vector2 _min,
+													final Vector2 _max,
+													final Vector2 _position,
+													final Vector2 _offset )
 	{
 		return new CollisionComponent( "COLLISION", new Box2D( new AABB( _min, _max, _position, _offset ) ) ) ;
 	}
 
-	public static CollisionComponent generateBox2D( final String _name, final Vector2 _min, final Vector2 _max, final Vector2 _position, final Vector2 _offset )
+	public static CollisionComponent generateBox2D( final String _name,
+													final Vector2 _min,
+													final Vector2 _max,
+													final Vector2 _position,
+													final Vector2 _offset )
 	{
 		return new CollisionComponent( _name, new Box2D( new AABB( _min, _max, _position, _offset ) ) ) ;
 	}

@@ -1,5 +1,7 @@
 package com.linxonline.mallet.physics.hulls ;
 
+import com.linxonline.mallet.maths.Vector2 ;
+
 import com.linxonline.mallet.physics.primitives.Circle ;
 
 public class Circle2D extends Hull
@@ -20,5 +22,23 @@ public class Circle2D extends Hull
 	public void setRotation( final float _theta )
 	{
 		circle.setRotation( _theta ) ;
+	}
+	
+	@Override
+	public Vector2[] getAxes()
+	{
+		return null ;
+	}
+
+	@Override
+	public Vector2 getAbsoluteCenter()
+	{
+		return new Vector2() ;
+	}
+
+	@Override
+	public float projectToAxis( final Vector2 _axis )
+	{
+		return -1.0f ;
 	}
 }
