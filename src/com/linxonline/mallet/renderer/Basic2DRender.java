@@ -29,8 +29,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
 
-	protected float accumulatedDeltaTime = 0.0f ;
-	protected float maxAccDeltaTime = 0.0f ;
+	protected int renderIteration = 1 ;
+	protected int maxRenderIteration = 0 ;
 
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
 	protected final RenderState state = new RenderState() ;
@@ -72,7 +72,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		// Make a copy of the currentState for interpolation
 		// between frames.
 		state.retireCurrentState() ;
-		accumulatedDeltaTime = 0.0f ;
+		renderIteration = 1 ;
 	}
 
 	@Override
@@ -211,13 +211,13 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		state.clear() ;
 	}
 
-	protected void CalculateInterpolatedPosition( final float _dt, Vector3 _old, Vector3 _current, Vector2 _position )
+	protected void CalculateInterpolatedPosition( Vector3 _old, Vector3 _current, Vector2 _position )
 	{
-		final float diff = 1.0f / maxAccDeltaTime ;
-		final float acc = _dt * diff ;
+		final float xDiff = ( _current.x - _old.x ) / maxRenderIteration ;
+		final float yDiff = ( _current.y - _old.y ) / maxRenderIteration ;
 
-		_position.x = _old.x + ( ( _current.x - _old.x ) * acc ) ;
-		_position.y = _old.y + ( ( _current.y - _old.y ) * acc ) ;
+		_position.x = _old.x + ( xDiff * renderIteration ) ;
+		_position.y = _old.y + ( yDiff * renderIteration ) ;
 	}
 
 	protected class RenderData implements SortInterface
@@ -343,16 +343,16 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			return oldState.size() == content.size() ;
 		}
 
-		public void calculatePosition( final float _dt, int _index, Vector2 _position )
+		public void calculatePosition( int _index, Vector2 _position )
 		{
-			final float diff = 1.0f / maxAccDeltaTime ;
-			final float acc = _dt * diff ;
-
 			final Vector3 old = oldState.get( _index ) ;
 			final Vector3 current = content.get( _index ).position ;
 			
-			_position.x = old.x + ( ( current.x - old.x ) * acc ) ;
-			_position.y = old.y + ( ( current.y - old.y ) * acc ) ;
+			final float xDiff = ( current.x - old.x ) / maxRenderIteration ;
+			final float yDiff = ( current.y - old.y ) / maxRenderIteration ;
+
+			_position.x = old.x + ( xDiff * renderIteration ) ;
+			_position.y = old.y + ( yDiff * renderIteration ) ;
 		}
 		
 		public void sort()

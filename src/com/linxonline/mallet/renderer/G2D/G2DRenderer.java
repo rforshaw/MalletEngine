@@ -323,7 +323,6 @@ public class G2DRenderer extends Basic2DRender
 			return ;
 		}
 
-		accumulatedDeltaTime += _dt ;
 		graphics = ( Graphics2D )buffer.getDrawGraphics() ;
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON ) ;
 		graphics.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR ) ;

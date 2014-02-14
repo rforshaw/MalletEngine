@@ -368,6 +368,7 @@ public class GameState extends State implements HookEntity
 				renderAccumulator += _dt ;
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
+					//System.out.println( 1.0f / renderAccumulator ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator = 0.0f ;

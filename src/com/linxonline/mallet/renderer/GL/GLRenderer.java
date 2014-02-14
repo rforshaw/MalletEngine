@@ -487,14 +487,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return ;
 		}
 
-		accumulatedDeltaTime += _dt ;
-		if( accumulatedDeltaTime >= maxAccDeltaTime )
-		{
-			maxAccDeltaTime = accumulatedDeltaTime ;
-		}
-
 		updateEvents() ;
 		canvas.display() ;
+		if( renderIteration > maxRenderIteration )
+		{
+			maxRenderIteration = renderIteration ;
+		}
+		++renderIteration ;
 	}
 
 	@Override
@@ -507,7 +506,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glLoadIdentity() ;
 
 		// Calculate the current Camera Position based on oldCameraPosition and future cameraPosition
-		CalculateInterpolatedPosition( accumulatedDeltaTime, oldCameraPosition, cameraPosition, pos ) ;
+		CalculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 
 		gl.glPushMatrix() ;
 			gl.glTranslatef( pos.x, pos.y, 0.0f ) ;
@@ -532,7 +531,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		for( int i = 0; i < currentLength; ++i )
 		{
 			current = state.getDataAt( i ) ;
-			state.calculatePosition( accumulatedDeltaTime, i, pos ) ;
+			state.calculatePosition( i, pos ) ;
 			current.drawCall.draw( current.drawData, pos ) ;
 		}
 	}

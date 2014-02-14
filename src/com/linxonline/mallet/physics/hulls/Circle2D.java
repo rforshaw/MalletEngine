@@ -10,7 +10,6 @@ public class Circle2D extends Hull
 
 	public Circle2D( final Circle _circle )
 	{
-		super( HullType.CIRCLE2D ) ;
 		circle = _circle ;
 	}
 

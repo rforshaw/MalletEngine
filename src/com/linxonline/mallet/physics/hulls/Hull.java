@@ -11,7 +11,6 @@ public abstract class Hull
 {
 	public static final int NO_GROUP = -1 ;
 
-	protected HullType hullType = HullType.NONE ;
 	private int groupID = NO_GROUP ;												// Defines what Group the Hull is in.
 	private final ArrayList<Integer> collidableGroups = new ArrayList<Integer>() ;	// Defines the Groups the Hull is affected by.
 																					// If no group-specified, collides with everything.
@@ -23,10 +22,7 @@ public abstract class Hull
 	protected boolean physical = true ; 										// Allows hull to be affected by a Collision
 	protected CollisionCallback callback = null ;								// Allows Owner to be informed of Collisions
 
-	protected Hull( final HullType _type )
-	{
-		hullType = _type ;
-	}
+	protected Hull() {}
 
 	/**
 		Update the Contact Data points.
@@ -85,11 +81,6 @@ public abstract class Hull
 	public final void setPhysical( final boolean _physical )
 	{
 		physical = _physical ;
-	}
-
-	public final HullType getHullType()
-	{
-		return hullType ;
 	}
 
 	public final int getGroupID()

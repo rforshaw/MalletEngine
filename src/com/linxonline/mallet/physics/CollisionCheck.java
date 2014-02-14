@@ -1,5 +1,7 @@
 package com.linxonline.mallet.physics ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 
 import com.linxonline.mallet.physics.primitives.AABB ;
@@ -12,30 +14,36 @@ public final class CollisionCheck
 {
 	private static final Vector2 toCenter = new Vector2() ;
 	private static final Vector2 axis = new Vector2() ;
-	private static final Vector2[] axes = new Vector2[4] ;
+	private static final ArrayList<Vector2> axes = new ArrayList<Vector2>() ;
 
 	public static final void generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
+		axes.clear() ;
 		final Vector2[] axes1 = _box1.getAxes() ;
 		final Vector2[] axes2 = _box2.getAxes() ;
+
+		for( int i = 0; i < axes1.length; i++ )
+		{
+			axes.add( axes1[i] ) ;
+		}
+
+		for( int i = 0; i < axes2.length; i++ )
+		{
+			axes.add( axes2[i] ) ;
+		}
 
 		final Vector2 bC1 = _box1.getAbsoluteCenter() ;
 		final Vector2 bC2 = _box2.getAbsoluteCenter() ;
 		toCenter.x = bC2.x - bC1.x ;
 		toCenter.y = bC2.y - bC1.y ;
 
-		// Make it easy to loop through axes from box1 and box2
-		axes[0] = axes1[0] ;
-		axes[1] = axes1[1] ;
-		axes[2] = axes2[0] ;
-		axes[3] = axes2[1] ;
-
 		int index = 0 ;
-		float bestOverlap = penetrationOnAxis( _box1, _box2, axes[index], toCenter ) ;
+		int size = axes.size() ;
+		float bestOverlap = penetrationOnAxis( _box1, _box2, axes.get( index ), toCenter ) ;
 
-		for( int i = 1; i < axes.length; i++ )
+		for( int i = 1; i < size; i++ )
 		{
-			float result = penetrationOnAxis( _box1, _box2, axes[i], toCenter ) ;
+			float result = penetrationOnAxis( _box1, _box2, axes.get( i ), toCenter ) ;
 			if( result < 0.0f )
 			{
 				//System.out.println( "Failed SATs: " + result ) ;
@@ -48,8 +56,8 @@ public final class CollisionCheck
 			}
 		}
 
-		axis.x = axes[index].x ;
-		axis.y = axes[index].y ;
+		axis.x = axes.get( index ).x ;
+		axis.y = axes.get( index ).y ;
 
 		if( Vector2.multiply( axis, toCenter ) > 0.0f )
 		{

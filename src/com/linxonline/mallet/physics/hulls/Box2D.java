@@ -13,7 +13,6 @@ public class Box2D extends Hull
 
 	public Box2D( final AABB _aabb )
 	{
-		super( HullType.BOUNDINGBOX2D ) ;
 		aabb = _aabb ;
 		obb = new OBB( aabb ) ;
 	}
