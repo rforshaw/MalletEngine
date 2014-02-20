@@ -58,6 +58,6 @@ public interface SystemInterface
 	/*AUDIO GENERATOR*/
 	public AudioGenerator getAudioGenerator() ;
 
-	public boolean update() ;
+	public boolean update( final float _dt ) ;
 	public void draw( final float _dt ) ;
 }

@@ -12,7 +12,7 @@ public interface RenderInterface extends EventHandler
 	public void setDisplayDimensions( final int _width, final int _height ) ;
 	public void setCameraPosition( final Vector3 _position ) ;
 
-	public void updateState() ;
+	public void updateState( final float _dt ) ;
 	public void draw( final float _dt ) ;			// Draw the current Render State
 
 	public void sort() ;

@@ -413,7 +413,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		viewMode = _mode ;
 	}
-	
+
 	public void hookToWindow( final JFrame _frame )
 	{
 		frame = _frame ;
@@ -472,12 +472,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public void dispose( GLAutoDrawable _drawable ) {}
 
 	@Override
-	public void updateState()
+	public void updateState( final float _dt )
 	{
-		super.updateState() ;
+		super.updateState( _dt ) ;
 		oldCameraPosition.setXYZ( cameraPosition ) ;
 	}
-	
+
 	public void draw( final float _dt )
 	{
 		cameraPosition = renderInfo.getCameraPosition() ;
@@ -487,13 +487,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return ;
 		}
 
+		++renderIter ;
+		drawDT = _dt ;
+
 		updateEvents() ;
 		canvas.display() ;
-		if( renderIteration > maxRenderIteration )
-		{
-			maxRenderIteration = renderIteration ;
-		}
-		++renderIteration ;
 	}
 
 	@Override

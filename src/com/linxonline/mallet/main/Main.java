@@ -56,11 +56,11 @@ public class Main
 			// Called when state is started.
 			public void initGame()
 			{
-				//renderTextureExample() ;
-				//renderAnimationExample() ;
-				//renderTextExample() ;
+				renderTextureExample() ;
+				renderAnimationExample() ;
+				renderTextExample() ;
 				//playAudioExample() ;
-				//createEntityExample() ;
+				createEntityExample() ;
 				createMouseAnimExample() ;
 			}
 

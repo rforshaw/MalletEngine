@@ -29,8 +29,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
 
-	protected int renderIteration = 1 ;
-	protected int maxRenderIteration = 0 ;
+	protected int renderIter = 0 ;
+	protected float updateDT = 0.0f ;
+	protected float drawDT = 0.0f ;
 
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
 	protected final RenderState state = new RenderState() ;
@@ -67,12 +68,13 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	}
 
 	@Override
-	public void updateState()
+	public void updateState( final float _dt )
 	{
 		// Make a copy of the currentState for interpolation
 		// between frames.
 		state.retireCurrentState() ;
-		renderIteration = 2 ;
+		updateDT = _dt ;
+		renderIter = 0 ;
 	}
 
 	@Override
@@ -213,11 +215,12 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void CalculateInterpolatedPosition( Vector3 _old, Vector3 _current, Vector2 _position )
 	{
-		final float xDiff = ( _current.x - _old.x ) / maxRenderIteration ;
-		final float yDiff = ( _current.y - _old.y ) / maxRenderIteration ;
+		final int renderDiff = ( int )( updateDT / drawDT ) ;
+		final float xDiff = ( _current.x - _old.x ) / renderDiff ;
+		final float yDiff = ( _current.y - _old.y ) / renderDiff ;
 
-		_position.x = _old.x + ( xDiff * renderIteration ) ;
-		_position.y = _old.y + ( yDiff * renderIteration ) ;
+		_position.x = _old.x + ( xDiff * renderIter ) ;
+		_position.y = _old.y + ( yDiff * renderIter ) ;
 	}
 
 	protected class RenderData implements SortInterface
@@ -269,10 +272,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected class RenderState implements RenderStateInterface<Integer, RenderData>
 	{
-		protected ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;
+		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;
 		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;
 		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;
-	
+
 		public void add( Integer _id, RenderData _data )
 		{
 			content.add( _data ) ;
@@ -348,15 +351,17 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			final Vector3 old = oldState.get( _index ) ;
 			final Vector3 current = content.get( _index ).position ;
 
-			final float xDiff = ( current.x - old.x ) / maxRenderIteration ;
-			final float yDiff = ( current.y - old.y ) / maxRenderIteration ;
+			final int renderDiff =  ( int )( updateDT / drawDT ) ;
+			final float xDiff = ( current.x - old.x ) / renderDiff ;
+			final float yDiff = ( current.y - old.y ) / renderDiff ;
 
-			//System.out.println( "MAX: " + maxRenderIteration + " XD: " + xDiff + " YD: " + yDiff ) ;
-			//System.out.println( "ITER: " + renderIteration + " XD: " + xDiff * renderIteration + " YD: " + yDiff * renderIteration ) ;
+			//System.out.println( "Diff: " + renderDiff + " Iter: " + renderIter ) ;
 			//System.out.println( "OLD: " + old + " CURRENT: " + current ) ;
+			//System.out.println( "XD: " + xDiff * renderIter + " YD: " + yDiff * renderIter ) ;
 
-			_position.x = old.x + ( xDiff * renderIteration ) ;
-			_position.y = old.y + ( yDiff * renderIteration ) ;
+			_position.x = old.x + ( xDiff * renderIter ) ;
+			_position.y = old.y + ( yDiff * renderIter ) ;
+			//System.out.println( _position ) ;
 		}
 
 		public void sort()

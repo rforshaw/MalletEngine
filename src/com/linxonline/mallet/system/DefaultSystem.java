@@ -132,9 +132,9 @@ public class DefaultSystem implements SystemInterface
 		return sourceGenerator ;
 	}
 
-	public boolean update()
+	public boolean update( final float _dt )
 	{
-		renderer.updateState() ;
+		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
 		eventSystem.update() ;
 		return true ;
