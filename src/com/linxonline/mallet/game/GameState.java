@@ -26,14 +26,10 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 
 public class GameState extends State implements HookEntity
 {
-	public static final int GAME_MODE = 1 ;								// Update Logic & Render on a recurring basis
-	public static final int APPLICATION_MODE = 2 ;						// Update on logic & Render on user-input/events
-
 	protected float DEFAULT_TIMESTEP = 1.0f / 20.0f ;					// 20Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;
 
-	protected final HashMap<Integer, UpdateInterface> updateModes = new HashMap<Integer, UpdateInterface>() ;
 	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
 
 	protected final InputState inputSystem = new InputState() ;										// Internal Input System
@@ -267,18 +263,6 @@ public class GameState extends State implements HookEntity
 		draw = true ;
 	}
 
-	/**
-		Informs the Game State which Mode it is running in.
-	*/
-	public final void setMode( final int _mode )
-	{
-		final Integer mode = new Integer( _mode ) ;
-		if( updateModes.containsKey( mode ) == true )
-		{
-			currentUpdate = updateModes.get( mode ) ;
-		}
-	}
-
 	public final void setTimeStep( final int _timestep )
 	{
 		DEFAULT_TIMESTEP = 1.0f / _timestep ;
@@ -331,19 +315,17 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		Initialise the default modes: GAME_MODE and APPLICATION_MODE
-		currentUpdate = GAME_MODE, by default.
+		Initialise the currentUpdate with the mode needed.
+		Game State uses useGameMode by default.
 	*/
 	protected void initModes()
 	{
-		initGameMode() ;
-		initApplicationMode() ;
-		setMode( GAME_MODE ) ;
+		useGameMode() ;
 	}
 
-	protected void initGameMode()
+	protected void useGameMode()
 	{
-		final UpdateInterface gameUpdate = new UpdateInterface()
+		currentUpdate = new UpdateInterface()
 		{
 			@Override
 			public void update( final double _dt )
@@ -366,21 +348,20 @@ public class GameState extends State implements HookEntity
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				if( renderAccumulator > DEFAULT_FRAMERATE )
+				while( renderAccumulator > DEFAULT_FRAMERATE )
 				{
-					//System.out.println( 1.0f / renderAccumulator ) ;
+					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator = 0.0f ;
+					renderAccumulator -= DEFAULT_FRAMERATE ;
 				}
 			}
 		} ;
-		updateModes.put( GAME_MODE, gameUpdate ) ;
 	}
 
-	protected void initApplicationMode()
+	protected void useApplicationMode()
 	{
-		final UpdateInterface applicationUpdate = new UpdateInterface()
+		currentUpdate = new UpdateInterface()
 		{
 			@Override
 			public void update( final double _dt )
@@ -417,8 +398,6 @@ public class GameState extends State implements HookEntity
 				}
 			}
 		} ;
-
-		updateModes.put( APPLICATION_MODE, applicationUpdate ) ;
 	}
 
 	/**

@@ -18,6 +18,7 @@ import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
@@ -390,13 +391,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl = _drawable.getGL().getGL2() ;
 
 		gl.glEnable( GL.GL_TEXTURE_2D ) ;
-		gl.setSwapInterval( 0 ) ; // V-Sync 1 = Enabled, 0 = Disabled
+		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 
 		gl.glEnable( GL.GL_BLEND ) ;
 		gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 		//gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE ) ;
-		
 		resize() ;
 
 		gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
@@ -505,7 +505,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glLoadIdentity() ;
 
-		// Calculate the current Camera Position based on oldCameraPosition and future cameraPosition
+		// Calculate the current Camera Position based 
+		// on oldCameraPosition and future cameraPosition
 		CalculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 
 		gl.glPushMatrix() ;
@@ -514,7 +515,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			render() ;
 		gl.glPopMatrix() ;
 
-		//gl.glFlush() ;
 		canvas.swapBuffers() ;
 	}
 

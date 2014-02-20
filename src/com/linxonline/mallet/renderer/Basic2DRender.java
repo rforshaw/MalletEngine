@@ -72,7 +72,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		// Make a copy of the currentState for interpolation
 		// between frames.
 		state.retireCurrentState() ;
-		renderIteration = 1 ;
+		renderIteration = 2 ;
 	}
 
 	@Override
@@ -347,14 +347,18 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			final Vector3 old = oldState.get( _index ) ;
 			final Vector3 current = content.get( _index ).position ;
-			
+
 			final float xDiff = ( current.x - old.x ) / maxRenderIteration ;
 			final float yDiff = ( current.y - old.y ) / maxRenderIteration ;
+
+			//System.out.println( "MAX: " + maxRenderIteration + " XD: " + xDiff + " YD: " + yDiff ) ;
+			//System.out.println( "ITER: " + renderIteration + " XD: " + xDiff * renderIteration + " YD: " + yDiff * renderIteration ) ;
+			//System.out.println( "OLD: " + old + " CURRENT: " + current ) ;
 
 			_position.x = old.x + ( xDiff * renderIteration ) ;
 			_position.y = old.y + ( yDiff * renderIteration ) ;
 		}
-		
+
 		public void sort()
 		{
 			content = QuickSort.quicksort( content ) ;

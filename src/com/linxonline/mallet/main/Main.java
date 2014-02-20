@@ -46,8 +46,9 @@ public class Main
 		//final DefaultSystem system = new DefaultSystem() ;			// Graphics2D & OpenAL backend
 		final GLDefaultSystem system = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
 
+		loadConfig() ;
 		system.initSystem() ;
-		loadConfig( system ) ;
+		setRenderSettings( system ) ;
 
 		final GameSystem game = new GameSystem( system ) ;
 		game.addGameState( new GameState( "DEFAULT" )
@@ -55,10 +56,10 @@ public class Main
 			// Called when state is started.
 			public void initGame()
 			{
-				renderTextureExample() ;
+				//renderTextureExample() ;
 				//renderAnimationExample() ;
-				renderTextExample() ;
-				playAudioExample() ;
+				//renderTextExample() ;
+				//playAudioExample() ;
 				//createEntityExample() ;
 				createMouseAnimExample() ;
 			}
@@ -69,7 +70,7 @@ public class Main
 			public void renderTextureExample()
 			{
 				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
-																	new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
+																	new Vector3( -100.0f, 0.0f, 0.0f ),	// Position
 																	new Vector2( -32, -32 ), 			// Offset
 																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
 																	null,								// fill, texture repeat
@@ -101,7 +102,7 @@ public class Main
 					public void pause() { System.out.println( "Source has been paused" ) ; }
 					public void stop() { System.out.println( "Source has been stopped" ) ; }
 
-					public void update( final float _dt ) { System.out.println( _dt ) ; }
+					public void update( final float _dt ) { /*System.out.println( _dt ) ;*/ }
 					public void finished() { System.out.println( "Source has finished" ) ; }
 				} ) ) ;
 			}
@@ -149,9 +150,9 @@ public class Main
 			{
 				final Settings image = new Settings() ;
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "0, 0" ) ;
-				image.addString( "DIM", "128, 128" ) ;
-				image.addString( "OFFSET", "-64, -64" ) ;
+				image.addString( "POS", "100, 0" ) ;
+				image.addString( "DIM", "64, 64" ) ;
+				image.addString( "OFFSET", "-32, -32" ) ;
 
 				final ImageCreator creator = new ImageCreator() ;
 				addEntity( creator.create( image ) ) ;
@@ -179,16 +180,19 @@ public class Main
 	}
 
 	private static void loadFileSystem()
-	{
+ 	{
 		GlobalFileSystem.setFileSystem( new DesktopFileSystem() ) ;
 		GlobalFileSystem.scanBaseDirectory() ;
 	}
 
-	private static void loadConfig( final SystemInterface _system )
+	private static void loadConfig()
 	{
 		final ConfigParser parser = new ConfigParser() ;
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
-
+	}
+	
+	private static void setRenderSettings( final SystemInterface _system )
+	{
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 

@@ -34,6 +34,7 @@ public final class CollisionCheck
 
 		final Vector2 bC1 = _box1.getAbsoluteCenter() ;
 		final Vector2 bC2 = _box2.getAbsoluteCenter() ;
+
 		toCenter.x = bC2.x - bC1.x ;
 		toCenter.y = bC2.y - bC1.y ;
 

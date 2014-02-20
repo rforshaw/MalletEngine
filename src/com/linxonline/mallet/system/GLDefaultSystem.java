@@ -4,6 +4,9 @@ import java.awt.event.WindowListener ;
 import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 import java.awt.image.BufferedImage ;
+import java.awt.Point ;
+import java.awt.Cursor ;
+import java.awt.Toolkit ;
 
 import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.audio.* ;
@@ -45,6 +48,11 @@ public class GLDefaultSystem implements SystemInterface
 		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
 		final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
+
+		//final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
+		//final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "blank cursor" ) ;
+		//frame.getContentPane().setCursor(blankCursor);
+
 		frame.addWindowListener( new WindowListener()
 		{
 			public void windowActivated( final WindowEvent _event ) {}

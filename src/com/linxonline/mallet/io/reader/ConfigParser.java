@@ -3,7 +3,6 @@ package com.linxonline.mallet.io.reader ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.game.GameState ;
 
 public class ConfigParser
 {
@@ -11,6 +10,9 @@ public class ConfigParser
 
 	public ConfigParser() { init() ; }
 
+	/**
+		Allows the developer to extend the config to accept custom settings.
+	*/
 	public void addParser( final ParseInterface _parse )
 	{
 		parsers.add( _parse ) ;
@@ -47,16 +49,9 @@ public class ConfigParser
 
 				var = _src.getString( "DISPLAYHEIGHT", "480" ) ;
 				_dest.addInteger( "DISPLAYHEIGHT", Integer.parseInt( var ) ) ;
-
-				var = _src.getString( "MODE", "GAME_MODE" ) ;
-				if( var.equals( "GAME_MODE" ) == true )
-				{
-					_dest.addInteger( "MODE", GameState.GAME_MODE ) ;
-				}
-				else if( var.equals( "APPLICATION_MODE" ) == true )
-				{
-					_dest.addInteger( "MODE", GameState.APPLICATION_MODE ) ;
-				}
+				
+				var = _src.getString( "VSYNC", "0" ) ;
+				_dest.addInteger( "VSYNC", Integer.parseInt( var ) ) ;
 			}
 		} ) ;
 	}
