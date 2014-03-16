@@ -145,7 +145,7 @@ public class GLDefaultSystem implements SystemInterface
 		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
 		eventSystem.update() ;
-		return true ; // Informs the Game System whether to continue updating or not.
+		return true ;	// Informs the Game System whether to continue updating or not.
 	}
 
 	public void draw( final float _dt )

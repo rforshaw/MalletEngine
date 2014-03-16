@@ -19,7 +19,7 @@ public class SoundManager extends AbstractManager<AudioBuffer>
 	{
 		generator = _generator ;
 	}
-	
+
 	@Override
 	protected AudioBuffer createResource( final String _file )
 	{
