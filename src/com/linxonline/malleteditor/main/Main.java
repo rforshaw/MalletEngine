@@ -5,13 +5,11 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.game.GameSystem ;
-import com.linxonline.malleteditor.system.EditorState ;
+import com.linxonline.mallet.game.GameLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
-import com.linxonline.malleteditor.system.GLEditorSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
-
-import com.linxonline.mallet.event.Event ;
+import com.linxonline.malleteditor.system.GLEditorSystem ;
 
 import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
@@ -19,8 +17,6 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.reader.ConfigParser ;
 import com.linxonline.mallet.io.reader.ConfigReader ;
 
-import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 /*===========================================*/
@@ -30,22 +26,36 @@ import com.linxonline.mallet.util.settings.Settings ;
 public class Main
 {
 	private final static String BASE_CONFIG = "base/config.cfg" ;
+	private final static GLEditorSystem backendSystem = new GLEditorSystem() ;		// OpenGL & OpenAL backend
+	private final static GameSystem gameSystem = new GameSystem( backendSystem ) ;
 
 	public static void main( String _args[] )
 	{
 		loadFileSystem() ;
-		final GLEditorSystem system = new GLEditorSystem() ;		// OpenGL & OpenAL backend
 
-		system.initSystem() ;
-		loadConfig( system ) ;
+		backendSystem.initSystem() ;
+		loadConfig( backendSystem ) ;
+		setRenderSettings( backendSystem ) ;
 
-		final GameSystem game = new GameSystem( system ) ;
-		game.addGameState( new EditorState( "DEFAULT" ) ) ;
+		if( loadGame( gameSystem, new EditorLoader() ) == false )
+		{
+			System.out.println( "Failed to load game.." ) ;
+			return ;
+		}
 
-		game.setDefaultGameState( "DEFAULT" ) ;
-		game.runSystem() ;							// Begin running the game-loop
+		gameSystem.runSystem() ;							// Begin running the game-loop
+		backendSystem.shutdownSystem() ;
+	}
 
-		system.shutdownSystem() ;
+	private static boolean loadGame( final GameSystem _system, final GameLoader _loader )
+	{
+		if( _system != null && _loader != null )
+		{
+			_loader.loadGame( _system ) ;
+			return true ;
+		}
+
+		return false ;
 	}
 
 	private static void loadFileSystem()
@@ -58,7 +68,10 @@ public class Main
 	{
 		final ConfigParser parser = new ConfigParser() ;
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
-
+	}
+	
+	protected static void setRenderSettings( final SystemInterface _system )
+	{
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 

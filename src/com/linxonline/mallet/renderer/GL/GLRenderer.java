@@ -69,8 +69,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	private void initGraphics()
 	{
-		GLProfile glProfile = GLProfile.getDefault() ;
-		GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
+		final GLProfile glProfile = GLProfile.getDefault() ;
+		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
 		capabilities.setDoubleBuffered( true ) ;
 		
 		canvas = new GLCanvas( capabilities ) ;
