@@ -1,19 +1,14 @@
 package com.linxonline.mallet.main ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.game.GameSystem ;
 import com.linxonline.mallet.game.GameLoader ;
-import com.linxonline.mallet.game.GameTestLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
-import com.linxonline.mallet.system.GLDefaultSystem ;
-import com.linxonline.mallet.system.DefaultSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
-import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
+import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.io.reader.ConfigParser ;
@@ -21,36 +16,42 @@ import com.linxonline.mallet.io.reader.ConfigReader ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
-/*===========================================*/
-// Main
-// Test Main
-/*===========================================*/
-public class Main
+public abstract class DesktopStarter extends StarterInterface
 {
-	final static GLDefaultSystem backendSystem = new GLDefaultSystem() ;		// OpenGL & OpenAL backend
-	final static GameSystem gameSystem = new GameSystem( backendSystem ) ;
+	protected final SystemInterface backendSystem  ;
+	protected final GameSystem gameSystem ;
 
-	private final static String BASE_CONFIG = "base/config.cfg" ;
+	protected final static String BASE_CONFIG = "base/config.cfg" ;
 
-	public static void main( String _args[] )
+	public DesktopStarter( final SystemInterface _backendSystem, final FileSystem _fileSystem )
 	{
-		loadFileSystem() ;
+		loadFileSystem( _fileSystem ) ;
+		backendSystem = _backendSystem ;
+		gameSystem = new GameSystem( _backendSystem ) ;
+	}
 
+	@Override
+	public void init()
+	{
 		loadConfig() ;
 		backendSystem.initSystem() ;
 		setRenderSettings( backendSystem ) ;
 
-		if( loadGame( gameSystem, new GameTestLoader() ) == false )
+		if( loadGame( gameSystem, getGameLoader() ) == false )
 		{
 			System.out.println( "Failed to load game.." ) ;
 			return ;
 		}
 
 		gameSystem.runSystem() ;			// Begin running the game-loop
-		backendSystem.shutdownSystem() ;			// Ensure all base systems are destroyed before exiting
+		backendSystem.shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 
-	protected static boolean loadGame( final GameSystem _system, final GameLoader _loader )
+	@Override
+	protected abstract GameLoader getGameLoader() ;
+
+	@Override
+	protected boolean loadGame( final GameSystem _system, final GameLoader _loader )
 	{
 		if( _system != null && _loader != null )
 		{
@@ -60,20 +61,23 @@ public class Main
 
 		return false ;
 	}
-	
-	protected static void loadFileSystem()
+
+	@Override
+	protected void loadFileSystem( final FileSystem _fileSystem )
  	{
-		GlobalFileSystem.setFileSystem( new DesktopFileSystem() ) ;
+		GlobalFileSystem.setFileSystem( _fileSystem ) ;
 		GlobalFileSystem.scanBaseDirectory() ;
 	}
 
-	protected static void loadConfig()
+	@Override
+	protected void loadConfig()
 	{
 		final ConfigParser parser = new ConfigParser() ;
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
 	}
 
-	protected static void setRenderSettings( final SystemInterface _system )
+	@Override
+	protected void setRenderSettings( final SystemInterface _system )
 	{
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;

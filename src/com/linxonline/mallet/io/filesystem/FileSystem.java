@@ -7,8 +7,7 @@ package com.linxonline.mallet.io.filesystem ;
 	Resources are then mapped to allow generic and easy access to all 
 	content. If a resource is accessed but has not been mapped, then it 
 	should be mapped first.
-**/
-
+*/
 public interface FileSystem
 {
 	public void scanBaseDirectory() ;
