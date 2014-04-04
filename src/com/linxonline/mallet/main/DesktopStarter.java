@@ -15,6 +15,7 @@ import com.linxonline.mallet.io.reader.ConfigParser ;
 import com.linxonline.mallet.io.reader.ConfigReader ;
 
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.logger.Logger ;
 
 public abstract class DesktopStarter extends StarterInterface
 {
@@ -39,10 +40,11 @@ public abstract class DesktopStarter extends StarterInterface
 
 		if( loadGame( gameSystem, getGameLoader() ) == false )
 		{
-			System.out.println( "Failed to load game.." ) ;
+			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 
+		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
 		backendSystem.shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
@@ -53,6 +55,7 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected boolean loadGame( final GameSystem _system, final GameLoader _loader )
 	{
+		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
 		if( _system != null && _loader != null )
 		{
 			_loader.loadGame( _system ) ;
@@ -65,6 +68,7 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected void loadFileSystem( final FileSystem _fileSystem )
  	{
+		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
 		GlobalFileSystem.setFileSystem( _fileSystem ) ;
 		GlobalFileSystem.scanBaseDirectory() ;
 	}
@@ -72,6 +76,7 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected void loadConfig()
 	{
+		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
 	}
