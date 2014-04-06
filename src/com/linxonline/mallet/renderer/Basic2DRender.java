@@ -213,8 +213,12 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		state.clear() ;
 	}
 
-	protected void CalculateInterpolatedPosition( Vector3 _old, Vector3 _current, Vector2 _position )
+	protected void calculateInterpolatedPosition( Vector3 _old, Vector3 _current, Vector2 _position )
 	{
+		// Calculate the how many render iterations must take place to reach 
+		// the current states positions.
+		// xDiff & yDiff represents the distance change for one render iteration.
+		// Linearly interpolate to the current state positions.
 		final int renderDiff = ( int )( updateDT / drawDT ) ;
 		final float xDiff = ( _current.x - _old.x ) / renderDiff ;
 		final float yDiff = ( _current.y - _old.y ) / renderDiff ;
