@@ -2,7 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.resources.texture.Sprite ;
+import com.linxonline.mallet.resources.Sprite ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.SourceCallback ;

@@ -33,7 +33,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		if( resource != null )
 		{
 			add( _file, resource ) ;
-			resource.register() ;
+			resource.register() ;			// Increment usage count
 		}
 
 		return resource ;

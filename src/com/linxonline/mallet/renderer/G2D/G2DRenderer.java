@@ -18,11 +18,11 @@ import java.awt.Insets ;
 
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.id.IDInterface ;
-import com.linxonline.mallet.resources.TextureManager ;
 import com.linxonline.mallet.util.settings.Settings ;
+
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.resources.* ;
 
 /**
 	G2DRenderer is an event-driven renderer.
@@ -32,7 +32,7 @@ import com.linxonline.mallet.renderer.* ;
 **/
 public class G2DRenderer extends Basic2DRender
 {
-	protected final static TextureManager textures = new TextureManager() ;
+	protected final static G2DTextureManager textures = new G2DTextureManager() ;
 
 	protected final Vector2 pos = new Vector2() ;
 	protected final AffineTransform transform = new AffineTransform() ;
@@ -359,14 +359,9 @@ public class G2DRenderer extends Basic2DRender
 
 	protected void render()
 	{
-		final int length = state.size() ;
-		RenderData data = null ;
-
-		for( int i = 0; i < length; ++i )
+		if( state.isStateStable() == true )
 		{
-			data = state.getDataAt( i ) ;
-			pos.setXY( data.position.x, data.position.y ) ;
-			data.drawCall.draw( data.drawData, pos ) ;
+			state.draw() ;
 		}
 	}
 

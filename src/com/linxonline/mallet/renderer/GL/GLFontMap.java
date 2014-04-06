@@ -1,8 +1,7 @@
 package com.linxonline.mallet.renderer.GL ;
 
 import com.linxonline.mallet.resources.Resource ;
-import com.linxonline.mallet.resources.model.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;

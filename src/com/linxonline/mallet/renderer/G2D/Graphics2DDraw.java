@@ -7,7 +7,7 @@ import java.awt.geom.AffineTransform ;
 
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 
 public class Graphics2DDraw
 {

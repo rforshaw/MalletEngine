@@ -1,25 +1,27 @@
 package com.linxonline.mallet.game ;
 
 import java.util.ArrayList ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.audio.alsa.* ;
 
-import com.linxonline.mallet.game.statemachine.* ;
-import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.entity.system.* ;
-import com.linxonline.mallet.system.* ;
-import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.game.statemachine.State ;
+
+import com.linxonline.mallet.input.InputHandler ;
+import com.linxonline.mallet.input.InputState ;
+
+import com.linxonline.mallet.event.EventSystem ;
+import com.linxonline.mallet.event.EventController ;
+
+import com.linxonline.mallet.physics.CollisionSystem ;
+
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.physics.* ;
+import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.animation.* ;
-import com.linxonline.mallet.util.locks.* ;
+
+import com.linxonline.mallet.util.settings.* ;
+import com.linxonline.mallet.util.locks.Locks ;
 
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;
@@ -173,21 +175,21 @@ public class GameState extends State implements HookEntity
 		ArrayList<Component> components = null ;
 
 		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			CollisionComponent coll = ( CollisionComponent )comp ;
 			collisionSystem.add( coll.hull ) ;
 		}
 
 		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			InputHandler component = ( InputHandler )comp ;
 			inputSystem.addInputHandler( component ) ;
 		}
 
 		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
 			final EventController controller = e.getEventController() ;
@@ -198,7 +200,7 @@ public class GameState extends State implements HookEntity
 		}
 
 		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			QueryComponent component = ( QueryComponent )comp ;
 			component.setSearch( entitySystem.getSearch() ) ;
@@ -216,21 +218,21 @@ public class GameState extends State implements HookEntity
 		ArrayList<Component> components = null ;
 
 		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			CollisionComponent coll = ( CollisionComponent )comp ;
 			collisionSystem.remove( coll.hull ) ;
 		}
 
 		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			InputHandler component = ( InputHandler )comp ;
 			inputSystem.removeInputHandler( component ) ;
 		}
 
 		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			final EventComponent e = ( EventComponent )comp ;
 			e.sendFinishEvents() ;
@@ -241,7 +243,7 @@ public class GameState extends State implements HookEntity
 		}
 
 		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
-		for( Component comp : components )
+		for( final Component comp : components )
 		{
 			QueryComponent component = ( QueryComponent )comp ;
 			component.setSearch( null ) ;

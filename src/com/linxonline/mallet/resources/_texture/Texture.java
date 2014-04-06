@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.texture ;
+package com.linxonline.mallet.resources ;
 
 import com.linxonline.mallet.resources.Resource ;
 

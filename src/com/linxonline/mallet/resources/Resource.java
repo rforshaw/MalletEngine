@@ -4,15 +4,15 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /**
 	Resource is the root class that all resource types 
-	should extends from.
+	should extend from.
 	
 	It uses a simple Reference Counting system to determine 
 	how many objects are using the Resource currently.
 **/
 public abstract class Resource
 {
-	private long creationTime = 0 ;
-	private int count = 0 ;
+	private long creationTime = 0 ;			// When was the resource created
+	private int count = 0 ;					// How many are referencing it
 
 	protected Resource()
 	{

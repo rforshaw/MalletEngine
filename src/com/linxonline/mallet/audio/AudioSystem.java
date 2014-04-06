@@ -6,7 +6,6 @@ import java.util.HashMap ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
 

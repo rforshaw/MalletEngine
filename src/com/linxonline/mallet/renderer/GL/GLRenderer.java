@@ -14,8 +14,7 @@ import javax.media.opengl.glu.GLU ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.model.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.system.GlobalConfig ;
@@ -518,19 +517,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected void render()
 	{
-		if( state.isAvailable() == false )
+		if( state.isStateStable() == true )
 		{
-			return ;
-		}
-
-		final int currentLength = state.size() ;
-		RenderData current = null ;
-
-		for( int i = 0; i < currentLength; ++i )
-		{
-			current = state.getDataAt( i ) ;
-			state.calculatePosition( i, pos ) ;
-			current.drawCall.draw( current.drawData, pos ) ;
+			state.draw() ;
 		}
 	}
 
@@ -560,7 +549,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		if( position != null )
 		{
-			final RenderData data = new RenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
+			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawText ;
 			insert( data ) ;
@@ -576,9 +565,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	private Texture loadTexture( final Settings _draw )
 	{
-		final Texture texture = ( Texture )textures.get( _draw.getString( "FILE", null ) ) ;
+		final Texture texture = textures.get( _draw.getString( "FILE", null ) ) ;
 		if( texture == null ) { return null ; }
-		
+
 		Vector2 fillDim = _draw.getObject( "FILL", null ) ;
 		Vector2 dimension = _draw.getObject( "DIM", null ) ;
 		if( dimension == null )
@@ -602,5 +591,36 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		return texture ;
+	}
+
+	protected class GLRenderData extends RenderData
+	{
+		public GLRenderData()
+		{
+			super() ;
+		}
+
+		public GLRenderData( final int _id, final int _type,
+							 final Settings _draw, final Vector3 _position,
+							 final int _layer )
+		{
+			super( _id, _type, _draw, _position, _layer ) ;
+		}
+	
+		@Override
+		public void unregisterResources()
+		{
+			final Texture texture = drawData.getObject( "TEXTURE", null ) ;
+			if( texture != null )
+			{
+				texture.unregister() ;
+			}
+
+			final Model model = drawData.getObject( "MODEL", null ) ;
+			if( model != null )
+			{
+				model.unregister() ;
+			}
+		}
 	}
 }

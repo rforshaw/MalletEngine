@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.GL ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.resources.model.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 

@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.sound ;
+package com.linxonline.mallet.resources ;
 
 /**
 	Implement Sound Interface for storing different 

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.audio ;
 
-import com.linxonline.mallet.resources.sound.* ;
+import com.linxonline.mallet.resources.* ;
 
 public interface AudioGenerator<T extends SoundInterface>
 {

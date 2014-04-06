@@ -1,4 +1,4 @@
-package com.linxonline.mallet.entity.system ;
+package com.linxonline.mallet.entity ;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;

@@ -10,11 +10,12 @@ import java.io.* ;
 import java.nio.* ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.util.logger.Logger ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.texture.Texture ;
 
-public class GLTextureManager extends TextureManager
+public class GLTextureManager extends AbstractManager<Texture>
 {
 	/**
 		Currently two OpenGL image formats are supported: GL_RGBA and GL_ABGR_EXT.
@@ -33,8 +34,21 @@ public class GLTextureManager extends TextureManager
 	{
 		imageFormat = _format ;
 	}
-	
+
 	@Override
+	protected Texture createResource( final String _file )
+	{
+		Texture texture = loadTexture( _file ) ;
+		if( texture != null )
+		{
+			resources.put( _file, texture ) ;
+			return texture ;
+		}
+
+		Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
+		return null ;
+	}
+
 	protected Texture loadTexture( final String _file )
 	{
 		try

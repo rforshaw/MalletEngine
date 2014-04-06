@@ -40,4 +40,8 @@ Android &amp; iOS support?
 I have yet to add the Android &amp; iOS source files to the repository. This will be done at a later date.
 
 Note:
-The Mallet Engine contains a pre-made entry point located at: ./src/com/linxonline/mallet/main/Main.java
+Folder that begin with an underscore, _desktop, or have underscores between words, _game_test, are not considered to be part of the 
+Mallet Engine compiled hierarchy. Classes with these folders should specify their package location as within the parent folder.
+
+Note:
+The Mallet Engine contains a pre-made entry point located at: ./src/com/linxonline/mallet/main/_desktop/DesktopTestMain.java

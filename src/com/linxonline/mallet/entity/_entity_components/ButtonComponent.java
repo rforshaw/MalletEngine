@@ -5,7 +5,7 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 
 /*==============================================================*/

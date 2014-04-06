@@ -6,7 +6,7 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 
 public class CheckBoxComponent extends InputComponent

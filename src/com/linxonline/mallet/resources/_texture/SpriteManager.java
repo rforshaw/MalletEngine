@@ -4,7 +4,6 @@ import java.util.ArrayList ;
 import java.io.* ;
 
 import com.linxonline.mallet.io.reader.* ;
-import com.linxonline.mallet.resources.texture.* ;
 
 public class SpriteManager extends AbstractManager<Sprite>
 {

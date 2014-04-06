@@ -2,7 +2,6 @@ package com.linxonline.mallet.entity ;
 
 import java.lang.StringBuffer ;
 
-import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;

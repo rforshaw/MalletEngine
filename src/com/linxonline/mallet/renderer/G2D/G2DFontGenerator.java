@@ -10,7 +10,7 @@ import java.awt.RenderingHints ;
 import java.awt.Graphics2D ;
 import java.awt.Canvas ;
 
-import com.linxonline.mallet.resources.texture.Texture ;
+import com.linxonline.mallet.resources.Texture ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.maths.Vector2 ;

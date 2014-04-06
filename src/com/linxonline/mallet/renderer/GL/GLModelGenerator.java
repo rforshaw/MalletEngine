@@ -2,7 +2,6 @@ package com.linxonline.mallet.renderer.GL ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.maths.* ;
 
 public class GLModelGenerator

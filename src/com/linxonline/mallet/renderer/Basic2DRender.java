@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.id.IDInterface ; 			// IDInterface to folder agnostic place
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.sort.QuickSort ;
 import com.linxonline.mallet.util.sort.SortInterface ;
 
@@ -29,9 +29,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static final Vector2 DEFAULT_ONE = new Vector2( 1.0f, 1.0f ) ;
 
-	protected int renderIter = 0 ;
-	protected float updateDT = 0.0f ;
-	protected float drawDT = 0.0f ;
+	protected int renderIter = 0 ;			// What render iteration we are currently on
+	protected float updateDT = 0.0f ;		// Delta time of the update cycle
+	protected float drawDT = 0.0f ;			// Delta time of the render cycle
 
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
 	protected final RenderState state = new RenderState() ;
@@ -223,6 +223,147 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		_position.y = _old.y + ( yDiff * renderIter ) ;
 	}
 
+	protected class RenderState implements RenderStateInterface<Integer, RenderData>
+	{
+		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;							// Old State
+		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;								// Current State - loopable
+		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;	// Current State - searchable
+
+		@Override
+		public void add( Integer _id, RenderData _data )
+		{
+			insert( _id, _data ) ;
+		}
+
+		@Override
+		public void insert( Integer _id, RenderData _data )
+		{
+			hashedContent.put( _id, _data ) ;
+			for( final RenderData data : content )
+			{
+				if( _data.layer <= data.layer )
+				{
+					final int index = content.indexOf( data ) ;
+					content.add( index, _data ) ;		// Insert at index location
+					return ;
+				}
+			}
+
+			content.add( _data ) ;						// Add to end of array
+		}
+
+		@Override
+		public void remove( Integer _id )
+		{
+			final RenderData data = getData( _id ) ;
+			if( data != null )
+			{
+				data.unregisterResources() ;		// Decrement resource count
+				hashedContent.remove( _id ) ;
+				content.remove( data ) ;
+			}
+		}
+
+		@Override
+		public void retireCurrentState()
+		{
+			final int size = content.size() ;
+			setOldStateSize( size ) ;
+
+			for( int i = 0; i < size; ++i )
+			{
+				// Set the positions of old-state to the possitions
+				// of the current-state. Current-state data will 
+				// soon be updated.
+				final RenderData data = content.get( i ) ;
+				oldState.get( i ).setXYZ( data.position ) ;
+			}
+		}
+
+		protected void setOldStateSize( final int _size )
+		{
+			final int oldSize = oldState.size() ;
+			if( oldSize < _size )
+			{
+				// Add new vector states for interpolation
+				int toAdd = _size - oldSize ;
+				for( int i = 0; i < toAdd; ++i )
+				{
+					oldState.add( new Vector3() ) ;
+				}
+			}
+			else if( oldSize > _size )
+			{
+				// Remove vector states
+				int toRemove = oldSize - _size ;
+				oldState.subList( 0, toRemove ).clear() ;
+			}
+		}
+
+		@Override
+		public void clear()
+		{
+			final int size = content.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				content.get( i ).unregisterResources() ;
+			}
+
+			oldState.clear() ;
+			content.clear() ;
+			hashedContent.clear() ;
+		}
+
+		public boolean isStateStable()
+		{
+			return oldState.size() == content.size() ;
+		}
+
+		public void draw()
+		{
+			final Vector2 position = new Vector2() ;
+			final int size = content.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final RenderData data = state.getCurrentPosition( i, position ) ;
+				data.drawCall.draw( data.drawData, position ) ;
+			}
+		}
+		
+		protected RenderData getCurrentPosition( final int _index, final Vector2  _position )
+		{
+			final Vector3 old = oldState.get( _index ) ;
+			final RenderData data = content.get( _index ) ;
+			final Vector3 current = data.position ;
+
+			final int renderDiff =  ( int )( updateDT / drawDT ) ;
+			final float xDiff = ( current.x - old.x ) / renderDiff ;
+			final float yDiff = ( current.y - old.y ) / renderDiff ;
+
+			_position.x = old.x + ( xDiff * renderIter ) ;
+			_position.y = old.y + ( yDiff * renderIter ) ;
+
+			return data ;
+		}
+
+		@Override
+		public void sort()
+		{
+			content = QuickSort.quicksort( content ) ;
+		}
+
+		@Override
+		public RenderData getData( Integer _id )
+		{
+			if( hashedContent.containsKey( _id ) == true )
+			{
+				return hashedContent.get( _id ) ;
+			}
+
+			return null ;
+		}
+	}
+
 	protected class RenderData implements SortInterface
 	{
 		public int id ;
@@ -268,123 +409,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			return layer ;
 		}
+
+		public void unregisterResources() {}
 	}
-
-	protected class RenderState implements RenderStateInterface<Integer, RenderData>
-	{
-		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;
-		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;
-		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;
-
-		public void add( Integer _id, RenderData _data )
-		{
-			content.add( _data ) ;
-		}
-
-		public void insert( Integer _id, RenderData _data )
-		{
-			hashedContent.put( _id, _data ) ;
-			for( final RenderData data : content )
-			{
-				if( _data.layer <= data.layer )
-				{
-					final int index = content.indexOf( data ) ;
-					content.add( index, _data ) ;
-					return ;
-				}
-			}
-
-			content.add( _data ) ;
-		}
-
-		public void remove( Integer _id )
-		{
-			if( hashedContent.containsKey( _id ) == true )
-			{
-				final RenderData data = hashedContent.get( _id ) ;
-				content.remove( data ) ;
-				hashedContent.remove( _id ) ;
-			}
-		}
-
-		public void retireCurrentState()
-		{
-			int currentSize = content.size() ;
-			int oldSize = oldState.size() ;
-
-			if( oldSize < currentSize )
-			{
-				// Add new vector states for interpolation
-				int toAdd = currentSize - oldSize ;
-				for( int i = 0; i < toAdd; ++i )
-				{
-					oldState.add( new Vector3() ) ;
-				}
-			}
-			else if( oldSize > currentSize )
-			{
-				// Remove vector states
-				int toRemove = oldSize - currentSize ;
-				oldState.subList( 0, toRemove ).clear() ;
-			}
-			
-			for( int i = 0; i < currentSize; ++i )
-			{
-				oldState.get( i ).setXYZ( getDataAt( i ).position ) ;
-			}
-		}
-
-		public void clear()
-		{
-			oldState.clear() ;
-			content.clear() ;
-			hashedContent.clear() ;
-		}
-
-		public boolean isAvailable()
-		{
-			return oldState.size() == content.size() ;
-		}
-
-		public void calculatePosition( int _index, Vector2 _position )
-		{
-			final Vector3 old = oldState.get( _index ) ;
-			final Vector3 current = content.get( _index ).position ;
-
-			final int renderDiff =  ( int )( updateDT / drawDT ) ;
-			final float xDiff = ( current.x - old.x ) / renderDiff ;
-			final float yDiff = ( current.y - old.y ) / renderDiff ;
-
-			//System.out.println( "Diff: " + renderDiff + " Iter: " + renderIter ) ;
-			//System.out.println( "OLD: " + old + " CURRENT: " + current ) ;
-			//System.out.println( "XD: " + xDiff * renderIter + " YD: " + yDiff * renderIter ) ;
-
-			_position.x = old.x + ( xDiff * renderIter ) ;
-			_position.y = old.y + ( yDiff * renderIter ) ;
-			//System.out.println( _position ) ;
-		}
-
-		public void sort()
-		{
-			content = QuickSort.quicksort( content ) ;
-		}
-
-		public int size()
-		{
-			return content.size() ;
-		}
-		
-		public RenderData getDataAt( int _index )
-		{
-			return content.get( _index ) ;
-		}
-		
-		public RenderData getData( Integer _id )
-		{
-			return null ;
-		}
-	}
-
+	
 	protected interface DrawInterface
 	{
 		public void draw( final Settings _settings, final Vector2 _position ) ;
