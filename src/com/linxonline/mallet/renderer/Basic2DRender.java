@@ -213,7 +213,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		state.clear() ;
 	}
 
-	protected void calculateInterpolatedPosition( Vector3 _old, Vector3 _current, Vector2 _position )
+	protected void calculateInterpolatedPosition( final Vector3 _old, final Vector3 _current, final Vector2 _position )
 	{
 		// Calculate the how many render iterations must take place to reach 
 		// the current states positions.
@@ -333,7 +333,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 				data.drawCall.draw( data.drawData, position ) ;
 			}
 		}
-		
+
 		protected RenderData getCurrentPosition( final int _index, final Vector2  _position )
 		{
 			final Vector3 old = oldState.get( _index ) ;
@@ -416,7 +416,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 		public void unregisterResources() {}
 	}
-	
+
 	protected interface DrawInterface
 	{
 		public void draw( final Settings _settings, final Vector2 _position ) ;
