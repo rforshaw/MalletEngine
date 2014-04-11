@@ -8,11 +8,12 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLGeometry implements GeometryInterface
 {
-	public static final int VERTEX_SIZE = 3 + 2 + 3 ;
+	public static final int VERTEX_SIZE = 3 + 4 + 2 + 3 ;
 	public static final int STRIDE = VERTEX_SIZE * 4 ; // 4 represents byte size
 	public static final int POSITION_OFFSET = 0 ;
-	public static final int TEXCOORD_OFFSET = 3 * 4 ;
-	public static final int NORMAL_OFFSET = 5 * 4 ;
+	public static final int COLOUR_OFFSET = 3 * 4 ;
+	public static final int TEXCOORD_OFFSET = 7 * 4 ;
+	public static final int NORMAL_OFFSET = 9 * 4 ;
 
 	private int vertexInc = 0 ; 
 	private int indexInc = 0 ;
@@ -57,13 +58,23 @@ public class GLGeometry implements GeometryInterface
 		vertex[vertexInc + 1] = _position.y ;
 		vertex[vertexInc + 2] = _position.z ;
 
-		vertex[vertexInc + 3] = _texCoord.x ;
-		vertex[vertexInc + 4] = _texCoord.y ;
+		vertex[vertexInc + 3] = 1.0f ;			// red
+		vertex[vertexInc + 4] = 1.0f ;			// green
+		vertex[vertexInc + 5] = 1.0f ;			// blue
+		vertex[vertexInc + 6] = 1.0f ;			// alpha
+	
+		vertex[vertexInc + 7] = _texCoord.x ;
+		vertex[vertexInc + 8] = _texCoord.y ;
 		
-		vertex[vertexInc + 5] = _normal.x ;
-		vertex[vertexInc + 6] = _normal.y ;
-		vertex[vertexInc + 7] = _normal.z ;
+		vertex[vertexInc + 9]  = _normal.x ;
+		vertex[vertexInc + 10]  = _normal.y ;
+		vertex[vertexInc + 11] = _normal.z ;
 
 		vertexInc += VERTEX_SIZE ;
+	}
+
+	public void destroy()
+	{
+		GLModelManager.unbind( this ) ;
 	}
 }

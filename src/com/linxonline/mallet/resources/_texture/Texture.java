@@ -33,6 +33,11 @@ public final class Texture<T extends ImageInterface> extends Resource
 		return image ;
 	}
 	
+	public final void destroy()
+	{
+		image.destroy() ;
+	}
+	
 	@Override
 	public String type()
 	{

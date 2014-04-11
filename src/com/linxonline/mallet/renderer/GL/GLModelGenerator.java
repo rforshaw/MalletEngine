@@ -57,6 +57,40 @@ public class GLModelGenerator
 		return model ;
 	}
 
+	/**
+		Create a Geometric Line
+	*/
+	public static Model genLineModel( final String _name, final Line _line )
+	{
+		// See if the model already exists
+		final Model m = ( Model )models.get( _name ) ;
+		if( m != null ) { return m ; }
+
+		// Generate the line, & register it.
+		final Model model = GLModelGenerator.genLineModel( _line ) ;
+		models.add( _name, model ) ;
+		model.register() ;
+		return model ;
+	}
+	
+	public static Model genLineModel( final Line _line )
+	{
+		final GLGeometry geometry = new GLGeometry( 2, 2 ) ;
+		geometry.addVertex( new Vector3( _line.start ),
+							new Vector3( 0, 0, 1 ),
+							new Vector2() ) ;
+		geometry.addVertex( new Vector3( _line.end ),
+							new Vector3( 0, 0, 1 ),
+							new Vector2() ) ;
+
+		geometry.addIndices( 0 ) ;
+		geometry.addIndices( 1 ) ;
+		
+		final Model model = new Model( geometry ) ;
+		models.bind( geometry ) ;
+		return model ;
+	}
+	
 	public static Model genCubeModel( final String _name, final Vector2 _dim )
 	{
 		return genCubeModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;

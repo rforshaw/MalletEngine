@@ -25,4 +25,6 @@ public class G2DImage implements ImageInterface
 	{
 		return height ;
 	}
+
+	public final void destroy() {}
 }

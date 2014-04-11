@@ -116,53 +116,47 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
+				final Model model = _settings.getObject( "MODEL", null ) ;
+				if( model == null )
+				{
+					// If we can't map the texture to a plane, then no point in rendering.
+					return ;
+				}
+
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
+				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+
+				gl.glDisable( gl.GL_TEXTURE_2D ) ;
+				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
 
 				gl.glPushMatrix() ;
-					gl.glTranslatef( _position.x + offset.x, _position.y + offset.y, 0.0f ) ;
+					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
+					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					final Line line = ( Line )_settings.getObject( "DRAWLINE", null ) ;
-					if( line != null )
+					gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
+					gl.glPointSize( 5.0f ) ;
+
+					if( geometry.indexID != indexID )
 					{
-						gl.glBegin( GL2.GL_LINES ) ;
-							gl.glVertex2f( line.start.x, line.start.y ) ;
-							gl.glVertex2f( line.end.x, line.end.y ) ;
-						gl.glEnd() ;
+						indexID = geometry.indexID ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
-					Shape shape = ( Shape )_settings.getObject( "DRAWLINES", null ) ;
-					if( shape != null )
-					{
-						final int size = shape.indicies.size() ;
-						for( int i = 0; i < size; i += 2 )
-						{
-							final Vector2 start = shape.points.get( shape.indicies.get( i ) ) ;
-							final Vector2 end = shape.points.get( shape.indicies.get( i + 1 ) ) ;
+					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
-							gl.glBegin( GL2.GL_LINES ) ;
-								gl.glColor3f( 1.0f, 1.0f, 1.0f ) ;
-								gl.glVertex2f( start.x, start.y ) ;
-								gl.glVertex2f( end.x, end.y ) ;
-							gl.glEnd() ;
-						}
-					}
-
-					shape = ( Shape )_settings.getObject( "POINTS", null ) ;
-					if( shape != null )
-					{
-						final int size = shape.indicies.size() ;
-						for( int i = 0; i < size; ++i )
-						{
-							final Vector2 point = shape.points.get( shape.indicies.get( i ) ) ;
-							gl.glBegin( GL2.GL_POINT ) ;
-								gl.glColor3f( 1.0f, 0.0f, 0.0f ) ;
-								gl.glVertex2f( point.x + offset.x, point.y + offset.y ) ;
-							gl.glEnd() ;
-						}
-					}
+					gl.glDrawElements( GL2.GL_LINES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 				gl.glPopMatrix() ;
+
+				gl.glEnable( GL.GL_TEXTURE_2D ) ;
+				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 		} ;
 
@@ -196,11 +190,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 
+				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+
 				gl.glPushMatrix() ;
 					
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+
+					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 					if( geometry.indexID != indexID )
 					{
@@ -210,11 +211,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 				gl.glPopMatrix() ;
+
+				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 		} ;
 
@@ -267,11 +274,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
+				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
+				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+
 				gl.glPushMatrix() ;
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+
 					gl.glTranslatef( currentPos.x, currentPos.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
@@ -280,6 +294,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						gl.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 				gl.glPopMatrix() ;
+
+				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
+				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm )
@@ -298,6 +317,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
@@ -391,16 +411,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		gl.glEnable( GL.GL_TEXTURE_2D ) ;
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
-
 		gl.glEnable( GL.GL_BLEND ) ;
-		gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 		//gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE ) ;
 		resize() ;
-
-		gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
-		gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
-		gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 
 		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
 		{
@@ -531,7 +545,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		if( position != null )
 		{
-			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;
@@ -539,7 +553,24 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 
 	@Override
-	protected void createGeometry( final Settings _draw ) {}
+	protected void createGeometry( final Settings _draw )
+	{
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
+		final int layer = _draw.getInteger( "LAYER", -1 ) ;
+
+		if( position != null )
+		{
+			final Line line = _draw.<Line>getObject( "DRAWLINE", null ) ;
+			if( line != null )
+			{
+				_draw.addObject( "MODEL", GLModelGenerator.genLineModel( line ) ) ;
+				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+				data.drawCall = drawShape ;
+				insert( data ) ;
+			}
+		}
+	}
 
 	@Override
 	protected void createText( final Settings _draw )
@@ -579,7 +610,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			final String name = dimension.toString() ;
 			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
-			//_draw.addObject( "MODEL", GLModelGenerator.genCubeModel( name, dimension ) ) ;
 			_draw.addObject( "TEXTURE", texture ) ;
 		}
 		else

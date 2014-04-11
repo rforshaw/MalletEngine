@@ -3,6 +3,7 @@ package com.linxonline.mallet.game ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
 import com.linxonline.mallet.util.sort.* ;
@@ -48,6 +49,14 @@ public final class GameTestLoader extends GameLoader
 																	null,								// clip
 																	null,								// clip offset
 																	10 ) ) ;							// layer
+
+				eventSystem.addEvent( DrawFactory.createShape( "DRAWLINE",
+																new Line( new Vector2(), new Vector2( 200.0f, 0.0f ) ),
+																new Vector3( -100.0f, 50.0f, 0.0f ),
+																null,
+																null,
+																null,
+																10 ) ) ;
 			}
 
 			/**

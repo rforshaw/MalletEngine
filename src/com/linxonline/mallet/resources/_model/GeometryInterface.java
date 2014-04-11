@@ -13,4 +13,6 @@ public interface GeometryInterface
 	public void addVertex( final Vector3 _position, 
 						   final Vector3 _normal,
 						   final Vector2 _texCoord ) ;
+	
+	public void destroy() ;
 }

@@ -17,6 +17,11 @@ public final class Model extends Resource
 		return _type.cast( geometry ) ;
 	}
 
+	public void destroy()
+	{
+		geometry.destroy() ;
+	}
+	
 	@Override
 	public String type()
 	{

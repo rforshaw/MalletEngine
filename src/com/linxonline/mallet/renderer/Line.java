@@ -18,4 +18,9 @@ public class Line
 		start = _start ;
 		end = _end ;
 	}
+	
+	public String toString()
+	{
+		return "Start: " + start.toString() + "\nEnd: " + end.toString() ;
+	}
 }

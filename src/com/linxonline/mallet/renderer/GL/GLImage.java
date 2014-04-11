@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.GL ;
 
 import java.awt.image.BufferedImage ;
+import javax.media.opengl.* ;
 
 import com.linxonline.mallet.resources.ImageInterface ;
 
@@ -25,5 +26,18 @@ public class GLImage implements ImageInterface
 	public final int getHeight()
 	{
 		return height ;
+	}
+	
+	public final void destroy()
+	{
+		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
+		if( gl != null )
+		{
+			final int[] textures = new int[1] ;
+			textures[0] = textureID ;
+			gl.glDeleteTextures( 1, textures, 0 ) ;
+		}
+		GLRenderer.getCanvas().getContext().release() ;
 	}
 }
