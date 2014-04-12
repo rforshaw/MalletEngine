@@ -91,6 +91,45 @@ public class GLModelGenerator
 		return model ;
 	}
 	
+		/**
+		Create a Geometric Line
+	*/
+	public static Model genShapeModel( final String _name, final Shape _line )
+	{
+		// See if the model already exists
+		final Model m = ( Model )models.get( _name ) ;
+		if( m != null ) { return m ; }
+
+		// Generate the line, & register it.
+		final Model model = GLModelGenerator.genShapeModel( _line ) ;
+		models.add( _name, model ) ;
+		model.register() ;
+		return model ;
+	}
+	
+	public static Model genShapeModel( final Shape _shape )
+	{
+		final int indexSize = _shape.indicies.size() ;
+		final int pointSize = _shape.points.size() ;
+
+		final GLGeometry geometry = new GLGeometry( indexSize, pointSize ) ;
+		for( int i = 0; i < pointSize; ++i )
+		{
+			geometry.addVertex( new Vector3( _shape.points.get( i ) ),
+								new Vector3( 0, 0, 1 ),
+								new Vector2() ) ;
+		}
+
+		for( int i = 0; i < indexSize; ++i )
+		{
+			geometry.addIndices( _shape.indicies.get( i ) ) ;
+		}
+		
+		final Model model = new Model( geometry ) ;
+		models.bind( geometry ) ;
+		return model ;
+	}
+
 	public static Model genCubeModel( final String _name, final Vector2 _dim )
 	{
 		return genCubeModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;

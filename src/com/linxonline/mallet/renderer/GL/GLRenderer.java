@@ -24,35 +24,35 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
 
-	private static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 
-	private int numID = 0 ;
-	private static GLU glu = new GLU() ;
-	private static GLCanvas canvas = null ;
-	private JFrame frame = null ;
+	protected int numID = 0 ;
+	protected static GLU glu = new GLU() ;
+	protected static GLCanvas canvas = null ;
+	protected JFrame frame = null ;
 
-	private final DefaultTimer timer = new DefaultTimer() ;
-	private Vector2 pos = new Vector2() ;
+	protected final DefaultTimer timer = new DefaultTimer() ;
+	protected Vector2 pos = new Vector2() ;
 
-	private Vector3 oldCameraPosition = new Vector3() ;
-	private Vector3 cameraPosition = null ;
+	protected Vector3 oldCameraPosition = new Vector3() ;
+	protected Vector3 cameraPosition = null ;
 
-	private Vector2 renderDimensions = null ;
-	private Vector2 displayDimensions = null ;
+	protected Vector2 renderDimensions = null ;
+	protected Vector2 displayDimensions = null ;
 
 	protected GL2 gl = null ;
 	protected DrawInterface drawShape = null ;
 	protected DrawInterface drawTexture = null ;
 	protected DrawInterface drawText = null ;
 
-	private int viewMode = ORTHOGRAPHIC_MODE ;
-	private int textureID = 0 ;
-	private int indexID = 0 ;
+	protected int viewMode = ORTHOGRAPHIC_MODE ;
+	protected int textureID = 0 ;
+	protected int indexID = 0 ;
 	
-	private float rotate = 0.0f ;
+	protected float rotate = 0.0f ;
 	
 	public GLRenderer() {}
 
@@ -119,7 +119,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
 				{
-					// If we can't map the texture to a plane, then no point in rendering.
 					return ;
 				}
 
@@ -137,7 +136,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
 					gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
-					gl.glPointSize( 5.0f ) ;
+					//gl.glPointSize( 5.0f ) ;
 
 					if( geometry.indexID != indexID )
 					{
@@ -240,7 +239,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( font == null )
 				{
 					System.out.println( "No Font, set." ) ;
-					return ; }
+					return ;
+				}
 				else
 				{
 					if( font.font == null )
@@ -564,6 +564,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( line != null )
 			{
 				_draw.addObject( "MODEL", GLModelGenerator.genLineModel( line ) ) ;
+				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+				data.drawCall = drawShape ;
+				insert( data ) ;
+			}
+
+			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
+			if( shape != null )
+			{
+				_draw.addObject( "MODEL", GLModelGenerator.genShapeModel( shape ) ) ;
 				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				data.drawCall = drawShape ;
