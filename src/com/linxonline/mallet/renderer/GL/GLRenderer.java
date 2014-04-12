@@ -136,7 +136,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
 					gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
-					//gl.glPointSize( 5.0f ) ;
 
 					if( geometry.indexID != indexID )
 					{
@@ -146,9 +145,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
-					gl.glDrawElements( GL2.GL_LINES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+					gl.glDrawElements( GL2.GL_LINE_STRIP, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 				gl.glPopMatrix() ;
 
 				gl.glEnable( GL.GL_TEXTURE_2D ) ;
@@ -210,7 +209,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
@@ -317,7 +316,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
@@ -568,6 +567,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				data.drawCall = drawShape ;
 				insert( data ) ;
+				return ;
 			}
 
 			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
@@ -578,6 +578,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				data.drawCall = drawShape ;
 				insert( data ) ;
+				return ;
 			}
 		}
 	}

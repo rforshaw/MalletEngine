@@ -129,7 +129,7 @@ public class Graphics2DDraw
 		{
 			if( colour.colour == null )
 			{
-				colour.setColour( ( Object )new Color( colour.red, colour.green, colour.blue ) ) ;
+				colour.setColour( ( Object )new Color( colour.toRGBA() ) ) ;
 			}
 
 			_graphics.setColor( ( Color )colour.colour ) ;

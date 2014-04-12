@@ -4,6 +4,7 @@ import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Line ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
 import com.linxonline.mallet.util.sort.* ;
@@ -31,7 +32,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 				createEntityExample() ;
 				createMouseAnimExample() ;
 			}
@@ -50,8 +51,19 @@ public final class GameTestLoader extends GameLoader
 																	null,								// clip offset
 																	10 ) ) ;							// layer
 
-				eventSystem.addEvent( DrawFactory.createShape( "DRAWLINE",
-																new Line( new Vector2(), new Vector2( 200.0f, 0.0f ) ),
+				final Shape lines = new Shape() ;
+				lines.addPoint( new Vector2( 0, 10 ) ) ;
+				lines.addPoint( new Vector2( 0, 0 ) ) ;
+				lines.addPoint( new Vector2( 200, 0 ) ) ;
+				lines.addPoint( new Vector2( 200, 10 ) ) ;
+				
+				lines.addIndex( 0 ) ;
+				lines.addIndex( 1 ) ;
+				lines.addIndex( 2 ) ;
+				lines.addIndex( 3 ) ;
+
+				eventSystem.addEvent( DrawFactory.createShape( "DRAWLINES",
+																lines,
 																new Vector3( -100.0f, 50.0f, 0.0f ),
 																null,
 																null,
