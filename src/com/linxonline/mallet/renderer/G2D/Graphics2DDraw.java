@@ -42,11 +42,11 @@ public class Graphics2DDraw
 		final Shape shape = _settings.getObject( "DRAWLINES", null ) ;
 		if( shape != null )
 		{
-			final int size = shape.indicies.size() - 1 ;
+			final int size = shape.indicies.length - 1 ;
 			for( int i = 0; i < size; ++i )
 			{
-				final Vector2 start = shape.points.get( shape.indicies.get( i ) ) ;
-				final Vector2 end = shape.points.get( shape.indicies.get( i + 1 ) ) ;
+				final Vector2 start = shape.points[shape.indicies[i]] ;
+				final Vector2 end = shape.points[shape.indicies[i + 1]] ;
 
 				_graphics.drawLine( ( int )( start.x + _position.x ),
 									( int )( start.y + _position.y ),
@@ -66,10 +66,10 @@ public class Graphics2DDraw
 		final Shape shape = _settings.getObject( "DRAWPOLYGON", null ) ;
 		if( shape != null )
 		{
-			final int size = shape.indicies.size() ;
+			final int size = shape.indicies.length ;
 			for( int i = 0; i < size; i++ )
 			{
-				final Vector2 point = shape.points.get( shape.indicies.get( i ) ) ;
+				final Vector2 point = shape.points[shape.indicies[i]] ;
 				polygon.addPoint( ( int )( point.x + _position.x ),
 								( int )( point.y + _position.y ) ) ;
 			}
@@ -92,7 +92,7 @@ public class Graphics2DDraw
 		{
 			for( final Integer index : shape.indicies )
 			{
-				final Vector2 point = shape.points.get( index ) ;
+				final Vector2 point = shape.points[index] ;
 				_graphics.drawLine( ( int )( point.x + _position.x + offset.x ),
 									( int )( point.y + _position.y + offset.y ),
 									( int )( point.x + _position.x + offset.x ),

@@ -51,12 +51,12 @@ public final class GameTestLoader extends GameLoader
 																	null,								// clip offset
 																	10 ) ) ;							// layer
 
-				final Shape lines = new Shape() ;
+				final Shape lines = new Shape( 4, 4 ) ;
 				lines.addPoint( new Vector2( 0, 10 ) ) ;
 				lines.addPoint( new Vector2( 0, 0 ) ) ;
 				lines.addPoint( new Vector2( 200, 0 ) ) ;
 				lines.addPoint( new Vector2( 200, 10 ) ) ;
-				
+
 				lines.addIndex( 0 ) ;
 				lines.addIndex( 1 ) ;
 				lines.addIndex( 2 ) ;

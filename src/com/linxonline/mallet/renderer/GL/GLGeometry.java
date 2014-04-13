@@ -4,6 +4,8 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
+import com.linxonline.mallet.util.logger.Logger ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
@@ -31,25 +33,15 @@ public class GLGeometry implements GeometryInterface
 
 	public GLGeometry( int _indexSize, int _vertexSize )
 	{
-		initIndexBufferSize( _indexSize ) ;
-		initVertexBufferSize( _vertexSize ) ;
-	}
-
-	public void initIndexBufferSize( final int _size )
-	{
-		index = new int[_size] ;
-	}
-
-	public void initVertexBufferSize( final int _size )
-	{
-		vertex = new float[_size * VERTEX_SIZE] ;
+		index = new int[_indexSize] ;
+		vertex = new float[_vertexSize * VERTEX_SIZE] ;
 	}
 
 	public void addIndices( final int _index )
 	{
 		if( indexInc >= index.length )
 		{
-			System.out.println( "Index Array Overflow." ) ;
+			Logger.println( "Index access out of bounds - GLGeometry.", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 

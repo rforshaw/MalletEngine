@@ -109,20 +109,18 @@ public class GLModelGenerator
 	
 	public static Model genShapeModel( final Shape _shape )
 	{
-		final int indexSize = _shape.indicies.size() ;
-		final int pointSize = _shape.points.size() ;
+		final int indexSize = _shape.indicies.length ;
+		final int pointSize = _shape.points.length ;
 
 		final GLGeometry geometry = new GLGeometry( indexSize, pointSize ) ;
 		for( int i = 0; i < pointSize; ++i )
 		{
-			geometry.addVertex( new Vector3( _shape.points.get( i ) ),
-								new Vector3( 0, 0, 1 ),
-								new Vector2() ) ;
+			geometry.addVertex( new Vector3( _shape.points[i] ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; ++i )
 		{
-			geometry.addIndices( _shape.indicies.get( i ) ) ;
+			geometry.addIndices( _shape.indicies[i] ) ;
 		}
 		
 		final Model model = new Model( geometry ) ;

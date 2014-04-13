@@ -5,14 +5,14 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public interface GeometryInterface
 {
-	public void initIndexBufferSize( final int _size ) ;
-	public void initVertexBufferSize( final int _size ) ;
-
 	public void addIndices( final int _index ) ;
 
-	public void addVertex( final Vector3 _position, 
-						   final Vector3 _normal,
-						   final Vector2 _texCoord ) ;
-	
+	public void addVertex( final Vector3 _position ) ;
+	public void addVertex( final Vector3 _position, final float _colour ) ;
+	public void addVertex( final Vector3 _position, final float _colour, final Vector2 _texCoord ) ;
+	public void addVertex( final Vector3 _position, final Vector2 _texCoord ) ;
+	public void addVertex( final Vector3 _position, final Vector3 _normal, final Vector2 _texCoord ) ;	
+	public void addVertex( final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord ) ;
+
 	public void destroy() ;
 }

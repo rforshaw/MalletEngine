@@ -661,6 +661,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( model != null )
 			{
 				model.unregister() ;
+				if( type == DrawRequestType.GEOMETRY )
+				{
+					// Geometry Requests are not stored.
+					// So must be destroyed explicity.
+					model.destroy() ;
+				}
 			}
 		}
 	}
