@@ -33,16 +33,12 @@ public class GLModelGenerator
 	{
 		final GLGeometry geometry = new GLGeometry( 6, 4 ) ;
 		geometry.addVertex( new Vector3( 0, 0, 0 ),
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, 0 ),
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, 0 ),
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, 0 ),
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addIndices( 0 ) ;
@@ -150,81 +146,57 @@ public class GLModelGenerator
 	{
 		final GLGeometry geometry = new GLGeometry( 36, 24 ) ;
 		geometry.addVertex( new Vector3( 0, 0, 0 ),					// 0 - 1st Face - Front
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, 0 ),			// 1
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, 0 ),			// 2
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, 0 ),		// 3
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 		final float z = _dim.x ;
 		geometry.addVertex( new Vector3( 0, 0, z ),					// 4 - 2nd Face - Back
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, z ),			// 5
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, z ),			// 6
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, z ),		// 7
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addVertex( new Vector3( 0, 0, 0 ),					// 8 - 3rd Face - Top
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, 0 ),			// 9
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, 0, z ),					// 10
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, z ),			// 11
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addVertex( new Vector3( 0, _dim.y, 0 ),			// 12 - 4th Face - Bottom
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, 0 ),		// 13
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, z ),			// 14
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, z ),		// 15
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addVertex( new Vector3( 0, 0, z ),					// 16 - 5th Face - Left
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, 0, 0 ),					// 17
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, z ),			// 18
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( 0, _dim.y, 0 ),			// 19
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addVertex( new Vector3( _dim.x, 0, 0 ),			// 20 - 6th Face - Left
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, 0, z ),			// 21
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv1.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, 0 ),		// 22
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv1.x, _uv2.y ) ) ;
 		geometry.addVertex( new Vector3( _dim.x, _dim.y, z ),		// 23
-							new Vector3( 0, 0, 1 ),
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addIndices( 0 ) ;	// 1st Face

@@ -2,6 +2,8 @@ package com.linxonline.mallet.util.inspect ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.sort.QuickSort ;
+
 /**
 	Screens contains the information about a specific screen 
 	connected to the computer.
@@ -33,6 +35,12 @@ public class Screen
 		return modes ;
 	}
 
+	public ScreenMode getBestScreenMode()
+	{
+		ScreenMode[] screens = QuickSort.quicksort( getScreenModes() ) ;
+		return screens[0] ;
+	}
+	
 	@Override
 	public String toString()
 	{

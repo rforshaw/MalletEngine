@@ -83,11 +83,10 @@ public class GLGeometry implements GeometryInterface
 
 		vertex[vertexInc + 4] = _texCoord.x ;
 		vertex[vertexInc + 5] = _texCoord.y ;
-		
+
 		vertex[vertexInc + 6]  = _normal.x ;
 		vertex[vertexInc + 7]  = _normal.y ;
 		vertex[vertexInc + 8] = _normal.z ;
-
 		vertexInc += VERTEX_SIZE ;
 	}
 

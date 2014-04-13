@@ -17,6 +17,9 @@ import com.linxonline.mallet.io.reader.ConfigReader ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.util.inspect.DesktopDisplay ;
+import com.linxonline.mallet.util.inspect.ScreenMode ;
+
 public abstract class DesktopStarter extends StarterInterface
 {
 	protected final SystemInterface backendSystem  ;
@@ -84,8 +87,16 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
-		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
-		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
+		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
+		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
+		
+		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
+		{
+			final DesktopDisplay desktop = new DesktopDisplay() ;
+			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
+			displayWidth = screen.getWidth() ;
+			displayHeight = screen.getHeight() ;
+		}
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;

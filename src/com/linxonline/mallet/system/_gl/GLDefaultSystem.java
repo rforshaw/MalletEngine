@@ -48,7 +48,6 @@ public class GLDefaultSystem implements SystemInterface
 		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
 
 		final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
-
 		final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
 		final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "blank cursor" ) ;
 		frame.getContentPane().setCursor(blankCursor);

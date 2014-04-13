@@ -51,9 +51,11 @@ public final class GameTestLoader extends GameLoader
 																	null,								// clip offset
 																	10 ) ) ;							// layer
 
-				final Shape lines = new Shape( 4, 4 ) ;
+				final Shape lines = new Shape( 7, 6 ) ;
 				lines.addPoint( new Vector2( 0, 10 ) ) ;
 				lines.addPoint( new Vector2( 0, 0 ) ) ;
+				lines.addPoint( new Vector2( 100, 0 ) ) ;
+				lines.addPoint( new Vector2( 100, 5 ) ) ;
 				lines.addPoint( new Vector2( 200, 0 ) ) ;
 				lines.addPoint( new Vector2( 200, 10 ) ) ;
 
@@ -61,6 +63,9 @@ public final class GameTestLoader extends GameLoader
 				lines.addIndex( 1 ) ;
 				lines.addIndex( 2 ) ;
 				lines.addIndex( 3 ) ;
+				lines.addIndex( 2 ) ;
+				lines.addIndex( 4 ) ;
+				lines.addIndex( 5 ) ;
 
 				eventSystem.addEvent( DrawFactory.createShape( "DRAWLINES",
 																lines,

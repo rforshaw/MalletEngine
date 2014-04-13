@@ -4,6 +4,7 @@ import javax.swing.JFrame ;
 import java.util.ArrayList ;
 import java.awt.Insets ;
 import java.awt.Dimension ;
+import java.awt.Frame ;
 import java.awt.image.BufferStrategy ;
 import java.awt.geom.AffineTransform ;
 
@@ -15,6 +16,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
+
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.system.GlobalConfig ;
@@ -412,7 +414,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 		gl.glEnable( GL.GL_BLEND ) ;
 
-		//gl.glPolygonMode( gl.GL_FRONT_AND_BACK, gl.GL_LINE ) ;
 		resize() ;
 
 		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
@@ -434,11 +435,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		frame.setIgnoreRepaint( true ) ;
 
 		frame.add( canvas ) ;
-		frame.pack() ;
-		
+
 		final Vector2 display = renderInfo.getDisplayDimensions() ;
 		frame.setSize( ( int )display.x, ( int )display.y ) ;
 		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
+		
+		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
+		{
+			frame.setAlwaysOnTop( true ) ;
+			frame.setUndecorated( true ) ;
+		}
+
+		frame.pack() ;
 		frame.validate() ;
 		frame.setVisible( true ) ;
 

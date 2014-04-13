@@ -2,12 +2,14 @@ package com.linxonline.mallet.util.inspect ;
 
 import com.linxonline.mallet.maths.Ratio ;
 
+import com.linxonline.mallet.util.sort.SortInterface ;
+
 /**
 	Store the information about a particular state a screen can cope with.
 	With vanilla Java refreshRate of 0, means unknown, and bitDepth of -1 
 	means either multi-depth supported, or unknown.
 **/
-public class ScreenMode
+public class ScreenMode implements SortInterface
 {
 	private final int width ;
 	private final int height ;
@@ -31,6 +33,12 @@ public class ScreenMode
 	public Ratio getRatio()
 	{
 		return Ratio.calculateRatio( width, height ) ;
+	}
+
+	@Override
+	public int sortValue()
+	{
+		return width * height ;
 	}
 
 	@Override

@@ -52,6 +52,9 @@ public class ConfigParser
 				
 				var = _src.getString( "VSYNC", "0" ) ;
 				_dest.addInteger( "VSYNC", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "FULLSCREEN", "false" ) ;
+				_dest.addBoolean( "FULLSCREEN", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}
