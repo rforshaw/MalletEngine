@@ -2,24 +2,29 @@ package com.linxonline.mallet.util.tools.ogg ;
 
 public class Page
 {
-	public final String header ;
-	public final int version ;
-	public final int hType ;
-	public final long gPosition ;
-	public final int bSN ;
-	public final int pSeq ;
-	public final int checksum ;
-	public final int pSeg ;
-	public final byte[] data ;
+	public enum HeaderType
+	{
+		CONTINUATION, BEGIN, END, UNDEFINED
+	}
+
+	public final String header ;		// Capture pattern OggS
+	public final byte version ;			// Version - 0
+	public final byte hType ;			// Header Type
+	public final long gPosition ;		// Granule Position
+	public final int bSN ;				// Bitstream Serial Number
+	public final int pSeq ;				// Page Sequence Number
+	public final int checksum ;			// Checksum
+	public final byte pSeg ;			// Page Segments
+	public final byte[] data ;			// Segment Table
 
 	Page( final String _header, 
-		  final int _version,
-		  final int _hType, 
+		  final byte _version,
+		  final byte _hType, 
 		  final long _gPosition, 
 		  final int _bSN, 
 		  final int _pSeq, 
 		  final int _checksum, 
-		  final int _pSeg,
+		  final byte _pSeg,
 		  final byte[] _data )
 	{
 		header = _header ;
@@ -33,8 +38,49 @@ public class Page
 		data = _data ;
 	}
 
+	public HeaderType getHeaderType()
+	{
+		switch( hType )
+		{
+			case 0 : return HeaderType.CONTINUATION ;
+			case 2 : return HeaderType.BEGIN ;
+			case 4 : return HeaderType.END ;
+			default: return HeaderType.UNDEFINED ;
+		}
+	}
+
+	public long getBitStreamNumber()
+	{
+		return ( bSN & 0xFFFFFFFFL ) ;
+	}
+	
+	public long getPageSequence()
+	{
+		return ( pSeq & 0xFFFFFFFFL ) ;
+	}
+
+	public long getChecksum()
+	{
+		return ( checksum & 0xFFFFFFFFL ) ;
+	}
+
+	public int getPageSegment()
+	{
+		return ( pSeg & 0xFF ) ;
+	}
+
 	public String toString()
 	{
-		return new String( data ) ;
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "Header: "    + header               + "\n" ) ;
+		buffer.append( "Version: "   + version              + "\n" ) ;
+		buffer.append( "hType: "     + getHeaderType()      + "\n" ) ;
+		buffer.append( "gPosition: " + gPosition            + "\n" ) ;
+		buffer.append( "bSN: "       + getBitStreamNumber() + "\n" ) ;
+		buffer.append( "pSeq: "      + getPageSequence()    + "\n" ) ;
+		buffer.append( "Checksum: "  + getChecksum()        + "\n" ) ;
+		buffer.append( "pSeg: "      + getPageSegment()     + "\n" ) ;
+
+		return buffer.toString() ;
 	}
 }

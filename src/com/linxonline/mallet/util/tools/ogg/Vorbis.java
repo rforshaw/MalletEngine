@@ -17,7 +17,7 @@ public class Vorbis
 	private ArrayList<VorbisHeader> headers = new ArrayList<VorbisHeader>() ;
 
 	private int version = -1 ;
-	private int audioChannels = 0 ;
+	private byte audioChannels = 0 ;
 	private int sampleRate = 0 ;
 	private int bitrateMax = 0 ;
 	private int bitrateNom = 0 ;
@@ -40,7 +40,6 @@ public class Vorbis
 			}
 		}
 	}
-
 
 	private void decodeHeaders( final Page _page ) throws Exception
 	{
@@ -99,7 +98,7 @@ public class Vorbis
 		ConvertBytes.flipEndian( stream, pos, 4 ) ;
 		version = ConvertBytes.toInt( stream, pos, 4 ) ;
 
-		audioChannels = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] & 0xff ;	// unsigned byte
+		audioChannels = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] ;	// unsigned byte
 
 		ConvertBytes.flipEndian( stream, pos += 1, 4 ) ;
 		sampleRate = ConvertBytes.toInt( stream, pos, 4 ) ;
@@ -115,13 +114,13 @@ public class Vorbis
 
 		final byte blocksize = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] ; // unsigned byte
 		blocksize0 = ( blocksize & 0x0F ) ;
-		blocksize1 = ( ( blocksize & 0xF0 ) >> 4 ) ;
+		blocksize1 = ( ( blocksize >> 4 ) & 0x0F );
 
-		blocksize0 *= blocksize0 ;
-		blocksize1 *= blocksize1 ;
+		blocksize0 = ( int )Math.pow( 2, blocksize0 ) ;
+		blocksize1 = ( int )Math.pow( 2, blocksize1 ) ; ;
 
 		final byte framing = ConvertBytes.toBytes( stream, pos += 1, 1 )[0] ;
-		if( framing != 1 )
+		if( framing == 0 )
 		{
 			throw new Exception( "Identification End Frame not suitable." ) ;
 		}
@@ -205,18 +204,58 @@ public class Vorbis
 		
 		return _pos ;
 	}
-	
+
+	public long getVersion()
+	{
+		return version & 0xFFFFFFFFL ;
+	}
+
+	public int getChannels()
+	{
+		return audioChannels & 0xFF ;
+	}
+
+	public long getSampleRate()
+	{
+		return sampleRate & 0xFFFFFFFFL ;
+	}
+
+	public long getBitrateMax()
+	{
+		return bitrateMax & 0xFFFFFFFFL ;
+	}
+
+	public long getBitrateNom()
+	{
+		return bitrateNom & 0xFFFFFFFFL ;
+	}
+
+	public long getBitrateMin()
+	{
+		return bitrateMin & 0xFFFFFFFFL ;
+	}
+
+	public int getBlockSize0()
+	{
+		return blocksize0 ;
+	}
+
+	public int getBlockSize1()
+	{
+		return blocksize1 ;
+	}
+
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		buffer.append( "Version: "     + version       + "\n" ) ;
-		buffer.append( "Channels: "    + audioChannels + "\n" ) ;
-		buffer.append( "Sample Rate: " + sampleRate    + "\n" ) ;
-		buffer.append( "Bitrate Max: " + bitrateMax    + "\n" ) ;
-		buffer.append( "Bitrate Nom: " + bitrateNom    + "\n" ) ;
-		buffer.append( "Bitrate Min: " + bitrateMin    + "\n" ) ;
-		buffer.append( "Blocksize 0: " + blocksize0    + "\n" ) ;
-		buffer.append( "Blocksize 1: " + blocksize1    + "\n" ) ;
+		buffer.append( "Version: "     + getVersion()    + "\n" ) ;
+		buffer.append( "Channels: "    + getChannels()   + "\n" ) ;
+		buffer.append( "Sample Rate: " + getSampleRate() + "\n" ) ;
+		buffer.append( "Bitrate Max: " + getBitrateMax() + "\n" ) ;
+		buffer.append( "Bitrate Nom: " + getBitrateNom() + "\n" ) ;
+		buffer.append( "Bitrate Min: " + getBitrateMin() + "\n" ) ;
+		buffer.append( "Blocksize 0: " + getBlockSize0() + "\n" ) ;
+		buffer.append( "Blocksize 1: " + getBlockSize1() + "\n" ) ;
 
 		buffer.append( "Vendor: " + vendor + "\n" ) ;
 		for( String statement : statements )

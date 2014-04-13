@@ -36,14 +36,22 @@ public class OGG
 		while( end == false )
 		{
 			final String header = new String( ConvertBytes.toBytes( _stream, pos, 4 ) ) ;
+			final byte version = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;		// unsigned byte
+			final byte hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] ;		// unsigned byte
 
-			final int version = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] & 0xff ;	// unsigned byte
-			final int hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] & 0xff ;		// unsigned byte
-			final long gPosition = ConvertBytes.toLong( _stream, pos += 1, 8 ) ;
-			final int bSN = ConvertBytes.toInt( _stream, pos += 8, 4 ) ;
-			final int pSeq = ConvertBytes.toInt( _stream, pos += 4, 4 ) ;
-			final int checksum = ConvertBytes.toInt( _stream, pos += 4, 4 ) ;
-			final int pSeg = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] & 0xff ;		// unsigned byte
+			ConvertBytes.flipEndian( _stream, pos += 1, 8 ) ;							// OGG is stored in little-endian, Java is big-endian.
+			final long gPosition = ConvertBytes.toLong( _stream, pos, 8 ) ;
+
+			ConvertBytes.flipEndian( _stream, pos += 8, 4 ) ;
+			final int bSN = ConvertBytes.toInt( _stream, pos, 4 ) ;
+
+			ConvertBytes.flipEndian( _stream, pos += 4, 4 ) ;
+			final int pSeq = ConvertBytes.toInt( _stream, pos, 4 ) ;
+
+			ConvertBytes.flipEndian( _stream, pos += 4, 4 ) ;
+			final int checksum = ConvertBytes.toInt( _stream, pos, 4 ) ;
+
+			final byte pSeg = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;		// unsigned byte
 			final byte[] segTable = ConvertBytes.toBytes( _stream, pos += 1, pSeg ) ;
 
 			try
@@ -70,5 +78,18 @@ public class OGG
 				end = true ;
 			}
 		}
+	}
+	
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		for( final Page page : pages )
+		{
+			buffer.append( page.toString() + "\n" ) ;
+		}
+
+		buffer.append( "Pages: " + pages.size() + "\n" ) ;
+
+		return buffer.toString() ;
 	}
 }

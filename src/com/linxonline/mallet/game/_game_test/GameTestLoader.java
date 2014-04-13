@@ -18,6 +18,9 @@ import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
 import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
 
+import com.linxonline.mallet.util.tools.ogg.OGG ;
+import com.linxonline.mallet.util.tools.ogg.Vorbis ;
+
 public final class GameTestLoader extends GameLoader
 {
 	public GameTestLoader() {}
@@ -32,7 +35,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 				createEntityExample() ;
 				createMouseAnimExample() ;
 			}
@@ -125,7 +128,7 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void playAudioExample()
 			{
-				eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
+				/*eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
 				{
 					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
@@ -136,7 +139,20 @@ public final class GameTestLoader extends GameLoader
 
 					public void update( final float _dt ) { System.out.println( _dt ) ; }
 					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;
+				} ) ) ;*/
+				
+				final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
+				System.out.println( ogg ) ;
+				final Vorbis vorbis = new Vorbis() ;
+				try
+				{
+					vorbis.decode( ogg ) ;
+					System.out.println( vorbis ) ;
+				}
+				catch( Exception ex )
+				{
+					ex.printStackTrace() ;
+				}
 			}
 
 			/**
