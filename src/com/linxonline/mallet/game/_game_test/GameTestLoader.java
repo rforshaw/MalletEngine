@@ -91,7 +91,7 @@ public final class GameTestLoader extends GameLoader
 																		 10,								// layer
 																		 new SourceCallback()
 				{
-					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
+					public void recieveID( final int _id ){ System.out.println( "Recieved ID: " + _id ) ; }
 
 					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
 

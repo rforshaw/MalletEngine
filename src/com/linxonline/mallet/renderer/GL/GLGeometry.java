@@ -92,6 +92,7 @@ public class GLGeometry implements GeometryInterface
 
 	public void destroy()
 	{
+		System.out.println( "Removing Geometry.." ) ;
 		GLModelManager.unbind( this ) ;
 	}
 }

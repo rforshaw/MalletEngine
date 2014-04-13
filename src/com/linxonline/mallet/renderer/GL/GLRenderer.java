@@ -66,7 +66,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 
 	@Override
-	public void shutdown() {}
+	public void shutdown()
+	{
+		clear() ;
+	}
 
 	private void initGraphics()
 	{
@@ -92,14 +95,22 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		final JFrame temp = new JFrame() ;
-		temp.pack() ;
+		int dimX = _width ;
+		int dimY = _height ;
 
-		final Insets insets = temp.getInsets() ;
-		final int dimX = insets.left + insets.right + _width ;
-		final int dimY = insets.top + insets.bottom + _height ;
+		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == false )
+		{
+			// Need to take into account decorated border 
+			// when not in fullscreen mode.
+			final JFrame temp = new JFrame() ;
+			temp.pack() ;
+
+			final Insets insets = temp.getInsets() ;
+			dimX += insets.left + insets.right ;
+			dimY += insets.top + insets.bottom ;
+		}
+
 		final Dimension dim = new Dimension( dimX, dimY ) ;
-
 		frame.setMinimumSize( dim ) ;
 		frame.setSize( dim ) ;
 		frame.validate() ;
@@ -155,8 +166,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glEnable( GL.GL_TEXTURE_2D ) ;
 				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 		} ;
 
