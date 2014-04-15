@@ -185,6 +185,21 @@ public class ConvertBytes
 		return allocate( _length, BIG_ENDIAN ).put( _bytes, _offset, _length ).array() ;
 	}
 
+	public static byte[] toBits( final byte[] _bytes, final int _byteOffset, final int _bitOffset, final int _bitLength )
+	{
+		final int offset = ( _byteOffset * 8 ) + _bitOffset ;
+		final int byteLength = ( int )Math.ceil( _bitLength / 8.0f ) ;
+
+		final byte[] bytes = new byte[byteLength] ;
+
+		for( int i = 0; i < _bitLength; ++i )
+		{
+			setBit( bytes, i, isBitSet( _bytes, offset + i ) ) ;
+		}
+
+		return bytes ;
+	}
+
 	/**FLIP BYTE ARRAY ENDIAN**/
 
 	public static byte[] newflipEndian( final byte[] _bytes )
@@ -246,6 +261,33 @@ public class ConvertBytes
 		}
 		
 		return _bytes ;
+	}
+
+	/**
+		0 - 7 positions are acceptable.
+	*/
+	public static boolean isBitSet( final byte _byte, final int _position )
+	{
+		return ( ( _byte >> _position ) & 1 ) == 1 ;
+	}
+
+	public static boolean isBitSet( final byte[] _bytes, final int _position )
+	{
+		final int index = ( int )Math.ceil( _position / 8.0f ) ;
+		final int bitPos = _position % 8 ;
+		return ( _bytes[index] >> bitPos & 1 ) == 1 ;
+	}
+
+	public static byte setBit( byte _byte, final int _position, final boolean _set )
+	{
+		return _byte |= ( ( _set == true ) ? 1 : 0 ) << _position ;
+	}
+
+	public static void setBit( byte[] _bytes, final int _position, final boolean _set )
+	{
+		final int index = ( int )Math.ceil( _position / 8.0f );
+		final int bitPos = _position % 8 ;
+		_bytes[index] |= ( ( _set == true ) ? 1 : 0 ) << bitPos ;
 	}
 
 	private static ByteBuffer allocate( final int _capacity, final int _endian )
