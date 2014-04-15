@@ -21,7 +21,7 @@ public enum KeyCode
 	L( 'L' ), M( 'M' ), N( 'N' ), O( 'O' ), P( 'P' ), Q( 'Q' ), R( 'R' ), S( 'S' ), T( 'T' ), U( 'U' ), V( 'V' ),
 	W( 'W' ), X( 'X' ), Y( 'Y' ), Z( 'Z' ),
 
-	QUESTION_MARK( '?' ), EXCLAMATION_MARK( '!' ), SPACEBAR( ' ' ), POUND_SIGN( '\u00A3' ), DOLLAR_SIGN( '$' ),
+	QUESTION_MARK( '?' ), EXCLAMATION_MARK( '!' ), SPACEBAR( ' ' ), POUND_SIGN( '£' ), DOLLAR_SIGN( '$' ),
 	PERCENTAGE( '%' ), LESS_THAN( '<' ), GREATER_THAN( '>' ), TIDEL( '~' ), QUOTATION( '\"' ),
 	CURLY_BRACKET_OPEN( '{' ), CURLY_BRACKET_CLOSED( '}' ), SQUARE_BRACKET_OPEN( '[' ), SQUARE_BRACKET_CLOSED( ']' ),
 	ASTERIK( '*' ), HASH_TAG( '#' ), FULL_STOP( '.' ), COMMA( ',' ), APOSTRAPHE( '\'' ), AMPERSAND( '&' ), AT( '@' ),
