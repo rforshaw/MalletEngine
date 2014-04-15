@@ -148,7 +148,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
+					//gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
 
 					if( geometry.indexID != indexID )
 					{
