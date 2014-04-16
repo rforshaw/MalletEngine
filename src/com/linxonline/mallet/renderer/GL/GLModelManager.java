@@ -20,7 +20,7 @@ public class GLModelManager extends AbstractManager
 
 	public static void bind( final GLGeometry _geometry )
 	{
-		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+		//GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
 		if( gl == null )
 		{
@@ -31,7 +31,7 @@ public class GLModelManager extends AbstractManager
 		bindVBO( gl, _geometry ) ;
 		bindIndex( gl, _geometry ) ;
 
-		GLRenderer.getCanvas().getContext().release() ;
+		//GLRenderer.getCanvas().getContext().release() ;
 	}
 
 	public static void unbind( final GLGeometry _geometry )
@@ -49,7 +49,7 @@ public class GLModelManager extends AbstractManager
 		}
 		GLRenderer.getCanvas().getContext().release() ;
 	}
-	
+
 	public static int glGenBuffers( GL2 _gl )
 	{
 		final int[] id = new int[1] ;

@@ -148,8 +148,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					//gl.glBlendFunc( gl.GL_DST_ALPHA, gl.GL_ONE_MINUS_DST_ALPHA ) ;
-
 					if( geometry.indexID != indexID )
 					{
 						indexID = geometry.indexID ;
@@ -389,7 +387,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				words = txt.toArray( words ) ;
 				return words ;
 			}
-			
+
 			private void setTextAlignment( final int _alignment, final Vector2 _position, final int _wordWidth )
 			{
 				//System.out.println( "WORD WIDTH: " + _wordWidth ) ;
@@ -519,7 +517,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		++renderIter ;
 		drawDT = _dt ;
 
-		updateEvents() ;
 		canvas.display() ;
 	}
 
@@ -531,6 +528,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		gl.glLoadIdentity() ;
+
+		updateEvents() ;
 
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
