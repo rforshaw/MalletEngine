@@ -48,12 +48,12 @@ public class DrawFactory
 	}
 
 	public static Event<Settings> createShape( 	final String _type,
-										final Line _line,
-										final Vector3 _pos, 
-										final Vector2 _offset, 		// Not needed
-										final Vector2 _clip,		// Not needed
-										final Vector2 _clipOffset,	// Not needed
-										final int _layer )
+												final Line _line,
+												final Vector3 _pos, 
+												final Vector2 _offset, 		// Not needed
+												final Vector2 _clip,		// Not needed
+												final Vector2 _clipOffset,	// Not needed
+												final int _layer )
 	{
 		final Settings settings = new Settings() ;
 
@@ -74,12 +74,12 @@ public class DrawFactory
 	}
 
 	public static Event<Settings> createShape( 	final String _type,
-										final Shape _shape,
-										final Vector3 _pos, 
-										final Vector2 _offset, 		// Not needed
-										final Vector2 _clip,		// Not needed
-										final Vector2 _clipOffset,	// Not needed
-										final int _layer )
+												final Shape _shape,
+												final Vector3 _pos, 
+												final Vector2 _offset, 		// Not needed
+												final Vector2 _clip,		// Not needed
+												final Vector2 _clipOffset,	// Not needed
+												final int _layer )
 	{
 		final Settings settings = new Settings() ;
 

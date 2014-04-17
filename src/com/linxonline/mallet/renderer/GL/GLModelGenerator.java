@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer.GL ;
 
+import javax.media.opengl.* ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.maths.* ;
@@ -118,7 +120,13 @@ public class GLModelGenerator
 		{
 			geometry.addIndices( _shape.indicies[i] ) ;
 		}
-		
+
+		switch( _shape.style )
+		{
+			case LINES      : geometry.setStyle( GL2.GL_LINES ) ; break ;
+			case LINE_STRIP : geometry.setStyle( GL2.GL_LINE_STRIP ) ; break ;
+		}
+
 		final Model model = new Model( geometry ) ;
 		models.bind( geometry ) ;
 		return model ;

@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer.GL ;
 
 import java.util.ArrayList ;
 
+import javax.media.opengl.* ;
+
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
@@ -26,6 +28,7 @@ public class GLGeometry implements GeometryInterface
 	private int vertexInc = 0 ; 
 	private int indexInc = 0 ;
 
+	public int style = GL2.GL_LINE_STRIP ;
 	public int vboID = 0 ;
 	public int indexID = 0 ;
 	public int[] index = null ;
@@ -35,6 +38,11 @@ public class GLGeometry implements GeometryInterface
 	{
 		index = new int[_indexSize] ;
 		vertex = new float[_vertexSize * VERTEX_SIZE] ;
+	}
+
+	public void setStyle( final int _style )
+	{
+		style = _style ;
 	}
 
 	public void addIndices( final int _index )

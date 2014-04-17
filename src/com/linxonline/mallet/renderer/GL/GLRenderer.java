@@ -158,7 +158,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
-					gl.glDrawElements( GL2.GL_LINE_STRIP, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+					gl.glDrawElements( geometry.style, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 				gl.glPopMatrix() ;
 
 				gl.glEnable( GL.GL_TEXTURE_2D ) ;

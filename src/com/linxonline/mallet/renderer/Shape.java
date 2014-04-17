@@ -6,9 +6,16 @@ import com.linxonline.mallet.maths.* ;
 
 public class Shape
 {
+	public enum Style
+	{
+		LINES, LINE_STRIP ; 
+	}
+
 	public final int[] indicies ;
 	public final Vector2[] points ;
 	public final MalletColour[] colours ;
+
+	public Style style = Style.LINE_STRIP ;
 
 	private int indexIncrement = 0 ;
 	private int pointIncrement = 0 ;
@@ -28,6 +35,11 @@ public class Shape
 		colours = null ;
 	}
 
+	public void setStyle( final Style _style )
+	{
+		style = _style ;
+	}
+
 	public void addIndex( final int _index )
 	{
 		if( indexIncrement < indicies.length )
@@ -43,7 +55,7 @@ public class Shape
 			points[pointIncrement++] = _point ;
 		}
 	}
-	
+
 	public void addColour( final MalletColour _colour )
 	{
 		if( colourIncrement < colours.length )
