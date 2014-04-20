@@ -1,7 +1,8 @@
-package com.linxonline.mallet.io.reader ;
+package com.linxonline.mallet.io.reader.config ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.util.settings.* ;
 
 public abstract class ConfigReader

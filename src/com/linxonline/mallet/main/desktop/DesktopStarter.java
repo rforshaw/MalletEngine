@@ -13,8 +13,8 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
-import com.linxonline.mallet.io.reader.ConfigParser ;
-import com.linxonline.mallet.io.reader.ConfigReader ;
+import com.linxonline.mallet.io.reader.config.ConfigParser ;
+import com.linxonline.mallet.io.reader.config.ConfigReader ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
