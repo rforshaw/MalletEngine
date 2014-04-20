@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.GL ;
 import java.awt.image.BufferedImage ;
 import javax.media.opengl.* ;
 
-import com.linxonline.mallet.resources.ImageInterface ;
+import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {

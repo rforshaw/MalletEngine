@@ -14,6 +14,10 @@ public class Vorbis
 	private final static int COMMENT_HEADER_TYPE = 3 ;
 	private final static int SETUP_HEADER_TYPE = 5 ;
 
+	private final static int NO_LOOKUP_TABLE = 0 ;
+	private final static int IMPLICIT_LOOKUP_TABLE = 1 ;
+	private final static int EXPLICIT_LOOKUP_TABLE = 2 ;
+	
 	private ArrayList<VorbisHeader> headers = new ArrayList<VorbisHeader>() ;
 
 	private int version = -1 ;
@@ -32,6 +36,7 @@ public class Vorbis
 
 	public void decode( final OGG _ogg ) throws Exception
 	{
+		System.out.println( "Reading ogg stream" ) ;
 		for( final Page page : _ogg.pages )
 		{
 			if( headers.size() < 3 )
@@ -120,7 +125,7 @@ public class Vorbis
 		blocksize1 = ( int )Math.pow( 2, blocksize1 ) ; ;
 
 		final byte framing = ConvertBytes.toBytes( stream, pos += 1, 1 )[0] ;
-		if( framing == 0 )
+		if( ConvertBytes.isBitSet( framing, 0 ) == false )
 		{
 			throw new Exception( "Identification End Frame not suitable." ) ;
 		}
@@ -152,7 +157,7 @@ public class Vorbis
 		pos += length ;
 
 		final byte framing = ConvertBytes.toBytes( stream, pos, 1 )[0] ;
-		if( framing != 1 )
+		if( ConvertBytes.isBitSet( framing, 0 ) == false )
 		{
 			throw new Exception( "Comment End Frame not suitable." ) ;
 		}
@@ -174,33 +179,84 @@ public class Vorbis
 
 	private int decodeCodebooks( int _pos, final int _count, final byte[] _stream ) throws Exception
 	{
-		final byte[] syncPattern = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
+		// Pattern Sync
+		final byte[] tempSync = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
+		final byte[] syncBytes = new byte[4] ;
+		syncBytes[0] = tempSync[0] ;
+		syncBytes[1] = tempSync[1] ;
+		syncBytes[2] = tempSync[2] ;
+		syncBytes[3] = 0 ;
 
-		ConvertBytes.flipEndian( _stream, _pos += 3, 2 ) ;
-		final byte[] dimBytes = ConvertBytes.toBytes( _stream, _pos, 2 ) ;
-		final int dimensions = dimBytes[0] << 8 | dimBytes[1];
+		ConvertBytes.flipEndian( syncBytes, 0, 4 ) ;
+		final long syncPattern = ConvertBytes.toInt( syncBytes, 0, 4 ) ;
+		System.out.println( "Sync Pattern: " + syncPattern + " Pos: " + _pos ) ;
+
+		// Dimensions
+		final byte[] dimBytes = ConvertBytes.toBytes( _stream, _pos += 3, 2 ) ;
+		ConvertBytes.flipEndian( dimBytes, 0, 2 ) ;
+		final int dimensions = ( int )ConvertBytes.toShort( dimBytes, 0, 2 ) ;
 		System.out.println( "Dimensions: " + dimensions ) ;
 
-		ConvertBytes.flipEndian( _stream, _pos += 2, 3 ) ;
-		final byte[] entryBytes = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
-		final int entries = entryBytes[0] << 16 | entryBytes[1] << 8 | entryBytes[2];
+		// Entries
+		final byte[] tempEntry = ConvertBytes.toBytes( _stream, _pos += 2, 3 ) ;
+		final byte[] entryBytes = new byte[4] ;
+		entryBytes[0] = tempEntry[0] ;
+		entryBytes[1] = tempEntry[1] ;
+		entryBytes[2] = tempEntry[2] ;
+		entryBytes[3] = 0 ;
+
+		ConvertBytes.flipEndian( entryBytes, 0, 4 ) ;
+		final int entries = ConvertBytes.toInt( entryBytes, 0, 4 ) ;
 		System.out.println( "Entries: " + entries ) ;
 
-		
-		final byte orderedFlag = ConvertBytes.toBytes( _stream, _pos += 3, 1 )[0] ;
-		System.out.println( "Ordered Flag: " + orderedFlag ) ;
+		// Flags
+		final byte flags = ConvertBytes.toBytes( _stream, _pos += 3, 1 )[0] ;
+		final boolean orderedFlag = ConvertBytes.isBitSet( flags, 7 ) ;
+		final boolean sparseFlag = ConvertBytes.isBitSet( flags, 6 ) ;
 
-		final byte sparseFlag = ConvertBytes.toBytes( _stream, _pos += 1, 1 )[0] ;
+		_pos += 1 ;					// Increment by 2 positions to ensure bits access correct content
+		int bitOffset = 0 ;			// Reading a bit stream now
 
-		/*if( sparseFlag == 1 )
+		final int[] codewordLengths = new int[entries] ;
+		for( int i = 0; i < entries; ++i )
 		{
-			throw new Exception( "Sparsing not implemented, yet." ) ;
+			if( sparseFlag == true )
+			{
+				final byte flag = ConvertBytes.toBits( _stream, _pos, bitOffset++, 1 )[0] ;
+				if( ConvertBytes.isBitSet( flag, 0 ) == true )
+				{
+					final byte length = ConvertBytes.toBits( _stream, _pos, bitOffset, 5 )[0] ;
+					codewordLengths[i] = length + 1 ;
+					bitOffset += 5 ;
+				}
+				else
+				{
+					codewordLengths[i] = -1 ;		// -1 represents a codeword that isn't used
+				}
+			}
+			else
+			{
+				final byte length = ConvertBytes.toBits( _stream, _pos, bitOffset, 5 )[0] ;
+				codewordLengths[i] = length + 1;
+				bitOffset += 5 ;
+				System.out.println( "Entry: " + i + " Codeword Length: " + codewordLengths[i] ) ;
+			}
 		}
-		else
+
+		if( orderedFlag == true )
 		{
-			final int codewordLength = ( ConvertBytes.toBytes( _stream, _pos += 1, 1 )[0] & 0xff ) + 1 ;		// unsigned byte
-			System.out.println( "Codeword Length: " + codewordLength ) ;
-		}*/
+			System.out.println( "Ordered Flag - enabled" ) ;
+		}
+
+		final byte lookupType = ConvertBytes.toBits( _stream, _pos, bitOffset, 4 )[0] ;
+		bitOffset += 4 ;
+
+		System.out.println( "Lookup Table Type: " + lookupType ) ;
+		switch( lookupType )
+		{
+			case IMPLICIT_LOOKUP_TABLE : System.out.println( "Not Implemented" ) ; break ;
+			case EXPLICIT_LOOKUP_TABLE : System.out.println( "Not Implemented" ) ; break ;
+		}
 		
 		return _pos ;
 	}

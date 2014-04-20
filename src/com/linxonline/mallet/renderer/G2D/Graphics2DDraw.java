@@ -1,4 +1,4 @@
-package com.linxonline.mallet.renderer ;
+package com.linxonline.mallet.renderer.G2D ;
 
 import java.util.ArrayList ;
 import java.awt.* ;
@@ -8,6 +8,10 @@ import java.awt.geom.AffineTransform ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;
+
+import com.linxonline.mallet.renderer.Line ;
+import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.MalletColour ;
 
 public class Graphics2DDraw
 {

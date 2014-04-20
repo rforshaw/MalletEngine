@@ -22,7 +22,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.resources.texture.* ;
 
 /**
 	G2DRenderer is an event-driven renderer.

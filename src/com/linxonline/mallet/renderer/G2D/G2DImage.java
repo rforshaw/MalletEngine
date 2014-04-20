@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.G2D ;
 
 import java.awt.image.BufferedImage ;
-import com.linxonline.mallet.resources.ImageInterface ;
+import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class G2DImage implements ImageInterface
 {

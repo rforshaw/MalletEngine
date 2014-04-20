@@ -187,19 +187,56 @@ public class ConvertBytes
 
 	public static byte[] toBits( final byte[] _bytes, final int _byteOffset, final int _bitOffset, final int _bitLength )
 	{
-		final int offset = ( _byteOffset * 8 ) + _bitOffset ;
+		final int startOffset = ( _byteOffset * 8 ) + _bitOffset ;
+		final int endOffset = startOffset + _bitLength ;
 		final int byteLength = ( int )Math.ceil( _bitLength / 8.0f ) ;
 
-		final byte[] bytes = new byte[byteLength] ;
-
-		for( int i = 0; i < _bitLength; ++i )
+		final int start = ( int )Math.floor( startOffset / 8.0f ) ;
+		final int end = ( int )Math.ceil( endOffset / 8.0f ) ;
+		final int len = end - start ;
+		
+		final byte[] temp = ConvertBytes.newInvertBytes( _bytes, start, len ) ;
 		{
-			setBit( bytes, i, isBitSet( _bytes, offset + i ) ) ;
+			printByte( _bytes[start] ) ;
+			printByte( temp[0] ) ;
+		}
+
+		final int subStart = startOffset % 8 ;
+		final int subEnd = endOffset % 8 ;
+		final int subLength = subStart + _bitLength ;
+
+		final byte[] bytes = new byte[len] ;
+
+		int j = 0 ;//( temp.length * 8 ) - 1 ;
+		for( int i = subLength - 1; i >= subStart ; --i )
+		{
+			setBit( bytes, j++, isBitSet( temp, i ) ) ;
 		}
 
 		return bytes ;
 	}
 
+	public static byte[] newInvertBytes( final byte[] _bytes, int _offset, final  int _length )
+	{
+		final byte[] bytes = new byte[_length] ;
+		final int size = _offset + _length ;
+		
+		//System.out.println( "Start: " + _offset + "Length: " + _length + " Size: " + size ) ;
+		
+		int bytesPos = 0 ;
+		for( int i = _offset; i < size; ++i )
+		{
+			//System.out.print( "Byte: " ) ; printByte( _bytes[i] ) ;
+			for( int bitPos = 0; bitPos < 8; ++bitPos )
+			{
+				setBit( bytes, bytesPos + ( 7 - bitPos ), isBitSet( _bytes[i], bitPos ) ) ;
+			}
+			bytesPos += 8 ;
+		}
+		
+		return bytes ;
+	}
+	
 	/**FLIP BYTE ARRAY ENDIAN**/
 
 	public static byte[] newflipEndian( final byte[] _bytes )
@@ -273,8 +310,13 @@ public class ConvertBytes
 
 	public static boolean isBitSet( final byte[] _bytes, final int _position )
 	{
-		final int index = ( int )Math.ceil( _position / 8.0f ) ;
-		final int bitPos = _position % 8 ;
+		final int index = ( int )Math.floor( _position / 8.0f ) ;
+		final int bitPos = ( _position % 8 ) ;
+
+		/*System.out.println( _position ) ;
+		System.out.println( "Index: " + index + " BitPos: " + bitPos ) ;
+		System.out.print( "Byte: " ) ; printByte( _bytes[index] ) ;*/
+
 		return ( _bytes[index] >> bitPos & 1 ) == 1 ;
 	}
 
@@ -285,11 +327,20 @@ public class ConvertBytes
 
 	public static void setBit( byte[] _bytes, final int _position, final boolean _set )
 	{
-		final int index = ( int )Math.ceil( _position / 8.0f );
+		final int index = _position / 8 ;
 		final int bitPos = _position % 8 ;
 		_bytes[index] |= ( ( _set == true ) ? 1 : 0 ) << bitPos ;
 	}
 
+	public static void printByte( final byte _byte )
+	{
+		for( int i = 0; i < 8; ++i )
+		{
+			System.out.print( ( isBitSet( _byte, i ) == true ) ? "1" : "0"  ) ;
+		}
+		System.out.print( "\n" ) ;
+	}
+	
 	private static ByteBuffer allocate( final int _capacity, final int _endian )
 	{
 		return ByteBuffer.allocate( _capacity ).order( getByteOrder( _endian ) ) ;

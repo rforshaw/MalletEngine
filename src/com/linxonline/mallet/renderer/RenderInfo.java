@@ -4,12 +4,18 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.input.InputAdapterInterface ;
 
+/**
+	Convenience class to handle Display & Render Dimensions.
+	Provides scaling information between Display & Render dimensions, 
+	retaining or not Aspect Ratio.
+	Also handles conversion for user-input between Display & Render.
+*/
 public final class RenderInfo implements InputAdapterInterface
 {
-	private boolean holdToRenderRatio = true ;
-	private Vector2 displayDimensions = null ;
-	private Vector2 renderDimensions = null ;
-	private Vector3 cameraPosition = null ;
+	private boolean holdToRenderRatio = true ;							// By default will scale inrespect to Aspect Ratio.
+	private Vector2 displayDimensions = null ;							// Dimensions of the Window
+	private Vector2 renderDimensions = null ;							// Dimensions of the render-buffer
+	private Vector3 cameraPosition = null ;								// Camera position
 	private Vector2 scaledRenderDimensions = new Vector2( 0, 0 ) ;
 	private Vector2 screenOffset = new Vector2( 0, 0 ) ;
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
@@ -61,19 +67,19 @@ public final class RenderInfo implements InputAdapterInterface
 	{
 		return Vector2.divide( renderDimensions, _dimensions ) ;
 	}
-	
+
 	public float convertInputToRenderX( final float _x )
 	{
 		updateRealCameraPosition() ;
 		return ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) - realCameraPosition.x ;
 	}
-	
+
 	public float convertInputToRenderY( final float _y )
 	{
 		updateRealCameraPosition() ;
 		return ( ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ) - realCameraPosition.y ;
 	}
-	
+
 	public Vector2 convertInputToRender( final Vector2 _input )
 	{
 		return new Vector2( convertInputToRenderX( _input.x ), convertInputToRenderY( _input.y ) ) ;
@@ -133,21 +139,35 @@ public final class RenderInfo implements InputAdapterInterface
 		return displayDimensions ;
 	}
 
+	/**
+		Return the render dimensions.
+		For example: if the render-buffer was 800x600 
+		it will return x:800, y:600.
+	*/
 	public final Vector2 getRenderDimensions()
 	{
 		return renderDimensions ;
 	}
-	
+
+	/**
+		Return the render dimensions scaled to display dimensions.
+		For example: if the render-buffer was 800x600 & display was 1024x768
+		it will return x:1024, y:768. The scale result will change depending on 
+		aspect-ratio and whether it is being enforced.
+	*/
 	public final Vector2 getScaledRenderDimensions()
 	{
 		return scaledRenderDimensions ;
 	}
-	
+
+	/**
+		Used to provide blackbars when render aspect-ratio does not fit with display aspect-ratio.
+	*/
 	public final Vector2 getScreenOffset()
 	{
 		return screenOffset ;
 	}
-	
+
 	public final Vector3 getCameraPosition()
 	{
 		updateRealCameraPosition() ;

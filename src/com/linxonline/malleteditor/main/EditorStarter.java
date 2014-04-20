@@ -1,9 +1,9 @@
 package com.linxonline.malleteditor.main ;
 
 import com.linxonline.mallet.game.GameLoader ;
-import com.linxonline.mallet.main.DesktopStarter ;
-import com.linxonline.mallet.system.GLDefaultSystem ;
-import com.linxonline.mallet.io.filesystem.DesktopFileSystem ;
+import com.linxonline.mallet.main.desktop.DesktopStarter ;
+import com.linxonline.mallet.system.gl.GLDefaultSystem ;
+import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
 import com.linxonline.malleteditor.system.GLEditorSystem ;
 

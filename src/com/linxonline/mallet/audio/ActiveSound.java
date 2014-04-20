@@ -4,7 +4,7 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.resources.AudioBuffer ;
+import com.linxonline.mallet.resources.sound.AudioBuffer ;
 import com.linxonline.mallet.util.SourceCallback ;
 
 public class ActiveSound

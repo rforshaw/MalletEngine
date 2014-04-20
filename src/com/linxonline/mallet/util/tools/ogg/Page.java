@@ -1,5 +1,7 @@
 package com.linxonline.mallet.util.tools.ogg ;
 
+import com.linxonline.mallet.util.tools.ConvertBytes ;
+
 public class Page
 {
 	public enum HeaderType
@@ -42,11 +44,25 @@ public class Page
 	{
 		switch( hType )
 		{
-			case 0 : return HeaderType.CONTINUATION ;
-			case 2 : return HeaderType.BEGIN ;
-			case 4 : return HeaderType.END ;
-			default: return HeaderType.UNDEFINED ;
+			case 0x01 : return HeaderType.CONTINUATION ;
+			case 0x02 : return HeaderType.BEGIN ;
+			case 0x04 : return HeaderType.END ;
 		}
+
+		if( ConvertBytes.isBitSet( hType, 2 ) == true )
+		{
+			return HeaderType.END ;
+		}
+		else if( ConvertBytes.isBitSet( hType, 1 ) == true )
+		{
+			return HeaderType.BEGIN ;
+		}
+		else if( ConvertBytes.isBitSet( hType, 0 ) == false )
+		{
+			return HeaderType.CONTINUATION ;
+		}
+
+		return HeaderType.UNDEFINED ;
 	}
 
 	public long getBitStreamNumber()

@@ -8,8 +8,8 @@ import com.linxonline.mallet.event.AddEventInterface ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.resources.SpriteManager ;
-import com.linxonline.mallet.resources.Sprite ;
+import com.linxonline.mallet.resources.texture.SpriteManager ;
+import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 
 public class AnimationSystem extends SystemRoot<Animation>

@@ -3,7 +3,8 @@ package com.linxonline.mallet.util.factory.creators ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.Creator ;
-import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.maths.* ;
 
 public class ImageCreator extends Creator<Entity>

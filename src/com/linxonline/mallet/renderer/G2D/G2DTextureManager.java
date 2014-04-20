@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources ;
+package com.linxonline.mallet.renderer.G2D ;
 
 import javax.imageio.* ;
 import java.io.* ;
@@ -6,7 +6,8 @@ import java.io.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
-import com.linxonline.mallet.resources.Texture ;
+import com.linxonline.mallet.resources.AbstractManager ;
+import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.renderer.G2D.G2DImage ;
 
 public class G2DTextureManager extends AbstractManager<Texture>

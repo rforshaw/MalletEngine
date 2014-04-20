@@ -4,7 +4,8 @@ import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.factory.* ;
-import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.maths.* ;
 
 public class AnimMouseCreator extends Creator<Entity>

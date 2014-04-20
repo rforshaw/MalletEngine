@@ -15,7 +15,9 @@ import javax.media.opengl.glu.GLU ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
+
+import com.linxonline.mallet.resources.model.* ;
+import com.linxonline.mallet.resources.texture.* ;
 
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;

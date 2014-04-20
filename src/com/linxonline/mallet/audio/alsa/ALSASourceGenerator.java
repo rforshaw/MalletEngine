@@ -7,7 +7,7 @@ import com.jogamp.openal.* ;
 import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.resources.sound.* ;
 
 public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 {

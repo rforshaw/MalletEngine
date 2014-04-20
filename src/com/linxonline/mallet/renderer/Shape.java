@@ -8,7 +8,9 @@ public class Shape
 {
 	public enum Style
 	{
-		LINES, LINE_STRIP ; 
+		LINES,				// Requires a start and an end point to be defined for each line
+		LINE_STRIP, 		// Will continue the line from the last point added
+		FILL ; 				// Not yet implemented
 	}
 
 	public final int[] indicies ;

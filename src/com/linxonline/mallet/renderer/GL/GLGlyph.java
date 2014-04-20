@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.GL ;
 
-import com.linxonline.mallet.resources.Model ;
+import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
 public class GLGlyph extends Glyph

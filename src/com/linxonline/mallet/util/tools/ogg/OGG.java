@@ -33,8 +33,12 @@ public class OGG
 		boolean end = false ;
 		int pos = 0 ;
 
-		while( end == false )
+		final int streamLength = _stream.length ;
+		System.out.println( "Stream Size: " + _stream.length ) ;
+
+		while( end == false  && ( pos + 4 ) < streamLength )
 		{
+			//System.out.println( "Pos: " + pos ) ;
 			final String header = new String( ConvertBytes.toBytes( _stream, pos, 4 ) ) ;
 			final byte version = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;		// unsigned byte
 			final byte hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] ;		// unsigned byte
@@ -72,8 +76,11 @@ public class OGG
 			final byte[] data = out.toByteArray() ;
 			out.reset() ;
 
-			pages.add( new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ) ;
-			if( hType == 4 ) // 4 represents end of file, 0 means progressing & 2 represents start.
+			final Page page = new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ;
+			pages.add( page ) ;
+
+			System.out.println( page ) ;
+			if( page.getHeaderType() == Page.HeaderType.END ) // 4 represents end of file, 0 means progressing & 2 represents start.
 			{
 				end = true ;
 			}

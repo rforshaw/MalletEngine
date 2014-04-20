@@ -12,6 +12,8 @@ import java.nio.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.resources.texture.* ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 

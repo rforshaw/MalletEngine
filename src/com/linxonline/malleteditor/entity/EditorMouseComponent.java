@@ -1,8 +1,8 @@
 package com.linxonline.malleteditor.entity ;
 
 import com.linxonline.mallet.renderer.CameraFactory ;
-import com.linxonline.mallet.entity.RenderComponent ;
-import com.linxonline.mallet.entity.MouseComponent ;
+import com.linxonline.mallet.entity.components.RenderComponent ;
+import com.linxonline.mallet.entity.components.MouseComponent ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.Event ;

@@ -18,6 +18,8 @@ import com.linxonline.mallet.physics.CollisionSystem ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.entity.system.* ;
+import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.animation.* ;
 
 import com.linxonline.mallet.util.settings.* ;

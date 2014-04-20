@@ -4,7 +4,7 @@ import java.util.ArrayList ;
 
 import javax.media.opengl.* ;
 
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 
