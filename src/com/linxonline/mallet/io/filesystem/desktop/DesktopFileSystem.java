@@ -206,7 +206,9 @@ public class DesktopFileSystem implements FileSystem
 				final long length = entry.getSize() ;
 
 				final InputStream is = zipFile.getInputStream( entry ) ;
-				return read( is, length ) ;
+				byte[] stream = read( is, length ) ;
+				zipFile.close() ;
+				return stream ;
 			}
 			catch( ZipException _ex )
 			{
