@@ -1,6 +1,5 @@
 package com.linxonline.mallet.event ;
 
-import java.io.Serializable ;
 import java.util.ArrayList ;
 
 /**
@@ -19,7 +18,7 @@ import java.util.ArrayList ;
 // refreshEvents()
 // process Events
 /*====================================================*/
-public final class EventMessenger implements Serializable
+public final class EventMessenger
 {
 	private ArrayList<Event> newEvents = new ArrayList<Event>() ;
 	private ArrayList<Event> events = new ArrayList<Event>() ;

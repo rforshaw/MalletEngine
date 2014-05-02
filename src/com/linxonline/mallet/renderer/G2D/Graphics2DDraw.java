@@ -128,7 +128,7 @@ public class Graphics2DDraw
 	*/
 	public static void setGraphicsColour( final Graphics2D _graphics, final Settings _settings )
 	{
-		final MalletColour colour = _settings.getObject( "COLOUR", null ) ;
+		/*final MalletColour colour = _settings.getObject( "COLOUR", null ) ;
 		if( colour != null )
 		{
 			if( colour.colour == null )
@@ -140,6 +140,6 @@ public class Graphics2DDraw
 			return ;
 		}
 		// Set to White if not specified
-		_graphics.setColor( Color.WHITE ) ;
+		_graphics.setColor( Color.WHITE ) ;*/
 	}
 }

@@ -34,7 +34,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 
 	protected int numID = 0 ;
-	protected static GLU glu = new GLU() ;
+	protected static final GLU glu = new GLU() ;
 	protected static GLCanvas canvas = null ;
 	protected JFrame frame = null ;
 

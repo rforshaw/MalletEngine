@@ -59,7 +59,7 @@ public class GlobalFileSystem
 
 	public static boolean writeResourceRaw( final String _file, final byte[] _data )
 	{
-		return writeResourceRaw( _file, _data ) ;
+		return fileSystem.writeResourceRaw( _file, _data ) ;
 	}
 
 	public static boolean doesResourceExist( final String _file )
