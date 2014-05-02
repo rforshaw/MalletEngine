@@ -78,12 +78,12 @@ public class DesktopFileSystem implements FileSystem
 		return null ;
 	}
 
-	public boolean getResourceRaw( final String _file, final ResourceCallback _callback )
+	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
 	{
 		return false ;
 	}
 
-	public boolean getResourceAsString( final String _file, final ResourceCallback _callback )
+	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
 	{
 		return false ;
 	}

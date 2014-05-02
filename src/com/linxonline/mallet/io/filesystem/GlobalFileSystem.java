@@ -38,15 +38,20 @@ public class GlobalFileSystem
 		Doesn't block calling Thread, when resource has started reading,
 		it'll call ResourceCallback.
 		Return boolean informs whether it successfully started reading.
+
+		Using a length of zero will result in the entire file/stream being returned.
+		Specifying a length greater than zero will determine the maximum amount of bytes/lines
+		that are read and then passed to the callback. If the end of the stream/file does not reach
+		the length size then it is still returned.
 	*/
-	public static boolean getResourceRaw( final String _file, final ResourceCallback _callback )
+	public static boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
 	{
-		return fileSystem.getResourceRaw( _file, _callback ) ;
+		return fileSystem.getResourceRaw( _file, _length, _callback ) ;
 	}
 
-	public static boolean getResourceAsString( final String _file, final ResourceCallback _callback )
+	public static boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
 	{
-		return fileSystem.getResourceAsString( _file, _callback ) ;
+		return fileSystem.getResourceAsString( _file, _length, _callback ) ;
 	}
 
 	/**

@@ -22,9 +22,14 @@ public interface FileSystem
 		Doesn't block calling Thread, when resource has started reading,
 		it'll call ResourceCallback.
 		Return boolean informs whether it successfully started reading.
-	**/
-	public boolean getResourceRaw( final String _file, final ResourceCallback _callback ) ;
-	public boolean getResourceAsString( final String _file, final ResourceCallback _callback ) ;
+
+		Using a length of zero will result in the entire file/stream being returned.
+		Specifying a length greater than zero will determine the maximum amount of bytes/lines
+		that are read and then passed to the callback. If the end of the stream/file does not reach
+		the length size then it is still returned.
+	*/
+	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback ) ;
+	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback ) ;
 
 	/**
 		Blocks calling Thread

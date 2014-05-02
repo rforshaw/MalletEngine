@@ -22,8 +22,8 @@ public class ByteReader
 		Not blocking, returns true if begun reading, false otherwise.
 		Streams the bytes through the callback as they are read.
 	**/
-	public static boolean readBytes( final String _file, final ResourceCallback _callback )
+	public static boolean readBytes( final String _file, final int _length, final ResourceCallback _callback )
 	{
-		return GlobalFileSystem.getResourceRaw( _file, _callback ) ;
+		return GlobalFileSystem.getResourceRaw( _file, _length, _callback ) ;
 	}
 }
