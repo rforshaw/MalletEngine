@@ -20,8 +20,8 @@ import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
 import com.linxonline.mallet.util.factory.creators.ImageCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
 
-import com.linxonline.mallet.util.tools.ogg.OGG ;
-import com.linxonline.mallet.util.tools.ogg.Vorbis ;
+import com.linxonline.mallet.io.reader.ogg.OGG ;
+import com.linxonline.mallet.io.reader.ogg.Vorbis ;
 
 /**
 	Example on how to implement the Game Loader class.

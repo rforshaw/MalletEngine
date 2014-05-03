@@ -59,7 +59,7 @@ public class MalletColour
 		return colours[ALPHA] ;
 	}
 
-	public int toRGBA()
+	public int getRGBA()
 	{
 		return ConvertBytes.toInt( colours, 0, 4 ) ;
 	}

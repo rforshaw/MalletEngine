@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.tools.ogg ;
+package com.linxonline.mallet.io.reader.ogg ;
 
 import java.util.ArrayList ;
 import java.io.ByteArrayOutputStream ;

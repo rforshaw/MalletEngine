@@ -37,7 +37,6 @@ public class QuickSort
 		return sort( array ).toArray( _contents ) ;
 	}
 
-	
 	private static <T extends SortInterface> ArrayList<T> sort( ArrayList<T> _contents )
 	{
 		int size = _contents.size() ;
