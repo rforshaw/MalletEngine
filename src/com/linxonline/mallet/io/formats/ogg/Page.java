@@ -1,4 +1,4 @@
-package com.linxonline.mallet.io.reader.ogg ;
+package com.linxonline.mallet.io.formats.ogg ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 

@@ -1,4 +1,4 @@
-package com.linxonline.mallet.io.reader.wav ;
+package com.linxonline.mallet.io.formats.wav ;
 
 import com.linxonline.mallet.util.tools.* ;
 
