@@ -30,8 +30,10 @@ import com.linxonline.mallet.renderer.GL.* ;
 public class GLDefaultSystem implements SystemInterface
 {
 	protected String titleName = new String( "GL Mallet Engine" ) ;
+	protected final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
 
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
+	protected EventController eventController = new EventController() ;
 	protected GLRenderer renderer = new GLRenderer() ;
 
 	public final EventSystem eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
@@ -44,14 +46,10 @@ public class GLDefaultSystem implements SystemInterface
 
 	public void initSystem()
 	{
+		initEventProcessors() ;
 		renderer.start() ;
 		sourceGenerator.startGenerator() ;
 		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
-
-		final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
-		final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
-		final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "blank cursor" ) ;
-		frame.getContentPane().setCursor(blankCursor);
 
 		frame.addWindowListener( new WindowListener()
 		{
@@ -69,6 +67,49 @@ public class GLDefaultSystem implements SystemInterface
 		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;
 		renderer.getCanvas().addMouseWheelListener( inputSystem ) ;
 		renderer.getCanvas().addKeyListener( inputSystem ) ;
+
+		addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+	}
+
+	protected void initEventProcessors()
+	{
+		final String[] eventTypes = { "DISPLAY_SYSTEM_MOUSE", "SYSTEM_RENDER" } ;
+		eventController.setWantedEventTypes( eventTypes ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "USE_SYSTEM_MOUSE" )
+		{
+			@Override
+			public void processEvent( final Event _event )
+			{
+				if( _event.isEventByString( "DISPLAY_SYSTEM_MOUSE" ) == true )
+				{
+					final Event<Boolean> useEvent = _event ;
+					final boolean displayMouse = useEvent.getVariable() ;
+					frame.getContentPane().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) ) ;
+					if( displayMouse == false )
+					{
+						// Hide the mouse if it isn't meant to be displayed.
+						final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
+						final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "BLANK_CURSOR" ) ;
+						frame.getContentPane().setCursor( blankCursor ) ;
+					}
+				}
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "SYSTEM_RENDER" )
+		{
+			@Override
+			public void processEvent( final Event _event )
+			{
+				if( _event.isEventByString( "SYSTEM_RENDER" ) == true )
+				{
+					System.out.println( "Handle Render" ) ;
+				}
+			}
+		} ) ;
+
+		addEventHandler( eventController ) ;
 	}
 
 	public void startSystem() {}
@@ -144,7 +185,10 @@ public class GLDefaultSystem implements SystemInterface
 	{
 		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
-		eventSystem.update() ;
+
+		eventSystem.update() ;			// Pass the Events to the interested Backend Systems
+		eventController.update() ;		// Process the Events this system is interested in
+
 		return true ;	// Informs the Game System whether to continue updating or not.
 	}
 

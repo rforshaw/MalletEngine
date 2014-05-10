@@ -56,6 +56,9 @@ public class ConfigParser
 
 				var = _src.getString( "FULLSCREEN", "false" ) ;
 				_dest.addBoolean( "FULLSCREEN", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "DISPLAYMOUSE", "false" ) ;
+				_dest.addBoolean( "DISPLAYMOUSE", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}

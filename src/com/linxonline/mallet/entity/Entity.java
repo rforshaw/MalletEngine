@@ -26,11 +26,11 @@ import com.linxonline.mallet.event.* ;
 public final class Entity implements SerialisableForm
 {
 	private final ArrayList<Component> components = new ArrayList<Component>() ;
-	private EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
+	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
-	public final ID id ;											// Unique ID for this Entity: Name:Family
-	public Vector3 position = new Vector3( 0.0f, 0.0f, 0.0f ) ;		// Position of Entity in world space
-	public boolean destroy = false ;									// Is the Entity to be destroyed and subsequently removed?
+	public final ID id ;							// Unique ID for this Entity: Name:Family
+	public Vector3 position = new Vector3() ;		// Position of Entity in world space
+	public boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
 	public Entity()
 	{
