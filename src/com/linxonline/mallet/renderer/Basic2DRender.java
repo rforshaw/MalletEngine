@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.id.IDInterface ; 			// IDInterface to folder agnostic place
 import com.linxonline.mallet.event.* ;
@@ -173,7 +174,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void removeDraw( final Settings _draw )
 	{
-		final Integer id = _draw.getInteger( "ID", -1 ) ;
+		final int id = _draw.getInteger( "ID", -1 ) ;
 		state.remove( id ) ;
 	}
 
@@ -262,6 +263,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			final RenderData data = getData( _id ) ;
 			if( data != null )
 			{
+				Logger.println( "Basic2DRender - Remove Render Data: " + _id, Logger.Verbosity.MINOR ) ;
 				data.unregisterResources() ;		// Decrement resource count
 				hashedContent.remove( _id ) ;
 				content.remove( data ) ;

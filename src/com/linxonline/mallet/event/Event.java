@@ -69,4 +69,11 @@ public final class Event<T>
 	{
 		return variable ;
 	}
+	
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "Event: " + eventType ) ;
+		return buffer.toString() ;
+	}
 }

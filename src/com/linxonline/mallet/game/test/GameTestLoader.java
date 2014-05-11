@@ -12,6 +12,8 @@ import com.linxonline.mallet.util.sort.* ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.game.* ;
+import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.entity.components.* ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.id.IDInterface ;
@@ -92,27 +94,40 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderAnimationExample()
 			{
-				eventSystem.addEvent( AnimationFactory.createAnimation( "base/anim/moomba.anim", 			// Animation Location
-																		 new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																		 new Vector2( -32, -32 ), 			// Offset
-																		 new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																		 null,								// fill, texture repeat
-																		 null,								// clip
-																		 null,								// clip offset
-																		 10,								// layer
-																		 new SourceCallback()
+				final AnimComponent anim = new AnimComponent() ;
+				anim.addAnimation( "DEFAULT", AnimationFactory.createAnimation( "base/anim/moomba.anim",
+																		 new Vector3( 0.0f, 0.0f, 0.0f ),
+																		 new Vector2( -32, -32 ),
+																		 new Vector2( 64, 64 ),
+																		 null,
+																		 null,
+																		 null,
+																		 10,
+																		 anim ) ) ;
+
+				anim.setDefaultAnim( "DEFAULT" ) ;
+
+				final Entity entity = new Entity( "Test Animation" ) ;
+				entity.addComponent( anim ) ;
+				addEntity( entity ) ;
+				
+				Thread thread = new Thread()
 				{
-					public void recieveID( final int _id ){ System.out.println( "Recieved ID: " + _id ) ; }
-
-					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
-
-					public void start() { System.out.println( "Source began playing" ) ; }
-					public void pause() { System.out.println( "Source has been paused" ) ; }
-					public void stop() { System.out.println( "Source has been stopped" ) ; }
-
-					public void update( final float _dt ) { /*System.out.println( _dt ) ;*/ }
-					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;
+					@Override
+					public void run()
+					{
+						try
+						{
+							Thread.sleep( 2000 ) ;
+						}
+						catch( InterruptedException e )
+						{
+							e.printStackTrace() ;
+						}
+						anim.playAnimation( "DEFAULT" ) ;
+					}
+				} ;
+				thread.start() ;
 			}
 
 			/**

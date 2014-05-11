@@ -8,6 +8,7 @@ import com.linxonline.mallet.event.AddEventInterface ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.resources.texture.SpriteManager ;
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.renderer.DrawFactory ;
@@ -61,9 +62,11 @@ public class AnimationSystem extends SystemRoot<Animation>
 			case AnimRequestType.REMOVE_ANIMATION :
 			{
 				final int id = anim.getInteger( "ID", -1 ) ;
+				Logger.println( "AnimationSystem - Remove Anim Request: " + id, Logger.Verbosity.MINOR ) ;
 				final Animation animation = getSource( id ) ;
 				if( animation != null )
 				{
+					Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
 					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
 					removeSources.add( new RemoveSource( id, animation ) ) ;
 				}
@@ -81,6 +84,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 			final Animation anim = new Animation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
 			if( anim != null )
 			{
+				Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
 				DrawFactory.insertIDCallback( event, anim ) ;
 				passEvent( event ) ;
 				addCallbackToAnimation( anim, _anim ) ;

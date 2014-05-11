@@ -2,6 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -9,6 +10,8 @@ import com.linxonline.mallet.event.Event ;
 
 public class AnimComponent extends EventComponent implements SourceCallback
 {
+	private static final int ANIM_NOT_SET = -1 ;
+
 	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
 	private String defaultAnim = null ;
 	private int animationID = -1 ;
@@ -56,7 +59,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	**/
 	public void stopAnimation()
 	{
-		passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
+		if( animationID != ANIM_NOT_SET )
+		{
+			passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
+			animationID = ANIM_NOT_SET ;
+		}
 	}
 
 	public void recieveID( final int _id ) { animationID = _id ; }
