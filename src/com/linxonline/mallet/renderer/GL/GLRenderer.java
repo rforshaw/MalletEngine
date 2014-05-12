@@ -549,6 +549,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected void render()
 	{
+		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
 			state.draw() ;

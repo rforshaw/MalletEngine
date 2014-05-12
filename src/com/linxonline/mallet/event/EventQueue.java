@@ -61,19 +61,15 @@ public class EventQueue
 			}
 		}
 
-		final int eventSize = optimisedEvents.size() ;
 		final int handlerSize = handlers.size() ;
-
-		if( eventSize > 0 )
+		while( optimisedEvents.size() > 0 )				// Reduce chance of sending the same event twice.
 		{
-			for( int i = 0; i < eventSize; ++i )
+			final Event event = optimisedEvents.get( 0 ) ;
+			optimisedEvents.remove( 0 ) ;
+			for( int j = 0; j < handlerSize; ++j )
 			{
-				for( int j = 0; j < handlerSize; ++j )
-				{
-					handlers.get( j ).processEvent( optimisedEvents.get( i ) ) ;
-				}
+				handlers.get( j ).processEvent( event ) ;
 			}
-			optimisedEvents.clear() ;
 		}
 	}
 

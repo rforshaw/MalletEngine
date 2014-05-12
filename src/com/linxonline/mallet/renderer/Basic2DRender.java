@@ -73,7 +73,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	{
 		// Make a copy of the currentState for interpolation
 		// between frames.
-		state.retireCurrentState() ;
+		state.updateState() ;
 		updateDT = _dt ;
 		renderIter = 0 ;
 	}
@@ -230,6 +230,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected class RenderState implements RenderStateInterface<Integer, RenderData>
 	{
+		protected final ArrayList<Integer> toRemove = new ArrayList<Integer>() ;
 		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;							// Old State
 		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;								// Current State - loopable
 		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;	// Current State - searchable
@@ -260,14 +261,28 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		@Override
 		public void remove( Integer _id )
 		{
-			final RenderData data = getData( _id ) ;
-			if( data != null )
+			Logger.println( "GLRenderer - Request Remove: " + _id, Logger.Verbosity.MINOR ) ;
+			toRemove.add( _id ) ;
+		}
+
+		public void removeRenderData()
+		{
+			final int size = toRemove.size() ;
+			for( int i = 0; i < size; ++i )
 			{
-				Logger.println( "Basic2DRender - Remove Render Data: " + _id, Logger.Verbosity.MINOR ) ;
-				data.unregisterResources() ;		// Decrement resource count
-				hashedContent.remove( _id ) ;
-				content.remove( data ) ;
+				final Integer id = toRemove.get( i ) ;
+				Logger.println( "GLRenderer - Remove: " + id, Logger.Verbosity.MINOR ) ;
+				final RenderData data = getData( id ) ;
+				if( data != null )
+				{
+					data.unregisterResources() ;		// Decrement resource count
+					hashedContent.remove( id ) ;
+
+					final int index = content.indexOf( data ) ;
+					content.remove( index ) ;
+				}
 			}
+			toRemove.clear() ;
 		}
 
 		@Override
@@ -315,6 +330,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 				content.get( i ).unregisterResources() ;
 			}
 
+			toRemove.clear() ;
 			oldState.clear() ;
 			content.clear() ;
 			hashedContent.clear() ;
@@ -323,6 +339,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		public boolean isStateStable()
 		{
 			return oldState.size() == content.size() ;
+		}
+
+		public void updateState()
+		{
+			retireCurrentState() ;
 		}
 
 		public void draw()
@@ -361,12 +382,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		@Override
 		public RenderData getData( Integer _id )
 		{
-			if( hashedContent.containsKey( _id ) == true )
-			{
-				return hashedContent.get( _id ) ;
-			}
-
-			return null ;
+			return hashedContent.get( _id ) ;
 		}
 	}
 
