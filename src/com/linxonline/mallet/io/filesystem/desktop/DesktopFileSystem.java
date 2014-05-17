@@ -50,12 +50,52 @@ public class DesktopFileSystem implements FileSystem
 	**/
 	public byte[] getResourceRaw( final String _file )
 	{
-		if( resources.containsKey( _file ) == true )
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
 		{
-			return streamBytes( resources.get( _file ) ) ;
+			if( file.isZipped == false )
+			{
+				return ReadFile.getRaw( file.filePath ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getRaw( file.filePath, file.zipPath ) ;
+			}
 		}
 
-		// Attempt to Map it, if it doesn't exist.
+		return attemptMapResource( _file ) ;
+	}
+
+	public String getResourceAsString( final String _file )
+	{
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
+		{
+			if( file.isZipped == false )
+			{
+				return ReadFile.getString( file.filePath ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getString( file.filePath, file.zipPath ) ;
+			}
+		}
+
+		return new String( attemptMapResource( _file ) ) ;
+	}
+
+	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
+	{
+		return false ;
+	}
+
+	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
+	{
+		return ReadFile.getString( _file, _length, _callback ) ;
+	}
+
+	private byte[] attemptMapResource( final String _file )
+	{
 		final File createFile = new File( _file ) ;
 		if( createFile.isFile() == true )
 		{
@@ -67,27 +107,6 @@ public class DesktopFileSystem implements FileSystem
 		return null ;
 	}
 
-	public String getResourceAsString( final String _file )
-	{
-		final byte[] resource = getResourceRaw( _file ) ;
-		if( resource != null )
-		{
-			return new String( resource ) ;
-		}
-
-		return null ;
-	}
-
-	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
-	{
-		return false ;
-	}
-
-	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
-	{
-		return false ;
-	}
-	
 	public boolean writeResourceAsString( final String _file, final String _data )
 	{
 		try
@@ -184,40 +203,11 @@ public class DesktopFileSystem implements FileSystem
 	{
 		if( _file.isZipped == false )
 		{
-			final File file = new File( _file.filePath ) ;
-			try
-			{
-				final long length = file.length() ;
-				final InputStream is = new FileInputStream( file ) ;
-				return read( is, length ) ;
-			}
-			catch( IOException _ex )
-			{
-				System.out.println( "Failed to Read Stream" ) ;
-				return null ;
-			}
+			return ReadFile.getRaw( _file.filePath ) ;
 		}
 		else if( _file.isZipped == true )
 		{
-			try
-			{
-				final ZipFile zipFile = new ZipFile( _file.filePath ) ;
-				final ZipEntry entry = zipFile.getEntry( _file.zipPath ) ;
-				final long length = entry.getSize() ;
-
-				final InputStream is = zipFile.getInputStream( entry ) ;
-				byte[] stream = read( is, length ) ;
-				zipFile.close() ;
-				return stream ;
-			}
-			catch( ZipException _ex )
-			{
-				System.out.println( "Failed to access Zip" ) ;
-			}
-			catch( IOException _ex )
-			{
-				System.out.println( "Failed to read Zip" ) ;
-			}
+			return ReadZip.getRaw( _file.filePath, _file.zipPath ) ;
 		}
 
 		System.out.println( "File Not Found" ) ;
