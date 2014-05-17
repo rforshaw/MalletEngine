@@ -5,6 +5,7 @@ import java.util.zip.* ;
 import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.util.logger.Logger ;
 
 public class DesktopFileSystem implements FileSystem
 {
@@ -86,12 +87,42 @@ public class DesktopFileSystem implements FileSystem
 
 	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
 	{
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
+		{
+			if( file.isZipped == false )
+			{
+				return ReadFile.getRaw( _file, _length, _callback ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				Logger.println( "ASync - zip access not implemented yet.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+		}
+
+		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
 		return false ;
 	}
 
 	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
 	{
-		return ReadFile.getString( _file, _length, _callback ) ;
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
+		{
+			if( file.isZipped == false )
+			{
+				return ReadFile.getString( _file, _length, _callback ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				Logger.println( "ASync - zip access not implemented yet.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+		}
+
+		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
+		return false ;
 	}
 
 	private byte[] attemptMapResource( final String _file )

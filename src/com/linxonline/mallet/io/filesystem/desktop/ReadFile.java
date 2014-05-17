@@ -38,56 +38,17 @@ public class ReadFile
 		return new String( getRaw( _path ) ) ;
 	}
 
+	public static boolean getRaw( final String _path, final int _length, final ResourceCallback _callback )
+	{
+		RawThread thread = new RawThread( _path, _length, _callback ) ;
+		thread.start() ;
+		return true ;
+	}
+
 	public static boolean getString( final String _file, final int _length, final ResourceCallback _callback )
 	{
-		if( _length == 0 )
-		{
-			final Thread thread = new Thread()
-			{
-				public void run()
-				{
-					_callback.resourceAsString( ReadFile.getString( _file ) ) ;
-					_callback.end() ;
-				}
-			} ;
-			thread.start() ;
-		}
-		else
-		{
-			final Thread thread = new Thread()
-			{
-				final String[] strings = new String[_length] ;
-				public void run()
-				{
-					try
-					{
-						final FileInputStream is = new FileInputStream( _file ) ;
-						final InputStreamReader isr = new InputStreamReader( is ) ;
-						final BufferedReader br = new BufferedReader( isr ) ;
-
-						int i = 0 ;
-						while( ( strings[i++] = br.readLine() ) != null )
-						{
-							if( i >= strings.length )
-							{
-								for( int j = 0; j < strings.length; ++j )
-								{
-									_callback.resourceAsString( strings[j] ) ;
-								}
-								i = 0 ;
-							}
-						}
-					}
-					catch( IOException ex )
-					{
-						Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
-					}
-
-					_callback.end() ;
-				}
-			} ;
-			thread.start() ;
-		}
+		final StringThread thread = new StringThread( _file, _length, _callback ) ;
+		thread.start() ;
 		return true ;
 	}
 
@@ -104,5 +65,148 @@ public class ReadFile
 		}
 
 		return bytes ;
+	}
+
+	protected static class RawThread extends Thread
+	{
+		final ResourceCallback callback ;
+		final int length ;
+		final String path ;
+
+		public RawThread( final String _path, final int _length, final ResourceCallback _callback )
+		{
+			callback = _callback ;
+			length = _length ;
+			path = _path ;
+		}
+
+		public void run()
+		{
+			if( length <= 0 )
+			{
+				batchRead() ;
+			}
+			else
+			{
+				iterativeRead() ;
+			}
+		}
+
+		private void batchRead()
+		{
+			callback.resourceRaw( ReadFile.getRaw( path ) ) ;
+			callback.end() ;
+		}
+		
+		private void iterativeRead()
+		{
+			try
+			{
+				final File file = new File( path ) ;
+				final int fileLength = ( int )file.length() ;
+
+				final FileInputStream is = new FileInputStream( file ) ;
+				int offset = 0 ;
+
+				while( offset < fileLength )
+				{
+					callback.resourceRaw( read( is, offset, length ) ) ;
+					offset += length ;
+				}
+				is.close() ;
+			}
+			catch( IOException ex )
+			{
+				Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
+			}
+
+			callback.end() ;
+		}
+	}
+
+	protected static class StringThread extends Thread
+	{
+		final ResourceCallback callback ;
+		final int length ;
+		final String file ;
+
+		public StringThread( final String _file, final int _length, final ResourceCallback _callback )
+		{
+			length = _length ;
+			callback = _callback ;
+			file = _file ;
+		}
+
+		public void run()
+		{
+			if( length <= 0 )
+			{
+				batchRead() ;
+			}
+			else
+			{
+				iterativeRead() ;
+			}
+		}
+
+		private void batchRead()
+		{
+			callback.resourceAsString( ReadFile.getString( file ) ) ;
+			callback.end() ;
+		}
+		
+		private void iterativeRead()
+		{
+			final String[] strings = new String[length] ;
+			nullStrings( strings ) ;
+
+			try
+			{
+				final FileInputStream is = new FileInputStream( file ) ;
+				final InputStreamReader isr = new InputStreamReader( is ) ;
+				final BufferedReader br = new BufferedReader( isr ) ;
+
+				int i = 0 ;
+				while( ( strings[i++] = br.readLine() ) != null )
+				{
+					if( i >= strings.length )
+					{
+						sendStringsToCallback( strings, callback ) ;	// Send strings when limit is reached
+						nullStrings( strings ) ;
+						i = 0 ;
+					}
+				}
+
+				br.close() ;
+				isr.close() ;
+				is.close() ;
+			}
+			catch( IOException ex )
+			{
+				Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
+			}
+
+			sendStringsToCallback( strings, callback ) ;				// Send left over strings that didn't reach limit
+			callback.end() ;
+		}
+		
+		private void sendStringsToCallback( final String[] _strings, final ResourceCallback _callback )
+		{
+			for( int i = 0; i < _strings.length; ++i )
+			{
+				if( _strings[i] != null )
+				{
+					_callback.resourceAsString( _strings[i] ) ;
+				}
+			}
+		}
+
+		private void nullStrings( final String[] _strings )
+		{
+			for( int i = 0; i < _strings.length; ++i )
+			{
+				_strings[i] = null ;
+			}
+		}
 	}
 }
