@@ -96,8 +96,7 @@ public class DesktopFileSystem implements FileSystem
 			}
 			else if( file.isZipped == true )
 			{
-				Logger.println( "ASync - zip access not implemented yet.", Logger.Verbosity.MAJOR ) ;
-				return false ;
+				return ReadZip.getRaw( file.filePath, file.zipPath, _length, _callback ) ;
 			}
 		}
 
@@ -116,8 +115,7 @@ public class DesktopFileSystem implements FileSystem
 			}
 			else if( file.isZipped == true )
 			{
-				Logger.println( "ASync - zip access not implemented yet.", Logger.Verbosity.MAJOR ) ;
-				return false ;
+				return ReadZip.getString( file.filePath, file.zipPath, _length, _callback ) ;
 			}
 		}
 
