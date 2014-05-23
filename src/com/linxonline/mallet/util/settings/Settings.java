@@ -92,6 +92,13 @@ public final class Settings
 		variables.put( _name, var ) ;
 	}
 
+	/* Remove Variable */
+
+	public boolean remove( final String _name )
+	{
+		return ( variables.remove( _name ) != null ) ? true : false ;
+	}
+
 	/* Return value, default or throw exception */
 
 	public final boolean getBoolean( final String _name ) throws NullPointerException
