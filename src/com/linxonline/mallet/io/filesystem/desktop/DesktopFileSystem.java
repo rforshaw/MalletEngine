@@ -155,25 +155,40 @@ public class DesktopFileSystem implements FileSystem
 		return false ;
 	}
 
-	public boolean doesResourceExist( final String _file )
+	public boolean exist( final String _path )
 	{
 		return false ;
 	}
 	
-	public boolean deleteResource( final String _file )
+	public boolean delete( final String _path )
 	{
 		// Only delete Resources that are mapped
-		if( resources.containsKey( _file ) == true )
+		if( resources.containsKey( _path ) == true )
 		{
-			DataFile data = resources.get( _file ) ;
+			DataFile data = resources.get( _path ) ;
 			if( data.zipPath == null )				// Don't delete if contained witihin Zip
 			{
 				final File file = new File( data.filePath ) ;
-				resources.remove( _file ) ;
+				resources.remove( _path ) ;
 				return file.delete() ;
 			}
 		}
 
+		return false ;
+	}
+
+	public boolean makeDirectories( final String _path )
+	{
+		return false ;
+	}
+
+	public boolean isFile( final String _file )
+	{
+		return false ;
+	}
+
+	public boolean isDirectory( final String _path )
+	{
 		return false ;
 	}
 

@@ -67,13 +67,38 @@ public class GlobalFileSystem
 		return fileSystem.writeResourceRaw( _file, _data ) ;
 	}
 
-	public static boolean doesResourceExist( final String _file )
+	/**
+		Check to see whether a file or directory exists.
+	*/
+	public static boolean exist( final String _path )
 	{
-		return fileSystem.doesResourceExist( _file ) ;
+		return fileSystem.exist( _path ) ;
 	}
 
-	public static boolean deleteResource( final String _file )
+	/**
+		Delete a file or directory represented by the path.
+		Deleting a directory will delete its children.
+	*/
+	public static boolean delete( final String _path )
 	{
-		return fileSystem.deleteResource( _file ) ;
+		return fileSystem.delete( _path ) ;
+	}
+
+	/**
+		Create the directory structure represented by _path.
+	*/
+	public boolean makeDirectories( final String _path )
+	{
+		return fileSystem.makeDirectories( _path ) ;
+	}
+
+	public boolean isFile( final String _file )
+	{
+		return fileSystem.isFile( _file ) ;
+	}
+
+	public boolean isDirectory( final String _path )
+	{
+		return fileSystem.isDirectory( _path ) ;
 	}
 }

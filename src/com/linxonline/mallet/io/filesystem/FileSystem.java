@@ -37,6 +37,22 @@ public interface FileSystem
 	public boolean writeResourceAsString( final String _file, final String _data ) ;
 	public boolean writeResourceRaw( final String _file, final byte[] _data ) ;
 
-	public boolean doesResourceExist( final String _file ) ;
-	public boolean deleteResource( final String _file ) ;
+	/**
+		Check to see whether a file or directory exists.
+	*/
+	public boolean exist( final String _path ) ;
+
+	/**
+		Delete a file or directory represented by the path.
+		Deleting a directory will delete its children.
+	*/
+	public boolean delete( final String _path ) ;
+
+	/**
+		Create the directory structure represented by _path.
+	*/
+	public boolean makeDirectories( final String _path ) ;
+
+	public boolean isFile( final String _file ) ;
+	public boolean isDirectory( final String _path ) ;
 }
