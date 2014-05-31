@@ -6,7 +6,7 @@ import javax.swing.JFrame ;
 import java.awt.Dimension ;
 
 import com.linxonline.malleteditor.renderer.GLEditorRenderer ;
-import com.linxonline.mallet.system.gl.GLDefaultSystem ;
+import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.maths.* ;
 
 public class GLEditorSystem extends GLDefaultSystem

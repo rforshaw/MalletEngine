@@ -1,6 +1,6 @@
 package com.linxonline.mallet.main.desktop ;
 
-import com.linxonline.mallet.system.gl.GLDefaultSystem ;
+import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
 import com.linxonline.mallet.game.GameLoader ;

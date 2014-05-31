@@ -3,7 +3,6 @@ package com.linxonline.mallet.game ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.audio.alsa.* ;
 
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.game.statemachine.State ;

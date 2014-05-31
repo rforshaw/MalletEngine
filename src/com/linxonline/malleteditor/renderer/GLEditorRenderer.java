@@ -2,7 +2,7 @@ package com.linxonline.malleteditor.renderer ;
 
 import javax.media.opengl.* ;
 
-import com.linxonline.mallet.renderer.GL.GLRenderer ;
+import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
 import com.linxonline.mallet.maths.* ;
 
 public class GLEditorRenderer extends GLRenderer
