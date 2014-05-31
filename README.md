@@ -37,7 +37,9 @@ run.bat
 
 Android &amp; iOS support?
 
-I have yet to add the Android &amp; iOS source files to the repository. This will be done at a later date.
+Android support has been integrated into the Mallet Engine. Android specific code is located within the android folders, and desktop specific code is located within desktop folders. The desktop build ignores Android sources and vice versa. To compile the Android Mallet Engine you will need the Android SDK, compiling Desktop Mallet Engine does not require the Android SDK.
+
+I've yet to decide whether to integrate iOS code into the Mallet Engine codebase or keep it as a separate codebase.
 
 Note:
 Folder that begin with an underscore, _desktop, or have underscores between words, _game_test, are not considered to be part of the 
