@@ -3,12 +3,44 @@ package com.linxonline.mallet.physics ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.physics.hulls.* ;
+import com.linxonline.mallet.event.* ;
 
-public class CollisionSystem
+public class CollisionSystem extends EventController
 {
+	private final String[] EVENT_TYPES = { "ADD_COLLISION_HULL", "REMOVE_COLLISION_HULL" } ;
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
 
-	public CollisionSystem() {}
+	public CollisionSystem( final AddEventInterface _addInterface )
+	{
+		setAddEventInterface( _addInterface ) ;
+		setWantedEventTypes( EVENT_TYPES ) ;
+		initEventProcessors() ;
+	}
+
+	private void initEventProcessors()
+	{
+		addEventProcessor( new EventProcessor( "ADD_COLLISION_HULL" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "ADD_COLLISION_HULL" ) == true )
+				{
+					add( ( Hull )_event.getVariable() ) ;
+				}
+			}
+		} ) ;
+
+		addEventProcessor( new EventProcessor( "REMOVE_COLLISION_HULL" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "REMOVE_COLLISION_HULL" ) == true )
+				{
+					add( ( Hull )_event.getVariable() ) ;
+				}
+			}
+		} ) ;
+	}
 
 	public void add( final Hull _hull )
 	{
@@ -28,6 +60,8 @@ public class CollisionSystem
 
 	public void update( final float _dt )
 	{
+		update() ;			// Update Event Controller
+
 		Hull hull1 = null ;
 		Hull hull2 = null ;
 		final int size = hulls.size() ;

@@ -51,17 +51,17 @@ public class RenderComponent extends EventComponent
 	}
 
 	@Override
-	public void sendInitialEvents()
+	public void passInitialEvents( final ArrayList<Event> _events )
 	{
 		final int length = content.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			passEvent( content.get( i ) ) ;
+			_events.add( content.get( i ) ) ;
 		}
 	}
 
 	@Override
-	public void sendFinishEvents()
+	public void passFinalEvents( final ArrayList<Event> _events )
 	{
 		final int length = content.size() ;
 		Settings draw = null ;
@@ -72,7 +72,7 @@ public class RenderComponent extends EventComponent
 			event = content.get( i ) ;
 			draw = event.<Settings>getVariable() ;
 			draw.addInteger( REQUEST_TYPE, DrawRequestType.REMOVE_DRAW ) ;
-			passEvent( event ) ;
+			_events.add( event ) ;
 		}
 	}
 

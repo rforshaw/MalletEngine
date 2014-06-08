@@ -1,5 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
@@ -79,17 +80,18 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	public void finished() {}
 
 	@Override
-	public void sendInitialEvents()
+	public void passInitialEvents( final ArrayList<Event> _events )
 	{
 		if( defaultAnim != null )
 		{
-			playAnimation( defaultAnim ) ;
+			_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
+			_events.add( animations.get( defaultAnim ) ) ;
 		}
 	}
 
 	@Override
-	public void sendFinishEvents()
+	public void passFinalEvents( final ArrayList<Event> _events )
 	{
-		stopAnimation() ;
+		_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
 	}
 }

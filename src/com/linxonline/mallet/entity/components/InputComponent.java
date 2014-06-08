@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity.components ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.input.* ;
+import com.linxonline.mallet.event.* ;
 
 public abstract class InputComponent extends Component implements InputHandler
 {
@@ -28,6 +29,20 @@ public abstract class InputComponent extends Component implements InputHandler
 	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
 	{
 		inputAdapter = _adapter ;
+	}
+
+	@Override
+	public void passInitialEvents( final ArrayList<Event> _events )
+	{
+		final Event<InputHandler> event = new Event<InputHandler>( "ADD_GAME_STATE_INPUT", this ) ;
+		_events.add( event ) ;
+	}
+
+	@Override
+	public void passFinalEvents( final ArrayList<Event> _events )
+	{
+		final Event<InputHandler> event = new Event<InputHandler>( "REMOVE_GAME_STATE_INPUT", this ) ;
+		_events.add( event ) ;
 	}
 
 	public void passInputEvent( final InputEvent _event )

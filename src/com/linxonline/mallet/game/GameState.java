@@ -10,7 +10,9 @@ import com.linxonline.mallet.game.statemachine.State ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
+import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventSystem ;
+import com.linxonline.mallet.event.EventProcessor ;
 import com.linxonline.mallet.event.EventController ;
 
 import com.linxonline.mallet.physics.CollisionSystem ;
@@ -41,9 +43,9 @@ public class GameState extends State implements HookEntity
 
 	protected SystemInterface system = null ;														// Provides access to Root systems
 	protected final AudioSystem audioSystem = new AudioSystem() ;									// Must specify a SourceGenerator
-	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
-	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
+	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
+	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
@@ -54,6 +56,7 @@ public class GameState extends State implements HookEntity
 	{
 		super( _name ) ;
 		initModes() ;
+		initEventProcessors() ;
 	}
 
 	/**
@@ -173,42 +176,28 @@ public class GameState extends State implements HookEntity
 	*/
 	public void hookEntity( final Entity _entity )
 	{
-		ArrayList<Component> components = null ;
-
-		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
-		for( final Component comp : components )
+		final ArrayList<Event> events = new ArrayList<Event>() ;
 		{
-			CollisionComponent coll = ( CollisionComponent )comp ;
-			collisionSystem.add( coll.hull ) ;
+			// Retrieve component system-registering events.
+			final ArrayList<Component> entityComponents = _entity.getAllComponents() ; 
+			Component component = null ;
+			final int size = entityComponents.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				component = entityComponents.get( i ) ;
+				component.passInitialEvents( events ) ;
+			}
 		}
 
-		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
-		for( final Component comp : components )
 		{
-			InputHandler component = ( InputHandler )comp ;
-			inputSystem.addInputHandler( component ) ;
+			final int size = events.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				eventSystem.addEvent( events.get( i ) ) ;
+			}
 		}
 
-		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
-		for( final Component comp : components )
-		{
-			final EventComponent e = ( EventComponent )comp ;
-			final EventController controller = e.getEventController() ;
-			controller.setAddEventInterface( eventSystem ) ;
-			eventSystem.addEventHandler( controller ) ;
-
-			e.sendInitialEvents() ;
-		}
-
-		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
-		for( final Component comp : components )
-		{
-			QueryComponent component = ( QueryComponent )comp ;
-			component.setSearch( entitySystem.getSearch() ) ;
-		}
-
-		// Update the Event System so other systems can process them asap.
-		eventSystem.update() ;
+		eventSystem.update() ;			// Update the Event System so other systems can process them asap.
 	}
 
 	/**
@@ -216,45 +205,29 @@ public class GameState extends State implements HookEntity
 	*/
 	public void unhookEntity( final Entity _entity )
 	{
-		ArrayList<Component> components = null ;
-
-		components = _entity.getComponentByGroup( "COLLISIONCOMPONENT" ) ;
-		for( final Component comp : components )
+		final ArrayList<Event> events = new ArrayList<Event>() ;
 		{
-			CollisionComponent coll = ( CollisionComponent )comp ;
-			collisionSystem.remove( coll.hull ) ;
+			// Retrieve component system-registering events.
+			final ArrayList<Component> entityComponents = _entity.getAllComponents() ; 
+			Component component = null ;
+			final int size = entityComponents.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				component = entityComponents.get( i ) ;
+				component.passFinalEvents( events ) ;		// Retrieve the Events that will unregister the components
+			}
 		}
 
-		components = _entity.getComponentByGroup( "INPUTCOMPONENT" ) ;
-		for( final Component comp : components )
 		{
-			InputHandler component = ( InputHandler )comp ;
-			inputSystem.removeInputHandler( component ) ;
+			final int size = events.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				eventSystem.addEvent( events.get( i ) ) ;
+			}
 		}
 
-		components = _entity.getComponentByGroup( "EVENTCOMPONENT" ) ;
-		for( final Component comp : components )
-		{
-			final EventComponent e = ( EventComponent )comp ;
-			e.sendFinishEvents() ;
-
-			final EventController controller = e.getEventController() ;
-			controller.setAddEventInterface( null ) ;
-			eventSystem.removeEventHandler( controller ) ;
-		}
-
-		components = _entity.getComponentByGroup( "QUERYCOMPONENT" ) ;
-		for( final Component comp : components )
-		{
-			QueryComponent component = ( QueryComponent )comp ;
-			component.setSearch( null ) ;
-		}
-
-		// Unregister any Resources this Component may have acquired.
-		_entity.clear() ;
-
-		// Update the Event System so other systems can process them asap.
-		eventSystem.update() ;
+		_entity.clear() ;			// Unregister any Resources this Component may have acquired.
+		eventSystem.update() ;		// Update the Event System so other systems can process them asap.
 	}
 
 	/**
@@ -401,6 +374,69 @@ public class GameState extends State implements HookEntity
 				}
 			}
 		} ;
+	}
+
+	protected void initEventProcessors()
+	{
+		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_INPUT" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "ADD_GAME_STATE_INPUT" ) == true )
+				{
+					inputSystem.addInputHandler( ( InputHandler )_event.getVariable() ) ;
+				}
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "REMOVE_GAME_STATE_INPUT" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "REMOVE_GAME_STATE_INPUT" ) == true )
+				{
+					inputSystem.addInputHandler( ( InputHandler )_event.getVariable() ) ;
+				}
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_EVENT" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "ADD_GAME_STATE_EVENT" ) == true )
+				{
+					final EventController controller = ( EventController )_event.getVariable() ;
+					controller.setAddEventInterface( eventSystem ) ;
+					eventSystem.addEventHandler( controller ) ;
+				}
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor( "REMOVE_GAME_STATE_EVENT" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "REMOVE_GAME_STATE_EVENT" ) == true )
+				{
+					final EventController controller = ( EventController )_event.getVariable() ;
+					controller.setAddEventInterface( null ) ;
+					eventSystem.removeEventHandler( controller ) ;
+				}
+			}
+		} ) ;
+		
+		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_QUERY" )
+		{
+			public void processEvent( final Event<?> _event )
+			{
+				if( _event.isEventByString( "ADD_GAME_STATE_QUERY" ) == true )
+				{
+					final QueryComponent query = ( QueryComponent )_event.getVariable() ;
+					query.setSearch( entitySystem.getSearch() ) ;
+				}
+			}
+		} ) ;
 	}
 
 	/**

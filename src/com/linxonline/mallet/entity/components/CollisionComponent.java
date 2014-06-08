@@ -1,6 +1,9 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.physics.CollisionCallback ;
 import com.linxonline.mallet.physics.ContactPoint ;
@@ -21,6 +24,18 @@ public class CollisionComponent extends Component
 	public void setCollisionCallback( final CollisionCallback _callback )
 	{
 		hull.setCollisionCallback( _callback ) ;
+	}
+
+	public void passInitialEvents( final ArrayList<Event> _events )
+	{
+		final Event<Hull> event = new Event<Hull>( "ADD_COLLISION_HULL", hull ) ;
+		_events.add( event ) ;
+	}
+
+	public void passFinalEvents( final ArrayList<Event> _events )
+	{
+		final Event<Hull> event = new Event<Hull>( "REMOVE_COLLISION_HULL", hull ) ;
+		_events.add( event ) ;
 	}
 
 	@Override

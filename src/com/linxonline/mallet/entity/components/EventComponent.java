@@ -1,5 +1,7 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.system.* ;
 
@@ -41,18 +43,19 @@ public class EventComponent extends Component
 		sendToEntity = _send ;
 	}
 
-	/**
-		Allows an extended component to send Events as 
-		soon as it is added to the Game State.
-	**/
-	public void sendInitialEvents() {}
+	@Override
+	public void passInitialEvents( final ArrayList<Event> _events )
+	{
+		final Event<EventController> event = new Event<EventController>( "ADD_GAME_STATE_EVENT", getEventController() ) ;
+		_events.add( event ) ;
+	}
 
-	/**
-		Allows the extended component to send Events as it 
-		is being removed from the Game State.
-		These events should not expect a reply.
-	**/
-	public void sendFinishEvents() {}
+	@Override
+	public void passFinalEvents( final ArrayList<Event> _events )
+	{
+		final Event<EventController> event = new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getEventController() ) ;
+		_events.add( event ) ;
+	}
 
 	public void update( final float _dt )
 	{

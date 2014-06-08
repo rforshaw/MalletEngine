@@ -1,5 +1,7 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.entity.Entity ;
 
 import com.linxonline.mallet.io.serialisation.* ;
@@ -72,6 +74,26 @@ public abstract class Component implements SerialisableForm
 	{
 		return id.isGroupID( _groupID ) ;
 	}
+
+	/**
+		Create events and add them to _events.
+		The events will be passed to the Event System
+		of the Game State. Use an Event to register the 
+		component or variables it holds to external systems.
+		Can also be used for any other events that may need 
+		to be passed when the component is added to the Entity System. 
+	*/
+	public void passInitialEvents( final ArrayList<Event> _events ) {}
+
+	/**
+		Create events and add them to _events.
+		The events will be passed to the Event System
+		of the Game State. Use an Event to cleanup the 
+		component or variables it holds to external systems.
+		Can also be used for any other events that may need 
+		to be passed when the component is removed from the Entity System. 
+	*/
+	public void passFinalEvents( final ArrayList<Event> _events ) {}
 
 	/**
 		Return the internal Event Controller for this component.

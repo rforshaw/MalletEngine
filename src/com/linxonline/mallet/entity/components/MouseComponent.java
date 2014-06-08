@@ -1,6 +1,9 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.input.* ;
+import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.entity.Entity ;
 
@@ -31,11 +34,28 @@ public class MouseComponent extends Component
 	}
 
 	@Override
+	public void passInitialEvents( final ArrayList<Event> _events )
+	{
+		final Event<InputHandler> event = new Event<InputHandler>( "ADD_GAME_STATE_INPUT", this ) ;
+		_events.add( event ) ;
+	}
+
+	@Override
+	public void passFinalEvents( final ArrayList<Event> _events )
+	{
+		final Event<InputHandler> event = new Event<InputHandler>( "REMOVE_GAME_STATE_INPUT", this ) ;
+		_events.add( event ) ;
+	}
+
+	@Override
 	public void update( final float _dt )
 	{
-		final Vector3 pos = parent.getPosition() ;
-		pos.x = inputAdapter.convertInputToRenderX( mouse.x ) ;
-		pos.y = inputAdapter.convertInputToRenderY( mouse.y ) ;
+		if( inputAdapter != null )
+		{
+			final Vector3 pos = parent.getPosition() ;
+			pos.x = inputAdapter.convertInputToRenderX( mouse.x ) ;
+			pos.y = inputAdapter.convertInputToRenderY( mouse.y ) ;
+		}
 	}
 
 	public void passInputEvent( final InputEvent _event )
