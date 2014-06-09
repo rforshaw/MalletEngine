@@ -4,6 +4,7 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.audio.* ;
 
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.game.statemachine.State ;
 
@@ -31,9 +32,9 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 
 public class GameState extends State implements HookEntity
 {
-	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 20Hz
+	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
-	protected float DEFAULT_ESCAPE_TIME = 0.25f ;
+	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 
 	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
 
@@ -57,6 +58,8 @@ public class GameState extends State implements HookEntity
 		super( _name ) ;
 		initModes() ;
 		initEventProcessors() ;
+
+		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
 	}
 
 	/**

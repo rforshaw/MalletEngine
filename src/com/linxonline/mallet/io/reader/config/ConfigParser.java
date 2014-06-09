@@ -50,7 +50,7 @@ public class ConfigParser
 
 				var = _src.getString( "DISPLAYHEIGHT", "480" ) ;
 				_dest.addInteger( "DISPLAYHEIGHT", Integer.parseInt( var ) ) ;
-				
+
 				var = _src.getString( "VSYNC", "0" ) ;
 				_dest.addInteger( "VSYNC", Integer.parseInt( var ) ) ;
 
@@ -59,6 +59,9 @@ public class ConfigParser
 
 				var = _src.getString( "DISPLAYMOUSE", "false" ) ;
 				_dest.addBoolean( "DISPLAYMOUSE", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "MAXFPS", "0" ) ;
+				_dest.addInteger( "MAXFPS", Integer.parseInt( var ) ) ;
 			}
 		} ) ;
 	}

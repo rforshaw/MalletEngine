@@ -14,7 +14,7 @@ import java.util.ArrayList ;
 **/
 public abstract class InputController implements InputHandler
 {
-	protected final ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
+	private final ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
 
 	public void update()
 	{

@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.time.* ;
 public final class GameSystem
 {
 	private SystemInterface system = null ;
-	private StateMachine stateMachine = new StateMachine() ;
+	private final StateMachine stateMachine = new StateMachine() ;
 
 	public GameSystem() {}
 
