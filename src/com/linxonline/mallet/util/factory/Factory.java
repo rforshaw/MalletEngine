@@ -63,6 +63,7 @@ public class Factory<T> implements FactoryInterface<T>
 
 	protected boolean exists( final String _type )
 	{
+		assert _type != null ;
 		return creators.containsKey( _type ) ;
 	}
 }

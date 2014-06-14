@@ -26,11 +26,15 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 
 	public AudioSystem( final AudioGenerator _generator )
 	{
+		assert _generator != null ;
 		sourceGenerator = _generator ;
 	}
 
 	public AudioSystem( final AddEventInterface _eventSystem, final AudioGenerator _generator )
 	{
+		assert _eventSystem != null ;
+		assert _generator != null ;
+
 		eventSystem = _eventSystem ;
 		sourceGenerator = _generator ;
 	}

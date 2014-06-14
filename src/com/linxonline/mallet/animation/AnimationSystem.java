@@ -22,6 +22,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 
 	public AnimationSystem( final AddEventInterface _eventSystem )
 	{
+		assert _eventSystem != null ;
 		eventSystem = _eventSystem ;
 	}
 

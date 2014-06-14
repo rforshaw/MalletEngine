@@ -307,6 +307,7 @@ public class InputSystem implements InputSystemInterface,
 
 	private final boolean exists( final InputHandler _handler )
 	{
+		assert _handler != null ; 
 		return handlers.contains( _handler ) ;
 	}
 

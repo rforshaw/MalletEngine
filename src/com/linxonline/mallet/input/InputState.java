@@ -109,6 +109,7 @@ public class InputState implements InputSystemInterface,
 
 	private final boolean exists( InputHandler _handler )
 	{
+		assert _handler != null ;
 		return handlers.contains( _handler ) ;
 	}
 }

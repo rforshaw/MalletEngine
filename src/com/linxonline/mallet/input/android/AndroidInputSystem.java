@@ -170,6 +170,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	private boolean exists( InputHandler _handler )
 	{
+		assert _handler != null ;
 		return handlers.contains( _handler ) ;
 	}
 }

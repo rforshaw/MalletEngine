@@ -19,6 +19,7 @@ public class GlobalConfig
 
 	public static void setConfig( final Settings _config )
 	{
+		assert _config != null ;
 		config = _config ;
 	}
 

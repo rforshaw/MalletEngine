@@ -156,6 +156,7 @@ public final class EventSystem implements AddEventInterface
 
 	private final boolean exists( final EventHandler _handler )
 	{
+		assert _handler != null ;
 		return handlers.contains( _handler ) ;
 	}
 }

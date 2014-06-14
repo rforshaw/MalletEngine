@@ -38,6 +38,7 @@ public final class GameSystem
 
 	public final void addGameState( final GameState _state )
 	{
+		assert _state != null ;
 		_state.setSystem( system ) ;
 		stateMachine.addState( _state ) ;
 	}
@@ -49,6 +50,7 @@ public final class GameSystem
 	**/
 	public final void setSystem( final SystemInterface _system )
 	{
+		assert _system != null ;
 		system = _system ;
 	}
 

@@ -143,6 +143,7 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void addEntity( final Entity _entity )
 	{
+		assert _entity != null ;
 		entitySystem.addEntity( _entity ) ;
 	}
 
@@ -152,6 +153,7 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void addEntityNow( final Entity _entity )
 	{
+		assert _entity != null ;
 		entitySystem.addEntityNow( _entity ) ;
 	}
 
@@ -171,6 +173,7 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void removeEntity( final Entity _entity )
 	{
+		assert _entity != null ;
 		entitySystem.removeEntity( _entity ) ;
 	}
 

@@ -13,6 +13,7 @@ public class GlobalFileSystem
 
 	public static void setFileSystem( final FileSystem _system )
 	{
+		assert _system != null ;
 		fileSystem = _system ;
 	}
 

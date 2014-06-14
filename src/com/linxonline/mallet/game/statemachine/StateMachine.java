@@ -104,6 +104,7 @@ public final class StateMachine
 
 	private final boolean exists( State _state )
 	{
+		assert _state != null ;
 		return states.contains( _state ) ;
 	}
 }

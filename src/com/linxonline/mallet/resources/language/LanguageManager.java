@@ -25,6 +25,7 @@ public class LanguageManager
 	**/
 	public void setLanguage( final String _language )
 	{
+		assert _language != null ;
 		languageFolder = _language ;
 	}
 
@@ -37,6 +38,7 @@ public class LanguageManager
 	**/
 	public boolean loadLanguageFile( final String _file )
 	{
+		assert _file != null ;
 		final String file = "base/languages/" + languageFolder + "/" + _file ;
 		ArrayList<String> textFile = TextReader.getTextFile( file ) ;
 		if( textFile == null )
@@ -53,6 +55,7 @@ public class LanguageManager
 	**/
 	public boolean containsLanguageFile( final String _file )
 	{
+		assert _file != null ;
 		for( String file : filesLoaded )
 		{
 			if( _file.equals( file ) == true )
@@ -86,6 +89,7 @@ public class LanguageManager
 
 	private final boolean exists( final String _keyword )
 	{
+		assert _keyword != null ;
 		return strings.containsKey( _keyword ) ;
 	}
 

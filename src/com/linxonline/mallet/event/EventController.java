@@ -28,10 +28,8 @@ public class EventController implements EventHandler
 	**/
 	public void addEventProcessor( final EventProcessor _processor )
 	{
-		if( _processor != null )
-		{
-			processors.add( _processor ) ;
-		}
+		assert _processor != null ;
+		processors.add( _processor ) ;
 	}
 
 	public void setAddEventInterface( final AddEventInterface _addInterface )
