@@ -2,7 +2,6 @@ package com.linxonline.mallet.util.factory ;
 
 import java.util.ArrayList ;
 
-//import com.linxonline.mallet.factory.Factory ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.io.reader.RFReader ;

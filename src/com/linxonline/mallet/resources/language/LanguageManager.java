@@ -109,8 +109,8 @@ public class LanguageManager
 	
 	private void process( String[] _split )
 	{
-		String keyword = _split[0].toUpperCase() ;
-		StringBuffer buffer = new StringBuffer() ;
+		final String keyword = _split[0].toUpperCase() ;
+		final StringBuffer buffer = new StringBuffer() ;
 		
 		for( int i = 1; i < _split.length; i++ )
 		{
