@@ -1,7 +1,7 @@
-package com.linxonline.mallet.io.format.json.desktop ;
+package com.linxonline.mallet.io.formats.json.desktop ;
 
-import com.linxonline.mallet.io.format.json.JSONObject ;
-import com.linxonline.mallet.io.format.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.JSONObject ;
+import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 public class DesktopJSONArray extends JSONArray
 {
@@ -40,12 +40,10 @@ public class DesktopJSONArray extends JSONArray
 		}
 	}
 
-	protected void init()
+	public static void init()
 	{
-		if( constructor == null )
-		{
-			constructor = new DesktopJSONArray() ;
-		}
+		System.out.println( "DESKTOP JSON Array STARTER" ) ;
+		constructor = new DesktopJSONArray() ;
 	}
 	
 	public int length()
@@ -190,6 +188,15 @@ public class DesktopJSONArray extends JSONArray
 		{
 			ex.printStackTrace() ;
 			return "[]" ;
+		}
+	}
+
+	private static class JSONStarter
+	{
+		public JSONStarter()
+		{
+			System.out.println( "DESKTOP JSON ARRAY STARTER" ) ;
+			DesktopJSONArray.init() ;
 		}
 	}
 }

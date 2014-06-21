@@ -7,12 +7,23 @@ import java.util.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.io.formats.json.desktop.* ;
+
 public class DesktopFileSystem implements FileSystem
 {
 	private HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
 	private static String ROOT_DIRECTORY = "base" ;
 
-	public DesktopFileSystem() {}
+	public DesktopFileSystem()
+	{
+		initJSONConstructors() ;
+	}
+
+	protected void initJSONConstructors()
+	{
+		DesktopJSONObject.init() ;
+		DesktopJSONArray.init() ;
+	}
 
 	/**
 		Scans the ROOT_DIRECTORY directory and maps it to the HashMap.

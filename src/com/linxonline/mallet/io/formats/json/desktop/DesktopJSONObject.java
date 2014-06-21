@@ -1,9 +1,9 @@
-package com.linxonline.mallet.io.format.json.desktop ;
+package com.linxonline.mallet.io.formats.json.desktop ;
 
 import java.util.Iterator ;
 
-import com.linxonline.mallet.io.format.json.JSONObject ;
-import com.linxonline.mallet.io.format.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.JSONObject ;
+import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 public class DesktopJSONObject extends JSONObject
 {
@@ -42,14 +42,11 @@ public class DesktopJSONObject extends JSONObject
 		}
 	}
 
-	protected void init()
+	public static void init()
 	{
-		if( constructor == null )
-		{
-			constructor = new DesktopJSONObject() ;
-		}
+		constructor = new DesktopJSONObject() ;
 	}
-	
+
 	public String[] keys()
 	{
 		final int length = object.length() ;

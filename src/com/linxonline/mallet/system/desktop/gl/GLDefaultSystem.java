@@ -21,7 +21,6 @@ import com.linxonline.mallet.system.* ;
 
 import com.linxonline.mallet.renderer.desktop.GL.* ;
 
-
 /*===========================================*/
 // DefaultSystem
 // Used to hook up Engine to OS using Java API

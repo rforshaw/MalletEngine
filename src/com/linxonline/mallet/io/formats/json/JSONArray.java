@@ -1,4 +1,4 @@
-package com.linxonline.mallet.io.format.json ;
+package com.linxonline.mallet.io.formats.json ;
 
 /**
 	A wrapper class around a platform specific implementation 
@@ -14,20 +14,16 @@ public abstract class JSONArray
 
 	public static JSONArray construct()
 	{
-		constructor.init() ;
 		return constructor.create() ;
 	}
 
 	public static JSONArray construct( final String _source )
 	{
-		constructor.init() ;
 		return constructor.create( _source ) ;
 	}
 
 	protected abstract JSONArray create() ;
 	protected abstract JSONArray create( final String _source ) ;
-
-	protected abstract void init() ;
 
 	public abstract int length() ;
 

@@ -1,4 +1,4 @@
-package com.linxonline.mallet.io.format.json ;
+package com.linxonline.mallet.io.formats.json ;
 
 /**
 	A wrapper class around a platform specific implementation 
@@ -19,7 +19,6 @@ public abstract class JSONObject
 	*/
 	public static JSONObject construct()
 	{
-		constructor.init() ;
 		return constructor.create() ;
 	}
 
@@ -28,14 +27,11 @@ public abstract class JSONObject
 	*/
 	public static JSONObject construct( final String _source )
 	{
-		constructor.init() ;
 		return constructor.create( _source ) ;
 	}
 
 	protected abstract JSONObject create() ;
 	protected abstract JSONObject create( final String _source ) ;
-
-	protected abstract void init() ;
 
 	public abstract String[] keys() ;
 	public abstract boolean has( final String _key ) ;
