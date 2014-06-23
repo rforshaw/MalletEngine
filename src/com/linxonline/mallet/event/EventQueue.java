@@ -73,6 +73,11 @@ public class EventQueue
 		}
 	}
 
+	public int size()
+	{
+		return messenger.size() ;
+	}
+	
 	public void clearHandlers()
 	{
 		handlers.clear() ;

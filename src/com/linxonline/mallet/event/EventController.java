@@ -45,6 +45,16 @@ public class EventController implements EventHandler
 		wantedTypes = _types ;
 	}
 
+	public int getProcessorSize()
+	{
+		return processors.size() ;
+	}
+
+	public int getEventSize()
+	{
+		return messenger.size() ;
+	}
+
 	/**
 		Should not be overriden.
 		Adds events to messenger and will process them at the appropriate time.

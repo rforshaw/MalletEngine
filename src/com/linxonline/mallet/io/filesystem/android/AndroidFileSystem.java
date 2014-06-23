@@ -8,6 +8,7 @@ import android.content.Context ;
 import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.io.formats.json.android.* ;
 
 public class AndroidFileSystem implements FileSystem
 {
@@ -20,6 +21,13 @@ public class AndroidFileSystem implements FileSystem
 	{
 		context = _context ;
 		assetManager = context.getAssets() ;
+		initJSONConstructors(); 
+	}
+
+	protected void initJSONConstructors()
+	{
+		AndroidJSONObject.init() ;
+		AndroidJSONArray.init() ;
 	}
 
 	@Override

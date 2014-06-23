@@ -127,7 +127,24 @@ public final class EventSystem implements AddEventInterface
 		}
 		handlers.remove( _handler ) ;
 	}
-	
+
+	public int getEventSize()
+	{
+		int size = 0 ;
+		final int length = queues.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			size += queues.get( i ).size() ;
+		}
+
+		return size ;
+	}
+
+	public int getHandlerSize()
+	{
+		return handlers.size() ;
+	}
+
 	public final void clearHandlers()
 	{
 		handlers.clear() ;

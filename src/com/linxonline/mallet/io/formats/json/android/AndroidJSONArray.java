@@ -1,37 +1,37 @@
-package com.linxonline.mallet.io.formats.json.desktop ;
+package com.linxonline.mallet.io.formats.json.android ;
 
 import com.linxonline.mallet.io.formats.json.JSONObject ;
 import com.linxonline.mallet.io.formats.json.JSONArray ;
 
-public class DesktopJSONArray extends JSONArray
+public class AndroidJSONArray extends JSONArray
 {
 	private final org.json.JSONArray array ;
 
-	public DesktopJSONArray()
+	public AndroidJSONArray()
 	{
 		array = new org.json.JSONArray() ;
 	}
 
-	public DesktopJSONArray( final String _source ) throws org.json.JSONException
+	public AndroidJSONArray( final String _source ) throws org.json.JSONException
 	{
 		array = new org.json.JSONArray( _source ) ;
 	}
 
-	protected DesktopJSONArray( final org.json.JSONArray _array )
+	protected AndroidJSONArray( final org.json.JSONArray _array )
 	{
 		array = _array ;
 	}
 	
 	protected JSONArray create()
 	{
-		return new DesktopJSONArray() ;
+		return new AndroidJSONArray() ;
 	}
 
 	protected JSONArray create( final String _source )
 	{
 		try
 		{
-			return new DesktopJSONArray( _source ) ;
+			return new AndroidJSONArray( _source ) ;
 		}
 		catch( org.json.JSONException ex )
 		{
@@ -42,7 +42,7 @@ public class DesktopJSONArray extends JSONArray
 
 	public static void init()
 	{
-		constructor = new DesktopJSONArray() ;
+		constructor = new AndroidJSONArray() ;
 	}
 	
 	public int length()
@@ -158,7 +158,7 @@ public class DesktopJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new DesktopJSONObject( obj ) ;
+		return new AndroidJSONObject( obj ) ;
 	}
 
 	public JSONArray optJSONArray( final int _index )
@@ -169,7 +169,7 @@ public class DesktopJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new DesktopJSONArray( arr ) ;
+		return new AndroidJSONArray( arr ) ;
 	}
 
 	public String toString()

@@ -53,6 +53,7 @@ public class RenderComponent extends EventComponent
 	@Override
 	public void passInitialEvents( final ArrayList<Event> _events )
 	{
+		super.passInitialEvents( _events ) ;
 		final int length = content.size() ;
 		for( int i = 0; i < length; ++i )
 		{
@@ -63,6 +64,7 @@ public class RenderComponent extends EventComponent
 	@Override
 	public void passFinalEvents( final ArrayList<Event> _events )
 	{
+		super.passFinalEvents( _events ) ;
 		final int length = content.size() ;
 		Settings draw = null ;
 		Event<Settings> event = null ;

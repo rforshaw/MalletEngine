@@ -60,7 +60,7 @@ public class ConfigParser
 				var = _src.getString( "DISPLAYMOUSE", "false" ) ;
 				_dest.addBoolean( "DISPLAYMOUSE", Boolean.parseBoolean( var ) ) ;
 
-				var = _src.getString( "MAXFPS", "0" ) ;
+				var = _src.getString( "MAXFPS", "60" ) ;
 				_dest.addInteger( "MAXFPS", Integer.parseInt( var ) ) ;
 			}
 		} ) ;
