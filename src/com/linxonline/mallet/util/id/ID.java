@@ -52,4 +52,9 @@ public class ID
 	public boolean isGroup( final String _group ) { return group.equals( _group ) ; }
 
 	public boolean isGroupID( final int _groupID ) { return groupID == _groupID ; }
+	
+	public String toString()
+	{
+		return name + ":" + group ;
+	}
 }

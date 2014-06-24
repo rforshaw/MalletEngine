@@ -618,7 +618,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
-			Logger.println( "GLRenderer - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
+			Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawText ;
@@ -631,6 +631,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static GLCanvas getCanvas()
 	{
 		return canvas ;
+	}
+
+	@Override
+	public String getName()
+	{
+		return "GLRenderer" ;
 	}
 
 	private Texture loadTexture( final Settings _draw )

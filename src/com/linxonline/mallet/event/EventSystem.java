@@ -4,6 +4,8 @@ import java.util.Collection ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.logger.Logger ;
+
 public final class EventSystem implements AddEventInterface
 {
 	// Replace HashMap with something easier to traverse.
@@ -37,7 +39,7 @@ public final class EventSystem implements AddEventInterface
 	{
 		if( exists( _handler ) == true )
 		{
-			System.out.println( "Already Exists" ) ;
+			Logger.println( _handler.getName() + "already exists within " + name, Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 
@@ -126,6 +128,14 @@ public final class EventSystem implements AddEventInterface
 			}
 		}
 		handlers.remove( _handler ) ;
+	}
+
+	/**
+		Return the Event Systems name, not considered unique.
+	*/
+	public String getName()
+	{
+		return name ;
 	}
 
 	public int getEventSize()

@@ -438,6 +438,12 @@ public class G2DRenderer extends Basic2DRender
 	}
 
 	@Override
+	public String getName()
+	{
+		return "G2D Renderer" ;
+	}
+
+	@Override
 	public void clear()
 	{
 		super.clear() ;

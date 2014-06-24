@@ -17,24 +17,27 @@ import com.linxonline.mallet.system.* ;
 **/
 public class EventComponent extends Component
 {
-	protected EventController eventController = new EventController() ;
+	protected final EventController eventController ;
 	protected boolean sendToEntity = false ;			// Allows Events to be passed onto rest of Entity
 
 	public EventComponent()
 	{
 		super( "EVENT", "EVENTCOMPONENT" ) ;
+		eventController = new EventController( id.toString() ) ;
 		initEventProcessor() ;
 	}
 
 	public EventComponent( final String _name )
 	{
 		super( _name, "EVENTCOMPONENT" ) ;
+		eventController = new EventController( id.toString() ) ;
 		initEventProcessor() ;
 	}
 	
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
+		eventController = new EventController( id.toString() ) ;
 		initEventProcessor() ;
 	}
 

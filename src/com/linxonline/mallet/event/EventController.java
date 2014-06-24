@@ -2,6 +2,8 @@ package com.linxonline.mallet.event ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.logger.Logger ;
+
 /**
 	This is a convience class to reduce Events being processed 
 	at the wrong time.
@@ -17,11 +19,21 @@ public class EventController implements EventHandler
 {
 	private String[] wantedTypes = Event.ALL_EVENT_TYPES ;
 
+	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
 	private final ArrayList<EventProcessor> processors = new ArrayList<EventProcessor>() ;
 	private AddEventInterface addInterface = null ;
 
-	public EventController() {}
+	public EventController()
+	{
+		name = "EVENT CONTROLLER" ;
+	}
+
+	public EventController( final String _name )
+	{
+		assert _name != null ;
+		name = _name ;
+	}
 
 	/**
 		Add an Event Processor to begin reading the event stream.
@@ -88,17 +100,26 @@ public class EventController implements EventHandler
 	**/
 	public void passEvent( final Event _event )
 	{
-		if( addInterface != null )
+		if( addInterface == null )
 		{
-			addInterface.addEvent( _event ) ;
+			Logger.println( "AddInterface not set in " + getName() + ".", Logger.Verbosity.MAJOR ) ;
+			return ;
 		}
+
+		addInterface.addEvent( _event ) ;
 	}
 
 	public AddEventInterface getAddEventInterface()
 	{
 		return addInterface ;
 	}
-	
+
+	@Override
+	public String getName()
+	{
+		return name ;
+	}
+
 	public String[] getWantedEventTypes()
 	{
 		return wantedTypes ;

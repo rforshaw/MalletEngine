@@ -7,13 +7,22 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
-	public static final String[] NONE_EVENT_TYPES = { "NONE" } ;
-	public static final String[] ALL_EVENT_TYPES = { "ALL" } ;
+	public static final String[] NONE_EVENT_TYPES = { "NONE" } ;				// Not interested in any Event Types, used by getWantedEventTypes()
+	public static final String[] ALL_EVENT_TYPES = { "ALL" } ;					// Interested in all Event Types, used by getWantedEventTypes()
 
-	private int hashCode = 0 ;
-	private String eventType = null ;
+	private static final EventHandlerMeta BLANK_META = new EventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
+	{
+		public String getName()
+		{
+			return "UNKNOWN" ;
+		}
+	} ;
 
-	private T variable = null ;
+	private String eventType = null ;				// Identifier
+	private int hashCode = 0 ;						// Hash representation of identifier
+
+	private EventHandlerMeta meta = BLANK_META ;	// Information about sender
+	private T variable = null ;						// Event package contains data the reciever is interested in
 
 	public Event()
 	{
@@ -24,6 +33,11 @@ public final class Event<T>
 	public Event( final String _eventType, final T _object )
 	{
 		setEvent( _eventType, _object ) ;
+	}
+
+	public Event( final String _eventType, final T _object, final EventHandlerMeta _meta )
+	{
+		setEvent( _eventType, _object, _meta ) ;
 	}
 
 	/**
@@ -55,9 +69,18 @@ public final class Event<T>
 	**/
 	public final void setEvent( final String _eventType, final T _object )
 	{
+		setEvent( _eventType, _object, null ) ;
+	}
+
+	/**
+		Enables an Event to be reused.
+	**/
+	public final void setEvent( final String _eventType, final T _object, final EventHandlerMeta _meta )
+	{
 		eventType = _eventType ;
 		hashCode = eventType.hashCode() ;
 		variable = _object ;
+		meta = ( _meta != null ) ? _meta : BLANK_META ;
 	}
 
 	public final String getEventType()
@@ -69,11 +92,21 @@ public final class Event<T>
 	{
 		return variable ;
 	}
-	
+
+	/**
+		Return any information about the sender of 
+		this Event.
+	*/
+	public EventHandlerMeta getHandlerMeta()
+	{
+		return meta ;
+	}
+
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		buffer.append( "Event: " + eventType ) ;
+		buffer.append( "[Event Type: " + eventType ) ;
+		buffer.append( ", Meta: " + meta.getName() + "]" ) ;
 		return buffer.toString() ;
 	}
 }

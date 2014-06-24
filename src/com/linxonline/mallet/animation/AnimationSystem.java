@@ -132,6 +132,12 @@ public class AnimationSystem extends SystemRoot<Animation>
 	}
 
 	@Override
+	public String getName()
+	{
+		return "Animation System" ;
+	}
+
+	@Override
 	public String[] getWantedEventTypes()
 	{
 		return EVENT_TYPES ;

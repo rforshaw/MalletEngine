@@ -200,6 +200,12 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	}
 
 	@Override
+	public String getName()
+	{
+		return "Audio System" ;
+	}
+
+	@Override
 	public final String[] getWantedEventTypes()
 	{
 		return EVENT_TYPES ;
