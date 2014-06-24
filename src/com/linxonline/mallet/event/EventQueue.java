@@ -93,4 +93,16 @@ public class EventQueue
 	{
 		return messenger.hasEvents() ;
 	}
+
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "[ Event Queue: " + name + ", " ) ;
+		for( final EventHandler handler : handlers )
+		{
+			buffer.append( handler.getName() + ", " ) ;
+		}
+		buffer.append( "]" ) ;
+		return buffer.toString() ;
+	}
 }

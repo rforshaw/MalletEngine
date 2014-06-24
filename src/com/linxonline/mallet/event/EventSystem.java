@@ -186,4 +186,16 @@ public final class EventSystem implements AddEventInterface
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;
 	}
+
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "[Event System: " + getName() ) ;
+		for( final EventQueue queue : queues )
+		{
+			buffer.append( queue.toString() + "," ) ;
+		}
+		buffer.append( "]" ) ;
+		return buffer.toString() ;
+	}
 }
