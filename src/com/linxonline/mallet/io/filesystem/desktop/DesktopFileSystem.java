@@ -9,6 +9,10 @@ import com.linxonline.mallet.util.logger.Logger ;
 
 import com.linxonline.mallet.io.formats.json.desktop.* ;
 
+/**
+	Provides access tot he filesystem on desktop platforms.
+	This currently includes: Linux, Windows, & Mac.
+*/
 public class DesktopFileSystem implements FileSystem
 {
 	private HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
@@ -19,6 +23,11 @@ public class DesktopFileSystem implements FileSystem
 		initJSONConstructors() ;
 	}
 
+	/**
+		Allows reading and parsing JSON formatted files.
+		Mallet Engine provides a wrapper around a platform 
+		JSON library.
+	*/
 	protected void initJSONConstructors()
 	{
 		DesktopJSONObject.init() ;
@@ -26,7 +35,7 @@ public class DesktopFileSystem implements FileSystem
 	}
 
 	/**
-		Scans the ROOT_DIRECTORY directory and maps it to the HashMap.
+		Scans the ROOT_DIRECTORY directory and map it to the HashMap.
 		Supports Zip files & uncompressed files located within the 
 		ROOT_DIRECTORY.
 	**/
@@ -161,16 +170,34 @@ public class DesktopFileSystem implements FileSystem
 		return true ;
 	}
 
+	/**
+		Write the byte stream to the spcified file location.
+		Does not support writing byte streams to a zip container.
+	*/
 	public boolean writeResourceRaw( final String _file, final byte[] _data )
 	{
-		return false ;
+		try
+		{
+			write( _file, _data ) ;
+		}
+		catch( IOException _ex )
+		{
+			return false ;
+		}
+
+		return true ;
 	}
 
 	public boolean exist( final String _path )
 	{
 		return false ;
 	}
-	
+
+	/**
+		Delete a resource that has been mapped to 
+		the local filesystem. Does not delete resources 
+		contained within an archive.
+	*/
 	public boolean delete( final String _path )
 	{
 		// Only delete Resources that are mapped
@@ -241,6 +268,7 @@ public class DesktopFileSystem implements FileSystem
 
 	/**
 		TODO: Needs to be improved to handle random '.' locations.
+		Returns the extension in UpperCase.
 	**/
 	public static String getExtension( final File _file )
 	{
@@ -253,21 +281,6 @@ public class DesktopFileSystem implements FileSystem
 	{
 		return getExtension( _file ).equals( "ZIP" ) ;
 	}
-	
-	private static byte[] streamBytes( final DataFile _file )
-	{
-		if( _file.isZipped == false )
-		{
-			return ReadFile.getRaw( _file.filePath ) ;
-		}
-		else if( _file.isZipped == true )
-		{
-			return ReadZip.getRaw( _file.filePath, _file.zipPath ) ;
-		}
-
-		System.out.println( "File Not Found" ) ;
-		return null ;
-	}
 
 	private static void write( final String _file, final String _data ) throws IOException
 	{
@@ -277,27 +290,19 @@ public class DesktopFileSystem implements FileSystem
 		out.close() ;
 	}
 
-	private static byte[] read( final InputStream _stream, final long _length ) throws IOException
+	private static void write( final String _file, final byte[] _data ) throws IOException
 	{
-		final byte[] bytes = new byte[( int )_length] ;
-
-		int offset = 0 ;
-		int numRead = 0 ;
-		while( offset < bytes.length &&
-			( numRead = _stream.read( bytes, offset, bytes.length - offset ) ) >= 0 ) 
-		{
-			offset += numRead;
-		}
-		
-		_stream.close() ;
-		return bytes ;
+		final FileOutputStream stream = new FileOutputStream( _file ) ;
+		stream.write( _data ) ;
+		stream.flush() ;
+		stream.close() ;
 	}
-	
+
 	private class DataFile
 	{
-		boolean isZipped = false ;
-		String filePath ;
-		String zipPath ;
+		public final boolean isZipped ;
+		public final String filePath ;
+		public final String zipPath ;
 
 		DataFile( final String _filePath, final String _zipPath, final boolean _isZipped )
 		{
