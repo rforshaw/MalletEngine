@@ -68,7 +68,7 @@ public class DesktopFileSystem implements FileSystem
 		Return a byte array of the specified file.
 		If _file hasn't been mapped, then it will 
 		be mapped, before loading the bytes.
-	**/
+	*/
 	public byte[] getResourceRaw( final String _file )
 	{
 		final DataFile file = resources.get( _file ) ;
@@ -87,6 +87,11 @@ public class DesktopFileSystem implements FileSystem
 		return attemptMapResource( _file ) ;
 	}
 
+	/**
+		Return a String of the specified file.
+		If _file hasn't been mapped, then it will 
+		be mapped, before loading the bytes.
+	*/
 	public String getResourceAsString( final String _file )
 	{
 		final DataFile file = resources.get( _file ) ;
@@ -102,7 +107,8 @@ public class DesktopFileSystem implements FileSystem
 			}
 		}
 
-		return new String( attemptMapResource( _file ) ) ;
+		final byte[] data = attemptMapResource( _file ) ; 
+		return ( data != null ) ? new String( data ) : null ;
 	}
 
 	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
@@ -188,9 +194,13 @@ public class DesktopFileSystem implements FileSystem
 		return true ;
 	}
 
+	/**
+		Check to see whether the path specified exists.
+		Does not check paths within archieved files.
+	*/
 	public boolean exist( final String _path )
 	{
-		return false ;
+		return new File( _path ).exists() ;
 	}
 
 	/**
@@ -217,17 +227,17 @@ public class DesktopFileSystem implements FileSystem
 
 	public boolean makeDirectories( final String _path )
 	{
-		return false ;
+		return new File( _path ).mkdirs() ;
 	}
 
 	public boolean isFile( final String _file )
 	{
-		return false ;
+		return new File( _file ).isFile() ;
 	}
 
 	public boolean isDirectory( final String _path )
 	{
-		return false ;
+		return new File( _path ).isDirectory() ;
 	}
 
 	private void mapToResources( final File _file )
