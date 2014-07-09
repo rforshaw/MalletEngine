@@ -65,11 +65,8 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 
 		switch( type )
 		{
-			case RequestType.CREATE_AUDIO :
-			{
-				creatAudio( audio ) ;
-				break ;
-			}
+			case RequestType.GARBAGE_COLLECT_AUDIO : soundManager.clean() ; break ;
+			case RequestType.CREATE_AUDIO          : creatAudio( audio ) ;  break ;
 			case RequestType.MODIFY_EXISTING_AUDIO :
 			{
 				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
@@ -116,26 +113,10 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 		final int type = _settings.getInteger( "MODIFY_AUDIO", -1 ) ;
 		switch( type )
 		{
-			case ModifyAudio.PLAY :
-			{
-				_sound.play() ;
-				break ;
-			}
-			case ModifyAudio.STOP :
-			{
-				_sound.stop() ;
-				break ;
-			}
-			case ModifyAudio.PAUSE :
-			{
-				_sound.pause() ;
-				break ;
-			}
-			case ModifyAudio.LOOP_CONTINUOSLY :
-			{
-				_sound.playLoop() ;
-				break ;
-			}
+			case ModifyAudio.PLAY             : _sound.play() ;     break ;
+			case ModifyAudio.STOP             : _sound.stop() ;     break ;
+			case ModifyAudio.PAUSE            : _sound.pause() ;    break ;
+			case ModifyAudio.LOOP_CONTINUOSLY : _sound.playLoop() ; break ;
 			case ModifyAudio.LOOP_SET :
 			{
 				// Specify the amount of Loops to go through

@@ -5,7 +5,8 @@ package com.linxonline.mallet.util.pools ;
 */
 public interface PoolInterface<T>
 {
-	public T get() ;							// Return the object the pool is meant to provide
+	public T get() ;							// Provide an object to use
+	public void reclaim( final T _obj ) ;		// Allow the pool to reclaim the object so it can be used again
 
 	public int size() ;							// How many objects located in the pool
 	public void trimTo( final int _size ) ;		// Trim the pool down to the specified size

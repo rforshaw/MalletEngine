@@ -450,6 +450,12 @@ public class G2DRenderer extends Basic2DRender
 		numID = 0 ;
 	}
 
+	@Override
+	public void clean()
+	{
+		textures.clean() ;
+	}
+	
 	private void initCanvasBuffer( final int _size )
 	{
 		canvas.createBufferStrategy( _size ) ;

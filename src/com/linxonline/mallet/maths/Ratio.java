@@ -5,8 +5,8 @@ package com.linxonline.mallet.maths ;
 **/
 public final class Ratio
 {
-	private int ratioA = 0 ;
-	private int ratioB = 0 ;
+	private final int ratioA ;
+	private final int ratioB ;
 
 	private Ratio( final int _a, final int _b )
 	{
@@ -27,9 +27,15 @@ public final class Ratio
 	@Override
 	public String toString()
 	{
-		return new String( ratioA + ":" + ratioB ) ;
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "[" + ratioA + ":" + ratioB + "]" ) ;
+		return buffer.toString() ;
 	}
 
+	/**
+		Typically used to calculate the ratio of the screen resolution.
+		But can still be used to determine the ratio of other variations.
+	*/
 	public static Ratio calculateRatio( final int _a, final int _b )
 	{
 		final int ratio = Ratio.gcd( _a, _b ) ;

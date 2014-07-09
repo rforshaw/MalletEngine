@@ -11,7 +11,7 @@ public class TimePool<T> implements PoolInterface<T>
 {
 	private final LinkedList<TimeWrapper> pool = new LinkedList<TimeWrapper>() ;	// Pool of objects that will be used.
 	private final Class<T> objectCreator ;											// Used to create T type instances.
-	private float wait = 0.0f ;														// The amount of time an object can be used for without being reused.
+	private final float wait ;														// The amount of time an object can be used for without being reused.
 	private int currentPos = 0 ;													// Current location within pool.
 
 	private TimeWrapper<T> temp = null ;
@@ -58,6 +58,14 @@ public class TimePool<T> implements PoolInterface<T>
 		return null ;
 	}
 
+	/**
+		Not used as TimePool will automatically reclaim, 
+		used objects after a period of time has elapsed.
+		No need for the developer to return it.
+	*/
+	@Override
+	public void reclaim( final T _obj ) {}
+	
 	@Override
 	public int size()
 	{

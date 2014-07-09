@@ -51,6 +51,13 @@ public class AnimationFactory
 		return new Event<Settings>( "ANIMATION", anim ) ;
 	}
 
+	public static Event createGarbageCollect()
+	{
+		final Settings anim = new Settings() ;
+		anim.addInteger( "REQUEST_TYPE", AnimRequestType.GARBAGE_COLLECT_ANIMATION ) ;
+		return new Event( "ANIMATION", anim ) ;
+	}
+
 	public static Event<Settings> modifyAnimation( final int _id, final int _modifyType )
 	{
 		final Settings anim = new Settings() ;

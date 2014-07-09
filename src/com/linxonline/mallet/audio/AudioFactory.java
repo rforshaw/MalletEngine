@@ -25,7 +25,14 @@ public class AudioFactory
 		audio.addInteger( "ID", _id ) ;
 		return new Event( "AUDIO", audio ) ;
 	}
-	
+
+	public static Event createGarbageCollect()
+	{
+		final Settings audio = new Settings() ;
+		audio.addInteger( "REQUEST_TYPE", RequestType.GARBAGE_COLLECT_AUDIO ) ;
+		return new Event( "AUDIO", audio ) ;
+	}
+
 	public static Event createAddCallback( final int _id, final SourceCallback _callback )
 	{
 		final Settings audio = new Settings() ;

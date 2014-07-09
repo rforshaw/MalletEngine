@@ -393,23 +393,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 			private void setTextAlignment( final int _alignment, final Vector2 _position, final int _wordWidth )
 			{
-				//System.out.println( "WORD WIDTH: " + _wordWidth ) ;
 				switch( _alignment )
 				{
-					case ALIGN_RIGHT :
-					{
-						_position.x -= _wordWidth ;
-						break ;
-					}
-					case ALIGN_CENTRE :
-					{
-						_position.x -= _wordWidth / 2 ;
-						break ;
-					}
-					default:
-					{
-						return ;
-					}
+					case ALIGN_RIGHT  : _position.x -= _wordWidth ;     break ;
+					case ALIGN_CENTRE : _position.x -= _wordWidth / 2 ; break ;
+					default           : return ;
 				}
 			}
 		} ;
@@ -627,6 +615,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 
 	public void sort() {}
+
+	@Override
+	public void clean()
+	{
+		textures.clean() ;
+		fontManager.clean() ;
+	}
 
 	public static GLCanvas getCanvas()
 	{

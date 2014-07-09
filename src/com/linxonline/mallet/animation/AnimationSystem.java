@@ -32,6 +32,9 @@ public class AnimationSystem extends SystemRoot<Animation>
 		_source.update( _dt ) ;
 	}
 
+	/**
+		Unregister any resources this Animation may have used.
+	*/
 	@Override
 	protected void destroySource( final Animation _source )
 	{
@@ -73,6 +76,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 				}
 				break ;
 			}
+			case AnimRequestType.GARBAGE_COLLECT_ANIMATION : spriteManager.clean() ; break ;
 		}
 	}
 
@@ -95,7 +99,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 		}
 	}
 
-	protected void modifyAnimation(  final Settings _settings, final Animation _animation )
+	protected void modifyAnimation( final Settings _settings, final Animation _animation )
 	{
 		final int type = _settings.getInteger( "MODIFY_ANIMATION", -1 ) ;
 		switch( type )

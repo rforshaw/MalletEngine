@@ -83,13 +83,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void useEvent( final Event _event )
 	{
-		if( _event.isEventByString( EVENT_TYPES[0] ) == true )			// DRAW
+		switch( _event.getEventType() )
 		{
-			useEventInDraw( _event ) ;
-		}
-		else if( _event.isEventByString( EVENT_TYPES[1] ) == true )		// CAMERA
-		{
-			useEventInCamera( _event ) ;
+			case "DRAW"   : useEventInDraw( _event ) ;   break ;		// EventType[0]
+			case "CAMERA" : useEventInCamera( _event ) ; break ;		// EventType[1]
 		}
 	}
 
@@ -129,21 +126,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 		switch( type )
 		{
-			case DrawRequestType.CREATE_DRAW :
-			{
-				createDraw( draw ) ;
-				break ;
-			}
-			case DrawRequestType.MODIFY_EXISTING_DRAW :
-			{
-				modifyDraw( draw ) ;
-				break ;
-			}
-			case DrawRequestType.REMOVE_DRAW :
-			{
-				removeDraw( draw ) ;
-				break ;
-			}
+			case DrawRequestType.CREATE_DRAW          : createDraw( draw ) ; break ;
+			case DrawRequestType.MODIFY_EXISTING_DRAW : modifyDraw( draw ) ; break ;
+			case DrawRequestType.REMOVE_DRAW          : removeDraw( draw ) ; break ;
+			case DrawRequestType.GARBAGE_COLLECT_DRAW : clean() ; break ;
 		}
 	}
 
@@ -204,16 +190,28 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		return EVENT_TYPES ;
 	}
 
+	/**
+		Sort the contents of the state based on their layer.
+	*/
 	public void sort() 
 	{
 		state.sort() ;
 	}
 
+	/**
+		Clear the contents of the state, this will 
+		remove anything that is being drawn.
+	*/
 	public void clear()
 	{
 		state.clear() ;
 	}
 
+	/**
+		Remove resources that aren't being used.
+	*/
+	public abstract void clean() ;
+	
 	protected void calculateInterpolatedPosition( final Vector3 _old, final Vector3 _current, final Vector2 _position )
 	{
 		// Calculate the how many render iterations must take place to reach 

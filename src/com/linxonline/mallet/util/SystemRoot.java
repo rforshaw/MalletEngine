@@ -66,6 +66,9 @@ public abstract class SystemRoot<T> extends EventUpdater
 		}
 	}
 
+	/**
+		Remove unwanted sources.
+	*/
 	protected void removeSources()
 	{
 		final int size = removeSources.size() ;

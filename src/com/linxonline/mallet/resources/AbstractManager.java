@@ -9,7 +9,8 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	protected final HashMap<String, T> resources = new HashMap<String, T>() ;
 
 	public AbstractManager() {}
-	
+
+	@Override
 	public boolean add( final String _key, final T _value )
 	{
 		if( exists( _key ) == true )
@@ -22,6 +23,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return true ;
 	}
 
+	@Override
 	public T get( final String _file )
 	{
 		if( exists( _file ) == true )
@@ -59,6 +61,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	/**
 		Removes resources that are not used.
 	**/
+	@Override
 	public void clean()
 	{
 		ManageResources.removeUnwantedResources( resources ) ;
@@ -68,6 +71,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		Iterates over all Resource and destroying them.
 		Then clearing the HashMap
 	**/
+	@Override
 	public void clear()
 	{
 		Collection<T> res = resources.values() ;
@@ -78,20 +82,19 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		resources.clear() ;
 	}
 
+	@Override
 	public void shutdown() {}
 
 	protected boolean exists( final String _file )
 	{
 		return resources.containsKey( _file ) ;
 	}
-	
-	public void printContents()
+
+	@Override
+	public String toString()
 	{
-		final Set<String> keys = resources.keySet() ;
-		System.out.println( "Amount: " + resources.size() ) ;
-		for( String name : keys )
-		{
-			System.out.println( "Key: " + name ) ;
-		}
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "Resources: " + resources ) ;
+		return buffer.toString() ;
 	}
 }

@@ -22,6 +22,13 @@ public class DrawFactory
 		return new Event( "DRAW", draw ) ;
 	}
 
+	public static Event createGarbageCollect()
+	{
+		final Settings draw = new Settings() ;
+		draw.addInteger( "REQUEST_TYPE", DrawRequestType.GARBAGE_COLLECT_DRAW ) ;
+		return new Event( "DRAW", draw ) ;
+	}
+
 	public static Event<Settings> createTexture( 	final String _file,
 										final Vector3 _pos, 
 										final Vector2 _offset, 		// Not needed

@@ -6,6 +6,7 @@ public class DrawRequestType
 	public final static int MODIFY_EXISTING_DRAW = 20 ;
 	public final static int REMOVE_DRAW = 30 ;
 	public final static int SET_CAMERA_POSITION = 40 ;
+	public final static int GARBAGE_COLLECT_DRAW = 50 ;
 
 	public final static int TEXTURE = 10 ;
 	public final static int GEOMETRY = 20 ;
