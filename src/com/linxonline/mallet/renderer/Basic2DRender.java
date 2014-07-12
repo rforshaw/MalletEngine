@@ -259,7 +259,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		@Override
 		public void remove( Integer _id )
 		{
-			Logger.println( "GLRenderer - Request Remove: " + _id, Logger.Verbosity.MINOR ) ;
+			//Logger.println( getName() + " - Request Remove: " + _id, Logger.Verbosity.MINOR ) ;
 			toRemove.add( _id ) ;
 		}
 
@@ -269,7 +269,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			for( int i = 0; i < size; ++i )
 			{
 				final Integer id = toRemove.get( i ) ;
-				Logger.println( "GLRenderer - Remove: " + id, Logger.Verbosity.MINOR ) ;
+				//Logger.println( getName() + " - Remove: " + id, Logger.Verbosity.MINOR ) ;
 				final RenderData data = getData( id ) ;
 				if( data != null )
 				{

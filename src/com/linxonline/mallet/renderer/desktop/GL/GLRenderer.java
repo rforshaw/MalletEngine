@@ -553,7 +553,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
-			Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
+			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawTexture ;
@@ -574,7 +574,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			{
 				_draw.addObject( "MODEL", GLModelGenerator.genLineModel( line ) ) ;
 				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
-				Logger.println( "GLRenderer - Create Line: " + data.id, Logger.Verbosity.MINOR ) ;
+				//Logger.println( "GLRenderer - Create Line: " + data.id, Logger.Verbosity.MINOR ) ;
 
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				data.drawCall = drawShape ;
@@ -587,7 +587,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			{
 				_draw.addObject( "MODEL", GLModelGenerator.genShapeModel( shape ) ) ;
 				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
-				Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
+				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				data.drawCall = drawShape ;
@@ -606,7 +606,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
-			Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
+			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawText ;

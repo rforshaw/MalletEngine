@@ -6,31 +6,37 @@ import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.id.IDInterface ;
 
-public class Animation implements IDInterface
+public class Animation implements IDInterface, Cacheable
 {
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
-	public final int id ;
-	private final Sprite sprite ;
-	private final Event event ;
+	public int id = 0 ;
 	public int renderID = -1 ;
+	private Sprite sprite = null ;
+	private Event event = null ;
 
 	private boolean play = false ;
 
 	private float elapsedTime = 0.0f ;
 	private int frame = 0 ;						// Current frame 
-	private final float frameDelta ;				// Amount of time that needs to elapse before next frame
-	private final int length ;					// How many frames
+	private float frameDelta = 0.0f ;			// Amount of time that needs to elapse before next frame
+	private int length = 0 ;					// How many frames
 
 	public Animation( final int _id, final Event _event, final Sprite _sprite )
+	{
+		setAnimation( _id, _event, _sprite ) ;
+	}
+
+	public void setAnimation( final int _id, final Event _event, final Sprite _sprite )
 	{
 		id = _id ;
 		event = _event ;
 		sprite = _sprite ;
 		frameDelta = 1.0f / sprite.framerate ;
 		length = sprite.size() ;
-		
+
 		changeTexture( event, sprite ) ;
 	}
 
@@ -70,6 +76,10 @@ public class Animation implements IDInterface
 		}
 	}
 
+	/**
+		Beging running the animation, inform the callbacks 
+		the animation has started.
+	*/
 	public void play()
 	{
 		play = true ;
@@ -80,6 +90,10 @@ public class Animation implements IDInterface
 		}
 	}
 
+	/**
+		Pause the running animation, inform the callbacks 
+		the animation has been paused.
+	*/
 	public void pause()
 	{
 		play = false ;
@@ -90,6 +104,11 @@ public class Animation implements IDInterface
 		}
 	}
 
+	/**
+		Stop the running the animation, inform the callbacks 
+		the animation has stopped.
+		Calling play, will start the animation from the begining.
+	*/
 	public void stop()
 	{
 		play = false ;
@@ -134,7 +153,26 @@ public class Animation implements IDInterface
 			callbacks.get( i ).update( ( float )frame * frameDelta ) ;
 		}
 	}
-	
+
+	public void reset()
+	{
+		callbacks.clear() ;
+		id = 0 ;
+		renderID = -1 ;
+		sprite = null ;
+		event = null ;
+
+		play = false ;
+
+		elapsedTime = 0.0f ;
+		frame = 0 ; 
+		frameDelta = 0.0f ;
+		length = 0 ;
+	}
+
+	/**
+		Unregister the sprite being used by this animation.
+	*/
 	public void destroy()
 	{
 		sprite.unregister() ;

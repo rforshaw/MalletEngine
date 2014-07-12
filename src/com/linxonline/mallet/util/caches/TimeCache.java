@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.pools ;
+package com.linxonline.mallet.util.caches ;
 
 import java.util.LinkedList ;
 
@@ -6,8 +6,9 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /**
 	Provides a cache of objects based on time elapsed.
+	Objects used in this cache, must have a default constructor.
 */
-public class TimePool<T> implements PoolInterface<T>
+public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 {
 	private final LinkedList<TimeWrapper> pool = new LinkedList<TimeWrapper>() ;	// Pool of objects that will be used.
 	private final Class<T> objectCreator ;											// Used to create T type instances.
@@ -16,7 +17,7 @@ public class TimePool<T> implements PoolInterface<T>
 
 	private TimeWrapper<T> temp = null ;
 
-	public TimePool( final float _wait, Class<T> _class )
+	public TimeCache( final float _wait, Class<T> _class )
 	{
 		objectCreator = _class ;
 		wait = _wait ;
@@ -24,7 +25,6 @@ public class TimePool<T> implements PoolInterface<T>
 		try { add( 0, 0.0f, objectCreator.newInstance() ) ; }
 		catch( InstantiationException ex ) { ex.printStackTrace() ; }
 		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
-
 	}
 
 	@Override
@@ -44,6 +44,7 @@ public class TimePool<T> implements PoolInterface<T>
 			++currentPos ;
 			temp.seconds = seconds ;
 			temp.remainder = remainder ;
+			temp.obj.reset() ;
 			return temp.obj ;
 		}
 

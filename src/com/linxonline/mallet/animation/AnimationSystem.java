@@ -66,11 +66,11 @@ public class AnimationSystem extends SystemRoot<Animation>
 			case AnimRequestType.REMOVE_ANIMATION :
 			{
 				final int id = anim.getInteger( "ID", -1 ) ;
-				Logger.println( "AnimationSystem - Remove Anim Request: " + id, Logger.Verbosity.MINOR ) ;
+				//Logger.println( "AnimationSystem - Remove Anim Request: " + id, Logger.Verbosity.MINOR ) ;
 				final Animation animation = getSource( id ) ;
 				if( animation != null )
 				{
-					Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
+					//Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
 					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
 					removeSources.add( new RemoveSource( id, animation ) ) ;
 				}
@@ -89,7 +89,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 			final Animation anim = new Animation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
 			if( anim != null )
 			{
-				Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
+				//Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
 				DrawFactory.insertIDCallback( event, anim ) ;
 				passEvent( event ) ;
 				addCallbackToAnimation( anim, _anim ) ;
