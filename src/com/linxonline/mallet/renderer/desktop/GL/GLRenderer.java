@@ -7,6 +7,7 @@ import java.awt.Dimension ;
 import java.awt.Frame ;
 import java.awt.image.BufferStrategy ;
 import java.awt.geom.AffineTransform ;
+import java.lang.reflect.* ;
 
 import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
@@ -22,6 +23,7 @@ import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
+import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
@@ -33,6 +35,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
+	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
 	protected int numID = 0 ;
 	protected static final GLU glu = new GLU() ;
@@ -552,7 +555,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		if( position != null )
 		{
-			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			final GLRenderData data = renderCache.get() ;
+			data.set( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
 			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -573,7 +577,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( line != null )
 			{
 				_draw.addObject( "MODEL", GLModelGenerator.genLineModel( line ) ) ;
-				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+				final GLRenderData data = renderCache.get() ;
+				data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
 				//Logger.println( "GLRenderer - Create Line: " + data.id, Logger.Verbosity.MINOR ) ;
 
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -586,7 +591,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( shape != null )
 			{
 				_draw.addObject( "MODEL", GLModelGenerator.genShapeModel( shape ) ) ;
-				final GLRenderData data = new GLRenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+				final GLRenderData data = renderCache.get() ;
+				data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 
 				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -605,7 +611,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		if( position != null )
 		{
-			final GLRenderData data = new GLRenderData( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
+			final GLRenderData data = renderCache.get() ;
+			data.set( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
 			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -661,42 +668,5 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		return texture ;
-	}
-
-	protected class GLRenderData extends RenderData
-	{
-		public GLRenderData()
-		{
-			super() ;
-		}
-
-		public GLRenderData( final int _id, final int _type,
-							 final Settings _draw, final Vector3 _position,
-							 final int _layer )
-		{
-			super( _id, _type, _draw, _position, _layer ) ;
-		}
-	
-		@Override
-		public void unregisterResources()
-		{
-			final Texture texture = drawData.getObject( "TEXTURE", null ) ;
-			if( texture != null )
-			{
-				texture.unregister() ;
-			}
-
-			final Model model = drawData.getObject( "MODEL", null ) ;
-			if( model != null )
-			{
-				model.unregister() ;
-				if( type == DrawRequestType.GEOMETRY )
-				{
-					// Geometry Requests are not stored.
-					// So must be destroyed explicity.
-					model.destroy() ;
-				}
-			}
-		}
 	}
 }

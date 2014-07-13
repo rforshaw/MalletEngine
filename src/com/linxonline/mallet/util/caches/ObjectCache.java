@@ -29,15 +29,10 @@ public class ObjectCache<T extends Cacheable> implements CacheInterface<T>
 	*/
 	private void expandCache( final int _size )
 	{
-		try
+		for( int i = 0; i < _size; ++i )
 		{
-			for( int i = 0; i < _size; ++i )
-			{
-				reclaim( creator.newInstance() ) ;
-			}
+			reclaim( newInstance() ) ;
 		}
-		catch( InstantiationException ex ) { ex.printStackTrace() ; }
-		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
 	}
 
 	/**
@@ -52,14 +47,7 @@ public class ObjectCache<T extends Cacheable> implements CacheInterface<T>
 			return available.pop() ;
 		}
 
-		try
-		{
-			return creator.newInstance() ;
-		}
-		catch( InstantiationException ex ) { ex.printStackTrace() ; }
-		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
-
-		return null ;
+		return newInstance() ;
 	}
 
 	/**
@@ -70,6 +58,18 @@ public class ObjectCache<T extends Cacheable> implements CacheInterface<T>
 	{
 		_obj.reset() ;
 		available.push( _obj ) ;
+	}
+
+	public T newInstance()
+	{
+		try
+		{
+			return creator.newInstance() ;
+		}
+		catch( InstantiationException ex ) { ex.printStackTrace() ; }
+		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
+
+		return null ;
 	}
 
 	public int size()

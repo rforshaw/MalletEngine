@@ -48,15 +48,13 @@ public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 			return temp.obj ;
 		}
 
-		try
+		final T obj = newInstance() ;
+		if( obj != null )
 		{
-			// Create new instance if one is not suitable to return.
-			return ( T )insert( currentPos++, seconds, remainder, objectCreator.newInstance() ).obj ;
+			insert( currentPos++, seconds, remainder, obj ) ;
 		}
-		catch( InstantiationException ex ) { ex.printStackTrace() ; }
-		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
 
-		return null ;
+		return obj ;
 	}
 
 	/**
@@ -66,7 +64,20 @@ public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 	*/
 	@Override
 	public void reclaim( final T _obj ) {}
-	
+
+	public T newInstance()
+	{
+		try
+		{
+			// Create new instance if one is not suitable to return.
+			return objectCreator.newInstance() ;
+		}
+		catch( InstantiationException ex ) { ex.printStackTrace() ; }
+		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
+
+		return null ;
+	}
+
 	@Override
 	public int size()
 	{

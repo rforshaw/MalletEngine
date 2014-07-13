@@ -24,6 +24,8 @@ public class Animation implements IDInterface, Cacheable
 	private float frameDelta = 0.0f ;			// Amount of time that needs to elapse before next frame
 	private int length = 0 ;					// How many frames
 
+	public Animation() {}
+
 	public Animation( final int _id, final Event _event, final Sprite _sprite )
 	{
 		setAnimation( _id, _event, _sprite ) ;

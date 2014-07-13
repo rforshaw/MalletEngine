@@ -10,7 +10,6 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.sort.QuickSort ;
-import com.linxonline.mallet.util.sort.SortInterface ;
 
 /**
 	Implements the boiler plate code required by most 2D renderers.
@@ -382,59 +381,5 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			return hashedContent.get( _id ) ;
 		}
-	}
-
-	protected class RenderData implements SortInterface
-	{
-		public int id ;
-		public int type ;
-		public int layer ;
-		public final Vector3 position ;
-		public Settings drawData ;
-
-		public DrawInterface drawCall = null ;
-
-		public RenderData()
-		{
-			position = new Vector3() ;
-		}
-		
-		public RenderData( final int _id,
-						   final int _type,
-						   final Settings _draw,
-						   final Vector3 _position,
-						   final int _layer )
-		{
-			id = _id ;
-			type = _type ;
-			layer = _layer ;
-			drawData = _draw ;
-			position = _position ;
-			drawData.addInteger( "ID", _id ) ;
-		}
-
-		public void copy( final RenderData _data )
-		{
-			id = _data.id ;
-			type = _data.type ;
-			layer = _data.layer ;
-
-			position.setXYZ( _data.position ) ;
-
-			drawData = _data.drawData ;
-			drawCall = _data.drawCall ;
-		}
-
-		public int sortValue()
-		{
-			return layer ;
-		}
-
-		public void unregisterResources() {}
-	}
-
-	protected interface DrawInterface
-	{
-		public void draw( final Settings _settings, final Vector2 _position ) ;
 	}
 }

@@ -9,6 +9,7 @@ import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.resources.texture.SpriteManager ;
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.renderer.DrawFactory ;
@@ -16,6 +17,7 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 public class AnimationSystem extends SystemRoot<Animation>
 {
 	private final static String[] EVENT_TYPES = { "ANIMATION" } ;
+	private final static ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
 	private final static SpriteManager spriteManager = new SpriteManager() ;
 
 	protected int numID = 0 ;
@@ -73,6 +75,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 					//Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
 					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
 					removeSources.add( new RemoveSource( id, animation ) ) ;
+					animationCache.reclaim( animation ) ;						// Return the animation object back to the cache
 				}
 				break ;
 			}
@@ -86,10 +89,11 @@ public class AnimationSystem extends SystemRoot<Animation>
 		if( file != null )
 		{
 			final Event event = _anim.getObject( "RENDER_EVENT", null ) ;
-			final Animation anim = new Animation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
+			final Animation anim = animationCache.get() ;			// Get an Animation object from the cache
 			if( anim != null )
 			{
 				//Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
+				anim.setAnimation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
 				DrawFactory.insertIDCallback( event, anim ) ;
 				passEvent( event ) ;
 				addCallbackToAnimation( anim, _anim ) ;
@@ -104,21 +108,9 @@ public class AnimationSystem extends SystemRoot<Animation>
 		final int type = _settings.getInteger( "MODIFY_ANIMATION", -1 ) ;
 		switch( type )
 		{
-			case ModifyAnimation.PLAY :
-			{
-				_animation.play() ;
-				break ;
-			}
-			case ModifyAnimation.STOP :
-			{
-				_animation.stop() ;
-				break ;
-			}
-			case ModifyAnimation.PAUSE :
-			{
-				_animation.pause() ;
-				break ;
-			}
+			case ModifyAnimation.PLAY  : _animation.play() ;  break ;
+			case ModifyAnimation.STOP  : _animation.stop() ;  break ;
+			case ModifyAnimation.PAUSE : _animation.pause() ; break ;
 		}
 	}
 
