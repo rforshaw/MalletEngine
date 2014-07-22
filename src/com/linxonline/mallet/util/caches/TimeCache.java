@@ -5,8 +5,10 @@ import java.util.LinkedList ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /**
-	Provides a cache of objects based on time elapsed.
+	Provide a cache of objects based on the Class defined.
 	Objects used in this cache, must have a default constructor.
+	An object is automatically returned when the object is 
+	older than the wait time. 
 */
 public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 {

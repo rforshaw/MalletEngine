@@ -7,7 +7,7 @@ import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 public class DesktopJSONObject extends JSONObject
 {
-	private final org.json.JSONObject object ;
+	protected final org.json.JSONObject object ;
 
 	public DesktopJSONObject()
 	{
@@ -140,7 +140,7 @@ public class DesktopJSONObject extends JSONObject
 	{
 		try
 		{
-			object.put( _key, _value ) ;
+			object.put( _key, ( ( DesktopJSONObject )_value ).object ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )
@@ -154,7 +154,7 @@ public class DesktopJSONObject extends JSONObject
 	{
 		try
 		{
-			object.put( _key, _value ) ;
+			object.put( _key, ( ( DesktopJSONArray )_value ).array ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )

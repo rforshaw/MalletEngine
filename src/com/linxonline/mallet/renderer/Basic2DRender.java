@@ -200,6 +200,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	/**
 		Clear the contents of the state, this will 
 		remove anything that is being drawn.
+		This does not remove the resources that were 
+		in use.
 	*/
 	public void clear()
 	{
@@ -232,6 +234,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;								// Current State - loopable
 		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;	// Current State - searchable
 
+		protected final Vector2 position = new Vector2() ;
+
 		@Override
 		public void add( Integer _id, RenderData _data )
 		{
@@ -255,6 +259,13 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			content.add( _data ) ;						// Add to end of array
 		}
 
+		/**
+			Remove the passed in id from the render state.
+			This will add the id to a queue, which will get the 
+			content associated with the id to be removed at 
+			the most opportune moment. Note: resources used 
+			by the id will not be automatically destroyed too.
+		*/
 		@Override
 		public void remove( Integer _id )
 		{
@@ -262,6 +273,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			toRemove.add( _id ) ;
 		}
 
+		/**
+			Remove the Render Data from the Render State.
+			Making sure to decrement the resource counts.
+		*/
 		public void removeRenderData()
 		{
 			final int size = toRemove.size() ;
@@ -298,6 +313,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			}
 		}
 
+		/**
+			Interpolate the render state based on position.
+			We need to ensure that the array used to store the 
+			states old positions are the same size as the current state.
+		*/
 		protected void setOldStateSize( final int _size )
 		{
 			final int oldSize = oldState.size() ;
@@ -321,6 +341,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		@Override
 		public void clear()
 		{
+			// Ensure that we unregister all the resources
+			// we are currently using. If we don't, we'll 
+			// most likely be leaking memory!
 			final int size = content.size() ;
 			for( int i = 0; i < size; ++i )
 			{
@@ -345,7 +368,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 		public void draw()
 		{
-			final Vector2 position = new Vector2() ;
+			position.setXY( 0.0f, 0.0f ) ;
 			final int size = content.size() ;
 			for( int i = 0; i < size; ++i )
 			{

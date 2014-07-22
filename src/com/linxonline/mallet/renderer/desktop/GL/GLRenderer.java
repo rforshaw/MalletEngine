@@ -74,7 +74,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void shutdown()
 	{
-		clear() ;
+		clear() ;			// Clear the contents being rendered
+		clean() ;			// Remove the resources that were in use
 	}
 
 	private void initGraphics()
@@ -82,7 +83,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final GLProfile glProfile = GLProfile.getDefault() ;
 		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
 		capabilities.setDoubleBuffered( true ) ;
-		
+
 		canvas = new GLCanvas( capabilities ) ;
 		canvas.setAutoSwapBufferMode( false ) ;
 		canvas.addGLEventListener( this ) ;
@@ -623,6 +624,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	public void sort() {}
 
+	/**
+		Remove resources that are not being used.
+		Does not remove resources that are still 
+		flagged for use.
+	*/
 	@Override
 	public void clean()
 	{
