@@ -41,6 +41,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 	protected void destroySource( final Animation _source )
 	{
 		_source.destroy() ;
+		animationCache.reclaim( _source ) ;						// Return the animation object back to the cache
 	}
 
 	@Override
@@ -75,7 +76,6 @@ public class AnimationSystem extends SystemRoot<Animation>
 					//Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
 					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
 					removeSources.add( new RemoveSource( id, animation ) ) ;
-					animationCache.reclaim( animation ) ;						// Return the animation object back to the cache
 				}
 				break ;
 			}
