@@ -252,11 +252,13 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 				{
 					final int index = content.indexOf( data ) ;
 					content.add( index, _data ) ;		// Insert at index location
+					oldState.add( index, new Vector3( _data.position ) ) ;
 					return ;
 				}
 			}
 
 			content.add( _data ) ;						// Add to end of array
+			oldState.add( new Vector3( _data.position ) ) ;
 		}
 
 		/**
@@ -292,6 +294,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 					final int index = content.indexOf( data ) ;
 					content.remove( index ) ;
+					oldState.remove( index ) ;
 				}
 			}
 			toRemove.clear() ;
@@ -301,8 +304,6 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		public void retireCurrentState()
 		{
 			final int size = content.size() ;
-			setOldStateSize( size ) ;
-
 			for( int i = 0; i < size; ++i )
 			{
 				// Set the positions of old-state to the possitions
