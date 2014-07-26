@@ -274,6 +274,7 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( eventController ) ;
 		eventSystem.addEventHandler( audioSystem ) ;
 		eventSystem.addEventHandler( animationSystem ) ;
+		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface() ) ;
 
 		system.addEventHandler( eventController ) ;
@@ -290,6 +291,7 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( eventController ) ;
 		eventSystem.removeEventHandler( audioSystem ) ;
 		eventSystem.removeEventHandler( animationSystem ) ;
+		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
 
 		system.removeEventHandler( eventController ) ;
