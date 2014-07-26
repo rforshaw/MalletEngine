@@ -83,7 +83,7 @@ public abstract class Component implements SerialisableForm
 		Can also be used for any other events that may need 
 		to be passed when the component is added to the Entity System. 
 	*/
-	public void passInitialEvents( final ArrayList<Event> _events ) {}
+	public void passInitialEvents( final ArrayList<Event<?>> _events ) {}
 
 	/**
 		Create events and add them to _events.
@@ -93,7 +93,7 @@ public abstract class Component implements SerialisableForm
 		Can also be used for any other events that may need 
 		to be passed when the component is removed from the Entity System. 
 	*/
-	public void passFinalEvents( final ArrayList<Event> _events ) {}
+	public void passFinalEvents( final ArrayList<Event<?>> _events ) {}
 
 	/**
 		Return the internal Event Controller for this component.

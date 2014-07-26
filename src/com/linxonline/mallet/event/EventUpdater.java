@@ -12,7 +12,7 @@ public abstract class EventUpdater implements EventHandler
 	/**
 		Process the passed in event
 	*/
-	protected abstract void useEvent( final Event _event ) ;
+	protected abstract void useEvent( final Event<?> _event ) ;
 
 	protected void updateEvents()
 	{
@@ -26,14 +26,14 @@ public abstract class EventUpdater implements EventHandler
 	}
 
 	@Override
-	public void processEvent( final Event _event )
+	public void processEvent( final Event<?> _event )
 	{
 		// Add events recieved to the messenger for later processing
 		messenger.addEvent( _event ) ;
 	}
 	
 	@Override
-	public void passEvent( final Event _event )
+	public void passEvent( final Event<?> _event )
 	{
 		// If we are passing an Event, we'll want to know if the EventSystem is null,
 		// So crash!

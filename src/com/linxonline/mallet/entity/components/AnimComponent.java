@@ -78,7 +78,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	public void finished() {}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event> _events )
+	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
 		if( defaultAnim != null )
@@ -89,7 +89,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event> _events )
+	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
 		_events.add( AnimationFactory.removeAnimation( animationID ) ) ;

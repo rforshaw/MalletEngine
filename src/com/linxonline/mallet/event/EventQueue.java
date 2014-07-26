@@ -7,7 +7,7 @@ public class EventQueue
 	public final String name ;
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventFilter> filters = new ArrayList<EventFilter>() ;
-	private final ArrayList<Event> optimisedEvents = new ArrayList<Event>() ;
+	private final ArrayList<Event<?>> optimisedEvents = new ArrayList<Event<?>>() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
 	public EventQueue( final String _name )
@@ -35,7 +35,7 @@ public class EventQueue
 		filters.remove( _filter ) ;
 	}
 
-	public void addEvent( final Event _event )
+	public void addEvent( final Event<?> _event )
 	{
 		messenger.addEvent( _event ) ;
 	}
@@ -53,7 +53,7 @@ public class EventQueue
 		}
 		else
 		{
-			final ArrayList<Event> events = messenger.getEvents() ;
+			final ArrayList<Event<?>> events = messenger.getEvents() ;
 			final int size = events.size() ;
 			if( size > 0 )
 			{
@@ -64,7 +64,7 @@ public class EventQueue
 		final int handlerSize = handlers.size() ;
 		while( optimisedEvents.size() > 0 )				// Reduce chance of sending the same event twice.
 		{
-			final Event event = optimisedEvents.get( 0 ) ;
+			final Event<?> event = optimisedEvents.get( 0 ) ;
 			optimisedEvents.remove( 0 ) ;
 			for( int j = 0; j < handlerSize; ++j )
 			{

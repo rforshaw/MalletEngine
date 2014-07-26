@@ -45,7 +45,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 	}
 
 	@Override
-	protected void useEvent( final Event _event )
+	protected void useEvent( final Event<?> _event )
 	{
 		final Settings anim = ( Settings )_event.getVariable() ;
 		final int type = anim.getInteger( "REQUEST_TYPE", -1 ) ;

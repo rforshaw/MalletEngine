@@ -182,7 +182,7 @@ public class GameState extends State implements HookEntity
 	*/
 	public void hookEntity( final Entity _entity )
 	{
-		final ArrayList<Event> events = new ArrayList<Event>() ;
+		final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 		{
 			// Retrieve component system-registering events.
 			final ArrayList<Component> entityComponents = _entity.getAllComponents() ; 
@@ -211,7 +211,7 @@ public class GameState extends State implements HookEntity
 	*/
 	public void unhookEntity( final Entity _entity )
 	{
-		final ArrayList<Event> events = new ArrayList<Event>() ;
+		final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 		{
 			// Retrieve component system-registering events.
 			final ArrayList<Component> entityComponents = _entity.getAllComponents() ; 

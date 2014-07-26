@@ -7,5 +7,5 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public interface AddEventInterface
 {
-	public void addEvent( final Event _event ) ;
+	public void addEvent( final Event<?> _event ) ;
 }

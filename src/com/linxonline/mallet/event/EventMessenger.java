@@ -20,22 +20,22 @@ import java.util.ArrayList ;
 /*====================================================*/
 public final class EventMessenger
 {
-	private ArrayList<Event> newEvents = new ArrayList<Event>() ;
-	private ArrayList<Event> events = new ArrayList<Event>() ;
+	private ArrayList<Event<?>> newEvents = new ArrayList<Event<?>>() ;
+	private ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 
 	public EventMessenger() {}
 	
-	public final void addEvent( final Event _event )
+	public final void addEvent( final Event<?> _event )
 	{
 		newEvents.add( _event ) ;
 	}
 
-	public final Event getAt( final int _index )
+	public final Event<?> getAt( final int _index )
 	{
 		return events.get( _index ) ;
 	}
 	
-	public final ArrayList<Event> getEvents()
+	public final ArrayList<Event<?>> getEvents()
 	{
 		return events ;
 	}
@@ -55,7 +55,7 @@ public final class EventMessenger
 	**/
 	public final void refreshEvents()
 	{
-		final ArrayList<Event> oldEvents = events ;
+		final ArrayList<Event<?>> oldEvents = events ;
 		oldEvents.clear() ;
 
 		events = newEvents ;

@@ -80,7 +80,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	@Override
 	public abstract void draw( final float _dt ) ;
 
-	protected void useEvent( final Event _event )
+	@Override
+	protected void useEvent( final Event<?> _event )
 	{
 		switch( _event.getEventType() )
 		{
@@ -89,7 +90,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		}
 	}
 
-	protected void useEventInCamera( final Event _event )
+	protected void useEventInCamera( final Event<?> _event )
 	{
 		final Settings camera = ( Settings )_event.getVariable() ;
 		final int type = camera.getInteger( "REQUEST_TYPE", -1 ) ;
@@ -118,7 +119,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		}
 	}
 
-	protected void useEventInDraw( final Event _event )
+	protected void useEventInDraw( final Event<?> _event )
 	{
 		final Settings draw = ( Settings )_event.getVariable() ;
 		final int type = draw.getInteger( "REQUEST_TYPE", -1 ) ;
@@ -181,7 +182,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	}
 
 	@Override
-	public final void passEvent( final Event _event ) {}
+	public final void passEvent( final Event<?> _event ) {}
 
 	@Override
 	public String[] getWantedEventTypes()

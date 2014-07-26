@@ -47,14 +47,14 @@ public class EventComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event> _events )
+	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
 		final Event<EventController> event = new Event<EventController>( "ADD_GAME_STATE_EVENT", getEventController() ) ;
 		_events.add( event ) ;
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event> _events )
+	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		final Event<EventController> event = new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getEventController() ) ;
 		_events.add( event ) ;

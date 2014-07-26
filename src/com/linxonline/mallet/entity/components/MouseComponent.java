@@ -34,14 +34,14 @@ public class MouseComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event> _events )
+	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
 		final Event<InputHandler> event = new Event<InputHandler>( "ADD_GAME_STATE_INPUT", this ) ;
 		_events.add( event ) ;
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event> _events )
+	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		final Event<InputHandler> event = new Event<InputHandler>( "REMOVE_GAME_STATE_INPUT", this ) ;
 		_events.add( event ) ;
