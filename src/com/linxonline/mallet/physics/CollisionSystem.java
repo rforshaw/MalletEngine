@@ -36,7 +36,7 @@ public class CollisionSystem extends EventController
 			{
 				if( _event.isEventByString( "REMOVE_COLLISION_HULL" ) == true )
 				{
-					add( ( Hull )_event.getVariable() ) ;
+					remove( ( Hull )_event.getVariable() ) ;
 				}
 			}
 		} ) ;
