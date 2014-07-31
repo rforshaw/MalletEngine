@@ -14,8 +14,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private static final int ANIM_NOT_SET = -1 ;
 
 	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
-	private String defaultAnim = null ;
-	private int animationID = -1 ;
+	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
+	private int toRemove = 0 ;					// Used when an animation has changed by the ID has yet to be recieved for the previous animation.
+	private int animationID = -1 ;				// Denotes the id of the current running animation.
 
 	public AnimComponent()
 	{
@@ -65,9 +66,26 @@ public class AnimComponent extends EventComponent implements SourceCallback
 			passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
 			animationID = ANIM_NOT_SET ;
 		}
+		else
+		{
+			// Failed to remove the Animation as it has yet to be set.
+			// Increment the counter and remove it first chance we get.
+			++toRemove ;
+		}
 	}
 
-	public void recieveID( final int _id ) { animationID = _id ; }
+	public void recieveID( final int _id )
+	{
+		animationID = _id ;
+		if( toRemove > 0 )
+		{
+			// If toRemove is greater than 0, then an 
+			// animation failed to be stop as we didn't have its 
+			// animationID, we do now, so remove it.
+			--toRemove ;
+			stopAnimation() ;
+		}
+	}
 
 	public void callbackRemoved() {}
 
