@@ -15,7 +15,8 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
 	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
-	private int toRemove = 0 ;					// Used when an animation has changed by the ID has yet to be recieved for the previous animation.
+	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
+	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
 	private int animationID = -1 ;				// Denotes the id of the current running animation.
 
 	public AnimComponent()
@@ -44,15 +45,27 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	/**
-		Begin playing specified animation
+		Begin playing specified animation as soon as possible.
+		If called very quickly, repeatedly, some animations 
+		may never get rendered.
 	**/
 	public void playAnimation( final String _name )
 	{
-		stopAnimation() ; 								// Stop the previous animation
+		if( waitForID == true )
+		{
+			// Currently waiting for the ID of the previous
+			// animation. Store the Animation name and wait till 
+			// we get the ID, before playing the new Animation.
+			toPlayAnim = _name ;
+			return ;
+		}
+
+		stopAnimation() ; 								// Stop the previous animation, else we'll leak animations
 		final Event<Settings> event = animations.get( _name ) ;
 		if( event != null )
 		{
-			passEvent( event ) ;
+			waitForID = true ;							// Need to wait for ID before changing animation again
+			passEvent( event ) ;						// Inform the Animation System of the new Animation.
 		}
 	}
 
@@ -66,24 +79,20 @@ public class AnimComponent extends EventComponent implements SourceCallback
 			passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
 			animationID = ANIM_NOT_SET ;
 		}
-		else
-		{
-			// Failed to remove the Animation as it has yet to be set.
-			// Increment the counter and remove it first chance we get.
-			++toRemove ;
-		}
 	}
 
 	public void recieveID( final int _id )
 	{
 		animationID = _id ;
-		if( toRemove > 0 )
+		waitForID = false ;		// We've recieved the ID so we can accept other animation requests
+
+		if( toPlayAnim != null )
 		{
-			// If toRemove is greater than 0, then an 
-			// animation failed to be stop as we didn't have its 
-			// animationID, we do now, so remove it.
-			--toRemove ;
-			stopAnimation() ;
+			// If toPlayAnim is set, then another animation 
+			// was requested before the previous animations ID 
+			// could be recieved. We can now play the new animation.
+			playAnimation( toPlayAnim ) ;
+			toPlayAnim = null ;
 		}
 	}
 
@@ -101,8 +110,15 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		super.passInitialEvents( _events ) ;
 		if( defaultAnim != null )
 		{
-			_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
-			_events.add( animations.get( defaultAnim ) ) ;
+			final Event<Settings> event = animations.get( defaultAnim ) ;
+			if( event != null )
+			{
+				// Add the default Anim to the Initial Events.
+				// Ensure the component knows it needs to wait for the ID
+				// before requesting another animation.
+				_events.add( event ) ;
+				waitForID = true ;
+			}
 		}
 	}
 
