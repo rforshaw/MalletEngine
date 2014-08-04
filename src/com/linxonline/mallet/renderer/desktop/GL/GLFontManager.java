@@ -14,7 +14,8 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 
 	public GLFontMap get( final String _name, final int _size )
 	{
-		if( exists( _name ) == true )
+		final String id = _name + _size ;
+		if( exists( id ) == true )
 		{
 			return resources.get( _name ) ;
 		}
@@ -22,7 +23,7 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 		final GLFontMap resource = createResource( _name, _size ) ;
 		if( resource != null )
 		{
-			add( _name, resource ) ;
+			add( id, resource ) ;
 			resource.register() ;
 		}
 
