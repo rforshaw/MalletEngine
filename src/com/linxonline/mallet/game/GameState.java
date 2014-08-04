@@ -403,7 +403,7 @@ public class GameState extends State implements HookEntity
 			{
 				if( _event.isEventByString( "REMOVE_GAME_STATE_INPUT" ) == true )
 				{
-					inputSystem.addInputHandler( ( InputHandler )_event.getVariable() ) ;
+					inputSystem.removeInputHandler( ( InputHandler )_event.getVariable() ) ;
 				}
 			}
 		} ) ;
