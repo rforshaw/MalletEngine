@@ -56,14 +56,14 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextureExample()
 			{
-				eventSystem.addEvent( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
-																	new Vector3( -100.0f, 0.0f, 0.0f ),	// Position
+				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
+																	new Vector3( 415.0f, 385.0f, 0.0f ),	// Position
 																	new Vector2( -32, -32 ), 			// Offset
 																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
 																	null,								// fill, texture repeat
 																	null,								// clip
 																	null,								// clip offset
-																	10 ) ) ;							// layer
+																	10 ), true ) ) ;							// layer
 
 				final Shape lines = new Shape( 7, 6 ) ;
 				lines.addPoint( new Vector2( 0, 10 ) ) ;

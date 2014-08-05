@@ -145,12 +145,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 
 				gl.glDisable( gl.GL_TEXTURE_2D ) ;
 				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
 
 				gl.glPushMatrix() ;
+					if( isGUI == true )
+					{
+						_position.subtract( pos ) ;
+						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+					}
+
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
@@ -203,6 +210,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 
 				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
@@ -210,7 +218,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 
 				gl.glPushMatrix() ;
-					
+					if( isGUI == true )
+					{
+						_position.subtract( pos ) ;
+						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+					}
+				
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
@@ -287,6 +300,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final int alignment = _settings.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
+				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
 				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
@@ -296,6 +310,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				gl.glPushMatrix() ;
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+					if( isGUI == true )
+					{
+						currentPos.subtract( pos ) ;
+						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+					}
 
 					gl.glTranslatef( currentPos.x, currentPos.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;

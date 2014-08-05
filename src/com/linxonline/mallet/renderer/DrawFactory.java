@@ -135,7 +135,23 @@ public class DrawFactory
 		set.addFloat( "ROTATE", _rotate ) ;
 		return _event ;
 	}
-	
+
+	/**
+		Inform the renderer to handle the draw request as a GUI element.
+		Amend the draw request to prevent camera position and scale from being 
+		applied. 
+	*/
+	public static Event<Settings> amendGUI( final Event<Settings> _event, final boolean _set )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addBoolean( "GUI", _set ) ;
+		return _event ;
+	}
+
+	/**
+		Inform the renderer to return the id of the draw request.
+		Must be applied before being passed to the renderer.
+	*/
 	public static void insertIDCallback( final Event<Settings> _event, final IDInterface _callback )
 	{
 		final Settings sets = ( Settings )_event.getVariable() ;
