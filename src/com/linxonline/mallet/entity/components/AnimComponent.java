@@ -24,6 +24,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		super( "ANIM" ) ;
 	}
 
+	public AnimComponent( final String _name )
+	{
+		super( _name ) ;
+	}
+
 	public void addAnimation( final String _name, final Event<Settings> _anim )
 	{
 		animations.put( _name, _anim ) ;
