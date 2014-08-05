@@ -2,6 +2,7 @@ package com.linxonline.mallet.game.test ;
 
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.renderer.Shape ;

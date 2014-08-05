@@ -16,6 +16,7 @@ public final class RenderInfo implements InputAdapterInterface
 	private Vector2 displayDimensions = null ;							// Dimensions of the Window
 	private Vector2 renderDimensions = null ;							// Dimensions of the render-buffer
 	private Vector3 cameraPosition = null ;								// Camera position
+	private final Vector2 cameraZoom = new Vector2( 1, 1 ) ;
 	private Vector2 scaledRenderDimensions = new Vector2( 0, 0 ) ;
 	private Vector2 screenOffset = new Vector2( 0, 0 ) ;
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
@@ -71,13 +72,13 @@ public final class RenderInfo implements InputAdapterInterface
 	public float convertInputToRenderX( final float _x )
 	{
 		updateRealCameraPosition() ;
-		return ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) - realCameraPosition.x ;
+		return ( ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) - realCameraPosition.x ) * cameraZoom.x ;
 	}
 
 	public float convertInputToRenderY( final float _y )
 	{
 		updateRealCameraPosition() ;
-		return ( ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ) - realCameraPosition.y ;
+		return ( ( ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ) - realCameraPosition.y ) * cameraZoom.y ;
 	}
 
 	public Vector2 convertInputToRender( final Vector2 _input )
@@ -98,6 +99,11 @@ public final class RenderInfo implements InputAdapterInterface
 		}
 		
 		return true ;
+	}
+
+	public void setCameraZoom( final float _zx, final float _zy )
+	{
+		cameraZoom.setXY( 1.0f / _zx, 1.0f / _zy ) ;
 	}
 
 	public void setCameraPosition( final Vector3 _cameraPosition )

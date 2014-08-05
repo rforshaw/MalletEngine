@@ -548,6 +548,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
+		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
 
 		gl.glPushMatrix() ;
 			gl.glTranslatef( pos.x, pos.y, 0.0f ) ;
