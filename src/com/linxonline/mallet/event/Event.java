@@ -18,16 +18,13 @@ public final class Event<T>
 		}
 	} ;
 
-	private String eventType = null ;				// Identifier
-	private int hashCode = 0 ;						// Hash representation of identifier
-
+	private EventType eventType = null ;
 	private EventHandlerMeta meta = BLANK_META ;	// Information about sender
 	private T variable = null ;						// Event package contains data the reciever is interested in
 
 	public Event()
 	{
-		eventType = "NONE" ;
-		hashCode = eventType.hashCode() ;
+		setEvent( "NONE", null ) ;
 	}
 
 	public Event( final String _eventType, final T _object )
@@ -45,23 +42,12 @@ public final class Event<T>
 	**/
 	public final boolean isEventByString( final String _name )
 	{
-		return eventType.equals( _name ) ;
+		return EventType.equals( _name, eventType ) ;
 	}
 
-	/**
-		Best used with Strings of 16 or less characters
-	**/
-	public final boolean isEventByHashCode( final String _name )
+	public final boolean isEventByType( final EventType _type )
 	{
-		return ( hashCode == _name.hashCode() ) ;
-	}
-
-	/**
-		Best used with Strings of 16 or less characters
-	**/
-	public final boolean isEventByHashCode( final int _hashCode )
-	{
-		return ( hashCode == _hashCode ) ;
+		return EventType.equals( _type, eventType ) ;
 	}
 
 	/**
@@ -77,15 +63,14 @@ public final class Event<T>
 	**/
 	public final void setEvent( final String _eventType, final T _object, final EventHandlerMeta _meta )
 	{
-		eventType = _eventType ;
-		hashCode = eventType.hashCode() ;
+		eventType = EventType.get( _eventType ) ;
 		variable = _object ;
 		meta = ( _meta != null ) ? _meta : BLANK_META ;
 	}
 
 	public final String getEventType()
 	{
-		return eventType ;
+		return eventType.getType() ;
 	}
 
 	public final T getVariable()
