@@ -4,7 +4,7 @@ import java.util.ArrayList ;
 
 public class EventQueue
 {
-	public final String name ;
+	private final EventType name ;
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventFilter> filters = new ArrayList<EventFilter>() ;
 	private final ArrayList<Event<?>> optimisedEvents = new ArrayList<Event<?>>() ;
@@ -12,7 +12,7 @@ public class EventQueue
 
 	public EventQueue( final String _name )
 	{
-		name = _name ;
+		name = EventType.get( _name ) ;
 	}
 	
 	public void addEventHandler( final EventHandler _handler )

@@ -86,7 +86,7 @@ public final class EventSystem implements AddEventInterface
 		}
 	}
 
-	public final void addEvent( final Event _event )
+	public final void addEvent( final Event<?> _event )
 	{
 		final String key = _event.getEventType() ;
 		//System.out.println( name + " " + key ) ;
