@@ -225,6 +225,12 @@ public class AndroidActivity extends Activity
 	public void processEvent( final Event _event ) {}
 
 	@Override
+	public String getName()
+	{
+		return "ANDROID_ACTIVITY" ;
+	}
+
+	@Override
 	public String[] getWantedEventTypes()
 	{
 		return Event.ALL_EVENT_TYPES ;

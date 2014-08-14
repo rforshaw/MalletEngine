@@ -83,10 +83,14 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	@Override
 	protected void useEvent( final Event<?> _event )
 	{
-		switch( _event.getEventType() )
+		final String type = ( String )_event.getEventType() ;
+		if( type.equals( "DRAW" ) == true )
 		{
-			case "DRAW"   : useEventInDraw( _event ) ;   break ;		// EventType[0]
-			case "CAMERA" : useEventInCamera( _event ) ; break ;		// EventType[1]
+			useEventInDraw( _event ) ;			// EventType[0]
+		}
+		else if( type.equals( "CAMERA" ) == true )
+		{
+			useEventInCamera( _event ) ;		// EventType[1]
 		}
 	}
 

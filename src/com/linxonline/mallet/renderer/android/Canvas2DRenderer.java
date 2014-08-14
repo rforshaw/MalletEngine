@@ -165,6 +165,12 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
+	public String getName()
+	{
+		return "CANVAS_2D_RENDERER" ;
+	}
+
+	@Override
 	public void updateState( final float _dt )
 	{
 		super.updateState( _dt ) ;
@@ -228,6 +234,12 @@ public class Canvas2DRenderer extends Basic2DRender
 		}
 	}
 
+	@Override
+	public void clean()
+	{
+		textures.clean() ;
+	}
+
 	private Texture loadTexture( final Settings _draw )
 	{
 		return textures.get( _draw.getString( "FILE", null ) ) ;
@@ -249,7 +261,19 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
-	protected void createGeometry( final Settings _draw ) {}
+	protected void createGeometry( final Settings _draw )
+	{
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
+		final int layer = _draw.getInteger( "LAYER", -1 ) ;
+
+		if( position != null )
+		{
+			final RenderData data = new RenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+			data.drawCall = drawShape ;
+			insert( data ) ;
+		}
+	}
 
 	@Override
 	protected void createText( final Settings _draw )

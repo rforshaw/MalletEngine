@@ -106,6 +106,12 @@ public class Android2DRenderer extends SurfaceView
 	}
 
 	@Override
+	public String getName()
+	{
+		return "ANDROID_2D_RENDERER" ;
+	}
+
+	@Override
 	public String[] getWantedEventTypes()
 	{
 		return render.getWantedEventTypes() ;
