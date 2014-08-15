@@ -57,7 +57,11 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
-	public void shutdown() {}
+	public void shutdown()
+	{
+		clear() ;
+		clean() ;
+	}
 	
 	private void initDrawCalls()
 	{
@@ -165,10 +169,15 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
+	public String getName()
+	{
+		return "CANVAS_2D_RENDERER" ;
+	}
+
+	@Override
 	public void updateState( final float _dt )
 	{
 		super.updateState( _dt ) ;
-		cameraPosition = renderInfo.getCameraPosition() ;
 		oldCameraPosition.setXYZ( cameraPosition ) ;
 	}
 
@@ -177,6 +186,7 @@ public class Canvas2DRenderer extends Basic2DRender
 	{
 		try
 		{
+			cameraPosition = renderInfo.getCameraPosition() ;
 			canvas = holder.lockCanvas() ;
 			synchronized( holder )
 			{
@@ -191,7 +201,6 @@ public class Canvas2DRenderer extends Basic2DRender
 					++renderIter ;
 					drawDT = _dt ;
 
-					updateEvents() ;		// Process the latest batch of Events
 					render( _dt ) ;
 				}
 			}
@@ -200,8 +209,8 @@ public class Canvas2DRenderer extends Basic2DRender
 		{
 			if( canvas != null )
 			{
-				//System.out.println( "POST ON CANVAS" ) ;
 				holder.unlockCanvasAndPost( canvas ) ;
+				canvas = null ;
 			}
 		}
 	}
@@ -217,15 +226,25 @@ public class Canvas2DRenderer extends Basic2DRender
 
 		canvas.translate( screenOffset.x, screenOffset.y ) ;
 		canvas.clipRect( 0, 0, ( int )renderScaleSize.x, ( int )renderScaleSize.y ) ;
+		canvas.drawColor( Color.BLACK ) ;
 		canvas.scale( renderRatio.x, renderRatio.y ) ;
-		
+
+		updateEvents() ;		// Process the latest batch of Events
+
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 		canvas.translate( pos.x, pos.y ) ;
 
+		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
 			state.draw() ;
 		}
+	}
+
+	@Override
+	public void clean()
+	{
+		textures.clean() ;
 	}
 
 	private Texture loadTexture( final Settings _draw )
@@ -249,7 +268,19 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
-	protected void createGeometry( final Settings _draw ) {}
+	protected void createGeometry( final Settings _draw )
+	{
+		final Vector3 position = _draw.getObject( "POSITION", null ) ;
+		final int layer = _draw.getInteger( "LAYER", -1 ) ;
+
+		if( position != null )
+		{
+			final RenderData data = new RenderData( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+			data.drawCall = drawShape ;
+			insert( data ) ;
+		}
+	}
 
 	@Override
 	protected void createText( final Settings _draw )

@@ -436,11 +436,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glEnable( GL.GL_BLEND ) ;
 
 		resize() ;
-
-		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
-		{
-			textures.setImageFormat( GL2.GL_ABGR_EXT  ) ;
-		}
 	}
 
 	public void setViewMode( final int _mode )

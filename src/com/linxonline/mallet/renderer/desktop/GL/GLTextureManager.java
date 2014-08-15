@@ -22,7 +22,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	/**
 		Currently two OpenGL image formats are supported: GL_RGBA and GL_ABGR_EXT.
 		It's set to GL_RGBA by default due to the extension potentially not 
-		being available, though unlikely.
+		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
 	protected int imageFormat = GL2.GL_RGBA ;
 
@@ -97,10 +97,28 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
+		final int channels = _image.getSampleModel().getNumBands() ;
+
+		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
+		{
+			switch( channels )
+			{
+				case 4 : imageFormat = GL2.GL_ABGR_EXT ; break ;
+				case 3 : imageFormat = GL2.GL_BGR ;      break ;
+			}
+		}
+		else
+		{
+			switch( channels )
+			{
+				case 4 : imageFormat = GL2.GL_RGBA ; break ;
+				case 3 : imageFormat = GL2.GL_RGB ;  break ;
+			}
+		}
 
 		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
 						 0, 
-						 GL2.GL_RGBA, 
+						 channels, 
 						 width, 
 						 height, 
 						 0, 

@@ -5,7 +5,7 @@ import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 public class AndroidJSONArray extends JSONArray
 {
-	private final org.json.JSONArray array ;
+	protected final org.json.JSONArray array ;
 
 	public AndroidJSONArray()
 	{
@@ -90,13 +90,13 @@ public class AndroidJSONArray extends JSONArray
 
 	public JSONArray put( final JSONObject _value )
 	{
-		array.put( _value ) ;
+		array.put( ( ( AndroidJSONObject )_value ).object ) ;
 		return this ;
 	}
 
 	public JSONArray put( final JSONArray _value )
 	{
-		array.put( _value ) ;
+		array.put( ( ( AndroidJSONArray )_value ).array ) ;
 		return this ;
 	}
 
