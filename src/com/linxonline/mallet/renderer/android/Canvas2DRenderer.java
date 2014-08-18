@@ -81,12 +81,17 @@ public class Canvas2DRenderer extends Basic2DRender
 		{
 			public void draw( final Settings _settings, final Vector2 _position )
 			{
+				System.out.println( "DRAW TEXTURE" ) ;
 				setGraphicsColour( _settings ) ;
 				Texture<AndroidImage> texture = _settings.getObject( "TEXTURE", null ) ;
 				if( texture == null )
 				{
 					texture = loadTexture( _settings ) ;
-					if( texture == null ) { return ; }
+					if( texture == null )
+					{
+						System.out.println( "TEXTURE NOT FOUND" ) ;
+						return ;
+					}
 				}
 
 				scaleMatrix.reset() ;
@@ -96,8 +101,17 @@ public class Canvas2DRenderer extends Basic2DRender
 					scaleMatrix.setScale( scale.x, scale.y ) ;
 				}
 
+				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
+				if( isGUI == true )
+				{
+					System.out.println( "GUI" ) ;
+					_position.subtract( pos ) ;
+					//scaleMatrix.setScale( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+				}
+
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				scaleMatrix.setTranslate( _position.x + offset.x, _position.y + offset.y ) ;
+				System.out.println( _position ) ;
 
 				final AndroidImage image = texture.getImage() ;
 				canvas.drawBitmap( image.bitmap, scaleMatrix, paint ) ;
@@ -201,7 +215,9 @@ public class Canvas2DRenderer extends Basic2DRender
 					++renderIter ;
 					drawDT = _dt ;
 
+					System.out.println( "START DRAW" ) ;
 					render( _dt ) ;
+					System.out.println( "END DRAW" ) ;
 				}
 			}
 		}
@@ -249,7 +265,10 @@ public class Canvas2DRenderer extends Basic2DRender
 
 	private Texture loadTexture( final Settings _draw )
 	{
-		return textures.get( _draw.getString( "FILE", null ) ) ;
+		final String file = _draw.getString( "FILE", null ) ;
+		final Texture texture = textures.get( file ) ;
+		_draw.addObject( "TEXTURE", texture ) ;
+		return texture ;
 	}
 
 	@Override

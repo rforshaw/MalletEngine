@@ -29,30 +29,34 @@ public class AndroidSystem implements SystemInterface
 	protected final EventSystem eventSystem = new EventSystem() ;
 	protected final AndroidInputSystem inputSystem = new AndroidInputSystem() ;
 	protected final AndroidAudioGenerator audioGenerator = new AndroidAudioGenerator() ;
-	protected Android2DRenderer renderer = null ;//new Android2DRenderer() ;
+	protected final Android2DRenderer renderer ;
 
 	public AndroidSystem( final AndroidActivity _activity )
 	{
 		activity = _activity ;
+		renderer = new Android2DRenderer( activity ) ;
 	}
 
 	public void initSystem()
 	{
-		renderer = new Android2DRenderer( activity ) ;
 		renderer.start() ;
 
 		inputSystem.inputAdapter = renderer.render.renderInfo ;
 
-		activity.requestWindowFeature( Window.FEATURE_NO_TITLE ) ;
-		activity.getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
-									   WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		setContentView() ;
 		activity.addAndroidInputListener( inputSystem ) ;
 	}
 
 	public void setContentView()
 	{
-		activity.setContentView( renderer ) ;
+		activity.runOnUiThread( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				activity.setContentView( renderer ) ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -65,6 +69,8 @@ public class AndroidSystem implements SystemInterface
 	public synchronized void shutdownSystem()
 	{
 		//activity.finished() ;
+		audioGenerator.shutdownGenerator() ;
+		renderer.shutdown() ;
 	}
 
 	/*INPUT HOOK*/
@@ -135,7 +141,9 @@ public class AndroidSystem implements SystemInterface
 	{
 		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
+
 		eventSystem.update() ;
+
 		return true ;	// Informs the Game System whether to continue updating or not.
 	}
 

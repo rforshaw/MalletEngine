@@ -77,36 +77,29 @@ public class GLDefaultSystem implements SystemInterface
 		final String[] eventTypes = { "DISPLAY_SYSTEM_MOUSE", "SYSTEM_RENDER" } ;
 		eventController.setWantedEventTypes( eventTypes ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "USE_SYSTEM_MOUSE" )
+		eventController.addEventProcessor( new EventProcessor( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
 		{
 			@Override
-			public void processEvent( final Event _event )
+			public void processEvent( final Event<?> _event )
 			{
-				if( _event.isEventByString( "DISPLAY_SYSTEM_MOUSE" ) == true )
+				final boolean displayMouse = ( Boolean )_event.getVariable() ;
+				frame.getContentPane().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) ) ;
+				if( displayMouse == false )
 				{
-					final Event<Boolean> useEvent = _event ;
-					final boolean displayMouse = useEvent.getVariable() ;
-					frame.getContentPane().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) ) ;
-					if( displayMouse == false )
-					{
-						// Hide the mouse if it isn't meant to be displayed.
-						final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
-						final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "BLANK_CURSOR" ) ;
-						frame.getContentPane().setCursor( blankCursor ) ;
-					}
+					// Hide the mouse if it isn't meant to be displayed.
+					final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
+					final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "BLANK_CURSOR" ) ;
+					frame.getContentPane().setCursor( blankCursor ) ;
 				}
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "SYSTEM_RENDER" )
+		eventController.addEventProcessor( new EventProcessor( "SYSTEM_RENDER", "SYSTEM_RENDER" )
 		{
 			@Override
-			public void processEvent( final Event _event )
+			public void processEvent( final Event<?> _event )
 			{
-				if( _event.isEventByString( "SYSTEM_RENDER" ) == true )
-				{
-					System.out.println( "Handle Render" ) ;
-				}
+				System.out.println( "Handle Render" ) ;
 			}
 		} ) ;
 

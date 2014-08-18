@@ -7,8 +7,10 @@ import android.content.Context ;
 import android.view.Display ;
 import android.view.KeyEvent ;
 import android.view.MotionEvent ;
+import android.view.Window ;
+import android.view.WindowManager ;
 import android.os.Bundle ;
-import android.util.DisplayMetrics ;
+
 import android.media.* ;
 
 import java.util.ArrayList ;
@@ -33,105 +35,27 @@ public class AndroidActivity extends Activity
 							implements EventHandler
 {
 	private ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
-	protected boolean fileSystemLoaded = false ;
-	protected AndroidSystem androidSystem = null ;
-	protected GameSystem gameSystem = new GameSystem() ;
+	protected AndroidStarter starter ;
 	protected GameThread gameThread = null ;
+	protected boolean fileSystemLoaded = false ;
 
 	public AndroidActivity()
 	{
 		super() ;
 	}
 
-	protected void init()
-	{
-		androidSystem = new AndroidSystem( this ) ;
-		androidSystem.initSystem() ;
-		androidSystem.addEventHandler( this ) ;
-		gameSystem.setSystem( androidSystem ) ;
-
-		gameSystem.addGameState( new GameState( "DEFAULT" )
-		{
-			// Called when state is started.
-			public void initGame()
-			{
-				renderTextureExample() ;
-				//renderAnimationExample() ;
-				renderTextExample() ;
-			}
-
-			/**
-				Add a texture and render directly to the renderer
-			**/
-			public void renderTextureExample()
-			{
-				eventSystem.addEvent( DrawFactory.createTexture( "com.linxonline:drawable/moomba",//"base/textures/moomba.png", 			// Texture Location
-																	new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																	new Vector2( -32, -32 ), 			// Offset
-																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																	null,								// fill, texture repeat
-																	null,								// clip
-																	null,								// clip offset
-																	10 ) ) ;							// layer
-			}
-
-			/**
-				Add text and render directly to the renderer
-			**/
-			public void renderTextExample()
-			{
-				eventSystem.addEvent( DrawFactory.createText(  "Hello World!", 						// Text
-																new Vector3( 0.0f, 0.0f, 0.0f ),	// Position
-																new Vector2( 0, 0 ), 				// Offset
-																new MalletFont( "Arial", 20 ),		// Mallet Font
-																null,								// Mallet Colour
-																null,								// clip
-																null,								// clip offset
-																10,									// layer
-																2 ) ) ;								// Text alignment, Centre
-			}
-		} ) ;
-		
-		gameSystem.setDefaultGameState( "DEFAULT" ) ;
-		startGameThread() ;
-	}
-
-	public void initActivity()
-	{
-		final DisplayMetrics display = new DisplayMetrics() ;
-		getWindowManager().getDefaultDisplay().getMetrics( display ) ; 
-		final int width = display.widthPixels ;
-		final int height = display.heightPixels ;
-
-		final int renderWidth = width ;
-		final int renderHeight = height ;
-
-		androidSystem.setDisplayDimensions( new Vector2( width, height ) ) ;
-		androidSystem.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
-		androidSystem.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
-
-		final Settings config = new Settings() ;
-		config.addInteger( "RENDERWIDTH", renderWidth ) ;
-		config.addInteger( "RENDERHEIGHT", renderHeight ) ;
-	}
-
 	@Override
 	public void onCreate( Bundle _savedInstance )
 	{
+		requestWindowFeature( Window.FEATURE_NO_TITLE ) ;
+		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
+									   WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		super.onCreate( _savedInstance ) ;
 
 		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
 		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
 									  audioManager.getStreamMaxVolume( AudioManager.STREAM_MUSIC ), 
 									  0 ) ;
-
-		if( fileSystemLoaded == false )
-		{
-			loadFileSystem() ;
-			init() ;
-			initActivity() ;
-			fileSystemLoaded = true ;
-		}
 	}
 
 	@Override
@@ -216,9 +140,9 @@ public class AndroidActivity extends Activity
 	{
 		super.onConfigurationChanged( _newConfig ) ;
 		// Update the render for new Screen Dimensions
-		androidSystem.setContentView() ;
-		androidSystem.addEvent( new Event( "REFRESH_STATE", null ) ) ;
-		initActivity() ;
+		//androidSystem.setContentView() ;
+		//androidSystem.addEvent( new Event( "REFRESH_STATE", null ) ) ;
+		//initActivity() ;
 	}
 
 	@Override
@@ -239,44 +163,39 @@ public class AndroidActivity extends Activity
 	@Override
 	public void passEvent( final Event _event )
 	{
-		androidSystem.addEvent( _event ) ;
+		starter.getAndroidSystem().addEvent( _event ) ;
 	}
 
 	private synchronized void startGameThread()
 	{
 		System.out.println( "Start Game Thread" ) ;
+		if( starter == null )
+		{
+			starter = new AndroidStarter( this ) ;
+		}
+
 		if( gameThread == null )
 		{
 			gameThread = new GameThread()
 			{
 				public void run() 
 				{
-					gameSystem.runSystem() ;
+					starter.init() ;
 				}
 			} ;
 
-			androidSystem.startSystem() ;
 			gameThread.start() ;
 		}
 	}
 	
 	private synchronized void stopGameThread()
 	{
-		if( gameThread != null )
+		/*if( gameThread != null )
 		{
-			androidSystem.stopSystem() ;
+			starter.getAndroidSystem().stopSystem() ;
 			gameThread.interrupt() ;
 			gameThread = null ;
-		}
-	}
-	
-	private void loadFileSystem()
-	{
-		final AndroidFileSystem fileSystem = new AndroidFileSystem() ;
-		GlobalFileSystem.setFileSystem( fileSystem ) ;
-		
-		fileSystem.init( this ) ;
-		fileSystem.scanBaseDirectory() ;
+		}*/
 	}
 
 	private boolean controlVolume( final int _keyCode )

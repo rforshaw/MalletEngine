@@ -1,5 +1,7 @@
 package com.linxonline.mallet.main.android ;
 
+import android.util.DisplayMetrics ;
+
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.main.StarterInterface ;
@@ -32,7 +34,6 @@ public class AndroidStarter extends StarterInterface
 
 	public AndroidStarter( final AndroidActivity _activity )
 	{
-		loadFileSystem( new AndroidFileSystem()  ) ;						// Ensure FileSystem is setup correctly.
 		backendSystem = new AndroidSystem( _activity ) ;
 		gameSystem = new GameSystem( backendSystem ) ;
 	}
@@ -40,6 +41,7 @@ public class AndroidStarter extends StarterInterface
 	@Override
 	public void init()
 	{
+		loadFileSystem( new AndroidFileSystem( ( ( AndroidSystem )backendSystem ).activity ) ) ;						// Ensure FileSystem is setup correctly.
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
 		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
 		setRenderSettings( backendSystem ) ;
@@ -92,7 +94,23 @@ public class AndroidStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
-		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
+		final DisplayMetrics display = new DisplayMetrics() ;
+		( ( AndroidSystem )backendSystem ).activity.getWindowManager().getDefaultDisplay().getMetrics( display ) ; 
+		final int width = display.widthPixels ;
+		final int height = display.heightPixels ;
+
+		final int renderWidth = width ;
+		final int renderHeight = height ;
+
+		_system.setDisplayDimensions( new Vector2( width, height ) ) ;
+		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
+		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+
+		final Settings config = new Settings() ;
+		config.addInteger( "RENDERWIDTH", renderWidth ) ;
+		config.addInteger( "RENDERHEIGHT", renderHeight ) ;
+
+		/*int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
@@ -100,9 +118,14 @@ public class AndroidStarter extends StarterInterface
 
 		_system.setDisplayDimensions( new Vector2( displayWidth, displayHeight ) ) ;
 		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
-		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;*/
 	}
-	
+
+	public SystemInterface getAndroidSystem()
+	{
+		return backendSystem ;
+	}
+
 	@Override
 	protected GameLoader getGameLoader()
 	{

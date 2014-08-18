@@ -17,6 +17,11 @@ public class AndroidFileSystem implements FileSystem
 	private HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
 	private static String ROOT_DIRECTORY = "base" ;
 
+	public AndroidFileSystem( final Context _context )
+	{
+		init( _context ) ;
+	}
+
 	public void init( final Context _context )
 	{
 		context = _context ;

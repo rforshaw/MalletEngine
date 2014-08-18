@@ -35,7 +35,7 @@ public class Android2DDraw
 		final Shape shape = _settings.getObject( "DRAWLINES", null ) ;
 		if( shape != null )
 		{
-			final int size = shape.indicies.length ;
+			final int size = shape.indicies.length - 1 ;
 			for( int i = 0; i < size; i += 2 )
 			{
 				final Vector2 start = shape.points[shape.indicies[i]] ;
