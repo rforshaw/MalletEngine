@@ -44,7 +44,7 @@ public class Android2DRenderer extends SurfaceView
 								final int _width, 
 								final int _height )
 	{
-		render.setRenderDimensions( _width, _height ) ;
+		//render.setRenderDimensions( _width, _height ) ;
 		render.setDisplayDimensions( _width, _height ) ;
 	}
 

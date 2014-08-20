@@ -25,6 +25,8 @@ public class Canvas2DRenderer extends Basic2DRender
 	private final Paint paint = new Paint() ;
 
 	private final Matrix scaleMatrix = new Matrix() ;
+	private final Rect rect = new Rect() ;
+	private final RectF rectF = new RectF() ;
 	private final SurfaceHolder holder ;
 	private Canvas canvas = null ;
 
@@ -81,40 +83,46 @@ public class Canvas2DRenderer extends Basic2DRender
 		{
 			public void draw( final Settings _settings, final Vector2 _position )
 			{
-				System.out.println( "DRAW TEXTURE" ) ;
 				setGraphicsColour( _settings ) ;
 				Texture<AndroidImage> texture = _settings.getObject( "TEXTURE", null ) ;
 				if( texture == null )
 				{
 					texture = loadTexture( _settings ) ;
-					if( texture == null )
-					{
-						System.out.println( "TEXTURE NOT FOUND" ) ;
-						return ;
-					}
-				}
-
-				scaleMatrix.reset() ;
-				final Vector2 scale = _settings.getObject( "SCALE", null ) ;
-				if( scale != null )
-				{
-					scaleMatrix.setScale( scale.x, scale.y ) ;
-				}
-
-				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
-				if( isGUI == true )
-				{
-					System.out.println( "GUI" ) ;
-					_position.subtract( pos ) ;
-					//scaleMatrix.setScale( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+					if( texture == null ) { return ; }
 				}
 
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
-				scaleMatrix.setTranslate( _position.x + offset.x, _position.y + offset.y ) ;
-				System.out.println( _position ) ;
+				float x = _position.x + offset.x ;
+				float y = _position.y + offset.y ;
+				float width = texture.getWidth() ;
+				float height = texture.getHeight() ;
+
+				Vector2 fillDim = _settings.getObject( "FILL", null ) ;
+				Vector2 dimension = _settings.getObject( "DIM", null ) ;
+				if( dimension != null )
+				{
+					width = dimension.x ;
+					height = dimension.y ;
+				}
+
+				/*final Vector2 scale = _settings.getObject( "SCALE", null ) ;
+				if( scale != null )
+				{
+					scaleMatrix.setScale( scale.x, scale.y ) ;
+				}*/
+
+				if( _settings.getBoolean( "GUI", false ) == true )
+				{
+					x -= pos.x ;
+					y -= pos.y ;
+					//scaleMatrix.setScale( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+				}
+
+				rect.set( 0, 0, ( int )width, ( int )height ) ;
+				rectF.set( x, y, x + width, y + height ) ;
 
 				final AndroidImage image = texture.getImage() ;
-				canvas.drawBitmap( image.bitmap, scaleMatrix, paint ) ;
+				canvas.drawBitmap( image.bitmap, rect, rectF, paint ) ;
 			}
 		} ;
 
@@ -215,9 +223,7 @@ public class Canvas2DRenderer extends Basic2DRender
 					++renderIter ;
 					drawDT = _dt ;
 
-					System.out.println( "START DRAW" ) ;
 					render( _dt ) ;
-					System.out.println( "END DRAW" ) ;
 				}
 			}
 		}
