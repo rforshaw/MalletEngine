@@ -94,8 +94,10 @@ public class Canvas2DRenderer extends Basic2DRender
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				float x = _position.x + offset.x ;
 				float y = _position.y + offset.y ;
+
 				float width = texture.getWidth() ;
 				float height = texture.getHeight() ;
+				rect.set( 0, 0, ( int )width, ( int )height ) ;
 
 				Vector2 fillDim = _settings.getObject( "FILL", null ) ;
 				Vector2 dimension = _settings.getObject( "DIM", null ) ;
@@ -118,7 +120,6 @@ public class Canvas2DRenderer extends Basic2DRender
 					//scaleMatrix.setScale( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
 				}
 
-				rect.set( 0, 0, ( int )width, ( int )height ) ;
 				rectF.set( x, y, x + width, y + height ) ;
 
 				final AndroidImage image = texture.getImage() ;
