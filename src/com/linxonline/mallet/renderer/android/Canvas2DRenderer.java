@@ -241,7 +241,6 @@ public class Canvas2DRenderer extends Basic2DRender
 	{
 		scaleMatrix.reset() ;
 
-		cameraPosition  = renderInfo.getCameraPosition() ;
 		renderScaleSize = renderInfo.getScaledRenderDimensions() ;
 		renderRatio     = renderInfo.getScaleRenderToDisplay() ;
 		screenOffset    = renderInfo.getScreenOffset() ;

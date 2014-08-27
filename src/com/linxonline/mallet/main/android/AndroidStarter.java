@@ -94,13 +94,13 @@ public class AndroidStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
-		/*final DisplayMetrics display = new DisplayMetrics() ;
+		final DisplayMetrics display = new DisplayMetrics() ;
 		( ( AndroidSystem )backendSystem ).activity.getWindowManager().getDefaultDisplay().getMetrics( display ) ; 
 		final int width = display.widthPixels ;
 		final int height = display.heightPixels ;
 
-		final int renderWidth = 800 ;//width ;
-		final int renderHeight = 600 ;//height ;
+		final int renderWidth = width ;
+		final int renderHeight = height ;
 
 		_system.setDisplayDimensions( new Vector2( width, height ) ) ;
 		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
@@ -108,9 +108,9 @@ public class AndroidStarter extends StarterInterface
 
 		final Settings config = new Settings() ;
 		config.addInteger( "RENDERWIDTH", renderWidth ) ;
-		config.addInteger( "RENDERHEIGHT", renderHeight ) ;*/
+		config.addInteger( "RENDERHEIGHT", renderHeight ) ;
 
-		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
+		/*int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
@@ -118,7 +118,7 @@ public class AndroidStarter extends StarterInterface
 
 		_system.setDisplayDimensions( new Vector2( displayWidth, displayHeight ) ) ;
 		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
-		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;*/
 	}
 
 	public SystemInterface getAndroidSystem()
