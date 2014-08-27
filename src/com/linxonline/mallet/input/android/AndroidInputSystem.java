@@ -26,6 +26,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 			return ;
 		}
 
+		_handler.setInputAdapterInterface( inputAdapter ) ;
 		handlers.add( _handler ) ;
 	}
 
@@ -115,11 +116,13 @@ public class AndroidInputSystem implements InputSystemInterface,
 		synchronized( touchInputs )
 		{
 			final int sizeInput = touchInputs.size() ;
+			//System.out.println( "Inputs: " + sizeInput ) ;
 			for( int i = 0; i < sizeInput; ++i )
 			{
 				event = touchInputs.get( i ) ;
 				for( int j = 0; j < sizeHandlers; ++j )
 				{
+					System.out.println( event ) ;
 					handler = handlers.get( j ) ;
 					handler.passInputEvent( event ) ;
 				}

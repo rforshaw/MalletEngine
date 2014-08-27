@@ -83,4 +83,28 @@ public final class InputEvent implements Cacheable
 		mouseX = 0 ;
 		mouseY = 0 ;
 	}
+
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( '[' ) ;
+		buffer.append( inputType ) ;
+		switch( inputType )
+		{
+			case KEYBOARD_RELEASED :
+			case KEYBOARD_PRESSED  :
+			{
+				buffer.append( "KeyCode: " + keycode ) ;
+				break ;
+			}
+			default :
+			{
+				buffer.append( " X: " + mouseX ) ;
+				buffer.append( " Y: " + mouseY ) ;
+				break ;
+			}
+		}
+		buffer.append( ']' ) ;
+		return buffer.toString() ;
+	}
 }
