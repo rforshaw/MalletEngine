@@ -255,6 +255,15 @@ public final class Settings
 		return list ;
 	}
 
+	/**
+		Return an array of keys used within
+		the Settings object.
+	*/
+	public final String[] keys()
+	{
+		return ( String[] )variables.keySet().toArray() ;
+	}
+
 	public final String toString()
 	{
 		final ArrayList<String> strings = toArrayString() ;
