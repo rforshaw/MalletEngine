@@ -261,7 +261,7 @@ public final class Settings
 	*/
 	public final String[] keys()
 	{
-		return ( String[] )variables.keySet().toArray() ;
+		return variables.keySet().toArray( new String[0] ) ;
 	}
 
 	public final String toString()

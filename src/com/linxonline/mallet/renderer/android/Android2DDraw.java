@@ -35,16 +35,40 @@ public class Android2DDraw
 		final Shape shape = _settings.getObject( "DRAWLINES", null ) ;
 		if( shape != null )
 		{
-			final int size = shape.indicies.length - 1 ;
-			for( int i = 0; i < size; i += 2 )
-			{
-				final Vector2 start = shape.points[shape.indicies[i]] ;
-				final Vector2 end = shape.points[shape.indicies[i + 1]] ;
+			final int indexSize = shape.indicies.length ;
+			final int pointSize = shape.points.length ;
 
-				_canvas.drawLine( start.x + _position.x,
-									start.y + _position.y,
-									end.x + _position.x,
-									end.y + _position.y, _paint ) ;
+			switch( shape.style )
+			{
+				case LINES :
+				{
+					for( int i = 0; i < indexSize; i += 2 )
+					{
+						final Vector2 start = shape.points[shape.indicies[i]] ;
+						final Vector2 end = shape.points[shape.indicies[i + 1]] ;
+
+						_canvas.drawLine( start.x + _position.x,
+											start.y + _position.y,
+											end.x + _position.x,
+											end.y + _position.y, _paint ) ;
+					}
+					break ;
+				}
+				case LINE_STRIP :
+				{
+					Vector2 first = shape.points[shape.indicies[0]] ;
+					for( int i = 1; i < indexSize; i++ )
+					{
+						final Vector2 next = shape.points[shape.indicies[i]] ;
+
+						_canvas.drawLine( first.x + _position.x,
+											first.y + _position.y,
+											next.x + _position.x,
+											next.y + _position.y, _paint ) ;
+						first = next ;
+					}
+					break ;
+				}
 			}
 		}
 	}
