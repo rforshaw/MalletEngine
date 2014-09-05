@@ -107,17 +107,10 @@ public class Canvas2DRenderer extends Basic2DRender
 					height = dimension.y ;
 				}
 
-				/*final Vector2 scale = _settings.getObject( "SCALE", null ) ;
-				if( scale != null )
-				{
-					scaleMatrix.setScale( scale.x, scale.y ) ;
-				}*/
-
 				if( _settings.getBoolean( "GUI", false ) == true )
 				{
 					x -= pos.x ;
 					y -= pos.y ;
-					//scaleMatrix.setScale( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
 				}
 
 				rectF.set( x, y, x + width, y + height ) ;
@@ -201,6 +194,7 @@ public class Canvas2DRenderer extends Basic2DRender
 	public void updateState( final float _dt )
 	{
 		super.updateState( _dt ) ;
+		cameraPosition = renderInfo.getCameraPosition() ;
 		oldCameraPosition.setXYZ( cameraPosition ) ;
 	}
 

@@ -4,8 +4,16 @@ public class GameThread extends Thread
 {
 	private boolean started = false ;
 
-	public GameThread() {}
-	
+	public GameThread()
+	{
+		super() ;
+	}
+
+	public GameThread( final String _name )
+	{
+		super( _name ) ;
+	}
+
 	@Override
 	public void start()
 	{

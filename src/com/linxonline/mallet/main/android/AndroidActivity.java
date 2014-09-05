@@ -36,8 +36,7 @@ public class AndroidActivity extends Activity
 {
 	private ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
 	protected AndroidStarter starter ;
-	protected GameThread gameThread = null ;
-	protected boolean fileSystemLoaded = false ;
+	protected Thread gameThread = null ;
 
 	public AndroidActivity()
 	{
@@ -56,11 +55,19 @@ public class AndroidActivity extends Activity
 		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
 									  audioManager.getStreamMaxVolume( AudioManager.STREAM_MUSIC ), 
 									  0 ) ;
+
+		if( starter == null )
+		{
+			System.out.println( "INIT ANDROID STARTER" ) ;
+			starter = new AndroidStarter( this ) ;
+			starter.init() ;
+		}
 	}
 
 	@Override
 	public void onResume()
 	{
+		System.out.println( "onResume()" ) ;
 		super.onResume() ;
 		startGameThread() ;
 	}
@@ -68,17 +75,18 @@ public class AndroidActivity extends Activity
 	@Override
 	public void onPause()
 	{
+		System.out.println( "onPause()" ) ;
 		super.onPause() ;
 		stopGameThread() ;
 	}
 
-	@Override
-	public void onStop()
+	public void onDestroy()
 	{
-		super.onStop() ;
-		stopGameThread() ;
+		System.out.println( "onDestroy()" ) ;
+		super.onDestroy() ;
+		//starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
-
+	
 	public void addAndroidInputListener( AndroidInputListener _listener )
 	{
 		if( containsInputListener( _listener ) == true )
@@ -139,10 +147,8 @@ public class AndroidActivity extends Activity
 	public void onConfigurationChanged( Configuration _newConfig )
 	{
 		super.onConfigurationChanged( _newConfig ) ;
-		// Update the render for new Screen Dimensions
-		//androidSystem.setContentView() ;
-		//androidSystem.addEvent( new Event( "REFRESH_STATE", null ) ) ;
-		//initActivity() ;
+		final AndroidSystem system = ( AndroidSystem )starter.getAndroidSystem() ;
+		system.setContentView() ;	// Update the render for new Screen Dimensions
 	}
 
 	@Override
@@ -168,34 +174,32 @@ public class AndroidActivity extends Activity
 
 	private synchronized void startGameThread()
 	{
-		System.out.println( "Start Game Thread" ) ;
-		if( starter == null )
-		{
-			starter = new AndroidStarter( this ) ;
-		}
-
 		if( gameThread == null )
 		{
-			gameThread = new GameThread()
+			gameThread = new Thread( "GAME THREAD" )
 			{
 				public void run() 
 				{
-					starter.init() ;
+					starter.getAndroidSystem().startSystem() ;
+					starter.run() ;
 				}
 			} ;
-
+			
+			System.out.println( "Starting Game Thread" ) ;
 			gameThread.start() ;
 		}
 	}
 	
 	private synchronized void stopGameThread()
 	{
-		/*if( gameThread != null )
+		if( gameThread != null )
 		{
-			starter.getAndroidSystem().stopSystem() ;
+			System.out.println( "Stopping Game Thread" ) ;
+			starter.stop() ;
+
 			gameThread.interrupt() ;
 			gameThread = null ;
-		}*/
+		}
 	}
 
 	private boolean controlVolume( final int _keyCode )

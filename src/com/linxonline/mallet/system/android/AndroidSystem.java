@@ -31,6 +31,8 @@ public class AndroidSystem implements SystemInterface
 	protected final AndroidAudioGenerator audioGenerator = new AndroidAudioGenerator() ;
 	protected final Android2DRenderer renderer ;
 
+	protected boolean execution = true ;
+
 	public AndroidSystem( final AndroidActivity _activity )
 	{
 		activity = _activity ;
@@ -68,7 +70,7 @@ public class AndroidSystem implements SystemInterface
 	@Override
 	public synchronized void shutdownSystem()
 	{
-		//activity.finished() ;
+		activity.finish() ;
 		audioGenerator.shutdownGenerator() ;
 		renderer.shutdown() ;
 	}
@@ -144,7 +146,7 @@ public class AndroidSystem implements SystemInterface
 
 		eventSystem.update() ;
 
-		return true ;	// Informs the Game System whether to continue updating or not.
+		return true ;		// Update - called by Game State, return variable not used.
 	}
 
 	@Override

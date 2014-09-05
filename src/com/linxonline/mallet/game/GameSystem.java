@@ -10,6 +10,7 @@ public final class GameSystem
 {
 	private SystemInterface system = null ;
 	private final StateMachine stateMachine = new StateMachine() ;
+	private boolean running = false ;
 
 	public GameSystem() {}
 
@@ -20,8 +21,8 @@ public final class GameSystem
 
 	public final void runSystem()
 	{
-		double dt = 0.0f ;
-		boolean running = true ;
+		double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
+		running = true ;
 
 		while( running == true )
 		{
@@ -30,10 +31,15 @@ public final class GameSystem
 		}
 	}
 
+	public void stopSystem()
+	{
+		running = false ;
+	}
+
 	public boolean update( final double _dt )
 	{
 		stateMachine.update( _dt ) ;					// Update Game State
-		return true ;
+		return running ;
 	}
 
 	public final void addGameState( final GameState _state )

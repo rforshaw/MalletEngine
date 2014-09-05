@@ -52,10 +52,18 @@ public class AndroidStarter extends StarterInterface
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
+	}
 
+	public void run()
+	{
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
-		backendSystem.shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
+		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
+	}
+
+	public void stop()
+	{
+		gameSystem.stopSystem() ;
 	}
 
 	@Override
