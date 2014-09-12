@@ -16,6 +16,9 @@ public final class CollisionCheck
 	private static final Vector2 axis = new Vector2() ;
 	private static final ArrayList<Vector2> axes = new ArrayList<Vector2>() ;
 
+	private static final Vector2 boxCenter1 = new Vector2() ;
+	private static final Vector2 boxCenter2 = new Vector2() ;
+
 	public static final void generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
 		axes.clear() ;
@@ -32,11 +35,11 @@ public final class CollisionCheck
 			axes.add( axes2[i] ) ;
 		}
 
-		final Vector2 bC1 = _box1.getAbsoluteCenter() ;
-		final Vector2 bC2 = _box2.getAbsoluteCenter() ;
+		_box1.getAbsoluteCenter( boxCenter1 ) ;
+		_box2.getAbsoluteCenter( boxCenter2 ) ;
 
-		toCenter.x = bC2.x - bC1.x ;
-		toCenter.y = bC2.y - bC1.y ;
+		toCenter.x = boxCenter2.x - boxCenter1.x ;
+		toCenter.y = boxCenter2.y - boxCenter1.y ;
 
 		int index = 0 ;
 		int size = axes.size() ;
@@ -48,6 +51,7 @@ public final class CollisionCheck
 			if( result < 0.0f )
 			{
 				//System.out.println( "Failed SATs: " + result ) ;
+				axes.clear() ;
 				return ;
 			}
 			else if( result < bestOverlap )
@@ -66,6 +70,7 @@ public final class CollisionCheck
 			axis.y *= -1.0f ;
 		}
 
+		axes.clear() ;
 		bestOverlap *= 0.5f ;
 		_box1.contactData.addContact( bestOverlap, axis.x, axis.y, 
 									  ( _box1.isPhysical() && _box2.isPhysical() ),

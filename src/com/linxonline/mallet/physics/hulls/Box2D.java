@@ -37,9 +37,9 @@ public class Box2D extends Hull
 	}
 
 	@Override
-	public Vector2 getAbsoluteCenter()
+	public void getAbsoluteCenter( final Vector2 _center )
 	{
-		return aabb.getAbsoluteCenter() ;
+		aabb.getAbsoluteCenter( _center ) ;
 	}
 
 	@Override

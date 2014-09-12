@@ -30,9 +30,9 @@ public class Circle2D extends Hull
 	}
 
 	@Override
-	public Vector2 getAbsoluteCenter()
+	public void getAbsoluteCenter( final Vector2 _center )
 	{
-		return new Vector2() ;
+		_center.setXY( 0.0f, 0.0f ) ;
 	}
 
 	@Override

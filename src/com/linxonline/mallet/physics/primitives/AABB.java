@@ -4,6 +4,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 
 public final class AABB
 {
+	private final Vector2 absoluteCenter = new Vector2() ;
 	public final Vector2 position = new Vector2() ;
 	public final Vector2 offset = new Vector2() ;
 
@@ -123,11 +124,11 @@ public final class AABB
 		return false ;
 	}
 
-	public Vector2 getAbsoluteCenter()
+	public void getAbsoluteCenter( final Vector2 _center )
 	{
 		final float centerX = ( max.x + min.x ) * 0.5f ;
 		final float centerY = ( max.y + min.y ) * 0.5f ;
-		return new Vector2( position.x + offset.x + centerX, position.y + offset.y + centerY ) ;
+		_center.setXY( position.x + offset.x + centerX, position.y + offset.y + centerY ) ;
 	}
 
 	public String toString()
