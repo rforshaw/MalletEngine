@@ -27,6 +27,10 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 
+import com.linxonline.mallet.physics.hulls.Box2D ;
+import com.linxonline.mallet.physics.primitives.AABB ;
+
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 
@@ -193,7 +197,14 @@ public final class GameTestLoader extends GameLoader
 				image.addString( "OFFSET", "-32, -32" ) ;
 
 				final ImageCreator creator = new ImageCreator() ;
-				addEntity( creator.create( image ) ) ;
+				final Entity entity = creator.create( image ) ;
+
+				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
+																	   new Vector2( 64, 64 ),
+																	   new Vector2( 100, 0 ),
+																	   new Vector2( -32, -32 ) ) ) ;
+
+				addEntity( entity ) ;
 			}
 
 			/**
@@ -207,7 +218,14 @@ public final class GameTestLoader extends GameLoader
 				mouse.addObject( "OFFSET", new Vector2( -16, -16 ) ) ;
 
 				final AnimMouseCreator creator = new AnimMouseCreator() ;
-				addEntity( creator.create( mouse ) ) ;
+				final Entity entity = creator.create( mouse ) ;
+
+				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
+																	   new Vector2( 32, 32 ),
+																	   new Vector2( 0, 0 ),
+																	   new Vector2( -16, -16 ) ) ) ;
+
+				addEntity( entity ) ;
 			}
 		} ) ;
 

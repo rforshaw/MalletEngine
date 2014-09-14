@@ -77,12 +77,12 @@ public class GLDefaultSystem implements SystemInterface
 		final String[] eventTypes = { "DISPLAY_SYSTEM_MOUSE", "SYSTEM_RENDER" } ;
 		eventController.setWantedEventTypes( eventTypes ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
+		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
 		{
 			@Override
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<Boolean> _event )
 			{
-				final boolean displayMouse = ( Boolean )_event.getVariable() ;
+				final boolean displayMouse = _event.getVariable() ;
 				frame.getContentPane().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) ) ;
 				if( displayMouse == false )
 				{
@@ -94,14 +94,14 @@ public class GLDefaultSystem implements SystemInterface
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "SYSTEM_RENDER", "SYSTEM_RENDER" )
+		/*eventController.addEventProcessor( new EventProcessor<?>( "SYSTEM_RENDER", "SYSTEM_RENDER" )
 		{
 			@Override
 			public void processEvent( final Event<?> _event )
 			{
 				System.out.println( "Handle Render" ) ;
 			}
-		} ) ;
+		} ) ;*/
 
 		addEventHandler( eventController ) ;
 	}

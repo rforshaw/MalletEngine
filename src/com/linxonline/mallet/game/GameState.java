@@ -386,61 +386,61 @@ public class GameState extends State implements HookEntity
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT" )
 		{
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<InputHandler> _event )
 			{
 				if( _event.isEventByString( "ADD_GAME_STATE_INPUT" ) == true )
 				{
-					inputSystem.addInputHandler( ( InputHandler )_event.getVariable() ) ;
+					inputSystem.addInputHandler( _event.getVariable() ) ;
 				}
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "REMOVE_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT" )
 		{
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<InputHandler> _event )
 			{
 				if( _event.isEventByString( "REMOVE_GAME_STATE_INPUT" ) == true )
 				{
-					inputSystem.removeInputHandler( ( InputHandler )_event.getVariable() ) ;
+					inputSystem.removeInputHandler( _event.getVariable() ) ;
 				}
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_EVENT" )
+		eventController.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT" )
 		{
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<EventController> _event )
 			{
 				if( _event.isEventByString( "ADD_GAME_STATE_EVENT" ) == true )
 				{
-					final EventController controller = ( EventController )_event.getVariable() ;
+					final EventController controller = _event.getVariable() ;
 					controller.setAddEventInterface( eventSystem ) ;
 					eventSystem.addEventHandler( controller ) ;
 				}
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor( "REMOVE_GAME_STATE_EVENT" )
+		eventController.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT" )
 		{
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<EventController> _event )
 			{
 				if( _event.isEventByString( "REMOVE_GAME_STATE_EVENT" ) == true )
 				{
-					final EventController controller = ( EventController )_event.getVariable() ;
+					final EventController controller = _event.getVariable() ;
 					controller.setAddEventInterface( null ) ;
 					eventSystem.removeEventHandler( controller ) ;
 				}
 			}
 		} ) ;
 		
-		eventController.addEventProcessor( new EventProcessor( "ADD_GAME_STATE_QUERY" )
+		eventController.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY" )
 		{
-			public void processEvent( final Event<?> _event )
+			public void processEvent( final Event<QueryComponent> _event )
 			{
 				if( _event.isEventByString( "ADD_GAME_STATE_QUERY" ) == true )
 				{
-					final QueryComponent query = ( QueryComponent )_event.getVariable() ;
+					final QueryComponent query = _event.getVariable() ;
 					query.setSearch( entitySystem.getSearch() ) ;
 				}
 			}

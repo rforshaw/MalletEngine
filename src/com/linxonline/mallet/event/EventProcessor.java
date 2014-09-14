@@ -3,17 +3,17 @@ package com.linxonline.mallet.event ;
 /**
 	Used by the Event Controller to allow the developer to 
 	effectively process the Event stream.
-	It's aim is to allow the developer to split-up event tasks 
+	Its aim is to allow the developer to split-up event tasks 
 	into smaller more managable groups.
 */
-public abstract class EventProcessor
+public abstract class EventProcessor<T>
 {
 	private final String name ;			// Event Processor name, for easy identification
 	private final EventType type ;		// Only process events that match this Event Type
 
 	public EventProcessor()
 	{
-		name = "NONE" ;
+		name = "UNKNOWN" ;
 		type = null ;
 	}
 
@@ -29,7 +29,14 @@ public abstract class EventProcessor
 		type = EventType.get( _type ) ;
 	}
 
-	public void passEvent( final Event<?> _event )
+	public EventProcessor( final String _name, final EventType _type )
+	{
+		assert _type != null ;
+		name = _name ;
+		type = _type ;
+	}
+
+	public void passEvent( final Event<T> _event )
 	{
 		if( isInterested( _event ) == true )
 		{
@@ -37,16 +44,20 @@ public abstract class EventProcessor
 		}
 	}
 
-	public abstract void processEvent( final Event<?> _event ) ;
+	public abstract void processEvent( final Event<T> _event ) ;
 
-	private boolean isInterested( final Event<?> _event )
+	/**
+		Check to see if the event passed in is of interest
+		to the EventProcessor.
+	*/
+	private boolean isInterested( final Event<T> _event )
 	{
 		if( type != null )
 		{
 			return _event.isEventByType( type ) ;
 		}
 
-		return true ;		// If type not set, assumme interested in all
+		return true ;		// Accepts all Events being passed to it
 	}
 
 	public String getName()
