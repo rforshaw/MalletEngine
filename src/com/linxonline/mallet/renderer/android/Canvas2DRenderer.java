@@ -308,7 +308,19 @@ public class Canvas2DRenderer extends Basic2DRender
 
 		if( position != null )
 		{
-			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			final RenderData data = new RenderData( numID++, DrawRequestType.TEXTURE, _draw, position, layer )
+			{
+				@Override
+				public void unregisterResources()
+				{
+					final Texture texture = drawData.getObject( "TEXTURE", null ) ;
+					if( texture != null )
+					{
+						texture.unregister() ;
+					}
+				}
+			} ;
+
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			data.drawCall = drawTexture ;
 			insert( data ) ;

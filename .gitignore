@@ -6,3 +6,5 @@ libs/*
 *.jar
 *.class
 *.apk
+*.png
+*.svg
