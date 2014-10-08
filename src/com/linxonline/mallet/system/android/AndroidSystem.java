@@ -106,25 +106,8 @@ public class AndroidSystem implements SystemInterface
 	{
 		eventSystem.removeEventHandler( _handler ) ;
 	}
-	
+
 	/*RENDER*/
-	@Override
-	public void setCameraPosition( Vector3 _camera )
-	{
-		renderer.setCameraPosition( _camera ) ;
-	}
-
-	@Override
-	public void setDisplayDimensions( Vector2 _display )
-	{
-		renderer.setDisplayDimensions( ( int )_display.x, ( int )_display.y ) ;
-	}
-
-	@Override
-	public void setRenderDimensions( Vector2 _render )
-	{
-		renderer.setRenderDimensions( ( int )_render.x, ( int )_render.y ) ;
-	}
 
 	@Override
 	public RenderInterface getRenderInterface()
@@ -136,6 +119,19 @@ public class AndroidSystem implements SystemInterface
 	public AudioGenerator getAudioGenerator()
 	{
 		return audioGenerator ;
+	}
+
+	@Override
+	public void sleep( final long _millis )
+	{
+		try
+		{
+			Thread.sleep( _millis ) ;
+		}
+		catch( InterruptedException ex )
+		{
+			ex.printStackTrace() ;
+		}
 	}
 
 	@Override

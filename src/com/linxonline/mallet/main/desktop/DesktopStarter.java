@@ -10,6 +10,8 @@ import com.linxonline.mallet.game.GameLoader ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.RenderInterface ;
+
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
@@ -115,8 +117,10 @@ public abstract class DesktopStarter extends StarterInterface
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
 
-		_system.setDisplayDimensions( new Vector2( displayWidth, displayHeight ) ) ;
-		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
-		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+		final RenderInterface render = _system.getRenderInterface() ;
+		render.setDisplayDimensions( displayWidth, displayHeight ) ;
+		render.setRenderDimensions( renderWidth, renderHeight ) ;
+
+		render.setCameraPosition( new Vector3() ) ;
 	}
 }

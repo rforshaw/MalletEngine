@@ -142,6 +142,18 @@ public class DefaultSystem implements SystemInterface
 		return true ;
 	}
 
+	public void sleep( final long _millis )
+	{
+		try
+		{
+			Thread.sleep( _millis ) ;
+		}
+		catch( InterruptedException ex )
+		{
+			ex.printStackTrace() ;
+		}
+	}
+
 	public void draw( final float _dt )
 	{
 		renderer.draw( _dt ) ;

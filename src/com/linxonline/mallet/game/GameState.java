@@ -35,6 +35,7 @@ public class GameState extends State implements HookEntity
 	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
+	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
 
 	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
 
@@ -314,7 +315,7 @@ public class GameState extends State implements HookEntity
 			@Override
 			public void update( final double _dt )
 			{
-				// Update Default : 120Hz
+				// Update Default : 15Hz
 				updateAccumulator += _dt ;
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
@@ -350,35 +351,37 @@ public class GameState extends State implements HookEntity
 			@Override
 			public void update( final double _dt )
 			{
-				boolean hasInput = inputSystem.hasInputs() ;
-				boolean hasEvents = eventSystem.hasEvents() ;
-				if( ( hasInput == false ) && ( hasEvents == false ) )
+				final boolean hasInput = inputSystem.hasInputs() ;
+				final boolean hasEvents = eventSystem.hasEvents() ;
+				if( hasInput == false && hasEvents == false )
 				{
-					Locks.getLocks().getLock( "APPLICATION_LOCK" ).lock() ;
-					hasInput = inputSystem.hasInputs() ;
-					hasEvents = eventSystem.hasEvents() ;
+					system.sleep( DEFAULT_SLEEP ) ;
 				}
 
-				// Update as fast as the computer can manage.
-				system.update( DEFAULT_TIMESTEP ) ;
-				inputSystem.update() ;
-				eventSystem.update() ;
-
-				// Update Default : 120Hz
+				// Update Default : 15Hz
 				updateAccumulator += _dt ;
-				if( hasEvents == true || hasInput == true || draw == true )
+				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					//System.out.println( 1.0f / updateAccumulator ) ;
-					final float dt = ( float )updateAccumulator ;
+					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
+					inputSystem.update() ;
+					eventSystem.update() ;
+
 					eventController.update() ;
 
-					audioSystem.update( dt ) ;
-					collisionSystem.update( dt ) ;
-					entitySystem.update( dt ) ;
-					updateAccumulator = 0.0f ;
+					collisionSystem.update( DEFAULT_TIMESTEP ) ;
+					entitySystem.update( DEFAULT_TIMESTEP ) ;
+					audioSystem.update( DEFAULT_TIMESTEP ) ;
+					updateAccumulator -= DEFAULT_TIMESTEP ;
+				}
 
-					system.draw( 0.0f ) ;
-					draw = false ;
+				// Render Default : 60Hz
+				renderAccumulator += _dt ;
+				if( renderAccumulator > DEFAULT_FRAMERATE )
+				{
+					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
+					animationSystem.update( DEFAULT_FRAMERATE ) ;
+					system.draw( DEFAULT_FRAMERATE ) ;
+					renderAccumulator = 0.0f ;
 				}
 			}
 		} ;
@@ -386,63 +389,48 @@ public class GameState extends State implements HookEntity
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
-				if( _event.isEventByString( "ADD_GAME_STATE_INPUT" ) == true )
-				{
-					inputSystem.addInputHandler( _event.getVariable() ) ;
-				}
+				inputSystem.addInputHandler( _event.getVariable() ) ;
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
-				if( _event.isEventByString( "REMOVE_GAME_STATE_INPUT" ) == true )
-				{
-					inputSystem.removeInputHandler( _event.getVariable() ) ;
-				}
+				inputSystem.removeInputHandler( _event.getVariable() ) ;
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT" )
+		eventController.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT", "ADD_GAME_STATE_EVENT" )
 		{
 			public void processEvent( final Event<EventController> _event )
 			{
-				if( _event.isEventByString( "ADD_GAME_STATE_EVENT" ) == true )
-				{
-					final EventController controller = _event.getVariable() ;
-					controller.setAddEventInterface( eventSystem ) ;
-					eventSystem.addEventHandler( controller ) ;
-				}
+				final EventController controller = _event.getVariable() ;
+				controller.setAddEventInterface( eventSystem ) ;
+				eventSystem.addEventHandler( controller ) ;
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT" )
+		eventController.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT", "REMOVE_GAME_STATE_EVENT" )
 		{
 			public void processEvent( final Event<EventController> _event )
 			{
-				if( _event.isEventByString( "REMOVE_GAME_STATE_EVENT" ) == true )
-				{
-					final EventController controller = _event.getVariable() ;
-					controller.setAddEventInterface( null ) ;
-					eventSystem.removeEventHandler( controller ) ;
-				}
+				final EventController controller = _event.getVariable() ;
+				controller.setAddEventInterface( null ) ;
+				eventSystem.removeEventHandler( controller ) ;
 			}
 		} ) ;
 		
-		eventController.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY" )
+		eventController.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY", "ADD_GAME_STATE_QUERY" )
 		{
 			public void processEvent( final Event<QueryComponent> _event )
 			{
-				if( _event.isEventByString( "ADD_GAME_STATE_QUERY" ) == true )
-				{
-					final QueryComponent query = _event.getVariable() ;
-					query.setSearch( entitySystem.getSearch() ) ;
-				}
+				final QueryComponent query = _event.getVariable() ;
+				query.setSearch( entitySystem.getSearch() ) ;
 			}
 		} ) ;
 	}

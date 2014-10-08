@@ -13,6 +13,8 @@ import com.linxonline.mallet.game.test.GameTestLoader ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.RenderInterface ;
+
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
@@ -110,9 +112,11 @@ public class AndroidStarter extends StarterInterface
 		final int renderWidth = width ;
 		final int renderHeight = height ;
 
-		_system.setDisplayDimensions( new Vector2( width, height ) ) ;
-		_system.setRenderDimensions( new Vector2( renderWidth, renderHeight ) ) ;
-		_system.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
+		final RenderInterface render = _system.getRenderInterface() ;
+		render.setDisplayDimensions( width, height ) ;
+		render.setRenderDimensions( renderWidth, renderHeight ) ;
+
+		render.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 
 		final Settings config = new Settings() ;
 		config.addInteger( "RENDERWIDTH", renderWidth ) ;

@@ -1,5 +1,7 @@
 package com.linxonline.mallet.game.test ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.CameraFactory ;
@@ -30,6 +32,7 @@ import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
+import com.linxonline.mallet.event.* ;
 
 /**
 	Example on how to implement the Game Loader class.

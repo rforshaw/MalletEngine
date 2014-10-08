@@ -81,7 +81,7 @@ public class MainPanel extends JPanel
 				if( cell != null )
 				{
 					final Entity entity = cell.getEntity() ;
-					eventController.passEvent( new Event( EditorState.EVENT_TYPES[4], entity ) ) ;
+					eventController.passEvent( new Event( "REMOVE_ENTITY", entity ) ) ;
 					defaultList.remove( index ) ;
 				}
 			}
@@ -150,7 +150,7 @@ public class MainPanel extends JPanel
 					case JFileChooser.APPROVE_OPTION :
 					{
 						final File file = chooser.getSelectedFile() ;
-						eventController.passEvent( new Event( EditorState.EVENT_TYPES[0], file.getAbsolutePath() ) ) ;
+						eventController.passEvent( new Event( "OPEN_FILE", file.getAbsolutePath() ) ) ;
 					}
 				}
 			}
@@ -161,7 +161,7 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				eventController.passEvent( new Event( EditorState.EVENT_TYPES[1], null ) ) ;
+				eventController.passEvent( new Event( "IMPORT_FILE", null ) ) ;
 			}
 		} ) ;
 		
@@ -170,7 +170,7 @@ public class MainPanel extends JPanel
 		{
 			public void actionPerformed( ActionEvent _event )
 			{
-				eventController.passEvent( new Event( EditorState.EVENT_TYPES[2], null ) ) ;
+				eventController.passEvent( new Event( "SAVE_FILE", null ) ) ;
 			}
 		} ) ;
 

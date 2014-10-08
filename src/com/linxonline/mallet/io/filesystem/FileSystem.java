@@ -55,4 +55,9 @@ public interface FileSystem
 
 	public boolean isFile( final String _file ) ;
 	public boolean isDirectory( final String _path ) ;
+
+	/**
+		Returns the filesize in bytes.
+	*/
+	public long getFileSize( final String _path ) ;
 }

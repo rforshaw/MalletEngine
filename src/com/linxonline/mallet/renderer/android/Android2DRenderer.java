@@ -61,6 +61,12 @@ public class Android2DRenderer extends SurfaceView
 	}
 
 	@Override
+	public void initFontAssist()
+	{
+		render.initFontAssist() ;
+	}
+
+	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
 		render.setRenderDimensions( _width, _height ) ;

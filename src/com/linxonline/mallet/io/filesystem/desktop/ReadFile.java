@@ -18,8 +18,10 @@ public class ReadFile
 		{
 			final File file = new File( _path ) ;
 			final FileInputStream is = new FileInputStream( file ) ;
+
 			final byte[] stream = read( is, 0, ( int )file.length() ) ;
 			is.close() ;
+
 			return stream ;
 		}
 		catch( IOException ex )
@@ -40,7 +42,7 @@ public class ReadFile
 
 	public static boolean getRaw( final String _path, final int _length, final ResourceCallback _callback )
 	{
-		RawThread thread = new RawThread( _path, _length, _callback ) ;
+		final RawThread thread = new RawThread( _path, _length, _callback ) ;
 		thread.start() ;
 		return true ;
 	}
@@ -94,23 +96,30 @@ public class ReadFile
 
 		private void batchRead()
 		{
+			callback.start( new File( path ).length() ) ;
 			callback.resourceRaw( ReadFile.getRaw( path ) ) ;
 			callback.end() ;
 		}
-		
+
 		private void iterativeRead()
 		{
 			try
 			{
 				final File file = new File( path ) ;
-				final int fileLength = ( int )file.length() ;
+				final long len = file.length() ;
+				callback.start( len ) ;
 
+				final int fileLength = ( int )len ;
 				final FileInputStream is = new FileInputStream( file ) ;
 				int offset = 0 ;
 
 				while( offset < fileLength )
 				{
-					callback.resourceRaw( read( is, offset, length ) ) ;
+					if( callback.resourceRaw( read( is, offset, length ) ) == false )
+					{
+						break ;
+					}
+
 					offset += length ;
 				}
 				is.close() ;
@@ -151,6 +160,7 @@ public class ReadFile
 
 		private void batchRead()
 		{
+			callback.start( new File( file ).length() ) ;
 			callback.resourceAsString( ReadFile.getString( file ) ) ;
 			callback.end() ;
 		}
@@ -162,6 +172,7 @@ public class ReadFile
 
 			try
 			{
+				callback.start( new File( file ).length() ) ;
 				final FileInputStream is = new FileInputStream( file ) ;
 				final InputStreamReader isr = new InputStreamReader( is ) ;
 				final BufferedReader br = new BufferedReader( isr ) ;
@@ -171,7 +182,11 @@ public class ReadFile
 				{
 					if( i >= strings.length )
 					{
-						sendStringsToCallback( strings, callback ) ;	// Send strings when limit is reached
+						if( sendStringsToCallback( strings, callback ) == false )		// Send strings when limit is reached
+						{
+							break ;		// User wants to stop reading, so stop
+						}
+
 						nullStrings( strings ) ;
 						i = 0 ;
 					}
@@ -189,16 +204,21 @@ public class ReadFile
 			sendStringsToCallback( strings, callback ) ;				// Send left over strings that didn't reach limit
 			callback.end() ;
 		}
-		
-		private void sendStringsToCallback( final String[] _strings, final ResourceCallback _callback )
+
+		private boolean sendStringsToCallback( final String[] _strings, final ResourceCallback _callback )
 		{
 			for( int i = 0; i < _strings.length; ++i )
 			{
 				if( _strings[i] != null )
 				{
-					_callback.resourceAsString( _strings[i] ) ;
+					if( _callback.resourceAsString( _strings[i] ) == false ) ;
+					{
+						return false ;		// Stop Reading
+					}
 				}
 			}
+
+			return true ;	// Continue reading
 		}
 
 		private void nullStrings( final String[] _strings )

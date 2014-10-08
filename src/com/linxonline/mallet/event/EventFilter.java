@@ -10,5 +10,5 @@ public interface EventFilter
 		returns optimised array, _populate if defined should be filled with optimised events,
 		else create a new array and return that.
 	**/
-	public ArrayList<Event> filter( final EventMessenger _messenger, ArrayList<Event<?>> _populate ) ;
+	public ArrayList<Event<?>> filter( final EventMessenger _messenger, ArrayList<Event<?>> _populate ) ;
 }

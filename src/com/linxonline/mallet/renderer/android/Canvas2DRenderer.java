@@ -12,6 +12,7 @@ import com.linxonline.mallet.renderer.Basic2DRender ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;
@@ -46,6 +47,34 @@ public class Canvas2DRenderer extends Basic2DRender
 	{
 		textures = new AndroidTextureManager( _resources ) ;
 		holder = _holder ;
+	}
+
+	@Override
+	public void initFontAssist()
+	{
+		FontAssist.setFontWrapper( new FontInterface()
+		{
+			@Override
+			public Font createFont( final String _font, final int _style, final int _size )
+			{
+				return new Font<Paint>( fontPaint )
+				{
+					@Override
+					public int getHeight()
+					{
+						font.setTextSize( _size ) ;
+						return ( int )font.getTextSize() ;
+					}
+
+					@Override
+					public int stringWidth( final String _text )
+					{
+						font.setTextSize( _size ) ;
+						return ( int )font.measureText( _text ) ;
+					}
+				} ;
+			}
+		} ) ;
 	}
 
 	@Override

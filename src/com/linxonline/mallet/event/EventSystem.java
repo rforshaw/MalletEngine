@@ -70,6 +70,30 @@ public final class EventSystem implements AddEventInterface
 		toBeRemoved.add( _handler ) ;
 	}
 
+	public final void addEventFilter( final String _type, final EventFilter _filter )
+	{
+		assert _type != null || _filter != null ;
+
+		if( eventQueues.containsKey( _type ) == false )
+		{
+			addEventQueue( _type, new EventQueue( _type ) ) ;
+		}
+
+		eventQueues.get( _type ).addEventFilter( _filter ) ;
+	}
+
+	public final void removeEventFilter( final String _type, final EventFilter _filter )
+	{
+		assert _type != null || _filter != null ;
+
+		if( eventQueues.containsKey( _type ) == false )
+		{
+			Logger.println( "Can't remove EventFilter event queue: " + _type + " does not exist.", Logger.Verbosity.MAJOR ) ;
+		}
+
+		eventQueues.get( _type ).removeEventFilter( _filter ) ;
+	}
+	
 	/**
 		Remove the EventHandlers queued for removal now.
 	**/

@@ -4,7 +4,6 @@ import java.util.ArrayList ;
 import javax.swing.JFrame ;
 import java.awt.RenderingHints ;
 import java.awt.Color ;
-import java.awt.Font ;
 import java.awt.FontMetrics ;
 import java.awt.Graphics2D ;
 import java.awt.Canvas ;
@@ -22,6 +21,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.resources.texture.* ;
 
 /**
@@ -58,6 +58,7 @@ public class G2DRenderer extends Basic2DRender
 	public G2DRenderer()
 	{
 		canvas.setIgnoreRepaint( true ) ;
+		initFontAssist() ;
 	}
 
 	@Override
@@ -65,6 +66,35 @@ public class G2DRenderer extends Basic2DRender
 
 	@Override
 	public void shutdown() {}
+
+	@Override
+	public void initFontAssist()
+	{
+		FontAssist.setFontWrapper( new FontInterface()
+		{
+			@Override
+			public Font createFont( final String _font, final int _style, final int _size )
+			{
+				final java.awt.Font fontMap = new java.awt.Font( _font, _style, _size ) ;
+				return new Font<java.awt.Font>( fontMap )
+				{
+					@Override
+					public int getHeight()
+					{
+						final FontMetrics fontMetric = graphics.getFontMetrics( fontMap ) ;
+						return fontMetric.getHeight() ;
+					}
+
+					@Override
+					public int stringWidth( final String _text )
+					{
+						final FontMetrics fontMetric = graphics.getFontMetrics( fontMap ) ;
+						return fontMetric.stringWidth( _text ) ;
+					}
+				} ;
+			}
+		} ) ;
+	}
 
 	private void initDrawCalls()
 	{
@@ -160,17 +190,8 @@ public class G2DRenderer extends Basic2DRender
 				Graphics2DDraw.setGraphicsColour( graphics, _settings ) ;
 
 				final MalletFont font = _settings.getObject( "FONT", null ) ;
-				if( font != null )
-				{
-					if( font.font == null )
-					{
-						font.setFont( new Font( font.fontName, font.style, font.size ) ) ;
-					}
-				}
-
-				final FontMetrics fontMetric = graphics.getFontMetrics( ( Font )font.font ) ;
-				final int height = fontMetric.getHeight() ;
-				final int textWidth = fontMetric.stringWidth( text ) ;
+				final int height = font.getHeight() ;
+				final int textWidth = font.stringWidth( text ) ;
 
 				_settings.addInteger( "TEXTWIDTH", textWidth ) ;
 
@@ -178,12 +199,12 @@ public class G2DRenderer extends Basic2DRender
 				final Vector2 position = new Vector2( _position.x + offset.x, _position.y + offset.y ) ;
 				final Vector2 currentPos = new Vector2( position.x, position.y ) ;
 
-				final int lineHeight = fontMetric.getHeight();
+				final int lineHeight = font.getHeight();
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )render.x ) + ( int )position.x ;
 				String[] words = _settings.getObject( "WORDS", null ) ;
 				if( words == null )
 				{
-					words = optimiseText( fontMetric, text, position, lineWidth ) ;
+					words = optimiseText( font, text, position, lineWidth ) ;
 					_settings.addObject( "WORDS", words ) ;
 					_settings.addInteger( "TEXTWIDTH", -1 ) ;
 				}
@@ -195,18 +216,18 @@ public class G2DRenderer extends Basic2DRender
 				_settings.addInteger( "TEXTHEIGHT", size * lineHeight ) ;
 
 				int textHeight = 0 ;
-				graphics.setFont( ( Font )font.font ) ;
+				graphics.setFont( ( java.awt.Font )font.font.getFont() ) ;
 				for( int i = 0; i < size; ++i )
 				{
 					word = words[i] ;
-					setTextAlignment( alignment, currentPos, fontMetric.stringWidth( word ) ) ;
+					setTextAlignment( alignment, currentPos, font.stringWidth( word ) ) ;
 					graphics.drawString( word, currentPos.x, currentPos.y ) ;
 					currentPos.y += lineHeight ;
 					currentPos.x = position.x ;
 				}
 			}
 
-			private String[] optimiseText( final FontMetrics _font, final String _text, final Vector2 _position, final int _lineWidth )
+			private String[] optimiseText( final MalletFont _font, final String _text, final Vector2 _position, final int _lineWidth )
 			{
 				int length = 0 ;
 				float wordWidth = 0.0f ;

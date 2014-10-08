@@ -1,0 +1,9 @@
+build/*
+libs/*
+lib/*
+
+.kateproject.d
+
+*.jar
+*.class
+*.apk

@@ -49,15 +49,13 @@ public interface SystemInterface
 		RENDER - convience methods.
 		The root renderer, typically one state should render at a time.
 	*/
-	public void setCameraPosition( final Vector3 _camera ) ;
-	public void setDisplayDimensions( final Vector2 _display ) ;
-	public void setRenderDimensions( final Vector2 _display ) ;
-
 	public RenderInterface getRenderInterface() ;
 
 	/*AUDIO GENERATOR*/
 	public AudioGenerator getAudioGenerator() ;
 
-	public boolean update( final float _dt ) ;
+	public boolean update( final float _dt ) ;		// Update the System
+	public void sleep( final long _millis ) ;		// Cause the Thread the System is running on to sleep for the specified duration
+
 	public void draw( final float _dt ) ;
 }

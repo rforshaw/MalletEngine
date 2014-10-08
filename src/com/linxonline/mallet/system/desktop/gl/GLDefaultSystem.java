@@ -175,6 +175,18 @@ public class GLDefaultSystem implements SystemInterface
 		return sourceGenerator ;
 	}
 
+	public void sleep( final long _millis )
+	{
+		try
+		{
+			Thread.sleep( _millis ) ;
+		}
+		catch( InterruptedException ex )
+		{
+			ex.printStackTrace() ;
+		}
+	}
+
 	public boolean update( final float _dt )
 	{
 		renderer.updateState( _dt ) ;

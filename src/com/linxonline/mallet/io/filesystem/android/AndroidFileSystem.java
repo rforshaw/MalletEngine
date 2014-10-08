@@ -171,6 +171,11 @@ public class AndroidFileSystem implements FileSystem
 		return false ;
 	}
 
+	public long getFileSize( final String _path )
+	{
+		return 0L ;
+	}
+
 	/**
 		TODO: Needs to be improved to handle random '.' locations.
 	**/

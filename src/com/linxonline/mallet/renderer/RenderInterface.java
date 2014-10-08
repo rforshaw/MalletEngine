@@ -8,8 +8,11 @@ public interface RenderInterface extends EventHandler
 	public void start() ;
 	public void shutdown() ;
 
+	public void initFontAssist() ;					// Ensure the Font Assist is correctly implemented
+
 	public void setRenderDimensions( final int _width, final int _height ) ;
 	public void setDisplayDimensions( final int _width, final int _height ) ;
+
 	public void setCameraPosition( final Vector3 _position ) ;
 
 	public void updateState( final float _dt ) ;

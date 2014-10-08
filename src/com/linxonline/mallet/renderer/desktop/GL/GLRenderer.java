@@ -16,6 +16,7 @@ import javax.media.opengl.glu.GLU ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
@@ -61,7 +62,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected int indexID = 0 ;
 	
 	protected float rotate = 0.0f ;
-	
+
 	public GLRenderer() {}
 
 	@Override
@@ -69,6 +70,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
+		initFontAssist() ;
 	}
 
 	@Override
@@ -89,6 +91,36 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		canvas.addGLEventListener( this ) ;
 	}
 
+	@Override
+	public void initFontAssist()
+	{
+		FontAssist.setFontWrapper( new FontInterface()
+		{
+			@Override
+			public Font createFont( final String _font, final int _style, final int _size )
+			{
+				canvas.getContext().makeCurrent() ;
+				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
+				canvas.getContext().release() ;
+
+				return new Font<GLFontMap>( fontMap )
+				{
+					@Override
+					public int getHeight()
+					{
+						return fontMap.getHeight() ;
+					}
+
+					@Override
+					public int stringWidth( final String _text )
+					{
+						return fontMap.stringWidth( _text ) ;
+					}
+				} ;
+			}
+		} ) ;
+	}
+	
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
@@ -269,15 +301,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					System.out.println( "No Font, set." ) ;
 					return ;
 				}
-				else
-				{
-					if( font.font == null )
-					{
-						font.font = fontManager.get( font.fontName, font.size ) ;
-					}
-				}
 
-				final GLFontMap fm = ( GLFontMap )font.font ;
+				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 				if( fm == null ) { return ; }
 
 				final GLImage image = fm.getGLImage() ;
@@ -546,8 +571,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
 
 		gl.glPushMatrix() ;
-			gl.glTranslatef( pos.x, pos.y, 0.0f ) ;
+			final Vector2 half = renderInfo.getHalfRenderDimensions() ;
+			gl.glTranslatef( half.x, half.y, 0.0f ) ;
 			gl.glScalef( cameraScale.x, cameraScale.y, cameraScale.z ) ;
+			gl.glTranslatef( -pos.x, -pos.y, 0.0f ) ;
 			render() ;
 		gl.glPopMatrix() ;
 

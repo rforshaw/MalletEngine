@@ -240,6 +240,11 @@ public class DesktopFileSystem implements FileSystem
 		return new File( _path ).isDirectory() ;
 	}
 
+	public long getFileSize( final String _path )
+	{
+		return new File( _path ).length() ;
+	}
+
 	private void mapToResources( final File _file )
 	{
 		final String path = _file.getPath() ;

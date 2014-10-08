@@ -102,4 +102,9 @@ public class GlobalFileSystem
 	{
 		return fileSystem.isDirectory( _path ) ;
 	}
+
+	public long getFileSize( final String _path )
+	{
+		return fileSystem.getFileSize( _path ) ;
+	}
 }

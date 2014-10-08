@@ -18,6 +18,7 @@ public final class RenderInfo implements InputAdapterInterface
 	private Vector3 cameraPosition = null ;								// Camera position
 	private final Vector2 cameraZoom = new Vector2( 1, 1 ) ;
 	private Vector2 scaledRenderDimensions = new Vector2( 0, 0 ) ;
+	private Vector2 halfRenderDimensions = new Vector2() ;
 	private Vector2 screenOffset = new Vector2( 0, 0 ) ;
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
 	private Vector2 scaleRtoD = new Vector2( 0, 0 ) ;
@@ -71,14 +72,14 @@ public final class RenderInfo implements InputAdapterInterface
 
 	public float convertInputToRenderX( final float _x )
 	{
-		updateRealCameraPosition() ;
-		return ( ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) - realCameraPosition.x ) * cameraZoom.x ;
+		final float t1 = ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ;
+		return ( ( t1 - cameraPosition.x ) * cameraZoom.x ) - halfRenderDimensions.x ;
 	}
 
 	public float convertInputToRenderY( final float _y )
 	{
-		updateRealCameraPosition() ;
-		return ( ( ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ) - realCameraPosition.y ) * cameraZoom.y ;
+		final float t1 = ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ;
+		return ( ( t1 - cameraPosition.y ) * cameraZoom.y ) - halfRenderDimensions.y ;
 	}
 
 	public Vector2 convertInputToRender( final Vector2 _input )
@@ -126,6 +127,7 @@ public final class RenderInfo implements InputAdapterInterface
 	public void setRenderDimensions( final Vector2 _renderDimensions )
 	{
 		renderDimensions =_renderDimensions ;
+		halfRenderDimensions.setXY( renderDimensions.x / 2.0f, renderDimensions.y / 2.0f ) ;
 		updateInfo() ;
 	}
 
@@ -155,6 +157,11 @@ public final class RenderInfo implements InputAdapterInterface
 		return renderDimensions ;
 	}
 
+	public final Vector2 getHalfRenderDimensions()
+	{
+		return halfRenderDimensions ;
+	}
+	
 	/**
 		Return the render dimensions scaled to display dimensions.
 		For example: if the render-buffer was 800x600 & display was 1024x768
@@ -176,8 +183,7 @@ public final class RenderInfo implements InputAdapterInterface
 
 	public final Vector3 getCameraPosition()
 	{
-		updateRealCameraPosition() ;
-		return realCameraPosition ;
+		return cameraPosition ;//realCameraPosition ;
 	}
 
 	public final Vector2 getRatioRenderToDisplay()
@@ -188,14 +194,5 @@ public final class RenderInfo implements InputAdapterInterface
 	public final Vector2 getScaleRenderToDisplay()
 	{
 		return scaleRtoD ;
-	}
-
-	private void updateRealCameraPosition()
-	{
-		// Place the position of the camera in the center.
-		// Focal point will be located at the cross-roads of the renderDimensions
-		realCameraPosition.x = -cameraPosition.x + ( renderDimensions.x / 2 ) ;
-		realCameraPosition.y = -cameraPosition.y + ( renderDimensions.y / 2 ) ;
-		realCameraPosition.z = -cameraPosition.z ;
 	}
 }
