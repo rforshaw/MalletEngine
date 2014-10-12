@@ -1,13 +1,22 @@
-package com.linxonline.mallet.io.filesystem.desktop ;
+package com.linxonline.mallet.io.filesystem.android ;
 
 import java.io.* ;
 import java.util.* ;
+
+import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.ResourceCallback ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 public class ReadFile
 {
+	private static AssetManager assetManager ;
+
+	public static void setAssetManager( final AssetManager _manager )
+	{
+		assetManager = _manager ;
+	}
+
 	/**
 		Blocks calling Thread.
 		Returns entire file within byte array
@@ -16,10 +25,9 @@ public class ReadFile
 	{
 		try
 		{
-			final File file = new File( _path ) ;
-			final FileInputStream is = new FileInputStream( file ) ;
+			final InputStream is = assetManager.open( _path ) ;
+			final byte[] buffer = new byte[is.available()] ;
 
-			final byte[] buffer = new byte[( int )file.length()] ;
 			final int readNum = read( is, buffer ) ;
 			is.close() ;
 
@@ -86,13 +94,11 @@ public class ReadFile
 		{
 			try
 			{
-				final File file = new File( path ) ;
-				final int fileLength = ( int )file.length() ;
+				final InputStream is = assetManager.open( path ) ;
+				final int fileLength = is.available() ;
 				callback.start( fileLength ) ;
 
-				final FileInputStream is = new FileInputStream( file ) ;
 				int offset = 0 ;
-
 				while( offset < fileLength && toReadNum > ResourceCallback.STOP )
 				{
 					// Set length to the amount of bytes to read in next
@@ -133,13 +139,12 @@ public class ReadFile
 		{
 			try
 			{
-				final File file = new File( path ) ;
-				final int fileLength = ( int )file.length() ;
+				final InputStream is = assetManager.open( path ) ;
+				final int fileLength = is.available() ;
 				callback.start( fileLength ) ;
 
 				final ArrayList<String> strings = new ArrayList<String>() ;
 
-				final FileInputStream is = new FileInputStream( file ) ;
 				final InputStreamReader isr = new InputStreamReader( is ) ;
 				final BufferedReader br = new BufferedReader( isr ) ;
 				int offset = 0 ;

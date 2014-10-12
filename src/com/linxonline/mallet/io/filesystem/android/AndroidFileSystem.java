@@ -9,24 +9,24 @@ import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.android.* ;
+import com.linxonline.mallet.util.logger.Logger ;
 
 public class AndroidFileSystem implements FileSystem
 {
 	private Context context = null ;
 	private AssetManager assetManager = null ;
-	private HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
+	private final HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
+
 	private static String ROOT_DIRECTORY = "base" ;
 
 	public AndroidFileSystem( final Context _context )
 	{
-		init( _context ) ;
-	}
-
-	public void init( final Context _context )
-	{
 		context = _context ;
 		assetManager = context.getAssets() ;
-		initJSONConstructors(); 
+		ReadFile.setAssetManager( assetManager ) ;
+		ReadZip.setAssetManager( assetManager ) ;
+
+		initJSONConstructors() ;
 	}
 
 	protected void initJSONConstructors()
@@ -71,7 +71,7 @@ public class AndroidFileSystem implements FileSystem
 				}
 				else
 				{
-					resources.put( _path, new DataFile( _path ) ) ;
+					resources.put( _path, new DataFile( _path, null, false ) ) ;
 				}
 			}
 		}
@@ -84,24 +84,40 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public byte[] getResourceRaw( final String _file )
 	{
-		if( resources.containsKey( _file ) == true )
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
 		{
-			return streamBytes( resources.get( _file ) ) ;
+			if( file.isZipped == false )
+			{
+				return ReadFile.getRaw( file.filePath ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getRaw( file.filePath, file.zipPath ) ;
+			}
 		}
 
-		return null ;
+		return null ;//attemptMapResource( _file ) ;
 	}
 
 	@Override
 	public String getResourceAsString( final String _file )
 	{
-		final byte[] resource = getResourceRaw( _file ) ;
-		if( resource != null )
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
 		{
-			return new String( resource ) ;
+			if( file.isZipped == false )
+			{
+				return ReadFile.getString( file.filePath ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getString( file.filePath, file.zipPath ) ;
+			}
 		}
 
-		return null ;
+		//final byte[] data = attemptMapResource( _file ) ; 
+		return null ;//( data != null ) ? new String( data ) : null ;
 	}
 
 	/**
@@ -117,12 +133,40 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
 	{
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
+		{
+			if( file.isZipped == false )
+			{
+				return ReadFile.getRaw( _file, _length, _callback ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getRaw( file.filePath, file.zipPath, _length, _callback ) ;
+			}
+		}
+
+		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
 		return false ;
 	}
 
 	@Override
 	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
 	{
+		final DataFile file = resources.get( _file ) ;
+		if( file != null )
+		{
+			if( file.isZipped == false )
+			{
+				return ReadFile.getString( _file, _length, _callback ) ;
+			}
+			else if( file.isZipped == true )
+			{
+				return ReadZip.getString( file.filePath, file.zipPath, _length, _callback ) ;
+			}
+		}
+
+		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
 		return false ;
 	}
 
@@ -265,7 +309,7 @@ public class AndroidFileSystem implements FileSystem
 				{
 					final String path = entry.getName() ;
 					final String basePath = ROOT_DIRECTORY + File.separator + path ;
-					final DataFile data = new DataFile( _file, path ) ;
+					final DataFile data = new DataFile( _file, path, true ) ;
 					resources.put( basePath, data ) ;
 				}
 			}
@@ -279,18 +323,15 @@ public class AndroidFileSystem implements FileSystem
 
 	private class DataFile
 	{
-		String filePath = null ;
-		String zipPath = null ;
+		public final boolean isZipped ;
+		public final String filePath ;
+		public final String zipPath ;
 
-		DataFile( final String _filePath, final String _zipPath )
+		DataFile( final String _filePath, final String _zipPath, final boolean _isZipped )
 		{
+			isZipped = _isZipped ;
 			filePath = _filePath ;
 			zipPath = _zipPath ;
-		}
-
-		DataFile( final String _filePath )
-		{
-			filePath = _filePath ;
 		}
 	}
 }

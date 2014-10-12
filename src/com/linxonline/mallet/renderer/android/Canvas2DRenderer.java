@@ -81,6 +81,7 @@ public class Canvas2DRenderer extends Basic2DRender
 	public void start()
 	{
 		initDrawCalls() ;
+		initFontAssist() ;
 
 		paint.setFilterBitmap( true ) ;
 		paint.setStyle( Paint.Style.FILL ) ;

@@ -18,11 +18,13 @@ public class ReadZip
 			final int length = ( int )entry.getSize() ;
 
 			final InputStream is = zipFile.getInputStream( entry ) ;
-			final byte[] stream = ReadFile.read( is, 0, length ) ;
+			
+			final byte[] buffer = new byte[length] ;
+			final int readNum = ReadFile.read( is, buffer ) ;
 			
 			is.close() ;
 			zipFile.close() ;
-			return stream ;
+			return buffer ;
 		}
 		catch( ZipException _ex )
 		{
@@ -58,51 +60,41 @@ public class ReadZip
 	protected static class RawThread extends Thread
 	{
 		final ResourceCallback callback ;
-		final int length ;
 		final String path ;
 		final String zipPath ;
+		int toReadNum ;
 
 		public RawThread( final String _path, final String _zipPath, final int _length, final ResourceCallback _callback )
 		{
 			callback = _callback ;
-			length = _length ;
+			toReadNum = _length ;
 			path = _path ;
 			zipPath = _zipPath ;
 		}
 
 		public void run()
 		{
-			if( length <= 0 )
-			{
-				batchRead() ;
-			}
-			else
-			{
-				iterativeRead() ;
-			}
-		}
-
-		private void batchRead()
-		{
-			callback.resourceRaw( ReadZip.getRaw( path, zipPath ) ) ;
-			callback.end() ;
-		}
-
-		private void iterativeRead()
-		{
 			try
 			{
 				final ZipFile zipFile = new ZipFile( path ) ;
 				final ZipEntry entry = zipFile.getEntry( zipPath ) ;
+
 				final int fileLength = ( int )entry.getSize() ;
+				callback.start( fileLength ) ;
 
 				final InputStream is = zipFile.getInputStream( entry ) ;
 
 				int offset = 0 ;
-				while( offset < fileLength )
+				while( offset < fileLength && toReadNum > ResourceCallback.STOP )
 				{
-					callback.resourceRaw( ReadFile.read( is, offset, length ) ) ;
-					offset += length ;
+					// Set length to the amount of bytes to read in next
+					toReadNum = ( toReadNum == ResourceCallback.RETURN_ALL ) ? ( fileLength - offset ) : toReadNum ;
+
+					final byte[] buffer = new byte[toReadNum] ;
+					final int readNum = ReadFile.read( is, buffer ) ;
+					offset += readNum ;
+
+					toReadNum = callback.resourceRaw( buffer, readNum ) ;
 				}
 
 				is.close() ;
@@ -123,14 +115,14 @@ public class ReadZip
 
 	protected static class StringThread extends Thread
 	{
-		final ResourceCallback callback ;
-		final int length ;
-		final String path ;
-		final String zipPath ;
+		private final ResourceCallback callback ;
+		private final String path ;
+		private final String zipPath ;
+		private int toReadNum ;
 
 		public StringThread( final String _path, final String _zipPath, final int _length, final ResourceCallback _callback )
 		{
-			length = _length ;
+			toReadNum = _length ;
 			callback = _callback ;
 			path = _path ;
 			zipPath = _zipPath ;
@@ -138,45 +130,40 @@ public class ReadZip
 
 		public void run()
 		{
-			if( length <= 0 )
-			{
-				batchRead() ;
-			}
-			else
-			{
-				iterativeRead() ;
-			}
-		}
-
-		private void batchRead()
-		{
-			callback.resourceAsString( ReadZip.getString( path, zipPath ) ) ;
-			callback.end() ;
-		}
-		
-		private void iterativeRead()
-		{
-			final String[] strings = new String[length] ;
-			nullStrings( strings ) ;
-
 			try
 			{
 				final ZipFile zipFile = new ZipFile( path ) ;
 				final ZipEntry entry = zipFile.getEntry( zipPath ) ;
 
+				final int fileLength = ( int )entry.getSize() ;
+				callback.start( fileLength ) ;
+
+				final ArrayList<String> strings = new ArrayList<String>() ;
+
 				final InputStream is = zipFile.getInputStream( entry ) ;
 				final InputStreamReader isr = new InputStreamReader( is ) ;
 				final BufferedReader br = new BufferedReader( isr ) ;
+				int offset = 0 ;
 
-				int i = 0 ;
-				while( ( strings[i++] = br.readLine() ) != null )
+				String line = null ;
+				while( ( ( line = br.readLine() ) != null ) && ( toReadNum > ResourceCallback.STOP ) )
 				{
-					if( i >= strings.length )
+					strings.add( line ) ;
+					if( toReadNum == ResourceCallback.RETURN_ALL )
 					{
-						sendStringsToCallback( strings, callback ) ;	// Send strings when limit is reached
-						nullStrings( strings ) ;
-						i = 0 ;
+						continue ;
 					}
+					else if( strings.size() >= toReadNum )
+					{
+						final int size = strings.size() ;
+						toReadNum = callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
+						strings.clear() ;
+					}
+				}
+
+				{
+					final int size = strings.size() ;
+					callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
 				}
 
 				br.close() ;
@@ -193,27 +180,7 @@ public class ReadZip
 				Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
 			}
 
-			sendStringsToCallback( strings, callback ) ;				// Send left over strings that didn't reach limit
 			callback.end() ;
-		}
-		
-		private void sendStringsToCallback( final String[] _strings, final ResourceCallback _callback )
-		{
-			for( int i = 0; i < _strings.length; ++i )
-			{
-				if( _strings[i] != null )
-				{
-					_callback.resourceAsString( _strings[i] ) ;
-				}
-			}
-		}
-
-		private void nullStrings( final String[] _strings )
-		{
-			for( int i = 0; i < _strings.length; ++i )
-			{
-				_strings[i] = null ;
-			}
 		}
 	}
 }
