@@ -30,7 +30,7 @@ public class GLFontMap extends Resource
 	
 	public GLGlyph getGlyphWithChar( final char _character )
 	{
-		return ( GLGlyph )fontMap.getGlyphWithCode( ( int )_character ) ;
+		return getGlyphWithCode( ( int )_character ) ;
 	}
 
 	public GLGlyph getGlyphWithCode( final int _code )
