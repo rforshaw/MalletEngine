@@ -75,12 +75,12 @@ public class GLGeometry implements GeometryInterface
 	{
 		addVertex( _position, DEFAULT_COLOUR, DEFAULT_NORMAL, _texCoord ) ;
 	}
-	
+
 	public void addVertex( final Vector3 _position, final Vector3 _normal, final Vector2 _texCoord )
 	{
 		addVertex( _position, DEFAULT_COLOUR, _normal, _texCoord ) ;
 	}
-	
+
 	public void addVertex( final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
 	{
 		vertex[vertexInc] = _position.x ;
@@ -96,6 +96,43 @@ public class GLGeometry implements GeometryInterface
 		vertex[vertexInc + 7]  = _normal.y ;
 		vertex[vertexInc + 8] = _normal.z ;
 		vertexInc += VERTEX_SIZE ;
+	}
+
+	public void updateVertex( final int _index, final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
+	{
+		updatePosition( _index, _position ) ;
+		updateColour( _index, _colour ) ;
+		updateTexCoord( _index, _texCoord ) ;
+		updateNormal( _index, _normal ) ;
+	}
+
+	public void updatePosition( final int _index, final Vector3 _position )
+	{
+		final int i = _index * VERTEX_SIZE ;
+		vertex[i] = _position.x ;
+		vertex[i + 1] = _position.y ;
+		vertex[i + 2] = _position.z ;
+	}
+
+	public void updateColour( final int _index, final float _colour )
+	{
+		final int i = _index * VERTEX_SIZE ;
+		vertex[i + 3] = ( float )_colour ;
+	}
+
+	public void updateTexCoord( final int _index, final Vector2 _texCoord )
+	{
+		final int i = _index * VERTEX_SIZE ;
+		vertex[i + 4] = _texCoord.x ;
+		vertex[i + 5] = _texCoord.y ;
+	}
+
+	public void updateNormal( final int _index, final Vector3 _normal )
+	{
+		final int i = _index * VERTEX_SIZE ;
+		vertex[i + 6]  = _normal.x ;
+		vertex[i + 7]  = _normal.y ;
+		vertex[i + 8] = _normal.z ;
 	}
 
 	public void destroy()

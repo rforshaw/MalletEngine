@@ -27,6 +27,8 @@ import com.linxonline.mallet.util.locks.* ;
 public class DefaultSystem implements SystemInterface
 {
 	protected String titleName = new String( "Mallet Engine" ) ;
+	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
+
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
 	protected G2DRenderer renderer = new G2DRenderer() ;
 	public EventSystem eventSystem = new EventSystem() ;
@@ -101,34 +103,21 @@ public class DefaultSystem implements SystemInterface
 		eventSystem.removeEventHandler( _handler ) ;
 	}
 
+	@Override
+	public ShutdownDelegate getShutdownDelegate()
+	{
+		return shutdownDelegate ;
+	}
+
 	/*RENDER*/
-
-	public void setTitleName( final String _titleName )
-	{
-		titleName = _titleName ;
-	}
-	
-	public void setDisplayDimensions( final Vector2 _display )
-	{
-		renderer.setDisplayDimensions( ( int )_display.x, ( int )_display.y ) ;
-	}
-
-	public void setRenderDimensions( final Vector2 _render )
-	{
-		renderer.setRenderDimensions( ( int )_render.x, ( int )_render.y ) ;
-	}
-
-	public void setCameraPosition( final Vector3 _camera )
-	{
-		renderer.setCameraPosition( _camera ) ;
-	}
-	
+	@Override
 	public RenderInterface getRenderInterface()
 	{
 		return renderer ;
 	}
 
 	/*AUDIO SOURCE GENERATOR*/
+	@Override
 	public AudioGenerator getAudioGenerator()
 	{
 		return sourceGenerator ;

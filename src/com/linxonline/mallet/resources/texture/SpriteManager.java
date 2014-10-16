@@ -31,15 +31,24 @@ public class SpriteManager extends AbstractManager<Sprite>
 	*/
 	protected Sprite loadSprite( final String _file )
 	{
-		ArrayList<String> texts = TextReader.getTextFile( _file ) ;
+		final ArrayList<String> texts = TextReader.getTextFile( _file ) ;
 
-		int framerate = Integer.parseInt( texts.get( 0 ) ) ;
-		Sprite sprite = new Sprite( framerate ) ;
+		final int framerate = Integer.parseInt( texts.get( 0 ) ) ;
+		final Sprite sprite = new Sprite( framerate ) ;
 
 		final int length = texts.size() ;
 		for( int i = 1; i < length; ++i )
 		{
-			sprite.addTexture( texts.get( i ) ) ;
+			final String line = texts.get( i ) ;
+			final String[] frameText = line.split( "\\s*,[,\\s]*" ) ;
+
+			final float u1 = Float.parseFloat( frameText[1] ) ;
+			final float v1 = Float.parseFloat( frameText[2] ) ;
+
+			final float u2 = Float.parseFloat( frameText[3] ) ;
+			final float v2 = Float.parseFloat( frameText[4] ) ;
+
+			sprite.addFrame( sprite.new Frame( frameText[0], u1, v1, u2, v2 ) ) ;
 		}
 
 		return sprite ;

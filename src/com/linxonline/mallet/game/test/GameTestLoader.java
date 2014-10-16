@@ -69,8 +69,8 @@ public final class GameTestLoader extends GameLoader
 																	new Vector2( -32, -32 ), 			// Offset
 																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
 																	null,								// fill, texture repeat
-																	null,								// clip
-																	null,								// clip offset
+																	new Vector2(),								// clip
+																	new Vector2( 1, 1 ),								// clip offset
 																	10 ), true ) ) ;							// layer
 
 				final Shape lines = new Shape( 7, 6 ) ;

@@ -31,6 +31,7 @@ import com.linxonline.mallet.renderer.desktop.GL.* ;
 public class GLDefaultSystem implements SystemInterface
 {
 	protected String titleName = new String( "GL Mallet Engine" ) ;
+	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
 	protected final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
 
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
@@ -142,39 +143,33 @@ public class GLDefaultSystem implements SystemInterface
 		eventSystem.removeEventHandler( _handler ) ;
 	}
 
+	@Override
+	public ShutdownDelegate getShutdownDelegate()
+	{
+		return shutdownDelegate ;
+	}
+
 	/*RENDER*/
 
 	public void setTitleName( final String _titleName )
 	{
 		titleName = _titleName ;
 	}
-	
-	public void setDisplayDimensions( final Vector2 _display )
-	{
-		renderer.setDisplayDimensions( ( int )_display.x, ( int )_display.y ) ;
-	}
 
-	public void setRenderDimensions( final Vector2 _render )
-	{
-		renderer.setRenderDimensions( ( int )_render.x, ( int )_render.y ) ;
-	}
-
-	public void setCameraPosition( final Vector3 _camera )
-	{
-		renderer.setCameraPosition( _camera ) ;
-	}
-
+	@Override
 	public RenderInterface getRenderInterface()
 	{
 		return renderer ;
 	}
 
 	/*AUDIO SOURCE GENERATOR*/
+	@Override
 	public AudioGenerator getAudioGenerator()
 	{
 		return sourceGenerator ;
 	}
 
+	@Override
 	public void sleep( final long _millis )
 	{
 		try
@@ -187,6 +182,7 @@ public class GLDefaultSystem implements SystemInterface
 		}
 	}
 
+	@Override
 	public boolean update( final float _dt )
 	{
 		renderer.updateState( _dt ) ;
@@ -198,6 +194,7 @@ public class GLDefaultSystem implements SystemInterface
 		return true ;	// Informs the Game System whether to continue updating or not.
 	}
 
+	@Override
 	public void draw( final float _dt )
 	{
 		renderer.draw( _dt ) ;

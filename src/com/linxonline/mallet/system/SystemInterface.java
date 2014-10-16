@@ -46,6 +46,16 @@ public interface SystemInterface
 	public void removeEventHandler( final EventHandler _handler ) ;
 
 	/**
+		It is impossible for the Game State to know when 
+		the player has decided to close the application 
+		externally.
+		This allows the developer to register things that 
+		should be shutdown correctly before the application 
+		is forcefully closed.
+	*/
+	public ShutdownDelegate getShutdownDelegate() ;
+
+	/**
 		RENDER - convience methods.
 		The root renderer, typically one state should render at a time.
 	*/
@@ -58,4 +68,29 @@ public interface SystemInterface
 	public void sleep( final long _millis ) ;		// Cause the Thread the System is running on to sleep for the specified duration
 
 	public void draw( final float _dt ) ;
+
+	/**
+		Implement this interface is DefaultShutdown is 
+		too limited for your use case.
+		Register things that need to be correctly dealt 
+		with before the application has been closed. 
+		This may include saving the current game-state 
+		or clearing specially resources.
+	*/
+	public static interface ShutdownDelegate
+	{
+		public void addShutdownCallback( final Callback _callback ) ;
+		public void removeShutdownCallback( final Callback _callback ) ;
+
+		public void shutdown() ;
+
+		/**
+			Implement this callback to handle the 
+			specific task upon the application being shutdown.
+		*/
+		public static interface Callback
+		{
+			public void shutdown() ;
+		}
+	}
 }

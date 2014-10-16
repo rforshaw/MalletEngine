@@ -8,6 +8,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.id.IDInterface ;
+import com.linxonline.mallet.maths.Vector2 ;
 
 public class Animation implements IDInterface, Cacheable
 {
@@ -126,10 +127,13 @@ public class Animation implements IDInterface, Cacheable
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
 		final Settings settings = ( Settings )_event.getVariable() ;
-		final String file = sprite.getTexture( frame ) ;
+		final Sprite.Frame f = sprite.getFrame( frame ) ;
 
-		settings.addString( "FILE", file ) ;
+		settings.addString( "FILE", f.path ) ;
 		settings.addObject( "TEXTURE", null ) ;
+
+		settings.<Vector2>addObject( "UV1", f.uv1 ) ;
+		settings.<Vector2>addObject( "UV2", f.uv2 ) ;
 	}
 
 	public void update( final float _dt )

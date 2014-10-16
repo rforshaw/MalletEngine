@@ -13,7 +13,7 @@ public class Matrix4
 		Each Matrix4 will consume double its normal space.
 		If only we could store the float-array on the stack!
 	*/
-	private final Matrix4 temp = Matrix4.createIdentity() ;
+	private final Matrix4 temp ;
 
 	/**
 		* Ordered by row, if directly using write it down.
@@ -27,20 +27,37 @@ public class Matrix4
 
 	public Matrix4()
 	{
+		// Create a matrix that contains a temp Matrix
+		this( true ) ;
+	}
+
+	private Matrix4( final boolean _temp )
+	{
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 0 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 1 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 2 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 3 ) ;
+		
+		if( _temp == true )
+		{
+			temp = Matrix4.createTempIdentity() ;
+		}
+		else
+		{
+			temp = null ;
+		}
 	}
 
 	public Matrix4( final Matrix4 _matrix )
 	{
 		Matrix4.copy( _matrix.matrix, matrix ) ;
+		temp = Matrix4.createTempIdentity() ;
 	}
 
 	public Matrix4( final float[] _matrix )
 	{
 		Matrix4.copy( _matrix, matrix ) ;
+		temp = Matrix4.createTempIdentity() ;
 	}
 
 	public Matrix4( final float _a00, final float _a01, final float _a02, final float _a03,
@@ -52,6 +69,7 @@ public class Matrix4
 		setRow( _a10, _a11, _a12, _a13, 1 ) ;
 		setRow( _a20, _a21, _a22, _a23, 2 ) ;
 		setRow( _a30, _a31, _a32, _a33, 3 ) ;
+		temp = Matrix4.createTempIdentity() ;
 	}
 
 	public void setIdentity()
@@ -68,7 +86,7 @@ public class Matrix4
 		multiply( temp ) ;
 		temp.setIdentity() ;
 	}
-	
+
 	public void setTranslate( final Vector3 _vec )
 	{
 		setTranslate( _vec.x, _vec.y, _vec.z ) ;
@@ -262,6 +280,13 @@ public class Matrix4
 	private void set( final float _val, final int _row, final int _col )
 	{
 		matrix[( _row * 4 ) + _col] = _val ;
+	}
+
+	private static Matrix4 createTempIdentity()
+	{
+		final Matrix4 iden = new Matrix4( false ) ;
+		iden.setIdentity() ;
+		return iden ;
 	}
 
 	public static Matrix4 createIdentity()

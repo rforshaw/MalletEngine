@@ -3,11 +3,12 @@ package com.linxonline.mallet.resources.texture ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.maths.Vector2 ;
 
 public final class Sprite extends Resource
 {
 	public final int framerate ;
-	public final ArrayList<String> textures = new ArrayList<String>() ;
+	public final ArrayList<Sprite.Frame> frames = new ArrayList<Sprite.Frame>() ;
 
 	public Sprite()
 	{
@@ -19,27 +20,41 @@ public final class Sprite extends Resource
 		framerate = _framerate ;
 	}
 
-	public void addTexture( String _texture )
+	public void addFrame( Sprite.Frame _frame )
 	{
-		if( _texture != null )
+		if( _frame != null )
 		{
-			textures.add( _texture ) ;
+			frames.add( _frame ) ;
 		}
 	}
 
 	public final int size()
 	{
-		return textures.size() ;
+		return frames.size() ;
 	}
 
-	public final String getTexture( final int _i )
+	public final Sprite.Frame getFrame( final int _i )
 	{
-		return textures.get( _i ) ;
+		return frames.get( _i ) ;
 	}
 
 	@Override
 	public String type()
 	{
 		return "SPRITE" ;
+	}
+
+	public class Frame
+	{
+		public final String path ;
+		public final Vector2 uv1 = new Vector2() ;
+		public final Vector2 uv2 = new Vector2() ;
+
+		public Frame( final String _frame, final float _u1, final float _v1, final float _u2, final float _v2 )
+		{
+			path = _frame ;
+			uv1.setXY( _u1, _v1 ) ;
+			uv2.setXY( _u2, _v2 ) ;
+		}
 	}
 }

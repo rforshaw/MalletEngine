@@ -34,8 +34,8 @@ public class DrawFactory
 												 final Vector2 _offset, 		// Not needed
 												 final Vector2 _dim,			// Not needed
 												 final Vector2 _fill,			// Not needed
-												 final Vector2 _clip,			// Not needed
-												 final Vector2 _clipOffset,		// Not needed
+												 final Vector2 _uv1,			// Not needed
+												 final Vector2 _uv2,			// Not needed
 												 final int _layer )
 	{
 		final Settings settings = new Settings() ;
@@ -47,8 +47,11 @@ public class DrawFactory
 		if( _dim != null ) { settings.addObject( "DIM", _dim ) ; }
 		if( _fill != null ) { settings.addObject( "FILL", _fill ) ; }
 
+		if( _uv1 != null ) { settings.addObject( "UV1", _uv1 ) ; }
+		if( _uv2 != null ) { settings.addObject( "UV2", _uv2 ) ; }
+
 		setPosition( settings, _pos, _offset ) ;
-		setClip( settings, _clip, _clipOffset ) ;
+		//setClip( settings, _clip, _clipOffset ) ;
 		settings.addInteger( "LAYER", _layer ) ;
 
 		return new Event<Settings>( "DRAW", settings ) ;

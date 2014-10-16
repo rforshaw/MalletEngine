@@ -43,8 +43,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected static GLCanvas canvas = null ;
 	protected JFrame frame = null ;
 
+	private final Vector2 UV1 = new Vector2() ;
+	private final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
+
 	protected final DefaultTimer timer = new DefaultTimer() ;
 	protected Vector2 pos = new Vector2() ;
+
+	protected final Matrix4 uiMatrix = new Matrix4() ;
+	protected final Matrix4 worldMatrix = new Matrix4() ;
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
@@ -244,6 +250,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 
+				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
+				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
+
 				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
@@ -255,7 +264,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						_position.subtract( pos ) ;
 						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
 					}
-				
+
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
@@ -269,6 +278,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
+					// Update the UV co-ordinates of the model
+					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
+					GLModelManager.updateVBO( gl, geometry ) ;
+					
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
@@ -694,7 +707,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final Texture texture = textures.get( _draw.getString( "FILE", null ) ) ;
 		if( texture == null ) { return null ; }
 
-		Vector2 fillDim = _draw.getObject( "FILL", null ) ;
+		final Vector2 fillDim = _draw.getObject( "FILL", null ) ;
 		Vector2 dimension = _draw.getObject( "DIM", null ) ;
 		if( dimension == null )
 		{

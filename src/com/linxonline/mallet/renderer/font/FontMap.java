@@ -7,8 +7,6 @@ import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class FontMap<T extends ImageInterface>
 {
-	public final static int FAILED_GLYPH = 0 ;		// A Blank Glyph should be the first one glyphs array
-
 	public final Glyph[] glyphs ;					// Data needed to render the glyphs available
 	public final Texture<T> texture ;				// Rendered glyph
 	public final int height ;
@@ -47,7 +45,12 @@ public class FontMap<T extends ImageInterface>
 			}
 		}
 
-		return glyphs[FAILED_GLYPH] ;
+		return getGlyphWithChar( getFailedGlyphChar() ) ;
+	}
+
+	public char getFailedGlyphChar()
+	{
+		return '\0' ;
 	}
 
 	public int getHeight()

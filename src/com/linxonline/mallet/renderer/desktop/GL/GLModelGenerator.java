@@ -56,6 +56,17 @@ public class GLModelGenerator
 		return model ;
 	}
 
+	public static Model updatePlaneModelUV( final Model _model, final Vector2 _uv1, final Vector2 _uv2 )
+	{
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		geometry.updateTexCoord( 0, _uv1 ) ;
+		geometry.updateTexCoord( 1, new Vector2( _uv2.x, _uv1.y ) ) ;
+		geometry.updateTexCoord( 2, new Vector2( _uv1.x, _uv2.y ) ) ;
+		geometry.updateTexCoord( 3, _uv2 ) ;
+
+		return _model ;
+	}
+	
 	/**
 		Create a Geometric Line
 	*/

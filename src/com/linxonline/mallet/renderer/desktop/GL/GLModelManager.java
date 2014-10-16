@@ -60,6 +60,11 @@ public class GLModelManager extends AbstractManager
 		_gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, vboID ) ;
 		_geometry.vboID = vboID ;
 
+		GLModelManager.updateVBO( _gl, _geometry ) ;
+	}
+
+	public static void updateVBO( final GL2 _gl, final GLGeometry _geometry )
+	{
 		final int vertexBufferLength = _geometry.vertex.length * 4 ; 
 
 		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexBufferLength ) ;
@@ -68,7 +73,7 @@ public class GLModelManager extends AbstractManager
 		vertexBuffer.put( _geometry.vertex ) ;
 		vertexBuffer.flip() ;
 
-		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, vertexBuffer, GL2.GL_STATIC_DRAW ) ;
+		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, vertexBuffer, GL2.GL_DYNAMIC_DRAW ) ;
 	}
 
 	public static void bindIndex( final GL2 _gl, final GLGeometry _geometry )
