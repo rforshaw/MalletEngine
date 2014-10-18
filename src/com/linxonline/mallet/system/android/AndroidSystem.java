@@ -9,6 +9,7 @@ import android.media.AudioManager ;
 import com.linxonline.mallet.main.android.AndroidActivity ;
 
 import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.system.DefaultShutdown ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.resources.* ;
@@ -29,6 +30,7 @@ public class AndroidSystem implements SystemInterface
 	protected final EventSystem eventSystem = new EventSystem() ;
 	protected final AndroidInputSystem inputSystem = new AndroidInputSystem() ;
 	protected final AndroidAudioGenerator audioGenerator = new AndroidAudioGenerator() ;
+	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
 	protected final Android2DRenderer renderer ;
 
 	protected boolean execution = true ;
@@ -105,6 +107,12 @@ public class AndroidSystem implements SystemInterface
 	public void removeEventHandler( EventHandler _handler )
 	{
 		eventSystem.removeEventHandler( _handler ) ;
+	}
+
+	@Override
+	public ShutdownDelegate getShutdownDelegate()
+	{
+		return shutdownDelegate ;
 	}
 
 	/*RENDER*/
