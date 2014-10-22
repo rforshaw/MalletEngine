@@ -3,8 +3,8 @@ package com.linxonline.mallet.renderer.desktop.G2D ;
 import javax.imageio.* ;
 import java.io.* ;
 
-import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.io.reader.ByteReader ;
 
 import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.resources.texture.Texture ;
@@ -33,17 +33,14 @@ public class G2DTextureManager extends AbstractManager<Texture>
 
 		try
 		{
-			byte[] image = GlobalFileSystem.getResourceRaw( file ) ;
+			final byte[] image = ByteReader.readBytes( file ) ;
 			if( image == null )
 			{
-				image = GlobalFileSystem.getResourceRaw( _file ) ;
+				return null ;
 			}
 
-			if( image != null )
-			{
-				final InputStream in = new ByteArrayInputStream( image ) ;
-				return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
-			}
+			final InputStream in = new ByteArrayInputStream( image ) ;
+			return new Texture( new G2DImage( ImageIO.read( in ) ) ) ;
 		}
 		catch( IOException _ex )
 		{

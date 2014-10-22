@@ -1,0 +1,38 @@
+package com.linxonline.mallet.io.filesystem ;
+
+public interface FileStream
+{
+	public ByteInStream getByteInStream() ;
+	public StringInStream getStringInStream() ;
+
+	public ByteOutStream getByteOutStream() ;
+	public StringOutStream getStringOutStream() ;
+
+	/**
+		Copy the File Stream to the requested location.
+		This should only work if the File Stream is a file.
+	*/
+	public boolean copyTo( final String _dest ) ;
+
+	public boolean isFile() ;
+	public boolean isDirectory() ;
+
+	public boolean exists() ;
+
+	/**
+		Delete the File repreented by this File Stream.
+		This also includes deleting folders.
+	*/
+	public boolean delete() ;
+
+	/**
+		Create the Directory structure represented 
+		by this File Stream.
+	*/
+	public boolean mkdirs() ;
+
+	/**
+		Return the File size of this FileStream.
+	*/
+	public long getSize() ;
+}
