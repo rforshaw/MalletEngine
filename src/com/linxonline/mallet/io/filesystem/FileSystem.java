@@ -10,7 +10,7 @@ package com.linxonline.mallet.io.filesystem ;
 */
 public interface FileSystem
 {
-	public void scanBaseDirectory() ;
+	public boolean mapDirectory( final String _directory ) ;
 
 	public FileStream getFile( final String _path ) ;
 }

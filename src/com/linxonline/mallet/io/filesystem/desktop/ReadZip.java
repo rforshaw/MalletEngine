@@ -11,7 +11,7 @@ public class ReadZip
 {
 	public static byte[] getRaw( final String _path, final String _zipPath )
 	{
-		try
+		/*try
 		{
 			final ZipFile zipFile = new ZipFile( _path ) ;
 			final ZipEntry entry = zipFile.getEntry( _zipPath ) ;
@@ -33,7 +33,7 @@ public class ReadZip
 		catch( IOException _ex )
 		{
 			Logger.println( "Failed to read Zip", Logger.Verbosity.MAJOR ) ;
-		}
+		}*/
 
 		return null ;
 	}
@@ -74,7 +74,7 @@ public class ReadZip
 
 		public void run()
 		{
-			try
+/*			try
 			{
 				final ZipFile zipFile = new ZipFile( path ) ;
 				final ZipEntry entry = zipFile.getEntry( zipPath ) ;
@@ -109,7 +109,7 @@ public class ReadZip
 				Logger.println( "Failed to read Zip.", Logger.Verbosity.MAJOR ) ;
 			}
 
-			callback.end() ;
+			callback.end() ;*/
 		}
 	}
 

@@ -5,6 +5,9 @@ public interface FileStream
 	public ByteInStream getByteInStream() ;
 	public StringInStream getStringInStream() ;
 
+	public boolean getByteInCallback( final ByteInCallback _callback, final int _length ) ;
+	public boolean getByteInCallback( final StringInCallback _callback, final int _length ) ;
+
 	public ByteOutStream getByteOutStream() ;
 	public StringOutStream getStringOutStream() ;
 

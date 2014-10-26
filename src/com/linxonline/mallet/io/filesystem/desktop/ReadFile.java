@@ -3,177 +3,99 @@ package com.linxonline.mallet.io.filesystem.desktop ;
 import java.io.* ;
 import java.util.* ;
 
-import com.linxonline.mallet.io.filesystem.ResourceCallback ;
+import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 public class ReadFile
 {
-	/**
-		Blocks calling Thread.
-		Returns entire file within byte array
-	**/
-	public static byte[] getRaw( final String _path )
+	public static boolean getRaw( final ByteInStream _stream, final ByteInCallback _callback, final int _length )
 	{
-		try
-		{
-			final File file = new File( _path ) ;
-			final FileInputStream is = new FileInputStream( file ) ;
-
-			final byte[] buffer = new byte[( int )file.length()] ;
-			final int readNum = read( is, buffer ) ;
-			is.close() ;
-
-			return buffer ;
-		}
-		catch( IOException ex )
-		{
-			Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
-			return null ;
-		}
-	}
-
-	/**
-		Blocks calling Thread.
-		Returns entire file as a string
-	**/
-	public static String getString( final String _path )
-	{
-		return new String( getRaw( _path ) ) ;
-	}
-
-	public static boolean getRaw( final String _path, final int _length, final ResourceCallback _callback )
-	{
-		final RawThread thread = new RawThread( _path, _length, _callback ) ;
+		final RawThread thread = new RawThread( _stream, _callback, _length ) ;
 		thread.start() ;
 		return true ;
 	}
 
-	public static boolean getString( final String _file, final int _length, final ResourceCallback _callback )
+	public static boolean getString( final StringInStream _stream, final StringInCallback _callback, final int _length )
 	{
-		final StringThread thread = new StringThread( _file, _length, _callback ) ;
+		final StringThread thread = new StringThread( _stream, _callback, _length ) ;
 		thread.start() ;
 		return true ;
-	}
-
-	public static int read( final InputStream _stream, final byte[] _buffer ) throws IOException
-	{
-		int offset = 0 ;
-		int numRead = 0 ;
-
-		while( ( offset < _buffer.length ) &&
-			   ( numRead = _stream.read( _buffer, offset, _buffer.length - offset ) ) >= 0 ) 
-		{
-			offset += numRead;
-		}
-
-		return numRead ;
 	}
 
 	protected static class RawThread extends Thread
 	{
-		private final ResourceCallback callback ;		// Where to return the byte stream
-		private final String path ;						// File location
-		private int toReadNum ;							// How many bytes to read in each iteration
+		private final ByteInStream stream ;
+		private final ByteInCallback callback ;		// Where to return the byte stream
+		private int toReadNum ;						// How many bytes to read in each iteration
 
-		public RawThread( final String _path, final int _length, final ResourceCallback _callback )
+		public RawThread( final ByteInStream _stream, final ByteInCallback _callback, final int _length )
 		{
 			callback = _callback ;
 			toReadNum = _length ;
-			path = _path ;
+			stream = _stream ;
 		}
 
 		public void run()
 		{
-			try
+			callback.start() ;
+			int offset = 0 ;
+
+			while( toReadNum > ByteInCallback.STOP )
 			{
-				final File file = new File( path ) ;
-				final int fileLength = ( int )file.length() ;
-				callback.start( fileLength ) ;
+				final byte[] buffer = new byte[toReadNum] ;
+				final int readNum = stream.readBytes( buffer, 0, toReadNum ) ;
+				offset += readNum ;
 
-				final FileInputStream is = new FileInputStream( file ) ;
-				int offset = 0 ;
-
-				while( offset < fileLength && toReadNum > ResourceCallback.STOP )
-				{
-					// Set length to the amount of bytes to read in next
-					toReadNum = ( toReadNum == ResourceCallback.RETURN_ALL ) ? ( fileLength - offset ) : toReadNum ;
-
-					final byte[] buffer = new byte[toReadNum] ;
-					final int readNum = read( is, buffer ) ;
-					offset += readNum ;
-
-					toReadNum = callback.resourceRaw( buffer, readNum ) ;
-				}
-
-				is.close() ;
-			}
-			catch( IOException ex )
-			{
-				Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
+				toReadNum = callback.readBytes( buffer, readNum ) ;
 			}
 
+			stream.close() ;
 			callback.end() ;
 		}
 	}
 
 	protected static class StringThread extends Thread
 	{
-		private final ResourceCallback callback ;
-		private final String path ;
+		private final StringInStream stream ;
+		private final StringInCallback callback ;
 		private int toReadNum ;
 
-		public StringThread( final String _file, final int _length, final ResourceCallback _callback )
+		public StringThread( StringInStream _stream, final StringInCallback _callback, final int _length )
 		{
 			toReadNum = _length ;
 			callback = _callback ;
-			path = _file ;
+			stream = _stream ;
 		}
 
 		public void run()
 		{
-			try
+			callback.start() ;
+
+			final ArrayList<String> strings = new ArrayList<String>() ;
+			int offset = 0 ;
+
+			String line = null ;
+			while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )
 			{
-				final File file = new File( path ) ;
-				final int fileLength = ( int )file.length() ;
-				callback.start( fileLength ) ;
-
-				final ArrayList<String> strings = new ArrayList<String>() ;
-
-				final FileInputStream is = new FileInputStream( file ) ;
-				final InputStreamReader isr = new InputStreamReader( is ) ;
-				final BufferedReader br = new BufferedReader( isr ) ;
-				int offset = 0 ;
-
-				String line = null ;
-				while( ( ( line = br.readLine() ) != null ) && ( toReadNum > ResourceCallback.STOP ) )
+				strings.add( line ) ;
+				if( toReadNum == ResourceCallback.RETURN_ALL )
 				{
-					strings.add( line ) ;
-					if( toReadNum == ResourceCallback.RETURN_ALL )
-					{
-						continue ;
-					}
-					else if( strings.size() >= toReadNum )
-					{
-						final int size = strings.size() ;
-						toReadNum = callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
-						strings.clear() ;
-					}
+					continue ;
 				}
-
+				else if( strings.size() >= toReadNum )
 				{
 					final int size = strings.size() ;
-					callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
+					toReadNum = callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
+					strings.clear() ;
 				}
-
-				br.close() ;
-				isr.close() ;
-				is.close() ;
 			}
-			catch( IOException ex )
+
 			{
-				Logger.println( "Failed to Read Stream.", Logger.Verbosity.MAJOR ) ;
+				final int size = strings.size() ;
+				callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
 			}
 
+			stream.close() ;
 			callback.end() ;
 		}
 	}

@@ -17,9 +17,9 @@ public class GlobalFileSystem
 		fileSystem = _system ;
 	}
 
-	public static void scanBaseDirectory()
+	public static boolean mapDirectory( final String _directory )
 	{
-		fileSystem.scanBaseDirectory() ;
+		return fileSystem.mapDirectory( _directory ) ;
 	}
 
 	public static FileStream getFile( final String _path )

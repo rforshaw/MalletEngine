@@ -1,29 +1,48 @@
 package com.linxonline.mallet.io.filesystem.desktop ;
 
-import java.io.File ;
-import java.io.FileInputStream ;
-import java.io.FileNotFoundException ;
+import java.io.* ;
+import java.util.zip.* ;
+import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 
-public class DesktopFile implements FileStream
+public class DesktopZipFile implements FileStream
 {
-	private final File file ;
+	private final ZipFile zipFile ;
+	private final ZipEntry zipEntry ;
 
-	public DesktopFile( final File _file )
+	public DesktopZipFile( final DesktopFileSystem.ZipPath _path ) throws IOException
 	{
-		assert _file != null ;
-		file = _file ;
+		assert _path != null ;
+		zipFile = new ZipFile( _path.getZipPath() ) ;
+		zipEntry = zipFile.getEntry( _path.filePath ) ;
 	}
 
 	public ByteInStream getByteInStream()
 	{
 		try
 		{
-			return new DesktopByteIn( new FileInputStream( file ) ) ;
+			return new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
+			{
+				public boolean close()
+				{
+					boolean success = super.close() ;
+					try
+					{
+						zipFile.close() ;
+						return success ;
+					}
+					catch( IOException ex )
+					{
+						ex.printStackTrace() ;
+						return false ;
+					}
+				}
+			} ;
 		}
-		catch( FileNotFoundException ex )
+		catch( IOException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -32,10 +51,27 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringIn( new FileInputStream( file ) ) ;
+			return new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
+			{
+				public boolean close()
+				{
+					boolean success = super.close() ;
+					try
+					{
+						zipFile.close() ;
+						return success ;
+					}
+					catch( IOException ex )
+					{
+						ex.printStackTrace() ;
+						return false ;
+					}
+				}
+			} ;
 		}
-		catch( FileNotFoundException ex )
+		catch( IOException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -71,17 +107,17 @@ public class DesktopFile implements FileStream
 
 	public boolean isFile()
 	{
-		return file.isFile() ;
+		return !zipEntry.isDirectory() ;
 	}
 
 	public boolean isDirectory()
 	{
-		return file.isDirectory() ;
+		return zipEntry.isDirectory() ;
 	}
 
 	public boolean exists()
 	{
-		return file.exists() ;
+		return true ;
 	}
 
 	/**
@@ -90,35 +126,16 @@ public class DesktopFile implements FileStream
 	*/
 	public boolean delete()
 	{
-		return deleteRecursive( file ) ;
+		return false ;
 	}
 
-	private static boolean deleteRecursive( final File _file )
-	{
-		if( _file.exists() == false )
-		{
-			return false ;
-		}
-
-		boolean ret = true ;
-		if( _file.isDirectory() == true )
-		{
-			for( final File file : _file.listFiles() )
-			{
-				ret = ret && deleteRecursive( file ) ;
-			}
-		}
-
-		return ret && _file.delete();
-	}
-	
 	/**
 		Create the Directory structure represented 
 		by this File Stream.
 	*/
 	public boolean mkdirs()
 	{
-		return file.mkdirs() ;
+		return false ;
 	}
 
 	/**
@@ -126,6 +143,6 @@ public class DesktopFile implements FileStream
 	*/
 	public long getSize()
 	{
-		return file.length() ;
+		return zipEntry.getSize() ;
 	}
 }
