@@ -1,15 +1,15 @@
-package com.linxonline.mallet.io.filesystem.desktop ;
+package com.linxonline.mallet.io.filesystem.android ;
 
 import java.io.BufferedWriter ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.StringOutStream ;
 
-public class DesktopStringOut implements StringOutStream
+public class AndroidStringOut implements StringOutStream
 {
 	private final BufferedWriter output ;
 
-	public DesktopStringOut( final BufferedWriter _output )
+	public AndroidStringOut( final BufferedWriter _output )
 	{
 		assert _output != null ;
 		output = _output ;

@@ -5,7 +5,7 @@ import java.util.HashMap ;
 import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
-import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.texture.* ;
 
@@ -54,7 +54,7 @@ public class AndroidTextureManager extends AbstractManager<Texture>
 	
 	private Texture loadTextureFromPath( String _file )
 	{
-		byte[] image = GlobalFileSystem.getResourceRaw( _file ) ;
+		final byte[] image = ByteReader.readBytes( _file ) ;
 		return new Texture( new AndroidImage( BitmapFactory.decodeByteArray( image, 0, image.length ) ) ) ;
 	}
 

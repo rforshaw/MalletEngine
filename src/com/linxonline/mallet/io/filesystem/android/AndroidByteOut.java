@@ -1,15 +1,15 @@
-package com.linxonline.mallet.io.filesystem.desktop ;
+package com.linxonline.mallet.io.filesystem.android ;
 
 import java.io.OutputStream ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.ByteOutStream ;
 
-public class DesktopByteOut implements ByteOutStream
+public class AndroidByteOut implements ByteOutStream
 {
 	private final OutputStream output ;
 
-	public DesktopByteOut( final OutputStream _output )
+	public AndroidByteOut( final OutputStream _output )
 	{
 		assert _output != null ;
 		output = _output ;

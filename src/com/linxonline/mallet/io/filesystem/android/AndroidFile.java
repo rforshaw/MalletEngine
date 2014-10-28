@@ -1,32 +1,32 @@
-package com.linxonline.mallet.io.filesystem.desktop ;
+package com.linxonline.mallet.io.filesystem.android ;
 
-import java.io.File ;
-import java.io.FileInputStream ;
-import java.io.FileOutputStream ;
-import java.io.FileWriter ;
-import java.io.BufferedWriter ;
-import java.io.FileNotFoundException ;
+import java.io.InputStream ;
 import java.io.IOException ;
+import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 
-public class DesktopFile implements FileStream
+public class AndroidFile implements FileStream
 {
-	private final File file ;
+	private final String file ;
+	private final AssetManager asset ;
 
-	public DesktopFile( final File _file )
+	public AndroidFile( final String _file, final AssetManager _asset )
 	{
 		assert _file != null ;
+		assert _asset != null ;
+
 		file = _file ;
+		asset = _asset ;
 	}
 
 	public ByteInStream getByteInStream()
 	{
 		try
 		{
-			return new DesktopByteIn( new FileInputStream( file ) ) ;
+			return new AndroidByteIn( asset.open( file ) ) ;
 		}
-		catch( FileNotFoundException ex )
+		catch( IOException ex )
 		{
 			return null ;
 		}
@@ -36,9 +36,9 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringIn( new FileInputStream( file ) ) ;
+			return new AndroidStringIn( asset.open( file ) ) ;
 		}
-		catch( FileNotFoundException ex )
+		catch( IOException ex )
 		{
 			return null ;
 		}
@@ -56,21 +56,22 @@ public class DesktopFile implements FileStream
 
 	public ByteOutStream getByteOutStream()
 	{
-		try
+		/*try
 		{
-			return new DesktopByteOut( new FileOutputStream( file ) ) ;
+			return new AndroidByteOut( new FileOutputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
 			return null ;
-		}
+		}*/
+		return null ;
 	}
 
 	public StringOutStream getStringOutStream()
 	{
-		try
+		/*try
 		{
-			return new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
+			return new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -79,7 +80,8 @@ public class DesktopFile implements FileStream
 		catch( IOException ex )
 		{
 			return null ;
-		}
+		}*/
+		return null ;
 	}
 
 	/**
@@ -93,17 +95,17 @@ public class DesktopFile implements FileStream
 
 	public boolean isFile()
 	{
-		return file.isFile() ;
+		return false ;
 	}
 
 	public boolean isDirectory()
 	{
-		return file.isDirectory() ;
+		return false ;
 	}
 
 	public boolean exists()
 	{
-		return file.exists() ;
+		return false ;
 	}
 
 	/**
@@ -112,10 +114,10 @@ public class DesktopFile implements FileStream
 	*/
 	public boolean delete()
 	{
-		return deleteRecursive( file ) ;
+		return false ;//deleteRecursive( file ) ;
 	}
 
-	private static boolean deleteRecursive( final File _file )
+	/*private static boolean deleteRecursive( final File _file )
 	{
 		if( _file.exists() == false )
 		{
@@ -132,15 +134,15 @@ public class DesktopFile implements FileStream
 		}
 
 		return ret && _file.delete();
-	}
-	
+	}*/
+
 	/**
 		Create the Directory structure represented 
 		by this File Stream.
 	*/
 	public boolean mkdirs()
 	{
-		return file.mkdirs() ;
+		return false ;//file.mkdirs() ;
 	}
 
 	/**
@@ -148,6 +150,16 @@ public class DesktopFile implements FileStream
 	*/
 	public long getSize()
 	{
-		return file.length() ;
+		try
+		{
+			final InputStream stream = asset.open( file ) ;
+			final int length = stream.available() ;
+			stream.close() ;
+			return length ;
+		}
+		catch( IOException ex )
+		{
+			return 0L ;
+		}
 	}
 }

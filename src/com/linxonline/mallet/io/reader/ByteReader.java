@@ -3,7 +3,6 @@ package com.linxonline.mallet.io.reader ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.ByteInStream ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
-import com.linxonline.mallet.io.filesystem.ResourceCallback ;
 
 /**
 	Convience methods to read byte streams.
@@ -31,14 +30,5 @@ public class ByteReader
 
 		in.close() ;
 		return buffer ;
-	}
-
-	/**
-		Not blocking, returns true if begun reading, false otherwise.
-		Streams the bytes through the callback as they are read.
-	**/
-	public static boolean readBytes( final String _file, final int _length, final ResourceCallback _callback )
-	{
-		return false ;//GlobalFileSystem.getResourceRaw( _file, _length, _callback ) ;
 	}
 }

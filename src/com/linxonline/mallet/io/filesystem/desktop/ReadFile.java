@@ -78,7 +78,7 @@ public class ReadFile
 			while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )
 			{
 				strings.add( line ) ;
-				if( toReadNum == ResourceCallback.RETURN_ALL )
+				if( toReadNum == StringInCallback.RETURN_ALL )
 				{
 					continue ;
 				}

@@ -1,15 +1,15 @@
-package com.linxonline.mallet.io.filesystem.desktop ;
+package com.linxonline.mallet.io.filesystem.android ;
 
 import java.io.InputStream ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.ByteInStream ;
 
-public class DesktopByteIn implements ByteInStream
+public class AndroidByteIn implements ByteInStream
 {
 	private final InputStream stream ;
 
-	public DesktopByteIn( final InputStream _stream )
+	public AndroidByteIn( final InputStream _stream )
 	{
 		stream = _stream ;
 	}

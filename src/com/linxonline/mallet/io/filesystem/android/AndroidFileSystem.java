@@ -1,50 +1,63 @@
 package com.linxonline.mallet.io.filesystem.android ;
 
-import java.util.* ;
-import java.util.zip.* ;
 import java.io.* ;
+import java.util.zip.* ;
+import java.util.* ;
 
 import android.content.Context ;
 import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.io.formats.json.android.* ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.io.formats.json.android.* ;
+
+/**
+	Provides access to the filesystem on desktop platforms.
+	This currently includes: Linux, Windows, & Mac.
+*/
 public class AndroidFileSystem implements FileSystem
 {
-	private Context context = null ;
-	private AssetManager assetManager = null ;
-	private final HashMap<String, DataFile> resources = new HashMap<String, DataFile>() ;
-
-	private static String ROOT_DIRECTORY = "base" ;
+	private final HashMap<String, ZipPath> mapZip = new HashMap<String, ZipPath>() ;
+	private final Context context ;
+	private final AssetManager assetManager ;
 
 	public AndroidFileSystem( final Context _context )
 	{
+		initJSONConstructors() ;
+
 		context = _context ;
 		assetManager = context.getAssets() ;
-		ReadFile.setAssetManager( assetManager ) ;
-		ReadZip.setAssetManager( assetManager ) ;
-
-		initJSONConstructors() ;
 	}
 
+	/**
+		Allows reading and parsing JSON formatted files.
+		Mallet Engine provides a wrapper around a platform 
+		JSON library.
+	*/
 	protected void initJSONConstructors()
 	{
 		AndroidJSONObject.init() ;
 		AndroidJSONArray.init() ;
 	}
 
+	/**
+		Search through the directory mapping out compressed 
+		file formats that are supported.
+		Currently maps zip file format.
+	*/
 	@Override
-	public void scanBaseDirectory()
+	public boolean mapDirectory( final String _directory )
 	{
+		assert _directory != null ;
 		if( context == null )
 		{
 			System.out.println( "Failed TO ACQUIRE CONTEXT" ) ;
-			return ;
+			return false ;
 		}
 
-		traverseFiles( ROOT_DIRECTORY ) ;
+		traverseFiles( _directory ) ;
+		return true ;
 	}
 
 	private void traverseFiles( final String _path )
@@ -65,13 +78,9 @@ public class AndroidFileSystem implements FileSystem
 			if( list.length == 0 )
 			{
 				//System.out.println( "IS A FILE: " + _path ) ;
-				if( isZipFile( _path ) == true )
+				if( isZip( _path ) == true )
 				{
-					mapZipToResources( _path ) ;
-				}
-				else
-				{
-					resources.put( _path, new DataFile( _path, null, false ) ) ;
+					generateZipPaths( _path ) ;
 				}
 			}
 		}
@@ -80,258 +89,94 @@ public class AndroidFileSystem implements FileSystem
 			_ex.printStackTrace() ;
 		}
 	}
-
-	@Override
-	public byte[] getResourceRaw( final String _file )
+	
+	private static ArrayList<ZipPath> generateZipPaths( final String _file )
 	{
-		final DataFile file = resources.get( _file ) ;
-		if( file != null )
+		final File file = new File( _file ) ;
+		final String zipName = file.getName() ;
+		final String zipPath = file.getParent() ;
+
+		final ArrayList<ZipPath> paths = new ArrayList<ZipPath>() ;
+
+		try
 		{
-			if( file.isZipped == false )
+			final ZipFile zipFile = new ZipFile( _file ) ;
+			final Enumeration files = zipFile.entries() ;
+
+			ZipEntry entry = null ;
+			while( files.hasMoreElements() )
 			{
-				return ReadFile.getRaw( file.filePath ) ;
+				entry = ( ZipEntry )files.nextElement() ;
+				if( entry != null )
+				{
+					if( entry.isDirectory() == false )
+					{
+						paths.add( new ZipPath( zipName, zipPath, entry.getName() ) ) ;
+					}
+				}
 			}
-			else if( file.isZipped == true )
-			{
-				return ReadZip.getRaw( file.filePath, file.zipPath ) ;
-			}
+
+			zipFile.close() ;
 		}
+		catch( ZipException _ex ) {}
+		catch( IOException _ex ) {}
 
-		return null ;//attemptMapResource( _file ) ;
+		return paths ;
 	}
 
-	@Override
-	public String getResourceAsString( final String _file )
-	{
-		final DataFile file = resources.get( _file ) ;
-		if( file != null )
-		{
-			if( file.isZipped == false )
-			{
-				return ReadFile.getString( file.filePath ) ;
-			}
-			else if( file.isZipped == true )
-			{
-				return ReadZip.getString( file.filePath, file.zipPath ) ;
-			}
-		}
-
-		//final byte[] data = attemptMapResource( _file ) ; 
-		return null ;//( data != null ) ? new String( data ) : null ;
-	}
-
-	/**
-		Doesn't block calling Thread, when resource has started reading,
-		it'll call ResourceCallback.
-		Return boolean informs whether it successfully started reading.
-
-		Using a length of zero will result in the entire file/stream being returned.
-		Specifying a length greater than zero will determine the maximum amount of bytes/lines
-		that are read and then passed to the callback. If the end of the stream/file does not reach
-		the length size then it is still returned.
-	*/
-	@Override
-	public boolean getResourceRaw( final String _file, final int _length, final ResourceCallback _callback )
-	{
-		final DataFile file = resources.get( _file ) ;
-		if( file != null )
-		{
-			if( file.isZipped == false )
-			{
-				return ReadFile.getRaw( _file, _length, _callback ) ;
-			}
-			else if( file.isZipped == true )
-			{
-				return ReadZip.getRaw( file.filePath, file.zipPath, _length, _callback ) ;
-			}
-		}
-
-		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
-		return false ;
-	}
-
-	@Override
-	public boolean getResourceAsString( final String _file, final int _length, final ResourceCallback _callback )
-	{
-		final DataFile file = resources.get( _file ) ;
-		if( file != null )
-		{
-			if( file.isZipped == false )
-			{
-				return ReadFile.getString( _file, _length, _callback ) ;
-			}
-			else if( file.isZipped == true )
-			{
-				return ReadZip.getString( file.filePath, file.zipPath, _length, _callback ) ;
-			}
-		}
-
-		Logger.println( "File not found.", Logger.Verbosity.MAJOR ) ;
-		return false ;
-	}
-
-	/**
-		Blocks calling Thread
-	**/
-	@Override
-	public boolean writeResourceAsString( final String _file, final String _data )
-	{
-		return false ;
-	}
-
-	@Override
-	public boolean writeResourceRaw( final String _file, final byte[] _data )
-	{
-		return false ;
-	}
-
-	@Override
-	public boolean exist( final String _file )
-	{
-		return false ;
-	}
-
-	@Override
-	public boolean delete( final String _file )
-	{
-		return false ;
-	}
-
-	/**
-		Create the directory structure represented by _path.
-	*/
-	public boolean makeDirectories( final String _path )
-	{
-		return false ;
-	}
-
-	public boolean isFile( final String _file )
-	{
-		return false ;
-	}
-
-	public boolean isDirectory( final String _path )
-	{
-		return false ;
-	}
-
-	public long getFileSize( final String _path )
-	{
-		return 0L ;
-	}
-
-	/**
-		TODO: Needs to be improved to handle random '.' locations.
-	**/
-	public static String getExtension( final String _file )
-	{
-		final int pos = _file.lastIndexOf( "." ) ;
-		return _file.substring( pos + 1 ).toUpperCase() ;
-	}
-
-	public static boolean isZipFile( final String _file )
+	private static boolean isZip( final String _file )
 	{
 		return getExtension( _file ).equals( "ZIP" ) ;
 	}
 
-	private byte[] streamBytes( final DataFile _file )
+	private static String getExtension( final String _name )
 	{
-		try
-		{
-			if( _file.zipPath != null )
-			{
-				final InputStream is = assetManager.open( _file.filePath ) ;
-				final ZipInputStream zis = new ZipInputStream( is ) ;
+		final int pos = _name.lastIndexOf( "." ) ;
+		return _name.substring( pos + 1 ).toUpperCase() ;
+	}
 
-				ZipEntry entry = null ;
-				while( ( entry = zis.getNextEntry() ) != null )
-				{
-					final String zipPath = _file.zipPath ;
-					if( zipPath.equals( entry.getName() ) == true )
-					{
-						final int length = ( int )entry.getSize() ;
-						return read( zis, length ) ;
-					}
-				}
+	@Override
+	public FileStream getFile( final String _path )
+	{
+		if( mapZip.containsKey( _path ) == true )
+		{
+			try
+			{
+				return new AndroidZipFile( mapZip.get( _path ) ) ;
+			}
+			catch( final IOException ex )
+			{
+				return null ;
 			}
 		}
-		catch( ZipException _ex )
-		{
-			System.out.println( "Failed to access Zip" ) ;
-		}
-		catch( IOException _ex )
-		{
-			System.out.println( "Failed to read Zip" ) ;
-		}
 
-		try
-		{
-			final String path = _file.filePath ;
-			final InputStream is = assetManager.open( path ) ;
-			return read( is, is.available() ) ;
-		}
-		catch( IOException _ex )
-		{
-			_ex.printStackTrace() ;
-		}
-
-		System.out.println( "File Not Found" ) ;
-		return null ;
+		return new AndroidFile( _path, assetManager ) ;
 	}
 
-	private static byte[] read( final InputStream _stream, final int _length ) throws IOException
+	public static class ZipPath
 	{
-		final byte[] bytes = new byte[_length] ;
+		public final String zipName ;			// Name of zip with extension
+		public final String zipPath ;			// Path to zip not including the file itself
+		public final String filePath ;			// Path to file within zip
 
-		int offset = 0 ;
-		int numRead = 0 ;
-		while( offset < bytes.length &&
-			( numRead = _stream.read( bytes, offset, bytes.length - offset ) ) >= 0 ) 
+		public ZipPath( final String _zipName, final String _zipPath, final String _filePath )
 		{
-			offset += numRead;
-		}
-
-		_stream.close() ;
-		return bytes ;
-	}
-
-	private void mapZipToResources( final String _file )
-	{
-		try
-		{
-			final InputStream is = assetManager.open( _file ) ;
-			final ZipInputStream zis = new ZipInputStream( is ) ;
-
-			ZipEntry entry = null ;
-			while( ( entry = zis.getNextEntry() ) != null )
-			{
-				if( entry.isDirectory() == false )
-				{
-					final String path = entry.getName() ;
-					final String basePath = ROOT_DIRECTORY + File.separator + path ;
-					final DataFile data = new DataFile( _file, path, true ) ;
-					resources.put( basePath, data ) ;
-				}
-			}
-
-			zis.close() ;
-			is.close() ;
-		}
-		catch( ZipException _ex ) {}
-		catch( IOException _ex ) {}
-	}
-
-	private class DataFile
-	{
-		public final boolean isZipped ;
-		public final String filePath ;
-		public final String zipPath ;
-
-		DataFile( final String _filePath, final String _zipPath, final boolean _isZipped )
-		{
-			isZipped = _isZipped ;
-			filePath = _filePath ;
+			zipName = _zipName ;
 			zipPath = _zipPath ;
+			filePath = _filePath ;
+		}
+
+		public String getZipPath()
+		{
+			return zipPath + '/' + zipName ;
+		}
+
+		public String toString()
+		{
+			final StringBuilder builder = new StringBuilder() ;
+			builder.append( "[Zip Path: " + getZipPath() ) ;
+			builder.append( " File Path: " + filePath + "]" ) ;
+			return builder.toString() ;
 		}
 	}
 }

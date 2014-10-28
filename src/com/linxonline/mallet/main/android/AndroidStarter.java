@@ -86,7 +86,7 @@ public class AndroidStarter extends StarterInterface
  	{
 		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
 		GlobalFileSystem.setFileSystem( _fileSystem ) ;
-		GlobalFileSystem.scanBaseDirectory() ;				// Map base-folder for faster access
+		GlobalFileSystem.mapDirectory( "base" ) ;				// Map base-folder for faster access
 	}
 
 	@Override

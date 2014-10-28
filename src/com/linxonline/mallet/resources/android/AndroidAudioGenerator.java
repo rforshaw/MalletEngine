@@ -6,7 +6,7 @@ import android.media.* ;
 import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
-import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.audio.* ;
@@ -25,7 +25,7 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 
 	public AudioBuffer<AndroidSound> createAudioBuffer( final String _file )
 	{
-		final byte[] soundBuffer = GlobalFileSystem.getResourceRaw( _file ) ;
+		final byte[] soundBuffer = ByteReader.readBytes( _file ) ;
 		if( soundBuffer != null )
 		{
 			return null ;
