@@ -119,24 +119,6 @@ public final class GameTestLoader extends GameLoader
 				final Entity entity = new Entity( "Test Animation" ) ;
 				entity.addComponent( anim ) ;
 				addEntity( entity ) ;
-				
-				Thread thread = new Thread()
-				{
-					@Override
-					public void run()
-					{
-						try
-						{
-							Thread.sleep( 2000 ) ;
-						}
-						catch( InterruptedException e )
-						{
-							e.printStackTrace() ;
-						}
-						anim.playAnimation( "DEFAULT" ) ;
-					}
-				} ;
-				thread.start() ;
 			}
 
 			/**
@@ -147,7 +129,7 @@ public final class GameTestLoader extends GameLoader
 				eventSystem.addEvent( DrawFactory.createText(  "Hello World!", 						// Text
 																new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
 																new Vector2( 0, 0 ), 				// Offset
-																new MalletFont( "Arial", 20 ),		// Mallet Font
+																new MalletFont( "Arial", 10 ),		// Mallet Font
 																null,								// Mallet Colour
 																null,								// clip
 																null,								// clip offset

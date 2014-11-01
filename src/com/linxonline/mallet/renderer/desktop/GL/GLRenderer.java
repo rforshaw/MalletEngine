@@ -49,8 +49,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected final DefaultTimer timer = new DefaultTimer() ;
 	protected Vector2 pos = new Vector2() ;
 
-	protected final Matrix4 uiMatrix = new Matrix4() ;
-	protected final Matrix4 worldMatrix = new Matrix4() ;
+	protected final Matrix4 uiMatrix = Matrix4.createIdentity() ;
+	protected final Matrix4 worldMatrix = Matrix4.createIdentity() ;
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
@@ -192,8 +192,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glPushMatrix() ;
 					if( isGUI == true )
 					{
-						_position.subtract( pos ) ;
-						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+						gl.glPushMatrix() ;
+						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
 					}
 
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
@@ -211,6 +211,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
 					gl.glDrawElements( geometry.style, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+
+					if( isGUI == true )
+					{
+						gl.glPopMatrix() ;
+					}
 				gl.glPopMatrix() ;
 
 				gl.glEnable( GL.GL_TEXTURE_2D ) ;
@@ -261,8 +266,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glPushMatrix() ;
 					if( isGUI == true )
 					{
-						_position.subtract( pos ) ;
-						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+						gl.glPushMatrix() ;
+						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
 					}
 
 					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
@@ -288,6 +293,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+
+					if( isGUI == true )
+					{
+						gl.glPopMatrix() ;
+					}
 				gl.glPopMatrix() ;
 
 				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
@@ -350,8 +360,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					if( isGUI == true )
 					{
-						currentPos.subtract( pos ) ;
-						gl.glScalef( 1.0f / cameraScale.x, 1.0f / cameraScale.y, 1.0f / cameraScale.z ) ;
+						gl.glPushMatrix() ;
+						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
 					}
 
 					gl.glTranslatef( currentPos.x, currentPos.y, 0.0f ) ;
@@ -364,6 +374,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					{
 						renderText( words[i], fm ) ;
 						gl.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
+					}
+
+					if( isGUI == true )
+					{
+						gl.glPopMatrix() ;
 					}
 				gl.glPopMatrix() ;
 
