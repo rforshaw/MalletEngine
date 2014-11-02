@@ -17,8 +17,12 @@ public class ByteReader
 	public static byte[] readBytes( final String _file )
 	{
 		final FileStream file = GlobalFileSystem.getFile( _file ) ;
-		final ByteInStream in = file.getByteInStream() ;
+		if( file.exists() == false )
+		{
+			return null ;
+		}
 
+		final ByteInStream in = file.getByteInStream() ;
 		final int size = ( int )file.getSize() ;
 		final byte[] buffer = new byte[size] ;
 
