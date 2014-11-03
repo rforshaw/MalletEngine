@@ -9,7 +9,7 @@ import java.awt.geom.Rectangle2D ;
 import java.awt.RenderingHints ;
 import java.awt.Graphics2D ;
 import java.awt.Canvas ;
-import java.awt.Color ;
+import java.awt.AlphaComposite ;
 
 import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.font.Glyph ;
@@ -38,9 +38,8 @@ public class GLFontGenerator
 
 		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_4BYTE_ABGR ) ;
 		final Graphics2D g2D = buffer.createGraphics() ;
-		g2D.setBackground( Color.BLACK ) ;
-		g2D.clearRect( 0, 0, ( int )width, dim.height ) ;
 
+		g2D.setComposite( AlphaComposite.SrcOut ) ;
 		g2D.setFont( _font ) ;
 		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
 		final FontMetrics metrics = g2D.getFontMetrics() ;
@@ -65,20 +64,6 @@ public class GLFontGenerator
 																new Vector2( x2, 1.0f ) ) ;
 			glyphs[i] = new GLGlyph( model, c[0], start, advance ) ;
 			increment += advance ;
-		}
-
-		final int markerRGB = Color.BLACK.getRGB() ;
-		for( int x = 0; x < ( int )width; ++x )
-		{
-			for( int y = 0; y < dim.height; ++y )
-			{
-				int rgb = buffer.getRGB( x, y ) ;
-				if( rgb == markerRGB )
-				{
-					// Mark the alpha bits as zero - transparent
-					buffer.setRGB( x, y, 0x00FFFFFF & rgb ) ;
-				}
-			}
 		}
 
 		// Create a GLFontMap and wrap it around a FontMap

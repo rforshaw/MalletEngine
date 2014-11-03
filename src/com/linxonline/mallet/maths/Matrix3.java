@@ -13,7 +13,7 @@ public class Matrix3
 		Each Matrix3 will consume double its normal space.
 		If only we could store the float-array on the stack!
 	*/
-	private final Matrix3 temp = Matrix3.createIdentity() ;
+	private final Matrix3 temp ;
 
 	/**
 		* Ordered by row, if directly using write it down.
@@ -26,19 +26,36 @@ public class Matrix3
 
 	public Matrix3()
 	{
+		// Create a matrix that contains a temp Matrix
+		this( true ) ;
+	}
+	
+	private Matrix3( final boolean _temp )
+	{
 		setRow( 0.0f, 0.0f, 0.0f, 0 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 1 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 2 ) ;
+
+		if( _temp == true )
+		{
+			temp = Matrix3.createTempIdentity() ;
+		}
+		else
+		{
+			temp = null ;
+		}
 	}
 
 	public Matrix3( final Matrix3 _matrix )
 	{
 		Matrix3.copy( _matrix.matrix, matrix ) ;
+		temp = Matrix3.createTempIdentity() ;
 	}
 	
 	public Matrix3( final float[] _matrix )
 	{
 		Matrix3.copy( _matrix, matrix ) ;
+		temp = Matrix3.createTempIdentity() ;
 	}
 
 	public Matrix3( final Vector3 _row1, final Vector3 _row2, final Vector3 _row3 )
@@ -46,6 +63,7 @@ public class Matrix3
 		setRow( _row1.x, _row1.y, _row1.z, 0 ) ;
 		setRow( _row2.x, _row2.y, _row2.z, 1 ) ;
 		setRow( _row3.x, _row3.y, _row3.z, 2 ) ;
+		temp = Matrix3.createTempIdentity() ;
 	}
 
 	public Matrix3( final float _a00, final float _a01, final float _a02, 
@@ -55,6 +73,7 @@ public class Matrix3
 		setRow( _a00, _a01, _a02, 0 ) ;
 		setRow( _a10, _a11, _a12, 1 ) ;
 		setRow( _a20, _a21, _a22, 2 ) ;
+		temp = Matrix3.createTempIdentity() ;
 	}
 
 	public void setIdentity()
@@ -230,6 +249,13 @@ public class Matrix3
 		matrix[( _row * 3) + _col] = _val ;
 	}
 
+	private static Matrix3 createTempIdentity()
+	{
+		final Matrix3 iden = new Matrix3( false ) ;
+		iden.setIdentity() ;
+		return iden ;
+	}
+	
 	public static Matrix3 createIdentity()
 	{
 		final Matrix3 iden = new Matrix3() ;

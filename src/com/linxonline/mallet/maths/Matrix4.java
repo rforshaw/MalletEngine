@@ -37,7 +37,7 @@ public class Matrix4
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 1 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 2 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 3 ) ;
-		
+
 		if( _temp == true )
 		{
 			temp = Matrix4.createTempIdentity() ;
