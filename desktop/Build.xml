@@ -8,15 +8,15 @@
 	<property name="engine-src.dir"		value="${src.dir}/mallet"/>
 	<property name="editor-src.dir"		value="${src.dir}/malleteditor"/>
 
-	<!-- Library location -->
-	<property name="lib.dir"		value="lib"/>
-
 	<!-- Compiler locations -->
 	<property name="build.dir"			value="build"/>
 	<property name="classes.dir"		value="${build.dir}/classes"/>
 	<property name="engine-classes.dir"	value="${classes.dir}/engine"/>
 	<property name="editor-classes.dir"	value="${classes.dir}/editor"/>
 	<property name="jar.dir"			value="${build.dir}/jar"/>
+
+		<!-- Library location -->
+	<property name="lib.dir"		value="${jar.dir}/jar"/>
 
 	<path id="classpath-engine">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>
