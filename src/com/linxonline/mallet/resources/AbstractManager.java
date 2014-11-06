@@ -13,12 +13,6 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	@Override
 	public boolean add( final String _key, final T _value )
 	{
-		if( exists( _key ) == true )
-		{
-			//System.out.println( "Key: " + _key + " Already Exists." ) ;
-			return false ;
-		}
-
 		resources.put( _key, _value ) ;
 		return true ;
 	}

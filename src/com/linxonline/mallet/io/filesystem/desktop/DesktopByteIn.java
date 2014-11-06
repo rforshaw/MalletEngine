@@ -26,6 +26,11 @@ public class DesktopByteIn implements ByteInStream
 		}
 	}
 
+	public InputStream getInputStream()
+	{
+		return stream ;
+	}
+
 	public boolean close()
 	{
 		try
