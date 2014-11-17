@@ -12,6 +12,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class DesktopFile implements FileStream
 {
+	private final CloseStreams toClose = new CloseStreams() ;
 	private final File file ;
 
 	public DesktopFile( final File _file )
@@ -24,7 +25,9 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopByteIn( new FileInputStream( file ) ) ;
+			final ByteInStream stream = new DesktopByteIn( new FileInputStream( file ) ) ;
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -36,7 +39,9 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringIn( new FileInputStream( file ) ) ;
+			final StringInStream stream = new DesktopStringIn( new FileInputStream( file ) ) ;
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -58,7 +63,9 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopByteOut( new FileOutputStream( file ) ) ;
+			final ByteOutStream stream = new DesktopByteOut( new FileOutputStream( file ) ) ;
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -70,7 +77,9 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
+			final StringOutStream stream = new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -149,5 +158,14 @@ public class DesktopFile implements FileStream
 	public long getSize()
 	{
 		return file.length() ;
+	}
+
+	/**
+		Close all the stream input/output that has 
+		been returned and close them.
+	*/
+	public boolean close()
+	{
+		return toClose.close() ;
 	}
 }

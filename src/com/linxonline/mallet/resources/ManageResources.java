@@ -27,9 +27,10 @@ public abstract class ManageResources
 		for( final String key : keys )
 		{
 			resource = ( Resource )_resources.get( key ) ;
-			if( resource.getLivingTime() > DEFAULT_LIVING_TIME )
+			if( resource != null )
 			{
-				if( resource.getReferenceCount() == 0 )
+				if( ( resource.getReferenceCount() == 0 ) &&
+					( resource.getLivingTime() > DEFAULT_LIVING_TIME ) )
 				{
 					remove.add( key ) ;
 				}

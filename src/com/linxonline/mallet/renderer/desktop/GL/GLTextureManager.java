@@ -12,6 +12,7 @@ import java.nio.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.desktop.* ;
+import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
@@ -41,7 +42,66 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	protected int imageFormat = GL2.GL_RGBA ;
 
-	public GLTextureManager() {}
+	public GLTextureManager()
+	{
+		final ResourceLoader<Texture> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<Texture>()
+		{
+			public boolean isLoadable( final String _file )
+			{
+				return true ;
+			}
+
+			public Texture load( final String _file, final Settings _settings )
+			{
+				return loadTextureASync( _file ) ;
+			}
+
+			protected Texture loadTextureASync( final String _file )
+			{
+				final FileStream file = GlobalFileSystem.getFile( _file ) ;
+				if( file.exists() == false )
+				{
+					Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
+					return null ;
+				}
+
+				final Thread load = new Thread( "LOAD_TEXTURE" )
+				{
+					public void run()
+					{
+						try
+						{
+							final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
+							final InputStream stream = in.getInputStream() ;
+							final BufferedImage image = ImageIO.read( stream ) ;
+							in.close() ;
+
+							synchronized( toBind )
+							{
+								// We don't want to bind the BufferedImage now
+								// as that will take control of the OpenGL context.
+								toBind.add( new Tuple<String, BufferedImage>( _file, image ) ) ;
+							}
+						}
+						catch( IOException ex )
+						{
+							ex.printStackTrace() ;
+						}
+					}
+				} ;
+
+				// We want to allocate the key for the resource so the texture 
+				// is not reloaded if another object wishes to use it before 
+				// the texture has fully loaded.
+				// The Renderer should skip the texture, until it is finally 
+				// available to render/
+				add( _file, null ) ;
+				load.start() ;
+				return null ;
+			}
+		} ) ;
+	}
 
 	@Override
 	public Texture get( final String _file )
@@ -65,56 +125,6 @@ public class GLTextureManager extends AbstractManager<Texture>
 	public void setImageFormat( final int _format )
 	{
 		imageFormat = _format ;
-	}
-
-	@Override
-	protected Texture createResource( final String _file )
-	{
-		return loadTextureASync( _file ) ;
-	}
-
-	protected Texture loadTextureASync( final String _file )
-	{
-		final FileStream file = GlobalFileSystem.getFile( _file ) ;
-		if( file.exists() == false )
-		{
-			Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
-			return null ;
-		}
-
-		final Thread load = new Thread( "LOAD_TEXTURE" )
-		{
-			public void run()
-			{
-				try
-				{
-					final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
-					final InputStream stream = in.getInputStream() ;
-					final BufferedImage image = ImageIO.read( stream ) ;
-					in.close() ;
-
-					synchronized( toBind )
-					{
-						// We don't want to bind the BufferedImage now
-						// as that will take control of the OpenGL context.
-						toBind.add( new Tuple<String, BufferedImage>( _file, image ) ) ;
-					}
-				}
-				catch( IOException ex )
-				{
-					ex.printStackTrace() ;
-				}
-			}
-		} ;
-
-		// We want to allocate the key for the resource so the texture 
-		// is not reloaded if another object wishes to use it before 
-		// the texture has fully loaded.
-		// The Renderer should skip the texture, until it is finally 
-		// available to render/
-		add( _file, null ) ;
-		load.start() ;
-		return null ;
 	}
 
 	/**

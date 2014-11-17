@@ -7,17 +7,10 @@ import java.nio.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.resources.model.Model ;
 
-public class GLModelManager extends AbstractManager
+public class GLModelManager extends AbstractManager<Model>
 {
-	@Override
-	protected Resource createResource( final String _file )
-	{
-		System.out.println( "GLModelManager - createResource() not supported." ) ;
-		System.out.println( "Will be supported once models formats are added." ) ;
-		return null ;
-	}
-
 	public static void bind( final GLGeometry _geometry )
 	{
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
@@ -65,7 +58,7 @@ public class GLModelManager extends AbstractManager
 
 	public static void updateVBO( final GL2 _gl, final GLGeometry _geometry )
 	{
-		final int vertexBufferLength = _geometry.vertex.length * 4 ; 
+		final int vertexBufferLength = _geometry.vertex.length * 4 ;								// * 4 represents the bytes for each float
 
 		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexBufferLength ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;

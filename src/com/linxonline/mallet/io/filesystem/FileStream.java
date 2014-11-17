@@ -1,6 +1,8 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface FileStream
+import java.util.ArrayList ;
+
+public interface FileStream extends Close
 {
 	public ByteInStream getByteInStream() ;
 	public StringInStream getStringInStream() ;
@@ -38,4 +40,34 @@ public interface FileStream
 		Return the File size of this FileStream.
 	*/
 	public long getSize() ;
+
+	public boolean close() ;
+
+	public static class CloseStreams implements Close
+	{
+		private final ArrayList<Close> toClose = new ArrayList<Close>() ;
+
+		public CloseStreams() {}
+
+		public void add( final Close _close )
+		{
+			toClose.add( _close ) ;
+		}
+
+		public boolean close()
+		{
+			boolean success = true ;
+			final int length = toClose.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				if( toClose.get( i ).close() == false )
+				{
+					success = false ;
+				}
+			}
+
+			toClose.clear() ;
+			return success ;
+		}
+	}
 }

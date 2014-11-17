@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface ByteInStream
+public interface ByteInStream extends Close
 {
 	/**
 		Request to read _length of bytes from the file.

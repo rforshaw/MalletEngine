@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface StringOutStream
+public interface StringOutStream extends Close
 {
 	/**
 		Return a line of text from the file.

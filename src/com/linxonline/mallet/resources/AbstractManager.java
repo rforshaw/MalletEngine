@@ -1,11 +1,15 @@
 package com.linxonline.mallet.resources ;
 
+import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.Set ;
 import java.util.Collection ;
 
+import com.linxonline.mallet.util.settings.Settings ;
+
 public abstract class AbstractManager<T extends Resource> implements ManagerInterface<T>
 {
+	protected final AbstractLoader<T> abstractLoader = new AbstractLoader<T>() ;
 	protected final HashMap<String, T> resources = new HashMap<String, T>() ;
 
 	public AbstractManager() {}
@@ -18,6 +22,30 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	}
 
 	@Override
+	public T get( final String _key, final Settings _settings )
+	{
+		return get( _key, _settings.getString( "FILE", null ) ) ;
+	}
+
+	@Override
+	public T get( final String _key, final String _file )
+	{
+		if( exists( _key ) == true )
+		{
+			return resources.get( _key ) ;
+		}
+
+		final T resource = createResource( _file, null ) ;
+		if( resource != null )
+		{
+			add( _key, resource ) ;
+			resource.register() ;			// Increment usage count
+		}
+
+		return resource ;
+	}
+
+	@Override
 	public T get( final String _file )
 	{
 		if( exists( _file ) == true )
@@ -25,7 +53,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 			return resources.get( _file ) ;
 		}
 
-		T resource = createResource( _file ) ;
+		final T resource = createResource( _file, null ) ;
 		if( resource != null )
 		{
 			add( _file, resource ) ;
@@ -35,23 +63,17 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return resource ;
 	}
 
-	/**
-		Should be overriden by all classes that extend this class.
-		Called when a resource needs to be created.
-	**/
-	protected abstract T createResource( final String _file ) ;
-
-	/**
-		This allow the developer to redirect what resource should be loaded up.
-
-		For example this would allow the request to be redirected to a lower quality 
-		or higher quality version of the requested resource. Override to make use of.
-	**/
-	protected String redirectResourceLocation( final String _file )
+	@Override
+	public ResourceLoader<T> getResourceLoader()
 	{
-		return _file ;
+		return abstractLoader ;
 	}
-	
+
+	protected T createResource( final String _file, final Settings _settings )
+	{
+		return abstractLoader.load( _file, _settings ) ;
+	}
+
 	/**
 		Removes resources that are not used.
 	**/
@@ -68,7 +90,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	@Override
 	public void clear()
 	{
-		Collection<T> res = resources.values() ;
+		final Collection<T> res = resources.values() ;
 		for( final T resource : res )
 		{
 			resource.destroy() ;
@@ -90,5 +112,45 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		final StringBuffer buffer = new StringBuffer() ;
 		buffer.append( "Resources: " + resources ) ;
 		return buffer.toString() ;
+	}
+
+	public class AbstractLoader<T extends Resource> implements ResourceLoader<T>
+	{
+		private final ArrayList<ResourceDelegate<T>> loaders = new ArrayList<ResourceDelegate<T>>() ;
+
+		public AbstractLoader() {}
+
+		public void add( final ResourceDelegate<T> _delegate )
+		{
+			if( loaders.contains( _delegate ) == false )
+			{
+				loaders.add( _delegate ) ;
+			}
+		}
+
+		public void remove( final ResourceDelegate<T> _delegate )
+		{
+			if( loaders.contains( _delegate ) == true )
+			{
+				loaders.remove( _delegate ) ;
+			}
+		}
+
+		public T load( final String _file, final Settings _settings )
+		{
+			assert _file != null ;			// _file must not be null, _settings can be null
+
+			final int length = loaders.size() ;
+			for( int i = 0; i < length; ++i )
+			{
+				final ResourceDelegate<T> delegate = loaders.get( i ) ;
+				if( delegate.isLoadable( _file ) == true )
+				{
+					return delegate.load( _file, _settings ) ;
+				}
+			}
+
+			return null ;
+		}
 	}
 }

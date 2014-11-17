@@ -8,6 +8,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class DesktopZipFile implements FileStream
 {
+	private CloseStreams toClose = new CloseStreams() ;
 	private final ZipFile zipFile ;
 	private final ZipEntry zipEntry ;
 
@@ -22,7 +23,7 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			return new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
+			final ByteInStream stream = new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
 			{
 				public boolean close()
 				{
@@ -39,6 +40,9 @@ public class DesktopZipFile implements FileStream
 					}
 				}
 			} ;
+
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( IOException ex )
 		{
@@ -51,7 +55,7 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
+			final StringInStream stream = new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
 			{
 				public boolean close()
 				{
@@ -68,6 +72,9 @@ public class DesktopZipFile implements FileStream
 					}
 				}
 			} ;
+
+			toClose.add( stream ) ;
+			return stream ;
 		}
 		catch( IOException ex )
 		{
@@ -144,5 +151,10 @@ public class DesktopZipFile implements FileStream
 	public long getSize()
 	{
 		return zipEntry.getSize() ;
+	}
+
+	public boolean close()
+	{
+		return false ;
 	}
 }
