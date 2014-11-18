@@ -95,7 +95,7 @@ public class Vector2
 	@Override
 	public String toString()
 	{
-		return new String( "X:" + x + " Y: " + y ) ;
+		return "X:" + x + " Y: " + y ;
 	}
 
 	/**

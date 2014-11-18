@@ -11,10 +11,12 @@ import com.linxonline.mallet.maths.* ;
 	one camera, however the camera can be moved to 
 	suggest multiple cameras in different locations.
 */
-public class CameraFactory
+public final class CameraFactory
 {
 	private final static String REQUEST_TYPE = "REQUEST_TYPE" ;
 	private final static String CAMERA = "CAMERA" ;
+
+	private CameraFactory() {}
 
 	public static Event setCameraPositionEvent( final Vector3 _pos )
 	{

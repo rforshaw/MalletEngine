@@ -5,7 +5,7 @@ import java.io.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 
-public class WriteFile
+public final class WriteFile
 {
 	private WriteFile() {}
 

@@ -66,7 +66,10 @@ public class Animation implements IDInterface, Cacheable
 		if( callbacks.contains( _callback ) == false )
 		{
 			callbacks.add( _callback ) ;
-			if( renderID > -1 ) { _callback.recieveID( id ) ; }
+			if( renderID > -1 )
+			{
+				_callback.recieveID( id ) ;
+			}
 		}
 	}
 

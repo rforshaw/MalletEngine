@@ -16,8 +16,6 @@ import com.linxonline.mallet.util.SourceCallback ;
 
 public class AudioSystem extends SystemRoot<ActiveSound>
 {
-	private static final String[] EVENT_TYPES = { "AUDIO" } ;
-
 	protected final static SoundManager soundManager = new SoundManager() ;
 	protected AudioGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
 	protected int numID = 0 ;
@@ -189,6 +187,6 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	@Override
 	public final String[] getWantedEventTypes()
 	{
-		return EVENT_TYPES ;
+		return new String[] { "AUDIO" } ;
 	}
 }

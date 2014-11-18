@@ -193,7 +193,6 @@ public final class Entity implements SerialisableForm
 	**/
 	public final ArrayList<Component> getComponentByGroup( final String _group )
 	{
-		final int groupID = _group.hashCode() ;
 		final ArrayList<Component> group = new ArrayList<Component>() ;
 
 		for( final Component component : components )

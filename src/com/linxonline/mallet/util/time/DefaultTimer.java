@@ -4,7 +4,6 @@ public class DefaultTimer implements TimerInterface
 {
 	private long oldTime = System.nanoTime() ;
 	private long currentTime = System.nanoTime() ;
-	private long elapsedTime = 0 ;
 	private long totalTimeSeconds = 0 ;
 	private double nanoseconds = 0.0f ;
 	private double seconds = 0.0f ;
@@ -42,7 +41,7 @@ public class DefaultTimer implements TimerInterface
 	{
 		oldTime = currentTime ;
 		currentTime = System.nanoTime() ;
-		
-		return elapsedTime = currentTime - oldTime ;
+
+		return currentTime - oldTime ;
 	}
 }

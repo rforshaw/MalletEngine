@@ -10,9 +10,9 @@ import com.linxonline.mallet.maths.* ;
 	for the Rendering System.
 	Supports: G2DRenderer, GLRenderer...
 */
-public class DrawFactory
+public final class DrawFactory
 {
-	public DrawFactory() {}
+	private DrawFactory() {}
 
 	public static Event removeDraw( final int _id )
 	{

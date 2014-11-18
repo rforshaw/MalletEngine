@@ -116,7 +116,7 @@ public class Vector3
 	@Override
 	public String toString()
 	{
-		return new String( "X:" + x + " Y: " + y + " Z: " + z ) ;
+		return "X:" + x + " Y: " + y + " Z: " + z ;
 	}
 
 	public static final Vector3 add( final Vector3 _vec1, final Vector3 _vec2 )

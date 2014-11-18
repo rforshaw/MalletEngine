@@ -41,10 +41,6 @@ public class LanguageManager
 		assert _file != null ;
 		final String file = "base/languages/" + languageFolder + "/" + _file ;
 		ArrayList<String> textFile = TextReader.getTextFile( file ) ;
-		if( textFile == null )
-		{
-			return false ;
-		}
 
 		filesLoaded.add( _file ) ;
 		return loadFile( textFile ) ;

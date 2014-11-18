@@ -10,8 +10,10 @@ import com.linxonline.mallet.maths.* ;
 	Provides an effective way to generate Events
 	for the Animation System.
 */
-public class AnimationFactory
+public final class AnimationFactory
 {
+	private AnimationFactory() {}
+
 	public static Event<Settings> createAnimation( final String _file,
 										 final Vector3 _pos, 
 										 final Vector2 _offset, 			// Not needed

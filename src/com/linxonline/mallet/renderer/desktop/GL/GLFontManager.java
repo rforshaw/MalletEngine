@@ -54,17 +54,6 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 
 	protected GLFontMap createResource( final String _name, final int _size )
 	{
-		final GLFontMap fontMap = loadFontMap( _name, _size ) ;
-		if( fontMap != null )
-		{
-			return fontMap ;
-		}
-
-		return null ;
-	}
-
-	protected GLFontMap loadFontMap( final String _name, final int _size )
-	{
 		// Generate the Glyphs for the passed in characters
 		return gen.generateFontMap( _name, _size, "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+.", 5 ) ;
 	}

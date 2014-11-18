@@ -325,7 +325,7 @@ public class Vorbis
 	/**
 		Contains the information required to quickly decode the headers.
 	**/
-	public class VorbisHeader
+	public static class VorbisHeader
 	{
 		public final int headerType ;	// ID_HEADER_TYPE, COMMENT_HEADER_TYPE, & SETUP_HEADER_TYPE are valid values
 		public final int start ;			// The start of header information skips default header data

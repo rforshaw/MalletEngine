@@ -73,7 +73,7 @@ public class InputCache
 		return inputTime ;
 	}
 
-	public class InputTime
+	public static class InputTime
 	{
 		public long timestamp ;
 		public double remainder ;

@@ -84,8 +84,8 @@ public class GLFontGenerator
 
 		return new Dimensions( new Vector2( 0, y ), width, height ) ;
 	}
-	
-	private class Dimensions
+
+	private static class Dimensions
 	{
 		public final int width ;
 		public final int height ;
@@ -97,7 +97,7 @@ public class GLFontGenerator
 			width = _width ;
 			height = _height ;
 		}
-		
+
 		public String toString()
 		{
 			return "WIDTH: " + width + " HEIGHT: " + height + " POS: " + position.toString() ;

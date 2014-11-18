@@ -39,9 +39,14 @@ public final class EventType
 		Return the EventType corresponding to the String 
 		passed in. Create an EventType if one doesn't exist.
 	*/
-	public static synchronized EventType get( final String _type )
+	public static EventType get( final String _type )
 	{
-		final EventType type = eventTypes.get( _type ) ;
+		final EventType type ;
+		synchronized( eventTypes )
+		{
+			type = eventTypes.get( _type ) ;
+		}
+
 		return ( type != null ) ? type : createEventType( _type ) ;
 	}
 
@@ -52,7 +57,10 @@ public final class EventType
 	private static EventType createEventType( final String _type )
 	{
 		final EventType type = new EventType( _type ) ;
-		eventTypes.put( _type, type ) ;
+		synchronized( eventTypes )
+		{
+			eventTypes.put( _type, type ) ;
+		}
 
 		return type ;
 	}

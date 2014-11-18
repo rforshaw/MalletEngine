@@ -4,7 +4,7 @@ package com.linxonline.mallet.main.desktop ;
 // Main
 // Test Main
 /*===========================================*/
-public class DesktopTestMain
+public final class DesktopTestMain
 {
 	public static void main( String _args[] )
 	{

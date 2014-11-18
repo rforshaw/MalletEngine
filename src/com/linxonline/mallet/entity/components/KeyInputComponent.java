@@ -74,7 +74,7 @@ public class KeyInputComponent extends InputComponent
 		}
 	}
 
-	private class Key
+	private static class Key
 	{
 		public final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
 

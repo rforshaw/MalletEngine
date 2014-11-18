@@ -16,7 +16,6 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 
 public class AnimationSystem extends SystemRoot<Animation>
 {
-	private final static String[] EVENT_TYPES = { "ANIMATION" } ;
 	private final static ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
 	private final static SpriteManager spriteManager = new SpriteManager() ;
 
@@ -136,6 +135,6 @@ public class AnimationSystem extends SystemRoot<Animation>
 	@Override
 	public String[] getWantedEventTypes()
 	{
-		return EVENT_TYPES ;
+		return new String[] { "ANIMATION" } ;
 	}
 }

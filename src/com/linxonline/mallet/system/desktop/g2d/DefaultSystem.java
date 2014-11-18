@@ -26,7 +26,7 @@ import com.linxonline.mallet.util.locks.* ;
 
 public class DefaultSystem implements SystemInterface
 {
-	protected String titleName = new String( "Mallet Engine" ) ;
+	protected String titleName = "Mallet Engine" ;
 	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
 
 	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;

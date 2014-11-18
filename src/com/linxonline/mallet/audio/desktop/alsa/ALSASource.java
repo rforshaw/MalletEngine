@@ -10,16 +10,16 @@ import com.linxonline.mallet.audio.* ;
 */
 public class ALSASource implements AudioSource
 {
-	private AL openAL = null ;
-	private int[] buffer = null ;
-	private int[] source = null ;
+	private final AL openAL ;
+	private final int[] buffer ;
+	private final int[] source ;
 
-	private int[] state = new int[1] ;			// Current State of the Audio: Playing, Pause, etc..
-	private int[] size = new int[1] ;
-	private int[] bits = new int[1] ;
-	private int[] channels = new int[1] ;
-	private int[] freq = new int[1] ;
-	private int[] bufferOffset = new int[1] ;
+	private final int[] state = new int[1] ;			// Current State of the Audio: Playing, Pause, etc..
+	private final int[] size = new int[1] ;
+	private final int[] bits = new int[1] ;
+	private final int[] channels = new int[1] ;
+	private final int[] freq = new int[1] ;
+	private final int[] bufferOffset = new int[1] ;
 
 	public ALSASource( final AL _openAL, final int[] _buffer, final int[] _source )
 	{

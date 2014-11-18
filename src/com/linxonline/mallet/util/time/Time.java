@@ -8,9 +8,9 @@ package com.linxonline.mallet.util.time ;
 	class, to reduce the possibility of corrupting the ElapsedTimer 
 	used by the engine.
 **/
-public class Time
+public final class Time
 {
-	public Time() {}
+	private Time() {}
 
 	public static final long getTotalElapsedTimeInSeconds()
 	{

@@ -11,13 +11,8 @@ public abstract class ConfigReader
 	
 	public static Settings getConfig( final String _file )
 	{
-		ArrayList<String> file = TextReader.getTextFile( _file ) ;
-		if( file == null )
-		{
-			return null ;
-		}
-
-		Settings config = new Settings() ;
+		final ArrayList<String> file = TextReader.getTextFile( _file ) ;
+		final Settings config = new Settings() ;
 
 		for( String line : file )
 		{
@@ -33,8 +28,8 @@ public abstract class ConfigReader
 
 	private static void process( final String[] _split, final Settings _config )
 	{
-		String keyword = _split[0].toUpperCase() ;			// Ensure keyword is UPPERCASE
-		StringBuffer buffer = new StringBuffer() ;
+		final String keyword = _split[0].toUpperCase() ;			// Ensure keyword is UPPERCASE
+		final StringBuffer buffer = new StringBuffer() ;
 
 		for( int i = 1; i < _split.length; i++ )
 		{

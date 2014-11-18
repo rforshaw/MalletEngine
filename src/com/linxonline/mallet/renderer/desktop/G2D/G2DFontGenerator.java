@@ -67,8 +67,8 @@ public class G2DFontGenerator
 
 		return new Dimensions( new Vector2( 0, y ), width, height ) ;
 	}
-	
-	private class Dimensions
+
+	private static class Dimensions
 	{
 		public final int width ;
 		public final int height ;

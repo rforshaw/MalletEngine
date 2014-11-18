@@ -199,6 +199,10 @@ public class Matrix3
 		final float a20 =  ( ( -matrix[6] * matrix[2] ) + ( matrix[0] * matrix[5] ) ) / d ;
 		final float a21 = -( ( -matrix[6] * matrix[1] ) + ( matrix[0] * matrix[7] ) ) / d ;
 		final float a22 =  ( ( -matrix[3] * matrix[1] ) + ( matrix[0] * matrix[4] ) ) / d ;
+
+		setRow( a00, a01, a02, 0 ) ;
+		setRow( a10, a11, a12, 1 ) ;
+		setRow( a20, a21, a22, 2 ) ;
 	}
 
 	public void transpose()

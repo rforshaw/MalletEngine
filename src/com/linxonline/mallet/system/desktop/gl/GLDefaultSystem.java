@@ -30,7 +30,7 @@ import com.linxonline.mallet.renderer.desktop.GL.* ;
 
 public class GLDefaultSystem implements SystemInterface
 {
-	protected String titleName = new String( "GL Mallet Engine" ) ;
+	protected String titleName = "GL Mallet Engine" ;
 	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
 	protected final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
 

@@ -19,7 +19,7 @@ public abstract class VariableInterface
 	public final static int BOOLEAN_TYPE = 4 ;
 	public final static int OBJECT_TYPE = 5 ;
 
-	public String name = new String( "NONE" ) ;
+	public String name = "NONE" ;
 	protected int type = NONE_TYPE ;
 
 	public void setName( final String _name )

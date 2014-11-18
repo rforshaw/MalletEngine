@@ -5,9 +5,9 @@ import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.audio.ModifyAudio ;
 
-public class AudioFactory
+public final class AudioFactory
 {
-	public AudioFactory() {}
+	private AudioFactory() {}
 
 	public static Event createAudio( final String _file, final SourceCallback _callback )
 	{

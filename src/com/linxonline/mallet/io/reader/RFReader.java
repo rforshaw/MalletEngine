@@ -32,12 +32,6 @@ public abstract class RFReader
 	public static ArrayList<Settings> loadFile( final String _file )
 	{
 		final ArrayList<String> file = TextReader.getTextFile( _file ) ;
-		if( file == null )
-		{
-			System.out.println( "Failed to Read File: " + _file ) ;
-			return null ;
-		}
-
 		final ArrayList<String> stripped = stripComments( file ) ;
 
 		boolean openBracket = false ;

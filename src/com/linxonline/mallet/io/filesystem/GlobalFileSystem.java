@@ -5,7 +5,7 @@ package com.linxonline.mallet.io.filesystem ;
 	Must be setFileSystem() must be called before game 
 	begin running.
 */
-public class GlobalFileSystem
+public final class GlobalFileSystem
 {
 	private static FileSystem fileSystem = null ;
 

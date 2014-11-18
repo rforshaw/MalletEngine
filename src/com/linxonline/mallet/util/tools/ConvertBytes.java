@@ -18,10 +18,12 @@ import java.nio.ByteOrder ;
 	If the byte-stream contains multiple variables, then the variable positions will also
 	be invereted.
 */
-public class ConvertBytes
+public final class ConvertBytes
 {
 	public static final int LITTLE_ENDIAN = 1 ;
 	public static final int BIG_ENDIAN = 2 ;
+
+	private ConvertBytes() {}
 
 	/**
 		Returns the platforms native Endianese

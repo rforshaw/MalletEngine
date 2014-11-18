@@ -44,7 +44,7 @@ public final class Sprite extends Resource
 		return "SPRITE" ;
 	}
 
-	public class Frame
+	public static class Frame
 	{
 		public final String path ;
 		public final Vector2 uv1 = new Vector2() ;

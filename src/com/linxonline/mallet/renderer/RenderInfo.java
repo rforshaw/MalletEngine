@@ -17,12 +17,11 @@ public final class RenderInfo implements InputAdapterInterface
 	private Vector2 renderDimensions = null ;							// Dimensions of the render-buffer
 	private Vector3 cameraPosition = null ;								// Camera position
 	private final Vector2 cameraZoom = new Vector2( 1, 1 ) ;
-	private Vector2 scaledRenderDimensions = new Vector2( 0, 0 ) ;
-	private Vector2 halfRenderDimensions = new Vector2() ;
+	private final Vector2 scaledRenderDimensions = new Vector2( 0, 0 ) ;
+	private final Vector2 halfRenderDimensions = new Vector2() ;
+	private final Vector2 scaleRtoD = new Vector2( 0, 0 ) ;
 	private Vector2 screenOffset = new Vector2( 0, 0 ) ;
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
-	private Vector2 scaleRtoD = new Vector2( 0, 0 ) ;
-	private Vector3 realCameraPosition = new Vector3( 0, 0, 0 ) ;
 
 	public RenderInfo( final Vector2 _displayDimension, 
 					   final Vector2 _renderDimensions, 
@@ -183,7 +182,7 @@ public final class RenderInfo implements InputAdapterInterface
 
 	public final Vector3 getCameraPosition()
 	{
-		return cameraPosition ;//realCameraPosition ;
+		return cameraPosition ;
 	}
 
 	public final Vector2 getRatioRenderToDisplay()

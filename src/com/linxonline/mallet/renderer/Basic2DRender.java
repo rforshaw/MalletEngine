@@ -23,8 +23,6 @@ import com.linxonline.mallet.util.sort.QuickSort ;
 */
 public abstract class Basic2DRender extends EventUpdater implements RenderInterface
 {
-	protected static final String[] EVENT_TYPES = { "DRAW", "CAMERA" } ;
-
 	protected static final int ALIGN_LEFT = 0 ;
 	protected static final int ALIGN_RIGHT = 1 ;
 	protected static final int ALIGN_CENTRE = 2 ;
@@ -195,7 +193,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	@Override
 	public String[] getWantedEventTypes()
 	{
-		return EVENT_TYPES ;
+		return new String[] { "DRAW", "CAMERA" } ;
 	}
 
 	/**

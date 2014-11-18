@@ -43,7 +43,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 					final float u2 = Float.parseFloat( frameText[3] ) ;
 					final float v2 = Float.parseFloat( frameText[4] ) ;
 
-					sprite.addFrame( sprite.new Frame( frameText[0], u1, v1, u2, v2 ) ) ;
+					sprite.addFrame( new Sprite.Frame( frameText[0], u1, v1, u2, v2 ) ) ;
 				}
 
 				return sprite ;
