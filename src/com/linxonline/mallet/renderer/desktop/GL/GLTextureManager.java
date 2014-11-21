@@ -115,7 +115,13 @@ public class GLTextureManager extends AbstractManager<Texture>
 			toBind.clear() ;
 		}
 
-		return super.get( _file ) ;
+		final Texture texture = super.get( _file ) ;
+		if( texture != null )
+		{
+			texture.register() ;
+		}
+
+		return texture ;
 	}
 
 	/**
