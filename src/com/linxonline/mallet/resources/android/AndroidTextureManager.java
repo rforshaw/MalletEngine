@@ -5,6 +5,7 @@ import java.util.HashMap ;
 import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
+import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.texture.* ;
@@ -20,46 +21,46 @@ public class AndroidTextureManager extends AbstractManager<Texture>
 	{
 		options.inScaled = false ;
 		activityResources = _resources ;
-	}
-
-	@Override
-	protected Texture createResource( final String _file )
-	{
-		Texture texture = loadTexture( _file ) ;
-		if( texture != null )
+		
+		final ResourceLoader<Texture> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<Texture>()
 		{
-			resources.put( _file, texture ) ;
-			return texture ;
-		}
+			public boolean isLoadable( final String _file )
+			{
+				return true ;
+			}
 
-		System.out.println( "Failed to create Texture: " + _file ) ;
-		return null ;
-	}
-	
-	protected Texture loadTexture( final String _file )
-	{
-		if( isResource( _file ) == true )
-		{
-			return loadTextureFromResource( _file ) ;
-		}
+			public Texture load( final String _file, final Settings _settings )
+			{
+				if( isResource( _file ) == true )
+				{
+					return loadTextureFromResource( _file ) ;
+				}
 
-		return loadTextureFromPath( _file ) ;
-	}
-	
-	private Texture loadTextureFromResource( String _file )
-	{
-		final int id = activityResources.getIdentifier( _file, null, null ) ;
-		return new Texture( new AndroidImage( BitmapFactory.decodeResource( activityResources, id, options ) ) ) ;
-	}
-	
-	private Texture loadTextureFromPath( String _file )
-	{
-		final byte[] image = ByteReader.readBytes( _file ) ;
-		return new Texture( new AndroidImage( BitmapFactory.decodeByteArray( image, 0, image.length ) ) ) ;
-	}
+				return loadTextureFromPath( _file ) ;
+			}
 
-	private boolean isResource( String _file )
-	{
-		return _file.contains( ":drawable/" ) ;
+			private Texture loadTextureFromResource( String _file )
+			{
+				final int id = activityResources.getIdentifier( _file, null, null ) ;
+				return new Texture( new AndroidImage( BitmapFactory.decodeResource( activityResources, id, options ) ) ) ;
+			}
+
+			private Texture loadTextureFromPath( String _file )
+			{
+				final byte[] image = ByteReader.readBytes( _file ) ;
+				if( _file != null )
+				{
+					return new Texture( new AndroidImage( BitmapFactory.decodeByteArray( image, 0, image.length ) ) ) ;
+				}
+
+				return null ;
+			}
+
+			private boolean isResource( String _file )
+			{
+				return _file.contains( ":drawable/" ) ;
+			}
+		} ) ;
 	}
 }

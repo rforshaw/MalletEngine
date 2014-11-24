@@ -49,9 +49,10 @@ public interface FileStream extends Close
 
 		public CloseStreams() {}
 
-		public void add( final Close _close )
+		public Close add( final Close _close )
 		{
 			toClose.add( _close ) ;
+			return _close ;
 		}
 
 		public boolean close()

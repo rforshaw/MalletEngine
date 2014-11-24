@@ -364,9 +364,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
 					}
 
-					gl.glTranslatef( currentPos.x, currentPos.y, 0.0f ) ;
+					gl.glTranslatef( ( int )currentPos.x, ( int )currentPos.y, 0.0f ) ;
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					gl.glTranslatef( ( int )offset.x, ( int )offset.y, 0.0f ) ;
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 					final int size = words.length ;

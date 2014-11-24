@@ -6,41 +6,43 @@ import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 
-public class AndroidFile implements FileStream
+public class AndroidAssetFile implements FileStream
 {
 	private final CloseStreams toClose = new CloseStreams() ;
 	private final String file ;
+	private final AssetManager asset ;
 
-	public AndroidFile( final String _file )
+	public AndroidAssetFile( final String _file, final AssetManager _asset )
 	{
 		assert _file != null ;
+		assert _asset != null ;
+
 		file = _file ;
+		asset = _asset ;
 	}
 
 	public ByteInStream getByteInStream()
 	{
-		/*try
+		try
 		{
-			return null ;//new AndroidByteIn( asset.open( file ) ) ;
+			return ( ByteInStream )toClose.add( new AndroidByteIn( asset.open( file ) ) ) ;
 		}
 		catch( IOException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	public StringInStream getStringInStream()
 	{
-		/*try
+		try
 		{
-			return null ;//new AndroidStringIn( asset.open( file ) ) ;
+			return ( StringInStream )toClose.add( new AndroidStringIn( asset.open( file ) ) ) ;
 		}
 		catch( IOException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	public boolean getByteInCallback( final ByteInCallback _callback, final int _length )
@@ -55,31 +57,11 @@ public class AndroidFile implements FileStream
 
 	public ByteOutStream getByteOutStream()
 	{
-		/*try
-		{
-			return new AndroidByteOut( new FileOutputStream( file ) ) ;
-		}
-		catch( FileNotFoundException ex )
-		{
-			return null ;
-		}*/
 		return null ;
 	}
 
 	public StringOutStream getStringOutStream()
 	{
-		/*try
-		{
-			return new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
-		}
-		catch( FileNotFoundException ex )
-		{
-			return null ;
-		}
-		catch( IOException ex )
-		{
-			return null ;
-		}*/
 		return null ;
 	}
 
@@ -94,7 +76,7 @@ public class AndroidFile implements FileStream
 
 	public boolean isFile()
 	{
-		return false ;
+		return true ;
 	}
 
 	public boolean isDirectory()
@@ -104,44 +86,25 @@ public class AndroidFile implements FileStream
 
 	public boolean exists()
 	{
+		return true ;
+	}
+
+	/**
+		Can't delete a file located within the 
+		AssetManager. It is read only.
+	*/
+	public boolean delete()
+	{
 		return false ;
 	}
 
 	/**
-		Delete the File repreented by this File Stream.
-		This also includes deleting folders.
-	*/
-	public boolean delete()
-	{
-		return false ;//deleteRecursive( file ) ;
-	}
-
-	/*private static boolean deleteRecursive( final File _file )
-	{
-		if( _file.exists() == false )
-		{
-			return false ;
-		}
-
-		boolean ret = true ;
-		if( _file.isDirectory() == true )
-		{
-			for( final File file : _file.listFiles() )
-			{
-				ret = ret && deleteRecursive( file ) ;
-			}
-		}
-
-		return ret && _file.delete();
-	}*/
-
-	/**
-		Create the Directory structure represented 
-		by this File Stream.
+		Cannot create directories within the 
+		AssetManager. It is read only.
 	*/
 	public boolean mkdirs()
 	{
-		return false ;//file.mkdirs() ;
+		return false ;
 	}
 
 	/**
@@ -149,7 +112,7 @@ public class AndroidFile implements FileStream
 	*/
 	public long getSize()
 	{
-		/*try
+		try
 		{
 			final InputStream stream = asset.open( file ) ;
 			final int length = stream.available() ;
@@ -159,8 +122,7 @@ public class AndroidFile implements FileStream
 		catch( IOException ex )
 		{
 			return 0L ;
-		}*/
-		return 0L ;
+		}
 	}
 
 	/**

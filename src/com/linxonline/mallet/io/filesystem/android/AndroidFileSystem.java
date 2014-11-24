@@ -19,6 +19,8 @@ import com.linxonline.mallet.io.formats.json.android.* ;
 public class AndroidFileSystem implements FileSystem
 {
 	private final HashMap<String, ZipPath> mapZip = new HashMap<String, ZipPath>() ;
+	private final HashMap<String, String> mapAssets = new HashMap<String, String>() ;
+
 	private final Context context ;
 	private final AssetManager assetManager ;
 
@@ -82,6 +84,10 @@ public class AndroidFileSystem implements FileSystem
 				{
 					generateZipPaths( _path ) ;
 				}
+				else
+				{
+					generateAssetPath( _path ) ;
+				}
 			}
 		}
 		catch( IOException _ex )
@@ -89,7 +95,12 @@ public class AndroidFileSystem implements FileSystem
 			_ex.printStackTrace() ;
 		}
 	}
-	
+
+	private void generateAssetPath( final String _file )
+	{
+		mapAssets.put( _file, _file ) ;
+	}
+
 	private static ArrayList<ZipPath> generateZipPaths( final String _file )
 	{
 		final File file = new File( _file ) ;
@@ -149,8 +160,12 @@ public class AndroidFileSystem implements FileSystem
 				return null ;
 			}
 		}
+		else if( mapAssets.containsKey( _path ) == true )
+		{
+			new AndroidAssetFile( _path, assetManager ) ;
+		}
 
-		return new AndroidFile( _path, assetManager ) ;
+		return new AndroidFile( _path ) ;
 	}
 
 	public static class ZipPath

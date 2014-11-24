@@ -8,6 +8,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class AndroidZipFile implements FileStream
 {
+	private final CloseStreams toClose = new CloseStreams() ;
 	private final ZipFile zipFile ;
 	private final ZipEntry zipEntry ;
 
@@ -22,7 +23,7 @@ public class AndroidZipFile implements FileStream
 	{
 		try
 		{
-			return new AndroidByteIn( zipFile.getInputStream( zipEntry ) )
+			return ( AndroidByteIn )toClose.add( new AndroidByteIn( zipFile.getInputStream( zipEntry ) )
 			{
 				public boolean close()
 				{
@@ -38,7 +39,7 @@ public class AndroidZipFile implements FileStream
 						return false ;
 					}
 				}
-			} ;
+			} ) ;
 		}
 		catch( IOException ex )
 		{
@@ -51,7 +52,7 @@ public class AndroidZipFile implements FileStream
 	{
 		try
 		{
-			return new AndroidStringIn( zipFile.getInputStream( zipEntry ) )
+			return ( AndroidStringIn )toClose.add( new AndroidStringIn( zipFile.getInputStream( zipEntry ) )
 			{
 				public boolean close()
 				{
@@ -67,7 +68,7 @@ public class AndroidZipFile implements FileStream
 						return false ;
 					}
 				}
-			} ;
+			} ) ;
 		}
 		catch( IOException ex )
 		{
@@ -144,5 +145,14 @@ public class AndroidZipFile implements FileStream
 	public long getSize()
 	{
 		return zipEntry.getSize() ;
+	}
+
+	/**
+		Close all the stream input/output that has 
+		been returned and close them.
+	*/
+	public boolean close()
+	{
+		return toClose.close() ;
 	}
 }
