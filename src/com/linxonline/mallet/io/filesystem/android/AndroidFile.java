@@ -1,46 +1,52 @@
 package com.linxonline.mallet.io.filesystem.android ;
 
-import java.io.InputStream ;
+import java.io.File ;
+import java.io.FileWriter ;
+import java.io.BufferedWriter ;
+import java.io.FileInputStream ;
+import java.io.FileOutputStream ;
 import java.io.IOException ;
+import java.io.FileNotFoundException ;
+
+import android.os.Environment ;
 import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 
 public class AndroidFile implements FileStream
 {
+	private final static String ENVIRONMENT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + '/' ; 
 	private final CloseStreams toClose = new CloseStreams() ;
-	private final String file ;
+	private final File file ;
 
 	public AndroidFile( final String _file )
 	{
 		assert _file != null ;
-		file = _file ;
+		file = new File( ENVIRONMENT_PATH + _file ) ;
 	}
 
 	public ByteInStream getByteInStream()
 	{
-		/*try
+		try
 		{
-			return null ;//new AndroidByteIn( asset.open( file ) ) ;
+			return ( AndroidByteIn )toClose.add( new AndroidByteIn( new FileInputStream( file ) ) ) ;
 		}
-		catch( IOException ex )
+		catch( FileNotFoundException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	public StringInStream getStringInStream()
 	{
-		/*try
+		try
 		{
-			return null ;//new AndroidStringIn( asset.open( file ) ) ;
+			return ( AndroidStringIn )toClose.add( new AndroidStringIn( new FileInputStream( file ) ) ) ;
 		}
-		catch( IOException ex )
+		catch( FileNotFoundException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	public boolean getByteInCallback( final ByteInCallback _callback, final int _length )
@@ -55,22 +61,21 @@ public class AndroidFile implements FileStream
 
 	public ByteOutStream getByteOutStream()
 	{
-		/*try
+		try
 		{
-			return new AndroidByteOut( new FileOutputStream( file ) ) ;
+			return ( AndroidByteOut )toClose.add( new AndroidByteOut( new FileOutputStream( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	public StringOutStream getStringOutStream()
 	{
-		/*try
+		try
 		{
-			return new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
+			return ( AndroidStringOut )toClose.add( new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -79,8 +84,7 @@ public class AndroidFile implements FileStream
 		catch( IOException ex )
 		{
 			return null ;
-		}*/
-		return null ;
+		}
 	}
 
 	/**
@@ -94,17 +98,17 @@ public class AndroidFile implements FileStream
 
 	public boolean isFile()
 	{
-		return false ;
+		return file.isFile() ;
 	}
 
 	public boolean isDirectory()
 	{
-		return false ;
+		return file.isDirectory() ;
 	}
 
 	public boolean exists()
 	{
-		return false ;
+		return file.exists() ;
 	}
 
 	/**
@@ -113,10 +117,10 @@ public class AndroidFile implements FileStream
 	*/
 	public boolean delete()
 	{
-		return false ;//deleteRecursive( file ) ;
+		return deleteRecursive( file ) ;
 	}
 
-	/*private static boolean deleteRecursive( final File _file )
+	private static boolean deleteRecursive( final File _file )
 	{
 		if( _file.exists() == false )
 		{
@@ -133,7 +137,7 @@ public class AndroidFile implements FileStream
 		}
 
 		return ret && _file.delete();
-	}*/
+	}
 
 	/**
 		Create the Directory structure represented 
@@ -141,7 +145,7 @@ public class AndroidFile implements FileStream
 	*/
 	public boolean mkdirs()
 	{
-		return false ;//file.mkdirs() ;
+		return file.mkdirs() ;
 	}
 
 	/**
@@ -149,18 +153,7 @@ public class AndroidFile implements FileStream
 	*/
 	public long getSize()
 	{
-		/*try
-		{
-			final InputStream stream = asset.open( file ) ;
-			final int length = stream.available() ;
-			stream.close() ;
-			return length ;
-		}
-		catch( IOException ex )
-		{
-			return 0L ;
-		}*/
-		return 0L ;
+		return file.length() ;
 	}
 
 	/**

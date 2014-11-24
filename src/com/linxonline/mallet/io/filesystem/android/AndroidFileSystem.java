@@ -79,13 +79,15 @@ public class AndroidFileSystem implements FileSystem
 			// Must be a file. Unless it's a directory with nothing in it...
 			if( list.length == 0 )
 			{
-				//System.out.println( "IS A FILE: " + _path ) ;
+				System.out.println( "IS A FILE: " + _path ) ;
 				if( isZip( _path ) == true )
 				{
+					System.out.println( "ZIP" ) ;
 					generateZipPaths( _path ) ;
 				}
 				else
 				{
+					System.out.println( "ASSET" ) ;
 					generateAssetPath( _path ) ;
 				}
 			}
@@ -149,8 +151,11 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public FileStream getFile( final String _path )
 	{
+		System.out.println( "GET FILE: " + _path ) ;
+
 		if( mapZip.containsKey( _path ) == true )
 		{
+			System.out.println( "FileStream ZIP: " + _path ) ;
 			try
 			{
 				return new AndroidZipFile( mapZip.get( _path ) ) ;
@@ -162,7 +167,8 @@ public class AndroidFileSystem implements FileSystem
 		}
 		else if( mapAssets.containsKey( _path ) == true )
 		{
-			new AndroidAssetFile( _path, assetManager ) ;
+			System.out.println( "FileStream Asset: " + _path ) ;
+			return new AndroidAssetFile( _path, assetManager ) ;
 		}
 
 		return new AndroidFile( _path ) ;
