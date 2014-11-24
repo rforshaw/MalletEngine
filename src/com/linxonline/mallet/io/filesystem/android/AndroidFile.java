@@ -93,7 +93,30 @@ public class AndroidFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
-		return false ;
+		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
+		if( stream == null )
+		{
+			return false ;
+		}
+
+		stream.mkdirs() ;
+		final ByteInStream in = stream.getByteInStream() ;
+		final ByteOutStream out = stream.getByteOutStream() ;
+
+		int position = 0 ;
+		int length = 0 ;
+		final byte[] buffer = new byte[48] ;
+		
+		while( ( length = in.readBytes( buffer, position, buffer.length ) ) != -1 )
+		{
+			out.writeBytes( buffer, 0, length ) ;
+			position += length ;
+		}
+
+		in.close() ;
+		out.close() ;
+
+		return true ;
 	}
 
 	public boolean isFile()

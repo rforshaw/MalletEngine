@@ -25,9 +25,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			final ByteInStream stream = new DesktopByteIn( new FileInputStream( file ) ) ;
-			toClose.add( stream ) ;
-			return stream ;
+			return ( DesktopByteIn )toClose.add( new DesktopByteIn( new FileInputStream( file ) )) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -39,9 +37,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			final StringInStream stream = new DesktopStringIn( new FileInputStream( file ) ) ;
-			toClose.add( stream ) ;
-			return stream ;
+			return ( DesktopStringIn )toClose.add( new DesktopStringIn( new FileInputStream( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -63,9 +59,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			final ByteOutStream stream = new DesktopByteOut( new FileOutputStream( file ) ) ;
-			toClose.add( stream ) ;
-			return stream ;
+			return ( DesktopByteOut )toClose.add( new DesktopByteOut( new FileOutputStream( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -77,9 +71,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			final StringOutStream stream = new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
-			toClose.add( stream ) ;
-			return stream ;
+			return ( DesktopStringOut )toClose.add( new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -97,7 +89,30 @@ public class DesktopFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
-		return false ;
+		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
+		if( stream == null )
+		{
+			return false ;
+		}
+
+		stream.mkdirs() ;
+		final ByteInStream in = stream.getByteInStream() ;
+		final ByteOutStream out = stream.getByteOutStream() ;
+
+		int position = 0 ;
+		int length = 0 ;
+		final byte[] buffer = new byte[48] ;
+		
+		while( ( length = in.readBytes( buffer, position, buffer.length ) ) != -1 )
+		{
+			out.writeBytes( buffer, 0, length ) ;
+			position += length ;
+		}
+
+		in.close() ;
+		out.close() ;
+
+		return true ;
 	}
 
 	public boolean isFile()
