@@ -14,8 +14,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private static final int ANIM_NOT_SET = -1 ;
 
 	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
+	private Component.ReadyCallback toDestroy = null ;
+
 	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
 	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
+
 	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
 	private int animationID = -1 ;				// Denotes the id of the current running animation.
 
@@ -50,12 +53,40 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	/**
+		We need to make sure we aren't waiting for any 
+		animation ID's before we allow the parent to destroy 
+		themselves.
+	*/
+	@Override
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		toDestroy = _callback ;
+	}
+
+	@Override
+	public void update( final float _dt )
+	{
+		super.update( _dt ) ;
+		if( toDestroy != null && waitForID == false )
+		{
+			toDestroy.ready( this ) ;
+		}
+	}
+	
+	/**
 		Begin playing specified animation as soon as possible.
 		If called very quickly, repeatedly, some animations 
 		may never get rendered.
 	**/
 	public void playAnimation( final String _name )
 	{
+		if( toDestroy != null )
+		{
+			// Prevent any more animations being run 
+			// if the parent is being destroyed. 
+			return ;
+		}
+
 		if( waitForID == true )
 		{
 			// Currently waiting for the ID of the previous
@@ -132,5 +163,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	{
 		super.passFinalEvents( _events ) ;
 		_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
+
+		toDestroy = null ;		// Blank toDestroy incase the component is reused.
 	}
 }

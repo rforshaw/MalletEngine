@@ -38,14 +38,12 @@ public class ReadFile
 		public void run()
 		{
 			callback.start() ;
-			int offset = 0 ;
+			int readNum = 0 ;
 
-			while( toReadNum > ByteInCallback.STOP )
+			while( ( readNum > -1 ) && ( toReadNum > ByteInCallback.STOP ) )
 			{
 				final byte[] buffer = new byte[toReadNum] ;
-				final int readNum = stream.readBytes( buffer, 0, toReadNum ) ;
-				offset += readNum ;
-
+				readNum = stream.readBytes( buffer, 0, toReadNum ) ;
 				toReadNum = callback.readBytes( buffer, readNum ) ;
 			}
 

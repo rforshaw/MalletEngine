@@ -96,6 +96,18 @@ public abstract class Component implements SerialisableForm
 	public void passFinalEvents( final ArrayList<Event<?>> _events ) {}
 
 	/**
+		The parent can be flagged for destruction at anytime, a 
+		component could be in an unstable state, for example 
+		waiting for the id of a render request.
+		readyToDestroy allows the component to inform the parent 
+		it is safe to destroy itself. When overriding don't call super.
+	*/
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		_callback.ready( this ) ;
+	}
+
+	/**
 		Return the internal Event Controller for this component.
 	*/
 	public EventController getComponentEventController()
@@ -126,5 +138,10 @@ public abstract class Component implements SerialisableForm
 		id.nameID = _input.readInt() ;
 		id.groupID = _input.readInt() ;
 		return true ;
+	}
+
+	public static interface ReadyCallback<T extends Component>
+	{
+		public void ready( final T _component ) ;
 	}
 }

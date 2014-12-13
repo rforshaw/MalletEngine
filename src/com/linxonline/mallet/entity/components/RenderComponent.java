@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity.components ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.system.* ;
@@ -22,8 +23,10 @@ import com.linxonline.mallet.system.* ;
 **/
 public class RenderComponent extends EventComponent
 {
-	private final static String REQUEST_TYPE = "REQUEST_TYPE" ;
+	private final SourceTracker tracker = new SourceTracker( this ) ;
 	private final ArrayList<Event<Settings>> content = new ArrayList<Event<Settings>>() ;
+
+	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
 	{
@@ -51,6 +54,16 @@ public class RenderComponent extends EventComponent
 	}
 
 	@Override
+	public void update( final float _dt )
+	{
+		super.update( _dt ) ;
+		if( toDestroy != null && tracker.isStable() == true )
+		{
+			toDestroy.ready( this ) ;
+		}
+	}
+	
+	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
@@ -73,9 +86,20 @@ public class RenderComponent extends EventComponent
 		{
 			event = content.get( i ) ;
 			draw = event.<Settings>getVariable() ;
-			draw.addInteger( REQUEST_TYPE, DrawRequestType.REMOVE_DRAW ) ;
+			draw.addInteger( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 			_events.add( event ) ;
 		}
+	}
+
+	/**
+		We need to make sure we aren't waiting for any 
+		render ID's before we allow the parent to destroy 
+		themselves.
+	*/
+	@Override
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		toDestroy = _callback ;
 	}
 
 	public int drawSize()
@@ -91,5 +115,33 @@ public class RenderComponent extends EventComponent
 	public Settings getDrawAt( final int _pos )
 	{
 		return content.get( _pos ).<Settings>getVariable() ;
+	}
+
+	/**
+		Keep track of the render id's ensure that the Render 
+		Component is stable.
+		Important to prevent the parent entity destrying 
+		itself without cleaning up render requests.
+	*/
+	private static class SourceTracker implements IDInterface
+	{
+		private final RenderComponent component ;
+		private int recieved = 0 ;
+
+		public SourceTracker( final RenderComponent _component )
+		{
+			component = _component ;
+		}
+
+		@Override
+		public void recievedID( final int _id )
+		{
+			++recieved ;
+		}
+
+		public boolean isStable()
+		{
+			return component.drawSize() == recieved ;
+		}
 	}
 }

@@ -249,7 +249,26 @@ public final class Entity implements SerialisableForm
 	*/
 	public final void destroy()
 	{
-		destroy = true ;
+		Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
+		{
+			private final ArrayList<Component> toDestroy = new ArrayList<Component>( components ) ;
+
+			public void ready( final Component _component )
+			{
+				if( toDestroy.remove( _component ) == true )
+				{
+					if( toDestroy.isEmpty() == true )
+					{
+						destroy = true ;
+					}
+				}
+			}
+		} ;
+
+		for( final Component component : components )
+		{
+			component.readyToDestroy( readyDestroy ) ;
+		}
 	}
 
 	/**
