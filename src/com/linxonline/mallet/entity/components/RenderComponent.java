@@ -45,6 +45,7 @@ public class RenderComponent extends EventComponent
 
 	public void add( final Event<Settings> _draw )
 	{
+		DrawFactory.insertIDCallback( _draw, tracker ) ;
 		content.add( _draw ) ;
 	}
 
@@ -141,7 +142,7 @@ public class RenderComponent extends EventComponent
 
 		public boolean isStable()
 		{
-			return component.drawSize() == recieved ;
+			return recieved >= component.drawSize() ;
 		}
 	}
 }
