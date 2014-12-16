@@ -40,7 +40,8 @@ public class EditorCreator extends Creator<Entity>
 													_image.<Vector2>getObject( "FILL", null ), 
 													null,		// Clip View 
 													null,		// Clip Offset
-													_image.getInteger( "LAYER", 0 ) ) ) ;
+													_image.getInteger( "LAYER", 0 ),
+													render ) ) ;
 		}
 
 		entity.addComponent( render ) ;

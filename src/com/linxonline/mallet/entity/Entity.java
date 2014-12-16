@@ -249,7 +249,7 @@ public final class Entity implements SerialisableForm
 	*/
 	public final void destroy()
 	{
-		Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
+		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
 		{
 			private final ArrayList<Component> toDestroy = new ArrayList<Component>( components ) ;
 
@@ -259,6 +259,7 @@ public final class Entity implements SerialisableForm
 				{
 					if( toDestroy.isEmpty() == true )
 					{
+						System.out.println( "Entity destroyed." ) ;
 						destroy = true ;
 					}
 				}

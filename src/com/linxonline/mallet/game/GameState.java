@@ -24,6 +24,8 @@ import com.linxonline.mallet.entity.system.* ;
 import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.animation.* ;
 
+import com.linxonline.mallet.util.time.ElapsedTimer ;
+
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.locks.Locks ;
 
@@ -32,7 +34,7 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 
 public class GameState extends State implements HookEntity
 {
-	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
+	protected float DEFAULT_TIMESTEP = 1.0f / 20.0f ;					// 20Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
@@ -312,6 +314,9 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
+			private final static long COMPENSATE_SLEEP = 40L ;		// We don't want to accidentally sleep too long
+			private long runningTime = 0L ;
+
 			@Override
 			public void update( final double _dt )
 			{
@@ -319,6 +324,8 @@ public class GameState extends State implements HookEntity
 				updateAccumulator += _dt ;
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
+					final long startTime = ElapsedTimer.nanoTime() ;
+
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
 					inputSystem.update() ;
 					eventSystem.update() ;
@@ -329,16 +336,35 @@ public class GameState extends State implements HookEntity
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
 					audioSystem.update( DEFAULT_TIMESTEP ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
+
+					final long endTime = ElapsedTimer.nanoTime() ;
+					runningTime += endTime - startTime ;
 				}
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
+					final long startTime = ElapsedTimer.nanoTime() ;
+
 					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator = 0.0f ;
+
+					final long endTime = ElapsedTimer.nanoTime() ;
+					runningTime += endTime - startTime ;
+				}
+
+				if( runningTime > 0L )
+				{
+					final long sleep = ( ( ( long )( DEFAULT_TIMESTEP * 1000000000.0 ) - runningTime ) / 1000000L ) - COMPENSATE_SLEEP ;
+					runningTime = 0L ;
+
+					if( sleep > 0L )
+					{
+						system.sleep( sleep ) ;
+					}
 				}
 			}
 		} ;

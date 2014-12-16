@@ -36,7 +36,8 @@ public final class DrawFactory
 												 final Vector2 _fill,			// Not needed
 												 final Vector2 _uv1,			// Not needed
 												 final Vector2 _uv2,			// Not needed
-												 final int _layer )
+												 final int _layer,
+												 final IDInterface _callback )
 	{
 		final Settings settings = new Settings() ;
 
@@ -50,84 +51,11 @@ public final class DrawFactory
 		if( _uv1 != null ) { settings.addObject( "UV1", _uv1 ) ; }
 		if( _uv2 != null ) { settings.addObject( "UV2", _uv2 ) ; }
 
+		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
+
 		setPosition( settings, _pos, _offset ) ;
 		//setClip( settings, _clip, _clipOffset ) ;
 		settings.addInteger( "LAYER", _layer ) ;
-
-		return new Event<Settings>( "DRAW", settings ) ;
-	}
-
-	public static Event<Settings> createShape( 	final String _type,
-												final Line _line,
-												final Vector3 _pos, 
-												final Vector2 _offset, 		// Not needed
-												final Vector2 _clip,		// Not needed
-												final Vector2 _clipOffset,	// Not needed
-												final int _layer )
-	{
-		final Settings settings = new Settings() ;
-
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.GEOMETRY ) ;
-		if( _type == null || _line == null )
-		{
-			return null ;
-		}
-
-		setPosition( settings, _pos, _offset ) ;
-		setClip( settings, _clip, _clipOffset ) ;
-
-		settings.addObject( _type, _line ) ;
-		settings.addInteger( "LAYER", _layer ) ;
-
-		return new Event<Settings>( "DRAW", settings ) ;
-	}
-
-	public static Event<Settings> createShape( 	final String _type,
-												final Shape _shape,
-												final Vector3 _pos, 
-												final Vector2 _offset, 		// Not needed
-												final Vector2 _clip,		// Not needed
-												final Vector2 _clipOffset,	// Not needed
-												final int _layer )
-	{
-		final Settings settings = new Settings() ;
-
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.GEOMETRY ) ;
-
-		setPosition( settings, _pos, _offset ) ;
-		setClip( settings, _clip, _clipOffset ) ;
-
-		if( _type != null ) { settings.addObject( _type, _shape ) ; }
-		settings.addInteger( "LAYER", _layer ) ;
-
-		return new Event<Settings>( "DRAW", settings ) ;
-	}
-	
-	public static Event<Settings> createText( 	final String _text,
-										final Vector3 _pos, 
-										final Vector2 _offset, 		// Not needed
-										final MalletFont _font,
-										final MalletColour _colour,
-										final Vector2 _clip,		// Not needed
-										final Vector2 _clipOffset,	// Not needed
-										final int _layer,
-										final int _alignment )
-	{
-		final Settings settings = new Settings() ;
-
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.TEXT ) ;
-		if( _text != null ) { settings.addString( "TEXT", _text ) ; }
-		if( _font != null ) { settings.addObject( "FONT", _font ) ; }
-		if( _colour != null ) { settings.addObject( "COLOUR", _colour ) ; }
-
-		setPosition( settings, _pos, _offset ) ;
-		setClip( settings, _clip, _clipOffset ) ;
-
-		settings.addInteger( "LAYER", _layer ) ;
-		settings.addInteger( "ALIGNMENT", _alignment ) ;
 
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
@@ -157,18 +85,18 @@ public final class DrawFactory
 	*/
 	public static void insertIDCallback( final Event<Settings> _event, final IDInterface _callback )
 	{
-		final Settings sets = ( Settings )_event.getVariable() ;
+		final Settings sets = _event.getVariable() ;
 		sets.addObject( "CALLBACK", _callback ) ;
 	}
 	
-	private static Settings setPosition( final Settings _settings, final Vector3 _pos, final Vector2 _offset )
+	public static Settings setPosition( final Settings _settings, final Vector3 _pos, final Vector2 _offset )
 	{
 		if( _pos != null ) { _settings.addObject( "POSITION", _pos ) ; }
 		if( _offset != null ) { _settings.addObject( "OFFSET", _offset ) ; }
 		return _settings ;
 	}
 
-	private static Settings setClip( final Settings _settings, final Vector2 _clip, final Vector2 _clipOffset )
+	public static Settings setClip( final Settings _settings, final Vector2 _clip, final Vector2 _clipOffset )
 	{
 		if( _clip != null ) { _settings.addObject( "CLIP", _clip ) ; }
 		if( _clipOffset != null ) { _settings.addObject( "CLIPOFFSET", _clipOffset ) ; }

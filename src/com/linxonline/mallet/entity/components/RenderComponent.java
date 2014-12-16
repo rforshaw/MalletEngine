@@ -21,11 +21,12 @@ import com.linxonline.mallet.system.* ;
 	Use removeDrawCalls() to remove all Events from the renderer 
 	that is located in content.
 **/
-public class RenderComponent extends EventComponent
+public class RenderComponent extends EventComponent implements IDInterface
 {
 	private final SourceTracker tracker = new SourceTracker( this ) ;
 	private final ArrayList<Event<Settings>> content = new ArrayList<Event<Settings>>() ;
 
+	private boolean initialEventDone = false ;
 	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
@@ -45,8 +46,11 @@ public class RenderComponent extends EventComponent
 
 	public void add( final Event<Settings> _draw )
 	{
-		DrawFactory.insertIDCallback( _draw, tracker ) ;
 		content.add( _draw ) ;
+		if( initialEventDone == false )
+		{
+			passEvent( _draw ) ;
+		}
 	}
 
 	public void remove( final Event<Settings> _draw )
@@ -67,6 +71,8 @@ public class RenderComponent extends EventComponent
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
+		initialEventDone = true ;
+
 		super.passInitialEvents( _events ) ;
 		final int length = content.size() ;
 		for( int i = 0; i < length; ++i )
@@ -90,6 +96,12 @@ public class RenderComponent extends EventComponent
 			draw.addInteger( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 			_events.add( event ) ;
 		}
+	}
+
+	@Override
+	public void recievedID( final int _id )
+	{
+		tracker.recievedID( _id ) ;
 	}
 
 	/**

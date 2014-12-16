@@ -35,7 +35,7 @@ public class ImageCreator extends Creator<Entity>
 											   _image.<Vector2>getObject( "FILL", null ), 
 											   new Vector2(),		// Clip View 
 											   new Vector2( 1, 1 ),		// Clip Offset
-											   _image.getInteger( "LAYER", 0 ) ) ) ;
+											   _image.getInteger( "LAYER", 0 ), render ) ) ;
 
 		entity.addComponent( render ) ;
 		return entity ;

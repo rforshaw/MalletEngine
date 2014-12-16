@@ -65,6 +65,7 @@ public interface SystemInterface
 	public AudioGenerator getAudioGenerator() ;
 
 	public boolean update( final float _dt ) ;		// Update the System
+
 	public void sleep( final long _millis ) ;		// Cause the Thread the System is running on to sleep for the specified duration
 
 	public void draw( final float _dt ) ;

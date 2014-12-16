@@ -15,14 +15,14 @@ public final class AnimationFactory
 	private AnimationFactory() {}
 
 	public static Event<Settings> createAnimation( final String _file,
-										 final Vector3 _pos, 
-										 final Vector2 _offset, 			// Not needed
-										 final Vector2 _dim,				// Not needed
-										 final Vector2 _fill,				// Not needed
-										 final Vector2 _clip,				// Not needed
-										 final Vector2 _clipOffset,			// Not needed
-										 final int _layer,
-										 final SourceCallback _callback )	// Not needed, but is important
+													final Vector3 _pos, 
+													final Vector2 _offset, 			// Not needed
+													final Vector2 _dim,				// Not needed
+													final Vector2 _fill,				// Not needed
+													final Vector2 _clip,				// Not needed
+													final Vector2 _clipOffset,			// Not needed
+													final int _layer,
+													final SourceCallback _callback )	// Not needed, but is important
 	{
 		final Settings settings = new Settings() ;
 		settings.addInteger( "REQUEST_TYPE", AnimRequestType.CREATE_ANIMATION ) ;
@@ -35,7 +35,7 @@ public final class AnimationFactory
 		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( null,
 																	 _pos, _offset,
 																	 _dim, _fill, 
-																	 _clip, _clipOffset, _layer ) ) ;
+																	 _clip, _clipOffset, _layer, null ) ) ;
 
 		if( _callback != null )
 		{

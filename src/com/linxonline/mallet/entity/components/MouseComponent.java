@@ -12,10 +12,8 @@ import com.linxonline.mallet.entity.Entity ;
 // position													    //
 /*==============================================================*/
 
-public class MouseComponent extends Component 
-							implements InputHandler
+public class MouseComponent extends InputComponent
 {
-	protected InputAdapterInterface inputAdapter = null ;
 	protected final Vector2 mouse = new Vector2() ;
 	protected boolean mouseMoved    = false ;
 	protected boolean mouse1Pressed = false ;
@@ -28,28 +26,9 @@ public class MouseComponent extends Component
 	}
 
 	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		inputAdapter = _adapter ;
-	}
-
-	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
-	{
-		final Event<InputHandler> event = new Event<InputHandler>( "ADD_GAME_STATE_INPUT", this ) ;
-		_events.add( event ) ;
-	}
-
-	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
-	{
-		final Event<InputHandler> event = new Event<InputHandler>( "REMOVE_GAME_STATE_INPUT", this ) ;
-		_events.add( event ) ;
-	}
-
-	@Override
 	public void update( final float _dt )
 	{
+		super.update( _dt ) ;
 		if( inputAdapter != null )
 		{
 			final Vector3 pos = parent.getPosition() ;
@@ -58,11 +37,9 @@ public class MouseComponent extends Component
 		}
 	}
 
-	public void passInputEvent( final InputEvent _event )
+	public void processInputEvent( final InputEvent _event )
 	{
-		final InputType eventType = _event.getInputType() ;
-
-		switch( eventType )
+		switch( _event.getInputType() )
 		{
 			case MOUSE_MOVED     : 
 			case TOUCH_MOVE      : mouseMoved = true ;

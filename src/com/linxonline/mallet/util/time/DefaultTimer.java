@@ -35,8 +35,13 @@ public class DefaultTimer implements TimerInterface
 	{
 		return seconds ;
 	}
-	
-	
+
+	@Override
+	public long nanoTime()
+	{
+		return System.nanoTime() ;//* 0.000000001 ;
+	}
+
 	private final long getLongElapsedTime()
 	{
 		oldTime = currentTime ;

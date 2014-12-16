@@ -2,12 +2,14 @@ package com.linxonline.mallet.game.test ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.TextFactory ;
+import com.linxonline.mallet.renderer.GeometryFactory ;
 import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
 import com.linxonline.mallet.util.sort.* ;
@@ -64,14 +66,15 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextureExample()
 			{
-				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( "base/textures/moomba.png", 			// Texture Location
-																	new Vector3( 415.0f, 385.0f, 0.0f ),	// Position
-																	new Vector2( -32, -32 ), 			// Offset
-																	new Vector2( 64, 64 ),				// Dimension, how large - scaled
-																	null,								// fill, texture repeat
-																	new Vector2(),								// clip
+				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( "base/textures/moomba.png", 		// Texture Location
+																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position
+																	new Vector2( -32, -32 ), 							// Offset
+																	new Vector2( 64, 64 ),								// Dimension, how large - scaled
+																	null,												// fill, texture repeat
+																	new Vector2(),										// clip
 																	new Vector2( 1, 1 ),								// clip offset
-																	10 ), true ) ) ;							// layer
+																	10,
+																	null ), true ) ) ;									// layer
 
 				final Shape lines = new Shape( 7, 6 ) ;
 				lines.addPoint( new Vector2( 0, 10 ) ) ;
@@ -89,13 +92,14 @@ public final class GameTestLoader extends GameLoader
 				lines.addIndex( 4 ) ;
 				lines.addIndex( 5 ) ;
 
-				eventSystem.addEvent( DrawFactory.createShape( "DRAWLINES",
-																lines,
-																new Vector3( -100.0f, 50.0f, 0.0f ),
-																null,
-																null,
-																null,
-																10 ) ) ;
+				eventSystem.addEvent( GeometryFactory.createShape( "DRAWLINES",
+																	lines,
+																	new Vector3( -100.0f, 50.0f, 0.0f ),
+																	null,
+																	null,
+																	null,
+																	10,
+																	null ) ) ;
 			}
 
 			/**
@@ -126,15 +130,16 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( DrawFactory.createText(  "Hello World!", 						// Text
-																new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
-																new Vector2( 0, 0 ), 				// Offset
-																new MalletFont( "Arial", 12 ),		// Mallet Font
-																null,								// Mallet Colour
-																null,								// clip
-																null,								// clip offset
-																200,									// layer
-																2 ) ) ;								// Text alignment, Centre
+				eventSystem.addEvent( TextFactory.createText( "Hello World!", 						// Text
+															  new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
+															  new Vector2( 0, 0 ), 					// Offset
+															  new MalletFont( "Arial", 12 ),		// Mallet Font
+															  null,									// Mallet Colour
+															  null,									// clip
+															  null,									// clip offset
+															  200,									// layer
+															  2,									// Text alignment, Centre
+															  null ) ) ;
 			}
 
 			/**
@@ -142,18 +147,14 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void playAudioExample()
 			{
-				/*eventSystem.addEvent( AudioFactory.createAudio( "base/music/fairing-well.wav", new SourceCallback()
-				{
-					public void recieveID( final int _id ) { System.out.println( "Recieved ID: " + _id ) ; }
-					public void callbackRemoved() { System.out.println( "Callback Removed" ) ; }
+				final SoundComponent sound = new SoundComponent() ;
+				sound.addSound( "DEFAULT", AudioFactory.createAudio( "base/music/fairing-well.wav", sound ) ) ;
 
-					public void start() { System.out.println( "Source began playing" ) ; }
-					public void pause() { System.out.println( "Source has been paused" ) ; }
-					public void stop() { System.out.println( "Source has been stopped" ) ; }
+				sound.setDefaultSound( "DEFAULT" ) ;
 
-					public void update( final float _dt ) { System.out.println( _dt ) ; }
-					public void finished() { System.out.println( "Source has finished" ) ; }
-				} ) ) ;*/
+				final Entity entity = new Entity( "Test Sound" ) ;
+				entity.addComponent( sound ) ;
+				addEntity( entity ) ;
 
 				/*final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
 				System.out.println( ogg ) ;
@@ -185,9 +186,9 @@ public final class GameTestLoader extends GameLoader
 				final Entity entity = creator.create( image ) ;
 
 				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	   new Vector2( 64, 64 ),
-																	   new Vector2( 100, 0 ),
-																	   new Vector2( -32, -32 ) ) ) ;
+																	new Vector2( 64, 64 ),
+																	new Vector2( 100, 0 ),
+																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
 			}

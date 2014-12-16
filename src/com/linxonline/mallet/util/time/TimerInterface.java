@@ -6,4 +6,6 @@ public interface TimerInterface
 
 	public long getTotalElapsedTimeInSeconds() ;
 	public double getRemainderInNanoSeconds() ; 
+
+	public long nanoTime() ;
 }
