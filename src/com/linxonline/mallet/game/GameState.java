@@ -314,7 +314,7 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
-			private final static long COMPENSATE_SLEEP = 40L ;		// We don't want to accidentally sleep too long
+			private final static long COMPENSATE_SLEEP = 1L ;		// We don't want to accidentally sleep too long
 			private long runningTime = 0L ;
 
 			@Override
@@ -358,7 +358,7 @@ public class GameState extends State implements HookEntity
 
 				if( runningTime > 0L )
 				{
-					final long sleep = ( ( ( long )( DEFAULT_TIMESTEP * 1000000000.0 ) - runningTime ) / 1000000L ) - COMPENSATE_SLEEP ;
+					final long sleep = ( ( ( long )( DEFAULT_FRAMERATE * 1000000000.0 ) - runningTime ) / 1000000L ) - COMPENSATE_SLEEP ;
 					runningTime = 0L ;
 
 					if( sleep > 0L )
