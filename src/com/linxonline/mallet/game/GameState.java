@@ -34,7 +34,7 @@ import com.linxonline.mallet.util.factory.EntityFactory ;
 
 public class GameState extends State implements HookEntity
 {
-	protected float DEFAULT_TIMESTEP = 1.0f / 20.0f ;					// 20Hz
+	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 20Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle

@@ -59,7 +59,7 @@ public class CollisionSystem extends EventController
 		Hull hull1 = null ;
 		Hull hull2 = null ;
 		final int size = hulls.size() ;
-		
+
 		for( int i = 0; i < size; i++ )
 		{
 			hull1 = hulls.get( i ) ;

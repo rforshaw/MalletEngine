@@ -47,7 +47,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 	public void add( final Event<Settings> _draw )
 	{
 		content.add( _draw ) ;
-		if( initialEventDone == false )
+		if( initialEventDone == true )
 		{
 			passEvent( _draw ) ;
 		}
