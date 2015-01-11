@@ -31,7 +31,7 @@ public class EventComponent extends Component
 		super( _name, "EVENTCOMPONENT" ) ;
 		initEventProcessor() ;
 	}
-	
+
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;

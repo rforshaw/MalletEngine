@@ -88,7 +88,7 @@ public final class DrawFactory
 		final Settings sets = _event.getVariable() ;
 		sets.addObject( "CALLBACK", _callback ) ;
 	}
-	
+
 	public static Settings setPosition( final Settings _settings, final Vector3 _pos, final Vector2 _offset )
 	{
 		if( _pos != null ) { _settings.addObject( "POSITION", _pos ) ; }

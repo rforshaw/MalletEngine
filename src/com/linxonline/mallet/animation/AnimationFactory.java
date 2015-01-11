@@ -76,4 +76,12 @@ public final class AnimationFactory
 		DrawFactory.amendRotate( renderEvent, _rotate ) ;
 		return _event ;
 	}
+
+	public static Event<Settings> amendGUI( final Event<Settings> _event, final boolean _gui )
+	{
+		final Settings animSet = _event.getVariable() ;
+		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
+		DrawFactory.amendGUI( renderEvent, _gui ) ;
+		return _event ;
+	}
 }

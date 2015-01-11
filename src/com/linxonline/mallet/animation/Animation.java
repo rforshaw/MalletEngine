@@ -126,7 +126,7 @@ public class Animation implements IDInterface, Cacheable
 			callbacks.get( i ).stop() ;
 		}
 	}
-	
+
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
 		final Settings settings = ( Settings )_event.getVariable() ;
@@ -149,6 +149,10 @@ public class Animation implements IDInterface, Cacheable
 				changeTexture( event, sprite ) ;
 				elapsedTime -= frameDelta ;
 				frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
+				if( frame == 0 )
+				{
+					finishedCallbacks() ;
+				}
 			}
 			updateCallbacks() ;
 		}
@@ -160,6 +164,15 @@ public class Animation implements IDInterface, Cacheable
 		for( int i = 0; i < length; ++i )
 		{
 			callbacks.get( i ).update( ( float )frame * frameDelta ) ;
+		}
+	}
+
+	private void finishedCallbacks()
+	{
+		final int length = callbacks.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			callbacks.get( i ).finished() ;
 		}
 	}
 

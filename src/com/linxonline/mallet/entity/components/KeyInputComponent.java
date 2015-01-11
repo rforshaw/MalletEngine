@@ -59,7 +59,7 @@ public class KeyInputComponent extends InputComponent
 			{
 				if( keys.containsKey( _input.keycode ) == true )
 				{
-					keys.get( _input.keycode ).callPressed() ;
+					keys.get( _input.keycode ).callPressed( _input ) ;
 				}
 				break ;
 			}
@@ -67,7 +67,7 @@ public class KeyInputComponent extends InputComponent
 			{
 				if( keys.containsKey( _input.keycode ) == true )
 				{
-					keys.get( _input.keycode ).callReleased() ;
+					keys.get( _input.keycode ).callReleased( _input ) ;
 				}
 				break ;
 			}
@@ -88,21 +88,21 @@ public class KeyInputComponent extends InputComponent
 			listeners.add( _listener ) ;
 		}
 
-		public void callPressed()
+		public void callPressed( final InputEvent _input )
 		{
 			final int size = listeners.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				listeners.get( i ).pressed() ;
+				listeners.get( i ).pressed( _input ) ;
 			}
 		}
 
-		public void callReleased()
+		public void callReleased( final InputEvent _input )
 		{
 			final int size = listeners.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				listeners.get( i ).released() ;
+				listeners.get( i ).released( _input ) ;
 			}
 		}
 	}

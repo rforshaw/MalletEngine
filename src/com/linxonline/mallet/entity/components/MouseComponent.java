@@ -11,7 +11,6 @@ import com.linxonline.mallet.entity.Entity ;
 // MouseComponent - Provides components that tracks mouse		// 
 // position													    //
 /*==============================================================*/
-
 public class MouseComponent extends InputComponent
 {
 	protected final Vector2 mouse = new Vector2() ;

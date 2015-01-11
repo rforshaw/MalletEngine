@@ -17,6 +17,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private Component.ReadyCallback toDestroy = null ;
 
 	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
+	private String currentAnim = null ;			// Name of the current animation that is playing
 	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
 
 	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
@@ -83,7 +84,8 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		if( toDestroy != null )
 		{
 			// Prevent any more animations being run 
-			// if the parent is being destroyed. 
+			// if the parent is being destroyed.
+			//System.out.println( "To Destroy" ) ;
 			return ;
 		}
 
@@ -92,6 +94,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 			// Currently waiting for the ID of the previous
 			// animation. Store the Animation name and wait till 
 			// we get the ID, before playing the new Animation.
+			//System.out.println( "Waiting For ID" ) ;
 			toPlayAnim = _name ;
 			return ;
 		}
@@ -100,6 +103,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		final Event<Settings> event = animations.get( _name ) ;
 		if( event != null )
 		{
+			currentAnim = _name ;
 			waitForID = true ;							// Need to wait for ID before changing animation again
 			passEvent( event ) ;						// Inform the Animation System of the new Animation.
 		}
@@ -119,6 +123,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public void recieveID( final int _id )
 	{
+		//System.out.println( "Recieved ID: " + _id ) ;
 		animationID = _id ;
 		waitForID = false ;		// We've recieved the ID so we can accept other animation requests
 

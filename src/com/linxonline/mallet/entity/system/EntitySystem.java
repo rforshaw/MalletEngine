@@ -133,17 +133,10 @@ public class EntitySystem implements EntitySystemInterface
 		final ArrayList<Entity> ents = entities.getEntities() ;
 		for( Entity entity : ents )
 		{
-			state.unhookEntity( entity ) ;
-		}
-		
-		cleanup.addAll( entities.getCleanup() ) ;
-		for( Entity entity : cleanup )
-		{
-			state.unhookEntity( entity ) ;
+			entity.destroy() ;
 		}
 
 		querySystem.clear() ;
-		entities.clear() ;
 		entitiesToAdd.clear() ;
 		cleanup.clear() ;
 	}
