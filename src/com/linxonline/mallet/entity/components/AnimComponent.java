@@ -19,6 +19,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
 	private String currentAnim = null ;			// Name of the current animation that is playing
 	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
+	private SourceCallback callback = null ;	// Allow an external source to track the running animation
 
 	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
 	private int animationID = -1 ;				// Denotes the id of the current running animation.
@@ -68,12 +69,23 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
+		if( callback != null )
+		{
+			callback.update( _dt ) ;
+		}
+
 		if( toDestroy != null && waitForID == false )
 		{
 			toDestroy.ready( this ) ;
 		}
 	}
-	
+
+	public void playAnimation( final String _name, final SourceCallback _callback )
+	{
+		callback = _callback ;
+		playAnimation( _name ) ;
+	}
+
 	/**
 		Begin playing specified animation as soon as possible.
 		If called very quickly, repeatedly, some animations 
@@ -118,6 +130,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		{
 			passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
 			animationID = ANIM_NOT_SET ;
+			callback = null ;
 		}
 	}
 
@@ -139,11 +152,41 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public void callbackRemoved() {}
 
-	public void start() {}
-	public void pause() {}
-	public void stop() {}
+	@Override
+	public void start()
+	{
+		if( callback != null )
+		{
+			callback.start() ;
+		}
+	}
 
-	public void finished() {}
+	@Override
+	public void pause()
+	{
+		if( callback != null )
+		{
+			callback.pause() ;
+		}
+	}
+
+	@Override
+	public void stop()
+	{
+		if( callback != null )
+		{
+			callback.stop() ;
+		}
+	}
+
+	@Override
+	public void finished()
+	{
+		if( callback != null )
+		{
+			callback.finished() ;
+		}
+	}
 
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
