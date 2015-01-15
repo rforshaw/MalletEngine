@@ -27,6 +27,10 @@ public class SpriteManager extends AbstractManager<Sprite>
 			public Sprite load( final String _file, final Settings _settings )
 			{
 				final ArrayList<String> texts = TextReader.getTextFile( _file ) ;
+				if( texts.size() == 0 )
+				{
+					return null ;
+				}
 
 				final int framerate = Integer.parseInt( texts.get( 0 ) ) ;
 				final Sprite sprite = new Sprite( framerate ) ;

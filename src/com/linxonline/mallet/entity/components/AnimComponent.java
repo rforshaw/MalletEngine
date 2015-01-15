@@ -19,7 +19,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
 	private String currentAnim = null ;			// Name of the current animation that is playing
 	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
+	
 	private SourceCallback callback = null ;	// Allow an external source to track the running animation
+	private SourceCallback toCallback = null ;
 
 	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
 	private int animationID = -1 ;				// Denotes the id of the current running animation.
@@ -82,8 +84,26 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public void playAnimation( final String _name, final SourceCallback _callback )
 	{
-		callback = _callback ;
+		if( toDestroy != null )
+		{
+			// Prevent any more animations being run 
+			// if the parent is being destroyed.
+			//System.out.println( "To Destroy" ) ;
+			return ;
+		}
+
+		if( waitForID == true )
+		{
+			// Currently waiting for the ID of the previous
+			// animation. Store the Animation name and wait till 
+			// we get the ID, before playing the new Animation.
+			//System.out.println( "Waiting For ID" ) ;
+			toCallback = _callback ;
+			return ;
+		}
+
 		playAnimation( _name ) ;
+		callback = _callback ;
 	}
 
 	/**
@@ -146,7 +166,10 @@ public class AnimComponent extends EventComponent implements SourceCallback
 			// was requested before the previous animations ID 
 			// could be recieved. We can now play the new animation.
 			playAnimation( toPlayAnim ) ;
+			callback = toCallback ;
+
 			toPlayAnim = null ;
+			toCallback = null ;
 		}
 	}
 
@@ -182,8 +205,10 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void finished()
 	{
+		//System.out.println( animationID + " " + currentAnim +" Finished!" ) ;
 		if( callback != null )
 		{
+			//System.out.println( animationID + " Callback called.." ) ;
 			callback.finished() ;
 		}
 	}
