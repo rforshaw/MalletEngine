@@ -18,7 +18,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 	private ArrayList<InputEvent> keyInputs = new ArrayList<InputEvent>() ;
 
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
-	private Vector2 touchPosition = new Vector2( 0, 0 ) ;
+	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
 
 	public AndroidInputSystem() {}
 
@@ -35,11 +35,6 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public void removeInputHandler( InputHandler _handler )
 	{
-		if( exists( _handler ) == true )
-		{
-			return ;
-		}
-
 		handlers.remove( _handler ) ;
 	}
 

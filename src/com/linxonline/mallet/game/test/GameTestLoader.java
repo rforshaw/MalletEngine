@@ -35,6 +35,8 @@ import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
 import com.linxonline.mallet.event.* ;
+import com.linxonline.mallet.input.* ;
+//import com.linxonline.mallet.input.desktop.XInputLinux ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -51,8 +53,32 @@ public final class GameTestLoader extends GameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
+			//private final XInputLinux device = new XInputLinux( "/dev/input/js0" ) ;
+		
 			public void initGame()			// Called when state is started
 			{
+				/*device.setXInputListener( new XInputListener()
+				{
+					public void keyPressed( final XInputDevice.Event _event )
+					{
+						System.out.println( _event ) ;
+					}
+
+					public void keyReleased( final XInputDevice.Event _event )
+					{
+						System.out.println( _event ) ;
+					}
+
+					// D-Pad, Joysticks, L2, R2
+					public void analogue( final XInputDevice.Event _event )
+					{
+						System.out.println( _event ) ;
+					}
+
+					public void start() {}
+					public void end() {}
+				} ) ;*/
+
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
