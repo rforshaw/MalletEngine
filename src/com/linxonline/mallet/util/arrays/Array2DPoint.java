@@ -18,4 +18,14 @@ public class Array2DPoint
 		i = _i ;
 		j = _j ;
 	}
+
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( "I: " ) ;
+		buffer.append( i ) ;
+		buffer.append( " J: " ) ;
+		buffer.append( j ) ;
+		return buffer.toString() ;
+	}
 }
