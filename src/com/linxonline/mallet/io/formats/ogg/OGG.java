@@ -34,7 +34,7 @@ public class OGG
 		int pos = 0 ;
 
 		final int streamLength = _stream.length ;
-		System.out.println( "Stream Size: " + _stream.length ) ;
+		//System.out.println( "Stream Size: " + _stream.length ) ;
 
 		while( end == false  && ( pos + 4 ) < streamLength )
 		{
@@ -79,7 +79,7 @@ public class OGG
 			final Page page = new Page( header, version, hType, gPosition, bSN, pSeq, checksum, pSeg, data ) ;
 			pages.add( page ) ;
 
-			System.out.println( page ) ;
+			//System.out.println( page ) ;
 			if( page.getHeaderType() == Page.HeaderType.END ) // 4 represents end of file, 0 means progressing & 2 represents start.
 			{
 				end = true ;

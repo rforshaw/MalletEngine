@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.ArrayList ;
+import java.nio.* ;
 
 import javax.media.opengl.* ;
 
@@ -33,11 +34,23 @@ public class GLGeometry implements GeometryInterface
 	public int indexID = 0 ;
 	public int[] index = null ;
 	public float[] vertex = null ;
+	private final FloatBuffer vertexBuffer ;
+	private final IntBuffer indexBuffer ;
 
 	public GLGeometry( int _indexSize, int _vertexSize )
 	{
 		index = new int[_indexSize] ;
 		vertex = new float[_vertexSize * VERTEX_SIZE] ;
+
+		final int vertexBufferLength = vertex.length * 4 ;			// * 4 represents the bytes for each float
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexBufferLength ) ;
+		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
+
+		final int indexBufferLength = index.length * 4 ; 
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexBufferLength ) ;
+		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+		indexBuffer = indexByteBuffer.asIntBuffer() ;
 	}
 
 	public void setStyle( final int _style )
@@ -100,18 +113,18 @@ public class GLGeometry implements GeometryInterface
 
 	public void updateVertex( final int _index, final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
 	{
-		updatePosition( _index, _position ) ;
+		updatePosition( _index, _position.x, _position.y, _position.z ) ;
 		updateColour( _index, _colour ) ;
-		updateTexCoord( _index, _texCoord ) ;
-		updateNormal( _index, _normal ) ;
+		updateTexCoord( _index, _texCoord.x, _texCoord.y ) ;
+		updateNormal( _index, _normal.x, _normal.y, _normal.z ) ;
 	}
 
-	public void updatePosition( final int _index, final Vector3 _position )
+	public void updatePosition( final int _index, final float _x, final float _y, final float _z )
 	{
 		final int i = _index * VERTEX_SIZE ;
-		vertex[i] = _position.x ;
-		vertex[i + 1] = _position.y ;
-		vertex[i + 2] = _position.z ;
+		vertex[i] = _x ;
+		vertex[i + 1] = _y ;
+		vertex[i + 2] = _z ;
 	}
 
 	public void updateColour( final int _index, final float _colour )
@@ -120,19 +133,33 @@ public class GLGeometry implements GeometryInterface
 		vertex[i + 3] = ( float )_colour ;
 	}
 
-	public void updateTexCoord( final int _index, final Vector2 _texCoord )
+	public void updateTexCoord( final int _index, final float _x, final float _y )
 	{
 		final int i = _index * VERTEX_SIZE ;
-		vertex[i + 4] = _texCoord.x ;
-		vertex[i + 5] = _texCoord.y ;
+		vertex[i + 4] = _x ;
+		vertex[i + 5] = _y ;
 	}
 
-	public void updateNormal( final int _index, final Vector3 _normal )
+	public void updateNormal( final int _index, final float _x, final float _y, final float _z )
 	{
 		final int i = _index * VERTEX_SIZE ;
-		vertex[i + 6]  = _normal.x ;
-		vertex[i + 7]  = _normal.y ;
-		vertex[i + 8] = _normal.z ;
+		vertex[i + 6]  = _x ;
+		vertex[i + 7]  = _y ;
+		vertex[i + 8] = _z ;
+	}
+
+	public FloatBuffer getVertexBuffer()
+	{
+		vertexBuffer.put( vertex ) ;
+		vertexBuffer.position( 0 ) ;
+		return vertexBuffer ;
+	}
+
+	public IntBuffer getIndexBuffer()
+	{
+		indexBuffer.put( index ) ;
+		indexBuffer.position( 0 ) ;
+		return indexBuffer ;
 	}
 
 	public void destroy()

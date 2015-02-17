@@ -58,15 +58,8 @@ public class GLModelManager extends AbstractManager<Model>
 
 	public static void updateVBO( final GL2 _gl, final GLGeometry _geometry )
 	{
-		final int vertexBufferLength = _geometry.vertex.length * 4 ;								// * 4 represents the bytes for each float
-
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexBufferLength ) ;
-		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
-		final FloatBuffer vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
-		vertexBuffer.put( _geometry.vertex ) ;
-		vertexBuffer.flip() ;
-
-		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, vertexBuffer, GL2.GL_DYNAMIC_DRAW ) ;
+		final int vertexBufferLength = _geometry.vertex.length * 4 ;		// * 4 represents the bytes for each float
+		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, _geometry.getVertexBuffer(), GL2.GL_DYNAMIC_DRAW ) ;
 	}
 
 	public static void bindIndex( final GL2 _gl, final GLGeometry _geometry )
@@ -75,14 +68,7 @@ public class GLModelManager extends AbstractManager<Model>
 		_gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
 		_geometry.indexID = indexID ;
 
-		final int indexBufferLength = _geometry.index.length * 4 ; 
-
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexBufferLength ) ;
-		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
-		final IntBuffer indexBuffer = indexByteBuffer.asIntBuffer() ;
-		indexBuffer.put( _geometry.index ) ;
-		indexBuffer.flip() ;
-
-		_gl.glBufferData( GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferLength, indexBuffer, GL2.GL_STATIC_DRAW ) ;
+		final int indexBufferLength = _geometry.index.length * 4 ;		// * 4 represents the bytes for each integer
+		_gl.glBufferData( GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferLength, _geometry.getIndexBuffer(), GL2.GL_STATIC_DRAW ) ;
 	}
 }

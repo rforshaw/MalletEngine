@@ -18,6 +18,8 @@ public class Vorbis
 	private final static int IMPLICIT_LOOKUP_TABLE = 1 ;
 	private final static int EXPLICIT_LOOKUP_TABLE = 2 ;
 	
+	private final static int UNUSED = -1 ;
+	
 	private ArrayList<VorbisHeader> headers = new ArrayList<VorbisHeader>() ;
 
 	private int version = -1 ;
@@ -31,7 +33,9 @@ public class Vorbis
 
 	private String vendor = null ;
 	private final ArrayList<String> statements = new ArrayList<String>() ;
-	
+
+	private final ArrayList<CodebookConfiguration> codebooks = new ArrayList<CodebookConfiguration>() ;
+
 	public Vorbis() {}
 
 	public void decode( final OGG _ogg ) throws Exception
@@ -42,6 +46,10 @@ public class Vorbis
 			if( headers.size() < 3 )
 			{
 				decodeHeaders( page )  ;
+			}
+			else
+			{
+				//System.out.println( "Audio Page" ) ;
 			}
 		}
 	}
@@ -76,18 +84,9 @@ public class Vorbis
 	{
 		switch( _header.headerType )
 		{
-			case ID_HEADER_TYPE :
-			{
-				return decodeIDHeader( _header ) ;
-			}
-			case COMMENT_HEADER_TYPE :
-			{
-				return decodeCommentHeader( _header ) ;
-			}
-			case SETUP_HEADER_TYPE :
-			{
-				return decodeSetupHeader( _header ) ;
-			}
+			case ID_HEADER_TYPE      : return decodeIDHeader( _header ) ;
+			case COMMENT_HEADER_TYPE : return decodeCommentHeader( _header ) ;
+			case SETUP_HEADER_TYPE   : return decodeSetupHeader( _header ) ;
 		}
 
 		// The first page or so, should contain all Vorbis Header details.
@@ -167,20 +166,31 @@ public class Vorbis
 
 	private int decodeSetupHeader( final VorbisHeader _header ) throws Exception
 	{
-		int pos = _header.start ;
 		final byte[] stream = _header.page.data ;
-		
-		final int codebookCount = ( ConvertBytes.toBytes( stream, pos, 1 )[0] & 0xff ) + 1 ;	// unsigned byte
-		System.out.println( "Codebooks Count: " + codebookCount ) ;
-		decodeCodebooks( pos += 1, codebookCount, stream ) ;
+		int pos = _header.start * 8 ;					// Convert to bits
 
-		return pos ;
+		final int codebookCount = ( ConvertBytes.toBits( stream, 0, pos, 8 )[0] & 0xFF ) + 1 ;	// unsigned byte
+		pos += 8 ;
+
+		for( int i = 0; i < codebookCount; i++ )
+		{
+			pos = decodeCodebooks( pos, codebookCount, stream ) ;
+		}
+
+		pos = decodeTimeDomain( pos, stream ) ;
+		pos = decodeFloors( pos, stream ) ;
+
+		// Residues
+		// Mappings
+		// Modes
+		
+		return pos / 8 ;
 	}
 
 	private int decodeCodebooks( int _pos, final int _count, final byte[] _stream ) throws Exception
 	{
 		// Pattern Sync
-		final byte[] tempSync = ConvertBytes.toBytes( _stream, _pos, 3 ) ;
+		final byte[] tempSync = ConvertBytes.toBits( _stream, 0, _pos, 24 ) ;
 		final byte[] syncBytes = new byte[4] ;
 		syncBytes[0] = tempSync[0] ;
 		syncBytes[1] = tempSync[1] ;
@@ -189,16 +199,18 @@ public class Vorbis
 
 		ConvertBytes.flipEndian( syncBytes, 0, 4 ) ;
 		final long syncPattern = ConvertBytes.toInt( syncBytes, 0, 4 ) ;
-		System.out.println( "Sync Pattern: " + syncPattern + " Pos: " + _pos ) ;
+		if( syncPattern != 5653314 )
+		{
+			throw new Exception( "OGG not in sync, failed to read correct Sync Pattern." ) ;
+		}
 
 		// Dimensions
-		final byte[] dimBytes = ConvertBytes.toBytes( _stream, _pos += 3, 2 ) ;
+		final byte[] dimBytes = ConvertBytes.toBits( _stream, 0, _pos += 24, 16 ) ;
 		ConvertBytes.flipEndian( dimBytes, 0, 2 ) ;
-		final int dimensions = ( int )ConvertBytes.toShort( dimBytes, 0, 2 ) ;
-		System.out.println( "Dimensions: " + dimensions ) ;
+		final int dimensions = ConvertBytes.toShort( dimBytes, 0, 2 ) & 0xFFFF ;
 
 		// Entries
-		final byte[] tempEntry = ConvertBytes.toBytes( _stream, _pos += 2, 3 ) ;
+		final byte[] tempEntry = ConvertBytes.toBits( _stream, 0, _pos += 16, 24 ) ;
 		final byte[] entryBytes = new byte[4] ;
 		entryBytes[0] = tempEntry[0] ;
 		entryBytes[1] = tempEntry[1] ;
@@ -206,61 +218,240 @@ public class Vorbis
 		entryBytes[3] = 0 ;
 
 		ConvertBytes.flipEndian( entryBytes, 0, 4 ) ;
-		final int entries = ConvertBytes.toInt( entryBytes, 0, 4 ) ;
-		System.out.println( "Entries: " + entries ) ;
+		final long entries = ConvertBytes.toInt( entryBytes, 0, 4 ) & 0xFFFFFFFFL ;
 
-		// Flags
-		final byte flags = ConvertBytes.toBytes( _stream, _pos += 3, 1 )[0] ;
-		final boolean orderedFlag = ConvertBytes.isBitSet( flags, 7 ) ;
-		final boolean sparseFlag = ConvertBytes.isBitSet( flags, 6 ) ;
+		_pos += 24 ;
+		final boolean orderedFlag = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+		final int[] codewordLengths = new int[( int )entries] ;
 
-		_pos += 1 ;					// Increment by 2 positions to ensure bits access correct content
-		int bitOffset = 0 ;			// Reading a bit stream now
-
-		final int[] codewordLengths = new int[entries] ;
-		for( int i = 0; i < entries; ++i )
+		if( orderedFlag == false )
 		{
-			if( sparseFlag == true )
+			final boolean sparseFlag = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+
+			for( int i = 0; i < entries; ++i )
 			{
-				final byte flag = ConvertBytes.toBits( _stream, _pos, bitOffset++, 1 )[0] ;
-				if( ConvertBytes.isBitSet( flag, 0 ) == true )
+				if( sparseFlag == true )
 				{
-					final byte length = ConvertBytes.toBits( _stream, _pos, bitOffset, 5 )[0] ;
-					codewordLengths[i] = length + 1 ;
-					bitOffset += 5 ;
+					final boolean flag = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+					if( flag == true )
+					{
+						codewordLengths[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) + 1 ;
+						_pos += 5 ;
+					}
+					else
+					{
+						codewordLengths[i] = UNUSED ;		// -1 represents a codeword that isn't used
+					}
 				}
 				else
 				{
-					codewordLengths[i] = -1 ;		// -1 represents a codeword that isn't used
+					codewordLengths[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) + 1 ;
+					_pos += 5 ;
 				}
 			}
-			else
+		}
+		else
+		{
+			int currentEntry = 0 ;
+			int currentLength = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) + 1 ;
+			_pos += 5 ;
+
+			while( currentEntry < entries )
 			{
-				final byte length = ConvertBytes.toBits( _stream, _pos, bitOffset, 5 )[0] ;
-				codewordLengths[i] = length + 1;
-				bitOffset += 5 ;
-				System.out.println( "Entry: " + i + " Codeword Length: " + codewordLengths[i] ) ;
+				final int toRead = iLog( ( int )( entries - currentEntry ) ) ;
+				final int number = ( ConvertBytes.toBits( _stream, 0, _pos, toRead )[0] ) & 0xFF ;
+				_pos += toRead ;
+
+				codewordLengths[currentEntry + number - 1] = currentLength ;
+				currentEntry = number + currentEntry ;
+				++currentLength ;
+
+				if( currentEntry > entries )
+				{
+					throw new Exception( "Current Entry out of bounds." ) ;
+				}
+			}
+			
+		}
+
+		final CodebookConfiguration book = new CodebookConfiguration() ;
+		book.entries = entries ;
+		book.dimensions = dimensions ;
+		book.codewordLengths = codewordLengths ;
+
+		// Read lookup table data - if any exists
+		final int lookupType = ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ;
+		book.lookupType = lookupType ;
+		_pos += 4 ;
+
+		if( lookupType != NO_LOOKUP_TABLE )
+		{
+			book.minValue = unpackFloat( ConvertBytes.toBits( _stream, 0, _pos, 32 ) ) ;
+			book.deltaValue = unpackFloat( ConvertBytes.toBits( _stream, 0, _pos += 32, 32 ) ) ;
+			final int valueBits = ( ConvertBytes.toBits( _stream, 0, _pos += 32, 4 )[0] & 0xFF ) + 1 ;
+			book.sequenceP = ConvertBytes.isBitSet( _stream, _pos += 4 ) ;
+			++_pos ;
+
+			final int lookupValues ;
+			switch( lookupType )
+			{
+				case IMPLICIT_LOOKUP_TABLE : lookupValues = getLookup1( ( int )entries, dimensions ) ; break ;
+				case EXPLICIT_LOOKUP_TABLE : lookupValues = ( int )entries * dimensions ; break ; 
+				default                    : throw new Exception( "Failed to identify Lookup Table: " + lookupType ) ;
+			}
+
+			final int[] multiplicands = new int[lookupValues] ;
+			for( int i = 0; i < lookupValues; i++ )
+			{
+				multiplicands[i] = ConvertBytes.toBits( _stream, 0, _pos, valueBits )[0] & 0xFF ;
+				_pos += valueBits ;
+			}
+
+			book.multiplicands = multiplicands ;
+		}
+
+		book.entry = codebooks.size() ;
+		codebooks.add( book ) ;
+		return _pos ;
+	}
+
+	private int decodeTimeDomain( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int timeCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
+		System.out.println( "Time Count: " + timeCount ) ;
+		_pos += 6 ;
+
+		for( int i = 0; i < timeCount; i++ )
+		{
+			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
+			_pos += 16 ;
+
+			for( int j = 0; j < read.length; j++ )
+			{
+				ConvertBytes.printByte( read[j] ) ;
+			}
+
+			ConvertBytes.flipEndian( read ) ;
+			final int time = ConvertBytes.toShort( read, 0, 2 ) & 0xFFFF  ;
+			if( time != 0 )
+			{
+				throw new Exception( "Failed to sync to time zero: " + time ) ;
 			}
 		}
 
-		if( orderedFlag == true )
-		{
-			System.out.println( "Ordered Flag - enabled" ) ;
-		}
+		return _pos ;
+	}
 
-		final byte lookupType = ConvertBytes.toBits( _stream, _pos, bitOffset, 4 )[0] ;
-		bitOffset += 4 ;
+	private int decodeFloors( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int floorCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
+		System.out.println( "Floor Count: " + floorCount ) ;
+		_pos += 6 ;
 
-		System.out.println( "Lookup Table Type: " + lookupType ) ;
-		switch( lookupType )
+		final int[] floors = new int[floorCount] ;
+		for( int i = 0; i < floorCount; i++ )
 		{
-			case IMPLICIT_LOOKUP_TABLE : System.out.println( "Not Implemented" ) ; break ;
-			case EXPLICIT_LOOKUP_TABLE : System.out.println( "Not Implemented" ) ; break ;
+			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
+			_pos += 16 ;
+
+			for( int j = 0; j < read.length; j++ )
+			{
+				ConvertBytes.printByte( read[j] ) ;
+			}
+
+			ConvertBytes.flipEndian( read ) ;
+			floors[i] = ConvertBytes.toShort( read, 0, 2 ) & 0xFFFF  ;
+			System.out.println( "Floor: " + floors[i] ) ;
+
+			switch( floors[i] )
+			{
+				case 0  : _pos = decodeFloorType0( _pos, _stream ) ; break ;
+				case 1  : _pos = decodeFloorType1( _pos, _stream ) ; break ;
+				default : throw new Exception( "Unknown floor type: " + floors[i] ) ;
+			}
 		}
 		
 		return _pos ;
 	}
 
+	private int decodeFloorType0( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+		final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
+		ConvertBytes.flipEndian( readRate ) ;
+		final int rate = ConvertBytes.toShort( readRate, 0, 2 ) & 0xFFFF  ;
+
+		final byte[] readbarkMapSize = ConvertBytes.toBits( _stream, 0, _pos += 16, 16 ) ;
+		ConvertBytes.flipEndian( readbarkMapSize ) ;
+		final int barkMapSize = ConvertBytes.toShort( readbarkMapSize, 0, 2 ) & 0xFFFF  ;
+
+		final int amplitude = ( ConvertBytes.toBits( _stream, 0, _pos += 16, 6 )[0] & 0xFF ) ;
+		final int amplitudeOffset = ( ConvertBytes.toBits( _stream, 0, _pos += 6, 8 )[0] & 0xFF ) ;
+		final int numBooks = ( ConvertBytes.toBits( _stream, 0, _pos += 8, 4 )[0] & 0xFF ) + 1 ;
+		_pos += 4 ;
+
+		for( int j = 0; j < numBooks; j++ )
+		{
+			final int bookList = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+			_pos += 8 ;
+		}
+
+		return _pos ;
+	}
+
+	private int decodeFloorType1( int _pos, final byte[] _stream ) throws Exception
+	{
+	
+		return _pos ;
+	}
+
+	private float unpackFloat( final byte[] _pack )
+	{
+		ConvertBytes.flipEndian( _pack ) ;
+		final int x = ConvertBytes.toInt( _pack, 0, 4 ) ;
+
+		int mantissa = x & 0x1FFFFF ;
+		final int sign = x & 0x80000000 ;
+		final int exponent = ( x & 0x7fe00000 ) >> 21 ;
+
+		mantissa = ( sign != 0 ) ? 1 : mantissa ;
+		return ( float )( mantissa * ( Math.pow( 2, ( exponent - 788 ) ) ) ) ;
+	}
+
+	private int getLookup1( final int _entries, final int _dimensions )
+	{
+		int i = 1 ;
+		while( Math.pow( i, _dimensions ) <= _entries )
+		{
+			i += 1 ;
+		}
+
+		return --i ;
+	}
+	
+	private int iLog( int _x )
+	{
+		int value = 0 ;
+		while( _x > 0 )
+		{
+			++value ;
+			_x = _x >> 1 ;
+		}
+
+		return value ;
+	}
+
+	private String testILog()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		for( int i = -1; i < 8; ++i )
+		{
+			buffer.append( "Pass: " + i + " Result: " + iLog( i ) + "\n" ) ;
+		}
+
+		return buffer.toString() ;
+	}
+	
 	public long getVersion()
 	{
 		return version & 0xFFFFFFFFL ;
@@ -319,7 +510,104 @@ public class Vorbis
 			buffer.append( "Statement: " + statement + "\n" ) ;
 		}
 
+		buffer.append( "Codebooks: " + codebooks.size() ) ;
+		/*for( final CodebookConfiguration book : codebooks )
+		{
+			buffer.append( book.toString() ) ;
+		}*/
+
 		return buffer.toString() ;
+	}
+
+	public static class CodebookConfiguration
+	{
+		int entry ;							// Denotes the entry of the codebook, for example 
+											// the 5th codebook to be read in
+		int dimensions ;
+		long entries ;
+		int[] codewordLengths = null ;		// Codeword Lengths length is the size of entries
+
+		int lookupType ;
+		float minValue ;
+		float deltaValue ;
+		boolean sequenceP ;
+		int[] multiplicands = null ;		// Lookup Values is multiplicands length
+
+		public float[] getVQLookupTable()
+		{
+			switch( lookupType )
+			{
+				case IMPLICIT_LOOKUP_TABLE : return getVQLookupTable1() ;
+				case EXPLICIT_LOOKUP_TABLE : return getVQLookupTable2() ;
+				default                    : return null ;
+			}
+		}
+
+		private float[] getVQLookupTable1()
+		{
+			float last = 0.0f ;
+			int indexDivisor = 1 ;
+			final int lookupOffset = entry ;
+
+			final float[] vq = new float[dimensions] ;
+			for( int i = 0; i < dimensions; ++i )
+			{
+				final int multiplicandOffset = ( lookupOffset / indexDivisor ) % multiplicands.length ;
+				vq[i] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
+
+				last = ( sequenceP == true ) ? vq[i] : last ;
+				indexDivisor = indexDivisor * multiplicands.length ;
+			}
+			
+			return vq ;
+		}
+
+		private float[] getVQLookupTable2()
+		{
+			float last = 0.0f ;
+			final int lookupOffset = entry ;
+			int multiplicandOffset = lookupOffset * dimensions ;
+
+			final float[] vq = new float[dimensions] ;
+			for( int i = 0; i < dimensions; ++i )
+			{
+				vq[i] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
+
+				last = ( sequenceP == true ) ? vq[i] : last ;
+				++multiplicandOffset ;
+			}
+
+			return vq ;
+		}
+
+		public String toString()
+		{
+			final StringBuffer buffer = new StringBuffer() ;
+			buffer.append( "Dimensions: " + dimensions + "\n" ) ;
+			buffer.append( "Entries: " + entries + "\n" ) ;
+			if( lookupType != NO_LOOKUP_TABLE )
+			{
+				buffer.append( "Min: " + minValue + "\n" ) ;
+				buffer.append( "Delta: " + deltaValue + "\n" ) ;
+				buffer.append( "sequenceP: " + sequenceP + "\n" ) ;
+				buffer.append( "Multiplicands: " + multiplicands.length + "\n" ) ;
+			}
+
+			/*for( int i = 0; i < entries; ++i )
+			{
+				buffer.append( "Entry: " + i + " Codeword Length: " + codewordLengths[i] + "\n" ) ;
+			}
+
+			if( multiplicands != null )
+			{
+				for( int i = 0; i < multiplicands.length; ++i )
+				{
+					buffer.append( "Index: " + i + " Multiplicands: " + multiplicands[i] + "\n" ) ;
+				}
+			}*/
+
+			return buffer.toString() ;
+		}
 	}
 
 	/**
@@ -328,8 +616,8 @@ public class Vorbis
 	public static class VorbisHeader
 	{
 		public final int headerType ;	// ID_HEADER_TYPE, COMMENT_HEADER_TYPE, & SETUP_HEADER_TYPE are valid values
-		public final int start ;			// The start of header information skips default header data
-		public final Page page ;			// Page the data is located on
+		public final int start ;		// The start of header information skips default header data
+		public final Page page ;		// Page the data is located on
 
 		public VorbisHeader( final int _headerType, final int _start, final Page _page )
 		{

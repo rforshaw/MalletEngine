@@ -191,28 +191,32 @@ public final class ConvertBytes
 	{
 		final int startOffset = ( _byteOffset * 8 ) + _bitOffset ;
 		final int endOffset = startOffset + _bitLength ;
-		final int byteLength = ( int )Math.ceil( _bitLength / 8.0f ) ;
 
 		final int start = ( int )Math.floor( startOffset / 8.0f ) ;
 		final int end = ( int )Math.ceil( endOffset / 8.0f ) ;
-		final int len = end - start ;
-		
-		final byte[] temp = ConvertBytes.newInvertBytes( _bytes, start, len ) ;
+		final int len = ( _bitLength / 8 ) + ( ( ( _bitLength % 8 > 0 ) ) ? 1 : 0 ) ;
+
+		int j = 0 ;
+		final byte[] bytes = new byte[len] ;
+		for( int i = startOffset; i < endOffset; ++i )
 		{
-			printByte( _bytes[start] ) ;
-			printByte( temp[0] ) ;
+			setBit( bytes, j++, isBitSet( _bytes, i ) ) ;
 		}
 
-		final int subStart = startOffset % 8 ;
-		final int subEnd = endOffset % 8 ;
-		final int subLength = subStart + _bitLength ;
+		return bytes ;
+	}
 
-		final byte[] bytes = new byte[len] ;
+	public static byte[] newBytes( final byte[] _bytes, int _offset, final  int _length )
+	{
+		final byte[] bytes = new byte[_length] ;
+		final int size = _offset + _length ;
 
-		int j = 0 ;//( temp.length * 8 ) - 1 ;
-		for( int i = subLength - 1; i >= subStart ; --i )
+		//System.out.println( "Start: " + _offset + "Length: " + _length + " Size: " + size ) ;
+
+		int bytesPos = 0 ;
+		for( int i = _offset; i < size; ++i )
 		{
-			setBit( bytes, j++, isBitSet( temp, i ) ) ;
+			bytes[bytesPos++] = _bytes[i] ;
 		}
 
 		return bytes ;
@@ -238,7 +242,7 @@ public final class ConvertBytes
 		
 		return bytes ;
 	}
-	
+
 	/**FLIP BYTE ARRAY ENDIAN**/
 
 	public static byte[] newflipEndian( final byte[] _bytes )
