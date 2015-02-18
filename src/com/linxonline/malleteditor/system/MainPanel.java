@@ -7,6 +7,7 @@ import javax.swing.event.* ;
 import java.io.File ;
 
 import javax.media.opengl.awt.GLCanvas ;
+import javax.media.opengl.awt.GLJPanel ;
 
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.event.EventController ;
@@ -25,7 +26,7 @@ public class MainPanel extends JPanel
 	private JList entityList = null ;
 	private final DefaultListModel<EntityCell> defaultList = new DefaultListModel<EntityCell>() ;
 
-	public MainPanel( final GLCanvas _canvas )
+	public MainPanel( final GLJPanel _canvas )
 	{
 		initSideList() ;
 		initMenuBar() ;

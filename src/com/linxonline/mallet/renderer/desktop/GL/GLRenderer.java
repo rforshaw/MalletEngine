@@ -11,6 +11,7 @@ import java.lang.reflect.* ;
 
 import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
+import javax.media.opengl.awt.GLJPanel ;
 import javax.media.opengl.glu.GLU ;
 
 import com.linxonline.mallet.maths.* ;
@@ -40,7 +41,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected int numID = 0 ;
 	protected static final GLU glu = new GLU() ;
-	protected static GLCanvas canvas = null ;
+	protected static GLJPanel canvas = null ;
 	protected JFrame frame = null ;
 
 	private final Vector2 UV1 = new Vector2() ;
@@ -92,7 +93,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
 		capabilities.setDoubleBuffered( true ) ;
 
-		canvas = new GLCanvas( capabilities ) ;
+		canvas = new GLJPanel( capabilities ) ;
 		canvas.setAutoSwapBufferMode( false ) ;
 		canvas.addGLEventListener( this ) ;
 	}
@@ -228,14 +229,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
-				
 				Texture<GLImage> texture = _settings.getObject( "TEXTURE", null ) ;
 				if( texture == null )
 				{
 					texture = loadTexture( _settings ) ;
-					if( texture == null ) { return ; }
+					if( texture == null )
+					{
+						return ;
+					}
 				}
-				
+
 				final GLImage image = texture.getImage() ;
 				if( image.textureID != textureID )
 				{
@@ -706,7 +709,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		fontManager.clean() ;
 	}
 
-	public static GLCanvas getCanvas()
+	public static GLJPanel getCanvas()
 	{
 		return canvas ;
 	}

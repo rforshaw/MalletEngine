@@ -23,7 +23,7 @@ public class GLModelGenerator
 	{
 		// See if the model already exists
 		final Model m = ( Model )models.get( _name ) ;
-		if( m != null ) { return m ; }
+		if( m != null ){ return m ; }
 
 		// Generate the plane, & register it.
 		final Model model = GLModelGenerator.genPlaneModel( _dim, _uv1, _uv2 ) ;
