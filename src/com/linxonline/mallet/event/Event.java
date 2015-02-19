@@ -7,8 +7,8 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
-	public static final String[] NONE_EVENT_TYPES = { "NONE" } ;				// Not interested in any Event Types, used by getWantedEventTypes()
-	public static final String[] ALL_EVENT_TYPES = { "ALL" } ;					// Interested in all Event Types, used by getWantedEventTypes()
+	public static final EventType NONE_EVENT_TYPES = EventType.get( "NONE" ) ;				// Not interested in any Event Types, used by getWantedEventTypes()
+	public static final EventType ALL_EVENT_TYPES = EventType.get( "ALL" ) ;				// Interested in all Event Types, used by getWantedEventTypes()
 
 	private static final EventHandlerMeta BLANK_META = new EventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
 	{
@@ -68,9 +68,9 @@ public final class Event<T>
 		meta = ( _meta != null ) ? _meta : BLANK_META ;
 	}
 
-	public final String getEventType()
+	public final EventType getEventType()
 	{
-		return eventType.getType() ;
+		return eventType ;
 	}
 
 	public final T getVariable()

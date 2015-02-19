@@ -319,10 +319,6 @@ public final class ConvertBytes
 		final int index = ( int )Math.floor( _position / 8.0f ) ;
 		final int bitPos = ( _position % 8 ) ;
 
-		/*System.out.println( _position ) ;
-		System.out.println( "Index: " + index + " BitPos: " + bitPos ) ;
-		System.out.print( "Byte: " ) ; printByte( _bytes[index] ) ;*/
-
 		return ( _bytes[index] >> bitPos & 1 ) == 1 ;
 	}
 

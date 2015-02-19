@@ -60,6 +60,11 @@ public abstract class EventProcessor<T>
 		return true ;		// Accepts all Events being passed to it
 	}
 
+	public EventType getEventType()
+	{
+		return type ;
+	}
+
 	public String getName()
 	{
 		return name ;

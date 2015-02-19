@@ -4,6 +4,8 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.event.EventType ;
+
 import com.linxonline.mallet.event.AddEventInterface ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -133,8 +135,10 @@ public class AnimationSystem extends SystemRoot<Animation>
 	}
 
 	@Override
-	public String[] getWantedEventTypes()
+	public ArrayList<EventType> getWantedEventTypes()
 	{
-		return new String[] { "ANIMATION" } ;
+		final ArrayList<EventType> types = new ArrayList<EventType>() ;
+		types.add( EventType.get( "ANIMATION" ) ) ;
+		return types ;
 	}
 }

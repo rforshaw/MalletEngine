@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.logger.Logger ;
 **/
 public class EventController implements EventHandler
 {
-	private String[] wantedTypes = Event.ALL_EVENT_TYPES ;
+	private final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
 
 	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
@@ -42,19 +42,12 @@ public class EventController implements EventHandler
 	{
 		assert _processor != null ;
 		processors.add( _processor ) ;
+		wantedTypes.add( _processor.getEventType() ) ;
 	}
 
 	public void setAddEventInterface( final AddEventInterface _addInterface )
 	{
 		addInterface = _addInterface ;
-	}
-	
-	/**
-		Define what type of events this controller should be interested in.
-	**/
-	public void setWantedEventTypes( final String[] _types )
-	{
-		wantedTypes = _types ;
 	}
 
 	public int getProcessorSize()
@@ -120,7 +113,7 @@ public class EventController implements EventHandler
 		return name ;
 	}
 
-	public String[] getWantedEventTypes()
+	public ArrayList<EventType> getWantedEventTypes()
 	{
 		return wantedTypes ;
 	}

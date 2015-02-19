@@ -10,7 +10,7 @@ public final class EventSystem implements AddEventInterface
 {
 	// Replace HashMap with something easier to traverse.
 	private final String name ;
-	private final HashMap<String, EventQueue> eventQueues = new HashMap<String, EventQueue>() ;
+	private final HashMap<EventType, EventQueue> eventQueues = new HashMap<EventType, EventQueue>() ;
 	private final ArrayList<EventQueue> queues = new ArrayList<EventQueue>() ;
 
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
@@ -20,14 +20,14 @@ public final class EventSystem implements AddEventInterface
 	{
 		name = "NONE" ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		addEventQueue( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
+		addEventQueue( Event.ALL_EVENT_TYPES, new EventQueue( Event.ALL_EVENT_TYPES ) ) ;
 	}
 
 	public EventSystem( final String _name )
 	{
 		name = _name ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		addEventQueue( Event.ALL_EVENT_TYPES[0], new EventQueue( "ALL" ) ) ;
+		addEventQueue( Event.ALL_EVENT_TYPES, new EventQueue( Event.ALL_EVENT_TYPES ) ) ;
 	}
 
 	/**
@@ -43,8 +43,17 @@ public final class EventSystem implements AddEventInterface
 			return ;
 		}
 
-		final String[] types = _handler.getWantedEventTypes() ;
-		for( final String type : types )
+		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
+		if( types.isEmpty() == true )
+		{
+			// Due to legacy reasons, getWantedEventTypes would be default return Event.ALL_EVENT_TYPES
+			// Because wantedTypes is populated when an EventProcessord are added
+			// we will assumme that a types size of zero, means the developer is looking to 
+			// recieve all Events.
+			eventQueues.get( Event.ALL_EVENT_TYPES ).addEventHandler( _handler ) ;
+		}
+
+		for( final EventType type : types )
 		{
 			if( eventQueues.containsKey( type ) == false )
 			{
@@ -70,7 +79,7 @@ public final class EventSystem implements AddEventInterface
 		toBeRemoved.add( _handler ) ;
 	}
 
-	public final void addEventFilter( final String _type, final EventFilter _filter )
+	public final void addEventFilter( final EventType _type, final EventFilter _filter )
 	{
 		assert _type != null || _filter != null ;
 
@@ -112,16 +121,16 @@ public final class EventSystem implements AddEventInterface
 
 	public final void addEvent( final Event<?> _event )
 	{
-		final String key = _event.getEventType() ;
+		final EventType key = _event.getEventType() ;
 		//System.out.println( name + " " + key ) ;
 		if( eventQueues.containsKey( key ) == true )
 		{
 			eventQueues.get( key ).addEvent( _event ) ;
 		}
 
-		if( eventQueues.containsKey( Event.ALL_EVENT_TYPES[0] ) == true )
+		if( eventQueues.containsKey( Event.ALL_EVENT_TYPES ) == true )
 		{
-			eventQueues.get( Event.ALL_EVENT_TYPES[0] ).addEvent( _event ) ;
+			eventQueues.get( Event.ALL_EVENT_TYPES ).addEvent( _event ) ;
 		}
 	}
 
@@ -135,7 +144,7 @@ public final class EventSystem implements AddEventInterface
 		}
 	}
 
-	protected void addEventQueue( final String _queueName, final EventQueue _queue )
+	protected void addEventQueue( final EventType _queueName, final EventQueue _queue )
 	{
 		eventQueues.put( _queueName, _queue ) ;
 		queues.add( _queue ) ;
@@ -143,8 +152,8 @@ public final class EventSystem implements AddEventInterface
 	
 	private void remove( final EventHandler _handler )
 	{
-		final String[] types = _handler.getWantedEventTypes() ;
-		for( final String type : types )
+		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
+		for( final EventType type : types )
 		{
 			if( eventQueues.containsKey( type ) == true )
 			{
@@ -202,7 +211,7 @@ public final class EventSystem implements AddEventInterface
 
 	public final boolean hasEvents()
 	{
-		return eventQueues.get( Event.ALL_EVENT_TYPES[0] ).hasEvents() ;
+		return eventQueues.get( Event.ALL_EVENT_TYPES ).hasEvents() ;
 	}
 
 	private final boolean exists( final EventHandler _handler )

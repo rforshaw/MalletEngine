@@ -10,9 +10,9 @@ public class EventQueue
 	private final ArrayList<Event<?>> optimisedEvents = new ArrayList<Event<?>>() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
-	public EventQueue( final String _name )
+	public EventQueue( final EventType _name )
 	{
-		name = EventType.get( _name ) ;
+		name = _name ;
 	}
 	
 	public void addEventHandler( final EventHandler _handler )

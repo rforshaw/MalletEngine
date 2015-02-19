@@ -75,9 +75,6 @@ public class GLDefaultSystem implements SystemInterface
 
 	protected void initEventProcessors()
 	{
-		final String[] eventTypes = { "DISPLAY_SYSTEM_MOUSE", "SYSTEM_RENDER" } ;
-		eventController.setWantedEventTypes( eventTypes ) ;
-
 		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
 		{
 			@Override

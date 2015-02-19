@@ -185,8 +185,10 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	}
 
 	@Override
-	public final String[] getWantedEventTypes()
+	public final ArrayList<EventType> getWantedEventTypes()
 	{
-		return new String[] { "AUDIO" } ;
+		final ArrayList<EventType> types = new ArrayList<EventType>() ;
+		types.add( EventType.get( "AUDIO" ) ) ;
+		return types ;
 	}
 }

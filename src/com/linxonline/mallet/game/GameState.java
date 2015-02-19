@@ -41,9 +41,9 @@ public class GameState extends State implements HookEntity
 
 	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
 
-	protected final InputState inputSystem = new InputState() ;										// Internal Input System
-	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;		// Internal Event System
-	protected final EventController eventController = new EventController() ;						// Used to process Events, gateway between internal eventSystem and root event-system
+	protected final InputState inputSystem = new InputState() ;												// Internal Input System
+	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
+	protected final EventController eventController = new EventController( "GAME_STATE_CONTROLLER" ) ;		// Used to process Events, gateway between internal eventSystem and root event-system
 
 	protected SystemInterface system = null ;														// Provides access to Root systems
 	protected final AudioSystem audioSystem = new AudioSystem() ;									// Must specify a SourceGenerator
@@ -89,6 +89,8 @@ public class GameState extends State implements HookEntity
 		{
 			initGame() ;
 		}
+
+		hookGameStateEventController() ;
 	}
 
 	@Override
@@ -269,18 +271,29 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
+		Called by startState once the game has been 
+		initialised or resumed.
+		Ensures that any EventProcessors added to 
+		the controller are handled correctly by the 
+		Event Systems.
+	*/
+	protected void hookGameStateEventController()
+	{
+		eventSystem.addEventHandler( eventController ) ;
+		system.addEventHandler( eventController ) ;
+	}
+	
+	/**
 		Enable event-based systems to recieve events.
 		Also hooks-up the inputSystem.
 	*/
 	protected void hookHandlerSystems()
 	{
-		eventSystem.addEventHandler( eventController ) ;
 		eventSystem.addEventHandler( audioSystem ) ;
 		eventSystem.addEventHandler( animationSystem ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface() ) ;
 
-		system.addEventHandler( eventController ) ;
 		system.addInputHandler( inputSystem ) ;
 	}
 

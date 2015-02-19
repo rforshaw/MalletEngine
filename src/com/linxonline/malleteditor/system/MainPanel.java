@@ -188,7 +188,7 @@ public class MainPanel extends JPanel
 
 	protected void initEventController()
 	{
-		eventController = new EventController()
+		/*eventController = new EventController()
 		{
 			//	Override processEvent, as storing Events via the 
 			//	EventControllers messenger wont get updated.
@@ -218,7 +218,7 @@ public class MainPanel extends JPanel
 				}
 			}
 		} ;
-		eventController.setWantedEventTypes( EVENT_TYPES ) ;
+		eventController.setWantedEventTypes( EVENT_TYPES ) ;*/
 	}
 
 	public EventController getEventController()

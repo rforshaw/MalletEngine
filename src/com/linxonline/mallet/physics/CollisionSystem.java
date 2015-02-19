@@ -7,13 +7,11 @@ import com.linxonline.mallet.event.* ;
 
 public class CollisionSystem extends EventController
 {
-	private final String[] EVENT_TYPES = { "ADD_COLLISION_HULL", "REMOVE_COLLISION_HULL" } ;
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
 
 	public CollisionSystem( final AddEventInterface _addInterface )
 	{
 		setAddEventInterface( _addInterface ) ;
-		setWantedEventTypes( EVENT_TYPES ) ;
 		initEventProcessors() ;
 	}
 

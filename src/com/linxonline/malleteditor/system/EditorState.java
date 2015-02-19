@@ -22,8 +22,6 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 public class EditorState extends GameState
 {
-	public final static String[] EVENT_TYPES = { "OPEN_FILE", "IMPORT_FILE", "SAVE_FILE", "ADD_ENTITY", "REMOVE_ENTITY" } ;
-	
 	private final EventController editorController = new EventController( "EDITOR_CONTROLLER" ) ;						// Used to process Events, gateway between internal eventSystem and root event-system
 	private final EditorEntityFactory factory = new EditorEntityFactory() ;
 
@@ -62,7 +60,6 @@ public class EditorState extends GameState
 			}
 		} ) ;
 
-		editorController.setWantedEventTypes( EVENT_TYPES ) ;
 		editorController.addEventProcessor( new EventProcessor<String>( "FILE", "OPEN_FILE" )
 		{
 			@Override
