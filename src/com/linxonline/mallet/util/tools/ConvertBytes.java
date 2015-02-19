@@ -356,38 +356,4 @@ public final class ConvertBytes
 	{
 		return ( _endian == BIG_ENDIAN ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN ;
 	}
-	
-	/**OLD CONVERSION FUNCTIONS - SHOULD BE DEPRECATED**/
-
-	/**
-		Requires at length 4 bytes
-	*/
-	public static int toInteger( final byte[] _bytes )
-	{
-		return _bytes[0] << 24 | 
-			 ( _bytes[1] & 0xFF ) << 16 |
-			 ( _bytes[2] & 0xFF ) << 8 |
-			 ( _bytes[3] & 0xFF ) ;
-	}
-
-	/**
-		Requires at length 2 bytes
-	*/
-	public static short toShort( final byte[] _bytes )
-	{
-		return ( short )( ( _bytes[0] << 8 ) | ( _bytes[1] ) ) ;
-	}
-
-	public static short[] toShorts( final byte[] _bytes )
-	{
-		final short[] shorts = new short[_bytes.length / 2] ;
-		int j = 0 ;
-
-		for( int i = 0; i < _bytes.length; i += 2 )
-		{
-			shorts[j++] = ( short )( ( _bytes[i] << 8 ) | ( _bytes[i + 1] ) ) ;
-		}
-
-		return shorts ;
-	}
 }

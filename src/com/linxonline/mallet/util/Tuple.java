@@ -20,4 +20,17 @@ public class Tuple<T, U>
 	{
 		return right ;
 	}
+
+	@Override
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( '[' ) ;
+		buffer.append( left.toString() ) ;
+		buffer.append( " | " ) ;
+		buffer.append( right.toString() ) ;
+		buffer.append( ']' ) ;
+
+		return buffer.toString() ;
+	}
 }

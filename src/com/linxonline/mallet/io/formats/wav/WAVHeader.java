@@ -46,42 +46,29 @@ public class WAVHeader
 
 	public static int getDataSize( final byte[] _soundBuffer )
 	{
-		final int pos = getDataStartPoint( _soundBuffer ) - 4 ;
-		final byte[] temp = new byte[4] ;
-		temp[0] = _soundBuffer[pos + 3] ;
-		temp[1] = _soundBuffer[pos + 2] ;
-		temp[2] = _soundBuffer[pos + 1] ;
-		temp[3] = _soundBuffer[pos] ;
+		int pos = getDataStartPoint( _soundBuffer ) - 4 ;
+		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
+		final int size = ConvertBytes.toInt( _soundBuffer, pos, 4 ) ;
+		pos += 4 ;
 
-		return ConvertBytes.toInteger( temp ) ;
+		return size ;
 	}
 
 	public static short getBitsPerSample( final byte[] _soundBuffer )
 	{
-		final byte[] temp = new byte[2] ;
-		temp[0] = _soundBuffer[35] ;
-		temp[1] = _soundBuffer[34] ;
-
-		return ConvertBytes.toShort( temp ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 34, 2 ) ;
+		return ConvertBytes.toShort( _soundBuffer, 34, 2 ) ;
 	}
 
 	public static int getSampleRate( final byte[] _soundBuffer )
 	{
-		final byte[] temp = new byte[4] ;
-		temp[0] = _soundBuffer[27] ;
-		temp[1] = _soundBuffer[26] ;
-		temp[2] = _soundBuffer[25] ;
-		temp[3] = _soundBuffer[24] ;
-
-		return ConvertBytes.toInteger( temp ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 24, 4 ) ;
+		return ConvertBytes.toInt( _soundBuffer, 24, 4 ) ;
 	}
 
 	public static short getChannels( final byte[] _soundBuffer )
 	{
-		final byte[] temp = new byte[2] ;
-		temp[0] = _soundBuffer[23] ;
-		temp[1] = _soundBuffer[22] ;
-
-		return ConvertBytes.toShort( temp ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 22, 2 ) ;
+		return ConvertBytes.toShort( _soundBuffer, 22, 2 ) ;
 	}
 }
