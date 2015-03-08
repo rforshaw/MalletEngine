@@ -27,8 +27,8 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
 
 import com.linxonline.mallet.game.android.* ;
+import com.linxonline.mallet.system.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
-import com.linxonline.mallet.system.android.AndroidSystem ;
 import com.linxonline.mallet.input.android.AndroidInputListener ;
 
 public class AndroidActivity extends Activity
@@ -147,7 +147,7 @@ public class AndroidActivity extends Activity
 	public void onConfigurationChanged( Configuration _newConfig )
 	{
 		super.onConfigurationChanged( _newConfig ) ;
-		final AndroidSystem system = ( AndroidSystem )starter.getAndroidSystem() ;
+		final GLAndroidSystem system = ( GLAndroidSystem )starter.getAndroidSystem() ;
 		system.setContentView() ;	// Update the render for new Screen Dimensions
 	}
 
@@ -161,9 +161,11 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public String[] getWantedEventTypes()
+	public ArrayList<EventType> getWantedEventTypes()
 	{
-		return Event.ALL_EVENT_TYPES ;
+		final ArrayList<EventType> types = new ArrayList<EventType>() ;
+		types.add( Event.ALL_EVENT_TYPES ) ;
+		return types ;
 	}
 
 	@Override
@@ -180,6 +182,19 @@ public class AndroidActivity extends Activity
 			{
 				public void run() 
 				{
+					synchronized( starter.ready )
+					{
+						try
+						{
+							System.out.println( "Waiting for system init" ) ;
+							starter.ready.wait() ;
+						}
+						catch( InterruptedException ex )
+						{
+							ex.printStackTrace() ;
+						}
+					}
+				
 					starter.getAndroidSystem().startSystem() ;
 					starter.run() ;
 				}

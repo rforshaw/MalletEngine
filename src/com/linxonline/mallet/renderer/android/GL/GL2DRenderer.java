@@ -1,12 +1,14 @@
-package com.linxonline.mallet.renderer.android ;
+package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
 
 import android.content.Context ;
-import android.view.SurfaceHolder ;
-import android.view.SurfaceView ;
-import android.graphics.Paint.Style ;
-import android.graphics.* ;
+
+import android.opengl.GLES11 ;
+import android.opengl.GLSurfaceView ;
+
+import javax.microedition.khronos.opengles.GL10 ;
+import javax.microedition.khronos.egl.EGLConfig ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventType ;
@@ -17,45 +19,40 @@ import com.linxonline.mallet.resources.* ;
 
 import com.linxonline.mallet.renderer.android.* ;
 
-public class Android2DRenderer extends SurfaceView 
-							   implements RenderInterface, 
-										  SurfaceHolder.Callback
+public class GL2DRenderer implements RenderInterface, 
+									 GLSurfaceView.Renderer
 {
-	public final Basic2DRender render ; 
+	public final GLRenderer render ;
+	public final ResumeInitialisation resume ;
 
-	public Android2DRenderer( final Context _context )
+	public GL2DRenderer( final ResumeInitialisation _resume )
 	{
-		super( _context ) ;
-
-		final SurfaceHolder holder = getHolder() ;
-		holder.addCallback( this ) ;
-
-		render = new Canvas2DRenderer( holder, _context.getResources() ) ;
-
-		setFocusable( true ) ;
+		render = new GLRenderer() ;
+		resume = _resume ;
 	}
 
 	@Override
-	public void surfaceDestroyed( final SurfaceHolder _holder ) {}
-
-	@Override
-	public void surfaceCreated( final SurfaceHolder _holder ) {}
-
-	@Override
-	public void surfaceChanged( final SurfaceHolder _holder, 
-								final int _format, 
-								final int _width, 
-								final int _height )
+	public void onSurfaceCreated( GL10 _unused, EGLConfig _config )
 	{
-		//render.setRenderDimensions( _width, _height ) ;
+		System.out.println( "Render Context available" ) ;
+		render.start() ;
+		resume.resume() ;
+	}
+
+	@Override
+	public void onDrawFrame( GL10 _unused )
+	{
+		render.display() ;
+	}
+
+	@Override
+	public void onSurfaceChanged( GL10 _unused, int _width, int _height)
+	{
 		render.setDisplayDimensions( _width, _height ) ;
 	}
 
 	@Override
-	public void start()
-	{
-		render.start() ;
-	}
+	public void start() {}
 
 	@Override
 	public void shutdown()
@@ -100,9 +97,6 @@ public class Android2DRenderer extends SurfaceView
 	}
 
 	@Override
-	public void onDraw( final Canvas _canvas ) {}
-
-	@Override
 	public void processEvent( final Event _event )
 	{
 		render.processEvent( _event ) ;
@@ -117,7 +111,7 @@ public class Android2DRenderer extends SurfaceView
 	@Override
 	public String getName()
 	{
-		return "ANDROID_2D_RENDERER" ;
+		return "GL_2D_RENDERER" ;
 	}
 
 	@Override
@@ -136,5 +130,10 @@ public class Android2DRenderer extends SurfaceView
 	public void clear()
 	{
 		render.clear() ;
+	}
+
+	public interface ResumeInitialisation
+	{
+		public void resume() ;
 	}
 }
