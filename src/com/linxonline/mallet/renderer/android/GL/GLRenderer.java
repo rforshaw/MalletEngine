@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 import java.util.ArrayList ;
 
 import android.opengl.GLES11 ;
+import android.opengl.EGL14 ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
@@ -287,7 +288,11 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm == null ) { return ; }
+				if( fm.fontMap.texture == null )
+				{
+					fontManager.generateFontGeometry( font ) ;
+					return ;
+				}
 
 				final GLImage image = fm.getGLImage() ;
 				if( image.textureID != textureID )

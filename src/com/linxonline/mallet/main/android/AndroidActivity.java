@@ -30,11 +30,29 @@ import com.linxonline.mallet.game.android.* ;
 import com.linxonline.mallet.system.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.input.android.AndroidInputListener ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 public class AndroidActivity extends Activity
 							implements EventHandler
 {
 	private ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
+	private final Notify<Object> startGame = new Notify<Object>()
+	{
+		int increment = 0 ;
+
+		public void inform( final Object _noData )
+		{
+			++increment ;
+			if( increment >= 2 )
+			{
+				// Only start the game thread once we know the 
+				// OpenGL context has been initialised.
+				// Only 2 things will call inform(), onSurfaceCreated & onResume
+				startGameThread() ;
+			}
+		}
+	} ;
+
 	protected AndroidStarter starter ;
 	protected Thread gameThread = null ;
 
@@ -59,7 +77,7 @@ public class AndroidActivity extends Activity
 		if( starter == null )
 		{
 			System.out.println( "INIT ANDROID STARTER" ) ;
-			starter = new AndroidStarter( this ) ;
+			starter = new AndroidStarter( this, startGame ) ;
 			starter.init() ;
 		}
 	}
@@ -69,7 +87,7 @@ public class AndroidActivity extends Activity
 	{
 		System.out.println( "onResume()" ) ;
 		super.onResume() ;
-		startGameThread() ;
+		startGame.inform( null ) ;
 	}
 
 	@Override
@@ -182,19 +200,6 @@ public class AndroidActivity extends Activity
 			{
 				public void run() 
 				{
-					synchronized( starter.ready )
-					{
-						try
-						{
-							System.out.println( "Waiting for system init" ) ;
-							starter.ready.wait() ;
-						}
-						catch( InterruptedException ex )
-						{
-							ex.printStackTrace() ;
-						}
-					}
-				
 					starter.getAndroidSystem().startSystem() ;
 					starter.run() ;
 				}

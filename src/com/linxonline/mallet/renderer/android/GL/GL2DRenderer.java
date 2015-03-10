@@ -16,6 +16,7 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.renderer.android.* ;
 
@@ -23,12 +24,12 @@ public class GL2DRenderer implements RenderInterface,
 									 GLSurfaceView.Renderer
 {
 	public final GLRenderer render ;
-	public final ResumeInitialisation resume ;
+	public final Notification surfaceCreated = new Notification() ;
 
-	public GL2DRenderer( final ResumeInitialisation _resume )
+	public GL2DRenderer( final Notification.Notify _notify )
 	{
 		render = new GLRenderer() ;
-		resume = _resume ;
+		surfaceCreated.addNotify( _notify ) ;
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class GL2DRenderer implements RenderInterface,
 	{
 		System.out.println( "Render Context available" ) ;
 		render.start() ;
-		resume.resume() ;
+		surfaceCreated.informOnce() ;
 	}
 
 	@Override

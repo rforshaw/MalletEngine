@@ -17,7 +17,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.event.* ;
-
+import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.resources.android.* ;
 import com.linxonline.mallet.renderer.android.GL.* ;
@@ -35,10 +35,10 @@ public class GLAndroidSystem implements SystemInterface
 
 	protected boolean execution = true ;
 
-	public GLAndroidSystem( final AndroidActivity _activity, final GL2DRenderer.ResumeInitialisation _resume )
+	public GLAndroidSystem( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
 		activity = _activity ;
-		renderer = new GL2DSurfaceView( _activity, _resume ) ;
+		renderer = new GL2DSurfaceView( _activity, _notify ) ;
 	}
 
 	public void initSystem()

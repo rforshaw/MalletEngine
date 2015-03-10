@@ -26,7 +26,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		image content a-synchronously.
 		To ensure the textures are added safely to resources we 
 		temporarily store the images in a queue.
-		The BufferedImages are then binded to OpenGL and added 
+		The Bitmap are then binded to OpenGL and added 
 		to resources in order. If we don't do this images may be 
 		binded to OpenGL out of order causing significant performance 
 		degradation.
@@ -90,7 +90,9 @@ public class GLTextureManager extends AbstractManager<Texture>
 		{
 			for( final Tuple<String, Bitmap> tuple : toBind )
 			{
-				add( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+				final Bitmap bitmap = tuple.getRight() ;
+				add( tuple.getLeft(), bind( bitmap ) ) ;
+				bitmap.recycle() ;
 			}
 			toBind.clear() ;
 		}

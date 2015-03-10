@@ -21,6 +21,7 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
 import com.linxonline.mallet.io.reader.config.ConfigReader ;
 
+import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 
@@ -35,21 +36,9 @@ public class AndroidStarter extends StarterInterface
 
 	protected final static String BASE_CONFIG = "base/config.cfg" ;
 
-	public Object ready = new Object() ;
-	
-	public AndroidStarter( final AndroidActivity _activity )
+	public AndroidStarter( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
-		backendSystem = new GLAndroidSystem( _activity, new GL2DRenderer.ResumeInitialisation()
-		{
-			public void resume()
-			{
-				synchronized( ready )
-				{
-					System.out.println( "Finished system init" ) ;
-					ready.notifyAll() ;
-				}
-			}
-		} ) ;
+		backendSystem = new GLAndroidSystem( _activity, _notify ) ;
 		gameSystem = new GameSystem( backendSystem ) ;
 	}
 
@@ -123,18 +112,14 @@ public class AndroidStarter extends StarterInterface
 		final int width = display.widthPixels ;
 		final int height = display.heightPixels ;
 
-		final int renderWidth = width ;
-		final int renderHeight = height ;
+		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
+		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
 
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( width, height ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
 
 		render.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
-
-		final Settings config = new Settings() ;
-		config.addInteger( "RENDERWIDTH", renderWidth ) ;
-		config.addInteger( "RENDERHEIGHT", renderHeight ) ;
 	}
 
 	public SystemInterface getAndroidSystem()

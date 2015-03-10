@@ -7,8 +7,8 @@ import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class FontMap<T extends ImageInterface>
 {
+	public Texture<T> texture = null ;						// Rendered glyph
 	public final Glyph[] glyphs ;					// Data needed to render the glyphs available
-	public final Texture<T> texture ;				// Rendered glyph
 	public final int height ;
 
 	public FontMap( final Glyph[] _glyphs, final Texture<T> _texture, final int _height )
@@ -28,6 +28,11 @@ public class FontMap<T extends ImageInterface>
 			final int code = temp[i].sortValue() ;
 			glyphs[code] = temp[i] ;
 		}
+	}
+
+	public void setTexture( final Texture<T> _texture )
+	{
+		texture = _texture ;
 	}
 
 	public Glyph getGlyphWithChar( final char _character )
