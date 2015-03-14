@@ -8,6 +8,7 @@ import com.linxonline.mallet.event.* ;
 public class CollisionSystem extends EventController
 {
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
+	private final QuadTree treeHulls = new QuadTree() ;
 
 	public CollisionSystem( final AddEventInterface _addInterface )
 	{
@@ -39,6 +40,7 @@ public class CollisionSystem extends EventController
 		if( exists( _hull ) == false )
 		{
 			hulls.add( _hull ) ;
+			treeHulls.insertHull( _hull ) ;
 		}
 	}
 
@@ -47,6 +49,7 @@ public class CollisionSystem extends EventController
 		if( exists( _hull ) == true )
 		{
 			hulls.remove( _hull ) ;
+			treeHulls.removeHull( _hull ) ;
 		}
 	}
 
@@ -54,34 +57,19 @@ public class CollisionSystem extends EventController
 	{
 		update() ;			// Update Event Controller
 
-		Hull hull1 = null ;
-		Hull hull2 = null ;
+		treeHulls.clear() ;
 		final int size = hulls.size() ;
-
 		for( int i = 0; i < size; i++ )
 		{
-			hull1 = hulls.get( i ) ;
-			if( hull1.isCollidable() == false )
-			{
-				continue ;
-			}
-
-			for( int j = 0; j < size; j++ )
-			{
-				hull2 = hulls.get( j ) ;
-				if( hull1 != hull2 )
-				{
-					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
-					{
-						CollisionCheck.generateContactPoint( hull1, hull2 ) ;
-					}
-				}
-			}
+			treeHulls.insertHull( hulls.get( i ) ) ;
 		}
+
+		treeHulls.update( _dt ) ;
 	}
 
 	private final boolean exists( final Hull _hull )
 	{
-		return hulls.contains( _hull ) ;
+		//return hulls.contains( _hull ) ;
+		return treeHulls.exists( _hull ) ;
 	}
 }

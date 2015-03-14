@@ -29,11 +29,21 @@ public class Box2D extends Hull
 		aabb.setDimensionsFromOBB( obb ) ;
 	}
 
+	public Vector2 getPosition()
+	{
+		return obb.getCenter() ;
+	}
+
 	@Override
 	public Vector2[] getAxes()
 	{
 		obb.updateAxesAndEdges() ;
 		return obb.axes ;
+	}
+
+	public Vector2[] getPoints()
+	{
+		return obb.points ;
 	}
 
 	@Override

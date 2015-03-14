@@ -93,6 +93,11 @@ public class GLRenderer extends Basic2DRender
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
 			{
+				// If the GLFontMap has not been previously created, 
+				// then a skeleton map is provided, skeleton is capable 
+				// of being queried for text length and height, however,
+				// cannot be used to draw until the font texture & glyph 
+				// geometry is created during a drawText phase.
 				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
 
 				return new Font<GLFontMap>( fontMap )
@@ -290,8 +295,10 @@ public class GLRenderer extends Basic2DRender
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 				if( fm.fontMap.texture == null )
 				{
+					// If the font maps texture has yet to be set,
+					// generate the texture and bind it with the 
+					// current OpenGL context
 					fontManager.generateFontGeometry( font ) ;
-					return ;
 				}
 
 				final GLImage image = fm.getGLImage() ;

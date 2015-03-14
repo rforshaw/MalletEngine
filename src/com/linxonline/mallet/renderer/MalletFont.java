@@ -7,10 +7,10 @@ public class MalletFont
 {
 	public static final int PLAIN = 5 ;
 
-	public final Font font ;
-	public final String fontName ;
-	public final int style ;
-	public final int size ;
+	public final Font font ;			// Wrapper around platform specific implementation
+	public final String fontName ;		// The Family Font Name
+	public final int style ;			// Italic, Bold, Plain, currently only Pain is supported
+	public final int size ;				// Text point size
 
 	public MalletFont( final String _name, final int _style, final int _size )
 	{
@@ -23,13 +23,14 @@ public class MalletFont
 
 	public MalletFont( final String _name, final int _size )
 	{
-		fontName = _name ;
-		size = _size ;
-		style = PLAIN ;
-
-		font = FontAssist.createFont( fontName, style, size ) ;
+		this( _name, PLAIN, _size ) ;
 	}
 
+	public MalletFont( final String _name )
+	{
+		this( _name, 12 ) ;
+	}
+	
 	public String getFontName()
 	{
 		return fontName ;

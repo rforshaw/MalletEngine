@@ -29,6 +29,16 @@ public class Circle2D extends Hull
 		return null ;
 	}
 
+	public Vector2[] getPoints()
+	{
+		return null ;
+	}
+
+	public Vector2 getPosition()
+	{
+		return circle.position ;
+	}
+
 	@Override
 	public void getAbsoluteCenter( final Vector2 _center )
 	{
