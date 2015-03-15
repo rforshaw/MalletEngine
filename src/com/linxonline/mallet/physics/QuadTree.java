@@ -24,10 +24,11 @@ public class QuadTree
 	}
 
 	private final QuadNode root ;
+	private int checksMade = 0 ;
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 1000.0f, 5, 3 ) ;
+		this( 0.0f, 0.0f, 1000.0f, 10, 3 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -62,7 +63,9 @@ public class QuadTree
 
 	public void update( final float _dt )
 	{
+		checksMade = 0 ;
 		root.update( _dt ) ;
+		//System.out.println( "Checks Made: " + checksMade ) ;
 	}
 
 	public void clear()
@@ -96,39 +99,6 @@ public class QuadTree
 			centre.setXY( _x, _y ) ;
 			quadrant = _quadrant ;
 			tier = _tier ;
-		}
-
-		/**
-			Expand the scope of the Quad Tree by doubling 
-			its initial spacial size.
-			Used when a hull's position is out of the 
-			Quad Tree's boundaries.
-		*/
-		public void expand()
-		{
-			final float offset = MAX_QUAD_OFFSET ;
-			MAX_QUAD_OFFSET = MAX_QUAD_OFFSET * 2.0f ;
-		
-			tier -= 1 ;
-			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, Quadrant.ROOT, tier ) ;
-			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
-
-			tempRoot.topLeft.createTier( offset ) ;
-			tempRoot.topLeft.bottomRight = topLeft ;
-
-			tempRoot.topRight.createTier( offset ) ;
-			tempRoot.topRight.bottomLeft = topRight ;
-
-			tempRoot.bottomLeft.createTier( offset ) ;
-			tempRoot.bottomLeft.topRight = bottomLeft ;
-
-			tempRoot.bottomRight.createTier( offset ) ;
-			tempRoot.bottomRight.topLeft = bottomRight ;
-
-			topLeft = tempRoot.topLeft ;
-			topRight = tempRoot.topRight ;
-			bottomLeft = tempRoot.bottomLeft ;
-			bottomRight = tempRoot.bottomRight ;
 		}
 
 		/**
@@ -292,6 +262,7 @@ public class QuadTree
 					{
 						if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 						{
+							++checksMade ;
 							CollisionCheck.generateContactPoint( hull1, hull2 ) ;
 						}
 					}
@@ -455,6 +426,41 @@ public class QuadTree
 			bottomRight = new QuadNode( centre.x + _offset, centre.y + _offset, Quadrant.BOTTOM_RIGHT, tier + 1 ) ;
 
 			return true ;
+		}
+		
+		/**
+			Expand the scope of the Quad Tree by doubling 
+			its initial spacial size.
+			Used when a hull's position is out of the 
+			Quad Tree's boundaries.
+		*/
+		private void expand()
+		{
+			final float offset = MAX_QUAD_OFFSET ;
+			MAX_QUAD_OFFSET = MAX_QUAD_OFFSET * 2.0f ;
+		
+			System.out.println( "Expanding to: " + MAX_QUAD_OFFSET ) ;
+		
+			tier -= 1 ;
+			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, Quadrant.ROOT, tier ) ;
+			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
+
+			tempRoot.topLeft.createTier( offset ) ;
+			tempRoot.topLeft.bottomRight = topLeft ;
+
+			tempRoot.topRight.createTier( offset ) ;
+			tempRoot.topRight.bottomLeft = topRight ;
+
+			tempRoot.bottomLeft.createTier( offset ) ;
+			tempRoot.bottomLeft.topRight = bottomLeft ;
+
+			tempRoot.bottomRight.createTier( offset ) ;
+			tempRoot.bottomRight.topLeft = bottomRight ;
+
+			topLeft = tempRoot.topLeft ;
+			topRight = tempRoot.topRight ;
+			bottomLeft = tempRoot.bottomLeft ;
+			bottomRight = tempRoot.bottomRight ;
 		}
 	}
 

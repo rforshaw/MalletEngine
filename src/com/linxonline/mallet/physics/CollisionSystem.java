@@ -69,7 +69,6 @@ public class CollisionSystem extends EventController
 
 	private final boolean exists( final Hull _hull )
 	{
-		//return hulls.contains( _hull ) ;
 		return treeHulls.exists( _hull ) ;
 	}
 }

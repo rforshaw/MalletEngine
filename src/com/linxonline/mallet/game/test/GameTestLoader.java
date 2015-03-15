@@ -84,11 +84,13 @@ public final class GameTestLoader extends GameLoader
 				renderTextExample() ;
 				playAudioExample() ;
 
-				createEntityExample() ;
-				createEntityExample2() ;
-				createEntityExample3() ;
-				createEntityExample4() ;
-				createEntityExample5() ;
+				for( int i = 0; i < 10; ++i )
+				{
+					for( int j = 0; j < 10; ++j )
+					{
+						createEntityExample( i, j ) ;
+					}
+				}
 
 				createMouseAnimExample() ;
 			}
@@ -206,12 +208,15 @@ public final class GameTestLoader extends GameLoader
 				Create an Entity using the ImageCreator and add 
 				it to the Game State
 			**/
-			public void createEntityExample()
+			public void createEntityExample( final int _i, final int _j )
 			{
+				final int x = 50 + ( _i * 50 ) ;
+				final int y = 0 + ( _j * 50 ) ;
+			
 				final Settings image = new Settings() ;
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "100, 0" ) ;
-				image.addString( "DIM", "64, 64" ) ;
+				image.addString( "POS", Integer.toString( x ) + "," + Integer.toString( y ) ) ;
+				image.addString( "DIM",  "64, 64" ) ;
 				image.addString( "OFFSET", "-32, -32" ) ;
 
 				final ImageCreator creator = new ImageCreator() ;
@@ -219,7 +224,7 @@ public final class GameTestLoader extends GameLoader
 
 				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
 																	new Vector2( 64, 64 ),
-																	new Vector2( 100, 0 ),
+																	new Vector2( x, y ),
 																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
