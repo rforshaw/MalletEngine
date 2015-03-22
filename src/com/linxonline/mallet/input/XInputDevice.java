@@ -15,6 +15,9 @@ public interface XInputDevice
 		DPAD_X, DPAD_Y
 	}
 
+	/**
+		XInputDevice is passed to XInputListener.
+	*/
 	public static class Event
 	{
 		public long timestamp ;

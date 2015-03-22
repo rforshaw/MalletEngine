@@ -127,7 +127,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			}
 		} ) ;
 	}
-	
+
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{

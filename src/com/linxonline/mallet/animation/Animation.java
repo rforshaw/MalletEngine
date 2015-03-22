@@ -129,12 +129,23 @@ public class Animation implements IDInterface, Cacheable
 
 	private void changeTexture( final Event _event, final Sprite _sprite )
 	{
-		final Settings settings = ( Settings )_event.getVariable() ;
-		final Sprite.Frame f = sprite.getFrame( frame ) ;
+		final Settings settings = ( Settings )_event.getVariable() ;		// Render Event
+		final Sprite.Frame f = sprite.getFrame( frame ) ;					// Grab the current frame
 
-		settings.addString( "FILE", f.path ) ;
+		// Doesn't assume the next frame is part of a spritesheet.
+		// We could check to see if the current path is the same as 
+		// f.path. Note sure if this would be more performant.
+		settings.addString( "FILE", f.path ) ; 
+		// We need to null TEXTURE so the renderer
+		// can load/grab the new texture denoted by FILE
 		settings.addObject( "TEXTURE", null ) ;
 
+		// If using a sprite sheet the UV coordinates 
+		// will have changed. Though there is a possibility
+		// that a change in texture could result in different 
+		// UV's too. Or the texture stays the same and the UV 
+		// coordinates have changed, to simulate a scrolling 
+		// animation, like water.
 		settings.<Vector2>addObject( "UV1", f.uv1 ) ;
 		settings.<Vector2>addObject( "UV2", f.uv2 ) ;
 	}
@@ -176,12 +187,19 @@ public class Animation implements IDInterface, Cacheable
 		}
 	}
 
+	/**
+		Reset the Animation object so it 
+		can be used for another animation 
+		request.
+		Reset should clear everything, no residual 
+		information should be preserved.
+	*/
 	public void reset()
 	{
 		callbacks.clear() ;
 		id = 0 ;
 		renderID = -1 ;
-		sprite = null ;
+		sprite = null ;		// Is the Sprite unregistered before a reset?
 		event = null ;
 
 		play = false ;

@@ -82,7 +82,7 @@ public class AndroidZipFile implements FileStream
 		return ReadFile.getRaw( getByteInStream(), _callback, _length ) ;
 	}
 
-	public boolean getByteInCallback( final StringInCallback _callback, final int _length )
+	public boolean getStringInCallback( final StringInCallback _callback, final int _length )
 	{
 		return ReadFile.getString( getStringInStream(), _callback, _length ) ;
 	}

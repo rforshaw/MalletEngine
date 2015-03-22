@@ -9,7 +9,7 @@ public class MalletFont
 
 	public final Font font ;			// Wrapper around platform specific implementation
 	public final String fontName ;		// The Family Font Name
-	public final int style ;			// Italic, Bold, Plain, currently only Pain is supported
+	public final int style ;			// Italic, Bold, Plain, currently only Plain is supported
 	public final int size ;				// Text point size
 
 	public MalletFont( final String _name, final int _style, final int _size )
@@ -30,7 +30,7 @@ public class MalletFont
 	{
 		this( _name, 12 ) ;
 	}
-	
+
 	public String getFontName()
 	{
 		return fontName ;

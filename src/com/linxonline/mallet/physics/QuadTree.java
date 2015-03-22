@@ -228,6 +228,8 @@ public class QuadTree
 		{
 			if( parent == false )
 			{
+				// If the node isn't a parent then it must
+				// be the node that contains hulls
 				updateThisNode( _dt ) ;
 			}
 			else
@@ -438,9 +440,7 @@ public class QuadTree
 		{
 			final float offset = MAX_QUAD_OFFSET ;
 			MAX_QUAD_OFFSET = MAX_QUAD_OFFSET * 2.0f ;
-		
-			System.out.println( "Expanding to: " + MAX_QUAD_OFFSET ) ;
-		
+
 			tier -= 1 ;
 			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, Quadrant.ROOT, tier ) ;
 			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
