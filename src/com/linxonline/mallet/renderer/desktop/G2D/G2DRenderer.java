@@ -58,7 +58,7 @@ public class G2DRenderer extends Basic2DRender
 	public G2DRenderer()
 	{
 		canvas.setIgnoreRepaint( true ) ;
-		initFontAssist() ;
+		initAssist() ;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class G2DRenderer extends Basic2DRender
 	public void shutdown() {}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
 		FontAssist.setFontWrapper( new FontInterface()
 		{

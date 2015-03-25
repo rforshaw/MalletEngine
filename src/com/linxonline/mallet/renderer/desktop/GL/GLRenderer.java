@@ -77,7 +77,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		initGraphics() ;
 		initDrawCalls() ;
-		initFontAssist() ;
+		initAssist() ;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
 		FontAssist.setFontWrapper( new FontInterface()
 		{
@@ -124,6 +124,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						return fontMap.stringWidth( _text ) ;
 					}
 				} ;
+			}
+		} ) ;
+
+		TextureAssist.setAssist( new TextureAssist.Assist()
+		{
+			public MalletTexture.Meta create( final String _path )
+			{
+				return textures.getMeta( _path ) ;
 			}
 		} ) ;
 	}

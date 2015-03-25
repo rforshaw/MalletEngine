@@ -29,6 +29,19 @@ public final class DrawFactory
 		return new Event( "DRAW", draw ) ;
 	}
 
+	public static Event<Settings> createTexture( final MalletTexture _texture,
+												 final Vector3 _pos, 
+												 final Vector2 _offset, 		// Not needed
+												 final Vector2 _dim,			// Not needed
+												 final Vector2 _fill,			// Not needed
+												 final Vector2 _uv1,			// Not needed
+												 final Vector2 _uv2,			// Not needed
+												 final int _layer,
+												 final IDInterface _callback )
+	{
+		return createTexture( _texture.getPath(), _pos, _offset, _dim, _fill, _uv1, _uv2, _layer, _callback ) ;
+	}
+
 	public static Event<Settings> createTexture( final String _file,
 												 final Vector3 _pos, 
 												 final Vector2 _offset, 		// Not needed

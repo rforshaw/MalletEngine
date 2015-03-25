@@ -32,10 +32,15 @@ public final class AnimationFactory
 			settings.addString( "ANIM_FILE", _file ) ;
 		}
 
-		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( null,
-																	 _pos, _offset,
-																	 _dim, _fill, 
-																	 _clip, _clipOffset, _layer, null ) ) ;
+		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
+																	   _pos,
+																	   _offset,
+																	   _dim,
+																	   _fill, 
+																	   _clip,
+																	   _clipOffset,
+																	   _layer,
+																	   null ) ) ;
 
 		if( _callback != null )
 		{

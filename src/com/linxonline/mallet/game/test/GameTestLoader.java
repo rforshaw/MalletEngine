@@ -6,6 +6,7 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.TextFactory ;
 import com.linxonline.mallet.renderer.GeometryFactory ;
 import com.linxonline.mallet.renderer.CameraFactory ;
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -100,10 +101,14 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextureExample()
 			{
-				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( "base/textures/moomba.png", 		// Texture Location
+				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
+				final int width = texture.getWidth() ;
+				final int height = texture.getHeight() ;
+				
+				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( texture, 		// Texture Location
 																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position
-																	new Vector2( -32, -32 ), 							// Offset
-																	new Vector2( 64, 64 ),								// Dimension, how large - scaled
+																	new Vector2( -( width / 2 ), -( height / 2 ) ), 	// Offset
+																	new Vector2( width, height ),						// Dimension, how large - scaled
 																	null,												// fill, texture repeat
 																	new Vector2(),										// clip
 																	new Vector2( 1, 1 ),								// clip offset

@@ -1,12 +1,15 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
+import java.util.Iterator ;
 import java.awt.* ;
 import java.awt.image.* ;
 import java.awt.color.ColorSpace ;
 import javax.media.opengl.* ;
 import javax.imageio.* ;
 import java.io.* ;
+import javax.imageio.stream.* ;
 
 import java.nio.* ;
 
@@ -34,6 +37,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		degradation.
 	*/
 	private final ArrayList<Tuple<String, BufferedImage>> toBind = new ArrayList<Tuple<String, BufferedImage>>() ;
+	private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
 
 	/**
 		Currently two OpenGL image formats are supported: GL_RGBA and GL_ABGR_EXT.
@@ -124,6 +128,50 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return texture ;
 	}
 
+	public MalletTexture.Meta getMeta( final String _path )
+	{
+		final FileStream file = GlobalFileSystem.getFile( _path ) ;
+		if( file.exists() == false )
+		{
+			Logger.println( "Failed to create Texture: " + _path, Logger.Verbosity.NORMAL ) ;
+			return new MalletTexture.Meta( _path, 0, 0 ) ;
+		}
+
+		MalletTexture.Meta meta = imageMetas.get( _path ) ;
+		if( meta == null )
+		{
+			final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
+			try( final ImageInputStream in = ImageIO.createImageInputStream( desktopIn.getInputStream() ) )
+			{
+				final Iterator<ImageReader> readers = ImageIO.getImageReaders( in ) ;
+				if( readers.hasNext() )
+				{
+					final ImageReader reader = readers.next() ;
+					try
+					{
+						reader.setInput( in ) ;
+						meta = new MalletTexture.Meta( _path,
+													   reader.getHeight( 0 ),
+													   reader.getWidth( 0 ) ) ;
+
+						imageMetas.put( _path, meta ) ;
+						return meta ;
+					}
+					finally
+					{
+						reader.dispose() ;
+					}
+				}
+			}
+			catch( IOException ex )
+			{
+				ex.printStackTrace() ;
+			}
+		}
+
+		return new MalletTexture.Meta( _path, 0, 0 ) ;
+	}
+	
 	/**
 		Change the image format used to bind textures.
 		GL_RGBA and GL_ABGR_EXT are supported.
