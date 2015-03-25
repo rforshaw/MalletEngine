@@ -101,7 +101,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void initAssist()
 	{
-		FontAssist.setFontWrapper( new FontInterface()
+		FontAssist.setFontWrapper( new FontAssist.Assist()
 		{
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
