@@ -91,7 +91,7 @@ public final class EventSystem implements AddEventInterface
 		eventQueues.get( _type ).addEventFilter( _filter ) ;
 	}
 
-	public final void removeEventFilter( final String _type, final EventFilter _filter )
+	public final void removeEventFilter( final EventType _type, final EventFilter _filter )
 	{
 		assert _type != null || _filter != null ;
 

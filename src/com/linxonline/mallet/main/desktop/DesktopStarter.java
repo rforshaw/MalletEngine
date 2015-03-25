@@ -85,7 +85,8 @@ public abstract class DesktopStarter extends StarterInterface
  	{
 		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
 		GlobalFileSystem.setFileSystem( _fileSystem ) ;
-		System.out.println( "Mapping Base directory." ) ;
+		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
+
 		if( GlobalFileSystem.mapDirectory( "base/" ) == false )				// Map base-folder for faster access
 		{
 			Logger.println( "Failed to map base directory.", Logger.Verbosity.MINOR ) ;

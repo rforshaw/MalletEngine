@@ -11,7 +11,6 @@ public class QuadTree
 	private final int MAX_HULLS ; 
 	private final float START_QUAD_OFFSET ;
 
-	private float MIN_QUAD_OFFSET ;
 	private float MAX_QUAD_OFFSET ;
 
 	private enum Quadrant
@@ -42,7 +41,6 @@ public class QuadTree
 		TIER_GRANULAR_LIMIT = _tierGranularity ;
 		MAX_HULLS = _nodeCapacity ;
 
-		MIN_QUAD_OFFSET = START_QUAD_OFFSET ;
 		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
 	}
 
