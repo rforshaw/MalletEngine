@@ -5,8 +5,10 @@ import com.linxonline.mallet.maths.Ratio ;
 /**
 	Provides access to the Meta information of a texture
 	without the requirement to manage a texture buffer.
-	This will eventually be used to associate a texture 
-	buffer internally within a renderer.
+	Provides meta data to the developer without the 
+	need to access Renderer/Platform specific texture 
+	implementations, or wait for the Renderer to load 
+	the requested texture.
 */
 public class MalletTexture
 {
