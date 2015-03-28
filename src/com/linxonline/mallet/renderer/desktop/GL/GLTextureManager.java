@@ -37,7 +37,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		degradation.
 	*/
 	private final ArrayList<Tuple<String, BufferedImage>> toBind = new ArrayList<Tuple<String, BufferedImage>>() ;
-	private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
+	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	/**
 		Currently two OpenGL image formats are supported: GL_RGBA and GL_ABGR_EXT.
@@ -141,57 +141,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	public MalletTexture.Meta getMeta( final String _path )
 	{
-		synchronized( imageMetas )
-		{
-			MalletTexture.Meta meta = imageMetas.get( _path ) ;
-			if( meta == null )
-			{
-				final FileStream file = GlobalFileSystem.getFile( _path ) ;
-				if( file.exists() == true )
-				{
-					final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
-					meta = createMeta( _path, desktopIn.getInputStream() ) ;
-					if( meta != null )
-					{
-						imageMetas.put( _path, meta ) ;
-						return meta ;
-					}
-				}
-			}
-		}
-
-		Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
-		return new MalletTexture.Meta( _path, 0, 0 ) ;
-	}
-
-	private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
-	{
-		try( final ImageInputStream in = ImageIO.createImageInputStream( _stream ) )
-		{
-			final Iterator<ImageReader> readers = ImageIO.getImageReaders( in ) ;
-			if( readers.hasNext() )
-			{
-				final ImageReader reader = readers.next() ;
-				try
-				{
-					reader.setInput( in ) ;
-					// Add additional Meta information to MalletTexture as 
-					// and when it becomes needed. It shouldn't hold too much (RGB, RGBA, Mono, endinese, 32, 24-bit, etc)
-					// data as a game-developer shouldn't need detailed information.
-					return new MalletTexture.Meta( _path, reader.getHeight( 0 ), reader.getWidth( 0 ) ) ;
-				}
-				finally
-				{
-					reader.dispose() ;
-				}
-			}
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-		}
-
-		return null ;
+		return metaGenerator.getMeta( _path ) ;
 	}
 
 	/**
@@ -210,7 +160,6 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	public Texture bind( final BufferedImage _image )
 	{
-		//GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
 		if( gl == null )
 		{
@@ -260,8 +209,6 @@ public class GLTextureManager extends AbstractManager<Texture>
 						 getByteBuffer( _image ) ) ;
 
 		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
-
-		//GLRenderer.getCanvas().getContext().release() ;
 		return new Texture( new GLImage( textureID, width, height ) ) ;
 	}
 
@@ -316,5 +263,76 @@ public class GLTextureManager extends AbstractManager<Texture>
 		_gl.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
+	}
+
+	protected static class MetaGenerator
+	{
+		private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
+
+		/**
+			Return the meta information associated with an image
+			defined by _path.
+			If the meta data has yet to be generated, create it 
+			and store the meta data in imageMetas. This hashmap 
+			is persistant across the runtime of the renderer.
+			If the meta data changes from one call to the next, 
+			the meta data stored is NOT updated.
+			FileStream would need to be updated to support 
+			file modification timestamps.
+		*/
+		public MalletTexture.Meta getMeta( final String _path )
+		{
+			synchronized( imageMetas )
+			{
+				MalletTexture.Meta meta = imageMetas.get( _path ) ;
+				if( meta == null )
+				{
+					final FileStream file = GlobalFileSystem.getFile( _path ) ;
+					if( file.exists() == true )
+					{
+						final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
+						meta = createMeta( _path, desktopIn.getInputStream() ) ;
+						if( meta != null )
+						{
+							imageMetas.put( _path, meta ) ;
+							return meta ;
+						}
+					}
+				}
+			}
+
+			Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
+			return new MalletTexture.Meta( _path, 0, 0 ) ;
+		}
+
+		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
+		{
+			try( final ImageInputStream in = ImageIO.createImageInputStream( _stream ) )
+			{
+				final Iterator<ImageReader> readers = ImageIO.getImageReaders( in ) ;
+				if( readers.hasNext() )
+				{
+					final ImageReader reader = readers.next() ;
+					try
+					{
+						reader.setInput( in ) ;
+						// Add additional Meta information to MalletTexture as 
+						// and when it becomes needed. It shouldn't hold too much (RGB, RGBA, Mono, endinese, 32, 24-bit, etc)
+						// data as a game-developer shouldn't need detailed information.
+						return new MalletTexture.Meta( _path, reader.getHeight( 0 ), reader.getWidth( 0 ) ) ;
+					}
+					finally
+					{
+						reader.dispose() ;
+					}
+				}
+			}
+			catch( IOException ex )
+			{
+				ex.printStackTrace() ;
+			}
+
+			return null ;
+		}
 	}
 }

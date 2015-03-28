@@ -64,9 +64,9 @@ public class Android2DRenderer extends SurfaceView
 	}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
-		render.initFontAssist() ;
+		render.initAssist() ;
 	}
 
 	@Override

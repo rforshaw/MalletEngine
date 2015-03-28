@@ -60,7 +60,7 @@ public class GLRenderer extends Basic2DRender
 	public GLRenderer()
 	{
 		initDrawCalls() ;
-		initFontAssist() ;
+		initAssist() ;
 	}
 
 	@Override
@@ -86,9 +86,9 @@ public class GLRenderer extends Basic2DRender
 	}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
-		FontAssist.setFontWrapper( new FontInterface()
+		FontAssist.setFontWrapper( new FontAssist.Assist()
 		{
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
@@ -114,6 +114,14 @@ public class GLRenderer extends Basic2DRender
 						return fontMap.stringWidth( _text ) ;
 					}
 				} ;
+			}
+		} ) ;
+
+		TextureAssist.setAssist( new TextureAssist.Assist()
+		{
+			public MalletTexture.Meta create( final String _path )
+			{
+				return textures.getMeta( _path ) ;
 			}
 		} ) ;
 	}

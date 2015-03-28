@@ -62,9 +62,9 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
-		render.initFontAssist() ;
+		render.initAssist() ;
 	}
 
 	@Override

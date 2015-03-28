@@ -50,9 +50,9 @@ public class Canvas2DRenderer extends Basic2DRender
 	}
 
 	@Override
-	public void initFontAssist()
+	public void initAssist()
 	{
-		FontAssist.setFontWrapper( new FontInterface()
+		FontAssist.setFontWrapper( new FontAssist.Assist()
 		{
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
@@ -81,7 +81,7 @@ public class Canvas2DRenderer extends Basic2DRender
 	public void start()
 	{
 		initDrawCalls() ;
-		initFontAssist() ;
+		initAssist() ;
 
 		paint.setFilterBitmap( true ) ;
 		paint.setStyle( Paint.Style.FILL ) ;

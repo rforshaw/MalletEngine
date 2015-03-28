@@ -1,6 +1,8 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
+import java.io.InputStream ;
 import java.nio.* ;
 
 import android.opengl.GLES11 ;
@@ -9,6 +11,8 @@ import android.opengl.GLUtils;
 import android.graphics.BitmapFactory ;
 import android.graphics.Bitmap ;
 
+import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
@@ -32,6 +36,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		degradation.
 	*/
 	private final ArrayList<Tuple<String, Bitmap>> toBind = new ArrayList<Tuple<String, Bitmap>>() ;
+	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	public GLTextureManager()
 	{
@@ -107,6 +112,22 @@ public class GLTextureManager extends AbstractManager<Texture>
 	}
 
 	/**
+		Return the meta information associated with an image
+		defined by _path.
+		If the meta data has yet to be generated, create it 
+		and store the meta data in imageMetas. This hashmap 
+		is persistant across the runtime of the renderer.
+		If the meta data changes from one call to the next, 
+		the meta data stored is NOT updated.
+		FileStream would need to be updated to support 
+		file modification timestamps.
+	*/
+	public MalletTexture.Meta getMeta( final String _path )
+	{
+		return metaGenerator.getMeta( _path ) ;
+	}
+
+	/**
 		Binds the BufferedImage byte-stream into video memory.
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
@@ -137,5 +158,58 @@ public class GLTextureManager extends AbstractManager<Texture>
 		GLES11.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
+	}
+
+	protected static class MetaGenerator
+	{
+		private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
+
+		/**
+			Return the meta information associated with an image
+			defined by _path.
+			If the meta data has yet to be generated, create it 
+			and store the meta data in imageMetas. This hashmap 
+			is persistant across the runtime of the renderer.
+			If the meta data changes from one call to the next, 
+			the meta data stored is NOT updated.
+			FileStream would need to be updated to support 
+			file modification timestamps.
+		*/
+		public MalletTexture.Meta getMeta( final String _path )
+		{
+			synchronized( imageMetas )
+			{
+				MalletTexture.Meta meta = imageMetas.get( _path ) ;
+				if( meta == null )
+				{
+					final FileStream file = GlobalFileSystem.getFile( _path ) ;
+					if( file.exists() == true )
+					{
+						final AndroidByteIn desktopIn = ( AndroidByteIn )file.getByteInStream() ;
+						meta = createMeta( _path, desktopIn.getInputStream() ) ;
+						if( meta != null )
+						{
+							imageMetas.put( _path, meta ) ;
+							return meta ;
+						}
+					}
+				}
+			}
+
+			Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
+			return new MalletTexture.Meta( _path, 0, 0 ) ;
+		}
+
+		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
+		{
+			final BitmapFactory.Options options = new BitmapFactory.Options() ;
+			options.inJustDecodeBounds = true ;
+
+			BitmapFactory.decodeStream( _stream, null, options ) ;
+			int width = options.outWidth ;
+			int height = options.outHeight ;
+
+			return new MalletTexture.Meta( _path, width, height ) ;
+		}
 	}
 }
