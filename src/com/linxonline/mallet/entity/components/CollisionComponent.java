@@ -14,6 +14,7 @@ import com.linxonline.mallet.physics.hulls.* ;
 public class CollisionComponent extends Component
 {
 	public final Hull hull ;
+	private final Vector2 oldPosition = new Vector2() ;
 
 	public CollisionComponent( final String _name, final Hull _hull )
 	{
@@ -45,6 +46,8 @@ public class CollisionComponent extends Component
 
 		// Shift the parents position by the penetration depth.
 		final Vector2 accumulated = hull.updateContactData() ;
+
+		oldPosition.setXY( hull.getPosition() ) ;
 		parent.addToPosition( accumulated.x, accumulated.y, 0.0f ) ;
 		// Set the hull to the parents new position.
 		hull.setPosition( parent.position.x, parent.position.y ) ;

@@ -12,14 +12,14 @@ public final class ContactPoint
 	public boolean physical = true ;
 
 	public ContactPoint() {}
-	
+
 	public ContactPoint( final float _penetration, 
 						 final Vector2 _contactNormal )
 	{
 		contactNormal = _contactNormal ;
 		penetration = _penetration ;
 	}
-	
+
 	public ContactPoint( final float _penetration, 
 						 final Vector2 _contactNormal,
 						 final boolean _physical )
@@ -28,7 +28,7 @@ public final class ContactPoint
 		penetration = _penetration ;
 		physical = _physical ;
 	}
-	
+
 	public ContactPoint( final float _penetration, 
 						 final Vector2 _contactNormal,
 						 final boolean _physical,

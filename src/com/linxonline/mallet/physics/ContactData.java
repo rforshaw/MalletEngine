@@ -54,9 +54,14 @@ public final class ContactData
 	{
 		if( index < usedContacts ) { return contacts[index++] ; }
 
-		usedContacts = 0 ;
 		index = 0 ;
 		return null ;
+	}
+
+	public void reset()
+	{
+		usedContacts = 0 ;
+		index = 0 ;
 	}
 
 	public int size()

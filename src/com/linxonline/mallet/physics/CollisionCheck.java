@@ -29,14 +29,14 @@ public final class CollisionCheck
 
 		// Find the best overlap for _box1
 		final float overlap1 = penetration( _box1, _box2, toCenter, axis1 ) ;
-		if( overlap1 < 0.0f )
+		if( overlap1 <= 0.0f )
 		{
 			return ;
 		}
 
 		// Find the best overlap for _box2
 		final float overlap2 = penetration( _box2, _box1, toCenter, axis2 ) ;
-		if( overlap2 < 0.0f )
+		if( overlap2 <= 0.0f )
 		{
 			return ;
 		}
@@ -51,6 +51,7 @@ public final class CollisionCheck
 		}
 
 		overlap *= 0.5f ;
+		//System.out.println( "Generated a collision: " + overlap ) ;
 		_box1.contactData.addContact( overlap, axis.x, axis.y, 
 									  ( _box1.isPhysical() && _box2.isPhysical() ),
 									  _box2 ) ;

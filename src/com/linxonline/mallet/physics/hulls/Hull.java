@@ -17,7 +17,7 @@ public abstract class Hull
 
 	private final Vector2 accumulatedPenetration = new Vector2() ;
 	public final ContactData contactData = new ContactData() ;
-	
+
 	protected boolean collidable = true ; 										// Allows hull to produce Collision Data.
 	protected boolean physical = true ; 										// Allows hull to be affected by a Collision
 	protected CollisionCallback callback = null ;								// Allows Owner to be informed of Collisions
@@ -76,7 +76,7 @@ public abstract class Hull
 
 	public abstract void getAbsoluteCenter( final Vector2 _center ) ;
 	public abstract float projectToAxis( final Vector2 _axis ) ;
-
+	
 	public final void setCollidable( final boolean _collidable )
 	{
 		collidable = _collidable ;

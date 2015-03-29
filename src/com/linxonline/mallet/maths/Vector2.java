@@ -92,6 +92,26 @@ public class Vector2
 		return y ;
 	}
 
+	public boolean equals( final float _x, final float _y )
+	{
+		return ( Float.compare( x, _x ) == 0 ) && ( Float.compare( y, _y ) == 0 ) ;
+	}
+
+	@Override
+	public boolean equals( Object _compare )
+	{
+		if( _compare != null )
+		{
+			if( _compare instanceof Vector2 )
+			{
+				final Vector2 compare = ( Vector2 )_compare ;
+				return ( Float.compare( x, compare.x ) == 0 ) && ( Float.compare( y, compare.y ) == 0 ) ;
+			}
+		}
+
+		return false ;
+	}
+
 	@Override
 	public String toString()
 	{
@@ -150,7 +170,12 @@ public class Vector2
 	{
 		return new Vector2( _vec1.x / _vec2.x, _vec1.y / _vec2.y ) ;
 	}
-	
+
+	public static final boolean compare( final Vector2 _a, final Vector2 _b )
+	{
+		return ( Float.compare( _a.x, _b.x ) == 0 ) && ( Float.compare( _a.y, _b.y ) == 0 ) ;
+	}
+
 	public static final Vector2 parseVector2( final String _text )
 	{
 		if( _text == null ) { return null ; }
