@@ -83,11 +83,11 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
-				for( int i = 0; i < 10; ++i )
+				for( int i = 0; i < 100; ++i )
 				{
-					for( int j = 0; j < 10; ++j )
+					for( int j = 0; j < 100; ++j )
 					{
 						createEntityExample( i, j ) ;
 					}
@@ -235,82 +235,6 @@ public final class GameTestLoader extends GameLoader
 				addEntity( entity ) ;
 			}
 
-			public void createEntityExample2()
-			{
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "-90, 0" ) ;
-				image.addString( "DIM", "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32" ) ;
-
-				final ImageCreator creator = new ImageCreator() ;
-				final Entity entity = creator.create( image ) ;
-
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	new Vector2( 64, 64 ),
-																	new Vector2( -90, 0 ),
-																	new Vector2( -32, -32 ) ) ) ;
-
-				addEntity( entity ) ;
-			}
-
-			public void createEntityExample3()
-			{
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "110, 0" ) ;
-				image.addString( "DIM", "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32" ) ;
-
-				final ImageCreator creator = new ImageCreator() ;
-				final Entity entity = creator.create( image ) ;
-
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	new Vector2( 64, 64 ),
-																	new Vector2( 110, 0 ),
-																	new Vector2( -32, -32 ) ) ) ;
-
-				addEntity( entity ) ;
-			}
-
-			public void createEntityExample4()
-			{
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "40, 0" ) ;
-				image.addString( "DIM", "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32" ) ;
-
-				final ImageCreator creator = new ImageCreator() ;
-				final Entity entity = creator.create( image ) ;
-
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	new Vector2( 64, 64 ),
-																	new Vector2( 40, 0 ),
-																	new Vector2( -32, -32 ) ) ) ;
-
-				addEntity( entity ) ;
-			}
-			
-			public void createEntityExample5()
-			{
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", "60, 0" ) ;
-				image.addString( "DIM", "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32" ) ;
-
-				final ImageCreator creator = new ImageCreator() ;
-				final Entity entity = creator.create( image ) ;
-
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	new Vector2( 64, 64 ),
-																	new Vector2( 60, 0 ),
-																	new Vector2( -32, -32 ) ) ) ;
-
-				addEntity( entity ) ;
-			}
-			
 			/**
 				Create an Entity that follows the mouse
 			**/

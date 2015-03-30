@@ -94,7 +94,8 @@ public class Vector2
 
 	public boolean equals( final float _x, final float _y )
 	{
-		return ( Float.compare( x, _x ) == 0 ) && ( Float.compare( y, _y ) == 0 ) ;
+		return ( Float.compare( x, _x ) == 0 ) &&
+			   ( Float.compare( y, _y ) == 0 ) ;
 	}
 
 	@Override
@@ -104,12 +105,23 @@ public class Vector2
 		{
 			if( _compare instanceof Vector2 )
 			{
-				final Vector2 compare = ( Vector2 )_compare ;
-				return ( Float.compare( x, compare.x ) == 0 ) && ( Float.compare( y, compare.y ) == 0 ) ;
+				final Vector2 c = ( Vector2 )_compare ;
+				return equals( c.x, c.y ) ;
 			}
 		}
 
 		return false ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31 ;
+		int result = 1 ;
+		result = prime * ( result + Float.floatToIntBits( x ) ) ;
+		result = prime * ( result + Float.floatToIntBits( y ) ) ;
+
+		return result ;
 	}
 
 	@Override

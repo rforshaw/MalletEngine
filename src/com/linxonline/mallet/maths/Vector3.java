@@ -113,6 +113,40 @@ public class Vector3
 		return z ;
 	}
 
+	public boolean equals( final float _x, final float _y, final float _z )
+	{
+		return ( Float.compare( x, _x ) == 0 ) && 
+			   ( Float.compare( y, _y ) == 0 ) &&
+			   ( Float.compare( z, _z ) == 0 ) ;
+	}
+
+	@Override
+	public boolean equals( Object _compare )
+	{
+		if( _compare != null )
+		{
+			if( _compare instanceof Vector3 )
+			{
+				final Vector3 c = ( Vector3 )_compare ;
+				return equals( c.x, c.y, c.z ) ;
+			}
+		}
+
+		return false ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31 ;
+		int result = 1 ;
+		result = prime * ( result + Float.floatToIntBits( x ) ) ;
+		result = prime * ( result + Float.floatToIntBits( y ) ) ;
+		result = prime * ( result + Float.floatToIntBits( z ) ) ;
+
+		return result ;
+	}
+
 	@Override
 	public String toString()
 	{
@@ -154,7 +188,7 @@ public class Vector3
 							( _vec1.z * _vec2.x ) - ( _vec1.x * _vec2.z ),
 							( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ) ;
 	}
-	
+
 	/**
 		Calculate the distance between _vec1 and _vec2
 	*/

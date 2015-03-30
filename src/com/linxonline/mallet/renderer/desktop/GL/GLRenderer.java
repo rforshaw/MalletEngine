@@ -47,7 +47,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	private final Vector2 UV1 = new Vector2() ;
 	private final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
 
-	protected final DefaultTimer timer = new DefaultTimer() ;
 	protected Vector2 pos = new Vector2() ;
 
 	protected final Matrix4 uiMatrix = Matrix4.createIdentity() ;
