@@ -43,4 +43,4 @@ Android support has been integrated into the Mallet Engine. Android specific cod
 I've yet to decide whether to integrate iOS code into the Mallet Engine codebase or keep it as a separate codebase.
 
 Note:
-The Mallet Engine contains a pre-made entry point located at: ./src/com/linxonline/mallet/main/_desktop/DesktopTestMain.java
+The Mallet Engine contains a pre-made entry point located at: ./src/com/linxonline/mallet/main/desktop/DesktopTestMain.java
