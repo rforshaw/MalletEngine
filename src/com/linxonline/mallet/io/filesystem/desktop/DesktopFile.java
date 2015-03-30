@@ -96,7 +96,7 @@ public class DesktopFile implements FileStream
 		}
 
 		stream.mkdirs() ;
-		final ByteInStream in = stream.getByteInStream() ;
+		final ByteInStream in = getByteInStream() ;
 		final ByteOutStream out = stream.getByteOutStream() ;
 
 		int position = 0 ;
