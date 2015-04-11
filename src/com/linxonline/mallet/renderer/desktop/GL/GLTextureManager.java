@@ -198,6 +198,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			}
 		}
 
+		gl.glPixelStorei( GL2.GL_UNPACK_ALIGNMENT, 1 ) ;
 		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
 						 0, 
 						 channels, 

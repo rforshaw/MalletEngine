@@ -1,6 +1,7 @@
 package com.linxonline.mallet.io.filesystem.desktop ;
 
 import java.io.* ;
+import java.net.* ;
 import java.util.zip.* ;
 import java.util.* ;
 
@@ -124,6 +125,7 @@ public class DesktopFileSystem implements FileSystem
 			}
 			catch( final IOException ex )
 			{
+				Logger.println( "Failed retrieve: " + _path + " from zip file.", Logger.Verbosity.MINOR ) ;
 				return null ;
 			}
 		}

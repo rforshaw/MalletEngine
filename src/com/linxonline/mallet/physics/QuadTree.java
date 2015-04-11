@@ -63,7 +63,7 @@ public class QuadTree
 	{
 		checksMade = 0 ;
 		root.update( _dt ) ;
-		System.out.println( "Checks Made: " + checksMade ) ;
+		//System.out.println( "Checks Made: " + checksMade ) ;
 	}
 
 	public void clear()

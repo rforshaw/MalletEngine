@@ -85,9 +85,9 @@ public final class GameTestLoader extends GameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				for( int i = 0; i < 100; ++i )
+				for( int i = 0; i < 10; ++i )
 				{
-					for( int j = 0; j < 100; ++j )
+					for( int j = 0; j < 10; ++j )
 					{
 						createEntityExample( i, j ) ;
 					}
@@ -248,10 +248,12 @@ public final class GameTestLoader extends GameLoader
 				final AnimMouseCreator creator = new AnimMouseCreator() ;
 				final Entity entity = creator.create( mouse ) ;
 
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	   new Vector2( 32, 32 ),
-																	   new Vector2( 0, 0 ),
-																	   new Vector2( -16, -16 ) ) ) ;
+				final CollisionComponent collision = CollisionComponent.generateBox2D( new Vector2(),
+																					   new Vector2( 32, 32 ),
+																					   new Vector2( 0, 0 ),
+																					   new Vector2( -16, -16 ) ) ;
+				collision.hull.setPhysical( false ) ;
+				entity.addComponent( collision ) ;
 
 				addEntity( entity ) ;
 			}

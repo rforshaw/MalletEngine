@@ -1,15 +1,15 @@
 package com.linxonline.mallet.io.filesystem.desktop ;
 
-import java.io.BufferedWriter ;
+import java.io.Writer ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.StringOutStream ;
 
 public class DesktopStringOut implements StringOutStream
 {
-	private final BufferedWriter output ;
+	private final Writer output ;
 
-	public DesktopStringOut( final BufferedWriter _output )
+	public DesktopStringOut( final Writer _output )
 	{
 		assert _output != null ;
 		output = _output ;

@@ -327,8 +327,8 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
-			private final static long COMPENSATE_SLEEP = 1L ;		// We don't want to accidentally sleep too long
-			private long runningTime = 0L ;
+			private long logicRunningTime = 0L ;
+			private long renderRunningTime = 0L ;
 
 			@Override
 			public void update( final double _dt )
@@ -351,7 +351,7 @@ public class GameState extends State implements HookEntity
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 
 					final long endTime = ElapsedTimer.nanoTime() ;
-					runningTime += endTime - startTime ;
+					logicRunningTime += endTime - startTime ;
 				}
 
 				// Render Default : 60Hz
@@ -360,24 +360,31 @@ public class GameState extends State implements HookEntity
 				{
 					final long startTime = ElapsedTimer.nanoTime() ;
 
-					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
+					System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator = 0.0f ;
 
 					final long endTime = ElapsedTimer.nanoTime() ;
-					runningTime += endTime - startTime ;
+					renderRunningTime += endTime - startTime ;
 				}
 
-				if( runningTime > 0L )
+				if( logicRunningTime > 0L || renderRunningTime > 0L )
 				{
-					final long sleep = ( ( ( long )( DEFAULT_FRAMERATE * 1000000000.0 ) - runningTime ) / 1000000L ) - COMPENSATE_SLEEP ;
-					runningTime = 0L ;
+					final float deltaLogic = logicRunningTime * 0.000000001f ;
+					final float deltaRender = renderRunningTime * 0.000000001f ;
 
-					if( sleep > 0L )
+					final long sleepLogic = ( long )( ( DEFAULT_TIMESTEP - deltaLogic ) * 100.0f ) ;
+					final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - deltaRender ) * 100.0f ) ;
+
+					//System.out.println( "Logic Sleep: " + sleepLogic + " Render Sleep: " + sleepRender ) ;
+					if( sleepLogic > 0L && sleepRender > 0L )
 					{
-						system.sleep( sleep ) ;
+						system.sleep( sleepLogic + sleepRender ) ;
 					}
+
+					logicRunningTime = 0L ;
+					renderRunningTime = 0L ;
 				}
 			}
 		} ;

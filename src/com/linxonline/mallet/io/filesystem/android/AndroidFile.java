@@ -99,18 +99,15 @@ public class AndroidFile implements FileStream
 			return false ;
 		}
 
-		stream.mkdirs() ;
 		final ByteInStream in = getByteInStream() ;
 		final ByteOutStream out = stream.getByteOutStream() ;
 
-		int position = 0 ;
 		int length = 0 ;
 		final byte[] buffer = new byte[48] ;
 		
-		while( ( length = in.readBytes( buffer, position, buffer.length ) ) != -1 )
+		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
 		{
 			out.writeBytes( buffer, 0, length ) ;
-			position += length ;
 		}
 
 		in.close() ;
