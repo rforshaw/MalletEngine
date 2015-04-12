@@ -68,12 +68,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void update( final float _dt )
+	public void tick( final float _dt )
 	{
-		super.update( _dt ) ;
 		if( callback != null )
 		{
-			callback.update( _dt ) ;
+			callback.tick( _dt ) ;
 		}
 
 		if( toDestroy != null && waitForID == false )
@@ -82,6 +81,19 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		}
 	}
 
+	@Override
+	public void update( final float _dt )
+	{
+		super.update( _dt ) ;
+		if( toDestroy != null && waitForID == false )
+		{
+			// Ensure that the component is not waiting 
+			// for an ID from the Animation System.
+			// Before we allow the parent to be destroyed.
+			toDestroy.ready( this ) ;
+		}
+	}
+	
 	public void playAnimation( final String _name, final SourceCallback _callback )
 	{
 		if( toDestroy != null )

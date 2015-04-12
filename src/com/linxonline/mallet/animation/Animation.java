@@ -174,7 +174,7 @@ public class Animation implements IDInterface, Cacheable
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			callbacks.get( i ).update( ( float )frame * frameDelta ) ;
+			callbacks.get( i ).tick( ( float )frame * frameDelta ) ;
 		}
 	}
 

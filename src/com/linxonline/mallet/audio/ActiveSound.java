@@ -100,7 +100,7 @@ public class ActiveSound
 		final int length = callbacks.size() ;
 		for( int i = 0; i < length; ++i )
 		{
-			callbacks.get( i ).update( sourceDT ) ;
+			callbacks.get( i ).tick( sourceDT ) ;
 		}
 	}
 

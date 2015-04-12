@@ -335,21 +335,24 @@ public class GameState extends State implements HookEntity
 			{
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
-				while( updateAccumulator > DEFAULT_TIMESTEP )
+				if( updateAccumulator > DEFAULT_TIMESTEP )
 				{
 					final long startTime = ElapsedTimer.nanoTime() ;
 
-					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputSystem.update() ;
-					eventSystem.update() ;
+					while( updateAccumulator > DEFAULT_TIMESTEP )
+					{
+						system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
+						inputSystem.update() ;
+						eventSystem.update() ;
 
-					eventController.update() ;
+						eventController.update() ;
 
-					collisionSystem.update( DEFAULT_TIMESTEP ) ;
-					entitySystem.update( DEFAULT_TIMESTEP ) ;
-					audioSystem.update( DEFAULT_TIMESTEP ) ;
-					updateAccumulator -= DEFAULT_TIMESTEP ;
-
+						collisionSystem.update( DEFAULT_TIMESTEP ) ;
+						entitySystem.update( DEFAULT_TIMESTEP ) ;
+						audioSystem.update( DEFAULT_TIMESTEP ) ;
+						updateAccumulator -= DEFAULT_TIMESTEP ;
+					}
+					
 					final long endTime = ElapsedTimer.nanoTime() ;
 					logicRunningTime += endTime - startTime ;
 				}
@@ -360,7 +363,7 @@ public class GameState extends State implements HookEntity
 				{
 					final long startTime = ElapsedTimer.nanoTime() ;
 
-					System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
+					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator = 0.0f ;

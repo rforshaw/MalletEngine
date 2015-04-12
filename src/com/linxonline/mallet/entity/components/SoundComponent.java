@@ -63,12 +63,22 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		toDestroy = _callback ;
 	}
 
+	/**
+		The progression through the audio file 
+		being played.
+	*/
+	@Override
+	public void tick( final float _dt ) {}
+
 	@Override
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
 		if( toDestroy != null && waitForID == false )
 		{
+			// Ensure that the component is not waiting 
+			// for an ID from the Animation System.
+			// Before we allow the parent to be destroyed.
 			toDestroy.ready( this ) ;
 		}
 	}
