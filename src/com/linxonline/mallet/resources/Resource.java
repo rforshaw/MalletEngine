@@ -8,6 +8,9 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 	
 	It uses a simple Reference Counting system to determine 
 	how many objects are using the Resource currently.
+	
+	A resource should be handled my an engine sub-system and 
+	should not be directly handled by game-logic.
 **/
 public abstract class Resource
 {

@@ -8,3 +8,5 @@ libs/*
 *.apk
 *.png
 *.svg
+*.h
+*.m
