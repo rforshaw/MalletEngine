@@ -112,12 +112,18 @@ public class AndroidStarter extends StarterInterface
 		final int width = display.widthPixels ;
 		final int height = display.heightPixels ;
 
-		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
+		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", width ) ;
+		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", height ) ;
+
+		GlobalConfig.addInteger( "DISPLAYWIDTH", width ) ;
+		GlobalConfig.addInteger( "DISPLAYHEIGHT", height ) ;
+
+		GlobalConfig.addInteger( "RENDERWIDTH", renderWidth ) ;
+		GlobalConfig.addInteger( "RENDERHEIGHT", renderHeight ) ;
 
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( width, height ) ;
-		render.setRenderDimensions( renderWidth, renderHeight ) ;
+		render.setRenderDimensions( width, height ) ;
 
 		render.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 	}

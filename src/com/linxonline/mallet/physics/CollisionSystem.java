@@ -46,11 +46,8 @@ public class CollisionSystem extends EventController
 
 	public void remove( final Hull _hull )
 	{
-		if( exists( _hull ) == true )
-		{
-			hulls.remove( _hull ) ;
-			treeHulls.removeHull( _hull ) ;
-		}
+		hulls.remove( _hull ) ;
+		treeHulls.removeHull( _hull ) ;
 	}
 
 	public void update( final float _dt )
@@ -76,6 +73,6 @@ public class CollisionSystem extends EventController
 
 	private final boolean exists( final Hull _hull )
 	{
-		return treeHulls.exists( _hull ) ;
+		return hulls.contains( _hull ) ;
 	}
 }

@@ -35,10 +35,10 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 public class AndroidActivity extends Activity
 							implements EventHandler
 {
-	private ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
+	private final ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
 	private final Notify<Object> startGame = new Notify<Object>()
 	{
-		int increment = 0 ;
+		private int increment = 0 ;
 
 		public void inform( final Object _noData )
 		{
@@ -102,7 +102,7 @@ public class AndroidActivity extends Activity
 	{
 		System.out.println( "onDestroy()" ) ;
 		super.onDestroy() ;
-		//starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
+		starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 	
 	public void addAndroidInputListener( AndroidInputListener _listener )

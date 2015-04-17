@@ -112,20 +112,17 @@ public class QuadTree
 			// any hulls, only children should.
 			if( parent == false && nextHull < hulls.length )
 			{
-				if( contains( _hull ) == false )
-				{
-					// Make sure that the hull being inserted 
-					// has not already been added.
-					hulls[nextHull++] = _hull ;
-				}
+				// We assume the check to see if the 
+				// hull already exists within this node has 
+				// been called. 
+				hulls[nextHull++] = _hull ;
 				return true ;
 			}
 			else if( parent == false )
 			{
-				if( contains( _hull ) == true )
-				{
-					return false ;
-				}
+				// We assume the check to see if the 
+				// hull already exists within this node has 
+				// been called.
 
 				// If the node has reached MAX_HULLS
 				// then it needs to be divided.
@@ -290,24 +287,20 @@ public class QuadTree
 				topRight.clear() ;
 				bottomLeft.clear() ;
 				bottomRight.clear() ;
-				return ;
 			}
 
-			for( int i = 0; i < nextHull; i++ )
-			{
-				hulls[i] = null ;
-			}
 			nextHull = 0 ;
 		}
-		
+
 		private boolean contains( final Hull _hull )
 		{
-			return getIndex( _hull ) >= 0 ;
+			final int index = getIndex( _hull ) ;
+			return index >= 0 && index < nextHull;
 		}
 
 		private int getIndex( final Hull _hull )
 		{
-			for( int i = 0; i < hulls.length; i++ )
+			for( int i = 0; i < nextHull; i++ )
 			{
 				if( hulls[i] == _hull )
 				{
@@ -318,7 +311,6 @@ public class QuadTree
 			return -1 ;
 		}
 
-		
 		/**
 			Figure out what node to stick the hull into.
 			It's possible for a hull to reside in multiple 
@@ -327,7 +319,17 @@ public class QuadTree
 		private boolean insertToQuadrant( final Hull _hull )
 		{
 			int added = 0 ;
-		
+			
+			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
+			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
+			// have the hull stored within it once.
+			// Once the hull has been added to the 
+			// appropriate node, then we should not attempt 
+			// to insert the hull again.
+			// Inserting the hull is costly, and should 
+			// only be done, if it isn't there already.
+			final Quadrant[] used = new Quadrant[4] ;
+
 			final Vector2 absolute = new Vector2() ;
 			final Vector2[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i++ )
@@ -344,38 +346,53 @@ public class QuadTree
 				// A hull could potentially be in multiple 
 				// quadrants, as a hulls points may cross 
 				// quadrant boundaries.
-				final Quadrant quad = findQuadrant( absolute, centre ) ;
-				switch( quad )
+				switch( findQuadrant( absolute, centre ) )
 				{
 					case TOP_LEFT     :
 					{
-						if( topLeft.insertHull( _hull ) == true )
+						if( used[0] == null )
 						{
-							++added ;
+							used[0] = Quadrant.TOP_LEFT ;
+							if( topLeft.insertHull( _hull ) == true )
+							{
+								++added ;
+							}
 						}
 						break ;
 					}
 					case TOP_RIGHT    :
 					{
-						if( topRight.insertHull( _hull ) == true )
+						if( used[1] == null )
 						{
-							++added ;
+							used[1] = Quadrant.TOP_RIGHT ;
+							if( topRight.insertHull( _hull ) == true )
+							{
+								++added ;
+							}
 						}
 						break ;
 					}
 					case BOTTOM_LEFT  :
 					{
-						if( bottomLeft.insertHull( _hull ) == true )
+						if( used[2] == null )
 						{
-							++added ;
+							used[2] = Quadrant.BOTTOM_LEFT ;
+							if( bottomLeft.insertHull( _hull ) == true )
+							{
+								++added ;
+							}
 						}
 						break ;
 					}
 					case BOTTOM_RIGHT :
 					{
-						if( bottomRight.insertHull( _hull ) == true )
+						if( used[3] == null )
 						{
-							++added ;
+							used[3] = Quadrant.BOTTOM_RIGHT ;
+							if( bottomRight.insertHull( _hull ) == true )
+							{
+								++added ;
+							}
 						}
 						break ;
 					}
@@ -394,12 +411,12 @@ public class QuadTree
 		private void calculateExpansion( final Vector2 _pos )
 		{
 			while( Math.abs( _pos.x ) > MAX_QUAD_OFFSET || 
-				Math.abs( _pos.y ) > MAX_QUAD_OFFSET )
+				   Math.abs( _pos.y ) > MAX_QUAD_OFFSET )
 			{
 				expand() ;
 			}
 		}
-		
+
 		private boolean createChildren()
 		{
 			switch( quadrant )
@@ -427,7 +444,7 @@ public class QuadTree
 
 			return true ;
 		}
-		
+
 		/**
 			Expand the scope of the Quad Tree by doubling 
 			its initial spacial size.

@@ -118,7 +118,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 				event = touchInputs.get( i ) ;
 				for( int j = 0; j < sizeHandlers; ++j )
 				{
-					System.out.println( event ) ;
+					//System.out.println( event ) ;
 					handler = handlers.get( j ) ;
 					handler.passInputEvent( event ) ;
 				}
