@@ -335,59 +335,50 @@ public class GameState extends State implements HookEntity
 			{
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
-				if( updateAccumulator > DEFAULT_TIMESTEP )
+				long startTime = ElapsedTimer.nanoTime() ;
+
+				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					final long startTime = ElapsedTimer.nanoTime() ;
+					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
+					inputSystem.update() ;
+					eventSystem.update() ;
 
-					while( updateAccumulator > DEFAULT_TIMESTEP )
-					{
-						system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-						inputSystem.update() ;
-						eventSystem.update() ;
+					eventController.update() ;
 
-						eventController.update() ;
-
-						collisionSystem.update( DEFAULT_TIMESTEP ) ;
-						entitySystem.update( DEFAULT_TIMESTEP ) ;
-						audioSystem.update( DEFAULT_TIMESTEP ) ;
-						updateAccumulator -= DEFAULT_TIMESTEP ;
-					}
-					
-					final long endTime = ElapsedTimer.nanoTime() ;
-					logicRunningTime += endTime - startTime ;
+					collisionSystem.update( DEFAULT_TIMESTEP ) ;
+					entitySystem.update( DEFAULT_TIMESTEP ) ;
+					audioSystem.update( DEFAULT_TIMESTEP ) ;
+					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
+
+				// Track the logic running time, not used to calculate 
+				// sleep duration, but useful information for developer
+				// to see if logic goes over allocated time.
+				long endTime = ElapsedTimer.nanoTime() ;
+				logicRunningTime = endTime - startTime ;		// In nanoseconds
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
+				startTime = ElapsedTimer.nanoTime() ;
+
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
-					final long startTime = ElapsedTimer.nanoTime() ;
-
-					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
+					System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator = 0.0f ;
-
-					final long endTime = ElapsedTimer.nanoTime() ;
-					renderRunningTime += endTime - startTime ;
+					renderAccumulator -= DEFAULT_FRAMERATE ;
 				}
 
-				if( logicRunningTime > 0L || renderRunningTime > 0L )
+				endTime = ElapsedTimer.nanoTime() ;
+				renderRunningTime = endTime - startTime ;		// In nanoseconds
+
+				final float deltaLogic = logicRunningTime * 0.000000001f ;							// Convert to seconds
+				final float deltaRender = renderRunningTime * 0.000000001f ;							// Convert to seconds
+				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaRender + deltaLogic ) ) * 1000.0f ) ;	// Convert to milliseconds
+
+				if( sleepRender > 0L )
 				{
-					final float deltaLogic = logicRunningTime * 0.000000001f ;
-					final float deltaRender = renderRunningTime * 0.000000001f ;
-
-					final long sleepLogic = ( long )( ( DEFAULT_TIMESTEP - deltaLogic ) * 100.0f ) ;
-					final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - deltaRender ) * 100.0f ) ;
-
-					//System.out.println( "Logic Sleep: " + sleepLogic + " Render Sleep: " + sleepRender ) ;
-					if( sleepLogic > 0L && sleepRender > 0L )
-					{
-						system.sleep( sleepLogic + sleepRender ) ;
-					}
-
-					logicRunningTime = 0L ;
-					renderRunningTime = 0L ;
+					system.sleep( sleepRender ) ;
 				}
 			}
 		} ;
