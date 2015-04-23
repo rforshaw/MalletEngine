@@ -64,10 +64,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected DrawInterface drawText = null ;
 
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
+	protected float rotate = 0.0f ;
+
+	// Keep track of the last binded ID
+	// If the next item to be rendered uses one of the same 
+	// ID's then we can avoid the bind call.
+	// Note: Caching vboID, results in an exception
+	// on some occasions.
 	protected int textureID = 0 ;
 	protected int indexID = 0 ;
-	
-	protected float rotate = 0.0f ;
 
 	public GLRenderer() {}
 
@@ -212,8 +217,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					{
 						indexID = geometry.indexID ;
 						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
+
+					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -290,8 +296,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					{
 						indexID = geometry.indexID ;
 						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
+
+					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
@@ -319,6 +326,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		drawText = new DrawInterface()
 		{
+			protected int indexID = -1 ;
+			protected int vboID = -1 ;
+
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
 				final String text = _settings.getString( "TEXT", null ) ;
@@ -410,8 +420,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					{
 						indexID = geometry.indexID ;
 						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
+
+					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -492,6 +503,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void init( GLAutoDrawable _drawable )
 	{
+		System.out.println( "GL Contex initialised.." ) ;
 		gl = _drawable.getGL().getGL2() ;
 
 		gl.glEnable( GL.GL_TEXTURE_2D ) ;

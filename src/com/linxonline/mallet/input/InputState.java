@@ -94,7 +94,7 @@ public class InputState implements InputSystemInterface,
 	{
 		return !( inputs.isEmpty() ) ;
 	}
-	
+
 	@Override
 	public final void clearHandlers()
 	{

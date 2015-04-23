@@ -321,6 +321,7 @@ public class GameState extends State implements HookEntity
 	protected void initModes()
 	{
 		useGameMode() ;
+		//useApplicationMode() ;
 	}
 
 	protected void useGameMode()
@@ -363,7 +364,7 @@ public class GameState extends State implements HookEntity
 
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
-					System.out.println( ( int )( 1.0f / _dt ) ) ;
+					//System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator -= DEFAULT_FRAMERATE ;
@@ -388,21 +389,25 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
+			private long logicRunningTime = 0L ;
+			private long renderRunningTime = 0L ;
+
 			@Override
 			public void update( final double _dt )
 			{
-				final boolean hasInput = inputSystem.hasInputs() ;
-				final boolean hasEvents = eventSystem.hasEvents() ;
-				if( hasInput == false && hasEvents == false )
-				{
-					system.sleep( DEFAULT_SLEEP ) ;
-				}
+				long startTime = ElapsedTimer.nanoTime() ;
 
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
+
+				// Update the system to ensure that the state 
+				// has the latest events and inputs.
+				system.update( DEFAULT_TIMESTEP ) ;						// Update low-level systems
+				final boolean hasInputs = inputSystem.hasInputs() ;
+				final boolean hasEvents = eventSystem.hasEvents() ;
+
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
 					inputSystem.update() ;
 					eventSystem.update() ;
 
@@ -414,14 +419,44 @@ public class GameState extends State implements HookEntity
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
 
+				// Track the logic running time, not used to calculate 
+				// sleep duration, but useful information for developer
+				// to see if logic goes over allocated time.
+				long endTime = ElapsedTimer.nanoTime() ;
+				logicRunningTime = endTime - startTime ;		// In nanoseconds
+
+				if( hasInputs == false && hasEvents == false )
+				{
+					// Rendering consumes the greatest amount of resources 
+					// and processing time, if the user has not interacted 
+					// with the application, and there are no events 
+					// needing passed, then don't refresh the screen.
+					system.sleep( ( long )( DEFAULT_FRAMERATE * 1000.0f ) ) ;
+					return ;
+				}
+
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				if( renderAccumulator > DEFAULT_FRAMERATE )
+				startTime = ElapsedTimer.nanoTime() ;
+
+				//System.out.println( ( int )( 1.0f / _dt ) ) ;
+				animationSystem.update( DEFAULT_FRAMERATE ) ;
+				system.draw( DEFAULT_FRAMERATE ) ;
+				renderAccumulator -= DEFAULT_FRAMERATE ;
+
+				endTime = ElapsedTimer.nanoTime() ;
+				renderRunningTime = endTime - startTime ;		// In nanoseconds
+
+				final float deltaLogic = logicRunningTime * 0.000000001f ;								// Convert to seconds
+				final float deltaRender = renderRunningTime * 0.000000001f ;							// Convert to seconds
+				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaRender + deltaLogic ) ) * 1000.0f ) ;	// Convert to milliseconds
+
+				if( sleepRender > 0L )
 				{
-					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
-					animationSystem.update( DEFAULT_FRAMERATE ) ;
-					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator = 0.0f ;
+					// Even after rendering there is still a chance that 
+					// we can sleep before we need to refresh the screen
+					// again.
+					system.sleep( sleepRender ) ;
 				}
 			}
 		} ;
