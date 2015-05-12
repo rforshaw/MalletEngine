@@ -49,12 +49,12 @@ import com.linxonline.mallet.io.save.* ;
 */
 public final class GameTestLoader extends GameLoader
 {
-	public static class TestObj
+	public static @SaveClass class TestObj
 	{
-		private @Save final int test1 ;
-		private @Save final int test2 ;
-		private @Save final float test3 ;
-		private @Save final Vector2 test4 ;
+		private final int test1 ;
+		private final int test2 ;
+		private final float test3 ;
+		private final Vector2 test4 ;
 
 		public TestObj()
 		{

@@ -65,7 +65,7 @@ public class Dump
 			final Field[] declaredFields = _class.getDeclaredFields() ;
 			for( final Field field : declaredFields )
 			{
-				if( toSave( field ) == true )
+				if( toSave( field, _class ) == true )
 				{
 					fields.add( field ) ;
 				}
@@ -210,8 +210,14 @@ public class Dump
 		public boolean dump( final String _file, final IOClass _class ) ;
 	}
 
-	private static boolean toSave( final Field _field )
+	private static boolean toSave( final Field _field, final Class _class )
 	{
+		final boolean saveClass = ( _class.getAnnotation( SaveClass.class ) != null ) ;
+		if( saveClass == true )
+		{
+			return _field.getAnnotation( NoSave.class ) == null ;
+		}
+
 		return _field.getAnnotation( Save.class ) != null ;
 	}
 }

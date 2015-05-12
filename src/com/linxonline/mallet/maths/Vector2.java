@@ -1,11 +1,11 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.SaveClass ;
 
-public class Vector2
+public @SaveClass class Vector2
 {
-	public @Save float x = 0.0f ;
-	public @Save float y = 0.0f ;
+	public float x = 0.0f ;
+	public float y = 0.0f ;
 
 	public Vector2() {}
 
