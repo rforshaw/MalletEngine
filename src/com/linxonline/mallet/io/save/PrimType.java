@@ -12,7 +12,8 @@ enum PrimType
 	LONG( Long.TYPE ),
 	FLOAT( Float.TYPE ),
 	DOUBLE( Double.TYPE ),
-	BOOLEAN( Boolean.TYPE ) ;
+	BOOLEAN( Boolean.TYPE ),
+	UNKNOWN( null ) ;
 
 	private final Class type ;
 
@@ -31,7 +32,7 @@ enum PrimType
 			}
 		}
 
-		return null ;
+		return UNKNOWN ;
 	}
 
 	public static PrimType getType( final Field _field )
@@ -45,6 +46,6 @@ enum PrimType
 			}
 		}
 
-		return null ;
+		return UNKNOWN ;
 	}
 }

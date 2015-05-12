@@ -39,6 +39,8 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 //import com.linxonline.mallet.input.desktop.XInputLinux ;
 
+import com.linxonline.mallet.io.save.* ;
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 
@@ -47,6 +49,35 @@ import com.linxonline.mallet.input.* ;
 */
 public final class GameTestLoader extends GameLoader
 {
+	public static class TestObj
+	{
+		private @Save final int test1 ;
+		private @Save final int test2 ;
+		private @Save final float test3 ;
+		private @Save final Vector2 test4 ;
+
+		public TestObj()
+		{
+			test1 = 0 ;
+			test2 = 0 ;
+			test3 = 0 ;
+			test4 = new Vector2() ;
+		}
+
+		public TestObj( final int _test1, final int _test2, final float _test3, final Vector2 _test4 )
+		{
+			test1 = _test1 ;
+			test2 = _test2 ;
+			test3 = _test3 ;
+			test4 = new Vector2( _test4 ) ;
+		}
+		
+		public String toString()
+		{
+			return "Test1: " + test1 + " Test2: " + test2 + " Test3: " + test3 + " Test4: " + test4 ;
+		}
+	}
+
 	public GameTestLoader() {}
 
 	@Override
@@ -58,10 +89,11 @@ public final class GameTestLoader extends GameLoader
 		
 			public void initGame()			// Called when state is started
 			{
-				final Vector2 test = new Vector2( 100, 100 ) ;
-				com.linxonline.mallet.io.save.Dump.dump( test, com.linxonline.mallet.io.save.Format.JSON, "test.dump" ) ;
+				//final Vector2 test = new Vector2( 100, 100 ) ;
+				final TestObj test = new TestObj( 1, 2, 250.0f, new Vector2( 10, 10 ) ) ;
+				Dump.dump( test, Format.JSON, "test.dump" ) ;
 
-				final Vector2 built = ( Vector2 )com.linxonline.mallet.io.save.Build.build( "test.dump", com.linxonline.mallet.io.save.Format.JSON ) ;
+				final TestObj built = ( TestObj )Build.build( "test.dump", Format.JSON ) ;
 				System.out.println( "Rebuilt: " + built ) ;
 
 				/*device.setXInputListener( new XInputListener()

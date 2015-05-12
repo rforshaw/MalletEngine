@@ -130,45 +130,68 @@ public class Dump
 
 		private boolean storeField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
 		{
-			switch( FieldType.getType( _field ) )
+			_field.setAccessible( true ) ;
+			final PrimType primType = PrimType.getType( _field ) ;
+			final String name = _field.getName() ;
+			switch( primType )
 			{
-				case PRIMITIVE :
+				case CHAR    :
 				{
-					final PrimType primType = PrimType.getType( _field ) ;
-					final String name = _field.getName() ;
-					switch( primType )
-					{
-						case CHAR    : _fields.put( name, _field.getChar( _obj ) ) ; break ;
-						case BYTE    : _fields.put( name, _field.getByte( _obj ) ) ; break ;
-						case INT     : _fields.put( name, _field.getInt( _obj ) ) ; break ;
-						case SHORT   : _fields.put( name, _field.getShort( _obj ) ) ; break ;
-						case LONG    : _fields.put( name, _field.getLong( _obj ) ) ; break ;
-						case FLOAT   : _fields.put( name, _field.getFloat( _obj ) ) ; break ;
-						case DOUBLE  : _fields.put( name, _field.getDouble( _obj ) ) ; break ;
-						case BOOLEAN : _fields.put( name, _field.getBoolean( _obj ) ) ; break ;
-						default      :
-						{
-							System.out.println( "Primitive Type unknown.." ) ;
-							return false ;
-						}
-					}
-
+					_fields.put( name, _field.getChar( _obj ) ) ;
 					_fieldTypes.put( name, primType.toString() ) ;
 					return true ;
 				}
-				case OBJECT    :
+				case BYTE    :
+				{
+					_fields.put( name, _field.getByte( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case INT     :
+				{
+					_fields.put( name, _field.getInt( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case SHORT   :
+				{
+					_fields.put( name, _field.getShort( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case LONG    :
+				{
+					_fields.put( name, _field.getLong( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case FLOAT   :
+				{
+					_fields.put( name, _field.getFloat( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case DOUBLE  :
+				{
+					_fields.put( name, _field.getDouble( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				case BOOLEAN :
+				{
+					_fields.put( name, _field.getBoolean( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
+				default      :
 				{
 					final Object object = _field.get( _obj ) ;
 					final IOClass objectClass = new IOClass( object, object.getClass() ) ;
 					final JSONObject jsonObject = JSONObject.construct() ;
 
-					_fields.put( _field.getName(), jsonObject ) ;
+					_fields.put( name, jsonObject ) ;
+					_fieldTypes.put( name, "OBJECT" ) ;
 					return dump( jsonObject, objectClass ) ;
-				}
-				default        :
-				{
-					System.out.println( "Field Type unknown.." ) ;
-					return false ;
 				}
 			}
 		}
