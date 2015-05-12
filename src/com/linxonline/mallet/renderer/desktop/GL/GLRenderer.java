@@ -388,6 +388,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( ( int )offset.x, ( int )offset.y, 0.0f ) ;
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
+					//gl.glAlphaFunc( GL.GL_GREATER, 0.5f ) ;
 
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )

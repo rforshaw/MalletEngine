@@ -58,6 +58,12 @@ public final class GameTestLoader extends GameLoader
 		
 			public void initGame()			// Called when state is started
 			{
+				final Vector2 test = new Vector2( 100, 100 ) ;
+				com.linxonline.mallet.io.save.Dump.dump( test, com.linxonline.mallet.io.save.Format.JSON, "test.dump" ) ;
+
+				final Vector2 built = ( Vector2 )com.linxonline.mallet.io.save.Build.build( "test.dump", com.linxonline.mallet.io.save.Format.JSON ) ;
+				System.out.println( "Rebuilt: " + built ) ;
+
 				/*device.setXInputListener( new XInputListener()
 				{
 					public void keyPressed( final XInputDevice.Event _event )
@@ -80,6 +86,7 @@ public final class GameTestLoader extends GameLoader
 					public void end() {}
 				} ) ;*/
 
+				//system.getRenderInterface().setCameraPosition( new Vector3( 512, -512, 0 ) ) ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;

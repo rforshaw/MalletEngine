@@ -19,6 +19,35 @@ public class Array2DPoint
 		j = _j ;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		int hash = 17 ;
+		hash = hash * 31 + i ;
+		hash = hash * 31 + j ;
+		return hash ;
+	}
+
+	@Override
+	public boolean equals( Object _obj )
+	{
+		if( _obj instanceof Array2DPoint )
+		{
+			final Array2DPoint point = ( Array2DPoint )_obj ;
+			if( this == _obj )
+			{
+				return true ;
+			}
+			else if( i == point.i && j == point.j )
+			{
+				return true ;
+			}
+		}
+
+		return false ;
+	}
+
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
