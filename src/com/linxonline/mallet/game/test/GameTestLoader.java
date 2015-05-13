@@ -1,6 +1,7 @@
 package com.linxonline.mallet.game.test ;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
 
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.TextFactory ;
@@ -51,6 +52,7 @@ public final class GameTestLoader extends GameLoader
 {
 	public static @SaveClass class TestObj
 	{
+		private final ArrayList<Vector2> arrayTest = new ArrayList<Vector2>() ;
 		private final int test1 ;
 		private final int test2 ;
 		private final float test3 ;
@@ -66,6 +68,8 @@ public final class GameTestLoader extends GameLoader
 
 		public TestObj( final int _test1, final int _test2, final float _test3, final Vector2 _test4 )
 		{
+			arrayTest.add( new Vector2( 1, 2 ) ) ;
+			arrayTest.add( new Vector2( 3, 4 ) ) ;
 			test1 = _test1 ;
 			test2 = _test2 ;
 			test3 = _test3 ;
@@ -74,7 +78,39 @@ public final class GameTestLoader extends GameLoader
 		
 		public String toString()
 		{
-			return "Test1: " + test1 + " Test2: " + test2 + " Test3: " + test3 + " Test4: " + test4 ;
+			String text = "" ;
+			for( final Vector2 vec : arrayTest )
+			{
+				text += " Vec: " + vec.toString() ;
+			}
+			return "Test1: " + test1 + " Test2: " + test2 + " Test3: " + test3 + " Test4: " + test4 + " Array: " + text;
+		}
+	}
+
+	public static class ExtendTest extends TestObj
+	{
+		private @Save final int test5 ;
+		private @Save final String test6 ;
+		private @Save final HashMap<String, Vector2> test7 = new HashMap<String, Vector2>() ;
+
+		public ExtendTest( final int _test1, final int _test2, final float _test3, final Vector2 _test4, final int _test5, final String _test6 )
+		{
+			super( _test1, _test2, _test3, _test4 ) ;
+			test5 = _test5 ;
+			test6 = _test6 ;
+			test7.put( "TEST", new Vector2( 567, 98 ) ) ;
+		}
+
+		public ExtendTest()
+		{
+			super() ;
+			test5 = 0 ;
+			test6 = "" ;
+		}
+
+		public String toString()
+		{
+			return super.toString() + " Test5 : " + test5 + " Test6: " + test6 + " Test7: " + test7.get( "TEST" ) ;
 		}
 	}
 
@@ -90,10 +126,10 @@ public final class GameTestLoader extends GameLoader
 			public void initGame()			// Called when state is started
 			{
 				//final Vector2 test = new Vector2( 100, 100 ) ;
-				final TestObj test = new TestObj( 1, 2, 250.0f, new Vector2( 10, 10 ) ) ;
+				final ExtendTest test = new ExtendTest( 1, 2, 250.0f, new Vector2( 10, 10 ), 7890, "BOB" ) ;
 				Dump.dump( test, Format.JSON, "test.dump" ) ;
 
-				final TestObj built = ( TestObj )Build.build( "test.dump", Format.JSON ) ;
+				final ExtendTest built = ( ExtendTest )Build.build( "test.dump", Format.JSON ) ;
 				System.out.println( "Rebuilt: " + built ) ;
 
 				/*device.setXInputListener( new XInputListener()

@@ -1,6 +1,9 @@
 package com.linxonline.mallet.io.save ;
 
 import java.util.ArrayList ;
+import java.util.Collection ;
+import java.util.Set ;
+import java.util.Map ;
 
 import java.lang.Class ;
 import java.lang.reflect.Field ;
@@ -11,6 +14,10 @@ import java.lang.IllegalAccessException ;
 import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
+/**
+	Supports the exporting of Java Primitives, Collections, and Maps.
+	Will export classes that use @SaveClass, @NoSave, and @Save.
+*/
 public class Dump
 {
 	private static final JSONDump jsonDump = new JSONDump() ;
@@ -34,27 +41,66 @@ public class Dump
 	*/
 	private static class IOClass
 	{
-		private final Object object ;										// Object to be saved
-		private final Class objectClass ;									// Class that represents object
-		private final ArrayList<Field> fields = new ArrayList<Field>() ;	// Fields to be saved - Objects and Primitives
-		private final IOClass parent ;										// Parent class
+		private final Object object ;												// Object to be saved
+		private final Class objectClass ;											// Class that represents object
+		private final ArrayList<Field> fields = new ArrayList<Field>() ;			// Fields to be saved - Objects and Primitives
+		private final ArrayList<IOClass> mapKeys = new ArrayList<IOClass>() ;			// Objects that represent a Map's key
+		private final ArrayList<IOClass> collections = new ArrayList<IOClass>() ;	// Objects to be saved within a Collection or a Map values
+		private final IOClass parent ;												// Parent class
 
 		public IOClass( final Object _obj, final Class _class )
 		{
 			object = _obj ;
 			objectClass = _class ;
+			//System.out.println( "Is: " + _class.getName() ) ;
 
-			final Class superClass = objectClass.getSuperclass() ;
-			if( superClass != null )
+			if( isCollection( _class ) == true )
 			{
-				parent = new IOClass( object, superClass ) ;
+				acquireFields( ( Collection )_obj ) ;
+				parent = null ;
 			}
-			else
+			else if( isMap( _class ) == true )
+			{
+				acquireFields( ( Map )_obj ) ;
+				parent = null ;
+			}
+			else if( isPrimitive( _class ) == true )
 			{
 				parent = null ;
 			}
+			else
+			{
+				final Class superClass = objectClass.getSuperclass() ;
+				if( superClass != null )
+				{
+					parent = new IOClass( object, superClass ) ;
+				}
+				else
+				{
+					parent = null ;
+				}
 
-			acquireFields( _obj, _class ) ;
+				acquireFields( _obj, _class ) ;
+			}
+		}
+
+		private void acquireFields( final Collection _list )
+		{
+			for( final Object obj : _list )
+			{
+				collections.add( new IOClass( obj, obj.getClass() ) ) ;
+			}
+		}
+
+		private void acquireFields( final Map _map )
+		{
+			final Set keys = _map.keySet() ;
+			for( final Object key : keys )
+			{
+				mapKeys.add( new IOClass( key, key.getClass() ) ) ;
+				final Object value = _map.get( key ) ;
+				collections.add( new IOClass( value, value.getClass() ) ) ;
+			}
 		}
 
 		/**
@@ -125,7 +171,110 @@ public class Dump
 				return dump( parentJSON, _class.parent ) ;
 			}
 
+			if( isPrimitive( _class.objectClass ) == true )
+			{
+				storePrimitive( _obj, _class.objectClass, _class.object ) ;
+			}
+			
+			if( _class.collections.isEmpty() == false )
+			{
+				// If the class being saved is a Collection,
+				// then we must handle it uniquely.
+				final JSONArray collections = JSONArray.construct() ;
+				_obj.put( "collections", collections ) ;
+				for( final IOClass item : _class.collections )
+				{
+					final JSONObject jsonItem = JSONObject.construct() ;
+					if( dump( jsonItem, item ) == true )
+					{
+						collections.put( jsonItem ) ;
+					}
+				}
+			}
+
+			if( _class.mapKeys.isEmpty() == false )
+			{
+				// If the class being saved is a Collection,
+				// then we must handle it uniquely.
+				final JSONArray keys = JSONArray.construct() ;
+				_obj.put( "keys", keys ) ;
+				for( final IOClass item : _class.mapKeys )
+				{
+					final JSONObject jsonItem = JSONObject.construct() ;
+					if( dump( jsonItem, item ) == true )
+					{
+						keys.put( jsonItem ) ;
+					}
+				}
+			}
+
 			return true ;
+		}
+
+		private boolean storePrimitive( final JSONObject _obj, final Class _class, final Object _val )
+		{
+			final PrimType primType = PrimType.getType( _class ) ;
+			switch( primType )
+			{
+				case CHAR    :
+				{
+					_obj.put( "value", ( char )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case BYTE    :
+				{
+					_obj.put( "value", ( byte )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case INT     :
+				{
+					_obj.put( "value", ( int )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case SHORT   :
+				{
+					_obj.put( "value", ( short )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case LONG    :
+				{
+					_obj.put( "value", ( long )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case FLOAT   :
+				{
+					_obj.put( "value", ( float )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case DOUBLE  :
+				{
+					_obj.put( "value", ( double )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case BOOLEAN :
+				{
+					_obj.put( "value", ( boolean )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				case STRING  :
+				{
+					_obj.put( "value", ( String )_val ) ;
+					_obj.put( "type", primType.toString() ) ;
+					return true ;
+				}
+				default      :
+				{
+					return false ;
+				}
+			}
 		}
 
 		private boolean storeField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
@@ -183,6 +332,12 @@ public class Dump
 					_fieldTypes.put( name, primType.toString() ) ;
 					return true ;
 				}
+				case STRING  :
+				{
+					_fields.put( name, ( String )_field.get( _obj ) ) ;
+					_fieldTypes.put( name, primType.toString() ) ;
+					return true ;
+				}
 				default      :
 				{
 					final Object object = _field.get( _obj ) ;
@@ -208,6 +363,21 @@ public class Dump
 	private static interface DumpFormat
 	{
 		public boolean dump( final String _file, final IOClass _class ) ;
+	}
+
+	private static boolean isCollection( final Class _class )
+	{
+		return Collection.class.isAssignableFrom( _class ) ;
+	}
+
+	private static boolean isMap( final Class _class )
+	{
+		return Map.class.isAssignableFrom( _class ) ;
+	}
+
+	private static boolean isPrimitive( final Class _class )
+	{
+		return PrimType.getType( _class ) != PrimType.UNKNOWN ;
 	}
 
 	private static boolean toSave( final Field _field, final Class _class )

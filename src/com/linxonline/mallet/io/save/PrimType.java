@@ -13,6 +13,7 @@ enum PrimType
 	FLOAT( Float.TYPE ),
 	DOUBLE( Double.TYPE ),
 	BOOLEAN( Boolean.TYPE ),
+	STRING( String.class ),
 	UNKNOWN( null ) ;
 
 	private final Class type ;
@@ -37,10 +38,14 @@ enum PrimType
 
 	public static PrimType getType( final Field _field )
 	{
-		final Class clazz = _field.getType() ;
+		return getType( _field.getType() ) ;
+	}
+
+	public static PrimType getType( final Class _class )
+	{
 		for( final PrimType prim : PrimType.values() )
 		{
-			if( clazz.equals( prim.type ) == true )
+			if( _class.equals( prim.type ) == true )
 			{
 				return prim ;
 			}
