@@ -1,12 +1,14 @@
 package com.linxonline.mallet.util.id ;
 
+import com.linxonline.mallet.io.save.SaveClass ;
+
 /**
 	Convenience class to provide name and group-name
 	identifiers for objects.
 	Many of the classes in Mallet Engine require the 
 	ability to identify one object from another.
 */
-public class ID
+public @SaveClass class ID
 {
 	public String name ;
 	public String group ;

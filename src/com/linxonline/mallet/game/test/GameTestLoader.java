@@ -92,6 +92,8 @@ public final class GameTestLoader extends GameLoader
 		private @Save final int test5 ;
 		private @Save final String test6 ;
 		private @Save final HashMap<String, Vector2> test7 = new HashMap<String, Vector2>() ;
+		private @Save int[] test8 = { 1, 2, 3, 4 } ;
+		private @Save Vector2[] test9 = new Vector2[2] ;
 
 		public ExtendTest( final int _test1, final int _test2, final float _test3, final Vector2 _test4, final int _test5, final String _test6 )
 		{
@@ -99,6 +101,9 @@ public final class GameTestLoader extends GameLoader
 			test5 = _test5 ;
 			test6 = _test6 ;
 			test7.put( "TEST", new Vector2( 567, 98 ) ) ;
+			test8[3] = 8 ;
+			test9[0] = new Vector2( 256, 256 ) ;
+			test9[1] = new Vector2( 512, 512 ) ;
 		}
 
 		public ExtendTest()
@@ -106,11 +111,13 @@ public final class GameTestLoader extends GameLoader
 			super() ;
 			test5 = 0 ;
 			test6 = "" ;
+			test9[0] = new Vector2() ;
+			test9[1] = new Vector2() ;
 		}
 
 		public String toString()
 		{
-			return super.toString() + " Test5 : " + test5 + " Test6: " + test6 + " Test7: " + test7.get( "TEST" ) ;
+			return super.toString() + " Test5 : " + test5 + " Test6: " + test6 + " Test7: " + test7.get( "TEST" ) + " Test8: " + test8[3] + " Test9 : " + test9[0] ;
 		}
 	}
 
@@ -125,6 +132,12 @@ public final class GameTestLoader extends GameLoader
 		
 			public void initGame()			// Called when state is started
 			{
+				/*final int[] array = new int[4] ;
+				array[0] = 1 ;
+				array[1] = 2 ;
+				array[2] = 3 ;
+				array[3] = 4 ;
+				Dump.dump( array, Format.JSON, "test.dump" ) ;*/
 				//final Vector2 test = new Vector2( 100, 100 ) ;
 				final ExtendTest test = new ExtendTest( 1, 2, 250.0f, new Vector2( 10, 10 ), 7890, "BOB" ) ;
 				Dump.dump( test, Format.JSON, "test.dump" ) ;
@@ -308,6 +321,7 @@ public final class GameTestLoader extends GameLoader
 																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
+				//Dump.dump( entity, Format.JSON, "test.dump" ) ;
 			}
 
 			/**

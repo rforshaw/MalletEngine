@@ -7,6 +7,7 @@ import java.util.Map ;
 
 import java.lang.Class ;
 import java.lang.reflect.Field ;
+import java.lang.reflect.Array ;
 import java.lang.annotation.Annotation ;
 
 import java.lang.IllegalAccessException ;
@@ -44,7 +45,7 @@ public class Dump
 		private final Object object ;												// Object to be saved
 		private final Class objectClass ;											// Class that represents object
 		private final ArrayList<Field> fields = new ArrayList<Field>() ;			// Fields to be saved - Objects and Primitives
-		private final ArrayList<IOClass> mapKeys = new ArrayList<IOClass>() ;			// Objects that represent a Map's key
+		private final ArrayList<IOClass> mapKeys = new ArrayList<IOClass>() ;		// Objects that represent a Map's key
 		private final ArrayList<IOClass> collections = new ArrayList<IOClass>() ;	// Objects to be saved within a Collection or a Map values
 		private final IOClass parent ;												// Parent class
 
@@ -52,7 +53,6 @@ public class Dump
 		{
 			object = _obj ;
 			objectClass = _class ;
-			//System.out.println( "Is: " + _class.getName() ) ;
 
 			if( isCollection( _class ) == true )
 			{
@@ -80,7 +80,15 @@ public class Dump
 					parent = null ;
 				}
 
-				acquireFields( _obj, _class ) ;
+				if( _class.isArray() == true )
+				{
+					System.out.println( "CLASS IS AN ARRAY" ) ;
+					acquireArrayField( _obj, _class ) ;
+				}
+				else
+				{
+					acquireFields( _obj, _class ) ;
+				}
 			}
 		}
 
@@ -101,6 +109,12 @@ public class Dump
 				final Object value = _map.get( key ) ;
 				collections.add( new IOClass( value, value.getClass() ) ) ;
 			}
+		}
+
+		private void acquireArrayField( final Object _array, final Class _class )
+		{
+			System.out.println( PrimType.getType( _class ) ) ;
+			final int length = Array.getLength( _array ) ;
 		}
 
 		/**
@@ -145,23 +159,26 @@ public class Dump
 		{
 			_obj.put( "class", _class.objectClass.getName() ) ;
 
-			final JSONObject fields = JSONObject.construct() ;			// Fields are stored here
-			_obj.put( "fields", fields ) ;
-
-			final JSONObject fieldTypes = JSONObject.construct() ;			// Fields are stored here
-			_obj.put( "field-types", fieldTypes ) ;
-
-			try
+			if( _class.fields.isEmpty() == false )
 			{
-				for( final Field field : _class.fields )
+				try
 				{
-					storeField( field, fields, fieldTypes, _class.object ) ;
+					final JSONObject fields = JSONObject.construct() ;			// Fields are stored here
+					_obj.put( "fields", fields ) ;
+
+					final JSONObject fieldTypes = JSONObject.construct() ;		// Fields are stored here
+					_obj.put( "field-types", fieldTypes ) ;
+
+					for( final Field field : _class.fields )
+					{
+						storeField( field, fields, fieldTypes, _class.object ) ;
+					}
 				}
-			}
-			catch( IllegalAccessException ex )
-			{
-				ex.printStackTrace() ;
-				return false ;
+				catch( IllegalAccessException ex )
+				{
+					ex.printStackTrace() ;
+					return false ;
+				}
 			}
 
 			if( _class.parent != null )
@@ -173,9 +190,16 @@ public class Dump
 
 			if( isPrimitive( _class.objectClass ) == true )
 			{
-				storePrimitive( _obj, _class.objectClass, _class.object ) ;
+				if( _class.objectClass.isArray() == true )
+				{
+					storePrimitives( _obj, _class.objectClass, _class.object ) ;
+				}
+				else
+				{
+					storePrimitive( _obj, _class.objectClass, _class.object ) ;
+				}
 			}
-			
+
 			if( _class.collections.isEmpty() == false )
 			{
 				// If the class being saved is a Collection,
@@ -277,11 +301,174 @@ public class Dump
 			}
 		}
 
+		private boolean storePrimitives( final JSONObject _obj, final Class _class, final Object _val )
+		{
+			final int length = Array.getLength( _val ) ;
+			final JSONArray array = JSONArray.construct() ;
+
+			final PrimType primType = PrimType.getType( _class ) ;
+			_obj.put( "values", array ) ;
+			_obj.put( "type", primType.toString() ) ;
+
+			for( int i = 0; i < length; i++ )
+			{
+				switch( primType )
+				{
+					case CHAR    :
+					{
+						array.put( Array.getChar( _val, i ) ) ;
+						break ;
+					}
+					case BYTE    :
+					{
+						array.put( Array.getByte( _val, i ) ) ;
+						break ;
+					}
+					case INT     :
+					{
+						array.put( Array.getInt( _val, i ) ) ;
+						break ;
+					}
+					case SHORT   :
+					{
+						array.put( Array.getShort( _val, i ) ) ;
+						break ;
+					}
+					case LONG    :
+					{
+						array.put( Array.getLong( _val, i ) ) ;
+						break ;
+					}
+					case FLOAT   :
+					{
+						array.put( Array.getFloat( _val, i ) ) ;
+						break ;
+					}
+					case DOUBLE  :
+					{
+						array.put( Array.getDouble( _val, i ) ) ;
+						break ;
+					}
+					case BOOLEAN :
+					{
+						array.put( Array.getBoolean( _val, i ) ) ;
+						break ;
+					}
+					case STRING  :
+					{
+						array.put( ( String )Array.get( _val, i ) ) ;
+						break ;
+					}
+					default      :
+					{
+						return false ;
+					}
+				}
+			}
+
+			return true ;
+		}
+
 		private boolean storeField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
 		{
 			_field.setAccessible( true ) ;
-			final PrimType primType = PrimType.getType( _field ) ;
+			final Class classType = _field.getType() ;
+
+			if( classType.isArray() == true )
+			{
+				return storeArrayField( _field, _fields, _fieldTypes, _obj ) ;
+			}
+			else
+			{
+				return storeItemField( _field, _fields, _fieldTypes, _obj ) ;
+			}
+		}
+
+		private boolean storeArrayField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
+		{
 			final String name = _field.getName() ;
+			final Class classType = _field.getType() ;
+			final PrimType primType = PrimType.getType( classType ) ;
+
+			final JSONArray array = JSONArray.construct() ;
+
+			_fields.put( name, array ) ;
+			_fieldTypes.put( name, primType.toString() ) ;
+
+			final Object value = _field.get( _obj ) ;
+			final int length = Array.getLength( value ) ;
+
+			for( int i = 0; i < length; i++ )
+			{
+				switch( primType )
+				{
+					case CHAR    :
+					{
+						array.put( Array.getChar( value, i ) ) ;
+						break ;
+					}
+					case BYTE    :
+					{
+						array.put( Array.getByte( value, i ) ) ;
+						break ;
+					}
+					case INT     :
+					{
+						array.put( Array.getInt( value, i ) ) ;
+						break ;
+					}
+					case SHORT   :
+					{
+						array.put( Array.getShort( value, i ) ) ;
+						break ;
+					}
+					case LONG    :
+					{
+						array.put( Array.getLong( value, i ) ) ;
+						break ;
+					}
+					case FLOAT   :
+					{
+						array.put( Array.getFloat( value, i ) ) ;
+						break ;
+					}
+					case DOUBLE  :
+					{
+						array.put( Array.getDouble( value, i ) ) ;
+						break ;
+					}
+					case BOOLEAN :
+					{
+						array.put( Array.getBoolean( value, i ) ) ;
+						break ;
+					}
+					case STRING  :
+					{
+						array.put( ( String )Array.get( value, i ) ) ;
+						break ;
+					}
+					default      :
+					{
+						final Object object = Array.get( value, i ) ;
+						final IOClass objectClass = new IOClass( object, object.getClass() ) ;
+						final JSONObject jsonObject = JSONObject.construct() ;
+
+						_fieldTypes.put( name, "OBJECT" ) ;
+						array.put( jsonObject ) ;
+						dump( jsonObject, objectClass ) ;
+					}
+				}
+			}
+
+			return true ;
+		}
+
+		private boolean storeItemField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
+		{
+			final String name = _field.getName() ;
+			final Class classType = _field.getType() ;
+			final PrimType primType = PrimType.getType( classType ) ;
+
 			switch( primType )
 			{
 				case CHAR    :

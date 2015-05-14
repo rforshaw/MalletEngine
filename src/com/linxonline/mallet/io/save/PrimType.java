@@ -5,22 +5,24 @@ import java.lang.reflect.Field ;
 
 enum PrimType
 {
-	CHAR( Character.TYPE ),
-	BYTE( Byte.TYPE ),
-	INT( Integer.TYPE ),
-	SHORT( Short.TYPE ),
-	LONG( Long.TYPE ),
-	FLOAT( Float.TYPE ),
-	DOUBLE( Double.TYPE ),
-	BOOLEAN( Boolean.TYPE ),
-	STRING( String.class ),
-	UNKNOWN( null ) ;
+	CHAR( Character.TYPE, char[].class ),
+	BYTE( Byte.TYPE, byte[].class ),
+	INT( Integer.TYPE, int[].class ),
+	SHORT( Short.TYPE, short[].class ),
+	LONG( Long.TYPE, long[].class ),
+	FLOAT( Float.TYPE, float[].class ),
+	DOUBLE( Double.TYPE, double[].class ),
+	BOOLEAN( Boolean.TYPE, boolean[].class ),
+	STRING( String.class, String[].class ),
+	UNKNOWN( null, null ) ;
 
 	private final Class type ;
+	private final Class arrayType ;
 
-	private PrimType( final Class _class )
+	private PrimType( final Class _class, final Class _arrayClass )
 	{
 		type = _class ;
+		arrayType = _arrayClass ;
 	}
 
 	public static PrimType getType( final String _type )
@@ -45,7 +47,8 @@ enum PrimType
 	{
 		for( final PrimType prim : PrimType.values() )
 		{
-			if( _class.equals( prim.type ) == true )
+			if( _class.equals( prim.type ) == true ||
+				_class.equals( prim.arrayType ) == true )
 			{
 				return prim ;
 			}

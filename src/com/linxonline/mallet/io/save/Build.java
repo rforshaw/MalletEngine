@@ -5,6 +5,7 @@ import java.util.Map ;
 
 import java.lang.Class ;
 import java.lang.reflect.Field ;
+import java.lang.reflect.Array ;
 import java.lang.annotation.Annotation ;
 
 import java.lang.IllegalAccessException ;
@@ -71,7 +72,14 @@ public class Build
 				
 				if( isPrimitive( clazz ) == true )
 				{
-					return createPrimitive( _obj ) ;
+					if( clazz.isArray() == true )
+					{
+						return createPrimitives( _obj, clazz ) ;
+					}
+					else
+					{
+						return createPrimitive( _obj ) ;
+					}
 				}
 				else
 				{
@@ -118,6 +126,34 @@ public class Build
 			}
 		}
 
+		private Object createPrimitives( final JSONObject _json, final Class _class )
+		{
+			final PrimType type = PrimType.getType( _json.optString( "type", null ) ) ;
+			final JSONArray array = _json.optJSONArray( "values" ) ;
+
+			final int length = array.length() ;
+			final Object value = Array.newInstance( _class, length ) ;
+
+			for( int i = 0; i < length; i++ )
+			{
+				switch( type )
+				{
+					case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
+					case BYTE    : Array.setByte( value, i, ( byte )array.optInt( i ) ) ; break ;
+					case INT     : Array.setInt( value, i, array.optInt( i ) ) ; break ;
+					case SHORT   : Array.setShort( value, i, ( short )array.optInt( i ) ) ; break ;
+					case LONG    : Array.setLong( value, i, array.optLong( i ) ) ; break ;
+					case FLOAT   : Array.setFloat( value, i, ( float )array.optDouble( i ) ) ; break ;
+					case DOUBLE  : Array.setDouble( value, i, array.optDouble( i ) ) ; break ;
+					case BOOLEAN : Array.setBoolean( value, i, array.optBoolean( i ) ) ; break ;
+					case STRING  : Array.set( value, i, array.optString( i ) ) ; break ;
+					default      : break ;
+				}
+			}
+
+			return value ;
+		}
+
 		private void insertFields( final Object _obj, final Class _class, final JSONObject _json ) throws ClassNotFoundException,
 																										  IllegalAccessException,
 																										  NoSuchFieldException
@@ -130,23 +166,55 @@ public class Build
 				for( final String key : keys )
 				{
 					final Field field = _class.getDeclaredField( key ) ;
+					final Class classType = field.getType() ;
+
 					field.setAccessible( true ) ;
-					final PrimType type = PrimType.getType( fieldTypes.optString( key, null ) ) ;
-					switch( type )
+					
+					if( classType.isArray() == true )
 					{
-						case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
-						case BYTE    : field.setByte( _obj, ( byte )fields.optInt( key, 0 ) ) ;        break ;
-						case INT     : field.setInt( _obj, fields.optInt( key, 0 ) ) ;                 break ;
-						case SHORT   : field.setShort( _obj, ( short )fields.optInt( key, 0 ) ) ;      break ;
-						case LONG    : field.setLong( _obj, fields.optLong( key, 0L ) ) ;              break ;
-						case FLOAT   : field.setFloat( _obj, ( float )fields.optDouble( key, 0.0 ) ) ; break ;
-						case DOUBLE  : field.setDouble( _obj, fields.optDouble( key, 0.0 ) ) ;         break ;
-						case BOOLEAN : field.setBoolean( _obj, fields.optBoolean( key, false ) ) ;     break ;
-						case STRING  : field.set( _obj, fields.optString( key, "" ) ) ;                break ;
-						// If it is not a primitive type then it must be an object.
-						// Whether it is a String, ArrayList, HashMap, or a Mallet 
-						// Object is unkown, but we'll find out soon enough. 
-						default      : field.set( _obj, construct( fields.optJSONObject( key ) ) ) ;   break ;
+						final PrimType type = PrimType.getType( fieldTypes.optString( key, null ) ) ;
+						final JSONArray array = fields.optJSONArray( key ) ;
+
+						final int length = array.length() ;
+						final Object value = Array.newInstance( classType.getComponentType(), length ) ;
+						field.set( _obj, value ) ;
+
+						for( int i = 0; i < length; i++ )
+						{
+							switch( type )
+							{
+								case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
+								case BYTE    : Array.setByte( value, i, ( byte )array.optInt( i ) ) ; break ;
+								case INT     : Array.setInt( value, i, array.optInt( i ) ) ; break ;
+								case SHORT   : Array.setShort( value, i, ( short )array.optInt( i ) ) ; break ;
+								case LONG    : Array.setLong( value, i, array.optLong( i ) ) ; break ;
+								case FLOAT   : Array.setFloat( value, i, ( float )array.optDouble( i) ) ; break ;
+								case DOUBLE  : Array.setDouble( value, i, array.optDouble( i ) ) ; break ;
+								case BOOLEAN : Array.setBoolean( value, i, array.optBoolean( i ) ) ; break ;
+								case STRING  : Array.set( value, i, array.optString( i ) ) ; break ;
+								default      : Array.set( value, i, construct( array.optJSONObject( i ) ) ) ; break ;
+							}
+						}
+					}
+					else
+					{
+						final PrimType type = PrimType.getType( fieldTypes.optString( key, null ) ) ;
+						switch( type )
+						{
+							case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
+							case BYTE    : field.setByte( _obj, ( byte )fields.optInt( key, 0 ) ) ;        break ;
+							case INT     : field.setInt( _obj, fields.optInt( key, 0 ) ) ;                 break ;
+							case SHORT   : field.setShort( _obj, ( short )fields.optInt( key, 0 ) ) ;      break ;
+							case LONG    : field.setLong( _obj, fields.optLong( key, 0L ) ) ;              break ;
+							case FLOAT   : field.setFloat( _obj, ( float )fields.optDouble( key, 0.0 ) ) ; break ;
+							case DOUBLE  : field.setDouble( _obj, fields.optDouble( key, 0.0 ) ) ;         break ;
+							case BOOLEAN : field.setBoolean( _obj, fields.optBoolean( key, false ) ) ;     break ;
+							case STRING  : field.set( _obj, fields.optString( key, "" ) ) ;                break ;
+							// If it is not a primitive type then it must be an object.
+							// Whether it is a String, ArrayList, HashMap, or a Mallet 
+							// Object is unkown, but we'll find out soon enough. 
+							default      : field.set( _obj, construct( fields.optJSONObject( key ) ) ) ;   break ;
+						}
 					}
 				}
 			}
