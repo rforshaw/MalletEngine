@@ -37,8 +37,6 @@ public class Dump
 	/**
 		Iterate over the Object storing Fields that have 
 		been tagged for saving.
-		In future implementations a class will be able to 
-		be tagged, and Fields can be flagged to not be saved.
 	*/
 	private static class IOClass
 	{
@@ -54,6 +52,13 @@ public class Dump
 			object = _obj ;
 			objectClass = _class ;
 
+			// Collections and Maps are objects however, 
+			// we cannot define how they should be saved using 
+			// the defined @Save Annotations. Because of this, 
+			// we must handle them manually.
+			// Any class that implements Collection or Map interfaces, 
+			// will be handled.
+
 			if( isCollection( _class ) == true )
 			{
 				acquireFields( ( Collection )_obj ) ;
@@ -66,6 +71,9 @@ public class Dump
 			}
 			else if( isPrimitive( _class ) == true )
 			{
+				// Primitves do not have fields, they are the 
+				// value themselves. A primitve can be represented 
+				// as either an individual variable or as an array.
 				parent = null ;
 			}
 			else
@@ -73,6 +81,9 @@ public class Dump
 				final Class superClass = objectClass.getSuperclass() ;
 				if( superClass != null )
 				{
+					// Iterate over the class's super classes 
+					// to save out any variables than may be 
+					// flagged within them.
 					parent = new IOClass( object, superClass ) ;
 				}
 				else
@@ -80,18 +91,14 @@ public class Dump
 					parent = null ;
 				}
 
-				if( _class.isArray() == true )
-				{
-					System.out.println( "CLASS IS AN ARRAY" ) ;
-					acquireArrayField( _obj, _class ) ;
-				}
-				else
-				{
-					acquireFields( _obj, _class ) ;
-				}
+				acquireFields( _obj, _class ) ;
 			}
 		}
 
+		/**
+			Acquire the objects contained within a 
+			Collection.
+		*/
 		private void acquireFields( final Collection _list )
 		{
 			for( final Object obj : _list )
@@ -100,6 +107,11 @@ public class Dump
 			}
 		}
 
+		/**
+			Acquire the objects contained within a 
+			Map, key is stored in mapKeys, while 
+			the values are stored within collections.
+		*/
 		private void acquireFields( final Map _map )
 		{
 			final Set keys = _map.keySet() ;
@@ -109,12 +121,6 @@ public class Dump
 				final Object value = _map.get( key ) ;
 				collections.add( new IOClass( value, value.getClass() ) ) ;
 			}
-		}
-
-		private void acquireArrayField( final Object _array, final Class _class )
-		{
-			System.out.println( PrimType.getType( _class ) ) ;
-			final int length = Array.getLength( _array ) ;
 		}
 
 		/**
@@ -181,29 +187,16 @@ public class Dump
 				}
 			}
 
-			if( _class.parent != null )
-			{
-				final JSONObject parentJSON = JSONObject.construct() ;
-				_obj.put( "parent", parentJSON ) ;
-				return dump( parentJSON, _class.parent ) ;
-			}
+			// Collections and Maps are objects, however 
+			// we cannot define how they should be saved using 
+			// the defined @Save Annotations. Because of this, 
+			// we must handle them manually.
+			// Any class that implements Collection or Map interfaces, 
+			// will be handled.
 
-			if( isPrimitive( _class.objectClass ) == true )
-			{
-				if( _class.objectClass.isArray() == true )
-				{
-					storePrimitives( _obj, _class.objectClass, _class.object ) ;
-				}
-				else
-				{
-					storePrimitive( _obj, _class.objectClass, _class.object ) ;
-				}
-			}
-
+			// Used by Map and Collections - stores values
 			if( _class.collections.isEmpty() == false )
 			{
-				// If the class being saved is a Collection,
-				// then we must handle it uniquely.
 				final JSONArray collections = JSONArray.construct() ;
 				_obj.put( "collections", collections ) ;
 				for( final IOClass item : _class.collections )
@@ -216,10 +209,9 @@ public class Dump
 				}
 			}
 
+			// Used by Map - stores keys
 			if( _class.mapKeys.isEmpty() == false )
 			{
-				// If the class being saved is a Collection,
-				// then we must handle it uniquely.
 				final JSONArray keys = JSONArray.construct() ;
 				_obj.put( "keys", keys ) ;
 				for( final IOClass item : _class.mapKeys )
@@ -229,6 +221,28 @@ public class Dump
 					{
 						keys.put( jsonItem ) ;
 					}
+				}
+			}
+
+			if( _class.parent != null )
+			{
+				// Write out the parent class, and 
+				// all subsequent classes, shouldstop when 
+				// we get to java.lang.Object 
+				final JSONObject parentJSON = JSONObject.construct() ;
+				_obj.put( "parent", parentJSON ) ;
+				return dump( parentJSON, _class.parent ) ;
+			}
+
+			if( isPrimitive( _class.objectClass ) == true )
+			{
+				if( _class.objectClass.isArray() == true )
+				{
+					return storePrimitives( _obj, _class.objectClass, _class.object ) ;
+				}
+				else
+				{
+					return storePrimitive( _obj, _class.objectClass, _class.object ) ;
 				}
 			}
 
@@ -314,55 +328,16 @@ public class Dump
 			{
 				switch( primType )
 				{
-					case CHAR    :
-					{
-						array.put( Array.getChar( _val, i ) ) ;
-						break ;
-					}
-					case BYTE    :
-					{
-						array.put( Array.getByte( _val, i ) ) ;
-						break ;
-					}
-					case INT     :
-					{
-						array.put( Array.getInt( _val, i ) ) ;
-						break ;
-					}
-					case SHORT   :
-					{
-						array.put( Array.getShort( _val, i ) ) ;
-						break ;
-					}
-					case LONG    :
-					{
-						array.put( Array.getLong( _val, i ) ) ;
-						break ;
-					}
-					case FLOAT   :
-					{
-						array.put( Array.getFloat( _val, i ) ) ;
-						break ;
-					}
-					case DOUBLE  :
-					{
-						array.put( Array.getDouble( _val, i ) ) ;
-						break ;
-					}
-					case BOOLEAN :
-					{
-						array.put( Array.getBoolean( _val, i ) ) ;
-						break ;
-					}
-					case STRING  :
-					{
-						array.put( ( String )Array.get( _val, i ) ) ;
-						break ;
-					}
-					default      :
-					{
-						return false ;
-					}
+					case CHAR    : array.put( Array.getChar( _val, i ) ) ;       break ;
+					case BYTE    : array.put( Array.getByte( _val, i ) ) ;       break ;
+					case INT     : array.put( Array.getInt( _val, i ) ) ;        break ;
+					case SHORT   : array.put( Array.getShort( _val, i ) ) ;      break ;
+					case LONG    : array.put( Array.getLong( _val, i ) ) ;       break ;
+					case FLOAT   : array.put( Array.getFloat( _val, i ) ) ;      break ;
+					case DOUBLE  : array.put( Array.getDouble( _val, i ) ) ;     break ;
+					case BOOLEAN : array.put( Array.getBoolean( _val, i ) ) ;    break ;
+					case STRING  : array.put( ( String )Array.get( _val, i ) ) ; break ;
+					default      : return false ;
 				}
 			}
 
@@ -402,51 +377,15 @@ public class Dump
 			{
 				switch( primType )
 				{
-					case CHAR    :
-					{
-						array.put( Array.getChar( value, i ) ) ;
-						break ;
-					}
-					case BYTE    :
-					{
-						array.put( Array.getByte( value, i ) ) ;
-						break ;
-					}
-					case INT     :
-					{
-						array.put( Array.getInt( value, i ) ) ;
-						break ;
-					}
-					case SHORT   :
-					{
-						array.put( Array.getShort( value, i ) ) ;
-						break ;
-					}
-					case LONG    :
-					{
-						array.put( Array.getLong( value, i ) ) ;
-						break ;
-					}
-					case FLOAT   :
-					{
-						array.put( Array.getFloat( value, i ) ) ;
-						break ;
-					}
-					case DOUBLE  :
-					{
-						array.put( Array.getDouble( value, i ) ) ;
-						break ;
-					}
-					case BOOLEAN :
-					{
-						array.put( Array.getBoolean( value, i ) ) ;
-						break ;
-					}
-					case STRING  :
-					{
-						array.put( ( String )Array.get( value, i ) ) ;
-						break ;
-					}
+					case CHAR    : array.put( Array.getChar( value, i ) ) ;       break ;
+					case BYTE    : array.put( Array.getByte( value, i ) ) ;       break ;
+					case INT     : array.put( Array.getInt( value, i ) ) ;        break ;
+					case SHORT   : array.put( Array.getShort( value, i ) ) ;      break ;
+					case LONG    : array.put( Array.getLong( value, i ) ) ;       break ;
+					case FLOAT   : array.put( Array.getFloat( value, i ) ) ;      break ;
+					case DOUBLE  : array.put( Array.getDouble( value, i ) ) ;     break ;
+					case BOOLEAN : array.put( Array.getBoolean( value, i ) ) ;    break ;
+					case STRING  : array.put( ( String )Array.get( value, i ) ) ; break ;
 					default      :
 					{
 						final Object object = Array.get( value, i ) ;

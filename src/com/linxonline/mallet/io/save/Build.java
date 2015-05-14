@@ -219,8 +219,9 @@ public class Build
 				}
 			}
 
-			final JSONArray collections = _json.optJSONArray( "collections" ) ;
-			final JSONArray mapKeys = _json.optJSONArray( "keys" ) ;
+			final JSONArray collections = _json.optJSONArray( "collections" ) ;		// Used by Map and Collections - stores values
+			final JSONArray mapKeys = _json.optJSONArray( "keys" ) ;				// Used by Map - stores keys
+
 			if( collections != null && mapKeys == null )
 			{
 				final Collection list = ( Collection )_obj ;
@@ -245,6 +246,7 @@ public class Build
 			final JSONObject parent = _json.optJSONObject( "parent" ) ;
 			if( parent != null )
 			{
+				// Insert the fields one super class at a time.
 				final String name = parent.optString( "class", null ) ;
 				final ClassLoader loader = _class.getClassLoader() ;
 				insertFields( _obj, loader.loadClass( name ), parent ) ;
