@@ -8,6 +8,7 @@ import java.util.Map ;
 import java.lang.Class ;
 import java.lang.reflect.Field ;
 import java.lang.reflect.Array ;
+import java.lang.reflect.Modifier ;
 import java.lang.annotation.Annotation ;
 
 import java.lang.IllegalAccessException ;
@@ -128,19 +129,34 @@ public class Dump
 		*/
 		private void acquireFields( final Object _obj, final Class _class )
 		{
-			final Field[] declaredFields = _class.getDeclaredFields() ;
-			for( final Field field : declaredFields )
+			try
 			{
-				if( toSave( field, _class ) == true )
+				final Field[] declaredFields = _class.getDeclaredFields() ;
+				for( final Field field : declaredFields )
 				{
-					fields.add( field ) ;
+					field.setAccessible( true ) ;
+					if( field.get( _obj ) != null )
+					{
+						// Fields set to null cannot be saved,
+						// will result in a horrible crash.
+						if( toSave( field, _class ) == true )
+						{
+							fields.add( field ) ;
+						}
+					}
 				}
+			}
+			catch( IllegalAccessException ex )
+			{
+				ex.printStackTrace() ;
 			}
 		}
 	}
 
 	private static class JSONDump implements DumpFormat
 	{
+		private ArrayList<Object> saved = new ArrayList<Object>() ;
+
 		public boolean dump( final String _file, final IOClass _class )
 		{
 			final JSONObject baseJSON = JSONObject.construct() ;
@@ -155,15 +171,22 @@ public class Dump
 			if( stream.writeLine( baseJSON.toString() ) == false )
 			{
 				System.out.println( "Failed to write out JSON to " + _file ) ;
+				saved.clear() ;
+				stream.close() ;
 				return false ;
 			}
 
+			saved.clear() ;
 			return stream.close() ;
 		}
 
 		private boolean dump( final JSONObject _obj, final IOClass _class )
 		{
 			_obj.put( "class", _class.objectClass.getName() ) ;
+			if( saved.contains( _class.object ) == false )
+			{
+				saved.add( _class.object ) ;
+			}
 
 			if( _class.fields.isEmpty() == false )
 			{
@@ -349,6 +372,18 @@ public class Dump
 			_field.setAccessible( true ) ;
 			final Class classType = _field.getType() ;
 
+			if( isStatic( _field ) == true )
+			{
+				// If a field is set as static 
+				// then we only want to save out 
+				// the field once, as it will be used 
+				// by all instances of the class.
+				if( saved.contains( _field.get( _obj ) ) == true )
+				{
+					return true ;
+				}
+			}
+			
 			if( classType.isArray() == true )
 			{
 				return storeArrayField( _field, _fields, _fieldTypes, _obj ) ;
@@ -494,6 +529,16 @@ public class Dump
 	private static boolean isCollection( final Class _class )
 	{
 		return Collection.class.isAssignableFrom( _class ) ;
+	}
+
+	private static boolean isStatic( final Class _class )
+	{
+		return Modifier.isStatic( _class.getModifiers() ) ;
+	}
+
+	private static boolean isStatic( final Field _field )
+	{
+		return Modifier.isStatic( _field.getModifiers() ) ;
 	}
 
 	private static boolean isMap( final Class _class )

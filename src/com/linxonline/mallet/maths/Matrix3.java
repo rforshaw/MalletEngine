@@ -1,9 +1,11 @@
 package com.linxonline.mallet.maths ;
 
+import com.linxonline.mallet.io.save.SaveClass ;
+
 /**
 	Designed for 2D transformations.
 */
-public class Matrix3
+public @SaveClass class Matrix3
 {
 	/**
 		Matrix3 functions are guaranteed to be called hundreds if 

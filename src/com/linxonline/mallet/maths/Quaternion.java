@@ -1,6 +1,8 @@
 package com.linxonline.mallet.maths ;
 
-public class Quaternion
+import com.linxonline.mallet.io.save.SaveClass ;
+
+public @SaveClass class Quaternion
 {
 	public float x = 0.0f ;
 	public float y = 0.0f ;

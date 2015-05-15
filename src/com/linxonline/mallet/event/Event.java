@@ -1,5 +1,7 @@
 package com.linxonline.mallet.event ;
 
+import com.linxonline.mallet.io.save.Save ;
+
 /*===========================================*/
 // Event
 // Used to store relevant data to pass to 
@@ -18,9 +20,9 @@ public final class Event<T>
 		}
 	} ;
 
-	private EventType eventType = null ;
-	private EventHandlerMeta meta = BLANK_META ;	// Information about sender
-	private T variable = null ;						// Event package contains data the reciever is interested in
+	private @Save EventType eventType = null ;
+	private @Save EventHandlerMeta meta = BLANK_META ;	// Information about sender
+	private @Save T variable = null ;						// Event package contains data the reciever is interested in
 
 	public Event()
 	{
@@ -55,7 +57,8 @@ public final class Event<T>
 	**/
 	public final void setEvent( final String _eventType, final T _object )
 	{
-		setEvent( _eventType, _object, null ) ;
+		setEvent( _object ) ;
+		setEventType( _eventType ) ;
 	}
 
 	/**
@@ -63,11 +66,26 @@ public final class Event<T>
 	**/
 	public final void setEvent( final String _eventType, final T _object, final EventHandlerMeta _meta )
 	{
-		eventType = EventType.get( _eventType ) ;
-		variable = _object ;
+		setEvent( _object ) ;
+		setEventType( _eventType ) ;
 		meta = ( _meta != null ) ? _meta : BLANK_META ;
 	}
 
+	public void setEventType( final EventType _eventType )
+	{
+		eventType = EventType.get( _eventType ) ;
+	}
+	
+	public void setEventType( final String _eventType )
+	{
+		eventType = EventType.get( _eventType ) ;
+	}
+
+	public void setEvent( final T _object )
+	{
+		variable = _object ;
+	}
+	
 	public final EventType getEventType()
 	{
 		return eventType ;
@@ -91,7 +109,8 @@ public final class Event<T>
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		buffer.append( "[Event Type: " + eventType ) ;
-		buffer.append( ", Meta: " + meta.getName() + "]" ) ;
+		buffer.append( ", Meta: " + meta.getName() ) ;
+		buffer.append( ", Event: " + variable.toString() + "]" ) ;
 		return buffer.toString() ;
 	}
 }

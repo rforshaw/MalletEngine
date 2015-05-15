@@ -50,77 +50,6 @@ import com.linxonline.mallet.io.save.* ;
 */
 public final class GameTestLoader extends GameLoader
 {
-	public static @SaveClass class TestObj
-	{
-		private final ArrayList<Vector2> arrayTest = new ArrayList<Vector2>() ;
-		private final int test1 ;
-		private final int test2 ;
-		private final float test3 ;
-		private final Vector2 test4 ;
-
-		public TestObj()
-		{
-			test1 = 0 ;
-			test2 = 0 ;
-			test3 = 0 ;
-			test4 = new Vector2() ;
-		}
-
-		public TestObj( final int _test1, final int _test2, final float _test3, final Vector2 _test4 )
-		{
-			arrayTest.add( new Vector2( 1, 2 ) ) ;
-			arrayTest.add( new Vector2( 3, 4 ) ) ;
-			test1 = _test1 ;
-			test2 = _test2 ;
-			test3 = _test3 ;
-			test4 = new Vector2( _test4 ) ;
-		}
-		
-		public String toString()
-		{
-			String text = "" ;
-			for( final Vector2 vec : arrayTest )
-			{
-				text += " Vec: " + vec.toString() ;
-			}
-			return "Test1: " + test1 + " Test2: " + test2 + " Test3: " + test3 + " Test4: " + test4 + " Array: " + text;
-		}
-	}
-
-	public static class ExtendTest extends TestObj
-	{
-		private @Save final int test5 ;
-		private @Save final String test6 ;
-		private @Save final HashMap<String, Vector2> test7 = new HashMap<String, Vector2>() ;
-		private @Save int[] test8 = { 1, 2, 3, 4 } ;
-		private @Save Vector2[] test9 = new Vector2[2] ;
-
-		public ExtendTest( final int _test1, final int _test2, final float _test3, final Vector2 _test4, final int _test5, final String _test6 )
-		{
-			super( _test1, _test2, _test3, _test4 ) ;
-			test5 = _test5 ;
-			test6 = _test6 ;
-			test7.put( "TEST", new Vector2( 567, 98 ) ) ;
-			test8[3] = 8 ;
-			test9[0] = new Vector2( 256, 256 ) ;
-			test9[1] = new Vector2( 512, 512 ) ;
-		}
-
-		public ExtendTest()
-		{
-			super() ;
-			test5 = 0 ;
-			test6 = "" ;
-			test9[0] = new Vector2() ;
-			test9[1] = new Vector2() ;
-		}
-
-		public String toString()
-		{
-			return super.toString() + " Test5 : " + test5 + " Test6: " + test6 + " Test7: " + test7.get( "TEST" ) + " Test8: " + test8[3] + " Test9 : " + test9[0] ;
-		}
-	}
-
 	public GameTestLoader() {}
 
 	@Override
@@ -129,21 +58,15 @@ public final class GameTestLoader extends GameLoader
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
 			//private final XInputLinux device = new XInputLinux( "/dev/input/js0" ) ;
-		
+
 			public void initGame()			// Called when state is started
 			{
-				/*final int[] array = new int[4] ;
-				array[0] = 1 ;
-				array[1] = 2 ;
-				array[2] = 3 ;
-				array[3] = 4 ;
-				Dump.dump( array, Format.JSON, "test.dump" ) ;*/
-				//final Vector2 test = new Vector2( 100, 100 ) ;
-				final ExtendTest test = new ExtendTest( 1, 2, 250.0f, new Vector2( 10, 10 ), 7890, "BOB" ) ;
-				Dump.dump( test, Format.JSON, "test.dump" ) ;
+				final Event<Matrix4> event = new Event( "BOB", new Matrix4() ) ;
+				Dump.dump( event, Format.JSON, "test.dump" ) ;
 
-				final ExtendTest built = ( ExtendTest )Build.build( "test.dump", Format.JSON ) ;
-				System.out.println( "Rebuilt: " + built ) ;
+				final Event<Matrix4> con = ( Event<Matrix4> )Build.build( "test.dump", Format.JSON ) ;
+				con.setEventType( con.getEventType() ) ;
+				System.out.println( con ) ;
 
 				/*device.setXInputListener( new XInputListener()
 				{

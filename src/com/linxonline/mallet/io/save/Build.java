@@ -6,9 +6,11 @@ import java.util.Map ;
 import java.lang.Class ;
 import java.lang.reflect.Field ;
 import java.lang.reflect.Array ;
+import java.lang.reflect.Constructor ;
 import java.lang.annotation.Annotation ;
 
 import java.lang.IllegalAccessException ;
+import java.lang.reflect.InvocationTargetException ;
 
 import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -83,7 +85,10 @@ public class Build
 				}
 				else
 				{
-					final Object object = clazz.newInstance() ;
+					final Constructor constructor = clazz.getDeclaredConstructor() ;
+					constructor.setAccessible( true ) ;
+
+					final Object object = constructor.newInstance() ;
 					insertFields( object, clazz, _obj ) ;
 					return object ;
 				}
@@ -101,6 +106,14 @@ public class Build
 				ex.printStackTrace() ;
 			}
 			catch( NoSuchFieldException ex )
+			{
+				ex.printStackTrace() ;
+			}
+			catch( NoSuchMethodException ex )
+			{
+				ex.printStackTrace() ;
+			}
+			catch( InvocationTargetException ex )
 			{
 				ex.printStackTrace() ;
 			}
