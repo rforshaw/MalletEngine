@@ -4,6 +4,7 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.Reference ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -16,7 +17,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	private static final int SOUND_NOT_SET = -1 ;
 
 	private @Save final HashMap<String, Event<Settings>> sounds = new HashMap<String, Event<Settings>>() ;
-	private Component.ReadyCallback toDestroy = null ;
+	private @Reference Component.ReadyCallback toDestroy = null ;
 
 	private @Save String defaultSound = null ;				// Name of the default sound, used as a fallback if all else fails.
 	private @Save String toPlaySound = null ;				// The Animation to be played, once the previous Anim ID is recieved.

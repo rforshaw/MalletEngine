@@ -5,7 +5,6 @@ import java.lang.annotation.Target ;
 import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 
-
 @Retention( RetentionPolicy.RUNTIME )
-@Target( ElementType.FIELD )			// Save a specific field
-public @interface Save {}
+@Target( ElementType.FIELD )			// Field is a reference, doesn't own the object being pointed to.
+public @interface Reference {}

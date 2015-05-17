@@ -1,6 +1,7 @@
 package com.linxonline.mallet.event ;
 
 import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.Reference ;
 
 /*===========================================*/
 // Event
@@ -20,9 +21,9 @@ public final class Event<T>
 		}
 	} ;
 
-	private @Save EventType eventType = null ;
-	private @Save EventHandlerMeta meta = BLANK_META ;	// Information about sender
-	private @Save T variable = null ;						// Event package contains data the reciever is interested in
+	private @Save @Reference EventType eventType = null ;
+	private @Save EventHandlerMeta meta = BLANK_META ;			// Information about sender
+	private @Save @Reference T variable = null ;				// Event package contains data the reciever is interested in
 
 	public Event()
 	{

@@ -3,6 +3,7 @@ package com.linxonline.mallet.event ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.io.save.SaveClass ;
+import com.linxonline.mallet.io.save.Reference ;
 import com.linxonline.mallet.io.save.NoSave ;
 
 import com.linxonline.mallet.util.logger.Logger ;
@@ -25,7 +26,7 @@ public @SaveClass class EventController implements EventHandler
 	private final String name ;
 	private @NoSave final EventMessenger messenger = new EventMessenger() ;
 	private final ArrayList<EventProcessor> processors = new ArrayList<EventProcessor>() ;
-	private @NoSave AddEventInterface addInterface = null ;
+	private @Reference AddEventInterface addInterface = null ;
 
 	public EventController()
 	{

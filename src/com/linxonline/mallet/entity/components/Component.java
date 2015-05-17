@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity.components ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.Reference ;
 
 import com.linxonline.mallet.entity.Entity ;
 
@@ -17,7 +18,7 @@ import com.linxonline.mallet.util.id.ID ;
 public abstract class Component implements SerialisableForm
 {
 	protected @Save final EventController componentEvents = new EventController() ;		// Handles events from parent
-	protected Entity parent = null ;													// Owner of this component
+	protected @Reference Entity parent = null ;											// Owner of this component
 	protected @Save final ID id ;														// Name and Group Name
 
 	public Component()

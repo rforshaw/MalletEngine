@@ -19,6 +19,10 @@ import com.linxonline.mallet.io.filesystem.* ;
 /**
 	Supports the exporting of Java Primitives, Collections, and Maps.
 	Will export classes that use @SaveClass, @NoSave, and @Save.
+	Current dump implementation does not handle references. For example, 
+	if two pointers point to the same object, then Dump will duplicate 
+	the same object for each pointer. Anything that has a reference to 
+	an object, but does not own it, should not save it out.
 */
 public class Dump
 {
@@ -553,6 +557,16 @@ public class Dump
 
 	private static boolean toSave( final Field _field, final Class _class )
 	{
+		final boolean isReference = ( _class.getAnnotation( Reference.class ) != null ) ;
+		if( isReference == true )
+		{
+			// Currently we do not want to save out references.
+			// A reference is a pointer to an object in which the 
+			// pointer does not have absolute control.
+			// For example, the Entity pointer, parent, in a Component.
+			return false ;
+		}
+	
 		final boolean saveClass = ( _class.getAnnotation( SaveClass.class ) != null ) ;
 		if( saveClass == true )
 		{

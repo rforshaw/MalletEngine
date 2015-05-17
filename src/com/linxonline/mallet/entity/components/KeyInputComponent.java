@@ -4,6 +4,7 @@ import java.util.HashMap ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.Reference ;
 
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.input.KeyInputListener ;
@@ -78,7 +79,7 @@ public class KeyInputComponent extends InputComponent
 
 	private static class Key
 	{
-		public @Save final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
+		public @Save @Reference final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
 
 		public Key( final KeyInputListener _listener )
 		{

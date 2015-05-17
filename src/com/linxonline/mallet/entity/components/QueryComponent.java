@@ -2,6 +2,8 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.io.save.Reference ;
+
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.event.* ;
@@ -9,7 +11,7 @@ import com.linxonline.mallet.util.settings.* ;
 
 public class QueryComponent extends Component
 {
-	private SearchInterface searchInterface = null ;
+	private @Reference SearchInterface searchInterface = null ;
 
 	public QueryComponent()
 	{
