@@ -1,14 +1,17 @@
 package com.linxonline.mallet.physics.primitives ;
 
+import com.linxonline.mallet.io.save.SaveClass ;
+import com.linxonline.mallet.io.save.NoSave ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public final class OBB
+public @SaveClass class OBB
 {
-	public static final int TOP_LEFT = 0 ;
-	public static final int TOP_RIGHT = 1 ;
-	public static final int BOTTOM_LEFT = 2 ;
-	public static final int BOTTOM_RIGHT = 3 ;
+	public @NoSave static final int TOP_LEFT = 0 ;
+	public @NoSave static final int TOP_RIGHT = 1 ;
+	public @NoSave static final int BOTTOM_LEFT = 2 ;
+	public @NoSave static final int BOTTOM_RIGHT = 3 ;
 
 	public float rotation = 0.0f ;
 	public Vector2 position = new Vector2() ;

@@ -1,12 +1,14 @@
 package com.linxonline.mallet.physics ;
 
-import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.io.save.SaveClass ;
+import com.linxonline.mallet.io.save.NoSave ;
 
+import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
-public final class ContactPoint
+public @SaveClass class ContactPoint
 {
-	public Hull collidedWith = null ;
+	public @NoSave Hull collidedWith = null ;
 	public Vector2 contactNormal = new Vector2( 0.0f, 0.0f ) ;
 	public float penetration = 0.0f ;
 	public boolean physical = true ;

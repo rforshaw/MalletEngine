@@ -2,6 +2,8 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.io.save.SaveClass ;
+
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.Event ;
 
@@ -11,7 +13,7 @@ import com.linxonline.mallet.physics.ContactPoint ;
 import com.linxonline.mallet.physics.primitives.* ;
 import com.linxonline.mallet.physics.hulls.* ;
 
-public class CollisionComponent extends Component
+public @SaveClass class CollisionComponent extends Component
 {
 	public final Hull hull ;
 	private final Vector2 oldPosition = new Vector2() ;

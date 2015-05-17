@@ -1,5 +1,7 @@
 package com.linxonline.mallet.input ;
 
+import com.linxonline.mallet.io.save.Save ;
+
 /**
 	Provides engine specific implementation of keycodes.
 	Because the keycodes used by the operating-system is unknown until
@@ -39,7 +41,7 @@ public enum KeyCode
 	GAMEPAD_A, GAMEPAD_B, GAMEPAD_X, GAMEPAD_Y, GAMEPAD_UP, GAMEPAD_DOWN, GAMEPAD_LEFT, GAMEPAD_RIGHT, GAMEPAD_START,
 	GAMEPAD_SELECT, GAMEPAD_R1, GAMEPAD_R2, GAMEPAD_L1, GAMEPAD_L2, GAMEPAD_STICK_1, GAMEPAD_STICK_2 ;
 
-	public final char character ;
+	public @Save final char character ;
 
 	private KeyCode()
 	{

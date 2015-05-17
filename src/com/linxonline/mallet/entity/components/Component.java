@@ -16,9 +16,9 @@ import com.linxonline.mallet.util.id.ID ;
 
 public abstract class Component implements SerialisableForm
 {
-	protected final EventController componentEvents = new EventController() ;	// Handles events from parent
-	protected Entity parent = null ;											// Owner of this component
-	protected @Save final ID id ;												// Name and Group Name
+	protected @Save final EventController componentEvents = new EventController() ;		// Handles events from parent
+	protected Entity parent = null ;													// Owner of this component
+	protected @Save final ID id ;														// Name and Group Name
 
 	public Component()
 	{

@@ -3,6 +3,8 @@ package com.linxonline.mallet.entity.components ;
 import java.util.HashMap ;
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.io.save.Save ;
+
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.input.KeyInputListener ;
 import com.linxonline.mallet.input.KeyCode ;
@@ -13,7 +15,7 @@ import com.linxonline.mallet.input.KeyCode ;
 **/
 public class KeyInputComponent extends InputComponent
 {
-	private final HashMap<KeyCode, Key> keys = new HashMap<KeyCode, Key>() ;
+	private @Save final HashMap<KeyCode, Key> keys = new HashMap<KeyCode, Key>() ;
 
 	public KeyInputComponent()
 	{
@@ -76,7 +78,7 @@ public class KeyInputComponent extends InputComponent
 
 	private static class Key
 	{
-		public final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
+		public @Save final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
 
 		public Key( final KeyInputListener _listener )
 		{

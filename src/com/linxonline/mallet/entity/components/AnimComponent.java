@@ -3,6 +3,8 @@ package com.linxonline.mallet.entity.components ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.io.save.Save ;
+
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.animation.AnimationFactory ;
@@ -13,18 +15,18 @@ public class AnimComponent extends EventComponent implements SourceCallback
 {
 	private static final int ANIM_NOT_SET = -1 ;
 
-	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
+	private @Save final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
 	private Component.ReadyCallback toDestroy = null ;
 
-	private String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
-	private String currentAnim = null ;			// Name of the current animation that is playing
-	private String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
+	private @Save String defaultAnim = null ;			// Name of the default animation, used as a fallback if all else fails.
+	private @Save String currentAnim = null ;			// Name of the current animation that is playing
+	private @Save String toPlayAnim = null ;			// The Animation to be played, once the previous Anim ID is recieved.
 	
-	private SourceCallback callback = null ;	// Allow an external source to track the running animation
+	private SourceCallback callback = null ;			// Allow an external source to track the running animation
 	private SourceCallback toCallback = null ;
 
-	private boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
-	private int animationID = -1 ;				// Denotes the id of the current running animation.
+	private @Save boolean waitForID = false ;			// true = waiting for animation ID, false = not waiting for ID
+	private @Save int animationID = -1 ;				// Denotes the id of the current running animation.
 
 	public AnimComponent()
 	{

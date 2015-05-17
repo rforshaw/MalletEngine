@@ -1,10 +1,13 @@
 package com.linxonline.mallet.physics.primitives ;
 
+import com.linxonline.mallet.io.save.SaveClass ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 
-public final class Circle
+public @SaveClass class Circle
 {
 	private final Vector2 temp = new Vector2() ;		// Used in intersectCircle
+
 	public final Vector2 position = new Vector2() ;
 	public final Vector2 offset = new Vector2() ;
 	public final float radius ;
