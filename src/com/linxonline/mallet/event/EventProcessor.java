@@ -16,13 +16,13 @@ public @SaveClass abstract class EventProcessor<T>
 	public EventProcessor()
 	{
 		name = "UNKNOWN" ;
-		type = null ;
+		type = Event.ALL_EVENT_TYPES ;
 	}
 
 	public EventProcessor( final String _name )
 	{
 		name = _name ;
-		type = null ;
+		type = Event.ALL_EVENT_TYPES ;
 	}
 
 	public EventProcessor( final String _name, final String _type )

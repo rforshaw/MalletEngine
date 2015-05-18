@@ -72,7 +72,7 @@ public class EventComponent extends Component
 
 	protected void initEventProcessor()
 	{
-		eventController.addEventProcessor( new EventProcessor()
+		eventController.addEventProcessor( new EventProcessor( "ROUTER" )
 		{
 			@Override
 			public void processEvent( final Event _event )

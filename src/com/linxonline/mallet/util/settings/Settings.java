@@ -4,6 +4,9 @@ import java.util.ArrayList ;
 import java.util.TreeMap ;
 import java.util.Collection ;
 
+import com.linxonline.mallet.io.save.Save ;
+import com.linxonline.mallet.io.save.NoSave ;
+
 import com.linxonline.mallet.io.serialisation.* ;
 
 /**
@@ -14,9 +17,9 @@ import com.linxonline.mallet.io.serialisation.* ;
 **/
 public final class Settings
 {
-	private final TreeMap<String, VariableInterface> variables = new TreeMap<String, VariableInterface>() ;
-	private static final NullPointerException exception = new NullPointerException() ;			// Defined as static to reduce creation time
-	private VariableInterface inter = null ;
+	private @NoSave final TreeMap<String, VariableInterface> variables = new TreeMap<String, VariableInterface>() ;
+	private @NoSave static final NullPointerException exception = new NullPointerException() ;			// Defined as static to reduce creation time
+	private @NoSave VariableInterface inter = null ;
 
 	public Settings() {}
 

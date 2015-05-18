@@ -21,7 +21,7 @@ import com.linxonline.mallet.util.logger.Logger ;
 **/
 public @SaveClass class EventController implements EventHandler
 {
-	private final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
+	private @NoSave final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
 
 	private final String name ;
 	private @NoSave final EventMessenger messenger = new EventMessenger() ;

@@ -1,6 +1,7 @@
 package com.linxonline.mallet.io.save ;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.Collection ;
 import java.util.Set ;
 import java.util.Map ;
@@ -54,6 +55,7 @@ public class Dump
 
 		public IOClass( final Object _obj, final Class _class )
 		{
+			System.out.println( "OBJ: " + _obj + " Class: " + _class ) ;
 			object = _obj ;
 			objectClass = _class ;
 
@@ -159,7 +161,7 @@ public class Dump
 
 	private static class JSONDump implements DumpFormat
 	{
-		private ArrayList<Object> saved = new ArrayList<Object>() ;
+		private final HashMap<String, Object> saved = new HashMap<String, Object>() ;
 
 		public boolean dump( final String _file, final IOClass _class )
 		{
@@ -172,7 +174,7 @@ public class Dump
 
 			final FileStream file = GlobalFileSystem.getFile( _file ) ;
 			final StringOutStream stream = file.getStringOutStream() ;
-			if( stream.writeLine( baseJSON.toString() ) == false )
+			if( stream.writeLine( baseJSON.toString( 4 ) ) == false )
 			{
 				System.out.println( "Failed to write out JSON to " + _file ) ;
 				saved.clear() ;
@@ -186,11 +188,11 @@ public class Dump
 
 		private boolean dump( final JSONObject _obj, final IOClass _class )
 		{
+			final String id = Integer.toHexString( System.identityHashCode( _class.object ) ) ;
+			saved.put( id, _class.object ) ;
+
 			_obj.put( "class", _class.objectClass.getName() ) ;
-			if( saved.contains( _class.object ) == false )
-			{
-				saved.add( _class.object ) ;
-			}
+			_obj.put( "id", id ) ;
 
 			if( _class.fields.isEmpty() == false )
 			{
@@ -378,16 +380,17 @@ public class Dump
 
 			if( isStatic( _field ) == true )
 			{
+				final String id = Integer.toHexString( System.identityHashCode( _field.get( _obj ) ) ) ;
 				// If a field is set as static 
 				// then we only want to save out 
 				// the field once, as it will be used 
 				// by all instances of the class.
-				if( saved.contains( _field.get( _obj ) ) == true )
+				if( saved.containsKey( id ) == true )
 				{
 					return true ;
 				}
 			}
-			
+
 			if( classType.isArray() == true )
 			{
 				return storeArrayField( _field, _fields, _fieldTypes, _obj ) ;
@@ -528,6 +531,11 @@ public class Dump
 	private static interface DumpFormat
 	{
 		public boolean dump( final String _file, final IOClass _class ) ;
+	}
+
+	private static boolean isReference( final Class _class )
+	{
+		return ( _class.getAnnotation( Reference.class ) != null ) ;
 	}
 
 	private static boolean isCollection( final Class _class )

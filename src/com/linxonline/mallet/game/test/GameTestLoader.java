@@ -61,12 +61,12 @@ public final class GameTestLoader extends GameLoader
 
 			public void initGame()			// Called when state is started
 			{
-				final Event<Matrix4> event = new Event( "BOB", new Matrix4() ) ;
+				/*final Event<Matrix4> event = new Event( "BOB", new Matrix4() ) ;
 				Dump.dump( event, Format.JSON, "test.dump" ) ;
 
 				final Event<Matrix4> con = ( Event<Matrix4> )Build.build( "test.dump", Format.JSON ) ;
 				con.setEventType( con.getEventType() ) ;
-				System.out.println( con ) ;
+				System.out.println( con ) ;*/
 
 				/*device.setXInputListener( new XInputListener()
 				{
@@ -244,7 +244,6 @@ public final class GameTestLoader extends GameLoader
 																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
-				//Dump.dump( entity, Format.JSON, "test.dump" ) ;
 			}
 
 			/**
@@ -268,6 +267,7 @@ public final class GameTestLoader extends GameLoader
 				entity.addComponent( collision ) ;
 
 				addEntity( entity ) ;
+				Dump.dump( entity, Format.JSON, "test.dump" ) ;
 			}
 		} ) ;
 
