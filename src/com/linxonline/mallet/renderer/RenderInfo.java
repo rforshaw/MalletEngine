@@ -69,6 +69,16 @@ public final class RenderInfo implements InputAdapterInterface
 		return Vector2.divide( renderDimensions, _dimensions ) ;
 	}
 
+	public float applyScreenOffsetX( final float _x )
+	{
+		return _x - screenOffset.x ;
+	}
+
+	public float applyScreenOffsetY( final float _y )
+	{
+		return _y - screenOffset.y ;
+	}
+
 	public float convertInputToRenderX( final float _x )
 	{
 		final float t1 = ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) - halfRenderDimensions.x ;

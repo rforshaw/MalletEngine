@@ -8,6 +8,8 @@ import java.awt.Point ;
 import java.awt.Cursor ;
 import java.awt.Toolkit ;
 
+import javax.media.opengl.awt.GLJPanel ;
+
 import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.audio.desktop.alsa.* ;
