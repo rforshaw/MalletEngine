@@ -20,29 +20,20 @@ import com.linxonline.mallet.system.* ;
 public class EventComponent extends Component
 {
 	protected @Save final EventController eventController = new EventController( id.toString() ) ;
-	protected @Save boolean sendToEntity = false ;			// Allows Events to be passed onto rest of Entity
 
 	public EventComponent()
 	{
 		super( "EVENT", "EVENTCOMPONENT" ) ;
-		initEventProcessor() ;
 	}
 
 	public EventComponent( final String _name )
 	{
 		super( _name, "EVENTCOMPONENT" ) ;
-		initEventProcessor() ;
 	}
 
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
-		initEventProcessor() ;
-	}
-
-	public void setSendToEntityComponents( final boolean _send )
-	{
-		sendToEntity = _send ;
 	}
 
 	@Override
@@ -68,22 +59,6 @@ public class EventComponent extends Component
 	public EventController getEventController()
 	{
 		return eventController ;
-	}
-
-	protected void initEventProcessor()
-	{
-		eventController.addEventProcessor( new EventProcessor( "ROUTER" )
-		{
-			@Override
-			public void processEvent( final Event _event )
-			{
-				if( sendToEntity == true )
-				{
-					// Sends the Event to the Entity's Internal Message pool
-					componentEvents.passEvent( _event ) ;
-				}
-			}
-		} ) ;
 	}
 
 	/**

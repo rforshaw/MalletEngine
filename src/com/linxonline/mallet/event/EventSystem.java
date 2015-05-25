@@ -43,14 +43,17 @@ public final class EventSystem implements AddEventInterface
 			return ;
 		}
 
+		handlers.add( _handler ) ;
+
 		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
-		if( types.isEmpty() == true )
+		if( types.isEmpty() == true || types.contains( Event.ALL_EVENT_TYPES ) == true )
 		{
-			// Due to legacy reasons, getWantedEventTypes would be default return Event.ALL_EVENT_TYPES
-			// Because wantedTypes is populated when an EventProcessord are added
-			// we will assumme that a types size of zero, means the developer is looking to 
-			// recieve all Events.
+			// Due to legacy we must assumme that a types size of 0, 
+			// represents a developer wishing to recieve all Events.
+			// If the types contains ALL_EVENT_TYPES then only add it 
+			// to the ALL_EVENT_TYPES EventQueue.
 			eventQueues.get( Event.ALL_EVENT_TYPES ).addEventHandler( _handler ) ;
+			return ;
 		}
 
 		for( final EventType type : types )
@@ -62,8 +65,6 @@ public final class EventSystem implements AddEventInterface
 
 			eventQueues.get( type ).addEventHandler( _handler ) ;
 		}
-
-		handlers.add( _handler ) ;
 	}
 
 	/**

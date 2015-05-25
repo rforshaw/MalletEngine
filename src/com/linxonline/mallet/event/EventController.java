@@ -75,7 +75,7 @@ public @SaveClass class EventController implements EventHandler
 
 	/**
 		Should be called during an update.
-		Override useEvent() if you wish to use the Events passed in
+		Override processEvent() if you wish to use the Events passed in
 	**/
 	public void update()
 	{
