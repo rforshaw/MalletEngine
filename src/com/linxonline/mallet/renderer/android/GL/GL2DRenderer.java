@@ -16,6 +16,7 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.renderer.android.* ;
@@ -35,8 +36,9 @@ public class GL2DRenderer implements RenderInterface,
 	@Override
 	public void onSurfaceCreated( GL10 _unused, EGLConfig _config )
 	{
-		System.out.println( "Render Context available" ) ;
-		render.start() ;
+		System.out.println( "onSurfaceCreated()" ) ;
+		shutdown() ;
+		start() ;
 		surfaceCreated.informOnce() ;
 	}
 
@@ -49,11 +51,25 @@ public class GL2DRenderer implements RenderInterface,
 	@Override
 	public void onSurfaceChanged( GL10 _unused, int _width, int _height)
 	{
-		render.setDisplayDimensions( _width, _height ) ;
+		System.out.println( "onSurfaceChanged()" ) ;
+		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", _width ) ;
+		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", _height ) ;
+
+		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
+		GlobalConfig.addInteger( "DISPLAYHEIGHT", _height ) ;
+
+		GlobalConfig.addInteger( "RENDERWIDTH", renderWidth ) ;
+		GlobalConfig.addInteger( "RENDERHEIGHT", renderHeight ) ;
+
+		setDisplayDimensions( _width, _height ) ;
+		setRenderDimensions( renderWidth, renderHeight ) ;
 	}
 
 	@Override
-	public void start() {}
+	public void start()
+	{
+		render.start() ;
+	}
 
 	@Override
 	public void shutdown()

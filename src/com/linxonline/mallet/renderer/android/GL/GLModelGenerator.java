@@ -11,6 +11,11 @@ public class GLModelGenerator
 {
 	private final static GLModelManager models = new GLModelManager() ;
 
+	public static void clear()
+	{
+		models.clear() ;
+	}
+	
 	public static Model genPlaneModel( final String _name, final Vector2 _dim )
 	{
 		return genPlaneModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;

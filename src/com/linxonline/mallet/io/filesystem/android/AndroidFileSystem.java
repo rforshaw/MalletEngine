@@ -151,11 +151,11 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public FileStream getFile( final String _path )
 	{
-		//System.out.println( "GET FILE: " + _path ) ;
+		System.out.println( "GET FILE: " + _path ) ;
 
 		if( mapZip.containsKey( _path ) == true )
 		{
-			//System.out.println( "FileStream ZIP: " + _path ) ;
+			System.out.println( "FileStream ZIP: " + _path ) ;
 			try
 			{
 				return new AndroidZipFile( mapZip.get( _path ) ) ;
@@ -167,7 +167,7 @@ public class AndroidFileSystem implements FileSystem
 		}
 		else if( mapAssets.containsKey( _path ) == true )
 		{
-			//System.out.println( "FileStream Asset: " + _path ) ;
+			System.out.println( "FileStream Asset: " + _path ) ;
 			return new AndroidAssetFile( _path, assetManager ) ;
 		}
 

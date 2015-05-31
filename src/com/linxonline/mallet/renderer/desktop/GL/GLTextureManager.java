@@ -286,19 +286,24 @@ public class GLTextureManager extends AbstractManager<Texture>
 			synchronized( imageMetas )
 			{
 				MalletTexture.Meta meta = imageMetas.get( _path ) ;
-				if( meta == null )
+				if( meta != null)
 				{
-					final FileStream file = GlobalFileSystem.getFile( _path ) ;
-					if( file.exists() == true )
-					{
-						final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
-						meta = createMeta( _path, desktopIn.getInputStream() ) ;
-						if( meta != null )
-						{
-							imageMetas.put( _path, meta ) ;
-							return meta ;
-						}
-					}
+					return meta ;
+				}
+
+				final FileStream file = GlobalFileSystem.getFile( _path ) ;
+				if( file.exists() == false )
+				{
+					Logger.println( "No Texture found to create Meta: " + _path, Logger.Verbosity.NORMAL ) ;
+					return new MalletTexture.Meta( _path, 0, 0 ) ;
+				}
+
+				final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
+				meta = createMeta( _path, desktopIn.getInputStream() ) ;
+				if( meta != null )
+				{
+					imageMetas.put( _path, meta ) ;
+					return meta ;
 				}
 			}
 

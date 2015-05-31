@@ -175,28 +175,30 @@ public class GLTextureManager extends AbstractManager<Texture>
 			FileStream would need to be updated to support 
 			file modification timestamps.
 		*/
-		public MalletTexture.Meta getMeta( final String _path )
+		public synchronized MalletTexture.Meta getMeta( final String _path )
 		{
-			synchronized( imageMetas )
+			MalletTexture.Meta meta = imageMetas.get( _path ) ;
+			if( meta != null )
 			{
-				MalletTexture.Meta meta = imageMetas.get( _path ) ;
-				if( meta == null )
-				{
-					final FileStream file = GlobalFileSystem.getFile( _path ) ;
-					if( file.exists() == true )
-					{
-						final AndroidByteIn desktopIn = ( AndroidByteIn )file.getByteInStream() ;
-						meta = createMeta( _path, desktopIn.getInputStream() ) ;
-						if( meta != null )
-						{
-							imageMetas.put( _path, meta ) ;
-							return meta ;
-						}
-					}
-				}
+				return meta ;
 			}
 
-			Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
+			final FileStream file = GlobalFileSystem.getFile( _path ) ;
+			if( file.exists() == false )
+			{
+				Logger.println( "No Texture found to create Meta: " + _path, Logger.Verbosity.NORMAL ) ;
+				return new MalletTexture.Meta( _path, 0, 0 ) ;
+			}
+
+			final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
+			meta = createMeta( _path, in.getInputStream() ) ;
+			if( meta != null )
+			{
+				imageMetas.put( _path, meta ) ;
+				return meta ;
+			}
+
+			Logger.println( "Unable to create meta data: " + _path, Logger.Verbosity.NORMAL ) ;
 			return new MalletTexture.Meta( _path, 0, 0 ) ;
 		}
 

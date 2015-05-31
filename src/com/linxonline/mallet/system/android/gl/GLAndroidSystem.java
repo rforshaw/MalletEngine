@@ -39,11 +39,11 @@ public class GLAndroidSystem implements SystemInterface
 	{
 		activity = _activity ;
 		renderer = new GL2DSurfaceView( _activity, _notify ) ;
+		setContentView() ;
 	}
 
 	public void initSystem()
 	{
-		setContentView() ;
 		inputSystem.inputAdapter = renderer.renderer.render.renderInfo ;
 		activity.addAndroidInputListener( inputSystem ) ;
 	}
@@ -61,7 +61,10 @@ public class GLAndroidSystem implements SystemInterface
 	}
 
 	@Override
-	public synchronized void startSystem() {}
+	public synchronized void startSystem()
+	{
+		//renderer.onResume() ;
+	}
 
 	@Override
 	public synchronized void stopSystem() {}
@@ -69,9 +72,8 @@ public class GLAndroidSystem implements SystemInterface
 	@Override
 	public synchronized void shutdownSystem()
 	{
-		activity.finish() ;
 		audioGenerator.shutdownGenerator() ;
-		renderer.renderer.shutdown() ;
+		//renderer.onPause() ;
 	}
 
 	/*INPUT HOOK*/
@@ -135,7 +137,8 @@ public class GLAndroidSystem implements SystemInterface
 		}
 		catch( InterruptedException ex )
 		{
-			ex.printStackTrace() ;
+			Thread.currentThread().interrupt() ;
+			//ex.printStackTrace() ;
 		}
 	}
 

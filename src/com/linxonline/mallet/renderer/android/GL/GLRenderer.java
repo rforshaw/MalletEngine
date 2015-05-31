@@ -26,8 +26,8 @@ public class GLRenderer extends Basic2DRender
 
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 
-	protected final static GLTextureManager textures = new GLTextureManager() ;
-	protected static GLFontManager fontManager = new GLFontManager( textures ) ;
+	protected final GLTextureManager textures = new GLTextureManager() ;
+	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
 	protected int numID = 0 ;
@@ -72,7 +72,10 @@ public class GLRenderer extends Basic2DRender
 	public void shutdown()
 	{
 		clear() ;			// Clear the contents being rendered
-		clean() ;			// Remove the resources that were in use
+
+		textures.clear() ;
+		fontManager.clear() ;
+		GLModelGenerator.clear() ;
 	}
 
 	private void initGraphics()
@@ -124,7 +127,7 @@ public class GLRenderer extends Basic2DRender
 			}
 		} ) ;
 	}
-	
+
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{

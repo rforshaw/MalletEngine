@@ -267,7 +267,6 @@ public final class GameTestLoader extends GameLoader
 				entity.addComponent( collision ) ;
 
 				addEntity( entity ) ;
-				Dump.dump( entity, Format.JSON, "test.dump" ) ;
 			}
 		} ) ;
 

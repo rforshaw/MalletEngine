@@ -48,12 +48,13 @@ public class AndroidActivity extends Activity
 				// Only start the game thread once we know the 
 				// OpenGL context has been initialised.
 				// Only 2 things will call inform(), onSurfaceCreated & onResume
+				System.out.println( "Inform: Starting Game Thread." ) ;
 				startGameThread() ;
 			}
 		}
 	} ;
 
-	protected AndroidStarter starter ;
+	protected AndroidStarter starter = null ;
 	protected Thread gameThread = null ;
 
 	public AndroidActivity()
@@ -64,9 +65,10 @@ public class AndroidActivity extends Activity
 	@Override
 	public void onCreate( Bundle _savedInstance )
 	{
+		System.out.println( "onCreate()" ) ;
 		requestWindowFeature( Window.FEATURE_NO_TITLE ) ;
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
-									   WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
+							  WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		super.onCreate( _savedInstance ) ;
 
 		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
@@ -95,14 +97,16 @@ public class AndroidActivity extends Activity
 	{
 		System.out.println( "onPause()" ) ;
 		super.onPause() ;
+
 		stopGameThread() ;
+		starter.getAndroidSystem().stopSystem() ;
+		starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 
 	public void onDestroy()
 	{
 		System.out.println( "onDestroy()" ) ;
 		super.onDestroy() ;
-		starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 	
 	public void addAndroidInputListener( AndroidInputListener _listener )
@@ -162,14 +166,6 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public void onConfigurationChanged( Configuration _newConfig )
-	{
-		super.onConfigurationChanged( _newConfig ) ;
-		final GLAndroidSystem system = ( GLAndroidSystem )starter.getAndroidSystem() ;
-		system.setContentView() ;	// Update the render for new Screen Dimensions
-	}
-
-	@Override
 	public void processEvent( final Event _event ) {}
 
 	@Override
@@ -200,7 +196,6 @@ public class AndroidActivity extends Activity
 			{
 				public void run() 
 				{
-					starter.getAndroidSystem().startSystem() ;
 					starter.run() ;
 				}
 			} ;

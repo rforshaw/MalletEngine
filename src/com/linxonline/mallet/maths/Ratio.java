@@ -38,6 +38,11 @@ public final class Ratio
 	*/
 	public static Ratio calculateRatio( final int _a, final int _b )
 	{
+		if( _a == 0 || _b == 0 )
+		{
+			return new Ratio( 0, 0 ) ;
+		}
+
 		final int ratio = Ratio.gcd( _a, _b ) ;
 		return new Ratio( _a / ratio, _b / ratio ) ;
 	}

@@ -174,7 +174,7 @@ public class Dump
 
 			final FileStream file = GlobalFileSystem.getFile( _file ) ;
 			final StringOutStream stream = file.getStringOutStream() ;
-			if( stream.writeLine( baseJSON.toString( 4 ) ) == false )
+			if( stream.writeLine( baseJSON.toString() ) == false )
 			{
 				System.out.println( "Failed to write out JSON to " + _file ) ;
 				saved.clear() ;
@@ -285,49 +285,49 @@ public class Dump
 			{
 				case CHAR    :
 				{
-					_obj.put( "value", ( char )_val ) ;
+					_obj.put( "value", ( Character )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case BYTE    :
 				{
-					_obj.put( "value", ( byte )_val ) ;
+					_obj.put( "value", ( Byte )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case INT     :
 				{
-					_obj.put( "value", ( int )_val ) ;
+					_obj.put( "value", ( Integer )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case SHORT   :
 				{
-					_obj.put( "value", ( short )_val ) ;
+					_obj.put( "value", ( Short )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case LONG    :
 				{
-					_obj.put( "value", ( long )_val ) ;
+					_obj.put( "value", ( Long )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case FLOAT   :
 				{
-					_obj.put( "value", ( float )_val ) ;
+					_obj.put( "value", ( Float )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case DOUBLE  :
 				{
-					_obj.put( "value", ( double )_val ) ;
+					_obj.put( "value", ( Double )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}
 				case BOOLEAN :
 				{
-					_obj.put( "value", ( boolean )_val ) ;
+					_obj.put( "value", ( Boolean )_val ) ;
 					_obj.put( "type", primType.toString() ) ;
 					return true ;
 				}

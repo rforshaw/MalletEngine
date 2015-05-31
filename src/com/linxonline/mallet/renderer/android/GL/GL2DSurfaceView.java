@@ -13,12 +13,18 @@ public class GL2DSurfaceView extends GLSurfaceView
 	{
 		super( _context ) ;
 		setEGLContextClientVersion( 1 ) ;
+		//setPreserveEGLContextOnPause( true ) ;
 		renderer = new GL2DRenderer( _notify ) ;
 
 		setRenderer( renderer ) ;
 		setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY ) ;
 	}
 
+	public void shutdown()
+	{
+		renderer.shutdown() ;
+	}
+	
 	public void draw( final float _dt )
 	{
 		renderer.draw( _dt ) ;

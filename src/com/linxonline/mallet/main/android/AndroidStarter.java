@@ -48,7 +48,11 @@ public class AndroidStarter extends StarterInterface
 		loadFileSystem( new AndroidFileSystem( ( ( GLAndroidSystem )backendSystem ).activity ) ) ;						// Ensure FileSystem is setup correctly.
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
 		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
+	}
 
+	public void run()
+	{
+		backendSystem.startSystem() ;
 		setRenderSettings( backendSystem ) ;
 
 		// Load the Game-States into the Game-System
@@ -57,10 +61,7 @@ public class AndroidStarter extends StarterInterface
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
-	}
 
-	public void run()
-	{
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
 		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
@@ -107,24 +108,7 @@ public class AndroidStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
-		final DisplayMetrics display = new DisplayMetrics() ;
-		( ( GLAndroidSystem )backendSystem ).activity.getWindowManager().getDefaultDisplay().getMetrics( display ) ; 
-		final int width = display.widthPixels ;
-		final int height = display.heightPixels ;
-
-		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", width ) ;
-		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", height ) ;
-
-		GlobalConfig.addInteger( "DISPLAYWIDTH", width ) ;
-		GlobalConfig.addInteger( "DISPLAYHEIGHT", height ) ;
-
-		GlobalConfig.addInteger( "RENDERWIDTH", renderWidth ) ;
-		GlobalConfig.addInteger( "RENDERHEIGHT", renderHeight ) ;
-
 		final RenderInterface render = _system.getRenderInterface() ;
-		render.setDisplayDimensions( width, height ) ;
-		render.setRenderDimensions( width, height ) ;
-
 		render.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 	}
 
