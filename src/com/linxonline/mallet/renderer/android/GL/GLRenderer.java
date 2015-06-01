@@ -65,17 +65,18 @@ public class GLRenderer extends Basic2DRender
 	@Override
 	public void start()
 	{
+		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		initGraphics() ;
 	}
 
 	@Override
 	public void shutdown()
 	{
-		clear() ;			// Clear the contents being rendered
-
-		textures.clear() ;
-		fontManager.clear() ;
-		GLModelGenerator.clear() ;
+		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
+		clear() ;							// Clear the contents being rendered
+		textures.shutdown() ;
+		//fontManager.shutdown() ;
+		GLModelGenerator.shutdown() ;
 	}
 
 	private void initGraphics()

@@ -26,7 +26,8 @@ public class GLImage implements ImageInterface
 	{
 		return height ;
 	}
-	
+
+	@Override
 	public final void destroy()
 	{
 		final int[] textures = new int[1] ;

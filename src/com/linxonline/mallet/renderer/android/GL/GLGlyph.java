@@ -16,7 +16,13 @@ public class GLGlyph extends Glyph
 	{
 		model = _model ;
 	}
-	
+
+	@Override
+	public void destroy()
+	{
+		model.destroy() ;
+	}
+
 	public GLGeometry getGLGeometry()
 	{
 		return model.getGeometry( GLGeometry.class ) ;

@@ -43,8 +43,18 @@ public class GLFontMap extends Resource
 		return fontMap.texture.getImage() ;
 	}
 
-	public int getHeight() { return fontMap.getHeight() ; }
+	public int getHeight()
+	{
+		return fontMap.getHeight() ;
+	}
 
+	@Override
+	public void destroy()
+	{
+		fontMap.destroy() ;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return fontMap.toString() ;
