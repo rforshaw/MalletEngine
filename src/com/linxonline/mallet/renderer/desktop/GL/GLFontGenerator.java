@@ -59,6 +59,9 @@ public class GLFontGenerator
 			final int height = metrics.getHeight() ;
 			final float x1 = ( float )( start * point ) ;
 			final float x2 = ( float )( ( start + advance ) * point ) ;
+			
+			// Must be destroyed manually destroyed, as not added to the 
+			// ModelManager automatically. 
 			final Model model = GLModelGenerator.genPlaneModel( new Vector2( advance, height ),
 																new Vector2( x1, 0.0f ),
 																new Vector2( x2, 1.0f ) ) ;
@@ -67,6 +70,8 @@ public class GLFontGenerator
 		}
 
 		// Create a GLFontMap and wrap it around a FontMap
+		// buffer is not automatically destroyed by TextureManager,
+		// must be manually destroyed.
 		return new GLFontMap( new FontMap( glyphs, manager.bind( buffer ), metrics.getHeight() ) ) ;
 	}
 

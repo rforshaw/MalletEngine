@@ -2,6 +2,12 @@ package com.linxonline.mallet.resources ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
+/**
+	Provide a consistant interface for loading resources.
+	All resource loading managers should implement this 
+	interface, or use AbstractManager for a general 
+	implementation that will cover most cases.
+*/
 public interface ManagerInterface<T>
 {
 	public boolean add( final String _key, final T _value ) ;			// Map T to _key

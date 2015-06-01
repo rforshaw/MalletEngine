@@ -15,6 +15,12 @@ public class Glyph implements SortInterface
 		advance = _advance ;
 	}
 
+	/**
+		If the glyph is hooked to an underlying system,
+		then use destroy to unhook it.
+	**/
+	public void destroy() {}
+	
 	@Override
 	public int sortValue()
 	{

@@ -63,6 +63,19 @@ public class FontMap<T extends ImageInterface>
 		return height ;
 	}
 
+	public void destroy()
+	{
+		texture.destroy() ;
+		for( final Glyph glyph : glyphs )
+		{
+			if( glyph != null )
+			{
+				glyph.destroy() ;
+			}
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

@@ -11,6 +11,11 @@ public class GLModelGenerator
 {
 	private final static GLModelManager models = new GLModelManager() ;
 
+	public static void shutdown()
+	{
+		models.shutdown() ;
+	}
+	
 	public static Model genPlaneModel( final String _name, final Vector2 _dim )
 	{
 		return genPlaneModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;
@@ -18,6 +23,7 @@ public class GLModelGenerator
 
 	/**
 		Create a Quad made from 2 triangles.
+		Added to ModelManager and registered.
 	*/
 	public static Model genPlaneModel( final String _name, final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
 	{
@@ -32,6 +38,10 @@ public class GLModelGenerator
 		return model ;
 	}
 
+	/**
+		Create a Quad made from 2 triangles.
+		NOT added to ModelManager or registered.
+	*/
 	public static Model genPlaneModel( final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
 	{
 		final GLGeometry geometry = new GLGeometry( 6, 4 ) ;
@@ -66,9 +76,10 @@ public class GLModelGenerator
 
 		return _model ;
 	}
-	
+
 	/**
-		Create a Geometric Line
+		Create a Geometric Line.
+		Added to ModelManager and registered.
 	*/
 	public static Model genLineModel( final String _name, final Line _line )
 	{
@@ -82,7 +93,11 @@ public class GLModelGenerator
 		model.register() ;
 		return model ;
 	}
-	
+
+	/**
+		Create a Geometric Line.
+		NOT added to ModelManager and registered.
+	*/
 	public static Model genLineModel( final Line _line )
 	{
 		final GLGeometry geometry = new GLGeometry( 2, 2 ) ;

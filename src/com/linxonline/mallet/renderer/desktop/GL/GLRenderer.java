@@ -79,6 +79,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void start()
 	{
+		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		initGraphics() ;
 		initDrawCalls() ;
 		initAssist() ;
@@ -87,8 +88,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void shutdown()
 	{
-		clear() ;			// Clear the contents being rendered
-		clean() ;			// Remove the resources that were in use
+		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
+		clear() ;							// Clear the contents being rendered
+		GLModelGenerator.shutdown() ;
+		textures.shutdown() ;
+		fontManager.shutdown() ;
 	}
 
 	private void initGraphics()

@@ -162,6 +162,7 @@ public class GLGeometry implements GeometryInterface
 		return indexBuffer ;
 	}
 
+	@Override
 	public void destroy()
 	{
 		System.out.println( "Removing Geometry.." ) ;

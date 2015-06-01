@@ -84,7 +84,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	}
 
 	/**
-		Iterates over all Resource and destroying them.
+		Iterates over all Resource and destroy them.
 		Then clearing the HashMap
 	**/
 	@Override
@@ -99,7 +99,10 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	}
 
 	@Override
-	public void shutdown() {}
+	public void shutdown()
+	{
+		clear() ;
+	}
 
 	protected boolean exists( final String _file )
 	{
@@ -114,6 +117,12 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return buffer.toString() ;
 	}
 
+	/**
+		AbstractLoader handles ResourceDelegate's available by this 
+		AbstractManager. When extending AbstractManager, call getResourceLoader()
+		and add the appropriate ResourceDelegate's to it.
+		Checkout GLTextureManager as an example.
+	*/
 	public class AbstractLoader<T extends Resource> implements ResourceLoader<T>
 	{
 		private final ArrayList<ResourceDelegate<T>> loaders = new ArrayList<ResourceDelegate<T>>() ;

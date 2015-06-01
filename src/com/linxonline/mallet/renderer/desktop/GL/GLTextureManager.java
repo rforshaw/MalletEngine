@@ -63,45 +63,16 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 			protected Texture loadTextureASync( final String _file )
 			{
-				final FileStream file = GlobalFileSystem.getFile( _file ) ;
-				if( file.exists() == false )
-				{
-					Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
-					return null ;
-				}
-
-				final Thread load = new Thread( "LOAD_TEXTURE" )
-				{
-					public void run()
-					{
-						try
-						{
-							final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
-							final InputStream stream = in.getInputStream() ;
-							final BufferedImage image = ImageIO.read( stream ) ;
-							in.close() ;
-
-							synchronized( toBind )
-							{
-								// We don't want to bind the BufferedImage now
-								// as that will take control of the OpenGL context.
-								toBind.add( new Tuple<String, BufferedImage>( _file, image ) ) ;
-							}
-						}
-						catch( IOException ex )
-						{
-							ex.printStackTrace() ;
-						}
-					}
-				} ;
-
 				// We want to allocate the key for the resource so the texture 
 				// is not reloaded if another object wishes to use it before 
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
 				add( _file, null ) ;
+
+				TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
 				load.start() ;
+
 				return null ;
 			}
 		} ) ;
@@ -112,6 +83,10 @@ public class GLTextureManager extends AbstractManager<Texture>
 	{
 		synchronized( toBind )
 		{
+			// GLRenderer will continuosly call get() untill it 
+			// recieves a Texture, so we only need to bind 
+			// textures that are waiting for the OpenGL context 
+			// when the render requests it.
 			for( final Tuple<String, BufferedImage> tuple : toBind )
 			{
 				add( tuple.getLeft(), bind( tuple.getRight() ) ) ;
@@ -122,6 +97,9 @@ public class GLTextureManager extends AbstractManager<Texture>
 		final Texture texture = super.get( _file ) ;
 		if( texture != null )
 		{
+			// Register the texture for being used.
+			// The renderer should call unregister when 
+			// the calling Render Event is no longer being used.
 			texture.register() ;
 		}
 
@@ -266,6 +244,11 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return id[0] ;
 	}
 
+	/**
+		Retains meta information about textures.
+		A texture can be loaded and used by the renderer,
+		without storing the meta data.
+	*/
 	protected static class MetaGenerator
 	{
 		private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
@@ -298,17 +281,26 @@ public class GLTextureManager extends AbstractManager<Texture>
 					return new MalletTexture.Meta( _path, 0, 0 ) ;
 				}
 
-				final DesktopByteIn desktopIn = ( DesktopByteIn )file.getByteInStream() ;
-				meta = createMeta( _path, desktopIn.getInputStream() ) ;
-				if( meta != null )
-				{
-					imageMetas.put( _path, meta ) ;
-					return meta ;
-				}
+				return addMeta( _path, createMeta( _path, file ) ) ; 
+			}
+		}
+
+		private MalletTexture.Meta addMeta( final String _path, final MalletTexture.Meta _meta )
+		{
+			if( _meta != null )
+			{
+				imageMetas.put( _path, _meta ) ;
+				return _meta ;
 			}
 
 			Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
 			return new MalletTexture.Meta( _path, 0, 0 ) ;
+		}
+
+		private MalletTexture.Meta createMeta( final String _path, final FileStream _file )
+		{
+			final DesktopByteIn desktopIn = ( DesktopByteIn )_file.getByteInStream() ;
+			return createMeta( _path, desktopIn.getInputStream() ) ;
 		}
 
 		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
@@ -339,6 +331,46 @@ public class GLTextureManager extends AbstractManager<Texture>
 			}
 
 			return null ;
+		}
+	}
+
+	private class TextureThread extends Thread
+	{
+		private final String texturePath ;
+
+		public TextureThread( final String _name, final String _file )
+		{
+			super( _name ) ;
+			texturePath = _file ;
+		}
+
+		public void run()
+		{
+			final FileStream file = GlobalFileSystem.getFile( texturePath ) ;
+			if( file.exists() == false )
+			{
+				Logger.println( "Failed to create Texture: " + texturePath, Logger.Verbosity.NORMAL ) ;
+				return ;
+			}
+		
+			try
+			{
+				final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
+				final InputStream stream = in.getInputStream() ;
+				final BufferedImage image = ImageIO.read( stream ) ;
+				in.close() ;
+
+				synchronized( toBind )
+				{
+					// We don't want to bind the BufferedImage now
+					// as that will take control of the OpenGL context.
+					toBind.add( new Tuple<String, BufferedImage>( texturePath, image ) ) ;
+				}
+			}
+			catch( IOException ex )
+			{
+				ex.printStackTrace() ;
+			}
 		}
 	}
 }
