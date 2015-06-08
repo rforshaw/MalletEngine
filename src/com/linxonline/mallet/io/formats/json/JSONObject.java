@@ -1,5 +1,8 @@
 package com.linxonline.mallet.io.formats.json ;
 
+import com.linxonline.mallet.io.filesystem.FileStream ;
+import com.linxonline.mallet.io.filesystem.StringInStream ;
+
 /**
 	A wrapper class around a platform specific implementation 
 	of the JSON format.
@@ -20,6 +23,27 @@ public abstract class JSONObject
 	public static JSONObject construct()
 	{
 		return constructor.create() ;
+	}
+
+	/**
+		Create a JSON Object/s from file stream.
+	*/
+	public static JSONObject construct( final FileStream _file )
+	{
+		final StringInStream stream = _file.getStringInStream() ;
+		if( stream == null )
+		{
+			return constructor.create( "" ) ;
+		}
+
+		final StringBuilder builder = new StringBuilder() ;
+		String line = null ;
+		while( ( line = stream.readLine() ) != null )
+		{
+			builder.append( line ) ;
+		}
+
+		return constructor.create( builder.toString() ) ;
 	}
 
 	/**
