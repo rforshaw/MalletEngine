@@ -47,12 +47,17 @@ public abstract class InputComponent extends Component implements InputHandler
 		_events.add( event ) ;
 	}
 
-	public void passInputEvent( final InputEvent _event )
+	/**
+		Extend function if you wish to determine whether to 
+		Consume or Propagate an Input Event.
+		Consuming an InputEvent is benificial for UIs, is it will 
+		prevent the InputEvent from being processed by other InputHandlers.
+	*/
+	@Override
+	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		synchronized( inputs )
-		{
-			inputs.add( _event ) ;
-		}
+		inputs.add( _event ) ;
+		return InputEvent.Action.PROPAGATE ;
 	}
 
 	@Override

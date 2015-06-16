@@ -23,8 +23,8 @@ public class InputState implements InputSystemInterface,
 
 	private InputAdapterInterface inputAdapter = null ;
 	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
-	private ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
-	private InputEvent event = null ;
+
+	private boolean hasInputs = false ;
 	private InputHandler handler = null ;
 
 	public InputState() {}
@@ -60,39 +60,36 @@ public class InputState implements InputSystemInterface,
 	}
 
 	@Override
-	public final void passInputEvent( final InputEvent _event )
+	public final InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( inputs.size() > MAX_QUEUE_THRESHOLD )
+		hasInputs = true ;
+		final int handlerSize = handlers.size() ;
+		for( int j = 0; j < handlerSize; ++j )
 		{
-			System.out.println( "InputState: INPUT EVENT, THRESHHOLD REACHED" ) ;
-			inputs.clear() ;
+			handler = handlers.get( j ) ;
+			switch( handler.passInputEvent( _event ) )
+			{
+				case PROPAGATE : continue ;
+				case CONSUME   : return InputEvent.Action.CONSUME ;
+			}
 		}
 
-		inputs.add( _event ) ;
+		return InputEvent.Action.PROPAGATE ;
 	}
 
 	@Override
 	public final void update()
 	{
-		final int size = inputs.size() ;
-		final int handlerSize = handlers.size() ;
-
-		for( int i = 0; i < size; ++i )
-		{
-			event = inputs.get( i ) ;
-			for( int j = 0; j < handlerSize; ++j )
-			{
-				handler = handlers.get( j ) ;
-				handler.passInputEvent( event ) ;
-			}
-		}
-
-		inputs.clear() ;
+		// InputState use to retain a collection of inputs
+		// now inputs are directly transfered to InputHandlers.
+		// When update is called we reset hasInputs as the 
+		// InputHandlers will be processing the inputs soon.
+		hasInputs = false ;
 	}
 
 	public final boolean hasInputs()
 	{
-		return !( inputs.isEmpty() ) ;
+		return hasInputs ;
 	}
 
 	@Override
@@ -104,7 +101,7 @@ public class InputState implements InputSystemInterface,
 	@Override
 	public final void clearInputs()
 	{
-		inputs.clear() ;
+		// Input State does not retain inputs anymore.
 	}
 
 	private final boolean exists( InputHandler _handler )

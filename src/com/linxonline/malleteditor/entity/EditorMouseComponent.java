@@ -26,7 +26,7 @@ public class EditorMouseComponent extends MouseComponent
 		render = _render ;
 	}
 
-	public void passInputEvent( final InputEvent _event )
+	/*public void passInputEvent( final InputEvent _event )
 	{
 		super.passInputEvent( _event ) ; 		// Update Mouse Input
 		final InputType eventType = _event.getInputType() ;
@@ -37,7 +37,7 @@ public class EditorMouseComponent extends MouseComponent
 			case KEYBOARD_RELEASED : updateKeyboardReleased( _event.getKeyCode() ) ; break ;
 			case SCROLL_WHEEL      : updateScrollWheel( ( float )_event.mouseX ) ;   break ; // mouseX or mouseY defines the same ScrollWheel movement
 		}
-	}
+	}*/
 
 	public void update( final float _dt )
 	{

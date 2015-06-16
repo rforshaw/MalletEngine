@@ -107,4 +107,10 @@ public final class InputEvent implements Cacheable
 		buffer.append( ']' ) ;
 		return buffer.toString() ;
 	}
+
+	public enum Action
+	{
+		PROPAGATE,			// Continue passing the InputEvent to the next InputHandler
+		CONSUME				// Do not propagate the InputEvent any further
+	}
 }

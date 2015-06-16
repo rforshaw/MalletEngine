@@ -98,12 +98,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 			final int sizeInput = keyInputs.size() ;
 			for( int i = 0; i < sizeInput; ++i )
 			{
-				event = keyInputs.get( i ) ;
-				for( int j = 0; j < sizeHandlers; ++j )
-				{
-					handler = handlers.get( j ) ;
-					handler.passInputEvent( event ) ;
-				}
+				passInputEventToHandlers( keyInputs.get( i ) ) ;
 			}
 		}
 
@@ -115,19 +110,29 @@ public class AndroidInputSystem implements InputSystemInterface,
 			//System.out.println( "Inputs: " + sizeInput ) ;
 			for( int i = 0; i < sizeInput; ++i )
 			{
-				event = touchInputs.get( i ) ;
-				for( int j = 0; j < sizeHandlers; ++j )
-				{
-					//System.out.println( event ) ;
-					handler = handlers.get( j ) ;
-					handler.passInputEvent( event ) ;
-				}
+				passInputEventToHandlers( touchInputs.get( i ) ) ;
 			}
 		}
 
 		touchInputs.clear() ;
 	}
-	
+
+	private void passInputEventToHandlers( final InputEvent _input )
+	{
+		final int handlerSize = handlers.size() ;
+		InputHandler handler = null ;
+
+		for( int j = 0; j < handlerSize; ++j )
+		{
+			handler = handlers.get( j ) ;
+			switch( handler.passInputEvent( _input ) )
+			{
+				case PROPAGATE : continue ;
+				case CONSUME   : return ;
+			}
+		}
+	}
+
 	private void updateKeys( int _inputType, KeyEvent _event )
 	{
 		System.out.println( "UPDATE KEYS: Needs implementing." ) ;

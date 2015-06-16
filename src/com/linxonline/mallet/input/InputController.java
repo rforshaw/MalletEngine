@@ -28,9 +28,16 @@ public abstract class InputController implements InputHandler
 
 	public abstract void processInputEvent( final InputEvent _input ) ;
 
+	/**
+		Extend function if you wish to determine whether to 
+		Consume or Propagate an Input Event.
+		Consuming an InputEvent is benificial for UIs, is it will 
+		prevent the InputEvent from being processed by other InputHandlers. 
+	*/
 	@Override
-	public void passInputEvent( final InputEvent _input )
+	public InputEvent.Action passInputEvent( final InputEvent _input )
 	{
 		inputs.add( _input ) ;
+		return InputEvent.Action.PROPAGATE ;
 	}
 }
