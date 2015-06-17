@@ -37,12 +37,12 @@ public final @SaveClass class Entity implements SerialisableForm
 
 	public Entity()
 	{
-		id = new ID( "NONE", "NONE" ) ;
+		this( "NONE", "NONE" ) ;
 	}
 
 	public Entity( final String _name )
 	{
-		id = new ID( _name, "NONE" ) ;
+		this( _name, "NONE" ) ;
 	}
 
 	public Entity( final String _name, final String _family )

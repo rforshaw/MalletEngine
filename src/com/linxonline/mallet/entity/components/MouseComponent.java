@@ -23,7 +23,12 @@ public @SaveClass class MouseComponent extends InputComponent
 
 	public MouseComponent()
 	{
-		super( "MOUSECOMPONENT", "INPUTCOMPONENT" ) ;
+		this( InputComponent.InputMode.UI ) ;
+	}
+
+	public MouseComponent( InputComponent.InputMode _mode )
+	{
+		super( "MOUSECOMPONENT", "INPUTCOMPONENT", _mode ) ;
 	}
 
 	@Override

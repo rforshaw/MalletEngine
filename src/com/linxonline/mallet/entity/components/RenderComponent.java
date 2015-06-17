@@ -34,7 +34,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 
 	public RenderComponent()
 	{
-		super( "RENDER" ) ;
+		this( "RENDER" ) ;
 	}
 
 	public RenderComponent( final String _name )

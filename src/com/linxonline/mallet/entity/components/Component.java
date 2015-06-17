@@ -23,7 +23,7 @@ public abstract class Component implements SerialisableForm
 
 	public Component()
 	{
-		id = new ID( "NONE", "NONE" ) ;
+		this( "NONE", "NONE" ) ;
 	}
 
 	/**

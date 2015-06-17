@@ -41,7 +41,8 @@ public class GameState extends State implements HookEntity
 
 	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
 
-	protected final InputState inputSystem = new InputState() ;												// Internal Input System
+	protected final InputState inputWorldSystem = new InputState() ;										// Internal World Input System
+	protected final InputState inputUISystem = new InputState() ;											// Internal UI Input System
 	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
 	protected final EventController eventController = new EventController( "GAME_STATE_CONTROLLER" ) ;		// Used to process Events, gateway between internal eventSystem and root event-system
 
@@ -294,7 +295,8 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface() ) ;
 
-		system.addInputHandler( inputSystem ) ;
+		system.addInputHandler( inputUISystem ) ;
+		system.addInputHandler( inputWorldSystem ) ;
 	}
 
 	/**
@@ -310,8 +312,8 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
 
-		system.removeEventHandler( eventController ) ;
-		system.removeInputHandler( inputSystem ) ;
+		system.removeInputHandler( inputUISystem ) ;
+		system.removeInputHandler( inputWorldSystem ) ;
 	}
 
 	/**
@@ -341,7 +343,8 @@ public class GameState extends State implements HookEntity
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputSystem.update() ;
+					inputUISystem.update() ;
+					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
 					eventController.update() ;
@@ -403,12 +406,13 @@ public class GameState extends State implements HookEntity
 				// Update the system to ensure that the state 
 				// has the latest events and inputs.
 				system.update( DEFAULT_TIMESTEP ) ;						// Update low-level systems
-				final boolean hasInputs = inputSystem.hasInputs() ;
+				final boolean hasInputs = inputWorldSystem.hasInputs() || inputWorldSystem.hasInputs() ;
 				final boolean hasEvents = eventSystem.hasEvents() ;
 
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					inputSystem.update() ;
+					inputUISystem.update() ;
+					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
 					eventController.update() ;
@@ -464,19 +468,35 @@ public class GameState extends State implements HookEntity
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_UI_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
-				inputSystem.addInputHandler( _event.getVariable() ) ;
+				inputUISystem.addInputHandler( _event.getVariable() ) ;
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_INPUT" )
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_UI_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
-				inputSystem.removeInputHandler( _event.getVariable() ) ;
+				inputUISystem.removeInputHandler( _event.getVariable() ) ;
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_WORLD_INPUT" )
+		{
+			public void processEvent( final Event<InputHandler> _event )
+			{
+				inputWorldSystem.addInputHandler( _event.getVariable() ) ;
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_WORLD_INPUT" )
+		{
+			public void processEvent( final Event<InputHandler> _event )
+			{
+				inputWorldSystem.removeInputHandler( _event.getVariable() ) ;
 			}
 		} ) ;
 
@@ -518,8 +538,11 @@ public class GameState extends State implements HookEntity
 		eventSystem.clearEvents() ;
 		eventSystem.clearHandlers() ;
 
-		inputSystem.clearInputs() ;
-		inputSystem.clearHandlers() ;
+		inputUISystem.clearInputs() ;
+		inputUISystem.clearHandlers() ;
+
+		inputWorldSystem.clearInputs() ;
+		inputWorldSystem.clearHandlers() ;
 
 		audioSystem.clear() ;
 		entitySystem.clear() ;

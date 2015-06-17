@@ -13,15 +13,12 @@ public final class InputEvent implements Cacheable
 
 	public InputEvent()
 	{
-		inputType = InputType.NONE ;
-		keycode = KeyCode.NONE ;
+		this( InputType.NONE, KeyCode.NONE ) ;
 	}
 
 	public InputEvent( final InputType _type, final int _x, final int _y )
 	{
-		inputType = _type ;
-		mouseX = _x ;
-		mouseY = _y ;
+		setInput( _type, _x, _y ) ;
 	}
 
 	public InputEvent( final InputType _type, final KeyCode _keycode )

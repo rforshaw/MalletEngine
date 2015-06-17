@@ -25,7 +25,7 @@ public class KeyInputComponent extends InputComponent
 
 	public KeyInputComponent( final String _name )
 	{
-		super( _name, "INPUTCOMPONENT" ) ;
+		this( _name, "INPUTCOMPONENT" ) ;
 	}
 	
 	public KeyInputComponent( final String _name, final String _group )

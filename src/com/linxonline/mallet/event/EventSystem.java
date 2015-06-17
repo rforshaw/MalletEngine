@@ -18,9 +18,7 @@ public final class EventSystem implements AddEventInterface
 
 	public EventSystem()
 	{
-		name = "NONE" ;
-		// Guarantee an ALL_EVENT_TYPES Queue.
-		addEventQueue( Event.ALL_EVENT_TYPES, new EventQueue( Event.ALL_EVENT_TYPES ) ) ;
+		this( "NONE" ) ;
 	}
 
 	public EventSystem( final String _name )

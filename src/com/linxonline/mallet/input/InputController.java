@@ -16,6 +16,8 @@ public abstract class InputController implements InputHandler
 {
 	private final ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
 
+	public InputController() {}
+
 	public void update()
 	{
 		final int size = inputs.size() ;

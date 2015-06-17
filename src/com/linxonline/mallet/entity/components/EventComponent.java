@@ -23,12 +23,12 @@ public class EventComponent extends Component
 
 	public EventComponent()
 	{
-		super( "EVENT", "EVENTCOMPONENT" ) ;
+		this( "EVENT", "EVENTCOMPONENT" ) ;
 	}
 
 	public EventComponent( final String _name )
 	{
-		super( _name, "EVENTCOMPONENT" ) ;
+		this( _name, "EVENTCOMPONENT" ) ;
 	}
 
 	public EventComponent( final String _name, final String _group )

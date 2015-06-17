@@ -125,7 +125,7 @@ public class EditorState extends GameState
 			@Override
 			public void update( final double _dt )
 			{
-				final boolean hasInput = inputSystem.hasInputs() ;
+				final boolean hasInput = inputWorldSystem.hasInputs() || inputUISystem.hasInputs() ;
 				final boolean hasEvents = eventSystem.hasEvents() ;
 				if( hasInput == false && hasEvents == false )
 				{
@@ -137,7 +137,8 @@ public class EditorState extends GameState
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputSystem.update() ;
+					inputUISystem.update() ;
+					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
 					eventController.update() ;

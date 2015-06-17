@@ -31,7 +31,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public AnimComponent()
 	{
-		super( "ANIM" ) ;
+		this( "ANIM" ) ;
 	}
 
 	public AnimComponent( final String _name )
