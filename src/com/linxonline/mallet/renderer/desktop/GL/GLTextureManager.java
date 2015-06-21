@@ -131,12 +131,17 @@ public class GLTextureManager extends AbstractManager<Texture>
 		imageFormat = _format ;
 	}
 
+	public Texture bind( final BufferedImage _image )
+	{
+		return bind( _image, InternalFormat.COMPRESSED ) ;
+	}
+
 	/**
 		Binds the BufferedImage byte-stream into video memory.
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final BufferedImage _image )
+	public Texture bind( final BufferedImage _image, final InternalFormat _format )
 	{
 		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
 		if( gl == null )
@@ -158,13 +163,14 @@ public class GLTextureManager extends AbstractManager<Texture>
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
 		final int channels = _image.getSampleModel().getNumBands() ;
+		int internalFormat = GL2.GL_RGB ;
 
 		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
 		{
 			switch( channels )
 			{
 				case 4 : imageFormat = GL2.GL_ABGR_EXT ; break ;
-				case 3 : imageFormat = GL2.GL_BGR ;      break ;
+				case 3 : imageFormat = GL2.GL_BGR ; break ;
 			}
 		}
 		else
@@ -172,14 +178,14 @@ public class GLTextureManager extends AbstractManager<Texture>
 			switch( channels )
 			{
 				case 4 : imageFormat = GL2.GL_RGBA ; break ;
-				case 3 : imageFormat = GL2.GL_RGB ;  break ;
+				case 3 : imageFormat = GL2.GL_RGB ; break ;
 			}
 		}
 
 		gl.glPixelStorei( GL2.GL_UNPACK_ALIGNMENT, 1 ) ;
 		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
 						 0, 
-						 channels, 
+						 getGLInternalFormat( channels, _format ), 
 						 width, 
 						 height, 
 						 0, 
@@ -189,6 +195,31 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
 		return new Texture( new GLImage( textureID, width, height ) ) ;
+	}
+
+	private int getGLInternalFormat( final int _channels, final InternalFormat _format )
+	{
+		switch( _channels )
+		{
+			case 4 :
+			{
+				switch( _format )
+				{
+					case COMPRESSED   : return GL2.GL_COMPRESSED_RGBA ;
+					case UNCOMPRESSED : return GL2.GL_RGBA ;
+				}
+			}
+			case 3 :
+			{
+				switch( _format )
+				{
+					case COMPRESSED   : return GL2.GL_COMPRESSED_RGB ;
+					case UNCOMPRESSED : return GL2.GL_RGB ;
+				}
+			}
+		}
+
+		return GL2.GL_RGB ;
 	}
 
 	/**
@@ -242,6 +273,12 @@ public class GLTextureManager extends AbstractManager<Texture>
 		_gl.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
+	}
+
+	public enum InternalFormat
+	{
+		COMPRESSED,
+		UNCOMPRESSED
 	}
 
 	/**

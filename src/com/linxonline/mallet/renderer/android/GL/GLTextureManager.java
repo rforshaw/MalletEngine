@@ -127,12 +127,17 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return metaGenerator.getMeta( _path ) ;
 	}
 
+	public Texture bind( final Bitmap _image )
+	{
+		return bind( _image, InternalFormat.COMPRESSED ) ;
+	}
+
 	/**
 		Binds the BufferedImage byte-stream into video memory.
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final Bitmap _image )
+	public Texture bind( final Bitmap _image, final InternalFormat _format )
 	{
 		GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
 
@@ -147,9 +152,39 @@ public class GLTextureManager extends AbstractManager<Texture>
 		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_S, GLES11.GL_CLAMP_TO_EDGE ) ;
 		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_T, GLES11.GL_REPEAT ) ;
 
-		GLUtils.texImage2D( GLES11.GL_TEXTURE_2D, 0, _image, 0 ) ;
+		GLUtils.texImage2D( GLES11.GL_TEXTURE_2D,
+							0,
+							//getGLInternalFormat( _image.getConfig(), _format ),
+							_image,
+							0 ) ;
 
 		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
+	}
+
+	private int getGLInternalFormat( final Bitmap.Config _config, final InternalFormat _format )
+	{
+		/*switch( _config )
+		{
+			case ARGB_4444 :
+			case ARGB_8888 :
+			{
+				switch( _format )
+				{
+					case COMPRESSED   : return GLES11.GL_COMPRESSED_RGBA ;
+					case UNCOMPRESSED : return GLES11.GL_RGBA ;
+				}
+			}
+			case RGB_565  :
+			{
+				switch( _format )
+				{
+					case COMPRESSED   : return GLES11.GL_COMPRESSED_RGB ;
+					case UNCOMPRESSED : return GLES11.GL_RGB ;
+				}
+			}
+		}*/
+
+		return GLES11.GL_RGB ;
 	}
 
 	private int glGenTextures()
@@ -158,6 +193,12 @@ public class GLTextureManager extends AbstractManager<Texture>
 		GLES11.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
+	}
+
+	public enum InternalFormat
+	{
+		COMPRESSED,
+		UNCOMPRESSED
 	}
 
 	protected static class MetaGenerator

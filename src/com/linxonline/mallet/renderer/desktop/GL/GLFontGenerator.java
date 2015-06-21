@@ -72,7 +72,9 @@ public class GLFontGenerator
 		// Create a GLFontMap and wrap it around a FontMap
 		// buffer is not automatically destroyed by TextureManager,
 		// must be manually destroyed.
-		return new GLFontMap( new FontMap( glyphs, manager.bind( buffer ), metrics.getHeight() ) ) ;
+		return new GLFontMap( new FontMap( glyphs, 
+										   manager.bind( buffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
+										   metrics.getHeight() ) ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )
