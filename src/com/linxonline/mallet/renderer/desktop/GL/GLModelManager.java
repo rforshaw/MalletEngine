@@ -53,13 +53,15 @@ public class GLModelManager extends AbstractManager<Model>
 		_gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, vboID ) ;
 		_geometry.vboID = vboID ;
 
-		GLModelManager.updateVBO( _gl, _geometry ) ;
+		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, getBufferLength( _geometry ), _geometry.getVertexBuffer(), GL2.GL_DYNAMIC_DRAW ) ;
 	}
 
 	public static void updateVBO( final GL2 _gl, final GLGeometry _geometry )
 	{
-		final int vertexBufferLength = _geometry.vertex.length * 4 ;		// * 4 represents the bytes for each float
-		_gl.glBufferData( GL2.GL_ARRAY_BUFFER, vertexBufferLength, _geometry.getVertexBuffer(), GL2.GL_DYNAMIC_DRAW ) ;
+		_gl.glBufferSubData( GL2.GL_ARRAY_BUFFER,	
+							 0,
+							 getBufferLength( _geometry ),
+							 _geometry.getVertexBuffer() ) ;
 	}
 
 	public static void bindIndex( final GL2 _gl, final GLGeometry _geometry )
@@ -70,5 +72,10 @@ public class GLModelManager extends AbstractManager<Model>
 
 		final int indexBufferLength = _geometry.index.length * 4 ;		// * 4 represents the bytes for each integer
 		_gl.glBufferData( GL2.GL_ELEMENT_ARRAY_BUFFER, indexBufferLength, _geometry.getIndexBuffer(), GL2.GL_STATIC_DRAW ) ;
+	}
+
+	private static int getBufferLength( final GLGeometry _geometry )
+	{
+		return _geometry.vertex.length * 4 ;		// * 4 represents the bytes for each float
 	}
 }
