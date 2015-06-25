@@ -342,7 +342,20 @@ public final class ConvertBytes
 		}
 		System.out.print( "\n" ) ;
 	}
-	
+
+	/**
+		Combine the two byte-arrays passed in.
+		Creates a new array of a.length + b.length long.
+		Copies the arrays sequentially into the new byte-array.
+	*/
+	public static byte[] concat( final byte[] _a, final byte[] _b )
+	{
+		final byte[] c = new byte[_a.length + _b.length] ;
+		System.arraycopy( _a, 0, c, 0, _a.length ) ;
+		System.arraycopy( _b, 0, c, _a.length, _b.length ) ;
+		return c ;
+	}
+
 	private static ByteBuffer allocate( final int _capacity, final int _endian )
 	{
 		return ByteBuffer.allocate( _capacity ).order( getByteOrder( _endian ) ) ;

@@ -38,8 +38,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public byte readByte()
 	{
-		final byte[] b = new byte[1] ;
-		return b[0] ;
+		return stream[increment( 1 )] ;
 	}
 
 	/**

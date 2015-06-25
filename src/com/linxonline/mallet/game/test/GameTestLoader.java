@@ -41,6 +41,8 @@ import com.linxonline.mallet.input.* ;
 //import com.linxonline.mallet.input.desktop.XInputLinux ;
 
 import com.linxonline.mallet.io.save.* ;
+import com.linxonline.mallet.util.tools.SimpleDiff ;
+import com.linxonline.mallet.io.reader.ByteReader ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -61,6 +63,25 @@ public final class GameTestLoader extends GameLoader
 
 			public void initGame()			// Called when state is started
 			{
+				final String base =     "This is a delta compression test" ;
+				final String modified = "This is a delta test" ;
+
+				final byte[] diff = SimpleDiff.encode( base.getBytes(), modified.getBytes() ) ;
+				System.out.println( "Diff: " + diff.length + " Length " + modified.getBytes().length ) ;
+
+				final byte[] reconstruct = SimpleDiff.decode( base.getBytes(), diff ) ;
+				final String newString = new String( reconstruct ) ;
+				System.out.println( "Reconstructed: " + newString ) ;
+
+				/*final byte[] base = ByteReader.readBytes( "base/textures/base.txt" ) ;
+				final byte[] modified = ByteReader.readBytes( "base/textures/mod.txt" ) ;
+
+				final byte[] diff = SimpleDiff.encode( base, modified ) ;
+				final byte[] reconstruct = SimpleDiff.decode( base, diff ) ;
+
+				GlobalFileSystem.getFile( "base/textures/test-diff.txt" ).getByteOutStream().writeBytes( diff, 0, diff.length ) ;
+				GlobalFileSystem.getFile( "base/textures/test-reconstruct.txt" ).getByteOutStream().writeBytes( reconstruct, 0, reconstruct.length ) ;*/
+
 				/*final Event<Matrix4> event = new Event( "BOB", new Matrix4() ) ;
 				Dump.dump( event, Format.JSON, "test.dump" ) ;
 

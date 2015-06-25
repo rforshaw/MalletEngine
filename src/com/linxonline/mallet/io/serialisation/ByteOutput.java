@@ -25,6 +25,14 @@ public class ByteOutput implements SerialiseOutput
 	}
 
 	/**
+		Add 2-byte short to stream. 
+	*/
+	public void writeShort( final short _short )
+	{
+		stream = concat( stream, ConvertBytes.toBytes( _short, ConvertBytes.BIG_ENDIAN ) ) ;
+	}
+
+	/**
 		Add a byte to stream. 
 	*/
 	public void writeByte( final byte _byte )
