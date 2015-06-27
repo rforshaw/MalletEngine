@@ -221,6 +221,11 @@ public class ByteInput implements SerialiseInput
 		return bools ;
 	}
 
+	public boolean isEnd()
+	{
+		return ( position >= ( stream.length - 1 ) ) ;
+	}
+
 	/**
 		Increment the position by X, but return the position before adding X.
 	**/

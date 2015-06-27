@@ -5,10 +5,10 @@ import com.linxonline.mallet.io.serialisation.ByteOutput ;
 import com.linxonline.mallet.io.serialisation.ByteInput ;
 
 /**
-	Simple Diff iterates over a byte stream 
-	tracking changes on a per byte basis.
-	Works well with fixed data structures that 
-	are not dynamic.
+	Simple Diff aims to find differences between 
+	_base and _compare.
+	It works well on fixed data structures like 
+	uncompressed bitmaps.
 */
 public class SimpleDiff
 {

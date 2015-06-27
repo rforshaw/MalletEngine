@@ -356,6 +356,19 @@ public final class ConvertBytes
 		return c ;
 	}
 
+	/**
+		Insert _a into _b.
+	*/
+	public static byte[] insert( final byte[] _a, final int _aOffset, final int _aLength, final byte[] _b, final int _bOffset )
+	{
+		for( int i = 0; i < _aLength; i++ )
+		{
+			_b[_bOffset + i] = _a[_aOffset + i] ;
+		}
+
+		return _b ;
+	}
+	
 	private static ByteBuffer allocate( final int _capacity, final int _endian )
 	{
 		return ByteBuffer.allocate( _capacity ).order( getByteOrder( _endian ) ) ;
