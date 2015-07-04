@@ -16,7 +16,7 @@
 	<property name="jar.dir"			value="${build.dir}/jar"/>
 
 		<!-- Library location -->
-	<property name="lib.dir"		value="${jar.dir}/jar"/>
+	<property name="lib.dir"		value="${jar.dir}/libs"/>
 
 	<path id="classpath-engine">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>
