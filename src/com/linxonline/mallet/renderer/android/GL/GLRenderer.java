@@ -51,8 +51,10 @@ public class GLRenderer extends Basic2DRender
 	protected DrawInterface drawText = null ;
 
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
-	protected int textureID = 0 ;
-	protected int indexID = 0 ;
+
+	protected final int[] textureID = new int[1] ;
+	protected final int[] indexID = new int[1] ;
+	protected final int[] bufferID = new int[1] ;
 	
 	protected float rotate = 0.0f ;
 
@@ -176,10 +178,15 @@ public class GLRenderer extends Basic2DRender
 					GLES11.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					GLES11.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					if( geometry.indexID != indexID )
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						indexID = geometry.indexID ;
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
+					}
+
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
 						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
@@ -216,10 +223,10 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLImage image = texture.getImage() ;
-				if( image.textureID != textureID )
+				GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+				if( textureID[0] != image.textureIDs[0] )
 				{
-					textureID = image.textureID ;
-					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, textureID ) ;
+					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, image.textureIDs[0] ) ;
 				}
 
 				final Model model = _settings.getObject( "MODEL", null ) ;
@@ -255,10 +262,15 @@ public class GLRenderer extends Basic2DRender
 
 					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					if( geometry.indexID != indexID )
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						indexID = geometry.indexID ;
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
+					}
+
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
 						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
@@ -314,10 +326,10 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLImage image = fm.getGLImage() ;
-				if( image.textureID != textureID )
+				GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+				if( textureID[0] != image.textureIDs[0] )
 				{
-					textureID = image.textureID ;
-					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, textureID ) ;
+					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, image.textureIDs[0] ) ;
 				}
 
 				final int height = fm.getHeight() ;
@@ -381,10 +393,15 @@ public class GLRenderer extends Basic2DRender
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-					if( geometry.indexID != indexID )
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						indexID = geometry.indexID ;
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
+					}
+
+					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
 						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
 					}
 
@@ -679,9 +696,11 @@ public class GLRenderer extends Basic2DRender
 			super() ;
 		}
 
-		public GLRenderData( final int _id, final int _type,
-							final Settings _draw, final Vector3 _position,
-							final int _layer )
+		public GLRenderData( final int _id,
+							 final DrawRequestType _type,
+							 final Settings _draw,
+							 final Vector3 _position,
+							 final int _layer )
 		{
 			super( _id, _type, _draw, _position, _layer ) ;
 		}

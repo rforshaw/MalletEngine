@@ -13,40 +13,37 @@ import com.linxonline.mallet.maths.* ;
 */
 public final class CameraFactory
 {
-	private final static String REQUEST_TYPE = "REQUEST_TYPE" ;
-	private final static String CAMERA = "CAMERA" ;
-
 	private CameraFactory() {}
 
 	public static Event setCameraPositionEvent( final Vector3 _pos )
 	{
 		final Settings settings = new Settings() ;
-		settings.addInteger( REQUEST_TYPE, CameraRequestType.SET_CAMERA_POSITION ) ;
+		settings.addObject( "REQUEST_TYPE", CameraRequestType.SET_CAMERA_POSITION ) ;
 		settings.addObject( "POS", _pos ) ;
-		return new Event( CAMERA, settings ) ;
+		return new Event( "CAMERA", settings ) ;
 	}
 
 	public static Event updateCameraPositionEvent( final Vector3 _acc )
 	{
 		final Settings settings = new Settings() ;
-		settings.addInteger( REQUEST_TYPE, CameraRequestType.UPDATE_CAMERA_POSITION ) ;
+		settings.addObject( "REQUEST_TYPE", CameraRequestType.UPDATE_CAMERA_POSITION ) ;
 		settings.addObject( "ACC", _acc ) ;
-		return new Event( CAMERA, settings ) ;
+		return new Event( "CAMERA", settings ) ;
 	}
 
 	public static Event setCameraScaleEvent( final Vector3 _scale )
 	{
 		final Settings settings = new Settings() ;
-		settings.addInteger( REQUEST_TYPE, CameraRequestType.SET_CAMERA_SCALE ) ;
+		settings.addObject( "REQUEST_TYPE", CameraRequestType.SET_CAMERA_SCALE ) ;
 		settings.addObject( "SCALE", _scale ) ;
-		return new Event( CAMERA, settings ) ;
+		return new Event( "CAMERA", settings ) ;
 	}
 
 	public static Event updateCameraScaleEvent( final Vector3 _scale )
 	{
 		final Settings settings = new Settings() ;
-		settings.addInteger( REQUEST_TYPE, CameraRequestType.UPDATE_CAMERA_SCALE ) ;
+		settings.addObject( "REQUEST_TYPE", CameraRequestType.UPDATE_CAMERA_SCALE ) ;
 		settings.addObject( "SCALE", _scale ) ;
-		return new Event( CAMERA, settings ) ;
+		return new Event( "CAMERA", settings ) ;
 	}
 }

@@ -59,13 +59,13 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	protected void useEvent( final Event<?> _event )
 	{
 		final Settings audio = ( Settings )_event.getVariable() ;
-		final int type = audio.getInteger( "REQUEST_TYPE", -1 ) ;
+		final RequestType type = audio.getObject( "REQUEST_TYPE", null ) ;
 
 		switch( type )
 		{
-			case RequestType.GARBAGE_COLLECT_AUDIO : soundManager.clean() ; break ;
-			case RequestType.CREATE_AUDIO          : creatAudio( audio ) ;  break ;
-			case RequestType.MODIFY_EXISTING_AUDIO :
+			case GARBAGE_COLLECT_AUDIO : soundManager.clean() ; break ;
+			case CREATE_AUDIO          : creatAudio( audio ) ;  break ;
+			case MODIFY_EXISTING_AUDIO :
 			{
 				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
 				if( sound != null )
@@ -74,7 +74,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 				}
 				break ;
 			}
-			case RequestType.REMOVE_AUDIO :
+			case REMOVE_AUDIO :
 			{
 				final int id = audio.getInteger( "ID", -1 ) ;
 				final ActiveSound sound = getSource( id ) ;
@@ -108,20 +108,20 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	**/
 	protected void modifyAudio( final Settings _settings, final ActiveSound _sound )
 	{
-		final int type = _settings.getInteger( "MODIFY_AUDIO", -1 ) ;
+		final ModifyAudio type = _settings.getObject( "MODIFY_AUDIO", null ) ;
 		switch( type )
 		{
-			case ModifyAudio.PLAY             : _sound.play() ;     break ;
-			case ModifyAudio.STOP             : _sound.stop() ;     break ;
-			case ModifyAudio.PAUSE            : _sound.pause() ;    break ;
-			case ModifyAudio.LOOP_CONTINUOSLY : _sound.playLoop() ; break ;
-			case ModifyAudio.LOOP_SET :
+			case PLAY             : _sound.play() ;     break ;
+			case STOP             : _sound.stop() ;     break ;
+			case PAUSE            : _sound.pause() ;    break ;
+			case LOOP_CONTINUOSLY : _sound.playLoop() ; break ;
+			case LOOP_SET :
 			{
 				// Specify the amount of Loops to go through
 				// before stopping.
 				break ;
 			}
-			case ModifyAudio.ADD_CALLBACK :
+			case ADD_CALLBACK :
 			{
 				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
 				if( callback != null )
@@ -130,7 +130,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 				}
 				break ;
 			}
-			case ModifyAudio.REMOVE_CALLBACK :
+			case REMOVE_CALLBACK :
 			{
 				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
 				if( callback != null )

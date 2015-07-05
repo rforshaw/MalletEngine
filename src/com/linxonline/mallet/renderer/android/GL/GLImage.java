@@ -6,13 +6,15 @@ import com.linxonline.mallet.resources.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {
-	public int textureID = 0 ;				// Buffer ID for openGL
+	public int[] textureIDs ;				// Buffer ID for openGL
 	private final int width ;				// Width of texture
 	private final int height ;				// Height of texture
 
 	public GLImage( int _textureID, final int _width, final int _height )
 	{
-		textureID = _textureID ;
+		textureIDs = new int[1] ;
+		textureIDs[0] = _textureID ;
+
 		width = _width ;
 		height = _height ;
 	}
@@ -30,8 +32,6 @@ public class GLImage implements ImageInterface
 	@Override
 	public final void destroy()
 	{
-		final int[] textures = new int[1] ;
-		textures[0] = textureID ;
-		GLES11.glDeleteTextures( 1, textures, 0 ) ;
+		GLES11.glDeleteTextures( 1, textureIDs, 0 ) ;
 	}
 }

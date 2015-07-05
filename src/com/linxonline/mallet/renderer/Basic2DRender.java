@@ -99,25 +99,26 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected void useEventInCamera( final Event<?> _event )
 	{
 		final Settings camera = ( Settings )_event.getVariable() ;
-		final int type = camera.getInteger( "REQUEST_TYPE", -1 ) ;
+		final CameraRequestType type = camera.getObject( "REQUEST_TYPE", null ) ;
+
 		switch( type )
 		{
-			case CameraRequestType.SET_CAMERA_POSITION :
+			case SET_CAMERA_POSITION :
 			{
 				renderInfo.setCameraPosition( camera.<Vector3>getObject( "POS", null ) ) ;
 				break ;
 			}
-			case CameraRequestType.UPDATE_CAMERA_POSITION :
+			case UPDATE_CAMERA_POSITION :
 			{
 				renderInfo.addToCameraPosition( camera.<Vector3>getObject( "ACC", null ) ) ;
 				break ;
 			}
-			case CameraRequestType.SET_CAMERA_SCALE :
+			case SET_CAMERA_SCALE :
 			{
 				cameraScale.setXYZ( camera.<Vector3>getObject( "SCALE", null ) ) ;
 				break ;
 			}
-			case CameraRequestType.UPDATE_CAMERA_SCALE :
+			case UPDATE_CAMERA_SCALE :
 			{
 				cameraScale.add( camera.<Vector3>getObject( "SCALE", null ) ) ;
 				break ;
@@ -128,37 +129,25 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected void useEventInDraw( final Event<?> _event )
 	{
 		final Settings draw = ( Settings )_event.getVariable() ;
-		final int type = draw.getInteger( "REQUEST_TYPE", -1 ) ;
+		final DrawRequestType type = draw.getObject( "REQUEST_TYPE", null ) ;
 
 		switch( type )
 		{
-			case DrawRequestType.CREATE_DRAW          : createDraw( draw ) ; break ;
-			case DrawRequestType.MODIFY_EXISTING_DRAW : modifyDraw( draw ) ; break ;
-			case DrawRequestType.REMOVE_DRAW          : removeDraw( draw ) ; break ;
-			case DrawRequestType.GARBAGE_COLLECT_DRAW : clean() ; break ;
+			case CREATE_DRAW          : createDraw( draw ) ; break ;
+			case MODIFY_EXISTING_DRAW : modifyDraw( draw ) ; break ;
+			case REMOVE_DRAW          : removeDraw( draw ) ; break ;
+			case GARBAGE_COLLECT_DRAW : clean() ;            break ;
 		}
 	}
 
 	protected void createDraw( final Settings _draw )
 	{
-		final int type = _draw.getInteger( "TYPE", -1 ) ;
+		final DrawRequestType type = _draw.getObject( "TYPE", null ) ;
 		switch( type )
 		{
-			case DrawRequestType.TEXTURE :
-			{
-				createTexture( _draw ) ;
-				break ;
-			}
-			case DrawRequestType.GEOMETRY :
-			{
-				createGeometry( _draw ) ;
-				break ;
-			}
-			case DrawRequestType.TEXT :
-			{
-				createText( _draw ) ;
-				break ;
-			}
+			case TEXTURE  : createTexture( _draw ) ; break ;
+			case GEOMETRY : createGeometry( _draw ) ; break ;
+			case TEXT     : createText( _draw ) ; break ;
 		}
 	}
 
@@ -394,12 +383,21 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			final RenderData data = content.get( _index ) ;
 			final Vector3 current = data.position ;
 
-			final int renderDiff =  ( int )( updateDT / drawDT ) ;
-			final float xDiff = ( current.x - old.x ) / renderDiff ;
-			final float yDiff = ( current.y - old.y ) / renderDiff ;
+			switch( data.interpolation )
+			{
+				case NONE   : _position.setXY( current.x, current.y ) ; break ;
+				case LINEAR :
+				default     :
+				{
+					final int renderDiff =  ( int )( updateDT / drawDT ) ;
+					final float xDiff = ( current.x - old.x ) / renderDiff ;
+					final float yDiff = ( current.y - old.y ) / renderDiff ;
 
-			_position.x = old.x + ( xDiff * renderIter ) ;
-			_position.y = old.y + ( yDiff * renderIter ) ;
+					_position.x = old.x + ( xDiff * renderIter ) ;
+					_position.y = old.y + ( yDiff * renderIter ) ;
+					break ;
+				}
+			}
 
 			return data ;
 		}
@@ -420,8 +418,10 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	public static class RenderData implements SortInterface, Cacheable
 	{
 		public int id ;
-		public int type ;
+		public DrawRequestType type ;
+		public Interpolation interpolation = Interpolation.LINEAR ;
 		public int layer ;
+		public boolean smooth ;
 		public Vector3 position ;
 		public Settings drawData ;
 
@@ -429,33 +429,38 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 		public RenderData()
 		{
-			set( -1, -1, null, new Vector3(), -1 ) ;
+			set( -1,
+				 DrawRequestType.NOT_SET,
+				 null,
+				 new Vector3(),
+				 -1 ) ;
 		}
 
 		public RenderData( final int _id,
-							final int _type,
-							final Settings _draw,
-							final Vector3 _position,
-							final int _layer )
+						   final DrawRequestType _type,
+						   final Settings _draw,
+						   final Vector3 _position,
+						   final int _layer )
 		{
 			set( _id, _type, _draw, _position, _layer ) ;
 		}
 
 		public void set( final int _id,
-							final int _type,
-							final Settings _draw,
-							final Vector3 _position,
-							final int _layer )
+						 final DrawRequestType _type,
+						 final Settings _draw,
+						 final Vector3 _position,
+						 final int _layer )
 		{
 			id = _id ;
 			type = _type ;
 			layer = _layer ;
 			drawData = _draw ;
 			position = _position ;
-			
+
 			if( drawData != null )
 			{
 				drawData.addInteger( "ID", _id ) ;
+				interpolation = drawData.getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
 			}
 		}
 

@@ -1,14 +1,15 @@
 package com.linxonline.mallet.renderer ;
 
-public class DrawRequestType
+public enum DrawRequestType
 {
-	public final static int CREATE_DRAW = 10 ;
-	public final static int MODIFY_EXISTING_DRAW = 20 ;
-	public final static int REMOVE_DRAW = 30 ;
-	public final static int SET_CAMERA_POSITION = 40 ;
-	public final static int GARBAGE_COLLECT_DRAW = 50 ;
+	NOT_SET,
+	CREATE_DRAW,
+	MODIFY_EXISTING_DRAW,
+	REMOVE_DRAW,
+	SET_CAMERA_POSITION,
+	GARBAGE_COLLECT_DRAW,
 
-	public final static int TEXTURE = 10 ;
-	public final static int GEOMETRY = 20 ;
-	public final static int TEXT = 30 ;
+	TEXTURE,
+	GEOMETRY,
+	TEXT
 }

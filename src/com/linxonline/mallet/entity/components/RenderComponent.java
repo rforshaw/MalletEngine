@@ -96,7 +96,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 		{
 			event = content.get( i ) ;
 			draw = event.<Settings>getVariable() ;
-			draw.addInteger( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
+			draw.addObject( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 			_events.add( event ) ;
 		}
 	}

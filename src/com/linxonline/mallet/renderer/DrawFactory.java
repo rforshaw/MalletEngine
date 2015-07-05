@@ -17,7 +17,7 @@ public final class DrawFactory
 	public static Event removeDraw( final int _id )
 	{
 		final Settings draw = new Settings() ;
-		draw.addInteger( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
+		draw.addObject( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 		draw.addInteger( "ID", _id ) ;
 		return new Event( "DRAW", draw ) ;
 	}
@@ -25,7 +25,7 @@ public final class DrawFactory
 	public static Event createGarbageCollect()
 	{
 		final Settings draw = new Settings() ;
-		draw.addInteger( "REQUEST_TYPE", DrawRequestType.GARBAGE_COLLECT_DRAW ) ;
+		draw.addObject( "REQUEST_TYPE", DrawRequestType.GARBAGE_COLLECT_DRAW ) ;
 		return new Event( "DRAW", draw ) ;
 	}
 
@@ -54,8 +54,8 @@ public final class DrawFactory
 	{
 		final Settings settings = new Settings() ;
 
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.TEXTURE ) ;
+		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
+		settings.addObject( "TYPE", DrawRequestType.TEXTURE ) ;
 
 		if( _file != null ) { settings.addString( "FILE", _file ) ; }
 		if( _dim != null ) { settings.addObject( "DIM", _dim ) ; }
@@ -89,6 +89,13 @@ public final class DrawFactory
 	{
 		final Settings set = _event.getVariable() ;
 		set.addBoolean( "GUI", _set ) ;
+		return _event ;
+	}
+
+	public static Event<Settings> amendInterpolation( final Event<Settings> _event, final Interpolation _set )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "INTERPOLATION", _set ) ;
 		return _event ;
 	}
 

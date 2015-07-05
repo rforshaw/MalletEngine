@@ -11,6 +11,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
@@ -106,7 +107,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{

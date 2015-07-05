@@ -267,7 +267,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				{
 					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
 				}
-				
+
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
 				{
@@ -664,7 +664,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = renderCache.get() ;
-			data.set( numID++, DrawRequestType.TEXTURE, _draw, position, layer ) ;
+			data.set( numID++,
+					  DrawRequestType.TEXTURE,
+					  _draw,
+					  position,
+					  layer ) ;
 			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
 			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -790,9 +794,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			super() ;
 		}
 
-		public GLRenderData( final int _id, final int _type,
-							final Settings _draw, final Vector3 _position,
-							final int _layer )
+		public GLRenderData( final int _id,
+							 final DrawRequestType _type,
+							 final Settings _draw,
+							 final Vector3 _position,
+							 final int _layer )
 		{
 			super( _id, _type, _draw, _position, _layer ) ;
 		}

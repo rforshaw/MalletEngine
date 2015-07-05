@@ -25,8 +25,8 @@ public final class GeometryFactory
 	{
 		final Settings settings = new Settings() ;
 
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.GEOMETRY ) ;
+		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
+		settings.addObject( "TYPE", DrawRequestType.GEOMETRY ) ;
 		if( _type == null || _line == null )
 		{
 			return null ;
@@ -54,8 +54,8 @@ public final class GeometryFactory
 	{
 		final Settings settings = new Settings() ;
 
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.GEOMETRY ) ;
+		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
+		settings.addObject( "TYPE", DrawRequestType.GEOMETRY ) ;
 
 		DrawFactory.setPosition( settings, _pos, _offset ) ;
 		DrawFactory.setClip( settings, _clip, _clipOffset ) ;

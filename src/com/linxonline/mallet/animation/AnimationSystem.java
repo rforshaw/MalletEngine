@@ -49,16 +49,16 @@ public class AnimationSystem extends SystemRoot<Animation>
 	protected void useEvent( final Event<?> _event )
 	{
 		final Settings anim = ( Settings )_event.getVariable() ;
-		final int type = anim.getInteger( "REQUEST_TYPE", -1 ) ;
+		final AnimRequestType type = anim.getObject( "REQUEST_TYPE", null ) ;
 
 		switch( type )
 		{
-			case AnimRequestType.CREATE_ANIMATION :
+			case CREATE_ANIMATION :
 			{
 				createAnimation( anim ) ;
 				break ;
 			}
-			case AnimRequestType.MODIFY_EXISTING_ANIMATION :
+			case MODIFY_EXISTING_ANIMATION :
 			{
 				final Animation animation = getSource( anim.getInteger( "ID", -1 ) ) ;
 				if( animation != null )
@@ -67,7 +67,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 				}
 				break ;
 			}
-			case AnimRequestType.REMOVE_ANIMATION :
+			case REMOVE_ANIMATION :
 			{
 				final int id = anim.getInteger( "ID", -1 ) ;
 				//Logger.println( "AnimationSystem - Remove Anim Request: " + id, Logger.Verbosity.MINOR ) ;
@@ -80,7 +80,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 				}
 				break ;
 			}
-			case AnimRequestType.GARBAGE_COLLECT_ANIMATION : spriteManager.clean() ; break ;
+			case GARBAGE_COLLECT_ANIMATION : spriteManager.clean() ; break ;
 		}
 	}
 

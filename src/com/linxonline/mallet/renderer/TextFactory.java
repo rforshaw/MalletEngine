@@ -27,8 +27,8 @@ public final class TextFactory
 	{
 		final Settings settings = new Settings() ;
 
-		settings.addInteger( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addInteger( "TYPE", DrawRequestType.TEXT ) ;
+		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
+		settings.addObject( "TYPE", DrawRequestType.TEXT ) ;
 
 		if( _text != null ) { settings.addString( "TEXT", _text ) ; }
 		if( _font != null ) { settings.addObject( "FONT", _font ) ; }
