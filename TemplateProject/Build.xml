@@ -5,13 +5,13 @@
 	<!-- Source location -->
 	<property name="src.dir"		value="src"/>
 
-	<!-- Library location -->
-	<property name="lib.dir"		value="lib"/>
-
 	<!-- Compiler locations -->
 	<property name="build.dir"		value="build"/>
 	<property name="classes.dir"	value="${build.dir}/classes"/>
 	<property name="jar.dir"		value="${build.dir}/jar"/>
+
+	<!-- Library location -->
+	<property name="lib.dir"		value="${jar.dir}/libs"/>
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>

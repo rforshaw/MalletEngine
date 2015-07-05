@@ -10,7 +10,7 @@ public class Main
 {
 	public static void main( String _args[] )
 	{
-		final DesktopTestStarter starter = new DesktopTestStarter() ;
+		final TemplateStarter starter = new TemplateStarter() ;
 		starter.init() ;
 	}
 }
