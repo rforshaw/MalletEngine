@@ -71,7 +71,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	// ID's then we can avoid the bind call.
 	// Note: Caching vboID, results in an exception
 	// on some occasions.
-	protected int indexID = 0 ;
+	protected final int[] textureID = new int[1] ;
+	protected final int[] indexID = new int[1] ;
+	protected final int[] bufferID = new int[1] ;
 
 	public GLRenderer() {}
 
@@ -216,13 +218,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					if( geometry.indexID != indexID )
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						indexID = geometry.indexID ;
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
 					}
 
-					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -256,6 +262,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final GLImage image = texture.getImage() ;
+				gl.glGetIntegerv( GL2.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+				if( textureID[0] != image.textureIDs[0] )
+				{
+					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
+				}
+				
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
 				{
@@ -289,20 +301,22 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					if( geometry.indexID != indexID )
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						//System.out.println( "Bind Index Buffer: " + geometry.indexID ) ;
-						indexID = geometry.indexID ;
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
 					}
 
-					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureID ) ;
-					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					}
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
-					
+
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
@@ -320,16 +334,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
-
-				gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;		// Reset texture bind to default
 			}
 		} ;
 
 		drawText = new DrawInterface()
 		{
-			protected int indexID = -1 ;
-			protected int vboID = -1 ;
-
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
 				final String text = _settings.getString( "TEXT", null ) ;
@@ -350,7 +359,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( fm == null ) { return ; }
 
 				final GLImage image = fm.getGLImage() ;
-				gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureID ) ;
+				gl.glGetIntegerv( GL2.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+				if( textureID[0] != image.textureIDs[0] )
+				{
+					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
+				}
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
@@ -404,8 +417,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
-
-				gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;		// Reset texture bind to default 
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm )
@@ -416,13 +427,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-					if( geometry.indexID != indexID )
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+					if( geometry.indexID != indexID[0] )
 					{
-						indexID = geometry.indexID ;
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
+						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
 					}
 
-					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+					if( geometry.vboID != bufferID[0] )
+					{
+						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
+					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
