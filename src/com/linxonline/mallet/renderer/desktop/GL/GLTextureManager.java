@@ -194,6 +194,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 						 getByteBuffer( _image ) ) ;
 
 		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
+		gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
+
 		return new Texture( new GLImage( textureID, width, height ) ) ;
 	}
 

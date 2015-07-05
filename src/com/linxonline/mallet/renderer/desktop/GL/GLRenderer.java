@@ -71,7 +71,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	// ID's then we can avoid the bind call.
 	// Note: Caching vboID, results in an exception
 	// on some occasions.
-	protected int textureID = 0 ;
 	protected int indexID = 0 ;
 
 	public GLRenderer() {}
@@ -257,12 +256,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final GLImage image = texture.getImage() ;
-				if( image.textureID != textureID )
-				{
-					textureID = image.textureID ;
-					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
-				}
-
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
 				{
@@ -298,10 +291,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					if( geometry.indexID != indexID )
 					{
+						//System.out.println( "Bind Index Buffer: " + geometry.indexID ) ;
 						indexID = geometry.indexID ;
 						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
 					}
 
+					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureID ) ;
 					gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
 
 					// Update the UV co-ordinates of the model
@@ -325,6 +320,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+
+				gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;		// Reset texture bind to default
 			}
 		} ;
 
@@ -353,11 +350,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( fm == null ) { return ; }
 
 				final GLImage image = fm.getGLImage() ;
-				if( image.textureID != textureID )
-				{
-					textureID = image.textureID ;
-					gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;
-				}
+				gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureID ) ;
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
@@ -411,6 +404,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+
+				gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;		// Reset texture bind to default 
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm )
