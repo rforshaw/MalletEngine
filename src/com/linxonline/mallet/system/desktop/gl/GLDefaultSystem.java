@@ -8,20 +8,12 @@ import java.awt.Point ;
 import java.awt.Cursor ;
 import java.awt.Toolkit ;
 
-import javax.media.opengl.awt.GLJPanel ;
-
-import com.linxonline.mallet.util.locks.* ;
-import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.audio.desktop.alsa.* ;
-import com.linxonline.mallet.renderer.RenderInterface ;
-import com.linxonline.mallet.renderer.desktop.* ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
-import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.system.* ;
-
 import com.linxonline.mallet.renderer.desktop.GL.* ;
+import com.linxonline.mallet.audio.desktop.alsa.* ;
+import com.linxonline.mallet.util.locks.* ;
+import com.linxonline.mallet.system.* ;
+import com.linxonline.mallet.event.* ;
 
 /*===========================================*/
 // DefaultSystem
@@ -30,30 +22,33 @@ import com.linxonline.mallet.renderer.desktop.GL.* ;
 // and Rendering
 /*===========================================*/
 
-public class GLDefaultSystem implements SystemInterface
+public class GLDefaultSystem extends BasicSystem
 {
-	protected String titleName = "GL Mallet Engine" ;
-	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
-	protected final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
-
-	protected ALSASourceGenerator sourceGenerator = new ALSASourceGenerator() ;
+	protected final JFrame frame = new JFrame( title ) ;					// Initialise Window
 	protected EventController eventController = new EventController() ;
-	protected GLRenderer renderer = new GLRenderer() ;
-
-	public final EventSystem eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
-	public final InputSystem inputSystem = new InputSystem() ;
 
 	public GLDefaultSystem()
 	{
 		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+		shutdownDelegate = new DefaultShutdown() ;
+		renderer = new GLRenderer() ;
+		audioGenerator = new ALSASourceGenerator() ;
+		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
+		inputSystem = new InputSystem() ;
 	}
 
+	@Override
 	public void initSystem()
 	{
 		initEventProcessors() ;
+
 		renderer.start() ;
-		sourceGenerator.startGenerator() ;
-		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
+		audioGenerator.startGenerator() ;
+
+		final GLRenderer render = ( GLRenderer )renderer ;
+		final InputSystem input = ( InputSystem )inputSystem ;
+
+		input.inputAdapter = render.renderInfo ;					// Hook up Input Adapter
 
 		frame.addWindowListener( new WindowListener()
 		{
@@ -66,13 +61,13 @@ public class GLDefaultSystem implements SystemInterface
 			public void windowOpened( final WindowEvent _event ) {}
 		} ) ;
 
-		renderer.hookToWindow( frame ) ;
-		renderer.getCanvas().addMouseListener( inputSystem ) ;
-		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;
-		renderer.getCanvas().addMouseWheelListener( inputSystem ) ;
-		renderer.getCanvas().addKeyListener( inputSystem ) ;
+		render.hookToWindow( frame ) ;
+		render.getCanvas().addMouseListener( input ) ;
+		render.getCanvas().addMouseMotionListener( input ) ;
+		render.getCanvas().addMouseWheelListener( input ) ;
+		render.getCanvas().addKeyListener( input ) ;
 
-		addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		eventSystem.addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
 	}
 
 	protected void initEventProcessors()
@@ -103,100 +98,20 @@ public class GLDefaultSystem implements SystemInterface
 			}
 		} ) ;*/
 
-		addEventHandler( eventController ) ;
+		eventSystem.addEventHandler( eventController ) ;
 	}
 
+	@Override
 	public void startSystem() {}
+
+	@Override
 	public void stopSystem() {}
-
-	public void shutdownSystem()
-	{
-		sourceGenerator.shutdownGenerator() ;
-		renderer.shutdown() ;
-	}
-
-	/*EVENT HOOK*/
-	public void addEvent( final Event _event )
-	{
-		eventSystem.addEvent( _event ) ;
-	}
-
-	public void addEventHandler( final EventHandler _handler )
-	{
-		eventSystem.addEventHandler( _handler ) ;
-	}
-
-	public void removeEventHandler( final EventHandler _handler )
-	{
-		eventSystem.removeEventHandler( _handler ) ;
-	}
-
-	@Override
-	public ShutdownDelegate getShutdownDelegate()
-	{
-		return shutdownDelegate ;
-	}
-
-	/*RENDER*/
-
-	public void setTitleName( final String _titleName )
-	{
-		titleName = _titleName ;
-	}
-
-	@Override
-	public RenderInterface getRenderInterface()
-	{
-		return renderer ;
-	}
-
-	/*AUDIO SOURCE GENERATOR*/
-	@Override
-	public AudioGenerator getAudioGenerator()
-	{
-		return sourceGenerator ;
-	}
-
-	@Override
-	public InputSystemInterface getInputInterface()
-	{
-		return inputSystem ;
-	}
-
-	@Override
-	public EventSystemInterface getEventInterface()
-	{
-		return eventSystem ;
-	}
-
-	@Override
-	public void sleep( final long _millis )
-	{
-		try
-		{
-			Thread.sleep( _millis ) ;
-		}
-		catch( InterruptedException ex )
-		{
-			ex.printStackTrace() ;
-		}
-	}
 
 	@Override
 	public boolean update( final float _dt )
 	{
-		renderer.updateState( _dt ) ;
-		inputSystem.update() ;
-
-		eventSystem.update() ;			// Pass the Events to the interested Backend Systems
+		super.update( _dt ) ;
 		eventController.update() ;		// Process the Events this system is interested in
-
-		return true ;	// Informs the Game System whether to continue updating or not.
-	}
-
-	@Override
-	public void draw( final float _dt )
-	{
-		renderer.draw( _dt ) ;
+		return true ;					// Informs the Game System whether to continue updating or not.
 	}
 }

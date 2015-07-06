@@ -7,7 +7,8 @@ import java.awt.Dimension ;
 
 import com.linxonline.malleteditor.renderer.GLEditorRenderer ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
-import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.input.desktop.InputSystem ;
+import com.linxonline.mallet.renderer.desktop.GL.* ;
 
 public class GLEditorSystem extends GLDefaultSystem
 {
@@ -20,10 +21,14 @@ public class GLEditorSystem extends GLDefaultSystem
 	public void initSystem()
 	{
 		renderer.start() ;
-		sourceGenerator.startGenerator() ;
-		inputSystem.inputAdapter = renderer.renderInfo ;				// Hook up Input Adapter
+		audioGenerator.startGenerator() ;
 
-		final JFrame frame = new JFrame( titleName ) ;					// Initialise Window
+		final GLRenderer render = ( GLRenderer )renderer ;
+		final InputSystem input = ( InputSystem )inputSystem ;
+
+		input.inputAdapter = render.renderInfo ;				// Hook up Input Adapter
+
+		final JFrame frame = new JFrame( title ) ;					// Initialise Window
 		frame.addWindowListener( new WindowListener()
 		{
 			public void windowActivated( final WindowEvent _event ) {}
@@ -35,11 +40,11 @@ public class GLEditorSystem extends GLDefaultSystem
 			public void windowOpened( final WindowEvent _event ) {}
 		} ) ;
 
-		renderer.hookToWindow( frame ) ;
+		render.hookToWindow( frame ) ;
 		frame.setVisible( false ) ;
-		frame.remove( renderer.getCanvas() ) ;
+		frame.remove( render.getCanvas() ) ;
 
-		final MainPanel mainPanel = new MainPanel( renderer.getCanvas() ) ;
+		final MainPanel mainPanel = new MainPanel( render.getCanvas() ) ;
 		eventSystem.addEventHandler( mainPanel.getEventController() ) ;
 		mainPanel.getEventController().setAddEventInterface( eventSystem ) ;
 
@@ -47,11 +52,11 @@ public class GLEditorSystem extends GLDefaultSystem
 		frame.pack() ;
 		frame.validate() ;
 		frame.setVisible( true ) ;
-		renderer.draw( 0.0f ) ;
+		render.draw( 0.0f ) ;
 
-		renderer.getCanvas().addMouseListener( inputSystem ) ;
-		renderer.getCanvas().addMouseMotionListener( inputSystem ) ;
-		renderer.getCanvas().addMouseWheelListener( inputSystem ) ;
-		renderer.getCanvas().addKeyListener( inputSystem ) ;
+		render.getCanvas().addMouseListener( input ) ;
+		render.getCanvas().addMouseMotionListener( input ) ;
+		render.getCanvas().addMouseWheelListener( input ) ;
+		render.getCanvas().addKeyListener( input ) ;
 	}
 }

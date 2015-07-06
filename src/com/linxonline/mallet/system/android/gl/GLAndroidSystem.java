@@ -8,7 +8,7 @@ import android.media.AudioManager ;
 
 import com.linxonline.mallet.main.android.AndroidActivity ;
 
-import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.system.BasicSystem ;
 import com.linxonline.mallet.system.DefaultShutdown ;
 import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.input.InputHandler ;
@@ -24,29 +24,35 @@ import com.linxonline.mallet.resources.android.* ;
 import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.input.android.* ;
 
-public class GLAndroidSystem implements SystemInterface
+public class GLAndroidSystem extends BasicSystem
 {
 	public final AndroidActivity activity ;
-
-	protected final EventSystem eventSystem = new EventSystem() ;
-	protected final AndroidInputSystem inputSystem = new AndroidInputSystem() ;
-	protected final AndroidAudioGenerator audioGenerator = new AndroidAudioGenerator() ;
-	protected final DefaultShutdown shutdownDelegate = new DefaultShutdown() ;
-	protected GL2DSurfaceView renderer ;
+	public GL2DSurfaceView surface ;
 
 	protected boolean execution = true ;
 
 	public GLAndroidSystem( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
 		activity = _activity ;
-		renderer = new GL2DSurfaceView( _activity, _notify ) ;
+
+		surface = new GL2DSurfaceView( _activity, _notify ) ;
+		renderer = surface.renderer ;
+
+		shutdownDelegate = new DefaultShutdown() ;
+		audioGenerator = new AndroidAudioGenerator() ;
+		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
+		inputSystem = new AndroidInputSystem() ;
+
 		setContentView() ;
 	}
 
+	@Override
 	public void initSystem()
 	{
-		inputSystem.inputAdapter = renderer.renderer.render.renderInfo ;
-		activity.addAndroidInputListener( inputSystem ) ;
+		final AndroidInputSystem input = ( AndroidInputSystem )inputSystem ;
+		final GL2DRenderer render = ( GL2DRenderer )renderer ;
+		input.inputAdapter = render.render.renderInfo ;
+		activity.addAndroidInputListener( input ) ;
 	}
 
 	public void setContentView()
@@ -56,7 +62,7 @@ public class GLAndroidSystem implements SystemInterface
 			@Override
 			public void run()
 			{
-				activity.setContentView( renderer ) ;
+				activity.setContentView( surface ) ;
 			}
 		} ) ;
 	}
@@ -64,7 +70,7 @@ public class GLAndroidSystem implements SystemInterface
 	@Override
 	public synchronized void startSystem()
 	{
-		//renderer.onResume() ;
+		//surface.onResume() ;
 	}
 
 	@Override
@@ -74,69 +80,19 @@ public class GLAndroidSystem implements SystemInterface
 	public synchronized void shutdownSystem()
 	{
 		audioGenerator.shutdownGenerator() ;
-		//renderer.onPause() ;
-	}
-
-	@Override
-	public ShutdownDelegate getShutdownDelegate()
-	{
-		return shutdownDelegate ;
-	}
-
-	/*RENDER*/
-
-	@Override
-	public RenderInterface getRenderInterface()
-	{
-		return renderer.renderer ;
-	}
-
-	@Override
-	public AudioGenerator getAudioGenerator()
-	{
-		return audioGenerator ;
-	}
-
-	@Override
-	public InputSystemInterface getInputInterface()
-	{
-		return inputSystem ;
-	}
-
-	@Override
-	public EventSystemInterface getEventInterface()
-	{
-		return eventSystem ;
-	}
-
-	@Override
-	public void sleep( final long _millis )
-	{
-		try
-		{
-			Thread.sleep( _millis ) ;
-		}
-		catch( InterruptedException ex )
-		{
-			Thread.currentThread().interrupt() ;
-			//ex.printStackTrace() ;
-		}
+		//surface.onPause() ;
 	}
 
 	@Override
 	public synchronized boolean update( final float _dt )
 	{
-		renderer.renderer.updateState( _dt ) ;
-		inputSystem.update() ;
-
-		eventSystem.update() ;
-
-		return true ;		// Update - called by Game State, return variable not used.
+		return super.update( _dt ) ;
 	}
 
 	@Override
 	public void draw( final float _dt )
 	{
-		renderer.draw( _dt ) ;
+		super.draw( _dt ) ;
+		surface.requestRender() ;
 	}
 }
