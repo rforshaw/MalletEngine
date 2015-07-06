@@ -15,13 +15,11 @@ import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.system.* ;
 import com.linxonline.mallet.event.* ;
 
-/*===========================================*/
-// DefaultSystem
-// Used to hook up Engine to OS using Java API
-// Central Location for Events, Input, 
-// and Rendering
-/*===========================================*/
-
+/**
+	Central location for OpenGL Desktop Applications.
+	Uses ALSA for audio.
+	Handles input events using JFrame.
+*/
 public class GLDefaultSystem extends BasicSystem
 {
 	protected final JFrame frame = new JFrame( title ) ;					// Initialise Window
@@ -45,11 +43,6 @@ public class GLDefaultSystem extends BasicSystem
 		renderer.start() ;
 		audioGenerator.startGenerator() ;
 
-		final GLRenderer render = ( GLRenderer )renderer ;
-		final InputSystem input = ( InputSystem )inputSystem ;
-
-		input.inputAdapter = render.renderInfo ;					// Hook up Input Adapter
-
 		frame.addWindowListener( new WindowListener()
 		{
 			public void windowActivated( final WindowEvent _event ) {}
@@ -60,6 +53,11 @@ public class GLDefaultSystem extends BasicSystem
 			public void windowIconified( final WindowEvent _event ) {}
 			public void windowOpened( final WindowEvent _event ) {}
 		} ) ;
+
+		final GLRenderer render = ( GLRenderer )renderer ;
+		final InputSystem input = ( InputSystem )inputSystem ;
+
+		input.inputAdapter = render.renderInfo ;					// Hook up Input Adapter
 
 		render.hookToWindow( frame ) ;
 		render.getCanvas().addMouseListener( input ) ;

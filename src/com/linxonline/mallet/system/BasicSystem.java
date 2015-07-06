@@ -7,6 +7,14 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.system.* ;
 
+/**
+	Basic implementation of the System Interface.
+	Defines what must be needed by a System and implements 
+	the boiler plate functions that are most consistent 
+	between implementations.
+	Look at GLDefaultSystem for an example on how to use 
+	this class.
+*/
 public abstract class BasicSystem implements SystemInterface
 {
 	protected String title = "Mallet Engine" ;
@@ -48,7 +56,6 @@ public abstract class BasicSystem implements SystemInterface
 		return renderer ;
 	}
 
-	/*AUDIO SOURCE GENERATOR*/
 	@Override
 	public AudioGenerator getAudioGenerator()
 	{
