@@ -100,9 +100,9 @@ public class AndroidInputSystem implements InputSystemInterface,
 			{
 				passInputEventToHandlers( keyInputs.get( i ) ) ;
 			}
-		}
 
-		keyInputs.clear() ;
+			keyInputs.clear() ;
+		}
 
 		synchronized( touchInputs )
 		{
@@ -112,9 +112,9 @@ public class AndroidInputSystem implements InputSystemInterface,
 			{
 				passInputEventToHandlers( touchInputs.get( i ) ) ;
 			}
-		}
 
-		touchInputs.clear() ;
+			touchInputs.clear() ;
+		}
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )

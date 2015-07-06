@@ -10,6 +10,7 @@ import com.linxonline.mallet.main.android.AndroidActivity ;
 
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.DefaultShutdown ;
+import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.resources.* ;
@@ -77,38 +78,6 @@ public class AndroidSystem implements SystemInterface
 		renderer.shutdown() ;
 	}
 
-	/*INPUT HOOK*/
-	@Override
-	public void addInputHandler( InputHandler _handler )
-	{
-		inputSystem.addInputHandler( _handler ) ;
-	}
-
-	@Override
-	public void removeInputHandler( InputHandler _handler )
-	{
-		inputSystem.removeInputHandler( _handler ) ;
-	}
-
-	/*EVENT HOOK*/
-	@Override
-	public void addEvent( Event _event )
-	{
-		eventSystem.addEvent( _event ) ;
-	}
-
-	@Override
-	public void addEventHandler( EventHandler _handler )
-	{
-		eventSystem.addEventHandler( _handler ) ;
-	}
-
-	@Override
-	public void removeEventHandler( EventHandler _handler )
-	{
-		eventSystem.removeEventHandler( _handler ) ;
-	}
-
 	@Override
 	public ShutdownDelegate getShutdownDelegate()
 	{
@@ -127,6 +96,18 @@ public class AndroidSystem implements SystemInterface
 	public AudioGenerator getAudioGenerator()
 	{
 		return audioGenerator ;
+	}
+
+	@Override
+	public InputSystemInterface getInputInterface()
+	{
+		return inputSystem ;
+	}
+
+	@Override
+	public EventSystemInterface getEventInterface()
+	{
+		return eventSystem ;
 	}
 
 	@Override

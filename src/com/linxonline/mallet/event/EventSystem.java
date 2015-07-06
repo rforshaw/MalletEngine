@@ -6,7 +6,7 @@ import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 
-public final class EventSystem implements AddEventInterface
+public final class EventSystem implements EventSystemInterface
 {
 	// Replace HashMap with something easier to traverse.
 	private final String name ;

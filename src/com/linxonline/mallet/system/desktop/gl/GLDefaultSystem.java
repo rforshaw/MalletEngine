@@ -115,17 +115,6 @@ public class GLDefaultSystem implements SystemInterface
 		renderer.shutdown() ;
 	}
 
-	/*INPUT HOOK*/
-	public void addInputHandler( final InputHandler _handler )
-	{
-		inputSystem.addInputHandler( _handler ) ;
-	}
-
-	public void removeInputHandler( final InputHandler _handler )
-	{
-		inputSystem.removeInputHandler( _handler ) ;
-	}
-
 	/*EVENT HOOK*/
 	public void addEvent( final Event _event )
 	{
@@ -166,6 +155,18 @@ public class GLDefaultSystem implements SystemInterface
 	public AudioGenerator getAudioGenerator()
 	{
 		return sourceGenerator ;
+	}
+
+	@Override
+	public InputSystemInterface getInputInterface()
+	{
+		return inputSystem ;
+	}
+
+	@Override
+	public EventSystemInterface getEventInterface()
+	{
+		return eventSystem ;
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class EditorState extends GameState
 				for( final Entity entity : entities )
 				{
 					addEntity( entity ) ;
-					system.addEvent( new Event( MainPanel.EVENT_TYPES[0], entity ) ) ;
+					system.getEventInterface().addEvent( new Event( MainPanel.EVENT_TYPES[0], entity ) ) ;
 				}
 			}
 		} ) ;
@@ -168,7 +168,7 @@ public class EditorState extends GameState
 	{
 		super.hookHandlerSystems() ;
 		eventSystem.addEventHandler( editorController ) ;
-		system.addEventHandler( editorController ) ;
+		system.getEventInterface().addEventHandler( editorController ) ;
 	}
 
 	@Override
@@ -176,7 +176,7 @@ public class EditorState extends GameState
 	{
 		super.unhookHandlerSystems() ;
 		eventSystem.removeEventHandler( editorController ) ;
-		system.removeEventHandler( editorController ) ;
+		system.getEventInterface().removeEventHandler( editorController ) ;
 	}
 	
 	private void populateEntityFactory()

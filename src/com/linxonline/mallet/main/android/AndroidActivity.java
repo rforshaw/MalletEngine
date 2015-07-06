@@ -185,7 +185,7 @@ public class AndroidActivity extends Activity
 	@Override
 	public void passEvent( final Event _event )
 	{
-		starter.getAndroidSystem().addEvent( _event ) ;
+		starter.getAndroidSystem().getEventInterface().addEvent( _event ) ;
 	}
 
 	private synchronized void startGameThread()

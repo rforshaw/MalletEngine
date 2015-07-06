@@ -8,6 +8,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.game.statemachine.State ;
 
+import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
@@ -15,6 +16,7 @@ import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventSystem ;
 import com.linxonline.mallet.event.EventProcessor ;
 import com.linxonline.mallet.event.EventController ;
+import com.linxonline.mallet.event.EventSystemInterface ;
 
 import com.linxonline.mallet.physics.CollisionSystem ;
 
@@ -281,7 +283,7 @@ public class GameState extends State implements HookEntity
 	protected void hookGameStateEventController()
 	{
 		eventSystem.addEventHandler( eventController ) ;
-		system.addEventHandler( eventController ) ;
+		system.getEventInterface().addEventHandler( eventController ) ;
 	}
 	
 	/**
@@ -295,8 +297,9 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface() ) ;
 
-		system.addInputHandler( inputUISystem ) ;
-		system.addInputHandler( inputWorldSystem ) ;
+		final InputSystemInterface input = system.getInputInterface() ;
+		input.addInputHandler( inputUISystem ) ;
+		input.addInputHandler( inputWorldSystem ) ;
 	}
 
 	/**
@@ -312,8 +315,9 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
 
-		system.removeInputHandler( inputUISystem ) ;
-		system.removeInputHandler( inputWorldSystem ) ;
+		final InputSystemInterface input = system.getInputInterface() ;
+		input.removeInputHandler( inputUISystem ) ;
+		input.removeInputHandler( inputWorldSystem ) ;
 	}
 
 	/**

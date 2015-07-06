@@ -1,12 +1,9 @@
 package com.linxonline.mallet.system ;
 
 import com.linxonline.mallet.audio.AudioGenerator ;
-import com.linxonline.mallet.input.InputHandler ;
-import com.linxonline.mallet.event.EventHandler ;
-import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.input.InputSystemInterface ;
+import com.linxonline.mallet.event.EventSystemInterface ;
 import com.linxonline.mallet.renderer.RenderInterface ;
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
 
 /**
 	To initialise low-level/Operating specific systems that the 
@@ -25,27 +22,6 @@ public interface SystemInterface
 	public void shutdownSystem() ;	// Shutdown systems and begin the clean-up job
 
 	/**
-		INPUT HOOK - convience methods.
-		The root Input-system, typically one state will be hooked.
-	*/
-	public void addInputHandler( final InputHandler _handler ) ;
-	public void removeInputHandler( final InputHandler _handler ) ;
-
-	/**
-		EVENT HOOK - convience methods.
-		The root Event-system, typically one state will be hooked.
-		Allows the state to be informed of external events. For 
-		example: shutdown, minimise, layout change requests that 
-		the state may be interested in.
-		It also enables the state to make O/S specific requests 
-		that only work on certain implementations. For example:
-		Displaying virtual-keyboard, opening a web browser, etc.
-	*/
-	public void addEvent( final Event _event ) ;
-	public void addEventHandler( final EventHandler _handler ) ;
-	public void removeEventHandler( final EventHandler _handler ) ;
-
-	/**
 		It is impossible for the Game State to know when 
 		the player has decided to close the application 
 		externally.
@@ -61,8 +37,27 @@ public interface SystemInterface
 	*/
 	public RenderInterface getRenderInterface() ;
 
-	/*AUDIO GENERATOR*/
+	/**
+		AUDIO GENERATOR
+	*/
 	public AudioGenerator getAudioGenerator() ;
+
+	/**
+		Return the main input system for the running application.
+		The root Input-system, typically one state will be hooked.
+	*/
+	public InputSystemInterface getInputInterface() ;
+
+	/**
+		The root Event-system, typically one state will be hooked.
+		Allows the state to be informed of external events. For 
+		example: shutdown, minimise, layout change requests that 
+		the state may be interested in.
+		It also enables the state to make O/S specific requests 
+		that only work on certain implementations. For example:
+		Displaying virtual-keyboard, opening a web browser, etc.
+	*/
+	public EventSystemInterface getEventInterface() ;
 
 	public boolean update( final float _dt ) ;		// Update the System
 
@@ -71,12 +66,12 @@ public interface SystemInterface
 	public void draw( final float _dt ) ;
 
 	/**
-		Implement this interface is DefaultShutdown is 
+		Implement this interface if DefaultShutdown is 
 		too limited for your use case.
 		Register things that need to be correctly dealt 
 		with before the application has been closed. 
 		This may include saving the current game-state 
-		or clearing specially resources.
+		or clearing special resources.
 	*/
 	public static interface ShutdownDelegate
 	{
