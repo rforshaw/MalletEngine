@@ -12,22 +12,15 @@ public class EditorEntityFactory extends EntityFactory
 	public EditorEntityFactory() {}
 
 	@Override
-	public Entity create( final Settings _setting )
+	public Entity create( final String _type, final Settings _setting )
 	{
-		final String type = _setting.getString( TYPE, null ) ;
-		if( type != null )
+		if( exists( _type ) == true )
 		{
-			if( exists( type ) == true )
-			{
-				return ( Entity )creators.get( type ).create( _setting ) ;
-			}
-			else
-			{
-				return ( Entity )creators.get( DEFAULT_EDITOR_CREATOR ).create( _setting ) ;
-			}
+			return ( Entity )creators.get( _type ).create( _setting ) ;
 		}
-
-		System.out.println( "Failed to create object of type: " + type ) ;
-		return null ;
+		else
+		{
+			return ( Entity )creators.get( DEFAULT_EDITOR_CREATOR ).create( _setting ) ;
+		}
 	}
 }

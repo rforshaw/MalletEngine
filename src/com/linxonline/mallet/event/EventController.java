@@ -2,10 +2,6 @@ package com.linxonline.mallet.event ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-import com.linxonline.mallet.io.save.Reference ;
-import com.linxonline.mallet.io.save.NoSave ;
-
 import com.linxonline.mallet.util.logger.Logger ;
 
 /**
@@ -19,14 +15,14 @@ import com.linxonline.mallet.util.logger.Logger ;
 	processed during the EventSystem update(). And not during an 
 	objects actual update time.
 **/
-public @SaveClass class EventController implements EventHandler
+public class EventController implements EventHandler
 {
-	private @NoSave final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
+	private final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
 
 	private final String name ;
-	private @NoSave final EventMessenger messenger = new EventMessenger() ;
+	private final EventMessenger messenger = new EventMessenger() ;
 	private final ArrayList<EventProcessor> processors = new ArrayList<EventProcessor>() ;
-	private @Reference AddEventInterface addInterface = null ;
+	private AddEventInterface addInterface = null ;
 
 	public EventController()
 	{

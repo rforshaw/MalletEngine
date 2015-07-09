@@ -39,9 +39,7 @@ import com.linxonline.mallet.physics.primitives.AABB ;
 
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-//import com.linxonline.mallet.input.desktop.XInputLinux ;
 
-import com.linxonline.mallet.io.save.* ;
 import com.linxonline.mallet.util.tools.Diff ;
 import com.linxonline.mallet.util.tools.SimpleDiff ;
 import com.linxonline.mallet.io.reader.ByteReader ;
@@ -61,49 +59,8 @@ public final class GameTestLoader extends GameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
-			//private final XInputLinux device = new XInputLinux( "/dev/input/js0" ) ;
-
 			public void initGame()			// Called when state is started
 			{
-				/*final byte[] base = ByteReader.readBytes( "base/textures/moomba.bmp" ) ;
-				final byte[] modified = ByteReader.readBytes( "base/textures/moomba1.bmp" ) ;
-
-				final byte[] diff = SimpleDiff.encode( base, modified ) ;
-				final byte[] reconstruct = SimpleDiff.decode( base, diff ) ;
-
-				GlobalFileSystem.getFile( "base/textures/test-simplediff.dif" ).getByteOutStream().writeBytes( diff, 0, diff.length ) ;
-				GlobalFileSystem.getFile( "base/textures/reconstruct.bmp" ).getByteOutStream().writeBytes( reconstruct, 0, reconstruct.length ) ;*/
-
-				/*final Event<Matrix4> event = new Event( "BOB", new Matrix4() ) ;
-				Dump.dump( event, Format.JSON, "test.dump" ) ;
-
-				final Event<Matrix4> con = ( Event<Matrix4> )Build.build( "test.dump", Format.JSON ) ;
-				con.setEventType( con.getEventType() ) ;
-				System.out.println( con ) ;*/
-
-				/*device.setXInputListener( new XInputListener()
-				{
-					public void keyPressed( final XInputDevice.Event _event )
-					{
-						System.out.println( _event ) ;
-					}
-
-					public void keyReleased( final XInputDevice.Event _event )
-					{
-						System.out.println( _event ) ;
-					}
-
-					// D-Pad, Joysticks, L2, R2
-					public void analogue( final XInputDevice.Event _event )
-					{
-						System.out.println( _event ) ;
-					}
-
-					public void start() {}
-					public void end() {}
-				} ) ;*/
-
-				//system.getRenderInterface().setCameraPosition( new Vector3( 512, -512, 0 ) ) ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;

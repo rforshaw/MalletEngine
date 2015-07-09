@@ -2,14 +2,12 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.Reference ;
-
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 
 public abstract class InputComponent extends Component implements InputHandler
 {
-	protected @Reference InputAdapterInterface inputAdapter = null ;
+	protected InputAdapterInterface inputAdapter = null ;
 	protected final InputMode mode ;
 	protected ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
 

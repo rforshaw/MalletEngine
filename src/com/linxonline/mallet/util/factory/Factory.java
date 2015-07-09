@@ -5,17 +5,13 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 /**
 	Factory is a container class for CreatorInterface objects.
-	
-	Used by passing a Settings object to create(), which must 
-	contain a Key = TYPE with the value as a String.
 **/
-public class Factory<T> implements FactoryInterface<T>
+public class Factory<T, U> implements FactoryInterface<T, U>
 {
-	protected static final String TYPE = "TYPE" ;
-	protected final HashMap<String, CreatorInterface<T>> creators = new HashMap<String, CreatorInterface<T>>() ;
+	protected final HashMap<String, CreatorInterface<T, U>> creators = new HashMap<String, CreatorInterface<T, U>>() ;
 
 	@Override
-	public void addCreator( final CreatorInterface<T> _creator )
+	public void addCreator( final CreatorInterface<T, U> _creator )
 	{
 		final String type = _creator.getType() ;
 		if( exists( type ) == true )
@@ -28,7 +24,7 @@ public class Factory<T> implements FactoryInterface<T>
 	}
 
 	@Override
-	public boolean removeCreator( final CreatorInterface<T> _creator )
+	public boolean removeCreator( final CreatorInterface<T, U> _creator )
 	{
 		return removeCreator( _creator.getType() ) ;
 	}
@@ -46,18 +42,14 @@ public class Factory<T> implements FactoryInterface<T>
 	}
 
 	@Override
-	public T create( final Settings _setting )
+	public T create( final String _type, final U _data )
 	{
-		final String type = _setting.getString( TYPE, null ) ;
-		if( type != null )
+		if( exists( _type ) == true )
 		{
-			if( exists( type ) == true )
-			{
-				return ( T )creators.get( type ).create( _setting ) ;
-			}
+			return ( T )creators.get( _type ).create( _data ) ;
 		}
 
-		System.out.println( "Failed to create object of type: " + type ) ;
+		System.out.println( "Failed to create object of type: " + _type ) ;
 		return null ;
 	}
 

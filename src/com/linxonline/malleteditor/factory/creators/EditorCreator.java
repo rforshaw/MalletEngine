@@ -9,7 +9,7 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class EditorCreator extends Creator<Entity>
+public class EditorCreator extends Creator<Entity, Settings>
 {
 	private static final Vector2 OFFSET_ZERO = new Vector2() ;
 

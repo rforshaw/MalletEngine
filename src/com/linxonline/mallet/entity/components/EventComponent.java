@@ -2,8 +2,6 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.Save ;
-
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.system.* ;
 
@@ -19,7 +17,7 @@ import com.linxonline.mallet.system.* ;
 **/
 public class EventComponent extends Component
 {
-	protected @Save final EventController eventController = new EventController( id.toString() ) ;
+	protected final EventController eventController = new EventController( id.toString() ) ;
 
 	public EventComponent()
 	{

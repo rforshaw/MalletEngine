@@ -4,9 +4,6 @@ import java.util.Collection ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-import com.linxonline.mallet.io.save.NoSave ;
-
 import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.id.ID ;
@@ -26,10 +23,10 @@ import com.linxonline.mallet.event.* ;
 	should be done through a component like EventComponent that can then route it 
 	through the Component Event System.
 **/
-public final @SaveClass class Entity implements SerialisableForm
+public final class Entity implements SerialisableForm
 {
 	private final ArrayList<Component> components = new ArrayList<Component>() ;
-	private @NoSave final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
+	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
 	public final ID id ;							// Unique ID for this Entity: Name:Family
 	public Vector3 position = new Vector3() ;		// Position of Entity in world space

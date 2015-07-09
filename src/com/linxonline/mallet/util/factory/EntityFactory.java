@@ -11,7 +11,7 @@ import com.linxonline.mallet.io.reader.RFReader ;
 	Assumes each Creator also parses the Settings object
 	passed to it.
 **/
-public class EntityFactory extends Factory<Entity>
+public class EntityFactory extends Factory<Entity, Settings>
 {
 	/**public void  addCreator()**/
 	/**public boolean  removeCreator()**/
@@ -28,7 +28,8 @@ public class EntityFactory extends Factory<Entity>
 
 		for( int i = 0; i < length; ++i )
 		{
-			final Object obj = create( _file.get( i ) ) ;
+			final Settings settings = _file.get( i ) ;
+			final Object obj = create( settings.getString( "TYPE", "" ), settings ) ;
 			if( obj instanceof ArrayList )
 			{
 				entities.addAll( ( ArrayList<Entity> )obj ) ;
@@ -44,7 +45,7 @@ public class EntityFactory extends Factory<Entity>
 
 	public Entity createEntity( final Settings _entity )
 	{
-		final Entity entity = create( _entity ) ;
+		final Entity entity = create( _entity.getString( "TYPE", "" ), _entity ) ;
 		return entity != null ? entity : new Entity() ;
 	}
 }

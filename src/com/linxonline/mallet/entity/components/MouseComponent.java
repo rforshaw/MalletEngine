@@ -2,8 +2,6 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -13,7 +11,7 @@ import com.linxonline.mallet.entity.Entity ;
 // MouseComponent - Provides components that tracks mouse		// 
 // position													    //
 /*==============================================================*/
-public @SaveClass class MouseComponent extends InputComponent
+public class MouseComponent extends InputComponent
 {
 	protected final Vector2 mouse = new Vector2() ;
 	protected boolean mouseMoved    = false ;

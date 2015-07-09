@@ -5,12 +5,12 @@ import com.linxonline.mallet.util.settings.Settings ;
 /**
 	Implements setType and getType.
 */
-public abstract class Creator<T> implements CreatorInterface<T>
+public abstract class Creator<T, U> implements CreatorInterface<T, U>
 {
 	protected String type = null ;
 
 	@Override
-	public abstract T create( final Settings _setting ) ;
+	public abstract T create( final U _data ) ;
 
 	public final void setType( final String _type )
 	{

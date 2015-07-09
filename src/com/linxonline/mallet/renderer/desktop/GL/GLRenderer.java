@@ -218,17 +218,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
-
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
+					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -262,11 +253,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final GLImage image = texture.getImage() ;
-				gl.glGetIntegerv( GL2.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-				if( textureID[0] != image.textureIDs[0] )
-				{
-					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-				}
+				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
@@ -301,17 +288,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
-
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
+					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
@@ -359,11 +337,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( fm == null ) { return ; }
 
 				final GLImage image = fm.getGLImage() ;
-				gl.glGetIntegerv( GL2.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-				if( textureID[0] != image.textureIDs[0] )
-				{
-					gl.glBindTexture( GL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-				}
+				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
@@ -427,17 +401,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
-
-					gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						gl.glBindBuffer( GL2.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
+					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -651,7 +616,29 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
+			gl.glGetIntegerv( GL2.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+			gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+			gl.glGetIntegerv( GL2.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+
 			state.draw() ;
+		}
+	}
+
+	private static void bindTexture( final GL2 _gl, final int[] _idToBind, final int[] _store )
+	{
+		if( _store[0] != _idToBind[0] )
+		{
+			_store[0] = _idToBind[0] ;
+			_gl.glBindTexture( GL.GL_TEXTURE_2D, _store[0] ) ;
+		}
+	}
+
+	private static void bindBuffer( final GL2 _gl, final int _type, final int _idToBind, final int[] _store )
+	{
+		if( _store[0] != _idToBind )
+		{
+			_store[0] = _idToBind ;
+			_gl.glBindBuffer( _type, _store[0] ) ;
 		}
 	}
 

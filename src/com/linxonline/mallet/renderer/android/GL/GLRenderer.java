@@ -178,17 +178,9 @@ public class GLRenderer extends Basic2DRender
 					GLES11.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
 					GLES11.glTranslatef( offset.x, offset.y, 0.0f ) ;
 
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
+					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -223,11 +215,7 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLImage image = texture.getImage() ;
-				GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-				if( textureID[0] != image.textureIDs[0] )
-				{
-					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-				}
+				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
 
 				final Model model = _settings.getObject( "MODEL", null ) ;
 				if( model == null )
@@ -262,17 +250,8 @@ public class GLRenderer extends Basic2DRender
 
 					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
-
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
+					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
@@ -326,11 +305,7 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLImage image = fm.getGLImage() ;
-				GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-				if( textureID[0] != image.textureIDs[0] )
-				{
-					GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-				}
+				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
@@ -393,17 +368,8 @@ public class GLRenderer extends Basic2DRender
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-					if( geometry.indexID != indexID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID ) ;
-					}
-
-					GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-					if( geometry.vboID != bufferID[0] )
-					{
-						GLES11.glBindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID ) ;
-					}
+					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -562,7 +528,29 @@ public class GLRenderer extends Basic2DRender
 		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
+			GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+			GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+			GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+
 			state.draw() ;
+		}
+	}
+
+	private static void bindTexture( final int[] _idToBind, final int[] _store )
+	{
+		if( _store[0] != _idToBind[0] )
+		{
+			_store[0] = _idToBind[0] ;
+			GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, _store[0] ) ;
+		}
+	}
+
+	private static void bindBuffer( final int _type, final int _idToBind, final int[] _store )
+	{
+		if( _store[0] != _idToBind )
+		{
+			_store[0] = _idToBind ;
+			GLES11.glBindBuffer( _type, _store[0] ) ;
 		}
 	}
 

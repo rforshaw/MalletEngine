@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.malleteditor.entity.EditorMouseComponent ;
 
-public class EditorMouseCreator extends Creator<Entity>
+public class EditorMouseCreator extends Creator<Entity, Settings>
 {
 	public EditorMouseCreator()
 	{

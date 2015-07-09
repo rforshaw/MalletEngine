@@ -1,14 +1,12 @@
 package com.linxonline.mallet.event ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 /**
 	Used by the Event Controller to allow the developer to 
 	effectively process the Event stream.
 	Its aim is to allow the developer to split-up event tasks 
 	into smaller more managable groups.
 */
-public @SaveClass abstract class EventProcessor<T>
+public abstract class EventProcessor<T>
 {
 	private final String name ;			// Event Processor name, for easy identification
 	private final EventType type ;		// Only process events that match this Event Type

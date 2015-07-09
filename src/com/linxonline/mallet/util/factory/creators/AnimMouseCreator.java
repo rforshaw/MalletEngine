@@ -11,7 +11,7 @@ import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 
-public class AnimMouseCreator extends Creator<Entity>
+public class AnimMouseCreator extends Creator<Entity, Settings>
 {
 	public AnimMouseCreator()
 	{

@@ -8,9 +8,9 @@ import java.awt.Point ;
 import java.awt.Cursor ;
 import java.awt.Toolkit ;
 
+import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
+import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
-import com.linxonline.mallet.renderer.desktop.GL.* ;
-import com.linxonline.mallet.audio.desktop.alsa.* ;
 import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.system.* ;
 import com.linxonline.mallet.event.* ;
@@ -28,6 +28,7 @@ public class GLDefaultSystem extends BasicSystem
 	public GLDefaultSystem()
 	{
 		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+
 		shutdownDelegate = new DefaultShutdown() ;
 		renderer = new GLRenderer() ;
 		audioGenerator = new ALSASourceGenerator() ;
@@ -86,15 +87,6 @@ public class GLDefaultSystem extends BasicSystem
 				}
 			}
 		} ) ;
-
-		/*eventController.addEventProcessor( new EventProcessor<?>( "SYSTEM_RENDER", "SYSTEM_RENDER" )
-		{
-			@Override
-			public void processEvent( final Event<?> _event )
-			{
-				System.out.println( "Handle Render" ) ;
-			}
-		} ) ;*/
 
 		eventSystem.addEventHandler( eventController ) ;
 	}

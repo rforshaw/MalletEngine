@@ -2,9 +2,6 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.Save ;
-import com.linxonline.mallet.io.save.Reference ;
-
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.event.Event ;
@@ -27,10 +24,10 @@ import com.linxonline.mallet.system.* ;
 public class RenderComponent extends EventComponent implements IDInterface
 {
 	private final SourceTracker tracker = new SourceTracker( this ) ;
-	private @Save final ArrayList<Event<Settings>> content = new ArrayList<Event<Settings>>() ;
+	private final ArrayList<Event<Settings>> content = new ArrayList<Event<Settings>>() ;
 
 	private boolean initialEventDone = false ;
-	private @Reference Component.ReadyCallback toDestroy = null ;
+	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
 	{

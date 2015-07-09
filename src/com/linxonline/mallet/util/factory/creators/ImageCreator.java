@@ -7,7 +7,7 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class ImageCreator extends Creator<Entity>
+public class ImageCreator extends Creator<Entity, Settings>
 {
 	private static final Vector2 OFFSET_ZERO = new Vector2() ;
 
