@@ -3,16 +3,14 @@ package com.linxonline.mallet.entity.components ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.entity.Entity ;
-
-import com.linxonline.mallet.io.serialisation.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.id.ID ;
+import com.linxonline.mallet.event.* ;
 
 /*==============================================================*/
 // Component - Root class for all Componets used by Entity.	  //
 /*==============================================================*/
 
-public abstract class Component implements SerialisableForm
+public abstract class Component
 {
 	protected final EventController componentEvents = new EventController() ;		// Handles events from parent
 	protected Entity parent = null ;											// Owner of this component
@@ -113,31 +111,6 @@ public abstract class Component implements SerialisableForm
 	public EventController getComponentEventController()
 	{
 		return componentEvents ;
-	}
-
-	/**
-		Used to write out the byte stream of the Component object
-	**/
-	public boolean writeObject( final SerialiseOutput _output )
-	{
-		_output.writeString( id.name ) ;
-		_output.writeString( id.group ) ;
-		_output.writeInt( id.nameID ) ;
-		_output.writeInt( id.groupID ) ;
-		return true ;
-	}
-
-	/**
-		Used to read an Component byte stream and reconstruct it.
-		It does NOT build the Component from scratch.
-	**/
-	public boolean readObject( final SerialiseInput _input )
-	{
-		id.name = _input.readString() ;
-		id.group = _input.readString() ;
-		id.nameID = _input.readInt() ;
-		id.groupID = _input.readInt() ;
-		return true ;
 	}
 
 	public static interface ReadyCallback<T extends Component>

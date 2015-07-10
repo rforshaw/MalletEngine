@@ -7,7 +7,6 @@ import java.util.HashMap ;
 import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.id.ID ;
-import com.linxonline.mallet.io.serialisation.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 
@@ -23,7 +22,7 @@ import com.linxonline.mallet.event.* ;
 	should be done through a component like EventComponent that can then route it 
 	through the Component Event System.
 **/
-public final class Entity implements SerialisableForm
+public final class Entity
 {
 	private final ArrayList<Component> components = new ArrayList<Component>() ;
 	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
@@ -270,55 +269,6 @@ public final class Entity implements SerialisableForm
 		{
 			component.readyToDestroy( readyDestroy ) ;
 		}
-	}
-
-	/**
-		Used to write out the byte stream of the Entity object
-	**/
-	public boolean writeObject( final SerialiseOutput _output )
-	{
-		_output.writeString( id.name ) ;
-		_output.writeString( id.group ) ;
-		_output.writeFloat( position.x ) ;
-		_output.writeFloat( position.y ) ;
-		_output.writeFloat( position.z ) ;
-		_output.writeBoolean( destroy ) ;
-		
-		final int length = components.size() ;
-		Component component = null ;
-		
-		for( int i = 0 ; i < length; ++i )
-		{
-			component = components.get( i ) ;
-			component.writeObject( _output ) ;
-		}
-
-		return true ;
-	}
-
-	/**
-		Used to read an Entity byte stream and reconstruct it.
-		It does NOT build the Entity from scratch.
-	**/
-	public boolean readObject( final SerialiseInput _input )
-	{
-		id.setName( _input.readString() ) ;
-		id.setGroup( _input.readString() ) ;
-		position.x = _input.readFloat() ;
-		position.y = _input.readFloat() ;
-		position.z = _input.readFloat() ;
-		destroy = _input.readBoolean() ;
-
-		final int length = components.size() ;
-		Component component = null ;
-
-		for( int i = 0 ; i < length; ++i )
-		{
-			component = components.get( i ) ;
-			component.readObject( _input ) ;
-		}
-
-		return true ;
 	}
 
 	/**
