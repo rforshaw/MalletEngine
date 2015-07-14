@@ -2,7 +2,6 @@ package com.linxonline.mallet.io.filesystem ;
 
 public interface FileStream extends Close
 {
-
 	public ByteInStream getByteInStream() ;
 	public StringInStream getStringInStream() ;
 
