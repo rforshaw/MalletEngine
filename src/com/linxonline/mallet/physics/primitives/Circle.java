@@ -1,10 +1,8 @@
 package com.linxonline.mallet.physics.primitives ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 
-public @SaveClass class Circle
+public class Circle
 {
 	private final Vector2 temp = new Vector2() ;		// Used in intersectCircle
 

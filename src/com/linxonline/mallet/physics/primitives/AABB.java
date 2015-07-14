@@ -1,10 +1,8 @@
 package com.linxonline.mallet.physics.primitives ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 
-public @SaveClass class AABB
+public class AABB
 {
 	private final Vector2 absoluteCenter = new Vector2() ;
 	public final Vector2 position = new Vector2() ;

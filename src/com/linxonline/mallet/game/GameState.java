@@ -34,9 +34,11 @@ import com.linxonline.mallet.util.locks.Locks ;
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;
 
+import com.linxonline.mallet.io.save.state.DataSet ;
+
 public class GameState extends State implements HookEntity
 {
-	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 20Hz
+	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
@@ -48,11 +50,13 @@ public class GameState extends State implements HookEntity
 	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
 	protected final EventController eventController = new EventController( "GAME_STATE_CONTROLLER" ) ;		// Used to process Events, gateway between internal eventSystem and root event-system
 
-	protected SystemInterface system = null ;														// Provides access to Root systems
-	protected final AudioSystem audioSystem = new AudioSystem() ;									// Must specify a SourceGenerator
+	protected SystemInterface system = null ;																// Provides access to Root systems
+	protected final AudioSystem audioSystem = new AudioSystem() ;											// Must specify a SourceGenerator
 	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
+
+	protected final ArrayList<DataSet> runtimeState = new ArrayList<DataSet>() ;				// Current Runtime State used for saving/loading/networking
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
@@ -523,13 +527,34 @@ public class GameState extends State implements HookEntity
 				eventSystem.removeEventHandler( controller ) ;
 			}
 		} ) ;
-		
+
 		eventController.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY", "ADD_GAME_STATE_QUERY" )
 		{
 			public void processEvent( final Event<QueryComponent> _event )
 			{
 				final QueryComponent query = _event.getVariable() ;
 				query.setSearch( entitySystem.getSearch() ) ;
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<ArrayList<DataSet>>( "REGISTER_RUNTIME_STATE", "REGISTER_RUNTIME_STATE" )
+		{
+			public void processEvent( final Event<ArrayList<DataSet>> _event )
+			{
+				runtimeState.addAll( _event.getVariable() ) ;
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<ArrayList<DataSet>>( "UNREGISTER_REGISTER_STATE", "UNREGISTER_RUNTIME_STATE" )
+		{
+			public void processEvent( final Event<ArrayList<DataSet>> _event )
+			{
+				final ArrayList<DataSet> data = _event.getVariable() ;
+				final int size = data.size() ;
+				for( int i = 0; i < size; ++i )
+				{
+					runtimeState.remove( data.get( i ) ) ;
+				}
 			}
 		} ) ;
 	}

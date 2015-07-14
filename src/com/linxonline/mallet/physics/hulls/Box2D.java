@@ -1,14 +1,12 @@
 package com.linxonline.mallet.physics.hulls ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 
 import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 import com.linxonline.mallet.physics.primitives.OBB ;
 
-public @SaveClass class Box2D extends Hull
+public class Box2D extends Hull
 {
 	public final AABB aabb ;
 	public final OBB obb ;

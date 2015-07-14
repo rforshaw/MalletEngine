@@ -154,35 +154,33 @@ public final class Entity
 	/**
 		Return all the components with the designated name
 	**/
-	public final ArrayList<Component> getComponentsByName( final String _name )
+	public final int getComponentsByName( final String _name, final ArrayList<Component> _components )
 	{
-		final ArrayList<Component> group = new ArrayList<Component>() ;
 		for( Component component : components )
 		{
 			if( component.isName( _name ) == true )
 			{
-				group.add( component ) ;
+				_components.add( component ) ;
 			}
 		}
 
-		return group ;
+		return _components.size() ;
 	}
 
 	/**
 		Return all the components with the designated nameID
 	**/
-	public final ArrayList<Component> getComponentsByNameID( final int _nameID )
+	public final int getComponentsByNameID( final int _nameID, final ArrayList<Component> _components )
 	{
-		final ArrayList<Component> group = new ArrayList<Component>() ;
 		for( Component component : components )
 		{
 			if( component.isNameID( _nameID ) == true )
 			{
-				group.add( component ) ;
+				_components.add( component ) ;
 			}
 		}
 
-		return group ;
+		return _components.size() ;
 	}
 
 	/**
@@ -190,19 +188,17 @@ public final class Entity
 		an ArrayList.
 		NOTE: A new ArrayList is created each time this function is called.
 	**/
-	public final ArrayList<Component> getComponentByGroup( final String _group )
+	public final int getComponentByGroup( final String _group, final ArrayList<Component> _components )
 	{
-		final ArrayList<Component> group = new ArrayList<Component>() ;
-
 		for( final Component component : components )
 		{
 			if( component.isGroup( _group ) == true )
 			{
-				group.add( component ) ;
+				_components.add( component ) ;
 			}
 		}
 
-		return group ;
+		return _components.size() ;
 	}
 
 	/**
@@ -258,7 +254,7 @@ public final class Entity
 				{
 					if( toDestroy.isEmpty() == true )
 					{
-						System.out.println( "Entity destroyed." ) ;
+						//System.out.println( "Entity destroyed." ) ;
 						destroy = true ;
 					}
 				}

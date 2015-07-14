@@ -67,7 +67,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 			toDestroy.ready( this ) ;
 		}
 	}
-	
+
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{

@@ -1,14 +1,11 @@
 package com.linxonline.mallet.physics ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-import com.linxonline.mallet.io.save.NoSave ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
-public @SaveClass class ContactData
+public class ContactData
 {
-	private @NoSave static final int MAX_COLLISION_POINTS = 5 ;
+	private static final int MAX_COLLISION_POINTS = 5 ;
 
 	private final ContactPoint[] contacts = new ContactPoint[MAX_COLLISION_POINTS] ;
 	private int usedContacts = 0 ;

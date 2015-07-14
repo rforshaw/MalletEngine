@@ -2,8 +2,6 @@ package com.linxonline.mallet.event ;
 
 import java.util.HashMap ;
 
-import com.linxonline.mallet.io.save.Save ;
-
 /**
 	The aim of Event Type is to provide faster checks 
 	when processing Events.
@@ -18,11 +16,7 @@ import com.linxonline.mallet.io.save.Save ;
 public final class EventType
 {
 	private final static HashMap<String, EventType> eventTypes = new HashMap<String, EventType>() ;
-
-	// A reconstructed EventType is not automatically added to the 
-	// eventTypes HashMap above. Consider it a container to retrieve 
-	// the correct EventType.
-	private @Save final String type ;
+	private final String type ;
 
 	private EventType()
 	{

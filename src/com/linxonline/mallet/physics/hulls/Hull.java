@@ -2,18 +2,14 @@ package com.linxonline.mallet.physics.hulls ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-import com.linxonline.mallet.io.save.NoSave ;
-import com.linxonline.mallet.io.save.Reference ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.entity.Entity ;
 
 import com.linxonline.mallet.physics.* ;
 
-public @SaveClass abstract class Hull
+public abstract class Hull
 {
-	public @NoSave static final int NO_GROUP = -1 ;
+	public static final int NO_GROUP = -1 ;
 
 	private int groupID = NO_GROUP ;												// Defines what Group the Hull is in.
 	private final ArrayList<Integer> collidableGroups = new ArrayList<Integer>() ;	// Defines the Groups the Hull is affected by.
@@ -24,7 +20,7 @@ public @SaveClass abstract class Hull
 
 	protected boolean collidable = true ; 											// Allows hull to produce Collision Data.
 	protected boolean physical = true ; 											// Allows hull to be affected by a Collision
-	protected @Reference CollisionCallback callback = null ;							// Allows Owner to be informed of Collisions
+	protected CollisionCallback callback = null ;							// Allows Owner to be informed of Collisions
 
 	protected Hull() {}
 

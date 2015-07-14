@@ -1,11 +1,9 @@
 package com.linxonline.mallet.physics.hulls ;
 
-import com.linxonline.mallet.io.save.SaveClass ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.primitives.Circle ;
 
-public @SaveClass class Circle2D extends Hull
+public class Circle2D extends Hull
 {
 	public final Circle circle ;
 

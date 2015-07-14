@@ -1,4 +1,4 @@
-package com.linxonline.mallet.io.save ;
+package com.linxonline.mallet.io.serial.save ;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;
