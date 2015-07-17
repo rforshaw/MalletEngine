@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util ;
 
-public class Tuple<T, U>
+public final class Tuple<T, U>
 {
 	private final T left ;
 	private final U right ;

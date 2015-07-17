@@ -44,6 +44,10 @@ import com.linxonline.mallet.util.tools.Diff ;
 import com.linxonline.mallet.util.tools.SimpleDiff ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 
+import com.linxonline.mallet.io.save.state.DataSet ;
+import com.linxonline.mallet.io.save.state.DataSet.DataOut ;
+import com.linxonline.mallet.io.save.state.DataSet.DataIn ;
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 

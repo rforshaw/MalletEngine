@@ -34,7 +34,7 @@ import com.linxonline.mallet.util.locks.Locks ;
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;
 
-import com.linxonline.mallet.io.save.state.DataSet ;
+import com.linxonline.mallet.io.save.state.DataConverter ;
 
 public class GameState extends State implements HookEntity
 {
@@ -56,7 +56,7 @@ public class GameState extends State implements HookEntity
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
-	protected final ArrayList<DataSet> runtimeState = new ArrayList<DataSet>() ;				// Current Runtime State used for saving/loading/networking
+	protected final DataConverter dataTracker = new DataConverter() ;
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
@@ -296,6 +296,7 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void hookHandlerSystems()
 	{
+		eventSystem.addEventHandler( dataTracker.getEventController() ) ;
 		eventSystem.addEventHandler( audioSystem ) ;
 		eventSystem.addEventHandler( animationSystem ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
@@ -313,6 +314,7 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void unhookHandlerSystems()
 	{
+		eventSystem.removeEventHandler( dataTracker.getEventController() ) ;
 		eventSystem.removeEventHandler( eventController ) ;
 		eventSystem.removeEventHandler( audioSystem ) ;
 		eventSystem.removeEventHandler( animationSystem ) ;
@@ -355,6 +357,7 @@ public class GameState extends State implements HookEntity
 					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
+					dataTracker.update() ;
 					eventController.update() ;
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
@@ -423,6 +426,7 @@ public class GameState extends State implements HookEntity
 					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
+					dataTracker.update() ;
 					eventController.update() ;
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
@@ -534,27 +538,6 @@ public class GameState extends State implements HookEntity
 			{
 				final QueryComponent query = _event.getVariable() ;
 				query.setSearch( entitySystem.getSearch() ) ;
-			}
-		} ) ;
-
-		eventController.addEventProcessor( new EventProcessor<ArrayList<DataSet>>( "REGISTER_RUNTIME_STATE", "REGISTER_RUNTIME_STATE" )
-		{
-			public void processEvent( final Event<ArrayList<DataSet>> _event )
-			{
-				runtimeState.addAll( _event.getVariable() ) ;
-			}
-		} ) ;
-
-		eventController.addEventProcessor( new EventProcessor<ArrayList<DataSet>>( "UNREGISTER_REGISTER_STATE", "UNREGISTER_RUNTIME_STATE" )
-		{
-			public void processEvent( final Event<ArrayList<DataSet>> _event )
-			{
-				final ArrayList<DataSet> data = _event.getVariable() ;
-				final int size = data.size() ;
-				for( int i = 0; i < size; ++i )
-				{
-					runtimeState.remove( data.get( i ) ) ;
-				}
 			}
 		} ) ;
 	}
