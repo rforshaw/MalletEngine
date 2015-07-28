@@ -56,7 +56,7 @@ public class GameState extends State implements HookEntity
 	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
-	protected final DataConverter dataTracker = new DataConverter() ;
+	protected final DataConverter dataTracker = new DataConverter() ;	// Track current data that you wish to save/read
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
@@ -388,7 +388,11 @@ public class GameState extends State implements HookEntity
 				renderRunningTime = endTime - startTime ;		// In nanoseconds
 
 				final float deltaLogic = logicRunningTime * 0.000000001f ;							// Convert to seconds
-				final float deltaRender = renderRunningTime * 0.000000001f ;							// Convert to seconds
+				final float deltaRender = renderRunningTime * 0.000000001f ;						// Convert to seconds
+				
+				// If the time taken to render the current frame and update the delta logic
+				// is less than the total time allocated for rendering a frame, 
+				// then we can risk sleeping for a short duration.
 				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaRender + deltaLogic ) ) * 1000.0f ) ;	// Convert to milliseconds
 
 				if( sleepRender > 0L )

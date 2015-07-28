@@ -14,35 +14,6 @@ public final class GeometryFactory
 {
 	private GeometryFactory() {}
 
-	public static Event<Settings> createShape( 	final String _type,
-												final Line _line,
-												final Vector3 _pos, 
-												final Vector2 _offset, 		// Not needed
-												final Vector2 _clip,		// Not needed
-												final Vector2 _clipOffset,	// Not needed
-												final int _layer,
-												final IDInterface _callback )
-	{
-		final Settings settings = new Settings() ;
-
-		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
-		settings.addObject( "TYPE", DrawRequestType.GEOMETRY ) ;
-		if( _type == null || _line == null )
-		{
-			return null ;
-		}
-
-		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
-
-		DrawFactory.setPosition( settings, _pos, _offset ) ;
-		DrawFactory.setClip( settings, _clip, _clipOffset ) ;
-
-		settings.addObject( _type, _line ) ;
-		settings.addInteger( "LAYER", _layer ) ;
-
-		return new Event<Settings>( "DRAW", settings ) ;
-	}
-
 	public static Event<Settings> createShape(  final String _type,
 												final Shape _shape,
 												final Vector3 _pos, 

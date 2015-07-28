@@ -672,20 +672,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		if( position != null )
 		{
-			final Line line = _draw.<Line>getObject( "DRAWLINE", null ) ;
-			if( line != null )
-			{
-				_draw.addObject( "MODEL", GLModelGenerator.genLineModel( line ) ) ;
-				final GLRenderData data = renderCache.get() ;
-				data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
-				//Logger.println( "GLRenderer - Create Line: " + data.id, Logger.Verbosity.MINOR ) ;
-
-				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-				data.drawCall = drawShape ;
-				insert( data ) ;
-				return ;
-			}
-
 			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
 			if( shape != null )
 			{

@@ -2,11 +2,14 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 
+/**
+	Define a colour with 8888 RGBA
+*/
 public class MalletColour
 {
-	public final static byte RED = 0 ;
+	public final static byte RED   = 0 ;
 	public final static byte GREEN = 1 ;
-	public final static byte BLUE = 2 ;
+	public final static byte BLUE  = 2 ;
 	public final static byte ALPHA = 3 ;
 
 	public final byte[] colours = new byte[4] ; 	// red, green, blue, alpha
@@ -33,9 +36,9 @@ public class MalletColour
 
 	public void changeColour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
 	{
-		colours[RED] = _red ;
+		colours[RED]   = _red ;
 		colours[GREEN] = _green ;
-		colours[BLUE] = _blue ;
+		colours[BLUE]  = _blue ;
 		colours[ALPHA] = _alpha ;
 	}
 

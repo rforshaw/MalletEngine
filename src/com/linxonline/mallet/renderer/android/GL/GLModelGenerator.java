@@ -7,6 +7,8 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.mallet.util.tools.ConvertBytes ;
+
 public class GLModelGenerator
 {
 	private final static GLModelManager models = new GLModelManager() ;
@@ -71,41 +73,7 @@ public class GLModelGenerator
 
 		return _model ;
 	}
-	
-	/**
-		Create a Geometric Line
-	*/
-	public static Model genLineModel( final String _name, final Line _line )
-	{
-		// See if the model already exists
-		final Model m = ( Model )models.get( _name ) ;
-		if( m != null ) { return m ; }
 
-		// Generate the line, & register it.
-		final Model model = GLModelGenerator.genLineModel( _line ) ;
-		models.add( _name, model ) ;
-		model.register() ;
-		return model ;
-	}
-	
-	public static Model genLineModel( final Line _line )
-	{
-		final GLGeometry geometry = new GLGeometry( 2, 2 ) ;
-		geometry.addVertex( new Vector3( _line.start ),
-							new Vector3( 0, 0, 1 ),
-							new Vector2() ) ;
-		geometry.addVertex( new Vector3( _line.end ),
-							new Vector3( 0, 0, 1 ),
-							new Vector2() ) ;
-
-		geometry.addIndices( 0 ) ;
-		geometry.addIndices( 1 ) ;
-		
-		final Model model = new Model( geometry ) ;
-		models.bind( geometry ) ;
-		return model ;
-	}
-	
 		/**
 		Create a Geometric Line
 	*/
@@ -128,9 +96,19 @@ public class GLModelGenerator
 		final int pointSize = _shape.points.length ;
 
 		final GLGeometry geometry = new GLGeometry( indexSize, pointSize ) ;
-		for( int i = 0; i < pointSize; ++i )
+		if( _shape.colours != null )
 		{
-			geometry.addVertex( new Vector3( _shape.points[i] ) ) ;
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.addVertex( _shape.points[i], getABGR( _shape.colours[i] ) ) ;
+			}
+		}
+		else
+		{
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.addVertex( _shape.points[i] ) ;
+			}
 		}
 
 		for( int i = 0; i < indexSize; ++i )
@@ -269,5 +247,16 @@ public class GLModelGenerator
 		final Model model = new Model( geometry ) ;
 		models.bind( geometry ) ;
 		return model ;
+	}
+
+	private static float getABGR( final MalletColour _colour )
+	{
+		final byte[] colour = new byte[4] ;
+		colour[0] = _colour.colours[MalletColour.ALPHA] ;
+		colour[1] = _colour.colours[MalletColour.BLUE] ;
+		colour[2] = _colour.colours[MalletColour.GREEN] ;
+		colour[3] = _colour.colours[MalletColour.RED] ;
+
+		return ConvertBytes.toFloat( colour, 0, 4 ) ;
 	}
 }

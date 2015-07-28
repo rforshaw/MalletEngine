@@ -9,9 +9,9 @@ import com.linxonline.mallet.renderer.GeometryFactory ;
 import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.Line ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
@@ -100,13 +100,21 @@ public final class GameTestLoader extends GameLoader
 																	10,
 																	null ), true ) ) ;									// layer
 
-				final Shape lines = new Shape( 7, 6 ) ;
-				lines.addPoint( new Vector2( 0, 10 ) ) ;
-				lines.addPoint( new Vector2( 0, 0 ) ) ;
-				lines.addPoint( new Vector2( 100, 0 ) ) ;
-				lines.addPoint( new Vector2( 100, 5 ) ) ;
-				lines.addPoint( new Vector2( 200, 0 ) ) ;
-				lines.addPoint( new Vector2( 200, 10 ) ) ;
+				final Shape lines = new Shape( 7, 6, 6 ) ;
+				lines.addPoint( 0, 10 ) ;
+				lines.addPoint( 0, 0 ) ;
+				lines.addPoint( 100, 0 ) ;
+				lines.addPoint( 100, 5 ) ;
+				lines.addPoint( 200, 0 ) ;
+				lines.addPoint( 200, 10 ) ;
+
+				final MalletColour colour = new MalletColour( 255, 255, 255, 255 ) ;
+				lines.addColour( colour ) ;
+				lines.addColour( colour ) ;
+				lines.addColour( colour ) ;
+				lines.addColour( colour ) ;
+				lines.addColour( colour ) ;
+				lines.addColour( colour ) ;
 
 				lines.addIndex( 0 ) ;
 				lines.addIndex( 1 ) ;
