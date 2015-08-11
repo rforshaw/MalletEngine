@@ -68,7 +68,10 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		being played.
 	*/
 	@Override
-	public void tick( final float _dt ) {}
+	public void tick( final float _dt )
+	{
+		//System.out.println( _dt ) ;
+	}
 
 	@Override
 	public void update( final float _dt )

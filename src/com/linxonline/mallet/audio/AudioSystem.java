@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 
 public class AudioSystem extends SystemRoot<ActiveSound>
 {
-	protected final static SoundManager soundManager = new SoundManager() ;
+	protected final SoundManager soundManager = new SoundManager() ;
 	protected AudioGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
 	protected int numID = 0 ;
 

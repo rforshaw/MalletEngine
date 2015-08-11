@@ -61,6 +61,8 @@ public abstract class DesktopStarter extends StarterInterface
 
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
+
+		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
 		backendSystem.shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 

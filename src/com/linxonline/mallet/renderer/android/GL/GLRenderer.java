@@ -77,8 +77,8 @@ public class GLRenderer extends Basic2DRender
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
 
-		//textures.shutdown() ;				// We'll loose all texture and font resources
-		//fontManager.shutdown() ;
+		textures.shutdown() ;				// We'll loose all texture and font resources
+		fontManager.shutdown() ;
 		GLModelGenerator.shutdown() ;		// ModelManager is static and so persists even after a shutdown
 	}
 

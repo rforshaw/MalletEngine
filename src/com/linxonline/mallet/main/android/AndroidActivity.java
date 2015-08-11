@@ -98,9 +98,8 @@ public class AndroidActivity extends Activity
 		System.out.println( "onPause()" ) ;
 		super.onPause() ;
 
+		// Stopping the Game Thread will initiate shutdown cycle
 		stopGameThread() ;
-		starter.getAndroidSystem().stopSystem() ;
-		starter.getAndroidSystem().shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
 	}
 
 	public void onDestroy()
@@ -204,7 +203,7 @@ public class AndroidActivity extends Activity
 			gameThread.start() ;
 		}
 	}
-	
+
 	private synchronized void stopGameThread()
 	{
 		if( gameThread != null )
@@ -212,8 +211,16 @@ public class AndroidActivity extends Activity
 			System.out.println( "Stopping Game Thread" ) ;
 			starter.stop() ;
 
-			gameThread.interrupt() ;
-			gameThread = null ;
+			try
+			{
+				gameThread.join() ;
+				gameThread = null ;
+			}
+			catch( InterruptedException ex )
+			{
+				gameThread.interrupt() ;
+				gameThread = null ;
+			}
 		}
 	}
 

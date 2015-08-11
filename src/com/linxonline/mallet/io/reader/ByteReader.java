@@ -27,9 +27,9 @@ public class ByteReader
 		final byte[] buffer = new byte[size] ;
 
 		int offset = 0 ;
-		while( offset >= 0 )
+		while( offset >= 0 && offset < size )
 		{
-			offset += in.readBytes( buffer, 0, size ) ;
+			offset += in.readBytes( buffer, offset, size ) ;
 		}
 
 		in.close() ;

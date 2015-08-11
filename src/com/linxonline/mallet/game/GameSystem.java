@@ -27,19 +27,15 @@ public final class GameSystem
 		while( running == true )
 		{
 			dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-			running = update( dt ) ;
+			stateMachine.update( dt ) ;						// Update Game State
 		}
+
+		stateMachine.shutdown() ;
 	}
 
 	public void stopSystem()
 	{
 		running = false ;
-	}
-
-	public boolean update( final double _dt )
-	{
-		stateMachine.update( _dt ) ;					// Update Game State
-		return running ;
 	}
 
 	public final void addGameState( final GameState _state )

@@ -64,7 +64,9 @@ public class AndroidStarter extends StarterInterface
 
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
+
 		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
+		backendSystem.shutdownSystem() ;
 	}
 
 	public void stop()

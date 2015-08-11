@@ -21,7 +21,11 @@ public final class StateMachine
 		
 		states.add( _state ) ;
 	}
-	
+
+	/**
+		Fallback state, if a state has been requested yet 
+		doesn't exist, this state will take its place.
+	*/
 	public final void setDefaultState( final String _name )
 	{
 		for( State state : states )
@@ -33,7 +37,20 @@ public final class StateMachine
 			}
 		}
 	}
-	
+
+	/**
+		Called when the application is being shutdown.
+		A shutdown can be caused by the user closing the 
+		application, or for Android onDestroy() being called.
+	*/
+	public final void shutdown()
+	{
+		for( State state : states )
+		{
+			state.shutdownState() ;
+		}
+	}
+
 	public final void update( final double _dt )
 	{
 		if( currentState == null )
@@ -42,7 +59,7 @@ public final class StateMachine
 			{
 				return ;
 			}
-			
+
 			currentState = defaultState ;
 			currentState.startState( null ) ;
 		}

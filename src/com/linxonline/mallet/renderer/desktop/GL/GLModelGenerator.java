@@ -94,7 +94,7 @@ public class GLModelGenerator
 		model.register() ;
 		return model ;
 	}
-	
+
 	public static Model genShapeModel( final Shape _shape )
 	{
 		final int indexSize = _shape.indicies.length ;

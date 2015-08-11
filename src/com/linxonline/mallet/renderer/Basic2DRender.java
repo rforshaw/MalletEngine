@@ -421,7 +421,6 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		public DrawRequestType type ;
 		public Interpolation interpolation = Interpolation.LINEAR ;
 		public int layer ;
-		public boolean smooth ;
 		public Vector3 position ;
 		public Settings drawData ;
 

@@ -148,6 +148,16 @@ public class GLGeometry implements GeometryInterface
 		vertex[i + 8] = _z ;
 	}
 
+	public int getIndexSize()
+	{
+		return index.length ;
+	}
+
+	public int getVertexSize()
+	{
+		return vertex.length / VERTEX_SIZE ;
+	}
+
 	public FloatBuffer getVertexBuffer()
 	{
 		vertexBuffer.put( vertex ) ;

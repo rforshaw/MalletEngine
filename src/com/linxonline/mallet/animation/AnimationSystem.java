@@ -18,8 +18,8 @@ import com.linxonline.mallet.renderer.DrawFactory ;
 
 public class AnimationSystem extends SystemRoot<Animation>
 {
-	private final static ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
-	private final static SpriteManager spriteManager = new SpriteManager() ;
+	private final ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
+	private final SpriteManager spriteManager = new SpriteManager() ;
 
 	protected int numID = 0 ;
 

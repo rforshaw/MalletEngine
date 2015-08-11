@@ -42,6 +42,7 @@ public abstract class BasicSystem implements SystemInterface
 	{
 		audioGenerator.shutdownGenerator() ;
 		renderer.shutdown() ;
+		shutdownDelegate.shutdown() ;
 	}
 
 	@Override

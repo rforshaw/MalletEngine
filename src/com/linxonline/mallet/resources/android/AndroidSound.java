@@ -1,24 +1,19 @@
 package com.linxonline.mallet.resources.android ;
 
-import android.media.* ;
-
 import com.linxonline.mallet.resources.sound.* ;
 
 public class AndroidSound implements SoundInterface
 {
-	private AudioTrack track = null ;
-	private int length = 0 ;
-	private boolean initialPlay = true ;
+	private final byte[] buffer ;
 
-	public AndroidSound( final AudioTrack _track, final int _length )
+	public AndroidSound( final byte[] _buffer )
 	{
-		track = _track ;
-		length = _length ;
+		buffer = _buffer ;
 	}
 
-	public AudioTrack getAudioTrack()
+	public byte[] getBuffer()
 	{
-		return track ;
+		return buffer ;
 	}
 	
 	/*public void play()
@@ -47,10 +42,5 @@ public class AndroidSound implements SoundInterface
 		track.stop() ;
 	}*/
 
-	public void destroy()
-	{
-		track.stop() ;
-		track.flush() ;
-		track.release() ;
-	}
+	public void destroy() {}
 }

@@ -100,6 +100,10 @@ public class GameState extends State implements HookEntity
 		hookGameStateEventController() ;
 	}
 
+	/**
+		Cleanup state resources and perhaps save 
+		any required persistant data.
+	*/
 	@Override
 	public Settings shutdownState()
 	{
@@ -108,6 +112,14 @@ public class GameState extends State implements HookEntity
 		return null ;
 	}
 
+	/**
+		The state will no longer be updated until 
+		startState is called again.
+		Cleanup unused resources and perhaps save 
+		persistant data.
+		The state shall not recieve any events or inputs 
+		while paused.
+	*/
 	@Override
 	public Settings pauseState()
 	{
@@ -563,7 +575,6 @@ public class GameState extends State implements HookEntity
 		audioSystem.clear() ;
 		entitySystem.clear() ;
 		animationSystem.clear() ;
-		system.getRenderInterface().clear() ;
 	}
 
 	/**
