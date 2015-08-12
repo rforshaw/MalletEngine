@@ -19,6 +19,7 @@ public class ByteReader
 		final FileStream file = GlobalFileSystem.getFile( _file ) ;
 		if( file.exists() == false )
 		{
+			System.out.println( "File: " + _file + " doesn't exist.." ) ;
 			return null ;
 		}
 

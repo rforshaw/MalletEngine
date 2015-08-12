@@ -52,7 +52,6 @@ public class AndroidStarter extends StarterInterface
 
 	public void run()
 	{
-		backendSystem.startSystem() ;
 		setRenderSettings( backendSystem ) ;
 
 		// Load the Game-States into the Game-System
@@ -64,9 +63,7 @@ public class AndroidStarter extends StarterInterface
 
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
-
-		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
-		backendSystem.shutdownSystem() ;
+		Logger.println( "Stopped...", Logger.Verbosity.MINOR ) ;
 	}
 
 	public void stop()
@@ -74,6 +71,11 @@ public class AndroidStarter extends StarterInterface
 		gameSystem.stopSystem() ;
 	}
 
+	public void shutdown()
+	{
+		backendSystem.shutdownSystem() ;
+	}
+	
 	@Override
 	protected boolean loadGame( final GameSystem _system, final GameLoader _loader )
 	{

@@ -65,7 +65,11 @@ public class FontMap<T extends ImageInterface>
 
 	public void destroy()
 	{
-		texture.destroy() ;
+		if( texture != null )
+		{
+			texture.destroy() ;
+		}
+
 		for( final Glyph glyph : glyphs )
 		{
 			if( glyph != null )

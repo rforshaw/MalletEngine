@@ -35,6 +35,7 @@ public class TextReader
 			lines.add( line ) ;
 		}
 
+		in.close() ;
 		return lines ;
 	}
 }

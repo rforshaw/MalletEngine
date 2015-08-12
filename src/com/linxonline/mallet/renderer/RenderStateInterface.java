@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.ArrayList ;
+
 public interface RenderStateInterface<T, V>		// T = ID, V = data
 {
 	public void add( T _id, V _data ) ;
@@ -11,6 +13,8 @@ public interface RenderStateInterface<T, V>		// T = ID, V = data
 	public void clear() ;
 
 	public void sort() ;
+
+	public ArrayList<V> getContent() ;
 
 	public V getData( T _id ) ;
 }

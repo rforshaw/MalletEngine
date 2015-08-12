@@ -409,6 +409,12 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		}
 
 		@Override
+		public ArrayList<RenderData> getContent()
+		{
+			return content ;
+		}
+
+		@Override
 		public RenderData getData( Integer _id )
 		{
 			return hashedContent.get( _id ) ;

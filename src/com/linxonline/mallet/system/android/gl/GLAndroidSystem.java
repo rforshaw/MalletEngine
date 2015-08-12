@@ -42,8 +42,6 @@ public class GLAndroidSystem extends BasicSystem
 		audioGenerator = new AndroidAudioGenerator() ;
 		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
 		inputSystem = new AndroidInputSystem() ;
-
-		setContentView() ;
 	}
 
 	@Override
@@ -70,7 +68,8 @@ public class GLAndroidSystem extends BasicSystem
 	@Override
 	public synchronized void startSystem()
 	{
-		//surface.onResume() ;
+		setContentView() ;
+		surface.onResume() ;
 	}
 
 	@Override

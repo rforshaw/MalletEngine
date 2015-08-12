@@ -36,23 +36,7 @@ public class AndroidActivity extends Activity
 							implements EventHandler
 {
 	private final ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
-	private final Notify<Object> startGame = new Notify<Object>()
-	{
-		private int increment = 0 ;
-
-		public void inform( final Object _noData )
-		{
-			++increment ;
-			if( increment >= 2 )
-			{
-				// Only start the game thread once we know the 
-				// OpenGL context has been initialised.
-				// Only 2 things will call inform(), onSurfaceCreated & onResume
-				System.out.println( "Inform: Starting Game Thread." ) ;
-				startGameThread() ;
-			}
-		}
-	} ;
+	private Notify<Object> startGame = null ;
 
 	protected AndroidStarter starter = null ;
 	protected Thread gameThread = null ;
@@ -70,6 +54,24 @@ public class AndroidActivity extends Activity
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
 							  WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		super.onCreate( _savedInstance ) ;
+	}
+
+	@Override
+	public void onResume()
+	{
+		System.out.println( "onResume()" ) ;
+		super.onResume() ;
+
+		startGame = new Notify<Object>()
+		{
+			public void inform( final Object _noData )
+			{
+				// Only start the game thread once we know the 
+				// OpenGL context has been initialised.
+				System.out.println( "Inform: Starting Game Thread." ) ;
+				startGameThread() ;
+			}
+		} ;
 
 		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
 		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
@@ -82,13 +84,8 @@ public class AndroidActivity extends Activity
 			starter = new AndroidStarter( this, startGame ) ;
 			starter.init() ;
 		}
-	}
 
-	@Override
-	public void onResume()
-	{
-		System.out.println( "onResume()" ) ;
-		super.onResume() ;
+		starter.getAndroidSystem().startSystem() ;
 		startGame.inform( null ) ;
 	}
 
@@ -98,8 +95,10 @@ public class AndroidActivity extends Activity
 		System.out.println( "onPause()" ) ;
 		super.onPause() ;
 
-		// Stopping the Game Thread will initiate shutdown cycle
+		starter.stop() ;
 		stopGameThread() ;
+		starter.shutdown() ;
+		starter = null ;
 	}
 
 	public void onDestroy()
@@ -107,7 +106,7 @@ public class AndroidActivity extends Activity
 		System.out.println( "onDestroy()" ) ;
 		super.onDestroy() ;
 	}
-	
+
 	public void addAndroidInputListener( AndroidInputListener _listener )
 	{
 		if( containsInputListener( _listener ) == true )
@@ -117,7 +116,7 @@ public class AndroidActivity extends Activity
 
 		inputListeners.add( _listener ) ;
 	}
-	
+
 	public void removeAndroidInputListener( AndroidInputListener _listener )
 	{
 		if( containsInputListener( _listener ) == true )
@@ -125,7 +124,7 @@ public class AndroidActivity extends Activity
 			inputListeners.remove( _listener ) ;
 		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown( int _keyCode, KeyEvent _event )
 	{
@@ -198,7 +197,7 @@ public class AndroidActivity extends Activity
 					starter.run() ;
 				}
 			} ;
-			
+
 			System.out.println( "Starting Game Thread" ) ;
 			gameThread.start() ;
 		}
@@ -209,16 +208,16 @@ public class AndroidActivity extends Activity
 		if( gameThread != null )
 		{
 			System.out.println( "Stopping Game Thread" ) ;
-			starter.stop() ;
-
 			try
 			{
 				gameThread.join() ;
-				gameThread = null ;
 			}
 			catch( InterruptedException ex )
 			{
 				gameThread.interrupt() ;
+			}
+			finally
+			{
 				gameThread = null ;
 			}
 		}

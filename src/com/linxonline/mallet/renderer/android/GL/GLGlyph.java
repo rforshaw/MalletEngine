@@ -20,7 +20,10 @@ public class GLGlyph extends Glyph
 	@Override
 	public void destroy()
 	{
-		model.destroy() ;
+		if( model != null )
+		{
+			model.destroy() ;
+		}
 	}
 
 	public GLGeometry getGLGeometry()

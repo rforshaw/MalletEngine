@@ -155,7 +155,6 @@ public class AndroidFileSystem implements FileSystem
 
 		if( mapZip.containsKey( _path ) == true )
 		{
-			System.out.println( "FileStream ZIP: " + _path ) ;
 			try
 			{
 				return new AndroidZipFile( mapZip.get( _path ) ) ;
@@ -167,7 +166,6 @@ public class AndroidFileSystem implements FileSystem
 		}
 		else if( mapAssets.containsKey( _path ) == true )
 		{
-			System.out.println( "FileStream Asset: " + _path ) ;
 			return new AndroidAssetFile( _path, assetManager ) ;
 		}
 
