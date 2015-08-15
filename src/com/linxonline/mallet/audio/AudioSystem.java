@@ -16,8 +16,9 @@ import com.linxonline.mallet.util.SourceCallback ;
 
 public class AudioSystem extends SystemRoot<ActiveSound>
 {
+	protected final ArrayList<ActiveSound> pausedSources = new ArrayList<ActiveSound>() ;		// Used when Audio System has been paused
 	protected final SoundManager soundManager = new SoundManager() ;
-	protected AudioGenerator sourceGenerator = null ;					// Used to create the Source from a Sound Buffer
+	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
 	protected int numID = 0 ;
 
 	public AudioSystem() {}
@@ -53,6 +54,35 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	protected void destroySource( final ActiveSound _source )
 	{
 		_source.destroy() ;
+	}
+
+	/**
+		Continue playing sources that had previously been 
+		playing before the Audio System was paused.
+	*/
+	public void resumeSystem()
+	{
+		for( final ActiveSound sound : pausedSources )
+		{
+			sound.play() ;
+		}
+		pausedSources.clear() ;
+	}
+
+	/**
+		Pause currently playing sources, and store them 
+		in a list to be resumed when Audio System is active again.
+	*/
+	public void pauseSystem()
+	{
+		for( final ActiveSound sound : activeSources )
+		{
+			if( sound.isPlaying() == true )
+			{
+				pausedSources.add( sound ) ;
+				sound.pause() ;
+			}
+		}
 	}
 
 	@Override

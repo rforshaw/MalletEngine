@@ -82,6 +82,27 @@ public class GLRenderer extends Basic2DRender
 		GLModelGenerator.shutdown() ;		// ModelManager is static and so persists even after a shutdown
 	}
 
+	/**
+		It's possible for the OpenGL Context 
+		to be lost on Android devices.
+		We need to remove previous references to 
+		OpenGL resources and reload them.
+	*/
+	public void recover()
+	{
+		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
+		GLModelGenerator.shutdown() ;	// Clear all Geometry Data and reload everything upon rendering
+		fontManager.recover() ;
+
+		final ArrayList<RenderData> content = state.getContent() ;
+		for( final RenderData data : content )
+		{
+			final Settings draw = data.drawData ;
+			draw.remove( "TEXTURE" ) ;
+			draw.remove( "MODEL" ) ;
+		}
+	}
+
 	private void initGraphics()
 	{
 		GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
@@ -152,7 +173,17 @@ public class GLRenderer extends Basic2DRender
 		{
 			public void draw( final Settings _settings, final Vector2 _position ) 
 			{
-				final Model model = _settings.getObject( "MODEL", null ) ;
+				Model model = _settings.getObject( "MODEL", null ) ;
+				if( model == null )
+				{
+					final Shape shape = _settings.<Shape>getObject( "DRAWLINES", null ) ;
+					if( shape != null )
+					{
+						model = GLModelGenerator.genShapeModel( shape ) ;
+						_settings.addObject( "MODEL", model ) ;
+					}
+				}
+
 				if( model == null )
 				{
 					return ;
@@ -580,19 +611,14 @@ public class GLRenderer extends Basic2DRender
 
 		if( position != null )
 		{
-			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
-			if( shape != null )
-			{
-				_draw.addObject( "MODEL", GLModelGenerator.genShapeModel( shape ) ) ;
-				final GLRenderData data = renderCache.get() ;
-				data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
-				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
+			final GLRenderData data = renderCache.get() ;
+			data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+			//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 
-				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-				data.drawCall = drawShape ;
-				insert( data ) ;
-				return ;
-			}
+			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+			data.drawCall = drawShape ;
+			insert( data ) ;
+			return ;
 		}
 	}
 

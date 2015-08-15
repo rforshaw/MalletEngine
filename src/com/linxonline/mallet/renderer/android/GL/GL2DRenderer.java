@@ -37,9 +37,11 @@ public class GL2DRenderer implements RenderInterface,
 	public void onSurfaceCreated( GL10 _unused, EGLConfig _config )
 	{
 		System.out.println( "onSurfaceCreated()" ) ;
-		shutdown() ;
+		// If a render state previously existed but we lost the OpenGL 
+		// context then we need to reload the lost resources.
+		render.recover() ;
 		start() ;
-		surfaceCreated.informOnce() ;
+		surfaceCreated.inform() ;
 	}
 
 	@Override
@@ -147,10 +149,5 @@ public class GL2DRenderer implements RenderInterface,
 	public void clear()
 	{
 		render.clear() ;
-	}
-
-	public interface ResumeInitialisation
-	{
-		public void resume() ;
 	}
 }

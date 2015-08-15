@@ -27,7 +27,7 @@ public class GLFontMap extends Resource
 
 		return width ;
 	}
-	
+
 	public GLGlyph getGlyphWithChar( final char _character )
 	{
 		return getGlyphWithCode( ( int )_character ) ;
@@ -59,7 +59,7 @@ public class GLFontMap extends Resource
 	{
 		return fontMap.toString() ;
 	}
-	
+
 	@Override
 	public String type()
 	{

@@ -24,13 +24,14 @@ public final class GameSystem
 		double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 		running = true ;
 
+		stateMachine.resume() ;
 		while( running == true )
 		{
 			dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 			stateMachine.update( dt ) ;						// Update Game State
 		}
 
-		stateMachine.shutdown() ;
+		stateMachine.pause() ;
 	}
 
 	public void stopSystem()

@@ -35,6 +35,7 @@ public abstract class DesktopStarter extends StarterInterface
 {
 	protected final SystemInterface backendSystem  ;
 	protected final GameSystem gameSystem ;
+	protected Thread thread ;
 
 	protected final static String BASE_CONFIG = "base/config.cfg" ;
 
@@ -50,7 +51,6 @@ public abstract class DesktopStarter extends StarterInterface
 	{
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
 		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
-		setRenderSettings( backendSystem ) ;
 
 		// Load the Game-States into the Game-System
 		if( loadGame( gameSystem, getGameLoader() ) == false )
@@ -58,12 +58,41 @@ public abstract class DesktopStarter extends StarterInterface
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
+	}
 
-		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
-		gameSystem.runSystem() ;			// Begin running the game-loop
+	public void run()
+	{
+		backendSystem.startSystem() ;
+		setRenderSettings( backendSystem ) ;
+		thread = new Thread( "GAME_THREAD" )
+		{
+			public void run()
+			{
+				Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
+				gameSystem.runSystem() ;			// Begin running the game-loop
+				Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
+			}
+		} ;
 
-		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
-		backendSystem.shutdownSystem() ;	// Ensure all base systems are destroyed before exiting
+		thread.start() ;
+	}
+
+	public void stop()
+	{
+		gameSystem.stopSystem() ;
+		if( thread.isAlive() == true )
+		{
+			try
+			{
+				thread.join( 10 ) ;
+				thread = null ;
+			}
+			catch( InterruptedException ex )
+			{
+				ex.printStackTrace() ;
+			}
+		}
+		backendSystem.stopSystem() ;
 	}
 
 	@Override

@@ -79,6 +79,11 @@ public class ActiveSound
 		}
 	}
 
+	public boolean isPlaying()
+	{
+		return source.isPlaying() ;
+	}
+
 	public boolean update()
 	{
 		updateCallbacks() ;

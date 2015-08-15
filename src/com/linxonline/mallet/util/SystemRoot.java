@@ -50,7 +50,7 @@ public abstract class SystemRoot<T> extends EventUpdater
 	{
 		return sources.get( _key ) ;
 	}
-	
+
 	protected void storeSource( final T _source, final int _id )
 	{
 		activeSources.add( _source ) ;

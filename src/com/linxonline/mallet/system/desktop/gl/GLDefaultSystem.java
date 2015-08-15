@@ -1,7 +1,5 @@
 package com.linxonline.mallet.system.desktop.gl ;
 
-import java.awt.event.WindowListener ;
-import java.awt.event.WindowEvent ;
 import javax.swing.JFrame ;
 import java.awt.image.BufferedImage ;
 import java.awt.Point ;
@@ -22,7 +20,7 @@ import com.linxonline.mallet.event.* ;
 */
 public class GLDefaultSystem extends BasicSystem
 {
-	protected final JFrame frame = new JFrame( title ) ;					// Initialise Window
+	protected JFrame frame = new JFrame( title ) ;					// Initialise Window
 	protected EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
@@ -36,6 +34,11 @@ public class GLDefaultSystem extends BasicSystem
 		inputSystem = new InputSystem() ;
 	}
 
+	public JFrame getFrame()
+	{
+		return frame ;
+	}
+	
 	@Override
 	public void initSystem()
 	{
@@ -43,17 +46,6 @@ public class GLDefaultSystem extends BasicSystem
 
 		renderer.start() ;
 		audioGenerator.startGenerator() ;
-
-		frame.addWindowListener( new WindowListener()
-		{
-			public void windowActivated( final WindowEvent _event ) {}
-			public void windowClosed( final WindowEvent _event ) {}
-			public void windowClosing( final WindowEvent _event ) { shutdownSystem() ; }
-			public void windowDeactivated( final WindowEvent _event ) {}
-			public void windowDeiconified( final WindowEvent _event ) {}
-			public void windowIconified( final WindowEvent _event ) {}
-			public void windowOpened( final WindowEvent _event ) {}
-		} ) ;
 
 		final GLRenderer render = ( GLRenderer )renderer ;
 		final InputSystem input = ( InputSystem )inputSystem ;
@@ -92,10 +84,16 @@ public class GLDefaultSystem extends BasicSystem
 	}
 
 	@Override
-	public void startSystem() {}
+	public void startSystem()
+	{
+		System.out.println( "Start System..." ) ;
+	}
 
 	@Override
-	public void stopSystem() {}
+	public void stopSystem()
+	{
+		System.out.println( "Stop System..." ) ;
+	}
 
 	@Override
 	public boolean update( final float _dt )

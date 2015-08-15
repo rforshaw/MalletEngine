@@ -93,7 +93,14 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		final Collection<T> res = resources.values() ;
 		for( final T resource : res )
 		{
-			resource.destroy() ;
+			if( resource != null )
+			{
+				// While loading a resource async 
+				// the key is registered and the value 
+				// is set to null. It's possible to clear 
+				// the manager before a resource is mapped to the key.
+				resource.destroy() ;
+			}
 		}
 		resources.clear() ;
 	}

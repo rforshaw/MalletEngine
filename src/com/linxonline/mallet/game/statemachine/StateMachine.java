@@ -39,15 +39,29 @@ public final class StateMachine
 	}
 
 	/**
-		Called when the application is being shutdown.
-		A shutdown can be caused by the user closing the 
-		application, or for Android onDestroy() being called.
+		Resume the application from the last 
+		current-state used.
+		If a current-state was not specified it 
+		will fallback to default-state.
 	*/
-	public final void shutdown()
+	public final void resume()
 	{
-		for( State state : states )
+		if( currentState != null )
 		{
-			state.shutdownState() ;
+			currentState.startState( null ) ;
+		}
+	}
+
+	/**
+		Called when the application is not being run anymore.
+		A pause can be called when the user is minimising the 
+		aplication or the application is being destroyed.
+	*/
+	public final void pause()
+	{
+		if( currentState != null )
+		{
+			currentState.pauseState() ;
 		}
 	}
 
@@ -67,7 +81,7 @@ public final class StateMachine
 		currentState.update( _dt ) ;
 		checkTransition( currentState ) ;
 	}
-	
+
 	private final void checkTransition( final State _state )
 	{
 		final int transition = _state.checkTransition() ;

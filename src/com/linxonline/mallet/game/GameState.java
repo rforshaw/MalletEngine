@@ -83,21 +83,26 @@ public class GameState extends State implements HookEntity
 	*/
 	public void resumeGame() {}
 
+	/**
+		The user should not have to override this method.
+		Override initGame and resumeGame instead.
+	*/
 	@Override
 	public void startState( final Settings _package )
 	{
+		hookGameStateEventController() ;
 		hookHandlerSystems() ;
+
 		if( paused == true )
 		{
 			paused = false ;
 			resumeGame() ;
+			audioSystem.resumeSystem() ;
 		}
 		else
 		{
 			initGame() ;
 		}
-
-		hookGameStateEventController() ;
 	}
 
 	/**
@@ -107,8 +112,9 @@ public class GameState extends State implements HookEntity
 	@Override
 	public Settings shutdownState()
 	{
-		unhookHandlerSystems() ;		// Prevent system from recieving external events
-		clear() ;						// Remove all content
+		clear() ;								// Remove all content
+		unhookHandlerSystems() ;				// Prevent system from recieving external events
+		unhookGameStateEventController() ;
 		return null ;
 	}
 
@@ -123,7 +129,10 @@ public class GameState extends State implements HookEntity
 	@Override
 	public Settings pauseState()
 	{
-		unhookHandlerSystems() ;		// Prevent system from recieving external events
+		unhookHandlerSystems() ;				// Prevent system from recieving external events
+		unhookGameStateEventController() ;
+		audioSystem.pauseSystem() ;
+
 		paused = true ;
 		return null ;
 	}
@@ -301,7 +310,16 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( eventController ) ;
 		system.getEventInterface().addEventHandler( eventController ) ;
 	}
-	
+
+	protected void unhookGameStateEventController()
+	{
+		eventSystem.removeEventHandler( eventController ) ;
+		eventSystem.removeHandlersNow() ;
+
+		system.getEventInterface().removeEventHandler( eventController ) ;
+		system.getEventInterface().removeHandlersNow() ;
+	}
+
 	/**
 		Enable event-based systems to recieve events.
 		Also hooks-up the inputSystem.
@@ -327,11 +345,11 @@ public class GameState extends State implements HookEntity
 	protected void unhookHandlerSystems()
 	{
 		eventSystem.removeEventHandler( dataTracker.getEventController() ) ;
-		eventSystem.removeEventHandler( eventController ) ;
 		eventSystem.removeEventHandler( audioSystem ) ;
 		eventSystem.removeEventHandler( animationSystem ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
+		eventSystem.removeHandlersNow() ;
 
 		final InputSystemInterface input = system.getInputInterface() ;
 		input.removeInputHandler( inputUISystem ) ;

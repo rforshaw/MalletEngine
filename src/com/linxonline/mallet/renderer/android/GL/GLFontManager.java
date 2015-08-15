@@ -66,4 +66,17 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 		// Generate the Glyphs for the passed in characters
 		return gen.generateFontMap( _name, _size, "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+.", 5 ) ;
 	}
+
+	/**
+		OpenGL Context can be lost on Android devices.
+		Remove references to previous context data, so 
+		it can be reloaded during rendering.
+	*/
+	public void recover()
+	{
+		for( final GLFontMap map : resources.values() )
+		{
+			map.fontMap.setTexture( null ) ;
+		}
+	}
 }

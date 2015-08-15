@@ -81,6 +81,7 @@ public abstract class BasicSystem implements SystemInterface
 		try
 		{
 			Thread.sleep( _millis ) ;
+			Thread.yield() ;
 		}
 		catch( InterruptedException ex )
 		{

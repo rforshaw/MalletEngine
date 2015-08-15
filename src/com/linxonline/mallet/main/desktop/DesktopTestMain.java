@@ -10,5 +10,6 @@ public final class DesktopTestMain
 	{
 		final DesktopTestStarter starter = new DesktopTestStarter() ;
 		starter.init() ;
+		starter.run() ;
 	}
 }

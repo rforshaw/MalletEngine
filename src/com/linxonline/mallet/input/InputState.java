@@ -40,6 +40,7 @@ public class InputState implements InputSystemInterface,
 	{
 		if( exists( _handler ) == true )
 		{
+			System.out.println( "Input Handler already exists.." ) ;
 			return ;
 		}
 
@@ -52,6 +53,7 @@ public class InputState implements InputSystemInterface,
 	{
 		if( exists( _handler ) == false )
 		{
+			System.out.println( "Input Handler doesn't exist.." ) ;
 			return ;
 		}
 

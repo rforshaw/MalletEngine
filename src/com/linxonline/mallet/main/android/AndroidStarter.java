@@ -48,11 +48,6 @@ public class AndroidStarter extends StarterInterface
 		loadFileSystem( new AndroidFileSystem( ( ( GLAndroidSystem )backendSystem ).activity ) ) ;						// Ensure FileSystem is setup correctly.
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
 		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
-	}
-
-	public void run()
-	{
-		setRenderSettings( backendSystem ) ;
 
 		// Load the Game-States into the Game-System
 		if( loadGame( gameSystem, getGameLoader() ) == false )
@@ -60,6 +55,11 @@ public class AndroidStarter extends StarterInterface
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
+	}
+
+	public void run()
+	{
+		setRenderSettings( backendSystem ) ;
 
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		gameSystem.runSystem() ;			// Begin running the game-loop
@@ -69,6 +69,7 @@ public class AndroidStarter extends StarterInterface
 	public void stop()
 	{
 		gameSystem.stopSystem() ;
+		backendSystem.stopSystem() ;
 	}
 
 	public void shutdown()

@@ -34,6 +34,8 @@ public abstract class State
 	/**
 		Called when the state is being transitioned to another state.
 		If the user whishes the state to retain its current data.
+		Also called when the application is being minimised or 
+		being destroyed.
 	*/
 	public abstract Settings pauseState() ;
 

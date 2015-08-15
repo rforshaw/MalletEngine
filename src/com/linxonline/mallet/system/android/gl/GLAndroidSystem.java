@@ -73,14 +73,16 @@ public class GLAndroidSystem extends BasicSystem
 	}
 
 	@Override
-	public synchronized void stopSystem() {}
-
-	@Override
-	public synchronized void shutdownSystem()
+	public synchronized void stopSystem()
 	{
 		// Don't call super, the renderer will be destroyed 
 		// via another route.
 		surface.onPause() ;
+	}
+
+	@Override
+	public synchronized void shutdownSystem()
+	{
 		shutdownDelegate.shutdown() ;
 		audioGenerator.shutdownGenerator() ;
 	}

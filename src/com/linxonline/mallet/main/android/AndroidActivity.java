@@ -54,6 +54,11 @@ public class AndroidActivity extends Activity
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
 							  WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		super.onCreate( _savedInstance ) ;
+
+		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
+		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
+									  audioManager.getStreamMaxVolume( AudioManager.STREAM_MUSIC ), 
+									  0 ) ;
 	}
 
 	@Override
@@ -73,11 +78,6 @@ public class AndroidActivity extends Activity
 			}
 		} ;
 
-		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
-		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
-									  audioManager.getStreamMaxVolume( AudioManager.STREAM_MUSIC ), 
-									  0 ) ;
-
 		if( starter == null )
 		{
 			System.out.println( "INIT ANDROID STARTER" ) ;
@@ -86,7 +86,6 @@ public class AndroidActivity extends Activity
 		}
 
 		starter.getAndroidSystem().startSystem() ;
-		startGame.inform( null ) ;
 	}
 
 	@Override
@@ -97,14 +96,15 @@ public class AndroidActivity extends Activity
 
 		starter.stop() ;
 		stopGameThread() ;
-		starter.shutdown() ;
-		starter = null ;
 	}
 
 	public void onDestroy()
 	{
 		System.out.println( "onDestroy()" ) ;
 		super.onDestroy() ;
+
+		starter.shutdown() ;
+		starter = null ;
 	}
 
 	public void addAndroidInputListener( AndroidInputListener _listener )
