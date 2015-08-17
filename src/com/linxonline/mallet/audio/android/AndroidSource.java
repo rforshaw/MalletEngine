@@ -3,7 +3,7 @@ package com.linxonline.mallet.audio.android ;
 import android.media.* ;
 
 import com.linxonline.mallet.io.formats.wav.WAVHeader ;
-import com.linxonline.mallet.resources.android.AndroidSound ; 
+import com.linxonline.mallet.audio.android.AndroidSound ; 
 import com.linxonline.mallet.audio.* ;
 
 /**

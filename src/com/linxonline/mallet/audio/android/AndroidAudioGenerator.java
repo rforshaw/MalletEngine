@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.android ;
+package com.linxonline.mallet.audio.android ;
 
 import java.nio.* ;
 
