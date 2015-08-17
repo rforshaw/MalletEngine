@@ -40,19 +40,20 @@ public class AndroidSource implements AudioSource
 								getBufferSize(),
 								AudioTrack.MODE_STATIC ) ;
 		track.write( _buffer, header.startPoint, getBufferSize() ) ;
+		track.setPlaybackHeadPosition( 0 ) ;
 	}
 
 	public void play()
 	{
 		pause() ;
-		track.setPlaybackHeadPosition( 0 ) ;
+		track.setPlaybackHeadPosition( getBufferOffset() < getBufferSize() ? getBufferOffset() : 0 ) ;
 		track.play() ;
 	}
 
 	public void playLoop()
 	{
 		pause() ;
-		track.setLoopPoints( 0, getBufferSize(), -1 ) ;
+		track.setLoopPoints( getBufferOffset(), getBufferSize(), -1 ) ;
 		track.play() ;
 	}
 
@@ -69,6 +70,7 @@ public class AndroidSource implements AudioSource
 		if( isPlaying() == true )
 		{
 			track.stop() ;
+			track.setPlaybackHeadPosition( 0 ) ;
 		}
 	}
 
@@ -79,12 +81,20 @@ public class AndroidSource implements AudioSource
 
 	public float getCurrentTime()
 	{
-		return getCurrentBufferTime() ;
+		final float offset = getBufferOffset() ;
+		final float channels = getBufferChannels() ;
+		final float freq = getBufferFreq() ;
+
+		return offset / channels / freq ;
 	}
 
 	public float getDuration()
 	{
-		return getBufferTime() ;
+		final float s = getBufferSize() ;
+		final float c = getBufferChannels() ;
+		final float f = getBufferFreq() ;
+
+		return s / c / f ;
 	}
 
 	public void destroySource()
@@ -117,25 +127,5 @@ public class AndroidSource implements AudioSource
 	private int getBufferFreq()
 	{
 		return header.samplerate ;
-	}
-
-	private float getCurrentBufferTime()
-	{
-		final int offset = getBufferOffset() ;
-		final int bits = ( getBufferBits() / 8 ) ; 	// Change to bytes
-		final int channels = getBufferChannels() ;
-		final float freq = getBufferFreq() ;
-
-		return ( float )( ( offset / channels / bits ) / freq ) ;
-	}
-
-	private float getBufferTime()
-	{
-		final int s = getBufferSize() ;
-		final int b = ( getBufferBits() / 8 ) ; 	// Change to bytes
-		final int c = getBufferChannels() ;
-		final float f = getBufferFreq() ;
-
-		return ( float )( ( s / c / b ) / f ) ;
 	}
 }
