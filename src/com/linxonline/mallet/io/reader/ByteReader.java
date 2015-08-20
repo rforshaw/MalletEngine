@@ -30,7 +30,7 @@ public class ByteReader
 		int offset = 0 ;
 		while( offset >= 0 && offset < size )
 		{
-			offset += in.readBytes( buffer, offset, size ) ;
+			offset += in.readBytes( buffer, offset, size - offset ) ;
 		}
 
 		in.close() ;

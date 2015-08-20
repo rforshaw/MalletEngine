@@ -26,4 +26,17 @@ public final class GlobalFileSystem
 	{
 		return fileSystem.getFile( _path ) ;
 	}
+
+	public static boolean isExtension( final String _path, final String ... _extensions )
+	{
+		for( final String extension : _extensions )
+		{
+			if( _path.endsWith( extension ) == true )
+			{
+				return true ;
+			}
+		}
+
+		return false ;
+	}
 }

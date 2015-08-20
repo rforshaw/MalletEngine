@@ -6,6 +6,7 @@ import android.media.* ;
 import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.resources.sound.* ;
@@ -24,19 +25,13 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
 		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
 		{
-			/**
-				Handles the static loading of wav files.
-				Should be reimplemented to use internal file-system.
-				This will alllow audio files to be read from zip files.
-			*/
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
 			public AudioBuffer load( final String _file, final Settings _settings )
 			{
-				System.out.println( "Creating Audio Buffer for: " + _file ) ;
 				final byte[] buffer = ByteReader.readBytes( _file ) ;
 				if( buffer == null )
 				{

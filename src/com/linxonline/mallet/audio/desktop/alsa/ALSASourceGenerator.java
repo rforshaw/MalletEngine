@@ -11,6 +11,7 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
@@ -43,14 +44,9 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
 		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
 		{
-			/**
-				Handles the static loading of wav files.
-				Should be reimplemented to use internal file-system.
-				This will alllow audio files to be read from zip files.
-			*/
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
 			public AudioBuffer load( final String _file, final Settings _settings )
@@ -72,23 +68,23 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 					return null ;
 				}
 
-				final WAVHeader header = WAVHeader.getHeader( wav ) ;
 				final int size = wav.length - 44 ;								// - 44, exclude header from wav file length
-				final int freq = header.samplerate ;
+				final int freq = WAVHeader.getSampleRate( wav ) ;
 				final ByteBuffer data = ByteBuffer.wrap( wav, 44, size ) ;		// 44 offset, bypass wav header
-				final int format = getALFormat( header ) ;
+				final int format = getALFormat( WAVHeader.getChannels( wav ),
+												WAVHeader.getBitsPerSample( wav ) ) ;
 
 				openAL.alBufferData( buffer[0], format, data, size, freq ) ;
 				return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
 			}
 
-			private int getALFormat( final WAVHeader _header )
+			private int getALFormat( final int _channels, final int _bitsPerSample )
 			{
-				switch( _header.channels )
+				switch( _channels )
 				{
 					case 1 :
 					{
-						switch( _header.bitPerSample )
+						switch( _bitsPerSample )
 						{
 							case 8  : return AL.AL_FORMAT_MONO8 ;
 							case 16 : return AL.AL_FORMAT_MONO16 ;
@@ -97,7 +93,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 					}
 					case 2 :
 					{
-						switch( _header.bitPerSample )
+						switch( _bitsPerSample )
 						{
 							case 8  : return AL.AL_FORMAT_STEREO8 ;
 							case 16 : return AL.AL_FORMAT_STEREO16 ;
