@@ -10,22 +10,7 @@ public class SoundManager extends AbstractManager<AudioBuffer>
 {
 	private AudioGenerator generator ;
 
-	public SoundManager()
-	{
-		final ResourceLoader<AudioBuffer> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<AudioBuffer>()
-		{
-			public boolean isLoadable( final String _file )
-			{
-				return true ;
-			}
-
-			public AudioBuffer load( final String _file, final Settings _settings )
-			{
-				return generator.createAudioBuffer( _file ) ;
-			}
-		} ) ;
-	}
+	public SoundManager() {}
 
 	public SoundManager( final AudioGenerator _generator )
 	{

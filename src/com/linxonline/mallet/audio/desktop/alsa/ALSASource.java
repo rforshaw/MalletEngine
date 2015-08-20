@@ -3,6 +3,7 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 import com.jogamp.openal.* ;
 
 import com.linxonline.mallet.audio.* ;
+import com.linxonline.mallet.resources.sound.* ;
 
 /**
 	Provides the entry point in manipulating and playing 
@@ -11,7 +12,7 @@ import com.linxonline.mallet.audio.* ;
 public class ALSASource implements AudioSource
 {
 	private final AL openAL ;
-	private final int[] buffer ;
+	private final AudioBuffer<ALSASound> buffer ;
 	private final int[] source ;
 
 	private final int[] state = new int[1] ;			// Current State of the Audio: Playing, Pause, etc..
@@ -21,7 +22,7 @@ public class ALSASource implements AudioSource
 	private final int[] freq = new int[1] ;
 	private final int[] bufferOffset = new int[1] ;
 
-	public ALSASource( final AL _openAL, final int[] _buffer, final int[] _source )
+	public ALSASource( final AL _openAL, final AudioBuffer<ALSASound> _buffer, final int[] _source )
 	{
 		openAL = _openAL ;
 		buffer = _buffer ;
@@ -74,11 +75,13 @@ public class ALSASource implements AudioSource
 		stop() ;
 		openAL.alSourcei( source[0], AL.AL_BUFFER,  AL.AL_NONE ) ;
 		openAL.alDeleteSources( 1, source, 0 ) ;
+		buffer.unregister() ;
 	}
 
 	private int getBufferSize()
 	{
-		openAL.alGetBufferi( buffer[0], AL.AL_SIZE, size, 0 ) ;
+		final int[] temp = buffer.getBuffer().getBufferID() ;
+		openAL.alGetBufferi( temp[0], AL.AL_SIZE, size, 0 ) ;
 		return size[0] ;
 	}
 
@@ -90,19 +93,22 @@ public class ALSASource implements AudioSource
 
 	private int getBufferBits()
 	{
-		openAL.alGetBufferi( buffer[0], AL.AL_BITS, bits, 0 ) ;
+		final int[] temp = buffer.getBuffer().getBufferID() ;
+		openAL.alGetBufferi( temp[0], AL.AL_BITS, bits, 0 ) ;
 		return bits[0] ;
 	}
 
 	private int getBufferChannels()
 	{
-		openAL.alGetBufferi( buffer[0], AL.AL_CHANNELS, channels, 0 ) ;
+		final int[] temp = buffer.getBuffer().getBufferID() ;
+		openAL.alGetBufferi( temp[0], AL.AL_CHANNELS, channels, 0 ) ;
 		return channels[0] ;
 	}
 
 	private int getBufferFreq()
 	{
-		openAL.alGetBufferi( buffer[0], AL.AL_FREQUENCY, freq, 0 ) ;
+		final int[] temp = buffer.getBuffer().getBufferID() ;
+		openAL.alGetBufferi( temp[0], AL.AL_FREQUENCY, freq, 0 ) ;
 		return freq[0] ;
 	}
 

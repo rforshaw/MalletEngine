@@ -11,14 +11,12 @@ public class ActiveSound
 {
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	private final AudioSource source ;
-	private final AudioBuffer sound ;
 	public final int id ;
 
-	public ActiveSound( final int _id, final AudioSource _source, final AudioBuffer _sound )
+	public ActiveSound( final int _id, final AudioSource _source )
 	{
 		id = _id ;
 		source = _source ;
-		sound = _sound ;
 	}
 
 	public void addCallback( final SourceCallback _callback )
@@ -134,6 +132,5 @@ public class ActiveSound
 
 		callbacks.clear() ;
 		source.destroySource() ;
-		sound.unregister() ;
 	}
 }

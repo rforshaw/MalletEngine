@@ -7,10 +7,16 @@ import com.jogamp.openal.* ;
 import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.sound.* ;
+import com.linxonline.mallet.io.reader.ByteReader ;
+import com.linxonline.mallet.io.formats.wav.* ;
+
+import com.linxonline.mallet.util.settings.Settings ;
 
 public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 {
+	private final SoundManager staticSoundManager = new SoundManager( this ) ;
 	private AL openAL = null ;
 
 	public ALSASourceGenerator() {}
@@ -21,6 +27,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		{
 			ALut.alutInit() ;
 			openAL = ALFactory.getAL() ;
+			initStaticLoaders() ;
 		}
 		catch( ALException ex )
 		{
@@ -30,11 +37,85 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 		return true ;
 	}
-	
+
+	private void initStaticLoaders()
+	{
+		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
+		{
+			/**
+				Handles the static loading of wav files.
+				Should be reimplemented to use internal file-system.
+				This will alllow audio files to be read from zip files.
+			*/
+			public boolean isLoadable( final String _file )
+			{
+				return true ;
+			}
+
+			public AudioBuffer load( final String _file, final Settings _settings )
+			{
+				final byte[] wav = ByteReader.readBytes( _file ) ;
+				if( wav == null )
+				{
+					System.out.println( "Error loading file: " + _file ) ;
+					return null ;
+				}
+
+				final AL openAL = ALSASourceGenerator.this.openAL ;
+				int[] buffer = new int[1] ;
+
+				openAL.alGenBuffers( 1, buffer, 0 ) ;
+				if( openAL.alGetError() != AL.AL_NO_ERROR )
+				{
+					System.out.println( "Failed to Generate Buffer" ) ;
+					return null ;
+				}
+
+				final WAVHeader header = WAVHeader.getHeader( wav ) ;
+				final int size = wav.length - 44 ;								// - 44, exclude header from wav file length
+				final int freq = header.samplerate ;
+				final ByteBuffer data = ByteBuffer.wrap( wav, 44, size ) ;		// 44 offset, bypass wav header
+				final int format = getALFormat( header ) ;
+
+				openAL.alBufferData( buffer[0], format, data, size, freq ) ;
+				return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
+			}
+
+			private int getALFormat( final WAVHeader _header )
+			{
+				switch( _header.channels )
+				{
+					case 1 :
+					{
+						switch( _header.bitPerSample )
+						{
+							case 8  : return AL.AL_FORMAT_MONO8 ;
+							case 16 : return AL.AL_FORMAT_MONO16 ;
+						}
+						break ;
+					}
+					case 2 :
+					{
+						switch( _header.bitPerSample )
+						{
+							case 8  : return AL.AL_FORMAT_STEREO8 ;
+							case 16 : return AL.AL_FORMAT_STEREO16 ;
+						}
+						break ;
+					}
+				}
+
+				return -1 ;
+			}
+		} ) ;
+	}
+
 	public boolean shutdownGenerator()
 	{
 		try
 		{
+			clear() ;
 			ALut.alutExit() ;
 		}
 		catch( ALException ex )
@@ -46,46 +127,14 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		return true ;
 	}
 
-	public AudioBuffer<ALSASound> createAudioBuffer( final String _file )
+	public AudioSource createAudioSource( final String _file, final StreamType _type )
 	{
-		int[] format = new int[1] ;
-		ByteBuffer[] data = new ByteBuffer[1] ;
-		int[] size = new int[1] ;
-		int[] freq = new int[1] ;
-		int[] loop = new int[1] ;
-		
-		try
-		{
-			ALut.alutLoadWAVFile( _file, format, data, size, freq, loop ) ;
-		}
-		catch( ALException _ex )
-		{
-			System.out.println( "Error loading wav file: " + _file ) ;
-			return null ;
-		}
-		
-		int[] buffer = new int[1] ;
-		openAL.alGenBuffers( 1, buffer, 0 ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to Generate Buffer" ) ;
-			return null ;
-		}
-		
-		openAL.alBufferData( buffer[0], format[0], data[0], size[0], freq[0] ) ;
-		return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
-	}
-
-	public AudioSource createAudioSource( final AudioBuffer<ALSASound> _sound )
-	{
-		if( _sound == null )
+		final AudioBuffer<ALSASound> sound = ( AudioBuffer<ALSASound> )staticSoundManager.get( _file ) ;
+		if( sound == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
 			return null ;
 		}
-
-		final ALSASound alsaSound = _sound.getBuffer() ;	// Assumes Sound contains an ALSASound reference
-		final int[] buffer = alsaSound.getBufferID() ;
 
 		int[] source = new int[1] ;
 		openAL.alGenSources( 1, source, 0 ) ;	
@@ -95,6 +144,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 			return null ;
 		}
 
+		final int[] buffer = sound.getBuffer().getBufferID() ;
 		openAL.alSourcei( source[0], AL.AL_BUFFER, buffer[0] ) ;		// Bind Buffer to Source
 		openAL.alSourcef( source[0], AL.AL_PITCH, 1.0f ) ;
 		openAL.alSourcef( source[0], AL.AL_GAIN, 1.0f ) ;
@@ -109,6 +159,16 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 			return null ;
 		}
 
-		return new ALSASource( openAL, buffer, source ) ;
+		return new ALSASource( openAL, sound, source ) ;
+	}
+
+	public void clean()
+	{
+		staticSoundManager.clean() ;
+	}
+
+	public void clear()
+	{
+		staticSoundManager.clear() ;
 	}
 }

@@ -10,12 +10,14 @@ public interface AudioGenerator<T extends SoundInterface>
 	public boolean startGenerator() ;
 	public boolean shutdownGenerator() ;
 
-	public AudioBuffer<T> createAudioBuffer( final String _file ) ;
-
 	/**
-		Creates an AudioSource which can be to manipulate a Sound buffer.
+		Creates an AudioSource which can be used to manipulate a Sound buffer.
 		An AudioSource can be created multiple times and use the same 
 		Sound buffer.
 	**/
-	public AudioSource createAudioSource( final AudioBuffer<T> _sound ) ;
+	public AudioSource createAudioSource( final String _file, final StreamType _type ) ;
+
+	public void clean() ;
+
+	public void clear() ;
 }

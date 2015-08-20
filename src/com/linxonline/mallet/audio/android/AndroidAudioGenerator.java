@@ -10,30 +10,50 @@ import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.audio.android.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.audio.* ;
+
+import com.linxonline.mallet.util.settings.Settings ;
 
 public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 {
+	private final SoundManager staticSoundManager = new SoundManager( this ) ;
+
 	public boolean startGenerator()
 	{
+		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
+		{
+			/**
+				Handles the static loading of wav files.
+				Should be reimplemented to use internal file-system.
+				This will alllow audio files to be read from zip files.
+			*/
+			public boolean isLoadable( final String _file )
+			{
+				return true ;
+			}
+
+			public AudioBuffer load( final String _file, final Settings _settings )
+			{
+				System.out.println( "Creating Audio Buffer for: " + _file ) ;
+				final byte[] buffer = ByteReader.readBytes( _file ) ;
+				if( buffer == null )
+				{
+					return null ;
+				}
+
+				return new AudioBuffer<AndroidSound>( new AndroidSound( buffer ) ) ;
+			}
+		} ) ;
+
 		return true ;
 	}
 
 	public boolean shutdownGenerator()
 	{
+		clear() ;
 		return true ;
-	}
-
-	public AudioBuffer<AndroidSound> createAudioBuffer( final String _file )
-	{
-		System.out.println( "Creating Audio Buffer for: " + _file ) ;
-		final byte[] buffer = ByteReader.readBytes( _file ) ;
-		if( buffer == null )
-		{
-			return null ;
-		}
-
-		return new AudioBuffer<AndroidSound>( new AndroidSound( buffer ) ) ;
 	}
 
 	/**
@@ -41,15 +61,26 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 		An AudioSource can be created multiple times and use the same 
 		Sound buffer.
 	**/
-	public AudioSource createAudioSource( final AudioBuffer<AndroidSound> _sound )
+	public AudioSource createAudioSource( final String _file, final StreamType _type )
 	{
-		if( _sound == null )
+		final AudioBuffer<AndroidSound> buffer = ( AudioBuffer<AndroidSound> )staticSoundManager.get( _file ) ;
+		if( buffer == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
 			return null ;
 		}
 
-		final AndroidSound sound = _sound.getBuffer() ;
+		final AndroidSound sound = buffer.getBuffer() ;
 		return new AndroidSource( sound.getBuffer() ) ;
+	}
+
+	public void clean()
+	{
+		staticSoundManager.clean() ;
+	}
+
+	public void clear()
+	{
+		staticSoundManager.clear() ;
 	}
 }

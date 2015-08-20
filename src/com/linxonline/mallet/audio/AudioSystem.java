@@ -17,7 +17,6 @@ import com.linxonline.mallet.util.SourceCallback ;
 public class AudioSystem extends SystemRoot<ActiveSound>
 {
 	protected final ArrayList<ActiveSound> pausedSources = new ArrayList<ActiveSound>() ;		// Used when Audio System has been paused
-	protected final SoundManager soundManager = new SoundManager() ;
 	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
 	protected int numID = 0 ;
 
@@ -41,7 +40,6 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	public void setAudioGenerator( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;
-		soundManager.setAudioGenerator( _generator ) ;
 	}
 
 	@Override
@@ -93,7 +91,7 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 
 		switch( type )
 		{
-			case GARBAGE_COLLECT_AUDIO : soundManager.clean() ; break ;
+			case GARBAGE_COLLECT_AUDIO : sourceGenerator.clean() ; break ;
 			case CREATE_AUDIO          : creatAudio( audio ) ;  break ;
 			case MODIFY_EXISTING_AUDIO :
 			{
@@ -120,9 +118,10 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	protected void creatAudio( final Settings _audio )
 	{
 		final String file = _audio.getString( "AUDIO_FILE", null ) ;
+		final StreamType type = _audio.getObject( "STREAM_TYPE", StreamType.STATIC ) ;
 		if( file != null )
 		{
-			final ActiveSound sound = createActiveSound( file ) ;
+			final ActiveSound sound = createActiveSound( file, type ) ;
 			if( sound != null )
 			{
 				addCallbackToSound( sound, _audio ) ;
@@ -172,14 +171,13 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 		}
 	}
 
-	protected ActiveSound createActiveSound( final String _file )
+	protected ActiveSound createActiveSound( final String _file, final StreamType _type )
 	{
-		final AudioBuffer sound = ( AudioBuffer )soundManager.get( _file ) ;
-		final AudioSource source = sourceGenerator.createAudioSource( sound ) ;
+		final AudioSource source = sourceGenerator.createAudioSource( _file, _type ) ;
 		if( source != null )
 		{
 			// Increment numID, so next ActiveSource will have a unique ID
-			final ActiveSound active = new ActiveSound( numID++, source, sound ) ;
+			final ActiveSound active = new ActiveSound( numID++, source ) ;
 			return active ;
 		}
 
