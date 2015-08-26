@@ -62,6 +62,9 @@ public class ConfigParser
 
 				var = _src.getString( "MAXFPS", "60" ) ;
 				_dest.addInteger( "MAXFPS", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "TEXTURECOMPRESSION", "true" ) ;
+				_dest.addBoolean( "TEXTURECOMPRESSION", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}

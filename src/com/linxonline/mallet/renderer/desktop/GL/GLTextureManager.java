@@ -13,6 +13,7 @@ import javax.imageio.stream.* ;
 
 import java.nio.* ;
 
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.desktop.* ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -201,11 +202,20 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 	private int getGLInternalFormat( final int _channels, final InternalFormat _format )
 	{
+		// If texture compression is enabled then use texture compression.
+		// Unless the texture request specifically requests not to use compression.
+		// If compression is disabled then never use compression, even if specified.
+		// Uncompressed will provide the best results, compressed can provide blury or 
+		// create artifacts, for example on Intel chips. Certain textures should never 
+		// be compressed such as fonts.
+		final boolean useCompression = GlobalConfig.getBoolean( "TEXTURECOMPRESSION", true ) ;
+		final InternalFormat format = ( useCompression == true ) ? _format : InternalFormat.UNCOMPRESSED ;
+
 		switch( _channels )
 		{
 			case 4 :
 			{
-				switch( _format )
+				switch( format )
 				{
 					case COMPRESSED   : return GL2.GL_COMPRESSED_RGBA ;
 					case UNCOMPRESSED : return GL2.GL_RGBA ;
@@ -213,7 +223,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			}
 			case 3 :
 			{
-				switch( _format )
+				switch( format )
 				{
 					case COMPRESSED   : return GL2.GL_COMPRESSED_RGB ;
 					case UNCOMPRESSED : return GL2.GL_RGB ;
