@@ -5,12 +5,18 @@ import java.util.HashMap ;
 import java.io.InputStream ;
 import java.nio.* ;
 
+import android.util.DisplayMetrics ;
 import android.opengl.GLES11 ;
 import android.opengl.GLUtils;
+import android.opengl.ETC1Util ;
+import android.opengl.ETC1Util.ETC1Texture ;
+import android.opengl.ETC1 ;
 
+import android.graphics.Canvas ;
 import android.graphics.BitmapFactory ;
 import android.graphics.Bitmap ;
 
+import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
@@ -37,6 +43,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	private final ArrayList<Tuple<String, Bitmap>> toBind = new ArrayList<Tuple<String, Bitmap>>() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
+	
+	private boolean supportedETC1 = ETC1Util.isETC1Supported() ;
 
 	public GLTextureManager()
 	{
@@ -152,11 +160,46 @@ public class GLTextureManager extends AbstractManager<Texture>
 		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_S, GLES11.GL_CLAMP_TO_EDGE ) ;
 		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_T, GLES11.GL_REPEAT ) ;
 
-		GLUtils.texImage2D( GLES11.GL_TEXTURE_2D,
-							0,
-							//getGLInternalFormat( _image.getConfig(), _format ),
-							_image,
-							0 ) ;
+		// If texture compression is enabled then use texture compression.
+		// Unless the texture request specifically requests not to use compression.
+		// If compression is disabled then never use compression, even if specified.
+		// Uncompressed will provide the best results, compressed can provide blury or 
+		// create artifacts, for example on Intel chips. Certain textures should never 
+		// be compressed such as fonts.
+		final boolean useCompression = GlobalConfig.getBoolean( "TEXTURECOMPRESSION", true ) ;
+		final InternalFormat format = ( useCompression == true ) ? _format : InternalFormat.UNCOMPRESSED ;
+
+		if( _format == InternalFormat.UNCOMPRESSED || _image.hasAlpha() == true )
+		{
+			// If the texture has been flagged to not use 
+			// compression or contains an alpha channel, then 
+			// do not compress the texture.
+			GLUtils.texImage2D( GLES11.GL_TEXTURE_2D, 0, _image, 0 ) ;
+		}
+		else
+		{
+			final int width = _image.getWidth() ;
+			final int height = _image.getHeight() ;
+			final Bitmap image = _image.createBitmap( width,
+													  height,
+													  Bitmap.Config.RGB_565 ) ;
+			final Canvas canvas = new Canvas( image ) ;
+			canvas.drawBitmap( _image, 0.0f, 0.0f, null ) ;
+
+			final int size = image.getRowBytes() * height ;
+
+			final ByteBuffer buffer = ByteBuffer.allocateDirect( size ) ;
+			buffer.order( ByteOrder.nativeOrder() ) ;
+
+			image.copyPixelsToBuffer( buffer ) ;
+			buffer.position( 0 ) ;
+
+			// RGB_565 is 2 bytes per pixel
+			final ETC1Texture etc1tex = ETC1Util.compressTexture( buffer, width, height, 2, 2 * width ) ;
+			ETC1Util.loadTexture( GLES11.GL_TEXTURE_2D, 0, 0, GLES11.GL_RGB, GLES11.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
+
+			image.recycle() ;
+		}
 
 		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
 	}

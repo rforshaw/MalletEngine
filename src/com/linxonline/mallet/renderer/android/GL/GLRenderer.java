@@ -90,6 +90,12 @@ public class GLRenderer extends Basic2DRender
 	*/
 	public void recover()
 	{
+		// Reset ID's so they aren't refering a potentially 
+		// destroyed resource.
+		textureID[0] = -1 ;
+		indexID[0] = -1 ;
+		bufferID[0] = -1 ;
+
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		GLModelGenerator.shutdown() ;	// Clear all Geometry Data and reload everything upon rendering
 		fontManager.recover() ;
