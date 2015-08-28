@@ -12,7 +12,6 @@ import android.opengl.ETC1Util ;
 import android.opengl.ETC1Util.ETC1Texture ;
 import android.opengl.ETC1 ;
 
-import android.graphics.Canvas ;
 import android.graphics.BitmapFactory ;
 import android.graphics.Bitmap ;
 
@@ -53,7 +52,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		{
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return GlobalFileSystem.isExtension( _file, ".PNG", ".png" ) ;
 			}
 
 			public Texture load( final String _file, final Settings _settings )
@@ -75,6 +74,57 @@ public class GLTextureManager extends AbstractManager<Texture>
 						}
 
 						final Bitmap bitmap = BitmapFactory.decodeByteArray( image, 0, image.length ) ;
+						synchronized( toBind )
+						{
+							// We don't want to bind the Bitmap now
+							// as that will take control of the OpenGL context.
+							toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+						}
+					}
+				} ;
+
+				// We want to allocate the key for the resource so the texture 
+				// is not reloaded if another object wishes to use it before 
+				// the texture has fully loaded.
+				// The Renderer should skip the texture, until it is finally 
+				// available to render/
+				add( _file, null ) ;
+				load.start() ;
+				return null ;
+			}
+		} ) ;
+
+		loader.add( new ResourceDelegate<Texture>()
+		{
+			public boolean isLoadable( final String _file )
+			{
+				return GlobalFileSystem.isExtension( _file, ".JPG", ".jpg", ".JPEG", ".jpeg" ) ;
+			}
+
+			public Texture load( final String _file, final Settings _settings )
+			{
+				return loadTextureASync( _file ) ;
+			}
+
+			protected Texture loadTextureASync( final String _file )
+			{
+				final Thread load = new Thread( "LOAD_TEXTURE" )
+				{
+					public void run()
+					{
+						final byte[] image = ByteReader.readBytes( _file ) ;
+						if( _file == null )
+						{
+							Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
+							return ;
+						}
+
+						// We know Jpegs do not support an alpha channel, 
+						// so we can generate a Bitmap using 2 bytes instead of 4.
+						final BitmapFactory.Options options = new BitmapFactory.Options() ;
+						options.inPreferredConfig = Bitmap.Config.RGB_565 ;
+
+						final Bitmap bitmap = BitmapFactory.decodeByteArray( image, 0, image.length, options ) ;
 						synchronized( toBind )
 						{
 							// We don't want to bind the Bitmap now
@@ -166,40 +216,35 @@ public class GLTextureManager extends AbstractManager<Texture>
 		// Uncompressed will provide the best results, compressed can provide blury or 
 		// create artifacts, for example on Intel chips. Certain textures should never 
 		// be compressed such as fonts.
-		final boolean useCompression = GlobalConfig.getBoolean( "TEXTURECOMPRESSION", true ) ;
-		final InternalFormat format = ( useCompression == true ) ? _format : InternalFormat.UNCOMPRESSED ;
+		//final boolean useCompression = GlobalConfig.getBoolean( "TEXTURECOMPRESSION", true ) ;
+		//final InternalFormat format = ( useCompression == true ) ? _format : InternalFormat.UNCOMPRESSED ;
 
-		if( _format == InternalFormat.UNCOMPRESSED || _image.hasAlpha() == true )
-		{
+		//if( format == InternalFormat.UNCOMPRESSED || _image.getConfig() == Bitmap.Config.ARGB_8888 )
+		//{
 			// If the texture has been flagged to not use 
 			// compression or contains an alpha channel, then 
 			// do not compress the texture.
 			GLUtils.texImage2D( GLES11.GL_TEXTURE_2D, 0, _image, 0 ) ;
-		}
-		else
+		//}
+		/*else		// This is too slow
 		{
+			// We don't want the memory hit of converting an ARGB_8888 
+			// that doesn't use alpha to RGB_565. Too many copies!
 			final int width = _image.getWidth() ;
 			final int height = _image.getHeight() ;
-			final Bitmap image = _image.createBitmap( width,
-													  height,
-													  Bitmap.Config.RGB_565 ) ;
-			final Canvas canvas = new Canvas( image ) ;
-			canvas.drawBitmap( _image, 0.0f, 0.0f, null ) ;
+			final int size = _image.getRowBytes() * height ;
 
-			final int size = image.getRowBytes() * height ;
-
+			// Personally this implementation still has 1 too many copies.
 			final ByteBuffer buffer = ByteBuffer.allocateDirect( size ) ;
 			buffer.order( ByteOrder.nativeOrder() ) ;
 
-			image.copyPixelsToBuffer( buffer ) ;
+			_image.copyPixelsToBuffer( buffer ) ;
 			buffer.position( 0 ) ;
 
 			// RGB_565 is 2 bytes per pixel
 			final ETC1Texture etc1tex = ETC1Util.compressTexture( buffer, width, height, 2, 2 * width ) ;
 			ETC1Util.loadTexture( GLES11.GL_TEXTURE_2D, 0, 0, GLES11.GL_RGB, GLES11.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
-
-			image.recycle() ;
-		}
+		}*/
 
 		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
 	}
