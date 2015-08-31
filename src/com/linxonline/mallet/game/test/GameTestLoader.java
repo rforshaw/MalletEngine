@@ -226,7 +226,6 @@ public final class GameTestLoader extends GameLoader
 																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
-				entity.destroy() ;
 			}
 
 			/**
