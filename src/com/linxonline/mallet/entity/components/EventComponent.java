@@ -45,10 +45,7 @@ public class EventComponent extends Component
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		eventController.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
-
-		final Event<EventController> event = new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getEventController() ) ;
-		_events.add( event ) ;
+		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getEventController() )  ) ;
 	}
 
 	public void update( final float _dt )

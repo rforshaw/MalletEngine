@@ -78,6 +78,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		if( toDestroy != null && waitForID == false )
 		{
 			toDestroy.ready( this ) ;
+			toDestroy = null ;
 		}
 	}
 
@@ -248,6 +249,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	{
 		super.passFinalEvents( _events ) ;
 		_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
+		animations.clear() ;
 
 		toDestroy = null ;		// Blank toDestroy incase the component is reused.
 	}

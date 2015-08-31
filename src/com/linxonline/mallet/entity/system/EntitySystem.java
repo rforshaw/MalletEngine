@@ -104,17 +104,11 @@ public class EntitySystem implements EntitySystemInterface
 
 	protected void cleanupEntities()
 	{
-		final ArrayList<Entity> toClean = entities.getCleanup() ;
-		if( toClean.size() > 0 )
+		if( entities.getCleanup( cleanup ) == true )
 		{
-			cleanup.addAll( toClean ) ;
-			toClean.clear() ;
-		}
-
-		final int cleanupSize = cleanup.size() ;
-		if( cleanupSize > 0 )
-		{
+			final int cleanupSize = cleanup.size() ;
 			Entity entity = null ;
+
 			for( int i = 0; i < cleanupSize; ++i )
 			{
 				entity = cleanup.get( i ) ;

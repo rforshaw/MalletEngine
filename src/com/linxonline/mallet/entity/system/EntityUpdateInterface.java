@@ -12,5 +12,5 @@ public interface EntityUpdateInterface
 	public void clear() ;
 
 	public ArrayList<Entity> getEntities() ;
-	public ArrayList<Entity> getCleanup() ;
+	public boolean getCleanup( final ArrayList<Entity> _entities ) ;
 }

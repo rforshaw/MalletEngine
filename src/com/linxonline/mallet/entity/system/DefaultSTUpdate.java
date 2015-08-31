@@ -51,15 +51,15 @@ public class DefaultSTUpdate implements EntityUpdateInterface
 		Used by entity-system to determine what entities need to be un-hooked.
 		Should be replaced with callback functionality.
 	**/
-	public ArrayList<Entity> getCleanup()
+	public boolean getCleanup( final ArrayList<Entity> _entities )
 	{
 		if( cleanup.size() > 0 )
 		{
-			final ArrayList<Entity> clean = new ArrayList<Entity>( cleanup ) ;
+			_entities.addAll( cleanup ) ;
 			cleanup.clear() ;
-			return clean ;
+			return true ;
 		}
 
-		return cleanup ;
+		return false ;
 	}
 }

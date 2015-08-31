@@ -67,7 +67,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				renderTextureExample() ;
 				renderAnimationExample() ;
-				//renderTextExample() ;
+				renderTextExample() ;
 				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
@@ -226,6 +226,7 @@ public final class GameTestLoader extends GameLoader
 																	new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
+				entity.destroy() ;
 			}
 
 			/**

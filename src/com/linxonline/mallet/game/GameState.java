@@ -563,6 +563,7 @@ public class GameState extends State implements HookEntity
 				final EventController controller = _event.getVariable() ;
 				controller.setAddEventInterface( null ) ;
 				eventSystem.removeEventHandler( controller ) ;
+				controller.clearEvents() ;		// Ensure there are no lingering events stored
 			}
 		} ) ;
 

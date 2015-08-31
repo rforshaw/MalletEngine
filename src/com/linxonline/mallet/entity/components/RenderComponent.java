@@ -65,6 +65,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 		if( toDestroy != null && tracker.isStable() == true )
 		{
 			toDestroy.ready( this ) ;
+			toDestroy = null ;
 		}
 	}
 

@@ -83,6 +83,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 			// for an ID from the Animation System.
 			// Before we allow the parent to be destroyed.
 			toDestroy.ready( this ) ;
+			toDestroy = null ;
 		}
 	}
 	
