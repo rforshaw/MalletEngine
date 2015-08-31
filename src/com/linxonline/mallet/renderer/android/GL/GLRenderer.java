@@ -658,6 +658,7 @@ public class GLRenderer extends Basic2DRender
 	{
 		textures.clean() ;
 		fontManager.clean() ;
+		GLModelGenerator.clean() ;
 	}
 
 	@Override

@@ -13,6 +13,11 @@ public class GLModelGenerator
 {
 	private final static GLModelManager models = new GLModelManager() ;
 
+	public static void clean()
+	{
+		models.clean() ;
+	}
+
 	public static void shutdown()
 	{
 		models.shutdown() ;

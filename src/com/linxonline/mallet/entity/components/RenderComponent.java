@@ -23,10 +23,10 @@ import com.linxonline.mallet.system.* ;
 **/
 public class RenderComponent extends EventComponent implements IDInterface
 {
-	private final SourceTracker tracker = new SourceTracker( this ) ;
+	private final SourceTracker tracker = new SourceTracker() ;
 	private final ArrayList<Event<Settings>> content = new ArrayList<Event<Settings>>() ;
 
-	private boolean initialEventDone = false ;
+	private boolean initialEventDone = false ;				// false when not hooked up, true when initial events have been called.
 	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
@@ -86,6 +86,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 	{
 		super.passFinalEvents( _events ) ;
 		final int length = content.size() ;
+
 		Settings draw = null ;
 		Event<Settings> event = null ;
 
@@ -96,6 +97,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 			draw.addObject( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 			_events.add( event ) ;
 		}
+		content.clear() ;
 	}
 
 	@Override
@@ -136,15 +138,11 @@ public class RenderComponent extends EventComponent implements IDInterface
 		Important to prevent the parent entity destroying 
 		itself without cleaning up render requests.
 	*/
-	private static class SourceTracker implements IDInterface
+	private class SourceTracker implements IDInterface
 	{
-		private final RenderComponent component ;
 		private int recieved = 0 ;
 
-		public SourceTracker( final RenderComponent _component )
-		{
-			component = _component ;
-		}
+		public SourceTracker() {}
 
 		@Override
 		public void recievedID( final int _id )
@@ -154,7 +152,7 @@ public class RenderComponent extends EventComponent implements IDInterface
 
 		public boolean isStable()
 		{
-			return recieved >= component.drawSize() ;
+			return recieved >= RenderComponent.this.drawSize() ;
 		}
 	}
 }

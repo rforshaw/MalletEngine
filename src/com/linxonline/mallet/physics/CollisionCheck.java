@@ -19,7 +19,21 @@ public final class CollisionCheck
 	private static final Vector2 boxCenter1 = new Vector2() ;
 	private static final Vector2 boxCenter2 = new Vector2() ;
 
-	public static final void generateContactPoint( final Hull _box1, final Hull _box2 )
+	/**
+		Generate a Contact Point if a collision has occured.
+		Return true if a contact point was generated.
+		Return false if no collision was detected.
+
+		This implementation does not handle fast moving objects 
+		that can 'teleport' through objects instead of 
+		colliding with the object.
+
+		To solve telporting a physic system would need to be 
+		implemented so to handle translating hulls over time 
+		can be correctly implemented. Rather than leaving 
+		motion to the game-logic to update.
+	*/
+	public static final boolean generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
 		_box1.getAbsoluteCenter( boxCenter1 ) ;
 		_box2.getAbsoluteCenter( boxCenter2 ) ;
@@ -31,14 +45,14 @@ public final class CollisionCheck
 		final float overlap1 = penetration( _box1, _box2, toCenter, axis1 ) ;
 		if( overlap1 <= 0.0f )
 		{
-			return ;
+			return false ;
 		}
 
 		// Find the best overlap for _box2
 		final float overlap2 = penetration( _box2, _box1, toCenter, axis2 ) ;
 		if( overlap2 <= 0.0f )
 		{
-			return ;
+			return false ;
 		}
 
 		float overlap = ( overlap1 < overlap2 ) ? overlap1 : overlap2 ;		// Get the best overlap overall
@@ -51,10 +65,10 @@ public final class CollisionCheck
 		}
 
 		overlap *= 0.5f ;
-		//System.out.println( "Generated a collision: " + overlap ) ;
 		_box1.contactData.addContact( overlap, axis.x, axis.y, 
 									  ( _box1.isPhysical() && _box2.isPhysical() ),
 									  _box2 ) ;
+		return true ;
 	}
 
 	private static final float penetration( final Hull _a, 

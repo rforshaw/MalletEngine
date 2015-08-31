@@ -718,6 +718,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		textures.clean() ;
 		fontManager.clean() ;
+		GLModelGenerator.clean() ;
 	}
 
 	public static GLJPanel getCanvas()
@@ -734,7 +735,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	private Texture loadTexture( final Settings _draw )
 	{
 		final Texture texture = textures.get( _draw.getString( "FILE", null ) ) ;
-		if( texture == null ) { return null ; }
+		if( texture == null )
+		{
+			return null ;
+		}
 
 		final Vector2 fillDim = _draw.getObject( "FILL", null ) ;
 		Vector2 dimension = _draw.getObject( "DIM", null ) ;

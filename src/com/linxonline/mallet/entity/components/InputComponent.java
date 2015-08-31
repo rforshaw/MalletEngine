@@ -59,14 +59,13 @@ public abstract class InputComponent extends Component implements InputHandler
 	@Override
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
-		Event<InputHandler> event ;
+		super.passFinalEvents( _events ) ;
 		switch( mode )
 		{
-			case UI    : event = new Event<InputHandler>( "REMOVE_GAME_STATE_UI_INPUT", this ) ; break ;
-			case WORLD : event = new Event<InputHandler>( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ; break ;
+			case UI    : _events.add( new Event<InputHandler>( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
+			case WORLD : _events.add( new Event<InputHandler>( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
 			default    : return ;
 		}
-		_events.add( event ) ;
 	}
 
 	/**

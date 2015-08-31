@@ -2,7 +2,10 @@ package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.texture.Sprite ;
+import com.linxonline.mallet.resources.model.Model ;
+
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -136,9 +139,22 @@ public class Animation implements IDInterface, Cacheable
 		// We could check to see if the current path is the same as 
 		// f.path. Note sure if this would be more performant.
 		settings.addString( "FILE", f.path ) ; 
+		
 		// We need to null TEXTURE so the renderer
 		// can load/grab the new texture denoted by FILE
-		settings.addObject( "TEXTURE", null ) ;
+		final Texture texture = settings.<Texture>getObject( "TEXTURE", null ) ;
+		if( texture != null )
+		{
+			texture.unregister() ;
+			settings.remove( "TEXTURE" ) ;
+		}
+
+		final Model model = settings.<Model>getObject( "MODEL", null ) ;
+		if( model != null )
+		{
+			model.unregister() ;
+			settings.remove( "MODEL" ) ;
+		}
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility

@@ -27,17 +27,31 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return get( _key, _settings.getString( "FILE", null ) ) ;
 	}
 
+	/**
+		Load the resource specified by file path and associate 
+		it with _key for future reference.
+	*/
 	@Override
 	public T get( final String _key, final String _file )
 	{
-		if( exists( _key ) == true )
-		{
-			return resources.get( _key ) ;
-		}
-
-		final T resource = createResource( _file, null ) ;
+		T resource = resources.get( _key ) ;
 		if( resource != null )
 		{
+			// If the resource has already been loaded 
+			// increment resource count and return resource
+			resource.register() ;
+			return resource ;
+		}
+
+		// If the resource doesn't exist create the resource 
+		// using the appropriate resource loader.
+		resource = createResource( _file, null ) ;
+		if( resource != null )
+		{
+			// If the resource was successfully created, 
+			// add it to the manager, increment the resource 
+			// count and return, if no resource was created 
+			// simply return null
 			add( _key, resource ) ;
 			resource.register() ;			// Increment usage count
 		}
@@ -45,17 +59,31 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return resource ;
 	}
 
+	/**
+		Load the resource specified by file path and use 
+		file path as unique key for future reference.
+	*/
 	@Override
 	public T get( final String _file )
 	{
-		if( exists( _file ) == true )
-		{
-			return resources.get( _file ) ;
-		}
-
-		final T resource = createResource( _file, null ) ;
+		T resource = resources.get( _file ) ;
 		if( resource != null )
 		{
+			// If the resource has already been loaded 
+			// increment resource count and return resource
+			resource.register() ;
+			return resource ;
+		}
+
+		// If the resource doesn't exist create the resource 
+		// using the appropriate resource loader.
+		resource = createResource( _file, null ) ;
+		if( resource != null )
+		{
+			// If the resource was successfully created, 
+			// add it to the manager, increment the resource 
+			// count and return, if no resource was created 
+			// simply return null
 			add( _file, resource ) ;
 			resource.register() ;			// Increment usage count
 		}

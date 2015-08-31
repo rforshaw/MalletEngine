@@ -31,6 +31,7 @@ public class QueryComponent extends Component
 	@Override
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
+		super.passFinalEvents( _events ) ;
 		searchInterface = null ;
 	}
 

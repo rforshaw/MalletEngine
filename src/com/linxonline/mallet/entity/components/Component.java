@@ -89,9 +89,13 @@ public abstract class Component
 		of the Game State. Use an Event to cleanup the 
 		component or variables it holds to external systems.
 		Can also be used for any other events that may need 
-		to be passed when the component is removed from the Entity System. 
+		to be passed when the component is removed from the Entity System.
+		super.passFinalEvents(), must be called.
 	*/
-	public void passFinalEvents( final ArrayList<Event<?>> _events ) {}
+	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	{
+		componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
+	}
 
 	/**
 		The parent can be flagged for destruction at anytime, a 
