@@ -52,8 +52,8 @@ public class InputSystem implements InputSystemInterface,
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( null ) ;
 		handlers.remove( _handler ) ;
+		_handler.reset() ;
 	}
 
 	/** Pass InputEvents to the handlers **/
@@ -297,6 +297,11 @@ public class InputSystem implements InputSystemInterface,
 
 	public void clearHandlers()
 	{
+		final int size = handlers.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			handlers.get( i ).reset() ;
+		}
 		handlers.clear() ;
 	}
 

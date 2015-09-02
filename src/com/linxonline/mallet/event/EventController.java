@@ -102,6 +102,14 @@ public class EventController implements EventHandler
 		addInterface.addEvent( _event ) ;
 	}
 
+	@Override
+	public void reset()
+	{
+		clearEvents() ;
+		processors.clear() ;
+		addInterface = null ;
+	}
+	
 	public void clearEvents()
 	{
 		messenger.clearEvents() ;

@@ -47,7 +47,10 @@ public class GL2DRenderer implements RenderInterface,
 	@Override
 	public void onDrawFrame( GL10 _unused )
 	{
-		render.display() ;
+		synchronized( render )
+		{
+			render.display() ;
+		}
 	}
 
 	@Override
@@ -106,7 +109,10 @@ public class GL2DRenderer implements RenderInterface,
 	@Override
 	public void updateState( final float _dt )
 	{
-		render.updateState( _dt ) ;
+		synchronized( render )
+		{
+			render.updateState( _dt ) ;
+		}
 	}
 
 	@Override
@@ -127,6 +133,12 @@ public class GL2DRenderer implements RenderInterface,
 		render.passEvent( _event ) ;
 	}
 
+	@Override
+	public final void reset()
+	{
+		render.reset() ;
+	}
+	
 	@Override
 	public String getName()
 	{

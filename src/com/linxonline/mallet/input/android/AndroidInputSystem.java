@@ -36,6 +36,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 	public void removeInputHandler( InputHandler _handler )
 	{
 		handlers.remove( _handler ) ;
+		_handler.reset() ;
 	}
 
 	public void onKeyDown( int _keyCode, KeyEvent _event )
@@ -167,6 +168,11 @@ public class AndroidInputSystem implements InputSystemInterface,
 	
 	public void clearHandlers()
 	{
+		final int size = handlers.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			handlers.get( i ).reset() ;
+		}
 		handlers.clear() ;
 	}
 

@@ -59,6 +59,7 @@ public class InputState implements InputSystemInterface,
 
 		_handler.setInputAdapterInterface( null ) ;
 		handlers.remove( _handler ) ;
+		_handler.reset() ;
 	}
 
 	@Override
@@ -95,8 +96,29 @@ public class InputState implements InputSystemInterface,
 	}
 
 	@Override
+	public void reset()
+	{
+		clearInputs() ;
+		// We don't want to re-add InputHandlers when a 
+		// State transition happens.
+		//clearHandlers() ;
+
+		inputAdapter = null ;
+		hasInputs = false ;
+		handler = null ;
+	}
+
+	/**
+		Remove the Input Handlers and reset them.
+	*/
+	@Override
 	public final void clearHandlers()
 	{
+		final int size = handlers.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			handlers.get( i ).reset() ;
+		}
 		handlers.clear() ;
 	}
 

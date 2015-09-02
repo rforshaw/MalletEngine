@@ -42,4 +42,10 @@ public abstract class InputController implements InputHandler
 		inputs.add( _input ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}
+
+	@Override
+	public void reset()
+	{
+		inputs.clear() ;
+	}
 }

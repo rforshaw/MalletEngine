@@ -159,7 +159,9 @@ public final class EventSystem implements EventSystemInterface
 				eventQueues.get( type ).removeEventHandler( _handler ) ;
 			}
 		}
+
 		handlers.remove( _handler ) ;
+		_handler.reset() ;				// Should clear any 
 	}
 
 	/**

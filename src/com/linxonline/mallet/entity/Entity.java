@@ -78,9 +78,8 @@ public final class Entity
 	{
 		_component.setParent( null ) ;					// Required by j2Objc conversion, causes memory-leak otherwise
 		components.remove( _component ) ;
-		
+
 		final EventController controller = _component.getComponentEventController() ;
-		controller.setAddEventInterface( null ) ;
 		eventSystem.removeEventHandler( controller ) ;
 	}
 

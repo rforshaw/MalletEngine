@@ -5,7 +5,8 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 
-public abstract class InputComponent extends Component implements InputHandler
+public abstract class InputComponent extends Component
+									 implements InputHandler
 {
 	protected InputAdapterInterface inputAdapter = null ;
 	protected final InputMode mode ;
@@ -95,7 +96,14 @@ public abstract class InputComponent extends Component implements InputHandler
 
 	protected void processInputEvent( final InputEvent _input ) {}
 
-	public enum InputMode
+	@Override
+	public void reset()
+	{
+		inputAdapter = null ;
+		inputs.clear() ;
+	}
+
+	public static enum InputMode
 	{
 		UI,
 		WORLD

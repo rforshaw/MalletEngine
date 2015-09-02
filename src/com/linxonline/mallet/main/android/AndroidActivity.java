@@ -186,6 +186,12 @@ public class AndroidActivity extends Activity
 		starter.getAndroidSystem().getEventInterface().addEvent( _event ) ;
 	}
 
+	/**
+		Implemented by Event Handler.
+	*/
+	@Override
+	public void reset() {}
+	
 	private synchronized void startGameThread()
 	{
 		if( gameThread == null )

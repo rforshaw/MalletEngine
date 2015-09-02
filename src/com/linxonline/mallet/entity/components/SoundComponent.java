@@ -86,7 +86,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 			toDestroy = null ;
 		}
 	}
-	
+
 	/**
 		Begin playing specified sound as soon as possible.
 		If called very quickly, repeatedly, some sounds 

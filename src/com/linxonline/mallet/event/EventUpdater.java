@@ -39,4 +39,11 @@ public abstract class EventUpdater implements EventHandler
 		// So crash!
 		eventSystem.addEvent( _event ) ;
 	}
+
+	@Override
+	public void reset()
+	{
+		messenger.clearEvents() ;
+		eventSystem = null ;
+	}
 }
