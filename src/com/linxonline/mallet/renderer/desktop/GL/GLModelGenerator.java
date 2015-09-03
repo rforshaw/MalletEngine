@@ -267,7 +267,7 @@ public class GLModelGenerator
 		return model ;
 	}
 
-	private static float getABGR( final MalletColour _colour )
+	public static float getABGR( final MalletColour _colour )
 	{
 		final byte[] colour = new byte[4] ;
 		colour[0] = _colour.colours[MalletColour.ALPHA] ;

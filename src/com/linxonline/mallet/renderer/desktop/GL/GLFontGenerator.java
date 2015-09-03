@@ -1,5 +1,9 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
+import javax.imageio.ImageIO ;
+import java.io.File ;
+import java.io.IOException ;
+
 import java.awt.Font ;
 import java.awt.FontMetrics ;
 import java.awt.font.GlyphVector ;
@@ -30,16 +34,22 @@ public class GLFontGenerator
 		return generateFontMap( new Font( _name, Font.PLAIN, _size ), _charsToMap, _spacing ) ;
 	}
 
+	/**
+		Needs to be updated to provide higher resolution font maps.
+		We should render out a high resolution map, but use geometry 
+		suitable for the font specified. Currently texture is generated 
+		based on 
+	*/
 	public GLFontMap generateFontMap( final Font _font, final String _charsToMap, int _spacing )
 	{
 		final int length = _charsToMap.length() ;
 		final Dimensions dim = determineDimensions( _font, _charsToMap ) ;
 		final float width = dim.width + ( _spacing * length ) ;
 
-		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_4BYTE_ABGR ) ;
+		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_BYTE_GRAY ) ;
 		final Graphics2D g2D = buffer.createGraphics() ;
 
-		g2D.setComposite( AlphaComposite.SrcOut ) ;
+		//g2D.setComposite( AlphaComposite.SrcOut ) ;
 		g2D.setFont( _font ) ;
 		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
 		final FontMetrics metrics = g2D.getFontMetrics() ;
@@ -69,6 +79,13 @@ public class GLFontGenerator
 			increment += advance ;
 		}
 
+		/*try
+		{
+			final File outputfile = new File( "saved.png" ) ;
+			ImageIO.write( buffer, "png", outputfile ) ;
+		}
+		catch (IOException e) {}*/
+
 		// Create a GLFontMap and wrap it around a FontMap
 		// buffer is not automatically destroyed by TextureManager,
 		// must be manually destroyed.
@@ -79,7 +96,7 @@ public class GLFontGenerator
 
 	private Dimensions determineDimensions( final Font _font, final String _text )
 	{
-		final BufferedImage buffer = new BufferedImage( 1, 1, BufferedImage.TYPE_INT_RGB ) ;
+		final BufferedImage buffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
 		final Graphics2D g2D = buffer.createGraphics() ;
 		g2D.setFont( _font ) ;
 		final FontMetrics metrics = g2D.getFontMetrics() ;

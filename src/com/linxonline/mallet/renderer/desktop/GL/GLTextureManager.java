@@ -170,16 +170,18 @@ public class GLTextureManager extends AbstractManager<Texture>
 		{
 			switch( channels )
 			{
-				case 4 : imageFormat = GL2.GL_ABGR_EXT ; break ;
-				case 3 : imageFormat = GL2.GL_BGR ; break ;
+				case 4 : imageFormat = GL2.GL_ABGR_EXT ;  break ;
+				case 3 : imageFormat = GL2.GL_BGR ;       break ;
+				case 1 : imageFormat = GL2.GL_ALPHA ; break ;
 			}
 		}
 		else
 		{
 			switch( channels )
 			{
-				case 4 : imageFormat = GL2.GL_RGBA ; break ;
-				case 3 : imageFormat = GL2.GL_RGB ; break ;
+				case 4 : imageFormat = GL2.GL_RGBA ;      break ;
+				case 3 : imageFormat = GL2.GL_RGB ;       break ;
+				case 1 : imageFormat = GL2.GL_ALPHA ; break ;
 			}
 		}
 
@@ -228,6 +230,10 @@ public class GLTextureManager extends AbstractManager<Texture>
 					case COMPRESSED   : return GL2.GL_COMPRESSED_RGB ;
 					case UNCOMPRESSED : return GL2.GL_RGB ;
 				}
+			}
+			case 1 :
+			{
+				return GL2.GL_ALPHA8 ;
 			}
 		}
 

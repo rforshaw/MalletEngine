@@ -66,14 +66,15 @@ public class GLTextureManager extends AbstractManager<Texture>
 				{
 					public void run()
 					{
-						final byte[] image = ByteReader.readBytes( _file ) ;
-						if( _file == null )
+						final FileStream file = GlobalFileSystem.getFile( _file ) ;
+						if( file.exists() == false )
 						{
 							Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
 							return ;
 						}
 
-						final Bitmap bitmap = BitmapFactory.decodeByteArray( image, 0, image.length ) ;
+						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
+						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
 						synchronized( toBind )
 						{
 							// We don't want to bind the Bitmap now
@@ -112,8 +113,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 				{
 					public void run()
 					{
-						final byte[] image = ByteReader.readBytes( _file ) ;
-						if( _file == null )
+						final FileStream file = GlobalFileSystem.getFile( _file ) ;
+						if( file.exists() == false )
 						{
 							Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
 							return ;
@@ -124,7 +125,9 @@ public class GLTextureManager extends AbstractManager<Texture>
 						final BitmapFactory.Options options = new BitmapFactory.Options() ;
 						options.inPreferredConfig = Bitmap.Config.RGB_565 ;
 
-						final Bitmap bitmap = BitmapFactory.decodeByteArray( image, 0, image.length, options ) ;
+						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
+						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
+
 						synchronized( toBind )
 						{
 							// We don't want to bind the Bitmap now
