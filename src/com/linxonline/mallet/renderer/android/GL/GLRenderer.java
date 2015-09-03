@@ -21,6 +21,8 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 public class GLRenderer extends Basic2DRender
 {
+	private static final MalletColour WHITE = new MalletColour( 255, 255, 255 ) ;
+
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
 
@@ -354,6 +356,7 @@ public class GLRenderer extends Basic2DRender
 					_settings.addInteger( "TEXTWIDTH", -1 ) ;
 				}
 
+				final MalletColour colour = _settings.getObject( "COLOUR", WHITE ) ;
 				final int alignment = _settings.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
@@ -381,7 +384,7 @@ public class GLRenderer extends Basic2DRender
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], fm ) ;
+						renderText( words[i], colour, fm ) ;
 						GLES11.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 
@@ -397,7 +400,7 @@ public class GLRenderer extends Basic2DRender
 				GLES11.glDisableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
-			private void renderText( final String _text, final GLFontMap _fm )
+			private void renderText( final String _text, final MalletColour _colour, final GLFontMap _fm )
 			{
 				final int length = _text.length() ;
 				for( int i = 0; i < length; ++i )
@@ -405,8 +408,16 @@ public class GLRenderer extends Basic2DRender
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
+					final int vertexSize = geometry.getVertexSize() ;
+					for( int j = 0; j < vertexSize; ++j )
+					{
+						geometry.updateColour( j, GLModelGenerator.getABGR( _colour ) ) ;
+					}
+
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+
+					GLModelManager.updateVBO( geometry ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;

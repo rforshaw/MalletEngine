@@ -148,6 +148,16 @@ public class GLGeometry implements GeometryInterface
 		vertex[i + 8] = _z ;
 	}
 
+	public int getIndexSize()
+	{
+		return index.length ;
+	}
+
+	public int getVertexSize()
+	{
+		return vertex.length / VERTEX_SIZE ;
+	}
+
 	public FloatBuffer getVertexBuffer()
 	{
 		vertexBuffer.put( vertex ) ;
@@ -162,9 +172,10 @@ public class GLGeometry implements GeometryInterface
 		return indexBuffer ;
 	}
 
+	@Override
 	public void destroy()
 	{
-		System.out.println( "Removing Geometry.." ) ;
+		//System.out.println( "Removing Geometry.." ) ;
 		GLModelManager.unbind( this ) ;
 	}
 }
