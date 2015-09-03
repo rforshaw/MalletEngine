@@ -82,7 +82,7 @@ public class GLFontGenerator
 		paint.setTextSize( ( float )_font.size ) ;
 		paint.setColor( Color.WHITE ) ;
 
-		final Bitmap bitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_8888 ) ;
+		final Bitmap bitmap = Bitmap.createBitmap( width, height, Bitmap.Config.ALPHA_8 ) ;
 		final Canvas canvas = new Canvas( bitmap ) ;
 
 		final char[] c = new char[1] ;

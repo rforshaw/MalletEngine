@@ -227,6 +227,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			// If the texture has been flagged to not use 
 			// compression or contains an alpha channel, then 
 			// do not compress the texture.
+			GLES11.glPixelStorei( GLES11.GL_UNPACK_ALIGNMENT, 1 ) ;
 			GLUtils.texImage2D( GLES11.GL_TEXTURE_2D, 0, _image, 0 ) ;
 		//}
 		/*else		// This is too slow
