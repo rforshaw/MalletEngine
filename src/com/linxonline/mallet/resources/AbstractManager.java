@@ -34,18 +34,27 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	@Override
 	public T get( final String _key, final String _file )
 	{
-		T resource = resources.get( _key ) ;
-		if( resource != null )
+		if( exists( _key ) == true )
 		{
-			// If the resource has already been loaded 
-			// increment resource count and return resource
-			resource.register() ;
-			return resource ;
+			final T resource = resources.get( _key ) ;
+			if( resource != null )
+			{
+				// If the resource has already been loaded 
+				// increment resource count and return resource
+				resource.register() ;
+				return resource ;
+			}
+
+			// The key has been assigned to a resource 
+			// that is currently being loaded async.
+			// We don't want to load a resource that is 
+			// currently being loaded.
+			return null ;
 		}
 
 		// If the resource doesn't exist create the resource 
 		// using the appropriate resource loader.
-		resource = createResource( _file, null ) ;
+		final T resource = createResource( _file, null ) ;
 		if( resource != null )
 		{
 			// If the resource was successfully created, 

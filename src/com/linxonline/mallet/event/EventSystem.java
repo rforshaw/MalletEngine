@@ -152,6 +152,13 @@ public final class EventSystem implements EventSystemInterface
 	private void remove( final EventHandler _handler )
 	{
 		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
+		if( types.isEmpty() == true )
+		{
+			// Due to legacy we must assumme that a types size of 0, 
+			// represents Event.ALL_EVENT_TYPES, must be special removed.
+			eventQueues.get( Event.ALL_EVENT_TYPES ).removeEventHandler( _handler ) ;
+		}
+
 		for( final EventType type : types )
 		{
 			if( eventQueues.containsKey( type ) == true )

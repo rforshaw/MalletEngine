@@ -19,7 +19,7 @@ public class Animation implements IDInterface, Cacheable
 	public int id = 0 ;
 	public int renderID = -1 ;
 	private Sprite sprite = null ;
-	private Event event = null ;
+	private Event<Settings> event = null ;
 
 	private boolean play = false ;
 
@@ -30,12 +30,12 @@ public class Animation implements IDInterface, Cacheable
 
 	public Animation() {}
 
-	public Animation( final int _id, final Event _event, final Sprite _sprite )
+	public Animation( final int _id, final Event<Settings> _event, final Sprite _sprite )
 	{
 		setAnimation( _id, _event, _sprite ) ;
 	}
 
-	public void setAnimation( final int _id, final Event _event, final Sprite _sprite )
+	public void setAnimation( final int _id, final Event<Settings> _event, final Sprite _sprite )
 	{
 		id = _id ;
 		event = _event ;
@@ -130,9 +130,9 @@ public class Animation implements IDInterface, Cacheable
 		}
 	}
 
-	private void changeTexture( final Event _event, final Sprite _sprite )
+	private void changeTexture( final Event<Settings> _event, final Sprite _sprite )
 	{
-		final Settings settings = ( Settings )_event.getVariable() ;		// Render Event
+		final Settings settings = _event.getVariable() ;		// Render Event
 		final Sprite.Frame f = sprite.getFrame( frame ) ;					// Grab the current frame
 
 		// Doesn't assume the next frame is part of a spritesheet.
@@ -232,6 +232,7 @@ public class Animation implements IDInterface, Cacheable
 	public void destroy()
 	{
 		sprite.unregister() ;
+		final Settings settings = event.getVariable() ;		// Render Event
 		final Texture texture = settings.<Texture>getObject( "TEXTURE", null ) ;
 		if( texture != null )
 		{
