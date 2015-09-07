@@ -1,8 +1,8 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import javax.imageio.ImageIO ;
+/*import javax.imageio.ImageIO ;
 import java.io.File ;
-import java.io.IOException ;
+import java.io.IOException ;*/
 
 import java.awt.Font ;
 import java.awt.FontMetrics ;
@@ -42,47 +42,59 @@ public class GLFontGenerator
 	*/
 	public GLFontMap generateFontMap( final Font _font, final String _charsToMap, int _spacing )
 	{
+		// We want to render the texture at a higher resolution
+		// Allowing the font to be scaled/zoomed without 
+		// significant quality loss.
+		final Font textureFont = _font.deriveFont( _font.getSize2D() * 2.0f ) ;
+		final Dimensions textureDim = determineDimensions( textureFont, _charsToMap ) ;
+
 		final int length = _charsToMap.length() ;
-		final Dimensions dim = determineDimensions( _font, _charsToMap ) ;
-		final float width = dim.width + ( _spacing * length ) ;
+		final float textureWidth = textureDim.width + ( _spacing * length ) ;
 
-		final BufferedImage buffer = new BufferedImage( ( int )width, dim.height, BufferedImage.TYPE_BYTE_GRAY ) ;
-		final Graphics2D g2D = buffer.createGraphics() ;
+		// Used to render the texture
+		final BufferedImage textureBuffer = new BufferedImage( ( int )textureWidth, textureDim.height, BufferedImage.TYPE_BYTE_GRAY ) ;
+		final Graphics2D gTex2D = textureBuffer.createGraphics() ;
+		gTex2D.setFont( textureFont ) ;
+		gTex2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
+		final FontMetrics textureMetrics = gTex2D.getFontMetrics() ;
 
-		//g2D.setComposite( AlphaComposite.SrcOut ) ;
-		g2D.setFont( _font ) ;
-		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
-		final FontMetrics metrics = g2D.getFontMetrics() ;
-		
+		// Used to get Metric information for geometry
+		final BufferedImage geometryBuffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
+		final Graphics2D gGeom2D = geometryBuffer.createGraphics() ;
+		gGeom2D.setFont( _font ) ;
+		final FontMetrics geometryMetrics = gGeom2D.getFontMetrics() ;
+
 		int increment = 0 ;
 		final char[] c = new char[1] ;
-		final double point = 1.0f / width ;
+		final double point = 1.0f / textureWidth ;
 		final Glyph[] glyphs = new GLGlyph[length] ;
+		final int geometryHeight = geometryMetrics.getHeight() ;
 
 		for( int i = 0; i < length; i++ )
 		{
 			c[0] = _charsToMap.charAt( i ) ;
-			final int start = increment + ( int )( dim.position.x + ( i * _spacing ) ) ;
-			g2D.drawChars( c, 0, 1, start, ( int )dim.position.y ) ;
+			// Render character to texture buffer starting from textureStart.
+			final int textureStart = increment + ( int )( textureDim.position.x + ( i * _spacing ) ) ;
+			gTex2D.drawChars( c, 0, 1, textureStart, ( int )textureDim.position.y ) ;
 
-			final int advance = metrics.charWidth( c[0] ) ;
-			final int height = metrics.getHeight() ;
-			final float x1 = ( float )( start * point ) ;
-			final float x2 = ( float )( ( start + advance ) * point ) ;
-			
+			final int geometryAdvance = geometryMetrics.charWidth( c[0] ) ;
+			final Vector2 maxPoint = new Vector2( geometryAdvance, geometryHeight ) ;
+
+			final int textureAdvance = textureMetrics.charWidth( c[0] ) ;
+			final Vector2 uv1 = new Vector2( ( float )( textureStart * point ), 0.0f ) ;
+			final Vector2 uv2 = new Vector2( ( float )( ( textureStart + textureAdvance ) * point ), 1.0f ) ;
+
 			// Must be destroyed manually destroyed, as not added to the 
 			// ModelManager automatically. 
-			final Model model = GLModelGenerator.genPlaneModel( new Vector2( advance, height ),
-																new Vector2( x1, 0.0f ),
-																new Vector2( x2, 1.0f ) ) ;
-			glyphs[i] = new GLGlyph( model, c[0], start, advance ) ;
-			increment += advance ;
+			final Model model = GLModelGenerator.genPlaneModel( maxPoint, uv1, uv2 ) ;
+			glyphs[i] = new GLGlyph( model, c[0], textureStart, geometryAdvance ) ;
+			increment += textureAdvance ;
 		}
 
 		/*try
 		{
 			final File outputfile = new File( "saved.png" ) ;
-			ImageIO.write( buffer, "png", outputfile ) ;
+			ImageIO.write( textureBuffer, "png", outputfile ) ;
 		}
 		catch (IOException e) {}*/
 
@@ -90,8 +102,8 @@ public class GLFontGenerator
 		// buffer is not automatically destroyed by TextureManager,
 		// must be manually destroyed.
 		return new GLFontMap( new FontMap( glyphs, 
-										   manager.bind( buffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
-										   metrics.getHeight() ) ) ;
+										   manager.bind( textureBuffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
+										   geometryHeight ) ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )

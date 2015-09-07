@@ -30,7 +30,12 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
-	private static final MalletColour WHITE = new MalletColour( 255, 255, 255 ) ;
+	private static final MalletColour WHITE = MalletColour.white() ;
+	private static final MalletColour BLACK = MalletColour.black() ;
+
+	private static final MalletColour RED   = MalletColour.red() ;
+	private static final MalletColour GREEN = MalletColour.green() ;
+	private static final MalletColour BLUE  = MalletColour.blue() ;
 
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
@@ -223,6 +228,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
+					GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
+					GLModelManager.updateVBO( gl, geometry ) ;
+
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
@@ -269,6 +277,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 
+				final MalletColour colour = _settings.<MalletColour>getObject( "COLOUR", WHITE ) ;
 				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
 				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
 
@@ -295,6 +304,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
+					GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
@@ -404,15 +414,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					final GLGeometry geometry = glyph.getGLGeometry() ;
 
-					final int vertexSize = geometry.getVertexSize() ;
-					for( int j = 0; j < vertexSize; ++j )
-					{
-						geometry.updateColour( j, GLModelGenerator.getABGR( _colour ) ) ;
-					}
-
 					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
+					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( _colour ) ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;

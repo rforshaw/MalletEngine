@@ -111,12 +111,22 @@ public class GLGeometry implements GeometryInterface
 		vertexInc += VERTEX_SIZE ;
 	}
 
+	public void updateIndex( final int _index, final int _val )
+	{
+		index[_index] = _val ;
+	}
+
 	public void updateVertex( final int _index, final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
 	{
 		updatePosition( _index, _position.x, _position.y, _position.z ) ;
 		updateColour( _index, _colour ) ;
 		updateTexCoord( _index, _texCoord.x, _texCoord.y ) ;
 		updateNormal( _index, _normal.x, _normal.y, _normal.z ) ;
+	}
+
+	public void updatePosition( final int _index, final Vector3 _position )
+	{
+		updatePosition( _index, _position.x, _position.y, _position.z ) ;
 	}
 
 	public void updatePosition( final int _index, final float _x, final float _y, final float _z )

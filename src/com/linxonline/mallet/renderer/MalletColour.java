@@ -66,4 +66,29 @@ public class MalletColour
 	{
 		return ConvertBytes.toInt( colours, 0, 4 ) ;
 	}
+
+	public static MalletColour white()
+	{
+		return new MalletColour( 255, 255, 255 ) ;
+	}
+
+	public static MalletColour black()
+	{
+		return new MalletColour( 0, 0, 0 ) ;
+	}
+
+	public static MalletColour red()
+	{
+		return new MalletColour( 255, 0, 0 ) ;
+	}
+
+	public static MalletColour green()
+	{
+		return new MalletColour( 0, 255, 0 ) ;
+	}
+
+	public static MalletColour blue()
+	{
+		return new MalletColour( 0, 0, 255 ) ;
+	}
 }

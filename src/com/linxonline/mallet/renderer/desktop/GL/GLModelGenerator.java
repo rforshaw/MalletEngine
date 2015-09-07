@@ -87,6 +87,70 @@ public class GLModelGenerator
 		return _model ;
 	}
 
+	public static Model updateModelColour( final Model _model, final float _colour )
+	{
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		final int size = geometry.getVertexSize() ;
+		for( int i = 0; i < size; i++ )
+		{
+			geometry.updateColour( i, _colour ) ;
+		}
+
+		return _model ;
+	}
+	
+	public static Model updatePlaneModelColour( final Model _model, final float _colour )
+	{
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		updatePlaneColour( geometry, _colour ) ;
+
+		return _model ;
+	}
+
+	public static void updatePlaneColour( final GLGeometry _geometry, final float _colour )
+	{
+		_geometry.updateColour( 0, _colour ) ;
+		_geometry.updateColour( 1, _colour ) ;
+		_geometry.updateColour( 2, _colour ) ;
+		_geometry.updateColour( 3, _colour ) ;
+	}
+
+	public static Model updateShapeModel( final Model _model, final Shape _shape )
+	{
+		final int indexSize = _shape.indicies.length ;
+		final int pointSize = _shape.points.length ;
+
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		if( indexSize >= geometry.getIndexSize() ||
+			pointSize >= geometry.getVertexSize() )
+		{
+			return _model ;
+		}
+
+		if( _shape.colours != null )
+		{
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.updatePosition( i, _shape.points[i] ) ;
+				geometry.updateColour( i, getABGR( _shape.colours[i] ) ) ;
+			}
+		}
+		else
+		{
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.updatePosition( i, _shape.points[i] ) ;
+			}
+		}
+
+		for( int i = 0; i < indexSize; ++i )
+		{
+			geometry.updateIndex( i, _shape.indicies[i] ) ;
+		}
+
+		return _model ;
+	}
+
 	/**
 		Create a Geometric Line
 	*/

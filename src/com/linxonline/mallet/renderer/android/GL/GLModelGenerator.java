@@ -22,7 +22,7 @@ public class GLModelGenerator
 	{
 		models.shutdown() ;
 	}
-
+	
 	public static Model genPlaneModel( final String _name, final Vector2 _dim )
 	{
 		return genPlaneModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;
@@ -30,12 +30,16 @@ public class GLModelGenerator
 
 	/**
 		Create a Quad made from 2 triangles.
+		Added to ModelManager and registered.
 	*/
 	public static Model genPlaneModel( final String _name, final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
 	{
 		// See if the model already exists
 		final Model m = ( Model )models.get( _name ) ;
-		if( m != null ){ return m ; }
+		if( m != null ) 
+		{
+			return m ;
+		}
 
 		// Generate the plane, & register it.
 		final Model model = GLModelGenerator.genPlaneModel( _dim, _uv1, _uv2 ) ;
@@ -44,6 +48,10 @@ public class GLModelGenerator
 		return model ;
 	}
 
+	/**
+		Create a Quad made from 2 triangles.
+		NOT added to ModelManager or registered.
+	*/
 	public static Model genPlaneModel( final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
 	{
 		final GLGeometry geometry = new GLGeometry( 6, 4 ) ;
@@ -79,7 +87,71 @@ public class GLModelGenerator
 		return _model ;
 	}
 
-		/**
+	public static Model updateModelColour( final Model _model, final float _colour )
+	{
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		final int size = geometry.getVertexSize() ;
+		for( int i = 0; i < size; i++ )
+		{
+			geometry.updateColour( i, _colour ) ;
+		}
+
+		return _model ;
+	}
+	
+	public static Model updatePlaneModelColour( final Model _model, final float _colour )
+	{
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		updatePlaneColour( geometry, _colour ) ;
+
+		return _model ;
+	}
+
+	public static void updatePlaneColour( final GLGeometry _geometry, final float _colour )
+	{
+		_geometry.updateColour( 0, _colour ) ;
+		_geometry.updateColour( 1, _colour ) ;
+		_geometry.updateColour( 2, _colour ) ;
+		_geometry.updateColour( 3, _colour ) ;
+	}
+
+	public static Model updateShapeModel( final Model _model, final Shape _shape )
+	{
+		final int indexSize = _shape.indicies.length ;
+		final int pointSize = _shape.points.length ;
+
+		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
+		if( indexSize >= geometry.getIndexSize() ||
+			pointSize >= geometry.getVertexSize() )
+		{
+			return _model ;
+		}
+
+		if( _shape.colours != null )
+		{
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.updatePosition( i, _shape.points[i] ) ;
+				geometry.updateColour( i, getABGR( _shape.colours[i] ) ) ;
+			}
+		}
+		else
+		{
+			for( int i = 0; i < pointSize; ++i )
+			{
+				geometry.updatePosition( i, _shape.points[i] ) ;
+			}
+		}
+
+		for( int i = 0; i < indexSize; ++i )
+		{
+			geometry.updateIndex( i, _shape.indicies[i] ) ;
+		}
+
+		return _model ;
+	}
+
+	/**
 		Create a Geometric Line
 	*/
 	public static Model genShapeModel( final String _name, final Shape _line )
@@ -94,7 +166,7 @@ public class GLModelGenerator
 		model.register() ;
 		return model ;
 	}
-	
+
 	public static Model genShapeModel( final Shape _shape )
 	{
 		final int indexSize = _shape.indicies.length ;
@@ -137,7 +209,10 @@ public class GLModelGenerator
 		return genCubeModel( _name, _dim, new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;
 	}
 
-	public static Model genCubeModel( final String _name, final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
+	public static Model genCubeModel( final String _name,
+									  final Vector2 _dim,
+									  final Vector2 _uv1,
+									  final Vector2 _uv2 )
 	{
 		// See if the model already exists
 		final Model m = ( Model )models.get( _name ) ;
@@ -150,7 +225,9 @@ public class GLModelGenerator
 		return model ;
 	}
 
-	public static Model genCubeModel( final Vector2 _dim, final Vector2 _uv1, final Vector2 _uv2 )
+	public static Model genCubeModel( final Vector2 _dim,
+									  final Vector2 _uv1,
+									  final Vector2 _uv2 )
 	{
 		final GLGeometry geometry = new GLGeometry( 36, 24 ) ;
 		geometry.addVertex( new Vector3( 0, 0, 0 ),					// 0 - 1st Face - Front

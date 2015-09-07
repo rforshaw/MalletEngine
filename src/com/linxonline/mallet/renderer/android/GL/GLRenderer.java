@@ -21,7 +21,12 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 public class GLRenderer extends Basic2DRender
 {
-	private static final MalletColour WHITE = new MalletColour( 255, 255, 255 ) ;
+	private static final MalletColour WHITE = MalletColour.white() ;
+	private static final MalletColour BLACK = MalletColour.black() ;
+
+	private static final MalletColour RED   = MalletColour.red() ;
+	private static final MalletColour GREEN = MalletColour.green() ;
+	private static final MalletColour BLUE  = MalletColour.blue() ;
 
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
@@ -220,6 +225,8 @@ public class GLRenderer extends Basic2DRender
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
+					GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
+					GLModelManager.updateVBO( geometry ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -268,6 +275,7 @@ public class GLRenderer extends Basic2DRender
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 
+				final MalletColour colour = _settings.<MalletColour>getObject( "COLOUR", WHITE ) ;
 				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
 				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
 
@@ -294,6 +302,7 @@ public class GLRenderer extends Basic2DRender
 
 					// Update the UV co-ordinates of the model
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
+					GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
 					GLModelManager.updateVBO( geometry ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
@@ -414,9 +423,7 @@ public class GLRenderer extends Basic2DRender
 						geometry.updateColour( j, GLModelGenerator.getABGR( _colour ) ) ;
 					}
 
-					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
+					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( _colour ) ) ;
 					GLModelManager.updateVBO( geometry ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
