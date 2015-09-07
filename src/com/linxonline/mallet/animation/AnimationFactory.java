@@ -2,6 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.event.Event ;
@@ -96,6 +97,14 @@ public final class AnimationFactory
 		final Settings animSet = _event.getVariable() ;
 		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
 		DrawFactory.amendGUI( renderEvent, _gui ) ;
+		return _event ;
+	}
+
+	public static Event<Settings> amendColour( final Event<Settings> _event, final MalletColour _colour )
+	{
+		final Settings animSet = _event.getVariable() ;
+		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
+		DrawFactory.amendColour( renderEvent, _colour ) ;
 		return _event ;
 	}
 }

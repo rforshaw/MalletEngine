@@ -99,6 +99,13 @@ public final class DrawFactory
 		return _event ;
 	}
 
+	public static Event<Settings> amendColour( final Event<Settings> _event, final MalletColour _colour )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "COLOUR", _colour ) ;
+		return _event ;
+	}
+
 	/**
 		Inform the renderer to return the id of the draw request.
 		Must be applied before being passed to the renderer.
