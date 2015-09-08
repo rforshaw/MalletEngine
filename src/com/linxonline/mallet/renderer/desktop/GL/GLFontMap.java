@@ -3,17 +3,20 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
+import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
 public class GLFontMap extends Resource
 {
 	public final FontMap<GLImage> fontMap ;
+	public final Model model ;
 
-	public GLFontMap( final FontMap<GLImage> _fontMap )
+	public GLFontMap( final FontMap<GLImage> _fontMap, final Model _model )
 	{
 		super() ;
 		fontMap = _fontMap ;
+		model = _model ;
 	}
 
 	public int stringWidth( final String _text )
@@ -48,10 +51,16 @@ public class GLFontMap extends Resource
 		return fontMap.getHeight() ;
 	}
 
+	public GLGeometry getGLGeometry()
+	{
+		return model.getGeometry( GLGeometry.class ) ;
+	}
+
 	@Override
 	public void destroy()
 	{
 		fontMap.destroy() ;
+		model.destroy() ;
 	}
 
 	@Override

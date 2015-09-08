@@ -387,10 +387,21 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 					//gl.glAlphaFunc( GL.GL_GREATER, 0.5f ) ;
 
+					final GLGeometry geometry = fm.getGLGeometry() ;
+					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+
+					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+
+					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( colour ) ) ;
+					GLModelManager.updateVBO( gl, geometry ) ;
+
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], colour, fm ) ;
+						renderText( words[i], fm ) ;
 						gl.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 
@@ -406,26 +417,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
-			private void renderText( final String _text, final MalletColour _colour, final GLFontMap _fm )
+			private void renderText( final String _text, final GLFontMap _fm )
 			{
 				final int length = _text.length() ;
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					final GLGeometry geometry = glyph.getGLGeometry() ;
+					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
-					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( _colour ) ) ;
-					GLModelManager.updateVBO( gl, geometry ) ;
-
-					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
+					gl.glDrawElements( GL2.GL_TRIANGLES, glyph.index.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 					gl.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}

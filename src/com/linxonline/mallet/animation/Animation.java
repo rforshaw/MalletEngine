@@ -57,8 +57,8 @@ public class Animation implements IDInterface, Cacheable
 
 		// Only call recieveID() once we have acquired the render ID.
 		// Else making modifications will become hard!
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).recieveID( id ) ;
 		}
@@ -92,8 +92,8 @@ public class Animation implements IDInterface, Cacheable
 	public void play()
 	{
 		play = true ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).start() ;
 		}
@@ -106,8 +106,8 @@ public class Animation implements IDInterface, Cacheable
 	public void pause()
 	{
 		play = false ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).pause() ;
 		}
@@ -123,8 +123,8 @@ public class Animation implements IDInterface, Cacheable
 		play = false ;
 		frame = 0 ;
 
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).stop() ;
 		}
@@ -187,8 +187,8 @@ public class Animation implements IDInterface, Cacheable
 
 	private void updateCallbacks()
 	{
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).tick( ( float )frame * frameDelta ) ;
 		}
@@ -196,8 +196,8 @@ public class Animation implements IDInterface, Cacheable
 
 	private void finishedCallbacks()
 	{
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			callbacks.get( i ).finished() ;
 		}
@@ -212,7 +212,13 @@ public class Animation implements IDInterface, Cacheable
 	*/
 	public void reset()
 	{
+		final int size = callbacks.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			callbacks.get( i ).callbackRemoved() ;
+		}
 		callbacks.clear() ;
+
 		id = 0 ;
 		renderID = -1 ;
 		sprite = null ;		// Is the Sprite unregistered before a reset?
