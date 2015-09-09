@@ -390,10 +390,21 @@ public class GLRenderer extends Basic2DRender
 					GLES11.glTranslatef( ( int )offset.x, ( int )offset.y, 0.0f ) ;
 					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
 
+					final GLGeometry geometry = fm.getGLGeometry() ;
+					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+
+					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES11.glTexCoordPointer( 2, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					GLES11.glNormalPointer( GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+
+					GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
+					GLModelManager.updateVBO( geometry ) ;
+
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], colour, fm ) ;
+						renderText( words[i], fm ) ;
 						GLES11.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 
@@ -409,29 +420,15 @@ public class GLRenderer extends Basic2DRender
 				GLES11.glDisableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
-			private void renderText( final String _text, final MalletColour _colour, final GLFontMap _fm )
+			private void renderText( final String _text, final GLFontMap _fm )
 			{
 				final int length = _text.length() ;
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					final GLGeometry geometry = glyph.getGLGeometry() ;
+					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
-					final int vertexSize = geometry.getVertexSize() ;
-					for( int j = 0; j < vertexSize; ++j )
-					{
-						geometry.updateColour( j, GLModelGenerator.getABGR( _colour ) ) ;
-					}
-
-					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( _colour ) ) ;
-					GLModelManager.updateVBO( geometry ) ;
-
-					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES11.glTexCoordPointer( 2, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES11.glNormalPointer( GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-					GLES11.glDrawElements( GLES11.GL_TRIANGLES, geometry.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES11.glDrawElements( GLES11.GL_TRIANGLES, glyph.index.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
 					GLES11.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}

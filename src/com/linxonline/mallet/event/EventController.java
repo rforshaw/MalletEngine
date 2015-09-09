@@ -42,7 +42,12 @@ public class EventController implements EventHandler
 	{
 		assert _processor != null ;
 		processors.add( _processor ) ;
-		wantedTypes.add( _processor.getEventType() ) ;
+
+		final EventType type = _processor.getEventType() ;
+		if( wantedTypes.contains( type ) == false )
+		{
+			wantedTypes.add( type ) ;
+		}
 	}
 
 	public void setAddEventInterface( final AddEventInterface _addInterface )
@@ -107,6 +112,7 @@ public class EventController implements EventHandler
 	{
 		clearEvents() ;
 		processors.clear() ;
+		wantedTypes.clear() ;
 		addInterface = null ;
 	}
 	

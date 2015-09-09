@@ -98,7 +98,7 @@ public class GLModelGenerator
 
 		return _model ;
 	}
-	
+
 	public static Model updatePlaneModelColour( final Model _model, final float _colour )
 	{
 		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;

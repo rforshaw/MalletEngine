@@ -395,7 +395,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
-					GLModelGenerator.updatePlaneColour( geometry, GLModelGenerator.getABGR( colour ) ) ;
+					GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
 					final int size = words.length ;

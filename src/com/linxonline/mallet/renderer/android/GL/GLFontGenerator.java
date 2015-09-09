@@ -14,6 +14,7 @@ import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLFontGenerator
 {
@@ -88,7 +89,9 @@ public class GLFontGenerator
 		final char[] c = new char[1] ;
 		final double point = 1.0f / width ;
 		final float ascent = Math.abs( paint.ascent() ) ;
+		final GLGeometry glyphGeometry = new GLGeometry( 0, 4 * length ) ;
 
+		int j = 0 ;
 		for( int i = 0; i < length; i++ )
 		{
 			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;
@@ -101,15 +104,41 @@ public class GLFontGenerator
 				final float advance = glyph.advance ;
 				final float x1 = ( float )( start * point ) ;
 				final float x2 = ( float )( ( start + advance ) * point ) ;
-				final Model model = GLModelGenerator.genPlaneModel( new Vector2( advance, height ),
-																	new Vector2( x1, 0.0f ),
-																	new Vector2( x2, 1.0f ) ) ;
-				glyph.setModel( model ) ;
+
+				final Vector2 maxPoint = new Vector2( advance, height ) ;
+				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
+				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
+
+				// Glyp geometry as located in a massive pool, stored in font map.
+				glyphGeometry.addVertex( new Vector3( 0, 0, 0 ),
+										 new Vector2( uv1.x, uv1.y ) ) ;		// 0
+				glyphGeometry.addVertex( new Vector3( maxPoint.x, 0, 0 ),
+										 new Vector2( uv2.x, uv1.y ) ) ;		// 1
+				glyphGeometry.addVertex( new Vector3( 0, maxPoint.y, 0 ),
+										 new Vector2( uv1.x, uv2.y ) ) ;		// 2
+				glyphGeometry.addVertex( new Vector3( maxPoint.x, maxPoint.y, 0 ),
+										 new Vector2( uv2.x, uv2.y ) ) ;		// 3
+
+				final GLGeometry glyphIndex = new GLGeometry( 6, 0 ) ;
+				glyphIndex.addIndices( j + 0 ) ;
+				glyphIndex.addIndices( j + 1 ) ;
+				glyphIndex.addIndices( j + 2 ) ;
+				glyphIndex.addIndices( j + 2 ) ;
+				glyphIndex.addIndices( j + 1 ) ;
+				glyphIndex.addIndices( j + 3 ) ;
+
+				GLModelManager.bindIndex( glyphIndex ) ;
+				glyph.setIndex( glyphIndex ) ;
+
+				j += 4 ;
 			}
 		}
 
 		_map.fontMap.setTexture( manager.bind( bitmap ) ) ;
 		bitmap.recycle() ;
+
+		GLModelManager.bindVBO( glyphGeometry ) ;
+		_map.setModel( new Model( glyphGeometry ) ) ;
 
 		return _map ;
 	}
