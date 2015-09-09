@@ -67,8 +67,6 @@ public class GameState extends State implements HookEntity
 	{
 		super( _name ) ;
 		initModes() ;
-		initEventProcessors() ;
-
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
 	}
 
@@ -90,7 +88,6 @@ public class GameState extends State implements HookEntity
 	@Override
 	public void startState( final Settings _package )
 	{
-		hookGameStateEventController() ;
 		hookHandlerSystems() ;
 
 		if( paused == true )
@@ -103,6 +100,9 @@ public class GameState extends State implements HookEntity
 		{
 			initGame() ;
 		}
+
+		initEventProcessors() ;
+		hookGameStateEventController() ;
 	}
 
 	/**
