@@ -8,6 +8,7 @@ import java.awt.Frame ;
 import java.awt.image.BufferStrategy ;
 import java.awt.geom.AffineTransform ;
 import java.lang.reflect.* ;
+import java.util.Stack ;
 
 import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
@@ -46,6 +47,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
+	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
+	protected final Matrix4 uiMatrix = matrixCache.get() ;			// Used for rendering GUI elements not impacted by World/Camera position
+	protected final Matrix4 worldMatrix = matrixCache.get() ;		// Used for moving the camera around the world
+
 	protected int numID = 0 ;
 	protected static final GLU glu = new GLU() ;
 	protected static GLJPanel canvas = null ;
@@ -55,9 +60,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	private final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
 
 	protected Vector2 pos = new Vector2() ;
-
-	protected final Matrix4 uiMatrix = Matrix4.createIdentity() ;
-	protected final Matrix4 worldMatrix = Matrix4.createIdentity() ;
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
@@ -209,21 +211,29 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
+				final int lineWidth = _settings.getInteger( "LINEWIDTH", 2 ) ;
 
 				gl.glDisable( gl.GL_TEXTURE_2D ) ;
+				gl.glEnable( GL2.GL_LINE_SMOOTH ) ;
 				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
 
-				gl.glPushMatrix() ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						gl.glPushMatrix() ;
-						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
-					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
+					gl.glLoadTransposeMatrixf( newMatrix.matrix, 0 ) ;
+					gl.glLineWidth( ( float )lineWidth ) ;
 
 					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
@@ -236,12 +246,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					gl.glDrawElements( geometry.style, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 
-					if( isGUI == true )
-					{
-						gl.glPopMatrix() ;
-					}
-				gl.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
+				gl.glDisable( GL2.GL_LINE_SMOOTH ) ;
 				gl.glEnable( GL.GL_TEXTURE_2D ) ;
 				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
@@ -286,16 +293,21 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 
-				gl.glPushMatrix() ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						gl.glPushMatrix() ;
-						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					gl.glTranslatef( _position.x, _position.y, 0.0f ) ;
-					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					gl.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
+					gl.glLoadTransposeMatrixf( newMatrix.matrix, 0 ) ;
 
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
@@ -314,11 +326,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 
-					if( isGUI == true )
-					{
-						gl.glPopMatrix() ;
-					}
-				gl.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
@@ -373,17 +381,21 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
 				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 
-				gl.glPushMatrix() ;
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						gl.glPushMatrix() ;
-						gl.glLoadTransposeMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					gl.glTranslatef( ( int )currentPos.x, ( int )currentPos.y, 0.0f ) ;
-					gl.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					gl.glTranslatef( ( int )offset.x, ( int )offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
 					gl.glBlendFunc( GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA ) ;
 					//gl.glAlphaFunc( GL.GL_GREATER, 0.5f ) ;
 
@@ -401,15 +413,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], fm ) ;
-						gl.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
+						renderText( words[i], fm, newMatrix ) ;
+						//newMatrix.translate(-fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 
-					if( isGUI == true )
-					{
-						gl.glPopMatrix() ;
-					}
-				gl.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
 				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
@@ -417,7 +425,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
-			private void renderText( final String _text, final GLFontMap _fm )
+			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix )
 			{
 				final int length = _text.length() ;
 				for( int i = 0; i < length; ++i )
@@ -425,8 +433,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
+					gl.glLoadTransposeMatrixf( _matrix.matrix, 0 ) ;
 					gl.glDrawElements( GL2.GL_TRIANGLES, glyph.index.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
-					gl.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
+					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
 
@@ -562,8 +571,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		gl.glMatrixMode( GL2.GL_MODELVIEW ) ;
-		gl.glLoadIdentity() ;
-
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		gl.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 	}
@@ -607,22 +614,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
-		gl.glLoadIdentity() ;
-
 		updateEvents() ;
 
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
+		final Vector2 half = renderInfo.getHalfRenderDimensions() ;
 
-		gl.glPushMatrix() ;
-			final Vector2 half = renderInfo.getHalfRenderDimensions() ;
-			gl.glTranslatef( half.x, half.y, 0.0f ) ;
-			gl.glScalef( cameraScale.x, cameraScale.y, cameraScale.z ) ;
-			gl.glTranslatef( -pos.x, -pos.y, 0.0f ) ;
-			render() ;
-		gl.glPopMatrix() ;
+		worldMatrix.setIdentity() ;
+		worldMatrix.translate( half.x, half.y, 0.0f ) ;
+		worldMatrix.scale( cameraScale.x, cameraScale.y, cameraScale.z ) ;
+		worldMatrix.translate( -pos.x, -pos.y, 0.0f ) ;
+
+		render() ;
 
 		canvas.swapBuffers() ;
 	}

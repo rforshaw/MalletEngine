@@ -1,9 +1,11 @@
 package com.linxonline.mallet.maths ;
 
+import com.linxonline.mallet.util.caches.Cacheable ;
+
 /**
 	Designed for 3D transformations.
 */
-public class Matrix4
+public class Matrix4 implements Cacheable
 {
 	/**
 		Matrix4 functions are guaranteed to be called hundreds if 
@@ -96,7 +98,7 @@ public class Matrix4
 	{
 		set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
 		set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
-		set( _y, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
+		set( _z, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
 							//	[0 | 0 | 0 |  1]
 	}
 
@@ -127,15 +129,20 @@ public class Matrix4
 	
 	public void rotate( final float _theta )
 	{
-		temp.setRotateX( _theta ) ;
+		rotate( _theta, 1.0f, 1.0f, 1.0f ) ;
+	}
+
+	public void rotate( final float _theta, final float _x, final float _y, final float _z )
+	{
+		temp.setRotateX( _theta * _x ) ;
 		multiply( temp ) ;
 		temp.setIdentity() ;
 
-		temp.setRotateX( _theta ) ;
+		temp.setRotateY( _theta * _y ) ;
 		multiply( temp ) ;
 		temp.setIdentity() ;
 
-		temp.setRotateX( _theta ) ;
+		temp.setRotateZ( _theta * _z ) ;
 		multiply( temp ) ;
 		temp.setIdentity() ;
 	}
@@ -243,6 +250,12 @@ public class Matrix4
 		t = matrix[ 6] ; matrix[ 6] = matrix[ 9] ; matrix[ 9] = t ;
 		t = matrix[ 7] ; matrix[ 7] = matrix[13] ; matrix[13] = t ;
 		t = matrix[11] ; matrix[11] = matrix[14] ; matrix[14] = t ;
+	}
+
+	@Override
+	public void reset()
+	{
+		setIdentity() ;
 	}
 
 	public float[] toArray()

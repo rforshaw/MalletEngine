@@ -37,15 +37,16 @@ public class GLRenderer extends Basic2DRender
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
+	protected final ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
+	protected final Matrix4 uiMatrix = matrixCache.get() ;			// Used for rendering GUI elements not impacted by World/Camera position
+	protected final Matrix4 worldMatrix = matrixCache.get() ;		// Used for moving the camera around the world
+	
 	protected int numID = 0 ;
 
 	private final Vector2 UV1 = new Vector2() ;
 	private final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
 
 	protected Vector2 pos = new Vector2() ;
-
-	protected final Matrix4 uiMatrix = Matrix4.createIdentity() ;
-	protected final Matrix4 worldMatrix = Matrix4.createIdentity() ;
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = new Vector3() ;
@@ -206,21 +207,30 @@ public class GLRenderer extends Basic2DRender
 				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
+				final int lineWidth = _settings.getInteger( "LINEWIDTH", 5 ) ;
 
 				GLES11.glDisable( GLES11.GL_TEXTURE_2D ) ;
+				//GLES11.glEnable( GLES11.GL_LINE_SMOOTH ) ;
 				GLES11.glEnableClientState( GLES11.GL_VERTEX_ARRAY ) ;
 				GLES11.glEnableClientState( GLES11.GL_COLOR_ARRAY ) ;
 
-				GLES11.glPushMatrix() ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						GLES11.glPushMatrix() ;
-						GLES11.glLoadMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					GLES11.glTranslatef( _position.x, _position.y, 0.0f ) ;
-					GLES11.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					GLES11.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
+					newMatrix.transpose() ;
+					GLES11.glLoadMatrixf( newMatrix.matrix, 0 ) ;
+					GLES11.glLineWidth( ( float )lineWidth ) ;
 
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
@@ -234,12 +244,9 @@ public class GLRenderer extends Basic2DRender
 					final short length = ( short )geometry.index.length ;
 					GLES11.glDrawElements( geometry.style, length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
 
-					if( isGUI == true )
-					{
-						GLES11.glPopMatrix() ;
-					}
-				GLES11.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
+				//GLES11.glDisable( GLES11.GL_LINE_SMOOTH ) ;
 				GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
 				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
 				GLES11.glDisableClientState( GLES11.GL_COLOR_ARRAY ) ;
@@ -284,16 +291,22 @@ public class GLRenderer extends Basic2DRender
 				GLES11.glEnableClientState( GLES11.GL_NORMAL_ARRAY ) ;
 				GLES11.glEnableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
 
-				GLES11.glPushMatrix() ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						GLES11.glPushMatrix() ;
-						GLES11.glLoadMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					GLES11.glTranslatef( _position.x, _position.y, 0.0f ) ;
-					GLES11.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					GLES11.glTranslatef( offset.x, offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
+					newMatrix.transpose() ;
+					GLES11.glLoadMatrixf( newMatrix.matrix, 0 ) ;
 
 					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
 
@@ -312,11 +325,7 @@ public class GLRenderer extends Basic2DRender
 
 					GLES11.glDrawElements( GLES11.GL_TRIANGLES, geometry.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
 
-					if( isGUI == true )
-					{
-						GLES11.glPopMatrix() ;
-					}
-				GLES11.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
 				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
 				GLES11.glDisableClientState( GLES11.GL_NORMAL_ARRAY ) ;
@@ -377,17 +386,21 @@ public class GLRenderer extends Basic2DRender
 				GLES11.glEnableClientState( GLES11.GL_NORMAL_ARRAY ) ;
 				GLES11.glEnableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
 
-				GLES11.glPushMatrix() ;
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
 					{
-						GLES11.glPushMatrix() ;
-						GLES11.glLoadMatrixf( uiMatrix.matrix, 0 ) ;
+						newMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					GLES11.glTranslatef( ( int )currentPos.x, ( int )currentPos.y, 0.0f ) ;
-					GLES11.glRotatef( rotation, 0.0f, 0.0f, 1.0f ) ;
-					GLES11.glTranslatef( ( int )offset.x, ( int )offset.y, 0.0f ) ;
+					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
 					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 					final GLGeometry geometry = fm.getGLGeometry() ;
@@ -404,15 +417,10 @@ public class GLRenderer extends Basic2DRender
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], fm ) ;
-						GLES11.glTranslatef( -fm.stringWidth( words[i] ), height, 0.0f ) ;
+						renderText( words[i], fm, newMatrix ) ;
 					}
 
-					if( isGUI == true )
-					{
-						GLES11.glPopMatrix() ;
-					}
-				GLES11.glPopMatrix() ;
+				matrixCache.reclaim( newMatrix ) ;
 
 				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
 				GLES11.glDisableClientState( GLES11.GL_COLOR_ARRAY ) ;
@@ -420,17 +428,23 @@ public class GLRenderer extends Basic2DRender
 				GLES11.glDisableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
 			}
 
-			private void renderText( final String _text, final GLFontMap _fm )
+			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix )
 			{
+				final Matrix4 transpose = matrixCache.get() ;
+			
 				final int length = _text.length() ;
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
+					GLES11.glLoadMatrixf( Matrix4.transpose( _matrix, transpose ).matrix, 0 ) ;
+
 					GLES11.glDrawElements( GLES11.GL_TRIANGLES, glyph.index.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
-					GLES11.glTranslatef( glyph.advance, 0.0f, 0.0f ) ;
+					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
+
+				matrixCache.reclaim( transpose ) ;
 			}
 
 			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector2 _position, final int _lineWidth )
@@ -526,7 +540,6 @@ public class GLRenderer extends Basic2DRender
 		}
 
 		GLES11.glMatrixMode( GLES11.GL_MODELVIEW ) ;
-		GLES11.glLoadIdentity() ;
 
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		GLES11.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
@@ -557,8 +570,6 @@ public class GLRenderer extends Basic2DRender
 		GLES11.glClear( GLES11.GL_COLOR_BUFFER_BIT | GLES11.GL_DEPTH_BUFFER_BIT ) ;
 		GLES11.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
-		GLES11.glLoadIdentity() ;
-
 		updateEvents() ;
 
 		// Calculate the current Camera Position based 
@@ -566,13 +577,13 @@ public class GLRenderer extends Basic2DRender
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
 
-		GLES11.glPushMatrix() ;
-			final Vector2 half = renderInfo.getHalfRenderDimensions() ;
-			GLES11.glTranslatef( half.x, half.y, 0.0f ) ;
-			GLES11.glScalef( cameraScale.x, cameraScale.y, cameraScale.z ) ;
-			GLES11.glTranslatef( -pos.x, -pos.y, 0.0f ) ;
-			render() ;
-		GLES11.glPopMatrix() ;
+		final Vector2 half = renderInfo.getHalfRenderDimensions() ;
+		worldMatrix.setIdentity() ;
+		worldMatrix.translate( half.x, half.y, 0.0f ) ;
+		worldMatrix.scale( cameraScale.x, cameraScale.y, cameraScale.z ) ;
+		worldMatrix.translate( -pos.x, -pos.y, 0.0f ) ;
+
+		render() ;
 	}
 
 	protected void render()
