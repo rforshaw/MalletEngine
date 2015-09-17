@@ -11,7 +11,7 @@ public abstract class ConfigReader
 	
 	public static Settings getConfig( final String _file )
 	{
-		final ArrayList<String> file = TextReader.getTextFile( _file ) ;
+		final ArrayList<String> file = TextReader.getTextAsArray( _file ) ;
 		final Settings config = new Settings() ;
 
 		for( String line : file )

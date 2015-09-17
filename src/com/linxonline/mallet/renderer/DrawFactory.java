@@ -107,6 +107,20 @@ public final class DrawFactory
 	}
 
 	/**
+		Inform the renderer that the render event is to be updated.
+		Geometry or colour changes require a forceUpdate. Texture/UV 
+		changes are automatically updated per frame currently.
+		Translation, rotation, or scale do not require the renderer to 
+		update its state.
+	*/
+	public static Event<Settings> forceUpdate( final Event<Settings> _event )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addBoolean( "UPDATE", true ) ;
+		return _event ;
+	}
+	
+	/**
 		Inform the renderer to return the id of the draw request.
 		Must be applied before being passed to the renderer.
 	*/

@@ -43,6 +43,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 
+	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
@@ -238,8 +239,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL2.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
-					GLModelManager.updateVBO( gl, geometry ) ;
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
+						GLModelManager.updateVBO( gl, geometry ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -315,8 +320,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					// Update the UV co-ordinates of the model
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
+
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
-					GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
 					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
@@ -407,8 +417,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
-					GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
-					GLModelManager.updateVBO( gl, geometry ) ;
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
+						GLModelManager.updateVBO( gl, geometry ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
 
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
@@ -516,6 +530,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.glEnable( GL.GL_BLEND ) ;
 
 		resize() ;
+
+		/*final GLProgram program = programs.get( "base/shaders/test.jgl" ) ;
+		if( GLProgramManager.buildProgram( gl, program ) == false )
+		{
+			System.out.println( "Failed to compile program: " + program.name ) ;
+			GLProgramManager.deleteProgram( gl, program ) ;
+		}*/
 	}
 
 	public void setViewMode( final int _mode )
@@ -555,7 +576,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
 		gl.glMatrixMode( GL2.GL_PROJECTION );
-		gl.glLoadIdentity();
+		final Matrix4 matrix = matrixCache.get() ;			// identity by default
+		gl.glLoadTransposeMatrixf( matrix.matrix, 0 ) ;
 
 		// coordinate system origin at lower left with width and height same as the window
 		if( viewMode == ORTHOGRAPHIC_MODE )
@@ -566,9 +588,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			final Vector2 ratio = renderInfo.getRatioRenderToDisplay() ;
 			glu.gluPerspective( 65.0f, ratio.x, 1.0f, 900.0f ) ;
-			gl.glScalef( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
-			gl.glTranslatef( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ; 	// To shift the camera back to centre 
+
+			matrix.scale( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
+			matrix.translate( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ;	// To shift the camera back to centre 
+			gl.glLoadTransposeMatrixf( matrix.matrix, 0 ) ;
 		}
+
+		matrixCache.reclaim( matrix ) ;
 
 		gl.glMatrixMode( GL2.GL_MODELVIEW ) ;
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;

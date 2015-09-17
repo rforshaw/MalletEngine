@@ -26,7 +26,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 			*/
 			public Sprite load( final String _file, final Settings _settings )
 			{
-				final ArrayList<String> texts = TextReader.getTextFile( _file ) ;
+				final ArrayList<String> texts = TextReader.getTextAsArray( _file ) ;
 				if( texts.size() == 0 )
 				{
 					return null ;

@@ -2,6 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.resources.model.Model ;
@@ -164,6 +165,8 @@ public class Animation implements IDInterface, Cacheable
 		// animation, like water.
 		settings.<Vector2>addObject( "UV1", f.uv1 ) ;
 		settings.<Vector2>addObject( "UV2", f.uv2 ) ;
+
+		DrawFactory.forceUpdate( _event ) ;
 	}
 
 	public void update( final float _dt )

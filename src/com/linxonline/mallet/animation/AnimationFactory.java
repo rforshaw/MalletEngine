@@ -107,4 +107,12 @@ public final class AnimationFactory
 		DrawFactory.amendColour( renderEvent, _colour ) ;
 		return _event ;
 	}
+
+	public static Event<Settings> forceUpdate( final Event<Settings> _event )
+	{
+		final Settings animSet = _event.getVariable() ;
+		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
+		DrawFactory.forceUpdate( renderEvent ) ;
+		return _event ;
+	}
 }

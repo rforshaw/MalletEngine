@@ -235,8 +235,12 @@ public class GLRenderer extends Basic2DRender
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
-					GLModelManager.updateVBO( geometry ) ;
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
+						GLModelManager.updateVBO( geometry ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
 					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
@@ -313,9 +317,15 @@ public class GLRenderer extends Basic2DRender
 					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					// Update the UV co-ordinates of the model
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
+
+					// Texture's share geometry so we must update the VBO's
+					// every frame as the uv coordinates can change.
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
-					GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
 					GLModelManager.updateVBO( geometry ) ;
 
 					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
@@ -411,8 +421,12 @@ public class GLRenderer extends Basic2DRender
 					GLES11.glTexCoordPointer( 2, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
 					GLES11.glNormalPointer( GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
-					GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
-					GLModelManager.updateVBO( geometry ) ;
+					if( _settings.getBoolean( "UPDATE", false ) == true )
+					{
+						GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
+						GLModelManager.updateVBO( geometry ) ;
+						_settings.addObject( "UPDATE", false ) ;
+					}
 
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
