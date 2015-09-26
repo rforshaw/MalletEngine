@@ -166,7 +166,7 @@ public final class GameTestLoader extends GameLoader
 															  new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
 															  new Vector2( 0, 0 ), 					// Offset
 															  new MalletFont( "Arial", 12 ),		// Mallet Font
-															  null,									// Mallet Colour
+															  new MalletColour( 255, 255, 255 ),	// Mallet Colour
 															  null,									// clip
 															  null,									// clip offset
 															  200,									// layer

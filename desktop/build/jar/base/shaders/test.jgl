@@ -1,5 +1,0 @@
-{
-	NAME: "TEST",
-	VERTEX: ["base/shaders/vertex.glsl"],
-	FRAGMENT: ["base/shaders/fragment.glsl"]
-}

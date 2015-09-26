@@ -40,6 +40,7 @@ public final class TextFactory
 
 		settings.addInteger( "LAYER", _layer ) ;
 		settings.addInteger( "ALIGNMENT", _alignment ) ;
+		settings.addBoolean( "UPDATE", true ) ;
 
 		return new Event<Settings>( "DRAW", settings ) ;
 	}

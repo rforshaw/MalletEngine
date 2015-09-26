@@ -38,6 +38,7 @@ public class TextReader
 		while( ( line = in.readLine() ) != null )
 		{
 			buffer.append( line ) ;
+			buffer.append( '\n' ) ;
 		}
 
 		in.close() ;

@@ -214,10 +214,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", 2 ) ;
 
-				gl.glDisable( gl.GL_TEXTURE_2D ) ;
-				gl.glEnable( GL2.GL_LINE_SMOOTH ) ;
-				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
+				final GLProgram program = programs.get( "base/shaders/simple_geometry.jgl" ) ;
+				if( program != null )
+				{
+					gl.glUseProgram( program.id[0] ) ;
+				}
+
+				final int inVertex   = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
+				final int inColour   = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
+
+				gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -246,17 +253,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						_settings.addObject( "UPDATE", false ) ;
 					}
 
-					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( inVertex,   3, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( inColour,   4, GL2.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
 
 					gl.glDrawElements( geometry.style, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisable( GL2.GL_LINE_SMOOTH ) ;
-				gl.glEnable( GL.GL_TEXTURE_2D ) ;
-				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
+				gl.glUseProgram( 0 ) ;
+				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
 			}
 		} ;
 
@@ -293,10 +299,24 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
 				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
 
-				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+				final GLProgram program = programs.get( "base/shaders/simple_texture.jgl" ) ;
+				if( program == null )
+				{
+					System.out.println( "Program doesn't exist.." ) ;
+					return ;
+				}
+
+				gl.glUseProgram( program.id[0] ) ;
+
+				final int inVertex   = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
+				final int inColour   = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
+				final int inTexCoord = gl.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
+				final int inNormal   = gl.glGetAttribLocation( program.id[0], "inNormal" ) ;
+
+				gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				gl.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+				gl.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -329,19 +349,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
-					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( inVertex,   3, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( inColour,   4, GL2.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( inTexCoord, 2, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( inNormal,   3, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					gl.glDrawElements( GL2.GL_TRIANGLES, geometry.index.length, GL2.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( inTexCoord ) ;		// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glUseProgram( 0 ) ;
 			}
 		} ;
 
@@ -386,10 +407,29 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
-				gl.glEnableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_COLOR_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_NORMAL_ARRAY ) ;
-				gl.glEnableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+				final GLProgram program = programs.get( "base/shaders/simple_font.jgl" ) ;
+				if( program == null )
+				{
+					System.out.println( "Program doesn't exist.." ) ;
+					return ;
+				}
+
+					gl.glUseProgram( program.id[0] ) ;
+
+					final int inVertex   = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
+					final int inColour   = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
+					final int inTexCoord = gl.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
+					final int inNormal   = gl.glGetAttribLocation( program.id[0], "inNormal" ) ;
+
+					//System.out.println( "inVertex: " + inVertex ) ;
+					//System.out.println( "inColour: " + inColour ) ;
+					//System.out.println( "inTexCoord: " + inTexCoord ) ;
+					//System.out.println( "inNormal: " + inNormal ) ;
+
+					gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+					gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+					gl.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+					gl.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -412,10 +452,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( gl, GL2.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					gl.glVertexPointer( 3, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					gl.glColorPointer( 4, GL2.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					gl.glTexCoordPointer( 2, GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glNormalPointer( GL2.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( inVertex,   3, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( inColour,   4, GL2.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( inTexCoord, 2, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( inNormal,   3, GL2.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -428,15 +468,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					for( int i = 0; i < size; ++i )
 					{
 						renderText( words[i], fm, newMatrix ) ;
-						//newMatrix.translate(-fm.stringWidth( words[i] ), height, 0.0f ) ;
 					}
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableClientState( GL2.GL_VERTEX_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_COLOR_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_NORMAL_ARRAY ) ;
-				gl.glDisableClientState( GL2.GL_TEXTURE_COORD_ARRAY ) ;
+				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( inTexCoord ) ;		// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glUseProgram( 0 ) ;
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix )
@@ -531,12 +571,32 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		resize() ;
 
-		/*final GLProgram program = programs.get( "base/shaders/test.jgl" ) ;
-		if( GLProgramManager.buildProgram( gl, program ) == false )
 		{
-			System.out.println( "Failed to compile program: " + program.name ) ;
-			GLProgramManager.deleteProgram( gl, program ) ;
-		}*/
+			final GLProgram program = programs.get( "base/shaders/simple_texture.jgl" ) ;
+			if( GLProgramManager.buildProgram( gl, program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( gl, program ) ;
+			}
+		}
+
+		{
+			final GLProgram program = programs.get( "base/shaders/simple_font.jgl" ) ;
+			if( GLProgramManager.buildProgram( gl, program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( gl, program ) ;
+			}
+		}
+
+		{
+			final GLProgram program = programs.get( "base/shaders/simple_geometry.jgl" ) ;
+			if( GLProgramManager.buildProgram( gl, program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( gl, program ) ;
+			}
+		}
 	}
 
 	public void setViewMode( final int _mode )
@@ -676,6 +736,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( _store[0] != _idToBind[0] )
 		{
 			_store[0] = _idToBind[0] ;
+			_gl.glActiveTexture( GL2.GL_TEXTURE0 + 0 ) ;
 			_gl.glBindTexture( GL.GL_TEXTURE_2D, _store[0] ) ;
 		}
 	}

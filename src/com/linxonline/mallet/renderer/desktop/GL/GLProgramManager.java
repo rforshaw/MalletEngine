@@ -70,10 +70,11 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final int length = _jShaders.length() ;
 				for( int i = 0; i < length; i++ )
 				{
-					final String source = TextReader.getTextAsString( _jShaders.optString( i ) ) ;
+					final String path = _jShaders.optString( i ) ;
+					final String source = TextReader.getTextAsString( path ) ;
 					if( source != null )
 					{
-						_glShaders.add( new GLShader( _type, source ) ) ;
+						_glShaders.add( new GLShader( _type, path, source ) ) ;
 					}
 				}
 			}
@@ -120,8 +121,19 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 		final int[] response = new int[]{ 0 } ;
 		_gl.glGetProgramiv( _program.id[0], GL2.GL_LINK_STATUS, response, 0 ) ;
+		if( response[0] == GL2.GL_FALSE )
+		{
+			final int[] logLength = new int[1] ;
+			_gl.glGetProgramiv( _program.id[0], GL2.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
 
-		return response[0] == GL2.GL_FALSE ? false : true ;
+			final byte[] log = new byte[logLength[0]] ;
+			_gl.glGetProgramInfoLog( _program.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
+
+			System.out.println( "Error linking program: " + new String( log ) ) ;
+			return false ;
+		}
+
+		return true ;
 	}
 
 	private static boolean compileShader( final GL2 _gl, final GLShader _shader )
@@ -132,7 +144,18 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 		final int[] response = new int[]{ 0 } ;
 		_gl.glGetShaderiv( _shader.id[0], GL2.GL_COMPILE_STATUS, response, 0 ) ;
+		if( response[0] == GL2.GL_FALSE )
+		{
+			final int[] logLength = new int[1] ;
+			_gl.glGetShaderiv( _shader.id[0], GL2.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
 
-		return response[0] == GL2.GL_FALSE ? false : true ;
+			final byte[] log = new byte[logLength[0]] ;
+			_gl.glGetShaderInfoLog( _shader.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
+
+			System.out.println( "Error compiling shader: " + _shader.file + "\n" + new String( log ) ) ;
+			return false ;
+		}
+
+		return true ;
 	}
 }

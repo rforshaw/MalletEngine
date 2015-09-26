@@ -15,11 +15,13 @@ public class GLShader extends Resource
 {
 	public final int[] id = new int[1] ;
 	public final int type ;
+	public final String file ;
 	public String[] source = new String[1] ;
 
-	public GLShader( final int _type, final String _source )
+	public GLShader( final int _type, final String _file, final String _source )
 	{
 		type = _type ;
+		file = _file ;
 		source[0] = _source ;
 	}
 
