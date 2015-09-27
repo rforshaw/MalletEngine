@@ -48,7 +48,7 @@ public class GLFontGenerator
 		// We want to render the texture at a higher resolution
 		// Allowing the font to be scaled/zoomed without 
 		// significant quality loss.
-		final Font textureFont = _font.deriveFont( _font.getSize2D() * 2.0f ) ;
+		final Font textureFont = _font.deriveFont( _font.getSize2D() ) ;//* 2.0f ) ;
 		final Dimensions textureDim = determineDimensions( textureFont, _charsToMap ) ;
 
 		final int length = _charsToMap.length() ;

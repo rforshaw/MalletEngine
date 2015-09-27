@@ -214,7 +214,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", 2 ) ;
 
-				final GLProgram program = programs.get( "base/shaders/simple_geometry.jgl" ) ;
+				final GLProgram program = programs.get( "SIMPLE_GEOMETRY" ) ;
 				if( program != null )
 				{
 					gl.glUseProgram( program.id[0] ) ;
@@ -299,7 +299,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
 				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
 
-				final GLProgram program = programs.get( "base/shaders/simple_texture.jgl" ) ;
+				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
 				if( program == null )
 				{
 					System.out.println( "Program doesn't exist.." ) ;
@@ -407,7 +407,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
-				final GLProgram program = programs.get( "base/shaders/simple_font.jgl" ) ;
+				final GLProgram program = programs.get( "SIMPLE_FONT" ) ;
 				if( program == null )
 				{
 					System.out.println( "Program doesn't exist.." ) ;
@@ -420,11 +420,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final int inColour   = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
 					final int inTexCoord = gl.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
 					final int inNormal   = gl.glGetAttribLocation( program.id[0], "inNormal" ) ;
-
-					//System.out.println( "inVertex: " + inVertex ) ;
-					//System.out.println( "inColour: " + inColour ) ;
-					//System.out.println( "inTexCoord: " + inTexCoord ) ;
-					//System.out.println( "inNormal: " + inNormal ) ;
 
 					gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
 					gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
@@ -474,7 +469,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
 				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( inTexCoord ) ;		// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
 				gl.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
 				gl.glUseProgram( 0 ) ;
 			}
@@ -572,7 +567,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		resize() ;
 
 		{
-			final GLProgram program = programs.get( "base/shaders/simple_texture.jgl" ) ;
+			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/simple_texture.jgl" ) ;
 			if( GLProgramManager.buildProgram( gl, program ) == false )
 			{
 				System.out.println( "Failed to compile program: " + program.name ) ;
@@ -581,7 +576,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		{
-			final GLProgram program = programs.get( "base/shaders/simple_font.jgl" ) ;
+			final GLProgram program = programs.get( "SIMPLE_FONT", "base/shaders/simple_font.jgl" ) ;
 			if( GLProgramManager.buildProgram( gl, program ) == false )
 			{
 				System.out.println( "Failed to compile program: " + program.name ) ;
@@ -590,7 +585,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		{
-			final GLProgram program = programs.get( "base/shaders/simple_geometry.jgl" ) ;
+			final GLProgram program = programs.get( "SIMPLE_GEOMETRY", "base/shaders/simple_geometry.jgl" ) ;
 			if( GLProgramManager.buildProgram( gl, program ) == false )
 			{
 				System.out.println( "Failed to compile program: " + program.name ) ;
