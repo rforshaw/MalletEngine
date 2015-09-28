@@ -34,7 +34,7 @@ public class GLImage implements ImageInterface
 	{
 		//System.out.println( "Removing texture.." ) ;
 		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
-		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
+		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
 		if( gl != null )
 		{
 			gl.glDeleteTextures( textureIDs.length, textureIDs, 0 ) ;

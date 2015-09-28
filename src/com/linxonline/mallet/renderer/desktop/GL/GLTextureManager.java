@@ -45,7 +45,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		It's set to GL_RGBA by default due to the extension potentially not 
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
-	protected int imageFormat = GL2.GL_RGBA ;
+	protected int imageFormat = GL3.GL_RGBA ;
 
 	public GLTextureManager()
 	{
@@ -144,7 +144,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	public Texture bind( final BufferedImage _image, final InternalFormat _format )
 	{
-		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
+		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
 		if( gl == null )
 		{
 			System.out.println( "GL context doesn't exist" ) ;
@@ -154,49 +154,49 @@ public class GLTextureManager extends AbstractManager<Texture>
 		gl.glEnable( GL.GL_TEXTURE_2D ) ;
 
 		final int textureID = glGenTextures( gl ) ;
-		gl.glBindTexture( GL2.GL_TEXTURE_2D, textureID ) ;
+		gl.glBindTexture( GL3.GL_TEXTURE_2D, textureID ) ;
 
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_S, GL2.GL_REPEAT ) ;
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_WRAP_T, GL2.GL_REPEAT ) ;
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR ) ;
-		gl.glTexParameteri( GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR_MIPMAP_LINEAR ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_LINEAR ) ;
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
 		final int channels = _image.getSampleModel().getNumBands() ;
-		int internalFormat = GL2.GL_RGB ;
+		int internalFormat = GL3.GL_RGB ;
 
 		if( gl.isExtensionAvailable( "GL_EXT_abgr" ) == true )
 		{
 			switch( channels )
 			{
 				case 4 : imageFormat = GL2.GL_ABGR_EXT ;  break ;
-				case 3 : imageFormat = GL2.GL_BGR ;       break ;
-				case 1 : imageFormat = GL2.GL_ALPHA ; break ;
+				case 3 : imageFormat = GL3.GL_BGR ;   break ;
+				case 1 : imageFormat = GL3.GL_RED ; break ;
 			}
 		}
 		else
 		{
 			switch( channels )
 			{
-				case 4 : imageFormat = GL2.GL_RGBA ;      break ;
-				case 3 : imageFormat = GL2.GL_RGB ;       break ;
-				case 1 : imageFormat = GL2.GL_ALPHA ; break ;
+				case 4 : imageFormat = GL3.GL_RGBA ;      break ;
+				case 3 : imageFormat = GL3.GL_RGB ;       break ;
+				case 1 : imageFormat = GL3.GL_RED ; break ;
 			}
 		}
 
-		gl.glPixelStorei( GL2.GL_UNPACK_ALIGNMENT, 1 ) ;
-		gl.glTexImage2D( GL2.GL_TEXTURE_2D, 
+		gl.glPixelStorei( GL3.GL_UNPACK_ALIGNMENT, 1 ) ;
+		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 
 						 0, 
 						 getGLInternalFormat( channels, _format ), 
 						 width, 
 						 height, 
 						 0, 
 						 imageFormat, 
-						 GL2.GL_UNSIGNED_BYTE, 
+						 GL3.GL_UNSIGNED_BYTE, 
 						 getByteBuffer( _image ) ) ;
 
-		gl.glGenerateMipmap( GL2.GL_TEXTURE_2D ) ;
+		gl.glGenerateMipmap( GL3.GL_TEXTURE_2D ) ;
 		gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 
 		return new Texture( new GLImage( textureID, width, height ) ) ;
@@ -219,25 +219,25 @@ public class GLTextureManager extends AbstractManager<Texture>
 			{
 				switch( format )
 				{
-					case COMPRESSED   : return GL2.GL_COMPRESSED_RGBA ;
-					case UNCOMPRESSED : return GL2.GL_RGBA ;
+					case COMPRESSED   : return GL3.GL_COMPRESSED_RGBA ;
+					case UNCOMPRESSED : return GL3.GL_RGBA ;
 				}
 			}
 			case 3 :
 			{
 				switch( format )
 				{
-					case COMPRESSED   : return GL2.GL_COMPRESSED_RGB ;
-					case UNCOMPRESSED : return GL2.GL_RGB ;
+					case COMPRESSED   : return GL3.GL_COMPRESSED_RGB ;
+					case UNCOMPRESSED : return GL3.GL_RGB ;
 				}
 			}
 			case 1 :
 			{
-				return GL2.GL_ALPHA8 ;
+				return GL3.GL_RED ;
 			}
 		}
 
-		return GL2.GL_RGB ;
+		return GL3.GL_RGB ;
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		if( type == DataBuffer.TYPE_BYTE )
 		{
 			final byte[] data = ( (  DataBufferByte )  buffer).getData() ;
-			if( imageFormat == GL2.GL_RGBA )
+			if( imageFormat == GL3.GL_RGBA )
 			{
 				convertABGRtoRGBA( data ) ;
 			}
@@ -285,7 +285,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return _data ;
 	}
 
-	private int glGenTextures( GL2 _gl )
+	private int glGenTextures( GL3 _gl )
 	{
 		final int[] id = new int[1] ;
 		_gl.glGenTextures( 1, id, 0 ) ;

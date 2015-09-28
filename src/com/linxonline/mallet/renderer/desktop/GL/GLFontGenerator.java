@@ -74,7 +74,7 @@ public class GLFontGenerator
 		final int geometryHeight = geometryMetrics.getHeight() ;
 
 		final GLGeometry geometry = new GLGeometry( 0, 4 * length ) ;
-		final GL2 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL2() ;
+		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
 		if( gl == null )
 		{
 			System.out.println( "GL context doesn't exist" ) ;
@@ -128,12 +128,12 @@ public class GLFontGenerator
 		final Model model = new Model( geometry ) ;
 		GLModelManager.bindVBO( gl, geometry ) ;
 
-		/*try
+		try
 		{
 			final File outputfile = new File( "saved.png" ) ;
 			ImageIO.write( textureBuffer, "png", outputfile ) ;
 		}
-		catch (IOException e) {}*/
+		catch (IOException e) {}
 
 		// Create a GLFontMap and wrap it around a FontMap
 		// buffer is not automatically destroyed by TextureManager,

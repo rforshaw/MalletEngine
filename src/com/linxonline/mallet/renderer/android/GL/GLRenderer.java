@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 import java.util.ArrayList ;
 
 import android.opengl.GLES11 ;
+import android.opengl.GLES20 ;
 import android.opengl.EGL14 ;
 
 import com.linxonline.mallet.maths.* ;
@@ -33,11 +34,13 @@ public class GLRenderer extends Basic2DRender
 
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 
+	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
 	protected final ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
+	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
 	protected final Matrix4 uiMatrix = matrixCache.get() ;			// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;		// Used for moving the camera around the world
 	
@@ -87,6 +90,7 @@ public class GLRenderer extends Basic2DRender
 
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
+		programs.shutdown() ;
 		GLModelGenerator.shutdown() ;		// ModelManager is static and so persists even after a shutdown
 	}
 
@@ -104,6 +108,7 @@ public class GLRenderer extends Basic2DRender
 		indexID[0] = -1 ;
 		bufferID[0] = -1 ;
 
+		programs.shutdown() ;
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		GLModelGenerator.shutdown() ;	// Clear all Geometry Data and reload everything upon rendering
 		fontManager.recover() ;
@@ -119,9 +124,35 @@ public class GLRenderer extends Basic2DRender
 
 	private void initGraphics()
 	{
-		GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
-		//GLES11.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
-		GLES11.glEnable( GLES11.GL_BLEND ) ;
+		//GLES20.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
+		GLES20.glEnable( GLES20.GL_BLEND ) ;
+
+		{
+			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
+			if( GLProgramManager.buildProgram( program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( program ) ;
+			}
+		}
+
+		{
+			final GLProgram program = programs.get( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
+			if( GLProgramManager.buildProgram( program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( program ) ;
+			}
+		}
+
+		{
+			final GLProgram program = programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
+			if( GLProgramManager.buildProgram( program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( program ) ;
+			}
+		}
 
 		resize() ;
 	}
@@ -209,10 +240,22 @@ public class GLRenderer extends Basic2DRender
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final int lineWidth = _settings.getInteger( "LINEWIDTH", 5 ) ;
 
-				GLES11.glDisable( GLES11.GL_TEXTURE_2D ) ;
-				//GLES11.glEnable( GLES11.GL_LINE_SMOOTH ) ;
-				GLES11.glEnableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_COLOR_ARRAY ) ;
+				final GLProgram program = programs.get( "SIMPLE_GEOMETRY" ) ;
+				if( program != null )
+				{
+					GLES20.glUseProgram( program.id[0] ) ;
+				}
+
+				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
+				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
+				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
+				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
+
+				//System.out.println( "inVertex: " + inVertex ) ;
+				//System.out.println( "inColour: " + inColour ) ;
+
+				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -228,12 +271,12 @@ public class GLRenderer extends Basic2DRender
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-					newMatrix.transpose() ;
-					GLES11.glLoadMatrixf( newMatrix.matrix, 0 ) ;
-					GLES11.glLineWidth( ( float )lineWidth ) ;
+					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
+					GLES20.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
+					GLES20.glLineWidth( ( float )lineWidth ) ;
 
-					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -242,18 +285,17 @@ public class GLRenderer extends Basic2DRender
 						_settings.addObject( "UPDATE", false ) ;
 					}
 
-					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
 
 					final short length = ( short )geometry.index.length ;
-					GLES11.glDrawElements( geometry.style, length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES20.glDrawElements( geometry.style, length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				//GLES11.glDisable( GLES11.GL_LINE_SMOOTH ) ;
-				GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
-				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_COLOR_ARRAY ) ;
+				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
 			}
 		} ;
 
@@ -290,10 +332,26 @@ public class GLRenderer extends Basic2DRender
 				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
 				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
 
-				GLES11.glEnableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_COLOR_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_NORMAL_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
+				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
+				if( program == null )
+				{
+					System.out.println( "Program doesn't exist.." ) ;
+					return ;
+				}
+
+				GLES20.glUseProgram( program.id[0] ) ;
+
+				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
+				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
+				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
+				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
+				final int inTexCoord       = GLES20.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
+				final int inNormal         = GLES20.glGetAttribLocation( program.id[0], "inNormal" ) ;
+
+				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+				GLES20.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -309,13 +367,13 @@ public class GLRenderer extends Basic2DRender
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-					newMatrix.transpose() ;
-					GLES11.glLoadMatrixf( newMatrix.matrix, 0 ) ;
+					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
+					GLES20.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
 
-					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
+					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -328,19 +386,20 @@ public class GLRenderer extends Basic2DRender
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( geometry ) ;
 
-					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES11.glTexCoordPointer( 2, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES11.glNormalPointer( GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inTexCoord, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inNormal,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
-					GLES11.glDrawElements( GLES11.GL_TRIANGLES, geometry.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES20.glDrawElements( GLES20.GL_TRIANGLES, geometry.index.length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_NORMAL_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_COLOR_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
+				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+				GLES20.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glUseProgram( 0 ) ;
 			}
 		} ;
 
@@ -391,10 +450,26 @@ public class GLRenderer extends Basic2DRender
 				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
-				GLES11.glEnableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_COLOR_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_NORMAL_ARRAY ) ;
-				GLES11.glEnableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
+				final GLProgram program = programs.get( "SIMPLE_FONT" ) ;
+				if( program == null )
+				{
+					System.out.println( "Program doesn't exist.." ) ;
+					return ;
+				}
+
+				GLES20.glUseProgram( program.id[0] ) ;
+
+				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
+				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
+				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
+				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
+				final int inTexCoord       = GLES20.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
+				final int inNormal         = GLES20.glGetAttribLocation( program.id[0], "inNormal" ) ;
+
+				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+				GLES20.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -411,15 +486,17 @@ public class GLRenderer extends Basic2DRender
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-					GLES11.glBlendFunc( GLES11.GL_SRC_ALPHA, GLES11.GL_ONE_MINUS_SRC_ALPHA ) ;
+					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
+
+					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 					final GLGeometry geometry = fm.getGLGeometry() ;
-					GLRenderer.bindBuffer( GLES11.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					GLES11.glVertexPointer( 3, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES11.glColorPointer( 4, GLES11.GL_UNSIGNED_BYTE, GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES11.glTexCoordPointer( 2, GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES11.glNormalPointer( GLES11.GL_FLOAT, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inTexCoord, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					GLES20.glVertexAttribPointer( inNormal,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -431,18 +508,19 @@ public class GLRenderer extends Basic2DRender
 					final int size = words.length ;
 					for( int i = 0; i < size; ++i )
 					{
-						renderText( words[i], fm, newMatrix ) ;
+						renderText( words[i], fm, newMatrix, inPositionMatrix ) ;
 					}
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				GLES11.glDisableClientState( GLES11.GL_VERTEX_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_COLOR_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_NORMAL_ARRAY ) ;
-				GLES11.glDisableClientState( GLES11.GL_TEXTURE_COORD_ARRAY ) ;
+				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
+				GLES20.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glUseProgram( 0 ) ;
 			}
 
-			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix )
+			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final int _matrixHandle )
 			{
 				final Matrix4 transpose = matrixCache.get() ;
 			
@@ -450,11 +528,10 @@ public class GLRenderer extends Basic2DRender
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					GLRenderer.bindBuffer( GLES11.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
+					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
-					GLES11.glLoadMatrixf( Matrix4.transpose( _matrix, transpose ).matrix, 0 ) ;
-
-					GLES11.glDrawElements( GLES11.GL_TRIANGLES, glyph.index.index.length, GLES11.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES20.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
+					GLES20.glDrawElements( GLES20.GL_TRIANGLES, glyph.index.index.length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 
@@ -537,7 +614,9 @@ public class GLRenderer extends Basic2DRender
 		renderDimensions = renderInfo.getRenderDimensions() ;
 		displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
-		GLES11.glMatrixMode( GLES11.GL_PROJECTION );
+		constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
+
+		/*GLES11.glMatrixMode( GLES11.GL_PROJECTION );
 		GLES11.glLoadIdentity();
 
 		// coordinate system origin at lower left with width and height same as the window
@@ -549,11 +628,11 @@ public class GLRenderer extends Basic2DRender
 		{
 			final Vector2 ratio = renderInfo.getRatioRenderToDisplay() ;
 			//GLU.gluPerspective( 65.0f, ratio.x, 1.0f, 900.0f ) ;
-			GLES11.glScalef( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
-			GLES11.glTranslatef( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ; 	// To shift the camera back to centre 
+			//GLES20.glScalef( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
+			//GLES20.glTranslatef( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ; 	// To shift the camera back to centre 
 		}
 
-		GLES11.glMatrixMode( GLES11.GL_MODELVIEW ) ;
+		GLES11.glMatrixMode( GLES11.GL_MODELVIEW ) ;*/
 
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		GLES11.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
@@ -581,8 +660,8 @@ public class GLRenderer extends Basic2DRender
 
 	public void display()
 	{
-		GLES11.glClear( GLES11.GL_COLOR_BUFFER_BIT | GLES11.GL_DEPTH_BUFFER_BIT ) ;
-		GLES11.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+		GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT ) ;
+		GLES20.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		updateEvents() ;
 
@@ -605,9 +684,9 @@ public class GLRenderer extends Basic2DRender
 		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
-			GLES11.glGetIntegerv( GLES11.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-			GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-			GLES11.glGetIntegerv( GLES11.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
+			GLES20.glGetIntegerv( GLES20.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
+			GLES20.glGetIntegerv( GLES20.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
+			GLES20.glGetIntegerv( GLES20.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
 
 			state.draw() ;
 		}
@@ -618,7 +697,7 @@ public class GLRenderer extends Basic2DRender
 		if( _store[0] != _idToBind[0] )
 		{
 			_store[0] = _idToBind[0] ;
-			GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, _store[0] ) ;
+			GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, _store[0] ) ;
 		}
 	}
 
@@ -627,8 +706,22 @@ public class GLRenderer extends Basic2DRender
 		if( _store[0] != _idToBind )
 		{
 			_store[0] = _idToBind ;
-			GLES11.glBindBuffer( _type, _store[0] ) ;
+			GLES20.glBindBuffer( _type, _store[0] ) ;
 		}
+	}
+
+	private static void constructOrhto2D( final Matrix4 _matrix, final float _left, final float _right, final float _bottom, final float _top )
+	{
+		final float zNear = -1.0f ;
+		final float zFar = 1.0f ;
+		final float invZ = 1.0f / ( zFar - zNear ) ;
+		final float invY = 1.0f / ( _top - _bottom ) ;
+		final float invX = 1.0f / ( _right - _left ) ;
+
+		_matrix.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
+					 0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
+					 0.0f,        0.0f,        -2.0f * invZ, ( -( zFar + zNear ) * invZ ),
+					 0.0f,        0.0f,        0.0f,         1.0f ) ;
 	}
 
 	@Override

@@ -74,6 +74,17 @@ public class Matrix4 implements Cacheable
 		temp = Matrix4.createTempIdentity() ;
 	}
 
+	public void set( final float _a00, final float _a01, final float _a02, final float _a03,
+					 final float _a10, final float _a11, final float _a12, final float _a13,
+					 final float _a20, final float _a21, final float _a22, final float _a23,
+					 final float _a30, final float _a31, final float _a32, final float _a33 )
+	{
+		setRow( _a00, _a01, _a02, _a03, 0 ) ;
+		setRow( _a10, _a11, _a12, _a13, 1 ) ;
+		setRow( _a20, _a21, _a22, _a23, 2 ) ;
+		setRow( _a30, _a31, _a32, _a33, 3 ) ;
+	}
+
 	public void setIdentity()
 	{
 		setRow( 1.0f, 0.0f, 0.0f, 0.0f, 0 ) ;

@@ -1,6 +1,4 @@
-package com.linxonline.mallet.renderer.desktop.GL ;
-
-import javax.media.opengl.* ;
+package com.linxonline.mallet.renderer.android.GL ;
 
 import com.linxonline.mallet.resources.Resource ;
 
@@ -26,11 +24,7 @@ public class GLShader extends Resource
 	}
 
 	@Override
-	public void destroy()
-	{
-		// Shaders are destroyed once they've been 
-		// compiled and linked into a GLProgram.
-	}
+	public void destroy() {}
 
 	@Override
 	public String type()

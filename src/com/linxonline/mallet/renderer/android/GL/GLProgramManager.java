@@ -1,7 +1,7 @@
-package com.linxonline.mallet.renderer.desktop.GL ;
+package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
-import javax.media.opengl.* ;
+import android.opengl.GLES20 ;
 
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -42,23 +42,23 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					final JSONArray vertexShaders = _jGL.optJSONArray( "VERTEX" ) ;
 					if( vertexShaders != null )
 					{
-						readShaders( vertexShaders, shaders, GL3.GL_VERTEX_SHADER ) ;
+						readShaders( vertexShaders, shaders, GLES20.GL_VERTEX_SHADER ) ;
 					}
 				}
 
-				{
+				/*{
 					final JSONArray geometryShaders = _jGL.optJSONArray( "GEOMETRY" ) ;
 					if( geometryShaders != null )
 					{
-						readShaders( geometryShaders, shaders, GL3.GL_GEOMETRY_SHADER ) ;
+						readShaders( geometryShaders, shaders, GLES20.GL_GEOMETRY_SHADER ) ;
 					}
-				}
+				}*/
 
 				{
 					final JSONArray fragmentShaders = _jGL.optJSONArray( "FRAGMENT" ) ;
 					if( fragmentShaders != null )
 					{
-						readShaders( fragmentShaders, shaders, GL3.GL_FRAGMENT_SHADER ) ;
+						readShaders( fragmentShaders, shaders, GLES20.GL_FRAGMENT_SHADER ) ;
 					}
 				}
 
@@ -89,17 +89,17 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		} ) ;
 	}
 
-	public static void deleteProgram( final GL3 _gl, final GLProgram _program )
+	public static void deleteProgram( final GLProgram _program )
 	{
 		// During the build process a programs 
 		// shaders list has already been detached 
 		// and destroyed.
-		_gl.glDeleteProgram( _program.id[0] ) ;
+		GLES20.glDeleteProgram( _program.id[0] ) ;
 	}
 
-	public static boolean buildProgram( final GL3 _gl, final GLProgram _program )
+	public static boolean buildProgram( final GLProgram _program )
 	{
-		_program.id[0] = _gl.glCreateProgram() ;
+		_program.id[0] = GLES20.glCreateProgram() ;
 		if( _program.id[0] < 1 )
 		{
 			System.out.println( "Failed to create program.." ) ;
@@ -109,58 +109,46 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		for( final GLShader shader : _program.shaders )
 		{
 			// Attach only successfully compiled shaders
-			if( compileShader( _gl, shader ) == true )
+			if( compileShader( shader ) == true )
 			{
-				_gl.glAttachShader( _program.id[0], shader.id[0] ) ;
+				GLES20.glAttachShader( _program.id[0], shader.id[0] ) ;
 			}
 		}
 
-		_gl.glLinkProgram( _program.id[0] ) ;
+		GLES20.glLinkProgram( _program.id[0] ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
 		for( final GLShader shader : _program.shaders )
 		{
-			_gl.glDetachShader( _program.id[0], shader.id[0] ) ;
-			_gl.glDeleteShader( shader.id[0] ) ;
+			GLES20.glDetachShader( _program.id[0], shader.id[0] ) ;
+			GLES20.glDeleteShader( shader.id[0] ) ;
 		}
 		_program.shaders.clear() ;
 
 		final int[] response = new int[]{ 0 } ;
-		_gl.glGetProgramiv( _program.id[0], GL3.GL_LINK_STATUS, response, 0 ) ;
-		if( response[0] == GL3.GL_FALSE )
+		GLES20.glGetProgramiv( _program.id[0], GLES20.GL_LINK_STATUS, response, 0 ) ;
+		if( response[0] == GLES20.GL_FALSE )
 		{
-			final int[] logLength = new int[1] ;
-			_gl.glGetProgramiv( _program.id[0], GL3.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
-
-			final byte[] log = new byte[logLength[0]] ;
-			_gl.glGetProgramInfoLog( _program.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
-
-			System.out.println( "Error linking program: " + new String( log ) ) ;
+			System.out.println( "Error linking program: " + GLES20.glGetProgramInfoLog( _program.id[0] ) ) ;
 			return false ;
 		}
 
 		return true ;
 	}
 
-	private static boolean compileShader( final GL3 _gl, final GLShader _shader )
+	private static boolean compileShader( final GLShader _shader )
 	{
-		_shader.id[0] = _gl.glCreateShader( _shader.type ) ;
-		_gl.glShaderSource( _shader.id[0], 1, _shader.source, null ) ;
-		_gl.glCompileShader( _shader.id[0] ) ;
+		_shader.id[0] = GLES20.glCreateShader( _shader.type ) ;
+		GLES20.glShaderSource( _shader.id[0], _shader.source[0] ) ;
+		GLES20.glCompileShader( _shader.id[0] ) ;
 
 		final int[] response = new int[]{ 0 } ;
-		_gl.glGetShaderiv( _shader.id[0], GL3.GL_COMPILE_STATUS, response, 0 ) ;
-		if( response[0] == GL3.GL_FALSE )
+		GLES20.glGetShaderiv( _shader.id[0], GLES20.GL_COMPILE_STATUS, response, 0 ) ;
+		if( response[0] == GLES20.GL_FALSE )
 		{
-			final int[] logLength = new int[1] ;
-			_gl.glGetShaderiv( _shader.id[0], GL3.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
-
-			final byte[] log = new byte[logLength[0]] ;
-			_gl.glGetShaderInfoLog( _shader.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
-
-			System.out.println( "Error compiling shader: " + _shader.file + "\n" + new String( log ) ) ;
+			System.out.println( "Error compiling shader: " + _shader.file + "\n" + GLES20.glGetShaderInfoLog( _shader.id[0] ) ) ;
 			return false ;
 		}
 
