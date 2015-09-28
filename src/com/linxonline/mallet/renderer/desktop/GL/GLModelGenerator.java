@@ -195,7 +195,7 @@ public class GLModelGenerator
 
 		switch( _shape.style )
 		{
-			case LINES      : geometry.setStyle( GL2.GL_LINES ) ; break ;
+			case LINES      : geometry.setStyle( GL2.GL_LINES ) ;      break ;
 			case LINE_STRIP : geometry.setStyle( GL2.GL_LINE_STRIP ) ; break ;
 		}
 

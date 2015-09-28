@@ -248,14 +248,12 @@ public class GLRenderer extends Basic2DRender
 
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
 
 				//System.out.println( "inVertex: " + inVertex ) ;
 				//System.out.println( "inColour: " + inColour ) ;
 
-				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -285,8 +283,9 @@ public class GLRenderer extends Basic2DRender
 						_settings.addObject( "UPDATE", false ) ;
 					}
 
-					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY, 3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY, 4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY, 3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					final short length = ( short )geometry.index.length ;
 					GLES20.glDrawElements( geometry.style, length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
@@ -294,8 +293,8 @@ public class GLRenderer extends Basic2DRender
 				matrixCache.reclaim( newMatrix ) ;
 
 				GLES20.glUseProgram( 0 ) ;
-				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
 			}
 		} ;
 
@@ -343,15 +342,11 @@ public class GLRenderer extends Basic2DRender
 
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
-				final int inTexCoord       = GLES20.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
-				final int inNormal         = GLES20.glGetAttribLocation( program.id[0], "inNormal" ) ;
 
-				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				GLES20.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				GLES20.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -386,19 +381,19 @@ public class GLRenderer extends Basic2DRender
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( geometry ) ;
 
-					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inTexCoord, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inNormal,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					GLES20.glDrawElements( GLES20.GL_TRIANGLES, geometry.index.length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				GLES20.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				GLES20.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 				GLES20.glUseProgram( 0 ) ;
 			}
 		} ;
@@ -461,15 +456,11 @@ public class GLRenderer extends Basic2DRender
 
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = GLES20.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = GLES20.glGetAttribLocation( program.id[0], "inColour" ) ;
-				final int inTexCoord       = GLES20.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
-				final int inNormal         = GLES20.glGetAttribLocation( program.id[0], "inNormal" ) ;
 
-				GLES20.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				GLES20.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				GLES20.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				GLES20.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -493,10 +484,10 @@ public class GLRenderer extends Basic2DRender
 					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					GLES20.glVertexAttribPointer( inVertex,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inColour,   4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inTexCoord, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES20.glVertexAttribPointer( inNormal,   3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
+					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -513,10 +504,10 @@ public class GLRenderer extends Basic2DRender
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				GLES20.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				GLES20.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				GLES20.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				GLES20.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 				GLES20.glUseProgram( 0 ) ;
 			}
 

@@ -28,6 +28,12 @@ public class Vector3
 		setXYZ( _vec.x, _vec.y, 0.0f ) ;
 	}
 
+	public Vector3( final Vector3 _point1, final Vector3 _point2 )
+	{
+		setXYZ( _point1.x, _point1.y, _point1.z ) ;
+		subtract( _point2 ) ;
+	}
+
 	public void setXYZ( final Vector3 _vec )
 	{
 		setXYZ( _vec.x, _vec.y, _vec.z ) ;
@@ -181,6 +187,7 @@ public class Vector3
 
 	/**
 		Cross Product
+		Assumes vector starts at the origin
 	*/
 	public static final Vector3 cross( final Vector3 _vec1, final Vector3 _vec2 )
 	{
@@ -199,6 +206,11 @@ public class Vector3
 		float tmp3 = ( _vec2.z - _vec1.z ) ;
 
 		return ( float )Math.sqrt( ( tmp1 * tmp1 ) + ( tmp2 * tmp2 ) + ( tmp3 * tmp3 ) ) ;
+	}
+
+	public static Vector3 constructVector3( final Vector3 _point1, final Vector3 _point2 )
+	{
+		return Vector3.subtract( _point1, _point2 ) ;
 	}
 
 	public static final Vector3 parseVector3( final String _text )

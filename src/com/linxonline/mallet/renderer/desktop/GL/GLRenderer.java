@@ -227,14 +227,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
 
 				//System.out.println( "MVP Matrix: " + inMVPMatrix ) ;
-				//System.out.println( "Position Matrix: " + inPositionMatrix ) ;
+				//System.out.println( "inNormal: " + inNormal ) ;
 
-				gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -252,7 +251,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					gl.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
 					gl.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
-					//gl.glLineWidth( ( float )lineWidth ) ;
+					gl.glLineWidth( ( float )lineWidth ) ;
 
 					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
@@ -264,16 +263,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						_settings.addObject( "UPDATE", false ) ;
 					}
 
-					gl.glVertexAttribPointer( inVertex,   3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( inColour,   4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-
+					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY, 3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY, 4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY, 3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+                                              
 					gl.glDrawElements( geometry.style, geometry.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glUseProgram( 0 ) ;
-				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// COLOUR ARRAY
 			}
 		} ;
 
@@ -321,15 +322,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
-				final int inTexCoord       = gl.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
-				final int inNormal         = gl.glGetAttribLocation( program.id[0], "inNormal" ) ;
 
-				gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				gl.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -363,19 +360,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
-					gl.glVertexAttribPointer( inVertex,   3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( inColour,   4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( inTexCoord, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( inNormal,   3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					gl.glDrawElements( GL3.GL_TRIANGLES, geometry.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( inTexCoord ) ;		// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 				gl.glUseProgram( 0 ) ;
 			}
 		} ;
@@ -432,15 +429,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-				final int inVertex         = gl.glGetAttribLocation( program.id[0], "inVertex" ) ;
-				final int inColour         = gl.glGetAttribLocation( program.id[0], "inColour" ) ;
-				final int inTexCoord       = gl.glGetAttribLocation( program.id[0], "inTexCoord" ) ;
-				final int inNormal         = gl.glGetAttribLocation( program.id[0], "inNormal" ) ;
 
-				gl.glEnableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				gl.glEnableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -465,10 +458,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					gl.glVertexAttribPointer( inVertex,   3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( inColour,   4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( inTexCoord, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( inNormal,   3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					if( _settings.getBoolean( "UPDATE", false ) == true )
 					{
@@ -485,10 +478,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( inVertex ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( inColour ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( inTexCoord ) ;	// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( inNormal ) ;		// NORMAL ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 				gl.glUseProgram( 0 ) ;
 			}
 

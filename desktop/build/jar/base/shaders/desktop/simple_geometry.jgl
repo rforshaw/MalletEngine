@@ -1,5 +1,5 @@
 {
 	NAME: "SIMPLE_GEOMETRY",
-	VERTEX: ["base/shaders/desktop/simple_vertex.glsl"],
+	VERTEX: ["base/shaders/desktop/simple_geometry_vertex.glsl"],
 	FRAGMENT: ["base/shaders/desktop/simple_geometry_fragment.glsl"]
 }
