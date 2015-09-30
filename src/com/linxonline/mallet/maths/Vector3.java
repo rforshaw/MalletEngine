@@ -208,11 +208,6 @@ public class Vector3
 		return ( float )Math.sqrt( ( tmp1 * tmp1 ) + ( tmp2 * tmp2 ) + ( tmp3 * tmp3 ) ) ;
 	}
 
-	public static Vector3 constructVector3( final Vector3 _point1, final Vector3 _point2 )
-	{
-		return Vector3.subtract( _point1, _point2 ) ;
-	}
-
 	public static final Vector3 parseVector3( final String _text )
 	{
 		final Vector3 num = new Vector3() ;

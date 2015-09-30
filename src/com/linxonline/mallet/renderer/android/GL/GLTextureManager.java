@@ -6,7 +6,7 @@ import java.io.InputStream ;
 import java.nio.* ;
 
 import android.util.DisplayMetrics ;
-import android.opengl.GLES11 ;
+import android.opengl.GLES20 ;
 import android.opengl.GLUtils;
 import android.opengl.ETC1Util ;
 import android.opengl.ETC1Util.ETC1Texture ;
@@ -154,6 +154,10 @@ public class GLTextureManager extends AbstractManager<Texture>
 	{
 		synchronized( toBind )
 		{
+			// GLRenderer will continuosly call get() until it 
+			// recieves a Texture, so we only need to bind 
+			// textures that are waiting for the OpenGL context 
+			// when the render requests it.
 			for( final Tuple<String, Bitmap> tuple : toBind )
 			{
 				final Bitmap bitmap = tuple.getRight() ;
@@ -163,13 +167,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			toBind.clear() ;
 		}
 
-		final Texture texture = super.get( _file ) ;
-		if( texture != null )
-		{
-			texture.register() ;
-		}
-
-		return texture ;
+		return super.get( _file ) ;
 	}
 
 	/**
@@ -200,18 +198,18 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	public Texture bind( final Bitmap _image, final InternalFormat _format )
 	{
-		GLES11.glEnable( GLES11.GL_TEXTURE_2D ) ;
+		GLES20.glEnable( GLES20.GL_TEXTURE_2D ) ;
 
 		final int textureID = glGenTextures() ;
-		GLES11.glBindTexture( GLES11.GL_TEXTURE_2D, textureID ) ;
+		GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, textureID ) ;
 
 		// Create Nearest Filtered Texture
-		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_MIN_FILTER, GLES11.GL_LINEAR ) ;
-		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_MAG_FILTER, GLES11.GL_LINEAR ) ;
+		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR ) ;
+		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR ) ;
  
 		// Different possible texture parameters, e.g. GL10.GL_CLAMP_TO_EDGE
-		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_S, GLES11.GL_CLAMP_TO_EDGE ) ;
-		GLES11.glTexParameterf( GLES11.GL_TEXTURE_2D, GLES11.GL_TEXTURE_WRAP_T, GLES11.GL_REPEAT ) ;
+		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE ) ;
+		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT ) ;
 
 		// If texture compression is enabled then use texture compression.
 		// Unless the texture request specifically requests not to use compression.
@@ -227,8 +225,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 			// If the texture has been flagged to not use 
 			// compression or contains an alpha channel, then 
 			// do not compress the texture.
-			GLES11.glPixelStorei( GLES11.GL_UNPACK_ALIGNMENT, 1 ) ;
-			GLUtils.texImage2D( GLES11.GL_TEXTURE_2D, 0, _image, 0 ) ;
+			GLES20.glPixelStorei( GLES20.GL_UNPACK_ALIGNMENT, 1 ) ;
+			GLUtils.texImage2D( GLES20.GL_TEXTURE_2D, 0, _image, 0 ) ;
 		//}
 		/*else		// This is too slow
 		{
@@ -247,7 +245,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 			// RGB_565 is 2 bytes per pixel
 			final ETC1Texture etc1tex = ETC1Util.compressTexture( buffer, width, height, 2, 2 * width ) ;
-			ETC1Util.loadTexture( GLES11.GL_TEXTURE_2D, 0, 0, GLES11.GL_RGB, GLES11.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
+			ETC1Util.loadTexture( GLES20.GL_TEXTURE_2D, 0, 0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
 		}*/
 
 		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
@@ -262,27 +260,27 @@ public class GLTextureManager extends AbstractManager<Texture>
 			{
 				switch( _format )
 				{
-					case COMPRESSED   : return GLES11.GL_COMPRESSED_RGBA ;
-					case UNCOMPRESSED : return GLES11.GL_RGBA ;
+					case COMPRESSED   : return GLES20.GL_COMPRESSED_RGBA ;
+					case UNCOMPRESSED : return GLES20.GL_RGBA ;
 				}
 			}
 			case RGB_565  :
 			{
 				switch( _format )
 				{
-					case COMPRESSED   : return GLES11.GL_COMPRESSED_RGB ;
-					case UNCOMPRESSED : return GLES11.GL_RGB ;
+					case COMPRESSED   : return GLES20.GL_COMPRESSED_RGB ;
+					case UNCOMPRESSED : return GLES20.GL_RGB ;
 				}
 			}
 		}*/
 
-		return GLES11.GL_RGB ;
+		return GLES20.GL_RGB ;
 	}
 
 	private int glGenTextures()
 	{
 		final int[] id = new int[1] ;
-		GLES11.glGenTextures( 1, id, 0 ) ;
+		GLES20.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
 	}

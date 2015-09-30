@@ -65,12 +65,12 @@ public class GLModelGenerator
 							new Vector2( _uv2.x, _uv2.y ) ) ;
 
 		geometry.addIndices( 0 ) ;
-		geometry.addIndices( 1 ) ;
 		geometry.addIndices( 2 ) ;
-		geometry.addIndices( 2 ) ;
-		geometry.addIndices( 1 ) ;
 		geometry.addIndices( 3 ) ;
-		
+		geometry.addIndices( 0 ) ;
+		geometry.addIndices( 3 ) ;
+		geometry.addIndices( 1 ) ;
+
 		final Model model = new Model( geometry ) ;
 		models.bind( geometry ) ;
 		return model ;

@@ -493,7 +493,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			int id = -1 ;
 			int type = -1 ;
 			int layer = -1 ;
-			Vector3 position = null ;
+
+			position = null ;
+
 			drawData = null ;
 			drawCall = null ; 
 		}

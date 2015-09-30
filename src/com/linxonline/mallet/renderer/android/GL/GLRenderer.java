@@ -2,7 +2,6 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
 
-import android.opengl.GLES11 ;
 import android.opengl.GLES20 ;
 import android.opengl.EGL14 ;
 
@@ -33,6 +32,7 @@ public class GLRenderer extends Basic2DRender
 	public static final int PERSPECTIVE_MODE = 2 ;
 
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
@@ -41,8 +41,8 @@ public class GLRenderer extends Basic2DRender
 
 	protected final ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
 	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
-	protected final Matrix4 uiMatrix = matrixCache.get() ;			// Used for rendering GUI elements not impacted by World/Camera position
-	protected final Matrix4 worldMatrix = matrixCache.get() ;		// Used for moving the camera around the world
+	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
+	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 	
 	protected int numID = 0 ;
 
@@ -53,9 +53,6 @@ public class GLRenderer extends Basic2DRender
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = new Vector3() ;
-
-	protected Vector2 renderDimensions = null ;
-	protected Vector2 displayDimensions = null ;
 
 	protected DrawInterface drawShape = null ;
 	protected DrawInterface drawTexture = null ;
@@ -126,6 +123,10 @@ public class GLRenderer extends Basic2DRender
 	{
 		//GLES20.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 		GLES20.glEnable( GLES20.GL_BLEND ) ;
+
+		GLES20.glEnable( GLES20.GL_CULL_FACE ) ;
+		GLES20.glCullFace( GLES20.GL_BACK ) ;  
+		GLES20.glFrontFace( GLES20.GL_CCW ) ;
 
 		{
 			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
@@ -429,7 +430,7 @@ public class GLRenderer extends Basic2DRender
 				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
 
 				final int height = fm.getHeight() ;
-				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
+				final int lineWidth = _settings.getInteger( "LINEWIDTH", DEFAULT_LINEWIDTH ) + ( int )_position.x ;
 				String[] words = _settings.getObject( "WORDS", null ) ;
 				if( words == null )
 				{
@@ -602,31 +603,20 @@ public class GLRenderer extends Basic2DRender
 
 	protected void resize()
 	{
-		renderDimensions = renderInfo.getRenderDimensions() ;
-		displayDimensions = renderInfo.getScaledRenderDimensions() ;
+		final Vector2 renderDimensions = renderInfo.getRenderDimensions() ;
+		final Vector2 displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
-		constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
-
-		/*GLES11.glMatrixMode( GLES11.GL_PROJECTION );
-		GLES11.glLoadIdentity();
-
-		// coordinate system origin at lower left with width and height same as the window
-		if( viewMode == ORTHOGRAPHIC_MODE )
+		switch( viewMode )
 		{
-			GLES11.glOrthof( 0.0f, renderDimensions.x, renderDimensions.y, 0.0f, -0.1f, 0.1f ) ;
+			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
+			case ORTHOGRAPHIC_MODE : 
+			default                : constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ; break ;
 		}
-		else
-		{
-			final Vector2 ratio = renderInfo.getRatioRenderToDisplay() ;
-			//GLU.gluPerspective( 65.0f, ratio.x, 1.0f, 900.0f ) ;
-			//GLES20.glScalef( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
-			//GLES20.glTranslatef( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ; 	// To shift the camera back to centre 
-		}
-
-		GLES11.glMatrixMode( GLES11.GL_MODELVIEW ) ;*/
 
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
-		GLES11.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+		GLES20.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+
+		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
 	}
 
 	@Override
@@ -843,6 +833,7 @@ public class GLRenderer extends Basic2DRender
 			if( texture != null )
 			{
 				texture.unregister() ;
+				drawData.remove( "TEXTURE" ) ;
 			}
 
 			final Model model = drawData.getObject( "MODEL", null ) ;
@@ -854,6 +845,7 @@ public class GLRenderer extends Basic2DRender
 					// Geometry Requests are not stored.
 					// So must be destroyed explicity.
 					model.destroy() ;
+					drawData.remove( "MODEL" ) ;
 				}
 			}
 		}

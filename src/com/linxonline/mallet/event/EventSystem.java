@@ -155,7 +155,7 @@ public final class EventSystem implements EventSystemInterface
 		if( types.isEmpty() == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 
-			// represents Event.ALL_EVENT_TYPES, must be special removed.
+			// represents Event.ALL_EVENT_TYPES, must be specially removed.
 			eventQueues.get( Event.ALL_EVENT_TYPES ).removeEventHandler( _handler ) ;
 		}
 

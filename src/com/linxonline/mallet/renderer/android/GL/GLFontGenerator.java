@@ -121,11 +121,11 @@ public class GLFontGenerator
 
 				final GLGeometry glyphIndex = new GLGeometry( 6, 0 ) ;
 				glyphIndex.addIndices( j + 0 ) ;
-				glyphIndex.addIndices( j + 1 ) ;
 				glyphIndex.addIndices( j + 2 ) ;
-				glyphIndex.addIndices( j + 2 ) ;
-				glyphIndex.addIndices( j + 1 ) ;
 				glyphIndex.addIndices( j + 3 ) ;
+				glyphIndex.addIndices( j + 0 ) ;
+				glyphIndex.addIndices( j + 3 ) ;
+				glyphIndex.addIndices( j + 1 ) ;
 
 				GLModelManager.bindIndex( glyphIndex ) ;
 				glyph.setIndex( glyphIndex ) ;

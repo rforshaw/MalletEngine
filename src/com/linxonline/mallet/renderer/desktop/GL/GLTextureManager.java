@@ -84,7 +84,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	{
 		synchronized( toBind )
 		{
-			// GLRenderer will continuosly call get() untill it 
+			// GLRenderer will continuosly call get() until it 
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
@@ -95,16 +95,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			toBind.clear() ;
 		}
 
-		final Texture texture = super.get( _file ) ;
-		if( texture != null )
-		{
-			// Register the texture for being used.
-			// The renderer should call unregister when 
-			// the calling Render Event is no longer being used.
-			texture.register() ;
-		}
-
-		return texture ;
+		return super.get( _file ) ;
 	}
 
 	/**

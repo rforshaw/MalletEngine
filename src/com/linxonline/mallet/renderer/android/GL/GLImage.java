@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import android.opengl.GLES11 ;
+import android.opengl.GLES20 ;
 
 import com.linxonline.mallet.resources.texture.ImageInterface ;
 
@@ -32,6 +32,6 @@ public class GLImage implements ImageInterface
 	@Override
 	public final void destroy()
 	{
-		GLES11.glDeleteTextures( 1, textureIDs, 0 ) ;
+		GLES20.glDeleteTextures( 1, textureIDs, 0 ) ;
 	}
 }

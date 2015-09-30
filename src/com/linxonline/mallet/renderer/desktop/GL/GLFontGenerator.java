@@ -112,11 +112,11 @@ public class GLFontGenerator
 			// Glyph index buffer is stored within the glyph.
 			final GLGeometry indexGeom = new GLGeometry( 6, 0 ) ;
 			indexGeom.addIndices( j + 0 ) ;
-			indexGeom.addIndices( j + 1 ) ;
 			indexGeom.addIndices( j + 2 ) ;
-			indexGeom.addIndices( j + 2 ) ;
-			indexGeom.addIndices( j + 1 ) ;
 			indexGeom.addIndices( j + 3 ) ;
+			indexGeom.addIndices( j + 0 ) ;
+			indexGeom.addIndices( j + 3 ) ;
+			indexGeom.addIndices( j + 1 ) ;
 
 			GLModelManager.bindIndex( gl, indexGeom ) ;
 			glyphs[i] = new GLGlyph( indexGeom, c[0], 0, geometryAdvance ) ;

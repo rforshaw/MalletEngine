@@ -42,6 +42,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static final int PERSPECTIVE_MODE = 2 ;
 
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
@@ -65,9 +66,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
-
-	protected Vector2 renderDimensions = null ;
-	protected Vector2 displayDimensions = null ;
 
 	protected GL3 gl = null ;
 	protected DrawInterface drawShape = null ;
@@ -319,6 +317,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				gl.glUseProgram( program.id[0] ) ;
+				gl.glEnable( GL.GL_BLEND ) ;
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
@@ -373,7 +372,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
 				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
 				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+
 				gl.glUseProgram( 0 ) ;
+				gl.glDisable( GL.GL_BLEND ) ;
 			}
 		} ;
 
@@ -402,7 +403,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
 				final int height = fm.getHeight() ;
-				final int lineWidth = _settings.getInteger( "LINEWIDTH", ( int )renderDimensions.x ) + ( int )_position.x ;
+				final int lineWidth = _settings.getInteger( "LINEWIDTH", DEFAULT_LINEWIDTH ) + ( int )_position.x ;
 				String[] words = _settings.getObject( "WORDS", null ) ;
 				if( words == null )
 				{
@@ -426,6 +427,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				gl.glUseProgram( program.id[0] ) ;
+				gl.glEnable( GL.GL_BLEND ) ;
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
@@ -482,7 +484,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
 				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
 				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+
 				gl.glUseProgram( 0 ) ;
+				gl.glDisable( GL.GL_BLEND ) ;
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final int _matrixHandle )
@@ -571,9 +575,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		System.out.println( "GL Contex initialised.." ) ;
 		gl = _drawable.getGL().getGL3() ;
 
-		//gl.glEnable( GL.GL_TEXTURE_2D ) ;
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
-		gl.glEnable( GL.GL_BLEND ) ;
+
+		gl.glEnable( GL.GL_CULL_FACE ) ;
+		gl.glCullFace( GL.GL_BACK ) ;  
+		gl.glFrontFace( GL.GL_CCW ) ;
 
 		resize() ;
 
@@ -640,35 +646,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	protected void resize()
 	{
-		renderDimensions = renderInfo.getRenderDimensions() ;
-		displayDimensions = renderInfo.getScaledRenderDimensions() ;
+		final Vector2 renderDimensions = renderInfo.getRenderDimensions() ;
+		final Vector2 displayDimensions = renderInfo.getScaledRenderDimensions() ;
 
-		constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
-
-		/*gl.glMatrixMode( GL3.GL_PROJECTION );
-		final Matrix4 matrix = matrixCache.get() ;			// identity by default
-		gl.glLoadTransposeMatrixf( matrix.matrix, 0 ) ;
-
-		// coordinate system origin at lower left with width and height same as the window
-		if( viewMode == ORTHOGRAPHIC_MODE )
+		switch( viewMode )
 		{
-			glu.gluOrtho2D( 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ;
-		}
-		else
-		{
-			final Vector2 ratio = renderInfo.getRatioRenderToDisplay() ;
-			glu.gluPerspective( 65.0f, ratio.x, 1.0f, 900.0f ) ;
-
-			matrix.scale( 1.0f, -1.0f, 1.0f ) ;															// Invert Y axis to everything is upright
-			matrix.translate( -( renderDimensions.x / 2.0f ), -( renderDimensions.y / 2.0f ), 0.0f ) ;	// To shift the camera back to centre 
-			gl.glLoadTransposeMatrixf( matrix.matrix, 0 ) ;
+			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
+			case ORTHOGRAPHIC_MODE : 
+			default                : constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ; break ;
 		}
 
-		matrixCache.reclaim( matrix ) ;
-
-		gl.glMatrixMode( GL3.GL_MODELVIEW ) ;*/
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		gl.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+
+		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
 	}
 
 	@Override
@@ -919,6 +910,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( texture != null )
 			{
 				texture.unregister() ;
+				drawData.remove( "TEXTURE" ) ;
 			}
 
 			final Model model = drawData.getObject( "MODEL", null ) ;
@@ -930,6 +922,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					// Geometry Requests are not stored.
 					// So must be destroyed explicity.
 					model.destroy() ;
+					drawData.remove( "MODEL" ) ;
 				}
 			}
 		}
