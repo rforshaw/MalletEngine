@@ -18,7 +18,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 	public static final int COLOUR_ARRAY = 3 ;
 	public static final int TEXTURE_COORD_ARRAY = 4 ;
 	public static final int NORMAL_ARRAY = 5 ;
-	
 
 	public GLProgramManager()
 	{

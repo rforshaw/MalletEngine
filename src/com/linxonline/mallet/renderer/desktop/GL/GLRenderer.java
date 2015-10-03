@@ -41,26 +41,26 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
 
+	protected static final Vector2 UV1 = new Vector2() ;
+	protected static final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
+
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
-	protected final ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
+	protected final static ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
 	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 
-	protected int numID = 0 ;
+	protected static int numID = 0 ;
 	protected static final GLU glu = new GLU() ;
 	protected static GLJPanel canvas = null ;
 	protected JFrame frame = null ;
-
-	private final Vector2 UV1 = new Vector2() ;
-	private final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
 
 	protected Vector2 pos = new Vector2() ;
 
@@ -68,9 +68,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected Vector3 cameraPosition = null ;
 
 	protected GL3 gl = null ;
-	protected DrawInterface drawShape = null ;
-	protected DrawInterface drawTexture = null ;
-	protected DrawInterface drawText = null ;
+	protected DrawInterface<GLRenderData> drawShape = null ;
+	protected DrawInterface<GLRenderData> drawTexture = null ;
+	protected DrawInterface<GLRenderData> drawText = null ;
 
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
 	protected float rotate = 0.0f ;
@@ -100,6 +100,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
+
 		programs.shutdown() ;
 		GLModelGenerator.shutdown() ;
 		textures.shutdown() ;
@@ -198,21 +199,22 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	private void initDrawCalls()
 	{
-		drawShape = new DrawInterface()
+		drawShape = new DrawInterface<GLRenderData>()
 		{
-			public void draw( final Settings _settings, final Vector2 _position ) 
+			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				final Model model = _settings.getObject( "MODEL", null ) ;
+				final Model model = _data.getModel() ;
 				if( model == null )
 				{
 					return ;
 				}
 
-				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
+				final float rotation = _data.getRotation() ;
+				final Vector2 offset = _data.getOffset() ;
+
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
-				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
-				final int lineWidth = _settings.getInteger( "LINEWIDTH", 2 ) ;
+				final boolean isGUI = _data.isUI() ;
+				final int lineWidth = _data.getLineWidth() ;
 
 				final GLProgram program = programs.get( "SIMPLE_GEOMETRY" ) ;
 				if( program == null )
@@ -254,11 +256,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					if( _settings.getBoolean( "UPDATE", false ) == true )
+					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updateShapeModel( model, _settings.<Shape>getObject( "DRAWLINES", null ) ) ;
+						GLModelGenerator.updateShapeModel( model, _data.getShape() ) ;
 						GLModelManager.updateVBO( gl, geometry ) ;
-						_settings.addObject( "UPDATE", false ) ;
 					}
 
 					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY, 3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
@@ -276,38 +277,39 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			}
 		} ;
 
-		drawTexture = new DrawInterface()
+		drawTexture = new DrawInterface<GLRenderData>()
 		{
-			public void draw( final Settings _settings, final Vector2 _position ) 
+			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				Texture<GLImage> texture = _settings.getObject( "TEXTURE", null ) ;
+				Texture<GLImage> texture = _data.getTexture() ;
 				if( texture == null )
 				{
-					texture = loadTexture( _settings ) ;
+					texture = loadTexture( _data ) ;
 					if( texture == null )
 					{
 						return ;
 					}
 				}
 
-				final GLImage image = texture.getImage() ;
-				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
-
-				final Model model = _settings.getObject( "MODEL", null ) ;
+				final Model model = _data.getModel() ;
 				if( model == null )
 				{
 					// If we can't map the texture to a plane, then no point in rendering.
 					return ;
 				}
 
-				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
-				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
-				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
+				final GLImage image = texture.getImage() ;
+				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
-				final MalletColour colour = _settings.<MalletColour>getObject( "COLOUR", WHITE ) ;
-				final Vector2 uv1 = _settings.<Vector2>getObject( "UV1", UV1 ) ;
-				final Vector2 uv2 = _settings.<Vector2>getObject( "UV2", UV2 ) ;
+				final float rotation = _data.getRotation() ;
+				final Vector2 offset = _data.getOffset() ;
+
+				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final boolean isGUI = _data.isUI() ;
+
+				final MalletColour colour = _data.getColour() ;
+				final Vector2 uv1 = _data.getUV1() ;
+				final Vector2 uv2 = _data.getUV2() ;
 
 				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
 				if( program == null )
@@ -350,10 +352,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					// Update the UV co-ordinates of the model
-					if( _settings.getBoolean( "UPDATE", false ) == true )
+					if( _data.toUpdate() == true )
 					{
 						GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
-						_settings.addObject( "UPDATE", false ) ;
 					}
 
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
@@ -378,18 +379,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			}
 		} ;
 
-		drawText = new DrawInterface()
+		drawText = new DrawInterface<GLRenderData>()
 		{
-			public void draw( final Settings _settings, final Vector2 _position ) 
+			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				final String text = _settings.getString( "TEXT", null ) ;
+				final String text = _data.getText() ;
 				if( text == null )
 				{
 					System.out.println( "No Text, set." ) ;
 					return ;
 				}
 
-				final MalletFont font = _settings.getObject( "FONT", null ) ;
+				final MalletFont font = _data.getFont() ;
 				if( font == null )
 				{
 					System.out.println( "No Font, set." ) ;
@@ -397,26 +398,28 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm == null ) { return ; }
+				if( fm == null )
+				{
+					return ;
+				}
 
 				final GLImage image = fm.getGLImage() ;
 				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
 				final int height = fm.getHeight() ;
-				final int lineWidth = _settings.getInteger( "LINEWIDTH", DEFAULT_LINEWIDTH ) + ( int )_position.x ;
-				String[] words = _settings.getObject( "WORDS", null ) ;
+				final int lineWidth = _data.getLineWidth() + ( int )_position.x ;
+				String[] words = _data.getWords() ;
 				if( words == null )
 				{
 					words = optimiseText( fm, text, _position, lineWidth ) ;
-					_settings.addObject( "WORDS", words ) ;
-					_settings.addInteger( "TEXTWIDTH", -1 ) ;
+					_data.setWords( words ) ;
 				}
 
-				final MalletColour colour = _settings.getObject( "COLOUR", WHITE ) ;
-				final int alignment = _settings.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
-				final float rotation = ( float )Math.toDegrees( _settings.getFloat( "ROTATE", 0.0f ) ) ;
-				final Vector2 offset = _settings.getObject( "OFFSET", DEFAULT_OFFSET ) ;
-				final boolean isGUI = _settings.getBoolean( "GUI", false ) ;
+				final MalletColour colour = _data.getColour() ;
+				final int alignment = _data.getTextAlignment() ;
+				final float rotation = _data.getRotation() ;
+				final Vector2 offset = _data.getOffset() ;
+				final boolean isGUI = _data.isUI() ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
 				final GLProgram program = programs.get( "SIMPLE_FONT" ) ;
@@ -465,11 +468,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
 					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
-					if( _settings.getBoolean( "UPDATE", false ) == true )
+					if( _data.toUpdate() == true )
 					{
 						GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
 						GLModelManager.updateVBO( gl, geometry ) ;
-						_settings.addObject( "UPDATE", false ) ;
 					}
 
 					final int size = words.length ;
@@ -732,6 +734,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
+	private static int getUniqueID()
+	{
+		return numID++ ;
+	}
+
 	private static void bindTexture( final GL3 _gl, final int[] _idToBind, final int[] _store )
 	{
 		if( _store[0] != _idToBind[0] )
@@ -769,20 +776,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected void createTexture( final Settings _draw )
 	{
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		final int layer = _draw.getInteger( "LAYER", -1 ) ;
-
 		if( position != null )
 		{
 			final GLRenderData data = renderCache.get() ;
-			data.set( numID++,
-					  DrawRequestType.TEXTURE,
-					  _draw,
-					  position,
-					  layer ) ;
+			data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
 			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
-			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-			data.drawCall = drawTexture ;
+			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			insert( data ) ;
 		}
 	}
@@ -791,22 +791,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected void createGeometry( final Settings _draw )
 	{
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		final int layer = _draw.getInteger( "LAYER", -1 ) ;
-
 		if( position != null )
 		{
 			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
 			if( shape != null )
 			{
-				_draw.addObject( "MODEL", GLModelGenerator.genShapeModel( shape ) ) ;
 				final GLRenderData data = renderCache.get() ;
-				data.set( numID++, DrawRequestType.GEOMETRY, _draw, position, layer ) ;
+				data.set( _draw, drawShape, DrawRequestType.GEOMETRY ) ;
+				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 
-				passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-				data.drawCall = drawShape ;
+				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				insert( data ) ;
-				return ;
 			}
 		}
 	}
@@ -820,11 +816,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = renderCache.get() ;
-			data.set( numID++, DrawRequestType.TEXT, _draw, position, layer ) ;
+			data.set( _draw, drawText, DrawRequestType.TEXT ) ;
 			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
 
-			passIDToCallback( data.id, _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-			data.drawCall = drawText ;
+			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			insert( data ) ;
 		}
 	}
@@ -839,6 +834,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	@Override
 	public void clean()
 	{
+		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;
 		GLModelGenerator.clean() ;
@@ -855,16 +851,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		return "GLRenderer" ;
 	}
 
-	private Texture loadTexture( final Settings _draw )
+	private Texture loadTexture( final GLRenderData _data )
 	{
-		final Texture texture = textures.get( _draw.getString( "FILE", null ) ) ;
+		final Texture texture = textures.get( _data.data.getString( "FILE", null ) ) ;
 		if( texture == null )
 		{
 			return null ;
 		}
 
-		final Vector2 fillDim = _draw.getObject( "FILL", null ) ;
-		Vector2 dimension = _draw.getObject( "DIM", null ) ;
+		final Vector2 fillDim = _data.data.getObject( "FILL", null ) ;
+		Vector2 dimension = _data.data.getObject( "DIM", null ) ;
 		if( dimension == null )
 		{
 			dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
@@ -873,47 +869,213 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( fillDim == null )
 		{
 			final String name = dimension.toString() ;
-			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, dimension ) ) ;
-			_draw.addObject( "TEXTURE", texture ) ;
+			_data.setModel( GLModelGenerator.genPlaneModel( name, dimension ) ) ;
 		}
 		else
 		{
 			final Vector2 div = Vector2.divide( fillDim, dimension ) ;
 			final String name = fillDim.toString() + dimension.toString() ;
-			_draw.addObject( "MODEL", GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
-			_draw.addObject( "TEXTURE", texture ) ;
+			_data.setModel( GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
 		}
 
+		_data.setTexture( texture ) ;
 		return texture ;
 	}
 
 	public static class GLRenderData extends RenderData
 	{
+		private final int id = getUniqueID() ;
+
+		private int layer ;
+		private Interpolation interpolation ;
+		private boolean uiElement ;
+		private float rotation ;
+		private int lineWidth ;
+		private int textAlignment ;
+
+		// Must be nulled when reclaimed by cache
+		// User data
+		private Vector3 position ;
+		private Vector2 offset ;
+		private MalletColour colour ;
+		private Shape shape ;
+		private String[] words ;
+
+		private final Vector2 uv1 = new Vector2( UV1 ) ;
+		private final Vector2 uv2 = new Vector2( UV2 ) ;
+
+		// Must be nulled when reclaimed by cache
+		// Renderer data
+		private Texture texture ;
+		private Model model ;
+		
 		public GLRenderData()
 		{
 			super() ;
 		}
 
-		public GLRenderData( final int _id,
-							 final DrawRequestType _type,
-							 final Settings _draw,
-							 final Vector3 _position,
-							 final int _layer )
+		@Override
+		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
 		{
-			super( _id, _type, _draw, _position, _layer ) ;
+			super.set( _data, _call, _type ) ;
+			updateData() ;
+		}
+
+		private void updateData()
+		{
+			position      = data.<Vector3>getObject( "POSITION", null ) ;
+			offset        = data.<Vector2>getObject( "OFFSET", DEFAULT_OFFSET ) ;
+			layer         = data.getInteger( "LAYER", 0 ) ;
+			interpolation = data.<Interpolation>getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
+			uiElement     = data.getBoolean( "GUI", false ) ;
+			rotation      = ( float )Math.toDegrees( data.getFloat( "ROTATE", 0.0f ) ) ;
+			lineWidth     = data.getInteger( "LINEWIDTH", 2 ) ;
+			textAlignment = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
+			colour        = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
+			shape         = data.<Shape>getObject( "DRAWLINES", null ) ;
+			words         = null ;
+
+			uv1.setXY( data.<Vector2>getObject( "UV1", UV1 ) ) ;
+			uv2.setXY( data.<Vector2>getObject( "UV2", UV2 ) ) ;
+		}
+
+		public void setTexture( final Texture _texture )
+		{
+			texture = _texture ;
+		}
+
+		public void setModel( final Model _model )
+		{
+			model = _model ;
+		}
+
+		public void setWords( final String[] _words )
+		{
+			words = _words ;
+		}
+
+		public int getID()
+		{
+			return id ;
+		}
+
+		public Vector3 getPosition()
+		{
+			return position ;
+		}
+
+		public int getLayer()
+		{
+			return layer ;
+		}
+
+		public Interpolation getInterpolation()
+		{
+			return interpolation ;
+		}
+
+		public boolean isUI()
+		{
+			return uiElement ;
+		}
+
+		public float getRotation()
+		{
+			return rotation ;
+		}
+
+		public Vector2 getOffset()
+		{
+			return offset ;
+		}
+
+		public Shape getShape()
+		{
+			return shape ;
+		}
+
+		public Model getModel()
+		{
+			return model ;
+		}
+
+		public MalletColour getColour()
+		{
+			return colour ;
+		}
+
+		public Texture getTexture()
+		{
+			return texture ;
+		}
+
+		public Vector2 getUV1()
+		{
+			return uv1 ;
+		}
+
+		public Vector2 getUV2()
+		{
+			return uv2 ;
+		}
+
+		public int getLineWidth()
+		{
+			return lineWidth ;
+		}
+
+		public String[] getWords()
+		{
+			return words ;
+		}
+
+		public boolean toUpdate()
+		{
+			final boolean update = data.getBoolean( "UPDATE", false ) ;
+			if( update == true )
+			{
+				data.addBoolean( "UPDATE", false ) ;
+				updateData() ;
+			}
+
+			return update ;
+		}
+
+		public int getTextAlignment()
+		{
+			return textAlignment ;
+		}
+
+		public String getText()
+		{
+			return data.getString( "TEXT", null ) ;
+		}
+
+		public MalletFont getFont()
+		{
+			return data.<MalletFont>getObject( "FONT", null ) ;
+		}
+
+		public void copy( final RenderData _data )
+		{
+			data = _data.data ;
+			call = _data.call ;
+			type = _data.type ;
+		}
+
+		public int sortValue()
+		{
+			return getLayer() ;
 		}
 
 		@Override
-		public void unregisterResources()
+		public void removeResources()
 		{
-			final Texture texture = drawData.getObject( "TEXTURE", null ) ;
 			if( texture != null )
 			{
 				texture.unregister() ;
-				drawData.remove( "TEXTURE" ) ;
 			}
 
-			final Model model = drawData.getObject( "MODEL", null ) ;
 			if( model != null )
 			{
 				model.unregister() ;
@@ -922,9 +1084,21 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					// Geometry Requests are not stored.
 					// So must be destroyed explicity.
 					model.destroy() ;
-					drawData.remove( "MODEL" ) ;
 				}
 			}
+
+			renderCache.reclaim( this ) ;
+		}
+
+		@Override
+		public void reset()
+		{
+			position = null ;
+			offset = null ;
+			colour = null ;
+			shape = null ;
+			words = null ;
+			super.reset() ;
 		}
 	}
 }

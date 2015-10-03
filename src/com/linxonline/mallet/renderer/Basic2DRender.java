@@ -35,8 +35,8 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected float updateDT = 0.0f ;		// Delta time of the update cycle
 	protected float drawDT = 0.0f ;			// Delta time of the render cycle
 
+	protected final RenderState state = new RenderState() ;;
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
-	protected final RenderState state = new RenderState() ;
 
 	private final EventMessenger messenger = new EventMessenger() ;
 	public  final RenderInfo renderInfo = new RenderInfo( new Vector2( 800, 600 ),
@@ -173,7 +173,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	protected void insert( final RenderData _data )
 	{
-		state.insert( _data.id, _data ) ;
+		state.insert( _data.getID(), _data ) ;
 	}
 
 	@Override
@@ -229,11 +229,13 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected class RenderState implements RenderStateInterface<Integer, RenderData>
 	{
 		protected final ArrayList<Integer> toRemove = new ArrayList<Integer>() ;
-		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;							// Old State
-		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;								// Current State - loopable
-		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;	// Current State - searchable
+		protected final ArrayList<Vector3> oldState = new ArrayList<Vector3>() ;								// Old State
+		protected ArrayList<RenderData> content = new ArrayList<RenderData>() ;									// Current State - loopable
+		protected final HashMap<Integer, RenderData> hashedContent = new HashMap<Integer, RenderData>() ;		// Current State - searchable
 
 		protected final Vector2 position = new Vector2() ;
+
+		public RenderState() {}
 
 		@Override
 		public void add( Integer _id, RenderData _data )
@@ -247,17 +249,17 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			hashedContent.put( _id, _data ) ;
 			for( final RenderData data : content )
 			{
-				if( _data.layer <= data.layer )
+				if( _data.getLayer() <= data.getLayer() )
 				{
 					final int index = content.indexOf( data ) ;
 					content.add( index, _data ) ;		// Insert at index location
-					oldState.add( index, new Vector3( _data.position ) ) ;
+					oldState.add( index, new Vector3( _data.getPosition() ) ) ;
 					return ;
 				}
 			}
 
 			content.add( _data ) ;						// Add to end of array
-			oldState.add( new Vector3( _data.position ) ) ;
+			oldState.add( new Vector3( _data.getPosition() ) ) ;
 		}
 
 		/**
@@ -280,20 +282,17 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		*/
 		public void removeRenderData()
 		{
-			final int size = toRemove.size() ;
-			for( int i = 0; i < size; ++i )
+			for( final Integer id : toRemove )
 			{
-				final Integer id = toRemove.get( i ) ;
 				//Logger.println( getName() + " - Remove: " + id, Logger.Verbosity.MINOR ) ;
 				final RenderData data = getData( id ) ;
 				if( data != null )
 				{
-					data.unregisterResources() ;		// Decrement resource count
 					hashedContent.remove( id ) ;
-
 					final int index = content.indexOf( data ) ;
 					content.remove( index ) ;
 					oldState.remove( index ) ;
+					data.removeResources() ;		// Remove any references to resources
 				}
 			}
 			toRemove.clear() ;
@@ -309,7 +308,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 				// of the current-state. Current-state data will 
 				// soon be updated.
 				final RenderData data = content.get( i ) ;
-				oldState.get( i ).setXYZ( data.position ) ;
+				oldState.get( i ).setXYZ( data.getPosition() ) ;
 			}
 		}
 
@@ -344,11 +343,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			// Ensure that we unregister all the resources
 			// we are currently using. If we don't, we'll 
 			// most likely be leaking memory!
-			final int size = content.size() ;
+			/*final int size = content.size() ;
 			for( int i = 0; i < size; ++i )
 			{
 				content.get( i ).unregisterResources() ;
-			}
+			}*/
 
 			toRemove.clear() ;
 			oldState.clear() ;
@@ -373,7 +372,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			for( int i = 0; i < size; ++i )
 			{
 				final RenderData data = state.getCurrentPosition( i, position ) ;
-				data.drawCall.draw( data.drawData, position ) ;
+				data.draw( position ) ;
 			}
 		}
 
@@ -381,9 +380,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			final Vector3 old = oldState.get( _index ) ;
 			final RenderData data = content.get( _index ) ;
-			final Vector3 current = data.position ;
+			final Vector3 current = data.getPosition() ;
 
-			switch( data.interpolation )
+			switch( data.getInterpolation() )
 			{
 				case NONE   : _position.setXY( current.x, current.y ) ; break ;
 				case LINEAR :
@@ -421,88 +420,49 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		}
 	}
 
-	public static class RenderData implements SortInterface, Cacheable
+	public static abstract class RenderData implements SortInterface, Cacheable
 	{
-		public int id ;
-		public DrawRequestType type ;
-		public Interpolation interpolation = Interpolation.LINEAR ;
-		public int layer ;
-		public Vector3 position ;
-		public Settings drawData ;
+		public Settings data = null ;			// Data to be drawn
+		public DrawInterface call = null ;		// Draw technique to use
+		public DrawRequestType type = null ;
 
-		public DrawInterface drawCall = null ;
+		public RenderData() {}
 
-		public RenderData()
+		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
 		{
-			set( -1,
-				 DrawRequestType.NOT_SET,
-				 null,
-				 new Vector3(),
-				 -1 ) ;
-		}
-
-		public RenderData( final int _id,
-						   final DrawRequestType _type,
-						   final Settings _draw,
-						   final Vector3 _position,
-						   final int _layer )
-		{
-			set( _id, _type, _draw, _position, _layer ) ;
-		}
-
-		public void set( final int _id,
-						 final DrawRequestType _type,
-						 final Settings _draw,
-						 final Vector3 _position,
-						 final int _layer )
-		{
-			id = _id ;
+			data = _data ;
+			call = _call ;
 			type = _type ;
-			layer = _layer ;
-			drawData = _draw ;
-			position = _position ;
-
-			if( drawData != null )
-			{
-				drawData.addInteger( "ID", _id ) ;
-				interpolation = drawData.getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
-			}
 		}
 
-		public void copy( final RenderData _data )
+		public void draw( final Vector2 _position )
 		{
-			id = _data.id ;
-			type = _data.type ;
-			layer = _data.layer ;
-
-			position.setXYZ( _data.position ) ;
-
-			drawData = _data.drawData ;
-			drawCall = _data.drawCall ;
+			call.draw( this, _position ) ;
 		}
 
-		public int sortValue()
-		{
-			return layer ;
-		}
+		//public abstract void updateData() ;
 
-		public void unregisterResources() {}
+		public abstract int getID() ;							// Unique identifier
+		public abstract Vector3 getPosition() ;					// Position in 3D space
+		public abstract int getLayer() ;						// Order to be rendered
+		public abstract Interpolation getInterpolation() ;		// How the renderer should handle updating its data
 
+		public abstract boolean isUI() ;
+		
+		public abstract void copy( final RenderData _data ) ;
+		public abstract void removeResources() ;
+		public abstract int sortValue() ;
+
+		@Override
 		public void reset()
 		{
-			int id = -1 ;
-			int type = -1 ;
-			int layer = -1 ;
-
-			position = null ;
-
-			drawData = null ;
-			drawCall = null ; 
+			data = null ;
+			call = null ;
 		}
 	}
 
-	public interface DrawInterface
+	public interface DrawInterface<T extends RenderData>
 	{
-		public void draw( final Settings _settings, final Vector2 _position ) ;
+		public void draw( final T _data, final Vector2 _position ) ;
 	}
 }

@@ -139,23 +139,9 @@ public class Animation implements IDInterface, Cacheable
 		// Doesn't assume the next frame is part of a spritesheet.
 		// We could check to see if the current path is the same as 
 		// f.path. Note sure if this would be more performant.
+		// Though the Animation System doesn't assume, the renderer 
+		// does, this will need to be resolved..
 		settings.addString( "FILE", f.path ) ; 
-		
-		// We need to null TEXTURE so the renderer
-		// can load/grab the new texture denoted by FILE
-		final Texture texture = settings.<Texture>getObject( "TEXTURE", null ) ;
-		if( texture != null )
-		{
-			texture.unregister() ;
-			settings.remove( "TEXTURE" ) ;
-		}
-
-		final Model model = settings.<Model>getObject( "MODEL", null ) ;
-		if( model != null )
-		{
-			model.unregister() ;
-			settings.remove( "MODEL" ) ;
-		}
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility
