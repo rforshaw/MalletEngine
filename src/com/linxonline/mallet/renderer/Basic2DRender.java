@@ -343,11 +343,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			// Ensure that we unregister all the resources
 			// we are currently using. If we don't, we'll 
 			// most likely be leaking memory!
-			/*final int size = content.size() ;
+			final int size = content.size() ;
 			for( int i = 0; i < size; ++i )
 			{
-				content.get( i ).unregisterResources() ;
-			}*/
+				content.get( i ).removeResources() ;
+			}
 
 			toRemove.clear() ;
 			oldState.clear() ;
@@ -458,6 +458,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		{
 			data = null ;
 			call = null ;
+			type = null ;
 		}
 	}
 

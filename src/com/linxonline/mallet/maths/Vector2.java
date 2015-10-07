@@ -22,6 +22,12 @@ public class Vector2
 		setXY( _vec ) ;
 	}
 
+	public Vector2( final Vector2 _point1, final Vector2 _point2 )
+	{
+		setXY( _point1 ) ;
+		subtract( _point2 ) ;
+	}
+
 	public void setXY( final Vector2 _vec )
 	{
 		setXY( _vec.x, _vec.y ) ;

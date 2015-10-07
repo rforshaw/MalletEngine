@@ -829,6 +829,7 @@ public class GLRenderer extends Basic2DRender
 		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
 		{
 			super.set( _data, _call, _type ) ;
+			data.addInteger( "ID", getID() ) ;
 			updateData() ;
 		}
 
@@ -982,6 +983,7 @@ public class GLRenderer extends Basic2DRender
 		@Override
 		public void removeResources()
 		{
+			data.remove( "ID" ) ;
 			if( texture != null )
 			{
 				texture.unregister() ;
@@ -1009,6 +1011,8 @@ public class GLRenderer extends Basic2DRender
 			colour = null ;
 			shape = null ;
 			words = null ;
+			texture = null ;
+			model = null ;
 			super.reset() ;
 		}
 	}

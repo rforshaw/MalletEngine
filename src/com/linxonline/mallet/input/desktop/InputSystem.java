@@ -1,5 +1,8 @@
 package com.linxonline.mallet.input.desktop ;
 
+import java.awt.Robot ;
+import java.awt.Point ;
+import java.awt.AWTException ;
 import java.util.HashMap ;
 import java.util.ArrayList ;
 import java.util.Collection ;
@@ -11,6 +14,7 @@ import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.locks.* ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 /**
 	Input System is designed to use Java's built in input listeners, 
@@ -22,6 +26,8 @@ public class InputSystem implements InputSystemInterface,
 									MouseMotionListener,
 									MouseWheelListener
 {
+	private Robot controlMouse ;
+
 	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
@@ -32,7 +38,18 @@ public class InputSystem implements InputSystemInterface,
 	private final ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem() {}
+	public InputSystem()
+	{
+		try
+		{
+			controlMouse = new Robot() ;
+		}
+		catch( AWTException ex )
+		{
+			ex.printStackTrace() ;
+			return ;
+		}
+	}
 
 	public void addInputHandler( final InputHandler _handler )
 	{
@@ -134,8 +151,24 @@ public class InputSystem implements InputSystemInterface,
 	/** Recieve mouse events from system **/
 	
 	public void mouseClicked( MouseEvent _event ) {}
+
 	public void mouseEntered( MouseEvent _event ) {}
-	public void mouseExited( MouseEvent _event ) {}
+
+	public void mouseExited( MouseEvent _event )
+	{
+		final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
+		if( capture == false || controlMouse == null )
+		{
+			return ;
+		}
+
+		final float exitY = _event.getY() ;
+		final float exitX = _event.getX() ;
+		final Vector2 shift = Vector2.subtract( mousePosition, new Vector2( exitX, exitY ) ) ;
+
+		final Point point = _event.getLocationOnScreen() ;
+		controlMouse.mouseMove( point.x + ( int )shift.x , point.y + ( int )shift.y ) ;
+	}
 
 	public void mousePressed( MouseEvent _event )
 	{

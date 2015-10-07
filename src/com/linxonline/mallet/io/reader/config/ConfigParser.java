@@ -65,6 +65,9 @@ public class ConfigParser
 
 				var = _src.getString( "TEXTURECOMPRESSION", "true" ) ;
 				_dest.addBoolean( "TEXTURECOMPRESSION", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "CAPTUREMOUSE", "false" ) ;
+				_dest.addBoolean( "CAPTUREMOUSE", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}

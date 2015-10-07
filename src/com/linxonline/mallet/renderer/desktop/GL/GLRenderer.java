@@ -57,7 +57,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 
-	protected static int numID = 0 ;
 	protected static final GLU glu = new GLU() ;
 	protected static GLJPanel canvas = null ;
 	protected JFrame frame = null ;
@@ -734,11 +733,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
-	private static int getUniqueID()
-	{
-		return numID++ ;
-	}
-
 	private static void bindTexture( final GL3 _gl, final int[] _idToBind, final int[] _store )
 	{
 		if( _store[0] != _idToBind[0] )
@@ -884,8 +878,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	public static class GLRenderData extends RenderData
 	{
-		private final int id = getUniqueID() ;
+		private static int numID = 0 ;
 
+		private final int id = getUniqueID() ;
 		private int layer ;
 		private Interpolation interpolation ;
 		private boolean uiElement ;
@@ -918,6 +913,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
 		{
 			super.set( _data, _call, _type ) ;
+			data.addInteger( "ID", getID() ) ;
 			updateData() ;
 		}
 
@@ -1071,6 +1067,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		@Override
 		public void removeResources()
 		{
+			data.remove( "ID" ) ;
 			if( texture != null )
 			{
 				texture.unregister() ;
@@ -1098,7 +1095,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			colour = null ;
 			shape = null ;
 			words = null ;
+			texture = null ;
+			model = null ;
 			super.reset() ;
+		}
+
+		private static int getUniqueID()
+		{
+			return numID++ ;
 		}
 	}
 }

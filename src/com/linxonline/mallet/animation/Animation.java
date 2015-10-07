@@ -227,19 +227,5 @@ public class Animation implements IDInterface, Cacheable
 	public void destroy()
 	{
 		sprite.unregister() ;
-		final Settings settings = event.getVariable() ;		// Render Event
-		final Texture texture = settings.<Texture>getObject( "TEXTURE", null ) ;
-		if( texture != null )
-		{
-			texture.unregister() ;
-			settings.remove( "TEXTURE" ) ;
-		}
-
-		final Model model = settings.<Model>getObject( "MODEL", null ) ;
-		if( model != null )
-		{
-			model.unregister() ;
-			settings.remove( "MODEL" ) ;
-		}
 	}
 }
