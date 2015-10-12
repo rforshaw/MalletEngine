@@ -10,7 +10,7 @@ public class Shape
 	{
 		LINES,				// Requires a start and an end point to be defined for each line
 		LINE_STRIP, 		// Will continue the line from the last point added
-		FILL ; 				// Not yet implemented
+		FILL ; 				// Fill the geometry shape, requires the shape to be defined in polygons, will eventuall be auto generated.
 	}
 
 	public final int[] indicies ;

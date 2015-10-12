@@ -197,6 +197,7 @@ public class GLModelGenerator
 		{
 			case LINES      : geometry.setStyle( GL2.GL_LINES ) ;      break ;
 			case LINE_STRIP : geometry.setStyle( GL2.GL_LINE_STRIP ) ; break ;
+			case FILL       : geometry.setStyle( GL2.GL_TRIANGLES ) ;  break ;
 		}
 
 		final Model model = new Model( geometry ) ;

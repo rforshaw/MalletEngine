@@ -108,7 +108,7 @@ public final class GameTestLoader extends GameLoader
 				lines.addPoint( 200, 0 ) ;
 				lines.addPoint( 200, 10 ) ;
 
-				final MalletColour colour = new MalletColour( 255, 255, 255, 255 ) ;
+				final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
 				lines.addColour( colour ) ;
 				lines.addColour( colour ) ;
 				lines.addColour( colour ) ;
@@ -132,6 +132,29 @@ public final class GameTestLoader extends GameLoader
 																	null,
 																	10,
 																	null ) ) ;
+
+				/*final Shape triangle = new Shape( 7, 3, 3 ) ;
+				triangle.setStyle( Shape.Style.FILL ) ;
+				triangle.addPoint( 0, 0 ) ;
+				triangle.addPoint( 50, 50 ) ;
+				triangle.addPoint( 100, 0 ) ;
+
+				triangle.addColour( colour ) ;
+				triangle.addColour( colour ) ;
+				triangle.addColour( colour ) ;
+
+				triangle.addIndex( 0 ) ;
+				triangle.addIndex( 1 ) ;
+				triangle.addIndex( 2 ) ;
+
+				eventSystem.addEvent( GeometryFactory.createShape( "DRAWLINES",
+																	triangle,
+																	new Vector3( 0.0f, 0.0f, 0.0f ),
+																	null,
+																	null,
+																	null,
+																	10,
+																	null ) ) ;*/
 			}
 
 			/**

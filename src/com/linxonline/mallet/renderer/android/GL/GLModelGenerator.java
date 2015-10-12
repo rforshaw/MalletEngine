@@ -195,8 +195,9 @@ public class GLModelGenerator
 
 		switch( _shape.style )
 		{
-			case LINES      : geometry.setStyle( GLES11.GL_LINES ) ; break ;
+			case LINES      : geometry.setStyle( GLES11.GL_LINES ) ;      break ;
 			case LINE_STRIP : geometry.setStyle( GLES11.GL_LINE_STRIP ) ; break ;
+			case FILL       : geometry.setStyle( GLES11.GL_TRIANGLES ) ;  break ;
 		}
 
 		final Model model = new Model( geometry ) ;
