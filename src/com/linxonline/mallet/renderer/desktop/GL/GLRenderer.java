@@ -202,9 +202,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
+				final Shape shape = _data.getShape() ;
+				if( shape == null )
+				{
+					Logger.println( "GLRenderer - Render Data for non-existent shape: " + _data.getID(), Logger.Verbosity.MINOR ) ;
+					//state.remove( _data.getID() ) ;
+					return ;
+				}
+
 				final Model model = _data.getModel() ;
 				if( model == null )
 				{
+					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
+					//state.remove( _data.getID() ) ;
 					return ;
 				}
 
@@ -890,11 +900,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		// Must be nulled when reclaimed by cache
 		// User data
-		private Vector3 position ;
-		private Vector2 offset ;
-		private MalletColour colour ;
-		private Shape shape ;
-		private String[] words ;
+		private Vector3 position    = null ;
+		private Vector2 offset      = null ;
+		private MalletColour colour = null ;
+		private Shape shape         = null ;
+		private String[] words      = null ;
 
 		private final Vector2 uv1 = new Vector2( UV1 ) ;
 		private final Vector2 uv2 = new Vector2( UV2 ) ;

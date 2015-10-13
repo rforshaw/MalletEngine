@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.input.InputAdapterInterface ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 /**
 	Convenience class to handle Display & Render Dimensions.
@@ -129,6 +130,8 @@ public final class RenderInfo implements InputAdapterInterface
 	public void setDisplayDimensions( final Vector2 _displayDimension )
 	{
 		displayDimensions = _displayDimension ;
+		GlobalConfig.addInteger( "DISPLAYWIDTH", ( int )_displayDimension.x ) ;
+		GlobalConfig.addInteger( "DISPLAYHEIGHT", ( int )_displayDimension.y ) ;
 		updateInfo() ;
 	}
 
@@ -138,6 +141,9 @@ public final class RenderInfo implements InputAdapterInterface
 	public void setRenderDimensions( final Vector2 _renderDimensions )
 	{
 		renderDimensions =_renderDimensions ;
+		GlobalConfig.addInteger( "RENDERWIDTH", ( int )_renderDimensions.x ) ;
+		GlobalConfig.addInteger( "RENDERHEIGHT", ( int )_renderDimensions.y ) ;
+
 		halfRenderDimensions.setXY( renderDimensions.x / 2.0f, renderDimensions.y / 2.0f ) ;
 		updateInfo() ;
 	}
