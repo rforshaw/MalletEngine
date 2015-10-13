@@ -34,6 +34,11 @@ public class MalletColour
 		changeColour( _red, _green, _blue, _alpha ) ;
 	}
 
+	public MalletColour( final MalletColour _colour )
+	{
+		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
+	}
+
 	public void changeColour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
 	{
 		colours[RED]   = _red ;

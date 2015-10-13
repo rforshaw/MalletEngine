@@ -167,8 +167,13 @@ public class GLModelGenerator
 		return model ;
 	}
 
-	public static Model genShapeModel( final Shape _shape )
+	public static Model genShapeModel( Shape _shape )
 	{
+		if( _shape.style == Shape.Style.FILL )
+		{
+			_shape = Shape.triangulate( _shape ) ;
+		}
+
 		final int indexSize = _shape.indicies.length ;
 		final int pointSize = _shape.points.length ;
 
