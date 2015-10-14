@@ -133,26 +133,32 @@ public final class GameTestLoader extends GameLoader
 																	10,
 																	null ) ) ;
 
-				final Shape triangle = new Shape( 4, 4, 4 ) ;
+				final Shape triangle = new Shape( 6, 6, 6 ) ;
 				triangle.setStyle( Shape.Style.FILL ) ;
 				triangle.addPoint( 0, 0 ) ;
-				triangle.addPoint( 0, 50 ) ;
-				triangle.addPoint( 50, 50 ) ;
-				triangle.addPoint( 50, 0 ) ;
+				triangle.addPoint( 10, 50 ) ;
+				triangle.addPoint( 50, 90 ) ;
+				triangle.addPoint( 100, 40 ) ;
+				triangle.addPoint( 110, -20 ) ;
+				triangle.addPoint( 50, -30 ) ;
 
-				triangle.addColour( colour ) ;
-				triangle.addColour( colour ) ;
-				triangle.addColour( colour ) ;
-				triangle.addColour( colour ) ;
+				triangle.addColour( MalletColour.red() ) ;
+				triangle.addColour( MalletColour.blue() ) ;
+				triangle.addColour( MalletColour.green() ) ;
+				triangle.addColour( MalletColour.red() ) ;
+				triangle.addColour( MalletColour.blue() ) ;
+				triangle.addColour( MalletColour.green() ) ;
 
 				triangle.addIndex( 0 ) ;
 				triangle.addIndex( 1 ) ;
 				triangle.addIndex( 2 ) ;
 				triangle.addIndex( 3 ) ;
+				triangle.addIndex( 4 ) ;
+				triangle.addIndex( 5 ) ;
 
 				eventSystem.addEvent( DrawFactory.forceUpdate( GeometryFactory.createShape( "DRAWLINES",
-																	triangle,
-																	new Vector3( 0.0f, 0.0f, 0.0f ),
+																	Shape.triangulate( triangle ),
+																	new Vector3( -200.0f, 0.0f, 0.0f ),
 																	null,
 																	null,
 																	null,
