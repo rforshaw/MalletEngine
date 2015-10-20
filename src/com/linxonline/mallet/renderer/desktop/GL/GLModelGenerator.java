@@ -127,20 +127,10 @@ public class GLModelGenerator
 			return _model ;
 		}
 
-		if( _shape.colours != null )
+		for( int i = 0; i < pointSize; ++i )
 		{
-			for( int i = 0; i < pointSize; ++i )
-			{
-				geometry.updatePosition( i, _shape.points[i] ) ;
-				geometry.updateColour( i, getABGR( _shape.colours[i] ) ) ;
-			}
-		}
-		else
-		{
-			for( int i = 0; i < pointSize; ++i )
-			{
-				geometry.updatePosition( i, _shape.points[i] ) ;
-			}
+			geometry.updatePosition( i, _shape.points[i] ) ;
+			geometry.updateColour( i, getABGR( _shape.colours[i] ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; ++i )
@@ -173,19 +163,9 @@ public class GLModelGenerator
 		final int pointSize = _shape.points.length ;
 
 		final GLGeometry geometry = new GLGeometry( indexSize, pointSize ) ;
-		if( _shape.colours != null )
+		for( int i = 0; i < pointSize; ++i )
 		{
-			for( int i = 0; i < pointSize; ++i )
-			{
-				geometry.addVertex( _shape.points[i], getABGR( _shape.colours[i] ) ) ;
-			}
-		}
-		else
-		{
-			for( int i = 0; i < pointSize; ++i )
-			{
-				geometry.addVertex( _shape.points[i] ) ;
-			}
+			geometry.addVertex( _shape.points[i], getABGR( _shape.colours[i] ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; ++i )

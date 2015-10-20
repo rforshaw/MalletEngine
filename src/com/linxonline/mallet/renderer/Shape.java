@@ -23,18 +23,11 @@ public class Shape
 	private int pointIncrement = 0 ;
 	private int colourIncrement = 0 ;
 
-	public Shape( final int _indexSize, final int _pointSize, final int _colourSize )
-	{
-		indicies = new int[_indexSize] ;
-		points = new Vector3[_pointSize] ;
-		colours = new MalletColour[_colourSize] ;
-	}
-
 	public Shape( final int _indexSize, final int _pointSize )
 	{
 		indicies = new int[_indexSize] ;
 		points = new Vector3[_pointSize] ;
-		colours = null ;
+		colours = new MalletColour[_pointSize] ;
 	}
 
 	public Shape( final Shape _shape )
@@ -57,7 +50,6 @@ public class Shape
 			}
 		}
 
-		if( _shape.colours != null )
 		{
 			final int size = _shape.colours.length ;
 			colours = new MalletColour[size] ;
@@ -65,10 +57,6 @@ public class Shape
 			{
 				colours[i] = new MalletColour( _shape.colours[i] ) ;
 			}
-		}
-		else
-		{
-			colours = null ;
 		}
 
 		setStyle( _shape.style ) ;
@@ -115,6 +103,18 @@ public class Shape
 		}
 	}
 
+	public void addPointAndColour( final float _x, final float _y, final float _z, final MalletColour _colour )
+	{
+		addPoint( _x, _y, _z ) ;
+		addColour( _colour ) ;
+	}
+
+	public void addPointAndColour( final float _x, final float _y, final MalletColour _colour )
+	{
+		addPoint( _x, _y, 0.0f ) ;
+		addColour( _colour ) ;
+	}
+
 	public Vector3 getPoint( final int _index )
 	{
 		return points[_index] ;
@@ -123,6 +123,61 @@ public class Shape
 	public MalletColour getColour( final int _index )
 	{
 		return colours[_index] ;
+	}
+
+	/**
+		Inform the developer whether the Shape 
+		has been correctly populated with data.
+	*/
+	public boolean isComplete()
+	{
+		return indexIncrement == indicies.length &&
+			   pointIncrement == points.length &&
+			   colourIncrement == colours.length ;
+	}
+
+	/**
+		Combine an array of shape objects into 1 shape object.
+		Ensure all the shapes being combined have the same style.
+		This is a convience function to improve rendering performance, 
+		instead of multiple draw calls per shape.
+		Constructing multiple shapes and then combining them is slow 
+		and memory intensive.
+	*/
+	public Shape combine( final Shape ... _shapes )
+	{
+		int totalIndicies = 0 ;
+		int totalPoints = 0 ;
+
+		for( int i = 0; i < _shapes.length; i++ )
+		{
+			totalIndicies += _shapes[i].indicies.length ;
+			totalPoints += _shapes[i].points.length ;
+		}
+
+		final Shape combined = new Shape( totalIndicies, totalPoints ) ;
+		combined.setStyle( _shapes[0].style ) ;
+		int indexOffset = 0 ;
+
+		for( int i = 0; i < _shapes.length; i++ )
+		{
+			final Shape shape = _shapes[i] ;
+			for( int j = 0; j < shape.indicies.length; j++ )
+			{
+				combined.addIndex( indexOffset + shape.indicies[j] ) ;
+			}
+
+			for( int j = 0; j < shape.points.length; j++ )
+			{
+				final Vector3 p = shape.points[j] ;
+				combined.addPoint( p.x, p.y, p.z ) ;
+				combined.addColour( shape.colours[j] ) ;
+			}
+
+			indexOffset += shape.indicies.length ;
+		}
+
+		return combined ;
 	}
 
 	/**

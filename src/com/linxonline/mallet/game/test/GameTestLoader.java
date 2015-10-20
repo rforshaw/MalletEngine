@@ -100,21 +100,14 @@ public final class GameTestLoader extends GameLoader
 																	10,
 																	null ), true ) ) ;									// layer
 
-				final Shape lines = new Shape( 7, 6, 6 ) ;
-				lines.addPoint( 0, 10 ) ;
-				lines.addPoint( 0, 0 ) ;
-				lines.addPoint( 100, 0 ) ;
-				lines.addPoint( 100, 5 ) ;
-				lines.addPoint( 200, 0 ) ;
-				lines.addPoint( 200, 10 ) ;
-
 				final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
-				lines.addColour( colour ) ;
-				lines.addColour( colour ) ;
-				lines.addColour( colour ) ;
-				lines.addColour( colour ) ;
-				lines.addColour( colour ) ;
-				lines.addColour( colour ) ;
+				final Shape lines = new Shape( 7, 6 ) ;
+				lines.addPointAndColour( 0, 10, colour ) ;
+				lines.addPointAndColour( 0, 0, colour ) ;
+				lines.addPointAndColour( 100, 0, colour ) ;
+				lines.addPointAndColour( 100, 5, colour ) ;
+				lines.addPointAndColour( 200, 0, colour ) ;
+				lines.addPointAndColour( 200, 10, colour ) ;
 
 				lines.addIndex( 0 ) ;
 				lines.addIndex( 1 ) ;
@@ -133,21 +126,14 @@ public final class GameTestLoader extends GameLoader
 																	10,
 																	null ) ) ;
 
-				final Shape triangle = new Shape( 6, 6, 6 ) ;
+				final Shape triangle = new Shape( 6, 6 ) ;
 				triangle.setStyle( Shape.Style.FILL ) ;
-				triangle.addPoint( 0, 0 ) ;
-				triangle.addPoint( 10, 50 ) ;
-				triangle.addPoint( 50, 90 ) ;
-				triangle.addPoint( 100, 40 ) ;
-				triangle.addPoint( 110, -20 ) ;
-				triangle.addPoint( 50, -30 ) ;
-
-				triangle.addColour( MalletColour.red() ) ;
-				triangle.addColour( MalletColour.blue() ) ;
-				triangle.addColour( MalletColour.green() ) ;
-				triangle.addColour( MalletColour.red() ) ;
-				triangle.addColour( MalletColour.blue() ) ;
-				triangle.addColour( MalletColour.green() ) ;
+				triangle.addPointAndColour( 0, 0,     MalletColour.red() ) ;
+				triangle.addPointAndColour( 10, 50,   MalletColour.blue() ) ;
+				triangle.addPointAndColour( 50, 90,   MalletColour.green() ) ;
+				triangle.addPointAndColour( 100, 40,  MalletColour.red() ) ;
+				triangle.addPointAndColour( 110, -20, MalletColour.blue() ) ;
+				triangle.addPointAndColour( 50, -30,  MalletColour.green() ) ;
 
 				triangle.addIndex( 0 ) ;
 				triangle.addIndex( 1 ) ;
