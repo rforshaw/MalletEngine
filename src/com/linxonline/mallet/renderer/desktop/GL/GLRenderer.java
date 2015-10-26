@@ -335,7 +335,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
 				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
 				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -369,19 +369,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
 					GLModelManager.updateVBO( gl, geometry ) ;
 
-					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,         4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					gl.glDrawElements( GL3.GL_TRIANGLES, geometry.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 				gl.glUseProgram( 0 ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
@@ -446,7 +446,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
 				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
+				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
 				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
@@ -472,10 +472,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,         4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
+					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
 
 					if( _data.toUpdate() == true )
 					{
@@ -491,10 +491,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
+				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
 
 				gl.glUseProgram( 0 ) ;
 				gl.glDisable( GL.GL_BLEND ) ;

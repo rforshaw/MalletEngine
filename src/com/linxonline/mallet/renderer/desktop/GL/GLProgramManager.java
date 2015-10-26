@@ -12,12 +12,15 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class GLProgramManager extends AbstractManager<GLProgram>
 {
-	public static final int MVP_MATRIX = 0 ;
-	public static final int POSITION_MATRIX = 1 ;
-	public static final int VERTEX_ARRAY = 2 ;
-	public static final int COLOUR_ARRAY = 3 ;
-	public static final int TEXTURE_COORD_ARRAY = 4 ;
-	public static final int NORMAL_ARRAY = 5 ;
+	public static final int MVP_MATRIX           = 0 ;
+	public static final int POSITION_MATRIX      = 1 ;
+	public static final int VERTEX_ARRAY         = 2 ;
+	public static final int COLOUR_ARRAY         = 3 ;
+	public static final int NORMAL_ARRAY         = 4 ;
+	public static final int TEXTURE_COORD_ARRAY0 = 5 ;
+	public static final int TEXTURE_COORD_ARRAY1 = 6 ;
+	public static final int TEXTURE_COORD_ARRAY2 = 7 ;
+	public static final int TEXTURE_COORD_ARRAY3 = 8 ;
 
 	public GLProgramManager()
 	{
@@ -126,9 +129,9 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		//_gl.glBindUniformLocation( _program.id[0], POSITION_MATRIX, "inPositionMatrix" ) ;
 		_gl.glBindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
 		_gl.glBindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
-		_gl.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY, "inTexCoord" ) ;
-		_gl.glBindAttribLocation( _program.id[0], NORMAL_ARRAY,"inNormal" ) ;
-		
+		_gl.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord0" ) ;
+		_gl.glBindAttribLocation( _program.id[0], NORMAL_ARRAY, "inNormal" ) ;
+
 		_gl.glLinkProgram( _program.id[0] ) ;
 
 		// Once all of the shaders have been compiled 

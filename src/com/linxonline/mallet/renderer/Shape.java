@@ -13,116 +13,175 @@ public class Shape
 		FILL ; 				// Fill the geometry shape, requires the shape to be defined in polygons, will eventuall be auto generated.
 	}
 
+	public enum Swivel
+	{
+		POINT,
+		COLOUR,
+		UV ;
+		
+		public static int getSwivelPointIndex( final Swivel[] _swivel )
+		{
+			for( int i = 0; i < _swivel.length; i++ )
+			{
+				if( _swivel[i] == Swivel.POINT )
+				{
+					return i ;
+				}
+			}
+
+			return -1 ;
+		}
+	}
+
+	private final Swivel[] swivel ;
+	private final Object[] verticies ;
 	public final int[] indicies ;
-	public final Vector3[] points ;
-	public final MalletColour[] colours ;
 
 	public Style style = Style.LINE_STRIP ;
 
+	private int vertexSize = 0 ;
 	private int indexIncrement = 0 ;
-	private int pointIncrement = 0 ;
-	private int colourIncrement = 0 ;
+	private int vertexIncrement = 0 ;
 
-	public Shape( final int _indexSize, final int _pointSize )
+	public Shape( final int _indexSize,
+				  final int _pointSize )
 	{
-		indicies = new int[_indexSize] ;
-		points = new Vector3[_pointSize] ;
-		colours = new MalletColour[_pointSize] ;
+		this( Style.LINE_STRIP, _indexSize, _pointSize ) ;
+	}
+
+	public Shape( final Style _style,
+				  final int _indexSize,
+				  final int _pointSize )
+	{
+		swivel = new Swivel[2] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+
+		verticies   = new Object[swivel.length * _pointSize] ;
+		indicies    = new int[_indexSize] ;
+
+		style       = _style ;
+		vertexSize  = _pointSize ; 
+	}
+
+	public Shape( final Style _style,
+				  final Swivel[] _swivel,
+				  final int _indexSize,
+				  final int _pointSize )
+	{
+		swivel = _swivel ;
+		verticies   = new Object[swivel.length * _pointSize] ;
+		indicies    = new int[_indexSize] ;
+
+		style       = _style ;
+		vertexSize  = _pointSize ;
 	}
 
 	public Shape( final Shape _shape )
 	{
+		swivel = new Swivel[_shape.swivel.length] ;
+		verticies   = new Object[_shape.verticies.length] ;
+		indicies    = new int[_shape.indicies.length] ;
+		style       = _shape.style ;
+
+		indexIncrement  = _shape.indexIncrement ;
+		vertexIncrement = _shape.vertexIncrement ;
+		vertexSize      = _shape.vertexSize ;
+
+		for( int i = 0; i < swivel.length; i++ )
 		{
-			final int size = _shape.indicies.length ;
-			indicies = new int[size] ;
-			for( int i = 0; i < size; i++ )
-			{
-				indicies[i] = _shape.indicies[i] ;
-			}
+			swivel[i] = _shape.swivel[i] ;
 		}
 
+		for( int i = 0; i < indicies.length; i++ )
 		{
-			final int size = _shape.points.length ;
-			points = new Vector3[size] ;
-			for( int i = 0; i < size; i++ )
-			{
-				points[i] = new Vector3( _shape.points[i] ) ;
-			}
+			indicies[i] = _shape.indicies[i] ;
 		}
 
+		for( int i = 0; i < verticies.length; i++ )
 		{
-			final int size = _shape.colours.length ;
-			colours = new MalletColour[size] ;
-			for( int i = 0; i < size; i++ )
+			final Object obj = _shape.verticies[i] ;
+			if( obj instanceof Vector3 )
 			{
-				colours[i] = new MalletColour( _shape.colours[i] ) ;
+				verticies[i] = new Vector3( ( Vector3 )_shape.verticies[i] ) ;
+			}
+			else if( obj instanceof Vector2 )
+			{
+				verticies[i] = new Vector2( ( Vector2 )_shape.verticies[i] ) ;
+			}
+			else if( obj instanceof MalletColour )
+			{
+				verticies[i] = new MalletColour( ( MalletColour )_shape.verticies[i] ) ;
 			}
 		}
-
-		setStyle( _shape.style ) ;
 	}
 
-	private Shape( final int[] _indicies, final Vector3[] _points, final MalletColour[] _colours )
+	private Shape( final Swivel[] _swivel,
+				   final Object[] _verticies,
+				   final int[] _indicies,
+				   final Style _style,
+				   final int _vertexSize )
 	{
-		indicies = _indicies ;
-		points = _points ;
-		colours = _colours ;
-	}
+		swivel      = _swivel ;
+		verticies   = _verticies ;
+		indicies    = _indicies ;
+		style       = _style ;
 
-	public void setStyle( final Style _style )
-	{
-		style = _style ;
+		//indexIncrement = _shape.indexIncrement ;
+		//vertexIncrement = _shape.vertexIncrement ;
+		vertexSize = _vertexSize ;
 	}
 
 	public void addIndex( final int _index )
 	{
-		if( indexIncrement < indicies.length )
+		indicies[indexIncrement++] = _index ;
+	}
+
+	public void addVertex( final Object[] _vertex )
+	{
+		for( int i = 0; i < _vertex.length; i++ )
 		{
-			indicies[indexIncrement++] = _index ;
+			verticies[vertexIncrement++] = _vertex[i] ;
 		}
 	}
 
-	public void addPoint( final float _x, final float _y )
+	public boolean getVertex( final Object[] _vertex, final int _index )
 	{
-		this.addPoint( _x, _y, 0.0f ) ;
-	}
-
-	public void addPoint( final float _x, final float _y, final float _z )
-	{
-		if( pointIncrement < points.length )
+		if( _vertex.length != swivel.length )
 		{
-			points[pointIncrement++] = new Vector3( _x, _y, _z ) ;
+			return false ;
 		}
-	}
 
-	public void addColour( final MalletColour _colour )
-	{
-		if( colourIncrement < colours.length )
+		int start = _index * swivel.length ;
+		for( int i = 0; i < _vertex.length; i++ )
 		{
-			colours[colourIncrement++] = _colour ;
+			_vertex[i] = verticies[start++] ;
 		}
+
+		return true ;
 	}
 
-	public void addPointAndColour( final float _x, final float _y, final float _z, final MalletColour _colour )
+	public Vector3 getPoint( final int _index, final int _swivelIndex )
 	{
-		addPoint( _x, _y, _z ) ;
-		addColour( _colour ) ;
+		final int index = ( _index * swivel.length ) + _swivelIndex ;
+		return ( Vector3 )verticies[index] ;
 	}
 
-	public void addPointAndColour( final float _x, final float _y, final MalletColour _colour )
+	public Vector2 getUV( final int _index, final int _swivelIndex )
 	{
-		addPoint( _x, _y, 0.0f ) ;
-		addColour( _colour ) ;
+		final int index = ( _index * swivel.length ) + _swivelIndex ;
+		return ( Vector2 )verticies[index] ;
 	}
 
-	public Vector3 getPoint( final int _index )
+	public MalletColour getColour( final int _index, final int _swivelIndex )
 	{
-		return points[_index] ;
+		final int index = ( _index * swivel.length ) + _swivelIndex ;
+		return ( MalletColour )verticies[index] ;
 	}
 
-	public MalletColour getColour( final int _index )
+	public int getVertexSize()
 	{
-		return colours[_index] ;
+		return vertexSize ;
 	}
 
 	/**
@@ -132,8 +191,52 @@ public class Shape
 	public boolean isComplete()
 	{
 		return indexIncrement == indicies.length &&
-			   pointIncrement == points.length &&
-			   colourIncrement == colours.length ;
+			   vertexIncrement == verticies.length ;
+	}
+
+	public static Object[] construct( final float _x, final float _y, final float _z, final MalletColour _colour )
+	{
+		final Object[] swivel = new Object[2] ;
+		swivel[0] = new Vector3( _x, _y, _z ) ;
+		swivel[1] = new MalletColour( _colour ) ;
+
+		return swivel ;
+	}
+	
+	public static boolean isCorrectSwivel( final Swivel[] _swivel, final Object[] _object )
+	{
+		for( int i = 0; i < _swivel.length; i++ )
+		{
+			switch( _swivel[i] )
+			{
+				case POINT  :
+				{
+					if( ( _object[i] instanceof Vector3 ) == false )
+					{
+						return false ;
+					}
+					break ;
+				}
+				case COLOUR :
+				{
+					if( ( _object[i] instanceof MalletColour ) == false )
+					{
+						return false ;
+					}
+					break ;
+				}
+				case UV     :
+				{
+					if( ( _object[i] instanceof Vector2 ) == false )
+					{
+						return false ;
+					}
+					break ;
+				}
+			}
+		}
+
+		return true ;
 	}
 
 	/**
@@ -152,11 +255,10 @@ public class Shape
 		for( int i = 0; i < _shapes.length; i++ )
 		{
 			totalIndicies += _shapes[i].indicies.length ;
-			totalPoints += _shapes[i].points.length ;
+			totalPoints += _shapes[i].getVertexSize() ;
 		}
 
-		final Shape combined = new Shape( totalIndicies, totalPoints ) ;
-		combined.setStyle( _shapes[0].style ) ;
+		final Shape combined = new Shape( _shapes[0].style, totalIndicies, totalPoints ) ;
 		int indexOffset = 0 ;
 
 		for( int i = 0; i < _shapes.length; i++ )
@@ -167,14 +269,16 @@ public class Shape
 				combined.addIndex( indexOffset + shape.indicies[j] ) ;
 			}
 
-			for( int j = 0; j < shape.points.length; j++ )
+			final Object[] vertex = new Object[_shapes[0].swivel.length] ;
+			final int size = shape.getVertexSize() ;
+
+			for( int j = 0; j < size; j++ )
 			{
-				final Vector3 p = shape.points[j] ;
-				combined.addPoint( p.x, p.y, p.z ) ;
-				combined.addColour( shape.colours[j] ) ;
+				shape.getVertex( vertex, j ) ;
+				combined.addVertex( vertex ) ;
 			}
 
-			indexOffset += shape.indicies.length ;
+			indexOffset += size ;
 		}
 
 		return combined ;
@@ -188,7 +292,11 @@ public class Shape
 	{
 		if( _shape.indicies.length <= 3 )
 		{
-			return new Shape( _shape.indicies, _shape.points, _shape.colours ) ;
+			return new Shape( _shape.swivel,
+							  _shape.verticies,
+							  _shape.indicies,
+							  _shape.style,
+							  _shape.getVertexSize() ) ;
 		}
 
 		final ArrayList<Integer> tempIndicies = constructTriangulatedIndex( _shape ) ;
@@ -198,8 +306,11 @@ public class Shape
 			indicies[i] = tempIndicies.get( i ) ;
 		}
 
-		final Shape triangulated = new Shape( indicies, _shape.points, _shape.colours ) ;
-		triangulated.setStyle( _shape.style ) ;
+		final Shape triangulated = new Shape( _shape.swivel,
+											  _shape.verticies,
+											  indicies,
+											  _shape.style,
+											  _shape.getVertexSize() ) ;
 		return triangulated ;
 	}
 
@@ -217,6 +328,7 @@ public class Shape
 		}
 
 		final ArrayList<Integer> newIndicies = new ArrayList<Integer>() ;
+		final int swivelPointIndex = Swivel.getSwivelPointIndex( _shape.swivel ) ;
 		int size = indicies.size() ;
 
 		while( size >= 3 )
@@ -227,12 +339,12 @@ public class Shape
 				final int currentIndex = indicies.get( i ) ;
 				final int nextIndex = indicies.get( i + 1 ) ;
 
-				final Vector3 previous = _shape.getPoint( previousIndex ) ;
-				final Vector3 current = _shape.getPoint( currentIndex ) ;
-				final Vector3 next = _shape.getPoint( nextIndex ) ;
+				final Vector3 previous = _shape.getPoint( previousIndex, swivelPointIndex ) ;
+				final Vector3 current = _shape.getPoint( currentIndex, swivelPointIndex ) ;
+				final Vector3 next = _shape.getPoint( nextIndex, swivelPointIndex ) ;
 
 				if( isInteriorVertex( current, previous, next ) == true &&
-					isTriangleEmpty( current, previous, next, indicies, _shape.points ) == true )
+					isTriangleEmpty( current, previous, next, indicies, _shape ) == true )
 				{
 					newIndicies.add( previousIndex ) ;
 					newIndicies.add( currentIndex ) ;
@@ -260,12 +372,14 @@ public class Shape
 											final Vector3 _previous,
 											final Vector3 _next,
 											final ArrayList<Integer> _indicies,
-											final Vector3[] _points )
+											final Shape _shape )
 	{
+		final int swivelPointIndex = Swivel.getSwivelPointIndex( _shape.swivel ) ;
 		final int size = _indicies.size() ; 
+
 		for( int i = 0; i < size; i++ )
 		{
-			final Vector3 point = _points[_indicies.get( i )] ;
+			final Vector3 point = _shape.getPoint( _indicies.get( i ), swivelPointIndex ) ;
 			if( point != _current && point != _previous && point != _next )
 			{
 				final boolean b1 = sign( point, _current, _previous ) < 0.0f ;

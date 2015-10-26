@@ -118,19 +118,21 @@ public class GLModelGenerator
 	public static Model updateShapeModel( final Model _model, final Shape _shape )
 	{
 		final int indexSize = _shape.indicies.length ;
-		final int pointSize = _shape.points.length ;
+		final int vertexSize = _shape.getVertexSize() ;
 
 		final GLGeometry geometry = _model.getGeometry( GLGeometry.class ) ;
 		if( indexSize >= geometry.getIndexSize() ||
-			pointSize >= geometry.getVertexSize() )
+			vertexSize >= geometry.getVertexSize() )
 		{
 			return _model ;
 		}
 
-		for( int i = 0; i < pointSize; ++i )
+		final Object[] vertex = new Object[2] ;
+
+		for( int i = 0; i < vertexSize; ++i )
 		{
-			geometry.updatePosition( i, _shape.points[i] ) ;
-			geometry.updateColour( i, getABGR( _shape.colours[i] ) ) ;
+			geometry.updatePosition( i, _shape.getPoint( i, 0 ) ) ;
+			geometry.updateColour( i, getABGR( _shape.getColour( i, 1 ) ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; ++i )
@@ -160,12 +162,12 @@ public class GLModelGenerator
 	public static Model genShapeModel( Shape _shape )
 	{
 		final int indexSize = _shape.indicies.length ;
-		final int pointSize = _shape.points.length ;
+		final int vertexSize = _shape.getVertexSize() ;
 
-		final GLGeometry geometry = new GLGeometry( indexSize, pointSize ) ;
-		for( int i = 0; i < pointSize; ++i )
+		final GLGeometry geometry = new GLGeometry( indexSize, vertexSize ) ;
+		for( int i = 0; i < vertexSize; ++i )
 		{
-			geometry.addVertex( _shape.points[i], getABGR( _shape.colours[i] ) ) ;
+			geometry.addVertex( _shape.getPoint( i, 0 ), getABGR( _shape.getColour( i, 1 ) ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; ++i )
