@@ -89,14 +89,11 @@ public final class GameTestLoader extends GameLoader
 				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 				final int width = texture.getWidth() ;
 				final int height = texture.getHeight() ;
-				
+
 				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( texture, 		// Texture Location
+																	Shape.constructPlane( new Vector3(), new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ),
 																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position
 																	new Vector2( -( width / 2 ), -( height / 2 ) ), 	// Offset
-																	new Vector2( width, height ),						// Dimension, how large - scaled
-																	null,												// fill, texture repeat
-																	new Vector2(),										// clip
-																	new Vector2( 1, 1 ),								// clip offset
 																	10,
 																	null ), true ) ) ;									// layer
 
@@ -117,11 +114,8 @@ public final class GameTestLoader extends GameLoader
 				lines.addIndex( 4 ) ;
 				lines.addIndex( 5 ) ;
 
-				eventSystem.addEvent( GeometryFactory.createShape( "DRAWLINES",
-																	lines,
+				eventSystem.addEvent( GeometryFactory.createShape( lines,
 																	new Vector3( -100.0f, 50.0f, 0.0f ),
-																	null,
-																	null,
 																	null,
 																	10,
 																	null ) ) ;
@@ -141,11 +135,8 @@ public final class GameTestLoader extends GameLoader
 				triangle.addIndex( 4 ) ;
 				triangle.addIndex( 5 ) ;
 
-				eventSystem.addEvent( DrawFactory.forceUpdate( GeometryFactory.createShape( "DRAWLINES",
-																	Shape.triangulate( triangle ),
+				eventSystem.addEvent( DrawFactory.forceUpdate( GeometryFactory.createShape( Shape.triangulate( triangle ),
 																	new Vector3( -200.0f, 0.0f, 0.0f ),
-																	null,
-																	null,
 																	null,
 																	10,
 																	null ) ) ) ;

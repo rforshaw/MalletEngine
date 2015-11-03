@@ -18,6 +18,7 @@ import java.awt.Canvas ;
 import java.awt.AlphaComposite ;
 
 import com.linxonline.mallet.resources.model.Model ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -73,7 +74,6 @@ public class GLFontGenerator
 		final Glyph[] glyphs = new GLGlyph[length] ;
 		final int geometryHeight = geometryMetrics.getHeight() ;
 
-		final GLGeometry geometry = new GLGeometry( 0, 4 * length ) ;
 		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
 		if( gl == null )
 		{
@@ -81,7 +81,9 @@ public class GLFontGenerator
 			return null ;
 		}
 
+		final Shape[] shapes = new Shape[length] ;
 		int j = 0 ;
+
 		for( int i = 0; i < length; i++ )
 		{
 			c[0] = _charsToMap.charAt( i ) ;
@@ -91,7 +93,7 @@ public class GLFontGenerator
 			gTex2D.drawChars( c, 0, 1, textureStart, ( int )textureDim.position.y ) ;
 
 			final int geometryAdvance = geometryMetrics.charWidth( c[0] ) ;
-			final Vector2 maxPoint = new Vector2( geometryAdvance, geometryHeight ) ;
+			final Vector3 maxPoint = new Vector3( geometryAdvance, geometryHeight, 0.0f ) ;
 
 			final int textureAdvance = textureMetrics.charWidth( c[0] ) ;
 			final Vector2 uv1 = new Vector2( ( float )textureStart * point, 0.0f ) ;
@@ -99,24 +101,19 @@ public class GLFontGenerator
 
 			// Must be destroyed manually destroyed, as not added to the 
 			// ModelManager automatically.
-			// Glyp geometry as located in a massive pool, stored in font map.
-			geometry.addVertex( new Vector3( 0, 0, 0 ),
-								new Vector2( uv1.x, uv1.y ) ) ;		// 0
-			geometry.addVertex( new Vector3( maxPoint.x, 0, 0 ),
-								new Vector2( uv2.x, uv1.y ) ) ;		// 1
-			geometry.addVertex( new Vector3( 0, maxPoint.y, 0 ),
-								new Vector2( uv1.x, uv2.y ) ) ;		// 2
-			geometry.addVertex( new Vector3( maxPoint.x, maxPoint.y, 0 ),
-								new Vector2( uv2.x, uv2.y ) ) ;		// 3
+			// Glyph geometry as located in a massive pool, stored in font map.
+			shapes[i] = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
+
+			final int[] index = new int[6] ;
+			index[0] = j + 0 ;
+			index[1] = j + 2 ;
+			index[2] = j + 1 ;
+			index[3] = j + 0 ;
+			index[4] = j + 1 ;
+			index[5] = j + 3 ;
 
 			// Glyph index buffer is stored within the glyph.
-			final GLGeometry indexGeom = new GLGeometry( 6, 0 ) ;
-			indexGeom.addIndices( j + 0 ) ;
-			indexGeom.addIndices( j + 2 ) ;
-			indexGeom.addIndices( j + 3 ) ;
-			indexGeom.addIndices( j + 0 ) ;
-			indexGeom.addIndices( j + 3 ) ;
-			indexGeom.addIndices( j + 1 ) ;
+			final GLGeometry indexGeom = GLGeometry.constructIndex( index ) ;
 
 			GLModelManager.bindIndex( gl, indexGeom ) ;
 			glyphs[i] = new GLGlyph( indexGeom, c[0], 0, geometryAdvance ) ;
@@ -125,22 +122,25 @@ public class GLFontGenerator
 			increment += textureAdvance ;
 		}
 
+		final Shape combined = Shape.combine( shapes ) ;
+		final GLGeometry geometry = GLGeometry.construct( combined ) ;
+
 		final Model model = new Model( geometry ) ;
 		GLModelManager.bindVBO( gl, geometry ) ;
 
-		try
+		/*try
 		{
 			final File outputfile = new File( "saved.png" ) ;
 			ImageIO.write( textureBuffer, "png", outputfile ) ;
 		}
-		catch (IOException e) {}
+		catch (IOException e) {}*/
 
 		// Create a GLFontMap and wrap it around a FontMap
 		// buffer is not automatically destroyed by TextureManager,
 		// must be manually destroyed.
 		return new GLFontMap( new FontMap( glyphs, 
 										   manager.bind( textureBuffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
-										   geometryHeight ), model ) ;
+										   geometryHeight ), model, combined ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )

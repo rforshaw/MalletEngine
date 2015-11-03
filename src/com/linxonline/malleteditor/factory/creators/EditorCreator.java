@@ -33,7 +33,7 @@ public class EditorCreator extends Creator<Entity, Settings>
 		final String imagePath = _image.getString( "IMAGE", null ) ;
 		if( imagePath != null )
 		{
-			render.add( DrawFactory.createTexture( imagePath,
+			/*render.add( DrawFactory.createTexture( imagePath,
 													entity.position,
 													_image.<Vector2>getObject( "OFFSET", null ),
 													_image.<Vector2>getObject( "DIM", null ),
@@ -41,7 +41,7 @@ public class EditorCreator extends Creator<Entity, Settings>
 													null,		// Clip View 
 													null,		// Clip Offset
 													_image.getInteger( "LAYER", 0 ),
-													render ) ) ;
+													render ) ) ;*/
 		}
 
 		entity.addComponent( render ) ;

@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
+import java.util.ArrayList ;
+
 import android.graphics.Typeface ;
 import android.graphics.Bitmap.Config ;
 import android.graphics.Canvas ;
@@ -11,6 +13,7 @@ import android.graphics.Color ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.model.Model ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -54,6 +57,7 @@ public class GLFontGenerator
 			final float advance = paint.measureText( c, 0, 1 ) ;
 
 			glyphs[i] = new GLGlyph( c[0], start, advance ) ;
+			//System.out.println( "Index: " + i + " Glyph: " + glyphs[i] ) ;
 			increment += advance ;
 		}
 
@@ -89,12 +93,15 @@ public class GLFontGenerator
 		final char[] c = new char[1] ;
 		final double point = 1.0f / width ;
 		final float ascent = Math.abs( paint.ascent() ) ;
-		final GLGeometry glyphGeometry = new GLGeometry( 0, 4 * length ) ;
 
+		//final Shape[] shapes = new Shape[length] ;
+		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
 		int j = 0 ;
+
 		for( int i = 0; i < length; i++ )
 		{
 			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;
+			//System.out.println( "Index: " + i + " Glyph: " + glyph ) ;
 			if( glyph != null )
 			{
 				c[0] = glyph.character ;
@@ -105,27 +112,22 @@ public class GLFontGenerator
 				final float x1 = ( float )( start * point ) ;
 				final float x2 = ( float )( ( start + advance ) * point ) ;
 
-				final Vector2 maxPoint = new Vector2( advance, height ) ;
+				final Vector3 maxPoint = new Vector3( advance, height, 0.0f ) ;
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
 				// Glyp geometry as located in a massive pool, stored in font map.
-				glyphGeometry.addVertex( new Vector3( 0, 0, 0 ),
-										 new Vector2( uv1.x, uv1.y ) ) ;		// 0
-				glyphGeometry.addVertex( new Vector3( maxPoint.x, 0, 0 ),
-										 new Vector2( uv2.x, uv1.y ) ) ;		// 1
-				glyphGeometry.addVertex( new Vector3( 0, maxPoint.y, 0 ),
-										 new Vector2( uv1.x, uv2.y ) ) ;		// 2
-				glyphGeometry.addVertex( new Vector3( maxPoint.x, maxPoint.y, 0 ),
-										 new Vector2( uv2.x, uv2.y ) ) ;		// 3
+				shapes.add( Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ) ;
 
-				final GLGeometry glyphIndex = new GLGeometry( 6, 0 ) ;
-				glyphIndex.addIndices( j + 0 ) ;
-				glyphIndex.addIndices( j + 2 ) ;
-				glyphIndex.addIndices( j + 3 ) ;
-				glyphIndex.addIndices( j + 0 ) ;
-				glyphIndex.addIndices( j + 3 ) ;
-				glyphIndex.addIndices( j + 1 ) ;
+				final int[] index = new int[6] ;
+				index[0] = j + 0 ;
+				index[1] = j + 2 ;
+				index[2] = j + 1 ;
+				index[3] = j + 0 ;
+				index[4] = j + 1 ;
+				index[5] = j + 3 ;
+
+				final GLGeometry glyphIndex = GLGeometry.constructIndex( index ) ;
 
 				GLModelManager.bindIndex( glyphIndex ) ;
 				glyph.setIndex( glyphIndex ) ;
@@ -137,8 +139,12 @@ public class GLFontGenerator
 		_map.fontMap.setTexture( manager.bind( bitmap ) ) ;
 		bitmap.recycle() ;
 
+		final Shape[] array = new Shape[shapes.size()] ;
+		final Shape combined = Shape.combine( shapes.toArray( array ) ) ;
+		final GLGeometry glyphGeometry = GLGeometry.construct( combined ) ;
+
 		GLModelManager.bindVBO( glyphGeometry ) ;
-		_map.setModel( new Model( glyphGeometry ) ) ;
+		_map.setModel( new Model( glyphGeometry ), combined ) ;
 
 		return _map ;
 	}

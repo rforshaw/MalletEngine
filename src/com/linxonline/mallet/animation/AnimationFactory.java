@@ -5,6 +5,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;
 
@@ -34,13 +35,11 @@ public final class AnimationFactory
 			settings.addString( "ANIM_FILE", _file ) ;
 		}
 
+		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
+																		plane,
 																	   _pos,
 																	   _offset,
-																	   _dim,
-																	   _fill, 
-																	   _clip,
-																	   _clipOffset,
 																	   _layer,
 																	   null ) ) ;
 

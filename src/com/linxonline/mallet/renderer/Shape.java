@@ -17,7 +17,8 @@ public class Shape
 	{
 		POINT,
 		COLOUR,
-		UV ;
+		UV,
+		NORMAL ;
 		
 		public static int getSwivelPointIndex( final Swivel[] _swivel )
 		{
@@ -179,6 +180,17 @@ public class Shape
 		return ( MalletColour )verticies[index] ;
 	}
 
+	public Vector3 getNormal( final int _index, final int _swivelIndex )
+	{
+		final int index = ( _index * swivel.length ) + _swivelIndex ;
+		return ( Vector3 )verticies[index] ;
+	}
+
+	public Swivel[] getSwivel()
+	{
+		return swivel ;
+	}
+
 	public int getVertexSize()
 	{
 		return vertexSize ;
@@ -233,10 +245,57 @@ public class Shape
 					}
 					break ;
 				}
+				case NORMAL  :
+				{
+					if( ( _object[i] instanceof Vector3 ) == false )
+					{
+						return false ;
+					}
+					break ;
+				}
 			}
 		}
 
 		return true ;
+	}
+
+	public static Shape constructPlane( final Vector3 _min,
+										final Vector3 _max,
+										final Vector2 _minUV,
+										final Vector2 _maxUV )
+	{
+		final Swivel[] swivel = new Swivel[3] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+		swivel[2] = Swivel.UV ;
+
+		final MalletColour white = MalletColour.white() ;
+		
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
+		plane.addVertex( new Object[] { new Vector3( _min ), white, new Vector2( _minUV ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( _max ), white, new Vector2( _maxUV ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( _min.x, _max.y, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( _max.x, _min.y, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;
+
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 2 ) ;
+		plane.addIndex( 1 ) ;
+		
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 1 ) ;
+		plane.addIndex( 3 ) ;
+
+		return plane ;
+	}
+
+	public static Shape updatePlaneUV( final Shape _plane, final Vector2 _minUV, final Vector2 _maxUV )
+	{
+		_plane.getUV( 0, 2 ).setXY( _minUV ) ;
+		_plane.getUV( 1, 2 ).setXY( _maxUV ) ;
+		_plane.getUV( 2, 2 ).setXY( _minUV.x, _maxUV.y ) ;
+		_plane.getUV( 3, 2 ).setXY( _maxUV.x, _minUV.y ) ;
+
+		return _plane ;
 	}
 
 	/**
@@ -247,7 +306,7 @@ public class Shape
 		Constructing multiple shapes and then combining them is slow 
 		and memory intensive.
 	*/
-	public Shape combine( final Shape ... _shapes )
+	public static Shape combine( final Shape ... _shapes )
 	{
 		int totalIndicies = 0 ;
 		int totalPoints = 0 ;
@@ -258,7 +317,7 @@ public class Shape
 			totalPoints += _shapes[i].getVertexSize() ;
 		}
 
-		final Shape combined = new Shape( _shapes[0].style, totalIndicies, totalPoints ) ;
+		final Shape combined = new Shape( _shapes[0].style, _shapes[0].swivel, totalIndicies, totalPoints ) ;
 		int indexOffset = 0 ;
 
 		for( int i = 0; i < _shapes.length; i++ )

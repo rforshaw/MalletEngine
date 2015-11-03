@@ -53,14 +53,14 @@ public class GLModelManager extends AbstractManager<Model>
 		_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, vboID ) ;
 		_geometry.vboID = vboID ;
 
-		_gl.glBufferData( GL3.GL_ARRAY_BUFFER, getBufferLength( _geometry ), _geometry.getVertexBuffer(), GL3.GL_DYNAMIC_DRAW ) ;
+		_gl.glBufferData( GL3.GL_ARRAY_BUFFER, _geometry.getVertexLengthInBytes(), _geometry.getVertexBuffer(), GL3.GL_DYNAMIC_DRAW ) ;
 	}
 
 	public static void updateVBO( final GL3 _gl, final GLGeometry _geometry )
 	{
 		_gl.glBufferSubData( GL3.GL_ARRAY_BUFFER,	
 							 0,
-							 getBufferLength( _geometry ),
+							 _geometry.getVertexLengthInBytes(),
 							 _geometry.getVertexBuffer() ) ;
 	}
 
@@ -70,12 +70,7 @@ public class GLModelManager extends AbstractManager<Model>
 		_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
 		_geometry.indexID = indexID ;
 
-		final int indexBufferLength = _geometry.index.length * 4 ;		// * 4 represents the bytes for each integer
+		final int indexBufferLength = _geometry.getIndexLength() * 4 ;		// * 4 represents the bytes for each integer
 		_gl.glBufferData( GL3.GL_ELEMENT_ARRAY_BUFFER, indexBufferLength, _geometry.getIndexBuffer(), GL3.GL_STATIC_DRAW ) ;
-	}
-
-	private static int getBufferLength( final GLGeometry _geometry )
-	{
-		return _geometry.vertex.length * 4 ;		// * 4 represents the bytes for each float
 	}
 }

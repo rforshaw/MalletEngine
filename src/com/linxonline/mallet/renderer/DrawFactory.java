@@ -30,25 +30,19 @@ public final class DrawFactory
 	}
 
 	public static Event<Settings> createTexture( final MalletTexture _texture,
+												 final Shape _shape,
 												 final Vector3 _pos, 
 												 final Vector2 _offset, 		// Not needed
-												 final Vector2 _dim,			// Not needed
-												 final Vector2 _fill,			// Not needed
-												 final Vector2 _uv1,			// Not needed
-												 final Vector2 _uv2,			// Not needed
 												 final int _layer,
 												 final IDInterface _callback )
 	{
-		return createTexture( _texture.getPath(), _pos, _offset, _dim, _fill, _uv1, _uv2, _layer, _callback ) ;
+		return createTexture( _texture.getPath(), _shape, _pos, _offset, _layer, _callback ) ;
 	}
 
 	public static Event<Settings> createTexture( final String _file,
+												 final Shape _shape,
 												 final Vector3 _pos, 
 												 final Vector2 _offset, 		// Not needed
-												 final Vector2 _dim,			// Not needed
-												 final Vector2 _fill,			// Not needed
-												 final Vector2 _uv1,			// Not needed
-												 final Vector2 _uv2,			// Not needed
 												 final int _layer,
 												 final IDInterface _callback )
 	{
@@ -58,17 +52,12 @@ public final class DrawFactory
 		settings.addObject( "TYPE", DrawRequestType.TEXTURE ) ;
 
 		if( _file != null ) { settings.addString( "FILE", _file ) ; }
-		if( _dim != null ) { settings.addObject( "DIM", _dim ) ; }
-		if( _fill != null ) { settings.addObject( "FILL", _fill ) ; }
-
-		if( _uv1 != null ) { settings.addObject( "UV1", _uv1 ) ; }
-		if( _uv2 != null ) { settings.addObject( "UV2", _uv2 ) ; }
-
 		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
 
 		setPosition( settings, _pos, _offset ) ;
-		//setClip( settings, _clip, _clipOffset ) ;
 		settings.addInteger( "LAYER", _layer ) ;
+
+		if( _shape != null ) { settings.addObject( "SHAPE", _shape ) ; }
 
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
@@ -134,13 +123,6 @@ public final class DrawFactory
 	{
 		if( _pos != null ) { _settings.addObject( "POSITION", _pos ) ; }
 		if( _offset != null ) { _settings.addObject( "OFFSET", _offset ) ; }
-		return _settings ;
-	}
-
-	public static Settings setClip( final Settings _settings, final Vector2 _clip, final Vector2 _clipOffset )
-	{
-		if( _clip != null ) { _settings.addObject( "CLIP", _clip ) ; }
-		if( _clipOffset != null ) { _settings.addObject( "CLIPOFFSET", _clipOffset ) ; }
 		return _settings ;
 	}
 }

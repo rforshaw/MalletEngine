@@ -19,6 +19,8 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.android.GL.GLGeometry.VertexAttrib ;
+
 public class GLRenderer extends Basic2DRender
 {
 	private static final MalletColour WHITE = MalletColour.white() ;
@@ -43,10 +45,6 @@ public class GLRenderer extends Basic2DRender
 	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
-
-	protected static int numID = 0 ;
-	private static final Vector2 UV1 = new Vector2() ;
-	private static final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
 
 	protected Vector2 pos = new Vector2() ;
 
@@ -208,9 +206,17 @@ public class GLRenderer extends Basic2DRender
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
+				final Shape shape = _data.getShape() ;
+				if( shape == null )
+				{
+					Logger.println( "GLRenderer - Render Data for non-existent shape: " + _data.getID(), Logger.Verbosity.MINOR ) ;
+					return ;
+				}
+
 				final Model model = _data.getModel() ;
 				if( model == null )
 				{
+					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 					return ;
 				}
 
@@ -236,8 +242,8 @@ public class GLRenderer extends Basic2DRender
 				//System.out.println( "inVertex: " + inVertex ) ;
 				//System.out.println( "inColour: " + inColour ) ;
 
-				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -262,22 +268,17 @@ public class GLRenderer extends Basic2DRender
 
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updateShapeModel( model, _data.getShape() ) ;
+						GLGeometry.update( shape, geometry ) ;
 						GLModelManager.updateVBO( geometry ) ;
 					}
 
-					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY, 3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY, 4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY, 3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-					final short length = ( short )geometry.index.length ;
-					GLES20.glDrawElements( geometry.style, length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
+					GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
 				GLES20.glUseProgram( 0 ) ;
-				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
+				disableVertexAttributes( attributes ) ;
 			}
 		} ;
 
@@ -291,6 +292,7 @@ public class GLRenderer extends Basic2DRender
 					texture = loadTexture( _data ) ;
 					if( texture == null )
 					{
+						//Logger.println( "GLRenderer - Render Data for non-existent texture: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 						return ;
 					}
 				}
@@ -299,9 +301,11 @@ public class GLRenderer extends Basic2DRender
 				if( model == null )
 				{
 					// If we can't map the texture to a plane, then no point in rendering.
+					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 					return ;
 				}
 
+				final Shape shape = _data.getShape() ;
 				final GLImage image = texture.getImage() ;
 				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
 
@@ -310,10 +314,6 @@ public class GLRenderer extends Basic2DRender
 
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
-
-				final MalletColour colour = _data.getColour() ;
-				final Vector2 uv1 = _data.getUV1() ;
-				final Vector2 uv2 = _data.getUV2() ;
 
 				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
 				if( program == null )
@@ -328,10 +328,8 @@ public class GLRenderer extends Basic2DRender
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -358,28 +356,17 @@ public class GLRenderer extends Basic2DRender
 					// Update the UV co-ordinates of the model
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
+						GLGeometry.update( shape, geometry ) ;
+						GLModelManager.updateVBO( geometry ) ;
 					}
 
-					// Texture's share geometry so we must update the VBO's
-					// every frame as the uv coordinates can change.
-					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
-					GLModelManager.updateVBO( geometry ) ;
-
-					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
-
-					GLES20.glDrawElements( GLES20.GL_TRIANGLES, geometry.index.length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
+					GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
 				GLES20.glUseProgram( 0 ) ;
+				disableVertexAttributes( attributes ) ;
 			}
 		} ;
 
@@ -441,10 +428,9 @@ public class GLRenderer extends Basic2DRender
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				GLES20.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				GLES20.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
+				final GLGeometry geometry = fm.getGLGeometry() ;
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -465,17 +451,12 @@ public class GLRenderer extends Basic2DRender
 
 					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
 
-					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-					GLES20.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.POSITION_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,        4, GLES20.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, GLGeometry.COLOUR_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY, 2, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.TEXCOORD_OFFSET ) ;
-					GLES20.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,        3, GLES20.GL_FLOAT,         false, GLGeometry.STRIDE, GLGeometry.NORMAL_OFFSET ) ;
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
+						GLGeometry.update( fm.shape, geometry ) ;
 						GLModelManager.updateVBO( geometry ) ;
 					}
 
@@ -486,11 +467,7 @@ public class GLRenderer extends Basic2DRender
 					}
 
 				matrixCache.reclaim( newMatrix ) ;
-
-				GLES20.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY ) ;	// TEXTURE COORD ARRAY
-				GLES20.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+				disableVertexAttributes( attributes ) ;
 				GLES20.glUseProgram( 0 ) ;
 			}
 
@@ -503,7 +480,7 @@ public class GLRenderer extends Basic2DRender
 					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
 					GLES20.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
-					GLES20.glDrawElements( GLES20.GL_TRIANGLES, glyph.index.index.length, GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES20.glDrawElements( GLES20.GL_TRIANGLES, glyph.index.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -651,10 +628,6 @@ public class GLRenderer extends Basic2DRender
 		}
 	}
 
-	private static int getUniqueID()
-	{
-		return numID++ ;
-	}
 
 	private static void bindTexture( final int[] _idToBind, final int[] _store )
 	{
@@ -694,12 +667,17 @@ public class GLRenderer extends Basic2DRender
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		if( position != null )
 		{
-			final GLRenderData data = renderCache.get() ;
-			data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
-			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
+			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
+			if( shape != null )
+			{
+				final GLRenderData data = renderCache.get() ;
+				data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
+				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
+				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
-			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-			insert( data ) ;
+				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+				insert( data ) ;
+			}
 		}
 	}
 
@@ -709,7 +687,7 @@ public class GLRenderer extends Basic2DRender
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		if( position != null )
 		{
-			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
+			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
 			if( shape != null )
 			{
 				final GLRenderData data = renderCache.get() ;
@@ -770,33 +748,39 @@ public class GLRenderer extends Basic2DRender
 			return null ;
 		}
 
-		final Vector2 fillDim = _data.data.getObject( "FILL", null ) ;
-		Vector2 dimension = _data.data.getObject( "DIM", null ) ;
-		if( dimension == null )
-		{
-			dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
-		}
-
-		if( fillDim == null )
-		{
-			final String name = dimension.toString() ;
-			_data.setModel( GLModelGenerator.genPlaneModel( name, dimension ) ) ;
-		}
-		else
-		{
-			final Vector2 div = Vector2.divide( fillDim, dimension ) ;
-			final String name = fillDim.toString() + dimension.toString() ;
-			_data.setModel( GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
-		}
-
 		_data.setTexture( texture ) ;
 		return texture ;
 	}
 
+	private void enableVertexAttributes( final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			GLES20.glEnableVertexAttribArray( att.index ) ;
+		}
+	}
+
+	private void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
+	{
+		for( GLGeometry.VertexAttrib att : _atts )
+		{
+			GLES20.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
+		}
+	}
+	
+	private void disableVertexAttributes( final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			GLES20.glDisableVertexAttribArray( att.index ) ;
+		}
+	}
+
 	public static class GLRenderData extends RenderData
 	{
-		private final int id = getUniqueID() ;
+		private static int numID = 0 ;
 
+		private final int id = getUniqueID() ;
 		private int layer ;
 		private Interpolation interpolation ;
 		private boolean uiElement ;
@@ -806,14 +790,11 @@ public class GLRenderer extends Basic2DRender
 
 		// Must be nulled when reclaimed by cache
 		// User data
-		private Vector3 position ;
-		private Vector2 offset ;
-		private MalletColour colour ;
-		private Shape shape ;
-		private String[] words ;
-
-		private final Vector2 uv1 = new Vector2() ;
-		private final Vector2 uv2 = new Vector2() ;
+		private Vector3 position    = null ;
+		private Vector2 offset      = null ;
+		private MalletColour colour = null ;
+		private Shape shape         = null ;
+		private String[] words      = null ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
@@ -844,11 +825,8 @@ public class GLRenderer extends Basic2DRender
 			lineWidth     = data.getInteger( "LINEWIDTH", 2 ) ;
 			textAlignment = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 			colour        = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
-			shape         = data.<Shape>getObject( "DRAWLINES", null ) ;
+			shape         = data.<Shape>getObject( "SHAPE", null ) ;
 			words         = null ;
-
-			uv1.setXY( data.<Vector2>getObject( "UV1", UV1 ) ) ;
-			uv2.setXY( data.<Vector2>getObject( "UV2", UV2 ) ) ;
 		}
 
 		public void setTexture( final Texture _texture )
@@ -921,16 +899,6 @@ public class GLRenderer extends Basic2DRender
 			return texture ;
 		}
 
-		public Vector2 getUV1()
-		{
-			return uv1 ;
-		}
-
-		public Vector2 getUV2()
-		{
-			return uv2 ;
-		}
-
 		public int getLineWidth()
 		{
 			return lineWidth ;
@@ -992,7 +960,7 @@ public class GLRenderer extends Basic2DRender
 			if( model != null )
 			{
 				model.unregister() ;
-				if( type == DrawRequestType.GEOMETRY )
+				if( type == DrawRequestType.GEOMETRY || type == DrawRequestType.TEXTURE )
 				{
 					// Geometry Requests are not stored.
 					// So must be destroyed explicity.
@@ -1014,6 +982,11 @@ public class GLRenderer extends Basic2DRender
 			texture = null ;
 			model = null ;
 			super.reset() ;
+		}
+
+		private static int getUniqueID()
+		{
+			return numID++ ;
 		}
 	}
 }

@@ -3,8 +3,11 @@ package com.linxonline.mallet.renderer.android.GL ;
 import java.util.ArrayList ;
 import java.nio.* ;
 
-import android.opengl.GLES11 ;
+import android.opengl.GLES20 ;
 
+import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.Shape.Swivel ;
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
@@ -14,158 +17,102 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLGeometry implements GeometryInterface
 {
-	private static final Vector3 DEFAULT_NORMAL = new Vector3() ;
-	private static final Vector2 DEFAULT_TEXCOORD = new Vector2() ;
-	private static final byte[] BYTE_DEFAULT_COLOUR = { ( byte )255, ( byte )255, ( byte )255, ( byte )255 } ;
-	private static final float DEFAULT_COLOUR = ConvertBytes.toFloat( BYTE_DEFAULT_COLOUR, 0, 4 ) ;
-
-	public static final int VERTEX_SIZE = 3 + 1 + 2 + 3 ;
-	public static final int STRIDE = VERTEX_SIZE * 4 ; // 4 represents byte size
-	public static final int POSITION_OFFSET = 0 ;
-	public static final int COLOUR_OFFSET = 3 * 4 ;
-	public static final int TEXCOORD_OFFSET = 4 * 4 ;
-	public static final int NORMAL_OFFSET = 6 * 4 ;
-
-	private int vertexInc = 0 ; 
-	private int indexInc = 0 ;
-
-	public int style = GLES11.GL_LINE_STRIP ;
-	public int vboID = 0 ;
-	public int indexID = 0 ;
-	public short[] index = null ;
-	public float[] vertex = null ;
-	private final FloatBuffer vertexBuffer ;
-	private final ShortBuffer indexBuffer ;
-
-	public GLGeometry( int _indexSize, int _vertexSize )
+	public static class VertexAttrib
 	{
-		index = new short[_indexSize] ;
-		vertex = new float[_vertexSize * VERTEX_SIZE] ;
+		public int index ;				// Specifies the index of the generic vertex attribute to be modified 
+		public int size ;				// Specifies the number of components per generic vertex attribute
+		public int type ;				// Specifies the data type ;
+		public boolean normalised ;		// Specifies whether fixed-point data values should be normalized
+		public int offset ;				// Specifies the offset for the first component
 
-		final int vertexBufferLength = vertex.length * 4 ;			// * 4 represents the bytes for each float
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexBufferLength ) ;
+		public VertexAttrib( final int _index, final int _size, final int _type, final boolean _normalised, final int _offset )
+		{
+			index = _index ;
+			size = _size ;
+			type = _type ;
+			normalised = _normalised ;
+			offset = _offset ; 
+		}
+
+		public String toString()
+		{
+			return "Index: " + index + " Size: " + size + " Norm: " + normalised + " Offset: " + offset ;
+		}
+	} ;
+
+	private final int stride ;			// Specifies the byte offset between verticies
+	private final VertexAttrib[] attributes ;
+	private final short[] index ;
+	private final float[] vertex ;
+
+	private final ShortBuffer indexBuffer ;
+	private final FloatBuffer vertexBuffer ;
+
+	private final int style ; 
+	private int vertexInc = 0 ;
+
+	public int indexID ;
+	public int vboID ;
+
+	private GLGeometry( final VertexAttrib[] _attributes,
+						final Shape.Style _style,
+						final int _indexLength,
+						final int _vertexLength,
+						final int _vertexStride )
+	{
+		attributes = _attributes ;
+		index = new short[_indexLength] ;
+		vertex = new float[_vertexLength] ;
+		stride = _vertexStride ;
+		
+		switch( _style )
+		{
+			case LINES      : style = GLES20.GL_LINES ;      break ;
+			case LINE_STRIP : style = GLES20.GL_LINE_STRIP ; break ;
+			case FILL       : style = GLES20.GL_TRIANGLES ;  break ;
+			default         : style = GLES20.GL_LINES ;      break ;
+		}
+		
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( getVertexLengthInBytes() ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final int indexBufferLength = index.length * 2 ; 			// * 2 represents the bytes for each index
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexBufferLength ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( getIndexLength() * 4 ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asShortBuffer() ;
 	}
-
-	public void setStyle( final int _style )
+	
+	private void addIndices( final int[] _indicies )
 	{
-		style = _style ;
-	}
-
-	public void addIndices( final int _index )
-	{
-		if( indexInc >= index.length )
+		for( int i = 0; i < _indicies.length; i++ )
 		{
-			Logger.println( "Index access out of bounds - GLGeometry.", Logger.Verbosity.MAJOR ) ;
-			return ;
+			index[i] = ( short )_indicies[i] ;
 		}
-
-		index[indexInc++] = ( short )_index ;
+	}
+	
+	private void addPoint( final Vector3 _point )
+	{
+		vertex[vertexInc++] = _point.x ;
+		vertex[vertexInc++] = _point.y ;
+		vertex[vertexInc++] = _point.z ;
 	}
 
-	public void addVertex( final Vector3 _position )
+	private void addColour( final MalletColour _colour )
 	{
-		addVertex( _position, DEFAULT_COLOUR, DEFAULT_NORMAL, DEFAULT_TEXCOORD ) ;
+		vertex[vertexInc++] = getABGR( _colour ) ;
 	}
 
-	public void addVertex( final Vector3 _position, final float _colour )
+	private void addUV( final Vector2 _uv )
 	{
-		addVertex( _position, _colour, DEFAULT_NORMAL, DEFAULT_TEXCOORD ) ;
+		vertex[vertexInc++] = _uv.x ;
+		vertex[vertexInc++] = _uv.y ;
 	}
 
-	public void addVertex( final Vector3 _position, final float _colour, final Vector2 _texCoord )
+	private void addNormal( final Vector3 _normal )
 	{
-		addVertex( _position, _colour, DEFAULT_NORMAL, _texCoord ) ;
-	}
-
-	public void addVertex( final Vector3 _position, final Vector2 _texCoord )
-	{
-		addVertex( _position, DEFAULT_COLOUR, DEFAULT_NORMAL, _texCoord ) ;
-	}
-
-	public void addVertex( final Vector3 _position, final Vector3 _normal, final Vector2 _texCoord )
-	{
-		addVertex( _position, DEFAULT_COLOUR, _normal, _texCoord ) ;
-	}
-
-	public void addVertex( final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
-	{
-		vertex[vertexInc] = _position.x ;
-		vertex[vertexInc + 1] = _position.y ;
-		vertex[vertexInc + 2] = _position.z ;
-
-		vertex[vertexInc + 3] = ( float )_colour ;
-
-		vertex[vertexInc + 4] = _texCoord.x ;
-		vertex[vertexInc + 5] = _texCoord.y ;
-
-		vertex[vertexInc + 6]  = _normal.x ;
-		vertex[vertexInc + 7]  = _normal.y ;
-		vertex[vertexInc + 8] = _normal.z ;
-		vertexInc += VERTEX_SIZE ;
-	}
-
-	public void updateIndex( final int _index, final int _val )
-	{
-		index[_index] = ( short )_val ;
-	}
-
-	public void updateVertex( final int _index, final Vector3 _position, final float _colour, final Vector3 _normal, final Vector2 _texCoord )
-	{
-		updatePosition( _index, _position.x, _position.y, _position.z ) ;
-		updateColour( _index, _colour ) ;
-		updateTexCoord( _index, _texCoord.x, _texCoord.y ) ;
-		updateNormal( _index, _normal.x, _normal.y, _normal.z ) ;
-	}
-
-	public void updatePosition( final int _index, final Vector3 _position )
-	{
-		updatePosition( _index, _position.x, _position.y, _position.z ) ;
-	}
-
-	public void updatePosition( final int _index, final float _x, final float _y, final float _z )
-	{
-		final int i = _index * VERTEX_SIZE ;
-		vertex[i] = _x ;
-		vertex[i + 1] = _y ;
-		vertex[i + 2] = _z ;
-	}
-
-	public void updateColour( final int _index, final float _colour )
-	{
-		final int i = _index * VERTEX_SIZE ;
-		vertex[i + 3] = ( float )_colour ;
-	}
-
-	public void updateTexCoord( final int _index, final float _x, final float _y )
-	{
-		final int i = _index * VERTEX_SIZE ;
-		vertex[i + 4] = _x ;
-		vertex[i + 5] = _y ;
-	}
-
-	public void updateNormal( final int _index, final float _x, final float _y, final float _z )
-	{
-		final int i = _index * VERTEX_SIZE ;
-		vertex[i + 6]  = _x ;
-		vertex[i + 7]  = _y ;
-		vertex[i + 8] = _z ;
-	}
-
-	public int getIndexSize()
-	{
-		return index.length ;
-	}
-
-	public int getVertexSize()
-	{
-		return vertex.length / VERTEX_SIZE ;
+		vertex[vertexInc++] = _normal.x ;
+		vertex[vertexInc++] = _normal.y ;
+		vertex[vertexInc++] = _normal.z ;
 	}
 
 	public FloatBuffer getVertexBuffer()
@@ -182,10 +129,143 @@ public class GLGeometry implements GeometryInterface
 		return indexBuffer ;
 	}
 
+	public VertexAttrib[] getAttributes()
+	{
+		return attributes ;
+	}
+
+	public int getIndexLength()
+	{
+		return index.length ;
+	}
+
+	public int getVertexLengthInBytes()
+	{
+		return vertex.length * 4 ;
+	}
+
+	public int getStyle()
+	{
+		return style ;
+	}
+
+	public int getStride()
+	{
+		return stride ;
+	}
+
 	@Override
 	public void destroy()
 	{
 		//System.out.println( "Removing Geometry.." ) ;
 		GLModelManager.unbind( this ) ;
+	}
+
+	public static GLGeometry update( final Shape _shape, final GLGeometry _geometry )
+	{
+		final Shape.Swivel[] swivel = _shape.getSwivel() ;
+		final int vertexSize = _shape.getVertexSize() ;
+
+		_geometry.vertexInc = 0 ;
+
+		for( int i = 0; i < vertexSize; i++ )
+		{
+			for( int j = 0; j < swivel.length; j++ )
+			{
+				switch( swivel[j] )
+				{
+					case POINT  : _geometry.addPoint( _shape.getPoint( i, j ) ) ;   break ;
+					case COLOUR : _geometry.addColour( _shape.getColour( i, j ) ) ; break ;
+					case UV     : _geometry.addUV( _shape.getUV( i, j ) ) ;         break ;
+					case NORMAL : _geometry.addNormal( _shape.getNormal( i, j ) ) ; break ;
+				}
+			}
+		}
+
+		return _geometry ;
+	}
+
+	public static GLGeometry constructIndex( final int[] _index )
+	{
+		final GLGeometry geometry = new GLGeometry( null, Shape.Style.FILL, _index.length, 0, 0 ) ;
+		geometry.addIndices( _index ) ;
+
+		return geometry ;
+	}
+	
+	public static GLGeometry construct( final Shape _shape )
+	{
+		final Shape.Swivel[] swivel = _shape.getSwivel() ;
+		final VertexAttrib[] attributes = new VertexAttrib[swivel.length] ;
+
+		int offset = 0 ;
+		for( int i = 0; i < swivel.length; i++ )
+		{
+			switch( swivel[i] )
+			{
+				case POINT  :
+				{
+					attributes[i] = new VertexAttrib( GLProgramManager.VERTEX_ARRAY, 3, GLES20.GL_FLOAT, false, offset ) ;
+					offset += 3 * 4 ;
+					break ;
+				}
+				case COLOUR :
+				{
+					attributes[i] = new VertexAttrib( GLProgramManager.COLOUR_ARRAY, 4, GLES20.GL_UNSIGNED_BYTE, true, offset ) ;
+					offset += 1 * 4 ;
+					break ;
+				}
+				case UV     :
+				{
+					attributes[i] = new VertexAttrib( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GLES20.GL_FLOAT, false, offset ) ;
+					offset += 2 * 4 ;
+					break ;
+				}
+				case NORMAL  :
+				{
+					attributes[i] = new VertexAttrib( GLProgramManager.NORMAL_ARRAY, 3, GLES20.GL_FLOAT, false, offset ) ;
+					offset += 3 * 4 ;
+					break ;
+				}
+			}
+		}
+
+		final int vertexStride = offset ;
+		final int vertexLength = _shape.getVertexSize() * ( vertexStride / 4 ) ;
+		final GLGeometry geometry = new GLGeometry( attributes,
+													_shape.style,
+													_shape.indicies.length,
+													vertexLength,
+													vertexStride ) ;
+
+		geometry.addIndices( _shape.indicies ) ;
+
+		final int vertexSize = _shape.getVertexSize() ;
+		for( int i = 0; i < vertexSize; i++ )
+		{
+			for( int j = 0; j < swivel.length; j++ )
+			{
+				switch( swivel[j] )
+				{
+					case POINT  : geometry.addPoint( _shape.getPoint( i, j ) ) ;   break ;
+					case COLOUR : geometry.addColour( _shape.getColour( i, j ) ) ; break ;
+					case UV     : geometry.addUV( _shape.getUV( i, j ) ) ;         break ;
+					case NORMAL : geometry.addNormal( _shape.getNormal( i, j ) ) ; break ;
+				}
+			}
+		}
+
+		return geometry ;
+	}
+	
+	private static float getABGR( final MalletColour _colour )
+	{
+		final byte[] colour = new byte[4] ;
+		colour[0] = _colour.colours[MalletColour.ALPHA] ;
+		colour[1] = _colour.colours[MalletColour.BLUE] ;
+		colour[2] = _colour.colours[MalletColour.GREEN] ;
+		colour[3] = _colour.colours[MalletColour.RED] ;
+
+		return ConvertBytes.toFloat( colour, 0, 4 ) ;
 	}
 }

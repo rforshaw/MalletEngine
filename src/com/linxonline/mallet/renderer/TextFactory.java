@@ -36,7 +36,7 @@ public final class TextFactory
 		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
 
 		DrawFactory.setPosition( settings, _pos, _offset ) ;
-		DrawFactory.setClip( settings, _clip, _clipOffset ) ;
+		//DrawFactory.setClip( settings, _clip, _clipOffset ) ;
 
 		settings.addInteger( "LAYER", _layer ) ;
 		settings.addInteger( "ALIGNMENT", _alignment ) ;

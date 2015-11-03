@@ -3,6 +3,7 @@ package com.linxonline.mallet.animation ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.resources.model.Model ;
@@ -149,8 +150,7 @@ public class Animation implements IDInterface, Cacheable
 		// UV's too. Or the texture stays the same and the UV 
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
-		settings.<Vector2>addObject( "UV1", f.uv1 ) ;
-		settings.<Vector2>addObject( "UV2", f.uv2 ) ;
+		Shape.updatePlaneUV( settings.<Shape>getObject( "SHAPE", null ), f.uv1, f.uv2 ) ;
 
 		DrawFactory.forceUpdate( _event ) ;
 	}

@@ -41,7 +41,7 @@ public class GLModelManager extends AbstractManager<Model>
 		_geometry.vboID = vboID ;
 
 		GLES20.glBufferData( GLES20.GL_ARRAY_BUFFER,
-							 getBufferLength( _geometry ),
+							 _geometry.getVertexLengthInBytes(),
 							 _geometry.getVertexBuffer(),
 							 GLES20.GL_DYNAMIC_DRAW ) ;
 	}
@@ -50,7 +50,7 @@ public class GLModelManager extends AbstractManager<Model>
 	{
 		GLES20.glBufferSubData( GLES20.GL_ARRAY_BUFFER,
 								0,
-								getBufferLength( _geometry ),
+								_geometry.getVertexLengthInBytes(),
 								_geometry.getVertexBuffer() ) ;
 	}
 
@@ -60,12 +60,7 @@ public class GLModelManager extends AbstractManager<Model>
 		GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, indexID ) ;
 		_geometry.indexID = indexID ;
 
-		final int indexBufferLength = _geometry.index.length * 2 ;		// * 2 represents the bytes for each short
+		final int indexBufferLength = _geometry.getIndexLength() * 2 ;		// * 2 represents the bytes for each short
 		GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBufferLength, _geometry.getIndexBuffer(), GLES20.GL_STATIC_DRAW ) ;
-	}
-
-	private static int getBufferLength( final GLGeometry _geometry )
-	{
-		return _geometry.vertex.length * 4 ;		// * 4 represents the bytes for each float
 	}
 }

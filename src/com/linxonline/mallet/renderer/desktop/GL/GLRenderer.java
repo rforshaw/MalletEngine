@@ -29,6 +29,8 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.desktop.GL.GLGeometry.VertexAttrib ;
+
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
 	private static final MalletColour WHITE = MalletColour.white() ;
@@ -206,7 +208,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( shape == null )
 				{
 					Logger.println( "GLRenderer - Render Data for non-existent shape: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-					//state.remove( _data.getID() ) ;
 					return ;
 				}
 
@@ -214,7 +215,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( model == null )
 				{
 					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-					//state.remove( _data.getID() ) ;
 					return ;
 				}
 
@@ -240,9 +240,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				//System.out.println( "MVP Matrix: " + inMVPMatrix ) ;
 				//System.out.println( "inNormal: " + inNormal ) ;
 
-				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// NORMAL ARRAY
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -267,22 +266,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updateShapeModel( model, _data.getShape() ) ;
+						GLGeometry.update( shape, geometry ) ;
 						GLModelManager.updateVBO( gl, geometry ) ;
 					}
 
-					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY, 3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY, 4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY, 3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
-                                              
-					gl.glDrawElements( geometry.style, geometry.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
+					gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glUseProgram( 0 ) ;
-				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;		// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;		// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;		// COLOUR ARRAY
+				disableVertexAttributes( attributes ) ;
 			}
 		} ;
 
@@ -296,6 +290,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					texture = loadTexture( _data ) ;
 					if( texture == null )
 					{
+						//Logger.println( "GLRenderer - Render Data for non-existent texture: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 						return ;
 					}
 				}
@@ -304,9 +299,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				if( model == null )
 				{
 					// If we can't map the texture to a plane, then no point in rendering.
+					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 					return ;
 				}
 
+				final Shape shape = _data.getShape() ;
 				final GLImage image = texture.getImage() ;
 				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
 
@@ -315,10 +312,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
-
-				final MalletColour colour = _data.getColour() ;
-				final Vector2 uv1 = _data.getUV1() ;
-				final Vector2 uv2 = _data.getUV2() ;
 
 				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
 				if( program == null )
@@ -333,10 +326,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					final Matrix4 newMatrix = matrixCache.get() ;
 					if( isGUI == true )
@@ -363,25 +354,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					// Update the UV co-ordinates of the model
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updatePlaneModelColour( model, GLModelGenerator.getABGR( colour ) ) ;
+						GLGeometry.update( shape, geometry ) ;
+						GLModelManager.updateVBO( gl, geometry ) ;
 					}
 
-					GLModelGenerator.updatePlaneModelUV( model, uv1, uv2 ) ;
-					GLModelManager.updateVBO( gl, geometry ) ;
-
-					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,         4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
-
-					gl.glDrawElements( GL3.GL_TRIANGLES, geometry.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
-
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
+					gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
+					
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
+				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
@@ -444,10 +426,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				gl.glEnableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
-				gl.glEnableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
+				final GLGeometry geometry = fm.getGLGeometry() ;
+				final VertexAttrib[] attributes =  geometry.getAttributes() ;
+				enableVertexAttributes( attributes ) ;
 
 					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 					final Matrix4 newMatrix = matrixCache.get() ;
@@ -469,17 +450,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;
 					//gl.glAlphaFunc( GL.GL_GREATER, 0.5f ) ;
 
-					final GLGeometry geometry = fm.getGLGeometry() ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					gl.glVertexAttribPointer( GLProgramManager.VERTEX_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.POSITION_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.COLOUR_ARRAY,         4, GL3.GL_UNSIGNED_BYTE, true,  GLGeometry.STRIDE, ( long )GLGeometry.COLOUR_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.TEXCOORD_OFFSET ) ;
-					gl.glVertexAttribPointer( GLProgramManager.NORMAL_ARRAY,         3, GL3.GL_FLOAT,         false, GLGeometry.STRIDE, ( long )GLGeometry.NORMAL_OFFSET ) ;
+					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 
 					if( _data.toUpdate() == true )
 					{
-						GLModelGenerator.updateModelColour( fm.model, GLModelGenerator.getABGR( colour ) ) ;
+						GLGeometry.update( fm.shape, geometry ) ;
 						GLModelManager.updateVBO( gl, geometry ) ;
 					}
 
@@ -491,10 +468,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				matrixCache.reclaim( newMatrix ) ;
 
-				gl.glDisableVertexAttribArray( GLProgramManager.VERTEX_ARRAY ) ;			// VERTEX ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.COLOUR_ARRAY ) ;			// COLOUR ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.TEXTURE_COORD_ARRAY0 ) ;	// TEXTURE COORD ARRAY
-				gl.glDisableVertexAttribArray( GLProgramManager.NORMAL_ARRAY ) ;			// NORMAL ARRAY
+				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
@@ -509,7 +483,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
 					gl.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
-					gl.glDrawElements( GL3.GL_TRIANGLES, glyph.index.index.length, GL3.GL_UNSIGNED_INT, 0 ) ;
+					gl.glDrawElements( GL3.GL_TRIANGLES, glyph.index.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -782,12 +756,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		if( position != null )
 		{
-			final GLRenderData data = renderCache.get() ;
-			data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
-			//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
+			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
+			if( shape != null )
+			{
+				final GLRenderData data = renderCache.get() ;
+				data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
+				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
+				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
-			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-			insert( data ) ;
+				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
+				insert( data ) ;
+			}
 		}
 	}
 
@@ -797,7 +776,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
 		if( position != null )
 		{
-			final Shape shape = _draw.<Shape>getObject( "DRAWLINES", null ) ;
+			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
 			if( shape != null )
 			{
 				final GLRenderData data = renderCache.get() ;
@@ -863,27 +842,32 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return null ;
 		}
 
-		final Vector2 fillDim = _data.data.getObject( "FILL", null ) ;
-		Vector2 dimension = _data.data.getObject( "DIM", null ) ;
-		if( dimension == null )
-		{
-			dimension = new Vector2( texture.getWidth(), texture.getHeight() ) ;
-		}
-
-		if( fillDim == null )
-		{
-			final String name = dimension.toString() ;
-			_data.setModel( GLModelGenerator.genPlaneModel( name, dimension ) ) ;
-		}
-		else
-		{
-			final Vector2 div = Vector2.divide( fillDim, dimension ) ;
-			final String name = fillDim.toString() + dimension.toString() ;
-			_data.setModel( GLModelGenerator.genPlaneModel( name, fillDim, new Vector2( 0.0f, 0.0f ), div ) ) ;
-		}
-
 		_data.setTexture( texture ) ;
 		return texture ;
+	}
+
+	private void enableVertexAttributes( final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			gl.glEnableVertexAttribArray( att.index ) ;
+		}
+	}
+
+	private void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
+	{
+		for( GLGeometry.VertexAttrib att : _atts )
+		{
+			gl.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
+		}
+	}
+	
+	private void disableVertexAttributes( final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			gl.glDisableVertexAttribArray( att.index ) ;
+		}
 	}
 
 	public static class GLRenderData extends RenderData
@@ -905,9 +889,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		private MalletColour colour = null ;
 		private Shape shape         = null ;
 		private String[] words      = null ;
-
-		private final Vector2 uv1 = new Vector2( UV1 ) ;
-		private final Vector2 uv2 = new Vector2( UV2 ) ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
@@ -938,11 +919,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			lineWidth     = data.getInteger( "LINEWIDTH", 2 ) ;
 			textAlignment = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 			colour        = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
-			shape         = data.<Shape>getObject( "DRAWLINES", null ) ;
+			shape         = data.<Shape>getObject( "SHAPE", null ) ;
 			words         = null ;
-
-			uv1.setXY( data.<Vector2>getObject( "UV1", UV1 ) ) ;
-			uv2.setXY( data.<Vector2>getObject( "UV2", UV2 ) ) ;
 		}
 
 		public void setTexture( final Texture _texture )
@@ -1015,16 +993,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return texture ;
 		}
 
-		public Vector2 getUV1()
-		{
-			return uv1 ;
-		}
-
-		public Vector2 getUV2()
-		{
-			return uv2 ;
-		}
-
 		public int getLineWidth()
 		{
 			return lineWidth ;
@@ -1086,7 +1054,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( model != null )
 			{
 				model.unregister() ;
-				if( type == DrawRequestType.GEOMETRY )
+				if( type == DrawRequestType.GEOMETRY || type == DrawRequestType.TEXTURE )
 				{
 					// Geometry Requests are not stored.
 					// So must be destroyed explicity.

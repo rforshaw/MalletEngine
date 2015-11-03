@@ -6,17 +6,20 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.Shape ;
 
 public class GLFontMap extends Resource
 {
 	public final FontMap<GLImage> fontMap ;
 	public final Model model ;
+	public final Shape shape ;
 
-	public GLFontMap( final FontMap<GLImage> _fontMap, final Model _model )
+	public GLFontMap( final FontMap<GLImage> _fontMap, final Model _model, final Shape _shape )
 	{
 		super() ;
 		fontMap = _fontMap ;
 		model = _model ;
+		shape = _shape ;
 	}
 
 	public int stringWidth( final String _text )

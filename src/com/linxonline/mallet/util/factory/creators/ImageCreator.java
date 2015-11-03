@@ -1,6 +1,7 @@
 package com.linxonline.mallet.util.factory.creators ;
 
 import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.Creator ;
 import com.linxonline.mallet.entity.Entity ;
@@ -27,14 +28,14 @@ public class ImageCreator extends Creator<Entity, Settings>
 		final Entity entity = new Entity( name ) ;
 		entity.position = new Vector3( position ) ;
 
+		final Vector2 dim = _image.<Vector2>getObject( "DIM", null ) ;
+		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+
 		final RenderComponent render = new RenderComponent() ;
 		render.add( DrawFactory.createTexture( _image.getString( "IMAGE", "" ),
+												plane,
 												entity.position,
 											   _image.<Vector2>getObject( "OFFSET", null ),
-											   _image.<Vector2>getObject( "DIM", null ),
-											   _image.<Vector2>getObject( "FILL", null ), 
-											   new Vector2(),		// Clip View 
-											   new Vector2( 1, 1 ),		// Clip Offset
 											   _image.getInteger( "LAYER", 0 ), render ) ) ;
 
 		entity.addComponent( render ) ;
