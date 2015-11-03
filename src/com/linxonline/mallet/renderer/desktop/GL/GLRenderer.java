@@ -103,7 +103,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		clear() ;							// Clear the contents being rendered
 
 		programs.shutdown() ;
-		GLModelGenerator.shutdown() ;
 		textures.shutdown() ;
 		fontManager.shutdown() ;
 	}
@@ -820,7 +819,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;
-		GLModelGenerator.clean() ;
 	}
 
 	public static GLJPanel getCanvas()
