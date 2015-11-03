@@ -83,7 +83,6 @@ public class GLRenderer extends Basic2DRender
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
 		programs.shutdown() ;
-		GLModelGenerator.shutdown() ;		// ModelManager is static and so persists even after a shutdown
 	}
 
 	/**
@@ -102,7 +101,6 @@ public class GLRenderer extends Basic2DRender
 
 		programs.shutdown() ;
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
-		GLModelGenerator.shutdown() ;	// Clear all Geometry Data and reload everything upon rendering
 		fontManager.recover() ;
 	}
 
@@ -731,7 +729,6 @@ public class GLRenderer extends Basic2DRender
 		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;
-		GLModelGenerator.clean() ;
 	}
 
 	@Override

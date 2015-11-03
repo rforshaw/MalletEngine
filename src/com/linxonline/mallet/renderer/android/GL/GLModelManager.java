@@ -9,7 +9,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.resources.model.Model ;
 
-public class GLModelManager extends AbstractManager<Model>
+public class GLModelManager
 {
 	public static void bind( final GLGeometry _geometry )
 	{
