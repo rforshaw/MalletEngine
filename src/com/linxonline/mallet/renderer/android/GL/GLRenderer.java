@@ -636,11 +636,11 @@ public class GLRenderer extends Basic2DRender
 		}
 	}
 
-	private static void bindBuffer( final int _type, final int _idToBind, final int[] _store )
+	private static void bindBuffer( final int _type, final int[] _idToBind, final int[] _store )
 	{
-		if( _store[0] != _idToBind )
+		if( _store[0] != _idToBind[0] )
 		{
-			_store[0] = _idToBind ;
+			_store[0] = _idToBind[0] ;
 			GLES20.glBindBuffer( _type, _store[0] ) ;
 		}
 	}

@@ -29,7 +29,7 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
-import com.linxonline.mallet.renderer.desktop.GL.GLGeometry.VertexAttrib ;
+import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib ;
 
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
@@ -49,6 +49,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
+	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 1000, 1000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
@@ -220,7 +221,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 
-				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 				final int lineWidth = _data.getLineWidth() ;
 
@@ -265,8 +266,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( shape, geometry ) ;
-						GLModelManager.updateVBO( gl, geometry ) ;
+						uploader.uploadIndex( gl, geometry, shape ) ;
+						uploader.uploadVBO( gl, geometry, shape ) ;
 					}
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
@@ -309,7 +310,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 
-				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 
 				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
@@ -353,13 +354,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					// Update the UV co-ordinates of the model
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( shape, geometry ) ;
-						GLModelManager.updateVBO( gl, geometry ) ;
+						uploader.uploadIndex( gl, geometry, shape ) ;
+						uploader.uploadVBO( gl, geometry, shape ) ;
 					}
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 					gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
-					
+
 				matrixCache.reclaim( newMatrix ) ;
 
 				disableVertexAttributes( attributes ) ;
@@ -425,7 +426,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				final GLGeometry geometry = fm.getGLGeometry() ;
+				final GLGeometryUploader.GLGeometry geometry = fm.getGLGeometry() ;
 				final VertexAttrib[] attributes =  geometry.getAttributes() ;
 				enableVertexAttributes( attributes ) ;
 
@@ -449,14 +450,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;
 					//gl.glAlphaFunc( GL.GL_GREATER, 0.5f ) ;
 
+					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( fm.shape, geometry ) ;
-						GLModelManager.updateVBO( gl, geometry ) ;
+						uploader.uploadIndex( gl, geometry, fm.shape ) ;
+						uploader.uploadVBO( gl, geometry, fm.shape ) ;
 					}
 
 					final int size = words.length ;
@@ -475,14 +477,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final int _matrixHandle )
 			{
+				final GLGeometryUploader.GLGeometry geometry = _fm.getGLGeometry() ;
 				final int length = _text.length() ;
+
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
-
 					gl.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
-					gl.glDrawElements( GL3.GL_TRIANGLES, glyph.index.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
+
+					//System.out.println( glyph.character ) ;
+					gl.glDrawElements( GL3.GL_TRIANGLES, 6, GL3.GL_UNSIGNED_INT, glyph.index * 4 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -726,11 +730,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
-	private static void bindBuffer( final GL3 _gl, final int _type, final int _idToBind, final int[] _store )
+	private static void bindBuffer( final GL3 _gl, final int _type, final int[] _idToBind, final int[] _store )
 	{
-		if( _store[0] != _idToBind )
+		if( _store[0] != _idToBind[0] )
 		{
-			_store[0] = _idToBind ;
+			_store[0] = _idToBind[0] ;
 			_gl.glBindBuffer( _type, _store[0] ) ;
 		}
 	}
@@ -854,7 +858,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 	private void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
 	{
-		for( GLGeometry.VertexAttrib att : _atts )
+		for( VertexAttrib att : _atts )
 		{
 			gl.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
 		}
@@ -865,6 +869,25 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		for( VertexAttrib att : _atts )
 		{
 			gl.glDisableVertexAttribArray( att.index ) ;
+		}
+	}
+
+	public static void handleError( final String _txt, final GL3 _gl )
+	{
+		int error = 0 ;
+		while( ( error = _gl.glGetError() ) != GL3.GL_NO_ERROR )
+		{
+			switch( error )
+			{
+				case GL3.GL_NO_ERROR                      : break ;
+				case GL3.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
+				case GL3.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
+				case GL3.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
+				case GL3.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
+				case GL3.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
+				case GL3.GL_STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
+				case GL3.GL_STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
+			}
 		}
 	}
 
@@ -903,6 +926,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			super.set( _data, _call, _type ) ;
 			data.addInteger( "ID", getID() ) ;
+			data.addBoolean( "UPDATE", true ) ;
 			updateData() ;
 		}
 

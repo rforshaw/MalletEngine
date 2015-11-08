@@ -13,10 +13,7 @@ public class GLModelGenerator
 {
 	public static Model genShapeModel( Shape _shape )
 	{
-		final GLGeometry geometry = GLGeometry.construct( _shape ) ;
-		final Model model = new Model( geometry ) ;
-
-		GLModelManager.bind( geometry ) ;
-		return model ;
+		final GLGeometryUploader.GLGeometry geometry = GLGeometryUploader.construct( _shape ) ;
+		return new Model( geometry ) ;
 	}
 }

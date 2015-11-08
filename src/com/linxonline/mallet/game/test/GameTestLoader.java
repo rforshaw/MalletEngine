@@ -170,7 +170,7 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( TextFactory.createText( "Hello World!", 						// Text
+				eventSystem.addEvent( TextFactory.createText( "Hello world!", 						// Text
 															  new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
 															  new Vector2( 0, 0 ), 					// Offset
 															  new MalletFont( "Arial", 12 ),		// Mallet Font

@@ -191,6 +191,11 @@ public class Shape
 		return swivel ;
 	}
 
+	public int getIndexSize()
+	{
+		return indicies.length ;
+	}
+	
 	public int getVertexSize()
 	{
 		return vertexSize ;
@@ -270,7 +275,7 @@ public class Shape
 		swivel[2] = Swivel.UV ;
 
 		final MalletColour white = MalletColour.white() ;
-		
+
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
 		plane.addVertex( new Object[] { new Vector3( _min ), white, new Vector2( _minUV ) } ) ;
 		plane.addVertex( new Object[] { new Vector3( _max ), white, new Vector2( _maxUV ) } ) ;
@@ -280,7 +285,7 @@ public class Shape
 		plane.addIndex( 0 ) ;
 		plane.addIndex( 2 ) ;
 		plane.addIndex( 1 ) ;
-		
+
 		plane.addIndex( 0 ) ;
 		plane.addIndex( 1 ) ;
 		plane.addIndex( 3 ) ;

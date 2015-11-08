@@ -82,8 +82,6 @@ public class GLFontGenerator
 		}
 
 		final Shape[] shapes = new Shape[length] ;
-		int j = 0 ;
-
 		for( int i = 0; i < length; i++ )
 		{
 			c[0] = _charsToMap.charAt( i ) ;
@@ -99,34 +97,17 @@ public class GLFontGenerator
 			final Vector2 uv1 = new Vector2( ( float )textureStart * point, 0.0f ) ;
 			final Vector2 uv2 = new Vector2( ( float )( textureStart + textureAdvance ) * point, 1.0f ) ;
 
-			// Must be destroyed manually destroyed, as not added to the 
+			// Must be manually destroyed, as not added to the 
 			// ModelManager automatically.
 			// Glyph geometry as located in a massive pool, stored in font map.
 			shapes[i] = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
+			glyphs[i] = new GLGlyph( i * 6, c[0], 0, geometryAdvance ) ;
 
-			final int[] index = new int[6] ;
-			index[0] = j + 0 ;
-			index[1] = j + 2 ;
-			index[2] = j + 1 ;
-			index[3] = j + 0 ;
-			index[4] = j + 1 ;
-			index[5] = j + 3 ;
-
-			// Glyph index buffer is stored within the glyph.
-			final GLGeometry indexGeom = GLGeometry.constructIndex( index ) ;
-
-			GLModelManager.bindIndex( gl, indexGeom ) ;
-			glyphs[i] = new GLGlyph( indexGeom, c[0], 0, geometryAdvance ) ;
-
-			j += 4 ;
 			increment += textureAdvance ;
 		}
 
 		final Shape combined = Shape.combine( shapes ) ;
-		final GLGeometry geometry = GLGeometry.construct( combined ) ;
-
-		final Model model = new Model( geometry ) ;
-		GLModelManager.bindVBO( gl, geometry ) ;
+		final Model model = new Model( GLGeometryUploader.construct( combined ) ) ;
 
 		/*try
 		{
