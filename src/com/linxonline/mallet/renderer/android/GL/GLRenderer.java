@@ -233,6 +233,8 @@ public class GLRenderer extends Basic2DRender
 					return ;
 				}
 
+				handleClip( _data ) ;
+
 				GLES20.glUseProgram( program.id[0] ) ;
 
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
@@ -277,6 +279,7 @@ public class GLRenderer extends Basic2DRender
 				matrixCache.reclaim( newMatrix ) ;
 
 				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisable( GLES20.GL_SCISSOR_TEST ) ;
 				disableVertexAttributes( attributes ) ;
 			}
 		} ;
@@ -320,6 +323,8 @@ public class GLRenderer extends Basic2DRender
 					System.out.println( "Program doesn't exist.." ) ;
 					return ;
 				}
+
+				handleClip( _data ) ;
 
 				GLES20.glUseProgram( program.id[0] ) ;
 				GLES20.glEnable( GLES20.GL_BLEND ) ;
@@ -365,6 +370,7 @@ public class GLRenderer extends Basic2DRender
 				matrixCache.reclaim( newMatrix ) ;
 
 				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisable( GLES20.GL_SCISSOR_TEST ) ;
 				GLES20.glDisable( GLES20.GL_BLEND ) ;
 				disableVertexAttributes( attributes ) ;
 			}
@@ -444,6 +450,8 @@ public class GLRenderer extends Basic2DRender
 						newMatrix.multiply( worldMatrix ) ;
 					}
 
+					handleClip( _data ) ;
+
 					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
@@ -473,6 +481,7 @@ public class GLRenderer extends Basic2DRender
 				disableVertexAttributes( attributes ) ;
 
 				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisable( GLES20.GL_SCISSOR_TEST ) ;
 				GLES20.glDisable( GLES20.GL_BLEND ) ;
 			}
 
@@ -781,6 +790,22 @@ public class GLRenderer extends Basic2DRender
 		}
 	}
 
+	private void handleClip( final GLRenderData _data )
+	{
+		final Vector2 clipPosition = _data.getClipPosition() ;
+		final Vector2 clipDimensions = _data.getClipDimensions() ;
+		if( clipPosition != null && clipDimensions != null )
+		{
+			GLES20.glEnable( GLES20.GL_SCISSOR_TEST ) ;
+			final Vector2 offset = renderInfo.getScreenOffset() ;
+			final Vector2 dim = renderInfo.getDisplayDimensions() ;
+			final Vector2 scale = renderInfo.getScaleRenderToDisplay() ;
+
+			GLES20.glScissor( ( int )( clipPosition.x + offset.x ), ( int )( dim.y - clipPosition.y - ( clipDimensions.y * scale.y ) - offset.y ),
+							( int )( clipDimensions.x * scale.x ), ( int )( clipDimensions.y * scale.y ) ) ;
+		}
+	}
+
 	public static class GLRenderData extends RenderData
 	{
 		private static int numID = 0 ;
@@ -795,11 +820,13 @@ public class GLRenderer extends Basic2DRender
 
 		// Must be nulled when reclaimed by cache
 		// User data
-		private Vector3 position    = null ;
-		private Vector2 offset      = null ;
-		private MalletColour colour = null ;
-		private Shape shape         = null ;
-		private String[] words      = null ;
+		private Vector3 position       = null ;
+		private Vector2 offset         = null ;
+		private MalletColour colour    = null ;
+		private Shape shape            = null ;
+		private String[] words         = null ;
+		private Vector2 clipPosition   = null ;
+		private Vector2 clipDimensions = null ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
@@ -832,6 +859,8 @@ public class GLRenderer extends Basic2DRender
 			textAlignment = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 			colour        = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
 			shape         = data.<Shape>getObject( "SHAPE", null ) ;
+			clipPosition   = data.<Vector2>getObject( "CLIP_POSITION", null ) ;
+			clipDimensions = data.<Vector2>getObject( "CLIP_DIMENSIONS", null ) ;
 			words         = null ;
 		}
 
@@ -913,6 +942,16 @@ public class GLRenderer extends Basic2DRender
 		public String[] getWords()
 		{
 			return words ;
+		}
+
+		public Vector2 getClipPosition()
+		{
+			return clipPosition ;
+		}
+
+		public Vector2 getClipDimensions()
+		{
+			return clipDimensions ;
 		}
 
 		public boolean toUpdate()

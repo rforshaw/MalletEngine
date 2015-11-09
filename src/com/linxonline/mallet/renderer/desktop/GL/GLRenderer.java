@@ -229,6 +229,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					return ;
 				}
 
+				handleClip( _data ) ;
+
 				gl.glUseProgram( program.id[0] ) ;
 
 				final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
@@ -273,6 +275,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glUseProgram( 0 ) ;
+				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
 				disableVertexAttributes( attributes ) ;
 			}
 		} ;
@@ -316,6 +319,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					System.out.println( "Program doesn't exist.." ) ;
 					return ;
 				}
+
+				handleClip( _data ) ;
 
 				gl.glUseProgram( program.id[0] ) ;
 				gl.glEnable( GL.GL_BLEND ) ;
@@ -363,6 +368,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
+				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
 			}
 		} ;
@@ -438,6 +444,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						newMatrix.multiply( worldMatrix ) ;
 					}
 
+					handleClip( _data ) ;
+
 					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
@@ -469,6 +477,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
+				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
 			}
 
@@ -869,6 +878,22 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
+	private void handleClip( final GLRenderData _data )
+	{
+		final Vector2 clipPosition = _data.getClipPosition() ;
+		final Vector2 clipDimensions = _data.getClipDimensions() ;
+		if( clipPosition != null && clipDimensions != null )
+		{
+			gl.glEnable( GL3.GL_SCISSOR_TEST ) ;
+			final Vector2 offset = renderInfo.getScreenOffset() ;
+			final Vector2 dim = renderInfo.getDisplayDimensions() ;
+			final Vector2 scale = renderInfo.getScaleRenderToDisplay() ;
+
+			gl.glScissor( ( int )( clipPosition.x + offset.x ), ( int )( dim.y - clipPosition.y - ( clipDimensions.y * scale.y ) - offset.y ),
+							( int )( clipDimensions.x * scale.x ), ( int )( clipDimensions.y * scale.y ) ) ;
+		}
+	}
+
 	public static void handleError( final String _txt, final GL3 _gl )
 	{
 		int error = 0 ;
@@ -902,11 +927,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		// Must be nulled when reclaimed by cache
 		// User data
-		private Vector3 position    = null ;
-		private Vector2 offset      = null ;
-		private MalletColour colour = null ;
-		private Shape shape         = null ;
-		private String[] words      = null ;
+		private Vector3 position       = null ;
+		private Vector2 offset         = null ;
+		private MalletColour colour    = null ;
+		private Shape shape            = null ;
+		private String[] words         = null ;
+		private Vector2 clipPosition   = null ;
+		private Vector2 clipDimensions = null ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
@@ -929,17 +956,19 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		private void updateData()
 		{
-			position      = data.<Vector3>getObject( "POSITION", null ) ;
-			offset        = data.<Vector2>getObject( "OFFSET", DEFAULT_OFFSET ) ;
-			layer         = data.getInteger( "LAYER", 0 ) ;
-			interpolation = data.<Interpolation>getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
-			uiElement     = data.getBoolean( "GUI", false ) ;
-			rotation      = ( float )Math.toDegrees( data.getFloat( "ROTATE", 0.0f ) ) ;
-			lineWidth     = data.getInteger( "LINEWIDTH", 2 ) ;
-			textAlignment = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
-			colour        = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
-			shape         = data.<Shape>getObject( "SHAPE", null ) ;
-			words         = null ;
+			position       = data.<Vector3>getObject( "POSITION", null ) ;
+			offset         = data.<Vector2>getObject( "OFFSET", DEFAULT_OFFSET ) ;
+			layer          = data.getInteger( "LAYER", 0 ) ;
+			interpolation  = data.<Interpolation>getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
+			uiElement      = data.getBoolean( "GUI", false ) ;
+			rotation       = ( float )Math.toDegrees( data.getFloat( "ROTATE", 0.0f ) ) ;
+			lineWidth      = data.getInteger( "LINEWIDTH", 2 ) ;
+			textAlignment  = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
+			colour         = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
+			shape          = data.<Shape>getObject( "SHAPE", null ) ;
+			clipPosition   = data.<Vector2>getObject( "CLIP_POSITION", null ) ;
+			clipDimensions = data.<Vector2>getObject( "CLIP_DIMENSIONS", null ) ;
+			words          = null ;
 		}
 
 		public void setTexture( final Texture _texture )
@@ -1020,6 +1049,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		public String[] getWords()
 		{
 			return words ;
+		}
+
+		public Vector2 getClipPosition()
+		{
+			return clipPosition ;
+		}
+
+		public Vector2 getClipDimensions()
+		{
+			return clipDimensions ;
 		}
 
 		public boolean toUpdate()

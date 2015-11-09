@@ -62,6 +62,16 @@ public final class DrawFactory
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
+	public static Event<Settings> amendClip( final Event<Settings> _event,
+											 final Vector2 _clipPosition,
+											 final Vector2 _clipDimensions )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "CLIP_POSITION", _clipPosition ) ;
+		set.addObject( "CLIP_DIMENSIONS", _clipDimensions ) ;
+		return _event ;
+	}
+	
 	public static Event<Settings> amendRotate( final Event<Settings> _event, final float _rotate )
 	{
 		final Settings set = _event.getVariable() ;

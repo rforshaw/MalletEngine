@@ -36,12 +36,12 @@ public final class AnimationFactory
 		}
 
 		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
+		settings.addObject( "RENDER_EVENT", DrawFactory.amendClip( DrawFactory.createTexture( ( String )null,
 																		plane,
 																	   _pos,
 																	   _offset,
 																	   _layer,
-																	   null ) ) ;
+																	   null ), _clip, _clipOffset ) ) ;
 
 		if( _callback != null )
 		{
