@@ -11,8 +11,8 @@ public final class Texture<T extends ImageInterface> extends Resource
 	public Texture( T _image )
 	{
 		image = _image ;
-		width = image.getWidth() ;
-		height = image.getHeight() ;
+		width = ( image != null ) ? image.getWidth() : 0 ;
+		height = ( image != null ) ? image.getHeight() : 0 ;
 	}
 
 	public final int getWidth()

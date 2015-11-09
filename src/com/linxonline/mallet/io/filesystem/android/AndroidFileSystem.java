@@ -151,7 +151,7 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public FileStream getFile( final String _path )
 	{
-		System.out.println( "GET FILE: " + _path ) ;
+		//System.out.println( "GET FILE: " + _path ) ;
 
 		if( mapZip.containsKey( _path ) == true )
 		{

@@ -30,6 +30,9 @@ import com.linxonline.mallet.resources.* ;
 
 public class GLTextureManager extends AbstractManager<Texture>
 {
+	// Used when a texture is being loaded, but not yet available.
+	private final Texture PLACEHOLDER = new Texture( null ) ;
+
 	/**
 		When loading a texture the TextureManager will stream the 
 		image content a-synchronously.
@@ -42,7 +45,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	private final ArrayList<Tuple<String, Bitmap>> toBind = new ArrayList<Tuple<String, Bitmap>>() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
-	
+
 	private boolean supportedETC1 = ETC1Util.isETC1Supported() ;
 
 	public GLTextureManager()
@@ -66,6 +69,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				{
 					public void run()
 					{
+						System.out.println( "Loading Texture: " + _file ) ;
 						final FileStream file = GlobalFileSystem.getFile( _file ) ;
 						if( file.exists() == false )
 						{
@@ -89,7 +93,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
-				add( _file, null ) ;
+				add( _file, PLACEHOLDER ) ;
 				load.start() ;
 				return null ;
 			}
@@ -142,7 +146,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
-				add( _file, null ) ;
+				add( _file, PLACEHOLDER ) ;
 				load.start() ;
 				return null ;
 			}
@@ -167,7 +171,11 @@ public class GLTextureManager extends AbstractManager<Texture>
 			toBind.clear() ;
 		}
 
-		return super.get( _file ) ;
+		final Texture texture = super.get( _file ) ;
+		
+		// PLACEHOLDER is used to prevent the texture loader 
+		// loading the same texture twice when loading async, 
+		return ( texture != PLACEHOLDER ) ? texture : null ;
 	}
 
 	/**
