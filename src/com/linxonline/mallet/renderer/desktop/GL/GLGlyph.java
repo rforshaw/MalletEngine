@@ -14,8 +14,5 @@ public class GLGlyph extends Glyph
 	}
 
 	@Override
-	public void destroy()
-	{
-		//index.destroy() ;
-	}
+	public void destroy() {}
 }

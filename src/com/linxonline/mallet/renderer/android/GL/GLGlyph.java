@@ -4,29 +4,18 @@ import com.linxonline.mallet.renderer.font.Glyph ;
 
 public class GLGlyph extends Glyph
 {
-	public GLGeometry index ;
+	public int index = -1 ;
 
 	public GLGlyph( final char _char, final float _start, final float _advance )
 	{
 		super( _char, _start, _advance ) ;
 	}
 
-	public void setIndex( final GLGeometry _index )
+	public void setIndex( final int _index )
 	{
 		index = _index ;
 	}
 
 	@Override
-	public void destroy()
-	{
-		if( index != null )
-		{
-			index.destroy() ;
-		}
-	}
-
-	public GLGeometry getGLGeometry()
-	{
-		return index ;
-	}
+	public void destroy() {}
 }

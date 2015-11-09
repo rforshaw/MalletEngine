@@ -19,7 +19,7 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
-import com.linxonline.mallet.renderer.android.GL.GLGeometry.VertexAttrib ;
+import com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.VertexAttrib ;
 
 public class GLRenderer extends Basic2DRender
 {
@@ -36,6 +36,7 @@ public class GLRenderer extends Basic2DRender
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
+	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 1000, 1000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
@@ -221,7 +222,7 @@ public class GLRenderer extends Basic2DRender
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 
-				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 				final int lineWidth = _data.getLineWidth() ;
 
@@ -266,8 +267,8 @@ public class GLRenderer extends Basic2DRender
 
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( shape, geometry ) ;
-						GLModelManager.updateVBO( geometry ) ;
+						uploader.uploadIndex( geometry, shape ) ;
+						uploader.uploadVBO( geometry, shape ) ;
 					}
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
@@ -310,7 +311,7 @@ public class GLRenderer extends Basic2DRender
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 
-				final GLGeometry geometry = model.getGeometry( GLGeometry.class ) ;
+				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 
 				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
@@ -354,8 +355,8 @@ public class GLRenderer extends Basic2DRender
 					// Update the UV co-ordinates of the model
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( shape, geometry ) ;
-						GLModelManager.updateVBO( geometry ) ;
+						uploader.uploadIndex( geometry, shape ) ;
+						uploader.uploadVBO( geometry, shape ) ;
 					}
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
@@ -364,6 +365,7 @@ public class GLRenderer extends Basic2DRender
 				matrixCache.reclaim( newMatrix ) ;
 
 				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisable( GLES20.GL_BLEND ) ;
 				disableVertexAttributes( attributes ) ;
 			}
 		} ;
@@ -422,11 +424,12 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				GLES20.glUseProgram( program.id[0] ) ;
+				GLES20.glEnable( GLES20.GL_BLEND ) ;
 
 				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				final GLGeometry geometry = fm.getGLGeometry() ;
+				final GLGeometryUploader.GLGeometry geometry = fm.getGLGeometry() ;
 				final VertexAttrib[] attributes =  geometry.getAttributes() ;
 				enableVertexAttributes( attributes ) ;
 
@@ -449,13 +452,15 @@ public class GLRenderer extends Basic2DRender
 
 					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
 
+					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 
 					if( _data.toUpdate() == true )
 					{
-						GLGeometry.update( fm.shape, geometry ) ;
-						GLModelManager.updateVBO( geometry ) ;
+						uploader.uploadIndex( geometry, fm.shape ) ;
+						uploader.uploadVBO( geometry, fm.shape ) ;
 					}
 
 					final int size = words.length ;
@@ -466,19 +471,22 @@ public class GLRenderer extends Basic2DRender
 
 				matrixCache.reclaim( newMatrix ) ;
 				disableVertexAttributes( attributes ) ;
+
 				GLES20.glUseProgram( 0 ) ;
+				GLES20.glDisable( GLES20.GL_BLEND ) ;
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final int _matrixHandle )
 			{
+				final GLGeometryUploader.GLGeometry geometry = _fm.getGLGeometry() ;
 				final int length = _text.length() ;
+
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, glyph.index.indexID, indexID ) ;
 
 					GLES20.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
-					GLES20.glDrawElements( GLES20.GL_TRIANGLES, glyph.index.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+					GLES20.glDrawElements( GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, glyph.index * 2 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -759,7 +767,7 @@ public class GLRenderer extends Basic2DRender
 
 	private void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
 	{
-		for( GLGeometry.VertexAttrib att : _atts )
+		for( VertexAttrib att : _atts )
 		{
 			GLES20.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
 		}
@@ -808,6 +816,7 @@ public class GLRenderer extends Basic2DRender
 		{
 			super.set( _data, _call, _type ) ;
 			data.addInteger( "ID", getID() ) ;
+			data.addBoolean( "UPDATE", true ) ;
 			updateData() ;
 		}
 

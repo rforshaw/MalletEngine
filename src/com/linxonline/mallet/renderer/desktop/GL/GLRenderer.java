@@ -43,9 +43,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
 
-	protected static final Vector2 UV1 = new Vector2() ;
-	protected static final Vector2 UV2 = new Vector2( 1.0f, 1.0f ) ;
-
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 

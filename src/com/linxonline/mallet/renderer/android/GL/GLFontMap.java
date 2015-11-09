@@ -58,9 +58,9 @@ public class GLFontMap extends Resource
 		return fontMap.getHeight() ;
 	}
 
-	public GLGeometry getGLGeometry()
+	public GLGeometryUploader.GLGeometry getGLGeometry()
 	{
-		return model.getGeometry( GLGeometry.class ) ;
+		return model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 	}
 
 	@Override

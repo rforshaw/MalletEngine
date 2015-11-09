@@ -118,21 +118,7 @@ public class GLFontGenerator
 
 				// Glyp geometry as located in a massive pool, stored in font map.
 				shapes.add( Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ) ;
-
-				final int[] index = new int[6] ;
-				index[0] = j + 0 ;
-				index[1] = j + 2 ;
-				index[2] = j + 1 ;
-				index[3] = j + 0 ;
-				index[4] = j + 1 ;
-				index[5] = j + 3 ;
-
-				final GLGeometry glyphIndex = GLGeometry.constructIndex( index ) ;
-
-				GLModelManager.bindIndex( glyphIndex ) ;
-				glyph.setIndex( glyphIndex ) ;
-
-				j += 4 ;
+				glyph.setIndex( j++ * 6 ) ;
 			}
 		}
 
@@ -141,11 +127,9 @@ public class GLFontGenerator
 
 		final Shape[] array = new Shape[shapes.size()] ;
 		final Shape combined = Shape.combine( shapes.toArray( array ) ) ;
-		final GLGeometry glyphGeometry = GLGeometry.construct( combined ) ;
+		final Model model = new Model( GLGeometryUploader.construct( combined ) ) ;
 
-		GLModelManager.bindVBO( glyphGeometry ) ;
-		_map.setModel( new Model( glyphGeometry ), combined ) ;
-
+		_map.setModel( model, combined ) ;
 		return _map ;
 	}
 
