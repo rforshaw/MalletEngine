@@ -41,7 +41,7 @@ public final class AnimationFactory
 																	   _pos,
 																	   _offset,
 																	   _layer,
-																	   null ), null, _clipPosition, _clipOffset ) ) ;
+																	   null ), Shape.constructPlane( new Vector3(), new Vector3( 400, 400, 0 ), new Vector2(), new Vector2( 1, 1 ) ), new Vector3(), new Vector3( -200, -200, 0 ) ) ) ;
 
 		if( _callback != null )
 		{

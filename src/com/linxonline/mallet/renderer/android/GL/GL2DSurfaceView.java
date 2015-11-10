@@ -13,6 +13,8 @@ public class GL2DSurfaceView extends GLSurfaceView
 	{
 		super( _context ) ;
 		setEGLContextClientVersion( 2 ) ;
+		setEGLConfigChooser( 8, 8, 8, 8, 16, 8 ) ;
+
 		//setPreserveEGLContextOnPause( true ) ;
 		renderer = new GL2DRenderer( _notify ) ;
 
