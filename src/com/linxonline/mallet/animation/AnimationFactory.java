@@ -21,9 +21,9 @@ public final class AnimationFactory
 													final Vector3 _pos, 
 													final Vector2 _offset, 			// Not needed
 													final Vector2 _dim,				// Not needed
-													final Vector2 _fill,				// Not needed
-													final Vector2 _clip,				// Not needed
-													final Vector2 _clipOffset,			// Not needed
+													final Vector2 _fill,			// Not needed
+													final Vector3 _clipPosition,	// Not needed
+													final Vector3 _clipOffset,		// Not needed
 													final int _layer,
 													final SourceCallback _callback )	// Not needed, but is important
 	{
@@ -41,7 +41,7 @@ public final class AnimationFactory
 																	   _pos,
 																	   _offset,
 																	   _layer,
-																	   null ), _clip, _clipOffset ) ) ;
+																	   null ), null, _clipPosition, _clipOffset ) ) ;
 
 		if( _callback != null )
 		{

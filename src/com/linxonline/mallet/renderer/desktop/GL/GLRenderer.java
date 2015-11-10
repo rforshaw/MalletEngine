@@ -109,6 +109,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	{
 		final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
 		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
+		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
 		capabilities.setDoubleBuffered( true ) ;
 
 		canvas = new GLJPanel( capabilities ) ;
@@ -215,6 +216,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					return ;
 				}
 
+				final boolean update = _data.toUpdate() ;
+				applyClip( _data, update ) ;
+
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 
@@ -228,8 +232,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					System.out.println( "Program doesn't exist.." ) ;
 					return ;
 				}
-
-				handleClip( _data ) ;
 
 				gl.glUseProgram( program.id[0] ) ;
 
@@ -263,7 +265,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
-					if( _data.toUpdate() == true )
+					if( update == true )
 					{
 						uploader.uploadIndex( gl, geometry, shape ) ;
 						uploader.uploadVBO( gl, geometry, shape ) ;
@@ -275,7 +277,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				matrixCache.reclaim( newMatrix ) ;
 
 				gl.glUseProgram( 0 ) ;
-				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
+				gl.glDisable( GL3.GL_STENCIL_TEST ) ;
 				disableVertexAttributes( attributes ) ;
 			}
 		} ;
@@ -303,6 +305,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					return ;
 				}
 
+				final boolean update = _data.toUpdate() ;
+				applyClip( _data, update ) ;
+
 				final Shape shape = _data.getShape() ;
 				final GLImage image = texture.getImage() ;
 				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
@@ -319,8 +324,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					System.out.println( "Program doesn't exist.." ) ;
 					return ;
 				}
-
-				handleClip( _data ) ;
 
 				gl.glUseProgram( program.id[0] ) ;
 				gl.glEnable( GL.GL_BLEND ) ;
@@ -354,7 +357,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
 
 					// Update the UV co-ordinates of the model
-					if( _data.toUpdate() == true )
+					if( update == true )
 					{
 						uploader.uploadIndex( gl, geometry, shape ) ;
 						uploader.uploadVBO( gl, geometry, shape ) ;
@@ -364,11 +367,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
-
 				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
-				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
+				gl.glDisable( GL3.GL_STENCIL_TEST ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
 			}
 		} ;
@@ -396,6 +398,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				{
 					return ;
 				}
+
+				final boolean update = _data.toUpdate() ;
+				applyClip( _data, update ) ;
 
 				final GLImage image = fm.getGLImage() ;
 				GLRenderer.bindTexture( gl, image.textureIDs, textureID ) ;
@@ -444,8 +449,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 						newMatrix.multiply( worldMatrix ) ;
 					}
 
-					handleClip( _data ) ;
-
 					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
@@ -460,7 +463,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
 
-					if( _data.toUpdate() == true )
+					if( update == true )
 					{
 						uploader.uploadIndex( gl, geometry, fm.shape ) ;
 						uploader.uploadVBO( gl, geometry, fm.shape ) ;
@@ -473,11 +476,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					}
 
 				matrixCache.reclaim( newMatrix ) ;
-
 				disableVertexAttributes( attributes ) ;
 
 				gl.glUseProgram( 0 ) ;
-				gl.glDisable( GL3.GL_SCISSOR_TEST ) ;
+				gl.glDisable( GL3.GL_STENCIL_TEST ) ;
 				gl.glDisable( GL.GL_BLEND ) ;
 			}
 
@@ -491,7 +493,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					gl.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
 
-					//System.out.println( glyph.character ) ;
 					gl.glDrawElements( GL3.GL_TRIANGLES, 6, GL3.GL_UNSIGNED_INT, glyph.index * 4 ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
@@ -598,6 +599,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 		{
 			final GLProgram program = programs.get( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
+			if( GLProgramManager.buildProgram( gl, program ) == false )
+			{
+				System.out.println( "Failed to compile program: " + program.name ) ;
+				GLProgramManager.deleteProgram( gl, program ) ;
+			}
+		}
+
+		{
+			final GLProgram program = programs.get( "SIMPLE_STENCIL", "base/shaders/desktop/simple_stencil.jgl" ) ;
 			if( GLProgramManager.buildProgram( gl, program ) == false )
 			{
 				System.out.println( "Failed to compile program: " + program.name ) ;
@@ -773,6 +783,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
 				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 
+				final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
+				if( clipShape != null )
+				{
+					data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
+				}
+
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				insert( data ) ;
 			}
@@ -793,6 +809,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 
+				final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
+				if( clipShape != null )
+				{
+					data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
+				}
+
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				insert( data ) ;
 			}
@@ -810,6 +832,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			final GLRenderData data = renderCache.get() ;
 			data.set( _draw, drawText, DrawRequestType.TEXT ) ;
 			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
+
+			final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
+			if( clipShape != null )
+			{
+				data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
+			}
 
 			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			insert( data ) ;
@@ -878,19 +906,90 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 	}
 
-	private void handleClip( final GLRenderData _data )
+	/**
+		Called before drawing another element.
+		Constructs a stencil buffer that prevents 
+		the element from being rendered outside the 
+		clip-shape.
+		Anything that uses applyClip must disable 
+		GL_STENCIL_TEST afterwards.
+		Unlike glScissor clip-shapes are affected 
+		by worldspace and UI space. Allowing it to be much 
+		more flexible to use when limiting where a graphic 
+		can render out.
+	*/
+	private void applyClip( final GLRenderData _data, final boolean _update )
 	{
-		final Vector2 clipPosition = _data.getClipPosition() ;
-		final Vector2 clipDimensions = _data.getClipDimensions() ;
-		if( clipPosition != null && clipDimensions != null )
-		{
-			gl.glEnable( GL3.GL_SCISSOR_TEST ) ;
-			final Vector2 offset = renderInfo.getScreenOffset() ;
-			final Vector2 dim = renderInfo.getDisplayDimensions() ;
-			final Vector2 scale = renderInfo.getScaleRenderToDisplay() ;
+		final Vector3 position = _data.getClipPosition() ;
+		final Vector3 offset = _data.getClipOffset() ;
+		final Model model = _data.getClipModel() ;
+		final Shape shape = _data.getClipShape() ;
 
-			gl.glScissor( ( int )( clipPosition.x + offset.x ), ( int )( dim.y - clipPosition.y - ( clipDimensions.y * scale.y ) - offset.y ),
-							( int )( clipDimensions.x * scale.x ), ( int )( clipDimensions.y * scale.y ) ) ;
+		if( position != null && offset != null && model != null && shape != null )
+		{
+			final GLProgram program = programs.get( "SIMPLE_STENCIL" ) ;
+			if( program == null )
+			{
+				System.out.println( "Program doesn't exist.." ) ;
+				return ;
+			}
+
+			gl.glUseProgram( program.id[0] ) ;
+
+			final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
+			final boolean isGUI = _data.isUI() ;
+
+			final int inMVPMatrix      = gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
+			final int inPositionMatrix = gl.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
+
+			final VertexAttrib[] attributes =  geometry.getAttributes() ;
+			enableVertexAttributes( attributes ) ;
+
+				final Matrix4 newMatrix = matrixCache.get() ;
+				if( isGUI == true )
+				{
+					newMatrix.multiply( uiMatrix ) ;
+				}
+				else
+				{
+					newMatrix.multiply( worldMatrix ) ;
+				}
+
+				newMatrix.translate( position.x, position.y, 0.0f ) ;
+				//newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+
+				gl.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
+				gl.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
+
+				GLRenderer.bindBuffer( gl, GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
+				GLRenderer.bindBuffer( gl, GL3.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
+
+				if( _update == true )
+				{
+					uploader.uploadIndex( gl, geometry, shape ) ;
+					uploader.uploadVBO( gl, geometry, shape ) ;
+				}
+
+				// Don't render the element to the colour buffer
+				gl.glColorMask( false, false, false, false ) ;
+				gl.glEnable( GL3.GL_STENCIL_TEST ) ;
+
+				gl.glStencilMask( 0xFF ) ;
+				gl.glClear( GL.GL_STENCIL_BUFFER_BIT ) ;
+
+				gl.glStencilFunc( GL3.GL_NEVER, 1, 0xFF ) ;
+				gl.glStencilOp( GL3.GL_REPLACE, GL3.GL_KEEP, GL3.GL_KEEP ) ;
+
+				prepareVertexAttributes( attributes, geometry.getStride() ) ;
+				gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
+
+			matrixCache.reclaim( newMatrix ) ;
+			disableVertexAttributes( attributes ) ;
+
+			gl.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
+			gl.glStencilFunc( GL3.GL_EQUAL, 1, 1 ) ;
+			// Continue drawing scene...
 		}
 	}
 
@@ -931,14 +1030,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		private Vector2 offset         = null ;
 		private MalletColour colour    = null ;
 		private Shape shape            = null ;
+		private Shape clipShape        = null ;
 		private String[] words         = null ;
-		private Vector2 clipPosition   = null ;
-		private Vector2 clipDimensions = null ;
+		private Vector3 clipPosition   = null ;
+		private Vector3 clipOffset     = null ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
 		private Texture texture ;
 		private Model model ;
+		private Model clipModel ;
 		
 		public GLRenderData()
 		{
@@ -966,14 +1067,20 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			textAlignment  = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 			colour         = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
 			shape          = data.<Shape>getObject( "SHAPE", null ) ;
-			clipPosition   = data.<Vector2>getObject( "CLIP_POSITION", null ) ;
-			clipDimensions = data.<Vector2>getObject( "CLIP_DIMENSIONS", null ) ;
+			clipPosition   = data.<Vector3>getObject( "CLIP_POSITION", null ) ;
+			clipOffset     = data.<Vector3>getObject( "CLIP_OFFSET", null ) ;
+			clipShape      = data.<Shape>getObject( "CLIP_SHAPE", null ) ;
 			words          = null ;
 		}
 
 		public void setTexture( final Texture _texture )
 		{
 			texture = _texture ;
+		}
+
+		public void setClipModel( final Model _model )
+		{
+			clipModel = _model ;
 		}
 
 		public void setModel( final Model _model )
@@ -1026,11 +1133,21 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return shape ;
 		}
 
+		public Shape getClipShape()
+		{
+			return clipShape ;
+		}
+
 		public Model getModel()
 		{
 			return model ;
 		}
 
+		public Model getClipModel()
+		{
+			return clipModel ;
+		}
+		
 		public MalletColour getColour()
 		{
 			return colour ;
@@ -1051,14 +1168,14 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return words ;
 		}
 
-		public Vector2 getClipPosition()
+		public Vector3 getClipPosition()
 		{
 			return clipPosition ;
 		}
 
-		public Vector2 getClipDimensions()
+		public Vector3 getClipOffset()
 		{
-			return clipDimensions ;
+			return clipOffset ;
 		}
 
 		public boolean toUpdate()
@@ -1118,6 +1235,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					// So must be destroyed explicity.
 					model.destroy() ;
 				}
+			}
+
+			if( clipModel != null )
+			{
+				clipModel.destroy() ;
 			}
 
 			renderCache.reclaim( this ) ;

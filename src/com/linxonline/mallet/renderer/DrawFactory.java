@@ -63,12 +63,14 @@ public final class DrawFactory
 	}
 
 	public static Event<Settings> amendClip( final Event<Settings> _event,
-											 final Vector2 _clipPosition,
-											 final Vector2 _clipDimensions )
+											 final Shape _clip,
+											 final Vector3 _clipPosition,
+											 final Vector3 _clipOffset )
 	{
 		final Settings set = _event.getVariable() ;
+		set.addObject( "CLIP_SHAPE", _clip ) ;
 		set.addObject( "CLIP_POSITION", _clipPosition ) ;
-		set.addObject( "CLIP_DIMENSIONS", _clipDimensions ) ;
+		set.addObject( "CLIP_OFFSET", _clipOffset ) ;
 		return _event ;
 	}
 	

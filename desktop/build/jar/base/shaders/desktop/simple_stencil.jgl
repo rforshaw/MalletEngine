@@ -1,0 +1,4 @@
+{
+	NAME: "SIMPLE_STENCIL",
+	VERTEX: ["base/shaders/desktop/simple_vertex.glsl"]
+}
