@@ -40,6 +40,7 @@
   </dependencies>
 
   <build>
+	  <sourceDirectory>../src</sourceDirectory>
     <plugins>
       <!-- Configure Java compiler to use Java 8 syntax  -->
       <plugin>
