@@ -38,12 +38,14 @@
 		<!-- Desktop implementation should ignore Android folders -->
 		<javac encoding="UTF-8" srcdir="${engine-src.dir}" destdir="${engine-classes.dir}" classpathref="classpath-engine" debug="true">
 			<exclude name="**/android/**" />
+			<exclude name="**/web/**" />
 		</javac>
 		<jar destfile="${jar.dir}/${MALLETENGINE}.jar" basedir="${engine-classes.dir}"/>
 
 		<!-- Desktop implementation should ignore Android folders -->
 		<javac encoding="UTF-8" srcdir="${editor-src.dir}" destdir="${editor-classes.dir}" classpathref="classpath-editor" debug="true">
 			<exclude name="**/android/**" />
+			<exclude name="**/web/**" />
 		</javac>
 
 		<jar destfile="${jar.dir}/${MALLETEDITOR}.jar" basedir="${editor-classes.dir}"/>

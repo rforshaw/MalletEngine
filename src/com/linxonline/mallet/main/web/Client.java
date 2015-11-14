@@ -1,25 +1,22 @@
 package com.linxonline.mallet.main.web ;
 
-import org.teavm.jso.dom.html.HTMLDocument;
-import org.teavm.jso.dom.html.HTMLElement;
+import org.teavm.jso.browser.Window ;
+import org.teavm.jso.dom.html.HTMLDocument ;
+import org.teavm.jso.dom.html.HTMLElement ;
+import org.teavm.jso.dom.html.HTMLSourceElement ;
 
-import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.main.web.WebTestStarter ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.filesystem.FileStream ;
+
+import com.linxonline.mallet.io.filesystem.web.WebFile ;
 
 public class Client
 {
-	public static void main(String[] args)
+	public static void main( final String[] _args )
 	{
-		final Shape shape = new Shape( 10, 10 ) ;
-		System.out.println( shape ) ;
-	
-		final Settings test = new Settings() ;
-		test.addString( "TEST", "BOOM!!!!" ) ;
-		System.out.println( test ) ;
-
-		HTMLDocument document = HTMLDocument.current();
-		HTMLElement div = document.createElement("div");
-		div.appendChild(document.createTextNode("TeaVM generated element"));
-		document.getBody().appendChild(div);
+		final WebTestStarter starter = new WebTestStarter() ;
+		starter.init() ;
+		starter.run() ;
 	}
 }

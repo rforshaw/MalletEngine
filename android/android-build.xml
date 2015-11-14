@@ -736,6 +736,7 @@
                 <exclude name="**/GL/**"/>
 				<exclude name="**/G2D/**"/>
 				<exclude name="**/malleteditor/**"/>
+				<exclude name="**/web/**"/>
 				<src path="${source.absolute.dir}" />
                 <src path="${gen.absolute.dir}" />
                 <compilerarg line="${java.compilerargs}" />

@@ -255,7 +255,7 @@ public class InputSystem implements InputSystemInterface,
 		final InputEvent input = new InputEvent( InputType.SCROLL_WHEEL, scroll, scroll ) ;
 		mouseInputs.add( input ) ;
 	}
-	
+
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
 	{
 		final InputEvent input = cache.get() ;

@@ -1,0 +1,161 @@
+package com.linxonline.mallet.renderer.web.gl ;
+
+import javax.imageio.ImageIO ;
+import java.io.File ;
+import java.io.IOException ;
+
+import org.teavm.jso.webgl.WebGLRenderingContext ;
+
+import java.awt.Font ;
+import java.awt.FontMetrics ;
+import java.awt.font.GlyphVector ;
+
+import java.awt.image.BufferedImage ;
+import java.awt.geom.Rectangle2D ;
+import java.awt.RenderingHints ;
+import java.awt.Graphics2D ;
+import java.awt.Canvas ;
+import java.awt.AlphaComposite ;
+
+import com.linxonline.mallet.resources.model.Model ;
+import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.font.FontMap ;
+import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
+
+public class GLFontGenerator
+{
+	private final GLTextureManager manager ;
+
+	public GLFontGenerator( final GLTextureManager _manager )
+	{
+		manager = _manager ;
+	}
+
+	public GLFontMap generateFontMap( final String _name, final int _size, final String _charsToMap, final int _spacing )
+	{
+		return generateFontMap( new Font( _name, Font.PLAIN, _size ), _charsToMap, _spacing ) ;
+	}
+
+	/**
+		Needs to be updated to provide higher resolution font maps.
+		We should render out a high resolution map, but use geometry 
+		suitable for the font specified. Currently texture is generated 
+		based on 
+	*/
+	public GLFontMap generateFontMap( final Font _font, final String _charsToMap, int _spacing )
+	{
+		return null ;
+		// We want to render the texture at a higher resolution
+		// Allowing the font to be scaled/zoomed without 
+		// significant quality loss.
+		/*final Font textureFont = _font.deriveFont( _font.getSize2D() ) ;//* 2.0f ) ;
+		final Dimensions textureDim = determineDimensions( textureFont, _charsToMap ) ;
+
+		final int length = _charsToMap.length() ;
+		final float textureWidth = textureDim.width + ( _spacing * length ) ;
+
+		// Used to render the texture
+		final BufferedImage textureBuffer = new BufferedImage( ( int )textureWidth, textureDim.height, BufferedImage.TYPE_BYTE_GRAY ) ;
+		final Graphics2D gTex2D = textureBuffer.createGraphics() ;
+		gTex2D.setFont( textureFont ) ;
+		gTex2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
+		final FontMetrics textureMetrics = gTex2D.getFontMetrics() ;
+
+		// Used to get Metric information for geometry
+		final BufferedImage geometryBuffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
+		final Graphics2D gGeom2D = geometryBuffer.createGraphics() ;
+		gGeom2D.setFont( _font ) ;
+		final FontMetrics geometryMetrics = gGeom2D.getFontMetrics() ;
+
+		int increment = 0 ;
+		final char[] c = new char[1] ;
+		final float point = 1.0f / textureWidth ;
+		final Glyph[] glyphs = new GLGlyph[length] ;
+		final int geometryHeight = geometryMetrics.getHeight() ;
+
+		final WebGLRenderingContext gl = GLRenderer.getContext() ;
+		if( gl == null )
+		{
+			System.out.println( "GL context doesn't exist" ) ;
+			return null ;
+		}
+
+		final Shape[] shapes = new Shape[length] ;
+		for( int i = 0; i < length; i++ )
+		{
+			c[0] = _charsToMap.charAt( i ) ;
+
+			// Render character to texture buffer starting from textureStart.
+			final int textureStart = increment + ( int )( textureDim.position.x + ( i * _spacing ) ) ;
+			gTex2D.drawChars( c, 0, 1, textureStart, ( int )textureDim.position.y ) ;
+
+			final int geometryAdvance = geometryMetrics.charWidth( c[0] ) ;
+			final Vector3 maxPoint = new Vector3( geometryAdvance, geometryHeight, 0.0f ) ;
+
+			final int textureAdvance = textureMetrics.charWidth( c[0] ) ;
+			final Vector2 uv1 = new Vector2( ( float )textureStart * point, 0.0f ) ;
+			final Vector2 uv2 = new Vector2( ( float )( textureStart + textureAdvance ) * point, 1.0f ) ;
+
+			// Must be manually destroyed, as not added to the 
+			// ModelManager automatically.
+			// Glyph geometry as located in a massive pool, stored in font map.
+			shapes[i] = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
+			glyphs[i] = new GLGlyph( i * 6, c[0], 0, geometryAdvance ) ;
+
+			increment += textureAdvance ;
+		}
+
+		final Shape combined = Shape.combine( shapes ) ;
+		final Model model = new Model( GLGeometryUploader.construct( combined ) ) ;*/
+
+		/*try
+		{
+			final File outputfile = new File( "saved.png" ) ;
+			ImageIO.write( textureBuffer, "png", outputfile ) ;
+		}
+		catch (IOException e) {}*/
+
+		// Create a GLFontMap and wrap it around a FontMap
+		// buffer is not automatically destroyed by TextureManager,
+		// must be manually destroyed.
+		/*return new GLFontMap( new FontMap( glyphs, 
+										   manager.bind( textureBuffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
+										   geometryHeight ), model, combined ) ;*/
+	}
+
+	private Dimensions determineDimensions( final Font _font, final String _text )
+	{
+		final BufferedImage buffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
+		final Graphics2D g2D = buffer.createGraphics() ;
+		g2D.setFont( _font ) ;
+		final FontMetrics metrics = g2D.getFontMetrics() ;
+
+		final Rectangle2D rect = metrics.getStringBounds( _text, g2D ) ;
+		final int width = ( int )( rect.getMaxX() - rect.getMinX() ) ;
+		final int height = ( int )( rect.getMaxY() - rect.getMinY() ) ;
+		final float y = metrics.getAscent() ;
+
+		return new Dimensions( new Vector2( 0, y ), width, height ) ;
+	}
+
+	private static class Dimensions
+	{
+		public final int width ;
+		public final int height ;
+		public final Vector2 position ;
+
+		public Dimensions( final Vector2 _pos, final int _width, final int _height )
+		{
+			position = _pos ;
+			width = _width ;
+			height = _height ;
+		}
+
+		public String toString()
+		{
+			return "WIDTH: " + width + " HEIGHT: " + height + " POS: " + position.toString() ;
+		}
+	}
+}
