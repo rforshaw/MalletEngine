@@ -1,0 +1,5 @@
+{
+	"NAME": "SIMPLE_TEXTURE",
+	"VERTEX": ["base/shaders/web/simple_vertex.glsl"],
+	"FRAGMENT": ["base/shaders/web/simple_texture_fragment.glsl"]
+}

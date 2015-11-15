@@ -255,8 +255,7 @@ public class GLGeometryUploader
 
 			attributes = _attributes ;
 			stride = _vertexStride ;
-			
-			System.out.println( "Style: " + _style ) ;
+
 			switch( _style )
 			{
 				case LINES      : style = GL3.LINES ;      break ;
@@ -295,12 +294,16 @@ public class GLGeometryUploader
 	private static float getABGR( final MalletColour _colour )
 	{
 		final byte[] colour = new byte[4] ;
-		colour[0] = _colour.colours[MalletColour.ALPHA] ;
-		colour[1] = _colour.colours[MalletColour.BLUE] ;
-		colour[2] = _colour.colours[MalletColour.GREEN] ;
 		colour[3] = _colour.colours[MalletColour.RED] ;
+		colour[2] = _colour.colours[MalletColour.GREEN] ;
+		colour[1] = _colour.colours[MalletColour.BLUE] ;
+		colour[0] = _colour.colours[MalletColour.ALPHA] ;
+		return toFloat( colour ) ;
+	}
 
-		return ( colour[0] << 24 ) | ( colour[1] << 16 ) | ( colour[2] << 8 ) | colour[3] ;
-		//return ConvertBytes.toFloat( colour, 0, 4 ) ;
+	private static float toFloat( byte[] _b )
+	{
+		final int i = ( ( ( _b[0] & 0xff ) << 24 ) | ( ( _b[1] & 0xff ) << 16 ) | ( ( _b[2] & 0xff ) << 8) | ( _b[3] & 0xff ) ) ;
+		return Float.intBitsToFloat( i ) ;
 	}
 }

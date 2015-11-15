@@ -72,7 +72,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
-				add( _file, null ) ;
+				add( _file, PLACEHOLDER ) ;
 
 				TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
 				load.start() ;

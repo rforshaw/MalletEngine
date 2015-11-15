@@ -13,8 +13,8 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class GLProgramManager extends AbstractManager<GLProgram>
 {
-	public static final int MVP_MATRIX           = 0 ;
-	public static final int POSITION_MATRIX      = 1 ;
+	public static final int MVP_MATRIX           = 7 ;
+	public static final int POSITION_MATRIX      = 8 ;
 
 	public static final int VERTEX_ARRAY         = 0 ;
 	public static final int COLOUR_ARRAY         = 1 ;

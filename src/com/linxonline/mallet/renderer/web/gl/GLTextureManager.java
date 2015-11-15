@@ -3,18 +3,15 @@ package com.linxonline.mallet.renderer.web.gl ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.Iterator ;
-import java.awt.* ;
-import java.awt.image.* ;
-import java.awt.color.ColorSpace ;
-import javax.imageio.* ;
-import java.io.* ;
-import javax.imageio.stream.* ;
 
 import java.nio.* ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLTexture ;
+import org.teavm.jso.browser.Window ;
+import org.teavm.jso.dom.html.HTMLDocument ;
 import org.teavm.jso.dom.html.HTMLImageElement ;
+import org.teavm.jso.dom.events.* ;
 
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -30,6 +27,23 @@ import com.linxonline.mallet.resources.* ;
 
 public class GLTextureManager extends AbstractManager<Texture>
 {
+	private static final Window window = Window.current() ;
+	private static final HTMLDocument document = window.getDocument() ;
+
+	// Used when a texture is being loaded, but not yet available.
+	private final Texture PLACEHOLDER = new Texture( null ) ;
+
+	/**
+		When loading a texture the TextureManager will stream the 
+		image content a-synchronously.
+		To ensure the textures are added safely to resources we 
+		temporarily store the images in a queue.
+		The BufferedImages are then binded to OpenGL and added 
+		to resources in order. If we don't do this images may be 
+		binded to OpenGL out of order causing significant performance 
+		degradation.
+	*/
+	private final ArrayList<Tuple<String, HTMLImageElement>> toBind = new ArrayList<Tuple<String, HTMLImageElement>>() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	/**
@@ -58,9 +72,54 @@ public class GLTextureManager extends AbstractManager<Texture>
 					return null ;
 				}
 
-				return bind( file.getHTMLImage() ) ;
+				add( _file, PLACEHOLDER ) ;
+
+				final HTMLImageElement img = file.getHTMLImage() ;
+				window.getDocument().getBody().appendChild( img ) ;
+
+				img.getStyle().setProperty( "display", "none" ) ;
+				img.setSrc( _file ) ;
+				img.addEventListener( "load", new EventListener()
+				{
+					@Override
+					public void handleEvent( Event _event )
+					{
+						synchronized( toBind )
+						{
+							// We don't want to bind the BufferedImage now
+							// as that will take control of the OpenGL context.
+							toBind.add( new Tuple<String, HTMLImageElement>( _file, img ) ) ;
+						}
+					}
+				} ) ;
+
+				return null ; 
 			}
 		} ) ;
+	}
+
+	@Override
+	public Texture get( final String _file )
+	{
+		synchronized( toBind )
+		{
+			// GLRenderer will continuosly call get() until it 
+			// recieves a Texture, so we only need to bind 
+			// textures that are waiting for the OpenGL context 
+			// when the render requests it.
+			for( final Tuple<String, HTMLImageElement> tuple : toBind )
+			{
+				System.out.println( "Bind: " + tuple.getLeft() ) ;
+				add( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+			}
+			toBind.clear() ;
+		}
+
+		final Texture texture = super.get( _file ) ;
+		
+		// PLACEHOLDER is used to prevent the texture loader 
+		// loading the same texture twice when loading async, 
+		return ( texture != PLACEHOLDER ) ? texture : null ;
 	}
 
 	/**
@@ -107,22 +166,13 @@ public class GLTextureManager extends AbstractManager<Texture>
 			return null ;
 		}
 
-		//gl.enable( GL3.TEXTURE_2D ) ;
-
 		final WebGLTexture textureID = glGenTextures( gl ) ;
 		gl.bindTexture( GL3.TEXTURE_2D, textureID ) ;
 
 		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.REPEAT ) ;
 		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.REPEAT ) ;
 		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MAG_FILTER, GL3.LINEAR ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR_MIPMAP_LINEAR ) ;
-
-		final int width = _image.getWidth() ;
-		final int height = _image.getHeight() ;
-		//final int channels = _image.getSampleModel().getNumBands() ;
-		int internalFormat = GL3.RGB ;
-
-		imageFormat = GL3.RGBA ;
+		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR_MIPMAP_NEAREST ) ;
 
 		//gl.pixelStorei( GL3.UNPACK_ALIGNMENT, 1 ) ;
 		gl.texImage2D( GL3.TEXTURE_2D, 
@@ -132,55 +182,10 @@ public class GLTextureManager extends AbstractManager<Texture>
 						 GL3.UNSIGNED_BYTE, 
 						 _image ) ;
 
-		//gl.generateMipmap( GL3.TEXTURE_2D ) ;
+		gl.generateMipmap( GL3.TEXTURE_2D ) ;
 		gl.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
 
-		return new Texture( new GLImage( textureID, width, height ) ) ;
-	}
-
-	/**
-		Returns a ByteBuffer of BufferedImage data.
-		Ensure BufferedImage is of 4BYTE_ABGR type.
-		If imageFormat is set to RGBA, byte stream will be converted.
-	*/
-	private ByteBuffer getByteBuffer( final BufferedImage _image )
-	{
-		final DataBuffer buffer = _image.getRaster().getDataBuffer() ;
-		final int type = buffer.getDataType() ;
-
-		if( type == DataBuffer.TYPE_BYTE )
-		{
-			final byte[] data = ( (  DataBufferByte )  buffer).getData() ;
-			if( imageFormat == GL3.RGBA )
-			{
-				convertABGRtoRGBA( data ) ;
-			}
-
-			return ByteBuffer.wrap( data ) ;
-		}
-
-		System.out.println( "Failed to determine DataBuffer type." ) ;
-		return null ;
-	}
-
-	private byte[] convertABGRtoRGBA( final byte[] _data )
-	{
-		byte alpha, red, green, blue ;
-		final int size = _data.length ;
-		for( int i = 0; i < size; i += 4 )
-		{
-			red   = _data[i + 3] ;
-			green = _data[i + 2] ;
-			blue  = _data[i + 1] ;
-			alpha = _data[i] ;
-
-			_data[i]     = red ;
-			_data[i + 1] = green ;
-			_data[i + 2] = blue ;
-			_data[i + 3] = alpha ;
-		}
-
-		return _data ;
+		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
 	}
 
 	private WebGLTexture glGenTextures( final WebGLRenderingContext _gl )

@@ -58,7 +58,9 @@ public class GLRenderer extends Basic2DRender
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = new Vector3() ;
 
+	private final HTMLCanvasElement canvas ;
 	private static WebGLRenderingContext gl ;
+
 	protected DrawInterface<GLRenderData> drawShape = null ;
 	protected DrawInterface<GLRenderData> drawTexture = null ;
 	protected DrawInterface<GLRenderData> drawText = null ;
@@ -78,8 +80,7 @@ public class GLRenderer extends Basic2DRender
 	public GLRenderer()
 	{
 		final HTMLDocument document = HTMLDocument.current();
-		final HTMLCanvasElement canvas = ( HTMLCanvasElement )document.getElementById( "mallet-canvas" ) ;
-
+		canvas = ( HTMLCanvasElement )document.getElementById( "mallet-canvas" ) ;
 		gl = ( WebGLRenderingContext )canvas.getContext( "webgl" ) ;
 
 		System.out.println( "GL Contex initialised.." ) ;
@@ -207,13 +208,9 @@ public class GLRenderer extends Basic2DRender
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == false )
-		{
-		
-		}
-
 		super.setDisplayDimensions( _width, _height ) ;
-		//canvas.setSize( _width, _height ) ;
+		canvas.setWidth( _width ) ;
+		canvas.setHeight( _height ) ;
 		resize() ;
 	}
 
@@ -259,9 +256,6 @@ public class GLRenderer extends Basic2DRender
 				final WebGLUniformLocation inMVPMatrix      = gl.getUniformLocation( program.id[0], "inMVPMatrix" ) ;
 				final WebGLUniformLocation inPositionMatrix = gl.getUniformLocation( program.id[0], "inPositionMatrix" ) ;
 
-				//System.out.println( "MVP Matrix: " + inMVPMatrix ) ;
-				//System.out.println( "inNormal: " + inNormal ) ;
-
 				final VertexAttrib[] attributes =  geometry.getAttributes() ;
 				enableVertexAttributes( attributes ) ;
 
@@ -278,6 +272,7 @@ public class GLRenderer extends Basic2DRender
 					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+					newMatrix.transpose() ;
 
 					gl.uniformMatrix4fv( inMVPMatrix, false, modelViewProjectionMatrix.matrix ) ;
 					gl.uniformMatrix4fv( inPositionMatrix, false, newMatrix.matrix ) ;
@@ -307,7 +302,7 @@ public class GLRenderer extends Basic2DRender
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				/*Texture<GLImage> texture = _data.getTexture() ;
+				Texture<GLImage> texture = _data.getTexture() ;
 				if( texture == null )
 				{
 					texture = loadTexture( _data ) ;
@@ -327,7 +322,7 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final boolean update = _data.toUpdate() ;
-				//applyClip( _data, update ) ;
+				applyClip( _data, update ) ;
 
 				final Shape shape = _data.getShape() ;
 				final GLImage image = texture.getImage() ;
@@ -368,6 +363,7 @@ public class GLRenderer extends Basic2DRender
 					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+					newMatrix.transpose() ;
 
 					gl.uniformMatrix4fv( inMVPMatrix, false, modelViewProjectionMatrix.matrix ) ;
 					gl.uniformMatrix4fv( inPositionMatrix, false, newMatrix.matrix ) ;
@@ -386,14 +382,14 @@ public class GLRenderer extends Basic2DRender
 
 					//System.out.println( "Draw Texture.." ) ;
 					prepareVertexAttributes( attributes, geometry.getStride() ) ;
-					gl.drawElements( GL3.TRIANGLES, geometry.getIndexLength(), GL3.UNSIGNED_SHORT, 0 ) ;
+					gl.drawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.UNSIGNED_SHORT, 0 ) ;
 
 				matrixCache.reclaim( newMatrix ) ;
 				disableVertexAttributes( attributes ) ;
 
 				gl.useProgram( null ) ;
 				gl.disable( GL3.STENCIL_TEST ) ;
-				gl.disable( GL3.BLEND ) ;*/
+				gl.disable( GL3.BLEND ) ;
 			}
 		} ;
 
@@ -606,7 +602,7 @@ public class GLRenderer extends Basic2DRender
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		gl.viewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 
-		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
+		DEFAULT_LINEWIDTH = 5 ;//( int )renderDimensions.x ;
 	}
 
 	@Override
@@ -618,8 +614,7 @@ public class GLRenderer extends Basic2DRender
 
 	public void draw( final float _dt )
 	{
-		//System.out.println( "Draw!" ) ;
-		cameraPosition.setXYZ( renderInfo.getCameraPosition() ) ;
+		cameraPosition = renderInfo.getCameraPosition() ;
 		if( cameraPosition == null )
 		{
 			System.out.println( "Camera Not Set" ) ;
@@ -695,6 +690,7 @@ public class GLRenderer extends Basic2DRender
 					 0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
 					 0.0f,        0.0f,        -2.0f * invZ, ( -( zFar + zNear ) * invZ ),
 					 0.0f,        0.0f,        0.0f,         1.0f ) ;
+		_matrix.transpose() ;
 	}
 
 	@Override

@@ -66,11 +66,11 @@ public final class GameTestLoader extends GameLoader
 			public void initGame()			// Called when state is started
 			{
 				renderTextureExample() ;
-				//renderAnimationExample() ;
+				renderAnimationExample() ;
 				//renderTextExample() ;
 				//playAudioExample() ;
 
-				/*for( int i = 0; i < 10; ++i )
+				for( int i = 0; i < 10; ++i )
 				{
 					for( int j = 0; j < 10; ++j )
 					{
@@ -78,7 +78,7 @@ public final class GameTestLoader extends GameLoader
 					}
 				}
 
-				createMouseAnimExample() ;*/
+				createMouseAnimExample() ;
 			}
 
 			/**
@@ -120,7 +120,7 @@ public final class GameTestLoader extends GameLoader
 																	10,
 																	null ) ) ;
 
-				/*final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
+				final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
 				triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
 				triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
 				triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
@@ -139,7 +139,7 @@ public final class GameTestLoader extends GameLoader
 																	new Vector3( -200.0f, 0.0f, 0.0f ),
 																	null,
 																	10,
-																	null ) ) ) ;*/
+																	null ) ) ) ;
 			}
 
 			/**

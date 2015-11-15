@@ -60,7 +60,7 @@ public abstract class WebStarter extends StarterInterface
 	public void run()
 	{
 		backendSystem.startSystem() ;
-		//setRenderSettings( backendSystem ) ;
+		setRenderSettings( backendSystem ) ;
 
 		thread = new Thread( "GAME_THREAD" )
 		{
