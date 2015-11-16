@@ -612,6 +612,8 @@ public class GLRenderer extends Basic2DRender
 		oldCameraPosition.setXYZ( cameraPosition ) ;
 	}
 
+	private boolean wait ; 
+	
 	public void draw( final float _dt )
 	{
 		cameraPosition = renderInfo.getCameraPosition() ;
@@ -644,7 +646,7 @@ public class GLRenderer extends Basic2DRender
 
 		gl.flush() ;
 		gl.finish() ;
-	}
+	} 
 
 	protected void render()
 	{

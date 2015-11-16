@@ -67,10 +67,36 @@ public class GLDefaultSystem extends BasicSystem
 	}
 
 	@Override
+	public void sleep( final long _millis )
+	{
+		try
+		{
+			Thread.sleep( _millis ) ;
+			Thread.yield() ;
+		}
+		catch( InterruptedException ex )
+		{
+			Thread.currentThread().interrupt() ;
+			//ex.printStackTrace() ;
+		}
+	}
+
+	@Override
 	public boolean update( final float _dt )
 	{
 		super.update( _dt ) ;
 		eventController.update() ;		// Process the Events this system is interested in
 		return true ;					// Informs the Game System whether to continue updating or not.
+	}
+
+	@Override
+	public void draw( final float _dt )
+	{
+		super.draw( _dt ) ;
+		// Sleep for a frame duration to ensure that
+		// it has been rendered out. 
+		// Without sleeping webgl doesn't seem to display anything.
+		// Sleep duration should be set to the frame limit. 
+		sleep( 16 ) ;
 	}
 }

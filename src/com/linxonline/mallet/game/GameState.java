@@ -411,7 +411,7 @@ public class GameState extends State implements HookEntity
 					//System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator -= DEFAULT_FRAMERATE ;
+					renderAccumulator -= 0.0f ;//DEFAULT_FRAMERATE ;
 				}
 
 				endTime = ElapsedTimer.nanoTime() ;
