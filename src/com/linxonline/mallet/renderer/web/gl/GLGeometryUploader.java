@@ -8,6 +8,7 @@ import org.teavm.jso.webgl.WebGLBuffer ;
 import org.teavm.jso.typedarrays.ArrayBuffer ;
 import org.teavm.jso.typedarrays.Int16Array ;
 import org.teavm.jso.typedarrays.Float32Array ;
+import org.teavm.jso.typedarrays.Uint8Array ;
 
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
@@ -115,6 +116,8 @@ public class GLGeometryUploader
 		final int vertexSize = calculateVertexSize( swivel ) ;
 		final int verticiesSize = _shape.getVertexSize() ;
 
+		final Uint8Array byteVersion = Uint8Array.create( verticies.getBuffer() ) ;
+
 		int inc = 0 ;
 		int offset = 0 ;
 
@@ -136,7 +139,8 @@ public class GLGeometryUploader
 					case COLOUR :
 					{
 						final MalletColour colour = _shape.getColour( i, j ) ;
-						verticies.set( inc++, getABGR( colour ) ) ;
+						setColour( inc++, colour, byteVersion ) ;
+						//verticies.set( inc++, getABGR( colour ) ) ;
 						break ;
 					}
 					case UV     :
@@ -291,19 +295,12 @@ public class GLGeometryUploader
 		}
 	}
 
-	private static float getABGR( final MalletColour _colour )
+	private static void setColour( final int _fIndex, final MalletColour _colour, final Uint8Array _byteStream )
 	{
-		final byte[] colour = new byte[4] ;
-		colour[3] = _colour.colours[MalletColour.RED] ;
-		colour[2] = _colour.colours[MalletColour.GREEN] ;
-		colour[1] = _colour.colours[MalletColour.BLUE] ;
-		colour[0] = _colour.colours[MalletColour.ALPHA] ;
-		return toFloat( colour ) ;
-	}
-
-	private static float toFloat( byte[] _b )
-	{
-		final int i = ( ( ( _b[0] & 0xff ) << 24 ) | ( ( _b[1] & 0xff ) << 16 ) | ( ( _b[2] & 0xff ) << 8) | ( _b[3] & 0xff ) ) ;
-		return Float.intBitsToFloat( i ) ;
+		int byteIndex = _fIndex * 4 ;
+		_byteStream.set( byteIndex++, ( short )_colour.colours[MalletColour.RED] ) ;
+		_byteStream.set( byteIndex++, ( short )_colour.colours[MalletColour.GREEN] ) ;
+		_byteStream.set( byteIndex++, ( short )_colour.colours[MalletColour.BLUE] ) ;
+		_byteStream.set( byteIndex, ( short )_colour.colours[MalletColour.ALPHA] ) ;
 	}
 }
