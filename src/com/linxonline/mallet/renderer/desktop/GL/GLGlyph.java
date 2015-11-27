@@ -5,12 +5,12 @@ import com.linxonline.mallet.renderer.Shape ;
 
 public class GLGlyph extends Glyph
 {
-	public final int index ;
+	public final Shape shape ;
 
-	public GLGlyph( final int _index, final char _char, final float _start, final float _advance )
+	public GLGlyph( final Shape _shape, final char _char, final float _start, final float _advance )
 	{
 		super( _char, _start, _advance ) ;
-		index = _index ;
+		shape = _shape ;
 	}
 
 	@Override

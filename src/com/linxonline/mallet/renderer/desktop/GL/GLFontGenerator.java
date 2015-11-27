@@ -97,17 +97,11 @@ public class GLFontGenerator
 			final Vector2 uv1 = new Vector2( ( float )textureStart * point, 0.0f ) ;
 			final Vector2 uv2 = new Vector2( ( float )( textureStart + textureAdvance ) * point, 1.0f ) ;
 
-			// Must be manually destroyed, as not added to the 
-			// ModelManager automatically.
-			// Glyph geometry as located in a massive pool, stored in font map.
-			shapes[i] = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
-			glyphs[i] = new GLGlyph( i * 6, c[0], 0, geometryAdvance ) ;
+			final Shape glyph = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
+			glyphs[i] = new GLGlyph( glyph, c[0], 0, geometryAdvance ) ;
 
 			increment += textureAdvance ;
 		}
-
-		final Shape combined = Shape.combine( shapes ) ;
-		final Model model = new Model( GLGeometryUploader.construct( combined ) ) ;
 
 		/*try
 		{
@@ -121,7 +115,7 @@ public class GLFontGenerator
 		// must be manually destroyed.
 		return new GLFontMap( new FontMap( glyphs, 
 										   manager.bind( textureBuffer, GLTextureManager.InternalFormat.UNCOMPRESSED ),
-										   geometryHeight ), model, combined ) ;
+										   geometryHeight ) ) ;
 	}
 
 	private Dimensions determineDimensions( final Font _font, final String _text )

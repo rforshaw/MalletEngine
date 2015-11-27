@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.ArrayList ;
+import java.util.Arrays ;
 import java.nio.* ;
 
 import javax.media.opengl.* ;
@@ -9,11 +10,13 @@ import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.resources.model.* ;
+import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.Matrix4 ;
 
 public class GLGeometryUploader
 {
@@ -22,6 +25,9 @@ public class GLGeometryUploader
 
 	private final IntBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
+
+	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
+	private final Vector3 temp = new Vector3() ;
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
 	{
@@ -37,15 +43,161 @@ public class GLGeometryUploader
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
 	}
 
-	public static synchronized GLGeometry construct( final Shape _shape )
+	public void draw( final GL3 _gl, final Matrix4 _modelViewProjection )
+	{
+		for( final GLBuffer buffer : buffers )
+		{
+			buffer.draw( _gl, _modelViewProjection ) ;
+		}
+	}
+
+	public void upload( final GL3 _gl, final GLRenderer.GLRenderData _data, final Matrix4 _matrix )
+	{
+		final GLBuffer buffer = getBuffer( _data ) ;
+		if( buffer != null )
+		{
+			buffer.upload( _gl, _data.getShape(), _matrix ) ;
+		}
+	}
+
+	public void reset()
+	{
+		for( final GLBuffer buffer : buffers )
+		{
+			buffer.reset() ;
+		}
+	}
+
+	protected void uploadIndex( final GL3 _gl, final GLGeometry _handler, final Shape _shape )
+	{
+		final int[] index = _shape.indicies ;
+		final int indexOffset = _handler.amountVertexUsedBytes / _handler.vertexStrideBytes ;
+
+		int j = 0 ;
+		int offset = _handler.amountIndexUsedBytes ;
+		for( int i = 0; i < index.length; i++ )
+		{
+			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
+			indicies[j++] = indexOffset + index[i] ;
+			if( j >= indicies.length )
+			{
+				indexBuffer.put( indicies ) ;
+				indexBuffer.position( 0 ) ;
+
+				final int indexBufferLengthInBytes = indicies.length * 4 ;
+				_gl.glBufferSubData( GL3.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
+				//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+
+				j = 0 ;
+				offset += indexBufferLengthInBytes ;
+			}
+		}
+
+		if( j > 0 )
+		{
+			indexBuffer.put( indicies ) ;
+			indexBuffer.position( 0 ) ;
+
+			final int indexBufferLengthInBytes = j * 4 ;
+			_gl.glBufferSubData( GL3.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
+			//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+		}
+	}
+
+	protected void uploadVBO( final GL3 _gl, final GLGeometry _handler, final Shape _shape, final Matrix4 _matrix )
 	{
 		final Shape.Swivel[] swivel = _shape.getSwivel() ;
-		final VertexAttrib[] attributes = new VertexAttrib[swivel.length] ;
+		final int vertexSize = calculateVertexSize( swivel ) ;
+		final int verticiesSize = _shape.getVertexSize() ;
+
+		int inc = 0 ;
+		int offset = _handler.amountVertexUsedBytes ;
+
+		for( int i = 0; i < verticiesSize; i++ )
+		{
+			for( int j = 0; j < swivel.length; j++ )
+			{
+				switch( swivel[j] )
+				{
+					case NORMAL :
+					case POINT  :
+					{
+						final Vector3 point = _shape.getPoint( i, j ) ;
+						Matrix4.multiply( point, _matrix, temp ) ;
+						verticies[inc++] = temp.x ;
+						verticies[inc++] = temp.y ;
+						verticies[inc++] = temp.z ;
+						break ;
+					}
+					case COLOUR :
+					{
+						final MalletColour colour = _shape.getColour( i, j ) ;
+						verticies[inc++] = getABGR( colour ) ;
+						break ;
+					}
+					case UV     :
+					{
+						final Vector2 uv = _shape.getUV( i, j ) ;
+						verticies[inc++] = uv.x ;
+						verticies[inc++] = uv.y ;
+						break ;
+					}
+				}
+			}
+
+			if( ( inc + vertexSize ) >= verticies.length )
+			{
+				vertexBuffer.put( verticies ) ;
+				vertexBuffer.position( 0 ) ;
+
+				final int vertexLengthInBytes = inc * 4 ;
+				_gl.glBufferSubData( GL3.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
+				//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
+
+				inc = 0 ;
+				offset += vertexLengthInBytes ;
+			}
+		}
+		
+		if( inc > 0 )
+		{
+			vertexBuffer.put( verticies ) ;
+			vertexBuffer.position( 0 ) ;
+
+			final int vertexLengthInBytes = inc * 4 ;
+			_gl.glBufferSubData( GL3.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
+			//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
+		}
+	}
+
+	/**
+		Find a GLBuffer that supports the texture, swivel, and layer
+		of the datat passed in.
+		If a GLBuffer doesn't exist create one.
+	*/
+	private GLBuffer getBuffer( final GLRenderer.GLRenderData _data )
+	{
+		for( final GLBuffer buffer : buffers )
+		{
+			if( buffer.isSupported( _data ) == true )
+			{
+				return buffer ;
+			}
+		}
+
+		final GLBuffer buffer = new GLBuffer( _data, indicies.length * 4, verticies.length * 4 ) ;
+		buffers.add( buffer ) ;
+		return buffer ;
+	}
+
+	private static VertexAttrib[] constructVertexAttrib( final Shape.Swivel[] _swivel )
+	{
+		final VertexAttrib[] attributes = new VertexAttrib[_swivel.length] ;
 
 		int offset = 0 ;
-		for( int i = 0; i < swivel.length; i++ )
+		for( int i = 0; i < _swivel.length; i++ )
 		{
-			switch( swivel[i] )
+			switch( _swivel[i] )
 			{
 				case POINT  :
 				{
@@ -74,113 +226,10 @@ public class GLGeometryUploader
 			}
 		}
 
-		final int vertexStride = offset ;
-		final int vertexLength = _shape.getVertexSize() * ( vertexStride / 4 ) ;
-		final GLGeometry geometry = new GLGeometry( attributes,
-													_shape.style,
-													_shape.indicies.length,
-													vertexLength,
-													vertexStride ) ;
-
-		return geometry ;
+		return attributes ;
 	}
 
-	public synchronized void uploadIndex( final GL3 _gl, final GLGeometry _handler, final Shape _shape )
-	{
-		final int[] index = _shape.indicies ;
-
-		int j = 0 ;
-		int offset = 0 ;
-		for( int i = 0; i < index.length; i++ )
-		{
-			indicies[j++] = index[i] ;
-			if( j >= indicies.length )
-			{
-				indexBuffer.put( indicies ) ;
-				indexBuffer.position( 0 ) ;
-
-				final int indexBufferLengthInBytes = indicies.length * 4 ;
-				_gl.glBufferSubData( GL3.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
-
-				j = 0 ;
-				offset += indexBufferLengthInBytes ;
-			}
-		}
-
-		if( j > 0 )
-		{
-			indexBuffer.put( indicies ) ;
-			indexBuffer.position( 0 ) ;
-
-			final int indexBufferLengthInBytes = j * 4 ;
-			_gl.glBufferSubData( GL3.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
-		}
-	}
-
-	public synchronized void uploadVBO( final GL3 _gl, final GLGeometry _handler, final Shape _shape )
-	{
-		final Shape.Swivel[] swivel = _shape.getSwivel() ;
-		final int vertexSize = calculateVertexSize( swivel ) ;
-		final int verticiesSize = _shape.getVertexSize() ;
-
-		int inc = 0 ;
-		int offset = 0 ;
-
-		for( int i = 0; i < verticiesSize; i++ )
-		{
-			for( int j = 0; j < swivel.length; j++ )
-			{
-				switch( swivel[j] )
-				{
-					case NORMAL :
-					case POINT  :
-					{
-						final Vector3 point = _shape.getPoint( i, j ) ;
-						verticies[inc++] = point.x ;
-						verticies[inc++] = point.y ;
-						verticies[inc++] = point.z ;
-						break ;
-					}
-					case COLOUR :
-					{
-						final MalletColour colour = _shape.getColour( i, j ) ;
-						verticies[inc++] = getABGR( colour ) ;
-						break ;
-					}
-					case UV     :
-					{
-						final Vector2 uv = _shape.getUV( i, j ) ;
-						verticies[inc++] = uv.x ;
-						verticies[inc++] = uv.y ;
-						break ;
-					}
-				}
-			}
-
-			if( ( inc + vertexSize ) >= verticies.length )
-			{
-				vertexBuffer.put( verticies ) ;
-				vertexBuffer.position( 0 ) ;
-
-				final int vertexLengthInBytes = inc * 4 ;
-				_gl.glBufferSubData( GL3.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
-
-				inc = 0 ;
-				offset += vertexLengthInBytes ;
-			}
-		}
-		
-		if( inc > 0 )
-		{
-			vertexBuffer.put( verticies ) ;
-			vertexBuffer.position( 0 ) ;
-
-			final int vertexLengthInBytes = inc * 4 ;
-			_gl.glBufferSubData( GL3.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
-		}
-	}
-
-	private int calculateVertexSize( final Shape.Swivel[] _swivel )
+	private static int calculateVertexSize( final Shape.Swivel[] _swivel )
 	{
 		int size = 0 ;
 		for( int j = 0; j < _swivel.length; j++ )
@@ -196,7 +245,7 @@ public class GLGeometryUploader
 
 		return size ;
 	}
-	
+
 	public static class VertexAttrib
 	{
 		public int index ;				// Specifies the index of the generic vertex attribute to be modified 
@@ -230,60 +279,291 @@ public class GLGeometryUploader
 		}
 	} ;
 
-	public static class GLGeometry implements GeometryInterface
+	/**
+		Handles the geometry and index buffers for 
+		a particular set of vertex attributes and style.
+		GLBuffer will generate more GLGeometry buffers 
+		when the existing buffers are full.
+	*/
+	public class GLBuffer implements GeometryInterface
 	{
+		private final Shape.Swivel[] shapeSwivel ;
+		private final Shape.Style shapeStyle ;
+
 		private final VertexAttrib[] attributes ;
-		private final int stride ;			// Specifies the byte offset between verticies
-		private final int style ;
+		private final int style ;					// OpenGL GL_TRIANGLES, GL_LINES, 
+		private final int indexLengthBytes ;
+		private final int vertexLengthBytes ;
+		private final int vertexStrideBytes ;		// Specifies the byte offset between verticies
 
-		private final int indexLength ;
-		private final int vertexLength ;
-		private final int vertexStride ;
+		private final GLProgram program ;
+		private final int textureID ;				// -1 represent no texture in use
+		private final int layer ;
 
-		public final int[] indexID ;
-		public final int[] vboID ;
+		private final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
 
-		public GLGeometry( final VertexAttrib[] _attributes,
-						   final Shape.Style _style,
-						   final int _indexLength,
-						   final int _vertexLength,
-						   final int _vertexStride )
+		public GLBuffer( final GLRenderer.GLRenderData _data,
+						 final int _indexLengthBytes,
+						 final int _vertexLengthBytes )
 		{
-			indexLength  = _indexLength ;
-			vertexLength = _vertexLength ;
-			vertexStride = _vertexStride ;
+			final Shape shape = _data.getShape() ;
+			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
-			GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
-			final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
+			attributes = constructVertexAttrib( shapeSwivel ) ;
+			indexLengthBytes  = _indexLengthBytes ;
+			vertexLengthBytes = _vertexLengthBytes ;
+			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
 
-			indexID = GLModelManager.genIndexID( gl ) ;
-			vboID = GLModelManager.genVBOID( gl ) ;
+			final Texture<GLImage> texture = _data.getTexture() ;
+			textureID = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
+			layer = _data.getLayer() ;
+			program = _data.getProgram() ;
 
-			final int indexBufferLengthInBytes = indexLength * 4 ;
-			final int vertexLengthInBytes = vertexLength * 4 ;
-
-			gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
-			gl.glBufferData( GL3.GL_ELEMENT_ARRAY_BUFFER, indexBufferLengthInBytes, null, GL3.GL_STATIC_DRAW ) ;
-
-			gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, vboID[0] ) ;
-			gl.glBufferData( GL3.GL_ARRAY_BUFFER, vertexLengthInBytes, null, GL3.GL_DYNAMIC_DRAW ) ;
-
-			GLRenderer.getCanvas().getContext().release() ;
-
-			attributes = _attributes ;
-			stride = _vertexStride ;
-			switch( _style )
+			shapeStyle = shape.getStyle() ;
+			switch( shapeStyle )
 			{
 				case LINES      : style = GL2.GL_LINES ;      break ;
 				case LINE_STRIP : style = GL2.GL_LINE_STRIP ; break ;
 				case FILL       : style = GL2.GL_TRIANGLES ;  break ;
 				default         : style = GL2.GL_LINES ;      break ;
 			}
+
+			buffers.add( new GLGeometry( style,
+										 indexLengthBytes,
+										 vertexLengthBytes,
+										 vertexStrideBytes ) ) ;
+		}
+
+		public void draw( final GL3 _gl, final Matrix4 _modelViewProjection )
+		{
+			if( program == null )
+			{
+				System.out.println( "No program specified..." ) ;
+				return ;
+			}
+
+			_gl.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
+
+			final int inMVPMatrix = _gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
+			_gl.glUniformMatrix4fv( inMVPMatrix, 1, true, _modelViewProjection.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+
+			if( textureID != -1 )
+			{
+				_gl.glActiveTexture( GL3.GL_TEXTURE0 + 0 ) ;		//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				_gl.glEnable( GL3.GL_BLEND ) ;						//GLRenderer.handleError( "Enable Blend", _gl ) ;
+				_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+			}
+
+			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
+			for( final GLGeometry geometry : buffers )
+			{
+				_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
+				_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
+
+				GLGeometryUploader.prepareVertexAttributes( _gl, attributes, vertexStrideBytes ) ;
+				//System.out.println( "Index: " + geometry.getUsedIndexBytes() + " Vertex: " + geometry.getUsedVertexBytes() ) ;
+				_gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
+				//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
+			}
+			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
+
+			_gl.glUseProgram( 0 ) ;			//GLRenderer.handleError( "Disable Program", _gl ) ;
+			_gl.glDisable( GL3.GL_BLEND ) ;	//GLRenderer.handleError( "Disable Blend", _gl ) ;
+		}
+
+		public void upload( final GL3 _gl, final Shape _shape, final Matrix4 _matrix )
+		{
+			for( final GLGeometry geometry : buffers )
+			{
+				// Upload the data to the buffer 
+				// if it returns succesfully then the data 
+				// was uploaded.
+				if( geometry.upload( _gl, _shape, _matrix ) == true )
+				{
+					return ;
+				}
+			}
+
+			expand() ;
+			upload( _gl, _shape, _matrix ) ;
+		}
+
+		public void reset()
+		{
+			for( final GLGeometry geometry : buffers )
+			{
+				geometry.reset() ;
+			}
+		}
+
+		/**
+			Determine whether or not this GLBuffer supports
+			the requirements of the GLRenderData.
+			GLBuffers will batch together similar content to 
+			improve rendering performance.
+			They will use layer, texture, shape swivel and style
+			to determine if the buffer can support the data.
+		*/
+		public boolean isSupported( final GLRenderer.GLRenderData _data )
+		{
+			final Shape shape = _data.getShape() ;
+			if( shapeStyle != shape.getStyle() )
+			{
+				return false ;
+			}
+
+			if( program != _data.getProgram() )
+			{
+				return false ;
+			}
+
+			if( textureID > 0 )
+			{
+				final Texture<GLImage> texture = _data.getTexture() ;
+				if( texture == null )
+				{
+					return false ;
+				}
+
+				final GLImage image = texture.getImage() ;
+				if( image.textureIDs[0] != textureID )
+				{
+					return false ;
+				}
+			}
+
+			if( layer != _data.getLayer() )
+			{
+				return false ;
+			}
+
+			final Shape.Swivel[] sw = shape.getSwivel() ;
+			if( shapeSwivel.length != sw.length )
+			{
+				return false ;
+			}
+
+			for( int i = 0; i < sw.length; i++ )
+			{
+				if( shapeSwivel[i] != sw[i] )
+				{
+					return false ;
+				}
+			}
+
+			return true ;
+		}
+
+		private void expand()
+		{
+			buffers.add( new GLGeometry( style,
+										 indexLengthBytes,
+										 vertexLengthBytes,
+										 vertexStrideBytes ) ) ;
+		}
+
+		@Override
+		public void destroy()
+		{
+			for( final GLGeometry buffer : buffers )
+			{
+				buffer.destroy() ;
+			}
+		}
+	}
+
+	public class GLGeometry implements GeometryInterface
+	{
+		private final int style ;
+		private final int indexLengthBytes ;
+		private final int vertexLengthBytes ;
+		private final int vertexStrideBytes ;		// Specifies the byte offset between verticies
+
+		public final int[] indexID ;
+		public final int[] vboID ;
+
+		public int amountIndexUsedBytes  = 0 ;		// How much of buffer has been used
+		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
+
+		public GLGeometry( final int _style,
+						   final int _indexLengthBytes,
+						   final int _vertexLengthBytes,
+						   final int _vertexStrideBytes )
+		{
+			style = _style ;
+			indexLengthBytes  = _indexLengthBytes ;
+			vertexLengthBytes = _vertexLengthBytes ;
+			vertexStrideBytes = _vertexStrideBytes ;
+
+			GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+			final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+
+			indexID = GLModelManager.genIndexID( gl ) ;	//GLRenderer.handleError( "Gen Index: ", gl ) ;
+			vboID = GLModelManager.genVBOID( gl ) ;		//GLRenderer.handleError( "Gen VBO: ", gl ) ;
+
+			gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;	//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
+			gl.glBufferData( GL3.GL_ELEMENT_ARRAY_BUFFER, indexLengthBytes, null, GL3.GL_DYNAMIC_DRAW ) ;	//GLRenderer.handleError( "Upload Data: ", gl ) ;
+
+			gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, vboID[0] ) ;		//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
+			gl.glBufferData( GL3.GL_ARRAY_BUFFER, vertexLengthBytes, null, GL3.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
+
+			GLRenderer.getCanvas().getContext().release() ;
+		}
+
+		public boolean upload( final GL3 _gl, final Shape _shape, final Matrix4 _matrix )
+		{
+			final int availableIndex = indexLengthBytes - amountIndexUsedBytes ;
+			final int shapeIndexBytes = _shape.getIndexSize() * 4 ;
+			if( shapeIndexBytes > availableIndex )
+			{
+				//System.out.println( "Not enough Index space..." ) ;
+				return false ;
+			}
+
+			final int availableVertex = vertexLengthBytes - amountVertexUsedBytes ;
+			final int shapeVertexBytes = _shape.getVertexSize() * vertexStrideBytes ;
+			if( shapeVertexBytes > availableVertex )
+			{
+				//System.out.println( "Not enough Vertex space..." ) ;
+				return false ;
+			}
+
+			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+
+			GLGeometryUploader.this.uploadIndex( _gl, this, _shape ) ;
+			GLGeometryUploader.this.uploadVBO( _gl, this, _shape, _matrix ) ;
+
+			amountIndexUsedBytes += shapeIndexBytes ;
+			amountVertexUsedBytes += shapeVertexBytes ;
+			return true ;
+		}
+
+		public int getIndexID()
+		{
+			return indexID[0] ;
+		}
+
+		public int getVBOID()
+		{
+			return vboID[0] ;
 		}
 
 		public int getIndexLength()
 		{
-			return indexLength ;
+			return amountIndexUsedBytes / 4 ;
+		}
+
+		public int getUsedIndexBytes()
+		{
+			return amountIndexUsedBytes ;
+		}
+
+		public int getUsedVertexBytes()
+		{
+			return amountVertexUsedBytes ;
 		}
 
 		public int getStyle()
@@ -293,17 +573,43 @@ public class GLGeometryUploader
 
 		public int getStride()
 		{
-			return stride ;
+			return vertexStrideBytes ;
 		}
 
-		public VertexAttrib[] getAttributes()
+		public void reset()
 		{
-			return attributes ;
+			amountIndexUsedBytes  = 0 ;
+			amountVertexUsedBytes = 0 ;
 		}
 
 		public void destroy()
 		{
+			reset() ;
 			GLModelManager.unbind( this ) ;
+		}
+	}
+
+	protected static void enableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			_gl.glEnableVertexAttribArray( att.index ) ;
+		}
+	}
+
+	protected static void prepareVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts, final int _stride )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			_gl.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
+		}
+	}
+	
+	protected static void disableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
+	{
+		for( VertexAttrib att : _atts )
+		{
+			_gl.glDisableVertexAttribArray( att.index ) ;
 		}
 	}
 

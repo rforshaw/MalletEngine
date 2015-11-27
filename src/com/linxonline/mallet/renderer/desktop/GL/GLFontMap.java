@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
-import com.linxonline.mallet.resources.model.Model ;
+import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -11,15 +11,11 @@ import com.linxonline.mallet.renderer.Shape ;
 public class GLFontMap extends Resource
 {
 	public final FontMap<GLImage> fontMap ;
-	public final Model model ;
-	public final Shape shape ;
 
-	public GLFontMap( final FontMap<GLImage> _fontMap, final Model _model, final Shape _shape )
+	public GLFontMap( final FontMap<GLImage> _fontMap )
 	{
 		super() ;
 		fontMap = _fontMap ;
-		model = _model ;
-		shape = _shape ;
 	}
 
 	public int stringWidth( final String _text )
@@ -33,7 +29,7 @@ public class GLFontMap extends Resource
 
 		return width ;
 	}
-	
+
 	public GLGlyph getGlyphWithChar( final char _character )
 	{
 		return getGlyphWithCode( ( int )_character ) ;
@@ -44,9 +40,9 @@ public class GLFontMap extends Resource
 		return ( GLGlyph )fontMap.getGlyphWithCode( _code ) ;
 	}
 
-	public GLImage getGLImage()
+	public Texture getTexture()
 	{
-		return fontMap.texture.getImage() ;
+		return fontMap.texture ;
 	}
 
 	public int getHeight()
@@ -54,16 +50,10 @@ public class GLFontMap extends Resource
 		return fontMap.getHeight() ;
 	}
 
-	public GLGeometryUploader.GLGeometry getGLGeometry()
-	{
-		return model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
-	}
-
 	@Override
 	public void destroy()
 	{
 		fontMap.destroy() ;
-		model.destroy() ;
 	}
 
 	@Override

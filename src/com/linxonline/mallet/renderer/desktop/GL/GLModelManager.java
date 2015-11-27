@@ -14,9 +14,7 @@ public class GLModelManager
 	public static int[] genIndexID( final GL3 _gl )
 	{
 		final int[] id = new int[1] ;
-
 		_gl.glGenBuffers( 1, id, 0 ) ;
-		_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, id[0] ) ;
 
 		return id ;
 	}
@@ -24,9 +22,7 @@ public class GLModelManager
 	public static int[] genVBOID( final GL3 _gl )
 	{
 		final int[] id = new int[1] ;
-
 		_gl.glGenBuffers( 1, id, 0 ) ;
-		_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, id[0] ) ;
 
 		return id ;
 	}
@@ -38,8 +34,8 @@ public class GLModelManager
 
 		if( gl != null )
 		{
-			gl.glDeleteBuffers( 1, _geometry.vboID, 0 ) ;
-			gl.glDeleteBuffers( 1, _geometry.indexID, 0 ) ;
+			gl.glDeleteBuffers( 1, _geometry.vboID, 0 ) ;		//GLRenderer.handleError( "Delete VBO", gl ) ;
+			gl.glDeleteBuffers( 1, _geometry.indexID, 0 ) ;		//GLRenderer.handleError( "Delete Index", gl ) ;
 		}
 
 		GLRenderer.getCanvas().getContext().release() ;

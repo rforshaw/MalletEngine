@@ -149,15 +149,15 @@ public class GLTextureManager extends AbstractManager<Texture>
 			return null ;
 		}
 
-		gl.glEnable( GL.GL_TEXTURE_2D ) ;
+		//gl.glEnable( GL.GL_TEXTURE_2D ) ;		GLRenderer.handleError( "Enable Texture", gl ) ;
 
-		final int textureID = glGenTextures( gl ) ;
-		gl.glBindTexture( GL3.GL_TEXTURE_2D, textureID ) ;
+		final int textureID = glGenTextures( gl ) ;			//GLRenderer.handleError( "Gen Texture", gl ) ;
+		gl.glBindTexture( GL3.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", gl ) ;
 
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR ) ;
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_LINEAR ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;						//GLRenderer.handleError( "Parameter", gl ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;						//GLRenderer.handleError( "Parameter", gl ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR ) ;					//GLRenderer.handleError( "Parameter", gl ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_LINEAR ) ;	//GLRenderer.handleError( "Parameter", gl ) ;
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
@@ -183,7 +183,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			}
 		}
 
-		gl.glPixelStorei( GL3.GL_UNPACK_ALIGNMENT, 1 ) ;
+		gl.glPixelStorei( GL3.GL_UNPACK_ALIGNMENT, 1 ) ;		//GLRenderer.handleError( "Unpack Alignment", gl ) ;
 		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 
 						 0, 
 						 getGLInternalFormat( channels, _format ), 
@@ -192,10 +192,11 @@ public class GLTextureManager extends AbstractManager<Texture>
 						 0, 
 						 imageFormat, 
 						 GL3.GL_UNSIGNED_BYTE, 
-						 getByteBuffer( _image ) ) ;
+						 getByteBuffer( _image ) ) ;		//GLRenderer.handleError( "Tex Image", gl ) ;
 
-		gl.glGenerateMipmap( GL3.GL_TEXTURE_2D ) ;
+		gl.glGenerateMipmap( GL3.GL_TEXTURE_2D ) ;			//GLRenderer.handleError( "Gen Mipmap", gl ) ;
 		gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
+		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
 		return new Texture( new GLImage( textureID, width, height ) ) ;
 	}

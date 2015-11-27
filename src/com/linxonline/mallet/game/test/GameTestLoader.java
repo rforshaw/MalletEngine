@@ -67,7 +67,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				renderTextureExample() ;
 				renderAnimationExample() ;
-				//renderTextExample() ;
+				renderTextExample() ;
 				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
@@ -115,8 +115,8 @@ public final class GameTestLoader extends GameLoader
 				lines.addIndex( 5 ) ;
 
 				eventSystem.addEvent( GeometryFactory.createShape( lines,
-																	new Vector3( -100.0f, 50.0f, 0.0f ),
-																	null,
+																	new Vector3( 0.0f, 50.0f, 0.0f ),
+																	new Vector2( -100.0f, 0.0f ),
 																	10,
 																	null ) ) ;
 
@@ -135,11 +135,11 @@ public final class GameTestLoader extends GameLoader
 				triangle.addIndex( 4 ) ;
 				triangle.addIndex( 5 ) ;
 
-				eventSystem.addEvent( DrawFactory.forceUpdate( GeometryFactory.createShape( Shape.triangulate( triangle ),
+				eventSystem.addEvent( GeometryFactory.createShape( Shape.triangulate( triangle ),
 																	new Vector3( -200.0f, 0.0f, 0.0f ),
 																	null,
 																	10,
-																	null ) ) ) ;
+																	null ) ) ;
 			}
 
 			/**
@@ -216,8 +216,8 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void createEntityExample( final int _i, final int _j )
 			{
-				final int x = 50 + ( _i * 50 ) ;
-				final int y = 0 + ( _j * 50 ) ;
+				final int x = 100 + ( _i * 50 ) ;
+				final int y = 100 + ( _j * 50 ) ;
 			
 				final Settings image = new Settings() ;
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;

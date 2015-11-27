@@ -186,6 +186,11 @@ public class Shape
 		return ( Vector3 )verticies[index] ;
 	}
 
+	public Shape.Style getStyle()
+	{
+		return style ;
+	}
+
 	public Swivel[] getSwivel()
 	{
 		return swivel ;
