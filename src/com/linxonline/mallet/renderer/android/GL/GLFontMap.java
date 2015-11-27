@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
+import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.FontMap ;
@@ -11,19 +12,11 @@ import com.linxonline.mallet.renderer.font.Glyph ;
 public class GLFontMap extends Resource
 {
 	public final FontMap<GLImage> fontMap ;
-	public Model model ;
-	public Shape shape ;
 
 	public GLFontMap( final FontMap<GLImage> _fontMap )
 	{
 		super() ;
 		fontMap = _fontMap ;
-	}
-
-	public void setModel( final Model _model, final Shape _shape )
-	{
-		model = _model ;
-		shape = _shape ;
 	}
 
 	public int stringWidth( final String _text )
@@ -48,9 +41,9 @@ public class GLFontMap extends Resource
 		return ( GLGlyph )fontMap.getGlyphWithCode( _code ) ;
 	}
 
-	public GLImage getGLImage()
+	public Texture getTexture()
 	{
-		return fontMap.texture.getImage() ;
+		return fontMap.texture ;
 	}
 
 	public int getHeight()
@@ -58,19 +51,10 @@ public class GLFontMap extends Resource
 		return fontMap.getHeight() ;
 	}
 
-	public GLGeometryUploader.GLGeometry getGLGeometry()
-	{
-		return model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
-	}
-
 	@Override
 	public void destroy()
 	{
 		fontMap.destroy() ;
-		if( model != null )
-		{
-			model.destroy() ;
-		}
 	}
 
 	@Override

@@ -216,7 +216,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 				//newMatrix.transpose() ;
 
-				uploader.upload( gl, _data, newMatrix ) ;
+				uploader.upload( _data, newMatrix ) ;
 				matrixCache.reclaim( newMatrix ) ;
 			}
 		} ;
@@ -256,7 +256,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				uploader.upload( gl, _data, newMatrix ) ;
+				uploader.upload( _data, newMatrix ) ;
 				matrixCache.reclaim( newMatrix ) ;
 			}
 		} ;
@@ -336,7 +336,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					_data.setShape( glyph.shape ) ;
 
-					uploader.upload( gl, _data, _matrix ) ;
+					uploader.upload( _data, _matrix ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -547,7 +547,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public void display( GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL3() ;
-		GLRenderer.handleError( "Previous: ", gl ) ;
+		//GLRenderer.handleError( "Previous: ", gl ) ;
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
 

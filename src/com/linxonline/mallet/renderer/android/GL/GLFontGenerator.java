@@ -116,20 +116,13 @@ public class GLFontGenerator
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
-				// Glyp geometry as located in a massive pool, stored in font map.
-				shapes.add( Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ) ;
-				glyph.setIndex( j++ * 6 ) ;
+				glyph.setShape( Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ) ;
 			}
 		}
 
 		_map.fontMap.setTexture( manager.bind( bitmap ) ) ;
 		bitmap.recycle() ;
 
-		final Shape[] array = new Shape[shapes.size()] ;
-		final Shape combined = Shape.combine( shapes.toArray( array ) ) ;
-		final Model model = new Model( GLGeometryUploader.construct( combined ) ) ;
-
-		_map.setModel( model, combined ) ;
 		return _map ;
 	}
 

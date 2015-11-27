@@ -16,7 +16,7 @@ public class GLModelManager
 		final int[] id = new int[1] ;
 
 		GLES20.glGenBuffers( 1, id, 0 ) ;
-		GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, id[0] ) ;
+		//GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, id[0] ) ;
 
 		return id ;
 	}
@@ -26,7 +26,7 @@ public class GLModelManager
 		final int[] id = new int[1] ;
 
 		GLES20.glGenBuffers( 1, id, 0 ) ;
-		GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, id[0] ) ;
+		//GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, id[0] ) ;
 
 		return id ;
 	}

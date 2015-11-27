@@ -36,7 +36,7 @@ public class GLRenderer extends Basic2DRender
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
-	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 1000, 1000 ) ;
+	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
@@ -57,10 +57,6 @@ public class GLRenderer extends Basic2DRender
 	protected DrawInterface<GLRenderData> drawText = null ;
 
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
-
-	protected final int[] textureID = new int[1] ;
-	protected final int[] indexID = new int[1] ;
-	protected final int[] bufferID = new int[1] ;
 
 	public GLRenderer()
 	{
@@ -94,12 +90,6 @@ public class GLRenderer extends Basic2DRender
 	*/
 	public void recover()
 	{
-		// Reset ID's so they aren't refering a potentially 
-		// destroyed resource.
-		textureID[0] = -1 ;
-		indexID[0] = -1 ;
-		bufferID[0] = -1 ;
-
 		programs.shutdown() ;
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		fontManager.recover() ;
@@ -214,83 +204,30 @@ public class GLRenderer extends Basic2DRender
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				final Shape shape = _data.getShape() ;
-				if( shape == null )
-				{
-					Logger.println( "GLRenderer - Render Data for non-existent shape: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-					return ;
-				}
-
-				final Model model = _data.getModel() ;
-				if( model == null )
-				{
-					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-					return ;
-				}
-
-				final boolean update = _data.toUpdate() ;
-				applyClip( _data, update ) ;
+				//applyClip( _data, update ) ;
 
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
-
-				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 				final int lineWidth = _data.getLineWidth() ;
 
-				final GLProgram program = programs.get( "SIMPLE_GEOMETRY" ) ;
-				if( program == null )
+				final Matrix4 newMatrix = matrixCache.get() ;
+				if( isGUI == true )
 				{
-					System.out.println( "Program doesn't exist.." ) ;
-					return ;
+					newMatrix.multiply( uiMatrix ) ;
+				}
+				else
+				{
+					newMatrix.multiply( worldMatrix ) ;
 				}
 
-				GLES20.glUseProgram( program.id[0] ) ;
+				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				//newMatrix.transpose() ;
 
-				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
-				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-
-				//System.out.println( "inVertex: " + inVertex ) ;
-				//System.out.println( "inColour: " + inColour ) ;
-
-				final VertexAttrib[] attributes =  geometry.getAttributes() ;
-				enableVertexAttributes( attributes ) ;
-
-					final Matrix4 newMatrix = matrixCache.get() ;
-					if( isGUI == true )
-					{
-						newMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						newMatrix.multiply( worldMatrix ) ;
-					}
-
-					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
-
-					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
-					GLES20.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
-					GLES20.glLineWidth( ( float )lineWidth ) ;
-
-					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-					if( update == true )
-					{
-						uploader.uploadIndex( geometry, shape ) ;
-						uploader.uploadVBO( geometry, shape ) ;
-					}
-
-					prepareVertexAttributes( attributes, geometry.getStride() ) ;
-					GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
-
+				uploader.upload( _data, newMatrix ) ;
 				matrixCache.reclaim( newMatrix ) ;
-
-				GLES20.glUseProgram( 0 ) ;
-				GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;
-				disableVertexAttributes( attributes ) ;
 			}
 		} ;
 
@@ -309,81 +246,28 @@ public class GLRenderer extends Basic2DRender
 					}
 				}
 
-				final Model model = _data.getModel() ;
-				if( model == null )
-				{
-					// If we can't map the texture to a plane, then no point in rendering.
-					Logger.println( "GLRenderer - Render Data for non-existent model: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-					return ;
-				}
-
-				final boolean update = _data.toUpdate() ;
-				applyClip( _data, update ) ;
-
-				final Shape shape = _data.getShape() ;
-				final GLImage image = texture.getImage() ;
-				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
+				//applyClip( _data, update ) ;
 
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
-
-				final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
 				final boolean isGUI = _data.isUI() ;
 
-				final GLProgram program = programs.get( "SIMPLE_TEXTURE" ) ;
-				if( program == null )
+				final Matrix4 newMatrix = matrixCache.get() ;
+				if( isGUI == true )
 				{
-					System.out.println( "Program doesn't exist.." ) ;
-					return ;
+					newMatrix.multiply( uiMatrix ) ;
+				}
+				else
+				{
+					newMatrix.multiply( worldMatrix ) ;
 				}
 
-				GLES20.glUseProgram( program.id[0] ) ;
-				GLES20.glEnable( GLES20.GL_BLEND ) ;
+				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
-				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-
-				final VertexAttrib[] attributes =  geometry.getAttributes() ;
-				enableVertexAttributes( attributes ) ;
-
-					final Matrix4 newMatrix = matrixCache.get() ;
-					if( isGUI == true )
-					{
-						newMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						newMatrix.multiply( worldMatrix ) ;
-					}
-
-					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
-
-					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
-					GLES20.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
-
-					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
-
-					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-					// Update the UV co-ordinates of the model
-					if( update == true )
-					{
-						uploader.uploadIndex( geometry, shape ) ;
-						uploader.uploadVBO( geometry, shape ) ;
-					}
-
-					prepareVertexAttributes( attributes, geometry.getStride() ) ;
-					GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
-
+				uploader.upload( _data, newMatrix ) ;
 				matrixCache.reclaim( newMatrix ) ;
-
-				GLES20.glUseProgram( 0 ) ;
-				GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;
-				GLES20.glDisable( GLES20.GL_BLEND ) ;
-				disableVertexAttributes( attributes ) ;
 			}
 		} ;
 
@@ -414,15 +298,12 @@ public class GLRenderer extends Basic2DRender
 					fontManager.generateFontGeometry( font ) ;
 				}
 
-				final boolean update = _data.toUpdate() ;
-				applyClip( _data, update ) ;
-
-				final GLImage image = fm.getGLImage() ;
-				GLRenderer.bindTexture( image.textureIDs, textureID ) ;
+				//applyClip( _data, update ) ;
+				_data.setTexture( fm.getTexture() ) ;
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = _data.getLineWidth() + ( int )_position.x ;
-				String[] words = _data.data.getObject( "WORDS", null ) ;
+				String[] words = _data.getWords() ;
 				if( words == null )
 				{
 					words = optimiseText( fm, text, _position, lineWidth ) ;
@@ -436,78 +317,39 @@ public class GLRenderer extends Basic2DRender
 				final boolean isGUI = _data.isUI() ;
 				final Vector2 currentPos = new Vector2( _position ) ;
 
-				final GLProgram program = programs.get( "SIMPLE_FONT" ) ;
-				if( program == null )
+				setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+				final Matrix4 newMatrix = matrixCache.get() ;
+				if( isGUI == true )
 				{
-					System.out.println( "Program doesn't exist.." ) ;
-					return ;
+					newMatrix.multiply( uiMatrix ) ;
+				}
+				else
+				{
+					newMatrix.multiply( worldMatrix ) ;
 				}
 
-				GLES20.glUseProgram( program.id[0] ) ;
-				GLES20.glEnable( GLES20.GL_BLEND ) ;
+				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
-				final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-
-				final GLGeometryUploader.GLGeometry geometry = fm.getGLGeometry() ;
-				final VertexAttrib[] attributes =  geometry.getAttributes() ;
-				enableVertexAttributes( attributes ) ;
-
-					setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
-					final Matrix4 newMatrix = matrixCache.get() ;
-					if( isGUI == true )
-					{
-						newMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						newMatrix.multiply( worldMatrix ) ;
-					}
-
-					newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-					newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-					newMatrix.translate( offset.x, offset.y, 0.0f ) ;
-
-					GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
-
-					GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;
-
-					GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-					GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-					prepareVertexAttributes( attributes, geometry.getStride() ) ;
-
-					if( update == true )
-					{
-						uploader.uploadIndex( geometry, fm.shape ) ;
-						uploader.uploadVBO( geometry, fm.shape ) ;
-					}
-
-					final int size = words.length ;
-					for( int i = 0; i < size; ++i )
-					{
-						renderText( words[i], fm, newMatrix, inPositionMatrix ) ;
-					}
+				final int size = words.length ;
+				for( int i = 0; i < size; ++i )
+				{
+					renderText( words[i], fm, newMatrix, _data ) ;
+				}
 
 				matrixCache.reclaim( newMatrix ) ;
-				disableVertexAttributes( attributes ) ;
-
-				GLES20.glUseProgram( 0 ) ;
-				GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;
-				GLES20.glDisable( GLES20.GL_BLEND ) ;
 			}
 
-			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final int _matrixHandle )
+			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final GLRenderData _data )
 			{
-				final GLGeometryUploader.GLGeometry geometry = _fm.getGLGeometry() ;
 				final int length = _text.length() ;
-
 				for( int i = 0; i < length; ++i )
 				{
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
+					_data.setShape( glyph.shape ) ;
 
-					GLES20.glUniformMatrix4fv( _matrixHandle, 1, true, _matrix.matrix, 0 ) ;
-					GLES20.glDrawElements( GLES20.GL_TRIANGLES, 6, GLES20.GL_UNSIGNED_SHORT, glyph.index * 2 ) ;
+					uploader.upload( _data, _matrix ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -640,6 +482,7 @@ public class GLRenderer extends Basic2DRender
 		worldMatrix.translate( -pos.x, -pos.y, 0.0f ) ;
 
 		render() ;
+		uploader.reset() ;
 	}
 
 	protected void render()
@@ -647,30 +490,8 @@ public class GLRenderer extends Basic2DRender
 		state.removeRenderData() ;
 		if( state.isStateStable() == true )
 		{
-			GLES20.glGetIntegerv( GLES20.GL_TEXTURE_BINDING_2D, textureID, 0 ) ;
-			GLES20.glGetIntegerv( GLES20.GL_ELEMENT_ARRAY_BUFFER_BINDING, indexID, 0 ) ;
-			GLES20.glGetIntegerv( GLES20.GL_ELEMENT_ARRAY_BUFFER_BINDING, bufferID, 0 ) ;
-
 			state.draw() ;
-		}
-	}
-
-
-	private static void bindTexture( final int[] _idToBind, final int[] _store )
-	{
-		if( _store[0] != _idToBind[0] )
-		{
-			_store[0] = _idToBind[0] ;
-			GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, _store[0] ) ;
-		}
-	}
-
-	private static void bindBuffer( final int _type, final int[] _idToBind, final int[] _store )
-	{
-		if( _store[0] != _idToBind[0] )
-		{
-			_store[0] = _idToBind[0] ;
-			GLES20.glBindBuffer( _type, _store[0] ) ;
+			uploader.draw( modelViewProjectionMatrix ) ;
 		}
 	}
 
@@ -699,15 +520,9 @@ public class GLRenderer extends Basic2DRender
 			{
 				final GLRenderData data = renderCache.get() ;
 				data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
-				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
+				data.setProgram( programs.get( "SIMPLE_TEXTURE" ) ) ;
+
 				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
-
-				final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
-				if( clipShape != null )
-				{
-					data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
-				}
-
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				insert( data ) ;
 			}
@@ -725,15 +540,9 @@ public class GLRenderer extends Basic2DRender
 			{
 				final GLRenderData data = renderCache.get() ;
 				data.set( _draw, drawShape, DrawRequestType.GEOMETRY ) ;
-				data.setModel( GLModelGenerator.genShapeModel( shape ) ) ;
+				data.setProgram( programs.get( "SIMPLE_GEOMETRY" ) ) ;
+
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
-
-				final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
-				if( clipShape != null )
-				{
-					data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
-				}
-
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 				insert( data ) ;
 			}
@@ -744,20 +553,13 @@ public class GLRenderer extends Basic2DRender
 	protected void createText( final Settings _draw )
 	{
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		final int layer = _draw.getInteger( "LAYER", -1 ) ;
-
 		if( position != null )
 		{
 			final GLRenderData data = renderCache.get() ;
 			data.set( _draw, drawText, DrawRequestType.TEXT ) ;
+			data.setProgram( programs.get( "SIMPLE_FONT" ) ) ;
+
 			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
-
-			final Shape clipShape = _draw.<Shape>getObject( "CLIP_SHAPE", null ) ;
-			if( clipShape != null )
-			{
-				data.setClipModel( GLModelGenerator.genShapeModel( clipShape ) ) ;
-			}
-
 			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
 			insert( data ) ;
 		}
@@ -796,30 +598,6 @@ public class GLRenderer extends Basic2DRender
 		return texture ;
 	}
 
-	private void enableVertexAttributes( final VertexAttrib[] _atts )
-	{
-		for( VertexAttrib att : _atts )
-		{
-			GLES20.glEnableVertexAttribArray( att.index ) ;
-		}
-	}
-
-	private void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
-	{
-		for( VertexAttrib att : _atts )
-		{
-			GLES20.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
-		}
-	}
-	
-	private void disableVertexAttributes( final VertexAttrib[] _atts )
-	{
-		for( VertexAttrib att : _atts )
-		{
-			GLES20.glDisableVertexAttribArray( att.index ) ;
-		}
-	}
-
 	/**
 		Called before drawing another element.
 		Constructs a stencil buffer that prevents 
@@ -834,7 +612,7 @@ public class GLRenderer extends Basic2DRender
 	*/
 	private void applyClip( final GLRenderData _data, final boolean _update )
 	{
-		final Vector3 position = _data.getClipPosition() ;
+		/*final Vector3 position = _data.getClipPosition() ;
 		final Vector3 offset = _data.getClipOffset() ;
 		final Model model = _data.getClipModel() ;
 		final Shape shape = _data.getClipShape() ;
@@ -904,7 +682,7 @@ public class GLRenderer extends Basic2DRender
 			GLES20.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
 			GLES20.glStencilFunc( GLES20.GL_EQUAL, 1, 1 ) ;
 			// Continue drawing scene...
-		}
+		}*/
 	}
 
 	public static void handleError( final String _txt )
@@ -951,9 +729,8 @@ public class GLRenderer extends Basic2DRender
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
+		private GLProgram program ;
 		private Texture texture ;
-		private Model model ;
-		private Model clipModel ;
 		
 		public GLRenderData()
 		{
@@ -987,19 +764,19 @@ public class GLRenderer extends Basic2DRender
 			words          = null ;
 		}
 
+		public void setProgram( final GLProgram _program )
+		{
+			program = _program ;
+		}
+
 		public void setTexture( final Texture _texture )
 		{
 			texture = _texture ;
 		}
 
-		public void setClipModel( final Model _model )
+		public void setShape( final Shape _shape )
 		{
-			clipModel = _model ;
-		}
-
-		public void setModel( final Model _model )
-		{
-			model = _model ;
+			shape = _shape ;
 		}
 
 		public void setWords( final String[] _words )
@@ -1052,19 +829,14 @@ public class GLRenderer extends Basic2DRender
 			return clipShape ;
 		}
 
-		public Model getModel()
-		{
-			return model ;
-		}
-
-		public Model getClipModel()
-		{
-			return clipModel ;
-		}
-		
 		public MalletColour getColour()
 		{
 			return colour ;
+		}
+
+		public GLProgram getProgram()
+		{
+			return program ;
 		}
 
 		public Texture getTexture()
@@ -1140,22 +912,6 @@ public class GLRenderer extends Basic2DRender
 				texture.unregister() ;
 			}
 
-			if( model != null )
-			{
-				model.unregister() ;
-				if( type == DrawRequestType.GEOMETRY || type == DrawRequestType.TEXTURE )
-				{
-					// Geometry Requests are not stored.
-					// So must be destroyed explicity.
-					model.destroy() ;
-				}
-			}
-
-			if( clipModel != null )
-			{
-				clipModel.destroy() ;
-			}
-
 			renderCache.reclaim( this ) ;
 		}
 
@@ -1166,9 +922,12 @@ public class GLRenderer extends Basic2DRender
 			offset = null ;
 			colour = null ;
 			shape = null ;
+			clipShape = null ;
 			words = null ;
-			texture = null ;
-			model = null ;
+			clipPosition = null ;
+			clipOffset = null ;
+			program = null ;
+			texture = null ;	
 			super.reset() ;
 		}
 
