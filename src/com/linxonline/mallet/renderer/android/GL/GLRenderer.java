@@ -204,12 +204,29 @@ public class GLRenderer extends Basic2DRender
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
-				//applyClip( _data, update ) ;
-
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
-				final int lineWidth = _data.getLineWidth() ;
+
+				final Vector3 clipPosition = _data.getClipPosition() ;
+				final Vector3 clipOffset   = _data.getClipOffset() ;
+				if( clipPosition != null && clipOffset != null )
+				{
+					final Matrix4 clipMatrix = _data.getClipMatrix() ;
+					clipMatrix.setIdentity() ;
+
+					if( isGUI == true )
+					{
+						clipMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						clipMatrix.multiply( worldMatrix ) ;
+					}
+
+					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
+					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
+				}
 
 				final Matrix4 newMatrix = matrixCache.get() ;
 				if( isGUI == true )
@@ -224,7 +241,6 @@ public class GLRenderer extends Basic2DRender
 				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
 				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
-				//newMatrix.transpose() ;
 
 				uploader.upload( _data, newMatrix ) ;
 				matrixCache.reclaim( newMatrix ) ;
@@ -246,11 +262,29 @@ public class GLRenderer extends Basic2DRender
 					}
 				}
 
-				//applyClip( _data, update ) ;
-
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
+
+				final Vector3 clipPosition = _data.getClipPosition() ;
+				final Vector3 clipOffset   = _data.getClipOffset() ;
+				if( clipPosition != null && clipOffset != null )
+				{
+					final Matrix4 clipMatrix = _data.getClipMatrix() ;
+					clipMatrix.setIdentity() ;
+
+					if( isGUI == true )
+					{
+						clipMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						clipMatrix.multiply( worldMatrix ) ;
+					}
+
+					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
+					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
+				}
 
 				final Matrix4 newMatrix = matrixCache.get() ;
 				if( isGUI == true )
@@ -298,7 +332,6 @@ public class GLRenderer extends Basic2DRender
 					fontManager.generateFontGeometry( font ) ;
 				}
 
-				//applyClip( _data, update ) ;
 				_data.setTexture( fm.getTexture() ) ;
 
 				final int height = fm.getHeight() ;
@@ -315,6 +348,27 @@ public class GLRenderer extends Basic2DRender
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
+
+				final Vector3 clipPosition = _data.getClipPosition() ;
+				final Vector3 clipOffset   = _data.getClipOffset() ;
+				if( clipPosition != null && clipOffset != null )
+				{
+					final Matrix4 clipMatrix = _data.getClipMatrix() ;
+					clipMatrix.setIdentity() ;
+
+					if( isGUI == true )
+					{
+						clipMatrix.multiply( uiMatrix ) ;
+					}
+					else
+					{
+						clipMatrix.multiply( worldMatrix ) ;
+					}
+
+					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
+					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
+				}
+
 				final Vector2 currentPos = new Vector2( _position ) ;
 
 				setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
@@ -521,6 +575,7 @@ public class GLRenderer extends Basic2DRender
 				final GLRenderData data = renderCache.get() ;
 				data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
 				data.setProgram( programs.get( "SIMPLE_TEXTURE" ) ) ;
+				data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
 				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -541,6 +596,7 @@ public class GLRenderer extends Basic2DRender
 				final GLRenderData data = renderCache.get() ;
 				data.set( _draw, drawShape, DrawRequestType.GEOMETRY ) ;
 				data.setProgram( programs.get( "SIMPLE_GEOMETRY" ) ) ;
+				//data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -558,6 +614,7 @@ public class GLRenderer extends Basic2DRender
 			final GLRenderData data = renderCache.get() ;
 			data.set( _draw, drawText, DrawRequestType.TEXT ) ;
 			data.setProgram( programs.get( "SIMPLE_FONT" ) ) ;
+			data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
 			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
 			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -596,93 +653,6 @@ public class GLRenderer extends Basic2DRender
 
 		_data.setTexture( texture ) ;
 		return texture ;
-	}
-
-	/**
-		Called before drawing another element.
-		Constructs a stencil buffer that prevents 
-		the element from being rendered outside the 
-		clip-shape.
-		Anything that uses applyClip must disable 
-		GL_STENCIL_TEST afterwards.
-		Unlike glScissor clip-shapes are affected 
-		by worldspace and UI space. Allowing it to be much 
-		more flexible to use when limiting where a graphic 
-		can render out.
-	*/
-	private void applyClip( final GLRenderData _data, final boolean _update )
-	{
-		/*final Vector3 position = _data.getClipPosition() ;
-		final Vector3 offset = _data.getClipOffset() ;
-		final Model model = _data.getClipModel() ;
-		final Shape shape = _data.getClipShape() ;
-
-		if( position != null && offset != null && model != null && shape != null )
-		{
-			final GLProgram program = programs.get( "SIMPLE_STENCIL" ) ;
-			if( program == null )
-			{
-				System.out.println( "Program doesn't exist.." ) ;
-				return ;
-			}
-
-			GLES20.glUseProgram( program.id[0] ) ;
-
-			final GLGeometryUploader.GLGeometry geometry = model.getGeometry( GLGeometryUploader.GLGeometry.class ) ;
-			final boolean isGUI = _data.isUI() ;
-
-			final int inMVPMatrix      = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
-			final int inPositionMatrix = GLES20.glGetUniformLocation( program.id[0], "inPositionMatrix" ) ;
-
-			final VertexAttrib[] attributes =  geometry.getAttributes() ;
-			enableVertexAttributes( attributes ) ;
-
-				final Matrix4 newMatrix = matrixCache.get() ;
-				if( isGUI == true )
-				{
-					newMatrix.multiply( uiMatrix ) ;
-				}
-				else
-				{
-					newMatrix.multiply( worldMatrix ) ;
-				}
-
-				newMatrix.translate( position.x, position.y, 0.0f ) ;
-				//newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
-
-				GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, modelViewProjectionMatrix.matrix, 0 ) ;
-				GLES20.glUniformMatrix4fv( inPositionMatrix, 1, true, newMatrix.matrix, 0 ) ;
-
-				GLRenderer.bindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.indexID, indexID ) ;
-				GLRenderer.bindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.vboID, bufferID ) ;
-
-				if( _update == true )
-				{
-					uploader.uploadIndex( geometry, shape ) ;
-					uploader.uploadVBO( geometry, shape ) ;
-				}
-
-				// Don't render the element to the colour buffer
-				GLES20.glColorMask( false, false, false, false ) ;
-				GLES20.glEnable( GLES20.GL_STENCIL_TEST ) ;
-
-				GLES20.glStencilMask( 0xFF ) ;
-				GLES20.glClear( GLES20.GL_STENCIL_BUFFER_BIT ) ;
-
-				GLES20.glStencilFunc( GLES20.GL_NEVER, 1, 0xFF ) ;
-				GLES20.glStencilOp( GLES20.GL_REPLACE, GLES20.GL_KEEP, GLES20.GL_KEEP ) ;
-
-				prepareVertexAttributes( attributes, geometry.getStride() ) ;
-				GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
-
-			matrixCache.reclaim( newMatrix ) ;
-			disableVertexAttributes( attributes ) ;
-
-			GLES20.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
-			GLES20.glStencilFunc( GLES20.GL_EQUAL, 1, 1 ) ;
-			// Continue drawing scene...
-		}*/
 	}
 
 	public static void handleError( final String _txt )
@@ -724,11 +694,14 @@ public class GLRenderer extends Basic2DRender
 		private Shape shape            = null ;
 		private Shape clipShape        = null ;
 		private String[] words         = null ;
+		
 		private Vector3 clipPosition   = null ;
 		private Vector3 clipOffset     = null ;
+		private Matrix4 clipMatrix     = null ;
 
 		// Must be nulled when reclaimed by cache
 		// Renderer data
+		private GLProgram stencilProgram ;
 		private GLProgram program ;
 		private Texture texture ;
 		
@@ -758,10 +731,21 @@ public class GLRenderer extends Basic2DRender
 			textAlignment  = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
 			colour         = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
 			shape          = data.<Shape>getObject( "SHAPE", null ) ;
+			words          = null ;
+
+			clipShape      = data.<Shape>getObject( "CLIP_SHAPE", null ) ;
 			clipPosition   = data.<Vector3>getObject( "CLIP_POSITION", null ) ;
 			clipOffset     = data.<Vector3>getObject( "CLIP_OFFSET", null ) ;
-			clipShape      = data.<Shape>getObject( "CLIP_SHAPE", null ) ;
-			words          = null ;
+
+			if( clipPosition != null && clipOffset != null )
+			{
+				clipMatrix = ( clipMatrix == null ) ? new Matrix4() : clipMatrix ;
+			}
+		}
+
+		public void setStencilProgram( final GLProgram _program )
+		{
+			stencilProgram = _program ;
 		}
 
 		public void setProgram( final GLProgram _program )
@@ -834,6 +818,11 @@ public class GLRenderer extends Basic2DRender
 			return colour ;
 		}
 
+		public GLProgram getStencilProgram()
+		{
+			return stencilProgram ;
+		}
+
 		public GLProgram getProgram()
 		{
 			return program ;
@@ -862,6 +851,11 @@ public class GLRenderer extends Basic2DRender
 		public Vector3 getClipOffset()
 		{
 			return clipOffset ;
+		}
+
+		public Matrix4 getClipMatrix()
+		{
+			return clipMatrix ;
 		}
 
 		public boolean toUpdate()
@@ -923,9 +917,10 @@ public class GLRenderer extends Basic2DRender
 			colour = null ;
 			shape = null ;
 			clipShape = null ;
-			words = null ;
 			clipPosition = null ;
 			clipOffset = null ;
+			clipMatrix = null ;
+			words = null ;
 			program = null ;
 			texture = null ;	
 			super.reset() ;

@@ -43,14 +43,21 @@ public class GLGeometryUploader
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
 	}
 
+	/**
+		Draw the uploaded geometry.
+	*/
 	public void draw( final GL3 _gl, final Matrix4 _modelViewProjection )
 	{
+		//System.out.println( "Buffers: " + buffers.size() ) ;
 		for( final GLBuffer buffer : buffers )
 		{
 			buffer.draw( _gl, _modelViewProjection ) ;
 		}
 	}
 
+	/**
+		Upload geometry and have it prepared for drawing.
+	*/
 	public void upload( final GL3 _gl, final GLRenderer.GLRenderData _data, final Matrix4 _matrix )
 	{
 		final GLBuffer buffer = getBuffer( _data ) ;
@@ -60,6 +67,9 @@ public class GLGeometryUploader
 		}
 	}
 
+	/**
+		Reset the buffers for uploading to begin.
+	*/
 	public void reset()
 	{
 		for( final GLBuffer buffer : buffers )
@@ -296,10 +306,16 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;		// Specifies the byte offset between verticies
 
-		private final GLProgram program ;
+		private final GLProgram program ;			// What shader should be used
 		private final int textureID ;				// -1 represent no texture in use
-		private final int layer ;
+		private final int layer ;					// Defines the 2D layer the geometry resides on
 
+		private GLProgram stencilProgram         = null ;	// Stencil is applied to all geometry located in buffers
+		private Shape stencilShape               = null ;
+		private VertexAttrib[] stencilAttributes = null ;
+		private Matrix4 stencilMatrix            = null ;
+
+		private GLGeometry stencilBuffer = null ;
 		private final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
 
 		public GLBuffer( final GLRenderer.GLRenderData _data,
@@ -311,6 +327,7 @@ public class GLGeometryUploader
 
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
 			attributes = constructVertexAttrib( shapeSwivel ) ;
+
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
@@ -323,16 +340,13 @@ public class GLGeometryUploader
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
 			{
-				case LINES      : style = GL2.GL_LINES ;      break ;
-				case LINE_STRIP : style = GL2.GL_LINE_STRIP ; break ;
-				case FILL       : style = GL2.GL_TRIANGLES ;  break ;
-				default         : style = GL2.GL_LINES ;      break ;
+				case LINES      : style = GL3.GL_LINES ;      break ;
+				case LINE_STRIP : style = GL3.GL_LINE_STRIP ; break ;
+				case FILL       : style = GL3.GL_TRIANGLES ;  break ;
+				default         : style = GL3.GL_LINES ;      break ;
 			}
 
-			buffers.add( new GLGeometry( style,
-										 indexLengthBytes,
-										 vertexLengthBytes,
-										 vertexStrideBytes ) ) ;
+			setupStencil( _data ) ;
 		}
 
 		public void draw( final GL3 _gl, final Matrix4 _modelViewProjection )
@@ -341,6 +355,11 @@ public class GLGeometryUploader
 			{
 				System.out.println( "No program specified..." ) ;
 				return ;
+			}
+
+			if( stencilBuffer != null )
+			{
+				drawStencil( _gl, _modelViewProjection ) ;
 			}
 
 			_gl.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
@@ -369,8 +388,42 @@ public class GLGeometryUploader
 			}
 			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
 
-			_gl.glUseProgram( 0 ) ;			//GLRenderer.handleError( "Disable Program", _gl ) ;
-			_gl.glDisable( GL3.GL_BLEND ) ;	//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			_gl.glUseProgram( 0 ) ;					//GLRenderer.handleError( "Disable Program", _gl ) ;
+			_gl.glDisable( GL3.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			_gl.glDisable( GL3.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+		}
+
+		private void drawStencil( final GL3 _gl, final Matrix4 _modelViewProjection )
+		{
+			stencilBuffer.upload( _gl, stencilShape, stencilMatrix ) ;
+			_gl.glUseProgram( stencilProgram.id[0] ) ;
+
+			final int inMVPMatrix = _gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
+			_gl.glUniformMatrix4fv( inMVPMatrix, 1, true, _modelViewProjection.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+
+			// Don't render the element to the colour buffer
+			_gl.glColorMask( false, false, false, false ) ;
+			_gl.glEnable( GL3.GL_STENCIL_TEST ) ;
+
+			_gl.glStencilMask( 0xFF ) ;
+			_gl.glClear( GL3.GL_STENCIL_BUFFER_BIT ) ;
+
+			_gl.glStencilFunc( GL3.GL_NEVER, 1, 0xFF ) ;
+			_gl.glStencilOp( GL3.GL_REPLACE, GL3.GL_KEEP, GL3.GL_KEEP ) ;
+
+			GLGeometryUploader.enableVertexAttributes( _gl, stencilAttributes ) ;
+			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, stencilBuffer.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
+			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, stencilBuffer.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
+
+			GLGeometryUploader.prepareVertexAttributes( _gl, stencilAttributes, stencilBuffer.getStride() ) ;
+			//System.out.println( "Index: " + stencilBuffer.getUsedIndexBytes() + " Vertex: " + stencilBuffer.getUsedVertexBytes() ) ;
+			_gl.glDrawElements( stencilBuffer.getStyle(), stencilBuffer.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
+			//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
+			GLGeometryUploader.disableVertexAttributes( _gl, stencilAttributes ) ;
+
+			_gl.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
+			_gl.glStencilFunc( GL3.GL_EQUAL, 1, 1 ) ;
+			// continue rendering scene...
 		}
 
 		public void upload( final GL3 _gl, final Shape _shape, final Matrix4 _matrix )
@@ -414,6 +467,12 @@ public class GLGeometryUploader
 				return false ;
 			}
 
+			if( stencilShape != _data.getClipShape() )
+			{
+				//System.out.println( stencilShape + " : " + _data.getClipShape() ) ;
+				return false ;
+			}
+
 			if( program != _data.getProgram() )
 			{
 				return false ;
@@ -454,6 +513,27 @@ public class GLGeometryUploader
 			}
 
 			return true ;
+		}
+
+		/**
+			A buffer can support one stencil.
+		*/
+		private void setupStencil( final GLRenderer.GLRenderData _data )
+		{
+			stencilShape = _data.getClipShape() ;
+			if( stencilShape != null )
+			{
+				final Shape.Swivel[] swivel = stencilShape.getSwivel() ;
+				stencilAttributes = constructVertexAttrib( swivel ) ;
+
+				final int vertexStrideBytes = calculateVertexSize( swivel ) * 4 ;
+				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
+				final int indexBytes  = stencilShape.getIndexSize() * 4 ;
+
+				stencilBuffer = new GLGeometry( GL3.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
+				stencilProgram = _data.getStencilProgram() ;
+				stencilMatrix = _data.getClipMatrix() ;
+			}
 		}
 
 		private void expand()
@@ -580,6 +660,17 @@ public class GLGeometryUploader
 		{
 			amountIndexUsedBytes  = 0 ;
 			amountVertexUsedBytes = 0 ;
+		}
+
+		/**
+			Returns true if the GLGeometry contains any 
+			vertex data, false otherwise.
+			Can be used to determine whether the buffer can 
+			be destroyed.
+		*/
+		public boolean containsGeometry()
+		{
+			return amountVertexUsedBytes > 0 ;
 		}
 
 		public void destroy()
