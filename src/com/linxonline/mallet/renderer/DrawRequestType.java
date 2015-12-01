@@ -11,5 +11,8 @@ public enum DrawRequestType
 
 	TEXTURE,
 	GEOMETRY,
-	TEXT
+	TEXT,
+
+	CONTINUOUS,		// Update whenever possible
+	ON_DEMAND		// Update when requested by developer
 }

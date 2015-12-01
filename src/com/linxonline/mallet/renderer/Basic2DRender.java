@@ -422,17 +422,19 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 	public static abstract class RenderData implements SortInterface, Cacheable
 	{
-		public Settings data = null ;			// Data to be drawn
-		public DrawInterface call = null ;		// Draw technique to use
-		public DrawRequestType type = null ;
+		public Settings data = null ;					// Data to be drawn
+		public DrawInterface call = null ;				// Draw technique to use
+		public DrawRequestType type = null ;			// Texture, Geometry, Text
+		public DrawRequestType updateType = null ;		// Continuous, On-demand
 
 		public RenderData() {}
 
-		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
+		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type, final DrawRequestType _updateType )
 		{
 			data = _data ;
 			call = _call ;
 			type = _type ;
+			updateType = _updateType ;
 		}
 
 		public void draw( final Vector2 _position )
@@ -452,6 +454,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		public abstract void copy( final RenderData _data ) ;
 		public abstract void removeResources() ;
 		public abstract int sortValue() ;
+
+		public DrawRequestType getUpdateType()
+		{
+			return updateType ;
+		}
 
 		@Override
 		public void reset()

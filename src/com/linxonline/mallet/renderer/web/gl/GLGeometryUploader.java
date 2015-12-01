@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
 import java.util.ArrayList ;
+import java.util.Arrays ;
 import java.nio.* ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
@@ -14,11 +15,13 @@ import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.resources.model.* ;
+import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.Matrix4 ;
 
 public class GLGeometryUploader
 {

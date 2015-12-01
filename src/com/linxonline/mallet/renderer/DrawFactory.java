@@ -62,6 +62,19 @@ public final class DrawFactory
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
+	/**
+		Used to inform the renderer whether it should continuously 
+		update the rendering data or be told to update.
+		Use DrawRequestType.CONTINUOUS to update indefinately or 
+		DrawRequestType.ON_DEMAND to update on UPDATE request.
+	*/
+	public static Event<Settings> amendUpdateType( final Event<Settings> _event, final DrawRequestType _updateType )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "UPDATE_TYPE", _updateType ) ;
+		return _event ;
+	}
+
 	public static Event<Settings> amendClip( final Event<Settings> _event,
 											 final Shape _clip,
 											 final Vector3 _clipPosition,
@@ -113,6 +126,7 @@ public final class DrawFactory
 		changes are automatically updated per frame currently.
 		Translation, rotation, or scale do not require the renderer to 
 		update its state.
+		Used in conjunction with DrawRequestType.ON_DEMAND
 	*/
 	public static Event<Settings> forceUpdate( final Event<Settings> _event )
 	{

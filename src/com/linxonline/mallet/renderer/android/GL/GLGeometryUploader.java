@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
+import java.util.HashMap ;
 import java.util.Arrays ;
 import java.nio.* ;
 
@@ -9,8 +10,11 @@ import android.opengl.GLES20 ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.DrawRequestType ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.util.caches.ObjectCache ;
+import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 
@@ -20,12 +24,15 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public class GLGeometryUploader
 {
+	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
+
 	private final short[] indicies ;
 	private final float[] verticies ;
 
 	private final ShortBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
+	private final HashMap<GLRenderer.GLRenderData, GLBuffer> lookup = new HashMap<GLRenderer.GLRenderData, GLBuffer>() ;
 	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
 	private final Vector3 temp = new Vector3() ;
 
@@ -43,81 +50,73 @@ public class GLGeometryUploader
 		indexBuffer = indexByteBuffer.asShortBuffer() ;
 	}
 
-	public void draw( final Matrix4 _modelViewProjection )
+	/**
+		Draw the uploaded geometry.
+	*/
+	public void draw( final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
 		//System.out.println( "Buffers: " + buffers.size() ) ;
 		for( final GLBuffer buffer : buffers )
 		{
-			buffer.draw( _modelViewProjection ) ;
+			buffer.draw( _worldProjection, _uiProjection ) ;
 		}
 	}
 
 	/**
 		Upload geometry and have it prepared for drawing.
 	*/
-	public void upload( final GLRenderer.GLRenderData _data, final Matrix4 _matrix )
+	public void upload( final GLRenderer.GLRenderData _data )
 	{
-		final GLBuffer buffer = getBuffer( _data ) ;
+		GLBuffer buffer = lookup.get( _data ) ;
 		if( buffer != null )
 		{
-			buffer.upload( _data.getShape(), _matrix ) ;
-		}
-	}
-
-	/**
-		Reset the buffers for uploading to begin.
-	*/
-	public void reset()
-	{
-		for( final GLBuffer buffer : buffers )
-		{
-			buffer.reset() ;
-		}
-	}
-
-	protected void uploadIndex( final GLGeometry _handler, final Shape _shape )
-	{
-		final int[] index = _shape.indicies ;
-		final int indexOffset = _handler.amountVertexUsedBytes / _handler.vertexStrideBytes ;
-
-		int j = 0 ;
-		int offset = _handler.amountIndexUsedBytes ;
-		for( int i = 0; i < index.length; i++ )
-		{
-			indicies[j++] = ( short )( indexOffset + index[i] ) ;
-			if( j >= indicies.length )
+			if( buffer.isSupported( _data ) == true )
 			{
-				indexBuffer.put( indicies ) ;
-				indexBuffer.position( 0 ) ;
-
-				final int indexBufferLengthInBytes = indicies.length * 2 ;
-				GLES20.glBufferSubData( GLES20.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
-				//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
-
-				j = 0 ;
-				offset += indexBufferLengthInBytes ;
+				// If the buffer is still supported in the buffer 
+				// it was previously loaded into then update it.
+				buffer.upload( _data ) ;
+				return ;
+			}
+			else
+			{
+				// Else remove any references from the buffer
+				lookup.remove( _data ) ;
+				buffer.remove( _data ) ;
 			}
 		}
 
-		if( j > 0 )
-		{
-			indexBuffer.put( indicies ) ;
-			indexBuffer.position( 0 ) ;
-
-			final int indexBufferLengthInBytes = j * 2 ;
-			GLES20.glBufferSubData( GLES20.GL_ELEMENT_ARRAY_BUFFER, offset, indexBufferLengthInBytes, indexBuffer ) ;
-		}
+		buffer = getSupportedBuffer( _data ) ;
+		lookup.put( _data, buffer ) ;
+		buffer.upload( _data ) ;
 	}
 
-	protected void uploadVBO( final GLGeometry _handler, final Shape _shape, final Matrix4 _matrix )
+	protected void uploadIndex( final Location _handler, final Shape _shape )
+	{
+		final GLGeometry geometry = _handler.getGeometry() ;
+
+		final int[] index = _shape.indicies ;
+		final int indexOffset = _handler.getVertexStart() / geometry.vertexStrideBytes ;
+
+		for( int i = 0; i < index.length; i++ )
+		{
+			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
+			indicies[i] = ( short )( indexOffset + index[i] ) ;
+		}
+
+		indexBuffer.put( indicies ) ;
+		indexBuffer.position( 0 ) ;
+
+		GLES20.glBufferSubData( GLES20.GL_ELEMENT_ARRAY_BUFFER, _handler.getIndexStart(), _handler.getIndexLength(), indexBuffer ) ;
+		//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+	}
+
+	protected void uploadVBO( final Location _handler, final Shape _shape, final Matrix4 _matrix )
 	{
 		final Shape.Swivel[] swivel = _shape.getSwivel() ;
 		final int vertexSize = calculateVertexSize( swivel ) ;
 		final int verticiesSize = _shape.getVertexSize() ;
 
 		int inc = 0 ;
-		int offset = _handler.amountVertexUsedBytes ;
-
 		for( int i = 0; i < verticiesSize; i++ )
 		{
 			for( int j = 0; j < swivel.length; j++ )
@@ -149,30 +148,13 @@ public class GLGeometryUploader
 					}
 				}
 			}
-
-			if( ( inc + vertexSize ) >= verticies.length )
-			{
-				vertexBuffer.put( verticies ) ;
-				vertexBuffer.position( 0 ) ;
-
-				final int vertexLengthInBytes = inc * 4 ;
-				GLES20.glBufferSubData( GLES20.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
-				//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
-
-				inc = 0 ;
-				offset += vertexLengthInBytes ;
-			}
 		}
-		
-		if( inc > 0 )
-		{
-			vertexBuffer.put( verticies ) ;
-			vertexBuffer.position( 0 ) ;
 
-			final int vertexLengthInBytes = inc * 4 ;
-			GLES20.glBufferSubData( GLES20.GL_ARRAY_BUFFER, offset, vertexLengthInBytes, vertexBuffer ) ;
-			//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
-		}
+		vertexBuffer.put( verticies ) ;
+		vertexBuffer.position( 0 ) ;
+
+		GLES20.glBufferSubData( GLES20.GL_ARRAY_BUFFER, _handler.getVertexStart(), _handler.getVertexLength(), vertexBuffer ) ;
+		//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
 	}
 
 	/**
@@ -180,7 +162,7 @@ public class GLGeometryUploader
 		of the datat passed in.
 		If a GLBuffer doesn't exist create one.
 	*/
-	private GLBuffer getBuffer( final GLRenderer.GLRenderData _data )
+	private GLBuffer getSupportedBuffer( final GLRenderer.GLRenderData _data )
 	{
 		for( final GLBuffer buffer : buffers )
 		{
@@ -190,6 +172,7 @@ public class GLGeometryUploader
 			}
 		}
 
+		// Use _data as initial parameters for this buffer.
 		final GLBuffer buffer = new GLBuffer( _data, indicies.length * 2, verticies.length * 4 ) ;
 		buffers.add( buffer ) ;
 		return buffer ;
@@ -304,13 +287,17 @@ public class GLGeometryUploader
 		private final GLProgram program ;			// What shader should be used
 		private final int textureID ;				// -1 represent no texture in use
 		private final int layer ;					// Defines the 2D layer the geometry resides on
+		private final boolean ui ;					// Is the buffer used for UI or world space?
+		private final boolean isText ;				// Is the buffer to be used for text?
 
 		private GLProgram stencilProgram         = null ;	// Stencil is applied to all geometry located in buffers
 		private Shape stencilShape               = null ;
 		private VertexAttrib[] stencilAttributes = null ;
 		private Matrix4 stencilMatrix            = null ;
 
-		private GLGeometry stencilBuffer = null ;
+		private Location stencilLocation = null ;
+
+		private final HashMap<GLRenderer.GLRenderData, Location> locations = new HashMap<GLRenderer.GLRenderData, Location>() ;
 		private final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
 
 		public GLBuffer( final GLRenderer.GLRenderData _data,
@@ -331,6 +318,8 @@ public class GLGeometryUploader
 			textureID = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
 			layer = _data.getLayer() ;
 			program = _data.getProgram() ;
+			ui = _data.isUI() ;
+			isText = _data.type == DrawRequestType.TEXT ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -344,7 +333,7 @@ public class GLGeometryUploader
 			setupStencil( _data ) ;
 		}
 
-		public void draw( final Matrix4 _modelViewProjection )
+		public void draw( final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 		{
 			if( program == null )
 			{
@@ -352,15 +341,16 @@ public class GLGeometryUploader
 				return ;
 			}
 
-			if( stencilBuffer != null )
+			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
+			if( stencilLocation != null )
 			{
-				drawStencil( _modelViewProjection ) ;
+				//drawStencil( matrix ) ;
 			}
 
 			GLES20.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
 
 			final int inMVPMatrix = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, _modelViewProjection.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			if( textureID != -1 )
 			{
@@ -386,15 +376,21 @@ public class GLGeometryUploader
 			GLES20.glUseProgram( 0 ) ;			//GLRenderer.handleError( "Disable Program", _gl ) ;
 			GLES20.glDisable( GLES20.GL_BLEND ) ;		//GLRenderer.handleError( "Disable Blend", _gl ) ;
 			GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+
+			if( isText == true )
+			{
+				clear() ;
+			}		
 		}
 
-		private void drawStencil( final Matrix4 _modelViewProjection )
+		private void drawStencil( final float[] _projectionMatrix )
 		{
-			stencilBuffer.upload( stencilShape, stencilMatrix ) ;
-			GLES20.glUseProgram( stencilProgram.id[0] ) ;
+			final GLGeometry geometry = stencilLocation.getGeometry() ;
+			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
 			final int inMVPMatrix = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, _modelViewProjection.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			// Don't render the element to the colour buffer
 			GLES20.glColorMask( false, false, false, false ) ;
@@ -407,12 +403,10 @@ public class GLGeometryUploader
 			GLES20.glStencilOp( GLES20.GL_REPLACE, GLES20.GL_KEEP, GLES20.GL_KEEP ) ;
 
 			GLGeometryUploader.enableVertexAttributes( stencilAttributes ) ;
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, stencilBuffer.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, stencilBuffer.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
 
-			GLGeometryUploader.prepareVertexAttributes( stencilAttributes, stencilBuffer.getStride() ) ;
-			//System.out.println( "Index: " + stencilBuffer.getUsedIndexBytes() + " Vertex: " + stencilBuffer.getUsedVertexBytes() ) ;
-			GLES20.glDrawElements( stencilBuffer.getStyle(), stencilBuffer.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+			GLGeometryUploader.prepareVertexAttributes( stencilAttributes, geometry.getStride() ) ;
+			//System.out.println( "Index: " + geometry.getUsedIndexBytes() + " Vertex: " + geometry.getUsedVertexBytes() ) ;
+			GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 			//GLRenderer.handleError( "Draw Elements: " ) ;
 			GLGeometryUploader.disableVertexAttributes( stencilAttributes ) ;
 
@@ -421,28 +415,25 @@ public class GLGeometryUploader
 			// continue rendering scene...
 		}
 
-		public void upload( final Shape _shape, final Matrix4 _matrix )
+		public void upload( final GLRenderer.GLRenderData _data )
 		{
-			for( final GLGeometry geometry : buffers )
-			{
-				// Upload the data to the buffer 
-				// if it returns succesfully then the data 
-				// was uploaded.
-				if( geometry.upload( _shape, _matrix ) == true )
-				{
-					return ;
-				}
-			}
+			final Location location = findLocation( _data ) ;
+			final GLGeometry geometry = location.getGeometry() ;
+			final Shape shape = _data.getShape() ;
 
-			expand() ;
-			upload( _shape, _matrix ) ;
+			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+
+			GLGeometryUploader.this.uploadIndex( location, shape ) ;
+			GLGeometryUploader.this.uploadVBO( location, shape, _data.getPositionMatrix() ) ;
 		}
 
-		public void reset()
+		public void remove( final GLRenderer.GLRenderData _data )
 		{
-			for( final GLGeometry geometry : buffers )
+			final Location location = locations.get( _data ) ;
+			if( location != null )
 			{
-				geometry.reset() ;
+				location.getGeometry().remove( location ) ;
 			}
 		}
 
@@ -461,14 +452,20 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-
-			if( stencilShape != _data.getClipShape() )
+			else if( ui != _data.isUI() )
+			{
+				return false ;
+			}
+			else if( stencilShape != _data.getClipShape() )
 			{
 				//System.out.println( stencilShape + " : " + _data.getClipShape() ) ;
 				return false ;
 			}
-
-			if( program != _data.getProgram() )
+			else if( program != _data.getProgram() )
+			{
+				return false ;
+			}
+			else if( isText != ( _data.type == DrawRequestType.TEXT ) )
 			{
 				return false ;
 			}
@@ -510,6 +507,39 @@ public class GLGeometryUploader
 			return true ;
 		}
 
+		private Location findLocation( final GLRenderer.GLRenderData _data )
+		{
+			if( isText == false )
+			{
+				// If _data has already been added we return the location 
+				// in which it resides.
+				final Location location = locations.get( _data ) ;
+				if( location != null )
+				{
+					return location ;
+				}
+			}
+
+			// If it hasn't been added find a space for it within 
+			// an existing geometry buffer.
+			for( final GLGeometry geometry : buffers )
+			{
+				final Location location = geometry.findLocation( _data.getShape() ) ;
+				if( location != null )
+				{
+					locations.put( _data, location ) ;
+					return location ;
+				}
+			}
+
+			// If no space exists create a new geometry buffer 
+			// and repeat the finding process.
+			// Note: If the object is larger than the buffer, 
+			// this will infinity loop.
+			expand() ;
+			return findLocation( _data ) ;
+		}
+
 		/**
 			A buffer can support one stencil.
 		*/
@@ -525,12 +555,21 @@ public class GLGeometryUploader
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
 				final int indexBytes  = stencilShape.getIndexSize() * 2 ;
 
-				stencilBuffer = new GLGeometry( GLES20.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
+				stencilLocation = new Location( new GLGeometry( GLES20.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ), 0, indexBytes, 0, vertexBytes ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
 			}
 		}
 
+		private void clear()
+		{
+			locations.clear() ;
+			for( final GLGeometry geometry : buffers )
+			{
+				geometry.clear() ;
+			}
+		}
+		
 		private void expand()
 		{
 			buffers.add( new GLGeometry( style,
@@ -551,6 +590,8 @@ public class GLGeometryUploader
 
 	public class GLGeometry implements GeometryInterface
 	{
+		private final Location START = new Location( null, 0, 0, 0, 0 ) ;
+
 		private final int style ;
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
@@ -561,6 +602,8 @@ public class GLGeometryUploader
 
 		public int amountIndexUsedBytes  = 0 ;		// How much of buffer has been used
 		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
+
+		private final ArrayList<Location> allocated = new ArrayList<Location>() ;
 
 		public GLGeometry( final int _style,
 						   final int _indexLengthBytes,
@@ -582,14 +625,14 @@ public class GLGeometryUploader
 			GLES20.glBufferData( GLES20.GL_ARRAY_BUFFER, vertexLengthBytes, null, GLES20.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
 		}
 
-		public boolean upload( final Shape _shape, final Matrix4 _matrix )
+		public Location findLocation( final Shape _shape )
 		{
 			final int availableIndex = indexLengthBytes - amountIndexUsedBytes ;
 			final int shapeIndexBytes = _shape.getIndexSize() * 2 ;
 			if( shapeIndexBytes > availableIndex )
 			{
 				//System.out.println( "Not enough Index space..." ) ;
-				return false ;
+				return null ;
 			}
 
 			final int availableVertex = vertexLengthBytes - amountVertexUsedBytes ;
@@ -597,18 +640,88 @@ public class GLGeometryUploader
 			if( shapeVertexBytes > availableVertex )
 			{
 				//System.out.println( "Not enough Vertex space..." ) ;
-				return false ;
+				return null ;
 			}
 
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+			if( allocated.isEmpty() )
+			{
+				//System.out.println( "Index Length: " + shapeIndexBytes + " Vertex Length: " + shapeVertexBytes ) ;
+				return createLocation( 0, shapeIndexBytes, 0, shapeVertexBytes ) ;
+			}
 
-			GLGeometryUploader.this.uploadIndex( this, _shape ) ;
-			GLGeometryUploader.this.uploadVBO( this, _shape, _matrix ) ;
+			boolean foundIndex = false ;
+			boolean foundVertex = false ;
+			int locationIndexStart = 0 ;
+			int locationVertexStart = 0 ;
+			final int size = allocated.size() ;
 
-			amountIndexUsedBytes += shapeIndexBytes ;
-			amountVertexUsedBytes += shapeVertexBytes ;
-			return true ;
+			//System.out.println( "Searching for location.. " ) ;
+			for( int i = 0; i < size; i++ )
+			{
+				final Location next = allocated.get( i ) ;
+				if( foundIndex == false )
+				{
+					final int indexLen = next.getIndexStart() - locationIndexStart ;
+					if( indexLen < shapeIndexBytes )
+					{
+						locationIndexStart = next.getIndexEnd() ;
+					}
+					else
+					{
+						foundIndex = true ;
+					}
+				}
+
+				if( foundVertex == false )
+				{
+					final int vertexLen = next.getVertexStart() - locationVertexStart ;
+					if( vertexLen < shapeVertexBytes )
+					{
+						locationVertexStart = next.getVertexEnd() ;
+					}
+					else
+					{
+						foundVertex = true ;
+					}
+				}
+
+				if( foundIndex == true && foundVertex == true )
+				{
+					//System.out.println( "Found location... " ) ;
+					return createLocation( locationIndexStart, shapeIndexBytes, locationVertexStart, shapeVertexBytes ) ;
+				}
+			}
+
+			final int indexLen = indexLengthBytes - locationIndexStart ;
+			final int vertexLen = vertexLengthBytes - locationVertexStart ;
+			if( indexLen > shapeIndexBytes && vertexLen > shapeVertexBytes )
+			{
+				//System.out.println( "Found location at end... " ) ;
+				return createLocation( locationIndexStart, shapeIndexBytes, locationVertexStart, shapeVertexBytes ) ;
+			}
+
+			return null ;		// If no space is available
+		}
+
+		private Location createLocation( final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		{
+			amountIndexUsedBytes += _indexLength ;
+			amountVertexUsedBytes += _vertexLength ;
+
+			final Location location = locationCache.get() ;
+			location.set( this, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
+			allocated.add( location ) ;
+			return location ; 
+		}
+
+		public void remove( final Location _location )
+		{
+			if( allocated.remove( _location ) == true )
+			{
+				amountIndexUsedBytes -= _location.getIndexLength() ;
+				amountVertexUsedBytes -= _location.getVertexLength() ;
+				locationCache.reclaim( _location ) ;
+			}
 		}
 
 		public int getIndexID()
@@ -646,12 +759,6 @@ public class GLGeometryUploader
 			return vertexStrideBytes ;
 		}
 
-		public void reset()
-		{
-			amountIndexUsedBytes  = 0 ;
-			amountVertexUsedBytes = 0 ;
-		}
-
 		/**
 			Returns true if the GLGeometry contains any 
 			vertex data, false otherwise.
@@ -665,11 +772,91 @@ public class GLGeometryUploader
 
 		public void destroy()
 		{
-			reset() ;
 			GLModelManager.unbind( this ) ;
+		}
+
+		private void clear()
+		{
+			amountIndexUsedBytes = 0 ;
+			amountVertexUsedBytes = 0 ;
+			for( final Location location : allocated )
+			{
+				locationCache.reclaim( location ) ;
+			}
+			allocated.clear() ;
 		}
 	}
 
+	public static class Location implements Cacheable
+	{
+		private GLGeometry geometry = null ;
+		private int indexStart = 0 ;
+		private int indexLength = 0 ;
+		private int vertexStart = 0 ;
+		private int vertexLength = 0 ;
+
+		public Location() {}
+
+		public Location( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		{
+			set( _geometry, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
+		}
+
+		public void set( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		{
+			geometry = _geometry ;
+			indexStart = _indexStart ;
+			indexLength = _indexLength ;
+			vertexStart = _vertexStart ;
+			vertexLength = _vertexLength ;
+		}
+
+		public int getIndexStart()
+		{
+			return indexStart ;
+		}
+
+		public int getIndexEnd()
+		{
+			return indexStart + indexLength ;
+		}
+
+		public int getIndexLength()
+		{
+			return indexLength ;
+		}
+
+		public int getVertexStart()
+		{
+			return vertexStart ;
+		}
+
+		public int getVertexEnd()
+		{
+			return vertexStart + vertexLength ;
+		}
+
+		public int getVertexLength()
+		{
+			return vertexLength ;
+		}
+
+		public void reset()
+		{
+			set( null, 0, 0, 0, 0 ) ;
+		}
+
+		public GLGeometry getGeometry()
+		{
+			return geometry ;
+		}
+
+		public String toString()
+		{
+			return "Index: " + indexStart + " Index Length: " + indexLength + " Vertex: " + vertexStart + " Vertex Length: " + vertexLength ;
+		}
+	}
+	
 	protected static void enableVertexAttributes( final VertexAttrib[] _atts )
 	{
 		for( VertexAttrib att : _atts )

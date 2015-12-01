@@ -195,6 +195,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
+				if( _data.toUpdate() == false &&
+					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
+				{
+					return ;
+				}
+
 				final float rotation = _data.getRotation() ;
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
@@ -206,35 +212,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final Matrix4 clipMatrix = _data.getClipMatrix() ;
 					clipMatrix.setIdentity() ;
 
-					if( isGUI == true )
-					{
-						clipMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						clipMatrix.multiply( worldMatrix ) ;
-					}
-
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
 
-				final Matrix4 newMatrix = matrixCache.get() ;
-				if( isGUI == true )
-				{
-					newMatrix.multiply( uiMatrix ) ;
-				}
-				else
-				{
-					newMatrix.multiply( worldMatrix ) ;
-				}
+				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+				positionMatrix.setIdentity() ;
 
-				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				uploader.upload( gl, _data, newMatrix ) ;
-				matrixCache.reclaim( newMatrix ) ;
+				uploader.upload( gl, _data ) ;
 			}
 		} ;
 
@@ -242,6 +231,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
+				if( _data.toUpdate() == false &&
+					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
+				{
+					return ;
+				}
+
 				Texture<GLImage> texture = _data.getTexture() ;
 				if( texture == null )
 				{
@@ -264,35 +259,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final Matrix4 clipMatrix = _data.getClipMatrix() ;
 					clipMatrix.setIdentity() ;
 
-					if( isGUI == true )
-					{
-						clipMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						clipMatrix.multiply( worldMatrix ) ;
-					}
-
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
 
-				final Matrix4 newMatrix = matrixCache.get() ;
-				if( isGUI == true )
-				{
-					newMatrix.multiply( uiMatrix ) ;
-				}
-				else
-				{
-					newMatrix.multiply( worldMatrix ) ;
-				}
+				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+				positionMatrix.setIdentity() ;
 
-				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				uploader.upload( gl, _data, newMatrix ) ;
-				matrixCache.reclaim( newMatrix ) ;
+				uploader.upload( gl, _data ) ;
 			}
 		} ;
 
@@ -300,6 +278,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			public void draw( final GLRenderData _data, final Vector2 _position ) 
 			{
+				if( _data.toUpdate() == false &&
+					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
+				{
+					return ;
+				}
+
 				final String text = _data.getText() ;
 				if( text == null )
 				{
@@ -344,15 +328,6 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final Matrix4 clipMatrix = _data.getClipMatrix() ;
 					clipMatrix.setIdentity() ;
 
-					if( isGUI == true )
-					{
-						clipMatrix.multiply( uiMatrix ) ;
-					}
-					else
-					{
-						clipMatrix.multiply( worldMatrix ) ;
-					}
-
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
@@ -360,27 +335,18 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 currentPos = new Vector2( _position ) ;
 
 				setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
-				final Matrix4 newMatrix = matrixCache.get() ;
-				if( isGUI == true )
-				{
-					newMatrix.multiply( uiMatrix ) ;
-				}
-				else
-				{
-					newMatrix.multiply( worldMatrix ) ;
-				}
+				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+				positionMatrix.setIdentity() ;
 
-				newMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				newMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				newMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
 				final int size = words.length ;
 				for( int i = 0; i < size; ++i )
 				{
-					renderText( words[i], fm, newMatrix, _data ) ;
+					renderText( words[i], fm, positionMatrix, _data ) ;
 				}
-
-				matrixCache.reclaim( newMatrix ) ;
 			}
 
 			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final GLRenderData _data )
@@ -391,7 +357,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
 					_data.setShape( glyph.shape ) ;
 
-					uploader.upload( gl, _data, _matrix ) ;
+					uploader.upload( gl, _data ) ;
 					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 				}
 			}
@@ -471,9 +437,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 		//GLRenderer.handleError( "VSync: ", gl ) ;
 
-		//gl.glEnable( GL.GL_CULL_FACE ) ;
-		//gl.glCullFace( GL.GL_BACK ) ;  
-		//gl.glFrontFace( GL.GL_CCW ) ;
+		gl.glEnable( GL.GL_CULL_FACE ) ;
+		gl.glCullFace( GL.GL_BACK ) ;  
+		gl.glFrontFace( GL.GL_CCW ) ;
 
 		resize() ;
 
@@ -621,9 +587,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		worldMatrix.translate( -pos.x, -pos.y, 0.0f ) ;
 
 		render() ;
-
 		canvas.swapBuffers() ;
-		uploader.reset() ;
 	}
 
 	protected void render()
@@ -632,7 +596,17 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( state.isStateStable() == true )
 		{
 			state.draw() ;
-			uploader.draw( gl, modelViewProjectionMatrix ) ;
+
+			final Matrix4 worldProjection = matrixCache.get() ;
+			Matrix4.multiply( modelViewProjectionMatrix, worldMatrix, worldProjection ) ;
+
+			final Matrix4 uiProjection = matrixCache.get() ;
+			Matrix4.multiply( modelViewProjectionMatrix, uiMatrix, uiProjection ) ;
+
+			uploader.draw( gl, worldProjection, uiProjection ) ;
+
+			matrixCache.reclaim( worldProjection ) ;
+			matrixCache.reclaim( uiProjection ) ;
 		}
 	}
 
@@ -660,7 +634,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( shape != null )
 			{
 				final GLRenderData data = renderCache.get() ;
-				data.set( _draw, drawTexture, DrawRequestType.TEXTURE ) ;
+				data.set( _draw, drawTexture, DrawRequestType.TEXTURE, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
 				data.setProgram( programs.get( "SIMPLE_TEXTURE" ) ) ;
 				data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
@@ -681,9 +655,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			if( shape != null )
 			{
 				final GLRenderData data = renderCache.get() ;
-				data.set( _draw, drawShape, DrawRequestType.GEOMETRY ) ;
+				data.set( _draw, drawShape, DrawRequestType.GEOMETRY, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
 				data.setProgram( programs.get( "SIMPLE_GEOMETRY" ) ) ;
-				//data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
+				data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
 				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
 				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
@@ -699,7 +673,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		if( position != null )
 		{
 			final GLRenderData data = renderCache.get() ;
-			data.set( _draw, drawText, DrawRequestType.TEXT ) ;
+			data.set( _draw, drawText, DrawRequestType.TEXT, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
 			data.setProgram( programs.get( "SIMPLE_FONT" ) ) ;
 			data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
 
@@ -782,6 +756,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		// User data
 		private Vector3 position       = null ;
 		private Vector2 offset         = null ;
+		private Matrix4 positionMatrix = null ;
 		private MalletColour colour    = null ;
 		private Shape shape            = null ;
 		private Shape clipShape        = null ;
@@ -803,9 +778,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		}
 
 		@Override
-		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type )
+		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type, final DrawRequestType _updateType )
 		{
-			super.set( _data, _call, _type ) ;
+			super.set( _data, _call, _type, _updateType ) ;
 			data.addInteger( "ID", getID() ) ;
 			data.addBoolean( "UPDATE", true ) ;
 			updateData() ;
@@ -815,6 +790,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			position       = data.<Vector3>getObject( "POSITION", null ) ;
 			offset         = data.<Vector2>getObject( "OFFSET", DEFAULT_OFFSET ) ;
+			positionMatrix = ( positionMatrix == null ) ? matrixCache.get() : positionMatrix ;
+
 			layer          = data.getInteger( "LAYER", 0 ) ;
 			interpolation  = data.<Interpolation>getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
 			uiElement      = data.getBoolean( "GUI", false ) ;
@@ -831,7 +808,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 			if( clipPosition != null && clipOffset != null )
 			{
-				clipMatrix = ( clipMatrix == null ) ? new Matrix4() : clipMatrix ;
+				clipMatrix = ( clipMatrix == null ) ? matrixCache.get() : clipMatrix ;
 			}
 		}
 
@@ -863,6 +840,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		public int getID()
 		{
 			return id ;
+		}
+
+		public Matrix4 getPositionMatrix()
+		{
+			return positionMatrix ;
 		}
 
 		public Vector3 getPosition()
@@ -1004,6 +986,12 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		@Override
 		public void reset()
 		{
+			if( positionMatrix != null )
+			{
+				matrixCache.reclaim( positionMatrix ) ;
+				positionMatrix = null ;
+			}
+
 			position = null ;
 			offset = null ;
 			colour = null ;
@@ -1011,7 +999,13 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			clipShape = null ;
 			clipPosition = null ;
 			clipOffset = null ;
-			clipMatrix = null ;
+
+			if( clipMatrix != null )
+			{
+				matrixCache.reclaim( clipMatrix ) ;
+				clipMatrix = null ;
+			}
+
 			words = null ;
 			program = null ;
 			texture = null ;	
