@@ -79,15 +79,22 @@ public class GLGeometryUploader
 			}
 			else
 			{
-				// Else remove any references from the buffer
-				lookup.remove( _data ) ;
-				buffer.remove( _data ) ;
+				remove( _data ) ;
 			}
 		}
 
 		buffer = getSupportedBuffer( _data ) ;
 		lookup.put( _data, buffer ) ;
 		buffer.upload( _data ) ;
+	}
+
+	public void remove( final GLRenderer.GLRenderData _data )
+	{
+		final GLBuffer buffer = lookup.remove( _data ) ;
+		if( buffer != null )
+		{
+			buffer.remove( _data ) ;
+		}
 	}
 
 	protected void uploadIndex( final Location _handler, final Shape _shape )
@@ -315,11 +322,11 @@ public class GLGeometryUploader
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
 
 			final Texture<GLImage> texture = _data.getTexture() ;
-			textureID = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
-			layer = _data.getLayer() ;
-			program = _data.getProgram() ;
-			ui = _data.isUI() ;
-			isText = _data.type == DrawRequestType.TEXT ;
+			textureID                      = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
+			layer                          = _data.getLayer() ;
+			program                        = _data.getProgram() ;
+			ui                             = _data.isUI() ;
+			isText                         = _data.type == DrawRequestType.TEXT ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -344,7 +351,7 @@ public class GLGeometryUploader
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
 			if( stencilLocation != null )
 			{
-				//drawStencil( matrix ) ;
+				drawStencil( matrix ) ;
 			}
 
 			GLES20.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
@@ -361,35 +368,35 @@ public class GLGeometryUploader
 			}
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
+			//System.out.println( "Geometry Buffers: " + buffers.size() ) ;
 			for( final GLGeometry geometry : buffers )
 			{
+				//System.out.println( "Geometry Allocated: " + geometry.getLocationSize() ) ;
 				GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
 				GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
 
 				GLGeometryUploader.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
-				//System.out.println( "Index: " + geometry.getUsedIndexBytes() + " Vertex: " + geometry.getUsedVertexBytes() ) ;
 				GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 				//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
 			}
 			GLGeometryUploader.disableVertexAttributes( attributes ) ;
 
-			GLES20.glUseProgram( 0 ) ;			//GLRenderer.handleError( "Disable Program", _gl ) ;
-			GLES20.glDisable( GLES20.GL_BLEND ) ;		//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			GLES20.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program", _gl ) ;
+			GLES20.glDisable( GLES20.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
 			GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil", _gl ) ;
 
 			if( isText == true )
 			{
 				clear() ;
-			}		
+			}
+			//System.out.println( "End Draw" ) ;
 		}
 
 		private void drawStencil( final float[] _projectionMatrix )
 		{
-			final GLGeometry geometry = stencilLocation.getGeometry() ;
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
-
-			final int inMVPMatrix = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
+			GLES20.glUseProgram( stencilProgram.id[0] ) ;
+		
+			final int inMVPMatrix = GLES20.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
 			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			// Don't render the element to the colour buffer
@@ -404,8 +411,14 @@ public class GLGeometryUploader
 
 			GLGeometryUploader.enableVertexAttributes( stencilAttributes ) ;
 
+			final GLGeometry geometry = stencilLocation.getGeometry() ;
+			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+
+			GLGeometryUploader.this.uploadIndex( stencilLocation, stencilShape ) ;
+			GLGeometryUploader.this.uploadVBO( stencilLocation, stencilShape, stencilMatrix ) ;
+
 			GLGeometryUploader.prepareVertexAttributes( stencilAttributes, geometry.getStride() ) ;
-			//System.out.println( "Index: " + geometry.getUsedIndexBytes() + " Vertex: " + geometry.getUsedVertexBytes() ) ;
 			GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
 			//GLRenderer.handleError( "Draw Elements: " ) ;
 			GLGeometryUploader.disableVertexAttributes( stencilAttributes ) ;
@@ -430,7 +443,7 @@ public class GLGeometryUploader
 
 		public void remove( final GLRenderer.GLRenderData _data )
 		{
-			final Location location = locations.get( _data ) ;
+			final Location location = locations.remove( _data ) ;
 			if( location != null )
 			{
 				location.getGeometry().remove( location ) ;
@@ -555,7 +568,8 @@ public class GLGeometryUploader
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
 				final int indexBytes  = stencilShape.getIndexSize() * 2 ;
 
-				stencilLocation = new Location( new GLGeometry( GLES20.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ), 0, indexBytes, 0, vertexBytes ) ;
+				final GLGeometry geometry = new GLGeometry( GLES20.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
+				stencilLocation = geometry.findLocation( stencilShape ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
 			}
@@ -590,8 +604,6 @@ public class GLGeometryUploader
 
 	public class GLGeometry implements GeometryInterface
 	{
-		private final Location START = new Location( null, 0, 0, 0, 0 ) ;
-
 		private final int style ;
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
@@ -759,6 +771,11 @@ public class GLGeometryUploader
 			return vertexStrideBytes ;
 		}
 
+		public int getLocationSize()
+		{
+			return allocated.size() ;
+		}
+		
 		/**
 			Returns true if the GLGeometry contains any 
 			vertex data, false otherwise.
@@ -770,6 +787,7 @@ public class GLGeometryUploader
 			return amountVertexUsedBytes > 0 ;
 		}
 
+		@Override
 		public void destroy()
 		{
 			GLModelManager.unbind( this ) ;
@@ -797,7 +815,7 @@ public class GLGeometryUploader
 
 		public Location() {}
 
-		public Location( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		private Location( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
 		{
 			set( _geometry, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
 		}
@@ -841,6 +859,7 @@ public class GLGeometryUploader
 			return vertexLength ;
 		}
 
+		@Override
 		public void reset()
 		{
 			set( null, 0, 0, 0, 0 ) ;

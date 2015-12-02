@@ -466,6 +466,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 			data = null ;
 			call = null ;
 			type = null ;
+			updateType = null ;
 		}
 	}
 

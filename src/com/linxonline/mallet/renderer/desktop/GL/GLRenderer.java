@@ -31,9 +31,6 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib ;
 
-// Reduce drawCalls by batching geometry based on texture, drawCall, & shader used.
-// Allow each batch to have multiple vbo objects
-
 public class GLRenderer extends Basic2DRender implements GLEventListener
 {
 	private static final MalletColour WHITE = MalletColour.white() ;
@@ -69,7 +66,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
 
-	protected GL3 gl = null ;
+	protected static GL3 gl = null ;
 	protected DrawInterface<GLRenderData> drawShape = null ;
 	protected DrawInterface<GLRenderData> drawTexture = null ;
 	protected DrawInterface<GLRenderData> drawText = null ;
@@ -321,11 +318,11 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
 
-				final Vector3 clipPosition = _data.getClipPosition() ;
-				final Vector3 clipOffset   = _data.getClipOffset() ;
-				if( clipPosition != null && clipOffset != null )
+				final Matrix4 clipMatrix = _data.getClipMatrix() ;
+				if( clipMatrix != null )
 				{
-					final Matrix4 clipMatrix = _data.getClipMatrix() ;
+					final Vector3 clipPosition = _data.getClipPosition() ;
+					final Vector3 clipOffset   = _data.getClipOffset() ;
 					clipMatrix.setIdentity() ;
 
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
@@ -964,6 +961,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			data = _data.data ;
 			call = _data.call ;
 			type = _data.type ;
+			updateType = _data.updateType ;
 		}
 
 		public int sortValue()
@@ -974,6 +972,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		@Override
 		public void removeResources()
 		{
+			uploader.remove( gl, this ) ;
 			data.remove( "ID" ) ;
 			if( texture != null )
 			{
@@ -1008,6 +1007,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 			words = null ;
 			program = null ;
+			stencilProgram = null ;
 			texture = null ;	
 			super.reset() ;
 		}

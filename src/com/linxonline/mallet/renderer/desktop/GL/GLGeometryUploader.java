@@ -79,15 +79,22 @@ public class GLGeometryUploader
 			}
 			else
 			{
-				// Else remove any references from the buffer
-				lookup.remove( _data ) ;
-				buffer.remove( _data ) ;
+				remove( _gl, _data ) ;
 			}
 		}
 
 		buffer = getSupportedBuffer( _data ) ;
 		lookup.put( _data, buffer ) ;
 		buffer.upload( _gl, _data ) ;
+	}
+
+	public void remove( final GL3 _gl, final GLRenderer.GLRenderData _data )
+	{
+		final GLBuffer buffer = lookup.remove( _data ) ;
+		if( buffer != null )
+		{
+			buffer.remove( _gl, _data ) ;
+		}
 	}
 
 	protected void uploadIndex( final GL3 _gl, final Location _handler, final Shape _shape )
@@ -315,11 +322,11 @@ public class GLGeometryUploader
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
 
 			final Texture<GLImage> texture = _data.getTexture() ;
-			textureID = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
-			layer = _data.getLayer() ;
-			program = _data.getProgram() ;
-			ui = _data.isUI() ;
-			isText = _data.type == DrawRequestType.TEXT ;
+			textureID                      = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
+			layer                          = _data.getLayer() ;
+			program                        = _data.getProgram() ;
+			ui                             = _data.isUI() ;
+			isText                         = _data.type == DrawRequestType.TEXT ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -344,7 +351,7 @@ public class GLGeometryUploader
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
 			if( stencilLocation != null )
 			{
-				//drawStencil( _gl, matrix ) ;
+				drawStencil( _gl, matrix ) ;
 			}
 
 			_gl.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
@@ -364,11 +371,11 @@ public class GLGeometryUploader
 			//System.out.println( "Geometry Buffers: " + buffers.size() ) ;
 			for( final GLGeometry geometry : buffers )
 			{
+				//System.out.println( "Geometry Allocated: " + geometry.getLocationSize() ) ;
 				_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
 				_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
 
 				GLGeometryUploader.prepareVertexAttributes( _gl, attributes, vertexStrideBytes ) ;
-				//System.out.println( "Index: " + geometry.getUsedIndexBytes() + " Vertex: " + geometry.getUsedVertexBytes() ) ;
 				_gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
 				//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
 			}
@@ -382,17 +389,11 @@ public class GLGeometryUploader
 			{
 				clear() ;
 			}
+			//System.out.println( "End Draw" ) ;
 		}
 
 		private void drawStencil( final GL3 _gl, final float[] _projectionMatrix )
 		{
-			final GLGeometry geometry = stencilLocation.getGeometry() ;
-			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
-
-			GLGeometryUploader.this.uploadIndex( _gl, stencilLocation, stencilShape ) ;
-			GLGeometryUploader.this.uploadVBO( _gl, stencilLocation, stencilShape, stencilMatrix ) ;
-
 			_gl.glUseProgram( stencilProgram.id[0] ) ;
 
 			final int inMVPMatrix = _gl.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
@@ -409,9 +410,15 @@ public class GLGeometryUploader
 			_gl.glStencilOp( GL3.GL_REPLACE, GL3.GL_KEEP, GL3.GL_KEEP ) ;
 
 			GLGeometryUploader.enableVertexAttributes( _gl, stencilAttributes ) ;
-			GLGeometryUploader.prepareVertexAttributes( _gl, stencilAttributes, geometry.getStride() ) ;
 
-			//System.out.println( "Index: " + stencilBuffer.getUsedIndexBytes() + " Vertex: " + stencilBuffer.getUsedVertexBytes() ) ;
+			final GLGeometry geometry = stencilLocation.getGeometry() ;
+			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+
+			GLGeometryUploader.this.uploadIndex( _gl, stencilLocation, stencilShape ) ;
+			GLGeometryUploader.this.uploadVBO( _gl, stencilLocation, stencilShape, stencilMatrix ) ;
+
+			GLGeometryUploader.prepareVertexAttributes( _gl, stencilAttributes, geometry.getStride() ) ;
 			_gl.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GL3.GL_UNSIGNED_INT, 0 ) ;
 			//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
 			GLGeometryUploader.disableVertexAttributes( _gl, stencilAttributes ) ;
@@ -434,12 +441,12 @@ public class GLGeometryUploader
 			GLGeometryUploader.this.uploadVBO( _gl, location, shape, _data.getPositionMatrix() ) ;
 		}
 
-		public void remove( final GLRenderer.GLRenderData _data )
+		public void remove( final GL3 _gl, final GLRenderer.GLRenderData _data )
 		{
-			final Location location = locations.get( _data ) ;
+			final Location location = locations.remove( _data ) ;
 			if( location != null )
 			{
-				location.getGeometry().remove( location ) ;
+				location.getGeometry().remove( _gl, location ) ;
 			}
 		}
 
@@ -561,7 +568,8 @@ public class GLGeometryUploader
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
 				final int indexBytes  = stencilShape.getIndexSize() * 4 ;
 
-				stencilLocation = new Location( new GLGeometry( GL3.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ), 0, indexBytes, 0, vertexBytes ) ;
+				final GLGeometry geometry = new GLGeometry( GL3.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
+				stencilLocation = geometry.findLocation( stencilShape ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
 			}
@@ -596,8 +604,6 @@ public class GLGeometryUploader
 
 	public class GLGeometry implements GeometryInterface
 	{
-		private final Location START = new Location( null, 0, 0, 0, 0 ) ;
-
 		private final int style ;
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
@@ -645,7 +651,7 @@ public class GLGeometryUploader
 				//System.out.println( "Not enough Index space..." ) ;
 				return null ;
 			}
-		
+
 			final int availableVertex = vertexLengthBytes - amountVertexUsedBytes ;
 			final int shapeVertexBytes = _shape.getVertexSize() * vertexStrideBytes ;
 			if( shapeVertexBytes > availableVertex )
@@ -725,7 +731,7 @@ public class GLGeometryUploader
 			return location ; 
 		}
 
-		public void remove( final Location _location )
+		public void remove( final GL3 _gl, final Location _location )
 		{
 			if( allocated.remove( _location ) == true )
 			{
@@ -770,6 +776,11 @@ public class GLGeometryUploader
 			return vertexStrideBytes ;
 		}
 
+		public int getLocationSize()
+		{
+			return allocated.size() ;
+		}
+		
 		/**
 			Returns true if the GLGeometry contains any 
 			vertex data, false otherwise.
@@ -781,6 +792,7 @@ public class GLGeometryUploader
 			return amountVertexUsedBytes > 0 ;
 		}
 
+		@Override
 		public void destroy()
 		{
 			GLModelManager.unbind( this ) ;
@@ -808,7 +820,7 @@ public class GLGeometryUploader
 
 		public Location() {}
 
-		public Location( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		private Location( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
 		{
 			set( _geometry, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
 		}
@@ -852,6 +864,7 @@ public class GLGeometryUploader
 			return vertexLength ;
 		}
 
+		@Override
 		public void reset()
 		{
 			set( null, 0, 0, 0, 0 ) ;

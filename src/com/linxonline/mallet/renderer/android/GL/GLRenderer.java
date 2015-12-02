@@ -333,11 +333,11 @@ public class GLRenderer extends Basic2DRender
 				final Vector2 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
 
-				final Vector3 clipPosition = _data.getClipPosition() ;
-				final Vector3 clipOffset   = _data.getClipOffset() ;
-				if( clipPosition != null && clipOffset != null )
+				final Matrix4 clipMatrix = _data.getClipMatrix() ;
+				if( clipMatrix != null )
 				{
-					final Matrix4 clipMatrix = _data.getClipMatrix() ;
+					final Vector3 clipPosition = _data.getClipPosition() ;
+					final Vector3 clipOffset   = _data.getClipOffset() ;
 					clipMatrix.setIdentity() ;
 
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
@@ -459,6 +459,7 @@ public class GLRenderer extends Basic2DRender
 
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
 		GLES20.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+		//GLRenderer.handleError( "Viewport: " ) ;
 
 		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
 	}
@@ -494,8 +495,8 @@ public class GLRenderer extends Basic2DRender
 		// on oldCameraPosition and future cameraPosition
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
 		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
-
 		final Vector2 half = renderInfo.getHalfRenderDimensions() ;
+
 		worldMatrix.setIdentity() ;
 		worldMatrix.translate( half.x, half.y, 0.0f ) ;
 		worldMatrix.scale( cameraScale.x, cameraScale.y, cameraScale.z ) ;
@@ -873,6 +874,7 @@ public class GLRenderer extends Basic2DRender
 			data = _data.data ;
 			call = _data.call ;
 			type = _data.type ;
+			updateType = _data.updateType ;
 		}
 
 		public int sortValue()
@@ -883,6 +885,7 @@ public class GLRenderer extends Basic2DRender
 		@Override
 		public void removeResources()
 		{
+			uploader.remove( this ) ;
 			data.remove( "ID" ) ;
 			if( texture != null )
 			{
@@ -917,6 +920,7 @@ public class GLRenderer extends Basic2DRender
 
 			words = null ;
 			program = null ;
+			stencilProgram = null ;
 			texture = null ;	
 			super.reset() ;
 		}
