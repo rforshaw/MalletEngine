@@ -434,6 +434,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 		//GLRenderer.handleError( "VSync: ", gl ) ;
 
+		gl.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+		
 		gl.glEnable( GL.GL_CULL_FACE ) ;
 		gl.glCullFace( GL.GL_BACK ) ;  
 		gl.glFrontFace( GL.GL_CCW ) ;

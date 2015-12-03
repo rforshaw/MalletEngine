@@ -26,6 +26,12 @@ public class GLGeometryUploader
 {
 	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
 
+	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
+	private final static int PRIMITIVE_EXPANSION = 1 ;
+
+	private final static int VBO_VAR_BYTE_SIZE = 4 ;
+	private final static int IBO_VAR_BYTE_SIZE = 4 ;
+
 	private final int[] indicies ;
 	private final float[] verticies ;
 
@@ -109,6 +115,8 @@ public class GLGeometryUploader
 			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
 			indicies[i] = indexOffset + index[i] ;
 		}
+
+		indicies[index.length] = PRIMITIVE_RESTART_INDEX ;
 
 		indexBuffer.put( indicies ) ;
 		indexBuffer.position( 0 ) ;
@@ -197,25 +205,25 @@ public class GLGeometryUploader
 				case POINT  :
 				{
 					attributes[i] = new VertexAttrib( GLProgramManager.VERTEX_ARRAY, 3, GL3.GL_FLOAT, false, offset ) ;
-					offset += 3 * 4 ;
+					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case COLOUR :
 				{
 					attributes[i] = new VertexAttrib( GLProgramManager.COLOUR_ARRAY, 4, GL3.GL_UNSIGNED_BYTE, true, offset ) ;
-					offset += 1 * 4 ;
+					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case UV     :
 				{
 					attributes[i] = new VertexAttrib( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GL3.GL_FLOAT, false, offset ) ;
-					offset += 2 * 4 ;
+					offset += 2 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case NORMAL  :
 				{
 					attributes[i] = new VertexAttrib( GLProgramManager.NORMAL_ARRAY, 3, GL3.GL_FLOAT, false, offset ) ;
-					offset += 3 * 4 ;
+					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 			}
@@ -319,7 +327,7 @@ public class GLGeometryUploader
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
-			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
+			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
 			final Texture<GLImage> texture = _data.getTexture() ;
 			textureID                      = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
@@ -347,6 +355,8 @@ public class GLGeometryUploader
 				System.out.println( "No program specified..." ) ;
 				return ;
 			}
+
+			_gl.glEnable( GL3.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
 
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
 			if( stencilLocation != null )
@@ -381,9 +391,10 @@ public class GLGeometryUploader
 			}
 			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
 
-			_gl.glUseProgram( 0 ) ;					//GLRenderer.handleError( "Disable Program", _gl ) ;
-			_gl.glDisable( GL3.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
-			_gl.glDisable( GL3.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+			_gl.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program", _gl ) ;
+			_gl.glDisable( GL3.GL_BLEND ) ;				//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			_gl.glDisable( GL3.GL_STENCIL_TEST ) ;		//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+			_gl.glDisable( GL3.GL_PRIMITIVE_RESTART ) ;	//GLRenderer.handleError( "Disable Primitive Restart", _gl ) ;
 
 			if( isText == true )
 			{
@@ -564,9 +575,9 @@ public class GLGeometryUploader
 				final Shape.Swivel[] swivel = stencilShape.getSwivel() ;
 				stencilAttributes = constructVertexAttrib( swivel ) ;
 
-				final int vertexStrideBytes = calculateVertexSize( swivel ) * 4 ;
+				final int vertexStrideBytes = calculateVertexSize( swivel ) * VBO_VAR_BYTE_SIZE ;
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
-				final int indexBytes  = stencilShape.getIndexSize() * 4 ;
+				final int indexBytes  = ( stencilShape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 
 				final GLGeometry geometry = new GLGeometry( GL3.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
 				stencilLocation = geometry.findLocation( stencilShape ) ;
@@ -645,7 +656,7 @@ public class GLGeometryUploader
 		public Location findLocation( final Shape _shape )
 		{
 			final int availableIndex = indexLengthBytes - amountIndexUsedBytes ;
-			final int shapeIndexBytes = _shape.getIndexSize() * 4 ;
+			final int shapeIndexBytes = ( _shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			if( shapeIndexBytes > availableIndex )
 			{
 				//System.out.println( "Not enough Index space..." ) ;
@@ -753,7 +764,7 @@ public class GLGeometryUploader
 
 		public int getIndexLength()
 		{
-			return amountIndexUsedBytes / 4 ;
+			return amountIndexUsedBytes / IBO_VAR_BYTE_SIZE ;
 		}
 
 		public int getUsedIndexBytes()
