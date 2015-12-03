@@ -5,7 +5,7 @@ import java.util.HashMap ;
 import java.util.Arrays ;
 import java.nio.* ;
 
-import android.opengl.GLES20 ;
+import android.opengl.GLES30 ;
 
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
@@ -26,6 +26,12 @@ public class GLGeometryUploader
 {
 	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
 
+	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFF ;
+	private final static int PRIMITIVE_EXPANSION = 1 ;
+
+	private final static int VBO_VAR_BYTE_SIZE = 4 ;
+	private final static int IBO_VAR_BYTE_SIZE = 2 ;
+
 	private final short[] indicies ;
 	private final float[] verticies ;
 
@@ -38,14 +44,15 @@ public class GLGeometryUploader
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
 	{
+		System.out.println( PRIMITIVE_RESTART_INDEX ) ;
 		indicies = new short[_indexSize] ;
 		verticies = new float[_vboSize] ;
 
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _vboSize * 4 ) ;
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _vboSize * VBO_VAR_BYTE_SIZE ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _indexSize * 2 ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _indexSize * IBO_VAR_BYTE_SIZE ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asShortBuffer() ;
 	}
@@ -110,11 +117,13 @@ public class GLGeometryUploader
 			indicies[i] = ( short )( indexOffset + index[i] ) ;
 		}
 
+		indicies[index.length] = ( short )PRIMITIVE_RESTART_INDEX ;
+
 		indexBuffer.put( indicies ) ;
 		indexBuffer.position( 0 ) ;
 
-		GLES20.glBufferSubData( GLES20.GL_ELEMENT_ARRAY_BUFFER, _handler.getIndexStart(), _handler.getIndexLength(), indexBuffer ) ;
-		//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+		GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, _handler.getIndexStart(), _handler.getIndexLength(), indexBuffer ) ;
+		//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
 	}
 
 	protected void uploadVBO( final Location _handler, final Shape _shape, final Matrix4 _matrix )
@@ -160,7 +169,7 @@ public class GLGeometryUploader
 		vertexBuffer.put( verticies ) ;
 		vertexBuffer.position( 0 ) ;
 
-		GLES20.glBufferSubData( GLES20.GL_ARRAY_BUFFER, _handler.getVertexStart(), _handler.getVertexLength(), vertexBuffer ) ;
+		GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, _handler.getVertexStart(), _handler.getVertexLength(), vertexBuffer ) ;
 		//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
 	}
 
@@ -180,7 +189,7 @@ public class GLGeometryUploader
 		}
 
 		// Use _data as initial parameters for this buffer.
-		final GLBuffer buffer = new GLBuffer( _data, indicies.length * 2, verticies.length * 4 ) ;
+		final GLBuffer buffer = new GLBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
 		buffers.add( buffer ) ;
 		return buffer ;
 	}
@@ -196,26 +205,26 @@ public class GLGeometryUploader
 			{
 				case POINT  :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.VERTEX_ARRAY, 3, GLES20.GL_FLOAT, false, offset ) ;
-					offset += 3 * 4 ;
+					attributes[i] = new VertexAttrib( GLProgramManager.VERTEX_ARRAY, 3, GLES30.GL_FLOAT, false, offset ) ;
+					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case COLOUR :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.COLOUR_ARRAY, 4, GLES20.GL_UNSIGNED_BYTE, true, offset ) ;
-					offset += 1 * 4 ;
+					attributes[i] = new VertexAttrib( GLProgramManager.COLOUR_ARRAY, 4, GLES30.GL_UNSIGNED_BYTE, true, offset ) ;
+					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case UV     :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GLES20.GL_FLOAT, false, offset ) ;
-					offset += 2 * 4 ;
+					attributes[i] = new VertexAttrib( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GLES30.GL_FLOAT, false, offset ) ;
+					offset += 2 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case NORMAL  :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.NORMAL_ARRAY, 3, GLES20.GL_FLOAT, false, offset ) ;
-					offset += 3 * 4 ;
+					attributes[i] = new VertexAttrib( GLProgramManager.NORMAL_ARRAY, 3, GLES30.GL_FLOAT, false, offset ) ;
+					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 			}
@@ -319,7 +328,7 @@ public class GLGeometryUploader
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
-			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * 4 ;
+			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
 			final Texture<GLImage> texture = _data.getTexture() ;
 			textureID                      = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
@@ -331,10 +340,10 @@ public class GLGeometryUploader
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
 			{
-				case LINES      : style = GLES20.GL_LINES ;      break ;
-				case LINE_STRIP : style = GLES20.GL_LINE_STRIP ; break ;
-				case FILL       : style = GLES20.GL_TRIANGLES ;  break ;
-				default         : style = GLES20.GL_LINES ;      break ;
+				case LINES      : style = GLES30.GL_LINES ;      break ;
+				case LINE_STRIP : style = GLES30.GL_LINE_STRIP ; break ;
+				case FILL       : style = GLES30.GL_TRIANGLES ;  break ;
+				default         : style = GLES30.GL_LINES ;      break ;
 			}
 
 			setupStencil( _data ) ;
@@ -348,23 +357,25 @@ public class GLGeometryUploader
 				return ;
 			}
 
+			GLES30.glEnable( GLES30.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;		//GLRenderer.handleError( "Enable Primitive Restart" ) ;
+
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
 			if( stencilLocation != null )
 			{
 				drawStencil( matrix ) ;
 			}
 
-			GLES20.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
+			GLES30.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program" ) ;
 
-			final int inMVPMatrix = GLES20.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			final int inMVPMatrix = GLES30.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;	//GLRenderer.handleError( "Get Matrix Handle" ) ;
+			GLES30.glUniformMatrix4fv( inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
 
 			if( textureID != -1 )
 			{
-				GLES20.glActiveTexture( GLES20.GL_TEXTURE0 + 0 ) ;			//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
-				GLES20.glEnable( GLES20.GL_BLEND ) ;						//GLRenderer.handleError( "Enable Blend", _gl ) ;
-				GLES20.glBlendFunc( GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+				GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + 0 ) ;							//GLRenderer.handleError( "Activate Texture" ) ;
+				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, textureID ) ;					//GLRenderer.handleError( "Bind Texture" ) ;
+				GLES30.glEnable( GLES30.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend" ) ;
+				GLES30.glBlendFunc( GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func" ) ;
 			}
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
@@ -372,18 +383,19 @@ public class GLGeometryUploader
 			for( final GLGeometry geometry : buffers )
 			{
 				//System.out.println( "Geometry Allocated: " + geometry.getLocationSize() ) ;
-				GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
-				GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
+				GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Draw Bind Index: " ) ;
+				GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: " ) ;
 
 				GLGeometryUploader.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
-				GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
-				//GLRenderer.handleError( "Draw Elements: ", _gl ) ;
+				GLES30.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES30.GL_UNSIGNED_SHORT, 0 ) ;
+				//GLRenderer.handleError( "Draw Elements: " ) ;
 			}
 			GLGeometryUploader.disableVertexAttributes( attributes ) ;
 
-			GLES20.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program", _gl ) ;
-			GLES20.glDisable( GLES20.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
-			GLES20.glDisable( GLES20.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+			GLES30.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program" ) ;
+			GLES30.glDisable( GLES30.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend" ) ;
+			GLES30.glDisable( GLES30.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil" ) ;
+			GLES30.glEnable( GLES30.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;
 
 			if( isText == true )
 			{
@@ -394,37 +406,37 @@ public class GLGeometryUploader
 
 		private void drawStencil( final float[] _projectionMatrix )
 		{
-			GLES20.glUseProgram( stencilProgram.id[0] ) ;
+			GLES30.glUseProgram( stencilProgram.id[0] ) ;
 		
-			final int inMVPMatrix = GLES20.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			GLES20.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			final int inMVPMatrix = GLES30.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;	//GLRenderer.handleError( "Get Matrix Handle" ) ;
+			GLES30.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;						//GLRenderer.handleError( "Load Matrix" ) ;
 
 			// Don't render the element to the colour buffer
-			GLES20.glColorMask( false, false, false, false ) ;
-			GLES20.glEnable( GLES20.GL_STENCIL_TEST ) ;
+			GLES30.glColorMask( false, false, false, false ) ;
+			GLES30.glEnable( GLES30.GL_STENCIL_TEST ) ;
 
-			GLES20.glStencilMask( 0xFF ) ;
-			GLES20.glClear( GLES20.GL_STENCIL_BUFFER_BIT ) ;
+			GLES30.glStencilMask( 0xFF ) ;
+			GLES30.glClear( GLES30.GL_STENCIL_BUFFER_BIT ) ;
 
-			GLES20.glStencilFunc( GLES20.GL_NEVER, 1, 0xFF ) ;
-			GLES20.glStencilOp( GLES20.GL_REPLACE, GLES20.GL_KEEP, GLES20.GL_KEEP ) ;
+			GLES30.glStencilFunc( GLES30.GL_NEVER, 1, 0xFF ) ;
+			GLES30.glStencilOp( GLES30.GL_REPLACE, GLES30.GL_KEEP, GLES30.GL_KEEP ) ;
 
 			GLGeometryUploader.enableVertexAttributes( stencilAttributes ) ;
 
 			final GLGeometry geometry = stencilLocation.getGeometry() ;
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;					//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: " ) ;
+			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: " ) ;
 
 			GLGeometryUploader.this.uploadIndex( stencilLocation, stencilShape ) ;
 			GLGeometryUploader.this.uploadVBO( stencilLocation, stencilShape, stencilMatrix ) ;
 
 			GLGeometryUploader.prepareVertexAttributes( stencilAttributes, geometry.getStride() ) ;
-			GLES20.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES20.GL_UNSIGNED_SHORT, 0 ) ;
+			GLES30.glDrawElements( geometry.getStyle(), geometry.getIndexLength(), GLES30.GL_UNSIGNED_SHORT, 0 ) ;
 			//GLRenderer.handleError( "Draw Elements: " ) ;
 			GLGeometryUploader.disableVertexAttributes( stencilAttributes ) ;
 
-			GLES20.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
-			GLES20.glStencilFunc( GLES20.GL_EQUAL, 1, 1 ) ;
+			GLES30.glColorMask( true, true, true, true ) ;		// Re-enable colour buffer
+			GLES30.glStencilFunc( GLES30.GL_EQUAL, 1, 1 ) ;
 			// continue rendering scene...
 		}
 
@@ -434,8 +446,8 @@ public class GLGeometryUploader
 			final GLGeometry geometry = location.getGeometry() ;
 			final Shape shape = _data.getShape() ;
 
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: " ) ;
+			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: " ) ;
 
 			GLGeometryUploader.this.uploadIndex( location, shape ) ;
 			GLGeometryUploader.this.uploadVBO( location, shape, _data.getPositionMatrix() ) ;
@@ -564,11 +576,11 @@ public class GLGeometryUploader
 				final Shape.Swivel[] swivel = stencilShape.getSwivel() ;
 				stencilAttributes = constructVertexAttrib( swivel ) ;
 
-				final int vertexStrideBytes = calculateVertexSize( swivel ) * 4 ;
+				final int vertexStrideBytes = calculateVertexSize( swivel ) * VBO_VAR_BYTE_SIZE ;
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;
-				final int indexBytes  = stencilShape.getIndexSize() * 2 ;
+				final int indexBytes  = ( stencilShape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 
-				final GLGeometry geometry = new GLGeometry( GLES20.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
+				final GLGeometry geometry = new GLGeometry( GLES30.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
 				stencilLocation = geometry.findLocation( stencilShape ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
@@ -627,20 +639,20 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = _vertexStrideBytes ;
 
-			indexID = GLModelManager.genIndexID() ;	//GLRenderer.handleError( "Gen Index: ", gl ) ;
-			vboID = GLModelManager.genVBOID() ;		//GLRenderer.handleError( "Gen VBO: ", gl ) ;
+			indexID = GLModelManager.genIndexID() ;	//GLRenderer.handleError( "Gen Index: " ) ;
+			vboID = GLModelManager.genVBOID() ;		//GLRenderer.handleError( "Gen VBO: " ) ;
 
-			GLES20.glBindBuffer( GLES20.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;	//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
-			GLES20.glBufferData( GLES20.GL_ELEMENT_ARRAY_BUFFER, indexLengthBytes, null, GLES20.GL_DYNAMIC_DRAW ) ;	//GLRenderer.handleError( "Upload Data: ", gl ) ;
+			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;										//GLRenderer.handleError( "Bind Buffer: " ) ;
+			GLES30.glBufferData( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexLengthBytes, null, GLES30.GL_DYNAMIC_DRAW ) ;	//GLRenderer.handleError( "Upload Data: " ) ;
 
-			GLES20.glBindBuffer( GLES20.GL_ARRAY_BUFFER, vboID[0] ) ;		//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
-			GLES20.glBufferData( GLES20.GL_ARRAY_BUFFER, vertexLengthBytes, null, GLES20.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
+			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, vboID[0] ) ;												//GLRenderer.handleError( "Bind Buffer: " ) ;
+			GLES30.glBufferData( GLES30.GL_ARRAY_BUFFER, vertexLengthBytes, null, GLES30.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: " ) ;
 		}
 
 		public Location findLocation( final Shape _shape )
 		{
 			final int availableIndex = indexLengthBytes - amountIndexUsedBytes ;
-			final int shapeIndexBytes = _shape.getIndexSize() * 2 ;
+			final int shapeIndexBytes = ( _shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			if( shapeIndexBytes > availableIndex )
 			{
 				//System.out.println( "Not enough Index space..." ) ;
@@ -748,7 +760,7 @@ public class GLGeometryUploader
 
 		public int getIndexLength()
 		{
-			return amountIndexUsedBytes / 2 ;
+			return amountIndexUsedBytes / IBO_VAR_BYTE_SIZE ;
 		}
 
 		public int getUsedIndexBytes()
@@ -880,7 +892,7 @@ public class GLGeometryUploader
 	{
 		for( VertexAttrib att : _atts )
 		{
-			GLES20.glEnableVertexAttribArray( att.index ) ;
+			GLES30.glEnableVertexAttribArray( att.index ) ;
 		}
 	}
 
@@ -888,7 +900,7 @@ public class GLGeometryUploader
 	{
 		for( VertexAttrib att : _atts )
 		{
-			GLES20.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
+			GLES30.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
 		}
 	}
 	
@@ -896,7 +908,7 @@ public class GLGeometryUploader
 	{
 		for( VertexAttrib att : _atts )
 		{
-			GLES20.glDisableVertexAttribArray( att.index ) ;
+			GLES30.glDisableVertexAttribArray( att.index ) ;
 		}
 	}
 

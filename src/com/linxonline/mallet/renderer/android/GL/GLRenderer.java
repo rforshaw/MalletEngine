@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
 
-import android.opengl.GLES20 ;
+import android.opengl.GLES30 ;
 import android.opengl.EGL14 ;
 
 import com.linxonline.mallet.maths.* ;
@@ -97,12 +97,12 @@ public class GLRenderer extends Basic2DRender
 
 	private void initGraphics()
 	{
-		//GLES20.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
-		GLES20.glEnable( GLES20.GL_BLEND ) ;
+		//GLES30.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
+		GLES30.glEnable( GLES30.GL_BLEND ) ;
 
-		GLES20.glEnable( GLES20.GL_CULL_FACE ) ;
-		GLES20.glCullFace( GLES20.GL_BACK ) ;  
-		GLES20.glFrontFace( GLES20.GL_CCW ) ;
+		GLES30.glEnable( GLES30.GL_CULL_FACE ) ;
+		GLES30.glCullFace( GLES30.GL_BACK ) ;  
+		GLES30.glFrontFace( GLES30.GL_CCW ) ;
 
 		{
 			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
@@ -458,7 +458,7 @@ public class GLRenderer extends Basic2DRender
 		}
 
 		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
-		GLES20.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
+		GLES30.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 		//GLRenderer.handleError( "Viewport: " ) ;
 
 		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
@@ -486,8 +486,8 @@ public class GLRenderer extends Basic2DRender
 
 	public void display()
 	{
-		GLES20.glClear( GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT ) ;
-		GLES20.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT ) ;
+		GLES30.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		updateEvents() ;
 
@@ -634,18 +634,16 @@ public class GLRenderer extends Basic2DRender
 	public static void handleError( final String _txt )
 	{
 		int error = 0 ;
-		while( ( error = GLES20.glGetError() ) != GLES20.GL_NO_ERROR )
+		while( ( error = GLES30.glGetError() ) != GLES30.GL_NO_ERROR )
 		{
 			switch( error )
 			{
-				case GLES20.GL_NO_ERROR                      : break ;
-				case GLES20.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
-				case GLES20.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
-				case GLES20.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
-				case GLES20.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
-				case GLES20.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
-				//case GLES20.GL_STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
-				//case GLES20.GL_STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
+				case GLES30.GL_NO_ERROR                      : break ;
+				case GLES30.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
+				case GLES30.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
+				case GLES30.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
+				case GLES30.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
+				case GLES30.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
 			}
 		}
 	}

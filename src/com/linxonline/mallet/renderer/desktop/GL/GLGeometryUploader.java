@@ -47,11 +47,11 @@ public class GLGeometryUploader
 		indicies = new int[_indexSize] ;
 		verticies = new float[_vboSize] ;
 
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _vboSize * 4 ) ;
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _vboSize * VBO_VAR_BYTE_SIZE ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _indexSize * 4 ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _indexSize * IBO_VAR_BYTE_SIZE ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
 	}
@@ -188,7 +188,7 @@ public class GLGeometryUploader
 		}
 
 		// Use _data as initial parameters for this buffer.
-		final GLBuffer buffer = new GLBuffer( _data, indicies.length * 4, verticies.length * 4 ) ;
+		final GLBuffer buffer = new GLBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
 		buffers.add( buffer ) ;
 		return buffer ;
 	}
