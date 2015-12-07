@@ -46,7 +46,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
-	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
+	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10, 10 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
@@ -339,24 +339,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				final int size = words.length ;
-				for( int i = 0; i < size; ++i )
-				{
-					renderText( words[i], fm, positionMatrix, _data ) ;
-				}
-			}
+				_data.setShape( fm.getGlyphWithChar( ' ' ).shape ) ;
 
-			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final GLRenderData _data )
-			{
-				final int length = _text.length() ;
-				for( int i = 0; i < length; ++i )
-				{
-					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					_data.setShape( glyph.shape ) ;
-
-					uploader.upload( gl, _data ) ;
-					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
-				}
+				uploader.upload( gl, _data ) ;
 			}
 
 			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector2 _position, final int _lineWidth )
@@ -435,7 +420,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		//GLRenderer.handleError( "VSync: ", gl ) ;
 
 		gl.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
-		
+
 		gl.glEnable( GL.GL_CULL_FACE ) ;
 		gl.glCullFace( GL.GL_BACK ) ;  
 		gl.glFrontFace( GL.GL_CCW ) ;

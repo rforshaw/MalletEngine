@@ -10,6 +10,7 @@ import android.opengl.GLES30 ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.DrawRequestType ;
 import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
@@ -44,7 +45,6 @@ public class GLGeometryUploader
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
 	{
-		System.out.println( PRIMITIVE_RESTART_INDEX ) ;
 		indicies = new short[_indexSize] ;
 		verticies = new float[_vboSize] ;
 
@@ -397,10 +397,6 @@ public class GLGeometryUploader
 			GLES30.glDisable( GLES30.GL_STENCIL_TEST ) ;	//GLRenderer.handleError( "Disable Stencil" ) ;
 			GLES30.glEnable( GLES30.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;
 
-			if( isText == true )
-			{
-				clear() ;
-			}
 			//System.out.println( "End Draw" ) ;
 		}
 
@@ -442,15 +438,112 @@ public class GLGeometryUploader
 
 		public void upload( final GLRenderer.GLRenderData _data )
 		{
-			final Location location = findLocation( _data ) ;
-			final GLGeometry geometry = location.getGeometry() ;
+			if( isText == true )
+			{
+				final Location location = findLocationText( _data ) ;
+				uploadText( location, _data ) ;
+			}
+			else
+			{
+				final Location location = findLocationGeometry( _data ) ;
+				uploadGeometry( location, _data ) ;
+			}
+		}
+
+		private void uploadGeometry( final Location _location, final GLRenderer.GLRenderData _data )
+		{
+			final GLGeometry geometry = _location.getGeometry() ;
 			final Shape shape = _data.getShape() ;
 
 			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Upload Bind Index: " ) ;
+			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;			//GLRenderer.handleError( "Upload Bind Vertex: " ) ;
+
+			GLGeometryUploader.this.uploadIndex( _location, shape ) ;
+			GLGeometryUploader.this.uploadVBO( _location, shape, _data.getPositionMatrix() ) ;
+		}
+
+		private void uploadText( final Location _location, final GLRenderer.GLRenderData _data )
+		{
+			final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+
+			final MalletFont font = _data.getFont() ;
+			final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
+
+			final Shape shape = _data.getShape() ;
+			final Shape.Swivel[] swivel = shape.getSwivel() ;
+			final int vertexSize = calculateVertexSize( swivel ) ;
+			final int verticiesSize = shape.getVertexSize() ;
+
+			final GLGeometry geometry = _location.getGeometry() ;
+			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: " ) ;
 			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: " ) ;
 
-			GLGeometryUploader.this.uploadIndex( location, shape ) ;
-			GLGeometryUploader.this.uploadVBO( location, shape, _data.getPositionMatrix() ) ;
+			final String text = _data.getText() ;
+			final int length = text.length() ;
+
+			int indexInc = 0 ;
+			int vertexInc = 0 ;
+			
+			for( int i = 0; i < length; i++ )
+			{
+				final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
+				final int[] index = glyph.shape.indicies ;
+				final int indexOffset = i * 4 ;
+
+				for( int j = 0; j < index.length; j++ )
+				{
+					indicies[indexInc++] = ( short )( indexOffset + index[j] ) ;
+				}
+
+				for( int j = 0; j < verticiesSize; j++ )
+				{
+					for( int k = 0; k < swivel.length; k++ )
+					{
+						switch( swivel[k] )
+						{
+							case NORMAL :
+							case POINT  :
+							{
+								final Vector3 point = glyph.shape.getPoint( j, k ) ;
+								Matrix4.multiply( point, positionMatrix, temp ) ;
+								verticies[vertexInc++] = temp.x ;
+								verticies[vertexInc++] = temp.y ;
+								verticies[vertexInc++] = temp.z ;
+								break ;
+							}
+							case COLOUR :
+							{
+								final MalletColour colour = glyph.shape.getColour( j, k ) ;
+								verticies[vertexInc++] = getABGR( colour ) ;
+								break ;
+							}
+							case UV     :
+							{
+								final Vector2 uv = glyph.shape.getUV( j, k ) ;
+								verticies[vertexInc++] = uv.x ;
+								verticies[vertexInc++] = uv.y ;
+								break ;
+							}
+						}
+					}
+				}
+
+				positionMatrix.translate( glyph.advance, 0.0f, 0.0f ) ;
+			}
+
+			indicies[indexInc] = ( short )PRIMITIVE_RESTART_INDEX ;
+
+			indexBuffer.put( indicies ) ;
+			indexBuffer.position( 0 ) ;
+
+			GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, _location.getIndexStart(), _location.getIndexLength(), indexBuffer ) ;
+			//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
+
+			vertexBuffer.put( verticies ) ;
+			vertexBuffer.position( 0 ) ;
+
+			GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, _location.getVertexStart(), _location.getVertexLength(), vertexBuffer ) ;
+			//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
 		}
 
 		public void remove( final GLRenderer.GLRenderData _data )
@@ -483,7 +576,6 @@ public class GLGeometryUploader
 			}
 			else if( stencilShape != _data.getClipShape() )
 			{
-				//System.out.println( stencilShape + " : " + _data.getClipShape() ) ;
 				return false ;
 			}
 			else if( program != _data.getProgram() )
@@ -532,12 +624,11 @@ public class GLGeometryUploader
 			return true ;
 		}
 
-		private Location findLocation( final GLRenderer.GLRenderData _data )
+		private Location findLocationGeometry( final GLRenderer.GLRenderData _data )
 		{
-			if( isText == false )
+			// If _data has already been added we return the location 
+			// in which it resides.
 			{
-				// If _data has already been added we return the location 
-				// in which it resides.
 				final Location location = locations.get( _data ) ;
 				if( location != null )
 				{
@@ -549,7 +640,7 @@ public class GLGeometryUploader
 			// an existing geometry buffer.
 			for( final GLGeometry geometry : buffers )
 			{
-				final Location location = geometry.findLocation( _data.getShape() ) ;
+				final Location location = geometry.findLocationGeometry( _data.getShape() ) ;
 				if( location != null )
 				{
 					locations.put( _data, location ) ;
@@ -562,7 +653,39 @@ public class GLGeometryUploader
 			// Note: If the object is larger than the buffer, 
 			// this will infinity loop.
 			expand() ;
-			return findLocation( _data ) ;
+			return findLocationGeometry( _data ) ;
+		}
+
+		private Location findLocationText( final GLRenderer.GLRenderData _data )
+		{
+			// If _data has already been added we return the location 
+			// in which it resides.
+			{
+				final Location location = locations.get( _data ) ;
+				if( location != null )
+				{
+					return location ;
+				}
+			}
+
+			// If it hasn't been added find a space for it within 
+			// an existing geometry buffer.
+			for( final GLGeometry geometry : buffers )
+			{
+				final Location location = geometry.findLocationText( _data ) ;
+				if( location != null )
+				{
+					locations.put( _data, location ) ;
+					return location ;
+				}
+			}
+
+			// If no space exists create a new geometry buffer 
+			// and repeat the finding process.
+			// Note: If the object is larger than the buffer, 
+			// this will infinity loop.
+			expand() ;
+			return findLocationText( _data ) ;
 		}
 
 		/**
@@ -581,7 +704,7 @@ public class GLGeometryUploader
 				final int indexBytes  = ( stencilShape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 
 				final GLGeometry geometry = new GLGeometry( GLES30.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
-				stencilLocation = geometry.findLocation( stencilShape ) ;
+				stencilLocation = geometry.findLocationGeometry( stencilShape ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
 			}
@@ -649,10 +772,21 @@ public class GLGeometryUploader
 			GLES30.glBufferData( GLES30.GL_ARRAY_BUFFER, vertexLengthBytes, null, GLES30.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: " ) ;
 		}
 
-		public Location findLocation( final Shape _shape )
+		public Location findLocationGeometry( final Shape _shape )
+		{
+			return findLocation( _shape.getIndexSize(), _shape.getVertexSize() ) ;
+		}
+
+		private Location findLocationText( final GLRenderer.GLRenderData _data )
+		{
+			final String text = _data.getText() ;
+			return findLocation( ( 6 * text.length() ), ( 4 * text.length() ) ) ;
+		}
+
+		private Location findLocation( final int _indexSize, final int _vertexSize )
 		{
 			final int availableIndex = indexLengthBytes - amountIndexUsedBytes ;
-			final int shapeIndexBytes = ( _shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
+			final int shapeIndexBytes = ( _indexSize + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			if( shapeIndexBytes > availableIndex )
 			{
 				//System.out.println( "Not enough Index space..." ) ;
@@ -660,7 +794,7 @@ public class GLGeometryUploader
 			}
 
 			final int availableVertex = vertexLengthBytes - amountVertexUsedBytes ;
-			final int shapeVertexBytes = _shape.getVertexSize() * vertexStrideBytes ;
+			final int shapeVertexBytes = _vertexSize * vertexStrideBytes ;
 			if( shapeVertexBytes > availableVertex )
 			{
 				//System.out.println( "Not enough Vertex space..." ) ;
@@ -820,9 +954,9 @@ public class GLGeometryUploader
 	public static class Location implements Cacheable
 	{
 		private GLGeometry geometry = null ;
-		private int indexStart = 0 ;
-		private int indexLength = 0 ;
-		private int vertexStart = 0 ;
+		private int indexStart   = 0 ;
+		private int indexLength  = 0 ;
+		private int vertexStart  = 0 ;
 		private int vertexLength = 0 ;
 
 		public Location() {}
@@ -832,12 +966,16 @@ public class GLGeometryUploader
 			set( _geometry, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
 		}
 
-		public void set( final GLGeometry _geometry, final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
+		public void set( final GLGeometry _geometry,
+						 final int _indexStart,
+						 final int _indexLength,
+						 final int _vertexStart,
+						 final int _vertexLength )
 		{
 			geometry = _geometry ;
-			indexStart = _indexStart ;
-			indexLength = _indexLength ;
-			vertexStart = _vertexStart ;
+			indexStart   = _indexStart ;
+			indexLength  = _indexLength ;
+			vertexStart  = _vertexStart ;
 			vertexLength = _vertexLength ;
 		}
 
@@ -887,7 +1025,7 @@ public class GLGeometryUploader
 			return "Index: " + indexStart + " Index Length: " + indexLength + " Vertex: " + vertexStart + " Vertex Length: " + vertexLength ;
 		}
 	}
-	
+
 	protected static void enableVertexAttributes( final VertexAttrib[] _atts )
 	{
 		for( VertexAttrib att : _atts )

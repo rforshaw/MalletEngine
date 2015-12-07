@@ -354,24 +354,9 @@ public class GLRenderer extends Basic2DRender
 				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
 
-				final int size = words.length ;
-				for( int i = 0; i < size; ++i )
-				{
-					renderText( words[i], fm, positionMatrix, _data ) ;
-				}
-			}
+				_data.setShape( fm.getGlyphWithChar( ' ' ).shape ) ;
 
-			private void renderText( final String _text, final GLFontMap _fm, final Matrix4 _matrix, final GLRenderData _data )
-			{
-				final int length = _text.length() ;
-				for( int i = 0; i < length; ++i )
-				{
-					final GLGlyph glyph = _fm.getGlyphWithChar( _text.charAt( i ) ) ;
-					_data.setShape( glyph.shape ) ;
-
-					uploader.upload( _data ) ;
-					_matrix.translate( glyph.advance, 0.0f, 0.0f ) ;
-				}
+				uploader.upload( _data ) ;
 			}
 
 			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector2 _position, final int _lineWidth )
