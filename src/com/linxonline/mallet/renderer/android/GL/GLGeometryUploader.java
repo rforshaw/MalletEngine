@@ -111,18 +111,34 @@ public class GLGeometryUploader
 		final int[] index = _shape.indicies ;
 		final int indexOffset = _handler.getVertexStart() / geometry.vertexStrideBytes ;
 
+		int increment = 0 ;
+		int indexStartBytes = _handler.getIndexStart() ;
+
 		for( int i = 0; i < index.length; i++ )
 		{
 			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
-			indicies[i] = ( short )( indexOffset + index[i] ) ;
+			indicies[increment++] = ( short )( indexOffset + index[i] ) ;
+
+			if( increment >= indicies.length )
+			{
+				// Buffer is full needs to be passed to GPU now
+				indexBuffer.put( indicies ) ;
+				indexBuffer.position( 0 ) ;
+
+				final int lengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
+				GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, lengthBytes, indexBuffer ) ;
+
+				indexStartBytes += lengthBytes ;
+				increment = 0 ;
+			}
 		}
 
-		indicies[index.length] = ( short )PRIMITIVE_RESTART_INDEX ;
+		indicies[increment++] = ( short )PRIMITIVE_RESTART_INDEX ;
 
 		indexBuffer.put( indicies ) ;
 		indexBuffer.position( 0 ) ;
 
-		GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, _handler.getIndexStart(), _handler.getIndexLength(), indexBuffer ) ;
+		GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, increment * IBO_VAR_BYTE_SIZE, indexBuffer ) ;
 		//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
 	}
 
@@ -132,7 +148,9 @@ public class GLGeometryUploader
 		final int vertexSize = calculateVertexSize( swivel ) ;
 		final int verticiesSize = _shape.getVertexSize() ;
 
-		int inc = 0 ;
+		int increment = 0 ;
+		int vertexStartBytes = _handler.getVertexStart() ;
+
 		for( int i = 0; i < verticiesSize; i++ )
 		{
 			for( int j = 0; j < swivel.length; j++ )
@@ -144,33 +162,49 @@ public class GLGeometryUploader
 					{
 						final Vector3 point = _shape.getPoint( i, j ) ;
 						Matrix4.multiply( point, _matrix, temp ) ;
-						verticies[inc++] = temp.x ;
-						verticies[inc++] = temp.y ;
-						verticies[inc++] = temp.z ;
+						verticies[increment++] = temp.x ;
+						verticies[increment++] = temp.y ;
+						verticies[increment++] = temp.z ;
 						break ;
 					}
 					case COLOUR :
 					{
 						final MalletColour colour = _shape.getColour( i, j ) ;
-						verticies[inc++] = getABGR( colour ) ;
+						verticies[increment++] = getABGR( colour ) ;
 						break ;
 					}
 					case UV     :
 					{
 						final Vector2 uv = _shape.getUV( i, j ) ;
-						verticies[inc++] = uv.x ;
-						verticies[inc++] = uv.y ;
+						verticies[increment++] = uv.x ;
+						verticies[increment++] = uv.y ;
 						break ;
 					}
 				}
 			}
+
+			if( ( increment + vertexSize ) >= verticies.length )
+			{
+				vertexBuffer.put( verticies ) ;
+				vertexBuffer.position( 0 ) ;
+
+				final int lengthBytes = increment * VBO_VAR_BYTE_SIZE ;
+				GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, vertexStartBytes, lengthBytes, vertexBuffer ) ;
+				//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
+				
+				vertexStartBytes += lengthBytes ;
+				increment = 0 ;
+			}
 		}
 
-		vertexBuffer.put( verticies ) ;
-		vertexBuffer.position( 0 ) ;
+		if( increment > 0 )
+		{
+			vertexBuffer.put( verticies ) ;
+			vertexBuffer.position( 0 ) ;
 
-		GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, _handler.getVertexStart(), _handler.getVertexLength(), vertexBuffer ) ;
-		//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
+			GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, vertexStartBytes, increment * VBO_VAR_BYTE_SIZE, vertexBuffer ) ;
+			//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
+		}
 	}
 
 	/**
@@ -403,7 +437,7 @@ public class GLGeometryUploader
 		private void drawStencil( final float[] _projectionMatrix )
 		{
 			GLES30.glUseProgram( stencilProgram.id[0] ) ;
-		
+
 			final int inMVPMatrix = GLES30.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;	//GLRenderer.handleError( "Get Matrix Handle" ) ;
 			GLES30.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;						//GLRenderer.handleError( "Load Matrix" ) ;
 
@@ -483,6 +517,9 @@ public class GLGeometryUploader
 
 			int indexInc = 0 ;
 			int vertexInc = 0 ;
+
+			int indexStartBytes = _location.getIndexStart() ;
+			int vertexStartBytes = _location.getVertexStart() ;
 			
 			for( int i = 0; i < length; i++ )
 			{
@@ -493,6 +530,18 @@ public class GLGeometryUploader
 				for( int j = 0; j < index.length; j++ )
 				{
 					indicies[indexInc++] = ( short )( indexOffset + index[j] ) ;
+					if( indexInc >= indicies.length )
+					{
+						indexBuffer.put( indicies ) ;
+						indexBuffer.position( 0 ) ;
+
+						final int lengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
+						GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, lengthBytes, indexBuffer ) ;
+						//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
+
+						indexStartBytes += lengthBytes ;
+						indexInc = 0 ;
+					}
 				}
 
 				for( int j = 0; j < verticiesSize; j++ )
@@ -526,24 +575,39 @@ public class GLGeometryUploader
 							}
 						}
 					}
+
+					if( ( vertexInc + vertexSize ) >= verticies.length )
+					{
+						vertexBuffer.put( verticies ) ;
+						vertexBuffer.position( 0 ) ;
+
+						final int lengthBytes = vertexInc * VBO_VAR_BYTE_SIZE ;
+						GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, vertexStartBytes, lengthBytes, vertexBuffer ) ;
+
+						vertexStartBytes += lengthBytes ;
+						vertexInc = 0 ;
+					}
 				}
 
 				positionMatrix.translate( glyph.advance, 0.0f, 0.0f ) ;
 			}
 
-			indicies[indexInc] = ( short )PRIMITIVE_RESTART_INDEX ;
+			indicies[indexInc++] = ( short )PRIMITIVE_RESTART_INDEX ;
 
 			indexBuffer.put( indicies ) ;
 			indexBuffer.position( 0 ) ;
 
-			GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, _location.getIndexStart(), _location.getIndexLength(), indexBuffer ) ;
+			GLES30.glBufferSubData( GLES30.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, indexInc * IBO_VAR_BYTE_SIZE, indexBuffer ) ;
 			//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
 
-			vertexBuffer.put( verticies ) ;
-			vertexBuffer.position( 0 ) ;
+			if( vertexInc > 0 )
+			{
+				vertexBuffer.put( verticies ) ;
+				vertexBuffer.position( 0 ) ;
 
-			GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, _location.getVertexStart(), _location.getVertexLength(), vertexBuffer ) ;
-			//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
+				GLES30.glBufferSubData( GLES30.GL_ARRAY_BUFFER, vertexStartBytes, vertexInc * VBO_VAR_BYTE_SIZE, vertexBuffer ) ;
+				//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
+			}
 		}
 
 		public void remove( final GLRenderer.GLRenderData _data )
@@ -638,9 +702,10 @@ public class GLGeometryUploader
 
 			// If it hasn't been added find a space for it within 
 			// an existing geometry buffer.
+			final Shape shape = _data.getShape() ;
 			for( final GLGeometry geometry : buffers )
 			{
-				final Location location = geometry.findLocationGeometry( _data.getShape() ) ;
+				final Location location = geometry.findLocationGeometry( shape ) ;
 				if( location != null )
 				{
 					locations.put( _data, location ) ;
@@ -650,9 +715,14 @@ public class GLGeometryUploader
 
 			// If no space exists create a new geometry buffer 
 			// and repeat the finding process.
-			// Note: If the object is larger than the buffer, 
-			// this will infinity loop.
-			expand() ;
+			// Increase the buffer size if the geometry is too large.
+			final int shapeIndexBytes = ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
+			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
+
+			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes ;
+			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
+
+			expand( indexBytes, vertexBytes ) ;
 			return findLocationGeometry( _data ) ;
 		}
 
@@ -682,9 +752,16 @@ public class GLGeometryUploader
 
 			// If no space exists create a new geometry buffer 
 			// and repeat the finding process.
-			// Note: If the object is larger than the buffer, 
-			// this will infinity loop.
-			expand() ;
+			// Increase the buffer size if the geometry is too large.
+			final Shape shape = _data.getShape() ;
+			final String text = _data.getText() ;
+			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * text.length() ) * IBO_VAR_BYTE_SIZE ;
+			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
+
+			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes  * text.length() ;
+			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
+
+			expand( indexBytes, vertexBytes ) ;
 			return findLocationText( _data ) ;
 		}
 
@@ -719,11 +796,11 @@ public class GLGeometryUploader
 			}
 		}
 		
-		private void expand()
+		private void expand( final int _indexLengthBytes, final int _vertexLengthBytes )
 		{
 			buffers.add( new GLGeometry( style,
-										 indexLengthBytes,
-										 vertexLengthBytes,
+										 _indexLengthBytes,
+										 _vertexLengthBytes,
 										 vertexStrideBytes ) ) ;
 		}
 

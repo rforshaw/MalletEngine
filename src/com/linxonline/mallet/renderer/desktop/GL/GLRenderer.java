@@ -46,7 +46,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
-	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10, 10 ) ;
+	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
