@@ -514,6 +514,7 @@ public class GLGeometryUploader
 
 			final String text = _data.getText() ;
 			final int length = text.length() ;
+			final int initialIndexOffset = _location.getVertexStart() / geometry.vertexStrideBytes ;
 
 			int indexInc = 0 ;
 			int vertexInc = 0 ;
@@ -525,7 +526,7 @@ public class GLGeometryUploader
 			{
 				final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
 				final int[] index = glyph.shape.indicies ;
-				final int indexOffset = i * 4 ;
+				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
 
 				for( int j = 0; j < index.length; j++ )
 				{
@@ -708,6 +709,7 @@ public class GLGeometryUploader
 				final Location location = geometry.findLocationGeometry( shape ) ;
 				if( location != null )
 				{
+					location.setData( _data ) ;
 					locations.put( _data, location ) ;
 					return location ;
 				}
@@ -745,6 +747,7 @@ public class GLGeometryUploader
 				final Location location = geometry.findLocationText( _data ) ;
 				if( location != null )
 				{
+					location.setData( _data ) ;
 					locations.put( _data, location ) ;
 					return location ;
 				}
@@ -956,6 +959,8 @@ public class GLGeometryUploader
 				amountIndexUsedBytes -= _location.getIndexLength() ;
 				amountVertexUsedBytes -= _location.getVertexLength() ;
 				locationCache.reclaim( _location ) ;
+
+				packGeometryData() ;
 			}
 		}
 
@@ -1016,6 +1021,19 @@ public class GLGeometryUploader
 			GLModelManager.unbind( this ) ;
 		}
 
+		private void packGeometryData()
+		{
+			int start = 0 ;
+			for( final Location location : allocated )
+			{
+				final int indexLength = location.getIndexLength() ;
+				location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
+				start += indexLength ;
+
+				GLGeometryUploader.this.upload( location.getData() ) ;
+			}
+		}
+
 		private void clear()
 		{
 			amountIndexUsedBytes = 0 ;
@@ -1030,6 +1048,7 @@ public class GLGeometryUploader
 
 	public static class Location implements Cacheable
 	{
+		private GLRenderer.GLRenderData data ;
 		private GLGeometry geometry = null ;
 		private int indexStart   = 0 ;
 		private int indexLength  = 0 ;
@@ -1054,6 +1073,11 @@ public class GLGeometryUploader
 			indexLength  = _indexLength ;
 			vertexStart  = _vertexStart ;
 			vertexLength = _vertexLength ;
+		}
+
+		public void setData( final GLRenderer.GLRenderData _data )
+		{
+			data = _data ;
 		}
 
 		public int getIndexStart()
@@ -1090,6 +1114,12 @@ public class GLGeometryUploader
 		public void reset()
 		{
 			set( null, 0, 0, 0, 0 ) ;
+			setData( null ) ;
+		}
+
+		public GLRenderer.GLRenderData getData()
+		{
+			return data ;
 		}
 
 		public GLGeometry getGeometry()
