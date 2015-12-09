@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
+import java.util.Iterator ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.Arrays ;
@@ -98,6 +99,10 @@ public class GLGeometryUploader
 		buffer.upload( _gl, _data ) ;
 	}
 
+	/**
+		Find the GLBuffer/GLGeometry that the GLRenderData resides in.
+		Remove it from the buffers, and pack the index buffer.
+	*/
 	public void remove( final GL3 _gl, final GLRenderer.GLRenderData _data )
 	{
 		final GLBuffer buffer = lookup.remove( _data ) ;
@@ -107,6 +112,24 @@ public class GLGeometryUploader
 		}
 	}
 
+	/**
+		Remove any GLBuffers that do not contain any geometry.
+	*/
+	public void clean()
+	{
+		Iterator<GLBuffer> i = buffers.iterator() ;
+		while( i.hasNext() == true )
+		{
+			final GLBuffer buffer = i.next() ;
+			buffer.clean() ;
+			if( buffer.containsGeometry() == false )
+			{
+				buffer.destroy() ;
+				i.remove() ;
+			}
+		}
+	}
+	
 	protected void uploadIndex( final GL3 _gl, final Location _handler, final Shape _shape )
 	{
 		final GLGeometry geometry = _handler.getGeometry() ;
@@ -328,19 +351,19 @@ public class GLGeometryUploader
 	*/
 	public class GLBuffer implements GeometryInterface
 	{
-		private final Shape.Swivel[] shapeSwivel ;
-		private final Shape.Style shapeStyle ;
+		private Shape.Swivel[] shapeSwivel ;
+		private Shape.Style shapeStyle ;
 
-		private final VertexAttrib[] attributes ;
-		private final int style ;					// OpenGL GL_TRIANGLES, GL_LINES, 
+		private VertexAttrib[] attributes ;
+		private final int style ;				// OpenGL GL_TRIANGLES, GL_LINES, 
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
-		private final int vertexStrideBytes ;		// Specifies the byte offset between verticies
+		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private final GLProgram program ;			// What shader should be used
+		private GLProgram program ;				// What shader should be used
 		private final int textureID ;				// -1 represent no texture in use
-		private final int layer ;					// Defines the 2D layer the geometry resides on
-		private final boolean ui ;					// Is the buffer used for UI or world space?
+		private final int layer ;				// Defines the 2D layer the geometry resides on
+		private final boolean ui ;				// Is the buffer used for UI or world space?
 		private final boolean isText ;				// Is the buffer to be used for text?
 
 		private GLProgram stencilProgram         = null ;	// Stencil is applied to all geometry located in buffers
@@ -416,10 +439,8 @@ public class GLGeometryUploader
 			}
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
-			//System.out.println( "Geometry Buffers: " + buffers.size() ) ;
 			for( final GLGeometry geometry : buffers )
 			{
-				//System.out.println( "Geometry Allocated: " + geometry.getLocationSize() ) ;
 				_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
 				_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
 
@@ -429,12 +450,107 @@ public class GLGeometryUploader
 			}
 			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
 
-			_gl.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program", _gl ) ;
-			_gl.glDisable( GL3.GL_BLEND ) ;				//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			_gl.glUseProgram( 0 ) ;				//GLRenderer.handleError( "Disable Program", _gl ) ;
+			_gl.glDisable( GL3.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
 			_gl.glDisable( GL3.GL_STENCIL_TEST ) ;		//GLRenderer.handleError( "Disable Stencil", _gl ) ;
 			_gl.glDisable( GL3.GL_PRIMITIVE_RESTART ) ;	//GLRenderer.handleError( "Disable Primitive Restart", _gl ) ;
+		}
 
-			//System.out.println( "End Draw" ) ;
+		public void upload( final GL3 _gl, final GLRenderer.GLRenderData _data )
+		{
+			if( isText == true )
+			{
+				final Location location = findLocationText( _data ) ;
+				uploadText( _gl, location, _data ) ;
+			}
+			else
+			{
+				final Location location = findLocationGeometry( _data ) ;
+				uploadGeometry( _gl, location, _data ) ;
+			}
+		}
+
+		public void remove( final GL3 _gl, final GLRenderer.GLRenderData _data )
+		{
+			final Location location = locations.remove( _data ) ;
+			if( location != null )
+			{
+				location.getGeometry().remove( _gl, location ) ;
+			}
+		}
+
+		public boolean containsGeometry()
+		{
+			return buffers.isEmpty() == false ;
+		}
+		
+		/**
+			Determine whether or not this GLBuffer supports
+			the requirements of the GLRenderData.
+			GLBuffers will batch together similar content to 
+			improve rendering performance.
+			They will use layer, texture, shape swivel and style
+			to determine if the buffer can support the data.
+		*/
+		public boolean isSupported( final GLRenderer.GLRenderData _data )
+		{
+			final Shape shape = _data.getShape() ;
+			if( shapeStyle != shape.getStyle() )
+			{
+				return false ;
+			}
+			else if( ui != _data.isUI() )
+			{
+				return false ;
+			}
+			else if( stencilShape != _data.getClipShape() )
+			{
+				return false ;
+			}
+			else if( program != _data.getProgram() )
+			{
+				return false ;
+			}
+			else if( isText != ( _data.type == DrawRequestType.TEXT ) )
+			{
+				return false ;
+			}
+
+			if( textureID > 0 )
+			{
+				final Texture<GLImage> texture = _data.getTexture() ;
+				if( texture == null )
+				{
+					return false ;
+				}
+
+				final GLImage image = texture.getImage() ;
+				if( image.textureIDs[0] != textureID )
+				{
+					return false ;
+				}
+			}
+
+			if( layer != _data.getLayer() )
+			{
+				return false ;
+			}
+
+			final Shape.Swivel[] sw = shape.getSwivel() ;
+			if( shapeSwivel.length != sw.length )
+			{
+				return false ;
+			}
+
+			for( int i = 0; i < sw.length; i++ )
+			{
+				if( shapeSwivel[i] != sw[i] )
+				{
+					return false ;
+				}
+			}
+
+			return true ;
 		}
 
 		private void drawStencil( final GL3 _gl, final float[] _projectionMatrix )
@@ -473,27 +589,13 @@ public class GLGeometryUploader
 			// continue rendering scene...
 		}
 
-		public void upload( final GL3 _gl, final GLRenderer.GLRenderData _data )
-		{
-			if( isText == true )
-			{
-				final Location location = findLocationText( _data ) ;
-				uploadText( _gl, location, _data ) ;
-			}
-			else
-			{
-				final Location location = findLocationGeometry( _data ) ;
-				uploadGeometry( _gl, location, _data ) ;
-			}
-		}
-
 		private void uploadGeometry( final GL3 _gl, final Location _location, final GLRenderer.GLRenderData _data )
 		{
 			final GLGeometry geometry = _location.getGeometry() ;
 			final Shape shape = _data.getShape() ;
 
 			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
-			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;			//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+			_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
 			GLGeometryUploader.this.uploadIndex( _gl, _location, shape ) ;
 			GLGeometryUploader.this.uploadVBO( _gl, _location, shape, _data.getPositionMatrix() ) ;
@@ -614,84 +716,6 @@ public class GLGeometryUploader
 			}
 		}
 
-		public void remove( final GL3 _gl, final GLRenderer.GLRenderData _data )
-		{
-			final Location location = locations.remove( _data ) ;
-			if( location != null )
-			{
-				location.getGeometry().remove( _gl, location ) ;
-			}
-		}
-
-		/**
-			Determine whether or not this GLBuffer supports
-			the requirements of the GLRenderData.
-			GLBuffers will batch together similar content to 
-			improve rendering performance.
-			They will use layer, texture, shape swivel and style
-			to determine if the buffer can support the data.
-		*/
-		public boolean isSupported( final GLRenderer.GLRenderData _data )
-		{
-			final Shape shape = _data.getShape() ;
-			if( shapeStyle != shape.getStyle() )
-			{
-				return false ;
-			}
-			else if( ui != _data.isUI() )
-			{
-				return false ;
-			}
-			else if( stencilShape != _data.getClipShape() )
-			{
-				return false ;
-			}
-			else if( program != _data.getProgram() )
-			{
-				return false ;
-			}
-			else if( isText != ( _data.type == DrawRequestType.TEXT ) )
-			{
-				return false ;
-			}
-
-			if( textureID > 0 )
-			{
-				final Texture<GLImage> texture = _data.getTexture() ;
-				if( texture == null )
-				{
-					return false ;
-				}
-
-				final GLImage image = texture.getImage() ;
-				if( image.textureIDs[0] != textureID )
-				{
-					return false ;
-				}
-			}
-
-			if( layer != _data.getLayer() )
-			{
-				return false ;
-			}
-
-			final Shape.Swivel[] sw = shape.getSwivel() ;
-			if( shapeSwivel.length != sw.length )
-			{
-				return false ;
-			}
-
-			for( int i = 0; i < sw.length; i++ )
-			{
-				if( shapeSwivel[i] != sw[i] )
-				{
-					return false ;
-				}
-			}
-
-			return true ;
-		}
-
 		private Location findLocationGeometry( final GLRenderer.GLRenderData _data )
 		{
 			// If _data has already been added we return the location 
@@ -793,15 +817,6 @@ public class GLGeometryUploader
 			}
 		}
 
-		private void clear()
-		{
-			locations.clear() ;
-			for( final GLGeometry geometry : buffers )
-			{
-				geometry.clear() ;
-			}
-		}
-		
 		private void expand( final int _indexLengthBytes, final int _vertexLengthBytes )
 		{
 			buffers.add( new GLGeometry( style,
@@ -810,13 +825,49 @@ public class GLGeometryUploader
 										 vertexStrideBytes ) ) ;
 		}
 
+		private void clear()
+		{
+			locations.clear() ;
+			for( final GLGeometry geometry : buffers )
+			{
+				geometry.clear() ;
+			}
+		}
+
+		public void clean()
+		{
+			Iterator<GLGeometry> i = buffers.iterator() ;
+			while( i.hasNext() == true )
+			{
+				final GLGeometry geometry = i.next() ;
+				if( geometry.containsGeometry() == false )
+				{
+					geometry.destroy() ;
+					i.remove() ;
+				}
+			}
+		}
+
 		@Override
 		public void destroy()
 		{
-			for( final GLGeometry buffer : buffers )
+			shapeSwivel       = null ;
+			shapeStyle        = null ;
+			attributes        = null ;
+			program           = null ;
+			stencilProgram    = null ;
+			stencilShape      = null ;
+			stencilAttributes = null ;
+			stencilMatrix     = null ;
+			stencilLocation   = null ;
+
+			locations.clear() ;
+			for( final GLGeometry geometry : buffers )
 			{
-				buffer.destroy() ;
+				geometry.clear() ;
+				geometry.destroy() ;
 			}
+			buffers.clear() ;
 		}
 	}
 

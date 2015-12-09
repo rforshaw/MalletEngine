@@ -593,6 +593,7 @@ public class GLRenderer extends Basic2DRender
 	@Override
 	public void clean()
 	{
+		uploader.clean() ;
 		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;
