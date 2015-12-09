@@ -19,6 +19,9 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.util.sort.OrderedInsert ;
+import com.linxonline.mallet.util.sort.SortInterface ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
@@ -831,6 +834,8 @@ public class GLGeometryUploader
 		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
 
 		private final ArrayList<Location> allocated = new ArrayList<Location>() ;
+		private final ArrayList<Location.Range> indexRanges = new ArrayList<Location.Range>() ;
+		private final ArrayList<Location.Range> vertexRanges = new ArrayList<Location.Range>() ;
 
 		public GLGeometry( final int _style,
 						   final int _indexLengthBytes,
@@ -899,40 +904,38 @@ public class GLGeometryUploader
 			final int size = allocated.size() ;
 
 			//System.out.println( "Searching for location.. " ) ;
-			for( int i = 0; i < size; i++ )
+			for( final Location.Range nextIndex : indexRanges )
 			{
-				final Location next = allocated.get( i ) ;
-				if( foundIndex == false )
+				final int indexLen = nextIndex.getStart() - locationIndexStart ;
+				if( indexLen < shapeIndexBytes )
 				{
-					final int indexLen = next.getIndexStart() - locationIndexStart ;
-					if( indexLen < shapeIndexBytes )
-					{
-						locationIndexStart = next.getIndexEnd() ;
-					}
-					else
-					{
-						foundIndex = true ;
-					}
+					locationIndexStart = nextIndex.getEnd() ;
 				}
+				else
+				{
+					foundIndex = true ;
+					break ;
+				}
+			}
 
-				if( foundVertex == false )
+			for( final Location.Range nextVertex : vertexRanges )
+			{
+				final int vertexLen = nextVertex.getStart() - locationVertexStart ;
+				if( vertexLen < shapeVertexBytes )
 				{
-					final int vertexLen = next.getVertexStart() - locationVertexStart ;
-					if( vertexLen < shapeVertexBytes )
-					{
-						locationVertexStart = next.getVertexEnd() ;
-					}
-					else
-					{
-						foundVertex = true ;
-					}
+					locationVertexStart = nextVertex.getEnd() ;
 				}
+				else
+				{
+					foundVertex = true ;
+					break ;
+				}
+			}
 
-				if( foundIndex == true && foundVertex == true )
-				{
-					//System.out.println( "Found location... " ) ;
-					return createLocation( locationIndexStart, shapeIndexBytes, locationVertexStart, shapeVertexBytes ) ;
-				}
+			if( foundIndex == true && foundVertex == true )
+			{
+				//System.out.println( "Found location... " ) ;
+				return createLocation( locationIndexStart, shapeIndexBytes, locationVertexStart, shapeVertexBytes ) ;
 			}
 
 			final int indexLen = indexLengthBytes - locationIndexStart ;
@@ -954,6 +957,8 @@ public class GLGeometryUploader
 			final Location location = locationCache.get() ;
 			location.set( this, _indexStart, _indexLength, _vertexStart, _vertexLength ) ;
 			allocated.add( location ) ;
+
+			updateRanges() ;
 			return location ; 
 		}
 
@@ -965,6 +970,7 @@ public class GLGeometryUploader
 				amountVertexUsedBytes -= _location.getVertexLength() ;
 				locationCache.reclaim( _location ) ;
 
+				updateRanges() ;
 				packGeometryData( _gl ) ;
 			}
 		}
@@ -1026,6 +1032,58 @@ public class GLGeometryUploader
 			GLModelManager.unbind( this ) ;
 		}
 
+		/**
+			Update the index and vertex range arrays.
+			Ranges must be in order so findLocation 
+			can find a correct free space.
+		*/
+		private void updateRanges()
+		{
+			indexRanges.clear() ;
+			orderedIndexes( allocated, indexRanges ) ;
+
+			vertexRanges.clear() ;
+			orderedVertexes( allocated, vertexRanges ) ;
+		}
+
+		private ArrayList<Location.Range> orderedIndexes( final ArrayList<Location> _locations, final ArrayList<Location.Range> _ordered )
+		{
+			_ordered.clear() ;
+			if( _locations.isEmpty() == true )
+			{
+				return _ordered ;
+			}
+
+			_ordered.add( _locations.get( 0 ).index ) ;
+			final int size = _locations.size() ;
+
+			for( int i = 1; i < size; i++ )
+			{
+				OrderedInsert.insert( _locations.get( i ).index, _ordered ) ;
+			}
+
+			return _ordered ;
+		}
+
+		private ArrayList<Location.Range> orderedVertexes( final ArrayList<Location> _locations, final ArrayList<Location.Range> _ordered )
+		{
+			_ordered.clear() ;
+			if( _locations.isEmpty() == true )
+			{
+				return _ordered ;
+			}
+
+			_ordered.add( _locations.get( 0 ).vertex ) ;
+			final int size = _locations.size() ;
+
+			for( int i = 1; i < size; i++ )
+			{
+				OrderedInsert.insert( _locations.get( i ).vertex, _ordered ) ;
+			}
+
+			return _ordered ;
+		}
+
 		private void packGeometryData( final GL3 _gl )
 		{
 			int start = 0 ;
@@ -1055,10 +1113,9 @@ public class GLGeometryUploader
 	{
 		private GLRenderer.GLRenderData data ;
 		private GLGeometry geometry = null ;
-		private int indexStart   = 0 ;
-		private int indexLength  = 0 ;
-		private int vertexStart  = 0 ;
-		private int vertexLength = 0 ;
+		
+		private Range index = new Range() ;
+		private Range vertex = new Range() ;
 
 		public Location() {}
 
@@ -1074,10 +1131,8 @@ public class GLGeometryUploader
 						 final int _vertexLength )
 		{
 			geometry = _geometry ;
-			indexStart   = _indexStart ;
-			indexLength  = _indexLength ;
-			vertexStart  = _vertexStart ;
-			vertexLength = _vertexLength ;
+			index.set( _indexStart, _indexLength ) ;
+			vertex.set( _vertexStart, _vertexLength ) ;
 		}
 
 		public void setData( final GLRenderer.GLRenderData _data )
@@ -1087,32 +1142,32 @@ public class GLGeometryUploader
 
 		public int getIndexStart()
 		{
-			return indexStart ;
+			return index.getStart() ;
 		}
 
 		public int getIndexEnd()
 		{
-			return indexStart + indexLength ;
+			return index.getEnd() ;
 		}
 
 		public int getIndexLength()
 		{
-			return indexLength ;
+			return index.getLength() ;
 		}
 
 		public int getVertexStart()
 		{
-			return vertexStart ;
+			return vertex.getStart() ;
 		}
 
 		public int getVertexEnd()
 		{
-			return vertexStart + vertexLength ;
+			return vertex.getEnd() ;
 		}
 
 		public int getVertexLength()
 		{
-			return vertexLength ;
+			return vertex.getLength() ;
 		}
 
 		@Override
@@ -1134,7 +1189,51 @@ public class GLGeometryUploader
 
 		public String toString()
 		{
-			return "Index: " + indexStart + " Index Length: " + indexLength + " Vertex: " + vertexStart + " Vertex Length: " + vertexLength ;
+			return "Index: " + index.toString() + " Vertex: " + vertex.toString() ;
+		}
+
+		private class Range implements SortInterface
+		{
+			private int start = 0 ;
+			private int length = 0 ;
+
+			public Range() {}
+
+			public void set( final int _start, final int _length )
+			{
+				start = _start ;
+				length = _length ;
+			}
+
+			public int sortValue()
+			{
+				return start ;
+			}
+
+			public Location getParent()
+			{
+				return Location.this ;
+			}
+
+			public int getStart()
+			{
+				return start ;
+			}
+
+			public int getEnd()
+			{
+				return start + length ;
+			}
+
+			public int getLength()
+			{
+				return length ;
+			}
+
+			public String toString()
+			{
+				return "Start: " + start + " Length: " + length ;
+			}
 		}
 	}
 
