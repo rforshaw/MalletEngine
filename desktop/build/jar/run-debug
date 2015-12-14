@@ -12,4 +12,4 @@ do
   CLASSPATH=${CLASSPATH}:${i}
 done
 
-ddd -jdb -classpath $CLASSPATH com.linxonline.mallet.main.desktop.DesktopTestMain $@
+jdb -sourcepath ../../../src -classpath $CLASSPATH com.linxonline.mallet.main.desktop.DesktopTestMain $@
