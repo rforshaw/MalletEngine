@@ -13,7 +13,7 @@ public class OrderedInsert
 			if( _toInsert.sortValue() <= toCompare.sortValue() )
 			{
 				_list.add( i, _toInsert ) ;		// Insert at index location
-				break ;
+				return _list ;
 			}
 		}
 

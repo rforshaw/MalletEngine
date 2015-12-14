@@ -1138,13 +1138,17 @@ public class GLGeometryUploader
 		private void packGeometryData( final GL3 _gl )
 		{
 			int start = 0 ;
-			for( final Location location : allocated )
+			for( final Location.Range range : indexRanges )
 			{
-				final int indexLength = location.getIndexLength() ;
-				location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
-				start += indexLength ;
+				final int indexLength = range.getLength() ;
+				if( start != range.getStart() )
+				{
+					final Location location = range.getParent() ;
+					location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
+					GLGeometryUploader.this.upload( _gl, location.getData() ) ;
+				}
 
-				GLGeometryUploader.this.upload( _gl, location.getData() ) ;
+				start += indexLength ;
 			}
 		}
 
