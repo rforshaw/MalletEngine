@@ -18,7 +18,7 @@ public class GLEditorSystem extends GLDefaultSystem
 		renderer = new GLEditorRenderer() ;
 	}
 
-	public void initSystem()
+	/*public void initSystem()
 	{
 		renderer.start() ;
 		audioGenerator.startGenerator() ;
@@ -58,5 +58,5 @@ public class GLEditorSystem extends GLDefaultSystem
 		render.getCanvas().addMouseMotionListener( input ) ;
 		render.getCanvas().addMouseWheelListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;
-	}
+	}*/
 }

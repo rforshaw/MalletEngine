@@ -134,6 +134,8 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 		_gl.glLinkProgram( _program.id[0] ) ;
 
+		_program.inMVPMatrix = _gl.glGetUniformLocation( _program.id[0], "inMVPMatrix" ) ;
+
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.

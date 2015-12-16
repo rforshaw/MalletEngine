@@ -425,10 +425,8 @@ public class GLGeometryUploader
 				drawStencil( _gl, matrix ) ;
 			}
 
-			_gl.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program", _gl ) ;
-
-			final int inMVPMatrix = _gl.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			_gl.glUniformMatrix4fv( inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			_gl.glUseProgram( program.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
+			_gl.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			if( textureID != -1 )
 			{
@@ -556,9 +554,7 @@ public class GLGeometryUploader
 		private void drawStencil( final GL3 _gl, final float[] _projectionMatrix )
 		{
 			_gl.glUseProgram( stencilProgram.id[0] ) ;
-
-			final int inMVPMatrix = _gl.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;		//GLRenderer.handleError( "Get Matrix Handle", _gl ) ;
-			_gl.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;					//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			_gl.glUniformMatrix4fv( stencilProgram.inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;					//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			// Don't render the element to the colour buffer
 			_gl.glColorMask( false, false, false, false ) ;

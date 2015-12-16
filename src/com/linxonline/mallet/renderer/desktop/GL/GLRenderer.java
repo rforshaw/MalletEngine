@@ -58,7 +58,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	protected final static Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 
 	protected static final GLU glu = new GLU() ;
-	protected static GLJPanel canvas = null ;
+	protected static GLCanvas canvas = null ;
 	protected JFrame frame = null ;
 
 	protected Vector2 pos = new Vector2() ;
@@ -102,7 +102,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
 		capabilities.setDoubleBuffered( true ) ;
 
-		canvas = new GLJPanel( capabilities ) ;
+		canvas = new GLCanvas( capabilities ) ;
 		canvas.setAutoSwapBufferMode( false ) ;
 		canvas.addGLEventListener( this ) ;
 	}
@@ -683,7 +683,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		fontManager.clean() ;
 	}
 
-	public static GLJPanel getCanvas()
+	public static GLCanvas getCanvas()
 	{
 		return canvas ;
 	}
