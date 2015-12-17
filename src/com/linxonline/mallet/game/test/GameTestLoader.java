@@ -154,9 +154,6 @@ public final class GameTestLoader extends GameLoader
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector2( -32, -32 ),
 																		 new Vector2( 64, 64 ),
-																		 null,
-																		 null,
-																		 null,
 																		 10,
 																		 anim ) ) ;
 
@@ -177,10 +174,7 @@ public final class GameTestLoader extends GameLoader
 															  new Vector2( 0, 0 ), 					// Offset
 															  new MalletFont( "Arial", 12 ),		// Mallet Font
 															  new MalletColour( 255, 255, 255 ),	// Mallet Colour
-															  null,									// clip
-															  null,									// clip offset
 															  200,									// layer
-															  2,									// Text alignment, Centre
 															  null ) ) ;
 			}
 

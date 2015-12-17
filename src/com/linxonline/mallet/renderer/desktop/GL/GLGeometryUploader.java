@@ -392,12 +392,12 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
-			setupTextures( _data ) ;
-
 			layer                          = _data.getLayer() ;
 			program                        = _data.getProgram() ;
 			ui                             = _data.isUI() ;
 			isText                         = _data.type == DrawRequestType.TEXT ;
+
+			setupTextures( _data ) ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -820,6 +820,7 @@ public class GLGeometryUploader
 		private void setupTextures( final GLRenderer.GLRenderData _data )
 		{
 			final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+			final int size = textures.size() ;
 			if( textures.isEmpty() == true )
 			{
 				textureID = BLANK_TEXTURES ;

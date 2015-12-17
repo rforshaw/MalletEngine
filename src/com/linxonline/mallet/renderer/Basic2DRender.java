@@ -133,10 +133,11 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 
 		switch( type )
 		{
-			case CREATE_DRAW          : createDraw( draw ) ; break ;
-			case MODIFY_EXISTING_DRAW : modifyDraw( draw ) ; break ;
-			case REMOVE_DRAW          : removeDraw( draw ) ; break ;
-			case GARBAGE_COLLECT_DRAW : clean() ;            break ;
+			case CREATE_DRAW           : createDraw( draw ) ;    break ;
+			case MODIFY_EXISTING_DRAW  : modifyDraw( draw ) ;    break ;
+			case REMOVE_DRAW           : removeDraw( draw ) ;    break ;
+			case CREATE_SHADER_PROGRAM : createProgram( draw ) ; break ;
+			case GARBAGE_COLLECT_DRAW  : clean() ;               break ;
 		}
 	}
 
@@ -158,6 +159,9 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 		final int id = _draw.getInteger( "ID", -1 ) ;
 		state.remove( id ) ;
 	}
+
+	protected void createProgram( final Settings _draw ) {}
+	protected void removeProgram( final Settings _draw ) {}
 
 	protected abstract void createTexture( final Settings _draw ) ;
 	protected abstract void createGeometry( final Settings _draw ) ;

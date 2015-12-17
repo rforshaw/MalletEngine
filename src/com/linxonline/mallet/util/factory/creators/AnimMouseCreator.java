@@ -35,9 +35,6 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 																		 entity.position,
 																		_mouse.<Vector2>getObject( "OFFSET", null ),
 																		_mouse.<Vector2>getObject( "DIM", null ),
-																		_mouse.<Vector2>getObject( "FILL", null ), 
-																		 null,		// Clip View 
-																		 null,		// Clip Offset
 																		_mouse.getInteger( "LAYER", 100 ), anim ) ;
 		AnimationFactory.amendInterpolation( animation, Interpolation.NONE ) ;
 		

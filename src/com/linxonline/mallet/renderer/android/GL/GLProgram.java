@@ -12,7 +12,9 @@ public class GLProgram extends Resource
 {
 	public final String name ;
 	public final int[] id = new int[1] ;
+
 	public int inMVPMatrix = -1 ;			// Uniform used in shader
+	public int[] inTex = null ;
 
 	public final ArrayList<GLShader> shaders ;
 
@@ -20,6 +22,12 @@ public class GLProgram extends Resource
 	{
 		name = _name ;
 		shaders = _shaders ;
+	}
+
+	public void copyTextures( final int[] _inTex, final int _length )
+	{
+		inTex = new int[_length] ;
+		System.arraycopy( _inTex, 0, inTex, 0, _length ) ;
 	}
 
 	@Override

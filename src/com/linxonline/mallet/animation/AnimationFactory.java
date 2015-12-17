@@ -19,11 +19,8 @@ public final class AnimationFactory
 
 	public static Event<Settings> createAnimation( final String _file,
 													final Vector3 _pos, 
-													final Vector2 _offset, 			// Not needed
-													final Vector2 _dim,				// Not needed
-													final Vector2 _fill,			// Not needed
-													final Vector3 _clipPosition,	// Not needed
-													final Vector3 _clipOffset,		// Not needed
+													final Vector2 _offset,
+													final Vector2 _dim,
 													final int _layer,
 													final SourceCallback _callback )	// Not needed, but is important
 	{
@@ -36,12 +33,12 @@ public final class AnimationFactory
 		}
 
 		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		settings.addObject( "RENDER_EVENT", DrawFactory.amendClip( DrawFactory.createTexture( ( String )null,
+		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
 																		plane,
 																	   _pos,
 																	   _offset,
 																	   _layer,
-																	   null ), Shape.constructPlane( new Vector3(), new Vector3( 400, 400, 0 ), new Vector2(), new Vector2( 1, 1 ) ), new Vector3(), new Vector3( -200, -200, 0 ) ) ) ;
+																	   null ) ) ;
 
 		if( _callback != null )
 		{
@@ -96,14 +93,6 @@ public final class AnimationFactory
 		final Settings animSet = _event.getVariable() ;
 		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
 		DrawFactory.amendGUI( renderEvent, _gui ) ;
-		return _event ;
-	}
-
-	public static Event<Settings> amendColour( final Event<Settings> _event, final MalletColour _colour )
-	{
-		final Settings animSet = _event.getVariable() ;
-		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		DrawFactory.amendColour( renderEvent, _colour ) ;
 		return _event ;
 	}
 

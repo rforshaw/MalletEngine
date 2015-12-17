@@ -125,11 +125,9 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			}
 		}
 
-		//_gl.glBindUniformLocation( _program.id[0], MVP_MATRIX, "inMVPMatrix" ) ;
-		//_gl.glBindUniformLocation( _program.id[0], POSITION_MATRIX, "inPositionMatrix" ) ;
 		GLES30.glBindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
 		GLES30.glBindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
-		GLES30.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord" ) ;
+		GLES30.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord0" ) ;
 		GLES30.glBindAttribLocation( _program.id[0], NORMAL_ARRAY,"inNormal" ) ;
 
 		GLES30.glLinkProgram( _program.id[0] ) ;
@@ -169,14 +167,19 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 	*/
 	private static void mapTexturesToProgram( final GLProgram _program )
 	{
+		final int[] inTex = new int[10] ;
 		for( int i = 0; i < 10; i++ )
 		{
-			final int tex = GLES30.glGetUniformLocation( _program.id[0], "inTex" + i ) ;
-			GLES30.glUniform1i( tex, GLES30.GL_TEXTURE0 + i ) ;
-			if( tex == -1 )
+			final String inTexName = "inTex" + i ;
+			inTex[i] = GLES30.glGetUniformLocation( _program.id[0], inTexName ) ;
+
+			if( inTex[i] == -1 )
 			{
+				_program.copyTextures( inTex, i ) ;
 				return ;
 			}
+
+			_program.copyTextures( inTex, inTex.length ) ;
 		}
 	}
 

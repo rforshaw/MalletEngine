@@ -75,11 +75,11 @@ public class GLRenderer extends Basic2DRender
 	public void shutdown()
 	{
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
-		clear() ;							// Clear the contents being rendered
+		clear() ;					// Clear the contents being rendered
 
+		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
-		programs.shutdown() ;
 	}
 
 	/**
@@ -246,11 +246,10 @@ public class GLRenderer extends Basic2DRender
 					return ;
 				}
 
-				Texture<GLImage> texture = _data.getTexture() ;
-				if( texture == null )
+				final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+				if( textures.isEmpty() == true )
 				{
-					texture = loadTexture( _data ) ;
-					if( texture == null )
+					if( loadTexture( _data ) == false )
 					{
 						//Logger.println( "GLRenderer - Render Data for non-existent texture: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 						return ;
@@ -525,6 +524,24 @@ public class GLRenderer extends Basic2DRender
 	}
 
 	@Override
+	protected void createProgram( final Settings _draw )
+	{
+		final String key = _draw.getString( "PROGRAM_KEY", null ) ;
+		final String file = _draw.getString( "PROGRAM_FILE", null ) ;
+		if( key == null || file == null )
+		{
+			return ;
+		}
+
+		final GLProgram program = programs.get( key, file ) ;
+		if( GLProgramManager.buildProgram( program ) == false )
+		{
+			System.out.println( "Failed to compile program: " + program.name ) ;
+			GLProgramManager.deleteProgram( program ) ;
+		}
+	}
+
+	@Override
 	protected void createTexture( final Settings _draw )
 	{
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
@@ -605,16 +622,44 @@ public class GLRenderer extends Basic2DRender
 		return "GLRenderer" ;
 	}
 
-	private Texture loadTexture( final GLRenderData _data )
+	private boolean loadTexture( final GLRenderData _data )
 	{
-		final Texture texture = textures.get( _data.data.getString( "FILE", null ) ) ;
-		if( texture == null )
+		// Back in the day, the rendering system only allowed 
+		// one texture to be rendered on a piece of geometry.
+		// To ensure we keep some form of backwards compatibility, 
+		// this path will still be available.
+		final String singleTexture = _data.data.getString( "FILE", null ) ;
+		if( singleTexture != null )
 		{
-			return null ;
+			final Texture<GLImage> texture = textures.get( singleTexture ) ;
+			if( texture == null )
+			{
+				return false ;
+			}
+
+			_data.setTexture( texture ) ;
+			return true ;
 		}
 
-		_data.setTexture( texture ) ;
-		return texture ;
+		final String[] multiTexture = _data.data.getObject( "FILES", null ) ;
+		if( multiTexture != null )
+		{
+			for( final String st : multiTexture )
+			{
+				final Texture<GLImage> texture = textures.get( st ) ;
+				if( texture == null )
+				{
+					_data.getTextures().clear() ;
+					return false ;
+				}
+
+				_data.addTexture( texture ) ;
+			}
+
+			return true ;
+		}
+
+		return false ;
 	}
 
 	public static void handleError( final String _txt )
@@ -664,8 +709,8 @@ public class GLRenderer extends Basic2DRender
 		// Renderer data
 		private GLProgram stencilProgram ;
 		private GLProgram program ;
-		private Texture texture ;
-		
+		private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
+
 		public GLRenderData()
 		{
 			super() ;
@@ -716,9 +761,15 @@ public class GLRenderer extends Basic2DRender
 			program = _program ;
 		}
 
-		public void setTexture( final Texture _texture )
+		public void setTexture( final Texture<GLImage> _texture )
 		{
-			texture = _texture ;
+			textures.clear() ;
+			textures.add( _texture ) ;
+		}
+
+		public void addTexture( final Texture<GLImage> _texture )
+		{
+			textures.add( _texture ) ;
 		}
 
 		public void setShape( final Shape _shape )
@@ -796,9 +847,9 @@ public class GLRenderer extends Basic2DRender
 			return program ;
 		}
 
-		public Texture getTexture()
+		public ArrayList<Texture<GLImage>> getTextures()
 		{
-			return texture ;
+			return textures ;
 		}
 
 		public int getLineWidth()
@@ -871,9 +922,19 @@ public class GLRenderer extends Basic2DRender
 		{
 			uploader.remove( this ) ;
 			data.remove( "ID" ) ;
-			if( texture != null )
+			for( final Texture<GLImage> tex : textures )
 			{
-				texture.unregister() ;
+				tex.unregister() ;
+			}
+
+			if( program != null )
+			{
+				program.unregister() ;
+			}
+
+			if( stencilProgram != null )
+			{
+				stencilProgram.unregister() ;
 			}
 
 			renderCache.reclaim( this ) ;
@@ -905,7 +966,7 @@ public class GLRenderer extends Basic2DRender
 			words = null ;
 			program = null ;
 			stencilProgram = null ;
-			texture = null ;	
+			textures.clear() ;
 			super.reset() ;
 		}
 

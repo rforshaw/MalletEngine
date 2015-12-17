@@ -16,13 +16,10 @@ public final class TextFactory
 
 	public static Event<Settings> createText( final String _text,
 											  final Vector3 _pos, 
-											  final Vector2 _offset, 		// Not needed
+											  final Vector2 _offset,
 											  final MalletFont _font,
 											  final MalletColour _colour,
-											  final Vector2 _clip,			// Not needed
-											  final Vector2 _clipOffset,	// Not needed
 											  final int _layer,
-											  final int _alignment,
 											  final IDInterface _callback )
 	{
 		final Settings settings = new Settings() ;
@@ -36,12 +33,17 @@ public final class TextFactory
 		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
 
 		DrawFactory.setPosition( settings, _pos, _offset ) ;
-		//DrawFactory.setClip( settings, _clip, _clipOffset ) ;
 
 		settings.addInteger( "LAYER", _layer ) ;
-		settings.addInteger( "ALIGNMENT", _alignment ) ;
 		settings.addBoolean( "UPDATE", true ) ;
 
 		return new Event<Settings>( "DRAW", settings ) ;
+	}
+
+	public static Event<Settings> amendColour( final Event<Settings> _event, final MalletColour _colour )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "COLOUR", _colour ) ;
+		return _event ;
 	}
 }

@@ -608,6 +608,24 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	}
 
 	@Override
+	protected void createProgram( final Settings _draw )
+	{
+		final String key = _draw.getString( "PROGRAM_KEY", null ) ;
+		final String file = _draw.getString( "PROGRAM_FILE", null ) ;
+		if( key == null || file == null )
+		{
+			return ;
+		}
+
+		final GLProgram program = programs.get( key, file ) ;
+		if( GLProgramManager.buildProgram( gl, program ) == false )
+		{
+			System.out.println( "Failed to compile program: " + program.name ) ;
+			GLProgramManager.deleteProgram( gl, program ) ;
+		}
+	}
+
+	@Override
 	protected void createTexture( final Settings _draw )
 	{
 		final Vector3 position = _draw.getObject( "POSITION", null ) ;
@@ -998,6 +1016,16 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			for( final Texture<GLImage> tex : textures )
 			{
 				tex.unregister() ;
+			}
+
+			if( program != null )
+			{
+				program.unregister() ;
+			}
+
+			if( stencilProgram != null )
+			{
+				stencilProgram.unregister() ;
 			}
 
 			renderCache.reclaim( this ) ;

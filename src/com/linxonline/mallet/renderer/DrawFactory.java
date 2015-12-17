@@ -8,27 +8,49 @@ import com.linxonline.mallet.maths.* ;
 /**
 	Provides an effective way to generate Events
 	for the Rendering System.
-	Supports: G2DRenderer, GLRenderer...
 */
 public final class DrawFactory
 {
 	private DrawFactory() {}
 
-	public static Event removeDraw( final int _id )
+	public static Event<Settings> removeDraw( final int _id )
 	{
 		final Settings draw = new Settings() ;
 		draw.addObject( "REQUEST_TYPE", DrawRequestType.REMOVE_DRAW ) ;
 		draw.addInteger( "ID", _id ) ;
-		return new Event( "DRAW", draw ) ;
+		return new Event<Settings>( "DRAW", draw ) ;
 	}
 
-	public static Event createGarbageCollect()
+	/**
+		Request the rendering system to clean-up resources 
+		that it has accumulated. This should remove textures 
+		or programs that are not currently being used.
+	*/
+	public static Event<Settings> createGarbageCollect()
 	{
 		final Settings draw = new Settings() ;
 		draw.addObject( "REQUEST_TYPE", DrawRequestType.GARBAGE_COLLECT_DRAW ) ;
-		return new Event( "DRAW", draw ) ;
+		return new Event<Settings>( "DRAW", draw ) ;
 	}
 
+	/**
+		Upload a Program/Shader to the rendering system.
+		Once loaded use the _key within a draw event to 
+		use the Program/Shader. Use amendProgram().
+	*/
+	public static Event<Settings> createProgram( final String _key, final String _file )
+	{
+		final Settings program = new Settings() ;
+		program.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_SHADER_PROGRAM ) ;
+		program.addString( "PROGRAM_KEY", _key ) ;
+		program.addString( "PROGRAM_FILE", _file ) ;
+		return new Event<Settings>( "PROGRAM", program ) ;
+	}
+
+	/**
+		Assign one texture to piece of geometry.
+		By default uses the SIMPLE_TEXTURE program.
+	*/
 	public static Event<Settings> createTexture( final MalletTexture _texture,
 												 final Shape _shape,
 												 final Vector3 _pos, 
@@ -39,6 +61,10 @@ public final class DrawFactory
 		return createTexture( _texture.getPath(), _shape, _pos, _offset, _layer, _callback ) ;
 	}
 
+	/**
+		Assign one texture to piece of geometry.
+		By default uses the SIMPLE_TEXTURE program.
+	*/
 	public static Event<Settings> createTexture( final String _file,
 												 final Shape _shape,
 												 final Vector3 _pos, 
@@ -62,7 +88,37 @@ public final class DrawFactory
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
-	public static Event<Settings> createTexture( final String[] _files,
+	/**
+		Assign multiple textures to piece of geometry.
+		When using multi-textures you must specify a 
+		Program/Shader that determines how these textures 
+		are blended together.
+	*/
+	public static Event<Settings> createMultiTexture( final String _programKey,
+													  final MalletTexture[] _textures,
+													  final Shape _shape,
+													  final Vector3 _pos, 
+													  final Vector2 _offset, 		// Not needed
+													  final int _layer,
+													  final IDInterface _callback )
+	{
+		final String[] files = new String[_textures.length] ;
+		for( int i = 0; i < _textures.length; i++ )
+		{
+			files[i] = _textures[i].getPath() ;
+		}
+
+		return createMultiTexture( _programKey, files, _shape, _pos, _offset, _layer, _callback ) ;
+	}
+
+	/**
+		Assign multiple textures to piece of geometry.
+		When using multi-textures you must specify a 
+		Program/Shader that determines how these textures 
+		are blended together.
+	*/
+	public static Event<Settings> createMultiTexture( final String _programKey,
+												 final String[] _files,
 												 final Shape _shape,
 												 final Vector3 _pos, 
 												 final Vector2 _offset, 		// Not needed
@@ -74,6 +130,7 @@ public final class DrawFactory
 		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
 		settings.addObject( "TYPE", DrawRequestType.TEXTURE ) ;
 
+		if( _programKey != null ) { settings.addObject( "PROGRAM", _programKey ) ; }
 		if( _files != null ) { settings.addObject( "FILES", _files ) ; }
 		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
 
@@ -83,6 +140,19 @@ public final class DrawFactory
 		if( _shape != null ) { settings.addObject( "SHAPE", _shape ) ; }
 
 		return new Event<Settings>( "DRAW", settings ) ;
+	}
+
+	/**
+		Specify a program that should affect the draw event.
+		This will only be usable with rendering systems 
+		that support shaders.
+		OpenGL GLSL for example.
+	*/
+	public static Event<Settings> amendProgram( final Event<Settings> _event, final String _programKey )
+	{
+		final Settings set = _event.getVariable() ;
+		set.addObject( "PROGRAM", _programKey ) ;
+		return _event ;
 	}
 
 	/**
@@ -98,6 +168,11 @@ public final class DrawFactory
 		return _event ;
 	}
 
+	/**
+		Define a location that _event can be displayed in.
+		That allows the _event to be very large but only 
+		a subset of the content to be visible.
+	*/
 	public static Event<Settings> amendClip( final Event<Settings> _event,
 											 final Shape _clip,
 											 final Vector3 _clipPosition,
@@ -109,7 +184,7 @@ public final class DrawFactory
 		set.addObject( "CLIP_OFFSET", _clipOffset ) ;
 		return _event ;
 	}
-	
+
 	public static Event<Settings> amendRotate( final Event<Settings> _event, final float _rotate )
 	{
 		final Settings set = _event.getVariable() ;
@@ -129,17 +204,14 @@ public final class DrawFactory
 		return _event ;
 	}
 
+	/**
+		Define what type of interpolation should be applied
+		between frames.
+	*/
 	public static Event<Settings> amendInterpolation( final Event<Settings> _event, final Interpolation _set )
 	{
 		final Settings set = _event.getVariable() ;
 		set.addObject( "INTERPOLATION", _set ) ;
-		return _event ;
-	}
-
-	public static Event<Settings> amendColour( final Event<Settings> _event, final MalletColour _colour )
-	{
-		final Settings set = _event.getVariable() ;
-		set.addObject( "COLOUR", _colour ) ;
 		return _event ;
 	}
 
