@@ -426,16 +426,19 @@ public class GLGeometryUploader
 			}
 
 			GLES30.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program" ) ;
-
-			final int inMVPMatrix = GLES30.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;	//GLRenderer.handleError( "Get Matrix Handle" ) ;
-			GLES30.glUniformMatrix4fv( inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
+			GLES30.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
 
 			if( textureID != -1 )
 			{
-				GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + 0 ) ;							//GLRenderer.handleError( "Activate Texture" ) ;
-				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, textureID ) ;					//GLRenderer.handleError( "Bind Texture" ) ;
-				GLES30.glEnable( GLES30.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend" ) ;
-				GLES30.glBlendFunc( GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func" ) ;
+				// Currently only 1 texture is supported but 
+				// soon we'll support more.
+				for( int i = 0; i < 1; i++ )
+				{
+					GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + 0 ) ;							//GLRenderer.handleError( "Activate Texture" ) ;
+					GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, textureID ) ;					//GLRenderer.handleError( "Bind Texture" ) ;
+					GLES30.glEnable( GLES30.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend" ) ;
+					GLES30.glBlendFunc( GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func" ) ;
+				}
 			}
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
@@ -558,9 +561,7 @@ public class GLGeometryUploader
 		private void drawStencil( final float[] _projectionMatrix )
 		{
 			GLES30.glUseProgram( stencilProgram.id[0] ) ;
-
-			final int inMVPMatrix = GLES30.glGetUniformLocation( stencilProgram.id[0], "inMVPMatrix" ) ;	//GLRenderer.handleError( "Get Matrix Handle" ) ;
-			GLES30.glUniformMatrix4fv( inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;					//GLRenderer.handleError( "Load Matrix" ) ;
+			GLES30.glUniformMatrix4fv( stencilProgram.inMVPMatrix, 1, true, _projectionMatrix, 0 ) ;					//GLRenderer.handleError( "Load Matrix" ) ;
 
 			// Don't render the element to the colour buffer
 			GLES30.glColorMask( false, false, false, false ) ;

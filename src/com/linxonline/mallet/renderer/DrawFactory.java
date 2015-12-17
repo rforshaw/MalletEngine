@@ -62,6 +62,29 @@ public final class DrawFactory
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
+	public static Event<Settings> createTexture( final String[] _files,
+												 final Shape _shape,
+												 final Vector3 _pos, 
+												 final Vector2 _offset, 		// Not needed
+												 final int _layer,
+												 final IDInterface _callback )
+	{
+		final Settings settings = new Settings() ;
+
+		settings.addObject( "REQUEST_TYPE", DrawRequestType.CREATE_DRAW ) ;
+		settings.addObject( "TYPE", DrawRequestType.TEXTURE ) ;
+
+		if( _files != null ) { settings.addObject( "FILES", _files ) ; }
+		if( _callback != null ) { settings.addObject( "CALLBACK", _callback ) ; }
+
+		setPosition( settings, _pos, _offset ) ;
+		settings.addInteger( "LAYER", _layer ) ;
+
+		if( _shape != null ) { settings.addObject( "SHAPE", _shape ) ; }
+
+		return new Event<Settings>( "DRAW", settings ) ;
+	}
+
 	/**
 		Used to inform the renderer whether it should continuously 
 		update the rendering data or be told to update.

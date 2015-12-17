@@ -90,6 +90,8 @@ public final class GameTestLoader extends GameLoader
 				final int width = texture.getWidth() ;
 				final int height = texture.getHeight() ;
 
+				//final String[] tex = { "base/textures/back.png", "base/textures/moomba.png" } ;
+
 				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( texture, 		// Texture Location
 																	Shape.constructPlane( new Vector3(), new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ),
 																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position

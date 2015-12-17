@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
-import android.opengl.GLES20 ;
+import android.opengl.GLES30 ;
 
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -52,7 +52,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					final JSONArray vertexShaders = _jGL.optJSONArray( "VERTEX" ) ;
 					if( vertexShaders != null )
 					{
-						readShaders( vertexShaders, shaders, GLES20.GL_VERTEX_SHADER ) ;
+						readShaders( vertexShaders, shaders, GLES30.GL_VERTEX_SHADER ) ;
 					}
 				}
 
@@ -60,7 +60,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					final JSONArray geometryShaders = _jGL.optJSONArray( "GEOMETRY" ) ;
 					if( geometryShaders != null )
 					{
-						readShaders( geometryShaders, shaders, GLES20.GL_GEOMETRY_SHADER ) ;
+						readShaders( geometryShaders, shaders, GLES30.GL_GEOMETRY_SHADER ) ;
 					}
 				}*/
 
@@ -68,7 +68,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					final JSONArray fragmentShaders = _jGL.optJSONArray( "FRAGMENT" ) ;
 					if( fragmentShaders != null )
 					{
-						readShaders( fragmentShaders, shaders, GLES20.GL_FRAGMENT_SHADER ) ;
+						readShaders( fragmentShaders, shaders, GLES30.GL_FRAGMENT_SHADER ) ;
 					}
 				}
 
@@ -104,12 +104,12 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		// During the build process a programs 
 		// shaders list has already been detached 
 		// and destroyed.
-		GLES20.glDeleteProgram( _program.id[0] ) ;
+		GLES30.glDeleteProgram( _program.id[0] ) ;
 	}
 
 	public static boolean buildProgram( final GLProgram _program )
 	{
-		_program.id[0] = GLES20.glCreateProgram() ;
+		_program.id[0] = GLES30.glCreateProgram() ;
 		if( _program.id[0] < 1 )
 		{
 			System.out.println( "Failed to create program.." ) ;
@@ -121,51 +121,76 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			// Attach only successfully compiled shaders
 			if( compileShader( shader ) == true )
 			{
-				GLES20.glAttachShader( _program.id[0], shader.id[0] ) ;
+				GLES30.glAttachShader( _program.id[0], shader.id[0] ) ;
 			}
 		}
 
 		//_gl.glBindUniformLocation( _program.id[0], MVP_MATRIX, "inMVPMatrix" ) ;
 		//_gl.glBindUniformLocation( _program.id[0], POSITION_MATRIX, "inPositionMatrix" ) ;
-		GLES20.glBindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
-		GLES20.glBindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
-		GLES20.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord" ) ;
-		GLES20.glBindAttribLocation( _program.id[0], NORMAL_ARRAY,"inNormal" ) ;
+		GLES30.glBindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
+		GLES30.glBindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
+		GLES30.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord" ) ;
+		GLES30.glBindAttribLocation( _program.id[0], NORMAL_ARRAY,"inNormal" ) ;
 
-		GLES20.glLinkProgram( _program.id[0] ) ;
+		GLES30.glLinkProgram( _program.id[0] ) ;
+
+		_program.inMVPMatrix = GLES30.glGetUniformLocation( _program.id[0], "inMVPMatrix" ) ;
+		mapTexturesToProgram( _program ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
 		for( final GLShader shader : _program.shaders )
 		{
-			GLES20.glDetachShader( _program.id[0], shader.id[0] ) ;
-			GLES20.glDeleteShader( shader.id[0] ) ;
+			GLES30.glDetachShader( _program.id[0], shader.id[0] ) ;
+			GLES30.glDeleteShader( shader.id[0] ) ;
 		}
 		_program.shaders.clear() ;
 
 		final int[] response = new int[]{ 0 } ;
-		GLES20.glGetProgramiv( _program.id[0], GLES20.GL_LINK_STATUS, response, 0 ) ;
-		if( response[0] == GLES20.GL_FALSE )
+		GLES30.glGetProgramiv( _program.id[0], GLES30.GL_LINK_STATUS, response, 0 ) ;
+		if( response[0] == GLES30.GL_FALSE )
 		{
-			System.out.println( "Error linking program: " + GLES20.glGetProgramInfoLog( _program.id[0] ) ) ;
+			System.out.println( "Error linking program: " + GLES30.glGetProgramInfoLog( _program.id[0] ) ) ;
 			return false ;
 		}
 
 		return true ;
 	}
 
+	/**
+		Loop over a set of fixed 'inTex' uniform variables 
+		from the GLProgram/GLShaders.
+		Stop iterating as soon as an inTexi returns -1.
+		inTex0 should map to GL_TEXTURE0
+		inTex1 should map to GL_TEXTURE1
+		inTex2 should map to GL_TEXTURE1 and so on..
+		Currently an upper limit of 10 textures can be mapped.
+	*/
+	private static void mapTexturesToProgram( final GLProgram _program )
+	{
+		for( int i = 0; i < 10; i++ )
+		{
+			final int tex = GLES30.glGetUniformLocation( _program.id[0], "inTex" + i ) ;
+			GLES30.glUniform1i( tex, GLES30.GL_TEXTURE0 + i ) ;
+			if( tex == -1 )
+			{
+				return ;
+			}
+		}
+	}
+
 	private static boolean compileShader( final GLShader _shader )
 	{
-		_shader.id[0] = GLES20.glCreateShader( _shader.type ) ;
-		GLES20.glShaderSource( _shader.id[0], _shader.source[0] ) ;
-		GLES20.glCompileShader( _shader.id[0] ) ;
+		_shader.id[0] = GLES30.glCreateShader( _shader.type ) ;
+		GLES30.glShaderSource( _shader.id[0], _shader.source[0] ) ;
+		GLES30.glCompileShader( _shader.id[0] ) ;
 
 		final int[] response = new int[]{ 0 } ;
-		GLES20.glGetShaderiv( _shader.id[0], GLES20.GL_COMPILE_STATUS, response, 0 ) ;
-		if( response[0] == GLES20.GL_FALSE )
+		GLES30.glGetShaderiv( _shader.id[0], GLES30.GL_COMPILE_STATUS, response, 0 ) ;
+		if( response[0] == GLES30.GL_FALSE )
 		{
-			System.out.println( "Error compiling shader: " + _shader.file + "\n" + GLES20.glGetShaderInfoLog( _shader.id[0] ) ) ;
+			System.out.println( "Error compiling shader: " + _shader.file + "\n" + GLES30.glGetShaderInfoLog( _shader.id[0] ) ) ;
 			return false ;
 		}
 

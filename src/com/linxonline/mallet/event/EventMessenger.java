@@ -10,14 +10,6 @@ import java.util.ArrayList ;
 		refreshEvents() ;
 		process Events
 **/
-/*====================================================*/
-// Used to prevent new events tampering with old events
-// while they are being processed. Entity uses this for 
-// internal messaging.
-// Use in order:
-// refreshEvents()
-// process Events
-/*====================================================*/
 public final class EventMessenger
 {
 	private ArrayList<Event<?>> newEvents = new ArrayList<Event<?>>() ;

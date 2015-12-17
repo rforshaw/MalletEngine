@@ -351,6 +351,8 @@ public class GLGeometryUploader
 	*/
 	public class GLBuffer implements GeometryInterface
 	{
+		private final int[] BLANK_TEXTURES = new int[0] ;
+	
 		private Shape.Swivel[] shapeSwivel ;
 		private Shape.Style shapeStyle ;
 
@@ -360,11 +362,11 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private GLProgram program ;				// What shader should be used
-		private final int textureID ;				// -1 represent no texture in use
-		private final int layer ;				// Defines the 2D layer the geometry resides on
-		private final boolean ui ;				// Is the buffer used for UI or world space?
-		private final boolean isText ;				// Is the buffer to be used for text?
+		private GLProgram program ;						// What shader should be used
+		private int[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
+		private final int layer ;						// Defines the 2D layer the geometry resides on
+		private final boolean ui ;						// Is the buffer used for UI or world space?
+		private final boolean isText ;					// Is the buffer to be used for text?
 
 		private GLProgram stencilProgram         = null ;	// Stencil is applied to all geometry located in buffers
 		private Shape stencilShape               = null ;
@@ -390,8 +392,8 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
-			final Texture<GLImage> texture = _data.getTexture() ;
-			textureID                      = ( texture != null ) ? texture.getImage().textureIDs[0] : -1 ;
+			setupTextures( _data ) ;
+
 			layer                          = _data.getLayer() ;
 			program                        = _data.getProgram() ;
 			ui                             = _data.isUI() ;
@@ -428,11 +430,16 @@ public class GLGeometryUploader
 			_gl.glUseProgram( program.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
 			_gl.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
-			if( textureID != -1 )
+			if( textureID.length > 0 )
 			{
-				_gl.glActiveTexture( GL3.GL_TEXTURE0 + 0 ) ;		//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
-				_gl.glEnable( GL3.GL_BLEND ) ;						//GLRenderer.handleError( "Enable Blend", _gl ) ;
+				for( int i = 0; i < textureID.length; i++ )
+				{
+					_gl.glUniform1i( program.inTex[i], i ) ;
+					_gl.glActiveTexture( GL3.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
+					_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				}
+
+				_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 				_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 			}
 
@@ -448,8 +455,8 @@ public class GLGeometryUploader
 			}
 			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
 
-			_gl.glUseProgram( 0 ) ;				//GLRenderer.handleError( "Disable Program", _gl ) ;
-			_gl.glDisable( GL3.GL_BLEND ) ;			//GLRenderer.handleError( "Disable Blend", _gl ) ;
+			_gl.glUseProgram( 0 ) ;						//GLRenderer.handleError( "Disable Program", _gl ) ;
+			_gl.glDisable( GL3.GL_BLEND ) ;				//GLRenderer.handleError( "Disable Blend", _gl ) ;
 			_gl.glDisable( GL3.GL_STENCIL_TEST ) ;		//GLRenderer.handleError( "Disable Stencil", _gl ) ;
 			_gl.glDisable( GL3.GL_PRIMITIVE_RESTART ) ;	//GLRenderer.handleError( "Disable Primitive Restart", _gl ) ;
 		}
@@ -514,18 +521,15 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			if( textureID > 0 )
+			final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+			if( textureID.length == textures.size() )
 			{
-				final Texture<GLImage> texture = _data.getTexture() ;
-				if( texture == null )
+				for( int i = 0; i < textureID.length; i++ )
 				{
-					return false ;
-				}
-
-				final GLImage image = texture.getImage() ;
-				if( image.textureIDs[0] != textureID )
-				{
-					return false ;
+					if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
+					{
+						return false ;
+					}
 				}
 			}
 
@@ -810,6 +814,22 @@ public class GLGeometryUploader
 				stencilLocation = geometry.findLocationGeometry( stencilShape ) ;
 				stencilProgram = _data.getStencilProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
+			}
+		}
+
+		private void setupTextures( final GLRenderer.GLRenderData _data )
+		{
+			final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+			if( textures.isEmpty() == true )
+			{
+				textureID = BLANK_TEXTURES ;
+				return ;
+			}
+
+			textureID = new int[textures.size()] ;
+			for( int i = 0; i < textureID.length; i++ )
+			{
+				textureID[i] = textures.get( i ).getImage().textureIDs[0] ;
 			}
 		}
 

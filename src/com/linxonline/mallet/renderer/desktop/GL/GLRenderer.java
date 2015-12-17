@@ -234,11 +234,10 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 					return ;
 				}
 
-				Texture<GLImage> texture = _data.getTexture() ;
-				if( texture == null )
+				final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+				if( textures.isEmpty() == true )
 				{
-					texture = loadTexture( _data ) ;
-					if( texture == null )
+					if( loadTexture( _data ) == false )
 					{
 						//Logger.println( "GLRenderer - Render Data for non-existent texture: " + _data.getID(), Logger.Verbosity.MINOR ) ;
 						return ;
@@ -694,16 +693,44 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		return "GLRenderer" ;
 	}
 
-	private Texture loadTexture( final GLRenderData _data )
+	private boolean loadTexture( final GLRenderData _data )
 	{
-		final Texture texture = textures.get( _data.data.getString( "FILE", null ) ) ;
-		if( texture == null )
+		// Back in the day, the rendering system only allowed 
+		// one texture to be rendered on a piece of geometry.
+		// To ensure we keep some form of backwards compatibility, 
+		// this path will still be available.
+		final String singleTexture = _data.data.getString( "FILE", null ) ;
+		if( singleTexture != null )
 		{
-			return null ;
+			final Texture<GLImage> texture = textures.get( singleTexture ) ;
+			if( texture == null )
+			{
+				return false ;
+			}
+
+			_data.setTexture( texture ) ;
+			return true ;
 		}
 
-		_data.setTexture( texture ) ;
-		return texture ;
+		final String[] multiTexture = _data.data.getObject( "FILES", null ) ;
+		if( multiTexture != null )
+		{
+			for( final String st : multiTexture )
+			{
+				final Texture<GLImage> texture = textures.get( st ) ;
+				if( texture == null )
+				{
+					_data.getTextures().clear() ;
+					return false ;
+				}
+
+				_data.addTexture( texture ) ;
+			}
+
+			return true ;
+		}
+
+		return false ;
 	}
 
 	public static void handleError( final String _txt, final GL3 _gl )
@@ -755,8 +782,8 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		// Renderer data
 		private GLProgram stencilProgram ;
 		private GLProgram program ;
-		private Texture texture ;
-		
+		private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
+
 		public GLRenderData()
 		{
 			super() ;
@@ -807,9 +834,15 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			program = _program ;
 		}
 
-		public void setTexture( final Texture _texture )
+		public void setTexture( final Texture<GLImage> _texture )
 		{
-			texture = _texture ;
+			textures.clear() ;
+			textures.add( _texture ) ;
+		}
+
+		public void addTexture( final Texture<GLImage> _texture )
+		{
+			textures.add( _texture ) ;
 		}
 
 		public void setShape( final Shape _shape )
@@ -887,9 +920,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return program ;
 		}
 
-		public Texture getTexture()
+		public ArrayList<Texture<GLImage>> getTextures()
 		{
-			return texture ;
+			return textures ;
 		}
 
 		public int getLineWidth()
@@ -962,9 +995,9 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		{
 			uploader.remove( gl, this ) ;
 			data.remove( "ID" ) ;
-			if( texture != null )
+			for( final Texture<GLImage> tex : textures )
 			{
-				texture.unregister() ;
+				tex.unregister() ;
 			}
 
 			renderCache.reclaim( this ) ;
@@ -996,7 +1029,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			words = null ;
 			program = null ;
 			stencilProgram = null ;
-			texture = null ;	
+			textures.clear() ;
 			super.reset() ;
 		}
 
