@@ -79,6 +79,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
 						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
+						in.close() ;
+						
 						synchronized( toBind )
 						{
 							// We don't want to bind the Bitmap now
@@ -131,6 +133,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
 						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
+						in.close() ;
 
 						synchronized( toBind )
 						{
@@ -350,7 +353,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			int width = options.outWidth ;
 			int height = options.outHeight ;
 
-			return new MalletTexture.Meta( _path, width, height ) ;
+			return new MalletTexture.Meta( _path, height, width ) ;
 		}
 	}
 }

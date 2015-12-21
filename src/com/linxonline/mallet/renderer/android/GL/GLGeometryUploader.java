@@ -250,7 +250,7 @@ public class GLGeometryUploader
 
 		// Use _data as initial parameters for this buffer.
 		final GLBuffer buffer = new GLBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
-		buffers.add( buffer ) ;
+		OrderedInsert.insert( buffer, buffers ) ;
 		return buffer ;
 	}
 
@@ -349,7 +349,7 @@ public class GLGeometryUploader
 		GLBuffer will generate more GLGeometry buffers 
 		when the existing buffers are full.
 	*/
-	public class GLBuffer implements GeometryInterface
+	public class GLBuffer implements GeometryInterface, SortInterface
 	{
 		private final int[] BLANK_TEXTURES = new int[0] ;
 	
@@ -863,6 +863,12 @@ public class GLGeometryUploader
 					i.remove() ;
 				}
 			}
+		}
+
+		@Override
+		public int sortValue()
+		{
+			return layer ;
 		}
 
 		@Override
