@@ -113,6 +113,18 @@ public class GLGeometryUploader
 	}
 
 	/**
+		Destroy all buffers allocated in OpenGL.
+	*/
+	public void shutdown()
+	{
+		for( final GLBuffer buffer : buffers )
+		{
+			buffer.destroy() ;
+		}
+		buffers.clear() ;
+	}
+
+	/**
 		Remove any GLBuffers that do not contain any geometry.
 	*/
 	public void clean()
@@ -842,6 +854,11 @@ public class GLGeometryUploader
 										 vertexStrideBytes ) ) ;
 		}
 
+		/**
+			Blank out geometry stored by this buffer.
+			GLGeometry objects initialised still exist
+			but are reset.
+		*/
 		private void clear()
 		{
 			locations.clear() ;
@@ -871,6 +888,11 @@ public class GLGeometryUploader
 			return layer ;
 		}
 
+		/**
+			Clear allocations and unbind the GLGeometry 
+			objects in OpenGL.
+			Nothing should be left, purge it all.
+		*/
 		@Override
 		public void destroy()
 		{

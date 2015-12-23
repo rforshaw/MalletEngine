@@ -77,6 +77,7 @@ public class GLRenderer extends Basic2DRender
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;					// Clear the contents being rendered
 
+		uploader.shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
@@ -90,9 +91,19 @@ public class GLRenderer extends Basic2DRender
 	*/
 	public void recover()
 	{
+		uploader.shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		fontManager.recover() ;
+
+		final ArrayList<RenderData> content = state.getContent() ;
+		for( final RenderData data : content )
+		{
+			final GLRenderData d = ( GLRenderData )data ;
+			d.setTexture( null ) ;
+			d.data.addBoolean( "UPDATE", true ) ;
+			
+		}
 	}
 
 	private void initGraphics()
@@ -764,7 +775,10 @@ public class GLRenderer extends Basic2DRender
 		public void setTexture( final Texture<GLImage> _texture )
 		{
 			textures.clear() ;
-			textures.add( _texture ) ;
+			if( _texture != null )
+			{
+				textures.add( _texture ) ;
+			}
 		}
 
 		public void addTexture( final Texture<GLImage> _texture )

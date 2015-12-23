@@ -842,6 +842,11 @@ public class GLGeometryUploader
 										 vertexStrideBytes ) ) ;
 		}
 
+		/**
+			Blank out geometry stored by this buffer.
+			GLGeometry objects initialised still exist
+			but are reset.
+		*/
 		private void clear()
 		{
 			locations.clear() ;
@@ -871,6 +876,11 @@ public class GLGeometryUploader
 			return layer ;
 		}
 
+		/**
+			Clear allocations and unbind the GLGeometry 
+			objects in OpenGL.
+			Nothing should be left, purge it all.
+		*/
 		@Override
 		public void destroy()
 		{
