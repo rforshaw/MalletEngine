@@ -10,7 +10,6 @@ public abstract class InputComponent extends Component
 {
 	protected InputAdapterInterface inputAdapter = null ;
 	protected final InputMode mode ;
-	protected ArrayList<InputEvent> inputs = new ArrayList<InputEvent>() ;
 
 	public InputComponent()
 	{
@@ -78,29 +77,22 @@ public abstract class InputComponent extends Component
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		inputs.add( _event ) ;
+		processInputEvent( _event ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-		final int length = inputs.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			processInputEvent( inputs.get( i ) ) ;
-		}
-		inputs.clear() ;
-	}
-
+	/**
+		Extend function to implement custom input logic.
+		Ensure logic is not CPU intensive.
+		Input events are processed every render call, to ensure 
+		visual responsiveness to user demands.
+	*/
 	protected void processInputEvent( final InputEvent _input ) {}
 
 	@Override
 	public void reset()
 	{
 		inputAdapter = null ;
-		inputs.clear() ;
 	}
 
 	public static enum InputMode

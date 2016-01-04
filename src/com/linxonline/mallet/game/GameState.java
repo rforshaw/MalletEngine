@@ -383,8 +383,8 @@ public class GameState extends State implements HookEntity
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputUISystem.update() ;
-					inputWorldSystem.update() ;
+					//inputUISystem.update() ;
+					//inputWorldSystem.update() ;
 					eventSystem.update() ;
 
 					dataTracker.update() ;
@@ -408,6 +408,10 @@ public class GameState extends State implements HookEntity
 
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
+					system.getInputInterface().update() ;
+					inputUISystem.update() ;
+					inputWorldSystem.update() ;
+				
 					//System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;

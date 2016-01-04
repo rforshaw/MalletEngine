@@ -35,6 +35,7 @@ public class Vorbis
 	private final ArrayList<String> statements = new ArrayList<String>() ;
 
 	private final ArrayList<CodebookConfiguration> codebooks = new ArrayList<CodebookConfiguration>() ;
+	private final ArrayList<FloorConfiguration> floors = new ArrayList<FloorConfiguration>() ;
 
 	public Vorbis() {}
 
@@ -120,8 +121,8 @@ public class Vorbis
 		blocksize0 = ( blocksize & 0x0F ) ;
 		blocksize1 = ( ( blocksize >> 4 ) & 0x0F );
 
-		blocksize0 = ( int )Math.pow( 2, blocksize0 ) ;
-		blocksize1 = ( int )Math.pow( 2, blocksize1 ) ; ;
+		blocksize0 = 1 << blocksize0 ;
+		blocksize1 = 1 << blocksize1 ;
 
 		final byte framing = ConvertBytes.toBytes( stream, pos += 1, 1 )[0] ;
 		if( ConvertBytes.isBitSet( framing, 0 ) == false )
@@ -370,38 +371,24 @@ public class Vorbis
 				default : throw new Exception( "Unknown floor type: " + floors[i] ) ;
 			}
 		}
-		
+
 		return _pos ;
 	}
 
 	private int decodeFloorType0( int _pos, final byte[] _stream ) throws Exception
 	{
-		final int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
-		final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
-		ConvertBytes.flipEndian( readRate ) ;
-		final int rate = ConvertBytes.toShort( readRate, 0, 2 ) & 0xFFFF  ;
-
-		final byte[] readbarkMapSize = ConvertBytes.toBits( _stream, 0, _pos += 16, 16 ) ;
-		ConvertBytes.flipEndian( readbarkMapSize ) ;
-		final int barkMapSize = ConvertBytes.toShort( readbarkMapSize, 0, 2 ) & 0xFFFF  ;
-
-		final int amplitude = ( ConvertBytes.toBits( _stream, 0, _pos += 16, 6 )[0] & 0xFF ) ;
-		final int amplitudeOffset = ( ConvertBytes.toBits( _stream, 0, _pos += 6, 8 )[0] & 0xFF ) ;
-		final int numBooks = ( ConvertBytes.toBits( _stream, 0, _pos += 8, 4 )[0] & 0xFF ) + 1 ;
-		_pos += 4 ;
-
-		for( int j = 0; j < numBooks; j++ )
-		{
-			final int bookList = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
-			_pos += 8 ;
-		}
-
+		final Floor0Configuration floor = new Floor0Configuration() ;
+		_pos = floor.decode( _pos, _stream ) ;
+		floors.add( floor ) ;
 		return _pos ;
 	}
 
 	private int decodeFloorType1( int _pos, final byte[] _stream ) throws Exception
 	{
-	
+		final Floor1Configuration floor = new Floor1Configuration() ;
+		_pos = floor.decode( _pos, _stream ) ;
+		floors.add( floor ) ;
+
 		return _pos ;
 	}
 
@@ -415,7 +402,7 @@ public class Vorbis
 		final int exponent = ( x & 0x7fe00000 ) >> 21 ;
 
 		mantissa = ( sign != 0 ) ? 1 : mantissa ;
-		return ( float )( mantissa * ( Math.pow( 2, ( exponent - 788 ) ) ) ) ;
+		return ( float )( mantissa * ( 1 << ( exponent - 788 ) ) ) ;
 	}
 
 	private int getLookup1( final int _entries, final int _dimensions )
@@ -429,7 +416,7 @@ public class Vorbis
 		return --i ;
 	}
 	
-	private int iLog( int _x )
+	private static int iLog( int _x )
 	{
 		int value = 0 ;
 		while( _x > 0 )
@@ -441,7 +428,7 @@ public class Vorbis
 		return value ;
 	}
 
-	private String testILog()
+	private static String testILog()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		for( int i = -1; i < 8; ++i )
@@ -519,7 +506,216 @@ public class Vorbis
 		return buffer.toString() ;
 	}
 
-	public static class CodebookConfiguration
+	public class Floor1Configuration implements FloorConfiguration
+	{
+		private final int[] RANGES = { 256, 128, 86, 64 } ;
+
+		private boolean unused = false ;
+		private int partitions = 0 ;
+		private int[] partitionClassList = null ;
+		private int[] classDimensions = null ;
+		private int[] subClasses = null ;
+		private int[] masterbooks = null ;
+		private int[][] subClassBooks = null ;
+		private int[] xList = null ;
+
+		private int multiplier = 0 ;
+		private int[] y = null ;
+
+		public int decode( int _pos, final byte[] _stream ) throws Exception
+		{
+			System.out.println( "Decode Floor Type 1..." ) ;
+			_pos = decodeHeader( _pos, _stream ) ;
+			_pos = decodePacket( _pos, _stream ) ;
+			return _pos ;
+		}
+
+		private int decodeHeader( int _pos, final byte[] _stream )
+		{
+			partitions = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) ;
+			_pos += 5 ;
+
+
+			partitionClassList = new int[partitions] ;
+			int maximumClass = -1 ;
+
+			for( int i = 0; i < partitionClassList.length; i++ )
+			{
+				partitionClassList[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ) ;
+				_pos += 4 ;
+
+				System.out.println( "Partition Class: " + partitionClassList[i] ) ;
+				if( partitionClassList[i] > maximumClass )
+				{
+					maximumClass = partitionClassList[i] ;
+				}
+			}
+
+			maximumClass += 1 ;
+
+			System.out.println( "Partitions: " + partitions + " Maximum Classes: " + maximumClass ) ;
+			classDimensions = new int[maximumClass] ;
+			subClasses = new int[maximumClass] ;
+			masterbooks = new int[maximumClass] ;
+			subClassBooks = new int[maximumClass][] ;
+
+			for( int i = 0; i < maximumClass; i++ )
+			{
+				classDimensions[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 3 )[0] & 0xFF ) + 1 ;
+				subClasses[i] = ( ConvertBytes.toBits( _stream, 0, _pos += 3, 2 )[0] & 0xFF ) ;
+				_pos += 2 ;
+
+				if( subClasses[i] != 0 )
+				{
+					masterbooks[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+					System.out.println( "Masterbooks: " + masterbooks[i] + " at " + i ) ;
+					_pos += 8 ;
+
+				}
+
+				subClassBooks[i] = new int[1 << subClasses[i]] ;
+				for( int j = 0; j < subClassBooks[i].length; j++ )
+				{
+					subClassBooks[i][j] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) - 1 ;
+					_pos += 8 ;
+				}
+			}
+
+			multiplier = ( ConvertBytes.toBits( _stream, 0, _pos, 2 )[0] & 0xFF ) + 1 ;
+			final int rangeBits = ( ConvertBytes.toBits( _stream, 0, _pos += 2, 4 )[0] & 0xFF ) ;
+
+			System.out.println( "Multiplier: " + multiplier + " Range Bits: " + rangeBits ) ;
+
+			int xListLength = 2 ;
+			for( int i = 0; i < partitionClassList.length; i++ )
+			{
+				final int classNumber = partitionClassList[i] ;
+				xListLength += classDimensions[classNumber] ;
+			}
+
+			xList = new int[xListLength] ;
+			xList[0] = 0 ;
+			xList[1] = 1 << rangeBits ;
+
+			int values = 2 ;
+
+			for( int i = 0; i < partitionClassList.length; i++ )
+			{
+				final int classNumber = partitionClassList[i] ;
+				for( int j = 0; j < classDimensions[classNumber]; j++ )
+				{
+					xList[values++] = ( ConvertBytes.toBits( _stream, 0, _pos, rangeBits )[0] & 0xFF ) ;
+					_pos += rangeBits ;
+				}
+			}
+
+			return _pos ;
+		}
+
+		private int decodePacket( int _pos, final byte[] _stream )
+		{
+			if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
+			{
+				System.out.println( "Channel is unused this frame..." ) ;
+				unused = true ;
+				return _pos ;
+			}
+
+			final int range = RANGES[multiplier - 1] ;
+			y = new int[range] ;
+
+			final int bitsToRead = iLog( range - 1 ) ;
+			System.out.println( "Bits to Read: " + bitsToRead ) ;
+			y[0] = ( ConvertBytes.toBits( _stream, 0, _pos, bitsToRead )[0] & 0xFF ) ;
+			y[1] = ( ConvertBytes.toBits( _stream, 0, _pos += bitsToRead, bitsToRead )[0] & 0xFF ) ;
+			_pos += bitsToRead ;
+
+			int offset = 2 ;
+			for( int i = 0; i < partitionClassList.length; i++ )
+			{
+				final int classNumber = partitionClassList[i] ;
+				final int cdim = classDimensions[classNumber] ;
+				final int cbits = subClasses[classNumber] ;
+				final int csub = ( 1 << cbits ) - 1 ; 
+
+				System.out.println( "Pos: " + i + " Class Number: " + classNumber + " CDIM: " + cdim + " CBITS: " + cbits + " CSUB: " + csub ) ;
+
+				int cval = 0 ;
+				if( cbits > 0 )
+				{
+					System.out.println( "Masterbooks: " + masterbooks[classNumber] ) ;
+					cval = ( ConvertBytes.toBits( _stream, 0, _pos, codebooks.get( masterbooks[classNumber] ).dimensions )[0] & 0xFF ) ;
+					//_pos += masterbooks[classNumber] ;
+				}
+
+				for( int j = 0; j < cdim; j++ )
+				{
+					final int book = subClassBooks[classNumber][cval & csub] ;
+					cval = cval >> cbits ;
+
+					if( book >= 0 )
+					{
+						y[j + offset] = ( ConvertBytes.toBits( _stream, 0, _pos, codebooks.get( book ).dimensions )[0] & 0xFF ) ;
+						_pos += book ;
+					}
+					else
+					{
+						y[j + offset] = 0 ;
+					}
+				}
+
+				offset += cdim ;
+			}
+
+			return _pos ;
+		}
+	}
+
+	public class Floor0Configuration implements FloorConfiguration
+	{
+		private int order = 0 ;
+		private int rate = 0 ;
+		private int barkMapSize = 0 ;
+		private int amplitudeBits = 0 ;
+		private int amplitudeOffset = 0 ;
+		private int[] bookList = null ;
+
+		public int decode( int _pos, final byte[] _stream ) throws Exception
+		{
+			System.out.println( "Decode Floor Type 0..." ) ;
+			int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+			final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
+			ConvertBytes.flipEndian( readRate ) ;
+			int rate = ConvertBytes.toShort( readRate, 0, 2 ) & 0xFFFF  ;
+
+			final byte[] readbarkMapSize = ConvertBytes.toBits( _stream, 0, _pos += 16, 16 ) ;
+			ConvertBytes.flipEndian( readbarkMapSize ) ;
+			int barkMapSize = ConvertBytes.toShort( readbarkMapSize, 0, 2 ) & 0xFFFF  ;
+
+			amplitudeBits = ( ConvertBytes.toBits( _stream, 0, _pos += 16, 6 )[0] & 0xFF ) ;
+			amplitudeOffset = ( ConvertBytes.toBits( _stream, 0, _pos += 6, 8 )[0] & 0xFF ) ;
+
+			final int numBooks = ( ConvertBytes.toBits( _stream, 0, _pos += 8, 4 )[0] & 0xFF ) + 1 ;
+			_pos += 4 ;
+
+			bookList = new int[numBooks] ;
+
+			for( int i = 0; i < numBooks; i++ )
+			{
+				bookList[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+				_pos += 8 ;
+			}
+
+			return _pos ;
+		}
+	}
+
+	public interface FloorConfiguration
+	{
+		public int decode( int _pos, final byte[] _stream ) throws Exception ;
+	}
+
+	public class CodebookConfiguration
 	{
 		int entry ;							// Denotes the entry of the codebook, for example 
 											// the 5th codebook to be read in
@@ -558,7 +754,7 @@ public class Vorbis
 				last = ( sequenceP == true ) ? vq[i] : last ;
 				indexDivisor = indexDivisor * multiplicands.length ;
 			}
-			
+
 			return vq ;
 		}
 

@@ -68,7 +68,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -183,14 +183,14 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void playAudioExample()
 			{
-				final SoundComponent sound = new SoundComponent() ;
+				/*final SoundComponent sound = new SoundComponent() ;
 				sound.addSound( "DEFAULT", AudioFactory.createAudio( "base/music/fairing-well.wav", sound ) ) ;
 
 				sound.setDefaultSound( "DEFAULT" ) ;
 
 				final Entity entity = new Entity( "Test Sound" ) ;
 				entity.addComponent( sound ) ;
-				addEntity( entity ) ;
+				addEntity( entity ) ;*/
 
 				/*final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
 				//System.out.println( ogg ) ;

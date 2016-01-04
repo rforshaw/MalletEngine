@@ -33,12 +33,6 @@ public class MouseComponent extends InputComponent
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
-		if( inputAdapter != null )
-		{
-			final Vector3 pos = parent.getPosition() ;
-			pos.x = inputAdapter.convertInputToRenderX( mouse.x ) ;
-			pos.y = inputAdapter.convertInputToRenderY( mouse.y ) ;
-		}
 	}
 
 	public void processInputEvent( final InputEvent _event )
@@ -60,5 +54,11 @@ public class MouseComponent extends InputComponent
 	public void updateMousePosition( final InputEvent _event )
 	{
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;
+		if( inputAdapter != null )
+		{
+			final Vector3 pos = parent.getPosition() ;
+			pos.x = inputAdapter.convertInputToRenderX( mouse.x ) ;
+			pos.y = inputAdapter.convertInputToRenderY( mouse.y ) ;
+		}
 	}
 }
