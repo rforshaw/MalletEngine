@@ -133,6 +133,6 @@ public class AABB
 
 	public String toString()
 	{
-		return "MIN: " + min + "\nMAX: " + max ;
+		return "POSITION: " + position + " MIN: " + min + "\nMAX: " + max ;
 	}
 }

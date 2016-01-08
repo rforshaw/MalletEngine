@@ -27,6 +27,11 @@ public final class Event<T>
 		setEvent( "NONE", null ) ;
 	}
 
+	public Event( final String _eventType )
+	{
+		setEvent( _eventType, null ) ;
+	}
+
 	public Event( final String _eventType, final T _object )
 	{
 		setEvent( _eventType, _object ) ;

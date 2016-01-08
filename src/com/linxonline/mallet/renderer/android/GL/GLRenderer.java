@@ -756,6 +756,7 @@ public class GLRenderer extends Basic2DRender
 			clipPosition   = data.<Vector3>getObject( "CLIP_POSITION", null ) ;
 			clipOffset     = data.<Vector3>getObject( "CLIP_OFFSET", null ) ;
 
+			textures.clear() ;
 			if( clipPosition != null && clipOffset != null )
 			{
 				clipMatrix = ( clipMatrix == null ) ? matrixCache.get() : clipMatrix ;

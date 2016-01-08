@@ -99,6 +99,21 @@ public final class RenderInfo implements InputAdapterInterface
 		return new Vector2( convertInputToRenderX( _input.x ), convertInputToRenderY( _input.y ) ) ;
 	}
 
+	public float convertInputToUIRenderX( final float _x )
+	{
+		return ( ( ( _x - screenOffset.x ) * renderDimensions.x ) / scaledRenderDimensions.x ) ;
+	}
+
+	public float convertInputToUIRenderY( final float _y )
+	{
+		return ( ( ( _y - screenOffset.y ) * renderDimensions.y ) / scaledRenderDimensions.y ) ;
+	}
+
+	public Vector2 convertInputUIToRender( final Vector2 _input )
+	{
+		return new Vector2( convertInputToUIRenderX( _input.x ), convertInputToUIRenderY( _input.y ) ) ;
+	}
+
 	/**
 		Check to see if the position is located within the Scaled Render Dimensions.
 		The renderDimensions could be 640x480, but the display 1024x768.

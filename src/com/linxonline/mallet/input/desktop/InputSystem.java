@@ -262,7 +262,7 @@ public class InputSystem implements InputSystemInterface,
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
 
-		Locks.getLocks().getLock( "APPLICATION_LOCK" ).unlock() ;
+		//Locks.getLocks().getLock( "APPLICATION_LOCK" ).unlock() ;
 	}
 
 	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )

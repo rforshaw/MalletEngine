@@ -142,6 +142,13 @@ public final class DrawFactory
 		return new Event<Settings>( "DRAW", settings ) ;
 	}
 
+	public static Event<Settings> amendTexture( final Event<Settings> _event, final String _file )
+	{
+		final Settings set = _event.getVariable() ;
+		if( _file != null ) { set.addString( "FILE", _file ) ; }
+		return _event ;
+	}
+
 	/**
 		Specify a program that should affect the draw event.
 		This will only be usable with rendering systems 
