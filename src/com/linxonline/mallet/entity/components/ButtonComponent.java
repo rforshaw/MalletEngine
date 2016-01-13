@@ -20,10 +20,6 @@ import com.linxonline.mallet.maths.Vector3 ;
 public class ButtonComponent extends MouseComponent
 {
 	private final AABB aabb = new AABB() ;
-	private final Event neutral ;
-	private final Event rollover ;
-	private final Event clicked ;
-
 	private State current = State.NEUTRAL ;
 
 	private enum State
@@ -33,16 +29,19 @@ public class ButtonComponent extends MouseComponent
 		CLICKED
 	}
 
-	public ButtonComponent( final Event _neutral,
-							final Event _rollover,
-							final Event _clicked )
+	public ButtonComponent()
 	{
 		super() ;
-		neutral = _neutral ;
-		rollover = _rollover ;
-		clicked = _clicked ;
 	}
 
+	public ButtonComponent( final Vector2 _offset,
+							final Vector2 _min,
+							final Vector2 _max )
+	{
+		super() ;
+		setAABB( _offset, _min, _max ) ;
+	}
+	
 	public void setAABB( final Vector2 _offset,
 						 final Vector2 _min,
 						 final Vector2 _max )
@@ -74,7 +73,7 @@ public class ButtonComponent extends MouseComponent
 			{
 				if( current != State.CLICKED )
 				{
-					sendEvent( clicked ) ;
+					clicked( _event ) ;
 					current = State.CLICKED ;
 					return InputEvent.Action.CONSUME ;
 				}
@@ -83,7 +82,7 @@ public class ButtonComponent extends MouseComponent
 			{
 				if( current != State.ROLLOVER )
 				{
-					sendEvent( rollover ) ;
+					rollover( _event ) ;
 					current = State.ROLLOVER ;
 				}
 				return InputEvent.Action.CONSUME ;
@@ -92,12 +91,27 @@ public class ButtonComponent extends MouseComponent
 
 		if( current != State.NEUTRAL )
 		{
-			sendEvent( neutral ) ;
+			neutral( _event ) ;
 			current = State.NEUTRAL ;
 		}
 
 		return InputEvent.Action.PROPAGATE ;
 	}
+
+	/**
+		Override to implement custom click process
+	*/
+	public void clicked( final InputEvent _event ) {}
+
+	/**
+		Override to implement custom click process
+	*/
+	public void rollover( final InputEvent _event ) {}
+
+	/**
+		Override to implement custom click process
+	*/
+	public void neutral( final InputEvent _event ) {}
 
 	@Override
 	public void update( final float _dt )
@@ -116,11 +130,5 @@ public class ButtonComponent extends MouseComponent
 			mouse.x = inputAdapter.convertInputToUIRenderX( _event.mouseX ) ;
 			mouse.y = inputAdapter.convertInputToUIRenderY( _event.mouseY ) ;
 		}
-	}
-
-	private void sendEvent( final Event _event )
-	{
-		final EventController controller = getComponentEventController() ;
-		controller.passEvent( _event ) ;
 	}
 }

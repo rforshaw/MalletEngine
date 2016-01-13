@@ -35,7 +35,7 @@ public abstract class Basic2DRender extends EventUpdater implements RenderInterf
 	protected float updateDT = 0.0f ;		// Delta time of the update cycle
 	protected float drawDT = 0.0f ;			// Delta time of the render cycle
 
-	protected final RenderState state = new RenderState() ;;
+	protected final RenderState state = new RenderState() ;
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
 
 	private final EventMessenger messenger = new EventMessenger() ;
