@@ -17,7 +17,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 	The event can then be picked up by other components such as a 
 	render-component to modify the visual element of the entity.
 */
-public class ButtonComponent extends MouseComponent
+public abstract class ButtonComponent extends MouseComponent
 {
 	private final AABB aabb = new AABB() ;
 	private State current = State.NEUTRAL ;
@@ -34,15 +34,17 @@ public class ButtonComponent extends MouseComponent
 		super() ;
 	}
 
-	public ButtonComponent( final Vector2 _offset,
+	public ButtonComponent( final Vector3 _position,
+							final Vector2 _offset,
 							final Vector2 _min,
 							final Vector2 _max )
 	{
 		super() ;
-		setAABB( _offset, _min, _max ) ;
+		setAABB( _position, _offset, _min, _max ) ;
 	}
 	
-	public void setAABB( final Vector2 _offset,
+	public void setAABB( final Vector3 _position,
+						 final Vector2 _offset,
 						 final Vector2 _min,
 						 final Vector2 _max )
 	{
@@ -56,6 +58,11 @@ public class ButtonComponent extends MouseComponent
 			aabb.max.setXY( _max ) ;
 		}
 
+		if( _position != null )
+		{
+			aabb.setPosition( _position.x, _position.y ) ;
+		}
+		
 		if( _offset != null )
 		{
 			aabb.offset.setXY( _offset ) ;
@@ -101,26 +108,17 @@ public class ButtonComponent extends MouseComponent
 	/**
 		Override to implement custom click process
 	*/
-	public void clicked( final InputEvent _event ) {}
+	public abstract void clicked( final InputEvent _event ) ;
 
 	/**
 		Override to implement custom click process
 	*/
-	public void rollover( final InputEvent _event ) {}
+	public abstract void rollover( final InputEvent _event ) ;
 
 	/**
 		Override to implement custom click process
 	*/
-	public void neutral( final InputEvent _event ) {}
-
-	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-
-		final Vector3 position = parent.getPosition() ;
-		aabb.setPosition( position.x, position.y ) ;
-	}
+	public abstract void neutral( final InputEvent _event );
 
 	@Override
 	public void updateMousePosition( final InputEvent _event )
