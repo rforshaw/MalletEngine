@@ -269,8 +269,7 @@ public class Shape
 		return true ;
 	}
 
-	public static Shape constructPlane( final Vector3 _min,
-										final Vector3 _max,
+	public static Shape constructPlane( final Vector3 _length,
 										final Vector2 _minUV,
 										final Vector2 _maxUV )
 	{
@@ -282,10 +281,10 @@ public class Shape
 		final MalletColour white = MalletColour.white() ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
-		plane.addVertex( new Object[] { new Vector3( _min ), white, new Vector2( _minUV ) } ) ;
-		plane.addVertex( new Object[] { new Vector3( _max ), white, new Vector2( _maxUV ) } ) ;
-		plane.addVertex( new Object[] { new Vector3( _min.x, _max.y, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;
-		plane.addVertex( new Object[] { new Vector3( _max.x, _min.y, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;
+		plane.addVertex( new Object[] { new Vector3(), white, new Vector2( _minUV ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length ), white, new Vector2( _maxUV ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length.x, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;
 
 		plane.addIndex( 0 ) ;
 		plane.addIndex( 2 ) ;

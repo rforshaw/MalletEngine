@@ -29,7 +29,7 @@ public class ImageCreator extends Creator<Entity, Settings>
 		entity.position = new Vector3( position ) ;
 
 		final Vector2 dim = _image.<Vector2>getObject( "DIM", null ) ;
-		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+		final Shape plane = Shape.constructPlane( new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
 		final RenderComponent render = new RenderComponent() ;
 		render.add( DrawFactory.createTexture( _image.getString( "IMAGE", "" ),

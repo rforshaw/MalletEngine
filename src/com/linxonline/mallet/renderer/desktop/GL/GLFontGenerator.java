@@ -97,7 +97,7 @@ public class GLFontGenerator
 			final Vector2 uv1 = new Vector2( ( float )textureStart * point, 0.0f ) ;
 			final Vector2 uv2 = new Vector2( ( float )( textureStart + textureAdvance ) * point, 1.0f ) ;
 
-			final Shape glyph = Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ;
+			final Shape glyph = Shape.constructPlane( maxPoint, uv1, uv2 ) ;
 			glyphs[i] = new GLGlyph( glyph, c[0], 0, geometryAdvance ) ;
 
 			increment += textureAdvance ;

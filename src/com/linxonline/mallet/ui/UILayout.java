@@ -8,8 +8,9 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;
-	private final ArrayList<UISpacer> spacers = new ArrayList<UISpacer>() ;
+	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;	// Contains Buttons, and other UI elements
+	private final ArrayList<UIElement> spacers = new ArrayList<UIElement>() ;	// Contains Spacers, and elements that extend UISpacer
+	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;	// Contains all UIElements - Buttons and Spacers
 	private final UIElementUpdater updater ;
 
 	public UILayout( final Type _type )
@@ -52,36 +53,51 @@ public class UILayout extends UIElement
 
 	public void addElement( final UIElement _element )
 	{
-		if( elements.contains( _element ) == false )
+		if( ordered.contains( _element ) == true )
+		{
+			// Return if the element already resides
+			// within this UILayout.
+			return ;
+		}
+
+		ordered.add( _element ) ;
+		if( _element instanceof UISpacer )
+		{
+			spacers.add( _element ) ;
+		}
+		else
 		{
 			_element.setInputAdapterInterface( getInputAdapter() ) ;
 			_element.setEventController( getEventController() ) ;
 			elements.add( _element ) ;
-
-			if( _element instanceof UISpacer )
-			{
-				spacers.add( ( UISpacer )_element ) ;
-			}
 		}
 	}
 	
 	public void removeElement( final UIElement _element )
 	{
-		if( elements.remove( _element ) == true )
+		if( ordered.remove( _element ) == false )
 		{
-			if( _element instanceof UISpacer )
-			{
-				spacers.remove( ( UISpacer )_element ) ;
-			}
-			_element.clear() ;
+			// Return if the element does not reside
+			// within this UILayout.
+			return ;
+		}
+
+		_element.clear() ;
+		if( _element instanceof UISpacer )
+		{
+			spacers.remove( _element ) ;
+		}
+		else
+		{
+			elements.remove( _element ) ;
 		}
 	}
 
 	@Override
 	public void update( final float _dt )
 	{
-		updater.update( _dt, elements ) ;
-		for( final UIElement element : elements )
+		updater.update( _dt, ordered, spacers ) ;
+		for( final UIElement element : ordered )
 		{
 			element.update( _dt ) ;
 		}
@@ -105,10 +121,11 @@ public class UILayout extends UIElement
 	public void clear()
 	{
 		super.clear() ;
-		for( final UIElement element : elements )
+		for( final UIElement element : ordered )
 		{
 			element.clear() ;
 		}
+		ordered.clear() ;
 		elements.clear() ;
 		spacers.clear() ;
 	}
@@ -117,10 +134,12 @@ public class UILayout extends UIElement
 	public void reset()
 	{
 		super.reset() ;
-		for( final UIElement element : elements )
+		for( final UIElement element : ordered )
 		{
 			element.reset() ;
 		}
+
+		ordered.clear() ;
 		elements.clear() ;
 		spacers.clear() ;
 	}
@@ -130,14 +149,23 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 position = new Vector3() ;
+			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
 			{
+				calcTotalLength( _elements, totalLength ) ;
+				updateSpaceLengths( _spacers, totalLength ) ;
+
+				calcAbsolutePosition( position, UILayout.this ) ;
+
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _elements.get( i ) ;
-					calcAbsolutePosition( position, element ) ;
+					element.setPosition( position.x, position.y, position.z ) ;
+
+					final Vector3 length = element.getLength() ;
+					position.setXYZ( length.x, 0.0f, 0.0f ) ;
 				}
 			}
 		} ;
@@ -148,14 +176,23 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 position = new Vector3() ;
+			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
 			{
+				calcTotalLength( _elements, totalLength ) ;
+				updateSpaceLengths( _spacers, totalLength ) ;
+
+				calcAbsolutePosition( position, UILayout.this ) ;
+
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _elements.get( i ) ;
-					calcAbsolutePosition( position, element ) ;
+					element.setPosition( position.x, position.y, position.z ) ;
+
+					final Vector3 length = element.getLength() ;
+					position.setXYZ( 0.0f, length.y, 0.0f ) ;
 				}
 			}
 		} ;
@@ -166,9 +203,13 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 position = new Vector3() ;
+			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
 			{
+				calcTotalLength( _elements, totalLength ) ;
+				updateSpaceLengths( _spacers, totalLength ) ;
+
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
@@ -184,9 +225,13 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 position = new Vector3() ;
+			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
 			{
+				calcTotalLength( _elements, totalLength ) ;
+				updateSpaceLengths( _spacers, totalLength ) ;
+
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
@@ -204,6 +249,31 @@ public class UILayout extends UIElement
 		_pos.setXYZ( pos.x + offset.x, pos.y + offset.y, pos.z + offset.z ) ;
 	}
 
+	private static void calcTotalLength( final ArrayList<UIElement> _elements, final Vector3 _total )
+	{
+		_total.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+		for( final UIElement element : _elements )
+		{
+			final Vector3 length = element.getLength() ;
+			_total.x += length.x ;
+			_total.y += length.y ;
+			_total.z += length.z ;
+		}
+	}
+
+	private static void updateSpaceLengths( final ArrayList<UIElement> _spacers, final Vector3 _totalLength )
+	{
+		final int num = _spacers.size() ;
+		final float lengthX = _totalLength.x / num ;
+		final float lengthY = _totalLength.y / num ;
+		final float lengthZ = _totalLength.z / num ;
+
+		for( final UIElement spacer : _spacers )
+		{
+			spacer.setLength( lengthX, lengthY, lengthZ ) ;
+		}
+	}
+	
 	public enum Type
 	{
 		HORIZONTAL,
@@ -214,6 +284,6 @@ public class UILayout extends UIElement
 
 	private interface UIElementUpdater
 	{
-		public void update( final float _dt, final ArrayList<UIElement> _elements ) ;
+		public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers ) ;
 	}
 }

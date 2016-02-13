@@ -32,7 +32,7 @@ public final class AnimationFactory
 			settings.addString( "ANIM_FILE", _file ) ;
 		}
 
-		final Shape plane = Shape.constructPlane( new Vector3(), new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+		final Shape plane = Shape.constructPlane( new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
 																		plane,
 																	   _pos,

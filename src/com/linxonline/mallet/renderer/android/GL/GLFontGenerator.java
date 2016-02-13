@@ -116,7 +116,7 @@ public class GLFontGenerator
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
-				glyph.setShape( Shape.constructPlane( new Vector3(), maxPoint, uv1, uv2 ) ) ;
+				glyph.setShape( Shape.constructPlane( maxPoint, uv1, uv2 ) ) ;
 			}
 		}
 
