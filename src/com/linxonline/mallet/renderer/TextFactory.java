@@ -16,7 +16,7 @@ public final class TextFactory
 
 	public static Event<Settings> createText( final String _text,
 											  final Vector3 _pos, 
-											  final Vector2 _offset,
+											  final Vector3 _offset,
 											  final MalletFont _font,
 											  final MalletColour _colour,
 											  final int _layer,

@@ -35,7 +35,7 @@ public class ImageCreator extends Creator<Entity, Settings>
 		render.add( DrawFactory.createTexture( _image.getString( "IMAGE", "" ),
 												plane,
 												entity.position,
-											   _image.<Vector2>getObject( "OFFSET", null ),
+											   _image.<Vector3>getObject( "OFFSET", null ),
 											   _image.getInteger( "LAYER", 0 ), render ) ) ;
 
 		entity.addComponent( render ) ;

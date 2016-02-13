@@ -19,7 +19,7 @@ public final class AnimationFactory
 
 	public static Event<Settings> createAnimation( final String _file,
 													final Vector3 _pos, 
-													final Vector2 _offset,
+													final Vector3 _offset,
 													final Vector2 _dim,
 													final int _layer,
 													final SourceCallback _callback )	// Not needed, but is important

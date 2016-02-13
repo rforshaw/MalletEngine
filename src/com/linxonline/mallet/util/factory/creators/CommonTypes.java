@@ -37,7 +37,7 @@ public class CommonTypes
 		final String offset = _src.getString( "OFFSET", null ) ;
 		if( offset != null )
 		{
-			_dest.addObject( "OFFSET", Vector2.parseVector2( offset ) ) ;
+			_dest.addObject( "OFFSET", Vector3.parseVector3( offset ) ) ;
 		}
 	}
 }

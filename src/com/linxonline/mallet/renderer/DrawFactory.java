@@ -54,7 +54,7 @@ public final class DrawFactory
 	public static Event<Settings> createTexture( final MalletTexture _texture,
 												 final Shape _shape,
 												 final Vector3 _pos, 
-												 final Vector2 _offset, 		// Not needed
+												 final Vector3 _offset, 		// Not needed
 												 final int _layer,
 												 final IDInterface _callback )
 	{
@@ -68,7 +68,7 @@ public final class DrawFactory
 	public static Event<Settings> createTexture( final String _file,
 												 final Shape _shape,
 												 final Vector3 _pos, 
-												 final Vector2 _offset, 		// Not needed
+												 final Vector3 _offset, 		// Not needed
 												 final int _layer,
 												 final IDInterface _callback )
 	{
@@ -98,7 +98,7 @@ public final class DrawFactory
 													  final MalletTexture[] _textures,
 													  final Shape _shape,
 													  final Vector3 _pos, 
-													  final Vector2 _offset, 		// Not needed
+													  final Vector3 _offset, 		// Not needed
 													  final int _layer,
 													  final IDInterface _callback )
 	{
@@ -121,7 +121,7 @@ public final class DrawFactory
 												 final String[] _files,
 												 final Shape _shape,
 												 final Vector3 _pos, 
-												 final Vector2 _offset, 		// Not needed
+												 final Vector3 _offset, 		// Not needed
 												 final int _layer,
 												 final IDInterface _callback )
 	{
@@ -247,7 +247,7 @@ public final class DrawFactory
 		sets.addObject( "CALLBACK", _callback ) ;
 	}
 
-	public static Settings setPosition( final Settings _settings, final Vector3 _pos, final Vector2 _offset )
+	public static Settings setPosition( final Settings _settings, final Vector3 _pos, final Vector3 _offset )
 	{
 		if( _pos != null ) { _settings.addObject( "POSITION", _pos ) ; }
 		if( _offset != null ) { _settings.addObject( "OFFSET", _offset ) ; }

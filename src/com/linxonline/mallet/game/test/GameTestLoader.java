@@ -95,7 +95,7 @@ public final class GameTestLoader extends GameLoader
 				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( texture, 		// Texture Location
 																	Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ),
 																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position
-																	new Vector2( -( width / 2 ), -( height / 2 ) ), 	// Offset
+																	new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ), 	// Offset
 																	10,
 																	null ), true ) ) ;									// layer
 
@@ -118,7 +118,7 @@ public final class GameTestLoader extends GameLoader
 
 				eventSystem.addEvent( GeometryFactory.createShape( lines,
 																	new Vector3( 0.0f, 50.0f, 0.0f ),
-																	new Vector2( -100.0f, 0.0f ),
+																	new Vector3( -100.0f, 0.0f, 0.0f ),
 																	10,
 																	null ) ) ;
 
@@ -152,7 +152,7 @@ public final class GameTestLoader extends GameLoader
 				final AnimComponent anim = new AnimComponent() ;
 				anim.addAnimation( "DEFAULT", AnimationFactory.createAnimation( "base/anim/moomba.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
-																		 new Vector2( -32, -32 ),
+																		 new Vector3( -32, -32, 0 ),
 																		 new Vector2( 64, 64 ),
 																		 10,
 																		 anim ) ) ;
@@ -171,7 +171,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( TextFactory.createText( "Hello world!", 						// Text
 															  new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
-															  new Vector2( 0, 0 ), 					// Offset
+															  new Vector3( 0, 0, 0 ), 					// Offset
 															  new MalletFont( "Arial", 12 ),		// Mallet Font
 															  new MalletColour( 255, 255, 255 ),	// Mallet Colour
 															  200,									// layer
@@ -219,7 +219,7 @@ public final class GameTestLoader extends GameLoader
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
 				image.addString( "POS", Integer.toString( x ) + "," + Integer.toString( y ) ) ;
 				image.addString( "DIM",  "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32" ) ;
+				image.addString( "OFFSET", "-32, -32, 0" ) ;
 
 				final ImageCreator creator = new ImageCreator() ;
 				final Entity entity = creator.create( image ) ;
@@ -240,7 +240,7 @@ public final class GameTestLoader extends GameLoader
 				final Settings mouse = new Settings() ;
 				mouse.addString( "ANIM", "base/anim/moomba.anim" ) ;
 				mouse.addObject( "DIM", new Vector2( 32, 32 ) ) ;
-				mouse.addObject( "OFFSET", new Vector2( -16, -16 ) ) ;
+				mouse.addObject( "OFFSET", new Vector3( -16, -16, 0 ) ) ;
 
 				final AnimMouseCreator creator = new AnimMouseCreator() ;
 				final Entity entity = creator.create( mouse ) ;

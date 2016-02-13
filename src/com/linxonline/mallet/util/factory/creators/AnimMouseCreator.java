@@ -32,10 +32,10 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 		MouseComponent mouse = new MouseComponent() ;
 
 		final Event<Settings> animation = AnimationFactory.createAnimation( _mouse.getString( "ANIM", null ),
-																		 entity.position,
-																		_mouse.<Vector2>getObject( "OFFSET", null ),
-																		_mouse.<Vector2>getObject( "DIM", null ),
-																		_mouse.getInteger( "LAYER", 100 ), anim ) ;
+																			entity.position,
+																			_mouse.<Vector3>getObject( "OFFSET", null ),
+																			_mouse.<Vector2>getObject( "DIM", null ),
+																			_mouse.getInteger( "LAYER", 100 ), anim ) ;
 		AnimationFactory.amendInterpolation( animation, Interpolation.NONE ) ;
 		
 		anim.addAnimation( "DEFAULT", animation ) ;

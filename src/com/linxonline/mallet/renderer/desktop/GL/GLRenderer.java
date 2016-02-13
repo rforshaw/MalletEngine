@@ -43,7 +43,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE = 2 ;
 
-	protected static final Vector2 DEFAULT_OFFSET = new Vector2( 0, 0 ) ;
+	protected static final Vector3 DEFAULT_OFFSET = new Vector3( 0, 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
 	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
@@ -199,7 +199,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final float rotation = _data.getRotation() ;
-				final Vector2 offset = _data.getOffset() ;
+				final Vector3 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
 
 				final Vector3 clipPosition = _data.getClipPosition() ;
@@ -218,7 +218,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 				uploader.upload( gl, _data ) ;
 			}
@@ -245,7 +245,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				}
 
 				final float rotation = _data.getRotation() ;
-				final Vector2 offset = _data.getOffset() ;
+				final Vector3 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
 
 				final Vector3 clipPosition = _data.getClipPosition() ;
@@ -264,7 +264,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 				uploader.upload( gl, _data ) ;
 			}
@@ -314,7 +314,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 				final MalletColour colour = _data.getColour() ;
 				final int alignment = _data.getTextAlignment() ;
 				final float rotation = _data.getRotation() ;
-				final Vector2 offset = _data.getOffset() ;
+				final Vector3 offset = _data.getOffset() ;
 				final boolean isGUI = _data.isUI() ;
 
 				final Matrix4 clipMatrix = _data.getClipMatrix() ;
@@ -336,7 +336,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 
 				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 				_data.setShape( fm.getGlyphWithChar( ' ' ).shape ) ;
 
@@ -785,7 +785,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		// Must be nulled when reclaimed by cache
 		// User data
 		private Vector3 position       = null ;
-		private Vector2 offset         = null ;
+		private Vector3 offset         = null ;
 		private Matrix4 positionMatrix = null ;
 		private MalletColour colour    = null ;
 		private Shape shape            = null ;
@@ -819,7 +819,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 		private void updateData()
 		{
 			position       = data.<Vector3>getObject( "POSITION", null ) ;
-			offset         = data.<Vector2>getObject( "OFFSET", DEFAULT_OFFSET ) ;
+			offset         = data.<Vector3>getObject( "OFFSET", DEFAULT_OFFSET ) ;
 			positionMatrix = ( positionMatrix == null ) ? matrixCache.get() : positionMatrix ;
 
 			layer          = data.getInteger( "LAYER", 0 ) ;
@@ -909,7 +909,7 @@ public class GLRenderer extends Basic2DRender implements GLEventListener
 			return rotation ;
 		}
 
-		public Vector2 getOffset()
+		public Vector3 getOffset()
 		{
 			return offset ;
 		}

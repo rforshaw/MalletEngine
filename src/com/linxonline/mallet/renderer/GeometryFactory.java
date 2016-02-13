@@ -16,7 +16,7 @@ public final class GeometryFactory
 
 	public static Event<Settings> createShape(  final Shape _shape,
 												final Vector3 _pos, 
-												final Vector2 _offset, 		// Not needed
+												final Vector3 _offset, 		// Not needed
 												final int _layer,
 												final IDInterface _callback )
 	{
