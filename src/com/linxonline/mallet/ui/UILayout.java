@@ -165,7 +165,7 @@ public class UILayout extends UIElement
 					element.setPosition( position.x, position.y, position.z ) ;
 
 					final Vector3 length = element.getLength() ;
-					position.setXYZ( length.x, 0.0f, 0.0f ) ;
+					position.setXYZ( position.x + length.x, position.y, 0.0f ) ;
 				}
 			}
 		} ;
@@ -192,7 +192,7 @@ public class UILayout extends UIElement
 					element.setPosition( position.x, position.y, position.z ) ;
 
 					final Vector3 length = element.getLength() ;
-					position.setXYZ( 0.0f, length.y, 0.0f ) ;
+					position.setXYZ( position.x, position.y + length.y, 0.0f ) ;
 				}
 			}
 		} ;
