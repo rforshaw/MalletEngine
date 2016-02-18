@@ -144,10 +144,17 @@ public class UILayout extends UIElement
 		spacers.clear() ;
 	}
 
+	/**
+		Order the UIElements from left to right along the x-axis.
+		When the layouts length.x has been filled, drop down to the 
+		next row, the next row starts at the maximum height of the 
+		last row.
+	*/
 	private UIElementUpdater getHorizontalUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 position = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
@@ -157,24 +164,39 @@ public class UILayout extends UIElement
 				updateSpaceLengths( _spacers, totalLength ) ;
 
 				calcAbsolutePosition( position, UILayout.this ) ;
+				position.setXYZ( layoutPosition ) ;
 
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _elements.get( i ) ;
-					element.setPosition( position.x, position.y, position.z ) ;
-
 					final Vector3 length = element.getLength() ;
-					position.setXYZ( position.x + length.x, position.y, 0.0f ) ;
+					final Vector3 margin = element.getMargin() ;
+
+					if( UILayout.this.intersectPoint( position.x, position.y ) == false || 
+						UILayout.this.intersectPoint( position.x + length.x, position.y + length.y ) == false )
+					{
+						position.setXYZ( layoutPosition.x, position.y + length.y + margin.y, layoutPosition.z ) ;
+					}
+
+					element.setPosition( position.x, position.y, position.z ) ;
+					position.setXYZ( position.x + length.x + margin.x, position.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
 	}
 
+	/**
+		Order the UIElements from top to bottom along the y-axis.
+		When the layouts length.y has been filled, jump to the 
+		next column, the next column starts at the maximum width 
+		of the last column.
+	*/
 	private UIElementUpdater getVerticalUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 position = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
@@ -183,16 +205,24 @@ public class UILayout extends UIElement
 				calcTotalLength( _elements, totalLength ) ;
 				updateSpaceLengths( _spacers, totalLength ) ;
 
-				calcAbsolutePosition( position, UILayout.this ) ;
+				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
+				position.setXYZ( layoutPosition ) ;
 
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _elements.get( i ) ;
-					element.setPosition( position.x, position.y, position.z ) ;
-
 					final Vector3 length = element.getLength() ;
-					position.setXYZ( position.x, position.y + length.y, 0.0f ) ;
+					final Vector3 margin = element.getMargin() ;
+
+					if( UILayout.this.intersectPoint( position.x, position.y ) == false || 
+						UILayout.this.intersectPoint( position.x + length.x, position.y + length.y ) == false )
+					{
+						position.setXYZ( position.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
+					}
+
+					element.setPosition( position.x, position.y, position.z ) ;
+					position.setXYZ( position.x, position.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
 		} ;

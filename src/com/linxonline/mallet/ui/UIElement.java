@@ -6,25 +6,27 @@ import com.linxonline.mallet.maths.* ;
 
 public abstract class UIElement implements InputHandler
 {
+	private final float DEFAULT_MARGIN_SIZE = 9.0f ;
+
 	private EventController controller = null ;
 	private InputAdapterInterface adapter = null ;
 
 	private final Vector3 position ;
 	private final Vector3 offset ;
 	private final Vector3 length ;
+	private final Vector3 margin ;
 
 	public UIElement()
 	{
-		position = new Vector3() ;
-		offset = new Vector3() ;
-		length = new Vector3() ;
+		this( new Vector3(), new Vector3(), new Vector3() ) ;
 	}
-	
+
 	public UIElement( final Vector3 _position, final Vector3 _offset, final Vector3 _length )
 	{
 		position = _position ;
 		offset = _offset ;
 		length = _length ;
+		margin = new Vector3( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
 	}
 
 	public abstract void update( final float _dt ) ;
@@ -81,6 +83,11 @@ public abstract class UIElement implements InputHandler
 		length.setXYZ( _x, _y, _z ) ;
 	}
 
+	public void setMargin( final float _x, final float _y, final float _z )
+	{
+		margin.setXYZ( _x, _y, _z ) ;
+	}
+
 	public Vector3 getPosition()
 	{
 		return position ;
@@ -94,6 +101,11 @@ public abstract class UIElement implements InputHandler
 	public Vector3 getLength()
 	{
 		return length ;
+	}
+
+	public Vector3 getMargin()
+	{
+		return margin ;
 	}
 
 	@Override
