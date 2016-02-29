@@ -10,6 +10,7 @@ import com.linxonline.mallet.event.* ;
 public class UIComponent extends InputComponent
 {
 	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;
+	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 
 	public UIComponent()
 	{
@@ -51,11 +52,10 @@ public class UIComponent extends InputComponent
 		if( elements.contains( _element ) == false )
 		{
 			_element.setInputAdapterInterface( inputAdapter ) ;
-			_element.setEventController( this.getComponentEventController() ) ;
 			elements.add( _element ) ;
 		}
 	}
-	
+
 	public void removeElement( final UIElement _element )
 	{
 		elements.remove( _element ) ;
@@ -67,8 +67,15 @@ public class UIComponent extends InputComponent
 		super.update( _dt ) ;
 		for( final UIElement element : elements )
 		{
-			element.update( _dt ) ;
+			element.update( _dt, events ) ;
 		}
+
+		final EventController controller = this.getComponentEventController() ;
+		for( final Event event : events )
+		{
+			controller.passEvent( event ) ;
+		}
+		events.clear() ;
 	}
 
 	@Override

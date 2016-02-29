@@ -41,16 +41,6 @@ public class UILayout extends UIElement
 		}
 	}
 
-	@Override
-	public void setEventController( final EventController _controller )
-	{
-		super.setEventController( _controller ) ;
-		for( final UIElement element : elements )
-		{
-			element.setEventController( getEventController() ) ;
-		}
-	}
-
 	public void addElement( final UIElement _element )
 	{
 		if( ordered.contains( _element ) == true )
@@ -68,7 +58,6 @@ public class UILayout extends UIElement
 		else
 		{
 			_element.setInputAdapterInterface( getInputAdapter() ) ;
-			_element.setEventController( getEventController() ) ;
 			elements.add( _element ) ;
 		}
 	}
@@ -94,12 +83,14 @@ public class UILayout extends UIElement
 	}
 
 	@Override
-	public void update( final float _dt )
+	public void update( final float _dt, final ArrayList<Event<?>> _events )
 	{
+		super.update( _dt, _events ) ;
+
 		updater.update( _dt, ordered, spacers ) ;
 		for( final UIElement element : ordered )
 		{
-			element.update( _dt ) ;
+			element.update( _dt, _events ) ;
 		}
 	}
 

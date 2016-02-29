@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import java.util.ArrayList ;
+
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -8,7 +10,7 @@ public abstract class UIElement implements InputHandler
 {
 	private final float DEFAULT_MARGIN_SIZE = 9.0f ;
 
-	private EventController controller = null ;
+	private ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 	private InputAdapterInterface adapter = null ;
 
 	private final Vector3 position ;
@@ -29,7 +31,19 @@ public abstract class UIElement implements InputHandler
 		margin = new Vector3( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
 	}
 
-	public abstract void update( final float _dt ) ;
+	public void addEvent( final Event<?> _event )
+	{
+		events.add( _event ) ;
+	}
+
+	public void update( final float _dt, final ArrayList<Event<?>> _events )
+	{
+		if( events.isEmpty() == false )
+		{
+			_events.addAll( events ) ;
+			events.clear() ;
+		}
+	}
 
 	public abstract InputEvent.Action passInputEvent( final InputEvent _event ) ;
 
@@ -114,25 +128,15 @@ public abstract class UIElement implements InputHandler
 		adapter = _adapter ;
 	}
 
-	public void setEventController( final EventController _controller )
-	{
-		controller = _controller ;
-	}
-
 	public InputAdapterInterface getInputAdapter()
 	{
 		return adapter ;
 	}
 
-	public EventController getEventController()
-	{
-		return controller ;
-	}
-
 	public void clear()
 	{
 		setInputAdapterInterface( null ) ;
-		setEventController( null ) ;
+		events.clear() ;
 	}
 	
 	@Override

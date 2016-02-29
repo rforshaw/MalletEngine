@@ -12,7 +12,7 @@ import com.linxonline.mallet.event.* ;
 
 public abstract class Component
 {
-	protected final EventController componentEvents = new EventController() ;		// Handles events from parent
+	protected final EventController componentEvents = new EventController() ;	// Handles events from parent
 	protected Entity parent = null ;											// Owner of this component
 	protected final ID id ;														// Name and Group Name
 

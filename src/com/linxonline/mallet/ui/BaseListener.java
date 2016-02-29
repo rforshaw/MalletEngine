@@ -4,18 +4,18 @@ import com.linxonline.mallet.event.* ;
 
 public abstract class BaseListener
 {
-	private EventController controller ;
+	private UIElement parent ;
 
-	public void setEventController( final EventController _controller )
+	public void setParent( final UIElement _parent )
 	{
-		controller = _controller ;
+		parent = _parent ;
 	}
 
 	public void sendEvent( final Event<?> _event )
 	{
-		if( controller != null )
+		if( parent != null )
 		{
-			controller.passEvent( _event ) ;
+			parent.addEvent( _event ) ;
 		}
 	}
 }

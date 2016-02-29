@@ -68,22 +68,9 @@ public class UIButton extends UIElement
 		if( _listener != null && listeners.contains( _listener ) == false )
 		{
 			listeners.add( _listener ) ;
-			_listener.setEventController( getEventController() ) ;
+			_listener.setParent( this ) ;
 		}
 	}
-
-	@Override
-	public void setEventController( final EventController _controller )
-	{
-		super.setEventController( _controller ) ;
-		for( final Listener listener : listeners )
-		{
-			listener.setEventController( getEventController() ) ;
-		}
-	}
-
-	@Override
-	public void update( final float _dt ) {}
 
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
@@ -185,8 +172,6 @@ public class UIButton extends UIElement
 	public void clear()
 	{
 		super.clear() ;
-		// setEventController( null ) in super will null out listeners
-		// Ensuring no memory leaks occur, when listeners are cleared.
 		listeners.clear() ;
 	}
 

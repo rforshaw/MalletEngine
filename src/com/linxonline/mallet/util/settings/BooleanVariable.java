@@ -25,14 +25,9 @@ public final class BooleanVariable extends VariableInterface
 		value = _value ;
 		type = VariableInterface.BOOLEAN_TYPE ;
 	}
-	
+
 	public String toString()
 	{
-		if( value == true )
-		{
-			return "true" ;
-		}
-
-		return "false" ;
+		return value == true ? "true" : "false" ;
 	}
 }

@@ -13,6 +13,13 @@ public class AABB
 
 	public AABB() {}
 
+	public AABB( final Vector2 _length,
+				 final Vector2 _pos,
+				 final Vector2 _offset )
+	{
+		this( new Vector2(), _length, _pos, _offset ) ;
+	}
+
 	public AABB( final Vector2 _min, final Vector2 _max, 
 				 final Vector2 _pos, final Vector2 _offset )
 	{

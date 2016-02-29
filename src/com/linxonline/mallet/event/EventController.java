@@ -18,6 +18,7 @@ import com.linxonline.mallet.util.logger.Logger ;
 public class EventController implements EventHandler
 {
 	private final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
+	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
 	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
@@ -52,7 +53,15 @@ public class EventController implements EventHandler
 
 	public void setAddEventInterface( final AddEventInterface _addInterface )
 	{
-		addInterface = _addInterface ;
+		if( _addInterface != null )
+		{
+			ADD_EVENT_FALLBACK.transferEvents( _addInterface ) ;
+			addInterface = _addInterface ;
+		}
+		else
+		{
+			addInterface = ADD_EVENT_FALLBACK ;
+		}
 	}
 
 	public int getProcessorSize()
@@ -113,12 +122,13 @@ public class EventController implements EventHandler
 		clearEvents() ;
 		processors.clear() ;
 		wantedTypes.clear() ;
-		addInterface = null ;
+		setAddEventInterface( null ) ;
 	}
 	
 	public void clearEvents()
 	{
 		messenger.clearEvents() ;
+		ADD_EVENT_FALLBACK.clear() ;
 	}
 
 	public AddEventInterface getAddEventInterface()
@@ -135,5 +145,35 @@ public class EventController implements EventHandler
 	public ArrayList<EventType> getWantedEventTypes()
 	{
 		return wantedTypes ;
+	}
+
+	/**
+		Allows events to be passed to a controller without it 
+		being added to an EventSystem.
+		Once the controller is added to an Event System the 
+		events should be passed to it.
+	*/
+	private class AddEventFallback implements AddEventInterface
+	{
+		private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+
+		public void transferEvents( final AddEventInterface _addInterface )
+		{
+			for( final Event<?> event : events )
+			{
+				_addInterface.addEvent( event ) ;
+			}
+			clear() ;
+		}
+
+		public void addEvent( final Event<?> _event )
+		{
+			events.add( _event ) ;
+		}
+
+		public void clear()
+		{
+			events.clear() ;
+		}
 	}
 }
