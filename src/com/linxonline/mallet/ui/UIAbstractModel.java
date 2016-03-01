@@ -61,7 +61,7 @@ public interface UIAbstractModel
 	/**
 		Determine what can be done to an item defined by the _index.
 	*/
-	public Set<ItemFlags> getDataFlags( final UIModelIndex _index, final Set<ItemFlags> _flags, final Role _role ) ;
+	public Set<ItemFlags> getDataFlags( final UIModelIndex _index, final Set<ItemFlags> _flags ) ;
 
 	/**
 		Find out whether the _parent has children within the data-set.

@@ -52,7 +52,7 @@ public abstract class UIProxyAbstractModel implements UIAbstractModel
 	}
 
 	@Override
-	public Set<ItemFlags> getDataFlags( final UIModelIndex _proxyIndex, final Set<ItemFlags> _flags, final Role _role )
+	public Set<ItemFlags> getDataFlags( final UIModelIndex _proxyIndex, final Set<ItemFlags> _flags )
 	{
 		_flags.add( ItemFlags.NoFlags ) ;
 		return _flags ;
