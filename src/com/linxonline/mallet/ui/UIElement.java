@@ -145,5 +145,6 @@ public abstract class UIElement implements InputHandler
 		position.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		offset.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		length.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+		margin.setXYZ( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
 	}
 }

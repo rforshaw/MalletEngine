@@ -111,12 +111,21 @@ public abstract class Component
 
 	/**
 		Return the internal Event Controller for this component.
+		Passes and Receives event components within the parent Entity. 
 	*/
 	public EventController getComponentEventController()
 	{
 		return componentEvents ;
 	}
 
+	/**
+		Implemented in Entity.
+		The Entity will call Component.readyToDestroy when,
+		it has been flagged for destruction. When the Component 
+		is ready, it should call ReadyCallback.ready.
+		The Entity will track which components have readied themselves, 
+		once all components are readied it will destroy itself.
+	*/
 	public static interface ReadyCallback<T extends Component>
 	{
 		public void ready( final T _component ) ;

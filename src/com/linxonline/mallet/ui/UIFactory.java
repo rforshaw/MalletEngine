@@ -18,33 +18,10 @@ import com.linxonline.mallet.util.settings.Settings ;
 public class UIFactory
 {
 	/**
-		Used in conjunction with constructButtonDraw and constructButtonListener.
-		Add EventProcessor to the Component-EventController of a RenderComponent.
+		Used in conjunction with constructButtonListener and UIRenderComponent.
+		Pass the Draw Event to constructButtonListener, will eventually be passed to UIRenderComponent.
 	*/
-	public static EventProcessor<Tuple<Event, String>> constructButtonEventProcessor()
-	{
-		return new EventProcessor<Tuple<Event,String>>( "RENDER_BUTTON", "BUTTON" )
-		{
-			public void processEvent( final Event<Tuple<Event,String>> _event )
-			{
-				final Tuple<Event,String> tuple = _event.getVariable() ;
-				final Event event = tuple.getLeft() ;
-
-				DrawFactory.amendTexture( event, tuple.getRight() ) ;
-				DrawFactory.forceUpdate( event ) ;
-			}
-		} ;
-	}
-
-	/**
-		Used in conjunction with constructButtonEventProcessor and constructButtonListener.
-		Add the Event to a RenderComponent, this ensures the event is handled correctly.
-		Pass the Event when calling constructButtonListener. One Event per UIButton.
-		_callback will most likely be a RenderComponent.
-	*/
-	public static Event<Settings> constructButtonDraw( final String _neutral,
-													   final UIButton _button,
-													   final IDInterface _callback )
+	public static Event<Settings> constructButtonDraw( final String _neutral, final UIButton _button )
 	{
 		final Shape shape = Shape.constructPlane( _button.getLength(), new Vector2(), new Vector2( 1, 1 ) ) ;
 		final Event<Settings> event  = DrawFactory.amendGUI( DrawFactory.createTexture( _neutral,
@@ -52,46 +29,51 @@ public class UIFactory
 																						_button.getPosition(),
 																						_button.getOffset(),
 																						10,
-																						_callback ), true ) ;
+																						null ), true ) ;
 		return event ;
 	}
 
 	/**
-		Used in conjunction with constructButtonEventProcessor and constructButtonDraw.
+		Used in conjunction with UIRenderComponent and constructButtonDraw.
 		Attach the listener to a designated button.
+		Draw Event is automatically passed to Entity's UIRenderComponent.
+		Button Listener updates Draw Event when state changes.
 	*/
 	public static UIButton.Listener constructButtonListener( final Event<Settings> _draw,
 															 final String _neutral,
 															 final String _rollover,
 															 final String _clicked )
 	{
+		DrawFactory.amendTexture( _draw, _neutral ) ;
+
 		return new UIButton.Listener()
 		{
-			private final Tuple<Event,String> neutral = new Tuple<Event,String>( _draw, _neutral ) ;
-			private final Tuple<Event,String> rollover = new Tuple<Event,String>( _draw, _rollover ) ;
-			private final Tuple<Event,String> clicked = new Tuple<Event,String>( _draw, _clicked ) ;
-
-			private final Event<Tuple<Event,String>> state = new Event<Tuple<Event,String>>( "BUTTON", neutral ) ;
-
 			@Override
 			public void clicked( final InputEvent _event )
 			{
-				state.setEvent( clicked ) ;
-				sendEvent( state ) ;
+				DrawFactory.amendTexture( _draw, _clicked ) ;
+				DrawFactory.forceUpdate( _draw ) ;
 			}
 
 			@Override
 			public void rollover( final InputEvent _event )
 			{
-				state.setEvent( rollover ) ;
-				sendEvent( state ) ;
+				DrawFactory.amendTexture( _draw, _rollover ) ;
+				DrawFactory.forceUpdate( _draw ) ;
 			}
 
 			@Override
 			public void neutral( final InputEvent _event )
 			{
-				state.setEvent( neutral ) ;
-				sendEvent( state ) ;
+				DrawFactory.amendTexture( _draw, _neutral ) ;
+				DrawFactory.forceUpdate( _draw ) ;
+			}
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				sendEvent( new Event<Event<Settings>>( "ADD_UI_DRAW", _draw ) ) ;
 			}
 		} ;
 	}

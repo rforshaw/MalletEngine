@@ -18,6 +18,7 @@ public abstract class UIAbstractView extends UIElement
 {
 	private final Set<UIAbstractModel.ItemFlags> cellFlags = new HashSet<UIAbstractModel.ItemFlags>() ;
 	private UIAbstractModel model ;
+	private boolean refresh = false ;
 
 	public UIAbstractView( final Vector3 _offset,
 						   final Vector3 _length )
@@ -35,9 +36,10 @@ public abstract class UIAbstractView extends UIElement
 	public void update( final float _dt, final ArrayList<Event<?>> _events )
 	{
 		super.update( _dt, _events ) ;
-		if( model != null )
+		if( model != null && refresh == true )
 		{
 			updateModel( null ) ;
+			refresh = false ;
 		}
 	}
 
@@ -77,6 +79,11 @@ public abstract class UIAbstractView extends UIElement
 									  final UIVariant _display,
 									  final UIVariant _edit,
 									  final UIVariant _user ) ;
+
+	public void refresh()
+	{
+		refresh = true ;
+	}
 
 	public void setModel( UIAbstractModel _model )
 	{

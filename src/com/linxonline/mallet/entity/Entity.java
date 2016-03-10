@@ -185,7 +185,6 @@ public final class Entity
 	/**
 		Get the Components that have the same Group name and return them in 
 		an ArrayList.
-		NOTE: A new ArrayList is created each time this function is called.
 	**/
 	public final int getComponentByGroup( final String _group, final ArrayList<Component> _components )
 	{
@@ -205,27 +204,27 @@ public final class Entity
 		an ArrayList.
 		NOTE: A new ArrayList is created each time this function is called.
 	**/
-	public final ArrayList<Component> getComponentByGroupID( final int _groupID )
+	public final int getComponentByGroupID( final int _groupID, final ArrayList<Component> _components )
 	{
-		final ArrayList<Component> group = new ArrayList<Component>() ;
 		for( final Component component : components )
 		{
 			if( component.isGroupID( _groupID ) == true )
 			{
-				group.add( component ) ;
+				_components.add( component ) ;
 			}
 		}
 
-		return group ;
+		return _components.size() ;
 	}
 
 	/**
 		Returns the ArrayList that contains all the Entity's Components.
 		NOTE: the ArrayList is NOT a copy.
 	**/
-	public final ArrayList<Component> getAllComponents()
+	public final int getAllComponents( final ArrayList<Component> _components )
 	{
-		return components ;
+		_components.addAll( components ) ;
+		return _components.size() ;
 	}
 
 	/** 

@@ -51,10 +51,8 @@ public class UIButton extends UIElement
 					 final Vector3 _length,
 					 final Listener _listener )
 	{
-		super() ;
-		setPosition( _position.x, _position.y, _position.z ) ;
-		setOffset( _offset.x, _offset.y, _offset.z ) ;
-		setLength( _length.x, _length.y, _length.z ) ;
+		super( _position, _offset, _length ) ;
+		addListener( _listener ) ;
 	}
 
 	/**
@@ -65,10 +63,13 @@ public class UIButton extends UIElement
 	*/
 	public void addListener( final Listener _listener )
 	{
-		if( _listener != null && listeners.contains( _listener ) == false )
+		if( _listener != null )
 		{
-			listeners.add( _listener ) ;
-			_listener.setParent( this ) ;
+			if( listeners.contains( _listener ) == false )
+			{
+				listeners.add( _listener ) ;
+				_listener.setParent( this ) ;
+			}
 		}
 	}
 
