@@ -12,8 +12,8 @@ public class GLEditorRenderer extends GLRenderer
 	@Override
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
 	{
-		renderInfo.setDisplayDimensions( new Vector2( _width, _height ) ) ;
-		renderInfo.setRenderDimensions( new Vector2( _width, _height ) ) ;
+		getRenderInfo().setDisplayDimensions( new Vector2( _width, _height ) ) ;
+		getRenderInfo().setRenderDimensions( new Vector2( _width, _height ) ) ;
 		resize() ;
 	}
 }

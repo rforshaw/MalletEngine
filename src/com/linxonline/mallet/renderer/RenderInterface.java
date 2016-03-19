@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.event.EventHandler ;
+import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.maths.Vector3 ;
 
 public interface RenderInterface extends EventHandler
@@ -18,6 +19,9 @@ public interface RenderInterface extends EventHandler
 	public void updateState( final float _dt ) ;
 	public void draw( final float _dt ) ;			// Draw the current Render State
 
+	public EventController getEventController() ;
+
 	public void sort() ;
 	public void clear() ;
+	public void clean() ;
 }

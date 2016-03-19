@@ -21,11 +21,11 @@ public class TextureAssist
 
 	public static MalletTexture.Meta createMeta( final String _path )
 	{
-		return assist.create( _path ) ;
+		return assist.createMeta( _path ) ;
 	}
 
 	public static interface Assist
 	{
-		public MalletTexture.Meta create( final String _path ) ;
+		public MalletTexture.Meta createMeta( final String _path ) ;
 	}
 }

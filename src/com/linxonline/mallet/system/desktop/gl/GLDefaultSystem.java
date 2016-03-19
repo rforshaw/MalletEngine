@@ -50,7 +50,7 @@ public class GLDefaultSystem extends BasicSystem
 		final GLRenderer render = ( GLRenderer )renderer ;
 		final InputSystem input = ( InputSystem )inputSystem ;
 
-		input.inputAdapter = render.renderInfo ;					// Hook up Input Adapter
+		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
 
 		render.hookToWindow( frame ) ;
 		render.getCanvas().addMouseListener( input ) ;

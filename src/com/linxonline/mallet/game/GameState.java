@@ -330,7 +330,7 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( audioSystem ) ;
 		eventSystem.addEventHandler( animationSystem ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
-		eventSystem.addEventHandler( system.getRenderInterface() ) ;
+		eventSystem.addEventHandler( system.getRenderInterface().getEventController() ) ;
 
 		final InputSystemInterface input = system.getInputInterface() ;
 		input.addInputHandler( inputUISystem ) ;
@@ -348,7 +348,7 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( audioSystem ) ;
 		eventSystem.removeEventHandler( animationSystem ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
-		eventSystem.removeEventHandler( system.getRenderInterface() ) ;
+		eventSystem.removeEventHandler( system.getRenderInterface().getEventController() ) ;
 		eventSystem.removeHandlersNow() ;
 
 		final InputSystemInterface input = system.getInputInterface() ;

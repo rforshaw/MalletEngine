@@ -1,7 +1,12 @@
 package com.linxonline.mallet.util.factory.creators ;
 
-import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.UpdateType ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.Shape ;
+
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.Creator ;
 import com.linxonline.mallet.entity.Entity ;
@@ -31,13 +36,21 @@ public class ImageCreator extends Creator<Entity, Settings>
 		final Vector2 dim = _image.<Vector2>getObject( "DIM", null ) ;
 		final Shape plane = Shape.constructPlane( new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
-		final RenderComponent render = new RenderComponent() ;
-		render.add( DrawFactory.createTexture( _image.getString( "IMAGE", "" ),
-												plane,
-												entity.position,
-											   _image.<Vector3>getObject( "OFFSET", null ),
-											   _image.getInteger( "LAYER", 0 ), render ) ) ;
+		final DrawData draw = DrawAssist.createDraw( entity.position,
+													 _image.<Vector3>getObject( "OFFSET", null ),
+													 new Vector3(),
+													 new Vector3( 1, 1, 1 ),
+													 _image.getInteger( "LAYER", 0 ) ) ;
 
+		DrawAssist.amendShape( draw, plane ) ;
+		DrawAssist.amendTexture( draw, new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
+		DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+		DrawAssist.amendUpdateType( draw, UpdateType.CONTINUOUS ) ;
+		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+
+		final RenderComponent render = new RenderComponent() ;
+		render.addBasicDraw( draw ) ;
+		
 		entity.addComponent( render ) ;
 		return entity ;
 	}

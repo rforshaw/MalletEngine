@@ -3,6 +3,11 @@ package com.linxonline.mallet.game.test ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.DrawData ;
+
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.TextFactory ;
 import com.linxonline.mallet.renderer.GeometryFactory ;
@@ -86,62 +91,85 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextureExample()
 			{
-				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
-				final int width = texture.getWidth() ;
-				final int height = texture.getHeight() ;
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						{
+							final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
+							final int width = texture.getWidth() ;
+							final int height = texture.getHeight() ;
 
-				//final String[] tex = { "base/textures/back.png", "base/textures/moomba.png" } ;
+							final DrawData draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
+																		 new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
+																		 new Vector3(),
+																		 new Vector3( 1, 1, 1 ),
+																		 10 ) ;
+							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+							DrawAssist.amendTexture( draw, texture ) ;
+							DrawAssist.amendUI( draw, true ) ;
+							DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
 
-				eventSystem.addEvent( DrawFactory.amendGUI( DrawFactory.createTexture( texture, 		// Texture Location
-																	Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ),
-																	new Vector3( 415.0f, 385.0f, 0.0f ),				// Position
-																	new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ), 	// Offset
-																	10,
-																	null ), true ) ) ;									// layer
+							_delegate.addBasicDraw( draw ) ;
+						}
 
-				final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
-				final Shape lines = new Shape( 7, 6 ) ;
-				lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
-				lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
-				lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
-				lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
-				lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
-				lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
+						{
+							final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
+							final Shape lines = new Shape( 7, 6 ) ;
+							lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
+							lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
+							lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
+							lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
+							lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
+							lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
 
-				lines.addIndex( 0 ) ;
-				lines.addIndex( 1 ) ;
-				lines.addIndex( 2 ) ;
-				lines.addIndex( 3 ) ;
-				lines.addIndex( 2 ) ;
-				lines.addIndex( 4 ) ;
-				lines.addIndex( 5 ) ;
+							lines.addIndex( 0 ) ;
+							lines.addIndex( 1 ) ;
+							lines.addIndex( 2 ) ;
+							lines.addIndex( 3 ) ;
+							lines.addIndex( 2 ) ;
+							lines.addIndex( 4 ) ;
+							lines.addIndex( 5 ) ;
 
-				eventSystem.addEvent( GeometryFactory.createShape( lines,
-																	new Vector3( 0.0f, 50.0f, 0.0f ),
-																	new Vector3( -100.0f, 0.0f, 0.0f ),
-																	10,
-																	null ) ) ;
+							final DrawData draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
+																		 new Vector3( -100.0f, 0.0f, 0.0f ),
+																		 new Vector3(),
+																		 new Vector3( 1, 1, 1 ),
+																		 10 ) ;
+							DrawAssist.amendShape( draw, lines ) ;
+							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 
-				final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
-				triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
-				triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
-				triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
-				triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
-				triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
-				triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
+							_delegate.addBasicDraw( draw ) ;
+						}
 
-				triangle.addIndex( 0 ) ;
-				triangle.addIndex( 1 ) ;
-				triangle.addIndex( 2 ) ;
-				triangle.addIndex( 3 ) ;
-				triangle.addIndex( 4 ) ;
-				triangle.addIndex( 5 ) ;
+						{
+							final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
+							triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
+							triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
+							triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
+							triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
+							triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
+							triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
 
-				eventSystem.addEvent( GeometryFactory.createShape( Shape.triangulate( triangle ),
-																	new Vector3( -200.0f, 0.0f, 0.0f ),
-																	null,
-																	10,
-																	null ) ) ;
+							triangle.addIndex( 0 ) ;
+							triangle.addIndex( 1 ) ;
+							triangle.addIndex( 2 ) ;
+							triangle.addIndex( 3 ) ;
+							triangle.addIndex( 4 ) ;
+							triangle.addIndex( 5 ) ;
+
+							final DrawData draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
+																		 new Vector3(),
+																		 new Vector3(),
+																		 new Vector3( 1, 1, 1 ),
+																		 10 ) ;
+							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
+							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+
+							_delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
 			}
 
 			/**
@@ -169,13 +197,20 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( TextFactory.createText( "Hello world!", 						// Text
-															  new Vector3( 0.0f, -80.0f, 0.0f ),	// Position
-															  new Vector3( 0, 0, 0 ), 					// Offset
-															  new MalletFont( "Arial", 12 ),		// Mallet Font
-															  new MalletColour( 255, 255, 255 ),	// Mallet Colour
-															  200,									// layer
-															  null ) ) ;
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						final DrawData draw = DrawAssist.createTextDraw( "Hello world!",
+																		 new MalletFont( "Arial" ),
+																		 new Vector3( 0.0f, -80.0f, 0.0f ),
+																		 new Vector3( 0, 0, 0 ),
+																		 new Vector3(),
+																		 new Vector3( 1, 1, 1 ),
+																		 200 ) ;
+						_delegate.addTextDraw( draw ) ;
+					}
+				} ) ) ;
 			}
 
 			/**

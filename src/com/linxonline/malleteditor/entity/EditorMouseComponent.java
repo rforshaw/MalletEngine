@@ -48,7 +48,7 @@ public class EditorMouseComponent extends MouseComponent
 		if( ( mouse1Pressed == true && mouseMoved == true && moveCamera == true ) ||	// CTRL and Mouse 1 to move Camera
 			( mouse2Pressed == true ) )													// Mouse 2 (Scroll button) to move Camera
 		{
-			render.passEvent( cameraMoveEvent ) ;
+			//render.passEvent( cameraMoveEvent ) ;
 		}
 
 		mouseMoved = false ;
@@ -82,6 +82,6 @@ public class EditorMouseComponent extends MouseComponent
 			scrollDiff.y = 0.1f ;
 		}
 		
-		render.passEvent( cameraScaleEvent ) ;
+		//render.passEvent( cameraScaleEvent ) ;
 	}
 }

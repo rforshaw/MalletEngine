@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.Ratio ;
+//import com.linxonline.mallet.resources.texture.* ;
 
 /**
 	Provides access to the Meta information of a texture
