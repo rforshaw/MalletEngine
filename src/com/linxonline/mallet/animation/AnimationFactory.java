@@ -2,9 +2,12 @@ package com.linxonline.mallet.animation ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.* ;
@@ -32,13 +35,16 @@ public final class AnimationFactory
 			settings.addString( "ANIM_FILE", _file ) ;
 		}
 
+		final Draw draw = DrawAssist.createDraw( _pos,
+												 _offset,
+												 new Vector3(),
+												 new Vector3( 1, 1, 1 ),
+												 _layer ) ;
+		settings.addObject( "RENDER_EVENT", draw ) ;
+
 		final Shape plane = Shape.constructPlane( new Vector3( _dim.x, _dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		settings.addObject( "RENDER_EVENT", DrawFactory.createTexture( ( String )null,
-																		plane,
-																	   _pos,
-																	   _offset,
-																	   _layer,
-																	   null ) ) ;
+		DrawAssist.amendShape( draw, plane ) ;
+		DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
 
 		if( _callback != null )
 		{
@@ -75,32 +81,40 @@ public final class AnimationFactory
 	public static Event<Settings> amendRotate( final Event<Settings> _event, final float _rotate )
 	{
 		final Settings animSet = _event.getVariable() ;
-		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		DrawFactory.amendRotate( renderEvent, _rotate ) ;
+		final Draw draw = animSet.<Draw>getObject( "RENDER_EVENT", null ) ;
+		//DrawAssist.amendRotate( draw, _rotate ) ;
+		return _event ;
+	}
+
+	public static Event<Settings> amendUpdateType( final Event<Settings> _event, final UpdateType _type )
+	{
+		final Settings animSet = _event.getVariable() ;
+		final Draw draw = animSet.<Draw>getObject( "RENDER_EVENT", null ) ;
+		DrawAssist.amendUpdateType( draw, _type ) ;
 		return _event ;
 	}
 
 	public static Event<Settings> amendInterpolation( final Event<Settings> _event, final Interpolation _interpolation )
 	{
 		final Settings animSet = _event.getVariable() ;
-		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		DrawFactory.amendInterpolation( renderEvent, _interpolation ) ;
+		final Draw draw = animSet.<Draw>getObject( "RENDER_EVENT", null ) ;
+		DrawAssist.amendInterpolation( draw, _interpolation ) ;
 		return _event ;
 	}
 
 	public static Event<Settings> amendGUI( final Event<Settings> _event, final boolean _gui )
 	{
 		final Settings animSet = _event.getVariable() ;
-		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		DrawFactory.amendGUI( renderEvent, _gui ) ;
+		final Draw draw = animSet.<Draw>getObject( "RENDER_EVENT", null ) ;
+		DrawAssist.amendUI( draw, _gui ) ;
 		return _event ;
 	}
 
 	public static Event<Settings> forceUpdate( final Event<Settings> _event )
 	{
 		final Settings animSet = _event.getVariable() ;
-		final Event<Settings> renderEvent = animSet.<Event<Settings>>getObject( "RENDER_EVENT", null ) ;
-		DrawFactory.forceUpdate( renderEvent ) ;
+		final Draw draw = animSet.<Draw>getObject( "RENDER_EVENT", null ) ;
+		DrawAssist.forceUpdate( draw ) ;
 		return _event ;
 	}
 }

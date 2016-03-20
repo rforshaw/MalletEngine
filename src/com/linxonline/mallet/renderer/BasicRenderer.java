@@ -47,35 +47,41 @@ public abstract class BasicRenderer implements RenderInterface
 	{
 		return new DrawDelegate()
 		{
-			private final ArrayList<DrawData> data = new ArrayList<DrawData>() ;
+			private final ArrayList<Draw> data = new ArrayList<Draw>() ;
 
-			public void addTextDraw( final DrawData _draw )
+			public void addTextDraw( final Draw _draw )
 			{
-				if( _draw != null && data.contains( _draw ) == false )
+				if( _draw != null && _draw instanceof DrawData )
 				{
-					_draw.setDrawInterface( getTextDraw() ) ;
-					data.add( _draw ) ;
-					state.add( _draw ) ;
+					if( data.contains( _draw ) == false )
+					{
+						_draw.setDrawInterface( getTextDraw() ) ;
+						data.add( _draw ) ;
+						state.add( ( DrawData )_draw ) ;
+					}
 				}
 			}
 
-			public void addBasicDraw( final DrawData _draw )
+			public void addBasicDraw( final Draw _draw )
 			{
-				if( _draw != null && data.contains( _draw ) == false )
+				if( _draw != null && _draw instanceof DrawData )
 				{
-					_draw.setDrawInterface( getBasicDraw() ) ;
-					data.add( _draw ) ;
-					state.add( _draw ) ;
+					if( data.contains( _draw ) == false )
+					{
+						_draw.setDrawInterface( getBasicDraw() ) ;
+						data.add( _draw ) ;
+						state.add( ( DrawData )_draw ) ;
+					}
 				}
 			}
 
 			@Override
-			public void removeDrawData( final DrawData _draw )
+			public void removeDraw( final Draw _draw )
 			{
-				if( _draw != null )
+				if( _draw != null && _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
-					state.remove( _draw ) ;
+					state.remove( ( DrawData )_draw ) ;
 				}
 			}
 
@@ -85,9 +91,9 @@ public abstract class BasicRenderer implements RenderInterface
 			@Override
 			public void shutdown()
 			{
-				for( final DrawData draw : data  )
+				for( final Draw draw : data  )
 				{
-					state.remove( draw ) ;
+					state.remove( ( DrawData )draw ) ;
 				}
 				data.clear() ;
 			}

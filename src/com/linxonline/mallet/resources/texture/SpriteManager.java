@@ -16,7 +16,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 		{
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return _file.endsWith( ".anim" ) ;
 			}
 
 			/**

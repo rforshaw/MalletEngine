@@ -2,7 +2,8 @@ package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.renderer.DrawFactory ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.resources.texture.Texture ;
 import com.linxonline.mallet.resources.texture.Sprite ;
@@ -19,9 +20,8 @@ public class Animation implements IDInterface, Cacheable
 {
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	public int id = 0 ;
-	public int renderID = -1 ;
 	private Sprite sprite = null ;
-	private Event<Settings> event = null ;
+	protected Draw draw = null ;
 
 	private boolean play = false ;
 
@@ -32,20 +32,20 @@ public class Animation implements IDInterface, Cacheable
 
 	public Animation() {}
 
-	public Animation( final int _id, final Event<Settings> _event, final Sprite _sprite )
+	public Animation( final int _id, final Draw _draw, final Sprite _sprite )
 	{
-		setAnimation( _id, _event, _sprite ) ;
+		setAnimation( _id, _draw, _sprite ) ;
 	}
 
-	public void setAnimation( final int _id, final Event<Settings> _event, final Sprite _sprite )
+	public void setAnimation( final int _id, Draw _draw, final Sprite _sprite )
 	{
 		id = _id ;
-		event = _event ;
+		draw = _draw ;
 		sprite = _sprite ;
 		frameDelta = 1.0f / sprite.framerate ;
 		length = sprite.size() ;
 
-		changeTexture( event, sprite ) ;
+		changeTexture( draw, sprite ) ;
 	}
 
 	/**
@@ -55,8 +55,6 @@ public class Animation implements IDInterface, Cacheable
 	**/
 	public void recievedID( final int _id )
 	{
-		renderID = _id ;
-
 		// Only call recieveID() once we have acquired the render ID.
 		// Else making modifications will become hard!
 		final int size = callbacks.size() ;
@@ -71,7 +69,7 @@ public class Animation implements IDInterface, Cacheable
 		if( callbacks.contains( _callback ) == false )
 		{
 			callbacks.add( _callback ) ;
-			if( renderID > -1 )
+			if( draw != null )
 			{
 				_callback.recieveID( id ) ;
 			}
@@ -132,17 +130,17 @@ public class Animation implements IDInterface, Cacheable
 		}
 	}
 
-	private void changeTexture( final Event<Settings> _event, final Sprite _sprite )
+	private void changeTexture( final Draw _draw, final Sprite _sprite )
 	{
-		final Settings settings = _event.getVariable() ;		// Render Event
-		final Sprite.Frame f = sprite.getFrame( frame ) ;					// Grab the current frame
+		final Sprite.Frame f = sprite.getFrame( frame ) ;		// Grab the current frame
 
 		// Doesn't assume the next frame is part of a spritesheet.
 		// We could check to see if the current path is the same as 
 		// f.path. Note sure if this would be more performant.
 		// Though the Animation System doesn't assume, the renderer 
 		// does, this will need to be resolved..
-		settings.addString( "FILE", f.path ) ; 
+		DrawAssist.clearTextures( _draw ) ;
+		DrawAssist.amendTexture( _draw, f.path ) ;
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility
@@ -150,9 +148,8 @@ public class Animation implements IDInterface, Cacheable
 		// UV's too. Or the texture stays the same and the UV 
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
-		Shape.updatePlaneUV( settings.<Shape>getObject( "SHAPE", null ), f.uv1, f.uv2 ) ;
-
-		DrawFactory.forceUpdate( _event ) ;
+		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), f.uv1, f.uv2 ) ;
+		DrawAssist.forceUpdate( _draw ) ;
 	}
 
 	public void update( final float _dt )
@@ -162,7 +159,7 @@ public class Animation implements IDInterface, Cacheable
 			elapsedTime += _dt ;
 			if( elapsedTime >= frameDelta )
 			{
-				changeTexture( event, sprite ) ;
+				changeTexture( draw, sprite ) ;
 				elapsedTime -= frameDelta ;
 				frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
 				if( frame == 0 )
@@ -209,9 +206,8 @@ public class Animation implements IDInterface, Cacheable
 		callbacks.clear() ;
 
 		id = 0 ;
-		renderID = -1 ;
 		sprite = null ;		// Is the Sprite unregistered before a reset?
-		event = null ;
+		draw = null ;
 
 		play = false ;
 

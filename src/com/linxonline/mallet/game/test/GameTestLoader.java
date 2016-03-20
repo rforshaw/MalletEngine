@@ -6,7 +6,7 @@ import java.util.HashMap ;
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.DrawData ;
+import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.TextFactory ;
@@ -100,11 +100,11 @@ public final class GameTestLoader extends GameLoader
 							final int width = texture.getWidth() ;
 							final int height = texture.getHeight() ;
 
-							final DrawData draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
-																		 new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
-																		 new Vector3(),
-																		 new Vector3( 1, 1, 1 ),
-																		 10 ) ;
+							final Draw draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
+																	 new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ),
+																	 10 ) ;
 							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
 							DrawAssist.amendTexture( draw, texture ) ;
 							DrawAssist.amendUI( draw, true ) ;
@@ -131,11 +131,11 @@ public final class GameTestLoader extends GameLoader
 							lines.addIndex( 4 ) ;
 							lines.addIndex( 5 ) ;
 
-							final DrawData draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
-																		 new Vector3( -100.0f, 0.0f, 0.0f ),
-																		 new Vector3(),
-																		 new Vector3( 1, 1, 1 ),
-																		 10 ) ;
+							final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
+																	  new Vector3( -100.0f, 0.0f, 0.0f ),
+																	  new Vector3(),
+																	  new Vector3( 1, 1, 1 ),
+																	  10 ) ;
 							DrawAssist.amendShape( draw, lines ) ;
 							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 
@@ -158,11 +158,11 @@ public final class GameTestLoader extends GameLoader
 							triangle.addIndex( 4 ) ;
 							triangle.addIndex( 5 ) ;
 
-							final DrawData draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
-																		 new Vector3(),
-																		 new Vector3(),
-																		 new Vector3( 1, 1, 1 ),
-																		 10 ) ;
+							final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
+																	 new Vector3(),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ),
+																	 10 ) ;
 							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
 							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 
@@ -201,13 +201,13 @@ public final class GameTestLoader extends GameLoader
 				{
 					public void callback( DrawDelegate _delegate )
 					{
-						final DrawData draw = DrawAssist.createTextDraw( "Hello world!",
-																		 new MalletFont( "Arial" ),
-																		 new Vector3( 0.0f, -80.0f, 0.0f ),
-																		 new Vector3( 0, 0, 0 ),
-																		 new Vector3(),
-																		 new Vector3( 1, 1, 1 ),
-																		 200 ) ;
+						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
+																	 new MalletFont( "Arial" ),
+																	 new Vector3( 0.0f, -80.0f, 0.0f ),
+																	 new Vector3( 0, 0, 0 ),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ),
+																	 200 ) ;
 						_delegate.addTextDraw( draw ) ;
 					}
 				} ) ) ;

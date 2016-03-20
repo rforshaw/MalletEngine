@@ -2,6 +2,7 @@ package com.linxonline.mallet.util.factory.creators ;
 
 import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.factory.* ;
@@ -37,7 +38,8 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 																			_mouse.<Vector2>getObject( "DIM", null ),
 																			_mouse.getInteger( "LAYER", 100 ), anim ) ;
 		AnimationFactory.amendInterpolation( animation, Interpolation.NONE ) ;
-		
+		AnimationFactory.amendUpdateType( animation, UpdateType.CONTINUOUS ) ;
+
 		anim.addAnimation( "DEFAULT", animation ) ;
 		anim.setDefaultAnim( "DEFAULT" ) ;
 

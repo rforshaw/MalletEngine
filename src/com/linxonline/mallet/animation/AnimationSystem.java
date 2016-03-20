@@ -12,21 +12,56 @@ import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
+
 import com.linxonline.mallet.resources.texture.SpriteManager ;
 import com.linxonline.mallet.resources.texture.Sprite ;
-import com.linxonline.mallet.renderer.DrawFactory ;
+
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
 
 public class AnimationSystem extends SystemRoot<Animation>
 {
+	private final ArrayList<Draw> toAddDraw = new ArrayList<Draw>() ;
+	private final ArrayList<Draw> toRemoveDraw = new ArrayList<Draw>() ;
+
 	private final ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
 	private final SpriteManager spriteManager = new SpriteManager() ;
 
 	protected int numID = 0 ;
+	protected DrawDelegate drawDelegate = null ;
 
 	public AnimationSystem( final AddEventInterface _eventSystem )
 	{
 		assert _eventSystem != null ;
 		eventSystem = _eventSystem ;
+	}
+
+	@Override
+	public void update( final float _dt )
+	{
+		if( drawDelegate != null )
+		{
+			if( toAddDraw.isEmpty() == false )
+			{
+				for( final Draw draw : toAddDraw )
+				{
+					drawDelegate.addBasicDraw( draw ) ;
+				}
+				toAddDraw.clear() ;
+			}
+
+			if( toRemoveDraw.isEmpty() == false )
+			{
+				for( final Draw draw : toRemoveDraw )
+				{
+					drawDelegate.removeDraw( draw ) ;
+				}
+				toRemoveDraw.clear() ;
+			}
+		}
+		super.update( _dt ) ;
 	}
 
 	@Override
@@ -43,6 +78,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 	{
 		_source.destroy() ;
 		animationCache.reclaim( _source ) ;						// Return the animation object back to the cache
+		drawDelegate.removeDraw( _source.draw ) ;
 	}
 
 	@Override
@@ -75,7 +111,7 @@ public class AnimationSystem extends SystemRoot<Animation>
 				if( animation != null )
 				{
 					//Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
-					passEvent( DrawFactory.removeDraw( animation.renderID ) ) ;
+					toRemoveDraw.add( animation.draw ) ;
 					removeSources.add( new RemoveSource( id, animation ) ) ;
 				}
 				break ;
@@ -89,14 +125,13 @@ public class AnimationSystem extends SystemRoot<Animation>
 		final String file = _anim.getString( "ANIM_FILE", null ) ;
 		if( file != null )
 		{
-			final Event event = _anim.getObject( "RENDER_EVENT", null ) ;
+			final Draw draw = _anim.getObject( "RENDER_EVENT", null ) ;
 			final Animation anim = animationCache.get() ;			// Get an Animation object from the cache
 			if( anim != null )
 			{
 				//Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
-				anim.setAnimation( numID++, event, ( Sprite )spriteManager.get( file ) ) ;
-				DrawFactory.insertIDCallback( event, anim ) ;
-				passEvent( event ) ;
+				toAddDraw.add( draw ) ;
+				anim.setAnimation( numID++, draw, ( Sprite )spriteManager.get( file ) ) ;
 				addCallbackToAnimation( anim, _anim ) ;
 				storeSource( anim, anim.id ) ;
 				anim.play() ;						// Assumed that animation will want to be played immediately.
@@ -140,5 +175,17 @@ public class AnimationSystem extends SystemRoot<Animation>
 		final ArrayList<EventType> types = new ArrayList<EventType>() ;
 		types.add( EventType.get( "ANIMATION" ) ) ;
 		return types ;
+	}
+
+	public void requestDrawDelegate()
+	{
+		eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		{
+			public void callback( DrawDelegate _delegate )
+			{
+				System.out.println( "Recieved Draw Delegate" ) ;
+				drawDelegate = _delegate ;
+			}
+		} ) ) ;
 	}
 }

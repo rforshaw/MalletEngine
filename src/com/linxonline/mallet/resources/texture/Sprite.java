@@ -2,6 +2,7 @@ package com.linxonline.mallet.resources.texture ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.maths.Vector2 ;
 
@@ -46,13 +47,13 @@ public final class Sprite extends Resource
 
 	public static class Frame
 	{
-		public final String path ;
+		public final MalletTexture path ;
 		public final Vector2 uv1 = new Vector2() ;
 		public final Vector2 uv2 = new Vector2() ;
 
 		public Frame( final String _frame, final float _u1, final float _v1, final float _u2, final float _v2 )
 		{
-			path = _frame ;
+			path = new MalletTexture( _frame ) ;
 			uv1.setXY( _u1, _v1 ) ;
 			uv2.setXY( _u2, _v2 ) ;
 		}

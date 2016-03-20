@@ -5,14 +5,14 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.DrawData ;
+import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.event.Event ;
 
 public class RenderComponent extends Component
 {
-	private final ArrayList<DrawData> toAddBasic = new ArrayList<DrawData>() ;
-	private final ArrayList<DrawData> toAddText = new ArrayList<DrawData>() ;
+	private final ArrayList<Draw> toAddBasic = new ArrayList<Draw>() ;
+	private final ArrayList<Draw> toAddText = new ArrayList<Draw>() ;
 	private DrawDelegate drawDelegate = null ;
 
 	public RenderComponent()
@@ -30,7 +30,7 @@ public class RenderComponent extends Component
 		super( _name, _group ) ;
 	}
 
-	public void addBasicDraw( final DrawData _draw )
+	public void addBasicDraw( final Draw _draw )
 	{
 		if( drawDelegate == null )
 		{
@@ -41,7 +41,7 @@ public class RenderComponent extends Component
 		drawDelegate.addBasicDraw( _draw ) ;
 	}
 
-	public void addTextDraw( final DrawData _draw )
+	public void addTextDraw( final Draw _draw )
 	{
 		if( drawDelegate == null )
 		{
@@ -52,11 +52,11 @@ public class RenderComponent extends Component
 		drawDelegate.addTextDraw( _draw ) ;
 	}
 
-	public void remove( final DrawData _draw )
+	public void remove( final Draw _draw )
 	{
 		if( drawDelegate != null )
 		{
-			drawDelegate.removeDrawData( _draw ) ;
+			drawDelegate.removeDraw( _draw ) ;
 		}
 	}
 
@@ -68,13 +68,13 @@ public class RenderComponent extends Component
 			public void callback( DrawDelegate _delegate )
 			{
 				drawDelegate = _delegate ;
-				for( final DrawData draw : toAddBasic )
+				for( final Draw draw : toAddBasic )
 				{
 					addBasicDraw( draw ) ;
 				}
 				toAddBasic.clear() ;
 
-				for( final DrawData draw : toAddText )
+				for( final Draw draw : toAddText )
 				{
 					addTextDraw( draw ) ;
 				}

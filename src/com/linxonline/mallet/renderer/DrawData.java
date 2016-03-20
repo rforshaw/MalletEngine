@@ -5,9 +5,9 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
-public abstract class DrawData<T extends DrawData> implements Cacheable
+public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 {
-	private final DrawInterface DRAW_DEFAULT = new DrawInterface<T>()
+	private final Draw.DrawInterface DRAW_DEFAULT = new Draw.DrawInterface<T>()
 	{
 		@Override
 		public void draw( final T _data ) {}
@@ -24,7 +24,7 @@ public abstract class DrawData<T extends DrawData> implements Cacheable
 	private int order = 0 ;
 	private Interpolation mode = Interpolation.NONE ;
 	private UpdateType updateType  = UpdateType.ON_DEMAND ; 
-	private DrawInterface<T> draw = DRAW_DEFAULT ;
+	private Draw.DrawInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
@@ -98,6 +98,11 @@ public abstract class DrawData<T extends DrawData> implements Cacheable
 		textures.remove( _texture ) ;
 	}
 
+	public MalletTexture getMalletTexture( final int _index )
+	{
+		return textures.get( _index ) ;
+	}
+	
 	public ArrayList<MalletTexture> getMalletTextures()
 	{
 		return textures ;
@@ -257,13 +262,9 @@ public abstract class DrawData<T extends DrawData> implements Cacheable
 		scale    = null ;
 	}
 
-	protected void setDrawInterface( DrawInterface<T> _draw )
+	@Override
+	public void setDrawInterface( final Draw.DrawInterface<T> _draw )
 	{
 		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
-	}
-
-	public interface DrawInterface<T extends DrawData>
-	{
-		public void draw( final T _data ) ;
 	}
 }

@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.DrawData ;
+import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 
 import com.linxonline.mallet.util.settings.Settings ;
@@ -36,11 +36,11 @@ public class ImageCreator extends Creator<Entity, Settings>
 		final Vector2 dim = _image.<Vector2>getObject( "DIM", null ) ;
 		final Shape plane = Shape.constructPlane( new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
-		final DrawData draw = DrawAssist.createDraw( entity.position,
-													 _image.<Vector3>getObject( "OFFSET", null ),
-													 new Vector3(),
-													 new Vector3( 1, 1, 1 ),
-													 _image.getInteger( "LAYER", 0 ) ) ;
+		final Draw draw = DrawAssist.createDraw( entity.position,
+												 _image.<Vector3>getObject( "OFFSET", null ),
+												 new Vector3(),
+												 new Vector3( 1, 1, 1 ),
+												 _image.getInteger( "LAYER", 0 ) ) ;
 
 		DrawAssist.amendShape( draw, plane ) ;
 		DrawAssist.amendTexture( draw, new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;

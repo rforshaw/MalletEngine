@@ -139,25 +139,25 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		DrawAssist.setAssist( new DrawAssist.Assist()
 		{
-			public DrawData amendShape( final DrawData _draw, final Shape _shape )
+			public Draw amendShape( final Draw _draw, final Shape _shape )
 			{
 				( ( GLDrawData )_draw ).setDrawShape( _shape ) ;
 				return _draw ;
 			}
 
-			public DrawData amendTexture( final DrawData _draw, final MalletTexture _texture )
+			public Draw amendTexture( final Draw _draw, final MalletTexture _texture )
 			{
-				_draw.addTexture( _texture ) ;
+				( ( GLDrawData )_draw ).addTexture( _texture ) ;
 				return _draw ;
 			}
 
-			public DrawData removeTexture( final DrawData _draw, final MalletTexture _texture )
+			public Draw removeTexture( final Draw _draw, final MalletTexture _texture )
 			{
-				_draw.removeTexture( _texture ) ;
+				( ( GLDrawData )_draw ).removeTexture( _texture ) ;
 				return _draw ;
 			}
 
-			public DrawData amendClip( final DrawData _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
+			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 			{
 				final GLDrawData data = ( GLDrawData )_draw ;
 				if( data.getClipMatrix() == null )
@@ -172,61 +172,117 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				return _draw ;
 			}
 
-			public DrawData amendRotate( final DrawData _draw, final float _x, final float _y, final float _z )
+			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 			{
 				//_draw.setRotation( _x, _y, _z ) ;
 				return _draw ;
 			}
 
-			public DrawData amendScale( final DrawData _draw, final float _x, final float _y, final float _z )
+			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
 			{
 				//_draw.setScale( _x, _y, _z ) ;
 				return _draw ;
 			}
 
-			public DrawData amendPosition( final DrawData _draw, final float _x, final float _y, final float _z )
+			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
 			{
 				//_draw.setPosition( _x, _y, _z ) ;
 				return _draw ;
 			}
 
-			public DrawData amendText( final DrawData _draw, final String _text )
+			public Draw amendText( final Draw _draw, final String _text )
 			{
-				_draw.setText( _text ) ;
+				( ( GLDrawData )_draw ).setText( _text ) ;
 				return _draw ;
 			}
 
-			public DrawData amendUI( final DrawData _draw, final boolean _ui )
+			public Draw amendUI( final Draw _draw, final boolean _ui )
 			{
-				_draw.setUI( _ui ) ;
+				( ( GLDrawData )_draw ).setUI( _ui ) ;
 				return _draw ;
 			}
 
-			public DrawData amendInterpolation( final DrawData _draw, final Interpolation _interpolation )
+			public Draw amendColour( final Draw _draw, final MalletColour _colour )
 			{
-				_draw.setInterpolationMode( _interpolation ) ;
+				( ( GLDrawData )_draw ).setColour( _colour ) ;
 				return _draw ;
 			}
 
-			public DrawData amendUpdateType( final DrawData _draw, final UpdateType _type )
+			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
 			{
-				_draw.setUpdateType( _type ) ;
+				( ( GLDrawData )_draw ).setInterpolationMode( _interpolation ) ;
 				return _draw ;
 			}
 
-			public DrawData attachProgram( final DrawData _draw, final String _key )
+			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
+			{
+				( ( GLDrawData )_draw ).setUpdateType( _type ) ;
+				return _draw ;
+			}
+
+			public Draw attachProgram( final Draw _draw, final String _key )
 			{
 				( ( GLDrawData )_draw ).setDrawProgram( programs.get( _key ) ) ;
 				return _draw ;
 			}
 
-			public DrawData forceUpdate( final DrawData _draw )
+			public Draw forceUpdate( final Draw _draw )
 			{
-				_draw.forceUpdate() ;
+				( ( GLDrawData )_draw ).forceUpdate() ;
 				return _draw ;
 			}
 
-			public DrawData createTextDraw( final String _text,
+			public Shape getDrawShape( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getDrawShape() ;
+			}
+
+			public int getTextureSize( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getMalletTextures().size() ;
+			}
+
+			public MalletTexture getTexture( final Draw _draw, final int _index )
+			{
+				return ( ( GLDrawData )_draw ).getMalletTexture( _index ) ;
+			}
+
+			public void clearTextures( final Draw _draw )
+			{
+				( ( GLDrawData )_draw ).getMalletTextures().clear() ;
+			}
+			
+			public Vector3 getRotate( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getRotation() ;
+			}
+
+			public Vector3 getScale( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getScale() ;
+			}
+
+			public Vector3 getPosition( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getPosition() ;
+			}
+
+			public String getText( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getText() ;
+			}
+
+			public MalletColour getColour( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getColour() ;
+			}
+
+			public boolean isUI( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).isUI() ;
+			}
+
+			public Draw createTextDraw( final String _text,
 											final MalletFont _font,
 											final Vector3 _position,
 											final Vector3 _offset,
@@ -241,7 +297,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				return draw ;
 			}
 
-			public DrawData createDraw( final Vector3 _position,
+			public Draw createDraw( final Vector3 _position,
 										final Vector3 _offset,
 										final Vector3 _rotation,
 										final Vector3 _scale,

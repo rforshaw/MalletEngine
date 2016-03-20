@@ -4,9 +4,9 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public interface DrawDelegate
 {
-	public void addTextDraw( final DrawData _draw ) ;
-	public void addBasicDraw( final DrawData _draw ) ;
-	public void removeDrawData( final DrawData _draw ) ;
+	public void addTextDraw( final Draw _draw ) ;
+	public void addBasicDraw( final Draw _draw ) ;
+	public void removeDraw( final Draw _draw ) ;
 
 	/**
 		Inform the Renderer to start accept requests
