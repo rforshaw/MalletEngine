@@ -47,6 +47,11 @@ public class DrawState
 	
 	}
 
+	public ArrayList<DrawData> getActiveDraws()
+	{
+		return current ;
+	}
+
 	private void addNewDrawData( final ArrayList<DrawData> _toAdd )
 	{
 		for( final DrawData add : _toAdd )

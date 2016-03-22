@@ -92,14 +92,18 @@ public class GLRenderer extends BasicRenderer
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		fontManager.recover() ;
 
-		/*final ArrayList<RenderData> content = state.getContent() ;
-		for( final RenderData data : content )
+		final ArrayList<DrawData> content = state.getActiveDraws() ;
+		for( final DrawData draw : content )
 		{
-			final GLRenderData d = ( GLRenderData )data ;
-			d.setTexture( null ) ;
-			d.data.addBoolean( "UPDATE", true ) ;
-			
-		}*/
+			final GLDrawData d = ( GLDrawData )draw ;
+			final ArrayList<Texture<GLImage>> glTextures = d.getGLTextures() ;
+			for( final Texture<GLImage> texture : glTextures )
+			{
+				texture.unregister() ;
+			}
+			glTextures.clear() ;
+			d.forceUpdate() ; ;
+		}
 	}
 
 	private void initGraphics()
