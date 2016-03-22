@@ -4,7 +4,6 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.Shape ;
 
 import com.linxonline.mallet.util.Tuple ;
@@ -24,13 +23,13 @@ public class UIFactory
 	public static Event<Settings> constructButtonDraw( final String _neutral, final UIButton _button )
 	{
 		final Shape shape = Shape.constructPlane( _button.getLength(), new Vector2(), new Vector2( 1, 1 ) ) ;
-		final Event<Settings> event  = DrawFactory.amendGUI( DrawFactory.createTexture( _neutral,
+		/*final Event<Settings> event  = DrawFactory.amendGUI( DrawFactory.createTexture( _neutral,
 																						shape,
 																						_button.getPosition(),
 																						_button.getOffset(),
 																						10,
-																						null ), true ) ;
-		return event ;
+																						null ), true ) ;*/
+		return null ;
 	}
 
 	/**
@@ -44,29 +43,29 @@ public class UIFactory
 															 final String _rollover,
 															 final String _clicked )
 	{
-		DrawFactory.amendTexture( _draw, _neutral ) ;
+		//DrawFactory.amendTexture( _draw, _neutral ) ;
 
 		return new UIButton.Listener()
 		{
 			@Override
 			public void clicked( final InputEvent _event )
 			{
-				DrawFactory.amendTexture( _draw, _clicked ) ;
-				DrawFactory.forceUpdate( _draw ) ;
+				//DrawFactory.amendTexture( _draw, _clicked ) ;
+				//DrawFactory.forceUpdate( _draw ) ;
 			}
 
 			@Override
 			public void rollover( final InputEvent _event )
 			{
-				DrawFactory.amendTexture( _draw, _rollover ) ;
-				DrawFactory.forceUpdate( _draw ) ;
+				//DrawFactory.amendTexture( _draw, _rollover ) ;
+				//DrawFactory.forceUpdate( _draw ) ;
 			}
 
 			@Override
 			public void neutral( final InputEvent _event )
 			{
-				DrawFactory.amendTexture( _draw, _neutral ) ;
-				DrawFactory.forceUpdate( _draw ) ;
+				//DrawFactory.amendTexture( _draw, _neutral ) ;
+				//DrawFactory.forceUpdate( _draw ) ;
 			}
 
 			@Override

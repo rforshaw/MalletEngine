@@ -1,7 +1,6 @@
 package com.linxonline.malleteditor.factory.creators ;
 
 import com.linxonline.mallet.util.factory.creators.CommonTypes ;
-import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.Creator ;
 

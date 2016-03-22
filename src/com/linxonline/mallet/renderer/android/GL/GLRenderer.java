@@ -21,7 +21,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.VertexAttrib ;
 
-public class GLRenderer extends Basic2DRender
+public class GLRenderer extends BasicRenderer
 {
 	private static final MalletColour WHITE = MalletColour.white() ;
 	private static final MalletColour BLACK = MalletColour.black() ;
@@ -31,7 +31,7 @@ public class GLRenderer extends Basic2DRender
 	private static final MalletColour BLUE  = MalletColour.blue() ;
 
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
-	public static final int PERSPECTIVE_MODE = 2 ;
+	public static final int PERSPECTIVE_MODE  = 2 ;
 
 	protected static final Vector3 DEFAULT_OFFSET = new Vector3( 0, 0, 0 ) ;
 	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
@@ -40,27 +40,22 @@ public class GLRenderer extends Basic2DRender
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
-	protected final static ObjectCache<GLRenderData> renderCache = new ObjectCache<GLRenderData>( GLRenderData.class ) ;
+	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
 	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 
-	protected Vector2 pos = new Vector2() ;
-
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = new Vector3() ;
 
-	protected DrawInterface<GLRenderData> drawShape = null ;
-	protected DrawInterface<GLRenderData> drawTexture = null ;
-	protected DrawInterface<GLRenderData> drawText = null ;
+	protected Vector3 pos = new Vector3() ;
 
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
 
 	public GLRenderer()
 	{
-		initDrawCalls() ;
 		initAssist() ;
 	}
 
@@ -68,6 +63,7 @@ public class GLRenderer extends Basic2DRender
 	public void start()
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
+		super.start() ;
 		initGraphics() ;
 	}
 
@@ -75,7 +71,7 @@ public class GLRenderer extends Basic2DRender
 	public void shutdown()
 	{
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
-		clear() ;					// Clear the contents being rendered
+		clear() ;							// Clear the contents being rendered
 
 		uploader.shutdown() ;
 		programs.shutdown() ;
@@ -96,14 +92,14 @@ public class GLRenderer extends Basic2DRender
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		fontManager.recover() ;
 
-		final ArrayList<RenderData> content = state.getContent() ;
+		/*final ArrayList<RenderData> content = state.getContent() ;
 		for( final RenderData data : content )
 		{
 			final GLRenderData d = ( GLRenderData )data ;
 			d.setTexture( null ) ;
 			d.data.addBoolean( "UPDATE", true ) ;
 			
-		}
+		}*/
 	}
 
 	private void initGraphics()
@@ -188,9 +184,180 @@ public class GLRenderer extends Basic2DRender
 
 		TextureAssist.setAssist( new TextureAssist.Assist()
 		{
-			public MalletTexture.Meta create( final String _path )
+			public MalletTexture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
+			}
+		} ) ;
+
+		DrawAssist.setAssist( new DrawAssist.Assist()
+		{
+			public Draw amendShape( final Draw _draw, final Shape _shape )
+			{
+				( ( GLDrawData )_draw ).setDrawShape( _shape ) ;
+				return _draw ;
+			}
+
+			public Draw amendTexture( final Draw _draw, final MalletTexture _texture )
+			{
+				( ( GLDrawData )_draw ).addTexture( _texture ) ;
+				return _draw ;
+			}
+
+			public Draw removeTexture( final Draw _draw, final MalletTexture _texture )
+			{
+				( ( GLDrawData )_draw ).removeTexture( _texture ) ;
+				return _draw ;
+			}
+
+			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
+			{
+				final GLDrawData data = ( GLDrawData )_draw ;
+				if( data.getClipMatrix() == null )
+				{
+					data.setClipMatrix( new Matrix4() ) ;
+				}
+
+				data.setClipShape( _clipSpace ) ;
+				data.setClipPosition( _position ) ;
+				data.setClipOffset( _offset ) ;
+				data.setClipProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
+				return _draw ;
+			}
+
+			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
+			{
+				( ( GLDrawData )_draw ).setRotation( _x, _y, _z ) ;
+				return _draw ;
+			}
+
+			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
+			{
+				( ( GLDrawData )_draw ).setScale( _x, _y, _z ) ;
+				return _draw ;
+			}
+
+			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
+			{
+				( ( GLDrawData )_draw ).setPosition( _x, _y, _z ) ;
+				return _draw ;
+			}
+
+			public Draw amendText( final Draw _draw, final String _text )
+			{
+				( ( GLDrawData )_draw ).setText( _text ) ;
+				return _draw ;
+			}
+
+			public Draw amendUI( final Draw _draw, final boolean _ui )
+			{
+				( ( GLDrawData )_draw ).setUI( _ui ) ;
+				return _draw ;
+			}
+
+			public Draw amendColour( final Draw _draw, final MalletColour _colour )
+			{
+				( ( GLDrawData )_draw ).setColour( _colour ) ;
+				return _draw ;
+			}
+
+			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
+			{
+				( ( GLDrawData )_draw ).setInterpolationMode( _interpolation ) ;
+				return _draw ;
+			}
+
+			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
+			{
+				( ( GLDrawData )_draw ).setUpdateType( _type ) ;
+				return _draw ;
+			}
+
+			public Draw attachProgram( final Draw _draw, final String _key )
+			{
+				( ( GLDrawData )_draw ).setDrawProgram( programs.get( _key ) ) ;
+				return _draw ;
+			}
+
+			public Draw forceUpdate( final Draw _draw )
+			{
+				( ( GLDrawData )_draw ).forceUpdate() ;
+				return _draw ;
+			}
+
+			public Shape getDrawShape( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getDrawShape() ;
+			}
+
+			public int getTextureSize( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getMalletTextures().size() ;
+			}
+
+			public MalletTexture getTexture( final Draw _draw, final int _index )
+			{
+				return ( ( GLDrawData )_draw ).getMalletTexture( _index ) ;
+			}
+
+			public void clearTextures( final Draw _draw )
+			{
+				( ( GLDrawData )_draw ).clearTextures() ;
+			}
+			
+			public Vector3 getRotate( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getRotation() ;
+			}
+
+			public Vector3 getScale( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getScale() ;
+			}
+
+			public Vector3 getPosition( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getPosition() ;
+			}
+
+			public String getText( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getText() ;
+			}
+
+			public MalletColour getColour( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getColour() ;
+			}
+
+			public boolean isUI( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).isUI() ;
+			}
+
+			public Draw createTextDraw( final String _text,
+											final MalletFont _font,
+											final Vector3 _position,
+											final Vector3 _offset,
+											final Vector3 _rotation,
+											final Vector3 _scale,
+											final int _order )
+			{
+				final GLDrawData draw = ( GLDrawData )createDraw( _position, _offset, _rotation, _scale, _order ) ;
+				attachProgram( draw, "SIMPLE_FONT" ) ;
+				draw.setText( _text ) ;
+				draw.setFont( _font ) ;
+				return draw ;
+			}
+
+			public Draw createDraw( final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order )
+			{
+				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
+				return draw ;
 			}
 		} ) ;
 	}
@@ -209,68 +376,33 @@ public class GLRenderer extends Basic2DRender
 		resize() ;
 	}
 
-	private void initDrawCalls()
+	public DrawData.DrawInterface getBasicDraw()
 	{
-		drawShape = new DrawInterface<GLRenderData>()
+		return new DrawData.DrawInterface<GLDrawData>()
 		{
-			public void draw( final GLRenderData _data, final Vector2 _position ) 
+			public void draw( final GLDrawData _data )
 			{
 				if( _data.toUpdate() == false &&
-					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
+					_data.getUpdateType() == UpdateType.ON_DEMAND )
 				{
 					return ;
 				}
 
-				final float rotation = _data.getRotation() ;
-				final Vector3 offset = _data.getOffset() ;
-				final boolean isGUI = _data.isUI() ;
-
-				final Vector3 clipPosition = _data.getClipPosition() ;
-				final Vector3 clipOffset   = _data.getClipOffset() ;
-				if( clipPosition != null && clipOffset != null )
+				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
+				if( malletTextures.isEmpty() == false )
 				{
-					final Matrix4 clipMatrix = _data.getClipMatrix() ;
-					clipMatrix.setIdentity() ;
-
-					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
-					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
-				}
-
-				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
-				positionMatrix.setIdentity() ;
-
-				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
-
-				uploader.upload( _data ) ;
-			}
-		} ;
-
-		drawTexture = new DrawInterface<GLRenderData>()
-		{
-			public void draw( final GLRenderData _data, final Vector2 _position ) 
-			{
-				if( _data.toUpdate() == false &&
-					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
-				{
-					return ;
-				}
-
-				final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
-				if( textures.isEmpty() == true )
-				{
-					if( loadTexture( _data ) == false )
+					final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
+					if( glTextures.isEmpty() == true )
 					{
-						//Logger.println( "GLRenderer - Render Data for non-existent texture: " + _data.getID(), Logger.Verbosity.MINOR ) ;
-						return ;
+						if( loadTexture( _data ) == false )
+						{
+							//Logger.println( "GLRenderer - Render Data for non-existent texture", Logger.Verbosity.MINOR ) ;
+							_data.forceUpdate() ;
+							return ;
+						}
 					}
 				}
 
-				final float rotation = _data.getRotation() ;
-				final Vector3 offset = _data.getOffset() ;
-				final boolean isGUI = _data.isUI() ;
-
 				final Vector3 clipPosition = _data.getClipPosition() ;
 				final Vector3 clipOffset   = _data.getClipOffset() ;
 				if( clipPosition != null && clipOffset != null )
@@ -282,23 +414,30 @@ public class GLRenderer extends Basic2DRender
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
 
-				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+				final Vector3 position = _data.getPosition() ;
+				final Vector3 offset   = _data.getOffset() ;
+				final Vector3 rotation = _data.getRotation() ;
+
+				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 				uploader.upload( _data ) ;
 			}
 		} ;
+	}
 
-		drawText = new DrawInterface<GLRenderData>()
+	public DrawData.DrawInterface getTextDraw()
+	{
+		return new DrawData.DrawInterface<GLDrawData>()
 		{
-			public void draw( final GLRenderData _data, final Vector2 _position ) 
+			public void draw( final GLDrawData _data )
 			{
 				if( _data.toUpdate() == false &&
-					_data.getUpdateType() == DrawRequestType.ON_DEMAND )
+					_data.getUpdateType() == UpdateType.ON_DEMAND )
 				{
 					return ;
 				}
@@ -318,30 +457,33 @@ public class GLRenderer extends Basic2DRender
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm.fontMap.texture == null )
+				if( fm == null )
 				{
-					// If the font maps texture has yet to be set,
-					// generate the texture and bind it with the 
-					// current OpenGL context
-					fontManager.generateFontGeometry( font ) ;
+					return ;
 				}
 
-				_data.setTexture( fm.getTexture() ) ;
+				final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
+				if( textures.isEmpty() == true )
+				{
+					textures.add( fm.getTexture() ) ;
+				}
+
+				final Vector3 position = _data.getPosition() ;
+				final Vector3 offset   = _data.getOffset() ;
+				final Vector3 rotate   = _data.getOffset() ;
+				final boolean isGUI    = _data.isUI() ;
 
 				final int height = fm.getHeight() ;
-				final int lineWidth = _data.getLineWidth() + ( int )_position.x ;
+				final int lineWidth = /*_data.getLineWidth()*/500 + ( int )position.x ;
 				String[] words = _data.getWords() ;
 				if( words == null )
 				{
-					words = optimiseText( fm, text, _position, lineWidth ) ;
+					words = optimiseText( fm, text, position, lineWidth ) ;
 					_data.setWords( words ) ;
 				}
 
 				final MalletColour colour = _data.getColour() ;
-				final int alignment = _data.getTextAlignment() ;
-				final float rotation = _data.getRotation() ;
-				final Vector3 offset = _data.getOffset() ;
-				final boolean isGUI = _data.isUI() ;
+				//final int alignment = _data.getTextAlignment() ;
 
 				final Matrix4 clipMatrix = _data.getClipMatrix() ;
 				if( clipMatrix != null )
@@ -354,22 +496,22 @@ public class GLRenderer extends Basic2DRender
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
 
-				final Vector2 currentPos = new Vector2( _position ) ;
+				//final Vector3 currentPos = new Vector3( position ) ;
 
-				setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
-				final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+				//setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
+				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( _position.x, _position.y, 0.0f ) ;
-				positionMatrix.rotate( rotation, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, 0.0f ) ;
+				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.rotate( rotate.z, 0.0f, 0.0f, 1.0f ) ;
+				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-				_data.setShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+				_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
 
 				uploader.upload( _data ) ;
 			}
 
-			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector2 _position, final int _lineWidth )
+			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector3 _position, final int _lineWidth )
 			{
 				int length = 0 ;
 				float wordWidth = 0.0f ;
@@ -422,16 +564,6 @@ public class GLRenderer extends Basic2DRender
 				words = txt.toArray( words ) ;
 				return words ;
 			}
-
-			private void setTextAlignment( final int _alignment, final Vector2 _position, final int _wordWidth )
-			{
-				switch( _alignment )
-				{
-					case ALIGN_RIGHT  : _position.x -= _wordWidth ;     break ;
-					case ALIGN_CENTRE : _position.x -= _wordWidth / 2 ; break ;
-					default           : return ;
-				}
-			}
 		} ;
 	}
 
@@ -442,8 +574,8 @@ public class GLRenderer extends Basic2DRender
 
 	protected void resize()
 	{
-		final Vector2 renderDimensions = renderInfo.getRenderDimensions() ;
-		final Vector2 displayDimensions = renderInfo.getScaledRenderDimensions() ;
+		final Vector2 renderDimensions = getRenderInfo().getRenderDimensions() ;
+		final Vector2 displayDimensions = getRenderInfo().getScaledRenderDimensions() ;
 
 		switch( viewMode )
 		{
@@ -452,7 +584,7 @@ public class GLRenderer extends Basic2DRender
 			default                : constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ; break ;
 		}
 
-		final Vector2 screenOffset = renderInfo.getScreenOffset() ;
+		final Vector2 screenOffset = getRenderInfo().getScreenOffset() ;
 		GLES30.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 		//GLRenderer.handleError( "Viewport: " ) ;
 
@@ -468,7 +600,7 @@ public class GLRenderer extends Basic2DRender
 
 	public void draw( final float _dt )
 	{
-		cameraPosition = renderInfo.getCameraPosition() ;
+		cameraPosition = getRenderInfo().getCameraPosition() ;
 		if( cameraPosition == null )
 		{
 			System.out.println( "Camera Not Set" ) ;
@@ -484,13 +616,13 @@ public class GLRenderer extends Basic2DRender
 		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT ) ;
 		GLES30.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
-		updateEvents() ;
+		controller.update() ;
 
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
 		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
-		renderInfo.setCameraZoom( cameraScale.x, cameraScale.y ) ;
-		final Vector2 half = renderInfo.getHalfRenderDimensions() ;
+		getRenderInfo().setCameraZoom( cameraScale.x, cameraScale.y ) ;
+		final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
 
 		worldMatrix.setIdentity() ;
 		worldMatrix.translate( half.x, half.y, 0.0f ) ;
@@ -502,22 +634,18 @@ public class GLRenderer extends Basic2DRender
 
 	protected void render()
 	{
-		state.removeRenderData() ;
-		if( state.isStateStable() == true )
-		{
-			state.draw() ;
+		state.draw( ( int )( updateDT / drawDT ), renderIter ) ;
 
-			final Matrix4 worldProjection = matrixCache.get() ;
-			Matrix4.multiply( modelViewProjectionMatrix, worldMatrix, worldProjection ) ;
+		final Matrix4 worldProjection = matrixCache.get() ;
+		Matrix4.multiply( modelViewProjectionMatrix, worldMatrix, worldProjection ) ;
 
-			final Matrix4 uiProjection = matrixCache.get() ;
-			Matrix4.multiply( modelViewProjectionMatrix, uiMatrix, uiProjection ) ;
+		final Matrix4 uiProjection = matrixCache.get() ;
+		Matrix4.multiply( modelViewProjectionMatrix, uiMatrix, uiProjection ) ;
 
-			uploader.draw( worldProjection, uiProjection ) ;
+		uploader.draw( worldProjection, uiProjection ) ;
 
-			matrixCache.reclaim( worldProjection ) ;
-			matrixCache.reclaim( uiProjection ) ;
-		}
+		matrixCache.reclaim( worldProjection ) ;
+		matrixCache.reclaim( uiProjection ) ;
 	}
 
 	private static void constructOrhto2D( final Matrix4 _matrix, final float _left, final float _right, final float _bottom, final float _top )
@@ -532,83 +660,6 @@ public class GLRenderer extends Basic2DRender
 					 0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
 					 0.0f,        0.0f,        -2.0f * invZ, ( -( zFar + zNear ) * invZ ),
 					 0.0f,        0.0f,        0.0f,         1.0f ) ;
-	}
-
-	@Override
-	protected void createProgram( final Settings _draw )
-	{
-		final String key = _draw.getString( "PROGRAM_KEY", null ) ;
-		final String file = _draw.getString( "PROGRAM_FILE", null ) ;
-		if( key == null || file == null )
-		{
-			return ;
-		}
-
-		final GLProgram program = programs.get( key, file ) ;
-		if( GLProgramManager.buildProgram( program ) == false )
-		{
-			System.out.println( "Failed to compile program: " + program.name ) ;
-			GLProgramManager.deleteProgram( program ) ;
-		}
-	}
-
-	@Override
-	protected void createTexture( final Settings _draw )
-	{
-		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		if( position != null )
-		{
-			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
-			if( shape != null )
-			{
-				final GLRenderData data = renderCache.get() ;
-				data.set( _draw, drawTexture, DrawRequestType.TEXTURE, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
-				data.setProgram( programs.get( "SIMPLE_TEXTURE" ) ) ;
-				data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
-
-				//Logger.println( "GLRenderer - Create Texture: " + data.id, Logger.Verbosity.MINOR ) ;
-				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-				insert( data ) ;
-			}
-		}
-	}
-
-	@Override
-	protected void createGeometry( final Settings _draw )
-	{
-		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		if( position != null )
-		{
-			final Shape shape = _draw.<Shape>getObject( "SHAPE", null ) ;
-			if( shape != null )
-			{
-				final GLRenderData data = renderCache.get() ;
-				data.set( _draw, drawShape, DrawRequestType.GEOMETRY, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
-				data.setProgram( programs.get( "SIMPLE_GEOMETRY" ) ) ;
-				data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
-
-				//Logger.println( "GLRenderer - Create Lines: " + data.id, Logger.Verbosity.MINOR ) ;
-				passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-				insert( data ) ;
-			}
-		}
-	}
-
-	@Override
-	protected void createText( final Settings _draw )
-	{
-		final Vector3 position = _draw.getObject( "POSITION", null ) ;
-		if( position != null )
-		{
-			final GLRenderData data = renderCache.get() ;
-			data.set( _draw, drawText, DrawRequestType.TEXT, _draw.<DrawRequestType>getObject( "UPDATE_TYPE", DrawRequestType.CONTINUOUS ) ) ;
-			data.setProgram( programs.get( "SIMPLE_FONT" ) ) ;
-			data.setStencilProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
-
-			//Logger.println( getName() + " - Create Text: " + data.id, Logger.Verbosity.MINOR ) ;
-			passIDToCallback( data.getID(), _draw.<IDInterface>getObject( "CALLBACK", null ) ) ;
-			insert( data ) ;
-		}
 	}
 
 	public void sort() {}
@@ -633,44 +684,23 @@ public class GLRenderer extends Basic2DRender
 		return "GLRenderer" ;
 	}
 
-	private boolean loadTexture( final GLRenderData _data )
+	private boolean loadTexture( final GLDrawData _data )
 	{
-		// Back in the day, the rendering system only allowed 
-		// one texture to be rendered on a piece of geometry.
-		// To ensure we keep some form of backwards compatibility, 
-		// this path will still be available.
-		final String singleTexture = _data.data.getString( "FILE", null ) ;
-		if( singleTexture != null )
+		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
+		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
+
+		for( final MalletTexture texture : mltTextures )
 		{
-			final Texture<GLImage> texture = textures.get( singleTexture ) ;
-			if( texture == null )
+			final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
+			if( glTexture == null )
 			{
 				return false ;
 			}
 
-			_data.setTexture( texture ) ;
-			return true ;
+			glTextures.add( glTexture ) ;
 		}
 
-		final String[] multiTexture = _data.data.getObject( "FILES", null ) ;
-		if( multiTexture != null )
-		{
-			for( final String st : multiTexture )
-			{
-				final Texture<GLImage> texture = textures.get( st ) ;
-				if( texture == null )
-				{
-					_data.getTextures().clear() ;
-					return false ;
-				}
-
-				_data.addTexture( texture ) ;
-			}
-
-			return true ;
-		}
-
-		return false ;
+		return true ;
 	}
 
 	public static void handleError( final String _txt )
@@ -687,307 +717,6 @@ public class GLRenderer extends Basic2DRender
 				case GLES30.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
 				case GLES30.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
 			}
-		}
-	}
-
-	public static class GLRenderData extends RenderData
-	{
-		private static int numID = 0 ;
-
-		private final int id = getUniqueID() ;
-		private int layer ;
-		private Interpolation interpolation ;
-		private boolean uiElement ;
-		private float rotation ;
-		private int lineWidth ;
-		private int textAlignment ;
-
-		// Must be nulled when reclaimed by cache
-		// User data
-		private Vector3 position       = null ;
-		private Vector3 offset         = null ;
-		private Matrix4 positionMatrix = null ;
-		private MalletColour colour    = null ;
-		private Shape shape            = null ;
-		private Shape clipShape        = null ;
-		private String[] words         = null ;
-		
-		private Vector3 clipPosition   = null ;
-		private Vector3 clipOffset     = null ;
-		private Matrix4 clipMatrix     = null ;
-
-		// Must be nulled when reclaimed by cache
-		// Renderer data
-		private GLProgram stencilProgram ;
-		private GLProgram program ;
-		private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
-
-		public GLRenderData()
-		{
-			super() ;
-		}
-
-		@Override
-		public void set( final Settings _data, final DrawInterface _call, final DrawRequestType _type, final DrawRequestType _updateType )
-		{
-			super.set( _data, _call, _type, _updateType ) ;
-			data.addInteger( "ID", getID() ) ;
-			data.addBoolean( "UPDATE", true ) ;
-			updateData() ;
-		}
-
-		private void updateData()
-		{
-			position       = data.<Vector3>getObject( "POSITION", null ) ;
-			offset         = data.<Vector3>getObject( "OFFSET", DEFAULT_OFFSET ) ;
-			positionMatrix = ( positionMatrix == null ) ? matrixCache.get() : positionMatrix ;
-
-			layer          = data.getInteger( "LAYER", 0 ) ;
-			interpolation  = data.<Interpolation>getObject( "INTERPOLATION", Interpolation.LINEAR ) ;
-			uiElement      = data.getBoolean( "GUI", false ) ;
-			rotation       = ( float )Math.toDegrees( data.getFloat( "ROTATE", 0.0f ) ) ;
-			lineWidth      = data.getInteger( "LINEWIDTH", 2 ) ;
-			textAlignment  = data.getInteger( "ALIGNMENT", ALIGN_LEFT ) ;
-			colour         = data.<MalletColour>getObject( "COLOUR", WHITE ) ;
-			shape          = data.<Shape>getObject( "SHAPE", null ) ;
-			words          = null ;
-
-			clipShape      = data.<Shape>getObject( "CLIP_SHAPE", null ) ;
-			clipPosition   = data.<Vector3>getObject( "CLIP_POSITION", null ) ;
-			clipOffset     = data.<Vector3>getObject( "CLIP_OFFSET", null ) ;
-
-			textures.clear() ;
-			if( clipPosition != null && clipOffset != null )
-			{
-				clipMatrix = ( clipMatrix == null ) ? matrixCache.get() : clipMatrix ;
-			}
-		}
-
-		public void setStencilProgram( final GLProgram _program )
-		{
-			stencilProgram = _program ;
-		}
-
-		public void setProgram( final GLProgram _program )
-		{
-			program = _program ;
-		}
-
-		public void setTexture( final Texture<GLImage> _texture )
-		{
-			textures.clear() ;
-			if( _texture != null )
-			{
-				textures.add( _texture ) ;
-			}
-		}
-
-		public void addTexture( final Texture<GLImage> _texture )
-		{
-			textures.add( _texture ) ;
-		}
-
-		public void setShape( final Shape _shape )
-		{
-			shape = _shape ;
-		}
-
-		public void setWords( final String[] _words )
-		{
-			words = _words ;
-		}
-
-		public int getID()
-		{
-			return id ;
-		}
-
-		public Matrix4 getPositionMatrix()
-		{
-			return positionMatrix ;
-		}
-
-		public Vector3 getPosition()
-		{
-			return position ;
-		}
-
-		public int getLayer()
-		{
-			return layer ;
-		}
-
-		public Interpolation getInterpolation()
-		{
-			return interpolation ;
-		}
-
-		public boolean isUI()
-		{
-			return uiElement ;
-		}
-
-		public float getRotation()
-		{
-			return rotation ;
-		}
-
-		public Vector3 getOffset()
-		{
-			return offset ;
-		}
-
-		public Shape getShape()
-		{
-			return shape ;
-		}
-
-		public Shape getClipShape()
-		{
-			return clipShape ;
-		}
-
-		public MalletColour getColour()
-		{
-			return colour ;
-		}
-
-		public GLProgram getStencilProgram()
-		{
-			return stencilProgram ;
-		}
-
-		public GLProgram getProgram()
-		{
-			return program ;
-		}
-
-		public ArrayList<Texture<GLImage>> getTextures()
-		{
-			return textures ;
-		}
-
-		public int getLineWidth()
-		{
-			return lineWidth ;
-		}
-
-		public String[] getWords()
-		{
-			return words ;
-		}
-
-		public Vector3 getClipPosition()
-		{
-			return clipPosition ;
-		}
-
-		public Vector3 getClipOffset()
-		{
-			return clipOffset ;
-		}
-
-		public Matrix4 getClipMatrix()
-		{
-			return clipMatrix ;
-		}
-
-		public boolean toUpdate()
-		{
-			final boolean update = data.getBoolean( "UPDATE", false ) ;
-			if( update == true )
-			{
-				data.addBoolean( "UPDATE", false ) ;
-				updateData() ;
-			}
-
-			return update ;
-		}
-
-		public int getTextAlignment()
-		{
-			return textAlignment ;
-		}
-
-		public String getText()
-		{
-			return data.getString( "TEXT", null ) ;
-		}
-
-		public MalletFont getFont()
-		{
-			return data.<MalletFont>getObject( "FONT", null ) ;
-		}
-
-		public void copy( final RenderData _data )
-		{
-			data = _data.data ;
-			call = _data.call ;
-			type = _data.type ;
-			updateType = _data.updateType ;
-		}
-
-		public int sortValue()
-		{
-			return getLayer() ;
-		}
-
-		@Override
-		public void removeResources()
-		{
-			uploader.remove( this ) ;
-			data.remove( "ID" ) ;
-			for( final Texture<GLImage> tex : textures )
-			{
-				tex.unregister() ;
-			}
-
-			if( program != null )
-			{
-				program.unregister() ;
-			}
-
-			if( stencilProgram != null )
-			{
-				stencilProgram.unregister() ;
-			}
-
-			renderCache.reclaim( this ) ;
-		}
-
-		@Override
-		public void reset()
-		{
-			if( positionMatrix != null )
-			{
-				matrixCache.reclaim( positionMatrix ) ;
-				positionMatrix = null ;
-			}
-
-			position = null ;
-			offset = null ;
-			colour = null ;
-			shape = null ;
-			clipShape = null ;
-			clipPosition = null ;
-			clipOffset = null ;
-
-			if( clipMatrix != null )
-			{
-				matrixCache.reclaim( clipMatrix ) ;
-				clipMatrix = null ;
-			}
-
-			words = null ;
-			program = null ;
-			stencilProgram = null ;
-			textures.clear() ;
-			super.reset() ;
-		}
-
-		private static int getUniqueID()
-		{
-			return numID++ ;
 		}
 	}
 }

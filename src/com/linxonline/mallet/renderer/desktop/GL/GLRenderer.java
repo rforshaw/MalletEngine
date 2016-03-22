@@ -85,7 +85,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		uploader.shutdown() ;
 		programs.shutdown() ;
-		textures.shutdown() ;
+		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
 	}
 
@@ -444,7 +444,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 				uploader.upload( gl, _data ) ;
 			}
-			
+
 			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector3 _position, final int _lineWidth )
 			{
 				int length = 0 ;

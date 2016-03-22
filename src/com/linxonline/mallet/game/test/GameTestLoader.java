@@ -11,9 +11,6 @@ import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.animation.AnimationAssist ;
 import com.linxonline.mallet.animation.Anim ;
 
-import com.linxonline.mallet.renderer.DrawFactory ;
-import com.linxonline.mallet.renderer.TextFactory ;
-import com.linxonline.mallet.renderer.GeometryFactory ;
 import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;

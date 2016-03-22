@@ -10,8 +10,10 @@ import android.opengl.GLSurfaceView ;
 import javax.microedition.khronos.opengles.GL10 ;
 import javax.microedition.khronos.egl.EGLConfig ;
 
-import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.EventType ;
+import com.linxonline.mallet.event.Event ;
+
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
@@ -122,6 +124,12 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
+	public EventController getEventController()
+	{
+		return render.getEventController() ;
+	}
+	
+	@Override
 	public void processEvent( final Event _event )
 	{
 		render.processEvent( _event ) ;
@@ -138,7 +146,7 @@ public class GL2DRenderer implements RenderInterface,
 	{
 		render.reset() ;
 	}
-	
+
 	@Override
 	public String getName()
 	{
@@ -161,5 +169,11 @@ public class GL2DRenderer implements RenderInterface,
 	public void clear()
 	{
 		render.clear() ;
+	}
+	
+	@Override
+	public void clean()
+	{
+		render.clean() ;
 	}
 }

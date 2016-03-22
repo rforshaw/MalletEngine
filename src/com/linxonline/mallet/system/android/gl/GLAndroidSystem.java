@@ -51,7 +51,7 @@ public class GLAndroidSystem extends BasicSystem
 		final AndroidInputSystem input = ( AndroidInputSystem )inputSystem ;
 		final GL2DRenderer render = ( GL2DRenderer )renderer ;
 
-		input.inputAdapter = render.render.renderInfo ;
+		input.inputAdapter = render.render.getRenderInfo() ;
 		activity.addAndroidInputListener( input ) ;
 
 		audioGenerator.startGenerator() ;

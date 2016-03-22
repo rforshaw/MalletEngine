@@ -43,7 +43,7 @@ public class GLGeometryUploader
 	private final ShortBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final HashMap<GLRenderer.GLRenderData, GLBuffer> lookup = new HashMap<GLRenderer.GLRenderData, GLBuffer>() ;
+	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;
 	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
 	private final Vector3 temp = new Vector3() ;
 
@@ -76,7 +76,7 @@ public class GLGeometryUploader
 	/**
 		Upload geometry and have it prepared for drawing.
 	*/
-	public void upload( final GLRenderer.GLRenderData _data )
+	public void upload( final GLDrawData _data )
 	{
 		GLBuffer buffer = lookup.get( _data ) ;
 		if( buffer != null )
@@ -103,7 +103,7 @@ public class GLGeometryUploader
 		Find the GLBuffer/GLGeometry that the GLRenderData resides in.
 		Remove it from the buffers, and pack the index buffer.
 	*/
-	public void remove( final GLRenderer.GLRenderData _data )
+	public void remove( final GLDrawData _data )
 	{
 		final GLBuffer buffer = lookup.remove( _data ) ;
 		if( buffer != null )
@@ -250,7 +250,7 @@ public class GLGeometryUploader
 		of the datat passed in.
 		If a GLBuffer doesn't exist create one.
 	*/
-	private GLBuffer getSupportedBuffer( final GLRenderer.GLRenderData _data )
+	private GLBuffer getSupportedBuffer( final GLDrawData _data )
 	{
 		for( final GLBuffer buffer : buffers )
 		{
@@ -387,14 +387,14 @@ public class GLGeometryUploader
 
 		private Location stencilLocation = null ;
 
-		private final HashMap<GLRenderer.GLRenderData, Location> locations = new HashMap<GLRenderer.GLRenderData, Location>() ;
+		private final HashMap<GLDrawData, Location> locations = new HashMap<GLDrawData, Location>() ;
 		private final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
 
-		public GLBuffer( final GLRenderer.GLRenderData _data,
+		public GLBuffer( final GLDrawData _data,
 						 final int _indexLengthBytes,
 						 final int _vertexLengthBytes )
 		{
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
@@ -404,10 +404,10 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
-			layer                          = _data.getLayer() ;
-			program                        = _data.getProgram() ;
-			ui                             = _data.isUI() ;
-			isText                         = _data.type == DrawRequestType.TEXT ;
+			layer   = _data.getOrder() ;
+			program = _data.getDrawProgram() ;
+			ui      = _data.isUI() ;
+			isText  = _data.getText() != null ;
 
 			setupTextures( _data ) ;
 
@@ -473,7 +473,7 @@ public class GLGeometryUploader
 			GLES30.glEnable( GLES30.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;
 		}
 
-		public void upload( final GLRenderer.GLRenderData _data )
+		public void upload( final GLDrawData _data )
 		{
 			if( isText == true )
 			{
@@ -487,7 +487,7 @@ public class GLGeometryUploader
 			}
 		}
 
-		public void remove( final GLRenderer.GLRenderData _data )
+		public void remove( final GLDrawData _data )
 		{
 			final Location location = locations.remove( _data ) ;
 			if( location != null )
@@ -509,9 +509,9 @@ public class GLGeometryUploader
 			They will use layer, texture, shape swivel and style
 			to determine if the buffer can support the data.
 		*/
-		public boolean isSupported( final GLRenderer.GLRenderData _data )
+		public boolean isSupported( final GLDrawData _data )
 		{
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 			if( shapeStyle != shape.getStyle() )
 			{
 				return false ;
@@ -524,28 +524,30 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-			else if( program != _data.getProgram() )
+			else if( program != _data.getDrawProgram() )
 			{
 				return false ;
 			}
-			else if( isText != ( _data.type == DrawRequestType.TEXT ) )
+			else if( isText != ( _data.getText() != null ) )
 			{
 				return false ;
 			}
 
-			final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
-			if( textureID.length == textures.size() )
+			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
+			if( textureID.length != textures.size() )
 			{
-				for( int i = 0; i < textureID.length; i++ )
+				return false ;
+			}
+
+			for( int i = 0; i < textureID.length; i++ )
+			{
+				if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
 				{
-					if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
-					{
-						return false ;
-					}
+					return false ;
 				}
 			}
 
-			if( layer != _data.getLayer() )
+			if( layer != _data.getOrder() )
 			{
 				return false ;
 			}
@@ -601,26 +603,26 @@ public class GLGeometryUploader
 			// continue rendering scene...
 		}
 
-		private void uploadGeometry( final Location _location, final GLRenderer.GLRenderData _data )
+		private void uploadGeometry( final Location _location, final GLDrawData _data )
 		{
 			final GLGeometry geometry = _location.getGeometry() ;
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 
 			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
 			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
 			GLGeometryUploader.this.uploadIndex( _location, shape ) ;
-			GLGeometryUploader.this.uploadVBO( _location, shape, _data.getPositionMatrix() ) ;
+			GLGeometryUploader.this.uploadVBO( _location, shape, _data.getDrawMatrix() ) ;
 		}
 
-		private void uploadText( final Location _location, final GLRenderer.GLRenderData _data )
+		private void uploadText( final Location _location, final GLDrawData _data )
 		{
-			final Matrix4 positionMatrix = _data.getPositionMatrix() ;
+			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 
 			final MalletFont font = _data.getFont() ;
 			final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 			final int vertexSize = calculateVertexSize( swivel ) ;
 			final int verticiesSize = shape.getVertexSize() ;
@@ -728,7 +730,7 @@ public class GLGeometryUploader
 			}
 		}
 
-		private Location findLocationGeometry( final GLRenderer.GLRenderData _data )
+		private Location findLocationGeometry( final GLDrawData _data )
 		{
 			// If _data has already been added we return the location 
 			// in which it resides.
@@ -742,7 +744,7 @@ public class GLGeometryUploader
 
 			// If it hasn't been added find a space for it within 
 			// an existing geometry buffer.
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 			for( final GLGeometry geometry : buffers )
 			{
 				final Location location = geometry.findLocationGeometry( shape ) ;
@@ -767,7 +769,7 @@ public class GLGeometryUploader
 			return findLocationGeometry( _data ) ;
 		}
 
-		private Location findLocationText( final GLRenderer.GLRenderData _data )
+		private Location findLocationText( final GLDrawData _data )
 		{
 			// If _data has already been added we return the location 
 			// in which it resides.
@@ -795,7 +797,7 @@ public class GLGeometryUploader
 			// If no space exists create a new geometry buffer 
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
-			final Shape shape = _data.getShape() ;
+			final Shape shape = _data.getDrawShape() ;
 			final String text = _data.getText() ;
 			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * text.length() ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
@@ -810,7 +812,7 @@ public class GLGeometryUploader
 		/**
 			A buffer can support one stencil.
 		*/
-		private void setupStencil( final GLRenderer.GLRenderData _data )
+		private void setupStencil( final GLDrawData _data )
 		{
 			stencilShape = _data.getClipShape() ;
 			if( stencilShape != null )
@@ -824,14 +826,14 @@ public class GLGeometryUploader
 
 				final GLGeometry geometry = new GLGeometry( GLES30.GL_TRIANGLES, indexBytes, vertexBytes, vertexStrideBytes ) ;
 				stencilLocation = geometry.findLocationGeometry( stencilShape ) ;
-				stencilProgram = _data.getStencilProgram() ;
+				stencilProgram = _data.getClipProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
 			}
 		}
 
-		private void setupTextures( final GLRenderer.GLRenderData _data )
+		private void setupTextures( final GLDrawData _data )
 		{
-			final ArrayList<Texture<GLImage>> textures = _data.getTextures() ;
+			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
 			final int size = textures.size() ;
 			if( textures.isEmpty() == true )
 			{
@@ -848,10 +850,7 @@ public class GLGeometryUploader
 
 		private void expand( final int _indexLengthBytes, final int _vertexLengthBytes )
 		{
-			buffers.add( new GLGeometry( style,
-										 _indexLengthBytes,
-										 _vertexLengthBytes,
-										 vertexStrideBytes ) ) ;
+			buffers.add( new GLGeometry( style, _indexLengthBytes, _vertexLengthBytes, vertexStrideBytes ) ) ;
 		}
 
 		/**
@@ -958,7 +957,7 @@ public class GLGeometryUploader
 			return findLocation( _shape.getIndexSize(), _shape.getVertexSize() ) ;
 		}
 
-		private Location findLocationText( final GLRenderer.GLRenderData _data )
+		private Location findLocationText( final GLDrawData _data )
 		{
 			final String text = _data.getText() ;
 			return findLocation( ( 6 * text.length() ), ( 4 * text.length() ) ) ;
@@ -1206,7 +1205,7 @@ public class GLGeometryUploader
 
 	public static class Location implements Cacheable
 	{
-		private GLRenderer.GLRenderData data ;
+		private GLDrawData data ;
 		private GLGeometry geometry = null ;
 		
 		private Range index = new Range() ;
@@ -1230,7 +1229,7 @@ public class GLGeometryUploader
 			vertex.set( _vertexStart, _vertexLength ) ;
 		}
 
-		public void setData( final GLRenderer.GLRenderData _data )
+		public void setData( final GLDrawData _data )
 		{
 			data = _data ;
 		}
@@ -1272,7 +1271,7 @@ public class GLGeometryUploader
 			setData( null ) ;
 		}
 
-		public GLRenderer.GLRenderData getData()
+		public GLDrawData getData()
 		{
 			return data ;
 		}

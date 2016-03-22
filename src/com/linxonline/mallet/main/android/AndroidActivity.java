@@ -23,7 +23,6 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.event.* ;
 
-import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.MalletFont ;
 
 import com.linxonline.mallet.game.android.* ;
