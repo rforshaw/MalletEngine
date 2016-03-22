@@ -457,9 +457,12 @@ public class GLRenderer extends BasicRenderer
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm == null )
+				if( fm.fontMap.texture == null )
 				{
-					return ;
+					// If the font maps texture has yet to be set,
+					// generate the texture and bind it with the 
+					// current OpenGL context
+					fontManager.generateFontGeometry( font ) ;
 				}
 
 				final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
