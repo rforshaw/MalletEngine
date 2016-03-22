@@ -46,32 +46,28 @@ public class GLDrawData extends DrawData
 	@Override
 	public void setFont( final MalletFont _font )
 	{
-		for( final Texture<GLImage> texture : textures )
-		{
-			texture.unregister() ;
-		}
-		textures.clear() ;
+		clearTextures() ;
 		super.setFont( _font ) ;
 	}
 
 	public void addTexture( final MalletTexture _texture )
 	{
-		for( final Texture<GLImage> texture : textures )
-		{
-			texture.unregister() ;
-		}
-		textures.clear() ;
 		super.addTexture( _texture ) ;
 	}
 
 	public void removeTexture( final MalletTexture _texture )
+	{
+		super.removeTexture( _texture ) ;
+	}
+
+	public void clearTextures()
 	{
 		for( final Texture<GLImage> texture : textures )
 		{
 			texture.unregister() ;
 		}
 		textures.clear() ;
-		super.removeTexture( _texture ) ;
+		getMalletTextures().clear() ;
 	}
 
 	public void setText( final String _text )

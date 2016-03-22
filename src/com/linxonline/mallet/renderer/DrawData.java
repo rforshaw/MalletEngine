@@ -143,6 +143,21 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		scale = _scale ;
 	}
 
+	public void setPosition( final float _x, final float _y, final float _z )
+	{
+		position.setXYZ( _x, _y, _z ) ;
+	}
+
+	public void setRotation( final float _x, final float _y, final float _z )
+	{
+		rotation.setXYZ( _x, _y, _z ) ;
+	}
+
+	public void setScale( final float _x, final float _y, final float _z )
+	{
+		scale.setXYZ( _x, _y, _z ) ;
+	}
+
 	public void setUpdateType( final UpdateType _type )
 	{
 		updateType = ( _type == null ) ? UpdateType.ON_DEMAND : _type ;

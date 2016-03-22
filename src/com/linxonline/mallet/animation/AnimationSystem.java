@@ -5,6 +5,8 @@ import java.util.HashMap ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventType ;
+import com.linxonline.mallet.event.EventProcessor ;
+import com.linxonline.mallet.event.EventController ;
 
 import com.linxonline.mallet.event.AddEventInterface ;
 import com.linxonline.mallet.util.SystemRoot ;
@@ -21,171 +23,160 @@ import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
-public class AnimationSystem extends SystemRoot<Animation>
+public class AnimationSystem
 {
-	private final ArrayList<Draw> toAddDraw = new ArrayList<Draw>() ;
-	private final ArrayList<Draw> toRemoveDraw = new ArrayList<Draw>() ;
+	private final ArrayList<AnimData> toAddAnim    = new ArrayList<AnimData>() ;
+	private final ArrayList<AnimData> toRemoveAnim = new ArrayList<AnimData>() ;
+	private final ArrayList<AnimData> animations   = new ArrayList<AnimData>() ;
 
-	private final ObjectCache<Animation> animationCache = new ObjectCache<Animation>( Animation.class ) ; 
 	private final SpriteManager spriteManager = new SpriteManager() ;
 
-	protected int numID = 0 ;
+	private final EventController controller = new EventController() ;
 	protected DrawDelegate drawDelegate = null ;
 
-	public AnimationSystem( final AddEventInterface _eventSystem )
+	public AnimationSystem()
 	{
-		assert _eventSystem != null ;
-		eventSystem = _eventSystem ;
+		controller.addEventProcessor( new EventProcessor<AnimationDelegateCallback>( "ANIMATION_DELEGATE", "ANIMATION_DELEGATE" )
+		{
+			public void processEvent( final Event<AnimationDelegateCallback> _event )
+			{
+				final AnimationDelegateCallback callback = _event.getVariable() ;
+				callback.callback( constructAnimationDelegate() ) ;
+			}
+		} ) ;
+
+		/**
+			Animation System requires a handle to the Rendering System.
+			It determines when an Animation is displayed or not.
+		*/
+		controller.passEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		{
+			public void callback( DrawDelegate _delegate )
+			{
+				drawDelegate = _delegate ;
+			}
+		} ) ) ;
 	}
 
-	@Override
 	public void update( final float _dt )
 	{
+		controller.update() ;
 		if( drawDelegate != null )
 		{
-			if( toAddDraw.isEmpty() == false )
+			if( toAddAnim.isEmpty() == false )
 			{
-				for( final Draw draw : toAddDraw )
+				for( final AnimData anim : toAddAnim )
 				{
-					drawDelegate.addBasicDraw( draw ) ;
+					final Sprite sprite = ( Sprite )spriteManager.get( anim.getFile() ) ;
+					if( sprite != null )
+					{
+						anim.setSprite( sprite ) ;
+						animations.add( anim ) ;
+						drawDelegate.addBasicDraw( anim.getDraw() ) ;
+						anim.play() ;
+					}
 				}
-				toAddDraw.clear() ;
+				toAddAnim.clear() ;
 			}
 
-			if( toRemoveDraw.isEmpty() == false )
+			if( toRemoveAnim.isEmpty() == false )
 			{
-				for( final Draw draw : toRemoveDraw )
+				for( final AnimData anim : toRemoveAnim )
 				{
-					drawDelegate.removeDraw( draw ) ;
+					animations.remove( anim ) ;
+					drawDelegate.removeDraw( anim.getDraw() ) ;
+					anim.getSprite().unregister() ;
+					anim.setSprite( null ) ;
 				}
-				toRemoveDraw.clear() ;
+				toRemoveAnim.clear() ;
 			}
 		}
-		super.update( _dt ) ;
-	}
 
-	@Override
-	protected void updateSource( final Animation _source, final float _dt )
-	{
-		_source.update( _dt ) ;
-	}
-
-	/**
-		Unregister any resources this Animation may have used.
-	*/
-	@Override
-	protected void destroySource( final Animation _source )
-	{
-		_source.destroy() ;
-		animationCache.reclaim( _source ) ;						// Return the animation object back to the cache
-		drawDelegate.removeDraw( _source.draw ) ;
-	}
-
-	@Override
-	protected void useEvent( final Event<?> _event )
-	{
-		final Settings anim = ( Settings )_event.getVariable() ;
-		final AnimRequestType type = anim.getObject( "REQUEST_TYPE", null ) ;
-
-		switch( type )
+		final int size = animations.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			case CREATE_ANIMATION :
-			{
-				createAnimation( anim ) ;
-				break ;
-			}
-			case MODIFY_EXISTING_ANIMATION :
-			{
-				final Animation animation = getSource( anim.getInteger( "ID", -1 ) ) ;
-				if( animation != null )
-				{
-					modifyAnimation( anim, animation ) ;
-				}
-				break ;
-			}
-			case REMOVE_ANIMATION :
-			{
-				final int id = anim.getInteger( "ID", -1 ) ;
-				//Logger.println( "AnimationSystem - Remove Anim Request: " + id, Logger.Verbosity.MINOR ) ;
-				final Animation animation = getSource( id ) ;
-				if( animation != null )
-				{
-					//Logger.println( "AnimationSystem - Remove Anim: " + id, Logger.Verbosity.MINOR ) ;
-					toRemoveDraw.add( animation.draw ) ;
-					removeSources.add( new RemoveSource( id, animation ) ) ;
-				}
-				break ;
-			}
-			case GARBAGE_COLLECT_ANIMATION : spriteManager.clean() ; break ;
+			animations.get( i ).update( _dt ) ;
 		}
 	}
 
-	protected void createAnimation( final Settings _anim )
+	public EventController getEventController()
 	{
-		final String file = _anim.getString( "ANIM_FILE", null ) ;
-		if( file != null )
-		{
-			final Draw draw = _anim.getObject( "RENDER_EVENT", null ) ;
-			final Animation anim = animationCache.get() ;			// Get an Animation object from the cache
-			if( anim != null )
-			{
-				//Logger.println( "AnimationSystem - Create Anim: " + anim.id, Logger.Verbosity.MINOR ) ;
-				toAddDraw.add( draw ) ;
-				anim.setAnimation( numID++, draw, ( Sprite )spriteManager.get( file ) ) ;
-				addCallbackToAnimation( anim, _anim ) ;
-				storeSource( anim, anim.id ) ;
-				anim.play() ;						// Assumed that animation will want to be played immediately.
-			}
-		}
+		return controller ;
 	}
 
-	protected void modifyAnimation( final Settings _settings, final Animation _animation )
+	public void clear()
 	{
-		final int type = _settings.getInteger( "MODIFY_ANIMATION", -1 ) ;
-		switch( type )
+		toAddAnim.clear() ;			// Never added not hooked in
+		toRemoveAnim.clear() ;		// Will be removed from animations anyway
+
+		for( final AnimData anim : animations )
 		{
-			case ModifyAnimation.PLAY  : _animation.play() ;  break ;
-			case ModifyAnimation.STOP  : _animation.stop() ;  break ;
-			case ModifyAnimation.PAUSE : _animation.pause() ; break ;
+			animations.remove( anim ) ;
+			drawDelegate.removeDraw( anim.getDraw() ) ;
+			anim.getSprite().unregister() ;
+			anim.setSprite( null ) ;
 		}
+		animations.clear() ;
 	}
 
-	/**
-		Pass the ActiveSound ID to the IDInterface provided.
-		Currently called when ActiveSound is created
-	**/
-	protected void addCallbackToAnimation( final Animation _animation, final Settings _anim )
-	{
-		final SourceCallback callback = _anim.getObject( "CALLBACK", null ) ;
-		if( callback != null )
-		{
-			_animation.addCallback( callback ) ;
-		}
-	}
-
-	@Override
 	public String getName()
 	{
 		return "Animation System" ;
 	}
 
-	@Override
-	public ArrayList<EventType> getWantedEventTypes()
+	protected void removeAnimData( final ArrayList<AnimData> _data )
 	{
-		final ArrayList<EventType> types = new ArrayList<EventType>() ;
-		types.add( EventType.get( "ANIMATION" ) ) ;
-		return types ;
+		for( final AnimData anim : _data )
+		{
+			animations.remove( anim ) ;
+			drawDelegate.removeDraw( anim.getDraw() ) ;
+			anim.getSprite().unregister() ;
+			anim.setSprite( null ) ;
+		}
+		_data.clear() ;
 	}
 
-	public void requestDrawDelegate()
+	protected AnimationDelegate constructAnimationDelegate()
 	{
-		eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		return new AnimationDelegate()
 		{
-			public void callback( DrawDelegate _delegate )
+			private final ArrayList<AnimData> data = new ArrayList<AnimData>() ;
+
+			@Override
+			public void addAnimation( final Anim _animation )
 			{
-				System.out.println( "Recieved Draw Delegate" ) ;
-				drawDelegate = _delegate ;
+				if( _animation != null && _animation instanceof AnimData )
+				{
+					if( data.contains( _animation ) == false )
+					{
+						data.add( ( AnimData )_animation ) ;
+						toAddAnim.add( ( AnimData )_animation ) ;
+					}
+				}
 			}
-		} ) ) ;
+
+			@Override
+			public void removeAnimation( final Anim _animation )
+			{
+				if( _animation != null && _animation instanceof AnimData )
+				{
+					data.remove( ( AnimData )_animation ) ;
+					toRemoveAnim.add( ( AnimData )_animation ) ;
+				}
+			}
+
+			@Override
+			public void start() {}
+
+			@Override
+			public void shutdown()
+			{
+				for( final AnimData anim : data  )
+				{
+					toRemoveAnim.add( anim ) ;
+				}
+				data.clear() ;
+			}
+		} ;
 	}
 }

@@ -1,11 +1,17 @@
 package com.linxonline.mallet.util.factory.creators ;
 
-import com.linxonline.mallet.animation.AnimationFactory ;
+import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.factory.* ;
+
+import com.linxonline.mallet.system.GlobalConfig ;
+
+import com.linxonline.mallet.animation.AnimationAssist ;
+import com.linxonline.mallet.animation.Anim ;
+
+import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.UpdateType ;
-import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.system.GlobalConfig ;
-import com.linxonline.mallet.util.factory.* ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.* ;
 
@@ -32,13 +38,17 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 		EventComponent event = new EventComponent() ;
 		MouseComponent mouse = new MouseComponent() ;
 
-		final Event<Settings> animation = AnimationFactory.createAnimation( _mouse.getString( "ANIM", null ),
-																			entity.position,
-																			_mouse.<Vector3>getObject( "OFFSET", null ),
-																			_mouse.<Vector2>getObject( "DIM", null ),
-																			_mouse.getInteger( "LAYER", 100 ), anim ) ;
-		AnimationFactory.amendInterpolation( animation, Interpolation.NONE ) ;
-		AnimationFactory.amendUpdateType( animation, UpdateType.CONTINUOUS ) ;
+		final Anim animation = AnimationAssist.createAnimation( _mouse.getString( "ANIM", null ),
+																entity.position,
+																_mouse.<Vector3>getObject( "OFFSET", null ),
+																new Vector3(),
+																new Vector3( 1, 1, 1 ),
+																_mouse.getInteger( "LAYER", 100 ) ) ;
+
+		final Vector2 dim = _mouse.<Vector2>getObject( "DIM", null ) ;
+		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), Shape.constructPlane( new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.NONE ) ;
+		DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.CONTINUOUS ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
 		anim.setDefaultAnim( "DEFAULT" ) ;

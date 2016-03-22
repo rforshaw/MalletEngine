@@ -113,6 +113,18 @@ public class GLGeometryUploader
 	}
 
 	/**
+		Destroy all buffers allocated in OpenGL.
+	*/
+	public void shutdown()
+	{
+		for( final GLBuffer buffer : buffers )
+		{
+			buffer.destroy() ;
+		}
+		buffers.clear() ;
+	}
+
+	/**
 		Remove any GLBuffers that do not contain any geometry.
 	*/
 	public void clean()
@@ -522,14 +534,16 @@ public class GLGeometryUploader
 			}
 
 			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-			if( textureID.length == textures.size() )
+			if( textureID.length != textures.size() )
 			{
-				for( int i = 0; i < textureID.length; i++ )
+				return false ;
+			}
+
+			for( int i = 0; i < textureID.length; i++ )
+			{
+				if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
 				{
-					if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
-					{
-						return false ;
-					}
+					return false ;
 				}
 			}
 

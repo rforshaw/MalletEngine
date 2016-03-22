@@ -8,6 +8,9 @@ import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
+import com.linxonline.mallet.animation.AnimationAssist ;
+import com.linxonline.mallet.animation.Anim ;
+
 import com.linxonline.mallet.renderer.DrawFactory ;
 import com.linxonline.mallet.renderer.TextFactory ;
 import com.linxonline.mallet.renderer.GeometryFactory ;
@@ -17,7 +20,6 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.animation.AnimationFactory ;
 import com.linxonline.mallet.audio.AudioFactory ;
 
 import com.linxonline.mallet.util.sort.* ;
@@ -73,7 +75,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -178,13 +180,16 @@ public final class GameTestLoader extends GameLoader
 			public void renderAnimationExample()
 			{
 				final AnimComponent anim = new AnimComponent() ;
-				anim.addAnimation( "DEFAULT", AnimationFactory.createAnimation( "base/anim/moomba.anim",
+				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector3( -32, -32, 0 ),
-																		 new Vector2( 64, 64 ),
-																		 10,
-																		 anim ) ) ;
+																		 new Vector3(),
+																		 new Vector3( 1, 1, 1 ),
+																		 10 ) ;
 
+				DrawAssist.amendShape( AnimationAssist.getDraw( moombaAnim ), Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+
+				anim.addAnimation( "DEFAULT", moombaAnim ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
 
 				final Entity entity = new Entity( "Test Animation" ) ;

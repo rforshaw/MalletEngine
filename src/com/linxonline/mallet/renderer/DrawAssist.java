@@ -5,18 +5,40 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.event.Event ;
 
+/**
+	DrawAssist provides a set of functions to modify a Draw object
+	in the rendering-system in an agnostic way.
+
+	These functions will call into the active renderer which knows 
+	how its implementation of the Draw object is formed.
+
+	Allowing Draw data to be optimised for the active renderer.
+	DrawAssist calls should be thread-safe.
+*/
 public class DrawAssist
 {
 	private static Assist assist ;
 
 	private DrawAssist() {}
 
+	/**
+		Called by current active Renderer.
+		If swapping renderers all previous Draw objects will be invalid.
+	*/
 	public static void setAssist( final DrawAssist.Assist _assist )
 	{
 		assist = _assist ;
 	}
 
-	public static Event<DrawDelegateCallback> constructDrawDelegate( DrawDelegateCallback _callback )
+	/**
+		Request a DrawDelegate from the active rendering system.
+		The DrawDelegate allows the user to add/remove Draw objects
+		from being rendered.
+
+		A DrawDelegate is not required for constructing a Draw object, 
+		but is required for displaying it.
+	*/
+	public static Event<DrawDelegateCallback> constructDrawDelegate( final DrawDelegateCallback _callback )
 	{
 		return new Event<DrawDelegateCallback>( "DRAW_DELEGATE", _callback ) ;
 	}
@@ -136,6 +158,10 @@ public class DrawAssist
 		return assist.isUI( _draw ) ;
 	}
 
+	/**
+		Create a Text Draw object.
+		Handles the nuances of text rendering and ensures a performant display.
+	*/
 	public static Draw createTextDraw( final String _text,
 										final MalletFont _font,
 										final Vector3 _position,
@@ -147,15 +173,23 @@ public class DrawAssist
 		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
 	}
 
+	/**
+		Create a basic Draw object.
+		Can be used for almost anything, except rendering text.
+	*/
 	public static Draw createDraw( final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale,
+									final int _order )
 	{
 		return assist.createDraw( _position, _offset, _rotation, _scale, _order ) ;
 	}
 
+	/**
+		Required to be implemented by the active renderer for 
+		DrawAssist to be used.
+	*/
 	public interface Assist
 	{
 		public Draw amendShape( final Draw _draw, final Shape _shape ) ;

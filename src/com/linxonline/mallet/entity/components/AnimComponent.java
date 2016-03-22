@@ -5,7 +5,10 @@ import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.animation.AnimationFactory ;
+import com.linxonline.mallet.animation.AnimationDelegateCallback ;
+import com.linxonline.mallet.animation.AnimationDelegate ;
+import com.linxonline.mallet.animation.AnimationAssist ;
+import com.linxonline.mallet.animation.Anim ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.event.Event ;
 
@@ -13,18 +16,13 @@ public class AnimComponent extends EventComponent implements SourceCallback
 {
 	private static final int ANIM_NOT_SET = -1 ;
 
-	private final HashMap<String, Event<Settings>> animations = new HashMap<String, Event<Settings>>() ;
-	private Component.ReadyCallback toDestroy = null ;
+	private final HashMap<String, Anim> animations = new HashMap<String, Anim>() ;
 
 	private String defaultAnim = null ;					// Name of the default animation, used as a fallback if all else fails.
-	private String currentAnim = null ;					// Name of the current animation that is playing
-	private String toPlayAnim = null ;					// The Animation to be played, once the previous Anim ID is recieved.
-	
-	private SourceCallback callback = null ;			// Allow an external source to track the running animation
-	private SourceCallback toCallback = null ;
+	private Anim currentAnim   = null ;					// Name of the current animation that is playing
 
-	private boolean waitForID = false ;					// true = waiting for animation ID, false = not waiting for ID
-	private int animationID = -1 ;						// Denotes the id of the current running animation.
+	private AnimationDelegate delegate = null ;
+	private SourceCallback callback    = null ;
 
 	public AnimComponent()
 	{
@@ -36,8 +34,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		super( _name ) ;
 	}
 
-	public void addAnimation( final String _name, final Event<Settings> _anim )
+	public void addAnimation( final String _name, final Anim _anim )
 	{
+		AnimationAssist.addCallback( _anim, this ) ;
 		animations.put( _name, _anim ) ;
 	}
 
@@ -46,7 +45,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		animations.remove( _name ) ;
 	}
 
-	public Event<Settings> getAnimation( final String _name )
+	public Anim getAnimation( final String _name )
 	{
 		return animations.get( _name ) ;
 	}
@@ -56,6 +55,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		defaultAnim = _name ;
 	}
 
+	@Override
+	public void recieveID( final int _id ) {}
+
 	/**
 		We need to make sure we aren't waiting for any 
 		animation ID's before we allow the parent to destroy 
@@ -64,7 +66,8 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
-		toDestroy = _callback ;
+		delegate.shutdown() ;
+		super.readyToDestroy( _callback ) ;
 	}
 
 	@Override
@@ -74,47 +77,16 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		{
 			callback.tick( _dt ) ;
 		}
-
-		if( toDestroy != null && waitForID == false )
-		{
-			toDestroy.ready( this ) ;
-			toDestroy = null ;
-		}
 	}
 
 	@Override
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
-		if( toDestroy != null && waitForID == false )
-		{
-			// Ensure that the component is not waiting 
-			// for an ID from the Animation System.
-			// Before we allow the parent to be destroyed.
-			toDestroy.ready( this ) ;
-		}
 	}
 	
 	public void playAnimation( final String _name, final SourceCallback _callback )
 	{
-		if( toDestroy != null )
-		{
-			// Prevent any more animations being run 
-			// if the parent is being destroyed.
-			//System.out.println( "To Destroy" ) ;
-			return ;
-		}
-
-		if( waitForID == true )
-		{
-			// Currently waiting for the ID of the previous
-			// animation. Store the Animation name and wait till 
-			// we get the ID, before playing the new Animation.
-			//System.out.println( "Waiting For ID" ) ;
-			toCallback = _callback ;
-			return ;
-		}
-
 		playAnimation( _name ) ;
 		callback = _callback ;
 	}
@@ -126,31 +98,12 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	**/
 	public void playAnimation( final String _name )
 	{
-		if( toDestroy != null )
+		stopAnimation() ;
+		final Anim anim = animations.get( _name ) ;
+		if( delegate != null && anim != null )
 		{
-			// Prevent any more animations being run 
-			// if the parent is being destroyed.
-			//System.out.println( "To Destroy" ) ;
-			return ;
-		}
-
-		if( waitForID == true )
-		{
-			// Currently waiting for the ID of the previous
-			// animation. Store the Animation name and wait till 
-			// we get the ID, before playing the new Animation.
-			//System.out.println( "Waiting For ID" ) ;
-			toPlayAnim = _name ;
-			return ;
-		}
-
-		stopAnimation() ; 								// Stop the previous animation, else we'll leak animations
-		final Event<Settings> event = animations.get( _name ) ;
-		if( event != null )
-		{
-			currentAnim = _name ;
-			waitForID = true ;							// Need to wait for ID before changing animation again
-			passEvent( event ) ;						// Inform the Animation System of the new Animation.
+			delegate.addAnimation( anim ) ;
+			currentAnim = anim ;
 		}
 	}
 
@@ -159,30 +112,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	**/
 	public void stopAnimation()
 	{
-		if( animationID != ANIM_NOT_SET )
+		if( delegate != null && currentAnim != null )
 		{
-			passEvent( AnimationFactory.removeAnimation( animationID ) ) ;
-			animationID = ANIM_NOT_SET ;
-			callback = null ;
-		}
-	}
-
-	public void recieveID( final int _id )
-	{
-		//System.out.println( "Recieved ID: " + _id ) ;
-		animationID = _id ;
-		waitForID = false ;		// We've recieved the ID so we can accept other animation requests
-
-		if( toPlayAnim != null )
-		{
-			// If toPlayAnim is set, then another animation 
-			// was requested before the previous animations ID 
-			// could be recieved. We can now play the new animation.
-			playAnimation( toPlayAnim ) ;
-			callback = toCallback ;
-
-			toPlayAnim = null ;
-			toCallback = null ;
+			delegate.removeAnimation( currentAnim ) ;
 		}
 	}
 
@@ -218,10 +150,8 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void finished()
 	{
-		//System.out.println( animationID + " " + currentAnim +" Finished!" ) ;
 		if( callback != null )
 		{
-			//System.out.println( animationID + " Callback called.." ) ;
 			callback.finished() ;
 		}
 	}
@@ -229,28 +159,29 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
-		super.passInitialEvents( _events ) ;
-		if( defaultAnim != null )
+		_events.add( AnimationAssist.constructAnimationDelegate( new AnimationDelegateCallback()
 		{
-			final Event<Settings> event = animations.get( defaultAnim ) ;
-			if( event != null )
+			public void callback( AnimationDelegate _delegate )
 			{
-				// Add the default Anim to the Initial Events.
-				// Ensure the component knows it needs to wait for the ID
-				// before requesting another animation.
-				_events.add( event ) ;
-				waitForID = true ;
+				if( defaultAnim != null )
+				{
+					final Anim anim = animations.get( defaultAnim ) ;
+					if( anim != null )
+					{
+						// Add the default Anim to the Initial Events.
+						// Ensure the component knows it needs to wait for the ID
+						// before requesting another animation.
+						_delegate.addAnimation( anim ) ;
+					}
+				}
 			}
-		}
+		} ) ) ;
+		super.passInitialEvents( _events ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( AnimationFactory.removeAnimation( animationID ) ) ;
-		animations.clear() ;
-
-		toDestroy = null ;		// Blank toDestroy incase the component is reused.
 	}
 }

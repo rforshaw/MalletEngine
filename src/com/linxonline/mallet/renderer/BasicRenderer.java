@@ -57,7 +57,10 @@ public abstract class BasicRenderer implements RenderInterface
 					{
 						_draw.setDrawInterface( getTextDraw() ) ;
 						data.add( _draw ) ;
-						state.add( ( DrawData )_draw ) ;
+						synchronized( state )
+						{
+							state.add( ( DrawData )_draw ) ;
+						}
 					}
 				}
 			}
@@ -70,7 +73,10 @@ public abstract class BasicRenderer implements RenderInterface
 					{
 						_draw.setDrawInterface( getBasicDraw() ) ;
 						data.add( _draw ) ;
-						state.add( ( DrawData )_draw ) ;
+						synchronized( state )
+						{
+							state.add( ( DrawData )_draw ) ;
+						}
 					}
 				}
 			}
@@ -81,19 +87,22 @@ public abstract class BasicRenderer implements RenderInterface
 				if( _draw != null && _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
-					state.remove( ( DrawData )_draw ) ;
+					synchronized( state )
+					{
+						state.remove( ( DrawData )_draw ) ;
+					}
 				}
 			}
 
 			@Override
-			public void start() {}
-
-			@Override
 			public void shutdown()
 			{
-				for( final Draw draw : data  )
+				synchronized( state )
 				{
-					state.remove( ( DrawData )draw ) ;
+					for( final Draw draw : data  )
+					{
+						state.remove( ( DrawData )draw ) ;
+					}
 				}
 				data.clear() ;
 			}

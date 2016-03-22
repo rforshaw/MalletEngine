@@ -23,7 +23,7 @@ public class EventController implements EventHandler
 	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
 	private final ArrayList<EventProcessor> processors = new ArrayList<EventProcessor>() ;
-	private AddEventInterface addInterface = null ;
+	private AddEventInterface addInterface = ADD_EVENT_FALLBACK ;
 
 	public EventController()
 	{
@@ -55,8 +55,8 @@ public class EventController implements EventHandler
 	{
 		if( _addInterface != null )
 		{
-			ADD_EVENT_FALLBACK.transferEvents( _addInterface ) ;
 			addInterface = _addInterface ;
+			ADD_EVENT_FALLBACK.transferEvents( addInterface ) ;
 		}
 		else
 		{
@@ -107,12 +107,6 @@ public class EventController implements EventHandler
 	**/
 	public void passEvent( final Event<?> _event )
 	{
-		if( addInterface == null )
-		{
-			Logger.println( "AddInterface not set in " + getName() + ".", Logger.Verbosity.MAJOR ) ;
-			return ;
-		}
-
 		addInterface.addEvent( _event ) ;
 	}
 

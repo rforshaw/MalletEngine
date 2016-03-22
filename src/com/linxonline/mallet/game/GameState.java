@@ -53,7 +53,7 @@ public class GameState extends State implements HookEntity
 	protected SystemInterface system = null ;																// Provides access to Root systems
 	protected final AudioSystem audioSystem = new AudioSystem() ;											// Must specify a SourceGenerator
 	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
-	protected final AnimationSystem animationSystem = new AnimationSystem( eventSystem ) ;
+	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
 	protected final DataConverter dataTracker = new DataConverter() ;	// Track current data that you wish to save/read
@@ -326,13 +326,16 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void hookHandlerSystems()
 	{
-		eventSystem.addEventHandler( dataTracker.getEventController() ) ;
+		final EventController animationController = animationSystem.getEventController() ;
+		final EventController trackerController = dataTracker.getEventController() ;
+	
+		eventSystem.addEventHandler( trackerController ) ;
 		eventSystem.addEventHandler( audioSystem ) ;
-		eventSystem.addEventHandler( animationSystem ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface().getEventController() ) ;
+		eventSystem.addEventHandler( animationController ) ;
 
-		animationSystem.requestDrawDelegate() ;
+		animationController.setAddEventInterface( eventSystem ) ;
 
 		final InputSystemInterface input = system.getInputInterface() ;
 		input.addInputHandler( inputUISystem ) ;
@@ -348,7 +351,7 @@ public class GameState extends State implements HookEntity
 	{
 		eventSystem.removeEventHandler( dataTracker.getEventController() ) ;
 		eventSystem.removeEventHandler( audioSystem ) ;
-		eventSystem.removeEventHandler( animationSystem ) ;
+		eventSystem.removeEventHandler( animationSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface().getEventController() ) ;
 		eventSystem.removeHandlersNow() ;

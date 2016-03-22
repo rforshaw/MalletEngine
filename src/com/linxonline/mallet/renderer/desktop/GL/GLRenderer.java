@@ -83,6 +83,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
 
+		uploader.shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;
 		fontManager.shutdown() ;
@@ -174,19 +175,19 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				//_draw.setRotation( _x, _y, _z ) ;
+				( ( GLDrawData )_draw ).setRotation( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				//_draw.setScale( _x, _y, _z ) ;
+				( ( GLDrawData )_draw ).setScale( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				//_draw.setPosition( _x, _y, _z ) ;
+				( ( GLDrawData )_draw ).setPosition( _x, _y, _z ) ;
 				return _draw ;
 			}
 
@@ -249,7 +250,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			public void clearTextures( final Draw _draw )
 			{
-				( ( GLDrawData )_draw ).getMalletTextures().clear() ;
+				( ( GLDrawData )_draw ).clearTextures() ;
 			}
 			
 			public Vector3 getRotate( final Draw _draw )
@@ -322,10 +323,9 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				}
 
 				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
-				final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-
 				if( malletTextures.isEmpty() == false )
 				{
+					final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
 					if( glTextures.isEmpty() == true )
 					{
 						if( loadTexture( _data ) == false )
@@ -498,16 +498,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				words = txt.toArray( words ) ;
 				return words ;
 			}
-
-			/*private void setTextAlignment( final int _alignment, final Vector3 _position, final int _wordWidth )
-			{
-				switch( _alignment )
-				{
-					case ALIGN_RIGHT  : _position.x -= _wordWidth ;     break ;
-					case ALIGN_CENTRE : _position.x -= _wordWidth / 2 ; break ;
-					default           : return ;
-				}
-			}*/
 		} ;
 	}
 
