@@ -308,6 +308,32 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				return draw ;
 			}
 		} ) ;
+
+		CameraAssist.setAssist( new CameraAssist.Assist()
+		{
+			public Camera getCamera()
+			{
+				return camera ;
+			}
+
+			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setPosition( _x, _y, _z ) ;
+				return camera ;
+			}
+
+			public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setRotation( _x, _y, _z ) ;
+				return camera ;
+			}
+
+			public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setScale( _x, _y, _z ) ;
+				return camera ;
+			}
+		} ) ;
 	}
 
 	public DrawData.DrawInterface getBasicDraw()
@@ -663,17 +689,21 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public void updateState( final float _dt )
 	{
 		super.updateState( _dt ) ;
-		oldCameraPosition.setXYZ( cameraPosition ) ;
+
+		final Vector3 cam = camera.getPosition() ;
+		oldCamera.setPosition( cam.x, cam.y, cam.z ) ;
 	}
 
 	public void draw( final float _dt )
 	{
-		cameraPosition = getRenderInfo().getCameraPosition() ;
-		if( cameraPosition == null )
+		final Vector3 cam = getRenderInfo().getCameraPosition() ;
+		if( cam == null )
 		{
 			System.out.println( "Camera Not Set" ) ;
 			return ;
 		}
+
+		cam.setXYZ( camera.getPosition() ) ;
 
 		++renderIter ;
 		drawDT = _dt ;
@@ -693,13 +723,15 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
-		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
-		getRenderInfo().setCameraZoom( cameraScale.x, cameraScale.y ) ;
+		calculateInterpolatedPosition( oldCamera.getPosition(), camera.getPosition(), pos ) ;
+		
+		final Vector3 scale = camera.getScale() ;
+		getRenderInfo().setCameraZoom( scale.x, scale.y ) ;
 		final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
 
 		worldMatrix.setIdentity() ;
 		worldMatrix.translate( half.x, half.y, 0.0f ) ;
-		worldMatrix.scale( cameraScale.x, cameraScale.y, cameraScale.z ) ;
+		worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 		worldMatrix.translate( -pos.x, -pos.y, 0.0f ) ;
 
 		render() ;

@@ -13,6 +13,9 @@ public abstract class BasicRenderer implements RenderInterface
 													  new Vector2( 800, 600 ),
 													  new Vector3( 400, 300, 0 ) ) ;
 
+	protected final BasicCamera oldCamera = new BasicCamera() ;
+	protected final BasicCamera camera = new BasicCamera() ;
+
 	protected Vector3 oldCameraPosition = new Vector3() ;
 	protected Vector3 cameraPosition = null ;
 	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
@@ -178,5 +181,42 @@ public abstract class BasicRenderer implements RenderInterface
 
 		_position.x = _old.x + ( xDiff * renderIter ) ;
 		_position.y = _old.y + ( yDiff * renderIter ) ;
+	}
+
+	protected class BasicCamera implements Camera
+	{
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 rotation = new Vector3() ;
+		private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
+
+		public Vector3 getPosition()
+		{
+			return position ;
+		}
+
+		public Vector3 getRotation()
+		{
+			return rotation ;
+		}
+
+		public Vector3 getScale()
+		{
+			return scale ;
+		}
+
+		public void setPosition( final float _x, final float _y, final float _z )
+		{
+			position.setXYZ( _x, _y, _z ) ;
+		}
+		
+		public void setRotation( final float _x, final float _y, final float _z )
+		{
+			rotation.setXYZ( _x, _y, _z ) ;
+		}
+		
+		public void setScale( final float _x, final float _y, final float _z )
+		{
+			scale.setXYZ( _x, _y, _z ) ;
+		}
 	}
 }

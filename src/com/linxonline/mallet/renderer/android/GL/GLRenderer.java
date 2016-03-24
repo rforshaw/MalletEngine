@@ -602,17 +602,21 @@ public class GLRenderer extends BasicRenderer
 	public void updateState( final float _dt )
 	{
 		super.updateState( _dt ) ;
-		oldCameraPosition.setXYZ( cameraPosition ) ;
+
+		final Vector3 cam = camera.getPosition() ;
+		oldCamera.setPosition( cam.x, cam.y, cam.z ) ;
 	}
 
 	public void draw( final float _dt )
 	{
-		cameraPosition = getRenderInfo().getCameraPosition() ;
-		if( cameraPosition == null )
+		final Vector3 cam = getRenderInfo().getCameraPosition() ;
+		if( cam == null )
 		{
 			System.out.println( "Camera Not Set" ) ;
 			return ;
 		}
+
+		cam.setXYZ( camera.getPosition() ) ;
 
 		++renderIter ;
 		drawDT = _dt ;
@@ -627,7 +631,7 @@ public class GLRenderer extends BasicRenderer
 
 		// Calculate the current Camera Position based 
 		// on oldCameraPosition and future cameraPosition
-		calculateInterpolatedPosition( oldCameraPosition, cameraPosition, pos ) ;
+		calculateInterpolatedPosition( oldCamera.getPosition(), camera.getPosition(), pos ) ;
 		getRenderInfo().setCameraZoom( cameraScale.x, cameraScale.y ) ;
 		final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
 
