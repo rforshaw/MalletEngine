@@ -757,12 +757,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return canvas ;
 	}
 
-	@Override
-	public String getName()
-	{
-		return "GLRenderer" ;
-	}
-
 	private boolean loadTexture( final GLDrawData _data )
 	{
 		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;

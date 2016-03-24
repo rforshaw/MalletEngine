@@ -166,20 +166,6 @@ public abstract class BasicRenderer implements RenderInterface
 		state.clear() ;
 	}
 
-	public void passEvent( final Event _event ) {}
-
-	public void processEvent( final Event _event ) {}
-
-	@Override
-	public void reset() {}
-
-	@Override
-	public ArrayList<EventType> getWantedEventTypes()
-	{
-		final ArrayList<EventType> types = new ArrayList<EventType>() ;
-		return types ;
-	}
-
 	protected void calculateInterpolatedPosition( final Vector3 _old, final Vector3 _current, final Vector3 _position )
 	{
 		// Calculate the how many render iterations must take place to reach 

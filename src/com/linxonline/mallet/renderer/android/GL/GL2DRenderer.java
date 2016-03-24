@@ -128,37 +128,7 @@ public class GL2DRenderer implements RenderInterface,
 	{
 		return render.getEventController() ;
 	}
-	
-	@Override
-	public void processEvent( final Event _event )
-	{
-		render.processEvent( _event ) ;
-	}
 
-	@Override
-	public final void passEvent( final Event _event )
-	{
-		render.passEvent( _event ) ;
-	}
-
-	@Override
-	public final void reset()
-	{
-		render.reset() ;
-	}
-
-	@Override
-	public String getName()
-	{
-		return "GL_2D_RENDERER" ;
-	}
-
-	@Override
-	public ArrayList<EventType> getWantedEventTypes()
-	{
-		return render.getWantedEventTypes() ;
-	}
-	
 	@Override
 	public void sort()
 	{
@@ -170,7 +140,7 @@ public class GL2DRenderer implements RenderInterface,
 	{
 		render.clear() ;
 	}
-	
+
 	@Override
 	public void clean()
 	{

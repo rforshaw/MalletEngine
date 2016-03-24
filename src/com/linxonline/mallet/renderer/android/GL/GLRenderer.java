@@ -685,12 +685,6 @@ public class GLRenderer extends BasicRenderer
 		fontManager.clean() ;
 	}
 
-	@Override
-	public String getName()
-	{
-		return "GLRenderer" ;
-	}
-
 	private boolean loadTexture( final GLDrawData _data )
 	{
 		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;

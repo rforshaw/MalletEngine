@@ -4,7 +4,7 @@ import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public interface RenderInterface extends EventHandler
+public interface RenderInterface
 {
 	public void start() ;
 	public void shutdown() ;
