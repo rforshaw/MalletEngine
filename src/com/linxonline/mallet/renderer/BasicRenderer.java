@@ -35,16 +35,33 @@ public abstract class BasicRenderer implements RenderInterface
 				callback.callback( constructDrawDelegate() ) ;
 			}
 		} ) ;
+
+		state.setRemoveDelegate( constructRemoveDelegate() ) ;
 	}
 
+	/**
+		Inform the renderer to start the clean-up process.
+		Shutdown any active devices and ensure we leave it 
+		in the same state as we got it in.
+	*/
 	@Override
 	public abstract void shutdown() ;
 
+	/**
+		Construct any Assistors that are required.
+		TextureAssist, FontAssist, DrawAssist, CameraAssist.
+	*/
 	@Override
 	public abstract void initAssist() ;
 
 	public abstract DrawData.DrawInterface getBasicDraw() ;
 	public abstract DrawData.DrawInterface getTextDraw() ;
+
+	/**
+		Allows implementations to clean-up other systems using 
+		or is used by DrawData.
+	*/
+	public abstract DrawState.RemoveDelegate constructRemoveDelegate() ;
 
 	protected DrawDelegate constructDrawDelegate()
 	{

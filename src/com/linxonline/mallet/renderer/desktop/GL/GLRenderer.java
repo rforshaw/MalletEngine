@@ -336,6 +336,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		} ) ;
 	}
 
+	@Override
 	public DrawData.DrawInterface getBasicDraw()
 	{
 		return new DrawData.DrawInterface<GLDrawData>()
@@ -390,6 +391,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		} ;
 	}
 
+	@Override
 	public DrawData.DrawInterface getTextDraw()
 	{
 		return new DrawData.DrawInterface<GLDrawData>()
@@ -527,6 +529,19 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		} ;
 	}
 
+	@Override
+	public DrawState.RemoveDelegate constructRemoveDelegate()
+	{
+		return new DrawState.RemoveDelegate<GLDrawData>()
+		{
+			public void remove( final GLDrawData _data )
+			{
+				uploader.remove( gl, _data ) ;
+				_data.reset() ;
+			}
+		} ;
+	}
+	
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{

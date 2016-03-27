@@ -364,6 +364,32 @@ public class GLRenderer extends BasicRenderer
 				return draw ;
 			}
 		} ) ;
+
+		CameraAssist.setAssist( new CameraAssist.Assist()
+		{
+			public Camera getCamera()
+			{
+				return camera ;
+			}
+
+			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setPosition( _x, _y, _z ) ;
+				return camera ;
+			}
+
+			public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setRotation( _x, _y, _z ) ;
+				return camera ;
+			}
+
+			public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				( ( BasicCamera )_camera ).setScale( _x, _y, _z ) ;
+				return camera ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -570,6 +596,19 @@ public class GLRenderer extends BasicRenderer
 				words = new String[txt.size()] ;
 				words = txt.toArray( words ) ;
 				return words ;
+			}
+		} ;
+	}
+
+	@Override
+	public DrawState.RemoveDelegate constructRemoveDelegate()
+	{
+		return new DrawState.RemoveDelegate<GLDrawData>()
+		{
+			public void remove( final GLDrawData _data )
+			{
+				uploader.remove( _data ) ;
+				_data.reset() ;
 			}
 		} ;
 	}

@@ -8,6 +8,13 @@ public class DrawState
 	private final ArrayList<DrawData> toRemove = new ArrayList<DrawData>() ;
 	private final ArrayList<DrawData> current = new ArrayList<DrawData>() ;
 
+	private RemoveDelegate removeDelegate = null ;
+
+	public <T extends DrawData> void setRemoveDelegate( final RemoveDelegate<T> _delegate )
+	{
+		removeDelegate = _delegate ;
+	}
+
 	public synchronized void add( final DrawData _data )
 	{
 		if( _data != null )
@@ -78,8 +85,14 @@ public class DrawState
 	{
 		for( final DrawData remove : _toRemove )
 		{
+			removeDelegate.remove( remove ) ;
 			current.remove( remove ) ;
 		}
 		_toRemove.clear() ;
+	}
+
+	public interface RemoveDelegate<T extends Draw>
+	{
+		public void remove( final T _draw ) ;
 	}
 }

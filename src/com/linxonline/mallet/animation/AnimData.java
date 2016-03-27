@@ -22,7 +22,6 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	private float frameDelta  = 0.0f ;			// Amount of time that needs to elapse before next frame
 	private int length        = 0 ;				// How many frames
 
-	
 	public AnimData() {}
 
 	public AnimData( final String _file, final Draw _draw )
@@ -171,6 +170,11 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 			callbacks.get( i ).callbackRemoved() ;
 		}
 		callbacks.clear() ;
+
+		if( sprite != null )
+		{
+			sprite.unregister() ;
+		}
 
 		file   = null ;
 		draw   = null ;
