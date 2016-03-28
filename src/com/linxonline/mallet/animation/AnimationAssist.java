@@ -34,7 +34,7 @@ public class AnimationAssist
 	{
 		return ( ( AnimData )_anim ).getDraw() ;
 	}
-	
+
 	public static Anim play( final Anim _anim )
 	{
 		( ( AnimData )_anim ).play() ;

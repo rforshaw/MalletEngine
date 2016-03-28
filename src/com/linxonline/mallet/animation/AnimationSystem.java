@@ -110,7 +110,6 @@ public class AnimationSystem
 
 		for( final AnimData anim : animations )
 		{
-			animations.remove( anim ) ;
 			drawDelegate.removeDraw( anim.getDraw() ) ;
 			anim.reset() ;
 		}

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.animation ;
 
-import com.linxonline.mallet.util.SourceCallback ;
-
 public interface AnimationDelegate
 {
 	public void addAnimation( final Anim _animation ) ;

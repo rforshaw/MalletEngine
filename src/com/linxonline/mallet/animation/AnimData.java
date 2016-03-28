@@ -32,12 +32,18 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	public void addCallback( final SourceCallback _callback )
 	{
-		callbacks.add( _callback ) ;
+		if( callbacks.contains( _callback ) == false )
+		{
+			callbacks.add( _callback ) ;
+		}
 	}
 
 	public void removeCallback( final SourceCallback _callback )
 	{
-		callbacks.remove( _callback ) ;
+		if( callbacks.remove( _callback ) == true )
+		{
+			_callback.callbackRemoved() ;
+		}
 	}
 
 	/**
@@ -124,6 +130,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	public void setSprite( final Sprite _sprite )
 	{
 		sprite     = _sprite ;
+		changeTexture( draw, sprite ) ;
 		frameDelta = 1.0f / sprite.framerate ;
 		length     = sprite.size() ;
 	}

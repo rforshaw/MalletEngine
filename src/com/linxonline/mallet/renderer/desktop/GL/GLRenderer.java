@@ -811,6 +811,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		for( final MalletTexture texture : mltTextures )
 		{
+			//System.out.println( "Load: " + texture.getPath() ) ;
 			final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
 			if( glTexture == null )
 			{

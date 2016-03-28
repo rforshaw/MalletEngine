@@ -17,7 +17,11 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.audio.AudioFactory ;
+
+import com.linxonline.mallet.audio.AudioAssist ;
+import com.linxonline.mallet.audio.AudioDelegateCallback ;
+import com.linxonline.mallet.audio.AudioDelegate ;
+import com.linxonline.mallet.audio.StreamType ;
 
 import com.linxonline.mallet.util.sort.* ;
 
@@ -177,7 +181,7 @@ public final class GameTestLoader extends GameLoader
 			public void renderAnimationExample()
 			{
 				final AnimComponent anim = new AnimComponent() ;
-				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
+				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba2.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector3( -32, -32, 0 ),
 																		 new Vector3(),
@@ -220,6 +224,14 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void playAudioExample()
 			{
+				eventSystem.addEvent( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
+				{
+					public void callback( AudioDelegate _delegate )
+					{
+						_delegate.addAudio( AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ) ;
+					}
+				} ) ) ;
+
 				/*final SoundComponent sound = new SoundComponent() ;
 				sound.addSound( "DEFAULT", AudioFactory.createAudio( "base/music/fairing-well.wav", sound ) ) ;
 

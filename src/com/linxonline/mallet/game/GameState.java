@@ -328,14 +328,16 @@ public class GameState extends State implements HookEntity
 	{
 		final EventController animationController = animationSystem.getEventController() ;
 		final EventController trackerController = dataTracker.getEventController() ;
-	
+		final EventController audioController = audioSystem.getEventController() ;
+
 		eventSystem.addEventHandler( trackerController ) ;
-		eventSystem.addEventHandler( audioSystem ) ;
+		eventSystem.addEventHandler( audioController ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderInterface().getEventController() ) ;
 		eventSystem.addEventHandler( animationController ) ;
 
 		animationController.setAddEventInterface( eventSystem ) ;
+		audioController.setAddEventInterface( eventSystem ) ;
 
 		final InputSystemInterface input = system.getInputInterface() ;
 		input.addInputHandler( inputUISystem ) ;
@@ -350,7 +352,7 @@ public class GameState extends State implements HookEntity
 	protected void unhookHandlerSystems()
 	{
 		eventSystem.removeEventHandler( dataTracker.getEventController() ) ;
-		eventSystem.removeEventHandler( audioSystem ) ;
+		eventSystem.removeEventHandler( audioSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( animationSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
 		eventSystem.removeEventHandler( system.getRenderInterface().getEventController() ) ;

@@ -14,44 +14,75 @@ import com.linxonline.mallet.util.SourceCallback ;
 	// Get Sound ID
 // Modify running sound
 
-public class AudioSystem extends SystemRoot<ActiveSound>
+public class AudioSystem
 {
-	protected final ArrayList<ActiveSound> pausedSources = new ArrayList<ActiveSound>() ;		// Used when Audio System has been paused
-	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
-	protected int numID = 0 ;
+	private final ArrayList<AudioData> toAddAudio    = new ArrayList<AudioData>() ;
+	private final ArrayList<AudioData> toRemoveAudio = new ArrayList<AudioData>() ;
 
-	public AudioSystem() {}
+	private final ArrayList<AudioData> audio         = new ArrayList<AudioData>() ;
+	private final ArrayList<AudioData> paused        = new ArrayList<AudioData>() ;			// Used when Game-State has been paused, move playing audio to here.
+
+	private final EventController controller = new EventController() ;
+	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
+
+	public AudioSystem()
+	{
+		this( null ) ;
+	}
 
 	public AudioSystem( final AudioGenerator _generator )
 	{
-		assert _generator != null ;
 		sourceGenerator = _generator ;
+		controller.addEventProcessor( new EventProcessor<AudioDelegateCallback>( "AUDIO_DELEGATE", "AUDIO_DELEGATE" )
+		{
+			public void processEvent( final Event<AudioDelegateCallback> _event )
+			{
+				final AudioDelegateCallback callback = _event.getVariable() ;
+				callback.callback( constructAudioDelegate() ) ;
+			}
+		} ) ;
 	}
 
-	public AudioSystem( final AddEventInterface _eventSystem, final AudioGenerator _generator )
+	public void update( final float _dt )
 	{
-		assert _eventSystem != null ;
-		assert _generator != null ;
+		controller.update() ;
+		if( toAddAudio.isEmpty() == false )
+		{
+			if( sourceGenerator != null )
+			{
+				for( final AudioData a : toAddAudio )
+				{
+					final AudioSource source = sourceGenerator.createAudioSource( a.getFile(), a.getStreamType() ) ;
+					if( source != null )
+					{
+						a.setSource( source ) ;
+						a.play() ;
+					}
+				}
+				toAddAudio.clear() ;
+			}
+		}
 
-		eventSystem = _eventSystem ;
-		sourceGenerator = _generator ;
+		if( toRemoveAudio.isEmpty() == false )
+		{
+			for( final AudioData a : toRemoveAudio )
+			{
+				audio.remove( a ) ;
+				a.reset() ;
+			}
+			toRemoveAudio.clear() ;
+		}
+
+		final int size = audio.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			audio.get( i ).update( _dt ) ;
+		}
 	}
 
 	public void setAudioGenerator( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;
-	}
-
-	@Override
-	protected void updateSource( final ActiveSound _source, final float _dt )
-	{
-		_source.update() ;
-	}
-
-	@Override
-	protected void destroySource( final ActiveSound _source )
-	{
-		_source.destroy() ;
 	}
 
 	/**
@@ -60,11 +91,11 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	*/
 	public void resumeSystem()
 	{
-		for( final ActiveSound sound : pausedSources )
+		for( final AudioData a : paused )
 		{
-			sound.play() ;
+			a.play() ;
 		}
-		pausedSources.clear() ;
+		paused.clear() ;
 	}
 
 	/**
@@ -73,115 +104,14 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 	*/
 	public void pauseSystem()
 	{
-		for( final ActiveSound sound : activeSources )
+		for( final AudioData a : audio )
 		{
-			if( sound.isPlaying() == true )
+			if( a.isPlaying() == true )
 			{
-				pausedSources.add( sound ) ;
-				sound.pause() ;
+				paused.add( a ) ;
+				a.pause() ;
 			}
 		}
-	}
-
-	@Override
-	protected void useEvent( final Event<?> _event )
-	{
-		final Settings audio = ( Settings )_event.getVariable() ;
-		final RequestType type = audio.getObject( "REQUEST_TYPE", null ) ;
-
-		switch( type )
-		{
-			case GARBAGE_COLLECT_AUDIO : sourceGenerator.clean() ; break ;
-			case CREATE_AUDIO          : creatAudio( audio ) ;  break ;
-			case MODIFY_EXISTING_AUDIO :
-			{
-				final ActiveSound sound = getSource( audio.getInteger( "ID", -1 ) ) ;
-				if( sound != null )
-				{
-					modifyAudio( audio, sound ) ;
-				}
-				break ;
-			}
-			case REMOVE_AUDIO :
-			{
-				final int id = audio.getInteger( "ID", -1 ) ;
-				final ActiveSound sound = getSource( id ) ;
-				if( sound != null )
-				{
-					removeSources.add( new RemoveSource( id, sound ) ) ;
-				}
-				break ;
-			}
-		}
-	}
-
-	protected void creatAudio( final Settings _audio )
-	{
-		final String file = _audio.getString( "AUDIO_FILE", null ) ;
-		final StreamType type = _audio.getObject( "STREAM_TYPE", StreamType.STATIC ) ;
-		if( file != null )
-		{
-			final ActiveSound sound = createActiveSound( file, type ) ;
-			if( sound != null )
-			{
-				addCallbackToSound( sound, _audio ) ;
-				storeSource( sound, sound.id ) ;
-				sound.play() ;						// Assumed that sound will want to be played immediately.
-			}
-			return ;
-		}
-	}
-
-	/**
-		Modify the settings of a running AudioSource.
-	**/
-	protected void modifyAudio( final Settings _settings, final ActiveSound _sound )
-	{
-		final ModifyAudio type = _settings.getObject( "MODIFY_AUDIO", null ) ;
-		switch( type )
-		{
-			case PLAY             : _sound.play() ;     break ;
-			case STOP             : _sound.stop() ;     break ;
-			case PAUSE            : _sound.pause() ;    break ;
-			case LOOP_CONTINUOSLY : _sound.playLoop() ; break ;
-			case LOOP_SET :
-			{
-				// Specify the amount of Loops to go through
-				// before stopping.
-				break ;
-			}
-			case ADD_CALLBACK :
-			{
-				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
-				if( callback != null )
-				{
-					_sound.addCallback( callback ) ;
-				}
-				break ;
-			}
-			case REMOVE_CALLBACK :
-			{
-				final SourceCallback callback = _settings.getObject( "CALLBACK", null ) ;
-				if( callback != null )
-				{
-					_sound.removeCallback( callback ) ;
-				}
-				break ;
-			}
-		}
-	}
-
-	protected ActiveSound createActiveSound( final String _file, final StreamType _type )
-	{
-		final AudioSource source = sourceGenerator.createAudioSource( _file, _type ) ;
-		if( source != null )
-		{
-			// Increment numID, so next ActiveSource will have a unique ID
-			final ActiveSound active = new ActiveSound( numID++, source ) ;
-			return active ;
-		}
-
-		return null ;
 	}
 
 	/**
@@ -197,26 +127,69 @@ public class AudioSystem extends SystemRoot<ActiveSound>
 		}
 	}
 
-	@Override
-	public final void processEvent( final Event _event )
+	public void clear()
 	{
-		if( sourceGenerator != null )
+		toAddAudio.clear() ;		// Never added not hooked in
+		toRemoveAudio.clear() ;		// Will be removed from audio anyway
+
+		for( final AudioData a : audio )
 		{
-			super.processEvent( _event ) ;
+			a.reset() ;
 		}
+		audio.clear() ;
 	}
 
-	@Override
+	public EventController getEventController()
+	{
+		return controller ;
+	}
+
 	public String getName()
 	{
 		return "Audio System" ;
 	}
 
-	@Override
-	public final ArrayList<EventType> getWantedEventTypes()
+	protected AudioDelegate constructAudioDelegate()
 	{
-		final ArrayList<EventType> types = new ArrayList<EventType>() ;
-		types.add( EventType.get( "AUDIO" ) ) ;
-		return types ;
+		return new AudioDelegate()
+		{
+			private final ArrayList<AudioData> data = new ArrayList<AudioData>() ;
+
+			@Override
+			public void addAudio( final Audio _audio )
+			{
+				if( _audio != null && _audio instanceof AudioData )
+				{
+					if( data.contains( _audio ) == false )
+					{
+						data.add( ( AudioData )_audio ) ;
+						toAddAudio.add( ( AudioData )_audio ) ;
+					}
+				}
+			}
+
+			@Override
+			public void removeAudio( final Audio _audio )
+			{
+				if( _audio != null && _audio instanceof AudioData )
+				{
+					data.remove( ( AudioData )_audio ) ;
+					toRemoveAudio.add( ( AudioData )_audio ) ;
+				}
+			}
+
+			@Override
+			public void start() {}
+
+			@Override
+			public void shutdown()
+			{
+				for( final AudioData anim : data  )
+				{
+					toRemoveAudio.add( anim ) ;
+				}
+				data.clear() ;
+			}
+		} ;
 	}
 }
