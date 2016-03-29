@@ -608,7 +608,7 @@ public class GLRenderer extends BasicRenderer
 			public void remove( final GLDrawData _data )
 			{
 				uploader.remove( _data ) ;
-				_data.reset() ;
+				_data.unregister() ;
 			}
 		} ;
 	}

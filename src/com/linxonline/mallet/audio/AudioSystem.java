@@ -114,19 +114,6 @@ public class AudioSystem
 		}
 	}
 
-	/**
-		Pass the ActiveSound ID to the IDInterface provided.
-		Currently called when ActiveSound is created
-	**/
-	protected void addCallbackToSound( final ActiveSound _sound, final Settings _audio )
-	{
-		final SourceCallback callback = _audio.getObject( "CALLBACK", null ) ;
-		if( callback != null )
-		{
-			_sound.addCallback( callback ) ;
-		}
-	}
-
 	public void clear()
 	{
 		toAddAudio.clear() ;		// Never added not hooked in

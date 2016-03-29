@@ -11,7 +11,6 @@ import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.animation.AnimationAssist ;
 import com.linxonline.mallet.animation.Anim ;
 
-import com.linxonline.mallet.renderer.CameraFactory ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -181,7 +180,7 @@ public final class GameTestLoader extends GameLoader
 			public void renderAnimationExample()
 			{
 				final AnimComponent anim = new AnimComponent() ;
-				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba2.anim",
+				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector3( -32, -32, 0 ),
 																		 new Vector3(),

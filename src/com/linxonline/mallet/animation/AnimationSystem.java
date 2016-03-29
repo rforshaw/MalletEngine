@@ -85,7 +85,7 @@ public class AnimationSystem
 				{
 					animations.remove( anim ) ;
 					drawDelegate.removeDraw( anim.getDraw() ) ;
-					anim.reset() ;
+					anim.unregister() ;
 				}
 				toRemoveAnim.clear() ;
 			}
@@ -111,7 +111,7 @@ public class AnimationSystem
 		for( final AnimData anim : animations )
 		{
 			drawDelegate.removeDraw( anim.getDraw() ) ;
-			anim.reset() ;
+			anim.unregister() ;
 		}
 		animations.clear() ;
 	}
@@ -127,8 +127,7 @@ public class AnimationSystem
 		{
 			animations.remove( anim ) ;
 			drawDelegate.removeDraw( anim.getDraw() ) ;
-			anim.getSprite().unregister() ;
-			anim.setSprite( null ) ;
+			anim.unregister() ;
 		}
 		_data.clear() ;
 	}

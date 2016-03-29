@@ -255,6 +255,8 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		draw.draw( ( T )this ) ;
 	}
 
+	public abstract void unregister() ;
+
 	@Override
 	public void reset()
 	{

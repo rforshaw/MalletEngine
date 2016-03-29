@@ -172,15 +172,19 @@ public class GLDrawData extends DrawData
 	}
 
 	@Override
-	public void reset()
+	public void unregister()
 	{
-		super.reset() ;
 		for( final Texture<GLImage> texture : textures )
 		{
 			texture.unregister() ;
 		}
 		textures.clear() ;
+	}
 
+	@Override
+	public void reset()
+	{
+		super.reset() ;
 		words       = null ;
 		drawMatrix  = null ;
 		drawProgram = null ;

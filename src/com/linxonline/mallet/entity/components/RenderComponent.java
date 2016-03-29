@@ -83,11 +83,16 @@ public class RenderComponent extends Component
 		} ) ) ;
 	}
 
+	public void clear()
+	{
+		drawDelegate.shutdown() ;
+	}
+
 	@Override
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		drawDelegate.shutdown() ;
+		clear() ;
 		drawDelegate = null ;
 	}
 }

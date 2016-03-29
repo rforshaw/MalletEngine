@@ -537,7 +537,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public void remove( final GLDrawData _data )
 			{
 				uploader.remove( gl, _data ) ;
-				_data.reset() ;
+				_data.unregister() ;
 			}
 		} ;
 	}

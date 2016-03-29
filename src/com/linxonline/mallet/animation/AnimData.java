@@ -168,8 +168,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		}
 	}
 
-	@Override
-	public void reset()
+	public void unregister()
 	{
 		final int size = callbacks.size() ;
 		for( int i = 0; i < size; ++i )
@@ -182,7 +181,11 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		{
 			sprite.unregister() ;
 		}
+	}
 
+	@Override
+	public void reset()
+	{
 		file   = null ;
 		draw   = null ;
 		sprite = null ;

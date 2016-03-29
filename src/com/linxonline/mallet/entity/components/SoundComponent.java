@@ -5,26 +5,28 @@ import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.audio.AudioFactory ;
+import com.linxonline.mallet.audio.AudioDelegateCallback ;
+import com.linxonline.mallet.audio.AudioDelegate ;
+import com.linxonline.mallet.audio.AudioAssist ;
+import com.linxonline.mallet.audio.Audio ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.event.Event ;
 
 public class SoundComponent extends EventComponent implements SourceCallback
 {
-	private static final int SOUND_NOT_SET = -1 ;
+	private static final int ANIM_NOT_SET = -1 ;
 
-	private final HashMap<String, Event<Settings>> sounds = new HashMap<String, Event<Settings>>() ;
-	private Component.ReadyCallback toDestroy = null ;
+	private final HashMap<String, Audio> sounds = new HashMap<String, Audio>() ;
 
-	private String defaultSound = null ;				// Name of the default sound, used as a fallback if all else fails.
-	private String toPlaySound = null ;				// The Animation to be played, once the previous Anim ID is recieved.
+	private String defaultAudio = null ;					// Name of the default audio, used as a fallback if all else fails.
+	private Audio currentAudio   = null ;					// Name of the current audio that is playing
 
-	private boolean waitForID = false ;						// true = waiting for sound ID, false = not waiting for ID
-	private int soundID = -1 ;								// Denotes the id of the current running sound.
+	private AudioDelegate delegate = null ;
+	private SourceCallback callback    = null ;
 
 	public SoundComponent()
 	{
-		super( "SOUND", "SOUNDCOMPONENT" ) ;
+		this( "SOUND" ) ;
 	}
 
 	public SoundComponent( final String _name )
@@ -32,152 +34,138 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		super( _name ) ;
 	}
 
-	public void addSound( final String _name, final Event<Settings> _sound )
+	public void addAudio( final String _name, final Audio _audio )
 	{
-		sounds.put( _name, _sound ) ;
+		AudioAssist.addCallback( _audio, this ) ;
+		sounds.put( _name, _audio ) ;
 	}
 
-	public void removeSound( final String _name )
+	public void removeAudio( final String _name )
 	{
 		sounds.remove( _name ) ;
 	}
 
-	public Event<Settings> getSound( final String _name )
+	public Audio getAudio( final String _name )
 	{
 		return sounds.get( _name ) ;
 	}
 
-	public void setDefaultSound( final String _name )
+	public void setDefaultAudio( final String _name )
 	{
-		defaultSound = _name ;
+		defaultAudio = _name ;
 	}
 
-	/**
-		We need to make sure we aren't waiting for any 
-		sound ID's before we allow the parent to destroy 
-		themselves.
-	*/
+	@Override
+	public void recieveID( final int _id ) {}
+
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
-		toDestroy = _callback ;
+		delegate.shutdown() ;
+		super.readyToDestroy( _callback ) ;
 	}
 
-	/**
-		The progression through the audio file 
-		being played.
-	*/
 	@Override
 	public void tick( final float _dt )
 	{
-		//System.out.println( _dt ) ;
-	}
-
-	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-		if( toDestroy != null && waitForID == false )
+		if( callback != null )
 		{
-			// Ensure that the component is not waiting 
-			// for an ID from the Animation System.
-			// Before we allow the parent to be destroyed.
-			toDestroy.ready( this ) ;
-			toDestroy = null ;
+			callback.tick( _dt ) ;
 		}
 	}
 
-	/**
-		Begin playing specified sound as soon as possible.
-		If called very quickly, repeatedly, some sounds 
-		may never get rendered.
-	**/
-	public void playSound( final String _name )
+	public void playAudio( final String _name, final SourceCallback _callback )
 	{
-		if( toDestroy != null )
-		{
-			// Prevent any more sounds being run 
-			// if the parent is being destroyed. 
-			return ;
-		}
+		playAudio( _name ) ;
+		callback = _callback ;
+	}
 
-		if( waitForID == true )
+	public void playAudio( final String _name )
+	{
+		stopAudio() ;
+		final Audio audio = sounds.get( _name ) ;
+		if( delegate != null && audio != null )
 		{
-			// Currently waiting for the ID of the previous
-			// sound. Store the Animation name and wait till 
-			// we get the ID, before playing the new Animation.
-			toPlaySound = _name ;
-			return ;
-		}
-
-		stopSound() ; 									// Stop the previous sound, else we'll leak sounds
-		final Event<Settings> event = sounds.get( _name ) ;
-		if( event != null )
-		{
-			waitForID = true ;							// Need to wait for ID before changing sound again
-			passEvent( event ) ;						// Inform the Animation System of the new Animation.
+			delegate.addAudio( audio ) ;
+			currentAudio = audio ;
 		}
 	}
 
 	/**
-		Remove the current sound from the Animation system.
+		Remove the current audio from the Audio System.
 	**/
-	public void stopSound()
+	public void stopAudio()
 	{
-		if( soundID != SOUND_NOT_SET )
+		if( delegate != null && currentAudio != null )
 		{
-			passEvent( AudioFactory.removeAudio( soundID ) ) ;
-			soundID = SOUND_NOT_SET ;
-		}
-	}
-
-	public void recieveID( final int _id )
-	{
-		soundID = _id ;
-		waitForID = false ;		// We've recieved the ID so we can accept other sound requests
-
-		if( toPlaySound != null )
-		{
-			// If toPlayAnim is set, then another sound 
-			// was requested before the previous sounds ID 
-			// could be recieved. We can now play the new sound.
-			playSound( toPlaySound ) ;
-			toPlaySound = null ;
+			delegate.removeAudio( currentAudio ) ;
 		}
 	}
 
 	public void callbackRemoved() {}
 
-	public void start() {}
-	public void pause() {}
-	public void stop() {}
+	@Override
+	public void start()
+	{
+		if( callback != null )
+		{
+			callback.start() ;
+		}
+	}
 
-	public void finished() {}
+	@Override
+	public void pause()
+	{
+		if( callback != null )
+		{
+			callback.pause() ;
+		}
+	}
+
+	@Override
+	public void stop()
+	{
+		if( callback != null )
+		{
+			callback.stop() ;
+		}
+	}
+
+	@Override
+	public void finished()
+	{
+		if( callback != null )
+		{
+			callback.finished() ;
+		}
+	}
 
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
-		super.passInitialEvents( _events ) ;
-		if( defaultSound != null )
+		_events.add( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
 		{
-			final Event<Settings> event = sounds.get( defaultSound ) ;
-			if( event != null )
+			public void callback( AudioDelegate _delegate )
 			{
-				// Add the default Anim to the Initial Events.
-				// Ensure the component knows it needs to wait for the ID
-				// before requesting another sound.
-				_events.add( event ) ;
-				waitForID = true ;
+				if( defaultAudio != null )
+				{
+					final Audio audio = sounds.get( defaultAudio ) ;
+					if( audio != null )
+					{
+						// Add the default Anim to the Initial Events.
+						// Ensure the component knows it needs to wait for the ID
+						// before requesting another animation.
+						_delegate.addAudio( audio ) ;
+					}
+				}
 			}
-		}
+		} ) ) ;
+		super.passInitialEvents( _events ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final ArrayList<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( AudioFactory.removeAudio( soundID ) ) ;
-
-		toDestroy = null ;		// Blank toDestroy incase the component is reused.
 	}
 }

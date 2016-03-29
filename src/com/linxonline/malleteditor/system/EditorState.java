@@ -13,7 +13,6 @@ import com.linxonline.mallet.maths.Vector2 ;
 
 import com.linxonline.malleteditor.system.MainPanel ;
 import com.linxonline.malleteditor.factory.EditorEntityFactory ;
-import com.linxonline.malleteditor.factory.creators.EditorMouseCreator ;
 import com.linxonline.malleteditor.factory.creators.EditorCreator ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.event.EventController ;
@@ -43,11 +42,7 @@ public class EditorState extends GameState
 		useApplicationMode() ;
 	}
 
-	public void createMouseAnimExample()
-	{
-		final EditorMouseCreator creator = new EditorMouseCreator() ;
-		addEntity( creator.create( null ) ) ;
-	}
+	public void createMouseAnimExample() {}
 
 	private void initEventControllers()
 	{

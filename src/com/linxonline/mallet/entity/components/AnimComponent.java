@@ -58,11 +58,6 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void recieveID( final int _id ) {}
 
-	/**
-		We need to make sure we aren't waiting for any 
-		animation ID's before we allow the parent to destroy 
-		themselves.
-	*/
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
