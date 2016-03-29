@@ -41,6 +41,17 @@ public class AudioSystem
 				callback.callback( constructAudioDelegate() ) ;
 			}
 		} ) ;
+
+		controller.addEventProcessor( new EventProcessor( "AUDIO_CLEAN", "AUDIO_CLEAN" )
+		{
+			public void processEvent( final Event _event )
+			{
+				if( sourceGenerator != null )
+				{
+					sourceGenerator.clean() ;
+				}
+			}
+		} ) ;
 	}
 
 	public void update( final float _dt )

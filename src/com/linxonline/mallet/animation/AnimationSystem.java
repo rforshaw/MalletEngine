@@ -45,6 +45,14 @@ public class AnimationSystem
 			}
 		} ) ;
 
+		controller.addEventProcessor( new EventProcessor( "ANIMATION_CLEAN", "ANIMATION_CLEAN" )
+		{
+			public void processEvent( final Event _event )
+			{
+				spriteManager.clean() ;
+			}
+		} ) ;
+
 		/**
 			Animation System requires a handle to the Rendering System.
 			It determines when an Animation is displayed or not.

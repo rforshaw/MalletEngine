@@ -36,6 +36,14 @@ public abstract class BasicRenderer implements RenderInterface
 			}
 		} ) ;
 
+		controller.addEventProcessor( new EventProcessor<DrawDelegateCallback>( "DRAW_CLEAN", "DRAW_CLEAN" )
+		{
+			public void processEvent( final Event<DrawDelegateCallback> _event )
+			{
+				clean() ;
+			}
+		} ) ;
+
 		state.setRemoveDelegate( constructRemoveDelegate() ) ;
 	}
 

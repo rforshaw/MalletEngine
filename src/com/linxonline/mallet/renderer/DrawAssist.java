@@ -17,6 +17,8 @@ import com.linxonline.mallet.event.Event ;
 */
 public class DrawAssist
 {
+	private static final Event DRAW_CLEAN = new Event( "DRAW_CLEAN", null ) ; 
+
 	private static Assist assist ;
 
 	private DrawAssist() {}
@@ -42,7 +44,16 @@ public class DrawAssist
 	{
 		return new Event<DrawDelegateCallback>( "DRAW_DELEGATE", _callback ) ;
 	}
-	
+
+	/**
+		Request the active rendering system to clean-up any 
+		unused resources it may still be referencing.
+	*/
+	public static Event constructDrawClean()
+	{
+		return DRAW_CLEAN ;
+	}
+
 	public static Draw amendShape( final Draw _draw, final Shape _shape )
 	{
 		return assist.amendShape( _draw, _shape ) ;

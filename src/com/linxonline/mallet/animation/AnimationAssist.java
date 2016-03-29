@@ -8,9 +8,28 @@ import com.linxonline.mallet.renderer.Draw ;
 
 public class AnimationAssist
 {
+	private static final Event ANIMATION_CLEAN = new Event( "ANIMATION_CLEAN", null ) ;
+
+	/**
+		Request an AnimDelegate from the active animation system.
+		The AnimDelegate allows the user to add/remove Anim objects
+		from being rendered.
+
+		An AnimDelegate is not required for constructing an Anim object, 
+		but is required for displaying it.
+	*/
 	public static Event<AnimationDelegateCallback> constructAnimationDelegate( final AnimationDelegateCallback _callback )
 	{
 		return new Event<AnimationDelegateCallback>( "ANIMATION_DELEGATE", _callback ) ;
+	}
+
+	/**
+		Request the active animation system to clean-up any 
+		unused resources it may still be referencing.
+	*/
+	public static Event constructAnimationClean()
+	{
+		return ANIMATION_CLEAN ;
 	}
 
 	public static Anim createAnimation( final String _file,
