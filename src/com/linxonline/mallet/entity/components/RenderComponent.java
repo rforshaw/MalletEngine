@@ -85,7 +85,10 @@ public class RenderComponent extends Component
 
 	public void clear()
 	{
-		drawDelegate.shutdown() ;
+		if( drawDelegate != null )
+		{
+			drawDelegate.shutdown() ;
+		}
 	}
 
 	@Override

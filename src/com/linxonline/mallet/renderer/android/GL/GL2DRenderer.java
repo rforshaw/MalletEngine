@@ -124,6 +124,12 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
+	public RenderInfo getRenderInfo()
+	{
+		return render.getRenderInfo() ;
+	}
+
+	@Override
 	public EventController getEventController()
 	{
 		return render.getEventController() ;

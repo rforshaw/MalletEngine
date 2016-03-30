@@ -155,6 +155,7 @@ public abstract class BasicRenderer implements RenderInterface
 		info.setCameraPosition( _position ) ;
 	}
 
+	@Override
 	public RenderInfo getRenderInfo()
 	{
 		return info ;

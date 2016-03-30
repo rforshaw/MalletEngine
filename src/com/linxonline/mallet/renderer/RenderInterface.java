@@ -19,6 +19,7 @@ public interface RenderInterface
 	public void updateState( final float _dt ) ;
 	public void draw( final float _dt ) ;			// Draw the current Render State
 
+	public RenderInfo getRenderInfo() ;
 	public EventController getEventController() ;
 
 	public void sort() ;

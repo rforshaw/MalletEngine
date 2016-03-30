@@ -34,14 +34,13 @@ public class DrawState
 	public synchronized void draw( final int _diff, final int _iteration )
 	{
 		addNewDrawData( toAdd ) ;
+		removeOldDrawData( toRemove ) ;
 
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			current.get( i ).draw( _diff, _iteration ) ;
 		}
-
-		removeOldDrawData( toRemove ) ;
 	}
 
 	public synchronized void sort()
@@ -85,8 +84,10 @@ public class DrawState
 	{
 		for( final DrawData remove : _toRemove )
 		{
-			removeDelegate.remove( remove ) ;
-			current.remove( remove ) ;
+			if( current.remove( remove ) == true )
+			{
+				removeDelegate.remove( remove ) ;
+			}
 		}
 		_toRemove.clear() ;
 	}

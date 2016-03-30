@@ -96,12 +96,7 @@ public class GLRenderer extends BasicRenderer
 		for( final DrawData draw : content )
 		{
 			final GLDrawData d = ( GLDrawData )draw ;
-			final ArrayList<Texture<GLImage>> glTextures = d.getGLTextures() ;
-			for( final Texture<GLImage> texture : glTextures )
-			{
-				texture.unregister() ;
-			}
-			glTextures.clear() ;
+			d.getGLTextures().clear() ;
 			d.forceUpdate() ; ;
 		}
 	}
