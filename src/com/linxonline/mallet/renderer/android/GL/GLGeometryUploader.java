@@ -8,6 +8,7 @@ import java.nio.* ;
 
 import android.opengl.GLES30 ;
 
+import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -1183,7 +1184,7 @@ public class GLGeometryUploader
 				{
 					final Location location = range.getParent() ;
 					location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
-					GLGeometryUploader.this.upload( location.getData() ) ;
+					DrawAssist.forceUpdate( location.getData() ) ;
 				}
 
 				start += indexLength ;

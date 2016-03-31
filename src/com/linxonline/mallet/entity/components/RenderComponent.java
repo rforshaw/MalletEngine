@@ -13,7 +13,9 @@ public class RenderComponent extends Component
 {
 	private final ArrayList<Draw> toAddBasic = new ArrayList<Draw>() ;
 	private final ArrayList<Draw> toAddText = new ArrayList<Draw>() ;
+
 	private DrawDelegate drawDelegate = null ;
+	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
 	{
@@ -32,6 +34,11 @@ public class RenderComponent extends Component
 
 	public void addBasicDraw( final Draw _draw )
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		if( drawDelegate == null )
 		{
 			toAddBasic.add( _draw ) ;
@@ -43,6 +50,11 @@ public class RenderComponent extends Component
 
 	public void addTextDraw( final Draw _draw )
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		if( drawDelegate == null )
 		{
 			toAddText.add( _draw ) ;
@@ -58,6 +70,19 @@ public class RenderComponent extends Component
 		{
 			drawDelegate.removeDraw( _draw ) ;
 		}
+	}
+
+	@Override
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		if( drawDelegate != null )
+		{
+			drawDelegate.shutdown() ;
+			drawDelegate = null ;
+		}
+
+		toDestroy = _callback ;
+		super.readyToDestroy( _callback ) ;
 	}
 
 	@Override
@@ -89,13 +114,5 @@ public class RenderComponent extends Component
 		{
 			drawDelegate.shutdown() ;
 		}
-	}
-
-	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
-	{
-		super.passFinalEvents( _events ) ;
-		clear() ;
-		drawDelegate = null ;
 	}
 }

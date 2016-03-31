@@ -8,6 +8,7 @@ import java.nio.* ;
 
 import javax.media.opengl.* ;
 
+import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -96,6 +97,20 @@ public class GLGeometryUploader
 		buffer = getSupportedBuffer( _data ) ;
 		lookup.put( _data, buffer ) ;
 		buffer.upload( _gl, _data ) ;
+	}
+
+	/**
+		Upload geometry and have it prepared for drawing.
+	*/
+	private void update( final GL3 _gl, final GLDrawData _data )
+	{
+		GLBuffer buffer = lookup.get( _data ) ;
+		if( buffer != null )
+		{
+			// If the buffer is still supported in the buffer 
+			// it was previously loaded into then update it.
+			buffer.upload( _gl, _data ) ;
+		}
 	}
 
 	/**
@@ -1188,7 +1203,13 @@ public class GLGeometryUploader
 				{
 					final Location location = range.getParent() ;
 					location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
-					GLGeometryUploader.this.upload( _gl, location.getData() ) ;
+
+					// The data being shifted may be is a state of flux, 
+					// there is no guarantee that it will still 
+					// reside within this buffer.
+					// We'll flag the data to be updated during its
+					// render cycle.
+					DrawAssist.forceUpdate( location.getData() ) ;
 				}
 
 				start += indexLength ;

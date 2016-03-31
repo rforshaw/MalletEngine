@@ -14,15 +14,14 @@ import com.linxonline.mallet.event.Event ;
 
 public class SoundComponent extends EventComponent implements SourceCallback
 {
-	private static final int ANIM_NOT_SET = -1 ;
-
 	private final HashMap<String, Audio> sounds = new HashMap<String, Audio>() ;
 
 	private String defaultAudio = null ;					// Name of the default audio, used as a fallback if all else fails.
-	private Audio currentAudio   = null ;					// Name of the current audio that is playing
+	private Audio currentAudio  = null ;					// Name of the current audio that is playing
 
-	private AudioDelegate delegate = null ;
-	private SourceCallback callback    = null ;
+	private AudioDelegate delegate            = null ;
+	private Component.ReadyCallback toDestroy = null ;
+	private SourceCallback callback           = null ;
 
 	public SoundComponent()
 	{
@@ -61,7 +60,13 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
-		delegate.shutdown() ;
+		if( delegate != null )
+		{
+			delegate.shutdown() ;
+			delegate = null ;
+		}
+
+		toDestroy = _callback ;
 		super.readyToDestroy( _callback ) ;
 	}
 
@@ -82,6 +87,11 @@ public class SoundComponent extends EventComponent implements SourceCallback
 
 	public void playAudio( final String _name )
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		stopAudio() ;
 		final Audio audio = sounds.get( _name ) ;
 		if( delegate != null && audio != null )
@@ -96,6 +106,11 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	**/
 	public void stopAudio()
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		if( delegate != null && currentAudio != null )
 		{
 			delegate.removeAudio( currentAudio ) ;
@@ -147,25 +162,13 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		{
 			public void callback( AudioDelegate _delegate )
 			{
+				delegate = _delegate ;
 				if( defaultAudio != null )
 				{
-					final Audio audio = sounds.get( defaultAudio ) ;
-					if( audio != null )
-					{
-						// Add the default Anim to the Initial Events.
-						// Ensure the component knows it needs to wait for the ID
-						// before requesting another animation.
-						_delegate.addAudio( audio ) ;
-					}
+					playAudio( defaultAudio ) ;
 				}
 			}
 		} ) ) ;
 		super.passInitialEvents( _events ) ;
-	}
-
-	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
-	{
-		super.passFinalEvents( _events ) ;
 	}
 }

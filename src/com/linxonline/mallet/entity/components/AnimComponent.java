@@ -21,8 +21,9 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private String defaultAnim = null ;					// Name of the default animation, used as a fallback if all else fails.
 	private Anim currentAnim   = null ;					// Name of the current animation that is playing
 
-	private AnimationDelegate delegate = null ;
-	private SourceCallback callback    = null ;
+	private AnimationDelegate delegate        = null ;
+	private Component.ReadyCallback toDestroy = null ;
+	private SourceCallback callback           = null ;
 
 	public AnimComponent()
 	{
@@ -61,7 +62,13 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
-		delegate.shutdown() ;
+		if( delegate != null )
+		{
+			delegate.shutdown() ;
+			delegate = null ;
+		}
+
+		toDestroy = _callback ;
 		super.readyToDestroy( _callback ) ;
 	}
 
@@ -74,12 +81,6 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		}
 	}
 
-	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-	}
-	
 	public void playAnimation( final String _name, final SourceCallback _callback )
 	{
 		playAnimation( _name ) ;
@@ -93,6 +94,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	**/
 	public void playAnimation( final String _name )
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		stopAnimation() ;
 		final Anim anim = animations.get( _name ) ;
 		if( delegate != null && anim != null )
@@ -107,6 +113,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	**/
 	public void stopAnimation()
 	{
+		if( toDestroy != null )
+		{
+			return ;
+		}
+
 		if( delegate != null && currentAnim != null )
 		{
 			delegate.removeAnimation( currentAnim ) ;
@@ -158,25 +169,13 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		{
 			public void callback( AnimationDelegate _delegate )
 			{
+				delegate = _delegate ;
 				if( defaultAnim != null )
 				{
-					final Anim anim = animations.get( defaultAnim ) ;
-					if( anim != null )
-					{
-						// Add the default Anim to the Initial Events.
-						// Ensure the component knows it needs to wait for the ID
-						// before requesting another animation.
-						_delegate.addAnimation( anim ) ;
-					}
+					playAnimation( defaultAnim ) ;
 				}
 			}
 		} ) ) ;
 		super.passInitialEvents( _events ) ;
-	}
-
-	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
-	{
-		super.passFinalEvents( _events ) ;
 	}
 }

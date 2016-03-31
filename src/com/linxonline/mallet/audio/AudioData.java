@@ -146,24 +146,16 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 		}
 
 		callbacks.clear() ;
-		source.destroySource() ;
+		if( source != null )
+		{
+			source.destroySource() ;
+		}
 	}
 
 	@Override
 	public void reset()
 	{
-		final int size = callbacks.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			callbacks.get( i ).callbackRemoved() ;
-		}
-		callbacks.clear() ;
-
-		if( source != null )
-		{
-			source.destroySource() ;
-		}
-
+		destroy() ;
 		file   = null ;
 		source = null ;
 	}

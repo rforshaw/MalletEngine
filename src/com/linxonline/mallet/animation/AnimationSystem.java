@@ -91,6 +91,7 @@ public class AnimationSystem
 			{
 				for( final AnimData anim : toRemoveAnim )
 				{
+					anim.stop() ;
 					animations.remove( anim ) ;
 					drawDelegate.removeDraw( anim.getDraw() ) ;
 					anim.unregister() ;

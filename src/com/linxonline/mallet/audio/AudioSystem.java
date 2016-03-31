@@ -67,6 +67,7 @@ public class AudioSystem
 					if( source != null )
 					{
 						a.setSource( source ) ;
+						audio.add( a ) ;
 						a.play() ;
 					}
 				}
@@ -78,8 +79,9 @@ public class AudioSystem
 		{
 			for( final AudioData a : toRemoveAudio )
 			{
+				a.stop() ;
 				audio.remove( a ) ;
-				a.reset() ;
+				a.destroy() ;
 			}
 			toRemoveAudio.clear() ;
 		}
