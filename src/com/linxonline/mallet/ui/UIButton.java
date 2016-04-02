@@ -2,6 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -69,7 +70,23 @@ public class UIButton extends UIElement
 			{
 				listeners.add( _listener ) ;
 				_listener.setParent( this ) ;
+
+				final DrawDelegate delegate = getDrawDelegate() ;
+				if( delegate != null )
+				{
+					_listener.init( delegate ) ;
+				}
 			}
+		}
+	}
+
+	@Override
+	public void setDrawDelegate( final DrawDelegate _delegate )
+	{
+		super.setDrawDelegate( _delegate ) ;
+		for( final Listener listener : listeners )
+		{
+			listener.init( _delegate ) ;
 		}
 	}
 
@@ -188,6 +205,13 @@ public class UIButton extends UIElement
 
 	public static abstract class Listener extends BaseListener
 	{
+		/**
+			Called when UIButton recieves the DrawDelegate
+			Can be called multiple times.
+			Listener does not own the passed in delegate.
+		*/
+		public abstract void init( final DrawDelegate _delegate ) ;
+
 		public abstract void clicked( final InputEvent _event ) ;
 		public abstract void rollover( final InputEvent _event ) ;
 		public abstract void neutral( final InputEvent _event ) ;

@@ -11,7 +11,6 @@ package com.linxonline.mallet.util ;
 */
 public interface SourceCallback
 {
-	public void recieveID( final int _id ) ;	// Passes source ID
 	public void callbackRemoved() ;				// Informs that callback has been removed from source
 
 	public void start() ;						// Informs that source has started playing - via request

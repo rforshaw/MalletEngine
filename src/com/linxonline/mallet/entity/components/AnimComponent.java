@@ -57,9 +57,6 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void recieveID( final int _id ) {}
-
-	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
 		if( delegate != null )

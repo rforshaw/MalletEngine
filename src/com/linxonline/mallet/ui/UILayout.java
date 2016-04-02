@@ -2,6 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
@@ -41,6 +42,16 @@ public class UILayout extends UIElement
 		}
 	}
 
+	@Override
+	public void setDrawDelegate( final DrawDelegate _delegate )
+	{
+		super.setDrawDelegate( _delegate ) ;
+		for( final UIElement element : elements )
+		{
+			element.setDrawDelegate( getDrawDelegate() ) ;
+		}
+	}
+	
 	public void addElement( final UIElement _element )
 	{
 		if( ordered.contains( _element ) == true )

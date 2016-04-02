@@ -2,6 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.input.* ;
@@ -11,6 +12,9 @@ public class UIComponent extends InputComponent
 {
 	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;
 	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+
+	private DrawDelegate drawDelegate = null ;
+	private Component.ReadyCallback toDestroy = null ;
 
 	public UIComponent()
 	{
@@ -52,8 +56,27 @@ public class UIComponent extends InputComponent
 		if( elements.contains( _element ) == false )
 		{
 			_element.setInputAdapterInterface( inputAdapter ) ;
+			_element.setDrawDelegate( drawDelegate ) ;
 			elements.add( _element ) ;
 		}
+	}
+
+	@Override
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		if( drawDelegate != null )
+		{
+			for( final UIElement element : elements )
+			{
+				element.setDrawDelegate( null ) ;
+			}
+
+			drawDelegate.shutdown() ;
+			drawDelegate = null ;
+		}
+
+		toDestroy = _callback ;
+		super.readyToDestroy( _callback ) ;
 	}
 
 	public void removeElement( final UIElement _element )
@@ -76,6 +99,23 @@ public class UIComponent extends InputComponent
 			controller.passEvent( event ) ;
 		}
 		events.clear() ;
+	}
+
+	@Override
+	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	{
+		super.passInitialEvents( _events ) ;
+		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		{
+			public void callback( DrawDelegate _delegate )
+			{
+				drawDelegate = _delegate ;
+				for( final UIElement element : elements )
+				{
+					element.setDrawDelegate( drawDelegate ) ;
+				}
+			}
+		} ) ) ;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.linxonline.mallet.ui ;
 
+import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.event.* ;
 
 public abstract class BaseListener
@@ -9,6 +10,11 @@ public abstract class BaseListener
 	public void setParent( final UIElement _parent )
 	{
 		parent = _parent ;
+	}
+
+	public UIElement getParent()
+	{
+		return parent ;
 	}
 
 	public void sendEvent( final Event<?> _event )
