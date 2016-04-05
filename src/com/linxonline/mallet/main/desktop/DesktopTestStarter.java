@@ -50,7 +50,6 @@ public class DesktopTestStarter extends DesktopStarter
 
 			public void windowClosing( final WindowEvent _event )
 			{
-				stop() ;
 				backendSystem.shutdownSystem() ;
 			}
 

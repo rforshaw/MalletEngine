@@ -87,6 +87,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
+
+		frame.dispose() ;
 	}
 
 	private void initGraphics()

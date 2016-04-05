@@ -8,6 +8,7 @@ import com.linxonline.mallet.game.GameSystem ;
 import com.linxonline.mallet.game.GameLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
@@ -44,6 +45,15 @@ public abstract class DesktopStarter extends StarterInterface
 		loadFileSystem( _fileSystem ) ;						// Ensure FileSystem is setup correctly.
 		backendSystem = _backendSystem ;
 		gameSystem = new GameSystem( _backendSystem ) ;
+		final ShutdownDelegate delegate = _backendSystem.getShutdownDelegate() ;
+		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
+		{
+			public void shutdown()
+			{
+				stop() ;
+				System.exit( 0 ) ;
+			}
+		} ) ;
 	}
 
 	@Override

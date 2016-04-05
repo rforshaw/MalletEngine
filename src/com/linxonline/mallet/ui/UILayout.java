@@ -157,7 +157,7 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
-			private final Vector3 position = new Vector3() ;
+			private final Vector3 childPosition = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
 			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
@@ -165,8 +165,8 @@ public class UILayout extends UIElement
 				calcTotalLength( _elements, totalLength ) ;
 				updateSpaceLengths( _spacers, totalLength ) ;
 
-				calcAbsolutePosition( position, UILayout.this ) ;
-				position.setXYZ( layoutPosition ) ;
+				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
 
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
@@ -175,14 +175,14 @@ public class UILayout extends UIElement
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( position.x, position.y ) == false || 
-						UILayout.this.intersectPoint( position.x + length.x, position.y + length.y ) == false )
+					if( UILayout.this.intersectPoint( childPosition.x, childPosition.y ) == false || 
+						UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == false )
 					{
-						position.setXYZ( layoutPosition.x, position.y + length.y + margin.y, layoutPosition.z ) ;
+						childPosition.setXYZ( layoutPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 					}
 
-					element.setPosition( position.x, position.y, position.z ) ;
-					position.setXYZ( position.x + length.x + margin.x, position.y, layoutPosition.z ) ;
+					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
@@ -199,7 +199,7 @@ public class UILayout extends UIElement
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
-			private final Vector3 position = new Vector3() ;
+			private final Vector3 childPosition = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
 			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
@@ -208,7 +208,7 @@ public class UILayout extends UIElement
 				updateSpaceLengths( _spacers, totalLength ) ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
-				position.setXYZ( layoutPosition ) ;
+				childPosition.setXYZ( layoutPosition ) ;
 
 				final int size = _elements.size() ;
 				for( int i = 0; i < size; i++ )
@@ -217,14 +217,14 @@ public class UILayout extends UIElement
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( position.x, position.y ) == false || 
-						UILayout.this.intersectPoint( position.x + length.x, position.y + length.y ) == false )
+					if( UILayout.this.intersectPoint( childPosition.x, childPosition.y ) == false || 
+						UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == false )
 					{
-						position.setXYZ( position.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
+						childPosition.setXYZ( childPosition.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
 					}
 
-					element.setPosition( position.x, position.y, position.z ) ;
-					position.setXYZ( position.x, position.y + length.y + margin.y, layoutPosition.z ) ;
+					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
