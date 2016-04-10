@@ -4,8 +4,10 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
+
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -16,60 +18,66 @@ import com.linxonline.mallet.renderer.Shape ;
 */
 public class UIFactory
 {
-	public static UIButton.Listener constructButtonListener( final MalletTexture _neutral,
-															 final MalletTexture _rollover,
-															 final MalletTexture _clicked )
+	public static UIButton.Listener constructButtonListener( final MalletTexture _sheet,
+															 final UIButton.UV _neutral,
+															 final UIButton.UV _rollover,
+															 final UIButton.UV _clicked )
 	{
 		return new UIButton.Listener()
 		{
+			private DrawDelegate delegate = null ;
 			private Draw button = null ;
 
 			@Override
-			public void init( final DrawDelegate _delegate )
+			public void setParent( final UIElement _parent )
 			{
-				final UIElement parent = getParent() ;
-				button = DrawAssist.createDraw( parent.getPosition(),
-												parent.getOffset(),
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						delegate.addBasicDraw( button ) ;
+					}
+				} ) ) ;
+
+				button = DrawAssist.createDraw( _parent.getPosition(),
+												_parent.getOffset(),
 												new Vector3(),
 												new Vector3( 1, 1, 1 ), 10 ) ;
 				DrawAssist.amendUI( button, true ) ;
-				DrawAssist.amendTexture( button, _neutral ) ;
-				DrawAssist.amendShape( button, Shape.constructPlane( parent.getLength(), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+				DrawAssist.amendTexture( button, _sheet ) ;
+				DrawAssist.amendShape( button, Shape.constructPlane( _parent.getLength(), _neutral.min, _neutral.max ) ) ;
 				DrawAssist.attachProgram( button, "SIMPLE_TEXTURE" ) ;
-
-				_delegate.addBasicDraw( button ) ;
 			}
 
 			@Override
 			public void clicked( final InputEvent _event )
 			{
-				if( button != null )
-				{
-					DrawAssist.clearTextures( button ) ;
-					DrawAssist.amendTexture( button, _clicked ) ;
-					DrawAssist.forceUpdate( button ) ;
-				}
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( button ), _clicked.min, _clicked.max ) ;
+				DrawAssist.forceUpdate( button ) ;
 			}
 
 			@Override
 			public void rollover( final InputEvent _event )
 			{
-				if( button != null )
-				{
-					DrawAssist.clearTextures( button ) ;
-					DrawAssist.amendTexture( button, _rollover ) ;
-					DrawAssist.forceUpdate( button ) ;
-				}
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( button ), _rollover.min, _rollover.max ) ;
+				DrawAssist.forceUpdate( button ) ;
 			}
 
 			@Override
 			public void neutral( final InputEvent _event )
 			{
-				if( button != null )
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( button ), _neutral.min, _neutral.max ) ;
+				DrawAssist.forceUpdate( button ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
 				{
-					DrawAssist.clearTextures( button ) ;
-					DrawAssist.amendTexture( button, _neutral ) ;
-					DrawAssist.forceUpdate( button ) ;
+					delegate.shutdown() ;
 				}
 			}
 		} ;

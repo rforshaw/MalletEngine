@@ -3,6 +3,8 @@ package com.linxonline.mallet.ui ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.audio.AudioDelegate ;
+
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
@@ -17,6 +19,16 @@ public class UILayout extends UIElement
 	public UILayout( final Type _type )
 	{
 		this( _type, new Vector3(), new Vector3(), new Vector3() ) ;
+	}
+
+	public UILayout( final Type _type, final Vector3 _length )
+	{
+		this( _type, new Vector3(), new Vector3(), _length ) ;
+	}
+
+	public UILayout( final Type _type, final Vector3 _offset, final Vector3 _length )
+	{
+		this( _type, new Vector3(), _offset, _length ) ;
 	}
 
 	public UILayout( final Type _type, final Vector3 _position, final Vector3 _offset, final Vector3 _length )
@@ -42,16 +54,6 @@ public class UILayout extends UIElement
 		}
 	}
 
-	@Override
-	public void setDrawDelegate( final DrawDelegate _delegate )
-	{
-		super.setDrawDelegate( _delegate ) ;
-		for( final UIElement element : elements )
-		{
-			element.setDrawDelegate( getDrawDelegate() ) ;
-		}
-	}
-	
 	public void addElement( final UIElement _element )
 	{
 		if( ordered.contains( _element ) == true )
@@ -98,7 +100,7 @@ public class UILayout extends UIElement
 	{
 		super.update( _dt, _events ) ;
 
-		updater.update( _dt, ordered, spacers ) ;
+		updater.update( _dt, elements, ordered, spacers ) ;
 		for( final UIElement element : ordered )
 		{
 			element.update( _dt, _events ) ;
@@ -118,6 +120,9 @@ public class UILayout extends UIElement
 
 		return InputEvent.Action.PROPAGATE ;
 	}
+
+	@Override
+	public void shutdown() {}
 
 	@Override
 	public void clear()
@@ -152,37 +157,38 @@ public class UILayout extends UIElement
 		next row, the next row starts at the maximum height of the 
 		last row.
 	*/
-	private UIElementUpdater getHorizontalUpdater()
+	private UIElementUpdater getVerticalUpdater()
 	{
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
-			private final Vector3 totalLength = new Vector3() ;
+			private final Vector3 availableLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _ordered, final ArrayList<UIElement> _spacers )
 			{
-				calcTotalLength( _elements, totalLength ) ;
-				updateSpaceLengths( _spacers, totalLength ) ;
+				calcAvailableLength( _elements, UILayout.this.getLength(), availableLength ) ;
+				updateSpaceLengths( _spacers, availableLength ) ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
 				childPosition.setXYZ( layoutPosition ) ;
+				//childPosition.add( UILayout.this.getMargin() ) ;
 
-				final int size = _elements.size() ;
+				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _elements.get( i ) ;
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( childPosition.x, childPosition.y ) == false || 
-						UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == false )
+					if( UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == true )
 					{
-						childPosition.setXYZ( layoutPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+						element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+						childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+						continue ;
 					}
 
-					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
-					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
+					childPosition.setXYZ( childPosition.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
@@ -194,37 +200,37 @@ public class UILayout extends UIElement
 		next column, the next column starts at the maximum width 
 		of the last column.
 	*/
-	private UIElementUpdater getVerticalUpdater()
+	private UIElementUpdater getHorizontalUpdater()
 	{
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
-			private final Vector3 totalLength = new Vector3() ;
+			private final Vector3 availableLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _ordered, final ArrayList<UIElement> _spacers )
 			{
-				calcTotalLength( _elements, totalLength ) ;
-				updateSpaceLengths( _spacers, totalLength ) ;
+				calcAvailableLength( _elements, UILayout.this.getLength(), availableLength ) ;
+				updateSpaceLengths( _spacers, availableLength ) ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
 				childPosition.setXYZ( layoutPosition ) ;
 
-				final int size = _elements.size() ;
+				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _elements.get( i ) ;
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( childPosition.x, childPosition.y ) == false || 
-						UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == false )
+					if( UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == true )
 					{
-						childPosition.setXYZ( childPosition.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
+						element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+						childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
+						continue ;
 					}
 
-					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
-					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+					childPosition.setXYZ( layoutPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
@@ -237,9 +243,9 @@ public class UILayout extends UIElement
 			private final Vector3 position = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _ordered, final ArrayList<UIElement> _spacers )
 			{
-				calcTotalLength( _elements, totalLength ) ;
+				calcAvailableLength( _ordered, UILayout.this.getLength(), totalLength ) ;
 				updateSpaceLengths( _spacers, totalLength ) ;
 
 				final int size = _elements.size() ;
@@ -259,9 +265,9 @@ public class UILayout extends UIElement
 			private final Vector3 position = new Vector3() ;
 			private final Vector3 totalLength = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers )
+			public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _ordered, final ArrayList<UIElement> _spacers )
 			{
-				calcTotalLength( _elements, totalLength ) ;
+				calcAvailableLength( _ordered, UILayout.this.getLength(), totalLength ) ;
 				updateSpaceLengths( _spacers, totalLength ) ;
 
 				final int size = _elements.size() ;
@@ -281,16 +287,20 @@ public class UILayout extends UIElement
 		_pos.setXYZ( pos.x + offset.x, pos.y + offset.y, pos.z + offset.z ) ;
 	}
 
-	private static void calcTotalLength( final ArrayList<UIElement> _elements, final Vector3 _total )
+	private static void calcAvailableLength( final ArrayList<UIElement> _elements, final Vector3 _total, final Vector3 _available )
 	{
-		_total.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+		_available.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		for( final UIElement element : _elements )
 		{
 			final Vector3 length = element.getLength() ;
-			_total.x += length.x ;
-			_total.y += length.y ;
-			_total.z += length.z ;
+			_available.x += length.x ;
+			_available.y += length.y ;
+			_available.z += length.z ;
 		}
+
+		_available.x = _total.x - _available.x ;
+		_available.y = _total.y - _available.y ;
+		_available.z = _total.z - _available.z ;
 	}
 
 	private static void updateSpaceLengths( final ArrayList<UIElement> _spacers, final Vector3 _totalLength )
@@ -302,6 +312,8 @@ public class UILayout extends UIElement
 
 		for( final UIElement spacer : _spacers )
 		{
+			//System.out.println( "Total Len: " + _totalLength ) ;
+			//System.out.println( "LenX: " + lengthX + " LenY: " + lengthY ) ;
 			spacer.setLength( lengthX, lengthY, lengthZ ) ;
 		}
 	}
@@ -316,6 +328,6 @@ public class UILayout extends UIElement
 
 	private interface UIElementUpdater
 	{
-		public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _spacers ) ;
+		public void update( final float _dt, final ArrayList<UIElement> _elements, final ArrayList<UIElement> _ordered, final ArrayList<UIElement> _spacers ) ;
 	}
 }

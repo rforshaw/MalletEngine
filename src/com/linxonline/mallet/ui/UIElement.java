@@ -2,7 +2,6 @@ package com.linxonline.mallet.ui ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -11,9 +10,8 @@ public abstract class UIElement implements InputHandler
 {
 	private final float DEFAULT_MARGIN_SIZE = 9.0f ;
 
-	private ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 	private InputAdapterInterface adapter = null ;
-	private DrawDelegate drawDelegate = null ;
 
 	private final Vector3 position ;
 	private final Vector3 offset ;
@@ -130,24 +128,19 @@ public abstract class UIElement implements InputHandler
 		adapter = _adapter ;
 	}
 
-	public void setDrawDelegate( final DrawDelegate _delegate )
-	{
-		drawDelegate = _delegate ;
-	}
-
 	public InputAdapterInterface getInputAdapter()
 	{
 		return adapter ;
 	}
 
-	public DrawDelegate getDrawDelegate()
-	{
-		return drawDelegate ;
-	}
+	/**
+		Inform the UIElement it needs to release any 
+		resources or handlers it may have acquired.
+	*/
+	public abstract void shutdown() ;
 
 	public void clear()
 	{
-		setDrawDelegate( null ) ;
 		setInputAdapterInterface( null ) ;
 		events.clear() ;
 	}

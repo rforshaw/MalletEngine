@@ -3,6 +3,8 @@ package com.linxonline.mallet.ui ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.audio.AudioDelegate ;
+
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -32,8 +34,14 @@ public class UIButton extends UIElement
 
 	/**
 		If the UIButton is being added to a UILayout
-		then you don't have to define the position.
+		then you don't have to define the position 
+		or offset.
 	*/
+	public UIButton( final Vector3 _length )
+	{
+		this( new Vector3(), new Vector3(), _length, null ) ;
+	}
+
 	public UIButton( final Vector3 _offset,
 					 final Vector3 _length )
 	{
@@ -70,23 +78,7 @@ public class UIButton extends UIElement
 			{
 				listeners.add( _listener ) ;
 				_listener.setParent( this ) ;
-
-				final DrawDelegate delegate = getDrawDelegate() ;
-				if( delegate != null )
-				{
-					_listener.init( delegate ) ;
-				}
 			}
-		}
-	}
-
-	@Override
-	public void setDrawDelegate( final DrawDelegate _delegate )
-	{
-		super.setDrawDelegate( _delegate ) ;
-		for( final Listener listener : listeners )
-		{
-			listener.init( _delegate ) ;
 		}
 	}
 
@@ -194,6 +186,19 @@ public class UIButton extends UIElement
 	}
 
 	/**
+		Cleanup any resources, handlers that the listeners 
+		may have acquired.
+	*/
+	@Override
+	public void shutdown()
+	{
+		for( final Listener listener : listeners )
+		{
+			listener.shutdown() ;
+		}
+	}
+
+	/**
 		Retains listeners on a reset.
 		position, offset, and length are reset.
 	*/
@@ -203,15 +208,20 @@ public class UIButton extends UIElement
 		super.reset() ;
 	}
 
+	public static class UV
+	{
+		public final Vector2 min ;
+		public final Vector2 max ;
+
+		public UV( final Vector2 _min, final Vector2 _max )
+		{
+			min = _min ;
+			max = _max ;
+		}
+	}
+
 	public static abstract class Listener extends BaseListener
 	{
-		/**
-			Called when UIButton recieves the DrawDelegate
-			Can be called multiple times.
-			Listener does not own the passed in delegate.
-		*/
-		public abstract void init( final DrawDelegate _delegate ) ;
-
 		public abstract void clicked( final InputEvent _event ) ;
 		public abstract void rollover( final InputEvent _event ) ;
 		public abstract void neutral( final InputEvent _event ) ;

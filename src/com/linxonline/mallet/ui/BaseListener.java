@@ -24,4 +24,6 @@ public abstract class BaseListener
 			parent.addEvent( _event ) ;
 		}
 	}
+
+	public abstract void shutdown() ;
 }
