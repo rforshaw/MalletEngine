@@ -297,6 +297,16 @@ public class Shape
 		return plane ;
 	}
 
+	public static Shape updatePlaneGeometry( final Shape _plane, final Vector3 _length )
+	{
+		//_plane.getPoint( 0, 0 ).setXYZ() ;
+		_plane.getPoint( 1, 0 ).setXYZ( _length ) ;
+		_plane.getPoint( 2, 0 ).setXYZ( 0.0f, _length.y, 0.0f ) ;
+		_plane.getPoint( 3, 0 ).setXYZ( _length.x, 0.0f, 0.0f ) ;
+
+		return _plane ;
+	}
+
 	public static Shape updatePlaneUV( final Shape _plane, final Vector2 _minUV, final Vector2 _maxUV )
 	{
 		_plane.getUV( 0, 2 ).setXY( _minUV ) ;

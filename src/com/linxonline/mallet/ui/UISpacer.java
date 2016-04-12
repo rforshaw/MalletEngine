@@ -32,6 +32,9 @@ public class UISpacer extends UIElement
 	}
 
 	@Override
+	public void refresh() {}
+
+	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
 		return InputEvent.Action.PROPAGATE ;

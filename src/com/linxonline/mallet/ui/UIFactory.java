@@ -6,6 +6,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.UpdateType ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
@@ -69,6 +70,13 @@ public class UIFactory
 			public void neutral( final InputEvent _event )
 			{
 				Shape.updatePlaneUV( DrawAssist.getDrawShape( button ), _neutral.min, _neutral.max ) ;
+				DrawAssist.forceUpdate( button ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( button ), getParent().getLength() ) ;
 				DrawAssist.forceUpdate( button ) ;
 			}
 
