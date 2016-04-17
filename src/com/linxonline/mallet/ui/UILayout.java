@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;	// Contains all UIElements - Buttons and Spacers
+	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;
 	private final UIElementUpdater updater ;
 
 	public UILayout( final Type _type )
@@ -38,7 +38,7 @@ public class UILayout extends UIElement
 			case VERTICAL   : updater = getVerticalUpdater() ;   break ;
 			case GRID       : updater = getGridUpdater() ;       break ;
 			case FORM       : updater = getFormUpdater() ;       break ;
-			default         : updater = getFormUpdater() ;       break ;
+			default         : updater = getHorizontalUpdater() ; break ;
 		}
 	}
 
@@ -140,10 +140,9 @@ public class UILayout extends UIElement
 	}
 
 	/**
-		Order the UIElements from left to right along the x-axis.
-		When the layouts length.x has been filled, drop down to the 
-		next row, the next row starts at the maximum height of the 
-		last row.
+		Order the UIElements from top to bottom, filling up the space 
+		provided. Multiple elements will share vertical space.
+		Elements with minimum height set will be provided with it.
 	*/
 	private UIElementUpdater getVerticalUpdater()
 	{
@@ -158,8 +157,10 @@ public class UILayout extends UIElement
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 
-				for( final UIElement element : _ordered )
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
 					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
 					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
@@ -171,7 +172,9 @@ public class UILayout extends UIElement
 				availableLength.x = UILayout.this.getLength().x ;
 				availableLength.y = UILayout.this.getLength().y - availableLength.y ;
 
-				final int size = _ordered.size() ;
+				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
+
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
@@ -184,51 +187,27 @@ public class UILayout extends UIElement
 					{
 						lenX = availableLength.x ;
 					}
-					else
-					{
-					
-					}
 
 					if( minimum.y <= 0.01f )
 					{
 						lenY = availableLength.y / minNumY ;
 					}
-					else
-					{
-					
-					}
 
-					//System.out.println( "Vertical X: " + lenX + " Y: " + lenY ) ;
 					element.setLength( lenX, lenY, 0.0f ) ;
-				}
-
-				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
-				childPosition.setXYZ( layoutPosition ) ;
-
-				for( int i = 0; i < size; i++ )
-				{
-					final UIElement element = _ordered.get( i ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == true )
-					{
-						element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
-						childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
-						continue ;
-					}
-
-					childPosition.setXYZ( childPosition.x + length.x + margin.x, layoutPosition.y, layoutPosition.z ) ;
+					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
 	}
 
 	/**
-		Order the UIElements from top to bottom along the y-axis.
-		When the layouts length.y has been filled, jump to the 
-		next column, the next column starts at the maximum width 
-		of the last column.
+		Order the UIElements from left to right, filling up the space 
+		provided. Multiple elements will share horizontal space.
+		Elements with minimum width set will be provided with it.
 	*/
 	private UIElementUpdater getHorizontalUpdater()
 	{
@@ -243,8 +222,10 @@ public class UILayout extends UIElement
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 
-				for( final UIElement element : _ordered )
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
 					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
 					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
@@ -256,7 +237,9 @@ public class UILayout extends UIElement
 				availableLength.x = UILayout.this.getLength().x - availableLength.x ;
 				availableLength.y = UILayout.this.getLength().y ;
 
-				final int size = _ordered.size() ;
+				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
+
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
@@ -269,41 +252,18 @@ public class UILayout extends UIElement
 					{
 						lenX = availableLength.x / minNumX ;
 					}
-					else
-					{
-					
-					}
 
 					if( minimum.y <= 0.01f )
 					{
 						lenY = availableLength.y ;
 					}
-					else
-					{
-					
-					}
 
-					//System.out.println( "Horizontal X: " + lenX + " Y: " + lenY ) ;
 					element.setLength( lenX, lenY, 0.0f ) ;
-				}
-
-				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
-				childPosition.setXYZ( layoutPosition ) ;
-
-				for( int i = 0; i < size; i++ )
-				{
-					final UIElement element = _ordered.get( i ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( UILayout.this.intersectPoint( childPosition.x + length.x, childPosition.y + length.y ) == true )
-					{
-						element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
-						childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
-						continue ;
-					}
-
-					childPosition.setXYZ( layoutPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
 				}
 			}
 		} ;
@@ -338,66 +298,6 @@ public class UILayout extends UIElement
 		_pos.setXYZ( pos.x + offset.x, pos.y + offset.y, pos.z + offset.z ) ;
 	}
 
-	private static void calcAvailableLengthMissX( final ArrayList<UIElement> _elements, final Vector3 _total, final Vector3 _available )
-	{
-		_available.setXYZ( 0.0f, 0.0f, 0.0f ) ;
-		for( final UIElement element : _elements )
-		{
-			final Vector3 margin = element.getMargin() ;
-			final Vector3 minLen = element.getMinimumLength() ;
-			//_available.x += margin.x + ( minLen != null ? minLen.x : 0.0f ) ;
-			_available.y += margin.y + ( minLen != null ? minLen.y : 0.0f ) ;
-			_available.z += margin.z + ( minLen != null ? minLen.z : 0.0f ) ;
-		}
-
-		_available.x = _total.x - _available.x ;
-		_available.y = _total.y - _available.y ;
-		_available.z = _total.z - _available.z ;
-	}
-
-	private static void calcAvailableLengthMissY( final ArrayList<UIElement> _elements, final Vector3 _total, final Vector3 _available )
-	{
-		_available.setXYZ( 0.0f, 0.0f, 0.0f ) ;
-		for( final UIElement element : _elements )
-		{
-			final Vector3 margin = element.getMargin() ;
-			final Vector3 minLen = element.getMinimumLength() ;
-			_available.x += margin.x + ( minLen != null ? minLen.x : 0.0f ) ;
-			//_available.y += margin.y + ( minLen != null ? minLen.y : 0.0f ) ;
-			_available.z += margin.z + ( minLen != null ? minLen.z : 0.0f ) ;
-		}
-
-		_available.x = _total.x - _available.x ;
-		_available.y = _total.y - _available.y ;
-		_available.z = _total.z - _available.z ;
-	}
-
-	private static void updateLengthsMaxX( final ArrayList<UIElement> _elements, final Vector3 _totalLength )
-	{
-		final int num = _elements.size() ;
-		final float lengthX = _totalLength.x /*/ num*/ ;
-		final float lengthY = _totalLength.y / num ;
-		final float lengthZ = _totalLength.z / num ;
-
-		for( final UIElement element : _elements )
-		{
-			element.setLength( lengthX, lengthY, lengthZ ) ;
-		}
-	}
-
-	private static void updateLengthsMaxY( final ArrayList<UIElement> _elements, final Vector3 _totalLength )
-	{
-		final int num = _elements.size() ;
-		final float lengthX = _totalLength.x / num ;
-		final float lengthY = _totalLength.y /*/ num*/ ;
-		final float lengthZ = _totalLength.z / num ;
-
-		for( final UIElement element : _elements )
-		{
-			element.setLength( lengthX, lengthY, lengthZ ) ;
-		}
-	}
-	
 	public enum Type
 	{
 		HORIZONTAL,
