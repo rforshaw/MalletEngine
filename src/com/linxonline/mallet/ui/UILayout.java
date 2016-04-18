@@ -64,7 +64,7 @@ public class UILayout extends UIElement
 		ordered.add( _element ) ;
 		_element.setInputAdapterInterface( getInputAdapter() ) ;
 	}
-	
+
 	public void removeElement( final UIElement _element )
 	{
 		if( ordered.remove( _element ) == true )

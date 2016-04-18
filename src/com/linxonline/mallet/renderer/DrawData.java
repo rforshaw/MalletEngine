@@ -16,7 +16,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private final ArrayList<MalletTexture> textures = new ArrayList<MalletTexture>() ;
 	private MalletColour colour = null ;
 	private MalletFont font = null ;
-	private String text = null ;
+	private StringBuilder text = null ;
 
 	private boolean update = true ;
 	private boolean ui = false ;
@@ -68,12 +68,12 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		return colour ;
 	}
 
-	public void setText( final String _text )
+	public void setText( final StringBuilder _text )
 	{
 		text = _text ;
 	}
 
-	public String getText()
+	public StringBuilder getText()
 	{
 		return text ;
 	}

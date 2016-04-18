@@ -84,7 +84,7 @@ public class DrawAssist
 		return assist.amendPosition( _draw, _x, _y, _z ) ;
 	}
 
-	public static Draw amendText( final Draw _draw, final String _text )
+	public static Draw amendText( final Draw _draw, final StringBuilder _text )
 	{
 		return assist.amendText( _draw, _text ) ;
 	}
@@ -97,6 +97,11 @@ public class DrawAssist
 	public Draw amendColour( final Draw _draw, final MalletColour _colour )
 	{
 		return assist.amendColour( _draw, _colour ) ;
+	}
+
+	public static Draw amendOrder( final Draw _draw, final int _order )
+	{
+		return assist.amendOrder( _draw, _order ) ;
 	}
 
 	public static Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
@@ -154,7 +159,7 @@ public class DrawAssist
 		return assist.getPosition( _draw ) ;
 	}
 
-	public static String getText( final Draw _draw )
+	public static StringBuilder getText( final Draw _draw )
 	{
 		return assist.getText( _draw ) ;
 	}
@@ -167,6 +172,21 @@ public class DrawAssist
 	public static boolean isUI( final Draw _draw )
 	{
 		return assist.isUI( _draw ) ;
+	}
+
+	/**
+		Create a Text Draw object.
+		Handles the nuances of text rendering and ensures a performant display.
+	*/
+	public static Draw createTextDraw( final StringBuilder _text,
+										final MalletFont _font,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order )
+	{
+		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
 	}
 
 	/**
@@ -209,9 +229,10 @@ public class DrawAssist
 		public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z ) ;
-		public Draw amendText( final Draw _draw, final String _text ) ;
+		public Draw amendText( final Draw _draw, final StringBuilder _text ) ;
 		public Draw amendUI( final Draw _draw, final boolean _ui ) ;
 		public Draw amendColour( final Draw _draw, final MalletColour _colour ) ;
+		public Draw amendOrder( final Draw _draw, final int _order ) ;
 
 		public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation ) ;
 		public Draw amendUpdateType( final Draw _draw, final UpdateType _type ) ;
@@ -223,13 +244,21 @@ public class DrawAssist
 		public Vector3 getRotate( final Draw _draw ) ;
 		public Vector3 getScale( final Draw _draw ) ;
 		public Vector3 getPosition( final Draw _draw ) ;
-		public String getText( final Draw _draw ) ;
+		public StringBuilder getText( final Draw _draw ) ;
 		public MalletColour getColour( final Draw _draw ) ;
 		public boolean isUI( final Draw _draw ) ;
 
 		public int getTextureSize( final Draw _draw ) ;
 		public MalletTexture getTexture( final Draw _draw, final int _index ) ;
 		public void clearTextures( final Draw _draw ) ;
+
+		public Draw createTextDraw( final StringBuilder _text,
+									final MalletFont _font,
+									final Vector3 _position,
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale,
+									final int _order ) ;
 
 		public Draw createTextDraw( final String _text,
 										final MalletFont _font,

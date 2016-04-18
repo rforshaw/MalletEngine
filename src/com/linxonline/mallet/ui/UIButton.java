@@ -2,7 +2,17 @@ package com.linxonline.mallet.ui ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.UpdateType ;
+
+import com.linxonline.mallet.renderer.MalletFont ;
+
+import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.Shape ;
+
 import com.linxonline.mallet.audio.AudioDelegate ;
 
 import com.linxonline.mallet.input.* ;
@@ -87,6 +97,9 @@ public class UIButton extends UIElement
 		}
 	}
 
+	/**
+		Update all of the Button listeners.
+	*/
 	@Override
 	public void refresh()
 	{
@@ -223,6 +236,14 @@ public class UIButton extends UIElement
 		super.reset() ;
 	}
 
+	public static UIListener constructUIListener( final MalletTexture _sheet,
+												  final UIButton.UV _neutral,
+												  final UIButton.UV _rollover,
+												  final UIButton.UV _clicked )
+	{
+		return new UIListener( _sheet, _neutral, _rollover, _clicked ) ;
+	}
+
 	public static class UV
 	{
 		public final Vector2 min ;
@@ -232,6 +253,88 @@ public class UIButton extends UIElement
 		{
 			min = _min ;
 			max = _max ;
+		}
+	}
+
+	public static class UIListener extends Listener
+	{
+		private final MalletTexture sheet ;
+		private final UIButton.UV neutral ;
+		private final UIButton.UV rollover ;
+		private final UIButton.UV clicked ;
+
+		private DrawDelegate delegate = null ;
+		private Draw draw = null ;
+
+		public UIListener( final MalletTexture _sheet,
+						   final UIButton.UV _neutral,
+						   final UIButton.UV _rollover,
+						   final UIButton.UV _clicked )
+		{
+			sheet = _sheet ;
+			neutral = _neutral ;
+			rollover = _rollover ;
+			clicked = _clicked ;
+		}
+
+		@Override
+		public void setParent( final UIElement _parent )
+		{
+			super.setParent( _parent ) ;
+			_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+			{
+				public void callback( DrawDelegate _delegate )
+				{
+					delegate = _delegate ;
+					delegate.addBasicDraw( draw ) ;
+				}
+			} ) ) ;
+
+			draw = DrawAssist.createDraw( _parent.getPosition(),
+										  _parent.getOffset(),
+										  new Vector3(),
+										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+			DrawAssist.amendUI( draw, true ) ;
+			DrawAssist.amendTexture( draw, sheet ) ;
+			DrawAssist.amendShape( draw, Shape.constructPlane( _parent.getLength(), neutral.min, neutral.max ) ) ;
+			DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+		}
+
+		@Override
+		public void clicked( final InputEvent _event )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
+			DrawAssist.forceUpdate( draw ) ;
+		}
+
+		@Override
+		public void rollover( final InputEvent _event )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( draw ) ;
+		}
+
+		@Override
+		public void neutral( final InputEvent _event )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
+			DrawAssist.forceUpdate( draw ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getParent().getLength() ) ;
+			DrawAssist.forceUpdate( draw ) ;
+		}
+
+		@Override
+		public void shutdown()
+		{
+			if( delegate != null )
+			{
+				delegate.shutdown() ;
+			}
 		}
 	}
 

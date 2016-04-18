@@ -631,7 +631,7 @@ public class GLGeometryUploader
 			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
 			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
-			final String text = _data.getText() ;
+			final StringBuilder text = _data.getText() ;
 			final int length = text.length() ;
 			final int initialIndexOffset = _location.getVertexStart() / geometry.vertexStrideBytes ;
 
@@ -798,7 +798,7 @@ public class GLGeometryUploader
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
 			final Shape shape = _data.getDrawShape() ;
-			final String text = _data.getText() ;
+			final StringBuilder text = _data.getText() ;
 			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * text.length() ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
@@ -959,7 +959,7 @@ public class GLGeometryUploader
 
 		private Location findLocationText( final GLDrawData _data )
 		{
-			final String text = _data.getText() ;
+			final StringBuilder text = _data.getText() ;
 			return findLocation( ( 6 * text.length() ), ( 4 * text.length() ) ) ;
 		}
 

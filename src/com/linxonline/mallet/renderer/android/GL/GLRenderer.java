@@ -242,7 +242,7 @@ public class GLRenderer extends BasicRenderer
 				return _draw ;
 			}
 
-			public Draw amendText( final Draw _draw, final String _text )
+			public Draw amendText( final Draw _draw, final StringBuilder _text )
 			{
 				( ( GLDrawData )_draw ).setText( _text ) ;
 				return _draw ;
@@ -257,6 +257,12 @@ public class GLRenderer extends BasicRenderer
 			public Draw amendColour( final Draw _draw, final MalletColour _colour )
 			{
 				( ( GLDrawData )_draw ).setColour( _colour ) ;
+				return _draw ;
+			}
+
+			public Draw amendOrder( final Draw _draw, final int _order )
+			{
+				( ( GLDrawData )_draw ).setOrder( _order ) ;
 				return _draw ;
 			}
 
@@ -319,7 +325,7 @@ public class GLRenderer extends BasicRenderer
 				return ( ( GLDrawData )_draw ).getPosition() ;
 			}
 
-			public String getText( final Draw _draw )
+			public StringBuilder getText( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).getText() ;
 			}
@@ -334,19 +340,31 @@ public class GLRenderer extends BasicRenderer
 				return ( ( GLDrawData )_draw ).isUI() ;
 			}
 
-			public Draw createTextDraw( final String _text,
-											final MalletFont _font,
-											final Vector3 _position,
-											final Vector3 _offset,
-											final Vector3 _rotation,
-											final Vector3 _scale,
-											final int _order )
+			public Draw createTextDraw( final StringBuilder _text,
+										final MalletFont _font,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order )
 			{
 				final GLDrawData draw = ( GLDrawData )createDraw( _position, _offset, _rotation, _scale, _order ) ;
 				attachProgram( draw, "SIMPLE_FONT" ) ;
 				draw.setText( _text ) ;
 				draw.setFont( _font ) ;
 				return draw ;
+			}
+
+			public Draw createTextDraw( final String _text,
+										final MalletFont _font,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order )
+			{
+				final StringBuilder builder = new StringBuilder( _text ) ;
+				return createTextDraw( builder, _font, _position, _offset, _rotation, _scale, _order ) ;
 			}
 
 			public Draw createDraw( final Vector3 _position,
@@ -467,7 +485,7 @@ public class GLRenderer extends BasicRenderer
 					return ;
 				}
 
-				final String text = _data.getText() ;
+				final StringBuilder text = _data.getText() ;
 				if( text == null )
 				{
 					System.out.println( "No Text, set." ) ;
@@ -503,16 +521,8 @@ public class GLRenderer extends BasicRenderer
 
 				final int height = fm.getHeight() ;
 				final int lineWidth = /*_data.getLineWidth()*/500 + ( int )position.x ;
-				String[] words = _data.getWords() ;
-				if( words == null )
-				{
-					words = optimiseText( fm, text, position, lineWidth ) ;
-					_data.setWords( words ) ;
-				}
 
 				final MalletColour colour = _data.getColour() ;
-				//final int alignment = _data.getTextAlignment() ;
-
 				final Matrix4 clipMatrix = _data.getClipMatrix() ;
 				if( clipMatrix != null )
 				{
@@ -524,9 +534,6 @@ public class GLRenderer extends BasicRenderer
 					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
 				}
 
-				//final Vector3 currentPos = new Vector3( position ) ;
-
-				//setTextAlignment( alignment, currentPos, fm.stringWidth( words[0] ) ) ;
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 

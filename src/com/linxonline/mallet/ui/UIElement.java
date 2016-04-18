@@ -17,6 +17,7 @@ public abstract class UIElement implements InputHandler
 	private Vector3 maxLength = null ;
 
 	private boolean dirty = true ;
+	private int layer = 0 ;
 
 	private final Vector3 position ;
 	private final Vector3 offset ;
@@ -175,6 +176,11 @@ public abstract class UIElement implements InputHandler
 		margin.setXYZ( _x, _y, _z ) ;
 	}
 
+	public void setLayer( final int _layer )
+	{
+		layer = _layer ;
+	}
+
 	public boolean isDirty()
 	{
 		return dirty ;
@@ -203,6 +209,11 @@ public abstract class UIElement implements InputHandler
 	public Vector3 getMargin()
 	{
 		return margin ;
+	}
+
+	public int getLayer()
+	{
+		return layer ;
 	}
 
 	@Override

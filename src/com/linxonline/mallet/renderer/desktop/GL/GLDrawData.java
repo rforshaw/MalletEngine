@@ -18,8 +18,6 @@ public class GLDrawData extends DrawData
 {
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
-	private String[] words  = null ;
-	
 	private Matrix4 drawMatrix    = new Matrix4() ;
 	private GLProgram drawProgram = null ;
 	private Shape drawShape       = null ;
@@ -68,22 +66,6 @@ public class GLDrawData extends DrawData
 		}
 		textures.clear() ;
 		getMalletTextures().clear() ;
-	}
-
-	public void setText( final String _text )
-	{
-		super.setText( _text ) ;
-		words = null ;
-	}
-
-	public void setWords( final String[] _words )
-	{
-		words = _words ;
-	}
-
-	public String[] getWords()
-	{
-		return words ;
 	}
 
 	public void setDrawShape( final Shape _shape )
@@ -185,7 +167,6 @@ public class GLDrawData extends DrawData
 	public void reset()
 	{
 		super.reset() ;
-		words       = null ;
 		drawMatrix  = null ;
 		drawProgram = null ;
 		drawShape   = null ;
