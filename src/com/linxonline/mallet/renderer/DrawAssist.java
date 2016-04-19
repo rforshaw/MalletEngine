@@ -94,7 +94,7 @@ public class DrawAssist
 		return assist.amendUI( _draw, _ui ) ;
 	}
 
-	public Draw amendColour( final Draw _draw, final MalletColour _colour )
+	public static Draw amendColour( final Draw _draw, final MalletColour _colour )
 	{
 		return assist.amendColour( _draw, _colour ) ;
 	}
@@ -157,6 +157,11 @@ public class DrawAssist
 	public static Vector3 getPosition( final Draw _draw )
 	{
 		return assist.getPosition( _draw ) ;
+	}
+
+	public static Vector3 getOffset( final Draw _draw )
+	{
+		return assist.getOffset( _draw ) ;
 	}
 
 	public static StringBuilder getText( final Draw _draw )
@@ -244,6 +249,7 @@ public class DrawAssist
 		public Vector3 getRotate( final Draw _draw ) ;
 		public Vector3 getScale( final Draw _draw ) ;
 		public Vector3 getPosition( final Draw _draw ) ;
+		public Vector3 getOffset( final Draw _draw ) ;
 		public StringBuilder getText( final Draw _draw ) ;
 		public MalletColour getColour( final Draw _draw ) ;
 		public boolean isUI( final Draw _draw ) ;

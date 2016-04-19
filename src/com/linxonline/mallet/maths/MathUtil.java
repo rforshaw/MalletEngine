@@ -21,6 +21,25 @@ public class MathUtil
 		return ( isNegative == true ) ? -num : num ;
 	}
 
+	public static long toLong( final StringBuilder _builder )
+	{
+		return toLong( _builder, 0, _builder.length() ) ;
+	}
+
+	public static long toLong( final StringBuilder _builder, final int _start, final int _end )
+	{
+		final boolean isNegative = ( _builder.charAt( 0 ) == '-' ) ? true : false ;
+		final int start = ( isNegative == true ) ? _start + 1 : _start ;
+
+		long num = 0 ;
+		for( int i = start; i < _end; i++ )
+		{
+			num = ( num * 10L ) + ( long )Character.getNumericValue( _builder.charAt( i ) ) ;
+		}
+
+		return ( isNegative == true ) ? -num : num ;
+	}
+
 	public static float toFloat( final StringBuilder _builder )
 	{
 		return toFloat( _builder, 0, _builder.length() ) ;
@@ -80,7 +99,7 @@ public class MathUtil
 			}
 
 			increment += ( isDec == true ) ? 1 : 0 ;
-			num = ( num * 10.0f ) + ( double )Character.getNumericValue( c ) ;
+			num = ( num * 10.0 ) + ( double )Character.getNumericValue( c ) ;
 		}
 
 		if( isNegative == true )

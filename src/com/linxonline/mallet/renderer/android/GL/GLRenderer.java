@@ -173,6 +173,12 @@ public class GLRenderer extends BasicRenderer
 					}
 
 					@Override
+					public int stringWidth( final StringBuilder _text )
+					{
+						return fontMap.stringWidth( _text ) ;
+					}
+
+					@Override
 					public int stringWidth( final String _text )
 					{
 						return fontMap.stringWidth( _text ) ;
@@ -323,6 +329,11 @@ public class GLRenderer extends BasicRenderer
 			public Vector3 getPosition( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).getPosition() ;
+			}
+
+			public Vector3 getOffset( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getOffset() ;
 			}
 
 			public StringBuilder getText( final Draw _draw )

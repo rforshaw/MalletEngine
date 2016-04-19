@@ -10,6 +10,7 @@ public abstract class Font<T>
 	}
 
 	public abstract int getHeight() ;
+	public abstract int stringWidth( final StringBuilder _text ) ;
 	public abstract int stringWidth( final String _text ) ;
 
 	public void setFont( final T _font )

@@ -19,6 +19,18 @@ public class GLFontMap extends Resource
 		fontMap = _fontMap ;
 	}
 
+	public int stringWidth( final StringBuilder _text )
+	{
+		final int length = _text.length() ;
+		int width = 0 ;
+		for( int i = 0; i < length; ++i )
+		{
+			width += ( int )getGlyphWithChar( _text.charAt( i ) ).advance ;
+		}
+
+		return width ;
+	}
+
 	public int stringWidth( final String _text )
 	{
 		final int length = _text.length() ;

@@ -41,6 +41,11 @@ public class MalletFont
 		return font.getHeight() ;
 	}
 
+	public int stringWidth( final StringBuilder _text )
+	{
+		return font.stringWidth( _text ) ;
+	}
+
 	public int stringWidth( final String _text )
 	{
 		return font.stringWidth( _text ) ;

@@ -241,7 +241,17 @@ public class UIButton extends UIElement
 												  final UIButton.UV _rollover,
 												  final UIButton.UV _clicked )
 	{
-		return new UIListener( _sheet, _neutral, _rollover, _clicked ) ;
+		return new UIListener( "", null, _sheet, _neutral, _rollover, _clicked ) ;
+	}
+
+	public static UIListener constructUIListener( final String _text,
+												  final MalletFont _font,
+												  final MalletTexture _sheet,
+												  final UIButton.UV _neutral,
+												  final UIButton.UV _rollover,
+												  final UIButton.UV _clicked )
+	{
+		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
 	public static class UV
@@ -258,6 +268,9 @@ public class UIButton extends UIElement
 
 	public static class UIListener extends Listener
 	{
+		private final StringBuilder text = new StringBuilder() ;
+		private MalletFont font ;
+
 		private final MalletTexture sheet ;
 		private final UIButton.UV neutral ;
 		private final UIButton.UV rollover ;
@@ -265,12 +278,18 @@ public class UIButton extends UIElement
 
 		private DrawDelegate delegate = null ;
 		private Draw draw = null ;
+		private Draw drawText = null ;
 
-		public UIListener( final MalletTexture _sheet,
+		public UIListener( final String _text,
+						   final MalletFont _font,
+						   final MalletTexture _sheet,
 						   final UIButton.UV _neutral,
 						   final UIButton.UV _rollover,
 						   final UIButton.UV _clicked )
 		{
+			text.append( _text ) ;
+			font = _font ;
+
 			sheet = _sheet ;
 			neutral = _neutral ;
 			rollover = _rollover ;
@@ -286,9 +305,19 @@ public class UIButton extends UIElement
 				public void callback( DrawDelegate _delegate )
 				{
 					delegate = _delegate ;
-					delegate.addBasicDraw( draw ) ;
+					if( draw != null )
+					{
+						delegate.addBasicDraw( draw ) ;
+					}
+
+					if( drawText != null )
+					{
+						delegate.addTextDraw( drawText ) ;
+					}
 				}
 			} ) ) ;
+
+			final Vector3 length = _parent.getLength() ;
 
 			draw = DrawAssist.createDraw( _parent.getPosition(),
 										  _parent.getOffset(),
@@ -296,8 +325,20 @@ public class UIButton extends UIElement
 										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
 			DrawAssist.amendTexture( draw, sheet ) ;
-			DrawAssist.amendShape( draw, Shape.constructPlane( _parent.getLength(), neutral.min, neutral.max ) ) ;
+			DrawAssist.amendShape( draw, Shape.constructPlane( length, neutral.min, neutral.max ) ) ;
 			DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+
+			final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
+			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+
+			drawText = DrawAssist.createTextDraw( text,
+												  font,
+												  _parent.getPosition(),
+												  textOffset,
+												  new Vector3(),
+												  new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
+			DrawAssist.amendUI( drawText, true ) ;
+			DrawAssist.attachProgram( drawText, "SIMPLE_FONT" ) ;
 		}
 
 		@Override
@@ -324,8 +365,19 @@ public class UIButton extends UIElement
 		@Override
 		public void refresh()
 		{
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getParent().getLength() ) ;
+			final Vector3 length = getParent().getLength() ;
+			final Vector3 offset = getParent().getOffset() ;
+
+			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 			DrawAssist.forceUpdate( draw ) ;
+
+			if( font != null )
+			{
+				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
+				textOffset.setXYZ( offset ) ;
+				textOffset.add( ( length.x / 2 ) - ( font.stringWidth( text ) / 2 ), ( length.y / 2 ) - ( font.getHeight() / 2 ), 0.0f ) ;
+				DrawAssist.forceUpdate( drawText ) ;
+			}
 		}
 
 		@Override
