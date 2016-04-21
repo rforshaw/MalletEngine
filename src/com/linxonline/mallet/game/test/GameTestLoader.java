@@ -213,6 +213,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ),
 																	 200 ) ;
+					DrawAssist.amendColour( draw, MalletColour.red() ) ;
 						_delegate.addTextDraw( draw ) ;
 					}
 				} ) ) ;

@@ -633,6 +633,7 @@ public class GLGeometryUploader
 		{
 			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 
+			final MalletColour colour = _data.getColour() ;
 			final MalletFont font = _data.getFont() ;
 			final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 
@@ -696,8 +697,9 @@ public class GLGeometryUploader
 							}
 							case COLOUR :
 							{
-								final MalletColour colour = glyph.shape.getColour( j, k ) ;
-								verticies[vertexInc++] = getABGR( colour ) ;
+								// GLDrawData colour overrides Shapes colour.
+								final MalletColour c = ( colour != null ) ? colour : glyph.shape.getColour( j, k ) ;
+								verticies[vertexInc++] = getABGR( c ) ;
 								break ;
 							}
 							case UV     :
