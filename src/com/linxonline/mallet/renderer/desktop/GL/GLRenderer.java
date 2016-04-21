@@ -44,7 +44,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public static final int PERSPECTIVE_MODE  = 2 ;
 
 	protected static final Vector3 DEFAULT_OFFSET = new Vector3( 0, 0, 0 ) ;
-	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
 
 	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
@@ -53,7 +52,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache  = new ObjectCache<Matrix4>( Matrix4.class ) ;
-	protected final static Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 		// Combined Model View and Projection Matrix
 	protected final static Matrix4 uiMatrix                  = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
 	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
 
@@ -345,6 +343,26 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public Camera getCamera()
 			{
 				return camera ;
+			}
+
+			public Camera amendOrthographic( final Camera _camera,
+											 final float _top,
+											 final float _bottom,
+											 final float _left,
+											 final float _right,
+											 final float _near,
+											 final float _far )
+			{
+				final float invZ = 1.0f / ( _far - _near ) ;
+				final float invY = 1.0f / ( _top - _bottom ) ;
+				final float invX = 1.0f / ( _right - _left ) ;
+
+				final Matrix4 proj = ( ( BasicCamera )_camera ).getProjection() ;
+				proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
+						  0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
+						  0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
+						  0.0f,        0.0f,        0.0f,         1.0f ) ;
+				return _camera ;
 			}
 
 			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
@@ -640,22 +658,22 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 	protected void resize()
 	{
-		final Vector2 renderDimensions = getRenderInfo().getRenderDimensions() ;
-		final Vector2 displayDimensions = getRenderInfo().getScaledRenderDimensions() ;
-
 		switch( viewMode )
 		{
 			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
 			case ORTHOGRAPHIC_MODE : 
-			default                : constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ; break ;
+			default                :
+			{
+				final Vector2 renderDimensions = getRenderInfo().getRenderDimensions() ;
+				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1.0f, 1.0f ) ;
+				break ;
+			}
 		}
 
+		final Vector2 displayDimensions = getRenderInfo().getScaledRenderDimensions() ;
 		final Vector2 screenOffset = getRenderInfo().getScreenOffset() ;
 		gl.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 		//GLRenderer.handleError( "Viewport: ", gl ) ;
-
-		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
-		//gl.glLineWidth( DEFAULT_LINEWIDTH ) ;
 	}
 
 	@Override
@@ -726,32 +744,16 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		state.draw( ( int )( updateDT / drawDT ), renderIter ) ;
 
 		final Matrix4 worldProjection = matrixCache.get() ;
-		Matrix4.multiply( modelViewProjectionMatrix, worldMatrix, worldProjection ) ;
+		Matrix4.multiply( camera.getProjection(), worldMatrix, worldProjection ) ;
 
 		final Matrix4 uiProjection = matrixCache.get() ;
-		Matrix4.multiply( modelViewProjectionMatrix, uiMatrix, uiProjection ) ;
+		Matrix4.multiply( camera.getProjection(), uiMatrix, uiProjection ) ;
 
 		uploader.draw( gl, worldProjection, uiProjection ) ;
 
 		matrixCache.reclaim( worldProjection ) ;
 		matrixCache.reclaim( uiProjection ) ;
 	}
-
-	private static void constructOrhto2D( final Matrix4 _matrix, final float _left, final float _right, final float _bottom, final float _top )
-	{
-		final float zNear = -1.0f ;
-		final float zFar = 1.0f ;
-		final float invZ = 1.0f / ( zFar - zNear ) ;
-		final float invY = 1.0f / ( _top - _bottom ) ;
-		final float invX = 1.0f / ( _right - _left ) ;
-
-		_matrix.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
-					 0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
-					 0.0f,        0.0f,        -2.0f * invZ, ( -( zFar + zNear ) * invZ ),
-					 0.0f,        0.0f,        0.0f,         1.0f ) ;
-	}
-
-	public void sort() {}
 
 	/**
 		Remove resources that are not being used.

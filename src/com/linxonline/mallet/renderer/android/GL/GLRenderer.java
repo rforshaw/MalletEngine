@@ -43,12 +43,8 @@ public class GLRenderer extends BasicRenderer
 	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
-	protected final Matrix4 modelViewProjectionMatrix = matrixCache.get() ; 	// Combined Model View and Projection Matrix
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
-
-	protected Vector3 oldCameraPosition = new Vector3() ;
-	protected Vector3 cameraPosition = new Vector3() ;
 
 	protected Vector3 pos = new Vector3() ;
 
@@ -396,6 +392,26 @@ public class GLRenderer extends BasicRenderer
 				return camera ;
 			}
 
+			public Camera amendOrthographic( final Camera _camera,
+											 final float _top,
+											 final float _bottom,
+											 final float _left,
+											 final float _right,
+											 final float _near,
+											 final float _far )
+			{
+				final float invZ = 1.0f / ( _far - _near ) ;
+				final float invY = 1.0f / ( _top - _bottom ) ;
+				final float invX = 1.0f / ( _right - _left ) ;
+
+				final Matrix4 proj = ( ( BasicCamera )_camera ).getProjection() ;
+				proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
+						  0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
+						  0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
+						  0.0f,        0.0f,        0.0f,         1.0f ) ;
+				return _camera ;
+			}
+			
 			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
 			{
 				( ( BasicCamera )_camera ).setPosition( _x, _y, _z ) ;
@@ -640,7 +656,11 @@ public class GLRenderer extends BasicRenderer
 		{
 			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
 			case ORTHOGRAPHIC_MODE : 
-			default                : constructOrhto2D( modelViewProjectionMatrix, 0.0f, renderDimensions.x, renderDimensions.y, 0.0f ) ; break ;
+			default                :
+			{
+				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1.0f, 1.0f ) ;
+				break ;
+			}
 		}
 
 		final Vector2 screenOffset = getRenderInfo().getScreenOffset() ;
@@ -682,7 +702,7 @@ public class GLRenderer extends BasicRenderer
 		controller.update() ;
 
 		// Calculate the current Camera Position based 
-		// on oldCameraPosition and future cameraPosition
+		// on oldCamera and camera
 		calculateInterpolatedPosition( oldCamera.getPosition(), camera.getPosition(), pos ) ;
 		getRenderInfo().setCameraZoom( cameraScale.x, cameraScale.y ) ;
 		final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
@@ -700,32 +720,16 @@ public class GLRenderer extends BasicRenderer
 		state.draw( ( int )( updateDT / drawDT ), renderIter ) ;
 
 		final Matrix4 worldProjection = matrixCache.get() ;
-		Matrix4.multiply( modelViewProjectionMatrix, worldMatrix, worldProjection ) ;
+		Matrix4.multiply( camera.getProjection(), worldMatrix, worldProjection ) ;
 
 		final Matrix4 uiProjection = matrixCache.get() ;
-		Matrix4.multiply( modelViewProjectionMatrix, uiMatrix, uiProjection ) ;
+		Matrix4.multiply( camera.getProjection(), uiMatrix, uiProjection ) ;
 
 		uploader.draw( worldProjection, uiProjection ) ;
 
 		matrixCache.reclaim( worldProjection ) ;
 		matrixCache.reclaim( uiProjection ) ;
 	}
-
-	private static void constructOrhto2D( final Matrix4 _matrix, final float _left, final float _right, final float _bottom, final float _top )
-	{
-		final float zNear = -1.0f ;
-		final float zFar = 1.0f ;
-		final float invZ = 1.0f / ( zFar - zNear ) ;
-		final float invY = 1.0f / ( _top - _bottom ) ;
-		final float invX = 1.0f / ( _right - _left ) ;
-
-		_matrix.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
-					 0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
-					 0.0f,        0.0f,        -2.0f * invZ, ( -( zFar + zNear ) * invZ ),
-					 0.0f,        0.0f,        0.0f,         1.0f ) ;
-	}
-
-	public void sort() {}
 
 	/**
 		Remove resources that are not being used.

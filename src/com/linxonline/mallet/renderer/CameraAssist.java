@@ -14,6 +14,17 @@ public class CameraAssist
 		return assist.getCamera() ;
 	}
 
+	public static Camera amendOrthographic( final Camera _camera,
+											final float _top,
+											final float _bottom,
+											final float _left,
+											final float _right,
+											final float _near,
+											final float _far )
+	{
+		return assist.amendOrthographic( _camera, _top, _bottom, _left, _right, _near, _far ) ;
+	}
+
 	public static Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
 	{
 		return assist.amendPosition( _camera, _x, _y, _z ) ;
@@ -33,6 +44,14 @@ public class CameraAssist
 	{
 		public Camera getCamera() ;
 
+		public Camera amendOrthographic( final Camera _camera,
+										 final float _top,
+										 final float _bottom,
+										 final float _left,
+										 final float _right,
+										 final float _near,
+										 final float _far ) ;
+		
 		public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z ) ;
 		public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z ) ;
 		public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z ) ;

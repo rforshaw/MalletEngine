@@ -211,10 +211,16 @@ public abstract class BasicRenderer implements RenderInterface
 
 	protected class BasicCamera implements Camera
 	{
+		private final Matrix4 projection = new Matrix4() ;		// Combined Model View and Projection Matrix
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
 		private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
 
+		public Matrix4 getProjection()
+		{
+			return projection ;
+		}
+		
 		public Vector3 getPosition()
 		{
 			return position ;
