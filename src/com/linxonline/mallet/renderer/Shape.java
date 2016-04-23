@@ -297,6 +297,97 @@ public class Shape
 		return plane ;
 	}
 
+	public static Shape constructCube( final float _width, final Vector2 _minUV, final Vector2 _maxUV )
+	{
+		final Swivel[] swivel = new Swivel[3] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+		swivel[2] = Swivel.UV ;
+
+		final MalletColour white = MalletColour.white() ;
+
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 38, 24 ) ;
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 0 Front
+		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) } ) ;				// 1
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 2
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 3
+
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV ) } ) ;				// 4 Back
+		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 5
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 6
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 7
+
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV ) } ) ;				// 8 Top
+		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 9
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 10
+		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 11
+
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 12 Bottom
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV ) } ) ;				// 13
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 14
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 15
+
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 16 Left
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _maxUV ) } ) ;				// 17
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 18
+		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 19
+
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;				// 20 Right
+		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 21
+		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 22
+		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 23
+
+		plane.addIndex( 0 ) ;	// Front Face
+		plane.addIndex( 2 ) ;
+		plane.addIndex( 1 ) ;
+
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 1 ) ;
+		plane.addIndex( 3 ) ;
+
+		plane.addIndex( 5 ) ;	// Back Face
+		plane.addIndex( 6 ) ;
+		plane.addIndex( 4 ) ;
+
+		plane.addIndex( 7 ) ;
+		plane.addIndex( 5 ) ;
+		plane.addIndex( 4 ) ;
+
+		plane.addIndex( 8 ) ;	// Top Face
+		plane.addIndex( 10 ) ;
+		plane.addIndex( 9 ) ;
+
+		plane.addIndex( 8 ) ;
+		plane.addIndex( 9 ) ;
+		plane.addIndex( 11 ) ;
+
+		plane.addIndex( 13 ) ;	// Bottom Face
+		plane.addIndex( 14 ) ;
+		plane.addIndex( 12 ) ;
+
+		plane.addIndex( 15 ) ;
+		plane.addIndex( 13 ) ;
+		plane.addIndex( 12 ) ;
+
+		plane.addIndex( 17 ) ;	// Left Face
+		plane.addIndex( 18 ) ;
+		plane.addIndex( 16 ) ;
+
+		plane.addIndex( 19 ) ;
+		plane.addIndex( 17 ) ;
+		plane.addIndex( 16 ) ;
+
+		plane.addIndex( 20 ) ;	// Right Face
+		plane.addIndex( 22 ) ;
+		plane.addIndex( 21 ) ;
+
+		plane.addIndex( 20 ) ;
+		plane.addIndex( 21 ) ;
+		plane.addIndex( 23 ) ;
+
+		return plane ;
+	}
+
 	public static Shape updatePlaneGeometry( final Shape _plane, final Vector3 _length )
 	{
 		//_plane.getPoint( 0, 0 ).setXYZ() ;

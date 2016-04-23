@@ -432,6 +432,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				positionMatrix.setIdentity() ;
 
 				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
+				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
@@ -488,8 +490,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				final int lineWidth = /*_data.getLineWidth()*/500 + ( int )position.x ;
 
 				final MalletColour colour = _data.getColour() ;
-				//final int alignment = _data.getTextAlignment() ;
-
 				final Matrix4 clipMatrix = _data.getClipMatrix() ;
 				if( clipMatrix != null )
 				{
@@ -665,7 +665,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			default                :
 			{
 				final Vector2 renderDimensions = getRenderInfo().getRenderDimensions() ;
-				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1.0f, 1.0f ) ;
+				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1000.0f, 1000.0f ) ;
 				break ;
 			}
 		}

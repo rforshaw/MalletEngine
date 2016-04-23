@@ -411,7 +411,7 @@ public class GLRenderer extends BasicRenderer
 						  0.0f,        0.0f,        0.0f,         1.0f ) ;
 				return _camera ;
 			}
-			
+
 			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
 			{
 				( ( BasicCamera )_camera ).setPosition( _x, _y, _z ) ;
@@ -446,6 +446,7 @@ public class GLRenderer extends BasicRenderer
 		resize() ;
 	}
 
+	@Override
 	public DrawData.DrawInterface getBasicDraw()
 	{
 		return new DrawData.DrawInterface<GLDrawData>()
@@ -492,6 +493,8 @@ public class GLRenderer extends BasicRenderer
 				positionMatrix.setIdentity() ;
 
 				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
+				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
@@ -500,6 +503,7 @@ public class GLRenderer extends BasicRenderer
 		} ;
 	}
 
+	@Override
 	public DrawData.DrawInterface getTextDraw()
 	{
 		return new DrawData.DrawInterface<GLDrawData>()
@@ -572,60 +576,6 @@ public class GLRenderer extends BasicRenderer
 
 				uploader.upload( _data ) ;
 			}
-
-			private String[] optimiseText( final GLFontMap _fm, final String _text, final Vector3 _position, final int _lineWidth )
-			{
-				int length = 0 ;
-				float wordWidth = 0.0f ;
-				final Vector2 currentPos = new Vector2( _position.x, _position.y ) ;
-				String[] words = _text.split( "(?<= )" ) ;
-
-				final ArrayList<String> txt = new ArrayList<String>() ;
-				final StringBuilder buffer = new StringBuilder() ;
-
-				String word = null ;
-				for( int i = 0; i < words.length; ++i )
-				{
-					word = words[i] ;
-					wordWidth = _fm.stringWidth( word ) ;
-
-					if( word.contains( "<br>" ) == true )
-					{
-						if( length > 0 )
-						{
-							txt.add( buffer.toString() ) ;
-							buffer.delete( 0, length ) ;
-						}
-						else
-						{
-							txt.add( "" ) ;
-						}
-
-						currentPos.x = _position.x ;
-						continue ;
-					}
-					else if( currentPos.x + wordWidth >= _lineWidth )
-					{
-						txt.add( buffer.toString() ) ;
-						buffer.delete( 0, length ) ;
-						currentPos.x = _position.x ;
-					}
-
-					currentPos.x += wordWidth ;
-					buffer.append( word ) ;
-					length = buffer.length() ;
-				}
-
-				if( length > 0 )
-				{
-					txt.add( buffer.toString() ) ;
-					buffer.delete( 0, length ) ;
-				}
-
-				words = new String[txt.size()] ;
-				words = txt.toArray( words ) ;
-				return words ;
-			}
 		} ;
 	}
 
@@ -658,7 +608,7 @@ public class GLRenderer extends BasicRenderer
 			case ORTHOGRAPHIC_MODE : 
 			default                :
 			{
-				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1.0f, 1.0f ) ;
+				CameraAssist.amendOrthographic( camera, 0.0f, renderDimensions.y, 0.0f, renderDimensions.x, -1000.0f, 1000.0f ) ;
 				break ;
 			}
 		}

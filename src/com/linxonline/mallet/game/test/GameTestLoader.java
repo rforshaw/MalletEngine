@@ -15,6 +15,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Interpolation ;
+import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
 import com.linxonline.mallet.audio.AudioAssist ;
@@ -86,6 +87,7 @@ public final class GameTestLoader extends GameLoader
 				}
 
 				createMouseAnimExample() ;
+				createSpinningCubeExample() ;
 			}
 
 			/**
@@ -301,6 +303,45 @@ public final class GameTestLoader extends GameLoader
 				collision.hull.setPhysical( false ) ;
 				entity.addComponent( collision ) ;
 
+				addEntity( entity ) ;
+			}
+
+			public void createSpinningCubeExample()
+			{
+				final Entity entity = new Entity( "SPINNING_CUBE" ) ;
+
+				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
+				final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, -200.0f, 0.0f ),
+															new Vector3( -50.0f, -50.0f, -50.0f ),
+															new Vector3(),
+															new Vector3( 1, 1, 1 ),
+															10 ) ;
+				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
+				DrawAssist.amendTexture( draw, texture ) ;
+				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+
+				final RenderComponent render = new RenderComponent() ;
+				render.addBasicDraw( draw ) ;
+				
+				entity.addComponent( render ) ;
+				entity.addComponent( new Component( "SPIN", "CUBE" )
+				{
+					private final Vector3 rotate = new Vector3() ;
+
+					@Override
+					public void update( final float _dt )
+					{
+						super.update( _dt ) ;
+						rotate.x += 2.5f * _dt ;
+						rotate.y += 2.8f * _dt ;
+						rotate.z += 2.1f * _dt ;
+
+						DrawAssist.amendRotate( draw, rotate.x, rotate.y, rotate.z ) ;
+						DrawAssist.forceUpdate( draw ) ;
+					}
+				} ) ;
+				
 				addEntity( entity ) ;
 			}
 		} ) ;

@@ -220,26 +220,9 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		{
 			case LINEAR :
 			{
-				{
-					final float xDiff = ( position.x - oldPosition.x ) / _diff ;
-					final float yDiff = ( position.y - oldPosition.y ) / _diff ;
-					final float zDiff = ( position.z - oldPosition.z ) / _diff ;
-
-					currentPosition.setXYZ( oldPosition.x + ( xDiff * _iteration ),
-											oldPosition.y + ( yDiff * _iteration ),
-											oldPosition.z + ( zDiff * _iteration ) ) ;
-					oldPosition.setXYZ( currentPosition ) ;
-				}
-
-				{
-					final float xDiff = ( scale.x - oldScale.x ) / _diff ;
-					final float yDiff = ( scale.y - oldScale.y ) / _diff ;
-					final float zDiff = ( scale.z - oldScale.z ) / _diff ;
-
-					currentScale.x = oldScale.x + ( xDiff * _iteration ) ;
-					currentScale.y = oldScale.y + ( yDiff * _iteration ) ;
-					currentScale.z = oldScale.z + ( zDiff * _iteration ) ;
-				}
+				interpolate( position, oldPosition, currentPosition, _diff, _iteration ) ;
+				interpolate( scale,    oldScale,    currentScale,    _diff, _iteration ) ;
+				interpolate( rotation, oldRotation, currentRotation, _diff, _iteration ) ;
 				break ;
 			}
 			case NONE   :
@@ -255,6 +238,25 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		draw.draw( ( T )this ) ;
 	}
 
+	private void interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
+	{
+		final float xDiff = ( _future.x - _past.x ) / _diff ;
+		final float yDiff = ( _future.y - _past.y ) / _diff ;
+		final float zDiff = ( _future.z - _past.z ) / _diff ;
+
+		if( xDiff > 0.0f || yDiff > 0.0f || zDiff > 0.0f )
+		{
+			// If an object has not reached its final state
+			// then flag it for updating again during the next draw call.
+			forceUpdate() ;
+		}
+
+		_present.setXYZ( _past.x + ( xDiff * _iteration ),
+						 _past.y + ( yDiff * _iteration ),
+						 _past.z + ( zDiff * _iteration ) ) ;
+		_past.setXYZ( _present ) ;
+	}
+	
 	public abstract void unregister() ;
 
 	@Override
