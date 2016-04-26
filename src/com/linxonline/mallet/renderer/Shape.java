@@ -297,6 +297,29 @@ public class Shape
 		return plane ;
 	}
 
+	public static Shape constructPlane( final Vector3 _length, final MalletColour _colour )
+	{
+		final Swivel[] swivel = new Swivel[2] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
+		plane.addVertex( new Object[] { new Vector3(), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length ), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, 0.0f ), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length.x, 0.0f, 0.0f ), _colour } ) ;
+
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 2 ) ;
+		plane.addIndex( 1 ) ;
+
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 1 ) ;
+		plane.addIndex( 3 ) ;
+
+		return plane ;
+	}
+
 	public static Shape constructCube( final float _width, final Vector2 _minUV, final Vector2 _maxUV )
 	{
 		final Swivel[] swivel = new Swivel[3] ;

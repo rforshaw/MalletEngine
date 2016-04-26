@@ -6,5 +6,6 @@ public class Main
 	{
 		final EditorStarter starter = new EditorStarter() ;
 		starter.init() ;
+		starter.run() ;
 	}
 }

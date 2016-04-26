@@ -1,7 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.DrawDelegate ;
-import com.linxonline.mallet.event.* ;
+import com.linxonline.mallet.event.Event ;
 
 public abstract class BaseListener
 {
@@ -25,5 +24,14 @@ public abstract class BaseListener
 		}
 	}
 
+	/**
+		Called when parent UIElement is refreshing itself.
+	*/
+	public abstract void refresh() ;
+
+	/**
+		Called when parent UIElement has been flagged for shutdown.
+		Clean up any resources you may have allocated.
+	*/
 	public abstract void shutdown() ;
 }

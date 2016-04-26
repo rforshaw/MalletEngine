@@ -14,7 +14,7 @@ public abstract class UIElement implements InputHandler
 	private InputAdapterInterface adapter = null ;
 
 	private final Vector3 minLength = new Vector3() ;
-	private Vector3 maxLength = null ;
+	private Vector3 maxLength = new Vector3() ;
 
 	private boolean dirty = true ;
 	private int layer = 0 ;
@@ -134,13 +134,10 @@ public abstract class UIElement implements InputHandler
 
 	public void setMaximumLength( final float _x, final float _y, final float _z )
 	{
-		if( maxLength == null )
-		{
-			maxLength = new Vector3( _x, _y, _z ) ;
-			return ;
-		}
+		maxLength.x = ( _x < 0.0f ) ? 0.0f : _x ;
+		maxLength.y = ( _y < 0.0f ) ? 0.0f : _y ;
+		maxLength.z = ( _z < 0.0f ) ? 0.0f : _z ;
 
-		maxLength.setXYZ( _x, _y, _z ) ;
 		setLength( length.x, length.y, length.z ) ;
 	}
 
@@ -164,9 +161,20 @@ public abstract class UIElement implements InputHandler
 
 		if( maxLength != null )
 		{
-			length.x = ( _x > maxLength.x ) ? maxLength.x : _x ;
-			length.y = ( _y > maxLength.y ) ? maxLength.y : _y ;
-			length.z = ( _z > maxLength.z ) ? maxLength.z : _z ;
+			if( maxLength.x > 0.0f )
+			{
+				length.x = ( _x > maxLength.x ) ? maxLength.x : _x ;
+			}
+
+			if( maxLength.y > 0.0f )
+			{
+				length.y = ( _y > maxLength.y ) ? maxLength.y : _y ;
+			}
+
+			if( maxLength.z > 0.0f )
+			{
+				length.z = ( _z > maxLength.z ) ? maxLength.z : _z ;
+			}
 		}
 	}
 
@@ -194,6 +202,11 @@ public abstract class UIElement implements InputHandler
 	public Vector3 getOffset()
 	{
 		return offset ;
+	}
+
+	public Vector3 getMaximumLength()
+	{
+		return maxLength ;
 	}
 
 	public Vector3 getMinimumLength()

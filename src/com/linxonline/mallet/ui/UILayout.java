@@ -11,6 +11,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
+	private final ListenerUnit<Listener> listeners = new ListenerUnit<Listener>( this ) ;
 	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;
 	private final UIElementUpdater updater ;
 
@@ -50,6 +51,11 @@ public class UILayout extends UIElement
 		{
 			element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
+	}
+
+	public void addListener( final Listener _listener )
+	{
+		listeners.addListener( _listener ) ;
 	}
 
 	public void addElement( final UIElement _element )
@@ -92,11 +98,15 @@ public class UILayout extends UIElement
 	@Override
 	public void refresh()
 	{
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
 		{
-			ordered.get( i ).makeDirty() ;
+			final int size = ordered.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				ordered.get( i ).makeDirty() ;
+			}
 		}
+
+		listeners.refresh() ;
 	}
 
 	@Override
@@ -113,8 +123,15 @@ public class UILayout extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
+	/**
+		Cleanup any resources, handlers that the listeners 
+		may have acquired.
+	*/
 	@Override
-	public void shutdown() {}
+	public void shutdown()
+	{
+		listeners.shutdown() ;
+	}
 
 	@Override
 	public void clear()
@@ -125,6 +142,7 @@ public class UILayout extends UIElement
 			element.clear() ;
 		}
 		ordered.clear() ;
+		listeners.clear() ;
 	}
 
 	@Override
@@ -178,6 +196,27 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					final Vector3 maximum = element.getMaximumLength() ;
+					
+					// If the length allocated to this element is greater 
+					// than the maximum length, then we must remove the 
+					// element from the average minNumY and remove maximum.y 
+					// from available length.
+
+					if( maximum.y > 0.0f )
+					{
+						float lenY = availableLength.y / minNumY ;
+						if( lenY > maximum.y )
+						{
+							minNumY -= 1 ;
+							availableLength.y -= maximum.y ;
+						}
+					}
+				}
+
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
 
 					float lenX = 0.0f ;
@@ -192,7 +231,7 @@ public class UILayout extends UIElement
 					{
 						lenY = availableLength.y / minNumY ;
 					}
-
+					
 					element.setLength( lenX, lenY, 0.0f ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
@@ -243,7 +282,29 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					final Vector3 maximum = element.getMaximumLength() ;
+					
+					// If the length allocated to this element is greater 
+					// than the maximum length, then we must remove the 
+					// element from the average minNumY and remove maximum.y 
+					// from available length.
+
+					if( maximum.x > 0.0f )
+					{
+						float lenX = availableLength.x / minNumX ;
+						if( lenX > maximum.x )
+						{
+							minNumX -= 1 ;
+							availableLength.x -= maximum.x ;
+						}
+					}
+				}
+
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
+					final Vector3 maximum = element.getMaximumLength() ;
 
 					float lenX = 0.0f ;
 					float lenY = 0.0f ;
@@ -305,6 +366,8 @@ public class UILayout extends UIElement
 		GRID,
 		FORM
 	}
+
+	public static abstract class Listener extends BaseListener {}
 
 	private interface UIElementUpdater
 	{

@@ -679,7 +679,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
 	{
-		getRenderInfo().setDisplayDimensions( new Vector2( _width, _height ) ) ;
+		super.setRenderDimensions( _width, _height ) ;
+		super.setDisplayDimensions( _width, _height ) ;
 		resize() ;
 	}
 

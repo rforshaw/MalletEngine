@@ -31,7 +31,7 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIButton extends UIElement
 {
-	private final ArrayList<Listener> listeners = new ArrayList<Listener>() ;
+	private final ListenerUnit<Listener> listeners = new ListenerUnit<Listener>( this ) ;
 	private final Vector2 mouse = new Vector2() ;
 	private State current = State.NEUTRAL ;
 
@@ -87,14 +87,7 @@ public class UIButton extends UIElement
 	*/
 	public void addListener( final Listener _listener )
 	{
-		if( _listener != null )
-		{
-			if( listeners.contains( _listener ) == false )
-			{
-				listeners.add( _listener ) ;
-				_listener.setParent( this ) ;
-			}
-		}
+		listeners.addListener( _listener ) ;
 	}
 
 	/**
@@ -103,11 +96,7 @@ public class UIButton extends UIElement
 	@Override
 	public void refresh()
 	{
-		final int size = listeners.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			listeners.get( i ).refresh() ;
-		}
+		listeners.refresh() ;
 	}
 
 	@Override
@@ -162,7 +151,8 @@ public class UIButton extends UIElement
 	*/
 	private void neutral( final InputEvent _event )
 	{
-		for( final Listener listener : listeners )
+		final ArrayList<Listener> array = listeners.getListeners() ;
+		for( final Listener listener : array )
 		{
 			listener.neutral( _event ) ;
 		}
@@ -175,7 +165,8 @@ public class UIButton extends UIElement
 	*/
 	private void rollover( final InputEvent _event )
 	{
-		for( final Listener listener : listeners )
+		final ArrayList<Listener> array = listeners.getListeners() ;
+		for( final Listener listener : array )
 		{
 			listener.rollover( _event ) ;
 		}
@@ -190,7 +181,8 @@ public class UIButton extends UIElement
 	*/
 	private void clicked( final InputEvent _event )
 	{
-		for( final Listener listener : listeners )
+		final ArrayList<Listener> array = listeners.getListeners() ;
+		for( final Listener listener : array )
 		{
 			listener.clicked( _event ) ;
 		}
@@ -220,10 +212,7 @@ public class UIButton extends UIElement
 	@Override
 	public void shutdown()
 	{
-		for( final Listener listener : listeners )
-		{
-			listener.shutdown() ;
-		}
+		listeners.shutdown() ;
 	}
 
 	/**
@@ -395,7 +384,5 @@ public class UIButton extends UIElement
 		public abstract void clicked( final InputEvent _event ) ;
 		public abstract void rollover( final InputEvent _event ) ;
 		public abstract void neutral( final InputEvent _event ) ;
-
-		public abstract void refresh() ;
 	}
 }

@@ -1,39 +1,45 @@
 package com.linxonline.malleteditor.system ;
 
-import java.util.ArrayList ;
-
-import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.event.EventProcessor ;
+import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.game.GameState ;
+
+import com.linxonline.mallet.ui.UIElement ;
+import com.linxonline.mallet.ui.UILayout ;
+import com.linxonline.mallet.ui.UIButton ;
+import com.linxonline.mallet.ui.UISpacer ;
+
 import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.components.* ;
 
-import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.MalletColour ;
+
+import com.linxonline.mallet.renderer.UpdateType ;
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
+
 import com.linxonline.mallet.maths.Vector2 ;
-
-import com.linxonline.malleteditor.system.MainPanel ;
-import com.linxonline.malleteditor.factory.EditorEntityFactory ;
-import com.linxonline.malleteditor.factory.creators.EditorCreator ;
-import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.event.EventController ;
-
-import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.maths.Vector3 ;
 
 public class EditorState extends GameState
 {
-	private final EventController editorController = new EventController( "EDITOR_CONTROLLER" ) ;						// Used to process Events, gateway between internal eventSystem and root event-system
-	private final EditorEntityFactory factory = new EditorEntityFactory() ;
+	private static final float TOOLBAR_HEIGHT = 40.0f ;
+	private static final float SEPERATOR = 5.0f ;
+	private static final float EDITOR_LIST_WIDTH = 40.0f ;
 
 	public EditorState( final String _name )
 	{
 		super( _name ) ;
-		initEventControllers() ;
-		populateEntityFactory() ;
 	}
 
+	@Override
 	public void initGame()
 	{
-		createMouseAnimExample() ;
+		loadDefaultUILayout() ;
 	}
 
 	@Override
@@ -42,140 +48,360 @@ public class EditorState extends GameState
 		useApplicationMode() ;
 	}
 
-	public void createMouseAnimExample() {}
-
-	private void initEventControllers()
+	private void loadDefaultUILayout()
 	{
-		editorController.addEventProcessor( new EventProcessor( "EVENT" )
+		final UIComponent ui = new UIComponent() ;
+		ui.addElement( createMainLayout() ) ;
+
+		final Entity entity = new Entity() ;
+		entity.addComponent( ui ) ;
+
+		addEntity( entity ) ;
+	}
+
+	private UILayout createMainLayout()
+	{
+		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
+		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
+
+		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
+		final UILayout layout = new UILayout( UILayout.Type.VERTICAL,
+											  new Vector3(),
+											  new Vector3(),
+											  dimension ) ;
+
+		GlobalConfig.addNotify( "RENDERWIDTH", new Notification.Notify<String>()
 		{
-			@Override
-			public void processEvent( final Event _event )
+			public void inform( final String _data )
 			{
-				System.out.println( "Event: " + _event ) ;
+				dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
+				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
 			}
 		} ) ;
 
-		editorController.addEventProcessor( new EventProcessor<String>( "FILE", "OPEN_FILE" )
+		GlobalConfig.addNotify( "RENDERHEIGHT", new Notification.Notify<String>()
 		{
-			@Override
-			public void processEvent( final Event<String> _event )
+			public void inform( final String _data )
 			{
-				System.out.println( "OPEN FILE" ) ;
-				// Load Entities from file
-				final String path = _event.getVariable() ;
-				final ArrayList<Entity> entities = factory.create( path ) ;
+				dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
+				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+			}
+		} ) ;
 
-				for( final Entity entity : entities )
+		layout.addElement( createHeaderToolbar() ) ;
+		layout.addElement( createMainFrame() ) ;
+		layout.addElement( createFooterToolbar() ) ;
+
+		return layout ;
+	}
+
+	private static UILayout createHeaderToolbar()
+	{
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
+
+		layout.addListener( new UILayout.Listener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					addEntity( entity ) ;
-					system.getEventInterface().addEvent( new Event( MainPanel.EVENT_TYPES[0], entity ) ) ;
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
 				}
 			}
 		} ) ;
 
-		editorController.addEventProcessor( new EventProcessor( "FILE", "IMPORT_FILE" )
-		{
-			@Override
-			public void processEvent( final Event _event )
-			{
-				System.out.println( "Import File Request" ) ;
-			}
-		} ) ;
-
-		editorController.addEventProcessor( new EventProcessor( "FILE", "SAVE_FILE" )
-		{
-			@Override
-			public void processEvent( final Event _event )
-			{
-				System.out.println( "Save File Request" ) ;
-			}
-		} ) ;
-
-		editorController.addEventProcessor( new EventProcessor<Entity>( "ENTITY", "ADD_ENTITY" )
-		{
-			@Override
-			public void processEvent( final Event<Entity> _event )
-			{
-				// Add Entity to Game State
-				addEntity( _event.getVariable() ) ;
-			}
-		} ) ;
-
-		editorController.addEventProcessor( new EventProcessor<Entity>( "ENTITY", "REMOVE_ENTITY" )
-		{
-			@Override
-			public void processEvent( final Event<Entity> _event )
-			{
-				// Remove Entity to Game State
-				removeEntity( _event.getVariable() ) ;
-			}
-		} ) ;
+		return layout ;
 	}
 
-	@Override
-	protected void useApplicationMode()
+	private static UILayout createFooterToolbar()
 	{
-		currentUpdate = new UpdateInterface()
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
+
+		layout.addListener( new UILayout.Listener()
 		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
 			@Override
-			public void update( final double _dt )
+			public void setParent( final UIElement _parent )
 			{
-				final boolean hasInput = inputWorldSystem.hasInputs() || inputUISystem.hasInputs() ;
-				final boolean hasEvents = eventSystem.hasEvents() ;
-				if( hasInput == false && hasEvents == false )
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					system.sleep( 10 ) ;
-				}
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
 
-				// Update Default : 15Hz
-				updateAccumulator += _dt ;
-				while( updateAccumulator > DEFAULT_TIMESTEP )
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
 				{
-					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputUISystem.update() ;
-					inputWorldSystem.update() ;
-					eventSystem.update() ;
-
-					eventController.update() ;
-					editorController.update() ;
-
-					collisionSystem.update( DEFAULT_TIMESTEP ) ;
-					entitySystem.update( DEFAULT_TIMESTEP ) ;
-					audioSystem.update( DEFAULT_TIMESTEP ) ;
-					updateAccumulator -= DEFAULT_TIMESTEP ;
-				}
-
-				// Render Default : 60Hz
-				renderAccumulator += _dt ;
-				if( renderAccumulator > DEFAULT_FRAMERATE )
-				{
-					//System.out.println( ( int )( 1.0f / renderAccumulator ) ) ;
-					animationSystem.update( DEFAULT_FRAMERATE ) ;
-					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator = 0.0f ;
+					delegate.shutdown() ;
 				}
 			}
-		} ;
+		} ) ;
+
+		return layout ;
 	}
 
-	@Override
-	protected void hookHandlerSystems()
+	private static UILayout createMainFrame()
 	{
-		super.hookHandlerSystems() ;
-		eventSystem.addEventHandler( editorController ) ;
-		system.getEventInterface().addEventHandler( editorController ) ;
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+
+		layout.addElement( createEditorList() ) ;
+		layout.addElement( createSeperator() ) ;
+		layout.addElement( createMainView() ) ;
+
+		return layout ;
 	}
 
-	@Override
-	protected void unhookHandlerSystems()
+	private static UILayout createEditorList()
 	{
-		super.unhookHandlerSystems() ;
-		eventSystem.removeEventHandler( editorController ) ;
-		system.getEventInterface().removeEventHandler( editorController ) ;
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+		layout.setMinimumLength( 250.0f, 0.0f, 0.0f ) ;
+
+		layout.addListener( new UILayout.Listener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
+				}
+			}
+		} ) ;
+
+		return layout ;
 	}
-	
-	private void populateEntityFactory()
+
+	private static UILayout createSeperator()
 	{
-		factory.addCreator( new EditorCreator() ) ;
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+		layout.setMaximumLength( SEPERATOR, 0.0f, 0.0f ) ;
+
+		layout.addListener( new UILayout.Listener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.white() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
+				}
+			}
+		} ) ;
+
+		return layout ;
+	}
+
+	private static UILayout createMainView()
+	{
+		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
+
+		layout.addListener( new UILayout.Listener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
+				}
+			}
+		} ) ;
+
+		return layout ;
 	}
 }
