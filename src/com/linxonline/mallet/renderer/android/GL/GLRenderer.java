@@ -33,9 +33,6 @@ public class GLRenderer extends BasicRenderer
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
 
-	protected static final Vector3 DEFAULT_OFFSET = new Vector3( 0, 0, 0 ) ;
-	protected static int DEFAULT_LINEWIDTH = 50 ;								// Is set in resize to the width of render dimensions
-
 	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
@@ -616,8 +613,6 @@ public class GLRenderer extends BasicRenderer
 		final Vector2 screenOffset = getRenderInfo().getScreenOffset() ;
 		GLES30.glViewport( ( int )screenOffset.x, ( int )screenOffset.y, ( int )displayDimensions.x, ( int )displayDimensions.y ) ;
 		//GLRenderer.handleError( "Viewport: " ) ;
-
-		DEFAULT_LINEWIDTH = ( int )renderDimensions.x ;
 	}
 
 	@Override

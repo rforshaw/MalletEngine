@@ -448,13 +448,13 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
-			private long logicRunningTime = 0L ;
-			private long renderRunningTime = 0L ;
-
+			private float waitDelay = 2.0f ;
+			private float wait = 0.0f ;
+			
 			@Override
 			public void update( final double _dt )
 			{
-				long startTime = ElapsedTimer.nanoTime() ;
+				final long startTime = ElapsedTimer.nanoTime() ;
 
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
@@ -462,8 +462,9 @@ public class GameState extends State implements HookEntity
 				// Update the system to ensure that the state 
 				// has the latest events and inputs.
 				system.update( DEFAULT_TIMESTEP ) ;						// Update low-level systems
-				final boolean hasInputs = inputWorldSystem.hasInputs() || inputWorldSystem.hasInputs() ;
+				final boolean hasInputs = inputWorldSystem.hasInputs() || inputUISystem.hasInputs() ;
 				final boolean hasEvents = eventSystem.hasEvents() ;
+				wait += ( hasInputs == true || hasEvents == true ) ? -wait : _dt ;
 
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
@@ -480,37 +481,28 @@ public class GameState extends State implements HookEntity
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
 
-				// Track the logic running time, not used to calculate 
-				// sleep duration, but useful information for developer
-				// to see if logic goes over allocated time.
-				long endTime = ElapsedTimer.nanoTime() ;
-				logicRunningTime = endTime - startTime ;		// In nanoseconds
-
-				if( hasInputs == false && hasEvents == false )
+				if( hasInputs == false && hasEvents == false && wait > waitDelay )
 				{
 					// Rendering consumes the greatest amount of resources 
 					// and processing time, if the user has not interacted 
 					// with the application, and there are no events 
 					// needing passed, then don't refresh the screen.
 					system.sleep( ( long )( DEFAULT_FRAMERATE * 1000.0f ) ) ;
-					return ;
 				}
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				startTime = ElapsedTimer.nanoTime() ;
 
 				//System.out.println( ( int )( 1.0f / _dt ) ) ;
 				animationSystem.update( DEFAULT_FRAMERATE ) ;
 				system.draw( DEFAULT_FRAMERATE ) ;
 				renderAccumulator -= DEFAULT_FRAMERATE ;
 
-				endTime = ElapsedTimer.nanoTime() ;
-				renderRunningTime = endTime - startTime ;		// In nanoseconds
+				final long endTime = ElapsedTimer.nanoTime() ;
+				final long runTime = endTime - startTime ;		// In nanoseconds
 
-				final float deltaLogic = logicRunningTime * 0.000000001f ;								// Convert to seconds
-				final float deltaRender = renderRunningTime * 0.000000001f ;							// Convert to seconds
-				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaRender + deltaLogic ) ) * 1000.0f ) ;	// Convert to milliseconds
+				final float deltaTime = runTime * 0.000000001f ;									// Convert to seconds
+				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - deltaTime ) * 1000.0f ) ;	// Convert to milliseconds
 
 				if( sleepRender > 0L )
 				{

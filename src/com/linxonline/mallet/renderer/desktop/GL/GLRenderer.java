@@ -43,8 +43,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
 
-	protected static final Vector3 DEFAULT_OFFSET = new Vector3( 0, 0, 0 ) ;
-
 	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
@@ -679,7 +677,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
 	{
-		super.setRenderDimensions( _width, _height ) ;
 		super.setDisplayDimensions( _width, _height ) ;
 		resize() ;
 	}

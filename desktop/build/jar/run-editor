@@ -12,4 +12,4 @@ do
   CLASSPATH=${CLASSPATH}:${i}
 done
 
-java -classpath $CLASSPATH com.linxonline.malleteditor.main.Main $@
+java -classpath $CLASSPATH -XX:MinHeapFreeRatio=1 -XX:MaxHeapFreeRatio=5 com.linxonline.malleteditor.main.Main $@
