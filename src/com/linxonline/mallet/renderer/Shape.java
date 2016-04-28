@@ -555,9 +555,11 @@ public class Shape
 
 	private static boolean isInteriorVertex( final Vector3 _current, final Vector3 _previous, final Vector3 _next )
 	{
-		final float area1 = ( _previous.x * _current.y ) - ( _previous.y * _current.x ) ;
-		final float area2 = ( _next.x * _current.y ) - ( _next.y * _current.x ) ;
-		return area1 >= 0.0f && area2 >= 0.0f ;
+		//final float area1 = ( _previous.x * _current.y ) - ( _previous.y * _current.x ) ;
+		//final float area2 = ( _next.x * _current.y ) - ( _next.y * _current.x ) ;
+		final Vector3 area1 = Vector3.cross( _previous, _current ) ;
+		final Vector3 area2 = Vector3.cross( _next, _current ) ;
+		return area1.length() >= 0.0f && area2.length() >= 0.0f ;
 	}
 
 	private static boolean isTriangleEmpty( final Vector3 _current,

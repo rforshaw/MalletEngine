@@ -152,7 +152,7 @@ public abstract class BasicRenderer implements RenderInterface
 	@Override
 	public void setCameraPosition( final Vector3 _position )
 	{
-		info.setCameraPosition( _position ) ;
+		CameraAssist.amendPosition( CameraAssist.getCamera(), _position.x, _position.y, _position.z ) ;
 	}
 
 	@Override

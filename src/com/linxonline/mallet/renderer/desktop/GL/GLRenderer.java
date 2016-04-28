@@ -380,6 +380,24 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				( ( BasicCamera )_camera ).setScale( _x, _y, _z ) ;
 				return camera ;
 			}
+
+			public boolean getPosition( final Camera _camera, final Vector3 _populate )
+			{
+				_populate.setXYZ( ( ( BasicCamera )_camera ).getPosition() ) ;
+				return true ;
+			}
+
+			public boolean getRotation( final Camera _camera, final Vector3 _populate )
+			{
+				_populate.setXYZ( ( ( BasicCamera )_camera ).getRotation() ) ;
+				return true ;
+			}
+
+			public boolean getScale( final Camera _camera, final Vector3 _populate )
+			{
+				_populate.setXYZ( ( ( BasicCamera )_camera ).getScale() ) ;
+				return true ;
+			}
 		} ) ;
 	}
 
@@ -695,15 +713,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 	public void draw( final float _dt )
 	{
-		final Vector3 cam = getRenderInfo().getCameraPosition() ;
-		if( cam == null )
-		{
-			System.out.println( "Camera Not Set" ) ;
-			return ;
-		}
-
-		cam.setXYZ( camera.getPosition() ) ;
-
 		++renderIter ;
 		drawDT = _dt ;
 
@@ -725,7 +734,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		calculateInterpolatedPosition( oldCamera.getPosition(), camera.getPosition(), pos ) ;
 		
 		final Vector3 scale = camera.getScale() ;
-		getRenderInfo().setCameraZoom( scale.x, scale.y ) ;
 		final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
 
 		worldMatrix.setIdentity() ;

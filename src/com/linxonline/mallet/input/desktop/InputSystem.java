@@ -251,8 +251,10 @@ public class InputSystem implements InputSystemInterface,
 
 	private synchronized void updateMouseWheel( MouseWheelEvent _event )
 	{
+		final InputEvent input = cache.get() ;
 		final int scroll = _event.getWheelRotation() ;
-		final InputEvent input = new InputEvent( InputType.SCROLL_WHEEL, scroll, scroll ) ;
+
+		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll ) ;
 		mouseInputs.add( input ) ;
 	}
 

@@ -7,6 +7,9 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.entity.Entity ;
 
+import com.linxonline.mallet.renderer.Camera ;
+import com.linxonline.mallet.renderer.CameraAssist ;
+
 /*==============================================================*/
 // MouseComponent - Provides components that tracks mouse		// 
 // position													    //
@@ -54,11 +57,12 @@ public class MouseComponent extends InputComponent
 	public void updateMousePosition( final InputEvent _event )
 	{
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;
+		final Camera camera = CameraAssist.getCamera() ;
 		if( inputAdapter != null )
 		{
 			final Vector3 pos = parent.getPosition() ;
-			pos.x = inputAdapter.convertInputToRenderX( mouse.x ) ;
-			pos.y = inputAdapter.convertInputToRenderY( mouse.y ) ;
+			pos.x = inputAdapter.convertInputToRenderX( camera, mouse.x ) ;
+			pos.y = inputAdapter.convertInputToRenderY( camera, mouse.y ) ;
 		}
 	}
 }

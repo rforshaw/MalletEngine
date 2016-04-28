@@ -1,5 +1,6 @@
 package com.linxonline.mallet.input ;
 
+import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.maths.Vector2 ;
 
 public interface InputAdapterInterface
@@ -12,9 +13,9 @@ public interface InputAdapterInterface
 		into worldspace co-ordinates.
 		This applies the camera position.
 	*/
-	public float convertInputToRenderX( final float _x ) ;
-	public float convertInputToRenderY( final float _y ) ;
-	public Vector2 convertInputToRender( final Vector2 _input ) ;
+	public float convertInputToRenderX( final Camera _camera, final float _x ) ;
+	public float convertInputToRenderY( final Camera _camera, final float _y ) ;
+	public Vector2 convertInputToRender( final Camera _camera, final Vector2 _input ) ;
 
 	/**
 		Convert the window mouse position x or y 
