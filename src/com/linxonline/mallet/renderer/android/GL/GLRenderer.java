@@ -26,7 +26,6 @@ public class GLRenderer extends BasicRenderer
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
 
-	protected final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
@@ -482,20 +481,6 @@ public class GLRenderer extends BasicRenderer
 	}
 
 	@Override
-	public void setRenderDimensions( final int _width, final int _height )
-	{
-		super.setRenderDimensions( _width, _height ) ;
-		resize() ;
-	}
-
-	@Override
-	public void setDisplayDimensions( final int _width, final int _height )
-	{
-		super.setDisplayDimensions( _width, _height ) ;
-		resize() ;
-	}
-
-	@Override
 	public DrawData.UploadInterface getBasicUpload()
 	{
 		return new DrawData.UploadInterface<GLDrawData>()
@@ -684,6 +669,20 @@ public class GLRenderer extends BasicRenderer
 				_data.unregister() ;
 			}
 		} ;
+	}
+
+	@Override
+	public void setRenderDimensions( final int _width, final int _height )
+	{
+		super.setRenderDimensions( _width, _height ) ;
+		resize() ;
+	}
+
+	@Override
+	public void setDisplayDimensions( final int _width, final int _height )
+	{
+		super.setDisplayDimensions( _width, _height ) ;
+		resize() ;
 	}
 
 	public void setViewMode( final int _mode )
