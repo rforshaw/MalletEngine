@@ -60,7 +60,7 @@ public class GLWorldState extends WorldState<GLWorld>
 	}
 
 	/**
-		Shutdown each world and clean up the GL state.
+		Shutdown each world and clean up the World/GL state.
 	*/
 	public void shutdown()
 	{

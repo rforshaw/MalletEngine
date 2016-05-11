@@ -1,5 +1,9 @@
 package com.linxonline.mallet.renderer ;
- 
+
+/**
+	Implements common requirements for using World.
+	Basic World manages draw object state and Camera state.
+*/
 public class BasicWorld<T extends DrawData, U extends CameraData> implements World
 {
 	private final String id ;
@@ -50,11 +54,19 @@ public class BasicWorld<T extends DrawData, U extends CameraData> implements Wor
 		cameras.remove( _camera ) ;
 	}
 
+	/**
+		Update the draw objects position, rotation, and scale.
+	*/
 	public void upload( final int _diff, final int _iteration )
 	{
 		state.upload( _diff, _iteration ) ;
 	}
 
+	/**
+		Update the cameras position, rotation, and scale.
+		Call the cameras custom draw interface to begin 
+		rendering to the framebuffer.
+	*/
 	public void draw( final int _diff, final int _iteration )
 	{
 		cameras.draw( _diff, _iteration ) ;

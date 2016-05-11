@@ -5,6 +5,10 @@ import java.util.ArrayList ;
 /**
 	Implements common requirements when using BasicWorld.
 	See desktop/android GLWorldState for an implementation.
+	
+	WorldState allows the multiple BasicWorlds to be added to a 
+	rendering-system. A default world must be passed when WorldState is 
+	constructed/extended.
 */
 public abstract class WorldState<T extends BasicWorld> extends State<T>
 {

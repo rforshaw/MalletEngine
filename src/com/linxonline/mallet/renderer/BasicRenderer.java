@@ -274,18 +274,4 @@ public abstract class BasicRenderer implements RenderInterface
 	{
 		worlds.clear() ;
 	}
-
-	protected void calculateInterpolatedPosition( final Vector3 _old, final Vector3 _current, final Vector3 _position )
-	{
-		// Calculate the how many render iterations must take place to reach 
-		// the current states positions.
-		// xDiff & yDiff represents the distance change for one render iteration.
-		// Linearly interpolate to the current state positions.
-		final int renderDiff = ( int )( updateDT / drawDT ) ;
-		final float xDiff = ( _current.x - _old.x ) / renderDiff ;
-		final float yDiff = ( _current.y - _old.y ) / renderDiff ;
-
-		_position.x = _old.x + ( xDiff * renderIter ) ;
-		_position.y = _old.y + ( yDiff * renderIter ) ;
-	}
 }
