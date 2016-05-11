@@ -45,7 +45,7 @@ public class RenderComponent extends Component
 			return ;
 		}
 
-		drawDelegate.addBasicDraw( _draw ) ;
+		drawDelegate.addBasicDraw( _draw, null ) ;
 	}
 
 	public void addTextDraw( final Draw _draw )
@@ -61,7 +61,7 @@ public class RenderComponent extends Component
 			return ;
 		}
 
-		drawDelegate.addTextDraw( _draw ) ;
+		drawDelegate.addTextDraw( _draw, null ) ;
 	}
 
 	public void remove( final Draw _draw )

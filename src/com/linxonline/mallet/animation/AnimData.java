@@ -6,6 +6,7 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 
@@ -14,6 +15,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
 	private String file   = null ;
 	private Draw draw     = null ;
+	private World world   = null ;
 	private Sprite sprite = null ;
 
 	private boolean play      = false ;
@@ -28,6 +30,11 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	{
 		file = _file ;
 		draw = _draw ;
+	}
+
+	public void setWorld( final World _world )
+	{
+		world = _world ;
 	}
 
 	public void addCallback( final SourceCallback _callback )
@@ -145,6 +152,11 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		return sprite ;
 	}
 
+	public World getWorld()
+	{
+		return world ;
+	}
+
 	public Draw getDraw()
 	{
 		return draw ;
@@ -189,6 +201,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		file   = null ;
 		draw   = null ;
 		sprite = null ;
+		world  = null ;
 
 		play        = false ;
 		elapsedTime = 0.0f ;

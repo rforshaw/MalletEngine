@@ -8,8 +8,8 @@ import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
-import com.linxonline.mallet.animation.AnimationAssist ;
-import com.linxonline.mallet.animation.Anim ;
+import com.linxonline.mallet.renderer.CameraAssist ;
+import com.linxonline.mallet.renderer.Camera ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -18,12 +18,16 @@ import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
+import com.linxonline.mallet.animation.AnimationAssist ;
+import com.linxonline.mallet.animation.Anim ;
+
 import com.linxonline.mallet.audio.AudioAssist ;
 import com.linxonline.mallet.audio.AudioDelegateCallback ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 import com.linxonline.mallet.audio.StreamType ;
 
 import com.linxonline.mallet.util.sort.* ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -99,6 +103,17 @@ public final class GameTestLoader extends GameLoader
 				{
 					public void callback( DrawDelegate _delegate )
 					{
+						{
+							final int width = GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
+							final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 600 ) ;
+
+							final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
+							CameraAssist.amendOrthographic( cam, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
+							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
+							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
+							_delegate.addCamera( cam ) ;
+						}
+					
 						{
 							final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 							final int width = texture.getWidth() ;
@@ -215,7 +230,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ),
 																	 200 ) ;
-					DrawAssist.amendColour( draw, MalletColour.red() ) ;
+						DrawAssist.amendColour( draw, MalletColour.red() ) ;
 						_delegate.addTextDraw( draw ) ;
 					}
 				} ) ) ;

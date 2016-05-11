@@ -7,22 +7,27 @@ import com.linxonline.mallet.maths.* ;
 
 public abstract class BasicRenderer implements RenderInterface
 {
-	protected final DrawState state = new DrawState() ;
+	protected static final MalletColour WHITE = MalletColour.white() ;
+	protected static final MalletColour BLACK = MalletColour.black() ;
+
+	protected static final MalletColour RED   = MalletColour.red() ;
+	protected static final MalletColour GREEN = MalletColour.green() ;
+	protected static final MalletColour BLUE  = MalletColour.blue() ;
+
+	protected final WorldState worlds ;
+
 	protected final EventController controller = new EventController() ;
 	protected final RenderInfo info = new RenderInfo( new Vector2( 800, 600 ),
-													  new Vector2( 800, 600 ),
-													  new Vector3( 400, 300, 0 ) ) ;
-
-	protected final BasicCamera oldCamera = new BasicCamera() ;
-	protected final BasicCamera camera = new BasicCamera() ;
-
-	protected Vector3 oldCameraPosition = new Vector3() ;
-	protected Vector3 cameraPosition = null ;
-	protected final Vector3 cameraScale = new Vector3( 1, 1, 1 ) ;
+													  new Vector2( 800, 600 ) ) ;
 
 	protected float drawDT   = 0.0f ;
 	protected float updateDT = 0.0f ;
 	protected int renderIter = 0 ;
+
+	public BasicRenderer( final WorldState _worlds )
+	{
+		worlds = _worlds ;
+	}
 
 	@Override
 	public void start()
@@ -43,8 +48,6 @@ public abstract class BasicRenderer implements RenderInterface
 				clean() ;
 			}
 		} ) ;
-
-		state.setRemoveDelegate( constructRemoveDelegate() ) ;
 	}
 
 	/**
@@ -62,8 +65,10 @@ public abstract class BasicRenderer implements RenderInterface
 	@Override
 	public abstract void initAssist() ;
 
-	public abstract DrawData.DrawInterface getBasicDraw() ;
-	public abstract DrawData.DrawInterface getTextDraw() ;
+	public abstract DrawData.UploadInterface getBasicUpload() ;
+	public abstract DrawData.UploadInterface getTextUpload() ;
+
+	public abstract Camera.DrawInterface getCameraDraw() ;
 
 	/**
 		Allows implementations to clean-up other systems using 
@@ -76,35 +81,58 @@ public abstract class BasicRenderer implements RenderInterface
 		return new DrawDelegate()
 		{
 			private final ArrayList<Draw> data = new ArrayList<Draw>() ;
+			private final ArrayList<Camera> cameras = new ArrayList<Camera>() ;
 
+			@Override
 			public void addTextDraw( final Draw _draw )
+			{
+				addTextDraw( _draw, null ) ;
+			}
+
+			@Override
+			public void addBasicDraw( final Draw _draw )
+			{
+				addBasicDraw( _draw, null ) ;
+			}
+
+			@Override
+			public void addCamera( final Camera _camera )
+			{
+				addCamera( _camera, null ) ;
+			}
+
+			@Override
+			public void removeCamera( final Camera _camera )
+			{
+				removeCamera( _camera, null ) ;
+			}
+
+			@Override
+			public void addTextDraw( final Draw _draw, final World _world )
 			{
 				if( _draw != null && _draw instanceof DrawData )
 				{
 					if( data.contains( _draw ) == false )
 					{
-						_draw.setDrawInterface( getTextDraw() ) ;
+						_draw.setUploadInterface( getTextUpload() ) ;
 						data.add( _draw ) ;
-						synchronized( state )
-						{
-							state.add( ( DrawData )_draw ) ;
-						}
+
+						worlds.addDraw( ( DrawData )_draw, ( BasicWorld )_world ) ;
 					}
 				}
 			}
 
-			public void addBasicDraw( final Draw _draw )
+			@Override
+			public void addBasicDraw( final Draw _draw, final World _world )
 			{
 				if( _draw != null && _draw instanceof DrawData )
 				{
 					if( data.contains( _draw ) == false )
 					{
-						_draw.setDrawInterface( getBasicDraw() ) ;
+						_draw.setUploadInterface( getBasicUpload() ) ;
 						data.add( _draw ) ;
-						synchronized( state )
-						{
-							state.add( ( DrawData )_draw ) ;
-						}
+
+						worlds.addDraw( ( DrawData )_draw, ( BasicWorld )_world ) ;
 					}
 				}
 			}
@@ -115,24 +143,77 @@ public abstract class BasicRenderer implements RenderInterface
 				if( _draw != null && _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
-					synchronized( state )
-					{
-						state.remove( ( DrawData )_draw ) ;
-					}
+					worlds.removeDraw( ( DrawData )_draw ) ;
 				}
+			}
+
+			@Override
+			public void addCamera( final Camera _camera, final World _world )
+			{
+				if( _camera != null && _camera instanceof CameraData )
+				{
+					_camera.setDrawInterface( getCameraDraw() ) ;
+					cameras.add( _camera ) ;
+
+					worlds.addCamera( ( CameraData )_camera, ( BasicWorld )_world ) ;
+				}
+			}
+
+			@Override
+			public void removeCamera( final Camera _camera, final World _world )
+			{
+				if( _camera != null && _camera instanceof CameraData )
+				{
+					cameras.remove( _camera ) ;
+					worlds.removeCamera( ( CameraData )_camera ) ;
+				}
+			}
+
+			
+			@Override
+			public void addWorld( final World _world )
+			{
+				if( _world != null && _world instanceof BasicWorld )
+				{
+					worlds.add( ( BasicWorld )_world ) ;
+				}
+			}
+
+			@Override
+			public void removeWorld( final World _world )
+			{
+				if( _world != null && _world instanceof BasicWorld )
+				{
+					worlds.remove( ( BasicWorld )_world ) ;
+				}
+			}
+
+			@Override
+			public Camera getCamera( final String _id, final World _world )
+			{
+				return worlds.getCamera( _id, ( BasicWorld )_world ) ;
+			}
+
+			@Override
+			public World getWorld( final String _id )
+			{
+				return worlds.getWorld( _id ) ;
 			}
 
 			@Override
 			public void shutdown()
 			{
-				synchronized( state )
+				for( final Draw draw : data  )
 				{
-					for( final Draw draw : data  )
-					{
-						state.remove( ( DrawData )draw ) ;
-					}
+					worlds.removeDraw( ( DrawData )draw ) ;
 				}
 				data.clear() ;
+
+				for( final Camera camera : cameras  )
+				{
+					worlds.removeCamera( ( CameraData )camera ) ;
+				}
+				cameras.clear() ;
 			}
 		} ;
 	}
@@ -140,19 +221,19 @@ public abstract class BasicRenderer implements RenderInterface
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
-		info.setRenderDimensions( new Vector2( _width, _height ) ) ;
+		info.setRenderDimensions( _width, _height ) ;
 	}
 
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		info.setDisplayDimensions( new Vector2( _width, _height ) ) ;
+		info.setDisplayDimensions( _width, _height ) ;
 	}
 
 	@Override
 	public void setCameraPosition( final Vector3 _position )
 	{
-		CameraAssist.amendPosition( CameraAssist.getCamera(), _position.x, _position.y, _position.z ) ;
+		CameraAssist.amendPosition( CameraAssist.getDefaultCamera(), _position.x, _position.y, _position.z ) ;
 	}
 
 	@Override
@@ -180,19 +261,18 @@ public abstract class BasicRenderer implements RenderInterface
 	{
 		++renderIter ;
 		drawDT = _dt ;
-		state.draw( ( int )( updateDT / drawDT ), renderIter ) ;
 	}
 
 	@Override
 	public void sort()
 	{
-		state.sort() ;
+		worlds.sort() ;
 	}
 
 	@Override
 	public void clear()
 	{
-		state.clear() ;
+		worlds.clear() ;
 	}
 
 	protected void calculateInterpolatedPosition( final Vector3 _old, final Vector3 _current, final Vector3 _position )
@@ -207,48 +287,5 @@ public abstract class BasicRenderer implements RenderInterface
 
 		_position.x = _old.x + ( xDiff * renderIter ) ;
 		_position.y = _old.y + ( yDiff * renderIter ) ;
-	}
-
-	protected class BasicCamera implements Camera
-	{
-		private final Matrix4 projection = new Matrix4() ;		// Combined Model View and Projection Matrix
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 rotation = new Vector3() ;
-		private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
-
-		public Matrix4 getProjection()
-		{
-			return projection ;
-		}
-		
-		public Vector3 getPosition()
-		{
-			return position ;
-		}
-
-		public Vector3 getRotation()
-		{
-			return rotation ;
-		}
-
-		public Vector3 getScale()
-		{
-			return scale ;
-		}
-
-		public void setPosition( final float _x, final float _y, final float _z )
-		{
-			position.setXYZ( _x, _y, _z ) ;
-		}
-		
-		public void setRotation( final float _x, final float _y, final float _z )
-		{
-			rotation.setXYZ( _x, _y, _z ) ;
-		}
-		
-		public void setScale( final float _x, final float _y, final float _z )
-		{
-			scale.setXYZ( _x, _y, _z ) ;
-		}
 	}
 }

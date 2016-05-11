@@ -1,8 +1,10 @@
 package com.linxonline.mallet.animation ;
 
+import com.linxonline.mallet.renderer.World ;
+
 public interface AnimationDelegate
 {
-	public void addAnimation( final Anim _animation ) ;
+	public void addAnimation( final Anim _animation, final World _world ) ;
 	public void removeAnimation( final Anim _animation ) ;
 
 	/**

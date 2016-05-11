@@ -7,11 +7,13 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 
 public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 {
-	private final Draw.DrawInterface DRAW_DEFAULT = new Draw.DrawInterface<T>()
+	private final Draw.UploadInterface DRAW_DEFAULT = new Draw.UploadInterface<T>()
 	{
 		@Override
-		public void draw( final T _data ) {}
+		public void upload( final T _data ) {}
 	} ;
+
+	private World world = null ;		// Store the handler to the worldspace this data is associated with
 
 	private final ArrayList<MalletTexture> textures = new ArrayList<MalletTexture>() ;
 	private MalletColour colour = null ;
@@ -24,7 +26,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private int order = 0 ;
 	private Interpolation mode = Interpolation.NONE ;
 	private UpdateType updateType  = UpdateType.ON_DEMAND ; 
-	private Draw.DrawInterface<T> draw = DRAW_DEFAULT ;
+	private Draw.UploadInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
@@ -56,6 +58,16 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		rotation = _rotation ;
 		scale = _scale ;
 		order = _order ;
+	}
+
+	public void setWorld( final World _world )
+	{
+		world = _world ;
+	}
+
+	public World getWorld()
+	{
+		return world ;
 	}
 
 	public void setColour( final MalletColour _colour )
@@ -214,7 +226,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		return currentScale ;
 	}
 
-	protected void draw( final int _diff, final int _iteration )
+	protected void upload( final int _diff, final int _iteration )
 	{
 		switch( getInterpolationMode() )
 		{
@@ -235,7 +247,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 			}
 		}
 
-		draw.draw( ( T )this ) ;
+		draw.upload( ( T )this ) ;
 	}
 
 	private void interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
@@ -256,12 +268,14 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 						 _past.z + ( zDiff * _iteration ) ) ;
 		_past.setXYZ( _present ) ;
 	}
-	
+
 	public abstract void unregister() ;
 
 	@Override
 	public void reset()
 	{
+		world = null ;
+
 		textures.clear() ;
 		colour = null ;
 		font = null ;
@@ -282,7 +296,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	}
 
 	@Override
-	public void setDrawInterface( final Draw.DrawInterface<T> _draw )
+	public void setUploadInterface( final Draw.UploadInterface<T> _draw )
 	{
 		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
 	}

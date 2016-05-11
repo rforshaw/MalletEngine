@@ -11,9 +11,9 @@ public class CameraAssist
 		assist = _assist ;
 	}
 
-	public static Camera getCamera()
+	public static Camera getDefaultCamera()
 	{
-		return assist.getCamera() ;
+		return assist.getDefaultCamera() ;
 	}
 
 	public static Camera amendOrthographic( final Camera _camera,
@@ -39,7 +39,17 @@ public class CameraAssist
 
 	public static Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
 	{
-		return assist.amendRotation( _camera, _x, _y, _z ) ;
+		return assist.amendScale( _camera, _x, _y, _z ) ;
+	}
+
+	public static Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
+	{
+		return assist.amendScreenResolution( _camera, _width, _height ) ;
+	}
+
+	public static Camera amendScreenOffset( final Camera _camera, final int _x, final int _y )
+	{
+		return assist.amendScreenOffset( _camera, _x, _y ) ;
 	}
 
 	public static boolean getPosition( final Camera _camera, final Vector3 _populate )
@@ -57,9 +67,17 @@ public class CameraAssist
 		return assist.getScale( _camera, _populate ) ;
 	}
 
+	public static Camera createCamera( final String _id,
+									   final Vector3 _position,
+									   final Vector3 _rotation,
+									   final Vector3 _scale )
+	{
+		return assist.createCamera( _id, _position, _rotation, _scale ) ;
+	}
+
 	public interface Assist
 	{
-		public Camera getCamera() ;
+		public Camera getDefaultCamera() ;
 
 		public Camera amendOrthographic( final Camera _camera,
 										 final float _top,
@@ -73,8 +91,16 @@ public class CameraAssist
 		public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z ) ;
 		public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z ) ;
 
+		public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height ) ;
+		public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y ) ;
+
 		public boolean getPosition( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getRotation( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getScale( final Camera _camera, final Vector3 _populate ) ;
+
+		public Camera createCamera( final String _id,
+									final Vector3 _position,
+									final Vector3 _rotation,
+									final Vector3 _scale ) ;
 	}
 }

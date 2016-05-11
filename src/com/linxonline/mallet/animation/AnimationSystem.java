@@ -21,6 +21,7 @@ import com.linxonline.mallet.resources.texture.Sprite ;
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Draw ;
 
 public class AnimationSystem
@@ -80,7 +81,7 @@ public class AnimationSystem
 					{
 						anim.setSprite( sprite ) ;
 						animations.add( anim ) ;
-						drawDelegate.addBasicDraw( anim.getDraw() ) ;
+						drawDelegate.addBasicDraw( anim.getDraw(), anim.getWorld() ) ;
 						anim.play() ;
 					}
 				}
@@ -148,12 +149,13 @@ public class AnimationSystem
 			private final ArrayList<AnimData> data = new ArrayList<AnimData>() ;
 
 			@Override
-			public void addAnimation( final Anim _animation )
+			public void addAnimation( final Anim _animation, final World _world )
 			{
 				if( _animation != null && _animation instanceof AnimData )
 				{
 					if( data.contains( _animation ) == false )
 					{
+						( ( AnimData )_animation ).setWorld( _world ) ;
 						data.add( ( AnimData )_animation ) ;
 						toAddAnim.add( ( AnimData )_animation ) ;
 					}

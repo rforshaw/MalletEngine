@@ -100,20 +100,6 @@ public class GLGeometryUploader
 	}
 
 	/**
-		Upload geometry and have it prepared for drawing.
-	*/
-	private void update( final GL3 _gl, final GLDrawData _data )
-	{
-		GLBuffer buffer = lookup.get( _data ) ;
-		if( buffer != null )
-		{
-			// If the buffer is still supported in the buffer 
-			// it was previously loaded into then update it.
-			buffer.upload( _gl, _data ) ;
-		}
-	}
-
-	/**
 		Find the GLBuffer/GLGeometry that the GLRenderData resides in.
 		Remove it from the buffers, and pack the index buffer.
 	*/

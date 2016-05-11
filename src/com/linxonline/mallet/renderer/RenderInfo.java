@@ -14,8 +14,8 @@ import com.linxonline.mallet.system.GlobalConfig ;
 public final class RenderInfo implements InputAdapterInterface
 {
 	private boolean holdToRenderRatio = true ;							// By default will scale inrespect to Aspect Ratio.
-	private Vector2 displayDimensions = null ;							// Dimensions of the Window
-	private Vector2 renderDimensions = null ;							// Dimensions of the render-buffer
+	private Vector2 displayDimensions = new Vector2( 800, 600 ) ;		// Dimensions of the Window
+	private Vector2 renderDimensions = new Vector2( 800, 600 ) ;		// Dimensions of the render-buffer
 
 	private Vector3 cameraPosition = new Vector3() ;					// Camera position
 	private final Vector3 cameraZoom = new Vector3( 1, 1, 1 ) ;
@@ -27,12 +27,10 @@ public final class RenderInfo implements InputAdapterInterface
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
 
 	public RenderInfo( final Vector2 _displayDimension, 
-					   final Vector2 _renderDimensions, 
-					   final Vector3 _cameraPosition )
+					   final Vector2 _renderDimensions )
 	{
 		displayDimensions = _displayDimension ;
 		renderDimensions = _renderDimensions ;
-		cameraPosition = _cameraPosition ;
 		updateInfo() ;
 	}
 
@@ -140,22 +138,22 @@ public final class RenderInfo implements InputAdapterInterface
 	/**
 		Used to set the dimensions of the Window that the program will render into.
 	**/
-	public void setDisplayDimensions( final Vector2 _displayDimension )
+	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		displayDimensions = _displayDimension ;
-		GlobalConfig.addInteger( "DISPLAYWIDTH", ( int )_displayDimension.x ) ;
-		GlobalConfig.addInteger( "DISPLAYHEIGHT", ( int )_displayDimension.y ) ;
+		displayDimensions.setXY( _width, _height ) ;
+		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
+		GlobalConfig.addInteger( "DISPLAYHEIGHT", _height ) ;
 		updateInfo() ;
 	}
 
 	/**
 		Set the Dimensions of the canvas in which things will be rendered onto.
 	**/
-	public void setRenderDimensions( final Vector2 _renderDimensions )
+	public void setRenderDimensions( final int _width, final int _height )
 	{
-		renderDimensions =_renderDimensions ;
-		GlobalConfig.addInteger( "RENDERWIDTH", ( int )_renderDimensions.x ) ;
-		GlobalConfig.addInteger( "RENDERHEIGHT", ( int )_renderDimensions.y ) ;
+		renderDimensions.setXY( _width, _height ) ;
+		GlobalConfig.addInteger( "RENDERWIDTH", _width ) ;
+		GlobalConfig.addInteger( "RENDERHEIGHT", _height ) ;
 
 		halfRenderDimensions.setXY( renderDimensions.x / 2.0f, renderDimensions.y / 2.0f ) ;
 		updateInfo() ;

@@ -1,0 +1,73 @@
+package com.linxonline.mallet.renderer.android.GL ;
+
+import android.opengl.GLES30 ;
+
+import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.renderer.* ;
+
+/**
+	Provides the ability to manage multiple OpenGL 
+	states as seperate worlds.
+*/
+public class GLWorldState extends WorldState<GLWorld>
+{
+	public GLWorldState() {}
+
+	@Override
+	public void setDefault( final GLWorld _default )
+	{
+		super.setDefault( _default ) ;
+	}
+
+	/**
+		Iterate over each GLWorld and update/upload its GL state.
+		GL state will be updated based on GLDrawData flagged 
+		for updating.
+	*/
+	public void upload( final int _diff, final int _iteration )
+	{
+		manageState() ;
+
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final GLWorld world = current.get( i ) ;
+			world.upload( _diff, _iteration ) ;
+			world.draw( _diff, _iteration ) ;
+		}
+	}
+
+	/**
+		Iterate over each GLWorld and render its GL state 
+		to the defined Cameras.
+	*/
+	public void draw( final Matrix4 _worldProjection, final Matrix4 _uiProjection )
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).draw( _worldProjection, _uiProjection ) ;
+		}
+	}
+
+	public void clean()
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).clean() ;
+		}
+	}
+
+	/**
+		Shutdown each world and clean up the GL state.
+	*/
+	public void shutdown()
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).shutdown() ;
+		}
+	}
+}

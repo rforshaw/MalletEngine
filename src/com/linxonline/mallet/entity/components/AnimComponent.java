@@ -100,7 +100,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		final Anim anim = animations.get( _name ) ;
 		if( delegate != null && anim != null )
 		{
-			delegate.addAnimation( anim ) ;
+			delegate.addAnimation( anim, null ) ;
 			currentAnim = anim ;
 		}
 	}
