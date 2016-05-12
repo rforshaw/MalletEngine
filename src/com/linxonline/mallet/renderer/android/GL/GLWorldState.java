@@ -37,19 +37,6 @@ public class GLWorldState extends WorldState<GLWorld>
 		}
 	}
 
-	/**
-		Iterate over each GLWorld and render its GL state 
-		to the defined Cameras.
-	*/
-	public void draw( final Matrix4 _worldProjection, final Matrix4 _uiProjection )
-	{
-		final int size = current.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			current.get( i ).draw( _worldProjection, _uiProjection ) ;
-		}
-	}
-
 	public void clean()
 	{
 		final int size = current.size() ;

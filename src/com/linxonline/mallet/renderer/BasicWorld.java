@@ -91,4 +91,9 @@ public class BasicWorld<T extends DrawData, U extends CameraData> implements Wor
 	{
 		state.clear() ;
 	}
+
+	public String toString()
+	{
+		return id ;
+	}
 }

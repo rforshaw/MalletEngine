@@ -11,13 +11,13 @@ public class WorldAssist
 		assist = _assist ;
 	}
 
-	public static World constructeWorld( final String _id, final int _order )
+	public static World constructWorld( final String _id, final int _order )
 	{
-		return assist.constructeWorld( _id, _order ) ;
+		return assist.constructWorld( _id, _order ) ;
 	}
 
 	public interface Assist
 	{
-		public World constructeWorld( final String _id, final int _order ) ;
+		public World constructWorld( final String _id, final int _order ) ;
 	}
 }

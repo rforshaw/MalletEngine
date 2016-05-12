@@ -423,7 +423,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		WorldAssist.setAssist( new WorldAssist.Assist()
 		{
 			@Override
-			public World constructeWorld( final String _id, final int _order )
+			public World constructWorld( final String _id, final int _order )
 			{
 				return new GLWorld( _id, _order, constructRemoveDelegate() ) ;
 			}
@@ -569,11 +569,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		{
 			public void draw( final CameraData _camera )
 			{
-				final Vector2 half = getRenderInfo().getHalfRenderDimensions() ;
 				final Vector2 scaleRtoD = getRenderInfo().getScaleRenderToDisplay() ;
 				final Vector2 offset = getRenderInfo().getScreenOffset() ;
 				final CameraData.Screen screen = _camera.getRenderScreen() ;
 
+				System.out.println( "Camera: " + _camera + " Ratio: " + scaleRtoD ) ;
+				
 				gl.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
 							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
 							   ( int )( screen.dimension.x * scaleRtoD.x ),
@@ -585,7 +586,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				final Vector3 rotation = _camera.getRotation() ;
 
 				worldMatrix.setIdentity() ;
-				worldMatrix.translate( half.x, half.y, 0.0f ) ;
+				worldMatrix.translate( ( screen.dimension.x ) / 2 , ( screen.dimension.y ) / 2, 0.0f ) ;
 				worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 				worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
 				
@@ -595,7 +596,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				final Matrix4 uiProjection = matrixCache.get() ;
 				Matrix4.multiply( _camera.getProjection(), uiMatrix, uiProjection ) ;
 
-				( ( GLWorldState )worlds ).draw( gl, worldProjection, uiProjection ) ;
+				final GLWorld world = ( GLWorld )_camera.getWorld() ;
+				world.draw( gl, worldProjection, uiProjection ) ;
 
 				matrixCache.reclaim( worldProjection ) ;
 				matrixCache.reclaim( uiProjection ) ;

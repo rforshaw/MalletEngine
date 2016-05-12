@@ -13,6 +13,12 @@ import com.linxonline.mallet.ui.UISpacer ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.* ;
 
+import com.linxonline.mallet.renderer.WorldAssist ;
+import com.linxonline.mallet.renderer.World ;
+
+import com.linxonline.mallet.renderer.CameraAssist ;
+import com.linxonline.mallet.renderer.Camera ;
+
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
@@ -353,7 +359,14 @@ public class EditorState extends GameState
 		layout.addListener( new UILayout.Listener()
 		{
 			private DrawDelegate delegate = null ;
-			private Draw draw = null ;
+
+			private World world = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
+			private Camera camera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
+																				new Vector3(),
+																				new Vector3( 1, 1, 1 ) ) ;
+
+			private Draw draw1 = null ;
+			private Draw draw2 = null ;
 
 			@Override
 			public void setParent( final UIElement _parent )
@@ -364,32 +377,55 @@ public class EditorState extends GameState
 					public void callback( DrawDelegate _delegate )
 					{
 						delegate = _delegate ;
-						if( draw != null )
+						if( draw1 != null && draw2 != null )
 						{
-							delegate.addBasicDraw( draw ) ;
+							delegate.addWorld( world ) ;
+							delegate.addCamera( camera, world ) ;
+
+							delegate.addBasicDraw( draw1, world ) ;
+							//delegate.addBasicDraw( draw2, world ) ;
 						}
 					}
 				} ) ) ;
 
+				final Vector3 offset = Vector3.add( _parent.getPosition(), _parent.getOffset() ) ;
 				final Vector3 length = _parent.getLength() ;
 
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
-											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
-				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				draw1 = DrawAssist.createDraw( new Vector3(),
+												new Vector3(),
+												new Vector3(),
+												new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+
+				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw1, "SIMPLE_GEOMETRY" ) ;
+
+				draw2 = DrawAssist.createDraw( _parent.getPosition(),
+												_parent.getOffset(),
+												new Vector3(),
+												new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+
+				DrawAssist.amendUI( draw2, true ) ;
+				DrawAssist.amendShape( draw2, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw2, "SIMPLE_GEOMETRY" ) ;
+				
+				CameraAssist.amendOrthographic( camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( camera, ( int )length.x, ( int )length.y ) ;
+				CameraAssist.amendScreenOffset( camera, ( int )offset.x, ( int )offset.y ) ;
 			}
 
 			@Override
 			public void refresh()
 			{
-				final Vector3 length = getParent().getLength() ;
-				final Vector3 offset = getParent().getOffset() ;
+				final UIElement parent = getParent() ;
+				final Vector3 offset = Vector3.add( parent.getPosition(), parent.getOffset() ) ;
+				final Vector3 length = parent.getLength() ;
 
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
-				DrawAssist.forceUpdate( draw ) ;
+				CameraAssist.amendOrthographic( camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( camera, ( int )length.x, ( int )length.y ) ;
+				CameraAssist.amendScreenOffset( camera, ( int )offset.x, ( int )offset.y ) ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw2 ), length ) ;
+				DrawAssist.forceUpdate( draw2 ) ;
 			}
 
 			@Override

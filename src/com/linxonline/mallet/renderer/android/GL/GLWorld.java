@@ -11,7 +11,7 @@ import com.linxonline.mallet.renderer.* ;
 */
 public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 {
-	private final static GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
+	private final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 
 	public GLWorld( final String _id, final int _order, DrawState.RemoveDelegate _remove )
 	{
