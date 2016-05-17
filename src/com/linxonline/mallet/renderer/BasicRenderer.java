@@ -5,26 +5,19 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
-public abstract class BasicRenderer implements RenderInterface
+public abstract class BasicRenderer<T extends WorldState> implements RenderInterface<T>
 {
-	protected static final MalletColour WHITE = MalletColour.white() ;
-	protected static final MalletColour BLACK = MalletColour.black() ;
+	private final T worlds ;
 
-	protected static final MalletColour RED   = MalletColour.red() ;
-	protected static final MalletColour GREEN = MalletColour.green() ;
-	protected static final MalletColour BLUE  = MalletColour.blue() ;
-
-	protected final WorldState worlds ;
-
-	protected final EventController controller = new EventController() ;
-	protected final RenderInfo info = new RenderInfo( new Vector2( 800, 600 ),
-													  new Vector2( 800, 600 ) ) ;
+	private final EventController controller = new EventController() ;
+	private final RenderInfo info = new RenderInfo( new Vector2( 800, 600 ),
+													new Vector2( 800, 600 ) ) ;
 
 	protected float drawDT   = 0.0f ;
 	protected float updateDT = 0.0f ;
 	protected int renderIter = 0 ;
 
-	public BasicRenderer( final WorldState _worlds )
+	public BasicRenderer( final T _worlds )
 	{
 		worlds = _worlds ;
 	}
@@ -231,12 +224,6 @@ public abstract class BasicRenderer implements RenderInterface
 	}
 
 	@Override
-	public void setCameraPosition( final Vector3 _position )
-	{
-		CameraAssist.amendPosition( CameraAssist.getDefaultCamera(), _position.x, _position.y, _position.z ) ;
-	}
-
-	@Override
 	public RenderInfo getRenderInfo()
 	{
 		return info ;
@@ -246,6 +233,12 @@ public abstract class BasicRenderer implements RenderInterface
 	public EventController getEventController()
 	{
 		return controller ;
+	}
+
+	@Override
+	public T getWorldState()
+	{
+		return worlds ;
 	}
 
 	@Override

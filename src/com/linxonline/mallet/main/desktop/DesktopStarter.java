@@ -166,7 +166,5 @@ public abstract class DesktopStarter extends StarterInterface
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
-
-		render.setCameraPosition( new Vector3() ) ;
 	}
 }

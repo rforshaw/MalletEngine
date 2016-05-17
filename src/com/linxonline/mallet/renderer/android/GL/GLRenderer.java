@@ -21,7 +21,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.VertexAttrib ;
 
-public class GLRenderer extends BasicRenderer
+public class GLRenderer extends BasicRenderer<GLWorldState>
 {
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
@@ -41,6 +41,8 @@ public class GLRenderer extends BasicRenderer
 	public GLRenderer()
 	{
 		super( new GLWorldState() ) ;
+
+		final GLWorldState worlds = getWorldState() ;
 		worlds.setDefault( new GLWorld( "DEFAULT", 0, constructRemoveDelegate() ) ) ;
 
 		defaultCamera.setDrawInterface( getCameraDraw() ) ;
@@ -63,7 +65,7 @@ public class GLRenderer extends BasicRenderer
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
 
-		( ( GLWorldState )worlds ).shutdown() ;
+		getWorldState().shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
@@ -77,13 +79,14 @@ public class GLRenderer extends BasicRenderer
 	*/
 	public void recover()
 	{
-		( ( GLWorldState )worlds ).shutdown() ;
+		final GLWorldState worlds = getWorldState() ;
+		worlds.shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
 		fontManager.recover() ;
 
-		final ArrayList<BasicWorld> worldContent = worlds.getCurrentData() ;
-		for( final BasicWorld world : worldContent )
+		final ArrayList<GLWorld> worldContent = worlds.getCurrentData() ;
+		for( final GLWorld world : worldContent )
 		{
 			final DrawState state = world.getDrawState() ;
 			final ArrayList<DrawData> drawContent = state.getActiveDraws() ;
@@ -627,9 +630,9 @@ public class GLRenderer extends BasicRenderer
 				final CameraData.Screen screen = _camera.getRenderScreen() ;
 
 				GLES30.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
-							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
-							   ( int )( screen.dimension.x * scaleRtoD.x ),
-							   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
+								   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
+								   ( int )( screen.dimension.x * scaleRtoD.x ),
+								   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
 				//GLRenderer.handleError( "Viewport: ", gl ) ;
 
 				final Vector3 position = _camera.getPosition() ;
@@ -637,7 +640,7 @@ public class GLRenderer extends BasicRenderer
 				final Vector3 rotation = _camera.getRotation() ;
 
 				worldMatrix.setIdentity() ;
-				worldMatrix.translate( ( screen.dimension.x * scaleRtoD.x ) / 2 , ( screen.dimension.y * scaleRtoD.y ) / 2, 0.0f ) ;
+				worldMatrix.translate( ( screen.dimension.x ) / 2 , ( screen.dimension.y ) / 2, 0.0f ) ;
 				worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 				worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
 				
@@ -708,25 +711,14 @@ public class GLRenderer extends BasicRenderer
 		}
 	}
 
-	@Override
-	public void updateState( final float _dt )
-	{
-		super.updateState( _dt ) ;
-	}
-
-	public void draw( final float _dt )
-	{
-		++renderIter ;
-		drawDT = _dt ;
-	}
-
 	public void display()
 	{
 		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT ) ;
 		GLES30.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
-		controller.update() ;
-		( ( GLWorldState )worlds ).upload( ( int )( updateDT / drawDT ), renderIter ) ;
+		getEventController().update() ;
+
+		( ( GLWorldState )getWorldState() ).upload( ( int )( updateDT / drawDT ), renderIter ) ;
 	}
 
 	/**
@@ -737,7 +729,7 @@ public class GLRenderer extends BasicRenderer
 	@Override
 	public void clean()
 	{
-		( ( GLWorldState )worlds ).clean() ;
+		getWorldState().clean() ;
 		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;

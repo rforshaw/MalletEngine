@@ -103,12 +103,6 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public void setCameraPosition( final Vector3 _position )
-	{
-		render.setCameraPosition( _position ) ;
-	}
-
-	@Override
 	public void updateState( final float _dt )
 	{
 		synchronized( render )
@@ -133,6 +127,12 @@ public class GL2DRenderer implements RenderInterface,
 	public EventController getEventController()
 	{
 		return render.getEventController() ;
+	}
+
+	@Override
+	public WorldState getWorldState()
+	{
+		return render.getWorldState() ;
 	}
 
 	@Override

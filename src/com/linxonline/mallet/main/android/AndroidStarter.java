@@ -114,7 +114,6 @@ public class AndroidStarter extends StarterInterface
 	protected void setRenderSettings( final SystemInterface _system )
 	{
 		final RenderInterface render = _system.getRenderInterface() ;
-		render.setCameraPosition( new Vector3( 0.0f, 0.0f, 0.0f ) ) ;
 	}
 
 	public SystemInterface getAndroidSystem()

@@ -31,7 +31,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib ;
 
-public class GLRenderer extends BasicRenderer implements GLEventListener
+public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventListener
 {
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
@@ -56,6 +56,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public GLRenderer()
 	{
 		super( new GLWorldState() ) ;
+
+		final GLWorldState worlds = getWorldState() ;
 		worlds.setDefault( new GLWorld( "DEFAULT", 0, constructRemoveDelegate() ) ) ;
 
 		defaultCamera.setDrawInterface( getCameraDraw() ) ;
@@ -77,7 +79,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
 
-		( ( GLWorldState )worlds ).shutdown() ;
+		getWorldState().shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
@@ -573,8 +575,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				final Vector2 offset = getRenderInfo().getScreenOffset() ;
 				final CameraData.Screen screen = _camera.getRenderScreen() ;
 
-				System.out.println( "Camera: " + _camera + " Ratio: " + scaleRtoD ) ;
-				
 				gl.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
 							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
 							   ( int )( screen.dimension.x * scaleRtoD.x ),
@@ -747,6 +747,13 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		draw( 0.0f ) ;
 	}
 
+	@Override
+	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
+	{
+		super.setDisplayDimensions( _width, _height ) ;
+		resize() ;
+	}
+
 	protected void resize()
 	{
 		switch( viewMode )
@@ -766,26 +773,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	}
 
 	@Override
-	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
-	{
-		super.setDisplayDimensions( _width, _height ) ;
-		resize() ;
-	}
-
-	@Override
 	public void dispose( GLAutoDrawable _drawable ) {}
-
-	@Override
-	public void updateState( final float _dt )
-	{
-		super.updateState( _dt ) ;
-	}
 
 	public void draw( final float _dt )
 	{
-		++renderIter ;
-		drawDT = _dt ;
-
+		super.draw( _dt ) ;
 		canvas.display() ;
 	}
 
@@ -797,8 +789,9 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
 		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
 
-		controller.update() ;
-		( ( GLWorldState )worlds ).upload( ( int )( updateDT / drawDT ), renderIter ) ;
+		getEventController().update() ;
+
+		getWorldState().upload( ( int )( updateDT / drawDT ), renderIter ) ;
 		canvas.swapBuffers() ;
 	}
 
@@ -810,7 +803,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void clean()
 	{
-		( ( GLWorldState )worlds ).clean() ;
+		getWorldState().clean() ;
 		programs.clean() ;
 		textures.clean() ;
 		fontManager.clean() ;
