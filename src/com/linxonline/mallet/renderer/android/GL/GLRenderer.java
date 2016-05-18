@@ -402,11 +402,17 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 											 final float _near,
 											 final float _far )
 			{
+				final CameraData camera = ( CameraData )_camera ;
+				final CameraData.Projection projection = camera.getProjection() ;
+
+				projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
+				projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
+
 				final float invZ = 1.0f / ( _far - _near ) ;
 				final float invY = 1.0f / ( _top - _bottom ) ;
 				final float invX = 1.0f / ( _right - _left ) ;
 
-				final Matrix4 proj = ( ( CameraData )_camera ).getProjection() ;
+				final Matrix4 proj = projection.matrix ;
 				proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
 						  0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
 						  0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
@@ -627,6 +633,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			{
 				final Vector2 scaleRtoD = getRenderInfo().getScaleRenderToDisplay() ;
 				final Vector2 offset = getRenderInfo().getScreenOffset() ;
+				final CameraData.Projection projection = _camera.getProjection() ;
 				final CameraData.Screen screen = _camera.getRenderScreen() ;
 
 				GLES30.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
@@ -640,15 +647,15 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				final Vector3 rotation = _camera.getRotation() ;
 
 				worldMatrix.setIdentity() ;
-				worldMatrix.translate( ( screen.dimension.x ) / 2 , ( screen.dimension.y ) / 2, 0.0f ) ;
+				worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
 				worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 				worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
 				
 				final Matrix4 worldProjection = matrixCache.get() ;
-				Matrix4.multiply( _camera.getProjection(), worldMatrix, worldProjection ) ;
+				Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
 
 				final Matrix4 uiProjection = matrixCache.get() ;
-				Matrix4.multiply( _camera.getProjection(), uiMatrix, uiProjection ) ;
+				Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
 				final GLWorld world = ( GLWorld )_camera.getWorld() ;
 				world.draw( worldProjection, uiProjection ) ;

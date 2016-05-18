@@ -21,7 +21,6 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	private final Vector3 oldRotation = new Vector3()  ;
 	private final Vector3 oldScale = new Vector3() ;
 
-	private final Matrix4 projection = new Matrix4() ;		// Combined Model View and Projection Matrix
 	private final Vector3 position ;
 	private final Vector3 rotation ;
 	private final Vector3 scale ;
@@ -29,7 +28,8 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	private final Vector3 currentPosition = new Vector3() ;
 	private final Vector3 currentRotation = new Vector3()  ;
 	private final Vector3 currentScale = new Vector3() ;
-	
+
+	private final Projection projection = new Projection() ;
 	private final Screen renderScreen = new Screen() ;
 
 	public CameraData( final String _id )
@@ -58,11 +58,6 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		return world ;
 	}
 
-	public Matrix4 getProjection()
-	{
-		return projection ;
-	}
-	
 	public Vector3 getPosition()
 	{
 		return position ;
@@ -76,6 +71,11 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	public Vector3 getScale()
 	{
 		return scale ;
+	}
+
+	public Projection getProjection()
+	{
+		return projection ;
 	}
 
 	public Screen getRenderScreen()
@@ -145,6 +145,17 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		_past.setXYZ( _present ) ;
 	}
 
+	public static class Projection
+	{
+		public final Vector3 nearPlane = new Vector3() ;		// x = width, y = height, z = near
+		public final Vector3 farPlane = new Vector3() ;		// x = width, y = height, z = far
+		public final Matrix4 matrix = new Matrix4() ;		// Combined Model View and Projection Matrix
+	}
+
+	/**
+		Represents the size and position of the framebuffer that 
+		this camera will render to.
+	*/
 	public static class Screen
 	{
 		public final Vector2 offset = new Vector2() ;
