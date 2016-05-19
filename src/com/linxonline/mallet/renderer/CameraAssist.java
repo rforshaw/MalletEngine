@@ -67,6 +67,16 @@ public class CameraAssist
 		return assist.getScale( _camera, _populate ) ;
 	}
 
+	public static Camera addCamera( final Camera _camera, final World _world )
+	{
+		return assist.addCamera( _camera, _world ) ;
+	}
+
+	public static Camera removeCamera( final Camera _camera, final World _world )
+	{
+		return assist.removeCamera( _camera, _world ) ;
+	}
+
 	public static Camera createCamera( final String _id,
 									   final Vector3 _position,
 									   final Vector3 _rotation,
@@ -97,6 +107,9 @@ public class CameraAssist
 		public boolean getPosition( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getRotation( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getScale( final Camera _camera, final Vector3 _populate ) ;
+
+		public Camera addCamera( final Camera _camera, final World _world ) ;
+		public Camera removeCamera( final Camera _camera, final World _world ) ;
 
 		public Camera createCamera( final String _id,
 									final Vector3 _position,

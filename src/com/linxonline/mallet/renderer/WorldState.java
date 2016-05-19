@@ -23,6 +23,24 @@ public abstract class WorldState<T extends BasicWorld> extends State<T>
 	}
 
 	/**
+		Wrapper function around add, provides greater explanation 
+		on what add is being used for.
+	*/
+	public void addWorld( final T _world )
+	{
+		add( _world ) ;
+	}
+
+	/**
+		Wrapper function around remove, provides greater explanation 
+		on what remove is being used for.
+	*/
+	public void removeWorld( final T _world )
+	{
+		remove( _world ) ;
+	}
+
+	/**
 		Add the DrawData to the specified World.
 		If no world is specified add it to the default world.
 	*/

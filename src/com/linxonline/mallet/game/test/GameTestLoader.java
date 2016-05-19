@@ -108,10 +108,11 @@ public final class GameTestLoader extends GameLoader
 							final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 600 ) ;
 
 							final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
+							CameraAssist.addCamera( cam, null ) ;
+
 							CameraAssist.amendOrthographic( cam, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
 							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
-							_delegate.addCamera( cam ) ;
 						}
 					
 						{

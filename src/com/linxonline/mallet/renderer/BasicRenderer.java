@@ -74,7 +74,6 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 		return new DrawDelegate()
 		{
 			private final ArrayList<Draw> data = new ArrayList<Draw>() ;
-			private final ArrayList<Camera> cameras = new ArrayList<Camera>() ;
 
 			@Override
 			public void addTextDraw( final Draw _draw )
@@ -86,18 +85,6 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			public void addBasicDraw( final Draw _draw )
 			{
 				addBasicDraw( _draw, null ) ;
-			}
-
-			@Override
-			public void addCamera( final Camera _camera )
-			{
-				addCamera( _camera, null ) ;
-			}
-
-			@Override
-			public void removeCamera( final Camera _camera )
-			{
-				removeCamera( _camera, null ) ;
 			}
 
 			@Override
@@ -141,47 +128,6 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			}
 
 			@Override
-			public void addCamera( final Camera _camera, final World _world )
-			{
-				if( _camera != null && _camera instanceof CameraData )
-				{
-					_camera.setDrawInterface( getCameraDraw() ) ;
-					cameras.add( _camera ) ;
-
-					worlds.addCamera( ( CameraData )_camera, ( BasicWorld )_world ) ;
-				}
-			}
-
-			@Override
-			public void removeCamera( final Camera _camera, final World _world )
-			{
-				if( _camera != null && _camera instanceof CameraData )
-				{
-					cameras.remove( _camera ) ;
-					worlds.removeCamera( ( CameraData )_camera ) ;
-				}
-			}
-
-			
-			@Override
-			public void addWorld( final World _world )
-			{
-				if( _world != null && _world instanceof BasicWorld )
-				{
-					worlds.add( ( BasicWorld )_world ) ;
-				}
-			}
-
-			@Override
-			public void removeWorld( final World _world )
-			{
-				if( _world != null && _world instanceof BasicWorld )
-				{
-					worlds.remove( ( BasicWorld )_world ) ;
-				}
-			}
-
-			@Override
 			public Camera getCamera( final String _id, final World _world )
 			{
 				return worlds.getCamera( _id, ( BasicWorld )_world ) ;
@@ -201,12 +147,6 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 					worlds.removeDraw( ( DrawData )draw ) ;
 				}
 				data.clear() ;
-
-				for( final Camera camera : cameras  )
-				{
-					worlds.removeCamera( ( CameraData )camera ) ;
-				}
-				cameras.clear() ;
 			}
 		} ;
 	}

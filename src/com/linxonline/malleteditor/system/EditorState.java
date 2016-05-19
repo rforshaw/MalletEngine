@@ -37,6 +37,16 @@ public class EditorState extends GameState
 	private static final float SEPERATOR = 5.0f ;
 	private static final float EDITOR_LIST_WIDTH = 40.0f ;
 
+	private final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
+	private final World uiWorld = WorldAssist.constructWorld( "UI_EDITOR_WORLD", 2 ) ;
+
+	private final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
+																				 new Vector3(),
+																				 new Vector3( 1, 1, 1 ) ) ;
+	private final Camera uiCamera = CameraAssist.createCamera( "UI_EDITOR_CAMERA", new Vector3(),
+																					new Vector3(),
+																					new Vector3( 1, 1, 1 ) ) ;
+
 	public EditorState( final String _name )
 	{
 		super( _name ) ;
@@ -45,6 +55,9 @@ public class EditorState extends GameState
 	@Override
 	public void initGame()
 	{
+		CameraAssist.addCamera( edCamera, edWorld ) ;
+		CameraAssist.addCamera( uiCamera, uiWorld ) ;
+
 		loadDefaultUILayout() ;
 	}
 
@@ -82,6 +95,9 @@ public class EditorState extends GameState
 			{
 				dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+
+				CameraAssist.amendOrthographic( uiCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( uiCamera, ( int )dimension.x, ( int )dimension.y ) ;
 			}
 		} ) ;
 
@@ -91,17 +107,20 @@ public class EditorState extends GameState
 			{
 				dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
 				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+
+				CameraAssist.amendOrthographic( uiCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( uiCamera, ( int )dimension.x, ( int )dimension.y ) ;
 			}
 		} ) ;
 
-		layout.addElement( createHeaderToolbar() ) ;
-		layout.addElement( createMainFrame() ) ;
-		layout.addElement( createFooterToolbar() ) ;
+		layout.addElement( createHeaderToolbar( uiWorld ) ) ;
+		layout.addElement( createMainFrame( edCamera, edWorld, uiWorld ) ) ;
+		layout.addElement( createFooterToolbar( uiWorld ) ) ;
 
 		return layout ;
 	}
 
-	private static UILayout createHeaderToolbar()
+	private static UILayout createHeaderToolbar( final World _world )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
@@ -122,7 +141,7 @@ public class EditorState extends GameState
 						delegate = _delegate ;
 						if( draw != null )
 						{
-							delegate.addBasicDraw( draw ) ;
+							delegate.addBasicDraw( draw, _world ) ;
 						}
 					}
 				} ) ) ;
@@ -161,7 +180,7 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
-	private static UILayout createFooterToolbar()
+	private static UILayout createFooterToolbar( final World _world )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
@@ -182,7 +201,7 @@ public class EditorState extends GameState
 						delegate = _delegate ;
 						if( draw != null )
 						{
-							delegate.addBasicDraw( draw ) ;
+							delegate.addBasicDraw( draw, _world ) ;
 						}
 					}
 				} ) ) ;
@@ -221,18 +240,18 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
-	private static UILayout createMainFrame()
+	private static UILayout createMainFrame( final Camera _edCamera, final World _edWorld, final World _uiWorld )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 
-		layout.addElement( createEditorList() ) ;
-		layout.addElement( createSeperator() ) ;
-		layout.addElement( createMainView() ) ;
+		layout.addElement( createEditorList( _uiWorld ) ) ;
+		layout.addElement( createSeperator( _uiWorld ) ) ;
+		layout.addElement( createMainView( _edCamera, _edWorld ) ) ;
 
 		return layout ;
 	}
 
-	private static UILayout createEditorList()
+	private static UILayout createEditorList( final World _world )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMinimumLength( 250.0f, 0.0f, 0.0f ) ;
@@ -253,7 +272,7 @@ public class EditorState extends GameState
 						delegate = _delegate ;
 						if( draw != null )
 						{
-							delegate.addBasicDraw( draw ) ;
+							delegate.addBasicDraw( draw, _world ) ;
 						}
 					}
 				} ) ) ;
@@ -292,7 +311,7 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
-	private static UILayout createSeperator()
+	private static UILayout createSeperator( final World _world )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( SEPERATOR, 0.0f, 0.0f ) ;
@@ -313,7 +332,7 @@ public class EditorState extends GameState
 						delegate = _delegate ;
 						if( draw != null )
 						{
-							delegate.addBasicDraw( draw ) ;
+							delegate.addBasicDraw( draw, _world ) ;
 						}
 					}
 				} ) ) ;
@@ -352,19 +371,13 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
-	private static UILayout createMainView()
+	private static UILayout createMainView( final Camera _camera, final World _world )
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 
 		layout.addListener( new UILayout.Listener()
 		{
 			private DrawDelegate delegate = null ;
-
-			private World world = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
-			private Camera camera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
-																				new Vector3(),
-																				new Vector3( 1, 1, 1 ) ) ;
-
 			private Draw draw1 = null ;
 			private Draw draw2 = null ;
 
@@ -379,11 +392,7 @@ public class EditorState extends GameState
 						delegate = _delegate ;
 						if( draw1 != null && draw2 != null )
 						{
-							delegate.addWorld( world ) ;
-							delegate.addCamera( camera, world ) ;
-
-							delegate.addBasicDraw( draw1, world ) ;
-							//delegate.addBasicDraw( draw2, world ) ;
+							delegate.addBasicDraw( draw1, _world ) ;
 						}
 					}
 				} ) ) ;
@@ -407,10 +416,10 @@ public class EditorState extends GameState
 				DrawAssist.amendUI( draw2, true ) ;
 				DrawAssist.amendShape( draw2, Shape.constructPlane( length, MalletColour.blue() ) ) ;
 				DrawAssist.attachProgram( draw2, "SIMPLE_GEOMETRY" ) ;
-				
-				CameraAssist.amendOrthographic( camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( camera, ( int )length.x, ( int )length.y ) ;
-				CameraAssist.amendScreenOffset( camera, ( int )offset.x, ( int )offset.y ) ;
+
+				CameraAssist.amendOrthographic( _camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( _camera, ( int )length.x, ( int )length.y ) ;
+				CameraAssist.amendScreenOffset( _camera, ( int )offset.x, ( int )offset.y ) ;
 			}
 
 			@Override
@@ -420,9 +429,9 @@ public class EditorState extends GameState
 				final Vector3 offset = Vector3.add( parent.getPosition(), parent.getOffset() ) ;
 				final Vector3 length = parent.getLength() ;
 
-				CameraAssist.amendOrthographic( camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( camera, ( int )length.x, ( int )length.y ) ;
-				CameraAssist.amendScreenOffset( camera, ( int )offset.x, ( int )offset.y ) ;
+				CameraAssist.amendOrthographic( _camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
+				CameraAssist.amendScreenResolution( _camera, ( int )length.x, ( int )length.y ) ;
+				CameraAssist.amendScreenOffset( _camera, ( int )offset.x, ( int )offset.y ) ;
 
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw2 ), length ) ;
 				DrawAssist.forceUpdate( draw2 ) ;

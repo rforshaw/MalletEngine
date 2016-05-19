@@ -25,34 +25,12 @@ public interface DrawDelegate
 	public void addBasicDraw( final Draw _draw ) ;
 
 	/**
-		Added to the default world.
-		A Camera object should not be added to more than one World.
-	*/
-	public void addCamera( final Camera _camera ) ;
-	public void removeCamera( final Camera _camera ) ;
-
-	/**
 		Add Draw to a specific world.
 		A Draw object should not be added to more than one World.
 	*/
 	public void addTextDraw( final Draw _draw, final World _world ) ;
 	public void addBasicDraw( final Draw _draw, final World _world ) ;
 	public void removeDraw( final Draw _draw ) ;
-
-	/**
-		Add Camera to a specific world.
-		A Camera object should not be added to more than one World.
-	*/
-	public void addCamera( final Camera _camera, final World _world ) ;
-	public void removeCamera( final Camera _camera, final World _world ) ;
-
-	/**
-		Add a new world to the rendering-system.
-		Only create/add a world if you wish to render content separate
-		from the default world.
-	*/
-	public void addWorld( final World _world ) ;
-	public void removeWorld( final World _world ) ;
 
 	/**
 		Return the Camera associated with the unique _id.

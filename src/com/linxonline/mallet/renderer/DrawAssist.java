@@ -64,6 +64,11 @@ public class DrawAssist
 		return assist.amendTexture( _draw, _texture ) ;
 	}
 
+	public static Draw removeTexture( final Draw _draw, final MalletTexture _texture )
+	{
+		return assist.removeTexture( _draw, _texture ) ;
+	}
+	
 	public static Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 	{
 		return assist.amendClip( _draw, _clipSpace, _position, _offset ) ;
@@ -230,6 +235,7 @@ public class DrawAssist
 	{
 		public Draw amendShape( final Draw _draw, final Shape _shape ) ;
 		public Draw amendTexture( final Draw _draw, final MalletTexture _texture ) ;
+		public Draw removeTexture( final Draw _draw, final MalletTexture _texture ) ;
 		public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset ) ;
 		public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z ) ;
