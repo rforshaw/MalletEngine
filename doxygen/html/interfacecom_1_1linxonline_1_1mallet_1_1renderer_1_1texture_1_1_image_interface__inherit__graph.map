@@ -1,0 +1,4 @@
+<map id="com.linxonline.mallet.renderer.texture.ImageInterface" name="com.linxonline.mallet.renderer.texture.ImageInterface">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_image.html" title="com.linxonline.mallet.renderer.android.\lGL.GLImage" alt="" coords="298,5,543,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_image.html" title="com.linxonline.mallet.renderer.desktop.\lGL.GLImage" alt="" coords="296,71,545,112"/>
+</map>

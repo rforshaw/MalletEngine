@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_search_interface.html" title="com.linxonline.mallet.entity.query.SearchInterface" alt="" coords="5,5,317,35"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query_system.html" title="com.linxonline.mallet.entity.query.QuerySystem" alt="" coords="367,5,665,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1audio_1_1_audio_generator.html" title="com.linxonline.mallet.audio.\lAudioGenerator\&lt; WebSound \&gt;" alt="" coords="5,5,205,47"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1web_1_1_audio_source_generator.html" title="com.linxonline.mallet.audio.web.\lAudioSourceGenerator" alt="" coords="253,5,464,47"/>
 </map>

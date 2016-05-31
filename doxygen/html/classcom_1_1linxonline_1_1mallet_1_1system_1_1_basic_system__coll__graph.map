@@ -1,0 +1,8 @@
+<map id="com.linxonline.mallet.system.BasicSystem" name="com.linxonline.mallet.system.BasicSystem">
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="257,5,452,47"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html" title="com.linxonline.mallet.event.\lEventSystemInterface" alt="" coords="263,71,447,112"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_add_event_interface.html" title="com.linxonline.mallet.event.\lAddEventInterface" alt="" coords="5,71,189,112"/>
+<area shape="rect" id="node6" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_system_interface.html" title="com.linxonline.mallet.input.\lInputSystemInterface" alt="" coords="265,201,445,243"/>
+<area shape="rect" id="node7" href="$interfacecom_1_1linxonline_1_1mallet_1_1audio_1_1_audio_generator.html" title="com.linxonline.mallet.audio.\lAudioGenerator\&lt; T extends\l SoundInterface \&gt;" alt="" coords="263,266,446,322"/>
+<area shape="rect" id="node8" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_render_interface.html" title="com.linxonline.mallet.renderer.\lRenderInterface\&lt; T extends\l WorldState \&gt;" alt="" coords="255,346,454,402"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="com.linxonline.mallet.entity.components.InputComponent" name="com.linxonline.mallet.entity.components.InputComponent">
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_key_input_component.html" title="com.linxonline.mallet.entity.components.\lKeyInputComponent" alt="" coords="619,5,877,47"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_mouse_component.html" title="com.linxonline.mallet.entity.components.\lMouseComponent" alt="" coords="619,71,877,112"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_u_i_component.html" title="com.linxonline.mallet.entity.components.\lUIComponent" alt="" coords="619,136,877,177"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_component.html" title="com.linxonline.mallet.entity.components.\lComponent" alt="" coords="5,37,264,79"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_handler.html" title="com.linxonline.mallet.input.\lInputHandler" alt="" coords="45,103,225,144"/>
+</map>

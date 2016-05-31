@@ -1,0 +1,5 @@
+var enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format =
+[
+    [ "COMPRESSED", "enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format.html#a030319bc076fbf44c6c3d84fd9e690e2", null ],
+    [ "UNCOMPRESSED", "enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format.html#a26a14045a5e371fd306dd97457301d0e", null ]
+];

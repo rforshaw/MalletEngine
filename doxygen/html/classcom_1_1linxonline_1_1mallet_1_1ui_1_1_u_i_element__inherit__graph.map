@@ -1,0 +1,8 @@
+<map id="com.linxonline.mallet.ui.UIElement" name="com.linxonline.mallet.ui.UIElement">
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_abstract_view.html" title="com.linxonline.mallet.ui.\lUIAbstractView" alt="" coords="444,5,607,47"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_button.html" title="com.linxonline.mallet.ui.\lUIButton" alt="" coords="444,71,607,112"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_layout.html" title="com.linxonline.mallet.ui.\lUILayout" alt="" coords="444,136,607,177"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_spacer.html" title="com.linxonline.mallet.ui.\lUISpacer" alt="" coords="444,201,607,243"/>
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_handler.html" title="com.linxonline.mallet.input.\lInputHandler" alt="" coords="5,104,185,145"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_menu.html" title="com.linxonline.mallet.ui.\lUIMenu" alt="" coords="655,136,817,177"/>
+</map>

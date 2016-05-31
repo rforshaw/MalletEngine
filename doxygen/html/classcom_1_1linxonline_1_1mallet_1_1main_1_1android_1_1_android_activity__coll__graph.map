@@ -1,0 +1,8 @@
+<map id="com.linxonline.mallet.main.android.AndroidActivity" name="com.linxonline.mallet.main.android.AndroidActivity">
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html" title="com.linxonline.mallet.event.\lEventHandler" alt="" coords="368,57,552,98"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler_meta.html" title="com.linxonline.mallet.event.\lEventHandlerMeta" alt="" coords="11,39,195,81"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1android_1_1_android_starter.html" title="com.linxonline.mallet.main.android.\lAndroidStarter" alt="" coords="347,154,573,195"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1_starter_interface.html" title="com.linxonline.mallet.main.\lStarterInterface" alt="" coords="13,105,193,146"/>
+<area shape="rect" id="node7" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="5,170,200,211"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_system.html" title="com.linxonline.mallet.game.\lGameSystem" alt="" coords="11,235,195,277"/>
+</map>

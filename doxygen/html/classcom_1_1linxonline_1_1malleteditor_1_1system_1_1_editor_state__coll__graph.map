@@ -1,0 +1,23 @@
+<map id="com.linxonline.malleteditor.system.EditorState" name="com.linxonline.malleteditor.system.EditorState">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html" title="com.linxonline.mallet.game.\lGameState" alt="" coords="1247,353,1431,395"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html" title="com.linxonline.mallet.game.statemachine.\lState" alt="" coords="820,5,1087,47"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1_hook_entity.html" title="com.linxonline.mallet.entity.\lHookEntity" alt="" coords="861,71,1045,112"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html" title="com.linxonline.mallet.event.\lEventSystem" alt="" coords="861,136,1045,177"/>
+<area shape="rect" id="node6" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html" title="com.linxonline.mallet.event.\lEventSystemInterface" alt="" coords="479,136,663,177"/>
+<area shape="rect" id="node7" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_add_event_interface.html" title="com.linxonline.mallet.event.\lAddEventInterface" alt="" coords="239,136,423,177"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1save_1_1state_1_1_data_converter.html" title="com.linxonline.mallet.io.save.state.\lDataConverter" alt="" coords="840,201,1067,243"/>
+<area shape="rect" id="node9" href="$interfacecom_1_1linxonline_1_1mallet_1_1game_1_1_game_state_1_1_update_interface.html" title="com.linxonline.mallet.game.\lGameState.UpdateInterface" alt="" coords="861,267,1046,308"/>
+<area shape="rect" id="node10" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html" title="com.linxonline.mallet.event.\lEventController" alt="" coords="479,361,663,403"/>
+<area shape="rect" id="node16" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_system.html" title="com.linxonline.mallet.physics.\lCollisionSystem" alt="" coords="855,396,1052,437"/>
+<area shape="rect" id="node11" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html" title="com.linxonline.mallet.event.\lEventHandler" alt="" coords="239,361,423,403"/>
+<area shape="rect" id="node12" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler_meta.html" title="com.linxonline.mallet.event.\lEventHandlerMeta" alt="" coords="5,361,189,403"/>
+<area shape="rect" id="node13" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_state.html" title="com.linxonline.mallet.input.\lInputState" alt="" coords="863,461,1043,503"/>
+<area shape="rect" id="node14" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_system_interface.html" title="com.linxonline.mallet.input.\lInputSystemInterface" alt="" coords="481,444,661,485"/>
+<area shape="rect" id="node15" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_handler.html" title="com.linxonline.mallet.input.\lInputHandler" alt="" coords="481,509,661,551"/>
+<area shape="rect" id="node17" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1system_1_1_entity_system_interface.html" title="com.linxonline.mallet.entity.system.\lEntitySystemInterface" alt="" coords="838,527,1069,568"/>
+<area shape="rect" id="node18" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="856,592,1051,633"/>
+<area shape="rect" id="node19" href="$classcom_1_1linxonline_1_1mallet_1_1animation_1_1_animation_system.html" title="com.linxonline.mallet.animation.\lAnimationSystem" alt="" coords="849,657,1057,699"/>
+<area shape="rect" id="node20" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_delegate.html" title="com.linxonline.mallet.renderer.\lDrawDelegate" alt="" coords="472,655,671,696"/>
+<area shape="rect" id="node21" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1_audio_system.html" title="com.linxonline.mallet.audio.\lAudioSystem" alt="" coords="862,724,1045,765"/>
+<area shape="rect" id="node22" href="$interfacecom_1_1linxonline_1_1mallet_1_1audio_1_1_audio_generator.html" title="com.linxonline.mallet.audio.\lAudioGenerator\&lt; T extends\l SoundInterface \&gt;" alt="" coords="480,719,663,775"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="com.linxonline.mallet.resources.AbstractManager.clean" name="com.linxonline.mallet.resources.AbstractManager.clean">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1android_1_1_android_audio_generator.html#a88105077afb788e126e5841b3e2e8c00" title="com.linxonline.mallet.audio.android.\lAndroidAudioGenerator.createAudioSource" alt="" coords="263,5,533,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_renderer.html#ad69fddd38d28bc91467e83b226a4ff52" title="com.linxonline.mallet.renderer.android.\lGL.GLRenderer.clean" alt="" coords="275,71,521,112"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_renderer.html#acec722b38ea68e236753f96103583973" title="com.linxonline.mallet.renderer.desktop.\lGL.GLRenderer.clean" alt="" coords="273,136,523,177"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1web_1_1gl_1_1_g_l_renderer.html#ad2f67fab6d7addf65013b9e486f9ebee" title="com.linxonline.mallet.renderer.web.gl.\lGLRenderer.clean" alt="" coords="277,201,519,243"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l2_d_renderer.html#a6701ae2e3a6d894b05e6deff63b11bc4" title="com.linxonline.mallet.renderer.android.\lGL.GL2DRenderer.draw" alt="" coords="581,71,827,112"/>
+</map>

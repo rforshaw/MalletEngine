@@ -1,0 +1,10 @@
+<map id="com.linxonline.mallet.io.serialisation.ByteInput.readInt" name="com.linxonline.mallet.io.serialisation.ByteInput.readInt">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a0e3f8116d3cfad8fa284e2ef12fcfa08" title="com.linxonline.mallet.io.serialisation.\lByteInput.readString" alt="" coords="288,5,523,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#ad557d1f2720079ca4b188f75c0690962" title="com.linxonline.mallet.io.serialisation.\lByteInput.readDoubles" alt="" coords="571,35,805,76"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a140e6197f0610bf2086dd1db4c57f421" title="com.linxonline.mallet.io.serialisation.\lByteInput.readInts" alt="" coords="288,123,523,164"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a8737e7bb692c8f4b1c26664bbe97efc3" title="com.linxonline.mallet.io.serialisation.\lByteInput.readBytes" alt="" coords="288,188,523,229"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a0adf178feb091888af877dca093fcb99" title="com.linxonline.mallet.io.serialisation.\lByteInput.readChars" alt="" coords="288,253,523,295"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a6c0302ba452fef9c530b6890e96438d7" title="com.linxonline.mallet.io.serialisation.\lByteInput.readLongs" alt="" coords="288,319,523,360"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a1954ffa5a164bcd9129c7c365a9dfba9" title="com.linxonline.mallet.io.serialisation.\lByteInput.readFloats" alt="" coords="288,384,523,425"/>
+<area shape="rect" id="node9" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#aafcf7ad699998fe1a80bf3114eb70889" title="com.linxonline.mallet.io.serialisation.\lByteInput.readBooleans" alt="" coords="288,449,523,491"/>
+</map>

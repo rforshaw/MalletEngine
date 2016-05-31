@@ -1,3 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_desktop_file_system.html" title="com.linxonline.mallet.io.filesystem.DesktopFileSystem" alt="" coords="5,83,347,112"/>
+<map id="com.linxonline.mallet.io.filesystem.FileSystem" name="com.linxonline.mallet.io.filesystem.FileSystem">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_file_system.html" title="com.linxonline.mallet.io.filesystem.android.\lAndroidFileSystem" alt="" coords="282,5,554,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1desktop_1_1_desktop_file_system.html" title="com.linxonline.mallet.io.filesystem.desktop.\lDesktopFileSystem" alt="" coords="280,71,556,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1web_1_1_web_file_system.html" title="com.linxonline.mallet.io.filesystem.web.\lWebFileSystem" alt="" coords="291,136,545,177"/>
 </map>

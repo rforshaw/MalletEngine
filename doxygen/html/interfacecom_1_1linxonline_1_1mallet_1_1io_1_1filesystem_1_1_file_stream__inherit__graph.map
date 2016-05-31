@@ -1,0 +1,9 @@
+<map id="com.linxonline.mallet.io.filesystem.FileStream" name="com.linxonline.mallet.io.filesystem.FileStream">
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_asset_file.html" title="com.linxonline.mallet.io.filesystem.android.\lAndroidAssetFile" alt="" coords="557,5,829,47"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_file.html" title="com.linxonline.mallet.io.filesystem.android.\lAndroidFile" alt="" coords="557,71,829,112"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_zip_file.html" title="com.linxonline.mallet.io.filesystem.android.\lAndroidZipFile" alt="" coords="557,136,829,177"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1desktop_1_1_desktop_file.html" title="com.linxonline.mallet.io.filesystem.desktop.\lDesktopFile" alt="" coords="555,201,831,243"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1desktop_1_1_desktop_zip_file.html" title="com.linxonline.mallet.io.filesystem.desktop.\lDesktopZipFile" alt="" coords="555,267,831,308"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1web_1_1_web_file.html" title="com.linxonline.mallet.io.filesystem.web.\lWebFile" alt="" coords="565,332,820,373"/>
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_close.html" title="com.linxonline.mallet.io.filesystem.\lClose" alt="" coords="5,169,232,211"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="com.linxonline.mallet.io.filesystem.desktop.DesktopFile.copyTo" name="com.linxonline.mallet.io.filesystem.desktop.DesktopFile.copyTo">
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_file_stream.html#a8fdd06ba41117aa4c6d1d7e8eab01b2c" title="com.linxonline.mallet.io.filesystem.\lFileStream.mkdirs" alt="" coords="329,5,556,47"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_byte_in_stream.html#a4bacc938fecf05b18591e86fe0ba2f13" title="com.linxonline.mallet.io.filesystem.\lByteInStream.readBytes" alt="" coords="329,71,556,112"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_byte_out_stream.html#a2f1def77615007bb32a0c7cd353e4407" title="com.linxonline.mallet.io.filesystem.\lByteOutStream.writeBytes" alt="" coords="329,136,556,177"/>
+</map>

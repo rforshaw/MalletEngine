@@ -1,0 +1,12 @@
+<map id="com.linxonline.mallet.entity.components.CollisionComponent" name="com.linxonline.mallet.entity.components.CollisionComponent">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_component.html" title="com.linxonline.mallet.entity.components.\lComponent" alt="" coords="888,94,1147,135"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1id_1_1_i_d.html" title="com.linxonline.mallet.util.id.ID" alt="" coords="239,5,436,32"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_entity.html" title="com.linxonline.mallet.entity.\lEntity" alt="" coords="540,59,724,101"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html" title="com.linxonline.mallet.event.\lEventController" alt="" coords="540,125,724,166"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html" title="com.linxonline.mallet.event.\lEventHandler" alt="" coords="245,133,429,174"/>
+<area shape="rect" id="node6" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler_meta.html" title="com.linxonline.mallet.event.\lEventHandlerMeta" alt="" coords="5,133,189,174"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1maths_1_1_vector3.html" title="com.linxonline.mallet.maths.\lVector3" alt="" coords="243,67,431,109"/>
+<area shape="rect" id="node9" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1hulls_1_1_hull.html" title="com.linxonline.mallet.physics.hulls.Hull" alt="" coords="892,197,1143,224"/>
+<area shape="rect" id="node10" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_contact_data.html" title="com.linxonline.mallet.physics.\lContactData" alt="" coords="533,190,731,231"/>
+<area shape="rect" id="node11" href="$interfacecom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_callback.html" title="com.linxonline.mallet.physics.\lCollisionCallback" alt="" coords="533,255,731,297"/>
+</map>

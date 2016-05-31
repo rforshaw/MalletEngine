@@ -1,0 +1,4 @@
+<map id="com.linxonline.mallet.io.reader.ByteReader.readBytes" name="com.linxonline.mallet.io.reader.ByteReader.readBytes">
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_file_stream.html#aa93610cc478de005f883459c351079dd" title="com.linxonline.mallet.io.filesystem.\lFileStream.getSize" alt="" coords="256,5,483,47"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_byte_in_stream.html#a4bacc938fecf05b18591e86fe0ba2f13" title="com.linxonline.mallet.io.filesystem.\lByteInStream.readBytes" alt="" coords="256,71,483,112"/>
+</map>

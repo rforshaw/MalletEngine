@@ -1,0 +1,5 @@
+<map id="com.linxonline.mallet.entity.components.AnimComponent" name="com.linxonline.mallet.entity.components.AnimComponent">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_event_component.html" title="com.linxonline.mallet.entity.components.\lEventComponent" alt="" coords="312,5,571,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_component.html" title="com.linxonline.mallet.entity.components.\lComponent" alt="" coords="5,5,264,47"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1_source_callback.html" title="com.linxonline.mallet.util.\lSourceCallback" alt="" coords="357,71,526,112"/>
+</map>

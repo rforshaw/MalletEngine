@@ -1,0 +1,4 @@
+<map id="com.linxonline.mallet.event.EventController.passEvent" name="com.linxonline.mallet.event.EventController.passEvent">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1animation_1_1_animation_system.html#a8de34f39ea137edb63090aded8a89b4c" title="com.linxonline.mallet.animation.\lAnimationSystem.AnimationSystem" alt="" coords="251,5,483,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_event_component.html#ac1931d48084b29650dd2de642ae65c54" title="com.linxonline.mallet.entity.components.\lEventComponent.passEvent" alt="" coords="237,71,496,112"/>
+</map>

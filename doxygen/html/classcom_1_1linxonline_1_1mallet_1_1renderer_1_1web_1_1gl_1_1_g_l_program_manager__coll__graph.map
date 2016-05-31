@@ -1,0 +1,5 @@
+<map id="com.linxonline.mallet.renderer.web.gl.GLProgramManager" name="com.linxonline.mallet.renderer.web.gl.GLProgramManager">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1resources_1_1_abstract_manager.html" title="com::linxonline::mallet\l::resources::AbstractManager\l\&lt; GLProgram \&gt;" alt="" coords="372,70,567,126"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1resources_1_1_manager_interface.html" title="com::linxonline::mallet\l::resources::ManagerInterface\&lt; T \&gt;" alt="" coords="5,5,233,47"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1resources_1_1_abstract_manager_1_1_abstract_loader.html" title="com.linxonline.mallet.resources.\lAbstractManager\&lt; T extends\l Resource \&gt;.AbstractLoader\&lt; T \&gt;" alt="" coords="10,70,229,126"/>
+</map>

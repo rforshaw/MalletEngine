@@ -1,0 +1,10 @@
+<map id="com.linxonline.mallet.game.GameState.hookGameStateEventController" name="com.linxonline.mallet.game.GameState.hookGameStateEventController">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html#a388a532927dd5b18e9809060d6afab96" title="com.linxonline.mallet.event.\lEventSystem.addEventHandler" alt="" coords="366,5,571,47"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html#ac490bebec74be7d56335d46b08c1301b" title="com.linxonline.mallet.system.\lSystemInterface.getEventInterface" alt="" coords="356,71,581,112"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html#a80321bc1f618c76cbfad76f5f105fd98" title="com.linxonline.mallet.event.\lEventSystemInterface.addEventHandler" alt="" coords="341,136,597,177"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html#aea6fea5ec541274920ffcd252baa26dd" title="com.linxonline.mallet.event.\lEventSystem.removeEventHandler" alt="" coords="355,201,582,243"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html#abc5a8fe6f9f1d68f8823445084a08d11" title="com.linxonline.mallet.event.\lEventSystem.removeHandlersNow" alt="" coords="355,267,582,308"/>
+<area shape="rect" id="node8" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html#a2d5c472163e875a18287d3561df94e38" title="com.linxonline.mallet.event.\lEventSystemInterface.removeEvent\lHandler" alt="" coords="352,331,585,387"/>
+<area shape="rect" id="node9" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html#af24174f0c0c65348f5bb49ade9145a7a" title="com.linxonline.mallet.event.\lEventSystemInterface.removeHandlersNow" alt="" coords="329,411,608,452"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html#a58cb11cd8d8f3824c8370aea42433084" title="com.linxonline.mallet.event.\lEventHandler.getWantedEventTypes" alt="" coords="656,5,895,47"/>
+</map>

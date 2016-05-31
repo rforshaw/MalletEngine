@@ -1,3 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1game_1_1_game_state_1_1_update_interface.html" title="com.linxonline.mallet.game.GameState.UpdateInterface" alt="" coords="5,5,352,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_add_event_interface.html" title="com.linxonline.mallet.event.\lAddEventInterface" alt="" coords="5,5,189,47"/>
+<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html" title="com.linxonline.mallet.event.\lEventSystemInterface" alt="" coords="237,5,421,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html" title="com.linxonline.mallet.event.\lEventSystem" alt="" coords="469,5,653,47"/>
 </map>

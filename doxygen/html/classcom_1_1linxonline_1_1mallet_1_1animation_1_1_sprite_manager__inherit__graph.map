@@ -1,0 +1,4 @@
+<map id="com.linxonline.mallet.animation.SpriteManager" name="com.linxonline.mallet.animation.SpriteManager">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1resources_1_1_abstract_manager.html" title="com::linxonline::mallet\l::resources::AbstractManager\l\&lt; Sprite \&gt;" alt="" coords="22,95,217,151"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1resources_1_1_manager_interface.html" title="com::linxonline::mallet\l::resources::ManagerInterface\&lt; T \&gt;" alt="" coords="5,5,233,47"/>
+</map>

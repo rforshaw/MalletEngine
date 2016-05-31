@@ -1,4 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_hull.html" title="com.linxonline.mallet.physics.Hull" alt="" coords="7,5,225,35"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_box2_d.html" title="com.linxonline.mallet.physics.Box2D" alt="" coords="275,5,512,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_file_system.html" title="com.linxonline.mallet.io.filesystem.\lFileSystem" alt="" coords="5,71,232,112"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_file_system.html" title="com.linxonline.mallet.io.filesystem.android.\lAndroidFileSystem" alt="" coords="282,5,554,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1desktop_1_1_desktop_file_system.html" title="com.linxonline.mallet.io.filesystem.desktop.\lDesktopFileSystem" alt="" coords="280,71,556,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1web_1_1_web_file_system.html" title="com.linxonline.mallet.io.filesystem.web.\lWebFileSystem" alt="" coords="291,136,545,177"/>
 </map>

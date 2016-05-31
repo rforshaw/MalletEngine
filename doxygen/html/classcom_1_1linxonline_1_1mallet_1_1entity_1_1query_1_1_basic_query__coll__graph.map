@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query.html" title="com.linxonline.mallet.entity.query.Query" alt="" coords="32,83,285,112"/>
-<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query_interface.html" title="com.linxonline.mallet.entity.query.QueryInterface" alt="" coords="5,5,312,35"/>
+<map id="com.linxonline.mallet.entity.query.BasicQuery" name="com.linxonline.mallet.entity.query.BasicQuery">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query.html" title="com.linxonline.mallet.entity.query.\lQuery" alt="" coords="5,95,225,136"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query_interface.html" title="com.linxonline.mallet.entity.query.\lQueryInterface" alt="" coords="5,5,225,47"/>
 </map>

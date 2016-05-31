@@ -1,0 +1,8 @@
+<map id="com.linxonline.mallet.io.serialisation.ByteInput.readDoubles" name="com.linxonline.mallet.io.serialisation.ByteInput.readDoubles">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a8ac860c46d94fe7f04445a3b4fd7cb60" title="com.linxonline.mallet.io.serialisation.\lByteInput.readInt" alt="" coords="571,30,805,72"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#ae66b988314306a8f031b2374d8525263" title="com.linxonline.mallet.io.serialisation.\lByteInput.readDouble" alt="" coords="288,26,523,68"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1serialisation_1_1_byte_input.html#a0e3f8116d3cfad8fa284e2ef12fcfa08" title="com.linxonline.mallet.io.serialisation.\lByteInput.readString" alt="" coords="288,92,523,133"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1tools_1_1_convert_bytes.html#a10b41b836d117a6967a767aa3fb2d4e6" title="com.linxonline.mallet.util.tools.\lConvertBytes.toInt" alt="" coords="853,30,1055,72"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1tools_1_1_convert_bytes.html#ae00bdfd82a6c056975fb020a6e09fa48" title="com.linxonline.mallet.util.tools.\lConvertBytes.toBytes" alt="" coords="1103,92,1304,133"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1tools_1_1_convert_bytes.html#a2fae23b8538d6bd808f1f1a1a3be8e31" title="com.linxonline.mallet.util.tools.\lConvertBytes.isBitSet" alt="" coords="1103,26,1304,68"/>
+</map>

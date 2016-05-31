@@ -1,0 +1,12 @@
+<map id="com.linxonline.mallet.system.desktop.gl.GLDefaultSystem" name="com.linxonline.mallet.system.desktop.gl.GLDefaultSystem">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1_basic_system.html" title="com.linxonline.mallet.system.\lBasicSystem" alt="" coords="632,201,827,243"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="257,5,452,47"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_system_interface.html" title="com.linxonline.mallet.event.\lEventSystemInterface" alt="" coords="263,71,447,112"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_add_event_interface.html" title="com.linxonline.mallet.event.\lAddEventInterface" alt="" coords="5,71,189,112"/>
+<area shape="rect" id="node7" href="$interfacecom_1_1linxonline_1_1mallet_1_1input_1_1_input_system_interface.html" title="com.linxonline.mallet.input.\lInputSystemInterface" alt="" coords="265,201,445,243"/>
+<area shape="rect" id="node8" href="$interfacecom_1_1linxonline_1_1mallet_1_1audio_1_1_audio_generator.html" title="com.linxonline.mallet.audio.\lAudioGenerator\&lt; T extends\l SoundInterface \&gt;" alt="" coords="263,266,446,322"/>
+<area shape="rect" id="node9" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_render_interface.html" title="com.linxonline.mallet.renderer.\lRenderInterface\&lt; T extends\l WorldState \&gt;" alt="" coords="255,346,454,402"/>
+<area shape="rect" id="node10" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html" title="com.linxonline.mallet.event.\lEventController" alt="" coords="637,345,821,387"/>
+<area shape="rect" id="node11" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html" title="com.linxonline.mallet.event.\lEventHandler" alt="" coords="263,425,447,467"/>
+<area shape="rect" id="node12" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler_meta.html" title="com.linxonline.mallet.event.\lEventHandlerMeta" alt="" coords="5,425,189,467"/>
+</map>

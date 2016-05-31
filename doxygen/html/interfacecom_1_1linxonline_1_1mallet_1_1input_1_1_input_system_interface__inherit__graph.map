@@ -1,4 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_state.html" title="com.linxonline.mallet.input.InputState" alt="" coords="5,83,245,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_system.html" title="com.linxonline.mallet.input.InputSystem" alt="" coords="269,83,523,112"/>
+<map id="com.linxonline.mallet.input.InputSystemInterface" name="com.linxonline.mallet.input.InputSystemInterface">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1android_1_1_android_input_system.html" title="com.linxonline.mallet.input.android.\lAndroidInputSystem" alt="" coords="235,5,462,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1desktop_1_1_input_system.html" title="com.linxonline.mallet.input.desktop.\lInputSystem" alt="" coords="233,71,464,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1_input_state.html" title="com.linxonline.mallet.input.\lInputState" alt="" coords="259,136,439,177"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1input_1_1web_1_1_input_system.html" title="com.linxonline.mallet.input.web.\lInputSystem" alt="" coords="245,201,453,243"/>
 </map>

@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_cache_interface.html" title="com.linxonline.mallet.util.caches.\lCacheInterface\&lt; T \&gt;" alt="" coords="5,39,220,80"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_object_cache.html" title="com.linxonline.mallet.util.caches.\lObjectCache\&lt; T extends Cacheable \&gt;" alt="" coords="268,5,515,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_time_cache.html" title="com.linxonline.mallet.util.caches.\lTimeCache\&lt; T extends Cacheable \&gt;" alt="" coords="273,71,510,112"/>
+</map>

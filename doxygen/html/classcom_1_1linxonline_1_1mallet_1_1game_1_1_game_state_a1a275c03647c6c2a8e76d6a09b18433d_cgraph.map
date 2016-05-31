@@ -1,0 +1,6 @@
+<map id="com.linxonline.mallet.game.GameState.hookHandlerSystems" name="com.linxonline.mallet.game.GameState.hookHandlerSystems">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_system.html#a388a532927dd5b18e9809060d6afab96" title="com.linxonline.mallet.event.\lEventSystem.addEventHandler" alt="" coords="285,5,490,47"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html#a238757f4ffa67b37189d85ec8f7079fa" title="com.linxonline.mallet.system.\lSystemInterface.getRenderInterface" alt="" coords="271,71,504,112"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html#a9dc7894edce9acba8453ec34ac94a5c4" title="com.linxonline.mallet.system.\lSystemInterface.getInputInterface" alt="" coords="277,136,497,177"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html#a58cb11cd8d8f3824c8370aea42433084" title="com.linxonline.mallet.event.\lEventHandler.getWantedEventTypes" alt="" coords="552,5,791,47"/>
+</map>

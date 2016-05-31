@@ -1,0 +1,13 @@
+<map id="com.linxonline.mallet.entity.components.Component" name="com.linxonline.mallet.entity.components.Component">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_collision_component.html" title="com.linxonline.mallet.entity.components.\lCollisionComponent" alt="" coords="312,71,571,112"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_event_component.html" title="com.linxonline.mallet.entity.components.\lEventComponent" alt="" coords="312,136,571,177"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_input_component.html" title="com.linxonline.mallet.entity.components.\lInputComponent" alt="" coords="312,201,571,243"/>
+<area shape="rect" id="node11" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_query_component.html" title="com.linxonline.mallet.entity.components.\lQueryComponent" alt="" coords="312,267,571,308"/>
+<area shape="rect" id="node12" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_render_component.html" title="com.linxonline.mallet.entity.components.\lRenderComponent" alt="" coords="312,332,571,373"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_anim_component.html" title="com.linxonline.mallet.entity.components.\lAnimComponent" alt="" coords="619,5,877,47"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_sound_component.html" title="com.linxonline.mallet.entity.components.\lSoundComponent" alt="" coords="619,71,877,112"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_state_component.html" title="com.linxonline.mallet.entity.components.\lStateComponent" alt="" coords="619,136,877,177"/>
+<area shape="rect" id="node8" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_key_input_component.html" title="com.linxonline.mallet.entity.components.\lKeyInputComponent" alt="" coords="619,201,877,243"/>
+<area shape="rect" id="node9" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_mouse_component.html" title="com.linxonline.mallet.entity.components.\lMouseComponent" alt="" coords="619,267,877,308"/>
+<area shape="rect" id="node10" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_u_i_component.html" title="com.linxonline.mallet.entity.components.\lUIComponent" alt="" coords="619,332,877,373"/>
+</map>

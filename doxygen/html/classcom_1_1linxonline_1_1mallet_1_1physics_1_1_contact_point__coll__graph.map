@@ -1,7 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1maths_1_1_vector2.html" title="com.linxonline.mallet.maths.Vector2" alt="" coords="431,5,663,35"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_hull.html" title="com.linxonline.mallet.physics.Hull" alt="" coords="437,59,656,88"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_contact_data.html" title="com.linxonline.mallet.physics.ContactData" alt="" coords="20,5,289,35"/>
-<area shape="rect" id="node8" href="$interfacecom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_callback.html" title="com.linxonline.mallet.physics.CollisionCallback" alt="" coords="5,59,304,88"/>
-<area shape="rect" id="node10" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_entity.html" title="com.linxonline.mallet.entity.Entity" alt="" coords="45,112,264,141"/>
+<map id="com.linxonline.mallet.physics.ContactPoint" name="com.linxonline.mallet.physics.ContactPoint">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1maths_1_1_vector2.html" title="com.linxonline.mallet.maths.\lVector2" alt="" coords="358,5,546,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1hulls_1_1_hull.html" title="com.linxonline.mallet.physics.hulls.Hull" alt="" coords="327,71,577,98"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_contact_data.html" title="com.linxonline.mallet.physics.\lContactData" alt="" coords="5,31,203,72"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_callback.html" title="com.linxonline.mallet.physics.\lCollisionCallback" alt="" coords="5,96,203,137"/>
 </map>

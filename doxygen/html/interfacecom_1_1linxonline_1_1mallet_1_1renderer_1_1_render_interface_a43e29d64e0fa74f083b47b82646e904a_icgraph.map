@@ -1,0 +1,5 @@
+<map id="com.linxonline.mallet.renderer.RenderInterface.setRenderDimensions" name="com.linxonline.mallet.renderer.RenderInterface.setRenderDimensions">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1desktop_1_1_desktop_starter.html#a46672fa3cf0ff69954a23af0a99c96ae" title="com.linxonline.mallet.main.desktop.\lDesktopStarter.setRenderSettings" alt="" coords="301,5,532,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1web_1_1_web_starter.html#afa7ea0b72bee560bb7c600f194a5f3a4" title="com.linxonline.mallet.main.web.\lWebStarter.setRenderSettings" alt="" coords="313,71,521,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1malleteditor_1_1main_1_1_editor_starter.html#a0abca07567642d984526df527a7eecac" title="com.linxonline.malleteditor.main.\lEditorStarter.setRenderSettings" alt="" coords="311,136,523,177"/>
+</map>

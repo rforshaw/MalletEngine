@@ -1,3 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1alsa_1_1_a_l_s_a_source.html" title="com.linxonline.mallet.audio.alsa.ALSASource" alt="" coords="5,83,291,112"/>
+<map id="com.linxonline.mallet.audio.AudioSource" name="com.linxonline.mallet.audio.AudioSource">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1android_1_1_android_source.html" title="com.linxonline.mallet.audio.android.\lAndroidSource" alt="" coords="252,5,481,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1desktop_1_1alsa_1_1_a_l_s_a_source.html" title="com.linxonline.mallet.audio.desktop.alsa.\lALSASource" alt="" coords="236,71,497,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1audio_1_1web_1_1_web_audio_source.html" title="com.linxonline.mallet.audio.web.\lWebAudioSource" alt="" coords="261,136,472,177"/>
 </map>

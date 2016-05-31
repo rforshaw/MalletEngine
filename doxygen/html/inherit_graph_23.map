@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_processor.html" title="com.linxonline.mallet.event.EventProcessor" alt="" coords="5,5,283,35"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_search_interface.html" title="com.linxonline.mallet.entity.query.\lSearchInterface" alt="" coords="5,5,225,47"/>
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1query_1_1_query_system.html" title="com.linxonline.mallet.entity.query.\lQuerySystem" alt="" coords="273,5,493,47"/>
 </map>

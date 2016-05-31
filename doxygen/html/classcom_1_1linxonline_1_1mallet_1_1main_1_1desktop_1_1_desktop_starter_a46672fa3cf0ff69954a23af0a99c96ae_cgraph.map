@@ -1,0 +1,6 @@
+<map id="com.linxonline.mallet.main.desktop.DesktopStarter.setRenderSettings" name="com.linxonline.mallet.main.desktop.DesktopStarter.setRenderSettings">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1inspect_1_1desktop_1_1_desktop_display.html#aebf40aaf7a58ff16c5b2551cba32bad4" title="com.linxonline.mallet.util.inspect.desktop.\lDesktopDisplay.getScreens" alt="" coords="284,5,549,47"/>
+<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html#a238757f4ffa67b37189d85ec8f7079fa" title="com.linxonline.mallet.system.\lSystemInterface.getRenderInterface" alt="" coords="300,71,533,112"/>
+<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_render_interface.html#aa4a02a46fafe764fe5de06471f5a822c" title="com.linxonline.mallet.renderer.\lRenderInterface.setDisplayDimensions" alt="" coords="291,136,542,177"/>
+<area shape="rect" id="node5" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_render_interface.html#a43e29d64e0fa74f083b47b82646e904a" title="com.linxonline.mallet.renderer.\lRenderInterface.setRenderDimensions" alt="" coords="293,201,541,243"/>
+</map>

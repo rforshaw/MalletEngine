@@ -1,0 +1,8 @@
+<map id="com.linxonline.mallet.ui.UIProxyAbstractModel.mapToSource" name="com.linxonline.mallet.ui.UIProxyAbstractModel.mapToSource">
+<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#a06c852b85911a9de656c3f19e0deb029" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.rowCount" alt="" coords="302,5,517,47"/>
+<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#acfe116ed2586c93205fc7544876dc2f3" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.columnCount" alt="" coords="292,71,527,112"/>
+<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#a520722d14701da86b60faf20b5feda11" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.setData" alt="" coords="307,136,511,177"/>
+<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#aaa68abe34ea1c9ec1a3bd8ce25a2c339" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.getData" alt="" coords="307,201,511,243"/>
+<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#a4d640ad0ff5c114fb2dd55bab9851591" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.removeData" alt="" coords="295,267,524,308"/>
+<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_proxy_abstract_model.html#a0c4f624a23a0323b61dbdbc5a9c75167" title="com.linxonline.mallet.ui.\lUIProxyAbstractModel.hasChildren" alt="" coords="296,332,523,373"/>
+</map>
