@@ -1,10 +1,7 @@
-package com.linxonline.mallet.resources.sound ;
+package com.linxonline.mallet.audio ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.* ;
-
-import com.linxonline.mallet.util.settings.Settings ;
 
 public class SoundManager extends AbstractManager<AudioBuffer>
 {

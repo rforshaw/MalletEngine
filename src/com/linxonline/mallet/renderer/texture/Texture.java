@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.texture ;
+package com.linxonline.mallet.renderer.texture ;
 
 import com.linxonline.mallet.resources.Resource ;
 
@@ -34,7 +34,7 @@ public final class Texture<T extends ImageInterface> extends Resource
 	{
 		image.destroy() ;
 	}
-	
+
 	@Override
 	public String type()
 	{

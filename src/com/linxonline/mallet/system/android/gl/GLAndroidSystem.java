@@ -20,7 +20,6 @@ import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.notification.Notification ;
 
-import com.linxonline.mallet.resources.android.* ;
 import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.input.android.* ;
 import com.linxonline.mallet.audio.android.* ;

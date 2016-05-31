@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;

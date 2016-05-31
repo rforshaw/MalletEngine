@@ -11,7 +11,7 @@ import android.graphics.Rect ;
 import android.graphics.Color ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.resources.texture.Texture ;
+import com.linxonline.mallet.renderer.texture.Texture ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.font.FontMap ;

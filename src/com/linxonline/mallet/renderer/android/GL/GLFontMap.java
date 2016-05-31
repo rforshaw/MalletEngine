@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
-import com.linxonline.mallet.resources.texture.Texture ;
+import com.linxonline.mallet.renderer.texture.Texture ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;

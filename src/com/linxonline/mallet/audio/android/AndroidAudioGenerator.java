@@ -6,13 +6,11 @@ import android.media.* ;
 import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
-import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.audio.* ;
+import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
-import com.linxonline.mallet.resources.sound.* ;
-import com.linxonline.mallet.audio.android.* ;
-import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.audio.* ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 

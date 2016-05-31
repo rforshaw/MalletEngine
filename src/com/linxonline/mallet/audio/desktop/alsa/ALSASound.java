@@ -2,7 +2,7 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 
 import com.jogamp.openal.* ;
 
-import com.linxonline.mallet.resources.sound.SoundInterface ;
+import com.linxonline.mallet.audio.SoundInterface ;
 
 /**
 	Stores the required information to access the audio-buffer

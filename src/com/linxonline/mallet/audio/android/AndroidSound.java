@@ -1,6 +1,6 @@
 package com.linxonline.mallet.audio.android ;
 
-import com.linxonline.mallet.resources.sound.* ;
+import com.linxonline.mallet.audio.SoundInterface ;
 
 public class AndroidSound implements SoundInterface
 {

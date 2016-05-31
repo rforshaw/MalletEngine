@@ -8,7 +8,6 @@ import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.sound.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;

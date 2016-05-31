@@ -4,7 +4,9 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.resources.texture.Sprite ;
+
+import com.linxonline.mallet.animation.Sprite ;
+
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Draw ;

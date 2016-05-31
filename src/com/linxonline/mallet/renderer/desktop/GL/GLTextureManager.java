@@ -20,10 +20,9 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
-import com.linxonline.mallet.resources.texture.* ;
-
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.renderer.texture.* ;
 
 public class GLTextureManager extends AbstractManager<Texture>
 {

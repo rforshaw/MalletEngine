@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import android.opengl.GLES20 ;
 
-import com.linxonline.mallet.resources.texture.ImageInterface ;
+import com.linxonline.mallet.renderer.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {

@@ -17,10 +17,10 @@ import javax.media.opengl.glu.GLU ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
-
-import com.linxonline.mallet.resources.texture.* ;
+import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;

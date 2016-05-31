@@ -3,7 +3,6 @@ package com.linxonline.mallet.audio ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.caches.Cacheable ;
-import com.linxonline.mallet.resources.sound.AudioBuffer ;
 import com.linxonline.mallet.util.SourceCallback ;
 
 public class AudioData<T extends AudioData> implements Audio<T>, Cacheable

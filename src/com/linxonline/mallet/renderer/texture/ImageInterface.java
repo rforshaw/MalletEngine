@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.texture ;
+package com.linxonline.mallet.renderer.texture ;
 
 public interface ImageInterface
 {

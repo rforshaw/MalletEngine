@@ -2,8 +2,7 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.resources.texture.* ;
-
+import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.UpdateType ;

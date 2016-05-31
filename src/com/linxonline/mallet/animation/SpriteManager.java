@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.texture ;
+package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
 import java.io.* ;

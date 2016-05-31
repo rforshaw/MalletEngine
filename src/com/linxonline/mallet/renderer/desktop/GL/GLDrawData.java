@@ -2,14 +2,13 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.resources.texture.* ;
-
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;

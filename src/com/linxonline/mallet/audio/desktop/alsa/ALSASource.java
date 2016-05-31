@@ -3,7 +3,6 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 import com.jogamp.openal.* ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.sound.* ;
 
 /**
 	Provides the entry point in manipulating and playing 

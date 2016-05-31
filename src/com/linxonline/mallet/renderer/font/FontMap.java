@@ -2,8 +2,8 @@ package com.linxonline.mallet.renderer.font ;
 
 import com.linxonline.mallet.util.sort.QuickSort ;
 
-import com.linxonline.mallet.resources.texture.Texture ;
-import com.linxonline.mallet.resources.texture.ImageInterface ;
+import com.linxonline.mallet.renderer.texture.Texture ;
+import com.linxonline.mallet.renderer.texture.ImageInterface ;
 
 public class FontMap<T extends ImageInterface>
 {
