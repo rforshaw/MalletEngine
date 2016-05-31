@@ -89,6 +89,12 @@ public abstract class DesktopStarter extends StarterInterface
 
 	public void stop()
 	{
+		if( thread == null )
+		{
+			return ;
+		}
+
+		System.out.println( "Game System slowing.." ) ;
 		gameSystem.stopSystem() ;
 		if( thread.isAlive() == true )
 		{
@@ -102,6 +108,8 @@ public abstract class DesktopStarter extends StarterInterface
 				ex.printStackTrace() ;
 			}
 		}
+
+		System.out.println( "Backend stopped.." ) ;
 		backendSystem.stopSystem() ;
 	}
 

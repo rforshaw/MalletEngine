@@ -31,7 +31,6 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIButton extends UIElement
 {
-	private final ListenerUnit<Listener> listeners = new ListenerUnit<Listener>( this ) ;
 	private final Vector2 mouse = new Vector2() ;
 	private State current = State.NEUTRAL ;
 
@@ -79,152 +78,6 @@ public class UIButton extends UIElement
 		addListener( _listener ) ;
 	}
 
-	/**
-		Add a UIButton.Listener to kick-off an event.
-		clicked()  - Called when user clicks on button.
-		neutral()  - Called when pointer is not over button.
-		rollover() - Called when pointer has moved over button.
-	*/
-	public void addListener( final Listener _listener )
-	{
-		listeners.addListener( _listener ) ;
-	}
-
-	/**
-		Update all of the Button listeners.
-	*/
-	@Override
-	public void refresh()
-	{
-		listeners.refresh() ;
-	}
-
-	@Override
-	public InputEvent.Action passInputEvent( final InputEvent _event )
-	{
-		final InputType type = _event.getInputType() ;
-		switch( type )
-		{
-			case MOUSE_MOVED : 
-			case TOUCH_MOVE  : updateMousePosition( _event ) ; break ;
-		}
-
-		if( intersectPoint( mouse.x, mouse.y ) == true )
-		{
-			switch( type )
-			{
-				case MOUSE1_PRESSED :
-				{
-					if( current != State.CLICKED )
-					{
-						clicked( _event ) ;
-						current = State.CLICKED ;
-						return InputEvent.Action.CONSUME ;
-					}
-					break ;
-				}
-				case MOUSE_MOVED :
-				{
-					if( current != State.ROLLOVER )
-					{
-						rollover( _event ) ;
-						current = State.ROLLOVER ;
-					}
-					return InputEvent.Action.PROPAGATE ;
-				}
-			}
-		}
-
-		if( current != State.NEUTRAL )
-		{
-			neutral( _event ) ;
-			current = State.NEUTRAL ;
-		}
-
-		return InputEvent.Action.PROPAGATE ;
-	}
-
-	/**
-		Inform all attached listeners that the UIButton 
-		has moved into a neutral state.
-		Caused when the mouse is not hovering over the button. 
-	*/
-	private void neutral( final InputEvent _event )
-	{
-		final ArrayList<Listener> array = listeners.getListeners() ;
-		for( final Listener listener : array )
-		{
-			listener.neutral( _event ) ;
-		}
-	}
-
-	/**
-		Inform all attached listeners that the UIButton 
-		has moved into the rollover state.
-		Caused when the mouse has began hovering over the button. 
-	*/
-	private void rollover( final InputEvent _event )
-	{
-		final ArrayList<Listener> array = listeners.getListeners() ;
-		for( final Listener listener : array )
-		{
-			listener.rollover( _event ) ;
-		}
-	}
-
-	/**
-		Inform all attached listeners that the UIButton 
-		has moved into a click state.
-		Caused when the mouse is over the button and has 
-		been clicked, state will then revert back to rollover 
-		or neutral after click. 
-	*/
-	private void clicked( final InputEvent _event )
-	{
-		final ArrayList<Listener> array = listeners.getListeners() ;
-		for( final Listener listener : array )
-		{
-			listener.clicked( _event ) ;
-		}
-	}
-
-	public void updateMousePosition( final InputEvent _event )
-	{
-		final InputAdapterInterface adapter = getInputAdapter() ;
-		if( adapter != null )
-		{
-			mouse.x = adapter.convertInputToUIRenderX( _event.mouseX ) ;
-			mouse.y = adapter.convertInputToUIRenderY( _event.mouseY ) ;
-		}
-	}
-
-	@Override
-	public void clear()
-	{
-		super.clear() ;
-		listeners.clear() ;
-	}
-
-	/**
-		Cleanup any resources, handlers that the listeners 
-		may have acquired.
-	*/
-	@Override
-	public void shutdown()
-	{
-		listeners.shutdown() ;
-	}
-
-	/**
-		Retains listeners on a reset.
-		position, offset, and length are reset.
-	*/
-	@Override
-	public void reset()
-	{
-		super.reset() ;
-	}
-
 	public static UIListener constructUIListener( final MalletTexture _sheet,
 												  final UIButton.UV _neutral,
 												  final UIButton.UV _rollover,
@@ -255,7 +108,7 @@ public class UIButton extends UIElement
 		}
 	}
 
-	public static class UIListener extends Listener
+	public static class UIListener extends BaseListener
 	{
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
@@ -331,24 +184,41 @@ public class UIButton extends UIElement
 		}
 
 		@Override
-		public void clicked( final InputEvent _event )
+		public InputEvent.Action pressed( final InputEvent _input )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
+
+			return InputEvent.Action.CONSUME ;
 		}
 
 		@Override
-		public void rollover( final InputEvent _event )
+		public InputEvent.Action released( final InputEvent _input )
+		{
+			switch( getParent().getState() )
+			{
+				case ENGAGED : return move( _input ) ;
+				case NEUTRAL : return exited( _input ) ;
+				default      : return InputEvent.Action.PROPAGATE ;
+			}
+		}
+
+		@Override
+		public InputEvent.Action move( final InputEvent _input )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
+
+			return InputEvent.Action.CONSUME ;
 		}
 
 		@Override
-		public void neutral( final InputEvent _event )
+		public InputEvent.Action exited( final InputEvent _input )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
+
+			return InputEvent.Action.CONSUME ;
 		}
 
 		@Override

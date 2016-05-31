@@ -4,7 +4,6 @@ import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.resources.* ;
 
 import com.linxonline.mallet.resources.texture.Texture ;
-import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.FontMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
@@ -63,7 +62,6 @@ public class GLFontMap extends Resource
 		return fontMap.getHeight() ;
 	}
 
-	@Override
 	public void destroy()
 	{
 		fontMap.destroy() ;

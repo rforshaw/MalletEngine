@@ -11,7 +11,6 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final ListenerUnit<Listener> listeners = new ListenerUnit<Listener>( this ) ;
 	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;
 	private final UIElementUpdater updater ;
 
@@ -51,11 +50,6 @@ public class UILayout extends UIElement
 		{
 			element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
-	}
-
-	public void addListener( final Listener _listener )
-	{
-		listeners.addListener( _listener ) ;
 	}
 
 	public void addElement( final UIElement _element )
@@ -105,8 +99,7 @@ public class UILayout extends UIElement
 				ordered.get( i ).makeDirty() ;
 			}
 		}
-
-		listeners.refresh() ;
+		super.refresh() ;
 	}
 
 	@Override
@@ -130,7 +123,7 @@ public class UILayout extends UIElement
 	@Override
 	public void shutdown()
 	{
-		listeners.shutdown() ;
+		super.shutdown() ;
 	}
 
 	@Override
@@ -142,7 +135,6 @@ public class UILayout extends UIElement
 			element.clear() ;
 		}
 		ordered.clear() ;
-		listeners.clear() ;
 	}
 
 	@Override
@@ -366,8 +358,6 @@ public class UILayout extends UIElement
 		GRID,
 		FORM
 	}
-
-	public static abstract class Listener extends BaseListener {}
 
 	private interface UIElementUpdater
 	{

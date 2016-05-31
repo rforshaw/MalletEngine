@@ -7,7 +7,6 @@ import java.nio.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.model.Model ;
 
 public class GLModelManager
 {

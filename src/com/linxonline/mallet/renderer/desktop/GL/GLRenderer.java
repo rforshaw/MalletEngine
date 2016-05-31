@@ -20,7 +20,6 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
-import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
 
 import com.linxonline.mallet.util.logger.Logger ;
@@ -84,7 +83,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
 
-		frame.dispose() ;
+		if( frame != null )
+		{
+			frame.dispose() ;
+		}
 	}
 
 	private void initGraphics()
@@ -200,6 +202,13 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
 			{
 				( ( GLDrawData )_draw ).setPosition( _x, _y, _z ) ;
+				return _draw ;
+			}
+
+			@Override
+			public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
+			{
+				( ( GLDrawData )_draw ).setOffset( _x, _y, _z ) ;
 				return _draw ;
 			}
 

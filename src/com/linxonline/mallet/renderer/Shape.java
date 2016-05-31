@@ -19,7 +19,19 @@ public class Shape
 		COLOUR,
 		UV,
 		NORMAL ;
-		
+
+		public static Swivel getSwivelByString( final String _text )
+		{
+			switch( _text )
+			{
+				case "POINT"  : return POINT ;
+				case "COLOUR" : return COLOUR ;
+				case "UV"     : return UV ;
+				case "NORMAL" : return NORMAL ;
+				default       : return POINT ;
+			}
+		}
+
 		public static int getSwivelPointIndex( final Swivel[] _swivel )
 		{
 			for( int i = 0; i < _swivel.length; i++ )

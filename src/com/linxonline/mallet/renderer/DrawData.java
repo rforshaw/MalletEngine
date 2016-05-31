@@ -145,6 +145,11 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		position = _position ;
 	}
 
+	public void setOffset( final Vector3 _offset )
+	{
+		offset = _offset ;
+	}
+
 	public void setRotation( final Vector3 _rotation)
 	{
 		rotation = _rotation ;
@@ -158,6 +163,11 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		position.setXYZ( _x, _y, _z ) ;
+	}
+
+	public void setOffset( final float _x, final float _y, final float _z )
+	{
+		offset.setXYZ( _x, _y, _z ) ;
 	}
 
 	public void setRotation( final float _x, final float _y, final float _z )

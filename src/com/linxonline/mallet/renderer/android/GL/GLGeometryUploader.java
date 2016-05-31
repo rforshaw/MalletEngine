@@ -13,7 +13,6 @@ import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.resources.model.* ;
 import com.linxonline.mallet.resources.texture.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
@@ -361,7 +360,7 @@ public class GLGeometryUploader
 		GLBuffer will generate more GLGeometry buffers 
 		when the existing buffers are full.
 	*/
-	public class GLBuffer implements GeometryInterface, SortInterface
+	public class GLBuffer implements SortInterface
 	{
 		private final int[] BLANK_TEXTURES = new int[0] ;
 	
@@ -894,7 +893,6 @@ public class GLGeometryUploader
 			objects in OpenGL.
 			Nothing should be left, purge it all.
 		*/
-		@Override
 		public void destroy()
 		{
 			shapeSwivel       = null ;
@@ -917,7 +915,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	public class GLGeometry implements GeometryInterface
+	public class GLGeometry
 	{
 		private final int style ;
 		private final int indexLengthBytes ;
@@ -1118,7 +1116,6 @@ public class GLGeometryUploader
 			return amountVertexUsedBytes > 0 ;
 		}
 
-		@Override
 		public void destroy()
 		{
 			GLModelManager.unbind( this ) ;

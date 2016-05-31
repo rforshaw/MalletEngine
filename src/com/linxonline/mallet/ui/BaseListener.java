@@ -1,6 +1,7 @@
 package com.linxonline.mallet.ui ;
 
 import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.input.InputEvent ;
 
 public abstract class BaseListener
 {
@@ -22,6 +23,26 @@ public abstract class BaseListener
 		{
 			parent.addEvent( _event ) ;
 		}
+	}
+
+	public InputEvent.Action pressed( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	public InputEvent.Action released( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	public InputEvent.Action move( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	public InputEvent.Action exited( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
 	}
 
 	/**

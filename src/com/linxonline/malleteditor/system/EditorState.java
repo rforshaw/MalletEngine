@@ -5,10 +5,14 @@ import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.game.GameState ;
 
+import com.linxonline.mallet.ui.BaseListener ;
 import com.linxonline.mallet.ui.UIElement ;
 import com.linxonline.mallet.ui.UILayout ;
 import com.linxonline.mallet.ui.UIButton ;
 import com.linxonline.mallet.ui.UISpacer ;
+import com.linxonline.mallet.ui.UIMenu ;
+
+import com.linxonline.mallet.input.InputEvent ;
 
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.* ;
@@ -20,6 +24,7 @@ import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
 import com.linxonline.mallet.renderer.UpdateType ;
@@ -33,7 +38,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class EditorState extends GameState
 {
-	private static final float TOOLBAR_HEIGHT = 40.0f ;
+	private static final float TOOLBAR_HEIGHT = 30.0f ;
 	private static final float SEPERATOR = 5.0f ;
 	private static final float EDITOR_LIST_WIDTH = 40.0f ;
 
@@ -120,12 +125,11 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
-	private static UILayout createHeaderToolbar( final World _world )
+	private static UIMenu createHeaderToolbar( final World _world )
 	{
-		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
-		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
+		final UIMenu layout = new UIMenu( UILayout.Type.HORIZONTAL, TOOLBAR_HEIGHT ) ;
 
-		layout.addListener( new UILayout.Listener()
+		layout.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
@@ -177,7 +181,112 @@ public class EditorState extends GameState
 			}
 		} ) ;
 
+		addHeaderItem( _world, layout, "File" ) ;
+		addHeaderItem( _world, layout, "Edit" ) ;
+		addHeaderItem( _world, layout, "View" ) ;
+		addHeaderItem( _world, layout, "Tools" ) ;
+		addHeaderItem( _world, layout, "Help" ) ;
+		layout.addElement( new UISpacer() ) ;
+
 		return layout ;
+	}
+
+	private static void addHeaderItem( final World _world, final UILayout _toolbar, final String _text )
+	{
+		final MalletFont font = new MalletFont( "Arial", 12 ) ;
+		final int height = font.getHeight() ;
+		final int width = font.stringWidth( _text ) ;
+
+		final UIMenu.Item item = new UIMenu.Item() ;
+		item.setMaximumLength( width + 20, 0.0f, 0.0f ) ;
+
+		item.addListener( item.new Listener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+			private Draw drawText = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw, _world ) ;
+						}
+
+						if( drawText != null )
+						{
+							delegate.addTextDraw( drawText, _world ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+
+				final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
+				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+
+				drawText = DrawAssist.createTextDraw( _text,
+													  font,
+													  _parent.getPosition(),
+													  textOffset,
+													  new Vector3(),
+													  new Vector3( 1, 1, 1 ), _parent.getLayer() + 2 ) ;
+				DrawAssist.amendUI( drawText, true ) ;
+				DrawAssist.attachProgram( drawText, "SIMPLE_FONT" ) ;
+			}
+
+			@Override
+			public void clicked( final InputEvent _event ) {}
+
+			@Override
+			public void rollover( final InputEvent _event ) {}
+
+			@Override
+			public void neutral( final InputEvent _event ) {}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+				final Vector3 offset = getParent().getOffset() ;
+
+				{
+					Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+					DrawAssist.forceUpdate( draw ) ;
+				}
+
+				{
+					DrawAssist.amendOffset( drawText, offset.x + ( length.x / 2 ) - ( width / 2 ), offset.y + ( length.y / 2 ) - ( height / 2 ), 0.0f ) ;
+					DrawAssist.forceUpdate( drawText ) ;
+				}
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
+				}
+			}
+		} ) ;
+
+		_toolbar.addElement( item ) ;
 	}
 
 	private static UILayout createFooterToolbar( final World _world )
@@ -185,7 +294,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
 
-		layout.addListener( new UILayout.Listener()
+		layout.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
@@ -256,7 +365,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMinimumLength( 250.0f, 0.0f, 0.0f ) ;
 
-		layout.addListener( new UILayout.Listener()
+		layout.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
@@ -316,7 +425,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( SEPERATOR, 0.0f, 0.0f ) ;
 
-		layout.addListener( new UILayout.Listener()
+		layout.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
@@ -375,7 +484,7 @@ public class EditorState extends GameState
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 
-		layout.addListener( new UILayout.Listener()
+		layout.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw1 = null ;
