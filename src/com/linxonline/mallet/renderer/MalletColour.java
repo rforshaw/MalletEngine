@@ -72,6 +72,15 @@ public class MalletColour
 		return ConvertBytes.toInt( colours, 0, 4 ) ;
 	}
 
+	public String toString()
+	{
+		final StringBuilder buffer = new StringBuilder() ;
+		buffer.append( "R: " ) ; buffer.append( getRed() ) ;
+		buffer.append( "G: " ) ; buffer.append( getGreen() ) ;
+		buffer.append( "B: " ) ; buffer.append( getBlue() ) ;
+		return buffer.toString() ;
+	}
+	
 	public static MalletColour white()
 	{
 		return new MalletColour( 255, 255, 255 ) ;

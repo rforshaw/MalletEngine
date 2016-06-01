@@ -11,14 +11,38 @@ public class Shape
 		LINES,				// Requires a start and an end point to be defined for each line
 		LINE_STRIP, 		// Will continue the line from the last point added
 		FILL ; 				// Fill the geometry shape, requires the shape to be defined in polygons, will eventuall be auto generated.
+
+		public static Style getStyleByString( final String _text )
+		{
+			switch( _text )
+			{
+				case "LINES"      : return LINES ;
+				case "LINE_STRIP" : return LINE_STRIP ;
+				case "FILL"       : return FILL ;
+				default           : return LINES ;
+			}
+		}
 	}
 
 	public enum Swivel
 	{
-		POINT,
-		COLOUR,
-		UV,
-		NORMAL ;
+		POINT,		// Vector3
+		COLOUR,		// MalletColour
+		UV,			// Vector2
+		NORMAL ;	// Vector3
+
+		public static Swivel[] getSwivelByArray( final ArrayList<String> _text )
+		{
+			final int size = _text.size() ;
+			final Swivel[] swivel = new Swivel[size] ;
+
+			for( int i = 0; i < size; i++ )
+			{
+				swivel[i] = getSwivelByString( _text.get( i ) ) ;
+			}
+
+			return swivel ;
+		}
 
 		public static Swivel getSwivelByString( final String _text )
 		{

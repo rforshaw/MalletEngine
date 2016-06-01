@@ -27,7 +27,5 @@ public class UIMenu extends UILayout
 		{
 			super() ;
 		}
-
-		public abstract class Listener extends UIButton.Listener {}
 	}
 }

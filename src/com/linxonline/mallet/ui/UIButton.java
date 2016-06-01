@@ -72,7 +72,7 @@ public class UIButton extends UIElement
 	public UIButton( final Vector3 _position,
 					 final Vector3 _offset,
 					 final Vector3 _length,
-					 final Listener _listener )
+					 final BaseListener _listener )
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;
@@ -247,12 +247,5 @@ public class UIButton extends UIElement
 				delegate.shutdown() ;
 			}
 		}
-	}
-
-	public static abstract class Listener extends BaseListener
-	{
-		public abstract void clicked( final InputEvent _event ) ;
-		public abstract void rollover( final InputEvent _event ) ;
-		public abstract void neutral( final InputEvent _event ) ;
 	}
 }

@@ -200,7 +200,7 @@ public class EditorState extends GameState
 		final UIMenu.Item item = new UIMenu.Item() ;
 		item.setMaximumLength( width + 20, 0.0f, 0.0f ) ;
 
-		item.addListener( item.new Listener()
+		item.addListener( new BaseListener()
 		{
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
@@ -251,13 +251,11 @@ public class EditorState extends GameState
 			}
 
 			@Override
-			public void clicked( final InputEvent _event ) {}
-
-			@Override
-			public void rollover( final InputEvent _event ) {}
-
-			@Override
-			public void neutral( final InputEvent _event ) {}
+			public InputEvent.Action released( final InputEvent _input )
+			{
+				System.out.println( "Clicked: " + _text ) ;
+				return InputEvent.Action.CONSUME ;
+			}
 
 			@Override
 			public void refresh()

@@ -60,6 +60,8 @@ import com.linxonline.mallet.io.save.state.DataSet ;
 import com.linxonline.mallet.io.save.state.DataSet.DataOut ;
 import com.linxonline.mallet.io.save.state.DataSet.DataIn ;
 
+import com.linxonline.mallet.io.formats.sgeom.SGeom ;
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 
@@ -187,6 +189,22 @@ public final class GameTestLoader extends GameLoader
 							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 
 							_delegate.addBasicDraw( draw ) ;
+						}
+
+						{
+							final Shape shape = SGeom.load( "base/ui/test.sgeom" ) ;
+							if( shape != null )
+							{
+								final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
+																		new Vector3(),
+																		new Vector3(),
+																		new Vector3( 1, 1, 1 ),
+																		10 ) ;
+								DrawAssist.amendShape( draw, shape ) ;
+								DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+
+								_delegate.addBasicDraw( draw ) ;
+							}
 						}
 					}
 				} ) ) ;
