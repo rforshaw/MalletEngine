@@ -121,11 +121,17 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 			}
 		}
 
+		/**
+			Will allow the thread to continue execution.
+		*/
 		public void unpause()
 		{
 			block.unlock() ;
 		}
 
+		/**
+			Will block the thread from executing.
+		*/
 		public void pause()
 		{
 			block.lock() ;

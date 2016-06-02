@@ -13,11 +13,20 @@ public class MultiJLock implements MultiLockInterface
 		synchronized( lock ) { numLock = 0 ; }
 	}
 
+	/**
+		Inform the lock that something needs 
+		to be completed before lock() will continue.
+	*/
 	public void interest()
 	{
 		synchronized( lock ) { ++numLock ; }
 	}
-	
+
+	/**
+		Any party that called interest() will need to 
+		eventually call unlock to allow the thread that 
+		called lock to continue execution. 
+	*/
 	public void unlock()
 	{
 		synchronized( lock )
@@ -27,6 +36,11 @@ public class MultiJLock implements MultiLockInterface
 		}
 	}
 
+	/**
+		Call to block calling thread.
+		Calling thread will continue when all interest()'ed 
+		parties have called unlock().
+	*/
 	public void lock()
 	{
 		synchronized( lock )
