@@ -1,6 +1,9 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.Iterator ;
+
+import java.util.List ;
+import java.util.AbstractList ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.Arrays ;
@@ -14,6 +17,8 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
+
+import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -220,6 +225,8 @@ public class GLGeometryUploader
 				}
 			}
 
+			// If verticies does not have enough space to store 
+			// another vertex, upload it to the GPU before continuing.
 			if( ( increment + vertexSize ) >= verticies.length )
 			{
 				vertexBuffer.put( verticies ) ;

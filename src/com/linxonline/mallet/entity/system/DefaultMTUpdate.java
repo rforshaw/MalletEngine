@@ -1,140 +1,64 @@
 package com.linxonline.mallet.entity.system ;
 
+import java.util.List ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.util.locks.* ;
+import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 public class DefaultMTUpdate extends DefaultSTUpdate
 {
-	private final MultiJLock multiLock = new MultiJLock() ;
-	private EntityThread[] threads ;
+	private final WorkerGroup workers ;
+	private final EntityWorker entityWorker = new EntityWorker() ;
 
 	public DefaultMTUpdate()
 	{
-		init( 2 ) ;
+		this( 2 ) ;
 	}
 
 	public DefaultMTUpdate( final int _threads )
 	{
-		init( _threads ) ;
-	}
-
-	private void init( final int _threads )
-	{
-		threads = new EntityThread[_threads] ;
-		for( int i = 0; i < threads.length; i++ )
-		{
-			threads[i] = new EntityThread( entities ) ;
-			threads[i].start() ;
-		}
+		super() ;
+		workers = new WorkerGroup( _threads ) ; 
 	}
 
 	@Override
 	public void update( final float _dt )
 	{
-		multiLock.reset() ;
-		int threadLength = threads.length ;
-		final int entitiesLength = entities.size() ;
-		if( threadLength > entitiesLength )
-		{
-			// You should never have more threads than entities,
-			// Else don't have more threads than entities.
-			threadLength = entitiesLength ;
-		}
-
-		int start = 0 ;
-		int range = entitiesLength / threadLength ; 	// Split the entities between the threads.
-
-		EntityThread thread = null ;
-		for( int i = 0; i < threadLength; ++i )
-		{
-			thread = threads[i] ;
-			thread.setRange( start, start + range ) ;
-			start += range ;
-
-			multiLock.interest() ;
-			thread.setDeltaTime( _dt ) ;
-			thread.unpause() ;			// Resume entity updating
-		}
-
-		multiLock.lock() ;		 		// Only continue once all EntityThreads have finished
+		entityWorker.setDeltaTime( _dt ) ;
+		workers.exec( entityWorker ) ;				// This will block until all entities have been processed
 	}
 
-	private class EntityThread extends Thread
+	private class EntityWorker implements Worker<Entity>
 	{
-		public boolean run = false ;
-		private final ArrayList<Entity> entities ;
-		private final LockInterface block ;
-
 		private float deltaTime = 0.0f ;
-		private int begin = 0 ;
-		private int end = 0 ;
 
-		public EntityThread( final ArrayList<Entity> _entities )
-		{
-			entities = _entities ;
-			block = new JLock() ;
-		}
+		public EntityWorker() {}
 
 		public void setDeltaTime( final float _dt )
 		{
 			deltaTime = _dt ;
 		}
 
-		/**
-			Informs the thread which range of entities it will be processing
-		**/
-		public void setRange( final int _begin, final int _end )
+		@Override
+		public ExecType exec( final int _index, final Entity _entity )
 		{
-			begin = _begin ;
-			end = _end ;
-		}
-
-		public void update( final float _dt )
-		{
-			Entity entity = null ;
-			for( int i = begin; i < end; ++i )
+			_entity.update( deltaTime ) ;
+			if( _entity.destroy == true )
 			{
-				entity = entities.get( i ) ;
-				entity.update( _dt ) ;
-
-				if( entity.destroy == true )
+				synchronized( cleanup )
 				{
-					synchronized( cleanup )
-					{
-						cleanup.add( entity ) ;
-					}
+					cleanup.add( _entity ) ;
 				}
 			}
+
+			return ExecType.FINISH ;
 		}
 
-		@Override
-		public void run()
+		public List<Entity> getDataSet()
 		{
-			while( true )
-			{
-				update( deltaTime ) ;
-				multiLock.unlock() ;  		// Inform main thread you've finished
-				pause() ;					// Wait for main thread to call again
-			}
-		}
-
-		/**
-			Will allow the thread to continue execution.
-		*/
-		public void unpause()
-		{
-			block.unlock() ;
-		}
-
-		/**
-			Will block the thread from executing.
-		*/
-		public void pause()
-		{
-			block.lock() ;
+			return entities ;
 		}
 	}
 }

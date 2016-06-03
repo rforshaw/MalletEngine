@@ -45,14 +45,14 @@ public class WorkerThread extends Thread
 	public void run()
 	{
 		ExecType type = ExecType.FINISH ;
-		while( stop != true )
+		while( stop == false )
 		{
 			if( worker != null )
 			{
 				final List list = worker.getDataSet() ;
 				for( int i = start; i < end; i++ )
 				{
-					type = worker.exec( list.get( i ) ) ;		// Does the hard execution work
+					type = worker.exec( i, list.get( i ) ) ;		// Does the hard execution work
 				}
 			}
 

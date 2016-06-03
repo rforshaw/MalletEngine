@@ -12,7 +12,7 @@ public interface Worker<T>
 		threads. Function scope variables will not cause concurrency 
 		issues, however class scope upwards will.
 	*/
-	public ExecType exec( final T _data ) ;
+	public ExecType exec( final int _index, final T _data ) ;
 
 	/**
 		Return the entire list that the threads 
