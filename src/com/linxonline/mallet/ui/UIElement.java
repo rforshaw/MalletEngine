@@ -19,6 +19,8 @@ public abstract class UIElement implements InputHandler
 	private final Vector3 minLength = new Vector3() ;
 	private Vector3 maxLength = new Vector3() ;
 
+	public boolean destroy = false ;
+
 	private boolean dirty = true ;
 	private int layer = 0 ;
 
@@ -54,6 +56,17 @@ public abstract class UIElement implements InputHandler
 	public void addListener( final BaseListener _listener )
 	{
 		listeners.addListener( _listener ) ;
+	}
+
+	/**
+		An element can flag itself for destruction.
+		If it is contained by a UILayout or UIComponent,
+		then it will be removed and it will be shutdown 
+		and cleared.
+	*/
+	public void destroy()
+	{
+		destroy = true ;
 	}
 
 	public void update( final float _dt, final ArrayList<Event<?>> _events )

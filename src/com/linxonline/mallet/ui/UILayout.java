@@ -69,6 +69,7 @@ public class UILayout extends UIElement
 	{
 		if( ordered.remove( _element ) == true )
 		{
+			_element.shutdown() ;
 			_element.clear() ;
 		}
 	}
@@ -86,6 +87,10 @@ public class UILayout extends UIElement
 		for( final UIElement element : ordered )
 		{
 			element.update( _dt, _events ) ;
+			if( element.destroy == true )
+			{
+				removeElement( element ) ;
+			}
 		}
 	}
 

@@ -191,6 +191,13 @@ public class EditorState extends GameState
 		return layout ;
 	}
 
+	private static UIMenu createDropDown()
+	{
+		final UIMenu layout = new UIMenu( UILayout.Type.VERTICAL, 150.0f ) ;
+		
+		return layout ;
+	}
+
 	private static void addHeaderItem( final World _world, final UILayout _toolbar, final String _text )
 	{
 		final MalletFont font = new MalletFont( "Arial", 12 ) ;

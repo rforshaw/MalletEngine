@@ -74,9 +74,18 @@ public class UIComponent extends InputComponent
 		super.readyToDestroy( _callback ) ;
 	}
 
+	/**
+		Removing an element will shut it down.
+		Removing any assigned resources and blanking 
+		it out.
+	*/
 	public void removeElement( final UIElement _element )
 	{
-		elements.remove( _element ) ;
+		if( elements.remove( _element ) == true )
+		{
+			_element.shutdown() ;
+			_element.clear() ;
+		}
 	}
 
 	@Override
@@ -86,6 +95,10 @@ public class UIComponent extends InputComponent
 		for( final UIElement element : elements )
 		{
 			element.update( _dt, events ) ;
+			if( element.destroy == true )
+			{
+				removeElement( element ) ;
+			}
 		}
 
 		for( final Event event : events )
