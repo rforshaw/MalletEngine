@@ -1,6 +1,7 @@
 package com.linxonline.mallet.io.formats.sgeom ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.formats.json.JSONObject ;
 import com.linxonline.mallet.io.formats.json.JSONArray ;
 
@@ -16,7 +17,13 @@ public class SGeom
 {
 	public static Shape load( final String _file )
 	{
-		final JSONObject json = JSONObject.construct( GlobalFileSystem.getFile( _file ) ) ;
+		final FileStream stream = GlobalFileSystem.getFile( _file ) ;
+		if( stream.exists() == false )
+		{
+			return null ;
+		}
+
+		final JSONObject json = JSONObject.construct(  ) ;
 
 		final Shape.Style style = Shape.Style.getStyleByString( json.optString( "style", null ) ) ;
 
