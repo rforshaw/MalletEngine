@@ -12,6 +12,7 @@ import com.linxonline.mallet.maths.* ;
 public class UILayout extends UIElement
 {
 	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;
+	private final ArrayList<UIElement> toRemove = new ArrayList<UIElement>() ;
 	private final UIElementUpdater updater ;
 
 	public UILayout( final Type _type )
@@ -65,12 +66,15 @@ public class UILayout extends UIElement
 		_element.setInputAdapterInterface( getInputAdapter() ) ;
 	}
 
+	/**
+		Flag an element to be removed from the UILayout.
+		Element will be removed on the next update cycle.
+	*/
 	public void removeElement( final UIElement _element )
 	{
-		if( ordered.remove( _element ) == true )
+		if( toRemove.contains( _element ) == false )
 		{
-			_element.shutdown() ;
-			_element.clear() ;
+			toRemove.add( _element ) ;
 		}
 	}
 
@@ -89,20 +93,39 @@ public class UILayout extends UIElement
 			element.update( _dt, _events ) ;
 			if( element.destroy == true )
 			{
+				// If the child element is flagged for 
+				// destruction add it to the remove list.
 				removeElement( element ) ;
+
+				// We'll also want to refresh the UILayout.
+				makeDirty() ;
+			}
+			else if( element.isDirty() == true )
+			{
+				// If a Child element is updating we'll 
+				// most likely also want to update the parent.
+				makeDirty() ;
 			}
 		}
+
+		for( final UIElement element : toRemove )
+		{
+			if( ordered.remove( element ) == true )
+			{
+				element.shutdown() ;
+				element.clear() ;
+			}
+		}
+		toRemove.clear() ;
 	}
 
 	@Override
 	public void refresh()
 	{
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int size = ordered.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				ordered.get( i ).makeDirty() ;
-			}
+			ordered.get( i ).makeDirty() ;
 		}
 		super.refresh() ;
 	}
@@ -118,7 +141,7 @@ public class UILayout extends UIElement
 			}
 		}
 
-		return InputEvent.Action.PROPAGATE ;
+		return super.passInputEvent( _event ) ;
 	}
 
 	/**
@@ -129,6 +152,11 @@ public class UILayout extends UIElement
 	public void shutdown()
 	{
 		super.shutdown() ;
+		for( final UIElement element : ordered )
+		{
+			element.shutdown() ;
+		}
+		ordered.clear() ;
 	}
 
 	@Override

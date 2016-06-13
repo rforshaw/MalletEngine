@@ -16,8 +16,16 @@ public class UIMenu extends UILayout
 		super( _type ) ;
 		switch( _type )
 		{
-			case HORIZONTAL : setMaximumLength( 0.0f, _length, 0.0f ) ; break ;
-			case VERTICAL   : setMaximumLength( _length, 0.0f, 0.0f ) ; break ;
+			case HORIZONTAL :
+			{
+				setMaximumLength( 0.0f, _length, 0.0f ) ;
+				break ;
+			}
+			case VERTICAL   :
+			{
+				setMaximumLength( _length, 0.0f, 0.0f ) ;
+				break ;
+			}
 		}
 	}
 

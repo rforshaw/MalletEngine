@@ -75,7 +75,7 @@ public class EditorState extends GameState
 	private void loadDefaultUILayout()
 	{
 		final UIComponent ui = new UIComponent() ;
-		ui.addElement( createMainLayout() ) ;
+		ui.addElement( createMainLayout( ui ) ) ;
 
 		final Entity entity = new Entity() ;
 		entity.addComponent( ui ) ;
@@ -83,7 +83,7 @@ public class EditorState extends GameState
 		addEntity( entity ) ;
 	}
 
-	private UILayout createMainLayout()
+	private UILayout createMainLayout( final UIComponent _ui )
 	{
 		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
@@ -118,14 +118,14 @@ public class EditorState extends GameState
 			}
 		} ) ;
 
-		layout.addElement( createHeaderToolbar( uiWorld ) ) ;
+		layout.addElement( createHeaderToolbar( uiWorld, _ui ) ) ;
 		layout.addElement( createMainFrame( edCamera, edWorld, uiWorld ) ) ;
 		layout.addElement( createFooterToolbar( uiWorld ) ) ;
 
 		return layout ;
 	}
 
-	private static UIMenu createHeaderToolbar( final World _world )
+	private static UIMenu createHeaderToolbar( final World _world, final UIComponent _ui )
 	{
 		final UIMenu layout = new UIMenu( UILayout.Type.HORIZONTAL, TOOLBAR_HEIGHT ) ;
 
@@ -181,24 +181,99 @@ public class EditorState extends GameState
 			}
 		} ) ;
 
-		addHeaderItem( _world, layout, "File" ) ;
-		addHeaderItem( _world, layout, "Edit" ) ;
-		addHeaderItem( _world, layout, "View" ) ;
-		addHeaderItem( _world, layout, "Tools" ) ;
-		addHeaderItem( _world, layout, "Help" ) ;
+		addHeaderItem( _world, _ui, layout, "File" ) ;
+		addHeaderItem( _world, _ui, layout, "Edit" ) ;
+		addHeaderItem( _world, _ui, layout, "View" ) ;
+		addHeaderItem( _world, _ui, layout, "Tools" ) ;
+		addHeaderItem( _world, _ui, layout, "Help" ) ;
 		layout.addElement( new UISpacer() ) ;
 
 		return layout ;
 	}
 
-	private static UIMenu createDropDown()
+	private static UIMenu createDropDown( final World _world,
+										  final UIComponent _ui,
+										  final int _layer,
+										  final float _x,
+										  final float _y )
 	{
 		final UIMenu layout = new UIMenu( UILayout.Type.VERTICAL, 150.0f ) ;
-		
+		layout.setLayer( _layer ) ;
+		layout.setPosition( _x, _y, 0.0f ) ;
+		layout.setLength( 150.0f, 100.0f, 0.0f ) ;
+
+		layout.addListener( new BaseListener()
+		{
+			private DrawDelegate delegate = null ;
+			private Draw draw = null ;
+
+			@Override
+			public void setParent( final UIElement _parent )
+			{
+				super.setParent( _parent ) ;
+				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						if( draw != null )
+						{
+							delegate.addBasicDraw( draw, _world ) ;
+						}
+					}
+				} ) ) ;
+
+				final Vector3 length = _parent.getLength() ;
+				System.out.println( "Dropdown Length: " + length ) ;
+
+				draw = DrawAssist.createDraw( _parent.getPosition(),
+											  _parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			public InputEvent.Action exited( final InputEvent _input )
+			{
+				System.out.println( "Exited dropdown" ) ;
+				getParent().destroy() ;
+				return InputEvent.Action.PROPAGATE ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
+				final Vector3 offset = parent.getOffset() ;
+				System.out.println( "Refresh dropdown menu: " + length ) ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				if( delegate != null )
+				{
+					delegate.shutdown() ;
+				}
+			}
+		} ) ;
+
+		addHeaderItem( _world, _ui, layout, "Test 1" ) ;
+		addHeaderItem( _world, _ui, layout, "Test 2" ) ;
+
 		return layout ;
 	}
 
-	private static void addHeaderItem( final World _world, final UILayout _toolbar, final String _text )
+	private static void addHeaderItem( final World _world,
+									   final UIComponent _ui,
+									   final UILayout _toolbar,
+									   final String _text )
 	{
 		final MalletFont font = new MalletFont( "Arial", 12 ) ;
 		final int height = font.getHeight() ;
@@ -209,6 +284,8 @@ public class EditorState extends GameState
 
 		item.addListener( new BaseListener()
 		{
+			private UIMenu dropdown = null ;
+
 			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 			private Draw drawText = null ;
@@ -260,7 +337,20 @@ public class EditorState extends GameState
 			@Override
 			public InputEvent.Action released( final InputEvent _input )
 			{
-				System.out.println( "Clicked: " + _text ) ;
+				if( dropdown != null )
+				{
+					dropdown.destroy() ;
+				}
+
+				final UIElement parent = getParent() ;
+				final Vector3 position = parent.getPosition() ;
+				final Vector3 length = parent.getLength() ;
+				final int layer = parent.getLayer() + 1 ;
+
+				dropdown = createDropDown( _world, _ui, layer, position.x, position.y + length.y ) ;
+				_ui.addElement( dropdown ) ;
+
+				parent.makeDirty() ;
 				return InputEvent.Action.CONSUME ;
 			}
 
@@ -278,6 +368,11 @@ public class EditorState extends GameState
 				{
 					DrawAssist.amendOffset( drawText, offset.x + ( length.x / 2 ) - ( width / 2 ), offset.y + ( length.y / 2 ) - ( height / 2 ), 0.0f ) ;
 					DrawAssist.forceUpdate( drawText ) ;
+				}
+
+				if( dropdown != null )
+				{
+					dropdown.makeDirty() ;
 				}
 			}
 

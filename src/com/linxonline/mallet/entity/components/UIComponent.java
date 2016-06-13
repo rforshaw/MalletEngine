@@ -13,6 +13,7 @@ import com.linxonline.mallet.event.* ;
 public class UIComponent extends InputComponent
 {
 	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;
+	private final ArrayList<UIElement> toRemove = new ArrayList<UIElement>() ;
 	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
@@ -81,10 +82,9 @@ public class UIComponent extends InputComponent
 	*/
 	public void removeElement( final UIElement _element )
 	{
-		if( elements.remove( _element ) == true )
+		if( toRemove.contains( _element ) == false )
 		{
-			_element.shutdown() ;
-			_element.clear() ;
+			toRemove.add( _element ) ;
 		}
 	}
 
@@ -100,6 +100,16 @@ public class UIComponent extends InputComponent
 				removeElement( element ) ;
 			}
 		}
+
+		for( final UIElement element : toRemove )
+		{
+			if( elements.remove( element ) == true )
+			{
+				element.shutdown() ;
+				element.clear() ;
+			}
+		}
+		toRemove.clear() ;
 
 		for( final Event event : events )
 		{
