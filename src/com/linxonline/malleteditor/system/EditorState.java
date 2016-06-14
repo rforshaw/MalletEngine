@@ -5,7 +5,9 @@ import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.game.GameState ;
 
+
 import com.linxonline.mallet.ui.BaseListener ;
+import com.linxonline.mallet.ui.UIListener ;
 import com.linxonline.mallet.ui.UIElement ;
 import com.linxonline.mallet.ui.UILayout ;
 import com.linxonline.mallet.ui.UIButton ;
@@ -129,36 +131,27 @@ public class EditorState extends GameState
 	{
 		final UIMenu layout = new UIMenu( UILayout.Type.HORIZONTAL, TOOLBAR_HEIGHT ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
-					}
-				} ) ) ;
-
-				final Vector3 length = _parent.getLength() ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				final UIElement parent = getParent() ;
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( parent.getLength(), MalletColour.red() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+			
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
 			}
 
 			@Override
@@ -169,15 +162,6 @@ public class EditorState extends GameState
 
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
 			}
 		} ) ;
 
@@ -202,42 +186,33 @@ public class EditorState extends GameState
 		layout.setPosition( _x, _y, 0.0f ) ;
 		layout.setLength( 150.0f, 100.0f, 0.0f ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
-					}
-				} ) ) ;
+				final UIElement parent = getParent() ;
 
-				final Vector3 length = _parent.getLength() ;
-				System.out.println( "Dropdown Length: " + length ) ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				final Vector3 length = parent.getLength() ;
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 			}
 
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
+			}
+
 			public InputEvent.Action exited( final InputEvent _input )
 			{
-				System.out.println( "Exited dropdown" ) ;
 				getParent().destroy() ;
 				return InputEvent.Action.PROPAGATE ;
 			}
@@ -248,19 +223,9 @@ public class EditorState extends GameState
 				final UIElement parent = getParent() ;
 				final Vector3 length = parent.getLength() ;
 				final Vector3 offset = parent.getOffset() ;
-				System.out.println( "Refresh dropdown menu: " + length ) ;
 
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
 			}
 		} ) ;
 
@@ -282,56 +247,45 @@ public class EditorState extends GameState
 		final UIMenu.Item item = new UIMenu.Item() ;
 		item.setMaximumLength( width + 20, 0.0f, 0.0f ) ;
 
-		item.addListener( new BaseListener()
+		item.addListener( new UIListener()
 		{
 			private UIMenu dropdown = null ;
 
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 			private Draw drawText = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
 
-						if( drawText != null )
-						{
-							delegate.addTextDraw( drawText, _world ) ;
-						}
-					}
-				} ) ) ;
-
-				final Vector3 length = _parent.getLength() ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
 
-				final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
+				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
 				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
 
 				drawText = DrawAssist.createTextDraw( _text,
 													  font,
-													  _parent.getPosition(),
+													  parent.getPosition(),
 													  textOffset,
 													  new Vector3(),
-													  new Vector3( 1, 1, 1 ), _parent.getLayer() + 2 ) ;
+													  new Vector3( 1, 1, 1 ), parent.getLayer() + 2 ) ;
 				DrawAssist.amendUI( drawText, true ) ;
 				DrawAssist.attachProgram( drawText, "SIMPLE_FONT" ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
+				_delegate.addTextDraw( drawText, _world ) ;
 			}
 
 			@Override
@@ -375,15 +329,6 @@ public class EditorState extends GameState
 					dropdown.makeDirty() ;
 				}
 			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
-			}
 		} ) ;
 
 		_toolbar.addElement( item ) ;
@@ -394,36 +339,29 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
-					}
-				} ) ) ;
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
 
-				final Vector3 length = _parent.getLength() ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
 			}
 
 			@Override
@@ -434,15 +372,6 @@ public class EditorState extends GameState
 
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
 			}
 		} ) ;
 
@@ -465,36 +394,29 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMinimumLength( 250.0f, 0.0f, 0.0f ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
-					}
-				} ) ) ;
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
 
-				final Vector3 length = _parent.getLength() ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
 			}
 
 			@Override
@@ -505,15 +427,6 @@ public class EditorState extends GameState
 
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
 			}
 		} ) ;
 
@@ -525,36 +438,29 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( SEPERATOR, 0.0f, 0.0f ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw != null )
-						{
-							delegate.addBasicDraw( draw, _world ) ;
-						}
-					}
-				} ) ) ;
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
 
-				final Vector3 length = _parent.getLength() ;
-
-				draw = DrawAssist.createDraw( _parent.getPosition(),
-											  _parent.getOffset(),
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
 											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.white() ) ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
 			}
 
 			@Override
@@ -566,15 +472,6 @@ public class EditorState extends GameState
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
-			}
 		} ) ;
 
 		return layout ;
@@ -584,51 +481,30 @@ public class EditorState extends GameState
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 
-		layout.addListener( new BaseListener()
+		layout.addListener( new UIListener()
 		{
-			private DrawDelegate delegate = null ;
 			private Draw draw1 = null ;
-			private Draw draw2 = null ;
 
 			@Override
-			public void setParent( final UIElement _parent )
+			public void constructDraws()
 			{
-				super.setParent( _parent ) ;
-				_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-				{
-					public void callback( DrawDelegate _delegate )
-					{
-						delegate = _delegate ;
-						if( draw1 != null && draw2 != null )
-						{
-							delegate.addBasicDraw( draw1, _world ) ;
-						}
-					}
-				} ) ) ;
-
-				final Vector3 offset = Vector3.add( _parent.getPosition(), _parent.getOffset() ) ;
-				final Vector3 length = _parent.getLength() ;
+				final UIElement parent = getParent() ;
+				final Vector3 offset = Vector3.add( parent.getPosition(), parent.getOffset() ) ;
+				final Vector3 length = parent.getLength() ;
 
 				draw1 = DrawAssist.createDraw( new Vector3(),
 												new Vector3(),
 												new Vector3(),
-												new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
+												new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 
 				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
 				DrawAssist.attachProgram( draw1, "SIMPLE_GEOMETRY" ) ;
+			}
 
-				draw2 = DrawAssist.createDraw( _parent.getPosition(),
-												_parent.getOffset(),
-												new Vector3(),
-												new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
-
-				DrawAssist.amendUI( draw2, true ) ;
-				DrawAssist.amendShape( draw2, Shape.constructPlane( length, MalletColour.blue() ) ) ;
-				DrawAssist.attachProgram( draw2, "SIMPLE_GEOMETRY" ) ;
-
-				CameraAssist.amendOrthographic( _camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( _camera, ( int )length.x, ( int )length.y ) ;
-				CameraAssist.amendScreenOffset( _camera, ( int )offset.x, ( int )offset.y ) ;
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw1, _world ) ;
 			}
 
 			@Override
@@ -641,18 +517,6 @@ public class EditorState extends GameState
 				CameraAssist.amendOrthographic( _camera, 0.0f, length.y, 0.0f, length.x, -1000.0f, 1000.0f ) ;
 				CameraAssist.amendScreenResolution( _camera, ( int )length.x, ( int )length.y ) ;
 				CameraAssist.amendScreenOffset( _camera, ( int )offset.x, ( int )offset.y ) ;
-
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw2 ), length ) ;
-				DrawAssist.forceUpdate( draw2 ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( delegate != null )
-				{
-					delegate.shutdown() ;
-				}
 			}
 		} ) ;
 
