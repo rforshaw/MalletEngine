@@ -16,18 +16,19 @@ public abstract class UIElement implements InputHandler
 
 	private State current = State.NEUTRAL ;
 
-	private final Vector3 minLength = new Vector3() ;
-	private Vector3 maxLength = new Vector3() ;
-
 	public boolean destroy = false ;
 
-	private boolean dirty = true ;
+	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
-	private final Vector3 position ;
-	private final Vector3 offset ;
-	private final Vector3 length ;
-	private final Vector3 margin ;
+	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
+
+	private final Vector3 minLength = new Vector3() ;	// As pixels
+	private final Vector3 maxLength = new Vector3() ;	// As pixels
+	private final Vector3 position ;					// As pixels
+	private final Vector3 offset ;						// As pixels
+	private final Vector3 length ;						// As pixels
+	private final Vector3 margin ;						// As pixels
 
 	public enum State
 	{
@@ -45,7 +46,9 @@ public abstract class UIElement implements InputHandler
 		position = _position ;
 		offset = _offset ;
 		length = _length ;
-		margin = new Vector3( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
+
+		final float ratioMargin = ratio.scale( DEFAULT_MARGIN_SIZE ) ;
+		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
 	}
 
 	public void addEvent( final Event<?> _event )
@@ -196,6 +199,9 @@ public abstract class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
+	/**
+		Expected in pixels.
+	*/
 	public boolean intersectPoint( final float _x, final float _y, final float _z )
 	{
 		final float zMin = position.z + offset.z ;
@@ -212,6 +218,9 @@ public abstract class UIElement implements InputHandler
 		return false ;
 	}
 
+	/**
+		Expected in pixels.
+	*/
 	public boolean intersectPoint( final float _x, final float _y )
 	{
 		final float xMin = position.x + offset.x ;
@@ -240,77 +249,105 @@ public abstract class UIElement implements InputHandler
 		dirty = true ;
 	}
 
+	/**
+		Set the UIElement's absolute position.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		position.setXYZ( _x, _y, _z ) ;
+		position.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
 	}
 
+	/**
+		Set the UIElement's offset from position.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		offset.setXYZ( _x, _y, _z ) ;
+		offset.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
 	}
 
+	/**
+		Set the UIElement's minimum length, min size of the element.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setMinimumLength( final float _x, final float _y, final float _z )
 	{
-		minLength.x = ( _x < 0.0f ) ? 0.0f : _x ;
-		minLength.y = ( _y < 0.0f ) ? 0.0f : _y ;
-		minLength.z = ( _z < 0.0f ) ? 0.0f : _z ;
+		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.scale( _x ) ;
+		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.scale( _y ) ;
+		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.scale( _z ) ;
 
+		// Ensure that length adheres to the new minimum length
 		setLength( length.x, length.y, length.z ) ;
 	}
 
+	/**
+		Set the UIElement's maximum length, max size of the element.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setMaximumLength( final float _x, final float _y, final float _z )
 	{
-		maxLength.x = ( _x < 0.0f ) ? 0.0f : _x ;
-		maxLength.y = ( _y < 0.0f ) ? 0.0f : _y ;
-		maxLength.z = ( _z < 0.0f ) ? 0.0f : _z ;
+		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.scale( _x ) ;
+		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.scale( _y ) ;
+		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.scale( _z ) ;
 
+		// Ensure that length adheres to the new maximum length
 		setLength( length.x, length.y, length.z ) ;
 	}
 
+	/**
+		Set the UIElement's length, actual size of the element.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setLength( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		if( minLength == null && maxLength == null )
-		{
-			length.x = ( _x < 0.0f ) ? 0.0f : _x ;
-			length.y = ( _y < 0.0f ) ? 0.0f : _y ;
-			length.z = ( _z < 0.0f ) ? 0.0f : _z ;
-			return ;
-		}
-
 		if( minLength != null )
 		{
-			length.x = ( _x < minLength.x ) ? minLength.x : _x ;
-			length.y = ( _y < minLength.y ) ? minLength.y : _y ;
-			length.z = ( _z < minLength.z ) ? minLength.z : _z ;
+			length.x = ( _x < minLength.x ) ? minLength.x : ratio.scale( _x ) ;
+			length.y = ( _y < minLength.y ) ? minLength.y : ratio.scale( _y ) ;
+			length.z = ( _z < minLength.z ) ? minLength.z : ratio.scale( _z ) ;
 		}
 
-		if( maxLength != null )
+		if( maxLength.x > 0.0f )
 		{
-			if( maxLength.x > 0.0f )
-			{
-				length.x = ( _x > maxLength.x ) ? maxLength.x : _x ;
-			}
+			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.scale( _x ) ;
+		}
 
-			if( maxLength.y > 0.0f )
-			{
-				length.y = ( _y > maxLength.y ) ? maxLength.y : _y ;
-			}
+		if( maxLength.y > 0.0f )
+		{
+			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.scale( _y ) ;
+		}
 
-			if( maxLength.z > 0.0f )
-			{
-				length.z = ( _z > maxLength.z ) ? maxLength.z : _z ;
-			}
+		if( maxLength.z > 0.0f )
+		{
+			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.scale( _z ) ;
 		}
 	}
 
+	/**
+		Set the UIElement's margin, the spacing before the next 
+		UIElement is displayed.
+		Values are expected to be the unit type defined by UIRatio.
+		If the UIElement is not overidden the default value, Global UI Ratio 
+		is used.
+	*/
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		margin.setXYZ( _x, _y, _z ) ;
+		margin.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
 	}
 
 	public void setLayer( final int _layer )

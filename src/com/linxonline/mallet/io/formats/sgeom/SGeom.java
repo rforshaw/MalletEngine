@@ -23,7 +23,7 @@ public class SGeom
 			return null ;
 		}
 
-		final JSONObject json = JSONObject.construct(  ) ;
+		final JSONObject json = JSONObject.construct( stream ) ;
 
 		final Shape.Style style = Shape.Style.getStyleByString( json.optString( "style", null ) ) ;
 

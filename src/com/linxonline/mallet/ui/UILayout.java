@@ -222,7 +222,7 @@ public class UILayout extends UIElement
 				{
 					final UIElement element = _ordered.get( i ) ;
 					final Vector3 maximum = element.getMaximumLength() ;
-					
+
 					// If the length allocated to this element is greater 
 					// than the maximum length, then we must remove the 
 					// element from the average minNumY and remove maximum.y 

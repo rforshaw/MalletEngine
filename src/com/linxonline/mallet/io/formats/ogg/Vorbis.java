@@ -388,7 +388,6 @@ public class Vorbis
 		final Floor1Configuration floor = new Floor1Configuration() ;
 		_pos = floor.decode( _pos, _stream ) ;
 		floors.add( floor ) ;
-
 		return _pos ;
 	}
 
@@ -527,6 +526,7 @@ public class Vorbis
 			System.out.println( "Decode Floor Type 1..." ) ;
 			_pos = decodeHeader( _pos, _stream ) ;
 			_pos = decodePacket( _pos, _stream ) ;
+
 			return _pos ;
 		}
 
@@ -534,7 +534,6 @@ public class Vorbis
 		{
 			partitions = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) ;
 			_pos += 5 ;
-
 
 			partitionClassList = new int[partitions] ;
 			int maximumClass = -1 ;
@@ -574,6 +573,7 @@ public class Vorbis
 				}
 
 				subClassBooks[i] = new int[1 << subClasses[i]] ;
+				System.out.println( "SubClass Length: " + subClassBooks[i].length ) ;
 				for( int j = 0; j < subClassBooks[i].length; j++ )
 				{
 					subClassBooks[i][j] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) - 1 ;
@@ -583,6 +583,7 @@ public class Vorbis
 
 			multiplier = ( ConvertBytes.toBits( _stream, 0, _pos, 2 )[0] & 0xFF ) + 1 ;
 			final int rangeBits = ( ConvertBytes.toBits( _stream, 0, _pos += 2, 4 )[0] & 0xFF ) ;
+			_pos += 4 ;
 
 			System.out.println( "Multiplier: " + multiplier + " Range Bits: " + rangeBits ) ;
 
@@ -608,6 +609,8 @@ public class Vorbis
 					_pos += rangeBits ;
 				}
 			}
+
+			System.out.println( "xList: " + isUnique( xList ) ) ;
 
 			return _pos ;
 		}
@@ -643,20 +646,22 @@ public class Vorbis
 				int cval = 0 ;
 				if( cbits > 0 )
 				{
-					System.out.println( "Masterbooks: " + masterbooks[classNumber] ) ;
-					cval = ( ConvertBytes.toBits( _stream, 0, _pos, codebooks.get( masterbooks[classNumber] ).dimensions )[0] & 0xFF ) ;
-					//_pos += masterbooks[classNumber] ;
+					final CodebookConfiguration book = codebooks.get( masterbooks[classNumber] ) ;
+					System.out.println( "Masterbooks: " + book.entry ) ;
+					cval = ( ConvertBytes.toBits( _stream, 0, _pos, book.entry )[0] & 0xFF ) ;
+					_pos += book.entry ;
 				}
 
 				for( int j = 0; j < cdim; j++ )
 				{
-					final int book = subClassBooks[classNumber][cval & csub] ;
+					final int bookIndex = subClassBooks[classNumber][cval & csub] ;
 					cval = cval >> cbits ;
 
-					if( book >= 0 )
+					if( bookIndex >= 0 )
 					{
-						y[j + offset] = ( ConvertBytes.toBits( _stream, 0, _pos, codebooks.get( book ).dimensions )[0] & 0xFF ) ;
-						_pos += book ;
+						final CodebookConfiguration book = codebooks.get( bookIndex ) ;
+						y[j + offset] = ( ConvertBytes.toBits( _stream, 0, _pos, book.entry )[0] & 0xFF ) ;
+						_pos += book.entry ;
 					}
 					else
 					{
@@ -668,6 +673,23 @@ public class Vorbis
 			}
 
 			return _pos ;
+		}
+	
+		private boolean isUnique( final int[] _xList )
+		{
+			for( int i = 0; i < _xList.length; i++ )
+			{
+				for( int j = 0; j < _xList.length; j++ )
+				{
+					//System.out.println( _xList[i] + " : " + _xList[j] ) ;
+					if( _xList[i] == _xList[j] && i != j )
+					{
+						return false ;
+					}
+				}
+			}
+
+			return true ;
 		}
 	}
 
@@ -683,6 +705,13 @@ public class Vorbis
 		public int decode( int _pos, final byte[] _stream ) throws Exception
 		{
 			System.out.println( "Decode Floor Type 0..." ) ;
+			_pos = decodeHeader( _pos, _stream ) ;
+			_pos = decodePacket( _pos, _stream ) ;
+			return _pos ;
+		}
+
+		private int decodeHeader( int _pos, final byte[] _stream )
+		{
 			int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
 			final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
 			ConvertBytes.flipEndian( readRate ) ;
@@ -704,6 +733,21 @@ public class Vorbis
 			{
 				bookList[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
 				_pos += 8 ;
+			}
+
+			return _pos ;
+		}
+
+		private int decodePacket( int _pos, final byte[] _stream )
+		{
+			final int amplitude = ( ConvertBytes.toBits( _stream, 0, _pos, amplitudeBits )[0] & 0xFF ) ;
+			_pos += amplitudeBits ;
+
+			System.out.println( "Amplitude: " + amplitude + " Bits: " + amplitudeBits ) ;
+
+			if( amplitude > 0 )
+			{
+			
 			}
 
 			return _pos ;
