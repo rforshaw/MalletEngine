@@ -1,5 +1,8 @@
 package com.linxonline.mallet.main.web ;
 
+import org.teavm.jso.* ;
+import org.teavm.jso.browser.* ;
+
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.main.StarterInterface ;
@@ -18,6 +21,8 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
 import com.linxonline.mallet.io.reader.config.ConfigReader ;
 
+import com.linxonline.mallet.util.time.ElapsedTimer ;
+import com.linxonline.mallet.util.time.web.WebTimer ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 
@@ -32,15 +37,45 @@ public abstract class WebStarter extends StarterInterface
 {
 	protected final SystemInterface backendSystem  ;
 	protected final GameSystem gameSystem ;
-	protected Thread thread ;
 
 	protected final static String BASE_CONFIG = "base/config.cfg" ;
 
 	public WebStarter( final SystemInterface _backendSystem, final FileSystem _fileSystem )
 	{
+		ElapsedTimer.setTimer( new WebTimer() ) ;
+
 		loadFileSystem( _fileSystem ) ;						// Ensure FileSystem is setup correctly.
 		backendSystem = _backendSystem ;
-		gameSystem = new GameSystem( _backendSystem ) ;
+		gameSystem = new GameSystem( _backendSystem )
+		{
+			@Override
+			public void runSystem()
+			{
+				running = true ;
+
+				stateMachine.resume() ;
+				final TimerHandler timer = new TimerHandler()
+				{
+					double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
+
+					@Override
+					public void onTimer()
+					{
+						dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
+
+						if( running == true )
+						{
+							stateMachine.update( dt ) ;						// Update Game State
+							return ;
+						}
+
+						stateMachine.pause() ;
+					}
+				} ;
+
+				Window.setInterval( timer, 0 ) ;
+			}
+		} ;
 	}
 
 	@Override
@@ -62,34 +97,14 @@ public abstract class WebStarter extends StarterInterface
 		backendSystem.startSystem() ;
 		setRenderSettings( backendSystem ) ;
 
-		thread = new Thread( "GAME_THREAD" )
-		{
-			public void run()
-			{
-				Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
-				gameSystem.runSystem() ;			// Begin running the game-loop
-				Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
-			}
-		} ;
-
-		thread.start() ;
+		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
+		gameSystem.runSystem() ;			// Begin running the game-loop
+		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
 	}
 
 	public void stop()
 	{
 		gameSystem.stopSystem() ;
-		if( thread.isAlive() == true )
-		{
-			try
-			{
-				thread.join( 10 ) ;
-				thread = null ;
-			}
-			catch( InterruptedException ex )
-			{
-				ex.printStackTrace() ;
-			}
-		}
 		backendSystem.stopSystem() ;
 	}
 
@@ -154,7 +169,5 @@ public abstract class WebStarter extends StarterInterface
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
-
-		render.setCameraPosition( new Vector3() ) ;
 	}
 }

@@ -94,7 +94,7 @@
               <minifying>true</minifying>
 
               <!-- Whether TeaVM should produce debug information for its built-in debugger -->
-              <debugInformationGenerated>true</debugInformationGenerated>
+              <debugInformationGenerated>false</debugInformationGenerated>
 
               <!-- Whether TeaVM should produce source maps file -->
               <sourceMapsGenerated>false</sourceMapsGenerated>

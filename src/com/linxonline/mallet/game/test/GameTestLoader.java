@@ -82,7 +82,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -191,7 +191,7 @@ public final class GameTestLoader extends GameLoader
 							_delegate.addBasicDraw( draw ) ;
 						}
 
-						{
+						/*{
 							final Shape shape = SGeom.load( "base/ui/test.sgeom" ) ;
 							if( shape != null )
 							{
@@ -205,7 +205,7 @@ public final class GameTestLoader extends GameLoader
 
 								_delegate.addBasicDraw( draw ) ;
 							}
-						}
+						}*/
 					}
 				} ) ) ;
 			}
@@ -268,7 +268,7 @@ public final class GameTestLoader extends GameLoader
 					}
 				} ) ) ;*/
 
-				final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
+				/*final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
 				//System.out.println( ogg ) ;
 				final Vorbis vorbis = new Vorbis() ;
 				try
@@ -279,7 +279,7 @@ public final class GameTestLoader extends GameLoader
 				catch( Exception ex )
 				{
 					ex.printStackTrace() ;
-				}
+				}*/
 			}
 
 			/**

@@ -390,8 +390,8 @@ public class GameState extends State implements HookEntity
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					//inputUISystem.update() ;
-					//inputWorldSystem.update() ;
+					inputUISystem.update() ;
+					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
 					dataTracker.update() ;
@@ -420,7 +420,7 @@ public class GameState extends State implements HookEntity
 					inputWorldSystem.update() ;
 				
 					//System.out.println( ( int )( 1.0f / _dt ) ) ;
-					animationSystem.update( DEFAULT_FRAMERATE ) ;
+					//animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator -= DEFAULT_FRAMERATE ;
 				}
@@ -430,7 +430,9 @@ public class GameState extends State implements HookEntity
 
 				final float deltaLogic = logicRunningTime * 0.000000001f ;							// Convert to seconds
 				final float deltaRender = renderRunningTime * 0.000000001f ;						// Convert to seconds
-				
+
+				//System.out.println( "Render: " + deltaRender + " Logic: " + deltaLogic + " Total: " + ( deltaRender + deltaLogic ) + " FrameRate: " + DEFAULT_FRAMERATE ) ;
+
 				// If the time taken to render the current frame and update the delta logic
 				// is less than the total time allocated for rendering a frame, 
 				// then we can risk sleeping for a short duration.

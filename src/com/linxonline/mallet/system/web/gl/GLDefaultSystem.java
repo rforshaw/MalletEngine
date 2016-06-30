@@ -34,7 +34,7 @@ public class GLDefaultSystem extends BasicSystem
 		final GLRenderer render = ( GLRenderer )renderer ;
 		final InputSystem input = ( InputSystem )inputSystem ;
 
-		input.inputAdapter = render.renderInfo ;					// Hook up Input Adapter
+		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
 
 		eventSystem.addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
 	}
@@ -69,7 +69,7 @@ public class GLDefaultSystem extends BasicSystem
 	@Override
 	public void sleep( final long _millis )
 	{
-		try
+		/*try
 		{
 			Thread.sleep( _millis ) ;
 			Thread.yield() ;
@@ -78,7 +78,7 @@ public class GLDefaultSystem extends BasicSystem
 		{
 			Thread.currentThread().interrupt() ;
 			//ex.printStackTrace() ;
-		}
+		}*/
 	}
 
 	@Override
@@ -93,10 +93,5 @@ public class GLDefaultSystem extends BasicSystem
 	public void draw( final float _dt )
 	{
 		super.draw( _dt ) ;
-		// Sleep for a frame duration to ensure that
-		// it has been rendered out. 
-		// Without sleeping webgl doesn't seem to display anything.
-		// Sleep duration should be set to the frame limit. 
-		sleep( 16 ) ;
 	}
 }

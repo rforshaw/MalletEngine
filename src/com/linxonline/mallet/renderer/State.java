@@ -38,8 +38,15 @@ public abstract class State<T>
 
 	public void manageState()
 	{
-		addNewData( toAdd ) ;
-		removeOldData( toRemove ) ;
+		if( toAdd.isEmpty() == false )
+		{
+			addNewData( toAdd ) ;
+		}
+
+		if( toRemove.isEmpty() == false )
+		{
+			removeOldData( toRemove ) ;
+		}
 	}
 
 	protected void addNewData( final ArrayList<T> _toAdd )

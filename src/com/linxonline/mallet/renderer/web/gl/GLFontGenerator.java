@@ -17,7 +17,6 @@ import java.awt.Graphics2D ;
 import java.awt.Canvas ;
 import java.awt.AlphaComposite ;
 
-import com.linxonline.mallet.resources.model.Model ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.renderer.font.FontMap ;
@@ -35,7 +34,7 @@ public class GLFontGenerator
 
 	public GLFontMap generateFontMap( final String _name, final int _size, final String _charsToMap, final int _spacing )
 	{
-		return generateFontMap( new Font( _name, Font.PLAIN, _size ), _charsToMap, _spacing ) ;
+		return null ;//generateFontMap( new Font( _name, Font.PLAIN, _size ), _charsToMap, _spacing ) ;
 	}
 
 	/**

@@ -63,6 +63,7 @@ public class WebFile implements FileStream
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
 		request.open( "GET", path, false ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
 		request.send() ;
 
 		/*final Int8Array array = Int8Array.create( ( ArrayBuffer )request.getResponse() ) ;
@@ -130,6 +131,7 @@ public class WebFile implements FileStream
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
 		request.open( "GET", element.getSrc(), true ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
 		request.setResponseType( "arraybuffer" ) ;
 		request.setOnReadyStateChange( new ReadyStateChangeHandler()
 		{

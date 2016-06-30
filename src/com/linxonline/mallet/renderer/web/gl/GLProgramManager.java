@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.web.gl ;
 import java.util.ArrayList ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
+import org.teavm.jso.webgl.WebGLUniformLocation ;
 
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -43,7 +44,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					return null ;
 				}
 
-				//System.out.println( "Loading Shader Program: " + _file ) ;
 				return generateGLProgram( JSONObject.construct( stream ) ) ;
 			}
 
@@ -52,7 +52,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final ArrayList<GLShader> shaders = new ArrayList<GLShader>() ;
 
 				{
-					//System.out.println( "Generate Vertex Shaders.." ) ;
 					final JSONArray vertexShaders = _jGL.optJSONArray( "VERTEX" ) ;
 					if( vertexShaders != null )
 					{
@@ -60,8 +59,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					}
 				}
 
+				/*{
+					final JSONArray geometryShaders = _jGL.optJSONArray( "GEOMETRY" ) ;
+					if( geometryShaders != null )
+					{
+						readShaders( geometryShaders, shaders, GL3.GEOMETRY_SHADER ) ;
+					}
+				}*/
+
 				{
-					//System.out.println( "Generate Fragment Shaders.." ) ;
 					final JSONArray fragmentShaders = _jGL.optJSONArray( "FRAGMENT" ) ;
 					if( fragmentShaders != null )
 					{
@@ -122,14 +128,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			}
 		}
 
-		//_gl.glBindUniformLocation( _program.id[0], MVP_MATRIX, "inMVPMatrix" ) ;
-		//_gl.glBindUniformLocation( _program.id[0], POSITION_MATRIX, "inPositionMatrix" ) ;
 		_gl.bindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
 		_gl.bindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
 		_gl.bindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord0" ) ;
 		_gl.bindAttribLocation( _program.id[0], NORMAL_ARRAY, "inNormal" ) ;
 
 		_gl.linkProgram( _program.id[0] ) ;
+
+		_program.inMVPMatrix = _gl.getUniformLocation( _program.id[0], "inMVPMatrix" ) ;
+		mapTexturesToProgram( _gl, _program ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -150,6 +157,33 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		}
 
 		return true ;
+	}
+
+	/**
+		Loop over a set of fixed 'inTex' uniform variables 
+		from the GLProgram/GLShaders.
+		Stop iterating as soon as an inTexi returns -1.
+		inTex0 should map to GL_TEXTURE0
+		inTex1 should map to GL_TEXTURE1
+		inTex2 should map to GL_TEXTURE1 and so on..
+		Currently an upper limit of 10 textures can be mapped.
+	*/
+	private static void mapTexturesToProgram( final WebGLRenderingContext _gl, final GLProgram _program )
+	{
+		final WebGLUniformLocation[] inTex = new WebGLUniformLocation[10] ;
+		for( int i = 0; i < 10; i++ )
+		{
+			final String inTexName = "inTex" + i ;
+			inTex[i] = _gl.getUniformLocation( _program.id[0], inTexName ) ;
+
+			if( inTex[i] == null )
+			{
+				_program.copyTextures( inTex, i ) ;
+				return ;
+			}
+
+			_program.copyTextures( inTex, inTex.length ) ;
+		}
 	}
 
 	private static boolean compileShader( final WebGLRenderingContext _gl, final GLShader _shader )

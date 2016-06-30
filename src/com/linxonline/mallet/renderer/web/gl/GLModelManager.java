@@ -8,18 +8,23 @@ import org.teavm.jso.webgl.WebGLBuffer ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.resources.model.Model ;
 
 public class GLModelManager
 {
-	public static WebGLBuffer genIndexID( final WebGLRenderingContext _gl )
+	public static WebGLBuffer[] genIndexID( final WebGLRenderingContext _gl )
 	{
-		return _gl.createBuffer() ;
+		final WebGLBuffer[] id = new WebGLBuffer[1] ;
+		id[0] = _gl.createBuffer() ;
+
+		return id ;
 	}
 
-	public static WebGLBuffer genVBOID( final WebGLRenderingContext _gl )
+	public static WebGLBuffer[] genVBOID( final WebGLRenderingContext _gl )
 	{
-		return _gl.createBuffer() ;
+		final WebGLBuffer[] id = new WebGLBuffer[1] ;
+		id[0] = _gl.createBuffer() ;
+
+		return id ;
 	}
 
 	public static void unbind( final GLGeometryUploader.GLGeometry _geometry )

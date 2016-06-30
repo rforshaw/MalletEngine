@@ -1,7 +1,6 @@
 package com.linxonline.mallet.audio.web ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.sound.* ;
 
 public class WebAudioSource implements AudioSource
 {

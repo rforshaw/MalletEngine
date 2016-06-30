@@ -1,6 +1,8 @@
 package com.linxonline.mallet.ui ;
 
 import com.linxonline.mallet.maths.Ratio ;
+import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 
 public class UIRatio
 {
@@ -17,7 +19,25 @@ public class UIRatio
 		Take the unit and convert it to the appropriate 
 		pixel value.
 	*/
-	public float scale( final float _unit )
+	public void toPixel( final Vector3 _unit, final Vector3 _pixel )
+	{
+		_pixel.setXYZ( toPixel( _unit.x ), toPixel( _unit.y ), toPixel( _unit.z ) ) ;
+	}
+
+	/**
+		Take the unit and convert it to the appropriate 
+		pixel value.
+	*/
+	public void toPixel( final Vector2 _unit, final Vector2 _pixel )
+	{
+		_pixel.setXY( toPixel( _unit.x ), toPixel( _unit.y ) ) ;
+	}
+
+	/**
+		Take the unit and convert it to the appropriate 
+		pixel value.
+	*/
+	public float toPixel( final float _unit )
 	{
 		return _unit * ratio.getA() ;
 	}
@@ -26,7 +46,25 @@ public class UIRatio
 		Take the pixel and convert it to the appropriate 
 		unit value.
 	*/
-	public float descale( final float _pixel )
+	public void toUnit( final Vector3 _pixel, final Vector3 _unit )
+	{
+		_unit.setXYZ( toUnit( _pixel.x ), toUnit( _pixel.y ), toUnit( _pixel.z ) ) ;
+	}
+
+	/**
+		Take the pixel and convert it to the appropriate 
+		unit value.
+	*/
+	public void toUnit( final Vector2 _pixel, final Vector2 _unit )
+	{
+		_unit.setXY( toUnit( _pixel.x ), toUnit( _pixel.y ) ) ;
+	}
+
+	/**
+		Take the pixel and convert it to the appropriate 
+		unit value.
+	*/
+	public float toUnit( final float _pixel )
 	{
 		return _pixel / ratio.getA() ; 
 	}

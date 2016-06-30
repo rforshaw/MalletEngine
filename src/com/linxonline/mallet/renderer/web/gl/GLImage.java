@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.web.gl ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLTexture ;
 
-import com.linxonline.mallet.resources.texture.ImageInterface ;
+import com.linxonline.mallet.renderer.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {
@@ -28,7 +28,7 @@ public class GLImage implements ImageInterface
 	{
 		return height ;
 	}
-
+	
 	public final void destroy()
 	{
 		//System.out.println( "Removing texture.." ) ;

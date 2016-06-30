@@ -148,8 +148,6 @@ public class GLTextureManager extends AbstractManager<Texture>
 			return null ;
 		}
 
-		//gl.glEnable( GL.GL_TEXTURE_2D ) ;		GLRenderer.handleError( "Enable Texture", gl ) ;
-
 		final int textureID = glGenTextures( gl ) ;			//GLRenderer.handleError( "Gen Texture", gl ) ;
 		gl.glBindTexture( GL3.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", gl ) ;
 

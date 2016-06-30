@@ -23,12 +23,12 @@ public abstract class UIElement implements InputHandler
 
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
 
-	private final Vector3 minLength = new Vector3() ;	// As pixels
-	private final Vector3 maxLength = new Vector3() ;	// As pixels
-	private final Vector3 position ;					// As pixels
-	private final Vector3 offset ;						// As pixels
-	private final Vector3 length ;						// As pixels
-	private final Vector3 margin ;						// As pixels
+	private final Vector3 minLength = new Vector3() ;	// In pixels
+	private final Vector3 maxLength = new Vector3() ;	// In pixels
+	private final Vector3 position ;					// In pixels
+	private final Vector3 offset ;						// In pixels
+	private final Vector3 length ;						// In pixels
+	private final Vector3 margin ;						// In pixels
 
 	public enum State
 	{
@@ -47,7 +47,7 @@ public abstract class UIElement implements InputHandler
 		offset = _offset ;
 		length = _length ;
 
-		final float ratioMargin = ratio.scale( DEFAULT_MARGIN_SIZE ) ;
+		final float ratioMargin = ratio.toPixel( DEFAULT_MARGIN_SIZE ) ;
 		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
 	}
 
@@ -258,7 +258,7 @@ public abstract class UIElement implements InputHandler
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		position.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
+		position.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
 	}
 
 	/**
@@ -270,7 +270,7 @@ public abstract class UIElement implements InputHandler
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		offset.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
+		offset.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
 	}
 
 	/**
@@ -281,9 +281,9 @@ public abstract class UIElement implements InputHandler
 	*/
 	public void setMinimumLength( final float _x, final float _y, final float _z )
 	{
-		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.scale( _x ) ;
-		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.scale( _y ) ;
-		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.scale( _z ) ;
+		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixel( _x ) ;
+		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixel( _y ) ;
+		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixel( _z ) ;
 
 		// Ensure that length adheres to the new minimum length
 		setLength( length.x, length.y, length.z ) ;
@@ -297,9 +297,9 @@ public abstract class UIElement implements InputHandler
 	*/
 	public void setMaximumLength( final float _x, final float _y, final float _z )
 	{
-		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.scale( _x ) ;
-		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.scale( _y ) ;
-		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.scale( _z ) ;
+		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixel( _x ) ;
+		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixel( _y ) ;
+		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixel( _z ) ;
 
 		// Ensure that length adheres to the new maximum length
 		setLength( length.x, length.y, length.z ) ;
@@ -316,24 +316,24 @@ public abstract class UIElement implements InputHandler
 		makeDirty() ;
 		if( minLength != null )
 		{
-			length.x = ( _x < minLength.x ) ? minLength.x : ratio.scale( _x ) ;
-			length.y = ( _y < minLength.y ) ? minLength.y : ratio.scale( _y ) ;
-			length.z = ( _z < minLength.z ) ? minLength.z : ratio.scale( _z ) ;
+			length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixel( _x ) ;
+			length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixel( _y ) ;
+			length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixel( _z ) ;
 		}
 
 		if( maxLength.x > 0.0f )
 		{
-			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.scale( _x ) ;
+			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.toPixel( _x ) ;
 		}
 
 		if( maxLength.y > 0.0f )
 		{
-			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.scale( _y ) ;
+			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.toPixel( _y ) ;
 		}
 
 		if( maxLength.z > 0.0f )
 		{
-			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.scale( _z ) ;
+			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.toPixel( _z ) ;
 		}
 	}
 
@@ -347,7 +347,7 @@ public abstract class UIElement implements InputHandler
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		margin.setXYZ( ratio.scale( _x ), ratio.scale( _y ), ratio.scale( _z ) ) ;
+		margin.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
 	}
 
 	public void setLayer( final int _layer )
@@ -360,31 +360,133 @@ public abstract class UIElement implements InputHandler
 		return dirty ;
 	}
 
+	/**
+		Returns the elements position in pixels.
+		Pass in a Vector3 to retrieve the position in units.
+	*/
+	public Vector3 getPosition( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getPosition(), _unit ) ;
+		}
+
+		return getPosition() ;
+	}
+
+	/**
+		Returns the element's position in pixels.
+	*/
 	public Vector3 getPosition()
 	{
 		return position ;
 	}
 
+	/**
+		Returns the elements offset in pixels.
+		Pass in a Vector3 to retrieve the offset in units.
+	*/
+	public Vector3 getOffset( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getOffset(), _unit ) ;
+		}
+
+		return getOffset() ;
+	}
+
+	/**
+		Return the element's offset in pixels.
+	*/
 	public Vector3 getOffset()
 	{
 		return offset ;
 	}
 
+	/**
+		Returns the elements maximum length in pixels.
+		Pass in a Vector3 to retrieve the maximum length in units.
+	*/
+	public Vector3 getMaximumLength( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getMaximumLength(), _unit ) ;
+		}
+
+		return getMaximumLength() ;
+	}
+
+	/**
+		Return the element's potential maximum length in pixels.
+	*/
 	public Vector3 getMaximumLength()
 	{
 		return maxLength ;
 	}
 
+	/**
+		Returns the elements minimum length in pixels.
+		Pass in a Vector3 to retrieve the minimum length in units.
+	*/
+	public Vector3 getMinimumLength( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getMinimumLength(), _unit ) ;
+		}
+
+		return getMinimumLength() ;
+	}
+
+	/**
+		Return the element's potential minimum length in pixels.
+	*/
 	public Vector3 getMinimumLength()
 	{
 		return minLength ;
 	}
 
+	/**
+		Returns the elements length in pixels.
+		Pass in a Vector3 to retrieve the length in units.
+	*/
+	public Vector3 getLength( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getLength(), _unit ) ;
+		}
+
+		return getLength() ;
+	}
+
+	/**
+		Return the element's actual length in pixels.
+	*/
 	public Vector3 getLength()
 	{
 		return length ;
 	}
 
+	/**
+		Returns the elements margin in pixels.
+		Pass in a Vector3 to retrieve the margin in units.
+	*/
+	public Vector3 getMargin( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			ratio.toUnit( getMargin(), _unit ) ;
+		}
+
+		return getMargin() ;
+	}
+
+	/**
+		Return the elements margin around itself in pixels.
+	*/
 	public Vector3 getMargin()
 	{
 		return margin ;

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.audio.web ;
 
-import com.linxonline.mallet.resources.sound.SoundInterface ;
+import com.linxonline.mallet.audio.SoundInterface ;
 
 /**
 	Stores the central audio data.

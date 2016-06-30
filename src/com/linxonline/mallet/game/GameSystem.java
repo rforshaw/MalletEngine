@@ -6,11 +6,11 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.game.statemachine.* ;
 import com.linxonline.mallet.util.time.* ;
 
-public final class GameSystem
+public class GameSystem
 {
-	private SystemInterface system = null ;
-	private final StateMachine stateMachine = new StateMachine() ;
-	private boolean running = false ;
+	protected SystemInterface system = null ;
+	protected final StateMachine stateMachine = new StateMachine() ;
+	protected boolean running = false ;
 
 	public GameSystem() {}
 
@@ -19,7 +19,7 @@ public final class GameSystem
 		setSystem( _system ) ;
 	}
 
-	public final void runSystem()
+	public void runSystem()
 	{
 		double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 		running = true ;
