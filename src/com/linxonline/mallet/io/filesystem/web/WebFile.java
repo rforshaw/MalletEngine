@@ -66,14 +66,6 @@ public class WebFile implements FileStream
 		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
 		request.send() ;
 
-		/*final Int8Array array = Int8Array.create( ( ArrayBuffer )request.getResponse() ) ;
-		final byte[] data = new byte[array.getByteLength()] ;
-
-		for( int i = 0; i < data.length; ++i )
-		{
-			data[i] = array.get( i ) ;
-		}*/
-
 		return new WebStringIn( request.getResponseText().getBytes() ) ;
 	}
 

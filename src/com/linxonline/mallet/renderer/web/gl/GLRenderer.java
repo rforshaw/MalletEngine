@@ -59,6 +59,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		defaultCamera.setDrawInterface( getCameraDraw() ) ;
 		worlds.addCamera( defaultCamera, null ) ;
 
+		gl.enable( GL3.CULL_FACE ) ;
+		gl.cullFace( GL3.BACK ) ;  
+		gl.frontFace( GL3.CCW ) ;
+
 		System.out.println( "Building default shaders.." ) ;
 		{
 			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/web/simple_texture.jgl" ) ;
@@ -788,7 +792,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		super.draw( _dt ) ;
 		//GLRenderer.handleError( "Previous: ", gl ) ;
 		gl.clear( GL3.COLOR_BUFFER_BIT | GL3.DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
-		gl.clearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
+		gl.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
 
 		getEventController().update() ;
 

@@ -6,16 +6,31 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class WebStringIn implements StringInStream
 {
-	private final BufferedReader reader ;
+	private BufferedReader reader ;
+
+	public WebStringIn() {}
 
 	public WebStringIn( final byte[] _input )
 	{
 		assert _input != null ;
-		reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( _input ) ) ) ;
+		set( _input ) ;
+	}
+
+	public void set( final byte[] _input )
+	{
+		if( reader == null )
+		{
+			reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( _input ) ) ) ;
+		}
 	}
 
 	public String readLine()
 	{
+		if( reader == null )
+		{
+			return "" ;
+		}
+
 		try
 		{
 			return reader.readLine() ;

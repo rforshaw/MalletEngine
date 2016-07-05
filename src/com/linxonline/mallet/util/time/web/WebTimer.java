@@ -44,7 +44,7 @@ public class WebTimer implements TimerInterface
 	@Override
 	public long nanoTime()
 	{
-		return ( long )Performance.now() / 1000L ;
+		return ( long )Performance.now() ;
 	}
 
 	private final long getLongElapsedTime()

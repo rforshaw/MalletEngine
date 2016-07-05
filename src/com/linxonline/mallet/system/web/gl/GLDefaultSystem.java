@@ -67,19 +67,7 @@ public class GLDefaultSystem extends BasicSystem
 	}
 
 	@Override
-	public void sleep( final long _millis )
-	{
-		/*try
-		{
-			Thread.sleep( _millis ) ;
-			Thread.yield() ;
-		}
-		catch( InterruptedException ex )
-		{
-			Thread.currentThread().interrupt() ;
-			//ex.printStackTrace() ;
-		}*/
-	}
+	public void sleep( final long _millis ) {}
 
 	@Override
 	public boolean update( final float _dt )

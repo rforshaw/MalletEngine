@@ -82,6 +82,7 @@
               <goal>compile</goal>
             </goals>
             <configuration>
+              <stopOnErrors>false</stopOnErrors>
               <!-- Directory where TeaVM should put generated files. This configuration conforms to the settings
                    of the WAR plugin -->
               <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>

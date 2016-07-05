@@ -87,7 +87,7 @@ public class GLGeometryUploader
 		{
 			if( buffer.isSupported( _data ) == true )
 			{
-				// If the buffer is still supported in the buffer 
+				// If the data is still supported in the buffer 
 				// it was previously loaded into then update it.
 				buffer.upload( _data ) ;
 				return ;

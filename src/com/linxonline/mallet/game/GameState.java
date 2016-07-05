@@ -413,6 +413,7 @@ public class GameState extends State implements HookEntity
 				renderAccumulator += _dt ;
 				startTime = ElapsedTimer.nanoTime() ;
 
+				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ; ;
 				if( renderAccumulator > DEFAULT_FRAMERATE )
 				{
 					system.getInputInterface().update() ;
@@ -420,7 +421,7 @@ public class GameState extends State implements HookEntity
 					inputWorldSystem.update() ;
 				
 					//System.out.println( ( int )( 1.0f / _dt ) ) ;
-					//animationSystem.update( DEFAULT_FRAMERATE ) ;
+					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
 					renderAccumulator -= DEFAULT_FRAMERATE ;
 				}
@@ -430,8 +431,6 @@ public class GameState extends State implements HookEntity
 
 				final float deltaLogic = logicRunningTime * 0.000000001f ;							// Convert to seconds
 				final float deltaRender = renderRunningTime * 0.000000001f ;						// Convert to seconds
-
-				//System.out.println( "Render: " + deltaRender + " Logic: " + deltaLogic + " Total: " + ( deltaRender + deltaLogic ) + " FrameRate: " + DEFAULT_FRAMERATE ) ;
 
 				// If the time taken to render the current frame and update the delta logic
 				// is less than the total time allocated for rendering a frame, 

@@ -20,6 +20,7 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -37,7 +38,7 @@ public class GLGeometryUploader
 	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
-	private final static int PRIMITIVE_EXPANSION = 1 ;
+	private final static int PRIMITIVE_EXPANSION = 0/*1*/ ;			// Added to the end of a shapes index array
 
 	private final static int VBO_VAR_BYTE_SIZE = 4 ;
 	private final static int IBO_VAR_BYTE_SIZE = 2 ;
@@ -61,15 +62,9 @@ public class GLGeometryUploader
 	public void draw( final WebGLRenderingContext _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
 		//System.out.println( "Buffers: " + buffers.size() ) ;
-		if( buffers.isEmpty() == true )
+		for( final GLBuffer buffer : buffers )
 		{
-			return ;
-		}
-
-		final int size = buffers.size() ;
-		for( int i = 0; i < size; i++)
-		{
-			buffers.get( i ).draw( _gl, _worldProjection, _uiProjection ) ;
+			buffer.draw( _gl, _worldProjection, _uiProjection ) ;
 		}
 	}
 
@@ -83,7 +78,7 @@ public class GLGeometryUploader
 		{
 			if( buffer.isSupported( _data ) == true )
 			{
-				// If the buffer is still supported in the buffer 
+				// If the data is still supported in the buffer 
 				// it was previously loaded into then update it.
 				buffer.upload( _gl, _data ) ;
 				return ;
@@ -150,14 +145,15 @@ public class GLGeometryUploader
 		final int indexOffset = _handler.getVertexStart() / geometry.vertexStrideBytes ;
 
 		final int indiciesLength = indicies.getLength() ;
-		
+
 		int increment = 0 ;
 		int indexStartBytes = _handler.getIndexStart() ;
+		int indexLast = 0 ;
 
 		for( int i = 0; i < index.length; i++ )
 		{
-			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
-			indicies.set( increment++, ( short )( indexOffset + index[i] ) ) ;
+			indexLast = indexOffset + index[i] ;
+			indicies.set( increment++, ( short )indexLast ) ;
 
 			if( increment >= indiciesLength )
 			{
@@ -170,11 +166,15 @@ public class GLGeometryUploader
 			}
 		}
 
-		//indicies.set( increment++, ( short )PRIMITIVE_RESTART_INDEX ) ;
+		// Repeat the last index to create a dead triangle.
+		//indicies.set( increment++, ( short )indexLast ) ;
 
-		final Int16Array tmp = Int16Array.create( indicies.getBuffer(), indexStartBytes, increment * IBO_VAR_BYTE_SIZE ) ;
-		_gl.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, tmp ) ;
-		//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+		if( increment > 0 )
+		{
+			final Int16Array tmp = Int16Array.create( indicies.getBuffer(), 0, increment ) ;
+			_gl.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, tmp ) ;
+			//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+		}
 	}
 
 	protected void uploadVBO( final WebGLRenderingContext _gl, final Location _handler, final Shape _shape, final Matrix4 _matrix )
@@ -226,7 +226,7 @@ public class GLGeometryUploader
 				final int lengthBytes = increment * VBO_VAR_BYTE_SIZE ;
 				_gl.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, verticies ) ;
 				//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
-				
+
 				vertexStartBytes += lengthBytes ;
 				increment = 0 ;
 			}
@@ -234,7 +234,7 @@ public class GLGeometryUploader
 
 		if( increment > 0 )
 		{
-			final Float32Array tmp = Float32Array.create( verticies.getBuffer(), vertexStartBytes, increment * VBO_VAR_BYTE_SIZE ) ;
+			final Float32Array tmp = Float32Array.create( verticies.getBuffer(), 0, increment ) ;
 			_gl.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, tmp ) ;
 			//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
 		}
@@ -358,8 +358,6 @@ public class GLGeometryUploader
 	*/
 	public class GLBuffer implements SortInterface
 	{
-		private final WebGLTexture[] BLANK_TEXTURES = new WebGLTexture[0] ;
-	
 		private Shape.Swivel[] shapeSwivel ;
 		private Shape.Style shapeStyle ;
 
@@ -370,7 +368,8 @@ public class GLGeometryUploader
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
 		private GLProgram program ;						// What shader should be used
-		private WebGLTexture[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
+		private WebGLTexture[] textureID = null;		// -1 represent no texture in use
+		private MalletTexture[] malletTextures = null ; 
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
 		private final boolean isText ;					// Is the buffer to be used for text?
@@ -531,15 +530,15 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-			if( textureID.length != textures.size() )
+			final ArrayList<MalletTexture> textures = _data.getMalletTextures() ;
+			if( malletTextures.length != textures.size() )
 			{
 				return false ;
 			}
 
-			for( int i = 0; i < textureID.length; i++ )
+			for( int i = 0; i < malletTextures.length; i++ )
 			{
-				if( textureID[i] == textures.get( i ).getImage().textureIDs[0] )
+				if( malletTextures[i].getPath().equals( textures.get( i ).getPath() ) == false )
 				{
 					return false ;
 				}
@@ -827,18 +826,24 @@ public class GLGeometryUploader
 
 		private void setupTextures( final GLDrawData _data )
 		{
-			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-			final int size = textures.size() ;
-			if( textures.isEmpty() == true )
+			final ArrayList<MalletTexture> mTextures = _data.getMalletTextures() ; 
+			final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
+
+			if( mTextures.isEmpty() == true )
 			{
-				textureID = BLANK_TEXTURES ;
+				textureID = new WebGLTexture[0] ;
+				malletTextures = new MalletTexture[0] ;
 				return ;
 			}
 
-			textureID = new WebGLTexture[textures.size()] ;
-			for( int i = 0; i < textureID.length; i++ )
+			final int size = mTextures.size() ;
+
+			textureID = new WebGLTexture[size] ;
+			malletTextures = new MalletTexture[size] ;
+			for( int i = 0; i < size; i++ )
 			{
-				textureID[i] = textures.get( i ).getImage().textureIDs[0] ;
+				textureID[i] = glTextures.get( i ).getImage().textureIDs[0] ;
+				malletTextures[i] = mTextures.get( i ) ;
 			}
 		}
 
