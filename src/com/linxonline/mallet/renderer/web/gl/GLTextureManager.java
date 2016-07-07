@@ -11,7 +11,9 @@ import org.teavm.jso.webgl.WebGLTexture ;
 import org.teavm.jso.browser.Window ;
 import org.teavm.jso.dom.html.HTMLDocument ;
 import org.teavm.jso.dom.html.HTMLImageElement ;
+import org.teavm.jso.dom.html.HTMLCanvasElement ;
 import org.teavm.jso.dom.events.* ;
+import org.teavm.jso.canvas.ImageData ;
 
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -148,6 +150,47 @@ public class GLTextureManager extends AbstractManager<Texture>
 	public Texture bind( final HTMLImageElement _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
+	}
+
+	public Texture bind( final ImageData _image )
+	{
+		return bind( _image, InternalFormat.COMPRESSED ) ;
+	}
+
+	/**
+		Binds the BufferedImage byte-stream into video memory.
+		BufferedImage must be in 4BYTE_ABGR.
+		4BYTE_ABGR removes endinese problems.
+	*/
+	public Texture bind( final ImageData _image, final InternalFormat _format )
+	{
+		System.out.println( "W: " + _image.getWidth() + " H: " + _image.getHeight() ) ;
+		final WebGLRenderingContext gl = GLRenderer.getContext() ;
+		if( gl == null )
+		{
+			System.out.println( "GL context doesn't exist" ) ;
+			return null ;
+		}
+
+		final WebGLTexture textureID = glGenTextures( gl ) ;
+		gl.bindTexture( GL3.TEXTURE_2D, textureID ) ;
+
+		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR ) ;
+		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.CLAMP_TO_EDGE ) ;
+		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.CLAMP_TO_EDGE ) ;
+
+		//gl.pixelStorei( GL3.UNPACK_ALIGNMENT, 1 ) ;
+		gl.texImage2D( GL3.TEXTURE_2D, 
+						 0, 
+						 GL3.RGBA,
+						 GL3.RGBA, 
+						 GL3.UNSIGNED_BYTE, 
+						 _image ) ;		GLRenderer.handleError( "texImage2D", gl ) ;
+
+		//gl.generateMipmap( GL3.TEXTURE_2D ) ;
+		gl.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
+
+		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
 	}
 
 	/**

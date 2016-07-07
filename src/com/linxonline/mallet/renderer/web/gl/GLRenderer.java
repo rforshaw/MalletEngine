@@ -642,14 +642,21 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm == null )
+				if( fm.fontMap.texture == null )
 				{
-					return ;
+					// If the font maps texture has yet to be set,
+					// generate the texture and bind it with the 
+					// current OpenGL context
+					fontManager.generateFontGeometry( font ) ;
 				}
 
 				final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
 				if( textures.isEmpty() == true )
 				{
+					// We must add a fake MalletTexture to represent the font
+					// as GLUploadGeometry doesn't use the texture id to determine 
+					// uniqueness.
+					_data.addTexture( new MalletTexture( font.getFontName() ) ) ;
 					textures.add( fm.getTexture() ) ;
 				}
 

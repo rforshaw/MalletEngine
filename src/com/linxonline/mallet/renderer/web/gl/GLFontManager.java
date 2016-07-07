@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
+import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -50,6 +51,11 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 		}
 
 		return resource ;
+	}
+
+	public GLFontMap generateFontGeometry( final MalletFont _font )
+	{
+		return gen.generateFontGeometry( _font, ( GLFontMap )_font.font.getFont() ) ;
 	}
 
 	protected GLFontMap createResource( final String _name, final int _size )
