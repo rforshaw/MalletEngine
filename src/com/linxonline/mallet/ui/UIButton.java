@@ -189,7 +189,7 @@ public class UIButton extends UIElement
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
 
-			return InputEvent.Action.CONSUME ;
+			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
@@ -209,7 +209,7 @@ public class UIButton extends UIElement
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
 
-			return InputEvent.Action.CONSUME ;
+			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
@@ -218,7 +218,7 @@ public class UIButton extends UIElement
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
 
-			return InputEvent.Action.CONSUME ;
+			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
