@@ -86,7 +86,6 @@ public class GLFontGenerator
 		final HTMLCanvasElement element = canvas.getCanvas() ;
 		element.setWidth( width ) ;
 		element.setHeight( height ) ;
-		System.out.println( "H: " + height + " W: " + width ) ;
 
 		final StringBuilder builder = new StringBuilder() ;
 		builder.append( _font.size ) ;
@@ -94,12 +93,12 @@ public class GLFontGenerator
 		builder.append( _font.fontName ) ;
 
 		canvas.setFont( builder.toString() ) ;
-		canvas.setFillStyle( "#FF0000" ) ;
+		canvas.setFillStyle( "#FFFFFF" ) ;
 		canvas.clearRect( 0.0, 0.0, ( double )width, ( double )height ) ;
 
 		final char[] c = new char[1] ;
 		final double point = 1.0 / width ;
-		final float ascent = 10.0f ;//Math.abs( paint.ascent() ) ;
+		final float ascent = height / 2.0f ;//10.0f ;
 
 		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
 		int j = 0 ;
@@ -118,8 +117,6 @@ public class GLFontGenerator
 				final float x1 = ( float )( start * point ) ;
 				final float x2 = ( float )( ( start + advance ) * point ) ;
 
-				//System.out.println( "Char: " + txt + " Start: " + start + " Adv: " + advance + " x1: " + x1 + " x2: " + x2 ) ;
-
 				final Vector3 maxPoint = new Vector3( advance, height, 0.0f ) ;
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
@@ -128,8 +125,7 @@ public class GLFontGenerator
 			}
 		}
 
-		final ImageData data = canvas.getImageData( 0.0, 0.0, width, height ) ;
-		_map.fontMap.setTexture( manager.bind( data ) ) ;
+		_map.fontMap.setTexture( manager.bind( canvas.getCanvas() ) ) ;
 		return _map ;
 	}
 

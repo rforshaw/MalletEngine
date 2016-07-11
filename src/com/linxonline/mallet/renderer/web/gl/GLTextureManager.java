@@ -152,7 +152,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
 
-	public Texture bind( final ImageData _image )
+	public Texture bind( final HTMLCanvasElement _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
@@ -162,9 +162,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final ImageData _image, final InternalFormat _format )
+	public Texture bind( final HTMLCanvasElement _image, final InternalFormat _format )
 	{
-		System.out.println( "W: " + _image.getWidth() + " H: " + _image.getHeight() ) ;
 		final WebGLRenderingContext gl = GLRenderer.getContext() ;
 		if( gl == null )
 		{
@@ -179,17 +178,14 @@ public class GLTextureManager extends AbstractManager<Texture>
 		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.CLAMP_TO_EDGE ) ;
 		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.CLAMP_TO_EDGE ) ;
 
-		//gl.pixelStorei( GL3.UNPACK_ALIGNMENT, 1 ) ;
 		gl.texImage2D( GL3.TEXTURE_2D, 
 						 0, 
 						 GL3.RGBA,
 						 GL3.RGBA, 
 						 GL3.UNSIGNED_BYTE, 
-						 _image ) ;		GLRenderer.handleError( "texImage2D", gl ) ;
+						 _image ) ;
 
-		//gl.generateMipmap( GL3.TEXTURE_2D ) ;
 		gl.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
-
 		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
 	}
 

@@ -76,10 +76,4 @@ public class GLDefaultSystem extends BasicSystem
 		eventController.update() ;		// Process the Events this system is interested in
 		return true ;					// Informs the Game System whether to continue updating or not.
 	}
-
-	@Override
-	public void draw( final float _dt )
-	{
-		super.draw( _dt ) ;
-	}
 }

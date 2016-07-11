@@ -24,7 +24,7 @@ public class AudioAssist
 		Request the active audio system to clean-up any 
 		unused resources it may still be referencing.
 	*/
-	public static Event constructAnimationClean()
+	public static Event constructAudioClean()
 	{
 		return AUDIO_CLEAN ;
 	}

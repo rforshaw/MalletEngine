@@ -1,5 +1,7 @@
 package com.linxonline.mallet.audio.web ;
 
+import org.teavm.jso.dom.html.HTMLSourceElement ;
+
 import com.linxonline.mallet.audio.SoundInterface ;
 
 /**
@@ -8,7 +10,12 @@ import com.linxonline.mallet.audio.SoundInterface ;
 */
 public class WebSound implements SoundInterface
 {
-	public WebSound() {}
-	
+	private HTMLSourceElement source ;
+
+	public WebSound( final HTMLSourceElement _source )
+	{
+		source = _source ;
+	}
+
 	public void destroy() {}
 }
