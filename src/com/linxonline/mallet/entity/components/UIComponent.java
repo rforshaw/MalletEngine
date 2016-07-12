@@ -63,16 +63,20 @@ public class UIComponent extends InputComponent
 		}
 	}
 
+	/**
+		Called when parent is flagged for destruction.
+		Will remove all UIElements from component.
+	*/
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
-		//for( final UIElement element : elements )
-		//{
-		//	element.setDelegates( null, null ) ;
-		//}
+		for( final UIElement element : elements )
+		{
+			removeElement( element ) ;
+		}
 
 		toDestroy = _callback ;
-		super.readyToDestroy( _callback ) ;
+		//super.readyToDestroy( _callback ) ;
 	}
 
 	/**
@@ -117,6 +121,11 @@ public class UIComponent extends InputComponent
 		}
 		events.clear() ;
 		eventController.update() ;
+
+		if( toDestroy != null )
+		{
+			toDestroy.ready( this ) ;
+		}
 	}
 
 	@Override
