@@ -76,7 +76,6 @@ public class UIComponent extends InputComponent
 		}
 
 		toDestroy = _callback ;
-		//super.readyToDestroy( _callback ) ;
 	}
 
 	/**

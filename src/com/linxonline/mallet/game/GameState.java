@@ -584,6 +584,8 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void clear()
 	{
+		eventController.reset() ;
+
 		eventSystem.clearEvents() ;
 		eventSystem.clearHandlers() ;
 
