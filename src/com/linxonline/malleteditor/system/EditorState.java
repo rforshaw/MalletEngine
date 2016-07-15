@@ -9,6 +9,7 @@ import com.linxonline.mallet.game.GameState ;
 import com.linxonline.mallet.ui.BaseListener ;
 import com.linxonline.mallet.ui.UIListener ;
 import com.linxonline.mallet.ui.UIElement ;
+import com.linxonline.mallet.ui.UIFactory ;
 import com.linxonline.mallet.ui.UILayout ;
 import com.linxonline.mallet.ui.UIButton ;
 import com.linxonline.mallet.ui.UISpacer ;
@@ -87,38 +88,7 @@ public class EditorState extends GameState
 
 	private UILayout createMainLayout( final UIComponent _ui )
 	{
-		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
-
-		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
-		final UILayout layout = new UILayout( UILayout.Type.VERTICAL,
-											  new Vector3(),
-											  new Vector3(),
-											  dimension ) ;
-
-		GlobalConfig.addNotify( "RENDERWIDTH", new Notification.Notify<String>()
-		{
-			public void inform( final String _data )
-			{
-				dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
-
-				CameraAssist.amendOrthographic( uiCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( uiCamera, ( int )dimension.x, ( int )dimension.y ) ;
-			}
-		} ) ;
-
-		GlobalConfig.addNotify( "RENDERHEIGHT", new Notification.Notify<String>()
-		{
-			public void inform( final String _data )
-			{
-				dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
-				layout.setLength( dimension.x, dimension.y, dimension.z ) ;
-
-				CameraAssist.amendOrthographic( uiCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( uiCamera, ( int )dimension.x, ( int )dimension.y ) ;
-			}
-		} ) ;
+		final UILayout layout = UIFactory.constructWindowLayout( UILayout.Type.VERTICAL, uiCamera ) ;
 
 		layout.addElement( createHeaderToolbar( uiWorld, _ui ) ) ;
 		layout.addElement( createMainFrame( edCamera, edWorld, uiWorld ) ) ;

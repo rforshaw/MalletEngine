@@ -9,4 +9,4 @@ for /R ./ %%a in (*.jar) do (
 set CLASSPATH=!CLASSPATH!"
 echo !CLASSPATH!
 
-java com.linxonline.mallet.main.Main
+java -Dsun.awt.noerasebackground=true com.linxonline.mallet.main.Main

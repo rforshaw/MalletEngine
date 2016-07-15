@@ -149,12 +149,12 @@ public class UIButton extends UIElement
 					delegate = _delegate ;
 					if( draw != null )
 					{
-						delegate.addBasicDraw( draw, null ) ;
+						delegate.addBasicDraw( draw ) ;
 					}
 
 					if( drawText != null )
 					{
-						delegate.addTextDraw( drawText, null ) ;
+						delegate.addTextDraw( drawText ) ;
 					}
 				}
 			} ) ) ;
