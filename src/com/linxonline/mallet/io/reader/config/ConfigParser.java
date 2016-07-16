@@ -68,6 +68,12 @@ public class ConfigParser
 
 				var = _src.getString( "CAPTUREMOUSE", "false" ) ;
 				_dest.addBoolean( "CAPTUREMOUSE", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "KEEPRATIO", "true" ) ;
+				_dest.addBoolean( "KEEPRATIO", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "DISPLAYRENDERPARITY", "false" ) ;
+				_dest.addBoolean( "DISPLAYRENDERPARITY", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}

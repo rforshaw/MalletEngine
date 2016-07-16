@@ -43,6 +43,7 @@ public class UIFactory
 				{
 					dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 					layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
@@ -55,6 +56,7 @@ public class UIFactory
 				{
 					dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
 					layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;

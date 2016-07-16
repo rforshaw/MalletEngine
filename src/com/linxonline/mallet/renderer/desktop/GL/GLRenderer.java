@@ -854,6 +854,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
 	{
 		super.setDisplayDimensions( _width, _height ) ;
+		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == true )
+		{
+			// Update the render dimensions if the window size 
+			// and render size are meant to be identical.
+			// Some users will not want parity, using a larger window 
+			// size but rendering to a smaller size and subsequently being upscaled.
+			super.setRenderDimensions( _width, _height ) ;
+		}
 		resize() ;
 	}
 

@@ -162,6 +162,7 @@ public final class RenderInfo implements InputAdapterInterface
 	public void setKeepRenderRatio( final boolean _ratio )
 	{
 		holdToRenderRatio = _ratio ;
+		GlobalConfig.addBoolean( "KEEPRATIO", _ratio ) ;
 		updateInfo() ;
 	}
 

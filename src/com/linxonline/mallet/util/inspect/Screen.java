@@ -38,9 +38,9 @@ public class Screen
 	public ScreenMode getBestScreenMode()
 	{
 		ScreenMode[] screens = QuickSort.quicksort( getScreenModes() ) ;
-		return screens[0] ;
+		return screens[screens.length - 1] ;
 	}
-	
+
 	@Override
 	public String toString()
 	{

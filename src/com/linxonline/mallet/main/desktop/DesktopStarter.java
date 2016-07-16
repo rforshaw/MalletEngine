@@ -12,6 +12,7 @@ import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
+import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
@@ -166,6 +167,9 @@ public abstract class DesktopStarter extends StarterInterface
 			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
 			displayWidth = screen.getWidth() ;
 			displayHeight = screen.getHeight() ;
+
+			System.out.println( desktop.getScreens()[0] ) ;
+			System.out.println( "Display: " + displayWidth + " " + displayHeight ) ;
 		}
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
@@ -174,5 +178,8 @@ public abstract class DesktopStarter extends StarterInterface
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
+
+		final RenderInfo info = render.getRenderInfo() ;
+		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
 	}
 }

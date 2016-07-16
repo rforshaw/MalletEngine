@@ -11,6 +11,7 @@ import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
 import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.game.GameLoader ;
 
@@ -74,16 +75,11 @@ public class EditorStarter extends DesktopStarter
 	{
 		super.setRenderSettings( _system ) ;
 		final RenderInterface render = _system.getRenderInterface() ;
-		render.getRenderInfo().setKeepRenderRatio( false ) ;
 
-		final GLDefaultSystem backend = ( GLDefaultSystem )backendSystem ;
-		backend.getFrame().addComponentListener( new java.awt.event.ComponentAdapter() 
-		{
-			public void componentResized( ComponentEvent e )
-			{
-				render.setRenderDimensions( backend.getFrame().getWidth(), backend.getFrame().getHeight() ) ;
-			}
-		});
+		// Override config setting and prevent ratio from being adhered to
+		// Force Display and Render size parity.
+		render.getRenderInfo().setKeepRenderRatio( false ) ;
+		GlobalConfig.addBoolean( "DISPLAYRENDERPARITY", true ) ;
 	}
 
 	@Override
