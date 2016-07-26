@@ -82,7 +82,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -260,13 +260,13 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void playAudioExample()
 			{
-				/*eventSystem.addEvent( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
+				eventSystem.addEvent( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
 				{
 					public void callback( AudioDelegate _delegate )
 					{
 						_delegate.addAudio( AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ) ;
 					}
-				} ) ) ;*/
+				} ) ) ;
 
 				/*final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
 				//System.out.println( ogg ) ;

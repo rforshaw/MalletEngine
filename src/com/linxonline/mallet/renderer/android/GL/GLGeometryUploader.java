@@ -49,6 +49,10 @@ public class GLGeometryUploader
 
 	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;
 	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
+
+	private MalletColour shapeColour = new MalletColour() ;
+	private final Vector2 uv = new Vector2() ;
+	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
@@ -202,7 +206,7 @@ public class GLGeometryUploader
 					case NORMAL :
 					case POINT  :
 					{
-						final Vector3 point = _shape.getPoint( i, j ) ;
+						_shape.getVector3( i, j, point ) ;
 						Matrix4.multiply( point, _matrix, temp ) ;
 						verticies[increment++] = temp.x ;
 						verticies[increment++] = temp.y ;
@@ -211,13 +215,13 @@ public class GLGeometryUploader
 					}
 					case COLOUR :
 					{
-						final MalletColour colour = _shape.getColour( i, j ) ;
-						verticies[increment++] = getABGR( colour ) ;
+						_shape.getColour( i, j, shapeColour ) ;
+						verticies[increment++] = getABGR( shapeColour ) ;
 						break ;
 					}
 					case UV     :
 					{
-						final Vector2 uv = _shape.getUV( i, j ) ;
+						_shape.getVector2( i, j, uv ) ;
 						verticies[increment++] = uv.x ;
 						verticies[increment++] = uv.y ;
 						break ;
@@ -680,7 +684,7 @@ public class GLGeometryUploader
 							case NORMAL :
 							case POINT  :
 							{
-								final Vector3 point = glyph.shape.getPoint( j, k ) ;
+								glyph.shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, positionMatrix, temp ) ;
 								verticies[vertexInc++] = temp.x ;
 								verticies[vertexInc++] = temp.y ;
@@ -690,13 +694,13 @@ public class GLGeometryUploader
 							case COLOUR :
 							{
 								// GLDrawData colour overrides Shapes colour.
-								final MalletColour c = ( colour != null ) ? colour : glyph.shape.getColour( j, k ) ;
+								final MalletColour c = ( colour != null ) ? colour : glyph.shape.getColour( j, k, shapeColour ) ;
 								verticies[vertexInc++] = getABGR( c ) ;
 								break ;
 							}
 							case UV     :
 							{
-								final Vector2 uv = glyph.shape.getUV( j, k ) ;
+								glyph.shape.getVector2( j, k, uv ) ;
 								verticies[vertexInc++] = uv.x ;
 								verticies[vertexInc++] = uv.y ;
 								break ;

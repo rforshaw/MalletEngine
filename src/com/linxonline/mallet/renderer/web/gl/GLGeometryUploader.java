@@ -48,6 +48,10 @@ public class GLGeometryUploader
 
 	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;
 	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
+
+	private MalletColour shapeColour = new MalletColour() ;
+	private final Vector2 uv = new Vector2() ;
+	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
@@ -197,7 +201,7 @@ public class GLGeometryUploader
 					case NORMAL :
 					case POINT  :
 					{
-						final Vector3 point = _shape.getPoint( i, j ) ;
+						_shape.getVector3( i, j, point ) ;
 						Matrix4.multiply( point, _matrix, temp ) ;
 						verticies.set( increment++, temp.x ) ;
 						verticies.set( increment++, temp.y ) ;
@@ -206,13 +210,13 @@ public class GLGeometryUploader
 					}
 					case COLOUR :
 					{
-						final MalletColour colour = _shape.getColour( i, j ) ;
-						setColour( increment++, colour, byteVersion ) ;
+						_shape.getColour( i, j, shapeColour ) ;
+						setColour( increment++, shapeColour, byteVersion ) ;
 						break ;
 					}
 					case UV     :
 					{
-						final Vector2 uv = _shape.getUV( i, j ) ;
+						_shape.getVector2( i, j, uv ) ;
 						verticies.set( increment++, uv.x ) ;
 						verticies.set( increment++, uv.y ) ;
 						break ;
@@ -673,7 +677,7 @@ public class GLGeometryUploader
 							case NORMAL :
 							case POINT  :
 							{
-								final Vector3 point = glyph.shape.getPoint( j, k ) ;
+								glyph.shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, positionMatrix, temp ) ;
 								verticies.set( vertexInc++, temp.x ) ;
 								verticies.set( vertexInc++, temp.y ) ;
@@ -689,7 +693,7 @@ public class GLGeometryUploader
 							}
 							case UV     :
 							{
-								final Vector2 uv = glyph.shape.getUV( j, k ) ;
+								glyph.shape.getVector2( j, k, uv ) ;
 								verticies.set( vertexInc++, uv.x ) ;
 								verticies.set( vertexInc++, uv.y ) ;
 								break ;

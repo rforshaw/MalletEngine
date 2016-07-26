@@ -31,6 +31,14 @@ public class Shape
 		UV,			// Vector2
 		NORMAL ;	// Vector3
 
+		public static Swivel[] constructDefault()
+		{
+			final Swivel[] swivel = new Swivel[2] ;
+			swivel[0] = Swivel.POINT ;
+			swivel[1] = Swivel.COLOUR ;
+			return swivel ;
+		}
+		
 		public static Swivel[] getSwivelByArray( final ArrayList<String> _text )
 		{
 			final int size = _text.size() ;
@@ -68,10 +76,44 @@ public class Shape
 
 			return -1 ;
 		}
+
+		public static int getSwivelFloatSize( final Swivel[] _swivel, final int _length )
+		{
+			int size = 0 ;
+			for( int i = 0; i < _length; i++ )
+			{
+				switch( _swivel[i] )
+				{
+					case POINT  : size += 3 ; break ;	// Vector3
+					case COLOUR : size += 1 ; break ;	// MalletColour
+					case UV     : size += 2 ; break ;	// Vector2
+					case NORMAL : size += 3 ; break ;	// Vector3
+				}
+			}
+
+			return size ;
+		}
+
+		public static Object[] construct( final Swivel[] _swivel )
+		{
+			final Object[] obj = new Object[_swivel.length] ;
+			for( int i = 0; i < _swivel.length; i++ )
+			{
+				switch( _swivel[i] )
+				{
+					case POINT  : obj[i] = new Vector3() ;      break ;
+					case COLOUR : obj[i] = new MalletColour() ; break ;
+					case UV     : obj[i] = new Vector2() ;      break ;
+					case NORMAL : obj[i] = new Vector3() ;      break ;
+				}
+			}
+
+			return obj ;
+		}
 	}
 
 	private final Swivel[] swivel ;
-	private final Object[] verticies ;
+	private final float[] verticies ;
 	public final int[] indicies ;
 
 	public Style style = Style.LINE_STRIP ;
@@ -90,15 +132,7 @@ public class Shape
 				  final int _indexSize,
 				  final int _pointSize )
 	{
-		swivel = new Swivel[2] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
-
-		verticies   = new Object[swivel.length * _pointSize] ;
-		indicies    = new int[_indexSize] ;
-
-		style       = _style ;
-		vertexSize  = _pointSize ; 
+		this( _style, Swivel.constructDefault(), _indexSize, _pointSize ) ;
 	}
 
 	public Shape( final Style _style,
@@ -106,55 +140,32 @@ public class Shape
 				  final int _indexSize,
 				  final int _pointSize )
 	{
-		swivel = _swivel ;
-		verticies   = new Object[swivel.length * _pointSize] ;
-		indicies    = new int[_indexSize] ;
+		swivel    = _swivel ;
+		verticies = new float[Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize] ;
+		indicies  = new int[_indexSize] ;
 
-		style       = _style ;
-		vertexSize  = _pointSize ;
+		style      = _style ;
+		vertexSize = _pointSize ;
 	}
 
 	public Shape( final Shape _shape )
 	{
-		swivel = new Swivel[_shape.swivel.length] ;
-		verticies   = new Object[_shape.verticies.length] ;
-		indicies    = new int[_shape.indicies.length] ;
-		style       = _shape.style ;
+		swivel    = new Swivel[_shape.swivel.length] ;
+		verticies = new float[_shape.verticies.length] ;
+		indicies  = new int[_shape.indicies.length] ;
+		style     = _shape.style ;
 
 		indexIncrement  = _shape.indexIncrement ;
 		vertexIncrement = _shape.vertexIncrement ;
 		vertexSize      = _shape.vertexSize ;
 
-		for( int i = 0; i < swivel.length; i++ )
-		{
-			swivel[i] = _shape.swivel[i] ;
-		}
-
-		for( int i = 0; i < indicies.length; i++ )
-		{
-			indicies[i] = _shape.indicies[i] ;
-		}
-
-		for( int i = 0; i < verticies.length; i++ )
-		{
-			final Object obj = _shape.verticies[i] ;
-			if( obj instanceof Vector3 )
-			{
-				verticies[i] = new Vector3( ( Vector3 )_shape.verticies[i] ) ;
-			}
-			else if( obj instanceof Vector2 )
-			{
-				verticies[i] = new Vector2( ( Vector2 )_shape.verticies[i] ) ;
-			}
-			else if( obj instanceof MalletColour )
-			{
-				verticies[i] = new MalletColour( ( MalletColour )_shape.verticies[i] ) ;
-			}
-		}
+		System.arraycopy( _shape.swivel, 0, swivel, 0, swivel.length ) ;
+		System.arraycopy( _shape.indicies, 0, indicies, 0, indicies.length ) ;
+		System.arraycopy( _shape.verticies, 0, verticies, 0, verticies.length ) ;
 	}
 
 	private Shape( final Swivel[] _swivel,
-				   final Object[] _verticies,
+				   final float[] _verticies,
 				   final int[] _indicies,
 				   final Style _style,
 				   final int _vertexSize )
@@ -164,8 +175,6 @@ public class Shape
 		indicies    = _indicies ;
 		style       = _style ;
 
-		//indexIncrement = _shape.indexIncrement ;
-		//vertexIncrement = _shape.vertexIncrement ;
 		vertexSize = _vertexSize ;
 	}
 
@@ -176,9 +185,33 @@ public class Shape
 
 	public void addVertex( final Object[] _vertex )
 	{
-		for( int i = 0; i < _vertex.length; i++ )
+		for( int i = 0; i < swivel.length; i++ )
 		{
-			verticies[vertexIncrement++] = _vertex[i] ;
+			switch( swivel[i] )
+			{
+				case POINT  :
+				case NORMAL :
+				{
+					final Vector3 point = ( Vector3 )_vertex[i] ;
+					verticies[vertexIncrement++] = point.x ;
+					verticies[vertexIncrement++] = point.y ;
+					verticies[vertexIncrement++] = point.z ;
+					break ;
+				}
+				case COLOUR :
+				{
+					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					verticies[vertexIncrement++] = colour.toFloat() ;
+					break ;
+				}
+				case UV     :
+				{
+					final Vector2 uv = ( Vector2 )_vertex[i] ;
+					verticies[vertexIncrement++] = uv.x ;
+					verticies[vertexIncrement++] = uv.y ;
+					break ;
+				}
+			}
 		}
 	}
 
@@ -189,37 +222,125 @@ public class Shape
 			return false ;
 		}
 
-		int start = _index * swivel.length ;
-		for( int i = 0; i < _vertex.length; i++ )
+		int start = _index * Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		for( int i = 0; i < swivel.length; i++ )
 		{
-			_vertex[i] = verticies[start++] ;
+			switch( swivel[i] )
+			{
+				case POINT  :
+				case NORMAL :
+				{
+					final Vector3 point = ( Vector3 )_vertex[i] ;
+					point.x = verticies[start++] ;
+					point.y = verticies[start++] ;
+					point.z = verticies[start++] ;
+					break ;
+				}
+				case COLOUR :
+				{
+					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					colour.changeColour( verticies[start++] ) ;
+					break ;
+				}
+				case UV     :
+				{
+					final Vector2 uv = ( Vector2 )_vertex[i] ;
+					uv.x = verticies[start++] ;
+					uv.y = verticies[start++] ;
+					break ;
+				}
+			}
 		}
 
 		return true ;
 	}
 
-	public Vector3 getPoint( final int _index, final int _swivelIndex )
+	public void setVector3( final int _index, final int _swivelIndex, final Vector3 _point )
 	{
-		final int index = ( _index * swivel.length ) + _swivelIndex ;
-		return ( Vector3 )verticies[index] ;
+		setVector3( _index, _swivelIndex, _point.x, _point.y, _point.z ) ;
 	}
 
-	public Vector2 getUV( final int _index, final int _swivelIndex )
+	public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
 	{
-		final int index = ( _index * swivel.length ) + _swivelIndex ;
-		return ( Vector2 )verticies[index] ;
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies[start]     = _x ;
+		verticies[start + 1] = _y ;
+		verticies[start + 2] = _z ;
+	}
+
+	public Vector3 getVector3( final int _index, final int _swivelIndex )
+	{
+		final Vector3 point = new Vector3() ;
+		return getVector3( _index, _swivelIndex, point ) ;
+	}
+
+	public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		_point.setXYZ( verticies[start], verticies[start + 1], verticies[start + 2] ) ;
+		return _point ;
+	}
+
+	public void setVector2( final int _index, final int _swivelIndex, final Vector2 _point )
+	{
+		setVector2( _index, _swivelIndex, _point.x, _point.y ) ;
+	}
+
+	public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies[start]       = _x ;
+		verticies[start + 1]   = _y ;
+	}
+
+	public Vector2 getVector2( final int _index, final int _swivelIndex )
+	{
+		final Vector2 uv = new Vector2() ;
+		return getVector2( _index, _swivelIndex, uv ) ;
+	}
+
+	public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		_uv.setXY( verticies[start], verticies[start + 1] ) ;
+		return _uv ;
+	}
+
+	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies[start] = _colour.toFloat() ;
 	}
 
 	public MalletColour getColour( final int _index, final int _swivelIndex )
 	{
-		final int index = ( _index * swivel.length ) + _swivelIndex ;
-		return ( MalletColour )verticies[index] ;
+		final MalletColour colour = new MalletColour() ;
+		return getColour( _index, _swivelIndex, colour ) ;
 	}
 
-	public Vector3 getNormal( final int _index, final int _swivelIndex )
+	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
-		final int index = ( _index * swivel.length ) + _swivelIndex ;
-		return ( Vector3 )verticies[index] ;
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		_colour.changeColour( verticies[start] ) ;
+		return _colour ;
 	}
 
 	public Shape.Style getStyle()
@@ -450,19 +571,19 @@ public class Shape
 	public static Shape updatePlaneGeometry( final Shape _plane, final Vector3 _length )
 	{
 		//_plane.getPoint( 0, 0 ).setXYZ() ;
-		_plane.getPoint( 1, 0 ).setXYZ( _length ) ;
-		_plane.getPoint( 2, 0 ).setXYZ( 0.0f, _length.y, 0.0f ) ;
-		_plane.getPoint( 3, 0 ).setXYZ( _length.x, 0.0f, 0.0f ) ;
+		_plane.setVector3( 1, 0, _length ) ;
+		_plane.setVector3( 2, 0, 0.0f, _length.y, 0.0f ) ;
+		_plane.setVector3( 3, 0, _length.x, 0.0f, 0.0f ) ;
 
 		return _plane ;
 	}
 
 	public static Shape updatePlaneUV( final Shape _plane, final Vector2 _minUV, final Vector2 _maxUV )
 	{
-		_plane.getUV( 0, 2 ).setXY( _minUV ) ;
-		_plane.getUV( 1, 2 ).setXY( _maxUV ) ;
-		_plane.getUV( 2, 2 ).setXY( _minUV.x, _maxUV.y ) ;
-		_plane.getUV( 3, 2 ).setXY( _maxUV.x, _minUV.y ) ;
+		_plane.setVector2( 0, 2, _minUV ) ;
+		_plane.setVector2( 1, 2, _maxUV ) ;
+		_plane.setVector2( 2, 2, _minUV.x, _maxUV.y ) ;
+		_plane.setVector2( 3, 2, _maxUV.x, _minUV.y ) ;
 
 		return _plane ;
 	}
@@ -559,6 +680,10 @@ public class Shape
 		final int swivelPointIndex = Swivel.getSwivelPointIndex( _shape.swivel ) ;
 		int size = indicies.size() ;
 
+		final Vector3 previous = new Vector3() ;
+		final Vector3 current = new Vector3() ;
+		final Vector3 next = new Vector3() ;
+
 		while( size >= 3 )
 		{
 			for( int i = 1; i < size - 1; i++ )
@@ -567,12 +692,13 @@ public class Shape
 				final int currentIndex = indicies.get( i ) ;
 				final int nextIndex = indicies.get( i + 1 ) ;
 
-				final Vector3 previous = _shape.getPoint( previousIndex, swivelPointIndex ) ;
-				final Vector3 current = _shape.getPoint( currentIndex, swivelPointIndex ) ;
-				final Vector3 next = _shape.getPoint( nextIndex, swivelPointIndex ) ;
+				_shape.getVector3( previousIndex, swivelPointIndex, previous ) ;
+				_shape.getVector3( currentIndex, swivelPointIndex, current ) ;
+				_shape.getVector3( nextIndex, swivelPointIndex, next ) ;
 
 				if( isInteriorVertex( current, previous, next ) == true &&
-					isTriangleEmpty( current, previous, next, indicies, _shape ) == true )
+					isTriangleEmpty( currentIndex, previousIndex, nextIndex,
+									 current, previous, next, indicies, _shape ) == true )
 				{
 					newIndicies.add( previousIndex ) ;
 					newIndicies.add( currentIndex ) ;
@@ -598,20 +724,25 @@ public class Shape
 		return area1.length() >= 0.0f && area2.length() >= 0.0f ;
 	}
 
-	private static boolean isTriangleEmpty( final Vector3 _current,
+	private static boolean isTriangleEmpty( final int _currentIndex,
+											final int _previousIndex,
+											final int _nextIndex,
+											final Vector3 _current,
 											final Vector3 _previous,
 											final Vector3 _next,
 											final ArrayList<Integer> _indicies,
 											final Shape _shape )
 	{
+		final Vector3 point = new Vector3() ;
 		final int swivelPointIndex = Swivel.getSwivelPointIndex( _shape.swivel ) ;
 		final int size = _indicies.size() ; 
 
 		for( int i = 0; i < size; i++ )
 		{
-			final Vector3 point = _shape.getPoint( _indicies.get( i ), swivelPointIndex ) ;
-			if( point != _current && point != _previous && point != _next )
+			final int index = _indicies.get( i ) ;
+			if( index != _currentIndex && index != _previousIndex && index != _nextIndex )
 			{
+				_shape.getVector3( index, swivelPointIndex, point ) ;
 				final boolean b1 = sign( point, _current, _previous ) < 0.0f ;
 				final boolean b2 = sign( point, _current, _next ) < 0.0f ;
 				final boolean b3 = sign( point, _previous, _next ) < 0.0f ;

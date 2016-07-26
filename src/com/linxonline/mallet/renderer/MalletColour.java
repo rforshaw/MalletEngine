@@ -14,6 +14,11 @@ public class MalletColour
 
 	public final byte[] colours = new byte[4] ; 	// red, green, blue, alpha
 
+	public MalletColour()
+	{
+		this( 0, 0, 0 ) ;
+	}
+
 	public MalletColour( final int _red, final int _green, final int _blue )
 	{
 		changeColour( ( byte )_red, ( byte )_green, ( byte )_blue, ( byte )255 ) ;
@@ -34,9 +39,20 @@ public class MalletColour
 		changeColour( _red, _green, _blue, _alpha ) ;
 	}
 
+	public MalletColour( final float _colour )
+	{
+		changeColour( _colour ) ;
+	}
+
 	public MalletColour( final MalletColour _colour )
 	{
 		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
+	}
+
+	public void changeColour( final float _colour )
+	{
+		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder() ) ;
+		changeColour( c[3], c[1], c[2], c[0] ) ;
 	}
 
 	public void changeColour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
@@ -67,9 +83,14 @@ public class MalletColour
 		return colours[ALPHA] ;
 	}
 
-	public int getRGBA()
+	public int toInt()
 	{
 		return ConvertBytes.toInt( colours, 0, 4 ) ;
+	}
+
+	public float toFloat()
+	{
+		return ConvertBytes.toFloat( colours, 0, 4 ) ;
 	}
 
 	public String toString()

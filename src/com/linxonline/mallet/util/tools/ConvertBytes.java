@@ -38,37 +38,61 @@ public final class ConvertBytes
 
 	public static byte[] toBytes( final int _int, final int _endian )
 	{
-		return allocate( 4, _endian ).putInt( _int ).array() ;
+		final byte[] bytes = new byte[4] ;
+		for( int i = 0; i < bytes.length; i++ )
+		{
+			bytes[i] = ( byte )( _int >> ( i * 8 ) ) ;
+		}
+		return bytes ;
+		//return allocate( 4, _endian ).putInt( _int ).array() ;
 	}
 
 	public static byte[] toBytes( final byte _byte, final int _endian )
 	{
-		return allocate( 1, _endian ).put( _byte ).array() ;
+		final byte[] bytes = new byte[1] ;
+		bytes[0] = _byte ;
+		return bytes ;
+		//return allocate( 1, _endian ).put( _byte ).array() ;
 	}
 
 	public static byte[] toBytes( final char _char, final int _endian )
 	{
-		return allocate( 2, _endian ).putChar( _char ).array() ;
+		return toBytes( ( short )_char, _endian ) ;
+		//return allocate( 2, _endian ).putChar( _char ).array() ;
 	}
 
 	public static byte[] toBytes( final long _long, final int _endian )
 	{
-		return allocate( 8, _endian ).putLong( _long ).array() ;
+		final byte[] bytes = new byte[8] ;
+		for( int i = 0; i < bytes.length; i++ )
+		{
+			bytes[i] = ( byte )( _long >> ( i * 8 ) ) ;
+		}
+		return bytes ;
+		//return allocate( 8, _endian ).putLong( _long ).array() ;
 	}
 
 	public static byte[] toBytes( final short _short, final int _endian )
 	{
-		return allocate( 2, _endian ).putShort( _short ).array() ;
+		final byte[] bytes = new byte[2] ;
+		for( int i = 0; i < bytes.length; i++ )
+		{
+			bytes[i] = ( byte )( _short >> ( i * 8 ) ) ;
+		}
+		return bytes ;
+		//return allocate( 2, _endian ).putShort( _short ).array() ;
 	}
 
 	public static byte[] toBytes( final float _float, final int _endian )
 	{
-		return allocate( 4, _endian ).putFloat( _float ).array() ;
+		return toBytes( Float.floatToRawIntBits( _float ), _endian ) ;
+		//return allocate( 4, _endian ).putFloat( _float ).array() ;
 	}
 
 	public static byte[] toBytes( final double _double, final int _endian )
 	{
-		return allocate( 8, _endian ).putDouble( _double ).array() ;
+		return toBytes( Double.doubleToRawLongBits( _double ), _endian ) ;
+		//return allocate( 8, _endian ).putDouble( _double ).array() ;
 	}
 
 	public static byte[] toBytes( final boolean _bool, final int _endian )
@@ -148,32 +172,52 @@ public final class ConvertBytes
 
 	public static int toInt( final byte[] _int, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _int, _offset, _length ).getInt() ;
+		int asInt = 0 ;
+		int increment = 0 ;
+		final int size = _offset + _length ;
+		for( int i = size - 1; i >= _offset; i-- )
+		{
+			asInt |= ( _int[i] & 0xFF ) << ( 8 * increment++ ) ;
+		}
+		return asInt ;
+		//return ByteBuffer.wrap( _int, _offset, _length ).getInt() ;
 	}
 
 	public static char toChar( final byte[] _char, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _char, _offset, _length ).getChar() ;
+		return ( char )toInt( _char, _offset, _length ) ;
+		//return ByteBuffer.wrap( _char, _offset, _length ).getChar() ;
 	}
 
 	public static long toLong( final byte[] _long, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _long, _offset, _length ).getLong() ;
+		long asLong = 0 ;
+		int increment = 0 ;
+		final int size = _offset + _length ;
+		for( int i = size - 1; i >= _offset; i-- )
+		{
+			asLong |= ( _long[i] & 0xFF ) << ( 8 * increment++ ) ;
+		}
+		return asLong ;
+		//return ByteBuffer.wrap( _long, _offset, _length ).getLong() ;
 	}
 
 	public static short toShort( final byte[] _short, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _short, _offset, _length ).getShort() ;
+		return ( short )toInt( _short, _offset, _length ) ;
+		//return ByteBuffer.wrap( _short, _offset, _length ).getShort() ;
 	}
 
 	public static float toFloat( final byte[] _float, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _float, _offset, _length ).getFloat() ;
+		return Float.intBitsToFloat( toInt( _float, _offset, _length ) ) ;
+		//return ByteBuffer.wrap( _float, _offset, _length ).getFloat() ;
 	}
 
 	public static double toDouble( final byte[] _double, final int _offset, int _length )
 	{
-		return ByteBuffer.wrap( _double, _offset, _length ).getDouble() ;
+		return Double.longBitsToDouble( toLong( _double, _offset, _length ) ) ;
+		//return ByteBuffer.wrap( _double, _offset, _length ).getDouble() ;
 	}
 
 	public static boolean toBoolean( final byte[] _bool, final int _offset, int _length )
