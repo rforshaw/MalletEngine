@@ -164,8 +164,10 @@ public class GLTextureManager extends AbstractManager<Texture>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			for( final Tuple<String, Bitmap> tuple : toBind )
+			final int size = toBind.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final Tuple<String, Bitmap> tuple = toBind.get( i ) ;
 				final Bitmap bitmap = tuple.getRight() ;
 				add( tuple.getLeft(), bind( bitmap ) ) ;
 				bitmap.recycle() ;

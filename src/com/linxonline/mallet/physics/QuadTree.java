@@ -87,6 +87,8 @@ public class QuadTree
 		private boolean parent = false ;
 		private int nextHull = 0 ;
 
+		private final Vector2 absolute = new Vector2() ;		// Used by insertToQuadrant() - Android optimisation
+
 		public QuadNode( final Quadrant _quadrant, final int _tier )
 		{
 			this( 0.0f, 0.0f, _quadrant, _tier ) ;
@@ -328,9 +330,11 @@ public class QuadTree
 			// to insert the hull again.
 			// Inserting the hull is costly, and should 
 			// only be done, if it isn't there already.
-			final Quadrant[] used = new Quadrant[4] ;
+			boolean usedTopLeft = false ;
+			boolean usedTopRight = false ;
+			boolean usedBottomLeft = false ;
+			boolean usedBottomRight = false ;
 
-			final Vector2 absolute = new Vector2() ;
 			final Vector2[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i++ )
 			{
@@ -350,9 +354,9 @@ public class QuadTree
 				{
 					case TOP_LEFT     :
 					{
-						if( used[0] == null )
+						if( usedTopLeft == false )
 						{
-							used[0] = Quadrant.TOP_LEFT ;
+							usedTopLeft = true ;
 							if( topLeft.insertHull( _hull ) == true )
 							{
 								++added ;
@@ -362,9 +366,9 @@ public class QuadTree
 					}
 					case TOP_RIGHT    :
 					{
-						if( used[1] == null )
+						if( usedTopRight == false )
 						{
-							used[1] = Quadrant.TOP_RIGHT ;
+							usedTopRight = true ;
 							if( topRight.insertHull( _hull ) == true )
 							{
 								++added ;
@@ -374,9 +378,9 @@ public class QuadTree
 					}
 					case BOTTOM_LEFT  :
 					{
-						if( used[2] == null )
+						if( usedBottomLeft == false )
 						{
-							used[2] = Quadrant.BOTTOM_LEFT ;
+							usedBottomLeft = true ;
 							if( bottomLeft.insertHull( _hull ) == true )
 							{
 								++added ;
@@ -386,9 +390,9 @@ public class QuadTree
 					}
 					case BOTTOM_RIGHT :
 					{
-						if( used[3] == null )
+						if( usedBottomRight == false )
 						{
-							used[3] = Quadrant.BOTTOM_RIGHT ;
+							usedBottomRight = true ;
 							if( bottomRight.insertHull( _hull ) == true )
 							{
 								++added ;

@@ -76,8 +76,10 @@ public class GLGeometryUploader
 	public void draw( final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
 		//System.out.println( "Buffers: " + buffers.size() ) ;
-		for( final GLBuffer buffer : buffers )
+		final int size = buffers.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final GLBuffer buffer = buffers.get( i ) ;
 			buffer.draw( _worldProjection, _uiProjection ) ;
 		}
 	}
@@ -467,8 +469,10 @@ public class GLGeometryUploader
 			}
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
-			for( final GLGeometry geometry : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final GLGeometry geometry = buffers.get( 0 ) ;
 				GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Draw Bind Index: " ) ;
 				GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: " ) ;
 

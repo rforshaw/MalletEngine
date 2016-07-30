@@ -56,13 +56,13 @@ public class MalletColour
 
 	public void changeColour( final int _colour )
 	{
-		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder() ) ;
+		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder(), colours ) ;
 		changeColour( c[0], c[1], c[2], c[3] ) ;
 	}
 
 	public void changeColour( final float _colour )
 	{
-		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder() ) ;
+		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder(), colours ) ;
 		changeColour( c[0], c[1], c[2], c[3] ) ;
 	}
 

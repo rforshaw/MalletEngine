@@ -42,6 +42,16 @@ public final class ConvertBytes
 
 	/**VARIABLE to BYTE ARRAY**/
 
+	public static byte[] toBytes( final int _int, final int _endian, final byte[] _bytes )
+	{
+		return impl.toBytes( _int, _endian, _bytes ) ;
+	}
+
+	public static byte[] toBytes( final float _float, final int _endian, final byte[] _bytes )
+	{
+		return impl.toBytes( _float, _endian, _bytes ) ;
+	}
+
 	public static byte[] toBytes( final int _int, final int _endian )
 	{
 		return impl.toBytes( _int, _endian ) ;
@@ -271,17 +281,26 @@ public final class ConvertBytes
 
 		/**VARIABLE to BYTE ARRAY**/
 
-		public byte[] toBytes( final int _int, final int _endian )
+		public byte[] toBytes( final int _int, final int _endian, final byte[] _bytes )
 		{
 			// Big Endian
-			return new byte[]
-			{ 
-				( byte )( ( _int >> 24 ) & 0xFF ),
-				( byte )( ( _int >> 16 ) & 0xFF ),
-				( byte )( ( _int >> 8 ) & 0xFF ),
-				( byte )( ( _int >> 0 ) & 0xFF )
-			} ;
+			_bytes[0] = ( byte )( ( _int >> 24 ) & 0xFF ) ;
+			_bytes[1] = ( byte )( ( _int >> 16 ) & 0xFF ) ;
+			_bytes[2] = ( byte )( ( _int >> 8 ) & 0xFF ) ;
+			_bytes[3] = ( byte )( ( _int >> 0 ) & 0xFF ) ;
+
+			return _bytes ;
 			//return allocate( 4, _endian ).putInt( _int ).array() ;
+		}
+
+		public byte[] toBytes( final float _float, final int _endian, final byte[] _bytes )
+		{
+			return toBytes( Float.floatToRawIntBits( _float ), _endian, _bytes ) ;
+		}
+
+		public byte[] toBytes( final int _int, final int _endian )
+		{
+			return toBytes( _int, _endian, new byte[4] ) ;
 		}
 
 		public byte[] toBytes( final byte _byte, final int _endian )
@@ -330,7 +349,7 @@ public final class ConvertBytes
 
 		public byte[] toBytes( final float _float, final int _endian )
 		{
-			return toBytes( Float.floatToRawIntBits( _float ), _endian ) ;
+			return toBytes( _float, _endian, new byte[4] ) ;
 			//return allocate( 4, _endian ).putFloat( _float ).array() ;
 		}
 
@@ -672,6 +691,9 @@ public final class ConvertBytes
 		public int nativeOrder() ;
 
 		/**VARIABLE to BYTE ARRAY**/
+
+		public byte[] toBytes( final int _int, final int _endian, final byte[] _bytes ) ;
+		public byte[] toBytes( final float _float, final int _endian, final byte[] _bytes ) ;
 
 		public byte[] toBytes( final int _int, final int _endian ) ;
 		public byte[] toBytes( final byte _byte, final int _endian ) ;

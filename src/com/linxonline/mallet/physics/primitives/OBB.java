@@ -101,11 +101,18 @@ public class OBB
 		return new Vector2( x, y ) ;
 	}
 
+	public Vector2 getCenter( final Vector2 _center )
+	{
+		_center.setXY( position ) ;
+		_center.add( offset ) ;
+		return _center ;
+	}
+
 	public Vector2 getCenter()
 	{
-		return Vector2.add( position, offset ) ;
+		return getCenter( new Vector2() ) ;//Vector2.add( position, offset ) ;
 	}
-	
+
 	/**
 		NEEDS TO BE REIMPLEMENTED
 	**/

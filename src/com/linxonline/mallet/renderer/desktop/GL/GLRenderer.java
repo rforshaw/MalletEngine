@@ -544,6 +544,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 				if( _data.toUpdate() == false &&
 					_data.getUpdateType() == UpdateType.ON_DEMAND )
 				{
+					// Only upload new model state if _data is flagged 
+					// as to be updated or UpdateType is CONTINUOUS.
 					return ;
 				}
 
@@ -769,6 +771,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		System.out.println( "GL Contex initialised.." ) ;
 		gl = _drawable.getGL().getGL3() ;
 
+		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 		//GLRenderer.handleError( "VSync: ", gl ) ;
 

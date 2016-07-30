@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.caches ;
 
-import java.util.LinkedList ;
+import java.util.ArrayDeque ;
 
 /**
 	Provides a simple object cache to retrieve an object 
@@ -9,7 +9,7 @@ import java.util.LinkedList ;
 */
 public class ObjectCache<T extends Cacheable> implements CacheInterface<T>
 {
-	private final LinkedList<T> available = new LinkedList<T>() ;	// Pool of objects to retrieve.
+	private final ArrayDeque<T> available = new ArrayDeque<T>() ;	// Pool of objects to retrieve.
 	private final Class<T> creator ;								// Allows the creation of new default objects.
 
 	public ObjectCache( final Class<T> _creator )

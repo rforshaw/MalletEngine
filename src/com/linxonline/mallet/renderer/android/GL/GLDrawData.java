@@ -59,8 +59,10 @@ public class GLDrawData extends DrawData
 
 	public void clearTextures()
 	{
-		for( final Texture<GLImage> texture : textures )
+		final int size = textures.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Texture<GLImage> texture = textures.get( i ) ;
 			texture.unregister() ;
 		}
 		textures.clear() ;

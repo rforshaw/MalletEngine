@@ -289,8 +289,8 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void createEntityExample( final int _i, final int _j )
 			{
-				final int x = 100 + ( _i * 50 ) ;
-				final int y = 100 + ( _j * 50 ) ;
+				final int x = 100 + ( _i * 60 ) ;
+				final int y = 100 + ( _j * 60 ) ;
 			
 				final Settings image = new Settings() ;
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;

@@ -591,6 +591,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				if( _data.toUpdate() == false &&
 					_data.getUpdateType() == UpdateType.ON_DEMAND )
 				{
+					// Only upload new model state if _data is flagged 
+					// as to be updated or UpdateType is CONTINUOUS.
 					return ;
 				}
 
@@ -839,9 +841,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
 		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
 
-		for( final MalletTexture texture : mltTextures )
+		final int size = mltTextures.size() ;
+		for( int i = 0; i < size; i++ )
 		{
 			//System.out.println( "Load: " + texture.getPath() ) ;
+			final MalletTexture texture = mltTextures.get( i ) ;
 			final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
 			if( glTexture == null )
 			{

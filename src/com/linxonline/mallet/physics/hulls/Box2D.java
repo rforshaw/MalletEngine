@@ -11,6 +11,8 @@ public class Box2D extends Hull
 	public final AABB aabb ;
 	public final OBB obb ;
 
+	private final Vector2 position = new Vector2() ;		// Used to reduce allocations - Android optimisation
+
 	public Box2D( final AABB _aabb )
 	{
 		aabb = _aabb ;
@@ -31,7 +33,7 @@ public class Box2D extends Hull
 
 	public Vector2 getPosition()
 	{
-		return obb.getCenter() ;
+		return obb.getCenter( position ) ;
 	}
 
 	@Override
