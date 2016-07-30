@@ -49,6 +49,7 @@ public class GLGeometryUploader
 	private final Vector2 uv = new Vector2() ;
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
+	private final byte[] abgrTemp = new byte[4] ;
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
 	{
@@ -149,16 +150,16 @@ public class GLGeometryUploader
 	{
 		final GLGeometry geometry = _handler.getGeometry() ;
 
-		final int[] index = _shape.indicies ;
 		final int indexOffset = _handler.getVertexStart() / geometry.vertexStrideBytes ;
 
 		int increment = 0 ;
 		int indexStartBytes = _handler.getIndexStart() ;
 
-		for( int i = 0; i < index.length; i++ )
+		final int size = _shape.getIndexSize() ;
+		for( int i = 0; i < size; i++ )
 		{
-			//System.out.println( "Index: " + index[i] + " With Offset: " + ( indexOffset + index[i] ) ) ;
-			indicies[increment++] = indexOffset + index[i] ;
+			//System.out.println( "Index: " + _shape.getIndex( i ) + " With Offset: " + ( indexOffset + _shape.getIndex( i ) ) ) ;
+			indicies[increment++] = indexOffset + _shape.getIndex( i ) ;
 
 			if( increment >= indicies.length )
 			{
@@ -224,6 +225,8 @@ public class GLGeometryUploader
 				}
 			}
 
+			// If verticies does not have enough space to store 
+			// another vertex, upload it to the GPU before continuing.
 			if( ( increment + vertexSize ) >= verticies.length )
 			{
 				vertexBuffer.put( verticies ) ;
@@ -648,12 +651,12 @@ public class GLGeometryUploader
 			for( int i = 0; i < length; i++ )
 			{
 				final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
-				final int[] index = glyph.shape.indicies ;
 				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
 
-				for( int j = 0; j < index.length; j++ )
+				final int size = glyph.shape.getIndexSize() ; 
+				for( int j = 0; j < size; j++ )
 				{
-					indicies[indexInc++] = indexOffset + index[j] ;
+					indicies[indexInc++] = indexOffset + glyph.shape.getIndex( j ) ;
 					if( indexInc >= indicies.length )
 					{
 						indexBuffer.put( indicies ) ;
@@ -1369,14 +1372,13 @@ public class GLGeometryUploader
 		}
 	}
 
-	private static float getABGR( final MalletColour _colour )
+	private float getABGR( final MalletColour _colour )
 	{
-		final byte[] colour = new byte[4] ;
-		colour[0] = _colour.colours[MalletColour.ALPHA] ;
-		colour[1] = _colour.colours[MalletColour.BLUE] ;
-		colour[2] = _colour.colours[MalletColour.GREEN] ;
-		colour[3] = _colour.colours[MalletColour.RED] ;
+		abgrTemp[0] = _colour.colours[MalletColour.ALPHA] ;
+		abgrTemp[1] = _colour.colours[MalletColour.BLUE] ;
+		abgrTemp[2] = _colour.colours[MalletColour.GREEN] ;
+		abgrTemp[3] = _colour.colours[MalletColour.RED] ;
 
-		return ConvertBytes.toFloat( colour, 0, 4 ) ;
+		return ConvertBytes.toFloat( abgrTemp, 0, 4 ) ;
 	}
 }

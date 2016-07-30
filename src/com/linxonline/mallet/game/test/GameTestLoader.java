@@ -61,6 +61,7 @@ import com.linxonline.mallet.io.save.state.DataSet.DataOut ;
 import com.linxonline.mallet.io.save.state.DataSet.DataIn ;
 
 import com.linxonline.mallet.io.formats.sgeom.SGeom ;
+import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -82,7 +83,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -249,7 +250,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ),
 																	 200 ) ;
-						DrawAssist.amendColour( draw, MalletColour.red() ) ;
+						DrawAssist.amendColour( draw, new MalletColour( 144, 195, 212 ) ) ;
 						_delegate.addTextDraw( draw ) ;
 					}
 				} ) ) ;

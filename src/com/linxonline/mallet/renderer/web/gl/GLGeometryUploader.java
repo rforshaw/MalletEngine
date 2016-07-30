@@ -145,7 +145,6 @@ public class GLGeometryUploader
 	{
 		final GLGeometry geometry = _handler.getGeometry() ;
 
-		final int[] index = _shape.indicies ;
 		final int indexOffset = _handler.getVertexStart() / geometry.vertexStrideBytes ;
 
 		final int indiciesLength = indicies.getLength() ;
@@ -154,9 +153,10 @@ public class GLGeometryUploader
 		int indexStartBytes = _handler.getIndexStart() ;
 		int indexLast = 0 ;
 
-		for( int i = 0; i < index.length; i++ )
+		final int size = _shape.getIndexSize() ;
+		for( int i = 0; i < size; i++ )
 		{
-			indexLast = indexOffset + index[i] ;
+			indexLast = indexOffset + _shape.getIndex( i ) ;
 			indicies.set( increment++, ( short )indexLast ) ;
 
 			if( increment >= indiciesLength )
@@ -210,6 +210,7 @@ public class GLGeometryUploader
 					}
 					case COLOUR :
 					{
+						//verticies.set( increment++, _shape.getFloat( i, j ) ) ;
 						_shape.getColour( i, j, shapeColour ) ;
 						setColour( increment++, shapeColour, byteVersion ) ;
 						break ;
@@ -651,12 +652,12 @@ public class GLGeometryUploader
 			for( int i = 0; i < length; i++ )
 			{
 				final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
-				final int[] index = glyph.shape.indicies ;
 				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
 
-				for( int j = 0; j < index.length; j++ )
+				final int size = glyph.shape.getIndexSize() ; 
+				for( int j = 0; j < size; j++ )
 				{
-					indicies.set( indexInc++, ( short )( indexOffset + index[j] ) ) ;
+					indicies.set( indexInc++, ( short )( indexOffset + glyph.shape.getIndex( j ) ) ) ;
 					if( indexInc >= indiciesLength )
 					{
 						final int lengthBytes = indiciesLength * IBO_VAR_BYTE_SIZE ;
@@ -688,6 +689,7 @@ public class GLGeometryUploader
 							{
 								// GLDrawData colour overrides Shapes colour.
 								final MalletColour c = ( colour != null ) ? colour : glyph.shape.getColour( j, k ) ;
+								//verticies.set( vertexInc++, getABGR( c ) ) ;
 								setColour( vertexInc++, c, byteVersion ) ;
 								break ;
 							}
@@ -1364,6 +1366,18 @@ public class GLGeometryUploader
 		}
 	}
 
+	private static float getABGR( final MalletColour _colour )
+	{
+		final byte[] colour = new byte[4] ;
+		colour[0] = _colour.colours[MalletColour.RED] ;
+		colour[1] = _colour.colours[MalletColour.GREEN] ;
+		colour[2] = _colour.colours[MalletColour.BLUE] ;
+		colour[3] = _colour.colours[MalletColour.ALPHA] ;
+
+		System.out.println( _colour ) ;
+		return ConvertBytes.toFloat( colour, 0, 4 ) ;
+	}
+	
 	private static void setColour( final int _fIndex, final MalletColour _colour, final Uint8Array _byteStream )
 	{
 		int byteIndex = _fIndex * 4 ;

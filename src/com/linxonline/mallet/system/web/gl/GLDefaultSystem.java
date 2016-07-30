@@ -2,6 +2,8 @@ package com.linxonline.mallet.system.web.gl ;
 
 import com.linxonline.mallet.audio.web.AudioSourceGenerator ;
 import com.linxonline.mallet.renderer.web.gl.GLRenderer ;
+import com.linxonline.mallet.renderer.web.WebShape ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.input.web.InputSystem ;
 import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.system.* ;
@@ -15,6 +17,7 @@ public class GLDefaultSystem extends BasicSystem
 	public GLDefaultSystem()
 	{
 		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
+		Shape.setFactory( new WebShape.Factory() ) ;
 
 		shutdownDelegate = new DefaultShutdown() ;
 		renderer = new GLRenderer() ;

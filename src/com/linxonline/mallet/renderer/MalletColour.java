@@ -39,6 +39,11 @@ public class MalletColour
 		changeColour( _red, _green, _blue, _alpha ) ;
 	}
 
+	public MalletColour( final int _colour )
+	{
+		changeColour( _colour ) ;
+	}
+	
 	public MalletColour( final float _colour )
 	{
 		changeColour( _colour ) ;
@@ -49,10 +54,16 @@ public class MalletColour
 		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
 	}
 
+	public void changeColour( final int _colour )
+	{
+		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder() ) ;
+		changeColour( c[0], c[1], c[2], c[3] ) ;
+	}
+
 	public void changeColour( final float _colour )
 	{
 		final byte[] c = ConvertBytes.toBytes( _colour, ConvertBytes.nativeOrder() ) ;
-		changeColour( c[3], c[1], c[2], c[0] ) ;
+		changeColour( c[0], c[1], c[2], c[3] ) ;
 	}
 
 	public void changeColour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
@@ -65,22 +76,22 @@ public class MalletColour
 
 	public int getRed()
 	{
-		return colours[RED] ;
+		return colours[RED] & 0xFF ;
 	}
 
 	public int getGreen()
 	{
-		return colours[GREEN] ;
+		return colours[GREEN] & 0xFF ;
 	}
 
 	public int getBlue()
 	{
-		return colours[BLUE] ;
+		return colours[BLUE] & 0xFF ;
 	}
 
 	public int getAlpha()
 	{
-		return colours[ALPHA] ;
+		return colours[ALPHA] & 0xFF ;
 	}
 
 	public int toInt()
@@ -97,8 +108,9 @@ public class MalletColour
 	{
 		final StringBuilder buffer = new StringBuilder() ;
 		buffer.append( "R: " ) ; buffer.append( getRed() ) ;
-		buffer.append( "G: " ) ; buffer.append( getGreen() ) ;
-		buffer.append( "B: " ) ; buffer.append( getBlue() ) ;
+		buffer.append( " G: " ) ; buffer.append( getGreen() ) ;
+		buffer.append( " B: " ) ; buffer.append( getBlue() ) ;
+		buffer.append( " A: " ) ; buffer.append( getAlpha() ) ;
 		return buffer.toString() ;
 	}
 	
