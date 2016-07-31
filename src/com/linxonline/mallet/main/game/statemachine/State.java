@@ -1,4 +1,4 @@
-package com.linxonline.mallet.game.statemachine ;
+package com.linxonline.mallet.main.game.statemachine ;
 
 import com.linxonline.mallet.util.settings.* ;
 

@@ -1,4 +1,4 @@
-package com.linxonline.mallet.game ;
+package com.linxonline.mallet.main.game ;
 
 /**
 	Provides a robust means of defining what Game States

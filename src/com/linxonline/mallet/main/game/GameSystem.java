@@ -1,9 +1,9 @@
-package com.linxonline.mallet.game ;
+package com.linxonline.mallet.main.game ;
 
 import com.linxonline.mallet.system.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.game.statemachine.* ;
+import com.linxonline.mallet.main.game.statemachine.* ;
 import com.linxonline.mallet.util.time.* ;
 
 public class GameSystem

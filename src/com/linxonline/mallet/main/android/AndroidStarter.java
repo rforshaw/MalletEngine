@@ -5,10 +5,9 @@ import android.util.DisplayMetrics ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.main.StarterInterface ;
-
-import com.linxonline.mallet.game.GameSystem ;
-import com.linxonline.mallet.game.GameLoader ;
-import com.linxonline.mallet.game.test.GameTestLoader ;
+import com.linxonline.mallet.main.game.GameSystem ;
+import com.linxonline.mallet.main.game.GameLoader ;
+import com.linxonline.mallet.main.game.test.GameTestLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;
@@ -29,7 +28,7 @@ import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.system.android.gl.GLAndroidSystem ;
 import com.linxonline.mallet.renderer.android.GL.* ;
 
-public class AndroidStarter extends StarterInterface
+public abstract class AndroidStarter extends StarterInterface
 {
 	protected final SystemInterface backendSystem  ;
 	protected final GameSystem gameSystem ;
@@ -121,9 +120,9 @@ public class AndroidStarter extends StarterInterface
 		return backendSystem ;
 	}
 
-	@Override
+	/*@Override
 	protected GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;
-	}
+	}*/
 }

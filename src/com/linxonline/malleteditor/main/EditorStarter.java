@@ -4,7 +4,7 @@ import java.awt.event.WindowListener ;
 import java.awt.event.WindowEvent ;
 import java.awt.event.ComponentEvent ;
 
-import com.linxonline.mallet.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.desktop.DesktopStarter ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
@@ -12,8 +12,6 @@ import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 import com.linxonline.mallet.renderer.RenderInterface ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;
-
-import com.linxonline.mallet.game.GameLoader ;
 
 public class EditorStarter extends DesktopStarter
 {

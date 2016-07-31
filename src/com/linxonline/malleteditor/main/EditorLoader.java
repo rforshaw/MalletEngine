@@ -1,7 +1,7 @@
 package com.linxonline.malleteditor.main ;
 
-import com.linxonline.mallet.game.GameLoader ;
-import com.linxonline.mallet.game.GameSystem ;
+import com.linxonline.mallet.main.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameSystem ;
 
 import com.linxonline.malleteditor.system.EditorState ;
 

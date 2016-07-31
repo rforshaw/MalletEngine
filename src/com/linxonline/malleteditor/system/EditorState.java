@@ -3,8 +3,7 @@ package com.linxonline.malleteditor.system ;
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
-import com.linxonline.mallet.game.GameState ;
-
+import com.linxonline.mallet.main.game.GameState ;
 
 import com.linxonline.mallet.ui.BaseListener ;
 import com.linxonline.mallet.ui.UIListener ;

@@ -6,8 +6,8 @@ import java.awt.event.WindowEvent ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
-import com.linxonline.mallet.game.GameLoader ;
-import com.linxonline.mallet.game.test.GameTestLoader ;
+import com.linxonline.mallet.main.game.GameLoader ;
+import com.linxonline.mallet.main.game.test.GameTestLoader ;
 
 public class DesktopTestStarter extends DesktopStarter
 {

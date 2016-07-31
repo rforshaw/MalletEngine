@@ -6,9 +6,8 @@ import org.teavm.jso.browser.* ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.main.StarterInterface ;
-
-import com.linxonline.mallet.game.GameSystem ;
-import com.linxonline.mallet.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameSystem ;
+import com.linxonline.mallet.main.game.GameLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.system.GlobalConfig ;

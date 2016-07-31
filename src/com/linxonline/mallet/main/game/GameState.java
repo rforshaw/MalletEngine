@@ -1,4 +1,4 @@
-package com.linxonline.mallet.game ;
+package com.linxonline.mallet.main.game ;
 
 import java.util.ArrayList ;
 
@@ -6,7 +6,7 @@ import com.linxonline.mallet.audio.* ;
 
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.system.SystemInterface ;
-import com.linxonline.mallet.game.statemachine.State ;
+import com.linxonline.mallet.main.game.statemachine.State ;
 
 import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.input.InputHandler ;

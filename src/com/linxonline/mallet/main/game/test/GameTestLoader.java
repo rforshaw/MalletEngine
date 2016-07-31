@@ -1,7 +1,11 @@
-package com.linxonline.mallet.game.test ;
+package com.linxonline.mallet.main.game.test ;
 
 import java.util.ArrayList ;
 import java.util.HashMap ;
+
+import com.linxonline.mallet.main.game.GameSystem ;
+import com.linxonline.mallet.main.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameState ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
@@ -32,7 +36,6 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
-import com.linxonline.mallet.game.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 

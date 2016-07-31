@@ -16,8 +16,8 @@ import android.media.* ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
-import com.linxonline.mallet.game.statemachine.* ;
-import com.linxonline.mallet.game.* ;
+import com.linxonline.mallet.main.game.statemachine.* ;
+import com.linxonline.mallet.main.game.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.resources.* ;
@@ -25,7 +25,6 @@ import com.linxonline.mallet.event.* ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 
-import com.linxonline.mallet.game.android.* ;
 import com.linxonline.mallet.system.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.input.android.AndroidInputListener ;
@@ -35,7 +34,16 @@ public class AndroidActivity extends Activity
 							implements EventHandler
 {
 	private final ArrayList<AndroidInputListener> inputListeners = new ArrayList<AndroidInputListener>() ;
-	private Notify<Object> startGame = null ;
+	private final Notify<Object> startGame = new Notify<Object>()
+	{
+		public void inform( final Object _noData )
+		{
+			// Only start the game thread once we know the 
+			// OpenGL context has been initialised.
+			System.out.println( "Inform: Starting Game Thread." ) ;
+			startGameThread() ;
+		}
+	} ;
 
 	protected AndroidStarter starter = null ;
 	protected Thread gameThread = null ;
@@ -66,21 +74,10 @@ public class AndroidActivity extends Activity
 		System.out.println( "onResume()" ) ;
 		super.onResume() ;
 
-		startGame = new Notify<Object>()
-		{
-			public void inform( final Object _noData )
-			{
-				// Only start the game thread once we know the 
-				// OpenGL context has been initialised.
-				System.out.println( "Inform: Starting Game Thread." ) ;
-				startGameThread() ;
-			}
-		} ;
-
 		if( starter == null )
 		{
 			System.out.println( "INIT ANDROID STARTER" ) ;
-			starter = new AndroidStarter( this, startGame ) ;
+			starter = constructStarter( this, startGame ) ;
 			starter.init() ;
 		}
 
@@ -190,7 +187,12 @@ public class AndroidActivity extends Activity
 	*/
 	@Override
 	public void reset() {}
-	
+
+	public AndroidStarter constructStarter( final AndroidActivity _activity, final Notify<Object> _notify )
+	{
+		return new AndroidTestStarter( _activity, _notify ) ;
+	}
+
 	private synchronized void startGameThread()
 	{
 		if( gameThread == null )
