@@ -1,6 +1,6 @@
 package template.main ;
 
-import com.linxonline.mallet.game.* ;
+import com.linxonline.mallet.main.game.* ;
 
 public class TemplateLoader extends GameLoader
 {

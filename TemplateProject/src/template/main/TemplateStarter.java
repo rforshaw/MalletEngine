@@ -5,7 +5,7 @@ import com.linxonline.mallet.main.desktop.DesktopStarter ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
-import com.linxonline.mallet.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameLoader ;
 
 public class TemplateStarter extends DesktopStarter
 {

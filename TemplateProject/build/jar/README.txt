@@ -1,13 +1,17 @@
+This Template Project is current set up to quickly build a desktop application.
+For the Template Project to compile and run you will need to compile the Desktop 
+version of the Mallet Engine.
 
-Stick latest MalletEngine.jar here : located ./MalletEngine/build/jar
-Copy ./MalletEngine/build/jar/libs here - contains JogAmp libraries
+Stick './MalletEngine/desktop/build/jar/libs' and './MalletEngine/desktop/build/jar/MalletEngine.jar' 
+into './TemplateProject/build/jar/', you can stick MalletEngine.jar into the 'libs' directory.
+
+The Template Project will fail to run without './MalletEngine/desktop/build/jar/base/shaders' copy 
+this to './TemplateProject/build/jar/base/'
 
 Resultant folder should then contain:
 
-	'base' folder
+	'base/shaders/...'
 	'README.txt' (This)
 	'run'
-	'MalletEngine.jar'
-	'libs' folder
-
-Will write up a script to automate this process.
+	'libs/*.jar'
+	'libs/*MalletEngine.jar'
