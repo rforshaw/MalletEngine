@@ -292,8 +292,8 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void createEntityExample( final int _i, final int _j )
 			{
-				final int x = 100 + ( _i * 60 ) ;
-				final int y = 100 + ( _j * 60 ) ;
+				final int x = 100 + ( _i * 50 ) ;
+				final int y = 100 + ( _j * 50 ) ;
 			
 				final Settings image = new Settings() ;
 				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
@@ -348,6 +348,7 @@ public final class GameTestLoader extends GameLoader
 				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
 				DrawAssist.amendTexture( draw, texture ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 				DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
 
 				final RenderComponent render = new RenderComponent() ;

@@ -1,18 +1,35 @@
-package com.linxonline.mallet.renderer ;
+package com.linxonline.mallet.util.arrays ;
 
 import java.util.ArrayList ;
 
-public abstract class State<T>
+/**
+	Objects are only added to current state when 
+	manageState() is called.
+*/
+public abstract class ManagedArray<T>
 {
+	private RemoveDelegate FALLBACK = new RemoveDelegate<Object>()
+	{
+		public void remove( final Object _data ) {}
+	} ;
+
 	protected final ArrayList<T> toAdd = new ArrayList<T>() ;
 	protected final ArrayList<T> toRemove = new ArrayList<T>() ;
 	protected final ArrayList<T> current = new ArrayList<T>() ;
 
-	protected RemoveDelegate removeDelegate = null ;
+	protected RemoveDelegate removeDelegate = FALLBACK ;
 
+	/**
+		Set a custom delegate if the objects require specific 
+		removal handling.
+	*/
 	public <T> void setRemoveDelegate( final RemoveDelegate<T> _delegate )
 	{
 		removeDelegate = _delegate ;
+		if( removeDelegate == null )
+		{
+			removeDelegate = FALLBACK ;
+		}
 	}
 
 	public synchronized void add( final T _data )
@@ -36,6 +53,10 @@ public abstract class State<T>
 		return current ;
 	}
 
+	/**
+		Add new values that are in the toAdd list.
+		Remove values that are in the remove list.
+	*/
 	public void manageState()
 	{
 		if( toAdd.isEmpty() == false )

@@ -47,8 +47,8 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 
 		final Vector2 dim = _mouse.<Vector2>getObject( "DIM", null ) ;
 		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), Shape.constructPlane( new Vector3( dim.x, dim.y, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
-		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.NONE ) ;
-		DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.CONTINUOUS ) ;
+		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
+		DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.ON_DEMAND ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
 		anim.setDefaultAnim( "DEFAULT" ) ;

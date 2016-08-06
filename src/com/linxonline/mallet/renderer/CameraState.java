@@ -3,8 +3,9 @@ package com.linxonline.mallet.renderer ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.arrays.ManagedArray ;
 
-public class CameraState extends State<CameraData>
+public class CameraState extends ManagedArray<CameraData>
 {
 	public CameraState() {}
 
@@ -18,29 +19,6 @@ public class CameraState extends State<CameraData>
 			current.get( i ).draw( _diff, _iteration ) ;
 		}
 	}
-
-	/*@Override
-	protected void addNewData( final ArrayList<CameraData> _toAdd )
-	{
-		for( final CameraData add : _toAdd )
-		{
-			insertNewDrawData( add ) ;
-		}
-		_toAdd.clear() ;
-	}
-
-	private void insertNewDrawData( final CameraData _insert )
-	{
-		final int order = _insert.getOrder() ;
-		final int size = current.size() ;
-		if( order < size )
-		{
-			current.add( order, _insert ) ;
-			return ;
-		}
-
-		current.add( _insert ) ;
-	}*/
 
 	public void sort() {}
 

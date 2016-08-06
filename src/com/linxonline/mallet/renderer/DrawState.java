@@ -2,7 +2,9 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.ArrayList ;
 
-public class DrawState extends State<DrawData>
+import com.linxonline.mallet.util.arrays.ManagedArray ;
+
+public class DrawState extends ManagedArray<DrawData>
 {
 	public synchronized void upload( final int _diff, final int _iteration )
 	{

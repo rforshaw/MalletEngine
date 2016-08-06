@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.arrays.ManagedArray ;
+
 /**
 	Implements common requirements when using BasicWorld.
 	See desktop/android GLWorldState for an implementation.
@@ -10,7 +12,7 @@ import java.util.ArrayList ;
 	rendering-system. A default world must be passed when WorldState is 
 	constructed/extended.
 */
-public abstract class WorldState<T extends BasicWorld> extends State<T>
+public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 {
 	private T defaultWorld ;
 

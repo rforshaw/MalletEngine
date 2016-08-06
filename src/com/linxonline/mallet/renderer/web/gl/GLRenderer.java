@@ -562,12 +562,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public void upload( final GLDrawData _data )
 			{
-				if( _data.toUpdate() == false &&
-					_data.getUpdateType() == UpdateType.ON_DEMAND )
-				{
-					return ;
-				}
-
 				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
 				if( malletTextures.isEmpty() == false )
 				{
@@ -621,12 +615,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public void upload( final GLDrawData _data )
 			{
-				if( _data.toUpdate() == false &&
-					_data.getUpdateType() == UpdateType.ON_DEMAND )
-				{
-					return ;
-				}
-
 				final StringBuilder text = _data.getText() ;
 				if( text == null )
 				{

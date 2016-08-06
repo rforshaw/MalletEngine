@@ -45,7 +45,7 @@ public class ImageCreator extends Creator<Entity, Settings>
 		DrawAssist.amendShape( draw, plane ) ;
 		DrawAssist.amendTexture( draw, new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
 		DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
-		DrawAssist.amendUpdateType( draw, UpdateType.CONTINUOUS ) ;
+		DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
 		final RenderComponent render = new RenderComponent() ;

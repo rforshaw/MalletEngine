@@ -40,7 +40,7 @@
 			<exclude name="**/android/**" />
 			<exclude name="**/web/**" />
 		</javac>
-		<jar destfile="${jar.dir}/${MALLETENGINE}.jar" basedir="${engine-classes.dir}"/>
+		<jar destfile="${lib.dir}/${MALLETENGINE}.jar" basedir="${engine-classes.dir}"/>
 
 		<!-- Desktop implementation should ignore Android folders -->
 		<javac encoding="UTF-8" srcdir="${editor-src.dir}" destdir="${editor-classes.dir}" classpathref="classpath-editor" debug="true">
@@ -48,7 +48,7 @@
 			<exclude name="**/web/**" />
 		</javac>
 
-		<jar destfile="${jar.dir}/${MALLETEDITOR}.jar" basedir="${editor-classes.dir}"/>
+		<jar destfile="${lib.dir}/${MALLETEDITOR}.jar" basedir="${editor-classes.dir}"/>
 	</target>
 
 	<target name="clean-build" depends="clean,compile"/>
