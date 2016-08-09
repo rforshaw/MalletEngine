@@ -1,5 +1,0 @@
-{
-	"NAME": "SIMPLE_FONT",
-	"VERTEX": ["base/shaders/web/simple_vertex.glsl"],
-	"FRAGMENT": ["base/shaders/web/simple_font_fragment.glsl"]
-}

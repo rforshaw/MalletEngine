@@ -1,0 +1,15 @@
+#! /bin/bash
+
+# Find Jars in root directory
+for i in `ls ./*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+# Find Jars in Jar folder - JOGL, etc..
+for i in `ls ./libs/*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+jdb -sourcepath ../../../src -classpath $CLASSPATH com.linxonline.mallet.main.desktop.DesktopTestMain $@

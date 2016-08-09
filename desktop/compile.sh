@@ -1,3 +1,3 @@
 #! /bin/bash
 
-ant -f Build.xml
+gradle clean build

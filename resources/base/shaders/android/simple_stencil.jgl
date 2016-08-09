@@ -1,0 +1,5 @@
+{
+	NAME: "SIMPLE_STENCIL",
+	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
+	FRAGMENT: ["base/shaders/android/simple_texture_fragment.glsl"]
+}

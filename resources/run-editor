@@ -1,0 +1,15 @@
+#! /bin/bash
+
+# Find Jars in root directory
+for i in `ls ./*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+# Find Jars in Jar folder - JOGL, etc..
+for i in `ls ./libs/*.jar`
+do
+  CLASSPATH=${CLASSPATH}:${i}
+done
+
+java -classpath $CLASSPATH -XX:MinHeapFreeRatio=1 -XX:MaxHeapFreeRatio=5 -Dsun.awt.noerasebackground=true com.linxonline.malleteditor.main.Main $@

@@ -1,3 +1,5 @@
+resources/base/music/*
+desktop/*
 build/*
 libs/*
 web/target

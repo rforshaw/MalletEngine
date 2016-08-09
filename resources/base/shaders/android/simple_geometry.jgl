@@ -1,0 +1,5 @@
+{
+	NAME: "SIMPLE_GEOMETRY",
+	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
+	FRAGMENT: ["base/shaders/android/simple_fragment.glsl"]
+}

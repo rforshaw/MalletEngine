@@ -1,0 +1,58 @@
+
+subprojects {
+	apply plugin: 'java'
+}
+
+project( ':MalletEngine' ) {
+	clean {
+		delete '../target'
+	}
+
+	sourceSets {
+		main {
+			java {
+				srcDir '../../src'
+				exclude '**/web/**'
+				exclude '**/android/**'
+				exclude '**/malleteditor/**'
+			}
+		}
+	}
+
+	dependencies {
+		compile fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
+	}
+	
+	task copy(type: Copy) {
+		into( '../target' )
+		from( 'dependencies' )
+	}
+}
+
+project( ':MalletEditor' ) {
+	clean {
+		delete '../target'
+	}
+
+	sourceSets {
+		main {
+			java {
+				srcDir '../../src'
+				exclude '**/web/**'
+				exclude '**/android/**'
+				exclude '**/mallet/**'
+			}
+		}
+	}
+	dependencies {
+		compile project(':MalletEngine')
+	}
+}
+
+
+task copy(type: Copy) {
+	into( 'target' )
+	from( '../resources' )
+	from( 'MalletEngine/build/libs' )
+	from( 'MalletEditor/build/libs' )
+}
