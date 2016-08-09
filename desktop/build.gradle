@@ -1,13 +1,16 @@
 
 subprojects {
 	apply plugin: 'java'
-}
 
-project( ':MalletEngine' ) {
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+
 	clean {
 		delete '../target'
 	}
+}
 
+project( ':MalletEngine' ) {
 	sourceSets {
 		main {
 			java {
@@ -30,10 +33,6 @@ project( ':MalletEngine' ) {
 }
 
 project( ':MalletEditor' ) {
-	clean {
-		delete '../target'
-	}
-
 	sourceSets {
 		main {
 			java {
@@ -44,6 +43,7 @@ project( ':MalletEditor' ) {
 			}
 		}
 	}
+
 	dependencies {
 		compile project(':MalletEngine')
 	}
