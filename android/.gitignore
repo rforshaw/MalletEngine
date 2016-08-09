@@ -2,5 +2,6 @@ bin/*
 libs/*
 assets/*
 gen/*
+build/*
 .gradle
 
