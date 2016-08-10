@@ -15,6 +15,10 @@ project( ':desktop' ) {
 		}
 	}
 
+	clean {
+		delete 'target'
+	}
+
 	dependencies {
 		compile fileTree( dir: 'libs', include: ['*.jar'] )
 	}
