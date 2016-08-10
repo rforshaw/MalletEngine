@@ -25,10 +25,19 @@ project( ':MalletEngine' ) {
 	dependencies {
 		compile fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
 	}
-	
+
 	task copy(type: Copy) {
-		into( '../target' )
-		from( 'dependencies' )
+		into '.'
+		from( 'dependencies' ) {
+			into '../target'
+		}
+		from( 'build/libs' )
+		{
+			into '../target/libs'
+		}
+		from( '../target/libs' ) {
+			into( '../../TemplateProject/desktop/libs' )
+		}
 	}
 }
 
@@ -47,12 +56,26 @@ project( ':MalletEditor' ) {
 	dependencies {
 		compile project(':MalletEngine')
 	}
+	
+	task copy(type: Copy) {
+		into '.'
+		from( 'build/libs' )
+		{
+			into '../target/libs'
+		}
+	}
 }
 
 
 task copy(type: Copy) {
-	into( 'target' )
-	from( '../resources' )
-	from( 'MalletEngine/build/libs' )
-	from( 'MalletEditor/build/libs' )
+	into '.'
+	from( '../resources' ) {
+		into( 'target' )
+	}
+	from( '../resources/base/shaders' ) {
+		into( '../TemplateProject/resources/base/shaders' )
+	}
+	from( '../resources/base/config.cfg' ) {
+		into( '../TemplateProject/resources/base' )
+	}
 }

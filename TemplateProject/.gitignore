@@ -1,7 +1,9 @@
-build/*
+desktop/*
+resources/*
 libs/*
 lib/*
 
+.gradle
 .kateproject.d
 
 *.jar

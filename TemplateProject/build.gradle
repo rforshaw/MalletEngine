@@ -1,0 +1,42 @@
+
+subprojects {
+	apply plugin: 'java'
+
+	sourceCompatibility = 1.7
+	targetCompatibility = 1.7
+}
+
+project( ':desktop' ) {
+	sourceSets {
+		main {
+			java {
+				srcDir '../src'
+			}
+		}
+	}
+
+	dependencies {
+		compile fileTree( dir: 'libs', include: ['*.jar'] )
+	}
+
+	task copy(type: Copy) {
+		into '.'
+		from( 'libs' ) {
+			into 'target/libs'
+		}
+		from( 'build/libs' )
+		{
+			into 'target/libs'
+		}
+		from( '../resources' ) {
+			into 'target'
+		}
+	}
+}
+
+/*task copy(type: Copy) {
+	into( 'target' )
+	from( '../resources' )
+	from( 'MalletEngine/build/libs' )
+	from( 'MalletEditor/build/libs' )
+}*/
