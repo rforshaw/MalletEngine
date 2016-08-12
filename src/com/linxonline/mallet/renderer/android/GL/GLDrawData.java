@@ -2,13 +2,13 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -18,6 +18,7 @@ public class GLDrawData extends DrawData
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
 	private Matrix4 drawMatrix    = new Matrix4() ;
+	private String drawProgramID  = null ;
 	private GLProgram drawProgram = null ;
 	private Shape drawShape       = null ;
 
@@ -84,9 +85,15 @@ public class GLDrawData extends DrawData
 		return textures ;
 	}
 
-	public void setDrawProgram( final GLProgram _program )
+	public void setDrawProgram( final GLProgram _program, String _id )
 	{
+		drawProgramID = _id ;
 		drawProgram = _program ;
+	}
+
+	public String getDrawProgramID()
+	{
+		return drawProgramID ;
 	}
 
 	public GLProgram getDrawProgram()

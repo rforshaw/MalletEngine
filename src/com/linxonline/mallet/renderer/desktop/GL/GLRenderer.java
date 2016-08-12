@@ -257,7 +257,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			@Override
 			public Draw attachProgram( final Draw _draw, final String _key )
 			{
-				( ( GLDrawData )_draw ).setDrawProgram( programs.get( _key ) ) ;
+				( ( GLDrawData )_draw ).setDrawProgram( null, _key ) ;
 				return _draw ;
 			}
 
@@ -541,6 +541,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		{
 			public void upload( final GLDrawData _data )
 			{
+				if( _data.getDrawProgram() == null )
+				{
+					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					if( program == null )
+					{
+						_data.forceUpdate() ;
+						return ;
+					}
+
+					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
+				}
+
 				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
 				if( malletTextures.isEmpty() == false )
 				{
@@ -605,6 +617,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 				{
 					System.out.println( "No Font, set." ) ;
 					return ;
+				}
+
+				if( _data.getDrawProgram() == null )
+				{
+					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					if( program == null )
+					{
+						_data.forceUpdate() ;
+						return ;
+					}
+
+					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
@@ -770,42 +794,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		resize() ;
 
 		System.out.println( "Building default shaders.." ) ;
-		{
-			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/desktop/simple_texture.jgl" ) ;
-			if( GLProgramManager.buildProgram( gl, program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( gl, program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_FONT", "base/shaders/desktop/simple_font.jgl" ) ;
-			if( GLProgramManager.buildProgram( gl, program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( gl, program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
-			if( GLProgramManager.buildProgram( gl, program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( gl, program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_STENCIL", "base/shaders/desktop/simple_stencil.jgl" ) ;
-			if( GLProgramManager.buildProgram( gl, program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( gl, program ) ;
-			}
-		}
-		System.out.println( "Shaders built.." ) ;
+		programs.get( "SIMPLE_TEXTURE", "base/shaders/desktop/simple_texture.jgl" ) ;
+		programs.get( "SIMPLE_FONT", "base/shaders/desktop/simple_font.jgl" ) ;
+		programs.get( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
+		programs.get( "SIMPLE_STENCIL", "base/shaders/desktop/simple_stencil.jgl" ) ;
 	}
 
 	public void setViewMode( final int _mode )

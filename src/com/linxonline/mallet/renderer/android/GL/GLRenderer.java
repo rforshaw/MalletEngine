@@ -106,41 +106,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		GLES30.glCullFace( GLES30.GL_BACK ) ;  
 		GLES30.glFrontFace( GLES30.GL_CCW ) ;
 
-		{
-			final GLProgram program = programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
-			if( GLProgramManager.buildProgram( program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
-			if( GLProgramManager.buildProgram( program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
-			if( GLProgramManager.buildProgram( program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( program ) ;
-			}
-		}
-
-		{
-			final GLProgram program = programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
-			if( GLProgramManager.buildProgram( program ) == false )
-			{
-				System.out.println( "Failed to compile program: " + program.name ) ;
-				GLProgramManager.deleteProgram( program ) ;
-			}
-		}
+		programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
+		programs.get( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
+		programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
+		programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
 
 		resize() ;
 	}
@@ -304,7 +273,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			@Override
 			public Draw attachProgram( final Draw _draw, final String _key )
 			{
-				( ( GLDrawData )_draw ).setDrawProgram( programs.get( _key ) ) ;
+				( ( GLDrawData )_draw ).setDrawProgram( null, _key ) ;
 				return _draw ;
 			}
 
@@ -588,6 +557,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public void upload( final GLDrawData _data )
 			{
+				if( _data.getDrawProgram() == null )
+				{
+					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					if( program == null )
+					{
+						_data.forceUpdate() ;
+						return ;
+					}
+
+					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
+				}
+
 				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
 				if( malletTextures.isEmpty() == false )
 				{
@@ -652,6 +633,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				{
 					System.out.println( "No Font, set." ) ;
 					return ;
+				}
+
+				if( _data.getDrawProgram() == null )
+				{
+					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					if( program == null )
+					{
+						_data.forceUpdate() ;
+						return ;
+					}
+
+					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
@@ -730,7 +723,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
 				worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 				worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
-				
+
 				final Matrix4 worldProjection = matrixCache.get() ;
 				Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
 

@@ -2,6 +2,7 @@ package com.linxonline.mallet.io.formats.json ;
 
 import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.StringInStream ;
+import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
 /**
 	A wrapper class around a platform specific implementation 
@@ -46,6 +47,31 @@ public abstract class JSONObject
 		return constructor.create( builder.toString() ) ;
 	}
 
+	public static boolean construct( final FileStream _file, final ConstructCallback _callback )
+	{
+		return _file.getStringInCallback( new StringInCallback()
+		{
+			private final StringBuilder builder = new StringBuilder() ;
+
+			public int resourceAsString( final String[] _resource, final int _length )
+			{
+				for( int i = 0; i < _length; i++ )
+				{
+					builder.append( _resource[i] ) ;
+				}
+			
+				return 1 ;
+			}
+
+			public void start() {}
+
+			public void end()
+			{
+				_callback.callback( constructor.create( builder.toString() ) ) ;
+			}
+		}, 1 ) ;
+	}
+
 	/**
 		Create a JSON Object/s from source.
 	*/
@@ -88,4 +114,9 @@ public abstract class JSONObject
 
 	public abstract String toString() ;
 	public abstract String toString( final int _indent ) ;
+
+	public interface ConstructCallback
+	{
+		public void callback( final JSONObject _object ) ;
+	}
 }

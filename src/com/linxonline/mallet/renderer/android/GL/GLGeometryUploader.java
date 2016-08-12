@@ -54,7 +54,7 @@ public class GLGeometryUploader
 	private final Vector2 uv = new Vector2() ;
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
-	private final byte[] abgrTemp = new byte[4] ; 
+	private final byte[] abgrTemp = new byte[4] ;
 
 	public GLGeometryUploader( final int _indexSize, final int _vboSize )
 	{
@@ -472,7 +472,7 @@ public class GLGeometryUploader
 			final int size = buffers.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final GLGeometry geometry = buffers.get( 0 ) ;
+				final GLGeometry geometry = buffers.get( i ) ;
 				GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;		//GLRenderer.handleError( "Draw Bind Index: " ) ;
 				GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: " ) ;
 
@@ -1199,6 +1199,12 @@ public class GLGeometryUploader
 				{
 					final Location location = range.getParent() ;
 					location.set( this, start, indexLength, location.getVertexStart(), location.getVertexLength() ) ;
+
+					// The data being shifted may be is a state of flux, 
+					// there is no guarantee that it will still 
+					// reside within this buffer.
+					// We'll flag the data to be updated during its
+					// render cycle.
 					DrawAssist.forceUpdate( location.getData() ) ;
 				}
 

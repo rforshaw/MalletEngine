@@ -22,6 +22,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 	public static final int TEXTURE_COORD_ARRAY2 = 7 ;
 	public static final int TEXTURE_COORD_ARRAY3 = 8 ;
 
+	/**
+		When loading a program the ProgramManager will load the 
+		content a-synchronously.
+		To ensure the programs are added safely to resources we 
+		temporarily store the program in a queue.
+	*/
+	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null ) ;
+	private final ArrayList<GLProgram> toBind = new ArrayList<GLProgram>() ;
+
 	public GLProgramManager()
 	{
 		final ResourceLoader<GLProgram> loader = getResourceLoader() ;
@@ -41,62 +50,144 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					return null ;
 				}
 
-				return generateGLProgram( JSONObject.construct( stream ) ) ;
+				add( _file, PLACEHOLDER ) ;
+				JSONObject.construct( stream, new JSONObject.ConstructCallback()
+				{
+					public void callback( final JSONObject _obj )
+					{
+						generateGLProgram( _obj ) ;
+					}
+				} ) ;
+
+				return null ;
 			}
 
-			private GLProgram generateGLProgram( final JSONObject _jGL )
+			private void generateGLProgram( final JSONObject _jGL )
 			{
 				final ArrayList<GLShader> shaders = new ArrayList<GLShader>() ;
+				final ArrayList<GLShaderMap> paths = new ArrayList<GLShaderMap>() ;
 
+				fill( paths, _jGL.optJSONArray( "VERTEX" ), GL3.GL_VERTEX_SHADER ) ;
+				fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;
+				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.GL_FRAGMENT_SHADER ) ;
+
+				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders ) ;
+			}
+
+			private void fill( final ArrayList<GLShaderMap> _toFill, final JSONArray _base, final int _type )
+			{
+				if( _base == null )
 				{
-					final JSONArray vertexShaders = _jGL.optJSONArray( "VERTEX" ) ;
-					if( vertexShaders != null )
-					{
-						readShaders( vertexShaders, shaders, GL3.GL_VERTEX_SHADER ) ;
-					}
+					return ;
 				}
 
+				final int length = _base.length() ;
+				for( int i = 0; i < length; i++ )
 				{
-					final JSONArray geometryShaders = _jGL.optJSONArray( "GEOMETRY" ) ;
-					if( geometryShaders != null )
+					_toFill.add( new GLShaderMap( _base.optString( i ), _type ) ) ;
+				}
+			}
+
+			/**
+				Recusive function.
+				Loop through _jShaders loading the sources into 
+				_glShaders, once _jShaders is empty construct 
+				a GLProgram and add it to the toBind array.
+			*/
+			private void readShaders( final String _name,
+									  final ArrayList<GLShaderMap> _jShaders,
+									  final ArrayList<GLShader> _glShaders )
+			{
+				if( _jShaders.isEmpty() == true )
+				{
+					if( _glShaders.isEmpty() == true )
 					{
-						readShaders( geometryShaders, shaders, GL3.GL_GEOMETRY_SHADER ) ;
+						System.out.println( "Unable to generate GLProgram, no shaders specified." ) ;
+						return ;
 					}
+
+					synchronized( toBind )
+					{
+						// We don't want to compile the Shaders now
+						// as that will take control of the OpenGL context.
+						toBind.add( new GLProgram( _name, _glShaders ) ) ;
+					}
+
+					return ;
 				}
 
+				final GLShaderMap map = _jShaders.remove( 0 ) ;
+				final FileStream stream = GlobalFileSystem.getFile( map.path ) ;
+				if( stream.exists() == false )
 				{
-					final JSONArray fragmentShaders = _jGL.optJSONArray( "FRAGMENT" ) ;
-					if( fragmentShaders != null )
-					{
-						readShaders( fragmentShaders, shaders, GL3.GL_FRAGMENT_SHADER ) ;
-					}
+					System.out.println( "Unable to find: " + map.path ) ;
+					readShaders( _name, _jShaders, _glShaders ) ;
+					return ;
 				}
 
-				if( shaders.isEmpty() == true )
+				stream.getStringInCallback( new StringInCallback()
 				{
-					System.out.println( "Unable to generate GLProgram, no shaders specified." ) ;
+					private final StringBuilder source = new StringBuilder() ;
+
+					public int resourceAsString( final String[] _resource, final int _length )
+					{
+						for( int i = 0; i < _length; i++ )
+						{
+							source.append( _resource[i] ) ;
+							source.append( '\n' ) ;
+						}
+					
+						return 1 ;
+					}
+
+					public void start() {}
+
+					public void end()
+					{
+						_glShaders.add( new GLShader( map.type, map.path, source.toString() ) ) ;
+						readShaders( _name, _jShaders, _glShaders ) ;
+					}
+				}, 1 ) ;
+			}
+		} ) ;
+	}
+
+	@Override
+	public GLProgram get( final String _key )
+	{
+		synchronized( toBind )
+		{
+			// GLRenderer will continuosly call get() until it 
+			// recieves a GLProgram, so we need to compile Programs
+			// that are waiting for the OpenGL context 
+			// when the render requests it.
+			if( toBind.isEmpty() == false )
+			{
+				final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+				if( gl == null )
+				{
+					System.out.println( "GL context doesn't exist" ) ;
 					return null ;
 				}
 
-				return new GLProgram( _jGL.optString( "NAME", "undefined" ), shaders ) ;
-			}
-
-			private void readShaders( final JSONArray _jShaders,
-									  final ArrayList<GLShader> _glShaders,
-									  final int _type )
-			{
-				final int length = _jShaders.length() ;
-				for( int i = 0; i < length; i++ )
+				for( final GLProgram program : toBind )
 				{
-					final String path = _jShaders.optString( i ) ;
-					final String source = TextReader.getTextAsString( path ) ;
-					if( source != null )
+					if( GLProgramManager.buildProgram( gl, program ) == false )
 					{
-						_glShaders.add( new GLShader( _type, path, source ) ) ;
+						System.out.println( "Failed to compile program: " + program.name ) ;
+						GLProgramManager.deleteProgram( gl, program ) ;
 					}
+					add( program.name, program ) ;
 				}
+				toBind.clear() ;
 			}
-		} ) ;
+		}
+
+		final GLProgram program = super.get( _key ) ;
+
+		// PLACEHOLDER is used to prevent the program loader 
+		// loading the same program twice when loading async, 
+		return ( program != PLACEHOLDER ) ? program : null ;
 	}
 
 	public static void deleteProgram( final GL3 _gl, final GLProgram _program )
@@ -168,7 +259,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		Stop iterating as soon as an inTexi returns -1.
 		inTex0 should map to GL_TEXTURE0
 		inTex1 should map to GL_TEXTURE1
-		inTex2 should map to GL_TEXTURE1 and so on..
+		inTex2 should map to GL_TEXTURE2 and so on..
 		Currently an upper limit of 10 textures can be mapped.
 	*/
 	private static void mapTexturesToProgram( final GL3 _gl, final GLProgram _program )
@@ -210,5 +301,17 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		}
 
 		return true ;
+	}
+	
+	private class GLShaderMap
+	{
+		public String path ;
+		public int type ;
+
+		public GLShaderMap( final String _path, final int _type )
+		{
+			path = _path ;
+			type = _type ;
+		}
 	}
 }
