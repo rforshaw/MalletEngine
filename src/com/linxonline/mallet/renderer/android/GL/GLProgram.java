@@ -34,7 +34,10 @@ public class GLProgram extends Resource
 	public void destroy()
 	{
 		GLProgramManager.deleteProgram( this ) ;
-		shaders.clear() ;
+		if( shaders != null )
+		{
+			shaders.clear() ;
+		}
 	}
 
 	@Override
