@@ -1,16 +1,16 @@
 
-subprojects {
+project( ':desktop' ) {
 	apply plugin: 'java'
 
 	sourceCompatibility = 1.7
 	targetCompatibility = 1.7
-}
 
-project( ':desktop' ) {
 	sourceSets {
 		main {
 			java {
 				srcDir '../src'
+				exclude '**/web/**'
+				exclude '**/android/**'
 			}
 		}
 	}
@@ -37,10 +37,3 @@ project( ':desktop' ) {
 		}
 	}
 }
-
-/*task copy(type: Copy) {
-	into( 'target' )
-	from( '../resources' )
-	from( 'MalletEngine/build/libs' )
-	from( 'MalletEditor/build/libs' )
-}*/

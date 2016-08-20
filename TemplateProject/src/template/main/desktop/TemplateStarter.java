@@ -1,11 +1,12 @@
-package template.main ;
-
-import com.linxonline.mallet.main.desktop.DesktopStarter ;
+package template.main.desktop ;
 
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
+import com.linxonline.mallet.main.desktop.DesktopStarter ;
+
 import com.linxonline.mallet.main.game.GameLoader ;
+import template.main.TemplateLoader ;
 
 public class TemplateStarter extends DesktopStarter
 {

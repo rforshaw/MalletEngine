@@ -48,6 +48,14 @@ public abstract class ManagedArray<T>
 		}
 	}
 
+	public ArrayList<T> getNewState()
+	{
+		final ArrayList<T> state = new ArrayList<T>() ;
+		state.addAll( current ) ;
+		state.addAll( toAdd ) ;
+		return state ;
+	}
+
 	public ArrayList<T> getCurrentData()
 	{
 		return current ;

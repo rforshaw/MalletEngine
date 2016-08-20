@@ -1,4 +1,4 @@
-package template.main ;
+package template.main.desktop ;
 
 import com.linxonline.mallet.main.desktop.DesktopTestStarter ;
 

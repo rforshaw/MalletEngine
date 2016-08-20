@@ -1,4 +1,4 @@
-
+ 
 buildscript {
 	repositories {
 		mavenCentral()
@@ -9,7 +9,7 @@ buildscript {
 	}
 }
 
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
 	compileSdkVersion 20
@@ -43,12 +43,12 @@ android {
 }
 
 dependencies {
-	compile fileTree( dir: 'libs', include: '*.jar' )
+	compile( name:'MalletEngine', ext:'aar')
+	//compile fileTree( dir: 'libs', include: '*.aar' )
 }
 
-/*task copy(type: Copy) {
-	into '.'
-	from( '../target/libs' ) {
-		into( '../../TemplateProject/desktop/libs' )
+repositories {
+	flatDir {
+		dirs 'libs'
 	}
-}*/
+}
