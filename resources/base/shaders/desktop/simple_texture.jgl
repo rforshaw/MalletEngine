@@ -1,5 +1,9 @@
 {
-	NAME: "SIMPLE_TEXTURE",
-	VERTEX: ["base/shaders/desktop/simple_vertex.glsl"],
-	FRAGMENT: ["base/shaders/desktop/simple_texture_fragment.glsl"]
+	"NAME": "SIMPLE_TEXTURE",
+	"VERTEX": ["base/shaders/desktop/simple_vertex.glsl"],
+	"FRAGMENT": ["base/shaders/desktop/simple_texture_fragment.glsl"],
+
+	"UNIFORMS": ["inMVPMatrix"],
+	"TEXTURE_UNIFORMS": ["inTex0"],
+	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

@@ -12,15 +12,8 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class GLProgramManager extends AbstractManager<GLProgram>
 {
-	public static final int MVP_MATRIX           = 0 ;
-	public static final int POSITION_MATRIX      = 1 ;
-	public static final int VERTEX_ARRAY         = 2 ;
-	public static final int COLOUR_ARRAY         = 3 ;
-	public static final int NORMAL_ARRAY         = 4 ;
-	public static final int TEXTURE_COORD_ARRAY0 = 5 ;
-	public static final int TEXTURE_COORD_ARRAY1 = 6 ;
-	public static final int TEXTURE_COORD_ARRAY2 = 7 ;
-	public static final int TEXTURE_COORD_ARRAY3 = 8 ;
+	//public static final int MVP_MATRIX           = 0 ;
+	//public static final int POSITION_MATRIX      = 1 ;
 
 	/**
 		When loading a program the ProgramManager will load the 
@@ -28,7 +21,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null ) ;
+	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null, null ) ;
 	private final ArrayList<GLProgram> toBind = new ArrayList<GLProgram>() ;
 
 	public GLProgramManager()
@@ -67,11 +60,19 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final ArrayList<GLShader> shaders = new ArrayList<GLShader>() ;
 				final ArrayList<GLShaderMap> paths = new ArrayList<GLShaderMap>() ;
 
-				fill( paths, _jGL.optJSONArray( "VERTEX" ), GL3.GL_VERTEX_SHADER ) ;
+				fill( paths, _jGL.optJSONArray( "VERTEX" ),   GL3.GL_VERTEX_SHADER ) ;
 				fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;
 				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.GL_FRAGMENT_SHADER ) ;
 
-				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders ) ;
+				final ArrayList<String> uniforms        = new ArrayList<String>() ;
+				final ArrayList<String> uniformTextures = new ArrayList<String>() ;
+				final ArrayList<String> swivel          = new ArrayList<String>() ;
+
+				fill( uniforms,        _jGL.optJSONArray( "UNIFORMS" ) ) ;
+				fill( uniformTextures, _jGL.optJSONArray( "UNIFORM_TEXTURES" ) ) ;
+				fill( swivel,      _jGL.optJSONArray( "SWIVEL" ) ) ;
+
+				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, uniformTextures, swivel ) ;
 			}
 
 			private void fill( final ArrayList<GLShaderMap> _toFill, final JSONArray _base, final int _type )
@@ -88,6 +89,20 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				}
 			}
 
+			private void fill( final ArrayList<String> _toFill, final JSONArray _base )
+			{
+				if( _base == null )
+				{
+					return ;
+				}
+
+				final int length = _base.length() ;
+				for( int i = 0; i < length; i++ )
+				{
+					_toFill.add( _base.optString( i ) ) ;
+				}
+			}
+
 			/**
 				Recusive function.
 				Loop through _jShaders loading the sources into 
@@ -96,7 +111,10 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			*/
 			private void readShaders( final String _name,
 									  final ArrayList<GLShaderMap> _jShaders,
-									  final ArrayList<GLShader> _glShaders )
+									  final ArrayList<GLShader> _glShaders,
+									  final ArrayList<String> _uniforms,
+									  final ArrayList<String> _uniformTextures,
+									  final ArrayList<String> _swivel )
 			{
 				if( _jShaders.isEmpty() == true )
 				{
@@ -110,7 +128,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					{
 						// We don't want to compile the Shaders now
 						// as that will take control of the OpenGL context.
-						toBind.add( new GLProgram( _name, _glShaders ) ) ;
+						toBind.add( new GLProgram( _name, _glShaders, _uniforms, _uniformTextures, _swivel ) ) ;
 					}
 
 					return ;
@@ -121,7 +139,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				if( stream.exists() == false )
 				{
 					System.out.println( "Unable to find: " + map.path ) ;
-					readShaders( _name, _jShaders, _glShaders ) ;
+					readShaders( _name, _jShaders, _glShaders, _uniforms, _uniformTextures, _swivel ) ;
 					return ;
 				}
 
@@ -145,7 +163,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					public void end()
 					{
 						_glShaders.add( new GLShader( map.type, map.path, source.toString() ) ) ;
-						readShaders( _name, _jShaders, _glShaders ) ;
+						readShaders( _name, _jShaders, _glShaders, _uniforms, _uniformTextures, _swivel ) ;
 					}
 				}, 1 ) ;
 			}
@@ -216,10 +234,13 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			}
 		}
 
-		_gl.glBindAttribLocation( _program.id[0], VERTEX_ARRAY, "inVertex" ) ;
-		_gl.glBindAttribLocation( _program.id[0], COLOUR_ARRAY, "inColour" ) ;
-		_gl.glBindAttribLocation( _program.id[0], TEXTURE_COORD_ARRAY0, "inTexCoord0" ) ;
-		_gl.glBindAttribLocation( _program.id[0], NORMAL_ARRAY, "inNormal" ) ;
+		final ArrayList<String> swivel = _program.swivel ;
+		final int size = swivel.size() ;
+
+		for( int i = 0; i < size; i++ )
+		{
+			_gl.glBindAttribLocation( _program.id[0], _program.inAttributes[i], swivel.get( i ) ) ;
+		}
 
 		_gl.glLinkProgram( _program.id[0] ) ;
 

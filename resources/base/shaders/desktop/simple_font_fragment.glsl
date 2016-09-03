@@ -1,6 +1,7 @@
 #version 150
 
 uniform sampler2D inTex0 ;
+//uniform sampler2D inTex1 ;
 
 varying vec2 outTexCoord0 ;
 varying vec4 outColour ;
