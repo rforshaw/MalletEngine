@@ -448,11 +448,11 @@ public class GLGeometryUploader
 			_gl.glUseProgram( program.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
 			_gl.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
-			if( textureID.length > 0 )
+			if( textureID.length > 0 && program.inUniformTextures.length > 0 )
 			{
 				for( int i = 0; i < textureID.length; i++ )
 				{
-					_gl.glUniform1i( program.inTex[i], i ) ;
+					_gl.glUniform1i( program.inUniformTextures[i], i ) ;
 					_gl.glActiveTexture( GL3.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
 					_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				}
