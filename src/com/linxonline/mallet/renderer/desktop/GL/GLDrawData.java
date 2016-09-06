@@ -18,8 +18,6 @@ public class GLDrawData extends DrawData
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
 	private Matrix4 drawMatrix    = new Matrix4() ;
-	private String drawProgramID  = null ;
-	private GLProgram drawProgram = null ;
 	private Shape drawShape       = null ;
 
 	private Matrix4 clipMatrix    = null ;
@@ -81,22 +79,6 @@ public class GLDrawData extends DrawData
 	public ArrayList<Texture<GLImage>> getGLTextures()
 	{
 		return textures ;
-	}
-
-	public void setDrawProgram( final GLProgram _program, String _id )
-	{
-		drawProgramID = _id ;
-		drawProgram = _program ;
-	}
-
-	public String getDrawProgramID()
-	{
-		return drawProgramID ;
-	}
-
-	public GLProgram getDrawProgram()
-	{
-		return drawProgram ;
 	}
 
 	public void setClipProgram( final GLProgram _program )
@@ -174,7 +156,6 @@ public class GLDrawData extends DrawData
 	{
 		super.reset() ;
 		drawMatrix  = null ;
-		drawProgram = null ;
 		drawShape   = null ;
 
 		clipMatrix   = null ;

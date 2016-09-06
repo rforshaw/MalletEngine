@@ -25,6 +25,9 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
+
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -114,7 +117,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( parent.getLength(), MalletColour.red() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 			
 			@Override
@@ -171,7 +174,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override
@@ -235,7 +238,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 
 				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
 				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
@@ -247,7 +250,7 @@ public class EditorState extends GameState
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ), parent.getLayer() + 2 ) ;
 				DrawAssist.amendUI( drawText, true ) ;
-				DrawAssist.attachProgram( drawText, "SIMPLE_FONT" ) ;
+				DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
 			}
 
 			@Override
@@ -324,7 +327,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override
@@ -379,7 +382,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override
@@ -423,7 +426,7 @@ public class EditorState extends GameState
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.white() ) ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override
@@ -467,7 +470,7 @@ public class EditorState extends GameState
 												new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 
 				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
-				DrawAssist.attachProgram( draw1, "SIMPLE_GEOMETRY" ) ;
+				DrawAssist.attachProgram( draw1, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override

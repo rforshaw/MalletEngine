@@ -3,8 +3,12 @@ package com.linxonline.mallet.animation ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.SourceCallback ;
+
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
+
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
 
 public class AnimationAssist
 {
@@ -44,7 +48,7 @@ public class AnimationAssist
 												 _rotation,
 												 _scale,
 												 _order ) ;
-		DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+		DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 		return new AnimData( _file, draw ) ;
 	}

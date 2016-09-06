@@ -19,6 +19,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private MalletColour colour = null ;
 	private MalletFont font = null ;
 	private StringBuilder text = null ;
+	private Program program = null ;
 
 	private boolean update = true ;
 	private boolean ui = false ;
@@ -68,6 +69,16 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	public World getWorld()
 	{
 		return world ;
+	}
+
+	public void setProgram( final Program _program )
+	{
+		program = _program ;
+	}
+
+	public Program getProgram()
+	{
+		return program ;
 	}
 
 	public void setColour( final MalletColour _colour )
@@ -298,6 +309,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		colour = null ;
 		font = null ;
 		text = null ;
+		program = null ;
 
 		update = true ;
 		ui = false ;

@@ -7,6 +7,9 @@ import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
+
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.Creator ;
 import com.linxonline.mallet.entity.Entity ;
@@ -44,7 +47,7 @@ public class ImageCreator extends Creator<Entity, Settings>
 
 		DrawAssist.amendShape( draw, plane ) ;
 		DrawAssist.amendTexture( draw, new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
-		DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+		DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 		DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 

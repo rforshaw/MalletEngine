@@ -14,6 +14,7 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
+import com.linxonline.mallet.renderer.ProgramData ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -404,7 +405,7 @@ public class GLGeometryUploader
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			layer   = _data.getOrder() ;
-			program = _data.getDrawProgram() ;
+			program = ( ( ProgramData<GLProgram> )_data.getProgram() ).getProgram() ;
 			ui      = _data.isUI() ;
 			isText  = _data.getText() != null ;
 
@@ -518,6 +519,8 @@ public class GLGeometryUploader
 		public boolean isSupported( final GLDrawData _data )
 		{
 			final Shape shape = _data.getDrawShape() ;
+			final ProgramData<GLProgram> programData = ( ProgramData<GLProgram> )_data.getProgram() ;
+
 			if( shapeStyle != shape.getStyle() )
 			{
 				return false ;
@@ -530,7 +533,7 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-			else if( program != _data.getDrawProgram() )
+			else if( program != programData.getProgram() )
 			{
 				return false ;
 			}

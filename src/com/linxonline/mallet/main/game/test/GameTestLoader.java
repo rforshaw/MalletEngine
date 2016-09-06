@@ -12,6 +12,9 @@ import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
+
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
@@ -134,7 +137,7 @@ public final class GameTestLoader extends GameLoader
 							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
 							DrawAssist.amendTexture( draw, texture ) ;
 							DrawAssist.amendUI( draw, true ) ;
-							DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -163,7 +166,7 @@ public final class GameTestLoader extends GameLoader
 																	  new Vector3( 1, 1, 1 ),
 																	  10 ) ;
 							DrawAssist.amendShape( draw, lines ) ;
-							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -190,7 +193,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3( 1, 1, 1 ),
 																	 10 ) ;
 							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
-							DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -205,7 +208,7 @@ public final class GameTestLoader extends GameLoader
 																		new Vector3( 1, 1, 1 ),
 																		10 ) ;
 								DrawAssist.amendShape( draw, shape ) ;
-								DrawAssist.attachProgram( draw, "SIMPLE_GEOMETRY" ) ;
+								DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
 
 								_delegate.addBasicDraw( draw ) ;
 							}
@@ -349,7 +352,7 @@ public final class GameTestLoader extends GameLoader
 				DrawAssist.amendTexture( draw, texture ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
-				DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 				final RenderComponent render = new RenderComponent() ;
 				render.addBasicDraw( draw ) ;

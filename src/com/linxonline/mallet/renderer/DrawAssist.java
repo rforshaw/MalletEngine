@@ -124,9 +124,9 @@ public class DrawAssist
 		return assist.amendUpdateType( _draw, _type ) ;
 	}
 
-	public static Draw attachProgram( final Draw _draw, final String _key )
+	public static Draw attachProgram( final Draw _draw, final Program _program )
 	{
-		return assist.attachProgram( _draw, _key ) ;
+		return assist.attachProgram( _draw, _program ) ;
 	}
 
 	public static Draw forceUpdate( final Draw _draw )
@@ -254,7 +254,7 @@ public class DrawAssist
 		public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation ) ;
 		public Draw amendUpdateType( final Draw _draw, final UpdateType _type ) ;
 
-		public Draw attachProgram( final Draw _draw, final String _key ) ;
+		public Draw attachProgram( final Draw _draw, final Program _program ) ;
 		public Draw forceUpdate( final Draw _draw ) ;
 
 		public Shape getDrawShape( final Draw _draw ) ;

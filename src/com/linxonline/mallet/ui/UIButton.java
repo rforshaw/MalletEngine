@@ -13,6 +13,9 @@ import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
+
 import com.linxonline.mallet.audio.AudioDelegate ;
 
 import com.linxonline.mallet.input.* ;
@@ -168,7 +171,8 @@ public class UIButton extends UIElement
 			DrawAssist.amendUI( draw, true ) ;
 			DrawAssist.amendTexture( draw, sheet ) ;
 			DrawAssist.amendShape( draw, Shape.constructPlane( length, neutral.min, neutral.max ) ) ;
-			DrawAssist.attachProgram( draw, "SIMPLE_TEXTURE" ) ;
+
+			DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 			final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
 			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
@@ -180,7 +184,7 @@ public class UIButton extends UIElement
 												  new Vector3(),
 												  new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
 			DrawAssist.amendUI( drawText, true ) ;
-			DrawAssist.attachProgram( drawText, "SIMPLE_FONT" ) ;
+			DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
 		}
 
 		@Override
