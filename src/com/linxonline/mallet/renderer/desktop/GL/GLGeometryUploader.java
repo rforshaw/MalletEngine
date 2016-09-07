@@ -454,9 +454,9 @@ public class GLGeometryUploader
 			{
 				for( int i = 0; i < textureID.length; i++ )
 				{
-					_gl.glUniform1i( program.inUniformTextures[i], i ) ;
-					_gl.glActiveTexture( GL3.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					_gl.glBindTexture( GL.GL_TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
+					_gl.uniform1i( program.inUniformTextures[i], i ) ;
+					_gl.activeTexture( GL3.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
+					_gl.bindTexture( GL.GL_TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				}
 
 				_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;

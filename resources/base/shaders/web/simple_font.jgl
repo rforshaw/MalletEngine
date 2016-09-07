@@ -1,5 +1,10 @@
 {
 	"NAME": "SIMPLE_FONT",
 	"VERTEX": ["base/shaders/web/simple_vertex.glsl"],
-	"FRAGMENT": ["base/shaders/web/simple_font_fragment.glsl"]
+	"FRAGMENT": ["base/shaders/web/simple_font_fragment.glsl"],
+
+	"UNIFORMS": [{ "NAME": "inMVPMatrix", "TYPE": "MAT4"},
+				 { "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
+	"UNIFORM_TEXTURES": ["inTex0"],
+	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }
