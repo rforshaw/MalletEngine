@@ -17,6 +17,7 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
+import com.linxonline.mallet.renderer.ProgramData ;
 
 import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -279,7 +280,7 @@ public class GLGeometryUploader
 		return buffer ;
 	}
 
-	private static VertexAttrib[] constructVertexAttrib( final Shape.Swivel[] _swivel )
+	private static VertexAttrib[] constructVertexAttrib( final Shape.Swivel[] _swivel, final GLProgram _program )
 	{
 		final VertexAttrib[] attributes = new VertexAttrib[_swivel.length] ;
 
@@ -290,25 +291,25 @@ public class GLGeometryUploader
 			{
 				case POINT  :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.VERTEX_ARRAY, 3, GLES30.GL_FLOAT, false, offset ) ;
+					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, GLES30.GL_FLOAT, false, offset ) ;
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case COLOUR :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.COLOUR_ARRAY, 4, GLES30.GL_UNSIGNED_BYTE, true, offset ) ;
+					attributes[i] = new VertexAttrib( _program.inAttributes[i], 4, GLES30.GL_UNSIGNED_BYTE, true, offset ) ;
 					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case UV     :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.TEXTURE_COORD_ARRAY0, 2, GLES30.GL_FLOAT, false, offset ) ;
+					attributes[i] = new VertexAttrib( _program.inAttributes[i], 2, GLES30.GL_FLOAT, false, offset ) ;
 					offset += 2 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case NORMAL  :
 				{
-					attributes[i] = new VertexAttrib( GLProgramManager.NORMAL_ARRAY, 3, GLES30.GL_FLOAT, false, offset ) ;
+					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, GLES30.GL_FLOAT, false, offset ) ;
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
@@ -410,17 +411,17 @@ public class GLGeometryUploader
 			final Shape shape = _data.getDrawShape() ;
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
+			layer   = _data.getOrder() ;
+			program = ( ( ProgramData<GLProgram> )_data.getProgram() ).getProgram() ;
+			ui      = _data.isUI() ;
+			isText  = _data.getText() != null ;
+
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel ) ;
+			attributes = constructVertexAttrib( shapeSwivel, program ) ;
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
-
-			layer   = _data.getOrder() ;
-			program = _data.getDrawProgram() ;
-			ui      = _data.isUI() ;
-			isText  = _data.getText() != null ;
 
 			setupTextures( _data ) ;
 
@@ -455,11 +456,11 @@ public class GLGeometryUploader
 			GLES30.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program" ) ;
 			GLES30.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
 
-			if( textureID.length > 0 )
+			if( textureID.length > 0 && program.inUniformTextures.length > 0 )
 			{
 				for( int i = 0; i < textureID.length; i++ )
 				{
-					GLES30.glUniform1i( program.inTex[i], i ) ;
+					GLES30.glUniform1i( program.inUniformTextures[i], i ) ;
 					GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
 					GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, textureID[i] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				}
@@ -527,6 +528,8 @@ public class GLGeometryUploader
 		public boolean isSupported( final GLDrawData _data )
 		{
 			final Shape shape = _data.getDrawShape() ;
+			final ProgramData<GLProgram> programData = ( ProgramData<GLProgram> )_data.getProgram() ;
+
 			if( shapeStyle != shape.getStyle() )
 			{
 				return false ;
@@ -539,7 +542,7 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-			else if( program != _data.getDrawProgram() )
+			else if( program != programData.getProgram() )
 			{
 				return false ;
 			}
@@ -835,7 +838,7 @@ public class GLGeometryUploader
 			if( stencilShape != null )
 			{
 				final Shape.Swivel[] swivel = stencilShape.getSwivel() ;
-				stencilAttributes = constructVertexAttrib( swivel ) ;
+				stencilAttributes = constructVertexAttrib( swivel, stencilProgram ) ;
 
 				final int vertexStrideBytes = calculateVertexSize( swivel ) * VBO_VAR_BYTE_SIZE ;
 				final int vertexBytes = stencilShape.getVertexSize() * vertexStrideBytes ;

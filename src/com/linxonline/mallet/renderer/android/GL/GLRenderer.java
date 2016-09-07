@@ -7,6 +7,7 @@ import android.opengl.EGL14 ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
@@ -271,9 +272,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
-			public Draw attachProgram( final Draw _draw, final String _key )
+			public Draw attachProgram( final Draw _draw, final Program _program )
 			{
-				( ( GLDrawData )_draw ).setDrawProgram( null, _key ) ;
+				( ( GLDrawData )_draw ).setProgram( _program ) ;
 				return _draw ;
 			}
 
@@ -360,7 +361,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 										final int _order )
 			{
 				final GLDrawData draw = ( GLDrawData )createDraw( _position, _offset, _rotation, _scale, _order ) ;
-				attachProgram( draw, "SIMPLE_FONT" ) ;
+				final Program program = ProgramAssist.createProgram( "SIMPLE_FONT" ) ;
+
+				attachProgram( draw, program ) ;
 				draw.setText( _text ) ;
 				draw.setFont( _font ) ;
 				return draw ;
@@ -388,6 +391,39 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			{
 				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
 				return draw ;
+			}
+		} ) ;
+
+		ProgramAssist.setAssist( new ProgramAssist.Assist()
+		{
+			public Program createProgram( final String _id )
+			{
+				return new ProgramData<GLProgram>( _id ) ;
+			}
+
+			public Program remove( final Program _program, final String _handler )
+			{
+				return _program ;
+			}
+
+			public Program map( final Program _program, final String _handler, final Matrix3 _matrix )
+			{
+				return _program ;
+			}
+
+			public Program map( final Program _program, final String _handler, final Matrix4 _matrix )
+			{
+				return _program ;
+			}
+
+			public Program map( final Program _program, final String _handler, final Vector2 _vec2 )
+			{
+				return _program ;
+			}
+
+			public Program map( final Program _program, final String _handler, final Vector3 _vec3 )
+			{
+				return _program ;
 			}
 		} ) ;
 
@@ -557,16 +593,25 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public void upload( final GLDrawData _data )
 			{
-				if( _data.getDrawProgram() == null )
 				{
-					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
 					if( program == null )
 					{
-						_data.forceUpdate() ;
+						// If we don't have a program then there is no point progressing further.
 						return ;
 					}
 
-					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
+					if( program.getProgram() == null )
+					{
+						final GLProgram glProgram = programs.get( program.getID() ) ;
+						if( glProgram == null )
+						{
+							_data.forceUpdate() ;
+							return ;
+						}
+
+						program.setProgram( glProgram ) ;
+					}
 				}
 
 				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
@@ -635,16 +680,25 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					return ;
 				}
 
-				if( _data.getDrawProgram() == null )
 				{
-					final GLProgram program = programs.get( _data.getDrawProgramID() ) ;
+					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
 					if( program == null )
 					{
-						_data.forceUpdate() ;
+						// If we don't have a program then there is no point progressing further.
 						return ;
 					}
 
-					_data.setDrawProgram( program, _data.getDrawProgramID() ) ;
+					if( program.getProgram() == null )
+					{
+						final GLProgram glProgram = programs.get( program.getID() ) ;
+						if( glProgram == null )
+						{
+							_data.forceUpdate() ;
+							return ;
+						}
+
+						program.setProgram( glProgram ) ;
+					}
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
