@@ -22,7 +22,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null, null ) ;
+	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
 	private final ArrayList<GLProgram> toBind = new ArrayList<GLProgram>() ;
 
 	public GLProgramManager()
@@ -150,7 +150,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					{
 						// We don't want to compile the Shaders now
 						// as that will take control of the OpenGL context.
-						toBind.add( new GLProgram( _name, _glShaders, _uniforms, _uniformTextures, _swivel ) ) ;
+						toBind.add( new GLProgram( _name, _glShaders, _uniforms, _swivel ) ) ;
 					}
 
 					return ;
@@ -260,7 +260,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		GLES30.glLinkProgram( _program.id[0] ) ;
 
 		_program.inMVPMatrix = GLES30.glGetUniformLocation( _program.id[0], "inMVPMatrix" ) ;
-		mapTexturesToProgram( _program ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -281,27 +280,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		}
 
 		return true ;
-	}
-
-	/**
-		Loop over a set of fixed 'inTex' uniform variables 
-		from the GLProgram/GLShaders.
-		Stop iterating as soon as an inTexi returns -1.
-		inTex0 should map to GL_TEXTURE0
-		inTex1 should map to GL_TEXTURE1
-		inTex2 should map to GL_TEXTURE1 and so on..
-		Currently an upper limit of 10 textures can be mapped.
-	*/
-	private static void mapTexturesToProgram( final GLProgram _program )
-	{
-		final ArrayList<String> inTextures = _program.uniformTextures ;
-
-		final int size = inTextures.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final String name = inTextures.get( 0 ) ;
-			_program.inUniformTextures[i] = GLES30.glGetUniformLocation( _program.id[0], name ) ;
-		}
 	}
 
 	private static boolean compileShader( final GLShader _shader )

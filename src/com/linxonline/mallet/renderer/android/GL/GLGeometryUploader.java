@@ -388,7 +388,7 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private GLProgram program ;						// What shader should be used
+		private ProgramData<GLProgram> program ;		// What shader should be used
 		private int[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
@@ -412,12 +412,12 @@ public class GLGeometryUploader
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			layer   = _data.getOrder() ;
-			program = ( ( ProgramData<GLProgram> )_data.getProgram() ).getProgram() ;
+			program = ( ProgramData<GLProgram> )_data.getProgram() ;
 			ui      = _data.isUI() ;
 			isText  = _data.getText() != null ;
 
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel, program ) ;
+			attributes = constructVertexAttrib( shapeSwivel, program.getProgram() ) ;
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
@@ -445,6 +445,13 @@ public class GLGeometryUploader
 				return ;
 			}
 
+			final GLProgram glProgram = program.getProgram() ;
+			if( glProgram == null )
+			{
+				System.out.println( "No OpenGL program specified..." ) ;
+				return ;
+			}
+
 			GLES30.glEnable( GLES30.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;		//GLRenderer.handleError( "Enable Primitive Restart" ) ;
 
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
@@ -453,21 +460,14 @@ public class GLGeometryUploader
 				drawStencil( matrix ) ;
 			}
 
-			GLES30.glUseProgram( program.id[0] ) ;		//GLRenderer.handleError( "Use Program" ) ;
-			GLES30.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
+			GLES30.glUseProgram( glProgram.id[0] ) ;										//GLRenderer.handleError( "Use Program" ) ;
+			GLES30.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;							//GLRenderer.handleError( "Load Matrix" ) ;
 
-			if( textureID.length > 0 && program.inUniformTextures.length > 0 )
-			{
-				for( int i = 0; i < textureID.length; i++ )
-				{
-					GLES30.glUniform1i( program.inUniformTextures[i], i ) ;
-					GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, textureID[i] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
-				}
+			program.getProgram().textureID = textureID ;
+			glProgram.load( program ) ;
 
-				GLES30.glEnable( GLES30.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-				GLES30.glBlendFunc( GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
-			}
+			GLES30.glEnable( GLES30.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+			GLES30.glBlendFunc( GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
 			final int size = buffers.size() ;
@@ -542,7 +542,7 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-			else if( program != programData.getProgram() )
+			else if( program.getProgram() != programData.getProgram() )
 			{
 				return false ;
 			}

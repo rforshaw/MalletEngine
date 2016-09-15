@@ -16,11 +16,11 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.renderer.ProgramData ;
 
+import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.util.sort.OrderedInsert ;
 import com.linxonline.mallet.util.sort.SortInterface ;
@@ -383,7 +383,7 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private ProgramData<GLProgram> program ;						// What shader should be used
+		private ProgramData<GLProgram> program ;		// What shader should be used
 		private int[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
@@ -910,7 +910,6 @@ public class GLGeometryUploader
 			shapeSwivel       = null ;
 			shapeStyle        = null ;
 			attributes        = null ;
-			program.getProgram().textureID = null ;
 			program           = null ;
 			stencilProgram    = null ;
 			stencilShape      = null ;

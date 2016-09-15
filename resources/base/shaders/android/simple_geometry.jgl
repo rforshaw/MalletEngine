@@ -1,8 +1,8 @@
 {
 	NAME: "SIMPLE_GEOMETRY",
-	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
-	FRAGMENT: ["base/shaders/android/simple_fragment.glsl"],
+	VERTEX: ["base/shaders/android/simple_geometry_vertex.glsl"],
+	FRAGMENT: ["base/shaders/android/simple_geometry_fragment.glsl"],
 
-	"UNIFORMS": [{ "NAME": "inMVPMatrix", "TYPE": "MAT4"}],
+	"UNIFORMS": [],
 	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

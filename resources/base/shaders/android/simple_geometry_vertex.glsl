@@ -13,6 +13,7 @@ varying vec4 outColour ;
 void main()
 {
 	gl_Position = inMVPMatrix * inVertex ;
+
 	outTexCoord0 = inTexCoord0 ;
 	outColour = inColour ;
 }

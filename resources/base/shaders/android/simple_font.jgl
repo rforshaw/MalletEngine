@@ -3,8 +3,6 @@
 	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
 	FRAGMENT: ["base/shaders/android/simple_font_fragment.glsl"],
 
-	"UNIFORMS": [{ "NAME": "inMVPMatrix", "TYPE": "MAT4"},
-				 { "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
-	"UNIFORM_TEXTURES": ["inTex0"],
+	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
 	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

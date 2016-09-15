@@ -334,11 +334,14 @@ public class GLTextureManager extends AbstractManager<Texture>
 			}
 
 			final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-			meta = createMeta( _path, in.getInputStream() ) ;
-			if( meta != null )
+			if( in != null )
 			{
-				imageMetas.put( _path, meta ) ;
-				return meta ;
+				meta = createMeta( _path, in.getInputStream() ) ;
+				if( meta != null )
+				{
+					imageMetas.put( _path, meta ) ;
+					return meta ;
+				}
 			}
 
 			Logger.println( "Unable to create meta data: " + _path, Logger.Verbosity.NORMAL ) ;
