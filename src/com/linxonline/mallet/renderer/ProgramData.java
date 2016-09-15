@@ -44,4 +44,14 @@ public class ProgramData<U> implements Program<ProgramData>
 	{
 		return uniforms.get( _id ) ;
 	}
+
+	public <T> T get( final String _id, final Class<T> _clazz )
+	{
+		return _clazz.cast( get( _id ) ) ;
+	}
+
+	public HashMap<String, Object> getMaps()
+	{
+		return uniforms ;
+	}
 }

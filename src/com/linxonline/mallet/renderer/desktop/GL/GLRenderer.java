@@ -381,31 +381,40 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		{
 			public Program createProgram( final String _id )
 			{
-				return new ProgramData<GLProgram>( _id ) ;
+				final Program program = new ProgramData<GLProgram>( _id ) ;
+				switch( _id )
+				{
+					case "SIMPLE_GEOMETRY" :
+					{
+						break ;
+					}
+					case "SIMPLE_TEXTURE"  :
+					{
+						ProgramAssist.map( program, "inTex0", new MalletTexture( "" ) ) ;
+						break ;
+					}
+					case "SIMPLE_FONT"     :
+					{
+						ProgramAssist.map( program, "inTex0", new MalletTexture( "" ) ) ;
+						break ;
+					}
+					default                : break ;
+				}
+
+				return program ;
 			}
 
 			public Program remove( final Program _program, final String _handler )
 			{
+				final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_program ;
+				program.remove( _handler ) ;
 				return _program ;
 			}
 
-			public Program map( final Program _program, final String _handler, final Matrix3 _matrix )
+			public Program map( final Program _program, final String _handler, final Object _obj )
 			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Matrix4 _matrix )
-			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Vector2 _vec2 )
-			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Vector3 _vec3 )
-			{
+				final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_program ;
+				program.set( _handler, _obj ) ;
 				return _program ;
 			}
 		} ) ;
@@ -576,40 +585,16 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		{
 			public void upload( final GLDrawData _data )
 			{
+				if( loadProgram( _data ) == false )
 				{
-					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
-					if( program == null )
-					{
-						// If we don't have a program then there is no point progressing further.
-						return ;
-					}
-
-					if( program.getProgram() == null )
-					{
-						final GLProgram glProgram = programs.get( program.getID() ) ;
-						if( glProgram == null )
-						{
-							_data.forceUpdate() ;
-							return ;
-						}
-
-						program.setProgram( glProgram ) ;
-					}
+					return ;
 				}
 
-				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
-				if( malletTextures.isEmpty() == false )
+				if( loadTextures( _data ) == false )
 				{
-					final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-					if( glTextures.isEmpty() == true )
-					{
-						if( loadTexture( _data ) == false )
-						{
-							//Logger.println( "GLRenderer - Render Data for non-existent texture", Logger.Verbosity.MINOR ) ;
-							_data.forceUpdate() ;
-							return ;
-						}
-					}
+					// We only want to continue with rendering if we 
+					// have all the required textures loaded onto the GPU.
+					return ;
 				}
 
 				final Vector3 clipPosition = _data.getClipPosition() ;
@@ -663,25 +648,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 					return ;
 				}
 
+				if( loadProgram( _data ) == false )
 				{
-					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
-					if( program == null )
-					{
-						// If we don't have a program then there is no point progressing further.
-						return ;
-					}
-
-					if( program.getProgram() == null )
-					{
-						final GLProgram glProgram = programs.get( program.getID() ) ;
-						if( glProgram == null )
-						{
-							_data.forceUpdate() ;
-							return ;
-						}
-
-						program.setProgram( glProgram ) ;
-					}
+					return ;
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
@@ -959,21 +928,61 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		return canvas ;
 	}
 
-	private boolean loadTexture( final GLDrawData _data )
+	private boolean loadProgram( final GLDrawData _data )
 	{
-		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
-		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-
-		for( final MalletTexture texture : mltTextures )
+		final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
+		if( program == null )
 		{
-			//System.out.println( "Load: " + texture.getPath() ) ;
-			final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
-			if( glTexture == null )
+			// If we don't have a program then there is no point progressing further.
+			return false ;
+		}
+
+		if( program.getProgram() == null )
+		{
+			final GLProgram glProgram = programs.get( program.getID() ) ;
+			if( glProgram == null )
+			{
+				_data.forceUpdate() ;
+				return false ;
+			}
+
+			if( glProgram.isValidMap( program.getMaps() ) == false )
 			{
 				return false ;
 			}
 
-			glTextures.add( glTexture ) ;
+			program.setProgram( glProgram ) ;
+		}
+
+		return true ;
+	}
+
+	private boolean loadTextures( final GLDrawData _data )
+	{
+		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
+		if( mltTextures.isEmpty() == true )
+		{
+			// A Draw object may not require any textures.
+			return true ;
+		}
+
+		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
+		if( glTextures.isEmpty() == true )
+		{
+			for( final MalletTexture texture : mltTextures )
+			{
+				// If all textures have not been loaded into VRAM,
+				// clear the list and wait for them all to be loaded.
+				final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
+				if( glTexture == null )
+				{
+					glTextures.clear() ;
+					_data.forceUpdate() ;
+					return false ;
+				}
+
+				glTextures.add( glTexture ) ;
+			}
 		}
 
 		return true ;

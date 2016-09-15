@@ -20,6 +20,7 @@ import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.util.sort.OrderedInsert ;
 import com.linxonline.mallet.util.sort.SortInterface ;
@@ -382,7 +383,7 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private GLProgram program ;						// What shader should be used
+		private ProgramData<GLProgram> program ;						// What shader should be used
 		private int[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
@@ -406,12 +407,12 @@ public class GLGeometryUploader
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			layer   = _data.getOrder() ;
-			program = ( ( ProgramData<GLProgram> )_data.getProgram() ).getProgram() ;
+			program = ( ProgramData<GLProgram> )_data.getProgram() ;
 			ui      = _data.isUI() ;
 			isText  = _data.getText() != null ;
 
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel, program ) ;
+			attributes = constructVertexAttrib( shapeSwivel, program.getProgram() ) ;
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
@@ -439,6 +440,13 @@ public class GLGeometryUploader
 				return ;
 			}
 
+			final GLProgram glProgram = program.getProgram() ;
+			if( glProgram == null )
+			{
+				System.out.println( "No OpenGL program specified..." ) ;
+				return ;
+			}
+
 			_gl.glEnable( GL3.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
 
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
@@ -447,21 +455,14 @@ public class GLGeometryUploader
 				drawStencil( _gl, matrix ) ;
 			}
 
-			_gl.glUseProgram( program.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
-			_gl.glUniformMatrix4fv( program.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			_gl.glUseProgram( glProgram.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
+			_gl.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
-			if( textureID.length > 0 && program.inUniformTextures.length > 0 )
-			{
-				for( int i = 0; i < textureID.length; i++ )
-				{
-					_gl.uniform1i( program.inUniformTextures[i], i ) ;
-					_gl.activeTexture( GL3.GL_TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					_gl.bindTexture( GL.GL_TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
-				}
+			program.getProgram().textureID = textureID ;
+			glProgram.load( _gl, program ) ;
 
-				_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-				_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
-			}
+			_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+			_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
 			for( final GLGeometry geometry : buffers )
@@ -534,7 +535,7 @@ public class GLGeometryUploader
 			{
 				return false ;
 			}
-			else if( program != programData.getProgram() )
+			else if( program.getProgram() != programData.getProgram() )
 			{
 				return false ;
 			}
@@ -909,6 +910,7 @@ public class GLGeometryUploader
 			shapeSwivel       = null ;
 			shapeStyle        = null ;
 			attributes        = null ;
+			program.getProgram().textureID = null ;
 			program           = null ;
 			stencilProgram    = null ;
 			stencilShape      = null ;

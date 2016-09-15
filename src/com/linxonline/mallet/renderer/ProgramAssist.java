@@ -23,24 +23,9 @@ public class ProgramAssist
 		return assist.remove( _program, _handler ) ;
 	}
 
-	public static Program map( final Program _program, final String _handler, final Matrix3 _matrix )
+	public static Program map( final Program _program, final String _handler, final Object _obj )
 	{
-		return assist.map( _program, _handler, _matrix ) ;
-	}
-
-	public static Program map( final Program _program, final String _handler, final Matrix4 _matrix )
-	{
-		return assist.map( _program, _handler, _matrix ) ;
-	}
-
-	public static Program map( final Program _program, final String _handler, final Vector2 _vec2 )
-	{
-		return assist.map( _program, _handler, _vec2 ) ;
-	}
-
-	public static Program map( final Program _program, final String _handler, final Vector3 _vec3 )
-	{
-		return assist.map( _program, _handler, _vec3 ) ;
+		return assist.map( _program, _handler, _obj ) ;
 	}
 
 	public interface Assist
@@ -48,11 +33,6 @@ public class ProgramAssist
 		public Program createProgram( final String _id ) ;
 
 		public Program remove( final Program _program, final String _handler ) ;
-
-		public Program map( final Program _program, final String _handler, final Matrix3 _matrix ) ;
-		public Program map( final Program _program, final String _handler, final Matrix4 _matrix ) ;
-
-		public Program map( final Program _program, final String _handler, final Vector2 _vec2 ) ;
-		public Program map( final Program _program, final String _handler, final Vector3 _vec3 ) ;
+		public Program map( final Program _program, final String _handler, final Object _obj ) ;
 	}
 }

@@ -2,6 +2,6 @@
 	"NAME": "SIMPLE_STENCIL",
 	"VERTEX": ["base/shaders/desktop/simple_vertex.glsl"],
 
-	"UNIFORMS": [{ "NAME": "inMVPMatrix", "TYPE": "MAT4"}],
+	"UNIFORMS": [],
 	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }
