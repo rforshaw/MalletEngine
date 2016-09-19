@@ -459,7 +459,7 @@ public class GLGeometryUploader
 			_gl.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			program.getProgram().textureID = textureID ;
-			glProgram.load( _gl, program ) ;
+			glProgram.loadUniforms( _gl, program ) ;
 
 			_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 			_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;

@@ -21,22 +21,105 @@ import com.linxonline.mallet.maths.Matrix4 ;
 */
 public class GLProgram extends Resource
 {
-	public enum DataType
+	/**
+		Load mapped uniforms to GPU
+	*/
+	public enum Uniform
 	{
-		BOOL( null ),
-		INT( null ),
-		UINT( null ),
-		FLOAT( null ),
-		DOUBLE( null ),
-		VEC2( null ),
-		VEC3( null ),
-		VEC4( null ),
+		BOOL( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		INT( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		UINT( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		FLOAT( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		DOUBLE( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		VEC2( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		VEC3( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
+		VEC4( new UniformDelegate()
+		{
+			public void load( final GL3 _gl, final ProgramData _data, final int _index ) {}
+
+			public Class getUniformClass()
+			{
+				return null ;
+			}
+
+			public void reset() {}
+		} ),
 		MAT4( new UniformDelegate()
 		{
 			public void load( final GL3 _gl, final ProgramData _data, final int _index )
 			{
 				final GLProgram program               = ( GLProgram )_data.getProgram() ;
-				final Tuple<String, DataType> uniform = program.uniforms.get( _index ) ;
+				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 				final int inUniform                   = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
@@ -57,11 +140,11 @@ public class GLProgram extends Resource
 			public void load( final GL3 _gl, final ProgramData _data, final int _index )
 			{
 				final GLProgram program               = ( GLProgram )_data.getProgram() ;
-				final Tuple<String, DataType> uniform = program.uniforms.get( _index ) ;
+				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 				final int inUniform                   = program.inUniforms[_index] ;
 
 				_gl.glUniform1i( inUniform, textureUnit ) ;
-				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;				//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
 				_gl.glBindTexture( GL.GL_TEXTURE_2D, program.textureID[textureUnit] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 			}
@@ -79,11 +162,14 @@ public class GLProgram extends Resource
 
 		private final UniformDelegate delegate ;
 
-		private DataType( final UniformDelegate _delegate )
+		private Uniform( final UniformDelegate _delegate )
 		{
 			delegate = _delegate ;
 		}
 
+		/**
+			Load the information being mapped at index location.
+		*/
 		public void load( final GL3 _gl, final ProgramData _data, final int _index )
 		{
 			delegate.load( _gl, _data, _index ) ;
@@ -99,6 +185,20 @@ public class GLProgram extends Resource
 			return delegate.getUniformClass().isInstance( _obj ) ;
 		}
 
+		protected static void resetAll()
+		{
+			Uniform.BOOL.reset() ;
+			Uniform.INT.reset() ;
+			Uniform.UINT.reset() ;
+			Uniform.FLOAT.reset() ;
+			Uniform.DOUBLE.reset() ;
+			Uniform.VEC2.reset() ;
+			Uniform.VEC3.reset() ;
+			Uniform.VEC4.reset() ;
+			Uniform.MAT4.reset() ;
+			Uniform.SAMPLER2D.reset() ;
+		}
+
 		private interface UniformDelegate
 		{
 			public void load( final GL3 _gl, final ProgramData _data, final int _index ) ;
@@ -109,32 +209,35 @@ public class GLProgram extends Resource
 		}
 	}
 
-	public final String name ;
-	public final int[] id = new int[1] ;
+	public final String name ;				// Unique Name
+	public final int[] id = new int[1] ;	// GL Program ID
 
-	public int inMVPMatrix = -1 ;			// Must always exist in shader
-	public final int[] inUniforms ;
-	public final int[] inAttributes ;
+	// Model View Projection Matrix, doesn't need to be defined in *.jgl,
+	// however it must be defined in atleast vertex shader. 
+	public int inMVPMatrix = -1 ;
+	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders  
+	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
 
-	public int[] textureID = null ;
+	public int[] textureID = null ;			// Used by GLGeometryUploader to set the texture ids.
+											// Should be removed, eventually..
 
 	public final ArrayList<GLShader> shaders ;
-	public final ArrayList<Tuple<String, DataType>> uniforms ;
+	public final ArrayList<Tuple<String, Uniform>> uniforms ;
 	public final ArrayList<String> swivel ;
 
 	public GLProgram( final String _name,
 					  final ArrayList<GLShader> _shaders,
-					  final ArrayList<Tuple<String, DataType>> _uniforms,
+					  final ArrayList<Tuple<String, Uniform>> _uniforms,
 					  final ArrayList<String> _swivel )
 	{
 		name = _name ;
 
-		shaders         = _shaders ;
-		uniforms        = _uniforms ;
-		swivel          = _swivel ;
+		shaders  = _shaders ;
+		uniforms = _uniforms ;
+		swivel   = _swivel ;
 
-		inUniforms        = ( uniforms != null )        ? new int[uniforms.size()]        : new int[0] ;
-		inAttributes      = ( swivel != null )          ? new int[swivel.size()]          : new int[0] ;
+		inUniforms   = ( uniforms != null ) ? new int[uniforms.size()] : new int[0] ;
+		inAttributes = ( swivel != null )   ? new int[swivel.size()]   : new int[0] ;
 
 		final int length = inAttributes.length ;
 		for( int i = 0; i < length; i++ )
@@ -143,27 +246,26 @@ public class GLProgram extends Resource
 		}
 	}
 
-	public void load( final GL3 _gl, final ProgramData _data )
+	/**
+		A GL Program will have information that it requires 
+		before it can be used effectively. 
+	*/
+	public void loadUniforms( final GL3 _gl, final ProgramData _data )
 	{
 		final int size = uniforms.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final Tuple<String, DataType> uniform = uniforms.get( i ) ;
+			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
 			uniform.getRight().load( _gl, _data, i ) ;
 		}
 
-		/*DataType.BOOL.reset() ;
-		DataType.INT.reset() ;
-		DataType.UINT.reset() ;
-		DataType.FLOAT.reset() ;
-		DataType.DOUBLE.reset() ;
-		DataType.VEC2.reset() ;
-		DataType.VEC3.reset() ;
-		DataType.VEC4.reset() ;
-		DataType.MAT4.reset() ;*/
-		DataType.SAMPLER2D.reset() ;
+		Uniform.resetAll() ;
 	}
 
+	/**
+		Ensure that the Mallet Program maps correctly with 
+		the GL Program it is apparently associated with.
+	*/
 	public boolean isValidMap( final HashMap<String, Object> _map )
 	{
 		final int size = uniforms.size() ;
@@ -175,7 +277,7 @@ public class GLProgram extends Resource
 
 		for( int i = 0; i < size; i++ )
 		{
-			final Tuple<String, DataType> map = uniforms.get( i ) ;
+			final Tuple<String, Uniform> map = uniforms.get( i ) ;
 			final String name = map.getLeft() ;
 
 			final Object obj = _map.get( name ) ;
@@ -185,7 +287,7 @@ public class GLProgram extends Resource
 				return false ;
 			}
 
-			final DataType type = map.getRight() ;
+			final Uniform type = map.getRight() ;
 			if( type.isValid( obj ) == false )
 			{
 				Logger.println( "OpenGL Program does not map to Mallet Program", Logger.Verbosity.MINOR ) ;
