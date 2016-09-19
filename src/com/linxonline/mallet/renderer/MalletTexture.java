@@ -19,6 +19,37 @@ public class MalletTexture
 		meta = TextureAssist.createMeta( _texturePath ) ;
 	}
 
+	/**
+		Mallet Textures are considered equal 
+		if they share the same file path.
+	*/
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj instanceof MalletTexture )
+		{
+			return meta.equals( ( ( MalletTexture )_obj ).meta ) ;
+		}
+
+		return false ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return meta.hashCode() ;
+	}
+
 	public String getPath()
 	{
 		return meta.path ;
@@ -61,6 +92,35 @@ public class MalletTexture
 			ratio = Ratio.calculateRatio( width, height ) ;
 		}
 
+		@Override
+		public boolean equals( final Object _obj )
+		{
+			if( this == _obj )
+			{
+				return true ;
+			}
+
+			if( _obj == null )
+			{
+				return false ;
+			}
+
+			if( _obj instanceof Meta )
+			{
+				final Meta meta = ( Meta )_obj ;
+				return path.equals( meta.path ) ;
+			}
+
+			return false ;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return path.hashCode() ;
+		}
+
+		@Override
 		public String toString()
 		{
 			final StringBuilder buffer = new StringBuilder() ;

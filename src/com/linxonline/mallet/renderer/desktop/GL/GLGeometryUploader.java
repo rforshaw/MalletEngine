@@ -45,10 +45,10 @@ public class GLGeometryUploader
 	private final IntBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;
-	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
+	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;		// Quick lookup
+	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;							// Available GLBuffers
 
-	private MalletColour shapeColour = new MalletColour() ;
+	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
@@ -73,7 +73,6 @@ public class GLGeometryUploader
 	*/
 	public void draw( final GL3 _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
-		//System.out.println( "Buffers: " + buffers.size() ) ;
 		for( final GLBuffer buffer : buffers )
 		{
 			buffer.draw( _gl, _worldProjection, _uiProjection ) ;
@@ -90,7 +89,7 @@ public class GLGeometryUploader
 		{
 			if( buffer.isSupported( _data ) == true )
 			{
-				// If the buffer is still supported in the buffer 
+				// If the data is still supported in the buffer 
 				// it was previously loaded into then update it.
 				buffer.upload( _gl, _data ) ;
 				return ;
@@ -378,7 +377,7 @@ public class GLGeometryUploader
 		private Shape.Style shapeStyle ;
 
 		private VertexAttrib[] attributes ;
-		private final int style ;				// OpenGL GL_TRIANGLES, GL_LINES, 
+		private final int style ;						// OpenGL GL_TRIANGLES, GL_LINES, 
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
@@ -513,33 +512,41 @@ public class GLGeometryUploader
 		/**
 			Determine whether or not this GLBuffer supports
 			the requirements of the GLRenderData.
+
 			GLBuffers will batch together similar content to 
 			improve rendering performance.
+
 			They will use layer, texture, shape swivel and style
 			to determine if the buffer can support the data.
 		*/
 		public boolean isSupported( final GLDrawData _data )
 		{
-			final Shape shape = _data.getDrawShape() ;
-			final ProgramData<GLProgram> programData = ( ProgramData<GLProgram> )_data.getProgram() ;
+			if( layer != _data.getOrder() )
+			{
+				return false ;
+			}
 
-			if( shapeStyle != shape.getStyle() )
+			if( ui != _data.isUI() )
 			{
 				return false ;
 			}
-			else if( ui != _data.isUI() )
+
+			if( stencilShape != _data.getClipShape() )
 			{
 				return false ;
 			}
-			else if( stencilShape != _data.getClipShape() )
+
+			if( isProgram( ( ProgramData<GLProgram> )_data.getProgram() ) == false )
 			{
 				return false ;
 			}
-			else if( program.getProgram() != programData.getProgram() )
+
+			if( isText != ( _data.getText() != null ) )
 			{
 				return false ;
 			}
-			else if( isText != ( _data.getText() != null ) )
+
+			if( isShape( _data.getDrawShape() ) == false )
 			{
 				return false ;
 			}
@@ -558,12 +565,17 @@ public class GLGeometryUploader
 				}
 			}
 
-			if( layer != _data.getOrder() )
+			return true ;
+		}
+
+		private boolean isShape( final Shape _shape )
+		{
+			if( shapeStyle != _shape.getStyle() )
 			{
 				return false ;
 			}
 
-			final Shape.Swivel[] sw = shape.getSwivel() ;
+			final Shape.Swivel[] sw = _shape.getSwivel() ;
 			if( shapeSwivel.length != sw.length )
 			{
 				return false ;
@@ -578,6 +590,11 @@ public class GLGeometryUploader
 			}
 
 			return true ;
+		}
+
+		private boolean isProgram( final ProgramData<GLProgram> _program )
+		{
+			return program.getProgram() == _program.getProgram() ;
 		}
 
 		private void drawStencil( final GL3 _gl, final float[] _projectionMatrix )

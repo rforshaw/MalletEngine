@@ -36,6 +36,28 @@ public final class Texture<T extends ImageInterface> extends Resource
 	}
 
 	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+		
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		return image.equals( _obj ) ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return image.hashCode() ;
+	}
+
+	@Override
 	public String type()
 	{
 		return "TEXTURE" ;

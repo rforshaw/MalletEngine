@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.Set ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.maths.* ;
@@ -71,5 +72,58 @@ public class ProgramData<U> implements Program<ProgramData>
 	public HashMap<String, Object> getMaps()
 	{
 		return uniforms ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj instanceof ProgramData )
+		{
+			final ProgramData program = ( ProgramData )_obj ;
+			if( id.equals( program.id ) == false )
+			{
+				return false ;
+			}
+
+			final HashMap<String, Object> u = program.getMaps() ;
+			if( uniforms.size() != u.size() )
+			{
+				// If the hashmaps are not the same size then 
+				// no point in continuing.
+				return false ;
+			}
+
+			final Set<String> keys = uniforms.keySet() ;
+			for( final String key : keys )
+			{
+				final Object obj1 = uniforms.get( key ) ;
+				final Object obj2 = u.get( key ) ;
+
+				if( obj1.equals( obj2 ) == false )
+				{
+					return false ;
+				}
+			}
+		}
+
+		return true ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hashcode = id.hashCode() ;
+		hashcode *= uniforms.hashCode() ;
+		return hashcode ;
 	}
 }

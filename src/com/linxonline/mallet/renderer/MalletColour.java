@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.Arrays ;
+
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 /**
@@ -104,6 +106,38 @@ public class MalletColour
 		return ConvertBytes.toFloat( colours, 0, 4 ) ;
 	}
 
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj instanceof MalletColour )
+		{
+			final MalletColour col = ( MalletColour )_obj ;
+			return colours[RED]   == col.colours[RED]   &&
+				   colours[GREEN] == col.colours[GREEN] &&
+				   colours[BLUE]  == col.colours[BLUE]  &&
+				   colours[ALPHA] == col.colours[ALPHA] ;
+		}
+
+		return false ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Arrays.hashCode( colours ) ;
+	}
+	
+	@Override
 	public String toString()
 	{
 		final StringBuilder buffer = new StringBuilder() ;
