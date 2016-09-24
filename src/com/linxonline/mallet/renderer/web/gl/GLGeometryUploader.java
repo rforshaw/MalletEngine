@@ -20,8 +20,7 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.ProgramData ;
+import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
@@ -369,14 +368,12 @@ public class GLGeometryUploader
 		private Shape.Style shapeStyle ;
 
 		private VertexAttrib[] attributes ;
-		private final int style ;				// OpenGL GL_TRIANGLES, GL_LINES, 
+		private final int style ;						// OpenGL GL_TRIANGLES, GL_LINES, 
 		private final int indexLengthBytes ;
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private GLProgram program ;						// What shader should be used
-		private WebGLTexture[] textureID = null;		// -1 represent no texture in use
-		private MalletTexture[] malletTextures = null ; 
+		private ProgramMap<GLProgram> program ;			// What shader should be used
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
 		private final boolean isText ;					// Is the buffer to be used for text?
@@ -399,18 +396,16 @@ public class GLGeometryUploader
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			layer   = _data.getOrder() ;
-			program = ( ( ProgramData<GLProgram> )_data.getProgram() ).getProgram() ;
+			program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 			ui      = _data.isUI() ;
 			isText  = _data.getText() != null ;
 
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel, program ) ;
+			attributes = constructVertexAttrib( shapeSwivel, program.getProgram() ) ;
 
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
-
-			setupTextures( _data ) ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -432,6 +427,13 @@ public class GLGeometryUploader
 				return ;
 			}
 
+			final GLProgram glProgram = program.getProgram() ;
+			if( glProgram == null )
+			{
+				System.out.println( "No OpenGL program specified..." ) ;
+				return ;
+			}
+
 			//_gl.enable( GL3.PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
 
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
@@ -441,21 +443,18 @@ public class GLGeometryUploader
 			}
 
 			//System.out.println( "Use Program" ) ;
-			_gl.useProgram( program.id[0] ) ;								//GLRenderer.handleError( "Use Program", _gl ) ;
-			_gl.uniformMatrix4fv( program.inMVPMatrix, false, matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			_gl.useProgram( glProgram.id[0] ) ;								//GLRenderer.handleError( "Use Program", _gl ) ;
+			_gl.uniformMatrix4fv( glProgram.inMVPMatrix, false, matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
-			if( textureID.length > 0 && program.inUniformTextures.length > 0 )
+			if( glProgram.loadUniforms( _gl, program ) == false )
 			{
-				for( int i = 0; i < textureID.length; i++ )
-				{
-					_gl.uniform1i( program.inUniformTextures[i], i ) ;
-					_gl.activeTexture( GL3.TEXTURE0 + i ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					_gl.bindTexture( GL3.TEXTURE_2D, textureID[i] ) ;			//GLRenderer.handleError( "Bind Texture", _gl ) ;
-				}
-
-				_gl.enable( GL3.BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-				_gl.blendFunc( GL3.SRC_ALPHA, GL3.ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+				// We failed to load all uniforms required for 
+				// this buffer, 
+				return ;
 			}
+
+			_gl.enable( GL3.BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+			_gl.blendFunc( GL3.SRC_ALPHA, GL3.ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
 			for( final GLGeometry geometry : buffers )
@@ -506,57 +505,56 @@ public class GLGeometryUploader
 		/**
 			Determine whether or not this GLBuffer supports
 			the requirements of the GLRenderData.
+
 			GLBuffers will batch together similar content to 
 			improve rendering performance.
+
 			They will use layer, texture, shape swivel and style
 			to determine if the buffer can support the data.
 		*/
 		public boolean isSupported( final GLDrawData _data )
 		{
-			final Shape shape = _data.getDrawShape() ;
-			final ProgramData<GLProgram> programData = ( ProgramData<GLProgram> )_data.getProgram() ;
-
-			if( shapeStyle != shape.getStyle() )
-			{
-				return false ;
-			}
-			else if( ui != _data.isUI() )
-			{
-				return false ;
-			}
-			else if( stencilShape != _data.getClipShape() )
-			{
-				return false ;
-			}
-			else if( program != programData.getProgram() )
-			{
-				return false ;
-			}
-			else if( isText != ( _data.getText() != null ) )
-			{
-				return false ;
-			}
-
-			final ArrayList<MalletTexture> textures = _data.getMalletTextures() ;
-			if( malletTextures.length != textures.size() )
-			{
-				return false ;
-			}
-
-			for( int i = 0; i < malletTextures.length; i++ )
-			{
-				if( malletTextures[i].getPath().equals( textures.get( i ).getPath() ) == false )
-				{
-					return false ;
-				}
-			}
-
 			if( layer != _data.getOrder() )
 			{
 				return false ;
 			}
 
-			final Shape.Swivel[] sw = shape.getSwivel() ;
+			if( ui != _data.isUI() )
+			{
+				return false ;
+			}
+
+			if( stencilShape != _data.getClipShape() )
+			{
+				return false ;
+			}
+
+			if( isProgram( ( ProgramMap<GLProgram> )_data.getProgram() ) == false )
+			{
+				return false ;
+			}
+
+			if( isText != ( _data.getText() != null ) )
+			{
+				return false ;
+			}
+
+			if( isShape( _data.getDrawShape() ) == false )
+			{
+				return false ;
+			}
+
+			return true ;
+		}
+
+		private boolean isShape( final Shape _shape )
+		{
+			if( shapeStyle != _shape.getStyle() )
+			{
+				return false ;
+			}
+
+			final Shape.Swivel[] sw = _shape.getSwivel() ;
 			if( shapeSwivel.length != sw.length )
 			{
 				return false ;
@@ -571,6 +569,11 @@ public class GLGeometryUploader
 			}
 
 			return true ;
+		}
+
+		private boolean isProgram( final ProgramMap<GLProgram> _program )
+		{
+			return program.equals( _program ) ;
 		}
 
 		private void drawStencil( final WebGLRenderingContext _gl, final float[] _projectionMatrix )
@@ -829,29 +832,6 @@ public class GLGeometryUploader
 				stencilLocation = geometry.findLocationGeometry( stencilShape ) ;
 				stencilProgram = _data.getClipProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
-			}
-		}
-
-		private void setupTextures( final GLDrawData _data )
-		{
-			final ArrayList<MalletTexture> mTextures = _data.getMalletTextures() ; 
-			final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-
-			if( mTextures.isEmpty() == true )
-			{
-				textureID = new WebGLTexture[0] ;
-				malletTextures = new MalletTexture[0] ;
-				return ;
-			}
-
-			final int size = mTextures.size() ;
-
-			textureID = new WebGLTexture[size] ;
-			malletTextures = new MalletTexture[size] ;
-			for( int i = 0; i < size; i++ )
-			{
-				textureID[i] = glTextures.get( i ).getImage().textureIDs[0] ;
-				malletTextures[i] = mTextures.get( i ) ;
 			}
 		}
 

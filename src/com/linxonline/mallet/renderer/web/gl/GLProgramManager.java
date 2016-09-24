@@ -13,18 +13,17 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Tuple ;
 
+import com.linxonline.mallet.renderer.web.gl.GLProgram.Uniform ;
+
 public class GLProgramManager extends AbstractManager<GLProgram>
 {
-	//public static final int MVP_MATRIX           = 0 ;
-	//public static final int POSITION_MATRIX      = 1 ;
-
 	/**
 		When loading a program the ProgramManager will load the 
 		content a-synchronously.
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null, null ) ;
+	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
 	private final ArrayList<GLProgram> toBind = new ArrayList<GLProgram>() ;
 
 	public GLProgramManager()
@@ -67,15 +66,13 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				//fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GEOMETRY_SHADER ) ;
 				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.FRAGMENT_SHADER ) ;
 
-				final ArrayList<Tuple<String, GLProgram.DataType>> uniforms = new ArrayList<Tuple<String, GLProgram.DataType>>() ;
-				final ArrayList<String> uniformTextures = new ArrayList<String>() ;
+				final ArrayList<Tuple<String, Uniform>> uniforms = new ArrayList<Tuple<String, Uniform>>() ;
 				final ArrayList<String> swivel = new ArrayList<String>() ;
 
-				fillUniforms( uniforms,          _jGL.optJSONArray( "UNIFORMS" ) ) ;
-				fillAttributes( uniformTextures, _jGL.optJSONArray( "UNIFORM_TEXTURES" ) ) ;
-				fillAttributes( swivel,          _jGL.optJSONArray( "SWIVEL" ) ) ;
+				fillUniforms( uniforms, _jGL.optJSONArray( "UNIFORMS" ) ) ;
+				fillAttributes( swivel, _jGL.optJSONArray( "SWIVEL" ) ) ;
 
-				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, uniformTextures, swivel ) ;
+				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, swivel ) ;
 			}
 
 			private void fill( final ArrayList<GLShaderMap> _toFill, final JSONArray _base, final int _type )
@@ -106,7 +103,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				}
 			}
 
-			private void fillUniforms( final ArrayList<Tuple<String, GLProgram.DataType>> _toFill, final JSONArray _base )
+			private void fillUniforms( final ArrayList<Tuple<String, Uniform>> _toFill, final JSONArray _base )
 			{
 				if( _base == null )
 				{
@@ -118,11 +115,11 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				{
 					final JSONObject obj = _base.optJSONObject( i ) ;
 					final String name = obj.optString( "NAME", null ) ;
-					final GLProgram.DataType type = GLProgram.DataType.valueOf( obj.optString( "TYPE", null ) ) ;
+					final Uniform type = Uniform.valueOf( obj.optString( "TYPE", null ) ) ;
 
 					if( name != null && type != null )
 					{
-						_toFill.add( new Tuple<String, GLProgram.DataType>( name, type ) ) ;
+						_toFill.add( new Tuple<String, Uniform>( name, type ) ) ;
 					}
 				}
 			}
@@ -136,8 +133,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			private void readShaders( final String _name,
 									  final ArrayList<GLShaderMap> _jShaders,
 									  final ArrayList<GLShader> _glShaders,
-									  final ArrayList<Tuple<String, GLProgram.DataType>> _uniforms,
-									  final ArrayList<String> _uniformTextures,
+									  final ArrayList<Tuple<String, Uniform>> _uniforms,
 									  final ArrayList<String> _swivel )
 			{
 				if( _jShaders.isEmpty() == true )
@@ -152,7 +148,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					{
 						// We don't want to compile the Shaders now
 						// as that will take control of the OpenGL context.
-						toBind.add( new GLProgram( _name, _glShaders, _uniforms, _uniformTextures, _swivel ) ) ;
+						toBind.add( new GLProgram( _name, _glShaders, _uniforms, _swivel ) ) ;
 					}
 
 					return ;
@@ -163,7 +159,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				if( stream.exists() == false )
 				{
 					System.out.println( "Unable to find: " + map.path ) ;
-					readShaders( _name, _jShaders, _glShaders, _uniforms, _uniformTextures, _swivel ) ;
+					readShaders( _name, _jShaders, _glShaders, _uniforms, _swivel ) ;
 					return ;
 				}
 
@@ -187,7 +183,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					public void end()
 					{
 						_glShaders.add( new GLShader( map.type, map.path, source.toString() ) ) ;
-						readShaders( _name, _jShaders, _glShaders, _uniforms, _uniformTextures, _swivel ) ;
+						readShaders( _name, _jShaders, _glShaders, _uniforms, _swivel ) ;
 					}
 				}, 1 ) ;
 			}
@@ -268,7 +264,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		_gl.linkProgram( _program.id[0] ) ;
 
 		_program.inMVPMatrix = _gl.getUniformLocation( _program.id[0], "inMVPMatrix" ) ;
-		mapTexturesToProgram( _gl, _program ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -289,27 +284,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		}
 
 		return true ;
-	}
-
-	/**
-		Loop over a set of fixed 'inTex' uniform variables 
-		from the GLProgram/GLShaders.
-		Stop iterating as soon as an inTexi returns -1.
-		inTex0 should map to GL_TEXTURE0
-		inTex1 should map to GL_TEXTURE1
-		inTex2 should map to GL_TEXTURE1 and so on..
-		Currently an upper limit of 10 textures can be mapped.
-	*/
-	private static void mapTexturesToProgram( final WebGLRenderingContext _gl, final GLProgram _program )
-	{
-		final ArrayList<String> inTextures = _program.uniformTextures ;
-
-		final int size = inTextures.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final String name = inTextures.get( 0 ) ;
-			_program.inUniformTextures[i] = _gl.getUniformLocation( _program.id[0], name ) ;
-		}
 	}
 
 	private static boolean compileShader( final WebGLRenderingContext _gl, final GLShader _shader )

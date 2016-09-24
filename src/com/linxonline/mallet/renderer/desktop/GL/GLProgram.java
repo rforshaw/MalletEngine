@@ -144,9 +144,9 @@ public class GLProgram extends Resource
 		{
 			public boolean load( final GL3 _gl, final ProgramMap _data, final int _index )
 			{
-				final GLProgram program               = ( GLProgram )_data.getProgram() ;
+				final GLProgram program              = ( GLProgram )_data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
-				final int inUniform                   = program.inUniforms[_index] ;
+				final int inUniform                  = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
 				_gl.glUniformMatrix4fv( inUniform, 1, true, m.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;

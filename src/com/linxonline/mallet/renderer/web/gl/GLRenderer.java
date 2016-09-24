@@ -13,6 +13,7 @@ import org.teavm.jso.webgl.WebGLTexture ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.settings.* ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
@@ -144,20 +145,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
-			public Draw amendTexture( final Draw _draw, final MalletTexture _texture )
-			{
-				( ( GLDrawData )_draw ).addTexture( _texture ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw removeTexture( final Draw _draw, final MalletTexture _texture )
-			{
-				( ( GLDrawData )_draw ).removeTexture( _texture ) ;
-				return _draw ;
-			}
-
-			@Override
 			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 			{
 				final GLDrawData data = ( GLDrawData )_draw ;
@@ -264,24 +251,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
-			public int getTextureSize( final Draw _draw )
-			{
-				return ( ( GLDrawData )_draw ).getMalletTextures().size() ;
-			}
-
-			@Override
-			public MalletTexture getTexture( final Draw _draw, final int _index )
-			{
-				return ( ( GLDrawData )_draw ).getMalletTexture( _index ) ;
-			}
-
-			@Override
-			public void clearTextures( final Draw _draw )
-			{
-				( ( GLDrawData )_draw ).clearTextures() ;
-			}
-
-			@Override
 			public Vector3 getRotate( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).getRotation() ;
@@ -321,6 +290,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			public boolean isUI( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).isUI() ;
+			}
+
+			@Override
+			public Program getProgram( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getProgram() ;
 			}
 
 			@Override
@@ -370,31 +345,21 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public Program createProgram( final String _id )
 			{
-				return new ProgramData<GLProgram>( _id ) ;
+				final Program program = new ProgramMap<GLProgram>( _id ) ;
+				return program ;
 			}
 
 			public Program remove( final Program _program, final String _handler )
 			{
+				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
+				program.remove( _handler ) ;
 				return _program ;
 			}
 
-			public Program map( final Program _program, final String _handler, final Matrix3 _matrix )
+			public Program map( final Program _program, final String _handler, final Object _obj )
 			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Matrix4 _matrix )
-			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Vector2 _vec2 )
-			{
-				return _program ;
-			}
-
-			public Program map( final Program _program, final String _handler, final Vector3 _vec3 )
-			{
+				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
+				program.set( _handler, _obj ) ;
 				return _program ;
 			}
 		} ) ;
@@ -565,40 +530,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public void upload( final GLDrawData _data )
 			{
+				if( loadProgram( _data ) == false )
 				{
-					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
-					if( program == null )
-					{
-						// If we don't have a program then there is no point progressing further.
-						return ;
-					}
-
-					if( program.getProgram() == null )
-					{
-						final GLProgram glProgram = programs.get( program.getID() ) ;
-						if( glProgram == null )
-						{
-							_data.forceUpdate() ;
-							return ;
-						}
-
-						program.setProgram( glProgram ) ;
-					}
-				}
-
-				final ArrayList<MalletTexture> malletTextures = _data.getMalletTextures() ;
-				if( malletTextures.isEmpty() == false )
-				{
-					final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-					if( glTextures.isEmpty() == true )
-					{
-						if( loadTexture( _data ) == false )
-						{
-							//Logger.println( "GLRenderer - Render Data for non-existent texture", Logger.Verbosity.MINOR ) ;
-							_data.forceUpdate() ;
-							return ;
-						}
-					}
+					return ;
 				}
 
 				final Vector3 clipPosition = _data.getClipPosition() ;
@@ -653,27 +587,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					return ;
 				}
 
-				{
-					final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
-					if( program == null )
-					{
-						// If we don't have a program then there is no point progressing further.
-						return ;
-					}
-
-					if( program.getProgram() == null )
-					{
-						final GLProgram glProgram = programs.get( program.getID() ) ;
-						if( glProgram == null )
-						{
-							_data.forceUpdate() ;
-							return ;
-						}
-
-						program.setProgram( glProgram ) ;
-					}
-				}
-
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 				if( fm.fontMap.texture == null )
 				{
@@ -683,14 +596,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					fontManager.generateFontGeometry( font ) ;
 				}
 
-				final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-				if( textures.isEmpty() == true )
+				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
+
+				if( loadProgram( _data ) == false )
 				{
-					// We must add a fake MalletTexture to represent the font
-					// as GLUploadGeometry doesn't use the texture id to determine 
-					// uniqueness.
-					_data.addTexture( new MalletTexture( font.getFontName() ) ) ;
-					textures.add( fm.getTexture() ) ;
+					return ;
 				}
 
 				final Vector3 position = _data.getPosition() ;
@@ -861,24 +771,38 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		return gl ;
 	}
 
-	private boolean loadTexture( final GLDrawData _data )
+	private boolean loadProgram( final GLDrawData _data )
 	{
-		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
-		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-
-		for( final MalletTexture texture : mltTextures )
+		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
+		if( program == null )
 		{
-			//System.out.println( "Load: " + texture.getPath() ) ;
-			final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
-			if( glTexture == null )
+			// If we don't have a program then there is no point progressing further.
+			return false ;
+		}
+
+		if( program.getProgram() == null )
+		{
+			final GLProgram glProgram = programs.get( program.getID() ) ;
+			if( glProgram == null )
+			{
+				_data.forceUpdate() ;
+				return false ;
+			}
+
+			if( glProgram.isValidMap( program.getMaps() ) == false )
 			{
 				return false ;
 			}
 
-			glTextures.add( glTexture ) ;
+			program.setProgram( glProgram ) ;
 		}
 
 		return true ;
+	}
+
+	protected static Texture<GLImage> getTexture( final String _path )
+	{
+		return textures.get( _path ) ;
 	}
 
 	public static void handleError( final String _txt, final WebGLRenderingContext _gl )

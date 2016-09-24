@@ -3,6 +3,6 @@
 	"VERTEX": ["base/shaders/web/simple_vertex.glsl"],
 	"FRAGMENT": ["base/shaders/web/simple_geometry_fragment.glsl"],
 
-	"UNIFORMS": [{ "NAME": "inMVPMatrix", "TYPE": "MAT4"}],
+	"UNIFORMS": [],
 	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }
