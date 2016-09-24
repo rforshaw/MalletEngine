@@ -169,10 +169,13 @@ public class UIButton extends UIElement
 										  new Vector3(),
 										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendTexture( draw, sheet ) ;
+			//DrawAssist.amendTexture( draw, sheet ) ;
 			DrawAssist.amendShape( draw, Shape.constructPlane( length, neutral.min, neutral.max ) ) ;
 
-			DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
+			final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+			ProgramAssist.map( program, "inTex0", sheet ) ;
+
+			DrawAssist.attachProgram( draw, program ) ;
 
 			final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
 			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;

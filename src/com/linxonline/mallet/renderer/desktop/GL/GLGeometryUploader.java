@@ -14,7 +14,7 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
-import com.linxonline.mallet.renderer.ProgramData ;
+import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -371,8 +371,6 @@ public class GLGeometryUploader
 	*/
 	public class GLBuffer implements SortInterface
 	{
-		private final int[] BLANK_TEXTURES = new int[0] ;
-	
 		private Shape.Swivel[] shapeSwivel ;
 		private Shape.Style shapeStyle ;
 
@@ -382,8 +380,7 @@ public class GLGeometryUploader
 		private final int vertexLengthBytes ;
 		private final int vertexStrideBytes ;			// Specifies the byte offset between verticies
 
-		private ProgramData<GLProgram> program ;		// What shader should be used
-		private int[] textureID = BLANK_TEXTURES;		// -1 represent no texture in use
+		private ProgramMap<GLProgram> program ;			// What shader should be used
 		private final int layer ;						// Defines the 2D layer the geometry resides on
 		private final boolean ui ;						// Is the buffer used for UI or world space?
 		private final boolean isText ;					// Is the buffer to be used for text?
@@ -406,7 +403,7 @@ public class GLGeometryUploader
 			final Shape.Swivel[] swivel = shape.getSwivel() ;
 
 			layer   = _data.getOrder() ;
-			program = ( ProgramData<GLProgram> )_data.getProgram() ;
+			program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 			ui      = _data.isUI() ;
 			isText  = _data.getText() != null ;
 
@@ -416,8 +413,6 @@ public class GLGeometryUploader
 			indexLengthBytes  = _indexLengthBytes ;
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
-
-			setupTextures( _data ) ;
 
 			shapeStyle = shape.getStyle() ;
 			switch( shapeStyle )
@@ -457,8 +452,12 @@ public class GLGeometryUploader
 			_gl.glUseProgram( glProgram.id[0] ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
 			_gl.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
-			program.getProgram().textureID = textureID ;
-			glProgram.loadUniforms( _gl, program ) ;
+			if( glProgram.loadUniforms( _gl, program ) == false )
+			{
+				// We failed to load all uniforms required for 
+				// this buffer, 
+				return ;
+			}
 
 			_gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 			_gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
@@ -536,7 +535,7 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			if( isProgram( ( ProgramData<GLProgram> )_data.getProgram() ) == false )
+			if( isProgram( ( ProgramMap<GLProgram> )_data.getProgram() ) == false )
 			{
 				return false ;
 			}
@@ -549,20 +548,6 @@ public class GLGeometryUploader
 			if( isShape( _data.getDrawShape() ) == false )
 			{
 				return false ;
-			}
-
-			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-			if( textureID.length != textures.size() )
-			{
-				return false ;
-			}
-
-			for( int i = 0; i < textureID.length; i++ )
-			{
-				if( textureID[i] != textures.get( i ).getImage().textureIDs[0] )
-				{
-					return false ;
-				}
 			}
 
 			return true ;
@@ -592,9 +577,9 @@ public class GLGeometryUploader
 			return true ;
 		}
 
-		private boolean isProgram( final ProgramData<GLProgram> _program )
+		private boolean isProgram( final ProgramMap<GLProgram> _program )
 		{
-			return program.getProgram() == _program.getProgram() ;
+			return program.equals( _program ) ;
 		}
 
 		private void drawStencil( final GL3 _gl, final float[] _projectionMatrix )
@@ -858,23 +843,6 @@ public class GLGeometryUploader
 				stencilLocation = geometry.findLocationGeometry( stencilShape ) ;
 				stencilProgram = _data.getClipProgram() ;
 				stencilMatrix = _data.getClipMatrix() ;
-			}
-		}
-
-		private void setupTextures( final GLDrawData _data )
-		{
-			final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-			final int size = textures.size() ;
-			if( textures.isEmpty() == true )
-			{
-				textureID = BLANK_TEXTURES ;
-				return ;
-			}
-
-			textureID = new int[textures.size()] ;
-			for( int i = 0; i < textureID.length; i++ )
-			{
-				textureID[i] = textures.get( i ).getImage().textureIDs[0] ;
 			}
 		}
 

@@ -8,6 +8,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.animation.Sprite ;
 
 import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -123,8 +124,10 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	{
 		final Sprite.Frame f = sprite.getFrame( frame ) ;		// Grab the current frame
 
-		DrawAssist.clearTextures( draw ) ;
-		DrawAssist.amendTexture( draw, f.path ) ;
+		ProgramAssist.map( DrawAssist.getProgram( draw ), "inTex0", f.path ) ;
+		
+		//DrawAssist.clearTextures( draw ) ;
+		//DrawAssist.amendTexture( draw, f.path ) ;
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility

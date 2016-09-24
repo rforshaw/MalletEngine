@@ -134,10 +134,15 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ),
 																	 10 ) ;
+
+							final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+							ProgramAssist.map( program, "inTex0", texture ) ;
+							DrawAssist.attachProgram( draw, program ) ;
+
 							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
-							DrawAssist.amendTexture( draw, texture ) ;
+							//DrawAssist.amendTexture( draw, texture ) ;
 							DrawAssist.amendUI( draw, true ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
+							//DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -349,10 +354,14 @@ public final class GameTestLoader extends GameLoader
 															new Vector3( 1, 1, 1 ),
 															10 ) ;
 				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
-				DrawAssist.amendTexture( draw, texture ) ;
+				//DrawAssist.amendTexture( draw, texture ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
-				DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
+				//DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
+
+				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", texture ) ;
+				DrawAssist.attachProgram( draw, program ) ;
 
 				final RenderComponent render = new RenderComponent() ;
 				render.addBasicDraw( draw ) ;

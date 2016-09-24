@@ -59,16 +59,6 @@ public class DrawAssist
 		return assist.amendShape( _draw, _shape ) ;
 	}
 
-	public static Draw amendTexture( final Draw _draw, final MalletTexture _texture )
-	{
-		return assist.amendTexture( _draw, _texture ) ;
-	}
-
-	public static Draw removeTexture( final Draw _draw, final MalletTexture _texture )
-	{
-		return assist.removeTexture( _draw, _texture ) ;
-	}
-	
 	public static Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 	{
 		return assist.amendClip( _draw, _clipSpace, _position, _offset ) ;
@@ -139,21 +129,6 @@ public class DrawAssist
 		return assist.getDrawShape( _draw ) ;
 	}
 
-	public static int getTextureSize( final Draw _draw )
-	{
-		return assist.getTextureSize( _draw ) ;
-	}
-
-	public static MalletTexture getTexture( final Draw _draw, final int _index )
-	{
-		return assist.getTexture( _draw, _index ) ;
-	}
-
-	public static void clearTextures( final Draw _draw )
-	{
-		assist.clearTextures( _draw ) ;
-	}
-
 	public static Vector3 getRotate( final Draw _draw )
 	{
 		return assist.getRotate( _draw ) ;
@@ -187,6 +162,11 @@ public class DrawAssist
 	public static boolean isUI( final Draw _draw )
 	{
 		return assist.isUI( _draw ) ;
+	}
+
+	public static Program getProgram( final Draw _draw )
+	{
+		return assist.getProgram( _draw ) ;
 	}
 
 	/**
@@ -239,8 +219,6 @@ public class DrawAssist
 	public interface Assist
 	{
 		public Draw amendShape( final Draw _draw, final Shape _shape ) ;
-		public Draw amendTexture( final Draw _draw, final MalletTexture _texture ) ;
-		public Draw removeTexture( final Draw _draw, final MalletTexture _texture ) ;
 		public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset ) ;
 		public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z ) ;
@@ -265,10 +243,7 @@ public class DrawAssist
 		public StringBuilder getText( final Draw _draw ) ;
 		public MalletColour getColour( final Draw _draw ) ;
 		public boolean isUI( final Draw _draw ) ;
-
-		public int getTextureSize( final Draw _draw ) ;
-		public MalletTexture getTexture( final Draw _draw, final int _index ) ;
-		public void clearTextures( final Draw _draw ) ;
+		public Program getProgram( final Draw _draw ) ;
 
 		public Draw createTextDraw( final StringBuilder _text,
 									final MalletFont _font,
