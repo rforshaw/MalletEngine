@@ -26,7 +26,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 	public static final int PERSPECTIVE_MODE  = 2 ;
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
-	protected final GLTextureManager textures = new GLTextureManager() ;
+	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
@@ -173,20 +173,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
-			public Draw amendTexture( final Draw _draw, final MalletTexture _texture )
-			{
-				( ( GLDrawData )_draw ).addTexture( _texture ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw removeTexture( final Draw _draw, final MalletTexture _texture )
-			{
-				( ( GLDrawData )_draw ).removeTexture( _texture ) ;
-				return _draw ;
-			}
-
-			@Override
 			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 			{
 				final GLDrawData data = ( GLDrawData )_draw ;
@@ -293,24 +279,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
-			public int getTextureSize( final Draw _draw )
-			{
-				return ( ( GLDrawData )_draw ).getMalletTextures().size() ;
-			}
-
-			@Override
-			public MalletTexture getTexture( final Draw _draw, final int _index )
-			{
-				return ( ( GLDrawData )_draw ).getMalletTexture( _index ) ;
-			}
-
-			@Override
-			public void clearTextures( final Draw _draw )
-			{
-				( ( GLDrawData )_draw ).clearTextures() ;
-			}
-
-			@Override
 			public Vector3 getRotate( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).getRotation() ;
@@ -350,6 +318,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			public boolean isUI( final Draw _draw )
 			{
 				return ( ( GLDrawData )_draw ).isUI() ;
+			}
+
+			@Override
+			public Program getProgram( final Draw _draw )
+			{
+				return ( ( GLDrawData )_draw ).getProgram() ;
 			}
 
 			@Override
@@ -399,39 +373,20 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		{
 			public Program createProgram( final String _id )
 			{
-				final Program program = new ProgramData<GLProgram>( _id ) ;
-				switch( _id )
-				{
-					case "SIMPLE_GEOMETRY" :
-					{
-						break ;
-					}
-					case "SIMPLE_TEXTURE"  :
-					{
-						ProgramAssist.map( program, "inTex0", new MalletTexture( "" ) ) ;
-						break ;
-					}
-					case "SIMPLE_FONT"     :
-					{
-						ProgramAssist.map( program, "inTex0", new MalletTexture( "" ) ) ;
-						break ;
-					}
-					default                : break ;
-				}
-
+				final Program program = new ProgramMap<GLProgram>( _id ) ;
 				return program ;
 			}
 
 			public Program remove( final Program _program, final String _handler )
 			{
-				final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_program ;
+				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
 				program.remove( _handler ) ;
 				return _program ;
 			}
 
 			public Program map( final Program _program, final String _handler, final Object _obj )
 			{
-				final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_program ;
+				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
 				program.set( _handler, _obj ) ;
 				return _program ;
 			}
@@ -608,13 +563,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					return ;
 				}
 
-				if( loadTextures( _data ) == false )
-				{
-					// We only want to continue with rendering if we 
-					// have all the required textures loaded onto the GPU.
-					return ;
-				}
-
 				final Vector3 clipPosition = _data.getClipPosition() ;
 				final Vector3 clipOffset   = _data.getClipOffset() ;
 				if( clipPosition != null && clipOffset != null )
@@ -666,11 +614,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					return ;
 				}
 
-				if( loadProgram( _data ) == false )
-				{
-					return ;
-				}
-
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 				if( fm.fontMap.texture == null )
 				{
@@ -680,10 +623,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 					fontManager.generateFontGeometry( font ) ;
 				}
 
-				final ArrayList<Texture<GLImage>> textures = _data.getGLTextures() ;
-				if( textures.isEmpty() == true )
+				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
+
+				if( loadProgram( _data ) == false )
 				{
-					textures.add( fm.getTexture() ) ;
+					return ;
 				}
 
 				final Vector3 position = _data.getPosition() ;
@@ -841,7 +785,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 
 	private boolean loadProgram( final GLDrawData _data )
 	{
-		final ProgramData<GLProgram> program = ( ProgramData<GLProgram> )_data.getProgram() ;
+		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 		if( program == null )
 		{
 			// If we don't have a program then there is no point progressing further.
@@ -868,35 +812,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		return true ;
 	}
 
-	private boolean loadTextures( final GLDrawData _data )
+	protected static Texture<GLImage> getTexture( final String _path )
 	{
-		final ArrayList<MalletTexture> mltTextures = _data.getMalletTextures() ;
-		if( mltTextures.isEmpty() == true )
-		{
-			// A Draw object may not require any textures.
-			return true ;
-		}
-
-		final ArrayList<Texture<GLImage>> glTextures = _data.getGLTextures() ;
-		if( glTextures.isEmpty() == true )
-		{
-			for( final MalletTexture texture : mltTextures )
-			{
-				// If all textures have not been loaded into VRAM,
-				// clear the list and wait for them all to be loaded.
-				final Texture<GLImage> glTexture = textures.get( texture.getPath() ) ;
-				if( glTexture == null )
-				{
-					glTextures.clear() ;
-					_data.forceUpdate() ;
-					return false ;
-				}
-
-				glTextures.add( glTexture ) ;
-			}
-		}
-
-		return true ;
+		return textures.get( _path ) ;
 	}
 
 	public static void handleError( final String _txt )
