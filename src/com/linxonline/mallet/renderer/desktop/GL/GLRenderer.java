@@ -32,8 +32,8 @@ import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib
 
 public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventListener
 {
-	public static final int ORTHOGRAPHIC_MODE = 1 ;
-	public static final int PERSPECTIVE_MODE  = 2 ;
+	public final static int ORTHOGRAPHIC_MODE = 1 ;
+	public final static int PERSPECTIVE_MODE  = 2 ;
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;

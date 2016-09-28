@@ -55,6 +55,7 @@ import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
+import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 
@@ -86,6 +87,7 @@ public final class GameTestLoader extends GameLoader
 		{
 			public void initGame()			// Called when state is started
 			{
+				createUI() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
@@ -101,6 +103,25 @@ public final class GameTestLoader extends GameLoader
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
+			}
+
+			public void createUI()
+			{
+				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
+				final UIButton button = jUI.get( "TestButton", UIButton.class ) ;
+				button.addListener( UIButton.constructUIListener( "Test", 
+																  new MalletFont( "Arial", 33 ),
+																  new MalletTexture( "base/textures/button_sheet.png" ),
+																  new UIButton.UV( new Vector2(), new Vector2( 0.5f, 0.5f ) ),
+																  new UIButton.UV( new Vector2( 0.0f, 0.5f ), new Vector2( 0.5f, 1.0f ) ),
+																  new UIButton.UV( new Vector2( 0.5f, 0.0f ), new Vector2( 1.0f, 0.5f ) ) ) ) ;
+
+				final Entity entity = new Entity( "UI" ) ;
+				final UIComponent component = new UIComponent() ;
+				component.addElement( jUI.getParent() ) ;
+
+				entity.addComponent( component ) ;
+				addEntity( entity ) ;
 			}
 
 			/**

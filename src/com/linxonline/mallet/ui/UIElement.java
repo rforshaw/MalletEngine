@@ -6,7 +6,7 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
-public abstract class UIElement implements InputHandler
+public class UIElement implements InputHandler
 {
 	private final float DEFAULT_MARGIN_SIZE = 5.0f ;
 

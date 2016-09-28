@@ -210,6 +210,16 @@ public class Vector3
 
 	public static final Vector3 parseVector3( final String _text )
 	{
+		if( _text == null )
+		{
+			return null ;
+		}
+
+		if( _text.isEmpty() == true )
+		{
+			return null ;
+		}
+
 		final Vector3 num = new Vector3() ;
 		String[] split = _text.split( "," ) ;
 

@@ -389,7 +389,22 @@ public class UILayout extends UIElement
 		HORIZONTAL,
 		VERTICAL,
 		GRID,
-		FORM
+		FORM ;
+		
+		public static Type derive( final String _type )
+		{
+			if( _type == null )
+			{
+				return HORIZONTAL ;
+			}
+			
+			if( _type.isEmpty() == true )
+			{
+				return HORIZONTAL ;
+			}
+
+			return Type.valueOf( _type ) ;
+		}
 	}
 
 	private interface UIElementUpdater
