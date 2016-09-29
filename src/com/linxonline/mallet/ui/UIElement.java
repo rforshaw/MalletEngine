@@ -110,11 +110,11 @@ public class UIElement implements InputHandler
 				case MOUSE1_PRESSED  :
 				case MOUSE2_PRESSED  :
 				case MOUSE3_PRESSED  :
-				case TOUCH_DOWN      : return updateReleased( _event ) ;
+				case TOUCH_DOWN      : return updatePressed( _event ) ;
 				case MOUSE1_RELEASED :
 				case MOUSE2_RELEASED :
 				case MOUSE3_RELEASED :
-				case TOUCH_UP        : return updatePressed( _event ) ;
+				case TOUCH_UP        : return updateReleased( _event ) ;
 			}
 		}
 
