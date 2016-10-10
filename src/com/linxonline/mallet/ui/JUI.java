@@ -7,8 +7,12 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.formats.json.JSONObject ;
 import com.linxonline.mallet.io.formats.json.JSONArray ;
 
+import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.logger.Logger ;
+
+import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.MalletFont ;
 
 /**
 	UIMap provides a data-driven means to creating UI.
@@ -36,8 +40,24 @@ public class JUI
 		{
 			public UIElement create( final JUI _map, final JSONObject _ui )
 			{
-				final String layout = _ui.optString( "LAYOUT", null ) ;
-				final UILayout element = new UILayout( UILayout.Type.derive( layout ) ) ;
+				final UILayout.Type type = UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ;
+
+				final UILayout element = new UILayout( type ) ;
+				applyLengths( element, _ui ) ;
+				applyLookup( _map, element, _ui ) ;
+
+				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
+				return element ;
+			}
+		} ) ;
+
+		creators.put( "UIWINDOW_LAYOUT", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final UILayout.Type type = UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ;
+
+				final UILayout element = UIFactory.constructWindowLayout( type ) ;
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
@@ -54,7 +74,47 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
+				final UIButton.UIListener uiListener = createListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
 				return element ;
+			}
+			
+			public UIButton.UIListener createListener( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final String text = _ui.optString( "TEXT", "" ) ;
+				final String fontName = _ui.optString( "FONT", null ) ;
+				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+
+				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+				final UIButton.UV neutralUV  = createUV( _ui.optJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIButton.UV rolloverUV = createUV( _ui.optJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIButton.UV clickedUV  = createUV( _ui.optJSONObject( "CLICKED_UV" ) ) ;
+
+				if( neutralUV == null || rolloverUV == null || clickedUV == null )
+				{
+					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					return null ;
+				}
+				
+				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+			}
+
+			public UIButton.UV createUV( final JSONObject _uv )
+			{
+				final Vector2 min = Vector2.parseVector2( _uv.optString( "MIN", "0.0, 0.0" ) ) ;
+				final Vector2 max = Vector2.parseVector2( _uv.optString( "MAX", "1.0, 1.0" ) ) ;
+				return new UIButton.UV( min, max ) ;
 			}
 		} ) ;
 
@@ -69,6 +129,16 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
 
+				return element ;
+			}
+		} ) ;
+
+		creators.put( "UISPACER", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final String axis = _ui.optString( "AXIS", null ) ;
+				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 				return element ;
 			}
 		} ) ;

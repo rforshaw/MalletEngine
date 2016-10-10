@@ -11,7 +11,22 @@ public class UISpacer extends UIElement
 		ONLY_X,
 		ONLY_Y,
 		ONLY_Z,
-		ONLY_XYZ
+		ONLY_XYZ ;
+
+		public static Axis derive( final String _type )
+		{
+			if( _type == null )
+			{
+				return ONLY_XYZ ;
+			}
+			
+			if( _type.isEmpty() == true )
+			{
+				return ONLY_XYZ ;
+			}
+
+			return Axis.valueOf( _type ) ;
+		}
 	}
 
 	private final UISpacer.Axis axis ;

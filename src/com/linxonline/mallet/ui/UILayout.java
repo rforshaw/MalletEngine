@@ -390,7 +390,7 @@ public class UILayout extends UIElement
 		VERTICAL,
 		GRID,
 		FORM ;
-		
+
 		public static Type derive( final String _type )
 		{
 			if( _type == null )

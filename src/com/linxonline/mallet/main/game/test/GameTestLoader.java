@@ -110,7 +110,6 @@ public final class GameTestLoader extends GameLoader
 				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
 				{
 					final UIButton button = jUI.get( "TestButton1", UIButton.class ) ;
-					button.addListener( createUIListener( "Test" ) ) ;
 					button.addListener( new MouseListener()
 					{
 						@Override
@@ -124,7 +123,6 @@ public final class GameTestLoader extends GameLoader
 
 				{
 					final UIButton button = jUI.get( "TestButton2", UIButton.class ) ;
-					button.addListener( createUIListener( "Test" ) ) ;
 					button.addListener( new MouseListener()
 					{
 						@Override
@@ -142,16 +140,6 @@ public final class GameTestLoader extends GameLoader
 
 				entity.addComponent( component ) ;
 				addEntity( entity ) ;
-			}
-
-			private UIButton.UIListener createUIListener( final String _txt )
-			{
-				return UIButton.constructUIListener( _txt, 
-													 new MalletFont( "Arial", 33 ),
-													 new MalletTexture( "base/textures/button_sheet.png" ),
-													 new UIButton.UV( new Vector2(), new Vector2( 0.5f, 0.5f ) ),
-													 new UIButton.UV( new Vector2( 0.0f, 0.5f ), new Vector2( 0.5f, 1.0f ) ),
-													 new UIButton.UV( new Vector2( 0.5f, 0.0f ), new Vector2( 1.0f, 0.5f ) ) ) ;
 			}
 
 			/**
