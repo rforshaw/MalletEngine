@@ -2,10 +2,13 @@ package com.linxonline.mallet.maths ;
 
 public class Vector2
 {
-	public float x = 0.0f ;
-	public float y = 0.0f ;
+	public float x ;
+	public float y ;
 
-	public Vector2() {}
+	public Vector2()
+	{
+		this( 0.0f, 0.0f ) ;
+	}
 
 	public Vector2( final float _x, final float _y )
 	{
@@ -105,7 +108,7 @@ public class Vector2
 	}
 
 	@Override
-	public boolean equals( Object _compare )
+	public boolean equals( final Object _compare )
 	{
 		if( _compare != null )
 		{
@@ -198,7 +201,7 @@ public class Vector2
 	{
 		if( _text == null ) { return null ; }
 		final Vector2 num = new Vector2() ;
-		String[] split = _text.split( "," ) ;
+		final String[] split = _text.split( "," ) ;
 
 		if( split.length >= 2 )
 		{

@@ -54,7 +54,7 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public void onCreate( Bundle _savedInstance )
+	public void onCreate( final Bundle _savedInstance )
 	{
 		System.out.println( "onCreate()" ) ;
 		requestWindowFeature( Window.FEATURE_NO_TITLE ) ;
@@ -103,7 +103,7 @@ public class AndroidActivity extends Activity
 		starter = null ;
 	}
 
-	public void addAndroidInputListener( AndroidInputListener _listener )
+	public void addAndroidInputListener( final AndroidInputListener _listener )
 	{
 		if( containsInputListener( _listener ) == true )
 		{
@@ -113,7 +113,7 @@ public class AndroidActivity extends Activity
 		inputListeners.add( _listener ) ;
 	}
 
-	public void removeAndroidInputListener( AndroidInputListener _listener )
+	public void removeAndroidInputListener( final AndroidInputListener _listener )
 	{
 		if( containsInputListener( _listener ) == true )
 		{
@@ -122,14 +122,14 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public boolean onKeyDown( int _keyCode, KeyEvent _event )
+	public boolean onKeyDown( final int _keyCode, final KeyEvent _event )
 	{
 		if( controlVolume( _keyCode ) == true )
 		{
 			return true ;
 		}
 
-		for( AndroidInputListener listener : inputListeners )
+		for( final AndroidInputListener listener : inputListeners )
 		{
 			listener.onKeyDown( _keyCode, _event ) ;
 		}
@@ -138,9 +138,9 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public boolean onKeyUp( int _keyCode, KeyEvent _event )
+	public boolean onKeyUp( final int _keyCode, final KeyEvent _event )
 	{
-		for( AndroidInputListener listener : inputListeners )
+		for( final AndroidInputListener listener : inputListeners )
 		{
 			listener.onKeyUp( _keyCode, _event ) ;
 		}
@@ -149,9 +149,9 @@ public class AndroidActivity extends Activity
 	}
 
 	@Override
-	public boolean onTouchEvent( MotionEvent _event )
+	public boolean onTouchEvent( final MotionEvent _event )
 	{
-		for( AndroidInputListener listener : inputListeners )
+		for( final AndroidInputListener listener : inputListeners )
 		{
 			listener.onTouchEvent( _event ) ;
 		}
@@ -252,7 +252,7 @@ public class AndroidActivity extends Activity
 		return false ;
 	}
 
-	private boolean containsInputListener( AndroidInputListener _listener )
+	private boolean containsInputListener( final AndroidInputListener _listener )
 	{
 		return inputListeners.contains( _listener ) ;
 	}

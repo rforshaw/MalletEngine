@@ -14,9 +14,9 @@ public abstract class ConfigReader
 		final ArrayList<String> file = TextReader.getTextAsArray( _file ) ;
 		final Settings config = new Settings() ;
 
-		for( String line : file )
+		for( final String line : file )
 		{
-			String[] split = line.split( " " ) ;
+			final String[] split = line.split( " " ) ;
 			if( split.length >= 2 )
 			{
 				process( split, config ) ;

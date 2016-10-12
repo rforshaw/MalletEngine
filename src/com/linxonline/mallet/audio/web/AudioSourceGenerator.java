@@ -23,7 +23,7 @@ public class AudioSourceGenerator implements AudioGenerator<WebSound>
 
 	/**
 		Generator deals with the construction and deconstruction of the Audio backend 
-	**/
+	*/
 	public boolean startGenerator()
 	{
 		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
@@ -54,7 +54,7 @@ public class AudioSourceGenerator implements AudioGenerator<WebSound>
 				source.addEventListener( "load", new EventListener()
 				{
 					@Override
-					public void handleEvent( Event _event )
+					public void handleEvent( final Event _event )
 					{
 						
 					}

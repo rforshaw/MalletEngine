@@ -157,7 +157,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	{
 		_events.add( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
 		{
-			public void callback( AudioDelegate _delegate )
+			public void callback( final AudioDelegate _delegate )
 			{
 				delegate = _delegate ;
 				if( defaultAudio != null )

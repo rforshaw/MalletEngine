@@ -40,7 +40,7 @@ public abstract class RFReader
 		ArrayList<String> block = null ;
 		final ArrayList<ArrayList<String>> blocks = new ArrayList<ArrayList<String>>() ;
 
-		for( String line : stripped )
+		for( final String line : stripped )
 		{
 			// Check line to see if it is {
 			if( line.contains( OBRACKET ) == true )
@@ -99,7 +99,7 @@ public abstract class RFReader
 		for( int i = 0; i < size; ++i )
 		{
 			line = _file.get( i ) ;
-			int index = line.indexOf( COMMENT ) ;
+			final int index = line.indexOf( COMMENT ) ;
 			if( index > 0 )
 			{
 				line = line.substring( 0, index ) ;

@@ -7,7 +7,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 public class Skeleton2
 {
 	private Bone2 root = null ;
-	private HashMap<String, Bone2> bones = new HashMap<String, Bone2>() ;
+	private final HashMap<String, Bone2> bones = new HashMap<String, Bone2>() ;
 
 	public Skeleton2() {}
 
@@ -53,7 +53,7 @@ public class Skeleton2
 			return ;
 		}
 
-		int length = _bone.children.size() ;
+		final int length = _bone.children.size() ;
 		Bone2 child = null ;
 
 		for( int i = 0; i < length; ++i )

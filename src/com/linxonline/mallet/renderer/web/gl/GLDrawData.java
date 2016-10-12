@@ -83,7 +83,7 @@ public class GLDrawData extends DrawData
 		return textures ;
 	}
 
-	public void setDrawProgram( final GLProgram _program, String _id )
+	public void setDrawProgram( final GLProgram _program, final String _id )
 	{
 		drawProgramID = _id ;
 		drawProgram = _program ;

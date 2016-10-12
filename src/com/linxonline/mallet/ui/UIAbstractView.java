@@ -85,7 +85,7 @@ public abstract class UIAbstractView extends UIElement
 		refresh = true ;
 	}
 
-	public void setModel( UIAbstractModel _model )
+	public void setModel( final UIAbstractModel _model )
 	{
 		model = _model ;
 	}

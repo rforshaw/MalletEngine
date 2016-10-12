@@ -147,7 +147,7 @@ public class UIButton extends UIElement
 			super.setParent( _parent ) ;
 			_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 			{
-				public void callback( DrawDelegate _delegate )
+				public void callback( final DrawDelegate _delegate )
 				{
 					delegate = _delegate ;
 					if( draw != null )

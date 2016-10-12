@@ -155,7 +155,7 @@ public final class Entity
 	**/
 	public final int getComponentsByName( final String _name, final ArrayList<Component> _components )
 	{
-		for( Component component : components )
+		for( final Component component : components )
 		{
 			if( component.isName( _name ) == true )
 			{
@@ -171,7 +171,7 @@ public final class Entity
 	**/
 	public final int getComponentsByNameID( final int _nameID, final ArrayList<Component> _components )
 	{
-		for( Component component : components )
+		for( final Component component : components )
 		{
 			if( component.isNameID( _nameID ) == true )
 			{

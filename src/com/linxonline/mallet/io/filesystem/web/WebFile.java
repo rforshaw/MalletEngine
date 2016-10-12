@@ -153,7 +153,6 @@ public class WebFile implements FileStream
 				_callback.start() ;
 
 				final ArrayList<String> strings = new ArrayList<String>() ;
-				int offset = 0 ;
 
 				String line = null ;
 				while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )

@@ -128,7 +128,7 @@ public class InputState implements InputSystemInterface,
 		// Input State does not retain inputs anymore.
 	}
 
-	private final boolean exists( InputHandler _handler )
+	private final boolean exists( final InputHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;

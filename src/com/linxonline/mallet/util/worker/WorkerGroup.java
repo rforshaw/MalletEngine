@@ -52,7 +52,7 @@ public class WorkerGroup
 		}
 
 		int start = 0 ;
-		int range = dataSize / threadLength ; 	// Split the entities between the threads.
+		final int range = dataSize / threadLength ; 	// Split the entities between the threads.
 
 		for( int i = 0; i < threadLength; ++i )
 		{

@@ -58,7 +58,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 				}
 
 				final AL openAL = ALSASourceGenerator.this.openAL ;
-				int[] buffer = new int[1] ;
+				final int[] buffer = new int[1] ;
 
 				openAL.alGenBuffers( 1, buffer, 0 ) ;
 				if( openAL.alGetError() != AL.AL_NO_ERROR )
@@ -131,7 +131,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 			return null ;
 		}
 
-		int[] source = new int[1] ;
+		final int[] source = new int[1] ;
 		openAL.alGenSources( 1, source, 0 ) ;	
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{

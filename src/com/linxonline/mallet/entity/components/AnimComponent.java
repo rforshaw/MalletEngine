@@ -164,7 +164,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	{
 		_events.add( AnimationAssist.constructAnimationDelegate( new AnimationDelegateCallback()
 		{
-			public void callback( AnimationDelegate _delegate )
+			public void callback( final AnimationDelegate _delegate )
 			{
 				delegate = _delegate ;
 				if( defaultAnim != null )

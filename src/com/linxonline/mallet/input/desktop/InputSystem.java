@@ -130,7 +130,7 @@ public class InputSystem implements InputSystemInterface,
 
 	/** Recieve Key Events from system **/
 
-	public void keyPressed( KeyEvent _event )
+	public void keyPressed( final KeyEvent _event )
 	{
 		if( _event.getID() == KeyEvent.KEY_PRESSED )
 		{
@@ -138,7 +138,7 @@ public class InputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void keyReleased( KeyEvent _event )
+	public void keyReleased( final KeyEvent _event )
 	{
 		if( _event.getID() == KeyEvent.KEY_RELEASED )
 		{
@@ -146,15 +146,15 @@ public class InputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void keyTyped( KeyEvent _event ) {}
+	public void keyTyped( final KeyEvent _event ) {}
 
 	/** Recieve mouse events from system **/
 	
-	public void mouseClicked( MouseEvent _event ) {}
+	public void mouseClicked( final MouseEvent _event ) {}
 
-	public void mouseEntered( MouseEvent _event ) {}
+	public void mouseEntered( final MouseEvent _event ) {}
 
-	public void mouseExited( MouseEvent _event )
+	public void mouseExited( final MouseEvent _event )
 	{
 		final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
 		if( capture == false || controlMouse == null )
@@ -170,7 +170,7 @@ public class InputSystem implements InputSystemInterface,
 		controlMouse.mouseMove( point.x + ( int )shift.x , point.y + ( int )shift.y ) ;
 	}
 
-	public void mousePressed( MouseEvent _event )
+	public void mousePressed( final MouseEvent _event )
 	{
 		switch( _event.getButton() )
 		{
@@ -198,7 +198,7 @@ public class InputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void mouseReleased( MouseEvent _event )
+	public void mouseReleased( final MouseEvent _event )
 	{
 		switch( _event.getButton() )
 		{
@@ -226,7 +226,7 @@ public class InputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void mouseDragged( MouseEvent _event )
+	public void mouseDragged( final MouseEvent _event )
 	{
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
@@ -234,7 +234,7 @@ public class InputSystem implements InputSystemInterface,
 		updateMouse( InputType.MOUSE_MOVED, mousePosition ) ;
 	}
 
-	public void mouseMoved( MouseEvent _event )
+	public void mouseMoved( final MouseEvent _event )
 	{
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
@@ -244,12 +244,12 @@ public class InputSystem implements InputSystemInterface,
 
 	/**  Recieve MouseWheelEvents from system **/
 	
-	public void mouseWheelMoved( MouseWheelEvent _event )
+	public void mouseWheelMoved( final MouseWheelEvent _event )
 	{
 		updateMouseWheel( _event ) ;
 	}
 
-	private synchronized void updateMouseWheel( MouseWheelEvent _event )
+	private synchronized void updateMouseWheel( final MouseWheelEvent _event )
 	{
 		final InputEvent input = cache.get() ;
 		final int scroll = _event.getWheelRotation() ;

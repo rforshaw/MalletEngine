@@ -126,7 +126,7 @@ public class ALSASource implements AudioSource
 		final int b = ( getBufferBits() / 8 ) ; 	// Change to bytes
 		final int c = getBufferChannels() ;
 		final float f = getBufferFreq() ;
-		
+
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
 			return -1.0f ;

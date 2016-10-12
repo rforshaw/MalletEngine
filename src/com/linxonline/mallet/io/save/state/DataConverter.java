@@ -119,7 +119,7 @@ public class DataConverter
 		{
 			for( final T t : data )
 			{
-				for( DataOut<T> out : outs )
+				for( final DataOut<T> out : outs )
 				{
 					out.write( t ) ;
 				}
@@ -130,7 +130,7 @@ public class DataConverter
 		{
 			for( final T t : data )
 			{
-				for( DataIn<T> in : ins )
+				for( final DataIn<T> in : ins )
 				{
 					in.read( t ) ;
 				}

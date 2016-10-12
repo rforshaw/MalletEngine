@@ -9,7 +9,7 @@ public class QuickSort
 		Used to sort RenderContainers based on their LAYER.
 		-10, -4, 0, 1, 5, 11,
 	*/
-	public static <T extends SortInterface> ArrayList<T> quicksort( ArrayList<T> _contents )
+	public static <T extends SortInterface> ArrayList<T> quicksort( final ArrayList<T> _contents )
 	{
 		final int size = _contents.size() ;
 		if( size <= 1 )
@@ -20,7 +20,7 @@ public class QuickSort
 		return sort( _contents )  ;
 	}
 
-	public static <T extends SortInterface> T[] quicksort( T[] _contents )
+	public static <T extends SortInterface> T[] quicksort( final T[] _contents )
 	{
 		final int size = _contents.length ;
 		if( size <= 1 )
@@ -37,7 +37,7 @@ public class QuickSort
 		return sort( array ).toArray( _contents ) ;
 	}
 
-	private static <T extends SortInterface> ArrayList<T> sort( ArrayList<T> _contents )
+	private static <T extends SortInterface> ArrayList<T> sort( final ArrayList<T> _contents )
 	{
 		int size = _contents.size() ;
 		final int halfSize = size / 2 ;

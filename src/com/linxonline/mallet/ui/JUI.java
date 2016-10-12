@@ -90,13 +90,6 @@ public class JUI
 					return null ;
 				}
 
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
-
-				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
-				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-
 				final UIButton.UV neutralUV  = createUV( _ui.optJSONObject( "NEUTRAL_UV" ) ) ;
 				final UIButton.UV rolloverUV = createUV( _ui.optJSONObject( "ROLLOVER_UV" ) ) ;
 				final UIButton.UV clickedUV  = createUV( _ui.optJSONObject( "CLICKED_UV" ) ) ;
@@ -106,7 +99,14 @@ public class JUI
 					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
-				
+
+				final String text = _ui.optString( "TEXT", "" ) ;
+				final String fontName = _ui.optString( "FONT", null ) ;
+				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+
+				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
 				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
 			}
 

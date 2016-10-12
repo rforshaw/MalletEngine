@@ -26,12 +26,12 @@ public abstract class InputComponent extends Component
 		this( _name, _group, InputMode.WORLD ) ;
 	}
 
-	public InputComponent( final String _name, InputMode _mode )
+	public InputComponent( final String _name, final InputMode _mode )
 	{
 		this( _name, "INPUTCOMPONENT", _mode ) ;
 	}
 
-	public InputComponent( final String _name, final String _group, InputMode _mode )
+	public InputComponent( final String _name, final String _group, final InputMode _mode )
 	{
 		super( _name, _group ) ;
 		mode = _mode ;

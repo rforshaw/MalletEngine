@@ -149,7 +149,7 @@ public class OBB
 
 	private final void init()
 	{
-		Vector2 point = new Vector2() ;
+		final Vector2 point = new Vector2() ;
 
 		point.x = points[TOP_RIGHT].x - points[TOP_LEFT].x ;
 		point.y = points[TOP_RIGHT].y - points[TOP_LEFT].y ;

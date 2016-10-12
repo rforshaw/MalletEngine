@@ -4,7 +4,7 @@ public abstract class Font<T>
 {
 	protected T font ;
 
-	public Font( T _font )
+	public Font( final T _font )
 	{
 		font = _font ;
 	}

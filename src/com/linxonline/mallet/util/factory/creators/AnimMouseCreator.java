@@ -34,9 +34,9 @@ public class AnimMouseCreator extends Creator<Entity, Settings>
 		final Entity entity = new Entity( "MOUSE" ) ;
 		entity.position = new Vector3( width, height, 0 ) ;
 
-		AnimComponent anim = new AnimComponent() ;
-		EventComponent event = new EventComponent() ;
-		MouseComponent mouse = new MouseComponent() ;
+		final AnimComponent anim = new AnimComponent() ;
+		final EventComponent event = new EventComponent() ;
+		final MouseComponent mouse = new MouseComponent() ;
 
 		final Anim animation = AnimationAssist.createAnimation( _mouse.getString( "ANIM", null ),
 																entity.position,

@@ -25,12 +25,12 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
 		if( inter != null )
 		{
-			BooleanVariable var = ( BooleanVariable )inter ;
+			final BooleanVariable var = ( BooleanVariable )inter ;
 			var.setBoolean( _value ) ;
 			return ;
 		}
 
-		BooleanVariable var = new BooleanVariable( _name, _value ) ;
+		final BooleanVariable var = new BooleanVariable( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 	
@@ -39,12 +39,12 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
 		if( inter != null )
 		{
-			IntegerVariable var = ( IntegerVariable )inter ;
+			final IntegerVariable var = ( IntegerVariable )inter ;
 			var.setInteger( _value ) ;
 			return ;
 		}
 
-		IntegerVariable var = new IntegerVariable( _name, _value ) ;
+		final IntegerVariable var = new IntegerVariable( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -53,12 +53,12 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
 		if( inter != null )
 		{
-			FloatVariable var = ( FloatVariable )inter ;
+			final FloatVariable var = ( FloatVariable )inter ;
 			var.setFloat( _value ) ;
 			return ;
 		}
 
-		FloatVariable var = new FloatVariable( _name, _value ) ;
+		final FloatVariable var = new FloatVariable( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -67,12 +67,12 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
 		if( inter != null )
 		{
-			StringVariable var = ( StringVariable )inter ;
+			final StringVariable var = ( StringVariable )inter ;
 			var.setString( _value ) ;
 			return ;
 		}
 
-		StringVariable var = new StringVariable( _name, _value ) ;
+		final StringVariable var = new StringVariable( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -81,12 +81,12 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
-			ObjectVariable var = ( ObjectVariable )inter ;
+			final ObjectVariable var = ( ObjectVariable )inter ;
 			var.setObject( _value ) ;
 			return ;
 		}
 
-		ObjectVariable<T> var = new ObjectVariable<T>( _name, _value ) ;
+		final ObjectVariable<T> var = new ObjectVariable<T>( _name, _value ) ;
 		variables.put( _name, var ) ;
 	}
 
@@ -104,7 +104,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
 		if( inter != null )
 		{
-			BooleanVariable var = ( BooleanVariable )inter ;
+			final BooleanVariable var = ( BooleanVariable )inter ;
 			return var.value ;
 		}
 
@@ -116,7 +116,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
 		if( inter != null )
 		{
-			BooleanVariable var = ( BooleanVariable )inter ;
+			final BooleanVariable var = ( BooleanVariable )inter ;
 			return var.value ;
 		}
 
@@ -128,7 +128,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
 		if( inter != null )
 		{
-			IntegerVariable var = ( IntegerVariable )inter ;
+			final IntegerVariable var = ( IntegerVariable )inter ;
 			return var.value ;
 		}
 
@@ -140,7 +140,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
 		if( inter != null )
 		{
-			IntegerVariable var = ( IntegerVariable )inter ;
+			final IntegerVariable var = ( IntegerVariable )inter ;
 			return var.value ;
 		}
 
@@ -152,7 +152,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
 		if( inter != null )
 		{
-			FloatVariable var = ( FloatVariable )inter ;
+			final FloatVariable var = ( FloatVariable )inter ;
 			return var.value ;
 		}
 
@@ -164,7 +164,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
 		if( inter != null )
 		{
-			FloatVariable var = ( FloatVariable )inter ;
+			final FloatVariable var = ( FloatVariable )inter ;
 			return var.value ;
 		}
 
@@ -176,7 +176,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
 		if( inter != null )
 		{
-			StringVariable var = ( StringVariable )inter ;
+			final StringVariable var = ( StringVariable )inter ;
 			return var.value ;
 		}
 
@@ -188,7 +188,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
 		if( inter != null )
 		{
-			StringVariable var = ( StringVariable )inter ;
+			final StringVariable var = ( StringVariable )inter ;
 			return var.value ;
 		}
 
@@ -200,7 +200,7 @@ public final class Settings
 		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
 		if( inter != null )
 		{
-			ObjectVariable var = ( ObjectVariable )inter ;
+			final ObjectVariable var = ( ObjectVariable )inter ;
 			return var.value ;
 		}
 
@@ -243,7 +243,7 @@ public final class Settings
 		final ArrayList<String> list = new ArrayList<String>() ;
 		final StringBuilder buffer = new StringBuilder() ;
 
-		for( VariableInterface inter : collection )
+		for( final VariableInterface inter : collection )
 		{
 			buffer.append( inter.name + " " + "\"" + inter.toString() + "\"" ) ;
 			list.add( buffer.toString() ) ;

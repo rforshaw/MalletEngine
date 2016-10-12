@@ -8,7 +8,7 @@ public final class Texture<T extends ImageInterface> extends Resource
 	public final int height ;
 	public final T image ;
 
-	public Texture( T _image )
+	public Texture( final T _image )
 	{
 		image = _image ;
 		width = ( image != null ) ? image.getWidth() : 0 ;

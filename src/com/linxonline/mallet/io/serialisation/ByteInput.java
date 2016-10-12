@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 */
 public class ByteInput implements SerialiseInput
 {
-	private byte[] stream = null ;
+	private byte[] stream ;
 	private int position = 0 ;
 
 	protected ByteInput( final byte[] _stream )
@@ -229,7 +229,7 @@ public class ByteInput implements SerialiseInput
 	/**
 		Increment the position by X, but return the position before adding X.
 	**/
-	private int increment( int _x )
+	private int increment( final int _x )
 	{
 		final int pos = position ;
 		position += _x ;

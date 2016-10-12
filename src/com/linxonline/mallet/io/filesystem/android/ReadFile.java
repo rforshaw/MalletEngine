@@ -58,7 +58,7 @@ public class ReadFile
 		private final StringInCallback callback ;
 		private int toReadNum ;
 
-		public StringThread( StringInStream _stream, final StringInCallback _callback, final int _length )
+		public StringThread( final StringInStream _stream, final StringInCallback _callback, final int _length )
 		{
 			toReadNum = _length ;
 			callback = _callback ;
@@ -70,7 +70,6 @@ public class ReadFile
 			callback.start() ;
 
 			final ArrayList<String> strings = new ArrayList<String>() ;
-			int offset = 0 ;
 
 			String line = null ;
 			while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )

@@ -11,7 +11,7 @@ public class GLImage implements ImageInterface
 	private final int width ;				// Width of texture
 	private final int height ;				// Height of texture
 
-	public GLImage( WebGLTexture _textureID, final int _width, final int _height )
+	public GLImage( final WebGLTexture _textureID, final int _width, final int _height )
 	{
 		textureIDs[0] = _textureID ;
 

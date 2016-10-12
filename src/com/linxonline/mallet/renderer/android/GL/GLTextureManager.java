@@ -354,8 +354,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 			options.inJustDecodeBounds = true ;
 
 			BitmapFactory.decodeStream( _stream, null, options ) ;
-			int width = options.outWidth ;
-			int height = options.outHeight ;
+			final int width = options.outWidth ;
+			final int height = options.outHeight ;
 
 			return new MalletTexture.Meta( _path, height, width ) ;
 		}

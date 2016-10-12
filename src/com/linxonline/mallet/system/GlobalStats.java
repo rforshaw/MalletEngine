@@ -118,7 +118,7 @@ public class GlobalStats
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		final Collection<StatTrack> values = domains.values() ;
-		for( StatTrack track : values )
+		for( final StatTrack track : values )
 		{
 			buffer.append( track.toString() ) ;
 		}
@@ -215,7 +215,7 @@ public class GlobalStats
 		public void clear()
 		{
 			final Collection<Notification<Domain>> values = listeners.values() ;
-			for( Notification<Domain> notifications : values )
+			for( final Notification<Domain> notifications : values )
 			{
 				notifications.clear() ;
 			}

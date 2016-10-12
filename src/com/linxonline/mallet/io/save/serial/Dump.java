@@ -30,7 +30,7 @@ public class Dump
 	private static final JSONDump jsonDump = new JSONDump() ;
 	private static final BinaryDump binDump = new BinaryDump() ;
 
-	public static boolean dump( final Object _obj, Format _format, final String _file )
+	public static boolean dump( final Object _obj, final Format _format, final String _file )
 	{
 		switch( _format )
 		{
@@ -376,7 +376,6 @@ public class Dump
 		private boolean storeField( final Field _field, final JSONObject _fields, final JSONObject _fieldTypes, final Object _obj ) throws IllegalAccessException
 		{
 			_field.setAccessible( true ) ;
-			final Class classType = _field.getType() ;
 
 			if( isStatic( _field ) == true )
 			{
@@ -391,6 +390,7 @@ public class Dump
 				}
 			}
 
+			final Class classType = _field.getType() ;
 			if( classType.isArray() == true )
 			{
 				return storeArrayField( _field, _fields, _fieldTypes, _obj ) ;

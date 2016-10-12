@@ -149,7 +149,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( DrawDelegate _delegate )
+					public void callback( final DrawDelegate _delegate )
 					{
 						{
 							final int width = GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
@@ -291,7 +291,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( DrawDelegate _delegate )
+					public void callback( final DrawDelegate _delegate )
 					{
 						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
 																	 new MalletFont( "Arial" ),
@@ -313,7 +313,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
 				{
-					public void callback( AudioDelegate _delegate )
+					public void callback( final AudioDelegate _delegate )
 					{
 						_delegate.addAudio( AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ) ;
 					}

@@ -2,7 +2,7 @@ package com.linxonline.malleteditor.main ;
 
 public class Main
 {
-	public static void main( String _args[] )
+	public static void main( final String _args[] )
 	{
 		final EditorStarter starter = new EditorStarter() ;
 		starter.init() ;

@@ -27,7 +27,7 @@ public final class ConvertBytes
 
 	private ConvertBytes() {}
 
-	public static void setImplementation( ConvertBytes.Interface _impl )
+	public static void setImplementation( final ConvertBytes.Interface _impl )
 	{
 		impl = _impl ;
 	}
@@ -126,42 +126,42 @@ public final class ConvertBytes
 
 	/**BYTE ARRAY to VARIABLE**/
 
-	public static int toInt( final byte[] _int, int _offset, int _length )
+	public static int toInt( final byte[] _int, final int _offset, final int _length )
 	{
 		return impl.toInt( _int, _offset, _length ) ;
 	}
 
-	public static char toChar( final byte[] _char, final int _offset, int _length )
+	public static char toChar( final byte[] _char, final int _offset, final int _length )
 	{
 		return impl.toChar( _char, _offset, _length ) ;
 	}
 
-	public static long toLong( final byte[] _long, final int _offset, int _length )
+	public static long toLong( final byte[] _long, final int _offset, final int _length )
 	{
 		return impl.toLong( _long, _offset, _length ) ;
 	}
 
-	public static short toShort( final byte[] _short, final int _offset, int _length )
+	public static short toShort( final byte[] _short, final int _offset, final int _length )
 	{
 		return impl.toShort( _short, _offset, _length ) ;
 	}
 
-	public static float toFloat( final byte[] _float, final int _offset, int _length )
+	public static float toFloat( final byte[] _float, final int _offset, final int _length )
 	{
 		return impl.toFloat( _float, _offset, _length ) ;
 	}
 
-	public static double toDouble( final byte[] _double, final int _offset, int _length )
+	public static double toDouble( final byte[] _double, final int _offset, final int _length )
 	{
 		return impl.toDouble( _double, _offset, _length ) ;
 	}
 
-	public static boolean toBoolean( final byte[] _bool, final int _offset, int _length )
+	public static boolean toBoolean( final byte[] _bool, final int _offset, final int _length )
 	{
 		return impl.toBoolean( _bool, _offset, _length ) ;
 	}
 
-	public static byte[] toBytes( final byte[] _bytes, final int _offset, int _length )
+	public static byte[] toBytes( final byte[] _bytes, final int _offset, final int _length )
 	{
 		// Assumes BIG_ENDIAN
 		return impl.toBytes( _bytes, _offset, _length ) ;
@@ -172,12 +172,12 @@ public final class ConvertBytes
 		return impl.toBits( _bytes, _byteOffset, _bitOffset, _bitLength ) ;
 	}
 
-	public static byte[] newBytes( final byte[] _bytes, int _offset, final  int _length )
+	public static byte[] newBytes( final byte[] _bytes, final int _offset, final int _length )
 	{
 		return impl.newBytes( _bytes, _offset, _length ) ;
 	}
 
-	public static byte[] newInvertBytes( final byte[] _bytes, int _offset, final  int _length )
+	public static byte[] newInvertBytes( final byte[] _bytes, final int _offset, final int _length )
 	{
 		return impl.newInvertBytes( _bytes, _offset, _length ) ;
 	}
@@ -227,12 +227,12 @@ public final class ConvertBytes
 		return impl.isBitSet( _bytes, _position ) ;
 	}
 
-	public static byte setBit( byte _byte, final int _position, final boolean _set )
+	public static byte setBit( final byte _byte, final int _position, final boolean _set )
 	{
 		return impl.setBit( _byte, _position, _set ) ;
 	}
 
-	public static void setBit( byte[] _bytes, final int _position, final boolean _set )
+	public static void setBit( final byte[] _bytes, final int _position, final boolean _set )
 	{
 		impl.setBit( _bytes, _position, _set ) ;
 	}
@@ -434,7 +434,7 @@ public final class ConvertBytes
 
 		/**BYTE ARRAY to VARIABLE**/
 
-		public int toInt( final byte[] _int, int _offset, int _length )
+		public int toInt( final byte[] _int, final int _offset, final int _length )
 		{
 			return ( ( _int[_offset + 0] & 0xFF ) << 24 ) |
 				( ( _int[_offset + 1] & 0xFF ) << 16 ) |
@@ -444,13 +444,13 @@ public final class ConvertBytes
 			//return ByteBuffer.wrap( _int, _offset, _length ).getInt() ;
 		}
 
-		public char toChar( final byte[] _char, final int _offset, int _length )
+		public char toChar( final byte[] _char, final int _offset, final int _length )
 		{
 			return ( char )toInt( _char, _offset, _length ) ;
 			//return ByteBuffer.wrap( _char, _offset, _length ).getChar() ;
 		}
 
-		public long toLong( final byte[] _long, final int _offset, int _length )
+		public long toLong( final byte[] _long, final int _offset, final int _length )
 		{
 			return ( ( _long[_offset + 0] & 0xFF ) << 56 ) |
 				( ( _long[_offset + 1] & 0xFF ) << 48 ) |
@@ -463,31 +463,31 @@ public final class ConvertBytes
 			//return ByteBuffer.wrap( _long, _offset, _length ).getLong() ;
 		}
 
-		public short toShort( final byte[] _short, final int _offset, int _length )
+		public short toShort( final byte[] _short, final int _offset, final int _length )
 		{
 			//return ( short )toInt( _short, _offset, _length ) ;
 			return ByteBuffer.wrap( _short, _offset, _length ).getShort() ;
 		}
 
-		public float toFloat( final byte[] _float, final int _offset, int _length )
+		public float toFloat( final byte[] _float, final int _offset, final int _length )
 		{
 			final int toInt = toInt( _float, _offset, _length ) ;
 			return Float.intBitsToFloat( toInt ) ;
 			//return ByteBuffer.wrap( _float, _offset, _length ).getFloat() ;
 		}
 
-		public double toDouble( final byte[] _double, final int _offset, int _length )
+		public double toDouble( final byte[] _double, final int _offset, final int _length )
 		{
 			return Double.longBitsToDouble( toLong( _double, _offset, _length ) ) ;
 			//return ByteBuffer.wrap( _double, _offset, _length ).getDouble() ;
 		}
 
-		public boolean toBoolean( final byte[] _bool, final int _offset, int _length )
+		public boolean toBoolean( final byte[] _bool, final int _offset, final int _length )
 		{
 			return ( _bool == null || _bool.length == 0 ) ? false : _bool[_offset + _length] != 0x00;
 		}
 
-		public byte[] toBytes( final byte[] _bytes, final int _offset, int _length )
+		public byte[] toBytes( final byte[] _bytes, final int _offset, final int _length )
 		{
 			// Assumes BIG_ENDIAN
 			return allocate( _length, ConvertBytes.BIG_ENDIAN ).put( _bytes, _offset, _length ).array() ;
@@ -512,7 +512,7 @@ public final class ConvertBytes
 			return bytes ;
 		}
 
-		public byte[] newBytes( final byte[] _bytes, int _offset, final  int _length )
+		public byte[] newBytes( final byte[] _bytes, final int _offset, final int _length )
 		{
 			final byte[] bytes = new byte[_length] ;
 			final int size = _offset + _length ;
@@ -528,7 +528,7 @@ public final class ConvertBytes
 			return bytes ;
 		}
 
-		public byte[] newInvertBytes( final byte[] _bytes, int _offset, final  int _length )
+		public byte[] newInvertBytes( final byte[] _bytes, final int _offset, final int _length )
 		{
 			final byte[] bytes = new byte[_length] ;
 			final int size = _offset + _length ;
@@ -633,7 +633,7 @@ public final class ConvertBytes
 			return _byte |= ( ( _set == true ) ? 1 : 0 ) << _position ;
 		}
 
-		public void setBit( byte[] _bytes, final int _position, final boolean _set )
+		public void setBit( final byte[] _bytes, final int _position, final boolean _set )
 		{
 			final int index = _position / 8 ;
 			final int bitPos = _position % 8 ;
@@ -715,19 +715,19 @@ public final class ConvertBytes
 
 		/**BYTE ARRAY to VARIABLE**/
 
-		public int toInt( final byte[] _int, int _offset, int _length ) ;
-		public char toChar( final byte[] _char, final int _offset, int _length ) ;
-		public long toLong( final byte[] _long, final int _offset, int _length ) ;
-		public short toShort( final byte[] _short, final int _offset, int _length ) ;
-		public float toFloat( final byte[] _float, final int _offset, int _length ) ;
-		public double toDouble( final byte[] _double, final int _offset, int _length ) ;
-		public boolean toBoolean( final byte[] _bool, final int _offset, int _length ) ;
+		public int toInt( final byte[] _int, int _offset, final int _length ) ;
+		public char toChar( final byte[] _char, final int _offset, final int _length ) ;
+		public long toLong( final byte[] _long, final int _offset, final int _length ) ;
+		public short toShort( final byte[] _short, final int _offset, final int _length ) ;
+		public float toFloat( final byte[] _float, final int _offset, final int _length ) ;
+		public double toDouble( final byte[] _double, final int _offset, final int _length ) ;
+		public boolean toBoolean( final byte[] _bool, final int _offset, final int _length ) ;
 
-		public byte[] toBytes( final byte[] _bytes, final int _offset, int _length ) ;
+		public byte[] toBytes( final byte[] _bytes, final int _offset, final int _length ) ;
 		public byte[] toBits( final byte[] _bytes, final int _byteOffset, final int _bitOffset, final int _bitLength ) ;
 
-		public byte[] newBytes( final byte[] _bytes, int _offset, final  int _length ) ;
-		public byte[] newInvertBytes( final byte[] _bytes, int _offset, final  int _length ) ;
+		public byte[] newBytes( final byte[] _bytes, final int _offset, final int _length ) ;
+		public byte[] newInvertBytes( final byte[] _bytes, final int _offset, final int _length ) ;
 
 		/**FLIP BYTE ARRAY ENDIAN**/
 
@@ -740,9 +740,9 @@ public final class ConvertBytes
 		public boolean isBitSet( final byte _byte, final int _position ) ;
 		public boolean isBitSet( final byte[] _bytes, final int _position ) ;
 
-		public byte setBit( byte _byte, final int _position, final boolean _set ) ;
+		public byte setBit( final byte _byte, final int _position, final boolean _set ) ;
 
-		public void setBit( byte[] _bytes, final int _position, final boolean _set ) ;
+		public void setBit( final byte[] _bytes, final int _position, final boolean _set ) ;
 		public void printByte( final byte _byte ) ;
 
 		public byte[] concat( final byte[] _a, final byte[] _b ) ;

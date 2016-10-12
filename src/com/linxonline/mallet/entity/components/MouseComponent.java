@@ -27,7 +27,7 @@ public class MouseComponent extends InputComponent
 		this( InputComponent.InputMode.UI ) ;
 	}
 
-	public MouseComponent( InputComponent.InputMode _mode )
+	public MouseComponent( final InputComponent.InputMode _mode )
 	{
 		super( "MOUSECOMPONENT", "INPUTCOMPONENT", _mode ) ;
 	}

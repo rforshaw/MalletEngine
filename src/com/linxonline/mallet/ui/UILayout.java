@@ -230,7 +230,7 @@ public class UILayout extends UIElement
 
 					if( maximum.y > 0.0f )
 					{
-						float lenY = availableLength.y / minNumY ;
+						final float lenY = availableLength.y / minNumY ;
 						if( lenY > maximum.y )
 						{
 							minNumY -= 1 ;
@@ -316,7 +316,7 @@ public class UILayout extends UIElement
 
 					if( maximum.x > 0.0f )
 					{
-						float lenX = availableLength.x / minNumX ;
+						final float lenX = availableLength.x / minNumX ;
 						if( lenX > maximum.x )
 						{
 							minNumX -= 1 ;

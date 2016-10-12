@@ -2,12 +2,15 @@ package com.linxonline.mallet.maths ;
 
 public class Quaternion
 {
-	public float x = 0.0f ;
-	public float y = 0.0f ;
-	public float z = 0.0f ;
-	public float w = 0.0f ;
+	public float x ;
+	public float y ;
+	public float z ;
+	public float w ;
 
-	public Quaternion() {}
+	public Quaternion()
+	{
+		this( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+	}
 
 	public Quaternion( final Quaternion _quat )
 	{
@@ -37,7 +40,7 @@ public class Quaternion
 		w = _w ;
 	}
 
-	public void multiply( Quaternion _quat )
+	public void multiply( final Quaternion _quat )
 	{
 		multiply( _quat.x, _quat.y, _quat.z, _quat.w ) ;
 	}

@@ -12,7 +12,7 @@ public class DesktopFileTraversal
 		{
 			foundDirectory( _file ) ;
 			final File[] children = _file.listFiles() ;
-			for( File child : children )
+			for( final File child : children )
 			{
 				traverse( child ) ;
 			}

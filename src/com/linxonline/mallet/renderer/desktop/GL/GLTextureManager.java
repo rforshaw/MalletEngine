@@ -73,7 +73,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// available to render/
 				add( _file, PLACEHOLDER ) ;
 
-				TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
+				final TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
 				load.start() ;
 
 				return null ;
@@ -98,7 +98,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		}
 
 		final Texture texture = super.get( _file ) ;
-		
+
 		// PLACEHOLDER is used to prevent the texture loader 
 		// loading the same texture twice when loading async, 
 		return ( texture != PLACEHOLDER ) ? texture : null ;
@@ -281,7 +281,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		return _data ;
 	}
 
-	private int glGenTextures( GL3 _gl )
+	private int glGenTextures( final GL3 _gl )
 	{
 		final int[] id = new int[1] ;
 		_gl.glGenTextures( 1, id, 0 ) ;
@@ -319,7 +319,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		{
 			synchronized( imageMetas )
 			{
-				MalletTexture.Meta meta = imageMetas.get( _path ) ;
+				final MalletTexture.Meta meta = imageMetas.get( _path ) ;
 				if( meta != null)
 				{
 					return meta ;

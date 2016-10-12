@@ -28,7 +28,7 @@ public final class StateMachine
 	*/
 	public final void setDefaultState( final String _name )
 	{
-		for( State state : states )
+		for( final State state : states )
 		{
 			if( _name.equals( state.name ) == true )
 			{
@@ -89,7 +89,7 @@ public final class StateMachine
 		
 		if( transition != State.NONE )
 		{
-			String name = _state.getTransition() ;
+			final String name = _state.getTransition() ;
 			if( exists( name ) == false )
 			{
 				currentState = defaultState ;
@@ -117,7 +117,7 @@ public final class StateMachine
 
 	private final State getState( final String _name )
 	{
-		for( State state : states )
+		for( final State state : states )
 		{
 			if( _name.equals( state.name ) == true )
 			{
@@ -133,7 +133,7 @@ public final class StateMachine
 		return getState( _name ) != null ? true : false ;
 	}
 
-	private final boolean exists( State _state )
+	private final boolean exists( final State _state )
 	{
 		assert _state != null ;
 		return states.contains( _state ) ;

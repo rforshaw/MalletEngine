@@ -11,7 +11,7 @@ public class BasicWorld<T extends DrawData, U extends CameraData> implements Wor
 	private final DrawState state = new DrawState() ;			// Objects to be drawn
 	private final CameraState cameras = new CameraState() ;		// Camera view portals
 
-	public BasicWorld( final String _id, final int _order, DrawState.RemoveDelegate _remove )
+	public BasicWorld( final String _id, final int _order, final DrawState.RemoveDelegate _remove )
 	{
 		id = _id ;
 		order = _order ;

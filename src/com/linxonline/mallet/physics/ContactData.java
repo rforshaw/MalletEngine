@@ -26,7 +26,7 @@ public class ContactData
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
-			ContactPoint contact = contacts[usedContacts++] ;
+			final ContactPoint contact = contacts[usedContacts++] ;
 			contact.penetration = _penetration ;
 			contact.contactNormal = _normal ;
 			contact.physical = _physical ;
@@ -41,7 +41,7 @@ public class ContactData
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
-			ContactPoint contact = contacts[usedContacts++] ;
+			final ContactPoint contact = contacts[usedContacts++] ;
 			contact.penetration = _penetration ;
 			contact.contactNormal.x = _normalX ;
 			contact.contactNormal.y = _normalY ;

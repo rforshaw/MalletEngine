@@ -34,12 +34,12 @@ public class UIComponent extends InputComponent
 		super( _name, _group, InputMode.UI ) ;
 	}
 
-	public UIComponent( final String _name, InputMode _mode )
+	public UIComponent( final String _name, final InputMode _mode )
 	{
 		super( _name, "UICOMPONENT", _mode ) ;
 	}
 
-	public UIComponent( final String _name, final String _group, InputMode _mode )
+	public UIComponent( final String _name, final String _group, final InputMode _mode )
 	{
 		super( _name, _group, _mode ) ;
 	}

@@ -29,7 +29,7 @@ public class Array2DPoint
 	}
 
 	@Override
-	public boolean equals( Object _obj )
+	public boolean equals( final Object _obj )
 	{
 		if( _obj instanceof Array2DPoint )
 		{

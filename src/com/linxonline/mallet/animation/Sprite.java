@@ -21,7 +21,7 @@ public final class Sprite extends Resource
 		framerate = _framerate ;
 	}
 
-	public void addFrame( Sprite.Frame _frame )
+	public void addFrame( final Sprite.Frame _frame )
 	{
 		if( _frame != null )
 		{

@@ -10,7 +10,7 @@ public class GLImage implements ImageInterface
 	private final int width ;				// Width of texture
 	private final int height ;				// Height of texture
 
-	public GLImage( int _textureID, final int _width, final int _height )
+	public GLImage( final int _textureID, final int _width, final int _height )
 	{
 		textureIDs = new int[1] ;
 		textureIDs[0] = _textureID ;

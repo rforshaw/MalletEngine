@@ -83,7 +83,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 				img.addEventListener( "load", new EventListener()
 				{
 					@Override
-					public void handleEvent( Event _event )
+					public void handleEvent( final Event _event )
 					{
 						synchronized( toBind )
 						{
@@ -260,7 +260,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		{
 			synchronized( imageMetas )
 			{
-				MalletTexture.Meta meta = imageMetas.get( _path ) ;
+				final MalletTexture.Meta meta = imageMetas.get( _path ) ;
 				if( meta != null)
 				{
 					return meta ;

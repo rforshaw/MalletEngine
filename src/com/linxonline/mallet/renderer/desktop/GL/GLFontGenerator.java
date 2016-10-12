@@ -43,8 +43,15 @@ public class GLFontGenerator
 		suitable for the font specified. Currently texture is generated 
 		based on 
 	*/
-	public GLFontMap generateFontMap( final Font _font, final String _charsToMap, int _spacing )
+	public GLFontMap generateFontMap( final Font _font, final String _charsToMap, final int _spacing )
 	{
+		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+		if( gl == null )
+		{
+			System.out.println( "GL context doesn't exist" ) ;
+			return null ;
+		}
+
 		// We want to render the texture at a higher resolution
 		// Allowing the font to be scaled/zoomed without 
 		// significant quality loss.
@@ -72,13 +79,6 @@ public class GLFontGenerator
 		final float point = 1.0f / textureWidth ;
 		final Glyph[] glyphs = new GLGlyph[length] ;
 		final int geometryHeight = geometryMetrics.getHeight() ;
-
-		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
-		if( gl == null )
-		{
-			System.out.println( "GL context doesn't exist" ) ;
-			return null ;
-		}
 
 		final Shape[] shapes = new Shape[length] ;
 		for( int i = 0; i < length; i++ )

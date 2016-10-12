@@ -135,7 +135,7 @@ public class GLGeometryUploader
 	*/
 	public void clean()
 	{
-		Iterator<GLBuffer> i = buffers.iterator() ;
+		final Iterator<GLBuffer> i = buffers.iterator() ;
 		while( i.hasNext() == true )
 		{
 			final GLBuffer buffer = i.next() ;
@@ -867,7 +867,7 @@ public class GLGeometryUploader
 
 		public void clean()
 		{
-			Iterator<GLGeometry> i = buffers.iterator() ;
+			final Iterator<GLGeometry> i = buffers.iterator() ;
 			while( i.hasNext() == true )
 			{
 				final GLGeometry geometry = i.next() ;
@@ -1340,7 +1340,7 @@ public class GLGeometryUploader
 
 	protected static void enableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
 	{
-		for( VertexAttrib att : _atts )
+		for( final VertexAttrib att : _atts )
 		{
 			_gl.glEnableVertexAttribArray( att.index ) ;
 		}
@@ -1348,7 +1348,7 @@ public class GLGeometryUploader
 
 	protected static void prepareVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts, final int _stride )
 	{
-		for( VertexAttrib att : _atts )
+		for( final VertexAttrib att : _atts )
 		{
 			_gl.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
 		}
@@ -1356,7 +1356,7 @@ public class GLGeometryUploader
 	
 	protected static void disableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
 	{
-		for( VertexAttrib att : _atts )
+		for( final VertexAttrib att : _atts )
 		{
 			_gl.glDisableVertexAttribArray( att.index ) ;
 		}

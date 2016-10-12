@@ -2,11 +2,14 @@ package com.linxonline.mallet.maths ;
 
 public class Vector3
 {
-	public float x = 0.0f ;
-	public float y = 0.0f ;
-	public float z = 0.0f ;
+	public float x ;
+	public float y ;
+	public float z ;
 
-	public Vector3() {}
+	public Vector3()
+	{
+		this( 0.0f, 0.0f, 0.0f ) ;
+	}
 
 	public Vector3( final float _x, final float _y, final float _z )
 	{
@@ -127,7 +130,7 @@ public class Vector3
 	}
 
 	@Override
-	public boolean equals( Object _compare )
+	public boolean equals( final Object _compare )
 	{
 		if( _compare != null )
 		{
@@ -201,9 +204,9 @@ public class Vector3
 	*/
 	public static final float distance( final Vector3 _vec1, final Vector3 _vec2 )
 	{
-		float tmp1 = ( _vec2.x - _vec1.x ) ;
-		float tmp2 = ( _vec2.y - _vec1.y ) ;
-		float tmp3 = ( _vec2.z - _vec1.z ) ;
+		final float tmp1 = ( _vec2.x - _vec1.x ) ;
+		final float tmp2 = ( _vec2.y - _vec1.y ) ;
+		final float tmp3 = ( _vec2.z - _vec1.z ) ;
 
 		return ( float )Math.sqrt( ( tmp1 * tmp1 ) + ( tmp2 * tmp2 ) + ( tmp3 * tmp3 ) ) ;
 	}
@@ -221,7 +224,7 @@ public class Vector3
 		}
 
 		final Vector3 num = new Vector3() ;
-		String[] split = _text.split( "," ) ;
+		final String[] split = _text.split( "," ) ;
 
 		if( split.length >= 3 )
 		{

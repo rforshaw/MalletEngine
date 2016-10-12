@@ -196,7 +196,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		updateType = ( _type == null ) ? UpdateType.ON_DEMAND : _type ;
 	}
 
-	public void setInterpolationMode( Interpolation _mode )
+	public void setInterpolationMode( final Interpolation _mode )
 	{
 		mode = ( _mode == null ) ? Interpolation.NONE : _mode ;
 	}
@@ -314,7 +314,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		update = true ;
 		ui = false ;
 
-		int order = 0 ;
+		order = 0 ;
 		mode = Interpolation.NONE ;
 		updateType  = UpdateType.ON_DEMAND ; 
 		draw = DRAW_DEFAULT ;

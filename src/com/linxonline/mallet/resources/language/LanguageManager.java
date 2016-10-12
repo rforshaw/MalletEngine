@@ -12,9 +12,9 @@ import com.linxonline.mallet.io.reader.* ;
 /*====================================================*/
 public class LanguageManager
 {
-	private HashMap<String, String> strings = new HashMap<String, String>() ;
+	private final HashMap<String, String> strings = new HashMap<String, String>() ;
 	private String languageFolder = "en" ;
-	private ArrayList<String> filesLoaded = new ArrayList<String>() ;
+	private final ArrayList<String> filesLoaded = new ArrayList<String>() ;
 
 	public LanguageManager() {}
 
@@ -40,7 +40,7 @@ public class LanguageManager
 	{
 		assert _file != null ;
 		final String file = "base/languages/" + languageFolder + "/" + _file ;
-		ArrayList<String> textFile = TextReader.getTextAsArray( file ) ;
+		final ArrayList<String> textFile = TextReader.getTextAsArray( file ) ;
 
 		filesLoaded.add( _file ) ;
 		return loadFile( textFile ) ;
@@ -52,7 +52,7 @@ public class LanguageManager
 	public boolean containsLanguageFile( final String _file )
 	{
 		assert _file != null ;
-		for( String file : filesLoaded )
+		for( final String file : filesLoaded )
 		{
 			if( _file.equals( file ) == true )
 			{
@@ -89,11 +89,11 @@ public class LanguageManager
 		return strings.containsKey( _keyword ) ;
 	}
 
-	private final boolean loadFile( ArrayList<String> _textFile )
+	private final boolean loadFile( final ArrayList<String> _textFile )
 	{
-		for( String line : _textFile )
+		for( final String line : _textFile )
 		{
-			String[] split = line.split( " " ) ;
+			final String[] split = line.split( " " ) ;
 			if( split.length >= 2 )
 			{
 				process( split ) ;
@@ -103,16 +103,16 @@ public class LanguageManager
 		return true ;
 	}
 	
-	private void process( String[] _split )
+	private void process( final String[] _split )
 	{
 		final String keyword = _split[0].toUpperCase() ;
 		final StringBuffer buffer = new StringBuffer() ;
-		
+
 		for( int i = 1; i < _split.length; i++ )
 		{
 			buffer.append( _split[i] ) ;
 		}
-		
+
 		strings.put( keyword, buffer.toString() ) ;
 	}
 }

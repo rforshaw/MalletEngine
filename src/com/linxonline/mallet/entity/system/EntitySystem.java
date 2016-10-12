@@ -74,7 +74,7 @@ public class EntitySystem implements EntitySystemInterface
 	{
 		querySystem.addQuery( _interface ) ;
 		final ArrayList<Entity> ents = entities.getEntities() ;
-		for( Entity entity : ents )
+		for( final Entity entity : ents )
 		{
 			_interface.addEntity( entity ) ;
 		}
@@ -125,7 +125,7 @@ public class EntitySystem implements EntitySystemInterface
 	public void clear()
 	{
 		final ArrayList<Entity> ents = entities.getEntities() ;
-		for( Entity entity : ents )
+		for( final Entity entity : ents )
 		{
 			entity.destroy() ;
 		}

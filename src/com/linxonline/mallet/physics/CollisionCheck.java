@@ -86,7 +86,7 @@ public final class CollisionCheck
 		for( int i = 1; i < size; i++ )
 		{
 			axis = axes[i] ;
-			float result = penetrationOnAxis( _a, _b, axis, _toCenter ) ;
+			final float result = penetrationOnAxis( _a, _b, axis, _toCenter ) ;
 			if( result < 0.0f )
 			{
 				return result ;

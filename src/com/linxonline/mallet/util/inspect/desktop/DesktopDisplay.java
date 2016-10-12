@@ -37,7 +37,7 @@ public class DesktopDisplay implements DisplayEnvironment
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		Screen[] screens = getScreens() ;
+		final Screen[] screens = getScreens() ;
 		for( final Screen screen : screens )
 		{
 			buffer.append( screen.toString() + "\n" ) ;

@@ -47,7 +47,7 @@ public class GLFontGenerator
 		suitable for the font specified. Currently texture is generated 
 		based on 
 	*/
-	public GLFontMap generateFontMap( final CanvasRenderingContext2D _canvas, final String _charsToMap, int _spacing )
+	public GLFontMap generateFontMap( final CanvasRenderingContext2D _canvas, final String _charsToMap, final int _spacing )
 	{
 		final int length = _charsToMap.length() ;
 		float increment = 0 ;
@@ -101,7 +101,6 @@ public class GLFontGenerator
 		final float ascent = height / 2.0f ;//10.0f ;
 
 		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
-		int j = 0 ;
 
 		for( int i = 0; i < length; i++ )
 		{

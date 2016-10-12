@@ -59,7 +59,7 @@ public abstract class WebStarter extends StarterInterface
 					{
 						stateMachine.update( ( double )( dt * 0.001 ) ) ;			// Update Game State
 
-						long endTime = ElapsedTimer.nanoTime() ;
+						final long endTime = ElapsedTimer.nanoTime() ;
 						dt = endTime - startTime ;
 
 						long sleep = 16L - dt ;
@@ -160,16 +160,8 @@ public abstract class WebStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
-		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
-		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
-
-		/*if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
-		{
-			final DesktopDisplay desktop = new DesktopDisplay() ;
-			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
-			displayWidth = screen.getWidth() ;
-			displayHeight = screen.getHeight() ;
-		}*/
+		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
+		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;

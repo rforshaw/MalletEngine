@@ -36,7 +36,7 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public void onSurfaceCreated( GL10 _unused, EGLConfig _config )
+	public void onSurfaceCreated( final GL10 _unused, final EGLConfig _config )
 	{
 		System.out.println( "onSurfaceCreated()" ) ;
 		// If a render state previously existed but we lost the OpenGL 
@@ -47,7 +47,7 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public void onDrawFrame( GL10 _unused )
+	public void onDrawFrame( final GL10 _unused )
 	{
 		synchronized( render )
 		{
@@ -56,7 +56,7 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public void onSurfaceChanged( GL10 _unused, int _width, int _height)
+	public void onSurfaceChanged( final GL10 _unused, final int _width, final int _height)
 	{
 		System.out.println( "onSurfaceChanged()" ) ;
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", _width ) ;

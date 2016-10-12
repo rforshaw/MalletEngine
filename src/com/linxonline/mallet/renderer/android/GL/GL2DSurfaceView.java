@@ -9,7 +9,7 @@ public class GL2DSurfaceView extends GLSurfaceView
 {
 	public final GL2DRenderer renderer ;
 
-	public GL2DSurfaceView( Context _context, final Notification.Notify _notify )
+	public GL2DSurfaceView( final Context _context, final Notification.Notify _notify )
 	{
 		super( _context ) ;
 		setEGLContextClientVersion( 3 ) ;

@@ -38,7 +38,7 @@ public class GLFontGenerator
 		Creation of models and textures is done later during the 
 		draw cycle.
 	*/
-	public GLFontMap generateFontMap( final Typeface _typeface, final int _size, final String _charsToMap, int _spacing )
+	public GLFontMap generateFontMap( final Typeface _typeface, final int _size, final String _charsToMap, final int _spacing )
 	{
 		final Paint paint = new Paint() ;
 		paint.setTypeface( _typeface ) ;
@@ -78,7 +78,7 @@ public class GLFontGenerator
 		final int length = glyphs.length ;
 
 		final int height = _map.fontMap.height ;
-		int width = calculateWidth( glyphs ) ;
+		final int width = calculateWidth( glyphs ) ;
 
 		final Paint paint = new Paint( Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG ) ;
 		paint.setStyle( Paint.Style.FILL ) ;
@@ -93,10 +93,7 @@ public class GLFontGenerator
 		final double point = 1.0f / width ;
 		final float ascent = Math.abs( paint.ascent() ) ;
 
-		//final Shape[] shapes = new Shape[length] ;
 		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
-		int j = 0 ;
-
 		for( int i = 0; i < length; i++ )
 		{
 			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;

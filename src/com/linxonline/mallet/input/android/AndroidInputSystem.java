@@ -22,7 +22,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public AndroidInputSystem() {}
 
-	public void addInputHandler( InputHandler _handler )
+	public void addInputHandler( final InputHandler _handler )
 	{
 		if( exists( _handler ) == true )
 		{
@@ -33,13 +33,13 @@ public class AndroidInputSystem implements InputSystemInterface,
 		handlers.add( _handler ) ;
 	}
 
-	public void removeInputHandler( InputHandler _handler )
+	public void removeInputHandler( final InputHandler _handler )
 	{
 		handlers.remove( _handler ) ;
 		_handler.reset() ;
 	}
 
-	public void onKeyDown( int _keyCode, KeyEvent _event )
+	public void onKeyDown( final int _keyCode, final KeyEvent _event )
 	{
 		if( _event.getAction() == KeyEvent.ACTION_UP )
 		{
@@ -51,7 +51,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void onKeyUp( int _keyCode, KeyEvent _event )
+	public void onKeyUp( final int _keyCode, final KeyEvent _event )
 	{
 		if( _event.getAction() == KeyEvent.ACTION_UP )
 		{
@@ -63,7 +63,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 		}
 	}
 
-	public void onTouchEvent( MotionEvent _event )
+	public void onTouchEvent( final MotionEvent _event )
 	{
 		synchronized( touchInputs )
 		{
@@ -90,10 +90,6 @@ public class AndroidInputSystem implements InputSystemInterface,
 	
 	public void update()
 	{
-		final int sizeHandlers = handlers.size() ;
-		InputHandler handler = null ;
-		InputEvent event = null ;
-
 		synchronized( keyInputs )
 		{
 			final int sizeInput = keyInputs.size() ;
@@ -134,7 +130,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 		}
 	}
 
-	private void updateKeys( int _inputType, KeyEvent _event )
+	private void updateKeys( final int _inputType, final KeyEvent _event )
 	{
 		System.out.println( "UPDATE KEYS: Needs implementing." ) ;
 		/*KeyCode keycode = _event.getKeyCode() ;
@@ -178,7 +174,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public void clearInputs() {}
 
-	private boolean exists( InputHandler _handler )
+	private boolean exists( final InputHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;

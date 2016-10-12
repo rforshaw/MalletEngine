@@ -37,7 +37,7 @@ public class Screen
 
 	public ScreenMode getBestScreenMode()
 	{
-		ScreenMode[] screens = QuickSort.quicksort( getScreenModes() ) ;
+		final ScreenMode[] screens = QuickSort.quicksort( getScreenModes() ) ;
 		return screens[screens.length - 1] ;
 	}
 

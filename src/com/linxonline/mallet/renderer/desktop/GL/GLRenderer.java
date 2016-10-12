@@ -742,7 +742,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public void init( GLAutoDrawable _drawable )
+	public void init( final GLAutoDrawable _drawable )
 	{
 		System.out.println( "GL Contex initialised.." ) ;
 		gl = _drawable.getGL().getGL3() ;
@@ -798,7 +798,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public void reshape( GLAutoDrawable _drawable, int _x, int _y, int _width, int _height )
+	public void reshape( final GLAutoDrawable _drawable, final int _x, final int _y, final int _width, final int _height )
 	{
 		super.setDisplayDimensions( _width, _height ) ;
 		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == true )
@@ -831,7 +831,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public void dispose( GLAutoDrawable _drawable ) {}
+	public void dispose( final GLAutoDrawable _drawable ) {}
 
 	public void draw( final float _dt )
 	{
@@ -840,7 +840,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public void display( GLAutoDrawable _drawable )
+	public void display( final GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL3() ;
 		//GLRenderer.handleError( "Previous: ", gl ) ;

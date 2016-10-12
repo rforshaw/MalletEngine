@@ -14,7 +14,7 @@ public final class AudioBuffer<T extends SoundInterface> extends Resource
 {
 	private final T buffer ;
 
-	public AudioBuffer( T _buffer )
+	public AudioBuffer( final T _buffer )
 	{
 		buffer = _buffer ;
 	}

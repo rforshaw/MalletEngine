@@ -27,7 +27,7 @@ public class AndroidZipFile implements FileStream
 			{
 				public boolean close()
 				{
-					boolean success = super.close() ;
+					final boolean success = super.close() ;
 					try
 					{
 						zipFile.close() ;
@@ -56,7 +56,7 @@ public class AndroidZipFile implements FileStream
 			{
 				public boolean close()
 				{
-					boolean success = super.close() ;
+					final boolean success = super.close() ;
 					try
 					{
 						zipFile.close() ;

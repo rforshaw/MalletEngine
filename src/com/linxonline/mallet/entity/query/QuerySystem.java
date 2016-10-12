@@ -19,7 +19,7 @@ public class QuerySystem implements SearchInterface
 	/**
 		HashMap horribly slow to iterate over, possibly replace with a tree structure?
 	**/
-	protected HashMap<String, QueryInterface> queryInterfaces = new HashMap<String, QueryInterface>() ;
+	protected final HashMap<String, QueryInterface> queryInterfaces = new HashMap<String, QueryInterface>() ;
 
 	public void addQuery( final QueryInterface _interface )
 	{
@@ -61,7 +61,7 @@ public class QuerySystem implements SearchInterface
 	public void addEntity( final Entity _entity )
 	{
 		final Collection<QueryInterface> values = queryInterfaces.values() ;
-		for( QueryInterface queryInterface : values )
+		for( final QueryInterface queryInterface : values )
 		{
 			queryInterface.addEntity( _entity ) ;
 		}
@@ -70,7 +70,7 @@ public class QuerySystem implements SearchInterface
 	public void removeEntity( final Entity _entity )
 	{
 		final Collection<QueryInterface> values = queryInterfaces.values() ;
-		for( QueryInterface queryInterface : values )
+		for( final QueryInterface queryInterface : values )
 		{
 			queryInterface.removeEntity( _entity ) ;
 		}

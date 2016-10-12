@@ -19,7 +19,7 @@ public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 
 	private TimeWrapper<T> temp = null ;
 
-	public TimeCache( final float _wait, Class<T> _class )
+	public TimeCache( final float _wait, final Class<T> _class )
 	{
 		objectCreator = _class ;
 		wait = _wait ;

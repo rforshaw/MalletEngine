@@ -79,7 +79,7 @@ public class Bone2
 	
 	private void rotateChildren( final float _rotate, final Vector2 _origin )
 	{
-		int length = children.size() ;
+		final int length = children.size() ;
 		for( int i = 0; i < length; ++i )
 		{
 			children.get( i ).rotate( _rotate, _origin ) ;
@@ -88,7 +88,7 @@ public class Bone2
 	
 	private void translateChildren()
 	{
-		int length = children.size() ;
+		final int length = children.size() ;
 		for( int i = 0; i < length; ++i )
 		{
 			children.get( i ).translate( modifiedBone ) ;
