@@ -2,6 +2,8 @@ package com.linxonline.mallet.maths ;
 
 public class MathUtil
 {
+	private MathUtil() {}
+
 	public static int toInt( final StringBuilder _builder )
 	{
 		return toInt( _builder, 0, _builder.length() ) ;

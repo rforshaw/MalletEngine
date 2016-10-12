@@ -15,7 +15,7 @@ import com.linxonline.mallet.event.Event ;
 	Allowing Draw data to be optimised for the active renderer.
 	DrawAssist calls should be thread-safe.
 */
-public class DrawAssist
+public final class DrawAssist
 {
 	private static final Event DRAW_CLEAN = new Event( "DRAW_CLEAN", null ) ; 
 

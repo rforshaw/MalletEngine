@@ -4,6 +4,8 @@ import java.util.ArrayList ;
 
 public class OrderedInsert
 {
+	private OrderedInsert() {}
+
 	public static <T extends SortInterface> ArrayList<T> insert( final T _toInsert, final ArrayList<T> _list )
 	{
 		final int size = _list.size() ;

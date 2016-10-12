@@ -10,6 +10,8 @@ import com.linxonline.mallet.resources.* ;
 
 public class GLModelManager
 {
+	private GLModelManager() {}
+
 	public static int[] genIndexID( final GL3 _gl )
 	{
 		final int[] id = new int[1] ;

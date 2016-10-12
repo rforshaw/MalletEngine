@@ -12,8 +12,10 @@ import com.linxonline.mallet.maths.Vector3 ;
 	Contains helper functions for the construction of 
 	commonly used UI elements and their supporting classes.
 */
-public class UIFactory
+public final class UIFactory
 {
+	private UIFactory() {}
+
 	/**
 		Construct a UILayout that uses the RenderWidth and RenderHeight
 		of the window as the width and height of the UILayout.

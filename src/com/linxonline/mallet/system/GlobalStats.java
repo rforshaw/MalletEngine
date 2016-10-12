@@ -13,7 +13,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 	Each statistic should be paired with a domain.  A domain 
 	denotes a category like Rendering, AI, etc.
 */
-public class GlobalStats
+public final class GlobalStats
 {
 	private final static HashMap<String, StatTrack> domains = new HashMap<String, StatTrack>() ;
 

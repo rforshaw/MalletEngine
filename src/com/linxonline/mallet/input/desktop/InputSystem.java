@@ -360,7 +360,7 @@ public class InputSystem implements InputSystemInterface,
 			case KeyEvent.VK_WINDOWS     : return KeyCode.WINDOWS ;
 			case KeyEvent.VK_INSERT      : return KeyCode.INSERT ;
 			case KeyEvent.VK_SCROLL_LOCK : return KeyCode.SCROLL_LOCK ;
-			case KeyEvent.VK_PRINTSCREEN :return KeyCode.PRINT_SCREEN ;
+			case KeyEvent.VK_PRINTSCREEN : return KeyCode.PRINT_SCREEN ;
 			case KeyEvent.VK_DELETE      : return KeyCode.DELETE ;
 			case KeyEvent.VK_HOME        : return KeyCode.HOME ;
 			case KeyEvent.VK_END         : return KeyCode.END ;

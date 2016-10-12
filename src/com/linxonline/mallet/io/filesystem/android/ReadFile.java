@@ -6,8 +6,10 @@ import java.util.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
 
-public class ReadFile
+public final class ReadFile
 {
+	private ReadFile() {}
+
 	public static boolean getRaw( final ByteInStream _stream, final ByteInCallback _callback, final int _length )
 	{
 		final RawThread thread = new RawThread( _stream, _callback, _length ) ;

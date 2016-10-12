@@ -11,10 +11,11 @@ package com.linxonline.mallet.util.logger ;
 	Set Verbosity level to NORMAL, will print out NORMAL, & MAJOR calls.
 	Set Verbosity level to MAJOR, will print out MAJOR calls.
 **/
-public class Logger
+public final class Logger
 {
 	private static Verbosity verbosity = Verbosity.MINOR ;
-	public Logger() {}
+
+	private Logger() {}
 
 	public static void setVerbosity( final Verbosity _verbosity )
 	{

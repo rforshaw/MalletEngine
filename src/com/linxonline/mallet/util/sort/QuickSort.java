@@ -2,8 +2,10 @@ package com.linxonline.mallet.util.sort ;
 
 import java.util.ArrayList ;
 
-public class QuickSort
+public final class QuickSort
 {
+	private QuickSort() {}
+
 	/**
 		Recursive Quicksort algorithm.
 		Used to sort RenderContainers based on their LAYER.

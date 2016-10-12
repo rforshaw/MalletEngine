@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public class WorldAssist
+public final class WorldAssist
 {
 	private static Assist assist ;
 

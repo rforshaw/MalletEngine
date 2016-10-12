@@ -19,10 +19,12 @@ import com.linxonline.mallet.io.filesystem.* ;
 	Supports the importing of Java Primitives, Collections, and Maps.
 	Will also construct classes that used @SaveClass, @NoSave, and @Save.
 */
-public class Build
+public final class Build
 {
 	private static final JSONBuild jsonBuild = new JSONBuild() ;
 	private static final BinaryBuild binBuild = new BinaryBuild() ;
+
+	private Build() {}
 
 	public static Object build( final String _file, final Format _format )
 	{

@@ -14,7 +14,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 	information could be render/display dimensions, 
 	player name, server settings, etc.
 **/
-public class GlobalConfig
+public final class GlobalConfig
 {
 	private static HashMap<String, Notification<String>> listeners = new HashMap<String, Notification<String>>() ;
 	private static Settings config = new Settings() ;

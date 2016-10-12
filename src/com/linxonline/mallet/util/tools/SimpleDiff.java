@@ -10,8 +10,10 @@ import com.linxonline.mallet.io.serialisation.ByteInput ;
 	It works well on fixed data structures like 
 	uncompressed bitmaps.
 */
-public class SimpleDiff
+public final class SimpleDiff
 {
+	private SimpleDiff() {}
+
 	public static byte[] encode( final byte[] _base, final byte[] _compare )
 	{
 		int changes = 0 ;

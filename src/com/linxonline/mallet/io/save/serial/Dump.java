@@ -25,10 +25,12 @@ import com.linxonline.mallet.io.filesystem.* ;
 	the same object for each pointer. Anything that has a reference to 
 	an object, but does not own it, should not save it out.
 */
-public class Dump
+public final class Dump
 {
 	private static final JSONDump jsonDump = new JSONDump() ;
 	private static final BinaryDump binDump = new BinaryDump() ;
+
+	private Dump() {}
 
 	public static boolean dump( final Object _obj, final Format _format, final String _file )
 	{

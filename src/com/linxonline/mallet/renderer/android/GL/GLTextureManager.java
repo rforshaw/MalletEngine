@@ -45,7 +45,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	private final ArrayList<Tuple<String, Bitmap>> toBind = new ArrayList<Tuple<String, Bitmap>>() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
-	private boolean supportedETC1 = ETC1Util.isETC1Supported() ;
+	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
 
 	public GLTextureManager()
 	{

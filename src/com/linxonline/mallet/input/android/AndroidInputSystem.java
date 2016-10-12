@@ -13,9 +13,9 @@ public class AndroidInputSystem implements InputSystemInterface,
 										   AndroidInputListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
-	private ArrayList<InputEvent> touchInputs = new ArrayList<InputEvent>() ;
-	private ArrayList<InputEvent> keyInputs = new ArrayList<InputEvent>() ;
+	private final ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
+	private final ArrayList<InputEvent> touchInputs = new ArrayList<InputEvent>() ;
+	private final ArrayList<InputEvent> keyInputs = new ArrayList<InputEvent>() ;
 
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;

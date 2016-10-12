@@ -470,7 +470,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
-				if( _camera != null && _camera instanceof CameraData )
+				if( _camera instanceof CameraData )
 				{
 					_camera.setDrawInterface( getCameraDraw() ) ;
 					getWorldState().addCamera( ( CameraData )_camera, ( GLWorld )_world ) ;
@@ -482,7 +482,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			@Override
 			public Camera removeCamera( final Camera _camera, final World _world )
 			{
-				if( _camera != null && _camera instanceof CameraData )
+				if( _camera instanceof CameraData )
 				{
 					getWorldState().removeCamera( ( CameraData )_camera ) ;
 				}

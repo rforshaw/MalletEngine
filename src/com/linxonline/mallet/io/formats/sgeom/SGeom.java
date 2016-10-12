@@ -15,6 +15,8 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class SGeom
 {
+	private SGeom() {}
+
 	public static Shape load( final String _file )
 	{
 		final FileStream stream = GlobalFileSystem.getFile( _file ) ;

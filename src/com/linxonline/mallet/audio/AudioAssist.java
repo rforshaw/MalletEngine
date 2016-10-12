@@ -3,9 +3,11 @@ package com.linxonline.mallet.audio ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.SourceCallback ;
 
-public class AudioAssist
+public final class AudioAssist
 {
 	private static final Event AUDIO_CLEAN = new Event( "AUDIO_CLEAN", null ) ;
+
+	private AudioAssist() {}
 
 	/**
 		Request an AudioDelegate from the active audio system.

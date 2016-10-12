@@ -2,9 +2,11 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.* ;
 
-public class CameraAssist
+public final class CameraAssist
 {
 	private static Assist assist ;
+
+	private CameraAssist() {}
 
 	public static void setAssist( final CameraAssist.Assist _assist )
 	{

@@ -11,7 +11,7 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 
 import com.linxonline.mallet.io.filesystem.web.WebFile ;
 
-public class Client
+public final class Client
 {
 	public static void main( final String[] _args )
 	{

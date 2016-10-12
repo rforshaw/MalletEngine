@@ -138,8 +138,7 @@ public class JUI
 			public UIElement create( final JUI _map, final JSONObject _ui )
 			{
 				final String axis = _ui.optString( "AXIS", null ) ;
-				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
-				return element ;
+				return new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 			}
 		} ) ;
 	}

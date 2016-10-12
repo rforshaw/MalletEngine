@@ -19,6 +19,8 @@ public final class CollisionCheck
 	private static final Vector2 boxCenter1 = new Vector2() ;
 	private static final Vector2 boxCenter2 = new Vector2() ;
 
+	private CollisionCheck() {}
+
 	/**
 		Generate a Contact Point if a collision has occured.
 		Return true if a contact point was generated.

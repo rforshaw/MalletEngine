@@ -39,7 +39,7 @@ public final class EventMessenger
 	
 	public boolean hasEvents()
 	{
-		return ( events.size() > 0 ) || ( newEvents.size() > 0 ) ? true : false ;
+		return ( events.isEmpty() == false || newEvents.isEmpty() == false ) ;
 	}
 
 	/**

@@ -6,6 +6,8 @@ import com.linxonline.mallet.maths.* ;
 
 public class CommonTypes
 {
+	private CommonTypes() {}
+
 	public static void setDimension( final Settings _dest, final Settings _src )
 	{
 		final Vector2 dim = Vector2.parseVector2( _src.getString( "DIM", null ) ) ;

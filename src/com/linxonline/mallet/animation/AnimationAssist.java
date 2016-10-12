@@ -10,9 +10,11 @@ import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Program ;
 
-public class AnimationAssist
+public final class AnimationAssist
 {
 	private static final Event ANIMATION_CLEAN = new Event( "ANIMATION_CLEAN", null ) ;
+
+	private AnimationAssist() {}
 
 	/**
 		Request an AnimDelegate from the active animation system.

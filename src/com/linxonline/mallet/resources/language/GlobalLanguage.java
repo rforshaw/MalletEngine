@@ -1,6 +1,6 @@
 package com.linxonline.mallet.resources.language ;
 
-public class GlobalLanguage
+public final class GlobalLanguage
 {
 	private final static LanguageManager language = new LanguageManager() ;
 	

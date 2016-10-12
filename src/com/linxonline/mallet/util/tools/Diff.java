@@ -12,8 +12,10 @@ import com.linxonline.mallet.io.serialisation.ByteInput ;
 	It works well on dynamic data sctructures like 
 	text.
 */
-public class Diff
+public final class Diff
 {
+	private Diff() {}
+
 	public static byte[] encode( final byte[] _base, final byte[] _compare )
 	{
 		final ArrayList<Point> matches = new ArrayList<Point>() ;

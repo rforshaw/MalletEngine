@@ -5,8 +5,10 @@ import android.opengl.GLES20 ;
 
 import java.nio.* ;
 
-public class GLModelManager
+public final class GLModelManager
 {
+	private GLModelManager() {}
+
 	public static int[] genIndexID()
 	{
 		final int[] id = new int[1] ;

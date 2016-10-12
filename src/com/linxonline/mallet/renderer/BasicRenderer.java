@@ -90,7 +90,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			@Override
 			public void addTextDraw( final Draw _draw, final World _world )
 			{
-				if( _draw != null && _draw instanceof DrawData )
+				if( _draw instanceof DrawData )
 				{
 					if( data.contains( _draw ) == false )
 					{
@@ -105,7 +105,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			@Override
 			public void addBasicDraw( final Draw _draw, final World _world )
 			{
-				if( _draw != null && _draw instanceof DrawData )
+				if( _draw instanceof DrawData )
 				{
 					if( data.contains( _draw ) == false )
 					{
@@ -120,7 +120,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			@Override
 			public void removeDraw( final Draw _draw )
 			{
-				if( _draw != null && _draw instanceof DrawData )
+				if( _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
 					worlds.removeDraw( ( DrawData )_draw ) ;

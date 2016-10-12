@@ -22,7 +22,7 @@ public class InputState implements InputSystemInterface,
 	private static final int MAX_QUEUE_THRESHOLD = 40 ;
 
 	private InputAdapterInterface inputAdapter = null ;
-	private ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
+	private final ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
 
 	private boolean hasInputs = false ;
 	private InputHandler handler = null ;

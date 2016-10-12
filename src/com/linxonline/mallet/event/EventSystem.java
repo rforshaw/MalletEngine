@@ -143,7 +143,7 @@ public final class EventSystem implements EventSystemInterface
 		}
 	}
 
-	protected void addEventQueue( final EventType _queueName, final EventQueue _queue )
+	private void addEventQueue( final EventType _queueName, final EventQueue _queue )
 	{
 		eventQueues.put( _queueName, _queue ) ;
 		queues.add( _queue ) ;

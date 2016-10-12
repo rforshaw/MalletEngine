@@ -2,7 +2,7 @@ package com.linxonline.mallet.io.formats.wav ;
 
 import com.linxonline.mallet.util.tools.* ;
 
-public class WAVHeader
+public final class WAVHeader
 {
 	public int startPoint = 0 ;
 	public int length = 0 ;

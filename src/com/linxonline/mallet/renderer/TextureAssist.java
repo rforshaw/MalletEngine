@@ -7,7 +7,7 @@ package com.linxonline.mallet.renderer ;
 	This class provides meta information about the 
 	texture denoted by _path.
 */
-public class TextureAssist
+public final class TextureAssist
 {
 	private static Assist assist ;			// Platform/Render specific implementation to retreive image meta information
 

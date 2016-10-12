@@ -104,7 +104,7 @@ public abstract class Hull
 
 	public final boolean isCollidableWithGroup( final int _groupID )
 	{
-		if( collidableGroups.size() == 0 )
+		if( collidableGroups.isEmpty() )
 		{
 			// Groups haven't been spcified so it can collide with all
 			return true ;
