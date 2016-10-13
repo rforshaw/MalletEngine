@@ -16,43 +16,13 @@ import java.util.HashMap ;
 public final class EventType
 {
 	private final static HashMap<String, EventType> eventTypes = new HashMap<String, EventType>() ;
-	private final String type ;
-
-	private EventType()
+	static
 	{
-		type = "" ;
+		eventTypes.put( "NONE", new EventType() ) ;
+		eventTypes.put( "ALL", new EventType() ) ;
 	}
 
-	private EventType( final String _type )
-	{
-		type = _type ;
-	}
-
-	public String getType()
-	{
-		return type ;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "[Type: " + type + "]" ;
-	}
-
-	/**
-		If the Event Type has been reconstructed, call this 
-		to get a correctly managed EventType.
-	*/
-	public static EventType get( final EventType _type )
-	{
-		final EventType type ;
-		synchronized( eventTypes )
-		{
-			type = eventTypes.get( _type.getType() ) ;
-		}
-
-		return ( type != null ) ? type : createEventType( _type.getType() ) ;
-	}
+	private EventType() {}
 
 	/**
 		Return the EventType corresponding to the String 
@@ -60,37 +30,16 @@ public final class EventType
 	*/
 	public static EventType get( final String _type )
 	{
-		final EventType type ;
 		synchronized( eventTypes )
 		{
-			type = eventTypes.get( _type ) ;
-		}
+			if( eventTypes.containsKey( _type ) )
+			{
+				return eventTypes.get( _type ) ;
+			}
 
-		return ( type != null ) ? type : createEventType( _type ) ;
-	}
-
-	/**
-		Creates an EventType that correspondes with the String 
-		passed in.
-	*/
-	private static EventType createEventType( final String _type )
-	{
-		final EventType type = new EventType( _type ) ;
-		synchronized( eventTypes )
-		{
+			final EventType type = new EventType() ;
 			eventTypes.put( _type, type ) ;
+			return type ;
 		}
-
-		return type ;
-	}
-
-	public static boolean equals( final String _left, final EventType _right )
-	{
-		return EventType.equals( get( _left ), _right ) ;
-	}
-
-	public static boolean equals( final EventType _left, final EventType _right )
-	{
-		return _left == _right ;
 	}
 }

@@ -6,7 +6,6 @@ import android.opengl.GLES30 ;
 import android.opengl.EGL14 ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.settings.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;

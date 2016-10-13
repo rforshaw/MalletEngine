@@ -1,7 +1,6 @@
 package com.linxonline.mallet.animation ;
 
 import java.util.ArrayList ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventType ;
@@ -12,7 +11,6 @@ import com.linxonline.mallet.event.AddEventInterface ;
 
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 

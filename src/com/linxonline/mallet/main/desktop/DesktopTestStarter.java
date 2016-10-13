@@ -32,20 +32,20 @@ public class DesktopTestStarter extends DesktopStarter
 		
 			public void windowActivated( final WindowEvent _event )
 			{
-				if( windowDeactivated == true )
+				/*if( windowDeactivated == true )
 				{
 					windowDeactivated = false ;
 					run() ;
-				}
+				}*/
 			}
 
 			public void windowDeactivated( final WindowEvent _event )
 			{
-				if( windowDeactivated == false )
+				/*if( windowDeactivated == false )
 				{
 					windowDeactivated = true ;
 					stop() ;
-				}
+				}*/
 			}
 
 			public void windowClosing( final WindowEvent _event )

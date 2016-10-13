@@ -4,7 +4,6 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.animation.AnimationDelegateCallback ;
 import com.linxonline.mallet.animation.AnimationDelegate ;
 import com.linxonline.mallet.animation.AnimationAssist ;

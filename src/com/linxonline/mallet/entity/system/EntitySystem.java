@@ -1,7 +1,6 @@
 package com.linxonline.mallet.entity.system ;
 
 import java.util.ArrayList ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.entity.query.* ;
@@ -15,7 +14,7 @@ import com.linxonline.mallet.entity.* ;
 **/
 public class EntitySystem implements EntitySystemInterface
 {
-	protected final HookEntity state ;											// Interface to Game State hook functions
+	protected final HookEntity state ;												// Interface to Game State hook functions
 	protected final QuerySystem querySystem = new QuerySystem() ;					// Should be thread safe
 	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 

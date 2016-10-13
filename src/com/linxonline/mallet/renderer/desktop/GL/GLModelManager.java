@@ -1,14 +1,13 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import javax.media.opengl.* ;
-import java.util.HashMap ;
 
 import java.nio.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 
-public class GLModelManager
+public final class GLModelManager
 {
 	private GLModelManager() {}
 

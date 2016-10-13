@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.settings.Settings ;
-
 /**
 	DrawDelegate provides access for adding/removing Draw objects 
 	from the rendering-system.

@@ -29,13 +29,6 @@ public abstract class EventProcessor<T>
 		type = EventType.get( _type ) ;
 	}
 
-	public EventProcessor( final String _name, final EventType _type )
-	{
-		assert _type != null ;
-		name = _name ;
-		type = _type ;
-	}
-
 	public void passEvent( final Event<T> _event )
 	{
 		if( isInterested( _event ) == true )
@@ -52,12 +45,7 @@ public abstract class EventProcessor<T>
 	*/
 	private boolean isInterested( final Event<T> _event )
 	{
-		if( type != null )
-		{
-			return _event.isEventByType( type ) ;
-		}
-
-		return true ;		// Accepts all Events being passed to it
+		return _event.isEventByType( type ) ;
 	}
 
 	public EventType getEventType()

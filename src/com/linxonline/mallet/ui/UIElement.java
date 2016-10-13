@@ -8,7 +8,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UIElement implements InputHandler
 {
-	private final float DEFAULT_MARGIN_SIZE = 5.0f ;
+	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;
 
 	private final ListenerUnit<BaseListener> listeners = new ListenerUnit<BaseListener>( this ) ;
 	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;

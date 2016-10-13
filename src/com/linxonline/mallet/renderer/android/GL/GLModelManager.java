@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import java.util.HashMap ;
 import android.opengl.GLES20 ;
 
 import java.nio.* ;

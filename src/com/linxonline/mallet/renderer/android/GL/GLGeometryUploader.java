@@ -90,7 +90,7 @@ public class GLGeometryUploader
 	*/
 	public void upload( final GLDrawData _data )
 	{
-		GLBuffer buffer = lookup.get( _data ) ;
+		GLBuffer buffer = _data.getGLBuffer() ;
 		if( buffer != null )
 		{
 			if( buffer.isSupported( _data ) == true )
@@ -107,7 +107,8 @@ public class GLGeometryUploader
 		}
 
 		buffer = getSupportedBuffer( _data ) ;
-		lookup.put( _data, buffer ) ;
+		_data.setGLBuffer( buffer ) ;
+
 		buffer.upload( _data ) ;
 	}
 
@@ -117,10 +118,11 @@ public class GLGeometryUploader
 	*/
 	public void remove( final GLDrawData _data )
 	{
-		final GLBuffer buffer = lookup.remove( _data ) ;
+		GLBuffer buffer = _data.getGLBuffer() ;
 		if( buffer != null )
 		{
 			buffer.remove( _data ) ;
+			_data.setGLBuffer( null ) ;
 		}
 	}
 

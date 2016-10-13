@@ -107,9 +107,9 @@ public final class EventSystem implements EventSystemInterface
 	**/
 	public void removeHandlersNow()
 	{
-		final int size = toBeRemoved.size() ;
-		if( size > 0 )
+		if( toBeRemoved.isEmpty() == false )
 		{
+			final int size = toBeRemoved.size() ;
 			for( int i = 0; i < size; ++i )
 			{
 				remove( toBeRemoved.get( i ) ) ;
@@ -121,7 +121,7 @@ public final class EventSystem implements EventSystemInterface
 	public final void addEvent( final Event<?> _event )
 	{
 		final EventType key = _event.getEventType() ;
-		//System.out.println( name + " " + key ) ;
+		// System.out.println( name + " " + key ) ;
 		if( eventQueues.containsKey( key ) == true )
 		{
 			eventQueues.get( key ).addEvent( _event ) ;

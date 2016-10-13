@@ -24,12 +24,12 @@ public final class Event<T>
 
 	public Event()
 	{
-		setEvent( "NONE", null ) ;
+		this( "NONE", null ) ;
 	}
 
 	public Event( final String _eventType )
 	{
-		setEvent( _eventType, null ) ;
+		this( _eventType, null ) ;
 	}
 
 	public Event( final String _eventType, final T _object )
@@ -42,17 +42,10 @@ public final class Event<T>
 		setEvent( _eventType, _object, _meta ) ;
 	}
 
-	/**
-		Do the exceptionally slow String by String comparison
-	**/
-	public final boolean isEventByString( final String _name )
-	{
-		return EventType.equals( _name, eventType ) ;
-	}
-
 	public final boolean isEventByType( final EventType _type )
 	{
-		return EventType.equals( _type, eventType ) ;
+		//System.out.println( "Event: " + eventType + " Event: " + _type ) ;
+		return eventType == _type ;
 	}
 
 	/**
@@ -74,11 +67,6 @@ public final class Event<T>
 		meta = ( _meta != null ) ? _meta : BLANK_META ;
 	}
 
-	public void setEventType( final EventType _eventType )
-	{
-		eventType = EventType.get( _eventType ) ;
-	}
-	
 	public void setEventType( final String _eventType )
 	{
 		eventType = EventType.get( _eventType ) ;

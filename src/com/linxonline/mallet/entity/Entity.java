@@ -2,7 +2,6 @@ package com.linxonline.mallet.entity ;
 
 import java.util.Collection ;
 import java.util.ArrayList ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.entity.components.Component ;
 

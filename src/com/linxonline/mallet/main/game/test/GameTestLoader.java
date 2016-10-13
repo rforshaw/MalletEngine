@@ -1,7 +1,6 @@
 package com.linxonline.mallet.main.game.test ;
 
 import java.util.ArrayList ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.main.game.GameSystem ;
 import com.linxonline.mallet.main.game.GameLoader ;

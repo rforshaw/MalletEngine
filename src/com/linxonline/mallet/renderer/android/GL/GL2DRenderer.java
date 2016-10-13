@@ -14,7 +14,6 @@ import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.EventType ;
 import com.linxonline.mallet.event.Event ;
 
-import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;

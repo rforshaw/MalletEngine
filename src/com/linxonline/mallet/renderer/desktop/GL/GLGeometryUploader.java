@@ -2,7 +2,6 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.Iterator ;
 import java.util.ArrayList ;
-import java.util.HashMap ;
 import java.util.Arrays ;
 import java.nio.* ;
 
@@ -45,7 +44,6 @@ public class GLGeometryUploader
 	private final IntBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final HashMap<GLDrawData, GLBuffer> lookup = new HashMap<GLDrawData, GLBuffer>() ;		// Quick lookup
 	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;							// Available GLBuffers
 
 	private final MalletColour shapeColour = new MalletColour() ;
@@ -84,7 +82,7 @@ public class GLGeometryUploader
 	*/
 	public void upload( final GL3 _gl, final GLDrawData _data )
 	{
-		GLBuffer buffer = lookup.get( _data ) ;
+		GLBuffer buffer = _data.getGLBuffer() ;
 		if( buffer != null )
 		{
 			if( buffer.isSupported( _data ) == true )
@@ -101,7 +99,8 @@ public class GLGeometryUploader
 		}
 
 		buffer = getSupportedBuffer( _data ) ;
-		lookup.put( _data, buffer ) ;
+		_data.setGLBuffer( buffer ) ;
+
 		buffer.upload( _gl, _data ) ;
 	}
 
@@ -111,10 +110,11 @@ public class GLGeometryUploader
 	*/
 	public void remove( final GL3 _gl, final GLDrawData _data )
 	{
-		final GLBuffer buffer = lookup.remove( _data ) ;
+		GLBuffer buffer = _data.getGLBuffer() ;
 		if( buffer != null )
 		{
 			buffer.remove( _gl, _data ) ;
+			_data.setGLBuffer( null ) ;
 		}
 	}
 
@@ -392,7 +392,6 @@ public class GLGeometryUploader
 
 		private Location stencilLocation = null ;
 
-		private final HashMap<GLDrawData, Location> locations = new HashMap<GLDrawData, Location>() ;
 		private final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
 
 		public GLBuffer( final GLDrawData _data,
@@ -496,7 +495,7 @@ public class GLGeometryUploader
 
 		public void remove( final GL3 _gl, final GLDrawData _data )
 		{
-			final Location location = locations.remove( _data ) ;
+			final Location location = _data.getLocation() ;
 			if( location != null )
 			{
 				location.getGeometry().remove( _gl, location ) ;
@@ -750,7 +749,7 @@ public class GLGeometryUploader
 			// If _data has already been added we return the location 
 			// in which it resides.
 			{
-				final Location location = locations.get( _data ) ;
+				final Location location = _data.getLocation() ;
 				if( location != null )
 				{
 					return location ;
@@ -766,7 +765,7 @@ public class GLGeometryUploader
 				if( location != null )
 				{
 					location.setData( _data ) ;
-					locations.put( _data, location ) ;
+					_data.setLocation( location ) ;
 					return location ;
 				}
 			}
@@ -789,7 +788,7 @@ public class GLGeometryUploader
 			// If _data has already been added we return the location 
 			// in which it resides.
 			{
-				final Location location = locations.get( _data ) ;
+				final Location location = _data.getLocation() ;
 				if( location != null )
 				{
 					return location ;
@@ -804,7 +803,7 @@ public class GLGeometryUploader
 				if( location != null )
 				{
 					location.setData( _data ) ;
-					locations.put( _data, location ) ;
+					_data.setLocation( location ) ;
 					return location ;
 				}
 			}
@@ -858,7 +857,6 @@ public class GLGeometryUploader
 		*/
 		private void clear()
 		{
-			locations.clear() ;
 			for( final GLGeometry geometry : buffers )
 			{
 				geometry.clear() ;
@@ -902,7 +900,6 @@ public class GLGeometryUploader
 			stencilMatrix     = null ;
 			stencilLocation   = null ;
 
-			locations.clear() ;
 			for( final GLGeometry geometry : buffers )
 			{
 				geometry.clear() ;

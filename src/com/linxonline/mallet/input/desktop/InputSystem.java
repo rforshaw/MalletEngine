@@ -84,11 +84,9 @@ public class InputSystem implements InputSystemInterface,
 	private void passKeyInputs()
 	{
 		final int stateSize = activeKeyStates.size() ;
-		KeyState state = null ;
-
 		for( int i = 0; i < stateSize; i++ )
 		{
-			state = activeKeyStates.get( i ) ;
+			final KeyState state = activeKeyStates.get( i ) ;
 			final InputEvent input = cache.get() ;
 			input.clone( state.input ) ;
 
@@ -101,12 +99,9 @@ public class InputSystem implements InputSystemInterface,
 	private void passMouseInputs()
 	{
 		final int inputSize = mouseInputs.size() ;
-		InputEvent input = null ;
-
 		for( int i = 0; i < inputSize; ++i )
 		{
-			input = mouseInputs.get( i ) ;
-			passInputEventToHandlers( input ) ;
+			passInputEventToHandlers( mouseInputs.get( i ) ) ;
 		}
 
 		mouseInputs.clear() ;
@@ -115,11 +110,9 @@ public class InputSystem implements InputSystemInterface,
 	private void passInputEventToHandlers( final InputEvent _input )
 	{
 		final int handlerSize = handlers.size() ;
-		InputHandler handler = null ;
-
 		for( int j = 0; j < handlerSize; ++j )
 		{
-			handler = handlers.get( j ) ;
+			final InputHandler handler = handlers.get( j ) ;
 			switch( handler.passInputEvent( _input ) )
 			{
 				case PROPAGATE : continue ;

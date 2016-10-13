@@ -16,7 +16,6 @@ import javax.media.opengl.awt.GLJPanel ;
 import javax.media.opengl.glu.GLU ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.settings.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;

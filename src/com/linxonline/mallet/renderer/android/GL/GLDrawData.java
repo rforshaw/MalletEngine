@@ -17,6 +17,8 @@ public class GLDrawData extends DrawData
 {
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
+	private GLGeometryUploader.GLBuffer buffer ;
+	
 	private Matrix4 drawMatrix    = new Matrix4() ;
 	private Shape drawShape       = null ;
 
@@ -143,6 +145,16 @@ public class GLDrawData extends DrawData
 		return drawMatrix ;
 	}
 
+	public void setGLBuffer( final GLGeometryUploader.GLBuffer _buffer )
+	{
+		buffer = _buffer ;
+	}
+
+	public GLGeometryUploader.GLBuffer getGLBuffer()
+	{
+		return buffer ;
+	}
+
 	@Override
 	public void unregister()
 	{
@@ -157,6 +169,7 @@ public class GLDrawData extends DrawData
 	public void reset()
 	{
 		super.reset() ;
+		buffer      = null ;
 		drawMatrix  = null ;
 		drawShape   = null ;
 
