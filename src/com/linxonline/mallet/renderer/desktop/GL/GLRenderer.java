@@ -1,18 +1,16 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import javax.swing.JFrame ;
 import java.util.ArrayList ;
 import java.awt.Insets ;
 import java.awt.Dimension ;
 import java.awt.Frame ;
 import java.awt.image.BufferStrategy ;
 import java.awt.geom.AffineTransform ;
-import java.lang.reflect.* ;
 import java.util.Stack ;
 
+import com.jogamp.newt.opengl.GLWindow ;
 import javax.media.opengl.* ;
 import javax.media.opengl.awt.GLCanvas ;
-import javax.media.opengl.awt.GLJPanel ;
 import javax.media.opengl.glu.GLU ;
 
 import com.linxonline.mallet.maths.* ;
@@ -31,6 +29,11 @@ import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib
 
 public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventListener
 {
+	static
+	{
+		initWindow() ;
+	}
+
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
@@ -44,9 +47,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
 
 	protected static final GLU glu = new GLU() ;
-	protected static GLCanvas canvas = null ;
+	protected static GLWindow canvas = null ;
 	protected static GL3 gl = null ;
-	protected JFrame frame = null ;
 
 	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
@@ -67,8 +69,13 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
-		initGraphics() ;
+		canvas.addGLEventListener( this ) ;
+
 		initAssist() ;
+
+		final Vector2 display = getRenderInfo().getDisplayDimensions() ;
+		canvas.setSize( ( int )display.x, ( int )display.y ) ;
+		canvas.setVisible( true ) ;
 	}
 
 	@Override
@@ -81,23 +88,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
-
-		if( frame != null )
-		{
-			frame.dispose() ;
-		}
 	}
 
 	private void initGraphics()
 	{
-		final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
-		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
-		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
-		capabilities.setDoubleBuffered( true ) ;
-
-		canvas = new GLCanvas( capabilities ) ;
-		canvas.setAutoSwapBufferMode( false ) ;
-		canvas.addGLEventListener( this ) ;
+		
 	}
 
 	@Override
@@ -712,26 +707,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		int dimX = _width ;
-		int dimY = _height ;
-
-		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == false )
-		{
-			// Need to take into account decorated border 
-			// when not in fullscreen mode.
-			final JFrame temp = new JFrame() ;
-			temp.pack() ;
-
-			final Insets insets = temp.getInsets() ;
-			dimX += insets.left + insets.right ;
-			dimY += insets.top + insets.bottom ;
-		}
-
-		final Dimension dim = new Dimension( dimX, dimY ) ;
-		frame.setMinimumSize( dim ) ;
-		frame.setSize( dim ) ;
-		frame.validate() ;
-
 		super.setDisplayDimensions( _width, _height ) ;
 		canvas.setSize( _width, _height ) ;
 
@@ -770,30 +745,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		viewMode = _mode ;
 	}
 
-	public void hookToWindow( final JFrame _frame )
+	public void hookToWindow()
 	{
-		frame = _frame ;
-		frame.createBufferStrategy( 1 ) ;
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE ) ;
-		frame.setIgnoreRepaint( true ) ;
-
-		frame.add( canvas ) ;
-
-		final Vector2 display = getRenderInfo().getDisplayDimensions() ;
-		frame.setSize( ( int )display.x, ( int )display.y ) ;
-		frame.setMinimumSize( new Dimension( ( int )display.x, ( int )display.y ) ) ;
 		
-		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
-		{
-			frame.setAlwaysOnTop( true ) ;
-			frame.setUndecorated( true ) ;
-		}
-
-		frame.pack() ;
-		frame.validate() ;
-		frame.setVisible( true ) ;
-
-		draw( 0.0f ) ;
 	}
 
 	@Override
@@ -866,8 +820,22 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		fontManager.clean() ;
 	}
 
-	public static GLCanvas getCanvas()
+	private static void initWindow()
 	{
+		if( canvas == null )
+		{
+			final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
+			final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
+			capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
+			capabilities.setDoubleBuffered( true ) ;
+
+			canvas = GLWindow.create( capabilities ) ;
+		}
+	}
+
+	public static GLWindow getCanvas()
+	{
+		initWindow() ;
 		return canvas ;
 	}
 

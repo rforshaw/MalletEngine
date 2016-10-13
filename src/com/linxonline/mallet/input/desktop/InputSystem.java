@@ -6,8 +6,10 @@ import java.awt.AWTException ;
 import java.util.HashMap ;
 import java.util.ArrayList ;
 import java.util.Collection ;
-import java.awt.event.* ;
+//import java.awt.event.* ;
 import java.io.* ;
+
+import com.jogamp.newt.event.* ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.input.InputEvent ;
@@ -22,9 +24,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 **/
 public class InputSystem implements InputSystemInterface, 
 									KeyListener, 
-									MouseListener, 
-									MouseMotionListener,
-									MouseWheelListener
+									MouseListener
 {
 	private Robot controlMouse ;
 
@@ -125,7 +125,7 @@ public class InputSystem implements InputSystemInterface,
 
 	public void keyPressed( final KeyEvent _event )
 	{
-		if( _event.getID() == KeyEvent.KEY_PRESSED )
+		//if( _event.getID() == KeyEvent.KEY_PRESSED )
 		{
 			updateKey( InputType.KEYBOARD_PRESSED, _event ) ;
 		}
@@ -133,7 +133,7 @@ public class InputSystem implements InputSystemInterface,
 
 	public void keyReleased( final KeyEvent _event )
 	{
-		if( _event.getID() == KeyEvent.KEY_RELEASED )
+		//if( _event.getID() == KeyEvent.KEY_RELEASED )
 		{
 			updateKey( InputType.KEYBOARD_RELEASED, _event ) ;
 		}
@@ -159,8 +159,8 @@ public class InputSystem implements InputSystemInterface,
 		final float exitX = _event.getX() ;
 		final Vector2 shift = Vector2.subtract( mousePosition, new Vector2( exitX, exitY ) ) ;
 
-		final Point point = _event.getLocationOnScreen() ;
-		controlMouse.mouseMove( point.x + ( int )shift.x , point.y + ( int )shift.y ) ;
+		//final Point point = _event.getLocationOnScreen() ;
+		//controlMouse.mouseMove( point.x + ( int )shift.x , point.y + ( int )shift.y ) ;
 	}
 
 	public void mousePressed( final MouseEvent _event )
@@ -237,15 +237,15 @@ public class InputSystem implements InputSystemInterface,
 
 	/**  Recieve MouseWheelEvents from system **/
 	
-	public void mouseWheelMoved( final MouseWheelEvent _event )
+	public void mouseWheelMoved( final MouseEvent _event )
 	{
 		updateMouseWheel( _event ) ;
 	}
 
-	private synchronized void updateMouseWheel( final MouseWheelEvent _event )
+	private synchronized void updateMouseWheel( final MouseEvent _event )
 	{
 		final InputEvent input = cache.get() ;
-		final int scroll = _event.getWheelRotation() ;
+		final int scroll = ( int )_event.getRotation()[1] ;
 
 		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll ) ;
 		mouseInputs.add( input ) ;

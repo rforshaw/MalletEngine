@@ -1,10 +1,11 @@
 package com.linxonline.mallet.system.desktop.gl ;
 
-import javax.swing.JFrame ;
 import java.awt.image.BufferedImage ;
 import java.awt.Point ;
 import java.awt.Cursor ;
 import java.awt.Toolkit ;
+
+import com.jogamp.newt.opengl.GLWindow ;
 
 import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
 import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
@@ -20,7 +21,6 @@ import com.linxonline.mallet.event.* ;
 */
 public class GLDefaultSystem extends BasicSystem
 {
-	protected JFrame frame = new JFrame( title ) ;					// Initialise Window
 	protected EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
@@ -34,9 +34,10 @@ public class GLDefaultSystem extends BasicSystem
 		inputSystem = new InputSystem() ;
 	}
 
-	public JFrame getFrame()
+	public GLWindow getWindow()
 	{
-		return frame ;
+		final GLRenderer render = ( GLRenderer )renderer ;
+		return render.getCanvas() ;
 	}
 	
 	@Override
@@ -52,13 +53,12 @@ public class GLDefaultSystem extends BasicSystem
 
 		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
 
-		render.hookToWindow( frame ) ;
+		render.getCanvas().setTitle( title ) ;
 		render.getCanvas().addMouseListener( input ) ;
-		render.getCanvas().addMouseMotionListener( input ) ;
-		render.getCanvas().addMouseWheelListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;
 
 		eventSystem.addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		eventSystem.addEvent( new Event( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
 	}
 
 	protected void initEventProcessors()
@@ -69,14 +69,17 @@ public class GLDefaultSystem extends BasicSystem
 			public void processEvent( final Event<Boolean> _event )
 			{
 				final boolean displayMouse = _event.getVariable() ;
-				frame.getContentPane().setCursor( Cursor.getPredefinedCursor( Cursor.DEFAULT_CURSOR ) ) ;
-				if( displayMouse == false )
-				{
-					// Hide the mouse if it isn't meant to be displayed.
-					final BufferedImage cursorImg = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_ARGB ) ;
-					final Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor( cursorImg, new Point( 0, 0 ), "BLANK_CURSOR" ) ;
-					frame.getContentPane().setCursor( blankCursor ) ;
-				}
+				getWindow().setPointerVisible( displayMouse ) ;
+			}
+		} ) ;
+		
+		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "CAPTURE_SYSTEM_MOUSE" )
+		{
+			@Override
+			public void processEvent( final Event<Boolean> _event )
+			{
+				final boolean confineMouse = _event.getVariable() ;
+				getWindow().confinePointer( confineMouse ) ;
 			}
 		} ) ;
 

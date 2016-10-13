@@ -1,7 +1,8 @@
 package com.linxonline.mallet.main.desktop ;
 
-import java.awt.event.WindowListener ;
-import java.awt.event.WindowEvent ;
+import com.jogamp.newt.event.WindowListener ;
+import com.jogamp.newt.event.WindowUpdateEvent ;
+import com.jogamp.newt.event.WindowEvent ;
 
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
@@ -26,11 +27,11 @@ public class DesktopTestStarter extends DesktopStarter
 		// The below implementation will stop the application as soon 
 		// as focus is lost. Focus is lost when the window is minimised 
 		// or the user click on another window.
-		backend.getFrame().addWindowListener( new WindowListener()
+		backend.getWindow().addWindowListener( new WindowListener()
 		{
 			private boolean windowDeactivated = false ;
 		
-			public void windowActivated( final WindowEvent _event )
+			public void windowGainedFocus( final WindowEvent _event )
 			{
 				/*if( windowDeactivated == true )
 				{
@@ -39,7 +40,7 @@ public class DesktopTestStarter extends DesktopStarter
 				}*/
 			}
 
-			public void windowDeactivated( final WindowEvent _event )
+			public void windowLostFocus( final WindowEvent _event )
 			{
 				/*if( windowDeactivated == false )
 				{
@@ -48,15 +49,15 @@ public class DesktopTestStarter extends DesktopStarter
 				}*/
 			}
 
-			public void windowClosing( final WindowEvent _event )
+			public void windowDestroyNotify( final WindowEvent _event )
 			{
 				backendSystem.shutdownSystem() ;
 			}
 
-			public void windowClosed( final WindowEvent _event ) {}
-			public void windowDeiconified( final WindowEvent _event ) {}
-			public void windowIconified( final WindowEvent _event ) {}
-			public void windowOpened( final WindowEvent _event ) {}
+			public void windowRepaint( final WindowUpdateEvent _event ) {}
+			public void windowDestroyed( final WindowEvent _event ) {}
+			public void windowMoved( final WindowEvent _event ) {}
+			public void windowResized( final WindowEvent _event ) {}
 		} ) ;
 	}
 
