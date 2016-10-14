@@ -936,8 +936,8 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = _vertexStrideBytes ;
 
-			GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
-			final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+			//GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+			final GL3 gl = GLRenderer.getGL() ;
 
 			indexID = GLModelManager.genIndexID( gl ) ;	//GLRenderer.handleError( "Gen Index: ", gl ) ;
 			vboID = GLModelManager.genVBOID( gl ) ;		//GLRenderer.handleError( "Gen VBO: ", gl ) ;
@@ -948,7 +948,7 @@ public class GLGeometryUploader
 			gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, vboID[0] ) ;		//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
 			gl.glBufferData( GL3.GL_ARRAY_BUFFER, vertexLengthBytes, null, GL3.GL_DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
 
-			GLRenderer.getCanvas().getContext().release() ;
+			//GLRenderer.getCanvas().getContext().release() ;
 		}
 
 		public Location findLocationGeometry( final Shape _shape )

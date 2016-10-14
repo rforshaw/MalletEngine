@@ -29,11 +29,6 @@ import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib
 
 public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventListener
 {
-	static
-	{
-		initWindow() ;
-	}
-
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
@@ -47,7 +42,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
 
 	protected static final GLU glu = new GLU() ;
-	protected static GLWindow canvas = null ;
+	protected GLWindow canvas = null ;
 	protected static GL3 gl = null ;
 
 	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
@@ -69,6 +64,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
+
+		initWindow() ;
 		canvas.addGLEventListener( this ) ;
 
 		initAssist() ;
@@ -90,11 +87,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		fontManager.shutdown() ;
 	}
 
-	private void initGraphics()
-	{
-		
-	}
-
 	@Override
 	public void initAssist()
 	{
@@ -103,9 +95,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
 			{
-				canvas.getContext().makeCurrent() ;
+				// If the GLFontMap has not been previously created, 
+				// then a skeleton map is provided, skeleton is capable 
+				// of being queried for text length and height, however,
+				// cannot be used to draw until the font texture & glyph 
+				// geometry is created during a drawText phase.
 				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
-				canvas.getContext().release() ;
 
 				return new Font<GLFontMap>( fontMap )
 				{
@@ -591,13 +586,15 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 				}
 
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm == null )
+				if( fm.fontMap.texture == null )
 				{
-					return ;
+					// If the font maps texture has yet to be set,
+					// generate the texture and bind it with the 
+					// current OpenGL context
+					fontManager.generateFontGeometry( font ) ;
 				}
 
 				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
-
 				if( loadProgram( _data ) == false )
 				{
 					return ;
@@ -745,11 +742,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		viewMode = _mode ;
 	}
 
-	public void hookToWindow()
-	{
-		
-	}
-
 	@Override
 	public void reshape( final GLAutoDrawable _drawable, final int _x, final int _y, final int _width, final int _height )
 	{
@@ -820,7 +812,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		fontManager.clean() ;
 	}
 
-	private static void initWindow()
+	public static GL3 getGL()
+	{
+		return gl ;
+	}
+
+	public GLWindow getCanvas()
+	{
+		initWindow() ;
+		return canvas ;
+	}
+
+	private void initWindow()
 	{
 		if( canvas == null )
 		{
@@ -831,12 +834,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 
 			canvas = GLWindow.create( capabilities ) ;
 		}
-	}
-
-	public static GLWindow getCanvas()
-	{
-		initWindow() ;
-		return canvas ;
 	}
 
 	private boolean loadProgram( final GLDrawData _data )

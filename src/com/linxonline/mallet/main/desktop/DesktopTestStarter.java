@@ -30,7 +30,7 @@ public class DesktopTestStarter extends DesktopStarter
 		backend.getWindow().addWindowListener( new WindowListener()
 		{
 			private boolean windowDeactivated = false ;
-		
+
 			public void windowGainedFocus( final WindowEvent _event )
 			{
 				/*if( windowDeactivated == true )
@@ -49,11 +49,7 @@ public class DesktopTestStarter extends DesktopStarter
 				}*/
 			}
 
-			public void windowDestroyNotify( final WindowEvent _event )
-			{
-				backendSystem.shutdownSystem() ;
-			}
-
+			public void windowDestroyNotify( final WindowEvent _event ) {}
 			public void windowRepaint( final WindowUpdateEvent _event ) {}
 			public void windowDestroyed( final WindowEvent _event ) {}
 			public void windowMoved( final WindowEvent _event ) {}

@@ -199,7 +199,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			// when the render requests it.
 			if( toBind.isEmpty() == false )
 			{
-				final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+				final GL3 gl = GLRenderer.getGL() ;
 				if( gl == null )
 				{
 					System.out.println( "GL context doesn't exist" ) ;

@@ -623,7 +623,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				}
 
 				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
-
 				if( loadProgram( _data ) == false )
 				{
 					return ;

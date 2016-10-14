@@ -141,7 +141,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	public Texture bind( final BufferedImage _image, final InternalFormat _format )
 	{
-		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+		final GL3 gl = GLRenderer.getGL() ;
 		if( gl == null )
 		{
 			System.out.println( "GL context doesn't exist" ) ;

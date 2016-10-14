@@ -75,12 +75,12 @@ public class GLImage implements ImageInterface
 	public final void destroy()
 	{
 		//System.out.println( "Removing texture.." ) ;
-		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
-		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
+		//GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+		final GL3 gl = GLRenderer.getGL() ;
 		if( gl != null )
 		{
 			gl.glDeleteTextures( textureIDs.length, textureIDs, 0 ) ;
 		}
-		GLRenderer.getCanvas().getContext().release() ;
+		//GLRenderer.getCanvas().getContext().release() ;
 	}
 }

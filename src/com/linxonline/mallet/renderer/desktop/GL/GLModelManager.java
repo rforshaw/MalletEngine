@@ -29,15 +29,14 @@ public final class GLModelManager
 
 	public static void unbind( final GLGeometryUploader.GLGeometry _geometry )
 	{
-		GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
-		final GL3 gl = GLRenderer.getCanvas().getContext().getCurrentGL().getGL3() ;
-
+		//GLRenderer.getCanvas().getContext().makeCurrent() ;						// Get GL's Attention
+		final GL3 gl = GLRenderer.getGL() ;
 		if( gl != null )
 		{
 			gl.glDeleteBuffers( 1, _geometry.vboID, 0 ) ;		//GLRenderer.handleError( "Delete VBO", gl ) ;
 			gl.glDeleteBuffers( 1, _geometry.indexID, 0 ) ;		//GLRenderer.handleError( "Delete Index", gl ) ;
 		}
 
-		GLRenderer.getCanvas().getContext().release() ;
+		//GLRenderer.getCanvas().getContext().release() ;
 	}
 }

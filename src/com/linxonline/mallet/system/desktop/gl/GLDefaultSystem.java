@@ -1,11 +1,9 @@
 package com.linxonline.mallet.system.desktop.gl ;
 
-import java.awt.image.BufferedImage ;
-import java.awt.Point ;
-import java.awt.Cursor ;
-import java.awt.Toolkit ;
-
 import com.jogamp.newt.opengl.GLWindow ;
+import com.jogamp.newt.event.WindowListener ;
+import com.jogamp.newt.event.WindowUpdateEvent ;
+import com.jogamp.newt.event.WindowEvent ;
 
 import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
 import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
@@ -59,6 +57,22 @@ public class GLDefaultSystem extends BasicSystem
 
 		eventSystem.addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
 		eventSystem.addEvent( new Event( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		eventSystem.addEvent( new Event( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+
+		getWindow().addWindowListener( new WindowListener()
+		{
+			public void windowDestroyNotify( final WindowEvent _event )
+			{
+				GLDefaultSystem.this.shutdownSystem() ;
+			}
+
+			public void windowGainedFocus( final WindowEvent _event ) {}
+			public void windowLostFocus( final WindowEvent _event ) {}
+			public void windowRepaint( final WindowUpdateEvent _event ) {}
+			public void windowDestroyed( final WindowEvent _event ) {}
+			public void windowMoved( final WindowEvent _event ) {}
+			public void windowResized( final WindowEvent _event ) {}
+		} ) ;
 	}
 
 	protected void initEventProcessors()
@@ -72,7 +86,7 @@ public class GLDefaultSystem extends BasicSystem
 				getWindow().setPointerVisible( displayMouse ) ;
 			}
 		} ) ;
-		
+
 		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "CAPTURE_SYSTEM_MOUSE" )
 		{
 			@Override
@@ -80,6 +94,16 @@ public class GLDefaultSystem extends BasicSystem
 			{
 				final boolean confineMouse = _event.getVariable() ;
 				getWindow().confinePointer( confineMouse ) ;
+			}
+		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "SYSTEM_FULLSCREEN" )
+		{
+			@Override
+			public void processEvent( final Event<Boolean> _event )
+			{
+				final boolean fullscreen = _event.getVariable() ;
+				getWindow().setFullscreen( fullscreen ) ;
 			}
 		} ) ;
 
