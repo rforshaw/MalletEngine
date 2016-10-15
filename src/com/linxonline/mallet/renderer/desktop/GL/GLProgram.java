@@ -177,7 +177,6 @@ public class GLProgram extends Resource
 					return false ;
 				}
 
-				_gl.glUniform1i( inUniform, textureUnit ) ;
 				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
 				_gl.glBindTexture( GL.GL_TEXTURE_2D, glTexture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
@@ -207,10 +206,13 @@ public class GLProgram extends Resource
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
 				final Texture<GLImage> texture = fm.getTexture() ;
+				if( texture == null )
+				{
+					return false ;
+				}
 
-				_gl.glUniform1i( inUniform, textureUnit ) ;
 				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.glBindTexture( GL.GL_TEXTURE_2D, texture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				_gl.glBindTexture( GL.GL_TEXTURE_2D, texture.getImage().textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
 			}
@@ -263,6 +265,7 @@ public class GLProgram extends Resource
 			Uniform.VEC4.reset() ;
 			Uniform.MAT4.reset() ;
 			Uniform.SAMPLER2D.reset() ;
+			Uniform.FONT.reset() ;
 		}
 
 		private interface UniformDelegate

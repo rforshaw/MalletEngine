@@ -27,7 +27,7 @@ public class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 1000.0f, 10, 3 ) ;
+		this( 0.0f, 0.0f, 1000.0f, 100, 3 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -74,9 +74,9 @@ public class QuadTree
 	protected class QuadNode
 	{
 		private final Vector2 centre = new Vector2() ;
-		private final Quadrant quadrant ;
 
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
+		private Quadrant quadrant ;
 		private int tier ;
 
 		private QuadNode topLeft ;
@@ -246,6 +246,8 @@ public class QuadTree
 			Hull hull2 = null ;
 
 			final int size = nextHull ;
+			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + size ) ;
+
 			for( int i = 0; i < size; i++ )
 			{
 				hull1 = hulls[i] ;
@@ -275,6 +277,7 @@ public class QuadTree
 		*/
 		private void updateChildren( final float _dt )
 		{
+			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " is a Parent." ) ;
 			topLeft.update( _dt ) ;
 			topRight.update( _dt ) ;
 			bottomLeft.update( _dt ) ;
@@ -465,15 +468,23 @@ public class QuadTree
 			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
 
 			tempRoot.topLeft.createTier( offset ) ;
+			topLeft.tier = tempRoot.topLeft.bottomRight.tier ;
+			topLeft.quadrant = Quadrant.BOTTOM_RIGHT ;
 			tempRoot.topLeft.bottomRight = topLeft ;
 
 			tempRoot.topRight.createTier( offset ) ;
+			topRight.tier = tempRoot.topRight.bottomLeft.tier ;
+			topRight.quadrant = Quadrant.BOTTOM_LEFT ;
 			tempRoot.topRight.bottomLeft = topRight ;
 
 			tempRoot.bottomLeft.createTier( offset ) ;
+			bottomLeft.tier = tempRoot.bottomLeft.topRight.tier ;
+			bottomLeft.quadrant = Quadrant.TOP_RIGHT ;
 			tempRoot.bottomLeft.topRight = bottomLeft ;
 
 			tempRoot.bottomRight.createTier( offset ) ;
+			bottomRight.tier = tempRoot.bottomRight.topLeft.tier ;
+			bottomRight.quadrant = Quadrant.TOP_LEFT ;
 			tempRoot.bottomRight.topLeft = bottomRight ;
 
 			topLeft = tempRoot.topLeft ;

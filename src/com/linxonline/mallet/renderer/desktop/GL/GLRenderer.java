@@ -10,8 +10,6 @@ import java.util.Stack ;
 
 import com.jogamp.newt.opengl.GLWindow ;
 import javax.media.opengl.* ;
-import javax.media.opengl.awt.GLCanvas ;
-import javax.media.opengl.glu.GLU ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -41,7 +39,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected final static Matrix4 uiMatrix                  = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
 	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
 
-	protected static final GLU glu = new GLU() ;
 	protected GLWindow canvas = null ;
 	protected static GL3 gl = null ;
 
@@ -79,12 +76,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void shutdown()
 	{
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
+		canvas.getContext().makeCurrent() ;
 		clear() ;							// Clear the contents being rendered
 
 		getWorldState().shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
+		canvas.getContext().release() ;
 	}
 
 	@Override
