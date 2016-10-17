@@ -99,18 +99,6 @@ public class UIButton extends UIElement
 		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static class UV
-	{
-		public final Vector2 min ;
-		public final Vector2 max ;
-
-		public UV( final Vector2 _min, final Vector2 _max )
-		{
-			min = _min ;
-			max = _max ;
-		}
-	}
-
 	public static class UIListener extends BaseListener
 	{
 		private final StringBuilder text = new StringBuilder() ;

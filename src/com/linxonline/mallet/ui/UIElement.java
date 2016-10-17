@@ -544,4 +544,16 @@ public class UIElement implements InputHandler
 		length.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		margin.setXYZ( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
 	}
+
+	public static class UV
+	{
+		public final Vector2 min ;
+		public final Vector2 max ;
+
+		public UV( final Vector2 _min, final Vector2 _max )
+		{
+			min = _min ;
+			max = _max ;
+		}
+	}
 }

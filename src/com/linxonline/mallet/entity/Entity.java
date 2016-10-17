@@ -63,7 +63,7 @@ public final class Entity
 		Add a component to the Entity and set its parent to the Entity
 		The Component should not be owned by another Component, it could get messy!
 	**/
-	public final void addComponent( final Component _component )
+	public final <T extends Component> T addComponent( final T _component )
 	{
 		_component.setParent( this ) ;
 		components.add( _component ) ;
@@ -71,6 +71,7 @@ public final class Entity
 		final EventController controller = _component.getComponentEventController() ;
 		controller.setAddEventInterface( eventSystem ) ;
 		eventSystem.addEventHandler( controller ) ;
+		return _component ;
 	}
 
 	public final void removeComponent( final Component _component )

@@ -32,6 +32,12 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
+				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
 				return element ;
 			}
 		} ) ;
@@ -45,6 +51,12 @@ public class JUI
 				final UILayout element = new UILayout( type ) ;
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
+
+				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
 
 				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
 				return element ;
@@ -60,6 +72,12 @@ public class JUI
 				final UILayout element = UIFactory.constructWindowLayout( type ) ;
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
+
+				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
 
 				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
 				return element ;
@@ -82,8 +100,8 @@ public class JUI
 
 				return element ;
 			}
-			
-			public UIButton.UIListener createListener( final JSONObject _ui )
+
+			private UIButton.UIListener createListener( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
@@ -109,13 +127,6 @@ public class JUI
 
 				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
 			}
-
-			public UIButton.UV createUV( final JSONObject _uv )
-			{
-				final Vector2 min = Vector2.parseVector2( _uv.optString( "MIN", "0.0, 0.0" ) ) ;
-				final Vector2 max = Vector2.parseVector2( _uv.optString( "MAX", "1.0, 1.0" ) ) ;
-				return new UIButton.UV( min, max ) ;
-			}
 		} ) ;
 
 		creators.put( "UIMENU", new Generator()
@@ -129,6 +140,12 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
 
+				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
 				return element ;
 			}
 		} ) ;
@@ -138,7 +155,14 @@ public class JUI
 			public UIElement create( final JUI _map, final JSONObject _ui )
 			{
 				final String axis = _ui.optString( "AXIS", null ) ;
-				return new UISpacer( UISpacer.Axis.derive( axis ) ) ;
+				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
+				return element ;
 			}
 		} ) ;
 	}
@@ -284,7 +308,31 @@ public class JUI
 			_map.lookup.put( name, _element ) ;
 		}
 	}
-	
+
+	private static UIListener createUIElementUIListener( final JSONObject _ui )
+	{
+		if( _ui == null )
+		{
+			return null ;
+		}
+
+		final UIElement.UV uv  = createUV( _ui.optJSONObject( "UV" ) ) ;
+		if( uv == null )
+		{
+			Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+			return null ;
+		}
+
+		return UIFactory.constructUIListener( new MalletTexture( _ui.optString( "TEXTURE", "" ) ), uv ) ;
+	}
+
+	private static UIElement.UV createUV( final JSONObject _uv )
+	{
+		final Vector2 min = Vector2.parseVector2( _uv.optString( "MIN", "0.0, 0.0" ) ) ;
+		final Vector2 max = Vector2.parseVector2( _uv.optString( "MAX", "1.0, 1.0" ) ) ;
+		return new UIElement.UV( min, max ) ;
+	}
+
 	public interface Generator
 	{
 		public UIElement create( final JUI _map, final JSONObject _ui ) ;

@@ -3,8 +3,20 @@ package com.linxonline.mallet.ui ;
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.UpdateType ;
+
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
+
+import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.Shape ;
+
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 
@@ -82,5 +94,48 @@ public final class UIFactory
 		} ) ;
 
 		return layout ;
+	}
+
+	public static UIListener constructUIListener( final MalletTexture _sheet,
+												  final UIElement.UV _uv )
+	{
+		return new UIListener()
+		{
+			private Draw draw = null ;
+
+			@Override
+			public void constructDraws()
+			{
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
+
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  parent.getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, _uv.min, _uv.max ) ) ;
+
+				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", _sheet ) ;
+
+				DrawAssist.attachProgram( draw, program ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw ) ;
+			}
+
+			@Override
+			public void refresh()
+			{
+				final Vector3 length = getParent().getLength() ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+		} ;
 	}
 }
