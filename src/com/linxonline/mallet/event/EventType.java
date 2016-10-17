@@ -22,7 +22,22 @@ public final class EventType
 		eventTypes.put( "ALL", new EventType() ) ;
 	}
 
-	private EventType() {}
+	private final String name ;
+
+	private EventType()
+	{
+		name = "UNDEFINED" ;
+	}
+
+	private EventType( final String _name )
+	{
+		name = _name ;
+	}
+
+	public String toString()
+	{
+		return name ;
+	}
 
 	/**
 		Return the EventType corresponding to the String 
@@ -37,7 +52,7 @@ public final class EventType
 				return eventTypes.get( _type ) ;
 			}
 
-			final EventType type = new EventType() ;
+			final EventType type = new EventType( _type ) ;
 			eventTypes.put( _type, type ) ;
 			return type ;
 		}
