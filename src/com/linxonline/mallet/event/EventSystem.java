@@ -12,6 +12,7 @@ public final class EventSystem implements EventSystemInterface
 	private final String name ;
 	private final HashMap<EventType, EventQueue> eventQueues = new HashMap<EventType, EventQueue>() ;
 	private final ArrayList<EventQueue> queues = new ArrayList<EventQueue>() ;
+	private final EventQueue allQueue = new EventQueue( Event.ALL_EVENT_TYPES ) ;
 
 	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
 	private final ArrayList<EventHandler> toBeRemoved = new ArrayList<EventHandler>() ;
@@ -25,7 +26,7 @@ public final class EventSystem implements EventSystemInterface
 	{
 		name = _name ;
 		// Guarantee an ALL_EVENT_TYPES Queue.
-		addEventQueue( Event.ALL_EVENT_TYPES, new EventQueue( Event.ALL_EVENT_TYPES ) ) ;
+		addEventQueue( Event.ALL_EVENT_TYPES, allQueue ) ;
 	}
 
 	/**
@@ -50,7 +51,7 @@ public final class EventSystem implements EventSystemInterface
 			// represents a developer wishing to recieve all Events.
 			// If the types contains ALL_EVENT_TYPES then only add it 
 			// to the ALL_EVENT_TYPES EventQueue.
-			eventQueues.get( Event.ALL_EVENT_TYPES ).addEventHandler( _handler ) ;
+			allQueue.addEventHandler( _handler ) ;
 			return ;
 		}
 
@@ -123,16 +124,19 @@ public final class EventSystem implements EventSystemInterface
 	{
 		final EventType key = _event.getEventType() ;
 		// System.out.println( name + " " + key ) ;
-		if( eventQueues.containsKey( key ) == true )
+
+		final EventQueue queue = eventQueues.get( key ) ;
+		// We don't want to add an event flagged ALL_EVENT_TYPES
+		// multiple times into the same queue.
+		if( queue != null && queue != allQueue )
 		{
 			//System.out.println( "Found: " + key + " Event Queue." ) ;
-			eventQueues.get( key ).addEvent( _event ) ;
+			queue.addEvent( _event ) ;
 		}
 
-		if( eventQueues.containsKey( Event.ALL_EVENT_TYPES ) == true )
-		{
-			eventQueues.get( Event.ALL_EVENT_TYPES ).addEvent( _event ) ;
-		}
+		// We always want to pass the Event to ALL_EVENT_TYPES
+		// queue irrespective of its EventType.
+		allQueue.addEvent( _event ) ;
 	}
 
 	public final void update()
@@ -163,9 +167,10 @@ public final class EventSystem implements EventSystemInterface
 
 		for( final EventType type : types )
 		{
-			if( eventQueues.containsKey( type ) == true )
+			final EventQueue queue = eventQueues.get( type ) ;
+			if( queue != null )
 			{
-				eventQueues.get( type ).removeEventHandler( _handler ) ;
+				queue.removeEventHandler( _handler ) ;
 			}
 		}
 

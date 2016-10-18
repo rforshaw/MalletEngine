@@ -38,9 +38,10 @@ public final class SupportResolutions
 	public Vector2 getBestResolution( final Ratio _ratio, final Vector2 _default )
 	{
 		final String ratio = _ratio.toString() ;
-		if( resolutions.containsKey( ratio ) == true )
+		final ArrayList<Vector2> list = resolutions.get( ratio ) ;
+		if( list != null )
 		{
-			return findBestResolution( resolutions.get( ratio ), _default ) ;
+			return findBestResolution( list, _default ) ;
 		}
 
 		return _default ;

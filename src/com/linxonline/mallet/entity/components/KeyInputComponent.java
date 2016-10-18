@@ -32,9 +32,10 @@ public class KeyInputComponent extends InputComponent
 	
 	public void registerKey( final KeyCode _key, final KeyInputListener _listener )
 	{
-		if( keys.containsKey( _key ) == true )
+		final Key key = keys.get( _key ) ;
+		if( key != null )
 		{
-			keys.get( _key ).add( _listener ) ;
+			key.add( _listener ) ;
 		}
 		else
 		{
@@ -57,17 +58,19 @@ public class KeyInputComponent extends InputComponent
 		{
 			case KEYBOARD_PRESSED :
 			{
-				if( keys.containsKey( _input.keycode ) == true )
+				final Key key = keys.get( _input.keycode ) ;
+				if( key != null )
 				{
-					keys.get( _input.keycode ).callPressed( _input ) ;
+					key.callPressed( _input ) ;
 				}
 				break ;
 			}
 			case KEYBOARD_RELEASED :
 			{
-				if( keys.containsKey( _input.keycode ) == true )
+				final Key key = keys.get( _input.keycode ) ;
+				if( key != null )
 				{
-					keys.get( _input.keycode ).callReleased( _input ) ;
+					key.callReleased( _input ) ;
 				}
 				break ;
 			}

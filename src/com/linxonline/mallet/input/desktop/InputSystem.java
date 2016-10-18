@@ -268,12 +268,13 @@ public class InputSystem implements InputSystemInterface,
 			keycode = isSpecialKeyDown( _event ) ;
 		}
 
-		//System.out.println( keycode ) ;
-
-		if( keyboardState.containsKey( keycode ) == true )
 		{
-			changeKey( _inputType, keycode, _event ) ;
-			return ;
+			final KeyState state = keyboardState.get( keycode ) ;
+			if( state != null )
+			{
+				changeKey( _inputType, state, _event ) ;
+				return ;
+			}
 		}
 
 		// Create new Key if it doesn't exist.
@@ -285,10 +286,9 @@ public class InputSystem implements InputSystemInterface,
 		activeKeyStates.add( state ) ;
 	}
 
-	private void changeKey( final InputType _inputType, final KeyCode _keycode, final KeyEvent _event )
+	private void changeKey( final InputType _inputType, final KeyState _state, final KeyEvent _event )
 	{
-		final KeyState state = keyboardState.get( _keycode ) ;
-		if( state.input.inputType != _inputType )			// If the Input Type has changed
+		if( _state.input.inputType != _inputType )			// If the Input Type has changed
 		{
 			final long eventTimeStamp = _event.getWhen() ;
 			long dt = 0L ;
@@ -297,27 +297,27 @@ public class InputSystem implements InputSystemInterface,
 			// Causes endless Inputs to be sent, this filters duplicates.
 			if( _inputType == InputType.KEYBOARD_PRESSED )
 			{
-				dt = eventTimeStamp - state.pressedTimeStamp ;
+				dt = eventTimeStamp - _state.pressedTimeStamp ;
 			}
 			else if( _inputType == InputType.KEYBOARD_RELEASED )
 			{
-				dt = eventTimeStamp - state.releasedTimeStamp ;
+				dt = eventTimeStamp - _state.releasedTimeStamp ;
 			}
 
 			if( dt > 0L )
 			{
-				activeKeyStates.add( state ) ;
-				state.changed = true ;
+				activeKeyStates.add( _state ) ;
+				_state.changed = true ;
 
-				state.input.inputType = _inputType ;
+				_state.input.inputType = _inputType ;
 
 				if( _inputType == InputType.KEYBOARD_PRESSED )
 				{
-					state.pressedTimeStamp = eventTimeStamp ;
+					_state.pressedTimeStamp = eventTimeStamp ;
 				}
 				else if( _inputType == InputType.KEYBOARD_RELEASED )
 				{
-					state.releasedTimeStamp = eventTimeStamp ;
+					_state.releasedTimeStamp = eventTimeStamp ;
 				}
 			}
 		}

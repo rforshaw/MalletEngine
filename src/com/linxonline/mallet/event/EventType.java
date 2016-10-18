@@ -47,14 +47,15 @@ public final class EventType
 	{
 		synchronized( eventTypes )
 		{
-			if( eventTypes.containsKey( _type ) )
+			final EventType type = eventTypes.get( _type ) ;
+			if( type != null )
 			{
-				return eventTypes.get( _type ) ;
+				return type ;
 			}
 
-			final EventType type = new EventType( _type ) ;
-			eventTypes.put( _type, type ) ;
-			return type ;
+			final EventType newType = new EventType( _type ) ;
+			eventTypes.put( _type, newType ) ;
+			return newType ;
 		}
 	}
 }

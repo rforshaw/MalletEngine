@@ -38,9 +38,10 @@ public class Locks
 
 	public synchronized LockInterface getLock( final String _key )
 	{
-		if( locks.containsKey( _key ) )
+		final LockInterface lock = locks.get( _key ) ;
+		if( lock != null )
 		{
-			return locks.get( _key ) ;
+			return lock ;
 		}
 
 		final LockInterface fail = new LockInterface()
