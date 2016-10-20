@@ -403,7 +403,7 @@ public final class GameTestLoader extends GameLoader
 
 				final RenderComponent render = new RenderComponent() ;
 				render.addBasicDraw( draw ) ;
-				
+
 				entity.addComponent( render ) ;
 				entity.addComponent( new Component( "SPIN", "CUBE" )
 				{

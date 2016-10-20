@@ -125,9 +125,6 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		final Sprite.Frame f = sprite.getFrame( frame ) ;		// Grab the current frame
 
 		ProgramAssist.map( DrawAssist.getProgram( draw ), "inTex0", f.path ) ;
-		
-		//DrawAssist.clearTextures( draw ) ;
-		//DrawAssist.amendTexture( draw, f.path ) ;
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility

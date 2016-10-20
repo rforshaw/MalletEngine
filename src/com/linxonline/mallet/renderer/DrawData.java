@@ -275,7 +275,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 			// as to be updated or UpdateType is CONTINUOUS.
 			return ;
 		}
-		
+
 		draw.upload( ( T )this ) ;
 	}
 
@@ -285,10 +285,11 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		final float yDiff = ( _future.y - _past.y ) / _diff ;
 		final float zDiff = ( _future.z - _past.z ) / _diff ;
 
-		if( Math.abs( xDiff ) > 0.0f || Math.abs( yDiff ) > 0.0f || Math.abs( zDiff ) > 0.0f )
+		if( Math.abs( xDiff ) > 0.001f || Math.abs( yDiff ) > 0.001f || Math.abs( zDiff ) > 0.001f )
 		{
 			// If an object has not reached its final state
 			// then flag it for updating again during the next draw call.
+			//System.out.println( xDiff + " " + yDiff + " " + zDiff + " Forcing Update" ) ;
 			forceUpdate() ;
 		}
 

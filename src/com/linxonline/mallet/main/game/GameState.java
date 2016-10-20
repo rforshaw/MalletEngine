@@ -418,7 +418,7 @@ public class GameState extends State implements HookEntity
 					system.getInputInterface().update() ;
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
-				
+
 					//System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;

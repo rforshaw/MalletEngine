@@ -51,9 +51,6 @@ public class ImageCreator extends Creator<Entity, Settings>
 		ProgramAssist.map( program, "inTex0", new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
 
 		DrawAssist.attachProgram( draw, program ) ;
-
-		//DrawAssist.amendTexture( draw, new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
-		//DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 		DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
