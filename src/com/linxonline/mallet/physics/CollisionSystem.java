@@ -66,7 +66,7 @@ public class CollisionSystem extends EventController
 			treeHulls.insertHull( hull ) ;
 		}
 
-		System.out.println( "Collisions: " + collisions ) ;
+		//System.out.println( "Collisions: " + collisions ) ;
 		treeHulls.update( _dt ) ;
 	}
 
