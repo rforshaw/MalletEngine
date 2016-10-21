@@ -53,8 +53,7 @@ public class CollisionSystem extends EventController
 	public void update( final float _dt )
 	{
 		update() ;			// Update Event Controller
-		treeHulls.clear() ;
-		
+
 		int collisions = 0 ;
 		final int size = hulls.size() ;
 		for( int i = 0; i < size; i++ )
@@ -67,7 +66,7 @@ public class CollisionSystem extends EventController
 			treeHulls.insertHull( hull ) ;
 		}
 
-		//System.out.println( "Collisions: " + collisions ) ;
+		System.out.println( "Collisions: " + collisions ) ;
 		treeHulls.update( _dt ) ;
 	}
 

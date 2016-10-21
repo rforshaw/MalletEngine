@@ -245,17 +245,18 @@ public class QuadTree
 			Hull hull1 = null ;
 			Hull hull2 = null ;
 
-			final int size = nextHull ;
 			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + size ) ;
 
-			for( int i = 0; i < size; i++ )
+			while( nextHull > 0 )
 			{
-				hull1 = hulls[i] ;
+				hull1 = hulls[0] ;
 				if( hull1.isCollidable() == false )
 				{
+					removeHull( hull1 ) ;
 					continue ;
 				}
 
+				final int size = nextHull ;
 				for( int j = 0; j < size; j++ )
 				{
 					hull2 = hulls[j] ;
@@ -268,6 +269,12 @@ public class QuadTree
 						}
 					}
 				}
+
+				// We've compared this hull against all the other 
+				// hulls, and generated the needed collision points.
+				// No more can be done, leaving it in will only 
+				// consume valuable resources. 
+				removeHull( hull1 ) ;
 			}
 		}
 
