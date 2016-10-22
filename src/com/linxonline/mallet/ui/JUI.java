@@ -276,23 +276,28 @@ public class JUI
 
 	private static void applyLengths( final UIElement _element, final JSONObject _ui )
 	{
-		final Vector3 length = Vector3.parseVector3( _ui.optString( "LENGTH", null ) ) ;
-		final Vector3 minLength = Vector3.parseVector3( _ui.optString( "MIN-LENGTH", null ) ) ;
-		final Vector3 maxLength = Vector3.parseVector3( _ui.optString( "MAX-LENGTH", null ) ) ;
-
-		if( minLength != null )
 		{
-			_element.setMinimumLength( minLength.x, minLength.y, minLength.z ) ;
+			final Vector3 minLength = Vector3.parseVector3( _ui.optString( "MIN_LENGTH", null ) ) ;
+			if( minLength != null )
+			{
+				_element.setMinimumLength( minLength.x, minLength.y, minLength.z ) ;
+			}
 		}
 
-		if( maxLength != null )
 		{
-			_element.setMaximumLength( maxLength.x, maxLength.y, maxLength.z ) ;
+			final Vector3 maxLength = Vector3.parseVector3( _ui.optString( "MAX_LENGTH", null ) ) ;
+			if( maxLength != null )
+			{
+				_element.setMaximumLength( maxLength.x, maxLength.y, maxLength.z ) ;
+			}
 		}
 
-		if( length != null )
 		{
-			_element.setLength( length.x, length.y, length.z ) ;
+			final Vector3 length = Vector3.parseVector3( _ui.optString( "LENGTH", null ) ) ;
+			if( length != null )
+			{
+				_element.setLength( length.x, length.y, length.z ) ;
+			}
 		}
 	}
 

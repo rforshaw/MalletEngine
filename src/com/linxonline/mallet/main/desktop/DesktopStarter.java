@@ -45,6 +45,7 @@ public abstract class DesktopStarter extends StarterInterface
 		loadFileSystem( _fileSystem ) ;						// Ensure FileSystem is setup correctly.
 		backendSystem = _backendSystem ;
 		gameSystem = new GameSystem( _backendSystem ) ;
+
 		final ShutdownDelegate delegate = _backendSystem.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{
@@ -60,6 +61,7 @@ public abstract class DesktopStarter extends StarterInterface
 	public void init()
 	{
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
+		setRenderSettings( backendSystem ) ;
 		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
@@ -73,7 +75,6 @@ public abstract class DesktopStarter extends StarterInterface
 	public void run()
 	{
 		backendSystem.startSystem() ;
-		setRenderSettings( backendSystem ) ;
 		thread = new Thread( "GAME_THREAD" )
 		{
 			public void run()
@@ -173,6 +174,9 @@ public abstract class DesktopStarter extends StarterInterface
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
+
+		//System.out.println( "Render Settings Display: " + renderWidth + " " + renderHeight ) ;
+		//System.out.println( "Render Settings Display: " + displayWidth + " " + displayHeight ) ;
 
 		final RenderInterface render = _system.getRenderInterface() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;

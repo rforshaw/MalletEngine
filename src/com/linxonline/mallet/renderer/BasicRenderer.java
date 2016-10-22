@@ -10,8 +10,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	private final T worlds ;
 
 	private final EventController controller = new EventController() ;
-	private final RenderInfo info = new RenderInfo( new Vector2( 800, 600 ),
-													new Vector2( 800, 600 ) ) ;
+	private final RenderInfo info = new RenderInfo() ;
 
 	protected float drawDT   = 0.0f ;
 	protected float updateDT = 0.0f ;

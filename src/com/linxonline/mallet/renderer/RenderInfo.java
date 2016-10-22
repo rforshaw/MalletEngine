@@ -26,11 +26,8 @@ public final class RenderInfo implements InputAdapterInterface
 	private Vector2 screenOffset = new Vector2( 0, 0 ) ;
 	private Vector2 ratioRtoD = new Vector2( 0, 0 ) ;
 
-	public RenderInfo( final Vector2 _displayDimension, 
-					   final Vector2 _renderDimensions )
+	public RenderInfo()
 	{
-		displayDimensions = _displayDimension ;
-		renderDimensions = _renderDimensions ;
 		updateInfo() ;
 	}
 
@@ -140,6 +137,7 @@ public final class RenderInfo implements InputAdapterInterface
 	**/
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
+		//System.out.println( "RenderInfo setDislplay: " + _width + " " + _height ) ;
 		displayDimensions.setXY( _width, _height ) ;
 		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
 		GlobalConfig.addInteger( "DISPLAYHEIGHT", _height ) ;
@@ -151,6 +149,7 @@ public final class RenderInfo implements InputAdapterInterface
 	**/
 	public void setRenderDimensions( final int _width, final int _height )
 	{
+		//System.out.println( "RenderInfo setRender: " + _width + " " + _height ) ;
 		renderDimensions.setXY( _width, _height ) ;
 		GlobalConfig.addInteger( "RENDERWIDTH", _width ) ;
 		GlobalConfig.addInteger( "RENDERHEIGHT", _height ) ;

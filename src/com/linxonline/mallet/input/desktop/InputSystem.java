@@ -6,7 +6,6 @@ import java.awt.AWTException ;
 import java.util.HashMap ;
 import java.util.ArrayList ;
 import java.util.Collection ;
-//import java.awt.event.* ;
 import java.io.* ;
 
 import com.jogamp.newt.event.* ;

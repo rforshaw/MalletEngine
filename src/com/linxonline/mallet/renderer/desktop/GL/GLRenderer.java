@@ -35,12 +35,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
-	protected final static ObjectCache<Matrix4> matrixCache  = new ObjectCache<Matrix4>( Matrix4.class ) ;
-	protected final static Matrix4 uiMatrix                  = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
-	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
+	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
+	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
+	protected final static Matrix4 worldMatrix              = matrixCache.get() ;		// Used for moving the camera around the world
 
-	protected GLWindow canvas = null ;
-	protected static GL3 gl = null ;
+	protected GLWindow canvas ;
+	protected static GL3 gl ;
 
 	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
@@ -54,6 +54,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 
 		defaultCamera.setDrawInterface( getCameraDraw() ) ;
 		worlds.addCamera( defaultCamera, null ) ;
+
+		initWindow() ;
 	}
 
 	@Override
@@ -62,13 +64,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
 
-		initWindow() ;
 		canvas.addGLEventListener( this ) ;
 
 		initAssist() ;
-
-		final Vector2 display = getRenderInfo().getDisplayDimensions() ;
-		canvas.setSize( ( int )display.x, ( int )display.y ) ;
 		canvas.setVisible( true ) ;
 	}
 
@@ -76,14 +74,16 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void shutdown()
 	{
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
-		canvas.getContext().makeCurrent() ;
-		clear() ;							// Clear the contents being rendered
+		if( makeCurrent() == true )
+		{
+			clear() ;							// Clear the contents being rendered
 
-		getWorldState().shutdown() ;
-		programs.shutdown() ;
-		textures.shutdown() ;				// We'll loose all texture and font resources
-		fontManager.shutdown() ;
-		canvas.getContext().release() ;
+			getWorldState().shutdown() ;
+			programs.shutdown() ;
+			textures.shutdown() ;				// We'll loose all texture and font resources
+			fontManager.shutdown() ;
+			release() ;
+		}
 	}
 
 	@Override
@@ -650,7 +650,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
 							   ( int )( screen.dimension.x * scaleRtoD.x ),
 							   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
-				//GLRenderer.handleError( "Viewport: ", gl ) ;
 
 				final Vector3 position = _camera.getPosition() ;
 				final Vector3 scale = _camera.getScale() ;
@@ -695,9 +694,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void setRenderDimensions( final int _width, final int _height )
 	{
 		super.setRenderDimensions( _width, _height ) ;
-		canvas.getContext().makeCurrent() ;
-		resize() ;
-		canvas.getContext().release() ;
+		if( makeCurrent() == true )
+		{
+			resize() ;
+			release() ;
+		}
 	}
 
 	@Override
@@ -706,9 +707,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		super.setDisplayDimensions( _width, _height ) ;
 		canvas.setSize( _width, _height ) ;
 
-		canvas.getContext().makeCurrent() ;
-		resize() ;
-		canvas.getContext().release() ;
+		if( makeCurrent() == true )
+		{
+			resize() ;
+			release() ;
+		}
 	}
 
 	@Override
@@ -719,15 +722,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
-		//GLRenderer.handleError( "VSync: ", gl ) ;
-
 		gl.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
 
 		gl.glEnable( GL.GL_CULL_FACE ) ;
 		gl.glCullFace( GL.GL_BACK ) ;  
 		gl.glFrontFace( GL.GL_CCW ) ;
-
-		resize() ;
 
 		System.out.println( "Building default shaders.." ) ;
 		programs.get( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
@@ -787,9 +786,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void display( final GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL3() ;
-		//GLRenderer.handleError( "Previous: ", gl ) ;
-		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
-		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
+		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;
+		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		getEventController().update() ;
 
@@ -818,10 +816,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 
 	public GLWindow getCanvas()
 	{
-		initWindow() ;
 		return canvas ;
 	}
 
+	/**
+		We need to make sure the canvas is constructed 
+		as soon as possible.
+		We set the canvas size to renderInfo display dimensions, 
+		as reshape() is called when GLRenderer is added as 
+		a listener to the canvas.
+		reshape() updates renderInfo and wipes the dimension 
+		settings loaded in by 'base/config.txt' from DesktopStarter.
+	*/
 	private void initWindow()
 	{
 		if( canvas == null )
@@ -832,10 +838,19 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			capabilities.setDoubleBuffered( true ) ;
 
 			canvas = GLWindow.create( capabilities ) ;
+
+			final Vector2 display = getRenderInfo().getDisplayDimensions() ;
+			canvas.setSize( ( int )display.x, ( int )display.y ) ;
 		}
 	}
 
-	private boolean loadProgram( final GLDrawData _data )
+	/**
+		Attempt to acquire a compatible GLProgram from 
+		the ProgramManager. Make sure the GLProgram 
+		requested maps correctly with the ProgramMap 
+		defined in the GLDrawData object.
+	*/
+	private static boolean loadProgram( final GLDrawData _data )
 	{
 		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 		if( program == null )
@@ -849,12 +864,18 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			final GLProgram glProgram = programs.get( program.getID() ) ;
 			if( glProgram == null )
 			{
+				// If the GLProgram is yet to exist then 
+				// _data will need to be run through the
+				// rendering cycle again.
 				_data.forceUpdate() ;
 				return false ;
 			}
 
 			if( glProgram.isValidMap( program.getMaps() ) == false )
 			{
+				// If a GLProgram exists but the mappings are 
+				// incompatible return false and prevent _data 
+				// from being rendered.
 				return false ;
 			}
 
@@ -867,6 +888,33 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected static Texture<GLImage> getTexture( final String _path )
 	{
 		return textures.get( _path ) ;
+	}
+
+	/**
+		Will grab the GLContext and call makeCurrent() 
+		if it exists in the first place.
+	*/
+	private boolean makeCurrent()
+	{
+		final GLContext context = canvas.getContext() ;
+		if( context == null )
+		{
+			return false ;
+		}
+
+		context.makeCurrent() ;
+		return true ;
+	}
+
+	/**
+		Release the GLContext from the current thread.
+		This should only be called if makeCurrent()
+		returns true. 
+	*/
+	private void release()
+	{
+		final GLContext context = canvas.getContext() ;
+		context.release() ;
 	}
 
 	public static void handleError( final String _txt, final GL3 _gl )

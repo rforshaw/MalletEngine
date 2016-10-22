@@ -314,12 +314,9 @@ public class UIElement implements InputHandler
 	public void setLength( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		if( minLength != null )
-		{
-			length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixel( _x ) ;
-			length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixel( _y ) ;
-			length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixel( _z ) ;
-		}
+		length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixel( _x ) ;
+		length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixel( _y ) ;
+		length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixel( _z ) ;
 
 		if( maxLength.x > 0.0f )
 		{
