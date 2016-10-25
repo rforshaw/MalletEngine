@@ -100,9 +100,6 @@ public class GameState extends State implements HookEntity
 	{
 		hookHandlerSystems() ;
 
-		initEventProcessors() ;
-		hookGameStateEventController() ;
-
 		if( paused == true )
 		{
 			paused = false ;
@@ -113,6 +110,11 @@ public class GameState extends State implements HookEntity
 		{
 			initGame() ;
 		}
+		
+		// Event processors need to be called last 
+		// in case developer adds more during initGame or resumeGame.
+		initEventProcessors() ;
+		hookGameStateEventController() ;
 	}
 
 	/**
@@ -680,7 +682,7 @@ public class GameState extends State implements HookEntity
 			{
 				txt.setLength( 0 ) ;
 				txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
-				System.out.println( "FPS: " + txt ) ;
+				//System.out.println( "FPS: " + txt ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
 		}
