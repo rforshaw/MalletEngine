@@ -4,6 +4,14 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.audio.* ;
 
+import com.linxonline.mallet.renderer.DrawDelegateCallback ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.Draw ;
+
+import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.MalletColour ;
+
 import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.system.SystemInterface ;
 import com.linxonline.mallet.main.game.statemachine.State ;
@@ -63,6 +71,8 @@ public class GameState extends State implements HookEntity
 	protected double updateAccumulator = 0.0f ;							// Current dt update
 	protected double renderAccumulator = 0.0f ;							// Current dt render
 
+	private final ShowFPS showFPS = new ShowFPS() ;
+
 	public GameState( final String _name )
 	{
 		super( _name ) ;
@@ -90,6 +100,9 @@ public class GameState extends State implements HookEntity
 	{
 		hookHandlerSystems() ;
 
+		initEventProcessors() ;
+		hookGameStateEventController() ;
+
 		if( paused == true )
 		{
 			paused = false ;
@@ -100,9 +113,6 @@ public class GameState extends State implements HookEntity
 		{
 			initGame() ;
 		}
-
-		initEventProcessors() ;
-		hookGameStateEventController() ;
 	}
 
 	/**
@@ -376,15 +386,14 @@ public class GameState extends State implements HookEntity
 	{
 		currentUpdate = new UpdateInterface()
 		{
-			private long logicRunningTime = 0L ;
-			private long renderRunningTime = 0L ;
+			private double deltaRenderTime = 0.0 ;
 
 			@Override
 			public void update( final double _dt )
 			{
+				long startTime = ElapsedTimer.nanoTime() ;
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
-				long startTime = ElapsedTimer.nanoTime() ;
 
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
@@ -396,48 +405,45 @@ public class GameState extends State implements HookEntity
 					dataTracker.update() ;
 					eventController.update() ;
 
+					showFPS.update( deltaRenderTime ) ;
+
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
 					audioSystem.update( DEFAULT_TIMESTEP ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
 
-				// Track the logic running time, not used to calculate 
-				// sleep duration, but useful information for developer
-				// to see if logic goes over allocated time.
 				long endTime = ElapsedTimer.nanoTime() ;
-				logicRunningTime = endTime - startTime ;		// In nanoseconds
+				long deltaTime = endTime - startTime ;				// In nanoseconds
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				startTime = ElapsedTimer.nanoTime() ;
+				final double total = deltaTime * 0.000000001 ;
+				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( total + renderAccumulator ) ) * 1000.0 ) ;	// Convert to milliseconds
+				//System.out.println( "Total: " + total + " FPS: " + DEFAULT_FRAMERATE ) ;
 
-				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ; ;
-				if( renderAccumulator > DEFAULT_FRAMERATE )
+				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ;
+				if( renderAccumulator >= DEFAULT_FRAMERATE )
 				{
+					startTime = ElapsedTimer.nanoTime() ;
+
 					system.getInputInterface().update() ;
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
 
-					//System.out.println( ( int )( 1.0f / _dt ) ) ;
 					animationSystem.update( DEFAULT_FRAMERATE ) ;
 					system.draw( DEFAULT_FRAMERATE ) ;
-					renderAccumulator -= DEFAULT_FRAMERATE ;
+
+					endTime = ElapsedTimer.nanoTime() ;
+					deltaTime += endTime - startTime ;
+
+					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
+					renderAccumulator = 0.0 ;
 				}
-
-				endTime = ElapsedTimer.nanoTime() ;
-				renderRunningTime = endTime - startTime ;		// In nanoseconds
-
-				final float deltaLogic = logicRunningTime * 0.000000001f ;							// Convert to seconds
-				final float deltaRender = renderRunningTime * 0.000000001f ;						// Convert to seconds
-
-				// If the time taken to render the current frame and update the delta logic
-				// is less than the total time allocated for rendering a frame, 
-				// then we can risk sleeping for a short duration.
-				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaRender + deltaLogic ) ) * 1000.0f ) ;	// Convert to milliseconds
 
 				if( sleepRender > 0L )
 				{
+					//System.out.println( "Sleep: " + sleepRender ) ;
 					system.sleep( sleepRender ) ;
 				}
 			}
@@ -493,7 +499,7 @@ public class GameState extends State implements HookEntity
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
 
-				//System.out.println( ( int )( 1.0f / _dt ) ) ;
+				showFPS.update( _dt ) ;
 				animationSystem.update( DEFAULT_FRAMERATE ) ;
 				system.draw( DEFAULT_FRAMERATE ) ;
 				renderAccumulator -= DEFAULT_FRAMERATE ;
@@ -576,6 +582,40 @@ public class GameState extends State implements HookEntity
 				query.setSearch( entitySystem.getSearch() ) ;
 			}
 		} ) ;
+
+		eventController.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
+		{
+			private DrawDelegate delegate ;
+
+			public void processEvent( final Event<Boolean> _event )
+			{
+				final boolean show = _event.getVariable() ;
+				if( show == showFPS.toShow() )
+				{
+					// If they are setting it to the same value it 
+					// currently is don't do anything.
+					return ;
+				}
+
+				if( show == false )
+				{
+					showFPS.setShow( false ) ;
+					delegate.shutdown() ;
+					delegate = null ;
+					return ;
+				}
+
+				showFPS.setShow( true ) ;
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				{
+					public void callback( final DrawDelegate _delegate )
+					{
+						delegate = _delegate ;
+						delegate.addTextDraw( showFPS.getDraw() ) ;
+					}
+				} ) ) ;
+			}
+		} ) ;
 	}
 
 	/**
@@ -605,5 +645,49 @@ public class GameState extends State implements HookEntity
 	protected interface UpdateInterface
 	{
 		public void update( final double _dt ) ;
+	}
+
+	private class ShowFPS
+	{
+		private boolean show = false ;
+		private final StringBuilder txt = new StringBuilder( "0" ) ;
+		private final Draw draw = DrawAssist.createTextDraw( txt,
+															new MalletFont( "Arial" ),
+															new Vector3(),
+															new Vector3(),
+															new Vector3(),
+															new Vector3( 1.0f, 1.0f, 1.0f ),
+															200 ) ;
+
+		public ShowFPS()
+		{
+			DrawAssist.amendUI( draw, true ) ;
+		}
+
+		public void setShow( final boolean _show )
+		{
+			show = _show ;
+		}
+
+		public boolean toShow()
+		{
+			return show ;
+		}
+
+		public void update( final double _dt )
+		{
+			if( show == true )
+			{
+				txt.setLength( 0 ) ;
+				txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
+				System.out.println( "FPS: " + txt ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+		}
+
+		public Draw getDraw()
+		{
+			return draw ;
+		}
 	}
 }

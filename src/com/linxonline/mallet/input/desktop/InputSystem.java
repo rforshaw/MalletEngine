@@ -124,18 +124,12 @@ public class InputSystem implements InputSystemInterface,
 
 	public void keyPressed( final KeyEvent _event )
 	{
-		//if( _event.getID() == KeyEvent.KEY_PRESSED )
-		{
-			updateKey( InputType.KEYBOARD_PRESSED, _event ) ;
-		}
+		updateKey( InputType.KEYBOARD_PRESSED, _event ) ;
 	}
 
 	public void keyReleased( final KeyEvent _event )
 	{
-		//if( _event.getID() == KeyEvent.KEY_RELEASED )
-		{
-			updateKey( InputType.KEYBOARD_RELEASED, _event ) ;
-		}
+		updateKey( InputType.KEYBOARD_RELEASED, _event ) ;
 	}
 
 	public void keyTyped( final KeyEvent _event ) {}
@@ -146,21 +140,7 @@ public class InputSystem implements InputSystemInterface,
 
 	public void mouseEntered( final MouseEvent _event ) {}
 
-	public void mouseExited( final MouseEvent _event )
-	{
-		final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
-		if( capture == false || controlMouse == null )
-		{
-			return ;
-		}
-
-		final float exitY = _event.getY() ;
-		final float exitX = _event.getX() ;
-		final Vector2 shift = Vector2.subtract( mousePosition, new Vector2( exitX, exitY ) ) ;
-
-		//final Point point = _event.getLocationOnScreen() ;
-		//controlMouse.mouseMove( point.x + ( int )shift.x , point.y + ( int )shift.y ) ;
-	}
+	public void mouseExited( final MouseEvent _event ) {}
 
 	public void mousePressed( final MouseEvent _event )
 	{
@@ -255,8 +235,6 @@ public class InputSystem implements InputSystemInterface,
 		final InputEvent input = cache.get() ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
-
-		//Locks.getLocks().getLock( "APPLICATION_LOCK" ).unlock() ;
 	}
 
 	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )

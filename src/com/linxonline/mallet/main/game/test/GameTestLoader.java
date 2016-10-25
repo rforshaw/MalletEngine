@@ -102,6 +102,8 @@ public final class GameTestLoader extends GameLoader
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
+
+				eventSystem.addEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 			}
 
 			public void createUI()
