@@ -17,9 +17,10 @@ public class GLDrawData extends DrawData
 {
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
+	private GLGeometryUploader.GLBuffer buffer ;
+	private GLGeometryUploader.Location location ;
+
 	private Matrix4 drawMatrix    = new Matrix4() ;
-	private String drawProgramID  = null ;
-	private GLProgram drawProgram = null ;
 	private Shape drawShape       = null ;
 
 	private Matrix4 clipMatrix    = null ;
@@ -83,22 +84,6 @@ public class GLDrawData extends DrawData
 		return textures ;
 	}
 
-	public void setDrawProgram( final GLProgram _program, final String _id )
-	{
-		drawProgramID = _id ;
-		drawProgram = _program ;
-	}
-
-	public String getDrawProgramID()
-	{
-		return drawProgramID ;
-	}
-
-	public GLProgram getDrawProgram()
-	{
-		return drawProgram ;
-	}
-
 	public void setClipProgram( final GLProgram _program )
 	{
 		clipProgram = _program ;
@@ -159,6 +144,26 @@ public class GLDrawData extends DrawData
 		return drawMatrix ;
 	}
 
+	public void setGLBuffer( final GLGeometryUploader.GLBuffer _buffer )
+	{
+		buffer = _buffer ;
+	}
+
+	public GLGeometryUploader.GLBuffer getGLBuffer()
+	{
+		return buffer ;
+	}
+
+	public void setLocation( final GLGeometryUploader.Location _location )
+	{
+		location = _location ;
+	}
+
+	public GLGeometryUploader.Location getLocation()
+	{
+		return location ;
+	}
+
 	@Override
 	public void unregister()
 	{
@@ -173,8 +178,8 @@ public class GLDrawData extends DrawData
 	public void reset()
 	{
 		super.reset() ;
+		buffer      = null ;
 		drawMatrix  = null ;
-		drawProgram = null ;
 		drawShape   = null ;
 
 		clipMatrix   = null ;

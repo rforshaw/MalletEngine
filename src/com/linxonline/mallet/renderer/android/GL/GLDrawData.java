@@ -18,7 +18,8 @@ public class GLDrawData extends DrawData
 	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
 
 	private GLGeometryUploader.GLBuffer buffer ;
-	
+	private GLGeometryUploader.Location location ;
+
 	private Matrix4 drawMatrix    = new Matrix4() ;
 	private Shape drawShape       = null ;
 
@@ -153,6 +154,16 @@ public class GLDrawData extends DrawData
 	public GLGeometryUploader.GLBuffer getGLBuffer()
 	{
 		return buffer ;
+	}
+
+	public void setLocation( final GLGeometryUploader.Location _location )
+	{
+		location = _location ;
+	}
+
+	public GLGeometryUploader.Location getLocation()
+	{
+		return location ;
 	}
 
 	@Override
