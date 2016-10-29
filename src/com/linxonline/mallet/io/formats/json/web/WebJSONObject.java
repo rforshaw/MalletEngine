@@ -170,24 +170,22 @@ public class WebJSONObject extends JSONObject
 
 	public JSONObject optJSONObject( final String _key )
 	{
-		final JSObject obj = optJSObject( object, _key ) ;
-		if( obj == null )
+		if( has( _key ) == false )
 		{
 			return null ;
 		}
 
-		return new WebJSONObject( obj ) ;
+		return new WebJSONObject( optJSObject( object, _key ) ) ;
 	}
 
 	public JSONArray optJSONArray( final String _key )
 	{
-		final JSObject array = optJSArray( object, _key ) ;
-		if( array == null )
+		if( has( _key ) == false )
 		{
 			return null ;
 		}
 
-		return new WebJSONArray( array ) ;
+		return new WebJSONArray( optJSArray( object, _key ) ) ;
 	}
 
 	public String toString()

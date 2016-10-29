@@ -12,5 +12,6 @@ public class Main
 	{
 		final TemplateStarter starter = new TemplateStarter() ;
 		starter.init() ;
+		starter.run() ;
 	}
 }

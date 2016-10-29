@@ -95,14 +95,14 @@
               <minifying>true</minifying>
 
               <!-- Whether TeaVM should produce debug information for its built-in debugger -->
-              <debugInformationGenerated>false</debugInformationGenerated>
+              <debugInformationGenerated>true</debugInformationGenerated>
 
               <!-- Whether TeaVM should produce source maps file -->
-              <sourceMapsGenerated>false</sourceMapsGenerated>
+              <sourceMapsGenerated>true</sourceMapsGenerated>
 
               <!-- Whether TeaVM should also put source files into output directory,
                    for compatibility with source maps -->
-              <sourceFilesCopied>false</sourceFilesCopied>
+              <sourceFilesCopied>true</sourceFilesCopied>
             </configuration>
           </execution>
         </executions>

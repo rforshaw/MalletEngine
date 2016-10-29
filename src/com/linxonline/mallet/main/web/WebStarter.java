@@ -45,45 +45,7 @@ public abstract class WebStarter extends StarterInterface
 
 		loadFileSystem( _fileSystem ) ;						// Ensure FileSystem is setup correctly.
 		backendSystem = _backendSystem ;
-		gameSystem = new GameSystem( _backendSystem )
-		{
-			private final TimerHandler singleStep = new TimerHandler()
-			{
-				long startTime = ElapsedTimer.nanoTime() ;
-				long dt = 0L ;
-
-				@Override
-				public void onTimer()
-				{
-					if( running == true )
-					{
-						stateMachine.update( ( double )( dt * 0.001 ) ) ;			// Update Game State
-
-						final long endTime = ElapsedTimer.nanoTime() ;
-						dt = endTime - startTime ;
-
-						long sleep = 16L - dt ;
-						sleep = ( sleep > 0 ) ? sleep : 0L ;
-
-						// Calculate when the next timestep should be issued.
-						// We'll operate on a 60Hz timestep.
-						Window.setTimeout( singleStep, sleep ) ;
-						startTime = ElapsedTimer.nanoTime() ;
-						return ;
-					}
-
-					stateMachine.pause() ;
-				}
-			} ;
-		
-			@Override
-			public void runSystem()
-			{
-				running = true ;
-				stateMachine.resume() ;
-				Window.setTimeout( singleStep, 0 ) ;
-			}
-		} ;
+		gameSystem = new GameSystem( _backendSystem ) ;
 	}
 
 	@Override
