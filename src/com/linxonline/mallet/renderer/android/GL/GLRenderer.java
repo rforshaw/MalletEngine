@@ -485,6 +485,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			}
 
 			@Override
+			public boolean getDimensions( final Camera _camera, final Vector3 _populate )
+			{
+				final CameraData.Projection projection = ( ( CameraData )_camera ).getProjection() ;
+				_populate.setXYZ( projection.nearPlane ) ;
+				return true ;
+			}
+
+			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
 				if( _camera != null && _camera instanceof CameraData )

@@ -66,10 +66,11 @@ public final class CollisionCheck
 			axis.y *= -1.0f ;
 		}
 
+		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
 		overlap *= 0.5f ;
-		_box1.contactData.addContact( overlap, axis.x, axis.y, 
-									  ( _box1.isPhysical() && _box2.isPhysical() ),
-									  _box2 ) ;
+
+		_box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+		_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
 		return true ;
 	}
 

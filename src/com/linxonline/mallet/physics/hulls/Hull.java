@@ -1,6 +1,6 @@
 package com.linxonline.mallet.physics.hulls ;
 
-import java.util.ArrayList ;
+import java.util.HashSet ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.entity.Entity ;
@@ -11,9 +11,10 @@ public abstract class Hull
 {
 	public static final int NO_GROUP = -1 ;
 
-	private int groupID = NO_GROUP ;												// Defines what Group the Hull is in.
-	private final ArrayList<Integer> collidableGroups = new ArrayList<Integer>() ;	// Defines the Groups the Hull is affected by.
-																					// If no group-specified, collides with everything.
+	private Group.ID groupID = Group.get( -1 ) ;										// Defines what Group the Hull is in.
+	private final HashSet<Group.ID> collidableGroups = new HashSet<Group.ID>() ;	// Defines the Groups the Hull is affected by.
+																						// If no group-specified, collides with everything.
+	private Object parent ;
 
 	private final Vector2 accumulatedPenetration = new Vector2() ;
 	public final ContactData contactData = new ContactData() ;
@@ -53,12 +54,36 @@ public abstract class Hull
 
 	public final void setGroupID( final int _groupID )
 	{
-		groupID = _groupID ;
+		final Group.ID id = Group.get( _groupID ) ;
+		if( id == null )
+		{
+			System.out.println( "Attempted to set collidable group that doesn't exist." ) ;
+			return ;
+		}
+
+		setGroupID( id ) ;
+	}
+
+	public final void setGroupID( final Group.ID _id )
+	{
+		groupID = _id ;
 	}
 
 	public final void addCollidableGroup( final int _groupID )
 	{
-		collidableGroups.add( _groupID ) ;
+		final Group.ID id = Group.get( _groupID ) ;
+		if( id == null )
+		{
+			System.out.println( "Attempted to add collidable group that doesn't exist." ) ;
+			return ;
+		}
+
+		addCollidableGroup( id ) ;
+	}
+
+	public final void addCollidableGroup( final Group.ID _id )
+	{
+		collidableGroups.add( _id ) ;
 	}
 
 	public final void setCollisionCallback( final CollisionCallback _callback )
@@ -87,7 +112,7 @@ public abstract class Hull
 		physical = _physical ;
 	}
 
-	public final int getGroupID()
+	public final Group.ID getGroupID()
 	{
 		return groupID ;
 	}
@@ -102,14 +127,24 @@ public abstract class Hull
 		return collidable ;
 	}
 
-	public final boolean isCollidableWithGroup( final int _groupID )
+	public final boolean isCollidableWithGroup( final Group.ID _groupID )
 	{
 		if( collidableGroups.isEmpty() )
 		{
-			// Groups haven't been spcified so it can collide with all
+			// Groups haven't been specified so it can collide with all
 			return true ;
 		}
 
 		return collidableGroups.contains( _groupID ) ;
+	}
+
+	public final void setParent( final Object _parent )
+	{
+		parent = _parent ;
+	}
+
+	public final Object getParent()
+	{
+		return parent ;
 	}
 }

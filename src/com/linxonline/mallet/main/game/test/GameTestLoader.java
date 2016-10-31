@@ -180,9 +180,7 @@ public final class GameTestLoader extends GameLoader
 							DrawAssist.attachProgram( draw, program ) ;
 
 							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
-							//DrawAssist.amendTexture( draw, texture ) ;
 							DrawAssist.amendUI( draw, true ) ;
-							//DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
