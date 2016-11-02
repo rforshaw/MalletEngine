@@ -42,11 +42,6 @@ public abstract class Hull
 				accumulatedPenetration.x += point.contactNormal.x * point.penetration ;
 				accumulatedPenetration.y += point.contactNormal.y * point.penetration ;
 			}
-
-			if( callback != null )
-			{
-				callback.collisionCallback( point ) ;
-			}
 		}
 
 		return accumulatedPenetration ;
@@ -136,6 +131,11 @@ public abstract class Hull
 		}
 
 		return collidableGroups.contains( _groupID ) ;
+	}
+
+	public final CollisionCallback getCallback()
+	{
+		return callback ;
 	}
 
 	public final void setParent( final Object _parent )

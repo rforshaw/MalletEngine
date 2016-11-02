@@ -69,8 +69,12 @@ public final class CollisionCheck
 		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
 		overlap *= 0.5f ;
 
-		_box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
-		_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+		final ContactPoint point = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+		if( point != null )
+		{
+			callback( point, _box1.getCallback() ) ;
+			callback( point, _box2.getCallback() ) ;
+		}
 		return true ;
 	}
 
@@ -114,5 +118,13 @@ public final class CollisionCheck
 		final float distance = Math.abs( Vector2.multiply( _toCenter, _axis ) ) ;
 
 		return projectA + projectB - distance ;
+	}
+
+	private static void callback( final ContactPoint _point, final CollisionCallback _callback )
+	{
+		if( _callback != null )
+		{
+			_callback.collisionCallback( _point ) ;
+		}
 	}
 }

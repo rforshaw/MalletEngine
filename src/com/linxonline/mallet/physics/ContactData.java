@@ -19,10 +19,10 @@ public class ContactData
 		}
 	}
 
-	public final void addContact( final float _penetration, 
-								  final Vector2 _normal, 
-								  final boolean _physical,
-								  final Hull _collidedWith )
+	public final ContactPoint addContact( final float _penetration, 
+										  final Vector2 _normal, 
+										  final boolean _physical,
+										  final Hull _collidedWith )
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
@@ -31,13 +31,15 @@ public class ContactData
 			contact.contactNormal = _normal ;
 			contact.physical = _physical ;
 			contact.collidedWith = _collidedWith ;
+			return contact ;
 		}
+		return null ;
 	}
 
-	public final void addContact( final float _penetration, 
-								  final float _normalX, final float _normalY, 
-								  final boolean _physical,
-								  final Hull _collidedWith )
+	public final ContactPoint addContact( final float _penetration, 
+										  final float _normalX, final float _normalY, 
+										  final boolean _physical,
+										  final Hull _collidedWith )
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
@@ -47,7 +49,9 @@ public class ContactData
 			contact.contactNormal.y = _normalY ;
 			contact.physical = _physical ;
 			contact.collidedWith = _collidedWith ;
+			return contact ;
 		}
+		return null ;
 	}
 
 	public ContactPoint next()
@@ -56,6 +60,11 @@ public class ContactData
 
 		index = 0 ;
 		return null ;
+	}
+	
+	public ContactPoint get( final int _i )
+	{
+		return contacts[_i] ;
 	}
 
 	public void reset()

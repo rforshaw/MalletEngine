@@ -172,6 +172,11 @@ public class Vector3
 		return new Vector3( _vec1.x - _vec2.x, _vec1.y - _vec2.y, _vec1.z - _vec2.z ) ;
 	}
 
+	public static final Vector3 multiply( final Vector3 _vec1, final float _scalar )
+	{
+		return new Vector3( _vec1.x * _scalar, _vec1.y * _scalar, _vec1.z * _scalar ) ;
+	}
+
 	/**
 		Scalar Product
 	*/
