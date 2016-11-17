@@ -129,6 +129,11 @@ public class UIButton extends UIElement
 			clicked = _clicked ;
 		}
 
+		public StringBuilder getText()
+		{
+			return text ;
+		}
+
 		@Override
 		public void setParent( final UIElement _parent )
 		{
@@ -157,7 +162,6 @@ public class UIButton extends UIElement
 										  new Vector3(),
 										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
-			//DrawAssist.amendTexture( draw, sheet ) ;
 			DrawAssist.amendShape( draw, Shape.constructPlane( length, neutral.min, neutral.max ) ) ;
 
 			final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;

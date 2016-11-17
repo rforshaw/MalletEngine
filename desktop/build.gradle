@@ -6,7 +6,7 @@ subprojects {
 	targetCompatibility = 1.7
 
 	clean {
-		delete '../target'
+		delete += fileTree( '../target' ).include( '**/*' )
 	}
 }
 

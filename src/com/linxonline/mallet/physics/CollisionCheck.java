@@ -69,11 +69,16 @@ public final class CollisionCheck
 		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
 		overlap *= 0.5f ;
 
-		final ContactPoint point = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
-		if( point != null )
+		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+		if( point1 != null )
 		{
-			callback( point, _box1.getCallback() ) ;
-			callback( point, _box2.getCallback() ) ;
+			callback( point1, _box1.getCallback() ) ;
+		}
+
+		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+		if( point2 != null )
+		{
+			callback( point2, _box2.getCallback() ) ;
 		}
 		return true ;
 	}

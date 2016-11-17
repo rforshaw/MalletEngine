@@ -8,6 +8,7 @@ import com.linxonline.mallet.event.* ;
 public abstract class InputComponent extends Component
 									 implements InputHandler
 {
+	private Component.ReadyCallback destroy = null ;
 	protected InputAdapterInterface inputAdapter = null ;
 	protected final InputMode mode ;
 
@@ -41,6 +42,11 @@ public abstract class InputComponent extends Component
 	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
 	{
 		inputAdapter = _adapter ;
+	}
+
+	public void readyToDestroy( final Component.ReadyCallback _callback )
+	{
+		super.readyToDestroy( _callback ) ;
 	}
 
 	@Override
@@ -77,7 +83,10 @@ public abstract class InputComponent extends Component
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		processInputEvent( _event ) ;
+		if( destroy == null )
+		{
+			processInputEvent( _event ) ;
+		}
 		return InputEvent.Action.PROPAGATE ;
 	}
 

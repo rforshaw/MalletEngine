@@ -119,6 +119,16 @@ public abstract class Component
 	}
 
 	/**
+		Return the parent of the component, 
+		this should be guaranteed if the component 
+		has been added to an Entity.
+	*/
+	public Entity getParent()
+	{
+		return parent ;
+	}
+
+	/**
 		Implemented in Entity.
 		The Entity will call Component.readyToDestroy when,
 		it has been flagged for destruction. When the Component 
