@@ -65,29 +65,39 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public void onTouchEvent( final MotionEvent _event )
 	{
+		final int action = _event.getAction() ;
+		/*final int historySize = _event.getHistorySize() ;
+		for( int i = 0; i < historySize; i++)
+		{
+			final int pointer = 0 ;
+			addInput( action,
+					  _event.getHistoricalX( pointer, i ),
+					  _event.getHistoricalY( pointer, i ) ) ;
+		}*/
+
+		addInput( action, _event.getX(), _event.getY() ) ;
+	}
+
+	private void addInput( final int _action, final float _x, final float _y )
+	{
+		InputType type = InputType.TOUCH_MOVE ;
+		if( _action == MotionEvent.ACTION_UP )
+		{
+			type = InputType.TOUCH_UP ;
+		}
+		else if( _action == MotionEvent.ACTION_DOWN )
+		{
+			type = InputType.TOUCH_DOWN ;
+		}
+
 		synchronized( touchInputs )
 		{
-			InputType type = InputType.TOUCH_MOVE ;
-			final int action = _event.getAction() ;
-
-			if( action == MotionEvent.ACTION_UP )
-			{
-				type = InputType.TOUCH_UP ;
-			}
-			else if( action == MotionEvent.ACTION_DOWN )
-			{
-				type = InputType.TOUCH_DOWN ;
-			}
-
-			touchPosition.x = _event.getX() ;
-			touchPosition.y = _event.getY() ;
-
 			final InputEvent input = cache.get() ;
-			input.setInput( type, ( int )touchPosition.x, ( int )touchPosition.y ) ;
+			input.setInput( type, ( int )_x, ( int )_y ) ;
 			touchInputs.add( input ) ;
 		}
 	}
-	
+
 	public void update()
 	{
 		synchronized( keyInputs )

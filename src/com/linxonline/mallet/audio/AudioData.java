@@ -1,22 +1,35 @@
 package com.linxonline.mallet.audio ;
 
-import java.util.ArrayList ;
-
-import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.caches.Cacheable ;
 
 public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 {
-	private final ArrayList<SourceCallback> callbacks = new ArrayList<SourceCallback>() ;
+	private final static SourceCallback DEFAULT_CALLBACK = new SourceCallback()
+	{
+		public void callbackRemoved() {}
 
-	private String file = null ;
-	private StreamType type = null ;
-	private AudioSource source = null ;
+		public void start() {}
+		public void pause() {}
+		public void stop() {}
+
+		public void tick( final float _dt ) {}
+		public void finished() {}
+	} ;
+
+	private AudioSource source ;
+
+	private String file ;
+	private StreamType type ;
+	private SourceCallback callback = DEFAULT_CALLBACK ;
+
+	public boolean play = false ;
+	public boolean stop = false ;
+	public boolean dirty = false ;
 
 	public AudioData( final String _file, final StreamType _type )
 	{
-		file = _file ;
-		type = _type ;
+		set( _file, _type ) ;
 	}
 
 	public void setSource( final AudioSource _source )
@@ -24,64 +37,22 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 		source = _source ;
 	}
 
-	public void addCallback( final SourceCallback _callback )
+	public void set( final String _file, final StreamType _type )
 	{
-		if( callbacks.contains( _callback ) == false )
+		file = _file ;
+		type = _type ;
+	}
+
+	public void amendCallback( final SourceCallback _callback )
+	{
+		callback = _callback ;
+		if( callback == null )
 		{
-			callbacks.add( _callback ) ;
+			callback = DEFAULT_CALLBACK ;
 		}
 	}
 
-	public void removeCallback( final SourceCallback _callback )
-	{
-		if( callbacks.contains( _callback ) == true )
-		{
-			callbacks.remove( _callback ) ;
-			_callback.callbackRemoved() ;
-		}
-	}
-
-	public void play()
-	{
-		source.play() ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).start() ;
-		}
-	}
-
-	public void playLoop()
-	{
-		source.playLoop() ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).start() ;
-		}
-	}
-
-	public void pause()
-	{
-		source.pause() ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).pause() ;
-		}
-	}
-
-	public void stop()
-	{
-		source.stop() ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).stop() ;
-		}
-	}
-
-	public String getFile()
+	public String getFilePath()
 	{
 		return file ;
 	}
@@ -91,71 +62,24 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 		return type ;
 	}
 
-	public boolean isPlaying()
+	public SourceCallback getCallback()
 	{
-		return source.isPlaying() ;
+		return callback ;
 	}
 
-	public boolean update( final float _dt )
+	public AudioSource getSource()
 	{
-		updateCallbacks() ;
-		final boolean isPlaying = source.isPlaying() ;
-		if( isPlaying == false )
-		{
-			finished() ;
-		}
-
-		return !isPlaying ;
-	}
-
-	/**
-		Update registered callbacks with the sources current time position.
-	**/
-	private void updateCallbacks()
-	{
-		final float sourceDT = source.getCurrentTime() ;
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).tick( sourceDT ) ;
-		}
-	}
-
-	/**
-		Called when Audio Source has finished playing.
-	**/
-	private void finished()
-	{
-		final int length = callbacks.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			callbacks.get( i ).finished() ;
-		}
-	}
-
-	/**
-		Call when Audio Source is to be cleaned up and resources unregistered.
-	**/
-	public void destroy()
-	{
-		final int size = callbacks.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			callbacks.get( i ).callbackRemoved() ;
-		}
-
-		callbacks.clear() ;
-		if( source != null )
-		{
-			source.destroySource() ;
-		}
+		return source ;
 	}
 
 	@Override
 	public void reset()
 	{
-		destroy() ;
-		file   = null ;
-		source = null ;
+		setSource( null ) ;
+		set( null, null ) ;
+		amendCallback( DEFAULT_CALLBACK ) ;
+
+		play = false ;
+		stop = false ;
 	}
 }

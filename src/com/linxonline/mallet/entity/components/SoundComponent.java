@@ -1,5 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.Collection ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
@@ -32,15 +33,27 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		super( _name ) ;
 	}
 
+	/**
+		Add the audio to the Audio sub-system.
+		The audio will not be played until it has been requested.
+	*/
 	public void addAudio( final String _name, final Audio _audio )
 	{
-		AudioAssist.addCallback( _audio, this ) ;
 		sounds.put( _name, _audio ) ;
+		AudioAssist.amendCallback( _audio, this ) ;
+		if( delegate != null )
+		{
+			delegate.addAudio( _audio ) ;
+		}
 	}
 
 	public void removeAudio( final String _name )
 	{
-		sounds.remove( _name ) ;
+		final Audio audio = sounds.remove( _name ) ;
+		if( delegate != null )
+		{
+			delegate.removeAudio( audio ) ;
+		}
 	}
 
 	public Audio getAudio( final String _name )
@@ -66,15 +79,6 @@ public class SoundComponent extends EventComponent implements SourceCallback
 		super.readyToDestroy( _callback ) ;
 	}
 
-	@Override
-	public void tick( final float _dt )
-	{
-		if( callback != null )
-		{
-			callback.tick( _dt ) ;
-		}
-	}
-
 	public void playAudio( final String _name, final SourceCallback _callback )
 	{
 		playAudio( _name ) ;
@@ -90,9 +94,9 @@ public class SoundComponent extends EventComponent implements SourceCallback
 
 		stopAudio() ;
 		final Audio audio = sounds.get( _name ) ;
-		if( delegate != null && audio != null )
+		if( audio != null )
 		{
-			delegate.addAudio( audio ) ;
+			AudioAssist.play( audio ) ;
 			currentAudio = audio ;
 		}
 	}
@@ -107,9 +111,9 @@ public class SoundComponent extends EventComponent implements SourceCallback
 			return ;
 		}
 
-		if( delegate != null && currentAudio != null )
+		if( currentAudio != null )
 		{
-			delegate.removeAudio( currentAudio ) ;
+			AudioAssist.stop( currentAudio ) ;
 		}
 	}
 
@@ -152,6 +156,15 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
+	public void tick( final float _dt )
+	{
+		if( callback != null )
+		{
+			callback.tick( _dt ) ;
+		}
+	}
+
+	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
 		_events.add( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
@@ -159,9 +172,10 @@ public class SoundComponent extends EventComponent implements SourceCallback
 			public void callback( final AudioDelegate _delegate )
 			{
 				delegate = _delegate ;
-				if( defaultAudio != null )
+				final Collection<Audio> audio = sounds.values() ;
+				for( final Audio a : audio )
 				{
-					playAudio( defaultAudio ) ;
+					delegate.addAudio( a ) ;
 				}
 			}
 		} ) ) ;

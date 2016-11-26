@@ -54,13 +54,14 @@ public class UIComponent extends InputComponent
 		}
 	}
 
-	public void addElement( final UIElement _element )
+	public <T extends UIElement> T addElement( final T _element )
 	{
 		if( elements.contains( _element ) == false )
 		{
 			_element.setInputAdapterInterface( inputAdapter ) ;
 			elements.add( _element ) ;
 		}
+		return _element ;
 	}
 
 	/**

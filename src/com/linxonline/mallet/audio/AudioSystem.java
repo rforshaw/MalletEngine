@@ -17,7 +17,7 @@ public class AudioSystem
 	private final ArrayList<AudioData> toAddAudio    = new ArrayList<AudioData>() ;
 	private final ArrayList<AudioData> toRemoveAudio = new ArrayList<AudioData>() ;
 
-	private final ArrayList<AudioData> audio         = new ArrayList<AudioData>() ;
+	private final ArrayList<AudioData> active        = new ArrayList<AudioData>() ;
 	private final ArrayList<AudioData> paused        = new ArrayList<AudioData>() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
@@ -50,6 +50,50 @@ public class AudioSystem
 				}
 			}
 		} ) ;
+
+		AudioAssist.setAssist( new AudioAssist.Assist()
+		{
+			@Override
+			public Audio createAudio( final String _file, final StreamType _type )
+			{
+				return new AudioData( _file, _type ) ;
+			}
+
+			@Override
+			public Audio amendCallback( final Audio _audio, final SourceCallback _callback )
+			{
+				final AudioData audio = ( AudioData )_audio ;
+				audio.amendCallback( _callback ) ;
+				return _audio ;
+			}
+
+			@Override
+			public Audio play( Audio _audio )
+			{
+				final AudioData audio = ( AudioData )_audio ;
+				audio.play = true ;
+				audio.dirty = true ;
+				return _audio ;
+			}
+
+			@Override
+			public Audio stop( Audio _audio )
+			{
+				final AudioData audio = ( AudioData )_audio ;
+				audio.stop = true ;
+				audio.dirty = true ;
+				return _audio ;
+			}
+
+			@Override
+			public Audio pause( Audio _audio )
+			{
+				final AudioData audio = ( AudioData )_audio ;
+				audio.play = false ;
+				audio.dirty = true ;
+				return _audio ;
+			}
+		} ) ;
 	}
 
 	public void update( final float _dt )
@@ -59,14 +103,16 @@ public class AudioSystem
 		{
 			if( sourceGenerator != null )
 			{
-				for( final AudioData a : toAddAudio )
+				for( final AudioData audio : toAddAudio )
 				{
-					final AudioSource source = sourceGenerator.createAudioSource( a.getFile(), a.getStreamType() ) ;
+					final String path = audio.getFilePath() ;
+					final StreamType type = audio.getStreamType() ;
+				
+					final AudioSource source = sourceGenerator.createAudioSource( path, type ) ;
 					if( source != null )
 					{
-						a.setSource( source ) ;
-						audio.add( a ) ;
-						a.play() ;
+						audio.setSource( source ) ;
+						active.add( audio ) ;
 					}
 				}
 				toAddAudio.clear() ;
@@ -75,19 +121,77 @@ public class AudioSystem
 
 		if( toRemoveAudio.isEmpty() == false )
 		{
-			for( final AudioData a : toRemoveAudio )
+			for( final AudioData audio : toRemoveAudio )
 			{
-				a.stop() ;
-				audio.remove( a ) ;
-				a.destroy() ;
+				final AudioSource source = audio.getSource() ;
+				if( source != null )
+				{
+					source.stop() ;
+					source.destroySource() ;
+				}
+				active.remove( audio ) ;
 			}
 			toRemoveAudio.clear() ;
 		}
 
-		final int size = audio.size() ;
+		final int size = active.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			audio.get( i ).update( _dt ) ;
+			final AudioData audio = active.get( i ) ;
+			final AudioSource source = audio.getSource() ;
+			final SourceCallback callback = audio.getCallback() ;
+
+			if( audio.dirty == true )
+			{
+				// We only want to play/pause/stop if 
+				// it has been flagged as dirty.
+				// Dirty signifies the state has been changed.
+				audio.dirty = false ;
+				if( audio.stop == true )
+				{
+					audio.stop = false ;
+
+					source.stop() ;
+					callback.stop() ;
+				}
+
+				final boolean isPlaying = source.isPlaying() ;
+
+				if( audio.play == true )
+				{
+					// Start playing if currently not playing.
+					if( isPlaying == false )
+					{
+						source.play() ;
+						callback.start() ;
+					}
+				}
+				else if( audio.play == false )
+				{
+					// Pause if current playing
+					if( isPlaying == true )
+					{
+						source.pause() ;
+						callback.pause() ;
+					}
+				}
+			}
+
+			if( source.isPlaying() == true )
+			{
+				// Only call tick if the source is playing.
+				callback.tick( source.getCurrentTime() ) ;
+			}
+			else if( audio.play == true )
+			{
+				// If the source is not playing but play 
+				// is true then we expect it to be playing.
+				// If not the source has finished and we should inform 
+				// the user.
+				source.stop() ;
+				audio.play = false ;
+				callback.finished() ;
+			}
 		}
 	}
 
@@ -102,9 +206,12 @@ public class AudioSystem
 	*/
 	public void resumeSystem()
 	{
-		for( final AudioData a : paused )
+		for( final AudioData audio : paused )
 		{
-			a.play() ;
+			final AudioSource source = audio.getSource() ;
+			final SourceCallback callback = audio.getCallback() ;
+
+			source.play() ;
 		}
 		paused.clear() ;
 	}
@@ -115,12 +222,15 @@ public class AudioSystem
 	*/
 	public void pauseSystem()
 	{
-		for( final AudioData a : audio )
+		for( final AudioData audio : active )
 		{
-			if( a.isPlaying() == true )
+			final AudioSource source = audio.getSource() ;
+			final SourceCallback callback = audio.getCallback() ;
+
+			if( source.isPlaying() == true )
 			{
-				paused.add( a ) ;
-				a.pause() ;
+				paused.add( audio ) ;
+				source.pause() ;
 			}
 		}
 	}
@@ -130,11 +240,18 @@ public class AudioSystem
 		toAddAudio.clear() ;		// Never added not hooked in
 		toRemoveAudio.clear() ;		// Will be removed from audio anyway
 
-		for( final AudioData a : audio )
+		/*for( final AudioData audio : active )
 		{
-			a.reset() ;
-		}
-		audio.clear() ;
+			final AudioSource source = audio.getSource() ;
+			final SourceCallback callback = audio.getCallback() ;
+
+			if( source.isPlaying() == true )
+			{
+				paused.add( audio ) ;
+				source.pause() ;
+			}
+		}*/
+		active.clear() ;
 	}
 
 	public EventController getEventController()
@@ -151,16 +268,16 @@ public class AudioSystem
 	{
 		return new AudioDelegate()
 		{
-			private final ArrayList<AudioData> data = new ArrayList<AudioData>() ;
+			private final ArrayList<Audio> data = new ArrayList<Audio>() ;
 
 			@Override
 			public void addAudio( final Audio _audio )
 			{
-				if( _audio != null && _audio instanceof AudioData )
+				if( _audio instanceof AudioData )
 				{
 					if( data.contains( _audio ) == false )
 					{
-						data.add( ( AudioData )_audio ) ;
+						data.add( _audio ) ;
 						toAddAudio.add( ( AudioData )_audio ) ;
 					}
 				}
@@ -171,20 +288,17 @@ public class AudioSystem
 			{
 				if( _audio != null && _audio instanceof AudioData )
 				{
-					data.remove( ( AudioData )_audio ) ;
+					data.remove( _audio ) ;
 					toRemoveAudio.add( ( AudioData )_audio ) ;
 				}
 			}
 
 			@Override
-			public void start() {}
-
-			@Override
 			public void shutdown()
 			{
-				for( final AudioData anim : data  )
+				for( final Audio audio : data  )
 				{
-					toRemoveAudio.add( anim ) ;
+					toRemoveAudio.add( ( AudioData )audio ) ;
 				}
 				data.clear() ;
 			}

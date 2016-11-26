@@ -53,17 +53,14 @@ public class UILayout extends UIElement
 		}
 	}
 
-	public void addElement( final UIElement _element )
+	public <T extends UIElement> T addElement( final T _element )
 	{
-		if( ordered.contains( _element ) == true )
+		if( ordered.contains( _element ) == false )
 		{
-			// Return if the element already resides
-			// within this UILayout.
-			return ;
+			ordered.add( _element ) ;
+			_element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
-
-		ordered.add( _element ) ;
-		_element.setInputAdapterInterface( getInputAdapter() ) ;
+		return _element ; 
 	}
 
 	/**

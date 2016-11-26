@@ -133,9 +133,10 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 		final int[] source = new int[1] ;
 		openAL.alGenSources( 1, source, 0 ) ;	
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		int error = openAL.alGetError() ;
+		if( error != AL.AL_NO_ERROR )
 		{
-			System.out.println( "Failed to Generate Source" ) ;
+			System.out.println( "Failed to Generate Source: " + getALErrorString( error ) ) ;
 			return null ;
 		}
 
@@ -148,9 +149,10 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		// Not looping by default
 		openAL.alSourcei( source[0], AL.AL_LOOPING, AL.AL_FALSE ) ;
 
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		error = openAL.alGetError() ;
+		if( error != AL.AL_NO_ERROR )
 		{
-			System.out.println( "Failed to Configure Source" ) ;
+			System.out.println( "Failed to Configure Source: " + getALErrorString( error ) ) ;
 			return null ;
 		}
 
@@ -165,5 +167,19 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 	public void clear()
 	{
 		staticSoundManager.clear() ;
+	}
+
+	private static String getALErrorString( final int _error )
+	{
+		switch( _error )
+		{
+			case AL.AL_NO_ERROR          : return "AL_NO_ERROR" ;
+			case AL.AL_INVALID_NAME      : return "AL_INVALID_NAME" ;
+			case AL.AL_INVALID_ENUM      : return "AL_INVALID_ENUM" ;
+			case AL.AL_INVALID_VALUE     : return "AL_INVALID_VALUE" ;
+			case AL.AL_INVALID_OPERATION : return "AL_INVALID_OPERATION" ;
+			case AL.AL_OUT_OF_MEMORY     : return "AL_OUT_OF_MEMORY" ;
+			default                        : return "No such error code";
+		}
 	}
 }

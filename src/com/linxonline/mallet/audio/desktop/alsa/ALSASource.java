@@ -31,27 +31,48 @@ public class ALSASource implements AudioSource
 	public void play()
 	{
 		openAL.alSourcePlay( source[0] ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to play source" ) ;
+		}
 	}
 
 	public void playLoop()
 	{
 		openAL.alSourcei( source[0], AL.AL_LOOPING,  AL.AL_TRUE ) ;
-		openAL.alSourcePlay( source[0] ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to configure source" ) ;
+		}
+		play() ;
 	}
 
 	public void pause()
 	{
 		openAL.alSourcePause( source[0] ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to pause source" ) ;
+		}
 	}
 
 	public void stop()
 	{
 		openAL.alSourceStop( source[0] ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to stop source" ) ;
+		}
 	}
 
 	public boolean isPlaying()
 	{
 		openAL.alGetSourcei( source[0], AL.AL_SOURCE_STATE, state, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to determine playable state source" ) ;
+			return false ;
+		}
 		return ( state[0] == AL.AL_PLAYING ) ;
 	}
 
@@ -73,7 +94,17 @@ public class ALSASource implements AudioSource
 	{
 		stop() ;
 		openAL.alSourcei( source[0], AL.AL_BUFFER,  AL.AL_NONE ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to reset source" ) ;
+		}
+
 		openAL.alDeleteSources( 1, source, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to delete source" ) ;
+		}
+
 		buffer.unregister() ;
 	}
 
@@ -81,12 +112,20 @@ public class ALSASource implements AudioSource
 	{
 		final int[] temp = buffer.getBuffer().getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_SIZE, size, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to get buffer size from source" ) ;
+		}
 		return size[0] ;
 	}
 
 	private int getBufferOffset()
 	{
 		openAL.alGetSourcei( source[0], AL.AL_BYTE_OFFSET, bufferOffset, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to get buffer offset from source" ) ;
+		}
 		return bufferOffset[0] ;
 	}
 
@@ -94,6 +133,10 @@ public class ALSASource implements AudioSource
 	{
 		final int[] temp = buffer.getBuffer().getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_BITS, bits, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to get buffer bits from source" ) ;
+		}
 		return bits[0] ;
 	}
 
@@ -101,6 +144,10 @@ public class ALSASource implements AudioSource
 	{
 		final int[] temp = buffer.getBuffer().getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_CHANNELS, channels, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to get channels from source" ) ;
+		}
 		return channels[0] ;
 	}
 
@@ -108,6 +155,10 @@ public class ALSASource implements AudioSource
 	{
 		final int[] temp = buffer.getBuffer().getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_FREQUENCY, freq, 0 ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to get frequency from source" ) ;
+		}
 		return freq[0] ;
 	}
 
@@ -131,7 +182,7 @@ public class ALSASource implements AudioSource
 		{
 			return -1.0f ;
 		}
-		
+
 		return ( float )( ( s / c / b ) / f ) ;
 	}
 }

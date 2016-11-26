@@ -28,6 +28,7 @@ import com.linxonline.mallet.animation.AnimationAssist ;
 import com.linxonline.mallet.animation.Anim ;
 
 import com.linxonline.mallet.audio.AudioAssist ;
+import com.linxonline.mallet.audio.Audio ;
 import com.linxonline.mallet.audio.AudioDelegateCallback ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 import com.linxonline.mallet.audio.StreamType ;
@@ -90,7 +91,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -314,7 +315,8 @@ public final class GameTestLoader extends GameLoader
 				{
 					public void callback( final AudioDelegate _delegate )
 					{
-						_delegate.addAudio( AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ) ;
+						final Audio audio = AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ;
+						_delegate.addAudio( AudioAssist.play( audio ) ) ;
 					}
 				} ) ) ;
 

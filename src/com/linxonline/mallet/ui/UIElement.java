@@ -56,9 +56,10 @@ public class UIElement implements InputHandler
 		events.add( _event ) ;
 	}
 
-	public void addListener( final BaseListener _listener )
+	public <T extends BaseListener> T addListener( final T _listener )
 	{
 		listeners.addListener( _listener ) ;
+		return _listener ;
 	}
 
 	/**

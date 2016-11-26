@@ -1,13 +1,25 @@
 package com.linxonline.mallet.audio ;
 
-import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.event.Event ;
 
 public final class AudioAssist
 {
 	private static final Event AUDIO_CLEAN = new Event( "AUDIO_CLEAN", null ) ;
 
+	private static Assist assist ;
+	
 	private AudioAssist() {}
+
+	/**
+		Called by the active audio system.
+		If swapping audio-systems all previous Audio objects 
+		will become invalid.
+	*/
+	public static void setAssist( final Assist _assist )
+	{
+		assist = _assist ;
+	}
 
 	/**
 		Request an AudioDelegate from the active audio system.
@@ -30,39 +42,42 @@ public final class AudioAssist
 	{
 		return AUDIO_CLEAN ;
 	}
-	
+
 	public static Audio createAudio( final String _file, final StreamType _type )
 	{
-		return new AudioData( _file, _type ) ;
+		return assist.createAudio( _file, _type ) ;
 	}
 
-	public static Audio play( final Audio _audio )
+	public static Audio amendCallback( final Audio _audio, final SourceCallback _callback )
 	{
-		( ( AudioData )_audio ).play() ;
-		return _audio ;
+		return assist.amendCallback( _audio, _callback ) ;
 	}
 
-	public static Audio stop( final Audio _audio )
+	public static Audio play( Audio _audio )
 	{
-		( ( AudioData )_audio ).stop() ;
-		return _audio ;
+		return assist.play( _audio ) ;
 	}
 
-	public static Audio pause( final Audio _audio )
+	public static Audio stop( Audio _audio )
 	{
-		( ( AudioData )_audio ).pause() ;
-		return _audio ;
+		return assist.stop( _audio ) ;
 	}
 
-	public static Audio addCallback( final Audio _audio, final SourceCallback _callback )
+	public static Audio pause( Audio _audio )
 	{
-		( ( AudioData )_audio ).addCallback( _callback ) ;
-		return _audio ;
+		return assist.pause( _audio ) ;
 	}
 
-	public static Audio removeCallback( final Audio _audio, final SourceCallback _callback )
+	/**
+		Required to be implemented by the active audio-system.
+	*/
+	public interface Assist
 	{
-		( ( AudioData )_audio ).removeCallback( _callback ) ;
-		return _audio ;
+		public Audio createAudio( final String _file, final StreamType _type ) ;
+		public Audio amendCallback( final Audio _audio, final SourceCallback _callback ) ;
+
+		public Audio play( Audio _audio ) ;
+		public Audio stop( Audio _audio ) ;
+		public Audio pause( Audio _audio ) ;
 	}
 }
