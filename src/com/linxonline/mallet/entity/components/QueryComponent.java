@@ -24,8 +24,7 @@ public class QueryComponent extends Component
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )
 	{
-		final Event<QueryComponent> event = new Event<QueryComponent>( "ADD_GAME_STATE_QUERY", this ) ;
-		_events.add( event ) ;
+		_events.add( new Event<QueryComponent>( "ADD_GAME_STATE_QUERY", this ) ) ;
 	}
 
 	@Override

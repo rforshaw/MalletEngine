@@ -32,7 +32,16 @@ public class EventComponent extends Component
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
+		initStateEventProcessors( getEventController() ) ;
 	}
+
+	/**
+		Override to add Event Processors to the component's
+		State Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public void initStateEventProcessors( final EventController _controller ) {}
 
 	@Override
 	public void passInitialEvents( final ArrayList<Event<?>> _events )

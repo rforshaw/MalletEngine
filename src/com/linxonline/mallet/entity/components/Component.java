@@ -28,6 +28,7 @@ public abstract class Component
 	public Component( final String _name, final String _group )
 	{
 		id = new ID( _name, _group ) ;
+		initComponentEventProcessors( getComponentEventController() ) ;
 	}
 
 	/**
@@ -37,6 +38,7 @@ public abstract class Component
 					  final String _group, final int _groupID )
 	{
 		id = new ID( _name, _nameID, _group, _groupID ) ;
+		initComponentEventProcessors( getComponentEventController() ) ;
 	}
 
 	public void setParent( final Entity _parent )
@@ -72,6 +74,14 @@ public abstract class Component
 	{
 		return id.isGroupID( _groupID ) ;
 	}
+
+	/**
+		Override to add Event Processors to the component's
+		Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public void initComponentEventProcessors( final EventController _controller ) {}
 
 	/**
 		Create events and add them to _events.
