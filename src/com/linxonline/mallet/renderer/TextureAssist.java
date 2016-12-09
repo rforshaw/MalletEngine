@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
+import com.linxonline.mallet.maths.Vector2 ;
 
 /**
 	All renderers should call setAssist and implement 
@@ -13,19 +14,32 @@ public final class TextureAssist
 
 	private TextureAssist() {}
 
-	
 	public static void setAssist( final TextureAssist.Assist _assist )
 	{
 		assist = _assist ;
 	}
 
+	/**
+		Return the meta information associated to the 
+		texture defined at file _path.
+	*/
 	public static MalletTexture.Meta createMeta( final String _path )
 	{
 		return assist.createMeta( _path ) ;
 	}
 
+	/**
+		Return the maximum width and height texture 
+		supported by the active rendering system.
+	*/
+	public Vector2 getMaximumTextureSize()
+	{
+		return assist.getMaximumTextureSize() ;
+	}
+
 	public static interface Assist
 	{
 		public MalletTexture.Meta createMeta( final String _path ) ;
+		public Vector2 getMaximumTextureSize() ;
 	}
 }

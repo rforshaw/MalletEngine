@@ -39,6 +39,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
 	protected final static Matrix4 worldMatrix              = matrixCache.get() ;		// Used for moving the camera around the world
 
+	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
+
 	protected GLWindow canvas ;
 	protected static GL3 gl ;
 
@@ -130,6 +132,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			public MalletTexture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
+			}
+
+			@Override
+			public Vector2 getMaximumTextureSize()
+			{
+				return new Vector2( maxTextureSize ) ;
 			}
 		} ) ;
 
@@ -741,6 +749,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 		programs.get( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
 		programs.get( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
 		programs.get( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
+
+		{
+			// Query for the Max Texture Size and store the results.
+			// I doubt the size will change during the running of the engine.
+			final int[] size = new int[1] ;
+			gl.glGetIntegerv( GL.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
+			maxTextureSize.setXY( size[0], size[0] ) ;
+		}
 	}
 
 	public void setViewMode( final int _mode )

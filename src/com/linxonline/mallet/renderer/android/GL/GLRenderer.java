@@ -33,6 +33,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 	protected final Matrix4 uiMatrix = matrixCache.get() ;						// Used for rendering GUI elements not impacted by World/Camera position
 	protected final Matrix4 worldMatrix = matrixCache.get() ;					// Used for moving the camera around the world
 
+	protected final static Vector2 maxTextureSize = new Vector2() ;				// Maximum Texture resolution supported by the GPU.
+
 	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
 
@@ -92,6 +94,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			{
 				final GLDrawData d = ( GLDrawData )draw ;
 				d.getGLTextures().clear() ;
+				d.setGLBuffer( null ) ;
+				d.setLocation( null ) ;
+				( ( ProgramMap<GLProgram> )d.getProgram() ).setProgram( null ) ;
 				d.forceUpdate() ;
 			}
 		}
@@ -112,6 +117,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
 		programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
 
+		{
+			// Query for the Max Texture Size and store the results.
+			// I doubt the size will change during the running of the engine.
+			final int[] size = new int[1] ;
+			GLES30.glGetIntegerv( GLES30.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
+			maxTextureSize.setXY( size[0], size[0] ) ;
+		}
+		
 		resize() ;
 	}
 
@@ -159,6 +172,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			public MalletTexture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
+			}
+
+			@Override
+			public Vector2 getMaximumTextureSize()
+			{
+				return new Vector2( maxTextureSize ) ;
 			}
 		} ) ;
 
