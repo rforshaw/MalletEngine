@@ -88,6 +88,7 @@ public class GLAndroidSystem extends BasicSystem
 	{
 		shutdownDelegate.shutdown() ;
 		audioGenerator.shutdownGenerator() ;
+		activity.finish() ;
 	}
 
 	@Override
