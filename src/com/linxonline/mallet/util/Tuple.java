@@ -21,6 +21,11 @@ public final class Tuple<T, U>
 		return right ;
 	}
 
+	public static <T, U> Tuple<T, U> build( final T _left, final U _right )
+	{
+		return new Tuple<T, U>( _left, _right ) ;
+	}
+
 	@Override
 	public String toString()
 	{

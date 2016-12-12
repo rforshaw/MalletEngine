@@ -69,6 +69,7 @@ import com.linxonline.mallet.io.save.state.DataSet.DataIn ;
 
 import com.linxonline.mallet.io.formats.sgeom.SGeom ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
+import com.linxonline.mallet.util.Tuple ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -91,7 +92,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{

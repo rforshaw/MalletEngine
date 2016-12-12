@@ -17,7 +17,6 @@ public interface FileSystem
 	*/
 	public boolean mapDirectory( final String _directory ) ;
 
-	
 	/**
 		Return a FileStream that represents _path.
 		A FileStream can be a directory or file, 
@@ -26,4 +25,10 @@ public interface FileSystem
 		the FileStream to create a directory or file.
 	*/
 	public FileStream getFile( final String _path ) ;
+
+	/**
+		Return the expected applications home directory path.
+		This can be used to store user specific data.
+	*/
+	public String getHomeDirectory( final String _projectName ) ;
 }

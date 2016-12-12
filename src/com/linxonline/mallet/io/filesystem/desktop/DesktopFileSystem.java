@@ -133,6 +133,39 @@ public class DesktopFileSystem implements FileSystem
 		return new DesktopFile( new File( _path ) ) ;
 	}
 
+	@Override
+	public String getHomeDirectory( final String _projectName )
+	{
+		final StringBuilder builder = new StringBuilder() ;
+		builder.append( System.getProperty( "user.home" ) ) ;
+		builder.append( File.separator ) ;
+
+		final String os = System.getProperty( "os.name" ) ;
+		if( os.indexOf( "mac" ) >= 0 || os.indexOf( "darwin" ) >= 0 ||
+			os.indexOf( "nux" ) >= 0 )
+		{
+			builder.append( ".local" ) ;
+			builder.append( File.separator ) ;
+			builder.append( "share" ) ;
+			builder.append( File.separator ) ;
+		}
+		else if( os.indexOf( "win" ) >= 0 )
+		{
+			builder.append( "AppData" ) ;
+			builder.append( File.separator ) ;
+			builder.append( "Local" ) ;
+			builder.append( File.separator ) ;
+		}
+
+		builder.append( "MalletEngine" ) ;
+		builder.append( File.separator ) ;
+
+		builder.append( _projectName.trim() ) ;
+		builder.append( File.separator ) ;
+
+		return builder.toString() ;
+	}
+
 	public static class ZipPath
 	{
 		public final String zipName ;			// Name of zip with extension

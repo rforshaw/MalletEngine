@@ -1,5 +1,6 @@
 package com.linxonline.mallet.io.filesystem.android ;
 
+import java.io.File ;
 import java.io.InputStream ;
 import java.io.IOException ;
 import android.content.res.AssetManager ;
@@ -71,7 +72,37 @@ public class AndroidAssetFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
-		return false ;
+		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
+		if( destination.mkdirs() == false )
+		{
+			return false ;
+		}
+
+		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
+		if( stream == null )
+		{
+			return false ;
+		}
+
+		final ByteInStream in = getByteInStream() ;
+		final ByteOutStream out = stream.getByteOutStream() ;
+		if( out == null )
+		{
+			return false ;
+		}
+
+		int length = 0 ;
+		final byte[] buffer = new byte[48] ;
+
+		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
+		{
+			out.writeBytes( buffer, 0, length ) ;
+		}
+
+		in.close() ;
+		out.close() ;
+
+		return true ;
 	}
 
 	public boolean isFile()

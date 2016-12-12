@@ -151,8 +151,6 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public FileStream getFile( final String _path )
 	{
-		//System.out.println( "GET FILE: " + _path ) ;
-
 		if( mapZip.containsKey( _path ) == true )
 		{
 			try
@@ -169,7 +167,20 @@ public class AndroidFileSystem implements FileSystem
 			return new AndroidAssetFile( _path, assetManager ) ;
 		}
 
-		return new AndroidFile( _path ) ;
+		if( _path.indexOf( getHomeDirectory( "" ) ) > -1 )
+		{
+			return new AndroidFile( _path, AndroidFile.StorageType.Internal ) ;
+		}
+
+		return new AndroidFile( _path, AndroidFile.StorageType.External ) ;
+	}
+
+	@Override
+	public String getHomeDirectory( final String _projectName )
+	{
+		// Project name is not needed for Android
+		// As the Internal Storage is solely for the application.
+		return context.getFilesDir().getAbsolutePath() + '/' ;
 	}
 
 	public static class ZipPath

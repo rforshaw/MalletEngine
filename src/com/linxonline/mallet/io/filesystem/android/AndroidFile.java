@@ -15,14 +15,26 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class AndroidFile implements FileStream
 {
-	private final static String ENVIRONMENT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + '/' ; 
+	public enum StorageType
+	{
+		Internal,
+		External
+	}
+
+	private final static String EXTERNAL_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + '/' ;
+
 	private final CloseStreams toClose = new CloseStreams() ;
 	private final File file ;
 
-	public AndroidFile( final String _file )
+	public AndroidFile( final String _file, final StorageType _type )
 	{
 		assert _file != null ;
-		file = new File( ENVIRONMENT_PATH + _file ) ;
+		switch( _type )
+		{
+			case Internal : file = new File( _file ) ;                 break ;
+			case External :
+			default       : file = new File( EXTERNAL_PATH + _file ) ; break ;
+		}
 	}
 
 	public ByteInStream getByteInStream()
@@ -67,6 +79,7 @@ public class AndroidFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -79,10 +92,12 @@ public class AndroidFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 		catch( IOException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -93,6 +108,12 @@ public class AndroidFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
+		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
+		if( destination.mkdirs() == false )
+		{
+			return false ;
+		}
+
 		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
 		if( stream == null )
 		{
@@ -101,10 +122,14 @@ public class AndroidFile implements FileStream
 
 		final ByteInStream in = getByteInStream() ;
 		final ByteOutStream out = stream.getByteOutStream() ;
+		if( out == null )
+		{
+			return false ;
+		}
 
 		int length = 0 ;
 		final byte[] buffer = new byte[48] ;
-		
+
 		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
 		{
 			out.writeBytes( buffer, 0, length ) ;

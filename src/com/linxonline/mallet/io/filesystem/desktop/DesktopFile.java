@@ -63,6 +63,7 @@ public class DesktopFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -79,6 +80,7 @@ public class DesktopFile implements FileStream
 		}
 		catch( IOException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -89,24 +91,33 @@ public class DesktopFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
-		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
-		if( stream == null )
+		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
+		if( destination.mkdirs() == false )
 		{
+			System.out.println( "Failed to create directories." ) ;
 			return false ;
 		}
 
-		stream.mkdirs() ;
+		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
+		if( stream == null )
+		{
+			System.out.println( "Unable to acquire file stream for: " + _dest ) ;
+			return false ;
+		}
+
 		final ByteInStream in = getByteInStream() ;
 		final ByteOutStream out = stream.getByteOutStream() ;
+		if( out == null )
+		{
+			return null ;
+		}
 
-		int position = 0 ;
 		int length = 0 ;
 		final byte[] buffer = new byte[48] ;
-		
-		while( ( length = in.readBytes( buffer, position, buffer.length ) ) != -1 )
+
+		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
 		{
 			out.writeBytes( buffer, 0, length ) ;
-			position += length ;
 		}
 
 		in.close() ;
@@ -157,7 +168,7 @@ public class DesktopFile implements FileStream
 
 		return ret && _file.delete();
 	}
-	
+
 	/**
 		Create the Directory structure represented 
 		by this File Stream.
