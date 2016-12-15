@@ -15,5 +15,7 @@ public interface AudioSource
 	public float getCurrentTime() ;
 	public float getDuration() ;
 
+	public void setVolume( final int _volume ) ;
+
 	public void destroySource() ;
 }

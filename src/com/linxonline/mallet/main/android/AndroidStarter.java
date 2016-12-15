@@ -15,6 +15,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.renderer.RenderInterface ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
+import com.linxonline.mallet.io.filesystem.GlobalHome ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
@@ -23,6 +24,7 @@ import com.linxonline.mallet.io.reader.config.ConfigReader ;
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.system.android.gl.GLAndroidSystem ;
@@ -101,8 +103,11 @@ public abstract class AndroidStarter extends StarterInterface
 	protected void loadConfig()
 	{
 		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
+		GlobalHome.setHome( getApplicationName() ) ;
+		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
+
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
-		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
+		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( BASE_CONFIG ) ), new Settings() ) ) ;
 	}
 
 	/**
@@ -119,10 +124,4 @@ public abstract class AndroidStarter extends StarterInterface
 	{
 		return backendSystem ;
 	}
-
-	/*@Override
-	protected GameLoader getGameLoader()
-	{
-		return new GameTestLoader() ;
-	}*/
 }

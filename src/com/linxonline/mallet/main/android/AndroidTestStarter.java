@@ -17,6 +17,12 @@ public class AndroidTestStarter extends AndroidStarter
 	}
 
 	@Override
+	protected String getApplicationName()
+	{
+		return "test" ;
+	}
+
+	@Override
 	protected GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;

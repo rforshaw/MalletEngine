@@ -16,6 +16,17 @@ public class TextReader
 		return readFileToArray( _file ) ;
 	}
 
+	/**
+		Returns an array of strings, one string per line.
+	*/
+	public static ArrayList<String> getTextAsArray( final FileStream _file )
+	{
+		return readFileToArray( _file ) ;
+	}
+
+	/**
+		Returns an array of strings, one string per line.
+	*/
 	public static String getTextAsString( final String _file )
 	{
 		return readFileToString( _file ) ;
@@ -47,16 +58,20 @@ public class TextReader
 
 	private static ArrayList<String> readFileToArray( final String _file )
 	{
-		final ArrayList<String> lines = new ArrayList<String>() ;
 		final FileStream file = GlobalFileSystem.getFile( _file ) ;
-
 		if( file.exists() == false )
 		{
 			System.out.println( "Failed to read file: " + _file ) ;
-			return lines ;
+			return new ArrayList<String>() ;
 		}
 
-		final StringInStream in = file.getStringInStream() ;
+		return readFileToArray( file ) ;
+	}
+
+	private static ArrayList<String> readFileToArray( final FileStream _file )
+	{
+		final ArrayList<String> lines = new ArrayList<String>() ;
+		final StringInStream in = _file.getStringInStream() ;
 		String line = null ;
 
 		while( ( line = in.readLine() ) != null )

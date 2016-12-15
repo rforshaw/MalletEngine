@@ -14,6 +14,7 @@ import com.linxonline.mallet.renderer.RenderInterface ;
 import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
+import com.linxonline.mallet.io.filesystem.GlobalHome ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
@@ -22,6 +23,7 @@ import com.linxonline.mallet.io.reader.config.ConfigReader ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 
+import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.inspect.desktop.DesktopDisplay ;
 import com.linxonline.mallet.util.inspect.ScreenMode ;
 
@@ -115,6 +117,9 @@ public abstract class DesktopStarter extends StarterInterface
 	}
 
 	@Override
+	protected abstract String getApplicationName() ;
+
+	@Override
 	protected abstract GameLoader getGameLoader() ;
 
 	@Override
@@ -146,9 +151,12 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected void loadConfig()
 	{
+		GlobalHome.setHome( getApplicationName() ) ;
+		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
+
 		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
-		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( BASE_CONFIG ), new Settings() ) ) ;
+		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( BASE_CONFIG ) ), new Settings() ) ) ;
 	}
 
 	/**
@@ -168,8 +176,8 @@ public abstract class DesktopStarter extends StarterInterface
 			displayWidth = screen.getWidth() ;
 			displayHeight = screen.getHeight() ;
 
-			System.out.println( desktop.getScreens()[0] ) ;
-			System.out.println( "Display: " + displayWidth + " " + displayHeight ) ;
+			//System.out.println( desktop.getScreens()[0] ) ;
+			//System.out.println( "Display: " + displayWidth + " " + displayHeight ) ;
 		}
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;

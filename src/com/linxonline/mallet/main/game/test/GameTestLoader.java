@@ -2,48 +2,21 @@ package com.linxonline.mallet.main.game.test ;
 
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.main.game.GameSystem ;
-import com.linxonline.mallet.main.game.GameLoader ;
-import com.linxonline.mallet.main.game.GameState ;
-
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.Draw ;
-
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Program ;
-
-import com.linxonline.mallet.renderer.CameraAssist ;
-import com.linxonline.mallet.renderer.Camera ;
-
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.Interpolation ;
-import com.linxonline.mallet.renderer.UpdateType ;
-import com.linxonline.mallet.renderer.MalletColour ;
-
-import com.linxonline.mallet.animation.AnimationAssist ;
-import com.linxonline.mallet.animation.Anim ;
-
-import com.linxonline.mallet.audio.AudioAssist ;
-import com.linxonline.mallet.audio.Audio ;
-import com.linxonline.mallet.audio.AudioDelegateCallback ;
-import com.linxonline.mallet.audio.AudioDelegate ;
-import com.linxonline.mallet.audio.StreamType ;
-
-import com.linxonline.mallet.util.sort.* ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
+import com.linxonline.mallet.ui.* ;
+import com.linxonline.mallet.event.* ;
+import com.linxonline.mallet.input.* ;
+import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.main.game.* ;
+import com.linxonline.mallet.animation.* ;
+import com.linxonline.mallet.util.sort.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
-
-import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.id.IDInterface ;
 
 import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
 import com.linxonline.mallet.util.factory.creators.ImageCreator ;
@@ -55,20 +28,6 @@ import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
-import com.linxonline.mallet.ui.* ;
-import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.input.* ;
-
-import com.linxonline.mallet.util.tools.Diff ;
-import com.linxonline.mallet.util.tools.SimpleDiff ;
-import com.linxonline.mallet.io.reader.ByteReader ;
-
-import com.linxonline.mallet.io.save.state.DataSet ;
-import com.linxonline.mallet.io.save.state.DataSet.DataOut ;
-import com.linxonline.mallet.io.save.state.DataSet.DataIn ;
-
-import com.linxonline.mallet.io.formats.sgeom.SGeom ;
-import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 
 /**
@@ -316,7 +275,7 @@ public final class GameTestLoader extends GameLoader
 				{
 					public void callback( final AudioDelegate _delegate )
 					{
-						final Audio audio = AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC ) ;
+						final Audio audio = AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
 						_delegate.addAudio( AudioAssist.play( audio ) ) ;
 					}
 				} ) ) ;
@@ -395,10 +354,8 @@ public final class GameTestLoader extends GameLoader
 															new Vector3( 1, 1, 1 ),
 															10 ) ;
 				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
-				//DrawAssist.amendTexture( draw, texture ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
-				//DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
 
 				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", texture ) ;
@@ -424,7 +381,7 @@ public final class GameTestLoader extends GameLoader
 						DrawAssist.forceUpdate( draw ) ;
 					}
 				} ) ;
-				
+
 				addEntity( entity ) ;
 			}
 		} ) ;

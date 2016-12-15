@@ -4,8 +4,8 @@ import com.linxonline.mallet.util.Tuple ;
 
 public class Home
 {
-	private String name ;
-	private String homeDirectory ;
+	private final String name ;
+	private final String homeDirectory ;
 
 	public Home( final String _projectName )
 	{
@@ -43,8 +43,6 @@ public class Home
 			{
 				// If the destination file already exists
 				// there is no point copying it again.
-				System.out.println( "Files is yet to exist." ) ;
-				System.out.println( "Copying: " + path.getLeft() + " to: " + destination ) ;
 				if( fromStream.copyTo( destination ) == false )
 				{
 					System.out.println( "Failed to copy: " + path.getLeft() + " to: " + destination ) ;

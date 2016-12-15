@@ -109,7 +109,7 @@ public class DesktopFile implements FileStream
 		final ByteOutStream out = stream.getByteOutStream() ;
 		if( out == null )
 		{
-			return null ;
+			return false ;
 		}
 
 		int length = 0 ;

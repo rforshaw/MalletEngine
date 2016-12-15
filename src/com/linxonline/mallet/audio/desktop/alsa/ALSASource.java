@@ -86,6 +86,12 @@ public class ALSASource implements AudioSource
 		return getBufferTime() ;
 	}
 
+	public void setVolume( final int _volume )
+	{
+		final float vol = _volume / 100.0f ;
+		openAL.alSourcef( source[0], AL.AL_GAIN, vol ) ;
+	}
+
 	/**
 		Destory OpenAL source.
 		Doesn't destroy OpenAL buffer.

@@ -14,6 +14,8 @@ import com.linxonline.mallet.util.SourceCallback ;
 
 public class AudioSystem
 {
+	private final ArrayList<Volume> volumes = new ArrayList<Volume>() ;
+
 	private final ArrayList<AudioData> toAddAudio    = new ArrayList<AudioData>() ;
 	private final ArrayList<AudioData> toRemoveAudio = new ArrayList<AudioData>() ;
 
@@ -51,12 +53,20 @@ public class AudioSystem
 			}
 		} ) ;
 
+		controller.addEventProcessor( new EventProcessor<Volume>( "CHANGE_VOLUME", "CHANGE_VOLUME" )
+		{
+			public void processEvent( final Event<Volume> _event )
+			{
+				volumes.add( new Volume( _event.getVariable() ) ) ;
+			}
+		} ) ;
+
 		AudioAssist.setAssist( new AudioAssist.Assist()
 		{
 			@Override
-			public Audio createAudio( final String _file, final StreamType _type )
+			public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
 			{
-				return new AudioData( _file, _type ) ;
+				return new AudioData( _file, _type, new Category( _channel ) ) ;
 			}
 
 			@Override
@@ -107,7 +117,7 @@ public class AudioSystem
 				{
 					final String path = audio.getFilePath() ;
 					final StreamType type = audio.getStreamType() ;
-				
+
 					final AudioSource source = sourceGenerator.createAudioSource( path, type ) ;
 					if( source != null )
 					{
@@ -134,67 +144,96 @@ public class AudioSystem
 			toRemoveAudio.clear() ;
 		}
 
+		{
+			final int size = active.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final AudioData audio = active.get( i ) ;
+				final AudioSource source = audio.getSource() ;
+				final SourceCallback callback = audio.getCallback() ;
+
+				if( audio.dirty == true )
+				{
+					// We only want to play/pause/stop if 
+					// it has been flagged as dirty.
+					// Dirty signifies the state has been changed.
+					audio.dirty = false ;
+					if( audio.stop == true )
+					{
+						audio.stop = false ;
+
+						source.stop() ;
+						callback.stop() ;
+					}
+
+					final boolean isPlaying = source.isPlaying() ;
+
+					if( audio.play == true )
+					{
+						// Start playing if currently not playing.
+						if( isPlaying == false )
+						{
+							source.play() ;
+							callback.start() ;
+						}
+					}
+					else if( audio.play == false )
+					{
+						// Pause if current playing
+						if( isPlaying == true )
+						{
+							source.pause() ;
+							callback.pause() ;
+						}
+					}
+				}
+
+				if( source.isPlaying() == true )
+				{
+					// Only call tick if the source is playing.
+					callback.tick( source.getCurrentTime() ) ;
+				}
+				else if( audio.play == true )
+				{
+					// If the source is not playing but play 
+					// is true then we expect it to be playing.
+					// If not the source has finished and we should inform 
+					// the user.
+					source.stop() ;
+					audio.play = false ;
+					callback.finished() ;
+				}
+			}
+		}
+
+		if( volumes.isEmpty() == false )
+		{
+			final int size = volumes.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				updateVolume( volumes.get( i ) ) ;
+				
+			}
+			volumes.clear() ;
+		}
+	}
+
+	private void updateVolume( final Volume _volume )
+	{
+		final Category category = _volume.getCategory() ;
+
 		final int size = active.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			final AudioData audio = active.get( i ) ;
-			final AudioSource source = audio.getSource() ;
-			final SourceCallback callback = audio.getCallback() ;
-
-			if( audio.dirty == true )
+			if( category.equals( audio.getCategory() ) )
 			{
-				// We only want to play/pause/stop if 
-				// it has been flagged as dirty.
-				// Dirty signifies the state has been changed.
-				audio.dirty = false ;
-				if( audio.stop == true )
-				{
-					audio.stop = false ;
-
-					source.stop() ;
-					callback.stop() ;
-				}
-
-				final boolean isPlaying = source.isPlaying() ;
-
-				if( audio.play == true )
-				{
-					// Start playing if currently not playing.
-					if( isPlaying == false )
-					{
-						source.play() ;
-						callback.start() ;
-					}
-				}
-				else if( audio.play == false )
-				{
-					// Pause if current playing
-					if( isPlaying == true )
-					{
-						source.pause() ;
-						callback.pause() ;
-					}
-				}
-			}
-
-			if( source.isPlaying() == true )
-			{
-				// Only call tick if the source is playing.
-				callback.tick( source.getCurrentTime() ) ;
-			}
-			else if( audio.play == true )
-			{
-				// If the source is not playing but play 
-				// is true then we expect it to be playing.
-				// If not the source has finished and we should inform 
-				// the user.
-				source.stop() ;
-				audio.play = false ;
-				callback.finished() ;
+				final AudioSource source = audio.getSource() ;
+				source.setVolume( _volume.getVolume() ) ;
 			}
 		}
 	}
-
+	
 	public void setAudioGenerator( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;

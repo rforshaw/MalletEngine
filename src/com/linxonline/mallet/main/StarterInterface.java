@@ -17,6 +17,8 @@ public abstract class StarterInterface
 {
 	public abstract void init() ;																		// Starts the whole process
 
+	protected abstract String getApplicationName() ;
+
 	protected abstract GameLoader getGameLoader() ;														// Return the Game States for the game
 	protected abstract boolean loadGame( final GameSystem _system, final GameLoader _loader ) ;			// Load the 
 	

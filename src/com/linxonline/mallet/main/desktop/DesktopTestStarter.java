@@ -58,6 +58,12 @@ public class DesktopTestStarter extends DesktopStarter
 	}
 
 	@Override
+	protected String getApplicationName()
+	{
+		return "test" ;
+	}
+
+	@Override
 	protected GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;

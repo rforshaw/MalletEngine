@@ -2,16 +2,24 @@ package com.linxonline.mallet.io.reader.config ;
 
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.filesystem.FileStream ;
+
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.util.settings.* ;
 
 public abstract class ConfigReader
 {
 	public ConfigReader() {}
-	
+
 	public static Settings getConfig( final String _file )
 	{
-		final ArrayList<String> file = TextReader.getTextAsArray( _file ) ;
+		return getConfig( GlobalFileSystem.getFile( _file ) ) ;
+	}
+
+	public static Settings getConfig( final FileStream _stream )
+	{
+		final ArrayList<String> file = TextReader.getTextAsArray( _stream ) ;
 		final Settings config = new Settings() ;
 
 		for( final String line : file )

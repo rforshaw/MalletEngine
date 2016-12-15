@@ -97,6 +97,12 @@ public class AndroidSource implements AudioSource
 		return s / c / f ;
 	}
 
+	public void setVolume( final int _volume )
+	{
+		final float volume = _volume / 100.0f ;
+		track.setStereoVolume( volume, volume ) ;
+	}
+
 	public void destroySource()
 	{
 		track.stop() ;

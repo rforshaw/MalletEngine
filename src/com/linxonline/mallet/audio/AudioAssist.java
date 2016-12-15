@@ -43,9 +43,14 @@ public final class AudioAssist
 		return AUDIO_CLEAN ;
 	}
 
-	public static Audio createAudio( final String _file, final StreamType _type )
+	public static Event<Volume> constructVolume( final Category.Channel _channel, final int _volume )
 	{
-		return assist.createAudio( _file, _type ) ;
+		return new Event<Volume>( "CHANGE_VOLUME", new Volume( new Category( _channel ), _volume ) ) ;
+	}
+
+	public static Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
+	{
+		return assist.createAudio( _file, _type, _channel ) ;
 	}
 
 	public static Audio amendCallback( final Audio _audio, final SourceCallback _callback )
@@ -73,7 +78,7 @@ public final class AudioAssist
 	*/
 	public interface Assist
 	{
-		public Audio createAudio( final String _file, final StreamType _type ) ;
+		public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _cat ) ;
 		public Audio amendCallback( final Audio _audio, final SourceCallback _callback ) ;
 
 		public Audio play( Audio _audio ) ;

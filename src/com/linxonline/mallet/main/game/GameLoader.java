@@ -10,5 +10,5 @@ public abstract class GameLoader
 {
 	public GameLoader() {}
 
-	public abstract void loadGame( final GameSystem _system ) ;
+	public abstract void loadGame( final GameSystem _system ) ; 
 }

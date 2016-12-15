@@ -81,6 +81,12 @@ public class EditorStarter extends DesktopStarter
 	}
 
 	@Override
+	protected String getApplicationName()
+	{
+		return "MalletEditor" ;
+	}
+
+	@Override
 	protected GameLoader getGameLoader()
 	{
 		return new EditorLoader() ;
