@@ -3,9 +3,14 @@ package com.linxonline.mallet.audio ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.system.GlobalConfig ;
+
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
+
+import com.linxonline.mallet.util.notification.Notification ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 // Play Sound
 	// Set callback on Sound
@@ -15,6 +20,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 public class AudioSystem
 {
 	private final ArrayList<Volume> volumes = new ArrayList<Volume>() ;
+	private float masterVolume = 1.0f ;
 
 	private final ArrayList<AudioData> toAddAudio    = new ArrayList<AudioData>() ;
 	private final ArrayList<AudioData> toRemoveAudio = new ArrayList<AudioData>() ;
@@ -104,6 +110,8 @@ public class AudioSystem
 				return _audio ;
 			}
 		} ) ;
+
+		initGlobalConfig() ;
 	}
 
 	public void update( final float _dt )
@@ -221,16 +229,39 @@ public class AudioSystem
 	private void updateVolume( final Volume _volume )
 	{
 		final Category category = _volume.getCategory() ;
+		if( category.getChannel() == Category.Channel.MASTER )
+		{
+			masterVolume = _volume.getVolume() / 100.0f ;
+			updateMasterVolume( masterVolume ) ;
+			return ;
+		}
 
 		final int size = active.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			final AudioData audio = active.get( i ) ;
-			if( category.equals( audio.getCategory() ) )
+			final Volume audioVolume = audio.getVolume() ;
+
+			if( category.equals( audioVolume.getCategory() ) )
 			{
+				audioVolume.setVolume( _volume.getVolume() ) ;
+
 				final AudioSource source = audio.getSource() ;
-				source.setVolume( _volume.getVolume() ) ;
+				source.setVolume( ( int )( audioVolume.getVolume() * masterVolume ) ) ;
 			}
+		}
+	}
+
+	private void updateMasterVolume( final float _masterVolume )
+	{
+		final int size = active.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final AudioData audio = active.get( i ) ;
+			final Volume audioVolume = audio.getVolume() ;
+
+			final AudioSource source = audio.getSource() ;
+			source.setVolume( ( int )( audioVolume.getVolume() * _masterVolume ) ) ;
 		}
 	}
 	
@@ -342,5 +373,41 @@ public class AudioSystem
 				data.clear() ;
 			}
 		} ;
+	}
+
+	private void initGlobalConfig()
+	{
+		createVolume( Category.Channel.MASTER, GlobalConfig.getInteger( "MASTERVOLUME", 100 ) ) ;
+		createVolume( Category.Channel.MUSIC,  GlobalConfig.getInteger( "MUSICVOLUME", 100 ) ) ;
+		createVolume( Category.Channel.VOCAL,  GlobalConfig.getInteger( "VOCALVOLUME", 100 ) ) ;
+		createVolume( Category.Channel.EFFECT, GlobalConfig.getInteger( "EFFECTVOLUME", 100 ) ) ;
+
+		final Notify<String> notify = new Notify<String>()
+		{
+			@Override
+			public void inform( final String _data )
+			{
+				switch( _data )
+				{
+					case "MASTERVOLUME" : createVolume( Category.Channel.MASTER, GlobalConfig.getInteger( _data, 100 ) ) ; break ;
+					case "MUSICVOLUME"  : createVolume( Category.Channel.MUSIC, GlobalConfig.getInteger( _data, 100 ) ) ;  break ;
+					case "VOCALVOLUME"  : createVolume( Category.Channel.VOCAL, GlobalConfig.getInteger( _data, 100 ) ) ;  break ;
+					case "EFFECTVOLUME" : createVolume( Category.Channel.EFFECT, GlobalConfig.getInteger( _data, 100 ) ) ; break ;
+				}
+			}
+		} ;
+
+		GlobalConfig.addNotify( "MASTERVOLUME", notify ) ;
+		GlobalConfig.addNotify( "MUSICVOLUME", notify ) ;
+		GlobalConfig.addNotify( "VOCALVOLUME", notify ) ;
+		GlobalConfig.addNotify( "EFFECTVOLUME", notify ) ;
+	}
+
+	private void createVolume( final Category.Channel _channel, final int _volume )
+	{
+		if( _volume >= 0 )
+		{
+			volumes.add( new Volume( new Category( _channel ), _volume ) ) ;
+		}
 	}
 }

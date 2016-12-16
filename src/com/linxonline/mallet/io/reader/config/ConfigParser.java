@@ -74,6 +74,18 @@ public class ConfigParser
 
 				var = _src.getString( "DISPLAYRENDERPARITY", "false" ) ;
 				_dest.addBoolean( "DISPLAYRENDERPARITY", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "MASTERVOLUME", "100" ) ;
+				_dest.addInteger( "MASTERVOLUME", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "MUSICVOLUME", "100" ) ;
+				_dest.addInteger( "MUSICVOLUME", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "VOCALVOLUME", "100" ) ;
+				_dest.addInteger( "VOCALVOLUME", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "EFFECTVOLUME", "100" ) ;
+				_dest.addInteger( "EFFECTVOLUME", Integer.parseInt( var ) ) ;
 			}
 		} ) ;
 	}

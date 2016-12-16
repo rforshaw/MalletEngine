@@ -30,6 +30,11 @@ public class Category
 		subChannel = _subChannel ;
 	}
 
+	public Category.Channel getChannel()
+	{
+		return channel ;
+	}
+
 	@Override
 	public boolean equals( final Object _obj )
 	{
@@ -41,9 +46,12 @@ public class Category
 		if( _obj instanceof Category )
 		{
 			final Category cat = ( Category )_obj ;
-			if( cat.channel == channel &&
-				cat.subChannel == subChannel )
+			if( ( cat.channel == channel &&
+				  cat.subChannel == subChannel ) || 
+				  cat.channel == Category.Channel.MASTER )
 			{
+				// All categories should be affected by MASTER.
+				// Irrespective of actual channel or sub channel.
 				return true ;
 			}
 		}
