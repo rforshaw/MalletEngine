@@ -60,11 +60,6 @@ public class AndroidActivity extends Activity
 		getWindow().setFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN,
 							  WindowManager.LayoutParams.FLAG_FULLSCREEN ) ;
 		super.onCreate( _savedInstance ) ;
-
-		final AudioManager audioManager = ( AudioManager )getSystemService( Context.AUDIO_SERVICE ) ;
-		audioManager.setStreamVolume( AudioManager.STREAM_MUSIC, 
-									  audioManager.getStreamMaxVolume( AudioManager.STREAM_MUSIC ), 
-									  0 ) ;
 	}
 
 	@Override
