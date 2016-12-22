@@ -36,7 +36,7 @@ public class GLAndroidSystem extends BasicSystem
 		activity = _activity ;
 
 		surface = new GL2DSurfaceView( _activity, _notify ) ;
-		renderer = surface.renderer ;
+		renderer = surface.getRenderer() ;
 
 		shutdownDelegate = new DefaultShutdown() ;
 		audioGenerator = new AndroidAudioGenerator() ;
@@ -48,9 +48,8 @@ public class GLAndroidSystem extends BasicSystem
 	public void initSystem()
 	{
 		final AndroidInputSystem input = ( AndroidInputSystem )inputSystem ;
-		final GL2DRenderer render = ( GL2DRenderer )renderer ;
 
-		input.inputAdapter = render.render.getRenderInfo() ;
+		input.inputAdapter = renderer.getRenderInfo() ;
 		activity.addAndroidInputListener( input ) ;
 
 		audioGenerator.startGenerator() ;

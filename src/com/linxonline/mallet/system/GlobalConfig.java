@@ -27,6 +27,11 @@ public final class GlobalConfig
 		config = _config ;
 	}
 
+	public static Settings getConfig()
+	{
+		return config ;
+	}
+	
 	/**
 		Allow an object to be informed when a setting 
 		has been changed.

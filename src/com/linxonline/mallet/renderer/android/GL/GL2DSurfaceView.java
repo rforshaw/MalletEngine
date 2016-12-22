@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.notification.Notification ;
 
 public class GL2DSurfaceView extends GLSurfaceView
 {
-	public final GL2DRenderer renderer ;
+	private final GL2DRenderer renderer ;
 
 	public GL2DSurfaceView( final Context _context, final Notification.Notify _notify )
 	{
@@ -15,10 +15,13 @@ public class GL2DSurfaceView extends GLSurfaceView
 		setEGLContextClientVersion( 3 ) ;
 		setEGLConfigChooser( 8, 8, 8, 8, 16, 8 ) ;
 
-		//setPreserveEGLContextOnPause( true ) ;
 		renderer = new GL2DRenderer( _notify ) ;
-
 		setRenderer( renderer ) ;
 		setRenderMode( GLSurfaceView.RENDERMODE_WHEN_DIRTY ) ;
+	}
+
+	public GL2DRenderer getRenderer()
+	{
+		return renderer ;
 	}
 }

@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
+import java.util.Collection ;
+
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.resources.Resource ;
@@ -71,7 +73,8 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	*/
 	public void recover()
 	{
-		for( final GLFontMap map : resources.values() )
+		final Collection<GLFontMap> maps = resources.values() ;
+		for( final GLFontMap map : maps )
 		{
 			map.fontMap.setTexture( null ) ;
 		}

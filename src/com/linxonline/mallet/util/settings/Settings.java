@@ -237,6 +237,11 @@ public final class Settings
 		return null ;
 	}
 
+	public final Collection<VariableInterface> toArray()
+	{
+		return variables.values() ;
+	}
+
 	public final ArrayList<String> toArrayString()
 	{
 		final Collection<VariableInterface> collection = variables.values() ;
@@ -245,9 +250,14 @@ public final class Settings
 
 		for( final VariableInterface inter : collection )
 		{
-			buffer.append( inter.name + " " + "\"" + inter.toString() + "\"" ) ;
+			buffer.append( inter.name ) ;
+			buffer.append( ' ' ) ;
+			buffer.append( '\"' ) ;
+			buffer.append( inter.toString() ) ;
+			buffer.append( '\"' ) ;
+
 			list.add( buffer.toString() ) ;
-			buffer.delete( 0, buffer.length() ) ;
+			buffer.setLength( 0 ) ;
 		}
 
 		return list ;

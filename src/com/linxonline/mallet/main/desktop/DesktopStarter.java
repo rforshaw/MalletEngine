@@ -19,6 +19,7 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
 import com.linxonline.mallet.io.reader.config.ConfigReader ;
+import com.linxonline.mallet.io.writer.config.ConfigWriter ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
@@ -140,8 +141,8 @@ public abstract class DesktopStarter extends StarterInterface
  	{
 		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
 		GlobalFileSystem.setFileSystem( _fileSystem ) ;
-		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
 
+		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
 		if( GlobalFileSystem.mapDirectory( "base/" ) == false )				// Map base-folder for faster access
 		{
 			Logger.println( "Failed to map base directory.", Logger.Verbosity.MINOR ) ;
@@ -151,12 +152,27 @@ public abstract class DesktopStarter extends StarterInterface
 	@Override
 	protected void loadConfig()
 	{
+		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
 		GlobalHome.setHome( getApplicationName() ) ;
 		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
 
 		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( BASE_CONFIG ) ), new Settings() ) ) ;
+
+		final ShutdownDelegate delegate = backendSystem.getShutdownDelegate() ;
+		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
+		{
+			@Override
+			public void shutdown()
+			{
+				Logger.println( "Saving configuration file.", Logger.Verbosity.MINOR ) ;
+				if( ConfigWriter.write( GlobalHome.getFile( BASE_CONFIG ), GlobalConfig.getConfig() ) == false )
+				{
+					Logger.println( "Failed to write configuration file.", Logger.Verbosity.MAJOR ) ;
+				}
+			}
+		} ) ;
 	}
 
 	/**

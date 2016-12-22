@@ -82,9 +82,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		final GLWorldState worlds = getWorldState() ;
 		worlds.shutdown() ;
 		programs.shutdown() ;
-		textures.shutdown() ;			// Clear all Texture Data and reload everything upon rendering
+		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.recover() ;
-
+	
+		Logger.println( "Recovering renderer state..", Logger.Verbosity.NORMAL ) ;
 		final ArrayList<GLWorld> worldContent = worlds.getCurrentData() ;
 		for( final GLWorld world : worldContent )
 		{
@@ -93,7 +94,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			for( final DrawData draw : drawContent )
 			{
 				final GLDrawData d = ( GLDrawData )draw ;
-				d.getGLTextures().clear() ;
+				d.clearTextures() ;
 				d.setGLBuffer( null ) ;
 				d.setLocation( null ) ;
 				( ( ProgramMap<GLProgram> )d.getProgram() ).setProgram( null ) ;
@@ -115,7 +116,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
 		programs.get( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
 		programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
-		programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
+		//programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.

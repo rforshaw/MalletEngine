@@ -7,7 +7,7 @@ public class MalletFont
 {
 	public static final int PLAIN = 5 ;
 
-	public final Font font ;			// Wrapper around platform specific implementation
+	public Font font ;					// Wrapper around platform specific implementation
 	public final String fontName ;		// The Family Font Name
 	public final int style ;			// Italic, Bold, Plain, currently only Plain is supported
 	public final int size ;				// Text point size
@@ -51,6 +51,11 @@ public class MalletFont
 		return font.stringWidth( _text ) ;
 	}
 
+	/**
+		Return the rendering backend implementation.
+		This will eventually be removed to prevent 
+		compatibility issues between platforms.
+	*/
 	public Font getFont()
 	{
 		return font ;

@@ -25,8 +25,8 @@ import com.linxonline.mallet.renderer.android.* ;
 public class GL2DRenderer implements RenderInterface, 
 									 GLSurfaceView.Renderer
 {
-	public final GLRenderer render ;
-	public final Notification surfaceCreated = new Notification() ;
+	protected final GLRenderer render ;
+	protected final Notification surfaceCreated = new Notification() ;
 
 	public GL2DRenderer( final Notification.Notify _notify )
 	{

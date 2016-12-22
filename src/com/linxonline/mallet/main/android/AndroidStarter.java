@@ -10,6 +10,7 @@ import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.game.test.GameTestLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
+import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
@@ -20,6 +21,7 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
 import com.linxonline.mallet.io.reader.config.ConfigReader ;
+import com.linxonline.mallet.io.writer.config.ConfigWriter ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -96,18 +98,38 @@ public abstract class AndroidStarter extends StarterInterface
  	{
 		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
 		GlobalFileSystem.setFileSystem( _fileSystem ) ;
-		GlobalFileSystem.mapDirectory( "base" ) ;				// Map base-folder for faster access
+
+		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
+		if( GlobalFileSystem.mapDirectory( "base" ) == false )				// Map base-folder for faster access
+		{
+			Logger.println( "Failed to map base directory.", Logger.Verbosity.MINOR ) ;
+		}
 	}
 
 	@Override
 	protected void loadConfig()
 	{
-		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
+		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
 		GlobalHome.setHome( getApplicationName() ) ;
 		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
 
+		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( BASE_CONFIG ) ), new Settings() ) ) ;
+
+		final ShutdownDelegate delegate = backendSystem.getShutdownDelegate() ;
+		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
+		{
+			@Override
+			public void shutdown()
+			{
+				Logger.println( "Saving configuration file.", Logger.Verbosity.MINOR ) ;
+				if( ConfigWriter.write( GlobalHome.getFile( BASE_CONFIG ), GlobalConfig.getConfig() ) == false )
+				{
+					Logger.println( "Failed to write configuration file.", Logger.Verbosity.MAJOR ) ;
+				}
+			}
+		} ) ;
 	}
 
 	/**

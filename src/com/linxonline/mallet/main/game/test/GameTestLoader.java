@@ -51,7 +51,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				playAudioExample() ;
+				//playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
