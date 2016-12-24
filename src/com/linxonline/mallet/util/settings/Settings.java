@@ -1,8 +1,10 @@
 package com.linxonline.mallet.util.settings ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.TreeMap ;
 import java.util.Collection ;
+
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	Would like to add an Annotation that will switch the String comparison to 
@@ -242,10 +244,10 @@ public final class Settings
 		return variables.values() ;
 	}
 
-	public final ArrayList<String> toArrayString()
+	public final List<String> toArrayString()
 	{
 		final Collection<VariableInterface> collection = variables.values() ;
-		final ArrayList<String> list = new ArrayList<String>() ;
+		final List<String> list = Utility.<String>newArrayList() ;
 		final StringBuilder buffer = new StringBuilder() ;
 
 		for( final VariableInterface inter : collection )
@@ -274,7 +276,7 @@ public final class Settings
 
 	public final String toString()
 	{
-		final ArrayList<String> strings = toArrayString() ;
+		final List<String> strings = toArrayString() ;
 		final StringBuilder buffer = new StringBuilder() ;
 		final int size = strings.size() ;
 		String value = null ;

@@ -1,7 +1,8 @@
 package com.linxonline.mallet.event ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 /**
@@ -17,12 +18,12 @@ import com.linxonline.mallet.util.logger.Logger ;
 **/
 public class EventController implements EventHandler
 {
-	private final ArrayList<EventType> wantedTypes = new ArrayList<EventType>() ;
+	private final List<EventType> wantedTypes = Utility.<EventType>newArrayList() ;
 	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
 	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
-	private final ArrayList<EventProcessor> processors = new ArrayList<EventProcessor>() ;
+	private final List<EventProcessor> processors = Utility.<EventProcessor>newArrayList() ;
 	private AddEventInterface addInterface = ADD_EVENT_FALLBACK ;
 
 	public EventController()
@@ -136,7 +137,7 @@ public class EventController implements EventHandler
 		return name ;
 	}
 
-	public ArrayList<EventType> getWantedEventTypes()
+	public List<EventType> getWantedEventTypes()
 	{
 		return wantedTypes ;
 	}
@@ -149,7 +150,7 @@ public class EventController implements EventHandler
 	*/
 	private class AddEventFallback implements AddEventInterface
 	{
-		private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+		private final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 
 		public void transferEvents( final AddEventInterface _addInterface )
 		{

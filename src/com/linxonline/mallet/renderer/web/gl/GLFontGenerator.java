@@ -1,11 +1,13 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.canvas.CanvasRenderingContext2D ;
 import org.teavm.jso.canvas.ImageData ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.Texture ;
@@ -100,7 +102,7 @@ public class GLFontGenerator
 		final double point = 1.0 / width ;
 		final float ascent = height / 2.0f ;//10.0f ;
 
-		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
+		final List<Shape> shapes = Utility.<Shape>newArrayList() ;
 
 		for( int i = 0; i < length; i++ )
 		{

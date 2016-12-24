@@ -1,7 +1,6 @@
 package com.linxonline.mallet.entity.system ;
 
 import java.util.List ;
-import java.util.ArrayList ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.util.worker.* ;

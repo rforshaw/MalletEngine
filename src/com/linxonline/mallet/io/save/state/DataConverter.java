@@ -1,16 +1,17 @@
 package com.linxonline.mallet.io.save.state ;
 
 import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.io.save.state.DataSet.* ;
+import com.linxonline.mallet.util.Utility ;
 
 public class DataConverter
 {
 	private final HashMap<String, Track<?>> converters = new HashMap<String, Track<?>>() ;
-	private final ArrayList<Track<?>> tracks = new ArrayList<Track<?>>() ;
+	private final List<Track<?>> tracks = Utility.<Track<?>>newArrayList() ;
 
 	private final EventController events = new EventController() ;
 
@@ -93,9 +94,9 @@ public class DataConverter
 
 	private static class Track<T extends DataSet>
 	{
-		private final ArrayList<T> data = new ArrayList<T>() ;						// Data to be saved/loaded
-		private final ArrayList<DataOut<T>> outs = new ArrayList<DataOut<T>>() ;	// Save implementations
-		private final ArrayList<DataIn<T>> ins = new ArrayList<DataIn<T>>() ;		// Load implementations
+		private final List<T> data = Utility.<T>newArrayList() ;						// Data to be saved/loaded
+		private final List<DataOut<T>> outs = Utility.<DataOut<T>>newArrayList() ;		// Save implementations
+		private final List<DataIn<T>> ins = Utility.<DataIn<T>>newArrayList() ;			// Load implementations
 
 		public Track() {}
 

@@ -9,6 +9,7 @@ import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.io.formats.json.android.* ;
 
@@ -103,13 +104,13 @@ public class AndroidFileSystem implements FileSystem
 		mapAssets.put( _file, _file ) ;
 	}
 
-	private static ArrayList<ZipPath> generateZipPaths( final String _file )
+	private static List<ZipPath> generateZipPaths( final String _file )
 	{
 		final File file = new File( _file ) ;
 		final String zipName = file.getName() ;
 		final String zipPath = file.getParent() ;
 
-		final ArrayList<ZipPath> paths = new ArrayList<ZipPath>() ;
+		final List<ZipPath> paths = Utility.<ZipPath>newArrayList() ;
 
 		try
 		{

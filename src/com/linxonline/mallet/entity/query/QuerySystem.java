@@ -2,9 +2,10 @@ package com.linxonline.mallet.entity.query ;
 
 import java.util.HashMap ;
 import java.util.Collection ;
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
@@ -48,14 +49,14 @@ public class QuerySystem implements SearchInterface
 		And use _query to denote the specific criteria the Query will use to 
 		search for the Entities
 	**/
-	public ArrayList<Entity> queryForEntities( final String _queryName, final Settings _query )
+	public List<Entity> queryForEntities( final String _queryName, final Settings _query )
 	{
 		if( queryInterfaces.containsKey( _queryName ) == true )
 		{
 			return queryInterfaces.get( _queryName ).queryForEntities( _query ) ;
 		}
 
-		return new ArrayList<Entity>() ;
+		return Utility.<Entity>newArrayList() ;
 	}
 
 	public void addEntity( final Entity _entity )

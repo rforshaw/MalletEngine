@@ -1,13 +1,14 @@
 package com.linxonline.mallet.io.reader.config ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.io.reader.ParseInterface ;
 import com.linxonline.mallet.util.settings.* ;
+import com.linxonline.mallet.util.Utility ;
 
 public class ConfigParser
 {
-	private final ArrayList<ParseInterface> parsers = new ArrayList<ParseInterface>() ;
+	private final List<ParseInterface> parsers = Utility.<ParseInterface>newArrayList() ;
 
 	public ConfigParser() { init() ; }
 

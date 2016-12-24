@@ -1,6 +1,6 @@
 package com.linxonline.mallet.main.game ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.audio.* ;
 
@@ -36,6 +36,7 @@ import com.linxonline.mallet.animation.* ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.locks.Locks ;
 
@@ -162,7 +163,7 @@ public class GameState extends State implements HookEntity
 		Add entities at the most opportune moment.
 		Should be used during game-logic update.
 	*/
-	public final void addEntities( final ArrayList<Entity> _entities )
+	public final void addEntities( final List<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
 		{
@@ -174,7 +175,7 @@ public class GameState extends State implements HookEntity
 		Add entities straight away.
 		Should be used before the first game-logic update.
 	*/
-	public final void addEntitiesNow( final ArrayList<Entity> _entities )
+	public final void addEntitiesNow( final List<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
 		{
@@ -205,7 +206,7 @@ public class GameState extends State implements HookEntity
 	/**
 		Remove entities at the most opportune moment.
 	*/
-	public final void removeEntities( final ArrayList<Entity> _entities )
+	public final void removeEntities( final List<Entity> _entities )
 	{
 		for( final Entity entity : _entities )
 		{
@@ -227,10 +228,10 @@ public class GameState extends State implements HookEntity
 	*/
 	public void hookEntity( final Entity _entity )
 	{
-		final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+		final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 		{
 			// Retrieve component system-registering events.
-			final ArrayList<Component> entityComponents = new ArrayList<Component>() ;
+			final List<Component> entityComponents = Utility.<Component>newArrayList() ;
 			final int size = _entity.getAllComponents( entityComponents ) ;
 			for( int i = 0; i < size; ++i )
 			{
@@ -255,11 +256,11 @@ public class GameState extends State implements HookEntity
 	*/
 	public void unhookEntity( final Entity _entity )
 	{
-		final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+		final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 		{
 			// Retrieve component system-registering events.
 			Component component = null ;
-			final ArrayList<Component> entityComponents = new ArrayList<Component>() ;
+			final List<Component> entityComponents = Utility.<Component>newArrayList() ;
 			final int size = _entity.getAllComponents( entityComponents ) ;
 			for( int i = 0; i < size; ++i )
 			{

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
@@ -8,11 +8,12 @@ import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.util.Utility ;
 
 public class RenderComponent extends Component
 {
-	private final ArrayList<Draw> toAddBasic = new ArrayList<Draw>() ;
-	private final ArrayList<Draw> toAddText = new ArrayList<Draw>() ;
+	private final List<Draw> toAddBasic = Utility.<Draw>newArrayList() ;
+	private final List<Draw> toAddText = Utility.<Draw>newArrayList() ;
 
 	private DrawDelegate drawDelegate = null ;
 	private Component.ReadyCallback toDestroy = null ;
@@ -86,7 +87,7 @@ public class RenderComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{

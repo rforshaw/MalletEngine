@@ -1,6 +1,10 @@
 package com.linxonline.mallet.resources ;
 
-import java.util.* ;
+import java.util.List ;
+import java.util.HashMap ;
+import java.util.Set ;
+
+import com.linxonline.mallet.util.Utility ;
 
 /*==================================================*/
 // The default Resource cleaner when AbstractManagers
@@ -18,11 +22,11 @@ public abstract class ManageResources
 	/**
 		returns the names of all unused rescources
 	**/
-	public static ArrayList<String> findUnwantedResources( final HashMap _resources )
+	public static List<String> findUnwantedResources( final HashMap _resources )
 	{
 		Resource resource = null ;
 		final Set<String> keys = ( Set<String> )_resources.keySet() ;
-		final ArrayList<String> remove = new ArrayList<String>() ;
+		final List<String> remove = Utility.<String>newArrayList() ;
 
 		for( final String key : keys )
 		{
@@ -49,7 +53,7 @@ public abstract class ManageResources
 		Iterates over their names and removes them from the HashMap
 	**/
 	public static void removeUnwantedResources( final HashMap _resources, 
-												final ArrayList<String> _remove )
+												final List<String> _remove )
 	{
 		Resource resource = null ;
 		for( final String key : _remove )

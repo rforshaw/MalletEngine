@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.event.Event ;
 

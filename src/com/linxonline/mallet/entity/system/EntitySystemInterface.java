@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.system ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.entity.* ;
 
@@ -20,6 +20,6 @@ public interface EntitySystemInterface
 	public void clear() ;
 
 	public SearchInterface getSearch() ;
-	public ArrayList<Entity> getEntities() ;
+	public List<Entity> getEntities() ;
 	public Entity getEntityByName( final String _name ) ;
 }

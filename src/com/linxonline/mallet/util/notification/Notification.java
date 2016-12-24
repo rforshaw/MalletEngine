@@ -1,6 +1,8 @@
 package com.linxonline.mallet.util.notification ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	Convenience class that allows one system to inform 
@@ -11,16 +13,16 @@ import java.util.ArrayList ;
 */
 public class Notification<T>
 {
-	private final ArrayList<Notify<T>> listeners ;
+	private final List<Notify<T>> listeners ;
 
 	public Notification()
 	{
-		listeners = new ArrayList<Notify<T>>() ;
+		listeners = Utility.<Notify<T>>newArrayList() ;
 	}
 
 	public Notification( final int _initialCapacity )
 	{
-		listeners = new ArrayList<Notify<T>>( _initialCapacity ) ;
+		listeners = Utility.<Notify<T>>newArrayList( _initialCapacity ) ;
 	}
 
 	public void addNotify( final Notify<T> _toInform )

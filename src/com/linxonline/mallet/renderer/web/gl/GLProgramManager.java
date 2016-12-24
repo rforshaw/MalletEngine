@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLUniformLocation ;
@@ -12,6 +12,7 @@ import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.web.gl.GLProgram.Uniform ;
 
@@ -24,7 +25,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		temporarily store the program in a queue.
 	*/
 	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
-	private final ArrayList<GLProgram> toBind = new ArrayList<GLProgram>() ;
+	private final List<GLProgram> toBind = Utility.<GLProgram>newArrayList() ;
 
 	public GLProgramManager()
 	{
@@ -59,15 +60,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 			private void generateGLProgram( final JSONObject _jGL )
 			{
-				final ArrayList<GLShader> shaders = new ArrayList<GLShader>() ;
-				final ArrayList<GLShaderMap> paths = new ArrayList<GLShaderMap>() ;
+				final List<GLShader> shaders = Utility.<GLShader>newArrayList() ;
+				final List<GLShaderMap> paths = Utility.<GLShaderMap>newArrayList() ;
 
 				fill( paths, _jGL.optJSONArray( "VERTEX" ), GL3.VERTEX_SHADER ) ;
 				//fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GEOMETRY_SHADER ) ;
 				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.FRAGMENT_SHADER ) ;
 
-				final ArrayList<Tuple<String, Uniform>> uniforms = new ArrayList<Tuple<String, Uniform>>() ;
-				final ArrayList<String> swivel = new ArrayList<String>() ;
+				final List<Tuple<String, Uniform>> uniforms = Utility.<Tuple<String, Uniform>>newArrayList() ;
+				final List<String> swivel = Utility.<String>newArrayList() ;
 
 				fillUniforms( uniforms, _jGL.optJSONArray( "UNIFORMS" ) ) ;
 				fillAttributes( swivel, _jGL.optJSONArray( "SWIVEL" ) ) ;
@@ -75,7 +76,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, swivel ) ;
 			}
 
-			private void fill( final ArrayList<GLShaderMap> _toFill, final JSONArray _base, final int _type )
+			private void fill( final List<GLShaderMap> _toFill, final JSONArray _base, final int _type )
 			{
 				if( _base == null )
 				{
@@ -89,7 +90,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				}
 			}
 
-			private void fillAttributes( final ArrayList<String> _toFill, final JSONArray _base )
+			private void fillAttributes( final List<String> _toFill, final JSONArray _base )
 			{
 				if( _base == null )
 				{
@@ -103,7 +104,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				}
 			}
 
-			private void fillUniforms( final ArrayList<Tuple<String, Uniform>> _toFill, final JSONArray _base )
+			private void fillUniforms( final List<Tuple<String, Uniform>> _toFill, final JSONArray _base )
 			{
 				if( _base == null )
 				{
@@ -131,10 +132,10 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				a GLProgram and add it to the toBind array.
 			*/
 			private void readShaders( final String _name,
-									  final ArrayList<GLShaderMap> _jShaders,
-									  final ArrayList<GLShader> _glShaders,
-									  final ArrayList<Tuple<String, Uniform>> _uniforms,
-									  final ArrayList<String> _swivel )
+									  final List<GLShaderMap> _jShaders,
+									  final List<GLShader> _glShaders,
+									  final List<Tuple<String, Uniform>> _uniforms,
+									  final List<String> _swivel )
 			{
 				if( _jShaders.isEmpty() == true )
 				{
@@ -253,7 +254,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			}
 		}
 
-		final ArrayList<String> swivel = _program.swivel ;
+		final List<String> swivel = _program.swivel ;
 		final int size = swivel.size() ;
 
 		for( int i = 0; i < size; i++ )

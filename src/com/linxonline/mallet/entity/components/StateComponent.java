@@ -1,7 +1,8 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.io.save.state.DataSet ;
@@ -24,7 +25,7 @@ import com.linxonline.mallet.io.save.state.DataSet ;
 public class StateComponent extends EventComponent
 {
 	private boolean initialEventDone = false ;
-	private final ArrayList<Tuple<String, DataSet>> data = new ArrayList<Tuple<String, DataSet>>() ;
+	private final List<Tuple<String, DataSet>> data = Utility.<Tuple<String, DataSet>>newArrayList() ;
 
 	public StateComponent( final String _name, final String _group )
 	{
@@ -55,7 +56,7 @@ public class StateComponent extends EventComponent
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
 		for( final Tuple<String, DataSet> set : data )
@@ -67,7 +68,7 @@ public class StateComponent extends EventComponent
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
 		for( final Tuple<String, DataSet> set : data )

@@ -1,6 +1,8 @@
 package com.linxonline.mallet.util.arrays ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	Objects are only added to current state when 
@@ -13,9 +15,9 @@ public abstract class ManagedArray<T>
 		public void remove( final Object _data ) {}
 	} ;
 
-	protected final ArrayList<T> toAdd = new ArrayList<T>() ;
-	protected final ArrayList<T> toRemove = new ArrayList<T>() ;
-	protected final ArrayList<T> current = new ArrayList<T>() ;
+	protected final List<T> toAdd = Utility.<T>newArrayList() ;
+	protected final List<T> toRemove = Utility.<T>newArrayList() ;
+	protected final List<T> current = Utility.<T>newArrayList() ;
 
 	protected RemoveDelegate removeDelegate = FALLBACK ;
 
@@ -48,15 +50,15 @@ public abstract class ManagedArray<T>
 		}
 	}
 
-	public ArrayList<T> getNewState()
+	public List<T> getNewState()
 	{
-		final ArrayList<T> state = new ArrayList<T>() ;
+		final List<T> state = Utility.<T>newArrayList() ;
 		state.addAll( current ) ;
 		state.addAll( toAdd ) ;
 		return state ;
 	}
 
-	public ArrayList<T> getCurrentData()
+	public List<T> getCurrentData()
 	{
 		return current ;
 	}
@@ -78,7 +80,7 @@ public abstract class ManagedArray<T>
 		}
 	}
 
-	protected void addNewData( final ArrayList<T> _toAdd )
+	protected void addNewData( final List<T> _toAdd )
 	{
 		for( final T add : _toAdd )
 		{
@@ -87,7 +89,7 @@ public abstract class ManagedArray<T>
 		_toAdd.clear() ;
 	}
 
-	protected void removeOldData( final ArrayList<T> _toRemove )
+	protected void removeOldData( final List<T> _toRemove )
 	{
 		for( final T remove : _toRemove )
 		{

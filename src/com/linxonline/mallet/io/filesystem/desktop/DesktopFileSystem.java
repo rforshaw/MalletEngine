@@ -7,6 +7,7 @@ import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.io.formats.json.desktop.* ;
 
@@ -57,7 +58,7 @@ public class DesktopFileSystem implements FileSystem
 			{
 				if( isZip( _file ) == true )
 				{
-					final ArrayList<ZipPath> paths = generateZipPaths( _file ) ;
+					final List<ZipPath> paths = generateZipPaths( _file ) ;
 					for( final ZipPath zip : paths )
 					{
 						mapZip.put( _directory + zip.filePath, zip ) ;
@@ -70,12 +71,12 @@ public class DesktopFileSystem implements FileSystem
 		return true ;
 	}
 
-	private static ArrayList<ZipPath> generateZipPaths( final File _file )
+	private static List<ZipPath> generateZipPaths( final File _file )
 	{
 		final String zipName = _file.getName() ;
 		final String zipPath = _file.getParent() ;
 
-		final ArrayList<ZipPath> paths = new ArrayList<ZipPath>() ;
+		final List<ZipPath> paths = Utility.<ZipPath>newArrayList();
 
 		try
 		{

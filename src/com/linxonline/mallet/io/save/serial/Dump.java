@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.serial.save ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 import java.util.Collection ;
 import java.util.Set ;
@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation ;
 
 import java.lang.IllegalAccessException ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
@@ -50,9 +51,9 @@ public final class Dump
 	{
 		private final Object object ;												// Object to be saved
 		private final Class objectClass ;											// Class that represents object
-		private final ArrayList<Field> fields = new ArrayList<Field>() ;			// Fields to be saved - Objects and Primitives
-		private final ArrayList<IOClass> mapKeys = new ArrayList<IOClass>() ;		// Objects that represent a Map's key
-		private final ArrayList<IOClass> collections = new ArrayList<IOClass>() ;	// Objects to be saved within a Collection or a Map values
+		private final List<Field> fields = Utility.<Field>newArrayList() ;			// Fields to be saved - Objects and Primitives
+		private final List<IOClass> mapKeys = Utility.<IOClass>newArrayList() ;		// Objects that represent a Map's key
+		private final List<IOClass> collections = Utility.<IOClass>newArrayList() ;	// Objects to be saved within a Collection or a Map values
 		private final IOClass parent ;												// Parent class
 
 		public IOClass( final Object _obj, final Class _class )

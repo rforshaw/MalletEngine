@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import android.graphics.Typeface ;
 import android.graphics.Bitmap.Config ;
@@ -9,6 +9,8 @@ import android.graphics.Bitmap ;
 import android.graphics.Paint ;
 import android.graphics.Rect ;
 import android.graphics.Color ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.Texture ;
@@ -93,7 +95,7 @@ public class GLFontGenerator
 		final double point = 1.0f / width ;
 		final float ascent = Math.abs( paint.ascent() ) ;
 
-		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
+		final List<Shape> shapes = Utility.<Shape>newArrayList() ;
 		for( int i = 0; i < length; i++ )
 		{
 			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;

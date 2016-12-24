@@ -1,6 +1,8 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.DrawData ;
@@ -15,7 +17,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLDrawData extends DrawData
 {
-	private final ArrayList<Texture<GLImage>> textures = new ArrayList<Texture<GLImage>>() ;
+	private final List<Texture<GLImage>> textures = Utility.<Texture<GLImage>>newArrayList() ;
 
 	private GLGeometryUploader.GLBuffer buffer ;
 	private GLGeometryUploader.Location location ;
@@ -79,7 +81,7 @@ public class GLDrawData extends DrawData
 		return drawShape ;
 	}
 
-	public ArrayList<Texture<GLImage>> getGLTextures()
+	public List<Texture<GLImage>> getGLTextures()
 	{
 		return textures ;
 	}

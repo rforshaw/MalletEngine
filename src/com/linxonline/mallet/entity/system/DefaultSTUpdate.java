@@ -1,12 +1,14 @@
 package com.linxonline.mallet.entity.system ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.entity.* ;
 
 public class DefaultSTUpdate implements EntityUpdateInterface
 {
-	protected final ArrayList<Entity> entities = new ArrayList<Entity>() ;		// Entities that are active
-	protected final ArrayList<Entity> cleanup = new ArrayList<Entity>() ;		// Entities that need to be removed
+	protected final List<Entity> entities = Utility.<Entity>newArrayList() ;		// Entities that are active
+	protected final List<Entity> cleanup = Utility.<Entity>newArrayList() ;		// Entities that need to be removed
 
 	public DefaultSTUpdate() {}
 	
@@ -42,7 +44,7 @@ public class DefaultSTUpdate implements EntityUpdateInterface
 		cleanup.clear() ;
 	}
 
-	public ArrayList<Entity> getEntities()
+	public List<Entity> getEntities()
 	{
 		return entities ;
 	}
@@ -51,7 +53,7 @@ public class DefaultSTUpdate implements EntityUpdateInterface
 		Used by entity-system to determine what entities need to be un-hooked.
 		Should be replaced with callback functionality.
 	**/
-	public boolean getCleanup( final ArrayList<Entity> _entities )
+	public boolean getCleanup( final List<Entity> _entities )
 	{
 		if( cleanup.size() > 0 )
 		{

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.arrays.ManagedArray ;
 

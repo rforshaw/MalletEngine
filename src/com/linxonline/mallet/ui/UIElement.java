@@ -1,6 +1,8 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -11,7 +13,7 @@ public class UIElement implements InputHandler
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;
 
 	private final ListenerUnit<BaseListener> listeners = new ListenerUnit<BaseListener>( this ) ;
-	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+	private final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 	private InputAdapterInterface adapter = null ;
 
 	private State current = State.NEUTRAL ;
@@ -73,7 +75,7 @@ public class UIElement implements InputHandler
 		destroy = true ;
 	}
 
-	public void update( final float _dt, final ArrayList<Event<?>> _events )
+	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		if( events.isEmpty() == false )
 		{
@@ -142,7 +144,7 @@ public class UIElement implements InputHandler
 
 	private InputEvent.Action updateMove( final InputEvent _event )
 	{
-		final ArrayList<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -157,7 +159,7 @@ public class UIElement implements InputHandler
 
 	private InputEvent.Action updateReleased( final InputEvent _event )
 	{
-		final ArrayList<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -172,7 +174,7 @@ public class UIElement implements InputHandler
 
 	private InputEvent.Action updatePressed( final InputEvent _event )
 	{
-		final ArrayList<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -187,7 +189,7 @@ public class UIElement implements InputHandler
 
 	private InputEvent.Action updateExited( final InputEvent _event )
 	{
-		final ArrayList<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{

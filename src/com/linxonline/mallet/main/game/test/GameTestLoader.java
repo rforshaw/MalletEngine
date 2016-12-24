@@ -1,7 +1,5 @@
 package com.linxonline.mallet.main.game.test ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;

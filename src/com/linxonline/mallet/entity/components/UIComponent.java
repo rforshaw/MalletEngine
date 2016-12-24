@@ -1,7 +1,8 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.audio.* ;
 
@@ -12,9 +13,9 @@ import com.linxonline.mallet.event.* ;
 
 public class UIComponent extends InputComponent
 {
-	private final ArrayList<UIElement> elements = new ArrayList<UIElement>() ;
-	private final ArrayList<UIElement> toRemove = new ArrayList<UIElement>() ;
-	private final ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+	private final List<UIElement> elements = Utility.<UIElement>newArrayList() ;
+	private final List<UIElement> toRemove = Utility.<UIElement>newArrayList() ;
+	private final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
 	private Component.ReadyCallback toDestroy = null ;
@@ -129,14 +130,14 @@ public class UIComponent extends InputComponent
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
 		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", eventController )  ) ;

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import java.util.ArrayList ;
-
 import android.content.Context ;
 
 import android.opengl.GLES11 ;

@@ -1,10 +1,11 @@
 package com.linxonline.mallet.util.tools ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.io.serialisation.ByteOutput ;
 import com.linxonline.mallet.io.serialisation.ByteInput ;
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	This Diff implementation aims to find comparisons 
@@ -18,7 +19,7 @@ public final class Diff
 
 	public static byte[] encode( final byte[] _base, final byte[] _compare )
 	{
-		final ArrayList<Point> matches = new ArrayList<Point>() ;
+		final List<Point> matches = Utility.<Point>newArrayList() ;
 
 		int pos = 0 ;
 		// Find parts between _base and _compare 
@@ -39,7 +40,7 @@ public final class Diff
 			++pos ;
 		}
 
-		final ArrayList<Point> additions = new ArrayList<Point>() ;
+		final List<Point> additions = Utility.<Point>newArrayList() ;
 
 		// Assume that all other positions not flagged 
 		// within an existing point are new and must be 
@@ -80,7 +81,7 @@ public final class Diff
 	public static byte[] decode( final byte[] _base, final byte[] _diff )
 	{
 		final ByteInput diff = ByteInput.readStream( _diff ) ;
-		final ArrayList<Point> points = new ArrayList<Point>() ;
+		final List<Point> points = Utility.<Point>newArrayList() ;
 
 		int arraySize = 0 ;
 		while( diff.isEnd() == false )
@@ -191,7 +192,7 @@ public final class Diff
 		Determine whether or not _point.pos is 
 		used in another point.
 	*/
-	private static boolean isUsed( final Point _point, final ArrayList<Point> _points )
+	private static boolean isUsed( final Point _point, final List<Point> _points )
 	{
 		for( final Point point : _points )
 		{

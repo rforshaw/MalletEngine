@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 import java.util.Iterator ;
 import java.awt.* ;
@@ -19,6 +19,7 @@ import com.linxonline.mallet.io.filesystem.desktop.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
@@ -39,7 +40,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		binded to OpenGL out of order causing significant performance 
 		degradation.
 	*/
-	private final ArrayList<Tuple<String, BufferedImage>> toBind = new ArrayList<Tuple<String, BufferedImage>>() ;
+	private final List<Tuple<String, BufferedImage>> toBind = Utility.<Tuple<String, BufferedImage>>newArrayList() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	/**

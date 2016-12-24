@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import java.util.ArrayList ;
 import java.awt.Insets ;
 import java.awt.Dimension ;
 import java.awt.Frame ;

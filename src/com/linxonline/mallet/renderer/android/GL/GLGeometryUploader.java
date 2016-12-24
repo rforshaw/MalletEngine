@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.Iterator ;
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.Arrays ;
 import java.nio.* ;
 
@@ -20,6 +20,7 @@ import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.util.sort.OrderedInsert ;
 import com.linxonline.mallet.util.sort.SortInterface ;
@@ -44,7 +45,7 @@ public class GLGeometryUploader
 	private final ShortBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final ArrayList<GLBuffer> buffers = new ArrayList<GLBuffer>() ;							// Available GLBuffers
+	private final List<GLBuffer> buffers = Utility.<GLBuffer>newArrayList() ;							// Available GLBuffers
 
 	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
@@ -404,7 +405,7 @@ public class GLGeometryUploader
 
 		protected Location stencilLocation = null ;
 
-		protected final ArrayList<GLGeometry> buffers = new ArrayList<GLGeometry>() ;
+		protected final List<GLGeometry> buffers = Utility.<GLGeometry>newArrayList() ;
 
 		public GLBuffer( final GLDrawData _data,
 						 final int _indexLengthBytes,
@@ -1002,9 +1003,9 @@ public class GLGeometryUploader
 		public int amountIndexUsedBytes  = 0 ;		// How much of buffer has been used
 		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
 
-		private final ArrayList<Location> allocated = new ArrayList<Location>() ;
-		private final ArrayList<Location.Range> indexRanges = new ArrayList<Location.Range>() ;
-		private final ArrayList<Location.Range> vertexRanges = new ArrayList<Location.Range>() ;
+		private final List<Location> allocated = Utility.<Location>newArrayList() ;
+		private final List<Location.Range> indexRanges = Utility.<Location.Range>newArrayList() ;
+		private final List<Location.Range> vertexRanges = Utility.<Location.Range>newArrayList() ;
 
 		public GLGeometry( final int _style,
 						   final int _indexLengthBytes,
@@ -1205,7 +1206,7 @@ public class GLGeometryUploader
 			orderedVertexes( allocated, vertexRanges ) ;
 		}
 
-		private ArrayList<Location.Range> orderedIndexes( final ArrayList<Location> _locations, final ArrayList<Location.Range> _ordered )
+		private List<Location.Range> orderedIndexes( final List<Location> _locations, final List<Location.Range> _ordered )
 		{
 			_ordered.clear() ;
 			if( _locations.isEmpty() == true )
@@ -1224,7 +1225,7 @@ public class GLGeometryUploader
 			return _ordered ;
 		}
 
-		private ArrayList<Location.Range> orderedVertexes( final ArrayList<Location> _locations, final ArrayList<Location.Range> _ordered )
+		private List<Location.Range> orderedVertexes( final List<Location> _locations, final List<Location.Range> _ordered )
 		{
 			_ordered.clear() ;
 			if( _locations.isEmpty() == true )

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import android.opengl.GLES30 ;
 import android.opengl.EGL14 ;
@@ -86,11 +86,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		fontManager.recover() ;
 	
 		Logger.println( "Recovering renderer state..", Logger.Verbosity.NORMAL ) ;
-		final ArrayList<GLWorld> worldContent = worlds.getCurrentData() ;
+		final List<GLWorld> worldContent = worlds.getCurrentData() ;
 		for( final GLWorld world : worldContent )
 		{
 			final DrawState state = world.getDrawState() ;
-			final ArrayList<DrawData> drawContent = state.getActiveDraws() ;
+			final List<DrawData> drawContent = state.getActiveDraws() ;
 			for( final DrawData draw : drawContent )
 			{
 				final GLDrawData d = ( GLDrawData )draw ;

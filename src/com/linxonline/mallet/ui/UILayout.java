@@ -1,7 +1,8 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 
@@ -11,8 +12,8 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final ArrayList<UIElement> ordered = new ArrayList<UIElement>() ;
-	private final ArrayList<UIElement> toRemove = new ArrayList<UIElement>() ;
+	private final List<UIElement> ordered = Utility.<UIElement>newArrayList() ;
+	private final List<UIElement> toRemove = Utility.<UIElement>newArrayList() ;
 	private final UIElementUpdater updater ;
 
 	public UILayout( final Type _type )
@@ -76,7 +77,7 @@ public class UILayout extends UIElement
 	}
 
 	@Override
-	public void update( final float _dt, final ArrayList<Event<?>> _events )
+	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		if( isDirty() == true )
 		{
@@ -191,7 +192,7 @@ public class UILayout extends UIElement
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _ordered )
+			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 availableLength = new Vector3() ;
 				int minNumX = 0 ;
@@ -277,7 +278,7 @@ public class UILayout extends UIElement
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
-			public void update( final float _dt, final ArrayList<UIElement> _ordered )
+			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 availableLength = new Vector3() ;
 				int minNumX = 0 ;
@@ -356,7 +357,7 @@ public class UILayout extends UIElement
 	{
 		return new UIElementUpdater()
 		{
-			public void update( final float _dt, final ArrayList<UIElement> _ordered )
+			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 
 			}
@@ -367,7 +368,7 @@ public class UILayout extends UIElement
 	{
 		return new UIElementUpdater()
 		{
-			public void update( final float _dt, final ArrayList<UIElement> _ordered )
+			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 			
 			}
@@ -406,6 +407,6 @@ public class UILayout extends UIElement
 
 	private interface UIElementUpdater
 	{
-		public void update( final float _dt, final ArrayList<UIElement> _ordered ) ;
+		public void update( final float _dt, final List<UIElement> _ordered ) ;
 	}
 }

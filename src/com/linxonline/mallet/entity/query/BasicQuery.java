@@ -1,8 +1,9 @@
 package com.linxonline.mallet.entity.query ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
@@ -13,7 +14,7 @@ import com.linxonline.mallet.util.settings.* ;
 **/
 public class BasicQuery extends Query
 {
-	private ArrayList<Entity> entities = new ArrayList<Entity>() ;
+	private List<Entity> entities = Utility.<Entity>newArrayList() ;
 
 	public BasicQuery( final String _name )
 	{
@@ -40,9 +41,9 @@ public class BasicQuery extends Query
 		return null ;
 	}
 
-	public ArrayList<Entity> queryForEntities( final Settings _query )
+	public List<Entity> queryForEntities( final Settings _query )
 	{
-		return new ArrayList<Entity>() ;
+		return Utility.<Entity>newArrayList() ;
 	}
 
 	public void addEntity( final Entity _entity )

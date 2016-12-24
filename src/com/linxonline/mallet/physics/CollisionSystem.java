@@ -1,13 +1,15 @@
 package com.linxonline.mallet.physics ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.event.* ;
 
 public class CollisionSystem extends EventController
 {
-	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
+	private final List<Hull> hulls = Utility.<Hull>newArrayList() ;
 	private final QuadTree treeHulls = new QuadTree() ;
 
 	public CollisionSystem( final AddEventInterface _addInterface )

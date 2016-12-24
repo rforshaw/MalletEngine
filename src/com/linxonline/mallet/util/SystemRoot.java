@@ -1,8 +1,9 @@
 package com.linxonline.mallet.util ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.event.EventUpdater ;
 
 /**
@@ -17,12 +18,12 @@ import com.linxonline.mallet.event.EventUpdater ;
 public abstract class SystemRoot<T> extends EventUpdater
 {
 	/**
-		The HashMap and ArrayList should be replaced with a more structure 
+		The HashMap and List should be replaced with a more structure 
 		that provides effecient iteration & searching capabilites.
 	*/
 	protected final HashMap<Integer, T> sources = new HashMap<Integer, T>() ;
-	protected final ArrayList<T> activeSources = new ArrayList<T>() ;
-	protected final ArrayList<RemoveSource> removeSources = new ArrayList<RemoveSource>() ;
+	protected final List<T> activeSources = Utility.<T>newArrayList() ;
+	protected final List<RemoveSource> removeSources = Utility.<RemoveSource>newArrayList() ;
 
 	public void update( final float _dt )
 	{

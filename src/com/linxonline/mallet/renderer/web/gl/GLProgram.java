@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
@@ -292,14 +292,14 @@ public class GLProgram extends Resource
 	public final WebGLUniformLocation[] inUniforms ;		// Vertex swivel order defined in *.jgl
 	public final int[] inAttributes ;
 
-	public final ArrayList<GLShader> shaders ;
-	public final ArrayList<Tuple<String, Uniform>> uniforms ;
-	public final ArrayList<String> swivel ;
+	public final List<GLShader> shaders ;
+	public final List<Tuple<String, Uniform>> uniforms ;
+	public final List<String> swivel ;
 
 	public GLProgram( final String _name,
-					  final ArrayList<GLShader> _shaders,
-					  final ArrayList<Tuple<String, Uniform>> _uniforms,
-					  final ArrayList<String> _swivel )
+					  final List<GLShader> _shaders,
+					  final List<Tuple<String, Uniform>> _uniforms,
+					  final List<String> _swivel )
 	{
 		name = _name ;
 

@@ -1,14 +1,15 @@
 package com.linxonline.mallet.animation ; 
 
 import java.lang.Math ;
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.maths.Vector2 ; 
 
 public class Bone2
 {
 	public String name = null ;
-	public ArrayList<Bone2> children = new ArrayList<Bone2>() ;
+	public List<Bone2> children = Utility.<Bone2>newArrayList() ;
 	private Vector2 defaultBone = new Vector2() ;
 	private Vector2 modifiedBone = new Vector2() ;
 	private Vector2 offset = new Vector2() ;

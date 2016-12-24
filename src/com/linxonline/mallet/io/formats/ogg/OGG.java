@@ -1,15 +1,16 @@
 package com.linxonline.mallet.io.formats.ogg ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.io.ByteArrayOutputStream ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
+import com.linxonline.mallet.util.Utility ;
 
 public class OGG
 {
-	public final ArrayList<Page> pages = new ArrayList<Page>() ;
+	public final List<Page> pages = Utility.<Page>newArrayList() ;
 
 	public static OGG readOGG( final String _file )
 	{

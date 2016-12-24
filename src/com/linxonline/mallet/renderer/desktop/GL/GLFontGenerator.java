@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import javax.imageio.ImageIO ;
 import java.io.File ;
@@ -18,6 +18,8 @@ import java.awt.RenderingHints ;
 import java.awt.Graphics2D ;
 import java.awt.Canvas ;
 import java.awt.AlphaComposite ;
+
+import com.linxonline.mallet.util.Utility ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -96,7 +98,7 @@ public class GLFontGenerator
 		final double point = 1.0f / width ;
 		final float ascent = Math.abs( metrics.getAscent() ) ;
 
-		final ArrayList<Shape> shapes = new ArrayList<Shape>() ;
+		final List<Shape> shapes = Utility.<Shape>newArrayList() ;
 		for( int i = 0; i < length; i++ )
 		{
 			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;

@@ -1,9 +1,10 @@
 package com.linxonline.mallet.resources.language ;
 
 import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.List ;
 import java.io.* ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.io.reader.* ;
 
 /*====================================================*/
@@ -14,7 +15,7 @@ public class LanguageManager
 {
 	private final HashMap<String, String> strings = new HashMap<String, String>() ;
 	private String languageFolder = "en" ;
-	private final ArrayList<String> filesLoaded = new ArrayList<String>() ;
+	private final List<String> filesLoaded = Utility.<String>newArrayList() ;
 
 	public LanguageManager() {}
 
@@ -40,7 +41,7 @@ public class LanguageManager
 	{
 		assert _file != null ;
 		final String file = "base/languages/" + languageFolder + "/" + _file ;
-		final ArrayList<String> textFile = TextReader.getTextAsArray( file ) ;
+		final List<String> textFile = TextReader.getTextAsArray( file ) ;
 
 		filesLoaded.add( _file ) ;
 		return loadFile( textFile ) ;
@@ -89,7 +90,7 @@ public class LanguageManager
 		return strings.containsKey( _keyword ) ;
 	}
 
-	private final boolean loadFile( final ArrayList<String> _textFile )
+	private final boolean loadFile( final List<String> _textFile )
 	{
 		for( final String line : _textFile )
 		{

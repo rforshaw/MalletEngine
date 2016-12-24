@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashSet ;
 import java.util.Set ;
 
@@ -33,7 +33,7 @@ public abstract class UIAbstractView extends UIElement
 		super( _position, _offset, _length ) ;
 	}
 
-	public void update( final float _dt, final ArrayList<Event<?>> _events )
+	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		super.update( _dt, _events ) ;
 		if( model != null && refresh == true )

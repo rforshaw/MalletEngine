@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.util.ArrayList ;
-
 import org.teavm.jso.* ;
 import org.teavm.jso.browser.* ;
 import org.teavm.jso.dom.html.* ;

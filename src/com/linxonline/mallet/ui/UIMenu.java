@@ -1,7 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 

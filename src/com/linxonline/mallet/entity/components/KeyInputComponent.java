@@ -1,8 +1,9 @@
 package com.linxonline.mallet.entity.components ;
 
 import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.input.KeyInputListener ;
 import com.linxonline.mallet.input.KeyCode ;
@@ -79,7 +80,7 @@ public class KeyInputComponent extends InputComponent
 
 	private static class Key
 	{
-		public final ArrayList<KeyInputListener> listeners = new ArrayList<KeyInputListener>() ;
+		public final List<KeyInputListener> listeners = Utility.<KeyInputListener>newArrayList() ;
 
 		public Key( final KeyInputListener _listener )
 		{

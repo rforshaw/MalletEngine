@@ -1,11 +1,5 @@
 package com.linxonline.mallet.event ;
 
-import java.util.Collection ;
-import java.util.ArrayList ;
-import java.util.HashMap ;
-
-import com.linxonline.mallet.util.logger.Logger ;
-
 public interface EventSystemInterface extends AddEventInterface
 {
 	/**

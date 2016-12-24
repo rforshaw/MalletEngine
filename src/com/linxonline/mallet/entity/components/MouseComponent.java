@@ -1,7 +1,5 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;

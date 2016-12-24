@@ -1,6 +1,8 @@
 package com.linxonline.mallet.event ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	Double buffer effectively, prevents events from being added to 
@@ -12,8 +14,8 @@ import java.util.ArrayList ;
 **/
 public final class EventMessenger
 {
-	private ArrayList<Event<?>> newEvents = new ArrayList<Event<?>>() ;
-	private ArrayList<Event<?>> events = new ArrayList<Event<?>>() ;
+	private List<Event<?>> newEvents = Utility.<Event<?>>newArrayList() ;
+	private List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
 
 	public EventMessenger() {}
 	
@@ -27,7 +29,7 @@ public final class EventMessenger
 		return events.get( _index ) ;
 	}
 	
-	public final ArrayList<Event<?>> getEvents()
+	public final List<Event<?>> getEvents()
 	{
 		return events ;
 	}
@@ -47,7 +49,7 @@ public final class EventMessenger
 	**/
 	public final void refreshEvents()
 	{
-		final ArrayList<Event<?>> oldEvents = events ;
+		final List<Event<?>> oldEvents = events ;
 		oldEvents.clear() ;
 
 		events = newEvents ;

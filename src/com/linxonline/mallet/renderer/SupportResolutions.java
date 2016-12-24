@@ -1,12 +1,13 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.maths.Ratio ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.io.reader.RFReader ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	SupportResolutions allows a developer to inform the Engine what resolutions & aspect-ratios
@@ -18,13 +19,13 @@ import com.linxonline.mallet.util.settings.Settings ;
 **/
 public final class SupportResolutions
 {
-	private final HashMap<String, ArrayList<Vector2>> resolutions = new HashMap<String, ArrayList<Vector2>>() ;
+	private final HashMap<String, List<Vector2>> resolutions = new HashMap<String, List<Vector2>>() ;
 
 	public SupportResolutions() {}
 
 	public boolean loadSupportFile( final String _file )
 	{
-		final ArrayList<Settings> file = RFReader.loadFile( _file ) ;
+		final List<Settings> file = RFReader.loadFile( _file ) ;
 		if( file != null )
 		{
 			parseFile( file ) ;
@@ -38,7 +39,7 @@ public final class SupportResolutions
 	public Vector2 getBestResolution( final Ratio _ratio, final Vector2 _default )
 	{
 		final String ratio = _ratio.toString() ;
-		final ArrayList<Vector2> list = resolutions.get( ratio ) ;
+		final List<Vector2> list = resolutions.get( ratio ) ;
 		if( list != null )
 		{
 			return findBestResolution( list, _default ) ;
@@ -47,7 +48,7 @@ public final class SupportResolutions
 		return _default ;
 	}
 
-	private Vector2 findBestResolution( final ArrayList<Vector2> _resolutions, final Vector2 _default )
+	private Vector2 findBestResolution( final List<Vector2> _resolutions, final Vector2 _default )
 	{
 		final int length = _resolutions.size() ;
 		final Vector2 diff = new Vector2() ;
@@ -69,7 +70,7 @@ public final class SupportResolutions
 		return new Vector2( _default ) ;
 	}
 
-	private void parseFile( final ArrayList<Settings> _settings )
+	private void parseFile( final List<Settings> _settings )
 	{
 		final String TYPE = "TYPE" ;
 		final String DEFAULT = "" ;
@@ -92,7 +93,7 @@ public final class SupportResolutions
 	private void storeResolutions( final Settings _store )
 	{
 		final String[] sResolutions = _store.getString( "RESOLUTIONS", "" ).split( "," ) ;
-		final ArrayList<Vector2> vResolutions = new ArrayList<Vector2>() ;
+		final List<Vector2> vResolutions = Utility.<Vector2>newArrayList() ;
 
 		final String X = "x" ;
 		for( final String sRes : sResolutions )

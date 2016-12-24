@@ -1,10 +1,12 @@
 package com.linxonline.mallet.physics ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 public class Group
 {
-	private final static ArrayList<ID> ids = new ArrayList<ID>() ;
+	private final static List<ID> ids = Utility.<ID>newArrayList() ;
 	static
 	{
 		set( -1, "NO_GROUP", null ) ;

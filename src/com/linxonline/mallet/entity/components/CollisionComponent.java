@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.Event ;
@@ -28,13 +28,13 @@ public class CollisionComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		_events.add( new Event<Hull>( "ADD_COLLISION_HULL", hull ) ) ;
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		_events.add( new Event<Hull>( "REMOVE_COLLISION_HULL", hull ) ) ;
 	}

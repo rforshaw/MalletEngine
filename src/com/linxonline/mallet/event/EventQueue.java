@@ -1,13 +1,15 @@
 package com.linxonline.mallet.event ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 public class EventQueue
 {
 	private final EventType name ;
-	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
-	private final ArrayList<EventFilter> filters = new ArrayList<EventFilter>() ;
-	private final ArrayList<Event<?>> optimisedEvents = new ArrayList<Event<?>>() ;
+	private final List<EventHandler> handlers = Utility.<EventHandler>newArrayList();
+	private final List<EventFilter> filters = Utility.<EventFilter>newArrayList() ;
+	private final List<Event<?>> optimisedEvents = Utility.<Event<?>>newArrayList() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
 	public EventQueue( final EventType _name )
@@ -53,7 +55,7 @@ public class EventQueue
 		}
 		else
 		{
-			final ArrayList<Event<?>> events = messenger.getEvents() ;
+			final List<Event<?>> events = messenger.getEvents() ;
 			final int size = events.size() ;
 			if( size > 0 )
 			{

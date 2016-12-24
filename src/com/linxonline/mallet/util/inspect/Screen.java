@@ -1,7 +1,5 @@
 package com.linxonline.mallet.util.inspect ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.util.sort.QuickSort ;
 
 /**

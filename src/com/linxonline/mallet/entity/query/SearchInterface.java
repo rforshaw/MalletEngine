@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.query ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.util.settings.* ;
@@ -15,7 +15,7 @@ import com.linxonline.mallet.util.settings.* ;
 public interface SearchInterface
 {
 	public Entity queryForEntity( final String _queryName, final Settings _query ) ;
-	public ArrayList<Entity> queryForEntities( final String _queryName, final Settings _query ) ;
+	public List<Entity> queryForEntities( final String _queryName, final Settings _query ) ;
 	
 	public void clear() ;
 }

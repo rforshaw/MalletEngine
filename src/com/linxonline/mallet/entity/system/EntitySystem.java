@@ -1,7 +1,8 @@
 package com.linxonline.mallet.entity.system ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.entity.* ;
@@ -10,7 +11,7 @@ import com.linxonline.mallet.entity.* ;
 	The EntitySystem stores and updates Entities that are being used in the current running Game State.
 	Use the QuerySystem to effeciently search for entities.
 	You can also extends the EntitySystem so it updates certain entities before others, by default
-	it simply stores them all in a massive ArrayList.
+	it simply stores them all in a massive List.
 **/
 public class EntitySystem implements EntitySystemInterface
 {
@@ -19,8 +20,8 @@ public class EntitySystem implements EntitySystemInterface
 	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 
 	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
-	protected final ArrayList<Entity> entitiesToAdd = new ArrayList<Entity>() ;
-	protected final ArrayList<Entity> cleanup = new ArrayList<Entity>() ;
+	protected final List<Entity> entitiesToAdd = Utility.<Entity>newArrayList() ;
+	protected final List<Entity> cleanup = Utility.<Entity>newArrayList() ;
 
 	public EntitySystem( final HookEntity _state )
 	{
@@ -72,7 +73,7 @@ public class EntitySystem implements EntitySystemInterface
 	public void addQuery( final QueryInterface _interface )
 	{
 		querySystem.addQuery( _interface ) ;
-		final ArrayList<Entity> ents = entities.getEntities() ;
+		final List<Entity> ents = entities.getEntities() ;
 		for( final Entity entity : ents )
 		{
 			_interface.addEntity( entity ) ;
@@ -123,7 +124,7 @@ public class EntitySystem implements EntitySystemInterface
 	@Override
 	public void clear()
 	{
-		final ArrayList<Entity> ents = entities.getEntities() ;
+		final List<Entity> ents = entities.getEntities() ;
 		for( final Entity entity : ents )
 		{
 			entity.destroy() ;
@@ -150,9 +151,9 @@ public class EntitySystem implements EntitySystemInterface
 		to the main list.
 	**/
 	@Override
-	public ArrayList<Entity> getEntities()
+	public List<Entity> getEntities()
 	{
-		final ArrayList<Entity> ents = new ArrayList() ;
+		final List<Entity> ents = Utility.<Entity>newArrayList() ;
 		ents.addAll( entities.getEntities() ) ;
 		ents.addAll( entitiesToAdd ) ;
 		return ents ;

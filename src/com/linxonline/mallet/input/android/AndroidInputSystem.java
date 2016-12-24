@@ -8,14 +8,15 @@ import android.view.MotionEvent ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.caches.TimeCache ;
+import com.linxonline.mallet.util.Utility ;
 
 public class AndroidInputSystem implements InputSystemInterface, 
 										   AndroidInputListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private final ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
-	private final ArrayList<InputEvent> touchInputs = new ArrayList<InputEvent>() ;
-	private final ArrayList<InputEvent> keyInputs = new ArrayList<InputEvent>() ;
+	private final List<InputHandler> handlers = Utility.<InputHandler>newArrayList() ;
+	private final List<InputEvent> touchInputs = Utility.<InputEvent>newArrayList() ;
+	private final List<InputEvent> keyInputs = Utility.<InputEvent>newArrayList() ;
 
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;

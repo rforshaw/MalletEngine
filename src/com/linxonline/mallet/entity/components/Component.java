@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.id.ID ;
@@ -91,7 +91,7 @@ public abstract class Component
 		Can also be used for any other events that may need 
 		to be passed when the component is added to the Entity System. 
 	*/
-	public void passInitialEvents( final ArrayList<Event<?>> _events ) {}
+	public void passInitialEvents( final List<Event<?>> _events ) {}
 
 	/**
 		Create events and add them to _events.
@@ -102,7 +102,7 @@ public abstract class Component
 		to be passed when the component is removed from the Entity System.
 		super.passFinalEvents(), must be called.
 	*/
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
 	}

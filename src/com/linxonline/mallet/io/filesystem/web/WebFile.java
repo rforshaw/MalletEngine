@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem.web ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import org.teavm.jso.browser.Window ;
 import org.teavm.jso.dom.html.HTMLBodyElement ;
@@ -15,6 +15,7 @@ import org.teavm.jso.typedarrays.ArrayBuffer ;
 import org.teavm.jso.typedarrays.Int8Array ;
 
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.util.Utility ;
 
 public class WebFile implements FileStream
 {
@@ -152,7 +153,7 @@ public class WebFile implements FileStream
 				int toReadNum = _length ;
 				_callback.start() ;
 
-				final ArrayList<String> strings = new ArrayList<String>() ;
+				final List<String> strings = Utility.<String>newArrayList() ;
 
 				String line = null ;
 				while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )

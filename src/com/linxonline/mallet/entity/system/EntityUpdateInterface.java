@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.system ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import com.linxonline.mallet.entity.* ;
 
 public interface EntityUpdateInterface
@@ -11,6 +11,6 @@ public interface EntityUpdateInterface
 	public void update( final float _dt ) ;
 	public void clear() ;
 
-	public ArrayList<Entity> getEntities() ;
-	public boolean getCleanup( final ArrayList<Entity> _entities ) ;
+	public List<Entity> getEntities() ;
+	public boolean getCleanup( final List<Entity> _entities ) ;
 }

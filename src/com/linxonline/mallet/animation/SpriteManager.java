@@ -1,11 +1,12 @@
 package com.linxonline.mallet.animation ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.io.* ;
 
 import com.linxonline.mallet.io.reader.* ;
 import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.Utility ;
 
 public class SpriteManager extends AbstractManager<Sprite>
 {
@@ -26,7 +27,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 			*/
 			public Sprite load( final String _file, final Settings _settings )
 			{
-				final ArrayList<String> texts = TextReader.getTextAsArray( _file ) ;
+				final List<String> texts = TextReader.getTextAsArray( _file ) ;
 				if( texts.size() == 0 )
 				{
 					return null ;

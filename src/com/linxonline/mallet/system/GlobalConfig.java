@@ -1,6 +1,6 @@
 package com.linxonline.mallet.system ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.util.notification.Notification ;
@@ -131,7 +131,7 @@ public final class GlobalConfig
 		return config.getObject( _name, _default ) ;
 	}
 
-	public static ArrayList<String> toArrayString()
+	public static List<String> toArrayString()
 	{
 		return config.toArrayString() ;
 	}

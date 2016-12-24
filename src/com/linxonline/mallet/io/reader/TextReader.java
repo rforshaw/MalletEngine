@@ -1,8 +1,9 @@
 package com.linxonline.mallet.io.reader ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.util.Utility ;
 
 public class TextReader
 {
@@ -11,7 +12,7 @@ public class TextReader
 	/**
 		Returns an array of strings, one string per line.
 	*/
-	public static ArrayList<String> getTextAsArray( final String _file )
+	public static List<String> getTextAsArray( final String _file )
 	{
 		return readFileToArray( _file ) ;
 	}
@@ -19,7 +20,7 @@ public class TextReader
 	/**
 		Returns an array of strings, one string per line.
 	*/
-	public static ArrayList<String> getTextAsArray( final FileStream _file )
+	public static List<String> getTextAsArray( final FileStream _file )
 	{
 		return readFileToArray( _file ) ;
 	}
@@ -56,21 +57,21 @@ public class TextReader
 		return buffer.toString() ;
 	}
 
-	private static ArrayList<String> readFileToArray( final String _file )
+	private static List<String> readFileToArray( final String _file )
 	{
 		final FileStream file = GlobalFileSystem.getFile( _file ) ;
 		if( file.exists() == false )
 		{
 			System.out.println( "Failed to read file: " + _file ) ;
-			return new ArrayList<String>() ;
+			return Utility.<String>newArrayList() ;
 		}
 
 		return readFileToArray( file ) ;
 	}
 
-	private static ArrayList<String> readFileToArray( final FileStream _file )
+	private static List<String> readFileToArray( final FileStream _file )
 	{
-		final ArrayList<String> lines = new ArrayList<String>() ;
+		final List<String> lines = Utility.<String>newArrayList() ;
 		final StringInStream in = _file.getStringInStream() ;
 		String line = null ;
 

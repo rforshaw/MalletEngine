@@ -1,11 +1,12 @@
 package com.linxonline.mallet.resources ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 import java.util.Set ;
 import java.util.Collection ;
 
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.Utility ;
 
 public abstract class AbstractManager<T extends Resource> implements ManagerInterface<T>
 {
@@ -169,7 +170,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	*/
 	public class AbstractLoader<T extends Resource> implements ResourceLoader<T>
 	{
-		private final ArrayList<ResourceDelegate<T>> loaders = new ArrayList<ResourceDelegate<T>>() ;
+		private final List<ResourceDelegate<T>> loaders = Utility.<ResourceDelegate<T>>newArrayList() ;
 
 		public AbstractLoader() {}
 

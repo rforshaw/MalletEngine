@@ -1,7 +1,7 @@
 package com.linxonline.mallet.input.web ;
 
 import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.List ;
 
 import org.teavm.jso.* ;
 import org.teavm.jso.browser.* ;
@@ -12,17 +12,18 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.util.Utility ;
 
 public class InputSystem implements InputSystemInterface
 {
 	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
-	private final ArrayList<InputHandler> handlers = new ArrayList<InputHandler>() ;
+	private final List<InputHandler> handlers = Utility.<InputHandler>newArrayList() ;
 	private final HashMap<KeyCode, KeyState> keyboardState = new HashMap<KeyCode, KeyState>() ;
-	private final ArrayList<KeyState> activeKeyStates = new ArrayList<KeyState>() ;
+	private final List<KeyState> activeKeyStates = Utility.<KeyState>newArrayList() ;
 
-	private final ArrayList<InputEvent> mouseInputs = new ArrayList<InputEvent>() ;
+	private final List<InputEvent> mouseInputs = Utility.<InputEvent>newArrayList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
 	public InputSystem()

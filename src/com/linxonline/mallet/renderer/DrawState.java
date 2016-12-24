@@ -1,7 +1,8 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.arrays.ManagedArray ;
 
 public class DrawState extends ManagedArray<DrawData>
@@ -17,13 +18,13 @@ public class DrawState extends ManagedArray<DrawData>
 		}
 	}
 
-	public ArrayList<DrawData> getActiveDraws()
+	public List<DrawData> getActiveDraws()
 	{
 		return current ;
 	}
 
 	@Override
-	protected void addNewData( final ArrayList<DrawData> _toAdd )
+	protected void addNewData( final List<DrawData> _toAdd )
 	{
 		for( final DrawData add : _toAdd )
 		{

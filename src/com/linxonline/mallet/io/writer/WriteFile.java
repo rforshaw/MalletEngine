@@ -10,7 +10,7 @@ public final class WriteFile
 	private WriteFile() {}
 
 	/**
-		Writes each String of ArrayList to a new line of txt file.
+		Writes each String of Collection to a new line of txt file.
 	*/
 	public static final boolean write( final String _file, final Collection<String> _list )
 	{

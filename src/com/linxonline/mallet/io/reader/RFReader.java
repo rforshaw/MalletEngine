@@ -1,8 +1,9 @@
 package com.linxonline.mallet.io.reader ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.util.settings.* ;
+import com.linxonline.mallet.util.Utility ;
 
 /**
 	RFReader is a lexical parser of the RF format.
@@ -24,21 +25,21 @@ public abstract class RFReader
 	private static final String firstDelims = "[\n\t]+" ;
 	private static final String secondDelims = " " ;
 
-	private static final ArrayList<String> strip = new ArrayList<String>() ;
+	private static final List<String> strip = Utility.<String>newArrayList() ;
 	private static final StringBuilder buffer = new StringBuilder() ;
 	
 	public RFReader() {}
 
-	public static ArrayList<Settings> loadFile( final String _file )
+	public static List<Settings> loadFile( final String _file )
 	{
-		final ArrayList<String> file = TextReader.getTextAsArray( _file ) ;
-		final ArrayList<String> stripped = stripComments( file ) ;
+		final List<String> file = TextReader.getTextAsArray( _file ) ;
+		final List<String> stripped = stripComments( file ) ;
 
 		boolean openBracket = false ;
 		boolean closedBracket = false ;
 
-		ArrayList<String> block = null ;
-		final ArrayList<ArrayList<String>> blocks = new ArrayList<ArrayList<String>>() ;
+		List<String> block = null ;
+		final List<List<String>> blocks = Utility.<List<String>>newArrayList() ;
 
 		for( final String line : stripped )
 		{
@@ -54,7 +55,7 @@ public abstract class RFReader
 				{
 					openBracket = true ;
 					closedBracket = false ;
-					block = new ArrayList<String>() ;
+					block = Utility.<String>newArrayList() ;
 					continue ;
 				}
 			}
@@ -90,7 +91,7 @@ public abstract class RFReader
 		return parseBlocks( blocks ) ;
 	}
 
-	private static ArrayList<String> stripComments( final ArrayList<String> _file )
+	private static List<String> stripComments( final List<String> _file )
 	{
 		strip.clear() ;
 		final int size = _file.size() ;
@@ -111,10 +112,10 @@ public abstract class RFReader
 		return strip ;
 	}
 	
-	private static ArrayList<Settings> parseBlocks( final ArrayList<ArrayList<String>> _blocks )
+	private static List<Settings> parseBlocks( final List<List<String>> _blocks )
 	{
 		final int blocksSize = _blocks.size() ;
-		final ArrayList<Settings> settings = new ArrayList<Settings>( blocksSize ) ;
+		final List<Settings> settings = Utility.<Settings>newArrayList( blocksSize ) ;
 
 		for( int i = 0; i < blocksSize; ++i )
 		{
@@ -124,7 +125,7 @@ public abstract class RFReader
 		return settings ;
 	}
 
-	private static Settings parseBlock( final ArrayList<String> _block )
+	private static Settings parseBlock( final List<String> _block )
 	{
 		final int blockSize = _block.size() ;
 		String line = null ;

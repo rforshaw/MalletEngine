@@ -1,6 +1,8 @@
 package com.linxonline.mallet.util.sort ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 public final class QuickSort
 {
@@ -11,7 +13,7 @@ public final class QuickSort
 		Used to sort RenderContainers based on their LAYER.
 		-10, -4, 0, 1, 5, 11,
 	*/
-	public static <T extends SortInterface> ArrayList<T> quicksort( final ArrayList<T> _contents )
+	public static <T extends SortInterface> List<T> quicksort( final List<T> _contents )
 	{
 		final int size = _contents.size() ;
 		if( size <= 1 )
@@ -30,7 +32,7 @@ public final class QuickSort
 			return _contents ;
 		}
 
-		final ArrayList<T> array = new ArrayList<T>( size ) ;
+		final List<T> array = Utility.<T>newArrayList( size ) ;
 		for( int i = 0; i < size; ++i )
 		{
 			array.add( _contents[i] ) ;
@@ -39,7 +41,7 @@ public final class QuickSort
 		return sort( array ).toArray( _contents ) ;
 	}
 
-	private static <T extends SortInterface> ArrayList<T> sort( final ArrayList<T> _contents )
+	private static <T extends SortInterface> List<T> sort( final List<T> _contents )
 	{
 		int size = _contents.size() ;
 		final int halfSize = size / 2 ;
@@ -47,8 +49,8 @@ public final class QuickSort
 		final SortInterface pivot = _contents.get( halfSize ) ;
 		_contents.remove( pivot ) ;
 
-		ArrayList<T> less = new ArrayList<T>() ;
-		ArrayList<T> greater = new ArrayList<T>() ;
+		List<T> less = Utility.<T>newArrayList() ;
+		List<T> greater = Utility.<T>newArrayList() ;
 
 		--size ;
 		final int pivotPoint = pivot.sortValue() ;

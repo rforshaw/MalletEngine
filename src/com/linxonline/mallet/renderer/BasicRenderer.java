@@ -1,7 +1,8 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
+import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -72,7 +73,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	{
 		return new DrawDelegate()
 		{
-			private final ArrayList<Draw> data = new ArrayList<Draw>() ;
+			private final List<Draw> data = Utility.<Draw>newArrayList() ;
 
 			@Override
 			public void addTextDraw( final Draw _draw )

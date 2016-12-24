@@ -1,9 +1,10 @@
 package com.linxonline.mallet.entity.query ;
 
 import java.util.HashMap ;
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.* ;
 
 public class HashMapQuery extends Query
@@ -29,9 +30,9 @@ public class HashMapQuery extends Query
 		return null ;
 	}
 
-	public ArrayList<Entity> queryForEntities( final Settings _query )
+	public List<Entity> queryForEntities( final Settings _query )
 	{
-		return new ArrayList<Entity>() ;
+		return Utility.<Entity>newArrayList() ;
 	}
 
 	public void addEntity( final Entity _entity )

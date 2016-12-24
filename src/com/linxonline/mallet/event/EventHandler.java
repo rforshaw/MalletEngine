@@ -1,6 +1,6 @@
 package com.linxonline.mallet.event ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 public interface EventHandler extends EventHandlerMeta
 {
@@ -23,5 +23,5 @@ public interface EventHandler extends EventHandlerMeta
 		Informs the Event System what Event Types
 		this handler wants passed to it.
 	*/
-	public ArrayList<EventType> getWantedEventTypes() ;
+	public List<EventType> getWantedEventTypes() ;
 }

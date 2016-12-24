@@ -1,7 +1,5 @@
 package com.linxonline.mallet.physics ;
 
-import java.util.ArrayList ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 

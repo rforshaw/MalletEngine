@@ -1,10 +1,12 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.ArrayList ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.Utility ;
 
 public class ListenerUnit<T extends BaseListener>
 {
-	private final ArrayList<T> listeners = new ArrayList<T>() ;
+	private final List<T> listeners = Utility.<T>newArrayList() ;
 	private final UIElement parent ;
 
 	public ListenerUnit( final UIElement _parent )
@@ -24,7 +26,7 @@ public class ListenerUnit<T extends BaseListener>
 		}
 	}
 
-	public ArrayList<T> getListeners()
+	public List<T> getListeners()
 	{
 		return listeners ;
 	}

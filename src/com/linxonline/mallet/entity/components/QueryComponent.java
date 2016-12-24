@@ -1,10 +1,11 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.event.* ;
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.settings.* ;
 
 public class QueryComponent extends Component
@@ -22,13 +23,13 @@ public class QueryComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		_events.add( new Event<QueryComponent>( "ADD_GAME_STATE_QUERY", this ) ) ;
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
 		searchInterface = null ;
@@ -44,14 +45,14 @@ public class QueryComponent extends Component
 		return null;
 	}
 
-	public ArrayList<Entity> queryForEntities( final String _queryName, final Settings _query )
+	public List<Entity> queryForEntities( final String _queryName, final Settings _query )
 	{
 		if( searchInterface != null )
 		{
 			return searchInterface.queryForEntities( _queryName, _query ) ;
 		}
 
-		return new ArrayList<Entity>() ;
+		return Utility.<Entity>newArrayList() ;
 	}
 
 }

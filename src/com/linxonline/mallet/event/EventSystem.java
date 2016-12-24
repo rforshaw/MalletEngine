@@ -1,9 +1,10 @@
 package com.linxonline.mallet.event ;
 
 import java.util.Collection ;
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 public final class EventSystem implements EventSystemInterface
@@ -11,11 +12,11 @@ public final class EventSystem implements EventSystemInterface
 	// Replace HashMap with something easier to traverse.
 	private final String name ;
 	private final HashMap<EventType, EventQueue> eventQueues = new HashMap<EventType, EventQueue>() ;
-	private final ArrayList<EventQueue> queues = new ArrayList<EventQueue>() ;
+	private final List<EventQueue> queues = Utility.<EventQueue>newArrayList() ;
 	private final EventQueue allQueue = new EventQueue( Event.ALL_EVENT_TYPES ) ;
 
-	private final ArrayList<EventHandler> handlers = new ArrayList<EventHandler>() ;
-	private final ArrayList<EventHandler> toBeRemoved = new ArrayList<EventHandler>() ;
+	private final List<EventHandler> handlers = Utility.<EventHandler>newArrayList() ;
+	private final List<EventHandler> toBeRemoved = Utility.<EventHandler>newArrayList() ;
 
 	public EventSystem()
 	{
@@ -44,7 +45,7 @@ public final class EventSystem implements EventSystemInterface
 
 		handlers.add( _handler ) ;
 
-		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
+		final List<EventType> types = _handler.getWantedEventTypes() ;
 		if( types.isEmpty() == true || types.contains( Event.ALL_EVENT_TYPES ) == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 
@@ -157,7 +158,7 @@ public final class EventSystem implements EventSystemInterface
 	
 	private void remove( final EventHandler _handler )
 	{
-		final ArrayList<EventType> types = _handler.getWantedEventTypes() ;
+		final List<EventType> types = _handler.getWantedEventTypes() ;
 		if( types.isEmpty() == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 

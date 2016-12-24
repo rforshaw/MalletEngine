@@ -1,7 +1,7 @@
 package com.linxonline.mallet.entity.components ;
 
 import java.util.Collection ;
-import java.util.ArrayList ;
+import java.util.List ;
 import java.util.HashMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
@@ -165,7 +165,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		_events.add( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
 		{

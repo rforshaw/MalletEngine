@@ -1,8 +1,9 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.util.Utility ;
 
 public class Shape
 {
@@ -39,7 +40,7 @@ public class Shape
 			return swivel ;
 		}
 		
-		public static Swivel[] getSwivelByArray( final ArrayList<String> _text )
+		public static Swivel[] getSwivelByArray( final List<String> _text )
 		{
 			final int size = _text.size() ;
 			final Swivel[] swivel = new Swivel[size] ;
@@ -538,7 +539,7 @@ public class Shape
 		final Swivel[] swivel = _shape.getSwivel() ;
 		final Style style = _shape.getStyle() ;
 
-		final ArrayList<Integer> tempIndicies = constructTriangulatedIndex( _shape ) ;
+		final List<Integer> tempIndicies = constructTriangulatedIndex( _shape ) ;
 		final int indexSize = tempIndicies.size() ;
 		final int vertexSize = _shape.getVertexSize() ;
 
@@ -563,18 +564,18 @@ public class Shape
 		the points stored in _shape.points.
 		The point and colour array are not modified.
 	*/
-	private static ArrayList<Integer> constructTriangulatedIndex( final Shape _shape )
+	private static List<Integer> constructTriangulatedIndex( final Shape _shape )
 	{
 		final Swivel[] swivel = _shape.getSwivel() ;
 	
 		final int indexSize = _shape.getIndexSize() ;
-		final ArrayList<Integer> indicies = new ArrayList<Integer>( indexSize ) ;
+		final List<Integer> indicies = Utility.<Integer>newArrayList( indexSize ) ;
 		for( int i = 0; i < indexSize; i++ )
 		{
 			indicies.add( _shape.getIndex( i ) ) ;
 		}
 
-		final ArrayList<Integer> newIndicies = new ArrayList<Integer>() ;
+		final List<Integer> newIndicies = Utility.<Integer>newArrayList()  ;
 		final int swivelPointIndex = Swivel.getSwivelPointIndex( swivel ) ;
 		int size = indicies.size() ;
 
@@ -628,7 +629,7 @@ public class Shape
 											final Vector3 _current,
 											final Vector3 _previous,
 											final Vector3 _next,
-											final ArrayList<Integer> _indicies,
+											final List<Integer> _indicies,
 											final Shape _shape )
 	{
 		final Swivel[] swivel = _shape.getSwivel() ;

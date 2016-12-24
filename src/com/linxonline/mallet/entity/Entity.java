@@ -1,10 +1,11 @@
 package com.linxonline.mallet.entity ;
 
 import java.util.Collection ;
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.entity.components.Component ;
 
+import com.linxonline.mallet.util.Utility ;
 import com.linxonline.mallet.util.id.ID ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
@@ -23,7 +24,7 @@ import com.linxonline.mallet.event.* ;
 **/
 public final class Entity
 {
-	private final ArrayList<Component> components = new ArrayList<Component>() ;
+	private final List<Component> components = Utility.<Component>newArrayList() ;
 	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
 	public final ID id ;							// Unique ID for this Entity: Name:Family
@@ -83,7 +84,7 @@ public final class Entity
 		eventSystem.removeEventHandler( controller ) ;
 	}
 
-	public final void removeComponents( final ArrayList<Component> _components )
+	public final void removeComponents( final List<Component> _components )
 	{
 		for( final Component component : _components )
 		{
@@ -153,7 +154,7 @@ public final class Entity
 	/**
 		Return all the components with the designated name
 	**/
-	public final int getComponentsByName( final String _name, final ArrayList<Component> _components )
+	public final int getComponentsByName( final String _name, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -169,7 +170,7 @@ public final class Entity
 	/**
 		Return all the components with the designated nameID
 	**/
-	public final int getComponentsByNameID( final int _nameID, final ArrayList<Component> _components )
+	public final int getComponentsByNameID( final int _nameID, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -184,9 +185,9 @@ public final class Entity
 
 	/**
 		Get the Components that have the same Group name and return them in 
-		an ArrayList.
+		a List.
 	**/
-	public final int getComponentByGroup( final String _group, final ArrayList<Component> _components )
+	public final int getComponentByGroup( final String _group, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -201,10 +202,10 @@ public final class Entity
 
 	/**
 		Get the Components that have the same Group name and return them in 
-		an ArrayList.
-		NOTE: A new ArrayList is created each time this function is called.
+		a List.
+		NOTE: A new List is created each time this function is called.
 	**/
-	public final int getComponentByGroupID( final int _groupID, final ArrayList<Component> _components )
+	public final int getComponentByGroupID( final int _groupID, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -218,10 +219,10 @@ public final class Entity
 	}
 
 	/**
-		Returns the ArrayList that contains all the Entity's Components.
-		NOTE: the ArrayList is NOT a copy.
+		Returns the List that contains all the Entity's Components.
+		NOTE: the List is NOT a copy.
 	**/
-	public final int getAllComponents( final ArrayList<Component> _components )
+	public final int getAllComponents( final List<Component> _components )
 	{
 		_components.addAll( components ) ;
 		return _components.size() ;
@@ -244,7 +245,7 @@ public final class Entity
 	{
 		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
 		{
-			private final ArrayList<Component> toDestroy = new ArrayList<Component>( components ) ;
+			private final List<Component> toDestroy = Utility.<Component>newArrayList() ;
 
 			public void ready( final Component _component )
 			{
@@ -272,7 +273,7 @@ public final class Entity
 	**/
 	public void clear()
 	{
-		final ArrayList<Component> comps = new ArrayList<Component>( components ) ;
+		final List<Component> comps = Utility.<Component>newArrayList() ;
 		removeComponents( comps ) ;
 
 		comps.clear() ;

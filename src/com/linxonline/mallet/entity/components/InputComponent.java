@@ -1,6 +1,6 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -50,7 +50,7 @@ public abstract class InputComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final ArrayList<Event<?>> _events )
+	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		Event<InputHandler> event ;
 		switch( mode )
@@ -63,7 +63,7 @@ public abstract class InputComponent extends Component
 	}
 
 	@Override
-	public void passFinalEvents( final ArrayList<Event<?>> _events )
+	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
 		switch( mode )

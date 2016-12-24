@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.ArrayList ;
+import java.util.List ;
 
 import com.linxonline.mallet.util.arrays.ManagedArray ;
 
@@ -148,7 +148,7 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 	}
 
 	@Override
-	protected void addNewData( final ArrayList<T> _toAdd )
+	protected void addNewData( final List<T> _toAdd )
 	{
 		for( final T add : _toAdd )
 		{
