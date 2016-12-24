@@ -1,6 +1,8 @@
 package com.linxonline.mallet.util.locks ;
 
-import java.util.HashMap ;
+import java.util.Map ;
+
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	Allows you to create a Lock that has global access.
@@ -10,7 +12,7 @@ import java.util.HashMap ;
 public class Locks
 {
 	private static Locks instance = null ;
-	private final HashMap<String, LockInterface> locks = new HashMap<String, LockInterface>() ;
+	private final Map<String, LockInterface> locks = MalletMap.<String, LockInterface>newMap() ;
 
 	private Locks() {}
 

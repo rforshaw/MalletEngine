@@ -6,11 +6,11 @@ import java.io.IOException ;
 
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class OGG
 {
-	public final List<Page> pages = Utility.<Page>newArrayList() ;
+	public final List<Page> pages = MalletList.<Page>newList() ;
 
 	public static OGG readOGG( final String _file )
 	{

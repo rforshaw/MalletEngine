@@ -2,13 +2,13 @@ package com.linxonline.mallet.entity.system ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.entity.* ;
 
 public class DefaultSTUpdate implements EntityUpdateInterface
 {
-	protected final List<Entity> entities = Utility.<Entity>newArrayList() ;		// Entities that are active
-	protected final List<Entity> cleanup = Utility.<Entity>newArrayList() ;		// Entities that need to be removed
+	protected final List<Entity> entities = MalletList.<Entity>newList() ;		// Entities that are active
+	protected final List<Entity> cleanup = MalletList.<Entity>newList() ;		// Entities that need to be removed
 
 	public DefaultSTUpdate() {}
 	

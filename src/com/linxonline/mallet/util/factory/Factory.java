@@ -1,6 +1,8 @@
 package com.linxonline.mallet.util.factory ;
 
-import java.util.HashMap ;
+import java.util.Map ;
+
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 /**
@@ -8,7 +10,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 **/
 public class Factory<T, U> implements FactoryInterface<T, U>
 {
-	protected final HashMap<String, CreatorInterface<T, U>> creators = new HashMap<String, CreatorInterface<T, U>>() ;
+	protected final Map<String, CreatorInterface<T, U>> creators = MalletMap.<String, CreatorInterface<T, U>>newMap() ;
 
 	@Override
 	public void addCreator( final CreatorInterface<T, U> _creator )

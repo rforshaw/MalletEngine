@@ -1,8 +1,9 @@
 package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.animation.AnimationDelegateCallback ;
 import com.linxonline.mallet.animation.AnimationDelegate ;
@@ -15,7 +16,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 {
 	private static final int ANIM_NOT_SET = -1 ;
 
-	private final HashMap<String, Anim> animations = new HashMap<String, Anim>() ;
+	private final Map<String, Anim> animations = MalletMap.<String, Anim>newMap() ;
 
 	private String defaultAnim = null ;					// Name of the default animation, used as a fallback if all else fails.
 	private Anim currentAnim   = null ;					// Name of the current animation that is playing

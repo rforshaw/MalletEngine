@@ -2,7 +2,7 @@ package com.linxonline.mallet.input ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Accumulate InputEvents until it is appropriate to 
@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.Utility ;
 **/
 public abstract class InputController implements InputHandler
 {
-	private final List<InputEvent> inputs = Utility.<InputEvent>newArrayList() ;
+	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 
 	public InputController() {}
 

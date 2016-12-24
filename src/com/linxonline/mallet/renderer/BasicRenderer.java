@@ -73,7 +73,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	{
 		return new DrawDelegate()
 		{
-			private final List<Draw> data = Utility.<Draw>newArrayList() ;
+			private final List<Draw> data = MalletList.<Draw>newList() ;
 
 			@Override
 			public void addTextDraw( final Draw _draw )

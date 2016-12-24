@@ -1,13 +1,14 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
 import com.linxonline.mallet.maths.Ratio ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.io.reader.RFReader ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	SupportResolutions allows a developer to inform the Engine what resolutions & aspect-ratios
@@ -19,7 +20,7 @@ import com.linxonline.mallet.util.Utility ;
 **/
 public final class SupportResolutions
 {
-	private final HashMap<String, List<Vector2>> resolutions = new HashMap<String, List<Vector2>>() ;
+	private final Map<String, List<Vector2>> resolutions = MalletMap.<String, List<Vector2>>newMap() ;
 
 	public SupportResolutions() {}
 
@@ -93,7 +94,7 @@ public final class SupportResolutions
 	private void storeResolutions( final Settings _store )
 	{
 		final String[] sResolutions = _store.getString( "RESOLUTIONS", "" ).split( "," ) ;
-		final List<Vector2> vResolutions = Utility.<Vector2>newArrayList() ;
+		final List<Vector2> vResolutions = MalletList.<Vector2>newList() ;
 
 		final String X = "x" ;
 		for( final String sRes : sResolutions )

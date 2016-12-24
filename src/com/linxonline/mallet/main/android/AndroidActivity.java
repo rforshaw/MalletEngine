@@ -28,12 +28,12 @@ import com.linxonline.mallet.system.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.input.android.AndroidInputListener ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class AndroidActivity extends Activity
 							implements EventHandler
 {
-	private final List<AndroidInputListener> inputListeners = Utility.<AndroidInputListener>newArrayList() ;
+	private final List<AndroidInputListener> inputListeners = MalletList.<AndroidInputListener>newList() ;
 	private final Notify<Object> startGame = new Notify<Object>()
 	{
 		public void inform( final Object _noData )
@@ -166,7 +166,7 @@ public class AndroidActivity extends Activity
 	@Override
 	public List<EventType> getWantedEventTypes()
 	{
-		final List<EventType> types = Utility.<EventType>newArrayList() ;
+		final List<EventType> types = MalletList.<EventType>newList() ;
 		types.add( Event.ALL_EVENT_TYPES ) ;
 		return types ;
 	}

@@ -7,7 +7,8 @@ import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.io.formats.json.desktop.* ;
 
@@ -17,7 +18,7 @@ import com.linxonline.mallet.io.formats.json.desktop.* ;
 */
 public class DesktopFileSystem implements FileSystem
 {
-	private final HashMap<String, ZipPath> mapZip = new HashMap<String, ZipPath>() ;
+	private final Map<String, ZipPath> mapZip = MalletMap.<String, ZipPath>newMap() ;
 
 	public DesktopFileSystem()
 	{
@@ -76,7 +77,7 @@ public class DesktopFileSystem implements FileSystem
 		final String zipName = _file.getName() ;
 		final String zipPath = _file.getParent() ;
 
-		final List<ZipPath> paths = Utility.<ZipPath>newArrayList();
+		final List<ZipPath> paths = MalletList.<ZipPath>newList();
 
 		try
 		{

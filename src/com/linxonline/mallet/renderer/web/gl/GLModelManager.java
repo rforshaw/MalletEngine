@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.util.HashMap ;
 import java.nio.* ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;

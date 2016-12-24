@@ -2,14 +2,14 @@ package com.linxonline.mallet.event ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class EventQueue
 {
 	private final EventType name ;
-	private final List<EventHandler> handlers = Utility.<EventHandler>newArrayList();
-	private final List<EventFilter> filters = Utility.<EventFilter>newArrayList() ;
-	private final List<Event<?>> optimisedEvents = Utility.<Event<?>>newArrayList() ;
+	private final List<EventHandler> handlers = MalletList.<EventHandler>newList();
+	private final List<EventFilter> filters = MalletList.<EventFilter>newList() ;
+	private final List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
 	public EventQueue( final EventType _name )

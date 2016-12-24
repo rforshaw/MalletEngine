@@ -1,11 +1,12 @@
 package com.linxonline.mallet.entity.query ;
 
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Collection ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
@@ -18,9 +19,9 @@ import com.linxonline.mallet.util.settings.* ;
 public class QuerySystem implements SearchInterface
 {
 	/**
-		HashMap horribly slow to iterate over, possibly replace with a tree structure?
+		Map horribly slow to iterate over, possibly replace with a tree structure?
 	**/
-	protected final HashMap<String, QueryInterface> queryInterfaces = new HashMap<String, QueryInterface>() ;
+	protected final Map<String, QueryInterface> queryInterfaces = MalletMap.<String, QueryInterface>newMap() ;
 
 	public void addQuery( final QueryInterface _interface )
 	{
@@ -56,7 +57,7 @@ public class QuerySystem implements SearchInterface
 			return queryInterfaces.get( _queryName ).queryForEntities( _query ) ;
 		}
 
-		return Utility.<Entity>newArrayList() ;
+		return MalletList.<Entity>newList() ;
 	}
 
 	public void addEntity( final Entity _entity )

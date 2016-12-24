@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
 public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
@@ -16,7 +16,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	private World world = null ;		// Store the handler to the worldspace this data is associated with
 
-	private final List<MalletTexture> textures = Utility.<MalletTexture>newArrayList() ;
+	private final List<MalletTexture> textures = MalletList.<MalletTexture>newList() ;
 	private MalletColour colour = null ;
 	private MalletFont font = null ;
 	private StringBuilder text = null ;

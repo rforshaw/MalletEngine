@@ -36,7 +36,7 @@ import com.linxonline.mallet.animation.* ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.locks.Locks ;
 
@@ -228,10 +228,10 @@ public class GameState extends State implements HookEntity
 	*/
 	public void hookEntity( final Entity _entity )
 	{
-		final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
+		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 		{
 			// Retrieve component system-registering events.
-			final List<Component> entityComponents = Utility.<Component>newArrayList() ;
+			final List<Component> entityComponents = MalletList.<Component>newList() ;
 			final int size = _entity.getAllComponents( entityComponents ) ;
 			for( int i = 0; i < size; ++i )
 			{
@@ -256,11 +256,11 @@ public class GameState extends State implements HookEntity
 	*/
 	public void unhookEntity( final Entity _entity )
 	{
-		final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
+		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 		{
 			// Retrieve component system-registering events.
 			Component component = null ;
-			final List<Component> entityComponents = Utility.<Component>newArrayList() ;
+			final List<Component> entityComponents = MalletList.<Component>newList() ;
 			final int size = _entity.getAllComponents( entityComponents ) ;
 			for( int i = 0; i < size; ++i )
 			{

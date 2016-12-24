@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 import javax.media.opengl.* ;
 
 import com.linxonline.mallet.renderer.ProgramMap ;
@@ -337,7 +337,7 @@ public class GLProgram extends Resource
 		Ensure that the Mallet Program maps correctly with 
 		the GL Program it is apparently associated with.
 	*/
-	public boolean isValidMap( final HashMap<String, Object> _map )
+	public boolean isValidMap( final Map<String, Object> _map )
 	{
 		final int size = uniforms.size() ;
 		final int diff = _map.size() - size ;

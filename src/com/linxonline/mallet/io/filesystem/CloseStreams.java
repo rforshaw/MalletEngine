@@ -2,7 +2,7 @@ package com.linxonline.mallet.io.filesystem ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Should be used by StringInStream, StringOutStream, 
@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.Utility ;
 */
 public class CloseStreams implements Close
 {
-	private final List<Close> toClose = Utility.<Close>newArrayList() ;
+	private final List<Close> toClose = MalletList.<Close>newList() ;
 
 	public CloseStreams() {}
 

@@ -1,13 +1,13 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
 import android.opengl.GLES30 ;
 
 import com.linxonline.mallet.renderer.ProgramMap ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -339,7 +339,7 @@ public class GLProgram extends Resource
 		Ensure that the Mallet Program maps correctly with 
 		the GL Program it is apparently associated with.
 	*/
-	public boolean isValidMap( final HashMap<String, Object> _map )
+	public boolean isValidMap( final Map<String, Object> _map )
 	{
 		final int size = uniforms.size() ;
 		final int diff = _map.size() - size ;

@@ -1,9 +1,10 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.Set ;
-import java.util.HashMap ;
+import java.util.Map ;
 
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	Program Data is render implentation agnostic. 
@@ -18,7 +19,7 @@ import com.linxonline.mallet.maths.* ;
 public class ProgramMap<U> implements Program<ProgramMap>
 {
 	private final String id ;
-	private final HashMap<String, Object> uniforms = new HashMap<String, Object>() ;
+	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
 
 	private U program ;			// Handler to renderer specific program.
 
@@ -69,7 +70,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 		return _clazz.cast( get( _id ) ) ;
 	}
 
-	public HashMap<String, Object> getMaps()
+	public Map<String, Object> getMaps()
 	{
 		return uniforms ;
 	}
@@ -95,7 +96,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 				return false ;
 			}
 
-			final HashMap<String, Object> u = program.getMaps() ;
+			final Map<String, Object> u = program.getMaps() ;
 			if( uniforms.size() != u.size() )
 			{
 				// If the hashmaps are not the same size then 

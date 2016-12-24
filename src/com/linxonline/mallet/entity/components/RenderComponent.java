@@ -8,12 +8,12 @@ import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class RenderComponent extends Component
 {
-	private final List<Draw> toAddBasic = Utility.<Draw>newArrayList() ;
-	private final List<Draw> toAddText = Utility.<Draw>newArrayList() ;
+	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
+	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
 
 	private DrawDelegate drawDelegate = null ;
 	private Component.ReadyCallback toDestroy = null ;

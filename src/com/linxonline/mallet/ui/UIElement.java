@@ -2,7 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -13,7 +13,7 @@ public class UIElement implements InputHandler
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;
 
 	private final ListenerUnit<BaseListener> listeners = new ListenerUnit<BaseListener>( this ) ;
-	private final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
+	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 	private InputAdapterInterface adapter = null ;
 
 	private State current = State.NEUTRAL ;

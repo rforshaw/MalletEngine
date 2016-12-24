@@ -1,13 +1,14 @@
 package com.linxonline.mallet.animation ; 
 
-import java.util.HashMap ;
+import java.util.Map ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.util.MalletMap ;
 
 public class Skeleton2
 {
 	private Bone2 root = null ;
-	private final HashMap<String, Bone2> bones = new HashMap<String, Bone2>() ;
+	private final Map<String, Bone2> bones = MalletMap.<String, Bone2>newMap() ;
 
 	public Skeleton2() {}
 
@@ -44,7 +45,7 @@ public class Skeleton2
 		}
 	}
 	
-	// Go through all the bones and add them to the HashMap
+	// Go through all the bones and add them to the Map
 	private void addBones( final Bone2 _bone )
 	{
 		// Reached the end of a branch

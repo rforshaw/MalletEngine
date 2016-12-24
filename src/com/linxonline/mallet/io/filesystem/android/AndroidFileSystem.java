@@ -9,7 +9,8 @@ import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.io.formats.json.android.* ;
 
@@ -19,8 +20,8 @@ import com.linxonline.mallet.io.formats.json.android.* ;
 */
 public class AndroidFileSystem implements FileSystem
 {
-	private final HashMap<String, ZipPath> mapZip = new HashMap<String, ZipPath>() ;
-	private final HashMap<String, String> mapAssets = new HashMap<String, String>() ;
+	private final Map<String, ZipPath> mapZip = MalletMap.<String, ZipPath>newMap() ;
+	private final Map<String, String> mapAssets = MalletMap.<String, String>newMap() ;
 
 	private final Context context ;
 	private final AssetManager assetManager ;
@@ -110,7 +111,7 @@ public class AndroidFileSystem implements FileSystem
 		final String zipName = file.getName() ;
 		final String zipPath = file.getParent() ;
 
-		final List<ZipPath> paths = Utility.<ZipPath>newArrayList() ;
+		final List<ZipPath> paths = MalletList.<ZipPath>newList() ;
 
 		try
 		{

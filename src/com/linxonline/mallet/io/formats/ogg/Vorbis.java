@@ -4,7 +4,7 @@ import java.util.List ;
 import java.lang.Exception ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Vorbis integer variables are stored in little endian.
@@ -21,7 +21,7 @@ public class Vorbis
 	
 	private final static int UNUSED = -1 ;
 	
-	private List<VorbisHeader> headers = Utility.<VorbisHeader>newArrayList() ;
+	private List<VorbisHeader> headers = MalletList.<VorbisHeader>newList() ;
 
 	private int version = -1 ;
 	private byte audioChannels = 0 ;
@@ -33,10 +33,10 @@ public class Vorbis
 	private int blocksize1 = 0 ;
 
 	private String vendor = null ;
-	private final List<String> statements = Utility.<String>newArrayList() ;
+	private final List<String> statements = MalletList.<String>newList() ;
 
-	private final List<CodebookConfiguration> codebooks = Utility.<CodebookConfiguration>newArrayList() ;
-	private final List<FloorConfiguration> floors = Utility.<FloorConfiguration>newArrayList() ;
+	private final List<CodebookConfiguration> codebooks = MalletList.<CodebookConfiguration>newList() ;
+	private final List<FloorConfiguration> floors = MalletList.<FloorConfiguration>newList() ;
 
 	public Vorbis() {}
 

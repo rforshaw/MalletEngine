@@ -2,7 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -10,7 +10,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 public final class Sprite extends Resource
 {
 	public final int framerate ;
-	public final List<Sprite.Frame> frames = Utility.<Sprite.Frame>newArrayList()  ;
+	public final List<Sprite.Frame> frames = MalletList.<Sprite.Frame>newList()  ;
 
 	public Sprite()
 	{

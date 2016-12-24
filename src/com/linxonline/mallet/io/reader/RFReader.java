@@ -3,7 +3,7 @@ package com.linxonline.mallet.io.reader ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	RFReader is a lexical parser of the RF format.
@@ -25,7 +25,7 @@ public abstract class RFReader
 	private static final String firstDelims = "[\n\t]+" ;
 	private static final String secondDelims = " " ;
 
-	private static final List<String> strip = Utility.<String>newArrayList() ;
+	private static final List<String> strip = MalletList.<String>newList() ;
 	private static final StringBuilder buffer = new StringBuilder() ;
 	
 	public RFReader() {}
@@ -39,7 +39,7 @@ public abstract class RFReader
 		boolean closedBracket = false ;
 
 		List<String> block = null ;
-		final List<List<String>> blocks = Utility.<List<String>>newArrayList() ;
+		final List<List<String>> blocks = MalletList.<List<String>>newList() ;
 
 		for( final String line : stripped )
 		{
@@ -55,7 +55,7 @@ public abstract class RFReader
 				{
 					openBracket = true ;
 					closedBracket = false ;
-					block = Utility.<String>newArrayList() ;
+					block = MalletList.<String>newList() ;
 					continue ;
 				}
 			}
@@ -115,7 +115,7 @@ public abstract class RFReader
 	private static List<Settings> parseBlocks( final List<List<String>> _blocks )
 	{
 		final int blocksSize = _blocks.size() ;
-		final List<Settings> settings = Utility.<Settings>newArrayList( blocksSize ) ;
+		final List<Settings> settings = MalletList.<Settings>newList( blocksSize ) ;
 
 		for( int i = 0; i < blocksSize; ++i )
 		{

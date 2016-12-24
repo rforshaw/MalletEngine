@@ -1,17 +1,18 @@
 package com.linxonline.mallet.entity.query ;
 
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
 public class HashMapQuery extends Query
 {
 	public final static String NAME = "NAME" ;
 
-	private final HashMap<String, Entity> entities = new HashMap<String, Entity>() ;
+	private final Map<String, Entity> entities = MalletMap.<String, Entity>newMap() ;
 
 	public HashMapQuery( final String _name )
 	{
@@ -32,7 +33,7 @@ public class HashMapQuery extends Query
 
 	public List<Entity> queryForEntities( final Settings _query )
 	{
-		return Utility.<Entity>newArrayList() ;
+		return MalletList.<Entity>newList() ;
 	}
 
 	public void addEntity( final Entity _entity )

@@ -2,7 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
 
@@ -16,7 +16,7 @@ import com.linxonline.mallet.renderer.Shape ;
 
 public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 {
-	private final List<SourceCallback> callbacks = Utility.<SourceCallback>newArrayList() ;
+	private final List<SourceCallback> callbacks = MalletList.<SourceCallback>newList() ;
 	private String file   = null ;
 	private Draw draw     = null ;
 	private World world   = null ;

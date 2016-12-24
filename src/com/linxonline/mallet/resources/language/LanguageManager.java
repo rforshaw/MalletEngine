@@ -1,10 +1,11 @@
 package com.linxonline.mallet.resources.language ;
 
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.List ;
 import java.io.* ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.io.reader.* ;
 
 /*====================================================*/
@@ -13,9 +14,9 @@ import com.linxonline.mallet.io.reader.* ;
 /*====================================================*/
 public class LanguageManager
 {
-	private final HashMap<String, String> strings = new HashMap<String, String>() ;
+	private final Map<String, String> strings = MalletMap.<String, String>newMap() ;
 	private String languageFolder = "en" ;
-	private final List<String> filesLoaded = Utility.<String>newArrayList() ;
+	private final List<String> filesLoaded = MalletList.<String>newList() ;
 
 	public LanguageManager() {}
 

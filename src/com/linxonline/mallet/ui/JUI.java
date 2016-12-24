@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.HashMap ;
+import java.util.Map ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
@@ -10,6 +10,7 @@ import com.linxonline.mallet.io.formats.json.JSONArray ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -21,7 +22,7 @@ import com.linxonline.mallet.renderer.MalletFont ;
 */
 public class JUI
 {
-	private final static HashMap<String, Generator> creators = new HashMap<String, Generator>() ;
+	private final static Map<String, Generator> creators = MalletMap.<String, Generator>newMap() ;
 	static
 	{
 		creators.put( "UIELEMENT", new Generator()
@@ -175,7 +176,7 @@ public class JUI
 		creators.put( _id, _create ) ;
 	}
 
-	private final HashMap<String, UIElement> lookup = new HashMap<String, UIElement>() ;
+	private final Map<String, UIElement> lookup = MalletMap.<String, UIElement>newMap() ;
 	private final UIElement parent ;
 
 	private JUI( final JSONObject _map )

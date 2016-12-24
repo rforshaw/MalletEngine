@@ -2,7 +2,7 @@ package com.linxonline.mallet.util.arrays ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Objects are only added to current state when 
@@ -15,9 +15,9 @@ public abstract class ManagedArray<T>
 		public void remove( final Object _data ) {}
 	} ;
 
-	protected final List<T> toAdd = Utility.<T>newArrayList() ;
-	protected final List<T> toRemove = Utility.<T>newArrayList() ;
-	protected final List<T> current = Utility.<T>newArrayList() ;
+	protected final List<T> toAdd = MalletList.<T>newList() ;
+	protected final List<T> toRemove = MalletList.<T>newList() ;
+	protected final List<T> current = MalletList.<T>newList() ;
 
 	protected RemoveDelegate removeDelegate = FALLBACK ;
 
@@ -52,7 +52,7 @@ public abstract class ManagedArray<T>
 
 	public List<T> getNewState()
 	{
-		final List<T> state = Utility.<T>newArrayList() ;
+		final List<T> state = MalletList.<T>newList() ;
 		state.addAll( current ) ;
 		state.addAll( toAdd ) ;
 		return state ;

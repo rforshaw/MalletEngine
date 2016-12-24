@@ -5,7 +5,7 @@ import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public final class ReadFile
 {
@@ -72,7 +72,7 @@ public final class ReadFile
 		{
 			callback.start() ;
 
-			final List<String> strings = Utility.<String>newArrayList() ;
+			final List<String> strings = MalletList.<String>newList() ;
 
 			String line = null ;
 			while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )

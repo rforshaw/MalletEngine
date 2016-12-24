@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class Shape
 {
@@ -569,13 +569,13 @@ public class Shape
 		final Swivel[] swivel = _shape.getSwivel() ;
 	
 		final int indexSize = _shape.getIndexSize() ;
-		final List<Integer> indicies = Utility.<Integer>newArrayList( indexSize ) ;
+		final List<Integer> indicies = MalletList.<Integer>newList( indexSize ) ;
 		for( int i = 0; i < indexSize; i++ )
 		{
 			indicies.add( _shape.getIndex( i ) ) ;
 		}
 
-		final List<Integer> newIndicies = Utility.<Integer>newArrayList()  ;
+		final List<Integer> newIndicies = MalletList.<Integer>newList()  ;
 		final int swivelPointIndex = Swivel.getSwivelPointIndex( swivel ) ;
 		int size = indicies.size() ;
 

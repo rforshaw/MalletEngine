@@ -6,7 +6,7 @@ import java.util.List ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.io.writer.WriteFile ;
 
@@ -22,7 +22,7 @@ public class ConfigWriter
 	public static boolean write( final FileStream _stream, final Settings _config )
 	{
 		final Collection<VariableInterface> variables = _config.toArray() ;
-		final List<String> list = Utility.<String>newArrayList( variables.size() ) ;
+		final List<String> list = MalletList.<String>newList( variables.size() ) ;
 		final StringBuilder buffer = new StringBuilder() ;
 
 		for( final VariableInterface variable : variables )

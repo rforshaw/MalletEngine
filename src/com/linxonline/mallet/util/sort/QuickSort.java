@@ -2,7 +2,7 @@ package com.linxonline.mallet.util.sort ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public final class QuickSort
 {
@@ -32,7 +32,7 @@ public final class QuickSort
 			return _contents ;
 		}
 
-		final List<T> array = Utility.<T>newArrayList( size ) ;
+		final List<T> array = MalletList.<T>newList( size ) ;
 		for( int i = 0; i < size; ++i )
 		{
 			array.add( _contents[i] ) ;
@@ -49,8 +49,8 @@ public final class QuickSort
 		final SortInterface pivot = _contents.get( halfSize ) ;
 		_contents.remove( pivot ) ;
 
-		List<T> less = Utility.<T>newArrayList() ;
-		List<T> greater = Utility.<T>newArrayList() ;
+		List<T> less = MalletList.<T>newList() ;
+		List<T> greater = MalletList.<T>newList() ;
 
 		--size ;
 		final int pivotPoint = pivot.sortValue() ;

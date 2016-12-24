@@ -2,7 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 
@@ -12,8 +12,8 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final List<UIElement> ordered = Utility.<UIElement>newArrayList() ;
-	private final List<UIElement> toRemove = Utility.<UIElement>newArrayList() ;
+	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
+	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;
 	private final UIElementUpdater updater ;
 
 	public UILayout( final Type _type )

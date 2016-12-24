@@ -1,11 +1,12 @@
 package com.linxonline.mallet.system ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	Provides global access to system settings.
@@ -16,7 +17,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 **/
 public final class GlobalConfig
 {
-	private static HashMap<String, Notification<String>> listeners = new HashMap<String, Notification<String>>() ;
+	private static Map<String, Notification<String>> listeners = MalletMap.<String, Notification<String>>newMap() ;
 	private static Settings config = new Settings() ;
 
 	private GlobalConfig() {}

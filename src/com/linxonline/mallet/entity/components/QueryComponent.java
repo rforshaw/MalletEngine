@@ -5,7 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
 public class QueryComponent extends Component
@@ -52,7 +52,7 @@ public class QueryComponent extends Component
 			return searchInterface.queryForEntities( _queryName, _query ) ;
 		}
 
-		return Utility.<Entity>newArrayList() ;
+		return MalletList.<Entity>newList() ;
 	}
 
 }

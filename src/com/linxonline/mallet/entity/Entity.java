@@ -5,7 +5,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.entity.components.Component ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.id.ID ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
@@ -24,7 +24,7 @@ import com.linxonline.mallet.event.* ;
 **/
 public final class Entity
 {
-	private final List<Component> components = Utility.<Component>newArrayList() ;
+	private final List<Component> components = MalletList.<Component>newList() ;
 	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
 	public final ID id ;							// Unique ID for this Entity: Name:Family
@@ -245,7 +245,7 @@ public final class Entity
 	{
 		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
 		{
-			private final List<Component> toDestroy = Utility.<Component>newArrayList() ;
+			private final List<Component> toDestroy = MalletList.<Component>newList() ;
 
 			public void ready( final Component _component )
 			{
@@ -273,7 +273,7 @@ public final class Entity
 	**/
 	public void clear()
 	{
-		final List<Component> comps = Utility.<Component>newArrayList() ;
+		final List<Component> comps = MalletList.<Component>newList() ;
 		removeComponents( comps ) ;
 
 		comps.clear() ;

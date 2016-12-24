@@ -3,7 +3,7 @@ package com.linxonline.mallet.io.reader ;
 import java.util.List ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class TextReader
 {
@@ -63,7 +63,7 @@ public class TextReader
 		if( file.exists() == false )
 		{
 			System.out.println( "Failed to read file: " + _file ) ;
-			return Utility.<String>newArrayList() ;
+			return MalletList.<String>newList() ;
 		}
 
 		return readFileToArray( file ) ;
@@ -71,7 +71,7 @@ public class TextReader
 
 	private static List<String> readFileToArray( final FileStream _file )
 	{
-		final List<String> lines = Utility.<String>newArrayList() ;
+		final List<String> lines = MalletList.<String>newList() ;
 		final StringInStream in = _file.getStringInStream() ;
 		String line = null ;
 

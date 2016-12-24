@@ -15,7 +15,7 @@ import org.teavm.jso.typedarrays.ArrayBuffer ;
 import org.teavm.jso.typedarrays.Int8Array ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class WebFile implements FileStream
 {
@@ -153,7 +153,7 @@ public class WebFile implements FileStream
 				int toReadNum = _length ;
 				_callback.start() ;
 
-				final List<String> strings = Utility.<String>newArrayList() ;
+				final List<String> strings = MalletList.<String>newList() ;
 
 				String line = null ;
 				while( ( ( line = stream.readLine() ) != null ) && ( toReadNum > StringInCallback.STOP ) )

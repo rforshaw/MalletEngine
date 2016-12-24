@@ -2,11 +2,11 @@ package com.linxonline.mallet.physics ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class Group
 {
-	private final static List<ID> ids = Utility.<ID>newArrayList() ;
+	private final static List<ID> ids = MalletList.<ID>newList() ;
 	static
 	{
 		set( -1, "NO_GROUP", null ) ;

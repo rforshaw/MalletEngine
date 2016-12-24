@@ -2,21 +2,22 @@ package com.linxonline.mallet.event ;
 
 import java.util.Collection ;
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.logger.Logger ;
 
 public final class EventSystem implements EventSystemInterface
 {
-	// Replace HashMap with something easier to traverse.
+	// Replace Map with something easier to traverse.
 	private final String name ;
-	private final HashMap<EventType, EventQueue> eventQueues = new HashMap<EventType, EventQueue>() ;
-	private final List<EventQueue> queues = Utility.<EventQueue>newArrayList() ;
+	private final Map<EventType, EventQueue> eventQueues = MalletMap.<EventType, EventQueue>newMap() ;
+	private final List<EventQueue> queues = MalletList.<EventQueue>newList() ;
 	private final EventQueue allQueue = new EventQueue( Event.ALL_EVENT_TYPES ) ;
 
-	private final List<EventHandler> handlers = Utility.<EventHandler>newArrayList() ;
-	private final List<EventHandler> toBeRemoved = Utility.<EventHandler>newArrayList() ;
+	private final List<EventHandler> handlers = MalletList.<EventHandler>newList() ;
+	private final List<EventHandler> toBeRemoved = MalletList.<EventHandler>newList() ;
 
 	public EventSystem()
 	{

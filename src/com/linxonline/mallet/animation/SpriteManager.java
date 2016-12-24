@@ -6,7 +6,7 @@ import java.io.* ;
 import com.linxonline.mallet.io.reader.* ;
 import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class SpriteManager extends AbstractManager<Sprite>
 {

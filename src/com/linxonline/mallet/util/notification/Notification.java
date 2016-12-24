@@ -2,7 +2,7 @@ package com.linxonline.mallet.util.notification ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Convenience class that allows one system to inform 
@@ -17,12 +17,12 @@ public class Notification<T>
 
 	public Notification()
 	{
-		listeners = Utility.<Notify<T>>newArrayList() ;
+		listeners = MalletList.<Notify<T>>newList() ;
 	}
 
 	public Notification( final int _initialCapacity )
 	{
-		listeners = Utility.<Notify<T>>newArrayList( _initialCapacity ) ;
+		listeners = MalletList.<Notify<T>>newList( _initialCapacity ) ;
 	}
 
 	public void addNotify( final Notify<T> _toInform )

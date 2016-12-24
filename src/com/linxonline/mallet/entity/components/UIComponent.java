@@ -2,7 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.audio.* ;
 
@@ -13,9 +13,9 @@ import com.linxonline.mallet.event.* ;
 
 public class UIComponent extends InputComponent
 {
-	private final List<UIElement> elements = Utility.<UIElement>newArrayList() ;
-	private final List<UIElement> toRemove = Utility.<UIElement>newArrayList() ;
-	private final List<Event<?>> events = Utility.<Event<?>>newArrayList() ;
+	private final List<UIElement> elements = MalletList.<UIElement>newList() ;
+	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;
+	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
 	private Component.ReadyCallback toDestroy = null ;

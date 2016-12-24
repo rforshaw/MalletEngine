@@ -2,7 +2,7 @@ package com.linxonline.mallet.animation ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventType ;
@@ -24,9 +24,9 @@ import com.linxonline.mallet.renderer.Draw ;
 
 public class AnimationSystem
 {
-	private final List<AnimData> toAddAnim    = Utility.<AnimData>newArrayList() ;
-	private final List<AnimData> toRemoveAnim = Utility.<AnimData>newArrayList() ;
-	private final List<AnimData> animations   = Utility.<AnimData>newArrayList() ;
+	private final List<AnimData> toAddAnim    = MalletList.<AnimData>newList() ;
+	private final List<AnimData> toRemoveAnim = MalletList.<AnimData>newList() ;
+	private final List<AnimData> animations   = MalletList.<AnimData>newList() ;
 
 	private final SpriteManager spriteManager = new SpriteManager() ;
 
@@ -144,7 +144,7 @@ public class AnimationSystem
 	{
 		return new AnimationDelegate()
 		{
-			private final List<AnimData> data = Utility.<AnimData>newArrayList() ;
+			private final List<AnimData> data = MalletList.<AnimData>newList() ;
 
 			@Override
 			public void addAnimation( final Anim _animation, final World _world )

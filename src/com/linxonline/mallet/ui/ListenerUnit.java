@@ -2,11 +2,11 @@ package com.linxonline.mallet.ui ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class ListenerUnit<T extends BaseListener>
 {
-	private final List<T> listeners = Utility.<T>newArrayList() ;
+	private final List<T> listeners = MalletList.<T>newList() ;
 	private final UIElement parent ;
 
 	public ListenerUnit( final UIElement _parent )

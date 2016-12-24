@@ -1,6 +1,8 @@
 package com.linxonline.mallet.event ;
 
-import java.util.HashMap ;
+import java.util.Map ;
+
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	The aim of Event Type is to provide faster checks 
@@ -15,7 +17,7 @@ import java.util.HashMap ;
 */
 public final class EventType
 {
-	private final static HashMap<String, EventType> eventTypes = new HashMap<String, EventType>() ;
+	private final static Map<String, EventType> eventTypes = MalletMap.<String, EventType>newMap() ;
 	static
 	{
 		eventTypes.put( "NONE", new EventType() ) ;

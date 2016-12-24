@@ -2,7 +2,7 @@ package com.linxonline.mallet.entity.system ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.entity.query.* ;
 import com.linxonline.mallet.entity.* ;
@@ -20,8 +20,8 @@ public class EntitySystem implements EntitySystemInterface
 	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 
 	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
-	protected final List<Entity> entitiesToAdd = Utility.<Entity>newArrayList() ;
-	protected final List<Entity> cleanup = Utility.<Entity>newArrayList() ;
+	protected final List<Entity> entitiesToAdd = MalletList.<Entity>newList() ;
+	protected final List<Entity> cleanup = MalletList.<Entity>newList() ;
 
 	public EntitySystem( final HookEntity _state )
 	{
@@ -153,7 +153,7 @@ public class EntitySystem implements EntitySystemInterface
 	@Override
 	public List<Entity> getEntities()
 	{
-		final List<Entity> ents = Utility.<Entity>newArrayList() ;
+		final List<Entity> ents = MalletList.<Entity>newList() ;
 		ents.addAll( entities.getEntities() ) ;
 		ents.addAll( entitiesToAdd ) ;
 		return ents ;

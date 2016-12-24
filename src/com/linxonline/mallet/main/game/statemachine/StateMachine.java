@@ -3,11 +3,11 @@ package com.linxonline.mallet.main.game.statemachine ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public final class StateMachine
 {
-	private final List<State> states = Utility.<State>newArrayList() ;
+	private final List<State> states = MalletList.<State>newList() ;
 	private State currentState = null ;
 	private State defaultState = null ;
 

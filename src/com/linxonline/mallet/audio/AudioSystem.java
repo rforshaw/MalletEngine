@@ -1,12 +1,11 @@
 package com.linxonline.mallet.audio ;
 
 import java.util.List ;
-import java.util.HashMap ;
 
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
 
@@ -20,14 +19,14 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 public class AudioSystem
 {
-	private final List<Volume> volumes = Utility.<Volume>newArrayList() ;
+	private final List<Volume> volumes = MalletList.<Volume>newList() ;
 	private float masterVolume = 1.0f ;
 
-	private final List<AudioData> toAddAudio    = Utility.<AudioData>newArrayList() ;
-	private final List<AudioData> toRemoveAudio = Utility.<AudioData>newArrayList() ;
+	private final List<AudioData> toAddAudio    = MalletList.<AudioData>newList() ;
+	private final List<AudioData> toRemoveAudio = MalletList.<AudioData>newList() ;
 
-	private final List<AudioData> active        = Utility.<AudioData>newArrayList() ;
-	private final List<AudioData> paused        = Utility.<AudioData>newArrayList() ;			// Used when Game-State has been paused, move playing audio to here.
+	private final List<AudioData> active        = MalletList.<AudioData>newList() ;
+	private final List<AudioData> paused        = MalletList.<AudioData>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
 	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
@@ -339,7 +338,7 @@ public class AudioSystem
 	{
 		return new AudioDelegate()
 		{
-			private final List<Audio> data = Utility.<Audio>newArrayList() ;
+			private final List<Audio> data = MalletList.<Audio>newList() ;
 
 			@Override
 			public void addAudio( final Audio _audio )

@@ -12,7 +12,7 @@ import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Tuple ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.web.gl.GLProgram.Uniform ;
 
@@ -25,7 +25,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		temporarily store the program in a queue.
 	*/
 	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
-	private final List<GLProgram> toBind = Utility.<GLProgram>newArrayList() ;
+	private final List<GLProgram> toBind = MalletList.<GLProgram>newList() ;
 
 	public GLProgramManager()
 	{
@@ -60,15 +60,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 			private void generateGLProgram( final JSONObject _jGL )
 			{
-				final List<GLShader> shaders = Utility.<GLShader>newArrayList() ;
-				final List<GLShaderMap> paths = Utility.<GLShaderMap>newArrayList() ;
+				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
+				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList() ;
 
 				fill( paths, _jGL.optJSONArray( "VERTEX" ), GL3.VERTEX_SHADER ) ;
 				//fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GEOMETRY_SHADER ) ;
 				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.FRAGMENT_SHADER ) ;
 
-				final List<Tuple<String, Uniform>> uniforms = Utility.<Tuple<String, Uniform>>newArrayList() ;
-				final List<String> swivel = Utility.<String>newArrayList() ;
+				final List<Tuple<String, Uniform>> uniforms = MalletList.<Tuple<String, Uniform>>newList() ;
+				final List<String> swivel = MalletList.<String>newList() ;
 
 				fillUniforms( uniforms, _jGL.optJSONArray( "UNIFORMS" ) ) ;
 				fillAttributes( swivel, _jGL.optJSONArray( "SWIVEL" ) ) ;

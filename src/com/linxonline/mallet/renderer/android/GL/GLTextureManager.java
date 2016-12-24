@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 import java.io.InputStream ;
 import java.nio.* ;
 
@@ -22,7 +22,8 @@ import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
@@ -43,7 +44,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		binded to OpenGL out of order causing significant performance 
 		degradation.
 	*/
-	private final List<Tuple<String, Bitmap>> toBind = Utility.<Tuple<String, Bitmap>>newArrayList() ;
+	private final List<Tuple<String, Bitmap>> toBind = MalletList.<Tuple<String, Bitmap>>newList() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
@@ -306,7 +307,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 	protected static class MetaGenerator
 	{
-		private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
+		private final Map<String, MalletTexture.Meta> imageMetas = MalletMap.<String, MalletTexture.Meta>newMap() ;
 
 		/**
 			Return the meta information associated with an image

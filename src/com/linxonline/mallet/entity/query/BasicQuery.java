@@ -3,7 +3,7 @@ package com.linxonline.mallet.entity.query ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
 /**
@@ -14,7 +14,7 @@ import com.linxonline.mallet.util.settings.* ;
 **/
 public class BasicQuery extends Query
 {
-	private List<Entity> entities = Utility.<Entity>newArrayList() ;
+	private List<Entity> entities = MalletList.<Entity>newList() ;
 
 	public BasicQuery( final String _name )
 	{
@@ -43,7 +43,7 @@ public class BasicQuery extends Query
 
 	public List<Entity> queryForEntities( final Settings _query )
 	{
-		return Utility.<Entity>newArrayList() ;
+		return MalletList.<Entity>newList() ;
 	}
 
 	public void addEntity( final Entity _entity )

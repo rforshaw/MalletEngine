@@ -7,7 +7,7 @@ import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.canvas.CanvasRenderingContext2D ;
 import org.teavm.jso.canvas.ImageData ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.Texture ;
@@ -102,7 +102,7 @@ public class GLFontGenerator
 		final double point = 1.0 / width ;
 		final float ascent = height / 2.0f ;//10.0f ;
 
-		final List<Shape> shapes = Utility.<Shape>newArrayList() ;
+		final List<Shape> shapes = MalletList.<Shape>newList() ;
 
 		for( int i = 0; i < length; i++ )
 		{

@@ -5,7 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.io.serialisation.ByteOutput ;
 import com.linxonline.mallet.io.serialisation.ByteInput ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	This Diff implementation aims to find comparisons 
@@ -19,7 +19,7 @@ public final class Diff
 
 	public static byte[] encode( final byte[] _base, final byte[] _compare )
 	{
-		final List<Point> matches = Utility.<Point>newArrayList() ;
+		final List<Point> matches = MalletList.<Point>newList() ;
 
 		int pos = 0 ;
 		// Find parts between _base and _compare 
@@ -40,7 +40,7 @@ public final class Diff
 			++pos ;
 		}
 
-		final List<Point> additions = Utility.<Point>newArrayList() ;
+		final List<Point> additions = MalletList.<Point>newList() ;
 
 		// Assume that all other positions not flagged 
 		// within an existing point are new and must be 
@@ -81,7 +81,7 @@ public final class Diff
 	public static byte[] decode( final byte[] _base, final byte[] _diff )
 	{
 		final ByteInput diff = ByteInput.readStream( _diff ) ;
-		final List<Point> points = Utility.<Point>newArrayList() ;
+		final List<Point> points = MalletList.<Point>newList() ;
 
 		int arraySize = 0 ;
 		while( diff.isEnd() == false )

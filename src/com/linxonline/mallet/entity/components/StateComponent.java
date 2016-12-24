@@ -2,7 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.io.save.state.DataSet ;
@@ -25,7 +25,7 @@ import com.linxonline.mallet.io.save.state.DataSet ;
 public class StateComponent extends EventComponent
 {
 	private boolean initialEventDone = false ;
-	private final List<Tuple<String, DataSet>> data = Utility.<Tuple<String, DataSet>>newArrayList() ;
+	private final List<Tuple<String, DataSet>> data = MalletList.<Tuple<String, DataSet>>newList() ;
 
 	public StateComponent( final String _name, final String _group )
 	{

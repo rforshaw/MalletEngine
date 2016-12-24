@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLProgram ;
@@ -342,7 +342,7 @@ public class GLProgram extends Resource
 		Ensure that the Mallet Program maps correctly with 
 		the GL Program it is apparently associated with.
 	*/
-	public boolean isValidMap( final HashMap<String, Object> _map )
+	public boolean isValidMap( final Map<String, Object> _map )
 	{
 		final int size = uniforms.size() ;
 		final int diff = _map.size() - size ;

@@ -2,8 +2,9 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.Collection ;
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.audio.AudioDelegateCallback ;
 import com.linxonline.mallet.audio.AudioDelegate ;
@@ -14,7 +15,7 @@ import com.linxonline.mallet.event.Event ;
 
 public class SoundComponent extends EventComponent implements SourceCallback
 {
-	private final HashMap<String, Audio> sounds = new HashMap<String, Audio>() ;
+	private final Map<String, Audio> sounds = MalletMap.<String, Audio>newMap() ;
 
 	private String defaultAudio = null ;					// Name of the default audio, used as a fallback if all else fails.
 	private Audio currentAudio  = null ;					// Name of the current audio that is playing

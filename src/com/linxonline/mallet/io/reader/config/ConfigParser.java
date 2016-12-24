@@ -4,11 +4,11 @@ import java.util.List ;
 
 import com.linxonline.mallet.io.reader.ParseInterface ;
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class ConfigParser
 {
-	private final List<ParseInterface> parsers = Utility.<ParseInterface>newArrayList() ;
+	private final List<ParseInterface> parsers = MalletList.<ParseInterface>newList() ;
 
 	public ConfigParser() { init() ; }
 

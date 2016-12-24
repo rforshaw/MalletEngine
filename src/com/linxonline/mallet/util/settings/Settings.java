@@ -4,7 +4,7 @@ import java.util.List ;
 import java.util.TreeMap ;
 import java.util.Collection ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Would like to add an Annotation that will switch the String comparison to 
@@ -247,7 +247,7 @@ public final class Settings
 	public final List<String> toArrayString()
 	{
 		final Collection<VariableInterface> collection = variables.values() ;
-		final List<String> list = Utility.<String>newArrayList() ;
+		final List<String> list = MalletList.<String>newList() ;
 		final StringBuilder buffer = new StringBuilder() ;
 
 		for( final VariableInterface inter : collection )

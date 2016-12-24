@@ -1,7 +1,9 @@
 package com.linxonline.mallet.system ;
 
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Collection ;
+
+import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
@@ -15,7 +17,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 */
 public final class GlobalStats
 {
-	private final static HashMap<String, StatTrack> domains = new HashMap<String, StatTrack>() ;
+	private final static Map<String, StatTrack> domains = MalletMap.<String, StatTrack>newMap() ;
 
 	private GlobalStats() {}
 	
@@ -128,7 +130,7 @@ public final class GlobalStats
 	public static class StatTrack
 	{
 		private final String domain ;
-		private final HashMap<String, Notification<Domain>> listeners = new HashMap<String, Notification<Domain>>() ;
+		private final Map<String, Notification<Domain>> listeners = MalletMap.<String, Notification<Domain>>newMap() ;
 		private final Settings stats = new Settings() ;
 
 		public StatTrack( final String _domain )

@@ -26,7 +26,7 @@ import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.util.sort.OrderedInsert ;
 import com.linxonline.mallet.util.sort.SortInterface ;
@@ -48,7 +48,7 @@ public class GLGeometryUploader
 	private final Int16Array indicies ;
 	private final Float32Array verticies ;
 
-	private final List<GLBuffer> buffers = Utility.<GLBuffer>newArrayList() ;							// Available GLBuffers
+	private final List<GLBuffer> buffers = MalletList.<GLBuffer>newList() ;							// Available GLBuffers
 
 	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
@@ -395,7 +395,7 @@ public class GLGeometryUploader
 
 		protected Location stencilLocation = null ;
 
-		protected final List<GLGeometry> buffers = Utility.<GLGeometry>newArrayList() ;
+		protected final List<GLGeometry> buffers = MalletList.<GLGeometry>newList() ;
 
 		public GLBuffer( final GLDrawData _data,
 						 final int _indexLengthBytes,
@@ -989,9 +989,9 @@ public class GLGeometryUploader
 		public int amountIndexUsedBytes  = 0 ;		// How much of buffer has been used
 		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
 
-		private final List<Location> allocated = Utility.<Location>newArrayList() ;
-		private final List<Location.Range> indexRanges = Utility.<Location.Range>newArrayList() ;
-		private final List<Location.Range> vertexRanges = Utility.<Location.Range>newArrayList() ;
+		private final List<Location> allocated = MalletList.<Location>newList() ;
+		private final List<Location.Range> indexRanges = MalletList.<Location.Range>newList() ;
+		private final List<Location.Range> vertexRanges = MalletList.<Location.Range>newList() ;
 
 		public GLGeometry( final int _style,
 						   final int _indexLengthBytes,

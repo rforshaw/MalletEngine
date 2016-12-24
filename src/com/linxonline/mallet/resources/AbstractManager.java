@@ -1,17 +1,18 @@
 package com.linxonline.mallet.resources ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Set ;
 import java.util.Collection ;
 
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 
 public abstract class AbstractManager<T extends Resource> implements ManagerInterface<T>
 {
 	protected final AbstractLoader<T> abstractLoader = new AbstractLoader<T>() ;
-	protected final HashMap<String, T> resources = new HashMap<String, T>() ;
+	protected final Map<String, T> resources = MalletMap.<String, T>newMap() ;
 
 	public AbstractManager() {}
 
@@ -123,7 +124,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 
 	/**
 		Iterates over all Resource and destroy them.
-		Then clearing the HashMap
+		Then clearing the Map
 	**/
 	@Override
 	public void clear()
@@ -170,7 +171,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	*/
 	public class AbstractLoader<T extends Resource> implements ResourceLoader<T>
 	{
-		private final List<ResourceDelegate<T>> loaders = Utility.<ResourceDelegate<T>>newArrayList() ;
+		private final List<ResourceDelegate<T>> loaders = MalletList.<ResourceDelegate<T>>newList() ;
 
 		public AbstractLoader() {}
 

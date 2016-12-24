@@ -226,7 +226,7 @@ public final class Build
 							case BOOLEAN : field.setBoolean( _obj, fields.optBoolean( key, false ) ) ;     break ;
 							case STRING  : field.set( _obj, fields.optString( key, "" ) ) ;                break ;
 							// If it is not a primitive type then it must be an object.
-							// Whether it is a String, List, HashMap, or a Mallet 
+							// Whether it is a String, List, Map, or a Mallet 
 							// Object is unkown, but we'll find out soon enough. 
 							default      : field.set( _obj, construct( fields.optJSONObject( key ) ) ) ;   break ;
 						}

@@ -5,7 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.io.reader.RFReader ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Assumes the Entities are defined in the RF Format.
@@ -24,7 +24,7 @@ public class EntityFactory extends Factory<Entity, Settings>
 
 	public List<Entity> createEntities( final List<Settings> _file )
 	{
-		final List<Entity> entities = Utility.<Entity>newArrayList() ;
+		final List<Entity> entities = MalletList.<Entity>newList() ;
 		final int length = _file.size() ;
 
 		for( int i = 0; i < length; ++i )

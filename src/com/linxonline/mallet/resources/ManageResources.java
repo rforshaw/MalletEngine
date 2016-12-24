@@ -1,10 +1,10 @@
 package com.linxonline.mallet.resources ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Set ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 /*==================================================*/
 // The default Resource cleaner when AbstractManagers
@@ -22,11 +22,11 @@ public abstract class ManageResources
 	/**
 		returns the names of all unused rescources
 	**/
-	public static List<String> findUnwantedResources( final HashMap _resources )
+	public static List<String> findUnwantedResources( final Map _resources )
 	{
 		Resource resource = null ;
 		final Set<String> keys = ( Set<String> )_resources.keySet() ;
-		final List<String> remove = Utility.<String>newArrayList() ;
+		final List<String> remove = MalletList.<String>newList() ;
 
 		for( final String key : keys )
 		{
@@ -44,15 +44,15 @@ public abstract class ManageResources
 		return remove ;
 	}
 
-	public static void removeUnwantedResources( final HashMap _resources )
+	public static void removeUnwantedResources( final Map _resources )
 	{
 		removeUnwantedResources( _resources, findUnwantedResources( _resources ) ) ;
 	}
 
 	/**
-		Iterates over their names and removes them from the HashMap
+		Iterates over their names and removes them from the Map
 	**/
-	public static void removeUnwantedResources( final HashMap _resources, 
+	public static void removeUnwantedResources( final Map _resources, 
 												final List<String> _remove )
 	{
 		Resource resource = null ;
@@ -62,7 +62,7 @@ public abstract class ManageResources
 			resource.destroy() ;							// Destroy the resource
 
 			//System.out.println( "Removed: " + key ) ;
-			_resources.remove( key ) ;						// Remove from HashMap
+			_resources.remove( key ) ;						// Remove from Map
 		}
 
 		_remove.clear() ;

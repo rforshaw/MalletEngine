@@ -2,7 +2,7 @@ package com.linxonline.mallet.input ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.input.* ;
 
 /*==============================================================*/
@@ -23,7 +23,7 @@ public class InputState implements InputSystemInterface,
 	private static final int MAX_QUEUE_THRESHOLD = 40 ;
 
 	private InputAdapterInterface inputAdapter = null ;
-	private final List<InputHandler> handlers = Utility.<InputHandler>newArrayList() ;
+	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
 
 	private boolean hasInputs = false ;
 	private InputHandler handler = null ;

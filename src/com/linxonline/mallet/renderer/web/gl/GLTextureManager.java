@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
 import java.util.List ;
-import java.util.HashMap ;
+import java.util.Map ;
 import java.util.Iterator ;
 
 import java.nio.* ;
@@ -21,7 +21,7 @@ import com.linxonline.mallet.io.filesystem.web.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
-import com.linxonline.mallet.util.Utility ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
@@ -45,7 +45,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		binded to OpenGL out of order causing significant performance 
 		degradation.
 	*/
-	private final List<Tuple<String, HTMLImageElement>> toBind = Utility.<Tuple<String, HTMLImageElement>>newArrayList() ;
+	private final List<Tuple<String, HTMLImageElement>> toBind = MalletList.<Tuple<String, HTMLImageElement>>newList() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	/**
@@ -244,7 +244,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	*/
 	protected static class MetaGenerator
 	{
-		private final HashMap<String, MalletTexture.Meta> imageMetas = new HashMap<String, MalletTexture.Meta>() ;
+		private final Map<String, MalletTexture.Meta> imageMetas = MalletMap.<String, MalletTexture.Meta>newMap() ;
 
 		/**
 			Return the meta information associated with an image
