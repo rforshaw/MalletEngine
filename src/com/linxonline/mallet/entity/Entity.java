@@ -245,10 +245,13 @@ public final class Entity
 	{
 		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
 		{
-			private final List<Component> toDestroy = MalletList.<Component>newList() ;
+			private final List<Component> toDestroy = MalletList.<Component>newList( components ) ;
 
 			public void ready( final Component _component )
 			{
+				// toDestroy should not need to be synchronised 
+				// as Components of an Entity are not updated 
+				// a-synchronously.
 				if( toDestroy.remove( _component ) == true )
 				{
 					if( toDestroy.isEmpty() == true )
