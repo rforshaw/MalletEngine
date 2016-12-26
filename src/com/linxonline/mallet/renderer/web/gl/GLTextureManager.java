@@ -33,7 +33,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	private static final HTMLDocument document = window.getDocument() ;
 
 	// Used when a texture is being loaded, but not yet available.
-	private final Texture PLACEHOLDER = new Texture( null ) ;
+	private static final Texture PLACEHOLDER = new Texture( null ) ;
 
 	/**
 		When loading a texture the TextureManager will stream the 

@@ -5,12 +5,12 @@ import java.util.ArrayList ;
 
 public class MalletList
 {
-	public static <V> List<V> newList()
+	public final static <V> List<V> newList()
 	{
 		return MalletList.<V>newList( 10 ) ;
 	}
 
-	public static <V> List<V> newList( final int _initialCapacity )
+	public final static <V> List<V> newList( final int _initialCapacity )
 	{
 		return new ArrayList<V>( _initialCapacity ) ;
 	}

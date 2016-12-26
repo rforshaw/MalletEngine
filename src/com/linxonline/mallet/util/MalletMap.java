@@ -12,7 +12,7 @@ public class MalletMap
 		Eventually this will be replaced with an implementation 
 		that doesn't generate a lot of temporary objects.
 	*/
-	public static <K, V> Map<K, V> newMap()
+	public final static <K, V> Map<K, V> newMap()
 	{
 		return MalletMap.<K, V>newMap( 16 ) ;
 	}
@@ -24,7 +24,7 @@ public class MalletMap
 		Eventually this will be replaced with an implementation 
 		that doesn't generate a lot of temporary objects.
 	*/
-	public static <K, V> Map<K, V> newMap( final int _initialCapacity )
+	public final static <K, V> Map<K, V> newMap( final int _initialCapacity )
 	{
 		return MalletMap.<K, V>newMap( _initialCapacity, 0.75f ) ;
 	}
@@ -36,7 +36,7 @@ public class MalletMap
 		Eventually this will be replaced with an implementation 
 		that doesn't generate a lot of temporary objects.
 	*/
-	public static <K, V> Map<K, V> newMap( final int _initialCapacity, final float _loadFactor )
+	public final static <K, V> Map<K, V> newMap( final int _initialCapacity, final float _loadFactor )
 	{
 		return new HashMap<K, V>( _initialCapacity, _loadFactor ) ;
 	}
