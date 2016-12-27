@@ -3,7 +3,7 @@ package com.linxonline.mallet.ui ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.input.InputEvent ;
 
-public abstract class MouseListener extends BaseListener
+public abstract class InputListener<T extends UIElement> extends BaseListener<T>
 {
 	public InputEvent.Action pressed( final InputEvent _input )
 	{

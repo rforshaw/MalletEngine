@@ -58,7 +58,12 @@ public class UIElement implements InputHandler
 		events.add( _event ) ;
 	}
 
-	public <T extends BaseListener> T addListener( final T _listener )
+	/**
+		Add a listener to the UIElement.
+		Caution: BaseListeners not designed for the elements 
+		sub-type can still be added, not caught at compile-time.
+	*/
+	public <T extends BaseListener<? extends UIElement>> T addListener( final T _listener )
 	{
 		listeners.addListener( _listener ) ;
 		return _listener ;
@@ -75,6 +80,24 @@ public class UIElement implements InputHandler
 		destroy = true ;
 	}
 
+	/**
+		Flag the UIElement as being engaged.
+		This will allow it to accept Gamepad/Keyboard input.
+	*/
+	public void engage()
+	{
+		current = State.ENGAGED ;
+	}
+
+	/**
+		Flag the UIElement as being disengaged.
+		This will prevent it from accepting Gamepad/Keyboard input.
+	*/
+	public void disengage()
+	{
+		current = State.NEUTRAL ;
+	}
+	
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		if( events.isEmpty() == false )
@@ -103,28 +126,88 @@ public class UIElement implements InputHandler
 
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( isIntersectInput( _event ) == true )
+		// If the Input Type is Mouse or Touch 
+		// and the x, y of the input is within the 
+		// elements bounds consider the element to be engaged.
+		// Will only accept GamePad/Keyboard inputs if the 
+		// element is considered to be already engaged.
+		switch( _event.getInputType() )
 		{
-			current = State.ENGAGED ;
-			switch( _event.getInputType() )
+			case MOUSE_MOVED       :
+			case TOUCH_MOVE        :
 			{
-				case MOUSE_MOVED     :
-				case TOUCH_MOVE      : return updateMove( _event ) ;
-				case MOUSE1_PRESSED  :
-				case MOUSE2_PRESSED  :
-				case MOUSE3_PRESSED  :
-				case TOUCH_DOWN      : return updatePressed( _event ) ;
-				case MOUSE1_RELEASED :
-				case MOUSE2_RELEASED :
-				case MOUSE3_RELEASED :
-				case TOUCH_UP        : return updateReleased( _event ) ;
+				if( isIntersectInput( _event ) == true )
+				{
+					engage() ;
+					return updateMove( _event ) ;
+				}
+				else if( current == State.ENGAGED )
+				{
+					disengage() ;
+					return updateExited( _event ) ;
+				}
+				break ;
 			}
-		}
-
-		if( current == State.ENGAGED )
-		{
-			current = State.NEUTRAL ;
-			updateExited( _event ) ;
+			case MOUSE1_PRESSED    :
+			case MOUSE2_PRESSED    :
+			case MOUSE3_PRESSED    :
+			case TOUCH_DOWN        :
+			{
+				if( isIntersectInput( _event ) == true )
+				{
+					engage() ;
+					return updatePressed( _event ) ;
+				}
+				else if( current == State.ENGAGED )
+				{
+					disengage() ;
+					return updateExited( _event ) ;
+				}
+				break ;
+			}
+			case MOUSE1_RELEASED   :
+			case MOUSE2_RELEASED   :
+			case MOUSE3_RELEASED   :
+			case TOUCH_UP          :
+			{
+				if( isIntersectInput( _event ) == true )
+				{
+					engage() ;
+					return updateReleased( _event ) ;
+				}
+				else if( current == State.ENGAGED )
+				{
+					disengage() ;
+					return updateExited( _event ) ;
+				}
+				break ;
+			}
+			case GAMEPAD_RELEASED  :
+			case KEYBOARD_RELEASED :
+			{
+				if( current == State.ENGAGED )
+				{
+					return updateReleased( _event ) ;
+				}
+				break ;
+			}
+			case GAMEPAD_PRESSED  :
+			case KEYBOARD_PRESSED :
+			{
+				if( current == State.ENGAGED )
+				{
+					return updatePressed( _event ) ;
+				}
+				break ;
+			}
+			case GAMEPAD_ANALOGUE :
+			{
+				if( current == State.ENGAGED )
+				{
+					return updateMove( _event ) ;
+				}
+				break ;
+			}
 		}
 
 		return InputEvent.Action.PROPAGATE ;

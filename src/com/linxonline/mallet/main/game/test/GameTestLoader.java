@@ -70,7 +70,7 @@ public final class GameTestLoader extends GameLoader
 				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
 				{
 					final UIButton button = jUI.get( "TestButton1", UIButton.class ) ;
-					button.addListener( new MouseListener()
+					button.addListener( new InputListener<UIButton>()
 					{
 						@Override
 						public InputEvent.Action released( final InputEvent _input )
@@ -83,7 +83,7 @@ public final class GameTestLoader extends GameLoader
 
 				{
 					final UIButton button = jUI.get( "TestButton2", UIButton.class ) ;
-					button.addListener( new MouseListener()
+					button.addListener( new InputListener<UIButton>()
 					{
 						@Override
 						public InputEvent.Action released( final InputEvent _input )

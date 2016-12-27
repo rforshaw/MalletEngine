@@ -54,6 +54,10 @@ public class UILayout extends UIElement
 		}
 	}
 
+	/**
+		Add the passed in UIElement to the end of the UILayout.
+		Returns the passed in element, allows for further modifications. 
+	*/
 	public <T extends UIElement> T addElement( final T _element )
 	{
 		if( ordered.contains( _element ) == false )
@@ -62,6 +66,19 @@ public class UILayout extends UIElement
 			_element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
 		return _element ; 
+	}
+
+	/**
+		Populate the list with the UILayout's child elements.
+		The elements returned are not copies.
+	*/
+	public void getElements( final List<UIElement> _elements )
+	{
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			_elements.add( ordered.get( i ) ) ;
+		}
 	}
 
 	/**
@@ -131,6 +148,11 @@ public class UILayout extends UIElement
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
+		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+		{
+			return InputEvent.Action.CONSUME ;
+		}
+
 		for( final UIElement element : ordered )
 		{
 			if( element.passInputEvent( _event ) == InputEvent.Action.CONSUME )
@@ -139,7 +161,7 @@ public class UILayout extends UIElement
 			}
 		}
 
-		return super.passInputEvent( _event ) ;
+		return InputEvent.Action.PROPAGATE ;
 	}
 
 	/**

@@ -3,16 +3,16 @@ package com.linxonline.mallet.ui ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.input.InputEvent ;
 
-public abstract class BaseListener
+public abstract class BaseListener<T extends UIElement>
 {
-	private UIElement parent ;
+	private T parent ;
 
-	public void setParent( final UIElement _parent )
+	public void setParent( final T _parent )
 	{
 		parent = _parent ;
 	}
 
-	public UIElement getParent()
+	public T getParent()
 	{
 		return parent ;
 	}

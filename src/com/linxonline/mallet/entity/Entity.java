@@ -115,11 +115,9 @@ public final class Entity
 	public final Component getComponentByName( final String _name )
 	{
 		final int size = components.size() ;
-		Component component = null ;
-
 		for( int i = 0; i < size; ++i )
 		{
-			component = components.get( i ) ;
+			final Component component = components.get( i ) ;
 			if( component.isName( _name ) == true )
 			{
 				return component ;
@@ -137,11 +135,9 @@ public final class Entity
 	public final Component getComponentByNameID( final int _nameID )
 	{
 		final int size = components.size() ;
-		Component component = null ;
-
 		for( int i = 0; i < size; ++i )
 		{
-			component = components.get( i ) ;
+			final Component component = components.get( i ) ;
 			if( component.isNameID( _nameID ) == true )
 			{
 				return component ;
@@ -276,7 +272,7 @@ public final class Entity
 	**/
 	public void clear()
 	{
-		final List<Component> comps = MalletList.<Component>newList() ;
+		final List<Component> comps = MalletList.<Component>newList( components ) ;
 		removeComponents( comps ) ;
 
 		comps.clear() ;
