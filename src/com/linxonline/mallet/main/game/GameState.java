@@ -349,6 +349,7 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( animationController ) ;
 
 		animationController.setAddEventInterface( eventSystem ) ;
+		trackerController.setAddEventInterface( eventSystem ) ;
 		audioController.setAddEventInterface( eventSystem ) ;
 
 		final InputSystemInterface input = system.getInputInterface() ;

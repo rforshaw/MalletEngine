@@ -10,7 +10,7 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public abstract class ManagedArray<T>
 {
-	private RemoveDelegate FALLBACK = new RemoveDelegate<Object>()
+	private static RemoveDelegate FALLBACK = new RemoveDelegate<Object>()
 	{
 		public void remove( final Object _data ) {}
 	} ;

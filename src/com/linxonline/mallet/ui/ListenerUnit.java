@@ -14,7 +14,7 @@ public class ListenerUnit<T extends BaseListener>
 		parent = _parent ;
 	}
 
-	public void addListener( final T _listener )
+	public void add( final T _listener )
 	{
 		if( _listener != null )
 		{
@@ -24,6 +24,11 @@ public class ListenerUnit<T extends BaseListener>
 				_listener.setParent( parent ) ;
 			}
 		}
+	}
+
+	public boolean remove( final T _listener )
+	{
+		return listeners.remove( _listener ) ;
 	}
 
 	public List<T> getListeners()

@@ -73,6 +73,13 @@ public final class GameTestLoader extends GameLoader
 					button.addListener( new InputListener<UIButton>()
 					{
 						@Override
+						public InputEvent.Action pressed( final InputEvent _input )
+						{
+							System.out.println( "Test Button 1 - pressed" ) ;
+							return InputEvent.Action.PROPAGATE ;
+						}
+
+						@Override
 						public InputEvent.Action released( final InputEvent _input )
 						{
 							System.out.println( "Test Button 1 - released" ) ;
@@ -85,6 +92,13 @@ public final class GameTestLoader extends GameLoader
 					final UIButton button = jUI.get( "TestButton2", UIButton.class ) ;
 					button.addListener( new InputListener<UIButton>()
 					{
+						@Override
+						public InputEvent.Action pressed( final InputEvent _input )
+						{
+							System.out.println( "Test Button 2 - pressed" ) ;
+							return InputEvent.Action.PROPAGATE ;
+						}
+					
 						@Override
 						public InputEvent.Action released( final InputEvent _input )
 						{

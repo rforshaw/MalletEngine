@@ -37,11 +37,16 @@ public class RenderComponent extends Component
 	{
 		if( toDestroy != null )
 		{
+			// toDestroy will only be set if the entity 
+			// has been flagged for destruction, if that's 
+			// the case there is no point add a draw object 
+			// that will need to be removed.
 			return ;
 		}
 
 		if( drawDelegate == null )
 		{
+			// If the renderer has yet to give a drawDelegate
 			toAddBasic.add( _draw ) ;
 			return ;
 		}
@@ -53,11 +58,16 @@ public class RenderComponent extends Component
 	{
 		if( toDestroy != null )
 		{
+			// toDestroy will only be set if the entity 
+			// has been flagged for destruction, if that's 
+			// the case there is no point add a draw object 
+			// that will need to be removed.
 			return ;
 		}
 
 		if( drawDelegate == null )
 		{
+			// If the renderer has yet to give a drawDelegate
 			toAddText.add( _draw ) ;
 			return ;
 		}
@@ -89,6 +99,7 @@ public class RenderComponent extends Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
+		super.passInitialEvents( _events ) ;
 		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
 			public void callback( final DrawDelegate _delegate )

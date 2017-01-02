@@ -5,7 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.MalletList ;
 
-public class Shape
+public final class Shape
 {
 	public enum Style
 	{
@@ -25,6 +25,9 @@ public class Shape
 		}
 	}
 
+	/**
+		Use the Swivel to define the vertex structure.
+	*/
 	public enum Swivel
 	{
 		POINT,		// Vector3
@@ -32,6 +35,10 @@ public class Shape
 		UV,			// Vector2
 		NORMAL ;	// Vector3
 
+		/**
+			Return a basic vertex structure of two elements.
+			Point and Colour.
+		*/
 		public static Swivel[] constructDefault()
 		{
 			final Swivel[] swivel = new Swivel[2] ;
@@ -39,7 +46,12 @@ public class Shape
 			swivel[1] = Swivel.COLOUR ;
 			return swivel ;
 		}
-		
+
+		public static Swivel[] constructSwivel( final Swivel ... _swivel )
+		{
+			return _swivel ;
+		}
+
 		public static Swivel[] getSwivelByArray( final List<String> _text )
 		{
 			final int size = _text.size() ;
@@ -65,6 +77,10 @@ public class Shape
 			}
 		}
 
+		/**
+			A Vertex should always contain at least one POINT.
+			If a POINT exists return its index location, else return -1.
+		*/
 		public static int getSwivelPointIndex( final Swivel[] _swivel )
 		{
 			for( int i = 0; i < _swivel.length; i++ )
@@ -78,6 +94,15 @@ public class Shape
 			return -1 ;
 		}
 
+		/**
+			Return the amount of floats required to define the Vertex.
+			POINT  = 3 floats
+			COLOUR = 1 float
+			UV     = 2 floats
+			NORMAL = 3 floats
+
+			A default swivel would return 4. 3 for POINT, and 1 for COLOUR.
+		*/
 		public static int getSwivelFloatSize( final Swivel[] _swivel, final int _length )
 		{
 			int size = 0 ;
@@ -95,7 +120,10 @@ public class Shape
 			return size ;
 		}
 
-		public static Object[] construct( final Swivel[] _swivel )
+		/**
+			Construct a vertex based on _swivel.
+		*/
+		public static Object[] createVert( final Swivel[] _swivel )
 		{
 			final Object[] obj = new Object[_swivel.length] ;
 			for( int i = 0; i < _swivel.length; i++ )
@@ -111,14 +139,28 @@ public class Shape
 
 			return obj ;
 		}
+
+		public static Object[] createVert( final Object ... _objects )
+		{
+			return _objects ;
+		}
 	}
 
-	private static Shape.Factory factory = new DefaultFactory() ;
+	private static Shape.Factory factory = new Shape.Factory()
+	{
+		public Shape.Interface create()
+		{
+			return new DefaultShape() ;
+		}
+	} ;
 
 	/**
 		Allow the backend system to define a different 
-		shape implementation. The Default Factory should be 
-		fine for the majority of platforms: desktop and android.
+		shape implementation.
+
+		The Default Factory should be fine for the majority of 
+		platforms: desktop and android.
+
 		Web will require a custom implementation.
 	*/
 	public static void setFactory( final Shape.Factory _factory )
@@ -126,7 +168,7 @@ public class Shape
 		factory = _factory ;
 	}
 
-	private final Shape.Interface shape ;
+	private final Shape.Interface shape ;		// Defines a platform specific implementation of shape.
 
 	public Shape( final int _indexSize, final int _pointSize )
 	{
@@ -153,6 +195,15 @@ public class Shape
 		shape.init( _shape.shape ) ;
 	}
 
+	/**
+		The index allows the user to refer to the same vertex 
+		multiple types without duplicating vertex data.
+
+		_index defines the what vertex should be used next.
+		
+		Adding more indices than defined by getIndexSize() 
+		will result in undefined behaviour.
+	*/
 	public void addIndex( final int _index )
 	{
 		shape.addIndex( _index ) ;
@@ -163,81 +214,188 @@ public class Shape
 		return shape.getIndex( _index ) ;
 	}
 
+	/**
+		Add a vertex defined by the Shapes swivel.
+
+		Undefined errors may arise from using an incorrect 
+		vertex that does not align with the shapes swivel.
+
+		Adding more vertices than getVertexSize() will result in 
+		undefined behaviour.
+	*/
 	public void addVertex( final Object[] _vertex )
 	{
 		shape.addVertex( _vertex ) ;
 	}
 
+	/**
+		Copy the Vertex at index location into _vertex.
+		Use Swivel.createVert() to build a valid vertex object 
+		for the Swivel defined by the shape. 
+	*/
 	public Object[] getVertex( final Object[] _vertex, final int _index )
 	{
 		return shape.getVertex( _vertex, _index ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector3 location within the vertex.
+		_point defines the new values of the Vector3.
+
+		Assumes the caller knows that a Vector3 resides at the location.
+	*/
 	public void setVector3( final int _index, final int _swivelIndex, final Vector3 _point )
 	{
 		shape.setVector3( _index, _swivelIndex, _point ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector3 location within the vertex.
+		_x, _y, and _z defines the new values of the Vector3.
+
+		Assumes the caller knows that a Vector3 resides at the location.
+	*/
 	public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
 	{
 		shape.setVector3( _index, _swivelIndex, _x, _y, _z ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector3 location within the vertex.
+		Return a copy of the Vector3.
+
+		Assumes the caller knows that a Vector3 resides at the location.
+	*/
 	public Vector3 getVector3( final int _index, final int _swivelIndex )
 	{
 		return shape.getVector3( _index, _swivelIndex ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector3 location within the vertex.
+		Modify _point to reflect the Vector3 at the defined location.
+
+		Assumes the caller knows that a Vector3 resides at the location.
+	*/
 	public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
 	{
 		return shape.getVector3( _index, _swivelIndex, _point ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector2 location within the vertex.
+		_point defines the new values of the Vector2.
+
+		Assumes the caller knows that a Vector2 resides at the location.
+	*/
 	public void setVector2( final int _index, final int _swivelIndex, final Vector2 _point )
 	{
 		shape.setVector2( _index, _swivelIndex, _point ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector2 location within the vertex.
+		_x, and _y defines the new values of the Vector2.
+
+		Assumes the caller knows that a Vector2 resides at the location.
+	*/
 	public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
 	{
 		shape.setVector2( _index, _swivelIndex, _x, _y ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector2 location within the vertex.
+		Return a copy of the Vector2.
+
+		Assumes the caller knows that a Vector2 resides at the location.
+	*/
 	public Vector2 getVector2( final int _index, final int _swivelIndex )
 	{
 		return shape.getVector2( _index, _swivelIndex ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the Vector3 location within the vertex.
+		Modify _point to reflect the Vector3 at the defined location.
+
+		Assumes the caller knows that a Vector3 resides at the location.
+	*/
 	public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
 	{
 		return shape.getVector2( _index, _swivelIndex, _uv ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the float location within the vertex.
+		Return the float at the defined location.
+
+		Assumes the caller knows that a float resides there.
+	*/
 	public float getFloat( final int _index, final int _swivelIndex )
 	{
 		return shape.getFloat( _index, _swivelIndex ) ;
 	}
-	
+
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the MalletCOlour location within the vertex.
+		_colour defines the new value of the float.
+
+		Assumes the caller knows that a MalletColour resides at the location.
+	*/
 	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
 		shape.setColour( _index, _swivelIndex, _colour ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the MalletColour location within the vertex.
+		Return a copy of the MalletColour.
+
+		Assumes the caller knows that a MalletColour resides there.
+	*/
 	public MalletColour getColour( final int _index, final int _swivelIndex )
 	{
 		return shape.getColour( _index, _swivelIndex ) ;
 	}
 
+	/**
+		_index defines the vertex location.
+		_swivelIndex defines the MalletColour location within the vertex.
+		Modify _colour to reflect the MalletColour at the defined location.
+
+		Assumes the caller knows that a MalletColour resides at the location.
+	*/
 	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
 		return shape.getColour( _index, _swivelIndex, _colour ) ;
 	}
 
+	/**
+		Returns how the geometry should be interpreted.
+		LINES:		Requires a start and an end point to be defined for each line
+		LINE_STRIP: Will continue the line from the last point added
+		FILL: 		Fill the geometry shape, requires the shape to be defined in polygons, will eventually be auto generated.
+	*/
 	public Shape.Style getStyle()
 	{
 		return shape.getStyle() ;
 	}
 
+	/**
+		Defines what a Vertex within the Shape is made from.
+	*/
 	public Swivel[] getSwivel()
 	{
 		return shape.getSwivel() ;
@@ -262,6 +420,10 @@ public class Shape
 		return shape.isComplete() ;
 	}
 
+	/**
+		Construct a vertex with the default swivel format.
+		POINT and COLOUR.
+	*/
 	public static Object[] construct( final float _x, final float _y, final float _z, final MalletColour _colour )
 	{
 		final Object[] swivel = new Object[2] ;
@@ -270,9 +432,21 @@ public class Shape
 
 		return swivel ;
 	}
-	
+
+	/**
+		Determine whether the Swivel and Vertex structure are the same.
+		return true if the vertex order is what is expected by the swivel 
+		order, return false if the order is incorrect.
+		Because NORMAL and POINT use Vector3 there is a chance that a false 
+		positive may be made.
+	*/
 	public static boolean isCorrectSwivel( final Swivel[] _swivel, final Object[] _object )
 	{
+		if( _swivel.length != _object.length )
+		{
+			return false ;
+		}
+
 		for( int i = 0; i < _swivel.length; i++ )
 		{
 			switch( _swivel[i] )
@@ -343,6 +517,10 @@ public class Shape
 		return plane ;
 	}
 
+	/**
+		Construct a basic 2-dimensional quad.
+		Se also updatePlaneUV, and updatePlaneGeometry.
+	*/
 	public static Shape constructPlane( final Vector3 _length, final MalletColour _colour )
 	{
 		final Swivel[] swivel = new Swivel[2] ;
@@ -366,6 +544,9 @@ public class Shape
 		return plane ;
 	}
 
+	/**
+		Construct a basic 3D cube of dimension _width.
+	*/
 	public static Shape constructCube( final float _width, final Vector2 _minUV, final Vector2 _maxUV )
 	{
 		final Swivel[] swivel = new Swivel[3] ;
@@ -376,35 +557,35 @@ public class Shape
 		final MalletColour white = MalletColour.white() ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 38, 24 ) ;
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 0 Front
-		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) } ) ;				// 1
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 2
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 3
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) ) ) ;				// 1
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 2
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 3
 
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV ) } ) ;				// 4 Back
-		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 5
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 6
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 7
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV ) ) ) ;				// 4 Back
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 5
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 6
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 7
 
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV ) } ) ;				// 8 Top
-		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 9
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 10
-		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 11
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 8 Top
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 9
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 10
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 11
 
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 12 Bottom
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV ) } ) ;				// 13
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 14
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 15
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 12 Bottom
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV ) ) ) ;				// 13
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 14
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 15
 
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;					// 16 Left
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, _width ), white, new Vector2( _maxUV ) } ) ;				// 17
-		plane.addVertex( new Object[] { new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 18
-		plane.addVertex( new Object[] { new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 19
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 16 Left
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _maxUV ) ) ) ;				// 17
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 18
+		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 19
 
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _minUV ) } ) ;				// 20 Right
-		plane.addVertex( new Object[] { new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) } ) ;			// 21
-		plane.addVertex( new Object[] { new Vector3( _width, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;	// 22
-		plane.addVertex( new Object[] { new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) } ) ;	// 23
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 20 Right
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 21
+		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 22
+		plane.addVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 23
 
 		plane.addIndex( 0 ) ;	// Front Face
 		plane.addIndex( 2 ) ;
@@ -457,6 +638,11 @@ public class Shape
 		return plane ;
 	}
 
+	/**
+		Update the geometry of a 2-dimensional quad.
+		Length X defines the quads width.
+		Length Y defines the quads height.
+	*/
 	public static Shape updatePlaneGeometry( final Shape _plane, final Vector3 _length )
 	{
 		//_plane.getPoint( 0, 0 ).setXYZ() ;
@@ -467,6 +653,9 @@ public class Shape
 		return _plane ;
 	}
 
+	/**
+		Update the UV co-ordinates of a 2-dimensional quad.
+	*/
 	public static Shape updatePlaneUV( final Shape _plane, final Vector2 _minUV, final Vector2 _maxUV )
 	{
 		_plane.setVector2( 0, 2, _minUV ) ;
@@ -510,7 +699,7 @@ public class Shape
 				combined.addIndex( indexOffset + shape.getIndex( j ) ) ;
 			}
 
-			final Object[] vertex = Swivel.construct( swivel ) ;
+			final Object[] vertex = Swivel.createVert( swivel ) ;
 			final int size = shape.getVertexSize() ;
 
 			for( int j = 0; j < size; j++ )
@@ -549,7 +738,7 @@ public class Shape
 			triangulated.addIndex( tempIndicies.get( i ) ) ;
 		}
 
-		final Object[] vertex = Swivel.construct( swivel ) ;
+		final Object[] vertex = Swivel.createVert( swivel ) ;
 		for( int i = 0; i < vertexSize; i++ )
 		{
 			_shape.getVertex( vertex, i ) ;
@@ -663,14 +852,9 @@ public class Shape
 		return ( _p1.x - _p3.x ) * ( _p2.y - _p3.y ) - ( _p2.x - _p3.x ) * ( _p1.y - _p3.y ) ;
 	}
 
-	public static class DefaultFactory implements Shape.Factory
-	{
-		public Shape.Interface create()
-		{
-			return new DefaultShape() ;
-		}
-	}
-
+	/**
+		Default implementation of the Shape class.
+	*/
 	public static class DefaultShape implements Shape.Interface
 	{
 		private Swivel[] swivel ;
@@ -697,6 +881,10 @@ public class Shape
 
 		public void init( final Shape.Interface _shape )
 		{
+			// We've got all the information we need to make this a clean copy.
+			// This should work even if the implementation was changed 
+			// halfway through.
+
 			final Style s = _shape.getStyle() ;
 			final Swivel[] sw = _shape.getSwivel() ;
 			final int indexSize = _shape.getIndexSize() ;
@@ -704,7 +892,7 @@ public class Shape
 
 			init( s, sw, indexSize, vertexSize ) ;
 
-			final Object[] vertex = Swivel.construct( sw ) ;
+			final Object[] vertex = Swivel.createVert( sw ) ;
 			for( int i = 0; i < vertexSize; i++ )
 			{
 				addVertex( _shape.getVertex( vertex, i ) ) ;
@@ -869,7 +1057,7 @@ public class Shape
 
 			return verticies[start] ;
 		}
-		
+
 		public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 		{
 			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
@@ -915,10 +1103,6 @@ public class Shape
 			return vertexSize ;
 		}
 
-		/**
-			Inform the developer whether the Shape 
-			has been correctly populated with data.
-		*/
 		public boolean isComplete()
 		{
 			return indexIncrement == indicies.length && vertexIncrement == verticies.length ;

@@ -12,9 +12,11 @@ import com.linxonline.mallet.maths.* ;
 
 public class UILayout extends UIElement
 {
-	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
-	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;
-	private final UIElementUpdater updater ;
+	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
+	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
+	private final UIElementUpdater updater ;										// Used to position the layouts children
+
+	private EngageListener engageMode = null ;										// Selection/Focus mode
 
 	public UILayout( final Type _type )
 	{
@@ -42,6 +44,8 @@ public class UILayout extends UIElement
 			case FORM       : updater = getFormUpdater() ;       break ;
 			default         : updater = getHorizontalUpdater() ; break ;
 		}
+
+		setEngageMode( new SingleEngageListener() ) ;
 	}
 
 	@Override
@@ -52,6 +56,20 @@ public class UILayout extends UIElement
 		{
 			element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
+	}
+
+	/**
+		Set the Engagement protocol that should be used 
+		on the child elements of the layout.
+		The layout's children will only receive inputs 
+		if they are flagged as engaged. This listener 
+		will allow the layout to change how it decides 
+		elements are flagged as engaged.
+	*/
+	public void setEngageMode( final EngageListener _listener )
+	{
+		removeListener( engageMode ) ;
+		engageMode = addListener( _listener ) ;
 	}
 
 	/**
@@ -103,35 +121,43 @@ public class UILayout extends UIElement
 
 		super.update( _dt, _events ) ;
 
-		for( final UIElement element : ordered )
 		{
-			element.update( _dt, _events ) ;
-			if( element.destroy == true )
+			final int size = ordered.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				// If the child element is flagged for 
-				// destruction add it to the remove list.
-				removeElement( element ) ;
+				final UIElement element = ordered.get( i ) ;
+				element.update( _dt, _events ) ;
+				if( element.destroy == true )
+				{
+					// If the child element is flagged for 
+					// destruction add it to the remove list.
+					removeElement( element ) ;
 
-				// We'll also want to refresh the UILayout.
-				makeDirty() ;
-			}
-			else if( element.isDirty() == true )
-			{
-				// If a Child element is updating we'll 
-				// most likely also want to update the parent.
-				makeDirty() ;
+					// We'll also want to refresh the UILayout.
+					makeDirty() ;
+				}
+				else if( element.isDirty() == true )
+				{
+					// If a Child element is updating we'll 
+					// most likely also want to update the parent.
+					makeDirty() ;
+				}
 			}
 		}
 
-		for( final UIElement element : toRemove )
 		{
-			if( ordered.remove( element ) == true )
+			final int size = toRemove.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				element.shutdown() ;
-				element.clear() ;
+				final UIElement element = toRemove.get( i ) ;
+				if( ordered.remove( element ) == true )
+				{
+					element.shutdown() ;
+					element.clear() ;
+				}
 			}
+			toRemove.clear() ;
 		}
-		toRemove.clear() ;
 	}
 
 	@Override
@@ -150,17 +176,33 @@ public class UILayout extends UIElement
 	{
 		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 		{
+			// Don't pass the InputEvent on to the child elements.
+			// The UILayout may wish to consume the event if it was 
+			// used to get focus onto a child element.  
 			return InputEvent.Action.CONSUME ;
 		}
 
-		for( final UIElement element : ordered )
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			if( element.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+			final UIElement element = ordered.get( i ) ;
+			if( element.isEngaged() == true )
 			{
-				return InputEvent.Action.CONSUME ;
+				// A UILayout will only pass input events to a child 
+				// element if the element is flagged as engaged.
+				// Use an engagement listener to determine this.
+				if( element.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+				{
+					// A child element may want to deny the other 
+					// children the ability to process the InputEvent.
+					// This means that the children's order is important.
+					return InputEvent.Action.CONSUME ;
+				}
 			}
 		}
 
+		// If the UILayout or the children don't want t
+		// consume the event then let it propagate.
 		return InputEvent.Action.PROPAGATE ;
 	}
 
@@ -424,6 +466,82 @@ public class UILayout extends UIElement
 			}
 
 			return Type.valueOf( _type ) ;
+		}
+	}
+
+	public static abstract class EngageListener extends InputListener<UILayout> {}
+
+	/**
+		Only allows one UIElement within the UILayout to 
+		be enagaged at any one time.
+		This implementation will eventually be modified to 
+		enforce this rule when using keyboard inputs and 
+		gamepad inputs, for now it will deal with mouse/touch inputs.
+	*/
+	public static class SingleEngageListener extends EngageListener
+	{
+		@Override
+		public InputEvent.Action move( final InputEvent _input )
+		{
+			switch( _input.getInputType() )
+			{
+				case MOUSE_MOVED       :
+				case TOUCH_MOVE        :
+				case MOUSE1_PRESSED    :
+				case MOUSE2_PRESSED    :
+				case MOUSE3_PRESSED    :
+				case TOUCH_DOWN        :
+				case MOUSE1_RELEASED   :
+				case MOUSE2_RELEASED   :
+				case MOUSE3_RELEASED   :
+				case TOUCH_UP          :
+				{
+					return updateMouse( _input ) ;
+				}
+				case GAMEPAD_RELEASED  :
+				case KEYBOARD_RELEASED :
+				case GAMEPAD_PRESSED  :
+				case KEYBOARD_PRESSED :
+				case GAMEPAD_ANALOGUE :
+				{
+					// Not yet implemented.
+					break ;
+				}
+			}
+
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			If the Input Event uses mouseX and mouseY.
+			Check to see if the event intersects with a 
+			child element, if it does engage it and disengage 
+			the rest.
+		*/
+		public InputEvent.Action updateMouse( final InputEvent _input )
+		{
+			final UILayout layout = getParent() ;
+
+			final int size = layout.ordered.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIElement element = layout.ordered.get( i ) ;
+				if( element.isIntersectInput( _input ) == true &&
+					element.isEngaged() == false )
+				{
+					element.engage() ;
+				}
+				else if( element.isIntersectInput( _input ) == false &&
+						 element.isEngaged() == true )
+				{
+					// We only want to disengage if the element 
+					// was engaged, else we are spamming the UIElement 
+					// listener system with unwanted disengaged calls.
+					element.disengage() ;
+				}
+			}
+
+			return InputEvent.Action.PROPAGATE ;
 		}
 	}
 

@@ -9,6 +9,14 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	Using DefaultShape returned unpredictable results when 
+	uploading to a VBO.
+
+	To mitigate this issue and improve performance we ensure 
+	that the Shape structure is already in a viable format 
+	for uploading. 
+*/
 public class WebShape implements Shape.Interface
 {
 	private Shape.Style style ;

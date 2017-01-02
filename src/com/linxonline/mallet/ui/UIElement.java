@@ -8,9 +8,21 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	Base class for all UI related systems.
+	It can receive user input and event.
+
+	The UIElement defines the confines that the developer is restricted to
+	when implementing their custom listeners.
+
+	UIElement does not directly handle the visual display 
+	that is delegated to a UIListener and the developer is expected 
+	to implement it in whatever way they see fit.
+	
+*/
 public class UIElement implements InputHandler
 {
-	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;
+	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
 	private final ListenerUnit<BaseListener> listeners = new ListenerUnit<BaseListener>( this ) ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
@@ -34,8 +46,8 @@ public class UIElement implements InputHandler
 
 	public enum State
 	{
-		NEUTRAL,
-		ENGAGED
+		NEUTRAL,	// Element does not have focus
+		ENGAGED		// Element has focus
 	}
 
 	public UIElement()
@@ -53,6 +65,12 @@ public class UIElement implements InputHandler
 		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
 	}
 
+	/**
+		Add an event to the event list.
+		This list will be polled on the next elements 
+		update, the events will eventually find their 
+		way to the Game State event-system if using UIComponent. 
+	*/
 	public void addEvent( final Event<?> _event )
 	{
 		events.add( _event ) ;
@@ -65,8 +83,18 @@ public class UIElement implements InputHandler
 	*/
 	public <T extends BaseListener<? extends UIElement>> T addListener( final T _listener )
 	{
-		listeners.addListener( _listener ) ;
+		listeners.add( _listener ) ;
 		return _listener ;
+	}
+
+	/**
+		Remove the listener from the UIElement.
+		return true if the listener was removed else 
+		return false.
+	*/
+	public <T extends BaseListener<? extends UIElement>> boolean removeListener( final T _listener )
+	{
+		return listeners.remove( _listener ) ;
 	}
 
 	/**
@@ -82,22 +110,40 @@ public class UIElement implements InputHandler
 
 	/**
 		Flag the UIElement as being engaged.
-		This will allow it to accept Gamepad/Keyboard input.
 	*/
 	public void engage()
 	{
 		current = State.ENGAGED ;
+		final List<BaseListener> base = listeners.getListeners() ;
+		final int size = base.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			base.get( i ).engage() ;
+		}
 	}
 
 	/**
 		Flag the UIElement as being disengaged.
-		This will prevent it from accepting Gamepad/Keyboard input.
 	*/
 	public void disengage()
 	{
 		current = State.NEUTRAL ;
+		final List<BaseListener> base = listeners.getListeners() ;
+		final int size = base.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			base.get( i ).disengage() ;
+		}
 	}
-	
+
+	/**
+		Inform the caller whether the element is engaged.
+	*/
+	public boolean isEngaged()
+	{
+		return current == State.ENGAGED ;
+	}
+
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		if( events.isEmpty() == false )
@@ -126,94 +172,47 @@ public class UIElement implements InputHandler
 
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		// If the Input Type is Mouse or Touch 
-		// and the x, y of the input is within the 
-		// elements bounds consider the element to be engaged.
-		// Will only accept GamePad/Keyboard inputs if the 
-		// element is considered to be already engaged.
 		switch( _event.getInputType() )
 		{
 			case MOUSE_MOVED       :
 			case TOUCH_MOVE        :
 			{
-				if( isIntersectInput( _event ) == true )
-				{
-					engage() ;
-					return updateMove( _event ) ;
-				}
-				else if( current == State.ENGAGED )
-				{
-					disengage() ;
-					return updateExited( _event ) ;
-				}
-				break ;
+				return updateMove( _event ) ;
 			}
 			case MOUSE1_PRESSED    :
 			case MOUSE2_PRESSED    :
 			case MOUSE3_PRESSED    :
 			case TOUCH_DOWN        :
 			{
-				if( isIntersectInput( _event ) == true )
-				{
-					engage() ;
-					return updatePressed( _event ) ;
-				}
-				else if( current == State.ENGAGED )
-				{
-					disengage() ;
-					return updateExited( _event ) ;
-				}
-				break ;
+				return updatePressed( _event ) ;
 			}
 			case MOUSE1_RELEASED   :
 			case MOUSE2_RELEASED   :
 			case MOUSE3_RELEASED   :
 			case TOUCH_UP          :
 			{
-				if( isIntersectInput( _event ) == true )
-				{
-					engage() ;
-					return updateReleased( _event ) ;
-				}
-				else if( current == State.ENGAGED )
-				{
-					disengage() ;
-					return updateExited( _event ) ;
-				}
-				break ;
+				return updateReleased( _event ) ;
 			}
 			case GAMEPAD_RELEASED  :
 			case KEYBOARD_RELEASED :
 			{
-				if( current == State.ENGAGED )
-				{
-					return updateReleased( _event ) ;
-				}
-				break ;
+				return updateReleased( _event ) ;
 			}
 			case GAMEPAD_PRESSED  :
 			case KEYBOARD_PRESSED :
 			{
-				if( current == State.ENGAGED )
-				{
-					return updatePressed( _event ) ;
-				}
-				break ;
+				return updatePressed( _event ) ;
 			}
 			case GAMEPAD_ANALOGUE :
 			{
-				if( current == State.ENGAGED )
-				{
-					return updateMove( _event ) ;
-				}
-				break ;
+				return updateMove( _event ) ;
 			}
 		}
 
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	private boolean isIntersectInput( final InputEvent _event )
+	protected boolean isIntersectInput( final InputEvent _event )
 	{
 		final InputAdapterInterface adapter = getInputAdapter() ;
 		if( adapter != null )
@@ -262,21 +261,6 @@ public class UIElement implements InputHandler
 		for( int i = 0; i < size; i++ )
 		{
 			if( base.get( i ).pressed( _event ) == InputEvent.Action.CONSUME )
-			{
-				return InputEvent.Action.CONSUME ;
-			}
-		}
-
-		return InputEvent.Action.PROPAGATE ;
-	}
-
-	private InputEvent.Action updateExited( final InputEvent _event )
-	{
-		final List<BaseListener> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( base.get( i ).exited( _event ) == InputEvent.Action.CONSUME )
 			{
 				return InputEvent.Action.CONSUME ;
 			}

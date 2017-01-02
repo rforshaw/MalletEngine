@@ -183,39 +183,27 @@ public class UIButton extends UIElement
 		@Override
 		public InputEvent.Action pressed( final InputEvent _input )
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			if( getParent().isEngaged() == true )
+			{
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
 
 			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
-		public InputEvent.Action released( final InputEvent _input )
-		{
-			switch( getParent().getState() )
-			{
-				case ENGAGED : return move( _input ) ;
-				case NEUTRAL : return exited( _input ) ;
-				default      : return InputEvent.Action.PROPAGATE ;
-			}
-		}
-
-		@Override
-		public InputEvent.Action move( final InputEvent _input )
+		public void engage()
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
-
-			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
-		public InputEvent.Action exited( final InputEvent _input )
+		public void disengage()
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
-
-			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
