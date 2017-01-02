@@ -79,6 +79,17 @@ public class UIButton extends UIElement
 		addListener( _listener ) ;
 	}
 
+	@Override
+	public InputEvent.Action passInputEvent( final InputEvent _event )
+	{
+		if( isIntersectInput( _event ) == true )
+		{
+			return super.passInputEvent( _event ) ;
+		}
+
+		return InputEvent.Action.PROPAGATE ;
+	}
+
 	public static UIListener constructUIListener( final MalletTexture _sheet,
 												  final UIButton.UV _neutral,
 												  final UIButton.UV _rollover,

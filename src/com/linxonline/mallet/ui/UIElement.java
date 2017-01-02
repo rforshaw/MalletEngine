@@ -170,6 +170,7 @@ public class UIElement implements InputHandler
 		listeners.refresh() ;
 	}
 
+	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
 		switch( _event.getInputType() )
@@ -212,7 +213,7 @@ public class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	protected boolean isIntersectInput( final InputEvent _event )
+	public boolean isIntersectInput( final InputEvent _event )
 	{
 		final InputAdapterInterface adapter = getInputAdapter() ;
 		if( adapter != null )
