@@ -566,7 +566,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
@@ -637,11 +637,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotate.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-				_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+				if( _data.getDrawShape() == null )
+				{
+					_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+				}
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
 				world.upload( gl, _data ) ;
@@ -737,7 +740,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
 		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
+
+		gl.glEnable( GL3.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
 		gl.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+
+		gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+		gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
 		gl.glEnable( GL.GL_CULL_FACE ) ;
 		gl.glCullFace( GL.GL_BACK ) ;  
@@ -809,8 +817,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void display( final GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL3() ;
-		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT ) ;
-		gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT ) ;
+		//gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		getEventController().update() ;
 

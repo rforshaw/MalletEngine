@@ -82,10 +82,7 @@ public abstract class ManagedArray<T>
 
 	protected void addNewData( final List<T> _toAdd )
 	{
-		for( final T add : _toAdd )
-		{
-			current.add( add ) ;
-		}
+		current.addAll( _toAdd ) ;
 		_toAdd.clear() ;
 	}
 

@@ -250,6 +250,9 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	protected void upload( final int _diff, final int _iteration )
 	{
+		// Position, Rotation, and Scale should always 
+		// be updated even if the data is not being uploaded 
+		// to the GPU.
 		switch( getInterpolationMode() )
 		{
 			case LINEAR :
@@ -269,15 +272,13 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 			}
 		}
 
-		if( toUpdate() == false &&
-			getUpdateType() == UpdateType.ON_DEMAND )
+		if( toUpdate() == true ||
+			getUpdateType() == UpdateType.CONTINUOUS )
 		{
 			// Only upload new model state if _data is flagged 
 			// as to be updated or UpdateType is CONTINUOUS.
-			return ;
+			draw.upload( ( T )this ) ;
 		}
-
-		draw.upload( ( T )this ) ;
 	}
 
 	private void interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
