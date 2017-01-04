@@ -73,14 +73,14 @@ public final class GameTestLoader extends GameLoader
 					button.addListener( new InputListener<UIButton>()
 					{
 						@Override
-						public InputEvent.Action pressed( final InputEvent _input )
+						public InputEvent.Action mousePressed( final InputEvent _input )
 						{
 							System.out.println( "Test Button 1 - pressed" ) ;
 							return InputEvent.Action.PROPAGATE ;
 						}
 
 						@Override
-						public InputEvent.Action released( final InputEvent _input )
+						public InputEvent.Action mouseReleased( final InputEvent _input )
 						{
 							System.out.println( "Test Button 1 - released" ) ;
 							return InputEvent.Action.PROPAGATE ;
@@ -93,14 +93,14 @@ public final class GameTestLoader extends GameLoader
 					button.addListener( new InputListener<UIButton>()
 					{
 						@Override
-						public InputEvent.Action pressed( final InputEvent _input )
+						public InputEvent.Action mousePressed( final InputEvent _input )
 						{
 							System.out.println( "Test Button 2 - pressed" ) ;
 							return InputEvent.Action.PROPAGATE ;
 						}
 					
 						@Override
-						public InputEvent.Action released( final InputEvent _input )
+						public InputEvent.Action mouseReleased( final InputEvent _input )
 						{
 							System.out.println( "Test Button 2 - released" ) ;
 							return InputEvent.Action.PROPAGATE ;

@@ -28,7 +28,12 @@ public class ListenerUnit<T extends BaseListener>
 
 	public boolean remove( final T _listener )
 	{
-		return listeners.remove( _listener ) ;
+		if( listeners.remove( _listener ) == true )
+		{
+			_listener.setParent( null ) ;
+			return true ;
+		}
+		return false ;
 	}
 
 	public List<T> getListeners()

@@ -261,7 +261,7 @@ public class EditorState extends GameState
 			}
 
 			@Override
-			public InputEvent.Action released( final InputEvent _input )
+			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
 				if( dropdown != null )
 				{

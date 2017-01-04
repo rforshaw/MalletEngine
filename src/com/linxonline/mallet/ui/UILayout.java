@@ -59,6 +59,18 @@ public class UILayout extends UIElement
 	}
 
 	/**
+		Engaging a UILayout is somewhat redundant.
+		You will most likely want to engage a child element 
+		owned by the layout.
+	*/
+	@Override
+	public void engage()
+	{
+		super.engage() ;
+		current = State.CHILD_ENGAGED ;
+	}
+
+	/**
 		Set the Engagement protocol that should be used 
 		on the child elements of the layout.
 		The layout's children will only receive inputs 
@@ -480,45 +492,11 @@ public class UILayout extends UIElement
 	*/
 	public static class SingleEngageListener extends EngageListener
 	{
+		private UIElement currentEngaged = null ;
+		private int currentIndex = 0 ;
+
 		@Override
-		public InputEvent.Action move( final InputEvent _input )
-		{
-			switch( _input.getInputType() )
-			{
-				case MOUSE_MOVED       :
-				case TOUCH_MOVE        :
-				case MOUSE1_PRESSED    :
-				case MOUSE2_PRESSED    :
-				case MOUSE3_PRESSED    :
-				case TOUCH_DOWN        :
-				case MOUSE1_RELEASED   :
-				case MOUSE2_RELEASED   :
-				case MOUSE3_RELEASED   :
-				case TOUCH_UP          :
-				{
-					return updateMouse( _input ) ;
-				}
-				case GAMEPAD_RELEASED  :
-				case KEYBOARD_RELEASED :
-				case GAMEPAD_PRESSED  :
-				case KEYBOARD_PRESSED :
-				case GAMEPAD_ANALOGUE :
-				{
-					// Not yet implemented.
-					break ;
-				}
-			}
-
-			return InputEvent.Action.PROPAGATE ;
-		}
-
-		/**
-			If the Input Event uses mouseX and mouseY.
-			Check to see if the event intersects with a 
-			child element, if it does engage it and disengage 
-			the rest.
-		*/
-		public InputEvent.Action updateMouse( final InputEvent _input )
+		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
 			final UILayout layout = getParent() ;
 
@@ -529,19 +507,110 @@ public class UILayout extends UIElement
 				if( element.isIntersectInput( _input ) == true &&
 					element.isEngaged() == false )
 				{
-					element.engage() ;
-				}
-				else if( element.isIntersectInput( _input ) == false &&
-						 element.isEngaged() == true )
-				{
-					// We only want to disengage if the element 
-					// was engaged, else we are spamming the UIElement 
-					// listener system with unwanted disengaged calls.
-					element.disengage() ;
+					setCurrentEngaged( element, i ) ;
+					break ;
 				}
 			}
 
+			disengageOthers( currentEngaged, layout.ordered ) ;
 			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchMove( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action keyReleased( final InputEvent _input )
+		{
+			final UILayout layout = getParent() ;
+			final List<UIElement> elements = layout.ordered ;
+
+			if( currentEngaged == null )
+			{
+				setCurrentEngaged( elements.get( currentIndex ), currentIndex ) ;
+			}
+
+			switch( _input.getKeyCode() )
+			{
+				case UP    :
+				case DOWN  :
+				case LEFT  :
+				case RIGHT :
+			}
+
+			disengageOthers( currentEngaged, layout.ordered ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		private void setCurrentEngaged( final UIElement _toEngage, final int _index )
+		{
+			if( _toEngage == null )
+			{
+				disengage( currentEngaged ) ;
+				currentEngaged = null ;
+				currentIndex = _index ;
+				return ;
+			}
+
+			if( currentEngaged != _toEngage )
+			{
+				disengage( currentEngaged ) ;
+
+				currentEngaged = _toEngage ;
+				currentEngaged.engage() ;
+				currentIndex = _index ;
+			}
+		}
+
+		private static void disengageOthers( final UIElement _current, final List<UIElement> _others )
+		{
+			final int size = _others.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIElement element = _others.get( i ) ;
+				if( element != _current &&
+					element.isEngaged() == true )
+				{
+					// Only disengage the elements that were previously
+					// engaged and are not the currently engaged element.
+					element.disengage() ;
+				}
+			}
+		}
+
+		private static void disengage( final UIElement _element )
+		{
+			if( _element != null )
+			{
+				_element.disengage() ;
+			}
 		}
 	}
 

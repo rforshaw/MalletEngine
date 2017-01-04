@@ -87,6 +87,9 @@ public class ConfigParser
 
 				var = _src.getString( "EFFECTVOLUME", "100" ) ;
 				_dest.addInteger( "EFFECTVOLUME", Integer.parseInt( var ) ) ;
+
+				var = _src.getString( "DOUBLEBUFFER", "true" ) ;
+				_dest.addBoolean( "DOUBLEBUFFER", Boolean.parseBoolean( var ) ) ;
 			}
 		} ) ;
 	}

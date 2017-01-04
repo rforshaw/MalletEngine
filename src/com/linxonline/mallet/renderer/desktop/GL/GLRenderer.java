@@ -858,12 +858,15 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
 			final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
 			capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
-			capabilities.setDoubleBuffered( true ) ;
+			capabilities.setDoubleBuffered( GlobalConfig.getBoolean( "DOUBLE_BUFFER", true ) ) ;
 
 			canvas = GLWindow.create( capabilities ) ;
 
 			final Vector2 display = getRenderInfo().getDisplayDimensions() ;
 			canvas.setSize( ( int )display.x, ( int )display.y ) ;
+
+			// We want to be in complete control of any swapBuffer calls
+			canvas.setAutoSwapBufferMode( false ) ;
 		}
 	}
 

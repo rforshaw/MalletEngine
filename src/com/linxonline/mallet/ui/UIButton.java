@@ -192,7 +192,7 @@ public class UIButton extends UIElement
 		}
 
 		@Override
-		public InputEvent.Action pressed( final InputEvent _input )
+		public InputEvent.Action mousePressed( final InputEvent _input )
 		{
 			if( getParent().isEngaged() == true )
 			{
@@ -201,6 +201,12 @@ public class UIButton extends UIElement
 			}
 
 			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
 		}
 
 		@Override

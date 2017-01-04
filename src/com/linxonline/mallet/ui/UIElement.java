@@ -28,7 +28,7 @@ public class UIElement implements InputHandler
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 	private InputAdapterInterface adapter = null ;
 
-	private State current = State.NEUTRAL ;
+	protected State current = State.NEUTRAL ;
 
 	public boolean destroy = false ;
 
@@ -46,8 +46,9 @@ public class UIElement implements InputHandler
 
 	public enum State
 	{
-		NEUTRAL,	// Element does not have focus
-		ENGAGED		// Element has focus
+		NEUTRAL,		// Element does not have focus
+		ENGAGED,		// Element has focus
+		CHILD_ENGAGED	// A child has focus within the element
 	}
 
 	public UIElement()
@@ -138,10 +139,13 @@ public class UIElement implements InputHandler
 
 	/**
 		Inform the caller whether the element is engaged.
+		If a child element is engaged then the parent 
+		should be considered engaged too.
 	*/
 	public boolean isEngaged()
 	{
-		return current == State.ENGAGED ;
+		return current == State.ENGAGED ||
+			   current == State.CHILD_ENGAGED ;
 	}
 
 	public void update( final float _dt, final List<Event<?>> _events )
@@ -175,38 +179,36 @@ public class UIElement implements InputHandler
 	{
 		switch( _event.getInputType() )
 		{
-			case MOUSE_MOVED       :
-			case TOUCH_MOVE        :
-			{
-				return updateMove( _event ) ;
-			}
+			case MOUSE_MOVED       : return updateListeners( listeners.getListeners(), mouseMoveAction, _event ) ;
 			case MOUSE1_PRESSED    :
 			case MOUSE2_PRESSED    :
-			case MOUSE3_PRESSED    :
-			case TOUCH_DOWN        :
-			{
-				return updatePressed( _event ) ;
-			}
+			case MOUSE3_PRESSED    : return updateListeners( listeners.getListeners(), mousePressedAction, _event ) ;
 			case MOUSE1_RELEASED   :
 			case MOUSE2_RELEASED   :
-			case MOUSE3_RELEASED   :
-			case TOUCH_UP          :
-			{
-				return updateReleased( _event ) ;
-			}
+			case MOUSE3_RELEASED   : return updateListeners( listeners.getListeners(), mouseReleasedAction, _event ) ;
+			case TOUCH_MOVE        : return updateListeners( listeners.getListeners(), touchMoveAction, _event ) ;
+			case TOUCH_DOWN        : return updateListeners( listeners.getListeners(), touchPressedAction, _event ) ;
+			case TOUCH_UP          : return updateListeners( listeners.getListeners(), touchReleasedAction, _event ) ;
 			case GAMEPAD_RELEASED  :
-			case KEYBOARD_RELEASED :
+			case KEYBOARD_RELEASED : return updateListeners( listeners.getListeners(), keyReleasedAction, _event ) ;
+			case GAMEPAD_PRESSED   :
+			case KEYBOARD_PRESSED  : return updateListeners( listeners.getListeners(), keyPressedAction, _event ) ;
+			case GAMEPAD_ANALOGUE  : return updateListeners( listeners.getListeners(), analogueMoveAction, _event ) ;
+		}
+
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	private static InputEvent.Action updateListeners( final List<BaseListener> _base,
+													  final InputAction _action,
+													  final InputEvent _event )
+	{
+		final int size = _base.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			if( _action.action( _base.get( i ), _event ) == InputEvent.Action.CONSUME )
 			{
-				return updateReleased( _event ) ;
-			}
-			case GAMEPAD_PRESSED  :
-			case KEYBOARD_PRESSED :
-			{
-				return updatePressed( _event ) ;
-			}
-			case GAMEPAD_ANALOGUE :
-			{
-				return updateMove( _event ) ;
+				return InputEvent.Action.CONSUME ;
 			}
 		}
 
@@ -223,51 +225,6 @@ public class UIElement implements InputHandler
 		}
 
 		return false ;
-	}
-
-	private InputEvent.Action updateMove( final InputEvent _event )
-	{
-		final List<BaseListener> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( base.get( i ).move( _event ) == InputEvent.Action.CONSUME )
-			{
-				return InputEvent.Action.CONSUME ;
-			}
-		}
-
-		return InputEvent.Action.PROPAGATE ;
-	}
-
-	private InputEvent.Action updateReleased( final InputEvent _event )
-	{
-		final List<BaseListener> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( base.get( i ).released( _event ) == InputEvent.Action.CONSUME )
-			{
-				return InputEvent.Action.CONSUME ;
-			}
-		}
-
-		return InputEvent.Action.PROPAGATE ;
-	}
-
-	private InputEvent.Action updatePressed( final InputEvent _event )
-	{
-		final List<BaseListener> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( base.get( i ).pressed( _event ) == InputEvent.Action.CONSUME )
-			{
-				return InputEvent.Action.CONSUME ;
-			}
-		}
-
-		return InputEvent.Action.PROPAGATE ;
 	}
 
 	/**
@@ -612,6 +569,92 @@ public class UIElement implements InputHandler
 		length.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		margin.setXYZ( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
 	}
+
+	private interface InputAction
+	{
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event ) ;
+	}
+	
+	private static final InputAction mouseMoveAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.mouseMove( _event ) ;
+		}
+	} ;
+
+	private static final InputAction mousePressedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.mousePressed( _event ) ;
+		}
+	} ;
+
+	private static final InputAction mouseReleasedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.mouseReleased( _event ) ;
+		}
+	} ;
+
+	private static final InputAction touchMoveAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.touchMove( _event ) ;
+		}
+	} ;
+
+	private static final InputAction touchPressedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.touchPressed( _event ) ;
+		}
+	} ;
+
+	private static final InputAction touchReleasedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.touchReleased( _event ) ;
+		}
+	} ;
+
+	private static final InputAction keyReleasedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.keyReleased( _event ) ;
+		}
+	} ;
+
+	private static final InputAction keyPressedAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.keyPressed( _event ) ;
+		}
+	} ;
+
+	private static final InputAction analogueMoveAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		{
+			return _listener.analogueMove( _event ) ;
+		}
+	} ;
 
 	public static class UV
 	{

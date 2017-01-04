@@ -40,31 +40,74 @@ public abstract class BaseListener<T extends UIElement>
 	}
 
 	/**
-		Called when a key/button has been pressed.
-		This includes KEYBOARD_PRESSED, MOUSEX_PRESSED,
-		and GAMEPAD_PRESSED events. 
+		Called when the mouse is moved.
 	*/
-	public InputEvent.Action pressed( final InputEvent _input )
+	public InputEvent.Action mouseMove( final InputEvent _input )
 	{
 		return InputEvent.Action.PROPAGATE ;
 	}
 
 	/**
-		Called when a key/button has been released.
-		This includes KEYBOARD_RELEASED, MOUSEX_RELEASED,
-		and GAMEPAD_RELEASED events.
+		Called when the mouse has a trigger pressed.
 	*/
-	public InputEvent.Action released( final InputEvent _input )
+	public InputEvent.Action mousePressed( final InputEvent _input )
 	{
 		return InputEvent.Action.PROPAGATE ;
 	}
 
 	/**
-		Called when a move event is generated.
-		This can either be a TOUCH_MOVED, MOUSE_MOVED, 
-		or GAMEPAD_ANALOGUE event.
+		Called when the mouse has a trigger released.
 	*/
-	public InputEvent.Action move( final InputEvent _input )
+	public InputEvent.Action mouseReleased( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when the user is moving a pressed finger 
+		on the touch screen.
+	*/
+	public InputEvent.Action touchMove( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when a touch screen is pressed.
+	*/
+	public InputEvent.Action touchPressed( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when a touch screen is released.
+	*/
+	public InputEvent.Action touchReleased( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when a key is pressed.
+	*/
+	public InputEvent.Action keyPressed( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when a key is released.
+	*/
+	public InputEvent.Action keyReleased( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
+		Called when a joystick/gamepad stick is waggled.
+	*/
+	public InputEvent.Action analogueMove( final InputEvent _input )
 	{
 		return InputEvent.Action.PROPAGATE ;
 	}
