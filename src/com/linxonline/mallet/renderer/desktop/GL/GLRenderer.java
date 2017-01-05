@@ -810,6 +810,10 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	public void draw( final float _dt )
 	{
 		super.draw( _dt ) ;
+		if( canvas.getExclusiveContextThread() == null )
+		{
+			canvas.setExclusiveContextThread( Thread.currentThread() ) ;
+		}
 		canvas.display() ;
 	}
 
