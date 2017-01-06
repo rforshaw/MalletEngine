@@ -57,7 +57,9 @@ public class GameState extends State implements HookEntity
 	protected final InputState inputWorldSystem = new InputState() ;										// Internal World Input System
 	protected final InputState inputUISystem = new InputState() ;											// Internal UI Input System
 	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
-	protected final EventController eventController = new EventController( "GAME_STATE_CONTROLLER" ) ;		// Used to process Events, gateway between internal eventSystem and root event-system
+
+	private final EventController internalController = new EventController( "GAME_STATE_CONTROLLER_INTERNAL" ) ;		// Used to process Events, from internal eventSystem
+	private final EventController externalController = new EventController( "GAME_STATE_CONTROLLER_EXTERNAL" ) ;		// Used to process Events, from external eventSystem
 
 	protected SystemInterface system = null ;																// Provides access to Root systems
 	protected final AudioSystem audioSystem = new AudioSystem() ;											// Must specify a SourceGenerator
@@ -114,7 +116,7 @@ public class GameState extends State implements HookEntity
 		
 		// Event processors need to be called last 
 		// in case developer adds more during initGame or resumeGame.
-		initEventProcessors() ;
+		initEventProcessors( internalController, externalController ) ;
 		hookGameStateEventController() ;
 	}
 
@@ -319,16 +321,19 @@ public class GameState extends State implements HookEntity
 	*/
 	protected void hookGameStateEventController()
 	{
-		eventSystem.addEventHandler( eventController ) ;
-		system.getEventInterface().addEventHandler( eventController ) ;
+		eventSystem.addEventHandler( internalController ) ;
+		internalController.setAddEventInterface( eventSystem ) ;
+
+		system.getEventInterface().addEventHandler( externalController ) ;
+		externalController.setAddEventInterface( system.getEventInterface() ) ;
 	}
 
 	protected void unhookGameStateEventController()
 	{
-		eventSystem.removeEventHandler( eventController ) ;
+		eventSystem.removeEventHandler( internalController ) ;
 		eventSystem.removeHandlersNow() ;
 
-		system.getEventInterface().removeEventHandler( eventController ) ;
+		system.getEventInterface().removeEventHandler( externalController ) ;
 		system.getEventInterface().removeHandlersNow() ;
 	}
 
@@ -407,7 +412,8 @@ public class GameState extends State implements HookEntity
 					eventSystem.update() ;
 
 					dataTracker.update() ;
-					eventController.update() ;
+					internalController.update() ;
+					externalController.update() ;
 
 					showFPS.update( deltaRenderTime ) ;
 
@@ -483,7 +489,8 @@ public class GameState extends State implements HookEntity
 					eventSystem.update() ;
 
 					dataTracker.update() ;
-					eventController.update() ;
+					internalController.update() ;
+					externalController.update() ;
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
@@ -525,9 +532,9 @@ public class GameState extends State implements HookEntity
 		} ;
 	}
 
-	protected void initEventProcessors()
+	protected void initEventProcessors( final EventController _internal, final EventController _external )
 	{
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_UI_INPUT" )
+		_internal.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_UI_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
@@ -535,7 +542,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_UI_INPUT" )
+		_internal.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_UI_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
@@ -543,7 +550,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_WORLD_INPUT" )
+		_internal.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_WORLD_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
@@ -551,7 +558,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_WORLD_INPUT" )
+		_internal.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_WORLD_INPUT" )
 		{
 			public void processEvent( final Event<InputHandler> _event )
 			{
@@ -559,7 +566,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT", "ADD_GAME_STATE_EVENT" )
+		_internal.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT", "ADD_GAME_STATE_EVENT" )
 		{
 			public void processEvent( final Event<EventController> _event )
 			{
@@ -569,7 +576,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT", "REMOVE_GAME_STATE_EVENT" )
+		_internal.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT", "REMOVE_GAME_STATE_EVENT" )
 		{
 			public void processEvent( final Event<EventController> _event )
 			{
@@ -578,7 +585,30 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY", "ADD_GAME_STATE_QUERY" )
+		_internal.addEventProcessor( new EventProcessor<EventController>( "ADD_BACKEND_EVENT", "ADD_BACKEND_EVENT" )
+		{
+			public void processEvent( final Event<EventController> _event )
+			{
+				final EventController controller = _event.getVariable() ;
+				final EventSystemInterface eventBackend = system.getEventInterface() ;
+
+				controller.setAddEventInterface( eventBackend ) ;
+				eventBackend.addEventHandler( controller ) ;
+			}
+		} ) ;
+
+		_internal.addEventProcessor( new EventProcessor<EventController>( "REMOVE_BACKEND_EVENT", "REMOVE_BACKEND_EVENT" )
+		{
+			public void processEvent( final Event<EventController> _event )
+			{
+				final EventController controller = _event.getVariable() ;
+				final EventSystemInterface eventBackend = system.getEventInterface() ;
+
+				eventBackend.removeEventHandler( controller ) ;
+			}
+		} ) ;
+
+		_internal.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY", "ADD_GAME_STATE_QUERY" )
 		{
 			public void processEvent( final Event<QueryComponent> _event )
 			{
@@ -587,7 +617,7 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
+		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
 		{
 			private DrawDelegate delegate ;
 
@@ -622,12 +652,23 @@ public class GameState extends State implements HookEntity
 		} ) ;
 	}
 
+	public EventController getInternalController()
+	{
+		return internalController ;
+	}
+
+	public EventController getExternalController()
+	{
+		return externalController ;
+	}
+
 	/**
 		Guarantees that all systems the state uses will be blank.
 	*/
 	protected void clear()
 	{
-		eventController.reset() ;
+		internalController.reset() ;
+		externalController.reset() ;
 
 		eventSystem.clearEvents() ;
 		eventSystem.clearHandlers() ;

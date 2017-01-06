@@ -49,7 +49,7 @@ public class StateComponent extends EventComponent
 
 		if( initialEventDone == true )
 		{
-			passEvent( constructEvent( "TRACK_", set ) ) ;
+			passStateEvent( constructEvent( "TRACK_", set ) ) ;
 		}
 
 		return _data ;

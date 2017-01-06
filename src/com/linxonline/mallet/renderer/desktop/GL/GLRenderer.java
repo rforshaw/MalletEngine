@@ -822,7 +822,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	{
 		gl = _drawable.getGL().getGL3() ;
 		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT ) ;
-		//gl.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		getEventController().update() ;
 

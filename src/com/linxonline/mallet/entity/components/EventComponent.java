@@ -17,7 +17,8 @@ import com.linxonline.mallet.system.* ;
 **/
 public class EventComponent extends Component
 {
-	protected final EventController eventController = new EventController( id.toString() ) ;
+	protected final EventController stateController = new EventController( id.toString() ) ;		// Used to talk to GameState
+	protected final EventController backendController = new EventController( id.toString() ) ;		// Used to talk to GLDefaultSystem
 
 	public EventComponent()
 	{
@@ -32,8 +33,17 @@ public class EventComponent extends Component
 	public EventComponent( final String _name, final String _group )
 	{
 		super( _name, _group ) ;
-		initStateEventProcessors( getEventController() ) ;
+		initBackendEventProcessors( getBackendEventController() ) ;
+		initStateEventProcessors( getStateEventController() ) ;
 	}
+
+	/**
+		Override to add Event Processors to the component's
+		Backend Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public void initBackendEventProcessors( final EventController _controller ) {}
 
 	/**
 		Override to add Event Processors to the component's
@@ -46,33 +56,48 @@ public class EventComponent extends Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		final Event<EventController> event = new Event<EventController>( "ADD_GAME_STATE_EVENT", getEventController() ) ;
-		_events.add( event ) ;
+		_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
+		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", getStateEventController() ) ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getEventController() )  ) ;
+		_events.add( new Event<EventController>( "REMOVE_BACKEND_EVENT", getBackendEventController() )  ) ;
+		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getStateEventController() )  ) ;
 	}
 
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
-		eventController.update() ;
+		backendController.update() ;
+		stateController.update() ;
 	}
 
-	public EventController getEventController()
+	public EventController getBackendEventController()
 	{
-		return eventController ;
+		return backendController ;
+	}
+
+	public EventController getStateEventController()
+	{
+		return stateController ;
 	}
 
 	/**
 		Convienience method to EventController's passEvent.
 	**/
-	public void passEvent( final Event _event )
+	public void passBackendEvent( final Event _event )
 	{
-		eventController.passEvent( _event ) ;
+		backendController.passEvent( _event ) ;
+	}
+
+	/**
+		Convienience method to EventController's passEvent.
+	**/
+	public void passStateEvent( final Event _event )
+	{
+		stateController.passEvent( _event ) ;
 	}
 }
