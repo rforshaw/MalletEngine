@@ -70,6 +70,18 @@ public class AnimationSystem
 		controller.update() ;
 		if( drawDelegate != null )
 		{
+			if( toRemoveAnim.isEmpty() == false )
+			{
+				for( final AnimData anim : toRemoveAnim )
+				{
+					anim.stop() ;
+					animations.remove( anim ) ;
+					drawDelegate.removeDraw( anim.getDraw() ) ;
+					anim.unregister() ;
+				}
+				toRemoveAnim.clear() ;
+			}
+		
 			if( toAddAnim.isEmpty() == false )
 			{
 				for( final AnimData anim : toAddAnim )
@@ -84,18 +96,6 @@ public class AnimationSystem
 					}
 				}
 				toAddAnim.clear() ;
-			}
-
-			if( toRemoveAnim.isEmpty() == false )
-			{
-				for( final AnimData anim : toRemoveAnim )
-				{
-					anim.stop() ;
-					animations.remove( anim ) ;
-					drawDelegate.removeDraw( anim.getDraw() ) ;
-					anim.unregister() ;
-				}
-				toRemoveAnim.clear() ;
 			}
 		}
 

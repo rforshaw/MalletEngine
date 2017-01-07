@@ -238,7 +238,9 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void renderAnimationExample()
 			{
-				final AnimComponent anim = new AnimComponent() ;
+				final Entity entity = new Entity( "Test Animation" ) ;
+
+				final AnimComponent anim = entity.addComponent( new AnimComponent() ) ;
 				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector3( -32, -32, 0 ),
@@ -251,8 +253,22 @@ public final class GameTestLoader extends GameLoader
 				anim.addAnimation( "DEFAULT", moombaAnim ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
 
-				final Entity entity = new Entity( "Test Animation" ) ;
-				entity.addComponent( anim ) ;
+				entity.addComponent( new Component()
+				{
+					private final float DURATION = 5.0f ;
+					private float elapsed = 0.0f ;
+
+					public void update( final float _dt )
+					{
+						elapsed += _dt ;
+						if( elapsed >= DURATION )
+						{
+							elapsed = 0.0f ;
+							anim.playAnimation( "DEFAULT" ) ;
+						}
+					}
+				} ) ;
+				
 				addEntity( entity ) ;
 			}
 

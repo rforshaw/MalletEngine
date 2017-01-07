@@ -119,6 +119,7 @@ public class GLGeometryUploader
 		{
 			buffer.remove( _gl, _data ) ;
 			_data.setGLBuffer( null ) ;
+			_data.setLocation( null ) ;
 		}
 	}
 

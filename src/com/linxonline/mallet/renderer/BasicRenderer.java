@@ -120,7 +120,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			@Override
 			public void removeDraw( final Draw _draw )
 			{
-				if( _draw instanceof DrawData )
+				if( _draw != null && _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
 					worlds.removeDraw( ( DrawData )_draw ) ;
