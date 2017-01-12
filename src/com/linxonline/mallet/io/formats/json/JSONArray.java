@@ -35,23 +35,26 @@ public abstract class JSONArray
 	public abstract JSONArray put( final JSONObject _value ) ;
 	public abstract JSONArray put( final JSONArray _value ) ;
 
-	public abstract boolean optBoolean( final int _index ) ;
+	public abstract boolean getBoolean( final int _index ) ;
 	public abstract boolean optBoolean( final int _index, final boolean _default ) ;
 
-	public abstract int optInt( final int _index ) ;
+	public abstract int getInt( final int _index ) ;
 	public abstract int optInt( final int _index, final int _default ) ;
 
-	public abstract double optDouble( final int _index ) ;
+	public abstract double getDouble( final int _index ) ;
 	public abstract double optDouble( final int _index, final double _default ) ;
-	
-	public abstract long optLong( final int _index ) ;
+
+	public abstract long getLong( final int _index ) ;
 	public abstract long optLong( final int _index, final long _default ) ;
 	
-	public abstract String optString( final int _index ) ;
+	public abstract String getString( final int _index ) ;
 	public abstract String optString( final int _index, final String _default ) ;
-	
-	public abstract JSONObject optJSONObject( final int _index ) ;
-	public abstract JSONArray optJSONArray( final int _index ) ;
+
+	public abstract JSONObject getJSONObject( final int _index ) ;
+	public abstract JSONObject optJSONObject( final int _index, final JSONObject _default ) ;
+
+	public abstract JSONArray getJSONArray( final int _index ) ;
+	public abstract JSONArray optJSONArray( final int _index, final JSONArray _default ) ;
 
 	public abstract String toString() ;
 	public abstract String toString( final int _indent ) ;

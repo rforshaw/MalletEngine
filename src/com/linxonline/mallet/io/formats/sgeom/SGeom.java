@@ -29,21 +29,21 @@ public class SGeom
 
 		final Shape.Style style = Shape.Style.getStyleByString( json.optString( "style", null ) ) ;
 
-		final Shape.Swivel[] swivel = SGeom.constructSwivelOrder( json.optJSONArray( "swivel" ) ) ;
+		final Shape.Swivel[] swivel = SGeom.constructSwivelOrder( json.getJSONArray( "swivel" ) ) ;
 		if( swivel == null )
 		{
 			Logger.println( "No swivel order defined.", Logger.Verbosity.NORMAL ) ;
 			return null ;
 		}
 
-		final JSONArray vertices = json.optJSONArray( "vertices" ) ;
+		final JSONArray vertices = json.getJSONArray( "vertices" ) ;
 		if( vertices == null )
 		{
 			Logger.println( "No vertices defined.", Logger.Verbosity.NORMAL ) ;
 			return null ;
 		}
 
-		final JSONArray indices = json.optJSONArray( "indices" ) ;
+		final JSONArray indices = json.getJSONArray( "indices" ) ;
 		if( indices == null )
 		{
 			Logger.println( "No indices defined.", Logger.Verbosity.NORMAL ) ;
@@ -57,7 +57,7 @@ public class SGeom
 		for( int i = 0; i < iSize; i++ )
 		{
 			// Copy indicies straight into Shape index buffer.
-			shape.addIndex( indices.optInt( i ) ) ;
+			shape.addIndex( indices.getInt( i ) ) ;
 		}
 
 		int swivelIndex = 0 ;
@@ -78,40 +78,40 @@ public class SGeom
 				vertex = new Object[swivel.length] ;
 			}
 
-			final JSONObject jVertex = vertices.optJSONObject( i ) ;
+			final JSONObject jVertex = vertices.getJSONObject( i ) ;
 			switch( swivel[swivelIndex] )
 			{
 				case POINT  :
 				{
-					final float x = ( float )jVertex.optDouble( "x" ) ;
-					final float y = ( float )jVertex.optDouble( "y" ) ;
-					final float z = ( float )jVertex.optDouble( "z" ) ;
+					final float x = ( float )jVertex.getDouble( "x" ) ;
+					final float y = ( float )jVertex.getDouble( "y" ) ;
+					final float z = ( float )jVertex.getDouble( "z" ) ;
 					vertex[swivelIndex] = new Vector3( x, y, z ) ;
 					//System.out.println( "Adding Point" + vertex[swivelIndex] ) ;
 					break ;
 				}
 				case COLOUR :
 				{
-					final int r = jVertex.optInt( "r" ) ;
-					final int g = jVertex.optInt( "g" ) ;
-					final int b = jVertex.optInt( "b" ) ;
+					final int r = jVertex.getInt( "r" ) ;
+					final int g = jVertex.getInt( "g" ) ;
+					final int b = jVertex.getInt( "b" ) ;
 					vertex[swivelIndex] = new MalletColour( r, g, b ) ;
 					//System.out.println( "Adding Colour" + vertex[swivelIndex] ) ;
 					break ;
 				}
 				case NORMAL :
 				{
-					final float x = ( float )jVertex.optDouble( "x" ) ;
-					final float y = ( float )jVertex.optDouble( "y" ) ;
-					final float z = ( float )jVertex.optDouble( "z" ) ;
+					final float x = ( float )jVertex.getDouble( "x" ) ;
+					final float y = ( float )jVertex.getDouble( "y" ) ;
+					final float z = ( float )jVertex.getDouble( "z" ) ;
 					vertex[swivelIndex] = new Vector3( x, y, z ) ;
 					//System.out.println( "Adding Normal" + vertex[swivelIndex] ) ;
 					break ;
 				}
 				case UV     :
 				{
-					final float u = ( float )jVertex.optDouble( "u" ) ;
-					final float v = ( float )jVertex.optDouble( "v" ) ;
+					final float u = ( float )jVertex.getDouble( "u" ) ;
+					final float v = ( float )jVertex.getDouble( "v" ) ;
 					vertex[swivelIndex] = new Vector2( u, v ) ;
 					//System.out.println( "Adding UV: " + vertex[swivelIndex] ) ;
 					break ;
@@ -145,7 +145,7 @@ public class SGeom
 
 		for( int i = 0; i < length; i++ )
 		{
-			swivel[i] = Shape.Swivel.getSwivelByString( _swivel.optString( i ) ) ;
+			swivel[i] = Shape.Swivel.getSwivelByString( _swivel.getString( i ) ) ;
 		}
 
 		return swivel ;

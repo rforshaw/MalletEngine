@@ -61,15 +61,15 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
 				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList();
 
-				fill( paths, _jGL.optJSONArray( "VERTEX" ),   GL3.GL_VERTEX_SHADER ) ;
-				fill( paths, _jGL.optJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;
-				fill( paths, _jGL.optJSONArray( "FRAGMENT" ), GL3.GL_FRAGMENT_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "VERTEX" ),   GL3.GL_VERTEX_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "FRAGMENT" ), GL3.GL_FRAGMENT_SHADER ) ;
 
 				final List<Tuple<String, Uniform>> uniforms = MalletList.<Tuple<String, Uniform>>newList() ;
 				final List<String> swivel = MalletList.<String>newList() ;
 
-				fillUniforms( uniforms, _jGL.optJSONArray( "UNIFORMS" ) ) ;
-				fillAttributes( swivel, _jGL.optJSONArray( "SWIVEL" ) ) ;
+				fillUniforms( uniforms, _jGL.getJSONArray( "UNIFORMS" ) ) ;
+				fillAttributes( swivel, _jGL.getJSONArray( "SWIVEL" ) ) ;
 
 				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, swivel ) ;
 			}
@@ -84,7 +84,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final int length = _base.length() ;
 				for( int i = 0; i < length; i++ )
 				{
-					_toFill.add( new GLShaderMap( _base.optString( i ), _type ) ) ;
+					_toFill.add( new GLShaderMap( _base.getString( i ), _type ) ) ;
 				}
 			}
 
@@ -98,7 +98,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final int length = _base.length() ;
 				for( int i = 0; i < length; i++ )
 				{
-					_toFill.add( _base.optString( i ) ) ;
+					_toFill.add( _base.getString( i ) ) ;
 				}
 			}
 
@@ -112,7 +112,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final int length = _base.length() ;
 				for( int i = 0; i < length; i++ )
 				{
-					final JSONObject obj = _base.optJSONObject( i ) ;
+					final JSONObject obj = _base.getJSONObject( i ) ;
 					final String name = obj.optString( "NAME", null ) ;
 					final Uniform type = Uniform.valueOf( obj.optString( "TYPE", null ) ) ;
 

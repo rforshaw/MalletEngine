@@ -33,7 +33,7 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -53,13 +53,13 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
 				}
 
-				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
+				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
 		} ) ;
@@ -74,13 +74,13 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
 				}
 
-				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
+				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
 		} ) ;
@@ -93,7 +93,7 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.UIListener uiListener = createListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -109,9 +109,9 @@ public class JUI
 					return null ;
 				}
 
-				final UIButton.UV neutralUV  = createUV( _ui.optJSONObject( "NEUTRAL_UV" ) ) ;
-				final UIButton.UV rolloverUV = createUV( _ui.optJSONObject( "ROLLOVER_UV" ) ) ;
-				final UIButton.UV clickedUV  = createUV( _ui.optJSONObject( "CLICKED_UV" ) ) ;
+				final UIButton.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIButton.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIButton.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
 
 				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
@@ -122,11 +122,12 @@ public class JUI
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
 				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final boolean forceRatio = _ui.optBoolean( "FORCE_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV, forceRatio ) ;
 			}
 		} ) ;
 
@@ -139,9 +140,9 @@ public class JUI
 
 				final UIMenu element = new UIMenu( UILayout.Type.derive( layout ), ( float )length ) ;
 				applyLookup( _map, element, _ui ) ;
-				addChildren( _map, element, _ui.optJSONArray( "CHILDREN" ) ) ;
+				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -157,7 +158,7 @@ public class JUI
 			{
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
-				final UIListener uiListener = createUIElementUIListener( _ui.optJSONObject( "UILISTENER" ) ) ;
+				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -266,7 +267,7 @@ public class JUI
 		final int size = _children.length() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final JSONObject jChild = _children.optJSONObject( i ) ;
+			final JSONObject jChild = _children.getJSONObject( i ) ;
 			final UIElement child = createElement( _map, jChild ) ;
 			if( child != null )
 			{
@@ -322,7 +323,7 @@ public class JUI
 			return null ;
 		}
 
-		final UIElement.UV uv  = createUV( _ui.optJSONObject( "UV" ) ) ;
+		final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
 		if( uv == null )
 		{
 			Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;

@@ -144,7 +144,7 @@ public final class Build
 		private Object createPrimitives( final JSONObject _json, final Class _class )
 		{
 			final PrimType type = PrimType.getType( _json.optString( "type", null ) ) ;
-			final JSONArray array = _json.optJSONArray( "values" ) ;
+			final JSONArray array = _json.getJSONArray( "values" ) ;
 
 			final int length = array.length() ;
 			final Object value = Array.newInstance( _class, length ) ;
@@ -154,14 +154,14 @@ public final class Build
 				switch( type )
 				{
 					case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
-					case BYTE    : Array.setByte( value, i, ( byte )array.optInt( i ) ) ; break ;
-					case INT     : Array.setInt( value, i, array.optInt( i ) ) ; break ;
-					case SHORT   : Array.setShort( value, i, ( short )array.optInt( i ) ) ; break ;
-					case LONG    : Array.setLong( value, i, array.optLong( i ) ) ; break ;
-					case FLOAT   : Array.setFloat( value, i, ( float )array.optDouble( i ) ) ; break ;
-					case DOUBLE  : Array.setDouble( value, i, array.optDouble( i ) ) ; break ;
-					case BOOLEAN : Array.setBoolean( value, i, array.optBoolean( i ) ) ; break ;
-					case STRING  : Array.set( value, i, array.optString( i ) ) ; break ;
+					case BYTE    : Array.setByte( value, i, ( byte )array.getInt( i ) ) ; break ;
+					case INT     : Array.setInt( value, i,  array.getInt( i ) ) ; break ;
+					case SHORT   : Array.setShort( value, i, ( short )array.getInt( i ) ) ; break ;
+					case LONG    : Array.setLong( value, i, array.getLong( i ) ) ; break ;
+					case FLOAT   : Array.setFloat( value, i, ( float )array.getDouble( i ) ) ; break ;
+					case DOUBLE  : Array.setDouble( value, i, array.getDouble( i ) ) ; break ;
+					case BOOLEAN : Array.setBoolean( value, i, array.getBoolean( i ) ) ; break ;
+					case STRING  : Array.set( value, i, array.getString( i ) ) ; break ;
 					default      : break ;
 				}
 			}
@@ -173,8 +173,8 @@ public final class Build
 																										  IllegalAccessException,
 																										  NoSuchFieldException
 		{
-			final JSONObject fields = _json.optJSONObject( "fields" ) ;
-			final JSONObject fieldTypes = _json.optJSONObject( "field-types" ) ;
+			final JSONObject fields = _json.getJSONObject( "fields" ) ;
+			final JSONObject fieldTypes = _json.getJSONObject( "field-types" ) ;
 			if( fields != null || fieldTypes != null )
 			{
 				final String[] keys = fields.keys() ;
@@ -188,7 +188,7 @@ public final class Build
 					if( classType.isArray() == true )
 					{
 						final PrimType type = PrimType.getType( fieldTypes.optString( key, null ) ) ;
-						final JSONArray array = fields.optJSONArray( key ) ;
+						final JSONArray array = fields.getJSONArray( key ) ;
 
 						final int length = array.length() ;
 						final Object value = Array.newInstance( classType.getComponentType(), length ) ;
@@ -199,15 +199,15 @@ public final class Build
 							switch( type )
 							{
 								case CHAR    : break ;//field.setChar( _obj, fields.optChar( key, ' ' ) ) ; break ;
-								case BYTE    : Array.setByte( value, i, ( byte )array.optInt( i ) ) ; break ;
-								case INT     : Array.setInt( value, i, array.optInt( i ) ) ; break ;
-								case SHORT   : Array.setShort( value, i, ( short )array.optInt( i ) ) ; break ;
-								case LONG    : Array.setLong( value, i, array.optLong( i ) ) ; break ;
-								case FLOAT   : Array.setFloat( value, i, ( float )array.optDouble( i) ) ; break ;
-								case DOUBLE  : Array.setDouble( value, i, array.optDouble( i ) ) ; break ;
-								case BOOLEAN : Array.setBoolean( value, i, array.optBoolean( i ) ) ; break ;
-								case STRING  : Array.set( value, i, array.optString( i ) ) ; break ;
-								default      : Array.set( value, i, construct( array.optJSONObject( i ) ) ) ; break ;
+								case BYTE    : Array.setByte( value, i, ( byte )array.getInt( i ) ) ; break ;
+								case INT     : Array.setInt( value, i, array.getInt( i ) ) ; break ;
+								case SHORT   : Array.setShort( value, i, ( short )array.getInt( i ) ) ; break ;
+								case LONG    : Array.setLong( value, i, array.getLong( i ) ) ; break ;
+								case FLOAT   : Array.setFloat( value, i, ( float )array.getDouble( i) ) ; break ;
+								case DOUBLE  : Array.setDouble( value, i, array.getDouble( i ) ) ; break ;
+								case BOOLEAN : Array.setBoolean( value, i, array.getBoolean( i ) ) ; break ;
+								case STRING  : Array.set( value, i, array.getString( i ) ) ; break ;
+								default      : Array.set( value, i, construct( array.getJSONObject( i ) ) ) ; break ;
 							}
 						}
 					}
@@ -227,15 +227,15 @@ public final class Build
 							case STRING  : field.set( _obj, fields.optString( key, "" ) ) ;                break ;
 							// If it is not a primitive type then it must be an object.
 							// Whether it is a String, List, Map, or a Mallet 
-							// Object is unkown, but we'll find out soon enough. 
-							default      : field.set( _obj, construct( fields.optJSONObject( key ) ) ) ;   break ;
+							// Object is unknown, but we'll find out soon enough. 
+							default      : field.set( _obj, construct( fields.getJSONObject( key ) ) ) ;   break ;
 						}
 					}
 				}
 			}
 
-			final JSONArray collections = _json.optJSONArray( "collections" ) ;		// Used by Map and Collections - stores values
-			final JSONArray mapKeys = _json.optJSONArray( "keys" ) ;				// Used by Map - stores keys
+			final JSONArray collections = _json.getJSONArray( "collections" ) ;		// Used by Map and Collections - stores values
+			final JSONArray mapKeys = _json.getJSONArray( "keys" ) ;				// Used by Map - stores keys
 
 			if( collections != null && mapKeys == null )
 			{
@@ -243,7 +243,7 @@ public final class Build
 				final int size = collections.length() ;
 				for( int i = 0; i < size; i++ )
 				{
-					list.add( construct( collections.optJSONObject( i ) ) ) ;
+					list.add( construct( collections.getJSONObject( i ) ) ) ;
 				}
 			}
 			else if( collections != null && mapKeys != null )
@@ -252,13 +252,13 @@ public final class Build
 				final int size = collections.length() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final JSONObject key = mapKeys.optJSONObject( i ) ;
-					final JSONObject value = collections.optJSONObject( i ) ;
+					final JSONObject key = mapKeys.getJSONObject( i ) ;
+					final JSONObject value = collections.getJSONObject( i ) ;
 					map.put( construct( key ), construct( value ) ) ;
 				}
 			}
 
-			final JSONObject parent = _json.optJSONObject( "parent" ) ;
+			final JSONObject parent = _json.getJSONObject( "parent" ) ;
 			if( parent != null )
 			{
 				// Insert the fields one super class at a time.

@@ -94,23 +94,26 @@ public abstract class JSONObject
 	public abstract JSONObject put( final String _key, final JSONObject _value ) ;
 	public abstract JSONObject put( final String _key, final JSONArray _value ) ;
 
-	public abstract boolean optBoolean( final String _key ) ;
+	public abstract boolean getBoolean( final String _key ) ;
 	public abstract boolean optBoolean( final String _key, final boolean _default ) ;
 
-	public abstract int optInt( final String _key ) ;
+	public abstract int getInt( final String _key ) ;
 	public abstract int optInt( final String _key, final int _default ) ;
 
-	public abstract double optDouble( final String _key ) ;
+	public abstract double getDouble( final String _key ) ;
 	public abstract double optDouble( final String _key, final double _default ) ;
 
-	public abstract long optLong( final String _key ) ;
+	public abstract long getLong( final String _key ) ;
 	public abstract long optLong( final String _key, final long _default ) ;
 
-	public abstract String optString( final String _key ) ;
+	public abstract String getString( final String _key ) ;
 	public abstract String optString( final String _key, final String _default ) ;
 
-	public abstract JSONObject optJSONObject( final String _key ) ;
-	public abstract JSONArray optJSONArray( final String _key ) ;
+	public abstract JSONObject getJSONObject( final String _key ) ;
+	public abstract JSONObject optJSONObject( final String _key, final JSONObject _default ) ;
+
+	public abstract JSONArray getJSONArray( final String _key ) ;
+	public abstract JSONArray optJSONArray( final String _key, final JSONArray _default ) ;
 
 	public abstract String toString() ;
 	public abstract String toString( final int _indent ) ;

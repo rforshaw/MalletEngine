@@ -21,12 +21,14 @@ public class AndroidJSONArray extends JSONArray
 	{
 		array = _array ;
 	}
-	
+
+	@Override
 	protected JSONArray create()
 	{
 		return new AndroidJSONArray() ;
 	}
 
+	@Override
 	protected JSONArray create( final String _source )
 	{
 		try
@@ -44,24 +46,28 @@ public class AndroidJSONArray extends JSONArray
 	{
 		constructor = new AndroidJSONArray() ;
 	}
-	
+
+	@Override
 	public int length()
 	{
 		return array.length() ;
 	}
 
+	@Override
 	public JSONArray put( final boolean _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final int _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final double _value )
 	{
 		try
@@ -76,81 +82,96 @@ public class AndroidJSONArray extends JSONArray
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final long _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final String _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final JSONObject _value )
 	{
 		array.put( ( ( AndroidJSONObject )_value ).object ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final JSONArray _value )
 	{
 		array.put( ( ( AndroidJSONArray )_value ).array ) ;
 		return this ;
 	}
 
-	public boolean optBoolean( final int _index )
+	@Override
+	public boolean getBoolean( final int _index )
 	{
 		return array.optBoolean( _index ) ;
 	}
 
+	@Override
 	public boolean optBoolean( final int _index, final boolean _default )
 	{
 		return array.optBoolean( _index, _default ) ;
 	}
 
-	public int optInt( final int _index )
+	@Override
+	public int getInt( final int _index )
 	{
 		return array.optInt( _index ) ;
 	}
 
+	@Override
 	public int optInt( final int _index, final int _default )
 	{
 		return array.optInt( _index, _default ) ;
 	}
 
-	public double optDouble( final int _index )
+	@Override
+	public double getDouble( final int _index )
 	{
 		return array.optDouble( _index ) ;
 	}
 
+	@Override
 	public double optDouble( final int _index, final double _default )
 	{
 		return array.optDouble( _index, _default ) ;
 	}
 
-	public long optLong( final int _index )
+	@Override
+	public long getLong( final int _index )
 	{
 		return array.optLong( _index ) ;
 	}
 
+	@Override
 	public long optLong( final int _index, final long _default )
 	{
 		return array.optLong( _index, _default ) ;
 	}
 
-	public String optString( final int _index )
+	@Override
+	public String getString( final int _index )
 	{
 		return array.optString( _index ) ;
 	}
 
+	@Override
 	public String optString( final int _index, final String _default )
 	{
 		return array.optString( _index, _default ) ;
 	}
 
-	public JSONObject optJSONObject( final int _index )
+	@Override
+	public JSONObject getJSONObject( final int _index )
 	{
 		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
 		if( obj == null )
@@ -161,7 +182,20 @@ public class AndroidJSONArray extends JSONArray
 		return new AndroidJSONObject( obj ) ;
 	}
 
-	public JSONArray optJSONArray( final int _index )
+	@Override
+	public JSONObject optJSONObject( final int _index, final JSONObject _default )
+	{
+		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
+		if( obj == null )
+		{
+			return _default ;
+		}
+
+		return new AndroidJSONObject( obj ) ;
+	}
+
+	@Override
+	public JSONArray getJSONArray( final int _index )
 	{
 		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
 		if( arr == null )
@@ -172,11 +206,25 @@ public class AndroidJSONArray extends JSONArray
 		return new AndroidJSONArray( arr ) ;
 	}
 
+	@Override
+	public JSONArray optJSONArray( final int _index, final JSONArray _default )
+	{
+		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
+		if( arr == null )
+		{
+			return _default ;
+		}
+
+		return new AndroidJSONArray( arr ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return array.toString() ;
 	}
 
+	@Override
 	public String toString( final int _indent )
 	{
 		try
