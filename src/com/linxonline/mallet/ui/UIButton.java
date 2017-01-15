@@ -114,6 +114,7 @@ public class UIButton extends UIElement
 		private static final Ratio DEFAULT_RATIO = Ratio.calculateRatio( 1, 1 ) ;
 
 		private final Vector3 length = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
 
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
@@ -124,7 +125,7 @@ public class UIButton extends UIElement
 		private final UIButton.UV clicked ;
 		private UIButton.UV active = null ;
 
-		private final boolean forceRatio ;
+		private final boolean retainRatio ;
 
 		private DrawDelegate delegate = null ;
 		private Draw draw = null ;
@@ -146,7 +147,7 @@ public class UIButton extends UIElement
 						   final UIButton.UV _neutral,
 						   final UIButton.UV _rollover,
 						   final UIButton.UV _clicked,
-						   final boolean _forceRatio )
+						   final boolean _retainRatio )
 		{
 			text.append( _text ) ;
 			font = _font ;
@@ -157,7 +158,7 @@ public class UIButton extends UIElement
 			clicked = _clicked ;
 			active = neutral ;
 
-			forceRatio = _forceRatio ;
+			retainRatio = _retainRatio ;
 		}
 
 		public StringBuilder getText()
@@ -187,9 +188,10 @@ public class UIButton extends UIElement
 			} ) ) ;
 
 			updateLength( _parent.getLength() ) ;
+			updateOffset( _parent.getOffset() ) ;
 
 			draw = DrawAssist.createDraw( _parent.getPosition(),
-										  _parent.getOffset(),
+										  offset,
 										  new Vector3(),
 										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
@@ -264,28 +266,34 @@ public class UIButton extends UIElement
 
 		private void updateLength( final Vector3 _length )
 		{
-			if( active == null || forceRatio == false )
+			if( active == null || retainRatio == false )
 			{
 				length.setXYZ( _length ) ;
 				return ;
 			}
 
-			final Vector2 diff = Vector2.subtract( active.max, active.min ) ;
-			final Vector2 dim = new Vector2( diff.x * sheet.getWidth(), diff.y * sheet.getHeight() ) ;
-			final Vector2 ratio = Vector2.divide( new Vector2( _length.x, _length.y ), dim ) ;
+			// If the retainRatio is enabled we want to ensure the 
+			// buttons resolution ratio is kept 
+			
+			final float dimX = ( active.max.x - active.min.x ) * sheet.getWidth() ;
+			final float dimY = ( active.max.y - active.min.y ) * sheet.getHeight() ;
 
-			if( ratio.x < ratio.y )
+			final float ratioX = _length.x / dimX ;
+			final float ratioY = _length.y / dimY ;
+
+			if( ratioX < ratioY )
 			{
-				length.setXYZ( dim.x * ratio.x, dim.y * ratio.x, dim.x * ratio.x ) ;
+				length.setXYZ( dimX * ratioX, dimY * ratioX, 0.0f ) ;
 			}
 			else
 			{
-				length.setXYZ( dim.x * ratio.y, dim.y * ratio.y, dim.x * ratio.y ) ;
+				length.setXYZ( dimX * ratioY, dimY * ratioY, 0.0f ) ;
 			}
+		}
 
-			System.out.println( "Orig Len: " + _length ) ;
-			System.out.println( "Dim: " + dim ) ;
-			System.out.println( "Len: " + length ) ;
+		private void updateOffset( final Vector3 _offset )
+		{
+			offset.setXYZ( _offset ) ;
 		}
 
 		@Override

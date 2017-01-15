@@ -122,7 +122,7 @@ public class JUI
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
 				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
-				final boolean forceRatio = _ui.optBoolean( "FORCE_RATIO", false ) ;
+				final boolean forceRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;

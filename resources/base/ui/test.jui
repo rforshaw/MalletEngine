@@ -9,7 +9,7 @@
 				"TEXT": "Test 1",
 				"FONT" : "Arial",
 				"FONT_SIZE" : 33,
-				"FORCE_RATIO": true,
+				"RETAIN_RATIO": true,
 				"TEXTURE" : "base/textures/button_sheet.png",
 				"NEUTRAL_UV" : {
 					"MIN" : "0.0, 0.0",
