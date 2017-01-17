@@ -113,6 +113,7 @@ public class UIButton extends UIElement
 	{
 		private static final Ratio DEFAULT_RATIO = Ratio.calculateRatio( 1, 1 ) ;
 
+		private final Vector3 aspectRatio = new Vector3() ;
 		private final Vector3 length = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 
@@ -274,21 +275,10 @@ public class UIButton extends UIElement
 
 			// If the retainRatio is enabled we want to ensure the 
 			// buttons resolution ratio is kept 
-			
-			final float dimX = ( active.max.x - active.min.x ) * sheet.getWidth() ;
-			final float dimY = ( active.max.y - active.min.y ) * sheet.getHeight() ;
+			aspectRatio.x = ( active.max.x - active.min.x ) * sheet.getWidth() ;
+			aspectRatio.y = ( active.max.y - active.min.y ) * sheet.getHeight() ;
 
-			final float ratioX = _length.x / dimX ;
-			final float ratioY = _length.y / dimY ;
-
-			if( ratioX < ratioY )
-			{
-				length.setXYZ( dimX * ratioX, dimY * ratioX, 0.0f ) ;
-			}
-			else
-			{
-				length.setXYZ( dimX * ratioY, dimY * ratioY, 0.0f ) ;
-			}
+			UI.fill( UI.Modifier.RetainAspectRatio, length, aspectRatio, _length ) ;
 		}
 
 		private void updateOffset( final Vector3 _offset )
