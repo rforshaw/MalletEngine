@@ -60,9 +60,39 @@ public class MalletTexture
 		return meta.height ;
 	}
 
+	/**
+		Using the UVMap co-ordinates that assume a mapping 
+		between 0.0 and 1.0 determine what the sub-height would be.
+
+		If _minUV was 0.0 and _maxUV was 1.0 the value returned 
+		would effectively be getHeight().
+		
+		If _minUV was 0.5 and _maxUV was 1.0 the value returned 
+		would effectively be half of getHeight() (height / 2).
+	*/
+	public int getSubHeight( final float _minUV, final float _maxUV )
+	{
+		return Math.abs( ( int )( ( _maxUV - _minUV ) * getHeight() ) ) ;
+	}
+
 	public int getWidth()
 	{
 		return meta.width ;
+	}
+
+	/**
+		Using the UVMap co-ordinates that assume a mapping 
+		between 0.0 and 1.0 determine what the sub-width would be.
+
+		If _minUV was 0.0 and _maxUV was 1.0 the value returned 
+		would effectively be getWidth().
+		
+		If _minUV was 0.5 and _maxUV was 1.0 the value returned 
+		would effectively be half of getWidth() (width / 2).
+	*/
+	public int getSubWidth( final float _minUV, final float _maxUV )
+	{
+		return Math.abs( ( int )( ( _maxUV - _minUV ) * getWidth() ) ) ;
 	}
 
 	public Ratio getRatio()

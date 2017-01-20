@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import com.linxonline.mallet.renderer.MalletTexture ;
+
 import com.linxonline.mallet.maths.* ;
 
 public class UI
@@ -10,6 +12,53 @@ public class UI
 		None ;
 	} ;
 
+	public enum Alignment
+	{
+		Left,
+		Centre,
+		Right,
+		Top,
+		Bottom ;
+	} ;
+
+	public static void align( final Alignment _alignX, final Alignment _alignY, final Vector3 _val, final Vector3 _dim, final Vector3 _length )
+	{
+		_val.x = UI.align( _alignX, _dim.x, _length.x ) ;
+		_val.y = UI.align( _alignY, _dim.y, _length.y ) ;
+	}
+
+	public static float align( final Alignment _align, final float _dim, final float _length )
+	{
+		switch( _align )
+		{
+			case Centre :
+			{
+				return ( _length / 2.0f ) - ( _dim / 2.0f ) ;
+			}
+			case Bottom :
+			case Right  :
+			{
+				return _length - _dim ;
+			}
+			case Top  :
+			case Left :
+			default   :
+			{
+				return 0.0f ;
+			}
+		}
+	}
+
+	/**
+		Calculate the width and height covered by the uv-coordinates.
+		Apply calculation to _dim.
+	*/
+	public static void calcSubDimension( final Vector3 _dim, final MalletTexture _tex, final UIElement.UV _uv )
+	{
+		_dim.x = _tex.getSubWidth( _uv.min.x, _uv.max.x ) ;
+		_dim.y = _tex.getSubHeight( _uv.min.y, _uv.max.y ) ;
+	}
+	
 	/**
 		Set _val to use as much or as little space 
 		that is provided by _length, depending on the Modifier. 

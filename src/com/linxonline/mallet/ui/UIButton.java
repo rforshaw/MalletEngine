@@ -111,11 +111,9 @@ public class UIButton extends UIElement
 
 	public static class UIListener extends BaseListener
 	{
-		private static final Ratio DEFAULT_RATIO = Ratio.calculateRatio( 1, 1 ) ;
-
-		private final Vector3 aspectRatio = new Vector3() ;
-		private final Vector3 length = new Vector3() ;
-		private final Vector3 offset = new Vector3() ;
+		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
+		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
+		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
 
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
@@ -131,6 +129,12 @@ public class UIButton extends UIElement
 		private DrawDelegate delegate = null ;
 		private Draw draw = null ;
 		private Draw drawText = null ;
+
+		private UI.Alignment drawAlignmentX = UI.Alignment.Left ;
+		private UI.Alignment drawAlignmentY = UI.Alignment.Left ;
+
+		private UI.Alignment drawTextAlignmentX = UI.Alignment.Centre ;
+		private UI.Alignment drawTextAlignmentY = UI.Alignment.Centre ;
 
 		public UIListener( final String _text,
 						   final MalletFont _font,
@@ -160,6 +164,18 @@ public class UIButton extends UIElement
 			active = neutral ;
 
 			retainRatio = _retainRatio ;
+		}
+
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.Left : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.Left : _y ;
+		}
+
+		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.Centre : _x ;
+			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.Centre : _y ;
 		}
 
 		public StringBuilder getText()
@@ -252,6 +268,7 @@ public class UIButton extends UIElement
 		public void refresh()
 		{
 			updateLength( getParent().getLength() ) ;
+			updateOffset( getParent().getOffset() ) ;
 
 			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 			DrawAssist.forceUpdate( draw ) ;
@@ -259,8 +276,12 @@ public class UIButton extends UIElement
 			if( font != null )
 			{
 				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
-				textOffset.setXYZ( getParent().getOffset() ) ;
-				textOffset.add( ( length.x / 2 ) - ( font.stringWidth( text ) / 2 ), ( length.y / 2 ) - ( font.getHeight() / 2 ), 0.0f ) ;
+				textOffset.setXYZ( offset ) ;
+
+				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
+				final float y = UI.align( drawTextAlignmentY, font.getHeight(), length.y ) ;
+
+				textOffset.add( x, y, 0.0f ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
 		}
@@ -273,17 +294,14 @@ public class UIButton extends UIElement
 				return ;
 			}
 
-			// If the retainRatio is enabled we want to ensure the 
-			// buttons resolution ratio is kept 
-			aspectRatio.x = ( active.max.x - active.min.x ) * sheet.getWidth() ;
-			aspectRatio.y = ( active.max.y - active.min.y ) * sheet.getHeight() ;
-
+			UI.calcSubDimension( aspectRatio, sheet, active ) ;
 			UI.fill( UI.Modifier.RetainAspectRatio, length, aspectRatio, _length ) ;
 		}
 
 		private void updateOffset( final Vector3 _offset )
 		{
-			offset.setXYZ( _offset ) ;
+			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
+			offset.add( _offset ) ;
 		}
 
 		@Override
