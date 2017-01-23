@@ -90,23 +90,22 @@ public class UIButton extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public static UIListener constructUIListener( final MalletTexture _sheet,
-												  final UIButton.UV _neutral,
-												  final UIButton.UV _rollover,
-												  final UIButton.UV _clicked )
+	public static UIListener createUIListener( final MalletTexture _sheet,
+											   final UIButton.UV _neutral,
+											   final UIButton.UV _rollover,
+											   final UIButton.UV _clicked )
 	{
-		return new UIListener( "", null, _sheet, _neutral, _rollover, _clicked ) ;
+		return createUIListener( null, null, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static UIListener constructUIListener( final String _text,
-												  final MalletFont _font,
-												  final MalletTexture _sheet,
-												  final UIButton.UV _neutral,
-												  final UIButton.UV _rollover,
-												  final UIButton.UV _clicked,
-												  final boolean _forceRatio )
+	public static UIListener createUIListener( final String _text,
+											   final MalletFont _font,
+											   final MalletTexture _sheet,
+											   final UIButton.UV _neutral,
+											   final UIButton.UV _rollover,
+											   final UIButton.UV _clicked )
 	{
-		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked, _forceRatio ) ;
+		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
 	public static class UIListener extends BaseListener
@@ -124,17 +123,17 @@ public class UIButton extends UIElement
 		private final UIButton.UV clicked ;
 		private UIButton.UV active = null ;
 
-		private final boolean retainRatio ;
-
 		private DrawDelegate delegate = null ;
 		private Draw draw = null ;
 		private Draw drawText = null ;
 
-		private UI.Alignment drawAlignmentX = UI.Alignment.Left ;
-		private UI.Alignment drawAlignmentY = UI.Alignment.Left ;
+		private boolean retainRatio = false ;
 
-		private UI.Alignment drawTextAlignmentX = UI.Alignment.Centre ;
-		private UI.Alignment drawTextAlignmentY = UI.Alignment.Centre ;
+		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+
+		private UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
+		private UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
 
 		public UIListener( final String _text,
 						   final MalletFont _font,
@@ -143,39 +142,34 @@ public class UIButton extends UIElement
 						   final UIButton.UV _rollover,
 						   final UIButton.UV _clicked )
 		{
-			this( _text, _font, _sheet, _neutral, _rollover, _clicked, false ) ;
-		}
-
-		public UIListener( final String _text,
-						   final MalletFont _font,
-						   final MalletTexture _sheet,
-						   final UIButton.UV _neutral,
-						   final UIButton.UV _rollover,
-						   final UIButton.UV _clicked,
-						   final boolean _retainRatio )
-		{
-			text.append( _text ) ;
 			font = _font ;
+			if( _text != null )
+			{
+				text.append( _text ) ;
+			}
 
 			sheet = _sheet ;
 			neutral = _neutral ;
 			rollover = _rollover ;
 			clicked = _clicked ;
 			active = neutral ;
+		}
 
-			retainRatio = _retainRatio ;
+		public void setRetainRatio( final boolean _ratio )
+		{
+			retainRatio = _ratio ;
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			drawAlignmentX = ( _x == null ) ? UI.Alignment.Left : _x ;
-			drawAlignmentY = ( _y == null ) ? UI.Alignment.Left : _y ;
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
 		}
 
 		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.Centre : _x ;
-			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.Centre : _y ;
+			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
+			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
 		}
 
 		public StringBuilder getText()
@@ -295,7 +289,7 @@ public class UIButton extends UIElement
 			}
 
 			UI.calcSubDimension( aspectRatio, sheet, active ) ;
-			UI.fill( UI.Modifier.RetainAspectRatio, length, aspectRatio, _length ) ;
+			UI.fill( UI.Modifier.RETAIN_ASPECT_RATIO, length, aspectRatio, _length ) ;
 		}
 
 		private void updateOffset( final Vector3 _offset )

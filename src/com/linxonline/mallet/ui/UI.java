@@ -8,17 +8,47 @@ public class UI
 {
 	public enum Modifier
 	{
-		RetainAspectRatio,
-		None ;
+		RETAIN_ASPECT_RATIO,
+		NONE ;
+
+		public static Modifier derive( final String _type )
+		{
+			if( _type == null )
+			{
+				return NONE ;
+			}
+
+			if( _type.isEmpty() == true )
+			{
+				return NONE ;
+			}
+
+			return Modifier.valueOf( _type ) ;
+		}
 	} ;
 
 	public enum Alignment
 	{
-		Left,
-		Centre,
-		Right,
-		Top,
-		Bottom ;
+		LEFT,
+		CENTRE,
+		RIGHT,
+		TOP,
+		BOTTOM ;
+
+		public static Alignment derive( final String _type )
+		{
+			if( _type == null )
+			{
+				return LEFT ;
+			}
+
+			if( _type.isEmpty() == true )
+			{
+				return LEFT ;
+			}
+
+			return Alignment.valueOf( _type ) ;
+		}
 	} ;
 
 	public static void align( final Alignment _alignX, final Alignment _alignY, final Vector3 _val, final Vector3 _dim, final Vector3 _length )
@@ -31,17 +61,17 @@ public class UI
 	{
 		switch( _align )
 		{
-			case Centre :
+			case CENTRE :
 			{
 				return ( _length / 2.0f ) - ( _dim / 2.0f ) ;
 			}
-			case Bottom :
-			case Right  :
+			case BOTTOM :
+			case RIGHT  :
 			{
 				return _length - _dim ;
 			}
-			case Top  :
-			case Left :
+			case TOP  :
+			case LEFT :
 			default   :
 			{
 				return 0.0f ;
@@ -65,16 +95,16 @@ public class UI
 		For most cases _length represents the volume 
 		that a UIElement has.
 
-		RetainAspectRatio - will ensure that _val 
+		RETAIN_ASPECT_RATIO - will ensure that _val 
 		adheres to the aspect ratio defined by _ratio.
 
-		None : Set _val to _length.
+		NONE : Set _val to _length.
 	*/
 	public static void fill( final Modifier _mod, final Vector3 _val, final Vector3 _ratio, final Vector3 _length )
 	{
 		switch( _mod )
 		{
-			case RetainAspectRatio :
+			case RETAIN_ASPECT_RATIO :
 			{
 				final float ratioX = _ratio.x > 0.0f ?  _length.x / _ratio.x : 0.0f ;
 				final float ratioY = _ratio.y > 0.0f ?  _length.y / _ratio.y : 0.0f ;
@@ -84,7 +114,7 @@ public class UI
 				_val.setXYZ( _ratio.x * ratio, _ratio.y * ratio, _ratio.z * ratio ) ;
 				break ;
 			}
-			case None              :
+			case NONE              :
 			{
 				_val.setXYZ( _length ) ;
 				break ;

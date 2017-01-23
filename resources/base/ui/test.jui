@@ -10,6 +10,10 @@
 				"FONT" : "Arial",
 				"FONT_SIZE" : 33,
 				"RETAIN_RATIO": true,
+				"ALIGNMENT_X": "CENTRE", 
+				"ALIGNMENT_Y": "CENTRE",
+				"ALIGNMENT_TEXT_X": "CENTRE", 
+				"ALIGNMENT_TEXT_Y": "CENTRE",
 				"TEXTURE" : "base/textures/button_sheet.png",
 				"NEUTRAL_UV" : {
 					"MIN" : "0.0, 0.0",
@@ -32,6 +36,10 @@
 				"TEXT": "Test 2",
 				"FONT" : "Arial",
 				"FONT_SIZE" : 33,
+				"ALIGNMENT_X": "CENTRE", 
+				"ALIGNMENT_Y": "CENTRE",
+				"ALIGNMENT_TEXT_X": "CENTRE", 
+				"ALIGNMENT_TEXT_Y": "CENTRE",
 				"TEXTURE" : "base/textures/button_sheet.png",
 				"NEUTRAL_UV" : {
 					"MIN" : "0.0, 0.0",

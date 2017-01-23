@@ -122,12 +122,18 @@ public class JUI
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
 				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
-				final boolean forceRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				return UIButton.constructUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV, forceRatio ) ;
+				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+				listener.setRetainRatio( retainRatio ) ;
+				listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
+									   UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
+				listener.setTextAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_X", null ) ),
+										   UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_Y", null ) ) ) ;
+				return listener ;
 			}
 		} ) ;
 
