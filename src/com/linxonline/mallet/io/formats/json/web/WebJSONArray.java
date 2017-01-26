@@ -25,12 +25,14 @@ public class WebJSONArray extends JSONArray
 	{
 		array = _array ;
 	}
-	
+
+	@Override
 	protected JSONArray create()
 	{
 		return new WebJSONArray() ;
 	}
 
+	@Override
 	protected JSONArray create( final String _source )
 	{
 		return new WebJSONArray( _source ) ;
@@ -40,59 +42,69 @@ public class WebJSONArray extends JSONArray
 	{
 		constructor = new WebJSONArray() ;
 	}
-	
+
+	@Override
 	public int length()
 	{
 		return length( array ) ;
 	}
 
+	@Override
 	public JSONArray put( final boolean _value )
 	{
 		putBoolean( array, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final int _value )
 	{
 		putInt( array, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final double _value )
 	{
 		putDouble( array, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final long _value )
 	{
 		putLong( array, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final String _value )
 	{
 		putString( array, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final JSONObject _value )
 	{
 		putObject( array, ( ( WebJSONObject )_value ).object ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONArray put( final JSONArray _value )
 	{
 		putArray( array, ( ( WebJSONArray )_value ).array ) ;
 		return this ;
 	}
 
-	public boolean optBoolean( final int _index )
+	@Override
+	public boolean getBoolean( final int _index )
 	{
 		return optBoolean( array, _index ) ;
 	}
 
+	@Override
 	public boolean optBoolean( final int _index, final boolean _default )
 	{
 		if( _index > length() )
@@ -103,11 +115,13 @@ public class WebJSONArray extends JSONArray
 		return optBoolean( array, _index ) ;
 	}
 
-	public int optInt( final int _index )
+	@Override
+	public int getInt( final int _index )
 	{
 		return optInt( array, _index ) ;
 	}
 
+	@Override
 	public int optInt( final int _index, final int _default )
 	{
 		if( _index > length() )
@@ -118,11 +132,13 @@ public class WebJSONArray extends JSONArray
 		return optInt( array, _index ) ;
 	}
 
-	public double optDouble( final int _index )
+	@Override
+	public double getDouble( final int _index )
 	{
 		return optDouble( array, _index ) ;
 	}
 
+	@Override
 	public double optDouble( final int _index, final double _default )
 	{
 		if( _index > length() )
@@ -133,11 +149,13 @@ public class WebJSONArray extends JSONArray
 		return optDouble( array, _index ) ;
 	}
 
-	public long optLong( final int _index )
+	@Override
+	public long getLong( final int _index )
 	{
 		return ( long )optInt( array, _index ) ;
 	}
 
+	@Override
 	public long optLong( final int _index, final long _default )
 	{
 		if( _index > length() )
@@ -148,11 +166,13 @@ public class WebJSONArray extends JSONArray
 		return ( long )optInt( array, _index ) ;
 	}
 
-	public String optString( final int _index )
+	@Override
+	public String getString( final int _index )
 	{
 		return optString( array, _index ) ;
 	}
 
+	@Override
 	public String optString( final int _index, final String _default )
 	{
 		if( _index > length() )
@@ -163,7 +183,8 @@ public class WebJSONArray extends JSONArray
 		return optString( array, _index ) ;
 	}
 
-	public JSONObject optJSONObject( final int _index )
+	@Override
+	public JSONObject getJSONObject( final int _index )
 	{
 		final JSObject obj = optJSObject( array, _index ) ;
 		if( obj == null )
@@ -174,7 +195,20 @@ public class WebJSONArray extends JSONArray
 		return new WebJSONObject( obj ) ;
 	}
 
-	public JSONArray optJSONArray( final int _index )
+	@Override
+	public JSONObject optJSONObject( final int _index, final JSONObject _default )
+	{
+		final JSObject obj = optJSObject( array, _index ) ;
+		if( obj == null )
+		{
+			return _default ;
+		}
+
+		return new WebJSONObject( obj ) ;
+	}
+
+	@Override
+	public JSONArray getJSONArray( final int _index )
 	{
 		final JSObject arr = optJSObject( array, _index ) ;
 		if( arr == null )
@@ -185,11 +219,25 @@ public class WebJSONArray extends JSONArray
 		return new WebJSONArray( arr ) ;
 	}
 
+	@Override
+	public JSONArray optJSONArray( final int _index, final JSONArray _default )
+	{
+		final JSObject arr = optJSObject( array, _index ) ;
+		if( arr == null )
+		{
+			return _default ;
+		}
+
+		return new WebJSONArray( arr ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return array.toString() ;
 	}
 
+	@Override
 	public String toString( final int _indent )
 	{
 		return array.toString() ;

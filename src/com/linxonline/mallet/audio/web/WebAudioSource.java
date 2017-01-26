@@ -26,5 +26,7 @@ public class WebAudioSource implements AudioSource
 		return 0.0f ;
 	}
 
+	public void setVolume( final int _volume ) {}
+
 	public void destroySource() {}
 }

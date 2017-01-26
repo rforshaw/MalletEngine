@@ -50,7 +50,7 @@ public class WebShape implements Shape.Interface
 
 		init( s, sw, indexSize, vertexSize ) ;
 
-		final Object[] vertex = Shape.Swivel.construct( sw ) ;
+		final Object[] vertex = Shape.Swivel.constructSwivel( sw ) ;
 		for( int i = 0; i < vertexSize; i++ )
 		{
 			addVertex( _shape.getVertex( vertex, i ) ) ;

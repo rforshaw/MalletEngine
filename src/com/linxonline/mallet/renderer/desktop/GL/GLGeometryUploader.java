@@ -46,7 +46,7 @@ public class GLGeometryUploader
 	private final IntBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final List<GLBuffer> buffers = MalletList.<GLBuffer>newList()  ;							// Available GLBuffers
+	private final List<GLBuffer> buffers = MalletList.<GLBuffer>newList() ;							// Available GLBuffers
 
 	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
@@ -406,7 +406,7 @@ public class GLGeometryUploader
 
 		protected Location stencilLocation = null ;
 
-		protected final List<GLGeometry> buffers = MalletList.<GLGeometry>newList()  ;
+		protected final List<GLGeometry> buffers = MalletList.<GLGeometry>newList() ;
 
 		public GLBuffer( final GLDrawData _data,
 						 final int _indexLengthBytes,

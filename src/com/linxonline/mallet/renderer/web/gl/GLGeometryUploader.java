@@ -6,6 +6,7 @@ import java.util.Arrays ;
 import java.nio.* ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
+import org.teavm.jso.webgl.WebGLProgram ;
 import org.teavm.jso.webgl.WebGLTexture ;
 import org.teavm.jso.webgl.WebGLBuffer ;
 import org.teavm.jso.typedarrays.ArrayBuffer ;
@@ -44,6 +45,7 @@ public class GLGeometryUploader
 
 	private final static int VBO_VAR_BYTE_SIZE = 4 ;
 	private final static int IBO_VAR_BYTE_SIZE = 2 ;
+	private WebGLProgram programID = null ;
 
 	private final Int16Array indicies ;
 	private final Float32Array verticies ;
@@ -93,6 +95,8 @@ public class GLGeometryUploader
 			}
 		}
 
+		// If the draw data no longer fits with the previously 
+		// used buffer find or create a new buffer that matches.
 		buffer = getSupportedBuffer( _data ) ;
 		_data.setGLBuffer( buffer ) ;
 
@@ -110,6 +114,7 @@ public class GLGeometryUploader
 		{
 			buffer.remove( _gl, _data ) ;
 			_data.setGLBuffer( null ) ;
+			_data.setLocation( null ) ;
 		}
 	}
 
@@ -450,19 +455,22 @@ public class GLGeometryUploader
 				drawStencil( _gl, matrix ) ;
 			}
 
-			//System.out.println( "Use Program" ) ;
-			_gl.useProgram( glProgram.id[0] ) ;								//GLRenderer.handleError( "Use Program", _gl ) ;
-			_gl.uniformMatrix4fv( glProgram.inMVPMatrix, false, matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+			if( glProgram.id[0] != programID )
+			{
+				// Only call glUseProgram if the last program used 
+				// doesn't match what we want.
+				// Ordering draws by program could improve rendering performance.
+				programID = glProgram.id[0] ;
+				_gl.useProgram( programID ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
+			}
 
+			_gl.uniformMatrix4fv( glProgram.inMVPMatrix, false, matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 			if( glProgram.loadUniforms( _gl, program ) == false )
 			{
 				// We failed to load all uniforms required for 
-				// this buffer, 
+				// this buffer.
 				return ;
 			}
-
-			_gl.enable( GL3.BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-			_gl.blendFunc( GL3.SRC_ALPHA, GL3.ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
 			for( final GLGeometry geometry : buffers )
@@ -476,10 +484,10 @@ public class GLGeometryUploader
 			}
 			GLGeometryUploader.disableVertexAttributes( _gl, attributes ) ;
 
-			_gl.useProgram( null ) ;					//GLRenderer.handleError( "Disable Program", _gl ) ;
-			_gl.disable( GL3.BLEND ) ;				//GLRenderer.handleError( "Disable Blend", _gl ) ;
-			_gl.disable( GL3.STENCIL_TEST ) ;		//GLRenderer.handleError( "Disable Stencil", _gl ) ;
-			//_gl.disable( GL3.PRIMITIVE_RESTART ) ;	//GLRenderer.handleError( "Disable Primitive Restart", _gl ) ;
+			if( stencilLocation != null )
+			{
+				_gl.disable( GL3.STENCIL_TEST ) ;		//GLRenderer.handleError( "Disable Stencil", _gl ) ;
+			}
 		}
 
 		public abstract void upload( final WebGLRenderingContext _gl, final GLDrawData _data ) ;
@@ -570,7 +578,14 @@ public class GLGeometryUploader
 
 		private void drawStencil( final WebGLRenderingContext _gl, final float[] _projectionMatrix )
 		{
-			_gl.useProgram( stencilProgram.id[0] ) ;
+			if( stencilProgram.id[0] != programID )
+			{
+				// Only call UseProgram if the last program used 
+				// doesn't match what we want.
+				programID = stencilProgram.id[0] ;
+				_gl.useProgram( programID ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
+			}
+
 			_gl.uniformMatrix4fv( stencilProgram.inMVPMatrix, false, _projectionMatrix ) ;					//GLRenderer.handleError( "Load Matrix", _gl ) ;
 
 			// Don't render the element to the colour buffer

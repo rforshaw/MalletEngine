@@ -19,6 +19,12 @@ public class WebTestStarter extends WebStarter
 	}
 
 	@Override
+	protected String getApplicationName()
+	{
+		return "test" ;
+	}
+
+	@Override
 	protected GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;

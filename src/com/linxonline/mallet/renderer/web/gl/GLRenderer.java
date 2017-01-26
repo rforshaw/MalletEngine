@@ -37,6 +37,8 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 	protected final static Matrix4 uiMatrix                  = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
 	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
 
+	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
+
 	private final HTMLCanvasElement canvas ;
 	private static WebGLRenderingContext gl ;
 
@@ -57,6 +59,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		defaultCamera.setDrawInterface( getCameraDraw() ) ;
 		worlds.addCamera( defaultCamera, null ) ;
 
+		//gl.enable( GL3.PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
+		//gl.primitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+
+		gl.enable( GL3.BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+		gl.blendFunc( GL3.SRC_ALPHA, GL3.ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+
 		gl.enable( GL3.CULL_FACE ) ;
 		gl.cullFace( GL3.BACK ) ;  
 		gl.frontFace( GL3.CCW ) ;
@@ -66,6 +74,13 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		programs.get( "SIMPLE_FONT", "base/shaders/web/simple_font.jgl" ) ;
 		programs.get( "SIMPLE_GEOMETRY", "base/shaders/web/simple_geometry.jgl" ) ;
 		programs.get( "SIMPLE_STENCIL", "base/shaders/web/simple_stencil.jgl" ) ;
+
+		{
+			// Query for the Max Texture Size and store the results.
+			// I doubt the size will change during the running of the engine.
+			final int size = gl.getParameteri( GL3.MAX_TEXTURE_SIZE ) ;
+			maxTextureSize.setXY( size, size ) ;
+		}
 	}
 
 	@Override
@@ -99,7 +114,13 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
 			{
+				// If the GLFontMap has not been previously created, 
+				// then a skeleton map is provided, skeleton is capable 
+				// of being queried for text length and height, however,
+				// cannot be used to draw until the font texture & glyph 
+				// geometry is created during a drawText phase.
 				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
+
 				return new Font<GLFontMap>( fontMap )
 				{
 					@Override
@@ -129,6 +150,12 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			public MalletTexture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
+			}
+
+			@Override
+			public Vector2 getMaximumTextureSize()
+			{
+				return new Vector2( maxTextureSize ) ;
 			}
 		} ) ;
 
@@ -558,12 +585,11 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
-				//positionMatrix.transpose() ;
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
 				world.upload( gl, _data ) ;
@@ -631,11 +657,14 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotate.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-				_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+				if( _data.getDrawShape() == null )
+				{
+					_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+				}
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
 				world.upload( gl, _data ) ;
@@ -659,7 +688,6 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
 							   ( int )( screen.dimension.x * scaleRtoD.x ),
 							   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
-				//GLRenderer.handleError( "Viewport: ", gl ) ;
 
 				final Vector3 position = _camera.getPosition() ;
 				final Vector3 scale = _camera.getScale() ;
@@ -747,7 +775,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 		super.draw( _dt ) ;
 		//GLRenderer.handleError( "Previous: ", gl ) ;
 		gl.clear( GL3.COLOR_BUFFER_BIT | GL3.DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
-		gl.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;						//GLRenderer.handleError( "Clear Colour: ", gl ) ;
+		gl.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;					//GLRenderer.handleError( "Clear Colour: ", gl ) ;
 
 		getEventController().update() ;
 

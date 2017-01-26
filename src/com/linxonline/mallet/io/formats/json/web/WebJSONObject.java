@@ -26,11 +26,13 @@ public class WebJSONObject extends JSONObject
 		object = _object ;
 	}
 
+	@Override
 	protected JSONObject create()
 	{
 		return new WebJSONObject() ;
 	}
 
+	@Override
 	protected JSONObject create( final String _source )
 	{
 		return new WebJSONObject( _source ) ;
@@ -41,63 +43,74 @@ public class WebJSONObject extends JSONObject
 		constructor = new WebJSONObject() ;
 	}
 
+	@Override
 	public String[] keys()
 	{
 		return keys( object ) ;
 	}
 
+	@Override
 	public boolean has( final String _key )
 	{
 		return hasKey( object, _key ) ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final boolean _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final int _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final double _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final long _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final String _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final JSONObject _value )
 	{
 		put( object, _key, ( ( WebJSONObject )_value ).object ) ;
 		return this ;
 	}
 
+	@Override
 	public JSONObject put( final String _key, final JSONArray _value )
 	{
 		put( object, _key, ( ( WebJSONArray )_value ).array ) ;
 		return this ;
 	}
 
-	public boolean optBoolean( final String _key )
+	@Override
+	public boolean getBoolean( final String _key )
 	{
 		return optBoolean( object, _key ) ;
 	}
 
+	@Override
 	public boolean optBoolean( final String _key, final boolean _default )
 	{
 		if( has( _key ) )
@@ -108,11 +121,13 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	public int optInt( final String _key )
+	@Override
+	public int getInt( final String _key )
 	{
 		return optInt( object, _key ) ;
 	}
 
+	@Override
 	public int optInt( final String _key, final int _default )
 	{
 		if( has( _key ) )
@@ -123,11 +138,13 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	public double optDouble( final String _key )
+	@Override
+	public double getDouble( final String _key )
 	{
 		return optDouble( object, _key ) ;
 	}
 
+	@Override
 	public double optDouble( final String _key, final double _default )
 	{
 		if( has( _key ) )
@@ -138,11 +155,13 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	public long optLong( final String _key )
+	@Override
+	public long getLong( final String _key )
 	{
 		return ( long )optInt( object, _key ) ;
 	}
 
+	@Override
 	public long optLong( final String _key, final long _default )
 	{
 		if( has( _key ) )
@@ -153,11 +172,13 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	public String optString( final String _key )
+	@Override
+	public String getString( final String _key )
 	{
 		return optString( object, _key ) ;
 	}
 
+	@Override
 	public String optString( final String _key, final String _default )
 	{
 		if( has( _key ) )
@@ -168,7 +189,8 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	public JSONObject optJSONObject( final String _key )
+	@Override
+	public JSONObject getJSONObject( final String _key )
 	{
 		if( has( _key ) == false )
 		{
@@ -178,7 +200,19 @@ public class WebJSONObject extends JSONObject
 		return new WebJSONObject( optJSObject( object, _key ) ) ;
 	}
 
-	public JSONArray optJSONArray( final String _key )
+	@Override
+	public JSONObject optJSONObject( final String _key, final JSONObject _default )
+	{
+		if( has( _key ) == false )
+		{
+			return _default ;
+		}
+
+		return new WebJSONObject( optJSObject( object, _key ) ) ;
+	}
+
+	@Override
+	public JSONArray getJSONArray( final String _key )
 	{
 		if( has( _key ) == false )
 		{
@@ -188,11 +222,24 @@ public class WebJSONObject extends JSONObject
 		return new WebJSONArray( optJSArray( object, _key ) ) ;
 	}
 
+	@Override
+	public JSONArray optJSONArray( final String _key, final JSONArray _default )
+	{
+		if( has( _key ) == false )
+		{
+			return _default ;
+		}
+
+		return new WebJSONArray( optJSArray( object, _key ) ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return object.toString() ;
 	}
 
+	@Override
 	public String toString( final int _indent )
 	{
 		return object.toString() ;

@@ -34,6 +34,14 @@ public class WebFileSystem implements FileSystem
 		return new WebFile( _path ) ;
 	}
 
+	@Override
+	public String getHomeDirectory( final String _projectName )
+	{
+		final StringBuilder builder = new StringBuilder() ;
+		// Need to define a Home Directory for Web implementations.
+		return builder.toString() ;
+	}
+
 	/**
 		Allows reading and parsing JSON formatted files.
 		Mallet Engine provides a wrapper around a platform 

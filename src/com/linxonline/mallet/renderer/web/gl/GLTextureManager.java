@@ -22,6 +22,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;

@@ -1,13 +1,13 @@
 package com.linxonline.mallet.system ;
 
-import java.util.Stack ;
+import java.util.ArrayDeque ;
 
 import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate ;
 import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate.Callback ;
 
 public class DefaultShutdown implements SystemInterface.ShutdownDelegate
 {
-	private final Stack<ShutdownDelegate.Callback> callbacks = new Stack<ShutdownDelegate.Callback>() ;
+	private final ArrayDeque<ShutdownDelegate.Callback> callbacks = new ArrayDeque<ShutdownDelegate.Callback>() ;
 
 	public DefaultShutdown() {}
 
@@ -29,7 +29,7 @@ public class DefaultShutdown implements SystemInterface.ShutdownDelegate
 
 	public void shutdown()
 	{
-		while( callbacks.empty() == false )
+		while( callbacks.isEmpty() == false )
 		{
 			callbacks.pop().shutdown() ;
 		}
