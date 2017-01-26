@@ -22,10 +22,10 @@ public abstract class ManageResources
 	/**
 		returns the names of all unused rescources
 	**/
-	public static List<String> findUnwantedResources( final Map _resources )
+	public static List<String> findUnwantedResources( final Map<String, ?> _resources )
 	{
 		Resource resource = null ;
-		final Set<String> keys = ( Set<String> )_resources.keySet() ;
+		final Set<String> keys = _resources.keySet() ;
 		final List<String> remove = MalletList.<String>newList() ;
 
 		for( final String key : keys )
@@ -44,7 +44,7 @@ public abstract class ManageResources
 		return remove ;
 	}
 
-	public static void removeUnwantedResources( final Map _resources )
+	public static void removeUnwantedResources( final Map<String, ?> _resources )
 	{
 		removeUnwantedResources( _resources, findUnwantedResources( _resources ) ) ;
 	}
@@ -52,7 +52,7 @@ public abstract class ManageResources
 	/**
 		Iterates over their names and removes them from the Map
 	**/
-	public static void removeUnwantedResources( final Map _resources, 
+	public static void removeUnwantedResources( final Map<String, ?> _resources, 
 												final List<String> _remove )
 	{
 		Resource resource = null ;

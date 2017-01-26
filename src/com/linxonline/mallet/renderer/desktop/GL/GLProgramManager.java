@@ -23,7 +23,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		temporarily store the program in a queue.
 	*/
 	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
-	private final List<GLProgram> toBind = MalletList.<GLProgram>newList()  ;
+	private final List<GLProgram> toBind = MalletList.<GLProgram>newList() ;
 
 	public GLProgramManager()
 	{
@@ -59,7 +59,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			private void generateGLProgram( final JSONObject _jGL )
 			{
 				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
-				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList();
+				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList() ;
 
 				fill( paths, _jGL.getJSONArray( "VERTEX" ),   GL3.GL_VERTEX_SHADER ) ;
 				fill( paths, _jGL.getJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;

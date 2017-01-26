@@ -154,7 +154,7 @@ public abstract class DesktopStarter extends StarterInterface
 	{
 		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
 		GlobalHome.setHome( getApplicationName() ) ;
-		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
+		GlobalHome.copy( Tuple.<String, String>build( BASE_CONFIG, BASE_CONFIG ) ) ;
 
 		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings

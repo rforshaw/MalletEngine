@@ -12,7 +12,7 @@ import com.linxonline.mallet.renderer.Program ;
 
 public final class AnimationAssist
 {
-	private static final Event ANIMATION_CLEAN = new Event( "ANIMATION_CLEAN", null ) ;
+	private static final Event<Object> ANIMATION_CLEAN = new Event<Object>( "ANIMATION_CLEAN", null ) ;
 
 	private AnimationAssist() {}
 

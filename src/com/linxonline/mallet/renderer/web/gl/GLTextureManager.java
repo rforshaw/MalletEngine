@@ -118,7 +118,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		}
 
 		final Texture texture = super.get( _file ) ;
-		
+
 		// PLACEHOLDER is used to prevent the texture loader 
 		// loading the same texture twice when loading async, 
 		return ( texture != PLACEHOLDER ) ? texture : null ;

@@ -12,13 +12,15 @@ import com.linxonline.mallet.util.arrays.ManagedArray ;
 	rendering-system. A default world must be passed when WorldState is 
 	constructed/extended.
 */
-public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
+public abstract class WorldState<D extends DrawData,
+								 C extends CameraData,
+								 W extends BasicWorld<D, C>> extends ManagedArray<W>
 {
-	private T defaultWorld ;
+	private W defaultWorld ;
 
 	public WorldState() {}
 
-	public void setDefault( final T _default )
+	public void setDefault( final W _default )
 	{
 		defaultWorld = _default ;
 		current.add( defaultWorld ) ;
@@ -28,7 +30,7 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Wrapper function around add, provides greater explanation 
 		on what add is being used for.
 	*/
-	public void addWorld( final T _world )
+	public void addWorld( final W _world )
 	{
 		add( _world ) ;
 	}
@@ -37,7 +39,7 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Wrapper function around remove, provides greater explanation 
 		on what remove is being used for.
 	*/
-	public void removeWorld( final T _world )
+	public void removeWorld( final W _world )
 	{
 		remove( _world ) ;
 	}
@@ -46,9 +48,9 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Add the DrawData to the specified World.
 		If no world is specified add it to the default world.
 	*/
-	public void addDraw( final DrawData _draw, final T _world )
+	public void addDraw( final D _draw, final W _world )
 	{
-		final BasicWorld world = getWorld( _world ) ;
+		final W world = getWorld( _world ) ;
 		_draw.setWorld( world ) ;
 
 		synchronized( world )
@@ -61,9 +63,9 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Remove the DrawData to the specified World.
 		If no world is specified remove it from the default world.
 	*/
-	public void removeDraw( final DrawData _draw )
+	public void removeDraw( final D _draw )
 	{
-		final BasicWorld world = ( BasicWorld )_draw.getWorld() ;
+		final W world = ( W )_draw.getWorld() ;
 		synchronized( world )
 		{
 			world.removeDraw( _draw ) ;
@@ -74,9 +76,9 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Add the CameraData to the specified World.
 		If no world is specified add it to the default world.
 	*/
-	public void addCamera( final CameraData _camera, final T _world )
+	public void addCamera( final C _camera, final W _world )
 	{
-		final BasicWorld world = getWorld( _world ) ;
+		final W world = getWorld( _world ) ;
 		_camera.setWorld( world ) ;
 
 		synchronized( world )
@@ -89,32 +91,32 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 		Remove the CameraData to the specified World.
 		If no world is specified remove it from the default world.
 	*/
-	public void removeCamera( final CameraData _camera )
+	public void removeCamera( final C _camera )
 	{
-		final BasicWorld world = ( BasicWorld )_camera.getWorld() ;
+		final W world = ( W )_camera.getWorld() ;
 		synchronized( world )
 		{
 			world.removeCamera( _camera ) ;
 		}
 	}
 
-	public CameraData getCamera( final String _id, final T _world )
+	public C getCamera( final String _id, final W _world )
 	{
-		final BasicWorld world = getWorld( _world ) ;
-		return ( CameraData )world.getCameraState().getCamera( _id ) ;
+		final W world = getWorld( _world ) ;
+		return ( C )world.getCameraState().getCamera( _id ) ;
 	}
 
-	public BasicWorld getWorld( final BasicWorld _world )
+	public W getWorld( final W _world )
 	{
 		return _world == null ? defaultWorld : _world ;
 	}
 
-	public BasicWorld getWorld( final String _id )
+	public W getWorld( final String _id )
 	{
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final T world = current.get( i ) ;
+			final W world = current.get( i ) ;
 			if( _id.equals( world.getID() ) == true )
 			{
 				return world ;
@@ -148,16 +150,16 @@ public abstract class WorldState<T extends BasicWorld> extends ManagedArray<T>
 	}
 
 	@Override
-	protected void addNewData( final List<T> _toAdd )
+	protected void addNewData( final List<W> _toAdd )
 	{
-		for( final T add : _toAdd )
+		for( final W add : _toAdd )
 		{
 			insertNewDrawData( add ) ;
 		}
 		_toAdd.clear() ;
 	}
 
-	private void insertNewDrawData( final T _insert )
+	private void insertNewDrawData( final W _insert )
 	{
 		final int order = _insert.getOrder() ;
 		final int size = current.size() ;

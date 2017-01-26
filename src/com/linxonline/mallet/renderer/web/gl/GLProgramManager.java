@@ -63,7 +63,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
 				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList() ;
 
-				fill( paths, _jGL.getJSONArray( "VERTEX" ), GL3.VERTEX_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "VERTEX" ),   GL3.VERTEX_SHADER ) ;
 				//fill( paths, _jGL.getJSONArray( "GEOMETRY" ), GL3.GEOMETRY_SHADER ) ;
 				fill( paths, _jGL.getJSONArray( "FRAGMENT" ), GL3.FRAGMENT_SHADER ) ;
 

@@ -5,7 +5,7 @@ import com.linxonline.mallet.event.Event ;
 
 public final class AudioAssist
 {
-	private static final Event AUDIO_CLEAN = new Event( "AUDIO_CLEAN", null ) ;
+	private static final Event<Object> AUDIO_CLEAN = new Event<Object>( "AUDIO_CLEAN", null ) ;
 
 	private static Assist assist ;
 	

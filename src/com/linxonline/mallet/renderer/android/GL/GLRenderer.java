@@ -19,7 +19,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.VertexAttrib ;
 
-public class GLRenderer extends BasicRenderer<GLWorldState>
+public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState>
 {
 	public static final int ORTHOGRAPHIC_MODE = 1 ;
 	public static final int PERSPECTIVE_MODE  = 2 ;
@@ -550,8 +550,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState>
 			@Override
 			public World getDefaultWorld()
 			{
-				final BasicWorld world = null ;
-				return getWorldState().getWorld( world ) ;
+				return getWorldState().getWorld( ( GLWorld )null ) ;
 			}
 
 			@Override

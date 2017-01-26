@@ -7,7 +7,7 @@ import com.linxonline.mallet.renderer.* ;
 	Provides the ability to manage multiple OpenGL 
 	states as seperate worlds.
 */
-public class GLWorldState extends WorldState<GLWorld>
+public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 {
 	public GLWorldState() {}
 

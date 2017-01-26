@@ -24,7 +24,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib ;
 
-public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventListener
+public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState> implements GLEventListener
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
@@ -508,8 +508,7 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 			@Override
 			public World getDefaultWorld()
 			{
-				final BasicWorld world = null ;
-				return getWorldState().getWorld( world ) ;
+				return getWorldState().getWorld( ( GLWorld )null ) ;
 			}
 
 			@Override
@@ -537,9 +536,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public DrawData.UploadInterface getBasicUpload()
+	public GLDrawData.UploadInterface<GLDrawData> getBasicUpload()
 	{
-		return new DrawData.UploadInterface<GLDrawData>()
+		return new GLDrawData.UploadInterface<GLDrawData>()
 		{
 			public void upload( final GLDrawData _data )
 			{
@@ -579,9 +578,9 @@ public class GLRenderer extends BasicRenderer<GLWorldState> implements GLEventLi
 	}
 
 	@Override
-	public DrawData.UploadInterface getTextUpload()
+	public GLDrawData.UploadInterface<GLDrawData> getTextUpload()
 	{
-		return new DrawData.UploadInterface<GLDrawData>()
+		return new GLDrawData.UploadInterface<GLDrawData>()
 		{
 			public void upload( final GLDrawData _data )
 			{

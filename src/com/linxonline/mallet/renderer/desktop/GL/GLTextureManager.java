@@ -26,10 +26,10 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
-public class GLTextureManager extends AbstractManager<Texture>
+public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 {
 	// Used when a texture is being loaded, but not yet available.
-	private static final Texture PLACEHOLDER = new Texture( null ) ;
+	private static final Texture<GLImage> PLACEHOLDER = new Texture<GLImage>( null ) ;
 
 	/**
 		When loading a texture the TextureManager will stream the 
@@ -53,20 +53,20 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<Texture> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<Texture>()
+		final ResourceLoader<Texture<GLImage>> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<Texture<GLImage>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return true ;
 			}
 
-			public Texture load( final String _file, final Settings _settings )
+			public Texture<GLImage> load( final String _file, final Settings _settings )
 			{
 				return loadTextureASync( _file ) ;
 			}
 
-			protected Texture loadTextureASync( final String _file )
+			protected Texture<GLImage> loadTextureASync( final String _file )
 			{
 				// We want to allocate the key for the resource so the texture 
 				// is not reloaded if another object wishes to use it before 
@@ -84,7 +84,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	}
 
 	@Override
-	public Texture get( final String _file )
+	public Texture<GLImage> get( final String _file )
 	{
 		synchronized( toBind )
 		{
@@ -99,7 +99,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 			toBind.clear() ;
 		}
 
-		final Texture texture = super.get( _file ) ;
+		final Texture<GLImage> texture = super.get( _file ) ;
 
 		// PLACEHOLDER is used to prevent the texture loader 
 		// loading the same texture twice when loading async, 
@@ -131,7 +131,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		imageFormat = _format ;
 	}
 
-	public Texture bind( final BufferedImage _image )
+	public Texture<GLImage> bind( final BufferedImage _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
@@ -141,7 +141,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final BufferedImage _image, final InternalFormat _format )
+	public Texture<GLImage> bind( final BufferedImage _image, final InternalFormat _format )
 	{
 		final GL3 gl = GLRenderer.getGL() ;
 		if( gl == null )
@@ -197,7 +197,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 		gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
-		return new Texture( new GLImage( textureID, width, height ) ) ;
+		return new Texture<GLImage>( new GLImage( textureID, width, height ) ) ;
 	}
 
 	private int getGLInternalFormat( final int _channels, final InternalFormat _format )

@@ -127,12 +127,6 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public WorldState getWorldState()
-	{
-		return render.getWorldState() ;
-	}
-
-	@Override
 	public void sort()
 	{
 		render.sort() ;

@@ -46,7 +46,7 @@ public final class QuickSort
 		int size = _contents.size() ;
 		final int halfSize = size / 2 ;
 
-		final SortInterface pivot = _contents.get( halfSize ) ;
+		final T pivot = _contents.get( halfSize ) ;
 		_contents.remove( pivot ) ;
 
 		List<T> less = MalletList.<T>newList() ;
@@ -57,7 +57,7 @@ public final class QuickSort
 
 		for( int i = 0; i < size; i++ )
 		{
-			final SortInterface s = _contents.get( i ) ;
+			final T s = _contents.get( i ) ;
 			if( s.sortValue() <= pivotPoint )
 			{
 				less.add( ( T )s ) ;
@@ -71,7 +71,7 @@ public final class QuickSort
 		less = quicksort( less ) ;
 		greater = quicksort( greater ) ;
 
-		less.add( ( T )pivot ) ;
+		less.add( pivot ) ;
 		less.addAll( greater ) ;
 		return less ;
 	}

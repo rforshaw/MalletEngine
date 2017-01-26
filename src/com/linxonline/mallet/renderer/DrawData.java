@@ -8,7 +8,7 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 
 public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 {
-	private final Draw.UploadInterface DRAW_DEFAULT = new Draw.UploadInterface<T>()
+	private final Draw.UploadInterface<T> DRAW_DEFAULT = new Draw.UploadInterface<T>()
 	{
 		@Override
 		public void upload( final T _data ) {}

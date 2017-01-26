@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 {
-	private final SoundManager staticSoundManager = new SoundManager( this ) ;
+	private final SoundManager<ALSASound> staticSoundManager = new SoundManager<ALSASound>( this ) ;
 	private AL openAL = null ;
 
 	public ALSASourceGenerator() {}
@@ -40,15 +40,15 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 	private void initStaticLoaders()
 	{
-		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
+		final ManagerInterface.ResourceLoader<AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer<ALSASound>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
-			public AudioBuffer load( final String _file, final Settings _settings )
+			public AudioBuffer<ALSASound> load( final String _file, final Settings _settings )
 			{
 				final byte[] wav = ByteReader.readBytes( _file ) ;
 				if( wav == null )

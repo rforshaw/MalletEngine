@@ -6,9 +6,12 @@ import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
-public abstract class BasicRenderer<T extends WorldState> implements RenderInterface<T>
+public abstract class BasicRenderer<D extends DrawData,
+									C extends CameraData,
+									W extends BasicWorld<D, C>,
+									WS extends WorldState<D, C, W>> implements RenderInterface
 {
-	private final T worlds ;
+	private final WS worlds ;
 
 	private final EventController controller = new EventController() ;
 	private final RenderInfo info = new RenderInfo() ;
@@ -17,7 +20,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	protected float updateDT = 0.0f ;
 	protected int renderIter = 0 ;
 
-	public BasicRenderer( final T _worlds )
+	public BasicRenderer( final WS _worlds )
 	{
 		worlds = _worlds ;
 	}
@@ -58,8 +61,8 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	@Override
 	public abstract void initAssist() ;
 
-	public abstract DrawData.UploadInterface getBasicUpload() ;
-	public abstract DrawData.UploadInterface getTextUpload() ;
+	public abstract D.UploadInterface<D> getBasicUpload() ;
+	public abstract D.UploadInterface<D> getTextUpload() ;
 
 	public abstract Camera.DrawInterface getCameraDraw() ;
 
@@ -69,26 +72,26 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 	*/
 	public abstract DrawState.RemoveDelegate constructRemoveDelegate() ;
 
-	protected DrawDelegate constructDrawDelegate()
+	protected DrawDelegate<W, D> constructDrawDelegate()
 	{
-		return new DrawDelegate()
+		return new DrawDelegate<W, D>()
 		{
-			private final List<Draw> data = MalletList.<Draw>newList() ;
+			private final List<D> data = MalletList.<D>newList() ;
 
 			@Override
-			public void addTextDraw( final Draw _draw )
+			public void addTextDraw( final D _draw )
 			{
 				addTextDraw( _draw, null ) ;
 			}
 
 			@Override
-			public void addBasicDraw( final Draw _draw )
+			public void addBasicDraw( final D _draw )
 			{
 				addBasicDraw( _draw, null ) ;
 			}
 
 			@Override
-			public void addTextDraw( final Draw _draw, final World _world )
+			public void addTextDraw( final D _draw, final W _world )
 			{
 				if( _draw instanceof DrawData )
 				{
@@ -97,13 +100,13 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 						_draw.setUploadInterface( getTextUpload() ) ;
 						data.add( _draw ) ;
 
-						worlds.addDraw( ( DrawData )_draw, ( BasicWorld )_world ) ;
+						worlds.addDraw( _draw, _world ) ;
 					}
 				}
 			}
 
 			@Override
-			public void addBasicDraw( final Draw _draw, final World _world )
+			public void addBasicDraw( final D _draw, final W _world )
 			{
 				if( _draw instanceof DrawData )
 				{
@@ -112,25 +115,25 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 						_draw.setUploadInterface( getBasicUpload() ) ;
 						data.add( _draw ) ;
 
-						worlds.addDraw( ( DrawData )_draw, ( BasicWorld )_world ) ;
+						worlds.addDraw( _draw, _world ) ;
 					}
 				}
 			}
 
 			@Override
-			public void removeDraw( final Draw _draw )
+			public void removeDraw( final D _draw )
 			{
 				if( _draw != null && _draw instanceof DrawData )
 				{
 					data.remove( _draw ) ;
-					worlds.removeDraw( ( DrawData )_draw ) ;
+					worlds.removeDraw( _draw ) ;
 				}
 			}
 
 			@Override
-			public Camera getCamera( final String _id, final World _world )
+			public Camera getCamera( final String _id, final W _world )
 			{
-				return worlds.getCamera( _id, ( BasicWorld )_world ) ;
+				return worlds.getCamera( _id, _world ) ;
 			}
 
 			@Override
@@ -142,9 +145,9 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 			@Override
 			public void shutdown()
 			{
-				for( final Draw draw : data  )
+				for( final D draw : data  )
 				{
-					worlds.removeDraw( ( DrawData )draw ) ;
+					worlds.removeDraw( draw ) ;
 				}
 				data.clear() ;
 			}
@@ -175,8 +178,7 @@ public abstract class BasicRenderer<T extends WorldState> implements RenderInter
 		return controller ;
 	}
 
-	@Override
-	public T getWorldState()
+	public WS getWorldState()
 	{
 		return worlds ;
 	}

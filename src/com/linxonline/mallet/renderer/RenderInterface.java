@@ -4,7 +4,7 @@ import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public interface RenderInterface<T extends WorldState>
+public interface RenderInterface
 {
 	/**
 		Called on application initialisation by the SystemInterface
@@ -49,8 +49,6 @@ public interface RenderInterface<T extends WorldState>
 
 	public RenderInfo getRenderInfo() ;
 	public EventController getEventController() ;
-
-	public T getWorldState() ;
 
 	public void sort() ;
 	public void clear() ;
