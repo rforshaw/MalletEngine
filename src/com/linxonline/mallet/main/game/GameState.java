@@ -8,6 +8,7 @@ import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -619,7 +620,7 @@ public class GameState extends State implements HookEntity
 
 		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
 		{
-			private DrawDelegate delegate ;
+			private DrawDelegate<World, Draw> delegate ;
 
 			public void processEvent( final Event<Boolean> _event )
 			{
@@ -642,7 +643,7 @@ public class GameState extends State implements HookEntity
 				showFPS.setShow( true ) ;
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( final DrawDelegate _delegate )
+					public void callback( final DrawDelegate<World, Draw> _delegate )
 					{
 						delegate = _delegate ;
 						delegate.addTextDraw( showFPS.getDraw() ) ;

@@ -47,7 +47,7 @@ public final class DrawAssist
 		Request the active rendering system to clean-up any 
 		unused resources it may still be referencing.
 	*/
-	public static Event constructDrawClean()
+	public static Event<Object> constructDrawClean()
 	{
 		return DRAW_CLEAN ;
 	}

@@ -14,6 +14,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Program ;
@@ -49,7 +50,7 @@ public final class UIFactory
 
 		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
 		final UILayout layout = new UILayout( _type, new Vector3(), new Vector3(), dimension ) ;
-		layout.addListener( new BaseListener()
+		layout.addListener( new BaseListener<UILayout>()
 		{
 			private final Notification.Notify<String> widthNotify = new Notification.Notify<String>()
 			{
@@ -77,7 +78,8 @@ public final class UIFactory
 				}
 			} ;
 
-			public void setParent( final UIElement _parent )
+			@Override
+			public void setParent( final UILayout _parent )
 			{
 				super.setParent( _parent ) ;
 				GlobalConfig.addNotify( "RENDERWIDTH", widthNotify ) ;
@@ -96,10 +98,10 @@ public final class UIFactory
 		return layout ;
 	}
 
-	public static UIListener constructUIListener( final MalletTexture _sheet,
-												  final UIElement.UV _uv )
+	public static <T extends UIElement> UIListener<T> constructUIListener( final MalletTexture _sheet,
+																		   final UIElement.UV _uv )
 	{
-		return new UIListener()
+		return new UIListener<T>()
 		{
 			private Draw draw = null ;
 
@@ -123,7 +125,7 @@ public final class UIFactory
 			}
 
 			@Override
-			public void addDraws( final DrawDelegate _delegate )
+			public void addDraws( final DrawDelegate<World, Draw> _delegate )
 			{
 				_delegate.addBasicDraw( draw ) ;
 			}

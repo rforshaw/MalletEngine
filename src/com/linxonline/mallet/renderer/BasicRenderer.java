@@ -72,74 +72,83 @@ public abstract class BasicRenderer<D extends DrawData,
 	*/
 	public abstract DrawState.RemoveDelegate constructRemoveDelegate() ;
 
-	protected DrawDelegate<W, D> constructDrawDelegate()
+	protected DrawDelegate<World, Draw> constructDrawDelegate()
 	{
-		return new DrawDelegate<W, D>()
+		return new DrawDelegate<World, Draw>()
 		{
 			private final List<D> data = MalletList.<D>newList() ;
 
 			@Override
-			public void addTextDraw( final D _draw )
+			@SuppressWarnings( "unchecked" )
+			public void addTextDraw( final Draw _draw )
 			{
 				addTextDraw( _draw, null ) ;
 			}
 
 			@Override
-			public void addBasicDraw( final D _draw )
+			@SuppressWarnings( "unchecked" )
+			public void addBasicDraw( final Draw _draw )
 			{
 				addBasicDraw( _draw, null ) ;
 			}
 
 			@Override
-			public void addTextDraw( final D _draw, final W _world )
+			@SuppressWarnings( "unchecked" )
+			public void addTextDraw( final Draw _draw, final World _world )
 			{
-				if( _draw instanceof DrawData )
-				{
-					if( data.contains( _draw ) == false )
-					{
-						_draw.setUploadInterface( getTextUpload() ) ;
-						data.add( _draw ) ;
+				final W world = ( W )_world ;
+				final D draw = ( D )_draw ;
 
-						worlds.addDraw( _draw, _world ) ;
-					}
+				if( data.contains( draw ) == false )
+				{
+					draw.setUploadInterface( getTextUpload() ) ;
+					data.add( draw ) ;
+
+					worlds.addDraw( draw, world ) ;
 				}
 			}
 
 			@Override
-			public void addBasicDraw( final D _draw, final W _world )
+			@SuppressWarnings( "unchecked" )
+			public void addBasicDraw( final Draw _draw, final World _world )
 			{
-				if( _draw instanceof DrawData )
-				{
-					if( data.contains( _draw ) == false )
-					{
-						_draw.setUploadInterface( getBasicUpload() ) ;
-						data.add( _draw ) ;
+				final W world = ( W )_world ;
+				final D draw = ( D )_draw ;
 
-						worlds.addDraw( _draw, _world ) ;
-					}
+				if( data.contains( draw ) == false )
+				{
+					_draw.setUploadInterface( getBasicUpload() ) ;
+					data.add( draw ) ;
+
+					worlds.addDraw( draw, world ) ;
 				}
 			}
 
 			@Override
-			public void removeDraw( final D _draw )
+			@SuppressWarnings( "unchecked" )
+			public void removeDraw( final Draw _draw )
 			{
-				if( _draw != null && _draw instanceof DrawData )
+				final D draw = ( D )_draw ;
+				if( draw != null )
 				{
-					data.remove( _draw ) ;
-					worlds.removeDraw( _draw ) ;
+					data.remove( draw ) ;
+					worlds.removeDraw( draw ) ;
 				}
 			}
 
 			@Override
-			public Camera getCamera( final String _id, final W _world )
+			@SuppressWarnings( "unchecked" )
+			public Camera getCamera( final String _id, final World _world )
 			{
-				return worlds.getCamera( _id, _world ) ;
+				final W world = ( W )_world ;
+				return worlds.getCamera( _id, world ) ;
 			}
 
 			@Override
+			@SuppressWarnings( "unchecked" )
 			public World getWorld( final String _id )
 			{
-				return worlds.getWorld( _id ) ;
+				return ( W )worlds.getWorld( _id ) ;
 			}
 
 			@Override

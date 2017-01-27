@@ -33,7 +33,7 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UIElement> uiListener = JUI.<UIElement>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -53,7 +53,7 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -74,7 +74,7 @@ public class JUI
 				applyLengths( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -322,7 +322,7 @@ public class JUI
 		}
 	}
 
-	private static UIListener createUIElementUIListener( final JSONObject _ui )
+	private static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
@@ -336,7 +336,7 @@ public class JUI
 			return null ;
 		}
 
-		return UIFactory.constructUIListener( new MalletTexture( _ui.optString( "TEXTURE", "" ) ), uv ) ;
+		return UIFactory.<T>constructUIListener( new MalletTexture( _ui.optString( "TEXTURE", "" ) ), uv ) ;
 	}
 
 	private static UIElement.UV createUV( final JSONObject _uv )

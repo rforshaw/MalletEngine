@@ -6,6 +6,7 @@ import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.MalletList ;
@@ -15,7 +16,7 @@ public class RenderComponent extends Component
 	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
 	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
 
-	private DrawDelegate drawDelegate = null ;
+	private DrawDelegate<World, Draw> drawDelegate = null ;
 	private Component.ReadyCallback toDestroy = null ;
 
 	public RenderComponent()
@@ -102,7 +103,7 @@ public class RenderComponent extends Component
 		super.passInitialEvents( _events ) ;
 		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate _delegate )
+			public void callback( final DrawDelegate<World, Draw> _delegate )
 			{
 				drawDelegate = _delegate ;
 				for( final Draw draw : toAddBasic )

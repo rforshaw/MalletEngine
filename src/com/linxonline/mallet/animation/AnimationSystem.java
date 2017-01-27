@@ -31,7 +31,7 @@ public class AnimationSystem
 	private final SpriteManager spriteManager = new SpriteManager() ;
 
 	private final EventController controller = new EventController() ;
-	protected DrawDelegate drawDelegate = null ;
+	protected DrawDelegate<World, Draw> drawDelegate = null ;
 
 	public AnimationSystem()
 	{
@@ -58,7 +58,7 @@ public class AnimationSystem
 		*/
 		controller.passEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate _delegate )
+			public void callback( final DrawDelegate<World, Draw> _delegate )
 			{
 				drawDelegate = _delegate ;
 			}

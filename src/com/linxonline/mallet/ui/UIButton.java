@@ -10,6 +10,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Program ;
@@ -108,7 +109,7 @@ public class UIButton extends UIElement
 		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static class UIListener extends BaseListener
+	public static class UIListener extends BaseListener<UIButton>
 	{
 		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
 		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
@@ -123,7 +124,7 @@ public class UIButton extends UIElement
 		private final UIButton.UV clicked ;
 		private UIButton.UV active = null ;
 
-		private DrawDelegate delegate = null ;
+		private DrawDelegate<World, Draw> delegate = null ;
 		private Draw draw = null ;
 		private Draw drawText = null ;
 
@@ -178,12 +179,12 @@ public class UIButton extends UIElement
 		}
 
 		@Override
-		public void setParent( final UIElement _parent )
+		public void setParent( final UIButton _parent )
 		{
 			super.setParent( _parent ) ;
 			_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 			{
-				public void callback( final DrawDelegate _delegate )
+				public void callback( final DrawDelegate<World, Draw> _delegate )
 				{
 					delegate = _delegate ;
 					if( draw != null )

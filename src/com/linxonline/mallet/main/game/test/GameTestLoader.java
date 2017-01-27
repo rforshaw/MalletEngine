@@ -123,7 +123,8 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( final DrawDelegate _delegate )
+					@Override
+					public void callback( final DrawDelegate<World, Draw> _delegate )
 					{
 						{
 							final int width = GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
@@ -279,7 +280,8 @@ public final class GameTestLoader extends GameLoader
 			{
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( final DrawDelegate _delegate )
+					@Override
+					public void callback( final DrawDelegate<World, Draw> _delegate )
 					{
 						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
 																	 new MalletFont( "Arial" ),
