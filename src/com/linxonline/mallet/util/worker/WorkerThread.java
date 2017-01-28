@@ -11,7 +11,7 @@ public class WorkerThread extends Thread
 	private LockInterface block = new JLock() ;			// Block thread while waiting for work
 	private MultiLockInterface multiLock = null ;		// Lock to calling thread
 
-	private Worker worker = null ;						// Defines execution and data set
+	private Worker<?> worker = null ;						// Defines execution and data set
 	private int start = 0 ;								// Start of data subset
 	private int end = 0 ;								// End of data subset
 
@@ -36,7 +36,7 @@ public class WorkerThread extends Thread
 		Set the worker, without this the thread will 
 		not process anything.
 	*/
-	public <T> void setWorker( final Worker<T> _worker )
+	public void setWorker( final Worker<?> _worker )
 	{
 		worker = _worker ;
 	}
@@ -49,11 +49,12 @@ public class WorkerThread extends Thread
 		{
 			if( worker != null )
 			{
-				final List list = worker.getDataSet() ;
+				type = worker.exec( start, end ) ;
+				/*final List list = worker.getDataSet() ;
 				for( int i = start; i < end; i++ )
 				{
 					type = worker.exec( i, list.get( i ) ) ;		// Does the hard execution work
-				}
+				}*/
 			}
 
 			if( multiLock != null )

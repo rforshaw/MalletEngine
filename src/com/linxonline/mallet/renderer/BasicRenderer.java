@@ -64,13 +64,13 @@ public abstract class BasicRenderer<D extends DrawData,
 	public abstract D.UploadInterface<D> getBasicUpload() ;
 	public abstract D.UploadInterface<D> getTextUpload() ;
 
-	public abstract Camera.DrawInterface getCameraDraw() ;
+	public abstract C.DrawInterface<C> getCameraDraw() ;
 
 	/**
 		Allows implementations to clean-up other systems using 
 		or is used by DrawData.
 	*/
-	public abstract DrawState.RemoveDelegate constructRemoveDelegate() ;
+	public abstract DrawState.RemoveDelegate<D> constructRemoveDelegate() ;
 
 	protected DrawDelegate<World, Draw> constructDrawDelegate()
 	{

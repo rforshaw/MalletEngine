@@ -26,6 +26,7 @@ import com.linxonline.mallet.io.filesystem.* ;
 	the same object for each pointer. Anything that has a reference to 
 	an object, but does not own it, should not save it out.
 */
+@SuppressWarnings( "unchecked" )
 public final class Dump
 {
 	private static final JSONDump jsonDump = new JSONDump() ;

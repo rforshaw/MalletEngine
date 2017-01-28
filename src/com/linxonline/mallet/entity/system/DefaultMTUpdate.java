@@ -29,7 +29,7 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 		workers.exec( entityWorker ) ;				// This will block until all entities have been processed
 	}
 
-	private class EntityWorker implements Worker<Entity>
+	private class EntityWorker extends Worker<Entity>
 	{
 		private float deltaTime = 0.0f ;
 
@@ -52,7 +52,7 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 				}
 			}
 
-			return ExecType.FINISH ;
+			return ExecType.CONTINUE ;
 		}
 
 		public List<Entity> getDataSet()

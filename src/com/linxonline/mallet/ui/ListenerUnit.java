@@ -4,26 +4,23 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class ListenerUnit<T extends BaseListener>
+public class ListenerUnit<T extends BaseListener<? extends UIElement>>
 {
 	private final List<T> listeners = MalletList.<T>newList() ;
-	private final UIElement parent ;
 
-	public ListenerUnit( final UIElement _parent )
-	{
-		parent = _parent ;
-	}
+	public ListenerUnit() {}
 
-	public void add( final T _listener )
+	public boolean add( final T _listener )
 	{
 		if( _listener != null )
 		{
 			if( listeners.contains( _listener ) == false )
 			{
 				listeners.add( _listener ) ;
-				_listener.setParent( parent ) ;
+				return true ;
 			}
 		}
+		return false ;
 	}
 
 	public boolean remove( final T _listener )

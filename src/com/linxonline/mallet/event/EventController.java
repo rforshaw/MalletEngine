@@ -95,7 +95,7 @@ public class EventController implements EventHandler
 		final int processorSize = processors.size() ;
 		for( int i = 0; i < processorSize; ++i )
 		{
-			final EventProcessor proc = processors.get( i ) ;
+			final EventProcessor<?> proc = processors.get( i ) ;
 			for( int j = 0; j < messengerSize; ++j )
 			{
 				proc.passEvent( messenger.getAt( j ) ) ;

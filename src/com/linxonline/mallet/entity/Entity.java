@@ -239,7 +239,7 @@ public final class Entity
 	*/
 	public final void destroy()
 	{
-		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback<Component>()
+		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback()
 		{
 			private final List<Component> toDestroy = MalletList.<Component>newList( components ) ;
 

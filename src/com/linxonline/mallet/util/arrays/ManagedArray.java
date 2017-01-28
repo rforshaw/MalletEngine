@@ -10,22 +10,22 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public abstract class ManagedArray<T>
 {
-	private static RemoveDelegate FALLBACK = new RemoveDelegate<Object>()
+	private RemoveDelegate<T> FALLBACK = new RemoveDelegate<T>()
 	{
-		public void remove( final Object _data ) {}
+		public void remove( final T _data ) {}
 	} ;
 
 	protected final List<T> toAdd = MalletList.<T>newList() ;
 	protected final List<T> toRemove = MalletList.<T>newList() ;
 	protected final List<T> current = MalletList.<T>newList() ;
 
-	protected RemoveDelegate removeDelegate = FALLBACK ;
+	protected RemoveDelegate<T> removeDelegate = FALLBACK ;
 
 	/**
 		Set a custom delegate if the objects require specific 
 		removal handling.
 	*/
-	public <T> void setRemoveDelegate( final RemoveDelegate<T> _delegate )
+	public void setRemoveDelegate( final RemoveDelegate<T> _delegate )
 	{
 		removeDelegate = _delegate ;
 		if( removeDelegate == null )

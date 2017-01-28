@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 */
 public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 {
-	private final LinkedList<TimeWrapper> pool = new LinkedList<TimeWrapper>() ;	// Pool of objects that will be used.
+	private final LinkedList<TimeWrapper<T>> pool = new LinkedList<TimeWrapper<T>>() ;	// Pool of objects that will be used.
 	private final Class<T> objectCreator ;											// Used to create T type instances.
 	private final float wait ;														// The amount of time an object can be used for without being reused.
 	private int currentPos = 0 ;													// Current location within pool.
@@ -100,17 +100,16 @@ public class TimeCache<T extends Cacheable> implements CacheInterface<T>
 	**/
 	private void add( final long _seconds, final double _remainder, final T _t )
 	{
-		final TimeWrapper wrapper = new TimeWrapper( _seconds, _remainder, _t ) ;
-		pool.add( wrapper ) ;
+		pool.add( new TimeWrapper<T>( _seconds, _remainder, _t ) ) ;
 	}
 
 	/**
 		Insert T into specified location of pool.
 		Pushes everything from that position to the right by 1.
 	**/
-	private TimeWrapper insert( final int _insert, final long _seconds, final double _remainder, final T _t )
+	private TimeWrapper<T> insert( final int _insert, final long _seconds, final double _remainder, final T _t )
 	{
-		final TimeWrapper wrapper = new TimeWrapper( _seconds, _remainder, _t ) ;
+		final TimeWrapper<T> wrapper = new TimeWrapper<T>( _seconds, _remainder, _t ) ;
 		pool.add( _insert, wrapper ) ;
 		return wrapper ;
 	}

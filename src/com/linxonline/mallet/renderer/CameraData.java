@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public class CameraData<T extends CameraData> implements Camera<T>
 {
-	private final Camera.DrawInterface DRAW_DEFAULT = new Camera.DrawInterface<T>()
+	private final Camera.DrawInterface<T> DRAW_DEFAULT = new Camera.DrawInterface<T>()
 	{
 		@Override
 		public void draw( final T _data ) {}
@@ -104,7 +104,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	}
 
 	@Override
-	public void setDrawInterface( final Camera.DrawInterface<T> _draw )
+	public void setDrawInterface( final CameraData.DrawInterface<T> _draw )
 	{
 		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
 	}

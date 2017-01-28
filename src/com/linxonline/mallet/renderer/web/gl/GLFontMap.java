@@ -52,7 +52,7 @@ public class GLFontMap extends Resource
 		return ( GLGlyph )fontMap.getGlyphWithCode( _code ) ;
 	}
 
-	public Texture getTexture()
+	public Texture<GLImage> getTexture()
 	{
 		return fontMap.texture ;
 	}

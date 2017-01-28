@@ -24,7 +24,7 @@ public class UIElement implements InputHandler
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
-	private final ListenerUnit<BaseListener> listeners = new ListenerUnit<BaseListener>( this ) ;
+	private final ListenerUnit<BaseListener<? extends UIElement>> listeners = new ListenerUnit<BaseListener<? extends UIElement>>() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 	private InputAdapterInterface adapter = null ;
 
@@ -82,9 +82,12 @@ public class UIElement implements InputHandler
 		Caution: BaseListeners not designed for the elements 
 		sub-type can still be added, not caught at compile-time.
 	*/
-	public <T extends BaseListener<? extends UIElement>> T addListener( final T _listener )
+	public <T extends BaseListener> T addListener( final T _listener )
 	{
-		listeners.add( _listener ) ;
+		if( listeners.add( _listener ) == true )
+		{
+			_listener.setParent( this ) ;
+		}
 		return _listener ;
 	}
 
@@ -95,7 +98,12 @@ public class UIElement implements InputHandler
 	*/
 	public <T extends BaseListener<? extends UIElement>> boolean removeListener( final T _listener )
 	{
-		return listeners.remove( _listener ) ;
+		if( listeners.remove( _listener ) == true )
+		{
+			_listener.setParent( null ) ;
+			return true ;
+		}
+		return false ;
 	}
 
 	/**
@@ -115,7 +123,7 @@ public class UIElement implements InputHandler
 	public void engage()
 	{
 		current = State.ENGAGED ;
-		final List<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -129,7 +137,7 @@ public class UIElement implements InputHandler
 	public void disengage()
 	{
 		current = State.NEUTRAL ;
-		final List<BaseListener> base = listeners.getListeners() ;
+		final List<BaseListener<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -199,7 +207,7 @@ public class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	private static InputEvent.Action updateListeners( final List<BaseListener> _base,
+	private static InputEvent.Action updateListeners( final List<BaseListener<? extends UIElement>> _base,
 													  final InputAction _action,
 													  final InputEvent _event )
 	{

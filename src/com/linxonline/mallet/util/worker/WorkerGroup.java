@@ -37,7 +37,7 @@ public class WorkerGroup
 		threads, this function is blocking until 
 		data set has been processed completely.
 	*/
-	public void exec( final Worker _worker )
+	public void exec( final Worker<?> _worker )
 	{
 		multiLock.reset() ;
 		final List<?> dataset = _worker.getDataSet() ;
@@ -56,17 +56,17 @@ public class WorkerGroup
 
 		for( int i = 0; i < threadLength; ++i )
 		{
-			final WorkerThread worker = availableWorkers.pop() ;
-			workers.add( worker ) ;
+			final WorkerThread thread = availableWorkers.pop() ;
+			workers.add( thread ) ;
 
-			worker.setMultiLock( multiLock ) ;
-			worker.setRange( start, start + range ) ;
-			worker.setWorker( _worker ) ;
+			thread.setMultiLock( multiLock ) ;
+			thread.setRange( start, start + range ) ;
+			thread.setWorker( _worker ) ;
 
 			start += range ;
 
 			multiLock.interest() ;
-			worker.unpause() ;			// Resume data updating
+			thread.unpause() ;			// Resume data updating
 		}
 
 		multiLock.lock() ;		 		// Only continue once all EntityThreads have finished

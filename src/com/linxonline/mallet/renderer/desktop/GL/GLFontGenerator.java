@@ -74,7 +74,7 @@ public class GLFontGenerator
 		}
 
 		// Create a GLFontMap and wrap it around a FontMap
-		return new GLFontMap( new FontMap( glyphs, null, metrics.getHeight() ) ) ;
+		return new GLFontMap( new FontMap<GLImage>( glyphs, null, metrics.getHeight() ) ) ;
 	}
 
 	public GLFontMap generateFontGeometry( final MalletFont _font, final GLFontMap _map )

@@ -67,7 +67,7 @@ public class GLFontGenerator
 		}
 
 		// Create a GLFontMap and wrap it around a FontMap
-		return new GLFontMap( new FontMap( glyphs, null, getHeight( _canvas, _charsToMap ) ) ) ;
+		return new GLFontMap( new FontMap<GLImage>( glyphs, null, getHeight( _canvas, _charsToMap ) ) ) ;
 
 	}
 

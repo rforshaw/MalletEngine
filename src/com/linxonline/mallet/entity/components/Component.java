@@ -146,8 +146,8 @@ public abstract class Component
 		The Entity will track which components have readied themselves, 
 		once all components are readied it will destroy itself.
 	*/
-	public static interface ReadyCallback<T extends Component>
+	public static interface ReadyCallback
 	{
-		public void ready( final T _component ) ;
+		public void ready( final Component _component ) ;
 	}
 }

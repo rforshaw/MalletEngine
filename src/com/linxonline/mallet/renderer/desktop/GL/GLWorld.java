@@ -13,7 +13,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 {
 	private final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 
-	public GLWorld( final String _id, final int _order, final DrawState.RemoveDelegate _remove )
+	public GLWorld( final String _id, final int _order, final DrawState.RemoveDelegate<GLDrawData> _remove )
 	{
 		super( _id, _order, _remove ) ;
 	}

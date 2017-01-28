@@ -2,8 +2,22 @@ package com.linxonline.mallet.util.worker ;
 
 import java.util.List ;
 
-public interface Worker<T>
+public abstract class Worker<T>
 {
+	public final ExecType exec( final int _start, final int _end )
+	{
+		final List<T> list = getDataSet() ;
+		for( int i = _start; i < _end; i++ )
+		{
+			if( exec( i, list.get( i ) ) == ExecType.FINISH ) 		// Does the hard execution work
+			{
+				return ExecType.FINISH ;
+			}
+		}
+
+		return ExecType.FINISH ;
+	}
+
 	/**
 		Called by the WorkerThread.
 		Once the WorkerThread knowns what subset of 
@@ -12,7 +26,7 @@ public interface Worker<T>
 		threads. Function scope variables will not cause concurrency 
 		issues, however class scope upwards will.
 	*/
-	public ExecType exec( final int _index, final T _data ) ;
+	public abstract ExecType exec( final int _index, final T _data ) ;
 
 	/**
 		Return the entire list that the threads 
@@ -20,5 +34,5 @@ public interface Worker<T>
 		WorkerThreads will call this function and 
 		loop over a subset.
 	*/
-	public List<T> getDataSet() ;
+	public abstract List<T> getDataSet() ;
 }

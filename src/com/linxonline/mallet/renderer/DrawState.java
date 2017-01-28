@@ -5,7 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.arrays.ManagedArray ;
 
-public class DrawState extends ManagedArray<DrawData>
+public class DrawState<D extends DrawData> extends ManagedArray<D>
 {
 	public synchronized void upload( final int _diff, final int _iteration )
 	{
@@ -18,22 +18,22 @@ public class DrawState extends ManagedArray<DrawData>
 		}
 	}
 
-	public List<DrawData> getActiveDraws()
+	public List<D> getActiveDraws()
 	{
 		return current ;
 	}
 
 	@Override
-	protected void addNewData( final List<DrawData> _toAdd )
+	protected void addNewData( final List<D> _toAdd )
 	{
-		for( final DrawData add : _toAdd )
+		for( final D add : _toAdd )
 		{
 			insertNewDrawData( add ) ;
 		}
 		_toAdd.clear() ;
 	}
 
-	private void insertNewDrawData( final DrawData _insert )
+	private void insertNewDrawData( final D _insert )
 	{
 		final int order = _insert.getOrder() ;
 		final int size = current.size() ;

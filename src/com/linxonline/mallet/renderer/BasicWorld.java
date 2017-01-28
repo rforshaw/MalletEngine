@@ -8,10 +8,10 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 {
 	private final String id ;
 	private final int order ;
-	private final DrawState state = new DrawState() ;			// Objects to be drawn
-	private final CameraState cameras = new CameraState() ;		// Camera view portals
+	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
+	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
-	public BasicWorld( final String _id, final int _order, final DrawState.RemoveDelegate _remove )
+	public BasicWorld( final String _id, final int _order, final DrawState.RemoveDelegate<D> _remove )
 	{
 		id = _id ;
 		order = _order ;
@@ -72,12 +72,12 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		cameras.draw( _diff, _iteration ) ;
 	}
 
-	public DrawState getDrawState()
+	public DrawState<D> getDrawState()
 	{
 		return state ;
 	}
 
-	public CameraState getCameraState()
+	public CameraState<C> getCameraState()
 	{
 		return cameras ;
 	}

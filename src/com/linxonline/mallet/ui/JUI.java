@@ -148,7 +148,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -164,7 +164,8 @@ public class JUI
 			{
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
-				final UIListener uiListener = createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+
+				final UIListener<UISpacer> uiListener = JUI.<UISpacer>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;

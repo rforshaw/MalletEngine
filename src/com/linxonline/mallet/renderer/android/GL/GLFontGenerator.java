@@ -65,7 +65,7 @@ public class GLFontGenerator
 		// Create a GLFontMap and wrap it around a FontMap
 		final Rect bounds = new Rect() ;
 		paint.getTextBounds( _charsToMap, 0, length, bounds ) ;
-		return new GLFontMap( new FontMap( glyphs, null, bounds.height() ) ) ;
+		return new GLFontMap( new FontMap<GLImage>( glyphs, null, bounds.height() ) ) ;
 	}
 
 	/**

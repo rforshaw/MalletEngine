@@ -74,7 +74,7 @@ public class UIButton extends UIElement
 	public UIButton( final Vector3 _position,
 					 final Vector3 _offset,
 					 final Vector3 _length,
-					 final BaseListener _listener )
+					 final BaseListener<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;

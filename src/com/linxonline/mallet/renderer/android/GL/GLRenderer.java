@@ -35,7 +35,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 	protected final static Vector2 maxTextureSize = new Vector2() ;				// Maximum Texture resolution supported by the GPU.
 
-	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
+	protected CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
 
 	public GLRenderer()
@@ -691,9 +691,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public Camera.DrawInterface getCameraDraw()
+	public CameraData.DrawInterface<CameraData> getCameraDraw()
 	{
-		return new Camera.DrawInterface<CameraData>()
+		return new CameraData.DrawInterface<CameraData>()
 		{
 			public void draw( final CameraData _camera )
 			{
@@ -733,7 +733,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public DrawState.RemoveDelegate constructRemoveDelegate()
+	public DrawState.RemoveDelegate<GLDrawData> constructRemoveDelegate()
 	{
 		return new DrawState.RemoveDelegate<GLDrawData>()
 		{

@@ -672,9 +672,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public Camera.DrawInterface getCameraDraw()
+	public CameraData.DrawInterface<CameraData> getCameraDraw()
 	{
-		return new Camera.DrawInterface<CameraData>()
+		return new CameraData.DrawInterface<CameraData>()
 		{
 			public void draw( final CameraData _camera )
 			{
@@ -716,7 +716,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public DrawState.RemoveDelegate constructRemoveDelegate()
+	public DrawState.RemoveDelegate<GLDrawData> constructRemoveDelegate()
 	{
 		return new DrawState.RemoveDelegate<GLDrawData>()
 		{

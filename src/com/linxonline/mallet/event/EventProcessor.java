@@ -29,11 +29,14 @@ public abstract class EventProcessor<T>
 		type = EventType.get( _type ) ;
 	}
 
-	public void passEvent( final Event<T> _event )
+	@SuppressWarnings( "unchecked" )
+	public void passEvent( final Event<?> _event )
 	{
 		if( isInterested( _event ) == true )
 		{
-			processEvent( _event ) ;
+			// The Event Type should infer what variable 
+			// is being stored by the Event.
+			processEvent( ( Event<T> )_event ) ;
 		}
 	}
 
@@ -43,7 +46,7 @@ public abstract class EventProcessor<T>
 		Check to see if the event passed in is of interest
 		to the EventProcessor.
 	*/
-	private boolean isInterested( final Event<T> _event )
+	private boolean isInterested( final Event<?> _event )
 	{
 		return _event.isEventByType( type ) ;
 	}
