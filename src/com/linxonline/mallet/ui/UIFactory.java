@@ -10,6 +10,7 @@ import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
+import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
@@ -98,46 +99,176 @@ public final class UIFactory
 		return layout ;
 	}
 
-	public static <T extends UIElement> UIListener<T> constructUIListener( final MalletTexture _sheet,
+	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final String _text,
+																		   final MalletFont _font,
+																		   final MalletTexture _sheet,
 																		   final UIElement.UV _uv )
 	{
-		return new UIListener<T>()
+		return new UIBasicListener<T>( _text, _font, _sheet, _uv ) ;
+	}
+
+	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final MalletTexture _sheet,
+																		   final UIElement.UV _uv )
+	{
+		return new UIBasicListener<T>( _sheet, _uv ) ;
+	}
+
+	public static class UIBasicListener<T extends UIElement> extends UIListener<T>
+	{
+		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
+		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
+		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
+
+		private boolean retainRatio = false ;
+
+		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+
+		private UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
+		private UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
+
+		private final StringBuilder text = new StringBuilder() ;
+		private MalletFont font ;
+
+		private final MalletTexture sheet ;
+		private final UIElement.UV uv ;
+
+		protected Draw draw = null ;
+		protected Draw drawText = null ;
+
+		public UIBasicListener( final MalletTexture _sheet,
+								final UIElement.UV _uv )
 		{
-			private Draw draw = null ;
+			this( null, null, _sheet, _uv ) ;
+		}
 
-			@Override
-			public void constructDraws()
+		public UIBasicListener( final String _text,
+								final MalletFont _font,
+								final MalletTexture _sheet,
+								final UIElement.UV _uv )
+		{
+			font = _font ;
+			if( _text != null )
 			{
-				final UIElement parent = getParent() ;
-				final Vector3 length = parent.getLength() ;
-
-				draw = DrawAssist.createDraw( parent.getPosition(),
-											  parent.getOffset(),
-											  new Vector3(),
-											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
-				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, _uv.min, _uv.max ) ) ;
-
-				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", _sheet ) ;
-
-				DrawAssist.attachProgram( draw, program ) ;
+				text.append( _text ) ;
 			}
 
-			@Override
-			public void addDraws( final DrawDelegate<World, Draw> _delegate )
+			sheet = _sheet ;
+			uv = _uv ;
+		}
+
+		public void setRetainRatio( final boolean _ratio )
+		{
+			retainRatio = _ratio ;
+		}
+
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
+		}
+
+		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
+			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
+		}
+
+		public StringBuilder getText()
+		{
+			return text ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws()
+		{
+			final T parent = getParent() ;
+
+			updateLength( parent.getLength() ) ;
+			updateOffset( parent.getOffset() ) ;
+
+			draw = DrawAssist.createDraw( parent.getPosition(),
+										  offset,
+										  new Vector3(),
+										  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
+			DrawAssist.amendUI( draw, true ) ;
+			DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
+
+			final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+			ProgramAssist.map( program, "inTex0", sheet ) ;
+
+			DrawAssist.attachProgram( draw, program ) ;
+
+			final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
+			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+
+			drawText = DrawAssist.createTextDraw( text,
+												  font,
+												  parent.getPosition(),
+												  textOffset,
+												  new Vector3(),
+												  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
+			DrawAssist.amendUI( drawText, true ) ;
+			DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
+		}
+
+		/**
+			Called when listener receives a valid DrawDelegate.
+		*/
+		public void addDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			if( draw != null )
 			{
 				_delegate.addBasicDraw( draw ) ;
 			}
 
-			@Override
-			public void refresh()
+			if( drawText != null )
 			{
-				final Vector3 length = getParent().getLength() ;
-
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
-				DrawAssist.forceUpdate( draw ) ;
+				_delegate.addTextDraw( drawText ) ;
 			}
-		} ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			updateLength( getParent().getLength() ) ;
+			updateOffset( getParent().getOffset() ) ;
+
+			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+			DrawAssist.forceUpdate( draw ) ;
+
+			if( font != null )
+			{
+				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
+				textOffset.setXYZ( offset ) ;
+
+				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
+				final float y = UI.align( drawTextAlignmentY, font.getHeight(), length.y ) ;
+
+				textOffset.add( x, y, 0.0f ) ;
+				DrawAssist.forceUpdate( drawText ) ;
+			}
+		}
+
+		private void updateLength( final Vector3 _length )
+		{
+			if( uv == null || retainRatio == false )
+			{
+				length.setXYZ( _length ) ;
+				return ;
+			}
+
+			UI.calcSubDimension( aspectRatio, sheet, uv ) ;
+			UI.fill( UI.Modifier.RETAIN_ASPECT_RATIO, length, aspectRatio, _length ) ;
+		}
+
+		private void updateOffset( final Vector3 _offset )
+		{
+			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
+			offset.add( _offset ) ;
+		}
 	}
 }

@@ -337,7 +337,16 @@ public class JUI
 			return null ;
 		}
 
-		return UIFactory.<T>constructUIListener( new MalletTexture( _ui.optString( "TEXTURE", "" ) ), uv ) ;
+		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+		final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( texture, uv ) ;
+		listener.setRetainRatio( retainRatio ) ;
+		listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
+								UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
+		listener.setTextAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_X", null ) ),
+									UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_Y", null ) ) ) ;
+		return listener ;
 	}
 
 	private static UIElement.UV createUV( final JSONObject _uv )

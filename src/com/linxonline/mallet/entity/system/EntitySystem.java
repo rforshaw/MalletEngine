@@ -19,8 +19,8 @@ public class EntitySystem implements EntitySystemInterface
 	protected final QuerySystem querySystem = new QuerySystem() ;					// Should be thread safe
 	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 
-	protected EntityUpdateInterface entities = new DefaultMTUpdate() ;				// Entities update protocol
-	//protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
+	//protected EntityUpdateInterface entities = new DefaultMTUpdate() ;				// Entities update protocol
+	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
 	protected final List<Entity> entitiesToAdd = MalletList.<Entity>newList() ;
 	protected final List<Entity> cleanup = MalletList.<Entity>newList() ;
 

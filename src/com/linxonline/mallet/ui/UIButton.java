@@ -109,32 +109,11 @@ public class UIButton extends UIElement
 		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static class UIListener extends BaseListener<UIButton>
+	public static class UIListener extends UIFactory.UIBasicListener<UIButton>
 	{
-		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
-		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
-		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
-
-		private final StringBuilder text = new StringBuilder() ;
-		private MalletFont font ;
-
-		private final MalletTexture sheet ;
 		private final UIButton.UV neutral ;
 		private final UIButton.UV rollover ;
 		private final UIButton.UV clicked ;
-		private UIButton.UV active = null ;
-
-		private DrawDelegate<World, Draw> delegate = null ;
-		private Draw draw = null ;
-		private Draw drawText = null ;
-
-		private boolean retainRatio = false ;
-
-		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
-		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
-
-		private UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
-		private UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
 
 		public UIListener( final String _text,
 						   final MalletFont _font,
@@ -143,88 +122,10 @@ public class UIButton extends UIElement
 						   final UIButton.UV _rollover,
 						   final UIButton.UV _clicked )
 		{
-			font = _font ;
-			if( _text != null )
-			{
-				text.append( _text ) ;
-			}
-
-			sheet = _sheet ;
+			super( _text, _font, _sheet, _neutral ) ;
 			neutral = _neutral ;
 			rollover = _rollover ;
 			clicked = _clicked ;
-			active = neutral ;
-		}
-
-		public void setRetainRatio( final boolean _ratio )
-		{
-			retainRatio = _ratio ;
-		}
-
-		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
-		{
-			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
-			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
-		}
-
-		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
-		{
-			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
-			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
-		}
-
-		public StringBuilder getText()
-		{
-			return text ;
-		}
-
-		@Override
-		public void setParent( final UIButton _parent )
-		{
-			super.setParent( _parent ) ;
-			_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-			{
-				public void callback( final DrawDelegate<World, Draw> _delegate )
-				{
-					delegate = _delegate ;
-					if( draw != null )
-					{
-						delegate.addBasicDraw( draw ) ;
-					}
-
-					if( drawText != null )
-					{
-						delegate.addTextDraw( drawText ) ;
-					}
-				}
-			} ) ) ;
-
-			updateLength( _parent.getLength() ) ;
-			updateOffset( _parent.getOffset() ) ;
-
-			draw = DrawAssist.createDraw( _parent.getPosition(),
-										  offset,
-										  new Vector3(),
-										  new Vector3( 1, 1, 1 ), _parent.getLayer() ) ;
-			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendShape( draw, Shape.constructPlane( length, neutral.min, neutral.max ) ) ;
-
-			final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.map( program, "inTex0", sheet ) ;
-
-			DrawAssist.attachProgram( draw, program ) ;
-
-			final Vector3 textOffset = new Vector3( _parent.getOffset() ) ;
-			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
-
-			drawText = DrawAssist.createTextDraw( text,
-												  font,
-												  _parent.getPosition(),
-												  textOffset,
-												  new Vector3(),
-												  new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
-			DrawAssist.amendUI( drawText, true ) ;
-			DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
 		}
 
 		@Override
@@ -257,55 +158,6 @@ public class UIButton extends UIElement
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( draw ) ;
-		}
-
-		@Override
-		public void refresh()
-		{
-			updateLength( getParent().getLength() ) ;
-			updateOffset( getParent().getOffset() ) ;
-
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
-			DrawAssist.forceUpdate( draw ) ;
-
-			if( font != null )
-			{
-				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
-				textOffset.setXYZ( offset ) ;
-
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, font.getHeight(), length.y ) ;
-
-				textOffset.add( x, y, 0.0f ) ;
-				DrawAssist.forceUpdate( drawText ) ;
-			}
-		}
-
-		private void updateLength( final Vector3 _length )
-		{
-			if( active == null || retainRatio == false )
-			{
-				length.setXYZ( _length ) ;
-				return ;
-			}
-
-			UI.calcSubDimension( aspectRatio, sheet, active ) ;
-			UI.fill( UI.Modifier.RETAIN_ASPECT_RATIO, length, aspectRatio, _length ) ;
-		}
-
-		private void updateOffset( final Vector3 _offset )
-		{
-			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
-			offset.add( _offset ) ;
-		}
-
-		@Override
-		public void shutdown()
-		{
-			if( delegate != null )
-			{
-				delegate.shutdown() ;
-			}
 		}
 	}
 }
