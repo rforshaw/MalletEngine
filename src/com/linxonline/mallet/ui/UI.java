@@ -6,6 +6,39 @@ import com.linxonline.mallet.maths.* ;
 
 public class UI
 {
+	public enum Unit
+	{
+		CENTIMETRE( 0.393701f ),
+		INCH( 1.0f ) ;
+
+		public final float conversion ;
+
+		private Unit( final float _conversion )
+		{
+			conversion = _conversion ;
+		}
+
+		public int convert( final int _dpi )
+		{
+			return ( int )( _dpi * conversion ) ;
+		}
+
+		public static Unit derive( final String _type )
+		{
+			if( _type == null )
+			{
+				return CENTIMETRE ;
+			}
+
+			if( _type.isEmpty() == true )
+			{
+				return CENTIMETRE ;
+			}
+
+			return Unit.valueOf( _type ) ;
+		}
+	} ;
+
 	public enum Modifier
 	{
 		RETAIN_ASPECT_RATIO,

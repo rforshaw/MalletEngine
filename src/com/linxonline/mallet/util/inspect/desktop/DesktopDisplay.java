@@ -3,8 +3,11 @@ package com.linxonline.mallet.util.inspect.desktop ;
 import java.awt.GraphicsEnvironment ;
 import java.awt.GraphicsDevice ;
 import java.awt.DisplayMode ;
+import java.awt.Dimension ;
+import java.awt.Toolkit ;
 
 import com.linxonline.mallet.util.inspect.* ;
+import com.linxonline.mallet.maths.* ;
 
 public class DesktopDisplay implements DisplayEnvironment
 {
@@ -32,6 +35,18 @@ public class DesktopDisplay implements DisplayEnvironment
 		}
 
 		return screens ;
+	}
+
+	public int getDPI()
+	{
+		final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment() ;
+		if( env.isHeadless() == false )
+		{
+			final Toolkit toolkit = Toolkit.getDefaultToolkit() ;
+			return toolkit.getScreenResolution() ;
+		}
+
+		return 1 ;
 	}
 
 	public String toString()

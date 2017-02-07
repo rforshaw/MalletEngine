@@ -62,7 +62,7 @@ public class UIElement implements InputHandler
 		offset = _offset ;
 		length = _length ;
 
-		final float ratioMargin = ratio.toPixel( DEFAULT_MARGIN_SIZE ) ;
+		final float ratioMargin = DEFAULT_MARGIN_SIZE ;
 		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
 	}
 
@@ -294,7 +294,8 @@ public class UIElement implements InputHandler
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		position.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
+		position.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
+		//System.out.println( "Position: " + position ) ;
 	}
 
 	/**
@@ -306,7 +307,8 @@ public class UIElement implements InputHandler
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		offset.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
+		offset.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
+		//System.out.println( "Offset: " + offset ) ;
 	}
 
 	/**
@@ -317,9 +319,9 @@ public class UIElement implements InputHandler
 	*/
 	public void setMinimumLength( final float _x, final float _y, final float _z )
 	{
-		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixel( _x ) ;
-		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixel( _y ) ;
-		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixel( _z ) ;
+		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
+		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
+		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
 		// Ensure that length adheres to the new minimum length
 		setLength( length.x, length.y, length.z ) ;
@@ -333,9 +335,9 @@ public class UIElement implements InputHandler
 	*/
 	public void setMaximumLength( final float _x, final float _y, final float _z )
 	{
-		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixel( _x ) ;
-		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixel( _y ) ;
-		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixel( _z ) ;
+		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
+		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
+		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
 		// Ensure that length adheres to the new maximum length
 		setLength( length.x, length.y, length.z ) ;
@@ -350,24 +352,26 @@ public class UIElement implements InputHandler
 	public void setLength( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixel( _x ) ;
-		length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixel( _y ) ;
-		length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixel( _z ) ;
+		length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixelX( _x ) ;
+		length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixelY( _y ) ;
+		length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixelZ( _z ) ;
 
 		if( maxLength.x > 0.0f )
 		{
-			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.toPixel( _x ) ;
+			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.toPixelX( _x ) ;
 		}
 
 		if( maxLength.y > 0.0f )
 		{
-			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.toPixel( _y ) ;
+			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.toPixelY( _y ) ;
 		}
 
 		if( maxLength.z > 0.0f )
 		{
-			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.toPixel( _z ) ;
+			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.toPixelZ( _z ) ;
 		}
+
+		System.out.println( "Length: " + length ) ;
 	}
 
 	/**
@@ -380,7 +384,7 @@ public class UIElement implements InputHandler
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
 		makeDirty() ;
-		margin.setXYZ( ratio.toPixel( _x ), ratio.toPixel( _y ), ratio.toPixel( _z ) ) ;
+		margin.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
 	}
 
 	public void setLayer( final int _layer )
@@ -533,6 +537,11 @@ public class UIElement implements InputHandler
 	public UIElement.State getState()
 	{
 		return current ;
+	}
+
+	public UIRatio getRatio()
+	{
+		return ratio ;
 	}
 
 	@Override

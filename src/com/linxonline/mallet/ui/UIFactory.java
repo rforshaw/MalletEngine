@@ -190,29 +190,35 @@ public final class UIFactory
 			updateLength( parent.getLength() ) ;
 			updateOffset( parent.getOffset() ) ;
 
-			draw = DrawAssist.createDraw( parent.getPosition(),
-										  offset,
-										  new Vector3(),
-										  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
-			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
+			if( sheet != null && uv != null )
+			{
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											offset,
+											new Vector3(),
+											new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
 
-			final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.map( program, "inTex0", sheet ) ;
+				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
 
-			DrawAssist.attachProgram( draw, program ) ;
+				DrawAssist.attachProgram( draw, program ) ;
+			}
 
-			final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
-			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+			if( font != null )
+			{
+				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
+				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
 
-			drawText = DrawAssist.createTextDraw( text,
-												  font,
-												  parent.getPosition(),
-												  textOffset,
-												  new Vector3(),
-												  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
-			DrawAssist.amendUI( drawText, true ) ;
-			DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
+				drawText = DrawAssist.createTextDraw( text,
+													font,
+													parent.getPosition(),
+													textOffset,
+													new Vector3(),
+													new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
+				DrawAssist.amendUI( drawText, true ) ;
+				DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
+			}
 		}
 
 		/**
@@ -237,10 +243,13 @@ public final class UIFactory
 			updateLength( getParent().getLength() ) ;
 			updateOffset( getParent().getOffset() ) ;
 
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			if( draw != null )
+			{
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
 
-			if( font != null )
+			if( drawText != null )
 			{
 				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
 				textOffset.setXYZ( offset ) ;

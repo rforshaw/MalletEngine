@@ -28,6 +28,9 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.inspect.desktop.DesktopDisplay ;
 import com.linxonline.mallet.util.inspect.ScreenMode ;
 
+import com.linxonline.mallet.ui.UI ;
+import com.linxonline.mallet.ui.UIRatio ;
+
 /**
 	The Desktop implementation of the Starter Interface.
 	Handles the initialisation & loading stage for 
@@ -185,9 +188,11 @@ public abstract class DesktopStarter extends StarterInterface
 		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;
 		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 
+		final DesktopDisplay desktop = new DesktopDisplay() ;
+		System.out.println( desktop.getDPI() ) ;
+
 		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
 		{
-			final DesktopDisplay desktop = new DesktopDisplay() ;
 			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
 			displayWidth = screen.getWidth() ;
 			displayHeight = screen.getHeight() ;
@@ -208,5 +213,11 @@ public abstract class DesktopStarter extends StarterInterface
 
 		final RenderInfo info = render.getRenderInfo() ;
 		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
+
+		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
+
+		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", desktop.getDPI() ) ) ;
+		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", desktop.getDPI() ) ) ;
+		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
 	}
 }

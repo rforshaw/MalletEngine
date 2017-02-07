@@ -14,6 +14,7 @@ import com.linxonline.mallet.system.SystemInterface.ShutdownDelegate ;
 import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
+import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalHome ;
@@ -31,6 +32,9 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.system.android.gl.GLAndroidSystem ;
 import com.linxonline.mallet.renderer.android.GL.* ;
+
+import com.linxonline.mallet.ui.UI ;
+import com.linxonline.mallet.ui.UIRatio ;
 
 public abstract class AndroidStarter extends StarterInterface
 {
@@ -139,7 +143,20 @@ public abstract class AndroidStarter extends StarterInterface
 	@Override
 	protected void setRenderSettings( final SystemInterface _system )
 	{
+		final AndroidActivity activity = ( ( GLAndroidSystem )_system ).activity ;
+		final DisplayMetrics metrics = new DisplayMetrics() ;
+		activity.getWindowManager().getDefaultDisplay().getMetrics( metrics ) ;
+
 		final RenderInterface render = _system.getRenderInterface() ;
+
+		final RenderInfo info = render.getRenderInfo() ;
+		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
+
+		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
+
+		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", ( int )metrics.xdpi ) ) ;
+		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", ( int )metrics.ydpi ) ) ;
+		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
 	}
 
 	public SystemInterface getAndroidSystem()

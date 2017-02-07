@@ -5,6 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.io.reader.ParseInterface ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.ui.UI ;
 
 public class ConfigParser
 {
@@ -90,6 +91,25 @@ public class ConfigParser
 
 				var = _src.getString( "DOUBLEBUFFER", "true" ) ;
 				_dest.addBoolean( "DOUBLEBUFFER", Boolean.parseBoolean( var ) ) ;
+
+				var = _src.getString( "DPIX", null ) ;
+				if( var != null )
+				{
+					// We make the assumption that if no DPI is 
+					// specified we use the monitors DPI.
+					_dest.addInteger( "DPIX", Integer.parseInt( var ) ) ;
+				}
+
+				var = _src.getString( "DPIY", null ) ;
+				if( var != null )
+				{
+					// We make the assumption that if no DPI is 
+					// specified we use the monitors DPI.
+					_dest.addInteger( "DPIY", Integer.parseInt( var ) ) ;
+				}
+
+				var = _src.getString( "UI_UNIT", "CENTIMETRE" ) ;
+				_dest.addObject( "UI_UNIT", UI.Unit.derive( var ) ) ;
 			}
 		} ) ;
 	}

@@ -313,6 +313,8 @@ public class UILayout extends UIElement
 					}
 				}
 
+				final UIRatio ratio = getRatio() ;
+
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
@@ -330,12 +332,14 @@ public class UILayout extends UIElement
 					{
 						lenY = availableLength.y / minNumY ;
 					}
-					
-					element.setLength( lenX, lenY, 0.0f ) ;
+
+					element.setLength( ratio.toUnitX( lenX ), ratio.toUnitY( lenY ), 0.0f ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
 					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
@@ -399,6 +403,8 @@ public class UILayout extends UIElement
 					}
 				}
 
+				final UIRatio ratio = getRatio() ;
+
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
@@ -418,11 +424,13 @@ public class UILayout extends UIElement
 						lenY = availableLength.y ;
 					}
 
-					element.setLength( lenX, lenY, 0.0f ) ;
+					element.setLength( ratio.toUnitX( lenX ), ratio.toUnitY( lenY ), 0.0f ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					element.setPosition( childPosition.x, childPosition.y, childPosition.z ) ;
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
 					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
 				}
 			}

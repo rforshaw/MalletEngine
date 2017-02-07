@@ -331,16 +331,17 @@ public class JUI
 		}
 
 		final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
-		if( uv == null )
-		{
-			Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
-			return null ;
-		}
 
+		final String text = _ui.optString( "TEXT", "" ) ;
+		final String fontName = _ui.optString( "FONT", null ) ;
+		final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
 		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
-		final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+		final String texturePath = _ui.optString( "TEXTURE", null ) ;
 
-		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( texture, uv ) ;
+		final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+		final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
+
+		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( text, font, texture, uv ) ;
 		listener.setRetainRatio( retainRatio ) ;
 		listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
 								UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
@@ -351,6 +352,11 @@ public class JUI
 
 	private static UIElement.UV createUV( final JSONObject _uv )
 	{
+		if( _uv == null )
+		{
+			return null ;
+		}
+
 		final Vector2 min = Vector2.parseVector2( _uv.optString( "MIN", "0.0, 0.0" ) ) ;
 		final Vector2 max = Vector2.parseVector2( _uv.optString( "MAX", "1.0, 1.0" ) ) ;
 		return new UIElement.UV( min, max ) ;

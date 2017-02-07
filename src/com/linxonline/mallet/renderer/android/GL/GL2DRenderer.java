@@ -56,8 +56,18 @@ public class GL2DRenderer implements RenderInterface,
 	public void onSurfaceChanged( final GL10 _unused, final int _width, final int _height)
 	{
 		System.out.println( "onSurfaceChanged()" ) ;
-		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", _width ) ;
-		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", _height ) ;
+		int renderWidth = _width ;
+		int renderHeight = _height ;
+
+		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == false )
+		{
+			// Update the render dimensions if the window size 
+			// and render size are meant to be identical.
+			// Some users will not want parity, using a larger window 
+			// size but rendering to a smaller size and subsequently being upscaled.
+			renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", _width ) ;
+			renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", _height ) ;
+		}
 
 		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
 		GlobalConfig.addInteger( "DISPLAYHEIGHT", _height ) ;

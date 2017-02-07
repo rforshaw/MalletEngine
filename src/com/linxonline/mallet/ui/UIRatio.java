@@ -6,13 +6,17 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class UIRatio
 {
-	private static UIRatio global = new UIRatio( 1 ) ;
+	private static UIRatio global = new UIRatio( 1, 1 ) ;
 
-	private Ratio ratio ;
+	private Ratio ratioX ;
+	private Ratio ratioY ;
+	private Ratio ratioZ ;
 
-	public UIRatio( final int _pixels )
+	public UIRatio( final int _pixelsX, final int _pixelsY )
 	{
-		ratio = Ratio.calculateRatio( _pixels, 1 ) ;
+		ratioX = Ratio.calculateRatio( _pixelsX, 1 ) ;
+		ratioY = Ratio.calculateRatio( _pixelsY, 1 ) ;
+		ratioZ = Ratio.calculateRatio( 1, 1 ) ;
 	}
 
 	/**
@@ -21,7 +25,7 @@ public class UIRatio
 	*/
 	public void toPixel( final Vector3 _unit, final Vector3 _pixel )
 	{
-		_pixel.setXYZ( toPixel( _unit.x ), toPixel( _unit.y ), toPixel( _unit.z ) ) ;
+		_pixel.setXYZ( toPixelX( _unit.x ), toPixelY( _unit.y ), toPixelZ( _unit.z ) ) ;
 	}
 
 	/**
@@ -30,16 +34,34 @@ public class UIRatio
 	*/
 	public void toPixel( final Vector2 _unit, final Vector2 _pixel )
 	{
-		_pixel.setXY( toPixel( _unit.x ), toPixel( _unit.y ) ) ;
+		_pixel.setXY( toPixelX( _unit.x ), toPixelY( _unit.y ) ) ;
 	}
 
 	/**
 		Take the unit and convert it to the appropriate 
 		pixel value.
 	*/
-	public float toPixel( final float _unit )
+	public float toPixelX( final float _unit )
 	{
-		return _unit * ratio.getA() ;
+		return _unit * ratioX.getA() ;
+	}
+
+	/**
+		Take the unit and convert it to the appropriate 
+		pixel value.
+	*/
+	public float toPixelY( final float _unit )
+	{
+		return _unit * ratioY.getA() ;
+	}
+
+	/**
+		Take the unit and convert it to the appropriate 
+		pixel value.
+	*/
+	public float toPixelZ( final float _unit )
+	{
+		return _unit * ratioZ.getA() ;
 	}
 
 	/**
@@ -48,7 +70,7 @@ public class UIRatio
 	*/
 	public void toUnit( final Vector3 _pixel, final Vector3 _unit )
 	{
-		_unit.setXYZ( toUnit( _pixel.x ), toUnit( _pixel.y ), toUnit( _pixel.z ) ) ;
+		_unit.setXYZ( toUnitX( _pixel.x ), toUnitY( _pixel.y ), toUnitZ( _pixel.z ) ) ;
 	}
 
 	/**
@@ -57,16 +79,34 @@ public class UIRatio
 	*/
 	public void toUnit( final Vector2 _pixel, final Vector2 _unit )
 	{
-		_unit.setXY( toUnit( _pixel.x ), toUnit( _pixel.y ) ) ;
+		_unit.setXY( toUnitX( _pixel.x ), toUnitY( _pixel.y ) ) ;
 	}
 
 	/**
 		Take the pixel and convert it to the appropriate 
 		unit value.
 	*/
-	public float toUnit( final float _pixel )
+	public float toUnitX( final float _pixel )
 	{
-		return _pixel / ratio.getA() ; 
+		return _pixel / ratioX.getA() ; 
+	}
+
+	/**
+		Take the pixel and convert it to the appropriate 
+		unit value.
+	*/
+	public float toUnitY( final float _pixel )
+	{
+		return _pixel / ratioY.getA() ; 
+	}
+	
+	/**
+		Take the pixel and convert it to the appropriate 
+		unit value.
+	*/
+	public float toUnitZ( final float _pixel )
+	{
+		return _pixel / ratioZ.getA() ; 
 	}
 
 	/**
@@ -75,9 +115,10 @@ public class UIRatio
 		be. mm, cm, inches.
 		By default there is a 1:1 ratio, where the unit is pixel.
 	*/
-	public static void setGlobalUIRatio( final int _pixels )
+	public static void setGlobalUIRatio( final int _pixelsX, final int _pixelsY )
 	{
-		global.ratio = Ratio.calculateRatio( _pixels, 1 ) ;
+		global.ratioX = Ratio.calculateRatio( _pixelsX, 1 ) ;
+		global.ratioY = Ratio.calculateRatio( _pixelsY, 1 ) ;
 	}
 
 	public static UIRatio getGlobalUIRatio()
