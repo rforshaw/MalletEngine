@@ -4,6 +4,7 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 
 public final class InputEvent implements Cacheable
 {
+	public InputID id ;
 	public InputType inputType ;
 	public KeyCode keycode ;
 
@@ -13,7 +14,7 @@ public final class InputEvent implements Cacheable
 
 	public InputEvent()
 	{
-		this( InputType.NONE, KeyCode.NONE ) ;
+		this( InputType.NONE, KeyCode.NONE, InputID.NONE ) ;
 	}
 
 	public InputEvent( final InputType _type, final int _x, final int _y )
@@ -21,10 +22,16 @@ public final class InputEvent implements Cacheable
 		setInput( _type, _x, _y ) ;
 	}
 
-	public InputEvent( final InputType _type, final KeyCode _keycode )
+	public InputEvent( final InputType _type, final KeyCode _keycode, final InputID _id )
 	{
+		id = _id ;
 		inputType = _type ;
 		keycode = _keycode ;
+	}
+
+	public void setID( final InputID _id )
+	{
+		id = _id ;
 	}
 
 	public void setInput( final InputType _type, final int _x, final int _y )
@@ -33,7 +40,12 @@ public final class InputEvent implements Cacheable
 		mouseX = _x ;
 		mouseY = _y ;
 	}
-	
+
+	public final InputID getID()
+	{
+		return id ;
+	}
+
 	public final InputType getInputType()
 	{
 		return inputType ;
@@ -75,6 +87,7 @@ public final class InputEvent implements Cacheable
 
 	public final void reset()
 	{
+		id = InputID.NONE ;
 		inputType = InputType.NONE ;
 		keycode = KeyCode.NONE ;
 		mouseX = 0 ;

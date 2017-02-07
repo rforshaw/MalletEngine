@@ -235,6 +235,7 @@ public class InputSystem implements InputSystemInterface,
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
 	{
 		final InputEvent input = cache.get() ;
+		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
 	}
@@ -257,7 +258,7 @@ public class InputSystem implements InputSystemInterface,
 		}
 
 		// Create new Key if it doesn't exist.
-		final InputEvent input = new InputEvent( _inputType, keycode ) ;
+		final InputEvent input = new InputEvent( _inputType, keycode, InputID.KEYBOARD_1 ) ;
 		input.isActionKey = _event.isActionKey() ;
 
 		final KeyState state = new KeyState( input, true ) ;

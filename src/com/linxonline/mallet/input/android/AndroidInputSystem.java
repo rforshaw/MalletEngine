@@ -66,20 +66,27 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public void onTouchEvent( final MotionEvent _event )
 	{
-		final int action = _event.getAction() ;
-		/*final int historySize = _event.getHistorySize() ;
-		for( int i = 0; i < historySize; i++)
+		final int size = _event.getPointerCount() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int pointer = 0 ;
-			addInput( action,
-					  _event.getHistoricalX( pointer, i ),
-					  _event.getHistoricalY( pointer, i ) ) ;
-		}*/
+			InputID id = InputID.NONE ;
+			switch( i )
+			{
+				case 0 : id = InputID.TOUCH_1 ; break ;
+				case 1 : id = InputID.TOUCH_2 ; break ;
+				case 2 : id = InputID.TOUCH_3 ; break ;
+				case 3 : id = InputID.TOUCH_4 ; break ;
+			}
 
-		addInput( action, _event.getX(), _event.getY() ) ;
+			if( id != InputID.NONE )
+			{
+				final int action = _event.getAction() ;
+				addInput( id, action, _event.getX( i ), _event.getY( i ) ) ;
+			}
+		}
 	}
 
-	private void addInput( final int _action, final float _x, final float _y )
+	private void addInput( final InputID _id, final int _action, final float _x, final float _y )
 	{
 		InputType type = InputType.TOUCH_MOVE ;
 		if( _action == MotionEvent.ACTION_UP )
@@ -94,6 +101,7 @@ public class AndroidInputSystem implements InputSystemInterface,
 		synchronized( touchInputs )
 		{
 			final InputEvent input = cache.get() ;
+			input.setID( _id ) ;
 			input.setInput( type, ( int )_x, ( int )_y ) ;
 			touchInputs.add( input ) ;
 		}
