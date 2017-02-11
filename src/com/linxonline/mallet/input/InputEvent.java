@@ -19,6 +19,7 @@ public final class InputEvent implements Cacheable
 
 	public InputEvent( final InputType _type, final int _x, final int _y )
 	{
+		setID( InputID.NONE ) ;
 		setInput( _type, _x, _y ) ;
 	}
 
@@ -92,6 +93,7 @@ public final class InputEvent implements Cacheable
 		keycode = KeyCode.NONE ;
 		mouseX = 0 ;
 		mouseY = 0 ;
+		isActionKey = false ;
 	}
 
 	public String toString()

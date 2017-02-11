@@ -1,12 +1,6 @@
 package com.linxonline.mallet.input.desktop ;
 
-import java.awt.Robot ;
-import java.awt.Point ;
-import java.awt.AWTException ;
-import java.util.Map ;
-import java.util.List ;
-import java.util.Collection ;
-import java.io.* ;
+import java.util.* ;
 
 import com.jogamp.newt.event.* ;
 
@@ -14,8 +8,6 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.util.locks.* ;
-import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
@@ -27,8 +19,6 @@ public class InputSystem implements InputSystemInterface,
 									KeyListener, 
 									MouseListener
 {
-	private Robot controlMouse ;
-
 	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
@@ -39,18 +29,7 @@ public class InputSystem implements InputSystemInterface,
 	private final List<InputEvent> mouseInputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem()
-	{
-		try
-		{
-			controlMouse = new Robot() ;
-		}
-		catch( AWTException ex )
-		{
-			ex.printStackTrace() ;
-			return ;
-		}
-	}
+	public InputSystem() {}
 
 	public void addInputHandler( final InputHandler _handler )
 	{

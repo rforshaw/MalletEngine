@@ -8,17 +8,20 @@ import android.view.MotionEvent ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.caches.TimeCache ;
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
 public class AndroidInputSystem implements InputSystemInterface, 
 										   AndroidInputListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
-	private final List<InputEvent> touchInputs = MalletList.<InputEvent>newList() ;
-	private final List<InputEvent> keyInputs = MalletList.<InputEvent>newList() ;
-
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
+
+	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
+	private final Map<KeyCode, KeyState> keyboardState = MalletMap.<KeyCode, KeyState>newMap() ;
+	private final List<KeyState> activeKeyStates = MalletList.<KeyState>newList() ;
+
+	private final List<InputEvent> touchInputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
 
 	public AndroidInputSystem() {}
@@ -40,28 +43,16 @@ public class AndroidInputSystem implements InputSystemInterface,
 		_handler.reset() ;
 	}
 
+	@Override
 	public void onKeyDown( final int _keyCode, final KeyEvent _event )
 	{
-		if( _event.getAction() == KeyEvent.ACTION_UP )
-		{
-			//updateKeys( InputType.KEYBOARD_PRESSED, _event ) ;
-		}
-		else
-		{
-			//updateKeys( InputType.KEYBOARD_RELEASED, _event ) ;
-		}
+		updateKeys( InputType.KEYBOARD_PRESSED, _event ) ;
 	}
 
+	@Override
 	public void onKeyUp( final int _keyCode, final KeyEvent _event )
 	{
-		if( _event.getAction() == KeyEvent.ACTION_UP )
-		{
-			//updateKeys( InputType.KEYBOARD_PRESSED, _event ) ;
-		}
-		else
-		{
-			//updateKeys( InputType.KEYBOARD_RELEASED, _event ) ;
-		}
+		updateKeys( InputType.KEYBOARD_RELEASED, _event ) ;
 	}
 
 	public void onTouchEvent( final MotionEvent _event )
@@ -109,28 +100,35 @@ public class AndroidInputSystem implements InputSystemInterface,
 
 	public void update()
 	{
-		synchronized( keyInputs )
-		{
-			final int sizeInput = keyInputs.size() ;
-			for( int i = 0; i < sizeInput; ++i )
-			{
-				passInputEventToHandlers( keyInputs.get( i ) ) ;
-			}
+		passKeyInputs() ;
+		passMouseInputs() ;
+	}
 
-			keyInputs.clear() ;
+	private void passKeyInputs()
+	{
+		final int stateSize = activeKeyStates.size() ;
+		for( int i = 0; i < stateSize; i++ )
+		{
+			final KeyState state = activeKeyStates.get( i ) ;
+			final InputEvent input = cache.get() ;
+			input.clone( state.input ) ;
+
+			passInputEventToHandlers( input ) ;
 		}
 
-		synchronized( touchInputs )
-		{
-			final int sizeInput = touchInputs.size() ;
-			//System.out.println( "Inputs: " + sizeInput ) ;
-			for( int i = 0; i < sizeInput; ++i )
-			{
-				passInputEventToHandlers( touchInputs.get( i ) ) ;
-			}
+		activeKeyStates.clear() ;
+	}
 
-			touchInputs.clear() ;
+	private void passMouseInputs()
+	{
+		final int sizeInput = touchInputs.size() ;
+		//System.out.println( "Inputs: " + sizeInput ) ;
+		for( int i = 0; i < sizeInput; ++i )
+		{
+			passInputEventToHandlers( touchInputs.get( i ) ) ;
 		}
+
+		touchInputs.clear() ;
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )
@@ -149,38 +147,69 @@ public class AndroidInputSystem implements InputSystemInterface,
 		}
 	}
 
-	private void updateKeys( final int _inputType, final KeyEvent _event )
+	private void updateKeys( final InputType _inputType, final KeyEvent _event )
 	{
-		System.out.println( "UPDATE KEYS: Needs implementing." ) ;
-		/*KeyCode keycode = _event.getKeyCode() ;
-		if( keycode == KeyEvent.KEYCODE_SHIFT_LEFT || 
-			keycode == KeyEvent.KEYCODE_SHIFT_RIGHT )
+		KeyCode keycode = KeyCode.getKeyCode( ( char )_event.getUnicodeChar() ) ;
+		/*if( keycode == KeyCode.NONE )
 		{
-			keycode = KeyCode.SHIFT ;
-		}
-		else if( keycode == KeyEvent.KEYCODE_ALT_LEFT || 
-				 keycode == KeyEvent.KEYCODE_ALT_RIGHT )
+			keycode = isSpecialKeyDown( _event ) ;
+		}*/
+
 		{
-			keycode = KeyCode.ALT ;
-		}
-		else if( keycode == KeyEvent.KEYCODE_DEL )
-		{
-			keycode = KeyCode.BACKSPACE ;
-		}
-		else
-		{
-			keycode = _event.getUnicodeChar() ;
+			final KeyState state = keyboardState.get( keycode ) ;
+			if( state != null )
+			{
+				changeKey( _inputType, state, _event ) ;
+				return ;
+			}
 		}
 
-		synchronized( keyInputs )
-		{
-			InputEvent input = new InputEvent( _inputType, 
-											 ( char )_event.getUnicodeChar(), 
-											  keycode ) ;
-			keyInputs.add( input ) ;
-		}*/
+		// Create new Key if it doesn't exist.
+		final InputEvent input = new InputEvent( _inputType, keycode, InputID.KEYBOARD_1 ) ;
+		//input.isActionKey = _event.isActionKey() ;
+
+		final KeyState state = new KeyState( input, true ) ;
+		keyboardState.put( keycode, state ) ;
+		activeKeyStates.add( state ) ;
 	}
-	
+
+	private void changeKey( final InputType _inputType, final KeyState _state, final KeyEvent _event )
+	{
+		if( _state.input.inputType != _inputType )			// If the Input Type has changed
+		{
+			final long eventTimeStamp = _event.getEventTime() ;
+			long dt = 0L ;
+
+			// Timestamp check is done, due to Linux Input Bug
+			// Causes endless Inputs to be sent, this filters duplicates.
+			if( _inputType == InputType.KEYBOARD_PRESSED )
+			{
+				dt = eventTimeStamp - _state.pressedTimeStamp ;
+			}
+			else if( _inputType == InputType.KEYBOARD_RELEASED )
+			{
+				dt = eventTimeStamp - _state.releasedTimeStamp ;
+			}
+
+			if( dt > 0L )
+			{
+				activeKeyStates.add( _state ) ;
+				_state.changed = true ;
+
+				_state.input.inputType = _inputType ;
+
+				if( _inputType == InputType.KEYBOARD_PRESSED )
+				{
+					_state.pressedTimeStamp = eventTimeStamp ;
+				}
+				else if( _inputType == InputType.KEYBOARD_RELEASED )
+				{
+					_state.releasedTimeStamp = eventTimeStamp ;
+				}
+			}
+		}
+	}
+
 	public void clearHandlers()
 	{
 		final int size = handlers.size() ;

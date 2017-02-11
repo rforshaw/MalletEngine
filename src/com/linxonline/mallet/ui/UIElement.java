@@ -340,7 +340,9 @@ public class UIElement implements InputHandler
 		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
 		// Ensure that length adheres to the new maximum length
-		setLength( length.x, length.y, length.z ) ;
+		setLength( ratio.toUnitX( length.x ),
+				   ratio.toUnitX( length.y ),
+				   ratio.toUnitX( length.z ) ) ;
 	}
 
 	/**
@@ -371,7 +373,7 @@ public class UIElement implements InputHandler
 			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.toPixelZ( _z ) ;
 		}
 
-		System.out.println( "Length: " + length ) ;
+		//System.out.println( "Length: " + length ) ;
 	}
 
 	/**

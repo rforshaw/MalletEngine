@@ -51,14 +51,19 @@ public final class UIFactory
 
 		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
 		final UILayout layout = new UILayout( _type, new Vector3(), new Vector3(), dimension ) ;
+
 		layout.addListener( new BaseListener<UILayout>()
 		{
 			private final Notification.Notify<String> widthNotify = new Notification.Notify<String>()
 			{
 				public void inform( final String _data )
 				{
+					final UIRatio ratio = layout.getRatio() ;
 					dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-					layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+
+					layout.setLength( ratio.toUnitX( dimension.x ),
+									  ratio.toUnitY( dimension.y ),
+									  ratio.toUnitZ( dimension.z ) ) ;
 					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
@@ -70,8 +75,12 @@ public final class UIFactory
 			{
 				public void inform( final String _data )
 				{
+					final UIRatio ratio = layout.getRatio() ;
 					dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
-					layout.setLength( dimension.x, dimension.y, dimension.z ) ;
+
+					layout.setLength( ratio.toUnitX( dimension.x ),
+									  ratio.toUnitY( dimension.y ),
+									  ratio.toUnitZ( dimension.z ) ) ;
 					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
