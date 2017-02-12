@@ -282,6 +282,11 @@ public class UILayout extends UIElement
 					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
 					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
 
+					// UI elements can specify a minimum length,
+					// we need to accumulate this before we can 
+					// calculate how much actual available length 
+					// we have.
+
 					availableLength.add( minimum ) ;
 					availableLength.add( element.getMargin() ) ;
 				}
@@ -313,27 +318,30 @@ public class UILayout extends UIElement
 					}
 				}
 
-				final UIRatio ratio = getRatio() ;
-
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
+					final UIRatio ratio = element.getRatio() ;
 
 					float lenX = 0.0f ;
 					float lenY = 0.0f ;
 
 					if( minimum.x <= 0.01f )
 					{
+						// If minimum.x has not been set
 						lenX = availableLength.x ;
 					}
 
 					if( minimum.y <= 0.01f )
 					{
+						// If minimum.y has not been set
 						lenY = availableLength.y / minNumY ;
 					}
 
-					element.setLength( ratio.toUnitX( lenX ), ratio.toUnitY( lenY ), 0.0f ) ;
+					element.setLength( ratio.toUnitX( lenX ),
+									   ratio.toUnitY( lenY ),
+									   ratio.toUnitZ( 0.0f ) ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
@@ -403,13 +411,12 @@ public class UILayout extends UIElement
 					}
 				}
 
-				final UIRatio ratio = getRatio() ;
-
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
 					final Vector3 minimum = element.getMinimumLength() ;
 					final Vector3 maximum = element.getMaximumLength() ;
+					final UIRatio ratio = element.getRatio() ;
 
 					float lenX = 0.0f ;
 					float lenY = 0.0f ;
@@ -424,7 +431,9 @@ public class UILayout extends UIElement
 						lenY = availableLength.y ;
 					}
 
-					element.setLength( ratio.toUnitX( lenX ), ratio.toUnitY( lenY ), 0.0f ) ;
+					element.setLength( ratio.toUnitX( lenX ),
+									   ratio.toUnitY( lenY ),
+									   ratio.toUnitZ( 0.0f ) ) ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 

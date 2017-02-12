@@ -324,7 +324,9 @@ public class UIElement implements InputHandler
 		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
 		// Ensure that length adheres to the new minimum length
-		setLength( length.x, length.y, length.z ) ;
+		setLength( ratio.toUnitX( length.x ),
+				   ratio.toUnitY( length.y ),
+				   ratio.toUnitZ( length.z ) ) ;
 	}
 
 	/**
@@ -341,8 +343,8 @@ public class UIElement implements InputHandler
 
 		// Ensure that length adheres to the new maximum length
 		setLength( ratio.toUnitX( length.x ),
-				   ratio.toUnitX( length.y ),
-				   ratio.toUnitX( length.z ) ) ;
+				   ratio.toUnitY( length.y ),
+				   ratio.toUnitZ( length.z ) ) ;
 	}
 
 	/**
@@ -351,26 +353,30 @@ public class UIElement implements InputHandler
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
 	*/
-	public void setLength( final float _x, final float _y, final float _z )
+	public void setLength( float _x, float _y, float _z )
 	{
 		makeDirty() ;
-		length.x = ( _x < minLength.x ) ? minLength.x : ratio.toPixelX( _x ) ;
-		length.y = ( _y < minLength.y ) ? minLength.y : ratio.toPixelY( _y ) ;
-		length.z = ( _z < minLength.z ) ? minLength.z : ratio.toPixelZ( _z ) ;
+		_x = ratio.toPixelX( _x ) ;
+		_y = ratio.toPixelY( _y ) ;
+		_z = ratio.toPixelZ( _z ) ;
+
+		length.x = ( _x < minLength.x ) ? minLength.x : _x ;
+		length.y = ( _y < minLength.y ) ? minLength.y : _y ;
+		length.z = ( _z < minLength.z ) ? minLength.z : _z ;
 
 		if( maxLength.x > 0.0f )
 		{
-			length.x = ( _x > maxLength.x ) ? maxLength.x : ratio.toPixelX( _x ) ;
+			length.x = ( _x > maxLength.x ) ? maxLength.x : _x ;
 		}
 
 		if( maxLength.y > 0.0f )
 		{
-			length.y = ( _y > maxLength.y ) ? maxLength.y : ratio.toPixelY( _y ) ;
+			length.y = ( _y > maxLength.y ) ? maxLength.y : _y ;
 		}
 
 		if( maxLength.z > 0.0f )
 		{
-			length.z = ( _z > maxLength.z ) ? maxLength.z : ratio.toPixelZ( _z ) ;
+			length.z = ( _z > maxLength.z ) ? maxLength.z : _z ;
 		}
 
 		//System.out.println( "Length: " + length ) ;
