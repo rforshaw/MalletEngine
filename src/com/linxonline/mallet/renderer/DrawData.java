@@ -16,27 +16,26 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	private World world = null ;		// Store the handler to the worldspace this data is associated with
 
-	private final List<MalletTexture> textures = MalletList.<MalletTexture>newList() ;
 	private MalletColour colour = null ;
-	private MalletFont font = null ;
-	private StringBuilder text = null ;
-	private Program program = null ;
+	private MalletFont font     = null ;
+	private StringBuilder text  = null ;
+	private Program program     = null ;
 
 	private boolean update = true ;
-	private boolean ui = false ;
+	private boolean ui     = false ;
 
 	private int order = 0 ;
-	private Interpolation mode = Interpolation.NONE ;
-	private UpdateType updateType  = UpdateType.ON_DEMAND ; 
+	private Interpolation mode           = Interpolation.NONE ;
+	private UpdateType updateType        = UpdateType.ON_DEMAND ; 
 	private Draw.UploadInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
-	private final Vector3 oldScale = new Vector3() ;
+	private final Vector3 oldScale    = new Vector3() ;
 
 	private final Vector3 currentPosition = new Vector3() ;
 	private final Vector3 currentRotation = new Vector3()  ;
-	private final Vector3 currentScale = new Vector3() ;
+	private final Vector3 currentScale    = new Vector3() ;
 
 	private Vector3 position ;
 	private Vector3 offset ;
@@ -110,26 +109,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	public MalletFont getFont()
 	{
 		return font ;
-	}
-
-	public void addTexture( final MalletTexture _texture )
-	{
-		textures.add( _texture ) ;
-	}
-
-	public void removeTexture( final MalletTexture _texture )
-	{
-		textures.remove( _texture ) ;
-	}
-
-	public MalletTexture getMalletTexture( final int _index )
-	{
-		return textures.get( _index ) ;
-	}
-	
-	public List<MalletTexture> getMalletTextures()
-	{
-		return textures ;
 	}
 
 	public void setUI( final boolean _ui )
@@ -308,7 +287,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	{
 		world = null ;
 
-		textures.clear() ;
 		colour = null ;
 		font = null ;
 		text = null ;

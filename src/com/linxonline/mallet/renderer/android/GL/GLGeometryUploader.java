@@ -102,6 +102,8 @@ public class GLGeometryUploader
 			}
 		}
 
+		// If the draw data no longer fits with the previously 
+		// used buffer find or create a new buffer that matches.
 		buffer = getSupportedBuffer( _data ) ;
 		_data.setGLBuffer( buffer ) ;
 
@@ -120,6 +122,7 @@ public class GLGeometryUploader
 			buffer.remove( _data ) ;
 			_data.setGLBuffer( null ) ;
 			_data.setLocation( null ) ;
+			_data.setWorld( null ) ;
 		}
 	}
 

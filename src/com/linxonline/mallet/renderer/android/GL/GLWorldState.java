@@ -13,12 +13,6 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 {
 	public GLWorldState() {}
 
-	@Override
-	public void setDefault( final GLWorld _default )
-	{
-		super.setDefault( _default ) ;
-	}
-
 	/**
 		Iterate over each GLWorld and update/upload its GL state.
 		GL state will be updated based on GLDrawData flagged 

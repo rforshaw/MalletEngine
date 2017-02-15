@@ -94,7 +94,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			for( final DrawData draw : drawContent )
 			{
 				final GLDrawData d = ( GLDrawData )draw ;
-				d.clearTextures() ;
 				d.setGLBuffer( null ) ;
 				d.setLocation( null ) ;
 				( ( ProgramMap<GLProgram> )d.getProgram() ).setProgram( null ) ;

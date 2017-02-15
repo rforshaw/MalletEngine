@@ -33,16 +33,6 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIButton extends UIElement
 {
-	private final Vector2 mouse = new Vector2() ;
-	private State current = State.NEUTRAL ;
-
-	private enum State
-	{
-		NEUTRAL,
-		ROLLOVER,
-		CLICKED
-	}
-
 	/**
 		If the UIButton is being added to a UILayout
 		then you don't have to define the position, 

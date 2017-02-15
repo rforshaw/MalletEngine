@@ -54,6 +54,28 @@
 					"MAX" : "1.0, 0.5"
 				}
 			}
+		},
+		{
+			"TYPE" : "UICHECKBOX",
+			"NAME" : "TestCheckbox",
+			"UILISTENER" : {
+				"ALIGNMENT_X": "CENTRE", 
+				"ALIGNMENT_Y": "CENTRE",
+				"RETAIN_RATIO": "true",
+				"TEXTURE" : "base/textures/checkbox_sheet.png",
+				"NEUTRAL_UV" : {
+					"MIN" : "0.0, 0.0",
+					"MAX" : "0.5, 0.5"
+				},
+				"ROLLOVER_UV" : {
+					"MIN" : "0.0, 0.5",
+					"MAX" : "0.5, 1.0"
+				},
+				"TICK_UV" : {
+					"MIN" : "0.5, 0.0",
+					"MAX" : "1.0, 0.5"
+				}
+			}
 		}
 	],
 	"LENGTH" : "6.0, 4.5, 0.0"

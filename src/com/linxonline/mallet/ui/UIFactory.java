@@ -109,15 +109,15 @@ public final class UIFactory
 	}
 
 	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final String _text,
-																		   final MalletFont _font,
-																		   final MalletTexture _sheet,
-																		   final UIElement.UV _uv )
+																				final MalletFont _font,
+																				final MalletTexture _sheet,
+																				final UIElement.UV _uv )
 	{
 		return new UIBasicListener<T>( _text, _font, _sheet, _uv ) ;
 	}
 
 	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final MalletTexture _sheet,
-																		   final UIElement.UV _uv )
+																				final UIElement.UV _uv )
 	{
 		return new UIBasicListener<T>( _sheet, _uv ) ;
 	}
@@ -287,6 +287,21 @@ public final class UIFactory
 		{
 			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
 			offset.add( _offset ) ;
+		}
+
+		public MalletTexture getTexture()
+		{
+			return sheet ;
+		}
+
+		public Vector3 getLength()
+		{
+			return length ;
+		}
+		
+		public Vector3 getOffset()
+		{
+			return offset ;
 		}
 	}
 }

@@ -174,6 +174,51 @@ public class JUI
 				return element ;
 			}
 		} ) ;
+		
+		creators.put( "UICHECKBOX", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final UICheckbox element = new UICheckbox() ;
+				applyLengths( element, _ui ) ;
+				applyLookup( _map, element, _ui ) ;
+
+				final UICheckbox.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
+				return element ;
+			}
+
+			private UICheckbox.UIListener createListener( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final UICheckbox.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UICheckbox.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UICheckbox.UV tickUV     = createUV( _ui.getJSONObject( "TICK_UV" ) ) ;
+
+				if( neutralUV == null || rolloverUV == null || tickUV == null )
+				{
+					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					return null ;
+				}
+
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+				final UICheckbox.UIListener listener = UICheckbox.createUIListener( texture, neutralUV, rolloverUV, tickUV ) ;
+				listener.setRetainRatio( retainRatio ) ;
+				listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
+									   UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
+				return listener ;
+			}
+		} ) ;
 	}
 
 	/**

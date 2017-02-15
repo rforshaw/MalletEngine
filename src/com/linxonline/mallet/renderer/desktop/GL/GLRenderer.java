@@ -8,7 +8,13 @@ import java.awt.geom.AffineTransform ;
 import java.util.Stack ;
 
 import com.jogamp.newt.opengl.GLWindow ;
-import javax.media.opengl.* ;
+
+import javax.media.opengl.GLEventListener ;
+import javax.media.opengl.GLAutoDrawable ;
+import javax.media.opengl.GLCapabilities ;
+import javax.media.opengl.GLContext ;
+import javax.media.opengl.GLProfile ;
+import javax.media.opengl.GL3 ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -734,7 +740,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public void init( final GLAutoDrawable _drawable )
 	{
-		System.out.println( "GL Contex initialised.." ) ;
+		System.out.println( "GL3 Contex initialised.." ) ;
 		gl = _drawable.getGL().getGL3() ;
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
@@ -746,9 +752,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 		gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
-		gl.glEnable( GL.GL_CULL_FACE ) ;
-		gl.glCullFace( GL.GL_BACK ) ;  
-		gl.glFrontFace( GL.GL_CCW ) ;
+		gl.glEnable( GL3.GL_CULL_FACE ) ;
+		gl.glCullFace( GL3.GL_BACK ) ;  
+		gl.glFrontFace( GL3.GL_CCW ) ;
 
 		System.out.println( "Building default shaders.." ) ;
 		programs.get( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
@@ -760,7 +766,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			// Query for the Max Texture Size and store the results.
 			// I doubt the size will change during the running of the engine.
 			final int[] size = new int[1] ;
-			gl.glGetIntegerv( GL.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
+			gl.glGetIntegerv( GL3.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
 			maxTextureSize.setXY( size[0], size[0] ) ;
 		}
 	}
@@ -820,7 +826,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	public void display( final GLAutoDrawable _drawable )
 	{
 		gl = _drawable.getGL().getGL3() ;
-		gl.glClear( GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT | GL.GL_STENCIL_BUFFER_BIT ) ;
+		gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
 
 		getEventController().update() ;
 

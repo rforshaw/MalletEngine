@@ -38,6 +38,7 @@ public abstract class ManagedArray<T>
 	{
 		if( _data != null )
 		{
+			toRemove.remove( _data ) ;
 			toAdd.add( _data ) ;
 		}
 	}
@@ -46,6 +47,7 @@ public abstract class ManagedArray<T>
 	{
 		if( _data != null )
 		{
+			toAdd.remove( _data ) ;
 			toRemove.add( _data ) ;
 		}
 	}
