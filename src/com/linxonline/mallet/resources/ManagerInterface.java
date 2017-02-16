@@ -12,7 +12,6 @@ public interface ManagerInterface<T>
 {
 	public boolean add( final String _key, final T _value ) ;			// Map T to _key
 
-	public T get( final String _key, final Settings _settings ) ;		// Retrieve T with _key or load with _settings
 	public T get( final String _key, final String _file ) ;				// Retrieve T with _key or load with _file
 	public T get( final String _file ) ;								// Retrieve T, using _file as key or load with _file
 

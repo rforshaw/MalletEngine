@@ -94,9 +94,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public void initAssist()
+	public FontAssist.Assist getFontAssist()
 	{
-		FontAssist.setFontWrapper( new FontAssist.Assist()
+		return new FontAssist.Assist()
 		{
 			@Override
 			public Font createFont( final String _font, final int _style, final int _size )
@@ -129,9 +129,20 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 					}
 				} ;
 			}
-		} ) ;
 
-		TextureAssist.setAssist( new TextureAssist.Assist()
+			@Override
+			public boolean loadFont( final String _path )
+			{
+				assert( true ) ;
+				return false ;
+			}
+		} ;
+	}
+
+	@Override
+	public TextureAssist.Assist getTextureAssist()
+	{
+		return new TextureAssist.Assist()
 		{
 			@Override
 			public MalletTexture.Meta createMeta( final String _path )
@@ -144,9 +155,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				return new Vector2( maxTextureSize ) ;
 			}
-		} ) ;
+		} ;
+	}
 
-		DrawAssist.setAssist( new DrawAssist.Assist()
+	@Override
+	public DrawAssist.Assist getDrawAssist()
+	{
+		return new DrawAssist.Assist()
 		{
 			@Override
 			public Draw amendShape( final Draw _draw, final Shape _shape )
@@ -350,9 +365,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
 				return draw ;
 			}
-		} ) ;
+		} ;
+	}
 
-		ProgramAssist.setAssist( new ProgramAssist.Assist()
+	@Override
+	public ProgramAssist.Assist getProgramAssist()
+	{
+		return new ProgramAssist.Assist()
 		{
 			public Program createProgram( final String _id )
 			{
@@ -373,9 +392,47 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				program.set( _handler, _obj ) ;
 				return _program ;
 			}
-		} ) ;
+		} ;
+	}
 
-		CameraAssist.setAssist( new CameraAssist.Assist()
+	@Override
+	public WorldAssist.Assist getWorldAssist()
+	{
+		return new WorldAssist.Assist()
+		{
+			@Override
+			public World getDefaultWorld()
+			{
+				return getWorldState().getWorld( ( GLWorld )null ) ;
+			}
+
+			@Override
+			public World addWorld( final World _world )
+			{
+				getWorldState().addWorld( ( GLWorld )_world ) ;
+				return _world ;
+			}
+
+			@Override
+			public World removeWorld( final World _world )
+			{
+				getWorldState().removeWorld( ( GLWorld )_world ) ;
+				return _world ;
+			}
+
+			@Override
+			public World constructWorld( final String _id, final int _order )
+			{
+				final GLWorld world = new GLWorld( _id, _order, constructRemoveDelegate() ) ;
+				getWorldState().addWorld( world ) ;
+				return world ;
+			}
+		} ;
+	}
+
+	public CameraAssist.Assist getCameraAssist()
+	{
+		return new CameraAssist.Assist()
 		{
 			@Override
 			public Camera getDefaultCamera()
@@ -507,38 +564,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				return new CameraData( _id, _position, _rotation, _scale ) ;
 			}
-		} ) ;
-
-		WorldAssist.setAssist( new WorldAssist.Assist()
-		{
-			@Override
-			public World getDefaultWorld()
-			{
-				return getWorldState().getWorld( ( GLWorld )null ) ;
-			}
-
-			@Override
-			public World addWorld( final World _world )
-			{
-				getWorldState().addWorld( ( GLWorld )_world ) ;
-				return _world ;
-			}
-
-			@Override
-			public World removeWorld( final World _world )
-			{
-				getWorldState().removeWorld( ( GLWorld )_world ) ;
-				return _world ;
-			}
-
-			@Override
-			public World constructWorld( final String _id, final int _order )
-			{
-				final GLWorld world = new GLWorld( _id, _order, constructRemoveDelegate() ) ;
-				getWorldState().addWorld( world ) ;
-				return world ;
-			}
-		} ) ;
+		} ;
 	}
 
 	@Override

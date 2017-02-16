@@ -23,12 +23,6 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return true ;
 	}
 
-	@Override
-	public T get( final String _key, final Settings _settings )
-	{
-		return get( _key, _settings.getString( "FILE", null ) ) ;
-	}
-
 	/**
 		Load the resource specified by file path and associate 
 		it with _key for future reference.

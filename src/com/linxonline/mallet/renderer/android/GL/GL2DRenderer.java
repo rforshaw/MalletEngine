@@ -13,6 +13,8 @@ import com.linxonline.mallet.event.EventType ;
 import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.renderer.font.* ;
+import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.system.GlobalConfig ;
@@ -95,6 +97,42 @@ public class GL2DRenderer implements RenderInterface,
 	public void initAssist()
 	{
 		render.initAssist() ;
+	}
+
+	@Override
+	public FontAssist.Assist getFontAssist()
+	{
+		return render.getFontAssist() ;
+	}
+
+	@Override
+	public TextureAssist.Assist getTextureAssist()
+	{
+		return render.getTextureAssist() ;
+	}
+
+	@Override
+	public DrawAssist.Assist getDrawAssist()
+	{
+		return render.getDrawAssist() ;
+	}
+
+	@Override
+	public ProgramAssist.Assist getProgramAssist()
+	{
+		return render.getProgramAssist() ;
+	}
+
+	@Override
+	public WorldAssist.Assist getWorldAssist()
+	{
+		return render.getWorldAssist() ;
+	}
+
+	@Override
+	public CameraAssist.Assist getCameraAssist()
+	{
+		return render.getCameraAssist() ;
 	}
 
 	@Override

@@ -15,16 +15,10 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	}
 
 	@Override
-	public GLFontMap get( final String _key, final Settings _settings )
-	{
-		System.out.println( "GLFontManager: get( _key, _settings ). Not implemented yet." ) ;
-		return null ;
-	}
-
-	@Override
 	public GLFontMap get( final String _key, final String _file )
 	{
 		System.out.println( "GLFontManager: get( _key, _file ). Not implemented yet." ) ;
+		assert( true ) ;
 		return null ;
 	}
 
@@ -32,6 +26,7 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	public GLFontMap get( final String _file )
 	{
 		System.out.println( "GLFontManager: get( _file ). Not implemented yet." ) ;
+		assert( true ) ;
 		return null ;
 	}
 	

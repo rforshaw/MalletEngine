@@ -2,6 +2,9 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.renderer.font.* ;
+import com.linxonline.mallet.renderer.texture.* ;
+
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -59,13 +62,31 @@ public abstract class BasicRenderer<D extends DrawData,
 		TextureAssist, FontAssist, DrawAssist, CameraAssist.
 	*/
 	@Override
-	public abstract void initAssist() ;
+	public void initAssist()
+	{
+		FontAssist.setAssist( getFontAssist() ) ;
+		TextureAssist.setAssist( getTextureAssist() ) ;
+
+		DrawAssist.setAssist( getDrawAssist() ) ;
+		ProgramAssist.setAssist( getProgramAssist() ) ;
+
+		WorldAssist.setAssist( getWorldAssist() ) ;
+		CameraAssist.setAssist( getCameraAssist() ) ;
+	}
 
 	public abstract D.UploadInterface<D> getBasicUpload() ;
 	public abstract D.UploadInterface<D> getTextUpload() ;
-
 	public abstract C.DrawInterface<C> getCameraDraw() ;
 
+	public abstract FontAssist.Assist getFontAssist() ;
+	public abstract TextureAssist.Assist getTextureAssist() ;
+
+	public abstract DrawAssist.Assist getDrawAssist() ;
+	public abstract ProgramAssist.Assist getProgramAssist() ;
+
+	public abstract WorldAssist.Assist getWorldAssist() ;
+	public abstract CameraAssist.Assist getCameraAssist() ;
+	
 	/**
 		Allows implementations to clean-up other systems using 
 		or is used by DrawData.
