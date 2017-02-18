@@ -213,11 +213,13 @@ public class EditorState extends GameState
 									   final String _text )
 	{
 		final MalletFont font = new MalletFont( "Arial", 12 ) ;
-		final int height = font.getHeight() ;
-		final int width = font.stringWidth( _text ) ;
+		final MalletFont.Metrics metrics = font.getMetrics() ;
+
+		final float height = metrics.getHeight() ;
+		final float width = font.stringWidth( _text ) ;
 
 		final UIMenu.Item item = new UIMenu.Item() ;
-		item.setMaximumLength( width + 20, 0.0f, 0.0f ) ;
+		item.setMaximumLength( width + 20.0f, 0.0f, 0.0f ) ;
 
 		item.addListener( new UIListener()
 		{

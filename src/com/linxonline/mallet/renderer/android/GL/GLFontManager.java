@@ -7,8 +7,10 @@ import com.linxonline.mallet.resources.AbstractManager ;
 import com.linxonline.mallet.resources.Resource ;
 import com.linxonline.mallet.util.settings.Settings ;
 
-public class GLFontManager extends AbstractManager<GLFontMap>
+public class GLFontManager extends AbstractManager<GLFont>
 {
+	private final static String CHARACTERS = "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+." ;
+
 	private final GLFontGenerator gen ;
 
 	public GLFontManager( final GLTextureManager _manager )
@@ -17,7 +19,7 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	}
 
 	@Override
-	public GLFontMap get( final String _key, final String _file )
+	public GLFont get( final String _key, final String _file )
 	{
 		System.out.println( "GLFontManager: get( _key, _file ). Not implemented yet." ) ;
 		assert( true ) ;
@@ -25,22 +27,22 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	}
 
 	@Override
-	public GLFontMap get( final String _file )
+	public GLFont get( final String _file )
 	{
 		System.out.println( "GLFontManager: get( _file ). Not implemented yet." ) ;
 		assert( true ) ;
 		return null ;
 	}
 
-	public GLFontMap get( final String _name, final int _size )
+	public GLFont get( final MalletFont _font )
 	{
-		final String id = _name + _size ;
+		final String id = _font.getID() ;
 		if( exists( id ) == true )
 		{
 			return resources.get( id ) ;
 		}
 
-		final GLFontMap resource = createResource( _name, _size ) ;
+		final GLFont resource = createResource( _font ) ;
 		if( resource != null )
 		{
 			add( id, resource ) ;
@@ -50,15 +52,15 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 		return resource ;
 	}
 
-	public GLFontMap generateFontGeometry( final MalletFont _font )
+	public MalletFont.Metrics generateMetrics( final String _font, final int _style, final int _size )
 	{
-		return gen.generateFontGeometry( _font, ( GLFontMap )_font.font.getFont() ) ;
+		return gen.generateMetrics( _font, _style, _size, CHARACTERS ) ;
 	}
 
-	protected GLFontMap createResource( final String _name, final int _size )
+	protected GLFont createResource( final MalletFont _font )
 	{
 		// Generate the Glyphs for the passed in characters
-		return gen.generateFontMap( _name, _size, "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+.", 5 ) ;
+		return gen.generateFont( _font, 5 ) ;
 	}
 
 	/**
@@ -68,10 +70,6 @@ public class GLFontManager extends AbstractManager<GLFontMap>
 	*/
 	public void recover()
 	{
-		final Collection<GLFontMap> maps = resources.values() ;
-		for( final GLFontMap map : maps )
-		{
-			map.fontMap.setTexture( null ) ;
-		}
+		clear() ;
 	}
 }

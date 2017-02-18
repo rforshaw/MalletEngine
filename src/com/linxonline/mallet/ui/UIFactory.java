@@ -263,8 +263,9 @@ public final class UIFactory
 				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
 				textOffset.setXYZ( offset ) ;
 
+				final MalletFont.Metrics metrics = font.getMetrics() ;
 				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, font.getHeight(), length.y ) ;
+				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
 
 				textOffset.add( x, y, 0.0f ) ;
 				DrawAssist.forceUpdate( drawText ) ;

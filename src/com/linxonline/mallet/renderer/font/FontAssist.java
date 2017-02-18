@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer.font ;
 
+import com.linxonline.mallet.renderer.MalletFont ;
+
 public class FontAssist
 {
 	private static FontAssist.Assist inter ;
@@ -24,9 +26,9 @@ public class FontAssist
 		@param _style Plain, Bold, Italics
 		@param _size point size
 	*/
-	public static Font createFont( final String _name, final int _style, final int _size )
+	public static MalletFont.Metrics createMetrics( final String _name, final int _style, final int _size )
 	{
-		return inter.createFont( _name, _style, _size ) ;
+		return inter.createMetrics( _name, _style, _size ) ;
 	}
 
 	/**
@@ -44,9 +46,9 @@ public class FontAssist
 		return inter.loadFont( _path ) ;
 	}
 
-	public static interface Assist
+	public interface Assist
 	{
-		public Font createFont( final String _font, final int _style, final int _size ) ;
+		public MalletFont.Metrics createMetrics( final String _font, final int _style, final int _size ) ;
 		public boolean loadFont( final String _path ) ;
 	}
 }

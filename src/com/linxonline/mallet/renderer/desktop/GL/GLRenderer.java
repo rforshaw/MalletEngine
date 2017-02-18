@@ -92,35 +92,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return new FontAssist.Assist()
 		{
 			@Override
-			public Font createFont( final String _font, final int _style, final int _size )
+			public MalletFont.Metrics createMetrics( final String _font,
+													 final int _style,
+													 final int _size )
 			{
-				// If the GLFontMap has not been previously created, 
-				// then a skeleton map is provided, skeleton is capable 
-				// of being queried for text length and height, however,
-				// cannot be used to draw until the font texture & glyph 
-				// geometry is created during a drawText phase.
-				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
-
-				return new Font<GLFontMap>( fontMap )
-				{
-					@Override
-					public int getHeight()
-					{
-						return fontMap.getHeight() ;
-					}
-
-					@Override
-					public int stringWidth( final StringBuilder _text )
-					{
-						return fontMap.stringWidth( _text ) ;
-					}
-
-					@Override
-					public int stringWidth( final String _text )
-					{
-						return fontMap.stringWidth( _text ) ;
-					}
-				} ;
+				return fontManager.generateMetrics( _font, _style, _size ) ;
 			}
 
 			@Override
@@ -439,6 +415,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		} ;
 	}
 
+	@Override
 	public CameraAssist.Assist getCameraAssist()
 	{
 		return new CameraAssist.Assist()
@@ -645,15 +622,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 					return ;
 				}
 
-				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm.fontMap.texture == null )
-				{
-					// If the font maps texture has yet to be set,
-					// generate the texture and bind it with the 
-					// current OpenGL context
-					fontManager.generateFontGeometry( font ) ;
-				}
-
 				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
 				if( loadProgram( _data ) == false )
 				{
@@ -663,17 +631,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final Vector3 position = _data.getPosition() ;
 				final Vector3 offset   = _data.getOffset() ;
 				final Vector3 rotate   = _data.getOffset() ;
-				final boolean isGUI    = _data.isUI() ;
 
-				final int height = fm.getHeight() ;
-				final int lineWidth = /*_data.getLineWidth()*/500 + ( int )position.x ;
-
-				final MalletColour colour = _data.getColour() ;
-				final Matrix4 clipMatrix = _data.getClipMatrix() ;
-				if( clipMatrix != null )
+				final Vector3 clipPosition = _data.getClipPosition() ;
+				final Vector3 clipOffset   = _data.getClipOffset() ;
+				if( clipPosition != null && clipOffset != null )
 				{
-					final Vector3 clipPosition = _data.getClipPosition() ;
-					final Vector3 clipOffset   = _data.getClipOffset() ;
+					final Matrix4 clipMatrix = _data.getClipMatrix() ;
 					clipMatrix.setIdentity() ;
 
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
@@ -689,7 +652,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 				if( _data.getDrawShape() == null )
 				{
-					_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+					final GLFont glFont = GLRenderer.getFont( font ) ;
+					_data.setDrawShape( glFont.getShapeWithChar( '\0' ) ) ;
 				}
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
@@ -971,6 +935,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected static Texture<GLImage> getTexture( final String _path )
 	{
 		return textures.get( _path ) ;
+	}
+
+	protected static GLFont getFont( final MalletFont _font )
+	{
+		return fontManager.get( _font ) ;
 	}
 
 	/**

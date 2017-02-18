@@ -24,7 +24,11 @@ public class GLShader extends Resource
 	}
 
 	@Override
-	public void destroy() {}
+	public void destroy()
+	{
+		// Shaders are destroyed once they've been 
+		// compiled and linked into a GLProgram.
+	}
 
 	@Override
 	public String type()

@@ -5,22 +5,29 @@ import com.linxonline.mallet.util.sort.SortInterface ;
 public class Glyph implements SortInterface
 {
 	public final char character ;
-	public float start ;
-	public float advance ;
+	public final float width ;
 
-	public Glyph( final char _char, final float _start, final float _advance )
+	public Glyph( final char _char, final float _width )
 	{
 		character = _char ;
-		start = _start ;
-		advance = _advance ;
+		width = _width ;
 	}
 
-	/**
-		If the glyph is hooked to an underlying system,
-		then use destroy to unhook it.
-	**/
-	public void destroy() {}
-	
+	public char getCharacter()
+	{
+		return character ;
+	}
+
+	public boolean isCharacter( final char _char )
+	{
+		return character == _char ;
+	}
+
+	public float getWidth()
+	{
+		return width ;
+	}
+
 	@Override
 	public int sortValue()
 	{

@@ -14,6 +14,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.renderer.ProgramMap ;
+import com.linxonline.mallet.renderer.font.Glyph ;
 
 import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -275,7 +276,7 @@ public class GLGeometryUploader
 		}
 
 		GLBuffer buffer = null ;
-		if( _data.getText() != null )
+		if( _data.getFont() != null )
 		{
 			// Use _data as initial parameters for this buffer.
 			buffer = new GLTextBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
@@ -285,7 +286,7 @@ public class GLGeometryUploader
 			// Use _data as initial parameters for this buffer.
 			buffer = new GLGeometryBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
 		}
-		
+
 		OrderedInsert.insert( buffer, buffers ) ;
 		return buffer ;
 	}
@@ -829,12 +830,8 @@ public class GLGeometryUploader
 
 			final MalletColour colour = _data.getColour() ;
 			final MalletFont font = _data.getFont() ;
-			final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-
-			final Shape shape = _data.getDrawShape() ;
-			final Shape.Swivel[] swivel = shape.getSwivel() ;
-			final int vertexSize = calculateVertexSize( swivel ) ;
-			final int verticiesSize = shape.getVertexSize() ;
+			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final GLFont glFont = GLRenderer.getFont( font ) ;
 
 			final GLGeometry geometry = _location.getGeometry() ;
 			_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
@@ -852,13 +849,20 @@ public class GLGeometryUploader
 
 			for( int i = 0; i < length; i++ )
 			{
-				final GLGlyph glyph = fm.getGlyphWithChar( text.charAt( i ) ) ;
+				final char c = text.charAt( i ) ;
+				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
+				final Shape shape = glFont.getShapeWithChar( c ) ;
+
+				final Shape.Swivel[] swivel = shape.getSwivel() ;
+				final int vertexSize = calculateVertexSize( swivel ) ;
+				final int verticiesSize = shape.getVertexSize() ;
+
 				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
 
-				final int size = glyph.shape.getIndexSize() ; 
+				final int size = shape.getIndexSize() ; 
 				for( int j = 0; j < size; j++ )
 				{
-					indicies[indexInc++] = indexOffset + glyph.shape.getIndex( j ) ;
+					indicies[indexInc++] = indexOffset + shape.getIndex( j ) ;
 					if( indexInc >= indicies.length )
 					{
 						indexBuffer.put( indicies ) ;
@@ -881,7 +885,7 @@ public class GLGeometryUploader
 							case NORMAL :
 							case POINT  :
 							{
-								glyph.shape.getVector3( j, k, point ) ;
+								shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, positionMatrix, temp ) ;
 								verticies[vertexInc++] = temp.x ;
 								verticies[vertexInc++] = temp.y ;
@@ -891,13 +895,13 @@ public class GLGeometryUploader
 							case COLOUR :
 							{
 								// GLDrawData colour overrides Shapes colour.
-								final MalletColour c = ( colour != null ) ? colour : glyph.shape.getColour( j, k, shapeColour ) ;
-								verticies[vertexInc++] = getABGR( c ) ;
+								final MalletColour col = ( colour != null ) ? colour : shape.getColour( j, k, shapeColour ) ;
+								verticies[vertexInc++] = getABGR( col ) ;
 								break ;
 							}
 							case UV     :
 							{
-								glyph.shape.getVector2( j, k, uv ) ;
+								shape.getVector2( j, k, uv ) ;
 								verticies[vertexInc++] = uv.x ;
 								verticies[vertexInc++] = uv.y ;
 								break ;
@@ -918,7 +922,7 @@ public class GLGeometryUploader
 					}
 				}
 
-				positionMatrix.translate( glyph.advance, 0.0f, 0.0f ) ;
+				positionMatrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
 			indicies[indexInc++] = PRIMITIVE_RESTART_INDEX ;
@@ -1012,9 +1016,9 @@ public class GLGeometryUploader
 		public int amountIndexUsedBytes  = 0 ;		// How much of buffer has been used
 		public int amountVertexUsedBytes = 0 ;		// How much of buffer has been used
 
-		private final List<Location> allocated = MalletList.<Location>newList()  ;
-		private final List<Location.Range> indexRanges = MalletList.<Location.Range>newList()  ;
-		private final List<Location.Range> vertexRanges = MalletList.<Location.Range>newList()  ;
+		private final List<Location> allocated = MalletList.<Location>newList() ;
+		private final List<Location.Range> indexRanges = MalletList.<Location.Range>newList() ;
+		private final List<Location.Range> vertexRanges = MalletList.<Location.Range>newList() ;
 
 		public GLGeometry( final int _style,
 						   final int _indexLengthBytes,

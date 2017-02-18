@@ -17,11 +17,11 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLDrawData extends DrawData
 {
-	private GLGeometryUploader.GLBuffer buffer ;
-	private GLGeometryUploader.Location location ;
+	private GLGeometryUploader.GLBuffer buffer   = null ;
+	private GLGeometryUploader.Location location = null ;
 
-	private Matrix4 drawMatrix    = new Matrix4() ;
-	private Shape drawShape       = null ;
+	private Matrix4 drawMatrix = new Matrix4() ;
+	private Shape drawShape    = null ;
 
 	private Matrix4 clipMatrix    = null ;
 	private Vector3 clipPosition  = null ;
