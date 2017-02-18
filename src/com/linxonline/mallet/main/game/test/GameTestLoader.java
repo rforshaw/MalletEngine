@@ -149,7 +149,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3( 1, 1, 1 ),
 																	 10 ) ;
 
-							final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+							final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 							ProgramAssist.map( program, "inTex0", texture ) ;
 							DrawAssist.attachProgram( draw, program ) ;
 
@@ -183,7 +183,7 @@ public final class GameTestLoader extends GameLoader
 																	  new Vector3( 1, 1, 1 ),
 																	  10 ) ;
 							DrawAssist.amendShape( draw, lines ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -210,7 +210,7 @@ public final class GameTestLoader extends GameLoader
 																	 new Vector3( 1, 1, 1 ),
 																	 10 ) ;
 							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 							_delegate.addBasicDraw( draw ) ;
 						}
@@ -225,7 +225,7 @@ public final class GameTestLoader extends GameLoader
 																		new Vector3( 1, 1, 1 ),
 																		10 ) ;
 								DrawAssist.amendShape( draw, shape ) ;
-								DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_GEOMETRY" ) ) ;
+								DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 								_delegate.addBasicDraw( draw ) ;
 							}
@@ -387,7 +387,7 @@ public final class GameTestLoader extends GameLoader
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 
-				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", texture ) ;
 				DrawAssist.attachProgram( draw, program ) ;
 

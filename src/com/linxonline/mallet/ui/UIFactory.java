@@ -208,7 +208,7 @@ public final class UIFactory
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
 
-				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", sheet ) ;
 
 				DrawAssist.attachProgram( draw, program ) ;
@@ -226,7 +226,7 @@ public final class UIFactory
 													new Vector3(),
 													new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 				DrawAssist.amendUI( drawText, true ) ;
-				DrawAssist.attachProgram( drawText, ProgramAssist.createProgram( "SIMPLE_FONT" ) ) ;
+				DrawAssist.attachProgram( drawText, ProgramAssist.create( "SIMPLE_FONT" ) ) ;
 			}
 		}
 

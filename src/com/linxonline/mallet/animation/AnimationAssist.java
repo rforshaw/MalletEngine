@@ -50,7 +50,7 @@ public final class AnimationAssist
 												 _rotation,
 												 _scale,
 												 _order ) ;
-		DrawAssist.attachProgram( draw, ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ) ;
+		DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_TEXTURE" ) ) ;
 
 		return new AnimData( _file, draw ) ;
 	}

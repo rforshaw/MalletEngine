@@ -110,7 +110,7 @@ public class UICheckbox extends UIElement
 				DrawAssist.amendUI( drawTick, true ) ;
 				DrawAssist.amendShape( drawTick, Shape.constructPlane( getLength(), tick.min, tick.max ) ) ;
 
-				final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", sheet ) ;
 
 				DrawAssist.attachProgram( drawTick, program ) ;

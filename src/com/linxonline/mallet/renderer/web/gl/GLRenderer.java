@@ -179,14 +179,14 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Draw amendShape( final Draw _draw, final Shape _shape )
 			{
-				( ( GLDrawData )_draw ).setDrawShape( _shape ) ;
+				cast( _draw ).setDrawShape( _shape ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
 			{
-				final GLDrawData data = ( GLDrawData )_draw ;
+				final GLDrawData data = cast( _draw ) ;
 				if( data.getClipMatrix() == null )
 				{
 					data.setClipMatrix( new Matrix4() ) ;
@@ -202,139 +202,139 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				( ( GLDrawData )_draw ).setRotation( _x, _y, _z ) ;
+				cast( _draw ).setRotation( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				( ( GLDrawData )_draw ).setScale( _x, _y, _z ) ;
+				cast( _draw ).setScale( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				( ( GLDrawData )_draw ).setPosition( _x, _y, _z ) ;
+				cast( _draw ).setPosition( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				( ( GLDrawData )_draw ).setOffset( _x, _y, _z ) ;
+				cast( _draw ).setOffset( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendText( final Draw _draw, final StringBuilder _text )
 			{
-				( ( GLDrawData )_draw ).setText( _text ) ;
+				cast( _draw ).setText( _text ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendUI( final Draw _draw, final boolean _ui )
 			{
-				( ( GLDrawData )_draw ).setUI( _ui ) ;
+				cast( _draw ).setUI( _ui ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendColour( final Draw _draw, final MalletColour _colour )
 			{
-				( ( GLDrawData )_draw ).setColour( _colour ) ;
+				cast( _draw ).setColour( _colour ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendOrder( final Draw _draw, final int _order )
 			{
-				( ( GLDrawData )_draw ).setOrder( _order ) ;
+				cast( _draw ).setOrder( _order ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
 			{
-				( ( GLDrawData )_draw ).setInterpolationMode( _interpolation ) ;
+				cast( _draw ).setInterpolationMode( _interpolation ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
 			{
-				( ( GLDrawData )_draw ).setUpdateType( _type ) ;
+				cast( _draw ).setUpdateType( _type ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw attachProgram( final Draw _draw, final Program _program )
 			{
-				( ( GLDrawData )_draw ).setProgram( _program ) ;
+				cast( _draw ).setProgram( _program ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw forceUpdate( final Draw _draw )
 			{
-				( ( GLDrawData )_draw ).forceUpdate() ;
+				cast( _draw ).forceUpdate() ;
 				return _draw ;
 			}
 
 			@Override
 			public Shape getDrawShape( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getDrawShape() ;
+				return cast( _draw ).getDrawShape() ;
 			}
 
 			@Override
 			public Vector3 getRotate( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getRotation() ;
+				return cast( _draw ).getRotation() ;
 			}
 
 			@Override
 			public Vector3 getScale( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getScale() ;
+				return cast( _draw ).getScale() ;
 			}
 
 			@Override
 			public Vector3 getPosition( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getPosition() ;
+				return cast( _draw ).getPosition() ;
 			}
 
 			@Override
 			public Vector3 getOffset( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getOffset() ;
+				return cast( _draw ).getOffset() ;
 			}
 
 			@Override
 			public StringBuilder getText( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getText() ;
+				return cast( _draw ).getText() ;
 			}
 
 			@Override
 			public MalletColour getColour( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getColour() ;
+				return cast( _draw ).getColour() ;
 			}
 
 			@Override
 			public boolean isUI( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).isUI() ;
+				return cast( _draw ).isUI() ;
 			}
 
 			@Override
 			public Program getProgram( final Draw _draw )
 			{
-				return ( ( GLDrawData )_draw ).getProgram() ;
+				return cast( _draw ).getProgram() ;
 			}
 
 			@Override
@@ -346,8 +346,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 										final Vector3 _scale,
 										final int _order )
 			{
-				final GLDrawData draw = ( GLDrawData )createDraw( _position, _offset, _rotation, _scale, _order ) ;
-				final Program program = ProgramAssist.createProgram( "SIMPLE_FONT" ) ;
+				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
+				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
 
 				attachProgram( draw, program ) ;
 				draw.setText( _text ) ;
@@ -378,6 +378,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
 				return draw ;
 			}
+
+			private GLDrawData cast( final Draw _draw )
+			{
+				assert( _draw != null ) ;
+				assert( !( _draw instanceof GLDrawData ) ) ;
+				return ( GLDrawData )_draw ;
+			}
 		} ;
 	}
 
@@ -386,7 +393,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	{
 		return new ProgramAssist.Assist()
 		{
-			public Program createProgram( final String _id )
+			public void load( final String _id, final String _path ) {}
+
+			public Program create( final String _id )
 			{
 				final Program program = new ProgramMap<GLProgram>( _id ) ;
 				return program ;
@@ -394,16 +403,23 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			public Program remove( final Program _program, final String _handler )
 			{
-				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
+				final ProgramMap<GLProgram> program = cast( _program ) ;
 				program.remove( _handler ) ;
 				return _program ;
 			}
 
 			public Program map( final Program _program, final String _handler, final Object _obj )
 			{
-				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_program ;
+				final ProgramMap<GLProgram> program = cast( _program ) ;
 				program.set( _handler, _obj ) ;
 				return _program ;
+			}
+
+			private ProgramMap<GLProgram> cast( final Program _program )
+			{
+				assert( _program != null ) ;
+				assert( !( _program instanceof ProgramMap ) ) ;
+				return ( ProgramMap<GLProgram> )_program ;
 			}
 		} ;
 	}
@@ -463,7 +479,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 											 final float _near,
 											 final float _far )
 			{
-				final CameraData camera = ( CameraData )_camera ;
+				final CameraData camera = cast( _camera ) ;
 				final CameraData.Projection projection = camera.getProjection() ;
 
 				projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
@@ -484,28 +500,28 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
 			{
-				( ( CameraData )_camera ).setPosition( _x, _y, _z ) ;
+				cast( _camera ).setPosition( _x, _y, _z ) ;
 				return _camera ;
 			}
 
 			@Override
 			public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z )
 			{
-				( ( CameraData )_camera ).setRotation( _x, _y, _z ) ;
+				cast( _camera ).setRotation( _x, _y, _z ) ;
 				return _camera ;
 			}
 
 			@Override
 			public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
 			{
-				( ( CameraData )_camera ).setScale( _x, _y, _z ) ;
+				cast( _camera ).setScale( _x, _y, _z ) ;
 				return _camera ;
 			}
 
 			@Override
 			public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
 			{
-				final CameraData.Screen screen = ( ( CameraData )_camera ).getRenderScreen() ;
+				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
 				screen.setDimension( _width, _height ) ;
 				return _camera ;
 			}
@@ -513,7 +529,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y )
 			{
-				final CameraData.Screen screen = ( ( CameraData )_camera ).getRenderScreen() ;
+				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
 				screen.setOffset( _x, _y ) ;
 				return _camera ;
 			}
@@ -521,28 +537,28 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public boolean getPosition( final Camera _camera, final Vector3 _populate )
 			{
-				_populate.setXYZ( ( ( CameraData )_camera ).getPosition() ) ;
+				_populate.setXYZ( cast( _camera ).getPosition() ) ;
 				return true ;
 			}
 
 			@Override
 			public boolean getRotation( final Camera _camera, final Vector3 _populate )
 			{
-				_populate.setXYZ( ( ( CameraData )_camera ).getRotation() ) ;
+				_populate.setXYZ( cast( _camera ).getRotation() ) ;
 				return true ;
 			}
 
 			@Override
 			public boolean getScale( final Camera _camera, final Vector3 _populate )
 			{
-				_populate.setXYZ( ( ( CameraData )_camera ).getScale() ) ;
+				_populate.setXYZ( cast( _camera ).getScale() ) ;
 				return true ;
 			}
 
 			@Override
 			public boolean getDimensions( final Camera _camera, final Vector3 _populate )
 			{
-				final CameraData.Projection projection = ( ( CameraData )_camera ).getProjection() ;
+				final CameraData.Projection projection = cast( _camera ).getProjection() ;
 				_populate.setXYZ( projection.nearPlane ) ;
 				return true ;
 			}
@@ -550,23 +566,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
-				if( _camera instanceof CameraData )
-				{
-					_camera.setDrawInterface( getCameraDraw() ) ;
-					getWorldState().addCamera( ( CameraData )_camera, ( GLWorld )_world ) ;
-				}
-
+				_camera.setDrawInterface( getCameraDraw() ) ;
+				getWorldState().addCamera( cast( _camera ), cast( _world ) ) ;
 				return _camera ;
 			}
 
 			@Override
 			public Camera removeCamera( final Camera _camera, final World _world )
 			{
-				if( _camera instanceof CameraData )
-				{
-					getWorldState().removeCamera( ( CameraData )_camera ) ;
-				}
-
+				getWorldState().removeCamera( cast( _camera ) ) ;
 				return _camera ;
 			}
 
@@ -577,6 +585,20 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 										final Vector3 _scale )
 			{
 				return new CameraData( _id, _position, _rotation, _scale ) ;
+			}
+
+			private GLWorld cast( final World _world )
+			{
+				assert( _world != null ) ;
+				assert( !( _world instanceof GLWorld ) ) ;
+				return ( GLWorld )_world ;
+			}
+
+			private CameraData cast( final Camera _camera )
+			{
+				assert( _camera != null ) ;
+				assert( !( _camera instanceof CameraData ) ) ;
+				return ( CameraData )_camera ;
 			}
 		} ;
 	}

@@ -189,7 +189,6 @@ public abstract class DesktopStarter extends StarterInterface
 		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", 480 ) ;
 
 		final DesktopDisplay desktop = new DesktopDisplay() ;
-		System.out.println( desktop.getDPI() ) ;
 
 		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
 		{

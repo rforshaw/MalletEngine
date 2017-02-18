@@ -47,7 +47,7 @@ public class ImageCreator extends Creator<Entity, Settings>
 
 		DrawAssist.amendShape( draw, plane ) ;
 
-		final Program program = ProgramAssist.createProgram( "SIMPLE_TEXTURE" ) ;
+		final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 		ProgramAssist.map( program, "inTex0", new MalletTexture( _image.getString( "IMAGE", "" ) ) ) ;
 
 		DrawAssist.attachProgram( draw, program ) ;

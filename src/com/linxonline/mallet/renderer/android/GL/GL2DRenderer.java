@@ -100,42 +100,6 @@ public class GL2DRenderer implements RenderInterface,
 	}
 
 	@Override
-	public FontAssist.Assist getFontAssist()
-	{
-		return render.getFontAssist() ;
-	}
-
-	@Override
-	public TextureAssist.Assist getTextureAssist()
-	{
-		return render.getTextureAssist() ;
-	}
-
-	@Override
-	public DrawAssist.Assist getDrawAssist()
-	{
-		return render.getDrawAssist() ;
-	}
-
-	@Override
-	public ProgramAssist.Assist getProgramAssist()
-	{
-		return render.getProgramAssist() ;
-	}
-
-	@Override
-	public WorldAssist.Assist getWorldAssist()
-	{
-		return render.getWorldAssist() ;
-	}
-
-	@Override
-	public CameraAssist.Assist getCameraAssist()
-	{
-		return render.getCameraAssist() ;
-	}
-
-	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
 		render.setRenderDimensions( _width, _height ) ;
