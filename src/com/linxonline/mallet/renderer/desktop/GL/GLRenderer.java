@@ -302,7 +302,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 										final Vector3 _scale,
 										final int _order )
 			{
-				final GLDrawData draw = ( GLDrawData )createDraw( _position, _offset, _rotation, _scale, _order ) ;
+				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
 				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
 
 				attachProgram( draw, program ) ;

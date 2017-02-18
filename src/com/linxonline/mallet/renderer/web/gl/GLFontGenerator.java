@@ -10,10 +10,8 @@ import org.teavm.jso.canvas.ImageData ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.texture.Texture ;
-import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.font.Glyph ;
-import com.linxonline.mallet.renderer.font.FontMap ;
+import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
@@ -30,7 +28,7 @@ public class GLFontGenerator
 		canvas = ( CanvasRenderingContext2D )element.getContext( "2d" ) ;
 	}
 
-	public GLFontMap generateFontMap( final String _name, final int _size, final String _charsToMap, final int _spacing )
+	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
 	{
 		final StringBuilder builder = new StringBuilder() ;
 		builder.append( _size ) ;
@@ -40,59 +38,44 @@ public class GLFontGenerator
 		final String font = builder.toString() ;
 		canvas.setFont( font ) ;
 
-		return generateFontMap( canvas, _charsToMap, _spacing ) ;
+		return generateMetrics( canvas, _characters ) ;
 	}
 
-	/**
-		Needs to be updated to provide higher resolution font maps.
-		We should render out a high resolution map, but use geometry 
-		suitable for the font specified. Currently texture is generated 
-		based on 
-	*/
-	public GLFontMap generateFontMap( final CanvasRenderingContext2D _canvas, final String _charsToMap, final int _spacing )
+	public MalletFont.Metrics generateMetrics( final CanvasRenderingContext2D _canvas, final String _characters )
 	{
-		final int length = _charsToMap.length() ;
-		float increment = 0 ;
-		final char[] c = new char[1] ;
-		final Glyph[] glyphs = new GLGlyph[length] ;
+		final int length = _characters.length() ;
+		final Glyph[] glyphs = new Glyph[length] ;
 
 		for( int i = 0; i < length; i++ )
 		{
-			c[0] = _charsToMap.charAt( i ) ;
-			final float start = increment + ( i * _spacing ) ;
-			final float advance = _canvas.measureText( String.valueOf( c ) ).getWidth() ;
-
-			glyphs[i] = new GLGlyph( c[0], start, advance ) ;
-			increment += advance ;
+			final char c = _characters.charAt( i ) ;
+			final float width = _canvas.measureText( String.valueOf( c ) ).getWidth() ;
+			glyphs[i] = new Glyph( c, width ) ;
 		}
 
-		// Create a GLFontMap and wrap it around a FontMap
-		return new GLFontMap( new FontMap<GLImage>( glyphs, null, getHeight( _canvas, _charsToMap ) ) ) ;
-
+		final float height = getHeight( _canvas, _characters ) ;
+		return new MalletFont.Metrics( glyphs, height,
+											   height / 2.0f,
+											   0.0f,
+											   0.0f ) ;
 	}
 
-	/**
-		Create the fontmap's texture and generate the geometry to 
-		map the texture to.
-		This is called during a drawText call, when a font has yet to have 
-		this data initialised. 
-	*/
-	public GLFontMap generateFontGeometry( final MalletFont _font, final GLFontMap _map )
+	public GLFont generateFont( final MalletFont _font )
 	{
-		final Glyph[] glyphs = _map.fontMap.glyphs ;
-		final int length = glyphs.length ;
+		final MalletFont.Metrics metrics = _font.getMetrics() ;
+		final Glyph[] glyphs = metrics.getGlyphs() ;
 
-		final int height = _map.fontMap.height ;
-		final int width = calculateWidth( glyphs ) ;
+		final float height = metrics.getHeight() ;
+		final float width = calculateWidth( glyphs ) ;
 
 		final HTMLCanvasElement element = canvas.getCanvas() ;
-		element.setWidth( width ) ;
-		element.setHeight( height ) ;
+		element.setWidth( ( int )width ) ;
+		element.setHeight( ( int )height ) ;
 
 		final StringBuilder builder = new StringBuilder() ;
-		builder.append( _font.size ) ;
+		builder.append( _font.getPointSize() ) ;
 		builder.append( "pt;" ) ;
-		builder.append( _font.fontName ) ;
+		builder.append( _font.getFontName() ) ;
 
 		canvas.setFont( builder.toString() ) ;
 		canvas.setFillStyle( "#FFFFFF" ) ;
@@ -100,21 +83,21 @@ public class GLFontGenerator
 
 		final char[] c = new char[1] ;
 		final double point = 1.0 / width ;
-		final float ascent = height / 2.0f ;//10.0f ;
+		final float ascent = metrics.getAscent() ;
+		float start = 0.0f ;
 
-		final List<Shape> shapes = MalletList.<Shape>newList() ;
+		final int length = glyphs.length ;
+		final Shape[] shapes = new Shape[length] ;
 
 		for( int i = 0; i < length; i++ )
 		{
-			final GLGlyph glyph = ( GLGlyph )glyphs[i] ;
-			//System.out.println( "Index: " + i + " Glyph: " + glyph ) ;
+			final Glyph glyph = glyphs[i] ;
 			if( glyph != null )
 			{
-				final float start = glyph.start ;
-				final String txt = String.valueOf( glyph.character ) ;
+				final String txt = String.valueOf( glyph.getCharacter() ) ;
 				canvas.fillText( txt, start, ascent ) ;
 
-				final float advance = glyph.advance ;
+				final float advance = glyph.getWidth() ;
 				final float x1 = ( float )( start * point ) ;
 				final float x2 = ( float )( ( start + advance ) * point ) ;
 
@@ -122,37 +105,29 @@ public class GLFontGenerator
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
-				glyph.setShape( Shape.constructPlane( maxPoint, uv1, uv2 ) ) ;
+				shapes[i] = Shape.constructPlane( maxPoint, uv1, uv2 ) ;
+				start += advance ;
 			}
 		}
 
-		_map.fontMap.setTexture( manager.bind( canvas.getCanvas() ) ) ;
-		return _map ;
+		return new GLFont( shapes, manager.bind( canvas.getCanvas() ) ) ;
 	}
 
-	private static int calculateWidth( final Glyph[] _glyphs )
+	/**
+		The glyph array used in Metrics contains 
+		potentially null slots.
+		As not all characters in world are rendered out.
+		To calculate the correct width for the texture 
+		we need to skip these null glyphs.
+	*/
+	private static float calculateWidth( final Glyph[] _glyphs )
 	{
-		final int length = _glyphs.length ;
-		int width = 0 ;
-		for( int i = 0; i < length; i++ )
+		float width = 0.0f ;
+		for( int i = 0; i < _glyphs.length; i++ )
 		{
-			final GLGlyph glyph = ( GLGlyph )_glyphs[i] ;
-			if( glyph != null )
-			{
-				final int t = ( int )( glyph.start ) ;
-				if( t > width )
-				{
-					width = t ;
-				}
-			}
+			final Glyph glyph = _glyphs[i] ;
+			width += glyph != null ? glyph.getWidth() : 0.0f ;
 		}
-
-		final GLGlyph glyph = ( GLGlyph )_glyphs[_glyphs.length - 1] ;
-		if( glyph != null )
-		{
-			width += glyph.advance ;
-		}
-
 		return width ;
 	}
 

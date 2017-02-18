@@ -209,8 +209,9 @@ public class GLProgram extends Resource
 				final WebGLUniformLocation inUniform = program.inUniforms[_index] ;
 
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
-				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				final Texture<GLImage> texture = fm.getTexture() ;
+				final GLFont glFont = GLRenderer.getFont( font ) ;
+
+				final Texture<GLImage> texture = glFont.getTexture() ;
 				if( texture == null )
 				{
 					return false ;

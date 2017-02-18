@@ -25,17 +25,17 @@ import com.linxonline.mallet.renderer.web.gl.GLGeometryUploader.VertexAttrib ;
 
 public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState>
 {
-	public static final int ORTHOGRAPHIC_MODE = 1 ;
-	public static final int PERSPECTIVE_MODE  = 2 ;
+	public final static int ORTHOGRAPHIC_MODE = 1 ;
+	public final static int PERSPECTIVE_MODE  = 2 ;
 
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
-	protected final static ObjectCache<Matrix4> matrixCache  = new ObjectCache<Matrix4>( Matrix4.class ) ;
-	protected final static Matrix4 uiMatrix                  = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
-	protected final static Matrix4 worldMatrix               = matrixCache.get() ;		// Used for moving the camera around the world
+	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
+	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
+	protected final static Matrix4 worldMatrix              = matrixCache.get() ;		// Used for moving the camera around the world
 
 	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
@@ -112,35 +112,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return new FontAssist.Assist()
 		{
 			@Override
-			public Font createFont( final String _font, final int _style, final int _size )
+			public MalletFont.Metrics createMetrics( final String _font,
+													 final int _style,
+													 final int _size )
 			{
-				// If the GLFontMap has not been previously created, 
-				// then a skeleton map is provided, skeleton is capable 
-				// of being queried for text length and height, however,
-				// cannot be used to draw until the font texture & glyph 
-				// geometry is created during a drawText phase.
-				final GLFontMap fontMap = fontManager.get( _font, _size ) ;
-
-				return new Font<GLFontMap>( fontMap )
-				{
-					@Override
-					public int getHeight()
-					{
-						return fontMap.getHeight() ;
-					}
-
-					@Override
-					public int stringWidth( final StringBuilder _text )
-					{
-						return fontMap.stringWidth( _text ) ;
-					}
-
-					@Override
-					public int stringWidth( final String _text )
-					{
-						return fontMap.stringWidth( _text ) ;
-					}
-				} ;
+				return fontManager.generateMetrics( _font, _style, _size ) ;
 			}
 
 			@Override
@@ -370,10 +346,10 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			@Override
 			public Draw createDraw( final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale,
+									final int _order )
 			{
 				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
 				return draw ;
@@ -381,8 +357,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			private GLDrawData cast( final Draw _draw )
 			{
-				assert( _draw != null ) ;
-				assert( !( _draw instanceof GLDrawData ) ) ;
+				//assert( _draw != null ) ;
+				//assert( !( _draw instanceof GLDrawData ) ) ;
 				return ( GLDrawData )_draw ;
 			}
 		} ;
@@ -417,8 +393,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			private ProgramMap<GLProgram> cast( final Program _program )
 			{
-				assert( _program != null ) ;
-				assert( !( _program instanceof ProgramMap ) ) ;
+				//assert( _program != null ) ;
+				//assert( !( _program instanceof ProgramMap ) ) ;
 				return ( ProgramMap<GLProgram> )_program ;
 			}
 		} ;
@@ -589,24 +565,24 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			private GLWorld cast( final World _world )
 			{
-				assert( _world != null ) ;
-				assert( !( _world instanceof GLWorld ) ) ;
+				//assert( _world != null ) ;
+				//assert( !( _world instanceof GLWorld ) ) ;
 				return ( GLWorld )_world ;
 			}
 
 			private CameraData cast( final Camera _camera )
 			{
-				assert( _camera != null ) ;
-				assert( !( _camera instanceof CameraData ) ) ;
+				//assert( _camera != null ) ;
+				//assert( !( _camera instanceof CameraData ) ) ;
 				return ( CameraData )_camera ;
 			}
 		} ;
 	}
 
 	@Override
-	public DrawData.UploadInterface getBasicUpload()
+	public GLDrawData.UploadInterface<GLDrawData> getBasicUpload()
 	{
-		return new DrawData.UploadInterface<GLDrawData>()
+		return new GLDrawData.UploadInterface<GLDrawData>()
 		{
 			public void upload( final GLDrawData _data )
 			{
@@ -646,9 +622,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public DrawData.UploadInterface getTextUpload()
+	public GLDrawData.UploadInterface<GLDrawData> getTextUpload()
 	{
-		return new DrawData.UploadInterface<GLDrawData>()
+		return new GLDrawData.UploadInterface<GLDrawData>()
 		{
 			public void upload( final GLDrawData _data )
 			{
@@ -666,17 +642,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 					return ;
 				}
 
-				final GLFontMap fm = ( GLFontMap )font.font.getFont() ;
-				if( fm.fontMap.texture == null )
-				{
-					// If the font maps texture has yet to be set,
-					// generate the texture and bind it with the 
-					// current OpenGL context
-					fontManager.generateFontGeometry( font ) ;
-				}
-
 				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
-
 				if( loadProgram( _data ) == false )
 				{
 					return ;
@@ -685,17 +651,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final Vector3 position = _data.getPosition() ;
 				final Vector3 offset   = _data.getOffset() ;
 				final Vector3 rotate   = _data.getOffset() ;
-				final boolean isGUI    = _data.isUI() ;
 
-				final int height = fm.getHeight() ;
-				final int lineWidth = /*_data.getLineWidth()*/500 + ( int )position.x ;
-
-				final MalletColour colour = _data.getColour() ;
-				final Matrix4 clipMatrix = _data.getClipMatrix() ;
-				if( clipMatrix != null )
+				final Vector3 clipPosition = _data.getClipPosition() ;
+				final Vector3 clipOffset   = _data.getClipOffset() ;
+				if( clipPosition != null && clipOffset != null )
 				{
-					final Vector3 clipPosition = _data.getClipPosition() ;
-					final Vector3 clipOffset   = _data.getClipOffset() ;
+					final Matrix4 clipMatrix = _data.getClipMatrix() ;
 					clipMatrix.setIdentity() ;
 
 					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
@@ -711,7 +672,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 				if( _data.getDrawShape() == null )
 				{
-					_data.setDrawShape( fm.getGlyphWithChar( ' ' ).shape ) ;
+					final GLFont glFont = GLRenderer.getFont( font ) ;
+					_data.setDrawShape( glFont.getShapeWithChar( '\0' ) ) ;
 				}
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
@@ -852,7 +814,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return gl ;
 	}
 
-	private boolean loadProgram( final GLDrawData _data )
+	/**
+		Attempt to acquire a compatible GLProgram from 
+		the ProgramManager. Make sure the GLProgram 
+		requested maps correctly with the ProgramMap 
+		defined in the GLDrawData object.
+	*/
+	private static boolean loadProgram( final GLDrawData _data )
 	{
 		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 		if( program == null )
@@ -866,12 +834,18 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final GLProgram glProgram = programs.get( program.getID() ) ;
 			if( glProgram == null )
 			{
+				// If the GLProgram is yet to exist then 
+				// _data will need to be run through the
+				// rendering cycle again.
 				_data.forceUpdate() ;
 				return false ;
 			}
 
 			if( glProgram.isValidMap( program.getMaps() ) == false )
 			{
+				// If a GLProgram exists but the mappings are 
+				// incompatible return false and prevent _data 
+				// from being rendered.
 				return false ;
 			}
 
@@ -884,6 +858,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected static Texture<GLImage> getTexture( final String _path )
 	{
 		return textures.get( _path ) ;
+	}
+
+	protected static GLFont getFont( final MalletFont _font )
+	{
+		return fontManager.get( _font ) ;
 	}
 
 	public static void handleError( final String _txt, final WebGLRenderingContext _gl )

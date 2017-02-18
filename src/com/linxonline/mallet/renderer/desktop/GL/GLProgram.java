@@ -199,9 +199,9 @@ public class GLProgram extends Resource
 
 			public boolean load( final GL3 _gl, final ProgramMap _data, final int _index )
 			{
-				final GLProgram program               = ( GLProgram )_data.getProgram() ;
-				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
-				final int inUniform                   = program.inUniforms[_index] ;
+				final GLProgram program              = ( GLProgram )_data.getProgram() ;
+				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
+				final int inUniform                  = program.inUniforms[_index] ;
 
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFont glFont = GLRenderer.getFont( font ) ;

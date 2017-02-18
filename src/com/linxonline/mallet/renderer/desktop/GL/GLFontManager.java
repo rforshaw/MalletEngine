@@ -58,6 +58,6 @@ public class GLFontManager extends AbstractManager<GLFont>
 	protected GLFont createResource( final MalletFont _font )
 	{
 		// Generate the Glyphs for the passed in characters
-		return gen.generateFont( _font, 5 ) ;
+		return gen.generateFont( _font ) ;
 	}
 }

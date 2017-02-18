@@ -17,13 +17,11 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLDrawData extends DrawData
 {
-	private final List<Texture<GLImage>> textures = MalletList.<Texture<GLImage>>newList() ;
+	private GLGeometryUploader.GLBuffer buffer   = null ;
+	private GLGeometryUploader.Location location = null ;
 
-	private GLGeometryUploader.GLBuffer buffer ;
-	private GLGeometryUploader.Location location ;
-
-	private Matrix4 drawMatrix    = new Matrix4() ;
-	private Shape drawShape       = null ;
+	private Matrix4 drawMatrix = new Matrix4() ;
+	private Shape drawShape    = null ;
 
 	private Matrix4 clipMatrix    = null ;
 	private Vector3 clipPosition  = null ;
@@ -44,33 +42,6 @@ public class GLDrawData extends DrawData
 		super( _type, _mode, _position, _offset, _rotation, _scale, _order ) ;
 	}
 
-	@Override
-	public void setFont( final MalletFont _font )
-	{
-		clearTextures() ;
-		super.setFont( _font ) ;
-	}
-
-	public void addTexture( final MalletTexture _texture )
-	{
-		super.addTexture( _texture ) ;
-	}
-
-	public void removeTexture( final MalletTexture _texture )
-	{
-		super.removeTexture( _texture ) ;
-	}
-
-	public void clearTextures()
-	{
-		for( final Texture<GLImage> texture : textures )
-		{
-			texture.unregister() ;
-		}
-		textures.clear() ;
-		getMalletTextures().clear() ;
-	}
-
 	public void setDrawShape( final Shape _shape )
 	{
 		drawShape = _shape ;
@@ -79,11 +50,6 @@ public class GLDrawData extends DrawData
 	public Shape getDrawShape()
 	{
 		return drawShape ;
-	}
-
-	public List<Texture<GLImage>> getGLTextures()
-	{
-		return textures ;
 	}
 
 	public void setClipProgram( final GLProgram _program )
@@ -167,14 +133,7 @@ public class GLDrawData extends DrawData
 	}
 
 	@Override
-	public void unregister()
-	{
-		for( final Texture<GLImage> texture : textures )
-		{
-			texture.unregister() ;
-		}
-		textures.clear() ;
-	}
+	public void unregister() {}
 
 	@Override
 	public void reset()
