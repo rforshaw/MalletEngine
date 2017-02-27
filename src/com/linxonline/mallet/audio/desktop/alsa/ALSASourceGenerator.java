@@ -63,7 +63,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 				openAL.alGenBuffers( 1, buffer, 0 ) ;
 				if( openAL.alGetError() != AL.AL_NO_ERROR )
 				{
-					System.out.println( "Failed to Generate Buffer" ) ;
+					System.out.println( "Failed to Generate Buffer." ) ;
 					return null ;
 				}
 
@@ -74,6 +74,12 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 												WAVHeader.getBitsPerSample( wav ) ) ;
 
 				openAL.alBufferData( buffer[0], format, data, size, freq ) ;
+				if( openAL.alGetError() != AL.AL_NO_ERROR )
+				{
+					System.out.println( "Failed to upload data to buffer." ) ;
+					return null ;
+				}
+
 				return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
 			}
 
@@ -124,7 +130,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 	public AudioSource createAudioSource( final String _file, final StreamType _type )
 	{
-		final AudioBuffer<ALSASound> sound = ( AudioBuffer<ALSASound> )staticSoundManager.get( _file ) ;
+		final AudioBuffer<ALSASound> sound = staticSoundManager.get( _file ) ;
 		if( sound == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;

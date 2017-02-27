@@ -31,6 +31,7 @@ public class JUI
 			{
 				final UIElement element = new UIElement() ;
 				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
 				final UIListener<UIElement> uiListener = JUI.<UIElement>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -51,6 +52,7 @@ public class JUI
 
 				final UILayout element = new UILayout( type ) ;
 				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
 				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -72,6 +74,7 @@ public class JUI
 
 				final UILayout element = UIFactory.constructWindowLayout( type ) ;
 				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
 				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -91,6 +94,7 @@ public class JUI
 			{
 				final UIButton element = new UIButton() ;
 				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
 				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -146,6 +150,7 @@ public class JUI
 
 				final UIMenu element = new UIMenu( UILayout.Type.derive( layout ), ( float )length ) ;
 				applyLookup( _map, element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
 				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -181,6 +186,7 @@ public class JUI
 			{
 				final UICheckbox element = new UICheckbox() ;
 				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
 				final UICheckbox.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
@@ -328,6 +334,11 @@ public class JUI
 		}
 	}
 
+	private static void applyLayer( final UIElement _element, final JSONObject _ui )
+	{
+		_element.setLayer( _ui.optInt( "LAYER", 0 ) ) ;
+	}
+	
 	private static void applyLengths( final UIElement _element, final JSONObject _ui )
 	{
 		{

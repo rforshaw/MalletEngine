@@ -27,6 +27,7 @@ import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.SourceCallback ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -49,7 +50,7 @@ public final class GameTestLoader extends GameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				for( int i = 0; i < 10; ++i )
 				{
@@ -305,12 +306,42 @@ public final class GameTestLoader extends GameLoader
 				{
 					public void callback( final AudioDelegate _delegate )
 					{
-						final Audio audio = AudioAssist.createAudio( "base/music/fairing-well.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
-						_delegate.addAudio( AudioAssist.play( audio ) ) ;
+						final Audio audio = AudioAssist.createAudio( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
+						_delegate.addAudio( AudioAssist.amendCallback( AudioAssist.play( audio ), new SourceCallback()
+						{
+							public void callbackRemoved() {}
+
+							public void start()
+							{
+								//System.out.println( "Audio start." ) ;
+							}
+
+							public void pause()
+							{
+								//System.out.println( "Audio pause." ) ;
+							}
+
+							public void stop()
+							{
+								//System.out.println( "Audio stop." ) ;
+							}
+
+							public void tick( final float _dt )
+							{
+								//System.out.println( "Audio Tick " + _dt ) ;
+							}
+
+							public void finished()
+							{
+								//System.out.println( "Audio Finished." ) ;
+								// Enable to loop test audio.
+								AudioAssist.play( audio ) ;
+							}
+						} ) ) ;
 					}
 				} ) ) ;
 
-				/*final OGG ogg = OGG.readOGG( "base/music/fairing-well.ogg" ) ;
+				/*final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
 				//System.out.println( ogg ) ;
 				final Vorbis vorbis = new Vorbis() ;
 				try

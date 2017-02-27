@@ -29,7 +29,7 @@ public class AudioSystem
 	private final List<AudioData> paused        = MalletList.<AudioData>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
-	protected AudioGenerator sourceGenerator = null ;											// Used to create the Source from a Sound Buffer
+	protected AudioGenerator sourceGenerator = null ;										// Used to create the Source from a Sound Buffer
 
 	public AudioSystem()
 	{
@@ -123,10 +123,7 @@ public class AudioSystem
 			{
 				for( final AudioData audio : toAddAudio )
 				{
-					final String path = audio.getFilePath() ;
-					final StreamType type = audio.getStreamType() ;
-
-					final AudioSource source = sourceGenerator.createAudioSource( path, type ) ;
+					final AudioSource source = loadSource( audio ) ;
 					if( source != null )
 					{
 						audio.setSource( source ) ;
@@ -157,7 +154,22 @@ public class AudioSystem
 			for( int i = 0; i < size; i++ )
 			{
 				final AudioData audio = active.get( i ) ;
-				final AudioSource source = audio.getSource() ;
+				AudioSource source = audio.getSource() ;
+				if( source == null )
+				{
+					source = loadSource( audio ) ;
+					if( source == null )
+					{
+						// The source has yet to be loaded or 
+						// doesn't exist, we'll keep trying to load.
+						break ;
+					}
+
+					audio.dirty = true ;
+					audio.setSource( source ) ;
+					active.add( audio ) ;
+				}
+
 				final SourceCallback callback = audio.getCallback() ;
 
 				if( audio.dirty == true )
@@ -409,5 +421,12 @@ public class AudioSystem
 		{
 			volumes.add( new Volume( new Category( _channel ), _volume ) ) ;
 		}
+	}
+
+	private AudioSource loadSource( final AudioData _audio )
+	{
+		final String path = _audio.getFilePath() ;
+		final StreamType type = _audio.getStreamType() ;
+		return sourceGenerator.createAudioSource( path, type ) ;
 	}
 }

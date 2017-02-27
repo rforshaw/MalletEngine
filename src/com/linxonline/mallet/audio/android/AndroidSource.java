@@ -46,20 +46,20 @@ public class AndroidSource implements AudioSource
 	public void play()
 	{
 		pause() ;
-		track.setPlaybackHeadPosition( getBufferOffset() < getBufferSize() ? getBufferOffset() : 0 ) ;
+		track.setPlaybackHeadPosition( getBufferFrameOffset() < getBufferSize() ? getBufferFrameOffset() : 0 ) ;
 		track.play() ;
 	}
 
 	public void playLoop()
 	{
 		pause() ;
-		track.setLoopPoints( getBufferOffset(), getBufferSize(), -1 ) ;
+		track.setLoopPoints( getBufferFrameOffset(), getBufferSize(), -1 ) ;
 		track.play() ;
 	}
 
 	public void pause()
 	{
-		if( isPlaying() == true )
+		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
 		{
 			track.pause() ;
 		}
@@ -67,8 +67,11 @@ public class AndroidSource implements AudioSource
 
 	public void stop()
 	{
-		if( isPlaying() == true )
+		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
 		{
+			track.pause() ;
+			track.flush() ;
+
 			track.stop() ;
 			track.setPlaybackHeadPosition( 0 ) ;
 		}
@@ -76,12 +79,12 @@ public class AndroidSource implements AudioSource
 
 	public boolean isPlaying()
 	{
-		return track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING ;
+		return track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING && getCurrentTime() < getDuration() ;
 	}
 
 	public float getCurrentTime()
 	{
-		final float offset = getBufferOffset() ;
+		final float offset = getBufferFrameOffset() ;
 		final float channels = getBufferChannels() ;
 		final float freq = getBufferFreq() ;
 
@@ -94,7 +97,7 @@ public class AndroidSource implements AudioSource
 		final float c = getBufferChannels() ;
 		final float f = getBufferFreq() ;
 
-		return s / c / f ;
+		return s / c / f / getBytesPerSample() ;
 	}
 
 	public void setVolume( final int _volume )
@@ -115,7 +118,7 @@ public class AndroidSource implements AudioSource
 		return bufferLength ;
 	}
 
-	private int getBufferOffset()
+	private int getBufferFrameOffset()
 	{
 		return track.getPlaybackHeadPosition() ;
 	}
@@ -133,5 +136,10 @@ public class AndroidSource implements AudioSource
 	private int getBufferFreq()
 	{
 		return header.samplerate ;
+	}
+	
+	private int getBytesPerSample()
+	{
+		return header.bitPerSample / 8 ;
 	}
 }

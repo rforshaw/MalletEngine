@@ -1,5 +1,8 @@
 package com.linxonline.mallet.audio ;
 
+import java.lang.ref.Reference ;
+import java.lang.ref.WeakReference ;
+
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
