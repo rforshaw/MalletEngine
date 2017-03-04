@@ -6,14 +6,13 @@
 			"TYPE" : "UIBUTTON",
 			"NAME" : "TestButton1",
 			"UILISTENER" : {
-				"TEXT": "Test 1",
+				"TEXT" : "Test 1",
 				"FONT" : "Arial",
 				"FONT_SIZE" : 33,
-				"RETAIN_RATIO": true,
-				"ALIGNMENT_X": "CENTRE", 
-				"ALIGNMENT_Y": "CENTRE",
-				"ALIGNMENT_TEXT_X": "CENTRE", 
-				"ALIGNMENT_TEXT_Y": "CENTRE",
+				"RETAIN_RATIO" : true,
+				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+				"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+				"COLOUR_TEXT" : "255, 0, 0",
 				"TEXTURE" : "base/textures/button_sheet.png",
 				"NEUTRAL_UV" : {
 					"MIN" : "0.0, 0.0",
@@ -36,10 +35,8 @@
 				"TEXT": "Test 2",
 				"FONT" : "Arial",
 				"FONT_SIZE" : 33,
-				"ALIGNMENT_X": "CENTRE", 
-				"ALIGNMENT_Y": "CENTRE",
-				"ALIGNMENT_TEXT_X": "CENTRE", 
-				"ALIGNMENT_TEXT_Y": "CENTRE",
+				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+				"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 				"TEXTURE" : "base/textures/button_sheet.png",
 				"NEUTRAL_UV" : {
 					"MIN" : "0.0, 0.0",
@@ -59,8 +56,7 @@
 			"TYPE" : "UICHECKBOX",
 			"NAME" : "TestCheckbox",
 			"UILISTENER" : {
-				"ALIGNMENT_X": "CENTRE", 
-				"ALIGNMENT_Y": "CENTRE",
+				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 				"RETAIN_RATIO": "true",
 				"TEXTURE" : "base/textures/checkbox_sheet.png",
 				"NEUTRAL_UV" : {

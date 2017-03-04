@@ -147,6 +147,39 @@ public class MalletColour
 		buffer.append( " A: " ) ; buffer.append( getAlpha() ) ;
 		return buffer.toString() ;
 	}
+
+	public static final MalletColour parseColour( final String _text )
+	{
+		if( _text == null )
+		{
+			return null ;
+		}
+
+		if( _text.isEmpty() == true )
+		{
+			return null ;
+		}
+
+		final String[] split = _text.split( "," ) ;
+		int red    = 255 ;
+		int green  = 255 ;
+		int blue   = 255 ;
+		int alpha  = 255 ;
+
+		if( split.length >= 3 )
+		{
+			red   = Integer.parseInt( split[0].trim() ) ;
+			green = Integer.parseInt( split[1].trim() ) ;
+			blue  = Integer.parseInt( split[2].trim() ) ;
+		}
+
+		if( split.length >= 4 )
+		{
+			alpha = Integer.parseInt( split[3].trim() ) ;
+		}
+
+		return new MalletColour( red, green, blue, alpha ) ;
+	}
 	
 	public static MalletColour white()
 	{

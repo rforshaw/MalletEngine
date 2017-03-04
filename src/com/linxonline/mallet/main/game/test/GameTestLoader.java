@@ -136,7 +136,7 @@ public final class GameTestLoader extends GameLoader
 
 							CameraAssist.amendOrthographic( cam, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
-							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
+							CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 						}
 					
 						{
@@ -284,7 +284,7 @@ public final class GameTestLoader extends GameLoader
 					@Override
 					public void callback( final DrawDelegate<World, Draw> _delegate )
 					{
-						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
+						final Draw draw = DrawAssist.createTextDraw( "Hello\nworld!",
 																	 new MalletFont( "Arial" ),
 																	 new Vector3( 0.0f, -80.0f, 0.0f ),
 																	 new Vector3( 0, 0, 0 ),

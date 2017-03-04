@@ -12,14 +12,33 @@ public final class WAVHeader
 
 	private WAVHeader() {}
 
+	public String toString()
+	{
+		final StringBuilder buffer = new StringBuilder() ;
+		buffer.append( "Length: " ) ;
+		buffer.append( length ) ;
+		buffer.append( '\n' ) ;
+		buffer.append( "BitsPerSample: " ) ;
+		buffer.append( bitPerSample ) ;
+		buffer.append( '\n' ) ;
+		buffer.append( "Samplerate: " ) ;
+		buffer.append( samplerate ) ;
+		buffer.append( '\n' ) ;
+		buffer.append( "Channels: " ) ;
+		buffer.append( channels ) ;
+		buffer.append( '\n' ) ;
+
+		return buffer.toString() ;
+	}
+
 	public static WAVHeader getHeader( final byte[] _buffer )
 	{
 		final WAVHeader header = new WAVHeader() ;
-		header.startPoint = getDataStartPoint( _buffer ) ;
-		header.length = getDataSize( _buffer ) ;
-		header.bitPerSample = getBitsPerSample( _buffer ) ;
-		header.samplerate = getSampleRate( _buffer ) ;
-		header.channels = getChannels( _buffer ) ;
+		header.startPoint      = getDataStartPoint( _buffer ) ;
+		header.length          = getDataSize( _buffer ) ;
+		header.bitPerSample    = getBitsPerSample( _buffer ) ;
+		header.samplerate      = getSampleRate( _buffer ) ;
+		header.channels        = getChannels( _buffer ) ;
 		return header ;
 	}
 
@@ -49,6 +68,7 @@ public final class WAVHeader
 		int pos = getDataStartPoint( _soundBuffer ) - 4 ;
 		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
 		final int size = ConvertBytes.toInt( _soundBuffer, pos, 4 ) ;
+		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
 		pos += 4 ;
 
 		return size ;
@@ -57,18 +77,24 @@ public final class WAVHeader
 	public static short getBitsPerSample( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 34, 2 ) ;
-		return ConvertBytes.toShort( _soundBuffer, 34, 2 ) ;
+		final short bitsPerSample = ConvertBytes.toShort( _soundBuffer, 34, 2 ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 34, 2 ) ;
+		return bitsPerSample ;
 	}
 
 	public static int getSampleRate( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 24, 4 ) ;
-		return ConvertBytes.toInt( _soundBuffer, 24, 4 ) ;
+		final int samplerate = ConvertBytes.toInt( _soundBuffer, 24, 4 ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 24, 4 ) ;
+		return samplerate ;
 	}
 
 	public static short getChannels( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 22, 2 ) ;
-		return ConvertBytes.toShort( _soundBuffer, 22, 2 ) ;
+		final short channels = ConvertBytes.toShort( _soundBuffer, 22, 2 ) ;
+		ConvertBytes.flipEndian( _soundBuffer, 22, 2 ) ;
+		return channels ;
 	}
 }

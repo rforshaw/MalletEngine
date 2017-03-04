@@ -123,7 +123,7 @@ public class UICheckbox extends UIElement
 			super.addDraws( _delegate ) ;
 			if( drawTick != null && getParent().isChecked() )
 			{
-				_delegate.addBasicDraw( drawTick ) ;
+				_delegate.addBasicDraw( drawTick, getWorld() ) ;
 			}
 		}
 

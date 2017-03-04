@@ -50,6 +50,15 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 	public abstract void addDraws( final DrawDelegate<World, Draw> _delegate ) ;
 
 	/**
+		Return the world this UIListener is expected to use.
+		The world to be used comes from the parent UIElement.
+	*/
+	public World getWorld()
+	{
+		return getParent().getWorld() ;
+	}
+
+	/**
 		Returns valid DrawDelegate, return null if no 
 		Render System has yet to respond to DrawDelgate request.
 	*/

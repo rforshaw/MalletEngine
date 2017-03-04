@@ -11,6 +11,7 @@ import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
@@ -138,6 +139,7 @@ public final class UIFactory
 
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
+		private MalletColour colour = MalletColour.white() ;
 
 		private final MalletTexture sheet ;
 		private final UIElement.UV uv ;
@@ -183,6 +185,11 @@ public final class UIFactory
 			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
 		}
 
+		public void setTextColour( final MalletColour _colour )
+		{
+			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+		}
+
 		public StringBuilder getText()
 		{
 			return text ;
@@ -225,6 +232,7 @@ public final class UIFactory
 													textOffset,
 													new Vector3(),
 													new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
+				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;
 				DrawAssist.attachProgram( drawText, ProgramAssist.create( "SIMPLE_FONT" ) ) ;
 			}
@@ -237,12 +245,12 @@ public final class UIFactory
 		{
 			if( draw != null )
 			{
-				_delegate.addBasicDraw( draw ) ;
+				_delegate.addBasicDraw( draw, getWorld() ) ;
 			}
 
 			if( drawText != null )
 			{
-				_delegate.addTextDraw( drawText ) ;
+				_delegate.addTextDraw( drawText, getWorld() ) ;
 			}
 		}
 

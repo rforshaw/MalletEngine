@@ -4,6 +4,9 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
+import com.linxonline.mallet.renderer.WorldAssist ;
+import com.linxonline.mallet.renderer.World ;
+
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -32,6 +35,7 @@ public class UIElement implements InputHandler
 
 	public boolean destroy = false ;
 
+	private World world = WorldAssist.getDefaultWorld() ;
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
@@ -395,6 +399,11 @@ public class UIElement implements InputHandler
 		margin.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
 	}
 
+	public void setWorld( final World _world )
+	{
+		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
+	}
+
 	public void setLayer( final int _layer )
 	{
 		layer = _layer ;
@@ -535,6 +544,11 @@ public class UIElement implements InputHandler
 	public Vector3 getMargin()
 	{
 		return margin ;
+	}
+
+	public World getWorld()
+	{
+		return world ;
 	}
 
 	public int getLayer()

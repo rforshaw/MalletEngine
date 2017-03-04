@@ -850,6 +850,7 @@ public class GLGeometryUploader
 			for( int i = 0; i < length; i++ )
 			{
 				final char c = text.charAt( i ) ;
+
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
 

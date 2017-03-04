@@ -45,6 +45,7 @@ public class AndroidFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}
@@ -57,6 +58,7 @@ public class AndroidFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 	}

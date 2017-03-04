@@ -13,6 +13,7 @@ import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 
 /**
@@ -133,10 +134,27 @@ public class JUI
 
 				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
 				listener.setRetainRatio( retainRatio ) ;
-				listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
-									   UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
-				listener.setTextAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_X", null ) ),
-										   UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_Y", null ) ) ) ;
+
+				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
 				return listener ;
 			}
 		} ) ;
@@ -220,9 +238,41 @@ public class JUI
 
 				final UICheckbox.UIListener listener = UICheckbox.createUIListener( texture, neutralUV, rolloverUV, tickUV ) ;
 				listener.setRetainRatio( retainRatio ) ;
-				listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
-									   UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
+
+				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
 				return listener ;
+			}
+		} ) ;
+
+		creators.put( "UILIST", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final String layout = _ui.optString( "LAYOUT", null ) ;
+				final double length = _ui.optDouble( "LENGTH", 0.0 ) ;
+
+				final UIMenu element = new UIMenu( UILayout.Type.derive( layout ), ( float )length ) ;
+				applyLookup( _map, element, _ui ) ;
+				applyLayer( element, _ui ) ;
+				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
+
+				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
+				return element ;
 			}
 		} ) ;
 	}
@@ -334,12 +384,12 @@ public class JUI
 		}
 	}
 
-	private static void applyLayer( final UIElement _element, final JSONObject _ui )
+	public static void applyLayer( final UIElement _element, final JSONObject _ui )
 	{
 		_element.setLayer( _ui.optInt( "LAYER", 0 ) ) ;
 	}
 	
-	private static void applyLengths( final UIElement _element, final JSONObject _ui )
+	public static void applyLengths( final UIElement _element, final JSONObject _ui )
 	{
 		{
 			final Vector3 minLength = Vector3.parseVector3( _ui.optString( "MIN_LENGTH", null ) ) ;
@@ -366,7 +416,7 @@ public class JUI
 		}
 	}
 
-	private static void applyLookup( final JUI _map, final UIElement _element, final JSONObject _ui )
+	public static void applyLookup( final JUI _map, final UIElement _element, final JSONObject _ui )
 	{
 		final String name = _ui.optString( "NAME", null ) ;
 		if( name != null )
@@ -379,7 +429,7 @@ public class JUI
 		}
 	}
 
-	private static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui )
+	public static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
@@ -399,14 +449,31 @@ public class JUI
 
 		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( text, font, texture, uv ) ;
 		listener.setRetainRatio( retainRatio ) ;
-		listener.setAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_X", null ) ),
-								UI.Alignment.derive( _ui.optString( "ALIGNMENT_Y", null ) ) ) ;
-		listener.setTextAlignment( UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_X", null ) ),
-									UI.Alignment.derive( _ui.optString( "ALIGNMENT_TEXT_Y", null ) ) ) ;
+
+		listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+		{
+			final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+			if( align != null )
+			{
+				listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+									   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+			}
+		}
+
+		{
+			final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
+			if( align != null )
+			{
+				listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+									   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+			}
+		}
+
 		return listener ;
 	}
 
-	private static UIElement.UV createUV( final JSONObject _uv )
+	public static UIElement.UV createUV( final JSONObject _uv )
 	{
 		if( _uv == null )
 		{
@@ -418,6 +485,7 @@ public class JUI
 		return new UIElement.UV( min, max ) ;
 	}
 
+	
 	public interface Generator
 	{
 		public UIElement create( final JUI _map, final JSONObject _ui ) ;
