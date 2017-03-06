@@ -12,16 +12,27 @@ public class ALSASound implements SoundInterface
 {
 	private final AL openAL ;			// Used to destroy buffer
 	private final int[] buffer ;		// Buffer id to audio-stream
+	private final int consumption ;		// Buffer size
 
-	public ALSASound( final int[] _buffer, final AL _openAL )
+	public ALSASound( final int[] _buffer, final int _consumption, final AL _openAL )
 	{
 		openAL = _openAL ;
 		buffer = _buffer ;
+		consumption = _consumption ;
 	}
 
 	public int[] getBufferID()
 	{
 		return buffer ;
+	}
+
+	/**
+		Return the audio buffer size in bytes.
+	*/
+	@Override
+	public long getMemoryConsumption()
+	{
+		return consumption ;
 	}
 
 	/**

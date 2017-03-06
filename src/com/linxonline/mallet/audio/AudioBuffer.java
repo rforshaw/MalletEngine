@@ -25,6 +25,12 @@ public final class AudioBuffer<T extends SoundInterface> extends Resource
 	}
 
 	@Override
+	public long getMemoryConsumption()
+	{
+		return buffer.getMemoryConsumption() ;
+	}
+
+	@Override
 	public void destroy()
 	{
 		buffer.destroy() ;

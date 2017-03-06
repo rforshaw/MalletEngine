@@ -16,14 +16,9 @@ public class GLFontManager extends AbstractManager<GLFont>
 		gen = new GLFontGenerator( _manager ) ;
 	}
 
-	@Override
-	public GLFont get( final String _key, final String _file )
-	{
-		System.out.println( "GLFontManager: get( _key, _file ). Not implemented yet." ) ;
-		assert( true ) ;
-		return null ;
-	}
-
+	/**
+		Use to load a ttf font into the system.
+	*/
 	@Override
 	public GLFont get( final String _file )
 	{
@@ -43,8 +38,7 @@ public class GLFontManager extends AbstractManager<GLFont>
 		final GLFont resource = createResource( _font ) ;
 		if( resource != null )
 		{
-			add( id, resource ) ;
-			resource.register() ;
+			put( id, resource ) ;
 		}
 
 		return resource ;

@@ -762,10 +762,10 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		gl.glFrontFace( GL3.GL_CCW ) ;
 
 		System.out.println( "Building default shaders.." ) ;
-		programs.get( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
-		programs.get( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
-		programs.get( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
-		programs.get( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
+		programs.load( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
+		programs.load( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
+		programs.load( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
+		programs.load( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.

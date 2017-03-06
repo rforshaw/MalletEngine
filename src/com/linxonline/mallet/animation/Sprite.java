@@ -14,7 +14,7 @@ public final class Sprite extends Resource
 
 	public Sprite()
 	{
-		framerate = 30 ;
+		this( 30 ) ;
 	}
 
 	public Sprite( final int _framerate )
@@ -38,6 +38,15 @@ public final class Sprite extends Resource
 	public final Sprite.Frame getFrame( final int _i )
 	{
 		return frames.get( _i ) ;
+	}
+
+	/**
+		Return the audio buffer size in bytes.
+	*/
+	@Override
+	public long getMemoryConsumption()
+	{
+		return 0L ;
 	}
 
 	@Override

@@ -28,9 +28,6 @@ import com.linxonline.mallet.renderer.texture.* ;
 
 public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 {
-	// Used when a texture is being loaded, but not yet available.
-	private static final Texture<GLImage> PLACEHOLDER = new Texture<GLImage>( null ) ;
-
 	/**
 		When loading a texture the TextureManager will stream the 
 		image content a-synchronously.
@@ -61,19 +58,14 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 				return true ;
 			}
 
-			public Texture<GLImage> load( final String _file, final Settings _settings )
-			{
-				return loadTextureASync( _file ) ;
-			}
-
-			protected Texture<GLImage> loadTextureASync( final String _file )
+			public Texture<GLImage> load( final String _file )
 			{
 				// We want to allocate the key for the resource so the texture 
 				// is not reloaded if another object wishes to use it before 
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
-				// available to render/
-				add( _file, PLACEHOLDER ) ;
+				// available to render
+				put( _file, null ) ;
 
 				final TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
 				load.start() ;
@@ -92,18 +84,17 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			for( final Tuple<String, BufferedImage> tuple : toBind )
+			if( toBind.isEmpty() == false )
 			{
-				add( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+				for( final Tuple<String, BufferedImage> tuple : toBind )
+				{
+					put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+				}
+				toBind.clear() ;
 			}
-			toBind.clear() ;
 		}
 
-		final Texture<GLImage> texture = super.get( _file ) ;
-
-		// PLACEHOLDER is used to prevent the texture loader 
-		// loading the same texture twice when loading async, 
-		return ( texture != PLACEHOLDER ) ? texture : null ;
+		return super.get( _file ) ;
 	}
 
 	/**
@@ -197,7 +188,8 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		gl.glBindTexture( GL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
-		return new Texture<GLImage>( new GLImage( textureID, width, height ) ) ;
+		final long estimatedConsumption = width * height * ( channels * 8 ) ;
+		return new Texture<GLImage>( new GLImage( textureID, estimatedConsumption  ) ) ;
 	}
 
 	private int getGLInternalFormat( final int _channels, final InternalFormat _format )

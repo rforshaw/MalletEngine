@@ -48,7 +48,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
-			public AudioBuffer<ALSASound> load( final String _file, final Settings _settings )
+			public AudioBuffer<ALSASound> load( final String _file )
 			{
 				final byte[] wav = ByteReader.readBytes( _file ) ;
 				if( wav == null )
@@ -80,7 +80,7 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 					return null ;
 				}
 
-				return new AudioBuffer<ALSASound>( new ALSASound( buffer, openAL ) ) ;
+				return new AudioBuffer<ALSASound>( new ALSASound( buffer, size, openAL ) ) ;
 			}
 
 			private int getALFormat( final int _channels, final int _bitsPerSample )

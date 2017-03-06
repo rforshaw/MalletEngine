@@ -191,11 +191,6 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 			callbacks.get( i ).callbackRemoved() ;
 		}
 		callbacks.clear() ;
-
-		if( sprite != null )
-		{
-			sprite.unregister() ;
-		}
 	}
 
 	@Override

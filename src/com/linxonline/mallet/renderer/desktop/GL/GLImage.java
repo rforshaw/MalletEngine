@@ -10,26 +10,13 @@ import com.linxonline.mallet.renderer.texture.ImageInterface ;
 public class GLImage implements ImageInterface
 {
 	public final int[] textureIDs ;			// Buffer ID for openGL
-	private final int width ;				// Width of texture
-	private final int height ;				// Height of texture
+	public final long consumption ;
 
-	public GLImage( final int _textureID, final int _width, final int _height )
+	public GLImage( final int _textureID, final long _consumption )
 	{
 		textureIDs = new int[1] ;
 		textureIDs[0] = _textureID ;
-
-		width = _width ;
-		height = _height ;
-	}
-
-	public final int getWidth()
-	{
-		return width ;
-	}
-
-	public final int getHeight()
-	{
-		return height ;
+		consumption = _consumption ;
 	}
 
 	@Override
@@ -70,6 +57,12 @@ public class GLImage implements ImageInterface
 	public int hashCode()
 	{
 		return Arrays.hashCode( textureIDs ) ;
+	}
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		return consumption ;
 	}
 
 	public final void destroy()

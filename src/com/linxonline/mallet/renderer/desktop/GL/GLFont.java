@@ -41,6 +41,12 @@ public class GLFont extends Resource
 	}
 
 	@Override
+	public long getMemoryConsumption()
+	{
+		return texture.getMemoryConsumption() ;
+	}
+
+	@Override
 	public void destroy()
 	{
 		texture.destroy() ;

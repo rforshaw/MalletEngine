@@ -14,8 +14,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 **/
 public abstract class Resource
 {
-	private long creationTime = 0 ;			// When was the resource created
-	private int count = 0 ;					// How many are referencing it
+	private long creationTime = 0L ;			// When was the resource created
 
 	protected Resource()
 	{
@@ -25,7 +24,7 @@ public abstract class Resource
 	/**
 		How long has the Resource existed
 	**/
-	public synchronized final long getLivingTime()
+	public final long getLivingTime()
 	{
 		return ElapsedTimer.getTotalElapsedTimeInSeconds() - creationTime ;
 	}
@@ -33,29 +32,13 @@ public abstract class Resource
 	/**
 		When was the Resource created.
 	**/
-	public synchronized final long getCreationTime()
+	public final long getCreationTime()
 	{
 		return creationTime ;
 	}
 
-	/**
-		How many are using this resource
-	**/
-	public synchronized final int getReferenceCount()
-	{
-		return count ;
-	}
-
-	public synchronized final void register()
-	{
-		++count ;
-	}
+	public abstract long getMemoryConsumption() ;
 	
-	public synchronized final void unregister()
-	{
-		--count ;
-	}
-
 	/**
 		If a Resource is hooked to an underlying system, for example the 
 		buffer in an ALSASound, then use destroy to unhook it.

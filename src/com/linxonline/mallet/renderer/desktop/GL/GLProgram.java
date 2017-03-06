@@ -379,6 +379,17 @@ public class GLProgram extends Resource
 	}
 
 	@Override
+	public long getMemoryConsumption()
+	{
+		long consumption = 0L ;
+		for( final GLShader shader : shaders )
+		{
+			consumption += shader.getMemoryConsumption() ;
+		}
+		return consumption ;
+	}
+
+	@Override
 	public void destroy() {}
 
 	@Override

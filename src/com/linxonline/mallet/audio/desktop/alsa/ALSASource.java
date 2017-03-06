@@ -110,8 +110,6 @@ public class ALSASource implements AudioSource
 		{
 			System.out.println( "Failed to delete source" ) ;
 		}
-
-		buffer.unregister() ;
 	}
 
 	private int getBufferSize()

@@ -17,51 +17,10 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	public AbstractManager() {}
 
 	@Override
-	public boolean add( final String _key, final T _value )
+	public T put( final String _key, final T _value  )
 	{
 		resources.put( _key, _value ) ;
-		return true ;
-	}
-
-	/**
-		Load the resource specified by file path and associate 
-		it with _key for future reference.
-	*/
-	@Override
-	public T get( final String _key, final String _file )
-	{
-		if( exists( _key ) == true )
-		{
-			final T resource = resources.get( _key ) ;
-			if( resource != null )
-			{
-				// If the resource has already been loaded 
-				// increment resource count and return resource
-				resource.register() ;
-				return resource ;
-			}
-
-			// The key has been assigned to a resource 
-			// that is currently being loaded async.
-			// We don't want to load a resource that is 
-			// currently being loaded.
-			return null ;
-		}
-
-		// If the resource doesn't exist create the resource 
-		// using the appropriate resource loader.
-		final T resource = createResource( _file, null ) ;
-		if( resource != null )
-		{
-			// If the resource was successfully created, 
-			// add it to the manager, increment the resource 
-			// count and return, if no resource was created 
-			// simply return null
-			add( _key, resource ) ;
-			resource.register() ;			// Increment usage count
-		}
-
-		return resource ;
+		return _value ;
 	}
 
 	/**
@@ -71,29 +30,16 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	@Override
 	public T get( final String _file )
 	{
-		T resource = resources.get( _file ) ;
-		if( resource != null )
+		if( exists( _file ) == true )
 		{
-			// If the resource has already been loaded 
-			// increment resource count and return resource
-			resource.register() ;
-			return resource ;
+			// May still return a null resource but
+			// the key has been assigned.
+			return resources.get( _file ) ;
 		}
 
 		// If the resource doesn't exist create the resource 
 		// using the appropriate resource loader.
-		resource = createResource( _file, null ) ;
-		if( resource != null )
-		{
-			// If the resource was successfully created, 
-			// add it to the manager, increment the resource 
-			// count and return, if no resource was created 
-			// simply return null
-			add( _file, resource ) ;
-			resource.register() ;			// Increment usage count
-		}
-
-		return resource ;
+		return createResource( _file ) ;
 	}
 
 	@Override
@@ -102,9 +48,23 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		return abstractLoader ;
 	}
 
-	protected T createResource( final String _file, final Settings _settings )
+	@Override
+	public long getMemoryConsumption()
 	{
-		return abstractLoader.load( _file, _settings ) ;
+		long consumption = 0L ;
+
+		final Collection<T> res = resources.values() ;
+		for( final Resource resource : res )
+		{
+			consumption += resource.getMemoryConsumption() ;
+		}
+
+		return consumption ;
+	}
+
+	protected T createResource( final String _file )
+	{
+		return abstractLoader.load( _file ) ;
 	}
 
 	/**
@@ -113,7 +73,8 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 	@Override
 	public void clean()
 	{
-		ManageResources.removeUnwantedResources( resources ) ;
+		final List<T> remove = MalletList.<T>newList() ;
+
 	}
 
 	/**
@@ -169,6 +130,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 
 		public AbstractLoader() {}
 
+		@Override
 		public void add( final ResourceDelegate<T> _delegate )
 		{
 			if( loaders.contains( _delegate ) == false )
@@ -177,6 +139,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 			}
 		}
 
+		@Override
 		public void remove( final ResourceDelegate<T> _delegate )
 		{
 			if( loaders.contains( _delegate ) == true )
@@ -185,9 +148,10 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 			}
 		}
 
-		public T load( final String _file, final Settings _settings )
+		@Override
+		public T load( final String _file )
 		{
-			assert _file != null ;			// _file must not be null, _settings can be null
+			assert _file != null ;			// _file must not be null
 
 			final int length = loaders.size() ;
 			for( int i = 0; i < length; ++i )
@@ -195,7 +159,7 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 				final ResourceDelegate<T> delegate = loaders.get( i ) ;
 				if( delegate.isLoadable( _file ) == true )
 				{
-					return delegate.load( _file, _settings ) ;
+					return delegate.load( _file ) ;
 				}
 			}
 

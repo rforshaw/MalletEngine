@@ -25,7 +25,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 				Framerate
 				image/location
 			*/
-			public Sprite load( final String _file, final Settings _settings )
+			public Sprite load( final String _file )
 			{
 				final List<String> texts = TextReader.getTextAsArray( _file ) ;
 				if( texts.size() == 0 )

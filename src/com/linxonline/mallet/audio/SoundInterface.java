@@ -7,5 +7,6 @@ package com.linxonline.mallet.audio ;
 */
 public interface SoundInterface<T>
 {
-	public void destroy() ;			// Allows the audio-buffer/stream to be destroyed
+	public long getMemoryConsumption() ;	// buffer size in bytes
+	public void destroy() ;					// Allows the audio-buffer/stream to be destroyed
 }
