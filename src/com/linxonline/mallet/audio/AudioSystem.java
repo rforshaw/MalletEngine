@@ -1,6 +1,8 @@
 package com.linxonline.mallet.audio ;
 
 import java.util.List ;
+import java.util.Set ;
+import java.util.HashSet ;
 
 import com.linxonline.mallet.system.GlobalConfig ;
 
@@ -52,9 +54,26 @@ public class AudioSystem
 		{
 			public void processEvent( final Event _event )
 			{
-				if( sourceGenerator != null )
+				if( sourceGenerator == null )
 				{
-					sourceGenerator.clean() ;
+					return ;
+				}
+
+				final Set<String> activeKeys = new HashSet<String>() ;
+				getActiveKeys( activeKeys, toAddAudio ) ;
+				getActiveKeys( activeKeys, active ) ;
+
+				sourceGenerator.clean( activeKeys ) ;
+			}
+
+			private void getActiveKeys( final Set<String> _keys, final List<AudioData> _audio )
+			{
+				for( final AudioData audio : _audio )
+				{
+					if( audio.stop == false )
+					{
+						_keys.add( audio.getFilePath() ) ;
+					}
 				}
 			}
 		} ) ;

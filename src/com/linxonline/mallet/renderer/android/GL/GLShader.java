@@ -24,6 +24,12 @@ public class GLShader extends Resource
 	}
 
 	@Override
+	public long getMemoryConsumption()
+	{
+		return 0L ;
+	}
+
+	@Override
 	public void destroy()
 	{
 		// Shaders are destroyed once they've been 

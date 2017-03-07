@@ -22,7 +22,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final GLProgram PLACEHOLDER = new GLProgram( "PLACEHOLDER", null, null, null ) ;
 	private final List<GLProgram> toBind = MalletList.<GLProgram>newList() ;
 
 	public GLProgramManager()
@@ -35,7 +34,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				return GlobalFileSystem.isExtension( _file, ".jgl", ".JGL" ) ;
 			}
 
-			public GLProgram load( final String _file, final Settings _settings )
+			public GLProgram load( final String _file )
 			{
 				final FileStream stream = GlobalFileSystem.getFile( _file ) ;
 				if( stream.exists() == false )
@@ -44,7 +43,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					return null ;
 				}
 
-				add( _file, PLACEHOLDER ) ;
 				JSONObject.construct( stream, new JSONObject.ConstructCallback()
 				{
 					public void callback( final JSONObject _obj )
@@ -59,11 +57,11 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			private void generateGLProgram( final JSONObject _jGL )
 			{
 				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
-				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList();
+				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList() ;
 
-				fill( paths, _jGL.getJSONArray( "VERTEX" ), GLES30.GL_VERTEX_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "VERTEX" ),     GLES30.GL_VERTEX_SHADER ) ;
 				//fill( paths, _jGL.getJSONArray( "GEOMETRY" ), GLES30.GL_GEOMETRY_SHADER ) ;
-				fill( paths, _jGL.getJSONArray( "FRAGMENT" ), GLES30.GL_FRAGMENT_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "FRAGMENT" ),   GLES30.GL_FRAGMENT_SHADER ) ;
 
 				final List<Tuple<String, Uniform>> uniforms = MalletList.<Tuple<String, Uniform>>newList() ;
 				final List<String> swivel = MalletList.<String>newList() ;
@@ -189,6 +187,17 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		} ) ;
 	}
 
+	/**
+		Load the specified shader and map it to the 
+		passed int key.
+		Use the key with get() to retrieve the GLProgram.
+	*/
+	public void load( final String _key, final String _file )
+	{
+		put( _key, null ) ;
+		createResource( _file ) ;
+	}
+
 	@Override
 	public GLProgram get( final String _key )
 	{
@@ -207,17 +216,13 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 						System.out.println( "Failed to compile program: " + program.name ) ;
 						GLProgramManager.deleteProgram( program ) ;
 					}
-					add( program.name, program ) ;
+					put( program.name, program ) ;
 				}
 				toBind.clear() ;
 			}
 		}
 
-		final GLProgram program = super.get( _key ) ;
-
-		// PLACEHOLDER is used to prevent the program loader 
-		// loading the same program twice when loading async, 
-		return ( program != PLACEHOLDER ) ? program : null ;
+		return super.get( _key ) ;
 	}
 
 	public static void deleteProgram( final GLProgram _program )

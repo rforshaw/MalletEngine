@@ -1,6 +1,8 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.List ;
+import java.util.Set ;
+import java.util.HashSet ;
 
 import android.opengl.GLES30 ;
 import android.opengl.EGL14 ;
@@ -27,7 +29,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
-	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
 	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
@@ -112,10 +113,10 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		GLES30.glFrontFace( GLES30.GL_CCW ) ;
 
 		System.out.println( "Building default shaders.." ) ;
-		programs.get( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
-		programs.get( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
-		programs.get( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
-		//programs.get( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
+		programs.load( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
+		programs.load( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
+		programs.load( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
+		//programs.load( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.
@@ -631,7 +632,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
@@ -688,7 +689,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 				positionMatrix.setIdentity() ;
 
-				positionMatrix.translate( position.x, position.y, 0.0f ) ;
+				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
 				positionMatrix.rotate( rotate.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
@@ -816,10 +817,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public void clean()
 	{
-		getWorldState().clean() ;
-		programs.clean() ;
-		textures.clean() ;
-		fontManager.clean() ;
+		final Set<String> activeKeys = new HashSet<String>() ;
+		getWorldState().clean( activeKeys ) ;
+
+		programs.clean( activeKeys ) ;
+		textures.clean( activeKeys ) ;
+		fontManager.clean( activeKeys ) ;
 	}
 
 	private boolean loadProgram( final GLDrawData _data )

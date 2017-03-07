@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import android.opengl.GLES30 ;
+import java.util.Set ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
@@ -31,12 +31,12 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 		}
 	}
 
-	public void clean()
+	public void clean( final Set<String> _activeKeys )
 	{
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			current.get( i ).clean() ;
+			current.get( i ).clean( _activeKeys ) ;
 		}
 	}
 

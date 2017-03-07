@@ -1,35 +1,69 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
+import java.util.Arrays ;
+
 import android.opengl.GLES20 ;
 
 import com.linxonline.mallet.renderer.texture.ImageInterface ;
 
 public class GLImage implements ImageInterface
 {
-	public int[] textureIDs ;				// Buffer ID for openGL
-	private final int width ;				// Width of texture
-	private final int height ;				// Height of texture
+	public final int[] textureIDs ;			// Buffer ID for openGL
+	public final long consumption ;
 
-	public GLImage( final int _textureID, final int _width, final int _height )
+	public GLImage( final int _textureID, final long _consumption )
 	{
 		textureIDs = new int[1] ;
 		textureIDs[0] = _textureID ;
-
-		width = _width ;
-		height = _height ;
-	}
-
-	public final int getWidth()
-	{
-		return width ;
-	}
-
-	public final int getHeight()
-	{
-		return height ;
+		consumption = _consumption ;
 	}
 
 	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj instanceof GLImage )
+		{
+			final GLImage image = ( GLImage )_obj ;
+			if( textureIDs.length != image.textureIDs.length )
+			{
+				return false ;
+			}
+
+			final int size = textureIDs.length ;
+			for( int i = 0; i < size; i++ )
+			{
+				if( textureIDs[i] != image.textureIDs[i] )
+				{
+					return false ;
+				}
+			}
+		}
+
+		return true ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Arrays.hashCode( textureIDs ) ;
+	}
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		return consumption ;
+	}
+
 	public final void destroy()
 	{
 		GLES20.glDeleteTextures( 1, textureIDs, 0 ) ;

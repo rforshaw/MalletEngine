@@ -267,6 +267,9 @@ public final class GameTestLoader extends GameLoader
 						{
 							elapsed = 0.0f ;
 							anim.playAnimation( "DEFAULT" ) ;
+
+							eventSystem.addEvent( DrawAssist.constructDrawClean() ) ;
+							eventSystem.addEvent( AudioAssist.constructAudioClean() ) ;
 						}
 					}
 				} ) ;

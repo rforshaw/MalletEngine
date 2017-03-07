@@ -16,5 +16,14 @@ public class AndroidSound implements SoundInterface
 		return buffer ;
 	}
 
+	/**
+		Return the audio buffer size in bytes.
+	*/
+	@Override
+	public long getMemoryConsumption()
+	{
+		return buffer.length ;
+	}
+
 	public void destroy() {}
 }

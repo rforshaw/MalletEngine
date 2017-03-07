@@ -1,5 +1,7 @@
 package com.linxonline.mallet.audio ;
 
+import java.util.Set ;
+
 public interface AudioGenerator<T extends SoundInterface>
 {
 	/**
@@ -15,7 +17,7 @@ public interface AudioGenerator<T extends SoundInterface>
 	**/
 	public AudioSource createAudioSource( final String _file, final StreamType _type ) ;
 
-	public void clean() ;
+	public void clean( final Set<String> _activeKeys ) ;
 
 	public void clear() ;
 }

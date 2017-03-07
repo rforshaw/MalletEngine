@@ -1,5 +1,8 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
+import java.util.Set ;
+import java.util.List ;
+
 import android.opengl.GLES30 ;
 
 import com.linxonline.mallet.maths.* ;
@@ -42,8 +45,21 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		uploader.draw( _worldProjection, _uiProjection ) ;
 	}
 
-	public void clean()
+	/**
+		Return a list of resources currently being used.
+		Take the opportunity to also clear uploader 
+		of empty buffers.
+	*/
+	public void clean( final Set<String> _activeKeys )
 	{
+		final DrawState<GLDrawData> state = getDrawState() ;
+		final List<GLDrawData> list = state.getNewState() ;
+
+		for( final GLDrawData draw : list )
+		{
+			draw.getUsedResources( _activeKeys ) ;
+		}
+
 		uploader.clean() ;
 	}
 

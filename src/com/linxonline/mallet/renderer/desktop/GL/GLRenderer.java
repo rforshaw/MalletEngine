@@ -1,5 +1,8 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
+import java.util.Set ;
+import java.util.HashSet ;
+
 import com.jogamp.newt.opengl.GLWindow ;
 
 import javax.media.opengl.GLEventListener ;
@@ -31,7 +34,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected final static GLProgramManager programs = new GLProgramManager() ;
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
-	protected final static ObjectCache<GLDrawData> renderCache = new ObjectCache<GLDrawData>( GLDrawData.class ) ;
 
 	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
 	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
@@ -847,10 +849,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public void clean()
 	{
-		getWorldState().clean() ;
-		programs.clean() ;
-		textures.clean() ;
-		fontManager.clean() ;
+		final Set<String> activeKeys = new HashSet<String>() ;
+		getWorldState().clean( activeKeys ) ;
+
+		programs.clean( activeKeys ) ;
+		textures.clean( activeKeys ) ;
+		fontManager.clean( activeKeys ) ;
 	}
 
 	public static GL3 getGL()

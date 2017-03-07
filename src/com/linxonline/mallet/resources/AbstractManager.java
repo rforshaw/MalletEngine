@@ -71,10 +71,28 @@ public abstract class AbstractManager<T extends Resource> implements ManagerInte
 		Removes resources that are not used.
 	**/
 	@Override
-	public void clean()
+	public void clean( final Set<String> _activeKeys )
 	{
-		final List<T> remove = MalletList.<T>newList() ;
+		final List<String> toRemove = MalletList.<String>newList() ;
 
+		final Set<String> available = resources.keySet() ;
+		for( final String key : available )
+		{
+			if( _activeKeys.contains( key ) == false )
+			{
+				toRemove.add( key ) ;
+			}
+		}
+
+		for( final String key : toRemove )
+		{
+			final T resource = resources.get( key ) ;
+			if( resource != null )
+			{
+				resource.destroy() ;
+				resources.remove( key ) ;
+			}
+		}
 	}
 
 	/**

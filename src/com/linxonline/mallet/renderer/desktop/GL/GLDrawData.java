@@ -1,16 +1,13 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
+import java.util.Set ;
 import java.util.List ;
 
-import com.linxonline.mallet.util.MalletList ;
-
+import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.UpdateType ;
 import com.linxonline.mallet.renderer.Interpolation ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -130,6 +127,16 @@ public class GLDrawData extends DrawData
 	public GLGeometryUploader.Location getLocation()
 	{
 		return location ;
+	}
+
+	public void getUsedResources( final Set<String> _activeKeys )
+	{
+		final ProgramMap<GLProgram> map = ( ProgramMap<GLProgram> )getProgram() ;
+		if( map != null )
+		{
+			final GLProgram program = map.getProgram() ;
+			program.getUsedResources( _activeKeys, map ) ;
+		}
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.resources ;
 
-import java.util.List ;
+import java.util.Set ;
 
 /**
 	Provide a consistant interface for loading resources.
@@ -16,8 +16,8 @@ public interface ManagerInterface<T extends Resource>
 	public ResourceLoader<T> getResourceLoader() ;
 	public long getMemoryConsumption() ;
 
-	public void clean() ;		// Cleanup unused Resources
-	public void clear() ;		// Ceanup all Resources
+	public void clean( final Set<String> _activeKeys ) ;		// Cleanup unused Resources
+	public void clear() ;										// Ceanup all Resources
 
 	public void shutdown() ;	// Shutdown connections to systems if required
 

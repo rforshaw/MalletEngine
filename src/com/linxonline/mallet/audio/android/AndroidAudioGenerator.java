@@ -1,6 +1,7 @@
 package com.linxonline.mallet.audio.android ;
 
 import java.nio.* ;
+import java.util.Set ;
 
 import android.media.* ;
 import android.content.res.Resources ;
@@ -20,15 +21,15 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 
 	public boolean startGenerator()
 	{
-		final ManagerInterface.ResourceLoader<AudioBuffer> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer>()
+		final ManagerInterface.ResourceLoader<AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer<AndroidSound>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
-			public AudioBuffer load( final String _file, final Settings _settings )
+			public AudioBuffer<AndroidSound> load( final String _file )
 			{
 				final byte[] buffer = ByteReader.readBytes( _file ) ;
 				if( buffer == null )
@@ -67,9 +68,10 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 		return new AndroidSource( sound.getBuffer() ) ;
 	}
 
-	public void clean()
+	@Override
+	public void clean( final Set<String> _activeKeys )
 	{
-		staticSoundManager.clean() ;
+		staticSoundManager.clean( _activeKeys ) ;
 	}
 
 	public void clear()

@@ -2,6 +2,7 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 
 import java.io.* ;
 import java.nio.* ;
+import java.util.Set ;
 
 import com.jogamp.openal.* ;
 import com.jogamp.openal.util.* ;
@@ -165,11 +166,13 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		return new ALSASource( openAL, sound, source ) ;
 	}
 
-	public void clean()
+	@Override
+	public void clean( final Set<String> _activeKeys )
 	{
-		staticSoundManager.clean() ;
+		staticSoundManager.clean( _activeKeys ) ;
 	}
 
+	@Override
 	public void clear()
 	{
 		staticSoundManager.clear() ;

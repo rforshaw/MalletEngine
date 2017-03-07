@@ -29,11 +29,8 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
-public class GLTextureManager extends AbstractManager<Texture>
+public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 {
-	// Used when a texture is being loaded, but not yet available.
-	private static final Texture PLACEHOLDER = new Texture( null ) ;
-
 	/**
 		When loading a texture the TextureManager will stream the 
 		image content a-synchronously.
@@ -51,20 +48,20 @@ public class GLTextureManager extends AbstractManager<Texture>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<Texture> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<Texture>()
+		final ResourceLoader<Texture<GLImage>> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<Texture<GLImage>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".PNG", ".png" ) ;
 			}
 
-			public Texture load( final String _file, final Settings _settings )
+			public Texture<GLImage> load( final String _file )
 			{
 				return loadTextureASync( _file ) ;
 			}
 
-			protected Texture loadTextureASync( final String _file )
+			protected Texture<GLImage> loadTextureASync( final String _file )
 			{
 				final Thread load = new Thread( "LOAD_TEXTURE" )
 				{
@@ -96,25 +93,26 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
-				add( _file, PLACEHOLDER ) ;
+				put( _file, null ) ;
+
 				load.start() ;
 				return null ;
 			}
 		} ) ;
 
-		loader.add( new ResourceDelegate<Texture>()
+		loader.add( new ResourceDelegate<Texture<GLImage>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".JPG", ".jpg", ".JPEG", ".jpeg" ) ;
 			}
 
-			public Texture load( final String _file, final Settings _settings )
+			public Texture<GLImage> load( final String _file )
 			{
 				return loadTextureASync( _file ) ;
 			}
 
-			protected Texture loadTextureASync( final String _file )
+			protected Texture<GLImage> loadTextureASync( final String _file )
 			{
 				final Thread load = new Thread( "LOAD_TEXTURE" )
 				{
@@ -150,7 +148,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
 				// available to render/
-				add( _file, PLACEHOLDER ) ;
+				put( _file, null ) ;
+
 				load.start() ;
 				return null ;
 			}
@@ -158,7 +157,7 @@ public class GLTextureManager extends AbstractManager<Texture>
 	}
 
 	@Override
-	public Texture get( final String _file )
+	public Texture<GLImage> get( final String _file )
 	{
 		synchronized( toBind )
 		{
@@ -171,17 +170,13 @@ public class GLTextureManager extends AbstractManager<Texture>
 			{
 				final Tuple<String, Bitmap> tuple = toBind.get( i ) ;
 				final Bitmap bitmap = tuple.getRight() ;
-				add( tuple.getLeft(), bind( bitmap ) ) ;
+				put( tuple.getLeft(), bind( bitmap ) ) ;
 				bitmap.recycle() ;
 			}
 			toBind.clear() ;
 		}
 
-		final Texture texture = super.get( _file ) ;
-		
-		// PLACEHOLDER is used to prevent the texture loader 
-		// loading the same texture twice when loading async, 
-		return ( texture != PLACEHOLDER ) ? texture : null ;
+		return super.get( _file ) ;
 	}
 
 	/**
@@ -262,7 +257,8 @@ public class GLTextureManager extends AbstractManager<Texture>
 			ETC1Util.loadTexture( GLES20.GL_TEXTURE_2D, 0, 0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
 		}*/
 
-		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
+		final long estimatedConsumption = _image.getWidth() * _image.getHeight() * ( 3 * 8 ) ;
+		return new Texture( new GLImage( textureID, estimatedConsumption ) ) ;
 	}
 
 	private int getGLInternalFormat( final Bitmap.Config _config, final InternalFormat _format )
@@ -305,6 +301,11 @@ public class GLTextureManager extends AbstractManager<Texture>
 		UNCOMPRESSED
 	}
 
+	/**
+		Retains meta information about textures.
+		A texture can be loaded and used by the renderer,
+		without storing the meta data.
+	*/
 	protected static class MetaGenerator
 	{
 		private final Map<String, MalletTexture.Meta> imageMetas = MalletMap.<String, MalletTexture.Meta>newMap() ;

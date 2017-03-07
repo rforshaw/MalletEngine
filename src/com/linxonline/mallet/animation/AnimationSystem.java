@@ -1,6 +1,8 @@
 package com.linxonline.mallet.animation ;
 
 import java.util.List ;
+import java.util.Set ;
+import java.util.HashSet ;
 
 import com.linxonline.mallet.util.MalletList ;
 
@@ -48,7 +50,19 @@ public class AnimationSystem
 		{
 			public void processEvent( final Event _event )
 			{
-				spriteManager.clean() ;
+				final Set<String> activeKeys = new HashSet<String>() ;
+				getActiveKeys( activeKeys, toAddAnim ) ;
+				getActiveKeys( activeKeys, animations ) ;
+
+				spriteManager.clean( activeKeys ) ;
+			}
+
+			private void getActiveKeys( final Set<String> _keys, final List<AnimData> _animations )
+			{
+				for( final AnimData anim : _animations )
+				{
+					_keys.add( anim.getFile() ) ;
+				}
 			}
 		} ) ;
 

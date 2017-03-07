@@ -2,7 +2,6 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.Arrays ;
 
-import java.awt.image.BufferedImage ;
 import javax.media.opengl.* ;
 
 import com.linxonline.mallet.renderer.texture.ImageInterface ;
