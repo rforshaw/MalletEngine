@@ -1,8 +1,8 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import java.util.List ;
 import java.util.Set ;
 import java.util.HashSet ;
+import java.util.List ;
 
 import android.opengl.GLES30 ;
 import android.opengl.EGL14 ;
@@ -95,7 +95,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			for( final DrawData draw : drawContent )
 			{
 				final GLDrawData d = ( GLDrawData )draw ;
-				d.setGLBuffer( null ) ;
+				d.setBuffer( null ) ;
 				d.setLocation( null ) ;
 				( ( ProgramMap<GLProgram> )d.getProgram() ).setProgram( null ) ;
 				d.forceUpdate() ;
@@ -183,22 +183,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
-			public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
-			{
-				final GLDrawData data = cast( _draw ) ;
-				if( data.getClipMatrix() == null )
-				{
-					data.setClipMatrix( new Matrix4() ) ;
-				}
-
-				data.setClipShape( _clipSpace ) ;
-				data.setClipPosition( _position ) ;
-				data.setClipOffset( _offset ) ;
-				data.setClipProgram( programs.get( "SIMPLE_STENCIL" ) ) ;
-				return _draw ;
-			}
-
-			@Override
 			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 			{
 				cast( _draw ).setRotation( _x, _y, _z ) ;
@@ -229,7 +213,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Draw amendText( final Draw _draw, final StringBuilder _text )
 			{
-				cast( _draw ).setText( _text ) ;
+				final GLDrawData draw = cast( _draw ) ;
+				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				{
+					// Only a text draw object can have text.
+					draw.setText( _text ) ;
+				}
 				return _draw ;
 			}
 
@@ -315,6 +304,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public StringBuilder getText( final Draw _draw )
 			{
+				// This will return null if not a Text Draw.
 				return cast( _draw ).getText() ;
 			}
 
@@ -346,11 +336,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 										final int _order )
 			{
 				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
+				draw.setMode( GLDrawData.Mode.TEXT ) ;
+
 				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
+				ProgramAssist.map( program, "inTex0", _font ) ;
 
 				attachProgram( draw, program ) ;
 				draw.setText( _text ) ;
-				draw.setFont( _font ) ;
 				return draw ;
 			}
 
@@ -368,14 +360,36 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
+			public Draw createClipDraw( final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _startOrder,
+										final int _endOrder )
+			{
+				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _startOrder ) ) ;
+				draw.setMode( GLDrawData.Mode.STENCIL ) ;
+				draw.setEndOrder( _endOrder ) ;
+
+				attachProgram( draw, ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
+				return draw ;
+			}
+
+			@Override
 			public Draw createDraw( final Vector3 _position,
 									final Vector3 _offset,
 									final Vector3 _rotation,
 									final Vector3 _scale,
 									final int _order )
 			{
-				final GLDrawData draw = new GLDrawData( UpdateType.ON_DEMAND, Interpolation.NONE, _position, _offset, _rotation, _scale, _order ) ;
-				return draw ;
+				return new GLDrawData( GLDrawData.Mode.BASIC,
+									   UpdateType.ON_DEMAND,
+									   Interpolation.NONE,
+									   _position,
+									   _offset,
+									   _rotation,
+									   _scale,
+									   _order ) ;
 			}
 
 			private GLDrawData cast( final Draw _draw )
@@ -614,17 +628,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 					return ;
 				}
 
-				final Vector3 clipPosition = _data.getClipPosition() ;
-				final Vector3 clipOffset   = _data.getClipOffset() ;
-				if( clipPosition != null && clipOffset != null )
-				{
-					final Matrix4 clipMatrix = _data.getClipMatrix() ;
-					clipMatrix.setIdentity() ;
-
-					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
-					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
-				}
-
 				final Vector3 position = _data.getPosition() ;
 				final Vector3 offset   = _data.getOffset() ;
 				final Vector3 rotation = _data.getRotation() ;
@@ -637,67 +640,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
-
-				final GLWorld world = ( GLWorld )_data.getWorld() ;
-				world.upload( _data ) ;
-			}
-		} ;
-	}
-
-	@Override
-	public GLDrawData.UploadInterface<GLDrawData> getTextUpload()
-	{
-		return new GLDrawData.UploadInterface<GLDrawData>()
-		{
-			public void upload( final GLDrawData _data )
-			{
-				final StringBuilder text = _data.getText() ;
-				if( text == null )
-				{
-					System.out.println( "No Text, set." ) ;
-					return ;
-				}
-
-				final MalletFont font = _data.getFont() ;
-				if( font == null )
-				{
-					System.out.println( "No Font, set." ) ;
-					return ;
-				}
-
-				ProgramAssist.map( _data.getProgram(), "inTex0", font ) ;
-				if( loadProgram( _data ) == false )
-				{
-					return ;
-				}
-
-				final Vector3 position = _data.getPosition() ;
-				final Vector3 offset   = _data.getOffset() ;
-				final Vector3 rotate   = _data.getOffset() ;
-
-				final Vector3 clipPosition = _data.getClipPosition() ;
-				final Vector3 clipOffset   = _data.getClipOffset() ;
-				if( clipPosition != null && clipOffset != null )
-				{
-					final Matrix4 clipMatrix = _data.getClipMatrix() ;
-					clipMatrix.setIdentity() ;
-
-					clipMatrix.translate( clipPosition.x, clipPosition.y, clipPosition.z ) ;
-					clipMatrix.translate( clipOffset.x, clipOffset.y, clipOffset.z ) ;
-				}
-
-				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
-				positionMatrix.setIdentity() ;
-
-				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
-				positionMatrix.rotate( rotate.z, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
-
-				if( _data.getDrawShape() == null )
-				{
-					final GLFont glFont = GLRenderer.getFont( font ) ;
-					_data.setDrawShape( glFont.getShapeWithChar( '\0' ) ) ;
-				}
 
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
 				world.upload( _data ) ;
@@ -756,8 +698,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				final GLWorld world = ( GLWorld )_data.getWorld() ;
 				world.remove( _data ) ;
-
-				_data.unregister() ;
 			}
 		} ;
 	}

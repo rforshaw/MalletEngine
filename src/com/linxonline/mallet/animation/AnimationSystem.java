@@ -91,11 +91,11 @@ public class AnimationSystem
 					anim.stop() ;
 					animations.remove( anim ) ;
 					drawDelegate.removeDraw( anim.getDraw() ) ;
-					anim.unregister() ;
+					anim.removeCallback() ;
 				}
 				toRemoveAnim.clear() ;
 			}
-		
+
 			if( toAddAnim.isEmpty() == false )
 			{
 				for( final AnimData anim : toAddAnim )
@@ -133,7 +133,7 @@ public class AnimationSystem
 		for( final AnimData anim : animations )
 		{
 			drawDelegate.removeDraw( anim.getDraw() ) ;
-			anim.unregister() ;
+			anim.removeCallback() ;
 		}
 		animations.clear() ;
 	}
@@ -141,17 +141,6 @@ public class AnimationSystem
 	public String getName()
 	{
 		return "Animation System" ;
-	}
-
-	protected void removeAnimData( final List<AnimData> _data )
-	{
-		for( final AnimData anim : _data )
-		{
-			animations.remove( anim ) ;
-			drawDelegate.removeDraw( anim.getDraw() ) ;
-			anim.unregister() ;
-		}
-		_data.clear() ;
 	}
 
 	protected AnimationDelegate constructAnimationDelegate()

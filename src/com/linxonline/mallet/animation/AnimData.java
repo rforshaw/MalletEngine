@@ -2,6 +2,8 @@ package com.linxonline.mallet.animation ;
 
 import java.util.List ;
 
+import java.lang.ref.WeakReference ;
+
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -19,7 +21,8 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	private final List<SourceCallback> callbacks = MalletList.<SourceCallback>newList() ;
 	private String file   = null ;
 	private Draw draw     = null ;
-	private World world   = null ;
+
+	private WeakReference<World> world = null ;
 	private Sprite sprite = null ;
 
 	private boolean play      = false ;
@@ -38,7 +41,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	public void setWorld( final World _world )
 	{
-		world = _world ;
+		world = new WeakReference<World>( _world ) ;
 	}
 
 	public void addCallback( final SourceCallback _callback )
@@ -157,7 +160,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	public World getWorld()
 	{
-		return world ;
+		return ( world != null ) ? world.get() : null ;
 	}
 
 	public Draw getDraw()
@@ -183,7 +186,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		}
 	}
 
-	public void unregister()
+	public void removeCallback()
 	{
 		final int size = callbacks.size() ;
 		for( int i = 0; i < size; ++i )

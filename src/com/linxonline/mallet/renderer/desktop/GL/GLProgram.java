@@ -189,7 +189,7 @@ public class GLProgram extends Resource
 			Uniform.FONT.reset() ;
 		}
 
-		private static class  AbstractDelegate implements UniformDelegate
+		private static class AbstractDelegate implements UniformDelegate
 		{
 			public boolean load( final GL3 _gl, final ProgramMap _data, final int _index ) { return false ; }
 

@@ -14,29 +14,41 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLDrawData extends DrawData
 {
-	private GLGeometryUploader.GLBuffer buffer   = null ;
+	private GLGeometryUploader.IBuffer buffer   = null ;
 	private GLGeometryUploader.Location location = null ;
+
+	private Mode mode = Mode.BASIC ;
+	private int endOrder = 0 ;
 
 	private Matrix4 drawMatrix = new Matrix4() ;
 	private Shape drawShape    = null ;
 
-	private Matrix4 clipMatrix    = null ;
-	private Vector3 clipPosition  = null ;
-	private Vector3 clipOffset    = null ;
-	private GLProgram clipProgram = null ;
-	private Shape clipShape       = null ;
+	public GLDrawData()
+	{
+		super() ;
+	}
 
-	public GLDrawData() {}
-
-	public GLDrawData( final UpdateType _type,
-					   final Interpolation _mode,
+	public GLDrawData( final Mode _mode,
+					   final UpdateType _type,
+					   final Interpolation _interpolation,
 					   final Vector3 _position,
 					   final Vector3 _offset,
 					   final Vector3 _rotation,
 					   final Vector3 _scale,
 					   final int _order )
 	{
-		super( _type, _mode, _position, _offset, _rotation, _scale, _order ) ;
+		super( _type, _interpolation, _position, _offset, _rotation, _scale, _order ) ;
+		setMode( _mode ) ;
+	}
+
+	public void setMode( final Mode _mode )
+	{
+		mode = ( _mode != null ) ? _mode : Mode.BASIC ;
+	}
+
+	public Mode getMode()
+	{
+		return mode ;
 	}
 
 	public void setDrawShape( final Shape _shape )
@@ -49,72 +61,32 @@ public class GLDrawData extends DrawData
 		return drawShape ;
 	}
 
-	public void setClipProgram( final GLProgram _program )
-	{
-		clipProgram = _program ;
-	}
-
-	public GLProgram getClipProgram()
-	{
-		return clipProgram ;
-	}
-
-	public void setClipShape( final Shape _shape )
-	{
-		clipShape = _shape ;
-	}
-
-	public Shape getClipShape()
-	{
-		return clipShape ;
-	}
-
-	public void setClipMatrix( final Matrix4 _matrix )
-	{
-		clipMatrix = _matrix ;
-	}
-
-	public Matrix4 getClipMatrix()
-	{
-		return clipMatrix ;
-	}
-
-	public void setClipPosition( final Vector3 _position )
-	{
-		clipPosition = _position ;
-	}
-
-	public Vector3 getClipPosition()
-	{
-		return clipPosition ;
-	}
-
-	public void setClipOffset( final Vector3 _offset )
-	{
-		clipOffset = _offset ;
-	}
-
-	public Vector3 getClipOffset()
-	{
-		return clipOffset ;
-	}
-
 	public void setDrawMatrix( final Matrix4 _matrix )
 	{
 		drawMatrix = _matrix ;
 	}
-	
+
 	public Matrix4 getDrawMatrix()
 	{
 		return drawMatrix ;
 	}
 
-	public void setGLBuffer( final GLGeometryUploader.GLBuffer _buffer )
+	public void setEndOrder( final int _order )
+	{
+		endOrder = _order ;
+	}
+	
+	public int getEndOrder()
+	{
+		return endOrder ;
+	}
+
+	public void setBuffer( final GLGeometryUploader.IBuffer _buffer )
 	{
 		buffer = _buffer ;
 	}
 
-	public GLGeometryUploader.GLBuffer getGLBuffer()
+	public GLGeometryUploader.IBuffer getBuffer()
 	{
 		return buffer ;
 	}
@@ -135,25 +107,28 @@ public class GLDrawData extends DrawData
 		if( map != null )
 		{
 			final GLProgram program = map.getProgram() ;
-			program.getUsedResources( _activeKeys, map ) ;
+			if( program != null )
+			{
+				program.getUsedResources( _activeKeys, map ) ;
+			}
 		}
 	}
-
-	@Override
-	public void unregister() {}
 
 	@Override
 	public void reset()
 	{
 		super.reset() ;
+		mode        = Mode.BASIC ;
 		buffer      = null ;
 		drawMatrix  = null ;
 		drawShape   = null ;
+	}
 
-		clipMatrix   = null ;
-		clipPosition = null ;
-		clipOffset   = null ;
-		clipProgram  = null ;
-		clipShape    = null ;
+	public enum Mode
+	{
+		BASIC,
+		TEXT,
+		STENCIL,
+		DEPTH ;
 	}
 }

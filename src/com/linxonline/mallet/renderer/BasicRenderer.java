@@ -75,7 +75,6 @@ public abstract class BasicRenderer<D extends DrawData,
 	}
 
 	public abstract D.UploadInterface<D> getBasicUpload() ;
-	public abstract D.UploadInterface<D> getTextUpload() ;
 	public abstract C.DrawInterface<C> getCameraDraw() ;
 
 	public abstract FontAssist.Assist getFontAssist() ;
@@ -122,7 +121,7 @@ public abstract class BasicRenderer<D extends DrawData,
 
 				if( data.contains( draw ) == false )
 				{
-					draw.setUploadInterface( getTextUpload() ) ;
+					draw.setUploadInterface( getBasicUpload() ) ;
 					data.add( draw ) ;
 
 					worlds.addDraw( draw, world ) ;

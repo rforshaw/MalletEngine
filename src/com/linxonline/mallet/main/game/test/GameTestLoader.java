@@ -136,7 +136,7 @@ public final class GameTestLoader extends GameLoader
 
 							CameraAssist.amendOrthographic( cam, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
-							CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
+							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 						}
 					
 						{
@@ -205,11 +205,11 @@ public final class GameTestLoader extends GameLoader
 							triangle.addIndex( 4 ) ;
 							triangle.addIndex( 5 ) ;
 
-							final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
+							final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 0.0f, 0.0f ),
 																	 new Vector3(),
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ),
-																	 10 ) ;
+																	 0 ) ;
 							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
 							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
@@ -267,9 +267,6 @@ public final class GameTestLoader extends GameLoader
 						{
 							elapsed = 0.0f ;
 							anim.playAnimation( "DEFAULT" ) ;
-
-							eventSystem.addEvent( DrawAssist.constructDrawClean() ) ;
-							eventSystem.addEvent( AudioAssist.constructAudioClean() ) ;
 						}
 					}
 				} ) ;
@@ -372,6 +369,7 @@ public final class GameTestLoader extends GameLoader
 				image.addString( "POS", Integer.toString( x ) + "," + Integer.toString( y ) ) ;
 				image.addString( "DIM",  "64, 64" ) ;
 				image.addString( "OFFSET", "-32, -32, 0" ) ;
+				image.addString( "LAYER", "10" ) ;
 
 				final ImageCreator creator = new ImageCreator() ;
 				final Entity entity = creator.create( image ) ;

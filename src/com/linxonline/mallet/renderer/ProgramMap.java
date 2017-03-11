@@ -3,6 +3,8 @@ package com.linxonline.mallet.renderer ;
 import java.util.Set ;
 import java.util.Map ;
 
+import java.lang.ref.WeakReference ;
+
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -21,7 +23,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 	private final String id ;
 	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
 
-	private U program ;			// Handler to renderer specific program.
+	private WeakReference<U> program = null ;			// Handler to renderer specific program.
 
 	public ProgramMap( final String _id )
 	{
@@ -30,12 +32,12 @@ public class ProgramMap<U> implements Program<ProgramMap>
 
 	public void setProgram( final U _program )
 	{
-		program = _program ;
+		program = new WeakReference<U>( _program ) ;
 	}
 
 	public U getProgram()
 	{
-		return program ;
+		return ( program != null ) ? program.get() : null ;
 	}
 
 	public String getID()

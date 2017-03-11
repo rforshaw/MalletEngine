@@ -57,11 +57,6 @@ public final class DrawAssist
 		return assist.amendShape( _draw, _shape ) ;
 	}
 
-	public static Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset )
-	{
-		return assist.amendClip( _draw, _clipSpace, _position, _offset ) ;
-	}
-
 	public static Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 	{
 		return assist.amendRotate( _draw, _x, _y, _z ) ;
@@ -197,6 +192,16 @@ public final class DrawAssist
 		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
 	}
 
+	public static Draw createClipDraw( final Vector3 _position,
+									   final Vector3 _offset,
+									   final Vector3 _rotation,
+									   final Vector3 _scale,
+									   final int _startOrder,
+									   final int _endOrder )
+	{
+		return assist.createClipDraw( _position, _offset, _rotation, _scale, _startOrder, _endOrder ) ;
+	}
+
 	/**
 		Create a basic Draw object.
 		Can be used for almost anything, except rendering text.
@@ -217,7 +222,6 @@ public final class DrawAssist
 	public interface Assist
 	{
 		public Draw amendShape( final Draw _draw, final Shape _shape ) ;
-		public Draw amendClip( final Draw _draw, final Shape _clipSpace, final Vector3 _position, final Vector3 _offset ) ;
 		public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z ) ;
@@ -252,13 +256,20 @@ public final class DrawAssist
 									final int _order ) ;
 
 		public Draw createTextDraw( final String _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order ) ;
+									final MalletFont _font,
+									final Vector3 _position,
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale,
+									final int _order ) ;
 
+		public Draw createClipDraw( final Vector3 _position,
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale,
+									final int _startOrder,
+									final int _endOrder ) ;
+										
 		public Draw createDraw( final Vector3 _position,
 									final Vector3 _offset,
 									final Vector3 _rotation,

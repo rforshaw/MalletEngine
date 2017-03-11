@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
+import java.lang.ref.WeakReference ;
+
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;
@@ -14,10 +16,9 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		public void upload( final T _data ) {}
 	} ;
 
-	private World world = null ;		// Store the handler to the worldspace this data is associated with
+	private WeakReference<World> world = null ;		// Store the handler to the worldspace this data is associated with
 
 	private MalletColour colour = null ;
-	private MalletFont font     = null ;
 	private StringBuilder text  = null ;
 	private Program program     = null ;
 
@@ -25,7 +26,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private boolean ui     = false ;
 
 	private int order = 0 ;
-	private Interpolation mode           = Interpolation.NONE ;
+	private Interpolation interpolation  = Interpolation.NONE ;
 	private UpdateType updateType        = UpdateType.ON_DEMAND ; 
 	private Draw.UploadInterface<T> draw = DRAW_DEFAULT ;
 
@@ -42,10 +43,19 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private Vector3 rotation ;
 	private Vector3 scale ;
 
-	public DrawData() {}
+	public DrawData()
+	{
+		this( UpdateType.ON_DEMAND,
+			  Interpolation.NONE,
+			  new Vector3(),			// position
+			  new Vector3(),			// offset
+			  new Vector3(),			// rotation
+			  new Vector3( 1, 1, 1 ),	// scale
+			  0 ) ;
+	}
 
 	public DrawData( final UpdateType _type,
-					 final Interpolation _mode,
+					 final Interpolation _interpolation,
 					 final Vector3 _position,
 					 final Vector3 _offset,
 					 final Vector3 _rotation,
@@ -53,22 +63,22 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 					 final int _order )
 	{
 		setUpdateType( _type ) ;
-		setInterpolationMode( _mode ) ;
-		position = _position ;
-		offset = _offset ;
-		rotation = _rotation ;
-		scale = _scale ;
-		order = _order ;
+		setInterpolationMode( _interpolation ) ;
+		position = ( _position != null ) ? _position : new Vector3()  ;
+		offset   = ( _offset != null )   ? _offset   : new Vector3() ;
+		rotation = ( _rotation != null ) ? _rotation : new Vector3() ;
+		scale    = ( _scale != null )    ? _scale    : new Vector3() ;
+		order    = ( _order >= 0 )       ?  _order   : 0 ;
 	}
 
 	public void setWorld( final World _world )
 	{
-		world = _world ;
+		world = new WeakReference<World>( _world ) ;
 	}
 
 	public World getWorld()
 	{
-		return world ;
+		return ( world != null ) ? world.get() : null ;
 	}
 
 	public void setProgram( final Program _program )
@@ -101,16 +111,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		return text ;
 	}
 
-	public void setFont( final MalletFont _font )
-	{
-		font = _font ;
-	}
-
-	public MalletFont getFont()
-	{
-		return font ;
-	}
-
 	public void setUI( final boolean _ui )
 	{
 		ui = _ui ;
@@ -128,27 +128,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	public void setOrder( final int _order )
 	{
-		order = _order ;
-	}
-
-	public void setPosition( final Vector3 _position )
-	{
-		position = _position ;
-	}
-
-	public void setOffset( final Vector3 _offset )
-	{
-		offset = _offset ;
-	}
-
-	public void setRotation( final Vector3 _rotation)
-	{
-		rotation = _rotation ;
-	}
-
-	public void setScale( final Vector3 _scale )
-	{
-		scale = _scale ;
+		order = ( _order >= 0 ) ? _order : 0 ;
 	}
 
 	public void setPosition( final float _x, final float _y, final float _z )
@@ -176,22 +156,11 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		updateType = ( _type == null ) ? UpdateType.ON_DEMAND : _type ;
 	}
 
-	public void setInterpolationMode( final Interpolation _mode )
+	public void setInterpolationMode( final Interpolation _interpolation )
 	{
-		mode = ( _mode == null ) ? Interpolation.NONE : _mode ;
+		interpolation = ( _interpolation == null ) ? Interpolation.NONE : _interpolation ;
 	}
 
-	public boolean toUpdate()
-	{
-		final boolean temp = update ;
-		if( temp == true )
-		{
-			update = false ;
-		}
-
-		return temp ;
-	}
-	
 	public int getOrder()
 	{
 		return order ;
@@ -204,7 +173,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	public Interpolation getInterpolationMode()
 	{
-		return mode ;
+		return interpolation ;
 	}
 
 	public Vector3 getPosition()
@@ -227,6 +196,9 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		return currentScale ;
 	}
 
+	/**
+		Called by the worlds DrawState.
+	*/
 	protected void upload( final int _diff, final int _iteration )
 	{
 		// Position, Rotation, and Scale should always 
@@ -280,30 +252,29 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		_past.setXYZ( _present ) ;
 	}
 
-	public abstract void unregister() ;
+	private boolean toUpdate()
+	{
+		final boolean temp = update ;
+		update = false ;
+		return temp ;
+	}
 
 	@Override
 	public void reset()
 	{
 		world = null ;
 
-		colour = null ;
-		font = null ;
-		text = null ;
+		colour  = null ;
+		text    = null ;
 		program = null ;
 
 		update = true ;
 		ui = false ;
 
 		order = 0 ;
-		mode = Interpolation.NONE ;
-		updateType  = UpdateType.ON_DEMAND ; 
+		interpolation = Interpolation.NONE ;
+		updateType = UpdateType.ON_DEMAND ; 
 		draw = DRAW_DEFAULT ;
-
-		position = null ;
-		offset   = null ;
-		rotation = null ;
-		scale    = null ;
 	}
 
 	@Override

@@ -234,7 +234,6 @@ public final class UIFactory
 													new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;
-				DrawAssist.attachProgram( drawText, ProgramAssist.create( "SIMPLE_FONT" ) ) ;
 			}
 		}
 
