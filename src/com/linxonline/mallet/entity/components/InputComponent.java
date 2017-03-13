@@ -46,6 +46,7 @@ public abstract class InputComponent extends Component
 
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
+		destroy = _callback ;
 		super.readyToDestroy( _callback ) ;
 	}
 

@@ -257,7 +257,7 @@ public final class GameTestLoader extends GameLoader
 
 				entity.addComponent( new Component()
 				{
-					private final float DURATION = 5.0f ;
+					private final static float DURATION = 5.0f ;
 					private float elapsed = 0.0f ;
 
 					public void update( final float _dt )

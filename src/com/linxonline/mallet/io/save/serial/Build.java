@@ -176,7 +176,7 @@ public final class Build
 		{
 			final JSONObject fields = _json.getJSONObject( "fields" ) ;
 			final JSONObject fieldTypes = _json.getJSONObject( "field-types" ) ;
-			if( fields != null || fieldTypes != null )
+			if( fields != null && fieldTypes != null )
 			{
 				final String[] keys = fields.keys() ;
 				for( final String key : keys )

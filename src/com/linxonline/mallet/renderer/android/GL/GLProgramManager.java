@@ -301,7 +301,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		return true ;
 	}
 	
-	private class GLShaderMap
+	private static class GLShaderMap
 	{
 		public String path ;
 		public int type ;

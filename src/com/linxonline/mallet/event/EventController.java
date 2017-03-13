@@ -148,7 +148,7 @@ public class EventController implements EventHandler
 		Once the controller is added to an Event System the 
 		events should be passed to it.
 	*/
-	private class AddEventFallback implements AddEventInterface
+	private static class AddEventFallback implements AddEventInterface
 	{
 		private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 

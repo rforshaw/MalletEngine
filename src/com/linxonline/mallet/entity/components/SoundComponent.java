@@ -17,7 +17,6 @@ public class SoundComponent extends EventComponent implements SourceCallback
 {
 	private final Map<String, Audio> sounds = MalletMap.<String, Audio>newMap() ;
 
-	private String defaultAudio = null ;					// Name of the default audio, used as a fallback if all else fails.
 	private Audio currentAudio  = null ;					// Name of the current audio that is playing
 
 	private AudioDelegate delegate            = null ;
@@ -60,11 +59,6 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	public Audio getAudio( final String _name )
 	{
 		return sounds.get( _name ) ;
-	}
-
-	public void setDefaultAudio( final String _name )
-	{
-		defaultAudio = _name ;
 	}
 
 	@Override

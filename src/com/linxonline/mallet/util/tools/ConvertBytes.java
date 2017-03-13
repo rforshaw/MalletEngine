@@ -452,14 +452,14 @@ public final class ConvertBytes
 
 		public long toLong( final byte[] _long, final int _offset, final int _length )
 		{
-			return ( ( _long[_offset + 0] & 0xFF ) << 56 ) |
-				( ( _long[_offset + 1] & 0xFF ) << 48 ) |
-				( ( _long[_offset + 2] & 0xFF ) << 40 ) |
-				( ( _long[_offset + 3] & 0xFF ) << 32 ) |
-				( ( _long[_offset + 4] & 0xFF ) << 24 ) |
-				( ( _long[_offset + 5] & 0xFF ) << 16 ) |
-				( ( _long[_offset + 6] & 0xFF ) << 8 ) |
-				( ( _long[_offset + 7] & 0xFF ) << 0 ) ;
+			return ( ( long )( _long[_offset + 0] & 0xFF ) << 56 ) |
+				   ( ( long )( _long[_offset + 1] & 0xFF ) << 48 ) |
+				   ( ( long )( _long[_offset + 2] & 0xFF ) << 40 ) |
+				   ( ( long )( _long[_offset + 3] & 0xFF ) << 32 ) |
+				   ( ( long )( _long[_offset + 4] & 0xFF ) << 24 ) |
+				   ( ( long )( _long[_offset + 5] & 0xFF ) << 16 ) |
+				   ( ( long )( _long[_offset + 6] & 0xFF ) << 8 ) |
+				   ( ( long )( _long[_offset + 7] & 0xFF ) << 0 ) ;
 			//return ByteBuffer.wrap( _long, _offset, _length ).getLong() ;
 		}
 

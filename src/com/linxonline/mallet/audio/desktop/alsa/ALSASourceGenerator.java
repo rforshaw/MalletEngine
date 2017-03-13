@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 {
-	private final SoundManager<ALSASound> staticSoundManager = new SoundManager<ALSASound>( this ) ;
+	private final SoundManager<ALSASound> staticSoundManager = new SoundManager<ALSASound>() ;
 	private AL openAL = null ;
 
 	public ALSASourceGenerator() {}

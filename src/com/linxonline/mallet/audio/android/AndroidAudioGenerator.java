@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 
 public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 {
-	private final SoundManager staticSoundManager = new SoundManager( this ) ;
+	private final SoundManager staticSoundManager = new SoundManager() ;
 
 	public boolean startGenerator()
 	{

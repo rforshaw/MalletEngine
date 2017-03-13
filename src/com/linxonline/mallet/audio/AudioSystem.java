@@ -8,8 +8,8 @@ import com.linxonline.mallet.system.GlobalConfig ;
 
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.SystemRoot ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.logger.Logger ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
@@ -86,49 +86,7 @@ public class AudioSystem
 			}
 		} ) ;
 
-		AudioAssist.setAssist( new AudioAssist.Assist()
-		{
-			@Override
-			public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
-			{
-				return new AudioData( _file, _type, new Category( _channel ) ) ;
-			}
-
-			@Override
-			public Audio amendCallback( final Audio _audio, final SourceCallback _callback )
-			{
-				final AudioData audio = ( AudioData )_audio ;
-				audio.amendCallback( _callback ) ;
-				return _audio ;
-			}
-
-			@Override
-			public Audio play( Audio _audio )
-			{
-				final AudioData audio = ( AudioData )_audio ;
-				audio.play = true ;
-				audio.dirty = true ;
-				return _audio ;
-			}
-
-			@Override
-			public Audio stop( Audio _audio )
-			{
-				final AudioData audio = ( AudioData )_audio ;
-				audio.stop = true ;
-				audio.dirty = true ;
-				return _audio ;
-			}
-
-			@Override
-			public Audio pause( Audio _audio )
-			{
-				final AudioData audio = ( AudioData )_audio ;
-				audio.play = false ;
-				audio.dirty = true ;
-				return _audio ;
-			}
-		} ) ;
+		AudioAssist.setAssist( new Assist() ) ;
 
 		initGlobalConfig() ;
 	}
@@ -216,7 +174,7 @@ public class AudioSystem
 							callback.start() ;
 						}
 					}
-					else if( audio.play == false )
+					else //if( audio.play == false )
 					{
 						// Pause if current playing
 						if( isPlaying == true )
@@ -310,7 +268,7 @@ public class AudioSystem
 		for( final AudioData audio : paused )
 		{
 			final AudioSource source = audio.getSource() ;
-			final SourceCallback callback = audio.getCallback() ;
+			//final SourceCallback callback = audio.getCallback() ;
 
 			source.play() ;
 		}
@@ -326,7 +284,7 @@ public class AudioSystem
 		for( final AudioData audio : active )
 		{
 			final AudioSource source = audio.getSource() ;
-			final SourceCallback callback = audio.getCallback() ;
+			//final SourceCallback callback = audio.getCallback() ;
 
 			if( source.isPlaying() == true )
 			{
@@ -424,6 +382,11 @@ public class AudioSystem
 					case "MUSICVOLUME"  : createVolume( Category.Channel.MUSIC, GlobalConfig.getInteger( _data, 100 ) ) ;  break ;
 					case "VOCALVOLUME"  : createVolume( Category.Channel.VOCAL, GlobalConfig.getInteger( _data, 100 ) ) ;  break ;
 					case "EFFECTVOLUME" : createVolume( Category.Channel.EFFECT, GlobalConfig.getInteger( _data, 100 ) ) ; break ;
+					default             :
+					{
+						Logger.println( "Registered to " + _data  + " that is not handled.", Logger.Verbosity.MINOR ) ;
+						break ;
+					}
 				}
 			}
 		} ;
@@ -447,5 +410,49 @@ public class AudioSystem
 		final String path = _audio.getFilePath() ;
 		final StreamType type = _audio.getStreamType() ;
 		return sourceGenerator.createAudioSource( path, type ) ;
+	}
+
+	private static class Assist implements AudioAssist.Assist
+	{
+		@Override
+		public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
+		{
+			return new AudioData( _file, _type, new Category( _channel ) ) ;
+		}
+
+		@Override
+		public Audio amendCallback( final Audio _audio, final SourceCallback _callback )
+		{
+			final AudioData audio = ( AudioData )_audio ;
+			audio.amendCallback( _callback ) ;
+			return _audio ;
+		}
+
+		@Override
+		public Audio play( Audio _audio )
+		{
+			final AudioData audio = ( AudioData )_audio ;
+			audio.play = true ;
+			audio.dirty = true ;
+			return _audio ;
+		}
+
+		@Override
+		public Audio stop( Audio _audio )
+		{
+			final AudioData audio = ( AudioData )_audio ;
+			audio.stop = true ;
+			audio.dirty = true ;
+			return _audio ;
+		}
+
+		@Override
+		public Audio pause( Audio _audio )
+		{
+			final AudioData audio = ( AudioData )_audio ;
+			audio.play = false ;
+			audio.dirty = true ;
+			return _audio ;
+		}
 	}
 }

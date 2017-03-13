@@ -42,7 +42,13 @@ public final class Texture<T extends ImageInterface> extends Resource
 			return false ;
 		}
 
-		return image.equals( _obj ) ;
+		if( _obj instanceof Texture )
+		{
+			final Texture<T> temp = ( Texture<T> )_obj ;
+			return image.equals( temp.image ) ;
+		}
+
+		return false ;
 	}
 
 	@Override

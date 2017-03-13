@@ -168,18 +168,18 @@ public class ALSASource implements AudioSource
 
 	private float getCurrentBufferTime()
 	{
-		final int offset = getBufferOffset() ;
-		final int bits = ( getBufferBits() / 8 ) ; 	// Change to bytes
-		final int channels = getBufferChannels() ;
+		final float offset = getBufferOffset() ;
+		final float bits = ( getBufferBits() / ( float )8 ) ; 	// Change to bytes
+		final float channels = getBufferChannels() ;
 		final float freq = getBufferFreq() ;
-		return ( float )( ( offset / channels / bits ) / freq ) ;
+		return ( offset / channels / bits ) / freq ;
 	}
 
 	private float getBufferTime()
 	{
-		final int s = getBufferSize() ;
-		final int b = ( getBufferBits() / 8 ) ; 	// Change to bytes
-		final int c = getBufferChannels() ;
+		final float s = getBufferSize() ;
+		final float b = ( getBufferBits() / ( float )8 ) ; 	// Change to bytes
+		final float c = getBufferChannels() ;
 		final float f = getBufferFreq() ;
 
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
@@ -187,6 +187,6 @@ public class ALSASource implements AudioSource
 			return -1.0f ;
 		}
 
-		return ( float )( ( s / c / b ) / f ) ;
+		return ( s / c / b ) / f ;
 	}
 }

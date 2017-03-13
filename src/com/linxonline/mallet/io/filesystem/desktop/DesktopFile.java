@@ -142,7 +142,7 @@ public class DesktopFile implements FileStream
 	}
 
 	/**
-		Delete the File repreented by this File Stream.
+		Delete the File represented by this File Stream.
 		This also includes deleting folders.
 	*/
 	public boolean delete()
@@ -152,6 +152,11 @@ public class DesktopFile implements FileStream
 
 	private static boolean deleteRecursive( final File _file )
 	{
+		if( _file == null )
+		{
+			return false ;
+		}
+
 		if( _file.exists() == false )
 		{
 			return false ;
@@ -160,9 +165,13 @@ public class DesktopFile implements FileStream
 		boolean ret = true ;
 		if( _file.isDirectory() == true )
 		{
-			for( final File file : _file.listFiles() )
+			final File[] files = _file.listFiles() ;
+			if( files != null )
 			{
-				ret = ret && deleteRecursive( file ) ;
+				for( final File file : files )
+				{
+					ret = ret && deleteRecursive( file ) ;
+				}
 			}
 		}
 

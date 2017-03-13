@@ -7,7 +7,7 @@ package com.linxonline.mallet.util.time ;
 /*==================================================*/
 public abstract class ElapsedTimer
 {
-	private static TimerInterface time = null ;
+	private static TimerInterface time = new DefaultTimer() ;
 
 	public ElapsedTimer() {}
 
@@ -25,21 +25,11 @@ public abstract class ElapsedTimer
 	*/
 	public static final double getElapsedTimeInNanoSeconds()
 	{
-		if( time == null )
-		{
-			time = new DefaultTimer() ;
-		}
-
 		return time.getElapsedTimeInNanoSeconds() ;
 	}
 
 	public static final long getTotalElapsedTimeInSeconds()
 	{
-		if( time == null )
-		{
-			time = new DefaultTimer() ;
-		}
-
 		return time.getTotalElapsedTimeInSeconds() ;
 	}
 

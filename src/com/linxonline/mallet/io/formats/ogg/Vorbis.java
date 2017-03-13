@@ -694,7 +694,7 @@ public class Vorbis
 		}
 	}
 
-	public class Floor0Configuration implements FloorConfiguration
+	public static class Floor0Configuration implements FloorConfiguration
 	{
 		private int order = 0 ;
 		private int rate = 0 ;
@@ -760,7 +760,7 @@ public class Vorbis
 		public int decode( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
-	public class CodebookConfiguration
+	public static class CodebookConfiguration
 	{
 		int entry ;							// Denotes the entry of the codebook, for example 
 											// the 5th codebook to be read in

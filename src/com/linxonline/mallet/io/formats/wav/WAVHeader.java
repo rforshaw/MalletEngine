@@ -69,7 +69,7 @@ public final class WAVHeader
 		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
 		final int size = ConvertBytes.toInt( _soundBuffer, pos, 4 ) ;
 		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
-		pos += 4 ;
+		//pos += 4 ;
 
 		return size ;
 	}

@@ -62,13 +62,13 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 					 final Vector3 _scale,
 					 final int _order )
 	{
+		setOrder( 0 ) ;
 		setUpdateType( _type ) ;
 		setInterpolationMode( _interpolation ) ;
 		position = ( _position != null ) ? _position : new Vector3()  ;
 		offset   = ( _offset != null )   ? _offset   : new Vector3() ;
 		rotation = ( _rotation != null ) ? _rotation : new Vector3() ;
 		scale    = ( _scale != null )    ? _scale    : new Vector3() ;
-		order    = ( _order >= 0 )       ?  _order   : 0 ;
 	}
 
 	public void setWorld( final World _world )

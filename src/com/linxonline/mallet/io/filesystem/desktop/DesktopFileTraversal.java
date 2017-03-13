@@ -8,10 +8,20 @@ public class DesktopFileTraversal
 	
 	public final void traverse( final File _file )
 	{
+		if( _file == null )
+		{
+			return ;
+		}
+	
 		if( _file.isDirectory() == true )
 		{
 			foundDirectory( _file ) ;
 			final File[] children = _file.listFiles() ;
+			if( children == null )
+			{
+				return ;
+			}
+
 			for( final File child : children )
 			{
 				traverse( child ) ;

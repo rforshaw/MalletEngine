@@ -24,9 +24,9 @@ public class XInputLinux implements XInputDevice
 			switch( ( int )_stream[6] )
 			{
 				case AXIS        : processAxis( _stream ) ; break ;
-				case BUTTON      : processButton( _stream ) ;   break ;
-				case INIT        : System.out.println( "INIT" ) ; break ;
-				case INIT_BUTTON : System.out.println( "INIT_BUTTON" ) ; break ;
+				case BUTTON      : processButton( _stream ) ; break ;
+				//case INIT        : System.out.println( "INIT" ) ; break ;
+				//case INIT_BUTTON : System.out.println( "INIT_BUTTON" ) ; break ;
 			}
 			return 8 ;
 		}

@@ -106,11 +106,11 @@ public class ProgramMap<U> implements Program<ProgramMap>
 				return false ;
 			}
 
-			final Set<String> keys = uniforms.keySet() ;
-			for( final String key : keys )
+			final Set<Map.Entry<String, Object>> entries = uniforms.entrySet() ;
+			for( final Map.Entry<String, Object> entry : entries )
 			{
-				final Object obj1 = uniforms.get( key ) ;
-				final Object obj2 = u.get( key ) ;
+				final Object obj1 = entry.getValue() ;
+				final Object obj2 = u.get( entry.getKey() ) ;
 
 				if( obj1.equals( obj2 ) == false )
 				{

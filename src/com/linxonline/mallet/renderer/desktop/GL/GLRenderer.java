@@ -42,7 +42,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	protected GLWindow canvas ;
-	protected static GL3 gl ;
+	private static GL3 gl ;
 
 	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
@@ -625,7 +625,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 				final Vector3 position = _camera.getPosition() ;
 				final Vector3 scale = _camera.getScale() ;
-				final Vector3 rotation = _camera.getRotation() ;
+				//final Vector3 rotation = _camera.getRotation() ;
 
 				worldMatrix.setIdentity() ;
 				worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
@@ -747,7 +747,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			default                :
 			{
 				final Vector2 dimension = getRenderInfo().getRenderDimensions() ;
-				final Vector2 offset = getRenderInfo().getScreenOffset() ;
+				//final Vector2 offset = getRenderInfo().getScreenOffset() ;
 
 				CameraAssist.amendOrthographic( defaultCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 				CameraAssist.amendScreenResolution( defaultCamera, ( int )dimension.x, ( int )dimension.y ) ;

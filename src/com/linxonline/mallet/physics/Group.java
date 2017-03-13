@@ -57,7 +57,7 @@ public class Group
 			for( int i = 0; i < size; i++ )
 			{
 				final ID id = ids.get( i ) ;
-				if( id.name == _name )
+				if( _name.equals( id.name ) )
 				{
 					return id ; 
 				}
@@ -92,23 +92,21 @@ public class Group
 				// Expects an object for the group.
 				return false ;
 			}
-
-			if( _obj != null && parent == null )
+			else if( _obj != null && parent == null )
 			{
 				// Does not expect an object for group.
 				return false ;
 			}
-
-			if( parent == null && _obj == null )
+			else if( parent != null && _obj != null )
 			{
-				// Group does not expect an object 
-				// and no object was provided.
-				return true ;
+				// An object is expected and it must 
+				// be an instance of the parent type.
+				return parent.isInstance( _obj ) ;
 			}
 
-			// An object is expected and it must 
-			// be an instance of the parent type.
-			return parent.isInstance( _obj ) ;
+			// Group does not expect an object 
+			// and no object was provided.
+			return true ;
 		}
 
 		public int getID()

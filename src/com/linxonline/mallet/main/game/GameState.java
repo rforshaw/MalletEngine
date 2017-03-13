@@ -446,7 +446,7 @@ public class GameState extends State implements HookEntity
 					system.draw( DEFAULT_FRAMERATE ) ;
 
 					endTime = ElapsedTimer.nanoTime() ;
-					deltaTime += endTime - startTime ;
+					//deltaTime += endTime - startTime ;
 
 					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
 					renderAccumulator = 0.0 ;
@@ -635,8 +635,11 @@ public class GameState extends State implements HookEntity
 				if( show == false )
 				{
 					showFPS.setShow( false ) ;
-					delegate.shutdown() ;
-					delegate = null ;
+					if( delegate != null )
+					{
+						delegate.shutdown() ;
+						delegate = null ;
+					}
 					return ;
 				}
 
@@ -693,7 +696,7 @@ public class GameState extends State implements HookEntity
 		public void update( final double _dt ) ;
 	}
 
-	private class ShowFPS
+	private static class ShowFPS
 	{
 		private boolean show = false ;
 		private final StringBuilder txt = new StringBuilder( "0" ) ;

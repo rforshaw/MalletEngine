@@ -871,7 +871,9 @@ public final class Shape
 
 		public void init( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
 		{
-			swivel    = _swivel ;
+			swivel    = new Swivel[_swivel.length] ;
+			System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
+
 			verticies = new float[Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize] ;
 			indicies  = new int[_indexSize] ;
 

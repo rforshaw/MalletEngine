@@ -65,7 +65,7 @@ public class GLProgram extends Resource
 			{
 				final GLProgram program               = ( GLProgram )_data.getProgram() ;
 				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
-				final int inUniform                   = program.inUniforms[_index] ;
+				//final int inUniform                   = program.inUniforms[_index] ;
 
 				final MalletTexture texture = ( MalletTexture )_data.get( uniform.getLeft() ) ;
 				final Texture<GLImage> glTexture = GLRenderer.getTexture( texture.getPath() ) ;
@@ -107,7 +107,7 @@ public class GLProgram extends Resource
 			{
 				final GLProgram program              = ( GLProgram )_data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
-				final int inUniform                  = program.inUniforms[_index] ;
+				//final int inUniform                  = program.inUniforms[_index] ;
 
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFont glFont = GLRenderer.getFont( font ) ;

@@ -1021,7 +1021,7 @@ public class GLGeometryUploader
 						return location ;
 					}
 
-					remove( _gl, _data ) ;
+					super.remove( _gl, _data ) ;
 				}
 			}
 
