@@ -96,7 +96,8 @@ public class InputSystem implements InputSystemInterface,
 			switch( handler.passInputEvent( _input ) )
 			{
 				case PROPAGATE : continue ;
-				case CONSUME   : return ;
+				case CONSUME   :
+				default        : return ;
 			}
 		}
 	}
@@ -148,6 +149,7 @@ public class InputSystem implements InputSystemInterface,
 				updateMouse( InputType.MOUSE3_PRESSED, mousePosition ) ;
 				break ;
 			}
+			default                 : break ;
 		}
 	}
 
@@ -176,6 +178,7 @@ public class InputSystem implements InputSystemInterface,
 				updateMouse( InputType.MOUSE3_RELEASED, mousePosition ) ;
 				break ;
 			}
+			default                 : break ;
 		}
 	}
 

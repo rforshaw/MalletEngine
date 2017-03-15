@@ -14,9 +14,14 @@ import com.linxonline.mallet.io.filesystem.StringInCallback ;
 */
 public abstract class JSONObject
 {
-	protected static JSONObject constructor = null ;
+	private static JSONObject constructor = null ;
 
 	public JSONObject() {}
+
+	public static void setConstructor( final JSONObject _impl )
+	{
+		constructor = _impl ;
+	}
 
 	/**
 		Create a blank JSON Object

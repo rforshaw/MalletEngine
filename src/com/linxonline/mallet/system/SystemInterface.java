@@ -11,8 +11,6 @@ import com.linxonline.mallet.renderer.RenderInterface ;
 	It's responsibility entails creating a window, hooking-up 
 	the input-system, initialising the rendering system, and 
 	initialising the audio-system.
-	It also handles the responsibility of creating O/S specific 
-	locks that the game requires.
 */
 public interface SystemInterface
 {

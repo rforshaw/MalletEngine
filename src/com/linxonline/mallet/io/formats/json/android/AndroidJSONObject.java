@@ -46,7 +46,7 @@ public class AndroidJSONObject extends JSONObject
 
 	public static void init()
 	{
-		constructor = new AndroidJSONObject() ;
+		setConstructor( new AndroidJSONObject() ) ;
 	}
 
 	@Override

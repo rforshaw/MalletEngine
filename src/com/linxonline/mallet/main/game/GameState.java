@@ -39,7 +39,6 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
-import com.linxonline.mallet.util.locks.Locks ;
 
 import com.linxonline.mallet.util.factory.creators.* ;
 import com.linxonline.mallet.util.factory.EntityFactory ;

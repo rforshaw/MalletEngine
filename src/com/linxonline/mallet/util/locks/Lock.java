@@ -1,13 +1,9 @@
 package com.linxonline.mallet.util.locks ;
 
-/**
-	Thread locking implemented via Java's notifyAll() and wait() functionality.
-**/
-public class JLock implements LockInterface
+public class Lock implements ILock
 {
 	private final Object lock = new Object() ;
 
-	@Override
 	public void unlock()
 	{
 		synchronized( lock )
@@ -16,12 +12,17 @@ public class JLock implements LockInterface
 		}
 	}
 
-	@Override
-	public void lock()
+	public void lock( final ICondition _condition )
 	{
 		synchronized( lock )
 		{
-			try { lock.wait() ; }
+			try
+			{
+				while( _condition.isConditionMet() == false )
+				{
+					lock.wait() ;
+				}
+			}
 			catch( InterruptedException ex ) {}
 		}
 	}

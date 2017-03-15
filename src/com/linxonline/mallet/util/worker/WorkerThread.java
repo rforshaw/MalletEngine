@@ -1,25 +1,29 @@
 package com.linxonline.mallet.util.worker ;
 
 import java.util.List ;
+import java.util.concurrent.atomic.AtomicBoolean ;
 
 import com.linxonline.mallet.util.locks.* ;
 
 public class WorkerThread extends Thread
+						  implements ICondition
 {
-	private boolean stop = false ;						// true == Kill the thread
-	private boolean ready = true ;						// true == ready for action, false == current working
-	private LockInterface block = new JLock() ;			// Block thread while waiting for work
-	private MultiLockInterface multiLock = null ;		// Lock to calling thread
+	private boolean stop = false ;								// true == Kill the thread
+	private AtomicBoolean ready = new AtomicBoolean( true ) ;	// true == ready for action, false == current working
+	private ILock block = new Lock() ;							// Block thread while waiting for work
+	private ILock groupLock = null ;
+	private WorkerGroup.WorkerCondition groupCondition = null ;		// Lock to calling thread
 
-	private Worker<?> worker = null ;						// Defines execution and data set
+	private Worker<?> worker = null ;					// Defines execution and data set
 	private int start = 0 ;								// Start of data subset
 	private int end = 0 ;								// End of data subset
 
 	public WorkerThread() {}
 
-	public void setMultiLock( final MultiLockInterface _multiLock )
+	public void setWorkerCondition( final ILock _lock, final WorkerGroup.WorkerCondition _condition )
 	{
-		multiLock = _multiLock ;
+		groupLock = _lock ;
+		groupCondition = _condition ;
 	}
 
 	/**
@@ -50,19 +54,15 @@ public class WorkerThread extends Thread
 			if( worker != null )
 			{
 				type = worker.exec( start, end ) ;
-				/*final List list = worker.getDataSet() ;
-				for( int i = start; i < end; i++ )
-				{
-					type = worker.exec( i, list.get( i ) ) ;		// Does the hard execution work
-				}*/
 			}
 
-			if( multiLock != null )
+			if( groupLock != null && groupCondition != null )
 			{
 				// Inform calling thread you've finished
 				// Multilock will only be set if calling thread 
 				// is expected to wait for the work to be completed.
-				multiLock.unlock() ;
+				groupCondition.unregister() ;
+				groupLock.unlock() ;
 			}
 
 			if( type == ExecType.FINISH )
@@ -81,9 +81,15 @@ public class WorkerThread extends Thread
 	*/
 	public boolean ready()
 	{
-		return ready ;
+		return ready.get() ;
 	}
 
+	@Override
+	public boolean isConditionMet()
+	{
+		return !ready() ;
+	}
+	
 	/**
 		Resume Worker Thread execution.
 		Call setMultiLock(), setRange(), setWorker() 
@@ -91,14 +97,14 @@ public class WorkerThread extends Thread
 	*/
 	public void unpause()
 	{
-		ready = false ;
+		ready.set( false ) ;
 		block.unlock() ;
 	}
 
 	private void pause()
 	{
-		ready = true ;
-		block.lock() ;
+		ready.set( true ) ;
+		block.lock( this ) ;
 	}
 
 	public void end()

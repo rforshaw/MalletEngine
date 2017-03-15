@@ -4,14 +4,17 @@ import java.util.List ;
 import java.util.Stack ;
 import java.util.ArrayList ;
 
+import java.util.concurrent.atomic.AtomicInteger ;
+
 import com.linxonline.mallet.util.locks.* ;
 
 public class WorkerGroup
 {
 	private final Stack<WorkerThread> availableWorkers = new Stack<WorkerThread>() ;
 	private final ArrayList<WorkerThread> workers = new ArrayList<WorkerThread>() ;
+	private final WorkerCondition condition ;
 
-	private final MultiJLock multiLock = new MultiJLock() ;
+	private final ILock lock = new Lock() ;
 
 	public WorkerGroup()
 	{
@@ -22,6 +25,7 @@ public class WorkerGroup
 	{
 		availableWorkers.ensureCapacity( _threads ) ;
 		workers.ensureCapacity( _threads ) ;
+		condition = new WorkerCondition( _threads ) ;
 
 		for( int i = 0; i < _threads; i++ )
 		{
@@ -39,7 +43,7 @@ public class WorkerGroup
 	*/
 	public void exec( final Worker<?> _worker )
 	{
-		multiLock.reset() ;
+		//System.out.println( "Exec Worker Group" ) ;
 		final List<?> dataset = _worker.getDataSet() ;
 
 		int threadLength = availableWorkers.size() ;
@@ -53,23 +57,24 @@ public class WorkerGroup
 
 		int start = 0 ;
 		final int range = dataSize / threadLength ; 	// Split the entities between the threads.
+		condition.reset() ;
 
 		for( int i = 0; i < threadLength; ++i )
 		{
 			final WorkerThread thread = availableWorkers.pop() ;
 			workers.add( thread ) ;
 
-			thread.setMultiLock( multiLock ) ;
+			thread.setWorkerCondition( lock, condition ) ;
 			thread.setRange( start, start + range ) ;
 			thread.setWorker( _worker ) ;
 
 			start += range ;
 
-			multiLock.interest() ;
 			thread.unpause() ;			// Resume data updating
 		}
 
-		multiLock.lock() ;		 		// Only continue once all EntityThreads have finished
+		//System.out.println( "Lock Group" ) ;
+		lock.lock( condition ) ;		 // Only continue once all EntityThreads have finished
 
 		relinquishWorkers() ;
 	}
@@ -88,5 +93,35 @@ public class WorkerGroup
 			availableWorkers.push( thread ) ;
 		}
 		workers.clear() ;
+	}
+
+	public static class WorkerCondition implements ICondition
+	{
+		private final int workers ;
+		private final AtomicInteger active ;
+
+		public WorkerCondition( final int _workers )
+		{
+			workers = _workers ;
+			active = new AtomicInteger( workers ) ;
+		}
+
+		public void reset()
+		{
+			//System.out.println( "Reset" ) ;
+			active.set( workers ) ;
+		}
+
+		public void unregister()
+		{
+			//System.out.println( "Unregister" ) ;
+			active.decrementAndGet() ;
+		}
+
+		public boolean isConditionMet()
+		{
+			//System.out.println( "Group Condition: " + active ) ;
+			return active.intValue() <= 0 ;
+		}
 	}
 }

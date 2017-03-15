@@ -8,7 +8,6 @@ import com.jogamp.newt.event.WindowEvent ;
 import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
 import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
-import com.linxonline.mallet.util.locks.* ;
 import com.linxonline.mallet.system.* ;
 import com.linxonline.mallet.event.* ;
 
@@ -23,8 +22,6 @@ public class GLDefaultSystem extends BasicSystem
 
 	public GLDefaultSystem()
 	{
-		Locks.getLocks().addLock( "APPLICATION_LOCK", new JLock() ) ;
-
 		shutdownDelegate = new DefaultShutdown() ;
 		renderer = new GLRenderer() ;
 		audioGenerator = new ALSASourceGenerator() ;

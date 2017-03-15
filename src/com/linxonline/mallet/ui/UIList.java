@@ -25,6 +25,7 @@ public class UIList extends UILayout
 				break ;
 			}
 			case VERTICAL :
+			default       :
 			{
 				setMaximumLength( _length, 0.0f, 0.0f ) ;
 				break ;

@@ -46,7 +46,7 @@ public class DesktopJSONObject extends JSONObject
 
 	public static void init()
 	{
-		constructor = new DesktopJSONObject() ;
+		setConstructor( new DesktopJSONObject() ) ;
 	}
 
 	@Override

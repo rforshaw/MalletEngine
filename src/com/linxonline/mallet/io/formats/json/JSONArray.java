@@ -8,9 +8,14 @@ package com.linxonline.mallet.io.formats.json ;
 */
 public abstract class JSONArray
 {
-	protected static JSONArray constructor = null ;
+	private static JSONArray constructor = null ;
 
 	public JSONArray() {}
+
+	public static void setConstructor( final JSONArray _impl )
+	{
+		constructor = _impl ;
+	}
 
 	public static JSONArray construct()
 	{

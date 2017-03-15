@@ -53,6 +53,7 @@ public class MouseComponent extends InputComponent
 			case MOUSE2_RELEASED : mouse2Pressed = false ;         break ;
 			case MOUSE3_PRESSED  : mouse3Pressed = true ;          break ;
 			case MOUSE3_RELEASED : mouse3Pressed = false ;         break ;
+			default              : break ;
 		}
 	}
 

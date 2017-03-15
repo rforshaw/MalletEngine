@@ -183,8 +183,6 @@ public class InputSystem implements InputSystemInterface
 		final InputEvent input = cache.get() ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		mouseInputs.add( input ) ;
-
-		//Locks.getLocks().getLock( "APPLICATION_LOCK" ).unlock() ;
 	}
 
 	public synchronized void update()

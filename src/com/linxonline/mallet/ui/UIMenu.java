@@ -19,6 +19,7 @@ public class UIMenu extends UILayout
 				setMaximumLength( 0.0f, _length, 0.0f ) ;
 				break ;
 			}
+			default         :
 			case VERTICAL   :
 			{
 				setMaximumLength( _length, 0.0f, 0.0f ) ;

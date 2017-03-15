@@ -44,7 +44,7 @@ public class AndroidJSONArray extends JSONArray
 
 	public static void init()
 	{
-		constructor = new AndroidJSONArray() ;
+		setConstructor( new AndroidJSONArray() ) ;
 	}
 
 	@Override

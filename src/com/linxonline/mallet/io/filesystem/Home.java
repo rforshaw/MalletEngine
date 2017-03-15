@@ -4,12 +4,10 @@ import com.linxonline.mallet.util.Tuple ;
 
 public class Home
 {
-	private final String name ;
 	private final String homeDirectory ;
 
 	public Home( final String _projectName )
 	{
-		name = _projectName ;
 		homeDirectory = GlobalFileSystem.getHomeDirectory( _projectName ) ;
 	}
 

@@ -44,7 +44,7 @@ public class DesktopJSONArray extends JSONArray
 
 	public static void init()
 	{
-		constructor = new DesktopJSONArray() ;
+		setConstructor( new DesktopJSONArray() ) ;
 	}
 
 	@Override

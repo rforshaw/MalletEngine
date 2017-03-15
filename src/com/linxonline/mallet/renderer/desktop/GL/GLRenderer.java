@@ -410,15 +410,23 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public World addWorld( final World _world )
 			{
-				getWorldState().addWorld( ( GLWorld )_world ) ;
-				return _world ;
+				if( _world instanceof GLWorld )
+				{
+					getWorldState().addWorld( ( GLWorld )_world ) ;
+					return _world ;
+				}
+				return null ;
 			}
 
 			@Override
 			public World removeWorld( final World _world )
 			{
-				getWorldState().removeWorld( ( GLWorld )_world ) ;
-				return _world ;
+				if( _world instanceof GLWorld )
+				{
+					getWorldState().removeWorld( ( GLWorld )_world ) ;
+					return _world ;
+				}
+				return null ;
 			}
 
 			@Override
@@ -772,7 +780,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public void display( final GLAutoDrawable _drawable )
 	{
-		gl = _drawable.getGL().getGL3() ;
 		gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT ) ;
 
 		getEventController().update() ;
@@ -928,6 +935,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				case GL3.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
 				case GL3.GL_STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
 				case GL3.GL_STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
+				default                                   : System.out.println( _txt + ": Unknown Error." ) ; break ;
 			}
 		}
 	}
