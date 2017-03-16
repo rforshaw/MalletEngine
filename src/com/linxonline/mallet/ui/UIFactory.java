@@ -202,6 +202,7 @@ public final class UIFactory
 		public void constructDraws()
 		{
 			final T parent = getParent() ;
+			final int layer = parent.getLayer() ;
 
 			updateLength( parent.getLength() ) ;
 			updateOffset( parent.getOffset() ) ;
@@ -209,9 +210,10 @@ public final class UIFactory
 			if( sheet != null && uv != null )
 			{
 				draw = DrawAssist.createDraw( parent.getPosition(),
-											offset,
-											new Vector3(),
-											new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
+											  offset,
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ),
+											  layer ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
 
@@ -227,11 +229,12 @@ public final class UIFactory
 				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
 
 				drawText = DrawAssist.createTextDraw( text,
-													font,
-													parent.getPosition(),
-													textOffset,
-													new Vector3(),
-													new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
+													  font,
+													  parent.getPosition(),
+													  textOffset,
+													  new Vector3(),
+													  new Vector3( 1, 1, 1 ),
+													  layer + 1 ) ;
 				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;
 			}

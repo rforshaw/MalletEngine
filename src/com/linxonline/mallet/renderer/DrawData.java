@@ -62,7 +62,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 					 final Vector3 _scale,
 					 final int _order )
 	{
-		setOrder( 0 ) ;
+		setOrder( _order ) ;
 		setUpdateType( _type ) ;
 		setInterpolationMode( _interpolation ) ;
 		position = ( _position != null ) ? _position : new Vector3()  ;

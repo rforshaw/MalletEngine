@@ -95,12 +95,15 @@ public class EntitySystem implements EntitySystemInterface
 	**/
 	protected void toBeAddedEntities()
 	{
-		final int size = entitiesToAdd.size() ;
-		for( int i = 0; i < size; ++i )
+		if( entitiesToAdd.isEmpty() == false )
 		{
-			injectEntity( entitiesToAdd.get( i ) ) ;
+			final int size = entitiesToAdd.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				injectEntity( entitiesToAdd.get( i ) ) ;
+			}
+			entitiesToAdd.clear() ;
 		}
-		entitiesToAdd.clear() ;
 	}
 
 	protected void cleanupEntities()
