@@ -97,31 +97,46 @@ public class UIComponent extends InputComponent
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
-		for( final UIElement element : elements )
+		if( elements.isEmpty() == false )
 		{
-			element.update( _dt, events ) ;
-			if( element.destroy == true )
+			final int size = elements.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				removeElement( element ) ;
+				final UIElement element = elements.get( i ) ;
+				element.update( _dt, events ) ;
+				if( element.destroy == true )
+				{
+					removeElement( element ) ;
+				}
 			}
 		}
 
-		for( final UIElement element : toRemove )
+		if( toRemove.isEmpty() == false )
 		{
-			if( elements.remove( element ) == true )
+			final int size = toRemove.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				element.shutdown() ;
-				element.clear() ;
+				final UIElement element = toRemove.get( i ) ;
+				if( elements.remove( element ) == true )
+				{
+					element.shutdown() ;
+					element.clear() ;
+				}
 			}
+			toRemove.clear() ;
 		}
-		toRemove.clear() ;
 
-		for( final Event event : events )
+		if( events.isEmpty() == false )
 		{
-			eventController.passEvent( event ) ;
+			final int size = events.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final Event event = events.get( i ) ;
+				eventController.passEvent( event ) ;
+			}
+			events.clear() ;
+			eventController.update() ;
 		}
-		events.clear() ;
-		eventController.update() ;
 
 		if( toDestroy != null )
 		{
@@ -151,8 +166,10 @@ public class UIComponent extends InputComponent
 			return InputEvent.Action.CONSUME ;
 		}
 
-		for( final UIElement element : elements )
+		final int size = elements.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final UIElement element = elements.get( i ) ;
 			if( element.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
 				return InputEvent.Action.CONSUME ;

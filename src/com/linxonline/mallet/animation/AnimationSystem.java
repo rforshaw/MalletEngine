@@ -58,8 +58,10 @@ public class AnimationSystem
 
 			private void getActiveKeys( final Set<String> _keys, final List<AnimData> _animations )
 			{
-				for( final AnimData anim : _animations )
+				final int size = _animations.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AnimData anim = _animations.get( i ) ;
 					_keys.add( anim.getFile() ) ;
 				}
 			}
@@ -85,8 +87,10 @@ public class AnimationSystem
 		{
 			if( toRemoveAnim.isEmpty() == false )
 			{
-				for( final AnimData anim : toRemoveAnim )
+				final int size = toRemoveAnim.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AnimData anim = toRemoveAnim.get( 0 ) ;
 					anim.stop() ;
 					animations.remove( anim ) ;
 					drawDelegate.removeDraw( anim.getDraw() ) ;
@@ -97,8 +101,10 @@ public class AnimationSystem
 
 			if( toAddAnim.isEmpty() == false )
 			{
-				for( final AnimData anim : toAddAnim )
+				final int size = toAddAnim.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AnimData anim = toAddAnim.get( i ) ;
 					final Sprite sprite = ( Sprite )spriteManager.get( anim.getFile() ) ;
 					if( sprite != null )
 					{
@@ -129,8 +135,10 @@ public class AnimationSystem
 		toAddAnim.clear() ;			// Never added not hooked in
 		toRemoveAnim.clear() ;		// Will be removed from animations anyway
 
-		for( final AnimData anim : animations )
+		final int size = animations.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final AnimData anim = animations.get( i ) ;
 			drawDelegate.removeDraw( anim.getDraw() ) ;
 			anim.removeCallback() ;
 		}
@@ -178,8 +186,10 @@ public class AnimationSystem
 			@Override
 			public void shutdown()
 			{
-				for( final AnimData anim : data  )
+				final int size = data.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AnimData anim = data.get( i ) ;
 					toRemoveAnim.add( anim ) ;
 				}
 				data.clear() ;

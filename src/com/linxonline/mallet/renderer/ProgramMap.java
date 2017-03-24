@@ -24,6 +24,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
 
 	private WeakReference<U> program = null ;			// Handler to renderer specific program.
+	private boolean dirty = true ;
 
 	public ProgramMap( final String _id )
 	{
@@ -53,6 +54,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 	public void set( final String _id, final Object _value )
 	{
 		uniforms.put( _id, _value ) ;
+		dirty = true ;
 	}
 
 	/**
@@ -77,6 +79,21 @@ public class ProgramMap<U> implements Program<ProgramMap>
 		return uniforms ;
 	}
 
+	public void dirty()
+	{
+		setDirty( true ) ;
+	}
+
+	public void setDirty( final boolean _dirty )
+	{
+		dirty = _dirty ;
+	}
+
+	public boolean isDirty()
+	{
+		return dirty ;
+	}
+	
 	@Override
 	public boolean equals( final Object _obj )
 	{
@@ -107,14 +124,17 @@ public class ProgramMap<U> implements Program<ProgramMap>
 			}
 
 			final Set<Map.Entry<String, Object>> entries = uniforms.entrySet() ;
-			for( final Map.Entry<String, Object> entry : entries )
+			if( entries.isEmpty() == false )
 			{
-				final Object obj1 = entry.getValue() ;
-				final Object obj2 = u.get( entry.getKey() ) ;
-
-				if( obj1.equals( obj2 ) == false )
+				for( final Map.Entry<String, Object> entry : entries )
 				{
-					return false ;
+					final Object obj1 = entry.getValue() ;
+					final Object obj2 = u.get( entry.getKey() ) ;
+
+					if( obj1.equals( obj2 ) == false )
+					{
+						return false ;
+					}
 				}
 			}
 		}

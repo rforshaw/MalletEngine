@@ -106,17 +106,27 @@ public class RenderComponent extends Component
 			public void callback( final DrawDelegate<World, Draw> _delegate )
 			{
 				drawDelegate = _delegate ;
-				for( final Draw draw : toAddBasic )
+				if( toAddBasic.isEmpty() == false )
 				{
-					addBasicDraw( draw ) ;
+					final int size = toAddBasic.size() ;
+					for( int i = 0; i < size; i++ )
+					{
+						final Draw draw = toAddBasic.get( 0 ) ;
+						addBasicDraw( draw ) ;
+					}
+					toAddBasic.clear() ;
 				}
-				toAddBasic.clear() ;
 
-				for( final Draw draw : toAddText )
+				if( toAddText.isEmpty() == false )
 				{
-					addTextDraw( draw ) ;
+					final int size = toAddText.size() ;
+					for( int i = 0; i < size; i++ )
+					{
+						final Draw draw = toAddText.get( i ) ;
+						addTextDraw( draw ) ;
+					}
+					toAddText.clear() ;
 				}
-				toAddText.clear() ;
 			}
 		} ) ) ;
 	}

@@ -26,11 +26,16 @@ public class DrawState<D extends DrawData> extends ManagedArray<D>
 	@Override
 	protected void addNewData( final List<D> _toAdd )
 	{
-		for( final D add : _toAdd )
+		if( _toAdd.isEmpty() == false )
 		{
-			insertNewDrawData( add ) ;
+			final int size = _toAdd.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final D add = _toAdd.get( i ) ;
+				insertNewDrawData( add ) ;
+			}
+			_toAdd.clear() ;
 		}
-		_toAdd.clear() ;
 	}
 
 	private void insertNewDrawData( final D _insert )

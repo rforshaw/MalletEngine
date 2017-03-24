@@ -167,8 +167,10 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void addEntities( final List<Entity> _entities )
 	{
-		for( final Entity entity : _entities )
+		final int size = _entities.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Entity entity = _entities.get( i ) ;
 			addEntity( entity ) ;
 		}
 	}
@@ -179,8 +181,10 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void addEntitiesNow( final List<Entity> _entities )
 	{
-		for( final Entity entity : _entities )
+		final int size = _entities.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Entity entity = _entities.get( i ) ;
 			addEntityNow( entity ) ;
 		}
 	}
@@ -210,8 +214,10 @@ public class GameState extends State implements HookEntity
 	*/
 	public final void removeEntities( final List<Entity> _entities )
 	{
-		for( final Entity entity : _entities )
+		final int size = _entities.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Entity entity = _entities.get( i ) ;
 			removeEntity( entity ) ;
 		}
 	}

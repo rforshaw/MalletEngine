@@ -27,7 +27,8 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	private boolean play      = false ;
 	private float elapsedTime = 0.0f ;
-	private int frame         = 0 ;				// Current frame 
+	private int prevFrame     = 0 ;
+	private int currFrame     = 0 ;				// Current frame 
 	private float frameDelta  = 0.0f ;			// Amount of time that needs to elapse before next frame
 	private int length        = 0 ;				// How many frames
 
@@ -96,7 +97,8 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	public void stop()
 	{
 		play = false ;
-		frame = 0 ;
+		prevFrame = 0 ;
+		currFrame = 0 ;
 
 		final int size = callbacks.size() ;
 		for( int i = 0; i < size; ++i )
@@ -114,8 +116,9 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 			{
 				changeTexture( draw, sprite ) ;
 				elapsedTime -= frameDelta ;
-				frame = ++frame % length ; // Increment frame, reset to 0 if reaches length.
-				if( frame == 0 )
+				prevFrame = currFrame ;
+				currFrame = ++currFrame % length ; // Increment frame, reset to 0 if reaches length.
+				if( currFrame == 0 )
 				{
 					finishedCallbacks() ;
 				}
@@ -126,9 +129,15 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	private void changeTexture( final Draw _draw, final Sprite _sprite )
 	{
-		final Sprite.Frame f = sprite.getFrame( frame ) ;		// Grab the current frame
+		final Sprite.Frame p = sprite.getFrame( prevFrame ) ;		// Grab the previous frame
+		final Sprite.Frame c = sprite.getFrame( currFrame ) ;		// Grab the current frame
 
-		ProgramAssist.map( DrawAssist.getProgram( draw ), "inTex0", f.path ) ;
+		if( prevFrame == currFrame || p.path.equals( c.path ) == false )
+		{
+			// We only want to remap the programs texture 
+			// if the sprite is not using a spritesheet.
+			ProgramAssist.map( DrawAssist.getProgram( draw ), "inTex0", c.path ) ;
+		}
 
 		// If using a sprite sheet the UV coordinates 
 		// will have changed. Though there is a possibility
@@ -136,7 +145,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		// UV's too. Or the texture stays the same and the UV 
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
-		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), f.uv1, f.uv2 ) ;
+		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), c.uv1, c.uv2 ) ;
 		DrawAssist.forceUpdate( _draw ) ;
 	}
 
@@ -173,7 +182,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		final int size = callbacks.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			callbacks.get( i ).tick( ( float )frame * frameDelta ) ;
+			callbacks.get( i ).tick( ( float )currFrame * frameDelta ) ;
 		}
 	}
 
@@ -206,7 +215,8 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 		play        = false ;
 		elapsedTime = 0.0f ;
-		frame       = 0 ; 
+		prevFrame   = 0 ;
+		currFrame   = 0 ; 
 		frameDelta  = 0.0f ;
 		length      = 0 ;
 	}

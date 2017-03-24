@@ -193,33 +193,39 @@ public class InputSystem implements InputSystemInterface
 
 	private void passKeyInputs()
 	{
-		final int stateSize = activeKeyStates.size() ;
-		KeyState state = null ;
-
-		for( int i = 0; i < stateSize; i++ )
+		if( activeKeyStates.isEmpty() == false )
 		{
-			state = activeKeyStates.get( i ) ;
-			final InputEvent input = cache.get() ;
-			input.clone( state.input ) ;
+			final int stateSize = activeKeyStates.size() ;
+			KeyState state = null ;
 
-			passInputEventToHandlers( input ) ;
+			for( int i = 0; i < stateSize; i++ )
+			{
+				state = activeKeyStates.get( i ) ;
+				final InputEvent input = cache.get() ;
+				input.clone( state.input ) ;
+
+				passInputEventToHandlers( input ) ;
+			}
+
+			activeKeyStates.clear() ;
 		}
-
-		activeKeyStates.clear() ;
 	}
 
 	private void passMouseInputs()
 	{
-		final int inputSize = mouseInputs.size() ;
-		InputEvent input = null ;
-
-		for( int i = 0; i < inputSize; ++i )
+		if( mouseInputs.isEmpty() == false )
 		{
-			input = mouseInputs.get( i ) ;
-			passInputEventToHandlers( input ) ;
-		}
+			final int inputSize = mouseInputs.size() ;
+			InputEvent input = null ;
 
-		mouseInputs.clear() ;
+			for( int i = 0; i < inputSize; ++i )
+			{
+				input = mouseInputs.get( i ) ;
+				passInputEventToHandlers( input ) ;
+			}
+
+			mouseInputs.clear() ;
+		}
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )
@@ -240,12 +246,15 @@ public class InputSystem implements InputSystemInterface
 
 	public void clearHandlers()
 	{
-		final int size = handlers.size() ;
-		for( int i = 0; i < size; ++i )
+		if( handlers.isEmpty() == false )
 		{
-			handlers.get( i ).reset() ;
+			final int size = handlers.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				handlers.get( i ).reset() ;
+			}
+			handlers.clear() ;
 		}
-		handlers.clear() ;
 	}
 
 	public synchronized void clearInputs()

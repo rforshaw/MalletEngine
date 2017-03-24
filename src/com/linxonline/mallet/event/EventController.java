@@ -154,11 +154,16 @@ public class EventController implements EventHandler
 
 		public void transferEvents( final AddEventInterface _addInterface )
 		{
-			for( final Event<?> event : events )
+			if( events.isEmpty() == false )
 			{
-				_addInterface.addEvent( event ) ;
+				final int size = events.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final Event<?> event = events.get( i ) ;
+					_addInterface.addEvent( event ) ;
+				}
+				clear() ;
 			}
-			clear() ;
 		}
 
 		public void addEvent( final Event<?> _event )

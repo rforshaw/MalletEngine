@@ -74,8 +74,10 @@ public class GLGeometryUploader
 	*/
 	public void draw( final GL3 _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
-		for( final IBuffer buffer : buffers )
+		final int size = buffers.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final IBuffer buffer = buffers.get( i ) ;
 			buffer.draw( _gl, _worldProjection, _uiProjection ) ;
 		}
 	}
@@ -267,11 +269,16 @@ public class GLGeometryUploader
 	*/
 	private IBuffer getSupportedBuffer( final GLDrawData _data )
 	{
-		for( final IBuffer buffer : buffers )
+		if( buffers.isEmpty() == false )
 		{
-			if( buffer.isSupported( _data ) == true )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				return buffer ;
+				final IBuffer buffer = buffers.get( i ) ;
+				if( buffer.isSupported( _data ) == true )
+				{
+					return buffer ;
+				}
 			}
 		}
 
@@ -523,8 +530,10 @@ public class GLGeometryUploader
 			}
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
-			for( final GLGeometry geometry : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final GLGeometry geometry = buffers.get( i ) ;
 				_gl.glBindBuffer( GL3.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Draw Bind Index: ", _gl ) ;
 				_gl.glBindBuffer( GL3.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Draw Bind Vertex: ", _gl ) ;
 
@@ -612,7 +621,18 @@ public class GLGeometryUploader
 
 		protected boolean isProgram( final ProgramMap<GLProgram> _program )
 		{
-			return program.equals( _program ) ;
+			// Checking to see if the program matches up with 
+			// the program used by the buffer is expensive.
+			// We only check to see if the program is valid if it's 
+			// flagged as dirty.
+			// As only modified/new programs will be flagged as dirty.
+			if( _program.isDirty() == true )
+			{
+				_program.setDirty( false ) ;
+				return program.equals( _program ) ;
+			}
+
+			return true ;
 		}
 
 		/**
@@ -768,8 +788,10 @@ public class GLGeometryUploader
 
 			// If it hasn't been added find a space for it within 
 			// an existing geometry buffer.
-			for( final GLGeometry geometry : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final GLGeometry geometry = buffers.get( i ) ;
 				final Location location = geometry.findLocation( _data ) ;
 				if( location != null )
 				{
@@ -1027,8 +1049,10 @@ public class GLGeometryUploader
 
 			// If it hasn't been added find a space for it within 
 			// an existing geometry buffer.
-			for( final GLGeometry geometry : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final GLGeometry geometry = buffers.get( i ) ;
 				final Location location = geometry.findLocation( _data ) ;
 				if( location != null )
 				{
@@ -1145,31 +1169,41 @@ public class GLGeometryUploader
 			int locationVertexStart = 0 ;
 
 			//System.out.println( "Searching for location.. " ) ;
-			for( final Location.Range nextIndex : indexRanges )
+			if( indexRanges.isEmpty() == false )
 			{
-				final int indexLen = nextIndex.getStart() - locationIndexStart ;
-				if( indexLen < shapeIndexBytes )
+				final int size = indexRanges.size() ;
+				for( int i = 0; i < size; i++ )
 				{
-					locationIndexStart = nextIndex.getEnd() ;
-				}
-				else
-				{
-					foundIndex = true ;
-					break ;
+					final Location.Range nextIndex = indexRanges.get( i ) ;
+					final int indexLen = nextIndex.getStart() - locationIndexStart ;
+					if( indexLen < shapeIndexBytes )
+					{
+						locationIndexStart = nextIndex.getEnd() ;
+					}
+					else
+					{
+						foundIndex = true ;
+						break ;
+					}
 				}
 			}
 
-			for( final Location.Range nextVertex : vertexRanges )
+			if( vertexRanges.isEmpty() == false )
 			{
-				final int vertexLen = nextVertex.getStart() - locationVertexStart ;
-				if( vertexLen < shapeVertexBytes )
+				final int size = vertexRanges.size() ;
+				for( int i = 0; i < size; i++ )
 				{
-					locationVertexStart = nextVertex.getEnd() ;
-				}
-				else
-				{
-					foundVertex = true ;
-					break ;
+					final Location.Range nextVertex = vertexRanges.get( i ) ;
+					final int vertexLen = nextVertex.getStart() - locationVertexStart ;
+					if( vertexLen < shapeVertexBytes )
+					{
+						locationVertexStart = nextVertex.getEnd() ;
+					}
+					else
+					{
+						foundVertex = true ;
+						break ;
+					}
 				}
 			}
 
@@ -1327,8 +1361,10 @@ public class GLGeometryUploader
 		private void packGeometryData( final GL3 _gl )
 		{
 			int start = 0 ;
-			for( final Location.Range range : indexRanges )
+			final int size = indexRanges.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final Location.Range range = indexRanges.get( i ) ;
 				final int indexLength = range.getLength() ;
 				if( start != range.getStart() )
 				{
@@ -1489,24 +1525,27 @@ public class GLGeometryUploader
 
 	protected static void enableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
 	{
-		for( final VertexAttrib att : _atts )
+		for( int i = 0; i < _atts.length; i++ )
 		{
+			final VertexAttrib att = _atts[i] ;
 			_gl.glEnableVertexAttribArray( att.index ) ;
 		}
 	}
 
 	protected static void prepareVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts, final int _stride )
 	{
-		for( final VertexAttrib att : _atts )
+		for( int i = 0; i < _atts.length; i++ )
 		{
+			final VertexAttrib att = _atts[i] ;
 			_gl.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
 		}
 	}
 
 	protected static void disableVertexAttributes( final GL3 _gl, final VertexAttrib[] _atts )
 	{
-		for( final VertexAttrib att : _atts )
+		for( int i = 0; i < _atts.length; i++ )
 		{
+			final VertexAttrib att = _atts[i] ;
 			_gl.glDisableVertexAttribArray( att.index ) ;
 		}
 	}

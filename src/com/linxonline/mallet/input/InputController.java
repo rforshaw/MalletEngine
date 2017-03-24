@@ -22,12 +22,15 @@ public abstract class InputController implements InputHandler
 
 	public void update()
 	{
-		final int size = inputs.size() ;
-		for( int i = 0; i < size; ++i )
+		if( inputs.isEmpty() == false )
 		{
-			processInputEvent( inputs.get( i ) ) ;
+			final int size = inputs.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				processInputEvent( inputs.get( i ) ) ;
+			}
+			inputs.clear() ;
 		}
-		inputs.clear() ;
 	}
 
 	public abstract void processInputEvent( final InputEvent _input ) ;
@@ -48,6 +51,9 @@ public abstract class InputController implements InputHandler
 	@Override
 	public void reset()
 	{
-		inputs.clear() ;
+		if( inputs.isEmpty() == false )
+		{
+			inputs.clear() ;
+		}
 	}
 }

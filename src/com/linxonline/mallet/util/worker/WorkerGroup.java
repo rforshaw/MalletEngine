@@ -85,14 +85,17 @@ public class WorkerGroup
 	*/
 	private void relinquishWorkers()
 	{
-		final int size = workers.size() ;
-		for( int i = 0; i < size; i++ )
+		if( workers.isEmpty() == false )
 		{
-			final WorkerThread thread = workers.get( i ) ;
-			thread.setWorker( null ) ;
-			availableWorkers.push( thread ) ;
+			final int size = workers.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final WorkerThread thread = workers.get( i ) ;
+				thread.setWorker( null ) ;
+				availableWorkers.push( thread ) ;
+			}
+			workers.clear() ;
 		}
-		workers.clear() ;
 	}
 
 	public static class WorkerCondition implements ICondition

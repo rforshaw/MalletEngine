@@ -57,14 +57,19 @@ public final class EventSystem implements EventSystemInterface
 			return ;
 		}
 
-		for( final EventType type : types )
+		if( types.isEmpty() == false )
 		{
-			if( eventQueues.containsKey( type ) == false )
+			final int size = types.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				addEventQueue( type, new EventQueue( type ) ) ;
-			}
+				final EventType type = types.get( i ) ;
+				if( eventQueues.containsKey( type ) == false )
+				{
+					addEventQueue( type, new EventQueue( type ) ) ;
+				}
 
-			eventQueues.get( type ).addEventHandler( _handler ) ;
+				eventQueues.get( type ).addEventHandler( _handler ) ;
+			}
 		}
 	}
 

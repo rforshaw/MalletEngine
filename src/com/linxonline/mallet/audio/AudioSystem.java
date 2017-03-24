@@ -68,8 +68,10 @@ public class AudioSystem
 
 			private void getActiveKeys( final Set<String> _keys, final List<AudioData> _audio )
 			{
-				for( final AudioData audio : _audio )
+				final int size = _audio.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AudioData audio = _audio.get( i ) ;
 					if( audio.stop == false )
 					{
 						_keys.add( audio.getFilePath() ) ;
@@ -98,8 +100,10 @@ public class AudioSystem
 		{
 			if( sourceGenerator != null )
 			{
-				for( final AudioData audio : toAddAudio )
+				final int size = toAddAudio.size() ;
+				for( int i = 0; i < size; i++ )
 				{
+					final AudioData audio = toAddAudio.get( i ) ;
 					final AudioSource source = loadSource( audio ) ;
 					if( source != null )
 					{
@@ -113,8 +117,10 @@ public class AudioSystem
 
 		if( toRemoveAudio.isEmpty() == false )
 		{
-			for( final AudioData audio : toRemoveAudio )
+			final int size = toRemoveAudio.size() ;
+			for( int i = 0; i < size; i++ )
 			{
+				final AudioData audio = toRemoveAudio.get( i ) ;
 				final AudioSource source = audio.getSource() ;
 				if( source != null )
 				{
@@ -298,18 +304,6 @@ public class AudioSystem
 	{
 		toAddAudio.clear() ;		// Never added not hooked in
 		toRemoveAudio.clear() ;		// Will be removed from audio anyway
-
-		/*for( final AudioData audio : active )
-		{
-			final AudioSource source = audio.getSource() ;
-			final SourceCallback callback = audio.getCallback() ;
-
-			if( source.isPlaying() == true )
-			{
-				paused.add( audio ) ;
-				source.pause() ;
-			}
-		}*/
 		active.clear() ;
 	}
 
@@ -355,11 +349,14 @@ public class AudioSystem
 			@Override
 			public void shutdown()
 			{
-				for( final Audio audio : data  )
+				if( data.isEmpty() == false )
 				{
-					toRemoveAudio.add( ( AudioData )audio ) ;
+					for( final Audio audio : data  )
+					{
+						toRemoveAudio.add( ( AudioData )audio ) ;
+					}
+					data.clear() ;
 				}
-				data.clear() ;
 			}
 		} ;
 	}

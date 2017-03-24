@@ -84,20 +84,28 @@ public abstract class ManagedArray<T>
 
 	protected void addNewData( final List<T> _toAdd )
 	{
-		current.addAll( _toAdd ) ;
-		_toAdd.clear() ;
+		if( _toAdd.isEmpty() == false )
+		{
+			current.addAll( _toAdd ) ;
+			_toAdd.clear() ;
+		}
 	}
 
 	protected void removeOldData( final List<T> _toRemove )
 	{
-		for( final T remove : _toRemove )
+		if( _toRemove.isEmpty() == false )
 		{
-			if( current.remove( remove ) == true )
+			final int size = _toRemove.size() ;
+			for( int i = 0; i < size; i++ )
 			{
-				removeDelegate.remove( remove ) ;
+				final T remove = _toRemove.get( i ) ;
+				if( current.remove( remove ) == true )
+				{
+					removeDelegate.remove( remove ) ;
+				}
 			}
+			_toRemove.clear() ;
 		}
-		_toRemove.clear() ;
 	}
 
 	public interface RemoveDelegate<T>

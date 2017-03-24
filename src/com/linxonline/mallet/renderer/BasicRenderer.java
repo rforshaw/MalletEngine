@@ -174,11 +174,14 @@ public abstract class BasicRenderer<D extends DrawData,
 			@Override
 			public void shutdown()
 			{
-				for( final D draw : data  )
+				if( data.isEmpty() == false )
 				{
-					worlds.removeDraw( draw ) ;
+					for( final D draw : data  )
+					{
+						worlds.removeDraw( draw ) ;
+					}
+					data.clear() ;
 				}
-				data.clear() ;
 			}
 		} ;
 	}

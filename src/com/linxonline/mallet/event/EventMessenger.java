@@ -50,7 +50,10 @@ public final class EventMessenger
 	public final void refreshEvents()
 	{
 		final List<Event<?>> oldEvents = events ;
-		oldEvents.clear() ;
+		if( events.isEmpty() == false )
+		{
+			oldEvents.clear() ;
+		}
 
 		events = newEvents ;
 		newEvents = oldEvents ;

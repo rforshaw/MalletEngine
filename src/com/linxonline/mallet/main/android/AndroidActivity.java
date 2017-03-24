@@ -124,8 +124,10 @@ public class AndroidActivity extends Activity
 			return true ;
 		}
 
-		for( final AndroidInputListener listener : inputListeners )
+		final int size = inputListeners.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final AndroidInputListener listener = inputListeners.get( i ) ;
 			listener.onKeyDown( _keyCode, _event ) ;
 		}
 
@@ -135,8 +137,10 @@ public class AndroidActivity extends Activity
 	@Override
 	public boolean onKeyUp( final int _keyCode, final KeyEvent _event )
 	{
-		for( final AndroidInputListener listener : inputListeners )
+		final int size = inputListeners.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final AndroidInputListener listener = inputListeners.get( i ) ;
 			listener.onKeyUp( _keyCode, _event ) ;
 		}
 
@@ -146,8 +150,10 @@ public class AndroidActivity extends Activity
 	@Override
 	public boolean onTouchEvent( final MotionEvent _event )
 	{
-		for( final AndroidInputListener listener : inputListeners )
+		final int size = inputListeners.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final AndroidInputListener listener = inputListeners.get( i ) ;
 			listener.onTouchEvent( _event ) ;
 		}
 

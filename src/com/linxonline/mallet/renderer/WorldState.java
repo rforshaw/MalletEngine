@@ -152,11 +152,16 @@ public abstract class WorldState<D extends DrawData,
 	@Override
 	protected void addNewData( final List<W> _toAdd )
 	{
-		for( final W add : _toAdd )
+		if( _toAdd.isEmpty() == false )
 		{
-			insertNewDrawData( add ) ;
+			final int size = _toAdd.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final W add = _toAdd.get( i ) ;
+				insertNewDrawData( add ) ;
+			}
+			_toAdd.clear() ;
 		}
-		_toAdd.clear() ;
 	}
 
 	private void insertNewDrawData( final W _insert )

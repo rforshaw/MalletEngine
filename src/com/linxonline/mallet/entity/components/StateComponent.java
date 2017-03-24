@@ -59,8 +59,10 @@ public class StateComponent extends EventComponent
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
-		for( final Tuple<String, DataSet> set : data )
+		final int size = data.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Tuple<String, DataSet> set = data.get( i ) ;
 			_events.add( constructEvent( "TRACK_", set ) ) ;
 		}
 
@@ -71,8 +73,10 @@ public class StateComponent extends EventComponent
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		for( final Tuple<String, DataSet> set : data )
+		final int size = data.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final Tuple<String, DataSet> set = data.get( i ) ;
 			_events.add( constructEvent( "UNTRACK_", set ) ) ;
 		}
 	}

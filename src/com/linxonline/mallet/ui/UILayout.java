@@ -52,8 +52,10 @@ public class UILayout extends UIElement
 	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
 	{
 		super.setInputAdapterInterface( _adapter ) ;
-		for( final UIElement element : ordered )
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final UIElement element = ordered.get( i ) ;
 			element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
 	}
@@ -157,6 +159,7 @@ public class UILayout extends UIElement
 			}
 		}
 
+		if( toRemove.isEmpty() == false )
 		{
 			final int size = toRemove.size() ;
 			for( int i = 0; i < size; i++ )
