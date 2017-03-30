@@ -1,0 +1,105 @@
+{
+	"TYPE" : "UIWINDOW_LAYOUT",
+	"LAYOUT" : "VERTICAL",
+	"CHILDREN" : [
+		{
+			"TYPE" : "UIMENU",
+			"LENGTH" : "1",
+			"UILISTENER" : {
+				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+				"UV" : {
+					"MIN" : "0.0, 0.0",
+					"MAX" : "1.0, 1.0"
+				}
+			}
+		},
+		{
+			"TYPE" : "UILAYOUT",
+			"LAYOUT" : "HORIZONTAL",
+			"CHILDREN" : [
+				{
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "HORIZONTAL",
+					"NAME" : "UIElementPanel",
+					"CHILDREN" : [
+					
+					],
+					"MAX_LENGTH" : "5.5, 0, 0",
+					"UILISTENER" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					}
+				},
+				{
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "HORIZONTAL",
+					"MAX_LENGTH" : "0.2, 0, 0",
+					"UILISTENER" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					}
+				},
+				{
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "HORIZONTAL",
+					"NAME" : "MainWindow",
+					"CHILDREN" : [
+					
+					]
+				},
+				{
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "HORIZONTAL",
+					"MAX_LENGTH" : "0.2, 0, 0",
+					"UILISTENER" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					}
+				},
+				{
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "HORIZONTAL",
+					"NAME" : "UITree",
+					"CHILDREN" : [
+					
+					],
+					"MAX_LENGTH" : "5.5, 0, 0",
+					"UILISTENER" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					}
+				}
+			]
+		},
+		{
+			"TYPE" : "UIMENU",
+			"LENGTH" : "1",
+			"UILISTENER" : {
+				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+				"UV" : {
+					"MIN" : "0.0, 0.0",
+					"MAX" : "1.0, 1.0"
+				}
+			}
+		}
+	],
+	"UILISTENER" : {
+		"TEXTURE" : "base/ui/uieditor/grey.png",
+		"UV" : {
+			"MIN" : "0.0, 0.0",
+			"MAX" : "1.0, 1.0"
+		}
+	}
+}

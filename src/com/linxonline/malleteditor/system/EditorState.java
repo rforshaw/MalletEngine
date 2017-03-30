@@ -119,11 +119,17 @@ public class EditorState extends GameState
 				DrawAssist.amendShape( draw, Shape.constructPlane( parent.getLength(), MalletColour.red() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
-			
+
 			@Override
 			public void addDraws( final DrawDelegate _delegate )
 			{
 				_delegate.addBasicDraw( draw, _world ) ;
+			}
+
+			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
 			}
 
 			@Override
@@ -181,6 +187,12 @@ public class EditorState extends GameState
 			public void addDraws( final DrawDelegate _delegate )
 			{
 				_delegate.addBasicDraw( draw, _world ) ;
+			}
+
+			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
 			}
 
 			public InputEvent.Action exited( final InputEvent _input )
@@ -263,6 +275,13 @@ public class EditorState extends GameState
 			}
 
 			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
+				_delegate.removeDraw( drawText ) ;
+			}
+
+			@Override
 			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
 				if( dropdown != null )
@@ -339,6 +358,12 @@ public class EditorState extends GameState
 			}
 
 			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
+			}
+
+			@Override
 			public void refresh()
 			{
 				final Vector3 length = getParent().getLength() ;
@@ -394,6 +419,12 @@ public class EditorState extends GameState
 			}
 
 			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
+			}
+
+			@Override
 			public void refresh()
 			{
 				final Vector3 length = getParent().getLength() ;
@@ -438,6 +469,12 @@ public class EditorState extends GameState
 			}
 
 			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw ) ;
+			}
+
+			@Override
 			public void refresh()
 			{
 				final Vector3 length = getParent().getLength() ;
@@ -479,6 +516,12 @@ public class EditorState extends GameState
 			public void addDraws( final DrawDelegate _delegate )
 			{
 				_delegate.addBasicDraw( draw1, _world ) ;
+			}
+
+			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw1 ) ;
 			}
 
 			@Override

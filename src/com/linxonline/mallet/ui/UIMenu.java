@@ -35,4 +35,35 @@ public class UIMenu extends UILayout
 			super() ;
 		}
 	}
+
+	public static class DropDownListener extends InputListener<UIMenu>
+	{
+		private UIElement dropdown ;
+
+		public DropDownListener( final UIElement _toDrop )
+		{
+			dropdown = _toDrop ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			final UIElement parent = getParent() ;
+			final Vector3 position = parent.getPosition() ;
+			final Vector3 length   = parent.getLength() ;
+			final int layer        = parent.getLayer() + 1 ;
+
+			dropdown.setLayer( layer ) ;
+			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+
+			parent.makeDirty() ;
+			return InputEvent.Action.CONSUME ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			dropdown.makeDirty() ;
+		}
+	}
 }

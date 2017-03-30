@@ -14,6 +14,7 @@ import com.linxonline.mallet.renderer.World ;
 public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 {
 	private DrawDelegate<World, Draw> delegate = null ;
+	private boolean visible = true ;
 
 	@Override
 	public void setParent( final T _parent )
@@ -45,9 +46,16 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 	public abstract void constructDraws() ;
 
 	/**
-		Called when listener receives a valid DrawDelegate.
+		Called when listener receives a valid DrawDelegate
+		and when the parent UIElement is flagged as visible.
 	*/
 	public abstract void addDraws( final DrawDelegate<World, Draw> _delegate ) ;
+
+	/**
+		Only called if there is a valid DrawDelegate and 
+		when the parent UIElement is flagged as invisible.
+	*/
+	public abstract void removeDraws( final DrawDelegate<World, Draw> _delegate ) ;
 
 	/**
 		Return the world this UIListener is expected to use.
@@ -67,6 +75,29 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 		return delegate ;
 	}
 
+	@Override
+	public void refresh()
+	{
+		final T parent = getParent() ;
+		if( visible != parent.isVisible() )
+		{
+			visible = parent.isVisible() ;
+			final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
+
+			if( delegate != null )
+			{
+				if( visible == true )
+				{
+					addDraws( delegate ) ;
+				}
+				else
+				{
+					removeDraws( delegate ) ;
+				}
+			}
+		}
+	}
+	
 	/**
 		Clean up any resources allocated to the listener.
 	*/

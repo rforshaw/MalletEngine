@@ -243,6 +243,7 @@ public final class UIFactory
 		/**
 			Called when listener receives a valid DrawDelegate.
 		*/
+		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate )
 		{
 			if( draw != null )
@@ -257,10 +258,19 @@ public final class UIFactory
 		}
 
 		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			_delegate.removeDraw( draw ) ;
+			_delegate.removeDraw( drawText ) ;
+		}
+		
+		@Override
 		public void refresh()
 		{
-			updateLength( getParent().getLength() ) ;
-			updateOffset( getParent().getOffset() ) ;
+			final T parent = getParent() ;
+
+			updateLength( parent.getLength() ) ;
+			updateOffset( parent.getOffset() ) ;
 
 			if( draw != null )
 			{

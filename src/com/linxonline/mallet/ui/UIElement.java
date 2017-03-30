@@ -34,6 +34,7 @@ public class UIElement implements InputHandler
 	protected State current = State.NEUTRAL ;
 
 	public boolean destroy = false ;
+	public boolean visible = true ;
 
 	private World world = WorldAssist.getDefaultWorld() ;
 	private boolean dirty = true ;			// Causes refresh when true
@@ -289,6 +290,15 @@ public class UIElement implements InputHandler
 		dirty = true ;
 	}
 
+	public void setVisible( final boolean _visibility )
+	{
+		if( visible != _visibility )
+		{
+			visible = _visibility ;
+			makeDirty() ;
+		}
+	}
+
 	/**
 		Set the UIElement's absolute position.
 		Values are expected to be the unit type defined by UIRatio.
@@ -414,6 +424,11 @@ public class UIElement implements InputHandler
 		return dirty ;
 	}
 
+	public boolean isVisible()
+	{
+		return visible ;
+	}
+	
 	/**
 		Returns the elements position in pixels.
 		Pass in a Vector3 to retrieve the position in units.
