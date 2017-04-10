@@ -9,7 +9,9 @@ import com.linxonline.mallet.renderer.World ;
 /**
 	Makes a request to receive a DrawDelegate from the 
 	active Rendering System. addDraws() will be called 
-	once delegate has been provided.
+	once delegate has been provided and the parent is 
+	visible, if the parent is invisible removeDraws is 
+	called instead.
 */
 public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 {
@@ -20,6 +22,8 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 	public void setParent( final T _parent )
 	{
 		super.setParent( _parent ) ;
+		visible = _parent.isVisible() ;
+
 		_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
 			public void callback( final DrawDelegate<World, Draw> _delegate )
@@ -32,7 +36,11 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 				}
 
 				delegate = _delegate ;
-				addDraws( delegate ) ;
+				visible = _parent.isVisible() ;
+				if( visible == true )
+				{
+					addDraws( delegate ) ;
+				}
 			}
 		} ) ) ;
 

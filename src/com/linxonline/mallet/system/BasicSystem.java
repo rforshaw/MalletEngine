@@ -7,6 +7,8 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.system.* ;
 
+import com.linxonline.mallet.io.filesystem.FileSystem ;
+
 /**
 	Basic implementation of the System Interface.
 	Defines what must be needed by a System and implements 
@@ -25,6 +27,7 @@ public abstract class BasicSystem implements SystemInterface
 
 	protected EventSystemInterface eventSystem ;
 	protected InputSystemInterface inputSystem ;
+	protected FileSystem fileSystem ;
 
 	public BasicSystem() {}
 
@@ -43,6 +46,12 @@ public abstract class BasicSystem implements SystemInterface
 		audioGenerator.shutdownGenerator() ;
 		renderer.shutdown() ;
 		shutdownDelegate.shutdown() ;
+	}
+
+	@Override
+	public FileSystem getFileSystem()
+	{
+		return fileSystem ;
 	}
 
 	@Override

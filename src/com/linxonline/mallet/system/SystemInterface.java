@@ -4,6 +4,7 @@ import com.linxonline.mallet.audio.AudioGenerator ;
 import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.event.EventSystemInterface ;
 import com.linxonline.mallet.renderer.RenderInterface ;
+import com.linxonline.mallet.io.filesystem.FileSystem ;
 
 /**
 	To initialise low-level/Operating specific systems that the 
@@ -18,6 +19,8 @@ public interface SystemInterface
 	public void startSystem() ;		// Run the systems if required
 	public void stopSystem() ;		// Stop any independent systems - threaded for instance
 	public void shutdownSystem() ;	// Shutdown systems and begin the clean-up job
+
+	public FileSystem getFileSystem() ;
 
 	/**
 		It is impossible for the Game State to know when 

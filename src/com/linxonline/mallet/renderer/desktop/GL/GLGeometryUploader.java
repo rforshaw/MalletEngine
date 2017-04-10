@@ -628,8 +628,11 @@ public class GLGeometryUploader
 			// As only modified/new programs will be flagged as dirty.
 			if( _program.isDirty() == true )
 			{
-				_program.setDirty( false ) ;
-				return program.equals( _program ) ;
+				final boolean valid = program.equals( _program ) ;
+				// The program should only be flagged as not dirty 
+				// once a valid buffer has been found.
+				_program.setDirty( valid ? false : true ) ;
+				return valid ;
 			}
 
 			return true ;

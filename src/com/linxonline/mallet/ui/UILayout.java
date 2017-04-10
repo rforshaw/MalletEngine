@@ -94,6 +94,8 @@ public class UILayout extends UIElement
 	{
 		if( ordered.contains( _element ) == false )
 		{
+			applyLayer( _element, getLayer() ) ;
+
 			ordered.add( _element ) ;
 			_element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
@@ -172,6 +174,28 @@ public class UILayout extends UIElement
 				}
 			}
 			toRemove.clear() ;
+		}
+	}
+
+	@Override
+	public void setLayer( final int _layer )
+	{
+		super.setLayer( _layer ) ;
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			applyLayer( ordered.get( i ), _layer ) ;
+		}
+	}
+
+	@Override
+	public void setVisible( final boolean _visibility )
+	{
+		super.setVisible( _visibility ) ;
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			ordered.get( i ).setVisible( _visibility ) ;
 		}
 	}
 
@@ -478,6 +502,16 @@ public class UILayout extends UIElement
 		_pos.setXYZ( pos.x + offset.x, pos.y + offset.y, pos.z + offset.z ) ;
 	}
 
+	private static void applyLayer( final UIElement _element, final int _layer )
+	{
+		if( _element.getLayer() < _layer )
+		{
+			// Child elements should always be a
+			// layer above the parent.
+			_element.setLayer( _layer + 1 ) ;
+		}
+	}
+	
 	public enum Type
 	{
 		HORIZONTAL,
@@ -524,7 +558,8 @@ public class UILayout extends UIElement
 			for( int i = 0; i < size; i++ )
 			{
 				final UIElement element = layout.ordered.get( i ) ;
-				if( element.isIntersectInput( _input ) == true &&
+				if( element.isVisible() == true &&
+					element.isIntersectInput( _input ) == true &&
 					element.isEngaged() == false )
 				{
 					setCurrentEngaged( element, i ) ;

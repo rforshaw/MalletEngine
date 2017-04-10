@@ -1,5 +1,6 @@
 package com.linxonline.mallet.main.android ;
 
+import com.linxonline.mallet.main.game.GameSettings ;
 import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.game.test.GameTestLoader ;
 import com.linxonline.mallet.util.notification.Notification ;
@@ -17,13 +18,13 @@ public class AndroidTestStarter extends AndroidStarter
 	}
 
 	@Override
-	protected String getApplicationName()
+	public GameSettings getGameSettings()
 	{
-		return "test" ;
+		return new GameSettings( "Mallet Engine - Test" ) ;
 	}
 
 	@Override
-	protected GameLoader getGameLoader()
+	public GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;
 	}

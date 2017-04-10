@@ -20,6 +20,7 @@ import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.notification.Notification ;
 
+import com.linxonline.mallet.io.filesystem.android.AndroidFileSystem ;
 import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.input.android.* ;
 import com.linxonline.mallet.audio.android.* ;
@@ -42,6 +43,7 @@ public class GLAndroidSystem extends BasicSystem
 		audioGenerator = new AndroidAudioGenerator() ;
 		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
 		inputSystem = new AndroidInputSystem() ;
+		fileSystem = new AndroidFileSystem( activity ) ;
 	}
 
 	@Override

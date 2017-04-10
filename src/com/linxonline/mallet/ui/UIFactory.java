@@ -267,6 +267,7 @@ public final class UIFactory
 		@Override
 		public void refresh()
 		{
+			super.refresh() ;
 			final T parent = getParent() ;
 
 			updateLength( parent.getLength() ) ;
@@ -274,6 +275,7 @@ public final class UIFactory
 
 			if( draw != null )
 			{
+				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
@@ -288,6 +290,8 @@ public final class UIFactory
 				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
 
 				textOffset.add( x, y, 0.0f ) ;
+				
+				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
 		}

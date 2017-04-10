@@ -4,10 +4,10 @@ import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
+import com.linxonline.mallet.main.game.GameSettings ;
 import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.desktop.DesktopStarter ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
-import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 
 import com.linxonline.mallet.renderer.RenderInterface ;
 import com.linxonline.mallet.system.SystemInterface ;
@@ -22,9 +22,9 @@ public class EditorStarter extends DesktopStarter
 	*/
 	public EditorStarter()
 	{
-		super( new GLDefaultSystem(), new DesktopFileSystem() ) ;
+		super( new GLDefaultSystem() ) ;
 
-		final GLDefaultSystem backend = ( GLDefaultSystem )backendSystem ;
+		/*final GLDefaultSystem backend = ( GLDefaultSystem )backendSystem ;
 		// Some applications may not want to pause the entire application 
 		// while the user is not using it.
 		// The below implementation will stop the application as soon 
@@ -36,20 +36,20 @@ public class EditorStarter extends DesktopStarter
 		
 			public void windowGainedFocus( final WindowEvent _event )
 			{
-				/*if( windowDeactivated == true )
+				if( windowDeactivated == true )
 				{
 					windowDeactivated = false ;
 					run() ;
-				}*/
+				}
 			}
 
 			public void windowLostFocus( final WindowEvent _event )
 			{
-				/*if( windowDeactivated == false )
+				if( windowDeactivated == false )
 				{
 					windowDeactivated = true ;
 					stop() ;
-				}*/
+				}
 			}
 
 			public void windowDestroyNotify( final WindowEvent _event )
@@ -61,7 +61,7 @@ public class EditorStarter extends DesktopStarter
 			public void windowDestroyed( final WindowEvent _event ) {}
 			public void windowMoved( final WindowEvent _event ) {}
 			public void windowResized( final WindowEvent _event ) {}
-		} ) ;
+		} ) ;*/
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class EditorStarter extends DesktopStarter
 		Uses the configuration file loaded above to set the rendering system.
 	*/
 	@Override
-	protected void setRenderSettings( final SystemInterface _system )
+	public void setRenderSettings( final SystemInterface _system )
 	{
 		super.setRenderSettings( _system ) ;
 		final RenderInterface render = _system.getRenderInterface() ;
@@ -81,13 +81,13 @@ public class EditorStarter extends DesktopStarter
 	}
 
 	@Override
-	protected String getApplicationName()
+	public GameSettings getGameSettings()
 	{
-		return "MalletEditor" ;
+		return new GameSettings( "Mallet Editor" ) ;
 	}
 
 	@Override
-	protected GameLoader getGameLoader()
+	public GameLoader getGameLoader()
 	{
 		return new EditorLoader() ;
 	}

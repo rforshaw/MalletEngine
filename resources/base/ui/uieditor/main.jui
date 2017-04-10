@@ -1,10 +1,171 @@
 {
 	"TYPE" : "UIWINDOW_LAYOUT",
 	"LAYOUT" : "VERTICAL",
+	"LAYER" : "0",
 	"CHILDREN" : [
 		{
 			"TYPE" : "UIMENU",
 			"LENGTH" : "1",
+			"NAME" : "HeadToolbar",
+			"CHILDREN" : [
+				{
+					"TYPE" : "UIMENU_ITEM",
+					"NAME" : "FileButton",
+					"MAX_LENGTH" : "3.0, 0.0, 0.0",
+					"UILISTENER" : {
+						"TEXT" : "File",
+						"FONT" : "Arial",
+						"FONT_SIZE" : "12",
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"TEXTURE" : "base/ui/uieditor/grey.png",
+						"NEUTRAL_UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "0.5, 0.5"
+						},
+						"ROLLOVER_UV" : {
+							"MIN" : "0.0, 0.5",
+							"MAX" : "0.5, 1.0"
+						},
+						"CLICKED_UV" : {
+							"MIN" : "0.5, 0.0",
+							"MAX" : "1.0, 0.5"
+						}
+					},
+					"DROPDOWN" : {
+						"TYPE" : "UILAYOUT",
+						"LAYOUT" : "VERTICAL",
+						"NAME" : "FileDropdown",
+						"LENGTH" : "5, 3.5, 0",
+						"CHILDREN" : [
+							{
+								"TYPE" : "UIBUTTON",
+								"NAME" : "OpenButton",
+								"UILISTENER" : {
+									"TEXT" : "Open",
+									"FONT" : "Arial",
+									"FONT_SIZE" : "12",
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"TEXTURE" : "base/ui/uieditor/grey.png",
+									"NEUTRAL_UV" : {
+										"MIN" : "0.0, 0.0",
+										"MAX" : "0.5, 0.5"
+									},
+									"ROLLOVER_UV" : {
+										"MIN" : "0.0, 0.5",
+										"MAX" : "0.5, 1.0"
+									},
+									"CLICKED_UV" : {
+										"MIN" : "0.5, 0.0",
+										"MAX" : "1.0, 0.5"
+									}
+								}
+							},
+							{
+								"TYPE" : "UIBUTTON",
+								"NAME" : "SaveButton",
+								"UILISTENER" : {
+									"TEXT" : "Save",
+									"FONT" : "Arial",
+									"FONT_SIZE" : "12",
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"TEXTURE" : "base/ui/uieditor/grey.png",
+									"NEUTRAL_UV" : {
+										"MIN" : "0.0, 0.0",
+										"MAX" : "0.5, 0.5"
+									},
+									"ROLLOVER_UV" : {
+										"MIN" : "0.0, 0.5",
+										"MAX" : "0.5, 1.0"
+									},
+									"CLICKED_UV" : {
+										"MIN" : "0.5, 0.0",
+										"MAX" : "1.0, 0.5"
+									}
+								}
+							},
+							{
+								"TYPE" : "UIBUTTON",
+								"NAME" : "ExitButton",
+								"UILISTENER" : {
+									"TEXT" : "Exit",
+									"FONT" : "Arial",
+									"FONT_SIZE" : "12",
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"TEXTURE" : "base/ui/uieditor/grey.png",
+									"NEUTRAL_UV" : {
+										"MIN" : "0.0, 0.0",
+										"MAX" : "0.5, 0.5"
+									},
+									"ROLLOVER_UV" : {
+										"MIN" : "0.0, 0.5",
+										"MAX" : "0.5, 1.0"
+									},
+									"CLICKED_UV" : {
+										"MIN" : "0.5, 0.0",
+										"MAX" : "1.0, 0.5"
+									}
+								}
+							}
+						],
+						"MAX_LENGTH" : "3.5, 4.0, 0.0",
+						"UILISTENER" : {
+							"TEXTURE" : "base/ui/uieditor/light_black.png",
+							"UV" : {
+								"MIN" : "0.0, 0.0",
+								"MAX" : "1.0, 1.0"
+							}
+						}
+					}
+				},
+				{
+					"TYPE" : "UIBUTTON",
+					"NAME" : "EditButton",
+					"MAX_LENGTH" : "3.0, 0.0, 0.0",
+					"UILISTENER" : {
+						"TEXT" : "Edit",
+						"FONT" : "Arial",
+						"FONT_SIZE" : "12",
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"TEXTURE" : "base/ui/uieditor/grey.png",
+						"NEUTRAL_UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "0.5, 0.5"
+						},
+						"ROLLOVER_UV" : {
+							"MIN" : "0.0, 0.5",
+							"MAX" : "0.5, 1.0"
+						},
+						"CLICKED_UV" : {
+							"MIN" : "0.5, 0.0",
+							"MAX" : "1.0, 0.5"
+						}
+					}
+				},
+				{
+					"TYPE" : "UIBUTTON",
+					"NAME" : "HelpButton",
+					"MAX_LENGTH" : "3.0, 0.0, 0.0",
+					"UILISTENER" : {
+						"TEXT" : "Help",
+						"FONT" : "Arial",
+						"FONT_SIZE" : "12",
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"TEXTURE" : "base/ui/uieditor/grey.png",
+						"NEUTRAL_UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "0.5, 0.5"
+						},
+						"ROLLOVER_UV" : {
+							"MIN" : "0.0, 0.5",
+							"MAX" : "0.5, 1.0"
+						},
+						"CLICKED_UV" : {
+							"MIN" : "0.5, 0.0",
+							"MAX" : "1.0, 0.5"
+						}
+					}
+				}
+			],
 			"UILISTENER" : {
 				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 				"UV" : {
@@ -86,6 +247,7 @@
 		{
 			"TYPE" : "UIMENU",
 			"LENGTH" : "1",
+			"NAME" : "FooterToolbar",
 			"UILISTENER" : {
 				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 				"UV" : {

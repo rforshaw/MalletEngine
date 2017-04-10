@@ -76,7 +76,7 @@ public class AndroidActivity extends Activity
 			starter.init() ;
 		}
 
-		starter.getAndroidSystem().startSystem() ;
+		starter.getMainSystem().startSystem() ;
 	}
 
 	@Override
@@ -180,7 +180,7 @@ public class AndroidActivity extends Activity
 	@Override
 	public void passEvent( final Event _event )
 	{
-		starter.getAndroidSystem().getEventInterface().addEvent( _event ) ;
+		starter.getMainSystem().getEventInterface().addEvent( _event ) ;
 	}
 
 	/**

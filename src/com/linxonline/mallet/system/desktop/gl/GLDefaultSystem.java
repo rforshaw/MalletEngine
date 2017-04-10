@@ -5,6 +5,7 @@ import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
+import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
 import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
@@ -27,6 +28,7 @@ public class GLDefaultSystem extends BasicSystem
 		audioGenerator = new ALSASourceGenerator() ;
 		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
 		inputSystem = new InputSystem() ;
+		fileSystem = new DesktopFileSystem() ;
 	}
 
 	public GLWindow getWindow()

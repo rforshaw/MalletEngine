@@ -4,9 +4,11 @@ import android.util.DisplayMetrics ;
 
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.main.StarterInterface ;
+import com.linxonline.mallet.main.AbstractStarter ;
 import com.linxonline.mallet.main.game.GameSystem ;
 import com.linxonline.mallet.main.game.GameLoader ;
+import com.linxonline.mallet.main.game.GameSettings ;
+
 import com.linxonline.mallet.main.game.test.GameTestLoader ;
 
 import com.linxonline.mallet.system.SystemInterface ;
@@ -36,104 +38,34 @@ import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.ui.UI ;
 import com.linxonline.mallet.ui.UIRatio ;
 
-public abstract class AndroidStarter extends StarterInterface
+public abstract class AndroidStarter extends AbstractStarter
 {
-	protected final SystemInterface backendSystem  ;
-	protected final GameSystem gameSystem ;
-
-	protected final static String BASE_CONFIG = "base/config.cfg" ;
-
 	public AndroidStarter( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
-		backendSystem = new GLAndroidSystem( _activity, _notify ) ;
-		gameSystem = new GameSystem( backendSystem ) ;
-	}
-
-	@Override
-	public void init()
-	{
-		loadFileSystem( new AndroidFileSystem( ( ( GLAndroidSystem )backendSystem ).activity ) ) ;						// Ensure FileSystem is setup correctly.
-		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
-		backendSystem.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
-
-		// Load the Game-States into the Game-System
-		if( loadGame( gameSystem, getGameLoader() ) == false )
-		{
-			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
-			return ;
-		}
+		super( new GLAndroidSystem( _activity, _notify ) ) ;
 	}
 
 	public void run()
 	{
-		setRenderSettings( backendSystem ) ;
+		final SystemInterface main = getMainSystem() ;
+		final GameSystem game = getGameSystem() ;
+
+		setRenderSettings( main ) ;
 
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
-		gameSystem.runSystem() ;			// Begin running the game-loop
+		game.runSystem() ;			// Begin running the game-loop
 		Logger.println( "Stopped...", Logger.Verbosity.MINOR ) ;
 	}
 
 	public void stop()
 	{
-		gameSystem.stopSystem() ;
-		backendSystem.stopSystem() ;
+		getGameSystem().stopSystem() ;
+		getMainSystem().stopSystem() ;
 	}
 
 	public void shutdown()
 	{
-		backendSystem.shutdownSystem() ;
-	}
-	
-	@Override
-	protected boolean loadGame( final GameSystem _system, final GameLoader _loader )
-	{
-		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
-		if( _system != null && _loader != null )
-		{
-			_loader.loadGame( _system ) ;
-			return true ;
-		}
-
-		return false ;
-	}
-
-	@Override
-	protected void loadFileSystem( final FileSystem _fileSystem )
- 	{
-		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
-		GlobalFileSystem.setFileSystem( _fileSystem ) ;
-
-		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
-		if( GlobalFileSystem.mapDirectory( "base" ) == false )				// Map base-folder for faster access
-		{
-			Logger.println( "Failed to map base directory.", Logger.Verbosity.MINOR ) ;
-		}
-	}
-
-	@Override
-	protected void loadConfig()
-	{
-		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
-		GlobalHome.setHome( getApplicationName() ) ;
-		GlobalHome.copy( Tuple.build( BASE_CONFIG, BASE_CONFIG ) ) ;
-
-		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
-		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
-		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( BASE_CONFIG ) ), new Settings() ) ) ;
-
-		final ShutdownDelegate delegate = backendSystem.getShutdownDelegate() ;
-		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
-		{
-			@Override
-			public void shutdown()
-			{
-				Logger.println( "Saving configuration file.", Logger.Verbosity.MINOR ) ;
-				if( ConfigWriter.write( GlobalHome.getFile( BASE_CONFIG ), GlobalConfig.getConfig() ) == false )
-				{
-					Logger.println( "Failed to write configuration file.", Logger.Verbosity.MAJOR ) ;
-				}
-			}
-		} ) ;
+		getMainSystem().shutdownSystem() ;
 	}
 
 	/**
@@ -141,7 +73,7 @@ public abstract class AndroidStarter extends StarterInterface
 		Uses the configuration file loaded above to set the rendering system.
 	*/
 	@Override
-	protected void setRenderSettings( final SystemInterface _system )
+	public void setRenderSettings( final SystemInterface _system )
 	{
 		final AndroidActivity activity = ( ( GLAndroidSystem )_system ).activity ;
 		final DisplayMetrics metrics = new DisplayMetrics() ;
@@ -157,10 +89,5 @@ public abstract class AndroidStarter extends StarterInterface
 		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", ( int )metrics.xdpi ) ) ;
 		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", ( int )metrics.ydpi ) ) ;
 		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
-	}
-
-	public SystemInterface getAndroidSystem()
-	{
-		return backendSystem ;
 	}
 }

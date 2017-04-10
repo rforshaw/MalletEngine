@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 
@@ -30,40 +32,100 @@ public class UIMenu extends UILayout
 
 	public static class Item extends UIButton
 	{
-		public Item()
+		private final UIElement dropdown ;
+	
+		public Item( final UIElement _dropdown )
 		{
 			super() ;
+			dropdown = _dropdown ;
+			if( dropdown != null )
+			{
+				dropdown.setLayer( getLayer() + 1 ) ;
+				addListener( new UIMenu.DropDownListener( dropdown ) ) ;
+			}
+		}
+
+		@Override
+		public void setInputAdapterInterface( final InputAdapterInterface _adapter )
+		{
+			super.setInputAdapterInterface( _adapter ) ;
+			if( dropdown != null )
+			{
+				dropdown.setInputAdapterInterface( _adapter ) ;
+			}
+		}
+
+		@Override
+		public InputEvent.Action passInputEvent( final InputEvent _event )
+		{
+			System.out.println( "Item: " + _event ) ;
+			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+			{
+				// Don't pass the InputEvent on to the child elements.
+				// The UILayout may wish to consume the event if it was 
+				// used to get focus onto a child element.  
+				return InputEvent.Action.CONSUME ;
+			}
+
+			if( dropdown != null )
+			{
+				return dropdown.passInputEvent( _event ) ;
+			}
+
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public void update( final float _dt, final List<Event<?>> _events )
+		{
+			super.update( _dt, _events ) ;
+			if( dropdown != null )
+			{
+				dropdown.update( _dt, _events ) ;
+			}
 		}
 	}
 
-	public static class DropDownListener extends InputListener<UIMenu>
+	public static class DropDownListener extends InputListener<Item>
 	{
-		private UIElement dropdown ;
+		private final UIElement dropdown ;
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 length = new Vector3() ;
 
 		public DropDownListener( final UIElement _toDrop )
 		{
 			dropdown = _toDrop ;
+			dropdown.setVisible( false ) ;
+		}
+
+		@Override
+		public void disengage()
+		{
+			dropdown.disengage() ;
+			dropdown.setVisible( false ) ;
 		}
 
 		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
 			final UIElement parent = getParent() ;
-			final Vector3 position = parent.getPosition() ;
-			final Vector3 length   = parent.getLength() ;
-			final int layer        = parent.getLayer() + 1 ;
+			parent.getPosition( position ) ;
+			parent.getLength( length ) ;
 
-			dropdown.setLayer( layer ) ;
+			dropdown.setVisible( true ) ;
 			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+			dropdown.engage() ;
+
 
 			parent.makeDirty() ;
 			return InputEvent.Action.CONSUME ;
 		}
 
 		@Override
-		public void refresh()
+		public void shutdown()
 		{
-			dropdown.makeDirty() ;
+			super.shutdown() ;
+			dropdown.shutdown() ;
 		}
 	}
 }

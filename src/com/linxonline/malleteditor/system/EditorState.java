@@ -230,7 +230,7 @@ public class EditorState extends GameState
 		final float height = metrics.getHeight() ;
 		final float width = font.stringWidth( _text ) ;
 
-		final UIMenu.Item item = new UIMenu.Item() ;
+		final UIMenu.Item item = new UIMenu.Item( null ) ;
 		item.setMaximumLength( width + 20.0f, 0.0f, 0.0f ) ;
 
 		item.addListener( new UIListener()

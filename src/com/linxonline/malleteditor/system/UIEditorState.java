@@ -29,6 +29,40 @@ public class UIEditorState extends GameState
 	public void initGame()
 	{
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
+		{
+			final UIButton openProject = jui.get( "OpenButton", UIButton.class ) ;
+			openProject.addListener( new InputListener<UIButton>()
+			{
+				@Override
+				public InputEvent.Action mouseReleased( final InputEvent _input )
+				{
+					System.out.println( "Open Project..." ) ;
+					return InputEvent.Action.CONSUME ;
+				}
+			} ) ;
+			
+			final UIButton saveProject = jui.get( "SaveButton", UIButton.class ) ;
+			saveProject.addListener( new InputListener<UIButton>()
+			{
+				@Override
+				public InputEvent.Action mouseReleased( final InputEvent _input )
+				{
+					System.out.println( "Save Project..." ) ;
+					return InputEvent.Action.CONSUME ;
+				}
+			} ) ;
+
+			final UIButton exitProject = jui.get( "ExitButton", UIButton.class ) ;
+			exitProject.addListener( new InputListener<UIButton>()
+			{
+				@Override
+				public InputEvent.Action mouseReleased( final InputEvent _input )
+				{
+					System.out.println( "Exit Project..." ) ;
+					return InputEvent.Action.CONSUME ;
+				}
+			} ) ;
+		}
 
 		final Entity entity = new Entity( "UI" ) ;
 		final UIComponent component = new UIComponent() ;

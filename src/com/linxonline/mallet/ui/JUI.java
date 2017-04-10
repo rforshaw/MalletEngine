@@ -246,7 +246,7 @@ public class JUI
 					if( align != null )
 					{
 						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
@@ -273,6 +273,76 @@ public class JUI
 				}
 
 				return element ;
+			}
+		} ) ;
+
+		creators.put( "UIMENU_ITEM", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final UIMenu.Item element = new UIMenu.Item( JUI.createElement( _map, _ui.getJSONObject( "DROPDOWN" ) ) ) ;
+				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
+				applyLookup( _map, element, _ui ) ;
+
+				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
+				return element ;
+			}
+
+			private UIButton.UIListener createListener( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final UIButton.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIButton.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIButton.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
+
+				if( neutralUV == null || rolloverUV == null || clickedUV == null )
+				{
+					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					return null ;
+				}
+
+				final String text = _ui.optString( "TEXT", "" ) ;
+				final String fontName = _ui.optString( "FONT", null ) ;
+				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+
+				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+				listener.setRetainRatio( retainRatio ) ;
+
+				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				return listener ;
 			}
 		} ) ;
 	}
@@ -425,6 +495,7 @@ public class JUI
 			// table if they have a name defined.
 			// Some elements are not important enough to 
 			// have a name defined.
+			//System.out.println( "Adding: " + name + " to lookup." ) ;
 			_map.lookup.put( name, _element ) ;
 		}
 	}
