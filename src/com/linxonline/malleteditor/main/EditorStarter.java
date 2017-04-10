@@ -4,7 +4,6 @@ import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
-import com.linxonline.mallet.main.game.GameSettings ;
 import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.desktop.DesktopStarter ;
 import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
@@ -23,45 +22,6 @@ public class EditorStarter extends DesktopStarter
 	public EditorStarter()
 	{
 		super( new GLDefaultSystem() ) ;
-
-		/*final GLDefaultSystem backend = ( GLDefaultSystem )backendSystem ;
-		// Some applications may not want to pause the entire application 
-		// while the user is not using it.
-		// The below implementation will stop the application as soon 
-		// as focus is lost. Focus is lost when the window is minimised 
-		// or the user click on another window.
-		backend.getWindow().addWindowListener( new WindowListener()
-		{
-			private boolean windowDeactivated = false ;
-		
-			public void windowGainedFocus( final WindowEvent _event )
-			{
-				if( windowDeactivated == true )
-				{
-					windowDeactivated = false ;
-					run() ;
-				}
-			}
-
-			public void windowLostFocus( final WindowEvent _event )
-			{
-				if( windowDeactivated == false )
-				{
-					windowDeactivated = true ;
-					stop() ;
-				}
-			}
-
-			public void windowDestroyNotify( final WindowEvent _event )
-			{
-				backendSystem.shutdownSystem() ;
-			}
-
-			public void windowRepaint( final WindowUpdateEvent _event ) {}
-			public void windowDestroyed( final WindowEvent _event ) {}
-			public void windowMoved( final WindowEvent _event ) {}
-			public void windowResized( final WindowEvent _event ) {}
-		} ) ;*/
 	}
 
 	/**
@@ -78,12 +38,6 @@ public class EditorStarter extends DesktopStarter
 		// Force Display and Render size parity.
 		render.getRenderInfo().setKeepRenderRatio( false ) ;
 		GlobalConfig.addBoolean( "DISPLAYRENDERPARITY", true ) ;
-	}
-
-	@Override
-	public GameSettings getGameSettings()
-	{
-		return new GameSettings( "Mallet Editor" ) ;
 	}
 
 	@Override

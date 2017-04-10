@@ -24,6 +24,7 @@ public abstract class AbstractStarter implements IStarter
 {
 	private final SystemInterface mainSystem  ;
 	private final GameSystem gameSystem ;
+	private GameSettings settings ;
 
 	public AbstractStarter( final SystemInterface _main )
 	{
@@ -34,22 +35,33 @@ public abstract class AbstractStarter implements IStarter
 	@Override
 	public void init()
 	{
-		final SystemInterface main = getMainSystem() ;
+		final GameLoader loader = getGameLoader() ;
+		if( loader == null )
+		{
+			Logger.println( "No game loader specified..", Logger.Verbosity.MAJOR ) ;
+			return ;
+		}
+
+		settings = loader.getGameSettings() ;
 		loadFileSystem( mainSystem.getFileSystem() ) ;
 
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
-		setRenderSettings( main ) ;
-		main.initSystem() ;			// Fully init the backend: Input, OpenGL, & OpenAL.
+		setRenderSettings( mainSystem ) ;
+		mainSystem.initSystem() ;				// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
-		final GameSystem game = getGameSystem() ;
-		if( loadGame( game, getGameLoader() ) == false )
+		if( loadGame( getGameSystem(), loader ) == false )
 		{
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 	}
 
+	/**
+		Set the GlobalFileSystem to the file-system specified in 
+		SystemInterface - map the base directory to allow for 
+		quick lookup.
+	*/
 	@Override
 	public void loadFileSystem( final FileSystem _fileSystem )
  	{
@@ -63,28 +75,33 @@ public abstract class AbstractStarter implements IStarter
 		}
 	}
 
+	/**
+		Load the config file specified in game settings.
+		Copy the config from the applications read-only directory and 
+		move it to the user home directory.
+		Set GlobalConfig to the user home-directory config file.
+		Initialise a ShutdownCallback to save the GlobalConfig back to 
+		the users home-directory if the config changes while playing.
+	*/
 	@Override
 	public void loadConfig()
 	{
-		final GameSettings game = getGameSettings() ;
-		final SystemInterface main = getMainSystem() ;
-
 		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
-		GlobalHome.setHome( game.getApplicationName() ) ;
-		GlobalHome.copy( Tuple.<String, String>build( game.getConfigLocation(), game.getConfigLocation() ) ) ;
+		GlobalHome.setHome( settings.getApplicationName() ) ;
+		GlobalHome.copy( Tuple.<String, String>build( settings.getConfigLocation(), settings.getConfigLocation() ) ) ;
 
 		Logger.println( "Loading configuration file.", Logger.Verbosity.MINOR ) ;
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
-		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( game.getConfigLocation() ) ), new Settings() ) ) ;
+		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( settings.getConfigLocation() ) ), new Settings() ) ) ;
 
-		final ShutdownDelegate delegate = main.getShutdownDelegate() ;
+		final ShutdownDelegate delegate = mainSystem.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{
 			@Override
 			public void shutdown()
 			{
 				Logger.println( "Saving configuration file.", Logger.Verbosity.MINOR ) ;
-				if( ConfigWriter.write( GlobalHome.getFile( game.getConfigLocation() ), GlobalConfig.getConfig() ) == false )
+				if( ConfigWriter.write( GlobalHome.getFile( settings.getConfigLocation() ), GlobalConfig.getConfig() ) == false )
 				{
 					Logger.println( "Failed to write configuration file.", Logger.Verbosity.MAJOR ) ;
 				}
@@ -92,6 +109,12 @@ public abstract class AbstractStarter implements IStarter
 		} ) ;
 	}
 
+	/**
+		Load the Game States defined in GameLoader into the 
+		GameSystem.
+		return false if the GameSystem or Game Loader is not 
+		specified.
+	*/
 	@Override
 	public boolean loadGame( final GameSystem _system, final GameLoader _loader )
 	{
@@ -103,6 +126,16 @@ public abstract class AbstractStarter implements IStarter
 		}
 
 		return false ;
+	}
+
+	/**
+		Will return the GameSettings defined by the GameLoader.
+		Can be overridden to implement platform specific requirements.
+	*/
+	@Override
+	public GameSettings getGameSettings()
+	{
+		return settings ;
 	}
 
 	public SystemInterface getMainSystem()

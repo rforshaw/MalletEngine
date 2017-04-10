@@ -1,5 +1,6 @@
 package com.linxonline.malleteditor.main ;
 
+import com.linxonline.mallet.main.game.GameSettings ;
 import com.linxonline.mallet.main.game.GameLoader ;
 import com.linxonline.mallet.main.game.GameSystem ;
 
@@ -10,6 +11,13 @@ public class EditorLoader extends GameLoader
 {
 	public EditorLoader() {}
 
+	@Override
+	public GameSettings getGameSettings()
+	{
+		return new GameSettings( "Mallet Editor" ) ;
+	}
+
+	@Override
 	public void loadGame( final GameSystem _system )
 	{
 		_system.addGameState( new EditorState( "EDITOR" ) ) ;

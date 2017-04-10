@@ -14,12 +14,6 @@ public class DesktopTestStarter extends DesktopStarter
 	public DesktopTestStarter() {}
 
 	@Override
-	public GameSettings getGameSettings()
-	{
-		return new GameSettings( "Mallet Engine - Test" ) ;
-	}
-
-	@Override
 	public GameLoader getGameLoader()
 	{
 		return new GameTestLoader() ;

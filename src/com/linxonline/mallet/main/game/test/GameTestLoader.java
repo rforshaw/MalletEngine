@@ -450,4 +450,10 @@ public final class GameTestLoader extends GameLoader
 
 		_system.setDefaultGameState( "DEFAULT" ) ;		// Define what Game State should be run first
 	}
+
+	@Override
+	public GameSettings getGameSettings()
+	{
+		return new GameSettings( "Mallet Engine - Test" ) ;
+	}
 }
