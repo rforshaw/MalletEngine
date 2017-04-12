@@ -32,7 +32,7 @@ public class EditorStarter extends DesktopStarter
 	public void setRenderSettings( final SystemInterface _system )
 	{
 		super.setRenderSettings( _system ) ;
-		final RenderInterface render = _system.getRenderInterface() ;
+		final RenderInterface render = _system.getRenderer() ;
 
 		// Override config setting and prevent ratio from being adhered to
 		// Force Display and Render size parity.

@@ -179,7 +179,7 @@ public class AndroidActivity extends Activity
 	@Override
 	public void passEvent( final Event _event )
 	{
-		starter.getMainSystem().getEventInterface().addEvent( _event ) ;
+		starter.getMainSystem().getEventSystem().addEvent( _event ) ;
 	}
 
 	/**

@@ -13,14 +13,19 @@ import com.linxonline.mallet.io.filesystem.FileSystem ;
 	the input-system, initialising the rendering system, and 
 	initialising the audio-system.
 */
-public interface SystemInterface
+public interface SystemInterface<F extends FileSystem,
+								 S extends SystemInterface.ShutdownDelegate,
+								 R extends RenderInterface,
+								 A extends AudioGenerator,
+								 I extends InputSystemInterface,
+								 E extends EventSystemInterface>
 {
 	public void initSystem() ;		// Intialise systems
 	public void startSystem() ;		// Run the systems if required
 	public void stopSystem() ;		// Stop any independent systems - threaded for instance
 	public void shutdownSystem() ;	// Shutdown systems and begin the clean-up job
 
-	public FileSystem getFileSystem() ;
+	public F getFileSystem() ;
 
 	/**
 		It is impossible for the Game State to know when 
@@ -30,24 +35,24 @@ public interface SystemInterface
 		should be shutdown correctly before the application 
 		is forcefully closed.
 	*/
-	public ShutdownDelegate getShutdownDelegate() ;
+	public S getShutdownDelegate() ;
 
 	/**
 		RENDER - convience methods.
 		The root renderer, typically one state should render at a time.
 	*/
-	public RenderInterface getRenderInterface() ;
+	public R getRenderer() ;
 
 	/**
 		AUDIO GENERATOR
 	*/
-	public AudioGenerator getAudioGenerator() ;
+	public A getAudioGenerator() ;
 
 	/**
 		Return the main input system for the running application.
 		The root Input-system, typically one state will be hooked.
 	*/
-	public InputSystemInterface getInputInterface() ;
+	public I getInput() ;
 
 	/**
 		The root Event-system, typically one state will be hooked.
@@ -58,7 +63,7 @@ public interface SystemInterface
 		that only work on certain implementations. For example:
 		Displaying virtual-keyboard, opening a web browser, etc.
 	*/
-	public EventSystemInterface getEventInterface() ;
+	public E getEventSystem() ;
 
 	public boolean update( final float _dt ) ;		// Update the System
 

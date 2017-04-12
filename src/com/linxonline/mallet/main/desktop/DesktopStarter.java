@@ -128,7 +128,7 @@ public abstract class DesktopStarter extends AbstractStarter
 		//System.out.println( "Render Settings Display: " + renderWidth + " " + renderHeight ) ;
 		//System.out.println( "Render Settings Display: " + displayWidth + " " + displayHeight ) ;
 
-		final RenderInterface render = _system.getRenderInterface() ;
+		final RenderInterface render = _system.getRenderer() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
 

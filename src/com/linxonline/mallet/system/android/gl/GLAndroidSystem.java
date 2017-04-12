@@ -24,7 +24,12 @@ import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.input.android.* ;
 import com.linxonline.mallet.audio.android.* ;
 
-public class GLAndroidSystem extends BasicSystem
+public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
+												 DefaultShutdown,
+												 GL2DRenderer,
+												 AndroidAudioGenerator,
+												 AndroidInputSystem,
+												 EventSystem>
 {
 	public final AndroidActivity activity ;
 	public GL2DSurfaceView surface ;
@@ -33,27 +38,26 @@ public class GLAndroidSystem extends BasicSystem
 
 	public GLAndroidSystem( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
+		super( new DefaultShutdown(),
+			   new GL2DRenderer( _notify ),
+			   new AndroidAudioGenerator(),
+			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new AndroidInputSystem(),
+			   new AndroidFileSystem( _activity ) ) ;
+
 		activity = _activity ;
-
-		surface = new GL2DSurfaceView( _activity, _notify ) ;
-		renderer = surface.getRenderer() ;
-
-		shutdownDelegate = new DefaultShutdown() ;
-		audioGenerator = new AndroidAudioGenerator() ;
-		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
-		inputSystem = new AndroidInputSystem() ;
-		fileSystem = new AndroidFileSystem( activity ) ;
+		surface = new GL2DSurfaceView( _activity, getRenderer() ) ;
 	}
 
 	@Override
 	public void initSystem()
 	{
-		final AndroidInputSystem input = ( AndroidInputSystem )inputSystem ;
+		final AndroidInputSystem input = getInput() ;
 
-		input.inputAdapter = renderer.getRenderInfo() ;
+		input.inputAdapter = getRenderer().getRenderInfo() ;
 		activity.addAndroidInputListener( input ) ;
 
-		audioGenerator.startGenerator() ;
+		getAudioGenerator().startGenerator() ;
 	}
 
 	public void setContentView()
@@ -86,8 +90,8 @@ public class GLAndroidSystem extends BasicSystem
 	@Override
 	public synchronized void shutdownSystem()
 	{
-		shutdownDelegate.shutdown() ;
-		audioGenerator.shutdownGenerator() ;
+		getShutdownDelegate().shutdown() ;
+		getAudioGenerator().shutdownGenerator() ;
 		activity.finish() ;
 	}
 

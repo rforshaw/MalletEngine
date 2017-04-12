@@ -17,24 +17,28 @@ import com.linxonline.mallet.event.* ;
 	Uses ALSA for audio.
 	Handles input events using JFrame.
 */
-public class GLDefaultSystem extends BasicSystem
+public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
+												 DefaultShutdown,
+												 GLRenderer,
+												 ALSASourceGenerator,
+												 InputSystem,
+												 EventSystem>
 {
 	protected EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
 	{
-		shutdownDelegate = new DefaultShutdown() ;
-		renderer = new GLRenderer() ;
-		audioGenerator = new ALSASourceGenerator() ;
-		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
-		inputSystem = new InputSystem() ;
-		fileSystem = new DesktopFileSystem() ;
+		super( new DefaultShutdown(),
+			   new GLRenderer(),
+			   new ALSASourceGenerator(),
+			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new InputSystem(),
+			   new DesktopFileSystem() ) ;
 	}
 
 	public GLWindow getWindow()
 	{
-		final GLRenderer render = ( GLRenderer )renderer ;
-		return render.getCanvas() ;
+		return getRenderer().getCanvas() ;
 	}
 	
 	@Override
@@ -42,21 +46,22 @@ public class GLDefaultSystem extends BasicSystem
 	{
 		initEventProcessors() ;
 
-		renderer.start() ;
-		audioGenerator.startGenerator() ;
+		final GLRenderer render = getRenderer() ;
+		render.start() ;
 
-		final GLRenderer render = ( GLRenderer )renderer ;
-		final InputSystem input = ( InputSystem )inputSystem ;
+		getAudioGenerator().startGenerator() ;
 
+		final InputSystem input = getInput() ;
 		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
 
 		render.getCanvas().setTitle( title ) ;
 		render.getCanvas().addMouseListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;
 
-		eventSystem.addEvent( new Event<Boolean>( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
-		eventSystem.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
-		eventSystem.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+		final EventSystem event = getEventSystem() ;
+		event.addEvent( new Event<Boolean>( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 
 		getWindow().addWindowListener( new WindowListener()
 		{
@@ -106,7 +111,7 @@ public class GLDefaultSystem extends BasicSystem
 			}
 		} ) ;
 
-		eventSystem.addEventHandler( eventController ) ;
+		getEventSystem().addEventHandler( eventController ) ;
 	}
 
 	@Override

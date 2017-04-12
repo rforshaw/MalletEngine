@@ -17,19 +17,37 @@ import com.linxonline.mallet.io.filesystem.FileSystem ;
 	Look at GLDefaultSystem for an example on how to use 
 	this class.
 */
-public abstract class BasicSystem implements SystemInterface
+public abstract class BasicSystem<F extends FileSystem,
+								  S extends SystemInterface.ShutdownDelegate,
+								  R extends RenderInterface,
+								  A extends AudioGenerator,
+								  I extends InputSystemInterface,
+								  E extends EventSystemInterface> implements SystemInterface<F, S, R, A, I, E>
 {
 	protected String title = "Mallet Engine" ;
-	protected ShutdownDelegate shutdownDelegate ;
+	private final S shutdownDelegate ;
 
-	protected RenderInterface renderer ;
-	protected AudioGenerator audioGenerator ;
+	private final R renderer ;
+	private final A audioGenerator ;
 
-	protected EventSystemInterface eventSystem ;
-	protected InputSystemInterface inputSystem ;
-	protected FileSystem fileSystem ;
+	private final E eventSystem ;
+	private final I inputSystem ;
+	private final F fileSystem ;
 
-	public BasicSystem() {}
+	public BasicSystem( final S _shutdown,
+						final R _renderer,
+						final A _audio,
+						final E _event,
+						final I _input,
+						final F _fileSystem )
+	{
+		shutdownDelegate = _shutdown ;
+		renderer = _renderer ;
+		audioGenerator = _audio ;
+		eventSystem = _event ;
+		inputSystem = _input ;
+		fileSystem = _fileSystem ;
+	}
 
 	@Override
 	public abstract void initSystem() ;
@@ -49,37 +67,37 @@ public abstract class BasicSystem implements SystemInterface
 	}
 
 	@Override
-	public FileSystem getFileSystem()
+	public F getFileSystem()
 	{
 		return fileSystem ;
 	}
 
 	@Override
-	public ShutdownDelegate getShutdownDelegate()
+	public S getShutdownDelegate()
 	{
 		return shutdownDelegate ;
 	}
 
 	@Override
-	public RenderInterface getRenderInterface()
+	public R getRenderer()
 	{
 		return renderer ;
 	}
 
 	@Override
-	public AudioGenerator getAudioGenerator()
+	public A getAudioGenerator()
 	{
 		return audioGenerator ;
 	}
 
 	@Override
-	public InputSystemInterface getInputInterface()
+	public I getInput()
 	{
 		return inputSystem ;
 	}
 
 	@Override
-	public EventSystemInterface getEventInterface()
+	public E getEventSystem()
 	{
 		return eventSystem ;
 	}

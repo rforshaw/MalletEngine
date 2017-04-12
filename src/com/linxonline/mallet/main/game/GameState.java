@@ -330,8 +330,8 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( internalController ) ;
 		internalController.setAddEventInterface( eventSystem ) ;
 
-		system.getEventInterface().addEventHandler( externalController ) ;
-		externalController.setAddEventInterface( system.getEventInterface() ) ;
+		system.getEventSystem().addEventHandler( externalController ) ;
+		externalController.setAddEventInterface( system.getEventSystem() ) ;
 	}
 
 	protected void unhookGameStateEventController()
@@ -339,8 +339,8 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( internalController ) ;
 		eventSystem.removeHandlersNow() ;
 
-		system.getEventInterface().removeEventHandler( externalController ) ;
-		system.getEventInterface().removeHandlersNow() ;
+		system.getEventSystem().removeEventHandler( externalController ) ;
+		system.getEventSystem().removeHandlersNow() ;
 	}
 
 	/**
@@ -356,14 +356,14 @@ public class GameState extends State implements HookEntity
 		eventSystem.addEventHandler( trackerController ) ;
 		eventSystem.addEventHandler( audioController ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
-		eventSystem.addEventHandler( system.getRenderInterface().getEventController() ) ;
+		eventSystem.addEventHandler( system.getRenderer().getEventController() ) ;
 		eventSystem.addEventHandler( animationController ) ;
 
 		animationController.setAddEventInterface( eventSystem ) ;
 		trackerController.setAddEventInterface( eventSystem ) ;
 		audioController.setAddEventInterface( eventSystem ) ;
 
-		final InputSystemInterface input = system.getInputInterface() ;
+		final InputSystemInterface input = system.getInput() ;
 		input.addInputHandler( inputUISystem ) ;
 		input.addInputHandler( inputWorldSystem ) ;
 	}
@@ -379,10 +379,10 @@ public class GameState extends State implements HookEntity
 		eventSystem.removeEventHandler( audioSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( animationSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
-		eventSystem.removeEventHandler( system.getRenderInterface().getEventController() ) ;
+		eventSystem.removeEventHandler( system.getRenderer().getEventController() ) ;
 		eventSystem.removeHandlersNow() ;
 
-		final InputSystemInterface input = system.getInputInterface() ;
+		final InputSystemInterface input = system.getInput() ;
 		input.removeInputHandler( inputUISystem ) ;
 		input.removeInputHandler( inputWorldSystem ) ;
 	}
@@ -443,7 +443,7 @@ public class GameState extends State implements HookEntity
 				{
 					startTime = ElapsedTimer.nanoTime() ;
 
-					system.getInputInterface().update() ;
+					system.getInput().update() ;
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
 
@@ -596,7 +596,7 @@ public class GameState extends State implements HookEntity
 			public void processEvent( final Event<EventController> _event )
 			{
 				final EventController controller = _event.getVariable() ;
-				final EventSystemInterface eventBackend = system.getEventInterface() ;
+				final EventSystemInterface eventBackend = system.getEventSystem() ;
 
 				controller.setAddEventInterface( eventBackend ) ;
 				eventBackend.addEventHandler( controller ) ;
@@ -608,7 +608,7 @@ public class GameState extends State implements HookEntity
 			public void processEvent( final Event<EventController> _event )
 			{
 				final EventController controller = _event.getVariable() ;
-				final EventSystemInterface eventBackend = system.getEventInterface() ;
+				final EventSystemInterface eventBackend = system.getEventSystem() ;
 
 				eventBackend.removeEventHandler( controller ) ;
 			}

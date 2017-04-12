@@ -79,7 +79,7 @@ public abstract class AndroidStarter extends AbstractStarter
 		final DisplayMetrics metrics = new DisplayMetrics() ;
 		activity.getWindowManager().getDefaultDisplay().getMetrics( metrics ) ;
 
-		final RenderInterface render = _system.getRenderInterface() ;
+		final RenderInterface render = _system.getRenderer() ;
 
 		final RenderInfo info = render.getRenderInfo() ;
 		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
