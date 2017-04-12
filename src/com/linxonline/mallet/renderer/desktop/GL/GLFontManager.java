@@ -1,8 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.resources.AbstractManager ;
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 public class GLFontManager extends AbstractManager<GLFont>

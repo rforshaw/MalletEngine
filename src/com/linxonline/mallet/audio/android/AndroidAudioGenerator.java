@@ -8,7 +8,7 @@ import android.content.res.Resources ;
 import android.graphics.BitmapFactory ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.io.ILoader ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
@@ -21,8 +21,8 @@ public class AndroidAudioGenerator implements AudioGenerator<AndroidSound>
 
 	public boolean startGenerator()
 	{
-		final ManagerInterface.ResourceLoader<AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer<AndroidSound>>()
+		final ILoader.ResourceLoader<AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<AudioBuffer<AndroidSound>>()
 		{
 			public boolean isLoadable( final String _file )
 			{

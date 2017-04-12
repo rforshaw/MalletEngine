@@ -19,6 +19,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;
+import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.Tuple ;
@@ -26,7 +27,6 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
 public class GLTextureManager extends AbstractManager<Texture<GLImage>>

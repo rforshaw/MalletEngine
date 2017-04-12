@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.maths.Vector2 ;
 
 public final class Sprite extends Resource

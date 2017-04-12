@@ -1,8 +1,6 @@
-package com.linxonline.mallet.util.sort ;
+package com.linxonline.mallet.util ;
 
 import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 public final class QuickSort
 {
@@ -13,7 +11,7 @@ public final class QuickSort
 		Used to sort RenderContainers based on their LAYER.
 		-10, -4, 0, 1, 5, 11,
 	*/
-	public static <T extends SortInterface> List<T> quicksort( final List<T> _contents )
+	public static <T extends ISort> List<T> quicksort( final List<T> _contents )
 	{
 		final int size = _contents.size() ;
 		if( size <= 1 )
@@ -24,7 +22,7 @@ public final class QuickSort
 		return sort( _contents )  ;
 	}
 
-	public static <T extends SortInterface> T[] quicksort( final T[] _contents )
+	public static <T extends ISort> T[] quicksort( final T[] _contents )
 	{
 		final int size = _contents.length ;
 		if( size <= 1 )
@@ -41,7 +39,7 @@ public final class QuickSort
 		return sort( array ).toArray( _contents ) ;
 	}
 
-	private static <T extends SortInterface> List<T> sort( final List<T> _contents )
+	private static <T extends ISort> List<T> sort( final List<T> _contents )
 	{
 		int size = _contents.size() ;
 		final int halfSize = size / 2 ;

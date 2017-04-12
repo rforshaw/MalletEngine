@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.texture ;
 
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 
 public final class Texture<T extends ImageInterface> extends Resource
 {

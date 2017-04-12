@@ -4,9 +4,6 @@ import javax.media.opengl.* ;
 
 import java.nio.* ;
 
-import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
-
 public final class GLModelManager
 {
 	private GLModelManager() {}

@@ -8,7 +8,7 @@ import com.jogamp.openal.* ;
 import com.jogamp.openal.util.* ;
 
 import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.resources.* ;
+import com.linxonline.mallet.io.ILoader ;
 import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
@@ -41,8 +41,8 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 	private void initStaticLoaders()
 	{
-		final ManagerInterface.ResourceLoader<AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ManagerInterface.ResourceDelegate<AudioBuffer<ALSASound>>()
+		final ILoader.ResourceLoader<AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<AudioBuffer<ALSASound>>()
 		{
 			public boolean isLoadable( final String _file )
 			{

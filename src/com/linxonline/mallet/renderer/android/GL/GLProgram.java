@@ -8,7 +8,7 @@ import android.opengl.GLES30 ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.util.logger.Logger ;
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.texture.* ;

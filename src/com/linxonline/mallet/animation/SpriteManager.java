@@ -4,7 +4,7 @@ import java.util.List ;
 import java.io.* ;
 
 import com.linxonline.mallet.io.reader.* ;
-import com.linxonline.mallet.resources.AbstractManager ;
+import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.MalletList ;
 

@@ -6,8 +6,8 @@ import android.opengl.GLES30 ;
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.* ;
+import com.linxonline.mallet.io.AbstractManager ;
 
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;

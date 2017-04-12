@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.sort ;
+package com.linxonline.mallet.util ;
 
 import java.util.List ;
 
@@ -6,7 +6,7 @@ public class OrderedInsert
 {
 	private OrderedInsert() {}
 
-	public static <T extends SortInterface> List<T> insert( final T _toInsert, final List<T> _list )
+	public static <T extends ISort> List<T> insert( final T _toInsert, final List<T> _list )
 	{
 		final int size = _list.size() ;
 		for( int i = 0; i < size; i++ )

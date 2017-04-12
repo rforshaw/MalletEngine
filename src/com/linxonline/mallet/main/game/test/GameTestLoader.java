@@ -10,7 +10,6 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.main.game.* ;
 import com.linxonline.mallet.animation.* ;
-import com.linxonline.mallet.util.sort.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
 import com.linxonline.mallet.entity.* ;

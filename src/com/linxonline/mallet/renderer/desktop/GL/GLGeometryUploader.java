@@ -23,8 +23,8 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.util.sort.OrderedInsert ;
-import com.linxonline.mallet.util.sort.SortInterface ;
+import com.linxonline.mallet.util.OrderedInsert ;
+import com.linxonline.mallet.util.ISort ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -398,7 +398,7 @@ public class GLGeometryUploader
 		}
 	} ;
 
-	public interface IBuffer extends SortInterface
+	public interface IBuffer extends ISort
 	{
 		public void draw( final GL3 _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection ) ;
 
@@ -1481,7 +1481,7 @@ public class GLGeometryUploader
 			return "Index: " + index.toString() + " Vertex: " + vertex.toString() ;
 		}
 
-		private class Range implements SortInterface
+		private class Range implements ISort
 		{
 			private int start = 0 ;
 			private int length = 0 ;

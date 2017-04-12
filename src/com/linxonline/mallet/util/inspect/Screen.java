@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.inspect ;
 
-import com.linxonline.mallet.util.sort.QuickSort ;
+import com.linxonline.mallet.util.QuickSort ;
 
 /**
 	Screens contains the information about a specific screen 

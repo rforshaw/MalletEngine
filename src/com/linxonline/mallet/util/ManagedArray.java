@@ -1,8 +1,6 @@
-package com.linxonline.mallet.util.arrays ;
+package com.linxonline.mallet.util ;
 
 import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Objects are only added to current state when 

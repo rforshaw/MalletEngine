@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.arrays.ManagedArray ;
+import com.linxonline.mallet.util.ManagedArray ;
 
 public class DrawState<D extends DrawData> extends ManagedArray<D>
 {

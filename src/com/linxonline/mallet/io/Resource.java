@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources ;
+package com.linxonline.mallet.io ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 

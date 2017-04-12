@@ -13,7 +13,6 @@ import com.linxonline.mallet.system.DefaultShutdown ;
 import com.linxonline.mallet.input.InputSystemInterface ;
 import com.linxonline.mallet.input.InputHandler ;
 import com.linxonline.mallet.event.EventHandler ;
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;

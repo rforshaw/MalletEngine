@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources ;
+package com.linxonline.mallet.io ;
 
 import java.util.List ;
 import java.util.Map ;
@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
-public abstract class AbstractManager<T extends Resource> implements ManagerInterface<T>
+public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 {
 	protected final AbstractLoader<T> abstractLoader = new AbstractLoader<T>() ;
 	protected final Map<String, T> resources = MalletMap.<String, T>newMap() ;

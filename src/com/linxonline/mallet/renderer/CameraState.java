@@ -1,7 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.Tuple ;
-import com.linxonline.mallet.util.arrays.ManagedArray ;
+import com.linxonline.mallet.util.ManagedArray ;
 
 public class CameraState<C extends CameraData> extends ManagedArray<C>
 {

@@ -19,7 +19,6 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.main.game.statemachine.* ;
 import com.linxonline.mallet.main.game.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.event.* ;
 
 import com.linxonline.mallet.renderer.MalletFont ;

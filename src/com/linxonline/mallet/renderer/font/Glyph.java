@@ -1,8 +1,8 @@
 package com.linxonline.mallet.renderer.font ;
 
-import com.linxonline.mallet.util.sort.SortInterface ;
+import com.linxonline.mallet.util.ISort ;
 
-public class Glyph implements SortInterface
+public class Glyph implements ISort
 {
 	public final char character ;
 	public final float width ;

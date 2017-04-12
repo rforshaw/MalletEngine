@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.sort.QuickSort ;
+import com.linxonline.mallet.util.QuickSort ;
 
 import com.linxonline.mallet.renderer.font.FontAssist ;
 import com.linxonline.mallet.renderer.font.Glyph ;

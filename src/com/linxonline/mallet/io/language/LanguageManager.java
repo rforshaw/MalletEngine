@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.language ;
+package com.linxonline.mallet.io.language ;
 
 import java.util.Map ;
 import java.util.List ;

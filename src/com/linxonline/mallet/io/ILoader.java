@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources ;
+package com.linxonline.mallet.io ;
 
 import java.util.Set ;
 
@@ -8,7 +8,7 @@ import java.util.Set ;
 	interface, or use AbstractManager for a general 
 	implementation that will cover most cases.
 */
-public interface ManagerInterface<T extends Resource>
+public interface ILoader<T extends Resource>
 {
 	public T put( final String _key, final T _value  ) ;
 	public T get( final String _file ) ;								// Retrieve T, using _file as key or load with _file

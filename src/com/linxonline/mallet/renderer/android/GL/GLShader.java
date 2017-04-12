@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 
 /**
 	Transitionary object used to retain important 

@@ -2,14 +2,14 @@ package com.linxonline.mallet.util.inspect ;
 
 import com.linxonline.mallet.maths.Ratio ;
 
-import com.linxonline.mallet.util.sort.SortInterface ;
+import com.linxonline.mallet.util.ISort ;
 
 /**
 	Store the information about a particular state a screen can cope with.
 	With vanilla Java refreshRate of 0, means unknown, and bitDepth of -1 
 	means either multi-depth supported, or unknown.
 **/
-public class ScreenMode implements SortInterface
+public class ScreenMode implements ISort
 {
 	private final int width ;
 	private final int height ;

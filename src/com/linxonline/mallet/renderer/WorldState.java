@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.arrays.ManagedArray ;
+import com.linxonline.mallet.util.ManagedArray ;
 
 /**
 	Implements common requirements when using BasicWorld.

@@ -1,4 +1,4 @@
-package com.linxonline.mallet.resources.language ;
+package com.linxonline.mallet.io.language ;
 
 public final class GlobalLanguage
 {

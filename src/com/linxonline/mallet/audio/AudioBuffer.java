@@ -1,6 +1,6 @@
 package com.linxonline.mallet.audio ;
 
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 
 /**
 	Container class for storing the access point to a 
