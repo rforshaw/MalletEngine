@@ -11,7 +11,7 @@ import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-public class AndroidInputSystem implements InputSystemInterface, 
+public class AndroidInputSystem implements IInputSystem, 
 										   AndroidInputListener
 {
 	public InputAdapterInterface inputAdapter = null ;

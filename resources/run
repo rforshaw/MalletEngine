@@ -12,4 +12,4 @@ do
   CLASSPATH=${CLASSPATH}:${i}
 done
 
-java -classpath $CLASSPATH -XX:MinHeapFreeRatio=1 -XX:MaxHeapFreeRatio=5 -Dsun.awt.noerasebackground=true -Dsun.java2d.noddraw=true com.linxonline.mallet.main.desktop.DesktopTestMain $@
+java -classpath $CLASSPATH -XX:MinHeapFreeRatio=1 -XX:MaxHeapFreeRatio=5 -Dsun.awt.noerasebackground=true -Dsun.java2d.noddraw=true com.linxonline.mallet.core.desktop.DesktopTestMain $@

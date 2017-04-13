@@ -13,7 +13,7 @@ import javax.imageio.stream.* ;
 
 import java.nio.* ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.desktop.* ;
 import com.linxonline.mallet.io.AbstractManager ;

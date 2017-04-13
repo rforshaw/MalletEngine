@@ -13,4 +13,4 @@ do
 done
 
 #jdb -sourcepath ../../../src -classpath $CLASSPATH com.linxonline.mallet.main.desktop.DesktopTestMain $@
-java -classpath $CLASSPATH -Djogl.debug.DebugGL -Dsun.awt.noerasebackground=true com.linxonline.mallet.main.desktop.DesktopTestMain $@
+java -classpath $CLASSPATH -Djogl.debug.DebugGL -Dsun.awt.noerasebackground=true com.linxonline.mallet.core.desktop.DesktopTestMain $@

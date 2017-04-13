@@ -4,7 +4,7 @@ import java.util.List ;
 import java.util.Set ;
 import java.util.HashSet ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.MalletList ;

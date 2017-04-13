@@ -3,7 +3,7 @@ package com.linxonline.mallet.util.factory.creators ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.factory.* ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.animation.AnimationAssist ;
 import com.linxonline.mallet.animation.Anim ;

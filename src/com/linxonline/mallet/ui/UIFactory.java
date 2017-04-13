@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;

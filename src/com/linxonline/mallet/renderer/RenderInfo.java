@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.input.InputAdapterInterface ;
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 /**
 	Convenience class to handle Display & Render Dimensions.

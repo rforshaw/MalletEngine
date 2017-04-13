@@ -8,7 +8,7 @@ import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.logger.Logger ;
 
-public final class EventSystem implements EventSystemInterface
+public final class EventSystem implements IEventSystem
 {
 	// Replace Map with something easier to traverse.
 	private final String name ;

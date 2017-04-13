@@ -12,7 +12,7 @@ import com.linxonline.mallet.maths.* ;
 public abstract class BasicRenderer<D extends DrawData,
 									C extends CameraData,
 									W extends BasicWorld<D, C>,
-									WS extends WorldState<D, C, W>> implements RenderInterface
+									WS extends WorldState<D, C, W>> implements IRender
 {
 	private final WS worlds ;
 

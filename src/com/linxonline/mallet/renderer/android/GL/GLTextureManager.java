@@ -15,7 +15,7 @@ import android.opengl.ETC1 ;
 import android.graphics.BitmapFactory ;
 import android.graphics.Bitmap ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.io.reader.ByteReader ;

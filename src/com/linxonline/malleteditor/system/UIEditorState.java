@@ -1,6 +1,6 @@
 package com.linxonline.malleteditor.system ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.event.* ;
@@ -8,7 +8,7 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.main.game.* ;
+import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 

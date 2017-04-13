@@ -3,7 +3,6 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 
 import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.system.* ;
 
 /**
 	Allows a Component to send or recieve Events during runtime.

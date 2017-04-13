@@ -4,13 +4,13 @@ import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
-import com.linxonline.mallet.main.game.GameLoader ;
-import com.linxonline.mallet.main.desktop.DesktopStarter ;
-import com.linxonline.mallet.system.desktop.gl.GLDefaultSystem ;
+import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.desktop.DesktopStarter ;
+import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
-import com.linxonline.mallet.renderer.RenderInterface ;
-import com.linxonline.mallet.system.SystemInterface ;
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.renderer.IRender ;
+import com.linxonline.mallet.core.ISystem ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 public class EditorStarter extends DesktopStarter
 {
@@ -29,10 +29,10 @@ public class EditorStarter extends DesktopStarter
 		Uses the configuration file loaded above to set the rendering system.
 	*/
 	@Override
-	public void setRenderSettings( final SystemInterface _system )
+	public void setRenderSettings( final ISystem _system )
 	{
 		super.setRenderSettings( _system ) ;
-		final RenderInterface render = _system.getRenderer() ;
+		final IRender render = _system.getRenderer() ;
 
 		// Override config setting and prevent ratio from being adhered to
 		// Force Display and Render size parity.

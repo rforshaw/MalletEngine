@@ -15,7 +15,7 @@ import com.linxonline.mallet.input.* ;
 // Handlers														//
 /*==============================================================*/
 
-public class InputState implements InputSystemInterface,
+public class InputState implements IInputSystem,
 								   InputHandler
 {
 	// Prevents InputState from hording events, if it 

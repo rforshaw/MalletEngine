@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.logger.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.VertexAttrib ;
 

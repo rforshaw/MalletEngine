@@ -6,7 +6,7 @@
 	<uses-feature android:glEsVersion="0x00030000" android:required="true"/>
 	<uses-sdk android:targetSdkVersion="8" android:minSdkVersion="8"></uses-sdk>
     <application android:label="@string/app_name" >
-        <activity android:name=".mallet.main.android.AndroidActivity"
+        <activity android:name=".mallet.core.android.AndroidActivity"
                   android:label="@string/app_name"
                   android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>

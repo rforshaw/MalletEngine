@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.util.worker.* ;
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 
 public class DefaultMTUpdate extends DefaultSTUpdate
 {

@@ -15,12 +15,12 @@ import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.renderer.android.* ;
 
-public class GL2DRenderer implements RenderInterface, 
+public class GL2DRenderer implements IRender, 
 									 GLSurfaceView.Renderer
 {
 	protected final GLRenderer render ;
