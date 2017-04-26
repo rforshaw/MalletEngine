@@ -135,8 +135,9 @@ public class UIComponent extends InputComponent
 				eventController.passEvent( event ) ;
 			}
 			events.clear() ;
-			eventController.update() ;
 		}
+
+		eventController.update() ;
 
 		if( toDestroy != null )
 		{

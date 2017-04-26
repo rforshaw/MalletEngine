@@ -123,7 +123,6 @@ public class GLGeometryUploader
 			buffer.remove( _data ) ;
 			_data.setBuffer( null ) ;
 			_data.setLocation( null ) ;
-			_data.setWorld( null ) ;
 		}
 	}
 

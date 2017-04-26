@@ -178,10 +178,10 @@ public final class GameTestLoader extends GameLoader
 							lines.addIndex( 5 ) ;
 
 							final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
-																	  new Vector3( -100.0f, 0.0f, 0.0f ),
-																	  new Vector3(),
-																	  new Vector3( 1, 1, 1 ),
-																	  10 ) ;
+																	 new Vector3( -100.0f, 0.0f, 0.0f ),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ),
+																	 10 ) ;
 							DrawAssist.amendShape( draw, lines ) ;
 							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
@@ -374,9 +374,9 @@ public final class GameTestLoader extends GameLoader
 				final Entity entity = creator.create( image ) ;
 
 				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	new Vector2( 64, 64 ),
-																	new Vector2( x, y ),
-																	new Vector2( -32, -32 ) ) ) ;
+																	   new Vector2( 64, 64 ),
+																	   new Vector2( x, y ),
+																	   new Vector2( -32, -32 ) ) ) ;
 
 				addEntity( entity ) ;
 			}
@@ -410,10 +410,10 @@ public final class GameTestLoader extends GameLoader
 
 				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 				final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, -200.0f, 0.0f ),
-															new Vector3( -50.0f, -50.0f, -50.0f ),
-															new Vector3(),
-															new Vector3( 1, 1, 1 ),
-															10 ) ;
+														 new Vector3( -50.0f, -50.0f, -50.0f ),
+														 new Vector3(),
+														 new Vector3( 1, 1, 1 ),
+														 10 ) ;
 				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;

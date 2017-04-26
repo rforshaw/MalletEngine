@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import java.lang.ref.WeakReference ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
@@ -14,7 +16,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 	private final String id ;
 
-	private World world = null ;		// Store the handler to the worldspace this data is associated with
+	private WeakReference<World> world = null ;		// Store the handler to the worldspace this data is associated with
 	private Camera.DrawInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
@@ -50,12 +52,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	
 	public void setWorld( final World _world )
 	{
-		world = _world ;
+		world = new WeakReference<World>( _world ) ;
 	}
 
 	public World getWorld()
 	{
-		return world ;
+		return ( world != null ) ? world.get() : null ;
 	}
 
 	public Vector3 getPosition()
@@ -109,12 +111,15 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
 	}
 
-	protected void draw( final int _diff, final int _iteration )
+	protected void update( final int _diff, final int _iteration )
 	{
 		interpolate( position, oldPosition, currentPosition, _diff, _iteration ) ;
 		interpolate( scale,    oldScale,    currentScale,    _diff, _iteration ) ;
 		interpolate( rotation, oldRotation, currentRotation, _diff, _iteration ) ;
+	}
 
+	protected void draw()
+	{
 		draw.draw( ( T )this ) ;
 	}
 

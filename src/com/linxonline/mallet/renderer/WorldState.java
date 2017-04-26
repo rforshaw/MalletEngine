@@ -51,8 +51,6 @@ public abstract class WorldState<D extends DrawData,
 	public void addDraw( final D _draw, final W _world )
 	{
 		final W world = getWorld( _world ) ;
-		_draw.setWorld( world ) ;
-
 		synchronized( world )
 		{
 			world.addDraw( _draw ) ;
@@ -65,9 +63,10 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void removeDraw( final D _draw )
 	{
-		final W world = ( W )_draw.getWorld() ;
-		synchronized( world )
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final W world = current.get( i ) ;
 			world.removeDraw( _draw ) ;
 		}
 	}

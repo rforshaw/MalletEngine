@@ -1,20 +1,28 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.ManagedArray ;
 
-public class CameraState<C extends CameraData> extends ManagedArray<C>
+public final class CameraState<C extends CameraData> extends ManagedArray<C>
 {
 	public CameraState() {}
 
-	public synchronized void draw( final int _diff, final int _iteration )
+	public synchronized void update( final int _diff, final int _iteration )
 	{
 		manageState() ;
 
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			current.get( i ).draw( _diff, _iteration ) ;
+			current.get( i ).update( _diff, _iteration ) ;
+		}
+	}
+
+	public synchronized void draw()
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).draw() ;
 		}
 	}
 

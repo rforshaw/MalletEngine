@@ -1,4 +1,4 @@
-package com.linxonline.malleteditor.system ;
+package com.linxonline.malleteditor.core ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
@@ -47,16 +47,6 @@ public class EditorState extends GameState
 	private static final float SEPERATOR = 5.0f ;
 	private static final float EDITOR_LIST_WIDTH = 40.0f ;
 
-	private final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
-	private final World uiWorld = WorldAssist.constructWorld( "UI_EDITOR_WORLD", 2 ) ;
-
-	private final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
-																				 new Vector3(),
-																				 new Vector3( 1, 1, 1 ) ) ;
-	private final Camera uiCamera = CameraAssist.createCamera( "UI_EDITOR_CAMERA", new Vector3(),
-																					new Vector3(),
-																					new Vector3( 1, 1, 1 ) ) ;
-
 	public EditorState( final String _name )
 	{
 		super( _name ) ;
@@ -65,10 +55,20 @@ public class EditorState extends GameState
 	@Override
 	public void initGame()
 	{
+		/*final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
+		final World uiWorld = WorldAssist.constructWorld( "UI_EDITOR_WORLD", 2 ) ;
+
+		final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
+																			new Vector3(),
+																			new Vector3( 1, 1, 1 ) ) ;
+		final Camera uiCamera = CameraAssist.createCamera( "UI_EDITOR_CAMERA",  new Vector3(),
+																				new Vector3(),
+																				new Vector3( 1, 1, 1 ) ) ;
+	
 		CameraAssist.addCamera( edCamera, edWorld ) ;
 		CameraAssist.addCamera( uiCamera, uiWorld ) ;
 
-		loadDefaultUILayout() ;
+		loadDefaultUILayout() ;*/
 	}
 
 	@Override
@@ -79,16 +79,16 @@ public class EditorState extends GameState
 
 	private void loadDefaultUILayout()
 	{
-		final UIComponent ui = new UIComponent() ;
+		/*final UIComponent ui = new UIComponent() ;
 		ui.addElement( createMainLayout( ui ) ) ;
 
 		final Entity entity = new Entity() ;
 		entity.addComponent( ui ) ;
 
-		addEntity( entity ) ;
+		addEntity( entity ) ;*/
 	}
 
-	private UILayout createMainLayout( final UIComponent _ui )
+	/*private UILayout createMainLayout( final UIComponent _ui )
 	{
 		final UILayout layout = UIFactory.constructWindowLayout( UILayout.Type.VERTICAL, uiCamera ) ;
 
@@ -538,5 +538,5 @@ public class EditorState extends GameState
 		} ) ;
 
 		return layout ;
-	}
+	}*/
 }

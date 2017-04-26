@@ -44,9 +44,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		super( new GLWorldState() ) ;
 
 		final GLWorldState worlds = getWorldState() ;
-		worlds.setDefault( new GLWorld( "DEFAULT", 0, constructRemoveDelegate() ) ) ;
+		final GLWorld world = new GLWorld( "DEFAULT", 0 ) ;
+		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
+		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+		worlds.setDefault( world ) ;
 
-		defaultCamera.setDrawInterface( getCameraDraw() ) ;
+		defaultCamera.setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
 		worlds.addCamera( defaultCamera, null ) ;
 
 		initAssist() ;
@@ -451,21 +454,31 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public World addWorld( final World _world )
 			{
-				getWorldState().addWorld( ( GLWorld )_world ) ;
-				return _world ;
+				if( _world instanceof GLWorld )
+				{
+					getWorldState().addWorld( ( GLWorld )_world ) ;
+					return _world ;
+				}
+				return null ;
 			}
 
 			@Override
 			public World removeWorld( final World _world )
 			{
-				getWorldState().removeWorld( ( GLWorld )_world ) ;
-				return _world ;
+				if( _world instanceof GLWorld )
+				{
+					getWorldState().removeWorld( ( GLWorld )_world ) ;
+					return _world ;
+				}
+				return null ;
 			}
 
 			@Override
 			public World constructWorld( final String _id, final int _order )
 			{
-				final GLWorld world = new GLWorld( _id, _order, constructRemoveDelegate() ) ;
+				final GLWorld world = new GLWorld( _id, _order ) ;
+				world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
+				world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
 				getWorldState().addWorld( world ) ;
 				return world ;
 			}
@@ -579,8 +592,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
-				_camera.setDrawInterface( getCameraDraw() ) ;
-				getWorldState().addCamera( cast( _camera ), cast( _world ) ) ;
+				final GLWorld world = cast( _world ) ;
+				_camera.setDrawInterface( new GLCameraDraw( getRenderInfo(), getWorldState().getWorld( world ) ) ) ;
+				getWorldState().addCamera( cast( _camera ), world ) ;
 				return _camera ;
 			}
 
@@ -612,92 +626,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				assert( _camera != null ) ;
 				assert( !( _camera instanceof CameraData ) ) ;
 				return ( CameraData )_camera ;
-			}
-		} ;
-	}
-
-	@Override
-	public GLDrawData.UploadInterface<GLDrawData> getBasicUpload()
-	{
-		return new GLDrawData.UploadInterface<GLDrawData>()
-		{
-			public void upload( final GLDrawData _data )
-			{
-				if( loadProgram( _data ) == false )
-				{
-					return ;
-				}
-
-				final Vector3 position = _data.getPosition() ;
-				final Vector3 offset   = _data.getOffset() ;
-				final Vector3 rotation = _data.getRotation() ;
-
-				final Matrix4 positionMatrix = _data.getDrawMatrix() ;
-				positionMatrix.setIdentity() ;
-
-				positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
-				positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-				positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-				positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-				positionMatrix.translate( offset.x, offset.y, offset.z ) ;
-
-				final GLWorld world = ( GLWorld )_data.getWorld() ;
-				world.upload( _data ) ;
-			}
-		} ;
-	}
-
-	@Override
-	public CameraData.DrawInterface<CameraData> getCameraDraw()
-	{
-		return new CameraData.DrawInterface<CameraData>()
-		{
-			public void draw( final CameraData _camera )
-			{
-				final Vector2 scaleRtoD = getRenderInfo().getScaleRenderToDisplay() ;
-				final Vector2 offset = getRenderInfo().getScreenOffset() ;
-				final CameraData.Projection projection = _camera.getProjection() ;
-				final CameraData.Screen screen = _camera.getRenderScreen() ;
-
-				GLES30.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
-								   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
-								   ( int )( screen.dimension.x * scaleRtoD.x ),
-								   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
-				//GLRenderer.handleError( "Viewport: ", gl ) ;
-
-				final Vector3 position = _camera.getPosition() ;
-				final Vector3 scale = _camera.getScale() ;
-				final Vector3 rotation = _camera.getRotation() ;
-
-				worldMatrix.setIdentity() ;
-				worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
-				worldMatrix.scale( scale.x, scale.y, scale.z ) ;
-				worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
-
-				final Matrix4 worldProjection = matrixCache.get() ;
-				Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
-
-				final Matrix4 uiProjection = matrixCache.get() ;
-				Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
-
-				final GLWorld world = ( GLWorld )_camera.getWorld() ;
-				world.draw( worldProjection, uiProjection ) ;
-
-				matrixCache.reclaim( worldProjection ) ;
-				matrixCache.reclaim( uiProjection ) ;
-			}
-		} ;
-	}
-
-	@Override
-	public DrawState.RemoveDelegate<GLDrawData> constructRemoveDelegate()
-	{
-		return new DrawState.RemoveDelegate<GLDrawData>()
-		{
-			public void remove( final GLDrawData _data )
-			{
-				final GLWorld world = ( GLWorld )_data.getWorld() ;
-				world.remove( _data ) ;
 			}
 		} ;
 	}
@@ -746,6 +674,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 		getEventController().update() ;
 
+		//System.out.println( "Draw" ) ;
 		getWorldState().upload( ( int )( updateDT / drawDT ), renderIter ) ;
 	}
 
@@ -765,7 +694,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		fontManager.clean( activeKeys ) ;
 	}
 
-	private boolean loadProgram( final GLDrawData _data )
+	/**
+		Attempt to acquire a compatible GLProgram from 
+		the ProgramManager. Make sure the GLProgram 
+		requested maps correctly with the ProgramMap 
+		defined in the GLDrawData object.
+	*/
+	private static boolean loadProgram( final GLDrawData _data )
 	{
 		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 		if( program == null )
@@ -826,4 +761,97 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 		}
 	}
+
+	private static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
+	{
+		private final GLWorld world ;
+
+		public GLBasicRemove( final GLWorld _world )
+		{
+			world = _world ;
+		}
+
+		public void remove( final GLDrawData _data )
+		{
+			GLWorld.remove( world, _data ) ;
+		}
+	}
+	
+	private static class GLBasicUpload implements DrawState.UploadInterface<GLDrawData>
+	{
+		private final GLWorld world ;
+
+		public GLBasicUpload( final GLWorld _world )
+		{
+			world = _world ;
+		}
+
+		public void upload( final GLDrawData _data )
+		{
+			if( loadProgram( _data ) == false )
+			{
+				return ;
+			}
+
+			final Vector3 position = _data.getPosition() ;
+			final Vector3 offset   = _data.getOffset() ;
+			final Vector3 rotation = _data.getRotation() ;
+
+			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
+			positionMatrix.setIdentity() ;
+
+			positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
+			positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
+			positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
+			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
+			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
+
+			GLWorld.upload( world, _data ) ;
+		}
+	}
+
+	private static class GLCameraDraw implements CameraData.DrawInterface<CameraData>
+	{
+		private final GLWorld world ;
+		private final RenderInfo info ;
+
+		public GLCameraDraw( final RenderInfo _info, final GLWorld _world )
+		{
+			world = _world ;
+			info = _info ;
+		}
+
+		public void draw( final CameraData _camera )
+		{
+			final Vector2 scaleRtoD = info.getScaleRenderToDisplay() ;
+			final Vector2 offset = info.getScreenOffset() ;
+			final CameraData.Projection projection = _camera.getProjection() ;
+			final CameraData.Screen screen = _camera.getRenderScreen() ;
+
+			GLES30.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
+							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
+							   ( int )( screen.dimension.x * scaleRtoD.x ),
+							   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
+
+			final Vector3 position = _camera.getPosition() ;
+			final Vector3 scale = _camera.getScale() ;
+			//final Vector3 rotation = _camera.getRotation() ;
+
+			worldMatrix.setIdentity() ;
+			worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
+			worldMatrix.scale( scale.x, scale.y, scale.z ) ;
+			worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
+
+			final Matrix4 worldProjection = matrixCache.get() ;
+			Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
+
+			final Matrix4 uiProjection = matrixCache.get() ;
+			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
+
+			GLWorld.draw( world, worldProjection, uiProjection ) ;
+
+			matrixCache.reclaim( worldProjection ) ;
+			matrixCache.reclaim( uiProjection ) ;
+		}
+	} ;
 }

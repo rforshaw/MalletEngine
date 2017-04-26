@@ -9,6 +9,19 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	UIMenu is designed to provide Header/Footer toolbars that 
+	can be filled with Menu.Items - these items are extended 
+	UIButtons that allow for an external UIElement to be 
+	shown/hidden once clicked.
+
+	FIXME: There is a bug with the UILayout engagement system
+	that disables dropdown UIElements from recieving 
+	input events under certain circumstances.
+	
+	I'm not sure if this bug is caused by the UIMenu, Item, 
+	or dropdown not correctly being engaged.
+*/
 public class UIMenu extends UILayout
 {
 	public UIMenu( final Type _type, final float _length )
@@ -38,51 +51,48 @@ public class UIMenu extends UILayout
 		{
 			super() ;
 			dropdown = _dropdown ;
-			if( dropdown != null )
-			{
-				dropdown.setLayer( getLayer() + 1 ) ;
-				addListener( new UIMenu.DropDownListener( dropdown ) ) ;
-			}
+			addListener( new UIMenu.DropDownListener( dropdown ) ) ;
 		}
 
 		@Override
 		public void setInputAdapterInterface( final InputAdapterInterface _adapter )
 		{
 			super.setInputAdapterInterface( _adapter ) ;
-			if( dropdown != null )
-			{
-				dropdown.setInputAdapterInterface( _adapter ) ;
-			}
-		}
-
-		@Override
-		public InputEvent.Action passInputEvent( final InputEvent _event )
-		{
-			System.out.println( "Item: " + _event ) ;
-			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
-			{
-				// Don't pass the InputEvent on to the child elements.
-				// The UILayout may wish to consume the event if it was 
-				// used to get focus onto a child element.  
-				return InputEvent.Action.CONSUME ;
-			}
-
-			if( dropdown != null )
-			{
-				return dropdown.passInputEvent( _event ) ;
-			}
-
-			return InputEvent.Action.PROPAGATE ;
+			dropdown.setInputAdapterInterface( _adapter ) ;
 		}
 
 		@Override
 		public void update( final float _dt, final List<Event<?>> _events )
 		{
 			super.update( _dt, _events ) ;
-			if( dropdown != null )
+			dropdown.update( _dt, _events ) ;
+		}
+
+		@Override
+		public InputEvent.Action passInputEvent( final InputEvent _event )
+		{
+			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
-				dropdown.update( _dt, _events ) ;
+				return InputEvent.Action.CONSUME ;
 			}
+
+			if( dropdown.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+			{
+				return InputEvent.Action.CONSUME ;
+			}
+
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public boolean isIntersectInput( final InputEvent _event )
+		{
+			if( super.isIntersectInput( _event ) == true )
+			{
+				return true ;
+			}
+
+			return ( dropdown.isIntersectInput( _event ) && dropdown.isVisible() ) ;
 		}
 	}
 
@@ -99,6 +109,18 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
+		public void engage()
+		{
+			final UIElement parent = getParent() ;
+			parent.getPosition( position ) ;
+			parent.getLength( length ) ;
+
+			dropdown.setLayer( parent.getLayer() + 1 ) ;
+			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+			dropdown.engage() ;
+		}
+
+		@Override
 		public void disengage()
 		{
 			dropdown.disengage() ;
@@ -108,17 +130,9 @@ public class UIMenu extends UILayout
 		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
-			final UIElement parent = getParent() ;
-			parent.getPosition( position ) ;
-			parent.getLength( length ) ;
-
-			dropdown.setVisible( true ) ;
-			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
-			dropdown.engage() ;
-
-
-			parent.makeDirty() ;
-			return InputEvent.Action.CONSUME ;
+			dropdown.setVisible( !dropdown.isVisible() ) ;
+			dropdown.setEngage( !dropdown.isEngaged() ) ;
+			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override

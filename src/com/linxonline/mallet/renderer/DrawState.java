@@ -2,19 +2,31 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.ManagedArray ;
 
-public class DrawState<D extends DrawData> extends ManagedArray<D>
+public final class DrawState<D extends DrawData> extends ManagedArray<D>
 {
-	public synchronized void upload( final int _diff, final int _iteration )
+	private final UploadInterface<D> UPLOAD_DEFAULT = new UploadInterface<D>()
+	{
+		@Override
+		public void upload( final D _data ) {}
+	} ;
+
+	private UploadInterface<D> upload = UPLOAD_DEFAULT ;
+
+	public synchronized void update( final int _diff, final int _iteration )
 	{
 		manageState() ;
 
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			current.get( i ).upload( _diff, _iteration ) ;
+			final D draw = current.get( i ) ;
+			draw.update( _diff, _iteration ) ;
+			if( draw.toUpdate() == true )
+			{
+				upload.upload( draw ) ;
+			}
 		}
 	}
 
@@ -54,4 +66,14 @@ public class DrawState<D extends DrawData> extends ManagedArray<D>
 	public void sort() {}
 
 	public void clear() {}
+
+	public void setUploadInterface( final UploadInterface<D> _upload )
+	{
+		upload = ( _upload == null ) ? UPLOAD_DEFAULT : _upload ;
+	}
+
+	public interface UploadInterface<T extends Draw>
+	{
+		public void upload( final T _data ) ;
+	}
 }

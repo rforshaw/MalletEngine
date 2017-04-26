@@ -26,8 +26,8 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 		for( int i = 0; i < size; i++ )
 		{
 			final GLWorld world = current.get( i ) ;
-			world.upload( _diff, _iteration ) ;
-			world.draw( _diff, _iteration ) ;
+			world.update( _diff, _iteration ) ;
+			world.draw() ;
 		}
 	}
 

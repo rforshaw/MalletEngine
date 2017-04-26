@@ -10,12 +10,4 @@ package com.linxonline.mallet.renderer ;
 	
 	Don't cast unless you know what you're doing.
 */
-public interface Draw<T extends Draw>
-{
-	public void setUploadInterface( UploadInterface<T> _draw ) ;
-
-	public interface UploadInterface<T extends Draw>
-	{
-		public void upload( final T _data ) ;
-	}
-}
+public interface Draw<T extends Draw> {}

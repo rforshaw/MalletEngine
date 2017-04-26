@@ -1,4 +1,4 @@
-package com.linxonline.malleteditor.main ;
+package com.linxonline.malleteditor.core ;
 
 public class Main
 {

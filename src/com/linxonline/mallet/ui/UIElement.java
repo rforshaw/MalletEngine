@@ -150,6 +150,18 @@ public class UIElement implements InputHandler
 		}
 	}
 
+	public void setEngage( final boolean _engaged )
+	{
+		if( _engaged == true )
+		{
+			engage() ;
+		}
+		else
+		{
+			disengage() ;
+		}
+	}
+	
 	/**
 		Inform the caller whether the element is engaged.
 		If a child element is engaged then the parent 
@@ -622,6 +634,19 @@ public class UIElement implements InputHandler
 		offset.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		length.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		margin.setXYZ( DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE, DEFAULT_MARGIN_SIZE ) ;
+	}
+
+	@Override
+	public String toString()
+	{
+		final StringBuilder builder = new StringBuilder() ;
+		builder.append( "[" ) ;
+		builder.append( "Visible: " ) ;
+		builder.append( isVisible() ) ;
+		builder.append( " Engaged: " ) ;
+		builder.append( isEngaged() ) ;
+		builder.append( "]" ) ;
+		return builder.toString() ;
 	}
 
 	private interface InputAction

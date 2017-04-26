@@ -255,16 +255,13 @@ public class QuadTree
 				}
 
 				final int size = nextHull ;
-				for( int j = 0; j < size; j++ )
+				for( int j = 1; j < size; j++ )
 				{
 					hull2 = hulls[j] ;
-					if( hull1 != hull2 )
+					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 					{
-						if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
-						{
-							++checksMade ;
-							CollisionCheck.generateContactPoint( hull1, hull2 ) ;
-						}
+						++checksMade ;
+						CollisionCheck.generateContactPoint( hull1, hull2 ) ;
 					}
 				}
 

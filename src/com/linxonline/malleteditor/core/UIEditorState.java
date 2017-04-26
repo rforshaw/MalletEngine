@@ -1,4 +1,4 @@
-package com.linxonline.malleteditor.system ;
+package com.linxonline.malleteditor.core ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 
@@ -27,6 +27,13 @@ public class UIEditorState extends GameState
 	@Override
 	public void initGame()
 	{
+		final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
+		final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
+																			new Vector3(),
+																			new Vector3( 1, 1, 1 ) ) ;
+
+		CameraAssist.addCamera( edCamera, edWorld ) ;
+
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
 		{
 			final UIButton openProject = jui.get( "OpenButton", UIButton.class ) ;
@@ -61,6 +68,8 @@ public class UIEditorState extends GameState
 					return InputEvent.Action.CONSUME ;
 				}
 			} ) ;
+
+			createMainView( jui.get( "MainWindow", UIElement.class ), edWorld ) ;
 		}
 
 		final Entity entity = new Entity( "UI" ) ;
@@ -69,5 +78,44 @@ public class UIEditorState extends GameState
 
 		entity.addComponent( component ) ;
 		addEntity( entity ) ;
+	}
+
+	private static void createMainView( final UIElement _view, final World _world )
+	{
+		_view.addListener( new UIListener()
+		{
+			private Draw draw1 = null ;
+
+			@Override
+			public void constructDraws()
+			{
+				final UIElement parent = getParent() ;
+				final Vector3 length = parent.getLength() ;
+
+				draw1 = DrawAssist.createDraw( parent.getPosition(),
+											   parent.getOffset(),
+											   new Vector3(),
+											   new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
+
+				DrawAssist.amendUI( draw1, true ) ;
+				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
+				DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+			}
+
+			@Override
+			public void addDraws( final DrawDelegate _delegate )
+			{
+				_delegate.addBasicDraw( draw1/*, _world*/ ) ;
+			}
+
+			@Override
+			public void removeDraws( final DrawDelegate _delegate )
+			{
+				_delegate.removeDraw( draw1 ) ;
+			}
+
+			@Override
+			public void refresh() {}
+		} ) ;
 	}
 }

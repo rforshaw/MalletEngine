@@ -1,4 +1,4 @@
-package com.linxonline.malleteditor.main ;
+package com.linxonline.malleteditor.core ;
 
 import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;

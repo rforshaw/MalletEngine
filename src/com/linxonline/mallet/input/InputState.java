@@ -71,10 +71,9 @@ public class InputState implements IInputSystem,
 		for( int j = 0; j < handlerSize; ++j )
 		{
 			handler = handlers.get( j ) ;
-			switch( handler.passInputEvent( _event ) )
+			if( handler.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
-				case PROPAGATE : continue ;
-				case CONSUME   : return InputEvent.Action.CONSUME ;
+				return InputEvent.Action.CONSUME ;
 			}
 		}
 

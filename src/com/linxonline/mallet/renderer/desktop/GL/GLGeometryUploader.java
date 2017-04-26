@@ -32,7 +32,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public class GLGeometryUploader
 {
-	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
+	protected final ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	private final static int PRIMITIVE_EXPANSION = 1 ;
@@ -123,7 +123,6 @@ public class GLGeometryUploader
 			buffer.remove( _gl, _data ) ;
 			_data.setBuffer( null ) ;
 			_data.setLocation( null ) ;
-			_data.setWorld( null ) ;
 		}
 	}
 
@@ -524,6 +523,7 @@ public class GLGeometryUploader
 			_gl.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 			if( glProgram.loadUniforms( _gl, program ) == false )
 			{
+				//System.out.println( "Failed to load uniforms" ) ;
 				// We failed to load all uniforms required for 
 				// this buffer.
 				return ;

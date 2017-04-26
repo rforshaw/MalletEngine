@@ -11,11 +11,10 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
 	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
-	public BasicWorld( final String _id, final int _order, final DrawState.RemoveDelegate<D> _remove )
+	public BasicWorld( final String _id, final int _order )
 	{
 		id = _id ;
 		order = _order ;
-		state.setRemoveDelegate( _remove ) ;
 	}
 
 	/**
@@ -56,10 +55,12 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 
 	/**
 		Update the draw objects position, rotation, and scale.
+		This will eventually call DrawData.upload
 	*/
-	public void upload( final int _diff, final int _iteration )
+	public void update( final int _diff, final int _iteration )
 	{
-		state.upload( _diff, _iteration ) ;
+		state.update( _diff, _iteration ) ;
+		cameras.update( _diff, _iteration ) ;
 	}
 
 	/**
@@ -67,9 +68,9 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		Call the cameras custom draw interface to begin 
 		rendering to the framebuffer.
 	*/
-	public void draw( final int _diff, final int _iteration )
+	public void draw()
 	{
-		cameras.draw( _diff, _iteration ) ;
+		cameras.draw() ;
 	}
 
 	public DrawState<D> getDrawState()

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.List ;
-
 import java.lang.ref.WeakReference ;
 
 import com.linxonline.mallet.maths.Vector3 ;
@@ -10,14 +8,6 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 
 public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 {
-	private final Draw.UploadInterface<T> DRAW_DEFAULT = new Draw.UploadInterface<T>()
-	{
-		@Override
-		public void upload( final T _data ) {}
-	} ;
-
-	private WeakReference<World> world = null ;		// Store the handler to the worldspace this data is associated with
-
 	private MalletColour colour = null ;
 	private StringBuilder text  = null ;
 	private Program program     = null ;
@@ -28,7 +18,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private int order = 0 ;
 	private Interpolation interpolation  = Interpolation.NONE ;
 	private UpdateType updateType        = UpdateType.ON_DEMAND ; 
-	private Draw.UploadInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
@@ -69,16 +58,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		offset   = ( _offset != null )   ? _offset   : new Vector3() ;
 		rotation = ( _rotation != null ) ? _rotation : new Vector3() ;
 		scale    = ( _scale != null )    ? _scale    : new Vector3() ;
-	}
-
-	public void setWorld( final World _world )
-	{
-		world = new WeakReference<World>( _world ) ;
-	}
-
-	public World getWorld()
-	{
-		return ( world != null ) ? world.get() : null ;
 	}
 
 	public void setProgram( final Program _program )
@@ -199,7 +178,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	/**
 		Called by the worlds DrawState.
 	*/
-	protected void upload( final int _diff, final int _iteration )
+	protected void update( final int _diff, final int _iteration )
 	{
 		// Position, Rotation, and Scale should always 
 		// be updated even if the data is not being uploaded 
@@ -221,14 +200,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 				currentScale.setXYZ( scale ) ;
 				break ;
 			}
-		}
-
-		if( toUpdate() == true ||
-			getUpdateType() == UpdateType.CONTINUOUS )
-		{
-			// Only upload new model state if _data is flagged 
-			// as to be updated or UpdateType is CONTINUOUS.
-			draw.upload( ( T )this ) ;
 		}
 	}
 
@@ -252,8 +223,13 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		_past.setXYZ( _present ) ;
 	}
 
-	private boolean toUpdate()
+	public boolean toUpdate()
 	{
+		if( getUpdateType() == UpdateType.CONTINUOUS )
+		{
+			return true ;
+		}
+
 		final boolean temp = update ;
 		update = false ;
 		return temp ;
@@ -262,8 +238,6 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	@Override
 	public void reset()
 	{
-		world = null ;
-
 		colour  = null ;
 		text    = null ;
 		program = null ;
@@ -274,12 +248,5 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		order = 0 ;
 		interpolation = Interpolation.NONE ;
 		updateType = UpdateType.ON_DEMAND ; 
-		draw = DRAW_DEFAULT ;
-	}
-
-	@Override
-	public void setUploadInterface( final Draw.UploadInterface<T> _draw )
-	{
-		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
 	}
 }

@@ -74,9 +74,6 @@ public abstract class BasicRenderer<D extends DrawData,
 		CameraAssist.setAssist( getCameraAssist() ) ;
 	}
 
-	public abstract D.UploadInterface<D> getBasicUpload() ;
-	public abstract C.DrawInterface<C> getCameraDraw() ;
-
 	public abstract FontAssist.Assist getFontAssist() ;
 	public abstract TextureAssist.Assist getTextureAssist() ;
 
@@ -85,12 +82,6 @@ public abstract class BasicRenderer<D extends DrawData,
 
 	public abstract WorldAssist.Assist getWorldAssist() ;
 	public abstract CameraAssist.Assist getCameraAssist() ;
-	
-	/**
-		Allows implementations to clean-up other systems using 
-		or is used by DrawData.
-	*/
-	public abstract DrawState.RemoveDelegate<D> constructRemoveDelegate() ;
 
 	protected DrawDelegate<World, Draw> constructDrawDelegate()
 	{
@@ -121,9 +112,7 @@ public abstract class BasicRenderer<D extends DrawData,
 
 				if( data.contains( draw ) == false )
 				{
-					draw.setUploadInterface( getBasicUpload() ) ;
 					data.add( draw ) ;
-
 					worlds.addDraw( draw, world ) ;
 				}
 			}
@@ -137,9 +126,7 @@ public abstract class BasicRenderer<D extends DrawData,
 
 				if( data.contains( draw ) == false )
 				{
-					_draw.setUploadInterface( getBasicUpload() ) ;
 					data.add( draw ) ;
-
 					worlds.addDraw( draw, world ) ;
 				}
 			}

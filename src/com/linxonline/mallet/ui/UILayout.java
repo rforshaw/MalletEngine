@@ -217,7 +217,7 @@ public class UILayout extends UIElement
 		{
 			// Don't pass the InputEvent on to the child elements.
 			// The UILayout may wish to consume the event if it was 
-			// used to get focus onto a child element.  
+			// used to get focus onto a child element.
 			return InputEvent.Action.CONSUME ;
 		}
 
@@ -243,6 +243,30 @@ public class UILayout extends UIElement
 		// If the UILayout or the children don't want t
 		// consume the event then let it propagate.
 		return InputEvent.Action.PROPAGATE ;
+	}
+
+	@Override
+	public boolean isIntersectInput( final InputEvent _event )
+	{
+		if( super.isIntersectInput( _event ) == true )
+		{
+			return true ;
+		}
+
+		// A UILayout may contain UIElements that extend outside 
+		// of its defined dimensions.
+		// If the input is outside of the layout we need to see if 
+		// it's outside of all child elements. 
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			if( ordered.get( i ).isIntersectInput( _event ) == true )
+			{
+				return true ;
+			}
+		}
+
+		return false ;
 	}
 
 	/**
@@ -549,6 +573,8 @@ public class UILayout extends UIElement
 		private UIElement currentEngaged = null ;
 		private int currentIndex = 0 ;
 
+		public SingleEngageListener() {}
+
 		@Override
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
@@ -559,11 +585,13 @@ public class UILayout extends UIElement
 			{
 				final UIElement element = layout.ordered.get( i ) ;
 				if( element.isVisible() == true &&
-					element.isIntersectInput( _input ) == true &&
 					element.isEngaged() == false )
 				{
-					setCurrentEngaged( element, i ) ;
-					break ;
+					if( element.isIntersectInput( _input ) == true )
+					{
+						setCurrentEngaged( element, i ) ;
+						break ;
+					}
 				}
 			}
 

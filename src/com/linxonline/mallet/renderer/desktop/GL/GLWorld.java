@@ -16,33 +16,33 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 {
 	private final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 
-	public GLWorld( final String _id, final int _order, final DrawState.RemoveDelegate<GLDrawData> _remove )
+	public GLWorld( final String _id, final int _order )
 	{
-		super( _id, _order, _remove ) ;
+		super( _id, _order ) ;
 	}
 
 	/**
 		Remove the Draw object from the World/GL state
 	*/
-	public void remove( final GL3 _gl, final GLDrawData _data )
+	public static void remove( final GL3 _gl, GLWorld _world, final GLDrawData _data )
 	{
-		uploader.remove( _gl, _data ) ;
+		_world.uploader.remove( _gl, _data ) ;
 	}
 
 	/**
 		Add/Update the Draw object to the World/GL state
 	*/
-	public void upload( final GL3 _gl, final GLDrawData _data )
+	public static void upload( final GL3 _gl, final GLWorld _world, final GLDrawData _data )
 	{
-		uploader.upload( _gl, _data ) ;
+		_world.uploader.upload( _gl, _data ) ;
 	}
 
 	/**
 		Render the world state to the passed in projections.
 	*/
-	public void draw( final GL3 _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
+	public static void draw( final GL3 _gl, final GLWorld _world, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 	{
-		uploader.draw( _gl, _worldProjection, _uiProjection ) ;
+		_world.uploader.draw( _gl, _worldProjection, _uiProjection ) ;
 	}
 
 	/**
