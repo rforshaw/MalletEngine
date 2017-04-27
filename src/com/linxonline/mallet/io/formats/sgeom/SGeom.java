@@ -5,7 +5,7 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.formats.json.JSONObject ;
 import com.linxonline.mallet.io.formats.json.JSONArray ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.Shape ;

@@ -27,7 +27,7 @@ import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.util.sort.OrderedInsert ;

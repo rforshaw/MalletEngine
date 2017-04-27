@@ -13,7 +13,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -42,17 +42,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	public GLRenderer()
 	{
 		super( new GLWorldState() ) ;
-
-		final GLWorldState worlds = getWorldState() ;
-		final GLWorld world = new GLWorld( "DEFAULT", 0 ) ;
-		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
-		worlds.setDefault( world ) ;
-
-		defaultCamera.setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
-		worlds.addCamera( defaultCamera, null ) ;
-
 		initAssist() ;
+		initDefaultWorld() ;
 	}
 
 	@Override
@@ -130,6 +121,16 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		}
 		
 		resize() ;
+	}
+
+	private void initDefaultWorld()
+	{
+		final GLWorldState worlds = getWorldState() ;
+		final GLWorld world = ( GLWorld )WorldAssist.constructWorld( "DEFAULT", 0 ) ;
+		worlds.setDefault( world ) ;
+
+		world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
+		worlds.addCamera( defaultCamera, null ) ;
 	}
 
 	@Override
@@ -592,8 +593,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
-				final GLWorld world = cast( _world ) ;
-				_camera.setDrawInterface( new GLCameraDraw( getRenderInfo(), getWorldState().getWorld( world ) ) ) ;
+				final GLWorld world = getWorldState().getWorld( cast( _world ) ) ;
+				world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
 				getWorldState().addCamera( cast( _camera ), world ) ;
 				return _camera ;
 			}
@@ -762,7 +763,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		}
 	}
 
-	private static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
+	private final static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
 	{
 		private final GLWorld world ;
 
@@ -773,11 +774,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 		public void remove( final GLDrawData _data )
 		{
-			GLWorld.remove( world, _data ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.remove( _data ) ;
 		}
 	}
 	
-	private static class GLBasicUpload implements DrawState.UploadInterface<GLDrawData>
+	private final static class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
 		private final GLWorld world ;
 
@@ -806,11 +808,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-			GLWorld.upload( world, _data ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.upload( _data ) ;
 		}
 	}
 
-	private static class GLCameraDraw implements CameraData.DrawInterface<CameraData>
+	private final static class GLCameraDraw implements CameraState.IDraw<CameraData>
 	{
 		private final GLWorld world ;
 		private final RenderInfo info ;
@@ -848,7 +851,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final Matrix4 uiProjection = matrixCache.get() ;
 			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
-			GLWorld.draw( world, worldProjection, uiProjection ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.draw( worldProjection, uiProjection ) ;
 
 			matrixCache.reclaim( worldProjection ) ;
 			matrixCache.reclaim( uiProjection ) ;

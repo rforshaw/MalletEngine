@@ -19,7 +19,7 @@ import com.linxonline.mallet.system.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.web.* ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;

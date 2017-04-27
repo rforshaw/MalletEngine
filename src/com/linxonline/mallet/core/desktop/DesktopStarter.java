@@ -16,7 +16,7 @@ import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.inspect.desktop.DesktopDisplay ;
 import com.linxonline.mallet.util.inspect.ScreenMode ;
 

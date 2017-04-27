@@ -3,16 +3,20 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.ManagedArray ;
+import com.linxonline.mallet.util.Logger ;
 
 public final class DrawState<D extends DrawData> extends ManagedArray<D>
 {
-	private final UploadInterface<D> UPLOAD_DEFAULT = new UploadInterface<D>()
+	private final IUpload<D> UPLOAD_DEFAULT = new IUpload<D>()
 	{
 		@Override
-		public void upload( final D _data ) {}
+		public void upload( final D _data )
+		{
+			Logger.println( "Failed to set upload interface for World.", Logger.Verbosity.MAJOR ) ;
+		}
 	} ;
 
-	private UploadInterface<D> upload = UPLOAD_DEFAULT ;
+	private IUpload<D> upload = UPLOAD_DEFAULT ;
 
 	public synchronized void update( final int _diff, final int _iteration )
 	{
@@ -67,12 +71,28 @@ public final class DrawState<D extends DrawData> extends ManagedArray<D>
 
 	public void clear() {}
 
-	public void setUploadInterface( final UploadInterface<D> _upload )
+	public void setUploadInterface( final IUpload<D> _upload )
 	{
 		upload = ( _upload == null ) ? UPLOAD_DEFAULT : _upload ;
 	}
 
-	public interface UploadInterface<T extends Draw>
+	/**
+		Extend the upload interface to allow the 
+		Draw object to be uploaded to the World.
+
+		This should either be constructed and set 
+		within your World extension or by the core 
+		renderer - though it depends on how you manage 
+		your resources.
+
+		For example GLRenderer stores its resources (shaders, 
+		matrix cache, textures, GL, etc) in a central location,
+		it make sense then to allow our IUpload to access this.
+
+		When a World is created the GLRenderer WorldAssist sets 
+		the interfaces accordingly.
+	*/
+	public interface IUpload<T extends Draw>
 	{
 		public void upload( final T _data ) ;
 	}

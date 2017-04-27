@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.logger ;
+package com.linxonline.mallet.util ;
 
 /**
 	Logger operates exactly like System.out.println, however, 

@@ -15,7 +15,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;

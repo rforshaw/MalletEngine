@@ -6,7 +6,7 @@ import java.util.Map ;
 
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 
 public final class EventSystem implements IEventSystem
 {

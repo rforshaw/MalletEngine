@@ -9,7 +9,7 @@ import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;

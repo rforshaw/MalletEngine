@@ -3,7 +3,7 @@ package com.linxonline.mallet.event ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	This is a convience class to reduce Events being processed 

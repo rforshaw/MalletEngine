@@ -14,7 +14,7 @@ import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.AddEventInterface ;
 
 import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;

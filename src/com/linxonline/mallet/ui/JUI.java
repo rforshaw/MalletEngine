@@ -9,7 +9,7 @@ import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;

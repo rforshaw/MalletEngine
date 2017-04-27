@@ -23,7 +23,6 @@ public abstract class WorldState<D extends DrawData,
 	public void setDefault( final W _default )
 	{
 		defaultWorld = _default ;
-		current.add( defaultWorld ) ;
 	}
 
 	/**
@@ -78,8 +77,6 @@ public abstract class WorldState<D extends DrawData,
 	public void addCamera( final C _camera, final W _world )
 	{
 		final W world = getWorld( _world ) ;
-		_camera.setWorld( world ) ;
-
 		synchronized( world )
 		{
 			world.addCamera( _camera ) ;
@@ -92,9 +89,10 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void removeCamera( final C _camera )
 	{
-		final W world = ( W )_camera.getWorld() ;
-		synchronized( world )
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
 		{
+			final W world = current.get( i ) ;
 			world.removeCamera( _camera ) ;
 		}
 	}

@@ -4,7 +4,7 @@ import java.util.List ;
 import java.util.Map ;
 
 import com.linxonline.mallet.util.MalletMap ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.animation.AnimationDelegateCallback ;
 import com.linxonline.mallet.animation.AnimationDelegate ;
 import com.linxonline.mallet.animation.AnimationAssist ;

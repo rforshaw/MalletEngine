@@ -23,7 +23,7 @@ import com.linxonline.mallet.io.reader.config.ConfigReader ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.time.web.WebTimer ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	The Web implementation of the Starter Interface.

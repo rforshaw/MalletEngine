@@ -21,28 +21,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		super( _id, _order ) ;
 	}
 
-	/**
-		Remove the Draw object from the World/GL state
-	*/
-	public static void remove( final GL3 _gl, GLWorld _world, final GLDrawData _data )
+	public GLGeometryUploader getUploader()
 	{
-		_world.uploader.remove( _gl, _data ) ;
-	}
-
-	/**
-		Add/Update the Draw object to the World/GL state
-	*/
-	public static void upload( final GL3 _gl, final GLWorld _world, final GLDrawData _data )
-	{
-		_world.uploader.upload( _gl, _data ) ;
-	}
-
-	/**
-		Render the world state to the passed in projections.
-	*/
-	public static void draw( final GL3 _gl, final GLWorld _world, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
-	{
-		_world.uploader.draw( _gl, _worldProjection, _uiProjection ) ;
+		return uploader ;
 	}
 
 	/**

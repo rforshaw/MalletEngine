@@ -5,7 +5,7 @@ import java.util.List ;
 import java.util.Map ;
 
 import com.linxonline.mallet.util.MalletMap ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.audio.AudioDelegateCallback ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 import com.linxonline.mallet.audio.AudioAssist ;

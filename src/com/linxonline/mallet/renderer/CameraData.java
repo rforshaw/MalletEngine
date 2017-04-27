@@ -1,23 +1,12 @@
 package com.linxonline.mallet.renderer ;
 
-import java.lang.ref.WeakReference ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
 public class CameraData<T extends CameraData> implements Camera<T>
 {
-	private final Camera.DrawInterface<T> DRAW_DEFAULT = new Camera.DrawInterface<T>()
-	{
-		@Override
-		public void draw( final T _data ) {}
-	} ;
-
 	private final String id ;
-
-	private WeakReference<World> world = null ;		// Store the handler to the worldspace this data is associated with
-	private Camera.DrawInterface<T> draw = DRAW_DEFAULT ;
 
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
@@ -48,16 +37,6 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		position = _position ;
 		rotation = _rotation ;
 		scale = _scale ;
-	}
-	
-	public void setWorld( final World _world )
-	{
-		world = new WeakReference<World>( _world ) ;
-	}
-
-	public World getWorld()
-	{
-		return ( world != null ) ? world.get() : null ;
 	}
 
 	public Vector3 getPosition()
@@ -105,22 +84,11 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		scale.setXYZ( _x, _y, _z ) ;
 	}
 
-	@Override
-	public void setDrawInterface( final CameraData.DrawInterface<T> _draw )
-	{
-		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
-	}
-
 	protected void update( final int _diff, final int _iteration )
 	{
 		interpolate( position, oldPosition, currentPosition, _diff, _iteration ) ;
 		interpolate( scale,    oldScale,    currentScale,    _diff, _iteration ) ;
 		interpolate( rotation, oldRotation, currentRotation, _diff, _iteration ) ;
-	}
-
-	protected void draw()
-	{
-		draw.draw( ( T )this ) ;
 	}
 
 	@Override

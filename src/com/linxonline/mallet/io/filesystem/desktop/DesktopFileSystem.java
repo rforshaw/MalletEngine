@@ -6,7 +6,7 @@ import java.util.zip.* ;
 import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 

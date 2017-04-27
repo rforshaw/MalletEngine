@@ -28,7 +28,7 @@ import com.linxonline.mallet.io.writer.config.ConfigWriter ;
 
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.io.filesystem.android.* ;

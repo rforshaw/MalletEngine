@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import java.lang.ref.WeakReference ;
-
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;

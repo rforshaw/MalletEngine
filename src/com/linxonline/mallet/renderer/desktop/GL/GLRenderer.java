@@ -18,7 +18,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 import com.linxonline.mallet.renderer.texture.* ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.id.IDInterface ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -50,16 +50,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	public GLRenderer()
 	{
 		super( new GLWorldState() ) ;
-
-		final GLWorldState worlds = getWorldState() ;
-		final GLWorld world = new GLWorld( "DEFAULT", 0 ) ;
-		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
-		worlds.setDefault( world ) ;
-
-		defaultCamera.setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
-		worlds.addCamera( defaultCamera, null ) ;
-
 		initWindow() ;
 	}
 
@@ -72,6 +62,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		canvas.addGLEventListener( this ) ;
 
 		initAssist() ;
+		initDefaultWorld() ;
+
 		canvas.setVisible( true ) ;
 	}
 
@@ -551,8 +543,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
-				final GLWorld world = cast( _world ) ;
-				_camera.setDrawInterface( new GLCameraDraw( getRenderInfo(), getWorldState().getWorld( world ) ) ) ;
+				final GLWorld world = getWorldState().getWorld( cast( _world ) ) ;
+				world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
 				getWorldState().addCamera( cast( _camera ), world ) ;
 				return _camera ;
 			}
@@ -765,6 +757,24 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	/**
+		Construct an initial world that will be used 
+		if the game developer does not specify a world to 
+		place Draw objects into.
+
+		Ensure initAssist() is called beforehand.
+		This should be called on start() and only once.
+	*/
+	private void initDefaultWorld()
+	{
+		final GLWorldState worlds = getWorldState() ;
+		final GLWorld world = ( GLWorld )WorldAssist.constructWorld( "DEFAULT", 0 ) ;
+		worlds.setDefault( world ) ;
+
+		world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
+		worlds.addCamera( defaultCamera, null ) ;
+	}
+	
+	/**
 		Attempt to acquire a compatible GLProgram from 
 		the ProgramManager. Make sure the GLProgram 
 		requested maps correctly with the ProgramMap 
@@ -862,7 +872,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		}
 	}
 
-	private static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
+	private final static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
 	{
 		private final GLWorld world ;
 
@@ -871,13 +881,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			world = _world ;
 		}
 
+		@Override
 		public void remove( final GLDrawData _data )
 		{
-			GLWorld.remove( gl, world, _data ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.remove( gl, _data ) ;
 		}
 	}
-	
-	private static class GLBasicUpload implements DrawState.UploadInterface<GLDrawData>
+
+	private final static class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
 		private final GLWorld world ;
 
@@ -886,6 +898,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			world = _world ;
 		}
 
+		@Override
 		public void upload( final GLDrawData _data )
 		{
 			if( loadProgram( _data ) == false )
@@ -906,11 +919,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-			GLWorld.upload( gl, world, _data ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.upload( gl, _data ) ;
 		}
 	}
 
-	private static class GLCameraDraw implements CameraData.DrawInterface<CameraData>
+	private final static class GLCameraDraw implements CameraState.IDraw<CameraData>
 	{
 		private final GLWorld world ;
 		private final RenderInfo info ;
@@ -921,6 +935,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			info = _info ;
 		}
 
+		@Override
 		public void draw( final CameraData _camera )
 		{
 			final Vector2 scaleRtoD = info.getScaleRenderToDisplay() ;
@@ -948,12 +963,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final Matrix4 uiProjection = matrixCache.get() ;
 			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
-			GLWorld.draw( gl, world, worldProjection, uiProjection ) ;
+			final GLGeometryUploader uploader = world.getUploader() ;
+			uploader.draw( gl, worldProjection, uiProjection ) ;
 
 			//System.out.println( "Camera: " + world.getID() + " Order: " + world.getOrder() ) ;
 
 			matrixCache.reclaim( worldProjection ) ;
 			matrixCache.reclaim( uiProjection ) ;
 		}
-	} ;
+	}
 }

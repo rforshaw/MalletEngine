@@ -10,7 +10,7 @@ import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.web.* ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 public class AudioSourceGenerator implements AudioGenerator<WebSound>

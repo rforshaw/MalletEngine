@@ -1,9 +1,21 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.ManagedArray ;
+import com.linxonline.mallet.util.Logger ;
 
 public final class CameraState<C extends CameraData> extends ManagedArray<C>
 {
+	private final IDraw<C> DRAW_DEFAULT = new IDraw<C>()
+	{
+		@Override
+		public void draw( final C _data )
+		{
+			Logger.println( "Failed to set draw interface for World.", Logger.Verbosity.MAJOR ) ;
+		}
+	} ;
+
+	private IDraw<C> draw = DRAW_DEFAULT ;
+
 	public CameraState() {}
 
 	public synchronized void update( final int _diff, final int _iteration )
@@ -22,7 +34,7 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			current.get( i ).draw() ;
+			draw.draw( current.get( i ) ) ;
 		}
 	}
 
@@ -61,5 +73,31 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 		}
 
 		return null ;
+	}
+
+	/**
+		Extend the draw interface to allow the 
+		camera to render to the specified coordinates.
+
+		This should either be constructed and set 
+		within your World extension or by the core 
+		renderer - though it depends on how you manage 
+		your resources.
+
+		For example GLRenderer stores its resources (shaders, 
+		matrix cache, textures, GL, etc) in a central location,
+		it make sense then to allow our IDraw to access this.
+
+		When a World is created the GLRenderer WorldAssist sets 
+		the interfaces accordingly.
+	*/
+	public void setDrawInterface( final IDraw<C> _draw )
+	{
+		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
+	}
+
+	public interface IDraw<T extends Camera>
+	{
+		public void draw( final T _data ) ;
 	}
 }

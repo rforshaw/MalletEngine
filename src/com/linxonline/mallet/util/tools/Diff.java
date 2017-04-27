@@ -2,7 +2,7 @@ package com.linxonline.mallet.util.tools ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.logger.Logger ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.serialisation.ByteOutput ;
 import com.linxonline.mallet.io.serialisation.ByteInput ;
 import com.linxonline.mallet.util.MalletList ;
