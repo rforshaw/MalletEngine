@@ -10,7 +10,7 @@ public final class Event<T>
 	public static final EventType NONE_EVENT_TYPES = EventType.get( "NONE" ) ;				// Not interested in any Event Types, used by getWantedEventTypes()
 	public static final EventType ALL_EVENT_TYPES = EventType.get( "ALL" ) ;				// Interested in all Event Types, used by getWantedEventTypes()
 
-	private static final EventHandlerMeta BLANK_META = new EventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
+	private static final IEventHandlerMeta BLANK_META = new IEventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
 	{
 		public String getName()
 		{
@@ -19,8 +19,8 @@ public final class Event<T>
 	} ;
 
 	private EventType eventType = null ;
-	private EventHandlerMeta meta = BLANK_META ;			// Information about sender
-	private T variable = null ;				// Event package contains data the reciever is interested in
+	private IEventHandlerMeta meta = BLANK_META ;		// Information about sender
+	private T variable = null ;							// Event package contains data the reciever is interested in
 
 	public Event()
 	{
@@ -37,7 +37,7 @@ public final class Event<T>
 		setEvent( _eventType, _object ) ;
 	}
 
-	public Event( final String _eventType, final T _object, final EventHandlerMeta _meta )
+	public Event( final String _eventType, final T _object, final IEventHandlerMeta _meta )
 	{
 		setEvent( _eventType, _object, _meta ) ;
 	}
@@ -60,7 +60,7 @@ public final class Event<T>
 	/**
 		Enables an Event to be reused.
 	**/
-	public final void setEvent( final String _eventType, final T _object, final EventHandlerMeta _meta )
+	public final void setEvent( final String _eventType, final T _object, final IEventHandlerMeta _meta )
 	{
 		setEvent( _object ) ;
 		setEventType( _eventType ) ;
@@ -91,7 +91,7 @@ public final class Event<T>
 		Return any information about the sender of 
 		this Event.
 	*/
-	public EventHandlerMeta getHandlerMeta()
+	public IEventHandlerMeta getHandlerMeta()
 	{
 		return meta ;
 	}

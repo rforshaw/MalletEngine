@@ -15,10 +15,6 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
-import com.linxonline.mallet.util.factory.creators.AnimMouseCreator ;
-import com.linxonline.mallet.util.factory.creators.ImageCreator ;
-import com.linxonline.mallet.util.settings.Settings ;
-
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 
@@ -27,6 +23,7 @@ import com.linxonline.mallet.physics.primitives.AABB ;
 
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.SourceCallback ;
+import com.linxonline.mallet.util.settings.Settings ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -362,16 +359,28 @@ public final class GameTestLoader extends GameLoader
 			{
 				final int x = 50 + ( _i * 70 ) ;
 				final int y = 50 + ( _j * 70 ) ;
-			
-				final Settings image = new Settings() ;
-				image.addString( "IMAGE", "base/textures/moomba.png" ) ;
-				image.addString( "POS", Integer.toString( x ) + "," + Integer.toString( y ) ) ;
-				image.addString( "DIM",  "64, 64" ) ;
-				image.addString( "OFFSET", "-32, -32, 0" ) ;
-				image.addString( "LAYER", "10" ) ;
 
-				final ImageCreator creator = new ImageCreator() ;
-				final Entity entity = creator.create( image ) ;
+				final Entity entity = new Entity( "IMAGE" ) ;
+				entity.position = new Vector3( x, y, 0 ) ;
+
+				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
+				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
+
+				final Vector3 offset = new Vector3( -32, -32, 0 ) ;
+				final Draw draw = DrawAssist.createDraw( entity.position,
+														 offset,
+														 new Vector3(),
+														 new Vector3( 1, 1, 1 ),
+														 10 ) ;
+
+				DrawAssist.amendShape( draw, plane ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				DrawAssist.attachProgram( draw, program ) ;
+
+				final RenderComponent render =  entity.addComponent( new RenderComponent() ) ;
+				render.addBasicDraw( draw ) ;
 
 				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
 																	   new Vector2( 64, 64 ),
@@ -386,13 +395,30 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void createMouseAnimExample()
 			{
-				final Settings mouse = new Settings() ;
-				mouse.addString( "ANIM", "base/anim/moomba.anim" ) ;
-				mouse.addObject( "DIM", new Vector2( 32, 32 ) ) ;
-				mouse.addObject( "OFFSET", new Vector3( -16, -16, 0 ) ) ;
+				final int width = GlobalConfig.getInteger( "RENDERWIDTH", 0 ) / 2 ;
+				final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 0 ) / 2 ;
 
-				final AnimMouseCreator creator = new AnimMouseCreator() ;
-				final Entity entity = creator.create( mouse ) ;
+				final Entity entity = new Entity( "MOUSE" ) ;
+				entity.position = new Vector3( width, height, 0 ) ;
+
+				final AnimComponent anim   = entity.addComponent( new AnimComponent() ) ;
+				final EventComponent event = entity.addComponent( new EventComponent() ) ;
+				final MouseComponent mouse = entity.addComponent( new MouseComponent() ) ;
+
+				final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
+																		entity.position,
+																		new Vector3( -16, -16, 0 ),
+																		new Vector3(),
+																		new Vector3( 1, 1, 1 ),
+																		100 ) ;
+
+				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+				DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+				DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
+				DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.ON_DEMAND ) ;
+
+				anim.addAnimation( "DEFAULT", animation ) ;
+				anim.setDefaultAnim( "DEFAULT" ) ;
 
 				final CollisionComponent collision = CollisionComponent.generateBox2D( new Vector2(),
 																					   new Vector2( 32, 32 ),

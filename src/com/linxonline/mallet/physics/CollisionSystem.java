@@ -12,7 +12,7 @@ public class CollisionSystem extends EventController
 	private final List<Hull> hulls = MalletList.<Hull>newList() ;
 	private final QuadTree treeHulls = new QuadTree() ;
 
-	public CollisionSystem( final AddEventInterface _addInterface )
+	public CollisionSystem( final IAddEvent _addInterface )
 	{
 		setAddEventInterface( _addInterface ) ;
 		initEventProcessors() ;

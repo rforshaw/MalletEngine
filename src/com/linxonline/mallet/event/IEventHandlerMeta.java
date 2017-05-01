@@ -5,7 +5,7 @@ package com.linxonline.mallet.event ;
 	extends this interface.
 	Should only be used while debugging Events.
 */
-public interface EventHandlerMeta
+public interface IEventHandlerMeta
 {
 	public String getName() ;
 }

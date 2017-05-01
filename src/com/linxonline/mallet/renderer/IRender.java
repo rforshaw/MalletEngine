@@ -1,6 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.maths.Vector3 ;
 

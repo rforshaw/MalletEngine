@@ -48,6 +48,10 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		return abstractLoader ;
 	}
 
+	/**
+		Returns the amount of memory in bytes used 
+		by the loaded resources.
+	*/
 	@Override
 	public long getMemoryConsumption()
 	{
@@ -69,6 +73,12 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 
 	/**
 		Removes resources that are not used.
+		_activeKeys are resources considered as currently 
+		in use.
+		_activeKeys do not need to actually be in use, but 
+		is potentially a resource that is about to be used, 
+		or is considered an intensive resource to load and 
+		therefore should not be cleaned up - at least not yet.
 	**/
 	@Override
 	public void clean( final Set<String> _activeKeys )
@@ -117,6 +127,13 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		resources.clear() ;
 	}
 
+	/**
+		Clear currently loaded resources and shutdown 
+		anything else that the manager may be using.
+
+		For example the manager may have a connection 
+		to a database that needs to be closed.
+	*/
 	@Override
 	public void shutdown()
 	{

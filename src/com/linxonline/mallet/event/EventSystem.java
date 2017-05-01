@@ -16,8 +16,8 @@ public final class EventSystem implements IEventSystem
 	private final List<EventQueue> queues = MalletList.<EventQueue>newList() ;
 	private final EventQueue allQueue = new EventQueue( Event.ALL_EVENT_TYPES ) ;
 
-	private final List<EventHandler> handlers = MalletList.<EventHandler>newList() ;
-	private final List<EventHandler> toBeRemoved = MalletList.<EventHandler>newList() ;
+	private final List<IEventHandler> handlers = MalletList.<IEventHandler>newList() ;
+	private final List<IEventHandler> toBeRemoved = MalletList.<IEventHandler>newList() ;
 
 	public EventSystem()
 	{
@@ -36,7 +36,7 @@ public final class EventSystem implements IEventSystem
 		the EventHandlers EventTypes, placing it in the correct 
 		lists, so Events can be filtered correctly.
 	**/
-	public final void addEventHandler( final EventHandler _handler )
+	public final void addEventHandler( final IEventHandler _handler )
 	{
 		if( exists( _handler ) == true )
 		{
@@ -76,7 +76,7 @@ public final class EventSystem implements IEventSystem
 	/**
 		Removes the EventHandler in the next update().
 	**/
-	public final void removeEventHandler( final EventHandler _handler )
+	public final void removeEventHandler( final IEventHandler _handler )
 	{
 		if( exists( _handler ) == false )
 		{
@@ -86,7 +86,7 @@ public final class EventSystem implements IEventSystem
 		toBeRemoved.add( _handler ) ;
 	}
 
-	public final void addEventFilter( final EventType _type, final EventFilter _filter )
+	public final void addEventFilter( final EventType _type, final IEventFilter _filter )
 	{
 		assert _type != null || _filter != null ;
 
@@ -98,7 +98,7 @@ public final class EventSystem implements IEventSystem
 		eventQueues.get( _type ).addEventFilter( _filter ) ;
 	}
 
-	public final void removeEventFilter( final EventType _type, final EventFilter _filter )
+	public final void removeEventFilter( final EventType _type, final IEventFilter _filter )
 	{
 		assert _type != null || _filter != null ;
 
@@ -162,7 +162,7 @@ public final class EventSystem implements IEventSystem
 		queues.add( _queue ) ;
 	}
 	
-	private void remove( final EventHandler _handler )
+	private void remove( final IEventHandler _handler )
 	{
 		final List<EventType> types = _handler.getWantedEventTypes() ;
 		if( types.isEmpty() == true )
@@ -236,7 +236,7 @@ public final class EventSystem implements IEventSystem
 		return eventQueues.get( Event.ALL_EVENT_TYPES ).hasEvents() ;
 	}
 
-	private final boolean exists( final EventHandler _handler )
+	private final boolean exists( final IEventHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;

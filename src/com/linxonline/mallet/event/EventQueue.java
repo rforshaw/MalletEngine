@@ -7,8 +7,8 @@ import com.linxonline.mallet.util.MalletList ;
 public class EventQueue
 {
 	private final EventType name ;
-	private final List<EventHandler> handlers = MalletList.<EventHandler>newList();
-	private final List<EventFilter> filters = MalletList.<EventFilter>newList() ;
+	private final List<IEventHandler> handlers = MalletList.<IEventHandler>newList();
+	private final List<IEventFilter> filters = MalletList.<IEventFilter>newList() ;
 	private final List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
 	private final EventMessenger messenger = new EventMessenger() ;
 
@@ -17,22 +17,22 @@ public class EventQueue
 		name = _name ;
 	}
 	
-	public void addEventHandler( final EventHandler _handler )
+	public void addEventHandler( final IEventHandler _handler )
 	{
 		handlers.add( _handler ) ;
 	}
 
-	public void removeEventHandler( final EventHandler _handler )
+	public void removeEventHandler( final IEventHandler _handler )
 	{
 		handlers.remove( _handler ) ;
 	}
 
-	public void addEventFilter( final EventFilter _filter )
+	public void addEventFilter( final IEventFilter _filter )
 	{
 		filters.add( _filter ) ;
 	}
 
-	public void removeEventFilter( final EventFilter _filter )
+	public void removeEventFilter( final IEventFilter _filter )
 	{
 		filters.remove( _filter ) ;
 	}
@@ -100,7 +100,7 @@ public class EventQueue
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		buffer.append( "[ Event Queue: " + name + ", " ) ;
-		for( final EventHandler handler : handlers )
+		for( final IEventHandler handler : handlers )
 		{
 			buffer.append( handler.getName() + ", " ) ;
 		}

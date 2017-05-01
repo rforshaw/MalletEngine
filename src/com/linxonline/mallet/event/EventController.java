@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.Logger ;
 	processed during the EventSystem update(). And not during an 
 	objects actual update time.
 **/
-public class EventController implements EventHandler
+public class EventController implements IEventHandler
 {
 	private final List<EventType> wantedTypes = MalletList.<EventType>newList() ;
 	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
@@ -24,7 +24,7 @@ public class EventController implements EventHandler
 	private final String name ;
 	private final EventMessenger messenger = new EventMessenger() ;
 	private final List<EventProcessor> processors = MalletList.<EventProcessor>newList() ;
-	private AddEventInterface addInterface = ADD_EVENT_FALLBACK ;
+	private IAddEvent addInterface = ADD_EVENT_FALLBACK ;
 
 	public EventController()
 	{
@@ -52,7 +52,7 @@ public class EventController implements EventHandler
 		}
 	}
 
-	public void setAddEventInterface( final AddEventInterface _addInterface )
+	public void setAddEventInterface( final IAddEvent _addInterface )
 	{
 		if( _addInterface != null )
 		{
@@ -126,7 +126,7 @@ public class EventController implements EventHandler
 		ADD_EVENT_FALLBACK.clear() ;
 	}
 
-	public AddEventInterface getAddEventInterface()
+	public IAddEvent getAddEventInterface()
 	{
 		return addInterface ;
 	}
@@ -148,11 +148,11 @@ public class EventController implements EventHandler
 		Once the controller is added to an Event System the 
 		events should be passed to it.
 	*/
-	private static class AddEventFallback implements AddEventInterface
+	private static class AddEventFallback implements IAddEvent
 	{
 		private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
-		public void transferEvents( final AddEventInterface _addInterface )
+		public void transferEvents( final IAddEvent _addInterface )
 		{
 			if( events.isEmpty() == false )
 			{

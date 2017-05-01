@@ -1,11 +1,11 @@
 package com.linxonline.mallet.event ;
 
 /*===========================================*/
-// AddEventInterface
+// IAddEvent
 // Used to ensure old objects can still pass
 // Events to different new unknown Event Systems
 /*===========================================*/
-public interface AddEventInterface
+public interface IAddEvent
 {
 	public void addEvent( final Event<?> _event ) ;
 }

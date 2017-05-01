@@ -2,7 +2,7 @@ package com.linxonline.mallet.event ;
 
 import java.util.List ;
 
-public interface EventFilter
+public interface IEventFilter
 {
 	/**
 		Filter the events into an optimised array.

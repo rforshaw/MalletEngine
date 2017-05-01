@@ -30,10 +30,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 
-	protected final static ObjectCache<Matrix4> matrixCache = new ObjectCache<Matrix4>( Matrix4.class ) ;
-	protected final static Matrix4 uiMatrix                 = matrixCache.get() ;		// Used for rendering GUI elements not impacted by World/Camera position
-	protected final static Matrix4 worldMatrix              = matrixCache.get() ;		// Used for moving the camera around the world
-
 	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	protected CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
@@ -818,6 +814,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		private final GLWorld world ;
 		private final RenderInfo info ;
 
+		private final static Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
+		private final static Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
+
+		private final Matrix4 worldProjection = new Matrix4() ;
+		private final Matrix4 uiProjection = new Matrix4() ;
+
 		public GLCameraDraw( final RenderInfo _info, final GLWorld _world )
 		{
 			world = _world ;
@@ -840,22 +842,21 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final Vector3 scale = _camera.getScale() ;
 			//final Vector3 rotation = _camera.getRotation() ;
 
+			uiMatrix.setIdentity() ;
 			worldMatrix.setIdentity() ;
+
 			worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
 			worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 			worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
 
-			final Matrix4 worldProjection = matrixCache.get() ;
+			worldProjection.setIdentity() ;
 			Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
 
-			final Matrix4 uiProjection = matrixCache.get() ;
+			uiProjection.setIdentity() ;
 			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
 			final GLGeometryUploader uploader = world.getUploader() ;
 			uploader.draw( worldProjection, uiProjection ) ;
-
-			matrixCache.reclaim( worldProjection ) ;
-			matrixCache.reclaim( uiProjection ) ;
 		}
 	} ;
 }

@@ -40,9 +40,6 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
-import com.linxonline.mallet.util.factory.creators.* ;
-import com.linxonline.mallet.util.factory.EntityFactory ;
-
 import com.linxonline.mallet.io.save.state.DataConverter ;
 
 public class GameState extends State implements HookEntity
