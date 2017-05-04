@@ -10,7 +10,6 @@ import com.linxonline.mallet.core.android.AndroidActivity ;
 
 import com.linxonline.mallet.core.BasicSystem ;
 import com.linxonline.mallet.core.DefaultShutdown ;
-import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;
@@ -88,8 +87,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 	@Override
 	public synchronized void shutdownSystem()
 	{
-		getShutdownDelegate().shutdown() ;
-		getAudioGenerator().shutdownGenerator() ;
+		super.shutdownSystem() ;
 		activity.finish() ;
 	}
 
