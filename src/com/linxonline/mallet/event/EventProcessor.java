@@ -14,13 +14,13 @@ public abstract class EventProcessor<T>
 	public EventProcessor()
 	{
 		name = "UNKNOWN" ;
-		type = Event.ALL_EVENT_TYPES ;
+		type = EventType.ALL ;
 	}
 
 	public EventProcessor( final String _name )
 	{
 		name = _name ;
-		type = Event.ALL_EVENT_TYPES ;
+		type = EventType.ALL ;
 	}
 
 	public EventProcessor( final String _name, final String _type )

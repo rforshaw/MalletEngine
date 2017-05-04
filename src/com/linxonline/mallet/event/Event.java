@@ -7,9 +7,6 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
-	public static final EventType NONE_EVENT_TYPES = EventType.get( "NONE" ) ;				// Not interested in any Event Types, used by getWantedEventTypes()
-	public static final EventType ALL_EVENT_TYPES = EventType.get( "ALL" ) ;				// Interested in all Event Types, used by getWantedEventTypes()
-
 	private static final IEventHandlerMeta BLANK_META = new IEventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
 	{
 		public String getName()
@@ -18,7 +15,7 @@ public final class Event<T>
 		}
 	} ;
 
-	private EventType eventType = null ;
+	private EventType eventType = EventType.NONE ;
 	private IEventHandlerMeta meta = BLANK_META ;		// Information about sender
 	private T variable = null ;							// Event package contains data the reciever is interested in
 
@@ -44,7 +41,6 @@ public final class Event<T>
 
 	public final boolean isEventByType( final EventType _type )
 	{
-		//System.out.println( "Event: " + eventType + " Event: " + _type ) ;
 		return eventType == _type ;
 	}
 

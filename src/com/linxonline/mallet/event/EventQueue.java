@@ -75,6 +75,11 @@ public class EventQueue
 		}
 	}
 
+	public boolean isType( final EventType _type )
+	{
+		return ( _type != null && _type == name ) ;
+	}
+
 	public int size()
 	{
 		return messenger.size() ;

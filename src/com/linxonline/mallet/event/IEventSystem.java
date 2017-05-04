@@ -29,9 +29,6 @@ public interface IEventSystem extends IAddEvent
 	*/
 	public String getName() ;
 
-	public int getEventSize() ;
-	public int getHandlerSize() ;
-
 	public void clearHandlers() ;
 
 	public void clearEvents() ;

@@ -18,11 +18,14 @@ import com.linxonline.mallet.util.MalletMap ;
 public final class EventType
 {
 	private final static Map<String, EventType> eventTypes = MalletMap.<String, EventType>newMap() ;
-	static
-	{
-		eventTypes.put( "NONE", new EventType() ) ;
-		eventTypes.put( "ALL", new EventType() ) ;
-	}
+
+	// An Event Processor set to use NONE will not 
+	// receive any events from the Event System.
+	public static final EventType NONE = EventType.get( "NONE" ) ;
+
+	// An Event Processor set to use ALL will accept all 
+	// events from the Event System it is registered to.
+	public static final EventType ALL = EventType.get( "ALL" ) ;
 
 	private final String name ;
 

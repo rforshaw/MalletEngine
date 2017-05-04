@@ -10,11 +10,9 @@ import com.linxonline.mallet.util.Logger ;
 
 public final class EventSystem implements IEventSystem
 {
-	// Replace Map with something easier to traverse.
 	private final String name ;
-	private final Map<EventType, EventQueue> eventQueues = MalletMap.<EventType, EventQueue>newMap() ;
 	private final List<EventQueue> queues = MalletList.<EventQueue>newList() ;
-	private final EventQueue allQueue = new EventQueue( Event.ALL_EVENT_TYPES ) ;
+	private final EventQueue allQueue = new EventQueue( EventType.ALL ) ;
 
 	private final List<IEventHandler> handlers = MalletList.<IEventHandler>newList() ;
 	private final List<IEventHandler> toBeRemoved = MalletList.<IEventHandler>newList() ;
@@ -27,8 +25,8 @@ public final class EventSystem implements IEventSystem
 	public EventSystem( final String _name )
 	{
 		name = _name ;
-		// Guarantee an ALL_EVENT_TYPES Queue.
-		addEventQueue( Event.ALL_EVENT_TYPES, allQueue ) ;
+		// Guarantee an ALL Queue.
+		addEventQueue( EventType.ALL, allQueue ) ;
 	}
 
 	/**
@@ -47,12 +45,12 @@ public final class EventSystem implements IEventSystem
 		handlers.add( _handler ) ;
 
 		final List<EventType> types = _handler.getWantedEventTypes() ;
-		if( types.isEmpty() == true || types.contains( Event.ALL_EVENT_TYPES ) == true )
+		if( types.isEmpty() == true || types.contains( EventType.ALL ) == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 
 			// represents a developer wishing to recieve all Events.
-			// If the types contains ALL_EVENT_TYPES then only add it 
-			// to the ALL_EVENT_TYPES EventQueue.
+			// If the types contains ALL then only add it 
+			// to the ALL EventQueue.
 			allQueue.addEventHandler( _handler ) ;
 			return ;
 		}
@@ -63,12 +61,12 @@ public final class EventSystem implements IEventSystem
 			for( int i = 0; i < size; i++ )
 			{
 				final EventType type = types.get( i ) ;
-				if( eventQueues.containsKey( type ) == false )
+				if( getEventQueue( type ) == null )
 				{
 					addEventQueue( type, new EventQueue( type ) ) ;
 				}
 
-				eventQueues.get( type ).addEventHandler( _handler ) ;
+				getEventQueue( type ).addEventHandler( _handler ) ;
 			}
 		}
 	}
@@ -90,24 +88,24 @@ public final class EventSystem implements IEventSystem
 	{
 		assert _type != null || _filter != null ;
 
-		if( eventQueues.containsKey( _type ) == false )
+		if( getEventQueue( _type ) == null )
 		{
 			addEventQueue( _type, new EventQueue( _type ) ) ;
 		}
 
-		eventQueues.get( _type ).addEventFilter( _filter ) ;
+		getEventQueue( _type ).addEventFilter( _filter ) ;
 	}
 
 	public final void removeEventFilter( final EventType _type, final IEventFilter _filter )
 	{
 		assert _type != null || _filter != null ;
 
-		if( eventQueues.containsKey( _type ) == false )
+		if( getEventQueue( _type ) == null )
 		{
 			Logger.println( "Can't remove EventFilter event queue: " + _type + " does not exist.", Logger.Verbosity.MAJOR ) ;
 		}
 
-		eventQueues.get( _type ).removeEventFilter( _filter ) ;
+		getEventQueue( _type ).removeEventFilter( _filter ) ;
 	}
 	
 	/**
@@ -132,8 +130,8 @@ public final class EventSystem implements IEventSystem
 		final EventType key = _event.getEventType() ;
 		// System.out.println( name + " " + key ) ;
 
-		final EventQueue queue = eventQueues.get( key ) ;
-		// We don't want to add an event flagged ALL_EVENT_TYPES
+		final EventQueue queue = getEventQueue( key ) ;
+		// We don't want to add an event flagged ALL
 		// multiple times into the same queue.
 		if( queue != null && queue != allQueue )
 		{
@@ -141,7 +139,7 @@ public final class EventSystem implements IEventSystem
 			queue.addEvent( _event ) ;
 		}
 
-		// We always want to pass the Event to ALL_EVENT_TYPES
+		// We always want to pass the Event to ALL
 		// queue irrespective of its EventType.
 		allQueue.addEvent( _event ) ;
 	}
@@ -158,7 +156,6 @@ public final class EventSystem implements IEventSystem
 
 	private void addEventQueue( final EventType _queueName, final EventQueue _queue )
 	{
-		eventQueues.put( _queueName, _queue ) ;
 		queues.add( _queue ) ;
 	}
 	
@@ -168,13 +165,13 @@ public final class EventSystem implements IEventSystem
 		if( types.isEmpty() == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 
-			// represents Event.ALL_EVENT_TYPES, must be specially removed.
-			eventQueues.get( Event.ALL_EVENT_TYPES ).removeEventHandler( _handler ) ;
+			// represents EventType.ALL, must be specially removed.
+			allQueue.removeEventHandler( _handler ) ;
 		}
 
 		for( final EventType type : types )
 		{
-			final EventQueue queue = eventQueues.get( type ) ;
+			final EventQueue queue = getEventQueue( type ) ;
 			if( queue != null )
 			{
 				queue.removeEventHandler( _handler ) ;
@@ -191,23 +188,6 @@ public final class EventSystem implements IEventSystem
 	public String getName()
 	{
 		return name ;
-	}
-
-	public int getEventSize()
-	{
-		int size = 0 ;
-		final int length = queues.size() ;
-		for( int i = 0; i < length; ++i )
-		{
-			size += queues.get( i ).size() ;
-		}
-
-		return size ;
-	}
-
-	public int getHandlerSize()
-	{
-		return handlers.size() ;
 	}
 
 	public final void clearHandlers()
@@ -233,7 +213,26 @@ public final class EventSystem implements IEventSystem
 
 	public final boolean hasEvents()
 	{
-		return eventQueues.get( Event.ALL_EVENT_TYPES ).hasEvents() ;
+		// allQueue receives all events so 
+		// it is the only queue we need to check 
+		// to see if there are events available to 
+		// be processed.
+		return allQueue.hasEvents() ;
+	}
+
+	private EventQueue getEventQueue( final EventType _type )
+	{
+		final int length = queues.size() ;
+		for( int i = 0; i < length; ++i )
+		{
+			final EventQueue que = queues.get( i ) ;
+			if( que.isType( _type ) == true )
+			{
+				return que ;
+			}
+		}
+
+		return null ;
 	}
 
 	private final boolean exists( final IEventHandler _handler )

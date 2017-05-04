@@ -42,13 +42,14 @@ public class EventController implements IEventHandler
 	**/
 	public void addEventProcessor( final EventProcessor _processor )
 	{
-		assert _processor != null ;
-		processors.add( _processor ) ;
-
-		final EventType type = _processor.getEventType() ;
-		if( wantedTypes.contains( type ) == false )
+		if( _processor != null && processors.contains( _processor ) == false )
 		{
-			wantedTypes.add( type ) ;
+			processors.add( _processor ) ;
+			final EventType type = _processor.getEventType() ;
+			if( wantedTypes.contains( type ) == false )
+			{
+				wantedTypes.add( type ) ;
+			}
 		}
 	}
 
@@ -63,11 +64,6 @@ public class EventController implements IEventHandler
 		{
 			addInterface = ADD_EVENT_FALLBACK ;
 		}
-	}
-
-	public int getProcessorSize()
-	{
-		return processors.size() ;
 	}
 
 	public int getEventSize()
