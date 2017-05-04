@@ -3,7 +3,6 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.renderer.font.* ;
-import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;

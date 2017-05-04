@@ -11,7 +11,6 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
-import com.linxonline.mallet.renderer.texture.* ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
@@ -731,7 +730,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return true ;
 	}
 
-	protected static Texture<GLImage> getTexture( final String _path )
+	protected static GLImage getTexture( final String _path )
 	{
 		return textures.get( _path ) ;
 	}

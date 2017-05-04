@@ -31,16 +31,6 @@ public abstract class Component
 		initComponentEventProcessors( getComponentEventController() ) ;
 	}
 
-	/**
-		Developer specified unique codes for nameID and groupID.
-	*/
-	public Component( final String _name, final int _nameID,
-					  final String _group, final int _groupID )
-	{
-		id = new ID( _name, _nameID, _group, _groupID ) ;
-		initComponentEventProcessors( getComponentEventController() ) ;
-	}
-
 	public void setParent( final Entity _parent )
 	{
 		parent = _parent ;
@@ -60,19 +50,9 @@ public abstract class Component
 		return id.isName( _name ) ;
 	}
 
-	public final boolean isNameID( final int _nameID )
-	{
-		return id.isNameID( _nameID ) ;
-	}
-
 	public final boolean isGroup( final String _group )
 	{
 		return id.isGroup( _group ) ;
-	}
-
-	public final boolean isGroupID( final int _groupID )
-	{
-		return id.isGroupID( _groupID ) ;
 	}
 
 	/**

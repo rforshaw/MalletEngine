@@ -11,8 +11,6 @@ import com.linxonline.mallet.core.android.AndroidActivity ;
 import com.linxonline.mallet.core.BasicSystem ;
 import com.linxonline.mallet.core.DefaultShutdown ;
 import com.linxonline.mallet.input.IInputSystem ;
-import com.linxonline.mallet.input.InputHandler ;
-import com.linxonline.mallet.event.EventHandler ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;

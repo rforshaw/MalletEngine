@@ -44,7 +44,7 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 		public ExecType exec( final int _index, final Entity _entity )
 		{
 			_entity.update( deltaTime ) ;
-			if( _entity.destroy == true )
+			if( _entity.isDead() == true )
 			{
 				synchronized( cleanup )
 				{

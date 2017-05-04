@@ -4,9 +4,9 @@ import java.util.Arrays ;
 
 import android.opengl.GLES20 ;
 
-import com.linxonline.mallet.renderer.texture.ImageInterface ;
+import com.linxonline.mallet.io.Resource ;
 
-public class GLImage implements ImageInterface
+public class GLImage extends Resource
 {
 	public final int[] textureIDs ;			// Buffer ID for openGL
 	public final long consumption ;

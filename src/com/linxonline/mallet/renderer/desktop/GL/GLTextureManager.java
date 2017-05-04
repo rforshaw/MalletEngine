@@ -24,9 +24,8 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.renderer.texture.* ;
 
-public class GLTextureManager extends AbstractManager<Texture<GLImage>>
+public class GLTextureManager extends AbstractManager<GLImage>
 {
 	/**
 		When loading a texture the TextureManager will stream the 
@@ -50,15 +49,15 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<Texture<GLImage>> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<Texture<GLImage>>()
+		final ResourceLoader<GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return true ;
 			}
 
-			public Texture<GLImage> load( final String _file )
+			public GLImage load( final String _file )
 			{
 				// We want to allocate the key for the resource so the texture 
 				// is not reloaded if another object wishes to use it before 
@@ -76,7 +75,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 	}
 
 	@Override
-	public Texture<GLImage> get( final String _file )
+	public GLImage get( final String _file )
 	{
 		synchronized( toBind )
 		{
@@ -122,7 +121,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		imageFormat = _format ;
 	}
 
-	public Texture<GLImage> bind( final BufferedImage _image )
+	public GLImage bind( final BufferedImage _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
@@ -132,7 +131,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture<GLImage> bind( final BufferedImage _image, final InternalFormat _format )
+	public GLImage bind( final BufferedImage _image, final InternalFormat _format )
 	{
 		final GL3 gl = GLRenderer.getGL() ;
 		if( gl == null )
@@ -191,7 +190,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
 		final long estimatedConsumption = width * height * ( channels * 8 ) ;
-		return new Texture<GLImage>( new GLImage( textureID, estimatedConsumption  ) ) ;
+		return new GLImage( textureID, estimatedConsumption ) ;
 	}
 
 	private int getGLInternalFormat( final int _channels, final InternalFormat _format )

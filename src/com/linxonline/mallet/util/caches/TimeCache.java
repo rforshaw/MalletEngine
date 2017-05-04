@@ -10,7 +10,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 	An object is automatically returned when the object is 
 	older than the wait time. 
 */
-public class TimeCache<T extends Cacheable> implements CacheInterface<T>
+public class TimeCache<T extends Cacheable> implements ICache<T>
 {
 	private final LinkedList<TimeWrapper<T>> pool = new LinkedList<TimeWrapper<T>>() ;	// Pool of objects that will be used.
 	private final Class<T> objectCreator ;											// Used to create T type instances.

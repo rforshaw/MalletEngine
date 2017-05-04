@@ -11,7 +11,6 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.maths.Vector2 ;
@@ -68,14 +67,14 @@ public class GLProgram extends Resource
 				final int inUniform                   = program.inUniforms[_index] ;
 
 				final MalletTexture texture = ( MalletTexture )_data.get( uniform.getLeft() ) ;
-				final Texture<GLImage> glTexture = GLRenderer.getTexture( texture.getPath() ) ;
+				final GLImage glTexture = GLRenderer.getTexture( texture.getPath() ) ;
 				if( glTexture == null )
 				{
 					return false ;
 				}
 
 				GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + textureUnit ) ;				//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, glTexture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
 			}
@@ -112,14 +111,14 @@ public class GLProgram extends Resource
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFont glFont = GLRenderer.getFont( font ) ;
 
-				final Texture<GLImage> texture = glFont.getTexture() ;
+				final GLImage texture = glFont.getTexture() ;
 				if( texture == null )
 				{
 					return false ;
 				}
 
 				GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, texture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, texture.textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
 			}

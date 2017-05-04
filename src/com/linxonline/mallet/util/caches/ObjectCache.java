@@ -7,7 +7,7 @@ import java.util.ArrayDeque ;
 	that has been previously used.
 	Objects used in this cache must have a default constructor.
 */
-public class ObjectCache<T extends Cacheable> implements CacheInterface<T>
+public class ObjectCache<T extends Cacheable> implements ICache<T>
 {
 	private final ArrayDeque<T> available = new ArrayDeque<T>() ;	// Pool of objects to retrieve.
 	private final Class<T> creator ;								// Allows the creation of new default objects.

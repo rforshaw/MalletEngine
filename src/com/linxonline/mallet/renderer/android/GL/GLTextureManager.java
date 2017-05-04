@@ -27,9 +27,8 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.renderer.texture.* ;
 
-public class GLTextureManager extends AbstractManager<Texture<GLImage>>
+public class GLTextureManager extends AbstractManager<GLImage>
 {
 	/**
 		When loading a texture the TextureManager will stream the 
@@ -48,20 +47,20 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<Texture<GLImage>> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<Texture<GLImage>>()
+		final ResourceLoader<GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".PNG", ".png" ) ;
 			}
 
-			public Texture<GLImage> load( final String _file )
+			public GLImage load( final String _file )
 			{
 				return loadTextureASync( _file ) ;
 			}
 
-			protected Texture<GLImage> loadTextureASync( final String _file )
+			protected GLImage loadTextureASync( final String _file )
 			{
 				final Thread load = new Thread( "LOAD_TEXTURE" )
 				{
@@ -100,19 +99,19 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 			}
 		} ) ;
 
-		loader.add( new ResourceDelegate<Texture<GLImage>>()
+		loader.add( new ResourceDelegate<GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".JPG", ".jpg", ".JPEG", ".jpeg" ) ;
 			}
 
-			public Texture<GLImage> load( final String _file )
+			public GLImage load( final String _file )
 			{
 				return loadTextureASync( _file ) ;
 			}
 
-			protected Texture<GLImage> loadTextureASync( final String _file )
+			protected GLImage loadTextureASync( final String _file )
 			{
 				final Thread load = new Thread( "LOAD_TEXTURE" )
 				{
@@ -157,7 +156,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 	}
 
 	@Override
-	public Texture<GLImage> get( final String _file )
+	public GLImage get( final String _file )
 	{
 		synchronized( toBind )
 		{
@@ -195,7 +194,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		return metaGenerator.getMeta( _path ) ;
 	}
 
-	public Texture bind( final Bitmap _image )
+	public GLImage bind( final Bitmap _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
@@ -205,7 +204,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final Bitmap _image, final InternalFormat _format )
+	public GLImage bind( final Bitmap _image, final InternalFormat _format )
 	{
 		GLES20.glEnable( GLES20.GL_TEXTURE_2D ) ;
 
@@ -258,7 +257,7 @@ public class GLTextureManager extends AbstractManager<Texture<GLImage>>
 		}*/
 
 		final long estimatedConsumption = _image.getWidth() * _image.getHeight() * ( 3 * 8 ) ;
-		return new Texture( new GLImage( textureID, estimatedConsumption ) ) ;
+		return new GLImage( textureID, estimatedConsumption ) ;
 	}
 
 	private int getGLInternalFormat( final Bitmap.Config _config, final InternalFormat _format )

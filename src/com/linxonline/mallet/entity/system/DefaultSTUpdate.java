@@ -30,8 +30,8 @@ public class DefaultSTUpdate implements EntityUpdateInterface
 		{
 			entity = entities.get( i ) ;
 			entity.update( _dt ) ;
-			
-			if( entity.destroy == true )
+
+			if( entity.isDead() == true )
 			{
 				cleanup.add( entity ) ;
 			}

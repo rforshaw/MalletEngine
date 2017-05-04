@@ -30,7 +30,7 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.MalletList ;
 
 public class AndroidActivity extends Activity
-							implements EventHandler
+							implements IEventHandler
 {
 	private final List<AndroidInputListener> inputListeners = MalletList.<AndroidInputListener>newList() ;
 	private final Notify<Object> startGame = new Notify<Object>()
@@ -172,7 +172,7 @@ public class AndroidActivity extends Activity
 	public List<EventType> getWantedEventTypes()
 	{
 		final List<EventType> types = MalletList.<EventType>newList() ;
-		types.add( Event.ALL_EVENT_TYPES ) ;
+		types.add( EventType.ALL ) ;
 		return types ;
 	}
 

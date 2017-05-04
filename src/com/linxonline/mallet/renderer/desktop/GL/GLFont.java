@@ -3,20 +3,19 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import com.linxonline.mallet.io.Resource ;
 
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.texture.Texture ;
 
 public class GLFont extends Resource
 {
 	private final Shape[] glyphs ;
-	private final Texture<GLImage> texture ;
+	private final GLImage texture ;
 
-	public GLFont( final Shape[] _glyphs, final Texture<GLImage> _texture )
+	public GLFont( final Shape[] _glyphs, final GLImage _texture )
 	{
 		glyphs = _glyphs ;
 		texture = _texture ;
 	}
 
-	public Texture<GLImage> getTexture()
+	public GLImage getTexture()
 	{
 		return texture ;
 	}

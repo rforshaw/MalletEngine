@@ -29,7 +29,7 @@ public final class Entity
 
 	public final ID id ;							// Unique ID for this Entity: Name:Family
 	public Vector3 position = new Vector3() ;		// Position of Entity in world space
-	public boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
+	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
 	public Entity()
 	{
@@ -128,26 +128,6 @@ public final class Entity
 	}
 
 	/**
-		Get a Component with the designated name.
-		If there is more than one component with that name,
-		then it will return the first one it finds.
-	**/
-	public final Component getComponentByNameID( final int _nameID )
-	{
-		final int size = components.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			final Component component = components.get( i ) ;
-			if( component.isNameID( _nameID ) == true )
-			{
-				return component ;
-			}
-		}
-
-		return null ;
-	}
-
-	/**
 		Return all the components with the designated name
 	**/
 	public final int getComponentsByName( final String _name, final List<Component> _components )
@@ -155,22 +135,6 @@ public final class Entity
 		for( final Component component : components )
 		{
 			if( component.isName( _name ) == true )
-			{
-				_components.add( component ) ;
-			}
-		}
-
-		return _components.size() ;
-	}
-
-	/**
-		Return all the components with the designated nameID
-	**/
-	public final int getComponentsByNameID( final int _nameID, final List<Component> _components )
-	{
-		for( final Component component : components )
-		{
-			if( component.isNameID( _nameID ) == true )
 			{
 				_components.add( component ) ;
 			}
@@ -188,24 +152,6 @@ public final class Entity
 		for( final Component component : components )
 		{
 			if( component.isGroup( _group ) == true )
-			{
-				_components.add( component ) ;
-			}
-		}
-
-		return _components.size() ;
-	}
-
-	/**
-		Get the Components that have the same Group name and return them in 
-		a List.
-		NOTE: A new List is created each time this function is called.
-	**/
-	public final int getComponentByGroupID( final int _groupID, final List<Component> _components )
-	{
-		for( final Component component : components )
-		{
-			if( component.isGroupID( _groupID ) == true )
 			{
 				_components.add( component ) ;
 			}
@@ -236,6 +182,8 @@ public final class Entity
 		Call when you wish the Entity to be decalred dead.
 		An Entity decalred destroyed, will be removed by the
 		Entity System when appropriate.
+		isDead will return true when the entity can be removed 
+		from the EntitySystem.
 	*/
 	public final void destroy()
 	{
@@ -259,10 +207,23 @@ public final class Entity
 			}
 		} ;
 
-		for( final Component component : components )
+		final int size = components.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			component.readyToDestroy( readyDestroy ) ;
+			components.get( i ).readyToDestroy( readyDestroy ) ;
 		}
+	}
+
+	/**
+		Returns true when the entity can be removed 
+		from the EntitySystem.
+		Call destroy() if you want the Entity to clean-up 
+		any resources it may be accessing before it is 
+		completely removed from the EntitySystem.
+	*/
+	public boolean isDead()
+	{
+		return destroy ;
 	}
 
 	/**
