@@ -1,9 +1,9 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.CameraAssist ;
-import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.WorldAssist ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
+import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.audio.AudioDelegate ;
 
 import com.linxonline.mallet.event.* ;
@@ -12,8 +12,6 @@ import com.linxonline.mallet.maths.* ;
 
 public class UIList extends UILayout
 {
-	private final Camera camera ;
-
 	public UIList( final Type _type, final float _length )
 	{
 		super( _type ) ;
@@ -32,39 +30,29 @@ public class UIList extends UILayout
 			}
 		}
 
-		final Vector3 position = new Vector3( getPosition() ) ;
-		final Vector3 rotation = new Vector3() ;
-		final Vector3 scale = new Vector3( 1, 1, 1 ) ;
-		camera = CameraAssist.createCamera( "UILIST", position, rotation, scale ) ;
-
-		setWorld( WorldAssist.constructWorld( "UILIST", 1 ) ) ;
-		CameraAssist.addCamera( camera, getWorld() ) ;
+		addListener( new StencilListener() ) ;
 	}
 
-	@Override
-	public void refresh()
+	private static class StencilListener extends UIListener<UIList>
 	{
-		super.refresh() ;
+		private Draw draw = null ;
 
-		final Vector3 position = getPosition() ;
-		final Vector3 offset = getOffset() ;
-		final Vector3 length = getLength() ;
+		public void constructDraws()
+		{
+			final UIList parent = getParent() ;
+			final int layer = parent.getLayer() ;
 
-		final int x = ( int )( position.x + offset.x ) ;
-		final int y = ( int )( position.y + offset.y ) ;
+			//draw = DrawAssist.createClipDraw(  )
+		}
 
-		final int width = ( int )length.x ;
-		final int height = ( int )length.y ;
+		public void addDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+		
+		}
 
-		CameraAssist.amendOrthographic( camera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
-		CameraAssist.amendScreenResolution( camera, width, height ) ;
-		CameraAssist.amendScreenOffset( camera, x, y ) ;
-	}
-
-	@Override
-	public void shutdown()
-	{
-		super.shutdown() ;
-		WorldAssist.removeWorld( getWorld() ) ;
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+		
+		}
 	}
 }

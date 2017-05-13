@@ -19,15 +19,34 @@ public class EntitySystem implements EntitySystemInterface
 	protected final QuerySystem querySystem = new QuerySystem() ;					// Should be thread safe
 	protected final Settings hashQuery = new Settings() ;							// Not thread safe
 
-	//protected EntityUpdateInterface entities = new DefaultMTUpdate() ;				// Entities update protocol
-	protected EntityUpdateInterface entities = new DefaultSTUpdate() ;				// Entities update protocol
+	protected final EntityUpdateInterface entities ;								// Entities update protocol
 	protected final List<Entity> entitiesToAdd = MalletList.<Entity>newList() ;
 	protected final List<Entity> cleanup = MalletList.<Entity>newList() ;
 
 	public EntitySystem( final HookEntity _state )
 	{
+		this( _state, Threaded.SINGLE ) ;
+	}
+
+	public EntitySystem( final HookEntity _state, final Threaded _mode )
+	{
 		state = _state ;
 		querySystem.addQuery( new HashMapQuery( "HASHMAP" ) ) ;
+
+		switch( _mode )
+		{
+			default     :
+			case SINGLE :
+			{
+				entities = new DefaultSTUpdate() ;
+				break ;
+			}
+			case MULTI  :
+			{
+				entities = new DefaultMTUpdate() ;
+				break ;
+			}
+		}
 	}
 
 	/**
@@ -200,4 +219,10 @@ public class EntitySystem implements EntitySystemInterface
 
 		_entity.id.setName( newName ) ;
 	}
+
+	public enum Threaded
+	{
+		SINGLE,
+		MULTI
+	} ;
 }

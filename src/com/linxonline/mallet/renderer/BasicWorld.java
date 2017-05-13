@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import com.linxonline.mallet.maths.IntVector2 ;
+
 /**
 	Implements common requirements for using World.
 	Basic World manages draw object state and Camera state.
@@ -11,10 +13,23 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
 	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
+	private final IntVector2 render = new IntVector2( 1280, 720 ) ;
+	private final IntVector2 display = new IntVector2( 1280, 720 ) ;
+
 	public BasicWorld( final String _id, final int _order )
 	{
 		id = _id ;
 		order = _order ;
+	}
+
+	public void setRender( final int _width, final int _height )
+	{
+		render.setXY( _width, _height ) ;
+	}
+
+	public void setDisplay( final int _width, final int _height )
+	{
+		display.setXY( _width, _height ) ;
 	}
 
 	/**
@@ -31,6 +46,16 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	public int getOrder()
 	{
 		return order ;
+	}
+
+	public IntVector2 getRender()
+	{
+		return render ;
+	}
+
+	public IntVector2 getDisplay()
+	{
+		return display ;
 	}
 
 	public void addDraw( final D _data )

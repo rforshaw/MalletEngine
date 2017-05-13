@@ -78,6 +78,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		final List<GLWorld> worldContent = worlds.getCurrentData() ;
 		for( final GLWorld world : worldContent )
 		{
+			world.init() ;
 			final DrawState state = world.getDrawState() ;
 			final List<DrawData> drawContent = state.getActiveDraws() ;
 			for( final DrawData draw : drawContent )
@@ -664,7 +665,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 	public void display()
 	{
-		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT ) ;
+		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_STENCIL_BUFFER_BIT ) ;
 		GLES30.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		getEventController().update() ;
@@ -772,7 +773,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			uploader.remove( _data ) ;
 		}
 	}
-	
+
 	private final static class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
 		private final GLWorld world ;

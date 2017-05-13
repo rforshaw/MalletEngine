@@ -25,6 +25,24 @@ public abstract class WorldState<D extends DrawData,
 		defaultWorld = _default ;
 	}
 
+	public void setRender( final int _width, final int _height )
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).setRender( _width, _height ) ;
+		}
+	}
+
+	public void setDisplay( final int _width, final int _height )
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			current.get( i ).setDisplay( _width, _height ) ;
+		}
+	}
+
 	/**
 		Wrapper function around add, provides greater explanation 
 		on what add is being used for.

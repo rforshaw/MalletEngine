@@ -63,6 +63,11 @@ public abstract class ManagedArray<T>
 		return current ;
 	}
 
+	public List<T> getToAddData()
+	{
+		return toAdd ;
+	}
+
 	/**
 		Add new values that are in the toAdd list.
 		Remove values that are in the remove list.

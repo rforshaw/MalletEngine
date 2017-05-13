@@ -176,12 +176,14 @@ public abstract class BasicRenderer<D extends DrawData,
 	public void setRenderDimensions( final int _width, final int _height )
 	{
 		info.setRenderDimensions( _width, _height ) ;
+		worlds.setRender( _width, _height ) ;
 	}
 
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
 		info.setDisplayDimensions( _width, _height ) ;
+		worlds.setDisplay( _width, _height ) ;
 	}
 
 	@Override

@@ -158,7 +158,7 @@ public final class GameTestLoader extends GameLoader
 
 						{
 							final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
-							final Shape lines = new Shape( 7, 6 ) ;
+							final Shape lines = Shape.create( 7, 6 ) ;
 							lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
 							lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
 							lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
@@ -186,7 +186,7 @@ public final class GameTestLoader extends GameLoader
 						}
 
 						{
-							final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
+							final Shape triangle = Shape.create( Shape.Style.FILL, 6, 6 ) ;
 							triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
 							triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
 							triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;

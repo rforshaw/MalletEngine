@@ -7,6 +7,7 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.util.settings.* ;
+import com.linxonline.mallet.util.Logger ;
 
 public abstract class ConfigReader
 {
@@ -44,6 +45,7 @@ public abstract class ConfigReader
 			buffer.append( _split[i] ) ;
 		}
 
+		//Logger.println( keyword + " : " + buffer.toString(), Logger.Verbosity.MINOR ) ;
 		_config.addString( keyword, buffer.toString() ) ;
 	}
 }
