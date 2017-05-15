@@ -9,7 +9,6 @@ public abstract class InputComponent extends Component
 									 implements InputHandler
 {
 	private Component.ReadyCallback destroy = null ;
-	protected InputAdapterInterface inputAdapter = null ;
 	protected final InputMode mode ;
 
 	public InputComponent()
@@ -36,12 +35,6 @@ public abstract class InputComponent extends Component
 	{
 		super( _name, _group ) ;
 		mode = _mode ;
-	}
-
-	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		inputAdapter = _adapter ;
 	}
 
 	public void readyToDestroy( final Component.ReadyCallback _callback )
@@ -100,10 +93,7 @@ public abstract class InputComponent extends Component
 	protected void processInputEvent( final InputEvent _input ) {}
 
 	@Override
-	public void reset()
-	{
-		inputAdapter = null ;
-	}
+	public void reset() {}
 
 	public static enum InputMode
 	{

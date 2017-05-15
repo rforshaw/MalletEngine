@@ -55,13 +55,6 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
-		public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-		{
-			super.setInputAdapterInterface( _adapter ) ;
-			dropdown.setInputAdapterInterface( _adapter ) ;
-		}
-
-		@Override
 		public void update( final float _dt, final List<Event<?>> _events )
 		{
 			super.update( _dt, _events ) ;

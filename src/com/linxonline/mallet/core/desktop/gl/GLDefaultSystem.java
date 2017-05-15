@@ -52,8 +52,6 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		getAudioGenerator().startGenerator() ;
 
 		final InputSystem input = getInput() ;
-		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
-
 		render.getCanvas().setTitle( title ) ;
 		render.getCanvas().addMouseListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;

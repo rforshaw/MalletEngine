@@ -4,9 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.renderer.WorldAssist ;
-import com.linxonline.mallet.renderer.World ;
-
+import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -29,7 +27,6 @@ public class UIElement implements InputHandler
 
 	private final ListenerUnit<BaseListener<? extends UIElement>> listeners = new ListenerUnit<BaseListener<? extends UIElement>>() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-	private InputAdapterInterface adapter = null ;
 
 	protected State current = State.NEUTRAL ;
 
@@ -242,14 +239,9 @@ public class UIElement implements InputHandler
 
 	public boolean isIntersectInput( final InputEvent _event )
 	{
-		final InputAdapterInterface adapter = getInputAdapter() ;
-		if( adapter != null )
-		{
-			return intersectPoint( adapter.convertInputToUIRenderX( _event.mouseX ),
-								   adapter.convertInputToUIRenderY( _event.mouseY ) ) ;
-		}
-
-		return false ;
+		final Camera camera = CameraAssist.getDefaultCamera() ;
+		return intersectPoint( CameraAssist.convertInputToUICameraX( camera, _event.mouseX ),
+							   CameraAssist.convertInputToUICameraY( camera, _event.mouseY ) ) ;
 	}
 
 	/**
@@ -593,17 +585,6 @@ public class UIElement implements InputHandler
 		return ratio ;
 	}
 
-	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		adapter = _adapter ;
-	}
-
-	public InputAdapterInterface getInputAdapter()
-	{
-		return adapter ;
-	}
-
 	/**
 		Inform the UIElement it needs to release any 
 		resources or handlers it may have acquired.
@@ -618,7 +599,6 @@ public class UIElement implements InputHandler
 	*/
 	public void clear()
 	{
-		setInputAdapterInterface( null ) ;
 		listeners.clear() ;
 		events.clear() ;
 	}

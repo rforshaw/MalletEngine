@@ -433,6 +433,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public CameraAssist.Assist getCameraAssist()
 	{
+		final RenderInfo renderInfo = getRenderInfo() ;
+
 		return new CameraAssist.Assist()
 		{
 			@Override
@@ -532,6 +534,30 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final CameraData.Projection projection = cast( _camera ).getProjection() ;
 				_populate.setXYZ( projection.nearPlane ) ;
 				return true ;
+			}
+
+			@Override
+			public float convertInputToCameraX( final Camera _camera, final float _inputX )
+			{
+				return renderInfo.convertInputToRenderX( _camera, _inputX ) ;
+			}
+
+			@Override
+			public float convertInputToCameraY( final Camera _camera, final float _inputY )
+			{
+				return renderInfo.convertInputToRenderY( _camera, _inputY ) ;
+			}
+
+			@Override
+			public float convertInputToUICameraX( final Camera _camera, final float _inputX )
+			{
+				return renderInfo.convertInputToUIRenderX( _inputX ) ;
+			}
+
+			@Override
+			public float convertInputToUICameraY( final Camera _camera, final float _inputY )
+			{
+				return renderInfo.convertInputToUIRenderY( _inputY ) ;
 			}
 
 			@Override

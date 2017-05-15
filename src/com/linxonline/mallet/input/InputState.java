@@ -22,19 +22,12 @@ public class InputState implements IInputSystem,
 	// isn't removed from InputSystem
 	private static final int MAX_QUEUE_THRESHOLD = 40 ;
 
-	private InputAdapterInterface inputAdapter = null ;
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
 
 	private boolean hasInputs = false ;
 	private InputHandler handler = null ;
 
 	public InputState() {}
-
-	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		inputAdapter = _adapter ;
-	}
 
 	@Override
 	public final void addInputHandler( final InputHandler _handler )
@@ -45,7 +38,6 @@ public class InputState implements IInputSystem,
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( inputAdapter ) ;
 		handlers.add( _handler ) ;
 	}
 
@@ -58,7 +50,6 @@ public class InputState implements IInputSystem,
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( null ) ;
 		handlers.remove( _handler ) ;
 		_handler.reset() ;
 	}
@@ -103,7 +94,6 @@ public class InputState implements IInputSystem,
 		// State transition happens.
 		//clearHandlers() ;
 
-		inputAdapter = null ;
 		hasInputs = false ;
 		handler = null ;
 	}

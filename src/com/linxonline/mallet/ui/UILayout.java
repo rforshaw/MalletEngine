@@ -48,18 +48,6 @@ public class UILayout extends UIElement
 		setEngageMode( new SingleEngageListener() ) ;
 	}
 
-	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		super.setInputAdapterInterface( _adapter ) ;
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final UIElement element = ordered.get( i ) ;
-			element.setInputAdapterInterface( getInputAdapter() ) ;
-		}
-	}
-
 	/**
 		Engaging a UILayout is somewhat redundant.
 		You will most likely want to engage a child element 
@@ -95,9 +83,7 @@ public class UILayout extends UIElement
 		if( ordered.contains( _element ) == false )
 		{
 			applyLayer( _element, getLayer() ) ;
-
 			ordered.add( _element ) ;
-			_element.setInputAdapterInterface( getInputAdapter() ) ;
 		}
 		return _element ; 
 	}

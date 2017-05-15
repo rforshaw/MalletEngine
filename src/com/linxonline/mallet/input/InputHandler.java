@@ -2,8 +2,6 @@ package com.linxonline.mallet.input ;
 
 public interface InputHandler
 {
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter ) ;
-
 	/**
 		Usually called by either an InputSystem or InputState.
 		The return Action informs the caller whether to 

@@ -61,11 +61,9 @@ public class MouseComponent extends InputComponent
 	{
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;
 		final Camera camera = CameraAssist.getDefaultCamera() ;
-		if( inputAdapter != null )
-		{
-			final Vector3 pos = parent.getPosition() ;
-			pos.x = inputAdapter.convertInputToRenderX( camera, mouse.x ) ;
-			pos.y = inputAdapter.convertInputToRenderY( camera, mouse.y ) ;
-		}
+
+		final Vector3 pos = parent.getPosition() ;
+		pos.x = CameraAssist.convertInputToCameraX( camera, mouse.x ) ;
+		pos.y = CameraAssist.convertInputToCameraY( camera, mouse.y ) ;
 	}
 }

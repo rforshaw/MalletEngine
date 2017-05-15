@@ -45,21 +45,10 @@ public class UIComponent extends InputComponent
 		super( _name, _group, _mode ) ;
 	}
 
-	@Override
-	public void setInputAdapterInterface( final InputAdapterInterface _adapter )
-	{
-		inputAdapter = _adapter ;
-		for( final UIElement element : elements )
-		{
-			element.setInputAdapterInterface( _adapter ) ;
-		}
-	}
-
 	public <T extends UIElement> T addElement( final T _element )
 	{
 		if( elements.contains( _element ) == false )
 		{
-			_element.setInputAdapterInterface( inputAdapter ) ;
 			elements.add( _element ) ;
 		}
 		return _element ;

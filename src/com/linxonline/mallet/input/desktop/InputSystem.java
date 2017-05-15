@@ -19,7 +19,6 @@ public class InputSystem implements IInputSystem,
 									KeyListener, 
 									MouseListener
 {
-	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList();
@@ -38,7 +37,6 @@ public class InputSystem implements IInputSystem,
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( inputAdapter ) ;
 		handlers.add( _handler ) ;
 	}
 

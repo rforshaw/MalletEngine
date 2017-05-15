@@ -74,6 +74,26 @@ public final class CameraAssist
 		return assist.getDimensions( _camera, _populate ) ;
 	}
 
+	public static float convertInputToCameraX( final Camera _camera, final float _inputX )
+	{
+		return assist.convertInputToCameraX( _camera, _inputX ) ;
+	}
+
+	public static float convertInputToCameraY( final Camera _camera, final float _inputY )
+	{
+		return assist.convertInputToCameraY( _camera, _inputY ) ;
+	}
+
+	public static float convertInputToUICameraX( final Camera _camera, final float _inputX )
+	{
+		return assist.convertInputToUICameraX( _camera, _inputX ) ;
+	}
+
+	public static float convertInputToUICameraY( final Camera _camera, final float _inputY )
+	{
+		return assist.convertInputToUICameraY( _camera, _inputY ) ;
+	}
+
 	public static Camera addCamera( final Camera _camera, final World _world )
 	{
 		return assist.addCamera( _camera, _world ) ;
@@ -115,6 +135,12 @@ public final class CameraAssist
 		public boolean getRotation( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getScale( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getDimensions( final Camera _camera, final Vector3 _populate ) ;
+
+		public float convertInputToCameraX( final Camera _camera, final float _inputX ) ;
+		public float convertInputToCameraY( final Camera _camera, final float _inputY ) ;
+
+		public float convertInputToUICameraX( final Camera _camera, final float _inputX ) ;
+		public float convertInputToUICameraY( final Camera _camera, final float _inputY ) ;
 
 		public Camera addCamera( final Camera _camera, final World _world ) ;
 		public Camera removeCamera( final Camera _camera, final World _world ) ;
