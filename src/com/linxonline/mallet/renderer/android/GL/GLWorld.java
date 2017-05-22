@@ -32,6 +32,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	@Override
 	public void draw()
 	{
+		final IntVector2 render = getRender() ;
 		final IntVector2 display = getDisplay() ;
 
 		GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
@@ -41,8 +42,8 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 		GLES30.glBindFramebuffer( GLES30.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		GLES30.glBlitFramebuffer( 0, 0, display.x, display.y,
-								  0, 0, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_NEAREST ) ;
+		GLES30.glBlitFramebuffer( 0, 0, render.x, render.y,
+								  0, 0, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_LINEAR ) ;
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	public void init()
 	{
+		final IntVector2 render = getRender() ;
 		final IntVector2 display = getDisplay() ;
 
 		final int frameOffset = FRAME_BUFFER ;
@@ -86,7 +88,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		// Buffers afterwards are Renderbuffers.
 		GLES30.glGenRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ; //GLRenderer.handleError( "Gen Render Buffers" ) ;
 
-		updateBufferDimensions( display.x, display.y ) ;
+		updateBufferDimensions( render.x, render.y ) ;
 
 		GLES30.glGenFramebuffers( 1, buffers, frameOffset ) ; 							//GLRenderer.handleError( "Gen Frame Buffers" ) ;
 		GLES30.glBindFramebuffer( GLES30.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ; 		//GLRenderer.handleError( "Gen Bind Buffers: " + buffers[FRAME_BUFFER] ) ;

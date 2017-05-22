@@ -33,7 +33,6 @@ public class AndroidInputSystem implements IInputSystem,
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( inputAdapter ) ;
 		handlers.add( _handler ) ;
 	}
 

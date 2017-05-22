@@ -964,15 +964,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		@Override
 		public void draw( final CameraData _camera )
 		{
-			final Vector2 scaleRtoD = info.getScaleRenderToDisplay() ;
-			final Vector2 offset = info.getScreenOffset() ;
 			final CameraData.Projection projection = _camera.getProjection() ;
 			final CameraData.Screen screen = _camera.getRenderScreen() ;
 
-			gl.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
-							( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
-							( int )( screen.dimension.x * scaleRtoD.x ),
-							( int )( screen.dimension.y * scaleRtoD.y ) ) ;
+			gl.glViewport( ( int )screen.offset.x, ( int )screen.offset.y,
+							( int )screen.dimension.x, ( int )screen.dimension.y ) ;
 
 			final Vector3 position = _camera.getPosition() ;
 			final Vector3 scale = _camera.getScale() ;

@@ -484,6 +484,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public CameraAssist.Assist getCameraAssist()
 	{
+		final RenderInfo renderInfo = getRenderInfo() ;
+
 		return new CameraAssist.Assist()
 		{
 			@Override
@@ -583,6 +585,30 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final CameraData.Projection projection = cast( _camera ).getProjection() ;
 				_populate.setXYZ( projection.nearPlane ) ;
 				return true ;
+			}
+
+			@Override
+			public float convertInputToCameraX( final Camera _camera, final float _inputX )
+			{
+				return renderInfo.convertInputToRenderX( _camera, _inputX ) ;
+			}
+
+			@Override
+			public float convertInputToCameraY( final Camera _camera, final float _inputY )
+			{
+				return renderInfo.convertInputToRenderY( _camera, _inputY ) ;
+			}
+
+			@Override
+			public float convertInputToUICameraX( final Camera _camera, final float _inputX )
+			{
+				return renderInfo.convertInputToUIRenderX( _inputX ) ;
+			}
+
+			@Override
+			public float convertInputToUICameraY( final Camera _camera, final float _inputY )
+			{
+				return renderInfo.convertInputToUIRenderY( _inputY ) ;
 			}
 
 			@Override
@@ -827,15 +853,11 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 		public void draw( final CameraData _camera )
 		{
-			final Vector2 scaleRtoD = info.getScaleRenderToDisplay() ;
-			final Vector2 offset = info.getScreenOffset() ;
 			final CameraData.Projection projection = _camera.getProjection() ;
 			final CameraData.Screen screen = _camera.getRenderScreen() ;
 
-			GLES30.glViewport( ( int )( offset.x + ( screen.offset.x * scaleRtoD.x ) ),
-							   ( int )( offset.y + ( screen.offset.y * scaleRtoD.y ) ),
-							   ( int )( screen.dimension.x * scaleRtoD.x ),
-							   ( int )( screen.dimension.y * scaleRtoD.y ) ) ;
+			GLES30.glViewport( ( int )screen.offset.x, ( int )screen.offset.y,
+							   ( int )screen.dimension.x, ( int )screen.dimension.y ) ;
 
 			final Vector3 position = _camera.getPosition() ;
 			final Vector3 scale = _camera.getScale() ;

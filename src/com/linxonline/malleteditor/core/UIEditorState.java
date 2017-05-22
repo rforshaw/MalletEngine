@@ -27,12 +27,13 @@ public class UIEditorState extends GameState
 	@Override
 	public void initGame()
 	{
-		final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
+		final World edWorld = WorldAssist.getDefaultWorld() ;
+		/*final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
 		final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
 																			new Vector3(),
 																			new Vector3( 1, 1, 1 ) ) ;
 
-		CameraAssist.addCamera( edCamera, edWorld ) ;
+		CameraAssist.addCamera( edCamera, edWorld ) ;*/
 
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
 		{
@@ -105,7 +106,7 @@ public class UIEditorState extends GameState
 			@Override
 			public void addDraws( final DrawDelegate _delegate )
 			{
-				_delegate.addBasicDraw( draw1/*, _world*/ ) ;
+				_delegate.addBasicDraw( draw1, _world ) ;
 			}
 
 			@Override

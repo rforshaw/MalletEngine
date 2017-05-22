@@ -33,6 +33,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	public void draw()
 	{
 		final GL3 gl = GLRenderer.getGL() ;
+		final IntVector2 render = getRender() ;
 		final IntVector2 display = getDisplay() ;
 
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
@@ -42,14 +43,14 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 		gl.glBindFramebuffer( GL3.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		gl.glBlitFramebuffer( 0, 0, display.x, display.y,
-							  0, 0, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_NEAREST ) ;
+		gl.glBlitFramebuffer( 0, 0, render.x, render.y,
+							  0, 0, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_LINEAR ) ;
 	}
 
 	@Override
-	public void setDisplay( final int _width, final int _height )
+	public void setRender( final int _width, final int _height )
 	{
-		super.setDisplay( _width, _height ) ;
+		super.setRender( _width, _height ) ;
 		updateBufferDimensions( _width, _height ) ;
 	}
 
@@ -79,6 +80,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	public void init()
 	{
 		final GL3 gl = GLRenderer.getGL() ;
+		final IntVector2 render = getRender() ;
 		final IntVector2 display = getDisplay() ;
 
 		final int frameOffset = FRAME_BUFFER ;
@@ -88,7 +90,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		// Buffers afterwards are Renderbuffers.
 		gl.glGenRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ;
 
-		updateBufferDimensions( display.x, display.y ) ;
+		updateBufferDimensions( render.x, render.y ) ;
 
 		gl.glGenFramebuffers( 1, buffers, frameOffset ) ;
 		gl.glBindFramebuffer( GL3.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;

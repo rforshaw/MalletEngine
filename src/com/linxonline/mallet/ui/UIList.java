@@ -30,7 +30,7 @@ public class UIList extends UILayout
 			}
 		}
 
-		addListener( new StencilListener() ) ;
+		//addListener( new StencilListener() ) ;
 	}
 
 	private static class StencilListener extends UIListener<UIList>
