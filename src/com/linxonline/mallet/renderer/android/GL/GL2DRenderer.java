@@ -124,12 +124,6 @@ public class GL2DRenderer implements IRender,
 	}
 
 	@Override
-	public RenderInfo getRenderInfo()
-	{
-		return render.getRenderInfo() ;
-	}
-
-	@Override
 	public EventController getEventController()
 	{
 		return render.getEventController() ;

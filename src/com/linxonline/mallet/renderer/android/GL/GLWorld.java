@@ -32,7 +32,10 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	@Override
 	public void draw()
 	{
+		final IntVector2 renPosition = getRenderPosition() ;
 		final IntVector2 render = getRender() ;
+
+		final IntVector2 disPosition = getDisplayPosition() ;
 		final IntVector2 display = getDisplay() ;
 
 		GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
@@ -42,14 +45,14 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 		GLES30.glBindFramebuffer( GLES30.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		GLES30.glBlitFramebuffer( 0, 0, render.x, render.y,
-								  0, 0, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_LINEAR ) ;
+		GLES30.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
+								  disPosition.x, disPosition.y, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_LINEAR ) ;
 	}
 
 	@Override
-	public void setDisplay( final int _width, final int _height )
+	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
-		super.setDisplay( _width, _height ) ;
+		super.setRenderDimensions( _x, _y, _width, _height ) ;
 		updateBufferDimensions( _width, _height ) ;
 	}
 

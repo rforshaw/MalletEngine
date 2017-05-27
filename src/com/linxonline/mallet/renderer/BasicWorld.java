@@ -13,7 +13,10 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
 	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
+	private final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
 	private final IntVector2 render = new IntVector2( 1280, 720 ) ;
+
+	private final IntVector2 displayPosition = new IntVector2( 0, 0 ) ;
 	private final IntVector2 display = new IntVector2( 1280, 720 ) ;
 
 	public BasicWorld( final String _id, final int _order )
@@ -22,14 +25,17 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		order = _order ;
 	}
 
-	public void setRender( final int _width, final int _height )
+	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
+		renderPosition.setXY( _x, _y ) ;
 		render.setXY( _width, _height ) ;
 	}
 
-	public void setDisplay( final int _width, final int _height )
+	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
+		displayPosition.setXY( _x, _y ) ;
 		display.setXY( _width, _height ) ;
+		cameras.setDisplayDimensions( _x, _y, _width, _height ) ;
 	}
 
 	/**
@@ -48,9 +54,19 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		return order ;
 	}
 
+	public IntVector2 getRenderPosition()
+	{
+		return renderPosition ;
+	}
+
 	public IntVector2 getRender()
 	{
 		return render ;
+	}
+
+	public IntVector2 getDisplayPosition()
+	{
+		return displayPosition ;
 	}
 
 	public IntVector2 getDisplay()

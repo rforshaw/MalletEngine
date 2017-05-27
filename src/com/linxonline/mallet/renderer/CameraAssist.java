@@ -49,6 +49,16 @@ public final class CameraAssist
 		return assist.amendScreenResolution( _camera, _width, _height ) ;
 	}
 
+	public static Camera amendDisplayResolution( final Camera _camera, final int _width, final int _height )
+	{
+		return assist.amendDisplayResolution( _camera, _width, _height ) ;
+	}
+
+	public static Camera amendDisplayOffset( final Camera _camera, final int _x, final int _y )
+	{
+		return assist.amendDisplayOffset( _camera, _x, _y ) ;
+	}
+
 	public static Camera amendScreenOffset( final Camera _camera, final int _x, final int _y )
 	{
 		return assist.amendScreenOffset( _camera, _x, _y ) ;
@@ -130,6 +140,9 @@ public final class CameraAssist
 
 		public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height ) ;
 		public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y ) ;
+
+		public Camera amendDisplayResolution( final Camera _camera, final int _width, final int _height ) ;
+		public Camera amendDisplayOffset( final Camera _camera, final int _x, final int _y ) ;
 
 		public boolean getPosition( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getRotation( final Camera _camera, final Vector3 _populate ) ;

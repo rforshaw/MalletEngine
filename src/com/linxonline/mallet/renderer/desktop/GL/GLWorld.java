@@ -33,7 +33,11 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	public void draw()
 	{
 		final GL3 gl = GLRenderer.getGL() ;
+
+		final IntVector2 renPosition = getRenderPosition() ;
 		final IntVector2 render = getRender() ;
+
+		final IntVector2 disPosition = getDisplayPosition() ;
 		final IntVector2 display = getDisplay() ;
 
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
@@ -43,14 +47,14 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 		gl.glBindFramebuffer( GL3.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		gl.glBlitFramebuffer( 0, 0, render.x, render.y,
-							  0, 0, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_LINEAR ) ;
+		gl.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
+							  disPosition.x, disPosition.y, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_LINEAR ) ;
 	}
 
 	@Override
-	public void setRender( final int _width, final int _height )
+	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
-		super.setRender( _width, _height ) ;
+		super.setRenderDimensions( _x, _y, _width, _height ) ;
 		updateBufferDimensions( _width, _height ) ;
 	}
 

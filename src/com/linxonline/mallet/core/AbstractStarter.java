@@ -46,8 +46,8 @@ public abstract class AbstractStarter implements IStarter
 		loadFileSystem( mainSystem.getFileSystem() ) ;
 
 		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
-		setRenderSettings( mainSystem ) ;
 		mainSystem.initSystem() ;				// Fully init the backend: Input, OpenGL, & OpenAL.
+		setRenderSettings( mainSystem ) ;
 
 		// Load the Game-States into the Game-System
 		if( loadGame( getGameSystem(), loader ) == false )

@@ -12,7 +12,6 @@ import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.IRender ;
-import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
@@ -125,15 +124,15 @@ public abstract class DesktopStarter extends AbstractStarter
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", game.getRenderWidth() ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", game.getRenderHeight() ) ;
 
-		//System.out.println( "Render Settings Display: " + renderWidth + " " + renderHeight ) ;
-		//System.out.println( "Render Settings Display: " + displayWidth + " " + displayHeight ) ;
+		//System.out.println( "Render Settings: " + renderWidth + " " + renderHeight ) ;
+		//System.out.println( "Settings Display: " + displayWidth + " " + displayHeight ) ;
 
 		final IRender render = _system.getRenderer() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		render.setRenderDimensions( renderWidth, renderHeight ) ;
 
-		final RenderInfo info = render.getRenderInfo() ;
-		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
+		//final RenderInfo info = render.getRenderInfo() ;
+		//info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
 

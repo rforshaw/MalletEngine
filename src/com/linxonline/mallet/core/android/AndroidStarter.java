@@ -16,7 +16,6 @@ import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.IRender ;
-import com.linxonline.mallet.renderer.RenderInfo ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 import com.linxonline.mallet.io.filesystem.GlobalHome ;
@@ -81,8 +80,8 @@ public abstract class AndroidStarter extends AbstractStarter
 
 		final IRender render = _system.getRenderer() ;
 
-		final RenderInfo info = render.getRenderInfo() ;
-		info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
+		//final RenderInfo info = render.getRenderInfo() ;
+		//info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
 

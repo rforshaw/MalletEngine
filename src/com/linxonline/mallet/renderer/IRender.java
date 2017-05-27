@@ -46,7 +46,6 @@ public interface IRender
 	*/
 	public void draw( final float _dt ) ;
 
-	public RenderInfo getRenderInfo() ;
 	public EventController getEventController() ;
 
 	public void sort() ;

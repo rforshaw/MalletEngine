@@ -16,7 +16,6 @@ public abstract class BasicRenderer<D extends DrawData,
 	private final WS worlds ;
 
 	private final EventController controller = new EventController() ;
-	private final RenderInfo info = new RenderInfo() ;
 
 	protected float drawDT   = 0.0f ;
 	protected float updateDT = 0.0f ;
@@ -175,21 +174,21 @@ public abstract class BasicRenderer<D extends DrawData,
 	@Override
 	public void setRenderDimensions( final int _width, final int _height )
 	{
-		info.setRenderDimensions( _width, _height ) ;
-		worlds.setRender( _width, _height ) ;
+		final Camera camera = CameraAssist.getDefaultCamera() ;
+		CameraAssist.amendScreenResolution( camera, _width, _height ) ;
+
+		final World world = WorldAssist.getDefaultWorld() ;
+		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
 	}
 
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		info.setDisplayDimensions( _width, _height ) ;
-		worlds.setDisplay( _width, _height ) ;
-	}
+		final Camera camera = CameraAssist.getDefaultCamera() ;
+		CameraAssist.amendDisplayResolution( camera, _width, _height ) ;
 
-	@Override
-	public RenderInfo getRenderInfo()
-	{
-		return info ;
+		final World world = WorldAssist.getDefaultWorld() ;
+		WorldAssist.setDisplayDimensions( world, 0, 0, _width, _height ) ;
 	}
 
 	@Override

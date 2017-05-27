@@ -18,6 +18,16 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 
 	public CameraState() {}
 
+	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
+	{
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final CameraData camera = current.get( i ) ;
+			CameraData.Screen.setScreen( camera.getDisplayScreen(), _x, _y, _width, _height ) ;
+		}
+	}
+	
 	public synchronized void update( final int _diff, final int _iteration )
 	{
 		manageState() ;

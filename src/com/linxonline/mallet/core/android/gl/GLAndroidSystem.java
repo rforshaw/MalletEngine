@@ -49,11 +49,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 	@Override
 	public void initSystem()
 	{
-		final AndroidInputSystem input = getInput() ;
-
-		input.inputAdapter = getRenderer().getRenderInfo() ;
-		activity.addAndroidInputListener( input ) ;
-
+		activity.addAndroidInputListener( getInput() ) ;
 		getAudioGenerator().startGenerator() ;
 	}
 

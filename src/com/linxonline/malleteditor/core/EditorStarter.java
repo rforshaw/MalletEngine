@@ -36,7 +36,7 @@ public class EditorStarter extends DesktopStarter
 
 		// Override config setting and prevent ratio from being adhered to
 		// Force Display and Render size parity.
-		render.getRenderInfo().setKeepRenderRatio( false ) ;
+		//render.getRenderInfo().setKeepRenderRatio( false ) ;
 		GlobalConfig.addBoolean( "DISPLAYRENDERPARITY", true ) ;
 	}
 

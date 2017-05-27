@@ -399,23 +399,39 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public World addWorld( final World _world )
 			{
-				if( _world instanceof GLWorld )
-				{
-					getWorldState().addWorld( ( GLWorld )_world ) ;
-					return _world ;
-				}
-				return null ;
+				final GLWorld world = cast( _world ) ;
+				getWorldState().addWorld( world ) ;
+				return _world ;
 			}
 
 			@Override
 			public World removeWorld( final World _world )
 			{
-				if( _world instanceof GLWorld )
-				{
-					getWorldState().removeWorld( ( GLWorld )_world ) ;
-					return _world ;
-				}
-				return null ;
+				final GLWorld world = cast( _world ) ;
+				getWorldState().removeWorld( world ) ;
+				return _world ;
+			}
+
+			@Override
+			public void destroyWorld( final World _world )
+			{
+				final GLWorld world = cast( _world ) ;
+			}
+
+			@Override
+			public World setRenderDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
+			{
+				final GLWorld world = cast( _world ) ;
+				world.setRenderDimensions( _x, _y, _width, _height ) ;
+				return _world ;
+			}
+
+			@Override
+			public World setDisplayDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
+			{
+				final GLWorld world = cast( _world ) ;
+				world.setDisplayDimensions( _x, _y, _width, _height ) ;
+				return _world ;
 			}
 
 			@Override
@@ -427,14 +443,19 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				getWorldState().addWorld( world ) ;
 				return world ;
 			}
+
+			private GLWorld cast( final World _world )
+			{
+				assert( _world != null ) ;
+				assert( !( _world instanceof GLWorld ) ) ;
+				return ( GLWorld )_world ;
+			}
 		} ;
 	}
 
 	@Override
 	public CameraAssist.Assist getCameraAssist()
 	{
-		final RenderInfo renderInfo = getRenderInfo() ;
-
 		return new CameraAssist.Assist()
 		{
 			@Override
@@ -507,6 +528,20 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				return _camera ;
 			}
 
+			public Camera amendDisplayResolution( final Camera _camera, final int _width, final int _height )
+			{
+				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
+				screen.setDimension( _width, _height ) ;
+				return _camera ;
+			}
+
+			public Camera amendDisplayOffset( final Camera _camera, final int _x, final int _y )
+			{
+				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
+				screen.setOffset( _x, _y ) ;
+				return _camera ;
+			}
+
 			@Override
 			public boolean getPosition( final Camera _camera, final Vector3 _populate )
 			{
@@ -539,32 +574,36 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public float convertInputToCameraX( final Camera _camera, final float _inputX )
 			{
-				return renderInfo.convertInputToRenderX( _camera, _inputX ) ;
+				final CameraData camera = cast( _camera ) ;
+				return camera.convertInputToX( _inputX ) ;
 			}
 
 			@Override
 			public float convertInputToCameraY( final Camera _camera, final float _inputY )
 			{
-				return renderInfo.convertInputToRenderY( _camera, _inputY ) ;
+				final CameraData camera = cast( _camera ) ;
+				return camera.convertInputToY( _inputY ) ;
 			}
 
 			@Override
 			public float convertInputToUICameraX( final Camera _camera, final float _inputX )
 			{
-				return renderInfo.convertInputToUIRenderX( _inputX ) ;
+				final CameraData camera = cast( _camera ) ;
+				return camera.convertInputToUIX( _inputX ) ;
 			}
 
 			@Override
 			public float convertInputToUICameraY( final Camera _camera, final float _inputY )
 			{
-				return renderInfo.convertInputToUIRenderY( _inputY ) ;
+				final CameraData camera = cast( _camera ) ;
+				return camera.convertInputToUIY( _inputY ) ;
 			}
 
 			@Override
 			public Camera addCamera( final Camera _camera, final World _world )
 			{
 				final GLWorld world = getWorldState().getWorld( cast( _world ) ) ;
-				world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
+				world.getCameraState().setDrawInterface( new GLCameraDraw( world ) ) ;
 				getWorldState().addCamera( cast( _camera ), world ) ;
 				return _camera ;
 			}
@@ -602,27 +641,10 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	}
 
 	@Override
-	public void setRenderDimensions( final int _width, final int _height )
-	{
-		super.setRenderDimensions( _width, _height ) ;
-		if( makeCurrent() == true )
-		{
-			resize() ;
-			release() ;
-		}
-	}
-
-	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
 		super.setDisplayDimensions( _width, _height ) ;
 		canvas.setSize( _width, _height ) ;
-
-		if( makeCurrent() == true )
-		{
-			resize() ;
-			release() ;
-		}
 	}
 
 	@Override
@@ -687,11 +709,8 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			case ORTHOGRAPHIC_MODE : 
 			default                :
 			{
-				final Vector2 dimension = getRenderInfo().getRenderDimensions() ;
-				//final Vector2 offset = getRenderInfo().getScreenOffset() ;
-
+				final Vector2 dimension = defaultCamera.getRenderScreen().dimension ;
 				CameraAssist.amendOrthographic( defaultCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-				CameraAssist.amendScreenResolution( defaultCamera, ( int )dimension.x, ( int )dimension.y ) ;
 				break ;
 			}
 		}
@@ -768,7 +787,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			canvas = GLWindow.create( capabilities ) ;
 
-			final Vector2 display = getRenderInfo().getDisplayDimensions() ;
+			final Vector2 display = defaultCamera.getDisplayScreen().dimension ;
 			canvas.setSize( ( int )display.x, ( int )display.y ) ;
 
 			// We want to be in complete control of any swapBuffer calls
@@ -790,7 +809,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		final GLWorld world = ( GLWorld )WorldAssist.constructWorld( "DEFAULT", 0 ) ;
 		worlds.setDefault( world ) ;
 
-		world.getCameraState().setDrawInterface( new GLCameraDraw( getRenderInfo(), world ) ) ;
+		world.getCameraState().setDrawInterface( new GLCameraDraw( world ) ) ;
 		worlds.addCamera( defaultCamera, null ) ;
 	}
 	
@@ -947,7 +966,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	private final static class GLCameraDraw implements CameraState.IDraw<CameraData>
 	{
 		private final GLWorld world ;
-		private final RenderInfo info ;
 
 		private final static Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
 		private final static Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
@@ -955,10 +973,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		private final Matrix4 worldProjection = new Matrix4() ;
 		private final Matrix4 uiProjection = new Matrix4() ;
 
-		public GLCameraDraw( final RenderInfo _info, final GLWorld _world )
+		public GLCameraDraw( final GLWorld _world )
 		{
 			world = _world ;
-			info = _info ;
 		}
 
 		@Override
