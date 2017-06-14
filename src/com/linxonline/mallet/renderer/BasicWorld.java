@@ -8,27 +8,26 @@ import com.linxonline.mallet.maths.IntVector2 ;
 */
 public class BasicWorld<D extends DrawData, C extends CameraData> implements World
 {
-	private final String id ;
 	private final int order ;
 	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
 	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
 	private final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
-	private final IntVector2 render = new IntVector2( 1280, 720 ) ;
+	private final MalletTexture.Meta meta ;
 
 	private final IntVector2 displayPosition = new IntVector2( 0, 0 ) ;
 	private final IntVector2 display = new IntVector2( 1280, 720 ) ;
 
 	public BasicWorld( final String _id, final int _order )
 	{
-		id = _id ;
+		meta = new MalletTexture.Meta( _id, 1280, 720 ) ;
 		order = _order ;
 	}
 
 	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		renderPosition.setXY( _x, _y ) ;
-		render.setXY( _width, _height ) ;
+		meta.set( _width, _height ) ;
 	}
 
 	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
@@ -43,7 +42,7 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	*/
 	public String getID()
 	{
-		return id ;
+		return meta.getPath() ;
 	}
 
 	/**
@@ -61,7 +60,7 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 
 	public IntVector2 getRender()
 	{
-		return render ;
+		return meta.dimensions ;
 	}
 
 	public IntVector2 getDisplayPosition()
@@ -124,6 +123,11 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		return cameras ;
 	}
 
+	public MalletTexture.Meta getMeta()
+	{
+		return meta ;
+	}
+
 	public void sort()
 	{
 		state.sort() ;
@@ -136,6 +140,6 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 
 	public String toString()
 	{
-		return id ;
+		return meta.toString() ;
 	}
 }

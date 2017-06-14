@@ -14,19 +14,26 @@ import com.linxonline.mallet.renderer.* ;
 */
 public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 {
-	private final static int FRAME_BUFFER    = 0 ;
-	private final static int COLOUR_BUFFER   = 1 ;
-	private final static int STENCIL_BUFFER  = 2 ;
-	//private final static int DEPTH_BUFFER    = 3 ;
+	protected final static int FRAME_BUFFER    = 0 ;
+	protected final static int COLOUR_BUFFER   = 1 ;
+	protected final static int STENCIL_BUFFER  = 2 ;
+	protected final static int DEPTH_BUFFER    = 3 ;
 
-	private final static int BUFFER_LENGTH   = 3 ;
+	protected final static int BUFFER_LENGTH   = 4 ;
 
-	private final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
-	private final int[] buffers = new int[BUFFER_LENGTH] ;
+	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
+	protected final int[] buffers = new int[BUFFER_LENGTH] ;
+
+	protected GLImage image ;
 
 	public GLWorld( final String _id, final int _order )
 	{
 		super( _id, _order ) ;
+	}
+
+	public static GLWorld createDefaultWorld( final String _id, final int _order )
+	{
+		return new GLDefaultWorld( _id, _order ) ;
 	}
 
 	@Override
@@ -41,14 +48,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		final IntVector2 display = getDisplay() ;
 
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-		gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
+		//gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
 
 		super.draw() ;
-
-		gl.glBindFramebuffer( GL3.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		gl.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
-							  disPosition.x, disPosition.y, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_LINEAR ) ;
 	}
 
 	@Override
@@ -56,6 +58,11 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	{
 		super.setRenderDimensions( _x, _y, _width, _height ) ;
 		updateBufferDimensions( _width, _height ) ;
+	}
+
+	public GLImage getImage()
+	{
+		return image ;
 	}
 
 	public GLGeometryUploader getUploader()
@@ -84,46 +91,94 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	public void init()
 	{
 		final GL3 gl = GLRenderer.getGL() ;
-		final IntVector2 render = getRender() ;
-		final IntVector2 display = getDisplay() ;
-
-		final int frameOffset = FRAME_BUFFER ;
-		final int renderOffset = COLOUR_BUFFER ;
 
 		// First buffer is the Framebuffer.
 		// Buffers afterwards are Renderbuffers.
-		gl.glGenRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ;
+		gl.glGenTextures( 1, buffers, COLOUR_BUFFER ) ;
+		gl.glGenRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
+		//gl.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
+
+		final IntVector2 render = getRender() ;
+		final int channel = 3 ;
+		final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
+		image = new GLImage( buffers[COLOUR_BUFFER], estimatedConsumption ) ;
 
 		updateBufferDimensions( render.x, render.y ) ;
 
-		gl.glGenFramebuffers( 1, buffers, frameOffset ) ;
+		gl.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ;
 		gl.glBindFramebuffer( GL3.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-		gl.glFramebufferRenderbuffer( GL3.GL_FRAMEBUFFER, GL3.GL_COLOR_ATTACHMENT0,  GL3.GL_RENDERBUFFER, buffers[COLOUR_BUFFER] ) ;
+
+		gl.glFramebufferTexture2D( GL3.GL_FRAMEBUFFER, GL3.GL_COLOR_ATTACHMENT0, GL3.GL_TEXTURE_2D, buffers[COLOUR_BUFFER], 0 ) ;
 		gl.glFramebufferRenderbuffer( GL3.GL_FRAMEBUFFER, GL3.GL_STENCIL_ATTACHMENT, GL3.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ;
 		//gl.glFramebufferRenderbuffer( GL3.GL_FRAMEBUFFER, GL3.GL_DEPTH_ATTACHMENT,   GL3.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ;
+
+		switch( gl.glCheckFramebufferStatus( GL3.GL_DRAW_FRAMEBUFFER ) )
+		{
+			case GL3.GL_FRAMEBUFFER_COMPLETE    : break ;
+			case GL3.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( getID() + " framebuffer undefined." ) ; break ;
+			case GL3.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( getID() + " framebuffer unsupported." ) ; break ;
+			default                             : System.out.println( getID() + " framebuffer corrupt." ) ; break ;
+		}
+
+		gl.glBindFramebuffer( GL3.GL_FRAMEBUFFER, 0 ) ;
 	}
 
 	public void shutdown()
 	{
 		final GL3 gl = GLRenderer.getGL() ;
-		final int frameOffset = FRAME_BUFFER ;
-		final int renderOffset = COLOUR_BUFFER ;
 
-		gl.glDeleteFramebuffers( 1, buffers, frameOffset ) ;
-		gl.glDeleteRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ;
+		gl.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
+		gl.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;
+		gl.glDeleteRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
+		//gl.glDeleteRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
 		uploader.shutdown() ;
 	}
 
 	private void updateBufferDimensions( final int _width, final int _height )
 	{
 		final GL3 gl = GLRenderer.getGL() ;
-		gl.glBindRenderbuffer( GL3.GL_RENDERBUFFER, buffers[COLOUR_BUFFER] ) ;
-		gl.glRenderbufferStorage( GL3.GL_RENDERBUFFER, GL3.GL_RGBA, _width, _height ) ;
+
+		gl.glBindTexture( GL3.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
+
+		gl.glPixelStorei( GL3.GL_UNPACK_ALIGNMENT, 1 ) ;
+		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, _width, _height, 0, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, null ) ;
+
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;
+
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_NEAREST ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_NEAREST ) ;
+		gl.glBindTexture( GL3.GL_TEXTURE_2D, 0 ) ;
 
 		gl.glBindRenderbuffer( GL3.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ;
 		gl.glRenderbufferStorage( GL3.GL_RENDERBUFFER, GL3.GL_STENCIL_INDEX8, _width, _height ) ;
 
 		//gl.glBindRenderbuffer( GL3.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ;
 		//gl.glRenderbufferStorage( GL3.GL_RENDERBUFFER, GL3.GL_DEPTH_COMPONENT, _width, _height ) ;
+	}
+
+	private static class GLDefaultWorld extends GLWorld
+	{
+		public GLDefaultWorld( final String _id, final int _order )
+		{
+			super( _id, _order ) ;
+		}
+
+		@Override
+		public void draw()
+		{
+			super.draw() ;
+			final IntVector2 renPosition = getRenderPosition() ;
+			final IntVector2 render = getRender() ;
+
+			final IntVector2 disPosition = getDisplayPosition() ;
+			final IntVector2 display = getDisplay() ;
+
+			final GL3 gl = GLRenderer.getGL() ;
+			gl.glBindFramebuffer( GL3.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+			gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, 0 ) ;
+			gl.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
+								  disPosition.x, disPosition.y, display.x, display.y, GL3.GL_COLOR_BUFFER_BIT , GL3.GL_LINEAR ) ;
+		}
 	}
 }

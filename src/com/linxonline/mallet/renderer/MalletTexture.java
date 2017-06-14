@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.Ratio ;
+import com.linxonline.mallet.maths.IntVector2 ;
 
 /**
 	Provides access to the Meta information of a texture
@@ -14,9 +15,22 @@ public class MalletTexture
 {
 	private final Meta meta ;
 
+	/**
+		Construct a MalletTexture that uses a resource 
+		from the file-system as a texture object.
+	*/
 	public MalletTexture( final String _texturePath )
 	{
 		meta = TextureAssist.createMeta( _texturePath ) ;
+	}
+
+	/**
+		Construct a MalletTexture that uses the World's
+		framebuffer as a texture object.
+	*/
+	public MalletTexture( final World _world )
+	{
+		meta = TextureAssist.createMeta( _world ) ;
 	}
 
 	/**
@@ -57,7 +71,7 @@ public class MalletTexture
 
 	public int getHeight()
 	{
-		return meta.height ;
+		return meta.getHeight() ;
 	}
 
 	/**
@@ -77,7 +91,7 @@ public class MalletTexture
 
 	public int getWidth()
 	{
-		return meta.width ;
+		return meta.getWidth() ;
 	}
 
 	/**
@@ -108,8 +122,7 @@ public class MalletTexture
 	public static class Meta
 	{
 		public final String path ;
-		public final int height ;
-		public final int width ;
+		public final IntVector2 dimensions = new IntVector2() ;
 		public final Ratio ratio ;
 
 		public Meta( final String _path,
@@ -117,9 +130,13 @@ public class MalletTexture
 					 final int _width )
 		{
 			path = _path ;
-			width = _width ;
-			height = _height ;
-			ratio = Ratio.calculateRatio( width, height ) ;
+			set( _width, _height ) ;
+			ratio = Ratio.calculateRatio( _width, _height ) ;
+		}
+
+		public void set( final int _width, final int _height )
+		{
+			dimensions.setXY( _width, _height ) ;
 		}
 
 		@Override
@@ -144,6 +161,21 @@ public class MalletTexture
 			return false ;
 		}
 
+		public int getWidth()
+		{
+			return dimensions.x ;
+		}
+
+		public int getHeight()
+		{
+			return dimensions.y ;
+		}
+
+		public String getPath()
+		{
+			return path ;
+		}
+
 		@Override
 		public int hashCode()
 		{
@@ -155,8 +187,8 @@ public class MalletTexture
 		{
 			final StringBuilder buffer = new StringBuilder() ;
 			buffer.append( "Path: " + path + '\n' ) ;
-			buffer.append( "Height: " + height + '\n' ) ;
-			buffer.append( "Width: " + width + '\n') ;
+			buffer.append( "Height: " + getHeight() + '\n' ) ;
+			buffer.append( "Width: " + getWidth() + '\n') ;
 			buffer.append( "Ratio: " + ratio ) ;
 			return buffer.toString() ;
 		}

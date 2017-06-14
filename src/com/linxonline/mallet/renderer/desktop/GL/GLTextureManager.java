@@ -46,6 +46,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
 	protected int imageFormat = GL3.GL_RGBA ;
+	protected GLWorldState worldState ;
 
 	public GLTextureManager()
 	{
@@ -74,6 +75,11 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
+	public void setWorldState( final GLWorldState _worldState )
+	{
+		worldState = _worldState ;
+	}
+
 	@Override
 	public GLImage get( final String _file )
 	{
@@ -91,6 +97,12 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				}
 				toBind.clear() ;
 			}
+		}
+
+		final GLWorld world = worldState.getWorld( _file ) ;
+		if( world != null )
+		{
+			return world.getImage() ;
 		}
 
 		return super.get( _file ) ;

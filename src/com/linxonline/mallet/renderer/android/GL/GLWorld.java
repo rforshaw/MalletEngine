@@ -14,19 +14,26 @@ import com.linxonline.mallet.renderer.* ;
 */
 public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 {
-	private final static int FRAME_BUFFER    = 0 ;
-	private final static int COLOUR_BUFFER   = 1 ;
-	private final static int STENCIL_BUFFER  = 2 ;
-	//private final static int DEPTH_BUFFER    = 3 ;
+	protected final static int FRAME_BUFFER    = 0 ;
+	protected final static int COLOUR_BUFFER   = 1 ;
+	protected final static int STENCIL_BUFFER  = 2 ;
+	protected final static int DEPTH_BUFFER    = 3 ;
 
-	private final static int BUFFER_LENGTH   = 3 ;
+	protected final static int BUFFER_LENGTH   = 4 ;
 
-	private final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
-	private final int[] buffers = new int[BUFFER_LENGTH] ;
+	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
+	protected final int[] buffers = new int[BUFFER_LENGTH] ;
+
+	protected GLImage image ;
 
 	public GLWorld( final String _id, final int _order )
 	{
 		super( _id, _order ) ;
+	}
+
+	public static GLWorld createDefaultWorld( final String _id, final int _order )
+	{
+		return new GLDefaultWorld( _id, _order ) ;
 	}
 
 	@Override
@@ -42,11 +49,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_STENCIL_BUFFER_BIT ) ;
 
 		super.draw() ;
-
-		GLES30.glBindFramebuffer( GLES30.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-		GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
-		GLES30.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
-								  disPosition.x, disPosition.y, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_LINEAR ) ;
 	}
 
 	@Override
@@ -54,6 +56,11 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	{
 		super.setRenderDimensions( _x, _y, _width, _height ) ;
 		updateBufferDimensions( _width, _height ) ;
+	}
+
+	public GLImage getImage()
+	{
+		return image ;
 	}
 
 	public GLGeometryUploader getUploader()
@@ -81,44 +88,72 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	public void init()
 	{
-		final IntVector2 render = getRender() ;
-		final IntVector2 display = getDisplay() ;
-
-		final int frameOffset = FRAME_BUFFER ;
-		final int renderOffset = COLOUR_BUFFER ;
-
 		// First buffer is the Framebuffer.
 		// Buffers afterwards are Renderbuffers.
-		GLES30.glGenRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ; //GLRenderer.handleError( "Gen Render Buffers" ) ;
+		GLES30.glGenTextures( 1, buffers, COLOUR_BUFFER ) ;
+		GLES30.glGenRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
+		//GLES30.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
+
+		final IntVector2 render = getRender() ;
+		final int channel = 3 ;
+		final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
+		image = new GLImage( buffers[COLOUR_BUFFER], estimatedConsumption ) ;
 
 		updateBufferDimensions( render.x, render.y ) ;
 
-		GLES30.glGenFramebuffers( 1, buffers, frameOffset ) ; 							//GLRenderer.handleError( "Gen Frame Buffers" ) ;
-		GLES30.glBindFramebuffer( GLES30.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ; 		//GLRenderer.handleError( "Gen Bind Buffers: " + buffers[FRAME_BUFFER] ) ;
-		GLES30.glFramebufferRenderbuffer( GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0,  GLES30.GL_RENDERBUFFER, buffers[COLOUR_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Attach Colour Buffers" ) ;
+		GLES30.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ; 							//GLRenderer.handleError( "Gen Frame Buffers" ) ;
+		GLES30.glBindFramebuffer( GLES30.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+
+		GLES30.glFramebufferTexture2D( GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, buffers[COLOUR_BUFFER], 0 ) ; 		//GLRenderer.handleError( "Gen Bind Buffers: " + buffers[FRAME_BUFFER] ) ;
 		GLES30.glFramebufferRenderbuffer( GLES30.GL_FRAMEBUFFER, GLES30.GL_STENCIL_ATTACHMENT, GLES30.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Attach Stencil Buffers" ) ;
 		//GLES30.glFramebufferRenderbuffer( GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_ATTACHMENT,   GLES30.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Render Buffers" ) ;
 	}
 
 	public void shutdown()
 	{
-		final int frameOffset = FRAME_BUFFER ;
-		final int renderOffset = COLOUR_BUFFER ;
-
-		GLES30.glDeleteFramebuffers( 1, buffers, frameOffset ) ;
-		GLES30.glDeleteRenderbuffers( buffers.length - renderOffset, buffers, renderOffset ) ;
+		GLES30.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
+		GLES30.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;
+		GLES30.glDeleteRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
+		//GLES30.glDeleteRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
 		uploader.shutdown() ;
 	}
 
 	private void updateBufferDimensions( final int _width, final int _height )
 	{
-		GLES30.glBindRenderbuffer( GLES30.GL_RENDERBUFFER, buffers[COLOUR_BUFFER] ) ; 				//GLRenderer.handleError( "Bind Colour" ) ;
-		GLES30.glRenderbufferStorage( GLES30.GL_RENDERBUFFER, GLES30.GL_RGBA8, _width, _height ) ; 	//GLRenderer.handleError( "Storage Colour" ) ;
+		GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
+		GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, _width, _height, 0, GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, null ) ;
+
+		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST ) ;
+		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST ) ;
 
 		GLES30.glBindRenderbuffer( GLES30.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ; 						//GLRenderer.handleError( "Bind Stencil" ) ;
 		GLES30.glRenderbufferStorage( GLES30.GL_RENDERBUFFER, GLES30.GL_STENCIL_INDEX8, _width, _height ) ; //GLRenderer.handleError( "Storage Stencil" ) ;
 
 		//GLES30.glBindRenderbuffer( GLES30.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ;
 		//GLES30.glRenderbufferStorage( GLES30.GL_RENDERBUFFER, GLES30.GL_DEPTH_COMPONENT, _width, _height ) ;
+	}
+
+	private static class GLDefaultWorld extends GLWorld
+	{
+		public GLDefaultWorld( final String _id, final int _order )
+		{
+			super( _id, _order ) ;
+		}
+
+		@Override
+		public void draw()
+		{
+			super.draw() ;
+			final IntVector2 renPosition = getRenderPosition() ;
+			final IntVector2 render = getRender() ;
+
+			final IntVector2 disPosition = getDisplayPosition() ;
+			final IntVector2 display = getDisplay() ;
+
+			GLES30.glBindFramebuffer( GLES30.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+			GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
+			GLES30.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
+									  disPosition.x, disPosition.y, display.x, display.y, GLES30.GL_COLOR_BUFFER_BIT , GLES30.GL_LINEAR ) ;
+		}
 	}
 }

@@ -44,6 +44,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
+	protected GLWorldState worldState ;
 
 	public GLTextureManager()
 	{
@@ -155,6 +156,11 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
+	public void setWorldState( final GLWorldState _worldState )
+	{
+		worldState = _worldState ;
+	}
+
 	@Override
 	public GLImage get( final String _file )
 	{
@@ -164,18 +170,33 @@ public class GLTextureManager extends AbstractManager<GLImage>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			final int size = toBind.size() ;
-			for( int i = 0; i < size; i++ )
+			if( toBind.isEmpty() == false )
 			{
-				final Tuple<String, Bitmap> tuple = toBind.get( i ) ;
-				final Bitmap bitmap = tuple.getRight() ;
-				put( tuple.getLeft(), bind( bitmap ) ) ;
-				bitmap.recycle() ;
+				final int size = toBind.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final Tuple<String, Bitmap> tuple = toBind.get( i ) ;
+					final Bitmap bitmap = tuple.getRight() ;
+					put( tuple.getLeft(), bind( bitmap ) ) ;
+					bitmap.recycle() ;
+				}
+				toBind.clear() ;
 			}
-			toBind.clear() ;
 		}
 
-		return super.get( _file ) ;
+		final GLImage image = super.get( _file ) ;
+		if( image != null )
+		{
+			return image ;
+		}
+		
+		final GLWorld world = worldState.getWorld( _file ) ;
+		if( world != null )
+		{
+			return world.getImage() ;
+		}
+
+		return null ;
 	}
 
 	/**

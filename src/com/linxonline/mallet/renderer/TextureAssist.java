@@ -29,6 +29,15 @@ public final class TextureAssist
 	}
 
 	/**
+		Using the passed in World generate appropriate 
+		meta information that represents its framebuffer.
+	*/
+	public static MalletTexture.Meta createMeta( final World _world )
+	{
+		return assist.createMeta( _world ) ;
+	}
+
+	/**
 		Return the maximum width and height texture 
 		supported by the active rendering system.
 	*/
@@ -40,6 +49,8 @@ public final class TextureAssist
 	public static interface Assist
 	{
 		public MalletTexture.Meta createMeta( final String _path ) ;
+		public MalletTexture.Meta createMeta( final World _world ) ;
+
 		public Vector2 getMaximumTextureSize() ;
 	}
 }

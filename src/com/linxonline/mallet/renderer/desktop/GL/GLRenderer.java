@@ -38,12 +38,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected GLWindow canvas ;
 	private static GL3 gl ;
 
-	protected CameraData defaultCamera = new CameraData( "MAIN" ) ;
+	protected CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
 
 	public GLRenderer()
 	{
 		super( new GLWorldState() ) ;
+		textures.setWorldState( getWorldState() ) ;
 		initWindow() ;
 	}
 
@@ -111,9 +112,23 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
+			public MalletTexture.Meta createMeta( final World _world )
+			{
+				final GLWorld world = cast( _world ) ;
+				return world.getMeta() ;
+			}
+
+			@Override
 			public Vector2 getMaximumTextureSize()
 			{
 				return new Vector2( maxTextureSize ) ;
+			}
+
+			private GLWorld cast( final World _world )
+			{
+				assert( _world != null ) ;
+				assert( !( _world instanceof GLWorld ) ) ;
+				return ( GLWorld )_world ;
 			}
 		} ;
 	}
@@ -421,16 +436,28 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			@Override
 			public World setRenderDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
 			{
-				final GLWorld world = cast( _world ) ;
-				world.setRenderDimensions( _x, _y, _width, _height ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLWorld world = cast( _world ) ;
+						world.setRenderDimensions( _x, _y, _width, _height ) ;
+					}
+				} ) ;
 				return _world ;
 			}
 
 			@Override
 			public World setDisplayDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
 			{
-				final GLWorld world = cast( _world ) ;
-				world.setDisplayDimensions( _x, _y, _width, _height ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLWorld world = cast( _world ) ;
+						world.setDisplayDimensions( _x, _y, _width, _height ) ;
+					}
+				} ) ;
 				return _world ;
 			}
 
@@ -732,7 +759,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	@Override
 	public void display( final GLAutoDrawable _drawable )
 	{
-		gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
+		updateExecutions() ;
 
 		getEventController().update() ;
 
@@ -806,13 +833,18 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	private void initDefaultWorld()
 	{
 		final GLWorldState worlds = getWorldState() ;
-		final GLWorld world = ( GLWorld )WorldAssist.constructWorld( "DEFAULT", 0 ) ;
+
+		final GLWorld world = GLWorld.createDefaultWorld( "DEFAULT", 0 ) ;
+		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
+		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+
+		worlds.addWorld( world ) ;
 		worlds.setDefault( world ) ;
 
 		world.getCameraState().setDrawInterface( new GLCameraDraw( world ) ) ;
 		worlds.addCamera( defaultCamera, null ) ;
 	}
-	
+
 	/**
 		Attempt to acquire a compatible GLProgram from 
 		the ProgramManager. Make sure the GLProgram 

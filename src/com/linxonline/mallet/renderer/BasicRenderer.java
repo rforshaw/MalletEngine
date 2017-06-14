@@ -16,6 +16,7 @@ public abstract class BasicRenderer<D extends DrawData,
 	private final WS worlds ;
 
 	private final EventController controller = new EventController() ;
+	private final List<Runnable> executions = MalletList.<Runnable>newList() ;
 
 	protected float drawDT   = 0.0f ;
 	protected float updateDT = 0.0f ;
@@ -189,6 +190,27 @@ public abstract class BasicRenderer<D extends DrawData,
 
 		final World world = WorldAssist.getDefaultWorld() ;
 		WorldAssist.setDisplayDimensions( world, 0, 0, _width, _height ) ;
+	}
+
+	public void invokeLater( final Runnable _run )
+	{
+		if( _run != null )
+		{
+			executions.add( _run ) ;
+		}
+	}
+
+	protected void updateExecutions()
+	{
+		if( executions.isEmpty() == false )
+		{
+			final int size = executions.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				executions.get( i ).run() ;
+			}
+			executions.clear() ;
+		}
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class GLProgram extends Resource
 					return false ;
 				}
 
-				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
 				_gl.glBindTexture( GL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
