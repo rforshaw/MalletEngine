@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import javax.media.opengl.* ;
+import com.jogamp.opengl.* ;
 
 import java.nio.* ;
 

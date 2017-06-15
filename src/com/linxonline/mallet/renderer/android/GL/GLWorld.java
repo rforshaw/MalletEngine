@@ -24,7 +24,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	protected GLImage image ;
+	protected GLImage backbuffer = null ;
 
 	public GLWorld( final String _id, final int _order )
 	{
@@ -49,6 +49,12 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		GLES30.glClear( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_STENCIL_BUFFER_BIT ) ;
 
 		super.draw() ;
+
+		if( backbuffer != null )
+		{
+			GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+			GLES30.glCopyTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
+		}
 	}
 
 	@Override
@@ -60,7 +66,28 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	public GLImage getImage()
 	{
-		return image ;
+		// We only want to create a back buffer if it ever gets 
+		// used by the developer, else we are allocating space 
+		// for no reason.
+		if( backbuffer == null )
+		{
+			final int channel = 3 ;
+			final IntVector2 render = getRender() ;
+
+			final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
+			backbuffer = new GLImage( 0, estimatedConsumption ) ;
+
+			GLES30.glGenTextures( 1, backbuffer.textureIDs, 0 ) ;
+			GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+
+			GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT ) ;
+			GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT ) ;
+
+			GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST ) ;
+			GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST ) ;
+		}
+
+		return backbuffer ;
 	}
 
 	public GLGeometryUploader getUploader()
@@ -95,10 +122,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		//GLES30.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
 
 		final IntVector2 render = getRender() ;
-		final int channel = 3 ;
-		final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
-		image = new GLImage( buffers[COLOUR_BUFFER], estimatedConsumption ) ;
-
 		updateBufferDimensions( render.x, render.y ) ;
 
 		GLES30.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ; 							//GLRenderer.handleError( "Gen Frame Buffers" ) ;
@@ -107,6 +130,16 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		GLES30.glFramebufferTexture2D( GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, buffers[COLOUR_BUFFER], 0 ) ; 		//GLRenderer.handleError( "Gen Bind Buffers: " + buffers[FRAME_BUFFER] ) ;
 		GLES30.glFramebufferRenderbuffer( GLES30.GL_FRAMEBUFFER, GLES30.GL_STENCIL_ATTACHMENT, GLES30.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Attach Stencil Buffers" ) ;
 		//GLES30.glFramebufferRenderbuffer( GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_ATTACHMENT,   GLES30.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Render Buffers" ) ;
+
+		switch( GLES30.glCheckFramebufferStatus( GLES30.GL_DRAW_FRAMEBUFFER ) )
+		{
+			case GLES30.GL_FRAMEBUFFER_COMPLETE    : break ;
+			case GLES30.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( getID() + " framebuffer undefined." ) ; break ;
+			case GLES30.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( getID() + " framebuffer unsupported." ) ; break ;
+			default                             : System.out.println( getID() + " framebuffer corrupt." ) ; break ;
+		}
+
+		GLES30.glBindFramebuffer( GLES30.GL_FRAMEBUFFER, 0 ) ;
 	}
 
 	public void shutdown()
@@ -122,6 +155,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	{
 		GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
 		GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, _width, _height, 0, GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, null ) ;
+
+		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT ) ;
+		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT ) ;
 
 		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST ) ;
 		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST ) ;

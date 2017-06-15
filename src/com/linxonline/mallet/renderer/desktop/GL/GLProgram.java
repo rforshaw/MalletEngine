@@ -3,7 +3,8 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
-import javax.media.opengl.* ;
+
+import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.renderer.ProgramMap ;
 

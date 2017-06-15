@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.Arrays ;
 
-import javax.media.opengl.* ;
+import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.io.Resource ;
 

@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 import java.util.Set ;
 import java.util.List ;
 
-import javax.media.opengl.* ;
+import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
@@ -24,7 +24,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	protected GLImage image ;
+	protected GLImage backbuffer = null ;
 
 	public GLWorld( final String _id, final int _order )
 	{
@@ -48,9 +48,15 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		final IntVector2 display = getDisplay() ;
 
 		gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-		//gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
+		gl.glClear( GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT | GL3.GL_STENCIL_BUFFER_BIT ) ;
 
 		super.draw() ;
+
+		if( backbuffer != null )
+		{
+			gl.glBindTexture( GL3.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+			gl.glCopyTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
+		}
 	}
 
 	@Override
@@ -62,7 +68,29 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	public GLImage getImage()
 	{
-		return image ;
+		// We only want to create a back buffer if it ever gets 
+		// used by the developer, else we are allocating space 
+		// for no reason.
+		if( backbuffer == null )
+		{
+			final int channel = 3 ;
+			final IntVector2 render = getRender() ;
+
+			final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
+			backbuffer = new GLImage( 0, estimatedConsumption ) ;
+
+			final GL3 gl = GLRenderer.getGL() ;
+			gl.glGenTextures( 1, backbuffer.textureIDs, 0 ) ;
+			gl.glBindTexture( GL3.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+
+			gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
+			gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;
+
+			gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_NEAREST ) ;
+			gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_NEAREST ) ;
+		}
+
+		return backbuffer ;
 	}
 
 	public GLGeometryUploader getUploader()
@@ -99,10 +127,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		//gl.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
 
 		final IntVector2 render = getRender() ;
-		final int channel = 3 ;
-		final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
-		image = new GLImage( buffers[COLOUR_BUFFER], estimatedConsumption ) ;
-
 		updateBufferDimensions( render.x, render.y ) ;
 
 		gl.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ;
@@ -139,16 +163,13 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		final GL3 gl = GLRenderer.getGL() ;
 
 		gl.glBindTexture( GL3.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
-
-		gl.glPixelStorei( GL3.GL_UNPACK_ALIGNMENT, 1 ) ;
-		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, _width, _height, 0, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, null ) ;
+		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGB, _width, _height, 0, GL3.GL_RGB, GL3.GL_UNSIGNED_BYTE, null ) ;
 
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;
 
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_NEAREST ) ;
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_NEAREST ) ;
-		gl.glBindTexture( GL3.GL_TEXTURE_2D, 0 ) ;
 
 		gl.glBindRenderbuffer( GL3.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ;
 		gl.glRenderbufferStorage( GL3.GL_RENDERBUFFER, GL3.GL_STENCIL_INDEX8, _width, _height ) ;

@@ -4,13 +4,7 @@ import java.util.Set ;
 import java.util.HashSet ;
 
 import com.jogamp.newt.opengl.GLWindow ;
-
-import javax.media.opengl.GLEventListener ;
-import javax.media.opengl.GLAutoDrawable ;
-import javax.media.opengl.GLCapabilities ;
-import javax.media.opengl.GLContext ;
-import javax.media.opengl.GLProfile ;
-import javax.media.opengl.GL3 ;
+import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.maths.* ;
 

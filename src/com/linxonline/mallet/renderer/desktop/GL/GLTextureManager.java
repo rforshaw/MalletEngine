@@ -6,7 +6,7 @@ import java.util.Iterator ;
 import java.awt.* ;
 import java.awt.image.* ;
 import java.awt.color.ColorSpace ;
-import javax.media.opengl.* ;
+import com.jogamp.opengl.* ;
 import javax.imageio.* ;
 import java.io.* ;
 import javax.imageio.stream.* ;

@@ -5,7 +5,7 @@ import java.util.List ;
 import java.util.Arrays ;
 import java.nio.* ;
 
-import javax.media.opengl.* ;
+import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Shape ;

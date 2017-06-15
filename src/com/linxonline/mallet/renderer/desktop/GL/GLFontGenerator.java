@@ -6,8 +6,6 @@ import javax.imageio.ImageIO ;
 import java.io.File ;
 import java.io.IOException ;
 
-import javax.media.opengl.* ;
-
 import java.awt.Font ;
 import java.awt.FontMetrics ;
 import java.awt.font.GlyphVector ;

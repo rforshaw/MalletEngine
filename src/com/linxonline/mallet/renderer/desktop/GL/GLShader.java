@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
-import javax.media.opengl.* ;
-
 import com.linxonline.mallet.io.Resource ;
 
 /**
