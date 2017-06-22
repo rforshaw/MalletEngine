@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.core.GlobalConfig ;
+
 import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.* ;
@@ -180,6 +182,9 @@ public abstract class BasicRenderer<D extends DrawData,
 
 		final World world = WorldAssist.getDefaultWorld() ;
 		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
+
+		GlobalConfig.addInteger( "RENDERWIDTH", _width ) ;
+		GlobalConfig.addInteger( "RENDERHEIGHT", _height ) ;
 	}
 
 	@Override

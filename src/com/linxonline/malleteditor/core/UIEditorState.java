@@ -1,5 +1,7 @@
 package com.linxonline.malleteditor.core ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;
@@ -83,7 +85,7 @@ public class UIEditorState extends GameState
 
 	private static void createMainView( final UIElement _view, final World _world )
 	{
-		_view.addListener( new UIListener()
+		_view.addListener( new UIListener<UIElement>()
 		{
 			private Draw draw1 = null ;
 
@@ -99,32 +101,29 @@ public class UIEditorState extends GameState
 											   new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 
 				DrawAssist.amendUI( draw1, true ) ;
-				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 640, 360, 0 ),
+				/*DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 640, 360, 0 ),
 																	new Vector2( 0, 1 ),
-																	new Vector2( 1, 0 ) ) ) ;
-				//DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
+																	new Vector2( 1, 0 ) ) ) ;*/
+				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
 
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				/*final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
-				DrawAssist.attachProgram( draw1, program ) ;
+				DrawAssist.attachProgram( draw1, program ) ;*/
 
-				//DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+				DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
 			@Override
-			public void addDraws( final DrawDelegate _delegate )
+			public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world ) 
 			{
 				_delegate.addBasicDraw( draw1, _world ) ;
 			}
 
 			@Override
-			public void removeDraws( final DrawDelegate _delegate )
-			{
-				_delegate.removeDraw( draw1 ) ;
-			}
+			public void refresh() {}
 
 			@Override
-			public void refresh() {}
+			public void shutdown() {}
 		} ) ;
 	}
 }

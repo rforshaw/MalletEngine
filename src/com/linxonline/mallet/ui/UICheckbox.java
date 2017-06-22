@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -118,12 +120,12 @@ public class UICheckbox extends UIElement
 		}
 
 		@Override
-		public void addDraws( final DrawDelegate<World, Draw> _delegate )
+		public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			super.addDraws( _delegate ) ;
+			super.passDrawDelegate( _delegate, _world ) ;
 			if( drawTick != null && getParent().isChecked() )
 			{
-				_delegate.addBasicDraw( drawTick, getWorld() ) ;
+				_delegate.addBasicDraw( drawTick, _world ) ;
 			}
 		}
 
@@ -137,22 +139,22 @@ public class UICheckbox extends UIElement
 				DrawAssist.forceUpdate( drawTick ) ;
 			}
 		}
-		
+
 		@Override
 		public InputEvent.Action mousePressed( final InputEvent _input )
 		{
 			final UICheckbox parent = getParent() ;
-			final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 
 			if( parent.isEngaged() == true )
 			{
-				parent.setChecked( !parent.isChecked() ) ;
+				final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 				if( delegate != null )
 				{
+					parent.setChecked( !parent.isChecked() ) ;
 					if( parent.isChecked() == true )
 					{
 						DrawAssist.forceUpdate( drawTick ) ;
-						delegate.addBasicDraw( drawTick ) ;
+						delegate.addBasicDraw( drawTick, getWorld() ) ;
 					}
 					else
 					{

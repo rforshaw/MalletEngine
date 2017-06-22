@@ -25,7 +25,7 @@ public class UIElement implements InputHandler
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
-	private final ListenerUnit<BaseListener<? extends UIElement>> listeners = new ListenerUnit<BaseListener<? extends UIElement>>() ;
+	private final ListenerUnit<IBase<? extends UIElement>> listeners = new ListenerUnit<IBase<? extends UIElement>>() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected State current = State.NEUTRAL ;
@@ -33,7 +33,6 @@ public class UIElement implements InputHandler
 	public boolean destroy = false ;
 	public boolean visible = true ;
 
-	private World world = WorldAssist.getDefaultWorld() ;
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
@@ -69,6 +68,20 @@ public class UIElement implements InputHandler
 	}
 
 	/**
+		Return the Draw objects that this UIElement wishes 
+		to render to the rendering system.
+	*/
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	{
+		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
+		final int size = base.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			base.get( i ).passDrawDelegate( _delegate, _world ) ;
+		}
+	}
+
+	/**
 		Add an event to the event list.
 		This list will be polled on the next elements 
 		update, the events will eventually find their 
@@ -84,7 +97,7 @@ public class UIElement implements InputHandler
 		Caution: BaseListeners not designed for the elements 
 		sub-type can still be added, not caught at compile-time.
 	*/
-	public <T extends BaseListener> T addListener( final T _listener )
+	public <T extends IBase> T addListener( final T _listener )
 	{
 		if( listeners.add( _listener ) == true )
 		{
@@ -98,7 +111,7 @@ public class UIElement implements InputHandler
 		return true if the listener was removed else 
 		return false.
 	*/
-	public <T extends BaseListener<? extends UIElement>> boolean removeListener( final T _listener )
+	public <T extends IBase<? extends UIElement>> boolean removeListener( final T _listener )
 	{
 		if( listeners.remove( _listener ) == true )
 		{
@@ -125,7 +138,7 @@ public class UIElement implements InputHandler
 	public void engage()
 	{
 		current = State.ENGAGED ;
-		final List<BaseListener<? extends UIElement>> base = listeners.getListeners() ;
+		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -139,7 +152,7 @@ public class UIElement implements InputHandler
 	public void disengage()
 	{
 		current = State.NEUTRAL ;
-		final List<BaseListener<? extends UIElement>> base = listeners.getListeners() ;
+		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -158,7 +171,7 @@ public class UIElement implements InputHandler
 			disengage() ;
 		}
 	}
-	
+
 	/**
 		Inform the caller whether the element is engaged.
 		If a child element is engaged then the parent 
@@ -221,7 +234,7 @@ public class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	private static InputEvent.Action updateListeners( final List<BaseListener<? extends UIElement>> _base,
+	private static InputEvent.Action updateListeners( final List<IBase<? extends UIElement>> _base,
 													  final InputAction _action,
 													  final InputEvent _event )
 	{
@@ -413,11 +426,6 @@ public class UIElement implements InputHandler
 		margin.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
 	}
 
-	public void setWorld( final World _world )
-	{
-		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
-	}
-
 	public void setLayer( final int _layer )
 	{
 		layer = _layer ;
@@ -565,11 +573,6 @@ public class UIElement implements InputHandler
 		return margin ;
 	}
 
-	public World getWorld()
-	{
-		return world ;
-	}
-
 	public int getLayer()
 	{
 		return layer ;
@@ -631,13 +634,13 @@ public class UIElement implements InputHandler
 
 	private interface InputAction
 	{
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event ) ;
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event ) ;
 	}
 	
 	private static final InputAction mouseMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.mouseMove( _event ) ;
 		}
@@ -646,7 +649,7 @@ public class UIElement implements InputHandler
 	private static final InputAction mousePressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.mousePressed( _event ) ;
 		}
@@ -655,7 +658,7 @@ public class UIElement implements InputHandler
 	private static final InputAction mouseReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.mouseReleased( _event ) ;
 		}
@@ -664,7 +667,7 @@ public class UIElement implements InputHandler
 	private static final InputAction touchMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.touchMove( _event ) ;
 		}
@@ -673,7 +676,7 @@ public class UIElement implements InputHandler
 	private static final InputAction touchPressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.touchPressed( _event ) ;
 		}
@@ -682,7 +685,7 @@ public class UIElement implements InputHandler
 	private static final InputAction touchReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.touchReleased( _event ) ;
 		}
@@ -691,7 +694,7 @@ public class UIElement implements InputHandler
 	private static final InputAction keyReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.keyReleased( _event ) ;
 		}
@@ -700,7 +703,7 @@ public class UIElement implements InputHandler
 	private static final InputAction keyPressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.keyPressed( _event ) ;
 		}
@@ -709,7 +712,7 @@ public class UIElement implements InputHandler
 	private static final InputAction analogueMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final BaseListener _listener, final InputEvent _event )
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
 		{
 			return _listener.analogueMove( _event ) ;
 		}

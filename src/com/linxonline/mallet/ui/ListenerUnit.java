@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class ListenerUnit<T extends BaseListener<? extends UIElement>>
+public class ListenerUnit<T extends IBase<? extends UIElement>>
 {
 	private final List<T> listeners = MalletList.<T>newList() ;
 

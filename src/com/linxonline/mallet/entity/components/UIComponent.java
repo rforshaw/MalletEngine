@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.audio.* ;
 
@@ -15,10 +16,15 @@ public class UIComponent extends InputComponent
 {
 	private final List<UIElement> elements = MalletList.<UIElement>newList() ;
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;
+
+	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
+	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
+
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
 	private Component.ReadyCallback toDestroy = null ;
+	private DrawDelegate<World, Draw> delegate = null ;
 
 	public UIComponent()
 	{
@@ -61,6 +67,11 @@ public class UIComponent extends InputComponent
 	@Override
 	public void readyToDestroy( final Component.ReadyCallback _callback )
 	{
+		if( delegate != null )
+		{
+			delegate.shutdown() ;
+		}
+
 		for( final UIElement element : elements )
 		{
 			removeElement( element ) ;
@@ -139,6 +150,26 @@ public class UIComponent extends InputComponent
 	{
 		super.passInitialEvents( _events ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
+		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		{
+			public void callback( final DrawDelegate<World, Draw> _delegate )
+			{
+				if( delegate != null )
+				{
+					// Don't call shutdown(), we don't want to 
+					// clean anything except an existing DrawDelegate.
+					delegate.shutdown() ;
+				}
+
+				delegate = _delegate ;
+				final int size = elements.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = elements.get( i ) ;
+					element.passDrawDelegate( delegate, WorldAssist.getDefaultWorld() ) ;
+				}
+			}
+		} ) ) ;
 	}
 
 	@Override

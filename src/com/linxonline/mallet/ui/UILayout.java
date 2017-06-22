@@ -3,9 +3,10 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
+
 import com.linxonline.mallet.audio.AudioDelegate ;
 
+import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
@@ -46,6 +47,16 @@ public class UILayout extends UIElement
 		}
 
 		setEngageMode( new SingleEngageListener() ) ;
+	}
+
+	@Override
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	{
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			ordered.get( i ).passDrawDelegate( _delegate, _world ) ;
+		}
 	}
 
 	/**
@@ -521,7 +532,7 @@ public class UILayout extends UIElement
 			_element.setLayer( _layer + 1 ) ;
 		}
 	}
-	
+
 	public enum Type
 	{
 		HORIZONTAL,

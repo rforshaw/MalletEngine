@@ -1,11 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.World ;
-
 /**
 	Makes a request to receive a DrawDelegate from the 
 	active Rendering System. addDraws() will be called 
@@ -15,15 +9,10 @@ import com.linxonline.mallet.renderer.World ;
 */
 public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 {
-	private DrawDelegate<World, Draw> delegate = null ;
-	private boolean visible = true ;
-
-	@Override
+	/*@Override
 	public void setParent( final T _parent )
 	{
 		super.setParent( _parent ) ;
-		visible = _parent.isVisible() ;
-
 		_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
 			public void callback( final DrawDelegate<World, Draw> _delegate )
@@ -45,45 +34,11 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 		} ) ) ;
 
 		constructDraws() ;
-	}
+	}*/
 
-	/**
-		Can be used to construct Draw objects before a 
-		DrawDelegate is provided by the Rendering System.
-	*/
-	public abstract void constructDraws() ;
 
-	/**
-		Called when listener receives a valid DrawDelegate
-		and when the parent UIElement is flagged as visible.
-	*/
-	public abstract void addDraws( final DrawDelegate<World, Draw> _delegate ) ;
 
-	/**
-		Only called if there is a valid DrawDelegate and 
-		when the parent UIElement is flagged as invisible.
-	*/
-	public abstract void removeDraws( final DrawDelegate<World, Draw> _delegate ) ;
-
-	/**
-		Return the world this UIListener is expected to use.
-		The world to be used comes from the parent UIElement.
-	*/
-	public World getWorld()
-	{
-		return getParent().getWorld() ;
-	}
-
-	/**
-		Returns valid DrawDelegate, return null if no 
-		Render System has yet to respond to DrawDelgate request.
-	*/
-	public DrawDelegate<World, Draw> getDrawDelegate()
-	{
-		return delegate ;
-	}
-
-	@Override
+	/*@Override
 	public void refresh()
 	{
 		final T parent = getParent() ;
@@ -104,17 +59,5 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 				}
 			}
 		}
-	}
-	
-	/**
-		Clean up any resources allocated to the listener.
-	*/
-	@Override
-	public void shutdown()
-	{
-		if( delegate != null )
-		{
-			delegate.shutdown() ;
-		}
-	}
+	}*/
 }

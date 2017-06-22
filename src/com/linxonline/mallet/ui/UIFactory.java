@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
@@ -144,6 +146,9 @@ public final class UIFactory
 		private final MalletTexture sheet ;
 		private final UIElement.UV uv ;
 
+		private DrawDelegate<World, Draw> delegate = null ;
+		private World world = null ;
+
 		protected Draw draw = null ;
 		protected Draw drawText = null ;
 
@@ -195,6 +200,16 @@ public final class UIFactory
 			return text ;
 		}
 
+		public DrawDelegate<World, Draw> getDrawDelegate()
+		{
+			return delegate ;
+		}
+
+		public World getWorld()
+		{
+			return world ;
+		}
+
 		/**
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
@@ -244,30 +259,25 @@ public final class UIFactory
 			Called when listener receives a valid DrawDelegate.
 		*/
 		@Override
-		public void addDraws( final DrawDelegate<World, Draw> _delegate )
+		public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
+			delegate = _delegate ;
+			world = _world ;
+
 			if( draw != null )
 			{
-				_delegate.addBasicDraw( draw, getWorld() ) ;
+				delegate.addBasicDraw( draw, world ) ;
 			}
 
 			if( drawText != null )
 			{
-				_delegate.addTextDraw( drawText, getWorld() ) ;
+				delegate.addTextDraw( drawText, world ) ;
 			}
 		}
 
 		@Override
-		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
-		{
-			_delegate.removeDraw( draw ) ;
-			_delegate.removeDraw( drawText ) ;
-		}
-		
-		@Override
 		public void refresh()
 		{
-			super.refresh() ;
 			final T parent = getParent() ;
 
 			updateLength( parent.getLength() ) ;
@@ -290,11 +300,14 @@ public final class UIFactory
 				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
 
 				textOffset.add( x, y, 0.0f ) ;
-				
+
 				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
 		}
+
+		@Override
+		public void shutdown() {}
 
 		private void updateLength( final Vector3 _length )
 		{

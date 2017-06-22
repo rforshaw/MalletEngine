@@ -258,20 +258,20 @@ public class JUI
 		{
 			public UIElement create( final JUI _map, final JSONObject _ui )
 			{
-				final String layout = _ui.optString( "LAYOUT", null ) ;
-				final double length = _ui.optDouble( "LENGTH", 0.0 ) ;
+				final UILayout.Type type = UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ;
 
-				final UIMenu element = new UIMenu( UILayout.Type.derive( layout ), ( float )length ) ;
-				applyLookup( _map, element, _ui ) ;
+				final UILayout element = new UILayout( type ) ;
+				applyLengths( element, _ui ) ;
 				applyLayer( element, _ui ) ;
-				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
+				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
 				}
 
+				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
 		} ) ;
