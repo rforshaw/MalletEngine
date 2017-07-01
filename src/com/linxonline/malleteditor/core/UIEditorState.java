@@ -114,16 +114,19 @@ public class UIEditorState extends GameState
 			}
 
 			@Override
-			public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world ) 
+			public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 			{
 				_delegate.addBasicDraw( draw1, _world ) ;
 			}
 
 			@Override
-			public void refresh() {}
+			public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+			{
+				_delegate.removeDraw( draw1 ) ;
+			}
 
 			@Override
-			public void shutdown() {}
+			public void refresh() {}
 		} ) ;
 	}
 }

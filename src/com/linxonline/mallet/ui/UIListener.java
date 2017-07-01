@@ -1,5 +1,7 @@
 package com.linxonline.mallet.ui ;
 
+import com.linxonline.mallet.renderer.* ;
+
 /**
 	Makes a request to receive a DrawDelegate from the 
 	active Rendering System. addDraws() will be called 
@@ -9,49 +11,55 @@ package com.linxonline.mallet.ui ;
 */
 public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 {
-	/*@Override
+	private DrawDelegate<World, Draw> delegate = null ;
+	private World world = null ;
+
+	private boolean visible = true ;
+
+	/**
+		Called when listener receives a valid DrawDelegate
+		and when the parent UIElement is flagged as visible.
+	*/
+	public abstract void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world ) ;
+
+	/**
+		Only called if there is a valid DrawDelegate and 
+		when the parent UIElement is flagged as invisible.
+	*/
+	public abstract void removeDraws( final DrawDelegate<World, Draw> _delegate ) ;
+
+	@Override
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	{
+		delegate = _delegate ;
+		world = _world ;
+
+		super.passDrawDelegate( _delegate, _world ) ;
+		if( visible == true )
+		{
+			addDraws( delegate, _world ) ;
+		}
+	}
+
+	@Override
 	public void setParent( final T _parent )
 	{
 		super.setParent( _parent ) ;
-		_parent.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
-			{
-				if( delegate != null )
-				{
-					// Don't call shutdown(), we don't want to 
-					// clean anything except an existing DrawDelegate.
-					delegate.shutdown() ;
-				}
+		visible = _parent.isVisible() ;
+	}
 
-				delegate = _delegate ;
-				visible = _parent.isVisible() ;
-				if( visible == true )
-				{
-					addDraws( delegate ) ;
-				}
-			}
-		} ) ) ;
-
-		constructDraws() ;
-	}*/
-
-
-
-	/*@Override
+	@Override
 	public void refresh()
 	{
 		final T parent = getParent() ;
 		if( visible != parent.isVisible() )
 		{
 			visible = parent.isVisible() ;
-			final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
-
 			if( delegate != null )
 			{
 				if( visible == true )
 				{
-					addDraws( delegate ) ;
+					addDraws( delegate, world ) ;
 				}
 				else
 				{
@@ -59,5 +67,22 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 				}
 			}
 		}
-	}*/
+	}
+
+	@Override
+	public void shutdown()
+	{
+		delegate = null ;
+		world = null ;
+	}
+
+	public DrawDelegate<World, Draw> getDrawDelegate()
+	{
+		return delegate ;
+	}
+
+	public World getWorld()
+	{
+		return world ;
+	}
 }

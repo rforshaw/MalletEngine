@@ -162,11 +162,15 @@ public class UIComponent extends InputComponent
 				}
 
 				delegate = _delegate ;
+				final World world = WorldAssist.getDefaultWorld() ;
+
+				System.out.println( "Draw Delegates.." ) ;
+
 				final int size = elements.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = elements.get( i ) ;
-					element.passDrawDelegate( delegate, WorldAssist.getDefaultWorld() ) ;
+					element.passDrawDelegate( delegate, world ) ;
 				}
 			}
 		} ) ) ;

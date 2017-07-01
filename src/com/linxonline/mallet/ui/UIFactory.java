@@ -146,9 +146,6 @@ public final class UIFactory
 		private final MalletTexture sheet ;
 		private final UIElement.UV uv ;
 
-		private DrawDelegate<World, Draw> delegate = null ;
-		private World world = null ;
-
 		protected Draw draw = null ;
 		protected Draw drawText = null ;
 
@@ -200,16 +197,6 @@ public final class UIFactory
 			return text ;
 		}
 
-		public DrawDelegate<World, Draw> getDrawDelegate()
-		{
-			return delegate ;
-		}
-
-		public World getWorld()
-		{
-			return world ;
-		}
-
 		/**
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
@@ -256,23 +243,32 @@ public final class UIFactory
 		}
 
 		/**
-			Called when listener receives a valid DrawDelegate.
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
 		*/
 		@Override
-		public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			delegate = _delegate ;
-			world = _world ;
-
 			if( draw != null )
 			{
-				delegate.addBasicDraw( draw, world ) ;
+				_delegate.addBasicDraw( draw, _world ) ;
 			}
 
 			if( drawText != null )
 			{
-				delegate.addTextDraw( drawText, world ) ;
+				_delegate.addTextDraw( drawText, _world ) ;
 			}
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			_delegate.removeDraw( draw ) ;
+			_delegate.removeDraw( drawText ) ;
 		}
 
 		@Override
@@ -305,9 +301,6 @@ public final class UIFactory
 				DrawAssist.forceUpdate( drawText ) ;
 			}
 		}
-
-		@Override
-		public void shutdown() {}
 
 		private void updateLength( final Vector3 _length )
 		{

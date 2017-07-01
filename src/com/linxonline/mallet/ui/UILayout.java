@@ -52,6 +52,7 @@ public class UILayout extends UIElement
 	@Override
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
 	{
+		super.passDrawDelegate( _delegate, _world ) ;
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
 		{

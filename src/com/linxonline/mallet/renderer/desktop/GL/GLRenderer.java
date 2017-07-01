@@ -719,22 +719,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			// size but rendering to a smaller size and subsequently being upscaled.
 			super.setRenderDimensions( _width, _height ) ;
 		}
-		resize() ;
-	}
-
-	protected void resize()
-	{
-		switch( viewMode )
-		{
-			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
-			case ORTHOGRAPHIC_MODE : 
-			default                :
-			{
-				final Vector2 dimension = defaultCamera.getRenderScreen().dimension ;
-				CameraAssist.amendOrthographic( defaultCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-				break ;
-			}
-		}
 	}
 
 	@Override
