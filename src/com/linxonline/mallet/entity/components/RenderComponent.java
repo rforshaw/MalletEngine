@@ -111,7 +111,7 @@ public class RenderComponent extends Component
 					final int size = toAddBasic.size() ;
 					for( int i = 0; i < size; i++ )
 					{
-						final Draw draw = toAddBasic.get( 0 ) ;
+						final Draw draw = toAddBasic.get( i ) ;
 						addBasicDraw( draw ) ;
 					}
 					toAddBasic.clear() ;
