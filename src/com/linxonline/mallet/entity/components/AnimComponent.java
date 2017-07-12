@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 import java.util.Map ;
 
+import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.animation.AnimationDelegateCallback ;
@@ -11,15 +12,16 @@ import com.linxonline.mallet.animation.AnimationAssist ;
 import com.linxonline.mallet.animation.Anim ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.renderer.World ;
 
 public class AnimComponent extends EventComponent implements SourceCallback
 {
 	private static final int ANIM_NOT_SET = -1 ;
 
-	private final Map<String, Anim> animations = MalletMap.<String, Anim>newMap() ;
+	private final Map<String, Tuple<Anim, World>> animations = MalletMap.<String, Tuple<Anim, World>>newMap() ;
 
 	private String defaultAnim = null ;					// Name of the default animation, used as a fallback if all else fails.
-	private Anim currentAnim   = null ;					// Name of the current animation that is playing
+	private Tuple<Anim, World> currentAnim   = null ;					// Name of the current animation that is playing
 
 	private AnimationDelegate delegate        = null ;
 	private Component.ReadyCallback toDestroy = null ;
@@ -37,8 +39,13 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public void addAnimation( final String _name, final Anim _anim )
 	{
+		addAnimation( _name, _anim, null ) ;
+	}
+
+	public void addAnimation( final String _name, final Anim _anim, final World _world )
+	{
 		AnimationAssist.addCallback( _anim, this ) ;
-		animations.put( _name, _anim ) ;
+		animations.put( _name, new Tuple<Anim, World>( _anim, _world ) ) ;
 	}
 
 	public void removeAnimation( final String _name )
@@ -48,7 +55,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public Anim getAnimation( final String _name )
 	{
-		return animations.get( _name ) ;
+		return animations.get( _name ).getLeft() ;
 	}
 
 	public void setDefaultAnim( final String _name )
@@ -97,11 +104,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 		}
 
 		stopAnimation() ;
-		final Anim anim = animations.get( _name ) ;
-		if( delegate != null && anim != null )
+		final Tuple<Anim, World> tuple = animations.get( _name ) ;
+		if( delegate != null && tuple != null )
 		{
-			delegate.addAnimation( anim, null ) ;
-			currentAnim = anim ;
+			delegate.addAnimation( tuple.getLeft(), tuple.getRight() ) ;
+			currentAnim = tuple ;
 		}
 	}
 
@@ -117,7 +124,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 		if( delegate != null && currentAnim != null )
 		{
-			delegate.removeAnimation( currentAnim ) ;
+			delegate.removeAnimation( currentAnim.getLeft() ) ;
 		}
 	}
 

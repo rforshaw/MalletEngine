@@ -52,6 +52,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 		if( backbuffer != null )
 		{
+			GLES30.glBindFramebuffer( GLES30.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+			GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
+
 			GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
 			GLES30.glCopyTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
 		}

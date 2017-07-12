@@ -10,11 +10,12 @@ import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Tuple ;
 
 public class RenderComponent extends Component
 {
-	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
-	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
+	private final List<Tuple<Draw, World>> toAddBasic = MalletList.<Tuple<Draw, World>>newList() ;
+	private final List<Tuple<Draw, World>> toAddText = MalletList.<Tuple<Draw, World>>newList() ;
 
 	private DrawDelegate<World, Draw> drawDelegate = null ;
 	private Component.ReadyCallback toDestroy = null ;
@@ -36,26 +37,10 @@ public class RenderComponent extends Component
 
 	public void addBasicDraw( final Draw _draw )
 	{
-		if( toDestroy != null )
-		{
-			// toDestroy will only be set if the entity 
-			// has been flagged for destruction, if that's 
-			// the case there is no point add a draw object 
-			// that will need to be removed.
-			return ;
-		}
-
-		if( drawDelegate == null )
-		{
-			// If the renderer has yet to give a drawDelegate
-			toAddBasic.add( _draw ) ;
-			return ;
-		}
-
-		drawDelegate.addBasicDraw( _draw, null ) ;
+		addBasicDraw( _draw, null ) ;
 	}
 
-	public void addTextDraw( final Draw _draw )
+	public void addBasicDraw( final Draw _draw, final World _world )
 	{
 		if( toDestroy != null )
 		{
@@ -69,11 +54,37 @@ public class RenderComponent extends Component
 		if( drawDelegate == null )
 		{
 			// If the renderer has yet to give a drawDelegate
-			toAddText.add( _draw ) ;
+			toAddBasic.add( new Tuple<Draw, World>( _draw, _world ) ) ;
 			return ;
 		}
 
-		drawDelegate.addTextDraw( _draw, null ) ;
+		drawDelegate.addBasicDraw( _draw, _world ) ;
+	}
+
+	public void addTextDraw( final Draw _draw )
+	{
+		addTextDraw( _draw, null ) ;
+	}
+
+	public void addTextDraw( final Draw _draw, final World _world )
+	{
+		if( toDestroy != null )
+		{
+			// toDestroy will only be set if the entity 
+			// has been flagged for destruction, if that's 
+			// the case there is no point add a draw object 
+			// that will need to be removed.
+			return ;
+		}
+
+		if( drawDelegate == null )
+		{
+			// If the renderer has yet to give a drawDelegate
+			toAddText.add( new Tuple<Draw, World>( _draw, _world ) ) ;
+			return ;
+		}
+
+		drawDelegate.addTextDraw( _draw, _world ) ;
 	}
 
 	public void remove( final Draw _draw )
@@ -111,8 +122,8 @@ public class RenderComponent extends Component
 					final int size = toAddBasic.size() ;
 					for( int i = 0; i < size; i++ )
 					{
-						final Draw draw = toAddBasic.get( i ) ;
-						addBasicDraw( draw ) ;
+						final Tuple<Draw, World> tuple = toAddBasic.get( i ) ;
+						addBasicDraw( tuple.getLeft(), tuple.getRight() ) ;
 					}
 					toAddBasic.clear() ;
 				}
@@ -122,8 +133,8 @@ public class RenderComponent extends Component
 					final int size = toAddText.size() ;
 					for( int i = 0; i < size; i++ )
 					{
-						final Draw draw = toAddText.get( i ) ;
-						addTextDraw( draw ) ;
+						final Tuple<Draw, World> tuple = toAddText.get( i ) ;
+						addTextDraw( tuple.getLeft(), tuple.getRight() ) ;
 					}
 					toAddText.clear() ;
 				}
