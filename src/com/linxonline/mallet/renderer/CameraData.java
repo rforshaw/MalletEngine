@@ -51,12 +51,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, render, display ) ;
+		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		final float halfRender = render.x * 0.5f ;
 
 		final float t1 = ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) - halfRender ;
-		final float cam = ( t1 * scale.x ) + position.x ;
+		final float cam = ( t1 / scale.x ) + position.x ;
 		return cam ;
 	}
 
@@ -67,12 +67,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, render, display ) ;
+		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		final float halfRender = render.y * 0.5f ;
 
 		final float t1 = ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) - halfRender ;
-		final float cam = ( t1 * scale.y ) + position.y  ;
+		final float cam = ( t1 / scale.y ) + position.y  ;
 		return cam ;
 	}
 
@@ -83,7 +83,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, render, display ) ;
+		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) ;
 	}
@@ -92,6 +92,10 @@ public class CameraData<T extends CameraData> implements Camera<T>
 	{
 		final Vector2 render = renderScreen.dimension ;
 		final Vector2 display = displayScreen.dimension ;
+
+		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
+		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
+		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) ;
 	}
@@ -225,12 +229,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		}
 
 		public static Vector2 calculateOffset( final Vector2 _offset,
-											   final Vector2 _rDimension,
-											   final Vector2 _dDimension )
+											   final Vector2 _rOffset,
+											   final Vector2 _dOffset )
 		{
-			_offset.setXY( _dDimension ) ;
-			_offset.subtract( _rDimension ) ;
-			_offset.multiply( 0.5f ) ;
+			_offset.setXY( _rOffset ) ;
+			//_offset.subtract( _rDimension ) ;
+			//_offset.multiply( 0.5f ) ;
 			return _offset ;
 		}
 	}

@@ -994,8 +994,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final CameraData.Projection projection = _camera.getProjection() ;
 			final CameraData.Screen screen = _camera.getRenderScreen() ;
 
-			gl.glViewport( ( int )screen.offset.x, ( int )screen.offset.y,
-							( int )screen.dimension.x, ( int )screen.dimension.y ) ;
+			final int width = ( int )screen.dimension.x ;
+			final int height = ( int )screen.dimension.y ;
+			gl.glViewport( 0, 0, width, height ) ;
 
 			final Vector3 position = _camera.getPosition() ;
 			final Vector3 scale = _camera.getScale() ;
