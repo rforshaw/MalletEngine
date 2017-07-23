@@ -1,5 +1,6 @@
 package com.linxonline.mallet.core.android ;
 
+import android.app.Activity ;
 import android.util.DisplayMetrics ;
 
 import com.linxonline.mallet.maths.* ;
@@ -39,9 +40,17 @@ import com.linxonline.mallet.ui.UIRatio ;
 
 public abstract class AndroidStarter extends AbstractStarter
 {
+	private final AndroidActivity activity ;
+
 	public AndroidStarter( final AndroidActivity _activity, final Notification.Notify _notify )
 	{
-		super( new GLAndroidSystem( _activity, _notify ) ) ;
+		this( new GLAndroidSystem( _activity, _notify ), _activity ) ;
+	}
+
+	public AndroidStarter( final ISystem _system, final AndroidActivity _activity )
+	{
+		super( _system ) ;
+		activity = _activity ;
 	}
 
 	public void run()
@@ -74,7 +83,7 @@ public abstract class AndroidStarter extends AbstractStarter
 	@Override
 	public void setRenderSettings( final ISystem _system )
 	{
-		final AndroidActivity activity = ( ( GLAndroidSystem )_system ).activity ;
+		final AndroidActivity activity = getActivity() ;
 		final DisplayMetrics metrics = new DisplayMetrics() ;
 		activity.getWindowManager().getDefaultDisplay().getMetrics( metrics ) ;
 
@@ -88,5 +97,10 @@ public abstract class AndroidStarter extends AbstractStarter
 		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", ( int )metrics.xdpi ) ) ;
 		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", ( int )metrics.ydpi ) ) ;
 		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
+	}
+
+	public AndroidActivity getActivity()
+	{
+		return activity ;
 	}
 }

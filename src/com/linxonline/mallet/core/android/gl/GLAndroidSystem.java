@@ -1,13 +1,12 @@
 package com.linxonline.mallet.core.android.gl ;
 
-import android.content.Context ;
+import android.app.Activity ;
 import android.content.res.Resources ;
 import android.view.Window ;
 import android.view.WindowManager ;
 import android.media.AudioManager ;
 
 import com.linxonline.mallet.core.android.AndroidActivity ;
-
 import com.linxonline.mallet.core.BasicSystem ;
 import com.linxonline.mallet.core.DefaultShutdown ;
 import com.linxonline.mallet.renderer.* ;
