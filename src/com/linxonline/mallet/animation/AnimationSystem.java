@@ -89,7 +89,7 @@ public class AnimationSystem
 				final int size = toRemoveAnim.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final AnimData anim = toRemoveAnim.get( 0 ) ;
+					final AnimData anim = toRemoveAnim.get( i ) ;
 					anim.stop() ;
 					animations.remove( anim ) ;
 					drawDelegate.removeDraw( anim.getDraw() ) ;

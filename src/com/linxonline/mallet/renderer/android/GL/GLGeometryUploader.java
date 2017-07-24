@@ -31,7 +31,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public class GLGeometryUploader
 {
-	protected final static ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
+	protected final ObjectCache<Location> locationCache = new ObjectCache<Location>( Location.class ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFF ;
 	private final static int PRIMITIVE_EXPANSION = 1 ;
@@ -1052,7 +1052,7 @@ public class GLGeometryUploader
 						return location ;
 					}
 
-					remove( _data ) ;
+					super.remove( _data ) ;
 				}
 			}
 

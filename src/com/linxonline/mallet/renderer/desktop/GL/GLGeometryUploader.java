@@ -287,6 +287,7 @@ public class GLGeometryUploader
 			case TEXT    : buffer = new GLTextBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ; break ;
 			case STENCIL :
 			{
+				buffer = new GLStencilBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
 				final IBuffer endBuffer = new GLEndBuffer( buffer, _data.getEndOrder() )
 				{
 					public void end( final GL3 _gl )
@@ -297,7 +298,6 @@ public class GLGeometryUploader
 				} ;
 
 				OrderedInsert.insert( endBuffer, buffers ) ;
-				buffer = new GLStencilBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
 				break ;
 			}
 			case DEPTH   : break ;
