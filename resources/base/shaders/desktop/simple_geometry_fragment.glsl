@@ -1,6 +1,5 @@
 #version 150
 
-varying vec2 outTexCoord0 ;
 varying vec4 outColour ;
 
 void main()
