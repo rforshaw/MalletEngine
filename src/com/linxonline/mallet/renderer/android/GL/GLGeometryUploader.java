@@ -41,7 +41,14 @@ public class GLGeometryUploader
 
 	private final short[] indicies ;
 	private final float[] verticies ;
-	private int programID = -1 ;
+	// ProgramID is used to minimise the amount of calls made to 
+	// glUseProgram - if the previous buffer used the same program 
+	// while drawing as the current buffer then we don't change the 
+	// program that's in use.
+	// ProgramID is static as each GLWorld contains its own GeometryUploader,
+	// it's planned that uploading geometry can be done concurrently
+	// however drawing cannot.
+	private static int programID = -1 ;
 
 	private final ShortBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
