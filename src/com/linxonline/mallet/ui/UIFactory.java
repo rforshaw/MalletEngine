@@ -274,6 +274,7 @@ public final class UIFactory
 		@Override
 		public void refresh()
 		{
+			super.refresh() ;
 			final T parent = getParent() ;
 
 			updateLength( parent.getLength() ) ;

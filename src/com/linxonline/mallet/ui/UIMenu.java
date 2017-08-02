@@ -61,6 +61,13 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
+		public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			super.passDrawDelegate( _delegate, _world ) ;
+			dropdown.passDrawDelegate( _delegate, _world ) ;
+		}
+
+		@Override
 		public InputEvent.Action passInputEvent( final InputEvent _event )
 		{
 			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
