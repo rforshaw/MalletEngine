@@ -17,6 +17,16 @@ public final class WorldAssist
 	}
 
 	/**
+		Get the world associated with the specified id.
+		If the id is not associated with a world then 
+		null is returned instead.
+	*/
+	public static World getWorld( final String _id )
+	{
+		return assist.getWorld( _id ) ;
+	}
+
+	/**
 		Add the world to the rendering system so it 
 		can be rendered out.
 		A world should not be added multiple times.
@@ -65,6 +75,7 @@ public final class WorldAssist
 	public interface Assist
 	{
 		public World getDefaultWorld() ;
+		public World getWorld( final String _id ) ;
 
 		public World addWorld( final World _world ) ;
 		public World removeWorld( final World _world ) ;

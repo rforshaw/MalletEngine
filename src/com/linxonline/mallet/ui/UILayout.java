@@ -633,7 +633,7 @@ public class UILayout extends UIElement
 			final UILayout layout = getParent() ;
 			final List<UIElement> elements = layout.ordered ;
 
-			if( currentEngaged == null )
+			if( currentEngaged == null && currentIndex < elements.size() )
 			{
 				setCurrentEngaged( elements.get( currentIndex ), currentIndex ) ;
 			}

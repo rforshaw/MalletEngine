@@ -132,6 +132,12 @@ public class InputSystem implements IInputSystem,
 	{
 		switch( _event.getButton() )
 		{
+			// If the Mouse Event comes from a button greater 
+			// than the three supported don't ignore it.
+			// Consider it as the first mouse button.
+			// This is better than the user clicking and 
+			// getting no response.
+			default                 :
 			case MouseEvent.BUTTON1 :
 			{
 				mousePosition.x = _event.getX() ;
@@ -153,7 +159,6 @@ public class InputSystem implements IInputSystem,
 				updateMouse( InputType.MOUSE3_PRESSED, mousePosition ) ;
 				break ;
 			}
-			default                 : break ;
 		}
 	}
 
@@ -161,6 +166,12 @@ public class InputSystem implements IInputSystem,
 	{
 		switch( _event.getButton() )
 		{
+			// If the Mouse Event comes from a button greater 
+			// than the three supported don't ignore it.
+			// Consider it as the first mouse button.
+			// This is better than the user clicking and 
+			// getting no response.
+			default                 :
 			case MouseEvent.BUTTON1 :
 			{
 				mousePosition.x = _event.getX() ;
@@ -182,7 +193,6 @@ public class InputSystem implements IInputSystem,
 				updateMouse( InputType.MOUSE3_RELEASED, mousePosition ) ;
 				break ;
 			}
-			default                 : break ;
 		}
 	}
 

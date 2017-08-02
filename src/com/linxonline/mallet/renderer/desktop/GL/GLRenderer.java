@@ -406,6 +406,12 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
+			public World getWorld( final String _id )
+			{
+				return getWorldState().getWorld( _id ) ;
+			}
+
+			@Override
 			public World addWorld( final World _world )
 			{
 				final GLWorld world = cast( _world ) ;
