@@ -310,13 +310,14 @@ public class UILayout extends UIElement
 		provided. Multiple elements will share vertical space.
 		Elements with minimum height set will be provided with it.
 	*/
-	private UIElementUpdater getVerticalUpdater()
+	protected UIElementUpdater getVerticalUpdater()
 	{
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
+			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 availableLength = new Vector3() ;
@@ -408,13 +409,14 @@ public class UILayout extends UIElement
 		provided. Multiple elements will share horizontal space.
 		Elements with minimum width set will be provided with it.
 	*/
-	private UIElementUpdater getHorizontalUpdater()
+	protected UIElementUpdater getHorizontalUpdater()
 	{
 		return new UIElementUpdater()
 		{
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
+			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 availableLength = new Vector3() ;
@@ -495,10 +497,11 @@ public class UILayout extends UIElement
 		} ;
 	}
 
-	private UIElementUpdater getGridUpdater()
+	protected UIElementUpdater getGridUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 
@@ -506,10 +509,11 @@ public class UILayout extends UIElement
 		} ;
 	}
 
-	private UIElementUpdater getFormUpdater()
+	protected UIElementUpdater getFormUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 			
@@ -517,14 +521,14 @@ public class UILayout extends UIElement
 		} ;
 	}
 
-	private static void calcAbsolutePosition( final Vector3 _pos, final UIElement _element )
+	protected static void calcAbsolutePosition( final Vector3 _pos, final UIElement _element )
 	{
 		final Vector3 pos = _element.getPosition() ;
 		final Vector3 offset = _element.getOffset() ;
 		_pos.setXYZ( pos.x + offset.x, pos.y + offset.y, pos.z + offset.z ) ;
 	}
 
-	private static void applyLayer( final UIElement _element, final int _layer )
+	protected static void applyLayer( final UIElement _element, final int _layer )
 	{
 		if( _element.getLayer() < _layer )
 		{
@@ -695,7 +699,7 @@ public class UILayout extends UIElement
 		}
 	}
 
-	private interface UIElementUpdater
+	protected interface UIElementUpdater
 	{
 		public void update( final float _dt, final List<UIElement> _ordered ) ;
 	}

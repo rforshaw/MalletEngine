@@ -723,6 +723,11 @@ public class UIElement implements InputHandler
 		public final Vector2 min ;
 		public final Vector2 max ;
 
+		public UV()
+		{
+			this( new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;
+		}
+
 		public UV( final Vector2 _min, final Vector2 _max )
 		{
 			min = _min ;
