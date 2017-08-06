@@ -212,6 +212,14 @@ public class UIElement implements InputHandler
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
+		if( isIntersectInput( _event ) == false )
+		{
+			// A UIElement should only pass the InputEvent 
+			// to its listeners if the input is intersecting 
+			// else we run the risk of doing pointless processing.
+			return InputEvent.Action.PROPAGATE ;
+		}
+
 		switch( _event.getInputType() )
 		{
 			case MOUSE_MOVED       : return updateListeners( listeners.getListeners(), mouseMoveAction, _event ) ;

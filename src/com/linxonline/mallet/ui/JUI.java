@@ -260,7 +260,7 @@ public class JUI
 			{
 				final UILayout.Type type = UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ;
 
-				final UILayout element = new UILayout( type ) ;
+				final UIList element = new UIList( type ) ;
 				applyLengths( element, _ui ) ;
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
@@ -329,7 +329,7 @@ public class JUI
 					if( align != null )
 					{
 						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
@@ -338,7 +338,7 @@ public class JUI
 					if( align != null )
 					{
 						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
@@ -420,7 +420,7 @@ public class JUI
 		return null ;
 	}
 
-	private static UIElement createElement( final JUI _map, final JSONObject _ui )
+	public static UIElement createElement( final JUI _map, final JSONObject _ui )
 	{
 		final String type = _ui.optString( "TYPE", null ) ;
 		final Generator create = creators.get( type ) ;

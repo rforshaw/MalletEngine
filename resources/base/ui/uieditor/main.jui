@@ -36,6 +36,7 @@
 						"LAYOUT" : "VERTICAL",
 						"NAME" : "FileDropdown",
 						"LENGTH" : "5, 3.5, 0",
+						"LAYER" : "100",
 						"CHILDREN" : [
 							{
 								"TYPE" : "UIBUTTON",
@@ -145,6 +146,7 @@
 						"LAYOUT" : "VERTICAL",
 						"NAME" : "EditDropdown",
 						"LENGTH" : "5, 2.3, 0",
+						"LAYER" : "100",
 						"CHILDREN" : [
 							{
 								"TYPE" : "UIBUTTON",
@@ -231,6 +233,7 @@
 						"LAYOUT" : "VERTICAL",
 						"NAME" : "HelpDropdown",
 						"LENGTH" : "5, 2.3, 0",
+						"LAYER" : "100",
 						"CHILDREN" : [
 							{
 								"TYPE" : "UIBUTTON",
@@ -304,10 +307,193 @@
 			"CHILDREN" : [
 				{
 					"TYPE" : "UILIST",
-					"LAYOUT" : "HORIZONTAL",
+					"LAYOUT" : "VERTICAL",
 					"NAME" : "UIElementPanel",
 					"CHILDREN" : [
-					
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIBUTTON",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Test 1",
+								"FONT" : "Arial",
+								"FONT_SIZE" : 33,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"NEUTRAL_UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								},
+								"ROLLOVER_UV" : {
+									"MIN" : "0.0, 0.5",
+									"MAX" : "0.5, 1.0"
+								},
+								"CLICKED_UV" : {
+									"MIN" : "0.5, 0.0",
+									"MAX" : "1.0, 0.5"
+								}
+							}
+						}
 					],
 					"MAX_LENGTH" : "5.5, 0, 0",
 					"UILISTENER" : {
@@ -319,8 +505,7 @@
 					}
 				},
 				{
-					"TYPE" : "UILAYOUT",
-					"LAYOUT" : "HORIZONTAL",
+					"TYPE" : "UIELEMENT",
 					"MAX_LENGTH" : "0.2, 0, 0",
 					"UILISTENER" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
@@ -332,15 +517,10 @@
 				},
 				{
 					"TYPE" : "UIELEMENT",
-					"LAYOUT" : "HORIZONTAL",
 					"NAME" : "MainWindow",
-					"CHILDREN" : [
-					
-					]
 				},
 				{
-					"TYPE" : "UILAYOUT",
-					"LAYOUT" : "HORIZONTAL",
+					"TYPE" : "UIELEMENT",
 					"MAX_LENGTH" : "0.2, 0, 0",
 					"UILISTENER" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
@@ -352,7 +532,7 @@
 				},
 				{
 					"TYPE" : "UILIST",
-					"LAYOUT" : "HORIZONTAL",
+					"LAYOUT" : "VERTICAL",
 					"NAME" : "UITree",
 					"CHILDREN" : [
 					

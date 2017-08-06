@@ -15,6 +15,8 @@ public class UILayout extends UIElement
 {
 	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
+
+	private Type type ;
 	private final UIElementUpdater updater ;										// Used to position the layouts children
 
 	private EngageListener engageMode = null ;										// Selection/Focus mode
@@ -37,7 +39,9 @@ public class UILayout extends UIElement
 	public UILayout( final Type _type, final Vector3 _position, final Vector3 _offset, final Vector3 _length )
 	{
 		super( _position, _offset, _length ) ;
-		switch( _type )
+
+		type = _type ;
+		switch( type )
 		{
 			case HORIZONTAL : updater = getHorizontalUpdater() ; break ;
 			case VERTICAL   : updater = getVerticalUpdater() ;   break ;
@@ -111,6 +115,16 @@ public class UILayout extends UIElement
 		{
 			_elements.add( ordered.get( i ) ) ;
 		}
+	}
+
+	/**
+		Return the child elements attached to this 
+		UILayout - should only be used if you are 
+		extending this class.
+	*/
+	protected List<UIElement> getElements()
+	{
+		return ordered ;
 	}
 
 	/**
@@ -243,30 +257,6 @@ public class UILayout extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	@Override
-	public boolean isIntersectInput( final InputEvent _event )
-	{
-		if( super.isIntersectInput( _event ) == true )
-		{
-			return true ;
-		}
-
-		// A UILayout may contain UIElements that extend outside 
-		// of its defined dimensions.
-		// If the input is outside of the layout we need to see if 
-		// it's outside of all child elements. 
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( ordered.get( i ).isIntersectInput( _event ) == true )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
-	}
-
 	/**
 		Cleanup any resources, handlers that the listeners 
 		may have acquired.
@@ -303,6 +293,11 @@ public class UILayout extends UIElement
 		}
 
 		ordered.clear() ;
+	}
+
+	public Type getType()
+	{
+		return type ;
 	}
 
 	/**

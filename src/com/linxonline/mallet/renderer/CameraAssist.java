@@ -44,6 +44,11 @@ public final class CameraAssist
 		return assist.amendScale( _camera, _x, _y, _z ) ;
 	}
 
+	public static Camera amendUIPosition( final Camera _camera, final float _x, final float _y, final float _z )
+	{
+		return assist.amendUIPosition( _camera, _x, _y, _z ) ;
+	}
+
 	public static Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
 	{
 		return assist.amendScreenResolution( _camera, _width, _height ) ;
@@ -82,6 +87,11 @@ public final class CameraAssist
 	public static boolean getDimensions( final Camera _camera, final Vector3 _populate )
 	{
 		return assist.getDimensions( _camera, _populate ) ;
+	}
+
+	public static boolean getUIPosition( final Camera _camera, final Vector3 _populate )
+	{
+		return assist.getUIPosition( _camera, _populate ) ;
 	}
 
 	public static float convertInputToCameraX( final Camera _camera, final float _inputX )
@@ -138,6 +148,8 @@ public final class CameraAssist
 		public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z ) ;
 		public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z ) ;
 
+		public Camera amendUIPosition( final Camera _camera, final float _x, final float _y, final float _z ) ;
+
 		public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height ) ;
 		public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y ) ;
 
@@ -148,6 +160,8 @@ public final class CameraAssist
 		public boolean getRotation( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getScale( final Camera _camera, final Vector3 _populate ) ;
 		public boolean getDimensions( final Camera _camera, final Vector3 _populate ) ;
+
+		public boolean getUIPosition( final Camera _camera, final Vector3 _populate ) ;
 
 		public float convertInputToCameraX( final Camera _camera, final float _inputX ) ;
 		public float convertInputToCameraY( final Camera _camera, final float _inputY ) ;

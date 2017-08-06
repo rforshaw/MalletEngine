@@ -8,14 +8,17 @@ public class CameraData<T extends CameraData> implements Camera<T>
 {
 	private final String id ;
 
+	private final Vector3 oldUIPosition = new Vector3() ;
 	private final Vector3 oldPosition = new Vector3() ;
 	private final Vector3 oldRotation = new Vector3()  ;
 	private final Vector3 oldScale = new Vector3() ;
 
+	private final Vector3 uiPosition ;
 	private final Vector3 position ;
 	private final Vector3 rotation ;
 	private final Vector3 scale ;
 
+	private final Vector3 currentUIPosition = new Vector3() ;
 	private final Vector3 currentPosition = new Vector3() ;
 	private final Vector3 currentRotation = new Vector3()  ;
 	private final Vector3 currentScale = new Vector3() ;
@@ -39,6 +42,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 					   final Vector3 _scale )
 	{
 		id = _id ;
+		uiPosition = new Vector3() ;
 		position = _position ;
 		rotation = _rotation ;
 		scale = _scale ;
@@ -85,7 +89,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) ;
+		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + uiPosition.x ;
 	}
 
 	public float convertInputToUIY( final float _y )
@@ -97,7 +101,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) ;
+		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + uiPosition.y ;
+	}
+
+	public Vector3 getUIPosition()
+	{
+		return uiPosition ;
 	}
 
 	public Vector3 getPosition()
@@ -150,11 +159,17 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		scale.setXYZ( _x, _y, _z ) ;
 	}
 
+	public void setUIPosition( final float _x, final float _y, final float _z )
+	{
+		uiPosition.setXYZ( _x, _y, _z ) ;
+	}
+
 	protected void update( final int _diff, final int _iteration )
 	{
-		interpolate( position, oldPosition, currentPosition, _diff, _iteration ) ;
-		interpolate( scale,    oldScale,    currentScale,    _diff, _iteration ) ;
-		interpolate( rotation, oldRotation, currentRotation, _diff, _iteration ) ;
+		interpolate( uiPosition, oldUIPosition, currentUIPosition, _diff, _iteration ) ;
+		interpolate( position,   oldPosition,   currentPosition,   _diff, _iteration ) ;
+		interpolate( scale,      oldScale,      currentScale,      _diff, _iteration ) ;
+		interpolate( rotation,   oldRotation,   currentRotation,   _diff, _iteration ) ;
 	}
 
 	@Override

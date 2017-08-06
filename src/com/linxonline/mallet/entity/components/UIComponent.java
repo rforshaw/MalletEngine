@@ -20,6 +20,7 @@ public class UIComponent extends InputComponent
 	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
 	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
 
+	private final World world ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
@@ -28,27 +29,35 @@ public class UIComponent extends InputComponent
 
 	public UIComponent()
 	{
-		super( "UI", "UICOMPONENT", InputMode.UI ) ;
+		this( "UI", "UICOMPONENT", InputMode.UI, WorldAssist.getDefaultWorld() ) ;
 	}
 
 	public UIComponent( final String _name )
 	{
-		this( _name, "UICOMPONENT", InputMode.UI ) ;
+		this( _name, "UICOMPONENT", InputMode.UI, WorldAssist.getDefaultWorld() ) ;
 	}
 
 	public UIComponent( final String _name, final String _group )
 	{
-		this( _name, _group, InputMode.UI ) ;
+		this( _name, _group, InputMode.UI, WorldAssist.getDefaultWorld() ) ;
 	}
 
 	public UIComponent( final String _name, final InputMode _mode )
 	{
-		this( _name, "UICOMPONENT", _mode ) ;
+		this( _name, "UICOMPONENT", _mode, WorldAssist.getDefaultWorld() ) ;
 	}
 
-	public UIComponent( final String _name, final String _group, final InputMode _mode )
+	public UIComponent( final String _name,
+						final String _group,
+						final InputMode _mode,
+						final World _world )
 	{
 		super( _name, _group, _mode ) ;
+
+		// Allow the developer to specify what world 
+		// this UI should be drawn to - if no world 
+		// is specified we will assume its the default.
+		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
 	}
 
 	public <T extends UIElement> T addElement( final T _element )
@@ -162,9 +171,6 @@ public class UIComponent extends InputComponent
 				}
 
 				delegate = _delegate ;
-				final World world = WorldAssist.getDefaultWorld() ;
-
-				System.out.println( "Draw Delegates.." ) ;
 
 				final int size = elements.size() ;
 				for( int i = 0; i < size; i++ )

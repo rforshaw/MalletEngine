@@ -141,7 +141,7 @@ public class UICheckbox extends UIElement
 		}
 
 		@Override
-		public InputEvent.Action mousePressed( final InputEvent _input )
+		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
 			final UICheckbox parent = getParent() ;
 
@@ -168,9 +168,9 @@ public class UICheckbox extends UIElement
 		}
 
 		@Override
-		public InputEvent.Action touchPressed( final InputEvent _input )
+		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return mousePressed( _input ) ;
+			return mouseReleased( _input ) ;
 		}
 
 		@Override

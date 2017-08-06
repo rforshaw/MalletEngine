@@ -13,20 +13,46 @@ import com.linxonline.mallet.maths.* ;
 public class UIList extends UILayout
 {
 	private final World world ;
+	private final Camera camera ;
 	private final Draw pane ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
 	
+	// Used to define the boundaries of the scroll
+	private final Vector3 absoluteLength = new Vector3() ;		// In pixels
+
 	// Anything added to the UIList will make use of this 
 	// DrawDelegate rather than the delegate coming from 
 	// the UIComponent.
 	private DrawDelegate<World, Draw> delegate = null ;
 
-	public UIList( final Type _type, final float _length )
+	public UIList( final Type _type )
 	{
-		super( _type ) ;
+		this( _type, new Vector3(), new Vector3(), new Vector3() ) ;
+	}
+
+	public UIList( final Type _type, final Vector3 _length )
+	{
+		this( _type, new Vector3(), new Vector3(), _length ) ;
+	}
+
+	public UIList( final Type _type, final Vector3 _offset, final Vector3 _length )
+	{
+		this( _type, new Vector3(), _offset, _length ) ;
+	}
+
+	public UIList( final Type _type, final Vector3 _position, final Vector3 _offset, final Vector3 _length )
+	{
+		super( _type, _position, _offset, _length ) ;
+		setDefaultElementSize( 1.0f, 1.0f, 1.0f ) ;
+
 		final UUID uid = UUID.randomUUID() ;
 		world = WorldAssist.constructWorld( uid.toString(), 0 ) ;
+		camera = CameraAssist.createCamera( "SCROLL_CAMERA", new Vector3(),
+															 new Vector3(),
+															 new Vector3( 1, 1, 1 ) ) ;
+
+		CameraAssist.addCamera( camera, world ) ;
 		pane = UIList.createPane( world, this ) ;
 
 		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
@@ -45,22 +71,88 @@ public class UIList extends UILayout
 			}
 		} ) ) ;
 
-		switch( _type )
-		{
-			case HORIZONTAL :
-			{
-				setMaximumLength( 0.0f, _length, 0.0f ) ;
-				break ;
-			}
-			case VERTICAL :
-			default       :
-			{
-				setMaximumLength( _length, 0.0f, 0.0f ) ;
-				break ;
-			}
-		}
+		initScrollInput() ;
 	}
 
+	private void initScrollInput()
+	{
+		addListener( new InputListener()
+		{
+			private final Vector3 position = new Vector3() ;
+			private final Vector3 length = new Vector3() ;
+
+			private final Vector2 current = new Vector2() ;
+			private final Vector2 last = new Vector2() ;
+			private final Vector2 diff = new Vector2() ;
+
+			private boolean active = false ;
+			private boolean moved = false ;
+
+			@Override
+			public InputEvent.Action touchReleased( final InputEvent _input )
+			{
+				return mouseReleased( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action touchPressed( final InputEvent _input )
+			{
+				return mousePressed( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action mouseReleased( final InputEvent _input )
+			{
+				active = false ;
+				if( moved == true )
+				{
+					moved = false ;
+					return InputEvent.Action.CONSUME ;
+				}
+
+				return InputEvent.Action.PROPAGATE ;
+			}
+			
+			@Override
+			public InputEvent.Action mousePressed( final InputEvent _input )
+			{
+				active = true ;
+				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+			
+			@Override
+			public InputEvent.Action mouseMove( final InputEvent _input )
+			{
+				current.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+				if( active == true )
+				{
+					moved = true ;
+					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - current.x ) : 0.0f ;
+					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - current.y ) : 0.0f ;
+
+					CameraAssist.getUIPosition( camera, position ) ;
+					getLength( length ) ;
+
+					position.add( diff.x, diff.y, 0.0f ) ;
+
+					/*position.x = ( position.x >= -absoluteLength.x ) ? position.x : -absoluteLength.x ;
+					position.y = ( position.y >= -absoluteLength.y ) ? position.y : -absoluteLength.y ;
+
+					position.x = ( position.x + length.x < absoluteLength.x ) ? position.x : 0.0f ;
+					position.y = ( position.y + length.y < absoluteLength.y ) ? position.y : 0.0f ;*/
+
+					CameraAssist.amendUIPosition( camera, position.x, position.y, 0.0f ) ;
+					last.setXY( current ) ;
+					return InputEvent.Action.CONSUME ;
+				}
+
+				last.setXY( current ) ;
+				return InputEvent.Action.PROPAGATE ;
+			}
+		} ) ;
+	}
+	
 	/**
 		If any elements added to this list do not have a minimum or 
 		maximum length defined then this value will be used instead.
@@ -74,6 +166,24 @@ public class UIList extends UILayout
 		defaultItemSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
 		defaultItemSize.y = ( _y <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _y ) ;
 		defaultItemSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
+	}
+
+	@Override
+	public void setLength( final float _x, final float _y, final float _z )
+	{
+		super.setLength( _x, _y, _z ) ;
+
+		final Vector3 length = getLength() ;
+		final int width = ( int )length.x ;
+		final int height = ( int )length.y ;
+
+		CameraAssist.amendScreenResolution( camera, width, height ) ;
+		CameraAssist.amendOrthographic( camera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
+
+		WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
+
+		Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
+		DrawAssist.forceUpdate( pane ) ;
 	}
 
 	@Override
@@ -121,10 +231,50 @@ public class UIList extends UILayout
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 layoutPosition = new Vector3() ;
+			private final Vector3 childPosition = new Vector3() ;
+
 			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
+				final Vector3 listLength = UIList.this.getLength() ;
+				absoluteLength.setXYZ( listLength.x, 0.0f, listLength.z ) ;
 
+				calcAbsolutePosition( layoutPosition, UIList.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
+
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					final UIRatio ratio = element.getRatio() ;
+
+					final Vector3 length = element.getLength() ;
+					final Vector3 margin = element.getMargin() ;
+
+					if( length.y < 0.01f )
+					{
+						final Vector3 maximum = element.getMaximumLength() ;
+						if( maximum.y > 0.0f )
+						{
+							element.setLength( ratio.toUnitX( listLength.x ),
+											   ratio.toUnitY( maximum.y ),
+											   ratio.toUnitZ( listLength.z ) ) ;
+						}
+						else
+						{
+							element.setLength( ratio.toUnitX( listLength.x ),
+											   ratio.toUnitY( defaultItemSize.y ),
+											   ratio.toUnitZ( listLength.z ) ) ;
+						}
+					}
+
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
+					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+					absoluteLength.add( 0.0f, length.y + margin.y, 0.0f ) ;
+				}
 			}
 		} ;
 	}
@@ -134,11 +284,9 @@ public class UIList extends UILayout
 		If the element's length is greater than 0 then 
 		it will be given that space.
 
-		If the element does not have a valid length then 
-		minimum length will be used instead.
-
-		If the element does not have a valid minimum length, 
-		then maximum will be used.
+		If the element does not have a valid length, 
+		then maximum will be used. Minimum does not need to 
+		be checked as length cannot be smaller than minimum.
 
 		If non of the above provide a valid length then the 
 		element's length will be set to default item size. 
@@ -147,10 +295,50 @@ public class UIList extends UILayout
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 layoutPosition = new Vector3() ;
+			private final Vector3 childPosition = new Vector3() ;
+
 			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
+				final Vector3 listLength = UIList.this.getLength() ;
+				absoluteLength.setXYZ( 0.0f, listLength.y, listLength.z ) ;
 
+				calcAbsolutePosition( layoutPosition, UIList.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
+
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					final UIRatio ratio = element.getRatio() ;
+
+					final Vector3 length = element.getLength() ;
+					final Vector3 margin = element.getMargin() ;
+
+					if( length.x < 0.01f )
+					{
+						final Vector3 maximum = element.getMaximumLength() ;
+						if( maximum.x > 0.0f )
+						{
+							element.setLength( ratio.toUnitX( maximum.x ),
+											   ratio.toUnitY( listLength.y ),
+											   ratio.toUnitZ( listLength.z ) ) ;
+						}
+						else
+						{
+							element.setLength( ratio.toUnitX( defaultItemSize.x ),
+											   ratio.toUnitY( listLength.y ),
+											   ratio.toUnitZ( listLength.z ) ) ;
+						}
+					}
+
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
+					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
+					absoluteLength.add( length.x + margin.x, 0.0f, 0.0f ) ;
+				}
 			}
 		} ;
 	}
@@ -163,7 +351,7 @@ public class UIList extends UILayout
 			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
-
+			
 			}
 		} ;
 	}

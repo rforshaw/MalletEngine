@@ -81,6 +81,8 @@ public class UIEditorState extends GameState
 
 		entity.addComponent( component ) ;
 		addEntity( entity ) ;
+
+		//getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 	}
 
 	private static void createMainView( final UIElement _view, final World _world )
@@ -101,14 +103,14 @@ public class UIEditorState extends GameState
 											   new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 
 				DrawAssist.amendUI( draw1, true ) ;
-				/*DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 640, 360, 0 ),
+				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 640, 360, 0 ),
 																	new Vector2( 0, 1 ),
-																	new Vector2( 1, 0 ) ) ) ;*/
+																	new Vector2( 1, 0 ) ) ) ;
 				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
 
-				/*final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
-				DrawAssist.attachProgram( draw1, program ) ;*/
+				DrawAssist.attachProgram( draw1, program ) ;
 
 				DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}

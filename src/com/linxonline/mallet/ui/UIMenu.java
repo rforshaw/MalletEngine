@@ -42,6 +42,36 @@ public class UIMenu extends UILayout
 		}
 	}
 
+	/**
+		A UILayout by default does not expect its children 
+		to go outside of the layouts boundaries.
+
+		UIMenu is most likely used to provide dropdowns 
+		and so children will be expected to go beyond those 
+		boundaries.
+	*/
+	@Override
+	public boolean isIntersectInput( final InputEvent _event )
+	{
+		if( super.isIntersectInput( _event ) == true )
+		{
+			return true ;
+		}
+
+		final List<UIElement> ordered = getElements() ;
+
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			if( ordered.get( i ).isIntersectInput( _event ) == true )
+			{
+				return true ;
+			}
+		}
+
+		return false ;
+	}
+
 	public static class Item extends UIButton
 	{
 		private final UIElement dropdown ;
@@ -114,7 +144,7 @@ public class UIMenu extends UILayout
 			parent.getPosition( position ) ;
 			parent.getLength( length ) ;
 
-			dropdown.setLayer( parent.getLayer() + 1 ) ;
+			//dropdown.setLayer( parent.getLayer() + 1 ) ;
 			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
 			dropdown.engage() ;
 		}
