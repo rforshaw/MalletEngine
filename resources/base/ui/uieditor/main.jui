@@ -335,7 +335,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -358,7 +357,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -381,7 +379,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -404,7 +401,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -427,7 +423,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -450,7 +445,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
@@ -473,7 +467,6 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"NAME" : "TestButton1",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",

@@ -139,8 +139,11 @@ public abstract class BasicRenderer<D extends DrawData,
 				final D draw = ( D )_draw ;
 				if( draw != null )
 				{
-					data.remove( draw ) ;
-					worlds.removeDraw( draw ) ;
+					if( data.contains( draw ) == true )
+					{
+						data.remove( draw ) ;
+						worlds.removeDraw( draw ) ;
+					}
 				}
 			}
 

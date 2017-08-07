@@ -323,6 +323,13 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
 					final Vector3 minimum = element.getMinimumLength() ;
 					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
 					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
@@ -345,6 +352,13 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
 					final Vector3 maximum = element.getMaximumLength() ;
 
 					// If the length allocated to this element is greater 
@@ -366,6 +380,14 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						element.setLength( 0.0f, 0.0f, 0.0f ) ;
+						continue ;
+					}
+
 					final Vector3 minimum = element.getMinimumLength() ;
 					final UIRatio ratio = element.getRatio() ;
 

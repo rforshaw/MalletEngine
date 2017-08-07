@@ -3,54 +3,60 @@
 	"LAYOUT" : "VERTICAL",
 	"CHILDREN" :[
 		{
-			"TYPE" : "UIBUTTON",
-			"NAME" : "TestButton1",
-			"UILISTENER" : {
-				"TEXT" : "Test 1",
-				"FONT" : "Arial",
-				"FONT_SIZE" : 33,
-				"RETAIN_RATIO" : true,
-				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
-				"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
-				"COLOUR_TEXT" : "255, 0, 0",
-				"TEXTURE" : "base/textures/button_sheet.png",
-				"NEUTRAL_UV" : {
-					"MIN" : "0.0, 0.0",
-					"MAX" : "0.5, 0.5"
+			"TYPE" : "UILAYOUT",
+			"LAYOUT" : "HORIZONTAL",
+			CHILDREN : [
+				{
+					"TYPE" : "UIBUTTON",
+					"NAME" : "TestButton1",
+					"UILISTENER" : {
+						"TEXT" : "Test 1",
+						"FONT" : "Arial",
+						"FONT_SIZE" : 33,
+						"RETAIN_RATIO" : true,
+						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"COLOUR_TEXT" : "255, 0, 0",
+						"TEXTURE" : "base/textures/button_sheet.png",
+						"NEUTRAL_UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "0.5, 0.5"
+						},
+						"ROLLOVER_UV" : {
+							"MIN" : "0.0, 0.5",
+							"MAX" : "0.5, 1.0"
+						},
+						"CLICKED_UV" : {
+							"MIN" : "0.5, 0.0",
+							"MAX" : "1.0, 0.5"
+						}
+					}
 				},
-				"ROLLOVER_UV" : {
-					"MIN" : "0.0, 0.5",
-					"MAX" : "0.5, 1.0"
-				},
-				"CLICKED_UV" : {
-					"MIN" : "0.5, 0.0",
-					"MAX" : "1.0, 0.5"
+				{
+					"TYPE" : "UIBUTTON",
+					"NAME" : "TestButton2",
+					"UILISTENER" : {
+						"TEXT": "Test 2",
+						"FONT" : "Arial",
+						"FONT_SIZE" : 33,
+						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"TEXTURE" : "base/textures/button_sheet.png",
+						"NEUTRAL_UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "0.5, 0.5"
+						},
+						"ROLLOVER_UV" : {
+							"MIN" : "0.0, 0.5",
+							"MAX" : "0.5, 1.0"
+						},
+						"CLICKED_UV" : {
+							"MIN" : "0.5, 0.0",
+							"MAX" : "1.0, 0.5"
+						}
+					}
 				}
-			}
-		},
-		{
-			"TYPE" : "UIBUTTON",
-			"NAME" : "TestButton2",
-			"UILISTENER" : {
-				"TEXT": "Test 2",
-				"FONT" : "Arial",
-				"FONT_SIZE" : 33,
-				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
-				"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
-				"TEXTURE" : "base/textures/button_sheet.png",
-				"NEUTRAL_UV" : {
-					"MIN" : "0.0, 0.0",
-					"MAX" : "0.5, 0.5"
-				},
-				"ROLLOVER_UV" : {
-					"MIN" : "0.0, 0.5",
-					"MAX" : "0.5, 1.0"
-				},
-				"CLICKED_UV" : {
-					"MIN" : "0.5, 0.0",
-					"MAX" : "1.0, 0.5"
-				}
-			}
+			]
 		},
 		{
 			"TYPE" : "UICHECKBOX",

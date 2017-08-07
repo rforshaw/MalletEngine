@@ -90,7 +90,7 @@ public class UICheckbox extends UIElement
 						   final UICheckbox.UV _rolloverBox,
 						   final UICheckbox.UV _tick )
 		{
-			super( null, null, _sheet, _neutralBox ) ;
+			super( _sheet, _neutralBox ) ;
 			neutralBox  = _neutralBox ;
 			rolloverBox = _rolloverBox ;
 			tick        = _tick ;
@@ -119,14 +119,31 @@ public class UICheckbox extends UIElement
 			}
 		}
 
+		/**
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
+		*/
 		@Override
-		public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			super.passDrawDelegate( _delegate, _world ) ;
-			if( drawTick != null && getParent().isChecked() )
+			super.addDraws( _delegate, _world ) ;
+
+			final UICheckbox parent = getParent() ;
+			if( drawTick != null && parent.isChecked() )
 			{
 				_delegate.addBasicDraw( drawTick, _world ) ;
 			}
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			super.removeDraws( _delegate ) ;
+			_delegate.removeDraw( drawTick ) ;
 		}
 
 		@Override
@@ -147,10 +164,11 @@ public class UICheckbox extends UIElement
 
 			if( parent.isEngaged() == true )
 			{
+				parent.setChecked( !parent.isChecked() ) ;
+
 				final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 				if( delegate != null )
 				{
-					parent.setChecked( !parent.isChecked() ) ;
 					if( parent.isChecked() == true )
 					{
 						DrawAssist.forceUpdate( drawTick ) ;

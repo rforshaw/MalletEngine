@@ -602,6 +602,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
+			public Camera amendUIPosition( final Camera _camera, final float _x, final float _y, final float _z )
+			{
+				cast( _camera ).setUIPosition( _x, _y, _z ) ;
+				return _camera ;
+			}
+
+			@Override
 			public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
 			{
 				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
@@ -657,6 +664,13 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				final CameraData.Projection projection = cast( _camera ).getProjection() ;
 				_populate.setXYZ( projection.nearPlane ) ;
+				return true ;
+			}
+
+			@Override
+			public boolean getUIPosition( final Camera _camera, final Vector3 _populate )
+			{
+				_populate.setXYZ( cast( _camera ).getUIPosition() ) ;
 				return true ;
 			}
 
@@ -934,16 +948,18 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			final int height = ( int )screen.dimension.y ;
 			GLES30.glViewport( 0, 0, width, height ) ;
 
+			final Vector3 uiPosition = _camera.getUIPosition() ;
 			final Vector3 position = _camera.getPosition() ;
 			final Vector3 scale = _camera.getScale() ;
 			//final Vector3 rotation = _camera.getRotation() ;
 
-			uiMatrix.setIdentity() ;
 			worldMatrix.setIdentity() ;
-
 			worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
 			worldMatrix.scale( scale.x, scale.y, scale.z ) ;
 			worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
+
+			uiMatrix.setIdentity() ;
+			uiMatrix.translate( -uiPosition.x, -uiPosition.y, 0.0f ) ;
 
 			worldProjection.setIdentity() ;
 			Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;

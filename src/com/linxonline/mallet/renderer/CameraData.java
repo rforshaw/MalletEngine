@@ -277,7 +277,10 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 		public void setDimension( final float _x, final float _y )
 		{
-			dimension.setXY( _x, _y ) ;
+			if( _x > 0.0f && _y > 0.0f )
+			{
+				dimension.setXY( _x, _y ) ;
+			}
 		}
 		
 		public static void setScreen( final Screen _screen, final int _x,

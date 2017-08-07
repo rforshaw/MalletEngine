@@ -252,21 +252,18 @@ public class UIList extends UILayout
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( length.y < 0.01f )
+					final Vector3 maximum = element.getMaximumLength() ;
+					if( maximum.y > 0.0f )
 					{
-						final Vector3 maximum = element.getMaximumLength() ;
-						if( maximum.y > 0.0f )
-						{
-							element.setLength( ratio.toUnitX( listLength.x ),
-											   ratio.toUnitY( maximum.y ),
-											   ratio.toUnitZ( listLength.z ) ) ;
-						}
-						else
-						{
-							element.setLength( ratio.toUnitX( listLength.x ),
-											   ratio.toUnitY( defaultItemSize.y ),
-											   ratio.toUnitZ( listLength.z ) ) ;
-						}
+						element.setLength( ratio.toUnitX( listLength.x ),
+											ratio.toUnitY( maximum.y ),
+											ratio.toUnitZ( listLength.z ) ) ;
+					}
+					else
+					{
+						element.setLength( ratio.toUnitX( listLength.x ),
+											ratio.toUnitY( defaultItemSize.y ),
+											ratio.toUnitZ( listLength.z ) ) ;
 					}
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
@@ -316,21 +313,18 @@ public class UIList extends UILayout
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
-					if( length.x < 0.01f )
+					final Vector3 maximum = element.getMaximumLength() ;
+					if( maximum.x > 0.0f )
 					{
-						final Vector3 maximum = element.getMaximumLength() ;
-						if( maximum.x > 0.0f )
-						{
-							element.setLength( ratio.toUnitX( maximum.x ),
-											   ratio.toUnitY( listLength.y ),
-											   ratio.toUnitZ( listLength.z ) ) ;
-						}
-						else
-						{
-							element.setLength( ratio.toUnitX( defaultItemSize.x ),
-											   ratio.toUnitY( listLength.y ),
-											   ratio.toUnitZ( listLength.z ) ) ;
-						}
+						element.setLength( ratio.toUnitX( maximum.x ),
+											ratio.toUnitY( listLength.y ),
+											ratio.toUnitZ( listLength.z ) ) ;
+					}
+					else
+					{
+						element.setLength( ratio.toUnitX( defaultItemSize.x ),
+											ratio.toUnitY( listLength.y ),
+											ratio.toUnitZ( listLength.z ) ) ;
 					}
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
@@ -385,6 +379,7 @@ public class UIList extends UILayout
 		final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 		ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
 		DrawAssist.attachProgram( pane, program ) ;
+
 		return pane ;
 	}
 }

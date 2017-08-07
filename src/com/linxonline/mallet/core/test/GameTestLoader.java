@@ -65,45 +65,80 @@ public final class GameTestLoader extends GameLoader
 			public void createUI()
 			{
 				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
-				{
-					final UIButton button = jUI.get( "TestButton1", UIButton.class ) ;
-					button.addListener( new InputListener<UIButton>()
-					{
-						@Override
-						public InputEvent.Action mousePressed( final InputEvent _input )
-						{
-							System.out.println( "Test Button 1 - pressed" ) ;
-							return InputEvent.Action.PROPAGATE ;
-						}
+				final UIButton button1 = jUI.get( "TestButton1", UIButton.class ) ;
+				final UIButton button2 = jUI.get( "TestButton2", UIButton.class ) ;
+				final UICheckbox checkbox = jUI.get( "TestCheckbox", UICheckbox.class ) ;
 
-						@Override
-						public InputEvent.Action mouseReleased( final InputEvent _input )
-						{
-							System.out.println( "Test Button 1 - released" ) ;
-							return InputEvent.Action.PROPAGATE ;
-						}
-					} ) ;
-				}
-
+				button1.addListener( new InputListener<UIButton>()
 				{
-					final UIButton button = jUI.get( "TestButton2", UIButton.class ) ;
-					button.addListener( new InputListener<UIButton>()
+					@Override
+					public InputEvent.Action touchReleased( final InputEvent _input )
 					{
-						@Override
-						public InputEvent.Action mousePressed( final InputEvent _input )
-						{
-							System.out.println( "Test Button 2 - pressed" ) ;
-							return InputEvent.Action.PROPAGATE ;
-						}
-					
-						@Override
-						public InputEvent.Action mouseReleased( final InputEvent _input )
-						{
-							System.out.println( "Test Button 2 - released" ) ;
-							return InputEvent.Action.PROPAGATE ;
-						}
-					} ) ;
-				}
+						return mouseReleased( _input ) ;
+					}
+
+					@Override
+					public InputEvent.Action mousePressed( final InputEvent _input )
+					{
+						System.out.println( "Test Button 1 - pressed" ) ;
+						return InputEvent.Action.PROPAGATE ;
+					}
+
+					@Override
+					public InputEvent.Action mouseReleased( final InputEvent _input )
+					{
+						System.out.println( "Test Button 1 - released" ) ;
+						button2.setVisible( !button2.isVisible() ) ;
+						return InputEvent.Action.PROPAGATE ;
+					}
+				} ) ;
+
+				button2.addListener( new InputListener<UIButton>()
+				{
+					@Override
+					public InputEvent.Action touchReleased( final InputEvent _input )
+					{
+						return mouseReleased( _input ) ;
+					}
+
+					@Override
+					public InputEvent.Action mousePressed( final InputEvent _input )
+					{
+						System.out.println( "Test Button 2 - pressed" ) ;
+						return InputEvent.Action.PROPAGATE ;
+					}
+				
+					@Override
+					public InputEvent.Action mouseReleased( final InputEvent _input )
+					{
+						System.out.println( "Test Button 2 - released" ) ;
+						button1.setVisible( !button1.isVisible() ) ;
+						return InputEvent.Action.PROPAGATE ;
+					}
+				} ) ;
+
+				checkbox.addListener( new InputListener<UICheckbox>()
+				{
+					@Override
+					public InputEvent.Action touchReleased( final InputEvent _input )
+					{
+						return mouseReleased( _input ) ;
+					}
+
+					@Override
+					public InputEvent.Action mousePressed( final InputEvent _input )
+					{
+						return InputEvent.Action.PROPAGATE ;
+					}
+				
+					@Override
+					public InputEvent.Action mouseReleased( final InputEvent _input )
+					{
+						button1.setVisible( !button1.isVisible() ) ;
+						button2.setVisible( !button2.isVisible() ) ;
+						return InputEvent.Action.PROPAGATE ;
+					}
+				} ) ;
 
 				final Entity entity = new Entity( "UI" ) ;
 				final UIComponent component = new UIComponent() ;

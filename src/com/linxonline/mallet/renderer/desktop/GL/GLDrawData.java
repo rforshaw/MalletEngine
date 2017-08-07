@@ -118,10 +118,10 @@ public class GLDrawData extends DrawData
 	public void reset()
 	{
 		super.reset() ;
-		mode        = Mode.BASIC ;
-		buffer      = null ;
-		drawMatrix  = null ;
-		drawShape   = null ;
+		setMode( Mode.BASIC ) ;
+		setBuffer( null ) ;
+		setDrawMatrix( null ) ;
+		setDrawShape( null ) ;
 	}
 
 	public enum Mode

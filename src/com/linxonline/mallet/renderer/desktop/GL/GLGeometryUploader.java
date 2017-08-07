@@ -427,6 +427,7 @@ public class GLGeometryUploader
 	*/
 	public abstract class GLBuffer implements IBuffer
 	{
+		protected final GLDrawData.Mode mode ;
 		protected Shape.Swivel[] shapeSwivel ;
 		protected Shape.Style shapeStyle ;
 
@@ -446,21 +447,24 @@ public class GLGeometryUploader
 						 final int _indexLengthBytes,
 						 final int _vertexLengthBytes )
 		{
-			this( ( ProgramMap<GLProgram> )_data.getProgram(),
-				   _data.isUI(),
-				   _data.getDrawShape(),
-				   _data.getOrder(),
-				   _indexLengthBytes,
-				   _vertexLengthBytes ) ;
+			this( _data.getMode(),
+				  ( ProgramMap<GLProgram> )_data.getProgram(),
+				  _data.isUI(),
+				  _data.getDrawShape(),
+				  _data.getOrder(),
+				  _indexLengthBytes,
+				  _vertexLengthBytes ) ;
 		}
 
-		public GLBuffer( final ProgramMap<GLProgram> _program,
+		public GLBuffer( final GLDrawData.Mode _mode,
+						 final ProgramMap<GLProgram> _program,
 						 final boolean _ui,
 						 final Shape _shape,
 						 final int _layer,
 						 final int _indexLengthBytes,
 						 final int _vertexLengthBytes )
 		{
+			mode = _mode ;
 			program = _program ;
 			layer = _layer ;
 			ui = _ui ;
@@ -578,6 +582,11 @@ public class GLGeometryUploader
 		*/
 		public boolean isSupported( final GLDrawData _data )
 		{
+			if( mode != _data.getMode() )
+			{
+				return false ;
+			}
+
 			if( layer != _data.getOrder() )
 			{
 				return false ;
@@ -887,6 +896,7 @@ public class GLGeometryUploader
 							 final int _vertexLengthBytes )
 		{
 			super( _data, _indexLengthBytes, _vertexLengthBytes ) ;
+
 			font = program.get( "inTex0", MalletFont.class ) ;
 			metrics = font.getMetrics() ;
 		}
