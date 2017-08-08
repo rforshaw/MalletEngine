@@ -3,6 +3,11 @@ package com.linxonline.mallet.ui ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.input.InputEvent ;
 
+import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.Camera ;
+import com.linxonline.mallet.renderer.DrawDelegate ;
+
 public abstract class InputListener<T extends UIElement> extends BaseListener<T>
 {
 	/**
@@ -17,4 +22,9 @@ public abstract class InputListener<T extends UIElement> extends BaseListener<T>
 	*/
 	@Override
 	public void shutdown() {}
+
+	public Camera getCamera()
+	{
+		return getParent().getCamera() ;
+	}
 }

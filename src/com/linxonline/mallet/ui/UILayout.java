@@ -54,13 +54,13 @@ public class UILayout extends UIElement
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
-		super.passDrawDelegate( _delegate, _world ) ;
+		super.passDrawDelegate( _delegate, _world, _camera ) ;
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			ordered.get( i ).passDrawDelegate( _delegate, _world ) ;
+			ordered.get( i ).passDrawDelegate( _delegate, _world, _camera ) ;
 		}
 	}
 
@@ -225,14 +225,6 @@ public class UILayout extends UIElement
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
-		{
-			// Don't pass the InputEvent on to the child elements.
-			// The UILayout may wish to consume the event if it was 
-			// used to get focus onto a child element.
-			return InputEvent.Action.CONSUME ;
-		}
-
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -250,6 +242,11 @@ public class UILayout extends UIElement
 					return InputEvent.Action.CONSUME ;
 				}
 			}
+		}
+
+		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+		{
+			return InputEvent.Action.CONSUME ;
 		}
 
 		// If the UILayout or the children don't want t
@@ -444,6 +441,13 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
 					final Vector3 minimum = element.getMinimumLength() ;
 					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
 					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
@@ -461,6 +465,13 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
 					final Vector3 maximum = element.getMaximumLength() ;
 					
 					// If the length allocated to this element is greater 
@@ -482,6 +493,13 @@ public class UILayout extends UIElement
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
 					final Vector3 minimum = element.getMinimumLength() ;
 					final Vector3 maximum = element.getMaximumLength() ;
 					final UIRatio ratio = element.getRatio() ;

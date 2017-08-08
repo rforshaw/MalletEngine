@@ -21,6 +21,7 @@ public class UIComponent extends InputComponent
 	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
 
 	private final World world ;
+	private final Camera camera ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
@@ -29,28 +30,37 @@ public class UIComponent extends InputComponent
 
 	public UIComponent()
 	{
-		this( "UI", "UICOMPONENT", InputMode.UI, WorldAssist.getDefaultWorld() ) ;
+		this( "UI" ) ;
 	}
 
 	public UIComponent( final String _name )
 	{
-		this( _name, "UICOMPONENT", InputMode.UI, WorldAssist.getDefaultWorld() ) ;
+		this( _name, "UICOMPONENT" ) ;
 	}
 
 	public UIComponent( final String _name, final String _group )
 	{
-		this( _name, _group, InputMode.UI, WorldAssist.getDefaultWorld() ) ;
+		this( _name,
+			  _group,
+			  InputMode.UI,
+			  WorldAssist.getDefaultWorld(),
+			  CameraAssist.getDefaultCamera() ) ;
 	}
 
 	public UIComponent( final String _name, final InputMode _mode )
 	{
-		this( _name, "UICOMPONENT", _mode, WorldAssist.getDefaultWorld() ) ;
+		this( _name,
+			  "UICOMPONENT",
+			  _mode,
+			  WorldAssist.getDefaultWorld(),
+			  CameraAssist.getDefaultCamera() ) ;
 	}
 
 	public UIComponent( final String _name,
 						final String _group,
 						final InputMode _mode,
-						final World _world )
+						final World _world,
+						final Camera _camera )
 	{
 		super( _name, _group, _mode ) ;
 
@@ -58,6 +68,7 @@ public class UIComponent extends InputComponent
 		// this UI should be drawn to - if no world 
 		// is specified we will assume its the default.
 		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
+		camera = ( _camera != null ) ? _camera : CameraAssist.getDefaultCamera() ;
 	}
 
 	public <T extends UIElement> T addElement( final T _element )
@@ -176,7 +187,7 @@ public class UIComponent extends InputComponent
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = elements.get( i ) ;
-					element.passDrawDelegate( delegate, world ) ;
+					element.passDrawDelegate( delegate, world, camera ) ;
 				}
 			}
 		} ) ) ;

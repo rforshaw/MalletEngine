@@ -36,6 +36,7 @@ public class UIElement implements InputHandler
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
+	private Camera camera = null ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
 
 	private final Vector3 minLength = new Vector3() ;	// In pixels
@@ -71,8 +72,10 @@ public class UIElement implements InputHandler
 		Return the Draw objects that this UIElement wishes 
 		to render to the rendering system.
 	*/
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
+		camera = _camera ;
+
 		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
@@ -258,11 +261,15 @@ public class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
+	public boolean isIntersectInput( final InputEvent _event, final Camera _camera )
+	{
+		return intersectPoint( CameraAssist.convertInputToUICameraX( _camera, _event.mouseX ),
+							   CameraAssist.convertInputToUICameraY( _camera, _event.mouseY ) ) ;
+	}
+
 	public boolean isIntersectInput( final InputEvent _event )
 	{
-		final Camera camera = CameraAssist.getDefaultCamera() ;
-		return intersectPoint( CameraAssist.convertInputToUICameraX( camera, _event.mouseX ),
-							   CameraAssist.convertInputToUICameraY( camera, _event.mouseY ) ) ;
+		return isIntersectInput( _event, getCamera() ) ;
 	}
 
 	/**
@@ -594,6 +601,16 @@ public class UIElement implements InputHandler
 	public UIRatio getRatio()
 	{
 		return ratio ;
+	}
+
+	/**
+		Return the camera that this UI is expected to be 
+		displayed on - used to convert inputs to the 
+		correct co-ordinate system.
+	*/
+	public Camera getCamera()
+	{
+		return camera ;
 	}
 
 	/**

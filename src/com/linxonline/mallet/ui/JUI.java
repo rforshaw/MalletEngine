@@ -1,6 +1,8 @@
 package com.linxonline.mallet.ui ;
 
+import java.util.List ;
 import java.util.Map ;
+import java.util.Set ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
@@ -9,8 +11,10 @@ import com.linxonline.mallet.io.formats.json.JSONArray ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -401,6 +405,19 @@ public class JUI
 		return false ;
 	}
 
+	public List<String> getAvailableNames()
+	{
+		final Set<String> set = lookup.keySet() ;
+		final List<String> names = MalletList.<String>newList( set.size() ) ;
+
+		for( final String name : set )
+		{
+			names.add( name ) ;
+		}
+
+		return names ;
+	}
+	
 	public UIElement get( final String _name )
 	{
 		return lookup.get( _name ) ;

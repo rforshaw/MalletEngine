@@ -13,6 +13,7 @@ public abstract class UIListener<T extends UIElement> extends BaseListener<T>
 {
 	private DrawDelegate<World, Draw> delegate = null ;
 	private World world = null ;
+	private Camera camera = null ;
 
 	private boolean visible = true ;
 

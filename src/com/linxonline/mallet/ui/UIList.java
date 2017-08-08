@@ -13,11 +13,12 @@ import com.linxonline.mallet.maths.* ;
 public class UIList extends UILayout
 {
 	private final World world ;
-	private final Camera camera ;
+	private final Camera internalCamera ;
+	private Camera externalCamera ;
 	private final Draw pane ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
-	
+
 	// Used to define the boundaries of the scroll
 	private final Vector3 absoluteLength = new Vector3() ;		// In pixels
 
@@ -48,11 +49,11 @@ public class UIList extends UILayout
 
 		final UUID uid = UUID.randomUUID() ;
 		world = WorldAssist.constructWorld( uid.toString(), 0 ) ;
-		camera = CameraAssist.createCamera( "SCROLL_CAMERA", new Vector3(),
-															 new Vector3(),
-															 new Vector3( 1, 1, 1 ) ) ;
+		internalCamera = CameraAssist.createCamera( "SCROLL_CAMERA", new Vector3(),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ) ) ;
 
-		CameraAssist.addCamera( camera, world ) ;
+		CameraAssist.addCamera( internalCamera, world ) ;
 		pane = UIList.createPane( world, this ) ;
 
 		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
@@ -67,7 +68,7 @@ public class UIList extends UILayout
 				}
 
 				delegate = _delegate ;
-				UIList.this.passListDrawDelegate( delegate, world ) ;
+				UIList.this.passListDrawDelegate( delegate, world, internalCamera ) ;
 			}
 		} ) ) ;
 
@@ -76,7 +77,7 @@ public class UIList extends UILayout
 
 	private void initScrollInput()
 	{
-		addListener( new InputListener()
+		addListener( new InputListener<UIList>()
 		{
 			private final Vector3 position = new Vector3() ;
 			private final Vector3 length = new Vector3() ;
@@ -131,7 +132,7 @@ public class UIList extends UILayout
 					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - current.x ) : 0.0f ;
 					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - current.y ) : 0.0f ;
 
-					CameraAssist.getUIPosition( camera, position ) ;
+					CameraAssist.getUIPosition( internalCamera, position ) ;
 					getLength( length ) ;
 
 					position.add( diff.x, diff.y, 0.0f ) ;
@@ -142,7 +143,7 @@ public class UIList extends UILayout
 					position.x = ( position.x + length.x < absoluteLength.x ) ? position.x : 0.0f ;
 					position.y = ( position.y + length.y < absoluteLength.y ) ? position.y : 0.0f ;*/
 
-					CameraAssist.amendUIPosition( camera, position.x, position.y, 0.0f ) ;
+					CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
 					last.setXY( current ) ;
 					return InputEvent.Action.CONSUME ;
 				}
@@ -177,8 +178,8 @@ public class UIList extends UILayout
 		final int width = ( int )length.x ;
 		final int height = ( int )length.y ;
 
-		CameraAssist.amendScreenResolution( camera, width, height ) ;
-		CameraAssist.amendOrthographic( camera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
+		CameraAssist.amendScreenResolution( internalCamera, width, height ) ;
+		CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
 		WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
 
@@ -187,20 +188,22 @@ public class UIList extends UILayout
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
+		externalCamera = _camera ;
+
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
 		_delegate.addBasicDraw( pane, _world ) ;
 	}
 
-	private void passListDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	private void passListDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
 		// Pass the DrawDelegate of UIList to the 
 		// lists children instead of the DrawDelegate
 		// that is provided by passDrawDelegate.
-		super.passDrawDelegate( delegate, world ) ;
+		super.passDrawDelegate( _delegate, _world, _camera ) ;
 	}
 
 	@Override
@@ -231,7 +234,6 @@ public class UIList extends UILayout
 	{
 		return new UIElementUpdater()
 		{
-			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
@@ -239,16 +241,20 @@ public class UIList extends UILayout
 			{
 				final Vector3 listLength = UIList.this.getLength() ;
 				absoluteLength.setXYZ( listLength.x, 0.0f, listLength.z ) ;
-
-				calcAbsolutePosition( layoutPosition, UIList.this ) ;
-				childPosition.setXYZ( layoutPosition ) ;
+				childPosition.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
-					final UIRatio ratio = element.getRatio() ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
 
+					final UIRatio ratio = element.getRatio() ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
@@ -269,7 +275,7 @@ public class UIList extends UILayout
 					element.setPosition( ratio.toUnitX( childPosition.x ),
 										 ratio.toUnitY( childPosition.y ),
 										 ratio.toUnitZ( childPosition.z ) ) ;
-					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
+					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, childPosition.z ) ;
 					absoluteLength.add( 0.0f, length.y + margin.y, 0.0f ) ;
 				}
 			}
@@ -300,16 +306,20 @@ public class UIList extends UILayout
 			{
 				final Vector3 listLength = UIList.this.getLength() ;
 				absoluteLength.setXYZ( 0.0f, listLength.y, listLength.z ) ;
-
-				calcAbsolutePosition( layoutPosition, UIList.this ) ;
-				childPosition.setXYZ( layoutPosition ) ;
+				childPosition.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
 					final UIElement element = _ordered.get( i ) ;
-					final UIRatio ratio = element.getRatio() ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
 
+					final UIRatio ratio = element.getRatio() ;
 					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
@@ -330,7 +340,7 @@ public class UIList extends UILayout
 					element.setPosition( ratio.toUnitX( childPosition.x ),
 										 ratio.toUnitY( childPosition.y ),
 										 ratio.toUnitZ( childPosition.z ) ) ;
-					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
+					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, childPosition.z ) ;
 					absoluteLength.add( length.x + margin.x, 0.0f, 0.0f ) ;
 				}
 			}
@@ -361,6 +371,17 @@ public class UIList extends UILayout
 			
 			}
 		} ;
+	}
+
+	/**
+		Return the camera that this UI is expected to be 
+		displayed on - used to convert inputs to the 
+		correct co-ordinate system.
+	*/
+	@Override
+	public Camera getCamera()
+	{
+		return externalCamera ;
 	}
 
 	private static Draw createPane( final World _world, final UIElement _parent )
