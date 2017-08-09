@@ -179,9 +179,11 @@ public class UIList extends UILayout
 		final int height = ( int )length.y ;
 
 		CameraAssist.amendScreenResolution( internalCamera, width, height ) ;
+		CameraAssist.amendDisplayResolution( internalCamera, width, height ) ;
 		CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
 		WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
+		WorldAssist.setDisplayDimensions( world, 0, 0, width, height ) ;
 
 		Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
 		DrawAssist.forceUpdate( pane ) ;
