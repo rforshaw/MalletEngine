@@ -129,6 +129,14 @@ public class GLGeometryUploader
 			buffer.remove( _data ) ;
 			_data.setBuffer( null ) ;
 			_data.setLocation( null ) ;
+
+			// When a program is removed completely from the 
+			// buffer we need to reset the dirty flag to ensure 
+			// it is added to the correct buffer - else the 
+			// ProgramMap check is never kicked off and the 
+			// data is added to the wrong buffer.
+			final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
+			program.setDirty( true ) ;
 		}
 	}
 

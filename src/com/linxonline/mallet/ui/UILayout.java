@@ -11,6 +11,20 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 
+/**
+	Core class of the UI Framework.
+
+	Current supports child elements in vertical or horizontal 
+	layouts - children will be populated to fill out as much 
+	space as possible.
+
+	Children with minimum requirements will be given that space.
+	Children with maximum requirements will not be given more 
+	than what they have requested. 
+
+	UILayout will update its minimum length to 
+	represent the total minimum length of all of its children.
+*/
 public class UILayout extends UIElement
 {
 	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
