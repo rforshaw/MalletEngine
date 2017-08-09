@@ -340,6 +340,16 @@ public class UILayout extends UIElement
 					availableLength.add( element.getMargin() ) ;
 				}
 
+				{
+					// Available length currently holds the minimum 
+					// amount required by the UILayout to display itself
+					// with a resemblance of accuracy.
+					final UIRatio ratio = getRatio() ;
+					setMinimumLength( ratio.toUnitX( availableLength.x ),
+									  ratio.toUnitY( availableLength.y ),
+									  ratio.toUnitZ( availableLength.z ) ) ;
+				}
+
 				availableLength.x = UILayout.this.getLength().x ;
 				availableLength.y = UILayout.this.getLength().y - availableLength.y ;
 

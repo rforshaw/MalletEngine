@@ -36,7 +36,7 @@ public class UIElement implements InputHandler
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
-	private Camera camera = null ;
+	private Camera camera = CameraAssist.getDefaultCamera() ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
 
 	private final Vector3 minLength = new Vector3() ;	// In pixels
@@ -74,7 +74,7 @@ public class UIElement implements InputHandler
 	*/
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
-		camera = _camera ;
+		camera = ( _camera != null ) ? _camera : CameraAssist.getDefaultCamera() ;
 
 		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
