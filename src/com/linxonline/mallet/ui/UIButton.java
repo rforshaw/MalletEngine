@@ -75,13 +75,13 @@ public class UIButton extends UIElement
 	{
 		if( isIntersectInput( _event ) == true )
 		{
-			super.passInputEvent( _event ) ;
-			// Even if no listener consumes the input 
-			// we still don't want it to propagate.
-			// The button may be part of a UIList and 
-			// the event that was intended for the button 
-			// will fall through to the UIList instead.  
-			return InputEvent.Action.CONSUME ; 
+			processInputEvent( _event ) ;
+			switch( _event.getInputType() )
+			{
+				case MOUSE_MOVED :
+				case TOUCH_MOVE  : return InputEvent.Action.PROPAGATE ;
+				default          : return InputEvent.Action.CONSUME ;
+			}
 		}
 
 		return InputEvent.Action.PROPAGATE ;

@@ -53,8 +53,13 @@ public class UICheckbox extends UIElement
 	{
 		if( isIntersectInput( _event ) == true )
 		{
-			super.passInputEvent( _event ) ;
-			return InputEvent.Action.CONSUME ; 
+			processInputEvent( _event ) ;
+			switch( _event.getInputType() )
+			{
+				case MOUSE_MOVED :
+				case TOUCH_MOVE  : return InputEvent.Action.PROPAGATE ;
+				default          : return InputEvent.Action.CONSUME ;
+			}
 		}
 
 		return InputEvent.Action.PROPAGATE ;
@@ -180,7 +185,6 @@ public class UICheckbox extends UIElement
 						delegate.removeDraw( drawTick ) ;
 					}
 				}
-				return InputEvent.Action.CONSUME ;
 			}
 
 			return InputEvent.Action.PROPAGATE ;

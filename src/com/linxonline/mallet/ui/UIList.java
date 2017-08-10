@@ -215,12 +215,12 @@ public class UIList extends UILayout
 		{
 			final Vector3 position = getPosition() ;
 			final Vector3 offset = getOffset() ;
-		
+
 			final InputEvent input = new InputEvent( _event ) ;
 			final int x = input.getMouseX() - ( int )( position.x + offset.x ) ;
 			final int y = input.getMouseY() - ( int )( position.y + offset.y ) ;
 			input.setInput( input.getInputType(), x, y ) ;
-			
+
 			super.passInputEvent( input ) ;
 			// Even if no listener consumes the input 
 			// we still don't want it to propagate.

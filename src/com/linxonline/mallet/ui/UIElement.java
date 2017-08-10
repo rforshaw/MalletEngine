@@ -223,6 +223,11 @@ public class UIElement implements InputHandler
 			return InputEvent.Action.PROPAGATE ;
 		}
 
+		return processInputEvent( _event ) ;
+	}
+
+	protected InputEvent.Action processInputEvent( final InputEvent _event )
+	{
 		switch( _event.getInputType() )
 		{
 			case MOUSE_MOVED       : return updateListeners( listeners.getListeners(), mouseMoveAction, _event ) ;
@@ -240,9 +245,8 @@ public class UIElement implements InputHandler
 			case GAMEPAD_PRESSED   :
 			case KEYBOARD_PRESSED  : return updateListeners( listeners.getListeners(), keyPressedAction, _event ) ;
 			case GAMEPAD_ANALOGUE  : return updateListeners( listeners.getListeners(), analogueMoveAction, _event ) ;
+			default                : return InputEvent.Action.PROPAGATE ;
 		}
-
-		return InputEvent.Action.PROPAGATE ;
 	}
 
 	private static InputEvent.Action updateListeners( final List<IBase<? extends UIElement>> _base,
