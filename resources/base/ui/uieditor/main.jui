@@ -402,7 +402,7 @@
 						{
 							"TYPE" : "UILIST",
 							"LAYOUT" : "VERTICAL",
-							"MAX_LENGTH" : "0.0, 6.0, 0.0",
+							"MAX_LENGTH" : "0.0, 8.0, 0.0",
 							"CHILDREN" : [
 								{
 									"TYPE" : "UIBUTTON",

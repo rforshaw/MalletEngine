@@ -53,7 +53,8 @@ public class UICheckbox extends UIElement
 	{
 		if( isIntersectInput( _event ) == true )
 		{
-			return super.passInputEvent( _event ) ;
+			super.passInputEvent( _event ) ;
+			return InputEvent.Action.CONSUME ; 
 		}
 
 		return InputEvent.Action.PROPAGATE ;

@@ -30,6 +30,12 @@ public final class InputEvent implements Cacheable
 		keycode = _keycode ;
 	}
 
+	public InputEvent( final InputEvent _toCopy )
+	{
+		super() ;
+		clone( _toCopy ) ;
+	}
+
 	public void setID( final InputID _id )
 	{
 		id = _id ;

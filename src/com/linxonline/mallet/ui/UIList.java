@@ -209,6 +209,31 @@ public class UIList extends UILayout
 	}
 
 	@Override
+	public InputEvent.Action passInputEvent( final InputEvent _event )
+	{
+		if( isIntersectInput( _event ) == true )
+		{
+			final Vector3 position = getPosition() ;
+			final Vector3 offset = getOffset() ;
+		
+			final InputEvent input = new InputEvent( _event ) ;
+			final int x = input.getMouseX() - ( int )( position.x + offset.x ) ;
+			final int y = input.getMouseY() - ( int )( position.y + offset.y ) ;
+			input.setInput( input.getInputType(), x, y ) ;
+			
+			super.passInputEvent( input ) ;
+			// Even if no listener consumes the input 
+			// we still don't want it to propagate.
+			// The button may be part of a UIList and 
+			// the event that was intended for the button 
+			// will fall through to the UIList instead.  
+			return InputEvent.Action.CONSUME ; 
+		}
+
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	@Override
 	public void shutdown()
 	{
 		super.shutdown() ;

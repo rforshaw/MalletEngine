@@ -70,6 +70,23 @@ public class UIButton extends UIElement
 		addListener( _listener ) ;
 	}
 
+	@Override
+	public InputEvent.Action passInputEvent( final InputEvent _event )
+	{
+		if( isIntersectInput( _event ) == true )
+		{
+			super.passInputEvent( _event ) ;
+			// Even if no listener consumes the input 
+			// we still don't want it to propagate.
+			// The button may be part of a UIList and 
+			// the event that was intended for the button 
+			// will fall through to the UIList instead.  
+			return InputEvent.Action.CONSUME ; 
+		}
+
+		return InputEvent.Action.PROPAGATE ;
+	}
+
 	public static UIListener createUIListener( final MalletTexture _sheet,
 											   final UIButton.UV _neutral,
 											   final UIButton.UV _rollover,
