@@ -91,6 +91,20 @@ public class UILayout extends UIElement
 	}
 
 	/**
+		Flag the UIElement as being disengaged.
+	*/
+	public void disengage()
+	{
+		super.disengage() ;
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final UIElement element = ordered.get( i ) ;
+			element.disengage() ;
+		}
+	}
+
+	/**
 		Set the Engagement protocol that should be used 
 		on the child elements of the layout.
 		The layout's children will only receive inputs 
@@ -156,12 +170,13 @@ public class UILayout extends UIElement
 	@Override
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
-		if( isDirty() == true )
+		final boolean dirt = isDirty() ;
+		super.update( _dt, _events ) ;
+
+		if( dirt == true )
 		{
 			updater.update( _dt, ordered ) ;
 		}
-
-		super.update( _dt, _events ) ;
 
 		{
 			final int size = ordered.size() ;
@@ -266,6 +281,30 @@ public class UILayout extends UIElement
 		// If the UILayout or the children don't want t
 		// consume the event then let it propagate.
 		return InputEvent.Action.PROPAGATE ;
+	}
+
+	@Override
+	public boolean isIntersectInput( final InputEvent _event )
+	{
+		if( super.isIntersectInput( _event ) == true )
+		{
+			return true ;
+		}
+
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final UIElement element = ordered.get( i ) ;
+			if( element.isIntersectInput( _event ) == true )
+			{
+				// There is a chance that a layout has children 
+				// that go beyond the layouts boundaries.
+				// For example UIMenu dropdown.
+				return true ;
+			}
+		}
+
+		return false ;
 	}
 
 	/**
@@ -645,18 +684,21 @@ public class UILayout extends UIElement
 			for( int i = 0; i < size; i++ )
 			{
 				final UIElement element = layout.ordered.get( i ) ;
-				if( element.isVisible() == true &&
-					element.isEngaged() == false )
+				if( element.isVisible() == true )
 				{
 					if( element.isIntersectInput( _input ) == true )
 					{
-						setCurrentEngaged( element, i ) ;
-						break ;
+						if( setCurrentEngaged( element, i ) == true )
+						{
+							disengageOthers( currentEngaged, layout.ordered ) ;
+						}
+						return InputEvent.Action.PROPAGATE ;
 					}
 				}
 			}
 
-			disengageOthers( currentEngaged, layout.ordered ) ;
+			setCurrentEngaged( null, 0 ) ;
+			disengageOthers( null, layout.ordered ) ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 
@@ -713,24 +755,28 @@ public class UILayout extends UIElement
 			return InputEvent.Action.PROPAGATE ;
 		}
 
-		private void setCurrentEngaged( final UIElement _toEngage, final int _index )
+		private boolean setCurrentEngaged( final UIElement _toEngage, final int _index )
 		{
 			if( _toEngage == null )
 			{
 				disengage( currentEngaged ) ;
 				currentEngaged = null ;
 				currentIndex = _index ;
-				return ;
+				return true ;
 			}
 
-			if( currentEngaged != _toEngage )
+			if( currentEngaged != _toEngage && 
+				_toEngage.isEngaged() == false )
 			{
 				disengage( currentEngaged ) ;
 
 				currentEngaged = _toEngage ;
 				currentEngaged.engage() ;
 				currentIndex = _index ;
+				return true ;
 			}
+
+			return false ;
 		}
 
 		private static void disengageOthers( final UIElement _current, final List<UIElement> _others )

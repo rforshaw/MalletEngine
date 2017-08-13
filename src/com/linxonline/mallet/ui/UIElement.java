@@ -265,15 +265,15 @@ public class UIElement implements InputHandler
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public boolean isIntersectInput( final InputEvent _event, final Camera _camera )
-	{
-		return intersectPoint( CameraAssist.convertInputToUICameraX( _camera, _event.mouseX ),
-							   CameraAssist.convertInputToUICameraY( _camera, _event.mouseY ) ) ;
-	}
-
 	public boolean isIntersectInput( final InputEvent _event )
 	{
 		return isIntersectInput( _event, getCamera() ) ;
+	}
+
+	private boolean isIntersectInput( final InputEvent _event, final Camera _camera )
+	{
+		return intersectPoint( CameraAssist.convertInputToUICameraX( _camera, _event.mouseX ),
+							   CameraAssist.convertInputToUICameraY( _camera, _event.mouseY ) ) ;
 	}
 
 	/**

@@ -911,6 +911,7 @@ public class GLGeometryUploader
 							 final int _vertexLengthBytes )
 		{
 			super( _data, _indexLengthBytes, _vertexLengthBytes ) ;
+
 			font = program.get( "inTex0", MalletFont.class ) ;
 			metrics = font.getMetrics() ;
 		}
@@ -957,7 +958,7 @@ public class GLGeometryUploader
 			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
 			final StringBuilder text = _data.getText() ;
-			final int length = text.length() ;
+			final int length = _data.getTextLength() ;
 			final int initialIndexOffset = _location.getVertexStart() / geometry.vertexStrideBytes ;
 
 			int indexInc = 0 ;
@@ -1095,15 +1096,17 @@ public class GLGeometryUploader
 				}
 			}
 
+			final int length = _data.getTextLength() ;
+
 			// If no space exists create a new geometry buffer 
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
 			final Shape shape = glFont.getShapeWithChar( '\0' ) ;
 			final StringBuilder text = _data.getText() ;
-			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * text.length() ) * IBO_VAR_BYTE_SIZE ;
+			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * length ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
-			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes  * text.length() ;
+			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes  * length ;
 			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
 
 			expand( indexBytes, vertexBytes ) ;
@@ -1119,7 +1122,7 @@ public class GLGeometryUploader
 				protected Location findLocation( final GLDrawData _data )
 				{
 					final StringBuilder text = _data.getText() ;
-					final int length = text.length() ;
+					final int length = _data.getTextLength() ;
 					return findLocation( ( 6 * length ), ( 4 * length ) ) ;
 				}
 			} ) ;

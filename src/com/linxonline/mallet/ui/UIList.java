@@ -289,8 +289,8 @@ public class UIList extends UILayout
 					if( maximum.y > 0.0f )
 					{
 						element.setLength( ratio.toUnitX( listLength.x ),
-											ratio.toUnitY( maximum.y ),
-											ratio.toUnitZ( listLength.z ) ) ;
+										   ratio.toUnitY( maximum.y ),
+										   ratio.toUnitZ( listLength.z ) ) ;
 					}
 					else
 					{

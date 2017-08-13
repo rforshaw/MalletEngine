@@ -180,6 +180,18 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
+			public Draw amendTextLength( final Draw _draw, final int _length )
+			{
+				final GLDrawData draw = cast( _draw ) ;
+				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				{
+					// Only a text draw object can have text.
+					draw.setTextLength( _length ) ;
+				}
+				return _draw ;
+			}
+
+			@Override
 			public Draw amendUI( final Draw _draw, final boolean _ui )
 			{
 				cast( _draw ).setUI( _ui ) ;

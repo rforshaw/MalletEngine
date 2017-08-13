@@ -45,6 +45,23 @@ public class MalletFont
 		return size ;
 	}
 
+	public int stringIndexWidth( final StringBuilder _text, final float _width )
+	{
+		float width = 0.0f ;
+
+		final int length = _text.length() ;
+		for( int i = 0; i < length; ++i )
+		{
+			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
+			if( width > _width )
+			{
+				return ( i > 0 ) ? i - 1 : 0 ;
+			}
+		}
+		
+		return length ;
+	}
+
 	public float stringWidth( final StringBuilder _text )
 	{
 		float width = 0.0f ;

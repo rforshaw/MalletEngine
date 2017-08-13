@@ -237,6 +237,7 @@ public final class UIFactory
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
 													  layer + 1 ) ;
+				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;
 			}
@@ -298,6 +299,7 @@ public final class UIFactory
 
 				textOffset.add( x, y, 0.0f ) ;
 
+				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
