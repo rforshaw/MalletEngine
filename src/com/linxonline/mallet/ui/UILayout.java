@@ -184,6 +184,13 @@ public class UILayout extends UIElement
 			{
 				final UIElement element = ordered.get( i ) ;
 				element.update( _dt, _events ) ;
+				if( element.isDirty() == true )
+				{
+					// If a Child element is updating we'll 
+					// most likely also want to update the parent.
+					makeDirty() ;
+				}
+
 				if( element.destroy == true )
 				{
 					// If the child element is flagged for 
@@ -191,12 +198,6 @@ public class UILayout extends UIElement
 					removeElement( element ) ;
 
 					// We'll also want to refresh the UILayout.
-					makeDirty() ;
-				}
-				else if( element.isDirty() == true )
-				{
-					// If a Child element is updating we'll 
-					// most likely also want to update the parent.
 					makeDirty() ;
 				}
 			}
@@ -251,7 +252,7 @@ public class UILayout extends UIElement
 		super.refresh() ;
 	}
 
-	@Override
+	/*@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
 		final int size = ordered.size() ;
@@ -281,7 +282,7 @@ public class UILayout extends UIElement
 		// If the UILayout or the children don't want t
 		// consume the event then let it propagate.
 		return InputEvent.Action.PROPAGATE ;
-	}
+	}*/
 
 	@Override
 	public boolean isIntersectInput( final InputEvent _event )
@@ -391,16 +392,6 @@ public class UILayout extends UIElement
 
 					availableLength.add( minimum ) ;
 					availableLength.add( element.getMargin() ) ;
-				}
-
-				{
-					// Available length currently holds the minimum 
-					// amount required by the UILayout to display itself
-					// with a resemblance of accuracy.
-					final UIRatio ratio = getRatio() ;
-					setMinimumLength( ratio.toUnitX( availableLength.x ),
-									  ratio.toUnitY( availableLength.y ),
-									  ratio.toUnitZ( availableLength.z ) ) ;
 				}
 
 				availableLength.x = UILayout.this.getLength().x ;
@@ -692,7 +683,8 @@ public class UILayout extends UIElement
 						{
 							disengageOthers( currentEngaged, layout.ordered ) ;
 						}
-						return InputEvent.Action.PROPAGATE ;
+
+						return passInput( element, _input ) ;
 					}
 				}
 			}
@@ -753,6 +745,11 @@ public class UILayout extends UIElement
 
 			disengageOthers( currentEngaged, layout.ordered ) ;
 			return InputEvent.Action.PROPAGATE ;
+		}
+
+		private InputEvent.Action passInput( final UIElement _current, final InputEvent _input )
+		{
+			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
 		}
 
 		private boolean setCurrentEngaged( final UIElement _toEngage, final int _index )
