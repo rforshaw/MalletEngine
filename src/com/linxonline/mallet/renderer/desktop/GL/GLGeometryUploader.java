@@ -912,7 +912,7 @@ public class GLGeometryUploader
 		@Override
 		protected boolean isShape( final Shape _shape )
 		{
-			return true ;
+			return ( _shape == null ) ? true : false ;
 		}
 
 		@Override
@@ -936,8 +936,8 @@ public class GLGeometryUploader
 		*/
 		private boolean isCorrectSize( final GLDrawData _data, final Location _location )
 		{
-			final StringBuilder txt = _data.getText() ;
-			final int shapeIndexBytes = ( ( txt.length() * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
+			final int length = _data.getTextLength() ;
+			final int shapeIndexBytes = ( ( length * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			return shapeIndexBytes == _location.getIndexLength() ;
 		}
 
@@ -1095,7 +1095,6 @@ public class GLGeometryUploader
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
 			final Shape shape = glFont.getShapeWithChar( '\0' ) ;
-			final StringBuilder text = _data.getText() ;
 			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * length ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
@@ -1114,7 +1113,6 @@ public class GLGeometryUploader
 				@Override
 				protected Location findLocation( final GLDrawData _data )
 				{
-					final StringBuilder text = _data.getText() ;
 					final int length = _data.getTextLength() ;
 					return findLocation( ( 6 * length ), ( 4 * length ) ) ;
 				}
