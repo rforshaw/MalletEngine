@@ -56,7 +56,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			GLES30.glBindFramebuffer( GLES30.GL_DRAW_FRAMEBUFFER, 0 ) ;
 
 			GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
-			GLES30.glCopyTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
+			GLES30.glCopyTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, 0, 0, render.x, render.y, 0 ) ;
 		}
 	}
 
@@ -157,7 +157,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	private void updateBufferDimensions( final int _width, final int _height )
 	{
 		GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
-		GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGB, _width, _height, 0, GLES30.GL_RGB, GLES30.GL_UNSIGNED_BYTE, null ) ;
+		GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, _width, _height, 0, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null ) ;
 
 		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT ) ;
 		GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT ) ;
