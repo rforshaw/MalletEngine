@@ -252,38 +252,6 @@ public class UILayout extends UIElement
 		super.refresh() ;
 	}
 
-	/*@Override
-	public InputEvent.Action passInputEvent( final InputEvent _event )
-	{
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final UIElement element = ordered.get( i ) ;
-			if( element.isEngaged() == true )
-			{
-				// A UILayout will only pass input events to a child 
-				// element if the element is flagged as engaged.
-				// Use an engagement listener to determine this.
-				if( element.passInputEvent( _event ) == InputEvent.Action.CONSUME )
-				{
-					// A child element may want to deny the other 
-					// children the ability to process the InputEvent.
-					// This means that the children's order is important.
-					return InputEvent.Action.CONSUME ;
-				}
-			}
-		}
-
-		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
-		{
-			return InputEvent.Action.CONSUME ;
-		}
-
-		// If the UILayout or the children don't want t
-		// consume the event then let it propagate.
-		return InputEvent.Action.PROPAGATE ;
-	}*/
-
 	@Override
 	public boolean isIntersectInput( final InputEvent _event )
 	{
@@ -725,30 +693,21 @@ public class UILayout extends UIElement
 		}
 
 		@Override
+		public InputEvent.Action keyPressed( final InputEvent _input )
+		{
+			return passInput( currentEngaged, _input ) ;
+		}
+
+		@Override
 		public InputEvent.Action keyReleased( final InputEvent _input )
 		{
-			final UILayout layout = getParent() ;
-			final List<UIElement> elements = layout.ordered ;
-
-			if( currentEngaged == null && currentIndex < elements.size() )
-			{
-				setCurrentEngaged( elements.get( currentIndex ), currentIndex ) ;
-			}
-
-			switch( _input.getKeyCode() )
-			{
-				case UP    :
-				case DOWN  :
-				case LEFT  :
-				case RIGHT :
-			}
-
-			disengageOthers( currentEngaged, layout.ordered ) ;
-			return InputEvent.Action.PROPAGATE ;
+			return passInput( currentEngaged, _input ) ;
 		}
 
 		private InputEvent.Action passInput( final UIElement _current, final InputEvent _input )
 		{
+			//System.out.println( "Current: " + _current ) ;
+			//System.out.println( _input ) ;
 			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
 		}
 

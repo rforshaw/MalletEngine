@@ -311,25 +311,18 @@
 					"NAME" : "UIElementPanel",
 					"CHILDREN" : [
 						{
-							"TYPE" : "UIBUTTON",
+							"TYPE" : "UITEXTFIELD",
 							"NAME" : "TestButton1",
 							"UILISTENER" : {
-								"TEXT" : "Test 1",
+								"TEXT" : "Type Here",
+								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 12,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
+								"UV" : {
 									"MIN" : "0.0, 0.0",
 									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
 								}
 							}
 						},
@@ -403,6 +396,13 @@
 							"TYPE" : "UILIST",
 							"LAYOUT" : "VERTICAL",
 							"MAX_LENGTH" : "0.0, 8.0, 0.0",
+							"UILISTENER" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
 							"CHILDREN" : [
 								{
 									"TYPE" : "UIBUTTON",
@@ -568,14 +568,7 @@
 							}
 						}
 					],
-					"MAX_LENGTH" : "5.5, 0, 0",
-					"UILISTENER" : {
-						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
-						"UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "1.0, 1.0"
-						}
-					}
+					"MAX_LENGTH" : "5.5, 0, 0"
 				},
 				{
 					"TYPE" : "UIELEMENT",

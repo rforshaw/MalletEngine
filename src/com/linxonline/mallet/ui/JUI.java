@@ -93,6 +93,73 @@ public class JUI
 			}
 		} ) ;
 
+		creators.put( "UITEXTFIELD", new Generator()
+		{
+			public UIElement create( final JUI _map, final JSONObject _ui )
+			{
+				final UITextField element = new UITextField() ;
+				applyLengths( element, _ui ) ;
+				applyLayer( element, _ui ) ;
+				applyLookup( _map, element, _ui ) ;
+
+				final UITextField.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				if( uiListener != null )
+				{
+					element.addListener( uiListener ) ;
+				}
+
+				return element ;
+			}
+
+			private UITextField.UIListener createListener( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final UITextField.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
+				if( uv == null )
+				{
+					Logger.println( "JUI: UIListener specified without valid uv-map.", Logger.Verbosity.MAJOR ) ;
+					return null ;
+				}
+
+				final String text = _ui.optString( "TEXT", "" ) ;
+				final String fontName = _ui.optString( "FONT", null ) ;
+				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+
+				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+				final UITextField.UIListener listener = UITextField.createUIListener( text, font, texture, uv ) ;
+				listener.setRetainRatio( retainRatio ) ;
+
+				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+					if( align != null )
+					{
+						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
+					if( align != null )
+					{
+						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				return listener ;
+			}
+		} ) ;
+
 		creators.put( "UIBUTTON", new Generator()
 		{
 			public UIElement create( final JUI _map, final JSONObject _ui )
@@ -154,8 +221,8 @@ public class JUI
 					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
 					if( align != null )
 					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
@@ -249,8 +316,8 @@ public class JUI
 					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
 					if( align != null )
 					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 

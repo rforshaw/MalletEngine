@@ -58,7 +58,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			gl.glBindFramebuffer( GL3.GL_DRAW_FRAMEBUFFER, 0 ) ;
 
 			gl.glBindTexture( GL3.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
-			gl.glCopyTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
+			gl.glCopyTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, 0, 0, render.x, render.y, 0 ) ;
 		}
 	}
 
@@ -166,7 +166,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		final GL3 gl = GLRenderer.getGL() ;
 
 		gl.glBindTexture( GL3.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
-		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGB, _width, _height, 0, GL3.GL_RGB, GL3.GL_UNSIGNED_BYTE, null ) ;
+		gl.glTexImage2D( GL3.GL_TEXTURE_2D, 0, GL3.GL_RGBA, _width, _height, 0, GL3.GL_RGBA, GL3.GL_UNSIGNED_BYTE, null ) ;
 
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;

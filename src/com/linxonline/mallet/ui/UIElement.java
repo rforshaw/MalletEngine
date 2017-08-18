@@ -74,7 +74,7 @@ public class UIElement implements InputHandler
 	*/
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
-		camera = ( _camera != null ) ? _camera : CameraAssist.getDefaultCamera() ;
+		camera = ( _camera != null ) ? _camera : camera ;
 
 		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
 		final int size = base.size() ;
@@ -215,15 +215,22 @@ public class UIElement implements InputHandler
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( isIntersectInput( _event ) == false )
+		switch( _event.getInputType() )
 		{
-			// A UIElement should only pass the InputEvent 
-			// to its listeners if the input is intersecting 
-			// else we run the risk of doing pointless processing.
-			return InputEvent.Action.PROPAGATE ;
+			case KEYBOARD_PRESSED  :
+			case KEYBOARD_RELEASED : return processInputEvent( _event ) ;
+			default                :
+			{
+				if( isIntersectInput( _event ) == false )
+				{
+					// A UIElement should only pass the InputEvent 
+					// to its listeners if the input is intersecting 
+					// else we run the risk of doing pointless processing.
+					return InputEvent.Action.PROPAGATE ;
+				}
+				return processInputEvent( _event ) ;
+			}
 		}
-
-		return processInputEvent( _event ) ;
 	}
 
 	protected InputEvent.Action processInputEvent( final InputEvent _event )
@@ -270,7 +277,7 @@ public class UIElement implements InputHandler
 		return isIntersectInput( _event, getCamera() ) ;
 	}
 
-	private boolean isIntersectInput( final InputEvent _event, final Camera _camera )
+	protected boolean isIntersectInput( final InputEvent _event, final Camera _camera )
 	{
 		return intersectPoint( CameraAssist.convertInputToUICameraX( _camera, _event.mouseX ),
 							   CameraAssist.convertInputToUICameraY( _camera, _event.mouseY ) ) ;
@@ -459,7 +466,7 @@ public class UIElement implements InputHandler
 	{
 		return visible ;
 	}
-	
+
 	/**
 		Returns the elements position in pixels.
 		Pass in a Vector3 to retrieve the position in units.
@@ -615,6 +622,14 @@ public class UIElement implements InputHandler
 	public Camera getCamera()
 	{
 		return camera ;
+	}
+
+	/**
+		Returns the listeners owned by this UIElement.
+	*/
+	protected ListenerUnit<IBase<? extends UIElement>> getListenerUnit()
+	{
+		return listeners ;
 	}
 
 	/**

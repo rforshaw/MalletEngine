@@ -13,13 +13,6 @@ import com.linxonline.mallet.maths.* ;
 	can be filled with Menu.Items - these items are extended 
 	UIButtons that allow for an external UIElement to be 
 	shown/hidden once clicked.
-
-	FIXME: There is a bug with the UILayout engagement system
-	that disables dropdown UIElements from recieving 
-	input events under certain circumstances.
-	
-	I'm not sure if this bug is caused by the UIMenu, Item, 
-	or dropdown not correctly being engaged.
 */
 public class UIMenu extends UILayout
 {
@@ -40,36 +33,6 @@ public class UIMenu extends UILayout
 				break ;
 			}
 		}
-	}
-
-	/**
-		A UILayout by default does not expect its children 
-		to go outside of the layouts boundaries.
-
-		UIMenu is most likely used to provide dropdowns 
-		and so children will be expected to go beyond those 
-		boundaries.
-	*/
-	@Override
-	public boolean isIntersectInput( final InputEvent _event )
-	{
-		if( super.isIntersectInput( _event ) == true )
-		{
-			return true ;
-		}
-
-		final List<UIElement> ordered = getElements() ;
-
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			if( ordered.get( i ).isIntersectInput( _event ) == true )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
 	}
 
 	public static class Item extends UIButton
@@ -101,11 +64,6 @@ public class UIMenu extends UILayout
 		public InputEvent.Action passInputEvent( final InputEvent _event )
 		{
 			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
-			{
-				return InputEvent.Action.CONSUME ;
-			}
-
-			if( dropdown.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
 				return InputEvent.Action.CONSUME ;
 			}
@@ -157,11 +115,60 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
+		public InputEvent.Action mouseMove( final InputEvent _input )
+		{
+			return dropdown.passInputEvent( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
+			final InputEvent.Action action = mouseMove( _input ) ;
 			dropdown.setVisible( !dropdown.isVisible() ) ;
 			dropdown.setEngage( !dropdown.isEngaged() ) ;
-			return InputEvent.Action.PROPAGATE ;
+			return action ;
+		}
+
+		@Override
+		public InputEvent.Action touchMove( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action keyPressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action keyReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action analogueMove( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
 		}
 
 		@Override

@@ -112,7 +112,7 @@ public final class InputEvent implements Cacheable
 			case KEYBOARD_RELEASED :
 			case KEYBOARD_PRESSED  :
 			{
-				buffer.append( "KeyCode: " + keycode ) ;
+				buffer.append( " KeyCode: " + keycode ) ;
 				break ;
 			}
 			default :

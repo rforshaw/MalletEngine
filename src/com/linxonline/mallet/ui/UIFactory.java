@@ -131,13 +131,13 @@ public final class UIFactory
 		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
 		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
 
-		private boolean retainRatio = false ;
+		protected boolean retainRatio = false ;
 
-		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
-		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
-		private UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
-		private UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
+		protected UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
+		protected UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
 
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
@@ -291,7 +291,7 @@ public final class UIFactory
 			if( drawText != null )
 			{
 				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
-				textOffset.setXYZ( offset ) ;
+				textOffset.setXYZ( getOffset() ) ;
 
 				final MalletFont.Metrics metrics = font.getMetrics() ;
 				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
@@ -321,6 +321,16 @@ public final class UIFactory
 		{
 			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
 			offset.add( _offset ) ;
+		}
+
+		public MalletFont getFont()
+		{
+			return font ;
+		}
+
+		public MalletColour getColour()
+		{
+			return colour ;
 		}
 
 		public MalletTexture getTexture()

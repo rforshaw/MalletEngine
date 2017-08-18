@@ -14,7 +14,7 @@ public class UIList extends UILayout
 {
 	private final World world ;
 	private final Camera internalCamera ;
-	private Camera externalCamera ;
+	private Camera externalCamera = CameraAssist.getDefaultCamera() ;
 	private final Draw pane ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
@@ -137,12 +137,6 @@ public class UIList extends UILayout
 
 					position.add( diff.x, diff.y, 0.0f ) ;
 
-					/*position.x = ( position.x >= -absoluteLength.x ) ? position.x : -absoluteLength.x ;
-					position.y = ( position.y >= -absoluteLength.y ) ? position.y : -absoluteLength.y ;
-
-					position.x = ( position.x + length.x < absoluteLength.x ) ? position.x : 0.0f ;
-					position.y = ( position.y + length.y < absoluteLength.y ) ? position.y : 0.0f ;*/
-
 					CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
 					last.setXY( current ) ;
 					return InputEvent.Action.CONSUME ;
@@ -192,7 +186,17 @@ public class UIList extends UILayout
 	@Override
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
-		externalCamera = _camera ;
+		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
+
+		final List<IBase<? extends UIElement>> base = getListenerUnit().getListeners() ;
+		final int size = base.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			// Listeners to the UIList will be given the 
+			// DrawDelegate passed in - only children 
+			// will be given the lists DrawDelegate.
+			base.get( i ).passDrawDelegate( _delegate, _world ) ;
+		}
 
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
@@ -202,26 +206,69 @@ public class UIList extends UILayout
 
 	private void passListDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
-		// Pass the DrawDelegate of UIList to the 
-		// lists children instead of the DrawDelegate
-		// that is provided by passDrawDelegate.
-		super.passDrawDelegate( _delegate, _world, _camera ) ;
+		final List<UIElement> ordered = getElements() ;
+
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			// Pass the DrawDelegate of UIList to the 
+			// lists children instead of the DrawDelegate
+			// that is provided by passDrawDelegate.
+			ordered.get( i ).passDrawDelegate( _delegate, _world, _camera ) ;
+		}
 	}
 
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		final Vector3 position = getPosition() ;
-		final Vector3 offset = getOffset() ;
+		switch( _event.getInputType() )
+		{
+			case KEYBOARD_PRESSED  :
+			case KEYBOARD_RELEASED : return processInputEvent( _event ) ;
+			default                :
+			{
+				if( isIntersectInput( _event ) == false )
+				{
+					// A UIElement should only pass the InputEvent 
+					// to its listeners if the input is intersecting 
+					// else we run the risk of doing pointless processing.
+					return InputEvent.Action.PROPAGATE ;
+				}
+			
+				final Vector3 position = getPosition() ;
+				final Vector3 offset = getOffset() ;
 
-		final InputEvent input = new InputEvent( _event ) ;
-		final int x = input.getMouseX() - ( int )( position.x + offset.x ) ;
-		final int y = input.getMouseY() - ( int )( position.y + offset.y ) ;
-		input.setInput( input.getInputType(), x, y ) ;
+				final InputEvent input = new InputEvent( _event ) ;
+				final float x = CameraAssist.convertInputToUICameraX( getCamera(), input.getMouseX() ) - ( position.x + offset.x ) ;
+				final float y = CameraAssist.convertInputToUICameraY( getCamera(), input.getMouseY() ) - ( position.y + offset.y ) ;
+				input.setInput( input.getInputType(), ( int )x, ( int )y ) ;
 
-		return super.passInputEvent( input ) ;
+				return processInputEvent( input ) ;
+			}
+		}
 	}
 
+	/**
+		Override the parent implementation comsing from UILayout.
+		UILayout tests all children to determine whether or not
+		the input intersects, this is to cover the case on a 
+		child extending beyond the UILayout.
+		
+		Children of a UIList are in a different co-ordinate space
+		and so passing them an unconverted input will cause 
+		problems. For now UIList only checks itself.
+	*/
+	@Override
+	public boolean isIntersectInput( final InputEvent _event )
+	{
+		if( super.isIntersectInput( _event, getCamera() ) == true )
+		{
+			return true ;
+		}
+
+		return false ;
+	}
+	
 	@Override
 	public void shutdown()
 	{
