@@ -10,6 +10,7 @@ import com.linxonline.mallet.maths.* ;
 public class UITextField extends UIElement
 {
 	private boolean checked = false ;
+	private final StringBuilder text = new StringBuilder() ;
 
 	/**
 		If the UICheckbox is being added to a UILayout
@@ -48,6 +49,11 @@ public class UITextField extends UIElement
 		addListener( _listener ) ;
 	}
 
+	public StringBuilder getText()
+	{
+		return text ;
+	}
+
 	public static UIListener createUIListener( final String _text,
 											   final MalletFont _font,
 											   final MalletTexture _sheet,
@@ -61,7 +67,7 @@ public class UITextField extends UIElement
 		private final String placeholder ;
 	
 		private Draw drawEdit = null ;
-		private final StringBuilder edit = new StringBuilder() ;
+		
 
 		public UIListener( final String _text,
 						   final MalletFont _font,
@@ -83,6 +89,7 @@ public class UITextField extends UIElement
 			{
 				final UITextField parent = getParent() ;
 				final Vector3 length = parent.getLength() ;
+				final StringBuilder edit = parent.getText() ;
 
 				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
 				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
@@ -136,6 +143,7 @@ public class UITextField extends UIElement
 				final UITextField parent = getParent() ;
 				final Vector3 length = parent.getLength() ;
 				final MalletFont font = getFont() ;
+				final StringBuilder edit = parent.getText() ;
 
 				final Vector3 textOffset = DrawAssist.getOffset( drawEdit ) ;
 				textOffset.setXYZ( getOffset() ) ;
@@ -193,6 +201,7 @@ public class UITextField extends UIElement
 				case WINDOWS      : break ;
 				case BACKSPACE    :
 				{
+					final StringBuilder edit = getParent().getText() ;
 					final int length = edit.length() ;
 					if( length > 0 )
 					{
@@ -203,6 +212,7 @@ public class UITextField extends UIElement
 				}
 				default :
 				{
+					final StringBuilder edit = getParent().getText() ;
 					edit.append( _input.getKeyCharacter() ) ;
 					getParent().makeDirty() ;
 					break ;
@@ -212,21 +222,27 @@ public class UITextField extends UIElement
 		}
 
 		@Override
-		public InputEvent.Action keyReleased( final InputEvent _input )
+		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return InputEvent.Action.PROPAGATE ;
+			return super.mouseReleased( _input ) ;
 		}
 
 		@Override
-		public void engage()
+		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
-			getText().setLength( 0 ) ;
-			getParent().makeDirty() ;
+			final StringBuilder txt = getText() ;
+			if( txt.length() > 0 )
+			{
+				txt.setLength( 0 ) ;
+				getParent().makeDirty() ;
+			}
+			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
 		public void disengage()
 		{
+			final StringBuilder edit = getParent().getText() ;
 			if( edit.length() <= 0 && getText().length() <= 0 )
 			{
 				getText().append( placeholder ) ;
