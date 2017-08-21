@@ -109,7 +109,10 @@ public class UILayout extends UIElement
 		for( int i = 0; i < size; i++ )
 		{
 			final UIElement element = ordered.get( i ) ;
-			element.disengage() ;
+			if( element.isEngaged() == true )
+			{
+				element.disengage() ;
+			}
 		}
 	}
 
@@ -125,6 +128,11 @@ public class UILayout extends UIElement
 	{
 		removeListener( engageMode ) ;
 		engageMode = addListener( _listener ) ;
+	}
+
+	public EngageListener getEngageMode()
+	{
+		return engageMode ;
 	}
 
 	/**
@@ -629,7 +637,10 @@ public class UILayout extends UIElement
 		}
 	}
 
-	public static abstract class EngageListener extends InputListener<UILayout> {}
+	public static abstract class EngageListener extends InputListener<UILayout>
+	{
+		public abstract boolean isEngaged() ;
+	}
 
 	/**
 		Only allows one UIElement within the UILayout to 
@@ -641,14 +652,38 @@ public class UILayout extends UIElement
 	public static class SingleEngageListener extends EngageListener
 	{
 		private UIElement currentEngaged = null ;
-		private int currentIndex = 0 ;
 
 		public SingleEngageListener() {}
+
+		@Override
+		public void disengage()
+		{
+			// If the layout has been disengaged then it is 
+			// safe to say that all children of the layout 
+			// should also be disengaged.
+			setCurrentEngaged( null ) ;
+			disengageOthers( null, getParent().ordered ) ;
+		}
 
 		@Override
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
 			final UILayout layout = getParent() ;
+			final UIElement current = getCurrentEngaged() ;
+
+			if( current != null )
+			{
+				if( current.isVisible() == true )
+				{
+					if( current.isIntersectInput( _input ) == true )
+					{
+						return passInput( current, _input ) ;
+					}
+				}
+			}
+
+			setCurrentEngaged( null ) ;
+			disengageOthers( null, layout.ordered ) ;
 
 			final int size = layout.ordered.size() ;
 			for( int i = 0; i < size; i++ )
@@ -658,18 +693,15 @@ public class UILayout extends UIElement
 				{
 					if( element.isIntersectInput( _input ) == true )
 					{
-						if( setCurrentEngaged( element, i ) == true )
-						{
-							disengageOthers( currentEngaged, layout.ordered ) ;
-						}
+						element.engage() ;
+						setCurrentEngaged( element ) ;
+						disengageOthers( getCurrentEngaged(), layout.ordered ) ;
 
 						return passInput( element, _input ) ;
 					}
 				}
 			}
 
-			setCurrentEngaged( null, 0 ) ;
-			disengageOthers( null, layout.ordered ) ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 
@@ -706,13 +738,13 @@ public class UILayout extends UIElement
 		@Override
 		public InputEvent.Action keyPressed( final InputEvent _input )
 		{
-			return passInput( currentEngaged, _input ) ;
+			return passInput( getCurrentEngaged(), _input ) ;
 		}
 
 		@Override
 		public InputEvent.Action keyReleased( final InputEvent _input )
 		{
-			return passInput( currentEngaged, _input ) ;
+			return passInput( getCurrentEngaged(), _input ) ;
 		}
 
 		private InputEvent.Action passInput( final UIElement _current, final InputEvent _input )
@@ -722,28 +754,19 @@ public class UILayout extends UIElement
 			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
 		}
 
-		private boolean setCurrentEngaged( final UIElement _toEngage, final int _index )
+		public void setCurrentEngaged( final UIElement _toEngage )
 		{
-			if( _toEngage == null )
-			{
-				disengage( currentEngaged ) ;
-				currentEngaged = null ;
-				currentIndex = _index ;
-				return true ;
-			}
+			currentEngaged = _toEngage ;
+		}
 
-			if( currentEngaged != _toEngage && 
-				_toEngage.isEngaged() == false )
-			{
-				disengage( currentEngaged ) ;
+		public UIElement getCurrentEngaged()
+		{
+			return currentEngaged ;
+		}
 
-				currentEngaged = _toEngage ;
-				currentEngaged.engage() ;
-				currentIndex = _index ;
-				return true ;
-			}
-
-			return false ;
+		public boolean isEngaged()
+		{
+			return getCurrentEngaged() != null ;
 		}
 
 		private static void disengageOthers( final UIElement _current, final List<UIElement> _others )
@@ -759,14 +782,6 @@ public class UILayout extends UIElement
 					// engaged and are not the currently engaged element.
 					element.disengage() ;
 				}
-			}
-		}
-
-		private static void disengage( final UIElement _element )
-		{
-			if( _element != null )
-			{
-				_element.disengage() ;
 			}
 		}
 	}

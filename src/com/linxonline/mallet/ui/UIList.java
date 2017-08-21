@@ -113,13 +113,19 @@ public class UIList extends UILayout
 
 				return InputEvent.Action.PROPAGATE ;
 			}
-			
+
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
-				active = true ;
-				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return InputEvent.Action.CONSUME ;
+				final EngageListener mode = getParent().getEngageMode() ;
+				if( mode.isEngaged() == false )
+				{
+					active = true ;
+					last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+					return InputEvent.Action.CONSUME ;
+				}
+
+				return InputEvent.Action.PROPAGATE ;
 			}
 			
 			@Override
@@ -144,6 +150,13 @@ public class UIList extends UILayout
 
 				last.setXY( current ) ;
 				return InputEvent.Action.PROPAGATE ;
+			}
+
+			@Override
+			public void disengage()
+			{
+				active = false ;
+				moved = false ;
 			}
 		} ) ;
 	}

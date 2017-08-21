@@ -125,14 +125,24 @@ public class UIButton extends UIElement
 		}
 
 		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( draw ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
 		public InputEvent.Action mousePressed( final InputEvent _input )
 		{
-			if( getParent().isEngaged() == true )
-			{
-				Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
-				DrawAssist.forceUpdate( draw ) ;
-			}
-
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
+			DrawAssist.forceUpdate( draw ) ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 

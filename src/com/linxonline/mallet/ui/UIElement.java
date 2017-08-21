@@ -260,16 +260,18 @@ public class UIElement implements InputHandler
 													  final InputAction _action,
 													  final InputEvent _event )
 	{
+		InputEvent.Action action = InputEvent.Action.PROPAGATE ;
+
 		final int size = _base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			if( _action.action( _base.get( i ), _event ) == InputEvent.Action.CONSUME )
 			{
-				return InputEvent.Action.CONSUME ;
+				action = InputEvent.Action.CONSUME ;
 			}
 		}
 
-		return InputEvent.Action.PROPAGATE ;
+		return action ;
 	}
 
 	public boolean isIntersectInput( final InputEvent _event )
@@ -289,7 +291,7 @@ public class UIElement implements InputHandler
 	public boolean intersectPoint( final float _x, final float _y, final float _z )
 	{
 		final float zMin = position.z + offset.z ;
-		final float zMax = position.z + offset.z + length.z ;
+		final float zMax = zMin + length.z ;
 
 		if( intersectPoint( _x, _y ) == true )
 		{
@@ -308,10 +310,10 @@ public class UIElement implements InputHandler
 	public boolean intersectPoint( final float _x, final float _y )
 	{
 		final float xMin = position.x + offset.x ;
-		final float xMax = position.x + offset.x + length.x ;
+		final float xMax = xMin + length.x ;
 
 		final float yMin = position.y + offset.y ;
-		final float yMax = position.y + offset.y + length.y ;
+		final float yMax = yMin + length.y ;
 
 		if( _x >= xMin && _x <= xMax )
 		{
