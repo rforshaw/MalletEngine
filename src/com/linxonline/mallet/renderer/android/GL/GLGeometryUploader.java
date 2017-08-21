@@ -128,7 +128,6 @@ public class GLGeometryUploader
 		{
 			buffer.remove( _data ) ;
 			_data.setBuffer( null ) ;
-			_data.setLocation( null ) ;
 
 			// When a program is removed completely from the 
 			// buffer we need to reset the dirty flag to ensure 
@@ -577,6 +576,7 @@ public class GLGeometryUploader
 			if( location != null )
 			{
 				location.getGeometry().remove( location ) ;
+				_data.setLocation( null ) ;
 			}
 		}
 

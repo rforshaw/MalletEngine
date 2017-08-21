@@ -183,13 +183,14 @@ public class UILayout extends UIElement
 			for( int i = 0; i < size; i++ )
 			{
 				final UIElement element = ordered.get( i ) ;
-				element.update( _dt, _events ) ;
 				if( element.isDirty() == true )
 				{
 					// If a Child element is updating we'll 
 					// most likely also want to update the parent.
 					makeDirty() ;
 				}
+
+				element.update( _dt, _events ) ;
 
 				if( element.destroy == true )
 				{
