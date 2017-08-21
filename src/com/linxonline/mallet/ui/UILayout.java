@@ -30,8 +30,17 @@ public class UILayout extends UIElement
 	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
 
-	private Type type ;
+	private Type type ;																// How children should be ordered
 	private final UIElementUpdater updater ;										// Used to position the layouts children
+
+	// It's very likely that a child of the layout will be flagged 
+	// as dirty - this may result in the other children of the 
+	// layout being impacted - for example if a minimum length has 
+	// changed, however, that change will not affect the dimensions 
+	// of the layout - so we want the layout to readjust itself but the 
+	// layout does not need to inform its parent - which would cause a 
+	// chain reaction of almost everything updating.
+	private boolean dirtyChildren = false ;											// Used to determine if the children are dirty
 
 	private EngageListener engageMode = null ;										// Selection/Focus mode
 
@@ -173,8 +182,9 @@ public class UILayout extends UIElement
 		final boolean dirt = isDirty() ;
 		super.update( _dt, _events ) ;
 
-		if( dirt == true )
+		if( dirt == true || dirtyChildren == true )
 		{
+			dirtyChildren = false ;
 			updater.update( _dt, ordered ) ;
 		}
 
@@ -187,7 +197,7 @@ public class UILayout extends UIElement
 				{
 					// If a Child element is updating we'll 
 					// most likely also want to update the parent.
-					makeDirty() ;
+					dirtyChildren = true ;
 				}
 
 				element.update( _dt, _events ) ;
@@ -199,7 +209,7 @@ public class UILayout extends UIElement
 					removeElement( element ) ;
 
 					// We'll also want to refresh the UILayout.
-					makeDirty() ;
+					dirtyChildren = true ;
 				}
 			}
 		}
