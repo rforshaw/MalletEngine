@@ -18,6 +18,7 @@ public class UIList extends UILayout
 	private final Draw pane ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
+	private final Vector3 scrollbarSize = new Vector3() ;
 
 	// Used to define the boundaries of the scroll
 	private final Vector3 absoluteLength = new Vector3() ;		// In pixels
@@ -46,6 +47,7 @@ public class UIList extends UILayout
 	{
 		super( _type, _position, _offset, _length ) ;
 		setDefaultElementSize( 1.0f, 1.0f, 1.0f ) ;
+		setScrollbarSize( 0.5f, 0.5f, 0.5f ) ;
 
 		final UUID uid = UUID.randomUUID() ;
 		world = WorldAssist.constructWorld( uid.toString(), 0 ) ;
@@ -143,6 +145,16 @@ public class UIList extends UILayout
 
 					position.add( diff.x, diff.y, 0.0f ) ;
 
+					final Vector3 length = getParent().getLength() ;
+					final float width = absoluteLength.x - length.x ;
+					final float height = absoluteLength.y - length.y ;
+
+					position.x = ( position.x > width ) ? width : position.x ;
+					position.y = ( position.y > height ) ? height : position.y ;
+
+					position.x = ( position.x > 0.0f ) ? position.x : 0.0f ;
+					position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
+
 					CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
 					last.setXY( current ) ;
 					return InputEvent.Action.CONSUME ;
@@ -174,6 +186,17 @@ public class UIList extends UILayout
 		defaultItemSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
 		defaultItemSize.y = ( _y <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _y ) ;
 		defaultItemSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
+	}
+
+	/**
+		Defines the basic dimensions of the scrollbar.
+	*/
+	public void setScrollbarSize( final float _x, final float _y, final float _z )
+	{
+		final UIRatio ratio = getRatio() ;
+		scrollbarSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
+		scrollbarSize.y = ( _y <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _y ) ;
+		scrollbarSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
 	}
 
 	@Override
@@ -316,8 +339,10 @@ public class UIList extends UILayout
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 listLength = UIList.this.getLength() ;
-				absoluteLength.setXYZ( listLength.x, 0.0f, listLength.z ) ;
-				childPosition.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+				final Vector3 listMargin = UIList.this.getMargin() ;
+
+				absoluteLength.setXYZ( listLength.x - scrollbarSize.x, 0.0f, listLength.z ) ;
+				childPosition.setXYZ( scrollbarSize.x + listMargin.x, 0.0f, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
@@ -337,15 +362,15 @@ public class UIList extends UILayout
 					final Vector3 maximum = element.getMaximumLength() ;
 					if( maximum.y > 0.0f )
 					{
-						element.setLength( ratio.toUnitX( listLength.x ),
+						element.setLength( ratio.toUnitX( absoluteLength.x ),
 										   ratio.toUnitY( maximum.y ),
-										   ratio.toUnitZ( listLength.z ) ) ;
+										   ratio.toUnitZ( absoluteLength.z ) ) ;
 					}
 					else
 					{
-						element.setLength( ratio.toUnitX( listLength.x ),
+						element.setLength( ratio.toUnitX( absoluteLength.x ),
 											ratio.toUnitY( defaultItemSize.y ),
-											ratio.toUnitZ( listLength.z ) ) ;
+											ratio.toUnitZ( absoluteLength.z ) ) ;
 					}
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
@@ -381,8 +406,10 @@ public class UIList extends UILayout
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
 				final Vector3 listLength = UIList.this.getLength() ;
-				absoluteLength.setXYZ( 0.0f, listLength.y, listLength.z ) ;
-				childPosition.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+				final Vector3 listMargin = UIList.this.getMargin() ;
+
+				absoluteLength.setXYZ( 0.0f, listLength.y - scrollbarSize.y, listLength.z ) ;
+				childPosition.setXYZ( 0.0f, scrollbarSize.y + listMargin.y, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
@@ -403,14 +430,14 @@ public class UIList extends UILayout
 					if( maximum.x > 0.0f )
 					{
 						element.setLength( ratio.toUnitX( maximum.x ),
-											ratio.toUnitY( listLength.y ),
-											ratio.toUnitZ( listLength.z ) ) ;
+											ratio.toUnitY( absoluteLength.y ),
+											ratio.toUnitZ( absoluteLength.z ) ) ;
 					}
 					else
 					{
 						element.setLength( ratio.toUnitX( defaultItemSize.x ),
-											ratio.toUnitY( listLength.y ),
-											ratio.toUnitZ( listLength.z ) ) ;
+											ratio.toUnitY( absoluteLength.y ),
+											ratio.toUnitZ( absoluteLength.z ) ) ;
 					}
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
