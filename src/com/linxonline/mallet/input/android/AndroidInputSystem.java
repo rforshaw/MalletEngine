@@ -71,12 +71,12 @@ public class AndroidInputSystem implements IInputSystem,
 			if( id != InputID.NONE )
 			{
 				final int action = _event.getAction() ;
-				addInput( id, action, _event.getX( i ), _event.getY( i ) ) ;
+				addInput( id, action, _event.getX( i ), _event.getY( i ), _event.getEventTime() ) ;
 			}
 		}
 	}
 
-	private void addInput( final InputID _id, final int _action, final float _x, final float _y )
+	private void addInput( final InputID _id, final int _action, final float _x, final float _y, final long _when )
 	{
 		InputType type = InputType.TOUCH_MOVE ;
 		if( _action == MotionEvent.ACTION_UP )
@@ -92,7 +92,7 @@ public class AndroidInputSystem implements IInputSystem,
 		{
 			final InputEvent input = cache.get() ;
 			input.setID( _id ) ;
-			input.setInput( type, ( int )_x, ( int )_y ) ;
+			input.setInput( type, ( int )_x, ( int )_y, _when ) ;
 			touchInputs.add( input ) ;
 		}
 	}

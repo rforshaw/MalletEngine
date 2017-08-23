@@ -142,21 +142,21 @@ public class InputSystem implements IInputSystem,
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE1_PRESSED, mousePosition ) ;
+				updateMouse( InputType.MOUSE1_PRESSED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON2 :
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE2_PRESSED, mousePosition ) ;
+				updateMouse( InputType.MOUSE2_PRESSED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON3 :
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE3_PRESSED, mousePosition ) ;
+				updateMouse( InputType.MOUSE3_PRESSED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 		}
@@ -176,21 +176,21 @@ public class InputSystem implements IInputSystem,
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE1_RELEASED, mousePosition ) ;
+				updateMouse( InputType.MOUSE1_RELEASED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON2 :
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE2_RELEASED, mousePosition ) ;
+				updateMouse( InputType.MOUSE2_RELEASED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON3 :
 			{
 				mousePosition.x = _event.getX() ;
 				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE3_RELEASED, mousePosition ) ;
+				updateMouse( InputType.MOUSE3_RELEASED, mousePosition, _event.getWhen() ) ;
 				break ;
 			}
 		}
@@ -201,7 +201,7 @@ public class InputSystem implements IInputSystem,
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
 
-		updateMouse( InputType.MOUSE_MOVED, mousePosition ) ;
+		updateMouse( InputType.MOUSE_MOVED, mousePosition, _event.getWhen() ) ;
 	}
 
 	public void mouseMoved( final MouseEvent _event )
@@ -209,7 +209,7 @@ public class InputSystem implements IInputSystem,
 		mousePosition.x = _event.getX() ;
 		mousePosition.y = _event.getY() ;
 
-		updateMouse( InputType.MOUSE_MOVED, mousePosition ) ;
+		updateMouse( InputType.MOUSE_MOVED, mousePosition, _event.getWhen() ) ;
 	}
 
 	/**  Recieve MouseWheelEvents from system **/
@@ -224,15 +224,15 @@ public class InputSystem implements IInputSystem,
 		final InputEvent input = cache.get() ;
 		final int scroll = ( int )_event.getRotation()[1] ;
 
-		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll ) ;
+		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll, _event.getWhen() ) ;
 		mouseInputs.add( input ) ;
 	}
 
-	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
+	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition, final long _when )
 	{
 		final InputEvent input = cache.get() ;
 		input.setID( InputID.MOUSE_1 ) ;
-		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
+		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y, _when ) ;
 		mouseInputs.add( input ) ;
 	}
 

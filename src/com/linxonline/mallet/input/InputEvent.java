@@ -11,16 +11,17 @@ public final class InputEvent implements Cacheable
 	public int mouseX = 0 ;
 	public int mouseY = 0 ;
 	public boolean isActionKey = false ;
+	public long when = 0L ;
 
 	public InputEvent()
 	{
 		this( InputType.NONE, KeyCode.NONE, InputID.NONE ) ;
 	}
 
-	public InputEvent( final InputType _type, final int _x, final int _y )
+	public InputEvent( final InputType _type, final int _x, final int _y, final long _when )
 	{
 		setID( InputID.NONE ) ;
-		setInput( _type, _x, _y ) ;
+		setInput( _type, _x, _y, _when ) ;
 	}
 
 	public InputEvent( final InputType _type, final KeyCode _keycode, final InputID _id )
@@ -43,9 +44,15 @@ public final class InputEvent implements Cacheable
 
 	public void setInput( final InputType _type, final int _x, final int _y )
 	{
+		setInput( _type, _x, _y, when ) ;
+	}
+
+	public void setInput( final InputType _type, final int _x, final int _y, final long _when )
+	{
 		inputType = _type ;
 		mouseX = _x ;
 		mouseY = _y ;
+		when = _when ;
 	}
 
 	public final InputID getID()
@@ -83,6 +90,11 @@ public final class InputEvent implements Cacheable
 		return mouseY ;
 	}
 
+	public long getWhen()
+	{
+		return when ;
+	}
+
 	public final void clone( final InputEvent _input )
 	{
 		inputType = _input.inputType ;
@@ -90,6 +102,7 @@ public final class InputEvent implements Cacheable
 		mouseY = _input.mouseY ;
 		keycode = _input.keycode ;
 		isActionKey = _input.isActionKey ;
+		when = _input.when ;
 	}
 
 	public final void reset()
@@ -100,6 +113,7 @@ public final class InputEvent implements Cacheable
 		mouseX = 0 ;
 		mouseY = 0 ;
 		isActionKey = false ;
+		when = 0L ;
 	}
 
 	public String toString()

@@ -22,6 +22,7 @@ public class UIList extends UILayout
 
 	// Used to define the boundaries of the scroll
 	private final Vector3 absoluteLength = new Vector3() ;		// In pixels
+	private int dragDelay = 100 ;
 
 	// Anything added to the UIList will make use of this 
 	// DrawDelegate rather than the delegate coming from 
@@ -88,6 +89,8 @@ public class UIList extends UILayout
 			private final Vector2 last = new Vector2() ;
 			private final Vector2 diff = new Vector2() ;
 
+			private long timestamp = 0L ;
+			private boolean pressed = false ;
 			private boolean active = false ;
 			private boolean moved = false ;
 
@@ -104,9 +107,16 @@ public class UIList extends UILayout
 			}
 
 			@Override
+			public InputEvent.Action touchMove( final InputEvent _input )
+			{
+				return mouseMove( _input ) ;
+			}
+
+			@Override
 			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
 				active = false ;
+				pressed = false ;
 				if( moved == true )
 				{
 					moved = false ;
@@ -119,6 +129,9 @@ public class UIList extends UILayout
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
+				timestamp = _input.getWhen() ;
+				pressed = true ;
+
 				final EngageListener mode = getParent().getEngageMode() ;
 				if( mode.isEngaged() == false )
 				{
@@ -129,10 +142,16 @@ public class UIList extends UILayout
 
 				return InputEvent.Action.PROPAGATE ;
 			}
-			
+
 			@Override
 			public InputEvent.Action mouseMove( final InputEvent _input )
 			{
+				if( active == false && pressed == true )
+				{
+					final int timeDiff = ( int )( _input.getWhen() - timestamp ) ;
+					active = timeDiff < getParent().getDragDelay() ;
+				}
+
 				current.setXY( _input.getMouseX(), _input.getMouseY() ) ;
 				if( active == true )
 				{
@@ -169,6 +188,7 @@ public class UIList extends UILayout
 			{
 				active = false ;
 				moved = false ;
+				pressed = false ;
 			}
 		} ) ;
 	}
@@ -199,24 +219,48 @@ public class UIList extends UILayout
 		scrollbarSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
 	}
 
+	/**
+		Define how long the delay can be between the user 
+		pressing down and moving that could trigger scrolling.
+	*/
+	public void setDragDelay( final int _delay )
+	{
+		dragDelay = _delay ;
+	}
+
+	/**
+		Return how long the delay can be between the user 
+		pressing down and moving that could trigger scrolling.
+	*/
+	public int getDragDelay()
+	{
+		return dragDelay ;
+	}
+
 	@Override
 	public void setLength( final float _x, final float _y, final float _z )
 	{
 		super.setLength( _x, _y, _z ) ;
 
-		final Vector3 length = getLength() ;
-		final int width = ( int )length.x ;
-		final int height = ( int )length.y ;
+		if( isDirty() == true )
+		{
+			// We only want to update the pane if 
+			// calling setLength was considered significant 
+			// enough to flag the UIList as dirty.
+			final Vector3 length = getLength() ;
+			final int width = ( int )length.x ;
+			final int height = ( int )length.y ;
 
-		CameraAssist.amendScreenResolution( internalCamera, width, height ) ;
-		CameraAssist.amendDisplayResolution( internalCamera, width, height ) ;
-		CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
+			CameraAssist.amendScreenResolution( internalCamera, width, height ) ;
+			CameraAssist.amendDisplayResolution( internalCamera, width, height ) ;
+			CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
-		WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
-		WorldAssist.setDisplayDimensions( world, 0, 0, width, height ) ;
+			WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
+			WorldAssist.setDisplayDimensions( world, 0, 0, width, height ) ;
 
-		Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
-		DrawAssist.forceUpdate( pane ) ;
+			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
+			DrawAssist.forceUpdate( pane ) ;
+		}
 	}
 
 	@Override
@@ -270,7 +314,7 @@ public class UIList extends UILayout
 					// else we run the risk of doing pointless processing.
 					return InputEvent.Action.PROPAGATE ;
 				}
-			
+
 				final Vector3 position = getPosition() ;
 				final Vector3 offset = getOffset() ;
 
@@ -474,6 +518,29 @@ public class UIList extends UILayout
 			
 			}
 		} ;
+	}
+
+	/**
+		Returns the elements absolute length in pixels.
+		Pass in a Vector3 to retrieve the length in units.
+	*/
+	public Vector3 getAbsoluteLength( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			getRatio().toUnit( getAbsoluteLength(), _unit ) ;
+		}
+
+		return getAbsoluteLength() ;
+	}
+
+	/**
+		Return the element's actual absolute length in pixels.
+	*/
+	public Vector3 getAbsoluteLength()
+	{
+		getCurrentUpdater().update( 0.0f, getElements() ) ;
+		return absoluteLength ;
 	}
 
 	/**

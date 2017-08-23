@@ -333,6 +333,11 @@ public class UILayout extends UIElement
 		ordered.clear() ;
 	}
 
+	protected UIElementUpdater getCurrentUpdater()
+	{
+		return updater ;
+	}
+
 	public Type getType()
 	{
 		return type ;

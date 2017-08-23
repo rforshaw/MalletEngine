@@ -156,6 +156,25 @@ public class UI
 	}
 
 	/**
+		Apply _x, _y and _z to passed in Vector3 _update.
+		Return true if the values are significantly different 
+		from the values current in _update, else return false 
+		if the values have no major difference.
+
+		Used by UIElement to determine if position, offset, 
+		margin and others require makeDirty to be called.
+	*/
+	public static boolean applyVec3( final Vector3 _update, final float _x, final float _y, final float _z )
+	{
+		final float xDiff = _update.x - _x ;
+		final float yDiff = _update.x - _y ;
+		final float zDiff = _update.x - _z ;
+
+		_update.setXYZ( _x, _y, _z ) ;
+		return Math.abs( xDiff ) > 0.001f || Math.abs( yDiff ) > 0.001f || Math.abs( zDiff ) > 0.001f ;
+	}
+
+	/**
 		The best ratio is the one that is smallest.
 		A ratio of 0.0 however means that the axis is not being used.
 		That axis should be ignored when trying to find the best ratio.

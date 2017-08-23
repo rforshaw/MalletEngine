@@ -352,9 +352,10 @@ public class UIElement implements InputHandler
 	*/
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		makeDirty() ;
-		position.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
-		//System.out.println( "Position: " + position ) ;
+		if( UI.applyVec3( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		{
+			makeDirty() ;
+		}
 	}
 
 	/**
@@ -365,9 +366,10 @@ public class UIElement implements InputHandler
 	*/
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		makeDirty() ;
-		offset.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
-		//System.out.println( "Offset: " + offset ) ;
+		if( UI.applyVec3( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		{
+			makeDirty() ;
+		}
 	}
 
 	/**
@@ -414,31 +416,33 @@ public class UIElement implements InputHandler
 	*/
 	public void setLength( float _x, float _y, float _z )
 	{
-		makeDirty() ;
 		_x = ratio.toPixelX( _x ) ;
 		_y = ratio.toPixelY( _y ) ;
 		_z = ratio.toPixelZ( _z ) ;
 
-		length.x = ( _x < minLength.x ) ? minLength.x : _x ;
-		length.y = ( _y < minLength.y ) ? minLength.y : _y ;
-		length.z = ( _z < minLength.z ) ? minLength.z : _z ;
+		_x = ( _x < minLength.x ) ? minLength.x : _x ;
+		_y = ( _y < minLength.y ) ? minLength.y : _y ;
+		_z = ( _z < minLength.z ) ? minLength.z : _z ;
 
 		if( maxLength.x > 0.0f )
 		{
-			length.x = ( _x > maxLength.x ) ? maxLength.x : _x ;
+			_x = ( _x > maxLength.x ) ? maxLength.x : _x ;
 		}
 
 		if( maxLength.y > 0.0f )
 		{
-			length.y = ( _y > maxLength.y ) ? maxLength.y : _y ;
+			_y = ( _y > maxLength.y ) ? maxLength.y : _y ;
 		}
 
 		if( maxLength.z > 0.0f )
 		{
-			length.z = ( _z > maxLength.z ) ? maxLength.z : _z ;
+			_z = ( _z > maxLength.z ) ? maxLength.z : _z ;
 		}
 
-		//System.out.println( "Length: " + length ) ;
+		if( UI.applyVec3( length, _x, _y, _z ) == true )
+		{
+			makeDirty() ;
+		}
 	}
 
 	/**
@@ -450,13 +454,19 @@ public class UIElement implements InputHandler
 	*/
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
-		makeDirty() ;
-		margin.setXYZ( ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) ;
+		if( UI.applyVec3( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		{
+			makeDirty() ;
+		}
 	}
 
 	public void setLayer( final int _layer )
 	{
-		layer = _layer ;
+		if( layer != _layer )
+		{
+			layer = _layer ;
+			makeDirty() ;
+		}
 	}
 
 	public boolean isDirty()
@@ -771,9 +781,14 @@ public class UIElement implements InputHandler
 
 		public UV()
 		{
-			this( new Vector2( 0.0f, 0.0f ), new Vector2( 1.0f, 1.0f ) ) ;
+			this( 0.0f, 0.0f, 1.0f, 1.0f ) ;
 		}
 
+		public UV( final float _minX, final float _minY, final float _maxX, final float _maxY )
+		{
+			this( new Vector2( _minX, _minY ), new Vector2( _maxX, _maxY ) ) ;
+		}
+		
 		public UV( final Vector2 _min, final Vector2 _max )
 		{
 			min = _min ;
