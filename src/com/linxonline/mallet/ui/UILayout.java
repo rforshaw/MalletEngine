@@ -645,6 +645,8 @@ public class UILayout extends UIElement
 	public static abstract class EngageListener extends InputListener<UILayout>
 	{
 		public abstract boolean isEngaged() ;
+
+		public abstract UIElement getEngaged() ;
 	}
 
 	/**
@@ -666,7 +668,7 @@ public class UILayout extends UIElement
 			// If the layout has been disengaged then it is 
 			// safe to say that all children of the layout 
 			// should also be disengaged.
-			setCurrentEngaged( null ) ;
+			setEngaged( null ) ;
 			disengageOthers( null, getParent().ordered ) ;
 		}
 
@@ -674,11 +676,11 @@ public class UILayout extends UIElement
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
 			final UILayout layout = getParent() ;
-			final UIElement current = getCurrentEngaged() ;
+			final UIElement current = getEngaged() ;
 
 			if( current != null )
 			{
-				if( current.isVisible() == true )
+				if( current.isVisible() == true && current.isDisabled() == false )
 				{
 					if( current.isIntersectInput( _input ) == true )
 					{
@@ -687,7 +689,7 @@ public class UILayout extends UIElement
 				}
 			}
 
-			setCurrentEngaged( null ) ;
+			setEngaged( null ) ;
 			disengageOthers( null, layout.ordered ) ;
 
 			final int size = layout.ordered.size() ;
@@ -699,8 +701,8 @@ public class UILayout extends UIElement
 					if( element.isIntersectInput( _input ) == true )
 					{
 						element.engage() ;
-						setCurrentEngaged( element ) ;
-						disengageOthers( getCurrentEngaged(), layout.ordered ) ;
+						setEngaged( element.isDisabled() ? null : element ) ;
+						disengageOthers( getEngaged(), layout.ordered ) ;
 
 						return passInput( element, _input ) ;
 					}
@@ -743,35 +745,33 @@ public class UILayout extends UIElement
 		@Override
 		public InputEvent.Action keyPressed( final InputEvent _input )
 		{
-			return passInput( getCurrentEngaged(), _input ) ;
+			return passInput( getEngaged(), _input ) ;
 		}
 
 		@Override
 		public InputEvent.Action keyReleased( final InputEvent _input )
 		{
-			return passInput( getCurrentEngaged(), _input ) ;
+			return passInput( getEngaged(), _input ) ;
 		}
 
 		private InputEvent.Action passInput( final UIElement _current, final InputEvent _input )
 		{
-			//System.out.println( "Current: " + _current ) ;
-			//System.out.println( _input ) ;
 			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
 		}
 
-		public void setCurrentEngaged( final UIElement _toEngage )
+		public void setEngaged( final UIElement _toEngage )
 		{
 			currentEngaged = _toEngage ;
 		}
 
-		public UIElement getCurrentEngaged()
+		public UIElement getEngaged()
 		{
 			return currentEngaged ;
 		}
-
+		
 		public boolean isEngaged()
 		{
-			return getCurrentEngaged() != null ;
+			return getEngaged() != null ;
 		}
 
 		private static void disengageOthers( final UIElement _current, final List<UIElement> _others )

@@ -166,12 +166,12 @@ public class UI
 	*/
 	public static boolean applyVec3( final Vector3 _update, final float _x, final float _y, final float _z )
 	{
-		final float xDiff = _update.x - _x ;
-		final float yDiff = _update.x - _y ;
-		final float zDiff = _update.x - _z ;
+		final float xDiff = Math.abs( _update.x - _x ) ;
+		final float yDiff = Math.abs( _update.y - _y ) ;
+		final float zDiff = Math.abs( _update.z - _z ) ;
 
 		_update.setXYZ( _x, _y, _z ) ;
-		return Math.abs( xDiff ) > 0.001f || Math.abs( yDiff ) > 0.001f || Math.abs( zDiff ) > 0.001f ;
+		return xDiff > 0.001f || yDiff > 0.001f || zDiff > 0.001f ;
 	}
 
 	/**

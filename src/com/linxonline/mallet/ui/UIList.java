@@ -90,9 +90,8 @@ public class UIList extends UILayout
 			private final Vector2 diff = new Vector2() ;
 
 			private long timestamp = 0L ;
+			private int timeDiff = 0 ;
 			private boolean pressed = false ;
-			private boolean active = false ;
-			private boolean moved = false ;
 
 			@Override
 			public InputEvent.Action touchReleased( final InputEvent _input )
@@ -115,49 +114,27 @@ public class UIList extends UILayout
 			@Override
 			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
-				active = false ;
 				pressed = false ;
-				if( moved == true )
-				{
-					moved = false ;
-					return InputEvent.Action.CONSUME ;
-				}
-
-				return InputEvent.Action.PROPAGATE ;
+				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+				return InputEvent.Action.CONSUME ;
 			}
 
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
-				timestamp = _input.getWhen() ;
 				pressed = true ;
-
-				final EngageListener mode = getParent().getEngageMode() ;
-				if( mode.isEngaged() == false )
-				{
-					active = true ;
-					last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-					return InputEvent.Action.CONSUME ;
-				}
-
-				return InputEvent.Action.PROPAGATE ;
+				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+				return InputEvent.Action.CONSUME ;
 			}
 
 			@Override
 			public InputEvent.Action mouseMove( final InputEvent _input )
 			{
-				if( active == false && pressed == true )
+				final EngageListener mode = getParent().getEngageMode() ;
+				if( pressed == true && mode.isEngaged() == false )
 				{
-					final int timeDiff = ( int )( _input.getWhen() - timestamp ) ;
-					active = timeDiff < getParent().getDragDelay() ;
-				}
-
-				current.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				if( active == true )
-				{
-					moved = true ;
-					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - current.x ) : 0.0f ;
-					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - current.y ) : 0.0f ;
+					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
+					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - _input.getMouseY() ) : 0.0f ;
 
 					CameraAssist.getUIPosition( internalCamera, position ) ;
 					getLength( length ) ;
@@ -175,19 +152,15 @@ public class UIList extends UILayout
 					position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
 
 					CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
-					last.setXY( current ) ;
-					return InputEvent.Action.CONSUME ;
 				}
 
-				last.setXY( current ) ;
-				return InputEvent.Action.PROPAGATE ;
+				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+				return InputEvent.Action.CONSUME ;
 			}
 
 			@Override
 			public void disengage()
 			{
-				active = false ;
-				moved = false ;
 				pressed = false ;
 			}
 		} ) ;

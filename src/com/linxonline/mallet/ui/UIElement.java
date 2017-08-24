@@ -32,6 +32,7 @@ public class UIElement implements InputHandler
 
 	public boolean destroy = false ;
 	public boolean visible = true ;
+	public boolean disabled = false ;
 
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
@@ -137,15 +138,19 @@ public class UIElement implements InputHandler
 
 	/**
 		Flag the UIElement as being engaged.
+		Only UIElements that are not disabled can be flagged as engaged.
 	*/
 	public void engage()
 	{
-		current = State.ENGAGED ;
-		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
+		if( current != State.ENGAGED && isDisabled() == false )
 		{
-			base.get( i ).engage() ;
+			current = State.ENGAGED ;
+			final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
+			final int size = base.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				base.get( i ).engage() ;
+			}
 		}
 	}
 
@@ -154,12 +159,15 @@ public class UIElement implements InputHandler
 	*/
 	public void disengage()
 	{
-		current = State.NEUTRAL ;
-		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
-		final int size = base.size() ;
-		for( int i = 0; i < size; i++ )
+		if( current != State.NEUTRAL )
 		{
-			base.get( i ).disengage() ;
+			current = State.NEUTRAL ;
+			final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
+			final int size = base.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				base.get( i ).disengage() ;
+			}
 		}
 	}
 
@@ -215,6 +223,11 @@ public class UIElement implements InputHandler
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
+		if( isDisabled() == true )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
 		switch( _event.getInputType() )
 		{
 			case KEYBOARD_PRESSED  :
@@ -340,6 +353,34 @@ public class UIElement implements InputHandler
 		if( visible != _visibility )
 		{
 			visible = _visibility ;
+			makeDirty() ;
+		}
+	}
+
+	/**
+		Enable the UIElement allow it to accept input.
+	*/
+	public void enable()
+	{
+		if( disabled == true )
+		{
+			disabled = false ;
+			makeDirty() ;
+		}
+	}
+
+	/**
+		Disable the UIElement from accepting input.
+		It should not acknowledge any user modifications.
+		A UIElement that is visible is still affected by 
+		layout adjustments.
+	*/
+	public void disable()
+	{
+		if( disabled == false )
+		{
+			disabled = true ;
+			disengage() ;
 			makeDirty() ;
 		}
 	}
@@ -477,6 +518,11 @@ public class UIElement implements InputHandler
 	public boolean isVisible()
 	{
 		return visible ;
+	}
+
+	public boolean isDisabled()
+	{
+		return disabled ;
 	}
 
 	/**
