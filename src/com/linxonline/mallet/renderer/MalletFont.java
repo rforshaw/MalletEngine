@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.QuickSort ;
+import com.linxonline.mallet.maths.MathUtil ;
 
 import com.linxonline.mallet.renderer.font.FontAssist ;
 import com.linxonline.mallet.renderer.font.Glyph ;
@@ -35,6 +36,17 @@ public class MalletFont
 		this( _name, 12 ) ;
 	}
 
+	public static MalletFont createByPixel( final String _name, final int _style, final int _pixels )
+	{
+		final int pt = ( int )MathUtil.linear( 6, 12, 8, 16, _pixels ) ;
+		return createByPoint( _name, _style, pt ) ;
+	}
+
+	public static MalletFont createByPoint( final String _name, final int _style, final int _pt )
+	{
+		return new MalletFont( _name, _style, _pt ) ;
+	}
+	
 	public String getFontName()
 	{
 		return name ;

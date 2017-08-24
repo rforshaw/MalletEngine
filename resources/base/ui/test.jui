@@ -12,7 +12,7 @@
 					"UILISTENER" : {
 						"TEXT" : "Test 1",
 						"FONT" : "Arial",
-						"FONT_SIZE" : 33,
+						"FONT_SIZE" : 1.16,
 						"RETAIN_RATIO" : true,
 						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
@@ -38,7 +38,7 @@
 					"UILISTENER" : {
 						"TEXT": "Test 2",
 						"FONT" : "Arial",
-						"FONT_SIZE" : 33,
+						"FONT_SIZE" : 1.16,
 						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"TEXTURE" : "base/textures/button_sheet.png",

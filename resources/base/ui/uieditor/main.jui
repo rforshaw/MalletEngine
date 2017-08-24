@@ -15,7 +15,7 @@
 					"UILISTENER" : {
 						"TEXT" : "File",
 						"FONT" : "Arial",
-						"FONT_SIZE" : "12",
+						"FONT_SIZE" : "0.42",
 						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
@@ -44,7 +44,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Open",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -67,7 +67,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Save",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -90,7 +90,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Exit",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -125,7 +125,7 @@
 					"UILISTENER" : {
 						"TEXT" : "Edit",
 						"FONT" : "Arial",
-						"FONT_SIZE" : "12",
+						"FONT_SIZE" : "0.42",
 						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
@@ -154,7 +154,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Copy",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -177,7 +177,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Paste",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -212,7 +212,7 @@
 					"UILISTENER" : {
 						"TEXT" : "Help",
 						"FONT" : "Arial",
-						"FONT_SIZE" : "12",
+						"FONT_SIZE" : "0.42",
 						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
@@ -241,7 +241,7 @@
 								"UILISTENER" : {
 									"TEXT" : "Help",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -264,7 +264,7 @@
 								"UILISTENER" : {
 									"TEXT" : "About",
 									"FONT" : "Arial",
-									"FONT_SIZE" : "12",
+									"FONT_SIZE" : "0.42",
 									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
@@ -317,7 +317,7 @@
 								"TEXT" : "Type Here",
 								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
 								"FONT" : "Arial",
-								"FONT_SIZE" : 12,
+								"FONT_SIZE" : 0.42,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"UV" : {
@@ -331,7 +331,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -353,7 +353,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -375,7 +375,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -397,7 +397,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -419,7 +419,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -441,7 +441,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -463,7 +463,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -485,7 +485,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -507,7 +507,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -529,7 +529,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -551,7 +551,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -585,7 +585,7 @@
 									"UILISTENER" : {
 										"TEXT" : "Test 2",
 										"FONT" : "Arial",
-										"FONT_SIZE" : 33,
+										"FONT_SIZE" : 1.16,
 										"COLOUR_TEXT" : "255, 0, 0",
 										"TEXTURE" : "base/textures/button_sheet.png",
 										"NEUTRAL_UV" : {
@@ -612,7 +612,7 @@
 											"UILISTENER" : {
 												"TEXT" : "T3",
 												"FONT" : "Arial",
-												"FONT_SIZE" : 33,
+												"FONT_SIZE" : 1.16,
 												"COLOUR_TEXT" : "255, 0, 0",
 												"TEXTURE" : "base/textures/button_sheet.png",
 												"NEUTRAL_UV" : {
@@ -634,7 +634,7 @@
 											"UILISTENER" : {
 												"TEXT" : "T3",
 												"FONT" : "Arial",
-												"FONT_SIZE" : 33,
+												"FONT_SIZE" : 1.16,
 												"COLOUR_TEXT" : "255, 0, 0",
 												"TEXTURE" : "base/textures/button_sheet.png",
 												"NEUTRAL_UV" : {
@@ -658,7 +658,7 @@
 									"UILISTENER" : {
 										"TEXT" : "Test 2",
 										"FONT" : "Arial",
-										"FONT_SIZE" : 33,
+										"FONT_SIZE" : 1.16,
 										"COLOUR_TEXT" : "255, 0, 0",
 										"TEXTURE" : "base/textures/button_sheet.png",
 										"NEUTRAL_UV" : {
@@ -682,7 +682,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -704,7 +704,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
@@ -726,7 +726,7 @@
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
-								"FONT_SIZE" : 33,
+								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {

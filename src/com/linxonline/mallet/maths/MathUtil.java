@@ -111,4 +111,11 @@ public class MathUtil
 
 		return num / Math.pow( 10, increment ) ;
 	}
+
+	public static float linear( final float _newMin, final float _newMax, final float _oldMin, final float _oldMax, final float _oldValue )
+	{
+		final float oldRange = _oldMax - _oldMin ;
+		final float newRange = _newMax - _newMin ;
+		return ( ( ( _oldValue - _oldMin ) * newRange ) / oldRange ) + _newMin ;
+	}
 }

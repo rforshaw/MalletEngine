@@ -39,7 +39,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UIElement> uiListener = JUI.<UIElement>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UIElement> uiListener = JUI.<UIElement>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -60,7 +60,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -82,7 +82,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -102,7 +102,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UITextField.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UITextField.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -111,7 +111,7 @@ public class JUI
 				return element ;
 			}
 
-			private UITextField.UIListener createListener( final JSONObject _ui )
+			private UITextField.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -127,10 +127,10 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
-				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
 				final UITextField.UIListener listener = UITextField.createUIListener( text, font, texture, uv ) ;
@@ -169,7 +169,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -178,7 +178,7 @@ public class JUI
 				return element ;
 			}
 
-			private UIButton.UIListener createListener( final JSONObject _ui )
+			private UIButton.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -197,10 +197,10 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
-				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
 				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
@@ -242,7 +242,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -259,7 +259,7 @@ public class JUI
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 
-				final UIListener<UISpacer> uiListener = JUI.<UISpacer>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UISpacer> uiListener = JUI.<UISpacer>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -336,7 +336,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -356,7 +356,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -365,7 +365,7 @@ public class JUI
 				return element ;
 			}
 
-			private UIButton.UIListener createListener( final JSONObject _ui )
+			private UIButton.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -384,10 +384,10 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
-				final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
 				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
@@ -584,7 +584,7 @@ public class JUI
 		}
 	}
 
-	public static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui )
+	public static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui, final UIRatio _ratio )
 	{
 		if( _ui == null )
 		{
@@ -595,11 +595,11 @@ public class JUI
 
 		final String text = _ui.optString( "TEXT", "" ) ;
 		final String fontName = _ui.optString( "FONT", null ) ;
-		final int fontSize = _ui.optInt( "FONT_SIZE", 12 ) ;
+		final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 		final String texturePath = _ui.optString( "TEXTURE", null ) ;
 
-		final MalletFont font = ( fontName != null ) ? new MalletFont( fontName, fontSize ) : null ;
+		final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 		final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
 
 		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( text, font, texture, uv ) ;
