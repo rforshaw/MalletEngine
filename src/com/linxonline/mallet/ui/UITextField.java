@@ -9,8 +9,9 @@ import com.linxonline.mallet.maths.* ;
 
 public class UITextField extends UIElement
 {
-	private boolean checked = false ;
 	private final StringBuilder text = new StringBuilder() ;
+
+	private int cursorIndex = 0 ;
 
 	/**
 		If the UICheckbox is being added to a UILayout
@@ -49,6 +50,16 @@ public class UITextField extends UIElement
 		addListener( _listener ) ;
 	}
 
+	public void setCursorIndex( final int _index )
+	{
+		cursorIndex = _index ;
+	}
+
+	public int getCursorIndex()
+	{
+		return cursorIndex ;
+	}
+
 	public StringBuilder getText()
 	{
 		return text ;
@@ -65,16 +76,22 @@ public class UITextField extends UIElement
 	public static class UIListener extends UIFactory.UIBasicListener<UITextField>
 	{
 		private final String placeholder ;
-	
+		private boolean editing = false ;
+		private boolean blinkCursor = false ;
+
+		private DrawDelegate<World, Draw> delegate = null ;
+		private World world ;
+
+		private Draw drawPlaceholder = null ;
 		private Draw drawEdit = null ;
-		
+		private Draw drawCursor = null ;
 
 		public UIListener( final String _text,
 						   final MalletFont _font,
 						   final MalletTexture _sheet,
 						   final UIElement.UV _uv )
 		{
-			super( _text, _font, _sheet, _uv ) ;
+			super( null, _font, _sheet, _uv ) ;
 			placeholder = _text ;
 		}
 
@@ -85,27 +102,66 @@ public class UITextField extends UIElement
 			final MalletFont font = getFont() ;
 			final MalletColour colour = getColour() ;
 
-			if( font != null )
+			final UITextField parent = getParent() ;
+			final UIRatio ratio = parent.getRatio() ;
+			final Vector3 length = parent.getLength() ;
+			final int layer = parent.getLayer() + 1 ;
+
+			final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
+			textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+
+			final StringBuilder edit = parent.getText() ;
+
 			{
-				final UITextField parent = getParent() ;
-				final Vector3 length = parent.getLength() ;
-				final StringBuilder edit = parent.getText() ;
-
-				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
-				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
-
-				final int layer = parent.getLayer() ;
-
 				drawEdit = DrawAssist.createTextDraw( edit,
 													  font,
 													  parent.getPosition(),
-													  textOffset,
+													  new Vector3( textOffset ),
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
-													  layer + 1 ) ;
-				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
+													  layer ) ;
+
 				DrawAssist.amendColour( drawEdit, colour ) ;
 				DrawAssist.amendUI( drawEdit, true ) ;
+			}
+
+			{
+				drawPlaceholder = DrawAssist.createTextDraw( placeholder,
+															 font,
+															 parent.getPosition(),
+															 new Vector3( textOffset ),
+															 new Vector3(),
+															 new Vector3( 1, 1, 1 ),
+															 layer ) ;
+
+				DrawAssist.amendColour( drawPlaceholder, colour ) ;
+				DrawAssist.amendUI( drawPlaceholder, true ) ;
+			}
+
+			{
+				final float width = ratio.toPixelX( 0.05f ) ;
+				final float height = ratio.toPixelY( 0.42f ) ;
+			
+				final Shape triangle = Shape.create( Shape.Style.FILL, 4, 4 ) ;
+				triangle.addVertex( Shape.construct( 0,     0,      0,   colour) ) ;
+				triangle.addVertex( Shape.construct( 0,     height, 0,   colour ) ) ;
+				triangle.addVertex( Shape.construct( width, height, 0,   colour ) ) ;
+				triangle.addVertex( Shape.construct( width, 0,      0,   colour ) ) ;
+
+				triangle.addIndex( 0 ) ;
+				triangle.addIndex( 1 ) ;
+				triangle.addIndex( 2 ) ;
+				triangle.addIndex( 3 ) ;
+
+				drawCursor = DrawAssist.createDraw( parent.getPosition(),
+													new Vector3( textOffset ),
+													new Vector3(),
+													new Vector3( 1, 1, 1 ),
+													layer ) ;
+
+				DrawAssist.amendShape( drawCursor, Shape.triangulate( triangle ) ) ;
+				DrawAssist.attachProgram( drawCursor, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+				DrawAssist.amendUI( drawCursor, true ) ;
 			}
 		}
 
@@ -117,10 +173,22 @@ public class UITextField extends UIElement
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
 			super.addDraws( _delegate, _world ) ;
-			if( drawEdit != null )
+			delegate = _delegate ;
+			world = _world ;
+
+			delegate.addTextDraw( drawEdit, world ) ;
+
+			final StringBuilder edit = getParent().getText() ;
+			if( isEditing() == false && edit.length() <= 0 )
 			{
-				_delegate.addTextDraw( drawEdit, _world ) ;
+				delegate.addTextDraw( drawPlaceholder, world ) ;
 			}
+
+			if( isEditing() == true )
+			{
+				delegate.addBasicDraw( drawCursor, world ) ;
+			}
+			getParent().makeDirty() ;
 		}
 
 		/**
@@ -132,43 +200,115 @@ public class UITextField extends UIElement
 		{
 			super.removeDraws( _delegate ) ;
 			_delegate.removeDraw( drawEdit ) ;
+			_delegate.removeDraw( drawPlaceholder ) ;
+			_delegate.removeDraw( drawCursor ) ;
 		}
 
 		@Override
 		public void refresh()
 		{
 			super.refresh() ;
-			if( drawEdit != null )
+			if( delegate == null )
 			{
-				final UITextField parent = getParent() ;
-				final Vector3 length = parent.getLength() ;
-				final MalletFont font = getFont() ;
-				final StringBuilder edit = parent.getText() ;
-
-				final Vector3 textOffset = DrawAssist.getOffset( drawEdit ) ;
-				textOffset.setXYZ( getOffset() ) ;
-
-				final MalletFont.Metrics metrics = font.getMetrics() ;
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( edit ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-				textOffset.add( x, y, 0.0f ) ;
-
-				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
-				DrawAssist.amendOrder( drawEdit, parent.getLayer() + 1 ) ;
-				DrawAssist.forceUpdate( drawEdit ) ;
+				return ;
 			}
+
+			final MalletFont font = getFont() ;
+			final StringBuilder edit = getParent().getText() ;
+
+			final UITextField parent = getParent() ;
+			final Vector3 length = parent.getLength() ;
+			final int layer = parent.getLayer() + 1 ;
+
+			applyTextOffset( drawEdit ) ;
+			DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
+			DrawAssist.amendOrder( drawEdit, layer ) ;
+			DrawAssist.forceUpdate( drawEdit ) ;
+
+			if( isEditing() == false && edit.length() <= 0 )
+			{
+				delegate.addTextDraw( drawPlaceholder, world ) ;
+
+				applyTextOffset( drawPlaceholder ) ;
+				DrawAssist.amendOrder( drawPlaceholder, layer ) ;
+				DrawAssist.forceUpdate( drawPlaceholder ) ;
+			}
+			else
+			{
+				delegate.removeDraw( drawPlaceholder ) ;
+			}
+
+			if( isEditing() == true )
+			{
+				delegate.addBasicDraw( drawCursor, world ) ;
+
+				final int index = getParent().getCursorIndex() ;
+
+				applyTextOffset( drawCursor ) ;
+				final Vector3 textOffset = DrawAssist.getOffset( drawCursor ) ;
+				textOffset.x += getFont().stringWidth( edit, 0, index ) ;
+
+				DrawAssist.amendOrder( drawCursor, layer ) ;
+				DrawAssist.forceUpdate( drawCursor ) ;
+			}
+			else
+			{
+				delegate.removeDraw( drawCursor ) ;
+			}
+		}
+
+		private void applyTextOffset( final Draw _draw )
+		{
+			final UITextField parent = getParent() ;
+			final StringBuilder edit = parent.getText() ;
+			final Vector3 length     = parent.getLength() ;
+			final MalletFont font    = getFont() ;
+
+			final Vector3 textOffset = DrawAssist.getOffset( _draw ) ;
+			textOffset.setXYZ( getOffset() ) ;
+
+			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final float x = UI.align( drawTextAlignmentX, font.stringWidth( edit ), length.x ) ;
+			final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
+
+			textOffset.add( x, y, 0.0f ) ;
+		}
+
+		private boolean isEditing()
+		{
+			return editing ;
 		}
 
 		@Override
 		public InputEvent.Action keyPressed( final InputEvent _input )
 		{
+			if( isEditing() == false )
+			{
+				return InputEvent.Action.PROPAGATE ;
+			}
+
 			switch( _input.getKeyCode() )
 			{
 				case UP           :
 				case DOWN         :
 				case LEFT         :
+				{
+					final UITextField parent = getParent() ;
+					final int index = parent.getCursorIndex() - 1 ;
+					parent.setCursorIndex( ( index < 0 ) ? 0 : index ) ;
+					parent.makeDirty() ;
+					break ;
+				}
 				case RIGHT        :
+				{
+					final UITextField parent = getParent() ;
+					final StringBuilder edit = parent.getText() ;
+
+					final int index = parent.getCursorIndex() + 1 ;
+					parent.setCursorIndex( ( index > edit.length() ) ? edit.length() : index ) ;
+					parent.makeDirty() ;
+					break ;
+				}
 				case F1           :
 				case F2           :
 				case F3           :
@@ -182,6 +322,19 @@ public class UITextField extends UIElement
 				case F11          :
 				case F12          :
 				case DELETE       :
+				{
+					final UITextField parent = getParent() ;
+					final int index = parent.getCursorIndex() ;
+					final StringBuilder edit = parent.getText() ;
+					final int length = edit.length() ;
+					if( index > 0 && index < length )
+					{
+						edit.deleteCharAt( index ) ;
+						parent.setCursorIndex( index ) ;
+						parent.makeDirty() ;
+					}
+					break ;
+				}
 				case HOME         :
 				case END          :
 				case PAGE_UP      :
@@ -201,20 +354,27 @@ public class UITextField extends UIElement
 				case WINDOWS      : break ;
 				case BACKSPACE    :
 				{
-					final StringBuilder edit = getParent().getText() ;
-					final int length = edit.length() ;
-					if( length > 0 )
+					final UITextField parent = getParent() ;
+					int index = parent.getCursorIndex() ;
+					final StringBuilder edit = parent.getText() ;
+					if( index > 0 )
 					{
-						edit.setLength( length - 1 ) ;
-						getParent().makeDirty() ;
+						index -= 1 ;
+						edit.deleteCharAt( index ) ;
+						parent.setCursorIndex( index ) ;
+						parent.makeDirty() ;
 					}
 					break ;
 				}
 				default :
 				{
+					final UITextField parent = getParent() ;
+					final int index = parent.getCursorIndex() ;
 					final StringBuilder edit = getParent().getText() ;
-					edit.append( _input.getKeyCharacter() ) ;
-					getParent().makeDirty() ;
+					edit.insert( index, _input.getKeyCharacter() ) ;
+
+					parent.setCursorIndex( index + 1 ) ;
+					parent.makeDirty() ;
 					break ;
 				}
 			}
@@ -230,24 +390,25 @@ public class UITextField extends UIElement
 		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
-			final StringBuilder txt = getText() ;
-			if( txt.length() > 0 )
-			{
-				txt.setLength( 0 ) ;
-				getParent().makeDirty() ;
-			}
+			editing = true ;
+
+			final UITextField parent = getParent() ;
+			final Vector3 position = parent.getPosition() ;
+			final StringBuilder text = parent.getText() ;
+			final MalletFont font = getFont() ;
+
+			final float width = _input.getMouseX() - position.x ;
+			parent.setCursorIndex( font.stringIndexWidth( text, width ) ) ;
+
+			getParent().makeDirty() ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 
 		@Override
 		public void disengage()
 		{
-			final StringBuilder edit = getParent().getText() ;
-			if( edit.length() <= 0 && getText().length() <= 0 )
-			{
-				getText().append( placeholder ) ;
-				getParent().makeDirty() ;
-			}
+			editing = false ;
+			getParent().makeDirty() ;
 		}
 	}
 }

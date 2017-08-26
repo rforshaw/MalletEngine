@@ -734,6 +734,12 @@ public class UIElement implements InputHandler
 		return builder.toString() ;
 	}
 
+	public static float toPixelX( final UIElement _element, final float _x )
+	{
+		final UIRatio ratio = _element.getRatio() ;
+		return ratio.toPixelX( _x ) ;
+	}
+
 	private interface InputAction
 	{
 		public InputEvent.Action action( final IBase _listener, final InputEvent _event ) ;

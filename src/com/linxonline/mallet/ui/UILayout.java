@@ -611,7 +611,7 @@ public class UILayout extends UIElement
 
 	protected static void applyLayer( final UIElement _element, final int _layer )
 	{
-		if( _element.getLayer() < _layer )
+		if( _element.getLayer() <= _layer )
 		{
 			// Child elements should always be a
 			// layer above the parent.

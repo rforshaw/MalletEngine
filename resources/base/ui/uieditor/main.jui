@@ -571,7 +571,7 @@
 						{
 							"TYPE" : "UILIST",
 							"LAYOUT" : "VERTICAL",
-							"MAX_LENGTH" : "0.0, 8.0, 0.0",
+							"MAX_LENGTH" : "0.0, 4.0, 0.0",
 							"UILISTENER" : {
 								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 								"UV" : {

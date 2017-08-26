@@ -211,6 +211,16 @@ public class UIList extends UILayout
 	}
 
 	@Override
+	public void setLayer( final int _layer )
+	{
+		super.setLayer( _layer ) ;
+		if( isDirty() == true )
+		{
+			DrawAssist.amendOrder( pane, getLayer() + 1 ) ;
+		}
+	}
+
+	@Override
 	public void setLength( final float _x, final float _y, final float _z )
 	{
 		super.setLength( _x, _y, _z ) ;

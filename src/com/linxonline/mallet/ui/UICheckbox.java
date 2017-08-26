@@ -159,6 +159,7 @@ public class UICheckbox extends UIElement
 			if( drawTick != null )
 			{
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( drawTick ), getLength() ) ;
+				DrawAssist.amendOrder( drawTick, getParent().getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawTick ) ;
 			}
 		}

@@ -74,12 +74,34 @@ public class MalletFont
 		return length ;
 	}
 
-	public float stringWidth( final StringBuilder _text )
+	public int stringIndexWidth( final String _text, final float _width )
 	{
 		float width = 0.0f ;
 
 		final int length = _text.length() ;
 		for( int i = 0; i < length; ++i )
+		{
+			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
+			if( width > _width )
+			{
+				return ( i > 0 ) ? i - 1 : 0 ;
+			}
+		}
+		
+		return length ;
+	}
+
+	public float stringWidth( final StringBuilder _text )
+	{
+		return stringWidth( _text, 0, _text.length() ) ;
+	}
+
+	public float stringWidth( final StringBuilder _text, final int _start, final int _end )
+	{
+		float width = 0.0f ;
+
+		final int length = _text.length() ;
+		for( int i = _start; i < _end; ++i )
 		{
 			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
 		}
@@ -89,10 +111,14 @@ public class MalletFont
 
 	public float stringWidth( final String _text )
 	{
+		return stringWidth( _text, 0, _text.length() ) ;
+	}
+
+	public float stringWidth( final String _text, final int _start, final int _end )
+	{
 		float width = 0.0f ;
 
-		final int length = _text.length() ;
-		for( int i = 0; i < length; ++i )
+		for( int i = _start; i < _end; ++i )
 		{
 			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
 		}
