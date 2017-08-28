@@ -327,6 +327,22 @@
 							}
 						},
 						{
+							"TYPE" : "UITEXTFIELD",
+							"NAME" : "TestButton1",
+							"UILISTENER" : {
+								"TEXT" : "Type Here",
+								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
+								"FONT" : "Arial",
+								"FONT_SIZE" : 0.42,
+								"COLOUR_TEXT" : "255, 0, 0",
+								"TEXTURE" : "base/textures/button_sheet.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "0.5, 0.5"
+								}
+							}
+						},
+						{
 							"TYPE" : "UIBUTTON",
 							"UILISTENER" : {
 								"TEXT" : "Test 1",
