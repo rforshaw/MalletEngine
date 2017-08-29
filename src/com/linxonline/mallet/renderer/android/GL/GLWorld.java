@@ -150,6 +150,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		if( backbuffer != null )
 		{
 			backbuffer.destroy() ;
+			backbuffer = null ;
 		}
 
 		GLES30.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;

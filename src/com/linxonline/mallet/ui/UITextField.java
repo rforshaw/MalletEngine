@@ -193,10 +193,10 @@ public class UITextField extends UIElement
 				delegate.addTextDraw( drawPlaceholder, world ) ;
 			}
 
-			/*if( isEditing() == true )
+			if( isEditing() == true )
 			{
 				delegate.addBasicDraw( drawCursor, world ) ;
-			}*/
+			}
 			getParent().makeDirty() ;
 		}
 

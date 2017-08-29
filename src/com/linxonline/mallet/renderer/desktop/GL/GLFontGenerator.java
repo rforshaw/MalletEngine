@@ -27,6 +27,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLFontGenerator
 {
+	private final static float PADDING = 4.0f ;
 	private final GLTextureManager manager ;
 
 	public GLFontGenerator( final GLTextureManager _manager )
@@ -67,20 +68,28 @@ public class GLFontGenerator
 		final MalletFont.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
 
-		final float height = metrics.getHeight() ;
-		final float width = calculateWidth( glyphs ) ;
+		// This allows us to render the text at a higher resolution 
+		// than the font has requested - change multiplier to increase 
+		// the base point size .
+		final int multiplier = 1 ;
+		final MalletFont bigger = new MalletFont( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
+
+		final MalletFont.Metrics biggerMetrics = bigger.getMetrics() ;
+		final Glyph[] biggerGlyphs = biggerMetrics.getGlyphs() ;
+		final float height = biggerMetrics.getHeight() ;
+		final float width = calculateWidth( biggerGlyphs ) ;
 
 		// Used to render the texture
-		final Font font = new Font( _font.getFontName(), Font.PLAIN, _font.getPointSize() ) ;
+		final Font font = new Font( bigger.getFontName(), Font.PLAIN, bigger.getPointSize() ) ;
 		final BufferedImage textureBuffer = new BufferedImage( ( int )width, ( int )height, BufferedImage.TYPE_BYTE_GRAY ) ;
 		final Graphics2D g2D = textureBuffer.createGraphics() ;
 
 		g2D.setFont( font.deriveFont( font.getSize2D() ) ) ;
-		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
+		//g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
 
 		final char[] c = new char[1] ;
 		final double point = 1.0 / width ;
-		final float ascent = metrics.getAscent() ;
+		final float ascent = biggerMetrics.getAscent() ;
 		float start = 0.0f ;
 
 		final int length = glyphs.length ;
@@ -94,16 +103,17 @@ public class GLFontGenerator
 				c[0] = glyph.getCharacter() ;
 				g2D.drawChars( c, 0, 1, ( int )start, ( int )ascent ) ;
 
-				final float advance = glyph.getWidth() ;
+				// We do not want to include the padding when uv-mapping
+				final float advance = biggerGlyphs[i].getWidth() ;
 				final float x1 = ( float )( start * point ) ;
 				final float x2 = ( float )( ( start + advance ) * point ) ;
 
-				final Vector3 maxPoint = new Vector3( advance, height, 0.0f ) ;
+				final Vector3 maxPoint = new Vector3( glyph.getWidth(), metrics.getHeight(), 0.0f ) ;
 				final Vector2 uv1 = new Vector2( x1, 0.0f ) ;
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
 				shapes[i] = Shape.constructPlane( maxPoint, uv1, uv2 ) ;
-				start += advance ;
+				start += advance + PADDING ;
 			}
 		}
 
@@ -123,7 +133,7 @@ public class GLFontGenerator
 		for( int i = 0; i < _glyphs.length; i++ )
 		{
 			final Glyph glyph = _glyphs[i] ;
-			width += glyph != null ? glyph.getWidth() : 0.0f ;
+			width += glyph != null ? glyph.getWidth() + PADDING : PADDING ;
 		}
 		return width ;
 	}
