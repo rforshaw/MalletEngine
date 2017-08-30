@@ -42,6 +42,13 @@ public final class InputEvent implements Cacheable
 		id = _id ;
 	}
 
+	public void setInput( final InputType _type, final KeyCode _keycode, final long _when )
+	{
+		inputType = _type ;
+		keycode = _keycode ;
+		when = _when ;
+	}
+
 	public void setInput( final InputType _type, final int _x, final int _y )
 	{
 		setInput( _type, _x, _y, when ) ;

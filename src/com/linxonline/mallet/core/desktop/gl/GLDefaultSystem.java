@@ -24,7 +24,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 												 InputSystem,
 												 EventSystem>
 {
-	protected EventController eventController = new EventController() ;
+	protected final EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
 	{

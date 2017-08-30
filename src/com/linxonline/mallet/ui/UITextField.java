@@ -9,6 +9,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UITextField extends UIElement
 {
+	private final EventController controller = new EventController() ;
 	private final StringBuilder text = new StringBuilder() ;
 
 	private int cursorIndex = 0 ;
@@ -48,6 +49,28 @@ public class UITextField extends UIElement
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;
+		addEvent( new Event<EventController>( "ADD_BACKEND_EVENT", controller ) ) ;
+	}
+
+	@Override
+	public void engage()
+	{
+		super.engage() ;
+		controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
+	}
+
+	@Override
+	public void disengage()
+	{
+		super.disengage() ;
+		controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+	}
+
+	@Override
+	public void refresh()
+	{
+		super.refresh() ;
+		controller.update() ;
 	}
 
 	public void setCursorIndex( final int _index )
@@ -416,7 +439,7 @@ public class UITextField extends UIElement
 		@Override
 		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return super.mouseReleased( _input ) ;
+			return mouseReleased( _input ) ;
 		}
 
 		@Override

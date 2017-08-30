@@ -18,10 +18,8 @@ public class AndroidInputSystem implements IInputSystem,
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
-	private final Map<KeyCode, KeyState> keyboardState = MalletMap.<KeyCode, KeyState>newMap() ;
-	private final List<KeyState> activeKeyStates = MalletList.<KeyState>newList() ;
 
-	private final List<InputEvent> touchInputs = MalletList.<InputEvent>newList() ;
+	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
 
 	public AndroidInputSystem() {}
@@ -88,46 +86,25 @@ public class AndroidInputSystem implements IInputSystem,
 			type = InputType.TOUCH_DOWN ;
 		}
 
-		synchronized( touchInputs )
+		synchronized( inputs )
 		{
 			final InputEvent input = cache.get() ;
 			input.setID( _id ) ;
 			input.setInput( type, ( int )_x, ( int )_y, _when ) ;
-			touchInputs.add( input ) ;
+			inputs.add( input ) ;
 		}
 	}
 
 	public void update()
 	{
-		passKeyInputs() ;
-		passMouseInputs() ;
-	}
-
-	private void passKeyInputs()
-	{
-		final int stateSize = activeKeyStates.size() ;
-		for( int i = 0; i < stateSize; i++ )
-		{
-			final KeyState state = activeKeyStates.get( i ) ;
-			final InputEvent input = cache.get() ;
-			input.clone( state.input ) ;
-
-			passInputEventToHandlers( input ) ;
-		}
-
-		activeKeyStates.clear() ;
-	}
-
-	private void passMouseInputs()
-	{
-		final int sizeInput = touchInputs.size() ;
+		final int sizeInput = inputs.size() ;
 		//System.out.println( "Inputs: " + sizeInput ) ;
 		for( int i = 0; i < sizeInput; ++i )
 		{
-			passInputEventToHandlers( touchInputs.get( i ) ) ;
+			passInputEventToHandlers( inputs.get( i ) ) ;
 		}
 
-		touchInputs.clear() ;
+		inputs.clear() ;
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )
@@ -149,64 +126,15 @@ public class AndroidInputSystem implements IInputSystem,
 	private void updateKeys( final InputType _inputType, final KeyEvent _event )
 	{
 		KeyCode keycode = KeyCode.getKeyCode( ( char )_event.getUnicodeChar() ) ;
-		/*if( keycode == KeyCode.NONE )
+		if( keycode == KeyCode.NONE )
 		{
 			keycode = isSpecialKeyDown( _event ) ;
-		}*/
-
-		{
-			final KeyState state = keyboardState.get( keycode ) ;
-			if( state != null )
-			{
-				changeKey( _inputType, state, _event ) ;
-				return ;
-			}
 		}
 
-		// Create new Key if it doesn't exist.
-		final InputEvent input = new InputEvent( _inputType, keycode, InputID.KEYBOARD_1 ) ;
-		//input.isActionKey = _event.isActionKey() ;
-
-		final KeyState state = new KeyState( input, true ) ;
-		keyboardState.put( keycode, state ) ;
-		activeKeyStates.add( state ) ;
-	}
-
-	private void changeKey( final InputType _inputType, final KeyState _state, final KeyEvent _event )
-	{
-		if( _state.input.inputType != _inputType )			// If the Input Type has changed
-		{
-			final long eventTimeStamp = _event.getEventTime() ;
-			long dt = 0L ;
-
-			// Timestamp check is done, due to Linux Input Bug
-			// Causes endless Inputs to be sent, this filters duplicates.
-			if( _inputType == InputType.KEYBOARD_PRESSED )
-			{
-				dt = eventTimeStamp - _state.pressedTimeStamp ;
-			}
-			else if( _inputType == InputType.KEYBOARD_RELEASED )
-			{
-				dt = eventTimeStamp - _state.releasedTimeStamp ;
-			}
-
-			if( dt > 0L )
-			{
-				activeKeyStates.add( _state ) ;
-				_state.changed = true ;
-
-				_state.input.inputType = _inputType ;
-
-				if( _inputType == InputType.KEYBOARD_PRESSED )
-				{
-					_state.pressedTimeStamp = eventTimeStamp ;
-				}
-				else if( _inputType == InputType.KEYBOARD_RELEASED )
-				{
-					_state.releasedTimeStamp = eventTimeStamp ;
-				}
-			}
-		}
+		final InputEvent input = cache.get() ;
+		input.setID( InputID.KEYBOARD_1 ) ;
+		input.setInput( _inputType, keycode, _event.getEventTime() ) ;
+		inputs.add( input ) ;
 	}
 
 	public void clearHandlers()
@@ -219,11 +147,23 @@ public class AndroidInputSystem implements IInputSystem,
 		handlers.clear() ;
 	}
 
-	public void clearInputs() {}
+	public void clearInputs()
+	{
+		inputs.clear() ;
+	}
 
 	private boolean exists( final InputHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;
+	}
+
+	private final KeyCode isSpecialKeyDown( final KeyEvent _event )
+	{
+		switch( _event.getKeyCode() )
+		{
+			case KeyEvent.KEYCODE_DEL : return KeyCode.BACKSPACE ;
+			default                   : return KeyCode.NONE ;
+		}
 	}
 }

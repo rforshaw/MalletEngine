@@ -21,11 +21,9 @@ public class InputSystem implements IInputSystem,
 {
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
-	private final List<InputHandler> handlers = MalletList.<InputHandler>newList();
-	private final Map<KeyCode, KeyState> keyboardState = MalletMap.<KeyCode, KeyState>newMap() ;
-	private final List<KeyState> activeKeyStates = MalletList.<KeyState>newList() ;
+	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
 
-	private final List<InputEvent> mouseInputs = MalletList.<InputEvent>newList() ;
+	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
 	public InputSystem() {}
@@ -55,39 +53,15 @@ public class InputSystem implements IInputSystem,
 
 	public synchronized void update()
 	{
-		passKeyInputs() ;
-		passMouseInputs() ;
-	}
-
-	private void passKeyInputs()
-	{
-		if( activeKeyStates.isEmpty() == false )
+		if( inputs.isEmpty() == false )
 		{
-			final int stateSize = activeKeyStates.size() ;
-			for( int i = 0; i < stateSize; i++ )
-			{
-				final KeyState state = activeKeyStates.get( i ) ;
-				final InputEvent input = cache.get() ;
-				input.clone( state.input ) ;
-
-				passInputEventToHandlers( input ) ;
-			}
-
-			activeKeyStates.clear() ;
-		}
-	}
-
-	private void passMouseInputs()
-	{
-		if( mouseInputs.isEmpty() == false )
-		{
-			final int inputSize = mouseInputs.size() ;
+			final int inputSize = inputs.size() ;
 			for( int i = 0; i < inputSize; ++i )
 			{
-				passInputEventToHandlers( mouseInputs.get( i ) ) ;
+				passInputEventToHandlers( inputs.get( i ) ) ;
 			}
 
-			mouseInputs.clear() ;
+			inputs.clear() ;
 		}
 	}
 
@@ -225,7 +199,7 @@ public class InputSystem implements IInputSystem,
 		final int scroll = ( int )_event.getRotation()[1] ;
 
 		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll, _event.getWhen() ) ;
-		mouseInputs.add( input ) ;
+		inputs.add( input ) ;
 	}
 
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition, final long _when )
@@ -233,70 +207,26 @@ public class InputSystem implements IInputSystem,
 		final InputEvent input = cache.get() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y, _when ) ;
-		mouseInputs.add( input ) ;
+		inputs.add( input ) ;
 	}
 
 	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )
 	{
+		if( _event.isAutoRepeat() == true )
+		{
+			return ;
+		}
+
 		KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
 		if( keycode == KeyCode.NONE )
 		{
 			keycode = isSpecialKeyDown( _event ) ;
 		}
 
-		{
-			final KeyState state = keyboardState.get( keycode ) ;
-			if( state != null )
-			{
-				changeKey( _inputType, state, _event ) ;
-				return ;
-			}
-		}
-
-		// Create new Key if it doesn't exist.
-		final InputEvent input = new InputEvent( _inputType, keycode, InputID.KEYBOARD_1 ) ;
-		input.isActionKey = _event.isActionKey() ;
-
-		final KeyState state = new KeyState( input, true ) ;
-		keyboardState.put( keycode, state ) ;
-		activeKeyStates.add( state ) ;
-	}
-
-	private void changeKey( final InputType _inputType, final KeyState _state, final KeyEvent _event )
-	{
-		if( _state.input.inputType != _inputType )			// If the Input Type has changed
-		{
-			final long eventTimeStamp = _event.getWhen() ;
-			long dt = 0L ;
-
-			// Timestamp check is done, due to Linux Input Bug
-			// Causes endless Inputs to be sent, this filters duplicates.
-			if( _inputType == InputType.KEYBOARD_PRESSED )
-			{
-				dt = eventTimeStamp - _state.pressedTimeStamp ;
-			}
-			else if( _inputType == InputType.KEYBOARD_RELEASED )
-			{
-				dt = eventTimeStamp - _state.releasedTimeStamp ;
-			}
-
-			if( dt > 0L )
-			{
-				activeKeyStates.add( _state ) ;
-				_state.changed = true ;
-
-				_state.input.inputType = _inputType ;
-
-				if( _inputType == InputType.KEYBOARD_PRESSED )
-				{
-					_state.pressedTimeStamp = eventTimeStamp ;
-				}
-				else if( _inputType == InputType.KEYBOARD_RELEASED )
-				{
-					_state.releasedTimeStamp = eventTimeStamp ;
-				}
-			}
-		}
+		final InputEvent input = cache.get() ;
+		input.setID( InputID.KEYBOARD_1 ) ;
+		input.setInput( _inputType, keycode, _event.getWhen() ) ;
+		inputs.add( input ) ;
 	}
 
 	public void clearHandlers()
@@ -314,9 +244,7 @@ public class InputSystem implements IInputSystem,
 
 	public synchronized void clearInputs()
 	{
-		mouseInputs.clear() ;
-		keyboardState.clear() ;
-		activeKeyStates.clear() ;
+		inputs.clear() ;
 	}
 
 	private final boolean exists( final InputHandler _handler )

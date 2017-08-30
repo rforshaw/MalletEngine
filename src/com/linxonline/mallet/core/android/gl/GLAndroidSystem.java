@@ -1,9 +1,11 @@
 package com.linxonline.mallet.core.android.gl ;
 
 import android.app.Activity ;
+import android.content.Context ;
 import android.content.res.Resources ;
 import android.view.Window ;
 import android.view.WindowManager ;
+import android.view.inputmethod.InputMethodManager ;
 import android.media.AudioManager ;
 
 import com.linxonline.mallet.core.android.AndroidActivity ;
@@ -30,6 +32,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 	public final AndroidActivity activity ;
 	public GL2DSurfaceView surface ;
 
+	protected final EventController eventController = new EventController() ;
 	protected boolean execution = true ;
 
 	public GLAndroidSystem( final AndroidActivity _activity, final Notification.Notify _notify )
@@ -48,8 +51,32 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 	@Override
 	public void initSystem()
 	{
+		initEventProcessors() ;
+
 		activity.addAndroidInputListener( getInput() ) ;
 		getAudioGenerator().startGenerator() ;
+	}
+
+	protected void initEventProcessors()
+	{
+		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_KEYBOARD", "DISPLAY_SYSTEM_KEYBOARD" )
+		{
+			private boolean show = false ;
+
+			@Override
+			public void processEvent( final Event<Boolean> _event )
+			{
+				final Boolean variable = _event.getVariable() ;
+				
+				final InputMethodManager imm = ( InputMethodManager )activity.getSystemService( Context.INPUT_METHOD_SERVICE ) ;
+				if( show != variable.booleanValue() )
+				{
+					imm.toggleSoftInput( 0, 0 ) ;
+				}
+			}
+		} ) ;
+
+		getEventSystem().addEventHandler( eventController ) ;
 	}
 
 	public void setContentView()
@@ -89,7 +116,9 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 	@Override
 	public synchronized boolean update( final float _dt )
 	{
-		return super.update( _dt ) ;
+		super.update( _dt ) ;
+		eventController.update() ;		// Process the Events this system is interested in
+		return true ;					// Informs the Game System whether to continue updating or not.
 	}
 
 	@Override
