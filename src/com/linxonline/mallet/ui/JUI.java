@@ -127,7 +127,7 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
@@ -197,7 +197,7 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
@@ -384,7 +384,7 @@ public class JUI
 
 				final String text = _ui.optString( "TEXT", "" ) ;
 				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
@@ -595,7 +595,7 @@ public class JUI
 
 		final String text = _ui.optString( "TEXT", "" ) ;
 		final String fontName = _ui.optString( "FONT", null ) ;
-		final int fontSize = ( int )_ratio.toPixelX( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+		final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 		final String texturePath = _ui.optString( "TEXTURE", null ) ;
 

@@ -368,8 +368,8 @@ public class UIList extends UILayout
 				final Vector3 listLength = UIList.this.getLength() ;
 				final Vector3 listMargin = UIList.this.getMargin() ;
 
-				absoluteLength.setXYZ( listLength.x - scrollbarSize.x, 0.0f, listLength.z ) ;
-				childPosition.setXYZ( scrollbarSize.x + listMargin.x, 0.0f, 0.0f ) ;
+				absoluteLength.setXYZ( listLength.x - ( scrollbarSize.x + listMargin.x ), 0.0f, listLength.z ) ;
+				childPosition.setXYZ( scrollbarSize.x - listMargin.x, 0.0f, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
@@ -435,8 +435,8 @@ public class UIList extends UILayout
 				final Vector3 listLength = UIList.this.getLength() ;
 				final Vector3 listMargin = UIList.this.getMargin() ;
 
-				absoluteLength.setXYZ( 0.0f, listLength.y - scrollbarSize.y, listLength.z ) ;
-				childPosition.setXYZ( 0.0f, scrollbarSize.y + listMargin.y, 0.0f ) ;
+				absoluteLength.setXYZ( 0.0f, listLength.y - ( scrollbarSize.y + listMargin.y ), listLength.z ) ;
+				childPosition.setXYZ( 0.0f, scrollbarSize.y - listMargin.y, 0.0f ) ;
 
 				final int size = _ordered.size() ;
 				for( int i = 0; i < size; i++ )
