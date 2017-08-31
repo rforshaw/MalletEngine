@@ -29,6 +29,11 @@ public interface IBase<T extends UIElement>
 	public void sendEvent( final Event<?> _event ) ;
 
 	/**
+		Called when the scroll is moved.
+	*/
+	public InputEvent.Action scroll( final InputEvent _input ) ;
+
+	/**
 		Called when the mouse is moved.
 	*/
 	public InputEvent.Action mouseMove( final InputEvent _input ) ;

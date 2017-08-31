@@ -230,6 +230,7 @@ public class UIElement implements InputHandler
 
 		switch( _event.getInputType() )
 		{
+			case SCROLL_WHEEL      : 
 			case KEYBOARD_PRESSED  :
 			case KEYBOARD_RELEASED : return processInputEvent( _event ) ;
 			default                :
@@ -250,6 +251,7 @@ public class UIElement implements InputHandler
 	{
 		switch( _event.getInputType() )
 		{
+			case SCROLL_WHEEL      : return updateListeners( listeners.getListeners(), scrollAction, _event ) ;
 			case MOUSE_MOVED       : return updateListeners( listeners.getListeners(), mouseMoveAction, _event ) ;
 			case MOUSE1_PRESSED    :
 			case MOUSE2_PRESSED    :
@@ -273,18 +275,16 @@ public class UIElement implements InputHandler
 													  final InputAction _action,
 													  final InputEvent _event )
 	{
-		InputEvent.Action action = InputEvent.Action.PROPAGATE ;
-
 		final int size = _base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			if( _action.action( _base.get( i ), _event ) == InputEvent.Action.CONSUME )
 			{
-				action = InputEvent.Action.CONSUME ;
+				return InputEvent.Action.CONSUME ;
 			}
 		}
 
-		return action ;
+		return InputEvent.Action.PROPAGATE ;
 	}
 
 	public boolean isIntersectInput( final InputEvent _event )
@@ -744,7 +744,16 @@ public class UIElement implements InputHandler
 	{
 		public InputEvent.Action action( final IBase _listener, final InputEvent _event ) ;
 	}
-	
+
+	private static final InputAction scrollAction = new InputAction()
+	{
+		@Override
+		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		{
+			return _listener.scroll( _event ) ;
+		}
+	} ;
+
 	private static final InputAction mouseMoveAction = new InputAction()
 	{
 		@Override

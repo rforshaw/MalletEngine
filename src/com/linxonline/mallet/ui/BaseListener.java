@@ -47,6 +47,15 @@ public abstract class BaseListener<T extends UIElement> implements IBase<T>
 	}
 
 	/**
+		Called when the scroll is moved.
+	*/
+	@Override
+	public InputEvent.Action scroll( final InputEvent _input )
+	{
+		return InputEvent.Action.PROPAGATE ;
+	}
+
+	/**
 		Called when the mouse is moved.
 	*/
 	@Override
