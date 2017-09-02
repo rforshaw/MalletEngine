@@ -69,16 +69,46 @@ public class UIComponent extends InputComponent
 		// is specified we will assume its the default.
 		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
 		camera = ( _camera != null ) ? _camera : CameraAssist.getDefaultCamera() ;
+		initEventProcessor( eventController ) ;
 	}
 
+	/**
+		Add _element to UIComponent using the elements 
+		layer to determine order.
+		An element with a higher layer will be updated 
+		first, for example an element with layer 100 
+		will be processed first compared to an element 
+		with a layer of 10.
+	*/
 	public <T extends UIElement> T addElement( final T _element )
+	{
+		final int layer = _element.getLayer() ;
+		final int size = elements.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			if( layer >= elements.get( i ).getLayer() )
+			{
+				return addElement( i, _element ) ;
+			}
+		}
+
+		return addElement( elements.size(), _element ) ;
+	}
+
+	private <T extends UIElement> T addElement( final int _index, final T _element )
 	{
 		if( elements.contains( _element ) == false )
 		{
-			elements.add( _element ) ;
+			elements.add( _index, _element ) ;
+			if( delegate != null )
+			{
+				_element.passDrawDelegate( delegate, getWorld(), getCamera() ) ;
+			}
 		}
 		return _element ;
 	}
+
+	protected void initEventProcessor( final EventController _controller ) {}
 
 	/**
 		Called when parent is flagged for destruction.
@@ -117,6 +147,24 @@ public class UIComponent extends InputComponent
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
+
+		updateElements( _dt ) ;
+		removeElements() ;
+		updateEvents() ;
+
+		if( toDestroy != null )
+		{
+			toDestroy.ready( this ) ;
+		}
+	}
+
+	/**
+		Update the UI elements added to this UIComponent.
+		Any elements flagged for destruction add them to 
+		the removal list.
+	*/
+	protected void updateElements( final float _dt )
+	{
 		if( elements.isEmpty() == false )
 		{
 			final int size = elements.size() ;
@@ -130,7 +178,15 @@ public class UIComponent extends InputComponent
 				}
 			}
 		}
+	}
 
+	/**
+		Remove all elements that have been added to 
+		the removal list - any elemts added will be 
+		shutdown and cleared.
+	*/
+	protected void removeElements()
+	{
 		if( toRemove.isEmpty() == false )
 		{
 			final int size = toRemove.size() ;
@@ -145,7 +201,14 @@ public class UIComponent extends InputComponent
 			}
 			toRemove.clear() ;
 		}
+	}
 
+	/**
+		Take any events from the elements and pass 
+		them through to the game-state. 
+	*/
+	protected void updateEvents()
+	{
 		if( events.isEmpty() == false )
 		{
 			final int size = events.size() ;
@@ -158,11 +221,6 @@ public class UIComponent extends InputComponent
 		}
 
 		eventController.update() ;
-
-		if( toDestroy != null )
-		{
-			toDestroy.ready( this ) ;
-		}
 	}
 
 	@Override
@@ -219,5 +277,15 @@ public class UIComponent extends InputComponent
 		}
 
 		return InputEvent.Action.PROPAGATE ;
+	}
+
+	public World getWorld()
+	{
+		return world ;
+	}
+
+	public Camera getCamera()
+	{
+		return camera ;
 	}
 }
