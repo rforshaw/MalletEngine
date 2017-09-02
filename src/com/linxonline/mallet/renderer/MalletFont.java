@@ -22,8 +22,10 @@ public class MalletFont
 		style = _style ;
 		size = _size ;
 
-		metrics = FontAssist.createMetrics( name, style, size ) ;
 		id = name + size + style ;
+
+		metrics = FontAssist.createMetrics( this ) ;
+		metrics.setParent( this ) ;
 	}
 
 	public MalletFont( final String _name, final int _size )
@@ -50,6 +52,11 @@ public class MalletFont
 	public String getFontName()
 	{
 		return name ;
+	}
+
+	public int getStyle()
+	{
+		return style ;
 	}
 
 	public int getPointSize()
@@ -166,7 +173,9 @@ public class MalletFont
 
 	public static class Metrics
 	{
-		private final Glyph[] glyphs ;
+		private MalletFont parent ;
+
+		private Glyph[] glyphs ;
 		private final float height ;
 		private final float ascent ;
 		private final float descent ;
@@ -194,6 +203,11 @@ public class MalletFont
 			ascent = _ascent ;
 			descent = _descent ;
 			leading = _leading ;
+		}
+
+		private void setParent( final MalletFont _parent )
+		{
+			parent = _parent ;
 		}
 
 		public float getHeight()
@@ -237,8 +251,29 @@ public class MalletFont
 				}
 			}
 
-			// Return failed glyph
-			return getGlyphWithChar( '\0' ) ;
+			acquireNewGlyph( _code ) ;
+			return getGlyphWithCode( _code ) ;
+		}
+
+		private void acquireNewGlyph( final int _code )
+		{
+			//System.out.println( "Acquiring Code: " + _code + " Char: " + ( char )_code + " For: " + parent.getID() ) ;
+			if( _code >= glyphs.length )
+			{
+				// We need to extend the glyph array
+				// to support the requested glyph.
+				final Glyph[] temp = glyphs ;
+				glyphs = new Glyph[_code + 1] ;
+
+				//System.out.println( "Copying Temp Glyphs: " + temp.length + " to: " + glyphs.length ) ;
+				final int size = temp.length ;
+				for( int i = 0; i < size; i++ )
+				{
+					glyphs[i] = temp[i] ;
+				}
+			}
+
+			glyphs[_code] = FontAssist.createGlyph( parent, _code ) ;
 		}
 	}
 }

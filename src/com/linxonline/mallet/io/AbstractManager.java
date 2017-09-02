@@ -13,6 +13,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 {
 	protected final AbstractLoader<T> abstractLoader = new AbstractLoader<T>() ;
 	protected final Map<String, T> resources = MalletMap.<String, T>newMap() ;
+	private final List<String> toRemove = MalletList.<String>newList() ;
 
 	public AbstractManager() {}
 
@@ -30,6 +31,8 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 	@Override
 	public T get( final String _file )
 	{
+		clean() ;
+
 		if( exists( _file ) == true )
 		{
 			// May still return a null resource but
@@ -42,6 +45,14 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		return createResource( _file ) ;
 	}
 
+	public void remove( final String _file )
+	{
+		if( toRemove.contains( _file ) == false )
+		{
+			toRemove.add( _file ) ;
+		}
+	}
+	
 	@Override
 	public ResourceLoader<T> getResourceLoader()
 	{
@@ -83,17 +94,25 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 	@Override
 	public void clean( final Set<String> _activeKeys )
 	{
-		final List<String> toRemove = MalletList.<String>newList() ;
-
 		final Set<String> available = resources.keySet() ;
 		for( final String key : available )
 		{
 			if( _activeKeys.contains( key ) == false )
 			{
-				toRemove.add( key ) ;
+				remove( key ) ;
 			}
 		}
 
+		clean() ;
+	}
+
+	/**
+		Remove unwanted resources that have been flagged 
+		for destruction - a resource is flagged if remove 
+		has been called on it.
+	*/
+	protected void clean()
+	{
 		for( final String key : toRemove )
 		{
 			final T resource = resources.get( key ) ;
@@ -103,8 +122,9 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 				resources.remove( key ) ;
 			}
 		}
+		toRemove.clear() ;
 	}
-
+	
 	/**
 		Iterates over all Resource and destroy them.
 		Then clearing the Map

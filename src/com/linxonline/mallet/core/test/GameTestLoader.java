@@ -315,7 +315,7 @@ public final class GameTestLoader extends GameLoader
 					@Override
 					public void callback( final DrawDelegate<World, Draw> _delegate )
 					{
-						final Draw draw = DrawAssist.createTextDraw( "Hello\nworld!",
+						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
 																	 new MalletFont( "Arial" ),
 																	 new Vector3( 0.0f, -80.0f, 0.0f ),
 																	 new Vector3( 0, 0, 0 ),

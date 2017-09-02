@@ -118,6 +118,19 @@ public class GLGeometryUploader
 	}
 
 	/**
+		Force all draw objects that are currently uploaded 
+		to be flagged for redrawing.
+	*/
+	public void forceUpdate()
+	{
+		final int size = buffers.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			buffers.get( i ).forceUpdate() ;
+		}
+	}
+	
+	/**
 		Find the GLBuffer/GLGeometry that the GLRenderData resides in.
 		Remove it from the buffers, and pack the index buffer.
 	*/
@@ -297,8 +310,16 @@ public class GLGeometryUploader
 		IBuffer buffer = null ;
 		switch( _data.getMode() )
 		{
-			case BASIC   : buffer = new GLGeometryBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ; break ;
-			case TEXT    : buffer = new GLTextBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ; break ;
+			case BASIC   :
+			{
+				buffer = new GLGeometryBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
+				break ;
+			}
+			case TEXT    :
+			{
+				buffer = new GLTextBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
+				break ;
+			}
 			case STENCIL :
 			{
 				buffer = new GLStencilBuffer( _data, indicies.length * IBO_VAR_BYTE_SIZE, verticies.length * VBO_VAR_BYTE_SIZE ) ;
@@ -416,6 +437,7 @@ public class GLGeometryUploader
 
 		public void upload( final GL3 _gl, final GLDrawData _data ) ;
 		public void remove( final GL3 _gl, final GLDrawData _data ) ;
+		public void forceUpdate() ;
 
 		public boolean containsGeometry() ;
 
@@ -506,6 +528,16 @@ public class GLGeometryUploader
 				case LINE_STRIP : style = GL3.GL_LINE_STRIP ; break ;
 				case FILL       : style = GL3.GL_TRIANGLES ;  break ;
 				default         : style = GL3.GL_LINES ;      break ;
+			}
+		}
+
+		@Override
+		public void forceUpdate()
+		{
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				buffers.get( i ).forceUpdate() ;
 			}
 		}
 
@@ -771,6 +803,9 @@ public class GLGeometryUploader
 		public void remove( final GL3 _gl, final GLDrawData _data ) {}
 
 		@Override
+		public void forceUpdate() {}
+
+		@Override
 		public void clean() {}
 
 		@Override
@@ -918,13 +953,11 @@ public class GLGeometryUploader
 		@Override
 		public void upload( final GL3 _gl, final GLDrawData _data )
 		{
-			if( glFont == null )
-			{
-				glFont = GLRenderer.getFont( font ) ;
-				initShape( glFont.getShapeWithChar( '\0' ) ) ;
-			}
+			//System.out.println( "Upload!" ) ;
+			glFont = GLRenderer.getFont( font ) ;
+			initShape( glFont.getShapeWithChar( '\0' ) ) ;
 
-			Location location = findLocationText( _gl, _data ) ;
+			final Location location = findLocationText( _gl, _data ) ;
 			uploadText( _gl, location, _data ) ;
 		}
 
@@ -966,6 +999,17 @@ public class GLGeometryUploader
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
+				if( shape == null )
+				{
+					//System.out.println( "Missing: " + c + " Glyph: " + glyph ) ;
+					// If a shape does not exist then the GLFont 
+					// needs to be recreated as the MalletFont has a 
+					// new glyph that is not yet represented.
+					// We need to update all text as the texture co-ordinates 
+					// used by the previously uploaded text will now be wrong.
+					GLGeometryUploader.this.forceUpdate() ;
+					continue ;
+				}
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
 				final int vertexSize = calculateVertexSize( swivel ) ;
@@ -1277,6 +1321,15 @@ public class GLGeometryUploader
 			}
 		}
 
+		public void forceUpdate()
+		{
+			final int size = allocated.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				DrawAssist.forceUpdate( allocated.get( i ).getData() ) ;
+			}
+		}
+		
 		public int getIndexID()
 		{
 			return indexID[0] ;

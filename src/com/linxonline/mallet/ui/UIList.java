@@ -81,7 +81,7 @@ public class UIList extends UILayout
 
 	private void initScrollInput()
 	{
-		/*addListener( new UIListener<UIList>()
+		addListener( new UIListener<UIList>()
 		{
 			private final Vector3 position = new Vector3() ;
 
@@ -102,7 +102,7 @@ public class UIList extends UILayout
 			{
 				super.refresh() ;
 			}
-		} ) ;*/
+		} ) ;
 
 		addListener( new InputListener<UIList>()
 		{
@@ -591,6 +591,27 @@ public class UIList extends UILayout
 	public Vector3 getScrollWidth()
 	{
 		return scrollWidth ;
+	}
+
+	public Vector3 getScrollbarLength( final Vector3 _unit )
+	{
+		if( _unit != null )
+		{
+			getRatio().toUnit( getScrollbarLength(), _unit ) ;
+		}
+
+		return getScrollbarLength() ;
+	}
+
+	public Vector3 getScrollbarLength()
+	{
+		final Vector3 len = getLength() ;
+		final Vector3 absLen = getAbsoluteLength() ;
+
+		scrollbarLength.x = ( absLen.x > len.x ) ? ( len.x * len.x ) / absLen.x : 0.0f ;
+		scrollbarLength.y = ( absLen.y > len.y ) ? ( len.y * len.y ) / absLen.y : 0.0f ;
+		scrollbarLength.z = ( absLen.z > len.z ) ? ( len.y * len.z ) / absLen.z : 0.0f ;
+		return scrollbarLength ;
 	}
 
 	/**

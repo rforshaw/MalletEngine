@@ -30,9 +30,13 @@ public class GLFontGenerator
 	private final static float PADDING = 4.0f ;
 	private final GLTextureManager manager ;
 
+	private final BufferedImage geometryBuffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
+	private final Graphics2D gGeom2D ;
+
 	public GLFontGenerator( final GLTextureManager _manager )
 	{
 		manager = _manager ;
+		gGeom2D = geometryBuffer.createGraphics() ;
 	}
 
 	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
@@ -40,11 +44,23 @@ public class GLFontGenerator
 		return generateMetrics( new Font( _name, Font.PLAIN, _size ), _characters ) ;
 	}
 
+	public Glyph generateGlyph( final String _name, final int _style, final int _size, final int _code )
+	{
+		return generateGlyph( new Font( _name, _style, _size ), _code ) ;
+	}
+
+	public Glyph generateGlyph( final Font _font, final int _code )
+	{
+		gGeom2D.setFont( _font ) ;
+
+		final FontMetrics metrics = gGeom2D.getFontMetrics() ;
+		final char c = ( char )_code ;
+		return new Glyph( c, metrics.charWidth( c ) ) ;
+	}
+
 	public MalletFont.Metrics generateMetrics( final Font _font, final String _characters )
 	{
 		// Used to get Metric information for geometry
-		final BufferedImage geometryBuffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
-		final Graphics2D gGeom2D = geometryBuffer.createGraphics() ;
 		gGeom2D.setFont( _font ) ;
 
 		final FontMetrics metrics = gGeom2D.getFontMetrics() ;
@@ -68,11 +84,13 @@ public class GLFontGenerator
 		final MalletFont.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
 
+		//System.out.println( "Gen: " + _font + " Length: " + glyphs.length ) ;
+
 		// This allows us to render the text at a higher resolution 
 		// than the font has requested - change multiplier to increase 
 		// the base point size .
 		final int multiplier = 1 ;
-		final MalletFont bigger = new MalletFont( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
+		final MalletFont bigger = _font ;//new MalletFont( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
 
 		final MalletFont.Metrics biggerMetrics = bigger.getMetrics() ;
 		final Glyph[] biggerGlyphs = biggerMetrics.getGlyphs() ;
@@ -102,6 +120,8 @@ public class GLFontGenerator
 			{
 				c[0] = glyph.getCharacter() ;
 				g2D.drawChars( c, 0, 1, ( int )start, ( int )ascent ) ;
+
+				//System.out.println( "Char: " + c[0] ) ;
 
 				// We do not want to include the padding when uv-mapping
 				final float advance = biggerGlyphs[i].getWidth() ;

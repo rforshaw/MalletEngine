@@ -26,9 +26,14 @@ public class FontAssist
 		@param _style Plain, Bold, Italics
 		@param _size point size
 	*/
-	public static MalletFont.Metrics createMetrics( final String _name, final int _style, final int _size )
+	public static MalletFont.Metrics createMetrics( final MalletFont _font )
 	{
-		return inter.createMetrics( _name, _style, _size ) ;
+		return inter.createMetrics( _font ) ;
+	}
+
+	public static Glyph createGlyph( final MalletFont _font, final int _code ) 
+	{
+		return inter.createGlyph( _font, _code ) ;
 	}
 
 	/**
@@ -48,7 +53,8 @@ public class FontAssist
 
 	public interface Assist
 	{
-		public MalletFont.Metrics createMetrics( final String _font, final int _style, final int _size ) ;
+		public MalletFont.Metrics createMetrics( final MalletFont _font ) ;
+		public Glyph createGlyph( final MalletFont _font, final int _code ) ;
 		public boolean loadFont( final String _path ) ;
 	}
 }

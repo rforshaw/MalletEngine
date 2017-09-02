@@ -29,14 +29,10 @@ public class GLFont extends Resource
 	{
 		if( _code < glyphs.length )
 		{
-			final Shape glyph = glyphs[_code] ;
-			if( glyph != null )
-			{
-				return glyph ;
-			}
+			return glyphs[_code] ;
 		}
 
-		return getShapeWithChar( '\0' ) ;
+		return null ;
 	}
 
 	@Override

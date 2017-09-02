@@ -78,11 +78,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return new FontAssist.Assist()
 		{
 			@Override
-			public MalletFont.Metrics createMetrics( final String _font,
-													 final int _style,
-													 final int _size )
+			public MalletFont.Metrics createMetrics( final MalletFont _font )
 			{
-				return fontManager.generateMetrics( _font, _style, _size ) ;
+				return fontManager.generateMetrics( _font ) ;
+			}
+
+			@Override
+			public Glyph createGlyph( final MalletFont _font, final int _code )
+			{
+				return fontManager.generateGlyph( _font, _code ) ;
 			}
 
 			@Override

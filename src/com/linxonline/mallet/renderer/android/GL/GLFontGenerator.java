@@ -22,6 +22,8 @@ public class GLFontGenerator
 {
 	private final GLTextureManager manager ;
 
+	private final Paint paint = new Paint() ;
+
 	public GLFontGenerator( final GLTextureManager _manager )
 	{
 		manager = _manager ;
@@ -32,11 +34,23 @@ public class GLFontGenerator
 		return generateMetrics( Typeface.create( _name, Typeface.NORMAL), _size, _characters ) ;
 	}
 
+	public Glyph generateGlyph( final String _name, final int _style, final int _size, final int _code )
+	{
+		return generateGlyph( Typeface.create( _name, Typeface.NORMAL), _size, _code ) ;
+	}
+
+	public Glyph generateGlyph( final Typeface _typeface, final int _size, final int _code )
+	{
+		final char[] c = new char[1] ;
+		c[0] = ( char )_code ;
+		return new Glyph( c[0], paint.measureText( c, 0, 1 ) ) ;
+	}
+
 	public MalletFont.Metrics generateMetrics( final Typeface _typeface, final int _size, final String _characters )
 	{
-		final Paint paint = new Paint() ;
 		paint.setTypeface( _typeface ) ;
 		paint.setTextSize( ( float )_size ) ;
+
 
 		final int length = _characters.length() ;
 		final char[] c = new char[1] ;
