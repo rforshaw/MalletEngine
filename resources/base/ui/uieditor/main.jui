@@ -309,6 +309,13 @@
 					"TYPE" : "UILIST",
 					"LAYOUT" : "VERTICAL",
 					"NAME" : "UIElementPanel",
+					"SCROLLBAR" : {
+						"TEXTURE" : "base/ui/uieditor/light_black.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					},
 					"CHILDREN" : [
 						{
 							"TYPE" : "UITEXTFIELD",

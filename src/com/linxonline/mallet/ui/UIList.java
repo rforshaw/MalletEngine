@@ -81,29 +81,6 @@ public class UIList extends UILayout
 
 	private void initScrollInput()
 	{
-		addListener( new UIListener<UIList>()
-		{
-			private final Vector3 position = new Vector3() ;
-
-			@Override
-			public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
-			{
-
-			}
-
-			@Override
-			public void removeDraws( final DrawDelegate<World, Draw> _delegate )
-			{
-
-			}
-
-			@Override
-			public void refresh()
-			{
-				super.refresh() ;
-			}
-		} ) ;
-
 		addListener( new InputListener<UIList>()
 		{
 			private final Vector3 position = new Vector3() ;
@@ -196,6 +173,7 @@ public class UIList extends UILayout
 				position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
 
 				CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
+				getParent().makeDirty() ;
 			}
 
 			@Override
@@ -625,6 +603,11 @@ public class UIList extends UILayout
 		return externalCamera ;
 	}
 
+	public Camera getInternalCamera()
+	{
+		return internalCamera ;
+	}
+	
 	private static Draw createPane( final World _world, final UIElement _parent )
 	{
 		final Vector3 length = _parent.getLength() ;
@@ -643,5 +626,129 @@ public class UIList extends UILayout
 		DrawAssist.attachProgram( pane, program ) ;
 
 		return pane ;
+	}
+	
+	public static class UIScrollbarListener<T extends UIList> extends UIListener<T>
+	{
+		private final Vector3 xLength = new Vector3() ;
+		private final Vector3 yLength = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
+
+		private final MalletTexture sheet ;
+		private final UIElement.UV uv ;
+
+		protected Draw xBar = null ;
+		protected Draw yBar = null ;
+
+		public UIScrollbarListener( final MalletTexture _sheet,
+									final UIElement.UV _uv )
+		{
+			sheet = _sheet ;
+			uv = _uv ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws()
+		{
+			final T parent = getParent() ;
+			final int layer = parent.getLayer() ;
+
+			CameraAssist.getUIPosition( parent.getInternalCamera(), offset ) ;
+			updateLengths( parent.getScrollbarLength(),
+						   parent.getScrollWidth() ) ;
+
+			{
+				xBar = DrawAssist.createDraw( parent.getPosition(),
+											  offset,
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ),
+											  layer ) ;
+				DrawAssist.amendUI( xBar, true ) ;
+				DrawAssist.amendShape( xBar, Shape.constructPlane( xLength, uv.min, uv.max ) ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
+
+				DrawAssist.attachProgram( xBar, program ) ;
+			}
+
+			{
+				yBar = DrawAssist.createDraw( parent.getPosition(),
+											offset,
+											new Vector3(),
+											new Vector3( 1, 1, 1 ),
+											layer ) ;
+				DrawAssist.amendUI( yBar, true ) ;
+				DrawAssist.amendShape( yBar, Shape.constructPlane( yLength, uv.min, uv.max ) ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
+
+				DrawAssist.attachProgram( yBar, program ) ;
+			}
+		}
+
+		/**
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
+		*/
+		@Override
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			if( xBar != null )
+			{
+				_delegate.addBasicDraw( xBar, _world ) ;
+			}
+
+			if( yBar != null )
+			{
+				_delegate.addBasicDraw( yBar, _world ) ;
+			}
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			_delegate.removeDraw( xBar ) ;
+			_delegate.removeDraw( yBar ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			super.refresh() ;
+			final T parent = getParent() ;
+
+			CameraAssist.getUIPosition( parent.getInternalCamera(), offset ) ;
+			updateLengths( parent.getScrollbarLength(),
+						   parent.getScrollWidth() ) ;
+
+			if( xBar != null )
+			{
+				DrawAssist.amendOrder( xBar, parent.getLayer() ) ;
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( xBar ), xLength ) ;
+				DrawAssist.forceUpdate( xBar ) ;
+			}
+
+			if( yBar != null )
+			{
+				DrawAssist.amendOrder( yBar, parent.getLayer() ) ;
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( yBar ), yLength ) ;
+				DrawAssist.forceUpdate( yBar ) ;
+			}
+		}
+
+		private void updateLengths( final Vector3 _length, final Vector3 _width )
+		{
+			xLength.setXYZ( _width.x, _length.y, _width.z ) ;
+			yLength.setXYZ( _length.x, _width.y, _width.z ) ;
+		}
 	}
 }

@@ -342,8 +342,29 @@ public class JUI
 					element.addListener( uiListener ) ;
 				}
 
+				final UIList.UIScrollbarListener scrollbar = createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ;
+				if( scrollbar != null )
+				{
+					element.addListener( scrollbar ) ;
+				}
+
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
+			}
+
+			private UIList.UIScrollbarListener<UIList> createScrollbar( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
+				final String texturePath = _ui.optString( "TEXTURE", null ) ;
+
+				final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
+
+				return new UIList.UIScrollbarListener(  texture, uv) ;
 			}
 		} ) ;
 
