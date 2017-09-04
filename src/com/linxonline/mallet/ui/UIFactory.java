@@ -24,6 +24,7 @@ import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.Vector2 ;
 
 /**
 	Contains helper functions for the construction of 
@@ -111,6 +112,143 @@ public final class UIFactory
 		return layout ;
 	}
 
+	public static Shape constructEdge( final Vector3 _length, final float _edge )
+	{
+		Shape.Swivel[] swivel = Shape.Swivel.constructSwivel( Shape.Swivel.POINT,
+															  Shape.Swivel.COLOUR,
+															  Shape.Swivel.UV ) ;
+
+		final Vector3 length = new Vector3( _length ) ;
+		length.subtract( _edge * 2, _edge * 2, _edge * 2 ) ;
+		final MalletColour white = MalletColour.white() ;
+
+		// 7 represents the amount of faces - Top Left Corner, Top Edge, etc..
+		// 4 is the amount of vertices needed for each face
+		// and 6 is the amount of indexes needed to construct that face
+		final Shape shape = Shape.create( Shape.Style.LINE_STRIP, swivel, 7 * 6, 7 * 4 ) ;
+
+		// Top Left Corner
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  0.0f,  0.0f ), white, new Vector2() ) ) ;	
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ), white, new Vector2() ) ) ;
+
+		int offset = 0 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Top Edge
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, 0.0f,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Top Right Corner
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, 0.0f,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Left Edge
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge,  0.0f ), white, new Vector2() ) ) ;	
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Bottom Left Corner
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y,  0.0f ), white, new Vector2() ) ) ;	
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y + _edge, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Right Edge
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge,  0.0f ), white, new Vector2() ) ) ;	
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		// Bottom Right Corner
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y,  0.0f ), white, new Vector2() ) ) ;	
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y,  0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y + _edge, 0.0f ), white, new Vector2() ) ) ;
+		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2() ) ) ;
+
+		offset += 4 ;
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 3 ) ;
+
+		shape.addIndex( offset + 0 ) ;
+		shape.addIndex( offset + 2 ) ;
+		shape.addIndex( offset + 1 ) ;
+
+		return shape ;
+	}
+
+	public static <T extends UIElement> GUIEdge<T> constructGUIEdge( final String _text,
+																	 final MalletFont _font,
+																	 final MalletTexture _sheet,
+																	 final float _edge )
+	{
+		return new GUIEdge<T>( _text, _font, _sheet, _edge ) ;
+	}
+
+	public static <T extends UIElement> GUIEdge<T> constructGUIEdge( final MalletTexture _sheet,
+																	  final float _edge )
+	{
+		return new GUIEdge<T>( _sheet, _edge ) ;
+	}
+
 	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final String _text,
 																		final MalletFont _font,
 																		final MalletTexture _sheet,
@@ -125,47 +263,146 @@ public final class UIFactory
 		return new GUIBasic<T>( _sheet, _uv ) ;
 	}
 
-	public static class GUIBasic<T extends UIElement> extends GUIBase<T>
+	public static class GUIEdge<T extends UIElement> extends GUITextBasic<T>
+	{
+		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+
+		private final MalletTexture sheet ;
+		private final float edge ;
+		protected Draw draw = null ;
+
+		public GUIEdge( final MalletTexture _sheet, final float _edge )
+		{
+			this( null, null, _sheet, _edge ) ;
+		}
+
+		public GUIEdge( final String _text, final MalletFont _font,
+						final MalletTexture _sheet, final float _edge )
+		{
+			super( _text, _font ) ;
+			sheet = _sheet ;
+			edge = _edge ;
+		}
+
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws()
+		{
+			final T parent = getParent() ;
+			updateLength( parent.getLength(), getLength() ) ;
+			updateOffset( parent.getOffset(), getOffset() ) ;
+
+			if( sheet != null )
+			{
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ),
+											  parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, UIFactory.constructEdge( getLength(), edge ) ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
+
+				DrawAssist.attachProgram( draw, program ) ;
+			}
+
+			super.constructDraws() ;
+		}
+
+		/**
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
+		*/
+		@Override
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			super.addDraws( _delegate, _world ) ;
+			if( draw != null )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
+			}
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			super.removeDraws( _delegate ) ;
+			_delegate.removeDraw( draw ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			final T parent = getParent() ;
+			updateLength( parent.getLength(), getLength() ) ;
+			updateOffset( parent.getOffset(), getOffset() ) ;
+
+			if( draw != null )
+			{
+				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			super.refresh() ;
+		}
+
+		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
+		{
+			_toUpdate.setXYZ( _length ) ;
+		}
+
+		private void updateOffset( final Vector3 _offset, final Vector3 _toUpdate )
+		{
+			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
+			_toUpdate.add( _offset ) ;
+		}
+
+		public MalletTexture getTexture()
+		{
+			return sheet ;
+		}
+	}
+
+	public static class GUIBasic<T extends UIElement> extends GUITextBasic<T>
 	{
 		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
-		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
-		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
-
 		protected boolean retainRatio = false ;
 
 		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
-		protected UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
-		protected UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
-
-		private final StringBuilder text = new StringBuilder() ;
-		private MalletFont font ;
-		private MalletColour colour = MalletColour.white() ;
-
 		private final MalletTexture sheet ;
 		private final UIElement.UV uv ;
 
 		protected Draw draw = null ;
-		protected Draw drawText = null ;
 
-		public GUIBasic( final MalletTexture _sheet,
-								final UIElement.UV _uv )
+		public GUIBasic( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
 			this( null, null, _sheet, _uv ) ;
 		}
 
 		public GUIBasic( final String _text,
-								final MalletFont _font,
-								final MalletTexture _sheet,
-								final UIElement.UV _uv )
+						 final MalletFont _font,
+						 final MalletTexture _sheet,
+						 final UIElement.UV _uv )
 		{
-			font = _font ;
-			if( _text != null )
-			{
-				text.append( _text ) ;
-			}
-
+			super( _text, _font ) ;
 			sheet = _sheet ;
 			uv = _uv ;
 		}
@@ -179,6 +416,124 @@ public final class UIFactory
 		{
 			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
 			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws()
+		{
+			final T parent = getParent() ;
+			updateLength( parent.getLength(), getLength() ) ;
+			updateOffset( parent.getOffset(), getOffset() ) ;
+
+			if( sheet != null && uv != null )
+			{
+				draw = DrawAssist.createDraw( parent.getPosition(),
+											  getOffset(),
+											  new Vector3(),
+											  new Vector3( 1, 1, 1 ),
+											  parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
+
+				DrawAssist.attachProgram( draw, program ) ;
+			}
+
+			super.constructDraws() ;
+		}
+
+		/**
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
+		*/
+		@Override
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			super.addDraws( _delegate, _world ) ;
+			if( draw != null )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
+			}
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			super.removeDraws( _delegate ) ;
+			_delegate.removeDraw( draw ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			final T parent = getParent() ;
+			updateLength( parent.getLength(), getLength() ) ;
+			updateOffset( parent.getOffset(), getOffset() ) ;
+
+			if( draw != null )
+			{
+				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			super.refresh() ;
+		}
+
+		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
+		{
+			if( uv == null || retainRatio == false )
+			{
+				_toUpdate.setXYZ( _length ) ;
+				return ;
+			}
+
+			UI.calcSubDimension( aspectRatio, sheet, uv ) ;
+			UI.fill( UI.Modifier.RETAIN_ASPECT_RATIO, _toUpdate, aspectRatio, _length ) ;
+		}
+
+		private void updateOffset( final Vector3 _offset, final Vector3 _toUpdate )
+		{
+			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
+			_toUpdate.add( _offset ) ;
+		}
+
+		public MalletTexture getTexture()
+		{
+			return sheet ;
+		}
+	}
+
+	public static class GUITextBasic<T extends UIElement> extends GUIBase<T>
+	{
+		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
+		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
+
+		protected UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
+		protected UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
+
+		private final StringBuilder text = new StringBuilder() ;
+		private MalletFont font ;
+		private MalletColour colour = MalletColour.white() ;
+
+		protected Draw drawText = null ;
+
+		public GUITextBasic( final String _text, final MalletFont _font )
+		{
+			font = _font ;
+			if( _text != null )
+			{
+				text.append( _text ) ;
+			}
 		}
 
 		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -206,25 +561,6 @@ public final class UIFactory
 			final T parent = getParent() ;
 			final int layer = parent.getLayer() ;
 
-			updateLength( parent.getLength() ) ;
-			updateOffset( parent.getOffset() ) ;
-
-			if( sheet != null && uv != null )
-			{
-				draw = DrawAssist.createDraw( parent.getPosition(),
-											  offset,
-											  new Vector3(),
-											  new Vector3( 1, 1, 1 ),
-											  layer ) ;
-				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, uv.min, uv.max ) ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", sheet ) ;
-
-				DrawAssist.attachProgram( draw, program ) ;
-			}
-
 			if( font != null )
 			{
 				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
@@ -250,11 +586,6 @@ public final class UIFactory
 		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			if( draw != null )
-			{
-				_delegate.addBasicDraw( draw, _world ) ;
-			}
-
 			if( drawText != null )
 			{
 				_delegate.addTextDraw( drawText, _world ) ;
@@ -268,7 +599,6 @@ public final class UIFactory
 		@Override
 		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
 		{
-			_delegate.removeDraw( draw ) ;
 			_delegate.removeDraw( drawText ) ;
 		}
 
@@ -277,16 +607,6 @@ public final class UIFactory
 		{
 			super.refresh() ;
 			final T parent = getParent() ;
-
-			updateLength( parent.getLength() ) ;
-			updateOffset( parent.getOffset() ) ;
-
-			if( draw != null )
-			{
-				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
-				DrawAssist.forceUpdate( draw ) ;
-			}
 
 			if( drawText != null )
 			{
@@ -305,24 +625,6 @@ public final class UIFactory
 			}
 		}
 
-		private void updateLength( final Vector3 _length )
-		{
-			if( uv == null || retainRatio == false )
-			{
-				length.setXYZ( _length ) ;
-				return ;
-			}
-
-			UI.calcSubDimension( aspectRatio, sheet, uv ) ;
-			UI.fill( UI.Modifier.RETAIN_ASPECT_RATIO, length, aspectRatio, _length ) ;
-		}
-
-		private void updateOffset( final Vector3 _offset )
-		{
-			UI.align( drawAlignmentX, drawAlignmentY, offset, length, getParent().getLength() ) ;
-			offset.add( _offset ) ;
-		}
-
 		public MalletFont getFont()
 		{
 			return font ;
@@ -331,11 +633,6 @@ public final class UIFactory
 		public MalletColour getColour()
 		{
 			return colour ;
-		}
-
-		public MalletTexture getTexture()
-		{
-			return sheet ;
 		}
 
 		public Vector3 getLength()
