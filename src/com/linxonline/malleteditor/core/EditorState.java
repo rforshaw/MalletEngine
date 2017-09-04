@@ -5,8 +5,8 @@ import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.core.GameState ;
 
-import com.linxonline.mallet.ui.BaseListener ;
-import com.linxonline.mallet.ui.UIListener ;
+import com.linxonline.mallet.ui.ABase ;
+import com.linxonline.mallet.ui.GUIBase ;
 import com.linxonline.mallet.ui.UIElement ;
 import com.linxonline.mallet.ui.UIFactory ;
 import com.linxonline.mallet.ui.UILayout ;
@@ -103,7 +103,7 @@ public class EditorState extends GameState
 	{
 		final UIMenu layout = new UIMenu( UILayout.Type.HORIZONTAL, TOOLBAR_HEIGHT ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw = null ;
 
@@ -164,7 +164,7 @@ public class EditorState extends GameState
 		layout.setPosition( _x, _y, 0.0f ) ;
 		layout.setLength( 150.0f, 100.0f, 0.0f ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw = null ;
 
@@ -233,7 +233,7 @@ public class EditorState extends GameState
 		final UIMenu.Item item = new UIMenu.Item( null ) ;
 		item.setMaximumLength( width + 20.0f, 0.0f, 0.0f ) ;
 
-		item.addListener( new UIListener()
+		item.addListener( new GUIBase()
 		{
 			private UIMenu dropdown = null ;
 
@@ -332,7 +332,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( 0.0f, TOOLBAR_HEIGHT, 0.0f ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw = null ;
 
@@ -393,7 +393,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMinimumLength( 250.0f, 0.0f, 0.0f ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw = null ;
 
@@ -443,7 +443,7 @@ public class EditorState extends GameState
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 		layout.setMaximumLength( SEPERATOR, 0.0f, 0.0f ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw = null ;
 
@@ -492,7 +492,7 @@ public class EditorState extends GameState
 	{
 		final UILayout layout = new UILayout( UILayout.Type.HORIZONTAL ) ;
 
-		layout.addListener( new UIListener()
+		layout.addListener( new GUIBase()
 		{
 			private Draw draw1 = null ;
 

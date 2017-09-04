@@ -87,7 +87,7 @@ public class UIEditorState extends GameState
 
 	private static void createMainView( final UIElement _view, final World _world )
 	{
-		_view.addListener( new UIListener<UIElement>()
+		_view.addListener( new GUIBase<UIElement>()
 		{
 			private Draw draw1 = null ;
 

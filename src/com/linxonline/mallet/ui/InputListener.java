@@ -8,7 +8,7 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 
-public abstract class InputListener<T extends UIElement> extends BaseListener<T>
+public abstract class InputListener<T extends UIElement> extends ABase<T>
 {
 	/**
 		Called when parent UIElement is refreshing itself.

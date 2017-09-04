@@ -39,7 +39,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UIElement> uiListener = JUI.<UIElement>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UIElement> uiListener = JUI.<UIElement>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -60,7 +60,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -82,7 +82,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -102,7 +102,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UITextField.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final UITextField.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -111,7 +111,7 @@ public class JUI
 				return element ;
 			}
 
-			private UITextField.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
+			private UITextField.GUIBasic createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -121,7 +121,7 @@ public class JUI
 				final UITextField.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
 				if( uv == null )
 				{
-					Logger.println( "JUI: UIListener specified without valid uv-map.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "JUI: GUIBasic specified without valid uv-map.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
 
@@ -133,7 +133,7 @@ public class JUI
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UITextField.UIListener listener = UITextField.createUIListener( text, font, texture, uv ) ;
+				final UITextField.GUIBasic listener = UITextField.createGUIBasic( text, font, texture, uv ) ;
 				listener.setRetainRatio( retainRatio ) ;
 
 				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
@@ -169,7 +169,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final UIButton.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -178,7 +178,7 @@ public class JUI
 				return element ;
 			}
 
-			private UIButton.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
+			private UIButton.GUIBasic createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -191,7 +191,7 @@ public class JUI
 
 				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
-					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "JUI: GUIBasic specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
 
@@ -203,7 +203,7 @@ public class JUI
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+				final UIButton.GUIBasic listener = UIButton.createGUIBasic( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
 				listener.setRetainRatio( retainRatio ) ;
 
 				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
@@ -242,7 +242,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final UIListener<UIMenu> uiListener = JUI.<UIMenu>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UIMenu> uiListener = JUI.<UIMenu>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -259,7 +259,7 @@ public class JUI
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 
-				final UIListener<UISpacer> uiListener = JUI.<UISpacer>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UISpacer> uiListener = JUI.<UISpacer>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -278,7 +278,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UICheckbox.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
+				final UICheckbox.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ) ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -287,7 +287,7 @@ public class JUI
 				return element ;
 			}
 
-			private UICheckbox.UIListener createListener( final JSONObject _ui )
+			private UICheckbox.GUIBasic createListener( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
@@ -300,14 +300,14 @@ public class JUI
 
 				if( neutralUV == null || rolloverUV == null || tickUV == null )
 				{
-					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "JUI: GUIBasic specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
 
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UICheckbox.UIListener listener = UICheckbox.createUIListener( texture, neutralUV, rolloverUV, tickUV ) ;
+				final UICheckbox.GUIBasic listener = UICheckbox.createGUIBasic( texture, neutralUV, rolloverUV, tickUV ) ;
 				listener.setRetainRatio( retainRatio ) ;
 
 				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
@@ -336,7 +336,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIListener<UILayout> uiListener = JUI.<UILayout>createUIElementUIListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -377,7 +377,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.UIListener uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+				final UIButton.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -386,7 +386,7 @@ public class JUI
 				return element ;
 			}
 
-			private UIButton.UIListener createListener( final JSONObject _ui, final UIRatio _ratio )
+			private UIButton.GUIBasic createListener( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -399,7 +399,7 @@ public class JUI
 
 				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
-					Logger.println( "JUI: UIListener specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "JUI: GUIBasic specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
 
@@ -411,7 +411,7 @@ public class JUI
 				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UIButton.UIListener listener = UIButton.createUIListener( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
+				final UIButton.GUIBasic listener = UIButton.createGUIBasic( text, font, texture, neutralUV, rolloverUV, clickedUV ) ;
 				listener.setRetainRatio( retainRatio ) ;
 
 				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
@@ -605,7 +605,7 @@ public class JUI
 		}
 	}
 
-	public static <T extends UIElement> UIListener<T> createUIElementUIListener( final JSONObject _ui, final UIRatio _ratio )
+	public static <T extends UIElement> GUIBase<T> createUIElementGUIBase( final JSONObject _ui, final UIRatio _ratio )
 	{
 		if( _ui == null )
 		{
@@ -623,7 +623,7 @@ public class JUI
 		final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 		final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
 
-		final UIFactory.UIBasicListener<T> listener = UIFactory.<T>constructUIListener( text, font, texture, uv ) ;
+		final UIFactory.GUIBasic<T> listener = UIFactory.<T>constructGUIBasic( text, font, texture, uv ) ;
 		listener.setRetainRatio( retainRatio ) ;
 
 		listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;

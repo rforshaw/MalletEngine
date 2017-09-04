@@ -55,7 +55,7 @@ public final class UIFactory
 		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
 		final UILayout layout = new UILayout( _type, new Vector3(), new Vector3(), dimension ) ;
 
-		layout.addListener( new BaseListener<UILayout>()
+		layout.addListener( new ABase<UILayout>()
 		{
 			private final Notification.Notify<String> widthNotify = new Notification.Notify<String>()
 			{
@@ -111,21 +111,21 @@ public final class UIFactory
 		return layout ;
 	}
 
-	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final String _text,
-																				final MalletFont _font,
-																				final MalletTexture _sheet,
-																				final UIElement.UV _uv )
+	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final String _text,
+																		final MalletFont _font,
+																		final MalletTexture _sheet,
+																		final UIElement.UV _uv )
 	{
-		return new UIBasicListener<T>( _text, _font, _sheet, _uv ) ;
+		return new GUIBasic<T>( _text, _font, _sheet, _uv ) ;
 	}
 
-	public static <T extends UIElement> UIBasicListener<T> constructUIListener( final MalletTexture _sheet,
-																				final UIElement.UV _uv )
+	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final MalletTexture _sheet,
+																		final UIElement.UV _uv )
 	{
-		return new UIBasicListener<T>( _sheet, _uv ) ;
+		return new GUIBasic<T>( _sheet, _uv ) ;
 	}
 
-	public static class UIBasicListener<T extends UIElement> extends UIListener<T>
+	public static class GUIBasic<T extends UIElement> extends GUIBase<T>
 	{
 		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
 		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
@@ -149,13 +149,13 @@ public final class UIFactory
 		protected Draw draw = null ;
 		protected Draw drawText = null ;
 
-		public UIBasicListener( final MalletTexture _sheet,
+		public GUIBasic( final MalletTexture _sheet,
 								final UIElement.UV _uv )
 		{
 			this( null, null, _sheet, _uv ) ;
 		}
 
-		public UIBasicListener( final String _text,
+		public GUIBasic( final String _text,
 								final MalletFont _font,
 								final MalletTexture _sheet,
 								final UIElement.UV _uv )

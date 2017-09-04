@@ -17,7 +17,7 @@ import com.linxonline.mallet.maths.* ;
 	when implementing their custom listeners.
 
 	UIElement does not directly handle the visual display 
-	that is delegated to a UIListener and the developer is expected 
+	that is delegated to a GUIBase and the developer is expected 
 	to implement it in whatever way they see fit.
 	
 */
@@ -98,7 +98,7 @@ public class UIElement implements InputHandler
 
 	/**
 		Add a listener to the UIElement.
-		Caution: BaseListeners not designed for the elements 
+		Caution: ABases not designed for the elements 
 		sub-type can still be added, not caught at compile-time.
 	*/
 	public <T extends IBase> T addListener( final T _listener )

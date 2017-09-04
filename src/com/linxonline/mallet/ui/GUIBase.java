@@ -9,7 +9,7 @@ import com.linxonline.mallet.renderer.* ;
 	visible, if the parent is invisible removeDraws is 
 	called instead.
 */
-public abstract class UIListener<T extends UIElement> extends BaseListener<T>
+public abstract class GUIBase<T extends UIElement> extends ABase<T>
 {
 	private DrawDelegate<World, Draw> delegate = null ;
 	private World world = null ;

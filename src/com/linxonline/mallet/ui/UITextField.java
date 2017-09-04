@@ -45,7 +45,7 @@ public class UITextField extends UIElement
 	public UITextField( final Vector3 _position,
 					   final Vector3 _offset,
 					   final Vector3 _length,
-					   final BaseListener<UIButton> _listener )
+					   final ABase<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;
@@ -88,15 +88,15 @@ public class UITextField extends UIElement
 		return text ;
 	}
 
-	public static UIListener createUIListener( final String _text,
+	public static GUIBasic createGUIBasic( final String _text,
 											   final MalletFont _font,
 											   final MalletTexture _sheet,
 											   final UIElement.UV _uv )
 	{
-		return new UIListener( _text, _font, _sheet, _uv ) ;
+		return new GUIBasic( _text, _font, _sheet, _uv ) ;
 	}
 
-	public static class UIListener extends UIFactory.UIBasicListener<UITextField>
+	public static class GUIBasic extends UIFactory.GUIBasic<UITextField>
 	{
 		private final String placeholder ;
 		private boolean editing = false ;
@@ -109,10 +109,10 @@ public class UITextField extends UIElement
 		private Draw drawEdit = null ;
 		private Draw drawCursor = null ;
 
-		public UIListener( final String _text,
-						   final MalletFont _font,
-						   final MalletTexture _sheet,
-						   final UIElement.UV _uv )
+		public GUIBasic( final String _text,
+						 final MalletFont _font,
+						 final MalletTexture _sheet,
+						 final UIElement.UV _uv )
 		{
 			super( null, _font, _sheet, _uv ) ;
 			placeholder = _text ;
@@ -131,7 +131,7 @@ public class UITextField extends UIElement
 			final Vector3 position = parent.getPosition() ;
 			final Vector3 length = getLength() ;
 			final Vector3 offset = getOffset() ;
-			
+
 			final StringBuilder edit = parent.getText() ;
 
 			{

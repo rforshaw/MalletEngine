@@ -64,7 +64,7 @@ public class UIButton extends UIElement
 	public UIButton( final Vector3 _position,
 					 final Vector3 _offset,
 					 final Vector3 _length,
-					 final BaseListener<UIButton> _listener )
+					 final ABase<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;
@@ -87,36 +87,36 @@ public class UIButton extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public static UIListener createUIListener( final MalletTexture _sheet,
-											   final UIButton.UV _neutral,
-											   final UIButton.UV _rollover,
-											   final UIButton.UV _clicked )
+	public static GUIBasic createGUIBasic( final MalletTexture _sheet,
+											final UIButton.UV _neutral,
+											final UIButton.UV _rollover,
+											final UIButton.UV _clicked )
 	{
-		return createUIListener( null, null, _sheet, _neutral, _rollover, _clicked ) ;
+		return createGUIBasic( null, null, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static UIListener createUIListener( final String _text,
-											   final MalletFont _font,
-											   final MalletTexture _sheet,
-											   final UIButton.UV _neutral,
-											   final UIButton.UV _rollover,
-											   final UIButton.UV _clicked )
+	public static GUIBasic createGUIBasic( final String _text,
+											final MalletFont _font,
+											final MalletTexture _sheet,
+											final UIButton.UV _neutral,
+											final UIButton.UV _rollover,
+											final UIButton.UV _clicked )
 	{
-		return new UIListener( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
+		return new GUIBasic( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static class UIListener extends UIFactory.UIBasicListener<UIButton>
+	public static class GUIBasic extends UIFactory.GUIBasic<UIButton>
 	{
 		private final UIButton.UV neutral ;
 		private final UIButton.UV rollover ;
 		private final UIButton.UV clicked ;
 
-		public UIListener( final String _text,
-						   final MalletFont _font,
-						   final MalletTexture _sheet,
-						   final UIButton.UV _neutral,
-						   final UIButton.UV _rollover,
-						   final UIButton.UV _clicked )
+		public GUIBasic( final String _text,
+						 final MalletFont _font,
+						 final MalletTexture _sheet,
+						 final UIButton.UV _neutral,
+						 final UIButton.UV _rollover,
+						 final UIButton.UV _clicked )
 		{
 			super( _text, _font, _sheet, _neutral ) ;
 			neutral = _neutral ;

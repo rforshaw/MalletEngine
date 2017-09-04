@@ -42,7 +42,7 @@ public class UICheckbox extends UIElement
 	public UICheckbox( final Vector3 _position,
 					   final Vector3 _offset,
 					   final Vector3 _length,
-					   final BaseListener<UIButton> _listener )
+					   final ABase<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
 		addListener( _listener ) ;
@@ -75,15 +75,15 @@ public class UICheckbox extends UIElement
 		return checked ;
 	}
 
-	public static UIListener createUIListener( final MalletTexture _sheet,
-											   final UIButton.UV _neutralBox,
-											   final UIButton.UV _rolloverBox,
-											   final UIButton.UV _tick )
+	public static GUIBasic createGUIBasic( final MalletTexture _sheet,
+											final UIButton.UV _neutralBox,
+											final UIButton.UV _rolloverBox,
+											final UIButton.UV _tick )
 	{
-		return new UIListener( _sheet, _neutralBox, _rolloverBox, _tick ) ;
+		return new GUIBasic( _sheet, _neutralBox, _rolloverBox, _tick ) ;
 	}
 
-	public static class UIListener extends UIFactory.UIBasicListener<UICheckbox>
+	public static class GUIBasic extends UIFactory.GUIBasic<UICheckbox>
 	{
 		private final UICheckbox.UV neutralBox ;
 		private final UICheckbox.UV rolloverBox ;
@@ -91,10 +91,10 @@ public class UICheckbox extends UIElement
 
 		private Draw drawTick = null ;
 
-		public UIListener( final MalletTexture _sheet,
-						   final UICheckbox.UV _neutralBox,
-						   final UICheckbox.UV _rolloverBox,
-						   final UICheckbox.UV _tick )
+		public GUIBasic( final MalletTexture _sheet,
+						 final UICheckbox.UV _neutralBox,
+						 final UICheckbox.UV _rolloverBox,
+						 final UICheckbox.UV _tick )
 		{
 			super( _sheet, _neutralBox ) ;
 			neutralBox  = _neutralBox ;

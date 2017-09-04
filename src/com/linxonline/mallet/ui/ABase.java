@@ -6,7 +6,14 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 
-public abstract class BaseListener<T extends UIElement> implements IBase<T>
+/**
+	Implement the Base Interface storing the parent 
+	as a local reference when setParent is called.
+
+	Return PROPAGATE on input functions and provide 
+	further functionality refresh and shutdown.
+*/
+public abstract class ABase<T extends UIElement> implements IBase<T>
 {
 	private T parent ;
 

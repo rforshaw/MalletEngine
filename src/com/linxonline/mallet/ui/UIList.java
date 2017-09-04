@@ -626,7 +626,7 @@ public class UIList extends UILayout
 		return pane ;
 	}
 	
-	public static class UIScrollbarListener<T extends UIList> extends UIListener<T>
+	public static class UIScrollbarListener<T extends UIList> extends GUIBase<T>
 	{
 		private final Vector3 xLength = new Vector3() ;
 		private final Vector3 yLength = new Vector3() ;
