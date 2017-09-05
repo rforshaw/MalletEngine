@@ -155,10 +155,10 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		final int textureID = glGenTextures( gl ) ;			//GLRenderer.handleError( "Gen Texture", gl ) ;
 		gl.glBindTexture( GL3.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", gl ) ;
 
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_REPEAT ) ;						//GLRenderer.handleError( "Parameter", gl ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_S, GL3.GL_CLAMP_TO_EDGE ) ;				//GLRenderer.handleError( "Parameter", gl ) ;
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_WRAP_T, GL3.GL_REPEAT ) ;						//GLRenderer.handleError( "Parameter", gl ) ;
 		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MAG_FILTER, GL3.GL_LINEAR ) ;					//GLRenderer.handleError( "Parameter", gl ) ;
-		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR_MIPMAP_LINEAR ) ;	//GLRenderer.handleError( "Parameter", gl ) ;
+		gl.glTexParameteri( GL3.GL_TEXTURE_2D, GL3.GL_TEXTURE_MIN_FILTER, GL3.GL_LINEAR ) ;	//GLRenderer.handleError( "Parameter", gl ) ;
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;

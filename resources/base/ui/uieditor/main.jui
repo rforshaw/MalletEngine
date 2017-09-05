@@ -351,24 +351,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UIEDGE" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
 								"COLOUR_TEXT" : "255, 0, 0",
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
+								"TEXTURE" : "base/textures/edge_button.png",
+								"EDGE" : 5.0
 							}
 						},
 						{

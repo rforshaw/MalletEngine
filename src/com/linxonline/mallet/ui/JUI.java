@@ -169,13 +169,54 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UIButton.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIButton.GUIBasic uiListener = createListener( _ui.getJSONObject( "UILISTENER" ), element.getRatio() ) ;
+					if( uiListener != null )
+					{
+						element.addListener( uiListener ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIEdge uiListener = createUIEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					if( uiListener != null )
+					{
+						element.addListener( uiListener ) ;
+					}
 				}
 
 				return element ;
+			}
+
+			private UIFactory.GUIEdge createUIEdge( final JSONObject _ui, final UIRatio _ratio )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final String text = _ui.optString( "TEXT", "" ) ;
+				final String fontName = _ui.optString( "FONT", null ) ;
+				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
+
+				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
+				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+
+				final UIFactory.GUIEdge listener = UIFactory.constructGUIEdge( text, font, texture, edge ) ;
+				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
+					if( align != null )
+					{
+						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				return listener ;
 			}
 
 			private UIButton.GUIBasic createListener( final JSONObject _ui, final UIRatio _ratio )
