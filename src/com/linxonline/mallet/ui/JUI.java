@@ -39,7 +39,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UIElement> uiListener = JUI.<UIElement>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UIElement> uiListener = JUI.<UIElement>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -60,7 +60,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -82,7 +82,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -190,7 +190,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIText text = createText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
+					final UIFactory.GUIText text = JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
 					if( text != null )
 					{
 						element.addListener( text ) ;
@@ -206,7 +206,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIEdge draw = createUIEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					final UIFactory.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -216,63 +216,16 @@ public class JUI
 				return element ;
 			}
 
-			private UIFactory.GUIText createText( final JSONObject _ui, final UIRatio _ratio )
+			private UIFactory.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
 					return null ;
 				}
 
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
-				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
-
-				final UIFactory.GUIText listener = new UIFactory.GUIText( text, font ) ;
-
-				listener.setColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
-					if( align != null )
-					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return listener ;
-			}
-
-			private UIFactory.GUIEdge createUIEdge( final JSONObject _ui, final UIRatio _ratio )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
-				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
-
-				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-
-				final UIFactory.GUIEdge listener = UIFactory.constructGUIEdge( text, font, texture, edge ) ;
-				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
-					if( align != null )
-					{
-						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return listener ;
+				return new UIFactory.GUIDrawEdge( texture, edge ) ;
 			}
 
 			private UIButton.GUIDraw createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
@@ -323,7 +276,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final GUIBase<UIMenu> uiListener = JUI.<UIMenu>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UIMenu> uiListener = JUI.<UIMenu>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -340,7 +293,7 @@ public class JUI
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 
-				final GUIBase<UISpacer> uiListener = JUI.<UISpacer>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UISpacer> uiListener = JUI.<UISpacer>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -417,7 +370,7 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createUIElementGUIBase( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
 				if( uiListener != null )
 				{
 					element.addListener( uiListener ) ;
@@ -459,7 +412,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIText text = createText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
+					final UIFactory.GUIText text = JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
 					if( text != null )
 					{
 						element.addListener( text ) ;
@@ -475,7 +428,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIEdge draw = createUIEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					final UIFactory.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -485,63 +438,16 @@ public class JUI
 				return element ;
 			}
 
-			private UIFactory.GUIText createText( final JSONObject _ui, final UIRatio _ratio )
+			private UIFactory.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
 					return null ;
 				}
 
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
-				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
-
-				final UIFactory.GUIText listener = new UIFactory.GUIText( text, font ) ;
-
-				listener.setColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
-					if( align != null )
-					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return listener ;
-			}
-
-			private UIFactory.GUIEdge createUIEdge( final JSONObject _ui, final UIRatio _ratio )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
-				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
-
-				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-
-				final UIFactory.GUIEdge listener = UIFactory.constructGUIEdge( text, font, texture, edge ) ;
-				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
-					if( align != null )
-					{
-						listener.setTextAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-												   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return listener ;
+				return new UIFactory.GUIDrawEdge( texture, edge ) ;
 			}
 
 			private UIButton.GUIDraw createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
@@ -747,7 +653,7 @@ public class JUI
 		}
 	}
 
-	public static <T extends UIElement> GUIBase<T> createUIElementGUIBase( final JSONObject _ui, final UIRatio _ratio )
+	public static <T extends UIElement> UIFactory.GUIDraw<T> createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
 	{
 		if( _ui == null )
 		{
@@ -755,20 +661,13 @@ public class JUI
 		}
 
 		final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
-
-		final String text = _ui.optString( "TEXT", "" ) ;
-		final String fontName = _ui.optString( "FONT", null ) ;
-		final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 		final String texturePath = _ui.optString( "TEXTURE", null ) ;
 
-		final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
 		final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
 
-		final UIFactory.GUIBasic<T> listener = UIFactory.<T>constructGUIBasic( text, font, texture, uv ) ;
+		final UIFactory.GUIDraw<T> listener = new UIFactory.GUIDraw<T>( texture, uv ) ;
 		listener.setRetainRatio( retainRatio ) ;
-
-		listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
 
 		{
 			final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
@@ -778,6 +677,25 @@ public class JUI
 									   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 			}
 		}
+
+		return listener ;
+	}
+
+	public static <T extends UIElement> UIFactory.GUIText<T> createGUIText( final JSONObject _ui, final UIRatio _ratio )
+	{
+		if( _ui == null )
+		{
+			return null ;
+		}
+
+		final String text = _ui.optString( "TEXT", "" ) ;
+		final String fontName = _ui.optString( "FONT", null ) ;
+		final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
+		final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+		final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
+
+		final UIFactory.GUIText<T> listener = new UIFactory.GUIText<T>( text, font ) ;
+		listener.setColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
 
 		{
 			final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;

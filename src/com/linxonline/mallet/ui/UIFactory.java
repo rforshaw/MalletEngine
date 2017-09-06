@@ -327,20 +327,6 @@ public final class UIFactory
 
 		return _shape ;
 	}
-	
-	public static <T extends UIElement> GUIEdge<T> constructGUIEdge( final String _text,
-																	 final MalletFont _font,
-																	 final MalletTexture _sheet,
-																	 final float _edge )
-	{
-		return new GUIEdge<T>( _text, _font, _sheet, _edge ) ;
-	}
-
-	public static <T extends UIElement> GUIEdge<T> constructGUIEdge( final MalletTexture _sheet,
-																	  final float _edge )
-	{
-		return new GUIEdge<T>( _sheet, _edge ) ;
-	}
 
 	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final String _text,
 																		final MalletFont _font,
