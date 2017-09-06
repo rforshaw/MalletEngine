@@ -356,10 +356,10 @@ public final class UIFactory
 		return new GUIBasic<T>( _sheet, _uv ) ;
 	}
 
-	public static class GUIEdge<T extends UIElement> extends GUITextBasic<T>
+	public static class GUIEdge<T extends UIElement> extends GUIBasic<T>
 	{
-		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
-		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
 		private final MalletTexture sheet ;
 		private final float edge ;
@@ -373,7 +373,7 @@ public final class UIFactory
 		public GUIEdge( final String _text, final MalletFont _font,
 						final MalletTexture _sheet, final float _edge )
 		{
-			super( _text, _font ) ;
+			super( _text, _font, null, null ) ;
 			sheet = _sheet ;
 			edge = _edge ;
 		}
@@ -473,7 +473,213 @@ public final class UIFactory
 		}
 	}
 
-	public static class GUIBasic<T extends UIElement> extends GUITextBasic<T>
+	public static class GUIBasic<T extends UIElement> extends GUIBase<T>
+	{
+		private final GUIDraw draw ;
+		private final GUIText text ;
+
+		public GUIBasic( final MalletTexture _sheet, final UIElement.UV _uv )
+		{
+			this( null, null, _sheet, _uv ) ;
+		}
+
+		public GUIBasic( final String _text,
+						 final MalletFont _font,
+						 final MalletTexture _sheet,
+						 final UIElement.UV _uv )
+		{
+			draw = new GUIDraw( _sheet, _uv ) ;
+			text = new GUIText( _text, _font ) ;
+		}
+
+		public void setRetainRatio( final boolean _ratio )
+		{
+			draw.setRetainRatio( _ratio ) ;
+		}
+
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			draw.setAlignment( _x, _y ) ;
+		}
+
+		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			text.setAlignment( _x, _y ) ;
+		}
+
+		public void setTextColour( final MalletColour _colour )
+		{
+			text.setColour( _colour ) ;
+		}
+
+		@Override
+		public void setParent( final T _parent )
+		{
+			super.setParent( _parent ) ;
+			draw.setParent( _parent ) ;
+			text.setParent( _parent ) ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		@Override
+		public void constructDraws() {}
+
+		/**
+			Called when listener receives a valid DrawDelegate
+			and when the parent UIElement is flagged as visible.
+		*/
+		@Override
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			draw.addDraws( _delegate, _world ) ;
+			text.addDraws( _delegate, _world ) ;
+		}
+
+		/**
+			Only called if there is a valid DrawDelegate and 
+			when the parent UIElement is flagged as invisible.
+		*/
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			draw.removeDraws( _delegate ) ;
+			text.removeDraws( _delegate ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			super.refresh() ;
+			draw.refresh() ;
+			text.refresh() ;
+		}
+
+		public StringBuilder getText()
+		{
+			return text.getText() ;
+		}
+
+		public UI.Alignment getBasicAlignmentX()
+		{
+			return draw.getAlignmentX() ;
+		}
+
+		public UI.Alignment getBasicAlignmentY()
+		{
+			return draw.getAlignmentY() ;
+		}
+
+		public UI.Alignment getTextAlignmentX()
+		{
+			return text.getAlignmentX() ;
+		}
+
+		public UI.Alignment getTextAlignmentY()
+		{
+			return text.getAlignmentY() ;
+		}
+
+		public Draw getBasicDraw()
+		{
+			return draw.getDraw() ;
+		}
+
+		public Draw getTextDraw()
+		{
+			return text.getDraw() ;
+		}
+
+		public MalletFont getFont()
+		{
+			return text.getFont() ;
+		}
+
+		public MalletColour getColour()
+		{
+			return text.getColour() ;
+		}
+
+		public MalletTexture getTexture()
+		{
+			return draw.getTexture() ;
+		}
+	}
+
+	public static class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
+	{
+		private final float edge ;
+
+		public GUIDrawEdge( final MalletTexture _sheet, final float _edge )
+		{
+			super( _sheet, null ) ;
+			edge = _edge ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws()
+		{
+			super.constructDraws() ;
+
+			final T parent = getParent() ;
+			final MalletTexture sheet = getTexture() ;
+
+			if( sheet != null )
+			{
+				final Draw draw = DrawAssist.createDraw( parent.getPosition(),
+														 getOffset(),
+														 new Vector3(),
+														 new Vector3( 1, 1, 1 ),
+														 parent.getLayer() ) ;
+				DrawAssist.amendUI( draw, true ) ;
+				DrawAssist.amendShape( draw, UIFactory.constructEdge( getLength(), edge ) ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				ProgramAssist.map( program, "inTex0", sheet ) ;
+
+				DrawAssist.attachProgram( draw, program ) ;
+				setDraw( draw ) ;
+			}
+
+			super.constructDraws() ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			final T parent = getParent() ;
+			updateLength( parent.getLength(), getLength() ) ;
+			updateOffset( parent.getOffset(), getOffset() ) ;
+
+			final Draw draw = getDraw() ;
+			if( draw != null )
+			{
+				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
+				UIFactory.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+
+			super.refresh() ;
+		}
+
+		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
+		{
+			_toUpdate.setXYZ( _length ) ;
+		}
+
+		private void updateOffset( final Vector3 _offset, final Vector3 _toUpdate )
+		{
+			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
+			_toUpdate.add( _offset ) ;
+		}
+	}
+
+	public static class GUIDraw<T extends UIElement> extends GUIBase<T>
 	{
 		private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
 		protected boolean retainRatio = false ;
@@ -486,17 +692,8 @@ public final class UIFactory
 
 		protected Draw draw = null ;
 
-		public GUIBasic( final MalletTexture _sheet, final UIElement.UV _uv )
+		public GUIDraw( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
-			this( null, null, _sheet, _uv ) ;
-		}
-
-		public GUIBasic( final String _text,
-						 final MalletFont _font,
-						 final MalletTexture _sheet,
-						 final UIElement.UV _uv )
-		{
-			super( _text, _font ) ;
 			sheet = _sheet ;
 			uv = _uv ;
 		}
@@ -516,6 +713,7 @@ public final class UIFactory
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
 		*/
+		@Override
 		public void constructDraws()
 		{
 			final T parent = getParent() ;
@@ -524,7 +722,7 @@ public final class UIFactory
 
 			if( sheet != null && uv != null )
 			{
-				draw = DrawAssist.createDraw( parent.getPosition(),
+				draw = DrawAssist.createDraw( getPosition(),
 											  getOffset(),
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ),
@@ -548,7 +746,6 @@ public final class UIFactory
 		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			super.addDraws( _delegate, _world ) ;
 			if( draw != null )
 			{
 				_delegate.addBasicDraw( draw, _world ) ;
@@ -562,7 +759,6 @@ public final class UIFactory
 		@Override
 		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
 		{
-			super.removeDraws( _delegate ) ;
 			_delegate.removeDraw( draw ) ;
 		}
 
@@ -601,19 +797,36 @@ public final class UIFactory
 			_toUpdate.add( _offset ) ;
 		}
 
+		public void setDraw( final Draw _draw )
+		{
+			draw = _draw ;
+		}
+
+		public Draw getDraw()
+		{
+			return draw ;
+		}
+
+		public UI.Alignment getAlignmentX()
+		{
+			return drawAlignmentX ;
+		}
+
+		public UI.Alignment getAlignmentY()
+		{
+			return drawAlignmentY ;
+		}
+
 		public MalletTexture getTexture()
 		{
 			return sheet ;
 		}
 	}
 
-	public static class GUITextBasic<T extends UIElement> extends GUIBase<T>
+	public static class GUIText<T extends UIElement> extends GUIBase<T>
 	{
-		private final Vector3 length = new Vector3() ;			// Actual length of the visual element
-		private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
-
-		protected UI.Alignment drawTextAlignmentX = UI.Alignment.CENTRE ;
-		protected UI.Alignment drawTextAlignmentY = UI.Alignment.CENTRE ;
+		protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
+		protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
 
 		private final StringBuilder text = new StringBuilder() ;
 		private MalletFont font ;
@@ -621,7 +834,7 @@ public final class UIFactory
 
 		protected Draw drawText = null ;
 
-		public GUITextBasic( final String _text, final MalletFont _font )
+		public GUIText( final String _text, final MalletFont _font )
 		{
 			font = _font ;
 			if( _text != null )
@@ -630,26 +843,22 @@ public final class UIFactory
 			}
 		}
 
-		public void setTextAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			drawTextAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
-			drawTextAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
 		}
 
-		public void setTextColour( final MalletColour _colour )
+		public void setColour( final MalletColour _colour )
 		{
 			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
-		}
-
-		public StringBuilder getText()
-		{
-			return text ;
 		}
 
 		/**
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
 		*/
+		@Override
 		public void constructDraws()
 		{
 			final T parent = getParent() ;
@@ -657,13 +866,17 @@ public final class UIFactory
 
 			if( font != null )
 			{
-				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
-				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
+				final Vector3 length = getLength() ;
+				final Vector3 offset = getOffset() ;
+
+				final MalletFont.Metrics metrics = font.getMetrics() ;
+				offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
+				offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
 				drawText = DrawAssist.createTextDraw( text,
 													  font,
-													  parent.getPosition(),
-													  textOffset,
+													  getPosition(),
+													  getOffset(),
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
 													  layer + 1 ) ;
@@ -704,19 +917,37 @@ public final class UIFactory
 
 			if( drawText != null )
 			{
-				final Vector3 textOffset = DrawAssist.getOffset( drawText ) ;
-				textOffset.setXYZ( getOffset() ) ;
+				final Vector3 length = getLength() ;
+				final Vector3 offset = getOffset() ;
 
 				final MalletFont.Metrics metrics = font.getMetrics() ;
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( text ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-				textOffset.add( x, y, 0.0f ) ;
+				offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
+				offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
 				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
+		}
+
+		public StringBuilder getText()
+		{
+			return text ;
+		}
+
+		public UI.Alignment getAlignmentX()
+		{
+			return drawAlignmentX ;
+		}
+
+		public UI.Alignment getAlignmentY()
+		{
+			return drawAlignmentY ;
+		}
+
+		public Draw getDraw()
+		{
+			return drawText ;
 		}
 
 		public MalletFont getFont()
@@ -727,16 +958,6 @@ public final class UIFactory
 		public MalletColour getColour()
 		{
 			return colour ;
-		}
-
-		public Vector3 getLength()
-		{
-			return length ;
-		}
-		
-		public Vector3 getOffset()
-		{
-			return offset ;
 		}
 	}
 }

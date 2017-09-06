@@ -12,11 +12,13 @@
 					"TYPE" : "UIMENU_ITEM",
 					"NAME" : "FileButton",
 					"MAX_LENGTH" : "3.0, 0.0, 0.0",
-					"UILISTENER" : {
+					"UITEXT" : {
 						"TEXT" : "File",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+					},
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
 							"MIN" : "0.0, 0.0",
@@ -41,11 +43,14 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "OpenButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Open",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
+
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -64,11 +69,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "SaveButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Save",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -87,11 +94,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "ExitButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Exit",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -109,7 +118,7 @@
 							}
 						],
 						"MAX_LENGTH" : "3.5, 4.0, 0.0",
-						"UILISTENER" : {
+						"UIDRAW" : {
 							"TEXTURE" : "base/ui/uieditor/light_black.png",
 							"UV" : {
 								"MIN" : "0.0, 0.0",
@@ -122,11 +131,13 @@
 					"TYPE" : "UIMENU_ITEM",
 					"NAME" : "EditButton",
 					"MAX_LENGTH" : "3.0, 0.0, 0.0",
-					"UILISTENER" : {
+					"UITEXT" : {
 						"TEXT" : "Edit",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+					},
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
 							"MIN" : "0.0, 0.0",
@@ -151,11 +162,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "CopyButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Copy",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -174,11 +187,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "PasteButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Paste",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -196,7 +211,7 @@
 							}
 						],
 						"MAX_LENGTH" : "3.5, 4.0, 0.0",
-						"UILISTENER" : {
+						"UIDRAW" : {
 							"TEXTURE" : "base/ui/uieditor/light_black.png",
 							"UV" : {
 								"MIN" : "0.0, 0.0",
@@ -209,11 +224,13 @@
 					"TYPE" : "UIMENU_ITEM",
 					"NAME" : "HelpButton",
 					"MAX_LENGTH" : "3.0, 0.0, 0.0",
-					"UILISTENER" : {
+					"UITEXT" : {
 						"TEXT" : "Help",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+					},
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/grey.png",
 						"NEUTRAL_UV" : {
 							"MIN" : "0.0, 0.0",
@@ -238,11 +255,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "HelpButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "Help",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -261,11 +280,13 @@
 							{
 								"TYPE" : "UIBUTTON",
 								"NAME" : "AboutButton",
-								"UILISTENER" : {
+								"UITEXT" : {
 									"TEXT" : "About",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+								},
+								"UIDRAW" : {
 									"TEXTURE" : "base/ui/uieditor/grey.png",
 									"NEUTRAL_UV" : {
 										"MIN" : "0.0, 0.0",
@@ -283,7 +304,7 @@
 							}
 						],
 						"MAX_LENGTH" : "3.5, 4.0, 0.0",
-						"UILISTENER" : {
+						"UIDRAW" : {
 							"TEXTURE" : "base/ui/uieditor/light_black.png",
 							"UV" : {
 								"MIN" : "0.0, 0.0",
@@ -293,7 +314,7 @@
 					}
 				}
 			],
-			"UILISTENER" : {
+			"UIDRAW" : {
 				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 				"UV" : {
 					"MIN" : "0.0, 0.0",
@@ -320,12 +341,14 @@
 						{
 							"TYPE" : "UITEXTFIELD",
 							"NAME" : "TestButton1",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Type Here",
 								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
 								"FONT" : "Arial",
 								"FONT_SIZE" : 0.42,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"UV" : {
 									"MIN" : "0.0, 0.0",
@@ -336,12 +359,15 @@
 						{
 							"TYPE" : "UITEXTFIELD",
 							"NAME" : "TestButton1",
-							"UILISTENER" : {
+							"UITEXT" : 
+							{
 								"TEXT" : "Type Here",
 								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
 								"FONT" : "Arial",
 								"FONT_SIZE" : 0.42,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"UV" : {
 									"MIN" : "0.0, 0.0",
@@ -362,11 +388,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -384,11 +412,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -406,11 +436,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -428,11 +460,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -450,11 +484,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -472,11 +508,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -494,11 +532,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -516,11 +556,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -538,11 +580,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -560,11 +604,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -584,7 +630,7 @@
 							"TYPE" : "UILIST",
 							"LAYOUT" : "VERTICAL",
 							"MAX_LENGTH" : "0.0, 4.0, 0.0",
-							"UILISTENER" : {
+							"UIDRAW" : {
 								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 								"UV" : {
 									"MIN" : "0.0, 0.0",
@@ -594,11 +640,13 @@
 							"CHILDREN" : [
 								{
 									"TYPE" : "UIBUTTON",
-									"UILISTENER" : {
+									"UITEXT" : {
 										"TEXT" : "Test 2",
 										"FONT" : "Arial",
 										"FONT_SIZE" : 1.16,
-										"COLOUR_TEXT" : "255, 0, 0",
+										"COLOUR_TEXT" : "255, 0, 0"
+									},
+									"UIDRAW" : {
 										"TEXTURE" : "base/textures/button_sheet.png",
 										"NEUTRAL_UV" : {
 											"MIN" : "0.0, 0.0",
@@ -621,11 +669,13 @@
 									"CHILDREN" : [
 										{
 											"TYPE" : "UIBUTTON",
-											"UILISTENER" : {
+											"UITEXT" : {
 												"TEXT" : "T3",
 												"FONT" : "Arial",
 												"FONT_SIZE" : 1.16,
-												"COLOUR_TEXT" : "255, 0, 0",
+												"COLOUR_TEXT" : "255, 0, 0"
+											},
+											"UIDRAW" : {
 												"TEXTURE" : "base/textures/button_sheet.png",
 												"NEUTRAL_UV" : {
 													"MIN" : "0.0, 0.0",
@@ -643,11 +693,13 @@
 										},
 										{
 											"TYPE" : "UIBUTTON",
-											"UILISTENER" : {
+											"UITEXT" : {
 												"TEXT" : "T3",
 												"FONT" : "Arial",
 												"FONT_SIZE" : 1.16,
-												"COLOUR_TEXT" : "255, 0, 0",
+												"COLOUR_TEXT" : "255, 0, 0"
+											},
+											"UIDRAW" : {
 												"TEXTURE" : "base/textures/button_sheet.png",
 												"NEUTRAL_UV" : {
 													"MIN" : "0.0, 0.0",
@@ -667,11 +719,13 @@
 								},
 								{
 									"TYPE" : "UIBUTTON",
-									"UILISTENER" : {
+									"UITEXT" : {
 										"TEXT" : "Test 2",
 										"FONT" : "Arial",
 										"FONT_SIZE" : 1.16,
-										"COLOUR_TEXT" : "255, 0, 0",
+										"COLOUR_TEXT" : "255, 0, 0"
+									},
+									"UIDRAW" : {
 										"TEXTURE" : "base/textures/button_sheet.png",
 										"NEUTRAL_UV" : {
 											"MIN" : "0.0, 0.0",
@@ -691,11 +745,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -713,11 +769,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -735,11 +793,13 @@
 						},
 						{
 							"TYPE" : "UIBUTTON",
-							"UILISTENER" : {
+							"UITEXT" : {
 								"TEXT" : "Test 1",
 								"FONT" : "Arial",
 								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0",
+								"COLOUR_TEXT" : "255, 0, 0"
+							},
+							"UIDRAW" : {
 								"TEXTURE" : "base/textures/button_sheet.png",
 								"NEUTRAL_UV" : {
 									"MIN" : "0.0, 0.0",
@@ -761,7 +821,7 @@
 				{
 					"TYPE" : "UIELEMENT",
 					"MAX_LENGTH" : "0.2, 0, 0",
-					"UILISTENER" : {
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 						"UV" : {
 							"MIN" : "0.0, 0.0",
@@ -776,7 +836,7 @@
 				{
 					"TYPE" : "UIELEMENT",
 					"MAX_LENGTH" : "0.2, 0, 0",
-					"UILISTENER" : {
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 						"UV" : {
 							"MIN" : "0.0, 0.0",
@@ -792,7 +852,7 @@
 					
 					],
 					"MAX_LENGTH" : "5.5, 0, 0",
-					"UILISTENER" : {
+					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 						"UV" : {
 							"MIN" : "0.0, 0.0",
@@ -806,7 +866,7 @@
 			"TYPE" : "UIMENU",
 			"LENGTH" : "1",
 			"NAME" : "FooterToolbar",
-			"UILISTENER" : {
+			"UIDRAW" : {
 				"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 				"UV" : {
 					"MIN" : "0.0, 0.0",
@@ -815,7 +875,7 @@
 			}
 		}
 	],
-	"UILISTENER" : {
+	"UIDRAW" : {
 		"TEXTURE" : "base/ui/uieditor/grey.png",
 		"UV" : {
 			"MIN" : "0.0, 0.0",

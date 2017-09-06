@@ -200,15 +200,15 @@ public class UICheckbox extends UIElement
 		@Override
 		public void engage()
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rolloverBox.min, rolloverBox.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getBasicDraw() ), rolloverBox.min, rolloverBox.max ) ;
+			DrawAssist.forceUpdate( getBasicDraw() ) ;
 		}
 
 		@Override
 		public void disengage()
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutralBox.min, neutralBox.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getBasicDraw() ), neutralBox.min, neutralBox.max ) ;
+			DrawAssist.forceUpdate( getBasicDraw() ) ;
 		}
 	}
 }

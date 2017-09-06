@@ -88,34 +88,27 @@ public class UITextField extends UIElement
 		return text ;
 	}
 
-	public static GUIBasic createGUIBasic( final String _text,
-											   final MalletFont _font,
-											   final MalletTexture _sheet,
-											   final UIElement.UV _uv )
+	public static GUIEditText createEditText( final String _text, final MalletFont _font )
 	{
-		return new GUIBasic( _text, _font, _sheet, _uv ) ;
+		return new GUIEditText( _text, _font ) ;
 	}
 
-	public static class GUIBasic extends UIFactory.GUIBasic<UITextField>
+	public static class GUIEditText extends UIFactory.GUIText<UITextField>
 	{
-		private final String placeholder ;
 		private boolean editing = false ;
 		private boolean blinkCursor = false ;
 
-		private DrawDelegate<World, Draw> delegate = null ;
-		private World world ;
-
-		private Draw drawPlaceholder = null ;
 		private Draw drawEdit = null ;
 		private Draw drawCursor = null ;
 
-		public GUIBasic( final String _text,
-						 final MalletFont _font,
-						 final MalletTexture _sheet,
-						 final UIElement.UV _uv )
+		/**
+			Use _text as placeholder text. 
+			This text is used if the user has not
+			written anything and is not editing the field.
+		*/
+		public GUIEditText( final String _text, final MalletFont _font )
 		{
-			super( null, _font, _sheet, _uv ) ;
-			placeholder = _text ;
+			super( _text, _font ) ;
 		}
 
 		@Override
@@ -128,42 +121,23 @@ public class UITextField extends UIElement
 			final UITextField parent = getParent() ;
 			final int layer = parent.getLayer() + 1 ;
 
-			final Vector3 position = parent.getPosition() ;
-			final Vector3 length = getLength() ;
+			final Vector3 position = getPosition() ;
 			final Vector3 offset = getOffset() ;
+			final Vector3 length = getLength() ;
 
 			final StringBuilder edit = parent.getText() ;
 
 			{
-				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
-				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
-
 				drawEdit = DrawAssist.createTextDraw( edit,
 													  font,
-													  parent.getPosition(),
-													  textOffset,
+													  position,
+													  offset,
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
 													  layer + 1 ) ;
 				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
 				DrawAssist.amendColour( drawEdit, colour ) ;
 				DrawAssist.amendUI( drawEdit, true ) ;
-			}
-
-			{
-				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
-				textOffset.add( length.x / 2, length.y / 2, 0.0f ) ;
-
-				drawPlaceholder = DrawAssist.createTextDraw( placeholder,
-															 font,
-															 parent.getPosition(),
-															 textOffset,
-															 new Vector3(),
-															 new Vector3( 1, 1, 1 ),
-															 layer + 1 ) ;
-				DrawAssist.amendTextLength( drawPlaceholder, font.stringIndexWidth( placeholder, length.x ) ) ;
-				DrawAssist.amendColour( drawPlaceholder, colour ) ;
-				DrawAssist.amendUI( drawPlaceholder, true ) ;
 			}
 
 			{
@@ -202,23 +176,20 @@ public class UITextField extends UIElement
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
 			super.addDraws( _delegate, _world ) ;
-			delegate = _delegate ;
-			world = _world ;
-
 			final UITextField parent = getParent() ;
 			final int layer = parent.getLayer() + 1 ;
 
-			delegate.addTextDraw( drawEdit, world ) ;
+			_delegate.addTextDraw( drawEdit, _world ) ;
 
 			final StringBuilder edit = getParent().getText() ;
 			if( isEditing() == false && edit.length() <= 0 )
 			{
-				delegate.addTextDraw( drawPlaceholder, world ) ;
+				_delegate.addTextDraw( getDraw(), _world ) ;
 			}
 
 			if( isEditing() == true )
 			{
-				delegate.addBasicDraw( drawCursor, world ) ;
+				_delegate.addBasicDraw( drawCursor, _world ) ;
 			}
 			getParent().makeDirty() ;
 		}
@@ -232,7 +203,6 @@ public class UITextField extends UIElement
 		{
 			super.removeDraws( _delegate ) ;
 			_delegate.removeDraw( drawEdit ) ;
-			_delegate.removeDraw( drawPlaceholder ) ;
 			_delegate.removeDraw( drawCursor ) ;
 		}
 
@@ -240,6 +210,7 @@ public class UITextField extends UIElement
 		public void refresh()
 		{
 			super.refresh() ;
+			final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 			if( delegate == null )
 			{
 				return ;
@@ -249,18 +220,14 @@ public class UITextField extends UIElement
 			final int layer = parent.getLayer() + 1 ;
 
 			final MalletFont font = getFont() ;
+			final Vector3 offset = getOffset() ;
 			final Vector3 length = getLength() ;
 			final StringBuilder edit = getParent().getText() ;
 
 			{
-				final Vector3 textOffset = DrawAssist.getOffset( drawEdit ) ;
-				textOffset.setXYZ( getOffset() ) ;
-
 				final MalletFont.Metrics metrics = font.getMetrics() ;
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( edit ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-				textOffset.add( x, y, 0.0f ) ;
+				offset.x = UI.align( getAlignmentX(), font.stringWidth( edit ), length.x ) ;
+				offset.y = UI.align( getAlignmentY(), metrics.getHeight(), length.y ) ;
 
 				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
 				DrawAssist.amendOrder( drawEdit, layer + 1 ) ;
@@ -269,40 +236,23 @@ public class UITextField extends UIElement
 
 			if( isEditing() == false && edit.length() <= 0 )
 			{
-				delegate.addTextDraw( drawPlaceholder, world ) ;
-
-				final Vector3 textOffset = DrawAssist.getOffset( drawPlaceholder ) ;
-				textOffset.setXYZ( getOffset() ) ;
-
-				final MalletFont.Metrics metrics = font.getMetrics() ;
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( placeholder ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-				textOffset.add( x, y, 0.0f ) ;
-
-				DrawAssist.amendTextLength( drawPlaceholder, font.stringIndexWidth( placeholder, length.x ) ) ;
-				DrawAssist.amendOrder( drawPlaceholder, layer + 1 ) ;
-				DrawAssist.forceUpdate( drawPlaceholder ) ;
+				delegate.addTextDraw( getDraw(), getWorld() ) ;
 			}
 			else
 			{
-				delegate.removeDraw( drawPlaceholder ) ;
+				delegate.removeDraw( getDraw() ) ;
 			}
 
 			if( isEditing() == true )
 			{
-				delegate.addBasicDraw( drawCursor, world ) ;
+				delegate.addBasicDraw( drawCursor, getWorld() ) ;
 
 				final int index = getParent().getCursorIndex() ;
 
-				final Vector3 textOffset = DrawAssist.getOffset( drawCursor ) ;
-				textOffset.setXYZ( getOffset() ) ;
+				final Vector3 cursorOffset = DrawAssist.getOffset( drawCursor ) ;
+				cursorOffset.setXYZ( offset ) ;
 
-				final MalletFont.Metrics metrics = font.getMetrics() ;
-				final float x = UI.align( drawTextAlignmentX, font.stringWidth( edit ), length.x ) ;
-				final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-				textOffset.add( x + font.stringWidth( edit, 0, index ), y, 0.0f ) ;
+				cursorOffset.add( font.stringWidth( edit, 0, index ), 0.0f, 0.0f ) ;
 
 				DrawAssist.amendOrder( drawCursor, layer ) ;
 				DrawAssist.forceUpdate( drawCursor ) ;
@@ -311,22 +261,6 @@ public class UITextField extends UIElement
 			{
 				delegate.removeDraw( drawCursor ) ;
 			}
-		}
-
-		private void applyTextOffset( final Draw _draw )
-		{
-			final StringBuilder edit = getParent().getText() ;
-			final Vector3 length     = getLength() ;
-			final MalletFont font    = getFont() ;
-
-			final Vector3 textOffset = DrawAssist.getOffset( _draw ) ;
-			textOffset.setXYZ( getOffset() ) ;
-
-			final MalletFont.Metrics metrics = font.getMetrics() ;
-			final float x = UI.align( drawTextAlignmentX, font.stringWidth( edit ), length.x ) ;
-			final float y = UI.align( drawTextAlignmentY, metrics.getHeight(), length.y ) ;
-
-			textOffset.add( x, y, 0.0f ) ;
 		}
 
 		private boolean isEditing()

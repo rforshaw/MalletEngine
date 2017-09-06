@@ -87,38 +87,26 @@ public class UIButton extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public static GUIBasic createGUIBasic( final MalletTexture _sheet,
+	public static GUIDraw createGUIBasic( final MalletTexture _sheet,
 											final UIButton.UV _neutral,
 											final UIButton.UV _rollover,
 											final UIButton.UV _clicked )
 	{
-		return createGUIBasic( null, null, _sheet, _neutral, _rollover, _clicked ) ;
+		return new GUIDraw( _sheet, _neutral, _rollover, _clicked ) ;
 	}
 
-	public static GUIBasic createGUIBasic( final String _text,
-											final MalletFont _font,
-											final MalletTexture _sheet,
-											final UIButton.UV _neutral,
-											final UIButton.UV _rollover,
-											final UIButton.UV _clicked )
-	{
-		return new GUIBasic( _text, _font, _sheet, _neutral, _rollover, _clicked ) ;
-	}
-
-	public static class GUIBasic extends UIFactory.GUIBasic<UIButton>
+	public static class GUIDraw extends UIFactory.GUIDraw<UIButton>
 	{
 		private final UIButton.UV neutral ;
 		private final UIButton.UV rollover ;
 		private final UIButton.UV clicked ;
 
-		public GUIBasic( final String _text,
-						 final MalletFont _font,
-						 final MalletTexture _sheet,
+		public GUIDraw( final MalletTexture _sheet,
 						 final UIButton.UV _neutral,
 						 final UIButton.UV _rollover,
 						 final UIButton.UV _clicked )
 		{
-			super( _text, _font, _sheet, _neutral ) ;
+			super( _sheet, _neutral ) ;
 			neutral = _neutral ;
 			rollover = _rollover ;
 			clicked = _clicked ;
@@ -127,8 +115,8 @@ public class UIButton extends UIElement
 		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 
@@ -141,8 +129,8 @@ public class UIButton extends UIElement
 		@Override
 		public InputEvent.Action mousePressed( final InputEvent _input )
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), clicked.min, clicked.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), clicked.min, clicked.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
 			return InputEvent.Action.PROPAGATE ;
 		}
 
@@ -155,15 +143,15 @@ public class UIButton extends UIElement
 		@Override
 		public void engage()
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), rollover.min, rollover.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 
 		@Override
 		public void disengage()
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( draw ), neutral.min, neutral.max ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	}
 }

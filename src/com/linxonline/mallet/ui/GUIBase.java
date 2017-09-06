@@ -1,6 +1,7 @@
 package com.linxonline.mallet.ui ;
 
 import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.maths.* ;
 
 /**
 	Makes a request to receive a DrawDelegate from the 
@@ -14,6 +15,10 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	private DrawDelegate<World, Draw> delegate = null ;
 	private World world = null ;
 	private Camera camera = null ;
+
+	private final Vector3 position = new Vector3() ;
+	private final Vector3 offset = new Vector3() ;
+	private final Vector3 length = new Vector3() ;
 
 	private boolean visible = true ;
 
@@ -47,12 +52,19 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	{
 		super.setParent( _parent ) ;
 		visible = _parent.isVisible() ;
+		position.setXYZ( _parent.getPosition() ) ;
+		offset.setXYZ( _parent.getOffset() ) ;
+		length.setXYZ( _parent.getLength() ) ;
 	}
 
 	@Override
 	public void refresh()
 	{
 		final T parent = getParent() ;
+		position.setXYZ( parent.getPosition() ) ;
+		offset.setXYZ( parent.getOffset() ) ;
+		length.setXYZ( parent.getLength() ) ;
+
 		if( visible != parent.isVisible() )
 		{
 			visible = parent.isVisible() ;
@@ -68,6 +80,21 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 				}
 			}
 		}
+	}
+
+	public Vector3 getPosition()
+	{
+		return position ;
+	}
+
+	public Vector3 getOffset()
+	{
+		return offset ;
+	}
+
+	public Vector3 getLength()
+	{
+		return length ;
 	}
 
 	@Override
