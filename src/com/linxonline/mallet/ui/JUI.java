@@ -206,7 +206,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					final UIButton.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -216,7 +216,7 @@ public class JUI
 				return element ;
 			}
 
-			private UIFactory.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
+			private UIButton.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
 			{
 				if( _ui == null )
 				{
@@ -225,7 +225,10 @@ public class JUI
 
 				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-				return new UIFactory.GUIDrawEdge( texture, edge ) ;
+				final MalletColour rollover = MalletColour.parseColour( _ui.optString( "COLOUR_ROLLOVER", null ) ) ;
+				final MalletColour clicked  = MalletColour.parseColour( _ui.optString( "COLOUR_CLICKED", null ) ) ;
+
+				return UIButton.createGUIEdge( texture, edge, null, rollover, clicked ) ;
 			}
 
 			private UIButton.GUIDraw createGUIDraw( final JSONObject _ui, final UIRatio _ratio )

@@ -384,7 +384,9 @@
 							},
 							"UIEDGE" : {
 								"TEXTURE" : "base/textures/edge_button.png",
-								"EDGE" : 5.0
+								"EDGE" : 5.0,
+								"COLOUR_ROLLOVER" : "0, 255, 0",
+								"COLOUR_CLICKED" : "0, 0, 255"
 							}
 						},
 						{

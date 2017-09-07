@@ -272,7 +272,7 @@ public final class UIFactory
 		length.subtract( _edge * 2, _edge * 2, _edge * 2 ) ;
 
 		// Top Left Corner
-		//_shape.setVector3( 0, 0, new Vector3( 0.0f, 0.0f,  0.0f ) ) ;
+		_shape.setVector3( 0, 0, new Vector3( 0.0f, 0.0f,  0.0f ) ) ;
 		_shape.setVector3( 1, 0, new Vector3( _edge, 0.0f,  0.0f ) ) ;
 		_shape.setVector3( 2, 0, new Vector3( 0.0f,  _edge, 0.0f ) ) ;
 		_shape.setVector3( 3, 0, new Vector3( _edge, _edge, 0.0f ) ) ;
@@ -328,6 +328,16 @@ public final class UIFactory
 		return _shape ;
 	}
 
+	public static Shape updateEdgeColour( final Shape _shape, final MalletColour _colour )
+	{
+		final int size = _shape.getVertexSize() ;
+		for( int i = 0; i < size; i++ )
+		{
+			_shape.setColour( i, 1, _colour ) ;
+		}
+		return _shape ;
+	}
+	
 	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final String _text,
 																		final MalletFont _font,
 																		final MalletTexture _sheet,
@@ -597,11 +607,26 @@ public final class UIFactory
 	public static class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 	{
 		private final float edge ;
+		private MalletColour colour ;
 
 		public GUIDrawEdge( final MalletTexture _sheet, final float _edge )
 		{
 			super( _sheet, null ) ;
 			edge = _edge ;
+		}
+
+		public void setColour( final MalletColour _colour )
+		{
+			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+			final Draw draw = getDraw() ;
+			if( draw != null )
+			{
+				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
+				if( shape != null )
+				{
+					updateEdgeColour( shape, colour ) ;
+				}
+			}
 		}
 
 		/**
@@ -624,6 +649,7 @@ public final class UIFactory
 														 parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, UIFactory.constructEdge( getLength(), edge ) ) ;
+				setColour( getColour() ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", sheet ) ;
@@ -663,6 +689,11 @@ public final class UIFactory
 			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
 			_toUpdate.add( _offset ) ;
 		}
+
+		public MalletColour getColour()
+		{
+			return colour ;
+		}
 	}
 
 	public static class GUIDraw<T extends UIElement> extends GUIBase<T>
@@ -673,6 +704,7 @@ public final class UIFactory
 		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
+		private MalletColour colour ;
 		private final MalletTexture sheet ;
 		private final UIElement.UV uv ;
 
@@ -695,6 +727,20 @@ public final class UIFactory
 			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
 		}
 
+		public void setColour( final MalletColour _colour )
+		{
+			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+			final Draw draw = getDraw() ;
+			if( draw != null )
+			{
+				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
+				if( shape != null )
+				{
+					updateEdgeColour( shape, colour ) ;
+				}
+			}
+		}
+
 		/**
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
@@ -715,6 +761,7 @@ public final class UIFactory
 											  parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
+				setColour( getColour() ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.map( program, "inTex0", sheet ) ;
@@ -801,6 +848,11 @@ public final class UIFactory
 		public UI.Alignment getAlignmentY()
 		{
 			return drawAlignmentY ;
+		}
+
+		public MalletColour getColour()
+		{
+			return colour ;
 		}
 
 		public MalletTexture getTexture()

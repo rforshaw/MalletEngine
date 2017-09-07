@@ -5,6 +5,7 @@ import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.UpdateType ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.MalletColour ;
 
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
@@ -93,6 +94,78 @@ public class UIButton extends UIElement
 											final UIButton.UV _clicked )
 	{
 		return new GUIDraw( _sheet, _neutral, _rollover, _clicked ) ;
+	}
+
+	public static GUIDrawEdge createGUIEdge( final MalletTexture _sheet,
+											 final float _edge,
+											 final MalletColour _neutral,
+											 final MalletColour _rollover,
+											 final MalletColour _clicked )
+	{
+		return new GUIDrawEdge( _sheet, _edge, _neutral, _rollover, _clicked ) ;
+	}
+
+	public static class GUIDrawEdge extends UIFactory.GUIDrawEdge<UIButton>
+	{
+		private final MalletColour neutral ;
+		private final MalletColour rollover ;
+		private final MalletColour clicked ;
+
+		public GUIDrawEdge( final MalletTexture _sheet,
+							final float _edge,
+							final MalletColour _neutral,
+							final MalletColour _rollover,
+							final MalletColour _clicked )
+		{
+			super( _sheet, _edge ) ;
+			neutral  = ( _neutral != null )  ? _neutral  : MalletColour.white() ;
+			rollover = ( _rollover != null ) ? _rollover : MalletColour.white() ;
+			clicked  = ( _clicked != null )  ? _clicked  : MalletColour.white() ;
+			
+			setColour( neutral ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			setColour( rollover ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			setColour( clicked ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public void engage()
+		{
+			setColour( rollover ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+		}
+
+		@Override
+		public void disengage()
+		{
+			setColour( neutral ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+		}
 	}
 
 	public static class GUIDraw extends UIFactory.GUIDraw<UIButton>
