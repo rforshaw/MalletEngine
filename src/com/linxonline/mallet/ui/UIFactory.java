@@ -26,6 +26,8 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Vector2 ;
 
+import com.linxonline.mallet.input.* ;
+
 /**
 	Contains helper functions for the construction of 
 	commonly used UI elements and their supporting classes.
@@ -328,7 +330,7 @@ public final class UIFactory
 		return _shape ;
 	}
 
-	public static Shape updateEdgeColour( final Shape _shape, final MalletColour _colour )
+	public static Shape updateColour( final Shape _shape, final MalletColour _colour )
 	{
 		final int size = _shape.getVertexSize() ;
 		for( int i = 0; i < size; i++ )
@@ -336,137 +338,6 @@ public final class UIFactory
 			_shape.setColour( i, 1, _colour ) ;
 		}
 		return _shape ;
-	}
-	
-	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final String _text,
-																		final MalletFont _font,
-																		final MalletTexture _sheet,
-																		final UIElement.UV _uv )
-	{
-		return new GUIBasic<T>( _text, _font, _sheet, _uv ) ;
-	}
-
-	public static <T extends UIElement> GUIBasic<T> constructGUIBasic( final MalletTexture _sheet,
-																		final UIElement.UV _uv )
-	{
-		return new GUIBasic<T>( _sheet, _uv ) ;
-	}
-
-	public static class GUIEdge<T extends UIElement> extends GUIBasic<T>
-	{
-		private UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
-		private UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
-
-		private final MalletTexture sheet ;
-		private final float edge ;
-		protected Draw draw = null ;
-
-		public GUIEdge( final MalletTexture _sheet, final float _edge )
-		{
-			this( null, null, _sheet, _edge ) ;
-		}
-
-		public GUIEdge( final String _text, final MalletFont _font,
-						final MalletTexture _sheet, final float _edge )
-		{
-			super( _text, _font, null, null ) ;
-			sheet = _sheet ;
-			edge = _edge ;
-		}
-
-		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
-		{
-			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
-			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
-		}
-
-		/**
-			Can be used to construct Draw objects before a 
-			DrawDelegate is provided by the Rendering System.
-		*/
-		public void constructDraws()
-		{
-			final T parent = getParent() ;
-			updateLength( parent.getLength(), getLength() ) ;
-			updateOffset( parent.getOffset(), getOffset() ) ;
-
-			if( sheet != null )
-			{
-				draw = DrawAssist.createDraw( parent.getPosition(),
-											  getOffset(),
-											  new Vector3(),
-											  new Vector3( 1, 1, 1 ),
-											  parent.getLayer() ) ;
-				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, UIFactory.constructEdge( getLength(), edge ) ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", sheet ) ;
-
-				DrawAssist.attachProgram( draw, program ) ;
-			}
-
-			super.constructDraws() ;
-		}
-
-		/**
-			Called when listener receives a valid DrawDelegate
-			and when the parent UIElement is flagged as visible.
-		*/
-		@Override
-		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
-		{
-			super.addDraws( _delegate, _world ) ;
-			if( draw != null )
-			{
-				_delegate.addBasicDraw( draw, _world ) ;
-			}
-		}
-
-		/**
-			Only called if there is a valid DrawDelegate and 
-			when the parent UIElement is flagged as invisible.
-		*/
-		@Override
-		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
-		{
-			super.removeDraws( _delegate ) ;
-			_delegate.removeDraw( draw ) ;
-		}
-
-		@Override
-		public void refresh()
-		{
-			final T parent = getParent() ;
-			updateLength( parent.getLength(), getLength() ) ;
-			updateOffset( parent.getOffset(), getOffset() ) ;
-
-			if( draw != null )
-			{
-				
-				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
-				UIFactory.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
-				DrawAssist.forceUpdate( draw ) ;
-			}
-
-			super.refresh() ;
-		}
-
-		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
-		{
-			_toUpdate.setXYZ( _length ) ;
-		}
-
-		private void updateOffset( final Vector3 _offset, final Vector3 _toUpdate )
-		{
-			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
-			_toUpdate.add( _offset ) ;
-		}
-
-		public MalletTexture getTexture()
-		{
-			return sheet ;
-		}
 	}
 
 	public static class GUIBasic<T extends UIElement> extends GUIBase<T>
@@ -604,6 +475,69 @@ public final class UIFactory
 		}
 	}
 
+	public static class GUIPanelEdge<T extends UIElement> extends UIFactory.GUIDrawEdge<T>
+	{
+		private final MalletColour neutral ;
+		private final MalletColour rollover ;
+		private final MalletColour clicked ;
+
+		public GUIPanelEdge( final MalletTexture _sheet,
+							 final float _edge,
+							 final MalletColour _neutral,
+							 final MalletColour _rollover,
+							 final MalletColour _clicked )
+		{
+			super( _sheet, _edge ) ;
+			neutral  = ( _neutral != null )  ? _neutral  : MalletColour.white() ;
+			rollover = ( _rollover != null ) ? _rollover : MalletColour.white() ;
+			clicked  = ( _clicked != null )  ? _clicked  : MalletColour.white() ;
+
+			setColour( neutral ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			setColour( rollover ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			setColour( clicked ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public void engage()
+		{
+			setColour( rollover ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+		}
+
+		@Override
+		public void disengage()
+		{
+			setColour( neutral ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+		}
+	}
+
 	public static class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 	{
 		private final float edge ;
@@ -624,7 +558,7 @@ public final class UIFactory
 				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
 				if( shape != null )
 				{
-					updateEdgeColour( shape, colour ) ;
+					updateColour( shape, colour ) ;
 				}
 			}
 		}
@@ -657,13 +591,12 @@ public final class UIFactory
 				DrawAssist.attachProgram( draw, program ) ;
 				setDraw( draw ) ;
 			}
-
-			super.constructDraws() ;
 		}
 
 		@Override
 		public void refresh()
 		{
+			super.refresh() ;
 			final T parent = getParent() ;
 			updateLength( parent.getLength(), getLength() ) ;
 			updateOffset( parent.getOffset(), getOffset() ) ;
@@ -675,8 +608,6 @@ public final class UIFactory
 				UIFactory.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
-
-			super.refresh() ;
 		}
 
 		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
@@ -693,6 +624,66 @@ public final class UIFactory
 		public MalletColour getColour()
 		{
 			return colour ;
+		}
+	}
+
+	public static class GUIPanelDraw<T extends UIElement> extends UIFactory.GUIDraw<T>
+	{
+		private final UIElement.UV neutral ;
+		private final UIElement.UV rollover ;
+		private final UIElement.UV clicked ;
+
+		public GUIPanelDraw( final MalletTexture _sheet,
+							 final UIElement.UV _neutral,
+							 final UIElement.UV _rollover,
+							 final UIElement.UV _clicked )
+		{
+			super( _sheet, _neutral ) ;
+			neutral = _neutral ;
+			rollover = _rollover ;
+			clicked = _clicked ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), clicked.min, clicked.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public void engage()
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
+		}
+
+		@Override
+		public void disengage()
+		{
+			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
+			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	}
 
@@ -736,7 +727,7 @@ public final class UIFactory
 				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
 				if( shape != null )
 				{
-					updateEdgeColour( shape, colour ) ;
+					updateColour( shape, colour ) ;
 				}
 			}
 		}
@@ -798,6 +789,7 @@ public final class UIFactory
 		@Override
 		public void refresh()
 		{
+			super.refresh() ;
 			final T parent = getParent() ;
 			updateLength( parent.getLength(), getLength() ) ;
 			updateOffset( parent.getOffset(), getOffset() ) ;
@@ -808,8 +800,6 @@ public final class UIFactory
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
-
-			super.refresh() ;
 		}
 
 		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )

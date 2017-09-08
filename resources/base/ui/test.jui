@@ -9,11 +9,13 @@
 				{
 					"TYPE" : "UIBUTTON",
 					"NAME" : "TestButton1",
-					"UIEDGE" : {
+					"UITEXT" : {
 						"TEXT" : "Test 1",
 						"FONT" : "Arial",
 						"FONT_SIZE" : 1.16,
-						"COLOUR_TEXT" : "255, 0, 0",
+						"COLOUR_TEXT" : "255, 0, 0"
+					},
+					"UIEDGE" : {
 						"TEXTURE" : "base/textures/edge_button.png",
 						"EDGE" : 10.0
 					}

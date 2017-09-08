@@ -39,10 +39,28 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UIElement> uiListener = JUI.<UIElement>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIFactory.GUIText text = JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
+					if( text != null )
+					{
+						element.addListener( text ) ;
+					}
+				}
+
+				{
+					final GUIBase<UIElement> draw = JUI.<UIElement>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UIElement> draw = JUI.<UIElement>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
 				return element ;
@@ -60,10 +78,20 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final GUIBase<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
@@ -82,10 +110,20 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIFactory.GUIDraw<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
@@ -103,7 +141,15 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIDraw draw = createBackPanel( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+					final UIFactory.GUIDraw<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -119,38 +165,6 @@ public class JUI
 				}
 
 				return element ;
-			}
-
-			private UIFactory.GUIDraw createBackPanel( final JSONObject _ui, final UIRatio _ratio )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final UITextField.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
-				if( uv == null )
-				{
-					Logger.println( "JUI: GUIEditText specified without valid uv-map.", Logger.Verbosity.MAJOR ) ;
-					return null ;
-				}
-
-				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
-				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-
-				final UIFactory.GUIDraw listener = new UIFactory.GUIDraw( texture, uv ) ;
-				listener.setRetainRatio( retainRatio ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
-					if( align != null )
-					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return listener ;
 			}
 
 			private UITextField.GUIEditText createEditText( final JSONObject _ui, final UIRatio _ratio )
@@ -196,9 +210,9 @@ public class JUI
 						element.addListener( text ) ;
 					}
 				}
-				
+
 				{
-					final UIButton.GUIDraw draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+					final UIFactory.GUIPanelDraw draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -206,7 +220,7 @@ public class JUI
 				}
 
 				{
-					final UIButton.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					final UIFactory.GUIDrawEdge<UIButton> draw = JUI.<UIButton>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -216,31 +230,16 @@ public class JUI
 				return element ;
 			}
 
-			private UIButton.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
+			private UIFactory.GUIPanelDraw<UIButton> createGUIDraw( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
 					return null ;
 				}
 
-				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
-				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-				final MalletColour rollover = MalletColour.parseColour( _ui.optString( "COLOUR_ROLLOVER", null ) ) ;
-				final MalletColour clicked  = MalletColour.parseColour( _ui.optString( "COLOUR_CLICKED", null ) ) ;
-
-				return UIButton.createGUIEdge( texture, edge, null, rollover, clicked ) ;
-			}
-
-			private UIButton.GUIDraw createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final UIButton.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
-				final UIButton.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
-				final UIButton.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
+				final UIElement.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIElement.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIElement.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
 
 				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
@@ -251,19 +250,19 @@ public class JUI
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UIButton.GUIDraw listener = UIButton.createGUIBasic( texture, neutralUV, rolloverUV, clickedUV ) ;
-				listener.setRetainRatio( retainRatio ) ;
+				final UIFactory.GUIPanelDraw<UIButton> draw = new UIFactory.GUIPanelDraw<UIButton>( texture, neutralUV, rolloverUV, clickedUV ) ;
+				draw.setRetainRatio( retainRatio ) ;
 
 				{
 					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
 					if( align != null )
 					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+						draw.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
 											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
-				return listener ;
+				return draw ;
 			}
 		} ) ;
 
@@ -279,10 +278,20 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 
-				final GUIBase<UIMenu> uiListener = JUI.<UIMenu>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIFactory.GUIDraw<UIMenu> draw = JUI.<UIMenu>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UIMenu> draw = JUI.<UIMenu>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
 				return element ;
@@ -296,10 +305,20 @@ public class JUI
 				final String axis = _ui.optString( "AXIS", null ) ;
 				final UISpacer element = new UISpacer( UISpacer.Axis.derive( axis ) ) ;
 
-				final GUIBase<UISpacer> uiListener = JUI.<UISpacer>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIFactory.GUIDraw<UISpacer> draw = JUI.<UISpacer>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UISpacer> draw = JUI.<UISpacer>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
 				return element ;
@@ -373,16 +392,28 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final GUIBase<UILayout> uiListener = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UIFactory.GUIDraw<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
 				}
 
-				final UIList.UIScrollbarListener scrollbar = createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ;
-				if( scrollbar != null )
 				{
-					element.addListener( scrollbar ) ;
+					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIList.UIScrollbarListener scrollbar = createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ;
+					if( scrollbar != null )
+					{
+						element.addListener( scrollbar ) ;
+					}
 				}
 
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
@@ -423,7 +454,7 @@ public class JUI
 				}
 				
 				{
-					final UIButton.GUIDraw draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ), element.getRatio() ) ;
+					final UIFactory.GUIPanelDraw<UIMenu.Item> draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -431,7 +462,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIDrawEdge draw = createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ), element.getRatio() ) ;
+					final UIFactory.GUIDrawEdge<UIMenu.Item> draw = JUI.<UIMenu.Item>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -441,28 +472,16 @@ public class JUI
 				return element ;
 			}
 
-			private UIFactory.GUIDrawEdge createGUIDrawEdge( final JSONObject _ui, final UIRatio _ratio )
+			private UIFactory.GUIPanelDraw<UIMenu.Item> createGUIDraw( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
 					return null ;
 				}
 
-				final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
-				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
-				return new UIFactory.GUIDrawEdge( texture, edge ) ;
-			}
-
-			private UIButton.GUIDraw createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final UIButton.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
-				final UIButton.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
-				final UIButton.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
+				final UIElement.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIElement.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIElement.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
 
 				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
@@ -473,19 +492,19 @@ public class JUI
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UIButton.GUIDraw listener = UIButton.createGUIBasic( texture, neutralUV, rolloverUV, clickedUV ) ;
-				listener.setRetainRatio( retainRatio ) ;
+				final UIFactory.GUIPanelDraw<UIMenu.Item> draw = new UIFactory.GUIPanelDraw<UIMenu.Item>( texture, neutralUV, rolloverUV, clickedUV ) ;
+				draw.setRetainRatio( retainRatio ) ;
 
 				{
 					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
 					if( align != null )
 					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+						draw.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
-				return listener ;
+				return draw ;
 			}
 		} ) ;
 	}
@@ -656,7 +675,23 @@ public class JUI
 		}
 	}
 
-	public static <T extends UIElement> UIFactory.GUIDraw<T> createGUIDraw( final JSONObject _ui, final UIRatio _ratio )
+	public static <T extends UIElement> UIFactory.GUIDrawEdge<T> createGUIDrawEdge( final JSONObject _ui )
+	{
+		if( _ui == null )
+		{
+			return null ;
+		}
+
+		final float edge = ( float )_ui.optDouble( "EDGE", 5.0 ) ;
+		final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
+		final MalletColour neutral  = MalletColour.parseColour( _ui.optString( "COLOUR_NEUTRAL", null ) ) ;
+		final MalletColour rollover = MalletColour.parseColour( _ui.optString( "COLOUR_ROLLOVER", null ) ) ;
+		final MalletColour clicked  = MalletColour.parseColour( _ui.optString( "COLOUR_CLICKED", null ) ) ;
+
+		return new UIFactory.GUIPanelEdge( texture, edge, neutral, rollover, clicked ) ;
+	}
+	
+	public static <T extends UIElement> UIFactory.GUIDraw<T> createGUIDraw( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
