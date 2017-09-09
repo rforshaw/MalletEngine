@@ -75,31 +75,35 @@ public class UICheckbox extends UIElement
 		return checked ;
 	}
 
-	public static GUIBasic createGUIBasic( final MalletTexture _sheet,
+	public static GUIPanelDraw createGUIBasic( final MalletTexture _sheet,
 											final UIButton.UV _neutralBox,
 											final UIButton.UV _rolloverBox,
 											final UIButton.UV _tick )
 	{
-		return new GUIBasic( _sheet, _neutralBox, _rolloverBox, _tick ) ;
+		return new GUIPanelDraw( _sheet, _neutralBox, _rolloverBox, _tick ) ;
 	}
 
-	public static class GUIBasic extends UIFactory.GUIBasic<UICheckbox>
+	public static class GUIPanelDraw extends UIFactory.GUIPanelDraw<UICheckbox>
 	{
-		private final UICheckbox.UV neutralBox ;
-		private final UICheckbox.UV rolloverBox ;
-		private final UICheckbox.UV tick ;
+		private final UIElement.UV tick ;
 
 		private Draw drawTick = null ;
+		private boolean checked = false ;
 
-		public GUIBasic( final MalletTexture _sheet,
-						 final UICheckbox.UV _neutralBox,
-						 final UICheckbox.UV _rolloverBox,
-						 final UICheckbox.UV _tick )
+		public GUIPanelDraw( final MalletTexture _sheet,
+							 final UICheckbox.UV _neutralBox,
+							 final UICheckbox.UV _rolloverBox,
+							 final UICheckbox.UV _tick )
 		{
-			super( _sheet, _neutralBox ) ;
-			neutralBox  = _neutralBox ;
-			rolloverBox = _rolloverBox ;
+			super( _sheet, _neutralBox, _rolloverBox, _neutralBox ) ;
 			tick        = _tick ;
+		}
+
+		@Override
+		public void setParent( final UICheckbox _parent )
+		{
+			super.setParent( _parent ) ;
+			checked = _parent.isChecked() ;
 		}
 
 		@Override
@@ -156,23 +160,10 @@ public class UICheckbox extends UIElement
 		public void refresh()
 		{
 			super.refresh() ;
-			if( drawTick != null )
-			{
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( drawTick ), getLength() ) ;
-				DrawAssist.amendOrder( drawTick, getParent().getLayer() + 1 ) ;
-				DrawAssist.forceUpdate( drawTick ) ;
-			}
-		}
-
-		@Override
-		public InputEvent.Action mouseReleased( final InputEvent _input )
-		{
 			final UICheckbox parent = getParent() ;
-
-			if( parent.isEngaged() == true )
+			if( checked != parent.isChecked() )
 			{
-				parent.setChecked( !parent.isChecked() ) ;
-
+				checked = !checked ;
 				final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 				if( delegate != null )
 				{
@@ -188,6 +179,24 @@ public class UICheckbox extends UIElement
 				}
 			}
 
+			if( drawTick != null )
+			{
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( drawTick ), getLength() ) ;
+				DrawAssist.amendOrder( drawTick, getParent().getLayer() + 1 ) ;
+				DrawAssist.forceUpdate( drawTick ) ;
+			}
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			final UICheckbox parent = getParent() ;
+			if( parent.isEngaged() == true )
+			{
+				parent.setChecked( !parent.isChecked() ) ;
+				parent.makeDirty() ;
+			}
+
 			return InputEvent.Action.PROPAGATE ;
 		}
 
@@ -195,20 +204,6 @@ public class UICheckbox extends UIElement
 		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
 			return mouseReleased( _input ) ;
-		}
-
-		@Override
-		public void engage()
-		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getBasicDraw() ), rolloverBox.min, rolloverBox.max ) ;
-			DrawAssist.forceUpdate( getBasicDraw() ) ;
-		}
-
-		@Override
-		public void disengage()
-		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getBasicDraw() ), neutralBox.min, neutralBox.max ) ;
-			DrawAssist.forceUpdate( getBasicDraw() ) ;
 		}
 	}
 }

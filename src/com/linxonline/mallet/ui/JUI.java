@@ -334,16 +334,18 @@ public class JUI
 				applyLayer( element, _ui ) ;
 				applyLookup( _map, element, _ui ) ;
 
-				final UICheckbox.GUIBasic uiListener = createListener( _ui.getJSONObject( "UIDRAW" ) ) ;
-				if( uiListener != null )
 				{
-					element.addListener( uiListener ) ;
+					final UICheckbox.GUIPanelDraw uiListener = createListener( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( uiListener != null )
+					{
+						element.addListener( uiListener ) ;
+					}
 				}
 
 				return element ;
 			}
 
-			private UICheckbox.GUIBasic createListener( final JSONObject _ui )
+			private UICheckbox.GUIPanelDraw createListener( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
@@ -356,28 +358,26 @@ public class JUI
 
 				if( neutralUV == null || rolloverUV == null || tickUV == null )
 				{
-					Logger.println( "JUI: GUIBasic specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "JUI: GUIPanelDraw specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
 				}
 
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UICheckbox.GUIBasic listener = UICheckbox.createGUIBasic( texture, neutralUV, rolloverUV, tickUV ) ;
-				listener.setRetainRatio( retainRatio ) ;
-
-				listener.setTextColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
+				final UICheckbox.GUIPanelDraw draw = UICheckbox.createGUIBasic( texture, neutralUV, rolloverUV, tickUV ) ;
+				draw.setRetainRatio( retainRatio ) ;
 
 				{
 					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
 					if( align != null )
 					{
-						listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-											   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+						draw.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
-				return listener ;
+				return draw ;
 			}
 		} ) ;
 
