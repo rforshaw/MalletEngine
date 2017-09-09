@@ -75,28 +75,13 @@ public class UICheckbox extends UIElement
 		return checked ;
 	}
 
-	public static GUIPanelDraw createGUIBasic( final MalletTexture _sheet,
-											final UIButton.UV _neutralBox,
-											final UIButton.UV _rolloverBox,
-											final UIButton.UV _tick )
+	public static class GUITick extends UIFactory.GUIDraw<UICheckbox>
 	{
-		return new GUIPanelDraw( _sheet, _neutralBox, _rolloverBox, _tick ) ;
-	}
-
-	public static class GUIPanelDraw extends UIFactory.GUIPanelDraw<UICheckbox>
-	{
-		private final UIElement.UV tick ;
-
-		private Draw drawTick = null ;
 		private boolean checked = false ;
 
-		public GUIPanelDraw( final MalletTexture _sheet,
-							 final UICheckbox.UV _neutralBox,
-							 final UICheckbox.UV _rolloverBox,
-							 final UICheckbox.UV _tick )
+		public GUITick( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
-			super( _sheet, _neutralBox, _rolloverBox, _neutralBox ) ;
-			tick        = _tick ;
+			super( _sheet, _uv ) ;
 		}
 
 		@Override
@@ -106,29 +91,6 @@ public class UICheckbox extends UIElement
 			checked = _parent.isChecked() ;
 		}
 
-		@Override
-		public void constructDraws()
-		{
-			super.constructDraws() ;
-
-			final MalletTexture sheet = getTexture() ;
-			if( sheet != null && tick != null )
-			{
-				final UICheckbox parent = getParent() ;
-				drawTick = DrawAssist.createDraw( parent.getPosition(),
-												  getOffset(),
-												  new Vector3(),
-												  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
-				DrawAssist.amendUI( drawTick, true ) ;
-				DrawAssist.amendShape( drawTick, Shape.constructPlane( getLength(), tick.min, tick.max ) ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", sheet ) ;
-
-				DrawAssist.attachProgram( drawTick, program ) ;
-			}
-		}
-
 		/**
 			Called when listener receives a valid DrawDelegate
 			and when the parent UIElement is flagged as visible.
@@ -136,24 +98,11 @@ public class UICheckbox extends UIElement
 		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			super.addDraws( _delegate, _world ) ;
-
 			final UICheckbox parent = getParent() ;
-			if( drawTick != null && parent.isChecked() )
+			if( parent.isChecked() )
 			{
-				_delegate.addBasicDraw( drawTick, _world ) ;
+				super.addDraws( _delegate, _world ) ;
 			}
-		}
-
-		/**
-			Only called if there is a valid DrawDelegate and 
-			when the parent UIElement is flagged as invisible.
-		*/
-		@Override
-		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
-		{
-			super.removeDraws( _delegate ) ;
-			_delegate.removeDraw( drawTick ) ;
 		}
 
 		@Override
@@ -169,21 +118,14 @@ public class UICheckbox extends UIElement
 				{
 					if( parent.isChecked() == true )
 					{
-						DrawAssist.forceUpdate( drawTick ) ;
-						delegate.addBasicDraw( drawTick, getWorld() ) ;
+						DrawAssist.forceUpdate( getDraw() ) ;
+						delegate.addBasicDraw( getDraw(), getWorld() ) ;
 					}
 					else
 					{
-						delegate.removeDraw( drawTick ) ;
+						delegate.removeDraw( getDraw() ) ;
 					}
 				}
-			}
-
-			if( drawTick != null )
-			{
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( drawTick ), getLength() ) ;
-				DrawAssist.amendOrder( drawTick, getParent().getLayer() + 1 ) ;
-				DrawAssist.forceUpdate( drawTick ) ;
 			}
 		}
 

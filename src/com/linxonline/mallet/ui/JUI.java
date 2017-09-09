@@ -141,7 +141,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIDraw<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					final UIFactory.GUIDraw<UITextField> draw = JUI.<UITextField>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -149,7 +149,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					final UIFactory.GUIDrawEdge<UITextField> draw = JUI.<UITextField>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -212,7 +212,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIPanelDraw draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					final UIFactory.GUIPanelDraw<UIButton> draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -335,28 +335,72 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UICheckbox.GUIPanelDraw uiListener = createListener( _ui.getJSONObject( "UIDRAW" ) ) ;
-					if( uiListener != null )
+					final UICheckbox.GUITick tick = createGUITick( _ui.getJSONObject( "UITICK" ) ) ;
+					if( tick != null )
 					{
-						element.addListener( uiListener ) ;
+						element.addListener( tick ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIPanelDraw<UICheckbox> draw = createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
+					}
+				}
+
+				{
+					final UIFactory.GUIDrawEdge<UICheckbox> draw = JUI.<UICheckbox>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					if( draw != null )
+					{
+						element.addListener( draw ) ;
 					}
 				}
 
 				return element ;
 			}
 
-			private UICheckbox.GUIPanelDraw createListener( final JSONObject _ui )
+			private UICheckbox.GUITick createGUITick( final JSONObject _ui )
 			{
 				if( _ui == null )
 				{
 					return null ;
 				}
 
-				final UICheckbox.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
-				final UICheckbox.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
-				final UICheckbox.UV tickUV     = createUV( _ui.getJSONObject( "TICK_UV" ) ) ;
+				final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
+				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
+				final String texturePath = _ui.optString( "TEXTURE", null ) ;
 
-				if( neutralUV == null || rolloverUV == null || tickUV == null )
+				final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
+
+				final UICheckbox.GUITick tick = new UICheckbox.GUITick( texture, uv ) ;
+				tick.setRetainRatio( retainRatio ) ;
+
+				{
+					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+					if( align != null )
+					{
+						tick.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+					}
+				}
+
+				return tick ;
+			}
+			
+			private UIFactory.GUIPanelDraw<UICheckbox> createGUIDraw( final JSONObject _ui )
+			{
+				if( _ui == null )
+				{
+					return null ;
+				}
+
+				final UIElement.UV neutralUV  = createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ;
+				final UIElement.UV rolloverUV = createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ;
+				final UIElement.UV clickedUV  = createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ;
+
+				if( neutralUV == null || rolloverUV == null || clickedUV == null )
 				{
 					Logger.println( "JUI: GUIPanelDraw specified without valid uv-maps.", Logger.Verbosity.MAJOR ) ;
 					return null ;
@@ -365,7 +409,7 @@ public class JUI
 				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
 				final MalletTexture texture = new MalletTexture( _ui.optString( "TEXTURE", "" ) ) ;
 
-				final UICheckbox.GUIPanelDraw draw = UICheckbox.createGUIBasic( texture, neutralUV, rolloverUV, tickUV ) ;
+				final UIFactory.GUIPanelDraw<UICheckbox> draw = new UIFactory.GUIPanelDraw<UICheckbox>( texture, neutralUV, rolloverUV, clickedUV ) ;
 				draw.setRetainRatio( retainRatio ) ;
 
 				{
@@ -373,7 +417,7 @@ public class JUI
 					if( align != null )
 					{
 						draw.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+											UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 					}
 				}
 
@@ -393,7 +437,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIDraw<UILayout> draw = JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
+					final UIFactory.GUIDraw<UIList> draw = JUI.<UIList>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -401,7 +445,7 @@ public class JUI
 				}
 
 				{
-					final UIFactory.GUIDrawEdge<UILayout> draw = JUI.<UILayout>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
+					final UIFactory.GUIDrawEdge<UIList> draw = JUI.<UIList>createGUIDrawEdge( _ui.getJSONObject( "UIEDGE" ) ) ;
 					if( draw != null )
 					{
 						element.addListener( draw ) ;
@@ -446,7 +490,7 @@ public class JUI
 				applyLookup( _map, element, _ui ) ;
 
 				{
-					final UIFactory.GUIText text = JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
+					final UIFactory.GUIText<UIMenu.Item> text = JUI.<UIMenu.Item>createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ;
 					if( text != null )
 					{
 						element.addListener( text ) ;

@@ -469,7 +469,7 @@ public final class UIFactory
 			final Draw draw = getDraw() ;
 			if( draw != null )
 			{
-				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
+				DrawAssist.amendOrder( draw, getLayer() ) ;
 				UIFactory.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
@@ -614,7 +614,7 @@ public final class UIFactory
 											  getOffset(),
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ),
-											  parent.getLayer() ) ;
+											  getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
 				DrawAssist.amendShape( draw, Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 				setColour( getColour() ) ;
@@ -661,7 +661,7 @@ public final class UIFactory
 
 			if( draw != null )
 			{
-				DrawAssist.amendOrder( draw, parent.getLayer() ) ;
+				DrawAssist.amendOrder( draw, getLayer() ) ;
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
@@ -736,6 +736,13 @@ public final class UIFactory
 			}
 		}
 
+		@Override
+		public void setParent( final T _parent )
+		{
+			super.setParent( _parent ) ;
+			setLayerOffset( 1 ) ;
+		}
+
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
 			drawAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
@@ -755,8 +762,6 @@ public final class UIFactory
 		public void constructDraws()
 		{
 			final T parent = getParent() ;
-			final int layer = parent.getLayer() ;
-
 			if( font != null )
 			{
 				final Vector3 length = getLength() ;
@@ -772,7 +777,7 @@ public final class UIFactory
 													  getOffset(),
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
-													  layer + 1 ) ;
+													  getLayer()  ) ;
 				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;

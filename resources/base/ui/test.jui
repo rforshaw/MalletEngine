@@ -51,6 +51,15 @@
 		{
 			"TYPE" : "UICHECKBOX",
 			"NAME" : "TestCheckbox",
+			"UITICK" : {
+				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+				"RETAIN_RATIO": "true",
+				"TEXTURE" : "base/textures/checkbox_sheet.png",
+				"UV" : {
+					"MIN" : "0.5, 0.0",
+					"MAX" : "1.0, 0.5"
+				}
+			},
 			"UIDRAW" : {
 				"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
 				"RETAIN_RATIO": "true",
@@ -63,7 +72,7 @@
 					"MIN" : "0.0, 0.5",
 					"MAX" : "0.5, 1.0"
 				},
-				"TICK_UV" : {
+				"CLICKED_UV" : {
 					"MIN" : "0.5, 0.0",
 					"MAX" : "1.0, 0.5"
 				}

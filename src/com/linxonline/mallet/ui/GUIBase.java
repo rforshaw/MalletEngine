@@ -16,6 +16,8 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	private World world = null ;
 	private Camera camera = null ;
 
+	private int layerOffset = 0 ;
+
 	private final Vector3 position = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 length = new Vector3() ;
@@ -45,6 +47,11 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		{
 			addDraws( delegate, _world ) ;
 		}
+	}
+
+	public void setLayerOffset( final int _layer )
+	{
+		layerOffset = _layer ;
 	}
 
 	@Override
@@ -80,6 +87,17 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 				}
 			}
 		}
+	}
+
+	/**
+		Return the a layer that any draw objects 
+		constructed are expected to use.
+	*/
+	public int getLayer()
+	{
+		final T parent = getParent() ;
+		final int layer = ( parent != null ) ? parent.getLayer() : 0 ;
+		return layer + layerOffset ;
 	}
 
 	public Vector3 getPosition()
