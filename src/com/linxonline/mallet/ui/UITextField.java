@@ -75,7 +75,11 @@ public class UITextField extends UIElement
 
 	public void setCursorIndex( final int _index )
 	{
-		cursorIndex = _index ;
+		if( cursorIndex != _index )
+		{
+			cursorIndex = _index ;
+			Connect.signal( this ) ;
+		}
 	}
 
 	public int getCursorIndex()

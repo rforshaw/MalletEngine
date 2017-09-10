@@ -140,6 +140,24 @@ public final class GameTestLoader extends GameLoader
 					}
 				} ) ;
 
+				Connect.connect( checkbox, checkbox.getPosition(), new Connect.Slot<UICheckbox>()
+				{
+					@Override
+					public void slot( final UICheckbox _box )
+					{
+						System.out.println( "Checkbox Position: " + _box.getPosition() ) ;
+					}
+				} ) ;
+
+				Connect.connect( checkbox, new Connect.Slot<UICheckbox>()
+				{
+					@Override
+					public void slot( final UICheckbox _box )
+					{
+						System.out.println( "Checkbox: " + _box.isChecked() ) ;
+					}
+				} ) ;
+
 				final Entity entity = new Entity( "UI" ) ;
 				final UIComponent component = new UIComponent() ;
 				component.addElement( jUI.getParent() ) ;

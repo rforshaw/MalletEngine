@@ -354,6 +354,7 @@ public class UIElement implements InputHandler
 		{
 			visible = _visibility ;
 			makeDirty() ;
+			Connect.signal( this ) ;
 		}
 	}
 
@@ -396,6 +397,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
+			Connect.signal( this, position ) ;
 		}
 	}
 
@@ -410,6 +412,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
+			Connect.signal( this, offset ) ;
 		}
 	}
 
@@ -483,6 +486,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( length, _x, _y, _z ) == true )
 		{
 			makeDirty() ;
+			Connect.signal( this, length ) ;
 		}
 	}
 
@@ -498,6 +502,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
+			Connect.signal( this, margin ) ;
 		}
 	}
 
@@ -507,6 +512,7 @@ public class UIElement implements InputHandler
 		{
 			layer = _layer ;
 			makeDirty() ;
+			Connect.signal( this ) ;
 		}
 	}
 
@@ -696,6 +702,7 @@ public class UIElement implements InputHandler
 	*/
 	public void shutdown()
 	{
+		Connect.disconnect( this ) ;
 		listeners.shutdown() ;
 	}
 

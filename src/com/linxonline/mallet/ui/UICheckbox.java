@@ -67,7 +67,12 @@ public class UICheckbox extends UIElement
 
 	public void setChecked( final boolean _checked )
 	{
-		checked = _checked ;
+		if( checked != _checked )
+		{
+			checked = _checked ;
+			makeDirty() ;
+			Connect.signal( this ) ;
+		}
 	}
 
 	public boolean isChecked()
