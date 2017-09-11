@@ -78,7 +78,7 @@ public class UITextField extends UIElement
 		if( cursorIndex != _index )
 		{
 			cursorIndex = _index ;
-			Connect.signal( this ) ;
+			UIElement.signal( this ) ;
 		}
 	}
 
@@ -342,6 +342,8 @@ public class UITextField extends UIElement
 						edit.deleteCharAt( index ) ;
 						parent.setCursorIndex( index ) ;
 						parent.makeDirty() ;
+
+						UIElement.signal( parent, edit ) ;
 					}
 					break ;
 				}
@@ -356,6 +358,8 @@ public class UITextField extends UIElement
 						edit.deleteCharAt( index ) ;
 						parent.setCursorIndex( index ) ;
 						parent.makeDirty() ;
+
+						UIElement.signal( parent, edit ) ;
 					}
 					break ;
 				}
@@ -368,6 +372,8 @@ public class UITextField extends UIElement
 
 					parent.setCursorIndex( index + 1 ) ;
 					parent.makeDirty() ;
+
+					UIElement.signal( parent, edit ) ;
 					break ;
 				}
 			}

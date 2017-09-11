@@ -219,7 +219,7 @@ public class UIList extends UILayout
 		if( dragDelay != _delay )
 		{
 			dragDelay = _delay ;
-			Connect.signal( this ) ;
+			UIElement.signal( this ) ;
 		}
 	}
 

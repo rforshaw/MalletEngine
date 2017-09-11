@@ -71,7 +71,7 @@ public class UICheckbox extends UIElement
 		{
 			checked = _checked ;
 			makeDirty() ;
-			Connect.signal( this ) ;
+			UIElement.signal( this ) ;
 		}
 	}
 

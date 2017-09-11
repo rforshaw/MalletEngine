@@ -27,6 +27,7 @@ public class UIElement implements InputHandler
 
 	private final ListenerUnit<IBase<? extends UIElement>> listeners = new ListenerUnit<IBase<? extends UIElement>>() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
+	private final Connect connect = new Connect() ;
 
 	protected State current = State.NEUTRAL ;
 
@@ -354,7 +355,7 @@ public class UIElement implements InputHandler
 		{
 			visible = _visibility ;
 			makeDirty() ;
-			Connect.signal( this ) ;
+			UIElement.signal( this ) ;
 		}
 	}
 
@@ -397,7 +398,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
-			Connect.signal( this, position ) ;
+			UIElement.signal( this, position ) ;
 		}
 	}
 
@@ -412,7 +413,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
-			Connect.signal( this, offset ) ;
+			UIElement.signal( this, offset ) ;
 		}
 	}
 
@@ -486,7 +487,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( length, _x, _y, _z ) == true )
 		{
 			makeDirty() ;
-			Connect.signal( this, length ) ;
+			UIElement.signal( this, length ) ;
 		}
 	}
 
@@ -502,7 +503,7 @@ public class UIElement implements InputHandler
 		if( UI.applyVec3( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			makeDirty() ;
-			Connect.signal( this, margin ) ;
+			UIElement.signal( this, margin ) ;
 		}
 	}
 
@@ -512,7 +513,7 @@ public class UIElement implements InputHandler
 		{
 			layer = _layer ;
 			makeDirty() ;
-			Connect.signal( this ) ;
+			UIElement.signal( this ) ;
 		}
 	}
 
@@ -702,7 +703,7 @@ public class UIElement implements InputHandler
 	*/
 	public void shutdown()
 	{
-		Connect.disconnect( this ) ;
+		UIElement.disconnect( this ) ;
 		listeners.shutdown() ;
 	}
 
@@ -741,10 +742,89 @@ public class UIElement implements InputHandler
 		return builder.toString() ;
 	}
 
-	public static float toPixelX( final UIElement _element, final float _x )
+	protected Connect getConnect()
 	{
-		final UIRatio ratio = _element.getRatio() ;
-		return ratio.toPixelX( _x ) ;
+		return connect ;
+	}
+
+	/**
+		Connect the slot to the signal, a signal may contain 
+		multiple data-points if any of those data points change 
+		the slot will be informed of the change.
+
+		Signals can not be immutable - for example String.
+		The data-point cannot change to reference a different 
+		object, it can update the objects state.
+	*/
+	public static <T extends UIElement> boolean connect( final T _signal, final Connect.Slot<T> _slot )
+	{
+		return UIElement.connect( _signal, _signal, _slot ) ;
+	}
+
+	/**
+		Connect the slot to the signal, a signal may contain 
+		multiple data-points if any of those data points change 
+		the slot will be informed of the change.
+
+		Signals or Variables can not be immutable - for example String.
+	*/
+	public static <T extends UIElement, V> boolean connect( final T _signal, final V _var, final Connect.Slot<T> _slot )
+	{
+		final Connect connect = _signal.getConnect() ;
+		return connect.connect( _signal, _var, _slot ) ;
+	}
+
+	/**
+		Disconnect the specific slot from a particular signal..
+	*/
+	public static <T extends UIElement> boolean disconnect( final T _signal, final Connect.Slot<T> _slot )
+	{
+		return UIElement.disconnect( _signal, _signal, _slot ) ;
+	}
+
+	/**
+		Disconnect the specific slot from a particular signal
+		and associated variable.
+
+		Disconnect will not work if the signal or variable is 
+		immutable.
+	*/
+	public static <T extends UIElement, V> boolean disconnect( final T _signal, final V _var, final Connect.Slot<T> _slot )
+	{
+		final Connect connect = _signal.getConnect() ;
+		return connect.disconnect( _signal, _var, _slot ) ;
+	}
+
+	/**
+		Disconnect all slots from a signal.
+	*/
+	public static <T extends UIElement> boolean disconnect( final T _signal )
+	{
+		final Connect connect = _signal.getConnect() ;
+		return connect.disconnect( _signal ) ;
+	}
+
+	/**
+		Inform all slots connected to this signal 
+		that the signal state has changed.
+
+		This is useful if the state contains primitive 
+		types. However it won't be able to tell you what 
+		primitive type has changed.
+	*/
+	public static <T extends UIElement> void signal( final T _signal )
+	{
+		UIElement.signal( _signal, _signal ) ;
+	}
+
+	/**
+		Inform all slots connected to this signal and associated
+		to the variable that the signal's state has changed.
+	*/
+	public static <T extends UIElement, V> void signal( final T _signal, final V _var )
+	{
+		final Connect connect = _signal.getConnect() ;
+		connect.signal( _signal, _var ) ;
 	}
 
 	private interface InputAction

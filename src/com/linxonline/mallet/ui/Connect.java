@@ -34,23 +34,9 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public class Connect
 {
-	private final static Map<Object, Map<Object, List<Slot<Object>>>> connections = MalletMap.<Object, Map<Object, List<Slot<Object>>>>newMap() ;
+	private final Map<Object, Map<Object, List<Slot<Object>>>> connections = MalletMap.<Object, Map<Object, List<Slot<Object>>>>newMap() ;
 
-	private Connect() {}
-
-	/**
-		Connect the slot to the signal, a signal may contain 
-		multiple data-points if any of those data points change 
-		the slot will be informed of the change.
-
-		Signals can not be immutable - for example String.
-		The data-point cannot change to reference a different 
-		object, it can update the objects state.
-	*/
-	public static <T> boolean connect( final T _signal, final Slot<T> _slot )
-	{
-		return Connect.connect( _signal, _signal, _slot ) ;
-	}
+	public Connect() {}
 
 	/**
 		Connect the slot to the signal, a signal may contain 
@@ -59,7 +45,7 @@ public class Connect
 
 		Signals or Variables can not be immutable - for example String.
 	*/
-	public static <T, V> boolean connect( final T _signal, final V _var, final Slot<T> _slot )
+	public <T, V> boolean connect( final T _signal, final V _var, final Slot<T> _slot )
 	{
 		if( _signal == null || _var == null )
 		{
@@ -104,7 +90,7 @@ public class Connect
 		Disconnect will not work if the signal or variable is 
 		immutable.
 	*/
-	public static <T, V> boolean disconnect( final T _signal, final V _var, final Slot<T> _slot )
+	public <T, V> boolean disconnect( final T _signal, final V _var, final Slot<T> _slot )
 	{
 		if( _signal == null )
 		{
@@ -142,7 +128,7 @@ public class Connect
 		{
 			// If there are no connections left we will automatically
 			// remove the signal from the connection list.
-			Connect.disconnect( _signal ) ;
+			disconnect( _signal ) ;
 		}
 
 		return true ;
@@ -151,7 +137,7 @@ public class Connect
 	/**
 		Disconnect all slots from a signal.
 	*/
-	public static <T> boolean disconnect( final T _signal )
+	public <T> boolean disconnect( final T _signal )
 	{
 		if( _signal == null )
 		{
@@ -164,23 +150,10 @@ public class Connect
 	}
 
 	/**
-		Inform all slots connected to this signal 
-		that the signal state has changed.
-
-		This is useful if the state contains primitive 
-		types. However it won't be able to tell you what 
-		primitive type has changed.
-	*/
-	public static <T> void signal( final T _signal )
-	{
-		Connect.signal( _signal, _signal ) ;
-	}
-
-	/**
 		Inform all slots connected to this signal and associated
 		to the variable that the signal's state has changed.
 	*/
-	public static <T, V> void signal( final T _signal, final V _var )
+	public <T, V> void signal( final T _signal, final V _var )
 	{
 		if( _signal == null )
 		{
