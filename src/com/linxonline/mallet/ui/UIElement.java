@@ -112,6 +112,23 @@ public class UIElement implements InputHandler
 	}
 
 	/**
+		Add a listener to the UIElement.
+		Caution: ABases not designed for the elements 
+		sub-type can still be added, not caught at compile-time.
+
+		Inserts the listener at the specified index, shifts existing 
+		listeners to the right. 
+	*/
+	public <T extends IBase> T addListener( final int _index, final T _listener )
+	{
+		if( listeners.add( _index, _listener ) == true )
+		{
+			_listener.setParent( this ) ;
+		}
+		return _listener ;
+	}
+
+	/**
 		Remove the listener from the UIElement.
 		return true if the listener was removed else 
 		return false.

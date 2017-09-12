@@ -76,6 +76,7 @@ public class UIList extends UILayout
 			}
 		} ) ) ;
 
+		setEngageMode( new ScrollSingleEngageListener() ) ;
 		initScrollInput() ;
 	}
 
@@ -144,7 +145,7 @@ public class UIList extends UILayout
 			public InputEvent.Action mouseMove( final InputEvent _input )
 			{
 				final EngageListener mode = getParent().getEngageMode() ;
-				if( pressed == true && mode.isEngaged() == false )
+				if( pressed == true )
 				{
 					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
 					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - _input.getMouseY() ) : 0.0f ;
@@ -197,6 +198,7 @@ public class UIList extends UILayout
 		defaultItemSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
 		defaultItemSize.y = ( _y <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _y ) ;
 		defaultItemSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
+		UIElement.signal( this, defaultItemSize ) ;
 	}
 
 	/**
@@ -208,6 +210,7 @@ public class UIList extends UILayout
 		scrollWidth.x = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _width ) ;
 		scrollWidth.y = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _width ) ;
 		scrollWidth.z = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _width ) ;
+		UIElement.signal( this, scrollWidth ) ;
 	}
 
 	/**
@@ -764,6 +767,21 @@ public class UIList extends UILayout
 		{
 			xLength.setXYZ( _width.x, _length.y, _width.z ) ;
 			yLength.setXYZ( _length.x, _width.y, _width.z ) ;
+		}
+	}
+
+	public class ScrollSingleEngageListener extends SingleEngageListener
+	{
+		private InputEvent lastInput = null ;
+	
+		public ScrollSingleEngageListener() {}
+
+		@Override
+		public InputEvent.Action mouseMove( final InputEvent _input )
+		{
+			final InputEvent.Action action = super.mouseMove( _input ) ;
+			//System.out.println( action ) ;
+			return action ;
 		}
 	}
 }

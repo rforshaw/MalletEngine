@@ -23,6 +23,19 @@ public class ListenerUnit<T extends IBase<? extends UIElement>>
 		return false ;
 	}
 
+	public boolean add( final int _index, final T _listener )
+	{
+		if( _listener != null )
+		{
+			if( listeners.contains( _listener ) == false )
+			{
+				listeners.add( _index, _listener ) ;
+				return true ;
+			}
+		}
+		return false ;
+	}
+
 	public boolean remove( final T _listener )
 	{
 		if( listeners.remove( _listener ) == true )

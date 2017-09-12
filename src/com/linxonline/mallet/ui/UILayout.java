@@ -126,7 +126,7 @@ public class UILayout extends UIElement
 	*/
 	public void setEngageMode( final EngageListener _listener )
 	{
-		removeListener( engageMode ) ;
+		removeListener( getEngageMode() ) ;
 		engageMode = addListener( _listener ) ;
 	}
 

@@ -76,12 +76,12 @@ public class UIButton extends UIElement
 	{
 		if( isIntersectInput( _event ) == true )
 		{
-			processInputEvent( _event ) ;
+			final InputEvent.Action action = processInputEvent( _event ) ;
 			switch( _event.getInputType() )
 			{
 				case MOUSE_MOVED :
 				case TOUCH_MOVE  : return InputEvent.Action.PROPAGATE ;
-				default          : return InputEvent.Action.CONSUME ;
+				default          : return action ;
 			}
 		}
 
