@@ -10,7 +10,8 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	private StringBuilder text  = null ;
 	private Program program     = null ;
 
-	private int textLength = 0 ;
+	private int textStart = 0 ;
+	private int textEnd = 0 ;
 	private boolean update = true ;
 	private boolean ui     = false ;
 
@@ -82,12 +83,18 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	public void setText( final StringBuilder _text )
 	{
 		text = _text ;
-		setTextLength( text.length() ) ;
+		setTextStart( 0 ) ;
+		setTextEnd( text.length() ) ;
 	}
 
-	public void setTextLength( final int _length )
+	public void setTextStart( final int _start )
 	{
-		textLength = _length ;
+		textStart = _start ;
+	}
+
+	public void setTextEnd( final int _end )
+	{
+		textEnd = _end ;
 	}
 
 	public StringBuilder getText()
@@ -95,9 +102,14 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		return text ;
 	}
 
-	public int getTextLength()
+	public int getTextStart()
 	{
-		return textLength ;
+		return textStart ;
+	}
+
+	public int getTextEnd()
+	{
+		return textEnd ;
 	}
 
 	public void setUI( final boolean _ui )

@@ -371,7 +371,7 @@ public final class UIFactory
 		@Override
 		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return mousePressed( _input ) ;
+			return mouseReleased( _input ) ;
 		}
 
 		@Override
@@ -520,7 +520,7 @@ public final class UIFactory
 		@Override
 		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return mousePressed( _input ) ;
+			return mouseReleased( _input ) ;
 		}
 
 		@Override
@@ -778,7 +778,9 @@ public final class UIFactory
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
 													  getLayer()  ) ;
-				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
+
+				DrawAssist.amendTextStart( drawText, 0 ) ;
+				DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendColour( drawText, colour ) ;
 				DrawAssist.amendUI( drawText, true ) ;
 			}
@@ -822,7 +824,8 @@ public final class UIFactory
 				offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
 				offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-				DrawAssist.amendTextLength( drawText, font.stringIndexWidth( text, length.x ) ) ;
+				DrawAssist.amendTextStart( drawText, 0 ) ;
+				DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
 				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}

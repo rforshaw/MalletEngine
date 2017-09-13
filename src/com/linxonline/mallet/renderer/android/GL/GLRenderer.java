@@ -246,13 +246,25 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
-			public Draw amendTextLength( final Draw _draw, final int _length )
+			public Draw amendTextStart( final Draw _draw, final int _start )
 			{
 				final GLDrawData draw = cast( _draw ) ;
 				if( draw.getMode() == GLDrawData.Mode.TEXT )
 				{
 					// Only a text draw object can have text.
-					draw.setTextLength( _length ) ;
+					draw.setTextStart( _start ) ;
+				}
+				return _draw ;
+			}
+
+			@Override
+			public Draw amendTextEnd( final Draw _draw, final int _end )
+			{
+				final GLDrawData draw = cast( _draw ) ;
+				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				{
+					// Only a text draw object can have text.
+					draw.setTextEnd( _end ) ;
 				}
 				return _draw ;
 			}

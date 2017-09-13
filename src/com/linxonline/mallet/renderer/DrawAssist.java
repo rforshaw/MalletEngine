@@ -82,11 +82,16 @@ public final class DrawAssist
 		return assist.amendText( _draw, _text ) ;
 	}
 
-	public static Draw amendTextLength( final Draw _draw, final int _length )
+	public static Draw amendTextStart( final Draw _draw, final int _start )
 	{
-		return assist.amendTextLength( _draw, _length ) ;
+		return assist.amendTextStart( _draw, _start ) ;
 	}
-	
+
+	public static Draw amendTextEnd( final Draw _draw, final int _end )
+	{
+		return assist.amendTextEnd( _draw, _end ) ;
+	}
+
 	public static Draw amendUI( final Draw _draw, final boolean _ui )
 	{
 		return assist.amendUI( _draw, _ui ) ;
@@ -232,7 +237,8 @@ public final class DrawAssist
 		public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z ) ;
 		public Draw amendText( final Draw _draw, final StringBuilder _text ) ;
-		public Draw amendTextLength( final Draw _draw, final int _length ) ;
+		public Draw amendTextStart( final Draw _draw, final int _start ) ;
+		public Draw amendTextEnd( final Draw _draw, final int _end ) ;
 		public Draw amendUI( final Draw _draw, final boolean _ui ) ;
 		public Draw amendColour( final Draw _draw, final MalletColour _colour ) ;
 		public Draw amendOrder( final Draw _draw, final int _order ) ;

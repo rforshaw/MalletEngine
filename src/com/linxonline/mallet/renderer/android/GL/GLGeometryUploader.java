@@ -977,7 +977,7 @@ public class GLGeometryUploader
 		*/
 		private boolean isCorrectSize( final GLDrawData _data, final Location _location )
 		{
-			final int length = _data.getTextLength() ;
+			final int length = _data.getTextEnd() - _data.getTextStart() ;
 			final int shapeIndexBytes = ( ( length * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			return shapeIndexBytes == _location.getIndexLength() ;
 		}
@@ -991,8 +991,6 @@ public class GLGeometryUploader
 			GLES30.glBindBuffer( GLES30.GL_ELEMENT_ARRAY_BUFFER, geometry.getIndexID() ) ;	//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
 			GLES30.glBindBuffer( GLES30.GL_ARRAY_BUFFER, geometry.getVBOID() ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
 
-			final StringBuilder text = _data.getText() ;
-			final int length = _data.getTextLength() ;
 			final int initialIndexOffset = _location.getVertexStart() / geometry.vertexStrideBytes ;
 
 			int indexInc = 0 ;
@@ -1001,9 +999,14 @@ public class GLGeometryUploader
 			int indexStartBytes = _location.getIndexStart() ;
 			int vertexStartBytes = _location.getVertexStart() ;
 
+			final StringBuilder text = _data.getText() ;
+			final int start = _data.getTextStart() ;
+			final int end = _data.getTextEnd() ;
+
+			final int length = end - start ;
 			for( int i = 0; i < length; i++ )
 			{
-				final char c = text.charAt( i ) ;
+				final char c = text.charAt( start + i ) ;
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
@@ -1141,7 +1144,7 @@ public class GLGeometryUploader
 				}
 			}
 
-			final int length = _data.getTextLength() ;
+			final int length = _data.getTextEnd() - _data.getTextStart() ;
 
 			// If no space exists create a new geometry buffer 
 			// and repeat the finding process.
@@ -1150,7 +1153,7 @@ public class GLGeometryUploader
 			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * length ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
-			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes  * length ;
+			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes * length ;
 			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
 
 			expand( indexBytes, vertexBytes ) ;
@@ -1165,7 +1168,7 @@ public class GLGeometryUploader
 				@Override
 				protected Location findLocation( final GLDrawData _data )
 				{
-					final int length = _data.getTextLength() ;
+					final int length = _data.getTextEnd() - _data.getTextStart() ;
 					return findLocation( ( 6 * length ), ( 4 * length ) ) ;
 				}
 			} ) ;

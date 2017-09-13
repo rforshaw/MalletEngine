@@ -733,7 +733,8 @@ public class GameState extends State implements HookEntity
 				txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
 				//System.out.println( "FPS: " + txt ) ;
 
-				DrawAssist.amendTextLength( draw, txt.length() ) ;
+				DrawAssist.amendTextStart( draw, 0 ) ;
+				DrawAssist.amendTextEnd( draw, txt.length() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
 		}

@@ -5,7 +5,7 @@
 		{
 			"TYPE" : "UILAYOUT",
 			"LAYOUT" : "HORIZONTAL",
-			CHILDREN : [
+			"CHILDREN" : [
 				{
 					"TYPE" : "UIBUTTON",
 					"NAME" : "TestButton1",
@@ -27,7 +27,7 @@
 						"TEXT": "Test 2",
 						"FONT" : "Arial",
 						"FONT_SIZE" : 1.16,
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" },
+						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 					},
 					"UIDRAW" : {
 						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" },
@@ -79,5 +79,5 @@
 			}
 		}
 	],
-	"LENGTH" : "10.0, 10, 0.0"
+	"LENGTH" : "4.0, 5.0, 0.0"
 }

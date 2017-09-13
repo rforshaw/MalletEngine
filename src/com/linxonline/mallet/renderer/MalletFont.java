@@ -66,15 +66,20 @@ public class MalletFont
 
 	public int stringIndexWidth( final StringBuilder _text, final float _width )
 	{
+		return stringIndexWidth( _text, 0, _width ) ;
+	}
+
+	public int stringIndexWidth( final StringBuilder _text, final int _start, final float _width )
+	{
 		float width = 0.0f ;
 
 		final int length = _text.length() ;
-		for( int i = 0; i < length; ++i )
+		for( int i = _start; i < length; ++i )
 		{
 			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
 			if( width > _width )
 			{
-				return ( i > 0 ) ? i - 1 : 0 ;
+				return ( i > 0 ) ? i : 0 ;
 			}
 		}
 		
@@ -83,10 +88,15 @@ public class MalletFont
 
 	public int stringIndexWidth( final String _text, final float _width )
 	{
+		return stringIndexWidth( _text, 0, _width ) ;
+	}
+
+	public int stringIndexWidth( final String _text, final int _start, final float _width )
+	{
 		float width = 0.0f ;
 
 		final int length = _text.length() ;
-		for( int i = 0; i < length; ++i )
+		for( int i = _start; i < length; ++i )
 		{
 			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;
 			if( width > _width )

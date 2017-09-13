@@ -105,6 +105,9 @@ public class UITextField extends UIElement
 		private Draw drawEdit = null ;
 		private Draw drawCursor = null ;
 
+		private int start = 0 ;
+		private int end = 0 ;
+
 		/**
 			Use _text as placeholder text. 
 			This text is used if the user has not
@@ -139,7 +142,8 @@ public class UITextField extends UIElement
 													  new Vector3(),
 													  new Vector3( 1, 1, 1 ),
 													  layer + 1 ) ;
-				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
+
+				updateTextRange() ;
 				DrawAssist.amendColour( drawEdit, colour ) ;
 				DrawAssist.amendUI( drawEdit, true ) ;
 			}
@@ -233,7 +237,8 @@ public class UITextField extends UIElement
 				offset.x = UI.align( getAlignmentX(), font.stringWidth( edit ), length.x ) ;
 				offset.y = UI.align( getAlignmentY(), metrics.getHeight(), length.y ) ;
 
-				DrawAssist.amendTextLength( drawEdit, font.stringIndexWidth( edit, length.x ) ) ;
+				updateTextRange() ;
+
 				DrawAssist.amendOrder( drawEdit, layer + 1 ) ;
 				DrawAssist.forceUpdate( drawEdit ) ;
 			}
@@ -270,6 +275,22 @@ public class UITextField extends UIElement
 		private boolean isEditing()
 		{
 			return editing ;
+		}
+
+		private void updateTextRange()
+		{
+			final MalletFont font = getFont() ;
+			final Vector3 length = getLength() ;
+			final StringBuilder edit = getParent().getText() ;
+
+			final int index = getParent().getCursorIndex() ;
+
+			end = font.stringIndexWidth( edit, start, length.x ) ;
+			start = ( index > end && end > start ) ? start + 1 : start - 1 ;
+			start = ( start > 0 ) ? start : 0 ;
+
+			DrawAssist.amendTextStart( drawEdit, start ) ;
+			DrawAssist.amendTextEnd( drawEdit, end ) ;
 		}
 
 		@Override
