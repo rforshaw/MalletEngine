@@ -130,7 +130,7 @@ public class UIList extends UILayout
 			{
 				pressed = false ;
 				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return InputEvent.Action.CONSUME ;
+				return InputEvent.Action.PROPAGATE ;
 			}
 
 			@Override
@@ -138,25 +138,26 @@ public class UIList extends UILayout
 			{
 				pressed = true ;
 				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return InputEvent.Action.CONSUME ;
+				return applyScroll( 0.0f, 0.0f ) ;
 			}
 
 			@Override
 			public InputEvent.Action mouseMove( final InputEvent _input )
 			{
+				InputEvent.Action action = InputEvent.Action.CONSUME ;
 				final EngageListener mode = getParent().getEngageMode() ;
 				if( pressed == true )
 				{
 					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
 					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - _input.getMouseY() ) : 0.0f ;
-					applyScroll( diff.x, diff.y ) ;
+					action = applyScroll( diff.x, diff.y ) ;
 				}
 
 				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return InputEvent.Action.CONSUME ;
+				return action ;
 			}
 
-			private void applyScroll( final float _x, final float _y )
+			private InputEvent.Action applyScroll( final float _x, final float _y )
 			{
 				CameraAssist.getUIPosition( internalCamera, position ) ;
 				getLength( length ) ;
@@ -167,6 +168,14 @@ public class UIList extends UILayout
 				final float width = absoluteLength.x - length.x ;
 				final float height = absoluteLength.y - length.y ;
 
+				final Type type = getParent().getType() ;
+				InputEvent.Action action = InputEvent.Action.CONSUME ;
+				if( ( type == Type.HORIZONTAL && ( position.x <= 0.0f || position.x >= width ) ) || 
+					( type == Type.VERTICAL   && ( position.y <= 0.0f || position.y >= height ) ) )
+				{
+					action = InputEvent.Action.PROPAGATE ;
+				}
+
 				position.x = ( position.x > width ) ? width : position.x ;
 				position.y = ( position.y > height ) ? height : position.y ;
 
@@ -175,6 +184,8 @@ public class UIList extends UILayout
 
 				CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
 				getParent().makeDirty() ;
+
+				return action ;
 			}
 
 			@Override
