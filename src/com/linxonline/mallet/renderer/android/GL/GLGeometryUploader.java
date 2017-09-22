@@ -148,7 +148,8 @@ public class GLGeometryUploader
 			// ProgramMap check is never kicked off and the 
 			// data is added to the wrong buffer.
 			final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
-			program.setDirty( true ) ;
+			//program.setProgram( null ) ;
+			program.dirty() ;
 		}
 	}
 

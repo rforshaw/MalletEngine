@@ -74,7 +74,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.recover() ;
-	
+
 		Logger.println( "Recovering renderer state..", Logger.Verbosity.NORMAL ) ;
 		final List<GLWorld> worldContent = worlds.getCurrentData() ;
 		for( final GLWorld world : worldContent )
@@ -87,10 +87,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				final GLDrawData d = ( GLDrawData )draw ;
 				d.setBuffer( null ) ;
 				d.setLocation( null ) ;
-				( ( ProgramMap<GLProgram> )d.getProgram() ).setProgram( null ) ;
+
+				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )d.getProgram() ;
+				program.setProgram( null ) ;
+				program.dirty() ;
 				d.forceUpdate() ;
 			}
 		}
+
+		//initGraphics() ;
 	}
 
 	private void initGraphics()
@@ -115,7 +120,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			GLES30.glGetIntegerv( GLES30.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
 			maxTextureSize.setXY( size[0], size[0] ) ;
 		}
-		
+
 		resize() ;
 	}
 

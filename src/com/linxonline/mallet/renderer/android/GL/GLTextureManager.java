@@ -187,9 +187,10 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		final GLImage image = super.get( _file ) ;
 		if( image != null )
 		{
+			//System.out.println( "GLImage: " + _file ) ;
 			return image ;
 		}
-		
+
 		final GLWorld world = worldState.getWorld( _file ) ;
 		if( world != null )
 		{

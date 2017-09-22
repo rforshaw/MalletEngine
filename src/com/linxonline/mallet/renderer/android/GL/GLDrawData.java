@@ -120,6 +120,7 @@ public class GLDrawData extends DrawData
 		super.reset() ;
 		setMode( Mode.BASIC ) ;
 		setBuffer( null ) ;
+		setLocation( null ) ;
 		setDrawMatrix( null ) ;
 		setDrawShape( null ) ;
 	}
