@@ -249,7 +249,7 @@ public class GLProgram extends Resource
 		A GL Program will have information that it requires 
 		before it can be used effectively. 
 	*/
-	public boolean loadUniforms( final ProgramMap _data )
+	public boolean loadUniforms( final ProgramMap<GLProgram> _data )
 	{
 		final int size = uniforms.size() ;
 		for( int i = 0; i < size; i++ )

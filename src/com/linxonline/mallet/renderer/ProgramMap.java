@@ -31,6 +31,15 @@ public class ProgramMap<U> implements Program<ProgramMap>
 		id = _id ;
 	}
 
+	public ProgramMap( final ProgramMap<U> _map )
+	{
+		id = _map.id ;
+		uniforms.putAll( _map.getMaps() ) ;
+
+		setProgram( _map.getProgram() ) ;
+		setDirty( _map.dirty ) ;
+	}
+
 	public void setProgram( final U _program )
 	{
 		program = new WeakReference<U>( _program ) ;
