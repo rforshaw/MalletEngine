@@ -42,7 +42,11 @@ public class ProgramMap<U> implements Program<ProgramMap>
 
 	public void setProgram( final U _program )
 	{
-		program = new WeakReference<U>( _program ) ;
+		if( _program != getProgram() )
+		{
+			program = new WeakReference<U>( _program ) ;
+			dirty() ;
+		}
 	}
 
 	public U getProgram()
@@ -55,15 +59,36 @@ public class ProgramMap<U> implements Program<ProgramMap>
 		return id ;
 	}
 
-	public void remove( final String _handler )
+	public boolean remove( final String _id )
 	{
-		uniforms.remove( _handler ) ;
+		if( uniforms.remove( _id ) != null )
+		{
+			dirty() ;
+			return true ;
+		}
+
+		// Failed to remove an object associated with 
+		// the passed in id - most likely never set.
+		return false ;
 	}
 
-	public void set( final String _id, final Object _value )
+	public boolean set( final String _id, final Object _value )
 	{
+		if( _id == null || _value == null )
+		{
+			// The id or value cannot be null
+			return false ;
+		}
+
+		if( _value == get( _id ) )
+		{
+			// Attempting reassign to the same object. 
+			return false ;
+		}
+
 		uniforms.put( _id, _value ) ;
-		dirty = true ;
+		dirty() ;
+		return true ;
 	}
 
 	/**

@@ -90,7 +90,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 				final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )d.getProgram() ;
 				program.setProgram( null ) ;
-				program.dirty() ;
 				d.forceUpdate() ;
 			}
 		}

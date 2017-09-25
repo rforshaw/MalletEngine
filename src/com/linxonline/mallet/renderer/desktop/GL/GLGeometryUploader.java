@@ -149,7 +149,6 @@ public class GLGeometryUploader
 			// data is added to the wrong buffer.
 			final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
 			program.setProgram( null ) ;
-			program.dirty() ;
 		}
 	}
 
