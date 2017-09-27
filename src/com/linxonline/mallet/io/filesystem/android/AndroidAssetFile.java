@@ -115,6 +115,16 @@ public class AndroidAssetFile implements FileStream
 		return false ;
 	}
 
+	public boolean isReadable()
+	{
+		return true ;
+	}
+
+	public boolean isWritable()
+	{
+		return false ;
+	}
+
 	public boolean exists()
 	{
 		return true ;

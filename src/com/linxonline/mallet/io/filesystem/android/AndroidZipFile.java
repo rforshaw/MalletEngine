@@ -116,6 +116,26 @@ public class AndroidZipFile implements FileStream
 		return zipEntry.isDirectory() ;
 	}
 
+	/**
+		So long as the FileStream is not a directory it must 
+		be readable - if we can read the zip but the file inside 
+		is not readable then something has went horribly wrong.
+	*/
+	public boolean isReadable()
+	{
+		return isDirectory() == false ;
+	}
+
+	/**
+		If the file is located within a zip it is not writable.
+		getByteOutStream and getStringOutStream will return a null 
+		stream reference.
+	*/
+	public boolean isWritable()
+	{
+		return false ;
+	}
+
 	public boolean exists()
 	{
 		return true ;

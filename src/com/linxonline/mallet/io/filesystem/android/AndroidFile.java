@@ -153,6 +153,16 @@ public class AndroidFile implements FileStream
 		return file.isDirectory() ;
 	}
 
+	public boolean isReadable()
+	{
+		return file.canRead() ;
+	}
+
+	public boolean isWritable()
+	{
+		return file.canWrite() ;
+	}
+
 	public boolean exists()
 	{
 		return file.exists() ;

@@ -20,6 +20,9 @@ public interface FileStream extends Close
 	public boolean isFile() ;
 	public boolean isDirectory() ;
 
+	public boolean isReadable() ;
+	public boolean isWritable() ;
+
 	public boolean exists() ;
 
 	/**

@@ -110,7 +110,39 @@ public class DesktopZipFile implements FileStream
 	*/
 	public boolean copyTo( final String _dest )
 	{
-		return false ;
+		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
+		if( destination.exists() == false && destination.mkdirs() == false )
+		{
+			System.out.println( "Failed to create directories." ) ;
+			return false ;
+		}
+
+		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
+		if( stream == null )
+		{
+			System.out.println( "Unable to acquire file stream for: " + _dest ) ;
+			return false ;
+		}
+
+		final ByteInStream in = getByteInStream() ;
+		final ByteOutStream out = stream.getByteOutStream() ;
+		if( out == null )
+		{
+			return false ;
+		}
+
+		int length = 0 ;
+		final byte[] buffer = new byte[48] ;
+
+		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
+		{
+			out.writeBytes( buffer, 0, length ) ;
+		}
+
+		in.close() ;
+		out.close() ;
+
+		return true ;
 	}
 
 	public boolean isFile()
@@ -121,6 +153,26 @@ public class DesktopZipFile implements FileStream
 	public boolean isDirectory()
 	{
 		return zipEntry.isDirectory() ;
+	}
+
+	/**
+		So long as the FileStream is not a directory it must 
+		be readable - if we can read the zip but the file inside 
+		is not readable then something has went horribly wrong.
+	*/
+	public boolean isReadable()
+	{
+		return isDirectory() == false ;
+	}
+
+	/**
+		If the file is located within a zip it is not writable.
+		getByteOutStream and getStringOutStream will return a null 
+		stream reference.
+	*/
+	public boolean isWritable()
+	{
+		return false ;
 	}
 
 	public boolean exists()

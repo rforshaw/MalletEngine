@@ -92,7 +92,7 @@ public class DesktopFile implements FileStream
 	public boolean copyTo( final String _dest )
 	{
 		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
-		if( destination.mkdirs() == false )
+		if( destination.exists() == false && destination.mkdirs() == false )
 		{
 			System.out.println( "Failed to create directories." ) ;
 			return false ;
@@ -134,6 +134,16 @@ public class DesktopFile implements FileStream
 	public boolean isDirectory()
 	{
 		return file.isDirectory() ;
+	}
+
+	public boolean isReadable()
+	{
+		return file.canRead() ;
+	}
+
+	public boolean isWritable()
+	{
+		return file.canWrite() ;
 	}
 
 	public boolean exists()
