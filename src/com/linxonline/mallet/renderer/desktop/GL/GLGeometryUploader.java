@@ -141,6 +141,7 @@ public class GLGeometryUploader
 		{
 			buffer.remove( _gl, _data ) ;
 			_data.setBuffer( null ) ;
+			_data.setLocation( null ) ;
 
 			// When a program is removed completely from the 
 			// buffer we need to reset the dirty flag to ensure 
@@ -466,9 +467,15 @@ public class GLGeometryUploader
 		protected int vertexLengthBytes = -1 ;
 		protected int vertexStrideBytes = -1 ;			// Specifies the byte offset between verticies
 
-		protected ProgramMap<GLProgram> program ;		// What shader should be used
-		protected final int layer ;						// Defines the 2D layer the geometry resides on
-		protected final boolean ui ;					// Is the buffer used for UI or world space?
+		// Used to determine if a GLDrawData's ProgramMap 
+		// should be added to this buffer.
+		protected ProgramMap<GLProgram> baseProgram ;
+		// Removes the need for looking up the textures 
+		// referenced by MalletTexture and MalletFont.
+		protected ProgramMap<GLProgram> program ;
+
+		protected final int layer ;								// Defines the 2D layer the geometry resides on
+		protected final boolean ui ;							// Is the buffer used for UI or world space?
 
 		protected final List<GLGeometry> buffers = MalletList.<GLGeometry>newList() ;
 
@@ -494,7 +501,8 @@ public class GLGeometryUploader
 						 final int _vertexLengthBytes )
 		{
 			mode = _mode ;
-			program = new ProgramMap<GLProgram>( _program ) ;
+			baseProgram = new ProgramMap<GLProgram>( _program ) ;
+
 			layer = _layer ;
 			ui = _ui ;
 
@@ -517,7 +525,7 @@ public class GLGeometryUploader
 		{
 			final Shape.Swivel[] swivel = _shape.getSwivel() ;
 			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel, program.getProgram() ) ;
+			attributes = constructVertexAttrib( shapeSwivel, baseProgram.getProgram() ) ;
 
 			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
 
@@ -545,17 +553,26 @@ public class GLGeometryUploader
 		public void draw( final GL3 _gl, final Matrix4 _worldProjection, final Matrix4 _uiProjection )
 		{
 			//System.out.println( "Draw Buffer: " + sortValue() ) ;
-			if( program == null )
+			if( baseProgram == null )
 			{
 				System.out.println( "No program specified..." ) ;
 				return ;
 			}
 
-			final GLProgram glProgram = program.getProgram() ;
+			final GLProgram glProgram = baseProgram.getProgram() ;
 			if( glProgram == null )
 			{
 				System.out.println( "No OpenGL program specified..." ) ;
 				return ;
+			}
+
+			if( program == null )
+			{
+				program = glProgram.buildMap( _gl, baseProgram ) ;
+				if( program == null )
+				{
+					return ;
+				}
 			}
 
 			if( glProgram.id[0] != programID )
@@ -570,13 +587,7 @@ public class GLGeometryUploader
 			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
 
 			_gl.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
-			if( glProgram.loadUniforms( _gl, program ) == false )
-			{
-				//System.out.println( "Failed to load uniforms" ) ;
-				// We failed to load all uniforms required for 
-				// this buffer.
-				return ;
-			}
+			glProgram.loadUniforms( _gl, program ) ;
 
 			GLGeometryUploader.enableVertexAttributes( _gl, attributes ) ;
 			final int size = buffers.size() ;
@@ -683,7 +694,7 @@ public class GLGeometryUploader
 			// As only modified/new programs will be flagged as dirty.
 			if( _program.isDirty() == true )
 			{
-				final boolean valid = program.equals( _program ) ;
+				final boolean valid = baseProgram.equals( _program ) ;
 				// The program should only be flagged as not dirty 
 				// once a valid buffer has been found.
 				_program.setDirty( valid ? false : true ) ;
@@ -733,10 +744,11 @@ public class GLGeometryUploader
 		*/
 		public void destroy()
 		{
-			shapeSwivel       = null ;
-			shapeStyle        = null ;
-			attributes        = null ;
-			program           = null ;
+			shapeSwivel = null ;
+			shapeStyle  = null ;
+			attributes  = null ;
+			baseProgram = null ;
+			program     = null ;
 
 			for( final GLGeometry geometry : buffers )
 			{
@@ -932,6 +944,7 @@ public class GLGeometryUploader
 	{
 		private final MalletFont font ;
 		private final MalletFont.Metrics metrics ;
+
 		private GLFont glFont = null ;
 
 		public GLTextBuffer( final GLDrawData _data,
@@ -940,7 +953,7 @@ public class GLGeometryUploader
 		{
 			super( _data, _indexLengthBytes, _vertexLengthBytes ) ;
 
-			font = program.get( "inTex0", MalletFont.class ) ;
+			font = baseProgram.get( "inTex0", MalletFont.class ) ;
 			metrics = font.getMetrics() ;
 		}
 
@@ -954,8 +967,11 @@ public class GLGeometryUploader
 		public void upload( final GL3 _gl, final GLDrawData _data )
 		{
 			//System.out.println( "Upload!" ) ;
-			glFont = GLRenderer.getFont( font ) ;
-			initShape( glFont.getShapeWithChar( '\0' ) ) ;
+			if( glFont == null )
+			{
+				glFont = GLRenderer.getFont( font ) ;
+				initShape( glFont.getShapeWithChar( '\0' ) ) ;
+			}
 
 			final Location location = findLocationText( _gl, _data ) ;
 			uploadText( _gl, location, _data ) ;
@@ -1164,6 +1180,13 @@ public class GLGeometryUploader
 					return findLocation( ( 6 * length ), ( 4 * length ) ) ;
 				}
 			} ) ;
+		}
+
+		@Override
+		public void destroy()
+		{
+			super.destroy() ;
+			glFont = null ;
 		}
 	}
 
