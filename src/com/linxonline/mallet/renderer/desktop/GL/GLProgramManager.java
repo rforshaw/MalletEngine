@@ -1,7 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.List ;
-import com.jogamp.opengl.* ;
 
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
@@ -59,9 +58,9 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final List<GLShader> shaders = MalletList.<GLShader>newList() ;
 				final List<GLShaderMap> paths = MalletList.<GLShaderMap>newList() ;
 
-				fill( paths, _jGL.getJSONArray( "VERTEX" ),   GL3.GL_VERTEX_SHADER ) ;
-				fill( paths, _jGL.getJSONArray( "GEOMETRY" ), GL3.GL_GEOMETRY_SHADER ) ;
-				fill( paths, _jGL.getJSONArray( "FRAGMENT" ), GL3.GL_FRAGMENT_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "VERTEX" ),   MGL.GL_VERTEX_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "GEOMETRY" ), MGL.GL_GEOMETRY_SHADER ) ;
+				fill( paths, _jGL.getJSONArray( "FRAGMENT" ), MGL.GL_FRAGMENT_SHADER ) ;
 
 				final List<Tuple<String, Uniform>> uniforms = MalletList.<Tuple<String, Uniform>>newList() ;
 				final List<String> swivel = MalletList.<String>newList() ;
@@ -209,13 +208,12 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			// when the render requests it.
 			if( toBind.isEmpty() == false )
 			{
-				final GL3 gl = GLRenderer.getGL() ;
 				for( final GLProgram program : toBind )
 				{
-					if( GLProgramManager.buildProgram( gl, program ) == false )
+					if( GLProgramManager.buildProgram( program ) == false )
 					{
 						System.out.println( "Failed to compile program: " + program.name ) ;
-						GLProgramManager.deleteProgram( gl, program ) ;
+						GLProgramManager.deleteProgram( program ) ;
 					}
 					put( program.name, program ) ;
 				}
@@ -226,17 +224,17 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		return super.get( _key ) ;
 	}
 
-	public static void deleteProgram( final GL3 _gl, final GLProgram _program )
+	public static void deleteProgram( final GLProgram _program )
 	{
 		// During the build process a programs 
 		// shaders list has already been detached 
 		// and destroyed.
-		_gl.glDeleteProgram( _program.id[0] ) ;
+		MGL.glDeleteProgram( _program.id[0] ) ;
 	}
 
-	public static boolean buildProgram( final GL3 _gl, final GLProgram _program )
+	public static boolean buildProgram( final GLProgram _program )
 	{
-		_program.id[0] = _gl.glCreateProgram() ;
+		_program.id[0] = MGL.glCreateProgram() ;
 		if( _program.id[0] < 1 )
 		{
 			System.out.println( "Failed to create program.." ) ;
@@ -246,9 +244,9 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		for( final GLShader shader : _program.shaders )
 		{
 			// Attach only successfully compiled shaders
-			if( compileShader( _gl, shader ) == true )
+			if( compileShader( shader ) == true )
 			{
-				_gl.glAttachShader( _program.id[0], shader.id[0] ) ;
+				MGL.glAttachShader( _program.id[0], shader.id[0] ) ;
 			}
 		}
 
@@ -257,32 +255,32 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 		for( int i = 0; i < size; i++ )
 		{
-			_gl.glBindAttribLocation( _program.id[0], _program.inAttributes[i], swivel.get( i ) ) ;
+			MGL.glBindAttribLocation( _program.id[0], _program.inAttributes[i], swivel.get( i ) ) ;
 		}
 
-		_gl.glLinkProgram( _program.id[0] ) ;
+		MGL.glLinkProgram( _program.id[0] ) ;
 
-		_program.inMVPMatrix = _gl.glGetUniformLocation( _program.id[0], "inMVPMatrix" ) ;
+		_program.inMVPMatrix = MGL.glGetUniformLocation( _program.id[0], "inMVPMatrix" ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
 		for( final GLShader shader : _program.shaders )
 		{
-			_gl.glDetachShader( _program.id[0], shader.id[0] ) ;
-			_gl.glDeleteShader( shader.id[0] ) ;
+			MGL.glDetachShader( _program.id[0], shader.id[0] ) ;
+			MGL.glDeleteShader( shader.id[0] ) ;
 		}
 		_program.shaders.clear() ;
 
 		final int[] response = new int[]{ 0 } ;
-		_gl.glGetProgramiv( _program.id[0], GL3.GL_LINK_STATUS, response, 0 ) ;
-		if( response[0] == GL3.GL_FALSE )
+		MGL.glGetProgramiv( _program.id[0], MGL.GL_LINK_STATUS, response, 0 ) ;
+		if( response[0] == MGL.GL_FALSE )
 		{
 			final int[] logLength = new int[1] ;
-			_gl.glGetProgramiv( _program.id[0], GL3.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
+			MGL.glGetProgramiv( _program.id[0], MGL.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
 
 			final byte[] log = new byte[logLength[0]] ;
-			_gl.glGetProgramInfoLog( _program.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
+			MGL.glGetProgramInfoLog( _program.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
 
 			System.out.println( "Error linking program: " + new String( log ) ) ;
 			return false ;
@@ -291,21 +289,21 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		return true ;
 	}
 
-	private static boolean compileShader( final GL3 _gl, final GLShader _shader )
+	private static boolean compileShader( final GLShader _shader )
 	{
-		_shader.id[0] = _gl.glCreateShader( _shader.type ) ;
-		_gl.glShaderSource( _shader.id[0], 1, _shader.source, null ) ;
-		_gl.glCompileShader( _shader.id[0] ) ;
+		_shader.id[0] = MGL.glCreateShader( _shader.type ) ;
+		MGL.glShaderSource( _shader.id[0], 1, _shader.source, null ) ;
+		MGL.glCompileShader( _shader.id[0] ) ;
 
 		final int[] response = new int[]{ 0 } ;
-		_gl.glGetShaderiv( _shader.id[0], GL3.GL_COMPILE_STATUS, response, 0 ) ;
-		if( response[0] == GL3.GL_FALSE )
+		MGL.glGetShaderiv( _shader.id[0], MGL.GL_COMPILE_STATUS, response, 0 ) ;
+		if( response[0] == MGL.GL_FALSE )
 		{
 			final int[] logLength = new int[1] ;
-			_gl.glGetShaderiv( _shader.id[0], GL3.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
+			MGL.glGetShaderiv( _shader.id[0], MGL.GL_INFO_LOG_LENGTH, logLength, 0 ) ;
 
 			final byte[] log = new byte[logLength[0]] ;
-			_gl.glGetShaderInfoLog( _shader.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
+			MGL.glGetShaderInfoLog( _shader.id[0], logLength[0], ( int[] )null, 0, log, 0 ) ;
 
 			System.out.println( "Error compiling shader: " + _shader.file + "\n" + new String( log ) ) ;
 			return false ;

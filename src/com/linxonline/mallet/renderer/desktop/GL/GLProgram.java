@@ -4,8 +4,6 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
-import com.jogamp.opengl.* ;
-
 import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.util.Logger ;
@@ -40,20 +38,20 @@ public class GLProgram extends Resource
 		MAT4( new AUniform()
 		{
 			@Override
-			public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				return true ;
 			}
 
 			@Override
-			public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				final GLProgram program              = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 				final int inUniform                  = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
-				_gl.glUniformMatrix4fv( inUniform, 1, true, m.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+				MGL.glUniformMatrix4fv( inUniform, 1, true, m.matrix, 0 ) ;
 				return true ;
 			}
 
@@ -68,7 +66,7 @@ public class GLProgram extends Resource
 			private int textureUnit = 0 ;
 
 			@Override
-			public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				final GLProgram program               = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
@@ -84,15 +82,15 @@ public class GLProgram extends Resource
 				return true ;
 			}
 
-			public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				final GLProgram program               = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
 
 				final GLImage texture = ( GLImage )_data.get( uniform.getLeft() ) ;
 
-				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;					//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.glBindTexture( GL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
+				MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
 				textureUnit += 1 ;
 				return true ;
 			}
@@ -120,7 +118,7 @@ public class GLProgram extends Resource
 		{
 			private int textureUnit = 0 ;
 
-			public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				final GLProgram program               = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
@@ -138,15 +136,15 @@ public class GLProgram extends Resource
 				return true ;
 			}
 
-			public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index )
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
 			{
 				final GLProgram program               = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
 
 				final GLImage texture = ( GLImage )_data.get( uniform.getLeft() ) ;
 
-				_gl.glActiveTexture( GL3.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.glBindTexture( GL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
 			}
@@ -178,17 +176,17 @@ public class GLProgram extends Resource
 			delegate = _delegate ;
 		}
 
-		public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _map, final int _index )
+		public boolean build( final ProgramMap<GLProgram> _map, final int _index )
 		{
-			return delegate.build( _gl, _map, _index ) ;
+			return delegate.build( _map, _index ) ;
 		}
 
 		/**
 			Load the information being mapped at index location.
 		*/
-		public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _map, final int _index )
+		public boolean load( final ProgramMap<GLProgram> _map, final int _index )
 		{
-			return delegate.load( _gl, _map, _index ) ;
+			return delegate.load( _map, _index ) ;
 		}
 
 		public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _map, final int _index )
@@ -223,9 +221,9 @@ public class GLProgram extends Resource
 
 		private static class AUniform implements UniformDelegate
 		{
-			public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
 
-			public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
 
 			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index ) {}
 
@@ -236,9 +234,9 @@ public class GLProgram extends Resource
 
 		private interface UniformDelegate
 		{
-			public boolean build( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index ) ;
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index ) ;
 
-			public boolean load( final GL3 _gl, final ProgramMap<GLProgram> _data, final int _index ) ;
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index ) ;
 
 			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index ) ;
 
@@ -292,7 +290,7 @@ public class GLProgram extends Resource
 
 		If we fail to build an efficient map then return null.
 	*/
-	public ProgramMap<GLProgram> buildMap( final GL3 _gl, final ProgramMap<GLProgram> _map )
+	public ProgramMap<GLProgram> buildMap( final ProgramMap<GLProgram> _map )
 	{
 		final ProgramMap<GLProgram> map = new ProgramMap<GLProgram>( _map ) ;
 
@@ -300,7 +298,7 @@ public class GLProgram extends Resource
 		for( int i = 0; i < size; i++ )
 		{
 			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
-			if( uniform.getRight().build( _gl, map, i ) == false )
+			if( uniform.getRight().build( map, i ) == false )
 			{
 				return null ;
 			}
@@ -314,13 +312,13 @@ public class GLProgram extends Resource
 		A GL Program will have information that it requires 
 		before it can be used effectively. 
 	*/
-	public boolean loadUniforms( final GL3 _gl, final ProgramMap<GLProgram> _data )
+	public boolean loadUniforms( final ProgramMap<GLProgram> _data )
 	{
 		final int size = uniforms.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
-			if( uniform.getRight().load( _gl, _data, i ) == false )
+			if( uniform.getRight().load( _data, i ) == false )
 			{
 				Uniform.resetAll() ;
 				return false ;

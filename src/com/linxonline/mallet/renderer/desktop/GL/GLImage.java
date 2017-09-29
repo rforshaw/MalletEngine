@@ -2,8 +2,6 @@ package com.linxonline.mallet.renderer.desktop.GL ;
 
 import java.util.Arrays ;
 
-import com.jogamp.opengl.* ;
-
 import com.linxonline.mallet.io.Resource ;
 
 public class GLImage extends Resource
@@ -75,10 +73,6 @@ public class GLImage extends Resource
 	public final void destroy()
 	{
 		//System.out.println( "Removing texture.." ) ;
-		final GL3 gl = GLRenderer.getGL() ;
-		if( gl != null )
-		{
-			gl.glDeleteTextures( textureIDs.length, textureIDs, 0 ) ;
-		}
+		MGL.glDeleteTextures( textureIDs.length, textureIDs, 0 ) ;
 	}
 }

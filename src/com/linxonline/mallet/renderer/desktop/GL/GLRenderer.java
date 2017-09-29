@@ -4,7 +4,11 @@ import java.util.Set ;
 import java.util.HashSet ;
 
 import com.jogamp.newt.opengl.GLWindow ;
-import com.jogamp.opengl.* ;
+import com.jogamp.opengl.GLAutoDrawable ;
+import com.jogamp.opengl.GLProfile ;
+import com.jogamp.opengl.GLCapabilities ;
+import com.jogamp.opengl.GLContext ;
+import com.jogamp.opengl.GLEventListener ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -30,7 +34,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	protected GLWindow canvas ;
-	private static GL3 gl ;
 
 	protected CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
 	protected int viewMode = ORTHOGRAPHIC_MODE ;
@@ -720,20 +723,20 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	public void init( final GLAutoDrawable _drawable )
 	{
 		System.out.println( "GL3 Contex initialised.." ) ;
-		gl = _drawable.getGL().getGL3() ;
+		MGL.setGL( _drawable.getGL().getGL3() ) ;
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
-		gl.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
+		MGL.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 
-		gl.glEnable( GL3.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
-		gl.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+		MGL.glEnable( MGL.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
+		MGL.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
 
-		gl.glEnable( GL3.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-		gl.glBlendFunc( GL3.GL_SRC_ALPHA, GL3.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+		MGL.glEnable( MGL.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+		MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
-		gl.glEnable( GL3.GL_CULL_FACE ) ;
-		gl.glCullFace( GL3.GL_BACK ) ;  
-		gl.glFrontFace( GL3.GL_CCW ) ;
+		MGL.glEnable( MGL.GL_CULL_FACE ) ;
+		MGL.glCullFace( MGL.GL_BACK ) ;  
+		MGL.glFrontFace( MGL.GL_CCW ) ;
 
 		System.out.println( "Building default shaders.." ) ;
 		programs.load( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
@@ -745,7 +748,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			// Query for the Max Texture Size and store the results.
 			// I doubt the size will change during the running of the engine.
 			final int[] size = new int[1] ;
-			gl.glGetIntegerv( GL3.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
+			MGL.glGetIntegerv( MGL.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
 			maxTextureSize.setXY( size[0], size[0] ) ;
 		}
 	}
@@ -808,11 +811,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		programs.clean( activeKeys ) ;
 		textures.clean( activeKeys ) ;
 		fontManager.clean( activeKeys ) ;
-	}
-
-	public static GL3 getGL()
-	{
-		return gl ;
 	}
 
 	public GLWindow getCanvas()
@@ -949,21 +947,21 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		context.release() ;
 	}
 
-	public static void handleError( final String _txt, final GL3 _gl )
+	public static void handleError( final String _txt )
 	{
 		int error = 0 ;
-		while( ( error = _gl.glGetError() ) != GL3.GL_NO_ERROR )
+		while( ( error = MGL.glGetError() ) != MGL.GL_NO_ERROR )
 		{
 			switch( error )
 			{
-				case GL3.GL_NO_ERROR                      : break ;
-				case GL3.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
-				case GL3.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
-				case GL3.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
-				case GL3.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
-				case GL3.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
-				case GL3.GL_STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
-				case GL3.GL_STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
+				case MGL.GL_NO_ERROR                      : break ;
+				case MGL.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
+				case MGL.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
+				case MGL.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
+				case MGL.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
+				case MGL.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
+				case MGL.GL_STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
+				case MGL.GL_STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
 				default                                   : System.out.println( _txt + ": Unknown Error." ) ; break ;
 			}
 		}
@@ -982,7 +980,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		public void remove( final GLDrawData _data )
 		{
 			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.remove( gl, _data ) ;
+			uploader.remove( _data ) ;
 		}
 	}
 
@@ -1017,7 +1015,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.upload( gl, _data ) ;
+			uploader.upload( _data ) ;
 		}
 	}
 
@@ -1044,7 +1042,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 			final int width = ( int )screen.dimension.x ;
 			final int height = ( int )screen.dimension.y ;
-			gl.glViewport( 0, 0, width, height ) ;
+			MGL.glViewport( 0, 0, width, height ) ;
 
 			final Vector3 uiPosition = _camera.getUIPosition() ;
 			final Vector3 position = _camera.getPosition() ;
@@ -1066,7 +1064,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
 			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.draw( gl, worldProjection, uiProjection ) ;
+			uploader.draw( worldProjection, uiProjection ) ;
 
 			//System.out.println( "Camera: " + world.getID() + " Order: " + world.getOrder() ) ;
 		}
