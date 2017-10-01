@@ -284,10 +284,15 @@ public class UITextField extends UIElement
 			final StringBuilder edit = getParent().getText() ;
 
 			final int index = getParent().getCursorIndex() ;
-
 			end = font.stringIndexWidth( edit, start, length.x ) ;
-			start = ( index > end && end > start ) ? start + 1 : start - 1 ;
-			start = ( start > 0 ) ? start : 0 ;
+
+			final int temp = end ;
+			end = ( index > end ) ? index : end ;
+			end = ( end < edit.length() ) ? end : edit.length() ;
+
+			start += end - temp ;
+			start = ( index < start ) ? index : start ;
+			start = ( start >= 0 ) ? start : 0 ;
 
 			DrawAssist.amendTextStart( drawEdit, start ) ;
 			DrawAssist.amendTextEnd( drawEdit, end ) ;
@@ -348,7 +353,7 @@ public class UITextField extends UIElement
 					final StringBuilder edit = parent.getText() ;
 
 					final int index = parent.getCursorIndex() + 1 ;
-					parent.setCursorIndex( ( index > edit.length() ) ? edit.length() : index ) ;
+					parent.setCursorIndex( ( index >= edit.length() ) ? edit.length() : index ) ;
 					parent.makeDirty() ;
 					break ;
 				}
@@ -398,6 +403,7 @@ public class UITextField extends UIElement
 					break ;
 				}
 			}
+
 			return InputEvent.Action.CONSUME ;
 		}
 
