@@ -261,7 +261,7 @@ public class UITextField extends UIElement
 				final Vector3 cursorOffset = DrawAssist.getOffset( drawCursor ) ;
 				cursorOffset.setXYZ( offset ) ;
 
-				cursorOffset.add( font.stringWidth( edit, 0, index ), 0.0f, 0.0f ) ;
+				cursorOffset.add( font.stringWidth( edit, start, index ), 0.0f, 0.0f ) ;
 
 				DrawAssist.amendOrder( drawCursor, layer ) ;
 				DrawAssist.forceUpdate( drawCursor ) ;
