@@ -848,11 +848,160 @@
 					}
 				},
 				{
-					"TYPE" : "UILIST",
-					"LAYOUT" : "VERTICAL",
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "GRID",
 					"NAME" : "UITree",
+					"SCROLLBAR" : {
+						"TEXTURE" : "base/ui/uieditor/light_black.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					},
 					"CHILDREN" : [
-					
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "2.0, 2.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							}
+						}
 					],
 					"MAX_LENGTH" : "5.5, 0, 0",
 					"UIDRAW" : {

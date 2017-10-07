@@ -3,6 +3,7 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.audio.AudioDelegate ;
 
@@ -578,14 +579,91 @@ public class UILayout extends UIElement
 		} ;
 	}
 
+	/**
+		Order the UIElements from left to right, setting their size to 
+		the minimum or maximim length of the element with a defined 
+		minimum or maximum value.
+	*/
 	protected UIElementUpdater getGridUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 layoutPosition = new Vector3() ;
+			private final Vector3 childPosition = new Vector3() ;
+
 			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
+				final UIElement reference = getReferenceElement( _ordered ) ;
+				if( reference == null )
+				{
+					Logger.println( "No valid minimum or maximum length for grid.", Logger.Verbosity.NORMAL ) ;
+					return ;
+				}
 
+				final Vector3 length = reference.getLength() ;
+				final Vector3 margin = reference.getMargin() ;
+
+				final Vector3 layoutLength = UILayout.this.getLength() ;
+				final Vector3 layoutMargin = UILayout.this.getMargin() ;
+
+				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
+				childPosition.setXYZ( layoutPosition ) ;
+				childPosition.add( margin ) ;
+
+				final float layoutWidth = layoutPosition.x + layoutLength.x ;
+				
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
+					final UIRatio ratio = element.getRatio() ;
+					element.setLength( ratio.toUnitX( length.x ),
+									   ratio.toUnitY( length.y ),
+									   ratio.toUnitZ( length.z ) ) ;
+
+					if( ( childPosition.x + length.x + margin.x ) > layoutWidth )
+					{
+						final float y = childPosition.y + length.y + margin.y ;
+						childPosition.setXYZ( layoutPosition.x + margin.x, y, childPosition.z ) ;
+					}
+
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
+
+					final float x = childPosition.x + length.x + margin.x ;
+					childPosition.setXYZ( x, childPosition.y, childPosition.z ) ;
+				}
+			}
+
+			private final UIElement getReferenceElement( final List<UIElement> _ordered )
+			{
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					final Vector3 min = element.getMinimumLength() ;
+					if( min.x > 0.0f && min.y > 0.0f )
+					{
+						return element ;
+					}
+
+					final Vector3 max = element.getMinimumLength() ;
+					if( max.x > 0.0f && max.y > 0.0f )
+					{
+						return element ;
+					}
+				}
+
+				return null ;
 			}
 		} ;
 	}

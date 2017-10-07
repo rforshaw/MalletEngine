@@ -4,6 +4,7 @@ import java.util.UUID ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.event.* ;
@@ -149,7 +150,7 @@ public class UIList extends UILayout
 				if( pressed == true )
 				{
 					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
-					diff.y = ( getType() == UIList.Type.VERTICAL )   ? ( last.y - _input.getMouseY() ) : 0.0f ;
+					diff.y = ( getType() == UIList.Type.VERTICAL || getType() == UIList.Type.GRID ) ? ( last.y - _input.getMouseY() ) : 0.0f ;
 					action = applyScroll( diff.x, diff.y ) ;
 				}
 
@@ -516,15 +517,87 @@ public class UIList extends UILayout
 		} ;
 	}
 
-	@Override
 	protected UIElementUpdater getGridUpdater()
 	{
 		return new UIElementUpdater()
 		{
+			private final Vector3 childPosition = new Vector3() ;
+
 			@Override
 			public void update( final float _dt, final List<UIElement> _ordered )
 			{
-			
+				final UIElement reference = getReferenceElement( _ordered ) ;
+				if( reference == null )
+				{
+					Logger.println( "No valid minimum or maximum length for grid.", Logger.Verbosity.NORMAL ) ;
+					return ;
+				}
+
+				final Vector3 length = reference.getLength() ;
+				final Vector3 margin = reference.getMargin() ;
+
+				final Vector3 listLength = UIList.this.getLength() ;
+				final Vector3 listMargin = UIList.this.getMargin() ;
+
+				final float width  = listLength.x - scrollWidth.x ;
+
+				absoluteLength.setXYZ( width, margin.y, listLength.z ) ;
+				childPosition.setXYZ( margin ) ;
+				childPosition.x += scrollWidth.x ;
+
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					if( element.isVisible() == false )
+					{
+						// Don't take into account elements that 
+						// are invisible.
+						continue ;
+					}
+
+					final UIRatio ratio = element.getRatio() ;
+					element.setLength( ratio.toUnitX( length.x ),
+									   ratio.toUnitY( length.y ),
+									   ratio.toUnitZ( length.z ) ) ;
+
+					if( ( childPosition.x + length.x + margin.x ) > width )
+					{
+						final float y = childPosition.y + length.y + margin.y ;
+						childPosition.setXYZ( scrollWidth.x + margin.x, y, childPosition.z ) ;
+						absoluteLength.y = y + length.y + margin.y ;
+					}
+
+					element.setPosition( ratio.toUnitX( childPosition.x ),
+										 ratio.toUnitY( childPosition.y ),
+										 ratio.toUnitZ( childPosition.z ) ) ;
+
+					final float x = childPosition.x + length.x + margin.x ;
+					childPosition.setXYZ( x, childPosition.y, childPosition.z ) ;
+				}
+			}
+
+			private final UIElement getReferenceElement( final List<UIElement> _ordered )
+			{
+				final int size = _ordered.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final UIElement element = _ordered.get( i ) ;
+					final Vector3 min = element.getMinimumLength() ;
+
+					if( min.x > 0.0f && min.y > 0.0f )
+					{
+						return element ;
+					}
+
+					final Vector3 max = element.getMinimumLength() ;
+					if( max.x > 0.0f && max.y > 0.0f )
+					{
+						return element ;
+					}
+				}
+
+				return null ;
 			}
 		} ;
 	}
