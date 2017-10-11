@@ -34,7 +34,7 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public class Connect
 {
-	private final Map<Object, Map<Object, List<Slot<Object>>>> connections = MalletMap.<Object, Map<Object, List<Slot<Object>>>>newMap() ;
+	private final Map<Object, Map<Signal, List<Slot<Object>>>> connections = MalletMap.<Object, Map<Signal, List<Slot<Object>>>>newMap() ;
 
 	public Connect() {}
 
@@ -45,9 +45,9 @@ public class Connect
 
 		Signals or Variables can not be immutable - for example String.
 	*/
-	public <T, V> boolean connect( final T _signal, final V _var, final Slot<T> _slot )
+	public <T> boolean connect( final T _element, final Signal _signal, final Slot<T> _slot )
 	{
-		if( _signal == null || _var == null )
+		if( _element == null || _signal == null )
 		{
 			Logger.println( "Unable to map signal to slot - signal is null.", Logger.Verbosity.MAJOR ) ;
 			return false ;
@@ -59,14 +59,14 @@ public class Connect
 			return false ;
 		}
 
-		Map<Object, List<Slot<Object>>> lookups = connections.get( _signal ) ;
+		Map<Signal, List<Slot<Object>>> lookups = connections.get( _element ) ;
 		if( lookups == null )
 		{
-			lookups = MalletMap.<Object, List<Slot<Object>>>newMap() ;
-			connections.put( _signal, lookups ) ;
+			lookups = MalletMap.<Signal, List<Slot<Object>>>newMap() ;
+			connections.put( _element, lookups ) ;
 		}
 
-		List<Slot<Object>> slots = lookups.get( _var ) ;
+		List<Slot<Object>> slots = lookups.get( _signal ) ;
 		if( slots == null )
 		{
 			slots = MalletList.<Slot<Object>>newList() ;
@@ -75,7 +75,7 @@ public class Connect
 
 		if( slots.contains( _slot ) == true )
 		{
-			Logger.println( _slot + " already mapped to " + _signal, Logger.Verbosity.MAJOR ) ;
+			Logger.println( _slot + " already mapped to " + _element, Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
@@ -90,9 +90,9 @@ public class Connect
 		Disconnect will not work if the signal or variable is 
 		immutable.
 	*/
-	public <T, V> boolean disconnect( final T _signal, final V _var, final Slot<T> _slot )
+	public <T> boolean disconnect( final T _element, final Signal _signal, final Slot<T> _slot )
 	{
-		if( _signal == null )
+		if( _element == null )
 		{
 			Logger.println( "Unable to disconnect slot from signal - signal is null.", Logger.Verbosity.MAJOR ) ;
 			return false ;
@@ -104,23 +104,23 @@ public class Connect
 			return false ;
 		}
 
-		final Map<Object, List<Slot<Object>>> lookups = connections.get( _signal ) ;
+		final Map<Signal, List<Slot<Object>>> lookups = connections.get( _element ) ;
 		if( lookups == null )
+		{
+			Logger.println( _element + " has no connections.", Logger.Verbosity.MAJOR ) ;
+			return false ;
+		}
+
+		final List<Slot<Object>> slots = lookups.get( _signal ) ;
+		if( slots == null )
 		{
 			Logger.println( _signal + " has no connections.", Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
-		final List<Slot<Object>> slots = lookups.get( _var ) ;
-		if( slots == null )
-		{
-			Logger.println( _var + " has no connections.", Logger.Verbosity.MAJOR ) ;
-			return false ;
-		}
-
 		if( slots.remove( _slot ) == false )
 		{
-			Logger.println( _slot + " has no connection to " + _var, Logger.Verbosity.MAJOR ) ;
+			Logger.println( _slot + " has no connection to " + _signal, Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
@@ -128,7 +128,7 @@ public class Connect
 		{
 			// If there are no connections left we will automatically
 			// remove the signal from the connection list.
-			disconnect( _signal ) ;
+			disconnect( _element ) ;
 		}
 
 		return true ;
@@ -137,15 +137,15 @@ public class Connect
 	/**
 		Disconnect all slots from a signal.
 	*/
-	public <T> boolean disconnect( final T _signal )
+	public <T> boolean disconnect( final T _element )
 	{
-		if( _signal == null )
+		if( _element == null )
 		{
 			Logger.println( "Unable to disconnect slots from signal - signal is null.", Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
-		connections.remove( _signal ) ;
+		connections.remove( _element ) ;
 		return true ;
 	}
 
@@ -153,21 +153,21 @@ public class Connect
 		Inform all slots connected to this signal and associated
 		to the variable that the signal's state has changed.
 	*/
-	public <T, V> void signal( final T _signal, final V _var )
+	public <T> void signal( final T _element, final Signal _signal )
 	{
-		if( _signal == null )
+		if( _element == null )
 		{
 			Logger.println( "Unable to inform connections - signal is null", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 	
-		final Map<Object, List<Slot<Object>>> lookups = connections.get( _signal ) ;
+		final Map<Signal, List<Slot<Object>>> lookups = connections.get( _element ) ;
 		if( lookups == null )
 		{
 			return ;
 		}
 
-		final List<Slot<Object>> slots = lookups.get( _var ) ;
+		final List<Slot<Object>> slots = lookups.get( _signal ) ;
 		if( slots == null )
 		{
 			return ;
@@ -176,9 +176,11 @@ public class Connect
 		final int size = slots.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			slots.get( i ).slot( _signal ) ;
+			slots.get( i ).slot( _element ) ;
 		}
 	}
+
+	public static class Signal {}
 
 	public interface Slot<T>
 	{

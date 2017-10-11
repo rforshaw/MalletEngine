@@ -11,6 +11,8 @@ public class UICheckbox extends UIElement
 {
 	private boolean checked = false ;
 
+	private final Connect.Signal checkChanged = new Connect.Signal() ;
+
 	/**
 		If the UICheckbox is being added to a UILayout
 		then you don't have to define the position, 
@@ -71,13 +73,18 @@ public class UICheckbox extends UIElement
 		{
 			checked = _checked ;
 			makeDirty() ;
-			UIElement.signal( this ) ;
+			UIElement.signal( this, checkChanged() ) ;
 		}
 	}
 
 	public boolean isChecked()
 	{
 		return checked ;
+	}
+
+	public Connect.Signal checkChanged()
+	{
+		return checkChanged ;
 	}
 
 	public static class GUITick extends UIFactory.GUIDraw<UICheckbox>

@@ -140,7 +140,7 @@ public final class GameTestLoader extends GameLoader
 					}
 				} ) ;
 
-				UIElement.connect( checkbox, checkbox.getPosition(), new Connect.Slot<UICheckbox>()
+				UIElement.connect( checkbox, checkbox.positionChanged(), new Connect.Slot<UICheckbox>()
 				{
 					@Override
 					public void slot( final UICheckbox _box )
@@ -149,7 +149,7 @@ public final class GameTestLoader extends GameLoader
 					}
 				} ) ;
 
-				UIElement.connect( checkbox, new Connect.Slot<UICheckbox>()
+				UIElement.connect( checkbox, checkbox.checkChanged(), new Connect.Slot<UICheckbox>()
 				{
 					@Override
 					public void slot( final UICheckbox _box )

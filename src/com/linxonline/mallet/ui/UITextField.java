@@ -14,6 +14,9 @@ public class UITextField extends UIElement
 
 	private int cursorIndex = 0 ;
 
+	private final Connect.Signal cursorIndexChanged = new Connect.Signal() ;
+	private final Connect.Signal textChanged = new Connect.Signal() ;
+
 	/**
 		If the UICheckbox is being added to a UILayout
 		then you don't have to define the position, 
@@ -78,7 +81,7 @@ public class UITextField extends UIElement
 		if( cursorIndex != _index )
 		{
 			cursorIndex = _index ;
-			UIElement.signal( this ) ;
+			UIElement.signal( this, cursorIndexChanged() ) ;
 		}
 	}
 
@@ -90,6 +93,16 @@ public class UITextField extends UIElement
 	public StringBuilder getText()
 	{
 		return text ;
+	}
+
+	public Connect.Signal cursorIndexChanged()
+	{
+		return cursorIndexChanged ;
+	}
+
+	public Connect.Signal textChanged()
+	{
+		return textChanged ;
 	}
 
 	public static GUIEditText createEditText( final String _text, final MalletFont _font )
@@ -369,7 +382,7 @@ public class UITextField extends UIElement
 						parent.setCursorIndex( index ) ;
 						parent.makeDirty() ;
 
-						UIElement.signal( parent, edit ) ;
+						UIElement.signal( parent, parent.textChanged() ) ;
 					}
 					break ;
 				}
@@ -385,7 +398,7 @@ public class UITextField extends UIElement
 						parent.setCursorIndex( index ) ;
 						parent.makeDirty() ;
 
-						UIElement.signal( parent, edit ) ;
+						UIElement.signal( parent, parent.textChanged() ) ;
 					}
 					break ;
 				}
@@ -399,7 +412,7 @@ public class UITextField extends UIElement
 					parent.setCursorIndex( index + 1 ) ;
 					parent.makeDirty() ;
 
-					UIElement.signal( parent, edit ) ;
+					UIElement.signal( parent, parent.textChanged() ) ;
 					break ;
 				}
 			}

@@ -31,6 +31,10 @@ public class UIList extends UILayout
 	// the UIComponent.
 	private DrawDelegate<World, Draw> delegate = null ;
 
+	private final Connect.Signal defaultElementSizeChanged = new Connect.Signal() ;
+	private final Connect.Signal scrollWidthChanged        = new Connect.Signal() ;
+	private final Connect.Signal dragDelayChanged          = new Connect.Signal() ;
+
 	public UIList( final Type _type )
 	{
 		this( _type, new Vector3(), new Vector3(), new Vector3() ) ;
@@ -210,7 +214,7 @@ public class UIList extends UILayout
 		defaultItemSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
 		defaultItemSize.y = ( _y <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _y ) ;
 		defaultItemSize.z = ( _z <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _z ) ;
-		UIElement.signal( this, defaultItemSize ) ;
+		UIElement.signal( this, defaultElementSizeChanged() ) ;
 	}
 
 	/**
@@ -222,7 +226,7 @@ public class UIList extends UILayout
 		scrollWidth.x = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _width ) ;
 		scrollWidth.y = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelY( _width ) ;
 		scrollWidth.z = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelZ( _width ) ;
-		UIElement.signal( this, scrollWidth ) ;
+		UIElement.signal( this, scrollWidthChanged() ) ;
 	}
 
 	/**
@@ -234,7 +238,7 @@ public class UIList extends UILayout
 		if( dragDelay != _delay )
 		{
 			dragDelay = _delay ;
-			UIElement.signal( this ) ;
+			UIElement.signal( this, dragDelayChanged() ) ;
 		}
 	}
 
@@ -696,7 +700,22 @@ public class UIList extends UILayout
 	{
 		return internalCamera ;
 	}
-	
+
+	public Connect.Signal defaultElementSizeChanged()
+	{
+		return defaultElementSizeChanged ;
+	}
+
+	public Connect.Signal scrollWidthChanged()
+	{
+		return scrollWidthChanged ;
+	}
+
+	public Connect.Signal dragDelayChanged()
+	{
+		return dragDelayChanged ;
+	}
+
 	private static Draw createPane( final World _world, final UIElement _parent )
 	{
 		final Vector3 length = _parent.getLength() ;
