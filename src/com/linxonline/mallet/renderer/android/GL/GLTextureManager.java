@@ -67,7 +67,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				{
 					public void run()
 					{
-						System.out.println( "Loading Texture: " + _file ) ;
+						//System.out.println( "Loading Texture: " + _file ) ;
 						final FileStream file = GlobalFileSystem.getFile( _file ) ;
 						if( file.exists() == false )
 						{

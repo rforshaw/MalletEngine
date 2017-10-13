@@ -43,6 +43,11 @@ public interface FileStream extends Close
 	public long getSize() ;
 
 	/**
+		Used to close a specific stream.
+	*/
+	public boolean close( final Close _close ) ;
+
+	/**
 		Close all streams that a developer has requested.
 		This will close streams currently in use, and dead 
 		streams.

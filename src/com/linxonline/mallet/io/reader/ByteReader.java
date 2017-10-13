@@ -33,7 +33,7 @@ public class ByteReader
 			offset += in.readBytes( buffer, offset, size - offset ) ;
 		}
 
-		in.close() ;
+		file.close() ;
 		return buffer ;
 	}
 }

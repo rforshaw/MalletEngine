@@ -80,7 +80,7 @@ public class TextReader
 			lines.add( line ) ;
 		}
 
-		in.close() ;
+		_file.close() ;
 		return lines ;
 	}
 }

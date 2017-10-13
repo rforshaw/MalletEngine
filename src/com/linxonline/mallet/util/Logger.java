@@ -94,6 +94,15 @@ public final class Logger
 		}
 	}
 
+	public static void printStackTrace( final Verbosity _verbosity )
+	{
+		final StackTraceElement[] trace = Thread.currentThread().getStackTrace() ;
+		for( int i = 0; i < trace.length; i++ )
+		{
+			Logger.println( trace[i], _verbosity ) ;
+		}
+	}
+
 	public enum Verbosity
 	{
 		MINOR, NORMAL, MAJOR

@@ -5,6 +5,7 @@ import java.util.zip.* ;
 import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
+import com.linxonline.mallet.util.Logger ;
 
 public class DesktopZipFile implements FileStream
 {
@@ -25,6 +26,7 @@ public class DesktopZipFile implements FileStream
 		{
 			final ByteInStream stream = new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
 			{
+				@Override
 				public boolean close()
 				{
 					boolean success = super.close() ;
@@ -57,6 +59,7 @@ public class DesktopZipFile implements FileStream
 		{
 			final StringInStream stream = new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
 			{
+				@Override
 				public boolean close()
 				{
 					boolean success = super.close() ;
@@ -138,8 +141,8 @@ public class DesktopZipFile implements FileStream
 			out.writeBytes( buffer, 0, length ) ;
 		}
 
-		in.close() ;
-		out.close() ;
+		close( in ) ;
+		stream.close() ;
 
 		return true ;
 	}
@@ -205,8 +208,41 @@ public class DesktopZipFile implements FileStream
 		return zipEntry.getSize() ;
 	}
 
+	/**
+		Close a specific stream without closing other 
+		active streams.
+	*/
+	public boolean close( final Close _close )
+	{
+		return toClose.remove( _close ) ;
+	}
+
 	public boolean close()
 	{
 		return toClose.close() ;
+	}
+
+	@Override
+	public String toString()
+	{
+		return zipFile.toString() ;
+	}
+
+	/**
+		There is a chance that a user may access resources 
+		and forget to close them.
+		To ensure that they are at least closed at some point 
+		within the life cycle of the application we will log 
+		an error and close them on object finalize().
+	*/
+	@Override
+	protected void finalize() throws Throwable
+	{
+		if( toClose.isEmpty() == false )
+		{
+			Logger.println( this + " accessed without closing.", Logger.Verbosity.MAJOR ) ;
+			close() ;
+		}
+		super.finalize() ;
 	}
 }

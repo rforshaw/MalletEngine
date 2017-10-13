@@ -26,6 +26,25 @@ public class CloseStreams implements Close
 		return _close ;
 	}
 
+	/**
+		Close the connection and remove from the list 
+		of active connections.
+	*/
+	public boolean remove( final Close _close )
+	{
+		if( toClose.remove( _close ) == true )
+		{
+			_close.close() ;
+			return true ;
+		}
+		return false ;
+	}
+
+	public boolean isEmpty()
+	{
+		return toClose.isEmpty() ;
+	}
+
 	public boolean close()
 	{
 		boolean success = true ;

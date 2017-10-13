@@ -587,7 +587,9 @@ public class JUI
 			return null ;
 		}
 
-		return new JUI( JSONObject.construct( stream ) ) ;
+		final JUI jui = new JUI( JSONObject.construct( stream ) ) ;
+		stream.close() ;
+		return jui ;
 	}
 
 	public UIElement getParent()

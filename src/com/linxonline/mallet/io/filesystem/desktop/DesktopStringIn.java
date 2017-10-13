@@ -42,4 +42,25 @@ public class DesktopStringIn implements StringInStream
 			return false ;
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		try
+		{
+			reader.reset() ;
+			final StringBuilder builder = new StringBuilder() ;
+			String line = null ;
+			while( ( line = readLine() ) != null )
+			{
+				builder.append( line ) ;
+			}
+			return builder.toString() ;
+		}
+		catch( IOException ex )
+		{
+			ex.printStackTrace() ;
+			return super.toString() ;
+		}
+	}
 }
