@@ -4,77 +4,64 @@ import java.io.* ;
 import java.util.zip.* ;
 import java.util.* ;
 
+import android.content.res.AssetManager ;
+
 import com.linxonline.mallet.io.filesystem.* ;
 
 public class AndroidZipFile implements FileStream
 {
 	private final CloseStreams toClose = new CloseStreams() ;
-	private final ZipFile zipFile ;
+	private final ZipInputStream stream ;
 	private final ZipEntry zipEntry ;
 
-	public AndroidZipFile( final AndroidFileSystem.ZipPath _path ) throws IOException
+	public AndroidZipFile( final AndroidFileSystem.ZipPath _path, final AssetManager _asset ) throws IOException
 	{
 		assert _path != null ;
-		zipFile = new ZipFile( _path.getZipPath() ) ;
-		zipEntry = zipFile.getEntry( _path.filePath ) ;
+
+		stream = new ZipInputStream( _asset.open( _path.getZipPath() ) ) ;
+		zipEntry = AndroidZipFile.getZipEntry( _path.filePath, stream ) ;
 	}
 
 	public ByteInStream getByteInStream()
 	{
-		try
+		return ( AndroidByteIn )toClose.add( new AndroidByteIn( stream )
 		{
-			return ( AndroidByteIn )toClose.add( new AndroidByteIn( zipFile.getInputStream( zipEntry ) )
+			public boolean close()
 			{
-				public boolean close()
+				final boolean success = super.close() ;
+				try
 				{
-					final boolean success = super.close() ;
-					try
-					{
-						zipFile.close() ;
-						return success ;
-					}
-					catch( IOException ex )
-					{
-						ex.printStackTrace() ;
-						return false ;
-					}
+					stream.close() ;
+					return success ;
 				}
-			} ) ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return null ;
-		}
+				catch( IOException ex )
+				{
+					ex.printStackTrace() ;
+					return false ;
+				}
+			}
+		} ) ;
 	}
 
 	public StringInStream getStringInStream()
 	{
-		try
+		return ( AndroidStringIn )toClose.add( new AndroidStringIn( stream )
 		{
-			return ( AndroidStringIn )toClose.add( new AndroidStringIn( zipFile.getInputStream( zipEntry ) )
+			public boolean close()
 			{
-				public boolean close()
+				final boolean success = super.close() ;
+				try
 				{
-					final boolean success = super.close() ;
-					try
-					{
-						zipFile.close() ;
-						return success ;
-					}
-					catch( IOException ex )
-					{
-						ex.printStackTrace() ;
-						return false ;
-					}
+					stream.close() ;
+					return success ;
 				}
-			} ) ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return null ;
-		}
+				catch( IOException ex )
+				{
+					ex.printStackTrace() ;
+					return false ;
+				}
+			}
+		} ) ;
 	}
 
 	public boolean getByteInCallback( final ByteInCallback _callback, final int _length )
@@ -174,5 +161,26 @@ public class AndroidZipFile implements FileStream
 	public boolean close()
 	{
 		return toClose.close() ;
+	}
+
+	/**
+		Return the ZipEntry of the passed in _filePath.
+		Shift the stream to the beginning of this zip.
+	*/
+	private static ZipEntry getZipEntry( final String _filePath, final ZipInputStream _stream ) throws IOException
+	{
+		ZipEntry entry = null ;
+		while( ( entry = _stream.getNextEntry() ) != null )
+		{
+			if( entry.isDirectory() == false )
+			{
+				if( _filePath.equals( entry.getName() ) == true )
+				{
+					return entry ;
+				}
+			}
+		}
+
+		return null ;
 	}
 }

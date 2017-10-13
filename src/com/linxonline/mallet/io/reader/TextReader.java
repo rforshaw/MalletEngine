@@ -53,7 +53,7 @@ public class TextReader
 			buffer.append( '\n' ) ;
 		}
 
-		in.close() ;
+		file.close() ;
 		return buffer.toString() ;
 	}
 

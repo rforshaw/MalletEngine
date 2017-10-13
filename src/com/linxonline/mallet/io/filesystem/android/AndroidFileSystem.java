@@ -60,11 +60,11 @@ public class AndroidFileSystem implements FileSystem
 			return false ;
 		}
 
-		traverseFiles( _directory ) ;
+		traverseFiles( _directory, _directory ) ;
 		return true ;
 	}
 
-	private void traverseFiles( final String _path )
+	private void traverseFiles( final String _path, final String _directory )
 	{
 		try
 		{
@@ -74,7 +74,7 @@ public class AndroidFileSystem implements FileSystem
 				final String dir = _path + "/" ;
 				for( final String path : list )
 				{
-					traverseFiles( dir + path ) ;
+					traverseFiles( dir + path, dir ) ;
 				}
 			}
 
@@ -85,7 +85,11 @@ public class AndroidFileSystem implements FileSystem
 				if( isZip( _path ) == true )
 				{
 					//System.out.println( "ZIP" ) ;
-					generateZipPaths( _path ) ;
+					final List<ZipPath> paths = generateZipPaths( _path ) ;
+					for( final ZipPath zip : paths )
+					{
+						mapZip.put( _directory + zip.filePath, zip ) ;
+					}
 				}
 				else
 				{
@@ -105,7 +109,7 @@ public class AndroidFileSystem implements FileSystem
 		mapAssets.put( _file, _file ) ;
 	}
 
-	private static List<ZipPath> generateZipPaths( final String _file )
+	private List<ZipPath> generateZipPaths( final String _file )
 	{
 		final File file = new File( _file ) ;
 		final String zipName = file.getName() ;
@@ -115,23 +119,17 @@ public class AndroidFileSystem implements FileSystem
 
 		try
 		{
-			final ZipFile zipFile = new ZipFile( _file ) ;
-			final Enumeration files = zipFile.entries() ;
-
+			final ZipInputStream stream = new ZipInputStream( assetManager.open( _file ) ) ;
 			ZipEntry entry = null ;
-			while( files.hasMoreElements() )
+			while( ( entry = stream.getNextEntry() ) != null )
 			{
-				entry = ( ZipEntry )files.nextElement() ;
-				if( entry != null )
+				if( entry.isDirectory() == false )
 				{
-					if( entry.isDirectory() == false )
-					{
-						paths.add( new ZipPath( zipName, zipPath, entry.getName() ) ) ;
-					}
+					paths.add( new ZipPath( zipName, zipPath, entry.getName() ) ) ;
 				}
 			}
 
-			zipFile.close() ;
+			stream.close() ;
 		}
 		catch( ZipException _ex ) {}
 		catch( IOException _ex ) {}
@@ -157,7 +155,7 @@ public class AndroidFileSystem implements FileSystem
 		{
 			try
 			{
-				return new AndroidZipFile( mapZip.get( _path ) ) ;
+				return new AndroidZipFile( mapZip.get( _path ), assetManager ) ;
 			}
 			catch( final IOException ex )
 			{

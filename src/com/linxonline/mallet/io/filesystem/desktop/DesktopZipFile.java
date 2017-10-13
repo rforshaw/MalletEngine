@@ -23,7 +23,6 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			System.out.println( "Get Byte Stream from Zip File" ) ;
 			final ByteInStream stream = new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
 			{
 				public boolean close()
@@ -208,6 +207,6 @@ public class DesktopZipFile implements FileStream
 
 	public boolean close()
 	{
-		return false ;
+		return toClose.close() ;
 	}
 }

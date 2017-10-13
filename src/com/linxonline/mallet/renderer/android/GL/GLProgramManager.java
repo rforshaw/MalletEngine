@@ -48,6 +48,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					public void callback( final JSONObject _obj )
 					{
 						generateGLProgram( _obj ) ;
+						stream.close() ;
 					}
 				} ) ;
 
@@ -181,6 +182,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					{
 						_glShaders.add( new GLShader( map.type, map.path, source.toString() ) ) ;
 						readShaders( _name, _jShaders, _glShaders, _uniforms, _swivel ) ;
+						stream.close() ;
 					}
 				}, 1 ) ;
 			}

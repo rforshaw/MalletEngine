@@ -351,7 +351,9 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		private MalletTexture.Meta createMeta( final String _path, final FileStream _file )
 		{
 			final DesktopByteIn desktopIn = ( DesktopByteIn )_file.getByteInStream() ;
-			return createMeta( _path, desktopIn.getInputStream() ) ;
+			final MalletTexture.Meta meta = createMeta( _path, desktopIn.getInputStream() ) ;
+			_file.close() ;
+			return meta ;
 		}
 
 		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
@@ -409,7 +411,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
 				final InputStream stream = in.getInputStream() ;
 				final BufferedImage image = ImageIO.read( stream ) ;
-				in.close() ;
+				file.close() ;
 
 				synchronized( toBind )
 				{

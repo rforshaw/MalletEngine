@@ -62,7 +62,7 @@ public class DesktopFileSystem implements FileSystem
 					final List<ZipPath> paths = generateZipPaths( _file ) ;
 					for( final ZipPath zip : paths )
 					{
-						mapZip.put( _directory + zip.filePath, zip ) ;
+						mapZip.put( _directory + '/' + zip.filePath, zip ) ;
 					}
 				}
 			}
