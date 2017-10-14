@@ -26,14 +26,23 @@ project( ':desktop' ) {
 	task copy(type: Copy) {
 		into '.'
 		from( 'libs' ) {
-			into 'target/libs'
+			into( 'target/libs' )
 		}
 		from( 'build/libs' )
 		{
-			into 'target/libs'
+			into( 'target/libs' )
 		}
 		from( '../resources' ) {
-			into 'target'
+			include( 'run' )
+			into( 'target' )
 		}
+	}
+}
+
+task zip(type: Zip) {
+	into '.'
+	from( '../resources/base' ) {
+		baseName( 'resources' )
+		destinationDir(file('target/base'))
 	}
 }

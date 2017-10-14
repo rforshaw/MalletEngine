@@ -1,3 +1,3 @@
 #! /bin/bash
 
-gradle clean build copy
+gradle clean build copy zip
