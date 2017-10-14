@@ -60,7 +60,7 @@ public class AndroidFileSystem implements FileSystem
 			return false ;
 		}
 
-		traverseFiles( _directory, _directory ) ;
+		traverseFiles( _directory, _directory + '/' ) ;
 		return true ;
 	}
 
@@ -88,7 +88,8 @@ public class AndroidFileSystem implements FileSystem
 					final List<ZipPath> paths = generateZipPaths( _path ) ;
 					for( final ZipPath zip : paths )
 					{
-						mapZip.put( _directory + zip.filePath, zip ) ;
+						final String id = _directory + strip( zip.filePath ) ;
+						mapZip.put( id, zip ) ;
 					}
 				}
 				else
@@ -181,6 +182,18 @@ public class AndroidFileSystem implements FileSystem
 		// Project name is not needed for Android
 		// As the Internal Storage is solely for the application.
 		return context.getFilesDir().getAbsolutePath() + '/' ;
+	}
+
+	private static String strip( final String _val )
+	{
+		final int length = _val.length() ;
+		if( length < 2 )
+		{
+			return _val ;
+		}
+
+		final boolean strip = _val.charAt( 0 ) == '.' && _val.charAt( 1 ) == '/' ;
+		return ( strip == true ) ? _val.substring( 2, length ) : _val ;
 	}
 
 	public static class ZipPath

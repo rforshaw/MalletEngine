@@ -85,6 +85,10 @@ project( ':MalletEditor' ) {
 task copy(type: Copy) {
 	into '.'
 	from( '../resources' ) {
+		include('run')
+		include('run-debug')
+		include('run-editor')
+		include('run.bat')
 		into( 'target' )
 	}
 	from( '../resources/base/shaders' ) {
@@ -92,5 +96,13 @@ task copy(type: Copy) {
 	}
 	from( '../resources/base/config.cfg' ) {
 		into( '../TemplateProject/resources/base' )
+	}
+}
+
+task zip(type: Zip) {
+	into '.'
+	from( '../resources/base' ) {
+		baseName( 'resources' )
+		destinationDir(file('target/base'))
 	}
 }
