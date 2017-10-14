@@ -165,7 +165,7 @@ public class AndroidActivity extends Activity
 	@Override
 	public String getName()
 	{
-		return "ANDROID_ACTIVITY" ;
+		return GlobalConfig.getString( "APPLICATION_NAME", "Mallet Engine" ) ;
 	}
 
 	@Override

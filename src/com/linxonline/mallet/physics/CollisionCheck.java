@@ -55,8 +55,8 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		float overlap = ( overlap1 < overlap2 ) ? overlap1 : overlap2 ;		// Get the best overlap overall
-		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;		// Set the axis based on best overlap
+		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * 0.5f : overlap2 * 0.5f ;		// Get the best overlap overall
+		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;						// Set the axis based on best overlap
 
 		if( Vector2.multiply( axis, toCenter ) > 0.0f )
 		{
@@ -64,16 +64,13 @@ public final class CollisionCheck
 			axis.y *= -1.0f ;
 		}
 
-		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
-		overlap *= 0.5f ;
-
-		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, _box1.isPhysical(), _box2 ) ;
 		if( point1 != null )
 		{
 			callback( point1, _box1.getCallback() ) ;
 		}
 
-		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, _box2.isPhysical(), _box1 ) ;
 		if( point2 != null )
 		{
 			callback( point2, _box2.getCallback() ) ;
@@ -91,13 +88,17 @@ public final class CollisionCheck
 
 		Vector2 axis = axes[0] ;
 		float bestOverlap = penetrationOnAxis( _a, _b, axes[0], _toCenter ) ;
-		_setAxis.setXY( axis.x, axis.y ) ;
+		if( bestOverlap <= 0.0f )
+		{
+			return bestOverlap ;
+		}
 
+		_setAxis.setXY( axis.x, axis.y ) ;
 		for( int i = 1; i < size; i++ )
 		{
 			axis = axes[i] ;
 			final float result = penetrationOnAxis( _a, _b, axis, _toCenter ) ;
-			if( result < 0.0f )
+			if( result <= 0.0f )
 			{
 				return result ;
 			}

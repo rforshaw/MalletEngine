@@ -94,6 +94,8 @@ public abstract class AbstractStarter implements IStarter
 		final ConfigParser parser = new ConfigParser() ;		// Extend ConfigParser to implement custom settings
 		GlobalConfig.setConfig( parser.parseSettings( ConfigReader.getConfig( GlobalHome.getFile( settings.getConfigLocation() ) ), new Settings() ) ) ;
 
+		GlobalConfig.addString( "APPLICATION_NAME", settings.getApplicationName() ) ;
+
 		final ShutdownDelegate delegate = mainSystem.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{

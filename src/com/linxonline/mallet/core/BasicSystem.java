@@ -23,7 +23,6 @@ public abstract class BasicSystem<F extends FileSystem,
 								  I extends IInputSystem,
 								  E extends IEventSystem> implements ISystem<F, S, R, A, I, E>
 {
-	protected String title = "Mallet Engine" ;
 	private final S shutdownDelegate ;
 
 	private final R renderer ;

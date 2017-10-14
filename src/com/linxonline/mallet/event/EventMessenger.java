@@ -49,14 +49,17 @@ public final class EventMessenger
 	**/
 	public final void refreshEvents()
 	{
-		final List<Event<?>> oldEvents = events ;
 		if( events.isEmpty() == false )
 		{
-			oldEvents.clear() ;
+			events.clear() ;
 		}
 
-		events = newEvents ;
-		newEvents = oldEvents ;
+		if( newEvents.isEmpty() == false )
+		{
+			final List<Event<?>> oldEvents = events ;
+			events = newEvents ;
+			newEvents = oldEvents ;
+		}
 	}
 
 	public final void clearEvents()

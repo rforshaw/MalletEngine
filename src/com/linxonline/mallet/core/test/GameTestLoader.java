@@ -432,6 +432,8 @@ public final class GameTestLoader extends GameLoader
 				ProgramAssist.map( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 				DrawAssist.attachProgram( draw, program ) ;
 
+				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+
 				final RenderComponent render =  entity.addComponent( new RenderComponent() ) ;
 				render.addBasicDraw( draw ) ;
 

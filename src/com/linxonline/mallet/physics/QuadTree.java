@@ -108,9 +108,13 @@ public class QuadTree
 		*/
 		public boolean insertHull( final Hull _hull )
 		{
-			// A parent node should not contain 
-			// any hulls, only children should.
-			if( parent == false && nextHull < hulls.length )
+			if( parent == true )
+			{
+				// A parent node should not contain 
+				// any hulls, only children should.
+				return insertToQuadrant( _hull ) ;
+			}
+			else if( nextHull < hulls.length )
 			{
 				// We assume the check to see if the 
 				// hull already exists within this node has 
@@ -118,7 +122,7 @@ public class QuadTree
 				hulls[nextHull++] = _hull ;
 				return true ;
 			}
-			else if( parent == false )
+			else
 			{
 				// We assume the check to see if the 
 				// hull already exists within this node has 
@@ -126,7 +130,6 @@ public class QuadTree
 
 				// If the node has reached MAX_HULLS
 				// then it needs to be divided.
-				// Move the existing hulls to its children.
 				if( createChildren() == false )
 				{
 					// It will reach a point in which dividing the 
@@ -140,14 +143,13 @@ public class QuadTree
 				nextHull = 0 ;
 				for( int i = 0; i < hulls.length; i++ )
 				{
+					// Move the existing hulls to its children.
 					insertToQuadrant( hulls[i] ) ;
 					hulls[i] = null ;
 				}
-			}
 
-			// Should only reach here if parent 
-			// is set to true
-			return insertToQuadrant( _hull ) ;
+				return true ;
+			}
 		}
 
 		/**
@@ -172,12 +174,16 @@ public class QuadTree
 				return ;
 			}
 
+			removeHull( getIndex( _hull ) ) ;
+		}
+
+		private void removeHull( final int _index )
+		{
 			// Shift the hulls to the left by 1
 			// effectively removing the hull 
-			final int index = getIndex( _hull ) ;
-			if( index >= 0 )
+			if( _index >= 0 )
 			{
-				for( int i = index + 1; i < nextHull; i++ )
+				for( int i = _index + 1; i < nextHull; i++ )
 				{
 					hulls[i - 1] = hulls[i] ;
 				}
@@ -240,24 +246,20 @@ public class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
-			Hull hull1 = null ;
-			Hull hull2 = null ;
-
 			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + size ) ;
-
 			while( nextHull > 0 )
 			{
-				hull1 = hulls[0] ;
+				final Hull hull1 = hulls[0] ;
 				if( hull1.isCollidable() == false )
 				{
-					removeHull( hull1 ) ;
+					removeHull( 0 ) ;
 					continue ;
 				}
 
 				final int size = nextHull ;
 				for( int j = 1; j < size; j++ )
 				{
-					hull2 = hulls[j] ;
+					final Hull hull2 = hulls[j] ;
 					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 					{
 						++checksMade ;
@@ -269,7 +271,7 @@ public class QuadTree
 				// hulls, and generated the needed collision points.
 				// No more can be done, leaving it in will only 
 				// consume valuable resources. 
-				removeHull( hull1 ) ;
+				removeHull( 0 ) ;
 			}
 		}
 

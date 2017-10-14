@@ -932,6 +932,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			return false ;
 		}
 
+		canvas.setExclusiveContextThread( null ) ;
 		context.makeCurrent() ;
 		return true ;
 	}

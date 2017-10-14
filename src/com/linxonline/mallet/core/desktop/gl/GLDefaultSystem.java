@@ -52,7 +52,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		getAudioGenerator().startGenerator() ;
 
 		final InputSystem input = getInput() ;
-		render.getCanvas().setTitle( title ) ;
+		render.getCanvas().setTitle( GlobalConfig.getString( "APPLICATION_NAME", "Mallet Engine" ) ) ;
 		render.getCanvas().addMouseListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;
 
