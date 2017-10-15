@@ -13,7 +13,7 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 
 	public DefaultMTUpdate()
 	{
-		this( 2 ) ;
+		this( 4 ) ;
 	}
 
 	public DefaultMTUpdate( final int _threads )
@@ -43,6 +43,7 @@ public class DefaultMTUpdate extends DefaultSTUpdate
 		@Override
 		public ExecType exec( final int _index, final Entity _entity )
 		{
+			//System.out.println( "Updating: " + _entity.id ) ;
 			_entity.update( deltaTime ) ;
 			if( _entity.isDead() == true )
 			{

@@ -45,6 +45,12 @@ public class WorkerGroup
 	{
 		//System.out.println( "Exec Worker Group" ) ;
 		final List<?> dataset = _worker.getDataSet() ;
+		if( dataset.isEmpty() == true )
+		{
+			// If there is no data to process then we 
+			// might as well return early.
+			return ;
+		}
 
 		int threadLength = availableWorkers.size() ;
 		final int dataSize = dataset.size() ;
@@ -74,7 +80,8 @@ public class WorkerGroup
 		}
 
 		//System.out.println( "Lock Group" ) ;
-		lock.lock( condition ) ;		 // Only continue once all EntityThreads have finished
+		// Only continue once all WorkerThreads have finished
+		lock.lock( condition ) ;
 
 		relinquishWorkers() ;
 	}

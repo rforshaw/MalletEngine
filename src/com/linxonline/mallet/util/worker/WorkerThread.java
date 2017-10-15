@@ -18,7 +18,10 @@ public class WorkerThread extends Thread
 	private int start = 0 ;								// Start of data subset
 	private int end = 0 ;								// End of data subset
 
-	public WorkerThread() {}
+	public WorkerThread()
+	{
+		super( "WorkerThread" ) ;
+	}
 
 	public void setWorkerCondition( final ILock _lock, final WorkerGroup.WorkerCondition _condition )
 	{
@@ -53,12 +56,14 @@ public class WorkerThread extends Thread
 		{
 			if( worker != null )
 			{
+				// Execute the work specified by the developer
+				//System.out.println( "Exec Worker: " + start + " to: " + end ) ;
 				type = worker.exec( start, end ) ;
 			}
 
 			if( groupLock != null && groupCondition != null )
 			{
-				// Inform calling thread you've finished
+				// Inform calling WorkerGroup/thread you've finished
 				// Multilock will only be set if calling thread 
 				// is expected to wait for the work to be completed.
 				groupCondition.unregister() ;
