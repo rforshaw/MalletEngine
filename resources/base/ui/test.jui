@@ -17,7 +17,10 @@
 					},
 					"UIEDGE" : {
 						"TEXTURE" : "base/textures/edge_button.png",
-						"EDGE" : 10.0
+						"EDGE" : 10.0,
+						"COLOUR_NEUTRAL" : "255, 255, 255",
+						"COLOUR_ROLLOVER" : "0, 255, 0",
+						"COLOUR_CLICKED" : "0, 0, 255"
 					}
 				},
 				{
@@ -73,8 +76,8 @@
 					"MAX" : "0.5, 1.0"
 				},
 				"CLICKED_UV" : {
-					"MIN" : "0.5, 0.0",
-					"MAX" : "1.0, 0.5"
+					"MIN" : "0.0, 0.5",
+					"MAX" : "0.5, 1.0"
 				}
 			}
 		}

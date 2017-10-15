@@ -371,7 +371,9 @@ public final class UIFactory
 		@Override
 		public InputEvent.Action touchReleased( final InputEvent _input )
 		{
-			return mouseReleased( _input ) ;
+			final InputEvent.Action action = mouseReleased( _input ) ;
+			setColour( neutral ) ;
+			return action ;
 		}
 
 		@Override

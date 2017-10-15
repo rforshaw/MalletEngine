@@ -47,7 +47,28 @@ public class UICheckbox extends UIElement
 					   final ABase<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
+		init() ;
 		addListener( _listener ) ;
+	}
+
+	private void init()
+	{
+		addListener( new InputListener<UICheckbox>()
+		{
+			@Override
+			public InputEvent.Action touchReleased( final InputEvent _input )
+			{
+				return mouseReleased( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action mouseReleased( final InputEvent _input )
+			{
+				final UICheckbox parent = getParent() ;
+				parent.setChecked( !parent.isChecked() ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -72,8 +93,8 @@ public class UICheckbox extends UIElement
 		if( checked != _checked )
 		{
 			checked = _checked ;
-			makeDirty() ;
 			UIElement.signal( this, checkChanged() ) ;
+			makeDirty() ;
 		}
 	}
 
@@ -94,6 +115,7 @@ public class UICheckbox extends UIElement
 		public GUITick( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
 			super( _sheet, _uv ) ;
+			setLayerOffset( 1 ) ;
 		}
 
 		@Override
@@ -110,8 +132,7 @@ public class UICheckbox extends UIElement
 		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			final UICheckbox parent = getParent() ;
-			if( parent.isChecked() )
+			if( checked == true )
 			{
 				super.addDraws( _delegate, _world ) ;
 			}
@@ -120,7 +141,6 @@ public class UICheckbox extends UIElement
 		@Override
 		public void refresh()
 		{
-			super.refresh() ;
 			final UICheckbox parent = getParent() ;
 			if( checked != parent.isChecked() )
 			{
@@ -128,8 +148,9 @@ public class UICheckbox extends UIElement
 				final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
 				if( delegate != null )
 				{
-					if( parent.isChecked() == true )
+					if( checked == true )
 					{
+						super.refresh() ;
 						DrawAssist.forceUpdate( getDraw() ) ;
 						delegate.addBasicDraw( getDraw(), getWorld() ) ;
 					}
@@ -139,25 +160,6 @@ public class UICheckbox extends UIElement
 					}
 				}
 			}
-		}
-
-		@Override
-		public InputEvent.Action mouseReleased( final InputEvent _input )
-		{
-			final UICheckbox parent = getParent() ;
-			if( parent.isEngaged() == true )
-			{
-				parent.setChecked( !parent.isChecked() ) ;
-				parent.makeDirty() ;
-			}
-
-			return InputEvent.Action.PROPAGATE ;
-		}
-
-		@Override
-		public InputEvent.Action touchReleased( final InputEvent _input )
-		{
-			return mouseReleased( _input ) ;
 		}
 	}
 }

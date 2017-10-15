@@ -64,13 +64,20 @@ public final class CollisionCheck
 			axis.y *= -1.0f ;
 		}
 
-		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, _box1.isPhysical(), _box2 ) ;
+		// If one of the hulls is not physical then it will not 
+		// force the two hulls to push apart from each other.
+		// If it did then hulls used for triggers could be 
+		// 'pushed' away - or prevent the other hull from passing 
+		// through it.
+		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
+
+		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
 		if( point1 != null )
 		{
 			callback( point1, _box1.getCallback() ) ;
 		}
 
-		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, _box2.isPhysical(), _box1 ) ;
+		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
 		if( point2 != null )
 		{
 			callback( point2, _box2.getCallback() ) ;

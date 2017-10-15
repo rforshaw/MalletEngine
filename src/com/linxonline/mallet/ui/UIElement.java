@@ -113,11 +113,7 @@ public class UIElement implements InputHandler
 	*/
 	public <T extends IBase> T addListener( final T _listener )
 	{
-		if( listeners.add( _listener ) == true )
-		{
-			_listener.setParent( this ) ;
-		}
-		return _listener ;
+		return addListener( 0, _listener ) ;
 	}
 
 	/**
@@ -130,9 +126,12 @@ public class UIElement implements InputHandler
 	*/
 	public <T extends IBase> T addListener( final int _index, final T _listener )
 	{
-		if( listeners.add( _index, _listener ) == true )
+		if( _listener != null )
 		{
-			_listener.setParent( this ) ;
+			if( listeners.add( _index, _listener ) == true )
+			{
+				_listener.setParent( this ) ;
+			}
 		}
 		return _listener ;
 	}

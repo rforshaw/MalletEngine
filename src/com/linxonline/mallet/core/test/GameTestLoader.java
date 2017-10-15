@@ -69,83 +69,21 @@ public final class GameTestLoader extends GameLoader
 				final UIButton button2 = jUI.get( "TestButton2", UIButton.class ) ;
 				final UICheckbox checkbox = jUI.get( "TestCheckbox", UICheckbox.class ) ;
 
-				button1.addListener( new InputListener<UIButton>()
+				UIElement.connect( button1, button1.released(), new Connect.Slot<UIButton>()
 				{
 					@Override
-					public InputEvent.Action touchReleased( final InputEvent _input )
+					public void slot( final UIButton _box )
 					{
-						return mouseReleased( _input ) ;
-					}
-
-					@Override
-					public InputEvent.Action mousePressed( final InputEvent _input )
-					{
-						System.out.println( "Test Button 1 - pressed" ) ;
-						return InputEvent.Action.PROPAGATE ;
-					}
-
-					@Override
-					public InputEvent.Action mouseReleased( final InputEvent _input )
-					{
-						System.out.println( "Test Button 1 - released" ) ;
 						button2.setVisible( !button2.isVisible() ) ;
-						return InputEvent.Action.PROPAGATE ;
 					}
 				} ) ;
 
-				button2.addListener( new InputListener<UIButton>()
+				UIElement.connect( button2, button2.released(), new Connect.Slot<UIButton>()
 				{
 					@Override
-					public InputEvent.Action touchReleased( final InputEvent _input )
-					{
-						return mouseReleased( _input ) ;
-					}
-
-					@Override
-					public InputEvent.Action mousePressed( final InputEvent _input )
-					{
-						System.out.println( "Test Button 2 - pressed" ) ;
-						return InputEvent.Action.PROPAGATE ;
-					}
-				
-					@Override
-					public InputEvent.Action mouseReleased( final InputEvent _input )
-					{
-						System.out.println( "Test Button 2 - released" ) ;
-						button1.setVisible( !button1.isVisible() ) ;
-						return InputEvent.Action.PROPAGATE ;
-					}
-				} ) ;
-
-				checkbox.addListener( new InputListener<UICheckbox>()
-				{
-					@Override
-					public InputEvent.Action touchReleased( final InputEvent _input )
-					{
-						return mouseReleased( _input ) ;
-					}
-
-					@Override
-					public InputEvent.Action mousePressed( final InputEvent _input )
-					{
-						return InputEvent.Action.PROPAGATE ;
-					}
-				
-					@Override
-					public InputEvent.Action mouseReleased( final InputEvent _input )
+					public void slot( final UIButton _box )
 					{
 						button1.setVisible( !button1.isVisible() ) ;
-						button2.setVisible( !button2.isVisible() ) ;
-						return InputEvent.Action.PROPAGATE ;
-					}
-				} ) ;
-
-				UIElement.connect( checkbox, checkbox.positionChanged(), new Connect.Slot<UICheckbox>()
-				{
-					@Override
-					public void slot( final UICheckbox _box )
-					{
-						System.out.println( "Checkbox Position: " + _box.getPosition() ) ;
 					}
 				} ) ;
 
@@ -154,7 +92,8 @@ public final class GameTestLoader extends GameLoader
 					@Override
 					public void slot( final UICheckbox _box )
 					{
-						System.out.println( "Checkbox: " + _box.isChecked() ) ;
+						button1.setVisible( !button1.isVisible() ) ;
+						button2.setVisible( !button2.isVisible() ) ;
 					}
 				} ) ;
 
@@ -410,8 +349,8 @@ public final class GameTestLoader extends GameLoader
 			**/
 			public void createEntityExample( final int _i, final int _j )
 			{
-				final int x = 50 + ( _i * 70 ) ;
-				final int y = 50 + ( _j * 70 ) ;
+				final int x = 50 + ( _i * 50 ) ;
+				final int y = 50 + ( _j * 50 ) ;
 
 				final Entity entity = new Entity( "IMAGE" ) ;
 				entity.position = new Vector3( x, y, 0 ) ;

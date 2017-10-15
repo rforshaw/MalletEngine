@@ -34,6 +34,9 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIButton extends UIElement
 {
+	private final Connect.Signal pressed = new Connect.Signal() ;
+	private final Connect.Signal released = new Connect.Signal() ;
+
 	/**
 		If the UIButton is being added to a UILayout
 		then you don't have to define the position, 
@@ -68,7 +71,42 @@ public class UIButton extends UIElement
 					 final ABase<UIButton> _listener )
 	{
 		super( _position, _offset, _length ) ;
+		init() ;
 		addListener( _listener ) ;
+	}
+
+	private void init()
+	{
+		addListener( new InputListener<UIButton>()
+		{
+			@Override
+			public InputEvent.Action touchReleased( final InputEvent _input )
+			{
+				return mouseReleased( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action touchPressed( final InputEvent _input )
+			{
+				return mousePressed( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action mouseReleased( final InputEvent _input )
+			{
+				final UIButton parent = getParent() ;
+				UIElement.signal( parent, parent.released() ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+
+			@Override
+			public InputEvent.Action mousePressed( final InputEvent _input )
+			{
+				final UIButton parent = getParent() ;
+				UIElement.signal( parent, parent.pressed() ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -86,5 +124,15 @@ public class UIButton extends UIElement
 		}
 
 		return InputEvent.Action.PROPAGATE ;
+	}
+
+	public Connect.Signal pressed()
+	{
+		return pressed ;
+	}
+
+	public Connect.Signal released()
+	{
+		return released ;
 	}
 }
