@@ -15,7 +15,7 @@ import com.linxonline.mallet.maths.* ;
 /**
 	Core class of the UI Framework.
 
-	Current supports child elements in vertical or horizontal 
+	Supports child elements in vertical or horizontal 
 	layouts - children will be populated to fill out as much 
 	space as possible.
 
@@ -25,6 +25,12 @@ import com.linxonline.mallet.maths.* ;
 
 	UILayout will update its minimum length to 
 	represent the total minimum length of all of its children.
+
+	Supports child elements in Grid layouts - children will 
+	be set to the dimensions of the first element with a valid 
+	minimum or maximum length. Elements will be displayed 
+	left to right, once there is no more width it will drop 
+	down to the next row.
 */
 public class UILayout extends UIElement
 {
@@ -239,6 +245,13 @@ public class UILayout extends UIElement
 		}
 	}
 
+	/**
+		Set the layer that the visual elements are 
+		expected to be placed on.
+		
+		This also applies to the layouts children.
+		Causes the elements to be flagged as dirty.
+	*/
 	@Override
 	public void setLayer( final int _layer )
 	{
@@ -250,6 +263,12 @@ public class UILayout extends UIElement
 		}
 	}
 
+	/**
+		Set the element to be vissible  or not.
+		Also applies to all child elements.
+
+		Causes the elements to be flagged as dirty.
+	*/
 	@Override
 	public void setVisible( final boolean _visibility )
 	{
@@ -261,8 +280,16 @@ public class UILayout extends UIElement
 		}
 	}
 
+	/**
+		Refreshing a UILayout will most likely 
+		result in all child elements requiring to be 
+		refreshed.
+
+		Flag the child elements as dirty and during 
+		the next update cycle they will be refreshed.
+	*/
 	@Override
-	public void refresh()
+	protected void refresh()
 	{
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
@@ -272,6 +299,14 @@ public class UILayout extends UIElement
 		super.refresh() ;
 	}
 
+	/**
+		Check to see if the InputEvent intersects with 
+		either the UILayout or one of its children.
+
+		We check the children as there is a chance that 
+		the child is beyond the UILayout boundaries, for 
+		example a dropdown menu.
+	*/
 	@Override
 	public boolean isIntersectInput( final InputEvent _event )
 	{
@@ -299,6 +334,9 @@ public class UILayout extends UIElement
 	/**
 		Cleanup any resources, handlers that the listeners 
 		may have acquired.
+
+		Will also call shutdown on all children. Call clear 
+		if you wish to also remove all children from layout.
 	*/
 	@Override
 	public void shutdown()
@@ -308,9 +346,15 @@ public class UILayout extends UIElement
 		{
 			element.shutdown() ;
 		}
-		ordered.clear() ;
 	}
 
+	/**
+		Clear out each of the systems.
+		Remove all slots connected to signals.
+		Remove all listeners - note call shutdown if they have 
+		any resources attached.
+		Remove any events that may be in the event stream.
+	*/
 	@Override
 	public void clear()
 	{
@@ -322,6 +366,12 @@ public class UILayout extends UIElement
 		ordered.clear() ;
 	}
 
+	/**
+		Reset the UILayout as if it has just been constructed.
+		This does not remove listeners, connections or children.
+
+		Call reset on all children.
+	*/
 	@Override
 	public void reset()
 	{

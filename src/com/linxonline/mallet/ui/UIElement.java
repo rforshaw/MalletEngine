@@ -3,6 +3,7 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
@@ -356,7 +357,7 @@ public class UIElement implements InputHandler
 	}
 
 	/**
-		Inform the UIElement that is should update its 
+		Inform the UIElement that it should update its 
 		visual elements.
 	*/
 	public void makeDirty()
@@ -364,20 +365,27 @@ public class UIElement implements InputHandler
 		dirty = true ;
 	}
 
+	/**
+		Set the element to be visible or not.
+
+		Causes element to be flagged as dirty.
+	*/
 	public void setVisible( final boolean _visibility )
 	{
 		if( visible != _visibility )
 		{
 			visible = _visibility ;
-			makeDirty() ;
 
 			final Connect.Signal signal = ( visible == true ) ? elementShown() : elementHidden() ;
 			UIElement.signal( this, signal ) ;
+			makeDirty() ;
 		}
 	}
 
 	/**
 		Enable the UIElement allow it to accept input.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void enable()
 	{
@@ -394,6 +402,8 @@ public class UIElement implements InputHandler
 		It should not acknowledge any user modifications.
 		A UIElement that is visible is still affected by 
 		layout adjustments.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void disable()
 	{
@@ -411,13 +421,15 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		if( UI.applyVec3( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
-			makeDirty() ;
 			UIElement.signal( this, positionChanged() ) ;
+			makeDirty() ;
 		}
 	}
 
@@ -426,13 +438,15 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		if( UI.applyVec3( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
-			makeDirty() ;
 			UIElement.signal( this, offsetChanged() ) ;
+			makeDirty() ;
 		}
 	}
 
@@ -441,6 +455,9 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty if the length requires to 
+		be changed to be above new minimum range.
 	*/
 	public void setMinimumLength( final float _x, final float _y, final float _z )
 	{
@@ -459,6 +476,9 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty if the length requires to 
+		be changed to be within new maximum range.
 	*/
 	public void setMaximumLength( final float _x, final float _y, final float _z )
 	{
@@ -477,6 +497,8 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void setLength( float _x, float _y, float _z )
 	{
@@ -516,30 +538,41 @@ public class UIElement implements InputHandler
 		Values are expected to be the unit type defined by UIRatio.
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
 		if( UI.applyVec3( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
-			makeDirty() ;
 			UIElement.signal( this, marginChanged() ) ;
+			makeDirty() ;
 		}
 	}
 
 	/**
 		Set the layer that visual elements are expected to 
-		be placed on. 
+		be placed on.
+
+		Causes element to be flagged as dirty.
 	*/
 	public void setLayer( final int _layer )
 	{
 		if( layer != _layer )
 		{
 			layer = _layer ;
-			makeDirty() ;
 			UIElement.signal( this, layerChanged() ) ;
+			makeDirty() ;
 		}
 	}
 
+	/**
+		Returns true if the elements considers itself 
+		requiring a need to be refreshed.
+
+		You can dirty an element by calling makeDirty() 
+		or calling a function that makes the element dirty.
+	*/
 	public boolean isDirty()
 	{
 		return dirty ;
@@ -864,11 +897,21 @@ public class UIElement implements InputHandler
 		return elementDisengaged ;
 	}
 
+	/**
+		Called when the element is considered usable 
+		by the user.
+		An element that is enabled can be engaged.
+	*/
 	public Connect.Signal elementEnabled()
 	{
 		return elementEnabled ;
 	}
 
+	/**
+		Called when the element is considered not 
+		usable by the user.
+		An element that is disabled cannot be engaged.
+	*/
 	public Connect.Signal elementDisabled()
 	{
 		return elementDisabled ;
@@ -881,10 +924,11 @@ public class UIElement implements InputHandler
 
 		Signals or Variables can not be immutable - for example String.
 	*/
-	public static <T extends UIElement> boolean connect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
+	public static <T extends UIElement> Connect.Slot<T> connect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
 	{
 		final Connect connect = _element.getConnect() ;
-		return connect.connect( _element, _signal, _slot ) ;
+		connect.connect( _element, _signal, _slot ) ;
+		return _slot ;
 	}
 
 	/**

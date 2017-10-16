@@ -89,6 +89,30 @@ public class UIMenu extends UILayout
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 length = new Vector3() ;
 
+		private final Connect.Slot<Item> engagedSlot = new Connect.Slot<Item>()
+		{
+			@Override
+			public void slot( final Item _item )
+			{
+				_item.getPosition( position ) ;
+				_item.getLength( length ) ;
+
+				//dropdown.setLayer( parent.getLayer() + 1 ) ;
+				dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+				dropdown.engage() ;
+			}
+		} ;
+
+		private final Connect.Slot<Item> disengagedSlot = new Connect.Slot<Item>()
+		{
+			@Override
+			public void slot( final Item _item )
+			{
+				dropdown.disengage() ;
+				dropdown.setVisible( false ) ;
+			}
+		} ;
+
 		public DropDownListener( final UIElement _toDrop )
 		{
 			dropdown = _toDrop ;
@@ -98,29 +122,8 @@ public class UIMenu extends UILayout
 		@Override
 		public void setParent( Item _parent )
 		{
-			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<Item>()
-			{
-				@Override
-				public void slot( final Item _item )
-				{
-					_item.getPosition( position ) ;
-					_item.getLength( length ) ;
-
-					//dropdown.setLayer( parent.getLayer() + 1 ) ;
-					dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
-					dropdown.engage() ;
-				}
-			} ) ;
-
-			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<Item>()
-			{
-				@Override
-				public void slot( final Item _item )
-				{
-					dropdown.disengage() ;
-					dropdown.setVisible( false ) ;
-				}
-			} ) ;
+			UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
 
 			super.setParent( _parent ) ;
 		}
@@ -187,6 +190,10 @@ public class UIMenu extends UILayout
 		{
 			super.shutdown() ;
 			dropdown.shutdown() ;
+
+			final Item parent = getParent() ;
+			UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
+			UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 		}
 	}
 }

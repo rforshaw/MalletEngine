@@ -100,20 +100,30 @@ public class UIList extends UILayout
 			private int timeDiff = 0 ;
 			private boolean pressed = false ;
 
+			private final Connect.Slot<UIList> disengagedSlot = new Connect.Slot<UIList>()
+			{
+				@Override
+				public void slot( final UIList _layout )
+				{
+					pressed = false ;
+				}
+			} ;
+
 			@Override
 			public void setParent( UIList _parent )
 			{
-				UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UIList>()
-				{
-					@Override
-					public void slot( final UIList _layout )
-					{
-						pressed = false ;
-					}
-				} ) ;
+				UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
 				super.setParent( _parent ) ;
 			}
 			
+			@Override
+			public void shutdown()
+			{
+				super.shutdown() ;
+				final UIList parent = getParent() ;
+				UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
+			}
+
 			@Override
 			public InputEvent.Action scroll( final InputEvent _input )
 			{

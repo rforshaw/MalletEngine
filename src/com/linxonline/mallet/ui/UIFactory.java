@@ -346,6 +346,26 @@ public final class UIFactory
 		private final MalletColour rollover ;
 		private final MalletColour clicked ;
 
+		private final Connect.Slot<T> engagedSlot = new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _layout )
+			{
+				setColour( rollover ) ;
+				DrawAssist.forceUpdate( getDraw() ) ;
+			}
+		} ;
+
+		Connect.Slot<T> disengagedSlot = new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _layout )
+			{
+				setColour( neutral ) ;
+				DrawAssist.forceUpdate( getDraw() ) ;
+			}
+		} ;
+		
 		public GUIPanelEdge( final MalletTexture _sheet,
 							 final float _edge,
 							 final MalletColour _neutral,
@@ -363,27 +383,19 @@ public final class UIFactory
 		@Override
 		public void setParent( T _parent )
 		{
-			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<T>()
-			{
-				@Override
-				public void slot( final T _layout )
-				{
-					setColour( rollover ) ;
-					DrawAssist.forceUpdate( getDraw() ) ;
-				}
-			} ) ;
-
-			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<T>()
-			{
-				@Override
-				public void slot( final T _layout )
-				{
-					setColour( neutral ) ;
-					DrawAssist.forceUpdate( getDraw() ) ;
-				}
-			} ) ;
+			UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
 
 			super.setParent( _parent ) ;
+		}
+
+		@Override
+		public void shutdown()
+		{
+			super.shutdown() ;
+			final T parent = getParent() ;
+			UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
+			UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 		}
 
 		@Override
@@ -512,6 +524,26 @@ public final class UIFactory
 		private final UIElement.UV rollover ;
 		private final UIElement.UV clicked ;
 
+		private final Connect.Slot<T> engagedSlot = new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _layout )
+			{
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+				DrawAssist.forceUpdate( getDraw() ) ;
+			}
+		} ;
+
+		private final Connect.Slot<T> disengagedSlot = new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _layout )
+			{
+				Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
+				DrawAssist.forceUpdate( getDraw() ) ;
+			}
+		} ;
+
 		public GUIPanelDraw( final MalletTexture _sheet,
 							 final UIElement.UV _neutral,
 							 final UIElement.UV _rollover,
@@ -527,25 +559,17 @@ public final class UIFactory
 		public void setParent( T _parent )
 		{
 			super.setParent( _parent ) ;
-			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<T>()
-			{
-				@Override
-				public void slot( final T _layout )
-				{
-					Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
-					DrawAssist.forceUpdate( getDraw() ) ;
-				}
-			} ) ;
+			UIElement.connect( _parent, _parent.elementEngaged(),    engagedSlot ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
+		}
 
-			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<T>()
-			{
-				@Override
-				public void slot( final T _layout )
-				{
-					Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
-					DrawAssist.forceUpdate( getDraw() ) ;
-				}
-			} ) ;
+		@Override
+		public void shutdown()
+		{
+			super.shutdown() ;
+			final T parent = getParent() ;
+			UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
+			UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 		}
 
 		@Override
