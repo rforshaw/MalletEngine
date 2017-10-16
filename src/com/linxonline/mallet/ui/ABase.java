@@ -145,20 +145,6 @@ public abstract class ABase<T extends UIElement> implements IBase<T>
 	}
 
 	/**
-		Called when the parent UIElement is engaged.
-		This can occur at any time.
-	*/
-	@Override
-	public void engage() {}
-
-	/**
-		Called when the parent UIElement is no-longer engaged.
-		This can occur at any time.
-	*/
-	@Override
-	public void disengage() {}
-
-	/**
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
 	*/

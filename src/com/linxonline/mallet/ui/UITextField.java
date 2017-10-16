@@ -132,6 +132,22 @@ public class UITextField extends UIElement
 		}
 
 		@Override
+		public void setParent( UITextField _parent )
+		{
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UITextField>()
+			{
+				@Override
+				public void slot( final UITextField _textfield )
+				{
+					editing = false ;
+					_textfield.makeDirty() ;
+				}
+			} ) ;
+
+			super.setParent( _parent ) ;
+		}
+
+		@Override
 		public void constructDraws()
 		{
 			super.constructDraws() ;
@@ -441,13 +457,6 @@ public class UITextField extends UIElement
 
 			getParent().makeDirty() ;
 			return InputEvent.Action.PROPAGATE ;
-		}
-
-		@Override
-		public void disengage()
-		{
-			editing = false ;
-			getParent().makeDirty() ;
 		}
 	}
 }

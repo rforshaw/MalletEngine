@@ -96,22 +96,33 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
-		public void engage()
+		public void setParent( Item _parent )
 		{
-			final UIElement parent = getParent() ;
-			parent.getPosition( position ) ;
-			parent.getLength( length ) ;
+			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<Item>()
+			{
+				@Override
+				public void slot( final Item _item )
+				{
+					_item.getPosition( position ) ;
+					_item.getLength( length ) ;
 
-			//dropdown.setLayer( parent.getLayer() + 1 ) ;
-			dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
-			dropdown.engage() ;
-		}
+					//dropdown.setLayer( parent.getLayer() + 1 ) ;
+					dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+					dropdown.engage() ;
+				}
+			} ) ;
 
-		@Override
-		public void disengage()
-		{
-			dropdown.disengage() ;
-			dropdown.setVisible( false ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<Item>()
+			{
+				@Override
+				public void slot( final Item _item )
+				{
+					dropdown.disengage() ;
+					dropdown.setVisible( false ) ;
+				}
+			} ) ;
+
+			super.setParent( _parent ) ;
 		}
 
 		@Override

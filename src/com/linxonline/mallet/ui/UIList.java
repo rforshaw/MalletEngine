@@ -101,12 +101,26 @@ public class UIList extends UILayout
 			private boolean pressed = false ;
 
 			@Override
+			public void setParent( UIList _parent )
+			{
+				UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UIList>()
+				{
+					@Override
+					public void slot( final UIList _layout )
+					{
+						pressed = false ;
+					}
+				} ) ;
+				super.setParent( _parent ) ;
+			}
+			
+			@Override
 			public InputEvent.Action scroll( final InputEvent _input )
 			{
 				final EngageListener mode = getParent().getEngageMode() ;
 				if( mode.isEngaged() == true )
 				{
-					applyScroll( -_input.getMouseX(), -_input.getMouseY() ) ;
+					applyScroll( -_input.getMouseX() * 10, -_input.getMouseY() * 10 ) ;
 					return InputEvent.Action.CONSUME ;
 				}
 				return InputEvent.Action.PROPAGATE ;
@@ -143,7 +157,8 @@ public class UIList extends UILayout
 			{
 				pressed = true ;
 				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return applyScroll( 0.0f, 0.0f ) ;
+				applyScroll( 0.0f, 0.0f ) ;
+				return InputEvent.Action.PROPAGATE ;
 			}
 
 			@Override
@@ -191,12 +206,6 @@ public class UIList extends UILayout
 				getParent().makeDirty() ;
 
 				return action ;
-			}
-
-			@Override
-			public void disengage()
-			{
-				pressed = false ;
 			}
 		} ) ;
 	}

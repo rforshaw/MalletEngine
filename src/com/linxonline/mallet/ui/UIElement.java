@@ -48,15 +48,19 @@ public class UIElement implements InputHandler
 	private final Vector3 length ;						// In pixels
 	private final Vector3 margin ;						// In pixels
 
-	private final Connect.Signal positionChanged  = new Connect.Signal() ;
-	private final Connect.Signal offsetChanged    = new Connect.Signal() ;
-	private final Connect.Signal lengthChanged    = new Connect.Signal() ;
-	private final Connect.Signal marginChanged    = new Connect.Signal() ;
-	private final Connect.Signal elementDestroyed = new Connect.Signal() ;
-	private final Connect.Signal elementShown     = new Connect.Signal() ;
-	private final Connect.Signal elementHidden    = new Connect.Signal() ;
-	private final Connect.Signal layerChanged     = new Connect.Signal() ;
-	
+	private final Connect.Signal positionChanged   = new Connect.Signal() ;
+	private final Connect.Signal offsetChanged     = new Connect.Signal() ;
+	private final Connect.Signal lengthChanged     = new Connect.Signal() ;
+	private final Connect.Signal marginChanged     = new Connect.Signal() ;
+	private final Connect.Signal elementDestroyed  = new Connect.Signal() ;
+	private final Connect.Signal elementShown      = new Connect.Signal() ;
+	private final Connect.Signal elementHidden     = new Connect.Signal() ;
+	private final Connect.Signal layerChanged      = new Connect.Signal() ;
+	private final Connect.Signal elementEngaged    = new Connect.Signal() ;
+	private final Connect.Signal elementDisengaged = new Connect.Signal() ;
+	private final Connect.Signal elementEnabled    = new Connect.Signal() ;
+	private final Connect.Signal elementDisabled   = new Connect.Signal() ;
+
 	public enum State
 	{
 		NEUTRAL,		// Element does not have focus
@@ -143,12 +147,7 @@ public class UIElement implements InputHandler
 	*/
 	public <T extends IBase<? extends UIElement>> boolean removeListener( final T _listener )
 	{
-		if( listeners.remove( _listener ) == true )
-		{
-			_listener.setParent( null ) ;
-			return true ;
-		}
-		return false ;
+		return listeners.remove( _listener ) ;
 	}
 
 	/**
@@ -172,12 +171,7 @@ public class UIElement implements InputHandler
 		if( current != State.ENGAGED && isDisabled() == false )
 		{
 			current = State.ENGAGED ;
-			final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
-			final int size = base.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				base.get( i ).engage() ;
-			}
+			UIElement.signal( this, elementEngaged() ) ;
 		}
 	}
 
@@ -189,12 +183,7 @@ public class UIElement implements InputHandler
 		if( current != State.NEUTRAL )
 		{
 			current = State.NEUTRAL ;
-			final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
-			final int size = base.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				base.get( i ).disengage() ;
-			}
+			UIElement.signal( this, elementDisengaged() ) ;
 		}
 	}
 
@@ -242,7 +231,7 @@ public class UIElement implements InputHandler
 		of the UIElement. Refresh is called when isDirty() 
 		returns true.
 	*/
-	public void refresh()
+	protected void refresh()
 	{
 		listeners.refresh() ;
 	}
@@ -395,6 +384,7 @@ public class UIElement implements InputHandler
 		if( disabled == true )
 		{
 			disabled = false ;
+			UIElement.signal( this, elementEnabled() ) ;
 			makeDirty() ;
 		}
 	}
@@ -411,6 +401,7 @@ public class UIElement implements InputHandler
 		{
 			disabled = true ;
 			disengage() ;
+			UIElement.signal( this, elementDisabled() ) ;
 			makeDirty() ;
 		}
 	}
@@ -535,6 +526,10 @@ public class UIElement implements InputHandler
 		}
 	}
 
+	/**
+		Set the layer that visual elements are expected to 
+		be placed on. 
+	*/
 	public void setLayer( final int _layer )
 	{
 		if( layer != _layer )
@@ -726,27 +721,31 @@ public class UIElement implements InputHandler
 	}
 
 	/**
-		Inform the UIElement it needs to release any 
-		resources or handlers it may have acquired.
+		Inform the UIElement and Listeners it needs to release 
+		any resources or handlers it may have acquired.
 	*/
 	public void shutdown()
 	{
-		UIElement.disconnect( this ) ;
 		listeners.shutdown() ;
 	}
 
 	/**
-		Blank out any content it may be retaining.
+		Clear out each of the systems.
+		Remove all slots connected to signals.
+		Remove all listeners - note call shutdown if they have 
+		any resources attached.
+		Remove any events that may be in the event stream.
 	*/
 	public void clear()
 	{
+		UIElement.disconnect( this ) ;
 		listeners.clear() ;
 		events.clear() ;
 	}
 
 	/**
-		Reset the UIElement as if it has just been 
-		constructed.
+		Reset the UIElement as if it has just been constructed.
+		This does not remove listeners or connections.
 	*/
 	@Override
 	public void reset()
@@ -811,24 +810,68 @@ public class UIElement implements InputHandler
 		return marginChanged ;
 	}
 
+	/**
+		Called when the element has been flagged 
+		for destruction and will be destroyed.
+	*/
 	public Connect.Signal elementDestroyed()
 	{
 		return elementDestroyed ;
 	}
 
+	/**
+		Called when the element has been flagged 
+		to be visible to the user.
+	*/
 	public Connect.Signal elementShown()
 	{
 		return elementShown ;
 	}
-	
+
+	/**
+		Called when the element has been flagged 
+		to be invisible to the user.
+	*/
 	public Connect.Signal elementHidden()
 	{
 		return elementHidden ;
 	}
 
+	/**
+		Called when the element has had its layer 
+		change to a different value.
+	*/
 	public Connect.Signal layerChanged()
 	{
 		return layerChanged ;
+	}
+
+	/**
+		Called when the element is considered 
+		engaged with the user.
+	*/
+	public Connect.Signal elementEngaged()
+	{
+		return elementEngaged ;
+	}
+
+	/**
+		Called when the element is considered 
+		not engaged with the user.
+	*/
+	public Connect.Signal elementDisengaged()
+	{
+		return elementDisengaged ;
+	}
+
+	public Connect.Signal elementEnabled()
+	{
+		return elementEnabled ;
+	}
+
+	public Connect.Signal elementDisabled()
+	{
+		return elementDisabled ;
 	}
 
 	/**

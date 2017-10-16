@@ -80,18 +80,6 @@ public interface IBase<T extends UIElement>
 	public InputEvent.Action analogueMove( final InputEvent _input ) ;
 
 	/**
-		Called when the parent UIElement is engaged.
-		This can occur at any time.
-	*/
-	public void engage() ;
-
-	/**
-		Called when the parent UIElement is no-longer engaged.
-		This can occur at any time.
-	*/
-	public void disengage() ;
-
-	/**
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
 	*/

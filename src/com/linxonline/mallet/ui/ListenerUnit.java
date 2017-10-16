@@ -40,7 +40,7 @@ public class ListenerUnit<T extends IBase<? extends UIElement>>
 	{
 		if( listeners.remove( _listener ) == true )
 		{
-			_listener.setParent( null ) ;
+			//_listener.setParent( null ) ;
 			return true ;
 		}
 		return false ;

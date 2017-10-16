@@ -741,13 +741,21 @@ public class UILayout extends UIElement
 		public SingleEngageListener() {}
 
 		@Override
-		public void disengage()
+		public void setParent( UILayout _parent )
 		{
-			// If the layout has been disengaged then it is 
-			// safe to say that all children of the layout 
-			// should also be disengaged.
-			setEngaged( null ) ;
-			disengageOthers( null, getParent().ordered ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UILayout>()
+			{
+				@Override
+				public void slot( final UILayout _layout )
+				{
+					// If the layout has been disengaged then it is 
+					// safe to say that all children of the layout 
+					// should also be disengaged.
+					setEngaged( null ) ;
+					disengageOthers( null, _layout.ordered ) ;
+				}
+			} ) ;
+			super.setParent( _parent ) ;
 		}
 
 		@Override

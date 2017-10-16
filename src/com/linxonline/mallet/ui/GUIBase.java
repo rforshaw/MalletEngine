@@ -59,35 +59,78 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	{
 		super.setParent( _parent ) ;
 		visible = _parent.isVisible() ;
+
 		position.setXYZ( _parent.getPosition() ) ;
 		offset.setXYZ( _parent.getOffset() ) ;
 		length.setXYZ( _parent.getLength() ) ;
-	}
 
-	@Override
-	public void refresh()
-	{
-		final T parent = getParent() ;
-		position.setXYZ( parent.getPosition() ) ;
-		offset.setXYZ( parent.getOffset() ) ;
-		length.setXYZ( parent.getLength() ) ;
-
-		if( visible != parent.isVisible() )
+		UIElement.connect( _parent, _parent.elementShown(), new Connect.Slot<T>()
 		{
-			visible = parent.isVisible() ;
-			if( delegate != null )
+			@Override
+			public void slot( final T _parent )
 			{
-				if( visible == true )
+				visible = true ;
+				if( delegate != null )
 				{
 					addDraws( delegate, world ) ;
 				}
-				else
+			}
+		} ) ;
+
+		UIElement.connect( _parent, _parent.elementHidden(), new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _parent )
+			{
+				visible = false ;
+				if( delegate != null )
 				{
 					removeDraws( delegate ) ;
 				}
 			}
-		}
+		} ) ;
+
+		UIElement.connect( _parent, _parent.positionChanged(), new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _parent )
+			{
+				position.setXYZ( _parent.getPosition() ) ;
+			}
+		} ) ;
+
+		UIElement.connect( _parent, _parent.offsetChanged(), new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _parent )
+			{
+				offset.setXYZ( _parent.getOffset() ) ;
+			}
+		} ) ;
+
+		UIElement.connect( _parent, _parent.lengthChanged(), new Connect.Slot<T>()
+		{
+			@Override
+			public void slot( final T _parent )
+			{
+				length.setXYZ( _parent.getLength() ) ;
+			}
+		} ) ;
 	}
+
+	/**
+		Called the next time the parent element is updated 
+		and the element is flagged as dirty.
+
+		It's very likely that a listener will want to track 
+		changes made to the state of an element but will only 
+		want to refresh the Draw state once.
+
+		This allows multiple element state changes to be 
+		bundled together when updating Draw state.
+	*/
+	@Override
+	public void refresh() {}
 
 	/**
 		Return the a layer that any draw objects 

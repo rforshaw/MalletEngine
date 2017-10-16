@@ -361,6 +361,32 @@ public final class UIFactory
 		}
 
 		@Override
+		public void setParent( T _parent )
+		{
+			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<T>()
+			{
+				@Override
+				public void slot( final T _layout )
+				{
+					setColour( rollover ) ;
+					DrawAssist.forceUpdate( getDraw() ) ;
+				}
+			} ) ;
+
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<T>()
+			{
+				@Override
+				public void slot( final T _layout )
+				{
+					setColour( neutral ) ;
+					DrawAssist.forceUpdate( getDraw() ) ;
+				}
+			} ) ;
+
+			super.setParent( _parent ) ;
+		}
+
+		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
 			setColour( rollover ) ;
@@ -388,20 +414,6 @@ public final class UIFactory
 		public InputEvent.Action touchPressed( final InputEvent _input )
 		{
 			return mousePressed( _input ) ;
-		}
-
-		@Override
-		public void engage()
-		{
-			setColour( rollover ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
-		}
-
-		@Override
-		public void disengage()
-		{
-			setColour( neutral ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	}
 
@@ -512,6 +524,31 @@ public final class UIFactory
 		}
 
 		@Override
+		public void setParent( T _parent )
+		{
+			super.setParent( _parent ) ;
+			UIElement.connect( _parent, _parent.elementEngaged(), new Connect.Slot<T>()
+			{
+				@Override
+				public void slot( final T _layout )
+				{
+					Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+					DrawAssist.forceUpdate( getDraw() ) ;
+				}
+			} ) ;
+
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<T>()
+			{
+				@Override
+				public void slot( final T _layout )
+				{
+					Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
+					DrawAssist.forceUpdate( getDraw() ) ;
+				}
+			} ) ;
+		}
+
+		@Override
 		public InputEvent.Action mouseReleased( final InputEvent _input )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
@@ -538,20 +575,6 @@ public final class UIFactory
 		{
 			return mousePressed( _input ) ;
 		}
-
-		@Override
-		public void engage()
-		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
-		}
-
-		@Override
-		public void disengage()
-		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
-		}
 	}
 
 	public static class GUIDraw<T extends UIElement> extends GUIBase<T>
@@ -570,6 +593,7 @@ public final class UIFactory
 
 		public GUIDraw( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
+			super() ;
 			sheet = _sheet ;
 			uv = _uv ;
 		}
@@ -599,6 +623,14 @@ public final class UIFactory
 			}
 		}
 
+		@Override
+		public void setParent( final T _parent )
+		{
+			super.setParent( _parent ) ;
+			updateLength( _parent.getLength(), getLength() ) ;
+			updateOffset( _parent.getOffset(), getOffset() ) ;
+		}
+
 		/**
 			Can be used to construct Draw objects before a 
 			DrawDelegate is provided by the Rendering System.
@@ -606,10 +638,6 @@ public final class UIFactory
 		@Override
 		public void constructDraws()
 		{
-			final T parent = getParent() ;
-			updateLength( parent.getLength(), getLength() ) ;
-			updateOffset( parent.getOffset(), getOffset() ) ;
-
 			if( sheet != null && uv != null )
 			{
 				draw = DrawAssist.createDraw( getPosition(),
@@ -657,16 +685,17 @@ public final class UIFactory
 		public void refresh()
 		{
 			super.refresh() ;
-			final T parent = getParent() ;
-			updateLength( parent.getLength(), getLength() ) ;
-			updateOffset( parent.getOffset(), getOffset() ) ;
-
 			if( draw != null )
 			{
-				DrawAssist.amendOrder( draw, getLayer() ) ;
+				final T parent = getParent() ;
+				updateLength( parent.getLength(), getLength() ) ;
+				updateOffset( parent.getOffset(), getOffset() ) ;
+
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
+				DrawAssist.amendOrder( draw, getLayer() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
+			
 		}
 
 		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
@@ -731,6 +760,8 @@ public final class UIFactory
 
 		public GUIText( final String _text, final MalletFont _font )
 		{
+			super() ;
+			setLayerOffset( 1 ) ;
 			font = _font ;
 			if( _text != null )
 			{
@@ -742,7 +773,7 @@ public final class UIFactory
 		public void setParent( final T _parent )
 		{
 			super.setParent( _parent ) ;
-			setLayerOffset( 1 ) ;
+			
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -763,7 +794,6 @@ public final class UIFactory
 		@Override
 		public void constructDraws()
 		{
-			final T parent = getParent() ;
 			if( font != null )
 			{
 				final Vector3 length = getLength() ;
@@ -815,8 +845,6 @@ public final class UIFactory
 		public void refresh()
 		{
 			super.refresh() ;
-			final T parent = getParent() ;
-
 			if( drawText != null )
 			{
 				final Vector3 length = getLength() ;
@@ -828,7 +856,7 @@ public final class UIFactory
 
 				DrawAssist.amendTextStart( drawText, 0 ) ;
 				DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
-				DrawAssist.amendOrder( drawText, parent.getLayer() + 1 ) ;
+				DrawAssist.amendOrder( drawText, getLayer() ) ;
 				DrawAssist.forceUpdate( drawText ) ;
 			}
 		}

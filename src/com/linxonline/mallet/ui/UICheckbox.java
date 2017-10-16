@@ -110,8 +110,6 @@ public class UICheckbox extends UIElement
 
 	public static class GUITick extends UIFactory.GUIDraw<UICheckbox>
 	{
-		private boolean checked = false ;
-
 		public GUITick( final MalletTexture _sheet, final UIElement.UV _uv )
 		{
 			super( _sheet, _uv ) ;
@@ -122,7 +120,26 @@ public class UICheckbox extends UIElement
 		public void setParent( final UICheckbox _parent )
 		{
 			super.setParent( _parent ) ;
-			checked = _parent.isChecked() ;
+			UIElement.connect( _parent, _parent.checkChanged(), new Connect.Slot<UICheckbox>()
+			{
+				@Override
+				public void slot( final UICheckbox _box )
+				{
+					final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
+					if( delegate != null )
+					{
+						if( _box.isChecked() == true )
+						{
+							DrawAssist.forceUpdate( getDraw() ) ;
+							delegate.addBasicDraw( getDraw(), getWorld() ) ;
+						}
+						else
+						{
+							delegate.removeDraw( getDraw() ) ;
+						}
+					}
+				}
+			} ) ;
 		}
 
 		/**
@@ -132,33 +149,9 @@ public class UICheckbox extends UIElement
 		@Override
 		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
 		{
-			if( checked == true )
+			if( getParent().isChecked() == true )
 			{
 				super.addDraws( _delegate, _world ) ;
-			}
-		}
-
-		@Override
-		public void refresh()
-		{
-			final UICheckbox parent = getParent() ;
-			if( checked != parent.isChecked() )
-			{
-				checked = !checked ;
-				final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
-				if( delegate != null )
-				{
-					if( checked == true )
-					{
-						super.refresh() ;
-						DrawAssist.forceUpdate( getDraw() ) ;
-						delegate.addBasicDraw( getDraw(), getWorld() ) ;
-					}
-					else
-					{
-						delegate.removeDraw( getDraw() ) ;
-					}
-				}
 			}
 		}
 	}
