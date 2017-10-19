@@ -19,7 +19,7 @@ public class ContactData
 		}
 	}
 
-	public final ContactPoint addContact( final float _penetration, 
+	public final synchronized ContactPoint addContact( final float _penetration, 
 										  final Vector2 _normal, 
 										  final boolean _physical,
 										  final Hull _collidedWith )
@@ -28,7 +28,7 @@ public class ContactData
 		{
 			final ContactPoint contact = contacts[usedContacts++] ;
 			contact.penetration = _penetration ;
-			contact.contactNormal = _normal ;
+			contact.contactNormal.setXY( _normal ) ;
 			contact.physical = _physical ;
 			contact.collidedWith = _collidedWith ;
 			return contact ;
@@ -45,8 +45,7 @@ public class ContactData
 		{
 			final ContactPoint contact = contacts[usedContacts++] ;
 			contact.penetration = _penetration ;
-			contact.contactNormal.x = _normalX ;
-			contact.contactNormal.y = _normalY ;
+			contact.contactNormal.setXY( _normalX, _normalY ) ;
 			contact.physical = _physical ;
 			contact.collidedWith = _collidedWith ;
 			return contact ;

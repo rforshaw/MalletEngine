@@ -6,14 +6,14 @@ import java.util.concurrent.atomic.AtomicBoolean ;
 import com.linxonline.mallet.util.locks.* ;
 
 public class WorkerThread extends Thread
-						  implements ICondition
 {
 	private boolean stop = false ;								// true == Kill the thread
-	private AtomicBoolean ready = new AtomicBoolean( true ) ;	// true == ready for action, false == current working
-	private ILock block = new Lock() ;							// Block thread while waiting for work
+	private boolean paused = true ;
+
+	private Object block = new Object() ;						// Block thread while waiting for work
 	private ILock groupLock = null ;
 	private WorkerGroup.WorkerCondition groupCondition = null ;		// Lock to calling thread
-
+	
 	private Worker<?> worker = null ;					// Defines execution and data set
 	private int start = 0 ;								// Start of data subset
 	private int end = 0 ;								// End of data subset
@@ -25,8 +25,11 @@ public class WorkerThread extends Thread
 
 	public void setWorkerCondition( final ILock _lock, final WorkerGroup.WorkerCondition _condition )
 	{
-		groupLock = _lock ;
-		groupCondition = _condition ;
+		synchronized( block )
+		{
+			groupLock = _lock ;
+			groupCondition = _condition ;
+		}
 	}
 
 	/**
@@ -35,8 +38,11 @@ public class WorkerThread extends Thread
 	*/
 	public void setRange( final int _start, final int _end )
 	{
-		start = _start ;
-		end = _end ;
+		synchronized( block )
+		{
+			start = _start ;
+			end = _end ;
+		}
 	}
 
 	/**
@@ -45,7 +51,10 @@ public class WorkerThread extends Thread
 	*/
 	public void setWorker( final Worker<?> _worker )
 	{
-		worker = _worker ;
+		synchronized( block )
+		{
+			worker = _worker ;
+		}
 	}
 
 	@Override
@@ -54,47 +63,41 @@ public class WorkerThread extends Thread
 		ExecType type = ExecType.FINISH ;
 		while( stop == false )
 		{
+			try
+			{
+				while( paused == true )
+				{
+					synchronized( block )
+					{
+						block.wait() ;
+					}
+				}
+			}
+			catch( InterruptedException ex ) {}
+
 			if( worker != null )
 			{
 				// Execute the work specified by the developer
 				//System.out.println( "Exec Worker: " + start + " to: " + end ) ;
 				type = worker.exec( start, end ) ;
-			}
+				//System.out.println( "Work Complete!" ) ;
 
-			if( groupLock != null && groupCondition != null )
-			{
-				// Inform calling WorkerGroup/thread you've finished
-				// Multilock will only be set if calling thread 
-				// is expected to wait for the work to be completed.
-				groupCondition.unregister() ;
-				groupLock.unlock() ;
-			}
+				setWorker( null ) ;
+				paused = true ;
 
-			if( type == ExecType.FINISH )
-			{
-				// If the execution has been completed pause 
-				// the thread and wait for further instructions.
-				pause() ;
+				if( groupLock != null && groupCondition != null )
+				{
+					// Inform calling WorkerGroup/thread you've finished
+					// Multilock will only be set if calling thread 
+					// is expected to wait for the work to be completed.
+					//System.out.println( "Unregister" ) ;
+					groupCondition.unregister() ;
+					groupLock.unlock() ;
+				}
 			}
 		}
 	}
 
-	/**
-		If true the thread is happy to accept further 
-		work, if false the thread is currently processing 
-		something and should not be pestered.
-	*/
-	public boolean ready()
-	{
-		return ready.get() ;
-	}
-
-	@Override
-	public boolean isConditionMet()
-	{
-		return !ready() ;
-	}
-	
 	/**
 		Resume Worker Thread execution.
 		Call setMultiLock(), setRange(), setWorker() 
@@ -102,17 +105,25 @@ public class WorkerThread extends Thread
 	*/
 	public void unpause()
 	{
-		ready.set( false ) ;
-		block.unlock() ;
+		synchronized( block )
+		{
+			//System.out.println( "Request unpause" ) ;
+			paused = false ;
+			block.notify() ;
+		}
 	}
 
-	private void pause()
+	public void pause()
 	{
-		ready.set( true ) ;
-		block.lock( this ) ;
+		synchronized( block )
+		{
+			//System.out.println( "Request pause" ) ;
+			paused = true ;
+			block.notify() ;
+		}
 	}
 
-	public void end()
+	public synchronized void end()
 	{
 		stop = true ;
 	}

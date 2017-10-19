@@ -10,13 +10,6 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 
 public final class CollisionCheck
 {
-	private static final Vector2 toCenter = new Vector2() ;
-	private static final Vector2 axis1 = new Vector2() ;
-	private static final Vector2 axis2 = new Vector2() ;
-
-	private static final Vector2 boxCenter1 = new Vector2() ;
-	private static final Vector2 boxCenter2 = new Vector2() ;
-
 	private CollisionCheck() {}
 
 	/**
@@ -35,6 +28,13 @@ public final class CollisionCheck
 	*/
 	public static final boolean generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
+		final Vector2 toCenter = new Vector2() ;
+		final Vector2 axis1 = new Vector2() ;
+		final Vector2 axis2 = new Vector2() ;
+
+		final Vector2 boxCenter1 = new Vector2() ;
+		final Vector2 boxCenter2 = new Vector2() ;
+
 		_box1.getAbsoluteCenter( boxCenter1 ) ;
 		_box2.getAbsoluteCenter( boxCenter2 ) ;
 

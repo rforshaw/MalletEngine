@@ -1,5 +1,10 @@
 package com.linxonline.mallet.physics ;
 
+import java.util.List ;
+
+import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.worker.* ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
@@ -11,6 +16,10 @@ public class QuadTree
 
 	private float MAX_QUAD_OFFSET ;
 
+	private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
+	private final WorkerGroup workers = new WorkerGroup( 4 ) ;
+	private final NodeWorker nodeWorker = new NodeWorker() ;
+
 	private enum Quadrant
 	{
 		ROOT,
@@ -21,7 +30,6 @@ public class QuadTree
 	}
 
 	private final QuadNode root ;
-	private int checksMade = 0 ;
 
 	public QuadTree()
 	{
@@ -59,9 +67,17 @@ public class QuadTree
 
 	public void update( final float _dt )
 	{
-		checksMade = 0 ;
+		/*root.getChildNodes( nodes ) ;
+		if( nodes.isEmpty() == false )
+		{
+			nodeWorker.setDeltaTime( _dt ) ;
+			nodeWorker.setNodes( nodes ) ;
+
+			workers.exec( nodeWorker ) ;
+			nodes.clear() ;
+		}*/
+
 		root.update( _dt ) ;
-		//System.out.println( "Checks Made: " + checksMade ) ;
 	}
 
 	public void clear()
@@ -203,6 +219,24 @@ public class QuadTree
 			bottomRight.removeHull( _hull ) ;
 		}
 
+		public void getChildNodes( final List<QuadNode> _nodes )
+		{
+			if( parent == true )
+			{
+				topLeft.getChildNodes( _nodes ) ;
+				topRight.getChildNodes( _nodes ) ;
+				bottomLeft.getChildNodes( _nodes ) ;
+				bottomRight.getChildNodes( _nodes ) ;
+			}
+			else
+			{
+				if( nextHull > 0 )
+				{
+					_nodes.add( this ) ;
+				}
+			}
+		}
+
 		public boolean exists( final Hull _hull )
 		{
 			if( parent == true )
@@ -246,7 +280,7 @@ public class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
-			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + size ) ;
+			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + nextHull ) ;
 			while( nextHull > 0 )
 			{
 				final Hull hull1 = hulls[0] ;
@@ -262,7 +296,6 @@ public class QuadTree
 					final Hull hull2 = hulls[j] ;
 					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 					{
-						++checksMade ;
 						CollisionCheck.generateContactPoint( hull1, hull2 ) ;
 					}
 				}
@@ -521,6 +554,37 @@ public class QuadTree
 			{
 				return Quadrant.BOTTOM_LEFT ;
 			}
+		}
+	}
+	
+	private class NodeWorker extends Worker<QuadNode>
+	{
+		private float deltaTime = 0.0f ;
+		private List<QuadNode> nodes ;
+
+		public NodeWorker() {}
+
+		public void setDeltaTime( final float _dt )
+		{
+			deltaTime = _dt ;
+		}
+
+		public void setNodes( final List<QuadNode> _nodes )
+		{
+			nodes = _nodes ;
+		}
+
+		@Override
+		public ExecType exec( final int _index, final QuadNode _node )
+		{
+			_node.update( deltaTime ) ;
+			return ExecType.CONTINUE ;
+		}
+
+		@Override
+		public List<QuadNode> getDataSet()
+		{
+			return nodes ;
 		}
 	}
 }

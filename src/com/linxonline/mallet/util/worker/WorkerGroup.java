@@ -63,18 +63,22 @@ public class WorkerGroup
 
 		int start = 0 ;
 		final int range = dataSize / threadLength ; 	// Split the entities between the threads.
-		condition.reset() ;
+		final int remainder = dataSize % threadLength ;
+		condition.reset( threadLength ) ;
 
+		//System.out.println( "Available: " + threadLength + " Amount: " + dataSize + " Divided: " + range + " Remainder: " + remainder  ) ;
 		for( int i = 0; i < threadLength; ++i )
 		{
 			final WorkerThread thread = availableWorkers.pop() ;
 			workers.add( thread ) ;
 
+			final int extra = ( i == 0 ) ? remainder : 0 ;
+
 			thread.setWorkerCondition( lock, condition ) ;
-			thread.setRange( start, start + range ) ;
+			thread.setRange( start, start + range + extra ) ;
 			thread.setWorker( _worker ) ;
 
-			start += range ;
+			start += range + extra ;
 
 			thread.unpause() ;			// Resume data updating
 		}
@@ -83,6 +87,7 @@ public class WorkerGroup
 		// Only continue once all WorkerThreads have finished
 		lock.lock( condition ) ;
 
+		//System.out.println( "Relinquish Group" ) ;
 		relinquishWorkers() ;
 	}
 
@@ -90,7 +95,7 @@ public class WorkerGroup
 		Workers that have completed their task can be 
 		put back into the available worker pool.
 	*/
-	private void relinquishWorkers()
+	private boolean relinquishWorkers()
 	{
 		if( workers.isEmpty() == false )
 		{
@@ -98,40 +103,40 @@ public class WorkerGroup
 			for( int i = 0; i < size; i++ )
 			{
 				final WorkerThread thread = workers.get( i ) ;
-				thread.setWorker( null ) ;
+				thread.pause() ;
 				availableWorkers.push( thread ) ;
 			}
 			workers.clear() ;
 		}
+
+		return true ;
 	}
 
 	public static class WorkerCondition implements ICondition
 	{
-		private final int workers ;
-		private final AtomicInteger active ;
+		private int active ;
 
 		public WorkerCondition( final int _workers )
 		{
-			workers = _workers ;
-			active = new AtomicInteger( workers ) ;
+			active = _workers ;
 		}
 
-		public void reset()
+		public synchronized void reset( final int _workers )
 		{
-			//System.out.println( "Reset" ) ;
-			active.set( workers ) ;
+			//System.out.println( "Reset: " + _workers ) ;
+			active = _workers  ;
 		}
 
-		public void unregister()
+		public synchronized void unregister()
 		{
 			//System.out.println( "Unregister" ) ;
-			active.decrementAndGet() ;
+			--active ;
 		}
 
-		public boolean isConditionMet()
+		public synchronized boolean isConditionMet()
 		{
 			//System.out.println( "Group Condition: " + active ) ;
-			return active.intValue() <= 0 ;
+			return active <= 0 ;
 		}
 	}
 }
