@@ -35,4 +35,10 @@ public abstract class Worker<T>
 		loop over a subset.
 	*/
 	public abstract List<T> getDataSet() ;
+
+	public enum ExecType
+	{
+		CONTINUE,
+		FINISH
+	}
 }

@@ -60,7 +60,7 @@ public class WorkerThread extends Thread
 	@Override
 	public void run()
 	{
-		ExecType type = ExecType.FINISH ;
+		Worker.ExecType type = Worker.ExecType.FINISH ;
 		while( stop == false )
 		{
 			try
@@ -79,11 +79,11 @@ public class WorkerThread extends Thread
 			{
 				// Execute the work specified by the developer
 				//System.out.println( "Exec Worker: " + start + " to: " + end ) ;
-				type = worker.exec( start, end ) ;
-				//System.out.println( "Work Complete!" ) ;
-
-				setWorker( null ) ;
-				paused = true ;
+				if( worker.exec( start, end ) == Worker.ExecType.FINISH )
+				{
+					setWorker( null ) ;
+					paused = true ;
+				}
 
 				if( groupLock != null && groupCondition != null )
 				{

@@ -16,9 +16,12 @@ public class QuadTree
 
 	private float MAX_QUAD_OFFSET ;
 
-	private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
-	private final WorkerGroup workers = new WorkerGroup( 4 ) ;
-	private final NodeWorker nodeWorker = new NodeWorker() ;
+	private final IUpdate update ;
+
+	// Used when multi-threading
+	private final List<QuadNode> nodes ;
+	private final WorkerGroup workers ;
+	private final NodeWorker nodeWorker ;
 
 	private enum Quadrant
 	{
@@ -48,6 +51,58 @@ public class QuadTree
 		MAX_HULLS = _nodeCapacity ;
 
 		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
+
+		nodes = null ;
+		workers = null ;
+		nodeWorker = null ;
+
+		update = new IUpdate()
+		{
+			public void update( final float _dt )
+			{
+				root.update( _dt ) ;
+			}
+		} ;
+	}
+
+	public QuadTree( final WorkerGroup _workers )
+	{
+		this( 0.0f, 0.0f, 1000.0f, 100, 3, _workers ) ;
+	}
+
+	public QuadTree( final float _x,
+					 final float _y,
+					 final float _size,
+					 final int _nodeCapacity,
+					 final int _tierGranularity,
+					 final WorkerGroup _workers )
+	{
+		root = new QuadNode( _x, _y, Quadrant.ROOT, 0 ) ;
+		START_QUAD_OFFSET = _size ;
+		TIER_GRANULAR_LIMIT = _tierGranularity ;
+		MAX_HULLS = _nodeCapacity ;
+
+		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
+
+		nodes = MalletList.<QuadNode>newList() ;
+		workers = ( _workers != null ) ? _workers : new WorkerGroup( 4 ) ;
+		nodeWorker = new NodeWorker() ;
+
+		update = new IUpdate()
+		{
+			public void update( final float _dt )
+			{
+				root.getChildNodes( nodes ) ;
+				if( nodes.isEmpty() == false )
+				{
+					nodeWorker.setDeltaTime( _dt ) ;
+					nodeWorker.setNodes( nodes ) ;
+
+					workers.exec( nodeWorker ) ;
+					nodes.clear() ;
+				}
+			}
+		} ;
 	}
 
 	public void insertHull( final Hull _hull )
@@ -67,17 +122,7 @@ public class QuadTree
 
 	public void update( final float _dt )
 	{
-		/*root.getChildNodes( nodes ) ;
-		if( nodes.isEmpty() == false )
-		{
-			nodeWorker.setDeltaTime( _dt ) ;
-			nodeWorker.setNodes( nodes ) ;
-
-			workers.exec( nodeWorker ) ;
-			nodes.clear() ;
-		}*/
-
-		root.update( _dt ) ;
+		update.update( _dt ) ;
 	}
 
 	public void clear()
@@ -555,6 +600,11 @@ public class QuadTree
 				return Quadrant.BOTTOM_LEFT ;
 			}
 		}
+	}
+
+	private interface IUpdate
+	{
+		public void update( final float _dt ) ;
 	}
 	
 	private class NodeWorker extends Worker<QuadNode>
