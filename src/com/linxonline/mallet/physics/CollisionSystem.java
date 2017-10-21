@@ -26,7 +26,7 @@ public class CollisionSystem extends EventController
 		setAddEventInterface( _addInterface ) ;
 		initEventProcessors() ;
 
-		treeHulls = new QuadTree( _workers ) ;
+		treeHulls = new QuadTree( ( _workers != null ) ? _workers : new WorkerGroup( 4 ) ) ;
 	}
 
 	private void initEventProcessors()

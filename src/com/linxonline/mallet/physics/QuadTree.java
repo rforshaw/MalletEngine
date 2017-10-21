@@ -85,7 +85,7 @@ public class QuadTree
 		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
 
 		nodes = MalletList.<QuadNode>newList() ;
-		workers = ( _workers != null ) ? _workers : new WorkerGroup( 4 ) ;
+		workers = _workers ;
 		nodeWorker = new NodeWorker() ;
 
 		update = new IUpdate()
