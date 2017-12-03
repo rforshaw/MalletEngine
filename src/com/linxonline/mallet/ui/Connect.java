@@ -180,6 +180,11 @@ public class Connect
 		}
 	}
 
+	public interface Connection
+	{
+		public Connect getConnect() ;
+	}
+
 	public static class Signal {}
 
 	public interface Slot<T>

@@ -72,7 +72,10 @@ public class UIEditorState extends GameState
 				}
 			} ) ;
 
-			createMainView( jui.get( "MainWindow", UIElement.class ), edWorld ) ;
+			createMainView( jui.get( "MainWindow", UILayout.class ), edWorld ) ;
+			createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
+			createStructurePanel( jui.get( "UIStructurePanel", UIList.class ) ) ;
+			createElementDataPanel( jui.get( "UIElementDataPanel", UIList.class ) ) ;
 		}
 
 		final Entity entity = new Entity( "UI" ) ;
@@ -82,12 +85,30 @@ public class UIEditorState extends GameState
 		entity.addComponent( component ) ;
 		addEntity( entity ) ;
 
-		//getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 	}
 
-	private static void createMainView( final UIElement _view, final World _world )
+	private void createElementsPanel( final UIList _view )
 	{
-		_view.addListener( new GUIBase<UIElement>()
+	
+	}
+
+	private void createStructurePanel( final UIList _view )
+	{
+	
+	}
+
+	private void createElementDataPanel( final UIList _view )
+	{
+	
+	}
+
+	private void createMainView( final UILayout _view, final World _world )
+	{
+		//final UIWrapper wrapper = JUIWrapper.load( "base/ui/test.jui" ) ;
+		//_view.addElement( wrapper ) ;
+
+		/*_view.addListener( new GUIBase<UIElement>()
 		{
 			private Draw draw1 = null ;
 
@@ -129,6 +150,6 @@ public class UIEditorState extends GameState
 
 			@Override
 			public void refresh() {}
-		} ) ;
+		} ) ;*/
 	}
 }

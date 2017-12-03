@@ -15,7 +15,7 @@ public class MalletFont
 	private final int size ;				// Text point size
 	private final String id ;
 	private final Metrics metrics ;
-	
+
 	public MalletFont( final String _name, final int _style, final int _size )
 	{
 		name = _name ;

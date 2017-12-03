@@ -2,6 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.ui.gui.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -108,7 +109,7 @@ public class UICheckbox extends UIElement
 		return checkChanged ;
 	}
 
-	public static class GUITick extends UIFactory.GUIDraw<UICheckbox>
+	public static class GUITick extends GUIDraw<UICheckbox>
 	{
 		private final Connect.Slot<UICheckbox> checkSlot = new Connect.Slot<UICheckbox>()
 		{

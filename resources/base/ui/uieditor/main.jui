@@ -5,7 +5,7 @@
 	"CHILDREN" : [
 		{
 			"TYPE" : "UIMENU",
-			"LENGTH" : "1",
+			"THICKNESS" : "1",
 			"NAME" : "HeadToolbar",
 			"CHILDREN" : [
 				{
@@ -16,22 +16,14 @@
 						"TEXT" : "File",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 					},
-					"UIDRAW" : {
-						"TEXTURE" : "base/ui/uieditor/grey.png",
-						"NEUTRAL_UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "0.5, 0.5"
-						},
-						"ROLLOVER_UV" : {
-							"MIN" : "0.0, 0.5",
-							"MAX" : "0.5, 1.0"
-						},
-						"CLICKED_UV" : {
-							"MIN" : "0.5, 0.0",
-							"MAX" : "1.0, 0.5"
-						}
+					"UIEDGE" : {
+						"TEXTURE" : "base/textures/edge_button.png",
+						"EDGE" : 2.0,
+						"COLOUR_NEUTRAL" : "255, 255, 255",
+						"COLOUR_ROLLOVER" : "0, 255, 0",
+						"COLOUR_CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -47,22 +39,14 @@
 									"TEXT" : "Open",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -72,22 +56,14 @@
 									"TEXT" : "Save",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -97,22 +73,14 @@
 									"TEXT" : "Exit",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -134,22 +102,14 @@
 						"TEXT" : "Edit",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 					},
-					"UIDRAW" : {
-						"TEXTURE" : "base/ui/uieditor/grey.png",
-						"NEUTRAL_UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "0.5, 0.5"
-						},
-						"ROLLOVER_UV" : {
-							"MIN" : "0.0, 0.5",
-							"MAX" : "0.5, 1.0"
-						},
-						"CLICKED_UV" : {
-							"MIN" : "0.5, 0.0",
-							"MAX" : "1.0, 0.5"
-						}
+					"UIEDGE" : {
+						"TEXTURE" : "base/textures/edge_button.png",
+						"EDGE" : 2.0,
+						"COLOUR_NEUTRAL" : "255, 255, 255",
+						"COLOUR_ROLLOVER" : "0, 255, 0",
+						"COLOUR_CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -165,22 +125,14 @@
 									"TEXT" : "Copy",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -190,22 +142,14 @@
 									"TEXT" : "Paste",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -227,22 +171,14 @@
 						"TEXT" : "Help",
 						"FONT" : "Arial",
 						"FONT_SIZE" : "0.42",
-						"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+						"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 					},
-					"UIDRAW" : {
-						"TEXTURE" : "base/ui/uieditor/grey.png",
-						"NEUTRAL_UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "0.5, 0.5"
-						},
-						"ROLLOVER_UV" : {
-							"MIN" : "0.0, 0.5",
-							"MAX" : "0.5, 1.0"
-						},
-						"CLICKED_UV" : {
-							"MIN" : "0.5, 0.0",
-							"MAX" : "1.0, 0.5"
-						}
+					"UIEDGE" : {
+						"TEXTURE" : "base/textures/edge_button.png",
+						"EDGE" : 2.0,
+						"COLOUR_NEUTRAL" : "255, 255, 255",
+						"COLOUR_ROLLOVER" : "0, 255, 0",
+						"COLOUR_CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -258,22 +194,14 @@
 									"TEXT" : "Help",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -283,22 +211,14 @@
 									"TEXT" : "About",
 									"FONT" : "Arial",
 									"FONT_SIZE" : "0.42",
-									"ALIGNMENT_TEXT" : { "X" : "CENTRE", "Y" : "CENTRE" }
+									"ALIGNMENT" : { "X" : "CENTRE", "Y" : "CENTRE" }
 								},
-								"UIDRAW" : {
-									"TEXTURE" : "base/ui/uieditor/grey.png",
-									"NEUTRAL_UV" : {
-										"MIN" : "0.0, 0.0",
-										"MAX" : "0.5, 0.5"
-									},
-									"ROLLOVER_UV" : {
-										"MIN" : "0.0, 0.5",
-										"MAX" : "0.5, 1.0"
-									},
-									"CLICKED_UV" : {
-										"MIN" : "0.5, 0.0",
-										"MAX" : "1.0, 0.5"
-									}
+								"UIEDGE" : {
+									"TEXTURE" : "base/textures/edge_button.png",
+									"EDGE" : 2.0,
+									"COLOUR_NEUTRAL" : "255, 255, 255",
+									"COLOUR_ROLLOVER" : "0, 255, 0",
+									"COLOUR_CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -328,7 +248,14 @@
 				{
 					"TYPE" : "UILIST",
 					"LAYOUT" : "VERTICAL",
-					"NAME" : "UIElementPanel",
+					"NAME" : "UIElementsPanel",
+					"UIDRAW" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					},
 					"SCROLLBAR" : {
 						"TEXTURE" : "base/ui/uieditor/light_black.png",
 						"UV" : {
@@ -336,489 +263,7 @@
 							"MAX" : "1.0, 1.0"
 						}
 					},
-					"CHILDREN" : [
-						{
-							"TYPE" : "UITEXTFIELD",
-							"NAME" : "TestButton1",
-							"UITEXT" : {
-								"TEXT" : "Type Here",
-								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
-								"FONT" : "Arial",
-								"FONT_SIZE" : 0.42,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UITEXTFIELD",
-							"NAME" : "TestButton1",
-							"UITEXT" : 
-							{
-								"TEXT" : "Type Here",
-								"ALIGNMENT_TEXT" : { "X" : "LEFT", "Y" : "CENTRE" },
-								"FONT" : "Arial",
-								"FONT_SIZE" : 0.42,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIEDGE" : {
-								"TEXTURE" : "base/textures/edge_button.png",
-								"EDGE" : 5.0,
-								"COLOUR_ROLLOVER" : "0, 255, 0",
-								"COLOUR_CLICKED" : "0, 0, 255"
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UILIST",
-							"LAYOUT" : "VERTICAL",
-							"MAX_LENGTH" : "0.0, 4.0, 0.0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							},
-							"CHILDREN" : [
-								{
-									"TYPE" : "UIBUTTON",
-									"UITEXT" : {
-										"TEXT" : "Test 2",
-										"FONT" : "Arial",
-										"FONT_SIZE" : 1.16,
-										"COLOUR_TEXT" : "255, 0, 0"
-									},
-									"UIDRAW" : {
-										"TEXTURE" : "base/textures/button_sheet.png",
-										"NEUTRAL_UV" : {
-											"MIN" : "0.0, 0.0",
-											"MAX" : "0.5, 0.5"
-										},
-										"ROLLOVER_UV" : {
-											"MIN" : "0.0, 0.5",
-											"MAX" : "0.5, 1.0"
-										},
-										"CLICKED_UV" : {
-											"MIN" : "0.5, 0.0",
-											"MAX" : "1.0, 0.5"
-										}
-									}
-								},
-								{
-									"TYPE" : "UILIST",
-									"LAYOUT" : "HORIZONTAL",
-									"MAX_LENGTH" : "0.0, 4.0, 0.0",
-									"CHILDREN" : [
-										{
-											"TYPE" : "UIBUTTON",
-											"UITEXT" : {
-												"TEXT" : "T3",
-												"FONT" : "Arial",
-												"FONT_SIZE" : 1.16,
-												"COLOUR_TEXT" : "255, 0, 0"
-											},
-											"UIDRAW" : {
-												"TEXTURE" : "base/textures/button_sheet.png",
-												"NEUTRAL_UV" : {
-													"MIN" : "0.0, 0.0",
-													"MAX" : "0.5, 0.5"
-												},
-												"ROLLOVER_UV" : {
-													"MIN" : "0.0, 0.5",
-													"MAX" : "0.5, 1.0"
-												},
-												"CLICKED_UV" : {
-													"MIN" : "0.5, 0.0",
-													"MAX" : "1.0, 0.5"
-												}
-											}
-										},
-										{
-											"TYPE" : "UIBUTTON",
-											"UITEXT" : {
-												"TEXT" : "T3",
-												"FONT" : "Arial",
-												"FONT_SIZE" : 1.16,
-												"COLOUR_TEXT" : "255, 0, 0"
-											},
-											"UIDRAW" : {
-												"TEXTURE" : "base/textures/button_sheet.png",
-												"NEUTRAL_UV" : {
-													"MIN" : "0.0, 0.0",
-													"MAX" : "0.5, 0.5"
-												},
-												"ROLLOVER_UV" : {
-													"MIN" : "0.0, 0.5",
-													"MAX" : "0.5, 1.0"
-												},
-												"CLICKED_UV" : {
-													"MIN" : "0.5, 0.0",
-													"MAX" : "1.0, 0.5"
-												}
-											}
-										}
-									]
-								},
-								{
-									"TYPE" : "UIBUTTON",
-									"UITEXT" : {
-										"TEXT" : "Test 2",
-										"FONT" : "Arial",
-										"FONT_SIZE" : 1.16,
-										"COLOUR_TEXT" : "255, 0, 0"
-									},
-									"UIDRAW" : {
-										"TEXTURE" : "base/textures/button_sheet.png",
-										"NEUTRAL_UV" : {
-											"MIN" : "0.0, 0.0",
-											"MAX" : "0.5, 0.5"
-										},
-										"ROLLOVER_UV" : {
-											"MIN" : "0.0, 0.5",
-											"MAX" : "0.5, 1.0"
-										},
-										"CLICKED_UV" : {
-											"MIN" : "0.5, 0.0",
-											"MAX" : "1.0, 0.5"
-										}
-									}
-								}
-							]
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIBUTTON",
-							"UITEXT" : {
-								"TEXT" : "Test 1",
-								"FONT" : "Arial",
-								"FONT_SIZE" : 1.16,
-								"COLOUR_TEXT" : "255, 0, 0"
-							},
-							"UIDRAW" : {
-								"TEXTURE" : "base/textures/button_sheet.png",
-								"NEUTRAL_UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "0.5, 0.5"
-								},
-								"ROLLOVER_UV" : {
-									"MIN" : "0.0, 0.5",
-									"MAX" : "0.5, 1.0"
-								},
-								"CLICKED_UV" : {
-									"MIN" : "0.5, 0.0",
-									"MAX" : "1.0, 0.5"
-								}
-							}
-						}
-					],
+					"CHILDREN" : [],
 					"MAX_LENGTH" : "5.5, 0, 0"
 				},
 				{
@@ -833,8 +278,9 @@
 					}
 				},
 				{
-					"TYPE" : "UIELEMENT",
-					"NAME" : "MainWindow",
+					"TYPE" : "UILAYOUT",
+					"LAYOUT" : "VERTICAL",
+					"NAME" : "MainWindow"
 				},
 				{
 					"TYPE" : "UIELEMENT",
@@ -849,8 +295,7 @@
 				},
 				{
 					"TYPE" : "UILAYOUT",
-					"LAYOUT" : "GRID",
-					"NAME" : "UITree",
+					"LAYOUT" : "VERTICAL",
 					"SCROLLBAR" : {
 						"TEXTURE" : "base/ui/uieditor/light_black.png",
 						"UV" : {
@@ -860,10 +305,31 @@
 					},
 					"CHILDREN" : [
 						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "2.0, 2.0, 0",
+							"TYPE" : "UILIST",
+							"LAYOUT" : "VERTICAL",
+							"NAME" : "UIStructurePanel",
 							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"SCROLLBAR" : {
 								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"CHILDREN" : [],
+							"MAX_LENGTH" : "5.5, 0, 0"
+						},
+						{
+							"TYPE" : "UIELEMENT",
+							"MAX_LENGTH" : "0.0, 0.2, 0",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 								"UV" : {
 									"MIN" : "0.0, 0.0",
 									"MAX" : "1.0, 1.0"
@@ -871,152 +337,34 @@
 							}
 						},
 						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
+							"TYPE" : "UILIST",
+							"LAYOUT" : "VERTICAL",
+							"NAME" : "UIElementDataPanel",
 							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"SCROLLBAR" : {
 								"TEXTURE" : "base/ui/uieditor/light_black.png",
 								"UV" : {
 									"MIN" : "0.0, 0.0",
 									"MAX" : "1.0, 1.0"
 								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
-						},
-						{
-							"TYPE" : "UIELEMENT",
-							"MIN_LENGTH" : "1.0, 1.0, 0",
-							"UIDRAW" : {
-								"TEXTURE" : "base/ui/uieditor/light_black.png",
-								"UV" : {
-									"MIN" : "0.0, 0.0",
-									"MAX" : "1.0, 1.0"
-								}
-							}
+							},
+							"CHILDREN" : [],
+							"MAX_LENGTH" : "5.5, 0, 0"
 						}
 					],
 					"MAX_LENGTH" : "5.5, 0, 0",
-					"UIDRAW" : {
-						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
-						"UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "1.0, 1.0"
-						}
-					}
 				}
 			]
 		},
 		{
 			"TYPE" : "UIMENU",
-			"LENGTH" : "1",
+			"THICKNESS" : "1",
 			"NAME" : "FooterToolbar",
 			"UIDRAW" : {
 				"TEXTURE" : "base/ui/uieditor/dark_grey.png",

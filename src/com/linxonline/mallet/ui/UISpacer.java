@@ -57,4 +57,37 @@ public class UISpacer extends UIElement
 
 	@Override
 	public void shutdown() {}
+
+	public static UISpacer applyMeta( final UISpacer.Meta _meta, final UISpacer _spacer )
+	{
+		UIElement.applyMeta( _meta, _spacer ) ;
+		return _spacer ;
+	}
+
+	public static class Meta extends UIElement.Meta
+	{
+		private Axis axis = Axis.ONLY_X ;
+		
+		private Connect.Signal axisChanged = new Connect.Signal() ;
+
+		public Meta() {}
+
+		public void setAxis( final Axis _axis )
+		{
+			if( _axis != axis )
+			{
+				axis = _axis ;
+			}
+		}
+
+		public Axis getAxis()
+		{
+			return axis ;
+		}
+
+		public Connect.Signal axisChanged()
+		{
+			return axisChanged ;
+		}
+	}
 }

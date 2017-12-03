@@ -1,5 +1,6 @@
-package com.linxonline.mallet.ui ;
+package com.linxonline.mallet.ui.gui ;
 
+import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -186,5 +187,27 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	public World getWorld()
 	{
 		return world ;
+	}
+
+	public static class Meta implements Connect.Connection
+	{
+		private final Connect connect = new Connect() ;
+
+		public Meta() {}
+
+		/**
+			Remove all connections made to this packet.
+			Should only be called by the packets owner.
+		*/
+		public void shutdown()
+		{
+			UIElement.disconnect( this ) ;
+		}
+
+		@Override
+		public Connect getConnect()
+		{
+			return connect ;
+		}
 	}
 }

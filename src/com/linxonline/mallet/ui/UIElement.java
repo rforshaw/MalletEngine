@@ -22,7 +22,7 @@ import com.linxonline.mallet.maths.* ;
 	to implement it in whatever way they see fit.
 	
 */
-public class UIElement implements InputHandler
+public class UIElement implements InputHandler, Connect.Connection
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
@@ -802,7 +802,8 @@ public class UIElement implements InputHandler
 		return builder.toString() ;
 	}
 
-	protected Connect getConnect()
+	@Override
+	public Connect getConnect()
 	{
 		return connect ;
 	}
@@ -924,7 +925,7 @@ public class UIElement implements InputHandler
 
 		Signals or Variables can not be immutable - for example String.
 	*/
-	public static <T extends UIElement> Connect.Slot<T> connect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
+	public static <T extends Connect.Connection> Connect.Slot<T> connect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
 	{
 		final Connect connect = _element.getConnect() ;
 		connect.connect( _element, _signal, _slot ) ;
@@ -938,7 +939,7 @@ public class UIElement implements InputHandler
 		Disconnect will not work if the signal or variable is 
 		immutable.
 	*/
-	public static <T extends UIElement> boolean disconnect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
+	public static <T extends Connect.Connection> boolean disconnect( final T _element, final Connect.Signal _signal, final Connect.Slot<T> _slot )
 	{
 		final Connect connect = _element.getConnect() ;
 		return connect.disconnect( _element, _signal, _slot ) ;
@@ -947,7 +948,7 @@ public class UIElement implements InputHandler
 	/**
 		Disconnect all slots from a signal.
 	*/
-	public static <T extends UIElement> boolean disconnect( final T _element )
+	public static <T extends Connect.Connection> boolean disconnect( final T _element )
 	{
 		final Connect connect = _element.getConnect() ;
 		return connect.disconnect( _element ) ;
@@ -957,10 +958,32 @@ public class UIElement implements InputHandler
 		Inform all slots connected to this signal and associated
 		to the variable that the signal's state has changed.
 	*/
-	public static <T extends UIElement> void signal( final T _element, final Connect.Signal _signal )
+	public static <T extends Connect.Connection> void signal( final T _element, final Connect.Signal _signal )
 	{
 		final Connect connect = _element.getConnect() ;
 		connect.signal( _element, _signal ) ;
+	}
+
+	public static UIElement applyMeta( final UIElement.Meta _meta, final UIElement _element )
+	{
+		final Vector3 temp = new Vector3() ;
+
+		final Vector3 position = _meta.getPosition( temp ) ;
+		_element.setPosition( position.x, position.y, position.z ) ;
+
+		final Vector3 offset = _meta.getOffset( temp ) ;
+		_element.setOffset( offset.x, offset.y, offset.z ) ;
+
+		final Vector3 length = _meta.getLength( temp ) ;
+		_element.setLength( length.x, length.y, length.z ) ;
+
+		final Vector3 minLength = _meta.getMinimumLength( temp ) ;
+		_element.setMinimumLength( minLength.x, minLength.y, minLength.z ) ;
+
+		final Vector3 maxLength = _meta.getMaximumLength( temp ) ;
+		_element.setMaximumLength( maxLength.x, maxLength.y, maxLength.z ) ;
+
+		return _element ;
 	}
 
 	private interface InputAction
@@ -1058,6 +1081,292 @@ public class UIElement implements InputHandler
 		}
 	} ;
 
+	public static class Meta implements Connect.Connection
+	{
+		private String name = "" ;
+		private int layer = 0 ;
+		private boolean visible = true ;
+		private boolean disabled = false ;
+
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
+		private final Vector3 margin = new Vector3() ;
+
+		private final Vector3 length = new Vector3() ;
+		private final Vector3 minimumLength = new Vector3() ;
+		private final Vector3 maximumLength = new Vector3() ;
+
+		private final Connect.Signal nameChanged    = new Connect.Signal() ;
+		private final Connect.Signal layerChanged   = new Connect.Signal() ;
+		private final Connect.Signal disableChanged = new Connect.Signal() ;
+		private final Connect.Signal visibleChanged = new Connect.Signal() ;
+
+		private final Connect.Signal positionChanged = new Connect.Signal() ;
+		private final Connect.Signal offsetChanged   = new Connect.Signal() ;
+		private final Connect.Signal marginChanged   = new Connect.Signal() ;
+
+		private final Connect.Signal lengthChanged = new Connect.Signal() ;
+		private final Connect.Signal minimumLengthChanged = new Connect.Signal() ;
+		private final Connect.Signal maximumLengthChanged = new Connect.Signal() ;
+
+		private final Connect connect = new Connect() ;
+
+		public Meta() {}
+
+		public void setName( final String _name )
+		{
+			if( _name != null && name.equals( _name ) == false )
+			{
+				name = _name ;
+				UIElement.signal( this, nameChanged() ) ;
+			}
+		}
+
+		public void setLayer( final int _layer )
+		{
+			if( layer != _layer )
+			{
+				layer = _layer ;
+				UIElement.signal( this, layerChanged() ) ;
+			}
+		}
+
+		public void setDisableFlag( final boolean _flag )
+		{
+			if( disabled != _flag )
+			{
+				disabled = _flag ;
+				UIElement.signal( this, disableChanged() ) ;
+			}
+		}
+
+		public void setVisibleFlag( final boolean _flag )
+		{
+			if( visible != _flag )
+			{
+				visible = _flag ;
+				UIElement.signal( this, visibleChanged() ) ;
+			}
+		}
+
+		public String getName()
+		{
+			return name ;
+		}
+
+		public int getLayer()
+		{
+			return layer ;
+		}
+
+		public boolean getDisableFlag()
+		{
+			return disabled ;
+		}
+
+		public boolean getVisibleFlag()
+		{
+			return visible ;
+		}
+
+		public void setPosition( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setPosition( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setPosition( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( position, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, positionChanged() ) ;
+			}
+		}
+
+		public void setOffset( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setOffset( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setOffset( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( offset, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, offsetChanged() ) ;
+			}
+		}
+
+		public void setMargin( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setMargin( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setMargin( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( margin, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, marginChanged() ) ;
+			}
+		}
+
+		public Vector3 getPosition( final Vector3 _populate )
+		{
+			_populate.setXYZ( position ) ;
+			return _populate ;
+		}
+
+		public Vector3 getOffset( final Vector3 _populate )
+		{
+			_populate.setXYZ( offset ) ;
+			return _populate ;
+		}
+
+		public Vector3 getMargin( final Vector3 _populate )
+		{
+			_populate.setXYZ( margin ) ;
+			return _populate ;
+		}
+
+		public void setLength( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setLength( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setLength( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( length, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, lengthChanged() ) ;
+			}
+		}
+
+		public void setMinimumLength( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setMinimumLength( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setMinimumLength( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( minimumLength, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, minimumLengthChanged() ) ;
+			}
+		}
+
+		public void setMaximumLength( final Vector3 _val )
+		{
+			if( _val != null )
+			{
+				setMaximumLength( _val.x, _val.y, _val.z ) ;
+			}
+		}
+
+		public void setMaximumLength( final float _x, final float _y, final float _z )
+		{
+			if( UI.applyVec3( maximumLength, _x, _y, _z ) == true )
+			{
+				UIElement.signal( this, maximumLengthChanged() ) ;
+			}
+		}
+
+		public Vector3 getLength( final Vector3 _populate )
+		{
+			_populate.setXYZ( length ) ;
+			return _populate ;
+		}
+
+		public Vector3 getMinimumLength( final Vector3 _populate )
+		{
+			_populate.setXYZ( minimumLength ) ;
+			return _populate ;
+		}
+
+		public Vector3 getMaximumLength( final Vector3 _populate )
+		{
+			_populate.setXYZ( maximumLength ) ;
+			return _populate ;
+		}
+
+		/**
+			Remove all connections made to this packet.
+			Should only be called by the instance's owner.
+		*/
+		public void shutdown()
+		{
+			UIElement.disconnect( this ) ;
+		}
+
+		@Override
+		public Connect getConnect()
+		{
+			return connect ;
+		}
+
+		public Connect.Signal nameChanged()
+		{
+			return nameChanged ;
+		}
+
+		public Connect.Signal layerChanged()
+		{
+			return layerChanged ;
+		}
+
+		public Connect.Signal disableChanged()
+		{
+			return disableChanged ;
+		}
+
+		public Connect.Signal visibleChanged()
+		{
+			return visibleChanged ;
+		}
+
+		public Connect.Signal positionChanged()
+		{
+			return positionChanged ;
+		}
+
+		public Connect.Signal offsetChanged()
+		{
+			return offsetChanged ;
+		}
+
+		public Connect.Signal marginChanged()
+		{
+			return marginChanged ;
+		}
+
+		public Connect.Signal lengthChanged()
+		{
+			return lengthChanged ;
+		}
+
+		public Connect.Signal minimumLengthChanged()
+		{
+			return minimumLengthChanged ;
+		}
+
+		public Connect.Signal maximumLengthChanged()
+		{
+			return maximumLengthChanged ;
+		}
+	}
+
 	public static class UV
 	{
 		public final Vector2 min ;
@@ -1077,6 +1386,12 @@ public class UIElement implements InputHandler
 		{
 			min = _min ;
 			max = _max ;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "Min " + min.toString() + " Max " + max.toString() ;
 		}
 	}
 }

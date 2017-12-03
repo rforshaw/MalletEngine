@@ -16,25 +16,89 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIMenu extends UILayout
 {
-	public UIMenu( final Type _type, final float _length )
+	public UIMenu( final Type _type )
+	{
+		this( _type, 1.0f ) ;
+	}
+
+	public UIMenu( final Type _type, final float _thickness )
 	{
 		super( _type ) ;
 		switch( _type )
 		{
 			case HORIZONTAL :
 			{
-				setMaximumLength( 0.0f, _length, 0.0f ) ;
+				setMaximumLength( 0.0f, _thickness, 0.0f ) ;
 				break ;
 			}
 			default         :
 			case VERTICAL   :
 			{
-				setMaximumLength( _length, 0.0f, 0.0f ) ;
+				setMaximumLength( _thickness, 0.0f, 0.0f ) ;
 				break ;
 			}
 		}
 	}
 
+	public static UIMenu applyMeta( final UIMenu.Meta _meta, final UIMenu _menu )
+	{
+		UILayout.applyMeta( _meta, _menu ) ;
+		switch( _meta.getType() )
+		{
+			case HORIZONTAL :
+			{
+				_menu.setMaximumLength( 0.0f, _meta.getThickness(), 0.0f ) ;
+				break ;
+			}
+			default         :
+			case VERTICAL   :
+			{
+				_menu.setMaximumLength( _meta.getThickness(), 0.0f, 0.0f ) ;
+				break ;
+			}
+		}
+		return _menu ;
+	}
+
+	public static class Meta extends UILayout.Meta
+	{
+		private float thickness = 0.0f ;
+
+		private final Connect.Signal thicknessChanged = new Connect.Signal() ;
+
+		public Meta() {}
+
+		public void setThickness( final float _thickness )
+		{
+			if( Math.abs( thickness - _thickness ) > 0.001f )
+			{
+				thickness = _thickness ;
+				UIElement.signal( this, thicknessChanged() ) ;
+			}
+		}
+
+		public float getThickness()
+		{
+			return thickness ;
+		}
+
+		public Connect.Signal thicknessChanged()
+		{
+			return thicknessChanged ;
+		}
+	}
+
+	/**
+		Menu.Item is a UIButton that supports a dropdown.
+		The dropdown can be any UIElement though most likely 
+		to be a UILayout or UIList.
+		By default the dropdown is invisible and disengaged, if 
+		the Menu.Item is pressed then the dropdown is made visible 
+		and flagged as engaged.The dropdown will loose visibility 
+		and engagement if the Menu.Item is disengaged. The dropdown 
+		will be disengaged and made invisible if a mouse release
+		event is received and the event is consumed.
+	*/
 	public static class Item extends UIButton
 	{
 		private final UIElement dropdown ;
@@ -43,7 +107,51 @@ public class UIMenu extends UILayout
 		{
 			super() ;
 			dropdown = _dropdown ;
-			addListener( new UIMenu.DropDownListener( dropdown ) ) ;
+			dropdown.setVisible( false ) ;
+
+			UIElement.connect( this, layerChanged(), new Connect.Slot<Item>()
+			{
+				public void slot( final Item _item )
+				{
+					dropdown.setLayer( _item.getLayer() + 1 ) ;
+				}
+			} ) ;
+
+			UIElement.connect( this, elementEngaged(), new Connect.Slot<Item>()
+			{
+				private final Vector3 position = new Vector3() ;
+				private final Vector3 length = new Vector3() ;
+			
+				@Override
+				public void slot( final Item _item )
+				{
+					_item.getPosition( position ) ;
+					_item.getLength( length ) ;
+
+					dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
+					dropdown.engage() ;
+				}
+			} ) ;
+
+			UIElement.connect( this, elementDisengaged(), new Connect.Slot<Item>()
+			{
+				@Override
+				public void slot( final Item _item )
+				{
+					dropdown.disengage() ;
+					dropdown.setVisible( false ) ;
+				}
+			} ) ;
+
+			UIElement.connect( this, released(), new Connect.Slot<Item>()
+			{
+				@Override
+				public void slot( final Item _item )
+				{
+					dropdown.setVisible( !dropdown.isVisible() ) ;
+					dropdown.setEngage( !dropdown.isEngaged() ) ;
+				}
+			} ) ;
 		}
 
 		@Override
@@ -63,6 +171,25 @@ public class UIMenu extends UILayout
 		@Override
 		public InputEvent.Action passInputEvent( final InputEvent _event )
 		{
+			if( dropdown.isVisible() == true )
+			{
+				if( dropdown.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+				{
+					switch( _event.getInputType() )
+					{
+						case MOUSE1_RELEASED   :
+						case MOUSE2_RELEASED   :
+						case MOUSE3_RELEASED   :
+						{
+							dropdown.setVisible( !dropdown.isVisible() ) ;
+							dropdown.setEngage( !dropdown.isEngaged() ) ;
+							break ;
+						}
+					}
+					return InputEvent.Action.CONSUME ;
+				}
+			}
+
 			if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
 				return InputEvent.Action.CONSUME ;
@@ -81,119 +208,12 @@ public class UIMenu extends UILayout
 
 			return ( dropdown.isIntersectInput( _event ) && dropdown.isVisible() ) ;
 		}
-	}
-
-	public static class DropDownListener extends InputListener<Item>
-	{
-		private final UIElement dropdown ;
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 length = new Vector3() ;
-
-		private final Connect.Slot<Item> engagedSlot = new Connect.Slot<Item>()
-		{
-			@Override
-			public void slot( final Item _item )
-			{
-				_item.getPosition( position ) ;
-				_item.getLength( length ) ;
-
-				//dropdown.setLayer( parent.getLayer() + 1 ) ;
-				dropdown.setPosition( position.x, position.y + length.y, 0.0f ) ;
-				dropdown.engage() ;
-			}
-		} ;
-
-		private final Connect.Slot<Item> disengagedSlot = new Connect.Slot<Item>()
-		{
-			@Override
-			public void slot( final Item _item )
-			{
-				dropdown.disengage() ;
-				dropdown.setVisible( false ) ;
-			}
-		} ;
-
-		public DropDownListener( final UIElement _toDrop )
-		{
-			dropdown = _toDrop ;
-			dropdown.setVisible( false ) ;
-		}
-
-		@Override
-		public void setParent( Item _parent )
-		{
-			UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
-			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
-
-			super.setParent( _parent ) ;
-		}
-
-		@Override
-		public InputEvent.Action mouseMove( final InputEvent _input )
-		{
-			return dropdown.passInputEvent( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action mousePressed( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action mouseReleased( final InputEvent _input )
-		{
-			final InputEvent.Action action = mouseMove( _input ) ;
-			dropdown.setVisible( !dropdown.isVisible() ) ;
-			dropdown.setEngage( !dropdown.isEngaged() ) ;
-			return action ;
-		}
-
-		@Override
-		public InputEvent.Action touchMove( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action touchPressed( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action touchReleased( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action keyPressed( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action keyReleased( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
-
-		@Override
-		public InputEvent.Action analogueMove( final InputEvent _input )
-		{
-			return mouseMove( _input ) ;
-		}
 
 		@Override
 		public void shutdown()
 		{
 			super.shutdown() ;
 			dropdown.shutdown() ;
-
-			final Item parent = getParent() ;
-			UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
-			UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 		}
 	}
 }

@@ -32,7 +32,7 @@ import com.linxonline.mallet.maths.* ;
 	left to right, once there is no more width it will drop 
 	down to the next row.
 */
-public class UILayout extends UIElement
+public class UILayout extends UIElement implements IChildren
 {
 	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
@@ -747,6 +747,12 @@ public class UILayout extends UIElement
 		}
 	}
 
+	public static UILayout applyMeta( final UILayout.Meta _meta, final UILayout _layout )
+	{
+		UIElement.applyMeta( _meta, _layout ) ;
+		return _layout ;
+	}
+
 	public enum Type
 	{
 		HORIZONTAL,
@@ -930,6 +936,33 @@ public class UILayout extends UIElement
 					element.disengage() ;
 				}
 			}
+		}
+	}
+
+	public static class Meta extends UIElement.Meta
+	{
+		private Type type = Type.VERTICAL ;
+		
+		private Connect.Signal typeChanged = new Connect.Signal() ;
+
+		public Meta() {}
+
+		public void setType( final Type _type )
+		{
+			if( _type != type )
+			{
+				type = _type ;
+			}
+		}
+
+		public Type getType()
+		{
+			return type ;
+		}
+
+		public Connect.Signal typeChanged()
+		{
+			return typeChanged ;
 		}
 	}
 
