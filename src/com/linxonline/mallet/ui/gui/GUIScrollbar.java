@@ -138,4 +138,15 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 		xLength.setXYZ( _width.x, _length.y, _width.z ) ;
 		yLength.setXYZ( _length.x, _width.y, _width.z ) ;
 	}
+
+	public static class Meta extends GUIBase.Meta
+	{
+		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UILIST_GUISCROLLBAR" ;
+		}
+	}
 }

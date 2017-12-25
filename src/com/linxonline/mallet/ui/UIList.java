@@ -769,4 +769,15 @@ public class UIList extends UILayout
 			return action ;
 		}
 	}
+
+	public static class Meta extends UILayout.Meta
+	{
+		public Meta() {}
+
+		@Override
+		public String getElementType()
+		{
+			return "UILIST" ;
+		}
+	}
 }

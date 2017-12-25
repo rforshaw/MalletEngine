@@ -168,4 +168,6 @@ public abstract class ABase<T extends UIElement> implements IBase<T>
 		Clean up any resources you may have allocated.
 	*/
 	public abstract void shutdown() ;
+
+	public static abstract class Meta implements IBase.Meta {}
 }

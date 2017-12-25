@@ -152,6 +152,11 @@ public class UILayout extends UIElement implements IChildren
 		{
 			applyLayer( _element, getLayer() ) ;
 			ordered.add( _element ) ;
+
+			if( getDrawDelegate() != null )
+			{
+				_element.passDrawDelegate( getDrawDelegate(), getWorld(), getCamera() ) ;
+			}
 		}
 		return _element ; 
 	}
@@ -341,11 +346,11 @@ public class UILayout extends UIElement implements IChildren
 	@Override
 	public void shutdown()
 	{
-		super.shutdown() ;
 		for( final UIElement element : ordered )
 		{
 			element.shutdown() ;
 		}
+		super.shutdown() ;
 	}
 
 	/**
@@ -358,12 +363,13 @@ public class UILayout extends UIElement implements IChildren
 	@Override
 	public void clear()
 	{
-		super.clear() ;
 		for( final UIElement element : ordered )
 		{
 			element.clear() ;
 		}
+
 		ordered.clear() ;
+		super.clear() ;
 	}
 
 	/**
@@ -375,13 +381,12 @@ public class UILayout extends UIElement implements IChildren
 	@Override
 	public void reset()
 	{
-		super.reset() ;
 		for( final UIElement element : ordered )
 		{
 			element.reset() ;
 		}
 
-		ordered.clear() ;
+		super.reset() ;
 	}
 
 	protected UIElementUpdater getCurrentUpdater()
@@ -747,10 +752,9 @@ public class UILayout extends UIElement implements IChildren
 		}
 	}
 
-	public static UILayout applyMeta( final UILayout.Meta _meta, final UILayout _layout )
+	public static <T extends UILayout> T applyMeta( final UILayout.Meta _meta, final T _layout )
 	{
-		UIElement.applyMeta( _meta, _layout ) ;
-		return _layout ;
+		return UIElement.applyMeta( _meta, _layout ) ;
 	}
 
 	public enum Type
@@ -946,6 +950,18 @@ public class UILayout extends UIElement implements IChildren
 		private Connect.Signal typeChanged = new Connect.Signal() ;
 
 		public Meta() {}
+
+		@Override
+		public String getElementType()
+		{
+			return "UILAYOUT" ;
+		}
+
+		@Override
+		public boolean supportsChildren()
+		{
+			return true ;
+		}
 
 		public void setType( final Type _type )
 		{

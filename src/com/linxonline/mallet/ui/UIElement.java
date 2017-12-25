@@ -39,6 +39,8 @@ public class UIElement implements InputHandler, Connect.Connection
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
+	private DrawDelegate<World, Draw> drawDelegate ;
+	private World world ;
 	private Camera camera = CameraAssist.getDefaultCamera() ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
 
@@ -90,6 +92,8 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
+		drawDelegate = _delegate ;
+		world = _world ;
 		camera = ( _camera != null ) ? _camera : camera ;
 
 		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
@@ -736,6 +740,27 @@ public class UIElement implements InputHandler, Connect.Connection
 	}
 
 	/**
+		Return the draw delegate that the UI is expected 
+		to use to send draw objects for rendering.
+
+		This may return null if the renderer has yet to 
+		provide a draw delegate. 
+	*/
+	public DrawDelegate<World, Draw> getDrawDelegate()
+	{
+		return drawDelegate ;
+	}
+
+	/**
+		Return the world that draw objects are expected to 
+		be displayed in.
+	*/
+	public World getWorld()
+	{
+		return world ;
+	}
+
+	/**
 		Return the camera that this UI is expected to be 
 		displayed on - used to convert inputs to the 
 		correct co-ordinate system.
@@ -771,9 +796,9 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public void clear()
 	{
-		UIElement.disconnect( this ) ;
 		listeners.clear() ;
 		events.clear() ;
+		UIElement.disconnect( this ) ;
 	}
 
 	/**
@@ -964,7 +989,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		connect.signal( _element, _signal ) ;
 	}
 
-	public static UIElement applyMeta( final UIElement.Meta _meta, final UIElement _element )
+	public static <T extends UIElement> T applyMeta( final UIElement.Meta _meta, final T _element )
 	{
 		final Vector3 temp = new Vector3() ;
 
@@ -1096,6 +1121,8 @@ public class UIElement implements InputHandler, Connect.Connection
 		private final Vector3 minimumLength = new Vector3() ;
 		private final Vector3 maximumLength = new Vector3() ;
 
+		private final List<IBase.Meta> listeners = MalletList.<IBase.Meta>newList() ;
+
 		private final Connect.Signal nameChanged    = new Connect.Signal() ;
 		private final Connect.Signal layerChanged   = new Connect.Signal() ;
 		private final Connect.Signal disableChanged = new Connect.Signal() ;
@@ -1108,6 +1135,9 @@ public class UIElement implements InputHandler, Connect.Connection
 		private final Connect.Signal lengthChanged = new Connect.Signal() ;
 		private final Connect.Signal minimumLengthChanged = new Connect.Signal() ;
 		private final Connect.Signal maximumLengthChanged = new Connect.Signal() ;
+
+		private final Connect.Signal listenerAdded = new Connect.Signal() ;
+		private final Connect.Signal listenerRemoved = new Connect.Signal() ;
 
 		private final Connect connect = new Connect() ;
 
@@ -1301,6 +1331,35 @@ public class UIElement implements InputHandler, Connect.Connection
 			return _populate ;
 		}
 
+		public IBase.Meta addListener( final IBase.Meta _meta )
+		{
+			if( _meta != null && listeners.contains( _meta ) == false )
+			{
+				listeners.add( _meta ) ;
+				UIElement.signal( this, listenerAdded() ) ;
+			}
+			return _meta ;
+		}
+
+		public IBase.Meta removeListener( final IBase.Meta _meta )
+		{
+			if( _meta != null && listeners.contains( _meta ) == true )
+			{
+				if( listeners.remove( _meta ) == true )
+				{
+					UIElement.signal( this, listenerRemoved() ) ;
+					return _meta ;
+				}
+			}
+			return null ;
+		}
+
+		public List<IBase.Meta> getListeners( final List<IBase.Meta> _listeners )
+		{
+			_listeners.addAll( listeners ) ;
+			return _listeners ;
+		}
+
 		/**
 			Remove all connections made to this packet.
 			Should only be called by the instance's owner.
@@ -1308,6 +1367,23 @@ public class UIElement implements InputHandler, Connect.Connection
 		public void shutdown()
 		{
 			UIElement.disconnect( this ) ;
+		}
+
+		/**
+			Element type is used to figure out what UIGenerator is 
+			required to create the correct UI element.
+			When extending any Meta object override this function.
+			If you do not override this then it will fallback to the 
+			parent element-type.
+		*/
+		public String getElementType()
+		{
+			return "UIELEMENT" ;
+		}
+
+		public boolean supportsChildren()
+		{
+			return false ;
 		}
 
 		@Override
@@ -1364,6 +1440,16 @@ public class UIElement implements InputHandler, Connect.Connection
 		public Connect.Signal maximumLengthChanged()
 		{
 			return maximumLengthChanged ;
+		}
+		
+		public Connect.Signal listenerAdded()
+		{
+			return listenerAdded ;
+		}
+
+		public Connect.Signal listenerRemoved()
+		{
+			return listenerRemoved ;
 		}
 	}
 

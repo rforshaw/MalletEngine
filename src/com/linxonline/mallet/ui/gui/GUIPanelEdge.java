@@ -39,20 +39,6 @@ public class GUIPanelEdge<T extends UIElement> extends GUIDrawEdge<T>
 		clicked  = _meta.getNeutralColour( new MalletColour() ) ;
 	}
 
-	public GUIPanelEdge( final MalletTexture _sheet,
-						 final float _edge,
-						 final MalletColour _neutral,
-						 final MalletColour _rollover,
-						 final MalletColour _clicked )
-	{
-		super( _sheet, _edge ) ;
-		neutral  = ( _neutral != null )  ? _neutral  : MalletColour.white() ;
-		rollover = ( _rollover != null ) ? _rollover : MalletColour.white() ;
-		clicked  = ( _clicked != null )  ? _clicked  : MalletColour.white() ;
-
-		setColour( neutral ) ;
-	}
-
 	@Override
 	public void setParent( T _parent )
 	{
@@ -110,6 +96,12 @@ public class GUIPanelEdge<T extends UIElement> extends GUIDrawEdge<T>
 		private final Connect.Signal clickedChanged  = new Connect.Signal() ;
 
 		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUIPANELEDGE" ;
+		}
 
 		public void setNeutralColour( final MalletColour _colour )
 		{

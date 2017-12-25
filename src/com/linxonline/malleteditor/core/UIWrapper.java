@@ -12,18 +12,62 @@ import com.linxonline.mallet.ui.* ;
 
 public class UIWrapper extends UIElement
 {
-	private final UIPacket packet ;
+	private final UIElement.Meta meta ;
 	private final UIElement element ;	// Element that represents packet
 
 	private final List<UIWrapper> children ;
 
-	public UIWrapper( final UIPacket _packet )
+	public UIWrapper( final UIElement.Meta _meta )
 	{
-		packet = _packet ;
-		element = packet.createElement() ;
-		wrapPacket( packet, element ) ;
+		meta = _meta ;
+		element = UIGenerator.create( _meta ) ;
 
-		children = ( packet.supportsChildren() ) ? MalletList.<UIWrapper>newList() : null ;
+		children = ( meta.supportsChildren() ) ? MalletList.<UIWrapper>newList() : null ;
+
+		UIElement.connect( this, positionChanged(), new Connect.Slot<UIWrapper>()
+		{
+			private final Vector3 unit = new Vector3() ;
+		
+			@Override
+			public void slot( final UIWrapper _parent )
+			{
+				_parent.getPosition( unit ) ;
+				element.setPosition( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, offsetChanged(), new Connect.Slot<UIWrapper>()
+		{
+			private final Vector3 unit = new Vector3() ;
+		
+			@Override
+			public void slot( final UIWrapper _parent )
+			{
+				_parent.getOffset( unit ) ;
+				element.setOffset( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, lengthChanged(), new Connect.Slot<UIWrapper>()
+		{
+			private final Vector3 unit = new Vector3() ;
+		
+			@Override
+			public void slot( final UIWrapper _parent )
+			{
+				_parent.getLength( unit ) ;
+				element.setLength( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, layerChanged(), new Connect.Slot<UIWrapper>()
+		{
+			@Override
+			public void slot( final UIWrapper _parent )
+			{
+				element.setLayer( _parent.getLayer() ) ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -31,16 +75,6 @@ public class UIWrapper extends UIElement
 	{
 		super.passDrawDelegate( _delegate, _world, _camera ) ;
 		element.passDrawDelegate( _delegate, _world, _camera ) ;
-
-		if( packet.supportsChildren() == true )
-		{
-			final int size = children.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final UIWrapper wrapper = children.get( i ) ;
-				wrapper.passDrawDelegate( _delegate, _world, _camera ) ;
-			}
-		}
 	}
 
 	/**
@@ -56,18 +90,18 @@ public class UIWrapper extends UIElement
 	public boolean insertUIWrapper( final UIWrapper _child, final float _x, final float _y )
 	{
 		// We can only insert further packets if
-		// the Wrapper contains a packet that supports
+		// the Wrapper contains a meta that supports
 		// child elements - this should extend UILayout.
-		if( packet.supportsChildren() == false ||
+		if( meta.supportsChildren() == false ||
 		    intersectPoint( _x, _y ) == false )
 		{
 			return false ;
 		}
 
-		// If the packet does support children then 
-		// attempt to insert the packet into any of 
+		// If the meta does support children then 
+		// attempt to insert the meta into any of 
 		// the currently added children... It will 
-		// return true if the packet is appropriate.
+		// return true if the meta is appropriate.
 		final int size = children.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -86,6 +120,7 @@ public class UIWrapper extends UIElement
 		// _child should be inserted between other child elements.
 		final IChildren layout = ( IChildren )element ;
 		final UIWrapper child = layout.addElement( _child ) ;
+		children.add( child ) ;
 		return true ;
 	}
 
@@ -103,7 +138,7 @@ public class UIWrapper extends UIElement
 		// We can only insert further packets if
 		// the Wrapper contains a packet that supports
 		// child elements - this should extend UILayout.
-		if( packet.supportsChildren() == false )
+		if( meta.supportsChildren() == false )
 		{
 			return false ;
 		}
@@ -112,6 +147,7 @@ public class UIWrapper extends UIElement
 		// assume the element implements IChildren.
 		final IChildren layout = ( IChildren )element ;
 		final UIWrapper child = layout.addElement( _child ) ;
+		children.add( child ) ;
 		return true ;
 	}
 
@@ -141,37 +177,18 @@ public class UIWrapper extends UIElement
 		return false ;
 	}
 
-	protected UIPacket getPacket()
-	{
-		return packet ;
-	}
-
 	@Override
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		super.update( _dt, _events ) ;
 		element.update( _dt, _events ) ;
-
-		if( packet.supportsChildren() == true )
-		{
-			for( final UIWrapper child : children )
-			{
-				child.update( _dt, _events ) ;
-			}
-		}
 	}
 
 	@Override
 	public void shutdown()
 	{
 		super.shutdown() ;
-		packet.shutdown() ;
 		element.shutdown() ;
-
-		for( final UIWrapper child : children )
-		{
-			child.shutdown() ;
-		}
 	}
 
 	@Override
@@ -179,107 +196,5 @@ public class UIWrapper extends UIElement
 	{
 		super.clear() ;
 		element.clear() ;
-
-		for( final UIWrapper child : children )
-		{
-			child.clear() ;
-		}
-	}
-
-	/**
-		Whenever anything modifies the state of the UIPacket 
-		it should update the UIElement that is meant to 
-		reflect it.
-		
-		The UIWrapper is the ultimate arbiter as it ultimately 
-		owns the packet. 
-	*/
-	private static void wrapPacket( final UIPacket _packet, final UIElement _element )
-	{
-		UIPacket.connect( _packet, _packet.positionChanged(), new Connect.Slot<UIPacket>()
-		{
-			final Vector3 temp = new Vector3() ;
-
-			public void slot( final UIPacket _packet )
-			{
-				_packet.getPosition( temp ) ;
-				_element.setPosition( temp.x, temp.y, temp.z ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.offsetChanged(), new Connect.Slot<UIPacket>()
-		{
-			final Vector3 temp = new Vector3() ;
-
-			public void slot( final UIPacket _packet )
-			{
-				_packet.getOffset( temp ) ;
-				_element.setOffset( temp.x, temp.y, temp.z ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.marginChanged(), new Connect.Slot<UIPacket>()
-		{
-			final Vector3 temp = new Vector3() ;
-
-			public void slot( final UIPacket _packet )
-			{
-				_packet.getMargin( temp ) ;
-				_element.setMargin( temp.x, temp.y, temp.z ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.minimumLengthChanged(), new Connect.Slot<UIPacket>()
-		{
-			final Vector3 temp = new Vector3() ;
-
-			public void slot( final UIPacket _packet )
-			{
-				_packet.getMinimumLength( temp ) ;
-				_element.setMinimumLength( temp.x, temp.y, temp.z ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.maximumLengthChanged(), new Connect.Slot<UIPacket>()
-		{
-			final Vector3 temp = new Vector3() ;
-
-			public void slot( final UIPacket _packet )
-			{
-				_packet.getMaximumLength( temp ) ;
-				_element.setMaximumLength( temp.x, temp.y, temp.z ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.layerChanged(), new Connect.Slot<UIPacket>()
-		{
-			public void slot( final UIPacket _packet )
-			{
-				_element.setLayer( _packet.getLayer() ) ;
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.disableChanged(), new Connect.Slot<UIPacket>()
-		{
-			public void slot( final UIPacket _packet )
-			{
-				if( _packet.getDisableFlag() )
-				{
-					_element.disable() ;
-				}
-				else
-				{
-					_element.enable() ;
-				}
-			}
-		} ) ;
-
-		UIPacket.connect( _packet, _packet.visibleChanged(), new Connect.Slot<UIPacket>()
-		{
-			public void slot( final UIPacket _packet )
-			{
-				_element.setVisible( _packet.getVisibleFlag() ) ;
-			}
-		} ) ;
 	}
 }

@@ -39,17 +39,6 @@ public class GUIPanelDraw<T extends UIElement> extends GUIDraw<T>
 		clicked  = _meta.getClickedUV( new UIElement.UV() ) ;
 	}
 
-	public GUIPanelDraw( final MalletTexture _sheet,
-						 final UIElement.UV _neutral,
-						 final UIElement.UV _rollover,
-						 final UIElement.UV _clicked )
-	{
-		super( _sheet, _neutral ) ;
-		neutral = _neutral ;
-		rollover = _rollover ;
-		clicked = _clicked ;
-	}
-
 	@Override
 	public void setParent( T _parent )
 	{
@@ -104,6 +93,12 @@ public class GUIPanelDraw<T extends UIElement> extends GUIDraw<T>
 		private final Connect.Signal clickedChanged  = new Connect.Signal() ;
 
 		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUIPANELDRAW" ;
+		}
 
 		public void setNeutralUV( UIElement.UV _uv )
 		{

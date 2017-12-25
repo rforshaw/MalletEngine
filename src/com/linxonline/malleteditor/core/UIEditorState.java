@@ -5,6 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;
+import com.linxonline.mallet.ui.gui.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.audio.* ;
@@ -17,10 +18,14 @@ import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
+import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 public class UIEditorState extends GameState
 {
+	private UILayout mainView ;
+	private UIList elementsView ;
+
 	public UIEditorState( final String _name )
 	{
 		super( _name ) ;
@@ -29,53 +34,54 @@ public class UIEditorState extends GameState
 	@Override
 	public void initGame()
 	{
-		final World edWorld = WorldAssist.getDefaultWorld() ;
-		/*final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
-		final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
-																			new Vector3(),
-																			new Vector3( 1, 1, 1 ) ) ;
-
-		CameraAssist.addCamera( edCamera, edWorld ) ;*/
-
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
 		{
-			final UIButton openProject = jui.get( "OpenButton", UIButton.class ) ;
-			openProject.addListener( new InputListener<UIButton>()
+			final UIButton open = jui.get( "OpenButton", UIButton.class ) ;
+			UIButton.connect( open, open.released(), new Connect.Slot<UIButton>()
 			{
-				@Override
-				public InputEvent.Action mouseReleased( final InputEvent _input )
+				final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+				public void slot( final UIButton _open )
 				{
 					System.out.println( "Open Project..." ) ;
-					return InputEvent.Action.CONSUME ;
+					mainView.getElements( elements ) ;
+					for( UIElement element : elements )
+					{
+						mainView.removeElement( element ) ;
+					}
+					elements.clear() ;
+
+					final UIWrapper wrapper = JUIWrapper.loadWrapper( "base/ui/test.jui" ) ;
+					wrapper.setLayer( 1 ) ;
+
+					mainView.addElement( wrapper ) ;
 				}
 			} ) ;
-			
-			final UIButton saveProject = jui.get( "SaveButton", UIButton.class ) ;
-			saveProject.addListener( new InputListener<UIButton>()
+
+			final UIButton save = jui.get( "SaveButton", UIButton.class ) ;
+			UIButton.connect( save, save.released(), new Connect.Slot<UIButton>()
 			{
-				@Override
-				public InputEvent.Action mouseReleased( final InputEvent _input )
+				public void slot( final UIButton _open )
 				{
 					System.out.println( "Save Project..." ) ;
-					return InputEvent.Action.CONSUME ;
 				}
 			} ) ;
 
-			final UIButton exitProject = jui.get( "ExitButton", UIButton.class ) ;
-			exitProject.addListener( new InputListener<UIButton>()
+			final UIButton exit = jui.get( "ExitButton", UIButton.class ) ;
+			UIButton.connect( exit, exit.released(), new Connect.Slot<UIButton>()
 			{
-				@Override
-				public InputEvent.Action mouseReleased( final InputEvent _input )
+				public void slot( final UIButton _open )
 				{
 					System.out.println( "Exit Project..." ) ;
-					return InputEvent.Action.CONSUME ;
 				}
 			} ) ;
 
-			createMainView( jui.get( "MainWindow", UILayout.class ), edWorld ) ;
-			createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
-			createStructurePanel( jui.get( "UIStructurePanel", UIList.class ) ) ;
-			createElementDataPanel( jui.get( "UIElementDataPanel", UIList.class ) ) ;
+			mainView = jui.get( "MainWindow", UILayout.class ) ;
+			//mainView.addElement( JUIWrapper.loadWrapper( "base/ui/test.jui" ) ) ;
+
+			//createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
+			//createStructurePanel( jui.get( "UIStructurePanel", UIList.class ) ) ;
+			//createElementDataPanel( jui.get( "UIElementDataPanel", UIList.class ) ) ;
 		}
 
 		final Entity entity = new Entity( "UI" ) ;
@@ -88,68 +94,27 @@ public class UIEditorState extends GameState
 		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 	}
 
+	/**
+		A list of elements that can be added to a UI.
+	*/
 	private void createElementsPanel( final UIList _view )
 	{
 	
 	}
 
+	/**
+		The tree structure of the currently active UI. 
+	*/
 	private void createStructurePanel( final UIList _view )
 	{
 	
 	}
 
+	/**
+		The meta data of the currently selected element.
+	*/
 	private void createElementDataPanel( final UIList _view )
 	{
 	
-	}
-
-	private void createMainView( final UILayout _view, final World _world )
-	{
-		//final UIWrapper wrapper = JUIWrapper.load( "base/ui/test.jui" ) ;
-		//_view.addElement( wrapper ) ;
-
-		/*_view.addListener( new GUIBase<UIElement>()
-		{
-			private Draw draw1 = null ;
-
-			@Override
-			public void constructDraws()
-			{
-				final UIElement parent = getParent() ;
-				final Vector3 length = parent.getLength() ;
-
-				draw1 = DrawAssist.createDraw( parent.getPosition(),
-											   parent.getOffset(),
-											   new Vector3(),
-											   new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
-
-				DrawAssist.amendUI( draw1, true ) ;
-				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 640, 360, 0 ),
-																	new Vector2( 0, 1 ),
-																	new Vector2( 1, 0 ) ) ) ;
-				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
-				DrawAssist.attachProgram( draw1, program ) ;
-
-				DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-			}
-
-			@Override
-			public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
-			{
-				_delegate.addBasicDraw( draw1, _world ) ;
-			}
-
-			@Override
-			public void removeDraws( final DrawDelegate<World, Draw> _delegate )
-			{
-				_delegate.removeDraw( draw1 ) ;
-			}
-
-			@Override
-			public void refresh() {}
-		} ) ;*/
 	}
 }

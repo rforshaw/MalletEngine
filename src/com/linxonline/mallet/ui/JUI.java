@@ -24,274 +24,237 @@ import com.linxonline.mallet.ui.gui.* ;
 
 /**
 	UIMap provides a data-driven means to creating UI.
-	The class is broken up into two sections, the Generator
+	The class is broken up into two sections, the ElementGenerator
 	and the UIMap populated with the content.
 */
 public class JUI
 {
-	private final static Map<String, Generator> creators = MalletMap.<String, Generator>newMap() ;
+	private final static Map<String, Generator> elementCreators = MalletMap.<String, Generator>newMap() ;
 	static
 	{
-		creators.put( "UIELEMENT", new Generator()
+		elementCreators.put( "UIELEMENT", new Generator<UIElement, UIElement.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UIElement.Meta createMeta( final JSONObject _ui )
 			{
 				final UIElement.Meta meta = new UIElement.Meta() ;
+				applyBasics( _ui, meta ) ;
 
-				applyBasics( _map, _ui, meta ) ;
-				final UIElement element = UIElement.applyMeta( meta, new UIElement() ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( JUI.<UIElement>createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ) ;
-				element.addListener( JUI.<UIElement>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UIElement>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				return meta ;
+			}
 
-				return element ;
+			public UIElement create( final JUI _map, final UIElement.Meta _meta, final JSONObject _ui )
+			{
+				return UIGenerator.<UIElement>create( _meta ) ;
 			}
 		} ) ;
 
-		creators.put( "UILAYOUT", new Generator()
+		elementCreators.put( "UILAYOUT", new Generator<UILayout, UILayout.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UILayout.Meta createMeta( final JSONObject _ui )
 			{
 				final UILayout.Meta meta = new UILayout.Meta() ;
 
-				applyBasics( _map, _ui, meta ) ;
+				applyBasics( _ui, meta ) ;
 				meta.setType( UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				final UILayout element = UILayout.applyMeta( meta, new UILayout( meta.getType() ) ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UILayout>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				return meta ;
+			}
 
+			public UILayout create( final JUI _map, final UILayout.Meta _meta, final JSONObject _ui )
+			{
+				final UILayout element = UIGenerator.<UILayout>create( _meta ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
 		} ) ;
 
-		creators.put( "UIWINDOW_LAYOUT", new Generator()
+		elementCreators.put( "UIWINDOW_LAYOUT", new Generator<UILayout, UILayout.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UILayout.Meta createMeta( final JSONObject _ui )
 			{
-				final UILayout.Meta meta = new UILayout.Meta() ;
+				final UILayout.Meta meta = new UILayout.Meta()
+				{
+					@Override
+					public String getElementType()
+					{
+						return "UIWINDOW_LAYOUT" ;
+					}
+				} ;
 
-				applyBasics( _map, _ui, meta ) ;
+				applyBasics( _ui, meta ) ;
 				meta.setType( UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				final UILayout element = UIFactory.constructWindowLayout( meta.getType() ) ;
-				UILayout.applyMeta( meta, element ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( JUI.<UILayout>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UILayout>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-
+				return meta ;
+			}
+		
+			public UILayout create( final JUI _map, final UILayout.Meta _meta, final JSONObject _ui )
+			{
+				final UILayout element = UIGenerator.<UILayout>create( _meta ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
 		} ) ;
 
-		creators.put( "UITEXTFIELD", new Generator()
+		elementCreators.put( "UITEXTFIELD", new Generator<UITextField, UITextField.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UITextField.Meta createMeta( final JSONObject _ui )
 			{
 				final UITextField.Meta meta = new UITextField.Meta() ;
+				applyBasics( _ui, meta ) ;
 
-				applyBasics( _map, _ui, meta ) ;
-				final UIElement element = UIElement.applyMeta( meta, new UITextField() ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addListener( JUI.createGUIEditText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
 
-				element.addListener( JUI.<UITextField>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UITextField>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-				element.addListener( createEditText( _ui.getJSONObject( "UITEXT" ), element.getRatio() )  ) ;
-
-				return element ;
+				return meta ;
 			}
 
-			private GUIEditText createEditText( final JSONObject _ui, final UIRatio _ratio )
+			public UITextField create( final JUI _map, final UITextField.Meta _meta, final JSONObject _ui )
 			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final String text = _ui.optString( "TEXT", "" ) ;
-				final String fontName = _ui.optString( "FONT", null ) ;
-				final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
-
-				final MalletFont font = ( fontName != null ) ? MalletFont.createByPixel( fontName, MalletFont.PLAIN, fontSize ) : null ;
-
-				final GUIEditText listener = new GUIEditText( text, font ) ;
-				listener.setColour( MalletColour.parseColour( _ui.optString( "COLOUR_TEXT", null ) ) ) ;
-
-				final JSONObject align = _ui.optJSONObject( "ALIGNMENT_TEXT", null ) ;
-				if( align != null )
-				{
-					listener.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-				}
-
-				return listener ;
+				return UIGenerator.<UITextField>create( _meta ) ;
 			}
 		} ) ;
 
-		creators.put( "UIBUTTON", new Generator()
+		elementCreators.put( "UIBUTTON", new Generator<UIButton, UIButton.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UIButton.Meta createMeta( final JSONObject _ui )
 			{
 				final UIButton.Meta meta = new UIButton.Meta() ;
+				applyBasics( _ui, meta ) ;
 
-				applyBasics( _map, _ui, meta ) ;
-				final UIElement element = UIElement.applyMeta( meta, new UIButton() ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addListener( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ) ;
-				element.addListener( JUI.<UIButton>createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UIButton>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				return meta ;
+			}
 
-				return element ;
+			public UIButton create( final JUI _map, final UIButton.Meta _meta, final JSONObject _ui )
+			{
+				return UIGenerator.<UIButton>create( _meta ) ;
 			}
 		} ) ;
 
-		creators.put( "UIMENU", new Generator()
+		elementCreators.put( "UIMENU", new Generator<UIMenu, UIMenu.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UIMenu.Meta createMeta( final JSONObject _ui )
 			{
 				final UIMenu.Meta meta = new UIMenu.Meta() ;
 
-				applyBasics( _map, _ui, meta ) ;
+				applyBasics( _ui, meta ) ;
 				meta.setType( UIMenu.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 				meta.setThickness( ( float )_ui.optDouble( "THICKNESS", 0.0 ) ) ;
 
-				final UIMenu element = UIMenu.applyMeta( meta, new UIMenu( meta.getType(), meta.getThickness() ) ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
+				return meta ;
+			}
+
+			public UIMenu create( final JUI _map, final UIMenu.Meta _meta, final JSONObject _ui )
+			{
+				final UIMenu element = UIGenerator.<UIMenu>create( _meta ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
-
-				element.addListener( JUI.<UIMenu>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UIMenu>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-
 				return element ;
 			}
 		} ) ;
 
-		creators.put( "UISPACER", new Generator()
+		elementCreators.put( "UISPACER", new Generator<UISpacer, UISpacer.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UISpacer.Meta createMeta( final JSONObject _ui )
 			{
 				final UISpacer.Meta meta = new UISpacer.Meta() ;
 
-				applyBasics( _map, _ui, meta ) ;
+				applyBasics( _ui, meta ) ;
 				meta.setAxis( UISpacer.Axis.derive( _ui.optString( "AXIS", null ) ) ) ;
 
-				final UISpacer element = UISpacer.applyMeta( meta, new UISpacer( meta.getAxis() ) ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( JUI.<UISpacer>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UISpacer>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				return meta ;
+			}
 
-				return element ;
+			public UISpacer create( final JUI _map, final UISpacer.Meta _meta, final JSONObject _ui )
+			{
+				return UIGenerator.<UISpacer>create( _meta ) ;
 			}
 		} ) ;
 		
-		creators.put( "UICHECKBOX", new Generator()
+		elementCreators.put( "UICHECKBOX", new Generator<UICheckbox, UICheckbox.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UICheckbox.Meta createMeta( final JSONObject _ui )
 			{
 				final UICheckbox.Meta meta = new UICheckbox.Meta() ;
+				applyBasics( _ui, meta ) ;
 
-				applyBasics( _map, _ui, meta ) ;
-				final UIElement element = UIElement.applyMeta( meta, new UICheckbox() ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUITick( _ui.getJSONObject( "UITICK" ) )  ) ;
+				meta.addListener( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				element.addListener( createGUITick( _ui.getJSONObject( "UITICK" ) )  ) ;
-				element.addListener( JUI.<UICheckbox>createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UICheckbox>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-
-				return element ;
+				return meta ;
 			}
 
-			private UICheckbox.GUITick createGUITick( final JSONObject _ui )
+			public UICheckbox create( final JUI _map, final UICheckbox.Meta _meta, final JSONObject _ui )
 			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
-				final boolean retainRatio = _ui.optBoolean( "RETAIN_RATIO", false ) ;
-				final String texturePath = _ui.optString( "TEXTURE", null ) ;
-
-				final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
-
-				final UICheckbox.GUITick tick = new UICheckbox.GUITick( texture, uv ) ;
-				tick.setRetainRatio( retainRatio ) ;
-
-				{
-					final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
-					if( align != null )
-					{
-						tick.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
-										   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
-					}
-				}
-
-				return tick ;
+				return UIGenerator.<UICheckbox>create( _meta ) ;
 			}
 		} ) ;
 
-		creators.put( "UILIST", new Generator()
+		elementCreators.put( "UILIST", new Generator<UIList, UIList.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UIList.Meta createMeta( final JSONObject _ui )
 			{
 				final UIList.Meta meta = new UIList.Meta() ;
 
-				applyBasics( _map, _ui, meta ) ;
+				applyBasics( _ui, meta ) ;
 				meta.setType( UIList.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				final UILayout element = UILayout.applyMeta( meta, new UIList( meta.getType() ) ) ;
-				applyLookup( _map, element, meta ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addListener( JUI.createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ) ;
 
-				element.addListener( JUI.<UIList>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UIList>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-				element.addListener( createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ) ;
+				return meta ;
+			}
 
+			public UIList create( final JUI _map, final UIList.Meta _meta, final JSONObject _ui )
+			{
+				final UIList element = UIGenerator.<UIList>create( _meta ) ;
 				addChildren( _map, element, _ui.getJSONArray( "CHILDREN" ) ) ;
 				return element ;
 			}
-
-			private GUIScrollbar<UIList> createScrollbar( final JSONObject _ui )
-			{
-				if( _ui == null )
-				{
-					return null ;
-				}
-
-				final UIElement.UV uv  = createUV( _ui.getJSONObject( "UV" ) ) ;
-				final String texturePath = _ui.optString( "TEXTURE", null ) ;
-
-				final MalletTexture texture = ( texturePath != null ) ? new MalletTexture( texturePath ) : null ;
-
-				return new GUIScrollbar(  texture, uv) ;
-			}
 		} ) ;
 
-		creators.put( "UIMENU_ITEM", new Generator()
+		elementCreators.put( "UIMENU_ITEM", new Generator<UIButton, UIButton.Meta>()
 		{
-			public UIElement create( final JUI _map, final JSONObject _ui )
+			public UIButton.Meta createMeta( final JSONObject _ui )
 			{
 				final UIButton.Meta meta = new UIButton.Meta() ;
+				applyBasics( _ui, meta ) ;
 
-				applyBasics( _map, _ui, meta ) ;
-				
-				final UIMenu.Item element = new UIMenu.Item( JUI.createElement( _map, _ui.getJSONObject( "DROPDOWN" ) ) ) ;
-				UIElement.applyMeta( meta, element ) ;
+				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
-				applyLookup( _map, element, meta ) ;
+				return meta ;
+			}
 
-				element.addListener( JUI.<UIMenu.Item>createGUIText( _ui.getJSONObject( "UITEXT" ), element.getRatio() ) ) ;
-				element.addListener( JUI.<UIMenu.Item>createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				element.addListener( JUI.<UIMenu.Item>createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+			public UIButton create( final JUI _map, final UIButton.Meta _meta, final JSONObject _ui )
+			{
+				final UIElement dropdown = JUI.createElement( _map, _ui.getJSONObject( "DROPDOWN" ) ) ;
+
+				final UIMenu.Item element = new UIMenu.Item( dropdown ) ;
+				UIElement.applyMeta( _meta, element ) ;
+				UIGenerator.addListeners( element, _meta ) ;
 
 				return element ;
 			}
@@ -301,9 +264,9 @@ public class JUI
 	/**
 		Allow the developer to extend the UI system.
 	*/
-	public static void addGenerator( final String _id, final Generator _create )
+	public static void addElementGenerator( final String _id, final Generator _create )
 	{
-		creators.put( _id, _create ) ;
+		elementCreators.put( _id, _create ) ;
 	}
 
 	private final Map<String, UIElement> lookup = MalletMap.<String, UIElement>newMap() ;
@@ -314,6 +277,7 @@ public class JUI
 		parent = createElement( this, _map ) ;
 		if( parent == null )
 		{
+			Logger.println( "Error: JUI loaded but no parent element constructed..", Logger.Verbosity.MAJOR ) ;
 			lookup.clear() ;
 		}
 	}
@@ -390,10 +354,10 @@ public class JUI
 		return null ;
 	}
 
-	public static UIElement createElement( final JUI _map, final JSONObject _ui )
+	public static UIElement.Meta createMeta( final JSONObject _ui )
 	{
 		final String type = _ui.optString( "TYPE", null ) ;
-		final Generator create = creators.get( type ) ;
+		final Generator create = elementCreators.get( type ) ;
 		if( create == null )
 		{
 			// If a creator is not available we can't construct 
@@ -402,12 +366,33 @@ public class JUI
 			return null ;
 		}
 
-		return create.create( _map, _ui ) ;
+		//Logger.println( "Creating: " + _ui.toString(), Logger.Verbosity.MINOR ) ;
+		return create.createMeta( _ui ) ;
+	}
+
+	private static UIElement createElement( final JUI _map, final JSONObject _ui )
+	{
+		final String type = _ui.optString( "TYPE", null ) ;
+		final Generator create = elementCreators.get( type ) ;
+		if( create == null )
+		{
+			// If a creator is not available we can't construct 
+			// the requested type.
+			Logger.println( type + " generator doesn't exist.", Logger.Verbosity.MAJOR ) ;
+			return null ;
+		}
+
+		//Logger.println( "Creating: " + _ui.toString(), Logger.Verbosity.MINOR ) ;
+		final UIElement.Meta meta = create.createMeta( _ui ) ;
+		final UIElement element = create.create( _map, meta, _ui ) ;
+
+		applyLookup( _map, element, meta ) ;
+		return element ;
 	}
 
 	private static void addChildren( final JUI _map, final UILayout _layout, final JSONArray _children )
 	{
-		if( _children == null )
+		if( _map == null || _children == null )
 		{
 			return ;
 		}
@@ -424,7 +409,7 @@ public class JUI
 		}
 	}
 
-	public static void applyBasics( final JUI _map, final JSONObject _ui, final UIElement.Meta _meta )
+	public static void applyBasics( final JSONObject _ui, final UIElement.Meta _meta )
 	{
 		_meta.setName( _ui.optString( "NAME", null ) ) ;
 		_meta.setLength( Vector3.parseVector3( _ui.optString( "LENGTH", null ) ) ) ;
@@ -447,7 +432,7 @@ public class JUI
 		}
 	}
 
-	public static <T extends UIElement> GUIDrawEdge<T> createGUIPanelEdge( final JSONObject _ui )
+	public static GUIPanelEdge.Meta createGUIPanelEdge( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
@@ -461,10 +446,10 @@ public class JUI
 		meta.setRolloverColour( MalletColour.parseColour( _ui.optString( "COLOUR_ROLLOVER", null ) ) ) ;
 		meta.setClickedColour( MalletColour.parseColour( _ui.optString( "COLOUR_CLICKED", null ) ) ) ;
 
-		return new GUIPanelEdge<T>( meta ) ;
+		return meta ;
 	}
 	
-	public static <T extends UIElement> GUIDraw<T> createGUIDraw( final JSONObject _ui )
+	public static GUIDraw.Meta createGUIDraw( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
@@ -483,10 +468,10 @@ public class JUI
 							   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 		}
 
-		return new GUIDraw<T>( meta ) ;
+		return meta ;
 	}
 
-	public static <T extends UIElement> GUIText<T> createGUIText( final JSONObject _ui, final UIRatio _ratio )
+	public static GUIText.Meta createGUIText( final JSONObject _ui, final UIRatio _ratio )
 	{
 		if( _ui == null )
 		{
@@ -507,10 +492,10 @@ public class JUI
 							   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 		}
 
-		return new GUIText<T>( meta ) ;
+		return meta ;
 	}
 
-	public static <T extends UITextField> GUIEditText<T> createGUIEditText( final JSONObject _ui, final UIRatio _ratio )
+	public static GUIEditText.Meta createGUIEditText( final JSONObject _ui, final UIRatio _ratio )
 	{
 		if( _ui == null )
 		{
@@ -531,10 +516,10 @@ public class JUI
 							   UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 		}
 
-		return new GUIEditText<T>( meta ) ;
+		return meta ;
 	}
 
-	public static <T extends UIElement> GUIPanelDraw<T> createGUIPanelDraw( final JSONObject _ui )
+	public static GUIPanelDraw.Meta createGUIPanelDraw( final JSONObject _ui )
 	{
 		if( _ui == null )
 		{
@@ -555,9 +540,41 @@ public class JUI
 								UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
 		}
 
-		return new GUIPanelDraw<T>( meta ) ;
+		return meta ;
 	}
 
+	public static GUITick.Meta createGUITick( final JSONObject _ui )
+	{
+		if( _ui == null )
+		{
+			return null ;
+		}
+
+		final GUITick.Meta meta = new GUITick.Meta() ;
+		meta.setUV( createUV( _ui.getJSONObject( "UV" ) ) ) ;
+		meta.setRetainRatio( _ui.optBoolean( "RETAIN_RATIO", false ) ) ;
+		meta.setSheet( _ui.optString( "TEXTURE", null ) ) ;
+
+		final JSONObject align = _ui.optJSONObject( "ALIGNMENT", null ) ;
+		if( align != null )
+		{
+			meta.setAlignment( UI.Alignment.derive( align.optString( "X", null ) ),
+								UI.Alignment.derive( align.optString( "Y", null ) ) ) ;
+		}
+
+		return meta ;
+	}
+
+	public static GUIScrollbar.Meta createScrollbar( final JSONObject _ui )
+	{
+		if( _ui == null )
+		{
+			return null ;
+		}
+
+		return new GUIScrollbar.Meta() ;
+	}
+	
 	public static UIElement.UV createUV( final JSONObject _uv )
 	{
 		if( _uv == null )
@@ -570,8 +587,10 @@ public class JUI
 		return new UIElement.UV( min, max ) ;
 	}
 
-	public interface Generator
+	public interface Generator<E extends UIElement, M extends E.Meta>
 	{
-		public UIElement create( final JUI _map, final JSONObject _ui ) ;
+		public M createMeta( final JSONObject _ui ) ;
+
+		public E create( final JUI _map, final M _meta, final JSONObject _ui ) ;
 	}
 }

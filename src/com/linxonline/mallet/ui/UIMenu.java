@@ -68,6 +68,12 @@ public class UIMenu extends UILayout
 
 		public Meta() {}
 
+		@Override
+		public String getElementType()
+		{
+			return "UIMENU" ;
+		}
+
 		public void setThickness( final float _thickness )
 		{
 			if( Math.abs( thickness - _thickness ) > 0.001f )

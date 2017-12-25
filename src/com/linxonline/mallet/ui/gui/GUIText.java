@@ -178,6 +178,12 @@ public class GUIText<T extends UIElement> extends GUIBase<T>
 		
 		public Meta() {}
 
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUITEXT" ;
+		}
+
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
 			if( _x != null && _x != xAlign )

@@ -135,4 +135,15 @@ public class UIButton extends UIElement
 	{
 		return released ;
 	}
+
+	public static class Meta extends UIElement.Meta
+	{
+		public Meta() {}
+
+		@Override
+		public String getElementType()
+		{
+			return "UIBUTTON" ;
+		}
+	}
 }

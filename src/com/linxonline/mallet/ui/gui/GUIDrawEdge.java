@@ -14,12 +14,6 @@ public class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 		edge = _meta.getEdge() ;
 	}
 
-	public GUIDrawEdge( final MalletTexture _sheet, final float _edge )
-	{
-		super( _sheet, null ) ;
-		edge = _edge ;
-	}
-
 	/**
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
@@ -85,6 +79,12 @@ public class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 		private final Connect.Signal edgeChanged = new Connect.Signal() ;
 
 		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUIDRAWEDGE" ;
+		}
 
 		public void setEdge( final float _edge )
 		{

@@ -174,7 +174,8 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		UIElement.disconnect( parent, parent.positionChanged(), positionSlot ) ;
 		UIElement.disconnect( parent, parent.offsetChanged(),   offsetSlot ) ;
 		UIElement.disconnect( parent, parent.lengthChanged(),   lengthSlot ) ;
-	
+
+		removeDraws( delegate ) ;
 		delegate = null ;
 		world = null ;
 	}
@@ -189,11 +190,24 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		return world ;
 	}
 
-	public static class Meta implements Connect.Connection
+	public static class Meta extends ABase.Meta
 	{
 		private final Connect connect = new Connect() ;
 
 		public Meta() {}
+
+		/**
+			Base type is used to figure out what GUIGenerator is 
+			required to create the correct GUI listener.
+			When extending any Meta object override this function.
+			If you do not override this then it will fallback to the 
+			parent base-type.
+		*/
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUIBASE" ;
+		}
 
 		/**
 			Remove all connections made to this packet.

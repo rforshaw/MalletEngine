@@ -107,14 +107,14 @@ public class Connect
 		final Map<Signal, List<Slot<Object>>> lookups = connections.get( _element ) ;
 		if( lookups == null )
 		{
-			Logger.println( _element + " has no connections.", Logger.Verbosity.MAJOR ) ;
+			Logger.println( _element + " element has no connections.", Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
 		final List<Slot<Object>> slots = lookups.get( _signal ) ;
 		if( slots == null )
 		{
-			Logger.println( _signal + " has no connections.", Logger.Verbosity.MAJOR ) ;
+			Logger.println( _signal + " signal has no connections.", Logger.Verbosity.MAJOR ) ;
 			return false ;
 		}
 
@@ -128,7 +128,7 @@ public class Connect
 		{
 			// If there are no connections left we will automatically
 			// remove the signal from the connection list.
-			disconnect( _element ) ;
+			lookups.remove( _signal ) ;
 		}
 
 		return true ;

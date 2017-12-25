@@ -106,4 +106,15 @@ public class UITextField extends UIElement
 	{
 		return textChanged ;
 	}
+
+	public static class Meta extends UIElement.Meta
+	{
+		public Meta() {}
+
+		@Override
+		public String getElementType()
+		{
+			return "UITEXTFIELD" ;
+		}
+	}
 }

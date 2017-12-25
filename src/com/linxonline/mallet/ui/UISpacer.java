@@ -72,6 +72,12 @@ public class UISpacer extends UIElement
 
 		public Meta() {}
 
+		@Override
+		public String getElementType()
+		{
+			return "UISPACER" ;
+		}
+
 		public void setAxis( final Axis _axis )
 		{
 			if( _axis != axis )

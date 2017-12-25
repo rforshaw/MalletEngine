@@ -101,4 +101,9 @@ public interface IBase<T extends UIElement>
 		Clean up any resources you may have allocated.
 	*/
 	public void shutdown() ;
+
+	public interface Meta extends Connect.Connection
+	{
+		public String getType() ;
+	}
 }

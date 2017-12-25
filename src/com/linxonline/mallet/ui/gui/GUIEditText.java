@@ -358,4 +358,15 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		getParent().makeDirty() ;
 		return InputEvent.Action.PROPAGATE ;
 	}
+
+	public static class Meta extends GUIText.Meta
+	{
+		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UITEXTFIELD_GUIEDITTEXT" ;
+		}
+	}
 }

@@ -58,7 +58,16 @@ public final class UIFactory
 		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
 
 		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
-		final UILayout layout = new UILayout( _type, new Vector3(), new Vector3(), dimension ) ;
+
+		final UILayout layout = new UILayout( _type ) ;
+		final UIRatio ratio = layout.getRatio() ;
+
+		layout.setLength( ratio.toUnitX( dimension.x ),
+						  ratio.toUnitY( dimension.y ),
+						  ratio.toUnitZ( dimension.z ) ) ;
+
+		CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
+		CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
 
 		layout.addListener( new ABase<UILayout>()
 		{
@@ -72,7 +81,6 @@ public final class UIFactory
 					layout.setLength( ratio.toUnitX( dimension.x ),
 									  ratio.toUnitY( dimension.y ),
 									  ratio.toUnitZ( dimension.z ) ) ;
-					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
@@ -89,7 +97,6 @@ public final class UIFactory
 					layout.setLength( ratio.toUnitX( dimension.x ),
 									  ratio.toUnitY( dimension.y ),
 									  ratio.toUnitZ( dimension.z ) ) ;
-					layout.makeDirty() ;
 
 					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;

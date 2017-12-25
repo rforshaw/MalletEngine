@@ -28,13 +28,6 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 		sheet          = new MalletTexture( _meta.getSheet() ) ;
 		uv             = _meta.getUV( new UIElement.UV() ) ;
 	}
-	
-	public GUIDraw( final MalletTexture _sheet, final UIElement.UV _uv )
-	{
-		super() ;
-		sheet = _sheet ;
-		uv = _uv ;
-	}
 
 	public void setRetainRatio( final boolean _ratio )
 	{
@@ -204,6 +197,12 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 		private final Connect.Signal uvChanged          = new Connect.Signal() ;
 		
 		public Meta() {}
+
+		@Override
+		public String getType()
+		{
+			return "UIELEMENT_GUIDRAW" ;
+		}
 
 		public void setRetainRatio( final boolean _retain )
 		{
