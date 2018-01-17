@@ -10,6 +10,14 @@ import com.linxonline.mallet.maths.* ;
 	once delegate has been provided and the parent is 
 	visible, if the parent is invisible removeDraws is 
 	called instead.
+
+	The slots defined in this class can be overridden and 
+	custom logic can be implemented if required.
+
+	Ensure that you initialise your slot upfront and return 
+	it in the overridden function, do not return a new slot 
+	on each function call - else the slots will not be removed 
+	on shutdown.
 */
 public abstract class GUIBase<T extends UIElement> extends ABase<T>
 {
@@ -118,11 +126,11 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		offset.setXYZ( _parent.getOffset() ) ;
 		length.setXYZ( _parent.getLength() ) ;
 
-		UIElement.connect( _parent, _parent.elementShown(),    addDrawSlot ) ;
-		UIElement.connect( _parent, _parent.elementHidden(),   removeDrawSlot ) ;
-		UIElement.connect( _parent, _parent.positionChanged(), positionSlot ) ;
-		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot ) ;
-		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot ) ;
+		UIElement.connect( _parent, _parent.elementShown(),    addDrawSlot() ) ;
+		UIElement.connect( _parent, _parent.elementHidden(),   removeDrawSlot() ) ;
+		UIElement.connect( _parent, _parent.positionChanged(), positionSlot() ) ;
+		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot() ) ;
+		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot() ) ;
 	}
 
 	/**
@@ -165,15 +173,60 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		return length ;
 	}
 
+	/**
+		This slot is called when the parent element has been made 
+		visible and is expected to display something to the screen.
+	*/
+	public Connect.Slot<T> addDrawSlot()
+	{
+		return addDrawSlot ;
+	}
+
+	/**
+		This slot is called when the parent element has been made 
+		invisible and is expected to not display anything to the screen.
+	*/
+	public Connect.Slot<T> removeDrawSlot()
+	{
+		return removeDrawSlot ;
+	}
+
+	/**
+		This slot is called when the parent element has changed 
+		position and the GUI is expected to reflect that.
+	*/
+	public Connect.Slot<T> positionSlot()
+	{
+		return positionSlot ;
+	}
+
+	/**
+		This slot is called when the parent element has changed 
+		offset and the GUI is expected to reflect that.
+	*/
+	public Connect.Slot<T> offsetSlot()
+	{
+		return offsetSlot ;
+	}
+
+	/**
+		This slot is called when the parent element has changed 
+		length and the GUI is expected to reflect that.
+	*/
+	public Connect.Slot<T> lengthSlot()
+	{
+		return lengthSlot ;
+	}
+
 	@Override
 	public void shutdown()
 	{
 		final T parent = getParent() ;
-		UIElement.disconnect( parent, parent.elementShown(),    addDrawSlot ) ;
-		UIElement.disconnect( parent, parent.elementHidden(),   removeDrawSlot ) ;
-		UIElement.disconnect( parent, parent.positionChanged(), positionSlot ) ;
-		UIElement.disconnect( parent, parent.offsetChanged(),   offsetSlot ) ;
-		UIElement.disconnect( parent, parent.lengthChanged(),   lengthSlot ) ;
+		UIElement.disconnect( parent, parent.elementShown(),    addDrawSlot() ) ;
+		UIElement.disconnect( parent, parent.elementHidden(),   removeDrawSlot() ) ;
+		UIElement.disconnect( parent, parent.positionChanged(), positionSlot() ) ;
+		UIElement.disconnect( parent, parent.offsetChanged(),   offsetSlot() ) ;
+		UIElement.disconnect( parent, parent.lengthChanged(),   lengthSlot() ) ;
 
 		removeDraws( delegate ) ;
 		delegate = null ;

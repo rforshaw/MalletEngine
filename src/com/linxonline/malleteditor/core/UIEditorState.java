@@ -26,6 +26,8 @@ public class UIEditorState extends GameState
 	private UILayout mainView ;
 	private UIList elementsView ;
 
+	private UIWrapper root = null ;
+
 	public UIEditorState( final String _name )
 	{
 		super( _name ) ;
@@ -44,17 +46,26 @@ public class UIEditorState extends GameState
 				public void slot( final UIButton _open )
 				{
 					System.out.println( "Open Project..." ) ;
-					mainView.getElements( elements ) ;
+					cleanup( mainView ) ;
+
+					root = JUIWrapper.loadWrapper( "base/ui/test.jui" ) ;
+					root.setLayer( 1 ) ;
+
+					mainView.addElement( root ) ;
+				}
+
+				/**
+					Remove any elements that are stored in the passed 
+					in layout.
+				*/
+				private void cleanup( final UILayout _view )
+				{
+					_view.getElements( elements ) ;
 					for( UIElement element : elements )
 					{
-						mainView.removeElement( element ) ;
+						_view.removeElement( element ) ;
 					}
 					elements.clear() ;
-
-					final UIWrapper wrapper = JUIWrapper.loadWrapper( "base/ui/test.jui" ) ;
-					wrapper.setLayer( 1 ) ;
-
-					mainView.addElement( wrapper ) ;
 				}
 			} ) ;
 
@@ -77,9 +88,8 @@ public class UIEditorState extends GameState
 			} ) ;
 
 			mainView = jui.get( "MainWindow", UILayout.class ) ;
-			//mainView.addElement( JUIWrapper.loadWrapper( "base/ui/test.jui" ) ) ;
 
-			//createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
+			createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
 			//createStructurePanel( jui.get( "UIStructurePanel", UIList.class ) ) ;
 			//createElementDataPanel( jui.get( "UIElementDataPanel", UIList.class ) ) ;
 		}
@@ -94,12 +104,80 @@ public class UIEditorState extends GameState
 		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 	}
 
+	@Override
+	protected void initEventProcessors( final EventController _internal, final EventController _external )
+	{
+		super.initEventProcessors( _internal, _external ) ;
+
+		_internal.addEventProcessor( new EventProcessor<Entity>( "ADD_ENTITY", "ADD_ENTITY" )
+		{
+			public void processEvent( final Event<Entity> _event )
+			{
+				addEntity( _event.getVariable() ) ;
+			}
+		} ) ;
+
+		_internal.addEventProcessor( new EventProcessor<UIPacket>( "INSERT_UIPACKET", "INSERT_UIPACKET" )
+		{
+			public void processEvent( final Event<UIPacket> _event )
+			{
+				final UIPacket packet = _event.getVariable() ;
+				if( root != null )
+				{
+					root.insertUIWrapper( packet.getWrapper(), packet.getX(), packet.getY() ) ;
+				}
+				else
+				{
+					System.out.println( "Insert X: " + packet.getX() + " Y: " + packet.getY() ) ;
+					if( mainView.intersectPoint( packet.getX(), packet.getY() ) )
+					{
+						root = packet.getWrapper() ;
+						root.setLayer( 1 ) ;
+						mainView.addElement( root ) ;
+					}
+				}
+			}
+		} ) ;
+	}
+	
 	/**
 		A list of elements that can be added to a UI.
 	*/
 	private void createElementsPanel( final UIList _view )
 	{
-	
+		addElementPackage( _view, "Button", UIButton.Meta.class ) ;
+		addElementPackage( _view, "Layout", UILayout.Meta.class ) ;
+	}
+
+	private static void addElementPackage( final UIList _view, final String _name, final Class<? extends UIElement.Meta> _class )
+	{
+		final UIButton.Meta meta = new UIButton.Meta() ;
+
+		{
+			final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+			edge.setSheet( "base/textures/edge_button.png" ) ;
+
+			final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
+			text.setText( _name ) ;
+		}
+
+		final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
+		button.addListener( new InputListener<UIButton>()
+		{
+			@Override
+			public InputEvent.Action touchPressed( final InputEvent _input )
+			{
+				return mousePressed( _input ) ;
+			}
+
+			@Override
+			public InputEvent.Action mousePressed( final InputEvent _input )
+			{
+				final Entity entity = UIEditorState.createDropEntity( _class, _input ) ;
+				getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+		} ) ;
 	}
 
 	/**
@@ -116,5 +194,96 @@ public class UIEditorState extends GameState
 	private void createElementDataPanel( final UIList _view )
 	{
 	
+	}
+
+	private static Entity createDropEntity( final Class<? extends UIElement.Meta> _class, final InputEvent _event )
+	{
+		final Entity entity = new Entity( "DROP_ENTITY", "DROP_ENTITY" ) ;
+		entity.setPosition( 0, 0, 0 ) ;
+
+		final AnimComponent anim   = entity.addComponent( new AnimComponent() ) ;
+		final EventComponent event = entity.addComponent( new EventComponent() ) ;
+		final MouseComponent mouse = entity.addComponent( new MouseComponent()
+		{
+			@Override
+			public void mouseReleased( final InputEvent _event )
+			{
+				switch( _event.getInputType() )
+				{
+					case MOUSE1_RELEASED :
+					{
+						try
+						{
+							final UIElement.Meta meta = _class.newInstance() ;
+
+							final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+							edge.setSheet( "base/textures/edge_button.png" ) ;
+
+							final UIWrapper wrapper = new UIWrapper( meta ) ;
+							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
+
+							event.passStateEvent( new Event<UIPacket>( "INSERT_UIPACKET", new UIPacket( wrapper, position ) ) ) ;
+						}
+						catch( IllegalAccessException ex )
+						{
+							System.out.println( "Failed to access UI meta object.." ) ;
+						}
+						catch( InstantiationException ex )
+						{
+							System.out.println( "Failed to instantiate UI meta object.." ) ;
+						}
+						finally
+						{
+							getParent().destroy() ;
+						}
+						break ;
+					}
+					default              : break ;
+				}
+			}
+		} ) ;
+
+		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
+																entity.position,
+																new Vector3( -16, -16, 0 ),
+																new Vector3(),
+																new Vector3( 1, 1, 1 ),
+																100 ) ;
+
+		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
+
+		anim.addAnimation( "DEFAULT", animation ) ;
+		anim.setDefaultAnim( "DEFAULT" ) ;
+
+		return entity ;
+	}
+
+	private static class UIPacket
+	{
+		private final UIWrapper wrapper ;
+		private final Vector2 position ;
+
+		public UIPacket( final UIWrapper _wrapper, final Vector2 _position )
+		{
+			wrapper = _wrapper ;
+			position = _position ;
+		}
+
+		public UIWrapper getWrapper()
+		{
+			return wrapper ;
+		}
+
+		public float getX()
+		{
+			return position.x ;
+		}
+
+		public float getY()
+		{
+			return position.y ;
+		}
 	}
 }

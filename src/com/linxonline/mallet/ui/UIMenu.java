@@ -108,18 +108,20 @@ public class UIMenu extends UILayout
 	public static class Item extends UIButton
 	{
 		private final UIElement dropdown ;
+		private final int originalLayer ;
 	
 		public Item( final UIElement _dropdown )
 		{
 			super() ;
 			dropdown = _dropdown ;
 			dropdown.setVisible( false ) ;
+			originalLayer = dropdown.getLayer() ;
 
 			UIElement.connect( this, layerChanged(), new Connect.Slot<Item>()
 			{
 				public void slot( final Item _item )
 				{
-					dropdown.setLayer( _item.getLayer() + 1 ) ;
+					dropdown.setLayer( _item.getLayer() + originalLayer ) ;
 				}
 			} ) ;
 

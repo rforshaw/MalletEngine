@@ -1008,6 +1008,18 @@ public class UIElement implements InputHandler, Connect.Connection
 		final Vector3 maxLength = _meta.getMaximumLength( temp ) ;
 		_element.setMaximumLength( maxLength.x, maxLength.y, maxLength.z ) ;
 
+		_element.setLayer( _meta.getLayer() ) ;
+		_element.setVisible( _meta.getVisibleFlag() ) ;
+
+		if( _meta.getDisableFlag() == true )
+		{
+			_element.disable() ;
+		}
+		else
+		{
+			_element.enable() ;
+		}
+
 		return _element ;
 	}
 
@@ -1331,7 +1343,7 @@ public class UIElement implements InputHandler, Connect.Connection
 			return _populate ;
 		}
 
-		public IBase.Meta addListener( final IBase.Meta _meta )
+		public <M extends IBase.Meta> M addListener( final M _meta )
 		{
 			if( _meta != null && listeners.contains( _meta ) == false )
 			{
@@ -1341,7 +1353,7 @@ public class UIElement implements InputHandler, Connect.Connection
 			return _meta ;
 		}
 
-		public IBase.Meta removeListener( final IBase.Meta _meta )
+		public <M extends IBase.Meta> M removeListener( final M _meta )
 		{
 			if( _meta != null && listeners.contains( _meta ) == true )
 			{

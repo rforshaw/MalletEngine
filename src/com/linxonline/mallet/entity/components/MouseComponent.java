@@ -31,23 +31,21 @@ public class MouseComponent extends InputComponent
 	}
 
 	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-	}
-
 	public void processInputEvent( final InputEvent _event )
 	{
 		switch( _event.getInputType() )
 		{
 			case MOUSE_MOVED     : 
 			case TOUCH_MOVE      : mouseMoved = true ;
+								   mouseMoved( _event ) ;
 								   updateMousePosition( _event ) ; break ;
 			case TOUCH_DOWN      :
 			case MOUSE1_PRESSED  : mouse1Pressed = true ;
+								   mousePressed( _event ) ;
 								   updateMousePosition( _event ) ; break ;
 			case TOUCH_UP        :
 			case MOUSE1_RELEASED : mouse1Pressed = false ;
+								   mouseReleased( _event ) ;
 								   updateMousePosition( _event ) ; break ;
 			case MOUSE2_PRESSED  : mouse2Pressed = true ;          break ;
 			case MOUSE2_RELEASED : mouse2Pressed = false ;         break ;
@@ -66,4 +64,10 @@ public class MouseComponent extends InputComponent
 		pos.x = CameraAssist.convertInputToCameraX( camera, mouse.x ) ;
 		pos.y = CameraAssist.convertInputToCameraY( camera, mouse.y ) ;
 	}
+
+	public void mouseMoved( final InputEvent _event ) {}
+
+	public void mousePressed( final InputEvent _event ) {}
+
+	public void mouseReleased( final InputEvent _event ) {}
 }
