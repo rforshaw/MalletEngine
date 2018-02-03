@@ -8,7 +8,9 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.ui.* ;
+import com.linxonline.mallet.ui.gui.* ;
 
 public class UIWrapper extends UIElement
 {
@@ -68,6 +70,38 @@ public class UIWrapper extends UIElement
 				element.setLayer( _parent.getLayer() ) ;
 			}
 		} ) ;
+
+		final SingleEngageListener engage = addListener( new SingleEngageListener() ) ;
+		final GUILineDraw line = addListener( new GUILineDraw() ) ;
+
+		addListener( new InputListener<UIWrapper>()
+		{
+			@Override
+			public InputEvent.Action mousePressed( final InputEvent _input )
+			{
+				if( engage.isEngaged() == true )
+				{
+					return InputEvent.Action.PROPAGATE ;
+				}
+
+				final UIWrapper parent = getParent() ;
+				sendEvent( new Event<UIWrapper>( "DISPLAY_META", parent ) ) ;
+
+				line.setColour( MalletColour.blue() ) ;
+				parent.makeDirty() ;
+				return InputEvent.Action.CONSUME ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UIWrapper>()
+		{
+			@Override
+			public void slot( final UIWrapper _parent )
+			{
+				line.setColour( MalletColour.white() ) ;
+				_parent.makeDirty() ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -75,6 +109,47 @@ public class UIWrapper extends UIElement
 	{
 		super.passDrawDelegate( _delegate, _world, _camera ) ;
 		element.passDrawDelegate( _delegate, _world, _camera ) ;
+	}
+
+	@Override
+	public void engage()
+	{
+		super.engage() ;
+		current = State.CHILD_ENGAGED ;
+	}
+
+	public void disengage()
+	{
+		super.disengage() ;
+		if( children != null )
+		{
+			final int size = children.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIWrapper element = children.get( i ) ;
+				if( element.isEngaged() == true )
+				{
+					element.disengage() ;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void update( final float _dt, final List<Event<?>> _events )
+	{
+		super.update( _dt, _events ) ;
+		element.update( _dt, _events ) ;
+
+		if( meta.supportsChildren() == true )
+		{
+			final int size = children.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIWrapper wrapper = children.get( i ) ;
+				wrapper.update( _dt, _events ) ;
+			}
+		}
 	}
 
 	/**
@@ -177,11 +252,9 @@ public class UIWrapper extends UIElement
 		return false ;
 	}
 
-	@Override
-	public void update( final float _dt, final List<Event<?>> _events )
+	public UIElement.Meta getMeta()
 	{
-		super.update( _dt, _events ) ;
-		element.update( _dt, _events ) ;
+		return meta ;
 	}
 
 	@Override
@@ -196,5 +269,283 @@ public class UIWrapper extends UIElement
 	{
 		super.clear() ;
 		element.clear() ;
+	}
+
+	private static class GUILineDraw extends GUIBase<UIWrapper>
+	{
+		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
+		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
+
+		private MalletColour colour = MalletColour.white() ;
+
+		protected Draw draw = null ;
+
+		public GUILineDraw() {}
+
+		@Override
+		public void setParent( final UIWrapper _parent )
+		{
+			super.setParent( _parent ) ;
+			updateLength( _parent.getLength(), getLength() ) ;
+			updateOffset( _parent.getOffset(), getOffset() ) ;
+		}
+
+		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
+		{
+			drawAlignmentX = ( _x == null ) ? UI.Alignment.LEFT : _x ;
+			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
+		}
+
+		public void setColour( final MalletColour _colour )
+		{
+			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+			final Draw draw = getDraw() ;
+			if( draw != null )
+			{
+				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
+				if( shape != null )
+				{
+					GUI.updateColour( shape, colour ) ;
+				}
+			}
+		}
+
+		@Override
+		public void constructDraws()
+		{
+			draw = DrawAssist.createDraw( getPosition(),
+										  getOffset(),
+										  new Vector3(),
+										  new Vector3( 1, 1, 1 ),
+										  getLayer() ) ;
+			DrawAssist.amendUI( draw, true ) ;
+			DrawAssist.amendShape( draw, Shape.constructOutlinePlane( getLength(), colour ) ) ;
+
+			final Program program = ProgramAssist.create( "SIMPLE_GEOMETRY" ) ;
+			DrawAssist.attachProgram( draw, program ) ;
+
+			super.constructDraws() ;
+		}
+
+		@Override
+		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		{
+			if( draw != null )
+			{
+				_delegate.addBasicDraw( draw, _world ) ;
+			}
+		}
+
+		@Override
+		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		{
+			_delegate.removeDraw( draw ) ;
+		}
+
+		@Override
+		public void refresh()
+		{
+			super.refresh() ;
+			final UIWrapper parent = getParent() ;
+
+			if( draw != null && parent.isVisible() == true )
+			{
+				updateLength( parent.getLength(), getLength() ) ;
+				updateOffset( parent.getOffset(), getOffset() ) ;
+
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
+				DrawAssist.amendOrder( draw, getLayer() ) ;
+				DrawAssist.forceUpdate( draw ) ;
+			}
+		}
+
+		private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
+		{
+			_toUpdate.setXYZ( _length ) ;
+		}
+
+		private void updateOffset( final Vector3 _offset, final Vector3 _toUpdate )
+		{
+			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
+			_toUpdate.add( _offset ) ;
+		}
+
+		public Draw getDraw()
+		{
+			return draw ;
+		}
+
+		public UI.Alignment getAlignmentX()
+		{
+			return drawAlignmentX ;
+		}
+
+		public UI.Alignment getAlignmentY()
+		{
+			return drawAlignmentY ;
+		}
+
+		public MalletColour getColour()
+		{
+			return colour ;
+		}
+	}
+
+	public static class SingleEngageListener extends InputListener<UIWrapper>
+	{
+		private UIWrapper currentEngaged = null ;
+
+		public SingleEngageListener() {}
+
+		@Override
+		public void setParent( UIWrapper _parent )
+		{
+			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UIWrapper>()
+			{
+				@Override
+				public void slot( final UIWrapper _wrapper )
+				{
+					// If the parent has been disengaged then it is 
+					// safe to say that all children of the layout 
+					// should also be disengaged.
+					setEngaged( null ) ;
+					disengageOthers( null, _wrapper.children ) ;
+				}
+			} ) ;
+			super.setParent( _parent ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseMove( final InputEvent _input )
+		{
+			final UIWrapper parent = getParent() ;
+			if( parent.children == null )
+			{
+				return InputEvent.Action.PROPAGATE ;
+			}
+
+			final UIWrapper current = getEngaged() ;
+			if( current != null )
+			{
+				if( current.isVisible() == true && current.isDisabled() == false )
+				{
+					if( current.isIntersectInput( _input ) == true )
+					{
+						return passInput( current, _input ) ;
+					}
+				}
+			}
+
+			setEngaged( null ) ;
+			disengageOthers( null, parent.children ) ;
+
+			final int size = parent.children.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIWrapper element = parent.children.get( i ) ;
+				if( element.isVisible() == true )
+				{
+					if( element.isIntersectInput( _input ) == true )
+					{
+						element.engage() ;
+						setEngaged( element.isDisabled() ? null : element ) ;
+						disengageOthers( getEngaged(), parent.children ) ;
+
+						return passInput( element, _input ) ;
+					}
+				}
+			}
+
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchMove( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action keyPressed( final InputEvent _input )
+		{
+			return passInput( getEngaged(), _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action scroll( final InputEvent _input )
+		{
+			return passInput( getEngaged(), _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action keyReleased( final InputEvent _input )
+		{
+			return passInput( getEngaged(), _input ) ;
+		}
+
+		private InputEvent.Action passInput( final UIWrapper _current, final InputEvent _input )
+		{
+			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
+		}
+
+		public void setEngaged( final UIWrapper _toEngage )
+		{
+			currentEngaged = _toEngage ;
+		}
+
+		public UIWrapper getEngaged()
+		{
+			return currentEngaged ;
+		}
+		
+		public boolean isEngaged()
+		{
+			return getEngaged() != null ;
+		}
+
+		private static void disengageOthers( final UIWrapper _current, final List<UIWrapper> _others )
+		{
+			if( _others == null )
+			{
+				return ;
+			}
+
+			final int size = _others.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIWrapper wrapper = _others.get( i ) ;
+				if( wrapper != _current &&
+					wrapper.isEngaged() == true )
+				{
+					// Only disengage the elements that were previously
+					// engaged and are not the currently engaged element.
+					wrapper.disengage() ;
+				}
+			}
+		}
 	}
 }

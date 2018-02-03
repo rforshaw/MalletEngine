@@ -2,11 +2,11 @@ package com.linxonline.mallet.ui ;
 
 import java.util.Set ;
 
-public abstract class UIProxyAbstractModel implements UIAbstractModel
+public abstract class UIProxyAbstractModel implements IAbstractModel
 {
-	private UIAbstractModel source ;
+	private IAbstractModel source ;
 
-	public UIProxyAbstractModel( final UIAbstractModel _source )
+	public UIProxyAbstractModel( final IAbstractModel _source )
 	{
 		source = _source ;
 	}
@@ -34,13 +34,13 @@ public abstract class UIProxyAbstractModel implements UIAbstractModel
 	}
 
 	@Override
-	public void setData( final UIModelIndex _proxyIndex, final UIVariant _variant, final Role _role )
+	public void setData( final UIModelIndex _proxyIndex, final IVariant _variant, final Role _role )
 	{
 		source.setData( mapToSource( _proxyIndex ), _variant, _role ) ;
 	}
 
 	@Override
-	public UIVariant getData( final UIModelIndex _proxyIndex, final Role _role )
+	public IVariant getData( final UIModelIndex _proxyIndex, final Role _role )
 	{
 		return source.getData( mapToSource( _proxyIndex ), _role ) ;
 	}

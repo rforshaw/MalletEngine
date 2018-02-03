@@ -24,7 +24,9 @@ import com.linxonline.mallet.util.settings.Settings ;
 public class UIEditorState extends GameState
 {
 	private UILayout mainView ;
-	private UIList elementsView ;
+	private UIList elementOptionsPanel ;
+	private UIList elementStructurePanel ;
+	private UIList elementDataPanel ;
 
 	private UIWrapper root = null ;
 
@@ -88,10 +90,11 @@ public class UIEditorState extends GameState
 			} ) ;
 
 			mainView = jui.get( "MainWindow", UILayout.class ) ;
+			elementOptionsPanel = jui.get( "UIElementsPanel", UIList.class ) ;
+			elementStructurePanel = jui.get( "UIStructurePanel", UIList.class ) ;
+			elementDataPanel = jui.get( "UIElementDataPanel", UIList.class ) ;
 
-			createElementsPanel( jui.get( "UIElementsPanel", UIList.class ) ) ;
-			//createStructurePanel( jui.get( "UIStructurePanel", UIList.class ) ) ;
-			//createElementDataPanel( jui.get( "UIElementDataPanel", UIList.class ) ) ;
+			createElementsPanel( elementOptionsPanel ) ;
 		}
 
 		final Entity entity = new Entity( "UI" ) ;
@@ -128,7 +131,6 @@ public class UIEditorState extends GameState
 				}
 				else
 				{
-					System.out.println( "Insert X: " + packet.getX() + " Y: " + packet.getY() ) ;
 					if( mainView.intersectPoint( packet.getX(), packet.getY() ) )
 					{
 						root = packet.getWrapper() ;
@@ -136,6 +138,60 @@ public class UIEditorState extends GameState
 						mainView.addElement( root ) ;
 					}
 				}
+			}
+		} ) ;
+
+		_internal.addEventProcessor( new EventProcessor<UIWrapper>( "DISPLAY_META", "DISPLAY_META" )
+		{
+			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+			public void processEvent( final Event<UIWrapper> _event )
+			{
+				cleanup( elementDataPanel ) ;
+			
+				final UIWrapper wrapper = _event.getVariable() ;
+				final UIElement.Meta meta = wrapper.getMeta() ;
+
+				//System.out.println( "Rows: " + meta.rowCount( null ) + " Column: " + meta.columnCount( null ) ) ;
+				final int size = meta.rowCount( null ) ;
+				for( int i = 0; i < size; i++ )
+				{
+					final IVariant variant = meta.getData( new UIModelIndex( meta.root(), i, 0 ), UIAbstractModel.Role.User ) ;
+					System.out.println( ( variant != null ) ? ( variant.getName() + " " + variant.toString() ) : "No Variant Found." ) ;
+					addVariant( variant, elementDataPanel ) ;
+				}
+			}
+
+			private void addVariant( final IVariant _variant, final UIList _view )
+			{
+				final UIButton.Meta meta = new UIButton.Meta() ;
+
+				final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+				edge.setSheet( "base/textures/edge_button.png" ) ;
+
+				final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
+				text.setText( _variant.getName() + ' ' + _variant.toString() ) ;
+
+				/*UIElement.connect( meta, _variant.getSignal(), new Connect.Slot<UIElement.Meta>()
+				{
+					@Override
+					public void slot( final UIElement.Meta _meta )
+					{
+						
+					}
+				} ) ;*/
+
+				final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
+			}
+
+			private void cleanup( final UILayout _view )
+			{
+				_view.getElements( elements ) ;
+				for( UIElement element : elements )
+				{
+					_view.removeElement( element ) ;
+				}
+				elements.clear() ;
 			}
 		} ) ;
 	}
@@ -215,10 +271,6 @@ public class UIEditorState extends GameState
 						try
 						{
 							final UIElement.Meta meta = _class.newInstance() ;
-
-							final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
-							edge.setSheet( "base/textures/edge_button.png" ) ;
-
 							final UIWrapper wrapper = new UIWrapper( meta ) ;
 							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
 
@@ -260,6 +312,11 @@ public class UIEditorState extends GameState
 		return entity ;
 	}
 
+	/**
+		Used to pass a UIWrapper through an Event before 
+		being inserted into another UIWrapper at the 
+		designated position.
+	*/
 	private static class UIPacket
 	{
 		private final UIWrapper wrapper ;

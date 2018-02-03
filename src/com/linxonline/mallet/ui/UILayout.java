@@ -949,7 +949,10 @@ public class UILayout extends UIElement implements IChildren
 		
 		private Connect.Signal typeChanged = new Connect.Signal() ;
 
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getElementType()

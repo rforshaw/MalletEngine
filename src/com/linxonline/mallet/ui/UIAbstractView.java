@@ -16,8 +16,8 @@ import com.linxonline.mallet.maths.* ;
 */
 public abstract class UIAbstractView extends UIElement
 {
-	private final Set<UIAbstractModel.ItemFlags> cellFlags = new HashSet<UIAbstractModel.ItemFlags>() ;
-	private UIAbstractModel model ;
+	private final Set<IAbstractModel.ItemFlags> cellFlags = new HashSet<IAbstractModel.ItemFlags>() ;
+	private IAbstractModel model ;
 	private boolean refresh = false ;
 
 	public UIAbstractView( final Vector3 _offset,
@@ -60,9 +60,9 @@ public abstract class UIAbstractView extends UIElement
 
 				model.getDataFlags( index, cellFlags ) ;
 
-				final UIVariant display = model.getData( index, UIAbstractModel.Role.Display ) ;
-				final UIVariant edit    = model.getData( index, UIAbstractModel.Role.Edit ) ;
-				final UIVariant user    = model.getData( index, UIAbstractModel.Role.User ) ;
+				final IVariant display = model.getData( index, IAbstractModel.Role.Display ) ;
+				final IVariant edit    = model.getData( index, IAbstractModel.Role.Edit ) ;
+				final IVariant user    = model.getData( index, IAbstractModel.Role.User ) ;
 
 				displayCell( index, cellFlags, display, edit, user ) ;
 				cellFlags.clear() ;
@@ -75,22 +75,22 @@ public abstract class UIAbstractView extends UIElement
 		for being rendered.
 	*/
 	public abstract void displayCell( final UIModelIndex _index,
-									  final Set<UIAbstractModel.ItemFlags> _flags,
-									  final UIVariant _display,
-									  final UIVariant _edit,
-									  final UIVariant _user ) ;
+									  final Set<IAbstractModel.ItemFlags> _flags,
+									  final IVariant _display,
+									  final IVariant _edit,
+									  final IVariant _user ) ;
 
 	public void refresh()
 	{
 		refresh = true ;
 	}
 
-	public void setModel( final UIAbstractModel _model )
+	public void setModel( final IAbstractModel _model )
 	{
 		model = _model ;
 	}
 
-	public UIAbstractModel getModel()
+	public IAbstractModel getModel()
 	{
 		return model ;
 	}

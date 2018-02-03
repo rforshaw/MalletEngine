@@ -13,7 +13,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UIList extends UILayout
 {
-	private final World world ;
+	private final World internalWorld ;
 	private final Camera internalCamera ;
 	private Camera externalCamera = CameraAssist.getDefaultCamera() ;
 	private final Draw pane ;
@@ -29,7 +29,7 @@ public class UIList extends UILayout
 	// Anything added to the UIList will make use of this 
 	// DrawDelegate rather than the delegate coming from 
 	// the UIComponent.
-	private DrawDelegate<World, Draw> delegate = null ;
+	private DrawDelegate<World, Draw> internalDelegate = null ;
 
 	private final Connect.Signal defaultElementSizeChanged = new Connect.Signal() ;
 	private final Connect.Signal scrollWidthChanged        = new Connect.Signal() ;
@@ -57,27 +57,27 @@ public class UIList extends UILayout
 		setScrollWidth( 0.5f ) ;
 
 		final UUID uid = UUID.randomUUID() ;
-		world = WorldAssist.constructWorld( uid.toString(), 0 ) ;
+		internalWorld = WorldAssist.constructWorld( uid.toString(), 0 ) ;
 		internalCamera = CameraAssist.createCamera( "SCROLL_CAMERA", new Vector3(),
 																	 new Vector3(),
 																	 new Vector3( 1, 1, 1 ) ) ;
 
-		CameraAssist.addCamera( internalCamera, world ) ;
-		pane = UIList.createPane( world, this ) ;
+		CameraAssist.addCamera( internalCamera, internalWorld ) ;
+		pane = UIList.createPane( internalWorld, this ) ;
 
 		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
 			public void callback( final DrawDelegate<World, Draw> _delegate )
 			{
-				if( delegate != null )
+				if( internalDelegate != null )
 				{
 					// Don't call shutdown(), we don't want to 
 					// clean anything except an existing DrawDelegate.
-					delegate.shutdown() ;
+					internalDelegate.shutdown() ;
 				}
 
-				delegate = _delegate ;
-				UIList.this.passListDrawDelegate( delegate, world, internalCamera ) ;
+				internalDelegate = _delegate ;
+				UIList.this.passListDrawDelegate( internalDelegate, internalWorld, internalCamera ) ;
 			}
 		} ) ) ;
 
@@ -219,7 +219,28 @@ public class UIList extends UILayout
 			}
 		} ) ;
 	}
-	
+
+	/**
+		Add the passed in UIElement to the end of the UILayout.
+		Returns the passed in element, allows for further modifications. 
+	*/
+	@Override
+	public <T extends UIElement> T addElement( final T _element )
+	{
+		final List<UIElement> ordered = getElements() ;
+		if( ordered.contains( _element ) == false )
+		{
+			applyLayer( _element, getLayer() ) ;
+			ordered.add( _element ) ;
+
+			if( getInternalDrawDelegate() != null )
+			{
+				_element.passDrawDelegate( getInternalDrawDelegate(), getInternalWorld(), getInternalCamera() ) ;
+			}
+		}
+		return _element ; 
+	}
+
 	/**
 		If any elements added to this list do not have a minimum or 
 		maximum length defined then this value will be used instead.
@@ -298,8 +319,8 @@ public class UIList extends UILayout
 			CameraAssist.amendDisplayResolution( internalCamera, width, height ) ;
 			CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
-			WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
-			WorldAssist.setDisplayDimensions( world, 0, 0, width, height ) ;
+			WorldAssist.setRenderDimensions( internalWorld, 0, 0, width, height ) ;
+			WorldAssist.setDisplayDimensions( internalWorld, 0, 0, width, height ) ;
 
 			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
 			DrawAssist.forceUpdate( pane ) ;
@@ -397,9 +418,9 @@ public class UIList extends UILayout
 	public void shutdown()
 	{
 		super.shutdown() ;
-		if( world != WorldAssist.getDefaultWorld() )
+		if( internalWorld != WorldAssist.getDefaultWorld() )
 		{
-			WorldAssist.destroyWorld( world ) ;
+			WorldAssist.destroyWorld( internalWorld ) ;
 		}
 	}
 
@@ -705,6 +726,15 @@ public class UIList extends UILayout
 	}
 
 	/**
+		Return the DrawDelegate that this UI is expected to be 
+		displayed on.
+	*/
+	public DrawDelegate<World, Draw> getInternalDrawDelegate()
+	{
+		return internalDelegate ;
+	}
+
+	/**
 		Return the camera that this UI is expected to be 
 		displayed on - used to convert inputs to the 
 		correct co-ordinate system.
@@ -713,6 +743,11 @@ public class UIList extends UILayout
 	public Camera getCamera()
 	{
 		return externalCamera ;
+	}
+
+	public World getInternalWorld()
+	{
+		return internalWorld ;
 	}
 
 	public Camera getInternalCamera()
@@ -772,7 +807,10 @@ public class UIList extends UILayout
 
 	public static class Meta extends UILayout.Meta
 	{
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getElementType()

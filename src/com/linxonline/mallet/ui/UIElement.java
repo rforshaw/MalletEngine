@@ -1118,97 +1118,100 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	public static class Meta implements Connect.Connection
+	public static class Meta extends UIAbstractModel implements Connect.Connection
 	{
-		private String name = "" ;
-		private int layer = 0 ;
-		private boolean visible = true ;
-		private boolean disabled = false ;
+		private final UIVariant name     = new UIVariant( "NAME",     "",    new Connect.Signal() ) ;
+		private final UIVariant layer    = new UIVariant( "LAYER",    0,     new Connect.Signal() ) ;
+		private final UIVariant visible  = new UIVariant( "VISIBLE",  true,  new Connect.Signal() ) ;
+		private final UIVariant disabled = new UIVariant( "DISABLED", false, new Connect.Signal() ) ;
 
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 offset = new Vector3() ;
-		private final Vector3 margin = new Vector3() ;
+		private final UIVariant position = new UIVariant( "POSITION", new Vector3(), new Connect.Signal() ) ;
+		private final UIVariant offset   = new UIVariant( "OFFSET",   new Vector3(), new Connect.Signal() ) ;
+		private final UIVariant margin   = new UIVariant( "MARGIN",   new Vector3(), new Connect.Signal() ) ;
 
-		private final Vector3 length = new Vector3() ;
-		private final Vector3 minimumLength = new Vector3() ;
-		private final Vector3 maximumLength = new Vector3() ;
+		private final UIVariant length        = new UIVariant( "LENGTH",     new Vector3(), new Connect.Signal() ) ;
+		private final UIVariant minimumLength = new UIVariant( "MIN_LENGTH", new Vector3(), new Connect.Signal() ) ;
+		private final UIVariant maximumLength = new UIVariant( "MAX_LENGTH", new Vector3(), new Connect.Signal() ) ;
 
 		private final List<IBase.Meta> listeners = MalletList.<IBase.Meta>newList() ;
-
-		private final Connect.Signal nameChanged    = new Connect.Signal() ;
-		private final Connect.Signal layerChanged   = new Connect.Signal() ;
-		private final Connect.Signal disableChanged = new Connect.Signal() ;
-		private final Connect.Signal visibleChanged = new Connect.Signal() ;
-
-		private final Connect.Signal positionChanged = new Connect.Signal() ;
-		private final Connect.Signal offsetChanged   = new Connect.Signal() ;
-		private final Connect.Signal marginChanged   = new Connect.Signal() ;
-
-		private final Connect.Signal lengthChanged = new Connect.Signal() ;
-		private final Connect.Signal minimumLengthChanged = new Connect.Signal() ;
-		private final Connect.Signal maximumLengthChanged = new Connect.Signal() ;
 
 		private final Connect.Signal listenerAdded = new Connect.Signal() ;
 		private final Connect.Signal listenerRemoved = new Connect.Signal() ;
 
 		private final Connect connect = new Connect() ;
 
-		public Meta() {}
+		public Meta()
+		{
+			int row = rowCount( root() ) ;
+			createData( null, row + 10, 1 ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), name, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), layer, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), visible, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), disabled, UIAbstractModel.Role.User ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), position, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), offset, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), margin, UIAbstractModel.Role.User ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), length, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), minimumLength, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), maximumLength, UIAbstractModel.Role.User ) ;
+		}
 
 		public void setName( final String _name )
 		{
-			if( _name != null && name.equals( _name ) == false )
+			if( _name != null && name.toString().equals( _name ) == false )
 			{
-				name = _name ;
-				UIElement.signal( this, nameChanged() ) ;
+				name.setString( _name ) ;
+				UIElement.signal( this, name.getSignal() ) ;
 			}
 		}
 
 		public void setLayer( final int _layer )
 		{
-			if( layer != _layer )
+			if( layer.toInt() != _layer )
 			{
-				layer = _layer ;
-				UIElement.signal( this, layerChanged() ) ;
+				layer.setInt( _layer ) ;
+				UIElement.signal( this, layer.getSignal() ) ;
 			}
 		}
 
 		public void setDisableFlag( final boolean _flag )
 		{
-			if( disabled != _flag )
+			if( disabled.toBool() != _flag )
 			{
-				disabled = _flag ;
-				UIElement.signal( this, disableChanged() ) ;
+				disabled.setBool( _flag ) ;
+				UIElement.signal( this, disabled.getSignal() ) ;
 			}
 		}
 
 		public void setVisibleFlag( final boolean _flag )
 		{
-			if( visible != _flag )
+			if( visible.toBool() != _flag )
 			{
-				visible = _flag ;
-				UIElement.signal( this, visibleChanged() ) ;
+				visible.setBool( _flag ) ;
+				UIElement.signal( this, visible.getSignal() ) ;
 			}
 		}
 
 		public String getName()
 		{
-			return name ;
+			return name.toString() ;
 		}
 
 		public int getLayer()
 		{
-			return layer ;
+			return layer.toInt() ;
 		}
 
 		public boolean getDisableFlag()
 		{
-			return disabled ;
+			return disabled.toBool() ;
 		}
 
 		public boolean getVisibleFlag()
 		{
-			return visible ;
+			return visible.toBool() ;
 		}
 
 		public void setPosition( final Vector3 _val )
@@ -1221,9 +1224,9 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setPosition( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( position, _x, _y, _z ) == true )
+			if( UI.applyVec3( position.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, positionChanged() ) ;
+				UIElement.signal( this, position.getSignal() ) ;
 			}
 		}
 
@@ -1237,9 +1240,9 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setOffset( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( offset, _x, _y, _z ) == true )
+			if( UI.applyVec3( offset.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, offsetChanged() ) ;
+				UIElement.signal( this, offset.getSignal() ) ;
 			}
 		}
 
@@ -1253,27 +1256,27 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setMargin( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( margin, _x, _y, _z ) == true )
+			if( UI.applyVec3( margin.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, marginChanged() ) ;
+				UIElement.signal( this, margin.getSignal() ) ;
 			}
 		}
 
 		public Vector3 getPosition( final Vector3 _populate )
 		{
-			_populate.setXYZ( position ) ;
+			_populate.setXYZ( position.toVector3() ) ;
 			return _populate ;
 		}
 
 		public Vector3 getOffset( final Vector3 _populate )
 		{
-			_populate.setXYZ( offset ) ;
+			_populate.setXYZ( offset.toVector3() ) ;
 			return _populate ;
 		}
 
 		public Vector3 getMargin( final Vector3 _populate )
 		{
-			_populate.setXYZ( margin ) ;
+			_populate.setXYZ( margin.toVector3() ) ;
 			return _populate ;
 		}
 
@@ -1287,9 +1290,9 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( length, _x, _y, _z ) == true )
+			if( UI.applyVec3( length.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, lengthChanged() ) ;
+				UIElement.signal( this, length.getSignal() ) ;
 			}
 		}
 
@@ -1303,9 +1306,9 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setMinimumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( minimumLength, _x, _y, _z ) == true )
+			if( UI.applyVec3( minimumLength.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, minimumLengthChanged() ) ;
+				UIElement.signal( this, minimumLength.getSignal() ) ;
 			}
 		}
 
@@ -1319,27 +1322,27 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public void setMaximumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( maximumLength, _x, _y, _z ) == true )
+			if( UI.applyVec3( maximumLength.toVector3(), _x, _y, _z ) == true )
 			{
-				UIElement.signal( this, maximumLengthChanged() ) ;
+				UIElement.signal( this, maximumLength.getSignal() ) ;
 			}
 		}
 
 		public Vector3 getLength( final Vector3 _populate )
 		{
-			_populate.setXYZ( length ) ;
+			_populate.setXYZ( length.toVector3() ) ;
 			return _populate ;
 		}
 
 		public Vector3 getMinimumLength( final Vector3 _populate )
 		{
-			_populate.setXYZ( minimumLength ) ;
+			_populate.setXYZ( minimumLength.toVector3() ) ;
 			return _populate ;
 		}
 
 		public Vector3 getMaximumLength( final Vector3 _populate )
 		{
-			_populate.setXYZ( maximumLength ) ;
+			_populate.setXYZ( maximumLength.toVector3() ) ;
 			return _populate ;
 		}
 
@@ -1406,52 +1409,52 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public Connect.Signal nameChanged()
 		{
-			return nameChanged ;
+			return name.getSignal() ;
 		}
 
 		public Connect.Signal layerChanged()
 		{
-			return layerChanged ;
+			return layer.getSignal() ;
 		}
 
 		public Connect.Signal disableChanged()
 		{
-			return disableChanged ;
+			return disabled.getSignal() ;
 		}
 
 		public Connect.Signal visibleChanged()
 		{
-			return visibleChanged ;
+			return visible.getSignal() ;
 		}
 
 		public Connect.Signal positionChanged()
 		{
-			return positionChanged ;
+			return position.getSignal() ;
 		}
 
 		public Connect.Signal offsetChanged()
 		{
-			return offsetChanged ;
+			return offset.getSignal() ;
 		}
 
 		public Connect.Signal marginChanged()
 		{
-			return marginChanged ;
+			return margin.getSignal() ;
 		}
 
 		public Connect.Signal lengthChanged()
 		{
-			return lengthChanged ;
+			return length.getSignal() ;
 		}
 
 		public Connect.Signal minimumLengthChanged()
 		{
-			return minimumLengthChanged ;
+			return minimumLength.getSignal() ;
 		}
 
 		public Connect.Signal maximumLengthChanged()
 		{
-			return maximumLengthChanged ;
+			return maximumLength.getSignal() ;
 		}
 		
 		public Connect.Signal listenerAdded()

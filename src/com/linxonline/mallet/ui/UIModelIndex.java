@@ -11,6 +11,11 @@ public class UIModelIndex
 		this( null, -1, -1 ) ;
 	}
 
+	public UIModelIndex( final UIModelIndex _parent )
+	{
+		this( _parent, -1, -1 ) ;
+	}
+
 	public UIModelIndex( final int _row, final int _column )
 	{
 		this( null, _row, _column ) ;
@@ -28,19 +33,19 @@ public class UIModelIndex
 		return row >= 0 && column >= 0 ;
 	}
 
-	public UIModelIndex getChild( final int _row, final int _column )
+	public UIModelIndex getParent()
 	{
-		return new UIModelIndex( this, _row, _column ) ;
+		return parent ;
 	}
 
 	public UIModelIndex getSibling( final int _row, final int _column )
 	{
-		return new UIModelIndex( parent, _row, _column ) ;
+		return new UIModelIndex( getParent(), _row, _column ) ;
 	}
 
-	public UIModelIndex getParent()
+	public UIModelIndex getChild( final int _row, final int _column )
 	{
-		return parent ;
+		return new UIModelIndex( this, _row, _column ) ;
 	}
 
 	public int getRow()
@@ -51,5 +56,36 @@ public class UIModelIndex
 	public int getColumn()
 	{
 		return column ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return ( row * 2 ) + ( column * 3 ) ; 
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( _obj == null )
+		{
+			return false ;
+		}
+		
+		if( _obj instanceof UIModelIndex )
+		{
+			final UIModelIndex index = ( UIModelIndex )_obj ;
+			if( index.row == row && index.column == column )
+			{
+				if( parent == null )
+				{
+					return index.parent == null ;
+				}
+
+				return parent.equals( index.parent ) ;
+			}
+		}
+
+		return false ;
 	}
 }

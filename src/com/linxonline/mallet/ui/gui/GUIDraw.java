@@ -127,7 +127,6 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 			DrawAssist.amendOrder( draw, getLayer() ) ;
 			DrawAssist.forceUpdate( draw ) ;
 		}
-		
 	}
 
 	private void updateLength( final Vector3 _length, final Vector3 _toUpdate )

@@ -484,6 +484,27 @@ public abstract class Shape
 		return plane ;
 	}
 
+	public static Shape constructOutlinePlane( final Vector3 _length, final MalletColour _colour )
+	{
+		final Swivel[] swivel = new Swivel[2] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+
+		final Shape plane = Shape.create( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
+		plane.addVertex( new Object[] { new Vector3(), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length ), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, 0.0f ), _colour } ) ;
+		plane.addVertex( new Object[] { new Vector3( _length.x, 0.0f, 0.0f ), _colour } ) ;
+
+		plane.addIndex( 0 ) ;
+		plane.addIndex( 2 ) ;
+		plane.addIndex( 1 ) ;
+		plane.addIndex( 3 ) ;
+		plane.addIndex( 0 ) ;
+
+		return plane ;
+	}
+	
 	/**
 		Construct a basic 3D cube of dimension _width.
 	*/
