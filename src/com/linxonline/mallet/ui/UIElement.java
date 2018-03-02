@@ -46,9 +46,9 @@ public class UIElement implements InputHandler, Connect.Connection
 
 	private final Vector3 minLength = new Vector3() ;	// In pixels
 	private final Vector3 maxLength = new Vector3() ;	// In pixels
-	private final Vector3 position ;					// In pixels
-	private final Vector3 offset ;						// In pixels
-	private final Vector3 length ;						// In pixels
+	private final Vector3 position = new Vector3()  ;	// In pixels
+	private final Vector3 offset = new Vector3() ;		// In pixels
+	private final Vector3 length = new Vector3() ;		// In pixels
 	private final Vector3 margin ;						// In pixels
 
 	private final Connect.Signal positionChanged   = new Connect.Signal() ;
@@ -73,15 +73,6 @@ public class UIElement implements InputHandler, Connect.Connection
 
 	public UIElement()
 	{
-		this( new Vector3(), new Vector3(), new Vector3() ) ;
-	}
-
-	public UIElement( final Vector3 _position, final Vector3 _offset, final Vector3 _length )
-	{
-		position = _position ;
-		offset = _offset ;
-		length = _length ;
-
 		final float ratioMargin = DEFAULT_MARGIN_SIZE ;
 		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
 	}

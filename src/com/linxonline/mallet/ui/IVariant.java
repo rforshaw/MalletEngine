@@ -16,6 +16,7 @@ public interface IVariant
 	public void setBool( final boolean _value ) ;
 	public void setFloat( final float _value ) ;
 	public void setInt( final int _value ) ;
+	public void setObject( final Object _value ) ;
 	public void setVector3( final float _x, final float _y, final float _z ) ;
 	public void setVector2( final float _x, final float _y ) ;
 
@@ -23,6 +24,8 @@ public interface IVariant
 	public boolean toBool() ;
 	public float toFloat() ;
 	public int toInt() ;
+	public <T> T toObject( final Class<T> _class ) ;
+	public Object toObject() ;
 	public Vector3 toVector3() ;
 	public Vector2 toVector2() ;
 }

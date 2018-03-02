@@ -19,41 +19,9 @@ public class UITextField extends UIElement
 	private final Connect.Signal cursorIndexChanged = new Connect.Signal() ;
 	private final Connect.Signal textChanged = new Connect.Signal() ;
 
-	/**
-		If the UICheckbox is being added to a UILayout
-		then you don't have to define the position, 
-		offset, or length.
-	*/
 	public UITextField()
 	{
-		this( new Vector3(), new Vector3(), new Vector3(), null ) ;
-	}
-
-	public UITextField( final Vector3 _length )
-	{
-		this( new Vector3(), new Vector3(), _length, null ) ;
-	}
-
-	public UITextField( final Vector3 _offset,
-					   final Vector3 _length )
-	{
-		this( new Vector3(), _offset, _length, null ) ;
-	}
-
-	public UITextField( final Vector3 _position,
-					   final Vector3 _offset,
-					   final Vector3 _length )
-	{
-		this( _position, _offset, _length, null ) ;
-	}
-
-	public UITextField( final Vector3 _position,
-					   final Vector3 _offset,
-					   final Vector3 _length,
-					   final ABase<UIButton> _listener )
-	{
-		super( _position, _offset, _length ) ;
-		addListener( _listener ) ;
+		super() ;
 		addEvent( new Event<EventController>( "ADD_BACKEND_EVENT", controller ) ) ;
 	}
 

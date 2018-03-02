@@ -37,42 +37,10 @@ public class UIButton extends UIElement
 	private final Connect.Signal pressed = new Connect.Signal() ;
 	private final Connect.Signal released = new Connect.Signal() ;
 
-	/**
-		If the UIButton is being added to a UILayout
-		then you don't have to define the position, 
-		offset, or length.
-	*/
 	public UIButton()
 	{
-		this( new Vector3(), new Vector3(), new Vector3(), null ) ;
-	}
-
-	public UIButton( final Vector3 _length )
-	{
-		this( new Vector3(), new Vector3(), _length, null ) ;
-	}
-
-	public UIButton( final Vector3 _offset,
-					 final Vector3 _length )
-	{
-		this( new Vector3(), _offset, _length, null ) ;
-	}
-
-	public UIButton( final Vector3 _position,
-					 final Vector3 _offset,
-					 final Vector3 _length )
-	{
-		this( _position, _offset, _length, null ) ;
-	}
-
-	public UIButton( final Vector3 _position,
-					 final Vector3 _offset,
-					 final Vector3 _length,
-					 final ABase<UIButton> _listener )
-	{
-		super( _position, _offset, _length ) ;
+		super() ;
 		init() ;
-		addListener( _listener ) ;
 	}
 
 	private void init()

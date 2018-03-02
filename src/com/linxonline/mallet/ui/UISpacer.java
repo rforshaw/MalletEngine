@@ -66,11 +66,15 @@ public class UISpacer extends UIElement
 
 	public static class Meta extends UIElement.Meta
 	{
-		private Axis axis = Axis.ONLY_X ;
-		
-		private Connect.Signal axisChanged = new Connect.Signal() ;
+		private final UIVariant axis = new UIVariant( "AXIS", Axis.ONLY_X, new Connect.Signal() ) ;
 
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+			int row = rowCount( root() ) ;
+			createData( null, row + 1, 1 ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), axis, UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getElementType()
@@ -80,20 +84,21 @@ public class UISpacer extends UIElement
 
 		public void setAxis( final Axis _axis )
 		{
-			if( _axis != axis )
+			if( _axis.equals( axis.toObject() ) == false )
 			{
-				axis = _axis ;
+				axis.setObject( _axis ) ;
+				UIElement.signal( this, axis.getSignal() ) ;
 			}
 		}
 
 		public Axis getAxis()
 		{
-			return axis ;
+			return axis.toObject( Axis.class ) ;
 		}
 
 		public Connect.Signal axisChanged()
 		{
-			return axisChanged ;
+			return axis.getSignal() ;
 		}
 	}
 }

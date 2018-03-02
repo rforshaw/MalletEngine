@@ -37,22 +37,7 @@ public class UIList extends UILayout
 
 	public UIList( final Type _type )
 	{
-		this( _type, new Vector3(), new Vector3(), new Vector3() ) ;
-	}
-
-	public UIList( final Type _type, final Vector3 _length )
-	{
-		this( _type, new Vector3(), new Vector3(), _length ) ;
-	}
-
-	public UIList( final Type _type, final Vector3 _offset, final Vector3 _length )
-	{
-		this( _type, new Vector3(), _offset, _length ) ;
-	}
-
-	public UIList( final Type _type, final Vector3 _position, final Vector3 _offset, final Vector3 _length )
-	{
-		super( _type, _position, _offset, _length ) ;
+		super( _type ) ;
 		setDefaultElementSize( 1.0f, 1.0f, 1.0f ) ;
 		setScrollWidth( 0.5f ) ;
 

@@ -14,42 +14,10 @@ public class UICheckbox extends UIElement
 
 	private final Connect.Signal checkChanged = new Connect.Signal() ;
 
-	/**
-		If the UICheckbox is being added to a UILayout
-		then you don't have to define the position, 
-		offset, or length.
-	*/
 	public UICheckbox()
 	{
-		this( new Vector3(), new Vector3(), new Vector3(), null ) ;
-	}
-
-	public UICheckbox( final Vector3 _length )
-	{
-		this( new Vector3(), new Vector3(), _length, null ) ;
-	}
-
-	public UICheckbox( final Vector3 _offset,
-					   final Vector3 _length )
-	{
-		this( new Vector3(), _offset, _length, null ) ;
-	}
-
-	public UICheckbox( final Vector3 _position,
-					   final Vector3 _offset,
-					   final Vector3 _length )
-	{
-		this( _position, _offset, _length, null ) ;
-	}
-
-	public UICheckbox( final Vector3 _position,
-					   final Vector3 _offset,
-					   final Vector3 _length,
-					   final ABase<UIButton> _listener )
-	{
-		super( _position, _offset, _length ) ;
+		super() ;
 		init() ;
-		addListener( _listener ) ;
 	}
 
 	private void init()

@@ -6,6 +6,13 @@ import com.linxonline.mallet.maths.* ;
 public class UIVariant implements IVariant
 {
 	private final VariableInterface variable ;
+	
+	/**
+		A UIVariant can contain a signal however the variant 
+		itself does not support its own Connections as the 
+		UIVariant is expected to be a child object of a larger 
+		state - which would support the connections.
+	*/
 	private final Connect.Signal signal ;
 
 	public UIVariant( final String _name, final boolean _val )
@@ -138,6 +145,18 @@ public class UIVariant implements IVariant
 		}
 	}
 
+	public void setObject( final Object _value )
+	{
+		switch( getType() )
+		{
+			case VariableInterface.OBJECT_TYPE :
+			{
+				( ( ObjectVariable )variable ).value = _value;
+				break ;
+			}
+		}
+	}
+	
 	@Override
 	public void setVector3( final float _x, final float _y, final float _z )
 	{
@@ -165,7 +184,7 @@ public class UIVariant implements IVariant
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -199,6 +218,26 @@ public class UIVariant implements IVariant
 		{
 			case VariableInterface.INT_TYPE    : return ( ( IntegerVariable )variable ).value ;
 			default                            : return 0 ;
+		}
+	}
+
+	@Override
+	public <T> T toObject( final Class<T> _class )
+	{
+		switch( getType() )
+		{
+			case VariableInterface.OBJECT_TYPE : return _class.cast( ( ( ObjectVariable )variable ).value ) ;
+			default                            : return null ;
+		}
+	}
+	
+	@Override
+	public Object toObject()
+	{
+		switch( getType() )
+		{
+			case VariableInterface.OBJECT_TYPE : return ( ( ObjectVariable )variable ).value ;
+			default                            : return null ;
 		}
 	}
 

@@ -38,7 +38,7 @@ public class UILayout extends UIElement implements IChildren
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
 
 	private Type type ;																// How children should be ordered
-	private final UIElementUpdater updater ;										// Used to position the layouts children
+	private UIElementUpdater updater ;												// Used to position the children
 
 	// It's very likely that a child of the layout will be flagged 
 	// as dirty - this may result in the other children of the 
@@ -51,35 +51,12 @@ public class UILayout extends UIElement implements IChildren
 
 	private EngageListener engageMode = null ;										// Selection/Focus mode
 
+	private final Connect.Signal typeChanged = new Connect.Signal() ;
+
 	public UILayout( final Type _type )
 	{
-		this( _type, new Vector3(), new Vector3(), new Vector3() ) ;
-	}
-
-	public UILayout( final Type _type, final Vector3 _length )
-	{
-		this( _type, new Vector3(), new Vector3(), _length ) ;
-	}
-
-	public UILayout( final Type _type, final Vector3 _offset, final Vector3 _length )
-	{
-		this( _type, new Vector3(), _offset, _length ) ;
-	}
-
-	public UILayout( final Type _type, final Vector3 _position, final Vector3 _offset, final Vector3 _length )
-	{
-		super( _position, _offset, _length ) ;
-
-		type = _type ;
-		switch( type )
-		{
-			case HORIZONTAL : updater = getHorizontalUpdater() ; break ;
-			case VERTICAL   : updater = getVerticalUpdater() ;   break ;
-			case GRID       : updater = getGridUpdater() ;       break ;
-			case FORM       : updater = getFormUpdater() ;       break ;
-			default         : updater = getHorizontalUpdater() ; break ;
-		}
-
+		super() ;
+		setType( _type ) ;
 		setEngageMode( new SingleEngageListener() ) ;
 	}
 
@@ -251,6 +228,26 @@ public class UILayout extends UIElement implements IChildren
 	}
 
 	/**
+	
+	*/
+	public void setType( final Type _type )
+	{
+		if( type != _type  )
+		{
+			type = _type ;
+			switch( type )
+			{
+				case HORIZONTAL : updater = getHorizontalUpdater() ; break ;
+				case VERTICAL   : updater = getVerticalUpdater() ;   break ;
+				case GRID       : updater = getGridUpdater() ;       break ;
+				case FORM       : updater = getFormUpdater() ;       break ;
+				default         : updater = getHorizontalUpdater() ; break ;
+			}
+			UILayout.signal( this, typeChanged() ) ;
+		}
+	}
+
+	/**
 		Set the layer that the visual elements are 
 		expected to be placed on.
 		
@@ -397,6 +394,16 @@ public class UILayout extends UIElement implements IChildren
 	public Type getType()
 	{
 		return type ;
+	}
+
+	/**
+		Called when the type of the layout 
+		has been changed using setType().
+		This defines how child elements are laid out.
+	*/
+	public Connect.Signal typeChanged()
+	{
+		return typeChanged ;
 	}
 
 	/**
@@ -945,13 +952,14 @@ public class UILayout extends UIElement implements IChildren
 
 	public static class Meta extends UIElement.Meta
 	{
-		private Type type = Type.VERTICAL ;
-		
-		private Connect.Signal typeChanged = new Connect.Signal() ;
+		private final UIVariant type = new UIVariant( "TYPE", Type.VERTICAL, new Connect.Signal() ) ;
 
 		public Meta()
 		{
 			super() ;
+			int row = rowCount( root() ) ;
+			createData( null, row + 1, 1 ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), type, UIAbstractModel.Role.User ) ;
 		}
 
 		@Override
@@ -968,20 +976,21 @@ public class UILayout extends UIElement implements IChildren
 
 		public void setType( final Type _type )
 		{
-			if( _type != type )
+			if( _type.equals( type.toObject() ) == false )
 			{
-				type = _type ;
+				type.setObject( _type ) ;
+				UIElement.signal( this, type.getSignal() ) ;
 			}
 		}
 
 		public Type getType()
 		{
-			return type ;
+			return type.toObject( Type.class ) ;
 		}
 
 		public Connect.Signal typeChanged()
 		{
-			return typeChanged ;
+			return type.getSignal() ;
 		}
 	}
 

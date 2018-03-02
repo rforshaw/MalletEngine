@@ -144,20 +144,25 @@ public class UIEditorState extends GameState
 		_internal.addEventProcessor( new EventProcessor<UIWrapper>( "DISPLAY_META", "DISPLAY_META" )
 		{
 			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+			UIElement.Meta current = null ;
 
 			public void processEvent( final Event<UIWrapper> _event )
 			{
-				cleanup( elementDataPanel ) ;
-			
 				final UIWrapper wrapper = _event.getVariable() ;
 				final UIElement.Meta meta = wrapper.getMeta() ;
 
-				//System.out.println( "Rows: " + meta.rowCount( null ) + " Column: " + meta.columnCount( null ) ) ;
-				final int size = meta.rowCount( null ) ;
+				if( meta == current )
+				{
+					return ;
+				}
+
+				current = meta ;
+				cleanup( elementDataPanel ) ;
+
+				final int size = meta.rowCount( meta.root() ) ;
 				for( int i = 0; i < size; i++ )
 				{
 					final IVariant variant = meta.getData( new UIModelIndex( meta.root(), i, 0 ), UIAbstractModel.Role.User ) ;
-					System.out.println( ( variant != null ) ? ( variant.getName() + " " + variant.toString() ) : "No Variant Found." ) ;
 					addVariant( variant, elementDataPanel ) ;
 				}
 			}

@@ -20,17 +20,9 @@ public abstract class UIAbstractView extends UIElement
 	private IAbstractModel model ;
 	private boolean refresh = false ;
 
-	public UIAbstractView( final Vector3 _offset,
-						   final Vector3 _length )
+	public UIAbstractView()
 	{
-		this( new Vector3(), _offset, _length ) ;
-	}
-
-	public UIAbstractView( final Vector3 _position,
-						   final Vector3 _offset,
-						   final Vector3 _length )
-	{
-		super( _position, _offset, _length ) ;
+		super() ;
 	}
 
 	public void update( final float _dt, final List<Event<?>> _events )

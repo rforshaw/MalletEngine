@@ -308,8 +308,12 @@ public class UIAbstractModel implements IAbstractModel
 		
 		private void addNewRows( final int _row )
 		{
-			if( _row >= 0 )
+			if( _row >= 0 && rows == null )
 			{
+				// To save some space we only construct rows 
+				// if the developer has specified at least 1 row.
+				// Once rows has been initialised we don't 
+				// want to create it again.
 				rows = MalletList.<List<Matrix>>newList() ;
 			}
 		
