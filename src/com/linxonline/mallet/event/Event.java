@@ -7,7 +7,8 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
-	private static final IEventHandlerMeta BLANK_META = new IEventHandlerMeta()	// Blank Meta Handler, used if sender doesn't provide one
+	// Blank Meta Handler, used if sender doesn't provide one
+	private static final IEventHandlerMeta BLANK_META = new IEventHandlerMeta()
 	{
 		public String getName()
 		{

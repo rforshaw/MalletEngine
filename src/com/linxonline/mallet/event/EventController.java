@@ -22,7 +22,7 @@ public class EventController implements IEventHandler
 	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
 	private final String name ;
-	private final EventMessenger messenger = new EventMessenger() ;
+	private final SwapList<Event<?>> messenger = new SwapList<Event<?>>() ;
 	private final List<EventProcessor> processors = MalletList.<EventProcessor>newList() ;
 	private IAddEvent addInterface = ADD_EVENT_FALLBACK ;
 
@@ -83,7 +83,7 @@ public class EventController implements IEventHandler
 	**/
 	public void processEvent( final Event<?> _event )
 	{
-		messenger.addEvent( _event ) ;
+		messenger.add( _event ) ;
 	}
 
 	/**
@@ -92,15 +92,21 @@ public class EventController implements IEventHandler
 	*/
 	public void update()
 	{
-		messenger.refreshEvents() ;
-		final int messengerSize = messenger.size() ;
+		messenger.swap() ;
+		final List<Event<?>> events = messenger.getActiveList() ;
+		if( events.isEmpty() )
+		{
+			return ;
+		}
+
+		final int eventsSize = events.size() ;
 		final int processorSize = processors.size() ;
 		for( int i = 0; i < processorSize; ++i )
 		{
 			final EventProcessor<?> proc = processors.get( i ) ;
-			for( int j = 0; j < messengerSize; ++j )
+			for( int j = 0; j < eventsSize; ++j )
 			{
-				proc.passEvent( messenger.getAt( j ) ) ;
+				proc.passEvent( events.get( j ) ) ;
 			}
 		}
 	}
@@ -124,7 +130,7 @@ public class EventController implements IEventHandler
 	
 	public void clearEvents()
 	{
-		messenger.clearEvents() ;
+		messenger.clear() ;
 		ADD_EVENT_FALLBACK.clear() ;
 	}
 

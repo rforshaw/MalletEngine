@@ -58,11 +58,11 @@ public class GameState extends State
 	private final EventController externalController = new EventController( "GAME_STATE_CONTROLLER_EXTERNAL" ) ;		// Used to process Events, from external eventSystem
 
 	protected ISystem system = null ;																// Provides access to Root systems
-	protected final IEntitySystem entitySystem = new EntitySystem( eventSystem ) ;
+	protected final IEntitySystem entitySystem = new EntitySystem( eventSystem/*, EntitySystem.Threaded.MULTI*/ ) ;
 
 	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
-	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
+	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem/*, null*/ ) ;
 
 	protected final DataConverter dataTracker = new DataConverter() ;	// Track current data that you wish to save/read
 
@@ -345,11 +345,11 @@ public class GameState extends State
 				}
 
 				long endTime = ElapsedTimer.nanoTime() ;
-				long deltaTime = endTime - startTime ;				// In nanoseconds
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				final double total = deltaTime * 0.000000001 ;
+				final double total = ( endTime - startTime ) * 0.000000001 ;
+
 				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( total + renderAccumulator ) ) * 1000.0 ) ;	// Convert to milliseconds
 				//System.out.println( "Total: " + total + " FPS: " + DEFAULT_FRAMERATE ) ;
 

@@ -132,6 +132,7 @@ public class QuadTree
 
 	protected class QuadNode
 	{
+		private final CollisionCheck check = new CollisionCheck() ;
 		private final Vector2 centre = new Vector2() ;
 
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
@@ -341,7 +342,7 @@ public class QuadTree
 					final Hull hull2 = hulls[j] ;
 					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 					{
-						CollisionCheck.generateContactPoint( hull1, hull2 ) ;
+						check.generateContactPoint( hull1, hull2 ) ;
 					}
 				}
 

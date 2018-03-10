@@ -9,9 +9,22 @@ import com.linxonline.mallet.util.Logger ;
 
 public final class EventSystem implements IEventSystem
 {
+	/**
+		If the EventQueue does not have an event filter it 
+		will fallback to no filtering.
+	*/
+	private static final IEventFilter NO_FILTERING = new IEventFilter()
+	{
+		public List<Event<?>> filter( final List<Event<?>> _events, List<Event<?>> _populate )
+		{
+			_populate.addAll( _events ) ;
+			return _populate ;
+		}
+	} ;
+
 	private final String name ;
 	private final List<EventQueue> queues = MalletList.<EventQueue>newList() ;
-	private final EventQueue allQueue = new EventQueue( EventType.ALL ) ;
+	private final EventQueue allQueue ;
 
 	private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList() ;
 	private final List<WeakReference<IEventHandler>> toBeRemoved = MalletList.<WeakReference<IEventHandler>>newList() ;
@@ -25,14 +38,18 @@ public final class EventSystem implements IEventSystem
 	{
 		name = ( _name != null ) ? _name : "NONE" ;
 		// Guarantee an ALL Queue.
-		addEventQueue( EventType.ALL, allQueue ) ;
+		allQueue = getEventQueue( EventType.ALL ) ;
 	}
 
 	/**
 		Add EventHandler to handlers list & search through 
 		the EventHandlers EventTypes, placing it in the correct 
 		lists, so Events can be filtered correctly.
+
+		EventHandler is stored as a WeakReference make sure to remove 
+		it from the system before destroying the handler.
 	**/
+	@Override
 	public final void addEventHandler( final IEventHandler _handler )
 	{
 		if( exists( _handler ) >= 0 )
@@ -55,25 +72,19 @@ public final class EventSystem implements IEventSystem
 			return ;
 		}
 
-		if( types.isEmpty() == false )
+		final int size = types.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int size = types.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final EventType type = types.get( i ) ;
-				if( getEventQueue( type ) == null )
-				{
-					addEventQueue( type, new EventQueue( type ) ) ;
-				}
-
-				getEventQueue( type ).addEventHandler( weakHandler ) ;
-			}
+			final EventType type = types.get( i ) ;
+			final EventQueue que = getEventQueue( type ) ;
+			que.addEventHandler( weakHandler ) ;
 		}
 	}
 
 	/**
 		Removes the EventHandler in the next update().
 	**/
+	@Override
 	public final void removeEventHandler( final IEventHandler _handler )
 	{
 		final int index = exists( _handler ) ;
@@ -83,33 +94,17 @@ public final class EventSystem implements IEventSystem
 		}
 	}
 
-	public final void addEventFilter( final EventType _type, final IEventFilter _filter )
+	@Override
+	public final void setEventFilter( final EventType _type, final IEventFilter _filter )
 	{
-		assert _type != null || _filter != null ;
-
-		if( getEventQueue( _type ) == null )
-		{
-			addEventQueue( _type, new EventQueue( _type ) ) ;
-		}
-
-		getEventQueue( _type ).addEventFilter( _filter ) ;
+		final EventQueue que = getEventQueue( _type ) ;
+		que.setEventFilter( _filter ) ;
 	}
 
-	public final void removeEventFilter( final EventType _type, final IEventFilter _filter )
-	{
-		assert _type != null || _filter != null ;
-
-		if( getEventQueue( _type ) == null )
-		{
-			Logger.println( "Can't remove EventFilter event queue: " + _type + " does not exist.", Logger.Verbosity.MAJOR ) ;
-		}
-
-		getEventQueue( _type ).removeEventFilter( _filter ) ;
-	}
-	
 	/**
 		Remove the EventHandlers queued for removal now.
 	**/
+	@Override
 	public void removeHandlersNow()
 	{
 		if( toBeRemoved.isEmpty() )
@@ -128,15 +123,11 @@ public final class EventSystem implements IEventSystem
 	@Override
 	public final void addEvent( final Event<?> _event )
 	{
-		final EventType key = _event.getEventType() ;
-		// System.out.println( name + " " + key ) ;
-
-		final EventQueue queue = getEventQueue( key ) ;
 		// We don't want to add an event flagged ALL
 		// multiple times into the same queue.
-		if( queue != null && queue != allQueue )
+		final EventQueue queue = getEventQueue( _event.getEventType() ) ;
+		if( queue != allQueue )
 		{
-			//System.out.println( "Found: " + key + " Event Queue." ) ;
 			queue.addEvent( _event ) ;
 		}
 
@@ -145,6 +136,7 @@ public final class EventSystem implements IEventSystem
 		allQueue.addEvent( _event ) ;
 	}
 
+	@Override
 	public final void update()
 	{
 		removeHandlersNow() ;
@@ -154,47 +146,40 @@ public final class EventSystem implements IEventSystem
 			queues.get( i ).update() ;
 		}
 	}
-
-	private void addEventQueue( final EventType _queueName, final EventQueue _queue )
-	{
-		queues.add( _queue ) ;
-	}
 	
 	private void remove( final WeakReference<IEventHandler> _handler )
 	{
 		final IEventHandler handler = _handler.get() ;
 		final List<EventType> types = handler.getWantedEventTypes() ;
-		if( types.isEmpty() == true )
+		if( types.isEmpty() )
 		{
-			// Due to legacy we must assumme that a types size of 0, 
+			// Due to legacy we must assume that a types size of 0, 
 			// represents EventType.ALL, must be specially removed.
 			allQueue.removeEventHandler( _handler ) ;
+			return ;
 		}
 
-		for( final EventType type : types )
+		final int size = types.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final EventQueue queue = getEventQueue( type ) ;
-			if( queue != null )
-			{
-				queue.removeEventHandler( _handler ) ;
-			}
+			final EventQueue queue = getEventQueue( types.get( i ) ) ;
+			queue.removeEventHandler( _handler ) ;
 		}
 
 		handlers.remove( _handler ) ;
-		if( handler != null )
-		{
-			handler.reset() ;
-		}
+		handler.reset() ;
 	}
 
 	/**
 		Return the Event Systems name, not considered unique.
 	*/
+	@Override
 	public String getName()
 	{
 		return name ;
 	}
 
+	@Override
 	public final void clearHandlers()
 	{
 		handlers.clear() ;
@@ -207,6 +192,7 @@ public final class EventSystem implements IEventSystem
 		}
 	}
 
+	@Override
 	public final void clearEvents()
 	{
 		final int size = queues.size() ;
@@ -216,6 +202,7 @@ public final class EventSystem implements IEventSystem
 		}
 	}
 
+	@Override
 	public final boolean hasEvents()
 	{
 		// allQueue receives all events so 
@@ -237,7 +224,10 @@ public final class EventSystem implements IEventSystem
 			}
 		}
 
-		return null ;
+		final EventQueue que = new EventQueue( _type ) ;
+		queues.add( que ) ;
+
+		return que ;
 	}
 
 	private final int exists( final IEventHandler _handler )
@@ -264,5 +254,113 @@ public final class EventSystem implements IEventSystem
 		}
 		buffer.append( "]" ) ;
 		return buffer.toString() ;
+	}
+
+	private class EventQueue
+	{
+		private final EventType name ;
+		private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList();
+		private final List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
+		private final SwapList<Event<?>> messenger = new SwapList<Event<?>>() ;
+
+		private IEventFilter filter = NO_FILTERING ;
+
+		public EventQueue( final EventType _name )
+		{
+			name = _name ;
+		}
+		
+		public void addEventHandler( final WeakReference<IEventHandler> _handler )
+		{
+			handlers.add( _handler ) ;
+		}
+
+		public void removeEventHandler( final WeakReference<IEventHandler> _handler )
+		{
+			handlers.remove( _handler ) ;
+		}
+
+		public void setEventFilter( final IEventFilter _filter )
+		{
+			filter = ( _filter != null ) ? _filter : NO_FILTERING ;
+		}
+
+		public void addEvent( final Event<?> _event )
+		{
+			messenger.add( _event ) ;
+		}
+
+		public void update()
+		{
+			messenger.swap() ;
+			final List<Event<?>> events = messenger.getActiveList() ;
+			if( events.isEmpty() )
+			{
+				// There are no events to pass to handlers
+				return ;
+			}
+
+			filter.filter( events, optimisedEvents ) ;
+
+			final int handlerSize = handlers.size() ;
+			final int eventSize = optimisedEvents.size() ;
+			for( int i = 0; i < handlerSize; ++i )
+			{
+				final WeakReference<IEventHandler> weak = handlers.get( i ) ;
+				final IEventHandler handler = weak.get() ;
+				if( handler == null )
+				{
+					Logger.println( "Event handler destroyed without being removed from " + EventSystem.this.getName(), Logger.Verbosity.MAJOR ) ;
+					continue ;
+				}
+
+				for( int j = 0; j < eventSize; j++ )
+				{
+					final Event<?> event = optimisedEvents.get( j ) ;
+					handler.processEvent( event ) ;
+				}
+			}
+
+			optimisedEvents.clear() ;
+		}
+
+		public boolean isType( final EventType _type )
+		{
+			return ( _type != null && _type == name ) ;
+		}
+
+		public int size()
+		{
+			return messenger.size() ;
+		}
+		
+		public void clearHandlers()
+		{
+			handlers.clear() ;
+		}
+		
+		public void clearEvents()
+		{
+			messenger.clear() ;
+			optimisedEvents.clear() ;
+		}
+		
+		public boolean hasEvents()
+		{
+			return messenger.isEmpty() == false ;
+		}
+
+		public String toString()
+		{
+			final StringBuffer buffer = new StringBuffer() ;
+			buffer.append( "[ Event Queue: " + name + ", " ) ;
+			for( final WeakReference<IEventHandler> weakHandler : handlers )
+			{
+				final IEventHandler handler = weakHandler.get() ;
+				buffer.append( handler.getName() + ", " ) ;
+			}
+			buffer.append( "]" ) ;
+			return buffer.toString() ;
+		}
 	}
 }

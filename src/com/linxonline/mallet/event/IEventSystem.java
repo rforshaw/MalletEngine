@@ -14,8 +14,8 @@ public interface IEventSystem extends IAddEvent
 	**/
 	public void removeEventHandler( final IEventHandler _handler ) ;
 
-	public void addEventFilter( final EventType _type, final IEventFilter _filter ) ;
-	public void removeEventFilter( final EventType _type, final IEventFilter _filter ) ;
+	public void setEventFilter( final EventType _type, final IEventFilter _filter ) ;
+
 	/**
 		Remove the EventHandlers queued for removal now.
 	**/
