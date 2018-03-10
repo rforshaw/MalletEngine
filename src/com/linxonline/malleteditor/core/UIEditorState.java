@@ -98,10 +98,9 @@ public class UIEditorState extends GameState
 		}
 
 		final Entity entity = new Entity( "UI" ) ;
-		final UIComponent component = new UIComponent() ;
+		final UIComponent component = new UIComponent( entity ) ;
 		component.addElement( jui.getParent() ) ;
 
-		entity.addComponent( component ) ;
 		addEntity( entity ) ;
 
 		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
@@ -262,9 +261,9 @@ public class UIEditorState extends GameState
 		final Entity entity = new Entity( "DROP_ENTITY", "DROP_ENTITY" ) ;
 		entity.setPosition( 0, 0, 0 ) ;
 
-		final AnimComponent anim   = entity.addComponent( new AnimComponent() ) ;
-		final EventComponent event = entity.addComponent( new EventComponent() ) ;
-		final MouseComponent mouse = entity.addComponent( new MouseComponent()
+		final AnimComponent anim   = new AnimComponent( entity ) ;
+		final EventComponent event = new EventComponent( entity ) ;
+		final MouseComponent mouse = new MouseComponent( entity )
 		{
 			@Override
 			public void mouseReleased( final InputEvent _event )
@@ -298,7 +297,7 @@ public class UIEditorState extends GameState
 					default              : break ;
 				}
 			}
-		} ) ;
+		} ;
 
 		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																entity.position,

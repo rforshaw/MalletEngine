@@ -31,7 +31,6 @@ import com.linxonline.mallet.physics.CollisionSystem ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.entity.system.* ;
 import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.animation.* ;
 
@@ -42,14 +41,14 @@ import com.linxonline.mallet.util.settings.* ;
 
 import com.linxonline.mallet.io.save.state.DataConverter ;
 
-public class GameState extends State implements HookEntity
+public class GameState extends State
 {
 	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
 
-	protected UpdateInterface currentUpdate = null ;												// Current Running Mode
+	protected IUpdate currentUpdate = null ;												// Current Running Mode
 
 	protected final InputState inputWorldSystem = new InputState() ;										// Internal World Input System
 	protected final InputState inputUISystem = new InputState() ;											// Internal UI Input System
@@ -59,8 +58,9 @@ public class GameState extends State implements HookEntity
 	private final EventController externalController = new EventController( "GAME_STATE_CONTROLLER_EXTERNAL" ) ;		// Used to process Events, from external eventSystem
 
 	protected ISystem system = null ;																// Provides access to Root systems
-	protected final AudioSystem audioSystem = new AudioSystem() ;											// Must specify a SourceGenerator
-	protected final EntitySystemInterface entitySystem = new EntitySystem( this ) ;
+	protected final IEntitySystem entitySystem = new EntitySystem( eventSystem ) ;
+
+	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
@@ -173,20 +173,6 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		Add entities straight away.
-		Should be used before the first game-logic update.
-	*/
-	public final void addEntitiesNow( final List<Entity> _entities )
-	{
-		final int size = _entities.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final Entity entity = _entities.get( i ) ;
-			addEntityNow( entity ) ;
-		}
-	}
-
-	/**
 		Add an entity at the most opportune moment.
 		Should be used during game-logic update.
 	*/
@@ -194,16 +180,6 @@ public class GameState extends State implements HookEntity
 	{
 		assert _entity != null ;
 		entitySystem.addEntity( _entity ) ;
-	}
-
-	/**
-		Add an entity straight away.
-		Should be used before the first game-logic update.
-	*/
-	public final void addEntityNow( final Entity _entity )
-	{
-		assert _entity != null ;
-		entitySystem.addEntityNow( _entity ) ;
 	}
 
 	/**
@@ -229,66 +205,8 @@ public class GameState extends State implements HookEntity
 	}
 
 	/**
-		Hook Entity into relevant systems.
-	*/
-	public void hookEntity( final Entity _entity )
-	{
-		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-		{
-			// Retrieve component system-registering events.
-			final List<Component> entityComponents = MalletList.<Component>newList() ;
-			final int size = _entity.getAllComponents( entityComponents ) ;
-			for( int i = 0; i < size; ++i )
-			{
-				final Component component = entityComponents.get( i ) ;
-				component.passInitialEvents( events ) ;
-			}
-		}
-
-		{
-			final int size = events.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				eventSystem.addEvent( events.get( i ) ) ;
-			}
-		}
-
-		//eventSystem.update() ;			// Update the Event System so other systems can process them asap.
-	}
-
-	/**
-		Unhook Entity from systems.
-	*/
-	public void unhookEntity( final Entity _entity )
-	{
-		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-		{
-			// Retrieve component system-registering events.
-			Component component = null ;
-			final List<Component> entityComponents = MalletList.<Component>newList() ;
-			final int size = _entity.getAllComponents( entityComponents ) ;
-			for( int i = 0; i < size; ++i )
-			{
-				component = entityComponents.get( i ) ;
-				component.passFinalEvents( events ) ;		// Retrieve the Events that will unregister the components
-			}
-		}
-
-		{
-			final int size = events.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				eventSystem.addEvent( events.get( i ) ) ;
-			}
-		}
-
-		_entity.clear() ;			// Unregister any Resources this Component may have acquired.
-		eventSystem.update() ;		// Update the Event System so other systems can process them asap.
-	}
-
-	/**
 		Force the Game State to call system.draw(), on next update.
-		Not necessarily used by all UpdateInterface types.
+		Not necessarily used by all IUpdate types.
 	*/
 	protected final void forceDraw()
 	{
@@ -396,7 +314,7 @@ public class GameState extends State implements HookEntity
 
 	protected void useGameMode()
 	{
-		currentUpdate = new UpdateInterface()
+		currentUpdate = new IUpdate()
 		{
 			private double deltaRenderTime = 0.0 ;
 
@@ -465,7 +383,7 @@ public class GameState extends State implements HookEntity
 
 	protected void useApplicationMode()
 	{
-		currentUpdate = new UpdateInterface()
+		currentUpdate = new IUpdate()
 		{
 			private float waitDelay = 2.0f ;
 			private float wait = 0.0f ;
@@ -611,15 +529,6 @@ public class GameState extends State implements HookEntity
 			}
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<QueryComponent>( "ADD_GAME_STATE_QUERY", "ADD_GAME_STATE_QUERY" )
-		{
-			public void processEvent( final Event<QueryComponent> _event )
-			{
-				final QueryComponent query = _event.getVariable() ;
-				query.setSearch( entitySystem.getSearch() ) ;
-			}
-		} ) ;
-
 		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
 		{
 			private DrawDelegate<World, Draw> delegate ;
@@ -693,7 +602,7 @@ public class GameState extends State implements HookEntity
 	/**
 		Allows the developer to create their own update modes.
 	*/
-	protected interface UpdateInterface
+	protected interface IUpdate
 	{
 		public void update( final double _dt ) ;
 	}

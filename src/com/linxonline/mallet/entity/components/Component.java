@@ -1,133 +1,16 @@
 package com.linxonline.mallet.entity.components ;
 
-import java.util.List ;
-
 import com.linxonline.mallet.entity.Entity ;
-import com.linxonline.mallet.util.id.ID ;
-import com.linxonline.mallet.event.* ;
 
-/*==============================================================*/
-// Component - Root class for all Componets used by Entity.	  //
-/*==============================================================*/
-
-public abstract class Component
+public class Component extends Entity.Component
 {
-	protected final EventController componentEvents = new EventController() ;	// Handles events from parent
-	protected Entity parent = null ;											// Owner of this component
-	protected final ID id ;														// Name and Group Name
-
-	public Component()
+	public Component( final Entity _parent )
 	{
-		this( "NONE", "NONE" ) ;
+		this( _parent, null, null ) ;
 	}
 
-	/**
-		Engine specified codes for nameID and groupID.
-		Not guaranteed to be unique over 16 characters.
-	*/
-	public Component( final String _name, final String _group )
+	public Component( final Entity _parent, final String _name, final String _group )
 	{
-		id = new ID( _name, _group ) ;
-		initComponentEventProcessors( getComponentEventController() ) ;
-	}
-
-	public void setParent( final Entity _parent )
-	{
-		parent = _parent ;
-	}
-
-	/**
-		If overriding, you must call super.update( _dt ), 
-		else componentEvents will not be updated.
-	**/
-	public void update( final float _dt )
-	{
-		componentEvents.update() ;
-	}
-
-	public final boolean isName( final String _name )
-	{
-		return id.isName( _name ) ;
-	}
-
-	public final boolean isGroup( final String _group )
-	{
-		return id.isGroup( _group ) ;
-	}
-
-	/**
-		Override to add Event Processors to the component's
-		Event Controller.
-		Make sure to call super to ensure parents 
-		component Event Processors are added.
-	*/
-	public void initComponentEventProcessors( final EventController _controller ) {}
-
-	/**
-		Create events and add them to _events.
-		The events will be passed to the Event System
-		of the Game State. Use an Event to register the 
-		component or variables it holds to external systems.
-		Can also be used for any other events that may need 
-		to be passed when the component is added to the Entity System. 
-	*/
-	public void passInitialEvents( final List<Event<?>> _events ) {}
-
-	/**
-		Create events and add them to _events.
-		The events will be passed to the Event System
-		of the Game State. Use an Event to cleanup the 
-		component or variables it holds to external systems.
-		Can also be used for any other events that may need 
-		to be passed when the component is removed from the Entity System.
-		super.passFinalEvents(), must be called.
-	*/
-	public void passFinalEvents( final List<Event<?>> _events )
-	{
-		componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
-	}
-
-	/**
-		The parent can be flagged for destruction at anytime, a 
-		component could be in an unstable state, for example 
-		waiting for the id of a render request.
-		readyToDestroy allows the component to inform the parent 
-		it is safe to destroy itself. When overriding don't call super.
-	*/
-	public void readyToDestroy( final Component.ReadyCallback _callback )
-	{
-		_callback.ready( this ) ;
-	}
-
-	/**
-		Return the internal Event Controller for this component.
-		Passes and Receives event components within the parent Entity. 
-	*/
-	public EventController getComponentEventController()
-	{
-		return componentEvents ;
-	}
-
-	/**
-		Return the parent of the component, 
-		this should be guaranteed if the component 
-		has been added to an Entity.
-	*/
-	public Entity getParent()
-	{
-		return parent ;
-	}
-
-	/**
-		Implemented in Entity.
-		The Entity will call Component.readyToDestroy when,
-		it has been flagged for destruction. When the Component 
-		is ready, it should call ReadyCallback.ready.
-		The Entity will track which components have readied themselves, 
-		once all components are readied it will destroy itself.
-	*/
-	public static interface ReadyCallback
-	{
-		public void ready( final Component _component ) ;
+		_parent.super( _name, _group ) ;
 	}
 }

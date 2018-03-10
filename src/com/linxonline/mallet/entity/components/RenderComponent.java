@@ -2,6 +2,9 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.Entity.Component ;
+
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
@@ -12,27 +15,27 @@ import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 
-public class RenderComponent extends Component
+public class RenderComponent extends Entity.Component
 {
 	private final List<Tuple<Draw, World>> toAddBasic = MalletList.<Tuple<Draw, World>>newList() ;
 	private final List<Tuple<Draw, World>> toAddText = MalletList.<Tuple<Draw, World>>newList() ;
 
 	private DrawDelegate<World, Draw> drawDelegate = null ;
-	private Component.ReadyCallback toDestroy = null ;
+	private Entity.ReadyCallback toDestroy = null ;
 
-	public RenderComponent()
+	public RenderComponent( final Entity _parent )
 	{
-		this( "RENDER" ) ;
+		this( _parent, "RENDER" ) ;
 	}
 
-	public RenderComponent( final String _name )
+	public RenderComponent( final Entity _parent, final String _name )
 	{
-		this( _name, "RENDER_COMPONENT" ) ;
+		this( _parent, _name, "RENDER_COMPONENT" ) ;
 	}
 
-	public RenderComponent( final String _name, final String _group )
+	public RenderComponent( final Entity _parent, final String _name, final String _group )
 	{
-		super( _name, _group ) ;
+		_parent.super( _name, _group ) ;
 	}
 
 	public void addBasicDraw( final Draw _draw )
@@ -96,7 +99,7 @@ public class RenderComponent extends Component
 	}
 
 	@Override
-	public void readyToDestroy( final Component.ReadyCallback _callback )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		if( drawDelegate != null )
 		{

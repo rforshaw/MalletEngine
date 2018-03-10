@@ -3,6 +3,8 @@ package com.linxonline.mallet.entity.components ;
 import java.util.Map ;
 import java.util.List ;
 
+import com.linxonline.mallet.entity.Entity ;
+
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.input.InputEvent ;
@@ -17,19 +19,19 @@ public class KeyInputComponent extends InputComponent
 {
 	private final Map<KeyCode, Key> keys = MalletMap.<KeyCode, Key>newMap() ;
 
-	public KeyInputComponent()
+	public KeyInputComponent( final Entity _parent )
 	{
-		super() ;
+		super( _parent ) ;
 	}
 
-	public KeyInputComponent( final String _name )
+	public KeyInputComponent( final Entity _parent, final String _name )
 	{
-		this( _name, "INPUTCOMPONENT" ) ;
+		this( _parent, _name, "INPUTCOMPONENT" ) ;
 	}
 	
-	public KeyInputComponent( final String _name, final String _group )
+	public KeyInputComponent( final Entity _parent, final String _name, final String _group )
 	{
-		super( _name, _group ) ;
+		super( _parent, _name, _group ) ;
 	}
 	
 	public void registerKey( final KeyCode _key, final KeyInputListener _listener )

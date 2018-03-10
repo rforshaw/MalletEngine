@@ -20,14 +20,14 @@ public class MouseComponent extends InputComponent
 	protected boolean mouse2Pressed = false ;
 	protected boolean mouse3Pressed = false ;
 
-	public MouseComponent()
+	public MouseComponent( final Entity _parent )
 	{
-		this( InputComponent.InputMode.UI ) ;
+		this( _parent, InputComponent.InputMode.UI ) ;
 	}
 
-	public MouseComponent( final InputComponent.InputMode _mode )
+	public MouseComponent( final Entity _parent, final InputComponent.InputMode _mode )
 	{
-		super( "MOUSECOMPONENT", "INPUTCOMPONENT", _mode ) ;
+		super( _parent, "MOUSECOMPONENT", "INPUTCOMPONENT", _mode ) ;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class MouseComponent extends InputComponent
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;
 		final Camera camera = CameraAssist.getDefaultCamera() ;
 
-		final Vector3 pos = parent.getPosition() ;
+		final Vector3 pos = getParent().getPosition() ;
 		pos.x = CameraAssist.convertInputToCameraX( camera, mouse.x ) ;
 		pos.y = CameraAssist.convertInputToCameraY( camera, mouse.y ) ;
 	}

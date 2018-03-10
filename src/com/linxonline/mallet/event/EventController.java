@@ -28,21 +28,27 @@ public class EventController implements IEventHandler
 
 	public EventController()
 	{
-		name = "EVENT CONTROLLER" ;
+		this( null ) ;
 	}
 
 	public EventController( final String _name )
 	{
-		assert _name != null ;
-		name = _name ;
+		name = ( _name != null ) ? _name : "EVENT CONTROLLER" ;
 	}
 
 	/**
 		Add an Event Processor to begin reading the event stream.
-	**/
+		The event controller is considered the parent of the processor.
+	*/
 	public void addEventProcessor( final EventProcessor _processor )
 	{
-		if( _processor != null && processors.contains( _processor ) == false )
+		if( _processor == null )
+		{
+			Logger.println( "Attempting to add null processor to controller.", Logger.Verbosity.MAJOR ) ;
+			return ;
+		}
+
+		if( processors.contains( _processor ) == false )
 		{
 			processors.add( _processor ) ;
 			final EventType type = _processor.getEventType() ;
@@ -83,7 +89,7 @@ public class EventController implements IEventHandler
 	/**
 		Should be called during an update.
 		Override processEvent() if you wish to use the Events passed in
-	**/
+	*/
 	public void update()
 	{
 		messenger.refreshEvents() ;

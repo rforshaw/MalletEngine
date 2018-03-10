@@ -2,6 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.* ;
@@ -25,44 +26,47 @@ public class UIComponent extends InputComponent
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
-	private Component.ReadyCallback toDestroy = null ;
+	private Entity.ReadyCallback toDestroy = null ;
 	private DrawDelegate<World, Draw> delegate = null ;
 
-	public UIComponent()
+	public UIComponent( final Entity _parent )
 	{
-		this( "UI" ) ;
+		this( _parent, "UI" ) ;
 	}
 
-	public UIComponent( final String _name )
+	public UIComponent( final Entity _parent, final String _name )
 	{
-		this( _name, "UICOMPONENT" ) ;
+		this( _parent, _name, "UICOMPONENT" ) ;
 	}
 
-	public UIComponent( final String _name, final String _group )
+	public UIComponent( final Entity _parent, final String _name, final String _group )
 	{
-		this( _name,
+		this( _parent,
+			  _name,
 			  _group,
 			  InputMode.UI,
 			  WorldAssist.getDefaultWorld(),
 			  CameraAssist.getDefaultCamera() ) ;
 	}
 
-	public UIComponent( final String _name, final InputMode _mode )
+	public UIComponent( final Entity _parent, final String _name, final InputMode _mode )
 	{
-		this( _name,
+		this( _parent,
+			  _name,
 			  "UICOMPONENT",
 			  _mode,
 			  WorldAssist.getDefaultWorld(),
 			  CameraAssist.getDefaultCamera() ) ;
 	}
 
-	public UIComponent( final String _name,
+	public UIComponent( final Entity _parent,
+						final String _name,
 						final String _group,
 						final InputMode _mode,
 						final World _world,
 						final Camera _camera )
 	{
-		super( _name, _group, _mode ) ;
+		super( _parent, _name, _group, _mode ) ;
 
 		// Allow the developer to specify what world 
 		// this UI should be drawn to - if no world 
@@ -115,7 +119,7 @@ public class UIComponent extends InputComponent
 		Will remove all UIElements from component.
 	*/
 	@Override
-	public void readyToDestroy( final Component.ReadyCallback _callback )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		if( delegate != null )
 		{

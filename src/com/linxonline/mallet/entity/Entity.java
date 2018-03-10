@@ -1,9 +1,6 @@
 package com.linxonline.mallet.entity ;
 
-import java.util.Collection ;
 import java.util.List ;
-
-import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.id.ID ;
@@ -12,8 +9,8 @@ import com.linxonline.mallet.event.* ;
 
 /**
 	Entity is a container class for Componets.
-	By default an Entity should have a unique name, and a global family name.
-	For example an Entity could be named HENCHMAN3, and be in the ENEMY family.
+	By default an Entity should have a name, and a global family name.
+	For example an Entity could be named HENCHMAN, and be in the ENEMY family.
 	
 	Entity also allows an internal component to send messages to other components,
 	it operates in a similar basis to the EventSystem.
@@ -25,9 +22,9 @@ import com.linxonline.mallet.event.* ;
 public final class Entity
 {
 	private final List<Component> components = MalletList.<Component>newList() ;
-	private final EventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
+	private final IEventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
 
-	public final ID id ;							// Unique ID for this Entity: Name:Family
+	public final ID id ;							// ID for this Entity: Name:Family
 	public Vector3 position = new Vector3() ;		// Position of Entity in world space
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
@@ -64,32 +61,13 @@ public final class Entity
 		Add a component to the Entity and set its parent to the Entity
 		The Component should not be owned by another Component, it could get messy!
 	**/
-	public final <T extends Component> T addComponent( final T _component )
+	private final void addComponent( final Component _component )
 	{
-		_component.setParent( this ) ;
 		components.add( _component ) ;
 
 		final EventController controller = _component.getComponentEventController() ;
 		controller.setAddEventInterface( eventSystem ) ;
 		eventSystem.addEventHandler( controller ) ;
-		return _component ;
-	}
-
-	public final void removeComponent( final Component _component )
-	{
-		_component.setParent( null ) ;					// Required by j2Objc conversion, causes memory-leak otherwise
-		components.remove( _component ) ;
-
-		final EventController controller = _component.getComponentEventController() ;
-		eventSystem.removeEventHandler( controller ) ;
-	}
-
-	public final void removeComponents( final List<Component> _components )
-	{
-		for( final Component component : _components )
-		{
-			removeComponent( component ) ;
-		}
 	}
 
 	/**
@@ -108,29 +86,9 @@ public final class Entity
 	}
 
 	/**
-		Get a Component with the designated name.
-		If there is more than one component with that name,
-		then it will return the first one it finds.
-	**/
-	public final Component getComponentByName( final String _name )
-	{
-		final int size = components.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			final Component component = components.get( i ) ;
-			if( component.isName( _name ) == true )
-			{
-				return component ;
-			}
-		}
-
-		return null ;
-	}
-
-	/**
 		Return all the components with the designated name
 	**/
-	public final int getComponentsByName( final String _name, final List<Component> _components )
+	public final List<Component> getComponentsByName( final String _name, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -140,14 +98,14 @@ public final class Entity
 			}
 		}
 
-		return _components.size() ;
+		return _components ;
 	}
 
 	/**
 		Get the Components that have the same Group name and return them in 
 		a List.
 	**/
-	public final int getComponentByGroup( final String _group, final List<Component> _components )
+	public final List<Component> getComponentByGroup( final String _group, final List<Component> _components )
 	{
 		for( final Component component : components )
 		{
@@ -157,17 +115,17 @@ public final class Entity
 			}
 		}
 
-		return _components.size() ;
+		return _components ;
 	}
 
 	/**
 		Returns the List that contains all the Entity's Components.
 		NOTE: the List is NOT a copy.
 	**/
-	public final int getAllComponents( final List<Component> _components )
+	public final List<Component> getAllComponents( final List<Component> _components )
 	{
 		_components.addAll( components ) ;
-		return _components.size() ;
+		return _components ;
 	}
 
 	/** 
@@ -187,11 +145,11 @@ public final class Entity
 	*/
 	public final void destroy()
 	{
-		final Component.ReadyCallback readyDestroy = new Component.ReadyCallback()
+		final Entity.ReadyCallback readyDestroy = new Entity.ReadyCallback()
 		{
-			private final List<Component> toDestroy = MalletList.<Component>newList( components ) ;
+			private final List<Entity.Component> toDestroy = MalletList.<Entity.Component>newList( components ) ;
 
-			public void ready( final Component _component )
+			public void ready( final Entity.Component _component )
 			{
 				// toDestroy should not need to be synchronised 
 				// as Components of an Entity are not updated 
@@ -227,16 +185,124 @@ public final class Entity
 	}
 
 	/**
-	 Once clear() is called, the Entity it is pretty much dead,
-	 it's lost all of its components and the ComponentEventSystem 
-	 is nulled out.
-	**/
-	public void clear()
+		Implemented in Entity.
+		The Entity will call Component.readyToDestroy when,
+		it has been flagged for destruction. When the Component 
+		is ready, it should call ReadyCallback.ready.
+		The Entity will track which components have readied themselves, 
+		once all components are readied it will destroy itself.
+	*/
+	public interface ReadyCallback
 	{
-		final List<Component> comps = MalletList.<Component>newList( components ) ;
-		removeComponents( comps ) ;
+		public void ready( final Entity.Component _component ) ;
+	}
 
-		comps.clear() ;
-		eventSystem.clearHandlers() ;
+	/*==============================================================*/
+	// Component - Root class for all Components used by Entity.	  //
+	/*==============================================================*/
+
+	public abstract class Component
+	{
+		protected final EventController componentEvents = new EventController() ;	// Handles events from parent
+		protected final ID id ;														// Name and Group Name
+
+		public Component()
+		{
+			this( null, null ) ;
+		}
+
+		/**
+			Engine specified codes for nameID and groupID.
+			Not guaranteed to be unique over 16 characters.
+		*/
+		public Component( final String _name, final String _group )
+		{
+			id = new ID( ( _name != null ) ? _name : "NONE", ( _group != null ) ? _group : "NONE" ) ;
+			initComponentEventProcessors( getComponentEventController() ) ;
+
+			getParent().addComponent( this ) ;
+		}
+
+		/**
+			If overriding, you must call super.update( _dt ), 
+			else componentEvents will not be updated.
+		**/
+		public void update( final float _dt )
+		{
+			componentEvents.update() ;
+		}
+
+		public final boolean isName( final String _name )
+		{
+			return id.isName( _name ) ;
+		}
+
+		public final boolean isGroup( final String _group )
+		{
+			return id.isGroup( _group ) ;
+		}
+
+		/**
+			Override to add Event Processors to the component's
+			Event Controller.
+			Make sure to call super to ensure parents 
+			component Event Processors are added.
+		*/
+		public void initComponentEventProcessors( final EventController _controller ) {}
+
+		/**
+			Create events and add them to _events.
+			The events will be passed to the Event System
+			of the Game State. Use an Event to register the 
+			component or variables it holds to external systems.
+			Can also be used for any other events that may need 
+			to be passed when the component is added to the Entity System. 
+		*/
+		public void passInitialEvents( final List<Event<?>> _events ) {}
+
+		/**
+			Create events and add them to _events.
+			The events will be passed to the Event System
+			of the Game State. Use an Event to cleanup the 
+			component or variables it holds to external systems.
+			Can also be used for any other events that may need 
+			to be passed when the component is removed from the Entity System.
+			super.passFinalEvents(), must be called.
+		*/
+		public void passFinalEvents( final List<Event<?>> _events )
+		{
+			componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
+		}
+
+		/**
+			The parent can be flagged for destruction at anytime, a 
+			component could be in an unstable state, for example 
+			waiting for the id of a render request.
+			readyToDestroy allows the component to inform the parent 
+			it is safe to destroy itself. When overriding don't call super.
+		*/
+		public void readyToDestroy( final ReadyCallback _callback )
+		{
+			_callback.ready( this ) ;
+		}
+
+		/**
+			Return the internal Event Controller for this component.
+			Passes and Receives event components within the parent Entity. 
+		*/
+		public EventController getComponentEventController()
+		{
+			return componentEvents ;
+		}
+
+		/**
+			Return the parent of the component, 
+			this should be guaranteed if the component 
+			has been added to an Entity.
+		*/
+		public Entity getParent()
+		{
+			return Entity.this ;
+		}
 	}
 }

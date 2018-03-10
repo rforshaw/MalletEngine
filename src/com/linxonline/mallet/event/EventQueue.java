@@ -1,13 +1,16 @@
 package com.linxonline.mallet.event ;
 
+import java.lang.ref.WeakReference ;
+
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 public class EventQueue
 {
 	private final EventType name ;
-	private final List<IEventHandler> handlers = MalletList.<IEventHandler>newList();
+	private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList();
 	private final List<IEventFilter> filters = MalletList.<IEventFilter>newList() ;
 	private final List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
 	private final EventMessenger messenger = new EventMessenger() ;
@@ -17,12 +20,12 @@ public class EventQueue
 		name = _name ;
 	}
 	
-	public void addEventHandler( final IEventHandler _handler )
+	public void addEventHandler( final WeakReference<IEventHandler> _handler )
 	{
 		handlers.add( _handler ) ;
 	}
 
-	public void removeEventHandler( final IEventHandler _handler )
+	public void removeEventHandler( final WeakReference<IEventHandler> _handler )
 	{
 		handlers.remove( _handler ) ;
 	}
@@ -70,7 +73,14 @@ public class EventQueue
 			optimisedEvents.remove( 0 ) ;
 			for( int j = 0; j < handlerSize; ++j )
 			{
-				handlers.get( j ).processEvent( event ) ;
+				final WeakReference<IEventHandler> weak = handlers.get( j ) ;
+				final IEventHandler handler = weak.get() ;
+				if( handler == null )
+				{
+					Logger.println( "Attempting to pass event to destroyed handler that's not been removed.", Logger.Verbosity.MAJOR ) ;
+					continue ;
+				}
+				handler.processEvent( event ) ;
 			}
 		}
 	}
@@ -105,8 +115,9 @@ public class EventQueue
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		buffer.append( "[ Event Queue: " + name + ", " ) ;
-		for( final IEventHandler handler : handlers )
+		for( final WeakReference<IEventHandler> weakHandler : handlers )
 		{
+			final IEventHandler handler = weakHandler.get() ;
 			buffer.append( handler.getName() + ", " ) ;
 		}
 		buffer.append( "]" ) ;

@@ -98,10 +98,9 @@ public final class GameTestLoader extends GameLoader
 				} ) ;
 
 				final Entity entity = new Entity( "UI" ) ;
-				final UIComponent component = new UIComponent() ;
+				final UIComponent component = new UIComponent( entity ) ;
 				component.addElement( jUI.getParent() ) ;
 
-				entity.addComponent( component ) ;
 				addEntity( entity ) ;
 			}
 
@@ -230,7 +229,7 @@ public final class GameTestLoader extends GameLoader
 			{
 				final Entity entity = new Entity( "Test Animation" ) ;
 
-				final AnimComponent anim = entity.addComponent( new AnimComponent() ) ;
+				final AnimComponent anim = new AnimComponent( entity ) ;
 				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																		 new Vector3( 0.0f, 0.0f, 0.0f ),
 																		 new Vector3( -32, -32, 0 ),
@@ -243,7 +242,7 @@ public final class GameTestLoader extends GameLoader
 				anim.addAnimation( "DEFAULT", moombaAnim ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
 
-				entity.addComponent( new Component()
+				new Component( entity )
 				{
 					private final static float DURATION = 5.0f ;
 					private float elapsed = 0.0f ;
@@ -257,7 +256,7 @@ public final class GameTestLoader extends GameLoader
 							anim.playAnimation( "DEFAULT" ) ;
 						}
 					}
-				} ) ;
+				} ;
 				
 				addEntity( entity ) ;
 			}
@@ -373,13 +372,14 @@ public final class GameTestLoader extends GameLoader
 
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
-				final RenderComponent render =  entity.addComponent( new RenderComponent() ) ;
+				final RenderComponent render =  new RenderComponent( entity ) ;
 				render.addBasicDraw( draw ) ;
 
-				entity.addComponent( CollisionComponent.generateBox2D( new Vector2(),
-																	   new Vector2( 64, 64 ),
-																	   new Vector2( x, y ),
-																	   new Vector2( -32, -32 ) ) ) ;
+				CollisionComponent.generateBox2D( entity,
+												  new Vector2(),
+												  new Vector2( 64, 64 ),
+												  new Vector2( x, y ),
+												  new Vector2( -32, -32 ) ) ;
 
 				addEntity( entity ) ;
 			}
@@ -395,9 +395,9 @@ public final class GameTestLoader extends GameLoader
 				final Entity entity = new Entity( "MOUSE" ) ;
 				entity.position = new Vector3( width, height, 0 ) ;
 
-				final AnimComponent anim   = entity.addComponent( new AnimComponent() ) ;
-				final EventComponent event = entity.addComponent( new EventComponent() ) ;
-				final MouseComponent mouse = entity.addComponent( new MouseComponent() ) ;
+				final AnimComponent anim   = new AnimComponent( entity ) ;
+				final EventComponent event = new EventComponent( entity ) ;
+				final MouseComponent mouse = new MouseComponent( entity ) ;
 
 				final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																		entity.position,
@@ -414,12 +414,12 @@ public final class GameTestLoader extends GameLoader
 				anim.addAnimation( "DEFAULT", animation ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
 
-				final CollisionComponent collision = CollisionComponent.generateBox2D( new Vector2(),
-																					   new Vector2( 32, 32 ),
-																					   new Vector2( 0, 0 ),
-																					   new Vector2( -16, -16 ) ) ;
+				final CollisionComponent collision = CollisionComponent.generateBox2D( entity,
+																						new Vector2(),
+																						new Vector2( 32, 32 ),
+																						new Vector2( 0, 0 ),
+																						new Vector2( -16, -16 ) ) ;
 				collision.hull.setPhysical( false ) ;
-				entity.addComponent( collision ) ;
 
 				addEntity( entity ) ;
 			}
@@ -442,11 +442,10 @@ public final class GameTestLoader extends GameLoader
 				ProgramAssist.map( program, "inTex0", texture ) ;
 				DrawAssist.attachProgram( draw, program ) ;
 
-				final RenderComponent render = new RenderComponent() ;
+				final RenderComponent render = new RenderComponent( entity ) ;
 				render.addBasicDraw( draw ) ;
 
-				entity.addComponent( render ) ;
-				entity.addComponent( new Component( "SPIN", "CUBE" )
+				new Component( entity, "SPIN", "CUBE" )
 				{
 					private final Vector3 rotate = new Vector3() ;
 
@@ -461,7 +460,7 @@ public final class GameTestLoader extends GameLoader
 						DrawAssist.amendRotate( draw, rotate.x, rotate.y, rotate.z ) ;
 						DrawAssist.forceUpdate( draw ) ;
 					}
-				} ) ;
+				} ;
 
 				addEntity( entity ) ;
 			}

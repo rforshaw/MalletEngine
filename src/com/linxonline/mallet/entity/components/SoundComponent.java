@@ -4,6 +4,8 @@ import java.util.Collection ;
 import java.util.List ;
 import java.util.Map ;
 
+import com.linxonline.mallet.entity.Entity ;
+
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.audio.AudioDelegateCallback ;
@@ -20,17 +22,17 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	private Audio currentAudio  = null ;					// Name of the current audio that is playing
 
 	private AudioDelegate delegate            = null ;
-	private Component.ReadyCallback toDestroy = null ;
+	private Entity.ReadyCallback toDestroy = null ;
 	private SourceCallback callback           = null ;
 
-	public SoundComponent()
+	public SoundComponent( final Entity _parent )
 	{
-		this( "SOUND" ) ;
+		this( _parent, "SOUND" ) ;
 	}
 
-	public SoundComponent( final String _name )
+	public SoundComponent( final Entity _parent, final String _name )
 	{
-		super( _name ) ;
+		super( _parent, _name ) ;
 	}
 
 	/**
@@ -62,7 +64,7 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void readyToDestroy( final Component.ReadyCallback _callback )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		if( delegate != null )
 		{

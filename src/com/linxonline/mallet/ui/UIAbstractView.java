@@ -30,7 +30,7 @@ public abstract class UIAbstractView extends UIElement
 		super.update( _dt, _events ) ;
 		if( model != null && refresh == true )
 		{
-			updateModel( null ) ;
+			updateModel( model.root() ) ;
 			refresh = false ;
 		}
 	}

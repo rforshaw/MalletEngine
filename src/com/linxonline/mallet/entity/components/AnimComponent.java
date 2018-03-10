@@ -3,6 +3,8 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 import java.util.Map ;
 
+import com.linxonline.mallet.entity.Entity ;
+
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.Logger ;
@@ -24,17 +26,17 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	private Tuple<Anim, World> currentAnim   = null ;					// Name of the current animation that is playing
 
 	private AnimationDelegate delegate        = null ;
-	private Component.ReadyCallback toDestroy = null ;
+	private Entity.ReadyCallback toDestroy = null ;
 	private SourceCallback callback           = null ;
 
-	public AnimComponent()
+	public AnimComponent( final Entity _parent )
 	{
-		this( "ANIM" ) ;
+		this( _parent, "ANIM" ) ;
 	}
 
-	public AnimComponent( final String _name )
+	public AnimComponent( final Entity _parent, final String _name )
 	{
-		super( _name ) ;
+		super( _parent, _name ) ;
 	}
 
 	public void addAnimation( final String _name, final Anim _anim )
@@ -64,7 +66,7 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	}
 
 	@Override
-	public void readyToDestroy( final Component.ReadyCallback _callback )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		if( delegate != null )
 		{

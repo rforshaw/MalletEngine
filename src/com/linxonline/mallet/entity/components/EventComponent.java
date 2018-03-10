@@ -2,6 +2,8 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.event.* ;
 
 /**
@@ -14,24 +16,24 @@ import com.linxonline.mallet.event.* ;
 	You can also use the EventComponent as a filter of sorts before injecting 
 	the Game State events into the Entity's internal messaging system.
 **/
-public class EventComponent extends Component
+public class EventComponent extends Entity.Component
 {
 	protected final EventController stateController = new EventController( id.toString() ) ;		// Used to talk to GameState
 	protected final EventController backendController = new EventController( id.toString() ) ;		// Used to talk to GLDefaultSystem
 
-	public EventComponent()
+	public EventComponent( final Entity _parent )
 	{
-		this( "EVENT", "EVENTCOMPONENT" ) ;
+		this( _parent, "EVENT", "EVENTCOMPONENT" ) ;
 	}
 
-	public EventComponent( final String _name )
+	public EventComponent( final Entity _parent, final String _name )
 	{
-		this( _name, "EVENTCOMPONENT" ) ;
+		this( _parent, _name, "EVENTCOMPONENT" ) ;
 	}
 
-	public EventComponent( final String _name, final String _group )
+	public EventComponent( final Entity _parent, final String _name, final String _group )
 	{
-		super( _name, _group ) ;
+		_parent.super( _name, _group ) ;
 		initBackendEventProcessors( getBackendEventController() ) ;
 		initStateEventProcessors( getStateEventController() ) ;
 	}

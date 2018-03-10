@@ -2,42 +2,44 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 
-public abstract class InputComponent extends Component
+public abstract class InputComponent extends Entity.Component
 									 implements InputHandler
 {
-	private Component.ReadyCallback destroy = null ;
+	private Entity.ReadyCallback destroy = null ;
 	protected final InputMode mode ;
 
-	public InputComponent()
+	public InputComponent( final Entity _parent )
 	{
-		this( "INPUT", "INPUTCOMPONENT", InputMode.WORLD ) ;
+		this( _parent, "INPUT", "INPUTCOMPONENT", InputMode.WORLD ) ;
 	}
 
-	public InputComponent( final String _name )
+	public InputComponent( final Entity _parent, final String _name )
 	{
-		this( _name, "INPUTCOMPONENT", InputMode.WORLD ) ;
+		this( _parent, _name, "INPUTCOMPONENT", InputMode.WORLD ) ;
 	}
 
-	public InputComponent( final String _name, final String _group )
+	public InputComponent( final Entity _parent, final String _name, final String _group )
 	{
-		this( _name, _group, InputMode.WORLD ) ;
+		this( _parent, _name, _group, InputMode.WORLD ) ;
 	}
 
-	public InputComponent( final String _name, final InputMode _mode )
+	public InputComponent( final Entity _parent, final String _name, final InputMode _mode )
 	{
-		this( _name, "INPUTCOMPONENT", _mode ) ;
+		this( _parent, _name, "INPUTCOMPONENT", _mode ) ;
 	}
 
-	public InputComponent( final String _name, final String _group, final InputMode _mode )
+	public InputComponent( final Entity _parent, final String _name, final String _group, final InputMode _mode )
 	{
-		super( _name, _group ) ;
+		_parent.super( _name, _group ) ;
 		mode = _mode ;
 	}
 
-	public void readyToDestroy( final Component.ReadyCallback _callback )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		destroy = _callback ;
 		super.readyToDestroy( _callback ) ;
