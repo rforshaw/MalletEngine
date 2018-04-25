@@ -40,14 +40,7 @@ public class Matrix4 implements Cacheable
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 2 ) ;
 		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 3 ) ;
 
-		if( _temp == true )
-		{
-			temp = Matrix4.createTempIdentity() ;
-		}
-		else
-		{
-			temp = null ;
-		}
+		temp = ( _temp == true ) ? Matrix4.createTempIdentity() : null ;
 	}
 
 	public Matrix4( final Matrix4 _matrix )

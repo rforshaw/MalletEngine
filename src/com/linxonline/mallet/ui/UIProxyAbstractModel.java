@@ -2,6 +2,15 @@ package com.linxonline.mallet.ui ;
 
 import java.util.Set ;
 
+/**
+	The Abstract Model may contain more data than what is required
+	for a particular requirement, this may mean that tierd data, 
+	columns or even rows can be ignored. 
+
+	To allow the view to be ignorant of the data it is representing 
+	we can implement a proxy-model that will remap the proxy index 
+	onto the actual model.
+*/
 public abstract class UIProxyAbstractModel implements IAbstractModel
 {
 	private IAbstractModel source ;

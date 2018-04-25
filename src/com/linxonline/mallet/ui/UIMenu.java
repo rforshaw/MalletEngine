@@ -16,12 +16,12 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIMenu extends UILayout
 {
-	public UIMenu( final Type _type )
+	public UIMenu( final ILayout.Type _type )
 	{
 		this( _type, 1.0f ) ;
 	}
 
-	public UIMenu( final Type _type, final float _thickness )
+	public UIMenu( final ILayout.Type _type, final float _thickness )
 	{
 		super( _type ) ;
 		switch( _type )

@@ -59,7 +59,7 @@ public class JUI
 				final UILayout.Meta meta = new UILayout.Meta() ;
 
 				applyBasics( _ui, meta ) ;
-				meta.setType( UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
+				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
 				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
 				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
@@ -89,7 +89,7 @@ public class JUI
 				} ;
 
 				applyBasics( _ui, meta ) ;
-				meta.setType( UILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
+				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
 				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
 				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
@@ -152,7 +152,7 @@ public class JUI
 				final UIMenu.Meta meta = new UIMenu.Meta() ;
 
 				applyBasics( _ui, meta ) ;
-				meta.setType( UIMenu.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
+				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 				meta.setThickness( ( float )_ui.optDouble( "THICKNESS", 0.0 ) ) ;
 
 				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
@@ -217,7 +217,7 @@ public class JUI
 				final UIList.Meta meta = new UIList.Meta() ;
 
 				applyBasics( _ui, meta ) ;
-				meta.setType( UIList.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
+				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
 				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
 				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;

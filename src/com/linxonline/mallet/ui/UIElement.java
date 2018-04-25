@@ -63,6 +63,9 @@ public class UIElement implements InputHandler, Connect.Connection
 	private final Connect.Signal elementDisengaged = new Connect.Signal() ;
 	private final Connect.Signal elementEnabled    = new Connect.Signal() ;
 	private final Connect.Signal elementDisabled   = new Connect.Signal() ;
+	private final Connect.Signal elementShutdown   = new Connect.Signal() ;
+	private final Connect.Signal elementClear      = new Connect.Signal() ;
+	private final Connect.Signal elementReset      = new Connect.Signal() ;
 
 	public enum State
 	{
@@ -775,6 +778,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public void shutdown()
 	{
+		UIElement.signal( this, elementShutdown() ) ;
 		listeners.shutdown() ;
 	}
 
@@ -787,6 +791,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public void clear()
 	{
+		UIElement.signal( this, elementClear() ) ;
 		listeners.clear() ;
 		events.clear() ;
 		UIElement.disconnect( this ) ;
@@ -799,6 +804,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	@Override
 	public void reset()
 	{
+		UIElement.signal( this, elementReset() ) ;
 		position.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		offset.setXYZ( 0.0f, 0.0f, 0.0f ) ;
 		length.setXYZ( 0.0f, 0.0f, 0.0f ) ;
@@ -932,6 +938,30 @@ public class UIElement implements InputHandler, Connect.Connection
 	public Connect.Signal elementDisabled()
 	{
 		return elementDisabled ;
+	}
+
+	/**
+		Called when the shutdown operation is initiated.
+	*/
+	public Connect.Signal elementShutdown()
+	{
+		return elementShutdown ;
+	}
+
+	/**
+		Called when the clear operation is initiated.
+	*/
+	public Connect.Signal elementClear()
+	{
+		return elementClear ;
+	}
+
+	/**
+		Called when the reset operation is initiated.
+	*/
+	public Connect.Signal elementReset()
+	{
+		return elementReset ;
 	}
 
 	/**

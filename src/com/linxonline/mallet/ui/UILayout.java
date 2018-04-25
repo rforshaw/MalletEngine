@@ -34,11 +34,9 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UILayout extends UIElement implements IChildren
 {
-	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
-	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
-
-	private Type type ;																// How children should be ordered
-	private UIElementUpdater updater ;												// Used to position the children
+	private final UIChildren children = new UIChildren() ;
+	private ILayout.Type type ;								// How children should be ordered
+	private ILayout updater ;								// Used to position the children
 
 	// It's very likely that a child of the layout will be flagged 
 	// as dirty - this may result in the other children of the 
@@ -53,51 +51,127 @@ public class UILayout extends UIElement implements IChildren
 
 	private final Connect.Signal typeChanged = new Connect.Signal() ;
 
-	public UILayout( final Type _type )
+	public UILayout( final ILayout.Type _type )
 	{
 		super() ;
+		initLayoutConnections() ;
+
 		setType( _type ) ;
 		setEngageMode( new SingleEngageListener() ) ;
+	}
+
+	private void initLayoutConnections()
+	{
+		/**
+			Engaging a UILayout is somewhat redundant.
+			You will most likely want to engage a child element 
+			owned by the layout.
+		*/
+		UIElement.connect( this, elementEngaged(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				current = State.CHILD_ENGAGED ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				_this.children.disengage() ;
+			}
+		} ) ;
+
+		/**
+			Set the layer that the visual elements are 
+			expected to be placed on.
+			
+			This also applies to the layouts children.
+			Causes the elements to be flagged as dirty.
+		*/
+		UIElement.connect( this, layerChanged(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				_this.children.setLayer( getLayer() ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementShown(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				_this.children.setVisible( true ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementHidden(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				_this.children.setVisible( false ) ;
+			}
+		} ) ;
+
+		/**
+			Cleanup any resources, handlers that the listeners 
+			may have acquired.
+
+			Will also call shutdown on all children. Call clear 
+			if you wish to also remove all children from layout.
+		*/
+		UIElement.connect( this, elementShutdown(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				children.shutdown() ;
+			}
+		} ) ;
+
+		/**
+			Clear out each of the systems.
+			Remove all slots connected to signals.
+			Remove all listeners - note call shutdown if they have 
+			any resources attached.
+			Remove any events that may be in the event stream.
+		*/
+		UIElement.connect( this, elementClear(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				children.clear() ;
+			}
+		} ) ;
+
+		/**
+			Reset the UILayout as if it has just been constructed.
+			This does not remove listeners, connections or children.
+
+			Call reset on all children.
+		*/
+		UIElement.connect( this, elementReset(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				children.reset() ;
+			}
+		} ) ;
 	}
 
 	@Override
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
 		super.passDrawDelegate( _delegate, _world, _camera ) ;
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			ordered.get( i ).passDrawDelegate( _delegate, _world, _camera ) ;
-		}
-	}
-
-	/**
-		Engaging a UILayout is somewhat redundant.
-		You will most likely want to engage a child element 
-		owned by the layout.
-	*/
-	@Override
-	public void engage()
-	{
-		super.engage() ;
-		current = State.CHILD_ENGAGED ;
-	}
-
-	/**
-		Flag the UIElement as being disengaged.
-	*/
-	public void disengage()
-	{
-		super.disengage() ;
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final UIElement element = ordered.get( i ) ;
-			if( element.isEngaged() == true )
-			{
-				element.disengage() ;
-			}
-		}
+		children.passDrawDelegate( _delegate, _world, _camera ) ;
 	}
 
 	/**
@@ -125,17 +199,21 @@ public class UILayout extends UIElement implements IChildren
 	*/
 	public <T extends UIElement> T addElement( final T _element )
 	{
-		if( ordered.contains( _element ) == false )
+		final UIElement element = children.addElement( _element ) ;
+		if( element != null )
 		{
-			applyLayer( _element, getLayer() ) ;
-			ordered.add( _element ) ;
-
+			applyLayer( element, getLayer() ) ;
 			if( getDrawDelegate() != null )
 			{
-				_element.passDrawDelegate( getDrawDelegate(), getWorld(), getCamera() ) ;
+				element.passDrawDelegate( getDrawDelegate(), getWorld(), getCamera() ) ;
 			}
 		}
 		return _element ; 
+	}
+
+	public List<UIElement> getElements()
+	{
+		return children.getElements() ;
 	}
 
 	/**
@@ -144,21 +222,7 @@ public class UILayout extends UIElement implements IChildren
 	*/
 	public void getElements( final List<UIElement> _elements )
 	{
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			_elements.add( ordered.get( i ) ) ;
-		}
-	}
-
-	/**
-		Return the child elements attached to this 
-		UILayout - should only be used if you are 
-		extending this class.
-	*/
-	protected List<UIElement> getElements()
-	{
-		return ordered ;
+		children.getElements( _elements ) ;
 	}
 
 	/**
@@ -167,10 +231,7 @@ public class UILayout extends UIElement implements IChildren
 	*/
 	public void removeElement( final UIElement _element )
 	{
-		if( toRemove.contains( _element ) == false )
-		{
-			toRemove.add( _element ) ;
-		}
+		children.removeElement( _element ) ;
 	}
 
 	@Override
@@ -182,55 +243,13 @@ public class UILayout extends UIElement implements IChildren
 		if( dirt == true || dirtyChildren == true )
 		{
 			dirtyChildren = false ;
-			updater.update( _dt, ordered ) ;
+			updater.update( _dt, this ) ;
 		}
 
-		{
-			final int size = ordered.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final UIElement element = ordered.get( i ) ;
-				if( element.isDirty() == true )
-				{
-					// If a Child element is updating we'll 
-					// most likely also want to update the parent.
-					dirtyChildren = true ;
-				}
-
-				element.update( _dt, _events ) ;
-
-				if( element.destroy == true )
-				{
-					// If the child element is flagged for 
-					// destruction add it to the remove list.
-					removeElement( element ) ;
-
-					// We'll also want to refresh the UILayout.
-					dirtyChildren = true ;
-				}
-			}
-		}
-
-		if( toRemove.isEmpty() == false )
-		{
-			final int size = toRemove.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final UIElement element = toRemove.get( i ) ;
-				if( ordered.remove( element ) == true )
-				{
-					element.shutdown() ;
-					element.clear() ;
-				}
-			}
-			toRemove.clear() ;
-		}
+		dirtyChildren = children.update( _dt, _events ) ;
 	}
 
-	/**
-	
-	*/
-	public void setType( final Type _type )
+	public void setType( final ILayout.Type _type )
 	{
 		if( type != _type  )
 		{
@@ -248,41 +267,6 @@ public class UILayout extends UIElement implements IChildren
 	}
 
 	/**
-		Set the layer that the visual elements are 
-		expected to be placed on.
-		
-		This also applies to the layouts children.
-		Causes the elements to be flagged as dirty.
-	*/
-	@Override
-	public void setLayer( final int _layer )
-	{
-		super.setLayer( _layer ) ;
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			applyLayer( ordered.get( i ), _layer ) ;
-		}
-	}
-
-	/**
-		Set the element to be vissible  or not.
-		Also applies to all child elements.
-
-		Causes the elements to be flagged as dirty.
-	*/
-	@Override
-	public void setVisible( final boolean _visibility )
-	{
-		super.setVisible( _visibility ) ;
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			ordered.get( i ).setVisible( _visibility ) ;
-		}
-	}
-
-	/**
 		Refreshing a UILayout will most likely 
 		result in all child elements requiring to be 
 		refreshed.
@@ -293,11 +277,7 @@ public class UILayout extends UIElement implements IChildren
 	@Override
 	protected void refresh()
 	{
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			ordered.get( i ).makeDirty() ;
-		}
+		children.refresh() ;
 		super.refresh() ;
 	}
 
@@ -317,81 +297,18 @@ public class UILayout extends UIElement implements IChildren
 			return true ;
 		}
 
-		final int size = ordered.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final UIElement element = ordered.get( i ) ;
-			if( element.isIntersectInput( _event ) == true )
-			{
-				// There is a chance that a layout has children 
-				// that go beyond the layouts boundaries.
-				// For example UIMenu dropdown.
-				return true ;
-			}
-		}
-
-		return false ;
+		// There is a chance that a layout has children 
+		// that go beyond the layouts boundaries.
+		// For example UIMenu dropdown.
+		return children.isIntersectInput( _event ) != null ;
 	}
 
-	/**
-		Cleanup any resources, handlers that the listeners 
-		may have acquired.
-
-		Will also call shutdown on all children. Call clear 
-		if you wish to also remove all children from layout.
-	*/
-	@Override
-	public void shutdown()
-	{
-		for( final UIElement element : ordered )
-		{
-			element.shutdown() ;
-		}
-		super.shutdown() ;
-	}
-
-	/**
-		Clear out each of the systems.
-		Remove all slots connected to signals.
-		Remove all listeners - note call shutdown if they have 
-		any resources attached.
-		Remove any events that may be in the event stream.
-	*/
-	@Override
-	public void clear()
-	{
-		for( final UIElement element : ordered )
-		{
-			element.clear() ;
-		}
-
-		ordered.clear() ;
-		super.clear() ;
-	}
-
-	/**
-		Reset the UILayout as if it has just been constructed.
-		This does not remove listeners, connections or children.
-
-		Call reset on all children.
-	*/
-	@Override
-	public void reset()
-	{
-		for( final UIElement element : ordered )
-		{
-			element.reset() ;
-		}
-
-		super.reset() ;
-	}
-
-	protected UIElementUpdater getCurrentUpdater()
+	protected ILayout getCurrentUpdater()
 	{
 		return updater ;
 	}
 
-	public Type getType()
+	public ILayout.Type getType()
 	{
 		return type ;
 	}
@@ -411,24 +328,28 @@ public class UILayout extends UIElement implements IChildren
 		provided. Multiple elements will share vertical space.
 		Elements with minimum height set will be provided with it.
 	*/
-	protected UIElementUpdater getVerticalUpdater()
+	protected ILayout getVerticalUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+
 				final Vector3 availableLength = new Vector3() ;
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -457,7 +378,7 @@ public class UILayout extends UIElement implements IChildren
 
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -485,7 +406,7 @@ public class UILayout extends UIElement implements IChildren
 
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -532,24 +453,28 @@ public class UILayout extends UIElement implements IChildren
 		provided. Multiple elements will share horizontal space.
 		Elements with minimum width set will be provided with it.
 	*/
-	protected UIElementUpdater getHorizontalUpdater()
+	protected ILayout getHorizontalUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+
 				final Vector3 availableLength = new Vector3() ;
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -573,7 +498,7 @@ public class UILayout extends UIElement implements IChildren
 
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -601,7 +526,7 @@ public class UILayout extends UIElement implements IChildren
 
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -646,17 +571,20 @@ public class UILayout extends UIElement implements IChildren
 		the minimum or maximim length of the element with a defined 
 		minimum or maximum value.
 	*/
-	protected UIElementUpdater getGridUpdater()
+	protected ILayout getGridUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
-				final UIElement reference = getReferenceElement( _ordered ) ;
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+				final UIElement reference = getReferenceElement( ordered ) ;
 				if( reference == null )
 				{
 					Logger.println( "No valid minimum or maximum length for grid.", Logger.Verbosity.NORMAL ) ;
@@ -675,10 +603,10 @@ public class UILayout extends UIElement implements IChildren
 
 				final float layoutWidth = layoutPosition.x + layoutLength.x ;
 				
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -730,12 +658,12 @@ public class UILayout extends UIElement implements IChildren
 		} ;
 	}
 
-	protected UIElementUpdater getFormUpdater()
+	protected ILayout getFormUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
 			
 			}
@@ -762,29 +690,6 @@ public class UILayout extends UIElement implements IChildren
 	public static <T extends UILayout> T applyMeta( final UILayout.Meta _meta, final T _layout )
 	{
 		return UIElement.applyMeta( _meta, _layout ) ;
-	}
-
-	public enum Type
-	{
-		HORIZONTAL,
-		VERTICAL,
-		GRID,
-		FORM ;
-
-		public static Type derive( final String _type )
-		{
-			if( _type == null )
-			{
-				return HORIZONTAL ;
-			}
-			
-			if( _type.isEmpty() == true )
-			{
-				return HORIZONTAL ;
-			}
-
-			return Type.valueOf( _type ) ;
-		}
 	}
 
 	public static abstract class EngageListener extends InputListener<UILayout>
@@ -819,7 +724,8 @@ public class UILayout extends UIElement implements IChildren
 					// safe to say that all children of the layout 
 					// should also be disengaged.
 					setEngaged( null ) ;
-					disengageOthers( null, _layout.ordered ) ;
+					final List<UIElement> ordered = _layout.getElements() ;
+					disengageOthers( null, ordered ) ;
 				}
 			} ) ;
 			super.setParent( _parent ) ;
@@ -843,19 +749,20 @@ public class UILayout extends UIElement implements IChildren
 			}
 
 			setEngaged( null ) ;
-			disengageOthers( null, layout.ordered ) ;
+			final List<UIElement> ordered = layout.getElements() ;
+			disengageOthers( null, ordered ) ;
 
-			final int size = layout.ordered.size() ;
+			final int size = ordered.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final UIElement element = layout.ordered.get( i ) ;
+				final UIElement element = ordered.get( i ) ;
 				if( element.isVisible() == true )
 				{
 					if( element.isIntersectInput( _input ) == true )
 					{
 						element.engage() ;
 						setEngaged( element.isDisabled() ? null : element ) ;
-						disengageOthers( getEngaged(), layout.ordered ) ;
+						disengageOthers( getEngaged(), ordered ) ;
 
 						return passInput( element, _input ) ;
 					}
@@ -952,7 +859,7 @@ public class UILayout extends UIElement implements IChildren
 
 	public static class Meta extends UIElement.Meta
 	{
-		private final UIVariant type = new UIVariant( "TYPE", Type.VERTICAL, new Connect.Signal() ) ;
+		private final UIVariant type = new UIVariant( "TYPE", ILayout.Type.VERTICAL, new Connect.Signal() ) ;
 
 		public Meta()
 		{
@@ -974,7 +881,7 @@ public class UILayout extends UIElement implements IChildren
 			return true ;
 		}
 
-		public void setType( final Type _type )
+		public void setType( final ILayout.Type _type )
 		{
 			if( _type.equals( type.toObject() ) == false )
 			{
@@ -983,19 +890,14 @@ public class UILayout extends UIElement implements IChildren
 			}
 		}
 
-		public Type getType()
+		public ILayout.Type getType()
 		{
-			return type.toObject( Type.class ) ;
+			return type.toObject( ILayout.Type.class ) ;
 		}
 
 		public Connect.Signal typeChanged()
 		{
 			return type.getSignal() ;
 		}
-	}
-
-	protected interface UIElementUpdater
-	{
-		public void update( final float _dt, final List<UIElement> _ordered ) ;
 	}
 }

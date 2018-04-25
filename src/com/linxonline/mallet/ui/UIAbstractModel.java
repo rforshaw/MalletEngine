@@ -69,9 +69,9 @@ public class UIAbstractModel implements IAbstractModel
 	}
 
 	@Override
-	public boolean hasChildren( final UIModelIndex _parent )
+	public boolean hasChildren( final UIModelIndex _index )
 	{
-		return false ;
+		return rowCount( _index ) > 0 ;
 	}
 
 	private static class Matrix

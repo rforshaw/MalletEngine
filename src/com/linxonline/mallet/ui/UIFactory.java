@@ -43,7 +43,7 @@ public final class UIFactory
 		of the window as the width and height of the UILayout.
 		Will use the default camera.
 	*/
-	public static UILayout constructWindowLayout( final UILayout.Type _type )
+	public static UILayout constructWindowLayout( final ILayout.Type _type )
 	{
 		return constructWindowLayout( _type, CameraAssist.getDefaultCamera() ) ;
 	}
@@ -52,7 +52,7 @@ public final class UIFactory
 		Construct a UILayout that uses the RenderWidth and RenderHeight
 		of the window as the width and height of the UILayout.
 	*/
-	public static UILayout constructWindowLayout( final UILayout.Type _type, final Camera _camera )
+	public static UILayout constructWindowLayout( final ILayout.Type _type, final Camera _camera )
 	{
 		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
 		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;

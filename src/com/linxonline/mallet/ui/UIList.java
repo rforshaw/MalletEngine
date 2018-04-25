@@ -13,10 +13,8 @@ import com.linxonline.mallet.maths.* ;
 
 public class UIList extends UILayout
 {
-	private final World internalWorld ;
-	private final Camera internalCamera ;
+	private final FrameBuffer frame ;
 	private Camera externalCamera = CameraAssist.getDefaultCamera() ;
-	private final Draw pane ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
 	private final Vector3 scrollbarLength = new Vector3() ;
@@ -26,45 +24,24 @@ public class UIList extends UILayout
 	private final Vector3 absoluteLength = new Vector3() ;		// In pixels
 	private int dragDelay = 100 ;
 
-	// Anything added to the UIList will make use of this 
-	// DrawDelegate rather than the delegate coming from 
-	// the UIComponent.
-	private DrawDelegate<World, Draw> internalDelegate = null ;
-
 	private final Connect.Signal defaultElementSizeChanged = new Connect.Signal() ;
 	private final Connect.Signal scrollWidthChanged        = new Connect.Signal() ;
 	private final Connect.Signal dragDelayChanged          = new Connect.Signal() ;
 
-	public UIList( final Type _type )
+	public UIList( final ILayout.Type _type )
 	{
 		super( _type ) ;
 		setDefaultElementSize( 1.0f, 1.0f, 1.0f ) ;
 		setScrollWidth( 0.5f ) ;
 
-		final UUID uid = UUID.randomUUID() ;
-		internalWorld = WorldAssist.constructWorld( uid.toString(), 0 ) ;
-		internalCamera = CameraAssist.createCamera( "SCROLL_CAMERA", new Vector3(),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ) ) ;
+		final Vector3 position = getPosition() ;
+		final Vector3 offset = getOffset() ;
+		final Vector3 length = getLength() ;
 
-		CameraAssist.addCamera( internalCamera, internalWorld ) ;
-		pane = UIList.createPane( internalWorld, this ) ;
-
-		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
-		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
-			{
-				if( internalDelegate != null )
-				{
-					// Don't call shutdown(), we don't want to 
-					// clean anything except an existing DrawDelegate.
-					internalDelegate.shutdown() ;
-				}
-
-				internalDelegate = _delegate ;
-				UIList.this.passListDrawDelegate( internalDelegate, internalWorld, internalCamera ) ;
-			}
-		} ) ) ;
+		frame = new FrameBuffer( position.x, position.y, position.z,
+								 offset.x,   offset.y,   offset.z,
+								 length.x,   length.y,   getLayer() + 1 ) ;
+		initFrameConnections() ;
 
 		setEngageMode( new ScrollSingleEngageListener() ) ;
 		initScrollInput() ;
@@ -163,8 +140,8 @@ public class UIList extends UILayout
 				final EngageListener mode = getParent().getEngageMode() ;
 				if( pressed == true )
 				{
-					diff.x = ( getType() == UIList.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
-					diff.y = ( getType() == UIList.Type.VERTICAL || getType() == UIList.Type.GRID ) ? ( last.y - _input.getMouseY() ) : 0.0f ;
+					diff.x = ( getType() == ILayout.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
+					diff.y = ( getType() == ILayout.Type.VERTICAL || getType() == ILayout.Type.GRID ) ? ( last.y - _input.getMouseY() ) : 0.0f ;
 					action = applyScroll( diff.x, diff.y ) ;
 				}
 
@@ -174,7 +151,7 @@ public class UIList extends UILayout
 
 			private InputEvent.Action applyScroll( final float _x, final float _y )
 			{
-				CameraAssist.getUIPosition( internalCamera, position ) ;
+				CameraAssist.getUIPosition( frame.getCamera(), position ) ;
 				getLength( length ) ;
 
 				position.add( _x, _y, 0.0f ) ;
@@ -183,10 +160,10 @@ public class UIList extends UILayout
 				final float width = absoluteLength.x - length.x ;
 				final float height = absoluteLength.y - length.y ;
 
-				final Type type = getParent().getType() ;
+				final ILayout.Type type = getParent().getType() ;
 				InputEvent.Action action = InputEvent.Action.CONSUME ;
-				if( ( type == Type.HORIZONTAL && ( position.x <= 0.0f || position.x >= width ) ) || 
-					( type == Type.VERTICAL   && ( position.y <= 0.0f || position.y >= height ) ) )
+				if( ( type == ILayout.Type.HORIZONTAL && ( position.x <= 0.0f || position.x >= width ) ) || 
+					( type == ILayout.Type.VERTICAL   && ( position.y <= 0.0f || position.y >= height ) ) )
 				{
 					action = InputEvent.Action.PROPAGATE ;
 				}
@@ -197,12 +174,26 @@ public class UIList extends UILayout
 				position.x = ( position.x > 0.0f ) ? position.x : 0.0f ;
 				position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
 
-				CameraAssist.amendUIPosition( internalCamera, position.x, position.y, 0.0f ) ;
+				CameraAssist.amendUIPosition( frame.getCamera(), position.x, position.y, 0.0f ) ;
 				getParent().makeDirty() ;
 
 				return action ;
 			}
 		} ) ;
+	}
+
+	private void initFrameConnections()
+	{
+		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		{
+			public void callback( final DrawDelegate<World, Draw> _delegate )
+			{
+				frame.setDrawDelegate( _delegate ) ;
+				UIList.this.passListDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
+			}
+		} ) ) ;
+
+		FrameBuffer.connect( this, frame ) ;
 	}
 
 	/**
@@ -277,42 +268,6 @@ public class UIList extends UILayout
 	}
 
 	@Override
-	public void setLayer( final int _layer )
-	{
-		super.setLayer( _layer ) ;
-		if( isDirty() == true )
-		{
-			DrawAssist.amendOrder( pane, getLayer() + 1 ) ;
-		}
-	}
-
-	@Override
-	public void setLength( final float _x, final float _y, final float _z )
-	{
-		super.setLength( _x, _y, _z ) ;
-
-		if( isDirty() == true )
-		{
-			// We only want to update the pane if 
-			// calling setLength was considered significant 
-			// enough to flag the UIList as dirty.
-			final Vector3 length = getLength() ;
-			final int width = ( int )length.x ;
-			final int height = ( int )length.y ;
-
-			CameraAssist.amendScreenResolution( internalCamera, width, height ) ;
-			CameraAssist.amendDisplayResolution( internalCamera, width, height ) ;
-			CameraAssist.amendOrthographic( internalCamera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
-
-			WorldAssist.setRenderDimensions( internalWorld, 0, 0, width, height ) ;
-			WorldAssist.setDisplayDimensions( internalWorld, 0, 0, width, height ) ;
-
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( pane ), getLength() ) ;
-			DrawAssist.forceUpdate( pane ) ;
-		}
-	}
-
-	@Override
 	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
 	{
 		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
@@ -330,7 +285,7 @@ public class UIList extends UILayout
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
-		_delegate.addBasicDraw( pane, _world ) ;
+		_delegate.addBasicDraw( frame.getFrame(), _world ) ;
 	}
 
 	private void passListDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
@@ -379,7 +334,7 @@ public class UIList extends UILayout
 	}
 
 	/**
-		Override the parent implementation comsing from UILayout.
+		Override the parent implementation coming from UILayout.
 		UILayout tests all children to determine whether or not
 		the input intersects, this is to cover the case on a 
 		child extending beyond the UILayout.
@@ -398,16 +353,6 @@ public class UIList extends UILayout
 
 		return false ;
 	}
-	
-	@Override
-	public void shutdown()
-	{
-		super.shutdown() ;
-		if( internalWorld != WorldAssist.getDefaultWorld() )
-		{
-			WorldAssist.destroyWorld( internalWorld ) ;
-		}
-	}
 
 	/**
 		Order the UIElements from top to bottom.
@@ -423,15 +368,20 @@ public class UIList extends UILayout
 		If non of the above provide a valid length then the 
 		element's length will be set to default item size. 
 	*/
-	protected UIElementUpdater getVerticalUpdater()
+	@Override
+	protected ILayout getVerticalUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+
 				final Vector3 listLength = UIList.this.getLength() ;
 				final Vector3 listMargin = UIList.this.getMargin() ;
 
@@ -439,10 +389,10 @@ public class UIList extends UILayout
 				absoluteLength.setXYZ( width, 0.0f, listLength.z ) ;
 				childPosition.setXYZ( scrollWidth.x, 0.0f, 0.0f ) ;
 
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -490,16 +440,21 @@ public class UIList extends UILayout
 		If non of the above provide a valid length then the 
 		element's length will be set to default item size. 
 	*/
-	protected UIElementUpdater getHorizontalUpdater()
+	@Override
+	protected ILayout getHorizontalUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+
 				final Vector3 listLength = UIList.this.getLength() ;
 				final Vector3 listMargin = UIList.this.getMargin() ;
 
@@ -507,10 +462,10 @@ public class UIList extends UILayout
 				absoluteLength.setXYZ( 0.0f, height, listLength.z ) ;
 				childPosition.setXYZ( 0.0f, scrollWidth.y, 0.0f ) ;
 
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -546,16 +501,21 @@ public class UIList extends UILayout
 		} ;
 	}
 
-	protected UIElementUpdater getGridUpdater()
+	@Override
+	protected ILayout getGridUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
+			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
-				final UIElement reference = getReferenceElement( _ordered ) ;
+				ordered.clear() ;
+				_children.getElements( ordered ) ;
+
+				final UIElement reference = getReferenceElement( ordered ) ;
 				if( reference == null )
 				{
 					Logger.println( "No valid minimum or maximum length for grid.", Logger.Verbosity.NORMAL ) ;
@@ -574,10 +534,10 @@ public class UIList extends UILayout
 				childPosition.setXYZ( margin ) ;
 				childPosition.x += scrollWidth.x ;
 
-				final int size = _ordered.size() ;
+				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
 				{
-					final UIElement element = _ordered.get( i ) ;
+					final UIElement element = ordered.get( i ) ;
 					if( element.isVisible() == false )
 					{
 						// Don't take into account elements that 
@@ -632,12 +592,12 @@ public class UIList extends UILayout
 	}
 
 	@Override
-	protected UIElementUpdater getFormUpdater()
+	protected ILayout getFormUpdater()
 	{
-		return new UIElementUpdater()
+		return new ILayout()
 		{
 			@Override
-			public void update( final float _dt, final List<UIElement> _ordered )
+			public void update( final float _dt, final IChildren _children )
 			{
 			
 			}
@@ -663,7 +623,7 @@ public class UIList extends UILayout
 	*/
 	public Vector3 getAbsoluteLength()
 	{
-		getCurrentUpdater().update( 0.0f, getElements() ) ;
+		getCurrentUpdater().update( 0.0f, this ) ;
 		return absoluteLength ;
 	}
 
@@ -716,7 +676,7 @@ public class UIList extends UILayout
 	*/
 	public DrawDelegate<World, Draw> getInternalDrawDelegate()
 	{
-		return internalDelegate ;
+		return frame.getDrawDelegate() ;
 	}
 
 	/**
@@ -732,12 +692,12 @@ public class UIList extends UILayout
 
 	public World getInternalWorld()
 	{
-		return internalWorld ;
+		return frame.getWorld() ;
 	}
 
 	public Camera getInternalCamera()
 	{
-		return internalCamera ;
+		return frame.getCamera() ;
 	}
 
 	public Connect.Signal defaultElementSizeChanged()
@@ -753,26 +713,6 @@ public class UIList extends UILayout
 	public Connect.Signal dragDelayChanged()
 	{
 		return dragDelayChanged ;
-	}
-
-	private static Draw createPane( final World _world, final UIElement _parent )
-	{
-		final Vector3 length = _parent.getLength() ;
-		final Draw pane = DrawAssist.createDraw( _parent.getPosition(),
-												 _parent.getOffset(),
-												 new Vector3(),
-												 new Vector3( 1, 1, 1 ), _parent.getLayer() + 1 ) ;
-
-		DrawAssist.amendUI( pane, true ) ;
-		DrawAssist.amendShape( pane, Shape.constructPlane( new Vector3( length.x, length.y, 0 ),
-															new Vector2( 0, 1 ),
-															new Vector2( 1, 0 ) ) ) ;
-
-		final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-		ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
-		DrawAssist.attachProgram( pane, program ) ;
-
-		return pane ;
 	}
 
 	public class ScrollSingleEngageListener extends SingleEngageListener

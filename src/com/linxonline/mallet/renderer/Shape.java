@@ -606,10 +606,20 @@ public abstract class Shape
 	*/
 	public static Shape updatePlaneGeometry( final Shape _plane, final Vector3 _length )
 	{
+		return updatePlaneGeometry( _plane, _length.x, _length.y, _length.z ) ;
+	}
+
+	/**
+		Update the geometry of a 2-dimensional quad.
+		Length X defines the quads width.
+		Length Y defines the quads height.
+	*/
+	public static Shape updatePlaneGeometry( final Shape _plane, final float _x, final float _y, final float _z )
+	{
 		//_plane.getPoint( 0, 0 ).setXYZ() ;
-		_plane.setVector3( 1, 0, _length ) ;
-		_plane.setVector3( 2, 0, 0.0f, _length.y, 0.0f ) ;
-		_plane.setVector3( 3, 0, _length.x, 0.0f, 0.0f ) ;
+		_plane.setVector3( 1, 0, _x, _y, _z ) ;
+		_plane.setVector3( 2, 0, 0.0f, _y, 0.0f ) ;
+		_plane.setVector3( 3, 0, _x, 0.0f, 0.0f ) ;
 
 		return _plane ;
 	}
