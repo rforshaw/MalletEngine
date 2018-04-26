@@ -88,4 +88,20 @@ public class UIModelIndex
 
 		return false ;
 	}
+
+	@Override
+	public String toString()
+	{
+		final StringBuffer buffer = new StringBuffer() ;
+		buffer.append( '[' ) ;
+		buffer.append( parent ) ;
+		buffer.append( ' ' ) ;
+		buffer.append( "Row: " ) ;
+		buffer.append( getRow() ) ;
+		buffer.append( " Col: " ) ;
+		buffer.append( getColumn() ) ;
+		buffer.append( ']' ) ;
+		
+		return buffer.toString() ;
+	}
 }

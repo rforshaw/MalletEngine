@@ -1,6 +1,7 @@
 package com.linxonline.mallet.ui ;
 
 import java.util.List ;
+import java.util.Set ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
@@ -13,7 +14,7 @@ import com.linxonline.mallet.maths.* ;
 	You can have multiple UIAbstractViews reference 
 	one UIAbstractModel.
 */
-public abstract class UIAbstractView extends UIElement
+public class UIAbstractView extends UIElement
 {
 	private final FrameBuffer frame ;
 
@@ -22,7 +23,7 @@ public abstract class UIAbstractView extends UIElement
 	private ItemDelegate<?>[] rowItemDelegate = new ItemDelegate<?>[1] ;
 
 	private final IAbstractModel view = new UIAbstractModel() ;
-	private IAbstractModel model ;
+	private IAbstractModel model = UIAbstractView.createEmptyModel() ;
 
 	public UIAbstractView()
 	{
@@ -126,7 +127,7 @@ public abstract class UIAbstractView extends UIElement
 	{
 		final boolean dirty = isDirty() ;
 		super.update( _dt, _events ) ;
-		if( model != null && dirty == true )
+		if( dirty == true )
 		{
 			updateView( model.root(), this, _dt, _events ) ;
 		}
@@ -163,12 +164,18 @@ public abstract class UIAbstractView extends UIElement
 
 	public void setModel( final IAbstractModel _model )
 	{
-		model = _model ;
+		model = ( _model != null ) ? _model : UIAbstractView.createEmptyModel() ;
+		makeDirty() ;
 	}
 
 	public IAbstractModel getModel()
 	{
 		return model ;
+	}
+
+	public static <T extends UIAbstractView> T applyMeta( final UIAbstractView.Meta _meta, final T _view )
+	{
+		return UIElement.applyMeta( _meta, _view ) ;
 	}
 
 	/**
@@ -178,22 +185,24 @@ public abstract class UIAbstractView extends UIElement
 	*/
 	private UIElement getCellElement( final UIModelIndex _index, final ItemDelegate _delegate )
 	{
+		if( view.exists( _index ) == false )
+		{
+			view.createData( _index.getParent(), _index.getRow() + 1, _index.getColumn() + 1 ) ;
+		}
+
 		IVariant variant = view.getData( _index, IAbstractModel.Role.Display ) ;
 		if( variant == null )
 		{
-			if( view.createData( _index.getParent(), _index.getRow(), _index.getColumn() ) )
+			final UIElement cell = _delegate.createItem( this ) ;
+			if( frame.getDrawDelegate() != null )
 			{
-				final UIElement cell = _delegate.createItem( this ) ;
-				if( frame.getDrawDelegate() != null )
-				{
-					cell.passDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
-				}
-				
-				_delegate.setItemData( cell, model, _index ) ;
-
-				variant = new UIVariant( "CELL", cell ) ;
-				view.setData( _index, variant, IAbstractModel.Role.Display ) ;
+				cell.passDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
 			}
+			
+			_delegate.setItemData( cell, model, _index ) ;
+
+			variant = new UIVariant( "CELL", cell ) ;
+			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
 		}
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
@@ -224,6 +233,61 @@ public abstract class UIAbstractView extends UIElement
 		return defaultItemDelegate ;
 	}
 
+	/**
+		When an abstract view has been initialised but has yet 
+		to be given a model to display it will use this stub 
+		implementation instead.
+	*/
+	private static IAbstractModel createEmptyModel()
+	{
+		return new IAbstractModel()
+		{
+			public UIModelIndex root()
+			{
+				return new UIModelIndex() ;
+			}
+
+			public int rowCount( final UIModelIndex _parent )
+			{
+				return 0 ;
+			}
+
+			public int columnCount( final UIModelIndex _parent )
+			{
+				return 0 ;
+			}
+
+			public boolean createData( final UIModelIndex _parent, final int _row, final int _column )
+			{
+				return false ;
+			}
+
+			public void setData( final UIModelIndex _index, final IVariant _variant, final Role _role ) {}
+
+			public IVariant getData( final UIModelIndex _index, final Role _role )
+			{
+				return null ;
+			}
+
+			public boolean exists( final UIModelIndex _index )
+			{
+				return false ;
+			}
+
+			public void removeData( final UIModelIndex _index ) {}
+
+			public Set<ItemFlags> getDataFlags( final UIModelIndex _index, final Set<ItemFlags> _flags )
+			{
+				return null ;
+			}
+
+			public boolean hasChildren( final UIModelIndex _parent )
+			{
+				return false ;
+			}
+		} ;
+	}
+
 	private static ItemDelegate createDefaultItemDelegate()
 	{
 		return new ItemDelegate<UIElement>()
@@ -237,6 +301,20 @@ public abstract class UIAbstractView extends UIElement
 
 			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}
 		} ;
+	}
+
+	public static class Meta extends UIElement.Meta
+	{
+		public Meta()
+		{
+			super() ;
+		}
+
+		@Override
+		public String getElementType()
+		{
+			return "UIABSTRACTVIEW" ;
+		}
 	}
 
 	public interface ItemDelegate<T extends UIElement>

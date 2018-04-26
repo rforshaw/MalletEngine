@@ -26,6 +26,13 @@ import com.linxonline.mallet.ui.gui.* ;
 	UIMap provides a data-driven means to creating UI.
 	The class is broken up into two sections, the ElementGenerator
 	and the UIMap populated with the content.
+
+	Element generation uses the data stored by the json 
+	file to populate the requested element's meta object.
+
+	This meta object is then passed to UIGenerator to 
+	create the actual UI element that will be shown to 
+	the user. 
 */
 public class JUI
 {
@@ -256,6 +263,26 @@ public class JUI
 				UIElement.applyMeta( _meta, element ) ;
 				UIGenerator.addListeners( element, _meta ) ;
 
+				return element ;
+			}
+		} ) ;
+		
+		elementCreators.put( "UIABSTRACTVIEW", new Generator<UIAbstractView, UIAbstractView.Meta>()
+		{
+			public UIAbstractView.Meta createMeta( final JSONObject _ui )
+			{
+				final UIAbstractView.Meta meta = new UIAbstractView.Meta() ;
+				applyBasics( _ui, meta ) ;
+
+				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+
+				return meta ;
+			}
+
+			public UIAbstractView create( final JUI _map, final UIAbstractView.Meta _meta, final JSONObject _ui )
+			{
+				final UIAbstractView element = UIGenerator.<UIAbstractView>create( _meta ) ;
 				return element ;
 			}
 		} ) ;

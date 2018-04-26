@@ -53,6 +53,12 @@ public interface IAbstractModel
 	public IVariant getData( final UIModelIndex _index, final Role _role ) ;
 
 	/**
+		Return true if a location can be found with the passed 
+		in index.
+	*/
+	public boolean exists( final UIModelIndex _index ) ;
+	
+	/**
 		Remove the cell data associated at _row, _column, if _row and _column are >= 0.
 		Remove the data associated at _row, if _row is >= 0 and _column is -1.
 		Remove the data associted at _column, if _column is >= 0 and _row is -1.

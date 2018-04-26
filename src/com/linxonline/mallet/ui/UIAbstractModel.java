@@ -41,19 +41,26 @@ public class UIAbstractModel implements IAbstractModel
 	}
 
 	@Override
-	public void setData( final UIModelIndex _index, final IVariant _variant, final Role _role )
+	public void setData( final UIModelIndex _index, final IVariant _variant, final Role _role ) throws IndexOutOfBoundsException
 	{
 		final UIModelIndex index = ( _index != null ) ? _index : root.getHandler() ;
 		root.setData( index, _variant, _role ) ;
 	}
 
 	@Override
-	public IVariant getData( final UIModelIndex _index, final IAbstractModel.Role _role )
+	public IVariant getData( final UIModelIndex _index, final IAbstractModel.Role _role ) throws IndexOutOfBoundsException
 	{
 		final UIModelIndex index = ( _index != null ) ? _index : root.getHandler() ;
 		return root.getData( index, _role ) ;
 	}
 
+	@Override
+	public boolean exists( final UIModelIndex _index )
+	{
+		final UIModelIndex index = ( _index != null ) ? _index : root.getHandler() ;
+		return root.exists( index ) ;
+	}
+	
 	@Override
 	public void removeData( final UIModelIndex _index )
 	{
@@ -246,6 +253,59 @@ public class UIAbstractModel implements IAbstractModel
 			return null ;
 		}
 
+		public boolean exists( final UIModelIndex _index )
+		{
+			if( isHandler( _index ) == true )
+			{
+				return true ;
+			}
+
+			// Go down all of the parents until we find a parent 
+			// that matches our current Matrix, we then use that 
+			// index to get the child matrix that will eventually 
+			// lead us to the Matrix that we are looking for.
+			UIModelIndex parent = _index.getParent() ;
+			while( parent != null )
+			{
+				if( isHandler( parent ) == true )
+				{
+					final int rowIndex = _index.getRow() ;
+					if( rows == null )
+					{
+						return false ;
+					}
+					else if( rows.size() <= rowIndex || rowIndex < 0 )
+					{
+						return false ;
+					}
+
+					final int columnIndex = _index.getColumn() ;
+					final List<Matrix> row = rows.get( rowIndex ) ;
+					if( row == null )
+					{
+						return false ;
+					}
+					else if( row.size() <= columnIndex || columnIndex < 0 )
+					{
+						return false ;
+					}
+
+					final Matrix child = row.get( columnIndex ) ;
+					if( child == null )
+					{
+						return false ;
+					}
+
+					return child.exists( _index ) ;
+				}
+				parent = parent.getParent() ;
+			}
+
+			// If we do not find a parent that matches our current
+			// matrix then we would never find the Matrix that represents _index.
+			return false ;
+		}
+		
 		public void removeData( final UIModelIndex _index ) {}
 
 		public Set<ItemFlags> getDataFlags( final UIModelIndex _index, final Set<ItemFlags> _flags )

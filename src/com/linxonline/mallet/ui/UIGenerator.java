@@ -9,6 +9,14 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
+/**
+	Using the passed in Meta generate the associated UI element.
+
+	The goal of this is to ensure consistency between different 
+	file formats and what gets displayed to the user. A file 
+	format will populate the intended elements meta object and 
+	can then call the UIGenerator to construct the actual element.
+*/
 public class UIGenerator
 {
 	private final static Map<String, Generator> creators = MalletMap.<String, Generator>newMap() ;
@@ -148,6 +156,21 @@ public class UIGenerator
 			public UIList apply( final UIList _element, final UIList.Meta _meta )
 			{
 				return UIList.applyMeta( _meta, _element ) ;
+			}
+		} ) ;
+
+		creators.put( "UIABSTRACTVIEW", new Generator<UIAbstractView, UIAbstractView.Meta>()
+		{
+			@Override
+			public UIAbstractView create( final UIAbstractView.Meta _meta )
+			{
+				return addListeners( new UIAbstractView(), _meta ) ;
+			}
+
+			@Override
+			public UIAbstractView apply( final UIAbstractView _element, final UIAbstractView.Meta _meta )
+			{
+				return UIAbstractView.applyMeta( _meta, _element ) ;
 			}
 		} ) ;
 	}

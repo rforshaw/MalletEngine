@@ -26,7 +26,7 @@ public class UIEditorState extends GameState
 	private UILayout mainView ;
 	private UIList elementOptionsPanel ;
 	private UIList elementStructurePanel ;
-	private UIList elementDataPanel ;
+	private UIAbstractView elementDataPanel ;
 
 	private UIWrapper root = null ;
 
@@ -92,7 +92,7 @@ public class UIEditorState extends GameState
 			mainView = jui.get( "MainWindow", UILayout.class ) ;
 			elementOptionsPanel = jui.get( "UIElementsPanel", UIList.class ) ;
 			elementStructurePanel = jui.get( "UIStructurePanel", UIList.class ) ;
-			elementDataPanel = jui.get( "UIElementDataPanel", UIList.class ) ;
+			elementDataPanel = jui.get( "UIElementDataPanel", UIAbstractView.class ) ;
 
 			createElementsPanel( elementOptionsPanel ) ;
 		}
@@ -156,46 +156,7 @@ public class UIEditorState extends GameState
 				}
 
 				current = meta ;
-				cleanup( elementDataPanel ) ;
-
-				final int size = meta.rowCount( meta.root() ) ;
-				for( int i = 0; i < size; i++ )
-				{
-					final IVariant variant = meta.getData( new UIModelIndex( meta.root(), i, 0 ), UIAbstractModel.Role.User ) ;
-					addVariant( variant, elementDataPanel ) ;
-				}
-			}
-
-			private void addVariant( final IVariant _variant, final UIList _view )
-			{
-				final UIButton.Meta meta = new UIButton.Meta() ;
-
-				final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
-				edge.setSheet( "base/textures/edge_button.png" ) ;
-
-				final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
-				text.setText( _variant.getName() + ' ' + _variant.toString() ) ;
-
-				/*UIElement.connect( meta, _variant.getSignal(), new Connect.Slot<UIElement.Meta>()
-				{
-					@Override
-					public void slot( final UIElement.Meta _meta )
-					{
-						
-					}
-				} ) ;*/
-
-				final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
-			}
-
-			private void cleanup( final UILayout _view )
-			{
-				_view.getElements( elements ) ;
-				for( UIElement element : elements )
-				{
-					_view.removeElement( element ) ;
-				}
-				elements.clear() ;
+				elementDataPanel.setModel( meta ) ;
 			}
 		} ) ;
 	}
