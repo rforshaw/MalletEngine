@@ -27,7 +27,7 @@ public class UIComponent extends InputComponent
 
 	protected final EventController eventController = new EventController( id.toString() ) ;
 	private Entity.ReadyCallback toDestroy = null ;
-	private DrawDelegate<World, Draw> delegate = null ;
+	private DrawDelegate delegate = null ;
 
 	public UIComponent( final Entity _parent )
 	{
@@ -234,7 +234,7 @@ public class UIComponent extends InputComponent
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
 		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
+			public void callback( final DrawDelegate _delegate )
 			{
 				if( delegate != null )
 				{

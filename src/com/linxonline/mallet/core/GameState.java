@@ -531,7 +531,7 @@ public class GameState extends State
 
 		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
 		{
-			private DrawDelegate<World, Draw> delegate ;
+			private DrawDelegate delegate ;
 
 			public void processEvent( final Event<Boolean> _event )
 			{
@@ -557,7 +557,7 @@ public class GameState extends State
 				showFPS.setShow( true ) ;
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 				{
-					public void callback( final DrawDelegate<World, Draw> _delegate )
+					public void callback( final DrawDelegate _delegate )
 					{
 						delegate = _delegate ;
 						delegate.addTextDraw( showFPS.getDraw() ) ;

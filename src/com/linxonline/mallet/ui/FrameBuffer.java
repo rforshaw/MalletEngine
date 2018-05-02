@@ -11,7 +11,7 @@ public class FrameBuffer
 	private final Camera camera ;
 	private final Draw frame ;
 
-	private DrawDelegate<World, Draw> delegate = null ;
+	private DrawDelegate delegate = null ;
 
 	public FrameBuffer( final float _posX,  final float _posY, final float _posZ,
 						final float _offX,  final float _offY, final float _offZ,
@@ -38,7 +38,7 @@ public class FrameBuffer
 												_width, _height, _layer ) ;
 	}
 
-	public void setDrawDelegate( final DrawDelegate<World, Draw> _delegate )
+	public void setDrawDelegate( final DrawDelegate _delegate )
 	{
 		if( delegate != null )
 		{
@@ -81,7 +81,7 @@ public class FrameBuffer
 		DrawAssist.amendOrder( frame, _layer ) ;
 	}
 	
-	public DrawDelegate<World, Draw> getDrawDelegate()
+	public DrawDelegate getDrawDelegate()
 	{
 		return delegate ;
 	}

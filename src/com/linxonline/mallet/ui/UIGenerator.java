@@ -177,10 +177,10 @@ public class UIGenerator
 
 	public static <E extends UIElement, M extends E.Meta> E addListeners( final E _element, final M _meta )
 	{
-		final List<IBase.Meta> listeners = _meta.getListeners( MalletList.<IBase.Meta>newList() ) ;
-		for( final IBase.Meta meta : listeners )
+		final List<UIElement.MetaListener> listeners = _meta.getListeners( MalletList.<UIElement.MetaListener>newList() ) ;
+		for( final UIElement.MetaListener meta : listeners )
 		{
-			_element.addListener( GUIGenerator.create( meta ) ) ;
+			_element.addListener( GUIGenerator.create( meta, _element ) ) ;
 		}
 		return _element ;
 	}

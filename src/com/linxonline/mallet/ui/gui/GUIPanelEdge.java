@@ -5,54 +5,48 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIPanelEdge<T extends UIElement> extends GUIDrawEdge<T>
+public class GUIPanelEdge extends GUIDrawEdge
 {
 	private final MalletColour neutral ;
 	private final MalletColour rollover ;
 	private final MalletColour clicked ;
 
-	private final Connect.Slot<T> engagedSlot = new Connect.Slot<T>()
+	private final Connect.Slot<UIElement> engagedSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _layout )
+		public void slot( final UIElement _layout )
 		{
 			setColour( rollover ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
-	Connect.Slot<T> disengagedSlot = new Connect.Slot<T>()
+	Connect.Slot<UIElement> disengagedSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _layout )
+		public void slot( final UIElement _layout )
 		{
 			setColour( neutral ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
-	public GUIPanelEdge( final Meta _meta )
+	public GUIPanelEdge( final Meta _meta, final UIElement _parent )
 	{
-		super( _meta ) ;
+		super( _meta, _parent ) ;
 		neutral  = _meta.getNeutralColour( new MalletColour() ) ;
 		rollover = _meta.getNeutralColour( new MalletColour() ) ;
 		clicked  = _meta.getNeutralColour( new MalletColour() ) ;
-	}
 
-	@Override
-	public void setParent( T _parent )
-	{
 		UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
 		UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
-
-		super.setParent( _parent ) ;
 	}
 
 	@Override
 	public void shutdown()
 	{
 		super.shutdown() ;
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
 		UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 	}

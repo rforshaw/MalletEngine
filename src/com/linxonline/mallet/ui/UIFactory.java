@@ -69,57 +69,58 @@ public final class UIFactory
 		CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 		CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
 
-		layout.addListener( new ABase<UILayout>()
-		{
-			private final Notification.Notify<String> widthNotify = new Notification.Notify<String>()
-			{
-				public void inform( final String _data )
-				{
-					final UIRatio ratio = layout.getRatio() ;
-					dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-
-					layout.setLength( ratio.toUnitX( dimension.x ),
-									  ratio.toUnitY( dimension.y ),
-									  ratio.toUnitZ( dimension.z ) ) ;
-
-					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
-				}
-			} ;
-
-			private final Notification.Notify<String> heightNotify = new Notification.Notify<String>()
-			{
-				public void inform( final String _data )
-				{
-					final UIRatio ratio = layout.getRatio() ;
-					dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
-
-					layout.setLength( ratio.toUnitX( dimension.x ),
-									  ratio.toUnitY( dimension.y ),
-									  ratio.toUnitZ( dimension.z ) ) ;
-
-					CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-					CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
-				}
-			} ;
-
-			@Override
-			public void setParent( final UILayout _parent )
-			{
-				super.setParent( _parent ) ;
-				GlobalConfig.addNotify( "RENDERWIDTH", widthNotify ) ;
-				GlobalConfig.addNotify( "RENDERHEIGHT", heightNotify ) ;
-			}
-
-			public void refresh() {}
-
-			public void shutdown()
-			{
-				GlobalConfig.removeNotify( "RENDERWIDTH", widthNotify ) ;
-				GlobalConfig.removeNotify( "RENDERHEIGHT", heightNotify ) ;
-			}
-		} ) ;
+		layout.addListener( new WindowListener( layout, _camera, dimension ) ) ;
 
 		return layout ;
+	}
+
+	private static class WindowListener extends UIElement.Listener
+	{
+		private final Notification.Notify<String> widthNotify ;
+		private final Notification.Notify<String> heightNotify ;
+
+		public WindowListener( final UILayout _parent, final Camera _camera, final Vector3 _dimension )
+		{
+			_parent.super() ;
+			widthNotify = GlobalConfig.addNotify( "RENDERWIDTH", new Notification.Notify<String>()
+			{
+				public void inform( final String _data )
+				{
+					final UIRatio ratio = _parent.getRatio() ;
+					_dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
+
+					_parent.setLength( ratio.toUnitX( _dimension.x ),
+										ratio.toUnitY( _dimension.y ),
+										ratio.toUnitZ( _dimension.z ) ) ;
+
+					CameraAssist.amendOrthographic( _camera, 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
+					CameraAssist.amendScreenResolution( _camera, ( int )_dimension.x, ( int )_dimension.y ) ;
+				}
+			} ) ;
+
+			heightNotify = GlobalConfig.addNotify( "RENDERHEIGHT", new Notification.Notify<String>()
+			{
+				public void inform( final String _data )
+				{
+					final UIRatio ratio = _parent.getRatio() ;
+					_dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
+
+					_parent.setLength( ratio.toUnitX( _dimension.x ),
+										ratio.toUnitY( _dimension.y ),
+										ratio.toUnitZ( _dimension.z ) ) ;
+
+					CameraAssist.amendOrthographic( _camera, 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
+					CameraAssist.amendScreenResolution( _camera, ( int )_dimension.x, ( int )_dimension.y ) ;
+				}
+			} ) ;
+		}
+
+		public void refresh() {}
+
+		public void shutdown()
+		{
+			GlobalConfig.removeNotify( "RENDERWIDTH", widthNotify ) ;
+			GlobalConfig.removeNotify( "RENDERHEIGHT", heightNotify ) ;
+		}
 	}
 }

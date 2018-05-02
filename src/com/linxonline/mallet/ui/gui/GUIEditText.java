@@ -5,7 +5,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.input.* ;
 
-public class GUIEditText<T extends UITextField> extends GUIText<T>
+public class GUIEditText extends GUIText
 {
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
@@ -16,9 +16,9 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 	private int start = 0 ;
 	private int end = 0 ;
 
-	public GUIEditText( final Meta _meta )
+	public GUIEditText( final Meta _meta, final UITextField _parent )
 	{
-		super( _meta ) ;
+		super( _meta, _parent ) ;
 	}
 
 	/**
@@ -26,25 +26,18 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		This text is used if the user has not
 		written anything and is not editing the field.
 	*/
-	public GUIEditText( final String _text, final MalletFont _font )
+	public GUIEditText( final String _text, final MalletFont _font, final UITextField _parent )
 	{
-		super( _text, _font ) ;
-	}
-
-	@Override
-	public void setParent( T _parent )
-	{
-		UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<T>()
+		super( _text, _font, _parent ) ;
+		UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UITextField>()
 		{
 			@Override
-			public void slot( final T _textfield )
+			public void slot( final UITextField _textfield )
 			{
 				editing = false ;
 				_textfield.makeDirty() ;
 			}
 		} ) ;
-
-		super.setParent( _parent ) ;
 	}
 
 	@Override
@@ -54,7 +47,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		final MalletFont font = getFont() ;
 		final MalletColour colour = getColour() ;
 
-		final T parent = getParent() ;
+		final UITextField parent = getParentTextField() ;
 		final int layer = parent.getLayer() + 1 ;
 
 		final Vector3 position = getPosition() ;
@@ -110,15 +103,15 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void addDraws( final DrawDelegate _delegate, final World _world )
 	{
 		super.addDraws( _delegate, _world ) ;
-		final T parent = getParent() ;
+		final UITextField parent = getParentTextField() ;
 		final int layer = parent.getLayer() + 1 ;
 
 		_delegate.addTextDraw( drawEdit, _world ) ;
 
-		final StringBuilder edit = getParent().getText() ;
+		final StringBuilder edit = parent.getText() ;
 		if( isEditing() == false && edit.length() <= 0 )
 		{
 			_delegate.addTextDraw( getDraw(), _world ) ;
@@ -128,7 +121,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		{
 			_delegate.addBasicDraw( drawCursor, _world ) ;
 		}
-		getParent().makeDirty() ;
+		parent.makeDirty() ;
 	}
 
 	/**
@@ -136,7 +129,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+	public void removeDraws( final DrawDelegate _delegate )
 	{
 		super.removeDraws( _delegate ) ;
 		_delegate.removeDraw( drawEdit ) ;
@@ -147,19 +140,19 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 	public void refresh()
 	{
 		super.refresh() ;
-		final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
+		final DrawDelegate delegate = getDrawDelegate() ;
 		if( delegate == null )
 		{
 			return ;
 		}
 
-		final T parent = getParent() ;
+		final UITextField parent = getParentTextField() ;
 		final int layer = parent.getLayer() + 1 ;
 
 		final MalletFont font = getFont() ;
 		final Vector3 offset = getOffset() ;
 		final Vector3 length = getLength() ;
-		final StringBuilder edit = getParent().getText() ;
+		final StringBuilder edit = parent.getText() ;
 
 		{
 			final MalletFont.Metrics metrics = font.getMetrics() ;
@@ -185,7 +178,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		{
 			delegate.addBasicDraw( drawCursor, getWorld() ) ;
 
-			final int index = getParent().getCursorIndex() ;
+			final int index = parent.getCursorIndex() ;
 
 			final Vector3 cursorOffset = DrawAssist.getOffset( drawCursor ) ;
 			cursorOffset.setXYZ( offset ) ;
@@ -210,9 +203,9 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 	{
 		final MalletFont font = getFont() ;
 		final Vector3 length = getLength() ;
-		final StringBuilder edit = getParent().getText() ;
+		final StringBuilder edit = getParentTextField().getText() ;
 
-		final int index = getParent().getCursorIndex() ;
+		final int index = getParentTextField().getCursorIndex() ;
 		end = font.stringIndexWidth( edit, start, length.x ) ;
 
 		final int temp = end ;
@@ -270,7 +263,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 			case WINDOWS      : break ;
 			case LEFT         :
 			{
-				final T parent = getParent() ;
+				final UITextField parent = getParentTextField() ;
 				final int index = parent.getCursorIndex() - 1 ;
 				parent.setCursorIndex( ( index < 0 ) ? 0 : index ) ;
 				parent.makeDirty() ;
@@ -278,7 +271,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 			}
 			case RIGHT        :
 			{
-				final T parent = getParent() ;
+				final UITextField parent = getParentTextField() ;
 				final StringBuilder edit = parent.getText() ;
 
 				final int index = parent.getCursorIndex() + 1 ;
@@ -288,7 +281,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 			}
 			case DELETE       :
 			{
-				final T parent = getParent() ;
+				final UITextField parent = getParentTextField() ;
 				final int index = parent.getCursorIndex() ;
 				final StringBuilder edit = parent.getText() ;
 				final int length = edit.length() ;
@@ -304,7 +297,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 			}
 			case BACKSPACE    :
 			{
-				final T parent = getParent() ;
+				final UITextField parent = getParentTextField() ;
 				int index = parent.getCursorIndex() ;
 				final StringBuilder edit = parent.getText() ;
 				if( index > 0 )
@@ -320,9 +313,9 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 			}
 			default :
 			{
-				final T parent = getParent() ;
+				final UITextField parent = getParentTextField() ;
 				final int index = parent.getCursorIndex() ;
-				final StringBuilder edit = getParent().getText() ;
+				final StringBuilder edit = parent.getText() ;
 				edit.insert( index, _input.getKeyCharacter() ) ;
 
 				parent.setCursorIndex( index + 1 ) ;
@@ -347,7 +340,7 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 	{
 		editing = true ;
 
-		final T parent = getParent() ;
+		final UITextField parent = getParentTextField() ;
 		final Vector3 position = parent.getPosition() ;
 		final StringBuilder text = parent.getText() ;
 		final MalletFont font = getFont() ;
@@ -355,10 +348,15 @@ public class GUIEditText<T extends UITextField> extends GUIText<T>
 		final float width = _input.getMouseX() - position.x ;
 		parent.setCursorIndex( font.stringIndexWidth( text, width ) ) ;
 
-		getParent().makeDirty() ;
+		parent.makeDirty() ;
 		return InputEvent.Action.PROPAGATE ;
 	}
 
+	public UITextField getParentTextField()
+	{
+		return ( UITextField )getParent() ;
+	}
+	
 	public static class Meta extends GUIText.Meta
 	{
 		public Meta() {}

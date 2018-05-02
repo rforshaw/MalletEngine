@@ -183,7 +183,7 @@ public class UIEditorState extends GameState
 		}
 
 		final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
-		button.addListener( new InputListener<UIButton>()
+		button.addListener( new InputListener( button )
 		{
 			@Override
 			public InputEvent.Action touchPressed( final InputEvent _input )

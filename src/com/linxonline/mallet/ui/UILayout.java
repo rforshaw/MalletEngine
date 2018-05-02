@@ -57,7 +57,7 @@ public class UILayout extends UIElement implements IChildren
 		initLayoutConnections() ;
 
 		setType( _type ) ;
-		setEngageMode( new SingleEngageListener() ) ;
+		setEngageMode( new SingleEngageListener( this ) ) ;
 	}
 
 	private void initLayoutConnections()
@@ -168,7 +168,7 @@ public class UILayout extends UIElement implements IChildren
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		super.passDrawDelegate( _delegate, _world, _camera ) ;
 		children.passDrawDelegate( _delegate, _world, _camera ) ;
@@ -692,8 +692,13 @@ public class UILayout extends UIElement implements IChildren
 		return UIElement.applyMeta( _meta, _layout ) ;
 	}
 
-	public static abstract class EngageListener extends InputListener<UILayout>
+	public static abstract class EngageListener extends InputListener
 	{
+		public EngageListener( final UILayout _parent )
+		{
+			super( _parent ) ;
+		}
+	
 		public abstract boolean isEngaged() ;
 
 		public abstract UIElement getEngaged() ;
@@ -710,11 +715,9 @@ public class UILayout extends UIElement implements IChildren
 	{
 		private UIElement currentEngaged = null ;
 
-		public SingleEngageListener() {}
-
-		@Override
-		public void setParent( UILayout _parent )
+		public SingleEngageListener( final UILayout _parent )
 		{
+			super( _parent ) ;
 			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UILayout>()
 			{
 				@Override
@@ -728,13 +731,12 @@ public class UILayout extends UIElement implements IChildren
 					disengageOthers( null, ordered ) ;
 				}
 			} ) ;
-			super.setParent( _parent ) ;
 		}
 
 		@Override
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
-			final UILayout layout = getParent() ;
+			final UILayout layout = getParentLayout() ;
 			final UIElement current = getEngaged() ;
 
 			if( current != null )
@@ -840,6 +842,11 @@ public class UILayout extends UIElement implements IChildren
 			return getEngaged() != null ;
 		}
 
+		public UILayout getParentLayout()
+		{
+			return ( UILayout )getParent() ;
+		}
+		
 		private static void disengageOthers( final UIElement _current, final List<UIElement> _others )
 		{
 			final int size = _others.size() ;

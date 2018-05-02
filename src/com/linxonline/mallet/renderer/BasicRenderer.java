@@ -84,9 +84,9 @@ public abstract class BasicRenderer<D extends DrawData,
 	public abstract WorldAssist.Assist getWorldAssist() ;
 	public abstract CameraAssist.Assist getCameraAssist() ;
 
-	protected DrawDelegate<World, Draw> constructDrawDelegate()
+	protected DrawDelegate constructDrawDelegate()
 	{
-		return new DrawDelegate<World, Draw>()
+		return new DrawDelegate()
 		{
 			private final List<D> data = MalletList.<D>newList() ;
 

@@ -22,7 +22,7 @@ public class UICheckbox extends UIElement
 
 	private void init()
 	{
-		addListener( new InputListener<UICheckbox>()
+		addListener( new InputListener( this )
 		{
 			@Override
 			public InputEvent.Action touchReleased( final InputEvent _input )
@@ -33,7 +33,7 @@ public class UICheckbox extends UIElement
 			@Override
 			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
-				final UICheckbox parent = getParent() ;
+				final UICheckbox parent = ( UICheckbox )getParent() ;
 				parent.setChecked( !parent.isChecked() ) ;
 				return InputEvent.Action.CONSUME ;
 			}

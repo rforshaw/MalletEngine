@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIScrollbar<T extends UIList> extends GUIBase<T>
+public class GUIScrollbar extends GUIBase
 {
 	private final Vector3 xLength = new Vector3() ;
 	private final Vector3 yLength = new Vector3() ;
@@ -16,8 +16,9 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 	protected Draw xBar = null ;
 	protected Draw yBar = null ;
 
-	public GUIScrollbar( final MalletTexture _sheet, final UIElement.UV _uv )
+	public GUIScrollbar( final MalletTexture _sheet, final UIElement.UV _uv, final UIList _parent )
 	{
+		super( _parent ) ;
 		sheet = _sheet ;
 		uv = _uv ;
 	}
@@ -28,7 +29,7 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 	*/
 	public void constructDraws()
 	{
-		final T parent = getParent() ;
+		final UIList parent = getParentList() ;
 		final int layer = parent.getLayer() ;
 
 		CameraAssist.getUIPosition( parent.getInternalCamera(), offset ) ;
@@ -71,7 +72,7 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void addDraws( final DrawDelegate _delegate, final World _world )
 	{
 		if( xBar != null )
 		{
@@ -89,7 +90,7 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+	public void removeDraws( final DrawDelegate _delegate )
 	{
 		_delegate.removeDraw( xBar ) ;
 		_delegate.removeDraw( yBar ) ;
@@ -99,7 +100,7 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 	public void refresh()
 	{
 		super.refresh() ;
-		final T parent = getParent() ;
+		final UIList parent = getParentList() ;
 
 		updatePosition( offset ) ;
 		updateLengths( parent.getScrollbarLength(),
@@ -120,9 +121,14 @@ public class GUIScrollbar<T extends UIList> extends GUIBase<T>
 		}
 	}
 
+	UIList getParentList()
+	{
+		return ( UIList )getParent() ;
+	}
+
 	private void updatePosition( final Vector3 _position )
 	{
-		final T parent = getParent() ;
+		final UIList parent = getParentList() ;
 		final Vector3 length = parent.getLength() ;
 		final Vector3 absLength = parent.getAbsoluteLength() ;
 

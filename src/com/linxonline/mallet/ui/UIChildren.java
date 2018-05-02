@@ -52,7 +52,7 @@ public class UIChildren implements IChildren
 		return ordered ;
 	}
 
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )

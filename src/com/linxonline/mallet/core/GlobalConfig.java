@@ -40,7 +40,7 @@ public final class GlobalConfig
 		_notify will recieve the name of the setting 
 		that has been changed. 
 	*/
-	public static void addNotify( final String _name, final Notify<String> _notify )
+	public static Notify<String> addNotify( final String _name, final Notify<String> _notify )
 	{
 		Notification<String> notification = listeners.get( _name ) ;
 		if( notification == null )
@@ -50,6 +50,7 @@ public final class GlobalConfig
 		}
 
 		notification.addNotify( _notify ) ;
+		return _notify ;
 	}
 
 	public static void removeNotify( final String _name, final Notify<String> _notify )

@@ -43,150 +43,20 @@ public class UIList extends UILayout
 								 length.x,   length.y,   getLayer() + 1 ) ;
 		initFrameConnections() ;
 
-		setEngageMode( new ScrollSingleEngageListener() ) ;
+		setEngageMode( new ScrollSingleEngageListener( this ) ) ;
 		initScrollInput() ;
 	}
 
 	private void initScrollInput()
 	{
-		addListener( new InputListener<UIList>()
-		{
-			private final Vector3 position = new Vector3() ;
-			private final Vector3 length = new Vector3() ;
-
-			private final Vector2 current = new Vector2() ;
-			private final Vector2 last = new Vector2() ;
-			private final Vector2 diff = new Vector2() ;
-
-			private long timestamp = 0L ;
-			private int timeDiff = 0 ;
-			private boolean pressed = false ;
-
-			private final Connect.Slot<UIList> disengagedSlot = new Connect.Slot<UIList>()
-			{
-				@Override
-				public void slot( final UIList _layout )
-				{
-					pressed = false ;
-				}
-			} ;
-
-			@Override
-			public void setParent( UIList _parent )
-			{
-				UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
-				super.setParent( _parent ) ;
-			}
-			
-			@Override
-			public void shutdown()
-			{
-				super.shutdown() ;
-				final UIList parent = getParent() ;
-				UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
-			}
-
-			@Override
-			public InputEvent.Action scroll( final InputEvent _input )
-			{
-				final EngageListener mode = getParent().getEngageMode() ;
-				if( mode.isEngaged() == true )
-				{
-					applyScroll( -_input.getMouseX() * 10, -_input.getMouseY() * 10 ) ;
-					return InputEvent.Action.CONSUME ;
-				}
-				return InputEvent.Action.PROPAGATE ;
-			}
-
-			@Override
-			public InputEvent.Action touchReleased( final InputEvent _input )
-			{
-				return mouseReleased( _input ) ;
-			}
-
-			@Override
-			public InputEvent.Action touchPressed( final InputEvent _input )
-			{
-				return mousePressed( _input ) ;
-			}
-
-			@Override
-			public InputEvent.Action touchMove( final InputEvent _input )
-			{
-				return mouseMove( _input ) ;
-			}
-
-			@Override
-			public InputEvent.Action mouseReleased( final InputEvent _input )
-			{
-				pressed = false ;
-				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return InputEvent.Action.PROPAGATE ;
-			}
-
-			@Override
-			public InputEvent.Action mousePressed( final InputEvent _input )
-			{
-				pressed = true ;
-				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				applyScroll( 0.0f, 0.0f ) ;
-				return InputEvent.Action.PROPAGATE ;
-			}
-
-			@Override
-			public InputEvent.Action mouseMove( final InputEvent _input )
-			{
-				InputEvent.Action action = InputEvent.Action.CONSUME ;
-				final EngageListener mode = getParent().getEngageMode() ;
-				if( pressed == true )
-				{
-					diff.x = ( getType() == ILayout.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
-					diff.y = ( getType() == ILayout.Type.VERTICAL || getType() == ILayout.Type.GRID ) ? ( last.y - _input.getMouseY() ) : 0.0f ;
-					action = applyScroll( diff.x, diff.y ) ;
-				}
-
-				last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
-				return action ;
-			}
-
-			private InputEvent.Action applyScroll( final float _x, final float _y )
-			{
-				CameraAssist.getUIPosition( frame.getCamera(), position ) ;
-				getLength( length ) ;
-
-				position.add( _x, _y, 0.0f ) ;
-
-				final Vector3 length = getParent().getLength() ;
-				final float width = absoluteLength.x - length.x ;
-				final float height = absoluteLength.y - length.y ;
-
-				final ILayout.Type type = getParent().getType() ;
-				InputEvent.Action action = InputEvent.Action.CONSUME ;
-				if( ( type == ILayout.Type.HORIZONTAL && ( position.x <= 0.0f || position.x >= width ) ) || 
-					( type == ILayout.Type.VERTICAL   && ( position.y <= 0.0f || position.y >= height ) ) )
-				{
-					action = InputEvent.Action.PROPAGATE ;
-				}
-
-				position.x = ( position.x > width ) ? width : position.x ;
-				position.y = ( position.y > height ) ? height : position.y ;
-
-				position.x = ( position.x > 0.0f ) ? position.x : 0.0f ;
-				position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
-
-				CameraAssist.amendUIPosition( frame.getCamera(), position.x, position.y, 0.0f ) ;
-				getParent().makeDirty() ;
-
-				return action ;
-			}
-		} ) ;
+		addListener( new ScrollInputListener( this ) ) ;
 	}
 
 	private void initFrameConnections()
 	{
 		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
+			public void callback( final DrawDelegate _delegate )
 			{
 				frame.setDrawDelegate( _delegate ) ;
 				UIList.this.passListDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
@@ -268,11 +138,11 @@ public class UIList extends UILayout
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
 
-		final List<IBase<? extends UIElement>> base = getListenerUnit().getListeners() ;
+		final List<UIElement.Listener> base = getListenerUnit().getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -288,7 +158,7 @@ public class UIList extends UILayout
 		_delegate.addBasicDraw( frame.getFrame(), _world ) ;
 	}
 
-	private void passListDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	private void passListDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		final List<UIElement> ordered = getElements() ;
 
@@ -674,7 +544,7 @@ public class UIList extends UILayout
 		Return the DrawDelegate that this UI is expected to be 
 		displayed on.
 	*/
-	public DrawDelegate<World, Draw> getInternalDrawDelegate()
+	public DrawDelegate getInternalDrawDelegate()
 	{
 		return frame.getDrawDelegate() ;
 	}
@@ -719,7 +589,10 @@ public class UIList extends UILayout
 	{
 		private InputEvent lastInput = null ;
 	
-		public ScrollSingleEngageListener() {}
+		public ScrollSingleEngageListener( final UILayout _parent )
+		{
+			super( _parent ) ;
+		}
 
 		@Override
 		public InputEvent.Action mouseMove( final InputEvent _input )
@@ -741,6 +614,144 @@ public class UIList extends UILayout
 		public String getElementType()
 		{
 			return "UILIST" ;
+		}
+	}
+	
+	private static class ScrollInputListener extends InputListener
+	{
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 length = new Vector3() ;
+
+		private final Vector2 current = new Vector2() ;
+		private final Vector2 last = new Vector2() ;
+		private final Vector2 diff = new Vector2() ;
+
+		private long timestamp = 0L ;
+		private int timeDiff = 0 ;
+		private boolean pressed = false ;
+
+		private final Connect.Slot<UIList> disengagedSlot = new Connect.Slot<UIList>()
+		{
+			@Override
+			public void slot( final UIList _layout )
+			{
+				pressed = false ;
+			}
+		} ;
+
+		public ScrollInputListener( final UIList _parent )
+		{
+			super( _parent ) ;
+			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
+		}
+
+		@Override
+		public void shutdown()
+		{
+			super.shutdown() ;
+			final UIList parent = getParentList() ;
+			UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
+		}
+
+		@Override
+		public InputEvent.Action scroll( final InputEvent _input )
+		{
+			final EngageListener mode = getParentList().getEngageMode() ;
+			if( mode.isEngaged() == true )
+			{
+				applyScroll( -_input.getMouseX() * 10, -_input.getMouseY() * 10 ) ;
+				return InputEvent.Action.CONSUME ;
+			}
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return mouseReleased( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return mousePressed( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action touchMove( final InputEvent _input )
+		{
+			return mouseMove( _input ) ;
+		}
+
+		@Override
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			pressed = false ;
+			last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			pressed = true ;
+			last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+			applyScroll( 0.0f, 0.0f ) ;
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		@Override
+		public InputEvent.Action mouseMove( final InputEvent _input )
+		{
+			InputEvent.Action action = InputEvent.Action.CONSUME ;
+			final EngageListener mode = getParentList().getEngageMode() ;
+			if( pressed == true )
+			{
+				final UIList parent = getParentList() ;
+				diff.x = ( parent.getType() == ILayout.Type.HORIZONTAL ) ? ( last.x - _input.getMouseX() ) : 0.0f ;
+				diff.y = ( parent.getType() == ILayout.Type.VERTICAL || parent.getType() == ILayout.Type.GRID ) ? ( last.y - _input.getMouseY() ) : 0.0f ;
+				action = applyScroll( diff.x, diff.y ) ;
+			}
+
+			last.setXY( _input.getMouseX(), _input.getMouseY() ) ;
+			return action ;
+		}
+
+		private InputEvent.Action applyScroll( final float _x, final float _y )
+		{
+			final UIList parent = getParentList() ;
+			CameraAssist.getUIPosition( parent.frame.getCamera(), position ) ;
+			parent.getLength( length ) ;
+
+			position.add( _x, _y, 0.0f ) ;
+
+			final Vector3 length = parent.getLength() ;
+			final float width = parent.absoluteLength.x - length.x ;
+			final float height = parent.absoluteLength.y - length.y ;
+
+			final ILayout.Type type = parent.getType() ;
+			InputEvent.Action action = InputEvent.Action.CONSUME ;
+			if( ( type == ILayout.Type.HORIZONTAL && ( position.x <= 0.0f || position.x >= width ) ) || 
+				( type == ILayout.Type.VERTICAL   && ( position.y <= 0.0f || position.y >= height ) ) )
+			{
+				action = InputEvent.Action.PROPAGATE ;
+			}
+
+			position.x = ( position.x > width ) ? width : position.x ;
+			position.y = ( position.y > height ) ? height : position.y ;
+
+			position.x = ( position.x > 0.0f ) ? position.x : 0.0f ;
+			position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
+
+			CameraAssist.amendUIPosition( parent.frame.getCamera(), position.x, position.y, 0.0f ) ;
+			parent.makeDirty() ;
+
+			return action ;
+		}
+		
+		public UIList getParentList()
+		{
+			return ( UIList )getParent() ;
 		}
 	}
 }

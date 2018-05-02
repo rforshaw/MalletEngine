@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIDraw<T extends UIElement> extends GUIBase<T>
+public class GUIDraw extends GUIBase
 {
 	private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
 	protected boolean retainRatio = false ;
@@ -18,15 +18,18 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 
 	protected Draw draw = null ;
 
-	public GUIDraw( final Meta _meta )
+	public GUIDraw( final Meta _meta, final UIElement _parent )
 	{
-		super() ;
+		super( _parent ) ;
 		retainRatio    = _meta.isRetainRatio() ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
 		colour         = _meta.getColour( new MalletColour() ) ;
 		sheet          = new MalletTexture( _meta.getSheet() ) ;
 		uv             = _meta.getUV( new UIElement.UV() ) ;
+
+		updateLength( _parent.getLength(), getLength() ) ;
+		updateOffset( _parent.getOffset(), getOffset() ) ;
 	}
 
 	public void setRetainRatio( final boolean _ratio )
@@ -52,14 +55,6 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 				GUI.updateColour( shape, colour ) ;
 			}
 		}
-	}
-
-	@Override
-	public void setParent( final T _parent )
-	{
-		super.setParent( _parent ) ;
-		updateLength( _parent.getLength(), getLength() ) ;
-		updateOffset( _parent.getOffset(), getOffset() ) ;
 	}
 
 	/**
@@ -94,7 +89,7 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void addDraws( final DrawDelegate _delegate, final World _world )
 	{
 		if( draw != null )
 		{
@@ -107,7 +102,7 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+	public void removeDraws( final DrawDelegate _delegate )
 	{
 		_delegate.removeDraw( draw ) ;
 	}
@@ -116,7 +111,7 @@ public class GUIDraw<T extends UIElement> extends GUIBase<T>
 	public void refresh()
 	{
 		super.refresh() ;
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 
 		if( draw != null && parent.isVisible() == true )
 		{

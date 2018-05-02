@@ -3,6 +3,7 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 import java.util.Set ;
 
+import com.linxonline.mallet.ui.gui.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
@@ -43,7 +44,7 @@ public class UIAbstractView extends UIElement
 	{
 		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
+			public void callback( final DrawDelegate _delegate )
 			{
 				frame.setDrawDelegate( _delegate ) ;
 				UIAbstractView.this.passViewDrawDelegate( model.root(), frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
@@ -54,7 +55,7 @@ public class UIAbstractView extends UIElement
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		// Listeners to the UIAbstractView will be given the 
 		// DrawDelegate passed in here - only children 
@@ -67,7 +68,7 @@ public class UIAbstractView extends UIElement
 		_delegate.addBasicDraw( frame.getFrame(), _world ) ;
 	}
 
-	private void passViewDrawDelegate( final UIModelIndex _node, final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	private void passViewDrawDelegate( final UIModelIndex _node, final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		final int rowCount = model.rowCount( _node ) ;
 		final int columnCount = model.columnCount( _node ) ;
@@ -194,12 +195,13 @@ public class UIAbstractView extends UIElement
 		if( variant == null )
 		{
 			final UIElement cell = _delegate.createItem( this ) ;
+			cell.setPosition( _index.getColumn(), _index.getRow(), 0 ) ;
+			cell.setLength( 1.0f, 1.0f, 0.0f ) ;
+
 			if( frame.getDrawDelegate() != null )
 			{
 				cell.passDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
 			}
-			
-			_delegate.setItemData( cell, model, _index ) ;
 
 			variant = new UIVariant( "CELL", cell ) ;
 			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
@@ -294,7 +296,17 @@ public class UIAbstractView extends UIElement
 		{
 			public UIElement createItem( final UIAbstractView _parent )
 			{
-				return new UIElement() ;
+				final UIButton.Meta meta = new UIButton.Meta() ;
+
+				{
+					final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+					edge.setSheet( "base/textures/edge_button.png" ) ;
+
+					final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
+					text.setText( "Test" ) ;
+				}
+
+				return UIGenerator.<UIButton>create( meta ) ;
 			}
 
 			public void setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}

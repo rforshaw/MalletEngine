@@ -4,13 +4,13 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
+public class GUIDrawEdge extends GUIDraw
 {
 	private final float edge ;
 
-	public GUIDrawEdge( final Meta _meta )
+	public GUIDrawEdge( final Meta _meta, final UIElement _parent )
 	{
-		super( _meta ) ;
+		super( _meta, _parent ) ;
 		edge = _meta.getEdge() ;
 	}
 
@@ -22,7 +22,7 @@ public class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 	{
 		super.constructDraws() ;
 
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		final MalletTexture sheet = getTexture() ;
 
 		if( sheet != null )
@@ -48,7 +48,7 @@ public class GUIDrawEdge<T extends UIElement> extends GUIDraw<T>
 	public void refresh()
 	{
 		super.refresh() ;
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		updateLength( parent.getLength(), getLength() ) ;
 		updateOffset( parent.getOffset(), getOffset() ) ;
 

@@ -5,44 +5,39 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIPanelDraw<T extends UIElement> extends GUIDraw<T>
+public class GUIPanelDraw extends GUIDraw
 {
 	private final UIElement.UV neutral ;
 	private final UIElement.UV rollover ;
 	private final UIElement.UV clicked ;
 
-	private final Connect.Slot<T> engagedSlot = new Connect.Slot<T>()
+	private final Connect.Slot<UIElement> engagedSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _layout )
+		public void slot( final UIElement _layout )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
-	private final Connect.Slot<T> disengagedSlot = new Connect.Slot<T>()
+	private final Connect.Slot<UIElement> disengagedSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _layout )
+		public void slot( final UIElement _layout )
 		{
 			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
-	public GUIPanelDraw( final Meta _meta )
+	public GUIPanelDraw( final Meta _meta, final UIElement _parent )
 	{
-		super( _meta ) ;
+		super( _meta, _parent ) ;
 		neutral  = _meta.getNeutralUV( new UIElement.UV() ) ;
 		rollover = _meta.getRolloverUV( new UIElement.UV() ) ;
 		clicked  = _meta.getClickedUV( new UIElement.UV() ) ;
-	}
 
-	@Override
-	public void setParent( T _parent )
-	{
-		super.setParent( _parent ) ;
 		UIElement.connect( _parent, _parent.elementEngaged(),    engagedSlot ) ;
 		UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
 	}
@@ -51,7 +46,7 @@ public class GUIPanelDraw<T extends UIElement> extends GUIDraw<T>
 	public void shutdown()
 	{
 		super.shutdown() ;
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		UIElement.disconnect( parent, parent.elementEngaged(),    engagedSlot ) ;
 		UIElement.disconnect( parent, parent.elementDisengaged(), disengagedSlot ) ;
 	}

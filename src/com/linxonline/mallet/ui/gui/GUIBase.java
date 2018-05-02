@@ -19,9 +19,9 @@ import com.linxonline.mallet.maths.* ;
 	on each function call - else the slots will not be removed 
 	on shutdown.
 */
-public abstract class GUIBase<T extends UIElement> extends ABase<T>
+public abstract class GUIBase extends UIElement.Listener
 {
-	private DrawDelegate<World, Draw> delegate = null ;
+	private DrawDelegate delegate = null ;
 	private World world = null ;
 	private Camera camera = null ;
 
@@ -33,10 +33,10 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 
 	private boolean visible = true ;
 
-	private final Connect.Slot addDrawSlot = new Connect.Slot<T>()
+	private final Connect.Slot addDrawSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _parent )
+		public void slot( final UIElement _parent )
 		{
 			visible = true ;
 			if( delegate != null )
@@ -46,10 +46,10 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		}
 	} ;
 
-	private final Connect.Slot removeDrawSlot = new Connect.Slot<T>()
+	private final Connect.Slot removeDrawSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _parent )
+		public void slot( final UIElement _parent )
 		{
 			visible = false ;
 			if( delegate != null )
@@ -59,47 +59,63 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		}
 	} ;
 
-	private final Connect.Slot positionSlot = new Connect.Slot<T>()
+	private final Connect.Slot positionSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _parent )
+		public void slot( final UIElement _parent )
 		{
 			position.setXYZ( _parent.getPosition() ) ;
 		}
 	} ;
 
-	private final Connect.Slot offsetSlot = new Connect.Slot<T>()
+	private final Connect.Slot offsetSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _parent )
+		public void slot( final UIElement _parent )
 		{
 			offset.setXYZ( _parent.getOffset() ) ;
 		}
 	} ;
 
-	private final Connect.Slot lengthSlot = new Connect.Slot<T>()
+	private final Connect.Slot lengthSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
-		public void slot( final T _parent )
+		public void slot( final UIElement _parent )
 		{
 			length.setXYZ( _parent.getLength() ) ;
 		}
 	} ;
+
+	public GUIBase( final UIElement _parent )
+	{
+		_parent.super() ;
+		visible = _parent.isVisible() ;
+
+		position.setXYZ( _parent.getPosition() ) ;
+		offset.setXYZ( _parent.getOffset() ) ;
+		length.setXYZ( _parent.getLength() ) ;
+
+		UIElement.connect( _parent, _parent.elementShown(),    addDrawSlot() ) ;
+		UIElement.connect( _parent, _parent.elementHidden(),   removeDrawSlot() ) ;
+		UIElement.connect( _parent, _parent.positionChanged(), positionSlot() ) ;
+		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot() ) ;
+		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot() ) ;
+	}
 	
 	/**
 		Called when listener receives a valid DrawDelegate
 		and when the parent UIElement is flagged as visible.
 	*/
-	public abstract void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world ) ;
+	public abstract void addDraws( final DrawDelegate _delegate, final World _world ) ;
 
 	/**
 		Only called if there is a valid DrawDelegate and 
 		when the parent UIElement is flagged as invisible.
 	*/
-	public abstract void removeDraws( final DrawDelegate<World, Draw> _delegate ) ;
+	public abstract void removeDraws( final DrawDelegate _delegate ) ;
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world )
 	{
 		delegate = _delegate ;
 		world = _world ;
@@ -114,23 +130,6 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	public void setLayerOffset( final int _layer )
 	{
 		layerOffset = _layer ;
-	}
-
-	@Override
-	public void setParent( final T _parent )
-	{
-		super.setParent( _parent ) ;
-		visible = _parent.isVisible() ;
-
-		position.setXYZ( _parent.getPosition() ) ;
-		offset.setXYZ( _parent.getOffset() ) ;
-		length.setXYZ( _parent.getLength() ) ;
-
-		UIElement.connect( _parent, _parent.elementShown(),    addDrawSlot() ) ;
-		UIElement.connect( _parent, _parent.elementHidden(),   removeDrawSlot() ) ;
-		UIElement.connect( _parent, _parent.positionChanged(), positionSlot() ) ;
-		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot() ) ;
-		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot() ) ;
 	}
 
 	/**
@@ -153,7 +152,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	*/
 	public int getLayer()
 	{
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		final int layer = ( parent != null ) ? parent.getLayer() : 0 ;
 		return layer + layerOffset ;
 	}
@@ -177,7 +176,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		This slot is called when the parent element has been made 
 		visible and is expected to display something to the screen.
 	*/
-	public Connect.Slot<T> addDrawSlot()
+	public Connect.Slot<UIElement> addDrawSlot()
 	{
 		return addDrawSlot ;
 	}
@@ -186,7 +185,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		This slot is called when the parent element has been made 
 		invisible and is expected to not display anything to the screen.
 	*/
-	public Connect.Slot<T> removeDrawSlot()
+	public Connect.Slot<UIElement> removeDrawSlot()
 	{
 		return removeDrawSlot ;
 	}
@@ -195,7 +194,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		This slot is called when the parent element has changed 
 		position and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<T> positionSlot()
+	public Connect.Slot<UIElement> positionSlot()
 	{
 		return positionSlot ;
 	}
@@ -204,7 +203,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		This slot is called when the parent element has changed 
 		offset and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<T> offsetSlot()
+	public Connect.Slot<UIElement> offsetSlot()
 	{
 		return offsetSlot ;
 	}
@@ -213,7 +212,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		This slot is called when the parent element has changed 
 		length and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<T> lengthSlot()
+	public Connect.Slot<UIElement> lengthSlot()
 	{
 		return lengthSlot ;
 	}
@@ -221,7 +220,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 	@Override
 	public void shutdown()
 	{
-		final T parent = getParent() ;
+		final UIElement parent = getParent() ;
 		UIElement.disconnect( parent, parent.elementShown(),    addDrawSlot() ) ;
 		UIElement.disconnect( parent, parent.elementHidden(),   removeDrawSlot() ) ;
 		UIElement.disconnect( parent, parent.positionChanged(), positionSlot() ) ;
@@ -233,7 +232,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		world = null ;
 	}
 
-	public DrawDelegate<World, Draw> getDrawDelegate()
+	public DrawDelegate getDrawDelegate()
 	{
 		return delegate ;
 	}
@@ -243,7 +242,7 @@ public abstract class GUIBase<T extends UIElement> extends ABase<T>
 		return world ;
 	}
 
-	public static class Meta extends ABase.Meta
+	public static class Meta extends UIElement.MetaListener
 	{
 		private final Connect connect = new Connect() ;
 

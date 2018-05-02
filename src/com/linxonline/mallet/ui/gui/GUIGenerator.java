@@ -2,7 +2,9 @@ package com.linxonline.mallet.ui.gui ;
 
 import java.util.Map ;
 
-import com.linxonline.mallet.ui.IBase ;
+import com.linxonline.mallet.ui.UIElement ;
+import com.linxonline.mallet.ui.UITextField ;
+import com.linxonline.mallet.ui.UICheckbox ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
@@ -15,52 +17,52 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUIDRAW", new Generator<GUIDraw.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIDraw.Meta _meta )
+			public GUIBase create( final GUIDraw.Meta _meta, final UIElement _parent )
 			{
-				return new GUIDraw( _meta ) ;
+				return new GUIDraw( _meta, _parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UIELEMENT_GUIDRAWEDGE", new Generator<GUIDrawEdge.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIDrawEdge.Meta _meta )
+			public GUIBase create( final GUIDrawEdge.Meta _meta, final UIElement _parent )
 			{
-				return new GUIDrawEdge( _meta ) ;
+				return new GUIDrawEdge( _meta, _parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UITEXTFIELD_GUIEDITTEXT", new Generator<GUIEditText.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIEditText.Meta _meta )
+			public GUIBase create( final GUIEditText.Meta _meta, final UIElement _parent )
 			{
-				return new GUIEditText( _meta ) ;
+				return new GUIEditText( _meta, ( UITextField )_parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UIELEMENT_GUIPANELDRAW", new Generator<GUIPanelDraw.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIPanelDraw.Meta _meta )
+			public GUIBase create( final GUIPanelDraw.Meta _meta, final UIElement _parent )
 			{
-				return new GUIPanelDraw( _meta ) ;
+				return new GUIPanelDraw( _meta, _parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UIELEMENT_GUIPANELEDGE", new Generator<GUIPanelEdge.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIPanelEdge.Meta _meta )
+			public GUIBase create( final GUIPanelEdge.Meta _meta, final UIElement _parent )
 			{
-				return new GUIPanelEdge( _meta ) ;
+				return new GUIPanelEdge( _meta, _parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UILIST_GUISCROLLBAR", new Generator<GUIScrollbar.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIScrollbar.Meta _meta )
+			public GUIBase create( final GUIScrollbar.Meta _meta, final UIElement _parent )
 			{
 				return null ;
 			}
@@ -69,18 +71,18 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUITEXT", new Generator<GUIText.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIText.Meta _meta )
+			public GUIBase create( final GUIText.Meta _meta, final UIElement _parent )
 			{
-				return new GUIText( _meta ) ;
+				return new GUIText( _meta, _parent ) ;
 			}
 		} ) ;
 
 		creators.put( "UICHECKBOX_GUITICK", new Generator<GUITick.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUITick.Meta _meta )
+			public GUIBase create( final GUITick.Meta _meta, final UIElement _parent )
 			{
-				return new GUITick( _meta ) ;
+				return new GUITick( _meta, ( UICheckbox )_parent ) ;
 			}
 		} ) ;
 	}
@@ -90,7 +92,7 @@ public class GUIGenerator
 		creators.put( _id, _generator ) ;
 	}
 
-	public static <E extends IBase> E create( final IBase.Meta _meta )
+	public static <E extends UIElement.Listener> E create( final UIElement.MetaListener _meta, final UIElement _parent )
 	{
 		final String type = _meta.getType() ;
 		final Generator generator = creators.get( type ) ;
@@ -100,11 +102,11 @@ public class GUIGenerator
 			return null ;
 		}
 
-		return ( E )generator.create( _meta ) ;
+		return ( E )generator.create( _meta, _parent ) ;
 	}
 
-	public interface Generator<M extends IBase.Meta>
+	public interface Generator<M extends UIElement.MetaListener>
 	{
-		public GUIBase create( final M _meta ) ;
+		public GUIBase create( final M _meta, final UIElement _parent ) ;
 	}
 }

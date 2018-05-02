@@ -26,7 +26,7 @@ public class UIElement implements InputHandler, Connect.Connection
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
-	private final ListenerUnit<IBase<? extends UIElement>> listeners = new ListenerUnit<IBase<? extends UIElement>>() ;
+	private final ListenerUnit listeners = new ListenerUnit() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 	private final Connect connect = new Connect() ;
 
@@ -39,7 +39,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
-	private DrawDelegate<World, Draw> drawDelegate ;
+	private DrawDelegate drawDelegate ;
 	private World world ;
 	private Camera camera = CameraAssist.getDefaultCamera() ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
@@ -84,13 +84,13 @@ public class UIElement implements InputHandler, Connect.Connection
 		Return the Draw objects that this UIElement wishes 
 		to render to the rendering system.
 	*/
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		drawDelegate = _delegate ;
 		world = _world ;
 		camera = ( _camera != null ) ? _camera : camera ;
 
-		final List<IBase<? extends UIElement>> base = listeners.getListeners() ;
+		final List<UIElement.Listener> base = listeners.getListeners() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -114,7 +114,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		Caution: ABases not designed for the elements 
 		sub-type can still be added, not caught at compile-time.
 	*/
-	public <T extends IBase> T addListener( final T _listener )
+	public <T extends Listener> T addListener( final T _listener )
 	{
 		return addListener( 0, _listener ) ;
 	}
@@ -127,14 +127,12 @@ public class UIElement implements InputHandler, Connect.Connection
 		Inserts the listener at the specified index, shifts existing 
 		listeners to the right. 
 	*/
-	public <T extends IBase> T addListener( final int _index, final T _listener )
+	public <T extends Listener> T addListener( final int _index, final T _listener )
 	{
 		if( _listener != null )
 		{
-			if( listeners.add( _index, _listener ) == true )
-			{
-				_listener.setParent( this ) ;
-			}
+			listeners.add( _index, _listener ) ;
+			_listener.constructDraws() ;
 		}
 		return _listener ;
 	}
@@ -144,7 +142,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		return true if the listener was removed else 
 		return false.
 	*/
-	public <T extends IBase<? extends UIElement>> boolean removeListener( final T _listener )
+	public <T extends Listener> boolean removeListener( final T _listener )
 	{
 		return listeners.remove( _listener ) ;
 	}
@@ -286,7 +284,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	}
 
-	private static InputEvent.Action updateListeners( final List<IBase<? extends UIElement>> _base,
+	private static InputEvent.Action updateListeners( final List<UIElement.Listener> _base,
 													  final InputAction _action,
 													  final InputEvent _event )
 	{
@@ -740,7 +738,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		This may return null if the renderer has yet to 
 		provide a draw delegate. 
 	*/
-	public DrawDelegate<World, Draw> getDrawDelegate()
+	public DrawDelegate getDrawDelegate()
 	{
 		return drawDelegate ;
 	}
@@ -767,7 +765,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	/**
 		Returns the listeners owned by this UIElement.
 	*/
-	protected ListenerUnit<IBase<? extends UIElement>> getListenerUnit()
+	protected ListenerUnit getListenerUnit()
 	{
 		return listeners ;
 	}
@@ -1046,13 +1044,13 @@ public class UIElement implements InputHandler, Connect.Connection
 
 	private interface InputAction
 	{
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event ) ;
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event ) ;
 	}
 
 	private static final InputAction scrollAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.scroll( _event ) ;
 		}
@@ -1061,7 +1059,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction mouseMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.mouseMove( _event ) ;
 		}
@@ -1070,7 +1068,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction mousePressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.mousePressed( _event ) ;
 		}
@@ -1079,7 +1077,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction mouseReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.mouseReleased( _event ) ;
 		}
@@ -1088,7 +1086,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction touchMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.touchMove( _event ) ;
 		}
@@ -1097,7 +1095,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction touchPressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.touchPressed( _event ) ;
 		}
@@ -1106,7 +1104,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction touchReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.touchReleased( _event ) ;
 		}
@@ -1115,7 +1113,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction keyReleasedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.keyReleased( _event ) ;
 		}
@@ -1124,7 +1122,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction keyPressedAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.keyPressed( _event ) ;
 		}
@@ -1133,7 +1131,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	private static final InputAction analogueMoveAction = new InputAction()
 	{
 		@Override
-		public InputEvent.Action action( final IBase _listener, final InputEvent _event )
+		public InputEvent.Action action( final UIElement.Listener _listener, final InputEvent _event )
 		{
 			return _listener.analogueMove( _event ) ;
 		}
@@ -1154,7 +1152,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		private final UIVariant minimumLength = new UIVariant( "MIN_LENGTH", new Vector3(), new Connect.Signal() ) ;
 		private final UIVariant maximumLength = new UIVariant( "MAX_LENGTH", new Vector3(), new Connect.Signal() ) ;
 
-		private final List<IBase.Meta> listeners = MalletList.<IBase.Meta>newList() ;
+		private final List<UIElement.MetaListener> listeners = MalletList.<UIElement.MetaListener>newList() ;
 
 		private final Connect.Signal listenerAdded = new Connect.Signal() ;
 		private final Connect.Signal listenerRemoved = new Connect.Signal() ;
@@ -1367,7 +1365,7 @@ public class UIElement implements InputHandler, Connect.Connection
 			return _populate ;
 		}
 
-		public <M extends IBase.Meta> M addListener( final M _meta )
+		public <M extends UIElement.MetaListener> M addListener( final M _meta )
 		{
 			if( _meta != null && listeners.contains( _meta ) == false )
 			{
@@ -1377,7 +1375,7 @@ public class UIElement implements InputHandler, Connect.Connection
 			return _meta ;
 		}
 
-		public <M extends IBase.Meta> M removeListener( final M _meta )
+		public <M extends UIElement.MetaListener> M removeListener( final M _meta )
 		{
 			if( _meta != null && listeners.contains( _meta ) == true )
 			{
@@ -1390,7 +1388,7 @@ public class UIElement implements InputHandler, Connect.Connection
 			return null ;
 		}
 
-		public List<IBase.Meta> getListeners( final List<IBase.Meta> _listeners )
+		public List<UIElement.MetaListener> getListeners( final List<UIElement.MetaListener> _listeners )
 		{
 			_listeners.addAll( listeners ) ;
 			return _listeners ;
@@ -1487,6 +1485,142 @@ public class UIElement implements InputHandler, Connect.Connection
 		{
 			return listenerRemoved ;
 		}
+	}
+
+	public abstract class Listener
+	{
+		public Listener() {}
+
+		/**
+			Return the parent UIElement that this listener was 
+			added to.
+			Should return null if the listener has not or has been 
+			removed from a UIElement.
+		*/
+		public UIElement getParent()
+		{
+			return UIElement.this ;
+		}
+
+		/**
+			Send the event back-up the chain.
+		*/
+		public void sendEvent( final Event<?> _event )
+		{
+			if( UIElement.this != null )
+			{
+				UIElement.this.addEvent( _event ) ;
+			}
+		}
+
+		/**
+			Called when the scroll is moved.
+		*/
+		public InputEvent.Action scroll( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when the mouse is moved.
+		*/
+		public InputEvent.Action mouseMove( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when the mouse has a trigger pressed.
+		*/
+		public InputEvent.Action mousePressed( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when the mouse has a trigger released.
+		*/
+		public InputEvent.Action mouseReleased( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when the user is moving a pressed finger 
+			on the touch screen.
+		*/
+		public InputEvent.Action touchMove( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when a touch screen is pressed.
+		*/
+		public InputEvent.Action touchPressed( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when a touch screen is released.
+		*/
+		public InputEvent.Action touchReleased( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when a key is pressed.
+		*/
+		public InputEvent.Action keyPressed( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when a key is released.
+		*/
+		public InputEvent.Action keyReleased( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Called when a joystick/gamepad stick is waggled.
+		*/
+		public InputEvent.Action analogueMove( final InputEvent _input )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		/**
+			Can be used to construct Draw objects before a 
+			DrawDelegate is provided by the Rendering System.
+		*/
+		public void constructDraws() {}
+
+		/**
+			Called when parent UIElement is ready to recieve 
+			draw requests.
+		*/
+		public void passDrawDelegate( final DrawDelegate _delegate, final World _world ) {}
+
+		/**
+			Called when parent UIElement is refreshing itself.
+		*/
+		public abstract void refresh() ;
+
+		/**
+			Called when parent UIElement has been flagged for shutdown.
+			Clean up any resources you may have allocated.
+		*/
+		public abstract void shutdown() ;
+	}
+
+	public static abstract class MetaListener implements Connect.Connection
+	{
+		public abstract String getType() ;
 	}
 
 	public static class UV

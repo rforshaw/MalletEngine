@@ -13,29 +13,29 @@ package com.linxonline.mallet.renderer ;
 
 	DrawDelegate can also add Worlds to the rendering-system.
 */
-public interface DrawDelegate<W extends World, D extends Draw>
+public interface DrawDelegate
 {
 	/**
 		Added to the default world.
 		A Draw object should not be added to more than one World.
 	*/
-	public void addTextDraw( final D _draw ) ;
-	public void addBasicDraw( final D _draw ) ;
+	public void addTextDraw( final Draw _draw ) ;
+	public void addBasicDraw( final Draw _draw ) ;
 
 	/**
 		Add Draw to a specific world.
 		A Draw object should not be added to more than one World.
 	*/
-	public void addTextDraw( final D _draw, final W _world ) ;
-	public void addBasicDraw( final D _draw, final W _world ) ;
-	public void removeDraw( final D _draw ) ;
+	public void addTextDraw( final Draw _draw, final World _world ) ;
+	public void addBasicDraw( final Draw _draw, final World _world ) ;
+	public void removeDraw( final Draw _draw ) ;
 
 	/**
 		Return the Camera associated with the unique _id.
 		If World is not specified the camera is assumed to 
 		be in the default world.
 	*/
-	public Camera getCamera( final String _id, final W _world ) ;
+	public Camera getCamera( final String _id, final World _world ) ;
 
 	/**
 		Return the World associated with the unique _id.

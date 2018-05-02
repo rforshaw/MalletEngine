@@ -4,13 +4,13 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class ListenerUnit<T extends IBase<? extends UIElement>>
+public class ListenerUnit
 {
-	private final List<T> listeners = MalletList.<T>newList() ;
+	private final List<UIElement.Listener> listeners = MalletList.<UIElement.Listener>newList() ;
 
 	public ListenerUnit() {}
 
-	public boolean add( final T _listener )
+	public boolean add( final UIElement.Listener _listener )
 	{
 		if( _listener != null )
 		{
@@ -23,7 +23,7 @@ public class ListenerUnit<T extends IBase<? extends UIElement>>
 		return false ;
 	}
 
-	public boolean add( final int _index, final T _listener )
+	public boolean add( final int _index, final UIElement.Listener _listener )
 	{
 		if( _listener != null )
 		{
@@ -36,7 +36,7 @@ public class ListenerUnit<T extends IBase<? extends UIElement>>
 		return false ;
 	}
 
-	public boolean remove( final T _listener )
+	public boolean remove( final UIElement.Listener _listener )
 	{
 		if( listeners.remove( _listener ) == true )
 		{
@@ -46,7 +46,7 @@ public class ListenerUnit<T extends IBase<? extends UIElement>>
 		return false ;
 	}
 
-	public List<T> getListeners()
+	public List<UIElement.Listener> getListeners()
 	{
 		return listeners ;
 	}

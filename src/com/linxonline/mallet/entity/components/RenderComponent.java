@@ -20,7 +20,7 @@ public class RenderComponent extends Entity.Component
 	private final List<Tuple<Draw, World>> toAddBasic = MalletList.<Tuple<Draw, World>>newList() ;
 	private final List<Tuple<Draw, World>> toAddText = MalletList.<Tuple<Draw, World>>newList() ;
 
-	private DrawDelegate<World, Draw> drawDelegate = null ;
+	private DrawDelegate drawDelegate = null ;
 	private Entity.ReadyCallback toDestroy = null ;
 
 	public RenderComponent( final Entity _parent )
@@ -117,7 +117,7 @@ public class RenderComponent extends Entity.Component
 		super.passInitialEvents( _events ) ;
 		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
 		{
-			public void callback( final DrawDelegate<World, Draw> _delegate )
+			public void callback( final DrawDelegate _delegate )
 			{
 				drawDelegate = _delegate ;
 				if( toAddBasic.isEmpty() == false )

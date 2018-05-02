@@ -45,7 +45,7 @@ public class UIButton extends UIElement
 
 	private void init()
 	{
-		addListener( new InputListener<UIButton>()
+		addListener( new InputListener( this )
 		{
 			@Override
 			public InputEvent.Action touchReleased( final InputEvent _input )
@@ -62,7 +62,7 @@ public class UIButton extends UIElement
 			@Override
 			public InputEvent.Action mouseReleased( final InputEvent _input )
 			{
-				final UIButton parent = getParent() ;
+				final UIButton parent = ( UIButton )getParent() ;
 				UIElement.signal( parent, parent.released() ) ;
 				return InputEvent.Action.CONSUME ;
 			}
@@ -70,7 +70,7 @@ public class UIButton extends UIElement
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
-				final UIButton parent = getParent() ;
+				final UIButton parent = ( UIButton )getParent() ;
 				UIElement.signal( parent, parent.pressed() ) ;
 				return InputEvent.Action.CONSUME ;
 			}

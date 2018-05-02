@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIText<T extends UIElement> extends GUIBase<T>
+public class GUIText extends GUIBase
 {
 	protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
@@ -15,9 +15,9 @@ public class GUIText<T extends UIElement> extends GUIBase<T>
 
 	protected Draw drawText = null ;
 
-	public GUIText( final Meta _meta )
+	public GUIText( final Meta _meta, final UIElement _parent )
 	{
-		super() ;
+		super( _parent ) ;
 		setLayerOffset( 1 ) ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
@@ -27,22 +27,15 @@ public class GUIText<T extends UIElement> extends GUIBase<T>
 		colour = _meta.getColour( colour ) ;
 	}
 
-	public GUIText( final String _text, final MalletFont _font )
+	public GUIText( final String _text, final MalletFont _font, final UIElement _parent )
 	{
-		super() ;
+		super( _parent ) ;
 		setLayerOffset( 1 ) ;
 		font = _font ;
 		if( _text != null )
 		{
 			text.append( _text ) ;
 		}
-	}
-
-	@Override
-	public void setParent( final T _parent )
-	{
-		super.setParent( _parent ) ;
-		
 	}
 
 	public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -92,7 +85,7 @@ public class GUIText<T extends UIElement> extends GUIBase<T>
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void addDraws( final DrawDelegate _delegate, final World _world )
 	{
 		if( drawText != null )
 		{
@@ -105,7 +98,7 @@ public class GUIText<T extends UIElement> extends GUIBase<T>
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+	public void removeDraws( final DrawDelegate _delegate )
 	{
 		_delegate.removeDraw( drawText ) ;
 	}

@@ -71,10 +71,10 @@ public class UIWrapper extends UIElement
 			}
 		} ) ;
 
-		final SingleEngageListener engage = addListener( new SingleEngageListener() ) ;
-		final GUILineDraw line = addListener( new GUILineDraw() ) ;
+		final SingleEngageListener engage = addListener( new SingleEngageListener( this ) ) ;
+		final GUILineDraw line = addListener( new GUILineDraw( this ) ) ;
 
-		addListener( new InputListener<UIWrapper>()
+		addListener( new InputListener( this )
 		{
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
@@ -84,7 +84,7 @@ public class UIWrapper extends UIElement
 					return InputEvent.Action.PROPAGATE ;
 				}
 
-				final UIWrapper parent = getParent() ;
+				final UIWrapper parent = ( UIWrapper )getParent() ;
 				sendEvent( new Event<UIWrapper>( "DISPLAY_META", parent ) ) ;
 
 				line.setColour( MalletColour.blue() ) ;
@@ -105,7 +105,7 @@ public class UIWrapper extends UIElement
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate<World, Draw> _delegate, final World _world, final Camera _camera )
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		super.passDrawDelegate( _delegate, _world, _camera ) ;
 		element.passDrawDelegate( _delegate, _world, _camera ) ;
@@ -271,7 +271,7 @@ public class UIWrapper extends UIElement
 		element.clear() ;
 	}
 
-	private static class GUILineDraw extends GUIBase<UIWrapper>
+	private static class GUILineDraw extends GUIBase
 	{
 		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
@@ -280,12 +280,9 @@ public class UIWrapper extends UIElement
 
 		protected Draw draw = null ;
 
-		public GUILineDraw() {}
-
-		@Override
-		public void setParent( final UIWrapper _parent )
+		public GUILineDraw( final UIWrapper _parent )
 		{
-			super.setParent( _parent ) ;
+			super( _parent ) ;
 			updateLength( _parent.getLength(), getLength() ) ;
 			updateOffset( _parent.getOffset(), getOffset() ) ;
 		}
@@ -328,7 +325,7 @@ public class UIWrapper extends UIElement
 		}
 
 		@Override
-		public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+		public void addDraws( final DrawDelegate _delegate, final World _world )
 		{
 			if( draw != null )
 			{
@@ -337,7 +334,7 @@ public class UIWrapper extends UIElement
 		}
 
 		@Override
-		public void removeDraws( final DrawDelegate<World, Draw> _delegate )
+		public void removeDraws( final DrawDelegate _delegate )
 		{
 			_delegate.removeDraw( draw ) ;
 		}
@@ -346,7 +343,7 @@ public class UIWrapper extends UIElement
 		public void refresh()
 		{
 			super.refresh() ;
-			final UIWrapper parent = getParent() ;
+			final UIElement parent = getParent() ;
 
 			if( draw != null && parent.isVisible() == true )
 			{
@@ -391,15 +388,13 @@ public class UIWrapper extends UIElement
 		}
 	}
 
-	public static class SingleEngageListener extends InputListener<UIWrapper>
+	public static class SingleEngageListener extends InputListener
 	{
 		private UIWrapper currentEngaged = null ;
 
-		public SingleEngageListener() {}
-
-		@Override
-		public void setParent( UIWrapper _parent )
+		public SingleEngageListener( final UIWrapper _parent )
 		{
+			super( _parent ) ;
 			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UIWrapper>()
 			{
 				@Override
@@ -412,13 +407,12 @@ public class UIWrapper extends UIElement
 					disengageOthers( null, _wrapper.children ) ;
 				}
 			} ) ;
-			super.setParent( _parent ) ;
 		}
 
 		@Override
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
-			final UIWrapper parent = getParent() ;
+			final UIWrapper parent = getParentWrapper() ;
 			if( parent.children == null )
 			{
 				return InputEvent.Action.PROPAGATE ;
@@ -510,6 +504,11 @@ public class UIWrapper extends UIElement
 		private InputEvent.Action passInput( final UIWrapper _current, final InputEvent _input )
 		{
 			return ( _current != null ) ? _current.passInputEvent( _input ) : InputEvent.Action.PROPAGATE ;
+		}
+
+		public UIWrapper getParentWrapper()
+		{
+			return ( UIWrapper )getParent() ;
 		}
 
 		public void setEngaged( final UIWrapper _toEngage )

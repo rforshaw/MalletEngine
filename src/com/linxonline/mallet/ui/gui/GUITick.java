@@ -5,14 +5,14 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUITick<T extends UICheckbox> extends GUIDraw<T>
+public class GUITick extends GUIDraw
 {
-	private final Connect.Slot<T> checkSlot = new Connect.Slot<T>()
+	private final Connect.Slot<UICheckbox> checkSlot = new Connect.Slot<UICheckbox>()
 	{
 		@Override
-		public void slot( final T _box )
+		public void slot( final UICheckbox _box )
 		{
-			final DrawDelegate<World, Draw> delegate = getDrawDelegate() ;
+			final DrawDelegate delegate = getDrawDelegate() ;
 			if( delegate != null )
 			{
 				if( _box.isChecked() == true )
@@ -28,16 +28,11 @@ public class GUITick<T extends UICheckbox> extends GUIDraw<T>
 		}
 	} ;
 
-	public GUITick( final Meta _meta )
+	public GUITick( final Meta _meta, final UICheckbox _parent )
 	{
-		super( _meta ) ;
+		super( _meta, _parent ) ;
 		setLayerOffset( 1 ) ;
-	}
 
-	@Override
-	public void setParent( final T _parent )
-	{
-		super.setParent( _parent ) ;
 		UIElement.connect( _parent, _parent.checkChanged(), checkSlot ) ;
 	}
 
@@ -45,7 +40,7 @@ public class GUITick<T extends UICheckbox> extends GUIDraw<T>
 	public void shutdown()
 	{
 		super.shutdown() ;
-		final T parent = getParent() ;
+		final UICheckbox parent = getParentCheckbox() ;
 		UIElement.disconnect( parent, parent.checkChanged(), checkSlot ) ;
 	}
 
@@ -54,12 +49,17 @@ public class GUITick<T extends UICheckbox> extends GUIDraw<T>
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate<World, Draw> _delegate, final World _world )
+	public void addDraws( final DrawDelegate _delegate, final World _world )
 	{
-		if( getParent().isChecked() == true )
+		if( getParentCheckbox().isChecked() == true )
 		{
 			super.addDraws( _delegate, _world ) ;
 		}
+	}
+
+	UICheckbox getParentCheckbox()
+	{
+		return ( UICheckbox )getParent() ;
 	}
 
 	public static class Meta extends GUIDraw.Meta
