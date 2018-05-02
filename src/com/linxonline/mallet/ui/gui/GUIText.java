@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIText extends GUIBase
+public class GUIText extends GUIComponent
 {
 	protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
@@ -153,7 +153,7 @@ public class GUIText extends GUIBase
 		return colour ;
 	}
 
-	public static class Meta extends GUIBase.Meta
+	public static class Meta extends GUIComponent.Meta
 	{
 		private UI.Alignment xAlign = UI.Alignment.CENTRE ;
 		private UI.Alignment yAlign = UI.Alignment.CENTRE ;

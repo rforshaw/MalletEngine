@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIScrollbar extends GUIBase
+public class GUIScrollbar extends GUIComponent
 {
 	private final Vector3 xLength = new Vector3() ;
 	private final Vector3 yLength = new Vector3() ;
@@ -145,7 +145,7 @@ public class GUIScrollbar extends GUIBase
 		yLength.setXYZ( _length.x, _width.y, _width.z ) ;
 	}
 
-	public static class Meta extends GUIBase.Meta
+	public static class Meta extends GUIComponent.Meta
 	{
 		public Meta() {}
 

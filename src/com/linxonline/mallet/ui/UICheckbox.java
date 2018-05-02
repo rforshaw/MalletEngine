@@ -22,7 +22,7 @@ public class UICheckbox extends UIElement
 
 	private void init()
 	{
-		addListener( new InputListener( this )
+		addComponent( new InputComponent( this )
 		{
 			@Override
 			public InputEvent.Action touchReleased( final InputEvent _input )

@@ -46,9 +46,9 @@ public class JUI
 				final UIElement.Meta meta = new UIElement.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -68,8 +68,8 @@ public class JUI
 				applyBasics( _ui, meta ) ;
 				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -98,8 +98,8 @@ public class JUI
 				applyBasics( _ui, meta ) ;
 				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -119,9 +119,9 @@ public class JUI
 				final UITextField.Meta meta = new UITextField.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-				meta.addListener( JUI.createGUIEditText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIEditText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
 
 				return meta ;
 			}
@@ -139,9 +139,9 @@ public class JUI
 				final UIButton.Meta meta = new UIButton.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
-				meta.addListener( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addComponent( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -162,8 +162,8 @@ public class JUI
 				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 				meta.setThickness( ( float )_ui.optDouble( "THICKNESS", 0.0 ) ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -185,8 +185,8 @@ public class JUI
 				applyBasics( _ui, meta ) ;
 				meta.setAxis( UISpacer.Axis.derive( _ui.optString( "AXIS", null ) ) ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -204,9 +204,9 @@ public class JUI
 				final UICheckbox.Meta meta = new UICheckbox.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUITick( _ui.getJSONObject( "UITICK" ) )  ) ;
-				meta.addListener( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUITick( _ui.getJSONObject( "UITICK" ) )  ) ;
+				meta.addComponent( JUI.createGUIPanelDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -226,9 +226,9 @@ public class JUI
 				applyBasics( _ui, meta ) ;
 				meta.setType( ILayout.Type.derive( _ui.optString( "LAYOUT", null ) ) ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
-				meta.addListener( JUI.createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createScrollbar( _ui.getJSONObject( "SCROLLBAR" ) ) ) ;
 
 				return meta ;
 			}
@@ -248,9 +248,9 @@ public class JUI
 				final UIButton.Meta meta = new UIButton.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIText( _ui.getJSONObject( "UITEXT" ), UIRatio.getGlobalUIRatio() ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}
@@ -261,7 +261,7 @@ public class JUI
 
 				final UIMenu.Item element = new UIMenu.Item( dropdown ) ;
 				UIElement.applyMeta( _meta, element ) ;
-				UIGenerator.addListeners( element, _meta ) ;
+				UIGenerator.addComponents( element, _meta ) ;
 
 				return element ;
 			}
@@ -274,8 +274,8 @@ public class JUI
 				final UIAbstractView.Meta meta = new UIAbstractView.Meta() ;
 				applyBasics( _ui, meta ) ;
 
-				meta.addListener( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
-				meta.addListener( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
+				meta.addComponent( JUI.createGUIDraw( _ui.getJSONObject( "UIDRAW" ) ) ) ;
+				meta.addComponent( JUI.createGUIPanelEdge( _ui.getJSONObject( "UIEDGE" ) ) ) ;
 
 				return meta ;
 			}

@@ -16,7 +16,10 @@ import com.linxonline.mallet.animation.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.entity.components.* ;
+import com.linxonline.mallet.entity.components.AnimComponent ;
+import com.linxonline.mallet.entity.components.EventComponent ;
+import com.linxonline.mallet.entity.components.MouseComponent ;
+import com.linxonline.mallet.entity.components.UIComponent ;
 
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.util.settings.Settings ;
@@ -175,15 +178,15 @@ public class UIEditorState extends GameState
 		final UIButton.Meta meta = new UIButton.Meta() ;
 
 		{
-			final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+			final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
 			edge.setSheet( "base/textures/edge_button.png" ) ;
 
-			final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
+			final GUIText.Meta text = meta.addComponent( new GUIText.Meta() ) ;
 			text.setText( _name ) ;
 		}
 
 		final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
-		button.addListener( new InputListener( button )
+		button.addComponent( new InputComponent( button )
 		{
 			@Override
 			public InputEvent.Action touchPressed( final InputEvent _input )

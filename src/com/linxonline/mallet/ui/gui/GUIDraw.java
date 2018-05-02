@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUIDraw extends GUIBase
+public class GUIDraw extends GUIComponent
 {
 	private final Vector3 aspectRatio = new Vector3() ;		// Visual elements aspect ratio
 	protected boolean retainRatio = false ;
@@ -172,7 +172,7 @@ public class GUIDraw extends GUIBase
 		return sheet ;
 	}
 
-	public static class Meta extends GUIBase.Meta
+	public static class Meta extends GUIComponent.Meta
 	{
 		private boolean retainRatio = false ;
 		private UI.Alignment xAlign = UI.Alignment.LEFT ;

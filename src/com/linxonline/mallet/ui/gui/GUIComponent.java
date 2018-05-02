@@ -19,7 +19,7 @@ import com.linxonline.mallet.maths.* ;
 	on each function call - else the slots will not be removed 
 	on shutdown.
 */
-public abstract class GUIBase extends UIElement.Listener
+public abstract class GUIComponent extends UIElement.Component
 {
 	private DrawDelegate delegate = null ;
 	private World world = null ;
@@ -86,7 +86,7 @@ public abstract class GUIBase extends UIElement.Listener
 		}
 	} ;
 
-	public GUIBase( final UIElement _parent )
+	public GUIComponent( final UIElement _parent )
 	{
 		_parent.super() ;
 		visible = _parent.isVisible() ;
@@ -242,7 +242,7 @@ public abstract class GUIBase extends UIElement.Listener
 		return world ;
 	}
 
-	public static class Meta extends UIElement.MetaListener
+	public static class Meta extends UIElement.MetaComponent
 	{
 		private final Connect connect = new Connect() ;
 

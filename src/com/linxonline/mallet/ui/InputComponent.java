@@ -8,9 +8,9 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 
-public abstract class InputListener extends UIElement.Listener
+public abstract class InputComponent extends UIElement.Component
 {
-	public InputListener( final UIElement _parent )
+	public InputComponent( final UIElement _parent )
 	{
 		_parent.super() ;
 	}

@@ -71,10 +71,10 @@ public class UIWrapper extends UIElement
 			}
 		} ) ;
 
-		final SingleEngageListener engage = addListener( new SingleEngageListener( this ) ) ;
-		final GUILineDraw line = addListener( new GUILineDraw( this ) ) ;
+		final SingleEngageComponent engage = addComponent( new SingleEngageComponent( this ) ) ;
+		final GUILineDraw line = addComponent( new GUILineDraw( this ) ) ;
 
-		addListener( new InputListener( this )
+		addComponent( new InputComponent( this )
 		{
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
@@ -271,7 +271,7 @@ public class UIWrapper extends UIElement
 		element.clear() ;
 	}
 
-	private static class GUILineDraw extends GUIBase
+	private static class GUILineDraw extends GUIComponent
 	{
 		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
@@ -388,11 +388,11 @@ public class UIWrapper extends UIElement
 		}
 	}
 
-	public static class SingleEngageListener extends InputListener
+	public static class SingleEngageComponent extends InputComponent
 	{
 		private UIWrapper currentEngaged = null ;
 
-		public SingleEngageListener( final UIWrapper _parent )
+		public SingleEngageComponent( final UIWrapper _parent )
 		{
 			super( _parent ) ;
 			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UIWrapper>()

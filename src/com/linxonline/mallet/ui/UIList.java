@@ -43,13 +43,13 @@ public class UIList extends UILayout
 								 length.x,   length.y,   getLayer() + 1 ) ;
 		initFrameConnections() ;
 
-		setEngageMode( new ScrollSingleEngageListener( this ) ) ;
+		setEngageMode( new ScrollSingleEngageComponent( this ) ) ;
 		initScrollInput() ;
 	}
 
 	private void initScrollInput()
 	{
-		addListener( new ScrollInputListener( this ) ) ;
+		addComponent( new ScrollInputComponent( this ) ) ;
 	}
 
 	private void initFrameConnections()
@@ -142,7 +142,7 @@ public class UIList extends UILayout
 	{
 		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
 
-		final List<UIElement.Listener> base = getListenerUnit().getListeners() ;
+		final List<UIElement.Component> base = getComponentUnit().getComponents() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -585,11 +585,11 @@ public class UIList extends UILayout
 		return dragDelayChanged ;
 	}
 
-	public class ScrollSingleEngageListener extends SingleEngageListener
+	public class ScrollSingleEngageComponent extends SingleEngageComponent
 	{
 		private InputEvent lastInput = null ;
 	
-		public ScrollSingleEngageListener( final UILayout _parent )
+		public ScrollSingleEngageComponent( final UILayout _parent )
 		{
 			super( _parent ) ;
 		}
@@ -617,7 +617,7 @@ public class UIList extends UILayout
 		}
 	}
 	
-	private static class ScrollInputListener extends InputListener
+	private static class ScrollInputComponent extends InputComponent
 	{
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 length = new Vector3() ;
@@ -639,7 +639,7 @@ public class UIList extends UILayout
 			}
 		} ;
 
-		public ScrollInputListener( final UIList _parent )
+		public ScrollInputComponent( final UIList _parent )
 		{
 			super( _parent ) ;
 			UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
@@ -656,7 +656,7 @@ public class UIList extends UILayout
 		@Override
 		public InputEvent.Action scroll( final InputEvent _input )
 		{
-			final EngageListener mode = getParentList().getEngageMode() ;
+			final EngageComponent mode = getParentList().getEngageMode() ;
 			if( mode.isEngaged() == true )
 			{
 				applyScroll( -_input.getMouseX() * 10, -_input.getMouseY() * 10 ) ;
@@ -704,7 +704,7 @@ public class UIList extends UILayout
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
 			InputEvent.Action action = InputEvent.Action.CONSUME ;
-			final EngageListener mode = getParentList().getEngageMode() ;
+			final EngageComponent mode = getParentList().getEngageMode() ;
 			if( pressed == true )
 			{
 				final UIList parent = getParentList() ;

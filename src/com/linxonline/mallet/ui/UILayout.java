@@ -47,7 +47,7 @@ public class UILayout extends UIElement implements IChildren
 	// chain reaction of almost everything updating.
 	private boolean dirtyChildren = false ;											// Used to determine if the children are dirty
 
-	private EngageListener engageMode = null ;										// Selection/Focus mode
+	private EngageComponent engageMode = null ;										// Selection/Focus mode
 
 	private final Connect.Signal typeChanged = new Connect.Signal() ;
 
@@ -57,7 +57,7 @@ public class UILayout extends UIElement implements IChildren
 		initLayoutConnections() ;
 
 		setType( _type ) ;
-		setEngageMode( new SingleEngageListener( this ) ) ;
+		setEngageMode( new SingleEngageComponent( this ) ) ;
 	}
 
 	private void initLayoutConnections()
@@ -182,13 +182,13 @@ public class UILayout extends UIElement implements IChildren
 		will allow the layout to change how it decides 
 		elements are flagged as engaged.
 	*/
-	public void setEngageMode( final EngageListener _listener )
+	public void setEngageMode( final EngageComponent _listener )
 	{
-		removeListener( getEngageMode() ) ;
-		engageMode = addListener( _listener ) ;
+		removeComponent( getEngageMode() ) ;
+		engageMode = addComponent( _listener ) ;
 	}
 
-	public EngageListener getEngageMode()
+	public EngageComponent getEngageMode()
 	{
 		return engageMode ;
 	}
@@ -692,9 +692,9 @@ public class UILayout extends UIElement implements IChildren
 		return UIElement.applyMeta( _meta, _layout ) ;
 	}
 
-	public static abstract class EngageListener extends InputListener
+	public static abstract class EngageComponent extends InputComponent
 	{
-		public EngageListener( final UILayout _parent )
+		public EngageComponent( final UILayout _parent )
 		{
 			super( _parent ) ;
 		}
@@ -711,11 +711,11 @@ public class UILayout extends UIElement implements IChildren
 		enforce this rule when using keyboard inputs and 
 		gamepad inputs, for now it will deal with mouse/touch inputs.
 	*/
-	public static class SingleEngageListener extends EngageListener
+	public static class SingleEngageComponent extends EngageComponent
 	{
 		private UIElement currentEngaged = null ;
 
-		public SingleEngageListener( final UILayout _parent )
+		public SingleEngageComponent( final UILayout _parent )
 		{
 			super( _parent ) ;
 			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UILayout>()

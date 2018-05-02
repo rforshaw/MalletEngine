@@ -299,10 +299,10 @@ public class UIAbstractView extends UIElement
 				final UIButton.Meta meta = new UIButton.Meta() ;
 
 				{
-					final GUIPanelEdge.Meta edge = meta.addListener( new GUIPanelEdge.Meta() ) ;
+					final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
 					edge.setSheet( "base/textures/edge_button.png" ) ;
 
-					final GUIText.Meta text = meta.addListener( new GUIText.Meta() ) ;
+					final GUIText.Meta text = meta.addComponent( new GUIText.Meta() ) ;
 					text.setText( "Test" ) ;
 				}
 

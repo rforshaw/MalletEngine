@@ -69,12 +69,12 @@ public final class UIFactory
 		CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 		CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
 
-		layout.addListener( new WindowListener( layout, _camera, dimension ) ) ;
+		layout.addComponent( new WindowListener( layout, _camera, dimension ) ) ;
 
 		return layout ;
 	}
 
-	private static class WindowListener extends UIElement.Listener
+	private static class WindowListener extends UIElement.Component
 	{
 		private final Notification.Notify<String> widthNotify ;
 		private final Notification.Notify<String> heightNotify ;

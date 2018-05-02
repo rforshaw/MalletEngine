@@ -27,7 +27,7 @@ public class UIGenerator
 			@Override
 			public UIElement create( final UIElement.Meta _meta )
 			{
-				return addListeners( new UIElement(), _meta ) ;
+				return addComponents( new UIElement(), _meta ) ;
 			}
 
 			@Override
@@ -42,7 +42,7 @@ public class UIGenerator
 			@Override
 			public UILayout create( final UILayout.Meta _meta )
 			{
-				return addListeners( new UILayout( _meta.getType() ), _meta ) ;
+				return addComponents( new UILayout( _meta.getType() ), _meta ) ;
 			}
 
 			@Override
@@ -57,7 +57,7 @@ public class UIGenerator
 			@Override
 			public UILayout create( final UILayout.Meta _meta )
 			{
-				return addListeners( UIFactory.constructWindowLayout( _meta.getType() ), _meta ) ;
+				return addComponents( UIFactory.constructWindowLayout( _meta.getType() ), _meta ) ;
 			}
 
 			@Override
@@ -74,7 +74,7 @@ public class UIGenerator
 			@Override
 			public UITextField create( final UITextField.Meta _meta )
 			{
-				return addListeners( new UITextField(), _meta ) ;
+				return addComponents( new UITextField(), _meta ) ;
 			}
 
 			@Override
@@ -89,7 +89,7 @@ public class UIGenerator
 			@Override
 			public UIButton create( final UIButton.Meta _meta )
 			{
-				return addListeners( new UIButton(), _meta ) ;
+				return addComponents( new UIButton(), _meta ) ;
 			}
 
 			@Override
@@ -104,7 +104,7 @@ public class UIGenerator
 			@Override
 			public UIMenu create( final UIMenu.Meta _meta )
 			{
-				return addListeners( new UIMenu( _meta.getType(), _meta.getThickness() ), _meta ) ;
+				return addComponents( new UIMenu( _meta.getType(), _meta.getThickness() ), _meta ) ;
 			}
 
 			@Override
@@ -119,7 +119,7 @@ public class UIGenerator
 			@Override
 			public UISpacer create( final UISpacer.Meta _meta )
 			{
-				return addListeners( new UISpacer( _meta.getAxis() ), _meta ) ;
+				return addComponents( new UISpacer( _meta.getAxis() ), _meta ) ;
 			}
 
 			@Override
@@ -134,7 +134,7 @@ public class UIGenerator
 			@Override
 			public UICheckbox create( final UICheckbox.Meta _meta )
 			{
-				return addListeners( new UICheckbox(), _meta ) ;
+				return addComponents( new UICheckbox(), _meta ) ;
 			}
 
 			@Override
@@ -149,7 +149,7 @@ public class UIGenerator
 			@Override
 			public UIList create( final UIList.Meta _meta )
 			{
-				return addListeners( new UIList( _meta.getType() ), _meta ) ;
+				return addComponents( new UIList( _meta.getType() ), _meta ) ;
 			}
 
 			@Override
@@ -164,7 +164,7 @@ public class UIGenerator
 			@Override
 			public UIAbstractView create( final UIAbstractView.Meta _meta )
 			{
-				return addListeners( new UIAbstractView(), _meta ) ;
+				return addComponents( new UIAbstractView(), _meta ) ;
 			}
 
 			@Override
@@ -175,12 +175,12 @@ public class UIGenerator
 		} ) ;
 	}
 
-	public static <E extends UIElement, M extends E.Meta> E addListeners( final E _element, final M _meta )
+	public static <E extends UIElement, M extends E.Meta> E addComponents( final E _element, final M _meta )
 	{
-		final List<UIElement.MetaListener> listeners = _meta.getListeners( MalletList.<UIElement.MetaListener>newList() ) ;
-		for( final UIElement.MetaListener meta : listeners )
+		final List<UIElement.MetaComponent> listeners = _meta.getComponents( MalletList.<UIElement.MetaComponent>newList() ) ;
+		for( final UIElement.MetaComponent meta : listeners )
 		{
-			_element.addListener( GUIGenerator.create( meta, _element ) ) ;
+			_element.addComponent( GUIGenerator.create( meta, _element ) ) ;
 		}
 		return _element ;
 	}

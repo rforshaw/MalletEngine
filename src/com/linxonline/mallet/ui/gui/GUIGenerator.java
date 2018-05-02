@@ -17,7 +17,7 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUIDRAW", new Generator<GUIDraw.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIDraw.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIDraw.Meta _meta, final UIElement _parent )
 			{
 				return new GUIDraw( _meta, _parent ) ;
 			}
@@ -26,7 +26,7 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUIDRAWEDGE", new Generator<GUIDrawEdge.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIDrawEdge.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIDrawEdge.Meta _meta, final UIElement _parent )
 			{
 				return new GUIDrawEdge( _meta, _parent ) ;
 			}
@@ -35,7 +35,7 @@ public class GUIGenerator
 		creators.put( "UITEXTFIELD_GUIEDITTEXT", new Generator<GUIEditText.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIEditText.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIEditText.Meta _meta, final UIElement _parent )
 			{
 				return new GUIEditText( _meta, ( UITextField )_parent ) ;
 			}
@@ -44,7 +44,7 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUIPANELDRAW", new Generator<GUIPanelDraw.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIPanelDraw.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIPanelDraw.Meta _meta, final UIElement _parent )
 			{
 				return new GUIPanelDraw( _meta, _parent ) ;
 			}
@@ -53,7 +53,7 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUIPANELEDGE", new Generator<GUIPanelEdge.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIPanelEdge.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIPanelEdge.Meta _meta, final UIElement _parent )
 			{
 				return new GUIPanelEdge( _meta, _parent ) ;
 			}
@@ -62,7 +62,7 @@ public class GUIGenerator
 		creators.put( "UILIST_GUISCROLLBAR", new Generator<GUIScrollbar.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIScrollbar.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIScrollbar.Meta _meta, final UIElement _parent )
 			{
 				return null ;
 			}
@@ -71,7 +71,7 @@ public class GUIGenerator
 		creators.put( "UIELEMENT_GUITEXT", new Generator<GUIText.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUIText.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUIText.Meta _meta, final UIElement _parent )
 			{
 				return new GUIText( _meta, _parent ) ;
 			}
@@ -80,7 +80,7 @@ public class GUIGenerator
 		creators.put( "UICHECKBOX_GUITICK", new Generator<GUITick.Meta>()
 		{
 			@Override
-			public GUIBase create( final GUITick.Meta _meta, final UIElement _parent )
+			public GUIComponent create( final GUITick.Meta _meta, final UIElement _parent )
 			{
 				return new GUITick( _meta, ( UICheckbox )_parent ) ;
 			}
@@ -92,7 +92,7 @@ public class GUIGenerator
 		creators.put( _id, _generator ) ;
 	}
 
-	public static <E extends UIElement.Listener> E create( final UIElement.MetaListener _meta, final UIElement _parent )
+	public static <E extends UIElement.Component> E create( final UIElement.MetaComponent _meta, final UIElement _parent )
 	{
 		final String type = _meta.getType() ;
 		final Generator generator = creators.get( type ) ;
@@ -105,8 +105,8 @@ public class GUIGenerator
 		return ( E )generator.create( _meta, _parent ) ;
 	}
 
-	public interface Generator<M extends UIElement.MetaListener>
+	public interface Generator<M extends UIElement.MetaComponent>
 	{
-		public GUIBase create( final M _meta, final UIElement _parent ) ;
+		public GUIComponent create( final M _meta, final UIElement _parent ) ;
 	}
 }

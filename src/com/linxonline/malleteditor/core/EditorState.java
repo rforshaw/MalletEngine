@@ -5,7 +5,7 @@ import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.core.GameState ;
 
-import com.linxonline.mallet.ui.gui.GUIBase ;
+import com.linxonline.mallet.ui.gui.GUIComponent ;
 import com.linxonline.mallet.ui.UIElement ;
 import com.linxonline.mallet.ui.UIFactory ;
 import com.linxonline.mallet.ui.UILayout ;
