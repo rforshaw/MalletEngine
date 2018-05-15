@@ -4,6 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.id.ID ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
@@ -18,9 +19,8 @@ import com.linxonline.mallet.maths.* ;
 	when implementing their custom components.
 
 	UIElement does not directly handle the visual display 
-	that is delegated to a GUIBase and the developer is expected 
+	that is delegated to a GUIComponent and the developer is expected 
 	to implement it in whatever way they see fit.
-	
 */
 public class UIElement implements InputHandler, Connect.Connection
 {
@@ -110,9 +110,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	}
 
 	/**
-		Add a listener to the UIElement.
-		Caution: ABases not designed for the elements 
-		sub-type can still be added, not caught at compile-time.
+		Add a component to the UIElement.
 	*/
 	public <T extends UIElement.Component> T addComponent( final T _component )
 	{
@@ -120,31 +118,44 @@ public class UIElement implements InputHandler, Connect.Connection
 	}
 
 	/**
-		Add a listener to the UIElement.
-		Caution: ABases not designed for the elements 
-		sub-type can still be added, not caught at compile-time.
+		Add a component to the UIElement.
 
-		Inserts the listener at the specified index, shifts existing 
+		Inserts the component at the specified index, shifts existing 
 		components to the right. 
 	*/
 	public <T extends UIElement.Component> T addComponent( final int _index, final T _component )
 	{
-		if( _component != null )
-		{
-			components.add( _index, _component ) ;
-			_component.constructDraws() ;
-		}
+		components.add( _index, _component ) ;
 		return _component ;
 	}
 
 	/**
-		Remove the listener from the UIElement.
-		return true if the listener was removed else 
+		Remove the component from the UIElement.
+		return true if the component was removed else 
 		return false.
 	*/
 	public <T extends UIElement.Component> boolean removeComponent( final T _component )
 	{
 		return components.remove( _component ) ;
+	}
+
+	public <T extends UIElement.Component> T getComponent( final String _group, final String _name, final Class<T> _class )
+	{
+		final List<UIElement.Component> comps = components.getComponents() ;
+		final int size = comps.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final UIElement.Component comp = comps.get( i ) ;
+			if( comp.isGroup( _group ) )
+			{
+				if( comp.isName( _name ) )
+				{
+					return _class.cast( comp ) ;
+				}
+			}
+		}
+
+		return null ;
 	}
 
 	/**
@@ -1493,7 +1504,22 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public abstract class Component
 	{
-		public Component() {}
+		protected final ID id ;
+
+		public Component( final MetaComponent _meta )
+		{
+			id = new ID( _meta.getName(), _meta.getGroup() ) ;
+		}
+
+		public final boolean isName( final String _name )
+		{
+			return id.isName( _name ) ;
+		}
+
+		public final boolean isGroup( final String _group )
+		{
+			return id.isGroup( _group ) ;
+		}
 
 		/**
 			Return the parent UIElement that this listener was 
@@ -1619,8 +1645,69 @@ public class UIElement implements InputHandler, Connect.Connection
 		public abstract void shutdown() ;
 	}
 
+	/**
+		A UIElement may want to contain additional components 
+		that are automatically available when the element is 
+		constructed by default. 
+
+		For example it may contain a GUIDraw component - use the 
+		Meta Component to build these components for their 
+		associated meta element.
+	*/
 	public static abstract class MetaComponent implements Connect.Connection
 	{
+		private String name = "" ;
+		private String group = "" ;
+
+		private final Connect.Signal nameChanged  = new Connect.Signal() ;
+		private final Connect.Signal groupChanged = new Connect.Signal() ;
+
+		private final Connect connect = new Connect() ;
+
+		public void setName( final String _name )
+		{
+			if( _name != null && name.equals( _name ) == false )
+			{
+				name = _name ;
+				UIElement.signal( this, nameChanged() ) ;
+			}
+		}
+
+		public void setGroup( final String _group )
+		{
+			if( _group != null && group.equals( _group ) == false )
+			{
+				group = _group ;
+				UIElement.signal( this, groupChanged() ) ;
+			}
+		}
+
+		public String getName()
+		{
+			return name ;
+		}
+
+		public String getGroup()
+		{
+			return group ;
+		}
+
+		@Override
+		public Connect getConnect()
+		{
+			return connect ;
+		}
+
+		public Connect.Signal nameChanged()
+		{
+			return nameChanged ;
+		}
+
+		public Connect.Signal groupChanged()
+		{
+			return groupChanged ;
+		}
+
 		public abstract String getType() ;
 	}
 

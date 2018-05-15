@@ -17,7 +17,7 @@ public class GUIText extends GUIComponent
 
 	public GUIText( final Meta _meta, final UIElement _parent )
 	{
-		super( _parent ) ;
+		super( _meta, _parent ) ;
 		setLayerOffset( 1 ) ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
@@ -25,17 +25,6 @@ public class GUIText extends GUIComponent
 		text.append( _meta.getText() ) ;
 		font = _meta.getFont() ;
 		colour = _meta.getColour( colour ) ;
-	}
-
-	public GUIText( final String _text, final MalletFont _font, final UIElement _parent )
-	{
-		super( _parent ) ;
-		setLayerOffset( 1 ) ;
-		font = _font ;
-		if( _text != null )
-		{
-			text.append( _text ) ;
-		}
 	}
 
 	public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )

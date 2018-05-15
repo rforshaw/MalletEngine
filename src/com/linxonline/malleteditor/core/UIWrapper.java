@@ -282,7 +282,7 @@ public class UIWrapper extends UIElement
 
 		public GUILineDraw( final UIWrapper _parent )
 		{
-			super( _parent ) ;
+			super( UIFactory.createMeta( "GUILINEDRAW" ), _parent ) ;
 			updateLength( _parent.getLength(), getLength() ) ;
 			updateOffset( _parent.getOffset(), getOffset() ) ;
 		}

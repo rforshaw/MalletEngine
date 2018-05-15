@@ -10,19 +10,6 @@ public class ComponentUnit
 
 	public ComponentUnit() {}
 
-	public boolean add( final UIElement.Component _component )
-	{
-		if( _component != null )
-		{
-			if( components.contains( _component ) == false )
-			{
-				components.add( _component ) ;
-				return true ;
-			}
-		}
-		return false ;
-	}
-
 	public boolean add( final int _index, final UIElement.Component _component )
 	{
 		if( _component != null )
@@ -30,6 +17,7 @@ public class ComponentUnit
 			if( components.contains( _component ) == false )
 			{
 				components.add( _index, _component ) ;
+				_component.constructDraws() ;
 				return true ;
 			}
 		}

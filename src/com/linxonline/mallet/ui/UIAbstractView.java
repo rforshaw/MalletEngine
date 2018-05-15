@@ -26,6 +26,8 @@ public class UIAbstractView extends UIElement
 	private final IAbstractModel view = new UIAbstractModel() ;
 	private IAbstractModel model = UIAbstractView.createEmptyModel() ;
 
+	private final Vector3 cellLength = new Vector3( 1.0f, 1.0f, 0.0f ) ; 
+
 	public UIAbstractView()
 	{
 		super() ;
@@ -149,6 +151,12 @@ public class UIAbstractView extends UIElement
 		final int rowCount = model.rowCount( _node ) ;
 		final int columnCount = model.columnCount( _node ) ;
 
+		final UIRatio ratio = getRatio() ;
+		final Vector3 length = getLength() ;
+
+		final float width = length.x / ( ( columnCount == 0 ) ? 1 : columnCount ) ;
+		cellLength.x = ratio.toUnitX( width ) ;
+
 		for( int i = 0; i < rowCount; i++ )
 		{
 			for( int j = 0; j < columnCount; j++ )
@@ -196,7 +204,7 @@ public class UIAbstractView extends UIElement
 		{
 			final UIElement cell = _delegate.createItem( this ) ;
 			cell.setPosition( _index.getColumn(), _index.getRow(), 0 ) ;
-			cell.setLength( 1.0f, 1.0f, 0.0f ) ;
+			cell.setLength( cellLength.x, cellLength.y, cellLength.z ) ;
 
 			if( frame.getDrawDelegate() != null )
 			{
@@ -303,13 +311,27 @@ public class UIAbstractView extends UIElement
 					edge.setSheet( "base/textures/edge_button.png" ) ;
 
 					final GUIText.Meta text = meta.addComponent( new GUIText.Meta() ) ;
+					text.setGroup( "ENGINE" ) ;
+					text.setName( "TEXT" ) ;
 					text.setText( "Test" ) ;
 				}
 
 				return UIGenerator.<UIButton>create( meta ) ;
 			}
 
-			public void setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}
+			public void setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
+			{
+				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
+
+				final UIButton button = ( UIButton )_item ;
+
+				final GUIText gui = button.getComponent( "ENGINE", "TEXT", GUIText.class ) ;
+				final StringBuilder text = gui.getText() ;
+				text.setLength( 0 ) ;
+				text.append( variant.getName() ) ;
+				text.append( " : " ) ;
+				text.append( variant.toString() ) ;
+			}
 
 			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}
 		} ;

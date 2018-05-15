@@ -18,7 +18,7 @@ public class GUIScrollbar extends GUIComponent
 
 	public GUIScrollbar( final MalletTexture _sheet, final UIElement.UV _uv, final UIList _parent )
 	{
-		super( _parent ) ;
+		super( UIFactory.createMeta( "GUISCROLLBAR" ), _parent ) ;
 		sheet = _sheet ;
 		uv = _uv ;
 	}

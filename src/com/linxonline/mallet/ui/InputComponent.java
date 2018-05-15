@@ -12,7 +12,12 @@ public abstract class InputComponent extends UIElement.Component
 {
 	public InputComponent( final UIElement _parent )
 	{
-		_parent.super() ;
+		_parent.super( UIFactory.createMeta( "INPUTCOMPONENT" ) ) ;
+	}
+
+	public InputComponent( final UIElement.MetaComponent _meta, final UIElement _parent )
+	{
+		_parent.super( _meta ) ;
 	}
 
 	/**

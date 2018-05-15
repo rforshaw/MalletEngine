@@ -20,7 +20,7 @@ public class GUIDraw extends GUIComponent
 
 	public GUIDraw( final Meta _meta, final UIElement _parent )
 	{
-		super( _parent ) ;
+		super( _meta, _parent ) ;
 		retainRatio    = _meta.isRetainRatio() ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;

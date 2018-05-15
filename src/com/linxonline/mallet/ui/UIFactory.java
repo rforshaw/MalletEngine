@@ -74,14 +74,40 @@ public final class UIFactory
 		return layout ;
 	}
 
+	public static UIElement.MetaComponent createMeta( final String _type )
+	{
+		return new UIElement.MetaComponent()
+		{
+			@Override
+			public String getType()
+			{
+				return _type ;
+			}
+		} ;
+	}
+
 	private static class WindowListener extends UIElement.Component
 	{
 		private final Notification.Notify<String> widthNotify ;
 		private final Notification.Notify<String> heightNotify ;
 
-		public WindowListener( final UILayout _parent, final Camera _camera, final Vector3 _dimension )
+		public WindowListener( final UILayout _parent,
+							   final Camera _camera,
+							   final Vector3 _dimension )
 		{
-			_parent.super() ;
+			this( new UIElement.MetaComponent()
+			{
+				@Override
+				public String getType() { return "WINDOW_LISTENER" ; }
+			}, _parent, _camera, _dimension ) ;
+		}
+
+		public WindowListener( final UIElement.MetaComponent _meta,
+							   final UILayout _parent,
+							   final Camera _camera,
+							   final Vector3 _dimension )
+		{
+			_parent.super( _meta ) ;
 			widthNotify = GlobalConfig.addNotify( "RENDERWIDTH", new Notification.Notify<String>()
 			{
 				public void inform( final String _data )

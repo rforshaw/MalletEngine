@@ -86,9 +86,9 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
-	public GUIComponent( final UIElement _parent )
+	public GUIComponent( final UIElement.MetaComponent _meta, final UIElement _parent )
 	{
-		_parent.super() ;
+		_parent.super( _meta ) ;
 		visible = _parent.isVisible() ;
 
 		position.setXYZ( _parent.getPosition() ) ;
@@ -103,7 +103,7 @@ public abstract class GUIComponent extends UIElement.Component
 	}
 	
 	/**
-		Called when listener receives a valid DrawDelegate
+		Called when component receives a valid DrawDelegate
 		and when the parent UIElement is flagged as visible.
 	*/
 	public abstract void addDraws( final DrawDelegate _delegate, final World _world ) ;

@@ -19,16 +19,6 @@ public class GUIEditText extends GUIText
 	public GUIEditText( final Meta _meta, final UITextField _parent )
 	{
 		super( _meta, _parent ) ;
-	}
-
-	/**
-		Use _text as placeholder text. 
-		This text is used if the user has not
-		written anything and is not editing the field.
-	*/
-	public GUIEditText( final String _text, final MalletFont _font, final UITextField _parent )
-	{
-		super( _text, _font, _parent ) ;
 		UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UITextField>()
 		{
 			@Override

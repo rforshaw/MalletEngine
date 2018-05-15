@@ -484,6 +484,8 @@ public class JUI
 		}
 
 		final GUIDraw.Meta meta = new GUIDraw.Meta() ;
+		meta.setName( _ui.getString( "NAME" ) ) ;
+		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setUV( createUV( _ui.getJSONObject( "UV" ) ) ) ;
 		meta.setRetainRatio( _ui.optBoolean( "RETAIN_RATIO", false ) ) ;
 		meta.setSheet( _ui.optString( "TEXTURE", null ) ) ;
@@ -508,6 +510,8 @@ public class JUI
 		final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 
 		final GUIText.Meta meta = new GUIText.Meta() ;
+		meta.setName( _ui.getString( "NAME" ) ) ;
+		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setText( _ui.optString( "TEXT", "" ) ) ;
 		meta.setFont( MalletFont.createByPixel( _ui.optString( "FONT", "Arial" ), MalletFont.PLAIN, fontSize ) ) ;
 		meta.setColour( MalletColour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
@@ -532,6 +536,8 @@ public class JUI
 		final int fontSize = ( int )_ratio.toPixelY( ( float )_ui.optDouble( "FONT_SIZE", 0.42 ) ) ;
 
 		final GUIEditText.Meta meta = new GUIEditText.Meta() ;
+		meta.setName( _ui.getString( "NAME" ) ) ;
+		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setText( _ui.optString( "TEXT", "" ) ) ;
 		meta.setFont( MalletFont.createByPixel( _ui.optString( "FONT", "Arial" ), MalletFont.PLAIN, fontSize ) ) ;
 		meta.setColour( MalletColour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
@@ -554,6 +560,8 @@ public class JUI
 		}
 
 		final GUIPanelDraw.Meta meta = new GUIPanelDraw.Meta() ;
+		meta.setName( _ui.getString( "NAME" ) ) ;
+		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setNeutralUV( createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ) ;
 		meta.setRolloverUV( createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ) ;
 		meta.setClickedUV( createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ) ;
@@ -578,6 +586,8 @@ public class JUI
 		}
 
 		final GUITick.Meta meta = new GUITick.Meta() ;
+		meta.setName( _ui.getString( "NAME" ) ) ;
+		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setUV( createUV( _ui.getJSONObject( "UV" ) ) ) ;
 		meta.setRetainRatio( _ui.optBoolean( "RETAIN_RATIO", false ) ) ;
 		meta.setSheet( _ui.optString( "TEXTURE", null ) ) ;
