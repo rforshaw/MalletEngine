@@ -54,11 +54,11 @@ public class GL2DRenderer implements IRender,
 	@Override
 	public void onSurfaceChanged( final GL10 _unused, final int _width, final int _height)
 	{
-		System.out.println( "onSurfaceChanged()" ) ;
+		System.out.println( "onSurfaceChanged() width: " + _width + " height: " + _height ) ;
 		int renderWidth = _width ;
 		int renderHeight = _height ;
 
-		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == false )
+		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", true ) == false )
 		{
 			// Update the render dimensions if the window size 
 			// and render size are meant to be identical.
@@ -66,6 +66,7 @@ public class GL2DRenderer implements IRender,
 			// size but rendering to a smaller size and subsequently being upscaled.
 			renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", _width ) ;
 			renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", _height ) ;
+			//System.out.println( "Render parity width: " + renderWidth + " height: " + renderHeight ) ;
 		}
 
 		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
