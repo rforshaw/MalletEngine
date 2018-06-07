@@ -8,8 +8,8 @@ import org.teavm.jso.webgl.WebGLUniformLocation ;
 import com.linxonline.mallet.io.reader.TextReader ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.* ;
+import com.linxonline.mallet.io.AbstractManager ;
 
-import com.linxonline.mallet.resources.* ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
@@ -37,7 +37,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				return GlobalFileSystem.isExtension( _file, ".jgl", ".JGL" ) ;
 			}
 
-			public GLProgram load( final String _file, final Settings _settings )
+			public GLProgram load( final String _file )
 			{
 				final FileStream stream = GlobalFileSystem.getFile( _file ) ;
 				if( stream.exists() == false )
@@ -46,12 +46,12 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					return null ;
 				}
 
-				add( _file, PLACEHOLDER ) ;
 				JSONObject.construct( stream, new JSONObject.ConstructCallback()
 				{
 					public void callback( final JSONObject _obj )
 					{
 						generateGLProgram( _obj ) ;
+						stream.close() ;
 					}
 				} ) ;
 
@@ -185,10 +185,22 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 					{
 						_glShaders.add( new GLShader( map.type, map.path, source.toString() ) ) ;
 						readShaders( _name, _jShaders, _glShaders, _uniforms, _swivel ) ;
+						stream.close() ;
 					}
 				}, 1 ) ;
 			}
 		} ) ;
+	}
+
+	/**
+		Load the specified shader and map it to the 
+		passed int key.
+		Use the key with get() to retrieve the GLProgram.
+	*/
+	public void load( final String _key, final String _file )
+	{
+		put( _key, null ) ;
+		createResource( _file ) ;
 	}
 
 	@Override
@@ -196,12 +208,6 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 	{
 		synchronized( toBind )
 		{
-			final WebGLRenderingContext gl = GLRenderer.getContext() ;
-			if( gl == null )
-			{
-				return null ;
-			}
-
 			// GLRenderer will continuosly call get() until it 
 			// recieves a GLProgram, so we need to compile Programs
 			// that are waiting for the OpenGL context 
@@ -210,35 +216,31 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 			{
 				for( final GLProgram program : toBind )
 				{
-					if( GLProgramManager.buildProgram( gl, program ) == false )
+					if( GLProgramManager.buildProgram( program ) == false )
 					{
 						System.out.println( "Failed to compile program: " + program.name ) ;
-						GLProgramManager.deleteProgram( gl, program ) ;
+						GLProgramManager.deleteProgram( program ) ;
 					}
-					add( program.name, program ) ;
+					put( program.name, program ) ;
 				}
 				toBind.clear() ;
 			}
 		}
 
-		final GLProgram program = super.get( _key ) ;
-
-		// PLACEHOLDER is used to prevent the program loader 
-		// loading the same program twice when loading async, 
-		return ( program != PLACEHOLDER ) ? program : null ;
+		return super.get( _key ) ;
 	}
 
-	public static void deleteProgram( final WebGLRenderingContext _gl, final GLProgram _program )
+	public static void deleteProgram( final GLProgram _program )
 	{
 		// During the build process a programs 
 		// shaders list has already been detached 
 		// and destroyed.
-		_gl.deleteProgram( _program.id[0] ) ;
+		MGL.deleteProgram( _program.id[0] ) ;
 	}
 
-	public static boolean buildProgram( final WebGLRenderingContext _gl, final GLProgram _program )
+	public static boolean buildProgram( final GLProgram _program )
 	{
-		_program.id[0] = _gl.createProgram() ;
+		_program.id[0] = MGL.createProgram() ;
 		if( _program.id[0] == null )
 		{
 			System.out.println( "Failed to create program.." ) ;
@@ -248,9 +250,9 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		for( final GLShader shader : _program.shaders )
 		{
 			// Attach only successfully compiled shaders
-			if( compileShader( _gl, shader ) == true )
+			if( compileShader( shader ) == true )
 			{
-				_gl.attachShader( _program.id[0], shader.id[0] ) ;
+				MGL.attachShader( _program.id[0], shader.id[0] ) ;
 			}
 		}
 
@@ -259,27 +261,27 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 
 		for( int i = 0; i < size; i++ )
 		{
-			_gl.bindAttribLocation( _program.id[0], _program.inAttributes[i], swivel.get( i ) ) ;
+			MGL.bindAttribLocation( _program.id[0], _program.inAttributes[i], swivel.get( i ) ) ;
 		}
 
-		_gl.linkProgram( _program.id[0] ) ;
+		MGL.linkProgram( _program.id[0] ) ;
 
-		_program.inMVPMatrix = _gl.getUniformLocation( _program.id[0], "inMVPMatrix" ) ;
+		_program.inMVPMatrix = MGL.getUniformLocation( _program.id[0], "inMVPMatrix" ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
 		for( final GLShader shader : _program.shaders )
 		{
-			_gl.detachShader( _program.id[0], shader.id[0] ) ;
-			_gl.deleteShader( shader.id[0] ) ;
+			MGL.detachShader( _program.id[0], shader.id[0] ) ;
+			MGL.deleteShader( shader.id[0] ) ;
 		}
 		_program.shaders.clear() ;
 
-		final boolean response = _gl.getProgramParameterb( _program.id[0], GL3.LINK_STATUS ) ;
+		final boolean response = MGL.getProgramParameterb( _program.id[0], GL3.LINK_STATUS ) ;
 		if( response == false )
 		{
-			final String log = _gl.getProgramInfoLog( _program.id[0] ) ;
+			final String log = MGL.getProgramInfoLog( _program.id[0] ) ;
 			System.out.println( "Error linking program: " + log ) ;
 			return false ;
 		}
@@ -287,16 +289,16 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		return true ;
 	}
 
-	private static boolean compileShader( final WebGLRenderingContext _gl, final GLShader _shader )
+	private static boolean compileShader( final GLShader _shader )
 	{
-		_shader.id[0] = _gl.createShader( _shader.type ) ;
-		_gl.shaderSource( _shader.id[0], _shader.source[0] ) ;
-		_gl.compileShader( _shader.id[0] ) ;
+		_shader.id[0] = MGL.createShader( _shader.type ) ;
+		MGL.shaderSource( _shader.id[0], _shader.source[0] ) ;
+		MGL.compileShader( _shader.id[0] ) ;
 
-		final boolean response = _gl.getShaderParameterb( _shader.id[0], GL3.COMPILE_STATUS ) ;
+		final boolean response = MGL.getShaderParameterb( _shader.id[0], GL3.COMPILE_STATUS ) ;
 		if( response == false )
 		{
-			final String log = _gl.getShaderInfoLog( _shader.id[0] ) ;
+			final String log = MGL.getShaderInfoLog( _shader.id[0] ) ;
 			System.out.println( "Error compiling shader: " + _shader.file + "\n" + log ) ;
 			return false ;
 		}
@@ -304,7 +306,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 		return true ;
 	}
 	
-	private class GLShaderMap
+	private static class GLShaderMap
 	{
 		public String path ;
 		public int type ;

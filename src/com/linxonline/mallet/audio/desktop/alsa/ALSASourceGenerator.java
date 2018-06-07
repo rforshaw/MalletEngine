@@ -22,6 +22,9 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 
 	public ALSASourceGenerator() {}
 
+	/**
+		Generator deals with the construction and deconstruction of the Audio backend 
+	*/
 	public boolean startGenerator()
 	{
 		try
@@ -129,6 +132,11 @@ public class ALSASourceGenerator implements AudioGenerator<ALSASound>
 		return true ;
 	}
 
+	/**
+		Creates an AudioSource which can be used to manipulate a Sound buffer.
+		An AudioSource can be created multiple times and use the same 
+		Sound buffer.
+	**/
 	public AudioSource createAudioSource( final String _file, final StreamType _type )
 	{
 		final AudioBuffer<ALSASound> sound = staticSoundManager.get( _file ) ;

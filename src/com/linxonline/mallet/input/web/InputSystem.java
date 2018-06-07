@@ -9,22 +9,19 @@ import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.dom.events.* ;
 
 import com.linxonline.mallet.input.* ;
+import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.system.GlobalConfig ;
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.MalletList ;
 
-public class InputSystem implements InputSystemInterface
+public class InputSystem implements IInputSystem
 {
-	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
-	private final Map<KeyCode, KeyState> keyboardState = MalletMap.<KeyCode, KeyState>newMap() ;
-	private final List<KeyState> activeKeyStates = MalletList.<KeyState>newList() ;
 
-	private final List<InputEvent> mouseInputs = MalletList.<InputEvent>newList() ;
+	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
 	public InputSystem()
@@ -156,7 +153,6 @@ public class InputSystem implements InputSystemInterface
 			return ;
 		}
 
-		_handler.setInputAdapterInterface( inputAdapter ) ;
 		handlers.add( _handler ) ;
 	}
 
@@ -182,64 +178,34 @@ public class InputSystem implements InputSystemInterface
 	{
 		final InputEvent input = cache.get() ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
-		mouseInputs.add( input ) ;
+		inputs.add( input ) ;
 	}
 
 	public synchronized void update()
 	{
-		passKeyInputs() ;
-		passMouseInputs() ;
-	}
-
-	private void passKeyInputs()
-	{
-		if( activeKeyStates.isEmpty() == false )
+		if( inputs.isEmpty() == false )
 		{
-			final int stateSize = activeKeyStates.size() ;
-			KeyState state = null ;
-
-			for( int i = 0; i < stateSize; i++ )
-			{
-				state = activeKeyStates.get( i ) ;
-				final InputEvent input = cache.get() ;
-				input.clone( state.input ) ;
-
-				passInputEventToHandlers( input ) ;
-			}
-
-			activeKeyStates.clear() ;
-		}
-	}
-
-	private void passMouseInputs()
-	{
-		if( mouseInputs.isEmpty() == false )
-		{
-			final int inputSize = mouseInputs.size() ;
-			InputEvent input = null ;
-
+			final int inputSize = inputs.size() ;
 			for( int i = 0; i < inputSize; ++i )
 			{
-				input = mouseInputs.get( i ) ;
-				passInputEventToHandlers( input ) ;
+				passInputEventToHandlers( inputs.get( i ) ) ;
 			}
 
-			mouseInputs.clear() ;
+			inputs.clear() ;
 		}
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )
 	{
 		final int handlerSize = handlers.size() ;
-		InputHandler handler = null ;
-
 		for( int j = 0; j < handlerSize; ++j )
 		{
-			handler = handlers.get( j ) ;
+			final InputHandler handler = handlers.get( j ) ;
 			switch( handler.passInputEvent( _input ) )
 			{
 				case PROPAGATE : continue ;
-				case CONSUME   : return ;
+				case CONSUME   :
+				default        : return ;
 			}
 		}
 	}
@@ -259,9 +225,7 @@ public class InputSystem implements InputSystemInterface
 
 	public synchronized void clearInputs()
 	{
-		mouseInputs.clear() ;
-		keyboardState.clear() ;
-		activeKeyStates.clear() ;
+		inputs.clear() ;
 	}
 
 	private final boolean exists( final InputHandler _handler )

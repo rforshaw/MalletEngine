@@ -1,38 +1,30 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import java.nio.* ;
-
-import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLBuffer ;
-
-import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
 
 public class GLModelManager
 {
-	public static WebGLBuffer[] genIndexID( final WebGLRenderingContext _gl )
+	private GLModelManager() {}
+
+	public static WebGLBuffer[] genIndexID()
 	{
 		final WebGLBuffer[] id = new WebGLBuffer[1] ;
-		id[0] = _gl.createBuffer() ;
+		id[0] = MGL.createBuffer() ;
 
 		return id ;
 	}
 
-	public static WebGLBuffer[] genVBOID( final WebGLRenderingContext _gl )
+	public static WebGLBuffer[] genVBOID()
 	{
 		final WebGLBuffer[] id = new WebGLBuffer[1] ;
-		id[0] = _gl.createBuffer() ;
+		id[0] = MGL.createBuffer() ;
 
 		return id ;
 	}
 
 	public static void unbind( final GLGeometryUploader.GLGeometry _geometry )
 	{
-		final WebGLRenderingContext gl = GLRenderer.getContext() ;
-		if( gl != null )
-		{
-			gl.deleteBuffer( _geometry.vboID[0] ) ;
-			gl.deleteBuffer( _geometry.indexID[0] ) ;
-		}
+		MGL.deleteBuffer( _geometry.vboID[0] ) ;
+		MGL.deleteBuffer( _geometry.indexID[0] ) ;
 	}
 }

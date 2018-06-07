@@ -17,6 +17,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLFontGenerator
 {
+	private final static float PADDING = 4.0f ;
 	private final GLTextureManager manager ;
 	private final CanvasRenderingContext2D canvas ;
 
@@ -28,7 +29,7 @@ public class GLFontGenerator
 		canvas = ( CanvasRenderingContext2D )element.getContext( "2d" ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
+	private static void setCanvasFont( final CanvasRenderingContext2D _canvas, final String _name, final int _style, final int _size )
 	{
 		final StringBuilder builder = new StringBuilder() ;
 		builder.append( _size ) ;
@@ -36,8 +37,12 @@ public class GLFontGenerator
 		builder.append( _name ) ;
 
 		final String font = builder.toString() ;
-		canvas.setFont( font ) ;
+		_canvas.setFont( font ) ;
+	}
 
+	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
+	{
+		setCanvasFont( canvas, _name, _style, _size ) ;
 		return generateMetrics( canvas, _characters ) ;
 	}
 
@@ -58,6 +63,15 @@ public class GLFontGenerator
 											   height / 2.0f,
 											   0.0f,
 											   0.0f ) ;
+	}
+
+	public Glyph generateGlyph( final String _name, final int _style, final int _size, final int _code )
+	{
+		setCanvasFont( canvas, _name, _style, _size ) ;
+
+		final char c = ( char )_code ;
+		final float width = canvas.measureText( String.valueOf( c ) ).getWidth() ;
+		return new Glyph( c, width ) ;
 	}
 
 	public GLFont generateFont( final MalletFont _font )

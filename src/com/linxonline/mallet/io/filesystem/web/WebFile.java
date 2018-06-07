@@ -214,6 +214,16 @@ public class WebFile implements FileStream
 		return false ;
 	}
 
+	public boolean isReadable()
+	{
+		return exists() ;
+	}
+
+	public boolean isWritable()
+	{
+		return false ;
+	}
+
 	public boolean exists()
 	{
 		return element != null ;
@@ -248,9 +258,18 @@ public class WebFile implements FileStream
 	}
 
 	/**
-		Close all streams that a developer has requested.
-		This will close streams currently in use, and dead 
-		streams.
+		Close a specific stream without closing other 
+		active streams.
+	*/
+	public boolean close( final Close _close )
+	{
+		//return toClose.remove( _close ) ;
+		return true ;
+	}
+
+	/**
+		Close all the stream input/output that has 
+		been returned and close them.
 	*/
 	public boolean close()
 	{

@@ -125,7 +125,7 @@ public final class GameTestLoader extends GameLoader
 							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
 							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 						}
-					
+
 						{
 							final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 							final int width = texture.getWidth() ;

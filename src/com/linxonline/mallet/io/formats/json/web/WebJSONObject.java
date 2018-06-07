@@ -40,7 +40,7 @@ public class WebJSONObject extends JSONObject
 
 	public static void init()
 	{
-		constructor = new WebJSONObject() ;
+		setConstructor( new WebJSONObject() ) ;
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class WebJSONObject extends JSONObject
 	@Override
 	public String getString( final String _key )
 	{
-		return optString( object, _key ) ;
+		return optString( _key, null ) ;
 	}
 
 	@Override

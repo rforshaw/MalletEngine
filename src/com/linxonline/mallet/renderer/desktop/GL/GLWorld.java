@@ -137,7 +137,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			case MGL.GL_FRAMEBUFFER_COMPLETE    : break ;
 			case MGL.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( getID() + " framebuffer undefined." ) ; break ;
 			case MGL.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( getID() + " framebuffer unsupported." ) ; break ;
-			default                            : System.out.println( getID() + " framebuffer corrupt." ) ; break ;
+			default                             : System.out.println( getID() + " framebuffer corrupt." ) ; break ;
 		}
 
 		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, 0 ) ;

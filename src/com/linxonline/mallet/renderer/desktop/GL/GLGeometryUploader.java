@@ -269,7 +269,7 @@ public class GLGeometryUploader
 				final int lengthBytes = increment * VBO_VAR_BYTE_SIZE ;
 				MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, vertexStartBytes, lengthBytes, vertexBuffer ) ;
 				//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
-				
+
 				vertexStartBytes += lengthBytes ;
 				increment = 0 ;
 			}
@@ -1351,7 +1351,7 @@ public class GLGeometryUploader
 				DrawAssist.forceUpdate( allocated.get( i ).getData() ) ;
 			}
 		}
-		
+
 		public int getIndexID()
 		{
 			return indexID[0] ;

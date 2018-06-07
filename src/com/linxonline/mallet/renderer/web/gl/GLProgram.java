@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer.web.gl ;
 
 import java.util.List ;
 import java.util.Map ;
+import java.util.Set ;
 
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLProgram ;
@@ -11,10 +12,9 @@ import org.teavm.jso.webgl.WebGLUniformLocation ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.texture.* ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.maths.Vector2 ;
@@ -32,160 +32,83 @@ public class GLProgram extends Resource
 	*/
 	public enum Uniform
 	{
-		BOOL( new UniformDelegate()
+		BOOL( new AUniform() ),
+		INT( new AUniform() ),
+		UINT( new AUniform() ),
+		FLOAT( new AUniform() ),
+		DOUBLE( new AUniform() ),
+		VEC2( new AUniform() ),
+		VEC3( new AUniform() ),
+		VEC4( new AUniform() ),
+		MAT4( new AUniform()
 		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
+			@Override
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				return false ;
+				return true ;
 			}
 
-			public Class getUniformClass()
+			@Override
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		INT( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		UINT( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		FLOAT( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		DOUBLE( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		VEC2( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		VEC3( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		VEC4( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				return false ;
-			}
-
-			public Class getUniformClass()
-			{
-				return null ;
-			}
-
-			public void reset() {}
-		} ),
-		MAT4( new UniformDelegate()
-		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
-			{
-				final GLProgram program              = ( GLProgram )_data.getProgram() ;
+				final GLProgram program              = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 				final WebGLUniformLocation inUniform = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
-				_gl.uniformMatrix4fv( program.inMVPMatrix, false, m.matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+				MGL.uniformMatrix4fv( program.inMVPMatrix, false, m.matrix ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 				return true ;
 			}
 
+			@Override
 			public Class getUniformClass()
 			{
 				return Matrix4.class ;
 			}
-
-			public void reset() {}
 		} ),
 		SAMPLER2D( new UniformDelegate()
 		{
 			private int textureUnit = 0 ;
 
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
+			@Override
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				final GLProgram program              = ( GLProgram )_data.getProgram() ;
+				final GLProgram program              = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
-				final WebGLUniformLocation inUniform = program.inUniforms[_index] ;
 
 				final MalletTexture texture = ( MalletTexture )_data.get( uniform.getLeft() ) ;
-				final Texture<GLImage> glTexture = GLRenderer.getTexture( texture.getPath() ) ;
+				final GLImage glTexture = GLRenderer.getTexture( texture.getPath() ) ;
 				if( glTexture == null )
 				{
 					return false ;
 				}
 
-				_gl.uniform1i( inUniform, textureUnit ) ;
-				_gl.activeTexture( GL3.TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.bindTexture( GL3.TEXTURE_2D, glTexture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				_data.set( uniform.getLeft(), glTexture ) ;
+				return true ;
+			}
+
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
+			{
+				final GLProgram program               = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+				final WebGLUniformLocation inUniform = program.inUniforms[_index] ;
+
+				final GLImage texture = ( GLImage )_data.get( uniform.getLeft() ) ;
+
+				MGL.uniform1i( inUniform, textureUnit ) ;
+				MGL.activeTexture( GL3.TEXTURE0 + textureUnit ) ;				//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				MGL.bindTexture( GL3.TEXTURE_2D, texture.textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
+			}
+
+			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index )
+			{
+				final GLProgram program               = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+
+				final MalletTexture texture = ( MalletTexture )_data.get( uniform.getLeft() ) ;
+				_keys.add( texture.getPath() ) ;
 			}
 
 			public Class getUniformClass()
@@ -202,25 +125,44 @@ public class GLProgram extends Resource
 		{
 			private int textureUnit = 0 ;
 
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				final GLProgram program              = ( GLProgram )_data.getProgram() ;
+				final GLProgram program              = _data.getProgram() ;
 				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
-				final WebGLUniformLocation inUniform = program.inUniforms[_index] ;
 
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFont glFont = GLRenderer.getFont( font ) ;
 
-				final Texture<GLImage> texture = glFont.getTexture() ;
+				final GLImage texture = glFont.getTexture() ;
 				if( texture == null )
 				{
 					return false ;
 				}
 
-				_gl.activeTexture( GL3.TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
-				_gl.bindTexture( GL3.TEXTURE_2D, texture.getImage().textureIDs[0] ) ;		//GLRenderer.handleError( "Bind Texture", _gl ) ;
+				_data.set( uniform.getLeft(), texture ) ;
+				return true ;
+			}
+
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index )
+			{
+				final GLProgram program               = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+
+				final GLImage texture = ( GLImage )_data.get( uniform.getLeft() ) ;
+
+				MGL.activeTexture( GL3.TEXTURE0 + textureUnit ) ;						//GLRenderer.handleError( "Activate Texture", _gl ) ;
+				MGL.bindTexture( GL3.TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
 				textureUnit += 1 ;
 				return true ;
+			}
+
+			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index )
+			{
+				final GLProgram program               = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+
+				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
+				_keys.add( font.getID() ) ;
 			}
 
 			public Class getUniformClass()
@@ -241,12 +183,22 @@ public class GLProgram extends Resource
 			delegate = _delegate ;
 		}
 
+		public boolean build( final ProgramMap<GLProgram> _map, final int _index )
+		{
+			return delegate.build( _map, _index ) ;
+		}
+
 		/**
 			Load the information being mapped at index location.
 		*/
-		public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index )
+		public boolean load( final ProgramMap<GLProgram> _map, final int _index )
 		{
-			return delegate.load( _gl, _data, _index ) ;
+			return delegate.load( _map, _index ) ;
+		}
+
+		public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _map, final int _index )
+		{
+			delegate.clean( _keys, _map, _index ) ;
 		}
 
 		public void reset()
@@ -274,9 +226,26 @@ public class GLProgram extends Resource
 			Uniform.FONT.reset() ;
 		}
 
+		private static class AUniform implements UniformDelegate
+		{
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
+
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index ) { return false ; }
+
+			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index ) {}
+
+			public Class getUniformClass() { return null ; }
+
+			public void reset() {}
+		}
+
 		private interface UniformDelegate
 		{
-			public boolean load( final WebGLRenderingContext _gl, final ProgramMap _data, final int _index ) ;
+			public boolean build( final ProgramMap<GLProgram> _data, final int _index ) ;
+
+			public boolean load( final ProgramMap<GLProgram> _data, final int _index ) ;
+
+			public void clean( final Set<String> _keys, final ProgramMap<GLProgram> _data, final int _index ) ;
 
 			public Class getUniformClass() ;
 
@@ -319,16 +288,44 @@ public class GLProgram extends Resource
 	}
 
 	/**
+		The program-map defined by the user is not efficient 
+		for loading uniforms as it specifies MalletTextures and 
+		MalletFonts instead of GLImage and GLFont.
+
+		Construct a program-map that references render specific 
+		resources instead.
+
+		If we fail to build an efficient map then return null.
+	*/
+	public ProgramMap<GLProgram> buildMap( final ProgramMap<GLProgram> _map )
+	{
+		final ProgramMap<GLProgram> map = new ProgramMap<GLProgram>( _map ) ;
+
+		final int size = uniforms.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
+			if( uniform.getRight().build( map, i ) == false )
+			{
+				return null ;
+			}
+		}
+
+		map.setDirty( false ) ;
+		return map ;
+	}
+
+	/**
 		A GL Program will have information that it requires 
 		before it can be used effectively. 
 	*/
-	public boolean loadUniforms( final WebGLRenderingContext _gl, final ProgramMap _data )
+	public boolean loadUniforms( final ProgramMap<GLProgram> _data )
 	{
 		final int size = uniforms.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
-			if( uniform.getRight().load( _gl, _data, i ) == false )
+			if( uniform.getRight().load( _data, i ) == false )
 			{
 				Uniform.resetAll() ;
 				return false ;
@@ -337,6 +334,28 @@ public class GLProgram extends Resource
 
 		Uniform.resetAll() ;
 		return true ;
+	}
+
+	/**
+		Should only be used on a ProgramMap created by the user.
+		Will crash if used with a ProgramMap built using buildMap().
+
+		The program map contains the references to resources 
+		that are potential managed by the renderer.
+
+		Using the uniforms loop over the map and record 
+		within _activeKeys the keys for those resources.
+	*/
+	public void getUsedResources( final Set<String> _activeKeys, final ProgramMap<GLProgram> _data )
+	{
+		_activeKeys.add( name ) ;
+
+		final int size = uniforms.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final Tuple<String, Uniform> uniform = uniforms.get( i ) ;
+			uniform.getRight().clean( _activeKeys, _data, i ) ;
+		}
 	}
 
 	/**
@@ -381,6 +400,17 @@ public class GLProgram extends Resource
 		}
 
 		return true ;
+	}
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		long consumption = 0L ;
+		for( final GLShader shader : shaders )
+		{
+			consumption += shader.getMemoryConsumption() ;
+		}
+		return consumption ;
 	}
 
 	@Override

@@ -3,39 +3,76 @@ package com.linxonline.mallet.renderer.web.gl ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.webgl.WebGLTexture ;
 
-import com.linxonline.mallet.renderer.texture.ImageInterface ;
+import com.linxonline.mallet.io.Resource ;
 
-public class GLImage implements ImageInterface
+public class GLImage extends Resource
 {
 	public final WebGLTexture[] textureIDs = new WebGLTexture[1] ;			// Buffer ID for openGL
-	private final int width ;				// Width of texture
-	private final int height ;				// Height of texture
+	private final long consumption ;
 
-	public GLImage( final WebGLTexture _textureID, final int _width, final int _height )
+	/**
+		Store the texture image reference handle 
+		and the amount of memory it has allocated.
+
+		Consumption is used to determine what resources 
+		are most suitable for destruction if memory 
+		availability becomes an issue.
+	*/
+	public GLImage( final WebGLTexture _textureID, final long _consumption )
 	{
 		textureIDs[0] = _textureID ;
-
-		width = _width ;
-		height = _height ;
+		consumption = _consumption ;
 	}
 
-	public final int getWidth()
+	@Override
+	public boolean equals( final Object _obj )
 	{
-		return width ;
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj instanceof GLImage )
+		{
+			final GLImage image = ( GLImage )_obj ;
+			if( textureIDs.length != image.textureIDs.length )
+			{
+				return false ;
+			}
+
+			final int size = textureIDs.length ;
+			for( int i = 0; i < size; i++ )
+			{
+				if( textureIDs[i] != image.textureIDs[i] )
+				{
+					return false ;
+				}
+			}
+		}
+
+		return true ;
 	}
 
-	public final int getHeight()
+	@Override
+	public int hashCode()
 	{
-		return height ;
+		return textureIDs[0].hashCode() ;
 	}
-	
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		return consumption ;
+	}
+
 	public final void destroy()
 	{
 		//System.out.println( "Removing texture.." ) ;
-		final WebGLRenderingContext gl = GLRenderer.getContext() ;
-		if( gl != null )
-		{
-			gl.deleteTexture( textureIDs[0] ) ;
-		}
+		MGL.deleteTexture( textureIDs[0] ) ;
 	}
 }

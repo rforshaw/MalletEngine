@@ -68,8 +68,8 @@ public class GLProgram extends Resource
 			@Override
 			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				final GLProgram program               = _data.getProgram() ;
-				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+				final GLProgram program              = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 
 				final MalletTexture texture = ( MalletTexture )_data.get( uniform.getLeft() ) ;
 				final GLImage glTexture = GLRenderer.getTexture( texture.getPath() ) ;
@@ -120,8 +120,8 @@ public class GLProgram extends Resource
 
 			public boolean build( final ProgramMap<GLProgram> _data, final int _index )
 			{
-				final GLProgram program               = _data.getProgram() ;
-				final Tuple<String, Uniform> uniform  = program.uniforms.get( _index ) ;
+				final GLProgram program              = _data.getProgram() ;
+				final Tuple<String, Uniform> uniform = program.uniforms.get( _index ) ;
 
 				final MalletFont font = ( MalletFont )_data.get( uniform.getLeft() ) ;
 				final GLFont glFont = GLRenderer.getFont( font ) ;

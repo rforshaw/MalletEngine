@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.web.gl ;
 
 import org.teavm.jso.webgl.WebGLShader ;
 
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 
 /**
 	Transitionary object used to retain important 
@@ -23,6 +23,12 @@ public class GLShader extends Resource
 		type = _type ;
 		file = _file ;
 		source[0] = _source ;
+	}
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		return 0L ;
 	}
 
 	@Override

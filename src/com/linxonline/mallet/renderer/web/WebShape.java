@@ -17,7 +17,7 @@ import com.linxonline.mallet.maths.* ;
 	that the Shape structure is already in a viable format 
 	for uploading. 
 */
-public class WebShape implements Shape.Interface
+public class WebShape extends Shape
 {
 	private Shape.Style style ;
 	private Shape.Swivel[] swivel ;
@@ -29,28 +29,31 @@ public class WebShape implements Shape.Interface
 	private int indexIncrement = 0 ;
 	private int vertexIncrement = 0 ;
 
-	@Override
-	public void init( final Shape.Style _style, final Shape.Swivel[] _swivel, final int _indexSize, final int _pointSize )
+	public WebShape( final Shape.Style _style, final Shape.Swivel[] _swivel, final int _indexSize, final int _pointSize )
 	{
-		style = _style ;
 		swivel = _swivel ;
 
 		indicies = Int16Array.create( _indexSize ) ;
 		verticies = Float32Array.create( Shape.Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize ) ;
 		facadeVerticies = Uint8Array.create( verticies.getBuffer() ) ;
 
+		style = _style ;
 		vertexSize = _pointSize ;
 	}
 
-	@Override
-	public void init( final Shape.Interface _shape )
+	public WebShape( final Shape _shape )
 	{
-		final Shape.Style s = _shape.getStyle() ;
-		final Shape.Swivel[] sw = _shape.getSwivel() ;
+		this( _shape.getStyle(),
+			  _shape.getSwivel(),
+			  _shape.getIndexSize(),
+			  _shape.getVertexSize() ) ;
+
+		// We've got all the information we need to make this a clean copy.
+		// This should work even if the implementation was changed 
+		// halfway through.
+		final Swivel[] sw = _shape.getSwivel() ;
 		final int indexSize = _shape.getIndexSize() ;
 		final int vertexSize = _shape.getVertexSize() ;
-
-		init( s, sw, indexSize, vertexSize ) ;
 
 		final Object[] vertex = Shape.Swivel.constructSwivel( sw ) ;
 		for( int i = 0; i < vertexSize; i++ )
@@ -305,9 +308,18 @@ public class WebShape implements Shape.Interface
 
 	public static class Factory implements Shape.Factory
 	{
-		public Shape.Interface create()
+		@Override
+		public Shape create( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
 		{
-			return new WebShape() ;
+			System.out.println( "Create Web Shape" ) ;
+			return new WebShape( _style, _swivel, _indexSize, _pointSize ) ;
+		}
+
+		@Override
+		public Shape create( final Shape _shape )
+		{
+			System.out.println( "Create Web Shape" ) ;
+			return new WebShape( _shape ) ;
 		}
 	}
 }

@@ -11,10 +11,21 @@ import com.linxonline.mallet.audio.SoundInterface ;
 public class WebSound implements SoundInterface
 {
 	private HTMLSourceElement source ;
+	private final int consumption ;		// Buffer size
 
-	public WebSound( final HTMLSourceElement _source )
+	public WebSound( final HTMLSourceElement _source, final int _consumption )
 	{
 		source = _source ;
+		consumption = _consumption ;
+	}
+
+	/**
+		Return the audio buffer size in bytes.
+	*/
+	@Override
+	public long getMemoryConsumption()
+	{
+		return consumption ;
 	}
 
 	public void destroy() {}

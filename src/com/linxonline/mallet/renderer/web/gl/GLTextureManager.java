@@ -15,9 +15,10 @@ import org.teavm.jso.dom.html.HTMLCanvasElement ;
 import org.teavm.jso.dom.events.* ;
 import org.teavm.jso.canvas.ImageData ;
 
-import com.linxonline.mallet.system.GlobalConfig ;
+import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.web.* ;
+import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
@@ -25,16 +26,11 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.resources.* ;
-import com.linxonline.mallet.renderer.texture.* ;
 
-public class GLTextureManager extends AbstractManager<Texture>
+public class GLTextureManager extends AbstractManager<GLImage>
 {
 	private static final Window window = Window.current() ;
 	private static final HTMLDocument document = window.getDocument() ;
-
-	// Used when a texture is being loaded, but not yet available.
-	private static final Texture PLACEHOLDER = new Texture( null ) ;
 
 	/**
 		When loading a texture the TextureManager will stream the 
@@ -55,18 +51,19 @@ public class GLTextureManager extends AbstractManager<Texture>
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
 	protected int imageFormat = GL3.RGBA ;
+	protected GLWorldState worldState ;
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<Texture> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<Texture>()
+		final ResourceLoader<GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return true ;
 			}
 
-			public Texture load( final String _file, final Settings _settings )
+			public GLImage load( final String _file )
 			{
 				final WebFile file = ( WebFile )GlobalFileSystem.getFile( _file ) ;
 				if( file.exists() == false )
@@ -74,8 +71,6 @@ public class GLTextureManager extends AbstractManager<Texture>
 					Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
 					return null ;
 				}
-
-				add( _file, PLACEHOLDER ) ;
 
 				final HTMLImageElement img = file.getHTMLImage() ;
 				window.getDocument().getBody().appendChild( img ) ;
@@ -96,13 +91,19 @@ public class GLTextureManager extends AbstractManager<Texture>
 					}
 				} ) ;
 
+				put( _file, null ) ;
 				return null ; 
 			}
 		} ) ;
 	}
 
+	public void setWorldState( final GLWorldState _worldState )
+	{
+		worldState = _worldState ;
+	}
+
 	@Override
-	public Texture get( final String _file )
+	public GLImage get( final String _file )
 	{
 		synchronized( toBind )
 		{
@@ -110,18 +111,30 @@ public class GLTextureManager extends AbstractManager<Texture>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			for( final Tuple<String, HTMLImageElement> tuple : toBind )
+			if( toBind.isEmpty() == false )
 			{
-				add( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+				for( final Tuple<String, HTMLImageElement> tuple : toBind )
+				{
+					put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
+				}
+				toBind.clear() ;
 			}
-			toBind.clear() ;
 		}
 
-		final Texture texture = super.get( _file ) ;
+		final GLImage image = super.get( _file ) ;
+		if( image != null )
+		{
+			//System.out.println( "GLImage: " + _file ) ;
+			return image ;
+		}
 
-		// PLACEHOLDER is used to prevent the texture loader 
-		// loading the same texture twice when loading async, 
-		return ( texture != PLACEHOLDER ) ? texture : null ;
+		final GLWorld world = worldState.getWorld( _file ) ;
+		if( world != null )
+		{
+			return world.getImage() ;
+		}
+
+		return null ;
 	}
 
 	/**
@@ -149,12 +162,12 @@ public class GLTextureManager extends AbstractManager<Texture>
 		imageFormat = _format ;
 	}
 
-	public Texture bind( final HTMLImageElement _image )
+	public GLImage bind( final HTMLImageElement _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
 
-	public Texture bind( final HTMLCanvasElement _image )
+	public GLImage bind( final HTMLCanvasElement _image )
 	{
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
@@ -164,31 +177,25 @@ public class GLTextureManager extends AbstractManager<Texture>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final HTMLCanvasElement _image, final InternalFormat _format )
+	public GLImage bind( final HTMLCanvasElement _image, final InternalFormat _format )
 	{
-		final WebGLRenderingContext gl = GLRenderer.getContext() ;
-		if( gl == null )
-		{
-			System.out.println( "GL context doesn't exist" ) ;
-			return null ;
-		}
+		final WebGLTexture textureID = glGenTextures() ;
+		MGL.bindTexture( GL3.TEXTURE_2D, textureID ) ;
 
-		final WebGLTexture textureID = glGenTextures( gl ) ;
-		gl.bindTexture( GL3.TEXTURE_2D, textureID ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.CLAMP_TO_EDGE ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.CLAMP_TO_EDGE ) ;
 
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.CLAMP_TO_EDGE ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.CLAMP_TO_EDGE ) ;
-
-		gl.texImage2D( GL3.TEXTURE_2D, 
+		MGL.texImage2D( GL3.TEXTURE_2D, 
 						 0, 
 						 GL3.RGBA,
 						 GL3.RGBA, 
 						 GL3.UNSIGNED_BYTE, 
 						 _image ) ;
 
-		gl.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
-		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
+		MGL.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
+		//final long estimatedConsumption = width * height * ( channels * 8 ) ;
+		return new GLImage( textureID, 0L/*estimatedConsumption*/ ) ;
 	}
 
 	/**
@@ -196,40 +203,34 @@ public class GLTextureManager extends AbstractManager<Texture>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public Texture bind( final HTMLImageElement _image, final InternalFormat _format )
+	public GLImage bind( final HTMLImageElement _image, final InternalFormat _format )
 	{
-		final WebGLRenderingContext gl = GLRenderer.getContext() ;
-		if( gl == null )
-		{
-			System.out.println( "GL context doesn't exist" ) ;
-			return null ;
-		}
+		final WebGLTexture textureID = glGenTextures() ;
+		MGL.bindTexture( GL3.TEXTURE_2D, textureID ) ;
 
-		final WebGLTexture textureID = glGenTextures( gl ) ;
-		gl.bindTexture( GL3.TEXTURE_2D, textureID ) ;
-
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.REPEAT ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.REPEAT ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MAG_FILTER, GL3.LINEAR ) ;
-		gl.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR_MIPMAP_NEAREST ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.REPEAT ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.REPEAT ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MAG_FILTER, GL3.LINEAR ) ;
+		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR_MIPMAP_NEAREST ) ;
 
 		//gl.pixelStorei( GL3.UNPACK_ALIGNMENT, 1 ) ;
-		gl.texImage2D( GL3.TEXTURE_2D, 
+		MGL.texImage2D( GL3.TEXTURE_2D, 
 						 0, 
 						 GL3.RGBA, 
 						 GL3.RGBA, 
 						 GL3.UNSIGNED_BYTE, 
 						 _image ) ;
 
-		gl.generateMipmap( GL3.TEXTURE_2D ) ;
-		gl.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
+		MGL.generateMipmap( GL3.TEXTURE_2D ) ;
+		MGL.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
 
-		return new Texture( new GLImage( textureID, _image.getWidth(), _image.getHeight() ) ) ;
+		//final long estimatedConsumption = width * height * ( channels * 8 ) ;
+		return new GLImage( textureID, 0L/*estimatedConsumption*/ ) ;
 	}
 
-	private WebGLTexture glGenTextures( final WebGLRenderingContext _gl )
+	private WebGLTexture glGenTextures()
 	{
-		return _gl.createTexture() ;
+		return MGL.createTexture() ;
 	}
 
 	public enum InternalFormat

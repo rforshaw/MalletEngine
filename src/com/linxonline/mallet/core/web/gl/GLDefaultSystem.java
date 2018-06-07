@@ -1,43 +1,55 @@
-package com.linxonline.mallet.system.web.gl ;
+package com.linxonline.mallet.core.web.gl ;
 
+import com.linxonline.mallet.io.filesystem.web.WebFileSystem ;
 import com.linxonline.mallet.audio.web.AudioSourceGenerator ;
 import com.linxonline.mallet.renderer.web.gl.GLRenderer ;
-import com.linxonline.mallet.renderer.web.WebShape ;
-import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.input.web.InputSystem ;
-import com.linxonline.mallet.system.* ;
+import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;
 
-public class GLDefaultSystem extends BasicSystem
+import com.linxonline.mallet.renderer.web.WebShape ;
+import com.linxonline.mallet.renderer.Shape ;
+
+/**
+	Central location for WebGL Applications.
+*/
+public class GLDefaultSystem extends BasicSystem<WebFileSystem,
+												 DefaultShutdown,
+												 GLRenderer,
+												 AudioSourceGenerator,
+												 InputSystem,
+												 EventSystem>
 {
 	// Add Web Document here...
 	protected EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
 	{
-		Shape.setFactory( new WebShape.Factory() ) ;
-
-		shutdownDelegate = new DefaultShutdown() ;
-		renderer = new GLRenderer() ;
-		audioGenerator = new AudioSourceGenerator() ;
-		eventSystem = new EventSystem( "ROOT_EVENT_SYSTEM" ) ;
-		inputSystem = new InputSystem() ;
+		super( new DefaultShutdown(),
+			   new GLRenderer(),
+			   new AudioSourceGenerator(),
+			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new InputSystem(),
+			   new WebFileSystem() ) ;
 	}
 
 	@Override
 	public void initSystem()
 	{
+		Shape.setFactory( new WebShape.Factory() ) ;
 		initEventProcessors() ;
 
-		renderer.start() ;
-		audioGenerator.startGenerator() ;
+		final GLRenderer render = getRenderer() ;
+		render.start() ;
 
-		final GLRenderer render = ( GLRenderer )renderer ;
-		final InputSystem input = ( InputSystem )inputSystem ;
+		getAudioGenerator().startGenerator() ;
 
-		input.inputAdapter = render.getRenderInfo() ;					// Hook up Input Adapter
+		final InputSystem input = getInput() ;
 
-		eventSystem.addEvent( new Event( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		final EventSystem event = getEventSystem() ;
+		event.addEvent( new Event<Boolean>( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 	}
 
 	protected void initEventProcessors()
@@ -52,7 +64,7 @@ public class GLDefaultSystem extends BasicSystem
 			}
 		} ) ;
 
-		eventSystem.addEventHandler( eventController ) ;
+		getEventSystem().addEventHandler( eventController ) ;
 	}
 
 	@Override

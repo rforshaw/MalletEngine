@@ -1,22 +1,21 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
-import com.linxonline.mallet.resources.Resource ;
+import com.linxonline.mallet.io.Resource ;
 
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.texture.Texture ;
 
 public class GLFont extends Resource
 {
 	private final Shape[] glyphs ;
-	private final Texture<GLImage> texture ;
+	private final GLImage texture ;
 
-	public GLFont( final Shape[] _glyphs, final Texture<GLImage> _texture )
+	public GLFont( final Shape[] _glyphs, final GLImage _texture )
 	{
 		glyphs = _glyphs ;
 		texture = _texture ;
 	}
 
-	public Texture<GLImage> getTexture()
+	public GLImage getTexture()
 	{
 		return texture ;
 	}
@@ -30,14 +29,16 @@ public class GLFont extends Resource
 	{
 		if( _code < glyphs.length )
 		{
-			final Shape glyph = glyphs[_code] ;
-			if( glyph != null )
-			{
-				return glyph ;
-			}
+			return glyphs[_code] ;
 		}
 
-		return getShapeWithChar( '\0' ) ;
+		return null ;
+	}
+
+	@Override
+	public long getMemoryConsumption()
+	{
+		return texture.getMemoryConsumption() ;
 	}
 
 	@Override

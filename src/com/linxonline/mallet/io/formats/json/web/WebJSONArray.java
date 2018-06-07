@@ -40,7 +40,7 @@ public class WebJSONArray extends JSONArray
 
 	public static void init()
 	{
-		constructor = new WebJSONArray() ;
+		setConstructor( new WebJSONArray() ) ;
 	}
 
 	@Override
