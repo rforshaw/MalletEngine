@@ -517,7 +517,7 @@ public abstract class Shape
 
 		final MalletColour white = MalletColour.white() ;
 
-		final Shape plane = Shape.create( Shape.Style.FILL, swivel, 38, 24 ) ;
+		final Shape plane = Shape.create( Shape.Style.FILL, swivel, 36, 24 ) ;
 		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front
 		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) ) ) ;				// 1
 		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 2

@@ -1089,7 +1089,7 @@ public class GLGeometryUploader
 				positionMatrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
-			indicies.set( indexInc++, ( short )PRIMITIVE_RESTART_INDEX ) ;
+			//indicies.set( indexInc++, ( short )PRIMITIVE_RESTART_INDEX ) ;
 
 			MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, indicies ) ;
 			//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
@@ -1299,6 +1299,7 @@ public class GLGeometryUploader
 
 		private Location createLocation( final int _indexStart, final int _indexLength, final int _vertexStart, final int _vertexLength )
 		{
+			//System.out.println( "Index Start: " + ( _indexStart / IBO_VAR_BYTE_SIZE ) + " Length: " + ( _indexLength / IBO_VAR_BYTE_SIZE )+ " Vertex Start: " + ( _vertexStart / VBO_VAR_BYTE_SIZE ) + " Length: " + ( _vertexLength / VBO_VAR_BYTE_SIZE ) ) ;
 			amountIndexUsedBytes += _indexLength ;
 			amountVertexUsedBytes += _vertexLength ;
 
