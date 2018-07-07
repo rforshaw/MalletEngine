@@ -174,6 +174,7 @@ public class GUIEditText extends GUIText
 			cursorOffset.setXYZ( offset ) ;
 
 			cursorOffset.add( font.stringWidth( edit, start, index ), 0.0f, 0.0f ) ;
+			//System.out.println( "Update Cursor: " + index + " " + cursorOffset ) ;
 
 			DrawAssist.amendOrder( drawCursor, layer ) ;
 			DrawAssist.forceUpdate( drawCursor ) ;

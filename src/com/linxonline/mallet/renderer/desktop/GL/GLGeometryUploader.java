@@ -197,7 +197,8 @@ public class GLGeometryUploader
 
 			if( increment >= indicies.length )
 			{
-				// Buffer is full needs to be passed to GPU now
+				// The memory required for the Location may be 
+				// greater than the buffer - upload now.
 				indexBuffer.put( indicies ) ;
 				indexBuffer.position( 0 ) ;
 
@@ -263,6 +264,8 @@ public class GLGeometryUploader
 			// another vertex, upload it to the GPU before continuing.
 			if( ( increment + vertexSize ) >= verticies.length )
 			{
+				// The memory required for the Location may be 
+				// greater than the buffer - upload now.
 				vertexBuffer.put( verticies ) ;
 				vertexBuffer.position( 0 ) ;
 

@@ -39,6 +39,11 @@ public final class MGL
 		gl.bufferData( _target, _data, _usage ) ;
 	}
 
+	public static void bufferData( final int _target, final int _size, final int _usage )
+	{
+		gl.bufferData( _target, _size, _usage ) ;
+	}
+
 	public static void bufferSubData( final int _target, final int _offset, final ArrayBufferView _data )
 	{
 		gl.bufferSubData( _target, _offset, _data ) ;

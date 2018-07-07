@@ -1,5 +1,7 @@
 package com.linxonline.mallet.core.test ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;
@@ -58,6 +60,8 @@ public final class GameTestLoader extends GameLoader
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
+
+				createEventMessageTest() ;
 
 				getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 			}
@@ -463,6 +467,39 @@ public final class GameTestLoader extends GameLoader
 				} ;
 
 				addEntity( entity ) ;
+			}
+
+			public void createEventMessageTest()
+			{
+				{
+					final Entity receive = new Entity() ;
+					final EventComponent event = new EventComponent( receive )
+					{
+						@Override
+						public void initStateEventProcessors( final EventController _controller )
+						{
+							super.initStateEventProcessors( _controller ) ;
+							_controller.addEventProcessor( new EventProcessor<String>( "TEST_EVENT", "TEST_EVENT" )
+							{
+								@Override
+								public void processEvent( final Event<String> _event )
+								{
+									System.out.println( "Received: " + _event.getVariable() ) ;
+								}
+							} ) ;
+						}
+					} ;
+
+					addEntity( receive ) ;
+				}
+
+				{
+					final Entity send = new Entity() ;
+					final EventComponent event = new EventComponent( send ) ;
+					event.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
+
+					addEntity( send ) ;
+				}
 			}
 		} ) ;
 

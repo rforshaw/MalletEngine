@@ -305,8 +305,40 @@ public class UIAbstractModel implements IAbstractModel
 			// matrix then we would never find the Matrix that represents _index.
 			return false ;
 		}
-		
-		public void removeData( final UIModelIndex _index ) {}
+
+		/**
+			NOTE: Currently implemented to remove data from a specific cell.
+		*/
+		public void removeData( final UIModelIndex _index )
+		{
+			if( isHandler( _index ) == true )
+			{
+				setVariant( null, IAbstractModel.Role.Display ) ;
+				setVariant( null, IAbstractModel.Role.Edit ) ;
+				setVariant( null, IAbstractModel.Role.User ) ;
+				return ;
+			}
+
+			// Go down all of the parents until we find a parent 
+			// that matches our current Matrix, we then use that 
+			// index to get the child matrix that will eventually 
+			// lead us to the Matrix that we are looking for.
+			UIModelIndex parent = _index.getParent() ;
+			while( parent != null )
+			{
+				if( isHandler( parent ) == true )
+				{
+					final Matrix child = rows.get( _index.getRow() ).get( _index.getColumn() ) ;
+					child.removeData( _index ) ;
+					return ;
+				}
+				parent = parent.getParent() ;
+			}
+
+			// If we do not find a parent that matches our current
+			// matrix then we would never find the Matrix that represents _index.
+			return ;
+		}
 
 		public Set<ItemFlags> getDataFlags( final UIModelIndex _index, final Set<ItemFlags> _flags )
 		{

@@ -188,11 +188,11 @@ public class GLGeometryUploader
 
 			if( increment >= indiciesLength )
 			{
-				// Buffer is full needs to be passed to GPU now
-				final int lengthBytes = indiciesLength * IBO_VAR_BYTE_SIZE ;
+				// The memory required for the Location may be 
+				// greater than the buffer - upload now. 
 				MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, indicies ) ;
 
-				indexStartBytes += lengthBytes ;
+				indexStartBytes += indiciesLength * IBO_VAR_BYTE_SIZE ;
 				increment = 0 ;
 			}
 		}
@@ -205,7 +205,7 @@ public class GLGeometryUploader
 		{
 			final Int16Array tmp = Int16Array.create( indicies.getBuffer(), 0, increment ) ;
 			MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, tmp ) ;
-			//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+			//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
 		}
 	}
 
@@ -256,11 +256,12 @@ public class GLGeometryUploader
 			final int size = verticies.getLength() ;
 			if( ( increment + vertexSize ) >= size )
 			{
-				final int lengthBytes = increment * VBO_VAR_BYTE_SIZE ;
+				// The memory required for the Location may be 
+				// greater than the buffer - upload now.
 				MGL.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, verticies ) ;
-				//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
+				//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
 
-				vertexStartBytes += lengthBytes ;
+				vertexStartBytes += size * VBO_VAR_BYTE_SIZE ;
 				increment = 0 ;
 			}
 		}
@@ -269,7 +270,7 @@ public class GLGeometryUploader
 		{
 			final Float32Array tmp = Float32Array.create( verticies.getBuffer(), 0, increment ) ;
 			MGL.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, tmp ) ;
-			//GLRenderer.handleError( "Vertex Buffer Sub Data: ", _gl ) ;
+			//GLRenderer.handleError( "Vertex Buffer Sub Data: " ) ;
 		}
 	}
 
@@ -974,6 +975,8 @@ public class GLGeometryUploader
 		{
 			final int length = _data.getTextEnd() - _data.getTextStart() ;
 			final int shapeIndexBytes = ( ( length * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
+
+			//System.out.println( "Size: " + shapeIndexBytes + " " + _location.getIndexLength() ) ;
 			return shapeIndexBytes == _location.getIndexLength() ;
 		}
 
@@ -1034,11 +1037,10 @@ public class GLGeometryUploader
 					indicies.set( indexInc++, ( short )( indexOffset + shape.getIndex( j ) ) ) ;
 					if( indexInc >= indiciesLength )
 					{
-						final int lengthBytes = indiciesLength * IBO_VAR_BYTE_SIZE ;
 						MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, indicies ) ;
 						//GLRenderer.handleError( "Index Buffer Sub Data: " ) ;
 
-						indexStartBytes += lengthBytes ;
+						indexStartBytes += indiciesLength * IBO_VAR_BYTE_SIZE ;
 						indexInc = 0 ;
 					}
 				}
@@ -1078,10 +1080,9 @@ public class GLGeometryUploader
 
 					if( ( vertexInc + vertexSize ) >= verticiesLength )
 					{
-						final int lengthBytes = vertexInc * VBO_VAR_BYTE_SIZE ;
 						MGL.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, verticies ) ;
 
-						vertexStartBytes += lengthBytes ;
+						vertexStartBytes += size * VBO_VAR_BYTE_SIZE ;
 						vertexInc = 0 ;
 					}
 				}
@@ -1091,12 +1092,15 @@ public class GLGeometryUploader
 
 			//indicies.set( indexInc++, ( short )PRIMITIVE_RESTART_INDEX ) ;
 
-			MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, indicies ) ;
-			//GLRenderer.handleError( "Index Buffer Sub Data: ", _gl ) ;
+			if( indexInc > 0 )
+			{
+				final Int16Array tmp = Int16Array.create( indicies.getBuffer(), 0, indexInc ) ;
+				MGL.bufferSubData( GL3.ELEMENT_ARRAY_BUFFER, indexStartBytes, tmp ) ;
+			}
 
 			if( vertexInc > 0 )
 			{
-				final Float32Array tmp = Float32Array.create( verticies.getBuffer(), vertexStartBytes, vertexInc * VBO_VAR_BYTE_SIZE ) ;
+				final Float32Array tmp = Float32Array.create( verticies.getBuffer(), 0, vertexInc ) ;
 				MGL.bufferSubData( GL3.ARRAY_BUFFER, vertexStartBytes, tmp ) ;
 			}
 		}
@@ -1200,14 +1204,16 @@ public class GLGeometryUploader
 			vertexLengthBytes = _vertexLengthBytes ;
 			vertexStrideBytes = _vertexStrideBytes ;
 
+			System.out.println( "Creating buffer: " + indexLengthBytes + " " + vertexLengthBytes ) ;
+			
 			indexID = GLModelManager.genIndexID() ;	//GLRenderer.handleError( "Gen Index: ", gl ) ;
 			vboID = GLModelManager.genVBOID() ;		//GLRenderer.handleError( "Gen VBO: ", gl ) ;
 
 			MGL.bindBuffer( GL3.ELEMENT_ARRAY_BUFFER, indexID[0] ) ;	//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
-			MGL.bufferData( GL3.ELEMENT_ARRAY_BUFFER, indicies, GL3.DYNAMIC_DRAW ) ;	//GLRenderer.handleError( "Upload Data: ", gl ) ;
+			MGL.bufferData( GL3.ELEMENT_ARRAY_BUFFER, indexLengthBytes, GL3.DYNAMIC_DRAW ) ;	//GLRenderer.handleError( "Upload Data: ", gl ) ;
 
 			MGL.bindBuffer( GL3.ARRAY_BUFFER, vboID[0] ) ;		//GLRenderer.handleError( "Bind Buffer: ", gl ) ;
-			MGL.bufferData( GL3.ARRAY_BUFFER, verticies, GL3.DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
+			MGL.bufferData( GL3.ARRAY_BUFFER, vertexLengthBytes, GL3.DYNAMIC_DRAW ) ;		//GLRenderer.handleError( "Upload Data: ", gl ) ;
 		}
 
 		/**

@@ -311,14 +311,12 @@ public class WebShape extends Shape
 		@Override
 		public Shape create( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
 		{
-			System.out.println( "Create Web Shape" ) ;
 			return new WebShape( _style, _swivel, _indexSize, _pointSize ) ;
 		}
 
 		@Override
 		public Shape create( final Shape _shape )
 		{
-			System.out.println( "Create Web Shape" ) ;
 			return new WebShape( _shape ) ;
 		}
 	}

@@ -17,79 +17,176 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIAbstractView extends UIElement
 {
-	private final FrameBuffer frame ;
-
 	private ItemDelegate<?> defaultItemDelegate = createDefaultItemDelegate() ;
 	private ItemDelegate<?>[] columnItemDelegate = new ItemDelegate<?>[1] ;
 	private ItemDelegate<?>[] rowItemDelegate = new ItemDelegate<?>[1] ;
 
+	private final UIList list = new UIList( ILayout.Type.VERTICAL ) ;
+
 	private final IAbstractModel view = new UIAbstractModel() ;
 	private IAbstractModel model = UIAbstractView.createEmptyModel() ;
 
-	private final Vector3 cellLength = new Vector3( 1.0f, 1.0f, 0.0f ) ; 
+	private final Vector3 cellLength = new Vector3( 1.0f, 1.0f, 0.0f ) ;
 
 	public UIAbstractView()
 	{
 		super() ;
-
-		final Vector3 position = getPosition() ;
-		final Vector3 offset = getOffset() ;
-		final Vector3 length = getLength() ;
-
-		frame = new FrameBuffer( position.x, position.y, position.z,
-								 offset.x,   offset.y,   offset.z,
-								 length.x,   length.y,   getLayer() + 1 ) ;
-		initFrameConnections() ;
+		initViewConnections() ;
 	}
 
-	private void initFrameConnections()
+	private void initViewConnections()
 	{
-		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		/**
+			Engaging a UILayout is somewhat redundant.
+			You will most likely want to engage a child element 
+			owned by the layout.
+		*/
+		UIElement.connect( this, elementEngaged(), new Connect.Slot<UIAbstractView>()
 		{
-			public void callback( final DrawDelegate _delegate )
+			@Override
+			public void slot( final UIAbstractView _this )
 			{
-				frame.setDrawDelegate( _delegate ) ;
-				UIAbstractView.this.passViewDrawDelegate( model.root(), frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
+				_this.list.engage() ;
 			}
-		} ) ) ;
+		} ) ;
 
-		FrameBuffer.connect( this, frame ) ;
-	}
-
-	@Override
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
-	{
-		// Listeners to the UIAbstractView will be given the 
-		// DrawDelegate passed in here - only children 
-		// will be given the UIAbstractView DrawDelegate.
-		super.passDrawDelegate( _delegate, _world, _camera ) ;
-
-		// UIAbstractView will give its children its 
-		// own DrawDelegate the UIAbstractView will give the 
-		// DrawDelegate passed in here the Draw pane.
-		_delegate.addBasicDraw( frame.getFrame(), _world ) ;
-	}
-
-	private void passViewDrawDelegate( final UIModelIndex _node, final DrawDelegate _delegate, final World _world, final Camera _camera )
-	{
-		final int rowCount = model.rowCount( _node ) ;
-		final int columnCount = model.columnCount( _node ) ;
-
-		for( int i = 0; i < rowCount; i++ )
+		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UIAbstractView>()
 		{
-			for( int j = 0; j < columnCount; j++ )
+			@Override
+			public void slot( final UIAbstractView _this )
 			{
-				final UIModelIndex index = new UIModelIndex( _node, i, j ) ;
-
-				final UIElement element = getCellElement( index, getItemDelegate( index ) ) ;
-				element.passDrawDelegate( _delegate, _world, _camera ) ;
-
-				// Pass the DrawDelegate of UIAbstractView to the 
-				// UIAbstractView children instead of the DrawDelegate
-				// that is provided by passDrawDelegate.
-				passViewDrawDelegate( index, _delegate, _world, _camera ) ;
+				_this.list.disengage() ;
 			}
-		}
+		} ) ;
+	
+		/**
+			Set the layer that the visual elements are 
+			expected to be placed on.
+			
+			This also applies to the layouts children.
+			Causes the elements to be flagged as dirty.
+		*/
+		UIElement.connect( this, layerChanged(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.setLayer( getLayer() + 1 ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementShown(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.setVisible( true ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementHidden(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.setVisible( false ) ;
+			}
+		} ) ;
+
+		/**
+			Cleanup any resources, handlers that the listeners 
+			may have acquired.
+
+			Will also call shutdown on all children. Call clear 
+			if you wish to also remove all children from layout.
+		*/
+		UIElement.connect( this, elementShutdown(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.shutdown() ;
+			}
+		} ) ;
+
+		/**
+			Clear out each of the systems.
+			Remove all slots connected to signals.
+			Remove all listeners - note call shutdown if they have 
+			any resources attached.
+			Remove any events that may be in the event stream.
+		*/
+		UIElement.connect( this, elementClear(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.clear() ;
+			}
+		} ) ;
+
+		/**
+			Reset the UILayout as if it has just been constructed.
+			This does not remove listeners, connections or children.
+
+			Call reset on all children.
+		*/
+		UIElement.connect( this, elementReset(), new Connect.Slot<UIAbstractView>()
+		{
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.list.reset() ;
+			}
+		} ) ;
+
+		UIElement.connect( this, positionChanged(), new Connect.Slot<UIAbstractView>()
+		{
+			private final Vector3 unit = new Vector3() ;
+
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.getPosition( unit ) ;
+				_this.list.setPosition( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, offsetChanged(), new Connect.Slot<UIAbstractView>()
+		{
+			private final Vector3 unit = new Vector3() ;
+
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.getOffset( unit ) ;
+				_this.list.setOffset( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, lengthChanged(), new Connect.Slot<UIAbstractView>()
+		{
+			private final Vector3 unit = new Vector3() ;
+
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.getLength( unit ) ;
+				_this.list.setLength( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, marginChanged(), new Connect.Slot<UIAbstractView>()
+		{
+			private final Vector3 unit = new Vector3() ;
+
+			@Override
+			public void slot( final UIAbstractView _this )
+			{
+				_this.getMargin( unit ) ;
+				_this.list.setMargin( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
 	}
 
 	public ItemDelegate setDefaultItemDelegate( final ItemDelegate<?> _delegate )
@@ -126,6 +223,61 @@ public class UIAbstractView extends UIElement
 	}
 
 	@Override
+	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	{
+		super.passDrawDelegate( _delegate, _world, _camera ) ;
+		list.passDrawDelegate( _delegate, _world, _camera ) ;
+	}
+
+	@Override
+	public InputEvent.Action passInputEvent( final InputEvent _event )
+	{
+		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
+		{
+			return InputEvent.Action.CONSUME ;
+		}
+
+		return list.passInputEvent( _event ) ;
+	}
+
+	/**
+		Refreshing a UIAbstractView will most likely 
+		result in all child elements requiring to be 
+		refreshed.
+
+		Flag the child elements as dirty and during 
+		the next update cycle they will be refreshed.
+	*/
+	@Override
+	protected void refresh()
+	{
+		super.refresh() ;
+		list.refresh() ;
+	}
+
+	/**
+		Check to see if the InputEvent intersects with 
+		either the UIAbstractView or one of its children.
+
+		We check the children as there is a chance that 
+		the child is beyond the UIAbstractView boundaries, for 
+		example a dropdown menu.
+	*/
+	@Override
+	public boolean isIntersectInput( final InputEvent _event )
+	{
+		if( super.isIntersectInput( _event ) == true )
+		{
+			return true ;
+		}
+
+		// There is a chance that a layout has children 
+		// that go beyond the layouts boundaries.
+		// For example UIMenu dropdown.
+		return list.isIntersectInput( _event ) ;
+	}
+
+	@Override
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		final boolean dirty = isDirty() ;
@@ -134,6 +286,8 @@ public class UIAbstractView extends UIElement
 		{
 			updateView( model.root(), this, _dt, _events ) ;
 		}
+
+		list.update( _dt, _events ) ;
 	}
 
 	/**
@@ -162,17 +316,32 @@ public class UIAbstractView extends UIElement
 			for( int j = 0; j < columnCount; j++ )
 			{
 				final UIModelIndex index = new UIModelIndex( _node, i, j ) ;
-
 				final UIElement element = getCellElement( index, getItemDelegate( index ) ) ;
-				element.update( _dt, _events ) ;
-
 				updateView( index, element, _dt, _events ) ;
+			}
+		}
+	}
+
+	private void removeView( final UIModelIndex _node )
+	{
+		final int rowCount = model.rowCount( _node ) ;
+		final int columnCount = model.columnCount( _node ) ;
+
+		for( int i = 0; i < rowCount; i++ )
+		{
+			for( int j = 0; j < columnCount; j++ )
+			{
+				final UIModelIndex index = new UIModelIndex( _node, i, j ) ;
+				removeView( index ) ;
+
+				removeCellElement( index, getItemDelegate( index ) ) ;
 			}
 		}
 	}
 
 	public void setModel( final IAbstractModel _model )
 	{
+		removeView( model.root() ) ;
 		model = ( _model != null ) ? _model : UIAbstractView.createEmptyModel() ;
 		makeDirty() ;
 	}
@@ -203,21 +372,43 @@ public class UIAbstractView extends UIElement
 		if( variant == null )
 		{
 			final UIElement cell = _delegate.createItem( this ) ;
-			cell.setPosition( _index.getColumn(), _index.getRow(), 0 ) ;
-			cell.setLength( cellLength.x, cellLength.y, cellLength.z ) ;
-
-			if( frame.getDrawDelegate() != null )
-			{
-				cell.passDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
-			}
+			//cell.setPosition( _index.getColumn(), _index.getRow(), 0 ) ;
+			//cell.setLength( cellLength.x, cellLength.y, cellLength.z ) ;
 
 			variant = new UIVariant( "CELL", cell ) ;
 			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
+			list.addElement( cell ) ;
+			list.makeDirty() ;
+			System.out.println( "Add cell to list" ) ;
 		}
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
 		_delegate.setItemData( cell, model, _index ) ;
 		return cell ;
+	}
+
+	/**
+		Remove a cell that is associated with the passed in index.
+	*/
+	private void removeCellElement( final UIModelIndex _index, final ItemDelegate _delegate )
+	{
+		if( view.exists( _index ) == false )
+		{
+			// The view has not yet constructed an item for this index
+			return ;
+		}
+
+		final IVariant variant = view.getData( _index, IAbstractModel.Role.Display ) ;
+		if( variant == null )
+		{
+			return ;
+		}
+
+		view.removeData( _index ) ;		// Remove any variants assigned to that index
+		
+		final UIElement cell = variant.toObject( UIElement.class )  ;
+		//_delegate.destroyItem( cell ) ;
+		list.removeElement( cell ) ;
 	}
 
 	private ItemDelegate<?> getItemDelegate( final UIModelIndex _index )
@@ -302,37 +493,74 @@ public class UIAbstractView extends UIElement
 	{
 		return new ItemDelegate<UIElement>()
 		{
+			@Override
 			public UIElement createItem( final UIAbstractView _parent )
 			{
-				final UIButton.Meta meta = new UIButton.Meta() ;
+				final UILayout.Meta metaLayout = new UILayout.Meta() ;
+				metaLayout.setType( ILayout.Type.HORIZONTAL ) ;
+
+				final UILayout layout = UIGenerator.<UILayout>create( metaLayout ) ;
 
 				{
+					final UIButton.Meta meta = new UIButton.Meta() ;
 					final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
 					edge.setSheet( "base/textures/edge_button.png" ) ;
 
 					final GUIText.Meta text = meta.addComponent( new GUIText.Meta() ) ;
 					text.setGroup( "ENGINE" ) ;
-					text.setName( "TEXT" ) ;
+					text.setName( "TITLE" ) ;
 					text.setText( "Test" ) ;
+
+					layout.addElement( UIGenerator.<UIButton>create( meta ) ) ;
 				}
 
-				return UIGenerator.<UIButton>create( meta ) ;
+				{
+					final UITextField.Meta meta = new UITextField.Meta() ;
+					final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
+					edge.setSheet( "base/textures/edge_button.png" ) ;
+
+					final GUIEditText.Meta text = meta.addComponent( new GUIEditText.Meta() ) ;
+					text.setAlignment( UI.Alignment.LEFT, UI.Alignment.CENTRE ) ;
+					text.setGroup( "ENGINE" ) ;
+					text.setName( "VALUE" ) ;
+					text.setText( "Test" ) ;
+
+					layout.addElement( UIGenerator.<UITextField>create( meta ) ) ;
+				}
+
+				return layout ;
 			}
 
+			@Override
+			public void destroyItem( final UIElement _item )
+			{
+				_item.shutdown() ;
+				_item.clear() ;
+			}
+
+			@Override
 			public void setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 
-				final UIButton button = ( UIButton )_item ;
+				final UILayout layout = ( UILayout )_item ;
+				{
+					final UIButton title = ( UIButton )layout.getElements().get( 0 ) ;
+					final GUIText gui = title.getComponent( "ENGINE", "TITLE", GUIText.class ) ;
+					final StringBuilder text = gui.getText() ;
+					text.setLength( 0 ) ;
+					text.append( variant.getName() ) ;
+				}
 
-				final GUIText gui = button.getComponent( "ENGINE", "TEXT", GUIText.class ) ;
-				final StringBuilder text = gui.getText() ;
-				text.setLength( 0 ) ;
-				text.append( variant.getName() ) ;
-				text.append( " : " ) ;
-				text.append( variant.toString() ) ;
+				{
+					final UITextField value = ( UITextField )layout.getElements().get( 1 ) ;
+					final StringBuilder text = value.getText() ;
+					text.setLength( 0 ) ;
+					text.append( variant.toString() ) ;
+				}
 			}
 
+			@Override
 			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}
 		} ;
 	}
@@ -357,6 +585,11 @@ public class UIAbstractView extends UIElement
 			Create the item that is to be used within the cell.
 		*/
 		public T createItem( final UIAbstractView _parent ) ;
+
+		/**
+			Clean up any resources that may have been used by this cell.
+		*/
+		public void destroyItem( final T _item ) ;
 
 		/**
 			Apply any initial data to the item.
