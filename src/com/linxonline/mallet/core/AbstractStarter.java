@@ -1,7 +1,7 @@
 package com.linxonline.mallet.core ;
 
 import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
@@ -23,34 +23,34 @@ import com.linxonline.mallet.core.GlobalConfig ;
 public abstract class AbstractStarter implements IStarter
 {
 	private final ISystem mainSystem  ;
-	private final GameSystem gameSystem ;
-	private GameSettings settings ;
+	private final IGameLoader loader ;
 
-	public AbstractStarter( final ISystem _main )
+	private final GameSystem gameSystem ;
+
+	public AbstractStarter( final ISystem _main, final IGameLoader _loader )
 	{
 		mainSystem = _main ;
+		loader = _loader ;
+
 		gameSystem = new GameSystem( mainSystem ) ;
+		init( _main, _loader ) ;
 	}
 
-	@Override
-	public void init()
+	public void init( final ISystem _main, final IGameLoader _loader )
 	{
-		final GameLoader loader = getGameLoader() ;
-		if( loader == null )
+		if( _loader == null )
 		{
 			Logger.println( "No game loader specified..", Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 
-		settings = loader.getGameSettings() ;
-		loadFileSystem( mainSystem.getFileSystem() ) ;
+		loadFileSystem( _main.getFileSystem() ) ;
 
-		loadConfig() ;							// Load the config @ base/config.cfg using the default ConfigParser.
-		mainSystem.initSystem() ;				// Fully init the backend: Input, OpenGL, & OpenAL.
-		setRenderSettings( mainSystem ) ;
+		loadConfig() ;						// Load the config @ base/config.cfg using the default ConfigParser.
+		_main.initSystem() ;				// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
-		if( loadGame( getGameSystem(), loader ) == false )
+		if( loadGame( getGameSystem(), _loader ) == false )
 		{
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
@@ -62,7 +62,6 @@ public abstract class AbstractStarter implements IStarter
 		SystemInterface - map the base directory to allow for 
 		quick lookup.
 	*/
-	@Override
 	public void loadFileSystem( final FileSystem _fileSystem )
  	{
 		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
@@ -83,9 +82,10 @@ public abstract class AbstractStarter implements IStarter
 		Initialise a ShutdownCallback to save the GlobalConfig back to 
 		the users home-directory if the config changes while playing.
 	*/
-	@Override
 	public void loadConfig()
 	{
+		final GameSettings settings = getGameSettings() ;
+	
 		Logger.println( "Setting up home.", Logger.Verbosity.MINOR ) ;
 		GlobalHome.setHome( settings.getApplicationName() ) ;
 		GlobalHome.copy( Tuple.<String, String>build( settings.getConfigLocation(), settings.getConfigLocation() ) ) ;
@@ -112,13 +112,12 @@ public abstract class AbstractStarter implements IStarter
 	}
 
 	/**
-		Load the Game States defined in GameLoader into the 
+		Load the Game States defined in IGameLoader into the 
 		GameSystem.
 		return false if the GameSystem or Game Loader is not 
 		specified.
 	*/
-	@Override
-	public boolean loadGame( final GameSystem _system, final GameLoader _loader )
+	public boolean loadGame( final GameSystem _system, final IGameLoader _loader )
 	{
 		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
 		if( _system != null && _loader != null )
@@ -130,21 +129,29 @@ public abstract class AbstractStarter implements IStarter
 		return false ;
 	}
 
+	@Override
+	public IGameLoader getGameLoader()
+	{
+		return loader ;
+	}
+
 	/**
-		Will return the GameSettings defined by the GameLoader.
+		Will return the GameSettings defined by the IGameLoader.
 		Can be overridden to implement platform specific requirements.
 	*/
 	@Override
 	public GameSettings getGameSettings()
 	{
-		return settings ;
+		return getGameLoader().getGameSettings() ;
 	}
 
+	@Override
 	public ISystem getMainSystem()
 	{
 		return mainSystem ;
 	}
 
+	@Override
 	public GameSystem getGameSystem()
 	{
 		return gameSystem ;

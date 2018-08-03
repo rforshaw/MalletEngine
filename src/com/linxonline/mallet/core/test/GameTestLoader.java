@@ -2,8 +2,6 @@ package com.linxonline.mallet.core.test ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.core.GlobalConfig ;
-
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
@@ -33,7 +31,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 	Game System passed in. Remember to tell the Game System
 	what is the default-state!
 */
-public final class GameTestLoader extends GameLoader
+public final class GameTestLoader implements IGameLoader
 {
 	public GameTestLoader() {}
 

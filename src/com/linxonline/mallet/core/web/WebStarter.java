@@ -7,7 +7,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
 import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
 import com.linxonline.mallet.core.ISystem ;
@@ -29,20 +29,18 @@ import com.linxonline.mallet.ui.UIRatio ;
 /**
 	The Web implementation of the Starter Interface.
 	Handles the initialisation & loading stage for 
-	web based platforms. Override getGameLoader, for it 
-	to load your game.
-	Example: WebTestStarter.
+	web based platforms.
 */
-public abstract class WebStarter extends AbstractStarter
+public class WebStarter extends AbstractStarter
 {
-	public WebStarter()
+	public WebStarter( final IGameLoader _loader )
 	{
-		this( new GLDefaultSystem() ) ;
+		this( new GLDefaultSystem(), _loader ) ;
 	}
 
-	public WebStarter( final ISystem _mainSystem )
+	public WebStarter( final ISystem _mainSystem, final IGameLoader _loader )
 	{
-		super( _mainSystem ) ;
+		super( _mainSystem, _loader ) ;
 		ElapsedTimer.setTimer( new WebTimer() ) ;
 	}
 
@@ -70,7 +68,6 @@ public abstract class WebStarter extends AbstractStarter
 		Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
 		Uses the configuration file loaded above to set the rendering system.
 	*/
-	@Override
 	public void setRenderSettings( final ISystem _system )
 	{
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", 640 ) ;

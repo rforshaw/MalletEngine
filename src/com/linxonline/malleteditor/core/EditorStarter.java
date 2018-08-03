@@ -4,7 +4,7 @@ import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.desktop.DesktopStarter ;
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
@@ -21,7 +21,7 @@ public class EditorStarter extends DesktopStarter
 	*/
 	public EditorStarter()
 	{
-		super( new GLDefaultSystem() ) ;
+		super( new GLDefaultSystem(), new EditorLoader() ) ;
 	}
 
 	/**
@@ -38,11 +38,5 @@ public class EditorStarter extends DesktopStarter
 		// Force Display and Render size parity.
 		//render.getRenderInfo().setKeepRenderRatio( false ) ;
 		GlobalConfig.addBoolean( "DISPLAYRENDERPARITY", true ) ;
-	}
-
-	@Override
-	public GameLoader getGameLoader()
-	{
-		return new EditorLoader() ;
 	}
 }

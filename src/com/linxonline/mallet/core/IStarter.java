@@ -3,11 +3,9 @@ package com.linxonline.mallet.core ;
 import com.linxonline.mallet.util.settings.Settings ;
 
 import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
-
 import com.linxonline.mallet.core.ISystem ;
-import com.linxonline.mallet.io.filesystem.FileSystem ;
 
 /**
 	Each platform supported should implement this interface.
@@ -18,15 +16,15 @@ import com.linxonline.mallet.io.filesystem.FileSystem ;
 */
 public interface IStarter
 {
-	public void init() ;																		// Starts the whole process
+	public IGameLoader getGameLoader() ;
 
+	/**
+		Will return the GameSettings defined by the IGameLoader.
+		Can be overridden to implement platform specific requirements.
+	*/
 	public GameSettings getGameSettings() ;
-	public GameLoader getGameLoader() ;														// Return the Game States for the game
 
-	public boolean loadGame( final GameSystem _system, final GameLoader _loader ) ;			// Load the 
+	public ISystem getMainSystem() ;
 
-	public void loadFileSystem( final FileSystem _fileSystem ) ;							// Set GlobalFileSystem and do any heavy initialisation
-	public void loadConfig() ;																// Load the configuration file, Define the Config Parser and set GlobalConfig
-
-	public void setRenderSettings( final ISystem _system ) ;						// Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
+	public GameSystem getGameSystem() ;
 }

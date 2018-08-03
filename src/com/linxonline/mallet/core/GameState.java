@@ -64,8 +64,6 @@ public class GameState extends State
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem/*, null*/ ) ;
 
-	protected final DataConverter dataTracker = new DataConverter() ;	// Track current data that you wish to save/read
-
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
 	protected double updateAccumulator = 0.0f ;							// Current dt update
@@ -265,17 +263,14 @@ public class GameState extends State
 	protected void hookHandlerSystems()
 	{
 		final EventController animationController = animationSystem.getEventController() ;
-		final EventController trackerController = dataTracker.getEventController() ;
 		final EventController audioController = audioSystem.getEventController() ;
 
-		eventSystem.addEventHandler( trackerController ) ;
 		eventSystem.addEventHandler( audioController ) ;
 		eventSystem.addEventHandler( collisionSystem ) ;
 		eventSystem.addEventHandler( system.getRenderer().getEventController() ) ;
 		eventSystem.addEventHandler( animationController ) ;
 
 		animationController.setAddEventInterface( eventSystem ) ;
-		trackerController.setAddEventInterface( eventSystem ) ;
 		audioController.setAddEventInterface( eventSystem ) ;
 
 		final IInputSystem input = system.getInput() ;
@@ -290,7 +285,6 @@ public class GameState extends State
 	*/
 	protected void unhookHandlerSystems()
 	{
-		eventSystem.removeEventHandler( dataTracker.getEventController() ) ;
 		eventSystem.removeEventHandler( audioSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( animationSystem.getEventController() ) ;
 		eventSystem.removeEventHandler( collisionSystem ) ;
@@ -332,7 +326,6 @@ public class GameState extends State
 					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
-					dataTracker.update() ;
 					internalController.update() ;
 					externalController.update() ;
 
@@ -409,7 +402,6 @@ public class GameState extends State
 					inputWorldSystem.update() ;
 					eventSystem.update() ;
 
-					dataTracker.update() ;
 					internalController.update() ;
 					externalController.update() ;
 

@@ -4,7 +4,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
 import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
 import com.linxonline.mallet.core.ISystem ;
@@ -25,23 +25,23 @@ import com.linxonline.mallet.ui.UIRatio ;
 /**
 	The Desktop implementation of the Starter Interface.
 	Handles the initialisation & loading stage for 
-	desktop platforms. Override getGameLoader, for it 
-	to load your game.
-	Example: DesktopTestStarter.
+	desktop platforms.
 */
-public abstract class DesktopStarter extends AbstractStarter
+public class DesktopStarter extends AbstractStarter
 {
 	protected Thread thread ;
 
-	public DesktopStarter()
+	public DesktopStarter( final IGameLoader _loader )
 	{
-		this( new GLDefaultSystem() ) ;
+		this( new GLDefaultSystem(), _loader ) ;
 	}
 
-	public DesktopStarter( final ISystem _mainSystem )
+	public DesktopStarter( final ISystem _main, final IGameLoader _loader )
 	{
-		super( _mainSystem ) ;
-		final ShutdownDelegate delegate = _mainSystem.getShutdownDelegate() ;
+		super( _main, _loader ) ;
+		setRenderSettings( _main ) ;
+		
+		final ShutdownDelegate delegate = _main.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{
 			public void shutdown()
@@ -101,7 +101,6 @@ public abstract class DesktopStarter extends AbstractStarter
 		Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
 		Uses the configuration file loaded above to set the rendering system.
 	*/
-	@Override
 	public void setRenderSettings( final ISystem _system )
 	{
 		final GameSettings game = getGameSettings() ;

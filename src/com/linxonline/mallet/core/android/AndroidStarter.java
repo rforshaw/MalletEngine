@@ -7,7 +7,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
 import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
 import com.linxonline.mallet.core.test.GameTestLoader ;
@@ -38,18 +38,22 @@ import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.ui.UI ;
 import com.linxonline.mallet.ui.UIRatio ;
 
-public abstract class AndroidStarter extends AbstractStarter
+public class AndroidStarter extends AbstractStarter
 {
 	private final AndroidActivity activity ;
 
-	public AndroidStarter( final AndroidActivity _activity, final Notification.Notify _notify )
+	public AndroidStarter( final AndroidActivity _activity, 
+						   final Notification.Notify _notify,
+						   final IGameLoader _loader )
 	{
-		this( new GLAndroidSystem( _activity, _notify ), _activity ) ;
+		this( new GLAndroidSystem( _activity, _notify ), _activity, _loader ) ;
 	}
 
-	public AndroidStarter( final ISystem _system, final AndroidActivity _activity )
+	public AndroidStarter( final ISystem _system,
+						   final AndroidActivity _activity,
+						   final IGameLoader _loader )
 	{
-		super( _system ) ;
+		super( _system, _loader ) ;
 		activity = _activity ;
 	}
 
@@ -80,7 +84,6 @@ public abstract class AndroidStarter extends AbstractStarter
 		Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
 		Uses the configuration file loaded above to set the rendering system.
 	*/
-	@Override
 	public void setRenderSettings( final ISystem _system )
 	{
 		final AndroidActivity activity = getActivity() ;

@@ -21,13 +21,13 @@ import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
-
 import com.linxonline.mallet.core.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.input.android.AndroidInputListener ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.MalletList ;
+
+import com.linxonline.mallet.core.test.GameTestLoader ;
 
 public class AndroidActivity extends Activity
 							implements IEventHandler
@@ -72,7 +72,6 @@ public class AndroidActivity extends Activity
 		{
 			System.out.println( "INIT ANDROID STARTER" ) ;
 			starter = constructStarter( this, startGame ) ;
-			starter.init() ;
 		}
 
 		starter.getMainSystem().startSystem() ;
@@ -190,7 +189,7 @@ public class AndroidActivity extends Activity
 
 	public AndroidStarter constructStarter( final AndroidActivity _activity, final Notify<Object> _notify )
 	{
-		return new AndroidTestStarter( _activity, _notify ) ;
+		return new AndroidStarter( _activity, _notify, new GameTestLoader() ) ;
 	}
 
 	private synchronized void startGameThread()

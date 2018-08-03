@@ -7,15 +7,13 @@ import com.linxonline.mallet.util.time.* ;
 
 public class GameSystem
 {
-	protected ISystem system = null ;
+	protected final ISystem system ;
 	protected final StateMachine stateMachine = new StateMachine() ;
 	protected boolean running = false ;
 
-	public GameSystem() {}
-
 	public GameSystem( final ISystem _system )
 	{
-		setSystem( _system ) ;
+		system = _system ;
 	}
 
 	public void runSystem()
@@ -43,17 +41,6 @@ public class GameSystem
 		assert _state != null ;
 		_state.setSystem( system ) ;
 		stateMachine.addState( _state ) ;
-	}
-
-	/**
-		setSystem provides access to the low level systems, for 
-		example the FileSystem, Rendering, etc.
-		This must be set BEFORE any GameStates are added!
-	**/
-	public final void setSystem( final ISystem _system )
-	{
-		assert _system != null ;
-		system = _system ;
 	}
 
 	/**

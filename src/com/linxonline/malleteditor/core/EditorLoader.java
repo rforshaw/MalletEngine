@@ -1,10 +1,10 @@
 package com.linxonline.malleteditor.core ;
 
 import com.linxonline.mallet.core.GameSettings ;
-import com.linxonline.mallet.core.GameLoader ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSystem ;
 
-public class EditorLoader extends GameLoader
+public class EditorLoader implements IGameLoader
 {
 	public EditorLoader() {}
 
