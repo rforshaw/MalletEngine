@@ -1,7 +1,5 @@
 package com.linxonline.mallet.core ;
 
-import com.linxonline.mallet.maths.Vector2 ;
-
 /**
 	Provides a robust means of defining what Game States
 	should be loaded into the Game System.
@@ -20,5 +18,5 @@ public interface IGameLoader
 	/**
 		Load the game states into the game-system. 
 	*/
-	public void loadGame( final GameSystem _system ) ;
+	public void loadGame( final IGameSystem _system ) ;
 }

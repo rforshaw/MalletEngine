@@ -1,10 +1,8 @@
 package com.linxonline.mallet.core ;
 
-import com.linxonline.mallet.util.settings.Settings ;
-
-import com.linxonline.mallet.core.GameSystem ;
-import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
+import com.linxonline.mallet.core.IGameSystem ;
+import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.ISystem ;
 
 /**
@@ -25,6 +23,4 @@ public interface IStarter
 	public GameSettings getGameSettings() ;
 
 	public ISystem getMainSystem() ;
-
-	public GameSystem getGameSystem() ;
 }

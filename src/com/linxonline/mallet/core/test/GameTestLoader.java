@@ -36,7 +36,7 @@ public final class GameTestLoader implements IGameLoader
 	public GameTestLoader() {}
 
 	@Override
-	public void loadGame( final GameSystem _system )
+	public void loadGame( final IGameSystem _system )
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{

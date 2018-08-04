@@ -1,7 +1,9 @@
 package com.linxonline.mallet.core ;
 
-import com.linxonline.mallet.core.GameSystem ;
+import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
+
+import com.linxonline.mallet.core.GameSystem ;
 import com.linxonline.mallet.core.GameSettings ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
@@ -25,14 +27,11 @@ public abstract class AbstractStarter implements IStarter
 	private final ISystem mainSystem  ;
 	private final IGameLoader loader ;
 
-	private final GameSystem gameSystem ;
-
 	public AbstractStarter( final ISystem _main, final IGameLoader _loader )
 	{
 		mainSystem = _main ;
 		loader = _loader ;
 
-		gameSystem = new GameSystem( mainSystem ) ;
 		init( _main, _loader ) ;
 	}
 
@@ -50,7 +49,7 @@ public abstract class AbstractStarter implements IStarter
 		_main.initSystem() ;				// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
-		if( loadGame( getGameSystem(), _loader ) == false )
+		if( loadGame( getMainSystem(), _loader ) == false )
 		{
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return ;
@@ -117,12 +116,13 @@ public abstract class AbstractStarter implements IStarter
 		return false if the GameSystem or Game Loader is not 
 		specified.
 	*/
-	public boolean loadGame( final GameSystem _system, final IGameLoader _loader )
+	public boolean loadGame( final ISystem _system, final IGameLoader _loader )
 	{
 		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
 		if( _system != null && _loader != null )
 		{
-			_loader.loadGame( _system ) ;
+			final IGameSystem gameSystem = _system.getGameSystem() ;
+			_loader.loadGame( gameSystem ) ;
 			return true ;
 		}
 
@@ -149,11 +149,5 @@ public abstract class AbstractStarter implements IStarter
 	public ISystem getMainSystem()
 	{
 		return mainSystem ;
-	}
-
-	@Override
-	public GameSystem getGameSystem()
-	{
-		return gameSystem ;
 	}
 }

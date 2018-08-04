@@ -4,6 +4,7 @@ import com.linxonline.mallet.io.filesystem.web.WebFileSystem ;
 import com.linxonline.mallet.audio.web.AudioSourceGenerator ;
 import com.linxonline.mallet.renderer.web.gl.GLRenderer ;
 import com.linxonline.mallet.input.web.InputSystem ;
+import com.linxonline.mallet.core.web.WebGameSystem ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;
 
@@ -18,7 +19,8 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 												 GLRenderer,
 												 AudioSourceGenerator,
 												 InputSystem,
-												 EventSystem>
+												 EventSystem,
+												 WebGameSystem>
 {
 	// Add Web Document here...
 	protected EventController eventController = new EventController() ;
@@ -30,7 +32,10 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 			   new AudioSourceGenerator(),
 			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
 			   new InputSystem(),
-			   new WebFileSystem() ) ;
+			   new WebFileSystem(),
+			   new WebGameSystem() ) ;
+
+		getGameSystem().setMainSystem( this ) ;
 	}
 
 	@Override
@@ -82,7 +87,7 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 	@Override
 	public void sleep( final long _millis )
 	{
-		try
+		/*try
 		{
 			Thread.sleep( _millis ) ;
 			Thread.yield() ;
@@ -91,7 +96,7 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 		{
 			Thread.currentThread().interrupt() ;
 			//ex.printStackTrace() ;
-		}
+		}*/
 	}
 
 	@Override

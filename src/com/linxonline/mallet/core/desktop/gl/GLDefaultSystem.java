@@ -22,7 +22,8 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 												 GLRenderer,
 												 ALSASourceGenerator,
 												 InputSystem,
-												 EventSystem>
+												 EventSystem,
+												 GameSystem>
 {
 	protected final EventController eventController = new EventController() ;
 
@@ -33,7 +34,10 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 			   new ALSASourceGenerator(),
 			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
 			   new InputSystem(),
-			   new DesktopFileSystem() ) ;
+			   new DesktopFileSystem(),
+			   new GameSystem() ) ;
+
+		getGameSystem().setMainSystem( this ) ;
 	}
 
 	public GLWindow getWindow()

@@ -9,7 +9,7 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <teavm.version>0.4.0</teavm.version>
+    <teavm.version>0.5.1</teavm.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -88,7 +88,7 @@
               <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>
 
               <!-- Main class, containing static void main(String[]) -->
-              <mainClass>com.linxonline.mallet.main.web.Client</mainClass>
+              <mainClass>com.linxonline.mallet.core.web.Client</mainClass>
 
               <!-- Whether TeaVM should produce minified JavaScript. Can reduce JavaScript file size more than
                    two times -->
@@ -103,6 +103,9 @@
               <!-- Whether TeaVM should also put source files into output directory,
                    for compatibility with source maps -->
               <sourceFilesCopied>true</sourceFilesCopied>
+
+              <!-- Optimization level. Valid values are: SIMPLE, ADVANCED, FULL -->
+              <optimizationLevel>ADVANCED</optimizationLevel>
             </configuration>
           </execution>
         </executions>

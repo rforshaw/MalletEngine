@@ -2,7 +2,7 @@ package com.linxonline.malleteditor.core ;
 
 import com.linxonline.mallet.core.GameSettings ;
 import com.linxonline.mallet.core.IGameLoader ;
-import com.linxonline.mallet.core.GameSystem ;
+import com.linxonline.mallet.core.IGameSystem ;
 
 public class EditorLoader implements IGameLoader
 {
@@ -15,7 +15,7 @@ public class EditorLoader implements IGameLoader
 	}
 
 	@Override
-	public void loadGame( final GameSystem _system )
+	public void loadGame( final IGameSystem _system )
 	{
 		_system.addGameState( new EditorState( "EDITOR" ) ) ;
 		_system.addGameState( new UIEditorState( "UIEDITOR" ) ) ;

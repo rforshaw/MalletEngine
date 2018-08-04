@@ -73,7 +73,7 @@ public class WebJSONArray extends JSONArray
 	@Override
 	public JSONArray put( final long _value )
 	{
-		putLong( array, _value ) ;
+		putDouble( array, ( double )_value ) ;
 		return this ;
 	}
 
@@ -254,9 +254,6 @@ public class WebJSONArray extends JSONArray
 
 	@JSBody( params = { "_array", "_value" }, script = "_array.push( _value ) ;" )
 	public static native void putDouble( final JSObject _array, final double _value ) ;
-
-	@JSBody( params = { "_array", "_value" }, script = "_array.push( _value ) ;" )
-	public static native void putLong( final JSObject _array, final long _value ) ;
 
 	@JSBody( params = { "_array", "_value" }, script = "_array.push( _value ) ;" )
 	public static native void putString( final JSObject _array, final String _value ) ;

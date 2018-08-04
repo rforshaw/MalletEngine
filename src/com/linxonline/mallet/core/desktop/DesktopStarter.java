@@ -3,7 +3,7 @@ package com.linxonline.mallet.core.desktop ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
-import com.linxonline.mallet.core.GameSystem ;
+import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
@@ -55,7 +55,7 @@ public class DesktopStarter extends AbstractStarter
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;
-		final GameSystem game = getGameSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
 
 		main.startSystem() ;
 		thread = new Thread( "GAME_THREAD" )
@@ -78,8 +78,11 @@ public class DesktopStarter extends AbstractStarter
 			return ;
 		}
 
+		final ISystem main = getMainSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
+
 		System.out.println( "Game System slowing.." ) ;
-		getGameSystem().stopSystem() ;
+		game.stopSystem() ;
 		if( thread.isAlive() == true )
 		{
 			try
@@ -94,7 +97,7 @@ public class DesktopStarter extends AbstractStarter
 		}
 
 		System.out.println( "Backend stopped.." ) ;
-		getMainSystem().stopSystem() ;
+		main.stopSystem() ;
 	}
 
 	/**

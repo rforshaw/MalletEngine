@@ -6,7 +6,7 @@ import android.util.DisplayMetrics ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
-import com.linxonline.mallet.core.GameSystem ;
+import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
@@ -60,7 +60,7 @@ public class AndroidStarter extends AbstractStarter
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;
-		final GameSystem game = getGameSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
 
 		setRenderSettings( main ) ;
 
@@ -71,8 +71,11 @@ public class AndroidStarter extends AbstractStarter
 
 	public void stop()
 	{
-		getGameSystem().stopSystem() ;
-		getMainSystem().stopSystem() ;
+		final ISystem main = getMainSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
+
+		game.stopSystem() ;
+		main.stopSystem() ;
 	}
 
 	public void shutdown()

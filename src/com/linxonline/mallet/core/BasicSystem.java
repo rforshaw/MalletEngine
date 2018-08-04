@@ -21,7 +21,8 @@ public abstract class BasicSystem<F extends FileSystem,
 								  R extends IRender,
 								  A extends AudioGenerator,
 								  I extends IInputSystem,
-								  E extends IEventSystem> implements ISystem<F, S, R, A, I, E>
+								  E extends IEventSystem,
+								  G extends IGameSystem> implements ISystem<F, S, R, A, I, E, G>
 {
 	private final S shutdownDelegate ;
 
@@ -31,13 +32,16 @@ public abstract class BasicSystem<F extends FileSystem,
 	private final E eventSystem ;
 	private final I inputSystem ;
 	private final F fileSystem ;
+	
+	private final G gameSystem ;
 
 	public BasicSystem( final S _shutdown,
 						final R _renderer,
 						final A _audio,
 						final E _event,
 						final I _input,
-						final F _fileSystem )
+						final F _fileSystem,
+						final G _gameSystem )
 	{
 		shutdownDelegate = _shutdown ;
 		renderer = _renderer ;
@@ -45,6 +49,7 @@ public abstract class BasicSystem<F extends FileSystem,
 		eventSystem = _event ;
 		inputSystem = _input ;
 		fileSystem = _fileSystem ;
+		gameSystem = _gameSystem ;
 	}
 
 	@Override
@@ -98,6 +103,12 @@ public abstract class BasicSystem<F extends FileSystem,
 	public E getEventSystem()
 	{
 		return eventSystem ;
+	}
+
+	@Override
+	public G getGameSystem()
+	{
+		return gameSystem ;
 	}
 
 	@Override

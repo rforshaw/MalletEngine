@@ -1,8 +1,8 @@
-package com.linxonline.mallet.main.web ;
+package com.linxonline.mallet.core.web ;
 
 import com.linxonline.mallet.core.test.GameTestLoader ;
 
-public final class Client
+public class Client
 {
 	public static void main( final String[] _args )
 	{

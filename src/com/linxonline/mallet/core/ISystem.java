@@ -18,7 +18,8 @@ public interface ISystem<F extends FileSystem,
 						 R extends IRender,
 						 A extends AudioGenerator,
 						 I extends IInputSystem,
-						 E extends IEventSystem>
+						 E extends IEventSystem,
+						 G extends IGameSystem>
 {
 	public void initSystem() ;		// Intialise systems
 	public void startSystem() ;		// Run the systems if required
@@ -64,6 +65,8 @@ public interface ISystem<F extends FileSystem,
 		Displaying virtual-keyboard, opening a web browser, etc.
 	*/
 	public E getEventSystem() ;
+
+	public G getGameSystem() ;
 
 	public boolean update( final float _dt ) ;		// Update the System
 

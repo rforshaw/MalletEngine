@@ -1,17 +1,17 @@
 package com.linxonline.mallet.core ;
 
-import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.core.statemachine.* ;
 import com.linxonline.mallet.util.time.* ;
 
-public class GameSystem
+public class GameSystem implements IGameSystem
 {
-	protected final ISystem system ;
-	protected final StateMachine stateMachine = new StateMachine() ;
-	protected boolean running = false ;
+	private final StateMachine stateMachine = new StateMachine() ;
+	private boolean running = false ;
+	private ISystem system ;
 
-	public GameSystem( final ISystem _system )
+	public GameSystem() {}
+
+	public void setMainSystem( final ISystem _system )
 	{
 		system = _system ;
 	}

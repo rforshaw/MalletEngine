@@ -1,4 +1,4 @@
-package com.linxonline.mallet.main.web ;
+package com.linxonline.mallet.core.web ;
 
 import org.teavm.jso.* ;
 import org.teavm.jso.browser.* ;
@@ -6,7 +6,7 @@ import org.teavm.jso.browser.* ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.core.AbstractStarter ;
-import com.linxonline.mallet.core.GameSystem ;
+import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
@@ -47,21 +47,24 @@ public class WebStarter extends AbstractStarter
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;
-		final GameSystem game = getGameSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
 
 		main.startSystem() ;
 		Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
 		game.runSystem() ;			// Begin running the game-loop
-		Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
+		//Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
 	}
 
 	public void stop()
 	{
+		final ISystem main = getMainSystem() ;
+		final IGameSystem game = main.getGameSystem() ;
+	
 		System.out.println( "Game System slowing.." ) ;
-		getGameSystem().stopSystem() ;
+		game.stopSystem() ;
 
 		System.out.println( "Backend stopped.." ) ;
-		getMainSystem().stopSystem() ;
+		main.stopSystem() ;
 	}
 
 	/**

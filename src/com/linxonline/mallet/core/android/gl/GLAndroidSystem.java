@@ -9,8 +9,7 @@ import android.view.inputmethod.InputMethodManager ;
 import android.media.AudioManager ;
 
 import com.linxonline.mallet.core.android.AndroidActivity ;
-import com.linxonline.mallet.core.BasicSystem ;
-import com.linxonline.mallet.core.DefaultShutdown ;
+import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;
@@ -27,7 +26,8 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 												 GL2DRenderer,
 												 AndroidAudioGenerator,
 												 AndroidInputSystem,
-												 EventSystem>
+												 EventSystem,
+												 GameSystem>
 {
 	public final AndroidActivity activity ;
 	public GL2DSurfaceView surface ;
@@ -42,10 +42,12 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 			   new AndroidAudioGenerator(),
 			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
 			   new AndroidInputSystem(),
-			   new AndroidFileSystem( _activity ) ) ;
+			   new AndroidFileSystem( _activity ),
+			   new GameSystem() ) ;
 
 		activity = _activity ;
 		surface = new GL2DSurfaceView( _activity, getRenderer() ) ;
+		getGameSystem().setMainSystem( this ) ;
 	}
 
 	@Override

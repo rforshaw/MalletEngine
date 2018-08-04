@@ -79,7 +79,7 @@ public class WebJSONObject extends JSONObject
 	@Override
 	public JSONObject put( final String _key, final long _value )
 	{
-		put( object, _key, _value ) ;
+		put( object, _key, ( double )_value ) ;
 		return this ;
 	}
 
