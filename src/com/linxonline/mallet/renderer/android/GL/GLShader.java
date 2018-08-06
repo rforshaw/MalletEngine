@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer.android.GL ;
 
-import com.linxonline.mallet.io.Resource ;
-
 /**
 	Transitionary object used to retain important 
 	shader information for the program build process.
@@ -9,7 +7,7 @@ import com.linxonline.mallet.io.Resource ;
 	Once the GLProgram has been linked, all shader data 
 	is removed.
 */
-public class GLShader extends Resource
+public class GLShader
 {
 	public final int[] id = new int[1] ;
 	public final int type ;
@@ -21,24 +19,5 @@ public class GLShader extends Resource
 		type = _type ;
 		file = _file ;
 		source[0] = _source ;
-	}
-
-	@Override
-	public long getMemoryConsumption()
-	{
-		return 0L ;
-	}
-
-	@Override
-	public void destroy()
-	{
-		// Shaders are destroyed once they've been 
-		// compiled and linked into a GLProgram.
-	}
-
-	@Override
-	public String type()
-	{
-		return "GLPROGRAM" ;
 	}
 }

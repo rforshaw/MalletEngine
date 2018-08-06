@@ -2,8 +2,6 @@ package com.linxonline.mallet.renderer.web.gl ;
 
 import org.teavm.jso.webgl.WebGLShader ;
 
-import com.linxonline.mallet.io.Resource ;
-
 /**
 	Transitionary object used to retain important 
 	shader information for the program build process.
@@ -23,24 +21,5 @@ public class GLShader extends Resource
 		type = _type ;
 		file = _file ;
 		source[0] = _source ;
-	}
-
-	@Override
-	public long getMemoryConsumption()
-	{
-		return 0L ;
-	}
-
-	@Override
-	public void destroy()
-	{
-		// Shaders are destroyed once they've been 
-		// compiled and linked into a GLProgram.
-	}
-
-	@Override
-	public String type()
-	{
-		return "GLPROGRAM" ;
 	}
 }

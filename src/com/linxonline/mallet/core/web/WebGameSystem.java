@@ -35,7 +35,7 @@ public class WebGameSystem implements IGameSystem
 				stateMachine.update( dt ) ;						// Update Game State
 				if( running == true )
 				{
-					System.out.println( "Render: " + dt ) ;
+					//System.out.println( "Render: " + dt ) ;
 					Window.requestAnimationFrame( this ) ;
 				}
 				else

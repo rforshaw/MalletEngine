@@ -7,6 +7,7 @@ import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.event.IEventSystem ;
 import com.linxonline.mallet.event.Event ;
 
+import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
@@ -201,10 +202,4 @@ public class EntitySystem implements IEntitySystem
 		_events.clear() ;
 		_components.clear() ;
 	}
-
-	public enum Threaded
-	{
-		SINGLE,
-		MULTI
-	} ;
 }

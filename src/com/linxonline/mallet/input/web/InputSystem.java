@@ -27,7 +27,6 @@ public class InputSystem implements IInputSystem
 	public InputSystem()
 	{
 		final HTMLDocument document = HTMLDocument.current();
-		final HTMLCanvasElement canvas = ( HTMLCanvasElement )document.getElementById( "mallet-canvas" ) ;
 
 		final EventListener<MouseEvent> mouseDown = new EventListener<MouseEvent>()
 		{
@@ -124,26 +123,13 @@ public class InputSystem implements IInputSystem
 			
 			}
 		} ;
-		
-		canvas.addEventListener( "mousedown", mouseDown, true ) ;
-		document.addEventListener( "mousedown", mouseDown, true ) ;
 
-		canvas.addEventListener( "mouseup", mouseUp, true ) ;
-		document.addEventListener( "mouseup", mouseUp, true ) ;
+		/*document.addEventListener( "mousedown", mouseDown ) ;
+		document.addEventListener( "mouseup", mouseUp) ;
+		document.addEventListener( "mousemove", mouseMove ) ;
 
-		canvas.addEventListener( "mousemove", mouseMove, true ) ;
-		document.addEventListener( "mousemove", mouseMove, true ) ;
-
-		canvas.addEventListener( "mousewheel", mouseWheel, true ) ;
-
-		document.addEventListener( "keydown", keyDown, false ) ;
-		document.addEventListener( "keyup", keyUp, false ) ;
-		//document.addEventListener( "keypress", keyPress, false ) ;
-
-		canvas.addEventListener( "touchstart", mouseDown ) ;
-		canvas.addEventListener( "touchmove", mouseMove ) ;
-		canvas.addEventListener( "touchcancel", mouseUp ) ;
-		canvas.addEventListener( "touchend", mouseUp ) ;
+		document.addEventListener( "keydown", keyDown ) ;
+		document.addEventListener( "keyup", keyUp ) ;*/
 	}
 
 	public void addInputHandler( final InputHandler _handler )
@@ -177,6 +163,7 @@ public class InputSystem implements IInputSystem
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
 	{
 		final InputEvent input = cache.get() ;
+		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		inputs.add( input ) ;
 	}

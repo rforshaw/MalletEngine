@@ -35,7 +35,7 @@ import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.animation.* ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
-
+import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.* ;
 
@@ -58,11 +58,11 @@ public class GameState extends State
 	private final EventController externalController = new EventController( "GAME_STATE_CONTROLLER_EXTERNAL" ) ;		// Used to process Events, from external eventSystem
 
 	protected ISystem system = null ;																// Provides access to Root systems
-	protected final IEntitySystem entitySystem = new EntitySystem( eventSystem/*, EntitySystem.Threaded.MULTI*/ ) ;
+	protected final IEntitySystem entitySystem ;
+	protected final CollisionSystem collisionSystem ;
 
 	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
-	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem/*, null*/ ) ;
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
@@ -73,7 +73,15 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
+		this( _name, Threaded.SINGLE ) ;
+	}
+
+	public GameState( final String _name, final Threaded _type )
+	{
 		super( _name ) ;
+		entitySystem = new EntitySystem( eventSystem, _type ) ;
+		collisionSystem = new CollisionSystem( eventSystem, _type ) ; 
+
 		initModes() ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
 	}

@@ -2,6 +2,7 @@ package com.linxonline.mallet.physics ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.worker.* ;
 
@@ -15,18 +16,29 @@ public class CollisionSystem extends EventController
 
 	public CollisionSystem( final IAddEvent _addInterface )
 	{
-		setAddEventInterface( _addInterface ) ;
-		initEventProcessors() ;
-
-		treeHulls = new QuadTree() ;
+		this( _addInterface, Threaded.SINGLE ) ;
 	}
 
-	public CollisionSystem( final IAddEvent _addInterface, final WorkerGroup _workers )
+	public CollisionSystem( final IAddEvent _addInterface, Threaded _type )
 	{
 		setAddEventInterface( _addInterface ) ;
 		initEventProcessors() ;
 
-		treeHulls = new QuadTree( ( _workers != null ) ? _workers : new WorkerGroup( 4 ) ) ;
+		switch( _type )
+		{
+			default     :
+			case SINGLE :
+			{
+				treeHulls = new QuadTree() ;
+				break ;
+			}
+			case MULTI  :
+			{
+				treeHulls = new QuadTree( new WorkerGroup( 4 ) ) ;
+				break ;
+			}
+		}
+		
 	}
 
 	private void initEventProcessors()
