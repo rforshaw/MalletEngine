@@ -7,6 +7,7 @@ import android.opengl.GLES30 ;
 
 import com.linxonline.mallet.renderer.ProgramMap ;
 
+import com.linxonline.mallet.util.buffers.IFloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -52,7 +53,11 @@ public class GLProgram extends Resource
 				final int inUniform                  = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
-				GLES30.glUniformMatrix4fv( inUniform, 1, true, m.matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
+				final IFloatBuffer ibuffer = m.matrix ;
+				final com.linxonline.mallet.util.buffers.android.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.android.FloatBuffer )ibuffer ;
+				final float[] matrix = buffer.getArray() ;
+
+				GLES30.glUniformMatrix4fv( inUniform, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 				return true ;
 			}
 

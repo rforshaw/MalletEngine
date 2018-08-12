@@ -65,7 +65,7 @@ public class GUIEditText extends GUIText
 			final float width = ratio.toPixelX( 0.05f ) ;
 			final float height = ratio.toPixelY( 0.42f ) ;
 		
-			final Shape triangle = Shape.create( Shape.Style.FILL, 4, 4 ) ;
+			final Shape triangle = new Shape( Shape.Style.FILL, 4, 4 ) ;
 			triangle.addVertex( Shape.construct( 0,     0,      0,   colour) ) ;
 			triangle.addVertex( Shape.construct( 0,     height, 0,   colour ) ) ;
 			triangle.addVertex( Shape.construct( width, height, 0,   colour ) ) ;

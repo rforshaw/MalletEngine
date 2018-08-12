@@ -13,6 +13,8 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
+import com.linxonline.mallet.util.buffers.IFloatBuffer ;
+
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -584,7 +586,9 @@ public class GLGeometryUploader
 				MGL.glUseProgram( programID ) ;										//GLRenderer.handleError( "Use Program", _gl ) ;
 			}
 
-			final float[] matrix = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
+			final IFloatBuffer ibuffer = ( ui == false ) ? _worldProjection.matrix : _uiProjection.matrix ;
+			final com.linxonline.mallet.util.buffers.desktop.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.desktop.FloatBuffer )ibuffer ;
+			final float[] matrix = buffer.getArray() ;
 
 			MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;		//GLRenderer.handleError( "Load Matrix", _gl ) ;
 			glProgram.loadUniforms( program ) ;

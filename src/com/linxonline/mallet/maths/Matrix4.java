@@ -1,5 +1,6 @@
 package com.linxonline.mallet.maths ;
 
+import com.linxonline.mallet.util.buffers.* ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
 /**
@@ -25,7 +26,7 @@ public class Matrix4 implements Cacheable
 		* (2, 0)[ 8], (2, 1)[ 9], (2, 2)[10], (2, 3)[11]
 		* (3, 0)[12], (3, 1)[13], (3, 2)[14], (3, 3)[15]
 	*/
-	public final float[] matrix = new float[16] ;
+	public final IFloatBuffer matrix = FloatBuffer.allocate( 16 ) ;
 
 	public Matrix4()
 	{
@@ -46,12 +47,6 @@ public class Matrix4 implements Cacheable
 	public Matrix4( final Matrix4 _matrix )
 	{
 		Matrix4.copy( _matrix.matrix, matrix ) ;
-		temp = Matrix4.createTempIdentity() ;
-	}
-
-	public Matrix4( final float[] _matrix )
-	{
-		Matrix4.copy( _matrix, matrix ) ;
 		temp = Matrix4.createTempIdentity() ;
 	}
 
@@ -180,80 +175,118 @@ public class Matrix4 implements Cacheable
 
 	public void multiply( final Matrix4 _mat )
 	{
-		final float[] m = matrix ;			// Makes it easier to read
-		final float[] x = _mat.matrix ;		// Would take up entire screen without
-		final float a00 = ( m[ 0] * x[0] ) + ( m[ 1] * x[4] ) + ( m[ 2] * x[ 8] ) + ( m[ 3] * x[12] ) ;
-		final float a01 = ( m[ 0] * x[1] ) + ( m[ 1] * x[5] ) + ( m[ 2] * x[ 9] ) + ( m[ 3] * x[13] ) ;
-		final float a02 = ( m[ 0] * x[2] ) + ( m[ 1] * x[6] ) + ( m[ 2] * x[10] ) + ( m[ 3] * x[14] ) ;
-		final float a03 = ( m[ 0] * x[3] ) + ( m[ 1] * x[7] ) + ( m[ 2] * x[11] ) + ( m[ 3] * x[15] ) ;
+		final IFloatBuffer x = _mat.matrix ;		// Would take up entire screen without
+		Matrix4.multiplyStage1( this, x ) ;
+		Matrix4.multiplyStage2( this, x ) ;
+		Matrix4.multiplyStage3( this, x ) ;
+		Matrix4.multiplyStage4( this, x ) ;
+	}
 
-		final float a10 = ( m[ 4] * x[0] ) + ( m[ 5] * x[4] ) + ( m[ 6] * x[ 8] ) + ( m[ 7] * x[12] ) ;
-		final float a11 = ( m[ 4] * x[1] ) + ( m[ 5] * x[5] ) + ( m[ 6] * x[ 9] ) + ( m[ 7] * x[13] ) ;
-		final float a12 = ( m[ 4] * x[2] ) + ( m[ 5] * x[6] ) + ( m[ 6] * x[10] ) + ( m[ 7] * x[14] ) ;
-		final float a13 = ( m[ 4] * x[3] ) + ( m[ 5] * x[7] ) + ( m[ 6] * x[11] ) + ( m[ 7] * x[15] ) ;
+	private static void multiplyStage1( final Matrix4 _m, final IFloatBuffer _x )
+	{
+		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final float a00 = m.multiply( 0, _x, 0 ) + m.multiply( 1, _x, 4 ) + m.multiply( 2, _x,  8 ) + m.multiply( 3, _x, 12 ) ;
+		final float a01 = m.multiply( 0, _x, 1 ) + m.multiply( 1, _x, 5 ) + m.multiply( 2, _x,  9 ) + m.multiply( 3, _x, 13 ) ;
+		final float a02 = m.multiply( 0, _x, 2 ) + m.multiply( 1, _x, 6 ) + m.multiply( 2, _x, 10 ) + m.multiply( 3, _x, 14 ) ;
+		final float a03 = m.multiply( 0, _x, 3 ) + m.multiply( 1, _x, 7 ) + m.multiply( 2, _x, 11 ) + m.multiply( 3, _x, 15 ) ;
+		_m.setRow( a00, a01, a02, a03, 0 ) ;
+	}
 
-		final float a20 = ( m[ 8] * x[0] ) + ( m[ 9] * x[4] ) + ( m[10] * x[ 8] ) + ( m[11] * x[12] ) ;
-		final float a21 = ( m[ 8] * x[1] ) + ( m[ 9] * x[5] ) + ( m[10] * x[ 9] ) + ( m[11] * x[13] ) ;
-		final float a22 = ( m[ 8] * x[2] ) + ( m[ 9] * x[6] ) + ( m[10] * x[10] ) + ( m[11] * x[14] ) ;
-		final float a23 = ( m[ 8] * x[3] ) + ( m[ 9] * x[7] ) + ( m[10] * x[11] ) + ( m[11] * x[15] ) ;
+	private static void multiplyStage2( final Matrix4 _m, final IFloatBuffer _x )
+	{
+		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final float a10 = m.multiply( 4, _x, 0 ) + m.multiply( 5, _x, 4 ) + m.multiply( 6, _x,  8 ) + m.multiply( 7, _x, 12 ) ;
+		final float a11 = m.multiply( 4, _x, 1 ) + m.multiply( 5, _x, 5 ) + m.multiply( 6, _x,  9 ) + m.multiply( 7, _x, 13 ) ;
+		final float a12 = m.multiply( 4, _x, 2 ) + m.multiply( 5, _x, 6 ) + m.multiply( 6, _x, 10 ) + m.multiply( 7, _x, 14 ) ;
+		final float a13 = m.multiply( 4, _x, 3 ) + m.multiply( 5, _x, 7 ) + m.multiply( 6, _x, 11 ) + m.multiply( 7, _x, 15 ) ;
+		_m.setRow( a10, a11, a12, a13, 1 ) ;
+	}
 
-		final float a30 = ( m[12] * x[0] ) + ( m[13] * x[4] ) + ( m[14] * x[ 8] ) + ( m[15] * x[12] ) ;
-		final float a31 = ( m[12] * x[1] ) + ( m[13] * x[5] ) + ( m[14] * x[ 9] ) + ( m[15] * x[13] ) ;
-		final float a32 = ( m[12] * x[2] ) + ( m[13] * x[6] ) + ( m[14] * x[10] ) + ( m[15] * x[14] ) ;
-		final float a33 = ( m[12] * x[3] ) + ( m[13] * x[7] ) + ( m[14] * x[11] ) + ( m[15] * x[15] ) ;
+	private static void multiplyStage3( final Matrix4 _m, final IFloatBuffer _x )
+	{
+		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final float a20 = m.multiply( 8, _x, 0 ) + m.multiply( 9, _x, 4 ) + m.multiply( 10, _x,  8 ) + m.multiply( 11, _x, 12 ) ;
+		final float a21 = m.multiply( 8, _x, 1 ) + m.multiply( 9, _x, 5 ) + m.multiply( 10, _x,  9 ) + m.multiply( 11, _x, 13 ) ;
+		final float a22 = m.multiply( 8, _x, 2 ) + m.multiply( 9, _x, 6 ) + m.multiply( 10, _x, 10 ) + m.multiply( 11, _x, 14 ) ;
+		final float a23 = m.multiply( 8, _x, 3 ) + m.multiply( 9, _x, 7 ) + m.multiply( 10, _x, 11 ) + m.multiply( 11, _x, 15 ) ;
+		_m.setRow( a20, a21, a22, a23, 2 ) ;
+	}
 
-		setRow( a00, a01, a02, a03, 0 ) ;
-		setRow( a10, a11, a12, a13, 1 ) ;
-		setRow( a20, a21, a22, a23, 2 ) ;
-		setRow( a30, a31, a32, a33, 3 ) ;
+	private static void multiplyStage4( final Matrix4 _m, final IFloatBuffer _x )
+	{
+		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final float a30 = m.multiply( 12, _x, 0 ) + m.multiply( 13, _x, 4 ) + m.multiply( 14, _x,  8 ) + m.multiply( 15, _x, 12 ) ;
+		final float a31 = m.multiply( 12, _x, 1 ) + m.multiply( 13, _x, 5 ) + m.multiply( 14, _x,  9 ) + m.multiply( 15, _x, 13 ) ;
+		final float a32 = m.multiply( 12, _x, 2 ) + m.multiply( 13, _x, 6 ) + m.multiply( 14, _x, 10 ) + m.multiply( 15, _x, 14 ) ;
+		final float a33 = m.multiply( 12, _x, 3 ) + m.multiply( 13, _x, 7 ) + m.multiply( 14, _x, 11 ) + m.multiply( 15, _x, 15 ) ;
+		_m.setRow( a30, a31, a32, a33, 3 ) ;
 	}
 
 	public void invert()
 	{
-		final float[] t = temp.matrix ;		// Results stored
-		final float[] m = matrix ;			// Make it easier to read
-		t[ 0] = ( (  m[5] * m[10] * m[15] ) - ( m[5] * m[11] * m[14] ) - ( m[9] * m[6] * m[15] ) + ( m[9] * m[ 7] * m[14] ) + ( m[13] * m[6] * m[11] ) - ( m[13] * m[ 7] * m[10] ) ) ;
-		t[ 1] = ( ( -m[1] * m[10] * m[15] ) + ( m[1] * m[11] * m[14] ) + ( m[9] * m[2] * m[15] ) - ( m[9] * m[ 3] * m[14] ) - ( m[13] * m[2] * m[11] ) + ( m[13] * m[ 3] * m[10] ) ) ;
-		t[ 2] = ( (  m[1] * m[ 6] * m[15] ) - ( m[1] * m[ 7] * m[14] ) - ( m[5] * m[2] * m[15] ) + ( m[5] * m[ 3] * m[14] ) + ( m[13] * m[2] * m[ 7] ) - ( m[13] * m[ 3] * m[ 6] ) ) ;
-		t[ 3] = ( ( -m[1] * m[ 6] * m[11] ) + ( m[1] * m[ 7] * m[10] ) + ( m[5] * m[2] * m[11] ) - ( m[5] * m[ 3] * m[10] ) - ( m[ 9] * m[2] * m[ 7] ) + ( m[ 9] * m[ 3] * m[ 6] ) ) ;
+		final IFloatBuffer t = temp.matrix ;		// Results stored
+		final IFloatBuffer m = matrix ;			// Make it easier to read
 
-		t[ 4] = ( ( -m[4] * m[10] * m[15] ) + ( m[4] * m[11] * m[14] ) + ( m[8] * m[6] * m[15] ) - ( m[8] * m[ 7] * m[14] ) - ( m[12] * m[6] * m[11] ) + ( m[12] * m[ 7] * m[10] ) ) ;
-		t[ 5] = ( (  m[0] * m[10] * m[15] ) - ( m[0] * m[11] * m[14] ) - ( m[8] * m[2] * m[15] ) + ( m[8] * m[ 3] * m[14] ) + ( m[12] * m[2] * m[11] ) - ( m[12] * m[ 3] * m[10] ) ) ;
-		t[ 6] = ( ( -m[0] * m[ 6] * m[15] ) + ( m[0] * m[ 7] * m[14] ) + ( m[4] * m[2] * m[15] ) - ( m[4] * m[ 3] * m[14] ) - ( m[12] * m[2] * m[10] ) + ( m[12] * m[ 3] * m[ 6] ) ) ;
-		t[ 7] = ( (  m[0] * m[ 6] * m[11] ) - ( m[0] * m[10] * m[10] ) - ( m[4] * m[2] * m[11] ) + ( m[4] * m[ 3] * m[10] ) + ( m[ 8] * m[2] * m[10] ) - ( m[ 8] * m[ 3] * m[ 6] ) ) ;
-
-		t[ 8] = ( (  m[4] * m[ 9] * m[15] ) - ( m[4] * m[11] * m[13] ) - ( m[8] * m[5] * m[15] ) + ( m[8] * m[10] * m[13] ) + ( m[12] * m[5] * m[11] ) - ( m[12] * m[10] * m[ 9] ) ) ;
-		t[ 9] = ( ( -m[0] * m[ 9] * m[15] ) + ( m[0] * m[11] * m[13] ) + ( m[8] * m[1] * m[15] ) - ( m[8] * m[ 3] * m[13] ) - ( m[12] * m[1] * m[11] ) + ( m[12] * m[ 3] * m[ 9] ) ) ;
-		t[10] = ( (  m[0] * m[ 5] * m[15] ) - ( m[0] * m[10] * m[13] ) - ( m[4] * m[1] * m[15] ) + ( m[4] * m[ 3] * m[13] ) + ( m[12] * m[1] * m[10] ) - ( m[12] * m[ 3] * m[ 5] ) ) ;
-		t[11] = ( ( -m[0] * m[ 5] * m[11] ) + ( m[0] * m[10] * m[ 9] ) + ( m[4] * m[1] * m[11] ) - ( m[4] * m[ 3] * m[ 9] ) - ( m[ 8] * m[1] * m[10] ) + ( m[ 8] * m[ 3] * m[ 5] ) ) ;
-
-		t[12] = ( ( -m[4] * m[ 9] * m[14] ) + ( m[4] * m[10] * m[13] ) + ( m[8] * m[5] * m[14] ) - ( m[8] * m[ 6] * m[13] ) - ( m[12] * m[5] * m[10] ) + ( m[12] * m[ 6] * m[ 9] ) ) ;
-		t[13] = ( (  m[0] * m[ 9] * m[14] ) - ( m[0] * m[10] * m[13] ) - ( m[8] * m[1] * m[14] ) + ( m[8] * m[ 2] * m[13] ) + ( m[12] * m[1] * m[10] ) - ( m[12] * m[ 2] * m[ 9] ) ) ;
-		t[14] = ( ( -m[0] * m[ 5] * m[14] ) + ( m[0] * m[ 6] * m[13] ) + ( m[4] * m[1] * m[14] ) - ( m[4] * m[ 2] * m[13] ) - ( m[12] * m[1] * m[ 6] ) + ( m[12] * m[ 2] * m[ 5] ) ) ;
-		t[15] = ( (  m[0] * m[ 5] * m[10] ) - ( m[0] * m[ 6] * m[ 9] ) - ( m[4] * m[1] * m[10] ) + ( m[4] * m[ 2] * m[ 9] ) + ( m[ 8] * m[1] * m[ 6] ) - ( m[ 8] * m[ 2] * m[ 5] ) ) ;
-
-		final float d = ( ( m[0] * t[0] ) + ( m[4] * t[1] ) + ( m[8] * t[2] ) + ( m[12] * t[3] ) ) ;
-		for( int i = 0; i < t.length; i += 4 )
-		{
-			t[i] /= d ;
-			t[i + 1] /= d ;
-			t[i + 2] /= d ;
-			t[i + 3] /= d ;
-		}
+		Matrix4.invertStage1( t, m ) ;
+		Matrix4.invertStage2( t, m ) ;
+		Matrix4.invertStage3( t, m ) ;
+		Matrix4.invertStage4( t, m ) ;
+		Matrix4.invertStage5( t, m ) ;
 
 		Matrix4.copy( t, m ) ;
 		temp.setIdentity() ;
 	}
 
+	private static void invertStage1( final IFloatBuffer _t, final IFloatBuffer _m )
+	{
+		_t.set(  0,  _m.multiply( 5, 10, 15 )            - _m.multiply( 5, 11, 14 ) - _m.multiply( 9, 6, 15 ) + _m.multiply( 9, 7, 14 ) + _m.multiply( 13, 6, 11 ) - _m.multiply( 13, 7, 10 ) ) ;
+		_t.set(  1, -_m.get( 1 ) * _m.multiply( 10, 15 ) + _m.multiply( 1, 11, 14 ) + _m.multiply( 9, 2, 15 ) - _m.multiply( 9, 3, 14 ) - _m.multiply( 13, 2, 11 ) + _m.multiply( 13, 3, 10 ) ) ;
+		_t.set(  2,  _m.multiply( 1, 6, 15 )             - _m.multiply( 1,  7, 14 ) - _m.multiply( 5, 2, 15 ) + _m.multiply( 5, 3, 14 ) + _m.multiply( 13, 2,  7 ) - _m.multiply( 13, 3,  6 ) ) ;
+		_t.set(  3, -_m.get( 1 ) * _m.multiply( 6, 11 )  + _m.multiply( 1,  7, 10 ) + _m.multiply( 5, 2, 11 ) - _m.multiply( 5, 3, 10 ) - _m.multiply(  9, 2,  7 ) + _m.multiply( 9,  3,  6 ) ) ;
+	}
+
+	private static void invertStage2( final IFloatBuffer _t, final IFloatBuffer _m )
+	{
+		_t.set(  4, -_m.get( 4 ) * _m.multiply( 10, 15 ) + _m.multiply( 4, 11, 14 ) + _m.multiply( 8, 6, 15 ) - _m.multiply( 8, 7, 14 ) - _m.multiply( 12, 6, 11 ) + _m.multiply( 12, 7, 10 ) ) ;
+		_t.set(  5,  _m.multiply( 0, 10, 15 )            - _m.multiply( 0, 11, 14 ) - _m.multiply( 8, 2, 15 ) + _m.multiply( 8, 3, 14 ) + _m.multiply( 12, 2, 11 ) - _m.multiply( 12, 3, 10 ) ) ;
+		_t.set(  6, -_m.get( 0 ) * _m.multiply(  6, 15 ) + _m.multiply( 0,  7, 14 ) + _m.multiply( 4, 2, 15 ) - _m.multiply( 4, 3, 14 ) - _m.multiply( 12, 2, 10 ) + _m.multiply( 12, 3,  6 ) ) ;
+		_t.set(  7,  _m.multiply( 0, 6, 11 )             - _m.multiply( 0, 10, 10 ) - _m.multiply( 4, 2, 11 ) + _m.multiply( 4, 3, 10 ) + _m.multiply(  8, 2, 10 ) - _m.multiply(  8, 3,  6 ) ) ;
+	}
+
+	private static void invertStage3( final IFloatBuffer _t, final IFloatBuffer _m )
+	{
+		_t.set(  8,  _m.multiply( 4, 9, 15 )             - _m.multiply( 4, 11, 13 ) - _m.multiply( 8, 5, 15 ) + _m.multiply( 8, 10, 13 ) + _m.multiply( 12, 5, 11 ) - _m.multiply( 12, 10, 9 ) ) ;
+		_t.set(  9, -_m.get( 0 ) * _m.multiply(  9, 15 ) + _m.multiply( 0, 11, 13 ) + _m.multiply( 8, 1, 15 ) - _m.multiply( 8,  3, 13 ) - _m.multiply( 12, 1, 11 ) + _m.multiply( 12,  3, 9 ) ) ;
+		_t.set( 10,  _m.multiply( 0, 5, 15 )             - _m.multiply( 0, 10, 13 ) - _m.multiply( 4, 1, 15 ) + _m.multiply( 4,  3, 13 ) + _m.multiply( 12, 1, 10 ) - _m.multiply( 12,  3, 5 ) ) ;
+		_t.set( 11, -_m.get( 0 ) * _m.multiply(  5, 11 ) + _m.multiply( 0, 10,  9 ) + _m.multiply( 4, 1, 11 ) - _m.multiply( 4,  3,  9 ) - _m.multiply(  8, 1, 10 ) + _m.multiply(  8,  3, 5 ) ) ;
+	}
+
+	private static void invertStage4( final IFloatBuffer _t, final IFloatBuffer _m )
+	{
+		_t.set( 12, -_m.get( 4 ) * _m.multiply(  9, 14 ) + _m.multiply( 4, 10, 13 ) + _m.multiply( 8, 5, 14 ) - _m.multiply( 8, 6, 13 ) - _m.multiply( 12, 5, 10 ) + _m.multiply( 12, 6, 9 ) ) ;
+		_t.set( 13,  _m.multiply( 0, 9, 14 )             - _m.multiply( 0, 10, 13 ) - _m.multiply( 8, 1, 14 ) + _m.multiply( 8, 2, 13 ) + _m.multiply( 12, 1, 10 ) - _m.multiply( 12, 2, 9 ) ) ;
+		_t.set( 14, -_m.get( 0 ) * _m.multiply(  5, 14 ) + _m.multiply( 0,  6, 13 ) + _m.multiply( 4, 1, 14 ) - _m.multiply( 4, 2, 13 ) - _m.multiply( 12, 1,  6 ) + _m.multiply( 12, 2, 5 ) ) ;
+		_t.set( 15,  _m.multiply( 0, 5, 10 )             - _m.multiply( 0,  6,  9 ) - _m.multiply( 4, 1, 10 ) + _m.multiply( 4, 2,  9 ) + _m.multiply(  8, 1,  6 ) - _m.multiply(  8, 2, 5 ) ) ;
+	}
+
+	private static void invertStage5( final IFloatBuffer _t, final IFloatBuffer _m )
+	{
+		final float d = _m.multiply( 0, _t, 0 ) + _m.multiply( 4, _t, 1 ) + _m.multiply( 8, _t, 2 ) + _m.multiply( 12, _t, 3 ) ;
+		final int size = _t.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			_t.divide( i, d ) ;
+		}
+	}
+
 	public void transpose()
 	{
-		float t ;
-		t = matrix[ 1] ; matrix[ 1] = matrix[ 4] ; matrix[ 4] = t ;
-		t = matrix[ 2] ; matrix[ 2] = matrix[ 8] ; matrix[ 8] = t ;
-		t = matrix[ 3] ; matrix[ 3] = matrix[12] ; matrix[12] = t ;
-		t = matrix[ 6] ; matrix[ 6] = matrix[ 9] ; matrix[ 9] = t ;
-		t = matrix[ 7] ; matrix[ 7] = matrix[13] ; matrix[13] = t ;
-		t = matrix[11] ; matrix[11] = matrix[14] ; matrix[14] = t ;
+		matrix.swap( 1, 4 ) ;
+		matrix.swap( 2, 8 ) ;
+		matrix.swap( 3, 12 ) ;
+		matrix.swap( 6, 9 ) ;
+		matrix.swap( 7, 13 ) ;
+		matrix.swap( 11, 14 ) ;
 	}
 
 	@Override
@@ -262,41 +295,35 @@ public class Matrix4 implements Cacheable
 		setIdentity() ;
 	}
 
-	public float[] toArray()
-	{
-		final float[] t = new float[16] ;
-		Matrix4.copy( matrix, t ) ;
-		return t ;
-	}
-	
 	public String toString()
 	{
-		final String row1 = "[" + matrix[0] +  "|" + matrix[1] +  "|" + matrix[2]  +  "|" + matrix[3]  + "]\n" ;
-		final String row2 = "[" + matrix[4] +  "|" + matrix[5] +  "|" + matrix[6]  +  "|" + matrix[7]  + "]\n" ;
-		final String row3 = "[" + matrix[8] +  "|" + matrix[9] +  "|" + matrix[10]  + "|" + matrix[11] + "]\n" ;
-		final String row4 = "[" + matrix[12] + "|" + matrix[13] + "|" + matrix[14]  + "|" + matrix[15] + "]" ;
+		final String row1 = "[" + matrix.get( 0 ) +  "|" + matrix.get( 1 ) +  "|" + matrix.get( 2 )  +  "|" + matrix.get( 3 )  + "]\n" ;
+		final String row2 = "[" + matrix.get( 4 ) +  "|" + matrix.get( 5 ) +  "|" + matrix.get( 6 )  +  "|" + matrix.get( 7 )  + "]\n" ;
+		final String row3 = "[" + matrix.get( 8 ) +  "|" + matrix.get( 9 ) +  "|" + matrix.get( 10 )  + "|" + matrix.get( 11 ) + "]\n" ;
+		final String row4 = "[" + matrix.get( 12 ) + "|" + matrix.get( 13 ) + "|" + matrix.get( 14 )  + "|" + matrix.get( 15 ) + "]" ;
 		return row1 + row2 + row3 + row4 ;
 	}
 
 	private void setRow( final float _val1, final float _val2, final float _val3, final float _val4, final int _row )
 	{
-		matrix[( _row * 4) + 0] = _val1 ;
-		matrix[( _row * 4) + 1] = _val2 ;
-		matrix[( _row * 4) + 2] = _val3 ;
-		matrix[( _row * 4) + 3] = _val4 ;
+		final int offset = _row * 4 ;
+		matrix.set( offset + 0, _val1 ) ;
+		matrix.set( offset + 1, _val2 ) ;
+		matrix.set( offset + 2, _val3 ) ;
+		matrix.set( offset + 3, _val4 ) ;
 	}
 
 	private void setColumn( final float _val1, final float _val2, final float _val3, final float _val4, final int _col )
 	{
-		matrix[( 0 * 4) + _col] = _val1 ;		// Optimise 0 * 4 = 0
-		matrix[( 1 * 4) + _col] = _val2 ;		// Optimise 1 * 4 = 4
-		matrix[( 2 * 4) + _col] = _val3 ;		// Optimise 2 * 4 = 8
-		matrix[( 3 * 4) + _col] = _val4 ;		// Optimise 3 * 4 = 12
+		matrix.set( ( 0 * 4 ) + _col, _val1 ) ;		// Optimise 0 * 4 = 0
+		matrix.set( ( 1 * 4 ) + _col, _val2 ) ;		// Optimise 1 * 4 = 4
+		matrix.set( ( 2 * 4 ) + _col, _val3 ) ;		// Optimise 2 * 4 = 8
+		matrix.set( ( 3 * 4 ) + _col, _val4 ) ;		// Optimise 3 * 4 = 12
 	}
 
 	private void set( final float _val, final int _row, final int _col )
 	{
-		matrix[( _row * 4 ) + _col] = _val ;
+		matrix.set( ( _row * 4 ) + _col, _val ) ;
 	}
 
 	private static Matrix4 createTempIdentity()
@@ -339,15 +366,13 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
-		_result.x = _a.x * _b.matrix[ 0] + _a.y * _b.matrix[ 1] + _a.z * _b.matrix[ 2] + 1.0f * _b.matrix[ 3] ;
-		_result.y = _a.x * _b.matrix[ 4] + _a.y * _b.matrix[ 5] + _a.z * _b.matrix[ 6] + 1.0f * _b.matrix[ 7] ;
-		_result.z = _a.x * _b.matrix[ 8] + _a.y * _b.matrix[ 9] + _a.z * _b.matrix[10] + 1.0f * _b.matrix[11] ;
+		final IFloatBuffer m = _b.matrix ;
+		_result.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
+						m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
+						m.multiply( 8, _a.x ) + m.multiply( 9, _a.y ) + m.multiply( 10, _a.z ) + m.multiply( 11, 1.0f ) ) ;
 
-		final float w = _a.x * _b.matrix[12] + _a.y * _b.matrix[13] + _a.z * _b.matrix[14] + 1.0f * _b.matrix[15] ;
-
-		_result.x /= w ;
-		_result.y /= w ;
-		_result.z /= w ;
+		final float w = m.multiply( 12, _a.x ) + m.multiply( 13, _a.y ) + m.multiply( 14, _a.z ) + m.multiply( 15, 1.0f ) ;
+		_result.divide( w ) ;
 
 		return _result ;
 	}
@@ -357,17 +382,18 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
 	{
-		final float x = _a.x * _b.matrix[ 0] + _a.y * _b.matrix[ 1] + _a.z * _b.matrix[ 2] + 1.0f * _b.matrix[ 3] ;
-		final float y = _a.x * _b.matrix[ 4] + _a.y * _b.matrix[ 5] + _a.z * _b.matrix[ 6] + 1.0f * _b.matrix[ 7] ;
-		final float z = _a.x * _b.matrix[ 8] + _a.y * _b.matrix[ 9] + _a.z * _b.matrix[10] + 1.0f * _b.matrix[11] ;
-		final float w = _a.x * _b.matrix[12] + _a.y * _b.matrix[13] + _a.z * _b.matrix[14] + 1.0f * _b.matrix[15] ;
+		final IFloatBuffer m = _b.matrix ;
+		final float w = m.multiply( 12, _a.x ) + m.multiply( 13, _a.y ) + m.multiply( 14, _a.z ) + m.multiply( 15, 1.0f ) ;
+		_a.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
+				   m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
+				   m.multiply( 8, _a.x ) + m.multiply( 9, _a.y ) + m.multiply( 10, _a.z ) + m.multiply( 11, 1.0f ) ) ;
 
-		_a.setXYZ( x / w, y / w, z / w ) ;
+		_a.divide( w ) ;
 		return _a ;
 	}
 
-	private static void copy( final float[] _from, final float[] _to )
+	private static void copy( final IFloatBuffer _from, final IFloatBuffer _to )
 	{
-		System.arraycopy( _from, 0, _to, 0, 16 ) ;
+		FloatBuffer.copy( _from, _to ) ;
 	}
 }

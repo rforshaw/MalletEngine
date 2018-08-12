@@ -3,9 +3,10 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.util.buffers.* ;
 import com.linxonline.mallet.util.MalletList ;
 
-public abstract class Shape
+public class Shape
 {
 	public enum Style
 	{
@@ -146,56 +147,57 @@ public abstract class Shape
 		}
 	}
 
-	private static Shape.Factory factory = new Shape.Factory()
+	private Swivel[] swivel ;
+	private IFloatBuffer verticies ;
+	private IIntegerBuffer indicies ;
+
+	private Style style = Style.LINE_STRIP ;
+
+	private int vertexSize = 0 ;
+	private int indexIncrement = 0 ;
+	private int vertexIncrement = 0 ;
+
+	public Shape( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
 	{
-		@Override
-		public Shape create( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
+		swivel    = new Swivel[_swivel.length] ;
+		System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
+
+		verticies = FloatBuffer.allocate( Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize ) ;
+		indicies  = IntegerBuffer.allocate( _indexSize ) ;
+
+		style      = _style ;
+		vertexSize = _pointSize ;
+	}
+
+	public Shape( final Style _style, final int _indexSize, final int _pointSize )
+	{
+		this( _style, Swivel.constructDefault(), _indexSize, _pointSize ) ;
+	}
+
+	public Shape( final Shape _shape )
+	{
+		this( _shape.getStyle(),
+				_shape.getSwivel(),
+				_shape.getIndexSize(),
+				_shape.getVertexSize() ) ;
+
+		// We've got all the information we need to make this a clean copy.
+		// This should work even if the implementation was changed 
+		// halfway through.
+		final Swivel[] sw = _shape.getSwivel() ;
+		final int indexSize = _shape.getIndexSize() ;
+		final int vertexSize = _shape.getVertexSize() ;
+
+		final Object[] vertex = Swivel.createVert( sw ) ;
+		for( int i = 0; i < vertexSize; i++ )
 		{
-			return new DefaultShape( _style, _swivel, _indexSize, _pointSize ) ;
+			addVertex( _shape.getVertex( vertex, i ) ) ;
 		}
 
-		@Override
-		public Shape create( final Shape _shape )
+		for( int i = 0; i < indexSize; i++ )
 		{
-			return new DefaultShape( _shape ) ;
+			addIndex( _shape.getIndex( i ) ) ;
 		}
-	} ;
-
-	/**
-		Allow the backend system to define a different 
-		shape implementation.
-
-		The Default Factory should be fine for the majority of 
-		platforms: desktop and android.
-
-		Web will require a custom implementation.
-	*/
-	public static void setFactory( final Shape.Factory _factory )
-	{
-		factory = _factory ;
-	}
-
-	public static Shape create( final int _indexSize, final int _pointSize )
-	{
-		return Shape.create( Style.LINE_STRIP, _indexSize, _pointSize ) ;
-	}
-
-	public static Shape create( final Style _style, final int _indexSize, final int _pointSize )
-	{
-		return Shape.create( _style, Swivel.constructDefault(), _indexSize, _pointSize ) ;
-	}
-
-	public static Shape create( final Style _style,
-								final Swivel[] _swivel,
-								final int _indexSize,
-								final int _pointSize )
-	{
-		return factory.create( _style, _swivel, _indexSize, _pointSize ) ;
-	}
-
-	public static Shape create( final Shape _shape )
-	{
-		return factory.create( _shape ) ;
 	}
 
 	/**
@@ -207,9 +209,15 @@ public abstract class Shape
 		Adding more indices than defined by getIndexSize() 
 		will result in undefined behaviour.
 	*/
-	public abstract void addIndex( final int _index ) ;
+	public void addIndex( final int _index )
+	{
+		indicies.set( indexIncrement++, _index ) ;
+	}
 
-	public abstract int getIndex( final int _index ) ;
+	public int getIndex( final int _index )
+	{
+		return indicies.get( _index ) ;
+	}
 
 	/**
 		Add a vertex defined by the Shapes swivel.
@@ -220,14 +228,78 @@ public abstract class Shape
 		Adding more vertices than getVertexSize() will result in 
 		undefined behaviour.
 	*/
-	public abstract void addVertex( final Object[] _vertex ) ;
+	public void addVertex( final Object[] _vertex )
+	{
+		for( int i = 0; i < swivel.length; i++ )
+		{
+			switch( swivel[i] )
+			{
+				case POINT  :
+				case NORMAL :
+				{
+					final Vector3 point = ( Vector3 )_vertex[i] ;
+					verticies.set( vertexIncrement, point ) ;
+					vertexIncrement += 3 ;
+					break ;
+				}
+				case COLOUR :
+				{
+					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					verticies.set( vertexIncrement++, colour.toFloat() ) ;
+					break ;
+				}
+				case UV     :
+				{
+					final Vector2 uv = ( Vector2 )_vertex[i] ;
+					verticies.set( vertexIncrement, uv ) ;
+					vertexIncrement += 2 ;
+					break ;
+				}
+			}
+		}
+	}
 
 	/**
 		Copy the Vertex at index location into _vertex.
 		Use Swivel.createVert() to build a valid vertex object 
 		for the Swivel defined by the shape. 
 	*/
-	public abstract Object[] getVertex( final Object[] _vertex, final int _index ) ;
+	public Object[] getVertex( final Object[] _vertex, final int _index )
+	{
+		if( _vertex.length != swivel.length )
+		{
+			return null ;
+		}
+
+		int start = _index * Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		for( int i = 0; i < swivel.length; i++ )
+		{
+			switch( swivel[i] )
+			{
+				case POINT  :
+				case NORMAL :
+				{
+					verticies.fill( ( Vector3 )_vertex[i], start ) ;
+					start += 3 ;
+					break ;
+				}
+				case COLOUR :
+				{
+					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					colour.changeColour( verticies.get( start++ ) ) ;
+					break ;
+				}
+				case UV     :
+				{
+					verticies.fill( ( Vector2 )_vertex[i], start ) ;
+					start += 2 ;
+					break ;
+				}
+			}
+		}
+
+		return _vertex ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -236,7 +308,10 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector3 resides at the location.
 	*/
-	public abstract void setVector3( final int _index, final int _swivelIndex, final Vector3 _point ) ;
+	public void setVector3( final int _index, final int _swivelIndex, final Vector3 _point )
+	{
+		setVector3( _index, _swivelIndex, _point.x, _point.y, _point.z ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -245,7 +320,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector3 resides at the location.
 	*/
-	public abstract void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z ) ;
+	public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies.set( start, _x, _y, _z ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -254,7 +336,11 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector3 resides at the location.
 	*/
-	public abstract Vector3 getVector3( final int _index, final int _swivelIndex ) ;
+	public Vector3 getVector3( final int _index, final int _swivelIndex )
+	{
+		final Vector3 point = new Vector3() ;
+		return getVector3( _index, _swivelIndex, point ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -263,7 +349,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector3 resides at the location.
 	*/
-	public abstract Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point ) ;
+	public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		return verticies.fill( _point, start ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -272,7 +365,10 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector2 resides at the location.
 	*/
-	public abstract void setVector2( final int _index, final int _swivelIndex, final Vector2 _point ) ;
+	public void setVector2( final int _index, final int _swivelIndex, final Vector2 _point )
+	{
+		setVector2( _index, _swivelIndex, _point.x, _point.y ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -281,7 +377,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector2 resides at the location.
 	*/
-	public abstract void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y ) ;
+	public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies.set( start, _x, _y ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -290,7 +393,11 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector2 resides at the location.
 	*/
-	public abstract Vector2 getVector2( final int _index, final int _swivelIndex ) ;
+	public Vector2 getVector2( final int _index, final int _swivelIndex )
+	{
+		final Vector2 uv = new Vector2() ;
+		return getVector2( _index, _swivelIndex, uv ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -299,7 +406,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a Vector3 resides at the location.
 	*/
-	public abstract Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv ) ;
+	public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		return verticies.fill( _uv, start ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -308,7 +422,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a float resides there.
 	*/
-	public abstract float getFloat( final int _index, final int _swivelIndex ) ;
+	public float getFloat( final int _index, final int _swivelIndex )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		return verticies.get( start ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -317,7 +438,14 @@ public abstract class Shape
 
 		Assumes the caller knows that a MalletColour resides at the location.
 	*/
-	public abstract void setColour( final int _index, final int _swivelIndex, final MalletColour _colour ) ;
+	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		verticies.set( start, _colour.toFloat() ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -326,7 +454,11 @@ public abstract class Shape
 
 		Assumes the caller knows that a MalletColour resides there.
 	*/
-	public abstract MalletColour getColour( final int _index, final int _swivelIndex ) ;
+	public MalletColour getColour( final int _index, final int _swivelIndex )
+	{
+		final MalletColour colour = new MalletColour() ;
+		return getColour( _index, _swivelIndex, colour ) ;
+	}
 
 	/**
 		_index defines the vertex location.
@@ -335,7 +467,15 @@ public abstract class Shape
 
 		Assumes the caller knows that a MalletColour resides at the location.
 	*/
-	public abstract MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour ) ;
+	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
+	{
+		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int start = ( _index * size ) + offset ;
+
+		_colour.changeColour( verticies.get( start ) ) ;
+		return _colour ;
+	}
 
 	/**
 		Returns how the geometry should be interpreted.
@@ -343,22 +483,37 @@ public abstract class Shape
 		LINE_STRIP: Will continue the line from the last point added
 		FILL: 		Fill the geometry shape, requires the shape to be defined in polygons, will eventually be auto generated.
 	*/
-	public abstract Shape.Style getStyle() ;
+	public Shape.Style getStyle()
+	{
+		return style ;
+	}
 
 	/**
 		Defines what a Vertex within the Shape is made from.
 	*/
-	public abstract Swivel[] getSwivel() ;
+	public Swivel[] getSwivel()
+	{
+		return swivel ;
+	}
 
-	public abstract int getIndexSize() ;
-	
-	public abstract int getVertexSize() ;
+	public int getIndexSize()
+	{
+		return indicies.size() ;
+	}
+
+	public int getVertexSize()
+	{
+		return vertexSize ;
+	}
 
 	/**
 		Inform the developer whether the Shape 
 		has been correctly populated with data.
 	*/
-	public abstract boolean isComplete() ;
+	public boolean isComplete()
+	{
+		return indexIncrement == indicies.size() && vertexIncrement == verticies.size() ;
+	}
 
 	/**
 		Construct a vertex with the default swivel format.
@@ -440,7 +595,7 @@ public abstract class Shape
 
 		final MalletColour white = MalletColour.white() ;
 
-		final Shape plane = Shape.create( Shape.Style.FILL, swivel, 6, 4 ) ;
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
 		plane.addVertex( new Object[] { new Vector3(), white, new Vector2( _minUV ) } ) ;
 		plane.addVertex( new Object[] { new Vector3( _length ), white, new Vector2( _maxUV ) } ) ;
 		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, _length.z ), white, new Vector2( _minUV.x, _maxUV.y ) } ) ;
@@ -467,7 +622,7 @@ public abstract class Shape
 		swivel[0] = Swivel.POINT ;
 		swivel[1] = Swivel.COLOUR ;
 
-		final Shape plane = Shape.create( Shape.Style.FILL, swivel, 6, 4 ) ;
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
 		plane.addVertex( new Object[] { new Vector3(), _colour } ) ;
 		plane.addVertex( new Object[] { new Vector3( _length ), _colour } ) ;
 		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, 0.0f ), _colour } ) ;
@@ -490,7 +645,7 @@ public abstract class Shape
 		swivel[0] = Swivel.POINT ;
 		swivel[1] = Swivel.COLOUR ;
 
-		final Shape plane = Shape.create( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
+		final Shape plane = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		plane.addVertex( new Object[] { new Vector3(), _colour } ) ;
 		plane.addVertex( new Object[] { new Vector3( _length ), _colour } ) ;
 		plane.addVertex( new Object[] { new Vector3( 0.0f, _length.y, 0.0f ), _colour } ) ;
@@ -517,7 +672,7 @@ public abstract class Shape
 
 		final MalletColour white = MalletColour.white() ;
 
-		final Shape plane = Shape.create( Shape.Style.FILL, swivel, 36, 24 ) ;
+		final Shape plane = new Shape( Shape.Style.FILL, swivel, 36, 24 ) ;
 		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front
 		plane.addVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) ) ) ;				// 1
 		plane.addVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 2
@@ -656,7 +811,7 @@ public abstract class Shape
 			totalPoints += _shapes[i].getVertexSize() ;
 		}
 
-		final Shape combined = Shape.create( _shapes[0].getStyle(), _shapes[0].getSwivel(), totalIndicies, totalPoints ) ;
+		final Shape combined = new Shape( _shapes[0].getStyle(), _shapes[0].getSwivel(), totalIndicies, totalPoints ) ;
 		int indexOffset = 0 ;
 
 		for( int i = 0; i < _shapes.length; i++ )
@@ -693,7 +848,7 @@ public abstract class Shape
 	{
 		if( _shape.getIndexSize() <= 3 )
 		{
-			return Shape.create( _shape ) ;
+			return new Shape( _shape ) ;
 		}
 
 		final Swivel[] swivel = _shape.getSwivel() ;
@@ -703,7 +858,7 @@ public abstract class Shape
 		final int indexSize = tempIndicies.size() ;
 		final int vertexSize = _shape.getVertexSize() ;
 
-		final Shape triangulated = Shape.create( style, swivel, indexSize, vertexSize ) ;
+		final Shape triangulated = new Shape( style, swivel, indexSize, vertexSize ) ;
 		for( int i = 0; i < indexSize; i++ )
 		{
 			triangulated.addIndex( tempIndicies.get( i ) ) ;
@@ -821,291 +976,5 @@ public abstract class Shape
 	private static float sign( final Vector3 _p1, final Vector3 _p2, final Vector3 _p3 )
 	{
 		return ( _p1.x - _p3.x ) * ( _p2.y - _p3.y ) - ( _p2.x - _p3.x ) * ( _p1.y - _p3.y ) ;
-	}
-
-	/**
-		Default implementation of the Shape class.
-	*/
-	private static class DefaultShape extends Shape
-	{
-		private Swivel[] swivel ;
-		private float[] verticies ;
-		private int[] indicies ;
-
-		private Style style = Style.LINE_STRIP ;
-
-		private int vertexSize = 0 ;
-		private int indexIncrement = 0 ;
-		private int vertexIncrement = 0 ;
-
-		public DefaultShape( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
-		{
-			swivel    = new Swivel[_swivel.length] ;
-			System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
-
-			verticies = new float[Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize] ;
-			indicies  = new int[_indexSize] ;
-
-			style      = _style ;
-			vertexSize = _pointSize ;
-		}
-
-		public DefaultShape( final Shape _shape )
-		{
-			this( _shape.getStyle(),
-				  _shape.getSwivel(),
-				  _shape.getIndexSize(),
-				  _shape.getVertexSize() ) ;
-
-			// We've got all the information we need to make this a clean copy.
-			// This should work even if the implementation was changed 
-			// halfway through.
-			final Swivel[] sw = _shape.getSwivel() ;
-			final int indexSize = _shape.getIndexSize() ;
-			final int vertexSize = _shape.getVertexSize() ;
-
-			final Object[] vertex = Swivel.createVert( sw ) ;
-			for( int i = 0; i < vertexSize; i++ )
-			{
-				addVertex( _shape.getVertex( vertex, i ) ) ;
-			}
-
-			for( int i = 0; i < indexSize; i++ )
-			{
-				addIndex( _shape.getIndex( i ) ) ;
-			}
-		}
-
-		@Override
-		public void addIndex( final int _index )
-		{
-			indicies[indexIncrement++] = _index ;
-		}
-
-		@Override
-		public int getIndex( final int _index )
-		{
-			return indicies[_index] ;
-		}
-
-		@Override
-		public void addVertex( final Object[] _vertex )
-		{
-			for( int i = 0; i < swivel.length; i++ )
-			{
-				switch( swivel[i] )
-				{
-					case POINT  :
-					case NORMAL :
-					{
-						final Vector3 point = ( Vector3 )_vertex[i] ;
-						verticies[vertexIncrement++] = point.x ;
-						verticies[vertexIncrement++] = point.y ;
-						verticies[vertexIncrement++] = point.z ;
-						break ;
-					}
-					case COLOUR :
-					{
-						final MalletColour colour = ( MalletColour )_vertex[i] ;
-						verticies[vertexIncrement++] = colour.toFloat() ;
-						break ;
-					}
-					case UV     :
-					{
-						final Vector2 uv = ( Vector2 )_vertex[i] ;
-						verticies[vertexIncrement++] = uv.x ;
-						verticies[vertexIncrement++] = uv.y ;
-						break ;
-					}
-				}
-			}
-		}
-
-		@Override
-		public Object[] getVertex( final Object[] _vertex, final int _index )
-		{
-			if( _vertex.length != swivel.length )
-			{
-				return null ;
-			}
-
-			int start = _index * Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			for( int i = 0; i < swivel.length; i++ )
-			{
-				switch( swivel[i] )
-				{
-					case POINT  :
-					case NORMAL :
-					{
-						final Vector3 point = ( Vector3 )_vertex[i] ;
-						point.x = verticies[start++] ;
-						point.y = verticies[start++] ;
-						point.z = verticies[start++] ;
-						break ;
-					}
-					case COLOUR :
-					{
-						final MalletColour colour = ( MalletColour )_vertex[i] ;
-						colour.changeColour( verticies[start++] ) ;
-						break ;
-					}
-					case UV     :
-					{
-						final Vector2 uv = ( Vector2 )_vertex[i] ;
-						uv.x = verticies[start++] ;
-						uv.y = verticies[start++] ;
-						break ;
-					}
-				}
-			}
-
-			return _vertex ;
-		}
-
-		@Override
-		public void setVector3( final int _index, final int _swivelIndex, final Vector3 _point )
-		{
-			setVector3( _index, _swivelIndex, _point.x, _point.y, _point.z ) ;
-		}
-
-		@Override
-		public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			verticies[start]     = _x ;
-			verticies[start + 1] = _y ;
-			verticies[start + 2] = _z ;
-		}
-
-		@Override
-		public Vector3 getVector3( final int _index, final int _swivelIndex )
-		{
-			final Vector3 point = new Vector3() ;
-			return getVector3( _index, _swivelIndex, point ) ;
-		}
-
-		@Override
-		public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			_point.setXYZ( verticies[start], verticies[start + 1], verticies[start + 2] ) ;
-			return _point ;
-		}
-
-		@Override
-		public void setVector2( final int _index, final int _swivelIndex, final Vector2 _point )
-		{
-			setVector2( _index, _swivelIndex, _point.x, _point.y ) ;
-		}
-
-		@Override
-		public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			verticies[start]       = _x ;
-			verticies[start + 1]   = _y ;
-		}
-
-		@Override
-		public Vector2 getVector2( final int _index, final int _swivelIndex )
-		{
-			final Vector2 uv = new Vector2() ;
-			return getVector2( _index, _swivelIndex, uv ) ;
-		}
-
-		@Override
-		public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			_uv.setXY( verticies[start], verticies[start + 1] ) ;
-			return _uv ;
-		}
-
-		@Override
-		public float getFloat( final int _index, final int _swivelIndex )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			return verticies[start] ;
-		}
-
-		@Override
-		public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			verticies[start] = _colour.toFloat() ;
-		}
-
-		@Override
-		public MalletColour getColour( final int _index, final int _swivelIndex )
-		{
-			final MalletColour colour = new MalletColour() ;
-			return getColour( _index, _swivelIndex, colour ) ;
-		}
-
-		@Override
-		public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
-		{
-			final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-			final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-			final int start = ( _index * size ) + offset ;
-
-			_colour.changeColour( verticies[start] ) ;
-			return _colour ;
-		}
-
-		@Override
-		public Shape.Style getStyle()
-		{
-			return style ;
-		}
-
-		@Override
-		public Swivel[] getSwivel()
-		{
-			return swivel ;
-		}
-
-		@Override
-		public int getIndexSize()
-		{
-			return indicies.length ;
-		}
-
-		@Override
-		public int getVertexSize()
-		{
-			return vertexSize ;
-		}
-
-		@Override
-		public boolean isComplete()
-		{
-			return indexIncrement == indicies.length && vertexIncrement == verticies.length ;
-		}
-	}
-
-	public interface Factory
-	{
-		public Shape create( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize ) ;
-		
-		public Shape create( final Shape _shape ) ;
 	}
 }

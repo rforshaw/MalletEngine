@@ -22,6 +22,12 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 												 EventSystem,
 												 WebGameSystem>
 {
+	static
+	{
+		IntegerBuffer.setBase( new com.linxonline.mallet.util.buffers.web.IntegerBuffer( 0 ) ) ;
+		FloatBuffer.setBase( new com.linxonline.mallet.util.buffers.web.FloatBuffer( 0 ) ) ;
+	}
+
 	// Add Web Document here...
 	protected EventController eventController = new EventController() ;
 

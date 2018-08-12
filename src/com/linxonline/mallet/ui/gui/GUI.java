@@ -32,7 +32,7 @@ public class GUI
 		// 4 is the amount of vertices needed for each face
 		// and 6 is the amount of indexes needed to construct that face
 		final int faces = 9 ;
-		final Shape shape = Shape.create( Shape.Style.FILL, swivel, faces * 6, faces * 4 ) ;
+		final Shape shape = new Shape( Shape.Style.FILL, swivel, faces * 6, faces * 4 ) ;
 
 		// Top Left Corner
 		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  0.0f,  0.0f ), white, new Vector2( 0, 0 ) ) ) ;	

@@ -52,7 +52,7 @@ public class SGeom
 
 		final int iSize = indices.length() ;
 		final int vSize = vertices.length() ;
-		final Shape shape = Shape.create( style, swivel, iSize, vSize / swivel.length ) ;
+		final Shape shape = new Shape( style, swivel, iSize, vSize / swivel.length ) ;
 
 		for( int i = 0; i < iSize; i++ )
 		{

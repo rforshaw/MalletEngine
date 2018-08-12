@@ -6,6 +6,7 @@ import java.util.Set ;
 
 import com.linxonline.mallet.renderer.ProgramMap ;
 
+import com.linxonline.mallet.util.buffers.IFloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -51,7 +52,11 @@ public class GLProgram extends Resource
 				final int inUniform                  = program.inUniforms[_index] ;
 
 				final Matrix4 m = ( Matrix4 )_data.get( uniform.getLeft() ) ;
-				MGL.glUniformMatrix4fv( inUniform, 1, true, m.matrix, 0 ) ;
+				final IFloatBuffer ibuffer = m.matrix ;
+				final com.linxonline.mallet.util.buffers.desktop.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.desktop.FloatBuffer )ibuffer ;
+				final float[] matrix = buffer.getArray() ;
+				
+				MGL.glUniformMatrix4fv( inUniform, 1, true, matrix, 0 ) ;
 				return true ;
 			}
 
