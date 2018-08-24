@@ -20,14 +20,22 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
-import com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.VertexAttrib ;
+import com.linxonline.mallet.renderer.opengl.ProgramManager ;
+import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
 public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState> implements GLEventListener
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
-	protected final static GLProgramManager programs = new GLProgramManager() ;
+	protected final static ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder<GLProgram>()
+	{
+		public GLProgram build( final JSONProgram _program )
+		{
+			return GLProgram.build( _program ) ;
+		}
+	} ) ;
+
 	protected final static GLTextureManager textures = new GLTextureManager() ;
 	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
 

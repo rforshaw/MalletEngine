@@ -98,6 +98,7 @@ public final class MGL
 	public final static int GL_VERTEX_SHADER = GL3.GL_VERTEX_SHADER ;
 	public final static int GL_GEOMETRY_SHADER = GL3.GL_GEOMETRY_SHADER ;
 	public final static int GL_FRAGMENT_SHADER = GL3.GL_FRAGMENT_SHADER ;
+	public final static int GL_COMPUTE_SHADER = GL3.GL_COMPUTE_SHADER ;
 
 	public MGL() {}
 
