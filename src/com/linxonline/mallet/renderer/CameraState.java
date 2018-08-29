@@ -1,9 +1,11 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.ManagedArray ;
+import java.util.List ;
+
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
 
-public final class CameraState<C extends CameraData> extends ManagedArray<C>
+public final class CameraState<C extends CameraData>
 {
 	private final IDraw<C> DRAW_DEFAULT = new IDraw<C>()
 	{
@@ -14,12 +16,25 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 		}
 	} ;
 
+	private final BufferedList<C> state = new BufferedList<C>() ;
 	private IDraw<C> draw = DRAW_DEFAULT ;
 
 	public CameraState() {}
 
+	public void add( final C _camera )
+	{
+		state.add( _camera ) ;
+	}
+
+	public void remove( final C _camera )
+	{
+		state.remove( _camera ) ;
+	}
+
 	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
+		final List<C> current = state.getCurrentData() ;
+
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -30,7 +45,8 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 	
 	public synchronized void update( final int _diff, final int _iteration )
 	{
-		manageState() ;
+		state.update() ;
+		final List<C> current = state.getCurrentData() ;
 
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
@@ -41,6 +57,8 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 
 	public synchronized void draw()
 	{
+		final List<C> current = state.getCurrentData() ;
+
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -54,31 +72,18 @@ public final class CameraState<C extends CameraData> extends ManagedArray<C>
 
 	public synchronized C getCamera( final String _id )
 	{
-		{
-			final int size = current.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final C camera = current.get( i ) ;
-				final String id = camera.getID() ;
-				
-				if( _id.equals( id ) == true )
-				{
-					return camera ;
-				}
-			}
-		}
+		state.update() ;
+		final List<C> current = state.getCurrentData() ;
 
+		final int size = current.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int size = toAdd.size() ;
-			for( int i = 0; i < size; i++ )
+			final C camera = current.get( i ) ;
+			final String id = camera.getID() ;
+			
+			if( _id.equals( id ) == true )
 			{
-				final C camera = toAdd.get( i ) ;
-				final String id = camera.getID() ;
-				
-				if( _id.equals( id ) == true )
-				{
-					return camera ;
-				}
+				return camera ;
 			}
 		}
 

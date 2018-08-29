@@ -15,6 +15,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -505,7 +506,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				final GLWorld world = new GLWorld( _id, _order ) ;
 				world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-				world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+				world.getDrawState().setRemoveListener( new GLBasicRemove( world ) ) ;
 				getWorldState().addWorld( world ) ;
 				return world ;
 			}
@@ -868,7 +869,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 		final GLWorld world = GLWorld.createDefaultWorld( "DEFAULT", 0 ) ;
 		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+		world.getDrawState().setRemoveListener( new GLBasicRemove( world ) ) ;
 
 		worlds.addWorld( world ) ;
 		worlds.setDefault( world ) ;
@@ -976,7 +977,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		}
 	}
 
-	private final static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
+	private final static class GLBasicRemove implements BufferedList.RemoveListener<GLDrawData>
 	{
 		private final GLWorld world ;
 

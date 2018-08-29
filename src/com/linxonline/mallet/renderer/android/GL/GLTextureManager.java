@@ -241,74 +241,16 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE ) ;
 		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT ) ;
 
-		// If texture compression is enabled then use texture compression.
-		// Unless the texture request specifically requests not to use compression.
-		// If compression is disabled then never use compression, even if specified.
-		// Uncompressed will provide the best results, compressed can provide blury or 
-		// create artifacts, for example on Intel chips. Certain textures should never 
-		// be compressed such as fonts.
-		//final boolean useCompression = GlobalConfig.getBoolean( "TEXTURECOMPRESSION", true ) ;
-		//final InternalFormat format = ( useCompression == true ) ? _format : InternalFormat.UNCOMPRESSED ;
-
-		//if( format == InternalFormat.UNCOMPRESSED || _image.getConfig() == Bitmap.Config.ARGB_8888 )
-		//{
-			// If the texture has been flagged to not use 
-			// compression or contains an alpha channel, then 
-			// do not compress the texture.
-			GLES20.glPixelStorei( GLES20.GL_UNPACK_ALIGNMENT, 1 ) ;
-			GLUtils.texImage2D( GLES20.GL_TEXTURE_2D, 0, _image, 0 ) ;
-		//}
-		/*else		// This is too slow
-		{
-			// We don't want the memory hit of converting an ARGB_8888 
-			// that doesn't use alpha to RGB_565. Too many copies!
-			final int width = _image.getWidth() ;
-			final int height = _image.getHeight() ;
-			final int size = _image.getRowBytes() * height ;
-
-			// Personally this implementation still has 1 too many copies.
-			final ByteBuffer buffer = ByteBuffer.allocateDirect( size ) ;
-			buffer.order( ByteOrder.nativeOrder() ) ;
-
-			_image.copyPixelsToBuffer( buffer ) ;
-			buffer.position( 0 ) ;
-
-			// RGB_565 is 2 bytes per pixel
-			final ETC1Texture etc1tex = ETC1Util.compressTexture( buffer, width, height, 2, 2 * width ) ;
-			ETC1Util.loadTexture( GLES20.GL_TEXTURE_2D, 0, 0, GLES20.GL_RGB, GLES20.GL_UNSIGNED_SHORT_5_6_5, etc1tex ) ;
-		}*/
+		// Android GL doesn't use texture compression.
+		// At least for the moment.
+		GLES20.glPixelStorei( GLES20.GL_UNPACK_ALIGNMENT, 1 ) ;
+		GLUtils.texImage2D( GLES20.GL_TEXTURE_2D, 0, _image, 0 ) ;
 
 		final long estimatedConsumption = _image.getWidth() * _image.getHeight() * ( 3 * 8 ) ;
 		return new GLImage( textureID, estimatedConsumption ) ;
 	}
 
-	private int getGLInternalFormat( final Bitmap.Config _config, final InternalFormat _format )
-	{
-		/*switch( _config )
-		{
-			case ARGB_4444 :
-			case ARGB_8888 :
-			{
-				switch( _format )
-				{
-					case COMPRESSED   : return GLES20.GL_COMPRESSED_RGBA ;
-					case UNCOMPRESSED : return GLES20.GL_RGBA ;
-				}
-			}
-			case RGB_565  :
-			{
-				switch( _format )
-				{
-					case COMPRESSED   : return GLES20.GL_COMPRESSED_RGB ;
-					case UNCOMPRESSED : return GLES20.GL_RGB ;
-				}
-			}
-		}*/
-
-		return GLES20.GL_RGB ;
-	}
-
-	private int glGenTextures()
+	private static int glGenTextures()
 	{
 		final int[] id = new int[1] ;
 		GLES20.glGenTextures( 1, id, 0 ) ;

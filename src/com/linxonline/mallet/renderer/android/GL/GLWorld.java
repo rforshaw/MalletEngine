@@ -106,7 +106,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	public void clean( final Set<String> _activeKeys )
 	{
 		final DrawState<GLDrawData> state = getDrawState() ;
-		final List<GLDrawData> list = state.getNewState() ;
+		final List<GLDrawData> list = state.getActiveDraws() ;
 
 		for( final GLDrawData draw : list )
 		{

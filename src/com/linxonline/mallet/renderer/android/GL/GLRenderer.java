@@ -12,6 +12,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -77,15 +78,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	*/
 	public void recover()
 	{
-		final GLWorldState worlds = getWorldState() ;
-		worlds.shutdown() ;
+		final GLWorldState worldState = getWorldState() ;
+		worldState.shutdown() ;
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.recover() ;
 
 		Logger.println( "Recovering renderer state..", Logger.Verbosity.NORMAL ) ;
-		final List<GLWorld> worldContent = worlds.getCurrentData() ;
-		for( final GLWorld world : worldContent )
+		final BufferedList<GLWorld> worlds = worldState.getWorlds() ;
+		for( final GLWorld world : worlds.getCurrentData() )
 		{
 			world.init() ;
 			final DrawState state = world.getDrawState() ;
@@ -101,8 +102,6 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 				d.forceUpdate() ;
 			}
 		}
-
-		//initGraphics() ;
 	}
 
 	private void initGraphics()
@@ -137,7 +136,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 		final GLWorld world = GLWorld.createDefaultWorld( "DEFAULT", 0 ) ;
 		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+		world.getDrawState().setRemoveListener( new GLBasicRemove( world ) ) ;
 
 		worlds.addWorld( world ) ;
 		worlds.setDefault( world ) ;
@@ -568,7 +567,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			{
 				final GLWorld world = new GLWorld( _id, _order ) ;
 				world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-				world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+				world.getDrawState().setRemoveListener( new GLBasicRemove( world ) ) ;
 				getWorldState().addWorld( world ) ;
 				return world ;
 			}
@@ -911,7 +910,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		}
 	}
 
-	private final static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
+	private final static class GLBasicRemove implements BufferedList.RemoveListener<GLDrawData>
 	{
 		private final GLWorld world ;
 

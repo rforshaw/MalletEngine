@@ -2,10 +2,10 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.ManagedArray ;
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
 
-public final class DrawState<D extends DrawData> extends ManagedArray<D>
+public final class DrawState<D extends DrawData>
 {
 	private final IUpload<D> UPLOAD_DEFAULT = new IUpload<D>()
 	{
@@ -16,11 +16,13 @@ public final class DrawState<D extends DrawData> extends ManagedArray<D>
 		}
 	} ;
 
+	private final BufferedList<D> state = new BufferedList<D>() ;
 	private IUpload<D> upload = UPLOAD_DEFAULT ;
 
 	public synchronized void update( final int _diff, final int _iteration )
 	{
-		manageState() ;
+		state.update() ;
+		final List<D> current = state.getCurrentData() ;
 
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
@@ -36,40 +38,28 @@ public final class DrawState<D extends DrawData> extends ManagedArray<D>
 
 	public List<D> getActiveDraws()
 	{
-		return current ;
+		state.update() ;
+		return state.getCurrentData() ;
 	}
 
-	@Override
-	protected void addNewData( final List<D> _toAdd )
+	public void add( final D _draw )
 	{
-		if( _toAdd.isEmpty() == false )
-		{
-			final int size = _toAdd.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final D add = _toAdd.get( i ) ;
-				insertNewDrawData( add ) ;
-			}
-			_toAdd.clear() ;
-		}
+		state.insert( _draw, _draw.getOrder() ) ;
 	}
 
-	private void insertNewDrawData( final D _insert )
+	public void remove( final D _draw )
 	{
-		final int order = _insert.getOrder() ;
-		final int size = current.size() ;
-		if( order < size )
-		{
-			current.add( order, _insert ) ;
-			return ;
-		}
-
-		current.add( _insert ) ;
+		state.remove( _draw ) ;
 	}
 
 	public void sort() {}
 
 	public void clear() {}
+
+	public void setRemoveListener( final BufferedList.RemoveListener<D> _listener )
+	{
+		state.setRemoveListener( _listener ) ;
+	}
 
 	public void setUploadInterface( final IUpload<D> _upload )
 	{

@@ -2,7 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.ManagedArray ;
+import com.linxonline.mallet.util.BufferedList ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Implements common requirements when using BasicWorld.
@@ -12,10 +13,11 @@ import com.linxonline.mallet.util.ManagedArray ;
 	rendering-system. A default world must be passed when WorldState is 
 	constructed/extended.
 */
-public abstract class WorldState<D extends DrawData,
-								 C extends CameraData,
-								 W extends BasicWorld<D, C>> extends ManagedArray<W>
+public class WorldState<D extends DrawData,
+						C extends CameraData,
+						W extends BasicWorld<D, C>>
 {
+	private final BufferedList<W> worlds = new BufferedList<W>() ;
 	private W defaultWorld ;
 
 	public WorldState() {}
@@ -31,7 +33,7 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void addWorld( final W _world )
 	{
-		add( _world ) ;
+		worlds.insert( _world, _world.getOrder() ) ;
 	}
 
 	/**
@@ -40,7 +42,7 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void removeWorld( final W _world )
 	{
-		remove( _world ) ;
+		worlds.remove( _world ) ;
 	}
 
 	/**
@@ -62,6 +64,7 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void removeDraw( final D _draw )
 	{
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -89,6 +92,7 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void removeCamera( final C _camera )
 	{
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -110,6 +114,7 @@ public abstract class WorldState<D extends DrawData,
 
 	public W getWorld( final String _id )
 	{
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -123,6 +128,11 @@ public abstract class WorldState<D extends DrawData,
 		return null ;
 	}
 
+	public BufferedList<W> getWorlds()
+	{
+		return worlds ;
+	}
+
 	/**
 		Sort the worlds based on their order.
 		Inform the worlds to also update their draw 
@@ -130,6 +140,7 @@ public abstract class WorldState<D extends DrawData,
 	*/
 	public void sort() 
 	{
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -139,38 +150,11 @@ public abstract class WorldState<D extends DrawData,
 
 	public void clear()
 	{
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
 			current.get( i ).clear() ;
 		}
-	}
-
-	@Override
-	protected void addNewData( final List<W> _toAdd )
-	{
-		if( _toAdd.isEmpty() == false )
-		{
-			final int size = _toAdd.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final W add = _toAdd.get( i ) ;
-				insertNewDrawData( add ) ;
-			}
-			_toAdd.clear() ;
-		}
-	}
-
-	private void insertNewDrawData( final W _insert )
-	{
-		final int order = _insert.getOrder() ;
-		final int size = current.size() ;
-		if( order < size )
-		{
-			current.add( order, _insert ) ;
-			return ;
-		}
-
-		current.add( _insert ) ;
 	}
 }
