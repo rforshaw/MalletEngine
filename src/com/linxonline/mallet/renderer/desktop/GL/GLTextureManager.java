@@ -22,6 +22,7 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
+import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.* ;
 
 public class GLTextureManager extends AbstractManager<GLImage>
@@ -45,7 +46,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
 	protected int imageFormat = MGL.GL_RGBA ;
-	protected GLWorldState worldState ;
+	protected Worlds<GLDrawData, CameraData, GLWorld> worldState ;
 
 	public GLTextureManager()
 	{
@@ -74,7 +75,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
-	public void setWorldState( final GLWorldState _worldState )
+	public void setWorldState( final Worlds<GLDrawData, CameraData, GLWorld> _worldState )
 	{
 		worldState = _worldState ;
 	}

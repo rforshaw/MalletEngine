@@ -5,14 +5,17 @@ import java.util.List ;
 
 import android.opengl.GLES30 ;
 
-import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.maths.IntVector2 ;
+
+import com.linxonline.mallet.renderer.opengl.World ;
+import com.linxonline.mallet.renderer.DrawState ;
+import com.linxonline.mallet.renderer.CameraData ;
 
 /**
 	Represents the OpenGL state for a world.
 	A world cannot interact with other worlds.
 */
-public class GLWorld extends BasicWorld<GLDrawData, CameraData>
+public class GLWorld extends World<GLDrawData, CameraData>
 {
 	protected final static int FRAME_BUFFER    = 0 ;
 	protected final static int COLOUR_BUFFER   = 1 ;
@@ -103,6 +106,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		Take the opportunity to also clear uploader 
 		of empty buffers.
 	*/
+	@Override
 	public void clean( final Set<String> _activeKeys )
 	{
 		final DrawState<GLDrawData> state = getDrawState() ;
@@ -116,6 +120,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		uploader.clean() ;
 	}
 
+	@Override
 	public void init()
 	{
 		// First buffer is the Framebuffer.
@@ -145,6 +150,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		GLES30.glBindFramebuffer( GLES30.GL_FRAMEBUFFER, 0 ) ;
 	}
 
+	@Override
 	public void shutdown()
 	{
 		if( backbuffer != null )

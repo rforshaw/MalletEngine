@@ -1,25 +1,24 @@
-package com.linxonline.mallet.renderer.android.GL ;
+package com.linxonline.mallet.renderer.opengl ;
 
 import java.util.Set ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
 
-import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.renderer.DrawData ;
+import com.linxonline.mallet.renderer.CameraData ;
+import com.linxonline.mallet.renderer.WorldState ;
 
-/**
-	Provides the ability to manage multiple OpenGL 
-	states as seperate worlds.
-*/
-public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
+public class Worlds<D extends DrawData,
+					C extends CameraData,
+					W extends World<D, C>> extends WorldState<D, C, W>
 {
-	public GLWorldState()
+	public Worlds()
 	{
-		final BufferedList<GLWorld> worlds = getWorlds() ;
-		worlds.setAddListener( new BufferedList.AddListener<GLWorld>()
+		final BufferedList<W> worlds = getWorlds() ;
+		worlds.setAddListener( new BufferedList.AddListener<W>()
 		{
-			public void add( final GLWorld _world )
+			public void add( final W _world )
 			{
 				// Worlds that have just been added to the World state 
 				// have yet to be fully initialised.
@@ -32,20 +31,20 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 	}
 
 	/**
-		Iterate over each GLWorld and update/upload its GL state.
+		Iterate over each W and update/upload its GL state.
 		GL state will be updated based on GLDrawData flagged 
 		for updating.
 	*/
 	public void upload( final int _diff, final int _iteration )
 	{
-		final BufferedList<GLWorld> worlds = getWorlds() ;
+		final BufferedList<W> worlds = getWorlds() ;
 		worlds.update() ;
 
-		final List<GLWorld> current = worlds.getCurrentData() ;
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final GLWorld world = current.get( i ) ;
+			final W world = current.get( i ) ;
 			world.update( _diff, _iteration ) ;
 			world.draw() ;
 		}
@@ -53,10 +52,10 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 
 	public void clean( final Set<String> _activeKeys )
 	{
-		final BufferedList<GLWorld> worlds = getWorlds() ;
+		final BufferedList<W> worlds = getWorlds() ;
 		worlds.update() ;
 
-		final List<GLWorld> current = worlds.getCurrentData() ;
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -69,10 +68,10 @@ public class GLWorldState extends WorldState<GLDrawData, CameraData, GLWorld>
 	*/
 	public void shutdown()
 	{
-		final BufferedList<GLWorld> worlds = getWorlds() ;
+		final BufferedList<W> worlds = getWorlds() ;
 		worlds.update() ;
 
-		final List<GLWorld> current = worlds.getCurrentData() ;
+		final List<W> current = worlds.getCurrentData() ;
 		final int size = current.size() ;
 		for( int i = 0; i < size; i++ )
 		{

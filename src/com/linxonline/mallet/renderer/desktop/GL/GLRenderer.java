@@ -21,10 +21,14 @@ import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState> implements GLEventListener
+public class GLRenderer extends BasicRenderer<GLDrawData,
+											  CameraData,
+											  GLWorld,
+											  Worlds<GLDrawData, CameraData, GLWorld>> implements GLEventListener
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
@@ -49,7 +53,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 
 	public GLRenderer()
 	{
-		super( new GLWorldState() ) ;
+		super( new Worlds<GLDrawData, CameraData, GLWorld>() ) ;
 		textures.setWorldState( getWorldState() ) ;
 		initWindow() ;
 	}
@@ -865,7 +869,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	*/
 	private void initDefaultWorld()
 	{
-		final GLWorldState worlds = getWorldState() ;
+		final Worlds<GLDrawData, CameraData, GLWorld> worlds = getWorldState() ;
 
 		final GLWorld world = GLWorld.createDefaultWorld( "DEFAULT", 0 ) ;
 		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
