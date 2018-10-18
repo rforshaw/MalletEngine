@@ -17,6 +17,8 @@ public class GLDrawData extends DrawData
 	private GLGeometryUploader.IBuffer buffer   = null ;
 	private GLGeometryUploader.Location location = null ;
 
+	private com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> newLocation ;
+
 	private Mode mode = Mode.BASIC ;
 	private int endOrder = 0 ;
 
@@ -99,6 +101,16 @@ public class GLDrawData extends DrawData
 	public GLGeometryUploader.Location getLocation()
 	{
 		return location ;
+	}
+
+	public void setNewLocation( com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> _location )
+	{
+		newLocation = _location ;
+	}
+
+	public com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> getNewLocation()
+	{
+		return newLocation ;
 	}
 
 	public void getUsedResources( final Set<String> _activeKeys )

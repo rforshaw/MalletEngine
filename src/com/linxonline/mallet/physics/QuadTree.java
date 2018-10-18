@@ -10,9 +10,8 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 
 public class QuadTree
 {
-	private final int TIER_GRANULAR_LIMIT  ;
 	private final int MAX_HULLS ; 
-	private final float START_QUAD_OFFSET ;
+	private final float NODE_AREA_LIMIT  ;
 
 	private float MAX_QUAD_OFFSET ;
 
@@ -36,21 +35,20 @@ public class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 1000.0f, 100, 3 ) ;
+		this( 0.0f, 0.0f, 256.0f * 10.0f, 256.0f, 10 ) ;
 	}
 
 	public QuadTree( final float _x,
 					 final float _y,
 					 final float _size,
-					 final int _nodeCapacity,
-					 final int _tierGranularity )
+					 final float _nodeAreaLimit,
+					 final int _nodeCapacity )
 	{
-		root = new QuadNode( _x, _y, Quadrant.ROOT, 0 ) ;
-		START_QUAD_OFFSET = _size ;
-		TIER_GRANULAR_LIMIT = _tierGranularity ;
-		MAX_HULLS = _nodeCapacity ;
+		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
+		NODE_AREA_LIMIT = _nodeAreaLimit ;
 
-		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
+		MAX_QUAD_OFFSET = _size ;
+		MAX_HULLS = _nodeCapacity ;
 
 		nodes = null ;
 		workers = null ;
@@ -67,22 +65,21 @@ public class QuadTree
 
 	public QuadTree( final WorkerGroup _workers )
 	{
-		this( 0.0f, 0.0f, 1000.0f, 100, 3, _workers ) ;
+		this( 0.0f, 0.0f, 256.0f * 10.0f, 256.0f, 10, _workers ) ;
 	}
 
 	public QuadTree( final float _x,
 					 final float _y,
 					 final float _size,
+					 final float _nodeAreaLimit,
 					 final int _nodeCapacity,
-					 final int _tierGranularity,
 					 final WorkerGroup _workers )
 	{
-		root = new QuadNode( _x, _y, Quadrant.ROOT, 0 ) ;
-		START_QUAD_OFFSET = _size ;
-		TIER_GRANULAR_LIMIT = _tierGranularity ;
-		MAX_HULLS = _nodeCapacity ;
+		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
+		NODE_AREA_LIMIT = _nodeAreaLimit ;
 
-		MAX_QUAD_OFFSET = START_QUAD_OFFSET ;
+		MAX_QUAD_OFFSET = _size ;
+		MAX_HULLS = _nodeCapacity ;
 
 		nodes = MalletList.<QuadNode>newList() ;
 		workers = _workers ;
@@ -122,6 +119,7 @@ public class QuadTree
 
 	public void update( final float _dt )
 	{
+		//System.out.println( "Start" ) ;
 		update.update( _dt ) ;
 	}
 
@@ -137,7 +135,7 @@ public class QuadTree
 
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
 		private Quadrant quadrant ;
-		private int tier ;
+		private float length ;
 
 		private QuadNode topLeft ;
 		private QuadNode topRight ;
@@ -149,16 +147,11 @@ public class QuadTree
 
 		private final Vector2 absolute = new Vector2() ;		// Used by insertToQuadrant() - Android optimisation
 
-		public QuadNode( final Quadrant _quadrant, final int _tier )
-		{
-			this( 0.0f, 0.0f, _quadrant, _tier ) ;
-		}
-
-		public QuadNode( final float _x, final float _y, final Quadrant _quadrant, final int _tier )
+		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
 			centre.setXY( _x, _y ) ;
 			quadrant = _quadrant ;
-			tier = _tier ;
+			length = _length ;
 		}
 
 		/**
@@ -326,7 +319,11 @@ public class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
-			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " Huls: " + nextHull ) ;
+			/*if( nextHull > 0 )
+			{
+				System.out.println( "Centre: " + centre.toString() + " Length: " + length + " Quadrant: " + quadrant + " Hulls: " + nextHull ) ;
+			}*/
+
 			while( nextHull > 0 )
 			{
 				final Hull hull1 = hulls[0] ;
@@ -509,16 +506,12 @@ public class QuadTree
 
 		private boolean createChildren()
 		{
-			switch( quadrant )
-			{
-				case ROOT : return createTier( START_QUAD_OFFSET ) ;
-				default   : return createTier( centre.x / 2.0f ) ;
-			}
+			return createTier( length / 2.0f ) ;
 		}
 
 		private boolean createTier( final float _offset )
 		{
-			if( tier > TIER_GRANULAR_LIMIT )
+			if( _offset < NODE_AREA_LIMIT )
 			{
 				// At a certain point making the Quad Tree more accurate
 				// becomes futile. A node's scope that is too small 
@@ -527,10 +520,10 @@ public class QuadTree
 			}
 
 			parent = true ;
-			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, Quadrant.TOP_LEFT, tier + 1 ) ;
-			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, Quadrant.TOP_RIGHT, tier + 1 ) ;
-			bottomLeft = new QuadNode( centre.x - _offset, centre.y - _offset, Quadrant.BOTTOM_LEFT, tier + 1 ) ;
-			bottomRight = new QuadNode( centre.x + _offset, centre.y + _offset, Quadrant.BOTTOM_RIGHT, tier + 1 ) ;
+			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, _offset, Quadrant.TOP_LEFT ) ;
+			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
+			bottomLeft = new QuadNode( centre.x - _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
+			bottomRight = new QuadNode( centre.x + _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
 
 			return true ;
 		}
@@ -546,27 +539,22 @@ public class QuadTree
 			final float offset = MAX_QUAD_OFFSET ;
 			MAX_QUAD_OFFSET = MAX_QUAD_OFFSET * 2.0f ;
 
-			tier -= 1 ;
-			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, Quadrant.ROOT, tier ) ;
+			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, MAX_QUAD_OFFSET, Quadrant.ROOT ) ;
 			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
 
 			tempRoot.topLeft.createTier( offset ) ;
-			topLeft.tier = tempRoot.topLeft.bottomRight.tier ;
 			topLeft.quadrant = Quadrant.BOTTOM_RIGHT ;
 			tempRoot.topLeft.bottomRight = topLeft ;
 
 			tempRoot.topRight.createTier( offset ) ;
-			topRight.tier = tempRoot.topRight.bottomLeft.tier ;
 			topRight.quadrant = Quadrant.BOTTOM_LEFT ;
 			tempRoot.topRight.bottomLeft = topRight ;
 
 			tempRoot.bottomLeft.createTier( offset ) ;
-			bottomLeft.tier = tempRoot.bottomLeft.topRight.tier ;
 			bottomLeft.quadrant = Quadrant.TOP_RIGHT ;
 			tempRoot.bottomLeft.topRight = bottomLeft ;
 
 			tempRoot.bottomRight.createTier( offset ) ;
-			bottomRight.tier = tempRoot.bottomRight.topLeft.tier ;
 			bottomRight.quadrant = Quadrant.TOP_LEFT ;
 			tempRoot.bottomRight.topLeft = bottomRight ;
 

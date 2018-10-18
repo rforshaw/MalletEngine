@@ -7,6 +7,7 @@ import com.linxonline.mallet.util.buffers.IIntegerBuffer ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.ISort ;
 
 /**
 	Keep track of allocations made into this buffer.
@@ -16,12 +17,19 @@ import com.linxonline.mallet.util.MalletList ;
 	T : Developer data-type associated with this LocationBuffer.
 	U : Developer data-type associated with a Location.
 */
-public class LocationBuffer<T, U>
+public class LocationBuffer<T, U> implements ISort
 {
 	private static Listener FALLBACK = new Listener()
 	{
 		@Override
-		public void allocated( final Location _location )
+		public boolean isSupported( final Object _buffer, final Object _user )
+		{
+			Logger.println( "Unable to determine if Location Buffer supports user data.", Logger.Verbosity.MINOR ) ;
+			return false ;
+		}
+	
+		@Override
+		public void allocated( final Location _location, final Object _user )
 		{
 			Logger.println( "Location allocated to buffer without listener set.", Logger.Verbosity.MINOR ) ;
 		}
@@ -49,6 +57,7 @@ public class LocationBuffer<T, U>
 
 	private T data = null ;							// Developer data associated with this buffer
 	private Listener<T, U> listener = FALLBACK ;
+	private int order = 0 ;
 
 	private int currentByteIndex = 0 ;
 	private int currentByteVertex = 0 ;
@@ -72,6 +81,11 @@ public class LocationBuffer<T, U>
 		listener = ( _listener != null ) ? _listener : FALLBACK ;
 	}
 
+	public void setOrder( final int _order )
+	{
+		order = _order ;
+	}
+
 	public T setData( final T _data )
 	{
 		data = _data ;
@@ -87,13 +101,17 @@ public class LocationBuffer<T, U>
 		Using the index and vertex buffer passed in allocate 
 		a location within the buffer that is suitable.
 	*/
-	public Location<T, U> allocate( final int _indexBytesSize, final int _vertexByteSize )
+	public Location<T, U> allocate( final int _indexBytesSize, final int _vertexByteSize, final U _user )
 	{
 		final int endByteIndex = currentByteIndex + _indexBytesSize ;
-		final int endByteVertex = currentByteVertex = _vertexByteSize ;
+		final int endByteVertex = currentByteVertex + _vertexByteSize ;
 		if( endByteIndex >= maxByteIndex ||
-			endByteVertex >= maxByteVertex )
+			endByteVertex >= maxByteVertex ||
+			listener.isSupported( getData(), _user ) == false )
 		{
+			System.out.println( "endByteIndex: " + endByteIndex + " Max: " + maxByteIndex ) ;
+			System.out.println( "endByteVertex: " + endByteVertex + " Max: " + maxByteVertex ) ;
+			System.out.println( "Is Supported: " + listener.isSupported( getData(), _user ) ) ;
 			return null ;
 		}
 
@@ -108,7 +126,7 @@ public class LocationBuffer<T, U>
 		allocatedByteIndex = currentByteIndex ;
 		allocatedByteIndex = currentByteVertex ;
 
-		listener.allocated( location ) ;
+		listener.allocated( location, _user ) ;
 		return location ;
 	}
 
@@ -145,14 +163,42 @@ public class LocationBuffer<T, U>
 		currentByteVertex -= shiftByteVertex ;
 	}
 
+	@Override
+	public int sortValue()
+	{
+		return order ;
+	}
+
 	public interface Listener<T, U>
 	{
-		public void allocated( final Location<T, U> _location ) ;
+		/**
+			Determine whether or not T can support U.
+		*/
+		public boolean isSupported( final T _buffer, final U _user ) ;
 
+		/**
+			Return the Location that is now associated with the 
+			passed in user data U. Location specifies the allocation 
+			from T for U.
+		*/
+		public void allocated( final Location<T, U> _location, final U _user ) ;
+
+		/**
+			The location passed has been removed from the buffer.
+		*/
 		public void deallocated( final Location<T, U> _location ) ;
 
+		/**
+			The range has changed for this location.
+			Update the user data with the new range.
+		*/
 		public void shifted( final Location<T, U> _location ) ;
 
+		/**
+			One or more locations have been shifted.
+			This is called when no more shifting of locations will 
+			occur. If you are batching this is the time to execute.
+		*/
 		public void shiftEnded( final LocationBuffer<T, U> _buffer ) ;
 	}
 }

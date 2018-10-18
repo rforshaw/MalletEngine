@@ -27,17 +27,20 @@ import com.linxonline.mallet.event.EventProcessor ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.IEventSystem ;
 
+import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.CollisionSystem ;
 
-import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.entity.components.* ;
-import com.linxonline.mallet.animation.* ;
+import com.linxonline.mallet.animation.AnimationSystem ;
+
+import com.linxonline.mallet.entity.IEntitySystem ;
+import com.linxonline.mallet.entity.EntitySystem ;
+import com.linxonline.mallet.entity.Entity ;
+import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.settings.* ;
+import com.linxonline.mallet.util.settings.Settings ;
 
 import com.linxonline.mallet.io.save.state.DataConverter ;
 

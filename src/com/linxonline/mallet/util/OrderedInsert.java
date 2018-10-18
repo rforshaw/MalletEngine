@@ -6,6 +6,10 @@ public class OrderedInsert
 {
 	private OrderedInsert() {}
 
+	/**
+		Insert the value at the requested location specified 
+		by sortValue().
+	*/
 	public static <T extends ISort> List<T> insert( final T _toInsert, final List<T> _list )
 	{
 		final int size = _list.size() ;

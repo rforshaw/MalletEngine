@@ -175,7 +175,7 @@ public class Matrix4 implements Cacheable
 
 	public void multiply( final Matrix4 _mat )
 	{
-		final IFloatBuffer x = _mat.matrix ;		// Would take up entire screen without
+		final IFloatBuffer x = _mat.matrix ;
 		Matrix4.multiplyStage1( this, x ) ;
 		Matrix4.multiplyStage2( this, x ) ;
 		Matrix4.multiplyStage3( this, x ) ;

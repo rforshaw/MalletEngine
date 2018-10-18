@@ -13,6 +13,10 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
+import com.linxonline.mallet.renderer.opengl.Buffers ;
+import com.linxonline.mallet.renderer.opengl.LocationBuffer ;
+//import com.linxonline.mallet.renderer.opengl.Location ;
+
 import com.linxonline.mallet.util.buffers.IFloatBuffer ;
 
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -38,6 +42,268 @@ public class GLGeometryUploader
 	private final static int VBO_VAR_BYTE_SIZE = 4 ;
 	private final static int IBO_VAR_BYTE_SIZE = 4 ;
 
+	public class BufferObject
+	{
+		private final int[] indexID ;
+		private final int[] vboID ;
+
+		protected final GLDrawData.Mode mode ;
+		protected Shape.Swivel[] shapeSwivel ;
+		protected Shape.Style shapeStyle ;
+
+		protected VertexAttrib[] attributes ;
+		protected int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
+		protected int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES, 
+
+		// A Copy of the ProgramMap provided by the user.
+		// Used to determine if a ProgramMap provided by a 
+		// Draw is compatible with this ObjectBuffer.
+		protected ProgramMap<GLProgram> userProgram ;
+		// Removes the need for looking up the textures 
+		// referenced by MalletTexture and MalletFont.
+		protected ProgramMap<GLProgram> program ;
+
+		protected final int order ;						// Defines the 2D order the geometry resides on
+		protected final boolean ui ;					// Is the buffer used for UI or world space?
+
+		public BufferObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
+		{
+			order = _user.getOrder() ;
+			mode = _user.getMode() ;
+			ui = _user.isUI() ;
+
+			userProgram = new ProgramMap<GLProgram>( ( ProgramMap<GLProgram> )_user.getProgram() ) ;
+			final GLProgram glProgram = userProgram.getProgram() ;
+			program = ( glProgram != null ) ? glProgram.buildMap( userProgram ) : null ;
+
+			initShape( _user.getDrawShape() ) ;
+
+			indexID = GLModelManager.genIndexID() ;
+			vboID = GLModelManager.genVBOID() ;
+
+			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
+			MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, _indexByteSize, null, MGL.GL_DYNAMIC_DRAW ) ;
+
+			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
+			MGL.glBufferData( MGL.GL_ARRAY_BUFFER, _vertexByteSize, null, MGL.GL_DYNAMIC_DRAW ) ;
+		}
+
+		private void initShape( final Shape _shape )
+		{
+			if( _shape == null )
+			{
+				shapeSwivel = new Shape.Swivel[0] ;
+				attributes = new VertexAttrib[0] ;
+				return ;
+			}
+
+			final Shape.Swivel[] swivel = _shape.getSwivel() ;
+			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
+			attributes = constructVertexAttrib( shapeSwivel, userProgram.getProgram() ) ;
+
+			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
+
+			shapeStyle = _shape.getStyle() ;
+			switch( shapeStyle )
+			{
+				case LINES      : style = MGL.GL_LINES ;      break ;
+				case LINE_STRIP : style = MGL.GL_LINE_STRIP ; break ;
+				case FILL       : style = MGL.GL_TRIANGLES ;  break ;
+				default         : style = MGL.GL_LINES ;      break ;
+			}
+		}
+
+		public void upload( final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> _location )
+		{
+			final GLDrawData draw = _location.getLocationData() ;
+			switch( mode )
+			{
+				case BASIC   :
+				{
+					final Shape shape = draw.getDrawShape() ;
+					MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;		//GLRenderer.handleError( "Upload Bind Index: ", _gl ) ;
+					MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;				//GLRenderer.handleError( "Upload Bind Vertex: ", _gl ) ;
+
+					System.out.println( "Upload user basic data to buffers" ) ;
+					break ;
+				}
+				case TEXT    :
+				case STENCIL :
+				case DEPTH   :
+				default      : break ;
+			}
+		}
+
+		public void deallocate( final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> _location )
+		{
+			System.out.println( "Deallocate user data to buffers" ) ;
+		}
+
+		public void destroy()
+		{
+			MGL.glDeleteBuffers( 1, indexID, 0 ) ;
+			MGL.glDeleteBuffers( 1, vboID, 0 ) ;
+		}
+
+		/**
+			Determine whether or not this BufferObject supports
+			the requirements of the GLRenderData.
+
+			GLBuffers will batch together similar content to 
+			improve rendering performance.
+
+			They will use layer, texture, shape swivel and style
+			to determine if the buffer can support the data.
+		*/
+		public boolean isSupported( final GLDrawData _user )
+		{
+			if( mode != _user.getMode() )
+			{
+				return false ;
+			}
+
+			if( mode == GLDrawData.Mode.TEXT )
+			{
+				return _user.getDrawShape() == null ? true : false ;
+			}
+
+			if( order != _user.getOrder() )
+			{
+				return false ;
+			}
+
+			if( ui != _user.isUI() )
+			{
+				return false ;
+			}
+
+			if( isProgram( ( ProgramMap<GLProgram> )_user.getProgram() ) == false )
+			{
+				return false ;
+			}
+
+			if( isShape( _user.getDrawShape() ) == false )
+			{
+				return false ;
+			}
+
+			return true ;
+		}
+
+		private boolean isShape( final Shape _shape )
+		{
+			if( _shape == null )
+			{
+				return false ;
+			}
+
+			if( shapeStyle != _shape.getStyle() )
+			{
+				return false ;
+			}
+
+			final Shape.Swivel[] sw = _shape.getSwivel() ;
+			if( shapeSwivel.length != sw.length )
+			{
+				return false ;
+			}
+
+			for( int i = 0; i < sw.length; i++ )
+			{
+				if( shapeSwivel[i] != sw[i] )
+				{
+					return false ;
+				}
+			}
+
+			return true ;
+		}
+
+		private boolean isProgram( final ProgramMap<GLProgram> _program )
+		{
+			// Checking to see if the program matches up with 
+			// the program used by the buffer is expensive.
+			// We only check to see if the program is valid if it's 
+			// flagged as dirty.
+			// As only modified/new programs will be flagged as dirty.
+			if( _program.isDirty() == true )
+			{
+				final boolean valid = userProgram.equals( _program ) ;
+				// The program should only be flagged as not dirty 
+				// once a valid buffer has been found.
+				_program.setDirty( valid ? false : true ) ;
+				return valid ;
+			}
+
+			return true ;
+		}
+	}
+
+	private final Buffers<BufferObject, GLDrawData> tempBuffers = new Buffers<BufferObject, GLDrawData>( 1000, 1000, new Buffers.Listener<BufferObject, GLDrawData>()
+	{
+		public int calculateIndexByteSize( final GLDrawData _user )
+		{
+			return 100 ;
+		}
+
+		public int calculateVertexByteSize( final GLDrawData _user )
+		{
+			return 100 ;
+		}
+
+		@Override
+		public void allocated( final LocationBuffer<BufferObject, GLDrawData> _allocated, final GLDrawData _user )
+		{
+			_allocated.setListener( new LocationBuffer.Listener<BufferObject, GLDrawData>()
+			{
+				@Override
+				public boolean isSupported( final BufferObject _buffer, final GLDrawData _user )
+				{
+					return _buffer.isSupported( _user ) ;
+				}
+
+				@Override
+				public void allocated( final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> _location, final GLDrawData _user )
+				{
+					_user.setNewLocation( _location ) ;
+					_location.setLocationData( _user ) ;
+					final BufferObject buffer = _location.getBufferData() ;
+					buffer.upload( _location ) ;
+				}
+
+				@Override
+				public void deallocated( final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> _location )
+				{
+					final BufferObject buffer = _location.getBufferData() ;
+					buffer.deallocate( _location ) ;
+					_user.setNewLocation( null ) ;
+				}
+
+				@Override
+				public void shifted( final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> _location )
+				{
+					final BufferObject buffer = _location.getBufferData() ;
+					buffer.upload( _location ) ;
+				}
+
+				@Override
+				public void shiftEnded( final LocationBuffer<BufferObject, GLDrawData> _buffer ) {}
+			} ) ;
+
+			final int indexSize = tempBuffers.getMaximumByteIndex() ;
+			final int vertexSize = tempBuffers.getMaximumByteVertex() ;
+
+			_allocated.setOrder( _user.getOrder() ) ;
+			_allocated.setData( new BufferObject( indexSize, vertexSize, _user ) ) ;
+		}
+
+		@Override
+		public void deallocated( final BufferObject _data )
+		{
+			_data.destroy() ;
+		}
+	} ) ; 
+
 	private final int[] indicies ;
 	private final float[] verticies ;
 	// ProgramID is used to minimise the amount of calls made to 
@@ -52,7 +318,7 @@ public class GLGeometryUploader
 	private final IntBuffer indexBuffer ;
 	private final FloatBuffer vertexBuffer ;
 
-	private final List<IBuffer> buffers = MalletList.<IBuffer>newList() ;							// Available GLBuffers
+	private final List<IBuffer> buffers = MalletList.<IBuffer>newList() ;					// Available GLBuffers
 
 	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
@@ -92,6 +358,26 @@ public class GLGeometryUploader
 	*/
 	public void upload( final GLDrawData _data )
 	{
+		/*final com.linxonline.mallet.renderer.opengl.Location<BufferObject, GLDrawData> location = _data.getNewLocation() ;
+		if( location == null )
+		{
+			tempBuffers.allocate( _data ) ;
+			return ;
+		}
+
+		{
+			final BufferObject buffer = location.getBufferData() ;
+			if( buffer.isSupported( _data ) == true )
+			{
+				buffer.upload( location ) ;
+			}
+			else
+			{
+				location.deallocate() ;
+				upload( _data ) ;
+			}
+		}*/
+
 		IBuffer buffer = _data.getBuffer() ;
 		if( buffer != null )
 		{
@@ -1632,7 +1918,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	protected static void enableVertexAttributes( final VertexAttrib[] _atts )
+	private static void enableVertexAttributes( final VertexAttrib[] _atts )
 	{
 		for( int i = 0; i < _atts.length; i++ )
 		{
@@ -1641,7 +1927,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	protected static void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
+	private static void prepareVertexAttributes( final VertexAttrib[] _atts, final int _stride )
 	{
 		for( int i = 0; i < _atts.length; i++ )
 		{
@@ -1650,7 +1936,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	protected static void disableVertexAttributes( final VertexAttrib[] _atts )
+	private static void disableVertexAttributes( final VertexAttrib[] _atts )
 	{
 		for( int i = 0; i < _atts.length; i++ )
 		{
