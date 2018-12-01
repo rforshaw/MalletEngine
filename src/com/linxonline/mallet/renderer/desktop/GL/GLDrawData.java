@@ -14,9 +14,6 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLDrawData extends DrawData
 {
-	private GLGeometryUploader.IBuffer buffer   = null ;
-	private GLGeometryUploader.Location location = null ;
-
 	private com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> newLocation ;
 
 	private Mode mode = Mode.BASIC ;
@@ -83,26 +80,6 @@ public class GLDrawData extends DrawData
 		return endOrder ;
 	}
 
-	public void setBuffer( final GLGeometryUploader.IBuffer _buffer )
-	{
-		buffer = _buffer ;
-	}
-
-	public GLGeometryUploader.IBuffer getBuffer()
-	{
-		return buffer ;
-	}
-
-	public void setLocation( final GLGeometryUploader.Location _location )
-	{
-		location = _location ;
-	}
-
-	public GLGeometryUploader.Location getLocation()
-	{
-		return location ;
-	}
-
 	public void setNewLocation( com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> _location )
 	{
 		newLocation = _location ;
@@ -131,8 +108,7 @@ public class GLDrawData extends DrawData
 	{
 		super.reset() ;
 		setMode( Mode.BASIC ) ;
-		setBuffer( null ) ;
-		setLocation( null ) ;
+		setNewLocation( null ) ;
 		setDrawMatrix( null ) ;
 		setDrawShape( null ) ;
 	}

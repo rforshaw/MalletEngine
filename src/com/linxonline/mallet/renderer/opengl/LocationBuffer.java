@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer.opengl ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.maths.Matrix4 ;
+
 import com.linxonline.mallet.util.buffers.IFloatBuffer ;
 import com.linxonline.mallet.util.buffers.IIntegerBuffer ;
 
@@ -109,9 +111,9 @@ public class LocationBuffer<T, U> implements ISort
 			endByteVertex >= maxByteVertex ||
 			listener.isSupported( getData(), _user ) == false )
 		{
-			System.out.println( "endByteIndex: " + endByteIndex + " Max: " + maxByteIndex ) ;
-			System.out.println( "endByteVertex: " + endByteVertex + " Max: " + maxByteVertex ) ;
-			System.out.println( "Is Supported: " + listener.isSupported( getData(), _user ) ) ;
+			//System.out.println( "endByteIndex: " + endByteIndex + " Max: " + maxByteIndex ) ;
+			//System.out.println( "endByteVertex: " + endByteVertex + " Max: " + maxByteVertex ) ;
+			//System.out.println( "Is Supported: " + listener.isSupported( getData(), _user ) ) ;
 			return null ;
 		}
 
@@ -156,13 +158,19 @@ public class LocationBuffer<T, U> implements ISort
 			listener.shifted( location ) ;
 		}
 
-		listener.deallocated( _location ) ;
-		listener.shiftEnded( this ) ;
-
+		locations.remove( index ) ;
 		currentByteIndex -= shiftByteIndex ;
 		currentByteVertex -= shiftByteVertex ;
+
+		listener.deallocated( _location ) ;
+		listener.shiftEnded( this ) ;
 	}
 
+	public int getByteIndexLength()
+	{
+		return currentByteIndex ;
+	}
+	
 	@Override
 	public int sortValue()
 	{

@@ -19,10 +19,4 @@ public final class GLModelManager
 
 		return id ;
 	}
-
-	public static void unbind( final GLGeometryUploader.GLGeometry _geometry )
-	{
-		MGL.glDeleteBuffers( 1, _geometry.vboID, 0 ) ;		//GLRenderer.handleError( "Delete VBO", gl ) ;
-		MGL.glDeleteBuffers( 1, _geometry.indexID, 0 ) ;		//GLRenderer.handleError( "Delete Index", gl ) ;
-	}
 }

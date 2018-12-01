@@ -7,6 +7,4 @@ public interface StringInStream extends Close
 		Will return null when at the end of file.
 	*/
 	public String readLine() ;
-
-	public boolean close() ;
 }

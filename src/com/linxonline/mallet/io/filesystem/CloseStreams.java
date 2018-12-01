@@ -3,6 +3,7 @@ package com.linxonline.mallet.io.filesystem ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Should be used by StringInStream, StringOutStream, 
@@ -32,12 +33,12 @@ public class CloseStreams implements Close
 	*/
 	public boolean remove( final Close _close )
 	{
-		if( toClose.remove( _close ) == true )
+		if( toClose.remove( _close ) == false )
 		{
-			_close.close() ;
-			return true ;
+			Logger.println( "Attempting to close stream incorrectly.", Logger.Verbosity.MAJOR ) ;
 		}
-		return false ;
+
+		return _close.close() ;
 	}
 
 	public boolean isEmpty()

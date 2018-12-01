@@ -53,7 +53,7 @@ public class TextReader
 			buffer.append( '\n' ) ;
 		}
 
-		file.close() ;
+		file.close( in ) ;
 		return buffer.toString() ;
 	}
 
@@ -80,7 +80,7 @@ public class TextReader
 			lines.add( line ) ;
 		}
 
-		_file.close() ;
+		_file.close( in ) ;
 		return lines ;
 	}
 }

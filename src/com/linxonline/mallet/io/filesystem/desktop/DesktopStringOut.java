@@ -14,7 +14,8 @@ public class DesktopStringOut implements StringOutStream
 		assert _output != null ;
 		output = _output ;
 	}
-	
+
+	@Override
 	public boolean writeLine( final String _line )
 	{
 		try
@@ -29,6 +30,7 @@ public class DesktopStringOut implements StringOutStream
 		}
 	}
 
+	@Override
 	public boolean close()
 	{
 		try

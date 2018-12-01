@@ -94,6 +94,7 @@ public class RenderComponent extends Entity.Component
 	{
 		if( drawDelegate != null )
 		{
+			System.out.println( "RenderComponent remove Draw" ) ;
 			drawDelegate.removeDraw( _draw ) ;
 		}
 	}

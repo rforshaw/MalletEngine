@@ -37,6 +37,6 @@ public final class WriteFile
 	{
 		final StringOutStream stream = _file.getStringOutStream() ;
 		stream.writeLine( _data ) ;
-		return stream.close() ;
+		return _file.close( stream ) ;
 	}
 }

@@ -16,7 +16,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 		loader.add( new AnimDelegate() ) ;
 	}
 
-	private static class AnimDelegate implements ResourceDelegate<Sprite>
+	private class AnimDelegate implements ResourceDelegate<Sprite>
 	{
 		public boolean isLoadable( final String _file )
 		{
@@ -54,6 +54,7 @@ public class SpriteManager extends AbstractManager<Sprite>
 				sprite.addFrame( new Sprite.Frame( frameText[0], u1, v1, u2, v2 ) ) ;
 			}
 
+			put( _file, sprite ) ;
 			return sprite ;
 		}
 	}

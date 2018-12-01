@@ -12,6 +12,7 @@ subprojects {
 
 	sourceCompatibility = 1.7
 	targetCompatibility = 1.7
+	compileJava.options.encoding = 'UTF-8'
 
 	clean {
 		delete += fileTree( '../target' ).include( '**/*' )

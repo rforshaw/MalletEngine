@@ -13,7 +13,7 @@ public class QuadTree
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
 
-	private float MAX_QUAD_OFFSET ;
+	private float ROOT_LENGTH ;
 
 	private final IUpdate update ;
 
@@ -35,7 +35,7 @@ public class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 256.0f * 10.0f, 256.0f, 10 ) ;
+		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -47,7 +47,7 @@ public class QuadTree
 		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
 		NODE_AREA_LIMIT = _nodeAreaLimit ;
 
-		MAX_QUAD_OFFSET = _size ;
+		ROOT_LENGTH = root.length ;
 		MAX_HULLS = _nodeCapacity ;
 
 		nodes = null ;
@@ -65,7 +65,7 @@ public class QuadTree
 
 	public QuadTree( final WorkerGroup _workers )
 	{
-		this( 0.0f, 0.0f, 256.0f * 10.0f, 256.0f, 10, _workers ) ;
+		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100, _workers ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -78,7 +78,7 @@ public class QuadTree
 		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
 		NODE_AREA_LIMIT = _nodeAreaLimit ;
 
-		MAX_QUAD_OFFSET = _size ;
+		ROOT_LENGTH = root.length ;
 		MAX_HULLS = _nodeCapacity ;
 
 		nodes = MalletList.<QuadNode>newList() ;
@@ -104,7 +104,10 @@ public class QuadTree
 
 	public void insertHull( final Hull _hull )
 	{
-		root.insertHull( _hull ) ;
+		while( root.insertHull( _hull ) == false )
+		{
+			root.expand() ;
+		}
 	}
 
 	public void removeHull( final Hull _hull )
@@ -152,6 +155,16 @@ public class QuadTree
 			centre.setXY( _x, _y ) ;
 			quadrant = _quadrant ;
 			length = _length ;
+
+			if( _quadrant == Quadrant.ROOT )
+			{
+				// Initially the root node was considered a leaf.
+				// Hulls added to it were directly added to hulls.
+				// When you reach node capacity children were created 
+				// and the hulls reinserted - if the hulls were outside 
+				// of the roots boundaries problems arise.
+				createChildren() ;
+			}
 		}
 
 		/**
@@ -427,7 +440,10 @@ public class QuadTree
 				// It is possible for a hulls points to 
 				// go beyond the current scope of the tree,
 				// in this case we must expand the tree
-				calculateExpansion( absolute ) ;
+				if( needsExpansion( absolute ) == true )
+				{
+					return false ;
+				}
 
 				// Find out what quadrant the hull should reside in
 				// A hull could potentially be in multiple 
@@ -495,13 +511,10 @@ public class QuadTree
 			If it's outside the trees scope expand the 
 			tree until it is inside.
 		*/
-		private void calculateExpansion( final Vector2 _pos )
+		private boolean needsExpansion( final Vector2 _pos )
 		{
-			while( Math.abs( _pos.x ) > MAX_QUAD_OFFSET || 
-				   Math.abs( _pos.y ) > MAX_QUAD_OFFSET )
-			{
-				expand() ;
-			}
+			return Math.abs( _pos.x ) > ROOT_LENGTH || 
+				   Math.abs( _pos.y ) > ROOT_LENGTH ;
 		}
 
 		private boolean createChildren()
@@ -536,28 +549,28 @@ public class QuadTree
 		*/
 		private void expand()
 		{
-			final float offset = MAX_QUAD_OFFSET ;
-			MAX_QUAD_OFFSET = MAX_QUAD_OFFSET * 2.0f ;
+			ROOT_LENGTH += ROOT_LENGTH ;
 
-			final QuadNode tempRoot = new QuadNode( 0.0f, 0.0f, MAX_QUAD_OFFSET, Quadrant.ROOT ) ;
-			tempRoot.createTier( MAX_QUAD_OFFSET ) ;
+			final QuadNode tempRoot = new QuadNode( centre.x, centre.y, ROOT_LENGTH, Quadrant.ROOT ) ;
+			tempRoot.createChildren() ;
 
-			tempRoot.topLeft.createTier( offset ) ;
+			tempRoot.topLeft.createChildren() ;
 			topLeft.quadrant = Quadrant.BOTTOM_RIGHT ;
 			tempRoot.topLeft.bottomRight = topLeft ;
 
-			tempRoot.topRight.createTier( offset ) ;
+			tempRoot.topRight.createChildren() ;
 			topRight.quadrant = Quadrant.BOTTOM_LEFT ;
 			tempRoot.topRight.bottomLeft = topRight ;
 
-			tempRoot.bottomLeft.createTier( offset ) ;
+			tempRoot.bottomLeft.createChildren() ;
 			bottomLeft.quadrant = Quadrant.TOP_RIGHT ;
 			tempRoot.bottomLeft.topRight = bottomLeft ;
 
-			tempRoot.bottomRight.createTier( offset ) ;
+			tempRoot.bottomRight.createChildren() ;
 			bottomRight.quadrant = Quadrant.TOP_LEFT ;
 			tempRoot.bottomRight.topLeft = bottomRight ;
 
+			length = tempRoot.length ;
 			topLeft = tempRoot.topLeft ;
 			topRight = tempRoot.topRight ;
 			bottomLeft = tempRoot.bottomLeft ;

@@ -17,6 +17,7 @@ public class DesktopStringIn implements StringInStream
 		reader = new BufferedReader( new InputStreamReader( _input ) ) ;
 	}
 
+	@Override
 	public String readLine()
 	{
 		try
@@ -29,6 +30,7 @@ public class DesktopStringIn implements StringInStream
 		}
 	}
 
+	@Override
 	public boolean close()
 	{
 		try
