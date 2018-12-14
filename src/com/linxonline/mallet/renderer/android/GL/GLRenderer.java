@@ -15,6 +15,7 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
@@ -642,6 +643,34 @@ public class GLRenderer extends BasicRenderer
 			{
 				final GLWorld world = cast( _world ) ;
 				return new IntVector2( world.getDisplay() ) ;
+			}
+
+			@Override
+			public Notify<World> attachRenderNotify( final World _world , final Notify<World> _notify )
+			{
+				final GLWorld world = cast( _world ) ;
+				return world.addRenderNotify( _notify ) ;
+			}
+
+			@Override
+			public void dettachRenderNotify( final World _world, final Notify<World> _notify )
+			{
+				final GLWorld world = cast( _world ) ;
+				world.removeRenderNotify( _notify ) ;
+			}
+
+			@Override
+			public Notify<World> attachDisplayNotify( final World _world, final Notify<World> _notify )
+			{
+				final GLWorld world = cast( _world ) ;
+				return world.addDisplayNotify( _notify ) ;
+			}
+
+			@Override
+			public void dettachDisplayNotify( final World _world, final Notify<World> _notify )
+			{
+				final GLWorld world = cast( _world ) ;
+				world.removeDisplayNotify( _notify ) ;
 			}
 
 			@Override

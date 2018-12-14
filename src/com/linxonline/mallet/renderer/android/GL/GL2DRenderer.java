@@ -76,12 +76,12 @@ public class GL2DRenderer implements IRender,
 		GlobalConfig.addInteger( "RENDERHEIGHT", renderHeight ) ;
 
 		setDisplayDimensions( _width, _height ) ;
+		final World world = WorldAssist.getDefaultWorld() ;
+		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
+
 		final Camera camera = CameraAssist.getDefaultCamera() ;
 		CameraAssist.amendScreenResolution( camera, _width, _height ) ;
 		CameraAssist.amendOrthographic( camera, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
-
-		final World world = WorldAssist.getDefaultWorld() ;
-		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
 	}
 
 	@Override

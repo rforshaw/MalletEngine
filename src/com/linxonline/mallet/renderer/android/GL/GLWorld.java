@@ -6,7 +6,9 @@ import java.util.List ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.util.BufferedList ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
 
+import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.BasicWorld ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.DrawState ;
@@ -33,6 +35,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected GLImage backbuffer = null ;
+
+	private Notify<World> renderNotify ;
+	private Notify<World> displayNotify ;
 
 	private GLWorld( final String _id, final int _order )
 	{
@@ -100,6 +105,26 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	@Override
 	public void init()
 	{
+		renderNotify = addRenderNotify( new Notify<World>()
+		{
+			public void inform( final World _this )
+			{
+				final IntVector2 dim = getRender() ;
+				updateBufferDimensions( dim.x, dim.y ) ;
+			}
+		} ) ;
+
+		displayNotify = addDisplayNotify( new Notify<World>()
+		{
+			public void inform( final World _this )
+			{
+				final IntVector2 position = getDisplayPosition() ;
+				final IntVector2 dim = getDisplay() ;
+
+				cameras.setDisplayDimensions( position.x, position.y, dim.x, dim.y ) ;
+			}
+		} ) ;
+	
 		// First buffer is the Framebuffer.
 		// Buffers afterwards are Renderbuffers.
 		MGL.glGenTextures( 1, buffers, COLOUR_BUFFER ) ;
@@ -191,6 +216,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			backbuffer = null ;
 		}
 
+		removeRenderNotify( renderNotify ) ;
+		removeDisplayNotify( displayNotify ) ;
+
 		MGL.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
 		MGL.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;
 		MGL.glDeleteRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
@@ -233,24 +261,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	{
 		state.remove( _draw ) ;
 	}
-
-	@Override
-	public void displayChanged()
-	{
-		final IntVector2 position = getDisplayPosition() ;
-		final IntVector2 dim = getDisplay() ;
-		cameras.setDisplayDimensions( position.x, position.y, dim.x, dim.y ) ;
-	}
-
-	@Override
-	public void renderChanged()
-	{
-		final IntVector2 dim = getRender() ;
-		updateBufferDimensions( dim.x, dim.y ) ;
-	}
-
-	@Override
-	public void orderChanged() {}
 
 	private void updateBufferDimensions( final int _width, final int _height )
 	{

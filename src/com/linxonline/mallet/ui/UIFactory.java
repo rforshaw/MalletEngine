@@ -18,6 +18,8 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
+
+import com.linxonline.mallet.renderer.WorldAssist ;
 import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.renderer.ProgramAssist ;
@@ -25,6 +27,7 @@ import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.IntVector2 ;
 
 import com.linxonline.mallet.input.* ;
 
@@ -54,10 +57,10 @@ public final class UIFactory
 	*/
 	public static UILayout constructWindowLayout( final ILayout.Type _type, final Camera _camera )
 	{
-		final int width = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-		final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 480 ) ;
+		final World base = WorldAssist.getDefaultWorld() ;
+		final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
-		final Vector3 dimension = new Vector3( width, height, 0.0f ) ;
+		final Vector3 dimension = new Vector3( dim.x, dim.y, 0.0f ) ;
 
 		final UILayout layout = new UILayout( _type ) ;
 		final UIRatio ratio = layout.getRatio() ;
@@ -88,8 +91,8 @@ public final class UIFactory
 
 	private static class WindowListener extends UIElement.Component
 	{
-		private final Notification.Notify<String> widthNotify ;
-		private final Notification.Notify<String> heightNotify ;
+		private World world ;
+		private final Notification.Notify<World> renderNotify ;
 
 		public WindowListener( final UILayout _parent,
 							   final Camera _camera,
@@ -108,29 +111,17 @@ public final class UIFactory
 							   final Vector3 _dimension )
 		{
 			_parent.super( _meta ) ;
-			widthNotify = GlobalConfig.addNotify( "RENDERWIDTH", new Notification.Notify<String>()
+			world = WorldAssist.getDefaultWorld() ;
+
+			renderNotify = WorldAssist.attachRenderNotify( world, new Notification.Notify<World>()
 			{
-				public void inform( final String _data )
+				public void inform( final World _world )
 				{
+					final IntVector2 dim = WorldAssist.getRenderDimensions( _world ) ;
+					_dimension.x = dim.x ;
+					_dimension.y = dim.y ;
+
 					final UIRatio ratio = _parent.getRatio() ;
-					_dimension.x = GlobalConfig.getInteger( "RENDERWIDTH", 640 ) ;
-
-					_parent.setLength( ratio.toUnitX( _dimension.x ),
-										ratio.toUnitY( _dimension.y ),
-										ratio.toUnitZ( _dimension.z ) ) ;
-
-					CameraAssist.amendOrthographic( _camera, 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
-					CameraAssist.amendScreenResolution( _camera, ( int )_dimension.x, ( int )_dimension.y ) ;
-				}
-			} ) ;
-
-			heightNotify = GlobalConfig.addNotify( "RENDERHEIGHT", new Notification.Notify<String>()
-			{
-				public void inform( final String _data )
-				{
-					final UIRatio ratio = _parent.getRatio() ;
-					_dimension.y = GlobalConfig.getInteger( "RENDERHEIGHT", 640 ) ;
-
 					_parent.setLength( ratio.toUnitX( _dimension.x ),
 										ratio.toUnitY( _dimension.y ),
 										ratio.toUnitZ( _dimension.z ) ) ;
@@ -145,8 +136,7 @@ public final class UIFactory
 
 		public void shutdown()
 		{
-			GlobalConfig.removeNotify( "RENDERWIDTH", widthNotify ) ;
-			GlobalConfig.removeNotify( "RENDERHEIGHT", heightNotify ) ;
+			WorldAssist.dettachRenderNotify( world, renderNotify ) ;
 		}
 	}
 }

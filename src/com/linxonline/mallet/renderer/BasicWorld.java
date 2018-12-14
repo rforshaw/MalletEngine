@@ -4,12 +4,18 @@ import java.util.Set ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
 
+import com.linxonline.mallet.util.notification.Notification ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
+
 /**
 	Implements common requirements for using World.
 	Basic World manages draw object state and Camera state.
 */
 public abstract class BasicWorld<D extends DrawData, C extends CameraData> implements World
 {
+	private final Notification<World> renderNotification = new Notification<World>() ;
+	private final Notification<World> displayNotification = new Notification<World>() ;
+
 	private final int order ;
 
 	private final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
@@ -24,18 +30,44 @@ public abstract class BasicWorld<D extends DrawData, C extends CameraData> imple
 		order = _order ;
 	}
 
+	public Notify<World> addRenderNotify( final Notify<World> _notify )
+	{
+		renderNotification.addNotify( _notify ) ;
+		_notify.inform( this ) ;
+		return _notify ;
+	}
+
+	public void removeRenderNotify( final Notify<World> _notify )
+	{
+		renderNotification.removeNotify( _notify ) ;
+	}
+	
+	public Notify<World> addDisplayNotify( final Notify<World> _notify )
+	{
+		displayNotification.addNotify( _notify ) ;
+		_notify.inform( this ) ;
+		return _notify ;
+	}
+
+	public void removeDisplayNotify( final Notify<World> _notify )
+	{
+		displayNotification.removeNotify( _notify ) ;
+	}
+
 	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		renderPosition.setXY( _x, _y ) ;
 		meta.set( _width, _height ) ;
-		renderChanged() ;
+
+		renderNotification.inform( this ) ;
 	}
 
 	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		displayPosition.setXY( _x, _y ) ;
 		display.setXY( _width, _height ) ;
-		displayChanged() ;
+
+		displayNotification.inform( this ) ;
 	}
 
 	/**
@@ -112,12 +144,6 @@ public abstract class BasicWorld<D extends DrawData, C extends CameraData> imple
 
 	public abstract void clear() ;
 
-	public abstract void displayChanged() ;
-
-	public abstract void renderChanged() ;
-
-	public abstract void orderChanged() ;
-	
 	public String toString()
 	{
 		return meta.toString() ;

@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
 
+import com.linxonline.mallet.util.notification.Notification.Notify ;
+
 public final class WorldAssist
 {
 	private static Assist assist ;
@@ -79,6 +81,26 @@ public final class WorldAssist
 		return assist.getDisplayDimensions( _world ) ;
 	}
 
+	public static Notify<World> attachRenderNotify( final World _world , final Notify<World> _notify )
+	{
+		return assist.attachRenderNotify( _world, _notify ) ;
+	}
+
+	public static void dettachRenderNotify( final World _world, final Notify<World> _notify )
+	{
+		assist.dettachRenderNotify( _world, _notify ) ;
+	}
+
+	public static Notify<World> attachDisplayNotify( final World _world, final Notify<World> _notify )
+	{
+		return assist.attachDisplayNotify( _world, _notify ) ;
+	}
+
+	public static void dettachDisplayNotify( final World _world, final Notify<World> _notify )
+	{
+		assist.dettachDisplayNotify( _world, _notify ) ;
+	}
+
 	public static World constructWorld( final String _id, final int _order )
 	{
 		return assist.constructWorld( _id, _order ) ;
@@ -98,6 +120,12 @@ public final class WorldAssist
 
 		public IntVector2 getRenderDimensions( final World _world ) ;
 		public IntVector2 getDisplayDimensions( final World _world ) ;
+
+		public Notify<World> attachRenderNotify( final World _world , final Notify<World> _notify ) ;
+		public void dettachRenderNotify( final World _world, final Notify<World> _notify ) ;
+
+		public Notify<World> attachDisplayNotify( final World _world, final Notify<World> _notify ) ;
+		public void dettachDisplayNotify( final World _world, final Notify<World> _notify ) ;
 
 		/**
 			Construct a world with the specified identifier 
