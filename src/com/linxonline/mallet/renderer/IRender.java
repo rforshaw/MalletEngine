@@ -13,20 +13,6 @@ public interface IRender
 	public void shutdown() ;
 
 	/**
-		Ensure that the static assistant classes are 
-		loaded correctly.
-		This will include CameraAssist, TextureAssist, 
-		WorldAssist, DrawAssist and FontAssist.
-	*/
-	public void initAssist() ;
-
-	/**
-		Defines the actual framebuffer dimensions that the render 
-		state will be drawn into.
-	*/
-	public void setRenderDimensions( final int _width, final int _height ) ;
-
-	/**
 		Defines the window dimensions that the framebuffer will displayed to.
 		The framebuffer and display do not have to be the same dimensions.
 		The framebuffer will be upscaled or downscaled accordingly.

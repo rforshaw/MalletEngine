@@ -5,13 +5,14 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
 
+import com.linxonline.mallet.renderer.BasicWorld ;
 import com.linxonline.mallet.renderer.DrawData ;
 import com.linxonline.mallet.renderer.CameraData ;
 import com.linxonline.mallet.renderer.WorldState ;
 
 public class Worlds<D extends DrawData,
 					C extends CameraData,
-					W extends World<D, C>> extends WorldState<D, C, W>
+					W extends BasicWorld<D, C>> extends WorldState<D, C, W>
 {
 	public Worlds()
 	{

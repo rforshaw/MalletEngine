@@ -2,8 +2,6 @@ package com.linxonline.mallet.renderer.android.GL ;
 
 import java.util.Arrays ;
 
-import android.opengl.GLES20 ;
-
 import com.linxonline.mallet.io.Resource ;
 
 public class GLImage extends Resource
@@ -74,6 +72,6 @@ public class GLImage extends Resource
 
 	public final void destroy()
 	{
-		GLES20.glDeleteTextures( 1, textureIDs, 0 ) ;
+		MGL.glDeleteTextures( 1, textureIDs, 0 ) ;
 	}
 }

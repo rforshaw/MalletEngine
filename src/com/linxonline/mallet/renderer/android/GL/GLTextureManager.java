@@ -6,7 +6,6 @@ import java.io.InputStream ;
 import java.nio.* ;
 
 import android.util.DisplayMetrics ;
-import android.opengl.GLES20 ;
 import android.opengl.GLUtils;
 import android.opengl.ETC1Util ;
 import android.opengl.ETC1Util.ETC1Texture ;
@@ -229,23 +228,23 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	*/
 	public GLImage bind( final Bitmap _image, final InternalFormat _format )
 	{
-		GLES20.glEnable( GLES20.GL_TEXTURE_2D ) ;
+		MGL.glEnable( MGL.GL_TEXTURE_2D ) ;
 
 		final int textureID = glGenTextures() ;
-		GLES20.glBindTexture( GLES20.GL_TEXTURE_2D, textureID ) ;
+		MGL.glBindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
 
 		// Create Nearest Filtered Texture
-		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR ) ;
-		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR ) ;
+		MGL.glTexParameterf( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+		MGL.glTexParameterf( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
  
 		// Different possible texture parameters, e.g. GL10.GL_CLAMP_TO_EDGE
-		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE ) ;
-		GLES20.glTexParameterf( GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT ) ;
+		MGL.glTexParameterf( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+		MGL.glTexParameterf( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
 
 		// Android GL doesn't use texture compression.
 		// At least for the moment.
-		GLES20.glPixelStorei( GLES20.GL_UNPACK_ALIGNMENT, 1 ) ;
-		GLUtils.texImage2D( GLES20.GL_TEXTURE_2D, 0, _image, 0 ) ;
+		MGL.glPixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;
+		GLUtils.texImage2D( MGL.GL_TEXTURE_2D, 0, _image, 0 ) ;
 
 		final long estimatedConsumption = _image.getWidth() * _image.getHeight() * ( 3 * 8 ) ;
 		return new GLImage( textureID, estimatedConsumption ) ;
@@ -254,7 +253,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	private static int glGenTextures()
 	{
 		final int[] id = new int[1] ;
-		GLES20.glGenTextures( 1, id, 0 ) ;
+		MGL.glGenTextures( 1, id, 0 ) ;
 
 		return id[0] ;
 	}

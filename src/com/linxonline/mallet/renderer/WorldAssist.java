@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import com.linxonline.mallet.maths.IntVector2 ;
+
 public final class WorldAssist
 {
 	private static Assist assist ;
@@ -67,6 +69,16 @@ public final class WorldAssist
 		return assist.setDisplayDimensions( _world, _x, _y, _width, _height ) ;
 	}
 
+	public static IntVector2 getRenderDimensions( final World _world )
+	{
+		return assist.getRenderDimensions( _world ) ;
+	}
+
+	public static IntVector2 getDisplayDimensions( final World _world )
+	{
+		return assist.getDisplayDimensions( _world ) ;
+	}
+
 	public static World constructWorld( final String _id, final int _order )
 	{
 		return assist.constructWorld( _id, _order ) ;
@@ -83,6 +95,9 @@ public final class WorldAssist
 
 		public World setRenderDimensions( final World _world, final int _x, final int _y, final int _width, final int _height ) ;
 		public World setDisplayDimensions( final World _world, final int _x, final int _y, final int _width, final int _height ) ;
+
+		public IntVector2 getRenderDimensions( final World _world ) ;
+		public IntVector2 getDisplayDimensions( final World _world ) ;
 
 		/**
 			Construct a world with the specified identifier 

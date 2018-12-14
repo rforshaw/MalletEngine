@@ -104,7 +104,7 @@ public class WorldState<D extends DrawData,
 	public C getCamera( final String _id, final W _world )
 	{
 		final W world = getWorld( _world ) ;
-		return ( C )world.getCameraState().getCamera( _id ) ;
+		return world.getCamera( _id ) ;
 	}
 
 	public W getWorld( final W _world )

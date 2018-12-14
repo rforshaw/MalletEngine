@@ -12,6 +12,10 @@ import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.IRender ;
+import com.linxonline.mallet.renderer.WorldAssist ;
+import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.CameraAssist ;
+import com.linxonline.mallet.renderer.Camera ;
 
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
@@ -131,7 +135,7 @@ public class DesktopStarter extends AbstractStarter
 
 		final IRender render = _system.getRenderer() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
-		render.setRenderDimensions( renderWidth, renderHeight ) ;
+		updateRenderDimensions( renderWidth, renderHeight ) ;
 
 		//final RenderInfo info = render.getRenderInfo() ;
 		//info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
@@ -141,5 +145,15 @@ public class DesktopStarter extends AbstractStarter
 		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", desktop.getDPI() ) ) ;
 		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", desktop.getDPI() ) ) ;
 		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
+	}
+
+	private static void updateRenderDimensions( final int _width, final int _height )
+	{
+		final Camera camera = CameraAssist.getDefaultCamera() ;
+		CameraAssist.amendScreenResolution( camera, _width, _height ) ;
+		CameraAssist.amendOrthographic( camera, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+		
+		final World world = WorldAssist.getDefaultWorld() ;
+		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
 	}
 }

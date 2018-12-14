@@ -4,8 +4,6 @@ import java.util.List ;
 import java.util.Map ;
 import java.util.Set ;
 
-import android.opengl.GLES30 ;
-
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.ProgramMap ;
@@ -151,15 +149,15 @@ public class GLProgram extends ProgramManager.Program
 					final com.linxonline.mallet.util.buffers.android.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.android.FloatBuffer )ibuffer ;
 					final float[] matrix = buffer.getArray() ;
 
-					GLES30.glUniformMatrix4fv( inUniforms[i], 1, true, matrix, 0 ) ;
+					MGL.glUniformMatrix4fv( inUniforms[i], 1, true, matrix, 0 ) ;
 					break ;
 				}
 				case SAMPLER2D    :
 				{
 					final GLImage texture = ( GLImage )_data.get( uniform.getRight() ) ;
 
-					GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + textureUnit ) ;
-					GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
+					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
 					textureUnit += 1 ;
 					break ;
 				}
@@ -167,8 +165,8 @@ public class GLProgram extends ProgramManager.Program
 				{
 					final GLImage texture = ( GLImage )_data.get( uniform.getRight() ) ;
 
-					GLES30.glActiveTexture( GLES30.GL_TEXTURE0 + textureUnit ) ;			//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					GLES30.glBindTexture( GLES30.GL_TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
+					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;			//GLRenderer.handleError( "Activate Texture", _gl ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
 					textureUnit += 1 ;
 					break ;
 				}
@@ -230,14 +228,14 @@ public class GLProgram extends ProgramManager.Program
 		// During the build process a programs 
 		// shaders list has already been detached 
 		// and destroyed.
-		GLES30.glDeleteProgram( _program.id[0] ) ;
+		MGL.glDeleteProgram( _program.id[0] ) ;
 	}
 
 	public static GLProgram build( final JSONProgram _program )
 	{
 		final GLProgram program = new GLProgram( _program ) ;
 
-		program.id[0] = GLES30.glCreateProgram() ;
+		program.id[0] = MGL.glCreateProgram() ;
 		if( program.id[0] < 1 )
 		{
 			System.out.println( "Failed to create program.." ) ;
@@ -255,7 +253,7 @@ public class GLProgram extends ProgramManager.Program
 				// Attach only successfully compiled shaders
 				if( compileShader( shader, i, shaderIDs ) == true )
 				{
-					GLES30.glAttachShader( program.id[0], shaderIDs[i] ) ;
+					MGL.glAttachShader( program.id[0], shaderIDs[i] ) ;
 				}
 			}
 
@@ -268,28 +266,28 @@ public class GLProgram extends ProgramManager.Program
 
 			for( int i = 0; i < size; i++ )
 			{
-				GLES30.glBindAttribLocation( program.id[0], program.inAttributes[i], swivel.get( i ) ) ;
+				MGL.glBindAttribLocation( program.id[0], program.inAttributes[i], swivel.get( i ) ) ;
 			}
 		}
 
-		GLES30.glLinkProgram( program.id[0] ) ;
+		MGL.glLinkProgram( program.id[0] ) ;
 
-		program.inMVPMatrix = GLES30.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
+		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
 		for( int i = 0; i < shaderIDs.length; i++ )
 		{
-			GLES30.glDetachShader( program.id[0], shaderIDs[i] ) ;
-			GLES30.glDeleteShader( shaderIDs[i] ) ;
+			MGL.glDetachShader( program.id[0], shaderIDs[i] ) ;
+			MGL.glDeleteShader( shaderIDs[i] ) ;
 		}
 
 		final int[] response = new int[]{ 0 } ;
-		GLES30.glGetProgramiv( program.id[0], GLES30.GL_LINK_STATUS, response, 0 ) ;
-		if( response[0] == GLES30.GL_FALSE )
+		MGL.glGetProgramiv( program.id[0], MGL.GL_LINK_STATUS, response, 0 ) ;
+		if( response[0] == MGL.GL_FALSE )
 		{
-			System.out.println( "Error linking program: " + GLES30.glGetProgramInfoLog( program.id[0] ) ) ;
+			System.out.println( "Error linking program: " + MGL.glGetProgramInfoLog( program.id[0] ) ) ;
 			GLProgram.delete( program ) ;
 			return null ;
 		}
@@ -299,15 +297,15 @@ public class GLProgram extends ProgramManager.Program
 
 	private static boolean compileShader( final JSONProgram.ShaderMap _map, final int _index, final int[] _shaderIDs )
 	{
-		_shaderIDs[_index] = GLES30.glCreateShader( convertType( _map.getLeft() ) ) ;
-		GLES30.glShaderSource( _shaderIDs[_index], _map.getRight() ) ;
-		GLES30.glCompileShader( _shaderIDs[_index] ) ;
+		_shaderIDs[_index] = MGL.glCreateShader( convertType( _map.getLeft() ) ) ;
+		MGL.glShaderSource( _shaderIDs[_index], _map.getRight() ) ;
+		MGL.glCompileShader( _shaderIDs[_index] ) ;
 
 		final int[] response = new int[]{ 0 } ;
-		GLES30.glGetShaderiv( _shaderIDs[_index], GLES30.GL_COMPILE_STATUS, response, 0 ) ;
-		if( response[0] == GLES30.GL_FALSE )
+		MGL.glGetShaderiv( _shaderIDs[_index], MGL.GL_COMPILE_STATUS, response, 0 ) ;
+		if( response[0] == MGL.GL_FALSE )
 		{
-			System.out.println( "Error compiling shader: " + GLES30.glGetShaderInfoLog( _shaderIDs[_index] ) ) ;
+			System.out.println( "Error compiling shader: " + MGL.glGetShaderInfoLog( _shaderIDs[_index] ) ) ;
 			return false ;
 		}
 
@@ -318,8 +316,8 @@ public class GLProgram extends ProgramManager.Program
 	{
 		switch( _type )
 		{
-			case VERTEX   : return GLES30.GL_VERTEX_SHADER ;
-			case FRAGMENT : return GLES30.GL_FRAGMENT_SHADER ;
+			case VERTEX   : return MGL.GL_VERTEX_SHADER ;
+			case FRAGMENT : return MGL.GL_FRAGMENT_SHADER ;
 			//case GEOMETRY : return GLES30.GL_GEOMETRY_SHADER ;
 			//case COMPUTE  : return GLES30.GL_COMPUTE_SHADER ;
 			default       : return -1 ;

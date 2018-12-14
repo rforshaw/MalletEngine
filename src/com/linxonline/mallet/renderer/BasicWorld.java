@@ -1,16 +1,16 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.Set ;
+
 import com.linxonline.mallet.maths.IntVector2 ;
 
 /**
 	Implements common requirements for using World.
 	Basic World manages draw object state and Camera state.
 */
-public class BasicWorld<D extends DrawData, C extends CameraData> implements World
+public abstract class BasicWorld<D extends DrawData, C extends CameraData> implements World
 {
 	private final int order ;
-	private final DrawState<D> state = new DrawState<D>() ;				// Objects to be drawn
-	private final CameraState<C> cameras = new CameraState<C>() ;		// Camera view portals
 
 	private final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
 	private final MalletTexture.Meta meta ;
@@ -28,13 +28,14 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 	{
 		renderPosition.setXY( _x, _y ) ;
 		meta.set( _width, _height ) ;
+		renderChanged() ;
 	}
 
 	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		displayPosition.setXY( _x, _y ) ;
 		display.setXY( _width, _height ) ;
-		cameras.setDisplayDimensions( _x, _y, _width, _height ) ;
+		displayChanged() ;
 	}
 
 	/**
@@ -73,71 +74,50 @@ public class BasicWorld<D extends DrawData, C extends CameraData> implements Wor
 		return display ;
 	}
 
-	public void addDraw( final D _data )
+	public MalletTexture.Meta getMeta()
 	{
-		state.add( _data ) ;
+		return meta ;
 	}
 
-	public void removeDraw( final D _data )
-	{
-		state.remove( _data ) ;
-	}
+	public abstract void init() ;
 
-	public void addCamera( final C _camera )
-	{
-		cameras.add( _camera ) ;
-	}
+	public abstract void addDraw( final D _data ) ;
 
-	public void removeCamera( final C _camera )
-	{
-		cameras.remove( _camera ) ;
-	}
+	public abstract void removeDraw( final D _data ) ;
+
+	public abstract void addCamera( final C _camera ) ;
+
+	public abstract void removeCamera( final C _camera ) ;
+
+	public abstract C getCamera( final String _id ) ;
 
 	/**
 		Update the draw objects position, rotation, and scale.
 		This will eventually call DrawData.upload
 	*/
-	public void update( final int _diff, final int _iteration )
-	{
-		state.update( _diff, _iteration ) ;
-		cameras.update( _diff, _iteration ) ;
-	}
+	public abstract void update( final int _diff, final int _iteration ) ;
 
 	/**
 		Update the cameras position, rotation, and scale.
 		Call the cameras custom draw interface to begin 
 		rendering to the framebuffer.
 	*/
-	public void draw()
-	{
-		cameras.draw() ;
-	}
+	public abstract void draw() ;
 
-	public DrawState<D> getDrawState()
-	{
-		return state ;
-	}
+	public abstract void shutdown() ;
 
-	public CameraState<C> getCameraState()
-	{
-		return cameras ;
-	}
+	public abstract void sort() ;
 
-	public MalletTexture.Meta getMeta()
-	{
-		return meta ;
-	}
+	public abstract void clean( final Set<String> _activeKeys ) ;
 
-	public void sort()
-	{
-		state.sort() ;
-	}
+	public abstract void clear() ;
 
-	public void clear()
-	{
-		state.clear() ;
-	}
+	public abstract void displayChanged() ;
 
+	public abstract void renderChanged() ;
+
+	public abstract void orderChanged() ;
+	
 	public String toString()
 	{
 		return meta.toString() ;

@@ -117,14 +117,14 @@ public final class GameTestLoader implements IGameLoader
 					public void callback( final DrawDelegate _delegate )
 					{
 						{
-							final int width = GlobalConfig.getInteger( "RENDERWIDTH", 800 ) ;
-							final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 600 ) ;
+							final World base = WorldAssist.getDefaultWorld() ;
+							final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
 							final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
 							CameraAssist.addCamera( cam, null ) ;
 
-							CameraAssist.amendOrthographic( cam, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
-							CameraAssist.amendScreenResolution( cam, width / 4, height / 4 ) ;
+							CameraAssist.amendOrthographic( cam, 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
+							CameraAssist.amendScreenResolution( cam, dim.x / 4, dim.y / 4 ) ;
 							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 						}
 
@@ -391,11 +391,11 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void createMouseAnimExample()
 			{
-				final int width = GlobalConfig.getInteger( "RENDERWIDTH", 0 ) / 2 ;
-				final int height = GlobalConfig.getInteger( "RENDERHEIGHT", 0 ) / 2 ;
+				final World base = WorldAssist.getDefaultWorld() ;
+				final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
 				final Entity entity = new Entity( "MOUSE" ) ;
-				entity.position = new Vector3( width, height, 0 ) ;
+				entity.position = new Vector3( dim.x / 2, dim.y / 2, 0 ) ;
 
 				final AnimComponent anim   = new AnimComponent( entity ) ;
 				final EventComponent event = new EventComponent( entity ) ;
