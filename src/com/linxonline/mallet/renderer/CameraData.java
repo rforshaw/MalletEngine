@@ -4,6 +4,8 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
+import com.linxonline.mallet.util.Interpolate ;
+
 public class CameraData<T extends CameraData> implements Camera<T>
 {
 	private final String id ;
@@ -164,7 +166,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		uiPosition.setXYZ( _x, _y, _z ) ;
 	}
 
-	protected void update( final int _diff, final int _iteration )
+	public void update( final int _diff, final int _iteration )
 	{
 		interpolate( uiPosition, oldUIPosition, currentUIPosition, _diff, _iteration ) ;
 		interpolate( position,   oldPosition,   currentPosition,   _diff, _iteration ) ;
@@ -189,14 +191,12 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 	private void interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
 	{
-		final float xDiff = ( _future.x - _past.x ) / _diff ;
-		final float yDiff = ( _future.y - _past.y ) / _diff ;
-		final float zDiff = ( _future.z - _past.z ) / _diff ;
-
-		_present.setXYZ( _past.x + ( xDiff * _iteration ),
-						 _past.y + ( yDiff * _iteration ),
-						 _past.z + ( zDiff * _iteration ) ) ;
-		_past.setXYZ( _present ) ;
+		if( Interpolate.linear( _future, _past, _present, _diff, _iteration ) )
+		{
+			// If an object has not reached its final state
+			// then flag it for updating again during the next draw call.
+			//forceUpdate() ;
+		}
 	}
 
 	public enum Ratio

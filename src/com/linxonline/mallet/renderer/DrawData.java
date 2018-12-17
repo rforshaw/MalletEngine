@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
 public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
@@ -200,7 +201,7 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 	/**
 		Called by the worlds DrawState.
 	*/
-	protected void update( final int _diff, final int _iteration )
+	public void update( final int _diff, final int _iteration )
 	{
 		// Position, Rotation, and Scale should always 
 		// be updated even if the data is not being uploaded 
@@ -227,22 +228,12 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 
 	private void interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
 	{
-		final float xDiff = ( _future.x - _past.x ) / _diff ;
-		final float yDiff = ( _future.y - _past.y ) / _diff ;
-		final float zDiff = ( _future.z - _past.z ) / _diff ;
-
-		if( Math.abs( xDiff ) > 0.001f || Math.abs( yDiff ) > 0.001f || Math.abs( zDiff ) > 0.001f )
+		if( Interpolate.linear( _future, _past, _present, _diff, _iteration ) )
 		{
 			// If an object has not reached its final state
 			// then flag it for updating again during the next draw call.
-			//System.out.println( xDiff + " " + yDiff + " " + zDiff + " Forcing Update" ) ;
 			forceUpdate() ;
 		}
-
-		_present.setXYZ( _past.x + ( xDiff * _iteration ),
-						 _past.y + ( yDiff * _iteration ),
-						 _past.z + ( zDiff * _iteration ) ) ;
-		_past.setXYZ( _present ) ;
 	}
 
 	public boolean toUpdate()

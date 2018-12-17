@@ -1,9 +1,11 @@
-package com.linxonline.mallet.renderer ;
+package com.linxonline.mallet.renderer.opengl ;
 
 import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
+
+import com.linxonline.mallet.renderer.CameraData ;
 
 public final class CameraState<C extends CameraData>
 {
@@ -19,7 +21,26 @@ public final class CameraState<C extends CameraData>
 	private final BufferedList<C> state = new BufferedList<C>() ;
 	private IDraw<C> draw = DRAW_DEFAULT ;
 
-	public CameraState() {}
+	/**
+		Extend the draw interface to allow the 
+		camera to render to the specified coordinates.
+
+		This should either be constructed and set 
+		within your World extension or by the core 
+		renderer - though it depends on how you manage 
+		your resources.
+
+		For example GLRenderer stores its resources (shaders, 
+		matrix cache, textures, GL, etc) in a central location,
+		it make sense then to allow our IDraw to access this.
+
+		When a World is created the GLRenderer WorldAssist sets 
+		the interfaces accordingly.
+	*/
+	public CameraState( final IDraw<C> _draw )
+	{
+		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
+	}
 
 	public void add( final C _camera )
 	{
@@ -90,28 +111,7 @@ public final class CameraState<C extends CameraData>
 		return null ;
 	}
 
-	/**
-		Extend the draw interface to allow the 
-		camera to render to the specified coordinates.
-
-		This should either be constructed and set 
-		within your World extension or by the core 
-		renderer - though it depends on how you manage 
-		your resources.
-
-		For example GLRenderer stores its resources (shaders, 
-		matrix cache, textures, GL, etc) in a central location,
-		it make sense then to allow our IDraw to access this.
-
-		When a World is created the GLRenderer WorldAssist sets 
-		the interfaces accordingly.
-	*/
-	public void setDrawInterface( final IDraw<C> _draw )
-	{
-		draw = ( _draw == null ) ? DRAW_DEFAULT : _draw ;
-	}
-
-	public interface IDraw<T extends Camera>
+	public interface IDraw<T extends CameraData>
 	{
 		public void draw( final T _data ) ;
 	}

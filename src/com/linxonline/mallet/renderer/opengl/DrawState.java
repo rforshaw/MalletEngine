@@ -1,9 +1,11 @@
-package com.linxonline.mallet.renderer ;
+package com.linxonline.mallet.renderer.opengl ;
 
 import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
+
+import com.linxonline.mallet.renderer.DrawData ;
 
 public final class DrawState<D extends DrawData>
 {
@@ -17,9 +19,15 @@ public final class DrawState<D extends DrawData>
 	} ;
 
 	private final BufferedList<D> state = new BufferedList<D>() ;
-	private IUpload<D> upload = UPLOAD_DEFAULT ;
+	private final IUpload<D> upload ;
 
-	public synchronized void update( final int _diff, final int _iteration )
+	public DrawState( final IUpload _upload, final BufferedList.RemoveListener<D> _remove )
+	{
+		state.setRemoveListener( _remove ) ;
+		upload = ( _upload == null ) ? UPLOAD_DEFAULT : _upload ;
+	}
+
+	public void update( final int _diff, final int _iteration )
 	{
 		state.update() ;
 		final List<D> current = state.getCurrentData() ;
@@ -56,16 +64,6 @@ public final class DrawState<D extends DrawData>
 
 	public void clear() {}
 
-	public void setRemoveListener( final BufferedList.RemoveListener<D> _listener )
-	{
-		state.setRemoveListener( _listener ) ;
-	}
-
-	public void setUploadInterface( final IUpload<D> _upload )
-	{
-		upload = ( _upload == null ) ? UPLOAD_DEFAULT : _upload ;
-	}
-
 	/**
 		Extend the upload interface to allow the 
 		Draw object to be uploaded to the World.
@@ -82,7 +80,7 @@ public final class DrawState<D extends DrawData>
 		When a World is created the GLRenderer WorldAssist sets 
 		the interfaces accordingly.
 	*/
-	public interface IUpload<T extends Draw>
+	public interface IUpload<T extends DrawData>
 	{
 		public void upload( final T _data ) ;
 	}

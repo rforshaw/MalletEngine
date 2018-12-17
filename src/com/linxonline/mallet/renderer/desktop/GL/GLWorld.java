@@ -10,9 +10,10 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.BasicWorld ;
-import com.linxonline.mallet.renderer.DrawState ;
 import com.linxonline.mallet.renderer.CameraData ;
-import com.linxonline.mallet.renderer.CameraState ;
+
+import com.linxonline.mallet.renderer.opengl.DrawState ;
+import com.linxonline.mallet.renderer.opengl.CameraState ;
 
 /**
 	Represents the OpenGL state for a world.
@@ -29,8 +30,8 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	protected final DrawState<GLDrawData> state = new DrawState<GLDrawData>() ;			// Objects to be drawn
-	protected final CameraState<CameraData> cameras = new CameraState<CameraData>() ;		// Camera view portals
+	protected final DrawState<GLDrawData> state;			// Objects to be drawn
+	protected final CameraState<CameraData> cameras ;		// Camera view portals
 
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected GLImage backbuffer = null ;
@@ -41,9 +42,8 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	private GLWorld( final String _id, final int _order )
 	{
 		super( _id, _order ) ;
-		state.setUploadInterface( new GLBasicUpload( this ) ) ;
-		state.setRemoveListener( new GLBasicRemove( this ) ) ;
-		cameras.setDrawInterface( new GLCameraDraw( this ) ) ;
+		state = new DrawState<GLDrawData>( new GLBasicUpload(), new GLBasicRemove() ) ;
+		cameras = new CameraState<CameraData>( new GLCameraDraw() ) ;
 	}
 
 	public static GLWorld createCore( final String _id, final int _order )
@@ -286,20 +286,15 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 		}
 	}
 
-	private final static class GLCameraDraw implements CameraState.IDraw<CameraData>
+	private final class GLCameraDraw implements CameraState.IDraw<CameraData>
 	{
-		private final GLWorld world ;
-
-		private final static Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
-		private final static Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
+		private final Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
+		private final Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
 
 		private final Matrix4 worldProjection = new Matrix4() ;
 		private final Matrix4 uiProjection = new Matrix4() ;
 
-		public GLCameraDraw( final GLWorld _world )
-		{
-			world = _world ;
-		}
+		public GLCameraDraw() {}
 
 		@Override
 		public void draw( final CameraData _camera )
@@ -330,38 +325,26 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			uiProjection.setIdentity() ;
 			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
-			final GLGeometryUploader uploader = world.getUploader() ;
+			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
 			uploader.draw( worldProjection, uiProjection ) ;
-
-			//System.out.println( "Camera: " + world.getID() + " Order: " + world.getOrder() ) ;
 		}
 	}
 
-	private final static class GLBasicRemove implements BufferedList.RemoveListener<GLDrawData>
+	private final class GLBasicRemove implements BufferedList.RemoveListener<GLDrawData>
 	{
-		private final GLWorld world ;
-
-		public GLBasicRemove( final GLWorld _world )
-		{
-			world = _world ;
-		}
+		public GLBasicRemove() {}
 
 		@Override
 		public void remove( final GLDrawData _data )
 		{
-			final GLGeometryUploader uploader = world.getUploader() ;
+			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
 			uploader.remove( _data ) ;
 		}
 	}
 
-	private final static class GLBasicUpload implements DrawState.IUpload<GLDrawData>
+	private final class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
-		private final GLWorld world ;
-
-		public GLBasicUpload( final GLWorld _world )
-		{
-			world = _world ;
-		}
+		public GLBasicUpload() {}
 
 		@Override
 		public void upload( final GLDrawData _data )
@@ -384,7 +367,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
-			final GLGeometryUploader uploader = world.getUploader() ;
+			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
 			uploader.upload( _data ) ;
 		}
 	}
