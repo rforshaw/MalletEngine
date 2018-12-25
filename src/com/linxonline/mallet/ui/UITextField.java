@@ -23,20 +23,33 @@ public class UITextField extends UIElement
 	{
 		super() ;
 		addEvent( new Event<EventController>( "ADD_BACKEND_EVENT", controller ) ) ;
-	}
 
-	@Override
-	public void engage()
-	{
-		super.engage() ;
-		controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
-	}
+		UIElement.connect( this, elementDestroyed(), new Connect.Slot<UITextField>()
+		{
+			@Override
+			public void slot( final UITextField _this )
+			{
+				addEvent( new Event<EventController>( "REMOVE_BACKEND_EVENT", controller ) ) ;
+			}
+		} ) ;
 
-	@Override
-	public void disengage()
-	{
-		super.disengage() ;
-		controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+		UIElement.connect( this, elementEngaged(), new Connect.Slot<UITextField>()
+		{
+			@Override
+			public void slot( final UITextField _this )
+			{
+				controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
+			}
+		} ) ;
+
+		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UITextField>()
+		{
+			@Override
+			public void slot( final UITextField _this )
+			{
+				controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+			}
+		} ) ;
 	}
 
 	@Override

@@ -1,50 +1,43 @@
-package com.linxonline.mallet.io.formats.json.desktop ;
+package com.linxonline.mallet.io.formats.json ;
 
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.IJSONObject ;
+import com.linxonline.mallet.io.formats.json.IJSONArray ;
 
-public class DesktopJSONArray extends JSONArray
+public class JSONArray implements IJSONArray
 {
-	protected final org.json.JSONArray array ;
+	public final org.json.JSONArray array ;
 
-	public DesktopJSONArray()
+	protected JSONArray()
 	{
 		array = new org.json.JSONArray() ;
 	}
 
-	public DesktopJSONArray( final String _source ) throws org.json.JSONException
+	protected JSONArray( final String _source ) throws org.json.JSONException
 	{
 		array = new org.json.JSONArray( _source ) ;
 	}
 
-	protected DesktopJSONArray( final org.json.JSONArray _array )
+	protected JSONArray( final org.json.JSONArray _array )
 	{
 		array = _array ;
 	}
 
-	@Override
-	protected JSONArray create()
+	public static JSONArray construct()
 	{
-		return new DesktopJSONArray() ;
+		return new JSONArray() ;
 	}
 
-	@Override
-	protected JSONArray create( final String _source )
+	public static JSONArray construct( final String _source )
 	{
 		try
 		{
-			return new DesktopJSONArray( _source ) ;
+			return new JSONArray( _source ) ;
 		}
 		catch( org.json.JSONException ex )
 		{
 			ex.printStackTrace() ;
 			return null ;
 		}
-	}
-
-	public static void init()
-	{
-		setConstructor( new DesktopJSONArray() ) ;
 	}
 
 	@Override
@@ -99,14 +92,14 @@ public class DesktopJSONArray extends JSONArray
 	@Override
 	public JSONArray put( final JSONObject _value )
 	{
-		array.put( ( ( DesktopJSONObject )_value ).object ) ;
+		array.put( ( ( JSONObject )_value ).object ) ;
 		return this ;
 	}
 
 	@Override
 	public JSONArray put( final JSONArray _value )
 	{
-		array.put( ( ( DesktopJSONArray )_value ).array ) ;
+		array.put( ( ( JSONArray )_value ).array ) ;
 		return this ;
 	}
 
@@ -179,7 +172,7 @@ public class DesktopJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new DesktopJSONObject( obj ) ;
+		return new JSONObject( obj ) ;
 	}
 
 	@Override
@@ -191,7 +184,7 @@ public class DesktopJSONArray extends JSONArray
 			return _default ;
 		}
 
-		return new DesktopJSONObject( obj ) ;
+		return new JSONObject( obj ) ;
 	}
 
 	@Override
@@ -203,7 +196,7 @@ public class DesktopJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new DesktopJSONArray( arr ) ;
+		return new JSONArray( arr ) ;
 	}
 
 	@Override
@@ -215,7 +208,7 @@ public class DesktopJSONArray extends JSONArray
 			return _default ;
 		}
 
-		return new DesktopJSONArray( arr ) ;
+		return new JSONArray( arr ) ;
 	}
 
 	@Override

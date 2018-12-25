@@ -257,6 +257,11 @@ public class UIWrapper extends UIElement
 		return meta ;
 	}
 
+	public List<UIWrapper> getChildren()
+	{
+		return children ;
+	}
+
 	@Override
 	public void shutdown()
 	{

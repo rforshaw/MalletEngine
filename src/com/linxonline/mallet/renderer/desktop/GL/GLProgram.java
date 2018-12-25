@@ -8,7 +8,7 @@ import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 
-import com.linxonline.mallet.util.buffers.IFloatBuffer ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -145,8 +145,8 @@ public class GLProgram extends ProgramManager.Program
 				case FLOAT32_MAT4 :
 				{
 					final Matrix4 m = ( Matrix4 )_data.get( uniform.getRight() ) ;
-					final IFloatBuffer ibuffer = m.matrix ;
-					final com.linxonline.mallet.util.buffers.desktop.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.desktop.FloatBuffer )ibuffer ;
+					final FloatBuffer ibuffer = m.matrix ;
+					final FloatBuffer buffer = ( FloatBuffer )ibuffer ;
 					final float[] matrix = buffer.getArray() ;
 					
 					MGL.glUniformMatrix4fv( inUniforms[i], 1, true, matrix, 0 ) ;

@@ -119,6 +119,15 @@ public class UILayout extends UIElement implements IChildren
 			}
 		} ) ;
 
+		UIElement.connect( this, elementDestroyed(), new Connect.Slot<UILayout>()
+		{
+			@Override
+			public void slot( final UILayout _this )
+			{
+				children.destroy() ;
+			}
+		} ) ;
+
 		/**
 			Cleanup any resources, handlers that the listeners 
 			may have acquired.

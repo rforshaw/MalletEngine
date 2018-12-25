@@ -107,6 +107,15 @@ public class UIChildren implements IChildren
 		}
 	}
 
+	public void destroy()
+	{
+		final int size = ordered.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			ordered.get( i ).destroy() ;
+		}
+	}
+	
 	public void clear()
 	{
 		final int size = ordered.size() ;

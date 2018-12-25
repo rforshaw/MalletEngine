@@ -3,8 +3,9 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.buffers.* ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
+import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
 public class Shape
 {
@@ -148,8 +149,8 @@ public class Shape
 	}
 
 	private Swivel[] swivel ;
-	private IFloatBuffer verticies ;
-	private IIntegerBuffer indicies ;
+	private FloatBuffer verticies ;
+	private IntegerBuffer indicies ;
 
 	private Style style = Style.LINE_STRIP ;
 

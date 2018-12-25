@@ -916,7 +916,7 @@ public class GLRenderer extends BasicRenderer
 		getEventController().update() ;
 
 		//System.out.println( "Draw" ) ;
-		worlds.upload( ( int )( updateDT / drawDT ), renderIter ) ;
+		worlds.upload( ( int )( getUpdateDeltaTime() / getFrameDeltaTime() ), getFrameIteration() ) ;
 	}
 
 	@Override

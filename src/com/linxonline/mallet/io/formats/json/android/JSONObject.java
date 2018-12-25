@@ -1,52 +1,102 @@
-package com.linxonline.mallet.io.formats.json.android ;
+package com.linxonline.mallet.io.formats.json ;
 
 import java.util.Iterator ;
 
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.IJSONObject ;
+import com.linxonline.mallet.io.formats.json.IJSONArray ;
 
-public class AndroidJSONObject extends JSONObject
+import com.linxonline.mallet.io.filesystem.FileStream ;
+import com.linxonline.mallet.io.filesystem.StringInStream ;
+import com.linxonline.mallet.io.filesystem.StringInCallback ;
+
+public class JSONObject implements IJSONObject
 {
 	protected final org.json.JSONObject object ;
 
-	public AndroidJSONObject()
+	protected JSONObject()
 	{
 		object = new org.json.JSONObject() ;
 	}
 
-	public AndroidJSONObject( final String _source ) throws org.json.JSONException
+	protected JSONObject( final String _source ) throws org.json.JSONException
 	{
 		object = new org.json.JSONObject( _source ) ;
 	}
 
-	protected AndroidJSONObject( final org.json.JSONObject _object )
+	protected JSONObject( final org.json.JSONObject _object )
 	{
 		object = _object ;
 	}
 
-	@Override
-	protected JSONObject create()
+	/**
+		Create a blank JSON Object
+	*/
+	public static JSONObject construct()
 	{
-		return new AndroidJSONObject() ;
+		return new JSONObject() ;
 	}
 
-	@Override
-	protected JSONObject create( final String _source )
+	/**
+		Create a JSON Object/s from file stream.
+	*/
+	public static JSONObject construct( final FileStream _file )
+	{
+		final StringInStream stream = _file.getStringInStream() ;
+		if( stream == null )
+		{
+			return new JSONObject() ;
+		}
+
+		final StringBuilder builder = new StringBuilder() ;
+		String line = null ;
+		while( ( line = stream.readLine() ) != null )
+		{
+			builder.append( line ) ;
+		}
+
+		_file.close( stream ) ;
+		return JSONObject.construct( builder.toString() ) ;
+	}
+
+	public static boolean construct( final FileStream _file, final ConstructCallback _callback )
+	{
+		return _file.getStringInCallback( new StringInCallback()
+		{
+			private final StringBuilder builder = new StringBuilder() ;
+
+			public int resourceAsString( final String[] _resource, final int _length )
+			{
+				for( int i = 0; i < _length; i++ )
+				{
+					builder.append( _resource[i] ) ;
+				}
+			
+				return 1 ;
+			}
+
+			public void start() {}
+
+			public void end()
+			{
+				_callback.callback( JSONObject.construct( builder.toString() ) ) ;
+			}
+		}, 1 ) ;
+	}
+
+	/**
+		Create a JSON Object/s from source.
+	*/
+	public static JSONObject construct( final String _source )
 	{
 		try
 		{
-			return new AndroidJSONObject( _source ) ;
+			return new JSONObject( _source ) ;
 		}
 		catch( org.json.JSONException ex )
 		{
 			ex.printStackTrace() ;
 			return null ;
 		}
-	}
-
-	public static void init()
-	{
-		setConstructor( new AndroidJSONObject() ) ;
 	}
 
 	@Override
@@ -150,7 +200,7 @@ public class AndroidJSONObject extends JSONObject
 	{
 		try
 		{
-			object.put( _key, ( ( AndroidJSONObject )_value ).object ) ;
+			object.put( _key, ( ( JSONObject )_value ).object ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )
@@ -165,7 +215,7 @@ public class AndroidJSONObject extends JSONObject
 	{
 		try
 		{
-			object.put( _key, ( ( AndroidJSONArray )_value ).array ) ;
+			object.put( _key, ( ( JSONArray )_value ).array ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )
@@ -244,7 +294,7 @@ public class AndroidJSONObject extends JSONObject
 			return null ;
 		}
 
-		return new AndroidJSONObject( obj ) ;
+		return new JSONObject( obj ) ;
 	}
 
 	@Override
@@ -256,7 +306,7 @@ public class AndroidJSONObject extends JSONObject
 			return _default ;
 		}
 
-		return new AndroidJSONObject( obj ) ;
+		return new JSONObject( obj ) ;
 	}
 
 	@Override
@@ -268,7 +318,7 @@ public class AndroidJSONObject extends JSONObject
 			return null ;
 		}
 
-		return new AndroidJSONArray( array ) ;
+		return new JSONArray( array ) ;
 	}
 
 	@Override
@@ -280,7 +330,7 @@ public class AndroidJSONObject extends JSONObject
 			return _default ;
 		}
 
-		return new AndroidJSONArray( array ) ;
+		return new JSONArray( array ) ;
 	}
 
 	public String toString()

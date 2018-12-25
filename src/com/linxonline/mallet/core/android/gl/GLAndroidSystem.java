@@ -30,12 +30,6 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 												 EventSystem,
 												 GameSystem>
 {
-	static
-	{
-		IntegerBuffer.setBase( new com.linxonline.mallet.util.buffers.android.IntegerBuffer( 0 ) ) ;
-		FloatBuffer.setBase( new com.linxonline.mallet.util.buffers.android.FloatBuffer( 0 ) ) ;
-	}
-
 	public final AndroidActivity activity ;
 	public GL2DSurfaceView surface ;
 

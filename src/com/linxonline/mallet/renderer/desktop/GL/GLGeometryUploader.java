@@ -17,8 +17,6 @@ import com.linxonline.mallet.renderer.opengl.Buffers ;
 import com.linxonline.mallet.renderer.opengl.LocationBuffer ;
 import com.linxonline.mallet.renderer.opengl.Location ;
 
-import com.linxonline.mallet.util.buffers.IFloatBuffer ;
-
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -140,8 +138,7 @@ public class GLGeometryUploader
 
 			MGL.glUseProgram( glProgram.id[0] ) ;
 
-			final IFloatBuffer ibuffer = ( ui == false ) ? _world.matrix : _ui.matrix ;
-			final com.linxonline.mallet.util.buffers.desktop.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.desktop.FloatBuffer )ibuffer ;
+			final com.linxonline.mallet.util.buffers.FloatBuffer buffer = ( ui == false ) ? _world.matrix : _ui.matrix ;
 			final float[] matrix = buffer.getArray() ;
 
 			MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;

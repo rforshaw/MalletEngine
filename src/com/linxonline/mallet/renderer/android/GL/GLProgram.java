@@ -145,8 +145,7 @@ public class GLProgram extends ProgramManager.Program
 				case FLOAT32_MAT4 :
 				{
 					final Matrix4 m = ( Matrix4 )_data.get( uniform.getRight() ) ;
-					final IFloatBuffer ibuffer = m.matrix ;
-					final com.linxonline.mallet.util.buffers.android.FloatBuffer buffer = ( com.linxonline.mallet.util.buffers.android.FloatBuffer )ibuffer ;
+					final com.linxonline.mallet.util.buffers.FloatBuffer buffer = m.matrix ;
 					final float[] matrix = buffer.getArray() ;
 
 					MGL.glUniformMatrix4fv( inUniforms[i], 1, true, matrix, 0 ) ;

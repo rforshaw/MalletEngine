@@ -3,6 +3,7 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 import java.util.Set ;
 
+import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.ui.gui.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
@@ -371,15 +372,12 @@ public class UIAbstractView extends UIElement
 		IVariant variant = view.getData( _index, IAbstractModel.Role.Display ) ;
 		if( variant == null )
 		{
-			final UIElement cell = _delegate.createItem( this ) ;
-			//cell.setPosition( _index.getColumn(), _index.getRow(), 0 ) ;
-			//cell.setLength( cellLength.x, cellLength.y, cellLength.z ) ;
+			final UIElement cell = _delegate.createItem( this, model, _index ) ;
 
 			variant = new UIVariant( "CELL", cell ) ;
 			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
 			list.addElement( cell ) ;
 			list.makeDirty() ;
-			System.out.println( "Add cell to list" ) ;
 		}
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
@@ -405,10 +403,9 @@ public class UIAbstractView extends UIElement
 		}
 
 		view.removeData( _index ) ;		// Remove any variants assigned to that index
-		
+
 		final UIElement cell = variant.toObject( UIElement.class )  ;
-		//_delegate.destroyItem( cell ) ;
-		list.removeElement( cell ) ;
+		_delegate.destroyItem( cell ) ;
 	}
 
 	private ItemDelegate<?> getItemDelegate( final UIModelIndex _index )
@@ -489,12 +486,16 @@ public class UIAbstractView extends UIElement
 		} ;
 	}
 
+	/**
+		Not generic - expects the data to be stored in the 
+		format used by UI Meta objects. 
+	*/
 	private static ItemDelegate createDefaultItemDelegate()
 	{
 		return new ItemDelegate<UIElement>()
 		{
 			@Override
-			public UIElement createItem( final UIAbstractView _parent )
+			public UIElement createItem( final UIAbstractView _parent, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final UILayout.Meta metaLayout = new UILayout.Meta() ;
 				metaLayout.setType( ILayout.Type.HORIZONTAL ) ;
@@ -514,28 +515,82 @@ public class UIAbstractView extends UIElement
 					layout.addElement( UIGenerator.<UIButton>create( meta ) ) ;
 				}
 
-				{
-					final UITextField.Meta meta = new UITextField.Meta() ;
-					final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
-					edge.setSheet( "base/textures/edge_button.png" ) ;
-
-					final GUIEditText.Meta text = meta.addComponent( new GUIEditText.Meta() ) ;
-					text.setAlignment( UI.Alignment.LEFT, UI.Alignment.CENTRE ) ;
-					text.setGroup( "ENGINE" ) ;
-					text.setName( "VALUE" ) ;
-					text.setText( "Test" ) ;
-
-					layout.addElement( UIGenerator.<UITextField>create( meta ) ) ;
-				}
-
+				final UILayout valLayout = layout.addElement( UIGenerator.<UILayout>create( metaLayout ) ) ;
+				addTextFields( valLayout, _model, _index ) ;
 				return layout ;
+			}
+
+			public void addTextFields( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			{
+				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
+				switch( variant.getType() )
+				{
+					default :
+					{
+						hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						break ;
+					}
+					case VariableInterface.OBJECT_TYPE :
+					{
+						final Object obj = variant.toObject() ;
+						if( obj instanceof Vector2 )
+						{
+							// x, y
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
+						else if( obj instanceof Vector3 )
+						{
+							// x, y, z
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
+						else
+						{
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
+						break ;
+					}
+				}
+			}
+
+			public UITextField hook( final UITextField _field, final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			{
+				UIElement.connect( _field, _field.elementDisengaged(), new Connect.Slot<UITextField>()
+				{
+					@Override
+					public void slot( final UITextField _this )
+					{
+						setModelData( _layout, _model, _index ) ;
+					}
+				} ) ;
+
+				return _field ;
+			}
+
+			public UITextField create()
+			{
+				final UITextField.Meta meta = new UITextField.Meta() ;
+				final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
+				edge.setSheet( "base/textures/edge_button.png" ) ;
+
+				final GUIEditText.Meta text = meta.addComponent( new GUIEditText.Meta() ) ;
+				text.setAlignment( UI.Alignment.LEFT, UI.Alignment.CENTRE ) ;
+				text.setGroup( "ENGINE" ) ;
+				text.setName( "VALUE" ) ;
+				text.setText( "Test" ) ;
+			
+				return UIGenerator.<UITextField>create( meta ) ;
 			}
 
 			@Override
 			public void destroyItem( final UIElement _item )
 			{
-				_item.shutdown() ;
-				_item.clear() ;
+				// We don't need to explicitly remove the item from 
+				// the list, calling destroy will cause it to be removed 
+				// during the lists next update cycle.
+				_item.destroy() ;
 			}
 
 			@Override
@@ -553,15 +608,128 @@ public class UIAbstractView extends UIElement
 				}
 
 				{
-					final UITextField value = ( UITextField )layout.getElements().get( 1 ) ;
-					final StringBuilder text = value.getText() ;
-					text.setLength( 0 ) ;
-					text.append( variant.toString() ) ;
+					final UILayout vLayout = ( UILayout )layout.getElements().get( 1 ) ;
+					switch( variant.getType() )
+					{
+						default                             :
+						{
+							setTextTo( getText( vLayout, 0 ), variant.toString() ) ;
+							break ;
+						}
+						case VariableInterface.OBJECT_TYPE :
+						{
+							final Object obj = variant.toObject() ;
+							if( obj instanceof Vector2 )
+							{
+								final Vector2 vec = ( Vector2 )obj ;
+								setTextTo( getText( vLayout, 0 ), vec.x ) ;
+								setTextTo( getText( vLayout, 1 ), vec.y ) ;
+							}
+							else if( obj instanceof Vector3 )
+							{
+								final Vector3 vec = ( Vector3 )obj ;
+								setTextTo( getText( vLayout, 0 ), vec.x ) ;
+								setTextTo( getText( vLayout, 1 ), vec.y ) ;
+								setTextTo( getText( vLayout, 2 ), vec.z ) ;
+							}
+							else
+							{
+								setTextTo( getText( vLayout, 0 ), variant.toString() ) ;
+							}
+							break ;
+						}
+					}
 				}
 			}
 
 			@Override
-			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index ) {}
+			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
+			{
+				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
+
+				final UILayout vLayout = ( UILayout )_item ;
+				switch( variant.getType() )
+				{
+					case VariableInterface.STRING_TYPE  :
+					{
+						final StringBuilder text = getText( vLayout, 0 ) ;
+						variant.setString( text.toString() ) ;
+						break ;
+					}
+					case VariableInterface.BOOLEAN_TYPE :
+					{
+						variant.setBool( toBool( getText( vLayout, 0 ) ) ) ;
+						break ;
+					}
+					case VariableInterface.INT_TYPE     :
+					{
+						variant.setInt( toInt( getText( vLayout, 0 ) ) ) ;
+						break ;
+					}
+					case VariableInterface.FLOAT_TYPE   :
+					{
+						variant.setFloat( toFloat( getText( vLayout, 0 ) ) ) ;
+						break ;
+					}
+					case VariableInterface.OBJECT_TYPE  :
+					{
+						final Object obj = variant.toObject() ;
+						if( obj instanceof Vector2 )
+						{
+							final float x = toFloat( getText( vLayout, 0 ) ) ;
+							final float y = toFloat( getText( vLayout, 1 ) ) ;
+							variant.setVector2( x, y ) ;
+						}
+						else if( obj instanceof Vector3 )
+						{
+							final float x = toFloat( getText( vLayout, 0 ) ) ;
+							final float y = toFloat( getText( vLayout, 1 ) ) ;
+							final float z = toFloat( getText( vLayout, 2 ) ) ;
+							variant.setVector3( x, y, z ) ;
+						}
+						else
+						{
+							System.out.println( "Unable to set.." ) ;
+						}
+						break ;
+					}
+					default                             : break ;
+				}
+			}
+
+			public boolean toBool( final StringBuilder _text )
+			{
+				return Boolean.parseBoolean( _text.toString() ) ;
+			}
+
+			public int toInt( final StringBuilder _text )
+			{
+				return Integer.parseInt( _text.toString() ) ;
+			}
+
+			public float toFloat( final StringBuilder _text )
+			{
+				return Float.parseFloat( _text.toString() ) ;
+			}
+
+			public StringBuilder getText( final UILayout _layout, final int _index )
+			{
+				final UITextField value = ( UITextField )_layout.getElements().get( _index ) ;
+				final GUIText gui = value.getComponent( "ENGINE", "VALUE", GUIEditText.class ) ;
+				return gui.getText() ;
+			}
+
+			public void setTextTo( final StringBuilder _text, final float _value )
+			{
+				_text.setLength( 0 ) ;
+				_text.append( Float.toString( _value ) ) ;
+			}
+
+			public void setTextTo( final StringBuilder _text, final String _value )
+			{
+				_text.setLength( 0 ) ;
+				_text.append( _value ) ;
+			}
 		} ;
 	}
 
@@ -584,7 +752,7 @@ public class UIAbstractView extends UIElement
 		/**
 			Create the item that is to be used within the cell.
 		*/
-		public T createItem( final UIAbstractView _parent ) ;
+		public T createItem( final UIAbstractView _parent, final IAbstractModel _model, final UIModelIndex _index ) ;
 
 		/**
 			Clean up any resources that may have been used by this cell.

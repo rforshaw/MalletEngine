@@ -80,6 +80,7 @@ public class UIEditorState extends GameState
 				public void slot( final UIButton _open )
 				{
 					System.out.println( "Save Project..." ) ;
+					JUIWrapper.saveWrapper( root, "test_save.jui" ) ;
 				}
 			} ) ;
 

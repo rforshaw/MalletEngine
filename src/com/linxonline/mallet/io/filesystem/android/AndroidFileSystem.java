@@ -12,8 +12,6 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.io.formats.json.android.* ;
-
 /**
 	Provides access to the filesystem on desktop platforms.
 	This currently includes: Linux, Windows, & Mac.
@@ -28,21 +26,8 @@ public class AndroidFileSystem implements FileSystem
 
 	public AndroidFileSystem( final Context _context )
 	{
-		initJSONConstructors() ;
-
 		context = _context ;
 		assetManager = context.getAssets() ;
-	}
-
-	/**
-		Allows reading and parsing JSON formatted files.
-		Mallet Engine provides a wrapper around a platform 
-		JSON library.
-	*/
-	protected void initJSONConstructors()
-	{
-		AndroidJSONObject.init() ;
-		AndroidJSONArray.init() ;
 	}
 
 	/**

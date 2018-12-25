@@ -956,7 +956,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		getEventController().update() ;
 
 		//System.out.println( "Draw" ) ;
-		worlds.upload( ( int )( updateDT / drawDT ), renderIter ) ;
+		worlds.upload( ( int )( getUpdateDeltaTime() / getFrameDeltaTime() ), getFrameIteration() ) ;
 		canvas.swapBuffers() ;
 	}
 
@@ -1013,8 +1013,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			canvas = GLWindow.create( capabilities ) ;
 
-			final Vector2 display = defaultCamera.getDisplayScreen().dimension ;
-			canvas.setSize( ( int )display.x, ( int )display.y ) ;
+			//final Vector2 display = defaultCamera.getDisplayScreen().dimension ;
+			//canvas.setSize( ( int )display.x, ( int )display.y ) ;
 
 			// We want to be in complete control of any swapBuffer calls
 			canvas.setAutoSwapBufferMode( false ) ;

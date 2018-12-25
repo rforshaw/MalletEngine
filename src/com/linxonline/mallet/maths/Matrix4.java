@@ -1,6 +1,6 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.util.buffers.* ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
 /**
@@ -26,7 +26,7 @@ public class Matrix4 implements Cacheable
 		* (2, 0)[ 8], (2, 1)[ 9], (2, 2)[10], (2, 3)[11]
 		* (3, 0)[12], (3, 1)[13], (3, 2)[14], (3, 3)[15]
 	*/
-	public final IFloatBuffer matrix = FloatBuffer.allocate( 16 ) ;
+	public final FloatBuffer matrix = FloatBuffer.allocate( 16 ) ;
 
 	public Matrix4()
 	{
@@ -175,16 +175,16 @@ public class Matrix4 implements Cacheable
 
 	public void multiply( final Matrix4 _mat )
 	{
-		final IFloatBuffer x = _mat.matrix ;
+		final FloatBuffer x = _mat.matrix ;
 		Matrix4.multiplyStage1( this, x ) ;
 		Matrix4.multiplyStage2( this, x ) ;
 		Matrix4.multiplyStage3( this, x ) ;
 		Matrix4.multiplyStage4( this, x ) ;
 	}
 
-	private static void multiplyStage1( final Matrix4 _m, final IFloatBuffer _x )
+	private static void multiplyStage1( final Matrix4 _m, final FloatBuffer _x )
 	{
-		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
 		final float a00 = m.multiply( 0, _x, 0 ) + m.multiply( 1, _x, 4 ) + m.multiply( 2, _x,  8 ) + m.multiply( 3, _x, 12 ) ;
 		final float a01 = m.multiply( 0, _x, 1 ) + m.multiply( 1, _x, 5 ) + m.multiply( 2, _x,  9 ) + m.multiply( 3, _x, 13 ) ;
 		final float a02 = m.multiply( 0, _x, 2 ) + m.multiply( 1, _x, 6 ) + m.multiply( 2, _x, 10 ) + m.multiply( 3, _x, 14 ) ;
@@ -192,9 +192,9 @@ public class Matrix4 implements Cacheable
 		_m.setRow( a00, a01, a02, a03, 0 ) ;
 	}
 
-	private static void multiplyStage2( final Matrix4 _m, final IFloatBuffer _x )
+	private static void multiplyStage2( final Matrix4 _m, final FloatBuffer _x )
 	{
-		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
 		final float a10 = m.multiply( 4, _x, 0 ) + m.multiply( 5, _x, 4 ) + m.multiply( 6, _x,  8 ) + m.multiply( 7, _x, 12 ) ;
 		final float a11 = m.multiply( 4, _x, 1 ) + m.multiply( 5, _x, 5 ) + m.multiply( 6, _x,  9 ) + m.multiply( 7, _x, 13 ) ;
 		final float a12 = m.multiply( 4, _x, 2 ) + m.multiply( 5, _x, 6 ) + m.multiply( 6, _x, 10 ) + m.multiply( 7, _x, 14 ) ;
@@ -202,9 +202,9 @@ public class Matrix4 implements Cacheable
 		_m.setRow( a10, a11, a12, a13, 1 ) ;
 	}
 
-	private static void multiplyStage3( final Matrix4 _m, final IFloatBuffer _x )
+	private static void multiplyStage3( final Matrix4 _m, final FloatBuffer _x )
 	{
-		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
 		final float a20 = m.multiply( 8, _x, 0 ) + m.multiply( 9, _x, 4 ) + m.multiply( 10, _x,  8 ) + m.multiply( 11, _x, 12 ) ;
 		final float a21 = m.multiply( 8, _x, 1 ) + m.multiply( 9, _x, 5 ) + m.multiply( 10, _x,  9 ) + m.multiply( 11, _x, 13 ) ;
 		final float a22 = m.multiply( 8, _x, 2 ) + m.multiply( 9, _x, 6 ) + m.multiply( 10, _x, 10 ) + m.multiply( 11, _x, 14 ) ;
@@ -212,9 +212,9 @@ public class Matrix4 implements Cacheable
 		_m.setRow( a20, a21, a22, a23, 2 ) ;
 	}
 
-	private static void multiplyStage4( final Matrix4 _m, final IFloatBuffer _x )
+	private static void multiplyStage4( final Matrix4 _m, final FloatBuffer _x )
 	{
-		final IFloatBuffer m = _m.matrix ;				// Makes it easier to read
+		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
 		final float a30 = m.multiply( 12, _x, 0 ) + m.multiply( 13, _x, 4 ) + m.multiply( 14, _x,  8 ) + m.multiply( 15, _x, 12 ) ;
 		final float a31 = m.multiply( 12, _x, 1 ) + m.multiply( 13, _x, 5 ) + m.multiply( 14, _x,  9 ) + m.multiply( 15, _x, 13 ) ;
 		final float a32 = m.multiply( 12, _x, 2 ) + m.multiply( 13, _x, 6 ) + m.multiply( 14, _x, 10 ) + m.multiply( 15, _x, 14 ) ;
@@ -224,8 +224,8 @@ public class Matrix4 implements Cacheable
 
 	public void invert()
 	{
-		final IFloatBuffer t = temp.matrix ;		// Results stored
-		final IFloatBuffer m = matrix ;			// Make it easier to read
+		final FloatBuffer t = temp.matrix ;		// Results stored
+		final FloatBuffer m = matrix ;			// Make it easier to read
 
 		Matrix4.invertStage1( t, m ) ;
 		Matrix4.invertStage2( t, m ) ;
@@ -237,7 +237,7 @@ public class Matrix4 implements Cacheable
 		temp.setIdentity() ;
 	}
 
-	private static void invertStage1( final IFloatBuffer _t, final IFloatBuffer _m )
+	private static void invertStage1( final FloatBuffer _t, final FloatBuffer _m )
 	{
 		_t.set(  0,  _m.multiply( 5, 10, 15 )            - _m.multiply( 5, 11, 14 ) - _m.multiply( 9, 6, 15 ) + _m.multiply( 9, 7, 14 ) + _m.multiply( 13, 6, 11 ) - _m.multiply( 13, 7, 10 ) ) ;
 		_t.set(  1, -_m.get( 1 ) * _m.multiply( 10, 15 ) + _m.multiply( 1, 11, 14 ) + _m.multiply( 9, 2, 15 ) - _m.multiply( 9, 3, 14 ) - _m.multiply( 13, 2, 11 ) + _m.multiply( 13, 3, 10 ) ) ;
@@ -245,7 +245,7 @@ public class Matrix4 implements Cacheable
 		_t.set(  3, -_m.get( 1 ) * _m.multiply( 6, 11 )  + _m.multiply( 1,  7, 10 ) + _m.multiply( 5, 2, 11 ) - _m.multiply( 5, 3, 10 ) - _m.multiply(  9, 2,  7 ) + _m.multiply( 9,  3,  6 ) ) ;
 	}
 
-	private static void invertStage2( final IFloatBuffer _t, final IFloatBuffer _m )
+	private static void invertStage2( final FloatBuffer _t, final FloatBuffer _m )
 	{
 		_t.set(  4, -_m.get( 4 ) * _m.multiply( 10, 15 ) + _m.multiply( 4, 11, 14 ) + _m.multiply( 8, 6, 15 ) - _m.multiply( 8, 7, 14 ) - _m.multiply( 12, 6, 11 ) + _m.multiply( 12, 7, 10 ) ) ;
 		_t.set(  5,  _m.multiply( 0, 10, 15 )            - _m.multiply( 0, 11, 14 ) - _m.multiply( 8, 2, 15 ) + _m.multiply( 8, 3, 14 ) + _m.multiply( 12, 2, 11 ) - _m.multiply( 12, 3, 10 ) ) ;
@@ -253,7 +253,7 @@ public class Matrix4 implements Cacheable
 		_t.set(  7,  _m.multiply( 0, 6, 11 )             - _m.multiply( 0, 10, 10 ) - _m.multiply( 4, 2, 11 ) + _m.multiply( 4, 3, 10 ) + _m.multiply(  8, 2, 10 ) - _m.multiply(  8, 3,  6 ) ) ;
 	}
 
-	private static void invertStage3( final IFloatBuffer _t, final IFloatBuffer _m )
+	private static void invertStage3( final FloatBuffer _t, final FloatBuffer _m )
 	{
 		_t.set(  8,  _m.multiply( 4, 9, 15 )             - _m.multiply( 4, 11, 13 ) - _m.multiply( 8, 5, 15 ) + _m.multiply( 8, 10, 13 ) + _m.multiply( 12, 5, 11 ) - _m.multiply( 12, 10, 9 ) ) ;
 		_t.set(  9, -_m.get( 0 ) * _m.multiply(  9, 15 ) + _m.multiply( 0, 11, 13 ) + _m.multiply( 8, 1, 15 ) - _m.multiply( 8,  3, 13 ) - _m.multiply( 12, 1, 11 ) + _m.multiply( 12,  3, 9 ) ) ;
@@ -261,7 +261,7 @@ public class Matrix4 implements Cacheable
 		_t.set( 11, -_m.get( 0 ) * _m.multiply(  5, 11 ) + _m.multiply( 0, 10,  9 ) + _m.multiply( 4, 1, 11 ) - _m.multiply( 4,  3,  9 ) - _m.multiply(  8, 1, 10 ) + _m.multiply(  8,  3, 5 ) ) ;
 	}
 
-	private static void invertStage4( final IFloatBuffer _t, final IFloatBuffer _m )
+	private static void invertStage4( final FloatBuffer _t, final FloatBuffer _m )
 	{
 		_t.set( 12, -_m.get( 4 ) * _m.multiply(  9, 14 ) + _m.multiply( 4, 10, 13 ) + _m.multiply( 8, 5, 14 ) - _m.multiply( 8, 6, 13 ) - _m.multiply( 12, 5, 10 ) + _m.multiply( 12, 6, 9 ) ) ;
 		_t.set( 13,  _m.multiply( 0, 9, 14 )             - _m.multiply( 0, 10, 13 ) - _m.multiply( 8, 1, 14 ) + _m.multiply( 8, 2, 13 ) + _m.multiply( 12, 1, 10 ) - _m.multiply( 12, 2, 9 ) ) ;
@@ -269,7 +269,7 @@ public class Matrix4 implements Cacheable
 		_t.set( 15,  _m.multiply( 0, 5, 10 )             - _m.multiply( 0,  6,  9 ) - _m.multiply( 4, 1, 10 ) + _m.multiply( 4, 2,  9 ) + _m.multiply(  8, 1,  6 ) - _m.multiply(  8, 2, 5 ) ) ;
 	}
 
-	private static void invertStage5( final IFloatBuffer _t, final IFloatBuffer _m )
+	private static void invertStage5( final FloatBuffer _t, final FloatBuffer _m )
 	{
 		final float d = _m.multiply( 0, _t, 0 ) + _m.multiply( 4, _t, 1 ) + _m.multiply( 8, _t, 2 ) + _m.multiply( 12, _t, 3 ) ;
 		final int size = _t.size() ;
@@ -366,7 +366,7 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
-		final IFloatBuffer m = _b.matrix ;
+		final FloatBuffer m = _b.matrix ;
 		_result.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
 						m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
 						m.multiply( 8, _a.x ) + m.multiply( 9, _a.y ) + m.multiply( 10, _a.z ) + m.multiply( 11, 1.0f ) ) ;
@@ -382,7 +382,7 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
 	{
-		final IFloatBuffer m = _b.matrix ;
+		final FloatBuffer m = _b.matrix ;
 		final float w = m.multiply( 12, _a.x ) + m.multiply( 13, _a.y ) + m.multiply( 14, _a.z ) + m.multiply( 15, 1.0f ) ;
 		_a.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
 				   m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
@@ -392,7 +392,7 @@ public class Matrix4 implements Cacheable
 		return _a ;
 	}
 
-	private static void copy( final IFloatBuffer _from, final IFloatBuffer _to )
+	private static void copy( final FloatBuffer _from, final FloatBuffer _to )
 	{
 		FloatBuffer.copy( _from, _to ) ;
 	}

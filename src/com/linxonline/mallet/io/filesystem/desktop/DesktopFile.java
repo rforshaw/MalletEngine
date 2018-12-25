@@ -77,12 +77,29 @@ public class DesktopFile implements FileStream
 		}
 		catch( FileNotFoundException ex )
 		{
+			ex.printStackTrace() ;
 			return null ;
 		}
 		catch( IOException ex )
 		{
 			ex.printStackTrace() ;
 			return null ;
+		}
+	}
+
+	/**
+		Create a new file if the file does not already exist.
+	*/
+	public boolean create()
+	{
+		try
+		{
+			return file.createNewFile() ;
+		}
+		catch( IOException ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
 		}
 	}
 

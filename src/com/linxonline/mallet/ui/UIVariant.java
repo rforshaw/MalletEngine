@@ -132,7 +132,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.BOOLEAN_TYPE : ( ( FloatVariable )variable ).value = _value ; break ;
+			case VariableInterface.FLOAT_TYPE : ( ( FloatVariable )variable ).value = _value ; break ;
 		}
 	}
 

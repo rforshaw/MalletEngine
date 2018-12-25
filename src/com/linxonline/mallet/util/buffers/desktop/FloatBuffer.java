@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.buffers.desktop ;
+package com.linxonline.mallet.util.buffers ;
 
 import com.linxonline.mallet.util.buffers.IFloatBuffer ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -8,12 +8,12 @@ public class FloatBuffer implements IFloatBuffer
 {
 	private float[] array ;
 
-	public FloatBuffer( final int _size )
+	private FloatBuffer( final int _size )
 	{
 		array = new float[_size] ;
 	}
 
-	public FloatBuffer( final IFloatBuffer _buffer, final int _size )
+	private FloatBuffer( final FloatBuffer _buffer, final int _size )
 	{
 		final int length = _buffer.size() + _size ;
 		array = new float[length] ;
@@ -24,16 +24,23 @@ public class FloatBuffer implements IFloatBuffer
 		}
 	}
 
-	@Override
-	public IFloatBuffer allocate( final int _size )
+	public static FloatBuffer allocate( final int _size )
 	{
 		return new FloatBuffer( _size ) ;
 	}
 
-	@Override
-	public IFloatBuffer expand( final IFloatBuffer _buffer, final int _size )
+	public static FloatBuffer expand( final FloatBuffer _buffer, final int _size )
 	{
 		return new FloatBuffer( _buffer, _size ) ;
+	}
+
+	public static void copy( final FloatBuffer _from, final FloatBuffer _to )
+	{
+		final int size = _from.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			_to.set( i, _from.get( i ) ) ;
+		}
 	}
 
 	@Override
@@ -127,7 +134,7 @@ public class FloatBuffer implements IFloatBuffer
 	}
 
 	@Override
-	public float multiply( final int _lhs, final IFloatBuffer _buffer, final int _rhs )
+	public float multiply( final int _lhs, final FloatBuffer _buffer, final int _rhs )
 	{
 		return array[_lhs] * _buffer.get( _rhs ) ;
 	}

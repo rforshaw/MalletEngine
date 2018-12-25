@@ -15,9 +15,9 @@ public abstract class BasicRenderer implements IRender
 	private final EventController controller = new EventController() ;
 	private final List<Runnable> executions = MalletList.<Runnable>newList() ;
 
-	protected float drawDT   = 0.0f ;
-	protected float updateDT = 0.0f ;
-	protected int renderIter = 0 ;
+	private float drawDT   = 1.0f ;
+	private float updateDT = 1.0f ;
+	private int renderIter = 0 ;
 
 	public BasicRenderer() {}
 
@@ -63,6 +63,21 @@ public abstract class BasicRenderer implements IRender
 			}
 			executions.clear() ;
 		}
+	}
+
+	public float getUpdateDeltaTime()
+	{
+		return updateDT ;
+	}
+	
+	public int getFrameIteration()
+	{
+		return renderIter ;
+	}
+
+	public float getFrameDeltaTime()
+	{
+		return drawDT ;
 	}
 
 	@Override

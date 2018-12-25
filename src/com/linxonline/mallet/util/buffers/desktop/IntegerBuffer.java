@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.buffers.desktop ;
+package com.linxonline.mallet.util.buffers ;
 
 import com.linxonline.mallet.util.buffers.IIntegerBuffer ;
 
@@ -6,12 +6,12 @@ public class IntegerBuffer implements IIntegerBuffer
 {
 	private int[] array ;
 
-	public IntegerBuffer( final int _size )
+	private IntegerBuffer( final int _size )
 	{
 		array = new int[_size] ;
 	}
 
-	public IntegerBuffer( final IIntegerBuffer _buffer, final int _size )
+	private IntegerBuffer( final IntegerBuffer _buffer, final int _size )
 	{
 		final int length = _buffer.size() + _size ;
 		array = new int[length] ;
@@ -22,14 +22,12 @@ public class IntegerBuffer implements IIntegerBuffer
 		}
 	}
 
-	@Override
-	public IIntegerBuffer allocate( final int _size )
+	public static IntegerBuffer allocate( final int _size )
 	{
 		return new IntegerBuffer( _size ) ;
 	}
 
-	@Override
-	public IIntegerBuffer expand( final IIntegerBuffer _buffer, final int _size )
+	public static IntegerBuffer expand( final IntegerBuffer _buffer, final int _size )
 	{
 		return new IntegerBuffer( _buffer, _size ) ;
 	}

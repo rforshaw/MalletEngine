@@ -10,8 +10,6 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.io.formats.json.desktop.* ;
-
 /**
 	Provides access to the filesystem on desktop platforms.
 	This currently includes: Linux, Windows, & Mac.
@@ -20,21 +18,7 @@ public class DesktopFileSystem implements FileSystem
 {
 	private final Map<String, ZipPath> mapZip = MalletMap.<String, ZipPath>newMap() ;
 
-	public DesktopFileSystem()
-	{
-		initJSONConstructors() ;
-	}
-
-	/**
-		Allows reading and parsing JSON formatted files.
-		Mallet Engine provides a wrapper around a platform 
-		JSON library.
-	*/
-	protected void initJSONConstructors()
-	{
-		DesktopJSONObject.init() ;
-		DesktopJSONArray.init() ;
-	}
+	public DesktopFileSystem() {}
 
 	/**
 		Search through the directory mapping out compressed 

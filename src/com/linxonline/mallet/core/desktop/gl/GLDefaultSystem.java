@@ -26,12 +26,6 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 												 EventSystem,
 												 GameSystem>
 {
-	static
-	{
-		IntegerBuffer.setBase( new com.linxonline.mallet.util.buffers.desktop.IntegerBuffer( 0 ) ) ;
-		FloatBuffer.setBase( new com.linxonline.mallet.util.buffers.desktop.FloatBuffer( 0 ) ) ;
-	}
-
 	protected final EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()

@@ -5,9 +5,6 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public interface IFloatBuffer
 {
-	public IFloatBuffer allocate( final int _size ) ;
-	public IFloatBuffer expand( final IFloatBuffer _buffer, final int _size ) ;
-
 	public int size() ;
 
 	public float set( final int _index, final float _val ) ;
@@ -26,7 +23,7 @@ public interface IFloatBuffer
 	public float multiply( final int _lhs, final float _val ) ;
 	public float multiply( final int _lhs, final int _rhs ) ;
 	public float multiply( final int _lhs, final int _mhs, final int _rhs ) ;
-	public float multiply( final int _lhs, final IFloatBuffer _buffer, final int _rhs ) ;
+	public float multiply( final int _lhs, final FloatBuffer _buffer, final int _rhs ) ;
 
 	public void divide( final int _lhs, final float _val ) ;
 }

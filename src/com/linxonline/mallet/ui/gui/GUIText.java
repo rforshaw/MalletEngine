@@ -9,7 +9,7 @@ public class GUIText extends GUIComponent
 	protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
 
-	private final StringBuilder text = new StringBuilder() ;
+	private final StringBuilder text ;
 	private MalletFont font ;
 	private MalletColour colour = MalletColour.white() ;
 
@@ -17,12 +17,19 @@ public class GUIText extends GUIComponent
 
 	public GUIText( final Meta _meta, final UIElement _parent )
 	{
+		this( _meta, new StringBuilder(), _parent ) ;
+	}
+
+	public GUIText( final Meta _meta, final StringBuilder _text, final UIElement _parent )
+	{
 		super( _meta, _parent ) ;
 		setLayerOffset( 1 ) ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
 
+		text = _text ;
 		text.append( _meta.getText() ) ;
+
 		font = _meta.getFont() ;
 		colour = _meta.getColour( colour ) ;
 	}
@@ -106,7 +113,7 @@ public class GUIText extends GUIComponent
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
 			DrawAssist.amendTextStart( drawText, 0 ) ;
-			DrawAssist.amendTextEnd( drawText, text.length()/*font.stringIndexWidth( text, length.x )*/ ) ;
+			DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
 			DrawAssist.amendOrder( drawText, getLayer() ) ;
 			DrawAssist.forceUpdate( drawText ) ;
 		}

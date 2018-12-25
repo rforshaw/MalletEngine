@@ -11,6 +11,8 @@ public interface FileStream extends Close
 	public ByteOutStream getByteOutStream() ;
 	public StringOutStream getStringOutStream() ;
 
+	public boolean create() ;
+
 	/**
 		Copy the File Stream to the requested location.
 		This should only work if the File Stream is a file.

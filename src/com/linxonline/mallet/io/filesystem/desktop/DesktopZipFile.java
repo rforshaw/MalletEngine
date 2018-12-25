@@ -107,6 +107,14 @@ public class DesktopZipFile implements FileStream
 	}
 
 	/**
+		Cannot create new files into a zip file.
+	*/
+	public boolean create()
+	{
+		return false ;
+	}
+
+	/**
 		Copy the File Stream to the requested location.
 		This should only work if the File Stream is a file.
 	*/

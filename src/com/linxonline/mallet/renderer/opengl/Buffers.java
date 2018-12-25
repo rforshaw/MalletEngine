@@ -4,9 +4,6 @@ import java.util.List ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 
-import com.linxonline.mallet.util.buffers.IFloatBuffer ;
-import com.linxonline.mallet.util.buffers.IIntegerBuffer ;
-
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.OrderedInsert ;
@@ -78,7 +75,7 @@ public class Buffers<T, U>
 
 		// There is no existing buffer that can meet the requested allocations
 		// so we need to create a new buffer!
-		System.out.println( "Create new Location Buffer" ) ;
+		//System.out.println( "Create new Location Buffer" ) ;
 		final LocationBuffer<T, U> buffer = new LocationBuffer<T, U>( maxIndex, maxVertex ) ;
 		listener.allocated( buffer, _user ) ;
 
