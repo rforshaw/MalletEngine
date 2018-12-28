@@ -1,8 +1,6 @@
 package com.linxonline.mallet.io.writer ;
 
 import java.util.Collection ;
-import java.io.* ;
-
 import com.linxonline.mallet.io.filesystem.* ;
 
 public final class WriteFile
@@ -25,7 +23,7 @@ public final class WriteFile
 			stream.writeLine( line ) ;
 		}
 
-		return stream.close() ;
+		return _file.close( stream ) ;
 	}
 
 	public static final boolean write( final String _file, final String _data )

@@ -5,7 +5,7 @@ import android.util.DisplayMetrics ;
 
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.core.AbstractStarter ;
+import com.linxonline.mallet.core.IStarter ;
 import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
@@ -38,7 +38,7 @@ import com.linxonline.mallet.renderer.android.GL.* ;
 import com.linxonline.mallet.ui.UI ;
 import com.linxonline.mallet.ui.UIRatio ;
 
-public class AndroidStarter extends AbstractStarter
+public class AndroidStarter extends IStarter
 {
 	private final AndroidActivity activity ;
 
@@ -54,6 +54,8 @@ public class AndroidStarter extends AbstractStarter
 						   final IGameLoader _loader )
 	{
 		super( _system, _loader ) ;
+		IStarter.init( this ) ;
+
 		activity = _activity ;
 	}
 

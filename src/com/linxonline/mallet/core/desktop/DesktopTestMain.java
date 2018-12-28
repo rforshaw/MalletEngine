@@ -8,8 +8,6 @@ import com.linxonline.mallet.core.test.GameTestLoader ;
 /*===========================================*/
 public final class DesktopTestMain
 {
-	private DesktopTestMain() {}
-
 	public static void main( final String _args[] )
 	{
 		final DesktopStarter starter = new DesktopStarter( new GameTestLoader() ) ;

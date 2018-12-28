@@ -2,7 +2,7 @@ package com.linxonline.mallet.core.desktop ;
 
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.core.AbstractStarter ;
+import com.linxonline.mallet.core.IStarter ;
 import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
@@ -31,7 +31,7 @@ import com.linxonline.mallet.ui.UIRatio ;
 	Handles the initialisation & loading stage for 
 	desktop platforms.
 */
-public class DesktopStarter extends AbstractStarter
+public class DesktopStarter extends IStarter
 {
 	protected Thread thread ;
 
@@ -43,9 +43,16 @@ public class DesktopStarter extends AbstractStarter
 	public DesktopStarter( final ISystem _main, final IGameLoader _loader )
 	{
 		super( _main, _loader ) ;
-		setRenderSettings( _main ) ;
-		
-		final ShutdownDelegate delegate = _main.getShutdownDelegate() ;
+		init() ;
+	}
+
+	public void init()
+	{
+		IStarter.init( this ) ;
+		DesktopStarter.setRenderSettings( this ) ;
+
+		final ISystem main = getMainSystem() ;
+		final ShutdownDelegate delegate = main.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{
 			public void shutdown()
@@ -55,7 +62,7 @@ public class DesktopStarter extends AbstractStarter
 			}
 		} ) ;
 	}
-
+	
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;
@@ -108,37 +115,28 @@ public class DesktopStarter extends AbstractStarter
 		Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
 		Uses the configuration file loaded above to set the rendering system.
 	*/
-	public void setRenderSettings( final ISystem _system )
+	public static void setRenderSettings( final IStarter _starter )
 	{
-		final GameSettings game = getGameSettings() ;
+		final ISystem main = _starter.getMainSystem() ;
+		final GameSettings game = _starter.getGameLoader().getGameSettings() ;
 
 		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", game.getWindowWidth() ) ;
 		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", game.getWindowHeight() ) ;
 
 		final DesktopDisplay desktop = new DesktopDisplay() ;
-
 		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
 		{
 			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
 			displayWidth = screen.getWidth() ;
 			displayHeight = screen.getHeight() ;
-
-			//System.out.println( desktop.getScreens()[0] ) ;
-			//System.out.println( "Display: " + displayWidth + " " + displayHeight ) ;
 		}
+
+		final IRender render = main.getRenderer() ;
+		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", game.getRenderWidth() ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", game.getRenderHeight() ) ;
-
-		//System.out.println( "Render Settings: " + renderWidth + " " + renderHeight ) ;
-		//System.out.println( "Settings Display: " + displayWidth + " " + displayHeight ) ;
-
-		final IRender render = _system.getRenderer() ;
-		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 		updateRenderDimensions( renderWidth, renderHeight ) ;
-
-		//final RenderInfo info = render.getRenderInfo() ;
-		//info.setKeepRenderRatio( GlobalConfig.getBoolean( "KEEPRATIO", true ) ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
 

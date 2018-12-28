@@ -24,19 +24,10 @@ public class EditorStarter extends DesktopStarter
 		super( new GLDefaultSystem(), new EditorLoader() ) ;
 	}
 
-	/**
-		Set the Rendering Systems initial Display, Render Dimensions, & Camera position.
-		Uses the configuration file loaded above to set the rendering system.
-	*/
 	@Override
-	public void setRenderSettings( final ISystem _system )
+	public void init()
 	{
-		super.setRenderSettings( _system ) ;
-		final IRender render = _system.getRenderer() ;
-
-		// Override config setting and prevent ratio from being adhered to
-		// Force Display and Render size parity.
-		//render.getRenderInfo().setKeepRenderRatio( false ) ;
+		super.init() ;
 		GlobalConfig.addBoolean( "DISPLAYRENDERPARITY", true ) ;
 	}
 }

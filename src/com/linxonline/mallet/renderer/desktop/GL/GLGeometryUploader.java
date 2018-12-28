@@ -748,17 +748,25 @@ public class GLGeometryUploader
 		final Location.Range indexRange = _location.getIndex() ;
 		if( calculateIndexByteSize( draw ) != indexRange.size() )
 		{
+			//System.out.println( "Incorrect Index Range." ) ;
 			return false ;
 		}
 
 		final Location.Range vertRange = _location.getVertex() ;
 		if( calculateVertexByteSize( draw ) != vertRange.size() )
 		{
+			//System.out.println( "Incorrect Vertex Range." ) ;
 			return false ;
 		}
 
 		final BufferObject buffer = _location.getBufferData() ;
-		return buffer.isSupported( draw ) ;
+		if( buffer.isSupported( draw ) == false )
+		{
+			//System.out.println( "Buffer no longer supported." ) ;
+			return false ;
+		}
+
+		return true ;
 	}
 
 	private static int calculateIndexByteSize( final GLDrawData _user )

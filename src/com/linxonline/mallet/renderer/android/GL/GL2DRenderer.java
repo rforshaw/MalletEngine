@@ -69,12 +69,6 @@ public class GL2DRenderer implements IRender,
 			//System.out.println( "Render parity width: " + renderWidth + " height: " + renderHeight ) ;
 		}
 
-		GlobalConfig.addInteger( "DISPLAYWIDTH", _width ) ;
-		GlobalConfig.addInteger( "DISPLAYHEIGHT", _height ) ;
-
-		GlobalConfig.addInteger( "RENDERWIDTH", renderWidth ) ;
-		GlobalConfig.addInteger( "RENDERHEIGHT", renderHeight ) ;
-
 		setDisplayDimensions( _width, _height ) ;
 		final World world = WorldAssist.getDefaultWorld() ;
 		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;

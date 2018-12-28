@@ -7,6 +7,9 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.io.filesystem.FileSystem ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Basic implementation of the System Interface.
@@ -32,7 +35,7 @@ public abstract class BasicSystem<F extends FileSystem,
 	private final E eventSystem ;
 	private final I inputSystem ;
 	private final F fileSystem ;
-	
+
 	private final G gameSystem ;
 
 	public BasicSystem( final S _shutdown,
@@ -50,6 +53,21 @@ public abstract class BasicSystem<F extends FileSystem,
 		inputSystem = _input ;
 		fileSystem = _fileSystem ;
 		gameSystem = _gameSystem ;
+
+		initFileSystem() ;
+	}
+
+	private void initFileSystem()
+	{
+		Logger.println( "Finalising filesystem.", Logger.Verbosity.MINOR ) ;
+		GlobalFileSystem.setFileSystem( fileSystem ) ;
+
+		Logger.println( "Mapping Base directory.", Logger.Verbosity.MINOR ) ;
+		if( GlobalFileSystem.mapDirectory( "base" ) == false )				// Map base-folder for faster access
+		{
+			Logger.println( "Failed to map base directory.", Logger.Verbosity.MINOR ) ;
+		}
+
 	}
 
 	@Override

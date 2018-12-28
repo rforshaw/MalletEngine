@@ -129,14 +129,14 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	private void changeTexture( final Draw _draw, final Sprite _sprite )
 	{
-		final Sprite.Frame p = sprite.getFrame( prevFrame ) ;		// Grab the previous frame
-		final Sprite.Frame c = sprite.getFrame( currFrame ) ;		// Grab the current frame
+		final Sprite.Frame p = _sprite.getFrame( prevFrame ) ;		// Grab the previous frame
+		final Sprite.Frame c = _sprite.getFrame( currFrame ) ;		// Grab the current frame
 
 		if( prevFrame == currFrame || p.path.equals( c.path ) == false )
 		{
 			// We only want to remap the programs texture 
 			// if the sprite is not using a spritesheet.
-			ProgramAssist.map( DrawAssist.getProgram( draw ), "inTex0", c.path ) ;
+			ProgramAssist.map( DrawAssist.getProgram( _draw ), "inTex0", c.path ) ;
 		}
 
 		// If using a sprite sheet the UV coordinates 

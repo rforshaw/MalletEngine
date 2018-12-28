@@ -49,48 +49,17 @@ public class BufferedList<T>
 
 	public synchronized void add( final T _data )
 	{
-		tasks.add( new Task()
-		{
-			@Override
-			public void execute()
-			{
-				current.add( _data ) ;
-				addListener.add( _data ) ;
-			}
-		} ) ;
+		tasks.add( new AddTask( _data ) ) ;
 	}
 
 	public synchronized void remove( final T _data )
 	{
-		tasks.add( new Task()
-		{
-			@Override
-			public void execute()
-			{
-				if( current.remove( _data ) == true )
-				{
-					removeListener.remove( _data ) ;
-				}
-			}
-		} ) ;
+		tasks.add( new RemoveTask( _data ) ) ;
 	}
 
 	public synchronized void insert( final T _data, final int _index )
 	{
-		tasks.add( new Task()
-		{
-			@Override
-			public void execute()
-			{
-				if( _index < current.size() )
-				{
-					current.add( _index, _data ) ;
-					return ;
-				}
-
-				current.add( _data ) ;
-			}
-		} ) ;
+		tasks.add( new InsertTask( _data, _index ) ) ;
 	}
 
 	public List<T> getCurrentData()
@@ -118,6 +87,66 @@ public class BufferedList<T>
 	private interface Task
 	{
 		public void execute() ;
+	}
+
+	private class AddTask implements Task
+	{
+		private final T data ;
+
+		public AddTask( final T _data )
+		{
+			data = _data ;
+		}
+
+		@Override
+		public void execute()
+		{
+			current.add( data ) ;
+			addListener.add( data ) ;
+		}
+	}
+
+	private class RemoveTask implements Task
+	{
+		private final T data ;
+
+		public RemoveTask( final T _data )
+		{
+			data = _data ;
+		}
+
+		@Override
+		public void execute()
+		{
+			if( current.remove( data ) == true )
+			{
+				removeListener.remove( data ) ;
+			}
+		}
+	}
+
+	private class InsertTask implements Task
+	{
+		private final T data ;
+		private final int index ;
+
+		public InsertTask( final T _data, final int _index )
+		{
+			data = _data ;
+			index = _index ;
+		}
+
+		@Override
+		public void execute()
+		{
+			if( index < current.size() )
+			{
+				current.add( index, data ) ;
+				return ;
+			}
+
+			current.add( data ) ;
+		}
 	}
 
 	public interface RemoveListener<T>

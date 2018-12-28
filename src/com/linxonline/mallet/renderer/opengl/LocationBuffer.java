@@ -102,6 +102,8 @@ public class LocationBuffer<T, U> implements ISort
 	*/
 	public Location<T, U> allocate( final int _indexBytesSize, final int _vertexByteSize, final U _user )
 	{
+		// Ensure the buffer is supported and enough space is available to 
+		// make the allocation.
 		final int endByteIndex = currentByteIndex + _indexBytesSize ;
 		final int endByteVertex = currentByteVertex + _vertexByteSize ;
 		if( endByteIndex >= maxByteIndex ||
