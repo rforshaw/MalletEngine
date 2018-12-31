@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.time ;
 
-public class DefaultTimer implements TimerInterface
+public class DefaultTimer implements ITimer
 {
 	private long oldTime = System.nanoTime() ;
 	private long currentTime = System.nanoTime() ;

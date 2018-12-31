@@ -76,4 +76,10 @@ public class Box2D extends Hull
 
 		return ( max - min ) * 0.5f ;
 	}
+
+	@Override
+	public AABB getAABB()
+	{
+		return aabb ;
+	}
 }

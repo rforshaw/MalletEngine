@@ -86,10 +86,9 @@ public final class StateMachine
 	private final void checkTransition( final State _state )
 	{
 		final int transition = _state.checkTransition() ;
-		Settings pack = null ;
-		
 		if( transition != State.NONE )
 		{
+			Settings pack = null ;
 			final String name = _state.getTransition() ;
 			if( exists( name ) == false )
 			{

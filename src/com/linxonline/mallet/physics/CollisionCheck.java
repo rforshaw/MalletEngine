@@ -35,6 +35,11 @@ public final class CollisionCheck
 	*/
 	public final boolean generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
+		if( _box1.getAABB().intersectAABB( _box2.getAABB() ) == false )
+		{
+			return false ;
+		}
+
 		_box1.getAbsoluteCenter( boxCenter1 ) ;
 		_box2.getAbsoluteCenter( boxCenter2 ) ;
 

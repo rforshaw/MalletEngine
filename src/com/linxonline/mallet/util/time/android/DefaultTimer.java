@@ -1,24 +1,19 @@
-package com.linxonline.mallet.util.time.web ;
+package com.linxonline.mallet.util.time ;
 
-import org.teavm.jso.* ;
-import org.teavm.jso.browser.* ;
-
-import com.linxonline.mallet.util.time.* ;
-
-public class WebTimer implements TimerInterface
+public class DefaultTimer implements ITimer
 {
-	private long oldTime = ( long )Performance.now() ;
-	private long currentTime = ( long )Performance.now() ;
+	private long oldTime = System.nanoTime() ;
+	private long currentTime = System.nanoTime() ;
 	private long totalTimeSeconds = 0 ;
 	private double nanoseconds = 0.0f ;
 	private double seconds = 0.0f ;
 
-	public WebTimer() {}
+	public DefaultTimer() {}
 
 	@Override
 	public final double getElapsedTimeInNanoSeconds()
 	{
-		nanoseconds = ( double )getLongElapsedTime() * 0.001 ;
+		nanoseconds = ( double )getLongElapsedTime() * 0.000000001 ;
 		seconds += nanoseconds ;		// Accumulate the nanoseconds
 		while( seconds >= 1.0f )		// Once it reaches atleast 1 second store it 
 		{
@@ -44,13 +39,13 @@ public class WebTimer implements TimerInterface
 	@Override
 	public long nanoTime()
 	{
-		return ( long )Performance.now() ;
+		return System.nanoTime() ;
 	}
 
 	private final long getLongElapsedTime()
 	{
 		oldTime = currentTime ;
-		currentTime = ( long )Performance.now() ;
+		currentTime = System.nanoTime() ;
 
 		return currentTime - oldTime ;
 	}

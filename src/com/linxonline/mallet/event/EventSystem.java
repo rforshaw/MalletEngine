@@ -292,8 +292,7 @@ public final class EventSystem implements IEventSystem
 
 		public void update()
 		{
-			messenger.swap() ;
-			final List<Event<?>> events = messenger.getActiveList() ;
+			final List<Event<?>> events = messenger.swap() ;
 			if( events.isEmpty() )
 			{
 				// There are no events to pass to handlers
@@ -329,11 +328,6 @@ public final class EventSystem implements IEventSystem
 			return ( _type != null && _type == name ) ;
 		}
 
-		public int size()
-		{
-			return messenger.size() ;
-		}
-		
 		public void clearHandlers()
 		{
 			handlers.clear() ;

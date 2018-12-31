@@ -6,6 +6,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.entity.Entity ;
 
 import com.linxonline.mallet.physics.* ;
+import com.linxonline.mallet.physics.primitives.AABB ;
 
 public abstract class Hull
 {
@@ -96,7 +97,9 @@ public abstract class Hull
 
 	public abstract void getAbsoluteCenter( final Vector2 _center ) ;
 	public abstract float projectToAxis( final Vector2 _axis ) ;
-	
+
+	public abstract AABB getAABB() ;
+
 	public final void setCollidable( final boolean _collidable )
 	{
 		collidable = _collidable ;

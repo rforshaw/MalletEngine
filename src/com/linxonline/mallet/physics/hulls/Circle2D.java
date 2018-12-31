@@ -1,6 +1,7 @@
 package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.physics.primitives.AABB ;
 import com.linxonline.mallet.physics.primitives.Circle ;
 
 public class Circle2D extends Hull
@@ -48,5 +49,11 @@ public class Circle2D extends Hull
 	public float projectToAxis( final Vector2 _axis )
 	{
 		return -1.0f ;
+	}
+
+	@Override
+	public AABB getAABB()
+	{
+		return null ;
 	}
 }

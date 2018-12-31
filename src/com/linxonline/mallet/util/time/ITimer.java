@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.time ;
 
-public interface TimerInterface
+public interface ITimer
 {
 	public double getElapsedTimeInNanoSeconds() ;
 

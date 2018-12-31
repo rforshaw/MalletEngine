@@ -76,7 +76,7 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.SINGLE ) ;
+		this( _name, Threaded.MULTI ) ;
 	}
 
 	public GameState( final String _name, final Threaded _type )
@@ -321,6 +321,7 @@ public class GameState extends State
 	{
 		currentUpdate = new IUpdate()
 		{
+			private double deltaUpdateTime = 0.0 ;
 			private double deltaRenderTime = 0.0 ;
 
 			@Override
@@ -340,7 +341,7 @@ public class GameState extends State
 					internalController.update() ;
 					externalController.update() ;
 
-					showFPS.update( deltaRenderTime ) ;
+					showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
 
 					collisionSystem.update( DEFAULT_TIMESTEP ) ;
 					entitySystem.update( DEFAULT_TIMESTEP ) ;
@@ -352,10 +353,10 @@ public class GameState extends State
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				final double total = ( endTime - startTime ) * 0.000000001 ;
+				deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
 
-				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( total + renderAccumulator ) ) * 1000.0 ) ;	// Convert to milliseconds
-				//System.out.println( "Total: " + total + " FPS: " + DEFAULT_FRAMERATE ) ;
+				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaUpdateTime + renderAccumulator ) ) * 1000.0 ) ;	// Convert to milliseconds
+				//System.out.println( "Total: " + deltaUpdateTime + " FPS: " + DEFAULT_FRAMERATE ) ;
 
 				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ;
 				if( renderAccumulator >= DEFAULT_FRAMERATE )
@@ -434,7 +435,7 @@ public class GameState extends State
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
 
-				showFPS.update( _dt ) ;
+				showFPS.update( _dt, _dt ) ;
 				animationSystem.update( DEFAULT_FRAMERATE ) ;
 				system.draw( DEFAULT_FRAMERATE ) ;
 				renderAccumulator -= DEFAULT_FRAMERATE ;
@@ -563,7 +564,11 @@ public class GameState extends State
 					public void callback( final DrawDelegate _delegate )
 					{
 						delegate = _delegate ;
-						delegate.addTextDraw( showFPS.getDraw() ) ;
+						final Draw[] draws = showFPS.getDraws() ;
+						for( final Draw draw : draws )
+						{
+							delegate.addTextDraw( draw ) ;
+						}
 					}
 				} ) ) ;
 			}
@@ -613,18 +618,25 @@ public class GameState extends State
 	private static class ShowFPS
 	{
 		private boolean show = false ;
-		private final StringBuilder txt = new StringBuilder( "0" ) ;
-		private final Draw draw = DrawAssist.createTextDraw( txt,
-															new MalletFont( "Arial" ),
-															new Vector3(),
-															new Vector3(),
-															new Vector3(),
-															new Vector3( 1.0f, 1.0f, 1.0f ),
-															200 ) ;
+		private final Draw[] draws = new Draw[] { DrawAssist.createTextDraw( new StringBuilder( "0" ),
+																	new MalletFont( "Arial" ),
+																	new Vector3(),
+																	new Vector3(),
+																	new Vector3(),
+																	new Vector3( 1.0f, 1.0f, 1.0f ),
+																	200 ),
+												   DrawAssist.createTextDraw( new StringBuilder( "0" ),
+																	new MalletFont( "Arial" ),
+																	new Vector3( 0.0f, 20.0f, 0.0f ),
+																	new Vector3(),
+																	new Vector3(),
+																	new Vector3( 1.0f, 1.0f, 1.0f ),
+																	200 ) } ;
 
 		public ShowFPS()
 		{
-			DrawAssist.amendUI( draw, true ) ;
+			DrawAssist.amendUI( draws[0], true ) ;
+			DrawAssist.amendUI( draws[1], true ) ;
 		}
 
 		public void setShow( final boolean _show )
@@ -637,23 +649,42 @@ public class GameState extends State
 			return show ;
 		}
 
-		public void update( final double _dt )
+		public void update( final double _dtRender, final double _dtUpdate )
 		{
 			if( show == true )
 			{
-				txt.setLength( 0 ) ;
-				txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
-				//System.out.println( "FPS: " + txt ) ;
-
-				DrawAssist.amendTextStart( draw, 0 ) ;
-				DrawAssist.amendTextEnd( draw, txt.length() ) ;
-				DrawAssist.forceUpdate( draw ) ;
+				updateDrawFPS( draws[0], _dtRender ) ;
+				updateDrawMS( draws[1], _dtUpdate ) ;
 			}
 		}
 
-		public Draw getDraw()
+		private void updateDrawFPS( final Draw _draw, final double _dt )
 		{
-			return draw ;
+			final StringBuilder txt = DrawAssist.getText( _draw ) ;
+			txt.setLength( 0 ) ;
+			txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
+			txt.append( "fps" ) ;
+
+			DrawAssist.amendTextStart( _draw, 0 ) ;
+			DrawAssist.amendTextEnd( _draw, txt.length() ) ;
+			DrawAssist.forceUpdate( _draw ) ;
+		}
+
+		private void updateDrawMS( final Draw _draw, final double _dt )
+		{
+			final StringBuilder txt = DrawAssist.getText( _draw ) ;
+			txt.setLength( 0 ) ;
+			txt.insert( 0, ( int )( _dt * 1000.0 ) ) ;
+			txt.append( "ms" ) ;
+
+			DrawAssist.amendTextStart( _draw, 0 ) ;
+			DrawAssist.amendTextEnd( _draw, txt.length() ) ;
+			DrawAssist.forceUpdate( _draw ) ;
+		}
+
+		public Draw[] getDraws()
+		{
+			return draws ;
 		}
 	}
 }

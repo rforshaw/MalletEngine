@@ -92,8 +92,7 @@ public class EventController implements IEventHandler
 	*/
 	public void update()
 	{
-		messenger.swap() ;
-		final List<Event<?>> events = messenger.getActiveList() ;
+		final List<Event<?>> events = messenger.swap() ;
 		if( events.isEmpty() )
 		{
 			return ;

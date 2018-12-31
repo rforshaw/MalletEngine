@@ -19,24 +19,14 @@ public final class SwapList<T>
 
 	public SwapList() {}
 	
-	public final void add( final T _t )
+	public void add( final T _t )
 	{
 		newEvents.add( _t ) ;
 	}
 
-	public final T getAt( final int _index )
+	public int size()
 	{
-		return active.get( _index ) ;
-	}
-	
-	public final List<T> getActiveList()
-	{
-		return active ;
-	}
-
-	public final int size()
-	{
-		return active.size() ;
+		return active.size() + newEvents.size() ;
 	}
 
 	public boolean isEmpty()
@@ -46,8 +36,9 @@ public final class SwapList<T>
 
 	/**
 		Swap the buffers and clear the old active buffer.
+		Return the new active list.
 	**/
-	public final void swap()
+	public List<T> swap()
 	{
 		if( active.isEmpty() == false )
 		{
@@ -60,9 +51,11 @@ public final class SwapList<T>
 			active = newEvents ;
 			newEvents = oldEvents ;
 		}
+		
+		return active ;
 	}
 
-	public final void clear()
+	public void clear()
 	{
 		newEvents.clear() ;
 		active.clear() ;
