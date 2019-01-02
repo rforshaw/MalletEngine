@@ -64,7 +64,10 @@ public class GUITick extends GUIDraw
 
 	public static class Meta extends GUIDraw.Meta
 	{
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getType()

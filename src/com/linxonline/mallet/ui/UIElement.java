@@ -1411,6 +1411,10 @@ public class UIElement implements InputHandler, Connect.Connection
 		*/
 		public void shutdown()
 		{
+			for( UIElement.MetaComponent component : components )
+			{
+				component.shutdown() ;
+			}
 			UIElement.disconnect( this ) ;
 		}
 
@@ -1654,42 +1658,57 @@ public class UIElement implements InputHandler, Connect.Connection
 		Meta Component to build these components for their 
 		associated meta element.
 	*/
-	public static abstract class MetaComponent implements Connect.Connection
+	public static abstract class MetaComponent extends UIAbstractModel implements Connect.Connection
 	{
-		private String name = "" ;
-		private String group = "" ;
-
-		private final Connect.Signal nameChanged  = new Connect.Signal() ;
-		private final Connect.Signal groupChanged = new Connect.Signal() ;
+		private final UIVariant name     = new UIVariant( "NAME",     "",    new Connect.Signal() ) ;
+		private final UIVariant group    = new UIVariant( "GROUP",    "",    new Connect.Signal() ) ;
 
 		private final Connect connect = new Connect() ;
 
+		public MetaComponent()
+		{
+			int row = rowCount( root() ) ;
+			createData( null, row + 2, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), name,  UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), group, UIAbstractModel.Role.User ) ;
+		}
+		
 		public void setName( final String _name )
 		{
-			if( _name != null && name.equals( _name ) == false )
+			if( _name != null && name.toString().equals( _name ) == false )
 			{
-				name = _name ;
-				UIElement.signal( this, nameChanged() ) ;
+				name.setString( _name ) ;
+				UIElement.signal( this, name.getSignal() ) ;
 			}
 		}
 
 		public void setGroup( final String _group )
 		{
-			if( _group != null && group.equals( _group ) == false )
+			if( _group != null && group.toString().equals( _group ) == false )
 			{
-				group = _group ;
-				UIElement.signal( this, groupChanged() ) ;
+				group.setString( _group ) ;
+				UIElement.signal( this, group.getSignal() ) ;
 			}
 		}
 
 		public String getName()
 		{
-			return name ;
+			return name.toString() ;
 		}
 
 		public String getGroup()
 		{
-			return group ;
+			return group.toString() ;
+		}
+
+		/**
+			Remove all connections made to this packet.
+			Should only be called by the instance's owner.
+		*/
+		public void shutdown()
+		{
+			UIElement.disconnect( this ) ;
 		}
 
 		@Override
@@ -1700,12 +1719,12 @@ public class UIElement implements InputHandler, Connect.Connection
 
 		public Connect.Signal nameChanged()
 		{
-			return nameChanged ;
+			return name.getSignal() ;
 		}
 
 		public Connect.Signal groupChanged()
 		{
-			return groupChanged ;
+			return group.getSignal() ;
 		}
 
 		public abstract String getType() ;

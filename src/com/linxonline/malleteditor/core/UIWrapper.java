@@ -252,6 +252,38 @@ public class UIWrapper extends UIElement
 		return false ;
 	}
 
+	public boolean insertMetaComponent( final UIElement.MetaComponent _meta, final float _x, final float _y )
+	{
+		// We can only insert further packets if
+		// the Wrapper contains a meta that supports
+		// child elements - this should extend UILayout.
+		if( intersectPoint( _x, _y ) == false )
+		{
+			return false ;
+		}
+
+		if( meta.supportsChildren() == true )
+		{
+			// If the meta does support children then 
+			// attempt to insert the meta into any of 
+			// the currently added children... It will 
+			// return true if the meta is appropriate.
+			final int size = children.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIWrapper wrapper = children.get( i ) ;
+				if( wrapper.insertMetaComponent( _meta, _x, _y ) == true )
+				{
+					return true ;
+				}
+			}
+		}
+
+		element.addComponent( GUIGenerator.create( _meta, element ) ) ;
+		meta.addComponent( _meta ) ;
+		return true ;
+	}
+
 	public UIElement.Meta getMeta()
 	{
 		return meta ;

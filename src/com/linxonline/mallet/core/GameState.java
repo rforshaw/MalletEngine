@@ -76,7 +76,7 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.MULTI ) ;
+		this( _name, Threaded.SINGLE ) ;
 	}
 
 	public GameState( final String _name, final Threaded _type )

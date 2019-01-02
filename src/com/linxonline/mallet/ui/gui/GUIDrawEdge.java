@@ -74,11 +74,17 @@ public class GUIDrawEdge extends GUIDraw
 
 	public static class Meta extends GUIDraw.Meta
 	{
-		private float edge = 1.0f ;
+		private final UIVariant edge = new UIVariant( "EDGE", 1.0f, new Connect.Signal() ) ;
 
-		private final Connect.Signal edgeChanged = new Connect.Signal() ;
+		public Meta()
+		{
+			super() ;
 
-		public Meta() {}
+			int row = rowCount( root() ) ;
+			createData( null, row + 1, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), edge, UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getType()
@@ -88,21 +94,21 @@ public class GUIDrawEdge extends GUIDraw
 
 		public void setEdge( final float _edge )
 		{
-			if( Math.abs( edge - _edge ) > 0.001f )
+			if( Math.abs( edge.toFloat() - _edge ) > 0.001f )
 			{
-				edge = _edge ;
-				UIElement.signal( this, edgeChanged() ) ;
+				edge.setFloat( _edge ) ;
+				UIElement.signal( this, edge.getSignal() ) ;
 			}
 		}
 
 		public float getEdge()
 		{
-			return edge ;
+			return edge.toFloat() ;
 		}
 
 		public Connect.Signal edgeChanged()
 		{
-			return edgeChanged ;
+			return edge.getSignal() ;
 		}
 	}
 }

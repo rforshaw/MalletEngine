@@ -174,23 +174,27 @@ public class GUIDraw extends GUIComponent
 
 	public static class Meta extends GUIComponent.Meta
 	{
-		private boolean retainRatio = false ;
-		private UI.Alignment xAlign = UI.Alignment.LEFT ;
-		private UI.Alignment yAlign = UI.Alignment.LEFT ;
+		private final UIVariant retainRatio = new UIVariant( "RETAIN_RATIO", false,                new Connect.Signal() ) ;
+		private final UIVariant xAlign      = new UIVariant( "ALIGNMENT_X",  UI.Alignment.LEFT,    new Connect.Signal() ) ;
+		private final UIVariant yAlign      = new UIVariant( "ALIGNMENT_Y",  UI.Alignment.LEFT,    new Connect.Signal() ) ;
+		private final UIVariant sheet       = new UIVariant( "TEXTURE",      "",                   new Connect.Signal() ) ;
+		private final UIVariant colour      = new UIVariant( "COLOUR",       MalletColour.white(), new Connect.Signal() ) ;
+		private final UIVariant uv          = new UIVariant( "UV",           new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ), new Connect.Signal() ) ;
 
-		private String sheet = "" ;
-		private MalletColour colour = MalletColour.white() ;
-		private UIElement.UV uv = new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ) ;
+		public Meta()
+		{
+			super() ;
 
-		private final Connect.Signal retainRatioChanged = new Connect.Signal() ;
-		private final Connect.Signal xAlignChanged      = new Connect.Signal() ;
-		private final Connect.Signal yAlignChanged      = new Connect.Signal() ;
+			int row = rowCount( root() ) ;
+			createData( null, row + 6, 1 ) ;
 
-		private final Connect.Signal sheetChanged       = new Connect.Signal() ;
-		private final Connect.Signal colourChanged      = new Connect.Signal() ;
-		private final Connect.Signal uvChanged          = new Connect.Signal() ;
-		
-		public Meta() {}
+			setData( new UIModelIndex( root(), row++, 0 ), retainRatio, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), xAlign,      UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), yAlign,      UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), sheet,       UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), colour,      UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), uv,          UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getType()
@@ -200,43 +204,44 @@ public class GUIDraw extends GUIComponent
 
 		public void setRetainRatio( final boolean _retain )
 		{
-			if( retainRatio != _retain )
+			if( retainRatio.toBool() != _retain )
 			{
-				retainRatio = _retain ;
-				UIElement.signal( this, retainRatioChanged() ) ;
+				retainRatio.setBool( _retain ) ;
+				UIElement.signal( this, retainRatio.getSignal() ) ;
 			}
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			if( _x != null && _x != xAlign )
+			if( _x != null && _x != xAlign.toObject( UI.Alignment.class ) )
 			{
-				xAlign = _x ;
-				UIElement.signal( this, xAlignChanged() ) ;
+				xAlign.setObject( _x ) ;
+				UIElement.signal( this, xAlign.getSignal() ) ;
 			}
 
-			if( _y != null && _y != yAlign )
+			if( _y != null && _y != yAlign.toObject( UI.Alignment.class ) )
 			{
-				yAlign = _y ;
-				UIElement.signal( this, yAlignChanged() ) ;
+				yAlign.setObject( _y ) ;
+				UIElement.signal( this, yAlign.getSignal() ) ;
 			}
 		}
 
 		public void setSheet( final String _path )
 		{
-			if( _path != null && sheet.equals( _path ) == false )
+			if( _path != null && sheet.toString().equals( _path ) == false )
 			{
-				sheet = _path ;
-				UIElement.signal( this, sheetChanged() ) ;
+				sheet.setString( _path ) ;
+				UIElement.signal( this, sheet.getSignal() ) ;
 			}
 		}
 
 		public void setColour( final MalletColour _colour )
 		{
-			if( _colour != null && colour.equals( _colour ) == false )
+			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			if( _colour != null && col.equals( _colour ) == false )
 			{
-				colour.changeColour( _colour.toInt() ) ;
-				UIElement.signal( this, colourChanged() ) ;
+				col.changeColour( _colour.toInt() ) ;
+				UIElement.signal( this, colour.getSignal() ) ;
 			}
 		}
 
@@ -250,74 +255,77 @@ public class GUIDraw extends GUIComponent
 		public void setUV( final float _minX, final float _minY,
 						   final float _maxX, final float _maxY )
 		{
-			if( UI.applyVec2( uv.min, _minX, _minY ) || 
-				UI.applyVec2( uv.max, _maxX, _maxY ) )
+			final UIElement.UV temp = uv.toObject( UIElement.UV.class ) ;
+			if( UI.applyVec2( temp.min, _minX, _minY ) || 
+				UI.applyVec2( temp.max, _maxX, _maxY ) )
 			{
-				UIElement.signal( this, uvChanged() ) ;
+				UIElement.signal( this, uv.getSignal() ) ;
 			}
 		}
 
 		public boolean isRetainRatio()
 		{
-			return retainRatio ;
+			return retainRatio.toBool() ;
 		}
 
 		public UI.Alignment getAlignmentX()
 		{
-			return xAlign ;
+			return xAlign.toObject( UI.Alignment.class ) ;
 		}
 
 		public UI.Alignment getAlignmentY()
 		{
-			return yAlign ;
+			return yAlign.toObject( UI.Alignment.class ) ;
 		}
 
 		public String getSheet()
 		{
-			return sheet ;
+			return sheet.toString() ;
 		}
 
 		public MalletColour getColour( final MalletColour _populate )
 		{
-			_populate.changeColour( colour.toInt() ) ;
+			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}
 
 		public UIElement.UV getUV( final UIElement.UV _populate )
 		{
-			_populate.min.setXY( uv.min ) ;
-			_populate.max.setXY( uv.max ) ;
+			final UIElement.UV temp = uv.toObject( UIElement.UV.class ) ;
+			_populate.min.setXY( temp.min ) ;
+			_populate.max.setXY( temp.max ) ;
 			return _populate ;
 		}
 
 		public Connect.Signal retainRatioChanged()
 		{
-			return retainRatioChanged ;
+			return retainRatio.getSignal() ;
 		}
 
 		public Connect.Signal xAlignChanged()
 		{
-			return xAlignChanged ;
+			return xAlign.getSignal() ;
 		}
 
 		public Connect.Signal yAlignChanged()
 		{
-			return yAlignChanged ;
+			return yAlign.getSignal() ;
 		}
 
 		public Connect.Signal sheetChanged()
 		{
-			return sheetChanged ;
+			return sheet.getSignal() ;
 		}
 
 		public Connect.Signal colourChanged()
 		{
-			return colourChanged ;
+			return colour.getSignal() ;
 		}
 
 		public Connect.Signal uvChanged()
 		{
-			return uvChanged ;
+			return uv.getSignal() ;
 		}
 	}
 }

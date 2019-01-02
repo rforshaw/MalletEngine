@@ -84,7 +84,7 @@ public class UISpacer extends UIElement
 
 		public void setAxis( final Axis _axis )
 		{
-			if( _axis.equals( axis.toObject() ) == false )
+			if( _axis.equals( axis.toObject( Axis.class ) ) == false )
 			{
 				axis.setObject( _axis ) ;
 				UIElement.signal( this, axis.getSignal() ) ;

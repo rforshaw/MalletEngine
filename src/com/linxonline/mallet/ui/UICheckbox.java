@@ -79,7 +79,10 @@ public class UICheckbox extends UIElement
 
 	public static class Meta extends UIElement.Meta
 	{
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getElementType()

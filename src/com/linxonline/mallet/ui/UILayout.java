@@ -875,7 +875,7 @@ public class UILayout extends UIElement implements IChildren
 
 	public static class Meta extends UIElement.Meta
 	{
-		private final UIVariant type = new UIVariant( "TYPE", ILayout.Type.VERTICAL, new Connect.Signal() ) ;
+		private final UIVariant type = new UIVariant( "LAYOUT", ILayout.Type.VERTICAL, new Connect.Signal() ) ;
 
 		public Meta()
 		{

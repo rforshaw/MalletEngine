@@ -15,6 +15,7 @@ public class UIList extends UILayout
 {
 	private final FrameBuffer frame ;
 	private Camera externalCamera = CameraAssist.getDefaultCamera() ;
+	private DrawDelegate externalDelegate = null ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
 	private final Vector3 scrollbarLength = new Vector3() ;
@@ -43,13 +44,17 @@ public class UIList extends UILayout
 								 length.x,   length.y,   getLayer() + 1 ) ;
 		initFrameConnections() ;
 
-		setEngageMode( new ScrollSingleEngageComponent( this ) ) ;
-		initScrollInput() ;
-	}
+		UIElement.connect( this, elementShutdown(), new Connect.Slot<UIList>()
+		{
+			@Override
+			public void slot( final UIList _this )
+			{
+				externalDelegate.removeDraw( frame.getFrame() ) ;
+			}
+		} ) ;
 
-	private void initScrollInput()
-	{
 		addComponent( new ScrollInputComponent( this ) ) ;
+		setEngageMode( new ScrollSingleEngageComponent( this ) ) ;
 	}
 
 	private void initFrameConnections()
@@ -141,6 +146,7 @@ public class UIList extends UILayout
 	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
 	{
 		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
+		externalDelegate = _delegate ;
 
 		final List<UIElement.Component> base = getComponentUnit().getComponents() ;
 		final int size = base.size() ;
@@ -149,13 +155,13 @@ public class UIList extends UILayout
 			// Listeners to the UIList will be given the 
 			// DrawDelegate passed in - only children 
 			// will be given the lists DrawDelegate.
-			base.get( i ).passDrawDelegate( _delegate, _world ) ;
+			base.get( i ).passDrawDelegate( externalDelegate, _world ) ;
 		}
 
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
-		_delegate.addBasicDraw( frame.getFrame(), _world ) ;
+		externalDelegate.addBasicDraw( frame.getFrame(), _world ) ;
 	}
 
 	private void passListDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
@@ -587,8 +593,6 @@ public class UIList extends UILayout
 
 	public class ScrollSingleEngageComponent extends SingleEngageComponent
 	{
-		private InputEvent lastInput = null ;
-	
 		public ScrollSingleEngageComponent( final UILayout _parent )
 		{
 			super( _parent ) ;
@@ -616,7 +620,7 @@ public class UIList extends UILayout
 			return "UILIST" ;
 		}
 	}
-	
+
 	private static class ScrollInputComponent extends InputComponent
 	{
 		private final Vector3 position = new Vector3() ;
@@ -748,7 +752,7 @@ public class UIList extends UILayout
 
 			return action ;
 		}
-		
+
 		public UIList getParentList()
 		{
 			return ( UIList )getParent() ;

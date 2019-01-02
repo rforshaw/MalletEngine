@@ -81,13 +81,19 @@ public class GUIPanelDraw extends GUIDraw
 
 	public static class Meta extends GUIDraw.Meta
 	{
-		private UIElement.UV rollover = new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ) ;
-		private UIElement.UV clicked = new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ) ;
+		private final UIVariant rollover = new UIVariant( "ROLLOVER", new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ), new Connect.Signal() ) ;
+		private final UIVariant clicked = new UIVariant( "CLICKED",  new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ), new Connect.Signal() ) ;
 
-		private final Connect.Signal rolloverChanged = new Connect.Signal() ;
-		private final Connect.Signal clickedChanged  = new Connect.Signal() ;
+		public Meta()
+		{
+			super() ;
 
-		public Meta() {}
+			int row = rowCount( root() ) ;
+			createData( null, row + 2, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), rollover, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), clicked,  UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getType()
@@ -116,11 +122,12 @@ public class GUIPanelDraw extends GUIDraw
 		public void setRolloverUV( final float _minX, final float _minY,
 								   final float _maxX, final float _maxY )
 		{
-			final boolean b1 = UI.applyVec2( rollover.min, _minX, _minY ) ;
-			final boolean b2 = UI.applyVec2( rollover.max, _maxX, _maxY ) ;
+			final UIElement.UV temp = rollover.toObject( UIElement.UV.class ) ;
+			final boolean b1 = UI.applyVec2( temp.min, _minX, _minY ) ;
+			final boolean b2 = UI.applyVec2( temp.max, _maxX, _maxY ) ;
 			if( b1 == true || b2 == true )
 			{
-				UIElement.signal( this, rolloverChanged() ) ;
+				UIElement.signal( this, rollover.getSignal() ) ;
 			}
 		}
 
@@ -134,11 +141,12 @@ public class GUIPanelDraw extends GUIDraw
 		public void setClickedUV( final float _minX, final float _minY,
 								  final float _maxX, final float _maxY )
 		{
-			final boolean b1 = UI.applyVec2( clicked.min, _minX, _minY ) ;
-			final boolean b2 = UI.applyVec2( clicked.max, _maxX, _maxY ) ;
+			final UIElement.UV temp = clicked.toObject( UIElement.UV.class ) ;
+			final boolean b1 = UI.applyVec2( temp.min, _minX, _minY ) ;
+			final boolean b2 = UI.applyVec2( temp.max, _maxX, _maxY ) ;
 			if( b1 == true || b2 == true )
 			{
-				UIElement.signal( this, clickedChanged() ) ;
+				UIElement.signal( this, clicked.getSignal() ) ;
 			}
 		}
 
@@ -149,15 +157,17 @@ public class GUIPanelDraw extends GUIDraw
 
 		public UIElement.UV getRolloverUV( final UIElement.UV _populate )
 		{
-			_populate.min.setXY( rollover.min ) ;
-			_populate.max.setXY( rollover.max ) ;
+			final UIElement.UV temp = rollover.toObject( UIElement.UV.class ) ;
+			_populate.min.setXY( temp.min ) ;
+			_populate.max.setXY( temp.max ) ;
 			return _populate ;
 		}
 
 		public UIElement.UV getClickedUV( final UIElement.UV _populate )
 		{
-			_populate.min.setXY( clicked.min ) ;
-			_populate.max.setXY( clicked.max ) ;
+			final UIElement.UV temp = clicked.toObject( UIElement.UV.class ) ;
+			_populate.min.setXY( temp.min ) ;
+			_populate.max.setXY( temp.max ) ;
 			return _populate ;
 		}
 
@@ -168,12 +178,12 @@ public class GUIPanelDraw extends GUIDraw
 
 		public Connect.Signal rolloverChanged()
 		{
-			return rolloverChanged ;
+			return rollover.getSignal() ;
 		}
-		
+
 		public Connect.Signal clickedChanged()
 		{
-			return clickedChanged ;
+			return clicked.getSignal() ;
 		}
 	}
 }

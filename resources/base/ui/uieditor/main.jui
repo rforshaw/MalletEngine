@@ -21,9 +21,9 @@
 					"UIEDGE" : {
 						"TEXTURE" : "base/textures/edge_button.png",
 						"EDGE" : 2.0,
-						"COLOUR_NEUTRAL" : "255, 255, 255",
-						"COLOUR_ROLLOVER" : "0, 255, 0",
-						"COLOUR_CLICKED" : "0, 0, 255"
+						"NEUTRAL" : "255, 255, 255",
+						"ROLLOVER" : "0, 255, 0",
+						"CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -44,9 +44,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -61,9 +61,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -78,9 +78,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -107,9 +107,9 @@
 					"UIEDGE" : {
 						"TEXTURE" : "base/textures/edge_button.png",
 						"EDGE" : 2.0,
-						"COLOUR_NEUTRAL" : "255, 255, 255",
-						"COLOUR_ROLLOVER" : "0, 255, 0",
-						"COLOUR_CLICKED" : "0, 0, 255"
+						"NEUTRAL" : "255, 255, 255",
+						"ROLLOVER" : "0, 255, 0",
+						"CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -130,9 +130,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -147,9 +147,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -176,9 +176,9 @@
 					"UIEDGE" : {
 						"TEXTURE" : "base/textures/edge_button.png",
 						"EDGE" : 2.0,
-						"COLOUR_NEUTRAL" : "255, 255, 255",
-						"COLOUR_ROLLOVER" : "0, 255, 0",
-						"COLOUR_CLICKED" : "0, 0, 255"
+						"NEUTRAL" : "255, 255, 255",
+						"ROLLOVER" : "0, 255, 0",
+						"CLICKED" : "0, 0, 255"
 					},
 					"DROPDOWN" : {
 						"TYPE" : "UILAYOUT",
@@ -199,9 +199,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							},
 							{
@@ -216,9 +216,9 @@
 								"UIEDGE" : {
 									"TEXTURE" : "base/textures/edge_button.png",
 									"EDGE" : 2.0,
-									"COLOUR_NEUTRAL" : "255, 255, 255",
-									"COLOUR_ROLLOVER" : "0, 255, 0",
-									"COLOUR_CLICKED" : "0, 0, 255"
+									"NEUTRAL" : "255, 255, 255",
+									"ROLLOVER" : "0, 255, 0",
+									"CLICKED" : "0, 0, 255"
 								}
 							}
 						],
@@ -246,24 +246,52 @@
 			"LAYOUT" : "HORIZONTAL",
 			"CHILDREN" : [
 				{
-					"TYPE" : "UILIST",
+					"TYPE" : "UILAYOUT",
 					"LAYOUT" : "VERTICAL",
-					"NAME" : "UIElementsPanel",
-					"UIDRAW" : {
-						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
-						"UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "1.0, 1.0"
+					"CHILDREN" : [
+						{
+							"TYPE" : "UILIST",
+							"LAYOUT" : "VERTICAL",
+							"NAME" : "UIElementsPanel",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"SCROLLBAR" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"CHILDREN" : [],
+							
+						},
+						{
+							"TYPE" : "UILIST",
+							"LAYOUT" : "VERTICAL",
+							"NAME" : "GUIPanel",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"SCROLLBAR" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"CHILDREN" : [],
+							
 						}
-					},
-					"SCROLLBAR" : {
-						"TEXTURE" : "base/ui/uieditor/light_black.png",
-						"UV" : {
-							"MIN" : "0.0, 0.0",
-							"MAX" : "1.0, 1.0"
-						}
-					},
-					"CHILDREN" : [],
+					],
 					"MAX_LENGTH" : "5.5, 0, 0"
 				},
 				{
@@ -339,6 +367,26 @@
 							"TYPE" : "UIABSTRACTVIEW",
 							"LAYOUT" : "VERTICAL",
 							"NAME" : "UIElementDataPanel",
+							"UIDRAW" : {
+								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"SCROLLBAR" : {
+								"TEXTURE" : "base/ui/uieditor/light_black.png",
+								"UV" : {
+									"MIN" : "0.0, 0.0",
+									"MAX" : "1.0, 1.0"
+								}
+							},
+							"CHILDREN" : []
+						},
+						{
+							"TYPE" : "UILIST",
+							"LAYOUT" : "VERTICAL",
+							"NAME" : "UIComponentDataPanel",
 							"UIDRAW" : {
 								"TEXTURE" : "base/ui/uieditor/dark_grey.png",
 								"UV" : {

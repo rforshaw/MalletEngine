@@ -151,21 +151,26 @@ public class GUIText extends GUIComponent
 
 	public static class Meta extends GUIComponent.Meta
 	{
-		private UI.Alignment xAlign = UI.Alignment.CENTRE ;
-		private UI.Alignment yAlign = UI.Alignment.CENTRE ;
+		private final UIVariant xAlign = new UIVariant( "ALIGNMENT_X",  UI.Alignment.CENTRE,    new Connect.Signal() ) ;
+		private final UIVariant yAlign = new UIVariant( "ALIGNMENT_Y",  UI.Alignment.CENTRE,    new Connect.Signal() ) ;
 
-		private String text = "" ;
-		private MalletColour colour = MalletColour.white() ;
-		private MalletFont font = new MalletFont( "Arial" ) ;
+		private final UIVariant text   = new UIVariant( "TEXT",   "",                        new Connect.Signal() ) ;
+		private final UIVariant colour = new UIVariant( "COLOUR", MalletColour.white(),      new Connect.Signal() ) ;
+		private final UIVariant font   = new UIVariant( "FONT",   new MalletFont( "Arial" ), new Connect.Signal() ) ;
 
-		private final Connect.Signal xAlignChanged = new Connect.Signal() ;
-		private final Connect.Signal yAlignChanged = new Connect.Signal() ;
+		public Meta()
+		{
+			super() ;
 
-		private final Connect.Signal textChanged   = new Connect.Signal() ;
-		private final Connect.Signal colourChanged = new Connect.Signal() ;
-		private final Connect.Signal fontChanged   = new Connect.Signal() ;
-		
-		public Meta() {}
+			int row = rowCount( root() ) ;
+			createData( null, row + 5, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), xAlign, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), yAlign, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), text, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), colour, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), font, UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getType()
@@ -175,95 +180,98 @@ public class GUIText extends GUIComponent
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			if( _x != null && _x != xAlign )
+			if( _x != null && _x != xAlign.toObject( UI.Alignment.class ) )
 			{
-				xAlign = _x ;
-				UIElement.signal( this, xAlignChanged() ) ;
+				xAlign.setObject( _x ) ;
+				UIElement.signal( this, xAlign.getSignal() ) ;
 			}
 
-			if( _y != null && _y != yAlign )
+			if( _y != null && _y != yAlign.toObject( UI.Alignment.class ) )
 			{
-				yAlign = _y ;
-				UIElement.signal( this, yAlignChanged() ) ;
+				yAlign.setObject( _y ) ;
+				UIElement.signal( this, yAlign.getSignal() ) ;
 			}
 		}
 
 		public void setText( final String _text )
 		{
-			if( _text != null && text.equals( _text ) == false )
+			if( _text != null && text.toString().equals( _text ) == false )
 			{
-				text = _text ;
-				UIElement.signal( this, textChanged() ) ;
+				text.setString( _text ) ;
+				UIElement.signal( this, text.getSignal() ) ;
 			}
 		}
 
 		public void setColour( final MalletColour _colour )
 		{
-			if( _colour != null && colour.equals( _colour ) == false )
+			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			if( _colour != null && col.equals( _colour ) == false )
 			{
-				colour.changeColour( _colour.toInt() ) ;
-				UIElement.signal( this, colourChanged() ) ;
+				col.changeColour( _colour.toInt() ) ;
+				UIElement.signal( this, colour.getSignal() ) ;
 			}
 		}
 
 		public void setFont( final MalletFont _font )
 		{
-			if( font != null && font.equals( _font ) == false )
+			final MalletFont temp = font.toObject( MalletFont.class ) ;
+			if( font != null && temp.equals( _font ) == false )
 			{
-				font = new MalletFont( _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ;
-				UIElement.signal( this, fontChanged() ) ;
+				font.setObject( new MalletFont( _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ) ;
+				UIElement.signal( this, font.getSignal() ) ;
 			}
 		}
 		
 		public UI.Alignment getAlignmentX()
 		{
-			return xAlign ;
+			return xAlign.toObject( UI.Alignment.class ) ;
 		}
 
 		public UI.Alignment getAlignmentY()
 		{
-			return yAlign ;
+			return yAlign.toObject( UI.Alignment.class ) ;
 		}
 
 		public String getText()
 		{
-			return text ;
+			return text.toString() ;
 		}
 
 		public MalletColour getColour( final MalletColour _populate )
 		{
-			_populate.changeColour( colour.toInt() ) ;
+			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}
 
 		public MalletFont getFont()
 		{
-			return font ;
+			return font.toObject( MalletFont.class )  ;
 		}
 
 		public Connect.Signal xAlignChanged()
 		{
-			return xAlignChanged ;
+			return xAlign.getSignal() ;
 		}
 
 		public Connect.Signal yAlignChanged()
 		{
-			return yAlignChanged ;
+			return yAlign.getSignal() ;
 		}
 
 		public Connect.Signal textChanged()
 		{
-			return textChanged ;
+			return text.getSignal() ;
 		}
 
 		public Connect.Signal colourChanged()
 		{
-			return colourChanged ;
+			return colour.getSignal() ;
 		}
 
 		public Connect.Signal fontChanged()
 		{
-			return fontChanged ;
+			return font.getSignal() ;
 		}
 	}
 }

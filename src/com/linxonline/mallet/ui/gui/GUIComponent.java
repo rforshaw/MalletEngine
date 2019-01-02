@@ -244,10 +244,6 @@ public abstract class GUIComponent extends UIElement.Component
 
 	public static class Meta extends UIElement.MetaComponent
 	{
-		private final Connect connect = new Connect() ;
-
-		public Meta() {}
-
 		/**
 			Base type is used to figure out what GUIGenerator is 
 			required to create the correct GUI listener.
@@ -259,21 +255,6 @@ public abstract class GUIComponent extends UIElement.Component
 		public String getType()
 		{
 			return "UIELEMENT_GUIBASE" ;
-		}
-
-		/**
-			Remove all connections made to this packet.
-			Should only be called by the packets owner.
-		*/
-		public void shutdown()
-		{
-			UIElement.disconnect( this ) ;
-		}
-
-		@Override
-		public Connect getConnect()
-		{
-			return connect ;
 		}
 	}
 }

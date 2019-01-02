@@ -147,7 +147,10 @@ public class GUIScrollbar extends GUIComponent
 
 	public static class Meta extends GUIComponent.Meta
 	{
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getType()

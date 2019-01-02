@@ -120,6 +120,7 @@ public class FrameBuffer
 
 	public void shutdown()
 	{
+		delegate.shutdown() ;
 		if( world != WorldAssist.getDefaultWorld() )
 		{
 			WorldAssist.destroyWorld( world ) ;

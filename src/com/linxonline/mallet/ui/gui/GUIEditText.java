@@ -350,7 +350,10 @@ public class GUIEditText extends GUIText
 	
 	public static class Meta extends GUIText.Meta
 	{
-		public Meta() {}
+		public Meta()
+		{
+			super() ;
+		}
 
 		@Override
 		public String getType()

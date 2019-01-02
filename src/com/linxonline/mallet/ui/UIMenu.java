@@ -62,11 +62,17 @@ public class UIMenu extends UILayout
 
 	public static class Meta extends UILayout.Meta
 	{
-		private float thickness = 0.0f ;
+		private final UIVariant thickness = new UIVariant( "THICKNESS", 0.0f, new Connect.Signal() ) ;
 
-		private final Connect.Signal thicknessChanged = new Connect.Signal() ;
+		public Meta()
+		{
+			super() ;
 
-		public Meta() {}
+			int row = rowCount( root() ) ;
+			createData( null, row + 1, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), thickness,  UIAbstractModel.Role.User ) ;
+		}
 
 		@Override
 		public String getElementType()
@@ -76,21 +82,21 @@ public class UIMenu extends UILayout
 
 		public void setThickness( final float _thickness )
 		{
-			if( Math.abs( thickness - _thickness ) > 0.001f )
+			if( Math.abs( thickness.toFloat() - _thickness ) > 0.001f )
 			{
-				thickness = _thickness ;
-				UIElement.signal( this, thicknessChanged() ) ;
+				thickness.setFloat( _thickness ) ;
+				UIElement.signal( this, thickness.getSignal() ) ;
 			}
 		}
 
 		public float getThickness()
 		{
-			return thickness ;
+			return thickness.toFloat() ;
 		}
 
 		public Connect.Signal thicknessChanged()
 		{
-			return thicknessChanged ;
+			return thickness.getSignal() ;
 		}
 	}
 

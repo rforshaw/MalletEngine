@@ -266,7 +266,7 @@ public class JUI
 				return element ;
 			}
 		} ) ;
-		
+
 		elementCreators.put( "UIABSTRACTVIEW", new Generator<UIAbstractView, UIAbstractView.Meta>()
 		{
 			public UIAbstractView.Meta createMeta( final JSONObject _ui )
@@ -469,9 +469,9 @@ public class JUI
 		final GUIPanelEdge.Meta meta = new GUIPanelEdge.Meta() ;
 		meta.setEdge( ( float )_ui.optDouble( "EDGE", 5.0 ) ) ;
 		meta.setSheet( _ui.optString( "TEXTURE", "" ) ) ;
-		meta.setNeutralColour( MalletColour.parseColour( _ui.optString( "COLOUR_NEUTRAL", null ) ) ) ;
-		meta.setRolloverColour( MalletColour.parseColour( _ui.optString( "COLOUR_ROLLOVER", null ) ) ) ;
-		meta.setClickedColour( MalletColour.parseColour( _ui.optString( "COLOUR_CLICKED", null ) ) ) ;
+		meta.setNeutralColour( MalletColour.parseColour( _ui.optString( "NEUTRAL", _ui.optString( "COLOUR", null ) ) ) ) ;
+		meta.setRolloverColour( MalletColour.parseColour( _ui.optString( "ROLLOVER", null ) ) ) ;
+		meta.setClickedColour( MalletColour.parseColour( _ui.optString( "CLICKED", null ) ) ) ;
 
 		return meta ;
 	}
@@ -562,9 +562,9 @@ public class JUI
 		final GUIPanelDraw.Meta meta = new GUIPanelDraw.Meta() ;
 		meta.setName( _ui.getString( "NAME" ) ) ;
 		meta.setGroup( _ui.getString( "GROUP" ) ) ;
-		meta.setNeutralUV( createUV( _ui.getJSONObject( "NEUTRAL_UV" ) ) ) ;
-		meta.setRolloverUV( createUV( _ui.getJSONObject( "ROLLOVER_UV" ) ) ) ;
-		meta.setClickedUV( createUV( _ui.getJSONObject( "CLICKED_UV" ) ) ) ;
+		meta.setNeutralUV( createUV( _ui.optJSONObject( "NEUTRAL", _ui.getJSONObject( "UV" ) ) ) ) ;
+		meta.setRolloverUV( createUV( _ui.getJSONObject( "ROLLOVER" ) ) ) ;
+		meta.setClickedUV( createUV( _ui.getJSONObject( "CLICKED" ) ) ) ;
 		meta.setRetainRatio( _ui.optBoolean( "RETAIN_RATIO", false ) ) ;
 		meta.setSheet( _ui.optString( "TEXTURE", "" ) ) ;
 

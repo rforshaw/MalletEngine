@@ -546,6 +546,28 @@ public class UIAbstractView extends UIElement
 							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
 							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
 						}
+						else if( obj instanceof MalletColour )
+						{
+							// r, g, b, a
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
+						else if( obj instanceof MalletFont )
+						{
+							// name, font size
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
+						else if( obj instanceof UIElement.UV )
+						{
+							// minx, miny, maxx, maxy
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						}
 						else
 						{
 							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
@@ -632,6 +654,28 @@ public class UIAbstractView extends UIElement
 								setTextTo( getText( vLayout, 1 ), vec.y ) ;
 								setTextTo( getText( vLayout, 2 ), vec.z ) ;
 							}
+							else if( obj instanceof MalletColour )
+							{
+								final MalletColour colour = ( MalletColour )obj ;
+								setTextTo( getText( vLayout, 0 ), colour.getRed() ) ;
+								setTextTo( getText( vLayout, 1 ), colour.getGreen() ) ;
+								setTextTo( getText( vLayout, 2 ), colour.getBlue() ) ;
+								setTextTo( getText( vLayout, 3 ), colour.getAlpha() ) ;
+							}
+							else if( obj instanceof MalletFont )
+							{
+								final MalletFont font = variant.toObject( MalletFont.class ) ;
+								setTextTo( getText( vLayout, 0 ), font.getFontName() ) ;
+								setTextTo( getText( vLayout, 1 ), font.getPointSize() ) ;
+							}
+							else if( obj instanceof UIElement.UV )
+							{
+								final UIElement.UV uv = ( UIElement.UV )obj ;
+								setTextTo( getText( vLayout, 0 ), uv.min.x ) ;
+								setTextTo( getText( vLayout, 1 ), uv.min.y ) ;
+								setTextTo( getText( vLayout, 2 ), uv.max.x ) ;
+								setTextTo( getText( vLayout, 3 ), uv.max.y ) ;
+							}
 							else
 							{
 								setTextTo( getText( vLayout, 0 ), variant.toString() ) ;
@@ -687,6 +731,45 @@ public class UIAbstractView extends UIElement
 							final float z = toFloat( getText( vLayout, 2 ) ) ;
 							variant.setVector3( x, y, z ) ;
 						}
+						else if( obj instanceof MalletColour )
+						{
+							final MalletColour colour = ( MalletColour )obj ;
+							final byte r = ( byte )toInt( getText( vLayout, 0 ) ) ;
+							final byte g = ( byte )toInt( getText( vLayout, 1 ) ) ;
+							final byte b = ( byte )toInt( getText( vLayout, 2 ) ) ;
+							final byte a = ( byte )toInt( getText( vLayout, 3 ) ) ;
+							colour.changeColour( r, g, b, a ) ;
+						}
+						else if( obj instanceof MalletFont )
+						{
+							final String name = getText( vLayout, 0 ).toString() ;
+							final float size = toFloat( getText( vLayout, 1 ) ) ;
+							variant.setObject( new MalletFont( name, 12 ) ) ;
+						}
+						else if( obj instanceof UIElement.UV )
+						{
+							final float minx = toFloat( getText( vLayout, 0 ) ) ;
+							final float miny = toFloat( getText( vLayout, 1 ) ) ;
+							final float maxx = toFloat( getText( vLayout, 2 ) ) ;
+							final float maxy = toFloat( getText( vLayout, 3 ) ) ;
+
+							final UIElement.UV uv = ( UIElement.UV )obj ;
+							uv.min.setXY( minx, miny ) ;
+							uv.max.setXY( maxx, maxy ) ;
+						}
+						else if( obj instanceof Enum<?> )
+						{
+							try
+							{
+								final Enum<?> en = ( Enum<?> )obj ;
+								final String val = getText( vLayout, 0 ).toString() ;
+								variant.setObject( en.valueOf( en.getClass(), val ) ) ;
+							}
+							catch( IllegalArgumentException ex )
+							{
+								System.out.println( "Value not compatible with enum." ) ;
+							}
+						}
 						else
 						{
 							System.out.println( "Unable to set.." ) ;
@@ -700,6 +783,11 @@ public class UIAbstractView extends UIElement
 			public boolean toBool( final StringBuilder _text )
 			{
 				return Boolean.parseBoolean( _text.toString() ) ;
+			}
+
+			public byte toByte( final StringBuilder _text )
+			{
+				return Byte.parseByte( _text.toString() ) ;
 			}
 
 			public int toInt( final StringBuilder _text )
@@ -723,6 +811,12 @@ public class UIAbstractView extends UIElement
 			{
 				_text.setLength( 0 ) ;
 				_text.append( Float.toString( _value ) ) ;
+			}
+
+			public void setTextTo( final StringBuilder _text, final int _value )
+			{
+				_text.setLength( 0 ) ;
+				_text.append( Integer.toString( _value ) ) ;
 			}
 
 			public void setTextTo( final StringBuilder _text, final String _value )
