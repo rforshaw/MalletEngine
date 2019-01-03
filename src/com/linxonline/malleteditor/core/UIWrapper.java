@@ -15,16 +15,14 @@ import com.linxonline.mallet.ui.gui.* ;
 public class UIWrapper extends UIElement
 {
 	private final UIElement.Meta meta ;
-	private final UIElement element ;	// Element that represents packet
-
-	private final List<UIWrapper> children ;
+	
+	private UIElement element ;	// Element that represents packet
+	private List<UIWrapper> children ;
 
 	public UIWrapper( final UIElement.Meta _meta )
 	{
 		meta = _meta ;
-		element = UIGenerator.create( _meta ) ;
-
-		children = ( meta.supportsChildren() ) ? MalletList.<UIWrapper>newList() : null ;
+		createUIElement() ;
 
 		UIElement.connect( this, positionChanged(), new Connect.Slot<UIWrapper>()
 		{
@@ -34,7 +32,7 @@ public class UIWrapper extends UIElement
 			public void slot( final UIWrapper _parent )
 			{
 				_parent.getPosition( unit ) ;
-				element.setPosition( unit.x, unit.y, unit.z ) ;
+				getElement().setPosition( unit.x, unit.y, unit.z ) ;
 			}
 		} ) ;
 
@@ -46,7 +44,7 @@ public class UIWrapper extends UIElement
 			public void slot( final UIWrapper _parent )
 			{
 				_parent.getOffset( unit ) ;
-				element.setOffset( unit.x, unit.y, unit.z ) ;
+				getElement().setOffset( unit.x, unit.y, unit.z ) ;
 			}
 		} ) ;
 
@@ -58,7 +56,7 @@ public class UIWrapper extends UIElement
 			public void slot( final UIWrapper _parent )
 			{
 				_parent.getLength( unit ) ;
-				element.setLength( unit.x, unit.y, unit.z ) ;
+				getElement().setLength( unit.x, unit.y, unit.z ) ;
 			}
 		} ) ;
 
@@ -67,7 +65,7 @@ public class UIWrapper extends UIElement
 			@Override
 			public void slot( final UIWrapper _parent )
 			{
-				element.setLayer( _parent.getLayer() ) ;
+				getElement().setLayer( _parent.getLayer() ) ;
 			}
 		} ) ;
 
@@ -102,6 +100,18 @@ public class UIWrapper extends UIElement
 				_parent.makeDirty() ;
 			}
 		} ) ;
+	}
+
+	private void createUIElement()
+	{
+		if( element != null )
+		{
+			element.shutdown() ;
+			element.clear() ;
+		}
+
+		element = UIGenerator.create( meta ) ;
+		children = ( meta.supportsChildren() ) ? MalletList.<UIWrapper>newList() : null ;
 	}
 
 	@Override
@@ -279,9 +289,15 @@ public class UIWrapper extends UIElement
 			}
 		}
 
-		element.addComponent( GUIGenerator.create( _meta, element ) ) ;
+		final UIElement.Component component = element.addComponent( GUIGenerator.create( _meta, element ) ) ;
+
 		meta.addComponent( _meta ) ;
 		return true ;
+	}
+
+	public UIElement getElement()
+	{
+		return element ;
 	}
 
 	public UIElement.Meta getMeta()

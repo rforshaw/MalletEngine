@@ -4,6 +4,8 @@ import com.linxonline.mallet.main.android.AndroidActivity ;
 import com.linxonline.mallet.main.android.AndroidStarter ;
 import com.linxonline.mallet.util.notification.Notification ;
 
+import template.main.TemplateLoader ;
+
 public class TemplateActivity extends AndroidActivity
 {
 	public TemplateActivity()
@@ -19,6 +21,6 @@ public class TemplateActivity extends AndroidActivity
 
 	public AndroidStarter constructStarter( final AndroidActivity _activity, final Notification.Notify<Object> _notify )
 	{
-		return new AndroidTemplateStarter( _activity, _notify ) ;
+		return new AndroidStarter( _activity, _notify, new TemplateLoader() ) ;
 	}
 }

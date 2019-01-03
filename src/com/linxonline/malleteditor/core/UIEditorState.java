@@ -101,7 +101,7 @@ public class UIEditorState extends GameState
 			elementStructurePanel = jui.get( "UIStructurePanel", UIList.class ) ;
 			elementDataPanel = jui.get( "UIElementDataPanel", UIAbstractView.class ) ;
 			componentDataPanel = jui.get( "UIComponentDataPanel", UIList.class ) ;
-			componentDataPanel.setDefaultElementSize( 0.0f, 4.0f, 0.0f ) ;
+			componentDataPanel.setDefaultElementSize( 0.0f, 5.0f, 0.0f ) ;
 
 			createElementsPanel( elementOptionsPanel ) ;
 			createCUIsPanel( guiOptionsPanel ) ;

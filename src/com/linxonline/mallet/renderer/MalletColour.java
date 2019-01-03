@@ -45,7 +45,7 @@ public class MalletColour
 	{
 		changeColour( _colour ) ;
 	}
-	
+
 	public MalletColour( final float _colour )
 	{
 		changeColour( _colour ) ;
