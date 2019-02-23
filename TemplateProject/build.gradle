@@ -16,7 +16,7 @@ project( ':desktop' ) {
 	}
 
 	clean {
-		delete 'target'
+		delete  += fileTree( 'target' ).include( '**/*' )
 	}
 
 	dependencies {
@@ -41,8 +41,8 @@ project( ':desktop' ) {
 
 task zip(type: Zip) {
 	into '.'
-	from( '../resources/base' ) {
+	from( 'resources/base' ) {
 		baseName( 'resources' )
-		destinationDir(file('target/base'))
+		destinationDir(file('desktop/target/base'))
 	}
 }

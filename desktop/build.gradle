@@ -42,6 +42,10 @@ project( ':MalletEngine' ) {
 		compile fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
 	}
 
+	clean {
+		delete += fileTree( '../../TemplateProject/desktop' ).include( '**/*' )
+	}
+	
 	task copy(type: Copy) {
 		into '.'
 		from( 'dependencies' ) {

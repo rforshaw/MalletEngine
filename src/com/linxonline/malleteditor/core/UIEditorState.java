@@ -43,6 +43,9 @@ public class UIEditorState extends GameState
 	@Override
 	public void initGame()
 	{
+		final Entity entity = new Entity( "UI" ) ;
+		final UIComponent component = new UIComponent( entity ) ;
+
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
 		{
 			final UIButton open = jui.get( "OpenButton", UIButton.class ) ;
@@ -52,27 +55,7 @@ public class UIEditorState extends GameState
 
 				public void slot( final UIButton _open )
 				{
-					System.out.println( "Open Project..." ) ;
-					cleanup( mainView ) ;
-
-					root = JUIWrapper.loadWrapper( "base/ui/test.jui" ) ;
-					root.setLayer( 1 ) ;
-
-					mainView.addElement( root ) ;
-				}
-
-				/**
-					Remove any elements that are stored in the passed 
-					in layout.
-				*/
-				private void cleanup( final UILayout _view )
-				{
-					_view.getElements( elements ) ;
-					for( UIElement element : elements )
-					{
-						_view.removeElement( element ) ;
-					}
-					elements.clear() ;
+					component.addElement( createOpenPanel( 20 ) ) ;
 				}
 			} ) ;
 
@@ -81,8 +64,7 @@ public class UIEditorState extends GameState
 			{
 				public void slot( final UIButton _open )
 				{
-					System.out.println( "Save Project..." ) ;
-					JUIWrapper.saveWrapper( root, "test_save.jui" ) ;
+					component.addElement( createSavePanel( 20 ) ) ;
 				}
 			} ) ;
 
@@ -107,10 +89,7 @@ public class UIEditorState extends GameState
 			createCUIsPanel( guiOptionsPanel ) ;
 		}
 
-		final Entity entity = new Entity( "UI" ) ;
-		final UIComponent component = new UIComponent( entity ) ;
 		component.addElement( jui.getParent() ) ;
-
 		addEntity( entity ) ;
 
 		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
@@ -390,6 +369,97 @@ public class UIEditorState extends GameState
 		anim.setDefaultAnim( "DEFAULT" ) ;
 
 		return _entity ;
+	}
+
+	private UIElement createOpenPanel( final int _layer )
+	{
+		final JUI jui = JUI.create( "base/ui/uieditor/open_panel.jui" ) ;
+		final UIElement parent = jui.getParent() ;
+		parent.setLayer( _layer ) ;
+
+		final UITextField field = jui.get( "filepathField", UITextField.class ) ;
+
+		final UIButton open = jui.get( "actionButton", UIButton.class ) ;
+		UIButton.connect( open, open.released(), new Connect.Slot<UIButton>()
+		{
+			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+			public void slot( final UIButton _open )
+			{
+				System.out.println( "Open Project..." ) ;
+				cleanup( mainView ) ;
+
+				root = JUIWrapper.loadWrapper( field.getText().toString() ) ;
+				root.setLayer( 1 ) ;
+
+				mainView.addElement( root ) ;
+				parent.destroy() ;
+			}
+
+			/**
+				Remove any elements that are stored in the passed 
+				in layout.
+			*/
+			private void cleanup( final UILayout _view )
+			{
+				_view.getElements( elements ) ;
+				for( UIElement element : elements )
+				{
+					_view.removeElement( element ) ;
+				}
+				elements.clear() ;
+			}
+		} ) ;
+
+		final UIButton cancel = jui.get( "cancelButton", UIButton.class ) ;
+		UIButton.connect( cancel, cancel.released(), new Connect.Slot<UIButton>()
+		{
+			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+			public void slot( final UIButton _open )
+			{
+				System.out.println( "Cancel..." ) ;
+				parent.destroy() ;
+			}
+		} ) ;
+
+		return parent ;
+	}
+
+	private UIElement createSavePanel( final int _layer )
+	{
+		final JUI jui = JUI.create( "base/ui/uieditor/save_panel.jui" ) ;
+		final UIElement parent = jui.getParent() ;
+		parent.setLayer( _layer ) ;
+
+		final UITextField field = jui.get( "filepathField", UITextField.class ) ;
+
+		final UIButton open = jui.get( "actionButton", UIButton.class ) ;
+		UIButton.connect( open, open.released(), new Connect.Slot<UIButton>()
+		{
+			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+			public void slot( final UIButton _open )
+			{
+				System.out.println( "Save Project..." ) ;
+				JUIWrapper.saveWrapper( root, field.getText().toString() ) ;
+				parent.destroy() ;
+			}
+		} ) ;
+
+		final UIButton cancel = jui.get( "cancelButton", UIButton.class ) ;
+		UIButton.connect( cancel, cancel.released(), new Connect.Slot<UIButton>()
+		{
+			final List<UIElement> elements = MalletList.<UIElement>newList() ;
+
+			public void slot( final UIButton _open )
+			{
+				System.out.println( "Cancel..." ) ;
+				parent.destroy() ;
+			}
+		} ) ;
+
+		return parent ;
 	}
 
 	/**

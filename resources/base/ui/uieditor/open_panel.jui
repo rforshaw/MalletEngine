@@ -1,0 +1,184 @@
+{
+	"TYPE" : "UIWINDOW_LAYOUT",
+	"LAYOUT" : "VERTICAL",
+	"LAYER" : 100,
+	"UIDRAW" : {
+		"TEXTURE" : "base/ui/uieditor/grey.png",
+		"UV" : {
+			"MIN" : "0.0, 0.0",
+			"MAX" : "1.0, 1.0"
+		}
+	},
+	"CHILDREN" : [
+		{
+			"TYPE": "UIELEMENT" 
+		},
+		{
+			"TYPE" : "UILAYOUT",
+			"LAYOUT" : "HORIZONTAL",
+			"CHILDREN" : [
+				{
+					"TYPE": "UIELEMENT" 
+				},
+				{
+					"LENGTH": "6.0,1.2,0.0",
+					"LAYOUT": "HORIZONTAL",
+					"MAX_LENGTH": "15.0,1.2,0.0",
+					"NAME": "",
+					"VISIBLE": true,
+					"CHILDREN": [
+						{
+						"DISABLED": false,
+						"POSITION": "0.0,0.0,0.0",
+						"MARGIN": "0.0,0.0,0.0",
+						"MIN_LENGTH": "0.0,0.0,0.0",
+						"LENGTH": "0.0,0.0,0.0",
+						"OFFSET": "0.0,0.0,0.0",
+						"LAYER": 0,
+						"TYPE": "UITEXTFIELD",
+						"MAX_LENGTH": "0.0,0.0,0.0",
+						"NAME": "filepathField",
+						"VISIBLE": true,
+						"UIEDGE": {
+							"ROLLOVER": "255,255,255",
+							"GROUP": "",
+							"UV": {
+							"MIN": "0.0,0.0",
+							"MAX": "1.0,1.0"
+							},
+							"CLICKED": "255,255,255",
+							"TEXTURE": "base/textures/edge_button.png",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"COLOUR": "255,255,255",
+							"EDGE": 2.0,
+							"RETAIN_RATIO": false,
+							"NAME": ""
+						},
+						"UITEXT": {
+							"FONT_SIZE": 0.42,
+							"GROUP": "",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"TEXT": "base/ui/",
+							"COLOUR": "255,255,255",
+							"FONT": "Arial",
+							"NAME": ""
+						}
+						},
+						{
+						"DISABLED": false,
+						"UIEDGE": {
+							"ROLLOVER": "255,255,255",
+							"GROUP": "",
+							"UV": {
+							"MIN": "0.0,0.0",
+							"MAX": "1.0,1.0"
+							},
+							"CLICKED": "255,255,255",
+							"TEXTURE": "base/textures/edge_button.png",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"COLOUR": "255,255,255",
+							"EDGE": 2.0,
+							"RETAIN_RATIO": false,
+							"NAME": ""
+						},
+						"UITEXT": {
+							"FONT_SIZE": 0.42,
+							"GROUP": "",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"TEXT": "Cancel",
+							"COLOUR": "255,255,255",
+							"FONT": "Arial",
+							"NAME": ""
+						},
+						"POSITION": "0.0,0.0,0.0",
+						"MARGIN": "0.0,0.0,0.0",
+						"MIN_LENGTH": "0.0,0.0,0.0",
+						"LENGTH": "0.0,0.0,0.0",
+						"OFFSET": "0.0,0.0,0.0",
+						"LAYER": 0,
+						"TYPE": "UIBUTTON",
+						"MAX_LENGTH": "1.5,0.0,0.0",
+						"NAME": "cancelButton",
+						"VISIBLE": true
+						},
+						{
+						"DISABLED": false,
+						"UIEDGE": {
+							"ROLLOVER": "255,255,255",
+							"GROUP": "",
+							"UV": {
+							"MIN": "0.0,0.0",
+							"MAX": "1.0,1.0"
+							},
+							"CLICKED": "255,255,255",
+							"TEXTURE": "base/textures/edge_button.png",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"COLOUR": "255,255,255",
+							"EDGE": 2.0,
+							"RETAIN_RATIO": false,
+							"NAME": ""
+						},
+						"UITEXT": {
+							"FONT_SIZE": 0.42,
+							"GROUP": "",
+							"ALIGNMENT": {
+							"X": "CENTRE",
+							"Y": "CENTRE"
+							},
+							"TEXT": "Open",
+							"COLOUR": "255,255,255",
+							"FONT": "Arial",
+							"NAME": ""
+						},
+						"POSITION": "0.0,0.0,0.0",
+						"MARGIN": "0.0,0.0,0.0",
+						"MIN_LENGTH": "0.0,0.0,0.0",
+						"LENGTH": "0.0,0.0,0.0",
+						"OFFSET": "0.0,0.0,0.0",
+						"LAYER": 0,
+						"TYPE": "UIBUTTON",
+						"MAX_LENGTH": "1.5,0.0,0.0",
+						"NAME": "actionButton",
+						"VISIBLE": true
+						}
+					],
+					"DISABLED": false,
+					"POSITION": "0.0,0.0,0.0",
+					"MARGIN": "0.0,0.0,0.0",
+					"MIN_LENGTH": "0.0,0.0,0.0",
+					"OFFSET": "0.0,0.0,0.0",
+					"LAYER": 0,
+					"TYPE": "UILAYOUT",
+					"UIDRAW" : {
+						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
+						"UV" : {
+							"MIN" : "0.0, 0.0",
+							"MAX" : "1.0, 1.0"
+						}
+					}
+				},
+				{
+					"TYPE": "UIELEMENT"
+				}
+			]
+		},
+		{
+			"TYPE": "UIELEMENT" 
+		}
+	]
+}
