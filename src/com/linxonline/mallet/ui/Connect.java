@@ -187,6 +187,7 @@ public class Connect
 
 	public static class Signal {}
 
+	@FunctionalInterface
 	public interface Slot<T>
 	{
 		public void slot( final T _signal ) ;

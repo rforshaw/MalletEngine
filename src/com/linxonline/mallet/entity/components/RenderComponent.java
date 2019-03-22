@@ -116,32 +116,29 @@ public class RenderComponent extends Entity.Component
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
-		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		_events.add( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 		{
-			public void callback( final DrawDelegate _delegate )
+			drawDelegate = _delegate ;
+			if( toAddBasic.isEmpty() == false )
 			{
-				drawDelegate = _delegate ;
-				if( toAddBasic.isEmpty() == false )
+				final int size = toAddBasic.size() ;
+				for( int i = 0; i < size; i++ )
 				{
-					final int size = toAddBasic.size() ;
-					for( int i = 0; i < size; i++ )
-					{
-						final Tuple<Draw, World> tuple = toAddBasic.get( i ) ;
-						addBasicDraw( tuple.getLeft(), tuple.getRight() ) ;
-					}
-					toAddBasic.clear() ;
+					final Tuple<Draw, World> tuple = toAddBasic.get( i ) ;
+					addBasicDraw( tuple.getLeft(), tuple.getRight() ) ;
 				}
+				toAddBasic.clear() ;
+			}
 
-				if( toAddText.isEmpty() == false )
+			if( toAddText.isEmpty() == false )
+			{
+				final int size = toAddText.size() ;
+				for( int i = 0; i < size; i++ )
 				{
-					final int size = toAddText.size() ;
-					for( int i = 0; i < size; i++ )
-					{
-						final Tuple<Draw, World> tuple = toAddText.get( i ) ;
-						addTextDraw( tuple.getLeft(), tuple.getRight() ) ;
-					}
-					toAddText.clear() ;
+					final Tuple<Draw, World> tuple = toAddText.get( i ) ;
+					addTextDraw( tuple.getLeft(), tuple.getRight() ) ;
 				}
+				toAddText.clear() ;
 			}
 		} ) ) ;
 	}

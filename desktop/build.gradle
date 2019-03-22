@@ -1,17 +1,8 @@
-
-/*allprojects {
-	gradle.projectsEvaluated {
-		tasks.withType(JavaCompile) {
-		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-		}
-	}
-}*/
-
 subprojects {
 	apply plugin: 'java'
 
-	sourceCompatibility = 1.7
-	targetCompatibility = 1.7
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 	compileJava.options.encoding = 'UTF-8'
 
 	clean {
@@ -20,13 +11,6 @@ subprojects {
 }
 
 project( ':MalletEngine' ) {
-
-	/*gradle.projectsEvaluated {
-		tasks.withType(JavaCompile) {
-		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-		}
-	}*/
-
 	sourceSets {
 		main {
 			java {
@@ -45,7 +29,7 @@ project( ':MalletEngine' ) {
 	clean {
 		delete += fileTree( '../../TemplateProject/desktop' ).include( '**/*' )
 	}
-	
+
 	task copy(type: Copy) {
 		into '.'
 		from( 'dependencies' ) {

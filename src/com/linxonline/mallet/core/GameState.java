@@ -459,78 +459,49 @@ public class GameState extends State
 
 	protected void initEventProcessors( final EventController _internal, final EventController _external )
 	{
-		_internal.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_UI_INPUT" )
+		_internal.addProcessor( "ADD_GAME_STATE_UI_INPUT", ( final InputHandler _handler ) ->
 		{
-			public void processEvent( final Event<InputHandler> _event )
-			{
-				inputUISystem.addInputHandler( _event.getVariable() ) ;
-			}
+			inputUISystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_UI_INPUT" )
+		_internal.addProcessor( "REMOVE_GAME_STATE_UI_INPUT", ( final InputHandler _handler ) ->
 		{
-			public void processEvent( final Event<InputHandler> _event )
-			{
-				inputUISystem.removeInputHandler( _event.getVariable() ) ;
-			}
+			inputUISystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<InputHandler>( "ADD_GAME_STATE_INPUT", "ADD_GAME_STATE_WORLD_INPUT" )
+		_internal.addProcessor( "ADD_GAME_STATE_WORLD_INPUT", ( final InputHandler _handler ) ->
 		{
-			public void processEvent( final Event<InputHandler> _event )
-			{
-				inputWorldSystem.addInputHandler( _event.getVariable() ) ;
-			}
+			inputWorldSystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<InputHandler>( "REMOVE_GAME_STATE_INPUT", "REMOVE_GAME_STATE_WORLD_INPUT" )
+		_internal.addProcessor( "REMOVE_GAME_STATE_WORLD_INPUT", ( final InputHandler _handler ) ->
 		{
-			public void processEvent( final Event<InputHandler> _event )
-			{
-				inputWorldSystem.removeInputHandler( _event.getVariable() ) ;
-			}
+			inputWorldSystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<EventController>( "ADD_GAME_STATE_EVENT", "ADD_GAME_STATE_EVENT" )
+		_internal.addProcessor( "ADD_GAME_STATE_EVENT", ( final EventController _controller ) ->
 		{
-			public void processEvent( final Event<EventController> _event )
-			{
-				final EventController controller = _event.getVariable() ;
-				controller.setAddEventInterface( eventSystem ) ;
-				eventSystem.addEventHandler( controller ) ;
-			}
+			_controller.setAddEventInterface( eventSystem ) ;
+			eventSystem.addEventHandler( _controller ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<EventController>( "REMOVE_GAME_STATE_EVENT", "REMOVE_GAME_STATE_EVENT" )
+		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final EventController _controller ) ->
 		{
-			public void processEvent( final Event<EventController> _event )
-			{
-				final EventController controller = _event.getVariable() ;
-				eventSystem.removeEventHandler( controller ) ;
-			}
+			eventSystem.removeEventHandler( _controller ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<EventController>( "ADD_BACKEND_EVENT", "ADD_BACKEND_EVENT" )
+		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final EventController _controller ) ->
 		{
-			public void processEvent( final Event<EventController> _event )
-			{
-				final EventController controller = _event.getVariable() ;
-				final IEventSystem eventBackend = system.getEventSystem() ;
+			final IEventSystem eventBackend = system.getEventSystem() ;
 
-				controller.setAddEventInterface( eventBackend ) ;
-				eventBackend.addEventHandler( controller ) ;
-			}
+			_controller.setAddEventInterface( eventBackend ) ;
+			eventBackend.addEventHandler( _controller ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<EventController>( "REMOVE_BACKEND_EVENT", "REMOVE_BACKEND_EVENT" )
+		_internal.addProcessor( "REMOVE_BACKEND_EVENT", ( final EventController _controller ) ->
 		{
-			public void processEvent( final Event<EventController> _event )
-			{
-				final EventController controller = _event.getVariable() ;
-				final IEventSystem eventBackend = system.getEventSystem() ;
-
-				eventBackend.removeEventHandler( controller ) ;
-			}
+			final IEventSystem eventBackend = system.getEventSystem() ;
+			eventBackend.removeEventHandler( _controller ) ;
 		} ) ;
 
 		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
@@ -559,16 +530,13 @@ public class GameState extends State
 				}
 
 				showFPS.setShow( true ) ;
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 				{
-					public void callback( final DrawDelegate _delegate )
+					delegate = _delegate ;
+					final Draw[] draws = showFPS.getDraws() ;
+					for( final Draw draw : draws )
 					{
-						delegate = _delegate ;
-						final Draw[] draws = showFPS.getDraws() ;
-						for( final Draw draw : draws )
-						{
-							delegate.addTextDraw( draw ) ;
-						}
+						delegate.addTextDraw( draw ) ;
 					}
 				} ) ) ;
 			}

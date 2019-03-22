@@ -232,25 +232,22 @@ public class UIComponent extends InputComponent
 	{
 		super.passInitialEvents( _events ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
-		_events.add( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		_events.add( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 		{
-			public void callback( final DrawDelegate _delegate )
+			if( delegate != null )
 			{
-				if( delegate != null )
-				{
-					// Don't call shutdown(), we don't want to 
-					// clean anything except an existing DrawDelegate.
-					delegate.shutdown() ;
-				}
+				// Don't call shutdown(), we don't want to 
+				// clean anything except an existing DrawDelegate.
+				delegate.shutdown() ;
+			}
 
-				delegate = _delegate ;
+			delegate = _delegate ;
 
-				final int size = elements.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final UIElement element = elements.get( i ) ;
-					element.passDrawDelegate( delegate, world, camera ) ;
-				}
+			final int size = elements.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final UIElement element = elements.get( i ) ;
+				element.passDrawDelegate( delegate, world, camera ) ;
 			}
 		} ) ) ;
 	}

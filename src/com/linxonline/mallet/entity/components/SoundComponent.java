@@ -164,16 +164,13 @@ public class SoundComponent extends EventComponent implements SourceCallback
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
+		_events.add( AudioAssist.constructAudioDelegate( ( final AudioDelegate _delegate ) ->
 		{
-			public void callback( final AudioDelegate _delegate )
+			delegate = _delegate ;
+			final Collection<Audio> audio = sounds.values() ;
+			for( final Audio a : audio )
 			{
-				delegate = _delegate ;
-				final Collection<Audio> audio = sounds.values() ;
-				for( final Audio a : audio )
-				{
-					delegate.addAudio( a ) ;
-				}
+				delegate.addAudio( a ) ;
 			}
 		} ) ) ;
 		super.passInitialEvents( _events ) ;

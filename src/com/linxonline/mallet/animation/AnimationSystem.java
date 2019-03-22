@@ -70,12 +70,9 @@ public class AnimationSystem
 			Animation System requires a handle to the Rendering System.
 			It determines when an Animation is displayed or not.
 		*/
-		controller.passEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		controller.passEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) -> 
 		{
-			public void callback( final DrawDelegate _delegate )
-			{
-				drawDelegate = _delegate ;
-			}
+			drawDelegate = _delegate ;
 		} ) ) ;
 	}
 

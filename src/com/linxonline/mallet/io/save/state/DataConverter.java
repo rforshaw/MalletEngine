@@ -43,23 +43,11 @@ public class DataConverter
 		final Track<T> track = ( Track<T> )converters.get( _handler ) ;
 		track.add( _out, _in ) ;
 
-		events.addEventProcessor( new EventProcessor<T>( "TRACK_" + _handler, "TRACK_" + _handler )
-		{
-			public void processEvent( final Event<T> _event )
-			{
-				// Add the DataSet to the DataOut/In tracker
-				track.add( _event.getVariable() ) ;
-			}
-		} ) ;
+		// Add the DataSet to the DataOut/In tracker
+		events.addProcessor( "TRACK_" + _handler, ( final T _var ) -> track.add( _var ) ) ;
 
-		events.addEventProcessor( new EventProcessor<T>( "UNTRACK_" + _handler, "UNTRACK_" + _handler )
-		{
-			public void processEvent( final Event<T> _event )
-			{
-				// Remove the DataSet to the DataOut/In tracker
-				track.remove( _event.getVariable() ) ;
-			}
-		} ) ;
+		// Remove the DataSet to the DataOut/In tracker
+		events.addProcessor( "UNTRACK_" + _handler, ( final T _var ) -> track.remove( _var ) ) ;
 	}
 
 	public void write()

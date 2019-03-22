@@ -49,32 +49,21 @@ public class UIEditorState extends GameState
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
 		{
 			final UIButton open = jui.get( "OpenButton", UIButton.class ) ;
-			UIButton.connect( open, open.released(), new Connect.Slot<UIButton>()
+			UIButton.connect( open, open.released(), ( UIButton _open ) ->
 			{
-				final List<UIElement> elements = MalletList.<UIElement>newList() ;
-
-				public void slot( final UIButton _open )
-				{
-					component.addElement( createOpenPanel( 20 ) ) ;
-				}
+				component.addElement( createOpenPanel( 20 ) ) ;
 			} ) ;
 
 			final UIButton save = jui.get( "SaveButton", UIButton.class ) ;
-			UIButton.connect( save, save.released(), new Connect.Slot<UIButton>()
+			UIButton.connect( save, save.released(), ( UIButton _save ) ->
 			{
-				public void slot( final UIButton _open )
-				{
-					component.addElement( createSavePanel( 20 ) ) ;
-				}
+				component.addElement( createSavePanel( 20 ) ) ;
 			} ) ;
 
 			final UIButton exit = jui.get( "ExitButton", UIButton.class ) ;
-			UIButton.connect( exit, exit.released(), new Connect.Slot<UIButton>()
+			UIButton.connect( exit, exit.released(), ( UIButton _exit ) ->
 			{
-				public void slot( final UIButton _open )
-				{
-					System.out.println( "Exit Project..." ) ;
-				}
+				System.out.println( "Exit Project..." ) ;
 			} ) ;
 
 			mainView = jui.get( "MainWindow", UILayout.class ) ;
@@ -100,44 +89,33 @@ public class UIEditorState extends GameState
 	{
 		super.initEventProcessors( _internal, _external ) ;
 
-		_internal.addEventProcessor( new EventProcessor<Entity>( "ADD_ENTITY", "ADD_ENTITY" )
+		_internal.addProcessor( "ADD_ENTITY", ( final Entity _entity ) -> 
 		{
-			public void processEvent( final Event<Entity> _event )
-			{
-				addEntity( _event.getVariable() ) ;
-			}
+			addEntity( _entity ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<UIPacket>( "INSERT_UIPACKET", "INSERT_UIPACKET" )
+		_internal.addProcessor( "INSERT_UIPACKET", ( final UIPacket _packet ) ->
 		{
-			public void processEvent( final Event<UIPacket> _event )
+			if( root != null )
 			{
-				final UIPacket packet = _event.getVariable() ;
-				if( root != null )
+				root.insertUIWrapper( _packet.getWrapper(), _packet.getX(), _packet.getY() ) ;
+			}
+			else
+			{
+				if( mainView.intersectPoint( _packet.getX(), _packet.getY() ) )
 				{
-					root.insertUIWrapper( packet.getWrapper(), packet.getX(), packet.getY() ) ;
-				}
-				else
-				{
-					if( mainView.intersectPoint( packet.getX(), packet.getY() ) )
-					{
-						root = packet.getWrapper() ;
-						root.setLayer( 1 ) ;
-						mainView.addElement( root ) ;
-					}
+					root = _packet.getWrapper() ;
+					root.setLayer( 1 ) ;
+					mainView.addElement( root ) ;
 				}
 			}
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<CUIPacket>( "INSERT_CUIPACKET", "INSERT_CUIPACKET" )
+		_internal.addProcessor( "INSERT_CUIPACKET", ( final CUIPacket _packet ) ->
 		{
-			public void processEvent( final Event<CUIPacket> _event )
+			if( root != null )
 			{
-				final CUIPacket packet = _event.getVariable() ;
-				if( root != null )
-				{
-					root.insertMetaComponent( packet.getMetaComponent(), packet.getX(), packet.getY() ) ;
-				}
+				root.insertMetaComponent( _packet.getMetaComponent(), _packet.getX(), _packet.getY() ) ;
 			}
 		} ) ;
 

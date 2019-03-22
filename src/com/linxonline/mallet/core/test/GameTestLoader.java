@@ -111,116 +111,112 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderTextureExample()
 			{
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 				{
-					@Override
-					public void callback( final DrawDelegate _delegate )
 					{
-						{
-							final World base = WorldAssist.getDefaultWorld() ;
-							final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
+						final World base = WorldAssist.getDefaultWorld() ;
+						final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
-							final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
-							CameraAssist.addCamera( cam, null ) ;
+						final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
+						CameraAssist.addCamera( cam, null ) ;
 
-							CameraAssist.amendOrthographic( cam, 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
-							CameraAssist.amendScreenResolution( cam, dim.x / 4, dim.y / 4 ) ;
-							//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
-						}
-
-						{
-							final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
-							final int width = texture.getWidth() ;
-							final int height = texture.getHeight() ;
-
-							final Draw draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
-																	 new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ),
-																	 10 ) ;
-
-							final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-							ProgramAssist.map( program, "inTex0", texture ) ;
-							DrawAssist.attachProgram( draw, program ) ;
-
-							DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
-							DrawAssist.amendUI( draw, true ) ;
-
-							_delegate.addBasicDraw( draw ) ;
-						}
-
-						{
-							final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
-							final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
-							lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
-							lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
-							lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
-							lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
-							lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
-							lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
-
-							lines.addIndex( 0 ) ;
-							lines.addIndex( 1 ) ;
-							lines.addIndex( 2 ) ;
-							lines.addIndex( 3 ) ;
-							lines.addIndex( 2 ) ;
-							lines.addIndex( 4 ) ;
-							lines.addIndex( 5 ) ;
-
-							final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
-																	 new Vector3( -100.0f, 0.0f, 0.0f ),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ),
-																	 10 ) ;
-							DrawAssist.amendShape( draw, lines ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-
-							_delegate.addBasicDraw( draw ) ;
-						}
-
-						{
-							final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
-							triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
-							triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
-							triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
-							triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
-							triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
-							triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
-
-							triangle.addIndex( 0 ) ;
-							triangle.addIndex( 1 ) ;
-							triangle.addIndex( 2 ) ;
-							triangle.addIndex( 3 ) ;
-							triangle.addIndex( 4 ) ;
-							triangle.addIndex( 5 ) ;
-
-							final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 0.0f, 0.0f ),
-																	 new Vector3(),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ),
-																	 0 ) ;
-							DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-
-							_delegate.addBasicDraw( draw ) ;
-						}
-
-						/*{
-							final Shape shape = SGeom.load( "base/ui/test.sgeom" ) ;
-							if( shape != null )
-							{
-								final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
-																		new Vector3(),
-																		new Vector3(),
-																		new Vector3( 1, 1, 1 ),
-																		10 ) ;
-								DrawAssist.amendShape( draw, shape ) ;
-								DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-
-								_delegate.addBasicDraw( draw ) ;
-							}
-						}*/
+						CameraAssist.amendOrthographic( cam, 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
+						CameraAssist.amendScreenResolution( cam, dim.x / 4, dim.y / 4 ) ;
+						//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 					}
+
+					{
+						final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
+						final int width = texture.getWidth() ;
+						final int height = texture.getHeight() ;
+
+						final Draw draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
+																	new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
+																	new Vector3(),
+																	new Vector3( 1, 1, 1 ),
+																	10 ) ;
+
+						final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+						ProgramAssist.map( program, "inTex0", texture ) ;
+						DrawAssist.attachProgram( draw, program ) ;
+
+						DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+						DrawAssist.amendUI( draw, true ) ;
+
+						_delegate.addBasicDraw( draw ) ;
+					}
+
+					{
+						final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
+						final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
+						lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
+						lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
+						lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
+						lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
+						lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
+						lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
+
+						lines.addIndex( 0 ) ;
+						lines.addIndex( 1 ) ;
+						lines.addIndex( 2 ) ;
+						lines.addIndex( 3 ) ;
+						lines.addIndex( 2 ) ;
+						lines.addIndex( 4 ) ;
+						lines.addIndex( 5 ) ;
+
+						final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
+																	new Vector3( -100.0f, 0.0f, 0.0f ),
+																	new Vector3(),
+																	new Vector3( 1, 1, 1 ),
+																	10 ) ;
+						DrawAssist.amendShape( draw, lines ) ;
+						DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+
+						_delegate.addBasicDraw( draw ) ;
+					}
+
+					{
+						final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
+						triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
+						triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
+						triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
+						triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
+						triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
+						triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
+
+						triangle.addIndex( 0 ) ;
+						triangle.addIndex( 1 ) ;
+						triangle.addIndex( 2 ) ;
+						triangle.addIndex( 3 ) ;
+						triangle.addIndex( 4 ) ;
+						triangle.addIndex( 5 ) ;
+
+						final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 0.0f, 0.0f ),
+																	new Vector3(),
+																	new Vector3(),
+																	new Vector3( 1, 1, 1 ),
+																	0 ) ;
+						DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
+						DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+
+						_delegate.addBasicDraw( draw ) ;
+					}
+
+					/*{
+						final Shape shape = SGeom.load( "base/ui/test.sgeom" ) ;
+						if( shape != null )
+						{
+							final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
+																	new Vector3(),
+																	new Vector3(),
+																	new Vector3( 1, 1, 1 ),
+																	10 ) ;
+							DrawAssist.amendShape( draw, shape ) ;
+							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+
+							_delegate.addBasicDraw( draw ) ;
+						}
+					}*/
 				} ) ) ;
 			}
 
@@ -268,21 +264,17 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 				{
-					@Override
-					public void callback( final DrawDelegate _delegate )
-					{
-						final Draw draw = DrawAssist.createTextDraw( "Hello world!",
-																	 new MalletFont( "Arial" ),
-																	 new Vector3( 0.0f, -80.0f, 0.0f ),
-																	 new Vector3( 0, 0, 0 ),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ),
-																	 200 ) ;
-						DrawAssist.amendColour( draw, new MalletColour( 144, 195, 212 ) ) ;
-						_delegate.addTextDraw( draw ) ;
-					}
+					final Draw draw = DrawAssist.createTextDraw( "Hello world!",
+																	new MalletFont( "Arial" ),
+																	new Vector3( 0.0f, -80.0f, 0.0f ),
+																	new Vector3( 0, 0, 0 ),
+																	new Vector3(),
+																	new Vector3( 1, 1, 1 ),
+																	200 ) ;
+					DrawAssist.amendColour( draw, new MalletColour( 144, 195, 212 ) ) ;
+					_delegate.addTextDraw( draw ) ;
 				} ) ) ;
 			}
 
@@ -291,43 +283,40 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void playAudioExample()
 			{
-				eventSystem.addEvent( AudioAssist.constructAudioDelegate( new AudioDelegateCallback()
+				eventSystem.addEvent( AudioAssist.constructAudioDelegate( ( final AudioDelegate _delegate ) ->
 				{
-					public void callback( final AudioDelegate _delegate )
+					final Audio audio = AudioAssist.createAudio( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
+					_delegate.addAudio( AudioAssist.amendCallback( AudioAssist.play( audio ), new SourceCallback()
 					{
-						final Audio audio = AudioAssist.createAudio( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
-						_delegate.addAudio( AudioAssist.amendCallback( AudioAssist.play( audio ), new SourceCallback()
+						public void callbackRemoved() {}
+
+						public void start()
 						{
-							public void callbackRemoved() {}
+							//System.out.println( "Audio start." ) ;
+						}
 
-							public void start()
-							{
-								//System.out.println( "Audio start." ) ;
-							}
+						public void pause()
+						{
+							//System.out.println( "Audio pause." ) ;
+						}
 
-							public void pause()
-							{
-								//System.out.println( "Audio pause." ) ;
-							}
+						public void stop()
+						{
+							//System.out.println( "Audio stop." ) ;
+						}
 
-							public void stop()
-							{
-								//System.out.println( "Audio stop." ) ;
-							}
+						public void tick( final float _dt )
+						{
+							//System.out.println( "Audio Tick " + _dt ) ;
+						}
 
-							public void tick( final float _dt )
-							{
-								//System.out.println( "Audio Tick " + _dt ) ;
-							}
-
-							public void finished()
-							{
-								//System.out.println( "Audio Finished." ) ;
-								// Enable to loop test audio.
-								AudioAssist.play( audio ) ;
-							}
-						} ) ) ;
-					}
+						public void finished()
+						{
+							//System.out.println( "Audio Finished." ) ;
+							// Enable to loop test audio.
+							AudioAssist.play( audio ) ;
+						}
+					} ) ) ;
 				} ) ) ;
 
 				/*final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
@@ -477,13 +466,9 @@ public final class GameTestLoader implements IGameLoader
 						public void initStateEventProcessors( final EventController _controller )
 						{
 							super.initStateEventProcessors( _controller ) ;
-							_controller.addEventProcessor( new EventProcessor<String>( "TEST_EVENT", "TEST_EVENT" )
+							_controller.addProcessor( "TEST_EVENT", ( final String _message ) ->
 							{
-								@Override
-								public void processEvent( final Event<String> _event )
-								{
-									System.out.println( "Received: " + _event.getVariable() ) ;
-								}
+								System.out.println( "Received: " + _message ) ;
 							} ) ;
 						}
 					} ;

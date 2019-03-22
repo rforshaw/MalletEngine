@@ -36,6 +36,23 @@ public class EventController implements IEventHandler
 		name = ( _name != null ) ? _name : "EVENT CONTROLLER" ;
 	}
 
+	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
+	{
+		addProcessor( _type, _type, _processor ) ;
+	}
+
+	public <T> void addProcessor( final String _name, final String _type, final IProcessor<T> _processor )
+	{
+		addEventProcessor( new EventProcessor<T>( _name, _type )
+		{
+			@Override
+			public void processEvent( final Event<T> _event )
+			{
+				_processor.process( _event.getVariable() ) ;
+			}
+		} ) ;
+	}
+
 	/**
 		Add an Event Processor to begin reading the event stream.
 		The event controller is considered the parent of the processor.
@@ -182,5 +199,11 @@ public class EventController implements IEventHandler
 		{
 			events.clear() ;
 		}
+	}
+
+	@FunctionalInterface
+	public interface IProcessor<T>
+	{
+		public void process( final T _variable ) ;
 	}
 }

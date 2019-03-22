@@ -24,21 +24,14 @@ public abstract class BasicRenderer implements IRender
 	@Override
 	public void start()
 	{
-		controller.addEventProcessor( new EventProcessor<DrawDelegateCallback>( "DRAW_DELEGATE", "DRAW_DELEGATE" )
+		controller.addProcessor( "DRAW_DELEGATE", ( final DrawDelegateCallback _delegate ) ->
 		{
-			public void processEvent( final Event<DrawDelegateCallback> _event )
-			{
-				final DrawDelegateCallback callback = _event.getVariable() ;
-				callback.callback( constructDrawDelegate() ) ;
-			}
+			_delegate.callback( constructDrawDelegate() ) ;
 		} ) ;
 
-		controller.addEventProcessor( new EventProcessor<DrawDelegateCallback>( "DRAW_CLEAN", "DRAW_CLEAN" )
+		controller.addProcessor( "DRAW_CLEAN", ( final DrawDelegateCallback _delegate ) ->
 		{
-			public void processEvent( final Event<DrawDelegateCallback> _event )
-			{
-				clean() ;
-			}
+			clean() ;
 		} ) ;
 	}
 

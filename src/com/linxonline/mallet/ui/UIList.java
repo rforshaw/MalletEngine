@@ -59,13 +59,10 @@ public class UIList extends UILayout
 
 	private void initFrameConnections()
 	{
-		addEvent( DrawAssist.constructDrawDelegate( new DrawDelegateCallback()
+		addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 		{
-			public void callback( final DrawDelegate _delegate )
-			{
-				frame.setDrawDelegate( _delegate ) ;
-				UIList.this.passListDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
-			}
+			frame.setDrawDelegate( _delegate ) ;
+			UIList.this.passListDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
 		} ) ) ;
 
 		FrameBuffer.connect( this, frame ) ;

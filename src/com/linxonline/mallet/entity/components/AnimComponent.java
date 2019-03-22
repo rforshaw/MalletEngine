@@ -171,15 +171,12 @@ public class AnimComponent extends EventComponent implements SourceCallback
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( AnimationAssist.constructAnimationDelegate( new AnimationDelegateCallback()
+		_events.add( AnimationAssist.constructAnimationDelegate( ( final AnimationDelegate _delegate ) ->
 		{
-			public void callback( final AnimationDelegate _delegate )
+			delegate = _delegate ;
+			if( defaultAnim != null )
 			{
-				delegate = _delegate ;
-				if( defaultAnim != null )
-				{
-					playAnimation( defaultAnim ) ;
-				}
+				playAnimation( defaultAnim ) ;
 			}
 		} ) ) ;
 		super.passInitialEvents( _events ) ;

@@ -108,22 +108,22 @@ public class CameraData<T extends CameraData> implements Camera<T>
 
 	public Vector3 getUIPosition()
 	{
-		return uiPosition ;
+		return currentUIPosition ;
 	}
 
 	public Vector3 getPosition()
 	{
-		return position ;
+		return currentPosition ;
 	}
 
 	public Vector3 getRotation()
 	{
-		return rotation ;
+		return currentRotation ;
 	}
 
 	public Vector3 getScale()
 	{
-		return scale ;
+		return currentScale ;
 	}
 
 	public Projection getProjection()
