@@ -41,18 +41,15 @@ public class AudioSystem
 	public AudioSystem( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;
-		controller.addEventProcessor( new EventProcessor<AudioDelegateCallback>( "AUDIO_DELEGATE", "AUDIO_DELEGATE" )
+		controller.addProcessor( "AUDIO_DELEGATE", ( final AudioDelegateCallback _callback ) ->
 		{
-			public void processEvent( final Event<AudioDelegateCallback> _event )
-			{
-				final AudioDelegateCallback callback = _event.getVariable() ;
-				callback.callback( constructAudioDelegate() ) ;
-			}
+			_callback.callback( constructAudioDelegate() ) ;
 		} ) ;
 
-		controller.addEventProcessor( new EventProcessor( "AUDIO_CLEAN", "AUDIO_CLEAN" )
+		controller.addProcessor( "AUDIO_CLEAN", new EventController.IProcessor<Object>()
 		{
-			public void processEvent( final Event _event )
+			@Override
+			public void process( final Object _null )
 			{
 				if( sourceGenerator == null )
 				{
@@ -80,12 +77,9 @@ public class AudioSystem
 			}
 		} ) ;
 
-		controller.addEventProcessor( new EventProcessor<Volume>( "CHANGE_VOLUME", "CHANGE_VOLUME" )
+		controller.addProcessor( "CHANGE_VOLUME", ( final Volume _volume ) ->
 		{
-			public void processEvent( final Event<Volume> _event )
-			{
-				volumes.add( new Volume( _event.getVariable() ) ) ;
-			}
+			volumes.add( new Volume( _volume ) ) ;
 		} ) ;
 
 		AudioAssist.setAssist( new Assist() ) ;

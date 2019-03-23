@@ -18,12 +18,14 @@ import com.linxonline.mallet.util.Logger ;
 **/
 public class EventController implements IEventHandler
 {
+	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) -> {} ;
+
 	private final List<EventType> wantedTypes = MalletList.<EventType>newList() ;
 	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
 	private final String name ;
 	private final SwapList<Event<?>> messenger = new SwapList<Event<?>>() ;
-	private final List<EventProcessor> processors = MalletList.<EventProcessor>newList() ;
+	private final EventType.Lookup<IProcessor<?>> processors = new EventType.Lookup<IProcessor<?>>( PROCESSOR_FALLBACK ) ;
 	private IAddEvent addInterface = ADD_EVENT_FALLBACK ;
 
 	public EventController()
@@ -38,42 +40,12 @@ public class EventController implements IEventHandler
 
 	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
 	{
-		addProcessor( _type, _type, _processor ) ;
-	}
-
-	public <T> void addProcessor( final String _name, final String _type, final IProcessor<T> _processor )
-	{
-		addEventProcessor( new EventProcessor<T>( _name, _type )
+		final EventType type = EventType.get( _type ) ;
+		if( wantedTypes.contains( type ) == false )
 		{
-			@Override
-			public void processEvent( final Event<T> _event )
-			{
-				_processor.process( _event.getVariable() ) ;
-			}
-		} ) ;
-	}
-
-	/**
-		Add an Event Processor to begin reading the event stream.
-		The event controller is considered the parent of the processor.
-	*/
-	public void addEventProcessor( final EventProcessor _processor )
-	{
-		if( _processor == null )
-		{
-			Logger.println( "Attempting to add null processor to controller.", Logger.Verbosity.MAJOR ) ;
-			return ;
+			wantedTypes.add( type ) ;
 		}
-
-		if( processors.contains( _processor ) == false )
-		{
-			processors.add( _processor ) ;
-			final EventType type = _processor.getEventType() ;
-			if( wantedTypes.contains( type ) == false )
-			{
-				wantedTypes.add( type ) ;
-			}
-		}
+		processors.add( type, _processor ) ;
 	}
 
 	public void setAddEventInterface( final IAddEvent _addInterface )
@@ -115,15 +87,12 @@ public class EventController implements IEventHandler
 			return ;
 		}
 
-		final int eventsSize = events.size() ;
-		final int processorSize = processors.size() ;
-		for( int i = 0; i < processorSize; ++i )
+		final int size = events.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			final EventProcessor<?> proc = processors.get( i ) ;
-			for( int j = 0; j < eventsSize; ++j )
-			{
-				proc.passEvent( events.get( j ) ) ;
-			}
+			final Event event = events.get( i ) ;
+			final IProcessor proc = processors.get( event.getEventType() ) ;
+			proc.process( event.getVariable() ) ;
 		}
 	}
 
@@ -139,8 +108,8 @@ public class EventController implements IEventHandler
 	public void reset()
 	{
 		clearEvents() ;
-		processors.clear() ;
 		wantedTypes.clear() ;
+		processors.clear() ;
 		setAddEventInterface( null ) ;
 	}
 	

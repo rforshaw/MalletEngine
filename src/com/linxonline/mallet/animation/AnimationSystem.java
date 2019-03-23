@@ -8,7 +8,6 @@ import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventType ;
-import com.linxonline.mallet.event.EventProcessor ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.IAddEvent ;
 
@@ -35,18 +34,15 @@ public class AnimationSystem
 
 	public AnimationSystem()
 	{
-		controller.addEventProcessor( new EventProcessor<AnimationDelegateCallback>( "ANIMATION_DELEGATE", "ANIMATION_DELEGATE" )
+		controller.addProcessor( "ANIMATION_DELEGATE", ( final AnimationDelegateCallback _callback ) ->
 		{
-			public void processEvent( final Event<AnimationDelegateCallback> _event )
-			{
-				final AnimationDelegateCallback callback = _event.getVariable() ;
-				callback.callback( constructAnimationDelegate() ) ;
-			}
+			_callback.callback( constructAnimationDelegate() ) ;
 		} ) ;
 
-		controller.addEventProcessor( new EventProcessor( "ANIMATION_CLEAN", "ANIMATION_CLEAN" )
+		controller.addProcessor( "ANIMATION_CLEAN", new EventController.IProcessor<Object>()
 		{
-			public void processEvent( final Event _event )
+			@Override
+			public void process( final Object _null )
 			{
 				final Set<String> activeKeys = new HashSet<String>() ;
 				getActiveKeys( activeKeys, toAddAnim ) ;

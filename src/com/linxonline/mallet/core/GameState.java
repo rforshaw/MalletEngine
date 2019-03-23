@@ -23,7 +23,6 @@ import com.linxonline.mallet.input.InputState ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventSystem ;
-import com.linxonline.mallet.event.EventProcessor ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.IEventSystem ;
 
@@ -504,13 +503,13 @@ public class GameState extends State
 			eventBackend.removeEventHandler( _controller ) ;
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<Boolean>( "SHOW_GAME_STATE_FPS", "SHOW_GAME_STATE_FPS" )
+		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()
 		{
 			private DrawDelegate delegate ;
 
-			public void processEvent( final Event<Boolean> _event )
+			public void process( final Boolean _show )
 			{
-				final boolean show = _event.getVariable() ;
+				final boolean show = _show ;
 				if( show == showFPS.toShow() )
 				{
 					// If they are setting it to the same value it 

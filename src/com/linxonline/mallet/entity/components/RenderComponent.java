@@ -13,6 +13,7 @@ import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
 public class RenderComponent extends Entity.Component
@@ -92,11 +93,13 @@ public class RenderComponent extends Entity.Component
 
 	public void remove( final Draw _draw )
 	{
-		if( drawDelegate != null )
+		if( drawDelegate == null )
 		{
-			System.out.println( "RenderComponent remove Draw" ) ;
-			drawDelegate.removeDraw( _draw ) ;
+			Logger.println( "Attempting to remove draw from render component without a draw delegate.", Logger.Verbosity.MAJOR ) ;
+			return ;
 		}
+
+		drawDelegate.removeDraw( _draw ) ;
 	}
 
 	@Override

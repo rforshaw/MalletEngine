@@ -84,34 +84,22 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
+		eventController.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
 		{
-			@Override
-			public void processEvent( final Event<Boolean> _event )
-			{
-				final boolean displayMouse = _event.getVariable() ;
-				getWindow().setPointerVisible( displayMouse ) ;
-			}
+			final boolean displayMouse = _displayMouse ;
+			getWindow().setPointerVisible( displayMouse ) ;
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "CAPTURE_SYSTEM_MOUSE" )
+		eventController.addProcessor( "CAPTURE_SYSTEM_MOUSE", ( Boolean _confineMouse ) ->
 		{
-			@Override
-			public void processEvent( final Event<Boolean> _event )
-			{
-				final boolean confineMouse = _event.getVariable() ;
-				getWindow().confinePointer( confineMouse ) ;
-			}
+			final boolean confineMouse = _confineMouse ;
+			getWindow().confinePointer( confineMouse ) ;
 		} ) ;
 
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "SYSTEM_FULLSCREEN" )
+		eventController.addProcessor( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
 		{
-			@Override
-			public void processEvent( final Event<Boolean> _event )
-			{
-				final boolean fullscreen = _event.getVariable() ;
-				getWindow().setFullscreen( fullscreen ) ;
-			}
+			final boolean fullscreen = _fullscreen ;
+			getWindow().setFullscreen( fullscreen ) ;
 		} ) ;
 
 		getEventSystem().addEventHandler( eventController ) ;

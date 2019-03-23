@@ -119,15 +119,13 @@ public class UIEditorState extends GameState
 			}
 		} ) ;
 
-		_internal.addEventProcessor( new EventProcessor<UIWrapper>( "DISPLAY_META", "DISPLAY_META" )
+		_internal.addProcessor( "DISPLAY_META", new EventController.IProcessor<UIWrapper>()
 		{
 			UIElement.Meta current = null ;
 
-			public void processEvent( final Event<UIWrapper> _event )
+			public void process( final UIWrapper _wrapper )
 			{
-				final UIWrapper wrapper = _event.getVariable() ;
-				final UIElement.Meta meta = wrapper.getMeta() ;
-
+				final UIElement.Meta meta = _wrapper.getMeta() ;
 				if( meta == current )
 				{
 					return ;

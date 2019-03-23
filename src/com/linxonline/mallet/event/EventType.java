@@ -1,6 +1,7 @@
 package com.linxonline.mallet.event ;
 
 import java.util.Map ;
+import java.util.Arrays ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -18,6 +19,7 @@ import com.linxonline.mallet.util.MalletMap ;
 public final class EventType
 {
 	private final static Map<String, EventType> eventTypes = MalletMap.<String, EventType>newMap() ;
+	private static int incrementID = 0 ;
 
 	// An Event Processor set to use NONE will not 
 	// receive any events from the Event System.
@@ -27,21 +29,23 @@ public final class EventType
 	// events from the Event System it is registered to.
 	public static final EventType ALL = EventType.get( "ALL" ) ;
 
-	private final String name ;
+	private final String type ;
+	private final int id ;
 
-	private EventType()
+	private EventType( final String _type, final int _id )
 	{
-		name = "UNDEFINED" ;
+		type = _type ;
+		id = _id ;
 	}
 
-	private EventType( final String _name )
+	public int getID()
 	{
-		name = _name ;
+		return id ;
 	}
 
 	public String toString()
 	{
-		return name ;
+		return type ;
 	}
 
 	/**
@@ -58,9 +62,62 @@ public final class EventType
 				return type ;
 			}
 
-			final EventType newType = new EventType( _type ) ;
+			final EventType newType = new EventType( _type, incrementID++ ) ;
 			eventTypes.put( _type, newType ) ;
 			return newType ;
+		}
+	}
+
+	public static class Lookup<T>
+	{
+		private T fallback = null ;
+		private Object[] types = new Object[0] ;
+
+		public Lookup() {}
+
+		public Lookup( T _fallback )
+		{
+			fallback = _fallback ;
+		}
+
+		public T add( final EventType _type, final T _variable )
+		{
+			final int id = _type.getID() ;
+			ensureCapacity( id + 1 ) ;
+			types[id] = _variable ;
+			return _variable ;
+		}
+
+		public void remove( final EventType _type )
+		{
+			final int id = _type.getID() ;
+			ensureCapacity( id + 1 ) ;
+			types[id] = null ;
+		}
+
+		public T get( final EventType _type )
+		{
+			final int id = _type.getID() ;
+			ensureCapacity( id + 1 ) ;
+			return ( T )types[id] ;
+		}
+
+		public void clear()
+		{
+			types = new Object[0] ;
+		}
+
+		private void ensureCapacity( final int _size )
+		{
+			final int size = types.length ;
+			if( size < _size )
+			{
+				types = Arrays.copyOf( types, _size ) ;
+				for( int i = size; i < _size; ++i )
+				{
+					types[i] = fallback ;
+				}
+			}
 		}
 	}
 }

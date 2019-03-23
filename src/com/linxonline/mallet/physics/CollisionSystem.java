@@ -43,20 +43,14 @@ public class CollisionSystem extends EventController
 
 	private void initEventProcessors()
 	{
-		addEventProcessor( new EventProcessor<Hull>( "COLLISION_SYSTEM", "ADD_COLLISION_HULL" )
+		addProcessor( "ADD_COLLISION_HULL", ( Hull _hull ) ->
 		{
-			public void processEvent( final Event<Hull> _event )
-			{
-				add( _event.getVariable() ) ;
-			}
+			add( _hull ) ;
 		} ) ;
 
-		addEventProcessor( new EventProcessor<Hull>( "COLLISION_SYSTEM", "REMOVE_COLLISION_HULL" )
+		addProcessor( "REMOVE_COLLISION_HULL", ( Hull _hull ) ->
 		{
-			public void processEvent( final Event<Hull> _event )
-			{
-				remove( _event.getVariable() ) ;
-			}
+			remove( _hull ) ;
 		} ) ;
 	}
 

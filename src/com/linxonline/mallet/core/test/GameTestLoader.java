@@ -71,32 +71,20 @@ public final class GameTestLoader implements IGameLoader
 				final UIButton button2 = jUI.get( "TestButton2", UIButton.class ) ;
 				final UICheckbox checkbox = jUI.get( "TestCheckbox", UICheckbox.class ) ;
 
-				UIElement.connect( button1, button1.released(), new Connect.Slot<UIButton>()
+				UIElement.connect( button1, button1.released(), ( final UIButton _box ) ->
 				{
-					@Override
-					public void slot( final UIButton _box )
-					{
-						button2.setVisible( !button2.isVisible() ) ;
-					}
+					button2.setVisible( !button2.isVisible() ) ;
 				} ) ;
 
-				UIElement.connect( button2, button2.released(), new Connect.Slot<UIButton>()
+				UIElement.connect( button2, button2.released(), ( final UIButton _box ) ->
 				{
-					@Override
-					public void slot( final UIButton _box )
-					{
-						button1.setVisible( !button1.isVisible() ) ;
-					}
+					button1.setVisible( !button1.isVisible() ) ;
 				} ) ;
 
-				UIElement.connect( checkbox, checkbox.checkChanged(), new Connect.Slot<UICheckbox>()
+				UIElement.connect( checkbox, checkbox.checkChanged(), ( final UICheckbox _box ) ->
 				{
-					@Override
-					public void slot( final UICheckbox _box )
-					{
-						button1.setVisible( !button1.isVisible() ) ;
-						button2.setVisible( !button2.isVisible() ) ;
-					}
+					button1.setVisible( !button1.isVisible() ) ;
+					button2.setVisible( !button2.isVisible() ) ;
 				} ) ;
 
 				final Entity entity = new Entity( "UI" ) ;

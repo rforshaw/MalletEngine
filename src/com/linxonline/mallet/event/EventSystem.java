@@ -23,7 +23,8 @@ public final class EventSystem implements IEventSystem
 	} ;
 
 	private final String name ;
-	private final List<EventQueue> queues = MalletList.<EventQueue>newList() ;
+	private final List<EventType> eventTypes = MalletList.<EventType>newList() ;
+	private final EventType.Lookup<EventQueue> queues = new EventType.Lookup<EventQueue>() ;
 	private final EventQueue allQueue ;
 
 	private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList() ;
@@ -39,6 +40,9 @@ public final class EventSystem implements IEventSystem
 		name = ( _name != null ) ? _name : "NONE" ;
 		// Guarantee an ALL Queue.
 		allQueue = getEventQueue( EventType.ALL ) ;
+
+		eventTypes.add( EventType.ALL ) ;
+		eventTypes.add( EventType.NONE ) ;
 	}
 
 	/**
@@ -62,6 +66,14 @@ public final class EventSystem implements IEventSystem
 		handlers.add( weakHandler ) ;
 
 		final List<EventType> types = _handler.getWantedEventTypes() ;
+		for( final EventType type : types )
+		{
+			if( eventTypes.contains( type ) == false )
+			{
+				eventTypes.add( type ) ;
+			}
+		}
+
 		if( types.isEmpty() == true || types.contains( EventType.ALL ) == true )
 		{
 			// Due to legacy we must assumme that a types size of 0, 
@@ -140,10 +152,9 @@ public final class EventSystem implements IEventSystem
 	public final void update()
 	{
 		removeHandlersNow() ;
-		final int size = queues.size() ;
-		for( int i = 0; i < size; ++i )
+		for( final EventType type : eventTypes )
 		{
-			queues.get( i ).update() ;
+			getEventQueue( type ).update() ;
 		}
 	}
 	
@@ -185,20 +196,18 @@ public final class EventSystem implements IEventSystem
 		handlers.clear() ;
 		toBeRemoved.clear() ;
 
-		final int size = queues.size() ;
-		for( int i = 0; i < size; ++i )
+		for( final EventType type : eventTypes )
 		{
-			queues.get( i ).clearHandlers() ;
+			getEventQueue( type ).clearHandlers() ;
 		}
 	}
 
 	@Override
 	public final void clearEvents()
 	{
-		final int size = queues.size() ;
-		for( int i = 0; i < size; ++i )
+		for( final EventType type : eventTypes )
 		{
-			queues.get( i ).clearEvents() ;
+			getEventQueue( type ).clearEvents() ;
 		}
 	}
 
@@ -214,18 +223,12 @@ public final class EventSystem implements IEventSystem
 
 	private EventQueue getEventQueue( final EventType _type )
 	{
-		final int length = queues.size() ;
-		for( int i = 0; i < length; ++i )
+		EventQueue que = queues.get( _type ) ;
+		if( que == null )
 		{
-			final EventQueue que = queues.get( i ) ;
-			if( que.isType( _type ) == true )
-			{
-				return que ;
-			}
+			que = new EventQueue( _type ) ;
+			queues.add( _type, que ) ;
 		}
-
-		final EventQueue que = new EventQueue( _type ) ;
-		queues.add( que ) ;
 
 		return que ;
 	}
@@ -248,9 +251,10 @@ public final class EventSystem implements IEventSystem
 	{
 		final StringBuffer buffer = new StringBuffer() ;
 		buffer.append( "[Event System: " + getName() ) ;
-		for( final EventQueue queue : queues )
+		for( final EventType type : eventTypes )
 		{
-			buffer.append( queue.toString() + "," ) ;
+			final EventQueue que = getEventQueue( type ) ;
+			buffer.append( que.toString() + "," ) ;
 		}
 		buffer.append( "]" ) ;
 		return buffer.toString() ;
