@@ -12,7 +12,7 @@ import com.linxonline.mallet.renderer.Interpolation ;
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public class GLDrawData extends DrawData
+public class GLDrawData extends DrawData<GLDrawData, GLProgram>
 {
 	private com.linxonline.mallet.renderer.opengl.Location<GLGeometryUploader.BufferObject, GLDrawData> newLocation ;
 

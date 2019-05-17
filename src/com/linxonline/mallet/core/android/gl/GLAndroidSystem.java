@@ -62,17 +62,15 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_KEYBOARD", "DISPLAY_SYSTEM_KEYBOARD" )
+		eventController.addProcessor( "USE_SYSTEM_KEYBOARD", new EventController.IProcessor<Boolean>()
 		{
 			private boolean show = false ;
 
 			@Override
-			public void processEvent( final Event<Boolean> _event )
+			public void process( final Boolean _variable )
 			{
-				final Boolean variable = _event.getVariable() ;
-				
 				final InputMethodManager imm = ( InputMethodManager )activity.getSystemService( Context.INPUT_METHOD_SERVICE ) ;
-				if( show != variable.booleanValue() )
+				if( show != _variable.booleanValue() )
 				{
 					imm.toggleSoftInput( 0, 0 ) ;
 				}

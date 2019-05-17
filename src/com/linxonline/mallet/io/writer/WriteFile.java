@@ -23,7 +23,7 @@ public final class WriteFile
 			stream.writeLine( line ) ;
 		}
 
-		return _file.close( stream ) ;
+		return stream.close() ;
 	}
 
 	public static final boolean write( final String _file, final String _data )
@@ -35,6 +35,6 @@ public final class WriteFile
 	{
 		final StringOutStream stream = _file.getStringOutStream() ;
 		stream.writeLine( _data ) ;
-		return _file.close( stream ) ;
+		return stream.close() ;
 	}
 }

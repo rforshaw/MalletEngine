@@ -2,7 +2,7 @@ package com.linxonline.mallet.audio ;
 
 import java.util.Set ;
 
-public interface AudioGenerator<T extends SoundInterface>
+public interface AudioGenerator
 {
 	/**
 		Generator deals with the construction and deconstruction of the Audio backend 

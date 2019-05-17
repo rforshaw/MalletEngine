@@ -24,7 +24,6 @@ public class AndroidFile implements FileStream
 
 	private final static String EXTERNAL_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + '/' ;
 
-	private final CloseStreams toClose = new CloseStreams() ;
 	private final File file ;
 
 	public AndroidFile( final String _file, final StorageType _type )
@@ -42,7 +41,7 @@ public class AndroidFile implements FileStream
 	{
 		try
 		{
-			return ( AndroidByteIn )toClose.add( new AndroidByteIn( new FileInputStream( file ) ) ) ;
+			return new AndroidByteIn( new FileInputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -55,7 +54,7 @@ public class AndroidFile implements FileStream
 	{
 		try
 		{
-			return ( AndroidStringIn )toClose.add( new AndroidStringIn( new FileInputStream( file ) ) ) ;
+			return new AndroidStringIn( new FileInputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -78,7 +77,7 @@ public class AndroidFile implements FileStream
 	{
 		try
 		{
-			return ( AndroidByteOut )toClose.add( new AndroidByteOut( new FileOutputStream( file ) ) ) ;
+			return new AndroidByteOut( new FileOutputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -91,7 +90,7 @@ public class AndroidFile implements FileStream
 	{
 		try
 		{
-			return ( AndroidStringOut )toClose.add( new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ) ;
+			return new AndroidStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -146,8 +145,8 @@ public class AndroidFile implements FileStream
 			out.writeBytes( buffer, 0, length ) ;
 		}
 
-		close( in ) ;
-		stream.close() ;
+		in.close() ;
+		out.close() ;
 
 		return true ;
 	}
@@ -222,45 +221,9 @@ public class AndroidFile implements FileStream
 		return file.length() ;
 	}
 
-	/**
-		Close a specific stream without closing other 
-		active streams.
-	*/
-	public boolean close( final Close _close )
-	{
-		return toClose.remove( _close ) ;
-	}
-
-	/**
-		Close all the stream input/output that has 
-		been returned and close them.
-	*/
-	public boolean close()
-	{
-		return toClose.close() ;
-	}
-
 	@Override
 	public String toString()
 	{
 		return file.toString() ;
-	}
-
-	/**
-		There is a chance that a user may access resources 
-		and forget to close them.
-		To ensure that they are at least closed at some point 
-		within the life cycle of the application we will log 
-		an error and close them on object finalize().
-	*/
-	@Override
-	protected void finalize() throws Throwable
-	{
-		if( toClose.isEmpty() == false )
-		{
-			Logger.println( this + " accessed without closing.", Logger.Verbosity.MAJOR ) ;
-			close() ;
-		}
-		super.finalize() ;
 	}
 }

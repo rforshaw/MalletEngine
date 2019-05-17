@@ -13,7 +13,6 @@ import com.linxonline.mallet.util.Logger ;
 
 public class DesktopFile implements FileStream
 {
-	private final CloseStreams toClose = new CloseStreams() ;
 	private final File file ;
 
 	public DesktopFile( final File _file )
@@ -26,7 +25,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return ( DesktopByteIn )toClose.add( new DesktopByteIn( new FileInputStream( file ) )) ;
+			return new DesktopByteIn( new FileInputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -38,7 +37,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return ( DesktopStringIn )toClose.add( new DesktopStringIn( new FileInputStream( file ) ) ) ;
+			return new DesktopStringIn( new FileInputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -60,7 +59,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return ( DesktopByteOut )toClose.add( new DesktopByteOut( new FileOutputStream( file ) ) ) ;
+			return new DesktopByteOut( new FileOutputStream( file ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -73,7 +72,7 @@ public class DesktopFile implements FileStream
 	{
 		try
 		{
-			return ( DesktopStringOut )toClose.add( new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ) ;
+			return new DesktopStringOut( new BufferedWriter( new FileWriter( file ) ) ) ;
 		}
 		catch( FileNotFoundException ex )
 		{
@@ -138,8 +137,8 @@ public class DesktopFile implements FileStream
 			out.writeBytes( buffer, 0, length ) ;
 		}
 
-		close( in ) ;
-		stream.close() ;
+		in.close() ;
+		out.close() ;
 
 		return true ;
 	}
@@ -223,45 +222,9 @@ public class DesktopFile implements FileStream
 		return file.length() ;
 	}
 
-	/**
-		Close a specific stream without closing other 
-		active streams.
-	*/
-	public boolean close( final Close _close )
-	{
-		return toClose.remove( _close ) ;
-	}
-
-	/**
-		Close all the stream input/output that has 
-		been returned and close them.
-	*/
-	public boolean close()
-	{
-		return toClose.close() ;
-	}
-
 	@Override
 	public String toString()
 	{
 		return file.toString() ;
-	}
-
-	/**
-		There is a chance that a user may access resources 
-		and forget to close them.
-		To ensure that they are at least closed at some point 
-		within the life cycle of the application we will log 
-		an error and close them on object finalize().
-	*/
-	@Override
-	protected void finalize() throws Throwable
-	{
-		if( toClose.isEmpty() == false )
-		{
-			Logger.println( this + " accessed without closing.", Logger.Verbosity.MAJOR ) ;
-			close() ;
-		}
-		super.finalize() ;
 	}
 }

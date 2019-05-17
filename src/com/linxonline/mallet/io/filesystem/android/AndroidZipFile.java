@@ -27,7 +27,7 @@ public class AndroidZipFile implements FileStream
 
 	public ByteInStream getByteInStream()
 	{
-		return ( AndroidByteIn )toClose.add( new AndroidByteIn( stream )
+		return new AndroidByteIn( stream )
 		{
 			@Override
 			public boolean close()
@@ -44,12 +44,12 @@ public class AndroidZipFile implements FileStream
 					return false ;
 				}
 			}
-		} ) ;
+		} ;
 	}
 
 	public StringInStream getStringInStream()
 	{
-		return ( AndroidStringIn )toClose.add( new AndroidStringIn( stream )
+		return new AndroidStringIn( stream )
 		{
 			@Override
 			public boolean close()
@@ -66,7 +66,7 @@ public class AndroidZipFile implements FileStream
 					return false ;
 				}
 			}
-		} ) ;
+		} ;
 	}
 
 	public boolean getByteInCallback( final ByteInCallback _callback, final int _length )
@@ -130,8 +130,8 @@ public class AndroidZipFile implements FileStream
 			out.writeBytes( buffer, 0, length ) ;
 		}
 
-		close( in ) ;
-		stream.close() ;
+		in.close() ;
+		out.close() ;
 
 		return true ;
 	}
@@ -197,46 +197,10 @@ public class AndroidZipFile implements FileStream
 		return zipEntry.getSize() ;
 	}
 
-	/**
-		Close a specific stream without closing other 
-		active streams.
-	*/
-	public boolean close( final Close _close )
-	{
-		return toClose.remove( _close ) ;
-	}
-
-	/**
-		Close all the stream input/output that has 
-		been returned and close them.
-	*/
-	public boolean close()
-	{
-		return toClose.close() ;
-	}
-
 	@Override
 	public String toString()
 	{
 		return path.toString() ;
-	}
-
-	/**
-		There is a chance that a user may access resources 
-		and forget to close them.
-		To ensure that they are at least closed at some point 
-		within the life cycle of the application we will log 
-		an error and close them on object finalize().
-	*/
-	@Override
-	protected void finalize() throws Throwable
-	{
-		if( toClose.isEmpty() == false )
-		{
-			Logger.println( this + " accessed without closing.", Logger.Verbosity.MAJOR ) ;
-			close() ;
-		}
-		super.finalize() ;
 	}
 
 	/**

@@ -62,7 +62,7 @@ public final class EventSystem implements IEventSystem
 			return ;
 		}
 
-		final WeakReference weakHandler = new WeakReference( _handler ) ;
+		final WeakReference<IEventHandler> weakHandler = new WeakReference<IEventHandler>( _handler ) ;
 		handlers.add( weakHandler ) ;
 
 		final List<EventType> types = _handler.getWantedEventTypes() ;

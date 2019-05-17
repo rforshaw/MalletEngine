@@ -15,14 +15,22 @@ public class AndroidInputSystem implements IInputSystem,
 										   AndroidInputListener
 {
 	public InputAdapterInterface inputAdapter = null ;
-	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
+	private final TimeCache<InputEvent> cache ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
 
-	public AndroidInputSystem() {}
+	public AndroidInputSystem()
+	{
+		final InputEvent[] inputs = new InputEvent[150] ;
+		for( int i = 0; i < inputs.length; i++ )
+		{
+			inputs[i] = new InputEvent() ;
+		}
+		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
+	}
 
 	public void addInputHandler( final InputHandler _handler )
 	{

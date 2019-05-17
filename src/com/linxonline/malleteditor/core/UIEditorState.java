@@ -2,6 +2,9 @@ package com.linxonline.malleteditor.core ;
 
 import java.util.List ;
 
+import java.lang.reflect.Constructor ;
+import java.lang.reflect.InvocationTargetException ;
+
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.ui.* ;
@@ -255,10 +258,15 @@ public class UIEditorState extends GameState
 					{
 						try
 						{
-							final UIElement.MetaComponent meta = _class.newInstance() ;
+							Constructor<? extends UIElement.MetaComponent> constructor = _class.getConstructor() ;
+							final UIElement.MetaComponent meta = constructor.newInstance() ;
 							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
 
 							event.passStateEvent( new Event<CUIPacket>( "INSERT_CUIPACKET", new CUIPacket( meta, position ) ) ) ;
+						}
+						catch( NoSuchMethodException ex )
+						{
+							System.out.println( "Failed to find valid constructor" ) ;
 						}
 						catch( IllegalAccessException ex )
 						{
@@ -267,6 +275,10 @@ public class UIEditorState extends GameState
 						catch( InstantiationException ex )
 						{
 							System.out.println( "Failed to instantiate UI meta component object.." ) ;
+						}
+						catch( InvocationTargetException ex )
+						{
+							System.out.println( "Meta component constructor threw an exception." ) ;
 						}
 						finally
 						{
@@ -297,11 +309,16 @@ public class UIEditorState extends GameState
 					{
 						try
 						{
-							final UIElement.Meta meta = _class.newInstance() ;
+							Constructor<? extends UIElement.Meta> constructor = _class.getConstructor() ;
+							final UIElement.Meta meta = constructor.newInstance() ;
 							final UIWrapper wrapper = new UIWrapper( meta ) ;
 							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
 
 							event.passStateEvent( new Event<UIPacket>( "INSERT_UIPACKET", new UIPacket( wrapper, position ) ) ) ;
+						}
+						catch( NoSuchMethodException ex )
+						{
+							System.out.println( "Failed to find valid constructor" ) ;
 						}
 						catch( IllegalAccessException ex )
 						{
@@ -310,6 +327,10 @@ public class UIEditorState extends GameState
 						catch( InstantiationException ex )
 						{
 							System.out.println( "Failed to instantiate UI meta object.." ) ;
+						}
+						catch( InvocationTargetException ex )
+						{
+							System.out.println( "Meta constructor threw an exception." ) ;
 						}
 						finally
 						{

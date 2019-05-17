@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface FileStream extends Close
+public interface FileStream
 {
 	public ByteInStream getByteInStream() ;
 	public StringInStream getStringInStream() ;
@@ -43,16 +43,4 @@ public interface FileStream extends Close
 		Return the File size of this FileStream.
 	*/
 	public long getSize() ;
-
-	/**
-		Used to close a specific stream.
-	*/
-	public boolean close( final Close _close ) ;
-
-	/**
-		Close all streams that a developer has requested.
-		This will close streams currently in use, and dead 
-		streams.
-	*/
-	public boolean close() ;
 }

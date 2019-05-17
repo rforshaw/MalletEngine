@@ -324,7 +324,6 @@ public class JUI
 		}
 
 		final JUI jui = new JUI( JSONObject.construct( stream ) ) ;
-		stream.close() ;
 		return jui ;
 	}
 

@@ -360,7 +360,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw attachProgram( final Draw _draw, final Program _program )
 			{
-				cast( _draw ).setProgram( _program ) ;
+				cast( _draw ).setProgram( ( ProgramMap<GLProgram> )_program ) ;
 				return _draw ;
 			}
 

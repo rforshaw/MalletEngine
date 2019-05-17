@@ -54,7 +54,7 @@ public class JSONObject implements IJSONObject
 			builder.append( line ) ;
 		}
 
-		_file.close( stream ) ;
+		stream.close() ;
 		return JSONObject.construct( builder.toString() ) ;
 	}
 

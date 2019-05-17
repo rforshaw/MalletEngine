@@ -33,7 +33,7 @@ public abstract class GUIComponent extends UIElement.Component
 
 	private boolean visible = true ;
 
-	private final Connect.Slot addDrawSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> addDrawSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
 		public void slot( final UIElement _parent )
@@ -46,7 +46,7 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
-	private final Connect.Slot removeDrawSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> removeDrawSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
 		public void slot( final UIElement _parent )
@@ -59,7 +59,7 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
-	private final Connect.Slot positionSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> positionSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
 		public void slot( final UIElement _parent )
@@ -68,7 +68,7 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
-	private final Connect.Slot offsetSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> offsetSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
 		public void slot( final UIElement _parent )
@@ -77,7 +77,7 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
-	private final Connect.Slot lengthSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> lengthSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
 		public void slot( final UIElement _parent )

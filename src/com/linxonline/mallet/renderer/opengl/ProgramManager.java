@@ -16,11 +16,11 @@ public class ProgramManager<T extends ProgramManager.Program> extends AbstractMa
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final JSONBind binder ;
+	private final JSONBind<T> binder ;
 
-	public ProgramManager( final JSONBuilder _builder )
+	public ProgramManager( final JSONBuilder<T> _builder )
 	{
-		binder = new JSONBind( _builder ) ;
+		binder = new JSONBind<T>( _builder ) ;
 
 		final ResourceLoader<T> loader = getResourceLoader() ;
 		loader.add( new ResourceDelegate<T>()
@@ -65,7 +65,7 @@ public class ProgramManager<T extends ProgramManager.Program> extends AbstractMa
 		public abstract String getName() ;
 	}
 
-	public static interface JSONBuilder<T extends Program>
+	public static interface JSONBuilder<T extends ProgramManager.Program>
 	{
 		public T build( final JSONProgram _program ) ;
 	}

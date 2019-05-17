@@ -18,7 +18,7 @@ import com.linxonline.mallet.util.MalletMap ;
 	For example desktop OpenGL will allow you to map MalletTexture, 
 	Matrix4, Vector2 and Vector3 and the primitive types.
 */
-public class ProgramMap<U> implements Program<ProgramMap>
+public class ProgramMap<U> implements Program<ProgramMap<U>>
 {
 	private final String id ;
 	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
@@ -143,7 +143,7 @@ public class ProgramMap<U> implements Program<ProgramMap>
 
 		if( _obj instanceof ProgramMap )
 		{
-			final ProgramMap program = ( ProgramMap )_obj ;
+			final ProgramMap<U> program = ( ProgramMap<U> )_obj ;
 			if( id.equals( program.id ) == false )
 			{
 				return false ;

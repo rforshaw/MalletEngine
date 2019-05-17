@@ -21,7 +21,7 @@ public final class DrawState<D extends DrawData>
 	private final BufferedList<D> state = new BufferedList<D>() ;
 	private final IUpload<D> upload ;
 
-	public DrawState( final IUpload _upload, final BufferedList.RemoveListener<D> _remove )
+	public DrawState( final IUpload<D> _upload, final BufferedList.RemoveListener<D> _remove )
 	{
 		state.setRemoveListener( _remove ) ;
 		upload = ( _upload == null ) ? UPLOAD_DEFAULT : _upload ;

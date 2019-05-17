@@ -9,6 +9,4 @@ public interface ByteInStream extends Close
 		Will return -1 when nothing else can be read.
 	*/
 	public int readBytes( final byte[] _stream, final int _offset, final int _length ) ;
-
-	public boolean close() ;
 }

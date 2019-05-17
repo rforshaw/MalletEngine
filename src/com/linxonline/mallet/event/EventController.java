@@ -90,7 +90,7 @@ public class EventController implements IEventHandler
 		final int size = events.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Event event = events.get( i ) ;
+			final Event<?> event = events.get( i ) ;
 			final IProcessor proc = processors.get( event.getEventType() ) ;
 			proc.process( event.getVariable() ) ;
 		}

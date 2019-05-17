@@ -10,6 +10,7 @@ import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Input System is designed to use Java's built in input listeners, 
@@ -19,14 +20,22 @@ public class InputSystem implements IInputSystem,
 									KeyListener, 
 									MouseListener
 {
-	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
+	private final TimeCache<InputEvent> cache ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem() {}
+	public InputSystem()
+	{
+		final InputEvent[] inputs = new InputEvent[150] ;
+		for( int i = 0; i < inputs.length; i++ )
+		{
+			inputs[i] = new InputEvent() ;
+		}
+		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
+	}
 
 	public void addInputHandler( final InputHandler _handler )
 	{

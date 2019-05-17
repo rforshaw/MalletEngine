@@ -18,32 +18,32 @@ import com.linxonline.mallet.util.ISort ;
 */
 public class LocationBuffer<T, U> implements ISort
 {
-	private static Listener FALLBACK = new Listener()
+	private Listener<T, U> FALLBACK = new Listener<T, U>()
 	{
 		@Override
-		public boolean isSupported( final Object _buffer, final Object _user )
+		public boolean isSupported( final T _buffer, final U _user )
 		{
 			Logger.println( "Unable to determine if Location Buffer supports user data.", Logger.Verbosity.MINOR ) ;
 			return false ;
 		}
 	
 		@Override
-		public void allocated( final Location _location, final Object _user )
+		public void allocated( final Location<T, U> _location, final U _user )
 		{
 			Logger.println( "Location allocated to buffer without listener set.", Logger.Verbosity.MINOR ) ;
 		}
 
 		@Override
-		public void deallocated( final Location _location )
+		public void deallocated( final Location<T, U> _location )
 		{
 			Logger.println( "Location deallocated from buffer without listener set.", Logger.Verbosity.MINOR ) ;
 		}
 
 		@Override
-		public void shifted( final Location _location ) {}
+		public void shifted( final Location<T, U> _location ) {}
 
 		@Override
-		public void shiftEnded( final LocationBuffer _buffer )
+		public void shiftEnded( final LocationBuffer<T, U> _buffer )
 		{
 			Logger.println( "Location/s shifted in buffer without listener set.", Logger.Verbosity.MINOR ) ;
 		}

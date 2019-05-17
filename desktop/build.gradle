@@ -30,6 +30,11 @@ project( ':MalletEngine' ) {
 		delete += fileTree( '../../TemplateProject/desktop' ).include( '**/*' )
 	}
 
+	tasks.withType( JavaCompile ) {
+		options.compilerArgs << '-Xlint:unchecked'
+		options.deprecation = true
+	}
+
 	task copy(type: Copy) {
 		into '.'
 		from( 'dependencies' ) {
@@ -55,6 +60,11 @@ project( ':MalletEditor' ) {
 				exclude '**/mallet/**'
 			}
 		}
+	}
+
+	tasks.withType( JavaCompile ) {
+		options.compilerArgs << '-Xlint:unchecked'
+		options.deprecation = true
 	}
 
 	dependencies {

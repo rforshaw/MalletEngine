@@ -2,6 +2,7 @@ package com.linxonline.mallet.event ;
 
 import java.util.Map ;
 import java.util.Arrays ;
+import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -71,7 +72,7 @@ public final class EventType
 	public static class Lookup<T>
 	{
 		private T fallback = null ;
-		private Object[] types = new Object[0] ;
+		private ArrayList<T> types = new ArrayList<T>() ;
 
 		public Lookup() {}
 
@@ -84,7 +85,7 @@ public final class EventType
 		{
 			final int id = _type.getID() ;
 			ensureCapacity( id + 1 ) ;
-			types[id] = _variable ;
+			types.set( id, _variable ) ;
 			return _variable ;
 		}
 
@@ -92,31 +93,34 @@ public final class EventType
 		{
 			final int id = _type.getID() ;
 			ensureCapacity( id + 1 ) ;
-			types[id] = null ;
+			types.set( id, null ) ;
 		}
 
 		public T get( final EventType _type )
 		{
 			final int id = _type.getID() ;
 			ensureCapacity( id + 1 ) ;
-			return ( T )types[id] ;
+			return types.get( id ) ;
 		}
 
 		public void clear()
 		{
-			types = new Object[0] ;
+			types.clear() ;
 		}
 
 		private void ensureCapacity( final int _size )
 		{
-			final int size = types.length ;
-			if( size < _size )
+			final int origSize = types.size() ;
+			if( _size < origSize )
 			{
-				types = Arrays.copyOf( types, _size ) ;
-				for( int i = size; i < _size; ++i )
-				{
-					types[i] = fallback ;
-				}
+				return ;
+			}
+
+			types.ensureCapacity( _size ) ;
+
+			for( int i = origSize; i < _size; i++ )
+			{
+				types.add( fallback ) ;
 			}
 		}
 	}

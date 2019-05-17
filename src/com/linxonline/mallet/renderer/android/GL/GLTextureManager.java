@@ -77,7 +77,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
 						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
-						file.close() ;
+						in.close() ;
 						
 						synchronized( toBind )
 						{
@@ -132,7 +132,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
 						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
-						file.close() ;
+						in.close() ;
 
 						synchronized( toBind )
 						{
@@ -306,13 +306,13 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				if( meta != null )
 				{
 					imageMetas.put( _path, meta ) ;
-					file.close() ;
+					in.close() ;
 					return meta ;
 				}
+				in.close() ;
 			}
 
 			Logger.println( "Unable to create meta data: " + _path, Logger.Verbosity.NORMAL ) ;
-			file.close() ;
 			return new MalletTexture.Meta( _path, 0, 0 ) ;
 		}
 

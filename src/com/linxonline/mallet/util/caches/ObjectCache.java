@@ -2,6 +2,9 @@ package com.linxonline.mallet.util.caches ;
 
 import java.util.ArrayDeque ;
 
+import java.lang.reflect.Constructor ;
+import java.lang.reflect.InvocationTargetException ;
+
 /**
 	Provides a simple object cache to retrieve an object 
 	that has been previously used.
@@ -10,17 +13,16 @@ import java.util.ArrayDeque ;
 public class ObjectCache<T extends Cacheable> implements ICache<T>
 {
 	private final ArrayDeque<T> available = new ArrayDeque<T>() ;	// Pool of objects to retrieve.
-	private final Class<T> creator ;								// Allows the creation of new default objects.
+	private final Constructor<T> creator ;							// Allows the creation of new default objects.
 
-	public ObjectCache( final Class<T> _creator )
+	public ObjectCache( final Class<T> _class ) throws NoSuchMethodException
 	{
-		creator = _creator ;
-		expandCache( 10 ) ;
+		this( _class, 10 ) ;
 	}
 
-	public ObjectCache( final Class<T> _creator, final int _size )
+	public ObjectCache( final Class<T> _class, final int _size ) throws NoSuchMethodException
 	{
-		creator = _creator ;
+		creator = _class.getConstructor() ;
 		expandCache( _size ) ;
 	}
 
@@ -68,6 +70,7 @@ public class ObjectCache<T extends Cacheable> implements ICache<T>
 		}
 		catch( InstantiationException ex ) { ex.printStackTrace() ; }
 		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
+		catch( InvocationTargetException ex ) { ex.printStackTrace() ; }
 
 		return null ;
 	}

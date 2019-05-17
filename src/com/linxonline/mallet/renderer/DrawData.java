@@ -5,11 +5,11 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
-public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
+public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cacheable
 {
-	private MalletColour colour = null ;
-	private StringBuilder text  = null ;
-	private Program program     = null ;
+	private MalletColour colour   = null ;
+	private StringBuilder text    = null ;
+	private ProgramMap<P> program = null ;
 
 	private int textStart = 0 ;
 	private int textEnd = 0 ;
@@ -61,12 +61,12 @@ public abstract class DrawData<T extends DrawData> implements Draw<T>, Cacheable
 		scale    = ( _scale != null )    ? _scale    : new Vector3() ;
 	}
 
-	public void setProgram( final Program _program )
+	public void setProgram( final ProgramMap<P> _program )
 	{
 		program = _program ;
 	}
 
-	public Program getProgram()
+	public ProgramMap<P> getProgram()
 	{
 		return program ;
 	}

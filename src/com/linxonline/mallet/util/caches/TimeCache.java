@@ -2,7 +2,11 @@ package com.linxonline.mallet.util.caches ;
 
 import java.util.LinkedList ;
 
+import java.lang.reflect.Constructor ;
+import java.lang.reflect.InvocationTargetException ;
+
 import com.linxonline.mallet.util.time.ElapsedTimer ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Provide a cache of objects based on the Class defined.
@@ -13,34 +17,51 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 public class TimeCache<T extends Cacheable> implements ICache<T>
 {
 	private final LinkedList<TimeWrapper<T>> pool = new LinkedList<TimeWrapper<T>>() ;	// Pool of objects that will be used.
-	private final Class<T> objectCreator ;											// Used to create T type instances.
-	private final float wait ;														// The amount of time an object can be used for without being reused.
-	private int currentPos = 0 ;													// Current location within pool.
+	private final float wait ;															// The amount of time an object can be used for without being reused.
+	private Constructor<T> creator ;												// Used to create T type instances.
+	private int currentPos = 0 ;														// Current location within pool.
 
-	private TimeWrapper<T> temp = null ;
-
-	public TimeCache( final float _wait, final Class<T> _class )
+	public TimeCache( final float _wait, final Class<T> _class, final T[] _items )
 	{
-		objectCreator = _class ;
+		try
+		{
+			creator = _class.getConstructor() ;
+		}
+		catch( NoSuchMethodException ex )
+		{
+			Logger.println( "Failed to acquire valid item constructor for cache.", Logger.Verbosity.MAJOR ) ;
+			creator = null ;
+		}
 		wait = _wait ;
 
-		try { add( 0, 0.0f, objectCreator.newInstance() ) ; }
-		catch( InstantiationException ex ) { ex.printStackTrace() ; }
-		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
+		for( T item : _items )
+		{
+			add( 0, 0.0f, item ) ;
+		}
 	}
 
 	@Override
 	public T get()
 	{
-		// Ensure currentPos is within the pool limits.
 		if( currentPos >= pool.size() ) { currentPos = 0 ; }
 
 		final long seconds = ElapsedTimer.getTotalElapsedTimeInSeconds() ;
 		final double remainder = ElapsedTimer.getRemainderInNanoSeconds() ;
+		final TimeWrapper<T> temp = pool.get( currentPos ) ;
 
-		temp = pool.get( currentPos ) ;
+		// If we can't create a new item then we have to 
+		// accept what we've got.
+		if( creator == null )
+		{
+			++currentPos ;
+			temp.seconds = seconds ;
+			temp.remainder = remainder ;
+			temp.obj.reset() ;
+			return temp.obj ;
+		}
+
+		// If there is a creator we can hopefully create a new one..
 		final float diff = ( float )( seconds - temp.seconds ) + ( float )( remainder - temp.remainder ) ;
-
 		if( diff >= wait )
 		{
 			++currentPos ;
@@ -51,11 +72,15 @@ public class TimeCache<T extends Cacheable> implements ICache<T>
 		}
 
 		final T obj = newInstance() ;
-		if( obj != null )
+		if( obj == null )
 		{
-			insert( currentPos++, seconds, remainder, obj ) ;
+			// Our creator has failed us, we can only use the items 
+			// that are currently in the pool.
+			creator = null ;
+			return get() ;
 		}
 
+		insert( currentPos++, seconds, remainder, obj ) ;
 		return obj ;
 	}
 
@@ -72,10 +97,11 @@ public class TimeCache<T extends Cacheable> implements ICache<T>
 		try
 		{
 			// Create new instance if one is not suitable to return.
-			return objectCreator.newInstance() ;
+			return creator.newInstance() ;
 		}
 		catch( InstantiationException ex ) { ex.printStackTrace() ; }
 		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
+		catch( InvocationTargetException ex ) { ex.printStackTrace() ; }
 
 		return null ;
 	}

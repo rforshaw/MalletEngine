@@ -181,7 +181,6 @@ public class JSONProgram
 			public void callback( final JSONObject _obj )
 			{
 				generate( _obj, _delegate ) ;
-				stream.close() ;
 			}
 		} ) ;
 	}
@@ -247,7 +246,6 @@ public class JSONProgram
 			{
 				_program.shaders.add( new ShaderMap( map.getLeft(), source.toString() ) ) ;
 				readShaders( _paths, _program, _delegate ) ;
-				stream.close() ;
 			}
 		}, 1 ) ;
 	}

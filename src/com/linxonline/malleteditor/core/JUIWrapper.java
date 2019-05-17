@@ -35,7 +35,7 @@ public class JUIWrapper
 		final StringOutStream stream = file.getStringOutStream() ;
 		stream.writeLine( ui.toString( 2 ) ) ;
 
-		file.close( stream ) ;
+		stream.close() ;
 		return true ;
 	}
 
