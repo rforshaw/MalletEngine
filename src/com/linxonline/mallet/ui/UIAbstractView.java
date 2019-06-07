@@ -490,7 +490,7 @@ public class UIAbstractView extends UIElement
 		Not generic - expects the data to be stored in the 
 		format used by UI Meta objects. 
 	*/
-	private static ItemDelegate createDefaultItemDelegate()
+	private static ItemDelegate<?> createDefaultItemDelegate()
 	{
 		return new ItemDelegate<UIElement>()
 		{

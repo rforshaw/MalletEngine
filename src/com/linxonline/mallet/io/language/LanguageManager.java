@@ -1,22 +1,39 @@
 package com.linxonline.mallet.io.language ;
 
 import java.util.Map ;
-import java.util.List ;
-import java.io.* ;
 
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.io.reader.* ;
+import com.linxonline.mallet.util.Logger ;
 
-/*====================================================*/
-// Lanaguage Manager allows a developer to write 
-// applications with multi-language support.
-/*====================================================*/
+import com.linxonline.mallet.io.reader.* ;
+import com.linxonline.mallet.io.formats.json.JSONObject ;
+import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
+import com.linxonline.mallet.io.filesystem.FileStream ;
+
+/**
+	Allow the use of different languages within the engine.
+	Use setLanguage() to specify the directory to load.
+	Use load() to load a .lang file and map it to a namespace.
+	Load files with the format specified below:
+	{
+		"KEYWORD1": {
+			"response": "This is text.",
+			"description": "This is context for the response."
+		},
+		"KEYWORD1": {
+			"response": "This is more text."
+			"description": "This is context for the response."
+		}
+	}
+*/
 public class LanguageManager
 {
-	private final Map<String, String> strings = MalletMap.<String, String>newMap() ;
+	private static final String LANGUAGE_DEFAULT = "en" ;
+	private static final String EMPTY_STRING = "" ;
+
+	private final Map<String, JSONObject> lookup = MalletMap.<String, JSONObject>newMap() ;
 	private String languageFolder = "en" ;
-	private final List<String> filesLoaded = MalletList.<String>newList() ;
 
 	public LanguageManager() {}
 
@@ -27,8 +44,7 @@ public class LanguageManager
 	**/
 	public void setLanguage( final String _language )
 	{
-		assert _language != null ;
-		languageFolder = _language ;
+		languageFolder = ( _language != null ) ? _language : LANGUAGE_DEFAULT ;
 	}
 
 	/** 
@@ -38,83 +54,56 @@ public class LanguageManager
 		directory (en, fr), but have them use the same 
 		file names(main.lan).
 	**/
-	public boolean loadLanguageFile( final String _file )
+	public boolean load( final String _namespace, final String _file )
 	{
-		assert _file != null ;
-		final String file = "base/languages/" + languageFolder + "/" + _file ;
-		final List<String> textFile = TextReader.getTextAsArray( file ) ;
-
-		filesLoaded.add( _file ) ;
-		return loadFile( textFile ) ;
-	}
-
-	/**
-		Check to see if the file has already been loaded
-	**/
-	public boolean containsLanguageFile( final String _file )
-	{
-		assert _file != null ;
-		for( final String file : filesLoaded )
+		if( lookup.get( _namespace ) != null )
 		{
-			if( _file.equals( file ) == true )
-			{
-				return true ;
-			}
+			Logger.println( "Language namespace already in use.", Logger.Verbosity.NORMAL ) ;
+			return false ;
 		}
 
-		return false ;
+		if( GlobalFileSystem.isExtension( _file, ".lang", ".LANG" ) == false )
+		{
+			Logger.println( "File extension is not recognised.", Logger.Verbosity.NORMAL ) ;
+			return false ;
+		}
+
+		final String file = "base/languages/" + languageFolder + "/" + _file ;
+		final FileStream stream = GlobalFileSystem.getFile( file ) ;
+		if( stream.exists() == false )
+		{
+			Logger.println( "Language file does not exist.", Logger.Verbosity.NORMAL ) ;
+			return false ;
+		}
+
+		final JSONObject map = JSONObject.construct( stream ) ;
+		lookup.put( _namespace, map ) ;
+		return true ;
+	}
+
+	public void remove( final String _namespace )
+	{
+		lookup.remove( _namespace ) ;
 	}
 
 	/**
 		Get the Language specific text, using the defined 
 		keyword.
 	**/
-	public String getText( final String _keyword )
+	public String get( final String _namespace, final String _keyword )
 	{
-		if( exists( _keyword ) == true )
+		final JSONObject map = lookup.get( _namespace ) ;
+		if( map == null )
 		{
-			return strings.get( _keyword ) ;
+			return _keyword ;
 		}
 
-		return null ;
-	}
-
-	public void clear()
-	{
-		strings.clear() ;
-		filesLoaded.clear() ;
-	}
-
-	private final boolean exists( final String _keyword )
-	{
-		assert _keyword != null ;
-		return strings.containsKey( _keyword ) ;
-	}
-
-	private final boolean loadFile( final List<String> _textFile )
-	{
-		for( final String line : _textFile )
+		final JSONObject item = map.optJSONObject( _keyword, null ) ;
+		if( item == null )
 		{
-			final String[] split = line.split( " " ) ;
-			if( split.length >= 2 )
-			{
-				process( split ) ;
-			}
+			return _keyword ;
 		}
 
-		return true ;
-	}
-	
-	private void process( final String[] _split )
-	{
-		final String keyword = _split[0].toUpperCase() ;
-		final StringBuffer buffer = new StringBuffer() ;
-
-		for( int i = 1; i < _split.length; i++ )
-		{
-			buffer.append( _split[i] ) ;
-		}
-
-		strings.put( keyword, buffer.toString() ) ;
+		return item.optString( "response", _keyword ) ;
 	}
 }

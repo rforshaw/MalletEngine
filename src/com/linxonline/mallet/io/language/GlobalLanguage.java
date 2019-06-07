@@ -3,31 +3,29 @@ package com.linxonline.mallet.io.language ;
 public final class GlobalLanguage
 {
 	private final static LanguageManager language = new LanguageManager() ;
-	
+
 	private GlobalLanguage() {}
-	
+
 	public static void setLanguage( final String _language )
 	{
 		language.setLanguage( _language ) ;
 	}
 
-	public static boolean loadLanguageFile( final String _file )
+	/**
+		Load the language file into the specified namespace.
+	*/
+	public boolean load( final String _namespace, final String _file )
 	{
-		return language.loadLanguageFile( _file ) ;
+		return language.load( _namespace, _file ) ;
 	}
 
-	public static boolean containsLanguageFile( final String _file )
+	public void remove( final String _namespace )
 	{
-		return language.containsLanguageFile( _file ) ;
+		language.remove( _namespace ) ;
 	}
 
-	public static String getText( final String _keyword )
+	public String get( final String _namespace, final String _keyword )
 	{
-		return language.getText( _keyword ) ;
-	}
-
-	public static void clear()
-	{
-		language.clear() ;
+		return language.get( _namespace, _keyword ) ;
 	}
 }

@@ -87,7 +87,7 @@ public class GUIGenerator
 		} ) ;
 	}
 
-	public static void addGenerator( final String _id, final Generator _generator )
+	public static <M extends UIElement.MetaComponent> void addGenerator( final String _id, final Generator<M> _generator )
 	{
 		creators.put( _id, _generator ) ;
 	}
@@ -95,7 +95,7 @@ public class GUIGenerator
 	public static <E extends UIElement.Component> E create( final UIElement.MetaComponent _meta, final UIElement _parent )
 	{
 		final String type = _meta.getType() ;
-		final Generator generator = creators.get( type ) ;
+		final Generator<UIElement.MetaComponent> generator = creators.get( type ) ;
 		if( generator == null )
 		{
 			Logger.println( type + " GUIGenerator doesn't exist.", Logger.Verbosity.MAJOR ) ;

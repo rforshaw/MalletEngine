@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public abstract class DeleteFile
+public final class DeleteFile
 {
 	public static boolean delete( final String _file )
 	{

@@ -291,7 +291,7 @@ public class JUI
 	/**
 		Allow the developer to extend the UI system.
 	*/
-	public static void addElementGenerator( final String _id, final Generator _create )
+	public static <T extends UIElement, E extends T.Meta> void addElementGenerator( final String _id, final Generator<T, E> _create )
 	{
 		elementCreators.put( _id, _create ) ;
 	}
@@ -383,7 +383,7 @@ public class JUI
 	public static UIElement.Meta createMeta( final JSONObject _ui )
 	{
 		final String type = _ui.optString( "TYPE", null ) ;
-		final Generator create = elementCreators.get( type ) ;
+		final Generator<UIElement, UIElement.Meta> create = elementCreators.get( type ) ;
 		if( create == null )
 		{
 			// If a creator is not available we can't construct 
@@ -399,7 +399,7 @@ public class JUI
 	private static UIElement createElement( final JUI _map, final JSONObject _ui )
 	{
 		final String type = _ui.optString( "TYPE", null ) ;
-		final Generator create = elementCreators.get( type ) ;
+		final Generator<UIElement, UIElement.Meta> create = elementCreators.get( type ) ;
 		if( create == null )
 		{
 			// If a creator is not available we can't construct 

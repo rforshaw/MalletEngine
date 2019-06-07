@@ -16,7 +16,6 @@ public final class Settings
 {
 	private final TreeMap<String, VariableInterface> variables = new TreeMap<String, VariableInterface>() ;
 	private static final NullPointerException exception = new NullPointerException() ;			// Defined as static to reduce creation time
-	private VariableInterface inter = null ;
 
 	public Settings() {}
 
@@ -24,11 +23,10 @@ public final class Settings
 
 	public final void addBoolean( final String _name, final boolean _value )
 	{
-		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
-		if( inter != null )
+		final BooleanVariable obj = this.<BooleanVariable>getVar( _name, VariableInterface.BOOLEAN_TYPE ) ;
+		if( obj != null )
 		{
-			final BooleanVariable var = ( BooleanVariable )inter ;
-			var.setBoolean( _value ) ;
+			obj.setBoolean( _value ) ;
 			return ;
 		}
 
@@ -38,11 +36,10 @@ public final class Settings
 	
 	public final void addInteger( final String _name, final int _value )
 	{
-		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
-		if( inter != null )
+		final IntegerVariable obj = this.<IntegerVariable>getVar( _name, VariableInterface.INT_TYPE ) ;
+		if( obj != null )
 		{
-			final IntegerVariable var = ( IntegerVariable )inter ;
-			var.setInteger( _value ) ;
+			obj.setInteger( _value ) ;
 			return ;
 		}
 
@@ -52,11 +49,10 @@ public final class Settings
 
 	public final void addFloat( final String _name, final float _value )
 	{
-		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
-		if( inter != null )
+		final FloatVariable obj = this.<FloatVariable>getVar( _name, VariableInterface.FLOAT_TYPE ) ;
+		if( obj != null )
 		{
-			final FloatVariable var = ( FloatVariable )inter ;
-			var.setFloat( _value ) ;
+			obj.setFloat( _value ) ;
 			return ;
 		}
 
@@ -66,11 +62,10 @@ public final class Settings
 
 	public final void addString( final String _name, final String _value )
 	{
-		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
-		if( inter != null )
+		final StringVariable obj = this.<StringVariable>getVar( _name, VariableInterface.STRING_TYPE ) ;
+		if( obj != null )
 		{
-			final StringVariable var = ( StringVariable )inter ;
-			var.setString( _value ) ;
+			obj.setString( _value ) ;
 			return ;
 		}
 
@@ -80,11 +75,10 @@ public final class Settings
 
 	public final <T> void addObject( final String _name, final T _value )
 	{
-		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
-		if( inter != null )
+		final ObjectVariable<T> obj = this.<ObjectVariable<T>>getVar( _name, VariableInterface.OBJECT_TYPE ) ;
+		if( obj != null )
 		{
-			final ObjectVariable var = ( ObjectVariable )inter ;
-			var.setObject( _value ) ;
+			obj.setObject( _value ) ;
 			return ;
 		}
 
@@ -103,11 +97,10 @@ public final class Settings
 
 	public final boolean getBoolean( final String _name ) throws NullPointerException
 	{
-		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
-		if( inter != null )
+		final BooleanVariable obj = this.<BooleanVariable>getVar( _name, VariableInterface.BOOLEAN_TYPE ) ;
+		if( obj != null )
 		{
-			final BooleanVariable var = ( BooleanVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		throw exception ;
@@ -115,11 +108,10 @@ public final class Settings
 
 	public final boolean getBoolean( final String _name, final boolean _default )
 	{
-		inter = getVariable( _name, VariableInterface.BOOLEAN_TYPE ) ;
-		if( inter != null )
+		final BooleanVariable obj = this.<BooleanVariable>getVar( _name, VariableInterface.BOOLEAN_TYPE ) ;
+		if( obj != null )
 		{
-			final BooleanVariable var = ( BooleanVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		return _default ;
@@ -127,11 +119,10 @@ public final class Settings
 
 	public final int getInteger( final String _name ) throws NullPointerException
 	{
-		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
-		if( inter != null )
+		final IntegerVariable obj = this.<IntegerVariable>getVar( _name, VariableInterface.INT_TYPE ) ;
+		if( obj != null )
 		{
-			final IntegerVariable var = ( IntegerVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		throw exception ;
@@ -139,11 +130,10 @@ public final class Settings
 
 	public final int getInteger( final String _name, final int _default )
 	{
-		inter = getVariable( _name, VariableInterface.INT_TYPE ) ;
-		if( inter != null )
+		final IntegerVariable obj = this.<IntegerVariable>getVar( _name, VariableInterface.INT_TYPE ) ;
+		if( obj != null )
 		{
-			final IntegerVariable var = ( IntegerVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		return _default ;
@@ -151,11 +141,10 @@ public final class Settings
 
 	public final float getFloat( final String _name ) throws NullPointerException
 	{
-		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
-		if( inter != null )
+		final FloatVariable obj = this.<FloatVariable>getVar( _name, VariableInterface.FLOAT_TYPE ) ;
+		if( obj != null )
 		{
-			final FloatVariable var = ( FloatVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		throw exception ;
@@ -163,11 +152,10 @@ public final class Settings
 
 	public final float getFloat( final String _name, final float _default )
 	{
-		inter = getVariable( _name, VariableInterface.FLOAT_TYPE ) ;
-		if( inter != null )
+		final FloatVariable obj = this.<FloatVariable>getVar( _name, VariableInterface.FLOAT_TYPE ) ;
+		if( obj != null )
 		{
-			final FloatVariable var = ( FloatVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		return _default ;
@@ -175,11 +163,10 @@ public final class Settings
 
 	public final String getString( final String _name ) throws NullPointerException
 	{
-		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
-		if( inter != null )
+		final StringVariable obj = this.<StringVariable>getVar( _name, VariableInterface.STRING_TYPE ) ;
+		if( obj != null )
 		{
-			final StringVariable var = ( StringVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		throw exception ;
@@ -187,23 +174,21 @@ public final class Settings
 
 	public final String getString( final String _name, final String _default )
 	{
-		inter = getVariable( _name, VariableInterface.STRING_TYPE ) ;
-		if( inter != null )
+		final StringVariable obj = this.<StringVariable>getVar( _name, VariableInterface.STRING_TYPE ) ;
+		if( obj != null )
 		{
-			final StringVariable var = ( StringVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		return _default ;
 	}
 
-	public final Object getObject( final String _name ) throws NullPointerException
+	public final <T> T getObject( final String _name ) throws NullPointerException
 	{
-		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
-		if( inter != null )
+		final ObjectVariable<T> obj = this.<ObjectVariable<T>>getVar( _name, VariableInterface.OBJECT_TYPE ) ;
+		if( obj != null )
 		{
-			final ObjectVariable var = ( ObjectVariable )inter ;
-			return var.value ;
+			return obj.value ;
 		}
 
 		throw exception ;
@@ -215,30 +200,30 @@ public final class Settings
 	*/
 	public final <T> T getObject( final String _name, final T _default )
 	{
-		inter = getVariable( _name, VariableInterface.OBJECT_TYPE ) ;
-		if( inter != null )
+		final ObjectVariable<T> obj = this.<ObjectVariable<T>>getVar( _name, VariableInterface.OBJECT_TYPE ) ;
+		if( obj != null )
 		{
-			final ObjectVariable var = ( ObjectVariable )inter ;
-			return ( T )var.getObject() ;
+			return obj.value ;
 		}
 
 		return _default ;
 	}
 
-	private final VariableInterface getVariable( final String _name, final int _type )
+	@SuppressWarnings( "unchecked" )
+	private final <T extends VariableInterface> T getVar( final String _name, final int _type )
 	{
-		inter = variables.get( _name ) ;
-		if( inter != null )
+		final T t = ( T )variables.get( _name ) ;
+		if( t != null )
 		{
-			if( inter.type == _type )
+			if( t.type == _type )
 			{
-				return inter ;
+				return t ;
 			}
 		}
 
 		return null ;
 	}
-
+	
 	public final Collection<VariableInterface> toArray()
 	{
 		return variables.values() ;
