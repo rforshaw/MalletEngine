@@ -32,6 +32,7 @@ public class GUIText extends GUIComponent
 
 		font = _meta.getFont() ;
 		colour = _meta.getColour( colour ) ;
+		constructDraws() ;
 	}
 
 	public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -49,8 +50,7 @@ public class GUIText extends GUIComponent
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
 	*/
-	@Override
-	public void constructDraws()
+	private void constructDraws()
 	{
 		if( font != null )
 		{

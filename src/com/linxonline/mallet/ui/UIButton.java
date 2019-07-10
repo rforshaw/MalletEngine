@@ -45,7 +45,7 @@ public class UIButton extends UIElement
 
 	private void init()
 	{
-		addComponent( new InputComponent( this )
+		new InputComponent( this )
 		{
 			@Override
 			public InputEvent.Action touchReleased( final InputEvent _input )
@@ -74,7 +74,7 @@ public class UIButton extends UIElement
 				UIElement.signal( parent, parent.pressed() ) ;
 				return InputEvent.Action.CONSUME ;
 			}
-		} ) ;
+		} ;
 	}
 
 	@Override

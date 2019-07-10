@@ -193,8 +193,11 @@ public class UILayout extends UIElement implements IChildren
 	*/
 	public void setEngageMode( final EngageComponent _listener )
 	{
-		removeComponent( getEngageMode() ) ;
-		engageMode = addComponent( _listener ) ;
+		if( engageMode != null )
+		{
+			engageMode.destroy() ;
+		}
+		engageMode = _listener ;
 	}
 
 	public EngageComponent getEngageMode()

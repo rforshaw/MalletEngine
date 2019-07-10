@@ -184,7 +184,7 @@ public class UIEditorState extends GameState
 		}
 
 		final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
-		button.addComponent( new InputComponent( button )
+		new InputComponent( button )
 		{
 			@Override
 			public InputEvent.Action touchPressed( final InputEvent _input )
@@ -199,7 +199,7 @@ public class UIEditorState extends GameState
 				getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
-		} ) ;
+		} ;
 	}
 
 	private void createCUIsPanel( final UIList _view )
@@ -225,7 +225,7 @@ public class UIEditorState extends GameState
 		}
 
 		final UIButton button = _view.addElement( UIGenerator.<UIButton>create( meta ) ) ;
-		button.addComponent( new InputComponent( button )
+		new InputComponent( button )
 		{
 			@Override
 			public InputEvent.Action touchPressed( final InputEvent _input )
@@ -240,7 +240,7 @@ public class UIEditorState extends GameState
 				getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
-		} ) ;
+		} ;
 	}
 
 	private static Entity createCUIDropEntity( final Class<? extends UIElement.MetaComponent> _class, final InputEvent _event )

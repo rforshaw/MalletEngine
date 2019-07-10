@@ -53,7 +53,7 @@ public class UIList extends UILayout
 			}
 		} ) ;
 
-		addComponent( new ScrollInputComponent( this ) ) ;
+		new ScrollInputComponent( this ) ;
 		setEngageMode( new ScrollSingleEngageComponent( this ) ) ;
 	}
 

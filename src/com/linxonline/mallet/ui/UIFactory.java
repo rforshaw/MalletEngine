@@ -72,7 +72,7 @@ public final class UIFactory
 		CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 		CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
 
-		layout.addComponent( new WindowListener( layout, _camera, dimension ) ) ;
+		new WindowListener( layout, _camera, dimension ) ;
 
 		return layout ;
 	}

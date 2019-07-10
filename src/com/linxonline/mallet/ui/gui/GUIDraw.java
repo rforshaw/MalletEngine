@@ -30,6 +30,7 @@ public class GUIDraw extends GUIComponent
 
 		updateLength( _parent.getLength(), getLength() ) ;
 		updateOffset( _parent.getOffset(), getOffset() ) ;
+		constructDraws() ;
 	}
 
 	public void setRetainRatio( final boolean _ratio )
@@ -61,8 +62,7 @@ public class GUIDraw extends GUIComponent
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
 	*/
-	@Override
-	public void constructDraws()
+	private void constructDraws()
 	{
 		if( sheet != null && uv != null )
 		{
@@ -80,8 +80,6 @@ public class GUIDraw extends GUIComponent
 
 			DrawAssist.attachProgram( draw, program ) ;
 		}
-
-		super.constructDraws() ;
 	}
 
 	/**

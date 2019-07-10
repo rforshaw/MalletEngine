@@ -112,7 +112,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	/**
 		Add a component to the UIElement.
 	*/
-	public <T extends UIElement.Component> T addComponent( final T _component )
+	private <T extends UIElement.Component> T addComponent( final T _component )
 	{
 		return addComponent( 0, _component ) ;
 	}
@@ -123,7 +123,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		Inserts the component at the specified index, shifts existing 
 		components to the right. 
 	*/
-	public <T extends UIElement.Component> T addComponent( final int _index, final T _component )
+	private <T extends UIElement.Component> T addComponent( final int _index, final T _component )
 	{
 		components.add( _index, _component ) ;
 		return _component ;
@@ -134,7 +134,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		return true if the component was removed else 
 		return false.
 	*/
-	public <T extends UIElement.Component> boolean removeComponent( final T _component )
+	private <T extends UIElement.Component> boolean removeComponent( final T _component )
 	{
 		return components.remove( _component ) ;
 	}
@@ -1513,6 +1513,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		public Component( final MetaComponent _meta )
 		{
 			id = new ID( _meta.getName(), _meta.getGroup() ) ;
+			getParent().addComponent( this ) ;
 		}
 
 		public final boolean isName( final String _name )
@@ -1626,12 +1627,6 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 
 		/**
-			Can be used to construct Draw objects before a 
-			DrawDelegate is provided by the Rendering System.
-		*/
-		public void constructDraws() {}
-
-		/**
 			Called when parent UIElement is ready to recieve 
 			draw requests.
 		*/
@@ -1641,6 +1636,18 @@ public class UIElement implements InputHandler, Connect.Connection
 			Called when parent UIElement is refreshing itself.
 		*/
 		public abstract void refresh() ;
+
+		/**
+			Remove the component from the parent element.
+			Calls shutdown after component has been removed.
+		*/
+		public void destroy()
+		{
+			if( getParent().removeComponent( this ) == true )
+			{
+				shutdown() ;
+			}
+		}
 
 		/**
 			Called when parent UIElement has been flagged for shutdown.

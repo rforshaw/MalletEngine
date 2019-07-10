@@ -17,7 +17,6 @@ public class ComponentUnit
 			if( components.contains( _component ) == false )
 			{
 				components.add( _index, _component ) ;
-				_component.constructDraws() ;
 				return true ;
 			}
 		}

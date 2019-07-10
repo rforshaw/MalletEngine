@@ -28,12 +28,11 @@ public class GUIEditText extends GUIText
 				_textfield.makeDirty() ;
 			}
 		} ) ;
+		constructDraws() ;
 	}
 
-	@Override
-	public void constructDraws()
+	private void constructDraws()
 	{
-		super.constructDraws() ;
 		final MalletFont font = getFont() ;
 		final MalletColour colour = getColour() ;
 

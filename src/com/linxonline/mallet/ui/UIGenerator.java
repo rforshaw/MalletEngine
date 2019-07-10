@@ -180,8 +180,9 @@ public class UIGenerator
 		final List<UIElement.MetaComponent> listeners = _meta.getComponents( MalletList.<UIElement.MetaComponent>newList() ) ;
 		for( final UIElement.MetaComponent meta : listeners )
 		{
-			_element.addComponent( GUIGenerator.create( meta, _element ) ) ;
+			GUIGenerator.create( meta, _element ) ;
 		}
+
 		return _element ;
 	}
 

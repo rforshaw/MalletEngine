@@ -12,16 +12,15 @@ public class GUIDrawEdge extends GUIDraw
 	{
 		super( _meta, _parent ) ;
 		edge = _meta.getEdge() ;
+		constructDraws() ;
 	}
 
 	/**
 		Can be used to construct Draw objects before a 
 		DrawDelegate is provided by the Rendering System.
 	*/
-	public void constructDraws()
+	private void constructDraws()
 	{
-		super.constructDraws() ;
-
 		final UIElement parent = getParent() ;
 		final MalletTexture sheet = getTexture() ;
 

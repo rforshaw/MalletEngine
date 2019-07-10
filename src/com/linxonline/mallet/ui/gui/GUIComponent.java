@@ -101,7 +101,7 @@ public abstract class GUIComponent extends UIElement.Component
 		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot() ) ;
 		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot() ) ;
 	}
-	
+
 	/**
 		Called when component receives a valid DrawDelegate
 		and when the parent UIElement is flagged as visible.

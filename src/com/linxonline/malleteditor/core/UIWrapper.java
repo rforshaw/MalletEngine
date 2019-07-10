@@ -69,10 +69,10 @@ public class UIWrapper extends UIElement
 			}
 		} ) ;
 
-		final SingleEngageComponent engage = addComponent( new SingleEngageComponent( this ) ) ;
-		final GUILineDraw line = addComponent( new GUILineDraw( this ) ) ;
+		final SingleEngageComponent engage = new SingleEngageComponent( this ) ;
+		final GUILineDraw line = new GUILineDraw( this ) ;
 
-		addComponent( new InputComponent( this )
+		new InputComponent( this )
 		{
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
@@ -89,7 +89,7 @@ public class UIWrapper extends UIElement
 				parent.makeDirty() ;
 				return InputEvent.Action.CONSUME ;
 			}
-		} ) ;
+		} ;
 
 		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UIWrapper>()
 		{
@@ -289,7 +289,7 @@ public class UIWrapper extends UIElement
 			}
 		}
 
-		final UIElement.Component component = element.addComponent( GUIGenerator.create( _meta, element ) ) ;
+		final UIElement.Component component = GUIGenerator.create( _meta, element ) ;
 
 		meta.addComponent( _meta ) ;
 		return true ;
@@ -338,6 +338,7 @@ public class UIWrapper extends UIElement
 			super( UIFactory.createMeta( "GUILINEDRAW" ), _parent ) ;
 			updateLength( _parent.getLength(), getLength() ) ;
 			updateOffset( _parent.getOffset(), getOffset() ) ;
+			constructDraws() ;
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -360,8 +361,7 @@ public class UIWrapper extends UIElement
 			}
 		}
 
-		@Override
-		public void constructDraws()
+		private void constructDraws()
 		{
 			draw = DrawAssist.createDraw( getPosition(),
 										  getOffset(),
@@ -373,8 +373,6 @@ public class UIWrapper extends UIElement
 
 			final Program program = ProgramAssist.create( "SIMPLE_GEOMETRY" ) ;
 			DrawAssist.attachProgram( draw, program ) ;
-
-			super.constructDraws() ;
 		}
 
 		@Override
