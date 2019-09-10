@@ -422,7 +422,7 @@ public class GLGeometryUploader
 		private final MalletFont.Metrics metrics ;
 		private final GLFont glFont ;
 
-		private final Matrix4 positionMatrix = new Matrix4() ;
+		private final Matrix4 position = new Matrix4() ;
 
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
 		{
@@ -443,8 +443,8 @@ public class GLGeometryUploader
 			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, buffer.indexID[0] ) ;
 			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, buffer.vboID[0] ) ;
 
-			positionMatrix.setIdentity() ;
-			positionMatrix.multiply( draw.getDrawMatrix() ) ;
+			position.setIdentity() ;
+			position.multiply( draw.getDrawMatrix() ) ;
 			final MalletColour colour = draw.getColour() ;
 
 			final Location.Range indexRange = _location.getIndex() ;
@@ -514,7 +514,7 @@ public class GLGeometryUploader
 							case POINT  :
 							{
 								shape.getVector3( j, k, point ) ;
-								Matrix4.multiply( point, positionMatrix, temp ) ;
+								Matrix4.multiply( point, position, temp ) ;
 								verticies[vertexInc++] = temp.x ;
 								verticies[vertexInc++] = temp.y ;
 								verticies[vertexInc++] = temp.z ;
@@ -550,7 +550,7 @@ public class GLGeometryUploader
 					}
 				}
 
-				positionMatrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
+				position.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
 			indicies[indexInc++] = PRIMITIVE_RESTART_INDEX ;
