@@ -4,18 +4,18 @@ package com.linxonline.mallet.util.settings ;
 // BooleanVariable Key-Value that manages stores boolean value  //
 /*==============================================================*/
 
-public final class BooleanVariable extends VariableInterface
+public final class BooleanVariable extends AVariable
 {
 	public boolean value = false ;
 
 	public BooleanVariable()
 	{
-		type = VariableInterface.BOOLEAN_TYPE ;
+		type = AVariable.BOOLEAN_TYPE ;
 	}
 	
 	public BooleanVariable( final String _name, final boolean _value )
 	{
-		type = VariableInterface.BOOLEAN_TYPE ;
+		type = AVariable.BOOLEAN_TYPE ;
 		name = _name ;
 		value = _value ;
 	}
@@ -23,7 +23,7 @@ public final class BooleanVariable extends VariableInterface
 	public void setBoolean( final boolean _value )
 	{
 		value = _value ;
-		type = VariableInterface.BOOLEAN_TYPE ;
+		type = AVariable.BOOLEAN_TYPE ;
 	}
 
 	public String toString()

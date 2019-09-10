@@ -21,11 +21,11 @@ public class ConfigWriter
 
 	public static boolean write( final FileStream _stream, final Settings _config )
 	{
-		final Collection<VariableInterface> variables = _config.toArray() ;
+		final Collection<AVariable> variables = _config.toArray() ;
 		final List<String> list = MalletList.<String>newList( variables.size() ) ;
 		final StringBuilder buffer = new StringBuilder() ;
 
-		for( final VariableInterface variable : variables )
+		for( final AVariable variable : variables )
 		{
 			buffer.append( variable.name ) ;
 			buffer.append( ' ' ) ;

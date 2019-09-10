@@ -51,7 +51,7 @@ public class UIWrapper extends UIElement
 		UIElement.connect( this, lengthChanged(), new Connect.Slot<UIWrapper>()
 		{
 			private final Vector3 unit = new Vector3() ;
-		
+
 			@Override
 			public void slot( final UIWrapper _parent )
 			{
@@ -68,6 +68,37 @@ public class UIWrapper extends UIElement
 				getElement().setLayer( _parent.getLayer() ) ;
 			}
 		} ) ;
+
+		UIElement.connect( getElement(), maxLengthChanged(), new Connect.Slot<UIElement>()
+		{
+			private final Vector3 unit = new Vector3() ;
+		
+			@Override
+			public void slot( final UIElement _element )
+			{
+				_element.getMaximumLength( unit ) ;
+				setMaximumLength( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		UIElement.connect( getElement(), minLengthChanged(), new Connect.Slot<UIElement>()
+		{
+			private final Vector3 unit = new Vector3() ;
+		
+			@Override
+			public void slot( final UIElement _element )
+			{
+				_element.getMinimumLength( unit ) ;
+				setMinimumLength( unit.x, unit.y, unit.z ) ;
+			}
+		} ) ;
+
+		final Vector3 unit = new Vector3() ;
+		getElement().getMinimumLength( unit ) ;
+		setMinimumLength( unit.x, unit.y, unit.z ) ;
+
+		getElement().getMaximumLength( unit ) ;
+		setMaximumLength( unit.x, unit.y, unit.z ) ;
 
 		final SingleEngageComponent engage = new SingleEngageComponent( this ) ;
 		final GUILineDraw line = new GUILineDraw( this ) ;
@@ -333,11 +364,9 @@ public class UIWrapper extends UIElement
 
 		protected Draw draw = null ;
 
-		public GUILineDraw( final UIWrapper _parent )
+		public GUILineDraw( final UIElement _parent )
 		{
 			super( UIFactory.createMeta( "GUILINEDRAW" ), _parent ) ;
-			updateLength( _parent.getLength(), getLength() ) ;
-			updateOffset( _parent.getOffset(), getOffset() ) ;
 			constructDraws() ;
 		}
 
@@ -398,10 +427,9 @@ public class UIWrapper extends UIElement
 
 			if( draw != null && parent.isVisible() == true )
 			{
-				updateLength( parent.getLength(), getLength() ) ;
-				updateOffset( parent.getOffset(), getOffset() ) ;
+				final Vector3 len = getLength() ;
+				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), len ) ;
 
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
 				DrawAssist.amendOrder( draw, getLayer() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}

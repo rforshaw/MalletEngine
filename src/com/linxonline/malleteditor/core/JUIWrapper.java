@@ -97,27 +97,27 @@ public class JUIWrapper
 	{
 		switch( _variant.getType() )
 		{
-			case VariableInterface.STRING_TYPE  :
+			case AVariable.STRING_TYPE  :
 			{
 				_to.put( _variant.getName(), _variant.toString() ) ;
 				break ;
 			}
-			case VariableInterface.BOOLEAN_TYPE :
+			case AVariable.BOOLEAN_TYPE :
 			{
 				_to.put( _variant.getName(), _variant.toBool() ) ;
 				break ;
 			}
-			case VariableInterface.INT_TYPE     :
+			case AVariable.INT_TYPE     :
 			{
 				_to.put( _variant.getName(), _variant.toInt() ) ;
 				break ;
 			}
-			case VariableInterface.FLOAT_TYPE   :
+			case AVariable.FLOAT_TYPE   :
 			{
 				_to.put( _variant.getName(), _variant.toFloat() ) ;
 				break ;
 			}
-			case VariableInterface.OBJECT_TYPE  :
+			case AVariable.OBJECT_TYPE  :
 			{
 				final Object obj = _variant.toObject() ;
 				if( obj instanceof Vector2 )

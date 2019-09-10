@@ -5,7 +5,7 @@ import com.linxonline.mallet.maths.* ;
 
 public class UIVariant implements IVariant
 {
-	private final VariableInterface variable ;
+	private final AVariable variable ;
 	
 	/**
 		A UIVariant can contain a signal however the variant 
@@ -114,7 +114,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.STRING_TYPE : ( ( StringVariable )variable ).value = _value ; break ;
+			case AVariable.STRING_TYPE : ( ( StringVariable )variable ).value = _value ; break ;
 		}
 	}
 
@@ -123,7 +123,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.BOOLEAN_TYPE : ( ( BooleanVariable )variable ).value = _value ; break ;
+			case AVariable.BOOLEAN_TYPE : ( ( BooleanVariable )variable ).value = _value ; break ;
 		}
 	}
 
@@ -132,7 +132,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.FLOAT_TYPE : ( ( FloatVariable )variable ).value = _value ; break ;
+			case AVariable.FLOAT_TYPE : ( ( FloatVariable )variable ).value = _value ; break ;
 		}
 	}
 
@@ -141,7 +141,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.INT_TYPE : ( ( IntegerVariable )variable ).value = _value ; break ;
+			case AVariable.INT_TYPE : ( ( IntegerVariable )variable ).value = _value ; break ;
 		}
 	}
 
@@ -149,7 +149,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE :
+			case AVariable.OBJECT_TYPE :
 			{
 				( ( ObjectVariable )variable ).value = _value;
 				break ;
@@ -162,7 +162,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE :
+			case AVariable.OBJECT_TYPE :
 			{
 				final Vector3 value = ( Vector3 )( ( ObjectVariable )variable ).value ;
 				value.setXYZ( _x, _y, _z ) ;
@@ -176,7 +176,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE :
+			case AVariable.OBJECT_TYPE :
 			{
 				final Vector2 value = ( Vector2 )( ( ObjectVariable )variable ).value ;
 				value.setXY( _x, _y ) ;
@@ -196,7 +196,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.BOOLEAN_TYPE : return ( ( BooleanVariable )variable ).value ;
+			case AVariable.BOOLEAN_TYPE : return ( ( BooleanVariable )variable ).value ;
 			default           : return false ;
 		}
 	}
@@ -206,7 +206,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.FLOAT_TYPE  : return ( ( FloatVariable )variable ).value ;
+			case AVariable.FLOAT_TYPE  : return ( ( FloatVariable )variable ).value ;
 			default                            : return 0.0f ;
 		}
 	}
@@ -216,7 +216,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.INT_TYPE    : return ( ( IntegerVariable )variable ).value ;
+			case AVariable.INT_TYPE    : return ( ( IntegerVariable )variable ).value ;
 			default                            : return 0 ;
 		}
 	}
@@ -226,7 +226,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE : return _class.cast( ( ( ObjectVariable )variable ).value ) ;
+			case AVariable.OBJECT_TYPE : return _class.cast( ( ( ObjectVariable )variable ).value ) ;
 			default                            : return null ;
 		}
 	}
@@ -236,7 +236,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE : return ( ( ObjectVariable )variable ).value ;
+			case AVariable.OBJECT_TYPE : return ( ( ObjectVariable )variable ).value ;
 			default                            : return null ;
 		}
 	}
@@ -246,7 +246,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE : return ( Vector3 )( ( ObjectVariable )variable ).value ;
+			case AVariable.OBJECT_TYPE : return ( Vector3 )( ( ObjectVariable )variable ).value ;
 			default                            : return null ;
 		}
 	}
@@ -256,7 +256,7 @@ public class UIVariant implements IVariant
 	{
 		switch( getType() )
 		{
-			case VariableInterface.OBJECT_TYPE : return ( Vector2 )( ( ObjectVariable )variable ).value ;
+			case AVariable.OBJECT_TYPE : return ( Vector2 )( ( ObjectVariable )variable ).value ;
 			default                            : return null ;
 		}
 	}

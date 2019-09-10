@@ -10,7 +10,7 @@ import com.linxonline.mallet.io.serialisation.* ;
 // directly use this.											//
 /*==============================================================*/
 
-public abstract class VariableInterface
+public abstract class AVariable
 {
 	public final static int NONE_TYPE = 0 ;
 	public final static int INT_TYPE = 1 ;

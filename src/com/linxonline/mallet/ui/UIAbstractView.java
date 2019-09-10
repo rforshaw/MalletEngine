@@ -520,7 +520,7 @@ public class UIAbstractView extends UIElement
 				return layout ;
 			}
 
-			public void addTextFields( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			private void addTextFields( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 				switch( variant.getType() )
@@ -530,7 +530,7 @@ public class UIAbstractView extends UIElement
 						hook( _layout.addElement( create() ), _layout, _model, _index ) ;
 						break ;
 					}
-					case VariableInterface.OBJECT_TYPE :
+					case AVariable.OBJECT_TYPE :
 					{
 						final Object obj = variant.toObject() ;
 						if( obj instanceof Vector2 )
@@ -577,7 +577,7 @@ public class UIAbstractView extends UIElement
 				}
 			}
 
-			public UITextField hook( final UITextField _field, final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			private UITextField hook( final UITextField _field, final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				UIElement.connect( _field, _field.elementDisengaged(), new Connect.Slot<UITextField>()
 				{
@@ -591,7 +591,7 @@ public class UIAbstractView extends UIElement
 				return _field ;
 			}
 
-			public UITextField create()
+			private UITextField create()
 			{
 				final UITextField.Meta meta = new UITextField.Meta() ;
 				final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
@@ -638,7 +638,7 @@ public class UIAbstractView extends UIElement
 							setTextTo( getText( vLayout, 0 ), variant.toString() ) ;
 							break ;
 						}
-						case VariableInterface.OBJECT_TYPE :
+						case AVariable.OBJECT_TYPE :
 						{
 							final Object obj = variant.toObject() ;
 							if( obj instanceof Vector2 )
@@ -694,28 +694,28 @@ public class UIAbstractView extends UIElement
 				final UILayout vLayout = ( UILayout )_item ;
 				switch( variant.getType() )
 				{
-					case VariableInterface.STRING_TYPE  :
+					case AVariable.STRING_TYPE  :
 					{
 						final StringBuilder text = getText( vLayout, 0 ) ;
 						variant.setString( text.toString() ) ;
 						break ;
 					}
-					case VariableInterface.BOOLEAN_TYPE :
+					case AVariable.BOOLEAN_TYPE :
 					{
 						variant.setBool( toBool( getText( vLayout, 0 ) ) ) ;
 						break ;
 					}
-					case VariableInterface.INT_TYPE     :
+					case AVariable.INT_TYPE     :
 					{
 						variant.setInt( toInt( getText( vLayout, 0 ) ) ) ;
 						break ;
 					}
-					case VariableInterface.FLOAT_TYPE   :
+					case AVariable.FLOAT_TYPE   :
 					{
 						variant.setFloat( toFloat( getText( vLayout, 0 ) ) ) ;
 						break ;
 					}
-					case VariableInterface.OBJECT_TYPE  :
+					case AVariable.OBJECT_TYPE  :
 					{
 						final Object obj = variant.toObject() ;
 						if( obj instanceof Vector2 )

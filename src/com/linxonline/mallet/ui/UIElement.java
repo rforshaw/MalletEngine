@@ -54,6 +54,8 @@ public class UIElement implements InputHandler, Connect.Connection
 	private final Connect.Signal positionChanged   = new Connect.Signal() ;
 	private final Connect.Signal offsetChanged     = new Connect.Signal() ;
 	private final Connect.Signal lengthChanged     = new Connect.Signal() ;
+	private final Connect.Signal minLengthChanged  = new Connect.Signal() ;
+	private final Connect.Signal maxLengthChanged  = new Connect.Signal() ;
 	private final Connect.Signal marginChanged     = new Connect.Signal() ;
 	private final Connect.Signal elementDestroyed  = new Connect.Signal() ;
 	private final Connect.Signal elementShown      = new Connect.Signal() ;
@@ -466,16 +468,22 @@ public class UIElement implements InputHandler, Connect.Connection
 		Causes element to be flagged as dirty if the length requires to 
 		be changed to be above new minimum range.
 	*/
-	public void setMinimumLength( final float _x, final float _y, final float _z )
+	public void setMinimumLength( float _x, float _y, float _z )
 	{
-		minLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
-		minLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
-		minLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
+		_x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
+		_y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
+		_z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
-		// Ensure that length adheres to the new minimum length
-		setLength( ratio.toUnitX( length.x ),
-				   ratio.toUnitY( length.y ),
-				   ratio.toUnitZ( length.z ) ) ;
+		if( UI.applyVec3( minLength, _x, _y, _z ) == true )
+		{
+			makeDirty() ;
+			UIElement.signal( this, minLengthChanged() ) ;
+
+			// Ensure that length adheres to the new minimum length
+			setLength( ratio.toUnitX( length.x ),
+					   ratio.toUnitY( length.y ),
+					   ratio.toUnitZ( length.z ) ) ;
+		}
 	}
 
 	/**
@@ -487,16 +495,22 @@ public class UIElement implements InputHandler, Connect.Connection
 		Causes element to be flagged as dirty if the length requires to 
 		be changed to be within new maximum range.
 	*/
-	public void setMaximumLength( final float _x, final float _y, final float _z )
+	public void setMaximumLength( float _x, float _y, float _z )
 	{
-		maxLength.x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
-		maxLength.y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
-		maxLength.z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
+		_x = ( _x < 0.0f ) ? 0.0f : ratio.toPixelX( _x ) ;
+		_y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
+		_z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
-		// Ensure that length adheres to the new maximum length
-		setLength( ratio.toUnitX( length.x ),
-				   ratio.toUnitY( length.y ),
-				   ratio.toUnitZ( length.z ) ) ;
+		if( UI.applyVec3( maxLength, _x, _y, _z ) == true )
+		{
+			makeDirty() ;
+			UIElement.signal( this, maxLengthChanged() ) ;
+
+			// Ensure that length adheres to the new maximum length
+			setLength( ratio.toUnitX( length.x ),
+					   ratio.toUnitY( length.y ),
+					   ratio.toUnitZ( length.z ) ) ;
+		}
 	}
 
 	/**
@@ -864,6 +878,16 @@ public class UIElement implements InputHandler, Connect.Connection
 	public Connect.Signal lengthChanged()
 	{
 		return lengthChanged ;
+	}
+
+	public Connect.Signal minLengthChanged()
+	{
+		return minLengthChanged ;
+	}
+
+	public Connect.Signal maxLengthChanged()
+	{
+		return maxLengthChanged ;
 	}
 
 	/**

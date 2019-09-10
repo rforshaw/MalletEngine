@@ -371,8 +371,8 @@ public class UIEditorState extends GameState
 	private UIElement createOpenPanel( final int _layer )
 	{
 		final JUI jui = JUI.create( "base/ui/uieditor/open_panel.jui" ) ;
-		final UIElement parent = jui.getParent() ;
-		parent.setLayer( _layer ) ;
+		final UIElement openPanel = jui.getParent() ;
+		openPanel.setLayer( _layer ) ;
 
 		final UITextField field = jui.get( "filepathField", UITextField.class ) ;
 
@@ -384,13 +384,28 @@ public class UIEditorState extends GameState
 			public void slot( final UIButton _open )
 			{
 				System.out.println( "Open Project..." ) ;
-				cleanup( mainView ) ;
+				cleanCurrentProject() ;
 
 				root = JUIWrapper.loadWrapper( field.getText().toString() ) ;
-				root.setLayer( 1 ) ;
+				if( root != null )
+				{
+					root.setLayer( 1 ) ;
+					mainView.addElement( root ) ;
+					openPanel.destroy() ;
+				}
+			}
 
-				mainView.addElement( root ) ;
-				parent.destroy() ;
+			/**
+				Clean any active project data from the editor.
+				Before opening a new file ensure the editor is 
+				as new.
+			*/
+			private void cleanCurrentProject()
+			{
+				cleanup( elementStructurePanel ) ;
+				elementDataPanel.setModel( null ) ;
+				cleanup( componentDataPanel ) ;
+				cleanup( mainView ) ;
 			}
 
 			/**
@@ -416,11 +431,11 @@ public class UIEditorState extends GameState
 			public void slot( final UIButton _open )
 			{
 				System.out.println( "Cancel..." ) ;
-				parent.destroy() ;
+				openPanel.destroy() ;
 			}
 		} ) ;
 
-		return parent ;
+		return openPanel ;
 	}
 
 	private UIElement createSavePanel( final int _layer )
