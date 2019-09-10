@@ -422,6 +422,8 @@ public class GLGeometryUploader
 		private final MalletFont.Metrics metrics ;
 		private final GLFont glFont ;
 
+		private final Matrix4 positionMatrix = new Matrix4() ;
+
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
@@ -440,8 +442,9 @@ public class GLGeometryUploader
 
 			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, buffer.indexID[0] ) ;
 			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, buffer.vboID[0] ) ;
-			
-			final Matrix4 positionMatrix = draw.getDrawMatrix() ;
+
+			positionMatrix.setIdentity() ;
+			positionMatrix.multiply( draw.getDrawMatrix() ) ;
 			final MalletColour colour = draw.getColour() ;
 
 			final Location.Range indexRange = _location.getIndex() ;
