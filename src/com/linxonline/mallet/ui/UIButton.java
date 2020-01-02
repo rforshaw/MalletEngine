@@ -80,6 +80,11 @@ public class UIButton extends UIElement
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
+		if( isDisabled() == true )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
 		if( isIntersectInput( _event ) == true )
 		{
 			final InputEvent.Action action = processInputEvent( _event ) ;

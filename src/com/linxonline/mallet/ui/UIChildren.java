@@ -182,9 +182,6 @@ public class UIChildren implements IChildren
 					// If the child element is flagged for 
 					// destruction add it to the remove list.
 					removeElement( element ) ;
-
-					// We'll also want to refresh the UILayout.
-					dirtyChildren = true ;
 				}
 			}
 		}
@@ -202,6 +199,7 @@ public class UIChildren implements IChildren
 				}
 			}
 			toRemove.clear() ;
+			dirtyChildren = true ;		// We'll also want to refresh the UILayout.
 		}
 
 		return dirtyChildren ;

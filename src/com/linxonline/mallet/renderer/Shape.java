@@ -160,7 +160,7 @@ public class Shape
 
 	public Shape( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
 	{
-		swivel    = new Swivel[_swivel.length] ;
+		swivel = new Swivel[_swivel.length] ;
 		System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
 
 		verticies = FloatBuffer.allocate( Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize ) ;

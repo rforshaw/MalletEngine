@@ -46,7 +46,7 @@ public class GUIScrollbar extends GUIComponent
 			DrawAssist.amendShape( xBar, Shape.constructPlane( xLength, uv.min, uv.max ) ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.map( program, "inTex0", sheet ) ;
+			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
 
 			DrawAssist.attachProgram( xBar, program ) ;
 		}
@@ -61,7 +61,7 @@ public class GUIScrollbar extends GUIComponent
 			DrawAssist.amendShape( yBar, Shape.constructPlane( yLength, uv.min, uv.max ) ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.map( program, "inTex0", sheet ) ;
+			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
 
 			DrawAssist.attachProgram( yBar, program ) ;
 		}

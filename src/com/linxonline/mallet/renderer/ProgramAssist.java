@@ -41,9 +41,9 @@ public final class ProgramAssist
 		Remove a previous mapped uniform from the 
 		passed in program.
 	*/
-	public static Program remove( final Program _program, final String _handler )
+	public static Program removeUniform( final Program _program, final String _handler )
 	{
-		return assist.remove( _program, _handler ) ;
+		return assist.removeUniform( _program, _handler ) ;
 	}
 
 	/**
@@ -57,9 +57,9 @@ public final class ProgramAssist
 		@param _handler uniform name.
 		@param _obj the uniform/value to be mapped.
 	*/
-	public static Program map( final Program _program, final String _handler, final Object _obj )
+	public static Program mapUniform( final Program _program, final String _handler, final Object _obj )
 	{
-		return assist.map( _program, _handler, _obj ) ;
+		return assist.mapUniform( _program, _handler, _obj ) ;
 	}
 
 	public interface Assist
@@ -68,7 +68,7 @@ public final class ProgramAssist
 
 		public Program create( final String _id ) ;
 
-		public Program remove( final Program _program, final String _handler ) ;
-		public Program map( final Program _program, final String _handler, final Object _obj ) ;
+		public Program removeUniform( final Program _program, final String _handler ) ;
+		public Program mapUniform( final Program _program, final String _handler, final Object _obj ) ;
 	}
 }

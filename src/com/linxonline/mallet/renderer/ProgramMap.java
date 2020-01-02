@@ -22,6 +22,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 {
 	private final String id ;
 	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
+	private final Map<String, Storage> buffers = MalletMap.<String, Storage>newMap() ;
 
 	private WeakReference<U> program = null ;			// Handler to renderer specific program.
 	private boolean dirty = true ;
@@ -34,7 +35,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 	public ProgramMap( final ProgramMap<U> _map )
 	{
 		id = _map.id ;
-		uniforms.putAll( _map.getMaps() ) ;
+		uniforms.putAll( _map.getUniformMap() ) ;
 
 		setProgram( _map.getProgram() ) ;
 		setDirty( _map.dirty ) ;
@@ -59,7 +60,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 		return id ;
 	}
 
-	public boolean remove( final String _id )
+	public boolean removeUniform( final String _id )
 	{
 		if( uniforms.remove( _id ) != null )
 		{
@@ -72,7 +73,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 		return false ;
 	}
 
-	public boolean set( final String _id, final Object _value )
+	public boolean setUniform( final String _id, final Object _value )
 	{
 		if( _id == null || _value == null )
 		{
@@ -80,7 +81,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 			return false ;
 		}
 
-		if( _value == get( _id ) )
+		if( _value == getUniform( _id ) )
 		{
 			// Attempting reassign to the same object. 
 			return false ;
@@ -94,7 +95,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 	/**
 		Return the mapped object associated with _id.
 	*/
-	public Object get( final String _id )
+	public Object getUniform( final String _id )
 	{
 		return uniforms.get( _id ) ;
 	}
@@ -103,12 +104,12 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 		Return the mapped object associated with _id.
 		Will automatically cast object to _clazz.
 	*/
-	public <T> T get( final String _id, final Class<T> _clazz )
+	public <T> T getUniform( final String _id, final Class<T> _clazz )
 	{
-		return _clazz.cast( get( _id ) ) ;
+		return _clazz.cast( getUniform( _id ) ) ;
 	}
 
-	public Map<String, Object> getMaps()
+	public Map<String, Object> getUniformMap()
 	{
 		return uniforms ;
 	}
@@ -149,7 +150,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 				return false ;
 			}
 
-			final Map<String, Object> u = program.getMaps() ;
+			final Map<String, Object> u = program.getUniformMap() ;
 			if( uniforms.size() != u.size() )
 			{
 				// If the hashmaps are not the same size then 

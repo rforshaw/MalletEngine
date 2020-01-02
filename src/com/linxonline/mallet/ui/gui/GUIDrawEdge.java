@@ -36,7 +36,7 @@ public class GUIDrawEdge extends GUIDraw
 			setColour( getColour() ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.map( program, "inTex0", sheet ) ;
+			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
 
 			DrawAssist.attachProgram( draw, program ) ;
 			setDraw( draw ) ;

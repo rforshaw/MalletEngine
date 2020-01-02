@@ -14,17 +14,17 @@ public final class GlobalLanguage
 	/**
 		Load the language file into the specified namespace.
 	*/
-	public boolean load( final String _namespace, final String _file )
+	public static boolean load( final String _namespace, final String _file )
 	{
 		return language.load( _namespace, _file ) ;
 	}
 
-	public void remove( final String _namespace )
+	public static void remove( final String _namespace )
 	{
 		language.remove( _namespace ) ;
 	}
 
-	public String get( final String _namespace, final String _keyword )
+	public static String get( final String _namespace, final String _keyword )
 	{
 		return language.get( _namespace, _keyword ) ;
 	}

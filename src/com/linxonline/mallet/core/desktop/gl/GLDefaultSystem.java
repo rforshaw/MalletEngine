@@ -7,7 +7,7 @@ import com.jogamp.newt.event.WindowEvent ;
 
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
-import com.linxonline.mallet.renderer.desktop.GL.GLRenderer ;
+import com.linxonline.mallet.renderer.desktop.opengl.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;

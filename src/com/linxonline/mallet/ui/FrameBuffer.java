@@ -196,7 +196,7 @@ public class FrameBuffer
 														   new Vector2( 1, 0 ) ) ) ;
 
 		final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-		ProgramAssist.map( program, "inTex0", new MalletTexture( _world ) ) ;
+		ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( _world ) ) ;
 		DrawAssist.attachProgram( pane, program ) ;
 
 		return pane ;

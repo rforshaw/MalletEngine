@@ -21,7 +21,9 @@ import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
+import com.linxonline.mallet.util.schema.* ;
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 
@@ -42,6 +44,8 @@ public final class GameTestLoader implements IGameLoader
 		{
 			public void initGame()			// Called when state is started
 			{
+				createMeta() ;
+
 				createUI() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
@@ -62,6 +66,34 @@ public final class GameTestLoader implements IGameLoader
 				createEventMessageTest() ;
 
 				getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+			}
+
+			public void createMeta()
+			{
+				final IVar struct1 = SStruct.create( Tuple.build( "test1", SPrim.bool() ),
+													 Tuple.build( "test2", SPrim.flt() ),
+													 Tuple.build( "test3", SPrim.integer() ),
+													 Tuple.build( "test4", SPrim.matrix4() ),
+													 Tuple.build( "test5", SPrim.vec2() ),
+													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+
+				final IVar struct2 = SStruct.create( Tuple.build( "test1", SPrim.bool() ),
+													 Tuple.build( "test2", SPrim.flt() ),
+													 Tuple.build( "test3", SPrim.integer() ),
+													 Tuple.build( "test4", SPrim.matrix4() ),
+													 Tuple.build( "test5", SPrim.vec2() ),
+													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+
+				System.out.println( "Structures 1 and 2: " + struct1.equals( struct2 ) ) ;
+
+				final IVar struct3 = SStruct.create( Tuple.build( "test1", SPrim.flt() ),
+													 Tuple.build( "test2", SPrim.flt() ),
+													 Tuple.build( "test3", SPrim.integer() ),
+													 Tuple.build( "test4", SPrim.matrix4() ),
+													 Tuple.build( "test5", SPrim.vec2() ),
+													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+
+				System.out.println( "Structures 1 and 3: " + struct1.equals( struct3 ) ) ;
 			}
 
 			public void createUI()
@@ -125,7 +157,7 @@ public final class GameTestLoader implements IGameLoader
 																	10 ) ;
 
 						final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-						ProgramAssist.map( program, "inTex0", texture ) ;
+						ProgramAssist.mapUniform( program, "inTex0", texture ) ;
 						DrawAssist.attachProgram( draw, program ) ;
 
 						DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
@@ -346,7 +378,7 @@ public final class GameTestLoader implements IGameLoader
 				DrawAssist.amendShape( draw, plane ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 				DrawAssist.attachProgram( draw, program ) ;
 
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
@@ -418,7 +450,7 @@ public final class GameTestLoader implements IGameLoader
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.map( program, "inTex0", texture ) ;
+				ProgramAssist.mapUniform( program, "inTex0", texture ) ;
 				DrawAssist.attachProgram( draw, program ) ;
 
 				final RenderComponent render = new RenderComponent( entity ) ;

@@ -136,7 +136,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		{
 			// We only want to remap the programs texture 
 			// if the sprite is not using a spritesheet.
-			ProgramAssist.map( DrawAssist.getProgram( _draw ), "inTex0", c.path ) ;
+			ProgramAssist.mapUniform( DrawAssist.getProgram( _draw ), "inTex0", c.path ) ;
 		}
 
 		// If using a sprite sheet the UV coordinates 

@@ -24,6 +24,7 @@ public class JSONProgram
 	private final String name ;
 	private final List<ShaderMap> shaders   = MalletList.<ShaderMap>newList() ;
 	private final List<UniformMap> uniforms = MalletList.<UniformMap>newList() ;
+	private final List<String> buffers      = MalletList.<String>newList() ;
 	private final List<String> swivel       = MalletList.<String>newList() ;
 
 	public JSONProgram( final String _name )
@@ -44,6 +45,11 @@ public class JSONProgram
 	public List<UniformMap> getUniforms()
 	{
 		return uniforms ;
+	}
+
+	public List<String> getBuffers()
+	{
+		return buffers ;
 	}
 
 	public List<String> getSwivel()
@@ -67,13 +73,13 @@ public class JSONProgram
 			{
 				case SAMPLER2D :
 				{
-					final MalletTexture texture = ( MalletTexture )_data.get( uniform.getRight() ) ;
+					final MalletTexture texture = ( MalletTexture )_data.getUniform( uniform.getRight() ) ;
 					_activeKeys.add( texture.getPath() ) ;
 					break ;
 				}
 				case FONT      :
 				{
-					final MalletFont font = ( MalletFont )_data.get( uniform.getRight() ) ;
+					final MalletFont font = ( MalletFont )_data.getUniform( uniform.getRight() ) ;
 					_activeKeys.add( font.getID() ) ;
 					break ;
 				}
@@ -204,6 +210,7 @@ public class JSONProgram
 
 		fillUniforms( program.uniforms, _jGL.getJSONArray( "UNIFORMS" ) ) ;
 		fillAttributes( program.swivel, _jGL.getJSONArray( "SWIVEL" ) ) ;
+		fillBuffers( program.buffers, _jGL.getJSONArray( "BUFFERS" ) ) ;
 
 		readShaders( paths, program, _delegate ) ;
 	}
@@ -293,6 +300,20 @@ public class JSONProgram
 	}
 
 	private static void fillAttributes( final List<String> _toFill, final JSONArray _base )
+	{
+		if( _base == null )
+		{
+			return ;
+		}
+
+		final int length = _base.length() ;
+		for( int i = 0; i < length; i++ )
+		{
+			_toFill.add( _base.getString( i ) ) ;
+		}
+	}
+
+	private static void fillBuffers( final List<String> _toFill, final JSONArray _base )
 	{
 		if( _base == null )
 		{

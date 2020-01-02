@@ -1,17 +1,28 @@
-#version 150
+#version 430 core
 
 uniform mat4 inMVPMatrix ;
 
-attribute vec4 inVertex ;
-attribute vec4 inColour ;
-attribute vec2 inTexCoord0 ;
-attribute vec3 inNormal ;
+in vec4 inVertex ;
+in vec4 inColour ;
+in vec2 inTexCoord0 ;
+in vec3 inNormal ;
 
-varying vec2 outTexCoord0 ;
-varying vec4 outColour ;
+layout( std140, binding = 0 ) buffer TestBlock1 {
+	int test ;
+} Test1 ;
+
+layout( std140, binding = 1 ) buffer TestBlock2 {
+	int test ;
+} Test2 ;
+
+out vec2 outTexCoord0 ;
+out vec4 outColour ;
 
 void main()
 {
+	int test1 = Test1.test + 1 ;
+	int test2 = Test2.test + 1 ;
+
 	gl_Position = inMVPMatrix * inVertex ;
 	outTexCoord0 = inTexCoord0 ;
 	outColour = inColour ;

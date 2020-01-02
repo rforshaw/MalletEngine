@@ -33,7 +33,7 @@ import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.io.filesystem.android.* ;
 import com.linxonline.mallet.core.android.gl.GLAndroidSystem ;
-import com.linxonline.mallet.renderer.android.GL.* ;
+import com.linxonline.mallet.renderer.android.opengl.* ;
 
 import com.linxonline.mallet.ui.UI ;
 import com.linxonline.mallet.ui.UIRatio ;

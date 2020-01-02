@@ -27,6 +27,37 @@ public class Tuple<T, U>
 	}
 
 	@Override
+	public int hashCode()
+	{
+		int hash = 7 ;
+		hash = 31 * hash + left.hashCode() ;
+		hash = 31 * hash + right.hashCode() ;
+		return hash ;
+	}
+
+	@Override
+	public boolean equals( Object _obj )
+	{
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( _obj == this )
+		{
+			return true ;
+		}
+
+		if( _obj instanceof Tuple )
+		{
+			final Tuple tuple = ( Tuple )_obj ;
+			return left.equals( tuple.getLeft() ) && right.equals( tuple.getRight() ) ;
+		}
+
+		return false ;
+	}
+
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

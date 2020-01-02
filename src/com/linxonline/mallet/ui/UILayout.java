@@ -730,18 +730,14 @@ public class UILayout extends UIElement implements IChildren
 		public SingleEngageComponent( final UILayout _parent )
 		{
 			super( _parent ) ;
-			UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UILayout>()
+			UIElement.connect( _parent, _parent.elementDisengaged(), ( final UILayout _layout ) ->
 			{
-				@Override
-				public void slot( final UILayout _layout )
-				{
-					// If the layout has been disengaged then it is 
-					// safe to say that all children of the layout 
-					// should also be disengaged.
-					setEngaged( null ) ;
-					final List<UIElement> ordered = _layout.getElements() ;
-					disengageOthers( null, ordered ) ;
-				}
+				// If the layout has been disengaged then it is 
+				// safe to say that all children of the layout 
+				// should also be disengaged.
+				setEngaged( null ) ;
+				final List<UIElement> ordered = _layout.getElements() ;
+				disengageOthers( null, ordered ) ;
 			} ) ;
 		}
 
@@ -753,7 +749,9 @@ public class UILayout extends UIElement implements IChildren
 
 			if( current != null )
 			{
-				if( current.isVisible() == true && current.isDisabled() == false )
+				if( current.isVisible() == true &&
+					current.isDisabled() == false &&
+					current.destroy == false )
 				{
 					if( current.isIntersectInput( _input ) == true )
 					{

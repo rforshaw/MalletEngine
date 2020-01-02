@@ -35,8 +35,9 @@ public class GUIPanelEdge extends GUIDrawEdge
 	{
 		super( _meta, _parent ) ;
 		neutral  = _meta.getNeutralColour( new MalletColour() ) ;
-		rollover = _meta.getNeutralColour( new MalletColour() ) ;
-		clicked  = _meta.getNeutralColour( new MalletColour() ) ;
+		rollover = _meta.getRolloverColour( new MalletColour() ) ;
+		clicked  = _meta.getClickedColour( new MalletColour() ) ;
+		setColour( neutral ) ;
 
 		UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
 		UIElement.connect( _parent, _parent.elementDisengaged(), disengagedSlot ) ;
