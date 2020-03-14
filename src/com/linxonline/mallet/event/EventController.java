@@ -20,23 +20,15 @@ public class EventController implements IEventHandler
 {
 	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) -> {} ;
 
-	private final List<EventType> wantedTypes = MalletList.<EventType>newList() ;
-	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
+	private final List<EventType> wantedTypes = MalletList.<EventType>newList( 5 ) ;
+	private AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
-	private final String name ;
-	private final SwapList<Event<?>> messenger = new SwapList<Event<?>>() ;
+	private final int capacity = 10 ;
+	private List<Event<?>> messenger = MalletList.<Event<?>>newList( capacity ) ;
 	private final EventType.Lookup<IProcessor<?>> processors = new EventType.Lookup<IProcessor<?>>( PROCESSOR_FALLBACK ) ;
 	private IAddEvent addInterface = ADD_EVENT_FALLBACK ;
 
-	public EventController()
-	{
-		this( null ) ;
-	}
-
-	public EventController( final String _name )
-	{
-		name = ( _name != null ) ? _name : "EVENT CONTROLLER" ;
-	}
+	public EventController() {}
 
 	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
 	{
@@ -48,15 +40,24 @@ public class EventController implements IEventHandler
 		processors.add( type, _processor ) ;
 	}
 
+	/**
+		Called when added to an EventSystem.
+		If the Event Controller is not added to an EventSystem then 
+		any events will be added to the ADD_EVENT_FALLBACK mechanism.
+		If an EventSystem is added the FALLBACK is removed - if the 
+		addInterface is reset to a null state the FALLBACK is reintroduced.
+	*/
 	public void setAddEventInterface( final IAddEvent _addInterface )
 	{
 		if( _addInterface != null )
 		{
 			addInterface = _addInterface ;
 			ADD_EVENT_FALLBACK.transferEvents( addInterface ) ;
+			ADD_EVENT_FALLBACK = null ;
 		}
 		else
 		{
+			ADD_EVENT_FALLBACK = ( ADD_EVENT_FALLBACK != null ) ? ADD_EVENT_FALLBACK : new AddEventFallback() ;
 			addInterface = ADD_EVENT_FALLBACK ;
 		}
 	}
@@ -81,7 +82,7 @@ public class EventController implements IEventHandler
 	*/
 	public void update()
 	{
-		final List<Event<?>> events = messenger.swap() ;
+		final List<Event<?>> events = messenger ;//messenger.swap() ;
 		if( events.isEmpty() )
 		{
 			return ;
@@ -93,6 +94,12 @@ public class EventController implements IEventHandler
 			final Event<?> event = events.get( i ) ;
 			final IProcessor proc = processors.get( event.getEventType() ) ;
 			proc.process( event.getVariable() ) ;
+		}
+		events.clear() ;
+
+		if( size > capacity )
+		{
+			messenger = MalletList.<Event<?>>newList( capacity ) ;
 		}
 	}
 
@@ -116,18 +123,15 @@ public class EventController implements IEventHandler
 	public void clearEvents()
 	{
 		messenger.clear() ;
-		ADD_EVENT_FALLBACK.clear() ;
+		if( ADD_EVENT_FALLBACK != null )
+		{
+			ADD_EVENT_FALLBACK.clear() ;
+		}
 	}
 
 	public IAddEvent getAddEventInterface()
 	{
 		return addInterface ;
-	}
-
-	@Override
-	public String getName()
-	{
-		return name ;
 	}
 
 	public List<EventType> getWantedEventTypes()

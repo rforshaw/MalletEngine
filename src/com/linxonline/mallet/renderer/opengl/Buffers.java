@@ -91,6 +91,11 @@ public class Buffers<T, U>
 		}
 	}
 
+	public int size()
+	{
+		return locations.size() ;
+	}
+	
 	public interface Listener<T, U>
 	{
 		public void draw( final Matrix4 _world, final Matrix4 _ui, final LocationBuffer<T, U> _buffer ) ;

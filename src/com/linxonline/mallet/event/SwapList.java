@@ -1,6 +1,7 @@
 package com.linxonline.mallet.event ;
 
 import java.util.List ;
+import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.MalletList ;
 
@@ -14,10 +15,21 @@ import com.linxonline.mallet.util.MalletList ;
 **/
 public final class SwapList<T>
 {
-	private List<T> newEvents = MalletList.<T>newList() ;
-	private List<T> active = MalletList.<T>newList() ;
+	private final int capacity ;
+	private ArrayList<T> newEvents = null ;
+	private ArrayList<T> active = null ;
 
-	public SwapList() {}
+	public SwapList()
+	{
+		this( 10 ) ;
+	}
+
+	public SwapList( int _initialCapacity )
+	{
+		capacity = _initialCapacity ;
+		newEvents = new ArrayList<T>( capacity ) ;
+		active = new ArrayList<T>( capacity ) ;
+	}
 	
 	public void add( final T _t )
 	{
@@ -45,14 +57,26 @@ public final class SwapList<T>
 			active.clear() ;
 		}
 
-		if( newEvents.isEmpty() == false )
+		List<T> toReturn = active ;
+		final int size = newEvents.size() ;
+		if( size > 0 )
 		{
-			final List<T> oldEvents = active ;
+			final ArrayList<T> oldEvents = active ;
 			active = newEvents ;
 			newEvents = oldEvents ;
+			toReturn = active ;
+
+			if( size > capacity )
+			{
+				// If the size of events exceeds our capacity then 
+				// we want to resize the array - it's easy for an 
+				// array to expand, it's much harder to shrink it!
+				newEvents = new ArrayList<T>( capacity ) ;
+				active = new ArrayList<T>( capacity ) ;
+			}
 		}
-		
-		return active ;
+
+		return toReturn ;
 	}
 
 	public void clear()

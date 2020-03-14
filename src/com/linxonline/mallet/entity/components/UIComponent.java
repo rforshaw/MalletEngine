@@ -25,7 +25,7 @@ public class UIComponent extends InputComponent
 	private final Camera camera ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
-	protected final EventController eventController = new EventController( id.toString() ) ;
+	protected final EventController eventController = new EventController() ;
 	private Entity.ReadyCallback toDestroy = null ;
 	private DrawDelegate delegate = null ;
 

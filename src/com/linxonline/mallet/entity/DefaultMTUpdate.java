@@ -18,7 +18,7 @@ public class DefaultMTUpdate implements IEntityUpdate
 	public DefaultMTUpdate( final int _threads )
 	{
 		super() ;
-		workers = new WorkerGroup( _threads ) ; 
+		workers = new WorkerGroup( "ENTITY UPDATE", _threads ) ; 
 	}
 
 	@Override

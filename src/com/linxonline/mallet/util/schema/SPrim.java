@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.schema ; 
 
-public class SPrim implements IVar
+public class SPrim extends SNode
 {
 	private final Type type ;
 
@@ -22,21 +22,6 @@ public class SPrim implements IVar
 	public static SPrim flt()
 	{
 		return new SPrim( Type.FLOAT ) ;
-	}
-	
-	public static SPrim matrix4()
-	{
-		return new SPrim( Type.MATRIX4 ) ;
-	}
-	
-	public static SPrim vec2()
-	{
-		return new SPrim( Type.VECTOR2 ) ;
-	}
-	
-	public static SPrim vec3()
-	{
-		return new SPrim( Type.VECTOR3 ) ;
 	}
 
 	@Override

@@ -7,23 +7,8 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
-	// Blank Meta Handler, used if sender doesn't provide one
-	private static final IEventHandlerMeta BLANK_META = new IEventHandlerMeta()
-	{
-		public String getName()
-		{
-			return "UNKNOWN" ;
-		}
-	} ;
-
-	private EventType eventType = EventType.NONE ;
-	private IEventHandlerMeta meta = BLANK_META ;		// Information about sender
+	private final EventType eventType ;
 	private T variable = null ;							// Event package contains data the reciever is interested in
-
-	public Event()
-	{
-		this( "NONE", null ) ;
-	}
 
 	public Event( final String _eventType )
 	{
@@ -32,12 +17,8 @@ public final class Event<T>
 
 	public Event( final String _eventType, final T _object )
 	{
-		setEvent( _eventType, _object ) ;
-	}
-
-	public Event( final String _eventType, final T _object, final IEventHandlerMeta _meta )
-	{
-		setEvent( _eventType, _object, _meta ) ;
+		eventType = EventType.get( _eventType ) ;
+		variable = _object ;
 	}
 
 	public final boolean isEventByType( final EventType _type )
@@ -45,35 +26,6 @@ public final class Event<T>
 		return eventType == _type ;
 	}
 
-	/**
-		Enables an Event to be reused.
-	**/
-	public final void setEvent( final String _eventType, final T _object )
-	{
-		setEvent( _object ) ;
-		setEventType( _eventType ) ;
-	}
-
-	/**
-		Enables an Event to be reused.
-	**/
-	public final void setEvent( final String _eventType, final T _object, final IEventHandlerMeta _meta )
-	{
-		setEvent( _object ) ;
-		setEventType( _eventType ) ;
-		meta = ( _meta != null ) ? _meta : BLANK_META ;
-	}
-
-	public void setEventType( final String _eventType )
-	{
-		eventType = EventType.get( _eventType ) ;
-	}
-
-	public void setEvent( final T _object )
-	{
-		variable = _object ;
-	}
-	
 	public final EventType getEventType()
 	{
 		return eventType ;
@@ -84,21 +36,14 @@ public final class Event<T>
 		return variable ;
 	}
 
-	/**
-		Return any information about the sender of 
-		this Event.
-	*/
-	public IEventHandlerMeta getHandlerMeta()
-	{
-		return meta ;
-	}
-
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		buffer.append( "[Event Type: " + eventType ) ;
-		buffer.append( ", Meta: " + meta.getName() ) ;
-		buffer.append( ", Event: " + variable.toString() + "]" ) ;
+		buffer.append( "[Event Type: " ) ;
+		buffer.append( eventType ) ;
+		buffer.append( ", Event: " ) ;
+		buffer.append( variable.toString() ) ;
+		buffer.append( "]" ) ;
 		return buffer.toString() ;
 	}
 }

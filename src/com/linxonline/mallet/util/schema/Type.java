@@ -6,8 +6,5 @@ public enum Type
 	ARRAY,
 	BOOL,
 	FLOAT,
-	INTEGER,
-	MATRIX4,
-	VECTOR2,
-	VECTOR3
+	INTEGER
 }

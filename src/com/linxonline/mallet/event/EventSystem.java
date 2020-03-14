@@ -23,12 +23,12 @@ public final class EventSystem implements IEventSystem
 	} ;
 
 	private final String name ;
-	private final List<EventType> eventTypes = MalletList.<EventType>newList() ;
+	private final int capacity ;
 	private final EventType.Lookup<EventQueue> queues = new EventType.Lookup<EventQueue>() ;
-	private final EventQueue allQueue ;
 
-	private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList() ;
-	private final List<WeakReference<IEventHandler>> toBeRemoved = MalletList.<WeakReference<IEventHandler>>newList() ;
+	private final List<WeakReference<IEventHandler>> handlers ;
+	private List<WeakReference<IEventHandler>> toBeAdded ;
+	private List<WeakReference<IEventHandler>> toBeRemoved ;
 
 	public EventSystem()
 	{
@@ -37,12 +37,22 @@ public final class EventSystem implements IEventSystem
 
 	public EventSystem( final String _name )
 	{
-		name = ( _name != null ) ? _name : "NONE" ;
-		// Guarantee an ALL Queue.
-		allQueue = getEventQueue( EventType.ALL ) ;
+		this( _name, 100 ) ;
+	}
 
-		eventTypes.add( EventType.ALL ) ;
-		eventTypes.add( EventType.NONE ) ;
+	/**
+		Give the EventSystem a name and an initial capacity.
+		This sets the expected number of handlers the system 
+		intends to service.
+	*/
+	public EventSystem( final String _name, final int _handlerCapacity )
+	{
+		name = ( _name != null ) ? _name : "NONE" ;
+		capacity = _handlerCapacity ;
+
+		handlers = MalletList.<WeakReference<IEventHandler>>newList( capacity ) ;
+		toBeAdded = MalletList.<WeakReference<IEventHandler>>newList( capacity ) ;
+		toBeRemoved = MalletList.<WeakReference<IEventHandler>>newList( capacity ) ;
 	}
 
 	/**
@@ -58,39 +68,12 @@ public final class EventSystem implements IEventSystem
 	{
 		if( exists( _handler ) >= 0 )
 		{
-			Logger.println( _handler.getName() + "already exists within " + name, Logger.Verbosity.MAJOR ) ;
+			Logger.println( _handler + "already exists within " + name, Logger.Verbosity.MAJOR ) ;
 			return ;
 		}
 
 		final WeakReference<IEventHandler> weakHandler = new WeakReference<IEventHandler>( _handler ) ;
-		handlers.add( weakHandler ) ;
-
-		final List<EventType> types = _handler.getWantedEventTypes() ;
-		for( final EventType type : types )
-		{
-			if( eventTypes.contains( type ) == false )
-			{
-				eventTypes.add( type ) ;
-			}
-		}
-
-		if( types.isEmpty() == true || types.contains( EventType.ALL ) == true )
-		{
-			// Due to legacy we must assumme that a types size of 0, 
-			// represents a developer wishing to recieve all Events.
-			// If the types contains ALL then only add it 
-			// to the ALL EventQueue.
-			allQueue.addEventHandler( weakHandler ) ;
-			return ;
-		}
-
-		final int size = types.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final EventType type = types.get( i ) ;
-			final EventQueue que = getEventQueue( type ) ;
-			que.addEventHandler( weakHandler ) ;
-		}
+		toBeAdded.add( weakHandler ) ;
 	}
 
 	/**
@@ -113,6 +96,36 @@ public final class EventSystem implements IEventSystem
 		que.setEventFilter( _filter ) ;
 	}
 
+	public void addHandlersNow()
+	{
+		final int size = toBeAdded.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final WeakReference<IEventHandler> weakHandler = toBeAdded.get( i ) ;
+			final IEventHandler handler = weakHandler.get() ;
+			if( handler == null )
+			{
+				// As quickly as it was added, it was destroyed.
+				continue ;
+			}
+
+			handlers.add( weakHandler ) ;
+
+			final List<EventType> types = handler.getWantedEventTypes() ;
+			for( final EventType type : types )
+			{
+				final EventQueue que = getEventQueue( type ) ;
+				que.addEventHandler( weakHandler ) ;
+			}
+		}
+		toBeAdded.clear() ;
+		
+		if( size > capacity )
+		{
+			toBeAdded = MalletList.<WeakReference<IEventHandler>>newList( capacity ) ;
+		}
+	}
+	
 	/**
 		Remove the EventHandlers queued for removal now.
 	**/
@@ -130,6 +143,11 @@ public final class EventSystem implements IEventSystem
 			remove( toBeRemoved.get( i ) ) ;
 		}
 		toBeRemoved.clear() ;
+		
+		if( size > capacity )
+		{
+			toBeRemoved = MalletList.<WeakReference<IEventHandler>>newList( capacity ) ;
+		}
 	}
 
 	@Override
@@ -138,23 +156,18 @@ public final class EventSystem implements IEventSystem
 		// We don't want to add an event flagged ALL
 		// multiple times into the same queue.
 		final EventQueue queue = getEventQueue( _event.getEventType() ) ;
-		if( queue != allQueue )
-		{
-			queue.addEvent( _event ) ;
-		}
-
-		// We always want to pass the Event to ALL
-		// queue irrespective of its EventType.
-		allQueue.addEvent( _event ) ;
+		queue.addEvent( _event ) ;
 	}
 
 	@Override
 	public final void update()
 	{
+		addHandlersNow() ;
 		removeHandlersNow() ;
-		for( final EventType type : eventTypes )
+
+		for( final EventQueue que : queues )
 		{
-			getEventQueue( type ).update() ;
+			que.update() ;
 		}
 	}
 	
@@ -162,13 +175,6 @@ public final class EventSystem implements IEventSystem
 	{
 		final IEventHandler handler = _handler.get() ;
 		final List<EventType> types = handler.getWantedEventTypes() ;
-		if( types.isEmpty() )
-		{
-			// Due to legacy we must assume that a types size of 0, 
-			// represents EventType.ALL, must be specially removed.
-			allQueue.removeEventHandler( _handler ) ;
-			return ;
-		}
 
 		final int size = types.size() ;
 		for( int i = 0; i < size; i++ )
@@ -196,29 +202,32 @@ public final class EventSystem implements IEventSystem
 		handlers.clear() ;
 		toBeRemoved.clear() ;
 
-		for( final EventType type : eventTypes )
+		for( final EventQueue que : queues )
 		{
-			getEventQueue( type ).clearHandlers() ;
+			que.clearHandlers() ;
 		}
 	}
 
 	@Override
 	public final void clearEvents()
 	{
-		for( final EventType type : eventTypes )
+		for( final EventQueue que : queues )
 		{
-			getEventQueue( type ).clearEvents() ;
+			que.clearEvents() ;
 		}
 	}
 
 	@Override
 	public final boolean hasEvents()
 	{
-		// allQueue receives all events so 
-		// it is the only queue we need to check 
-		// to see if there are events available to 
-		// be processed.
-		return allQueue.hasEvents() ;
+		for( final EventQueue que : queues )
+		{
+			if( que.hasEvents() == true )
+			{
+				return true ;
+			}
+		}
+		return false ;
 	}
 
 	private EventQueue getEventQueue( final EventType _type )
@@ -226,7 +235,7 @@ public final class EventSystem implements IEventSystem
 		EventQueue que = queues.get( _type ) ;
 		if( que == null )
 		{
-			que = new EventQueue( _type ) ;
+			que = new EventQueue( _type, capacity ) ;
 			queues.add( _type, que ) ;
 		}
 
@@ -250,28 +259,33 @@ public final class EventSystem implements IEventSystem
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		buffer.append( "[Event System: " + getName() ) ;
-		for( final EventType type : eventTypes )
-		{
-			final EventQueue que = getEventQueue( type ) ;
-			buffer.append( que.toString() + "," ) ;
-		}
+		buffer.append( "[Event System: " ) ;
+		buffer.append( getName() ) ;
 		buffer.append( "]" ) ;
 		return buffer.toString() ;
 	}
 
 	private class EventQueue
 	{
-		private final EventType name ;
-		private final List<WeakReference<IEventHandler>> handlers = MalletList.<WeakReference<IEventHandler>>newList();
-		private final List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
+		private final int capacity ;
+		private final EventType type ;
+		private final List<WeakReference<IEventHandler>> handlers ;
+		private List<Event<?>> optimisedEvents = MalletList.<Event<?>>newList() ;
 		private final SwapList<Event<?>> messenger = new SwapList<Event<?>>() ;
 
 		private IEventFilter filter = NO_FILTERING ;
 
-		public EventQueue( final EventType _name )
+		public EventQueue( final EventType _type, final int _handlerCapacity )
 		{
-			name = _name ;
+			this( _type, _handlerCapacity, 10 ) ;
+		}
+
+		public EventQueue( final EventType _type, final int _handlerCapacity, final int _messengerCapacity )
+		{
+			capacity = _messengerCapacity ;
+			type = _type ;
+
+			handlers = MalletList.<WeakReference<IEventHandler>>newList( _handlerCapacity ) ;
 		}
 		
 		public void addEventHandler( final WeakReference<IEventHandler> _handler )
@@ -325,11 +339,15 @@ public final class EventSystem implements IEventSystem
 			}
 
 			optimisedEvents.clear() ;
+			if( eventSize > capacity )
+			{
+				optimisedEvents = MalletList.<Event<?>>newList( capacity ) ;
+			}
 		}
 
 		public boolean isType( final EventType _type )
 		{
-			return ( _type != null && _type == name ) ;
+			return ( _type != null && _type == type ) ;
 		}
 
 		public void clearHandlers()
@@ -355,7 +373,7 @@ public final class EventSystem implements IEventSystem
 			for( final WeakReference<IEventHandler> weakHandler : handlers )
 			{
 				final IEventHandler handler = weakHandler.get() ;
-				buffer.append( handler.getName() + ", " ) ;
+				buffer.append( handler + ", " ) ;
 			}
 			buffer.append( "]" ) ;
 			return buffer.toString() ;

@@ -24,6 +24,7 @@ public abstract class BasicRenderer implements IRender
 	@Override
 	public void start()
 	{
+		controller.reset() ;
 		controller.addProcessor( "DRAW_DELEGATE", ( final DrawDelegateCallback _delegate ) ->
 		{
 			_delegate.callback( constructDrawDelegate() ) ;

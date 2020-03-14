@@ -8,10 +8,22 @@ package com.linxonline.mallet.util.schema ;
 	It does not store the data itself, it represents what 
 	structure data could be in.
 */
-public interface IVar
+public abstract class SNode
 {
+	private SNode parent = null ;
+
 	/**
 		Return the variable's type.
 	*/
-	public Type getType() ;
+	public abstract Type getType() ;
+
+	protected void setParent( SNode _parent )
+	{
+		parent = _parent ;
+	}
+
+	public SNode getParent()
+	{
+		return parent ;
+	}
 }

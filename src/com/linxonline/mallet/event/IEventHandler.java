@@ -2,7 +2,7 @@ package com.linxonline.mallet.event ;
 
 import java.util.List ;
 
-public interface IEventHandler extends IEventHandlerMeta
+public interface IEventHandler
 {
 	public void processEvent( final Event<?> _event ) ;
 

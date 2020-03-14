@@ -32,7 +32,7 @@ public class GL2DRenderer implements IRender,
 	}
 
 	@Override
-	public void onSurfaceCreated( final GL10 _unused, final EGLConfig _config )
+	public synchronized void onSurfaceCreated( final GL10 _unused, final EGLConfig _config )
 	{
 		System.out.println( "onSurfaceCreated()" ) ;
 		// If a render state previously existed but we lost the OpenGL 
@@ -43,12 +43,9 @@ public class GL2DRenderer implements IRender,
 	}
 
 	@Override
-	public void onDrawFrame( final GL10 _unused )
+	public synchronized void onDrawFrame( final GL10 _unused )
 	{
-		synchronized( render )
-		{
-			render.display() ;
-		}
+		render.display() ;
 	}
 
 	@Override
@@ -79,34 +76,31 @@ public class GL2DRenderer implements IRender,
 	}
 
 	@Override
-	public void start()
+	public synchronized void start()
 	{
 		render.start() ;
 	}
 
 	@Override
-	public void shutdown()
+	public synchronized void shutdown()
 	{
 		render.shutdown() ;
 	}
 
 	@Override
-	public void setDisplayDimensions( final int _width, final int _height )
+	public synchronized void setDisplayDimensions( final int _width, final int _height )
 	{
 		render.setDisplayDimensions( _width, _height ) ;
 	}
 
 	@Override
-	public void updateState( final float _dt )
+	public synchronized void updateState( final float _dt )
 	{
-		synchronized( render )
-		{
-			render.updateState( _dt ) ;
-		}
+		render.updateState( _dt ) ;
 	}
 
 	@Override
-	public void draw( final float _dt )
+	public synchronized void draw( final float _dt )
 	{
 		render.draw( _dt ) ;
 	}
@@ -118,19 +112,19 @@ public class GL2DRenderer implements IRender,
 	}
 
 	@Override
-	public void sort()
+	public synchronized void sort()
 	{
 		render.sort() ;
 	}
 
 	@Override
-	public void clear()
+	public synchronized void clear()
 	{
 		render.clear() ;
 	}
 
 	@Override
-	public void clean()
+	public synchronized void clean()
 	{
 		render.clean() ;
 	}

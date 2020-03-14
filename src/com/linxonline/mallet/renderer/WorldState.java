@@ -52,10 +52,7 @@ public class WorldState<D extends DrawData,
 	public void addDraw( final D _draw, final W _world )
 	{
 		final W world = getWorld( _world ) ;
-		synchronized( world )
-		{
-			world.addDraw( _draw ) ;
-		}
+		world.addDraw( _draw ) ;
 	}
 
 	/**
@@ -80,10 +77,7 @@ public class WorldState<D extends DrawData,
 	public void addCamera( final C _camera, final W _world )
 	{
 		final W world = getWorld( _world ) ;
-		synchronized( world )
-		{
-			world.addCamera( _camera ) ;
-		}
+		world.addCamera( _camera ) ;
 	}
 
 	/**

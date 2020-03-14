@@ -46,7 +46,7 @@ public class UIEditorState extends GameState
 	@Override
 	public void initGame()
 	{
-		final Entity entity = new Entity( "UI" ) ;
+		final Entity entity = new Entity( 1 ) ;
 		final UIComponent component = new UIComponent( entity ) ;
 
 		final JUI jui = JUI.create( "base/ui/uieditor/main.jui" ) ;
@@ -245,7 +245,7 @@ public class UIEditorState extends GameState
 
 	private static Entity createCUIDropEntity( final Class<? extends UIElement.MetaComponent> _class, final InputEvent _event )
 	{
-		final Entity entity = new Entity( "DROP_ENTITY", "DROP_ENTITY" ) ;
+		final Entity entity = new Entity( 3 ) ;
 		final EventComponent event = new EventComponent( entity ) ;
 		final MouseComponent mouse = new MouseComponent( entity )
 		{
@@ -296,7 +296,7 @@ public class UIEditorState extends GameState
 
 	private static Entity createUIDropEntity( final Class<? extends UIElement.Meta> _class, final InputEvent _event )
 	{
-		final Entity entity = new Entity( "DROP_ENTITY", "DROP_ENTITY" ) ;
+		final Entity entity = new Entity( 3 ) ;
 		final EventComponent event = new EventComponent( entity ) ;
 		final MouseComponent mouse = new MouseComponent( entity )
 		{
@@ -350,7 +350,7 @@ public class UIEditorState extends GameState
 	{
 		_entity.setPosition( 0, 0, 0 ) ;
 
-		final AnimComponent anim   = new AnimComponent( _entity ) ;
+		final AnimComponent anim = new AnimComponent( _entity ) ;
 		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
 																_entity.position,
 																new Vector3( -16, -16, 0 ),

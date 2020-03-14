@@ -17,13 +17,14 @@ import com.linxonline.mallet.util.Logger ;
 **/
 public class EntitySystem implements IEntitySystem
 {
+	public final int capacity ;
+
 	private final IEventSystem eventSystem ;
 	private final IEntityUpdate updater ;							// Entities update protocol
 
-	private final List<Entity> entitiesToAdd = MalletList.<Entity>newList() ;
-	private final List<Entity> cleanup = MalletList.<Entity>newList() ;
-
-	private final List<Entity> entities = MalletList.<Entity>newList() ;		// Active entities
+	private List<Entity> entitiesToAdd = null ;
+	private List<Entity> cleanup = null ;
+	private List<Entity> entities = null ;		// Active entities
 
 	public EntitySystem( final IEventSystem _eventSystem )
 	{
@@ -32,6 +33,14 @@ public class EntitySystem implements IEntitySystem
 
 	public EntitySystem( IEventSystem _eventSystem, final Threaded _mode )
 	{
+		this( _eventSystem, _mode, 100 ) ;
+	}
+
+	public EntitySystem( IEventSystem _eventSystem,
+						 final Threaded _mode,
+						 final int _initialCapacity )
+	{
+		capacity = _initialCapacity ;
 		eventSystem = _eventSystem ;
 		switch( _mode )
 		{
@@ -47,6 +56,10 @@ public class EntitySystem implements IEntitySystem
 				break ;
 			}
 		}
+
+		entitiesToAdd = MalletList.<Entity>newList( capacity ) ;
+		cleanup = MalletList.<Entity>newList( capacity ) ;
+		entities = MalletList.<Entity>newList( capacity ) ;
 	}
 
 	/**
@@ -108,6 +121,14 @@ public class EntitySystem implements IEntitySystem
 			entities.add( entity ) ;
 		}
 		entitiesToAdd.clear() ;
+		
+		if( size > capacity )
+		{
+			// If the size of entitiesToAdd exceeds our capacity then 
+			// we want to resize the array - it's easy for an 
+			// array to expand, it's much harder to shrink it!
+			entitiesToAdd = MalletList.<Entity>newList( capacity ) ;
+		}
 	}
 
 	private void cleanupEntities()
@@ -129,6 +150,14 @@ public class EntitySystem implements IEntitySystem
 			entities.remove( entity ) ;
 		}
 		cleanup.clear() ;
+
+		if( size > capacity )
+		{
+			// If the size of cleanup exceeds our capacity then 
+			// we want to resize the array - it's easy for an 
+			// array to expand, it's much harder to shrink it!
+			cleanup = MalletList.<Entity>newList( capacity ) ;
+		}
 	}
 
 	@Override

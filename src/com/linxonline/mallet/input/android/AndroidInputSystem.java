@@ -105,14 +105,17 @@ public class AndroidInputSystem implements IInputSystem,
 
 	public void update()
 	{
-		final int sizeInput = inputs.size() ;
-		//System.out.println( "Inputs: " + sizeInput ) ;
-		for( int i = 0; i < sizeInput; ++i )
+		synchronized( inputs )
 		{
-			passInputEventToHandlers( inputs.get( i ) ) ;
-		}
+			final int sizeInput = inputs.size() ;
+			//System.out.println( "Inputs: " + sizeInput ) ;
+			for( int i = 0; i < sizeInput; ++i )
+			{
+				passInputEventToHandlers( inputs.get( i ) ) ;
+			}
 
-		inputs.clear() ;
+			inputs.clear() ;
+		}
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )

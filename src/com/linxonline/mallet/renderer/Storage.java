@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.schema.IVar ;
-
 /**
 	Handler for accessing and modifying storage objects.
 

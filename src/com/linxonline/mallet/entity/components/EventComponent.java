@@ -18,8 +18,8 @@ import com.linxonline.mallet.event.* ;
 **/
 public class EventComponent extends Entity.Component
 {
-	protected final EventController stateController = new EventController( id.toString() ) ;		// Used to talk to GameState
-	protected final EventController backendController = new EventController( id.toString() ) ;		// Used to talk to GLDefaultSystem
+	protected final EventController stateController = new EventController() ;		// Used to talk to GameState
+	protected final EventController backendController = new EventController() ;		// Used to talk to GLDefaultSystem
 
 	public EventComponent( final Entity _parent )
 	{
@@ -57,7 +57,7 @@ public class EventComponent extends Entity.Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
+		//_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", getStateEventController() ) ) ;
 	}
 

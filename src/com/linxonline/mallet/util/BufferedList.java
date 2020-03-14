@@ -20,7 +20,8 @@ public class BufferedList<T>
 		public void remove( final T _data ) {}
 	} ;
 
-	private final List<Task> tasks ;
+	private final int capacity ;
+	private List<Task> tasks ;
 	private final List<T> current ;
 
 	private AddListener<T> addListener = ADD_FALLBACK ;
@@ -33,8 +34,9 @@ public class BufferedList<T>
 
 	public BufferedList( final int _capacity )
 	{
-		tasks = MalletList.<Task>newList( _capacity ) ;
-		current = MalletList.<T>newList( _capacity ) ;
+		capacity = _capacity ;
+		tasks = MalletList.<Task>newList( capacity ) ;
+		current = MalletList.<T>newList( capacity ) ;
 	}
 
 	public void setAddListener( final AddListener<T> _listener )
@@ -73,14 +75,24 @@ public class BufferedList<T>
 	*/
 	public void update()
 	{
-		if( tasks.isEmpty() == false )
+		if( tasks.isEmpty() == true )
 		{
-			final int size = tasks.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				tasks.get( i ).execute() ;
-			}
-			tasks.clear() ;
+			return ;
+		}
+
+		final int size = tasks.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			tasks.get( i ).execute() ;
+		}
+		tasks.clear() ;
+
+		if( size > capacity )
+		{
+			// If the size of tasks exceeds our capacity then 
+			// we want to resize the array - it's easy for an 
+			// array to expand, it's much harder to shrink it!
+			tasks = MalletList.<Task>newList( capacity ) ;
 		}
 	}
 

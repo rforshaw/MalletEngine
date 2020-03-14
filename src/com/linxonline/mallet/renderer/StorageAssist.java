@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.schema.IVar ;
+import com.linxonline.mallet.util.schema.SNode ;
 import com.linxonline.mallet.maths.* ;
 
 public final class StorageAssist
@@ -18,7 +18,7 @@ public final class StorageAssist
 		Create a Storage block in which objects 
 		can be added to.
 	*/
-	public static Storage create( final String _id, final IVar _var, final int _capacity )
+	public static Storage create( final String _id, final SNode _var, final int _capacity )
 	{
 		return assist.create( _id, _var, _capacity ) ;
 	}
@@ -32,14 +32,6 @@ public final class StorageAssist
 	}
 
 	/**
-		Set the size of the storage block.
-	*/
-	public static int size( final Storage _storage, final int _size )
-	{
-		return assist.size( _storage, _size ) ;
-	}
-
-	/**
 		Return the size of the passed in storage block.
 	*/
 	public static int size( final Storage _storage )
@@ -47,25 +39,49 @@ public final class StorageAssist
 		return assist.size( _storage ) ;
 	}
 
-	public static int setAt( final Storage _storage, final int _index, Object _obj )
+	public static void setBool( final Storage _storage, final int _index, final SNode _node, boolean _val )
 	{
-		return assist.setAt( _storage, _index, _obj ) ;
+		assist.setBool( _storage, _index, _node, _val ) ;
 	}
 
-	public Object getAt( final Storage _storage, final int _index )
+	public static void setInt( final Storage _storage, final int _index, final SNode _node, int _val )
 	{
-		return assist.getAt( _storage, _index ) ;
+		assist.setInt( _storage, _index, _node, _val ) ;
+	}
+
+	public static void setFlt( final Storage _storage, final int _index, final SNode _node, float _val )
+	{
+		assist.setFlt( _storage, _index, _node, _val ) ;
+	}
+
+	public static boolean getBool( final Storage _storage, final int _index, final SNode _node )
+	{
+		return assist.getBool( _storage, _index, _node ) ;
+	}
+
+	public static int getInt( final Storage _storage, final int _index, final SNode _node )
+	{
+		return assist.getInt( _storage, _index, _node ) ;
+	}
+
+	public static float getFlt( final Storage _storage, final int _index, final SNode _node )
+	{
+		return assist.getFlt( _storage, _index, _node ) ;
 	}
 
 	public interface Assist
 	{
-		public Storage create( final String _id, final IVar _var, final int _capacity ) ;
+		public Storage create( final String _id, final SNode _node, final int _capacity ) ;
 		public Storage get( final String _id ) ;
 
-		public int size( final Storage _storage, final int _size ) ;
 		public int size( final Storage _storage ) ;
 
-		public int setAt( final Storage _storage, final int _index, Object _obj ) ;
-		public Object getAt( final Storage _storage, final int _index ) ;
+		public void setBool( final Storage _storage, final int _index, final SNode _node, boolean _val ) ;
+		public void setInt( final Storage _storage, final int _index, final SNode _node, int _val ) ;
+		public void setFlt( final Storage _storage, final int _index, final SNode _node, float _val ) ;
+
+		public boolean getBool( final Storage _storage, final int _index, final SNode _node ) ;
+		public int getInt( final Storage _storage, final int _index, final SNode _node ) ;
+		public float getFlt( final Storage _storage, final int _index, final SNode _node ) ;
 	}
 }

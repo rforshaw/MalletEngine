@@ -74,7 +74,7 @@ public class GLDrawData extends DrawData
 	{
 		endOrder = _order ;
 	}
-	
+
 	public int getEndOrder()
 	{
 		return endOrder ;

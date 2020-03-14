@@ -65,33 +65,24 @@ public final class GameTestLoader implements IGameLoader
 
 				createEventMessageTest() ;
 
-				getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 			}
 
 			public void createMeta()
 			{
-				final IVar struct1 = SStruct.create( Tuple.build( "test1", SPrim.bool() ),
-													 Tuple.build( "test2", SPrim.flt() ),
-													 Tuple.build( "test3", SPrim.integer() ),
-													 Tuple.build( "test4", SPrim.matrix4() ),
-													 Tuple.build( "test5", SPrim.vec2() ),
-													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+				final SNode struct1 = SStruct.create( SStruct.var( "test1", SPrim.bool() ),
+													  SStruct.var( "test2", SPrim.flt() ),
+													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
-				final IVar struct2 = SStruct.create( Tuple.build( "test1", SPrim.bool() ),
-													 Tuple.build( "test2", SPrim.flt() ),
-													 Tuple.build( "test3", SPrim.integer() ),
-													 Tuple.build( "test4", SPrim.matrix4() ),
-													 Tuple.build( "test5", SPrim.vec2() ),
-													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+				final SNode struct2 = SStruct.create( SStruct.var( "test1", SPrim.bool() ),
+													  SStruct.var( "test2", SPrim.flt() ),
+													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
 				System.out.println( "Structures 1 and 2: " + struct1.equals( struct2 ) ) ;
 
-				final IVar struct3 = SStruct.create( Tuple.build( "test1", SPrim.flt() ),
-													 Tuple.build( "test2", SPrim.flt() ),
-													 Tuple.build( "test3", SPrim.integer() ),
-													 Tuple.build( "test4", SPrim.matrix4() ),
-													 Tuple.build( "test5", SPrim.vec2() ),
-													 Tuple.build( "test6", SPrim.vec3() ) ) ;
+				final SNode struct3 = SStruct.create( SStruct.var( "test1", SPrim.flt() ),
+													  SStruct.var( "test2", SPrim.flt() ),
+													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
 				System.out.println( "Structures 1 and 3: " + struct1.equals( struct3 ) ) ;
 			}
@@ -119,7 +110,7 @@ public final class GameTestLoader implements IGameLoader
 					button2.setVisible( !button2.isVisible() ) ;
 				} ) ;
 
-				final Entity entity = new Entity( "UI" ) ;
+				final Entity entity = new Entity( 1 ) ;
 				final UIComponent component = new UIComponent( entity ) ;
 				component.addElement( jUI.getParent() ) ;
 
@@ -245,7 +236,7 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderAnimationExample()
 			{
-				final Entity entity = new Entity( "Test Animation" ) ;
+				final Entity entity = new Entity( 2 ) ;
 
 				final AnimComponent anim = new AnimComponent( entity ) ;
 				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
@@ -271,7 +262,7 @@ public final class GameTestLoader implements IGameLoader
 						if( elapsed >= DURATION )
 						{
 							elapsed = 0.0f ;
-							anim.playAnimation( "DEFAULT" ) ;
+							//anim.playAnimation( "DEFAULT" ) ;
 						}
 					}
 				} ;
@@ -362,7 +353,7 @@ public final class GameTestLoader implements IGameLoader
 				final int x = 50 + ( _i * 50 ) ;
 				final int y = 50 + ( _j * 50 ) ;
 
-				final Entity entity = new Entity( "IMAGE" ) ;
+				final Entity entity = new Entity( 2 ) ;
 				entity.position = new Vector3( x, y, 0 ) ;
 
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
@@ -403,7 +394,7 @@ public final class GameTestLoader implements IGameLoader
 				final World base = WorldAssist.getDefaultWorld() ;
 				final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
-				final Entity entity = new Entity( "MOUSE" ) ;
+				final Entity entity = new Entity( 4 ) ;
 				entity.position = new Vector3( dim.x / 2, dim.y / 2, 0 ) ;
 
 				final AnimComponent anim   = new AnimComponent( entity ) ;
@@ -437,7 +428,7 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createSpinningCubeExample()
 			{
-				final Entity entity = new Entity( "SPINNING_CUBE" ) ;
+				final Entity entity = new Entity( 2 ) ;
 
 				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 				final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, -200.0f, 0.0f ),
@@ -479,7 +470,7 @@ public final class GameTestLoader implements IGameLoader
 			public void createEventMessageTest()
 			{
 				{
-					final Entity receive = new Entity() ;
+					final Entity receive = new Entity( 1 ) ;
 					final EventComponent event = new EventComponent( receive )
 					{
 						@Override
@@ -497,7 +488,7 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final Entity send = new Entity() ;
+					final Entity send = new Entity( 1 ) ;
 					final EventComponent event = new EventComponent( send ) ;
 					event.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
 

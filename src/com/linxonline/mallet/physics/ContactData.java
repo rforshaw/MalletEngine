@@ -19,27 +19,18 @@ public class ContactData
 		}
 	}
 
-	public final synchronized ContactPoint addContact( final float _penetration, 
+	public final ContactPoint addContact( final float _penetration, 
 										  final Vector2 _normal, 
 										  final boolean _physical,
 										  final Hull _collidedWith )
 	{
-		if( usedContacts < MAX_COLLISION_POINTS )
-		{
-			final ContactPoint contact = contacts[usedContacts++] ;
-			contact.penetration = _penetration ;
-			contact.contactNormal.setXY( _normal ) ;
-			contact.physical = _physical ;
-			contact.collidedWith = _collidedWith ;
-			return contact ;
-		}
-		return null ;
+		return addContact( _penetration, _normal.x, _normal.y, _physical, _collidedWith ) ;
 	}
 
-	public final ContactPoint addContact( final float _penetration, 
-										  final float _normalX, final float _normalY, 
-										  final boolean _physical,
-										  final Hull _collidedWith )
+	public final synchronized ContactPoint addContact( final float _penetration, 
+														final float _normalX, final float _normalY, 
+														final boolean _physical,
+														final Hull _collidedWith )
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
@@ -55,7 +46,10 @@ public class ContactData
 
 	public ContactPoint next()
 	{
-		if( index < usedContacts ) { return contacts[index++] ; }
+		if( index < usedContacts )
+		{
+			return contacts[index++] ;
+		}
 
 		index = 0 ;
 		return null ;

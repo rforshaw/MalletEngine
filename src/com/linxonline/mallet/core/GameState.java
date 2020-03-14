@@ -56,8 +56,8 @@ public class GameState extends State
 	protected final InputState inputUISystem = new InputState() ;											// Internal UI Input System
 	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
 
-	private final EventController internalController = new EventController( "GAME_STATE_CONTROLLER_INTERNAL" ) ;		// Used to process Events, from internal eventSystem
-	private final EventController externalController = new EventController( "GAME_STATE_CONTROLLER_EXTERNAL" ) ;		// Used to process Events, from external eventSystem
+	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
+	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
 
 	protected ISystem system = null ;																// Provides access to Root systems
 	protected final IEntitySystem entitySystem ;
@@ -75,7 +75,7 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.SINGLE ) ;
+		this( _name, Threaded.MULTI ) ;
 	}
 
 	public GameState( final String _name, final Threaded _type )
@@ -335,8 +335,8 @@ public class GameState extends State
 					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
-					eventSystem.update() ;
 
+					eventSystem.update() ;
 					internalController.update() ;
 					externalController.update() ;
 

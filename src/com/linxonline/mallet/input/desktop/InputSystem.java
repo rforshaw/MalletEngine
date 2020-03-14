@@ -62,16 +62,18 @@ public class InputSystem implements IInputSystem,
 
 	public synchronized void update()
 	{
-		if( inputs.isEmpty() == false )
+		if( inputs.isEmpty() == true )
 		{
-			final int inputSize = inputs.size() ;
-			for( int i = 0; i < inputSize; ++i )
-			{
-				passInputEventToHandlers( inputs.get( i ) ) ;
-			}
-
-			inputs.clear() ;
+			return ;
 		}
+
+		final int inputSize = inputs.size() ;
+		for( int i = 0; i < inputSize; ++i )
+		{
+			passInputEventToHandlers( inputs.get( i ) ) ;
+		}
+
+		inputs.clear() ;
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )

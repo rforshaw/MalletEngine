@@ -1,17 +1,19 @@
 package com.linxonline.mallet.util.schema ; 
 
-public class SArray implements IVar
+public class SArray extends SNode
 {
-	private final IVar contains ;
+	private final SNode contains ;
 	private final int length ;
 
-	public SArray( IVar _contains, final int _length )
+	public SArray( SNode _contains, final int _length )
 	{
 		contains = _contains ;
+		contains.setParent( this ) ;
+
 		length = _length ;
 	}
 
-	public IVar getSupportedType()
+	public SNode getSupportedType()
 	{
 		return contains ;
 	}

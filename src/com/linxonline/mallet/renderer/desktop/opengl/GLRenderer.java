@@ -16,7 +16,6 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
-import com.linxonline.mallet.util.schema.IVar ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
@@ -27,6 +26,7 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.schema.SStruct ;
 import com.linxonline.mallet.util.schema.SArray ;
+import com.linxonline.mallet.util.schema.SNode ;
 
 import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
@@ -871,7 +871,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public Storage create( final String _id, IVar _var, final int _capacity )
+			public Storage create( final String _id, SNode _var, final int _capacity )
 			{
 				final int size = calculateSize( _var ) ;
 
@@ -885,56 +885,100 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public int size( final Storage _storage, final int _size )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			@Override
 			public int size( final Storage _storage )
 			{
 				throw new UnsupportedOperationException() ;
 			}
 
-			@Override
-			public int setAt( final Storage _storage, final int _index, Object _obj )
+			public void setBool( final Storage _storage, final int _index, final SNode _node, boolean _val )
 			{
 				throw new UnsupportedOperationException() ;
 			}
 
-			@Override
-			public Object getAt( final Storage _storage, final int _index )
+			public void setInt( final Storage _storage, final int _index, final SNode _node, int _val )
 			{
 				throw new UnsupportedOperationException() ;
 			}
 
-			private int calculateSize( IVar _variable )
+			public void setFlt( final Storage _storage, final int _index, final SNode _node, float _val )
 			{
-				switch( _variable.getType() )
+				throw new UnsupportedOperationException() ;
+			}
+
+			public boolean getBool( final Storage _storage, final int _index, final SNode _node )
+			{
+				throw new UnsupportedOperationException() ;
+			}
+
+			public int getInt( final Storage _storage, final int _index, final SNode _node )
+			{
+				throw new UnsupportedOperationException() ;
+			}
+
+			public float getFlt( final Storage _storage, final int _index, final SNode _node )
+			{
+				throw new UnsupportedOperationException() ;
+			}
+
+			private int calculateOffset( SNode _node )
+			{
+				int offset = 0 ;
+				SNode node = _node.getParent() ;
+				switch( _node.getType() )
 				{
 					default      : throw new UnsupportedOperationException() ;
-					case STRUCT  :
+					case STRUCT  : offset += calculateSStructOffset( ( SStruct )node, _node ) ; break ;
+					case ARRAY   : offset += calculateArray( ( SArray )node ) ; break ;
+					case BOOL    : offset +=  1 ; break ;
+					case FLOAT   : offset +=  4 ; break ;
+					case INTEGER : offset +=  4 ; break ;
+				}
+
+				return offset ;
+			}
+
+			private int calculateSStructOffset( SStruct _parent, SNode _child )
+			{
+				int size = 0 ;
+				for( final Tuple<String, SNode> child : _parent.getChildren() )
+				{
+					if( child.getRight() == _child )
 					{
-						int size = 0 ;
-						final SStruct struct = ( SStruct )_variable ;
-						for( final Tuple<String, IVar> variable : struct.getVariables() )
-						{
-							size += calculateSize( variable.getRight() ) ;
-						}
 						return size ;
 					}
-					case ARRAY   :
-					{
-						final SArray array = ( SArray )_variable ;
-						return array.getLength() * calculateSize( array.getSupportedType() ) ;
-					}
+
+					size += calculateSize( child.getRight() ) ;
+				}
+
+				return size ;
+			}
+
+			private int calculateSize( SNode _node )
+			{
+				switch( _node.getType() )
+				{
+					default      : throw new UnsupportedOperationException() ;
+					case STRUCT  : return calculateSStruct( ( SStruct )_node ) ;
+					case ARRAY   : return calculateArray( ( SArray )_node ) ;
 					case BOOL    : return 1 ;
 					case FLOAT   : return 4 ;
 					case INTEGER : return 4 ;
-					case MATRIX4 : return 16 *4 ;
-					case VECTOR2 : return 2 * 4 ;
-					case VECTOR3 : return 3 * 4 ;
 				}
+			}
+
+			private int calculateArray( SArray _array )
+			{
+				return _array.getLength() * calculateSize( _array.getSupportedType() ) ;
+			}
+
+			private int calculateSStruct( SStruct _struct )
+			{
+				int size = 0 ;
+				for( final Tuple<String, SNode> child : _struct.getChildren() )
+				{
+					size += calculateSize( child.getRight() ) ;
+				}
+				return size ;
 			}
 		} ;
 	}

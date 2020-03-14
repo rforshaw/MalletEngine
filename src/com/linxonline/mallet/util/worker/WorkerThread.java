@@ -20,7 +20,12 @@ public class WorkerThread extends Thread
 
 	public WorkerThread()
 	{
-		super( "WorkerThread" ) ;
+		this( "WorkerThread" ) ;
+	}
+
+	public WorkerThread( String _name )
+	{
+		super( _name ) ;
 	}
 
 	public void setWorkerCondition( final ILock _lock, final WorkerGroup.WorkerCondition _condition )

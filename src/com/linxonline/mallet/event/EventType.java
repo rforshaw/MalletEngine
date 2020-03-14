@@ -3,6 +3,7 @@ package com.linxonline.mallet.event ;
 import java.util.Map ;
 import java.util.Arrays ;
 import java.util.ArrayList ;
+import java.util.Iterator ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -21,14 +22,6 @@ public final class EventType
 {
 	private final static Map<String, EventType> eventTypes = MalletMap.<String, EventType>newMap() ;
 	private static int incrementID = 0 ;
-
-	// An Event Processor set to use NONE will not 
-	// receive any events from the Event System.
-	public static final EventType NONE = EventType.get( "NONE" ) ;
-
-	// An Event Processor set to use ALL will accept all 
-	// events from the Event System it is registered to.
-	public static final EventType ALL = EventType.get( "ALL" ) ;
 
 	private final String type ;
 	private final int id ;
@@ -69,7 +62,7 @@ public final class EventType
 		}
 	}
 
-	public static class Lookup<T>
+	public static class Lookup<T> implements Iterable<T>
 	{
 		private T fallback = null ;
 		private ArrayList<T> types = new ArrayList<T>() ;
@@ -108,6 +101,12 @@ public final class EventType
 			types.clear() ;
 		}
 
+		@Override
+		public Iterator<T> iterator() 
+		{ 
+			return new LookupIterator( types.iterator() ) ; 
+		} 
+
 		private void ensureCapacity( final int _size )
 		{
 			final int origSize = types.size() ;
@@ -122,6 +121,38 @@ public final class EventType
 			{
 				types.add( fallback ) ;
 			}
+		}
+	}
+	
+	private static class LookupIterator<T> implements Iterator<T>
+	{
+		private final Iterator<T> iter ;
+		private T next = null ;
+
+		public LookupIterator( Iterator<T> _iter )
+		{
+			iter = _iter ;
+		}
+
+		@Override
+		public boolean hasNext()
+		{
+			while( iter.hasNext() )
+			{
+				next = iter.next() ;
+				if( next != null )
+				{
+					return true ;
+				}
+			}
+
+			return false ;
+		}
+
+		@Override
+		public T next()
+		{
+			return next ;
 		}
 	}
 }

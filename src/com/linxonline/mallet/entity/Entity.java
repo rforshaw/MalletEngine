@@ -1,48 +1,58 @@
 package com.linxonline.mallet.entity ;
 
 import java.util.List ;
+import java.util.Collections;
 
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.id.ID ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 
 /**
-	Entity is a container class for Componets.
+	Entity is a container class for Components.
 	By default an Entity should have a name, and a global family name.
 	For example an Entity could be named HENCHMAN, and be in the ENEMY family.
 	
 	Entity also allows an internal component to send messages to other components,
 	it operates in a similar basis to the EventSystem.
 	
-	Entity does not have the capabilities to recieve Events from a Game State, this 
+	Entity does not have the capabilities to receive Events from a Game State, this 
 	should be done through a component like EventComponent that can then route it 
 	through the Component Event System.
 **/
 public final class Entity
 {
-	private final List<Component> components = MalletList.<Component>newList() ;
-	private final IEventSystem eventSystem = new EventSystem( "COMPONENT_EVENT_SYSTEM" ) ;		// Component Event System
+	private static final IEventSystem FALLBACK_EVENT_SYSTEM = new FallbackEventSystem() ;
 
-	public final ID id ;							// ID for this Entity: Name:Family
+	private final Component[] components ;
+	private final IEventSystem eventSystem ;		// Component Event System
+
 	public Vector3 position = new Vector3() ;		// Position of Entity in world space
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
-	public Entity()
+	public Entity( final int _capacity )
 	{
-		this( "NONE", "NONE" ) ;
+		components = new Component[_capacity] ;
+		eventSystem = ( _capacity <= 1 ) ? FALLBACK_EVENT_SYSTEM : new EventSystem( "COMPONENT_EVENT_SYSTEM", _capacity ) ;
 	}
 
-	public Entity( final String _name )
+	private void addComponent( Component _component )
 	{
-		this( _name, "NONE" ) ;
-	}
+		for( int i = 0; i < components.length; ++i )
+		{
+			if( components[i] == null )
+			{
+				components[i] = _component ;
+				final EventController controller = _component.getComponentEventController() ;
+				controller.setAddEventInterface( eventSystem ) ;
+				eventSystem.addEventHandler( controller ) ;
+				return ;
+			}
+		}
 
-	public Entity( final String _name, final String _family )
-	{
-		id = new ID( _name, _family ) ;
+		Logger.println( "Failed to add " + _component + " to entity.", Logger.Verbosity.MAJOR ) ;
 	}
-
+	
 	public final void setPosition( final float _x, final float _y, final float _z )
 	{
 		position.x = _x ;
@@ -58,19 +68,6 @@ public final class Entity
 	}
 
 	/**
-		Add a component to the Entity and set its parent to the Entity
-		The Component should not be owned by another Component, it could get messy!
-	**/
-	private final void addComponent( final Component _component )
-	{
-		components.add( _component ) ;
-
-		final EventController controller = _component.getComponentEventController() ;
-		controller.setAddEventInterface( eventSystem ) ;
-		eventSystem.addEventHandler( controller ) ;
-	}
-
-	/**
 		Update the message system of the Entity
 		and update the Components
 	**/
@@ -78,44 +75,11 @@ public final class Entity
 	{
 		eventSystem.update() ;
 		// Update Components
-		final int size = components.size() ;
+		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
 		{
-			components.get( i ).update( _dt ) ;
+			components[i].update( _dt ) ;
 		}
-	}
-
-	/**
-		Return all the components with the designated name
-	**/
-	public final List<Component> getComponentsByName( final String _name, final List<Component> _components )
-	{
-		for( final Component component : components )
-		{
-			if( component.isName( _name ) == true )
-			{
-				_components.add( component ) ;
-			}
-		}
-
-		return _components ;
-	}
-
-	/**
-		Get the Components that have the same Group name and return them in 
-		a List.
-	**/
-	public final List<Component> getComponentByGroup( final String _group, final List<Component> _components )
-	{
-		for( final Component component : components )
-		{
-			if( component.isGroup( _group ) == true )
-			{
-				_components.add( component ) ;
-			}
-		}
-
-		return _components ;
 	}
 
 	/**
@@ -124,7 +88,7 @@ public final class Entity
 	**/
 	public final List<Component> getAllComponents( final List<Component> _components )
 	{
-		_components.addAll( components ) ;
+		Collections.addAll( _components, components ) ;
 		return _components ;
 	}
 
@@ -165,10 +129,10 @@ public final class Entity
 			}
 		} ;
 
-		final int size = components.size() ;
+		final int size = components.length ;
 		for( int i = 0; i < size; i++ )
 		{
-			components.get( i ).readyToDestroy( readyDestroy ) ;
+			components[i].readyToDestroy( readyDestroy ) ;
 		}
 	}
 
@@ -204,7 +168,6 @@ public final class Entity
 	public abstract class Component
 	{
 		protected final EventController componentEvents = new EventController() ;	// Handles events from parent
-		protected final ID id ;														// Name and Group Name
 
 		public Component()
 		{
@@ -217,9 +180,7 @@ public final class Entity
 		*/
 		public Component( final String _name, final String _group )
 		{
-			id = new ID( ( _name != null ) ? _name : "NONE", ( _group != null ) ? _group : "NONE" ) ;
 			initComponentEventProcessors( getComponentEventController() ) ;
-
 			getParent().addComponent( this ) ;
 		}
 
@@ -230,16 +191,6 @@ public final class Entity
 		public void update( final float _dt )
 		{
 			componentEvents.update() ;
-		}
-
-		public final boolean isName( final String _name )
-		{
-			return id.isName( _name ) ;
-		}
-
-		public final boolean isGroup( final String _group )
-		{
-			return id.isGroup( _group ) ;
 		}
 
 		/**

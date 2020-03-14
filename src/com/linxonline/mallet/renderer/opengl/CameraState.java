@@ -64,7 +64,7 @@ public final class CameraState<C extends CameraData>
 		}
 	}
 	
-	public synchronized void update( final int _diff, final int _iteration )
+	public void update( final int _diff, final int _iteration )
 	{
 		state.update() ;
 		final List<C> current = state.getCurrentData() ;
@@ -76,7 +76,7 @@ public final class CameraState<C extends CameraData>
 		}
 	}
 
-	public synchronized void draw()
+	public void draw()
 	{
 		final List<C> current = state.getCurrentData() ;
 
@@ -91,7 +91,7 @@ public final class CameraState<C extends CameraData>
 
 	public void clear() {}
 
-	public synchronized C getCamera( final String _id )
+	public C getCamera( final String _id )
 	{
 		state.update() ;
 		final List<C> current = state.getCurrentData() ;

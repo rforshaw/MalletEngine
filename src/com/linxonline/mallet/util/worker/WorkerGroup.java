@@ -18,10 +18,10 @@ public class WorkerGroup
 
 	public WorkerGroup()
 	{
-		this( 2 ) ;
+		this( "Worker", 2 ) ;
 	}
 
-	public WorkerGroup( final int _threads )
+	public WorkerGroup( String _group, final int _threads )
 	{
 		availableWorkers.ensureCapacity( _threads ) ;
 		workers.ensureCapacity( _threads ) ;
@@ -29,7 +29,7 @@ public class WorkerGroup
 
 		for( int i = 0; i < _threads; i++ )
 		{
-			final WorkerThread thread = new WorkerThread() ;
+			final WorkerThread thread = new WorkerThread( _group + Integer.toString( i ) ) ;
 			thread.start() ;
 
 			availableWorkers.push( thread ) ;
