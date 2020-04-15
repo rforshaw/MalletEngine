@@ -87,6 +87,7 @@ public final class CollisionCheck
 		{
 			callback( point2, _box2.getCallback() ) ;
 		}
+
 		return true ;
 	}
 

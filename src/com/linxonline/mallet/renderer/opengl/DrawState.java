@@ -54,6 +54,14 @@ public final class DrawState<D extends DrawData>
 	{
 		state.insert( _draw, _draw.getOrder() ) ;
 	}
+	
+	public void addAll( final List<D> _draws )
+	{
+		for( final D draw : _draws )
+		{
+			state.insert( draw, draw.getOrder() ) ;
+		}
+	}
 
 	public void remove( final D _draw )
 	{

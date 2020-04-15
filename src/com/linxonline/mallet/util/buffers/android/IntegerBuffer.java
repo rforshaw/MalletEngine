@@ -1,8 +1,6 @@
 package com.linxonline.mallet.util.buffers ;
 
-import com.linxonline.mallet.util.buffers.IIntegerBuffer ;
-
-public class IntegerBuffer implements IIntegerBuffer
+public class IntegerBuffer
 {
 	private int[] array ;
 
@@ -32,19 +30,16 @@ public class IntegerBuffer implements IIntegerBuffer
 		return new IntegerBuffer( _buffer, _size ) ;
 	}
 
-	@Override
 	public int size()
 	{
 		return array.length ;
 	}
 
-	@Override
 	public int set( final int _index, final int _val )
 	{
 		return array[_index] = _val ;
 	}
 
-	@Override
 	public int get( final int _index )
 	{
 		return array[_index] ;

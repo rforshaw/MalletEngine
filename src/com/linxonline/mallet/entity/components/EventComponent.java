@@ -3,7 +3,6 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity ;
-import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.event.* ;
 
 /**
@@ -16,26 +15,32 @@ import com.linxonline.mallet.event.* ;
 	You can also use the EventComponent as a filter of sorts before injecting 
 	the Game State events into the Entity's internal messaging system.
 **/
-public class EventComponent extends Entity.Component
+public class EventComponent extends Component
 {
-	protected final EventController stateController = new EventController() ;		// Used to talk to GameState
-	protected final EventController backendController = new EventController() ;		// Used to talk to GLDefaultSystem
+	protected final EventController stateController ;		// Used to talk to GameState
+	protected final EventController backendController ;		// Used to talk to GLDefaultSystem
 
 	public EventComponent( final Entity _parent )
 	{
-		this( _parent, "EVENT", "EVENTCOMPONENT" ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public EventComponent( final Entity _parent, final String _name )
+	public EventComponent( final Entity _parent, final Entity.AllowEvents _allow )
 	{
-		this( _parent, _name, "EVENTCOMPONENT" ) ;
+		this( _parent, _allow, 0, 0 ) ;
 	}
 
-	public EventComponent( final Entity _parent, final String _name, final String _group )
+	public EventComponent( final Entity _parent,
+						   final Entity.AllowEvents _allow,
+						   final int _stateCapacity,
+						   final int _backendCapacity )
 	{
-		_parent.super( _name, _group ) ;
-		initBackendEventProcessors( getBackendEventController() ) ;
-		initStateEventProcessors( getStateEventController() ) ;
+		super( _parent, _allow ) ;
+		stateController = new EventController( _stateCapacity ) ;
+		backendController = new EventController( _backendCapacity ) ;
+
+		initBackendEventProcessors( backendController ) ;
+		initStateEventProcessors( stateController ) ;
 	}
 
 	/**
@@ -57,7 +62,7 @@ public class EventComponent extends Entity.Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		//_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
+		_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", getStateEventController() ) ) ;
 	}
 

@@ -4,7 +4,6 @@ import com.linxonline.mallet.maths.Vector2 ;
 
 public class AABB
 {
-	private final Vector2 absoluteCenter = new Vector2() ;
 	public final Vector2 position = new Vector2() ;
 	public final Vector2 offset = new Vector2() ;
 

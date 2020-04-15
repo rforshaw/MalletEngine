@@ -67,6 +67,7 @@ public class WorkerGroup
 		condition.reset( threadLength ) ;
 
 		//System.out.println( "Available: " + threadLength + " Amount: " + dataSize + " Divided: " + range + " Remainder: " + remainder  ) ;
+		//System.out.println( "Start Group: " + range ) ;
 		for( int i = 0; i < threadLength; ++i )
 		{
 			final WorkerThread thread = availableWorkers.pop() ;

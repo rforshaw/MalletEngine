@@ -1,36 +1,19 @@
 package com.linxonline.mallet.event ;
 
+import java.util.List ;
+
 public interface IEventSystem extends IAddEvent
 {
-	/**
-		Add EventHandler to handlers list & search through 
-		the EventHandlers EventTypes, placing it in the correct 
-		lists, so Events can be filtered correctly.
-	**/
-	public void addEventHandler( final IEventHandler _handler ) ;
+	public void addHandler( final IEventHandler _handler ) ;
+	public void removeHandler( final IEventHandler _handler ) ;
 
-	/**
-		Removes the EventHandler in the next update().
-	**/
-	public void removeEventHandler( final IEventHandler _handler ) ;
-
-	public void setEventFilter( final EventType _type, final IEventFilter _filter ) ;
-
-	/**
-		Remove the EventHandlers queued for removal now.
-	**/
-	public void removeHandlersNow() ;
+	public void setFilter( final EventType _type, final IEventFilter _filter ) ;
 
 	public void addEvent( final Event<?> _event ) ;
-	public void update() ;
+	public void addEvents( final List<Event<?>> _events ) ;
 
-	/**
-		Return the Event Systems name, not considered unique.
-	*/
-	public String getName() ;
+	public void sendEvents() ;
 
-	public void clearHandlers() ;
-
-	public void clearEvents() ;
 	public boolean hasEvents() ;
+	public void reset() ;
 }

@@ -13,15 +13,15 @@ public abstract class Hull
 	public static final int NO_GROUP = -1 ;
 
 	private Group.ID groupID = Group.get( -1 ) ;										// Defines what Group the Hull is in.
-	private final HashSet<Group.ID> collidableGroups = new HashSet<Group.ID>() ;	// Defines the Groups the Hull is affected by.
+	private final HashSet<Group.ID> collidableGroups = new HashSet<Group.ID>() ;		// Defines the Groups the Hull is affected by.
 																						// If no group-specified, collides with everything.
 	private Object parent ;
 
 	private final Vector2 accumulatedPenetration = new Vector2() ;
 	public final ContactData contactData = new ContactData() ;
 
-	protected boolean collidable = true ; 											// Allows hull to produce Collision Data.
-	protected boolean physical = true ; 											// Allows hull to be affected by a Collision
+	protected boolean collidable = true ; 									// Allows hull to produce Collision Data.
+	protected boolean physical = true ; 									// Allows hull to be affected by a Collision
 	protected CollisionCallback callback = null ;							// Allows Owner to be informed of Collisions
 
 	protected Hull() {}
@@ -35,8 +35,7 @@ public abstract class Hull
 		accumulatedPenetration.x = 0.0f ;
 		accumulatedPenetration.y = 0.0f ;
 
-		ContactPoint point = null ;
-		while( ( point = contactData.next() ) != null )
+		for( ContactPoint point = contactData.next(); point != null; point = contactData.next() )
 		{
 			if( point.physical == true )
 			{

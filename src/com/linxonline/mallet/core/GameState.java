@@ -52,9 +52,9 @@ public class GameState extends State
 
 	protected IUpdate currentUpdate = null ;												// Current Running Mode
 
-	protected final InputState inputWorldSystem = new InputState() ;										// Internal World Input System
-	protected final InputState inputUISystem = new InputState() ;											// Internal UI Input System
-	protected final EventSystem eventSystem = new EventSystem( "GAME_STATE_EVENT_SYSTEM" ) ;				// Internal Event System
+	protected final InputState inputWorldSystem = new InputState() ;			// Internal World Input System
+	protected final InputState inputUISystem = new InputState() ;				// Internal UI Input System
+	protected final EventSystem eventSystem = new EventSystem() ;				// Internal Event System
 
 	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
 	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
@@ -250,20 +250,17 @@ public class GameState extends State
 	*/
 	protected void hookGameStateEventController()
 	{
-		eventSystem.addEventHandler( internalController ) ;
+		eventSystem.addHandler( internalController ) ;
 		internalController.setAddEventInterface( eventSystem ) ;
 
-		system.getEventSystem().addEventHandler( externalController ) ;
+		system.getEventSystem().addHandler( externalController ) ;
 		externalController.setAddEventInterface( system.getEventSystem() ) ;
 	}
 
 	protected void unhookGameStateEventController()
 	{
-		eventSystem.removeEventHandler( internalController ) ;
-		eventSystem.removeHandlersNow() ;
-
-		system.getEventSystem().removeEventHandler( externalController ) ;
-		system.getEventSystem().removeHandlersNow() ;
+		eventSystem.removeHandler( internalController ) ;
+		system.getEventSystem().removeHandler( externalController ) ;
 	}
 
 	/**
@@ -275,10 +272,10 @@ public class GameState extends State
 		final EventController animationController = animationSystem.getEventController() ;
 		final EventController audioController = audioSystem.getEventController() ;
 
-		eventSystem.addEventHandler( audioController ) ;
-		eventSystem.addEventHandler( collisionSystem ) ;
-		eventSystem.addEventHandler( system.getRenderer().getEventController() ) ;
-		eventSystem.addEventHandler( animationController ) ;
+		eventSystem.addHandler( audioController ) ;
+		eventSystem.addHandler( collisionSystem ) ;
+		eventSystem.addHandler( system.getRenderer().getEventController() ) ;
+		eventSystem.addHandler( animationController ) ;
 
 		animationController.setAddEventInterface( eventSystem ) ;
 		audioController.setAddEventInterface( eventSystem ) ;
@@ -295,11 +292,10 @@ public class GameState extends State
 	*/
 	protected void unhookHandlerSystems()
 	{
-		eventSystem.removeEventHandler( audioSystem.getEventController() ) ;
-		eventSystem.removeEventHandler( animationSystem.getEventController() ) ;
-		eventSystem.removeEventHandler( collisionSystem ) ;
-		eventSystem.removeEventHandler( system.getRenderer().getEventController() ) ;
-		eventSystem.removeHandlersNow() ;
+		eventSystem.removeHandler( audioSystem.getEventController() ) ;
+		eventSystem.removeHandler( animationSystem.getEventController() ) ;
+		eventSystem.removeHandler( collisionSystem ) ;
+		eventSystem.removeHandler( system.getRenderer().getEventController() ) ;
 
 		final IInputSystem input = system.getInput() ;
 		input.removeInputHandler( inputUISystem ) ;
@@ -336,7 +332,7 @@ public class GameState extends State
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
 
-					eventSystem.update() ;
+					eventSystem.sendEvents() ;
 					internalController.update() ;
 					externalController.update() ;
 
@@ -353,9 +349,6 @@ public class GameState extends State
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
 				deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
-
-				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - ( deltaUpdateTime + renderAccumulator ) ) * 1000.0 ) ;	// Convert to milliseconds
-				//System.out.println( "Total: " + deltaUpdateTime + " FPS: " + DEFAULT_FRAMERATE ) ;
 
 				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ;
 				if( renderAccumulator >= DEFAULT_FRAMERATE )
@@ -375,6 +368,12 @@ public class GameState extends State
 					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
 					renderAccumulator = 0.0 ;
 				}
+
+				final int totalTime = ( int )( ( deltaUpdateTime + deltaRenderTime ) * 1000.0 ) ;
+				final int expectedFramerate = ( int )( DEFAULT_FRAMERATE * 1000.0 ) ;
+				final long sleepRender = ( expectedFramerate - totalTime ) ;
+
+				//System.out.println( "Total: " + totalTime + " Sleep: " + sleepRender ) ;
 
 				if( sleepRender > 0L )
 				{
@@ -411,7 +410,7 @@ public class GameState extends State
 				{
 					inputUISystem.update() ;
 					inputWorldSystem.update() ;
-					eventSystem.update() ;
+					eventSystem.sendEvents() ;
 
 					internalController.update() ;
 					externalController.update() ;
@@ -481,12 +480,12 @@ public class GameState extends State
 		_internal.addProcessor( "ADD_GAME_STATE_EVENT", ( final EventController _controller ) ->
 		{
 			_controller.setAddEventInterface( eventSystem ) ;
-			eventSystem.addEventHandler( _controller ) ;
+			eventSystem.addHandler( _controller ) ;
 		} ) ;
 
 		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final EventController _controller ) ->
 		{
-			eventSystem.removeEventHandler( _controller ) ;
+			eventSystem.removeHandler( _controller ) ;
 		} ) ;
 
 		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final EventController _controller ) ->
@@ -494,13 +493,13 @@ public class GameState extends State
 			final IEventSystem eventBackend = system.getEventSystem() ;
 
 			_controller.setAddEventInterface( eventBackend ) ;
-			eventBackend.addEventHandler( _controller ) ;
+			eventBackend.addHandler( _controller ) ;
 		} ) ;
 
 		_internal.addProcessor( "REMOVE_BACKEND_EVENT", ( final EventController _controller ) ->
 		{
 			final IEventSystem eventBackend = system.getEventSystem() ;
-			eventBackend.removeEventHandler( _controller ) ;
+			eventBackend.removeHandler( _controller ) ;
 		} ) ;
 
 		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()
@@ -559,9 +558,7 @@ public class GameState extends State
 	{
 		internalController.reset() ;
 		externalController.reset() ;
-
-		eventSystem.clearEvents() ;
-		eventSystem.clearHandlers() ;
+		eventSystem.reset() ;
 
 		inputUISystem.clearInputs() ;
 		inputUISystem.clearHandlers() ;

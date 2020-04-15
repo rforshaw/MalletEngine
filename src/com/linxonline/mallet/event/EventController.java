@@ -4,6 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.Tuple ;
 
 /**
 	This is a convience class to reduce Events being processed 
@@ -20,15 +21,49 @@ public class EventController implements IEventHandler
 {
 	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) -> {} ;
 
-	private final List<EventType> wantedTypes = MalletList.<EventType>newList( 5 ) ;
+	private final int processorCapacity ;
+	private final int eventCapacity ;
+
 	private AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
-	private final int capacity = 10 ;
-	private List<Event<?>> messenger = MalletList.<Event<?>>newList( capacity ) ;
-	private final EventType.Lookup<IProcessor<?>> processors = new EventType.Lookup<IProcessor<?>>( PROCESSOR_FALLBACK ) ;
+	private final List<EventType> wantedTypes ;
+	private final EventType.Lookup<IProcessor<?>> processors ;
+	private List<Event<?>> messenger ;
 	private IAddEvent addInterface = ADD_EVENT_FALLBACK ;
 
-	public EventController() {}
+	public EventController()
+	{
+		this( 0, 0 ) ;
+	}
+
+	public EventController( final Tuple<String, IProcessor<?>> ... _processors )
+	{
+		this( 10, _processors ) ;
+	}
+
+	public EventController( final int _eventCapacity, final Tuple<String, IProcessor<?>> ... _processors )
+	{
+		this( _processors.length, _eventCapacity ) ;
+		for( final Tuple<String, IProcessor<?>> processor : _processors )
+		{
+			final EventType type = EventType.get( processor.getLeft() ) ;
+			if( wantedTypes.contains( type ) == false )
+			{
+				wantedTypes.add( type ) ;
+			}
+			processors.add( type, processor.getRight() ) ;
+		}
+	}
+
+	public EventController( final int _processorCapacity, final int _eventCapacity )
+	{
+		processorCapacity = _processorCapacity ;
+		eventCapacity = _eventCapacity ;
+
+		processors = new EventType.Lookup<IProcessor<?>>( _processorCapacity, PROCESSOR_FALLBACK ) ;
+		wantedTypes = MalletList.<EventType>newList( _processorCapacity ) ;
+		messenger = MalletList.<Event<?>>newList( eventCapacity ) ;
+	}
 
 	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
 	{
@@ -97,9 +132,9 @@ public class EventController implements IEventHandler
 		}
 		events.clear() ;
 
-		if( size > capacity )
+		if( size > eventCapacity )
 		{
-			messenger = MalletList.<Event<?>>newList( capacity ) ;
+			messenger = MalletList.<Event<?>>newList( eventCapacity ) ;
 		}
 	}
 

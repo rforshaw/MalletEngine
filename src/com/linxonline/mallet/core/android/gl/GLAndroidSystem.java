@@ -41,7 +41,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 		super( new DefaultShutdown(),
 			   new GL2DRenderer( _notify ),
 			   new AndroidAudioGenerator(),
-			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new EventSystem(),
 			   new AndroidInputSystem(),
 			   new AndroidFileSystem( _activity ),
 			   new GameSystem() ) ;
@@ -77,7 +77,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 			}
 		} ) ;
 
-		getEventSystem().addEventHandler( eventController ) ;
+		getEventSystem().addHandler( eventController ) ;
 	}
 
 	public void setContentView()

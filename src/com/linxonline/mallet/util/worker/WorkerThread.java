@@ -45,6 +45,7 @@ public class WorkerThread extends Thread
 	{
 		synchronized( block )
 		{
+			//System.out.println( "Start: " + _start + " End: " + _end ) ;
 			start = _start ;
 			end = _end ;
 		}
@@ -65,15 +66,15 @@ public class WorkerThread extends Thread
 	@Override
 	public void run()
 	{
-		Worker.ExecType type = Worker.ExecType.FINISH ;
 		while( stop == false )
 		{
 			try
 			{
-				while( paused == true )
+				synchronized( block )
 				{
-					synchronized( block )
+					while( paused == true )
 					{
+						//System.out.println( getName() + " is inactive " + paused ) ;
 						block.wait() ;
 					}
 				}
@@ -112,9 +113,12 @@ public class WorkerThread extends Thread
 	{
 		synchronized( block )
 		{
-			//System.out.println( "Request unpause" ) ;
-			paused = false ;
-			block.notify() ;
+			if( paused == true )
+			{
+				//System.out.println( getName() + " request unpause" ) ;
+				paused = false ;
+				block.notify() ;
+			}
 		}
 	}
 
@@ -122,9 +126,11 @@ public class WorkerThread extends Thread
 	{
 		synchronized( block )
 		{
-			//System.out.println( "Request pause" ) ;
-			paused = true ;
-			block.notify() ;
+			if( paused == false )
+			{
+				//System.out.println( getName() + " request pause" ) ;
+				paused = true ;
+			}
 		}
 	}
 

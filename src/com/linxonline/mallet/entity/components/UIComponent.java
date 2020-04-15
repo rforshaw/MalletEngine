@@ -31,42 +31,33 @@ public class UIComponent extends InputComponent
 
 	public UIComponent( final Entity _parent )
 	{
-		this( _parent, "UI" ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public UIComponent( final Entity _parent, final String _name )
+	public UIComponent( final Entity _parent,
+						final Entity.AllowEvents _allow )
 	{
-		this( _parent, _name, "UICOMPONENT" ) ;
+		this( _parent, _allow, InputMode.UI ) ;
 	}
 
-	public UIComponent( final Entity _parent, final String _name, final String _group )
-	{
-		this( _parent,
-			  _name,
-			  _group,
-			  InputMode.UI,
-			  WorldAssist.getDefaultWorld(),
-			  CameraAssist.getDefaultCamera() ) ;
-	}
-
-	public UIComponent( final Entity _parent, final String _name, final InputMode _mode )
+	public UIComponent( final Entity _parent,
+						final Entity.AllowEvents _allow,
+						final InputMode _mode )
 	{
 		this( _parent,
-			  _name,
-			  "UICOMPONENT",
+			  _allow,
 			  _mode,
 			  WorldAssist.getDefaultWorld(),
 			  CameraAssist.getDefaultCamera() ) ;
 	}
 
 	public UIComponent( final Entity _parent,
-						final String _name,
-						final String _group,
+						final Entity.AllowEvents _allow,
 						final InputMode _mode,
 						final World _world,
 						final Camera _camera )
 	{
-		super( _parent, _name, _group, _mode ) ;
+		super( _parent, _allow, _mode ) ;
 
 		// Allow the developer to specify what world 
 		// this UI should be drawn to - if no world 

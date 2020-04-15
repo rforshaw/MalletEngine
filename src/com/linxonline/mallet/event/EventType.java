@@ -64,14 +64,23 @@ public final class EventType
 
 	public static class Lookup<T> implements Iterable<T>
 	{
-		private T fallback = null ;
-		private ArrayList<T> types = new ArrayList<T>() ;
+		private final T fallback ;
+		private final ArrayList<T> types ;
 
-		public Lookup() {}
+		public Lookup()
+		{
+			this( null ) ;
+		}
 
 		public Lookup( T _fallback )
 		{
+			this( 10, _fallback ) ;
+		}
+
+		public Lookup( int _capacity, T _fallback )
+		{
 			fallback = _fallback ;
+			types = new ArrayList<T>( _capacity ) ;
 		}
 
 		public T add( final EventType _type, final T _variable )

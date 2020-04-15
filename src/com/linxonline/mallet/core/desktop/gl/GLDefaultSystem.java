@@ -33,7 +33,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		super( new DefaultShutdown(),
 			   new GLRenderer(),
 			   new ALSASourceGenerator(),
-			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new EventSystem(),
 			   new InputSystem(),
 			   new DesktopFileSystem(),
 			   new GameSystem() ) ;
@@ -102,7 +102,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 			getWindow().setFullscreen( fullscreen ) ;
 		} ) ;
 
-		getEventSystem().addEventHandler( eventController ) ;
+		getEventSystem().addHandler( eventController ) ;
 	}
 
 	@Override

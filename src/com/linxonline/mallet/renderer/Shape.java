@@ -148,9 +148,10 @@ public class Shape
 		}
 	}
 
-	private Swivel[] swivel ;
-	private FloatBuffer verticies ;
-	private IntegerBuffer indicies ;
+	private final Swivel[] swivel ;
+	private final int swivelFloatSize ;
+	private final FloatBuffer verticies ;
+	private final IntegerBuffer indicies ;
 
 	private Style style = Style.LINE_STRIP ;
 
@@ -162,8 +163,9 @@ public class Shape
 	{
 		swivel = new Swivel[_swivel.length] ;
 		System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
+		swivelFloatSize = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 
-		verticies = FloatBuffer.allocate( Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize ) ;
+		verticies = FloatBuffer.allocate( swivelFloatSize * _pointSize ) ;
 		indicies  = IntegerBuffer.allocate( _indexSize ) ;
 
 		style      = _style ;
@@ -272,7 +274,7 @@ public class Shape
 			return null ;
 		}
 
-		int start = _index * Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		int start = _index * swivelFloatSize ;
 		for( int i = 0; i < swivel.length; i++ )
 		{
 			switch( swivel[i] )
@@ -323,9 +325,8 @@ public class Shape
 	*/
 	public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		verticies.set( start, _x, _y, _z ) ;
 	}
@@ -352,9 +353,8 @@ public class Shape
 	*/
 	public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		return verticies.fill( _point, start ) ;
 	}
@@ -380,9 +380,8 @@ public class Shape
 	*/
 	public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		verticies.set( start, _x, _y ) ;
 	}
@@ -409,9 +408,8 @@ public class Shape
 	*/
 	public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		return verticies.fill( _uv, start ) ;
 	}
@@ -425,9 +423,8 @@ public class Shape
 	*/
 	public float getFloat( final int _index, final int _swivelIndex )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		return verticies.get( start ) ;
 	}
@@ -441,9 +438,8 @@ public class Shape
 	*/
 	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		verticies.set( start, _colour.toFloat() ) ;
 	}
@@ -470,9 +466,8 @@ public class Shape
 	*/
 	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
-		final int size = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
-		final int start = ( _index * size ) + offset ;
+		final int start = ( _index * swivelFloatSize ) + offset ;
 
 		_colour.changeColour( verticies.get( start ) ) ;
 		return _colour ;

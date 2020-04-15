@@ -475,7 +475,8 @@ public class GLGeometryUploader
 				final int vertexSize = calculateVertexSize( swivel ) ;
 				final int verticiesSize = shape.getVertexSize() ;
 
-				final int indexOffset = initialIndexOffset + ( i * IBO_VAR_BYTE_SIZE ) ;
+				final int GLYPH_POINTS = 4 ;
+				final int indexOffset = initialIndexOffset + ( i * GLYPH_POINTS ) ;
 
 				final int size = shape.getIndexSize() ; 
 				for( int j = 0; j < size; j++ )

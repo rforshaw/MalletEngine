@@ -19,20 +19,29 @@ public class SoundComponent extends EventComponent implements SourceCallback
 {
 	private final Map<String, Audio> sounds = MalletMap.<String, Audio>newMap() ;
 
-	private Audio currentAudio  = null ;					// Name of the current audio that is playing
+	private Audio currentAudio = null ;					// Name of the current audio that is playing
 
-	private AudioDelegate delegate            = null ;
+	private AudioDelegate delegate = null ;
 	private Entity.ReadyCallback toDestroy = null ;
-	private SourceCallback callback           = null ;
+	private SourceCallback callback = null ;
 
 	public SoundComponent( final Entity _parent )
 	{
-		this( _parent, "SOUND" ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public SoundComponent( final Entity _parent, final String _name )
+	public SoundComponent( final Entity _parent,
+						   final Entity.AllowEvents _allow )
 	{
-		super( _parent, _name ) ;
+		this( _parent, _allow, 0, 0 ) ;
+	}
+
+	public SoundComponent( final Entity _parent,
+						   final Entity.AllowEvents _allow,
+						   final int _stateCapacity,
+						   final int _backendCapacity )
+	{
+		super( _parent, _allow, _stateCapacity, _backendCapacity ) ;
 	}
 
 	/**

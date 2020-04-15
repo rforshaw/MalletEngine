@@ -106,8 +106,13 @@ public class GUIScrollbar extends GUIComponent
 		updateLengths( parent.getScrollbarLength(),
 						parent.getScrollWidth() ) ;
 
+		final Vector3 position = parent.getPosition() ;
+
 		if( xBar != null )
 		{
+			DrawAssist.amendPosition( xBar, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( xBar, offset.x, offset.y, offset.z ) ;
+		
 			DrawAssist.amendOrder( xBar, parent.getLayer() ) ;
 			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( xBar ), xLength ) ;
 			DrawAssist.forceUpdate( xBar ) ;
@@ -115,6 +120,9 @@ public class GUIScrollbar extends GUIComponent
 
 		if( yBar != null )
 		{
+			DrawAssist.amendPosition( yBar, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( yBar, offset.x, offset.y, offset.z ) ;
+
 			DrawAssist.amendOrder( yBar, parent.getLayer() ) ;
 			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( yBar ), yLength ) ;
 			DrawAssist.forceUpdate( yBar ) ;

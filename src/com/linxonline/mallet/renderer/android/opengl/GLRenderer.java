@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.android.opengl ;
 import java.util.Set ;
 import java.util.HashSet ;
 import java.util.List ;
+import java.util.ArrayList ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -130,7 +131,7 @@ public class GLRenderer extends BasicRenderer
 	{
 		return new DrawDelegate()
 		{
-			private final List<GLDrawData> data = MalletList.<GLDrawData>newList() ;
+			private final ArrayList<GLDrawData> data = new ArrayList<GLDrawData>() ;
 
 			@Override
 			@SuppressWarnings( "unchecked" )
@@ -148,16 +149,27 @@ public class GLRenderer extends BasicRenderer
 
 			@Override
 			@SuppressWarnings( "unchecked" )
+			public void addTextDraw( final List<Draw> _draws )
+			{
+				addTextDraw( _draws, null ) ;
+			}
+
+			@Override
+			@SuppressWarnings( "unchecked" )
+			public void addBasicDraw( final List<Draw> _draws )
+			{
+				addBasicDraw( _draws, null ) ;
+			}
+
+			@Override
+			@SuppressWarnings( "unchecked" )
 			public void addTextDraw( final Draw _draw, final World _world )
 			{
 				final GLWorld world = ( GLWorld )_world ;
 				final GLDrawData draw = ( GLDrawData )_draw ;
 
-				if( data.contains( draw ) == false )
-				{
-					data.add( draw ) ;
-					worlds.addDraw( draw, world ) ;
-				}
+				data.add( draw ) ;
+				worlds.addDraw( draw, world ) ;
 			}
 
 			@Override
@@ -167,11 +179,32 @@ public class GLRenderer extends BasicRenderer
 				final GLWorld world = ( GLWorld )_world ;
 				final GLDrawData draw = ( GLDrawData )_draw ;
 
-				if( data.contains( draw ) == false )
-				{
-					data.add( draw ) ;
-					worlds.addDraw( draw, world ) ;
-				}
+				data.add( draw ) ;
+				worlds.addDraw( draw, world ) ;
+			}
+
+			@Override
+			@SuppressWarnings( "unchecked" )
+			public void addTextDraw( final List<Draw> _draws, final World _world )
+			{
+				data.ensureCapacity( data.size() + _draws.size() ) ;
+				final GLWorld world = ( GLWorld )_world ;
+				final List<GLDrawData> draws = ( List<GLDrawData> )( Object )_draws ;
+
+				data.addAll( draws ) ;
+				worlds.addDraw( draws, world ) ;
+			}
+
+			@Override
+			@SuppressWarnings( "unchecked" )
+			public void addBasicDraw( final List<Draw> _draws, final World _world )
+			{
+				data.ensureCapacity( data.size() + _draws.size() ) ;
+				final GLWorld world = ( GLWorld )_world ;
+				final List<GLDrawData> draws = ( List<GLDrawData> )( Object )_draws ;
+
+				data.addAll( draws ) ;
+				worlds.addDraw( draws, world ) ;
 			}
 
 			@Override
@@ -181,11 +214,8 @@ public class GLRenderer extends BasicRenderer
 				final GLDrawData draw = ( GLDrawData )_draw ;
 				if( draw != null )
 				{
-					if( data.contains( draw ) == true )
-					{
-						data.remove( draw ) ;
-						worlds.removeDraw( draw ) ;
-					}
+					data.remove( draw ) ;
+					worlds.removeDraw( draw ) ;
 				}
 			}
 
@@ -407,27 +437,27 @@ public class GLRenderer extends BasicRenderer
 			}
 
 			@Override
-			public Vector3 getRotate( final Draw _draw )
+			public Vector3 getRotate( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getRotation() ;
+				return cast( _draw ).getRotation( _fill ) ;
 			}
 
 			@Override
-			public Vector3 getScale( final Draw _draw )
+			public Vector3 getScale( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getScale() ;
+				return cast( _draw ).getScale( _fill ) ;
 			}
 
 			@Override
-			public Vector3 getPosition( final Draw _draw )
+			public Vector3 getPosition( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getPosition() ;
+				return cast( _draw ).getPosition( _fill ) ;
 			}
 
 			@Override
-			public Vector3 getOffset( final Draw _draw )
+			public Vector3 getOffset( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getOffset() ;
+				return cast( _draw ).getOffset( _fill ) ;
 			}
 
 			@Override

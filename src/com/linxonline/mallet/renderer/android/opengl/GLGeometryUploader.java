@@ -40,6 +40,12 @@ public class GLGeometryUploader
 
 	public abstract class BufferObject
 	{
+		protected final short[] indicies ;
+		protected final float[] verticies ;
+
+		protected final ShortBuffer indexBuffer ;
+		protected final FloatBuffer vertexBuffer ;
+
 		protected final int[] indexID ;
 		protected final int[] vboID ;
 
@@ -48,6 +54,7 @@ public class GLGeometryUploader
 		protected Shape.Style shapeStyle = null ;
 		protected int shapeSwivelSize = 0 ;
 
+		protected boolean dirty = true ;
 		protected VertexAttrib[] attributes = null ;
 		protected int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 		protected int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
@@ -70,6 +77,20 @@ public class GLGeometryUploader
 			mode = _user.getMode() ;
 			ui = _user.isUI() ;
 
+			final int indexSize = _indexByteSize / IBO_VAR_BYTE_SIZE ;
+			final int vboSize = _vertexByteSize / VBO_VAR_BYTE_SIZE ;
+			
+			indicies = new short[indexSize] ;
+			verticies = new float[vboSize] ;
+
+			final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _indexByteSize ) ;
+			vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+			vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
+
+			final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _vertexByteSize ) ;
+			indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+			indexBuffer = indexByteBuffer.asShortBuffer() ;
+			
 			userProgram = new ProgramMap<GLProgram>( ( ProgramMap<GLProgram> )_user.getProgram() ) ;
 			final GLProgram glProgram = userProgram.getProgram() ;
 			program = ( glProgram != null ) ? glProgram.buildMap( userProgram ) : null ;
@@ -110,6 +131,9 @@ public class GLGeometryUploader
 			}
 		}
 
+		/**
+			Trigger the rendering of the buffer.
+		*/
 		public void draw( final Matrix4 _world, final Matrix4 _ui )
 		{
 			//System.out.println( "Draw Buffer Object" ) ;
@@ -140,6 +164,15 @@ public class GLGeometryUploader
 			MGL.glEnable( MGL.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 			MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
+			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
+			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
+
+			if( dirty == true )
+			{
+				uploadBuffers() ;
+				dirty = false ;
+			}
+
 			MGL.glUseProgram( glProgram.id[0] ) ;
 
 			final com.linxonline.mallet.util.buffers.FloatBuffer buffer = ( ui == false ) ? _world.matrix : _ui.matrix ;
@@ -149,8 +182,6 @@ public class GLGeometryUploader
 			glProgram.loadUniforms( program ) ;
 
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
-			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
-			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
 
 			GLGeometryUploader.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
 			MGL.glDrawElements( style, indexLength, MGL.GL_UNSIGNED_SHORT, 0 ) ;
@@ -160,6 +191,25 @@ public class GLGeometryUploader
 			MGL.glEnable( MGL.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;
 		}
 
+		/**
+			Called during a draw operation - if the buffer object is 
+			considered dirty then the buffer will be reuploaded.
+		*/
+		private void uploadBuffers()
+		{
+			final int startBytes = 0 ;
+
+			indexBuffer.put( indicies ) ;
+			indexBuffer.position( 0 ) ;
+			final int indiciesLengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
+			MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, startBytes, indiciesLengthBytes, indexBuffer ) ;
+
+			vertexBuffer.put( verticies ) ;
+			vertexBuffer.position( 0 ) ;
+			final int verticiesLengthBytes = verticies.length * VBO_VAR_BYTE_SIZE ;
+			MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, startBytes, verticiesLengthBytes, vertexBuffer ) ;
+		}
+		
 		public abstract void upload( final Location<BufferObject, GLDrawData> _location ) ;
 
 		public void setIndexLength( final int _indexLengthInBytes )
@@ -290,14 +340,12 @@ public class GLGeometryUploader
 		public void upload( final Location<BufferObject, GLDrawData> _location )
 		{
 			final GLDrawData draw = _location.getLocationData() ;
-			final BufferObject buffer = _location.getBufferData() ;
-
 			final Shape shape = draw.getDrawShape() ;
-			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, buffer.indexID[0] ) ;
-			uploadIndex( _location, shape ) ;
 
-			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, buffer.vboID[0] ) ;
+			uploadIndex( _location, shape ) ;
 			uploadVBO( _location, shape, draw.getDrawMatrix() ) ;
+
+			dirty = true ;
 		}
 
 		private void uploadIndex( final Location<BufferObject, GLDrawData> _handler, final Shape _shape )
@@ -309,41 +357,15 @@ public class GLGeometryUploader
 			final Location.Range vertRange = _handler.getVertex() ;
 
 			final int indexOffset = vertRange.getStart() / buffer.vertexStrideBytes ;
-
-			int increment = 0 ;
-			int indexStartBytes = indexRange.getStart() ;
-
-			//System.out.println( "Start: " + indexStartBytes + " Offset: " + indexOffset ) ;
+			int increment = indexRange.getStart() / IBO_VAR_BYTE_SIZE ;
 
 			final int size = _shape.getIndexSize() ;
 			for( int i = 0; i < size; i++ )
 			{
-				//System.out.println( "Index: " + _shape.getIndex( i ) + " With Offset: " + ( indexOffset + _shape.getIndex( i ) ) ) ;
 				indicies[increment++] = ( short )( indexOffset + _shape.getIndex( i ) ) ;
-
-				if( increment >= indicies.length )
-				{
-					// The memory required for the Location may be 
-					// greater than the buffer - upload now.
-					indexBuffer.put( indicies ) ;
-					indexBuffer.position( 0 ) ;
-
-					final int lengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
-					MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, lengthBytes, indexBuffer ) ;
-
-					indexStartBytes += lengthBytes ;
-					increment = 0 ;
-				}
 			}
 
 			indicies[increment++] = ( short )PRIMITIVE_RESTART_INDEX ;
-
-			indexBuffer.put( indicies ) ;
-			indexBuffer.position( 0 ) ;
-
-			//System.out.println( "End: " + indexRange.getEnd() + " Increment: " + ( increment * IBO_VAR_BYTE_SIZE ) ) ;
-
-			MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, increment * IBO_VAR_BYTE_SIZE, indexBuffer ) ;
 		}
 
 		private void uploadVBO( final Location<BufferObject, GLDrawData> _handler, final Shape _shape, final Matrix4 _matrix )
@@ -356,8 +378,7 @@ public class GLGeometryUploader
 
 			final Location.Range vertRange = _handler.getVertex() ;
 
-			int increment = 0 ;
-			int vertexStartBytes = vertRange.getStart() ;
+			int increment = vertRange.getStart() / VBO_VAR_BYTE_SIZE ;
 
 			for( int i = 0; i < verticiesSize; i++ )
 			{
@@ -390,30 +411,6 @@ public class GLGeometryUploader
 						}
 					}
 				}
-
-				// If verticies does not have enough space to store 
-				// another vertex, upload it to the GPU before continuing.
-				if( ( increment + vertexSize ) >= verticies.length )
-				{
-					// The memory required for the Location may be 
-					// greater than the buffer - upload now.
-					vertexBuffer.put( verticies ) ;
-					vertexBuffer.position( 0 ) ;
-
-					final int lengthBytes = increment * VBO_VAR_BYTE_SIZE ;
-					MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, vertexStartBytes, lengthBytes, vertexBuffer ) ;
-
-					vertexStartBytes += lengthBytes ;
-					increment = 0 ;
-				}
-			}
-
-			if( increment > 0 )
-			{
-				vertexBuffer.put( verticies ) ;
-				vertexBuffer.position( 0 ) ;
-
-				MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, vertexStartBytes, increment * VBO_VAR_BYTE_SIZE, vertexBuffer ) ;
 			}
 		}
 	}
@@ -429,6 +426,8 @@ public class GLGeometryUploader
 		private final MalletFont.Metrics metrics ;
 		private final GLFont glFont ;
 
+		private final Matrix4 position = new Matrix4() ;
+
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
@@ -442,13 +441,12 @@ public class GLGeometryUploader
 		@Override
 		public void upload( final Location<BufferObject, GLDrawData> _location )
 		{
+			dirty = true ;
 			final GLDrawData draw = _location.getLocationData() ;
 			final BufferObject buffer = _location.getBufferData() ;
 
-			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, buffer.indexID[0] ) ;
-			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, buffer.vboID[0] ) ;
-			
-			final Matrix4 positionMatrix = draw.getDrawMatrix() ;
+			position.setIdentity() ;
+			position.multiply( draw.getDrawMatrix() ) ;
 			final MalletColour colour = draw.getColour() ;
 
 			final Location.Range indexRange = _location.getIndex() ;
@@ -456,11 +454,8 @@ public class GLGeometryUploader
 
 			final int initialIndexOffset = vertRange.getStart() / buffer.vertexStrideBytes ;
 
-			int indexInc = 0 ;
-			int vertexInc = 0 ;
-
-			int indexStartBytes = indexRange.getStart() ;
-			int vertexStartBytes = vertRange.getStart() ;
+			int indexInc = indexRange.getStart() / IBO_VAR_BYTE_SIZE ;
+			int vertexInc = vertRange.getStart() / VBO_VAR_BYTE_SIZE ;
 
 			final StringBuilder text = draw.getText() ;
 			final int start = draw.getTextStart() ;
@@ -489,23 +484,13 @@ public class GLGeometryUploader
 				final int vertexSize = calculateVertexSize( swivel ) ;
 				final int verticiesSize = shape.getVertexSize() ;
 
-				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
+				final int GLYPH_POINTS = 4 ;
+				final int indexOffset = initialIndexOffset + ( i * GLYPH_POINTS ) ;
 
 				final int size = shape.getIndexSize() ; 
 				for( int j = 0; j < size; j++ )
 				{
 					indicies[indexInc++] = ( short )( indexOffset + shape.getIndex( j ) ) ;
-					if( indexInc >= indicies.length )
-					{
-						indexBuffer.put( indicies ) ;
-						indexBuffer.position( 0 ) ;
-
-						final int lengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
-						MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, lengthBytes, indexBuffer ) ;
-
-						indexStartBytes += lengthBytes ;
-						indexInc = 0 ;
-					}
 				}
 
 				for( int j = 0; j < verticiesSize; j++ )
@@ -518,7 +503,7 @@ public class GLGeometryUploader
 							case POINT  :
 							{
 								shape.getVector3( j, k, point ) ;
-								Matrix4.multiply( point, positionMatrix, temp ) ;
+								Matrix4.multiply( point, position, temp ) ;
 								verticies[vertexInc++] = temp.x ;
 								verticies[vertexInc++] = temp.y ;
 								verticies[vertexInc++] = temp.z ;
@@ -540,37 +525,12 @@ public class GLGeometryUploader
 							}
 						}
 					}
-
-					if( ( vertexInc + vertexSize ) >= verticies.length )
-					{
-						vertexBuffer.put( verticies ) ;
-						vertexBuffer.position( 0 ) ;
-
-						final int lengthBytes = vertexInc * VBO_VAR_BYTE_SIZE ;
-						MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, vertexStartBytes, lengthBytes, vertexBuffer ) ;
-
-						vertexStartBytes += lengthBytes ;
-						vertexInc = 0 ;
-					}
 				}
 
-				positionMatrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
+				position.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
 			indicies[indexInc++] = ( short )PRIMITIVE_RESTART_INDEX ;
-
-			indexBuffer.put( indicies ) ;
-			indexBuffer.position( 0 ) ;
-
-			MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, indexStartBytes, indexInc * IBO_VAR_BYTE_SIZE, indexBuffer ) ;
-
-			if( vertexInc > 0 )
-			{
-				vertexBuffer.put( verticies ) ;
-				vertexBuffer.position( 0 ) ;
-
-				MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, vertexStartBytes, vertexInc * VBO_VAR_BYTE_SIZE, vertexBuffer ) ;
-			}
 		}
 	}
 
@@ -672,27 +632,9 @@ public class GLGeometryUploader
  
 	private final Buffers<BufferObject, GLDrawData> buffers = new Buffers<BufferObject, GLDrawData>( 50000, 50000, new BuffersListener() ) ; 
 
-	private final short[] indicies ;
-	private final float[] verticies ;
-
-	private final ShortBuffer indexBuffer ;
-	private final FloatBuffer vertexBuffer ;
-
 	private final byte[] abgrTemp = new byte[4] ;
 
-	public GLGeometryUploader( final int _indexSize, final int _vboSize )
-	{
-		indicies = new short[_indexSize] ;
-		verticies = new float[_vboSize] ;
-
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _vboSize * VBO_VAR_BYTE_SIZE ) ;
-		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
-		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
-
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _indexSize * IBO_VAR_BYTE_SIZE ) ;
-		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
-		indexBuffer = indexByteBuffer.asShortBuffer() ;
-	}
+	public GLGeometryUploader( final int _indexSize, final int _vboSize ) {}
 
 	/**
 		Draw the uploaded geometry.
@@ -755,17 +697,25 @@ public class GLGeometryUploader
 		final Location.Range indexRange = _location.getIndex() ;
 		if( calculateIndexByteSize( draw ) != indexRange.size() )
 		{
+			//System.out.println( "Incorrect Index Range." ) ;
 			return false ;
 		}
 
 		final Location.Range vertRange = _location.getVertex() ;
 		if( calculateVertexByteSize( draw ) != vertRange.size() )
 		{
+			//System.out.println( "Incorrect Vertex Range." ) ;
 			return false ;
 		}
 
 		final BufferObject buffer = _location.getBufferData() ;
-		return buffer.isSupported( draw ) ;
+		if( buffer.isSupported( draw ) == false )
+		{
+			//System.out.println( "Buffer no longer supported." ) ;
+			return false ;
+		}
+
+		return true ;
 	}
 
 	private static int calculateIndexByteSize( final GLDrawData _user )

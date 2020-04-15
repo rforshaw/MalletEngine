@@ -149,7 +149,7 @@ public abstract class BasicSystem<F extends FileSystem,
 	{
 		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
-		eventSystem.update() ;		// Pass the Events to the interested Backend Systems
+		eventSystem.sendEvents() ;		// Pass the Events to the interested Backend Systems
 		return true ;
 	}
 

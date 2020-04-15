@@ -1,9 +1,10 @@
 package com.linxonline.mallet.entity.components ;
 
+import java.util.Map ;
+import java.util.HashMap ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity ;
-import com.linxonline.mallet.entity.Entity.Component ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
@@ -16,27 +17,22 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
-public class RenderComponent extends Entity.Component
+public class RenderComponent extends Component
 {
-	private final List<Tuple<Draw, World>> toAddBasic = MalletList.<Tuple<Draw, World>>newList() ;
-	private final List<Tuple<Draw, World>> toAddText = MalletList.<Tuple<Draw, World>>newList() ;
+	private Map<World, List<Draw>> toAddBasic = new HashMap<World, List<Draw>>() ;
+	private Map<World, List<Draw>> toAddText = new HashMap<World, List<Draw>>() ;
 
 	private DrawDelegate drawDelegate = null ;
 	private Entity.ReadyCallback toDestroy = null ;
 
 	public RenderComponent( final Entity _parent )
 	{
-		this( _parent, "RENDER" ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public RenderComponent( final Entity _parent, final String _name )
+	public RenderComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		this( _parent, _name, "RENDER_COMPONENT" ) ;
-	}
-
-	public RenderComponent( final Entity _parent, final String _name, final String _group )
-	{
-		_parent.super( _name, _group ) ;
+		super( _parent, _allow ) ;
 	}
 
 	public void addBasicDraw( final Draw _draw )
@@ -58,11 +54,44 @@ public class RenderComponent extends Entity.Component
 		if( drawDelegate == null )
 		{
 			// If the renderer has yet to give a drawDelegate
-			toAddBasic.add( new Tuple<Draw, World>( _draw, _world ) ) ;
+			if( toAddBasic.containsKey( _world ) == false )
+			{
+				toAddBasic.put( _world, MalletList.<Draw>newList() ) ;
+			}
+
+			final List<Draw> toAdd = toAddBasic.get( _world ) ;
+			toAdd.add( _draw ) ;
 			return ;
 		}
 
 		drawDelegate.addBasicDraw( _draw, _world ) ;
+	}
+
+	public void addBasicDraw( final List<Draw> _draws, final World _world )
+	{
+		if( toDestroy != null )
+		{
+			// toDestroy will only be set if the entity 
+			// has been flagged for destruction, if that's 
+			// the case there is no point add a draw object 
+			// that will need to be removed.
+			return ;
+		}
+
+		if( drawDelegate == null )
+		{
+			// If the renderer has yet to give a drawDelegate
+			if( toAddBasic.containsKey( _world ) == false )
+			{
+				toAddBasic.put( _world, MalletList.<Draw>newList( _draws.size() ) ) ;
+			}
+
+			final List<Draw> toAdd = toAddBasic.get( _world ) ;
+			toAdd.addAll( _draws ) ;
+			return ;
+		}
+
+		drawDelegate.addBasicDraw( _draws, _world ) ;
 	}
 
 	public void addTextDraw( final Draw _draw )
@@ -84,7 +113,14 @@ public class RenderComponent extends Entity.Component
 		if( drawDelegate == null )
 		{
 			// If the renderer has yet to give a drawDelegate
-			toAddText.add( new Tuple<Draw, World>( _draw, _world ) ) ;
+			// If the renderer has yet to give a drawDelegate
+			if( toAddText.containsKey( _world ) == false )
+			{
+				toAddText.put( _world, MalletList.<Draw>newList() ) ;
+			}
+
+			final List<Draw> toAdd = toAddText.get( _world ) ;
+			toAdd.add( _draw ) ;
 			return ;
 		}
 
@@ -124,22 +160,22 @@ public class RenderComponent extends Entity.Component
 			drawDelegate = _delegate ;
 			if( toAddBasic.isEmpty() == false )
 			{
-				final int size = toAddBasic.size() ;
-				for( int i = 0; i < size; i++ )
+				for( Map.Entry<World, List<Draw>> entry : toAddBasic.entrySet() )
 				{
-					final Tuple<Draw, World> tuple = toAddBasic.get( i ) ;
-					addBasicDraw( tuple.getLeft(), tuple.getRight() ) ;
+					final World world = entry.getKey() ;
+					List<Draw> draws = entry.getValue() ;
+					drawDelegate.addBasicDraw( draws, world ) ;
 				}
 				toAddBasic.clear() ;
 			}
 
 			if( toAddText.isEmpty() == false )
 			{
-				final int size = toAddText.size() ;
-				for( int i = 0; i < size; i++ )
+				for( Map.Entry<World, List<Draw>> entry : toAddText.entrySet() )
 				{
-					final Tuple<Draw, World> tuple = toAddText.get( i ) ;
-					addTextDraw( tuple.getLeft(), tuple.getRight() ) ;
+					final World world = entry.getKey() ;
+					List<Draw> draws = entry.getValue() ;
+					drawDelegate.addTextDraw( draws, world ) ;
 				}
 				toAddText.clear() ;
 			}

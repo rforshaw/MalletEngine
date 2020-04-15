@@ -8,7 +8,7 @@ import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 
-import com.linxonline.mallet.util.buffers.IFloatBuffer ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;

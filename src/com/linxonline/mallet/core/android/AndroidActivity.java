@@ -19,7 +19,6 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.core.statemachine.* ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.event.* ;
 
 import com.linxonline.mallet.core.android.gl.* ;
 import com.linxonline.mallet.io.filesystem.android.* ;
@@ -30,7 +29,6 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.core.test.GameTestLoader ;
 
 public class AndroidActivity extends Activity
-							implements IEventHandler
 {
 	private final List<AndroidInputListener> inputListeners = MalletList.<AndroidInputListener>newList() ;
 	private final Notify<Object> startGame = new Notify<Object>()
@@ -157,35 +155,6 @@ public class AndroidActivity extends Activity
 
 		return true ;
 	}
-
-	@Override
-	public void processEvent( final Event _event ) {}
-
-	@Override
-	public String getName()
-	{
-		return GlobalConfig.getString( "APPLICATION_NAME", "Mallet Engine" ) ;
-	}
-
-	@Override
-	public List<EventType> getWantedEventTypes()
-	{
-		final List<EventType> types = MalletList.<EventType>newList() ;
-		types.add( EventType.ALL ) ;
-		return types ;
-	}
-
-	@Override
-	public void passEvent( final Event _event )
-	{
-		starter.getMainSystem().getEventSystem().addEvent( _event ) ;
-	}
-
-	/**
-		Implemented by Event Handler.
-	*/
-	@Override
-	public void reset() {}
 
 	public AndroidStarter constructStarter( final AndroidActivity _activity, final Notify<Object> _notify )
 	{

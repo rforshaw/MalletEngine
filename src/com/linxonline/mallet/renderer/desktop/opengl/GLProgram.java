@@ -282,8 +282,8 @@ public class GLProgram extends ProgramManager.Program
 			{
 				final int loc = MGL.glGetProgramResourceIndex( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, buffers.get( i ) ) ;
 				program.inBuffers[i] = loc ;
-				System.out.println( "Storage Block Binding: " + loc ) ;
-				System.out.println( "Error: " + MGL.glGetError() ) ;
+				//System.out.println( "Storage Block Binding: " + loc ) ;
+				//System.out.println( "Error: " + MGL.glGetError() ) ;
 			}
 		}
 

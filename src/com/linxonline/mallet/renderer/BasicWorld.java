@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.Set ;
+import java.util.List ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
 
@@ -114,6 +115,7 @@ public abstract class BasicWorld<D extends DrawData, C extends CameraData> imple
 	public abstract void init() ;
 
 	public abstract void addDraw( final D _data ) ;
+	public abstract void addDraw( final List<D> _data ) ;
 
 	public abstract void removeDraw( final D _data ) ;
 

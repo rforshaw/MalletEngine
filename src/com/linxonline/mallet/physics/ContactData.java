@@ -5,7 +5,7 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 
 public class ContactData
 {
-	private static final int MAX_COLLISION_POINTS = 5 ;
+	public static final int MAX_COLLISION_POINTS = 5 ;
 
 	private final ContactPoint[] contacts = new ContactPoint[MAX_COLLISION_POINTS] ;
 	private int usedContacts = 0 ;
@@ -41,6 +41,7 @@ public class ContactData
 			contact.collidedWith = _collidedWith ;
 			return contact ;
 		}
+
 		return null ;
 	}
 

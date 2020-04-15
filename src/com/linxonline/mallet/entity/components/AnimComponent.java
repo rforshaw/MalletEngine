@@ -31,12 +31,20 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public AnimComponent( final Entity _parent )
 	{
-		this( _parent, "ANIM" ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public AnimComponent( final Entity _parent, final String _name )
+	public AnimComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		super( _parent, _name ) ;
+		this( _parent, _allow, 0, 0 ) ;
+	}
+
+	public AnimComponent( final Entity _parent,
+						  final Entity.AllowEvents _allow,
+						  final int _stateCapacity,
+						  final int _backendCapacity )
+	{
+		super( _parent, _allow, _stateCapacity, _backendCapacity ) ;
 	}
 
 	public void addAnimation( final String _name, final Anim _anim )

@@ -67,10 +67,10 @@ public class GUIDraw extends GUIComponent
 		if( sheet != null && uv != null )
 		{
 			draw = DrawAssist.createDraw( getPosition(),
-											getOffset(),
-											new Vector3(),
-											new Vector3( 1, 1, 1 ),
-											getLayer() ) ;
+										  getOffset(),
+										  new Vector3(),
+										  new Vector3( 1, 1, 1 ),
+										  getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
 			DrawAssist.amendShape( draw, Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 			setColour( getColour() ) ;
@@ -111,12 +111,20 @@ public class GUIDraw extends GUIComponent
 		super.refresh() ;
 		final UIElement parent = getParent() ;
 
+		final Vector3 position = getPosition() ;
+		final Vector3 offset = getOffset() ;
+		final Vector3 length = getLength() ;
+
+		updateLength( parent.getLength(), length ) ;
+		updateOffset( parent.getOffset(), offset ) ;
+
 		if( draw != null && parent.isVisible() == true )
 		{
-			updateLength( parent.getLength(), getLength() ) ;
-			updateOffset( parent.getOffset(), getOffset() ) ;
+			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
 
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), getLength() ) ;
+			DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
+
 			DrawAssist.amendOrder( draw, getLayer() ) ;
 			DrawAssist.forceUpdate( draw ) ;
 		}

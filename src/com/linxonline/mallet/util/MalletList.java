@@ -1,6 +1,7 @@
 package com.linxonline.mallet.util ;
 
 import java.util.List ;
+import java.util.Arrays ;
 import java.util.ArrayList ;
 import java.util.Collection ;
 import java.util.Collections ;
@@ -27,5 +28,12 @@ public class MalletList
 		final ArrayList<V> list = new ArrayList( _array.length ) ;
 		Collections.addAll( list, _array ) ;
 		return list ;
+	}
+
+	public static <T> T[] concat( final T[] _lhs, final T ... _rhs )
+	{
+		final T[] result = Arrays.copyOf( _lhs, _lhs.length + _rhs.length ) ;
+		System.arraycopy( _rhs, 0, result, _lhs.length, _rhs.length ) ;
+		return result ;
 	}
 }

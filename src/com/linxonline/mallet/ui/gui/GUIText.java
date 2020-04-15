@@ -105,12 +105,16 @@ public class GUIText extends GUIComponent
 		super.refresh() ;
 		if( drawText != null && getParent().isVisible() )
 		{
+			final Vector3 position = getPosition() ;
 			final Vector3 length = getLength() ;
 			final Vector3 offset = getOffset() ;
 
 			final MalletFont.Metrics metrics = font.getMetrics() ;
 			offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
+
+			DrawAssist.amendPosition( drawText, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( drawText, offset.x, offset.y, offset.z ) ;
 
 			DrawAssist.amendTextStart( drawText, 0 ) ;
 			DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;

@@ -33,7 +33,18 @@ public final class SwapList<T>
 	
 	public void add( final T _t )
 	{
-		newEvents.add( _t ) ;
+		synchronized( newEvents )
+		{
+			newEvents.add( _t ) ;
+		}
+	}
+
+	public void addAll( final List<T> _ts )
+	{
+		synchronized( newEvents )
+		{
+			newEvents.addAll( _ts ) ;
+		}
 	}
 
 	public int size()

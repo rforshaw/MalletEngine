@@ -6,11 +6,11 @@ public class Component extends Entity.Component
 {
 	public Component( final Entity _parent )
 	{
-		this( _parent, null, null ) ;
+		_parent.super() ;
 	}
 
-	public Component( final Entity _parent, final String _name, final String _group )
+	public Component( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		_parent.super( _name, _group ) ;
+		_parent.super( _allow ) ;
 	}
 }

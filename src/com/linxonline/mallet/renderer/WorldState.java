@@ -55,6 +55,12 @@ public class WorldState<D extends DrawData,
 		world.addDraw( _draw ) ;
 	}
 
+	public void addDraw( final List<D> _draws, final W _world )
+	{
+		final W world = getWorld( _world ) ;
+		world.addDraw( _draws ) ;
+	}
+
 	/**
 		Remove the DrawData to the specified World.
 		If no world is specified remove it from the default world.

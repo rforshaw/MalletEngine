@@ -18,6 +18,7 @@ import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 
+import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
@@ -44,7 +45,7 @@ public final class GameTestLoader implements IGameLoader
 		{
 			public void initGame()			// Called when state is started
 			{
-				createMeta() ;
+				//createMeta() ;
 
 				createUI() ;
 				renderTextureExample() ;
@@ -52,13 +53,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				for( int i = 0; i < 10; ++i )
-				{
-					for( int j = 0; j < 10; ++j )
-					{
-						createEntityExample( i, j ) ;
-					}
-				}
+				createEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -110,7 +105,7 @@ public final class GameTestLoader implements IGameLoader
 					button2.setVisible( !button2.isVisible() ) ;
 				} ) ;
 
-				final Entity entity = new Entity( 1 ) ;
+				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
 				final UIComponent component = new UIComponent( entity ) ;
 				component.addElement( jUI.getParent() ) ;
 
@@ -236,7 +231,7 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderAnimationExample()
 			{
-				final Entity entity = new Entity( 2 ) ;
+				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
 
 				final AnimComponent anim = new AnimComponent( entity ) ;
 				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
@@ -344,44 +339,70 @@ public final class GameTestLoader implements IGameLoader
 				}*/
 			}
 
-			/**
-				Create an Entity using the ImageCreator and add 
-				it to the Game State
-			**/
-			public void createEntityExample( final int _i, final int _j )
+			public void createEntities( final int _row, final int _column )
 			{
-				final int x = 50 + ( _i * 50 ) ;
-				final int y = 50 + ( _j * 50 ) ;
-
-				final Entity entity = new Entity( 2 ) ;
-				entity.position = new Vector3( x, y, 0 ) ;
-
+				final int amount = _row * _column ;
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
 				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
-				final Vector3 offset = new Vector3( -32, -32, 0 ) ;
-				final Draw draw = DrawAssist.createDraw( entity.position,
-														 offset,
-														 new Vector3(),
-														 new Vector3( 1, 1, 1 ),
-														 10 ) ;
-
-				DrawAssist.amendShape( draw, plane ) ;
-
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
-				DrawAssist.attachProgram( draw, program ) ;
 
-				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+				final Entity entity = new Entity( amount + 1, Entity.AllowEvents.NO ) ;
 
-				final RenderComponent render =  new RenderComponent( entity ) ;
-				render.addBasicDraw( draw ) ;
+				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
+				final List<Draw> draws = MalletList.<Draw>newList( amount ) ;
+				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
+				{
+					@Override
+					public void update( final float _dt )
+					{
+						super.update( _dt ) ;
+						final int size = hulls.size() ;
+						for( int i = 0; i < size; ++i )
+						{
+							final Hull hull = hulls.get( i ) ;
+							final Draw draw = draws.get( i ) ;
 
-				CollisionComponent.generateBox2D( entity,
-												  new Vector2(),
-												  new Vector2( 64, 64 ),
-												  new Vector2( x, y ),
-												  new Vector2( -32, -32 ) ) ;
+							final Vector2 pos = hull.getPosition() ;
+							DrawAssist.amendPosition( draw, pos.x, pos.y, 0.0f ) ;
+						}
+					}
+				} ;
+
+				for( int i = 0; i < _row; ++i )
+				{
+					for( int j = 0; j < _column; ++j )
+					{
+						final int x = 50 + ( i * 50 ) ;
+						final int y = 50 + ( j * 50 ) ;
+
+						final CollisionComponent coll = CollisionComponent.generateBox2D( entity,
+																						Entity.AllowEvents.NO,
+																						new Vector2(),
+																						new Vector2( 64, 64 ),
+																						new Vector2( x, y ),
+																						new Vector2( -32, -32 ) ) ;
+						final Hull hull = coll.hull ;
+						final Vector2 position = hull.getPosition() ;
+
+						final Vector3 offset = new Vector3( -32, -32, 0 ) ;
+						final Draw draw = DrawAssist.createDraw( new Vector3( position ),
+																offset,
+																new Vector3(),
+																new Vector3( 1, 1, 1 ),
+																10 ) ;
+
+						DrawAssist.amendShape( draw, plane ) ;
+						DrawAssist.attachProgram( draw, program ) ;
+						DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
+
+						hulls.add( hull ) ;
+						draws.add( draw ) ;
+					}
+				}
+
+				render.addBasicDraw( draws, null ) ;
 
 				addEntity( entity ) ;
 			}
@@ -394,15 +415,12 @@ public final class GameTestLoader implements IGameLoader
 				final World base = WorldAssist.getDefaultWorld() ;
 				final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
 
-				final Entity entity = new Entity( 4 ) ;
-				entity.position = new Vector3( dim.x / 2, dim.y / 2, 0 ) ;
-
+				final Entity entity = new Entity( 4, Entity.AllowEvents.NO ) ;
 				final AnimComponent anim   = new AnimComponent( entity ) ;
 				final EventComponent event = new EventComponent( entity ) ;
-				final MouseComponent mouse = new MouseComponent( entity ) ;
 
 				final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
-																		entity.position,
+																		new Vector3( dim.x / 2, dim.y / 2, 0 ),
 																		new Vector3( -16, -16, 0 ),
 																		new Vector3(),
 																		new Vector3( 1, 1, 1 ),
@@ -423,12 +441,23 @@ public final class GameTestLoader implements IGameLoader
 																						new Vector2( -16, -16 ) ) ;
 				collision.hull.setPhysical( false ) ;
 
+				final MouseComponent mouse = new MouseComponent( entity )
+				{
+					private final Draw draw = AnimationAssist.getDraw( animation ) ;
+
+					@Override
+					public void applyMousePosition( final Vector2 _mouse )
+					{
+						DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+					}
+				} ;
+				
 				addEntity( entity ) ;
 			}
 
 			public void createSpinningCubeExample()
 			{
-				final Entity entity = new Entity( 2 ) ;
+				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
 
 				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 				final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, -200.0f, 0.0f ),
@@ -447,7 +476,7 @@ public final class GameTestLoader implements IGameLoader
 				final RenderComponent render = new RenderComponent( entity ) ;
 				render.addBasicDraw( draw ) ;
 
-				new Component( entity, "SPIN", "CUBE" )
+				new Component( entity )
 				{
 					private final Vector3 rotate = new Vector3() ;
 
@@ -470,7 +499,7 @@ public final class GameTestLoader implements IGameLoader
 			public void createEventMessageTest()
 			{
 				{
-					final Entity receive = new Entity( 1 ) ;
+					final Entity receive = new Entity( 1, Entity.AllowEvents.NO ) ;
 					final EventComponent event = new EventComponent( receive )
 					{
 						@Override
@@ -488,7 +517,7 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final Entity send = new Entity( 1 ) ;
+					final Entity send = new Entity( 1, Entity.AllowEvents.NO ) ;
 					final EventComponent event = new EventComponent( send ) ;
 					event.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
 

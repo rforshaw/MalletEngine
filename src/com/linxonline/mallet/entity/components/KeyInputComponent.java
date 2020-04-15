@@ -21,19 +21,19 @@ public class KeyInputComponent extends InputComponent
 
 	public KeyInputComponent( final Entity _parent )
 	{
-		super( _parent ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public KeyInputComponent( final Entity _parent, final String _name )
+	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		this( _parent, _name, "INPUTCOMPONENT" ) ;
+		this( _parent, _allow, InputMode.WORLD ) ;
 	}
-	
-	public KeyInputComponent( final Entity _parent, final String _name, final String _group )
+
+	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
 	{
-		super( _parent, _name, _group ) ;
+		super( _parent, _allow, _mode ) ;
 	}
-	
+
 	public void registerKey( final KeyCode _key, final KeyInputListener _listener )
 	{
 		final Key key = keys.get( _key ) ;

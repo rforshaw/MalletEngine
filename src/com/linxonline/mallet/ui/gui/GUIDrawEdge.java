@@ -26,11 +26,11 @@ public class GUIDrawEdge extends GUIDraw
 
 		if( sheet != null )
 		{
-			final Draw draw = DrawAssist.createDraw( parent.getPosition(),
-														getOffset(),
-														new Vector3(),
-														new Vector3( 1, 1, 1 ),
-														parent.getLayer() ) ;
+			final Draw draw = DrawAssist.createDraw( getPosition(),
+													 getOffset(),
+													 new Vector3(),
+													 new Vector3( 1, 1, 1 ),
+													 parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
 			DrawAssist.amendShape( draw, GUI.constructEdge( getLength(), edge ) ) ;
 			setColour( getColour() ) ;
@@ -48,12 +48,19 @@ public class GUIDrawEdge extends GUIDraw
 	{
 		super.refresh() ;
 		final UIElement parent = getParent() ;
+		final Vector3 position = getPosition() ;
+		final Vector3 offset = getOffset() ;
+		final Vector3 length = getLength() ;
+
 		updateLength( parent.getLength(), getLength() ) ;
 		updateOffset( parent.getOffset(), getOffset() ) ;
 
 		final Draw draw = getDraw() ;
 		if( draw != null && parent.isVisible() == true )
 		{
+			DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
+
 			DrawAssist.amendOrder( draw, getLayer() ) ;
 			GUI.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
 			DrawAssist.forceUpdate( draw ) ;

@@ -3,11 +3,10 @@ package com.linxonline.mallet.entity.components ;
 import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity ;
-import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 
-public abstract class InputComponent extends Entity.Component
+public abstract class InputComponent extends Component
 									 implements InputHandler
 {
 	private Entity.ReadyCallback destroy = null ;
@@ -15,27 +14,22 @@ public abstract class InputComponent extends Entity.Component
 
 	public InputComponent( final Entity _parent )
 	{
-		this( _parent, "INPUT", "INPUTCOMPONENT", InputMode.WORLD ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public InputComponent( final Entity _parent, final String _name )
+	public InputComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		this( _parent, _name, "INPUTCOMPONENT", InputMode.WORLD ) ;
+		this( _parent, _allow, InputMode.WORLD ) ;
 	}
 
-	public InputComponent( final Entity _parent, final String _name, final String _group )
+	public InputComponent( final Entity _parent, final InputMode _mode )
 	{
-		this( _parent, _name, _group, InputMode.WORLD ) ;
+		this( _parent, Entity.AllowEvents.YES, _mode ) ;
 	}
 
-	public InputComponent( final Entity _parent, final String _name, final InputMode _mode )
+	public InputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
 	{
-		this( _parent, _name, "INPUTCOMPONENT", _mode ) ;
-	}
-
-	public InputComponent( final Entity _parent, final String _name, final String _group, final InputMode _mode )
-	{
-		_parent.super( _name, _group ) ;
+		super( _parent, _allow ) ;
 		mode = _mode ;
 	}
 

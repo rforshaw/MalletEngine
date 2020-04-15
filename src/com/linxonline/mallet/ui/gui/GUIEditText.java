@@ -139,6 +139,7 @@ public class GUIEditText extends GUIText
 		final int layer = parent.getLayer() + 1 ;
 
 		final MalletFont font = getFont() ;
+		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
 		final Vector3 length = getLength() ;
 		final StringBuilder edit = getText() ;
@@ -149,6 +150,9 @@ public class GUIEditText extends GUIText
 			//offset.y = UI.align( getAlignmentY(), metrics.getHeight(), length.y ) ;
 
 			updateTextRange() ;
+
+			DrawAssist.amendPosition( drawEdit, position.x, position.y, position.z ) ;
+			DrawAssist.amendOffset( drawEdit, offset.x, offset.y, offset.z ) ;
 
 			DrawAssist.amendOrder( drawEdit, layer + 1 ) ;
 			DrawAssist.forceUpdate( drawEdit ) ;
@@ -167,13 +171,11 @@ public class GUIEditText extends GUIText
 		{
 			delegate.addBasicDraw( drawCursor, getWorld() ) ;
 
+			DrawAssist.amendPosition( drawCursor, position.x, position.y, position.z ) ;
 			final int index = parent.getCursorIndex() ;
 
-			final Vector3 cursorOffset = DrawAssist.getOffset( drawCursor ) ;
-			cursorOffset.setXYZ( offset ) ;
-
-			cursorOffset.add( font.stringWidth( edit, start, index ), 0.0f, 0.0f ) ;
-			//System.out.println( "Update Cursor: " + index + " " + cursorOffset ) ;
+			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
+			DrawAssist.amendOffset( drawCursor, xOffset, offset.y, offset.z ) ;
 
 			DrawAssist.amendOrder( drawCursor, layer ) ;
 			DrawAssist.forceUpdate( drawCursor ) ;

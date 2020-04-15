@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.List ;
+
 /**
 	DrawDelegate provides access for adding/removing Draw objects 
 	from the rendering-system.
@@ -22,12 +24,19 @@ public interface DrawDelegate
 	public void addTextDraw( final Draw _draw ) ;
 	public void addBasicDraw( final Draw _draw ) ;
 
+	public void addTextDraw( final List<Draw> _draws ) ;
+	public void addBasicDraw( final List<Draw> _draws ) ;
+
 	/**
 		Add Draw to a specific world.
 		A Draw object should not be added to more than one World.
 	*/
 	public void addTextDraw( final Draw _draw, final World _world ) ;
 	public void addBasicDraw( final Draw _draw, final World _world ) ;
+	
+	public void addTextDraw( final List<Draw> _draws, final World _world ) ;
+	public void addBasicDraw( final List<Draw> _draws, final World _world ) ;
+
 	public void removeDraw( final Draw _draw ) ;
 
 	/**

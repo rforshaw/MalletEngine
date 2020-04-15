@@ -427,8 +427,13 @@ public class UIWrapper extends UIElement
 
 			if( draw != null && parent.isVisible() == true )
 			{
+				final Vector3 position = getPosition() ;
+				final Vector3 offset = getOffset() ;
 				final Vector3 len = getLength() ;
 				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), len ) ;
+
+				DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
+				DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
 
 				DrawAssist.amendOrder( draw, getLayer() ) ;
 				DrawAssist.forceUpdate( draw ) ;

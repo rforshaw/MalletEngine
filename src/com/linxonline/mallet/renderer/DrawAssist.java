@@ -132,24 +132,24 @@ public final class DrawAssist
 		return assist.getDrawShape( _draw ) ;
 	}
 
-	public static Vector3 getRotate( final Draw _draw )
+	public static Vector3 getRotate( final Draw _draw, final Vector3 _fill )
 	{
-		return assist.getRotate( _draw ) ;
+		return assist.getRotate( _draw, _fill ) ;
 	}
 
-	public static Vector3 getScale( final Draw _draw )
+	public static Vector3 getScale( final Draw _draw, final Vector3 _fill )
 	{
-		return assist.getScale( _draw ) ;
+		return assist.getScale( _draw, _fill ) ;
 	}
 
-	public static Vector3 getPosition( final Draw _draw )
+	public static Vector3 getPosition( final Draw _draw, final Vector3 _fill )
 	{
-		return assist.getPosition( _draw ) ;
+		return assist.getPosition( _draw, _fill ) ;
 	}
 
-	public static Vector3 getOffset( final Draw _draw )
+	public static Vector3 getOffset( final Draw _draw, final Vector3 _fill )
 	{
-		return assist.getOffset( _draw ) ;
+		return assist.getOffset( _draw, _fill ) ;
 	}
 
 	public static StringBuilder getText( final Draw _draw )
@@ -250,10 +250,12 @@ public final class DrawAssist
 		public Draw forceUpdate( final Draw _draw ) ;
 
 		public Shape getDrawShape( final Draw _draw ) ;
-		public Vector3 getRotate( final Draw _draw ) ;
-		public Vector3 getScale( final Draw _draw ) ;
-		public Vector3 getPosition( final Draw _draw ) ;
-		public Vector3 getOffset( final Draw _draw ) ;
+
+		public Vector3 getRotate( final Draw _draw, final Vector3 _fill ) ;
+		public Vector3 getScale( final Draw _draw, final Vector3 _fill ) ;
+		public Vector3 getPosition( final Draw _draw, final Vector3 _fill ) ;
+		public Vector3 getOffset( final Draw _draw, final Vector3 _fill ) ;
+
 		public StringBuilder getText( final Draw _draw ) ;
 		public MalletColour getColour( final Draw _draw ) ;
 		public boolean isUI( final Draw _draw ) ;

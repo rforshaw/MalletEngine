@@ -246,9 +246,32 @@ public class UIEditorState extends GameState
 	private static Entity createCUIDropEntity( final Class<? extends UIElement.MetaComponent> _class, final InputEvent _event )
 	{
 		final Entity entity = new Entity( 3 ) ;
+		final AnimComponent anim = new AnimComponent( entity ) ;
+		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
+																new Vector3(),
+																new Vector3( -16, -16, 0 ),
+																new Vector3(),
+																new Vector3( 1, 1, 1 ),
+																100 ) ;
+
+		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
+
+		anim.addAnimation( "DEFAULT", animation ) ;
+		anim.setDefaultAnim( "DEFAULT" ) ;
+
 		final EventComponent event = new EventComponent( entity ) ;
 		final MouseComponent mouse = new MouseComponent( entity )
 		{
+			private final Draw draw = AnimationAssist.getDraw( animation ) ;
+
+			@Override
+			public void applyMousePosition( final Vector2 _mouse )
+			{
+				DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+			}
+
 			@Override
 			public void mouseReleased( final InputEvent _event )
 			{
@@ -291,15 +314,38 @@ public class UIEditorState extends GameState
 			}
 		} ;
 
-		return UIEditorState.setupDropEntity( entity ) ;
+		return entity ;
 	}
 
 	private static Entity createUIDropEntity( final Class<? extends UIElement.Meta> _class, final InputEvent _event )
 	{
 		final Entity entity = new Entity( 3 ) ;
+		final AnimComponent anim = new AnimComponent( entity ) ;
+		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
+																new Vector3(),
+																new Vector3( -16, -16, 0 ),
+																new Vector3(),
+																new Vector3( 1, 1, 1 ),
+																100 ) ;
+
+		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
+
+		anim.addAnimation( "DEFAULT", animation ) ;
+		anim.setDefaultAnim( "DEFAULT" ) ;
+
 		final EventComponent event = new EventComponent( entity ) ;
 		final MouseComponent mouse = new MouseComponent( entity )
 		{
+			private final Draw draw = AnimationAssist.getDraw( animation ) ;
+
+			@Override
+			public void applyMousePosition( final Vector2 _mouse )
+			{
+				DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+			}
+		
 			@Override
 			public void mouseReleased( final InputEvent _event )
 			{
@@ -343,29 +389,7 @@ public class UIEditorState extends GameState
 			}
 		} ;
 
-		return UIEditorState.setupDropEntity( entity ) ;
-	}
-
-	private static Entity setupDropEntity( final Entity _entity )
-	{
-		_entity.setPosition( 0, 0, 0 ) ;
-
-		final AnimComponent anim = new AnimComponent( _entity ) ;
-		final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
-																_entity.position,
-																new Vector3( -16, -16, 0 ),
-																new Vector3(),
-																new Vector3( 1, 1, 1 ),
-																100 ) ;
-
-		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
-		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
-
-		anim.addAnimation( "DEFAULT", animation ) ;
-		anim.setDefaultAnim( "DEFAULT" ) ;
-
-		return _entity ;
+		return entity ;
 	}
 
 	private UIElement createOpenPanel( final int _layer )

@@ -22,12 +22,22 @@ public class MouseComponent extends InputComponent
 
 	public MouseComponent( final Entity _parent )
 	{
-		this( _parent, InputComponent.InputMode.UI ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
+	}
+
+	public MouseComponent( final Entity _parent, final Entity.AllowEvents _allow )
+	{
+		this( _parent, _allow, InputComponent.InputMode.UI ) ;
 	}
 
 	public MouseComponent( final Entity _parent, final InputComponent.InputMode _mode )
 	{
-		super( _parent, "MOUSECOMPONENT", "INPUTCOMPONENT", _mode ) ;
+		this( _parent, Entity.AllowEvents.YES, _mode ) ;
+	}
+
+	public MouseComponent( final Entity _parent, final Entity.AllowEvents _allow, final InputComponent.InputMode _mode )
+	{
+		super( _parent, _allow, _mode ) ;
 	}
 
 	@Override
@@ -55,14 +65,14 @@ public class MouseComponent extends InputComponent
 		}
 	}
 
-	public void updateMousePosition( final InputEvent _event )
+	private void updateMousePosition( final InputEvent _event )
 	{
 		mouse.setXY( _event.mouseX, _event.mouseY ) ;
 		final Camera camera = CameraAssist.getDefaultCamera() ;
 
-		final Vector3 pos = getParent().getPosition() ;
-		pos.x = CameraAssist.convertInputToCameraX( camera, mouse.x ) ;
-		pos.y = CameraAssist.convertInputToCameraY( camera, mouse.y ) ;
+		mouse.x = CameraAssist.convertInputToCameraX( camera, mouse.x ) ;
+		mouse.y = CameraAssist.convertInputToCameraY( camera, mouse.y ) ;
+		applyMousePosition( mouse ) ;
 	}
 
 	public void mouseMoved( final InputEvent _event ) {}
@@ -70,4 +80,6 @@ public class MouseComponent extends InputComponent
 	public void mousePressed( final InputEvent _event ) {}
 
 	public void mouseReleased( final InputEvent _event ) {}
+	
+	public void applyMousePosition( final Vector2 _mouse ) {}
 }

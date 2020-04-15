@@ -29,11 +29,25 @@ public class StateComponent extends EventComponent
 	private boolean initialEventDone = false ;
 	private final List<Tuple<String, DataSet>> data = MalletList.<Tuple<String, DataSet>>newList() ;
 
-	public StateComponent( final Entity _parent, final String _name, final String _group )
+	public StateComponent( final Entity _parent )
 	{
-		super( _parent, _name, _group ) ;
+		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
+	public StateComponent( final Entity _parent,
+						   final Entity.AllowEvents _allow )
+	{
+		this( _parent, _allow, 0, 0 ) ;
+	}
+
+	public StateComponent( final Entity _parent,
+						   final Entity.AllowEvents _allow,
+						   final int _stateCapacity,
+						   final int _backendCapacity )
+	{
+		super( _parent, _allow, _stateCapacity, _backendCapacity ) ;
+	}
+	
 	/**
 		Add the DataSet for tracking, works in concert with DataConverter.
 

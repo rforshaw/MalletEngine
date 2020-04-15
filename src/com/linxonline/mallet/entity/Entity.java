@@ -3,6 +3,7 @@ package com.linxonline.mallet.entity ;
 import java.util.List ;
 import java.util.Collections;
 
+import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.maths.* ;
@@ -22,18 +23,32 @@ import com.linxonline.mallet.event.* ;
 **/
 public final class Entity
 {
-	private static final IEventSystem FALLBACK_EVENT_SYSTEM = new FallbackEventSystem() ;
+	public enum AllowEvents
+	{
+		YES,
+		NO
+	}
 
 	private final Component[] components ;
 	private final IEventSystem eventSystem ;		// Component Event System
 
-	public Vector3 position = new Vector3() ;		// Position of Entity in world space
+	//public Vector3 position = new Vector3() ;		// Position of Entity in world space
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
 	public Entity( final int _capacity )
 	{
+		this( _capacity, AllowEvents.YES ) ;
+	}
+	
+	public Entity( final int _capacity, final AllowEvents _allow )
+	{
 		components = new Component[_capacity] ;
-		eventSystem = ( _capacity <= 1 ) ? FALLBACK_EVENT_SYSTEM : new EventSystem( "COMPONENT_EVENT_SYSTEM", _capacity ) ;
+		switch( _allow )
+		{
+			default  :
+			case YES : eventSystem = new EventSystem( _capacity ) ; break ;
+			case NO  : eventSystem = null ; break ;
+		}
 	}
 
 	private void addComponent( Component _component )
@@ -43,28 +58,20 @@ public final class Entity
 			if( components[i] == null )
 			{
 				components[i] = _component ;
-				final EventController controller = _component.getComponentEventController() ;
-				controller.setAddEventInterface( eventSystem ) ;
-				eventSystem.addEventHandler( controller ) ;
+				if( eventSystem != null )
+				{
+					final EventController controller = _component.getComponentEventController() ;
+					if( controller != null )
+					{
+						controller.setAddEventInterface( eventSystem ) ;
+						eventSystem.addHandler( controller ) ;
+					}
+				}
 				return ;
 			}
 		}
 
 		Logger.println( "Failed to add " + _component + " to entity.", Logger.Verbosity.MAJOR ) ;
-	}
-	
-	public final void setPosition( final float _x, final float _y, final float _z )
-	{
-		position.x = _x ;
-		position.y = _y ;
-		position.z = _z ;
-	}
-
-	public final void addToPosition( final float _x, final float _y, final float _z )
-	{
-		position.x += _x ;
-		position.y += _y ;
-		position.z += _z ;
 	}
 
 	/**
@@ -73,7 +80,14 @@ public final class Entity
 	**/
 	public final void update( final float _dt )
 	{
-		eventSystem.update() ;
+		if( eventSystem != null )
+		{
+			// The entity can be constructed without an EventSystem.
+			// Some entities will be constructed with components that 
+			// do not inter-communicate.
+			eventSystem.sendEvents() ;
+		}
+
 		// Update Components
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
@@ -90,14 +104,6 @@ public final class Entity
 	{
 		Collections.addAll( _components, components ) ;
 		return _components ;
-	}
-
-	/** 
-		Returns the Entiy's current position
-	**/
-	public final Vector3 getPosition()
-	{
-		return position ;
 	}
 
 	/** 
@@ -167,20 +173,22 @@ public final class Entity
 
 	public abstract class Component
 	{
-		protected final EventController componentEvents = new EventController() ;	// Handles events from parent
+		protected final EventController componentEvents ;	// Handles events from parent
 
 		public Component()
 		{
-			this( null, null ) ;
+			this( AllowEvents.YES ) ;
 		}
 
-		/**
-			Engine specified codes for nameID and groupID.
-			Not guaranteed to be unique over 16 characters.
-		*/
-		public Component( final String _name, final String _group )
+		public Component( final AllowEvents _allow )
 		{
-			initComponentEventProcessors( getComponentEventController() ) ;
+			switch( _allow )
+			{
+				default :
+				case YES     : componentEvents = createEventController() ; break ;
+				case NO      : componentEvents = null ;
+			}
+
 			getParent().addComponent( this ) ;
 		}
 
@@ -190,16 +198,30 @@ public final class Entity
 		**/
 		public void update( final float _dt )
 		{
-			componentEvents.update() ;
+			if( componentEvents != null )
+			{
+				componentEvents.update() ;
+			}
 		}
 
 		/**
-			Override to add Event Processors to the component's
-			Event Controller.
-			Make sure to call super to ensure parents 
-			component Event Processors are added.
+			If the component requires an Event Controller construct one
+			and add any required Event Processors to it.
 		*/
-		public void initComponentEventProcessors( final EventController _controller ) {}
+		public EventController createEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+		{
+			if( _processors == null )
+			{
+				return new EventController() ;
+			}
+
+			if( _processors.length == 0 )
+			{
+				return new EventController() ;
+			}
+
+			return new EventController( _processors ) ;
+		}
 
 		/**
 			Create events and add them to _events.
@@ -222,7 +244,10 @@ public final class Entity
 		*/
 		public void passFinalEvents( final List<Event<?>> _events )
 		{
-			componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
+			if( componentEvents != null )
+			{
+				componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
+			}
 		}
 
 		/**

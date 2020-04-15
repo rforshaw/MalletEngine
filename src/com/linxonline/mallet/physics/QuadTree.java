@@ -251,6 +251,8 @@ public class QuadTree
 			// effectively removing the hull 
 			if( _index >= 0 )
 			{
+				// Try and remove things from the top of the hull 
+				// list first - it will avoid the array shift.
 				for( int i = _index + 1; i < nextHull; i++ )
 				{
 					hulls[i - 1] = hulls[i] ;
@@ -332,38 +334,47 @@ public class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
-			/*if( nextHull > 0 )
-			{
-				System.out.println( "Centre: " + centre.toString() + " Length: " + length + " Quadrant: " + quadrant + " Hulls: " + nextHull ) ;
-			}*/
-
 			while( nextHull > 0 )
 			{
-				final Hull hull1 = hulls[0] ;
+				final int index = nextHull - 1 ;
+				final Hull hull1 = hulls[index] ;
 				if( hull1.isCollidable() == false )
 				{
-					removeHull( 0 ) ;
+					removeHull( index ) ;
 					continue ;
 				}
 
-				final int size = nextHull ;
-				for( int j = 1; j < size; j++ )
-				{
-					final Hull hull2 = hulls[j] ;
-					if( hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
-					{
-						check.generateContactPoint( hull1, hull2 ) ;
-					}
-				}
+				updateCollisions( index, hull1, hulls ) ;
 
 				// We've compared this hull against all the other 
 				// hulls, and generated the needed collision points.
 				// No more can be done, leaving it in will only 
 				// consume valuable resources. 
-				removeHull( 0 ) ;
+				removeHull( index ) ;
 			}
 		}
 
+		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
+		{
+			final int size = _index ;
+			for( int j = 0; j < size; j++ )
+			{
+				final Hull hull2 = _hulls[j] ;
+				if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
+				{
+					if( check.generateContactPoint( _hull1, hull2 ) == true )
+					{
+						if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
+						{
+							// No point looking for more contacts if 
+							// we've reached maximum.
+							return ;
+						}
+					}
+				}
+			}
+		}
+		
 		/**
 			Called by a parent node to its children.
 			Should only ever be called by a parent node.
@@ -417,7 +428,7 @@ public class QuadTree
 		private boolean insertToQuadrant( final Hull _hull )
 		{
 			int added = 0 ;
-			
+
 			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
 			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
 			// have the hull stored within it once.
@@ -578,6 +589,11 @@ public class QuadTree
 			bottomLeft = tempRoot.bottomLeft ;
 			bottomRight = tempRoot.bottomRight ;
 		}
+
+		public int size()
+		{
+			return nextHull ;
+		}
 	}
 
 	protected static Quadrant findQuadrant( final Vector2 _point, final Vector2 _centre )
@@ -631,6 +647,7 @@ public class QuadTree
 		@Override
 		public ExecType exec( final int _index, final QuadNode _node )
 		{
+			//System.out.println( "Node: " + _node.size() ) ;
 			_node.update( deltaTime ) ;
 			return ExecType.CONTINUE ;
 		}

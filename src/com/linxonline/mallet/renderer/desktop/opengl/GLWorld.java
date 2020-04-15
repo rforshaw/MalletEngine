@@ -239,6 +239,12 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	}
 
 	@Override
+	public void addDraw( final List<GLDrawData> _draws )
+	{
+		state.addAll( _draws ) ;
+	}
+
+	@Override
 	public void removeDraw( final GLDrawData _draw )
 	{
 		state.remove( _draw ) ;
@@ -344,6 +350,10 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	private final class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
+		private final Vector3 rotation = new Vector3() ;
+
 		public GLBasicUpload() {}
 
 		@Override
@@ -354,9 +364,9 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 				return ;
 			}
 
-			final Vector3 position = _data.getPosition() ;
-			final Vector3 offset   = _data.getOffset() ;
-			final Vector3 rotation = _data.getRotation() ;
+			_data.getPosition( position ) ;
+			_data.getOffset( offset ) ;
+			_data.getRotation( rotation ) ;
 
 			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
 			positionMatrix.setIdentity() ;
