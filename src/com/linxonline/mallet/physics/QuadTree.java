@@ -133,9 +133,9 @@ public class QuadTree
 
 	protected class QuadNode
 	{
-		private final CollisionCheck check = new CollisionCheck() ;
 		private final Vector2 centre = new Vector2() ;
 
+		private CollisionCheck check = new CollisionCheck() ;
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
 		private Quadrant quadrant ;
 		private float length ;
@@ -442,12 +442,12 @@ public class QuadTree
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
 
-			final Vector2[] points = _hull.getPoints() ;
-			for( int i = 0; i < points.length; i++ )
+			final float[] points = _hull.getPoints() ;
+			for( int i = 0; i < points.length; i += 2 )
 			{
 				absolute.setXY( _hull.getPosition() ) ;
-				absolute.add( points[i] ) ;
-				
+				absolute.add( points[i], points[i + 1] ) ;
+
 				// It is possible for a hulls points to 
 				// go beyond the current scope of the tree,
 				// in this case we must expand the tree
@@ -545,6 +545,7 @@ public class QuadTree
 
 			parent = true ;
 			hulls = new Hull[0] ;
+			check = null ;
 
 			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, _offset, Quadrant.TOP_LEFT ) ;
 			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, _offset, Quadrant.TOP_RIGHT ) ;

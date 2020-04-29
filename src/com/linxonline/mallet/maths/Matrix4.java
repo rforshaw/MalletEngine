@@ -26,7 +26,7 @@ public class Matrix4 implements Cacheable
 		* (2, 0)[ 8], (2, 1)[ 9], (2, 2)[10], (2, 3)[11]
 		* (3, 0)[12], (3, 1)[13], (3, 2)[14], (3, 3)[15]
 	*/
-	public final FloatBuffer matrix = FloatBuffer.allocate( 16 ) ;
+	public final float[] matrix = FloatBuffer.allocate( 16 ) ;
 
 	public Matrix4()
 	{
@@ -175,57 +175,57 @@ public class Matrix4 implements Cacheable
 
 	public void multiply( final Matrix4 _mat )
 	{
-		final FloatBuffer x = _mat.matrix ;
+		final float[] x = _mat.matrix ;
 		Matrix4.multiplyStage1( this, x ) ;
 		Matrix4.multiplyStage2( this, x ) ;
 		Matrix4.multiplyStage3( this, x ) ;
 		Matrix4.multiplyStage4( this, x ) ;
 	}
 
-	private static void multiplyStage1( final Matrix4 _m, final FloatBuffer _x )
+	private static void multiplyStage1( final Matrix4 _m, final float[] _x )
 	{
-		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
-		final float a00 = m.multiply( 0, _x, 0 ) + m.multiply( 1, _x, 4 ) + m.multiply( 2, _x,  8 ) + m.multiply( 3, _x, 12 ) ;
-		final float a01 = m.multiply( 0, _x, 1 ) + m.multiply( 1, _x, 5 ) + m.multiply( 2, _x,  9 ) + m.multiply( 3, _x, 13 ) ;
-		final float a02 = m.multiply( 0, _x, 2 ) + m.multiply( 1, _x, 6 ) + m.multiply( 2, _x, 10 ) + m.multiply( 3, _x, 14 ) ;
-		final float a03 = m.multiply( 0, _x, 3 ) + m.multiply( 1, _x, 7 ) + m.multiply( 2, _x, 11 ) + m.multiply( 3, _x, 15 ) ;
+		final float[] m = _m.matrix ;				// Makes it easier to read
+		final float a00 = FloatBuffer.multiply( m, 0, _x, 0 ) + FloatBuffer.multiply( m, 1, _x, 4 ) + FloatBuffer.multiply( m, 2, _x,  8 ) + FloatBuffer.multiply( m, 3, _x, 12 ) ;
+		final float a01 = FloatBuffer.multiply( m, 0, _x, 1 ) + FloatBuffer.multiply( m, 1, _x, 5 ) + FloatBuffer.multiply( m, 2, _x,  9 ) + FloatBuffer.multiply( m, 3, _x, 13 ) ;
+		final float a02 = FloatBuffer.multiply( m, 0, _x, 2 ) + FloatBuffer.multiply( m, 1, _x, 6 ) + FloatBuffer.multiply( m, 2, _x, 10 ) + FloatBuffer.multiply( m, 3, _x, 14 ) ;
+		final float a03 = FloatBuffer.multiply( m, 0, _x, 3 ) + FloatBuffer.multiply( m, 1, _x, 7 ) + FloatBuffer.multiply( m, 2, _x, 11 ) + FloatBuffer.multiply( m, 3, _x, 15 ) ;
 		_m.setRow( a00, a01, a02, a03, 0 ) ;
 	}
 
-	private static void multiplyStage2( final Matrix4 _m, final FloatBuffer _x )
+	private static void multiplyStage2( final Matrix4 _m, final float[] _x )
 	{
-		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
-		final float a10 = m.multiply( 4, _x, 0 ) + m.multiply( 5, _x, 4 ) + m.multiply( 6, _x,  8 ) + m.multiply( 7, _x, 12 ) ;
-		final float a11 = m.multiply( 4, _x, 1 ) + m.multiply( 5, _x, 5 ) + m.multiply( 6, _x,  9 ) + m.multiply( 7, _x, 13 ) ;
-		final float a12 = m.multiply( 4, _x, 2 ) + m.multiply( 5, _x, 6 ) + m.multiply( 6, _x, 10 ) + m.multiply( 7, _x, 14 ) ;
-		final float a13 = m.multiply( 4, _x, 3 ) + m.multiply( 5, _x, 7 ) + m.multiply( 6, _x, 11 ) + m.multiply( 7, _x, 15 ) ;
+		final float[] m = _m.matrix ;				// Makes it easier to read
+		final float a10 = FloatBuffer.multiply( m, 4, _x, 0 ) + FloatBuffer.multiply( m, 5, _x, 4 ) + FloatBuffer.multiply( m, 6, _x,  8 ) + FloatBuffer.multiply( m, 7, _x, 12 ) ;
+		final float a11 = FloatBuffer.multiply( m, 4, _x, 1 ) + FloatBuffer.multiply( m, 5, _x, 5 ) + FloatBuffer.multiply( m, 6, _x,  9 ) + FloatBuffer.multiply( m, 7, _x, 13 ) ;
+		final float a12 = FloatBuffer.multiply( m, 4, _x, 2 ) + FloatBuffer.multiply( m, 5, _x, 6 ) + FloatBuffer.multiply( m, 6, _x, 10 ) + FloatBuffer.multiply( m, 7, _x, 14 ) ;
+		final float a13 = FloatBuffer.multiply( m, 4, _x, 3 ) + FloatBuffer.multiply( m, 5, _x, 7 ) + FloatBuffer.multiply( m, 6, _x, 11 ) + FloatBuffer.multiply( m, 7, _x, 15 ) ;
 		_m.setRow( a10, a11, a12, a13, 1 ) ;
 	}
 
-	private static void multiplyStage3( final Matrix4 _m, final FloatBuffer _x )
+	private static void multiplyStage3( final Matrix4 _m, final float[] _x )
 	{
-		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
-		final float a20 = m.multiply( 8, _x, 0 ) + m.multiply( 9, _x, 4 ) + m.multiply( 10, _x,  8 ) + m.multiply( 11, _x, 12 ) ;
-		final float a21 = m.multiply( 8, _x, 1 ) + m.multiply( 9, _x, 5 ) + m.multiply( 10, _x,  9 ) + m.multiply( 11, _x, 13 ) ;
-		final float a22 = m.multiply( 8, _x, 2 ) + m.multiply( 9, _x, 6 ) + m.multiply( 10, _x, 10 ) + m.multiply( 11, _x, 14 ) ;
-		final float a23 = m.multiply( 8, _x, 3 ) + m.multiply( 9, _x, 7 ) + m.multiply( 10, _x, 11 ) + m.multiply( 11, _x, 15 ) ;
+		final float[] m = _m.matrix ;				// Makes it easier to read
+		final float a20 = FloatBuffer.multiply( m, 8, _x, 0 ) + FloatBuffer.multiply( m, 9, _x, 4 ) + FloatBuffer.multiply( m, 10, _x,  8 ) + FloatBuffer.multiply( m, 11, _x, 12 ) ;
+		final float a21 = FloatBuffer.multiply( m, 8, _x, 1 ) + FloatBuffer.multiply( m, 9, _x, 5 ) + FloatBuffer.multiply( m, 10, _x,  9 ) + FloatBuffer.multiply( m, 11, _x, 13 ) ;
+		final float a22 = FloatBuffer.multiply( m, 8, _x, 2 ) + FloatBuffer.multiply( m, 9, _x, 6 ) + FloatBuffer.multiply( m, 10, _x, 10 ) + FloatBuffer.multiply( m, 11, _x, 14 ) ;
+		final float a23 = FloatBuffer.multiply( m, 8, _x, 3 ) + FloatBuffer.multiply( m, 9, _x, 7 ) + FloatBuffer.multiply( m, 10, _x, 11 ) + FloatBuffer.multiply( m, 11, _x, 15 ) ;
 		_m.setRow( a20, a21, a22, a23, 2 ) ;
 	}
 
-	private static void multiplyStage4( final Matrix4 _m, final FloatBuffer _x )
+	private static void multiplyStage4( final Matrix4 _m, final float[] _x )
 	{
-		final FloatBuffer m = _m.matrix ;				// Makes it easier to read
-		final float a30 = m.multiply( 12, _x, 0 ) + m.multiply( 13, _x, 4 ) + m.multiply( 14, _x,  8 ) + m.multiply( 15, _x, 12 ) ;
-		final float a31 = m.multiply( 12, _x, 1 ) + m.multiply( 13, _x, 5 ) + m.multiply( 14, _x,  9 ) + m.multiply( 15, _x, 13 ) ;
-		final float a32 = m.multiply( 12, _x, 2 ) + m.multiply( 13, _x, 6 ) + m.multiply( 14, _x, 10 ) + m.multiply( 15, _x, 14 ) ;
-		final float a33 = m.multiply( 12, _x, 3 ) + m.multiply( 13, _x, 7 ) + m.multiply( 14, _x, 11 ) + m.multiply( 15, _x, 15 ) ;
+		final float[] m = _m.matrix ;				// Makes it easier to read
+		final float a30 = FloatBuffer.multiply( m, 12, _x, 0 ) + FloatBuffer.multiply( m, 13, _x, 4 ) + FloatBuffer.multiply( m, 14, _x,  8 ) + FloatBuffer.multiply( m, 15, _x, 12 ) ;
+		final float a31 = FloatBuffer.multiply( m, 12, _x, 1 ) + FloatBuffer.multiply( m, 13, _x, 5 ) + FloatBuffer.multiply( m, 14, _x,  9 ) + FloatBuffer.multiply( m, 15, _x, 13 ) ;
+		final float a32 = FloatBuffer.multiply( m, 12, _x, 2 ) + FloatBuffer.multiply( m, 13, _x, 6 ) + FloatBuffer.multiply( m, 14, _x, 10 ) + FloatBuffer.multiply( m, 15, _x, 14 ) ;
+		final float a33 = FloatBuffer.multiply( m, 12, _x, 3 ) + FloatBuffer.multiply( m, 13, _x, 7 ) + FloatBuffer.multiply( m, 14, _x, 11 ) + FloatBuffer.multiply( m, 15, _x, 15 ) ;
 		_m.setRow( a30, a31, a32, a33, 3 ) ;
 	}
 
 	public void invert()
 	{
-		final FloatBuffer t = temp.matrix ;		// Results stored
-		final FloatBuffer m = matrix ;			// Make it easier to read
+		final float[] t = temp.matrix ;		// Results stored
+		final float[] m = matrix ;			// Make it easier to read
 
 		Matrix4.invertStage1( t, m ) ;
 		Matrix4.invertStage2( t, m ) ;
@@ -237,56 +237,55 @@ public class Matrix4 implements Cacheable
 		temp.setIdentity() ;
 	}
 
-	private static void invertStage1( final FloatBuffer _t, final FloatBuffer _m )
+	private static void invertStage1( final float[] _t, final float[] _m )
 	{
-		_t.set(  0,  _m.multiply( 5, 10, 15 )            - _m.multiply( 5, 11, 14 ) - _m.multiply( 9, 6, 15 ) + _m.multiply( 9, 7, 14 ) + _m.multiply( 13, 6, 11 ) - _m.multiply( 13, 7, 10 ) ) ;
-		_t.set(  1, -_m.get( 1 ) * _m.multiply( 10, 15 ) + _m.multiply( 1, 11, 14 ) + _m.multiply( 9, 2, 15 ) - _m.multiply( 9, 3, 14 ) - _m.multiply( 13, 2, 11 ) + _m.multiply( 13, 3, 10 ) ) ;
-		_t.set(  2,  _m.multiply( 1, 6, 15 )             - _m.multiply( 1,  7, 14 ) - _m.multiply( 5, 2, 15 ) + _m.multiply( 5, 3, 14 ) + _m.multiply( 13, 2,  7 ) - _m.multiply( 13, 3,  6 ) ) ;
-		_t.set(  3, -_m.get( 1 ) * _m.multiply( 6, 11 )  + _m.multiply( 1,  7, 10 ) + _m.multiply( 5, 2, 11 ) - _m.multiply( 5, 3, 10 ) - _m.multiply(  9, 2,  7 ) + _m.multiply( 9,  3,  6 ) ) ;
+		_t[0] =          FloatBuffer.multiply( _m, 5, 10, 15 ) - FloatBuffer.multiply( _m, 5, 11, 14 ) - FloatBuffer.multiply( _m, 9, 6, 15 ) + FloatBuffer.multiply( _m, 9, 7, 14 ) + FloatBuffer.multiply( _m, 13, 6, 11 ) - FloatBuffer.multiply( _m, 13, 7, 10 ) ;
+		_t[1] = -_m[1] * FloatBuffer.multiply( _m, 10, 15 )    + FloatBuffer.multiply( _m, 1, 11, 14 ) + FloatBuffer.multiply( _m, 9, 2, 15 ) - FloatBuffer.multiply( _m, 9, 3, 14 ) - FloatBuffer.multiply( _m, 13, 2, 11 ) + FloatBuffer.multiply( _m, 13, 3, 10 ) ;
+		_t[2] =          FloatBuffer.multiply( _m, 1, 6, 15 )  - FloatBuffer.multiply( _m, 1,  7, 14 ) - FloatBuffer.multiply( _m, 5, 2, 15 ) + FloatBuffer.multiply( _m, 5, 3, 14 ) + FloatBuffer.multiply( _m, 13, 2,  7 ) - FloatBuffer.multiply( _m, 13, 3,  6 ) ;
+		_t[3] = -_m[1] * FloatBuffer.multiply( _m, 6, 11 )     + FloatBuffer.multiply( _m, 1,  7, 10 ) + FloatBuffer.multiply( _m, 5, 2, 11 ) - FloatBuffer.multiply( _m, 5, 3, 10 ) - FloatBuffer.multiply( _m,  9, 2,  7 ) + FloatBuffer.multiply( _m,  9, 3,  6 ) ;
 	}
 
-	private static void invertStage2( final FloatBuffer _t, final FloatBuffer _m )
+	private static void invertStage2( final float[] _t, final float[] _m )
 	{
-		_t.set(  4, -_m.get( 4 ) * _m.multiply( 10, 15 ) + _m.multiply( 4, 11, 14 ) + _m.multiply( 8, 6, 15 ) - _m.multiply( 8, 7, 14 ) - _m.multiply( 12, 6, 11 ) + _m.multiply( 12, 7, 10 ) ) ;
-		_t.set(  5,  _m.multiply( 0, 10, 15 )            - _m.multiply( 0, 11, 14 ) - _m.multiply( 8, 2, 15 ) + _m.multiply( 8, 3, 14 ) + _m.multiply( 12, 2, 11 ) - _m.multiply( 12, 3, 10 ) ) ;
-		_t.set(  6, -_m.get( 0 ) * _m.multiply(  6, 15 ) + _m.multiply( 0,  7, 14 ) + _m.multiply( 4, 2, 15 ) - _m.multiply( 4, 3, 14 ) - _m.multiply( 12, 2, 10 ) + _m.multiply( 12, 3,  6 ) ) ;
-		_t.set(  7,  _m.multiply( 0, 6, 11 )             - _m.multiply( 0, 10, 10 ) - _m.multiply( 4, 2, 11 ) + _m.multiply( 4, 3, 10 ) + _m.multiply(  8, 2, 10 ) - _m.multiply(  8, 3,  6 ) ) ;
+		_t[4] = -_m[4] * FloatBuffer.multiply( _m, 10, 15 ) + FloatBuffer.multiply( _m, 4, 11, 14 ) + FloatBuffer.multiply( _m, 8, 6, 15 ) - FloatBuffer.multiply( _m, 8, 7, 14 ) - FloatBuffer.multiply( _m, 12, 6, 11 ) + FloatBuffer.multiply( _m, 12, 7, 10 ) ;
+		_t[5] =  FloatBuffer.multiply( _m, 0, 10, 15 )      - FloatBuffer.multiply( _m, 0, 11, 14 ) - FloatBuffer.multiply( _m, 8, 2, 15 ) + FloatBuffer.multiply( _m, 8, 3, 14 ) + FloatBuffer.multiply( _m, 12, 2, 11 ) - FloatBuffer.multiply( _m, 12, 3, 10 ) ;
+		_t[6] = -_m[0] * FloatBuffer.multiply( _m, 6, 15 )  + FloatBuffer.multiply( _m, 0,  7, 14 ) + FloatBuffer.multiply( _m, 4, 2, 15 ) - FloatBuffer.multiply( _m, 4, 3, 14 ) - FloatBuffer.multiply( _m, 12, 2, 10 ) + FloatBuffer.multiply( _m, 12, 3,  6 ) ;
+		_t[7] = FloatBuffer.multiply( _m, 0, 6, 11 )        - FloatBuffer.multiply( _m, 0, 10, 10 ) - FloatBuffer.multiply( _m, 4, 2, 11 ) + FloatBuffer.multiply( _m, 4, 3, 10 ) + FloatBuffer.multiply( _m,  8, 2, 10 ) - FloatBuffer.multiply( _m,  8, 3,  6 ) ;
 	}
 
-	private static void invertStage3( final FloatBuffer _t, final FloatBuffer _m )
+	private static void invertStage3( final float[] _t, final float[] _m )
 	{
-		_t.set(  8,  _m.multiply( 4, 9, 15 )             - _m.multiply( 4, 11, 13 ) - _m.multiply( 8, 5, 15 ) + _m.multiply( 8, 10, 13 ) + _m.multiply( 12, 5, 11 ) - _m.multiply( 12, 10, 9 ) ) ;
-		_t.set(  9, -_m.get( 0 ) * _m.multiply(  9, 15 ) + _m.multiply( 0, 11, 13 ) + _m.multiply( 8, 1, 15 ) - _m.multiply( 8,  3, 13 ) - _m.multiply( 12, 1, 11 ) + _m.multiply( 12,  3, 9 ) ) ;
-		_t.set( 10,  _m.multiply( 0, 5, 15 )             - _m.multiply( 0, 10, 13 ) - _m.multiply( 4, 1, 15 ) + _m.multiply( 4,  3, 13 ) + _m.multiply( 12, 1, 10 ) - _m.multiply( 12,  3, 5 ) ) ;
-		_t.set( 11, -_m.get( 0 ) * _m.multiply(  5, 11 ) + _m.multiply( 0, 10,  9 ) + _m.multiply( 4, 1, 11 ) - _m.multiply( 4,  3,  9 ) - _m.multiply(  8, 1, 10 ) + _m.multiply(  8,  3, 5 ) ) ;
+		_t[8]  =          FloatBuffer.multiply( _m, 4, 9, 15 ) - FloatBuffer.multiply( _m, 4, 11, 13 ) - FloatBuffer.multiply( _m, 8, 5, 15 ) + FloatBuffer.multiply( _m, 8, 10, 13 ) + FloatBuffer.multiply( _m, 12, 5, 11 ) - FloatBuffer.multiply( _m, 12, 10, 9 ) ;
+		_t[9]  = -_m[0] * FloatBuffer.multiply( _m, 9, 15 )    + FloatBuffer.multiply( _m, 0, 11, 13 ) + FloatBuffer.multiply( _m, 8, 1, 15 ) - FloatBuffer.multiply( _m, 8,  3, 13 ) - FloatBuffer.multiply( _m, 12, 1, 11 ) + FloatBuffer.multiply( _m, 12,  3, 9 ) ;
+		_t[10] =          FloatBuffer.multiply( _m, 0, 5, 15 ) - FloatBuffer.multiply( _m, 0, 10, 13 ) - FloatBuffer.multiply( _m, 4, 1, 15 ) + FloatBuffer.multiply( _m, 4,  3, 13 ) + FloatBuffer.multiply( _m, 12, 1, 10 ) - FloatBuffer.multiply( _m, 12,  3, 5 ) ;
+		_t[11] = -_m[0] * FloatBuffer.multiply( _m, 5, 11 )    + FloatBuffer.multiply( _m, 0, 10,  9 ) + FloatBuffer.multiply( _m, 4, 1, 11 ) - FloatBuffer.multiply( _m, 4,  3,  9 ) - FloatBuffer.multiply(  _m, 8, 1, 10 ) + FloatBuffer.multiply(  _m, 8,  3, 5 ) ;
 	}
 
-	private static void invertStage4( final FloatBuffer _t, final FloatBuffer _m )
+	private static void invertStage4( final float[] _t, final float[] _m )
 	{
-		_t.set( 12, -_m.get( 4 ) * _m.multiply(  9, 14 ) + _m.multiply( 4, 10, 13 ) + _m.multiply( 8, 5, 14 ) - _m.multiply( 8, 6, 13 ) - _m.multiply( 12, 5, 10 ) + _m.multiply( 12, 6, 9 ) ) ;
-		_t.set( 13,  _m.multiply( 0, 9, 14 )             - _m.multiply( 0, 10, 13 ) - _m.multiply( 8, 1, 14 ) + _m.multiply( 8, 2, 13 ) + _m.multiply( 12, 1, 10 ) - _m.multiply( 12, 2, 9 ) ) ;
-		_t.set( 14, -_m.get( 0 ) * _m.multiply(  5, 14 ) + _m.multiply( 0,  6, 13 ) + _m.multiply( 4, 1, 14 ) - _m.multiply( 4, 2, 13 ) - _m.multiply( 12, 1,  6 ) + _m.multiply( 12, 2, 5 ) ) ;
-		_t.set( 15,  _m.multiply( 0, 5, 10 )             - _m.multiply( 0,  6,  9 ) - _m.multiply( 4, 1, 10 ) + _m.multiply( 4, 2,  9 ) + _m.multiply(  8, 1,  6 ) - _m.multiply(  8, 2, 5 ) ) ;
+		_t[12] = -_m[4] * FloatBuffer.multiply( _m, 9, 14 )    + FloatBuffer.multiply( _m, 4, 10, 13 ) + FloatBuffer.multiply( _m, 8, 5, 14 ) - FloatBuffer.multiply( _m, 8, 6, 13 ) - FloatBuffer.multiply( _m, 12, 5, 10 ) + FloatBuffer.multiply( _m, 12, 6, 9 ) ;
+		_t[13] =          FloatBuffer.multiply( _m, 0, 9, 14 ) - FloatBuffer.multiply( _m, 0, 10, 13 ) - FloatBuffer.multiply( _m, 8, 1, 14 ) + FloatBuffer.multiply( _m, 8, 2, 13 ) + FloatBuffer.multiply( _m, 12, 1, 10 ) - FloatBuffer.multiply( _m, 12, 2, 9 ) ;
+		_t[14] = -_m[0] * FloatBuffer.multiply( _m, 5, 14 )    + FloatBuffer.multiply( _m, 0,  6, 13 ) + FloatBuffer.multiply( _m, 4, 1, 14 ) - FloatBuffer.multiply( _m, 4, 2, 13 ) - FloatBuffer.multiply( _m, 12, 1,  6 ) + FloatBuffer.multiply( _m, 12, 2, 5 ) ;
+		_t[15] =          FloatBuffer.multiply( _m, 0, 5, 10 ) - FloatBuffer.multiply( _m, 0,  6,  9 ) - FloatBuffer.multiply( _m, 4, 1, 10 ) + FloatBuffer.multiply( _m, 4, 2,  9 ) + FloatBuffer.multiply( _m,  8, 1,  6 ) - FloatBuffer.multiply( _m,  8, 2, 5 ) ;
 	}
 
-	private static void invertStage5( final FloatBuffer _t, final FloatBuffer _m )
+	private static void invertStage5( final float[] _t, final float[] _m )
 	{
-		final float d = _m.multiply( 0, _t, 0 ) + _m.multiply( 4, _t, 1 ) + _m.multiply( 8, _t, 2 ) + _m.multiply( 12, _t, 3 ) ;
-		final int size = _t.size() ;
-		for( int i = 0; i < size; ++i )
+		final float d = FloatBuffer.multiply( _m, 0, _t, 0 ) + FloatBuffer.multiply( _m, 4, _t, 1 ) + FloatBuffer.multiply( _m, 8, _t, 2 ) + FloatBuffer.multiply( _m, 12, _t, 3 ) ;
+		for( int i = 0; i < _t.length; ++i )
 		{
-			_t.divide( i, d ) ;
+			FloatBuffer.divide( _t, i, d ) ;
 		}
 	}
 
 	public void transpose()
 	{
-		matrix.swap( 1, 4 ) ;
-		matrix.swap( 2, 8 ) ;
-		matrix.swap( 3, 12 ) ;
-		matrix.swap( 6, 9 ) ;
-		matrix.swap( 7, 13 ) ;
-		matrix.swap( 11, 14 ) ;
+		FloatBuffer.swap( matrix, 1, 4 ) ;
+		FloatBuffer.swap( matrix, 2, 8 ) ;
+		FloatBuffer.swap( matrix, 3, 12 ) ;
+		FloatBuffer.swap( matrix, 6, 9 ) ;
+		FloatBuffer.swap( matrix, 7, 13 ) ;
+		FloatBuffer.swap( matrix, 11, 14 ) ;
 	}
 
 	@Override
@@ -297,33 +296,33 @@ public class Matrix4 implements Cacheable
 
 	public String toString()
 	{
-		final String row1 = "[" + matrix.get( 0 ) +  "|" + matrix.get( 1 ) +  "|" + matrix.get( 2 )  +  "|" + matrix.get( 3 )  + "]\n" ;
-		final String row2 = "[" + matrix.get( 4 ) +  "|" + matrix.get( 5 ) +  "|" + matrix.get( 6 )  +  "|" + matrix.get( 7 )  + "]\n" ;
-		final String row3 = "[" + matrix.get( 8 ) +  "|" + matrix.get( 9 ) +  "|" + matrix.get( 10 )  + "|" + matrix.get( 11 ) + "]\n" ;
-		final String row4 = "[" + matrix.get( 12 ) + "|" + matrix.get( 13 ) + "|" + matrix.get( 14 )  + "|" + matrix.get( 15 ) + "]" ;
+		final String row1 = "[" + matrix[0] +  "|" + matrix[1] +  "|" + matrix[2]  +  "|" + matrix[3]  + "]\n" ;
+		final String row2 = "[" + matrix[4] +  "|" + matrix[5] +  "|" + matrix[6]  +  "|" + matrix[7]  + "]\n" ;
+		final String row3 = "[" + matrix[8] +  "|" + matrix[9] +  "|" + matrix[10]  + "|" + matrix[11] + "]\n" ;
+		final String row4 = "[" + matrix[12] + "|" + matrix[13] + "|" + matrix[14]  + "|" + matrix[15] + "]" ;
 		return row1 + row2 + row3 + row4 ;
 	}
 
 	private void setRow( final float _val1, final float _val2, final float _val3, final float _val4, final int _row )
 	{
 		final int offset = _row * 4 ;
-		matrix.set( offset + 0, _val1 ) ;
-		matrix.set( offset + 1, _val2 ) ;
-		matrix.set( offset + 2, _val3 ) ;
-		matrix.set( offset + 3, _val4 ) ;
+		matrix[offset + 0] = _val1 ;
+		matrix[offset + 1] = _val2 ;
+		matrix[offset + 2] = _val3 ;
+		matrix[offset + 3] = _val4 ;
 	}
 
 	private void setColumn( final float _val1, final float _val2, final float _val3, final float _val4, final int _col )
 	{
-		matrix.set( ( 0 * 4 ) + _col, _val1 ) ;		// Optimise 0 * 4 = 0
-		matrix.set( ( 1 * 4 ) + _col, _val2 ) ;		// Optimise 1 * 4 = 4
-		matrix.set( ( 2 * 4 ) + _col, _val3 ) ;		// Optimise 2 * 4 = 8
-		matrix.set( ( 3 * 4 ) + _col, _val4 ) ;		// Optimise 3 * 4 = 12
+		matrix[( 0 * 4 ) + _col] = _val1 ;		// Optimise 0 * 4 = 0
+		matrix[( 1 * 4 ) + _col] = _val2 ;		// Optimise 1 * 4 = 4
+		matrix[( 2 * 4 ) + _col] = _val3 ;		// Optimise 2 * 4 = 8
+		matrix[( 3 * 4 ) + _col] = _val4 ;		// Optimise 3 * 4 = 12
 	}
 
 	private void set( final float _val, final int _row, final int _col )
 	{
-		matrix.set( ( _row * 4 ) + _col, _val ) ;
+		matrix[( _row * 4 ) + _col] = _val ;
 	}
 
 	private static Matrix4 createTempIdentity()
@@ -366,12 +365,12 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
-		final FloatBuffer m = _b.matrix ;
-		_result.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
-						m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
-						m.multiply( 8, _a.x ) + m.multiply( 9, _a.y ) + m.multiply( 10, _a.z ) + m.multiply( 11, 1.0f ) ) ;
+		final float[] m = _b.matrix ;
+		_result.setXYZ( FloatBuffer.multiply( m, 0, _a.x ) + FloatBuffer.multiply( m, 1, _a.y ) + FloatBuffer.multiply( m,  2, _a.z ) + FloatBuffer.multiply( m,  3, 1.0f ),
+						FloatBuffer.multiply( m, 4, _a.x ) + FloatBuffer.multiply( m, 5, _a.y ) + FloatBuffer.multiply( m,  6, _a.z ) + FloatBuffer.multiply( m,  7, 1.0f ),
+						FloatBuffer.multiply( m, 8, _a.x ) + FloatBuffer.multiply( m, 9, _a.y ) + FloatBuffer.multiply( m, 10, _a.z ) + FloatBuffer.multiply( m, 11, 1.0f ) ) ;
 
-		final float w = m.multiply( 12, _a.x ) + m.multiply( 13, _a.y ) + m.multiply( 14, _a.z ) + m.multiply( 15, 1.0f ) ;
+		final float w = FloatBuffer.multiply( m, 12, _a.x ) + FloatBuffer.multiply( m, 13, _a.y ) + FloatBuffer.multiply( m, 14, _a.z ) + FloatBuffer.multiply( m, 15, 1.0f ) ;
 		_result.divide( w ) ;
 
 		return _result ;
@@ -382,17 +381,17 @@ public class Matrix4 implements Cacheable
 	*/
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
 	{
-		final FloatBuffer m = _b.matrix ;
-		final float w = m.multiply( 12, _a.x ) + m.multiply( 13, _a.y ) + m.multiply( 14, _a.z ) + m.multiply( 15, 1.0f ) ;
-		_a.setXYZ( m.multiply( 0, _a.x ) + m.multiply( 1, _a.y ) + m.multiply(  2, _a.z ) + m.multiply(  3, 1.0f ),
-				   m.multiply( 4, _a.x ) + m.multiply( 5, _a.y ) + m.multiply(  6, _a.z ) + m.multiply(  7, 1.0f ),
-				   m.multiply( 8, _a.x ) + m.multiply( 9, _a.y ) + m.multiply( 10, _a.z ) + m.multiply( 11, 1.0f ) ) ;
+		final float[] m = _b.matrix ;
+		final float w = FloatBuffer.multiply( m, 12, _a.x ) + FloatBuffer.multiply( m, 13, _a.y ) + FloatBuffer.multiply( m, 14, _a.z ) + FloatBuffer.multiply( m, 15, 1.0f ) ;
+		_a.setXYZ( FloatBuffer.multiply( m, 0, _a.x ) + FloatBuffer.multiply( m, 1, _a.y ) + FloatBuffer.multiply( m,  2, _a.z ) + FloatBuffer.multiply( m,  3, 1.0f ),
+				   FloatBuffer.multiply( m, 4, _a.x ) + FloatBuffer.multiply( m, 5, _a.y ) + FloatBuffer.multiply( m,  6, _a.z ) + FloatBuffer.multiply( m,  7, 1.0f ),
+				   FloatBuffer.multiply( m, 8, _a.x ) + FloatBuffer.multiply( m, 9, _a.y ) + FloatBuffer.multiply( m, 10, _a.z ) + FloatBuffer.multiply( m, 11, 1.0f ) ) ;
 
 		_a.divide( w ) ;
 		return _a ;
 	}
 
-	private static void copy( final FloatBuffer _from, final FloatBuffer _to )
+	private static void copy( final float[] _from, final float[] _to )
 	{
 		FloatBuffer.copy( _from, _to ) ;
 	}

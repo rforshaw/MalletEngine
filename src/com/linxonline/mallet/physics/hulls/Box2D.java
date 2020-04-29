@@ -1,6 +1,7 @@
 package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.primitives.AABB ;
@@ -37,13 +38,14 @@ public class Box2D extends Hull
 	}
 
 	@Override
-	public Vector2[] getAxes()
+	public float[] getAxes()
 	{
 		obb.updateAxesAndEdges() ;
 		return obb.axes ;
 	}
 
-	public Vector2[] getPoints()
+	@Override
+	public float[] getPoints()
 	{
 		return obb.points ;
 	}
@@ -57,13 +59,17 @@ public class Box2D extends Hull
 	@Override
 	public float projectToAxis( final Vector2 _axis )
 	{
-		float dp = Vector2.dot( obb.points[0], _axis ) ;
+		final Vector2 point = new Vector2() ;
+		FloatBuffer.fill( obb.points, point, 0 ) ;
+		float dp = Vector2.dot( point, _axis ) ;
+
 		float max = dp ;
 		float min = dp ;
 
-		for( int i = 1; i < obb.points.length; ++i )
+		for( int i = 2; i < obb.points.length; i += 2 )
 		{
-			dp = Vector2.dot( obb.points[i], _axis ) ;
+			FloatBuffer.fill( obb.points, point, i ) ;
+			dp = Vector2.dot( point, _axis ) ;
 			if( dp > max )
 			{
 				max = dp ;

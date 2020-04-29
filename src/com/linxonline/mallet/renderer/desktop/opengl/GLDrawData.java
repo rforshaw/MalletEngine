@@ -19,7 +19,6 @@ public class GLDrawData extends DrawData<GLDrawData, GLProgram>
 	private Mode mode = Mode.BASIC ;
 	private int endOrder = 0 ;
 
-	private Matrix4 drawMatrix = new Matrix4() ;
 	private Shape drawShape    = null ;
 
 	public GLDrawData()
@@ -58,16 +57,6 @@ public class GLDrawData extends DrawData<GLDrawData, GLProgram>
 	public Shape getDrawShape()
 	{
 		return drawShape ;
-	}
-
-	public void setDrawMatrix( final Matrix4 _matrix )
-	{
-		drawMatrix = _matrix ;
-	}
-
-	public Matrix4 getDrawMatrix()
-	{
-		return drawMatrix ;
 	}
 
 	public void setEndOrder( final int _order )
@@ -109,7 +98,6 @@ public class GLDrawData extends DrawData<GLDrawData, GLProgram>
 		super.reset() ;
 		setMode( Mode.BASIC ) ;
 		setNewLocation( null ) ;
-		setDrawMatrix( null ) ;
 		setDrawShape( null ) ;
 	}
 

@@ -150,8 +150,8 @@ public class Shape
 
 	private final Swivel[] swivel ;
 	private final int swivelFloatSize ;
-	private final FloatBuffer verticies ;
-	private final IntegerBuffer indicies ;
+	private final float[] verticies ;
+	private final int[] indicies ;
 
 	private Style style = Style.LINE_STRIP ;
 
@@ -214,12 +214,12 @@ public class Shape
 	*/
 	public void addIndex( final int _index )
 	{
-		indicies.set( indexIncrement++, _index ) ;
+		indicies[indexIncrement++] = _index ;
 	}
 
 	public int getIndex( final int _index )
 	{
-		return indicies.get( _index ) ;
+		return indicies[_index] ;
 	}
 
 	/**
@@ -241,20 +241,20 @@ public class Shape
 				case NORMAL :
 				{
 					final Vector3 point = ( Vector3 )_vertex[i] ;
-					verticies.set( vertexIncrement, point ) ;
+					FloatBuffer.set( verticies, vertexIncrement, point ) ;
 					vertexIncrement += 3 ;
 					break ;
 				}
 				case COLOUR :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
-					verticies.set( vertexIncrement++, colour.toFloat() ) ;
+					verticies[vertexIncrement++] = colour.toFloat() ;
 					break ;
 				}
 				case UV     :
 				{
 					final Vector2 uv = ( Vector2 )_vertex[i] ;
-					verticies.set( vertexIncrement, uv ) ;
+					FloatBuffer.set( verticies, vertexIncrement, uv ) ;
 					vertexIncrement += 2 ;
 					break ;
 				}
@@ -282,19 +282,19 @@ public class Shape
 				case POINT  :
 				case NORMAL :
 				{
-					verticies.fill( ( Vector3 )_vertex[i], start ) ;
+					FloatBuffer.fill( verticies, ( Vector3 )_vertex[i], start ) ;
 					start += 3 ;
 					break ;
 				}
 				case COLOUR :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
-					colour.changeColour( verticies.get( start++ ) ) ;
+					colour.changeColour( verticies[start++] ) ;
 					break ;
 				}
 				case UV     :
 				{
-					verticies.fill( ( Vector2 )_vertex[i], start ) ;
+					FloatBuffer.fill( verticies, ( Vector2 )_vertex[i], start ) ;
 					start += 2 ;
 					break ;
 				}
@@ -328,7 +328,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		verticies.set( start, _x, _y, _z ) ;
+		FloatBuffer.set( verticies, start, _x, _y, _z ) ;
 	}
 
 	/**
@@ -356,7 +356,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		return verticies.fill( _point, start ) ;
+		return FloatBuffer.fill( verticies, _point, start ) ;
 	}
 
 	/**
@@ -383,7 +383,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		verticies.set( start, _x, _y ) ;
+		FloatBuffer.set( verticies, start, _x, _y ) ;
 	}
 
 	/**
@@ -411,7 +411,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		return verticies.fill( _uv, start ) ;
+		return FloatBuffer.fill( verticies, _uv, start ) ;
 	}
 
 	/**
@@ -426,7 +426,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		return verticies.get( start ) ;
+		return verticies[start] ;
 	}
 
 	/**
@@ -441,7 +441,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		verticies.set( start, _colour.toFloat() ) ;
+		verticies[start] = _colour.toFloat() ;
 	}
 
 	/**
@@ -469,7 +469,7 @@ public class Shape
 		final int offset = Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * swivelFloatSize ) + offset ;
 
-		_colour.changeColour( verticies.get( start ) ) ;
+		_colour.changeColour( verticies[start] ) ;
 		return _colour ;
 	}
 
@@ -494,7 +494,7 @@ public class Shape
 
 	public int getIndexSize()
 	{
-		return indicies.size() ;
+		return indicies.length ;
 	}
 
 	public int getVertexSize()
@@ -508,7 +508,7 @@ public class Shape
 	*/
 	public boolean isComplete()
 	{
-		return indexIncrement == indicies.size() && vertexIncrement == verticies.size() ;
+		return indexIncrement == indicies.length && vertexIncrement == verticies.length ;
 	}
 
 	/**

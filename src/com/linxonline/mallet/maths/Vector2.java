@@ -192,6 +192,11 @@ public class Vector2
 		return new Vector2( _vec1.x / _vec2.x, _vec1.y / _vec2.y ) ;
 	}
 
+	public static final float length( final float _x, final float _y )
+	{
+		return ( float )Math.sqrt( ( _x * _x ) + ( _y * _y ) ) ;
+	}
+
 	public static final boolean compare( final Vector2 _a, final Vector2 _b )
 	{
 		return ( Float.compare( _a.x, _b.x ) == 0 ) && ( Float.compare( _a.y, _b.y ) == 0 ) ;

@@ -24,12 +24,13 @@ public class Circle2D extends Hull
 	}
 	
 	@Override
-	public Vector2[] getAxes()
+	public float[] getAxes()
 	{
 		return null ;
 	}
 
-	public Vector2[] getPoints()
+	@Override
+	public float[] getPoints()
 	{
 		return null ;
 	}

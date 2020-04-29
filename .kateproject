@@ -1,4 +1,5 @@
 {
-  "name": "MalletEngine"
-, "files": [ { "git": 1 } ]
+  "name": "MalletEngine",
+  "index": true,
+  "files": [ { "git": 1 } ]
 }

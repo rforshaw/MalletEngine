@@ -348,7 +348,7 @@ public final class GameTestLoader implements IGameLoader
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 				ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
-				final Entity entity = new Entity( amount + 1, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
 
 				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
 				final List<Draw> draws = MalletList.<Draw>newList( amount ) ;
@@ -358,11 +358,12 @@ public final class GameTestLoader implements IGameLoader
 					public void update( final float _dt )
 					{
 						super.update( _dt ) ;
-						final int size = hulls.size() ;
+						final int size = draws.size() ;
 						for( int i = 0; i < size; ++i )
 						{
 							final Hull hull = hulls.get( i ) ;
 							final Draw draw = draws.get( i ) ;
+							DrawAssist.forceUpdate( draw ) ;
 
 							final Vector2 pos = hull.getPosition() ;
 							DrawAssist.amendPosition( draw, pos.x, pos.y, 0.0f ) ;
@@ -384,7 +385,7 @@ public final class GameTestLoader implements IGameLoader
 																						new Vector2( x, y ),
 																						new Vector2( -32, -32 ) ) ;
 						final Hull hull = coll.hull ;
-						final Vector2 position = hull.getPosition() ;
+						final Vector2 position = new Vector2( x, y ) ;
 
 						final Vector3 offset = new Vector3( -32, -32, 0 ) ;
 						final Draw draw = DrawAssist.createDraw( new Vector3( position ),

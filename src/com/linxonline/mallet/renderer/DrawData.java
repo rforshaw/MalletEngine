@@ -27,9 +27,9 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	private Vector3 offset ;
 	// Each contain Position, Rotation, and Scale
-	private final FloatBuffer old = FloatBuffer.allocate( 9 ) ;
-	private final FloatBuffer present = FloatBuffer.allocate( 9 ) ;
-	private final FloatBuffer future = FloatBuffer.allocate( 9 ) ;
+	private final float[] old = FloatBuffer.allocate( 9 ) ;
+	private final float[] present = FloatBuffer.allocate( 9 ) ;
+	private final float[] future = FloatBuffer.allocate( 9 ) ;
 
 	public DrawData()
 	{
@@ -56,9 +56,9 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 		offset   = ( _offset != null )   ? _offset   : new Vector3() ;
 
-		future.set( POSITION, ( _position != null ) ? _position : new Vector3()  ) ;
-		future.set( ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
-		future.set( SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
+		FloatBuffer.set( future, POSITION, ( _position != null ) ? _position : new Vector3()  ) ;
+		FloatBuffer.set( future, ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
+		FloatBuffer.set( future, SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
 	}
 
 	public void setProgram( final ProgramMap<P> _program )
@@ -135,7 +135,7 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		future.set( POSITION, _x, _y, _z ) ;
+		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
@@ -145,12 +145,12 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
-		future.set( ROTATION, _x, _y, _z ) ;
+		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )
 	{
-		future.set( SCALE, _x, _y, _z ) ;
+		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
 	}
 
 	public void setUpdateType( final UpdateType _type )
@@ -180,7 +180,7 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public Vector3 getPosition( final Vector3 _fill )
 	{
-		return present.fill( _fill, POSITION ) ;
+		return FloatBuffer.fill( present, _fill, POSITION ) ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )
@@ -191,12 +191,12 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public Vector3 getRotation( final Vector3 _fill )
 	{
-		return present.fill( _fill, ROTATION ) ;
+		return FloatBuffer.fill( present, _fill, ROTATION ) ;
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
 	{
-		return present.fill( _fill, SCALE ) ;
+		return FloatBuffer.fill( present, _fill, SCALE ) ;
 	}
 
 	/**
@@ -223,7 +223,7 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 		}
 	}
 
-	private void interpolate( final FloatBuffer _future, final FloatBuffer _past, final FloatBuffer _present, final int _diff, final int _iteration )
+	private void interpolate( final float[] _future, final float[] _past, final float[] _present, final int _diff, final int _iteration )
 	{
 		if( Interpolate.linear( _future, _past, _present, _diff, _iteration ) )
 		{

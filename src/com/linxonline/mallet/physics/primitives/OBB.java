@@ -2,63 +2,73 @@ package com.linxonline.mallet.physics.primitives ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public class OBB
 {
 	public static final int TOP_LEFT = 0 ;
-	public static final int TOP_RIGHT = 1 ;
-	public static final int BOTTOM_LEFT = 2 ;
-	public static final int BOTTOM_RIGHT = 3 ;
+	public static final int TOP_RIGHT = 2 ;
+	public static final int BOTTOM_LEFT = 4 ;
+	public static final int BOTTOM_RIGHT = 6 ;
 
-	public float rotation = 0.0f ;
-	public Vector2 position = new Vector2() ;
-	public Vector2 offset = new Vector2() ;
+	public static final int POINT_NUM = 4 ;
+	public static final int AXES_NUM = 2 ;
+	public static final int VECTOR_TYPE = 2 ;
 
-	public Vector2[] points = new Vector2[4] ;
-	public Vector2[] axes = new Vector2[2] ;
+	public static final int POSITION_X = 0 ;
+	public static final int POSITION_Y = 1 ;
+	public static final int OFFSET_X = 2 ;
+	public static final int OFFSET_Y = 3 ;
+	public static final int ROTATION = 4 ;
+
+	public float[] position = new float[( 2 * VECTOR_TYPE ) + 1] ;
+	public float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
+	public float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
 
 	public OBB()
 	{
-		points[TOP_LEFT] = new Vector2() ;
-		points[TOP_RIGHT] = new Vector2() ;
-		points[BOTTOM_LEFT] = new Vector2() ;
-		points[BOTTOM_RIGHT] = new Vector2() ;
+		FloatBuffer.set( points, TOP_LEFT, 0.0f, 0.0f ) ;
+		FloatBuffer.set( points, TOP_RIGHT, 0.0f, 0.0f ) ;
+		FloatBuffer.set( points, BOTTOM_LEFT, 0.0f, 0.0f ) ;
+		FloatBuffer.set( points, BOTTOM_RIGHT, 0.0f, 0.0f ) ;
 		init() ;
 	}
 
 	public OBB( final AABB _aabb )
 	{
-		points[TOP_LEFT] = new Vector2( _aabb.min.x, _aabb.min.y ) ;
-		points[TOP_RIGHT] = new Vector2( _aabb.max.x, _aabb.min.y ) ;
-		points[BOTTOM_LEFT] = new Vector2( _aabb.min.x, _aabb.max.y ) ;
-		points[BOTTOM_RIGHT] = new Vector2( _aabb.max.x, _aabb.max.y ) ;
-		offset.setXY( _aabb.offset ) ;
+		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],       _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],       _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],       _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],       _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X], _aabb.position[AABB.OFFSET_Y] ) ;
 		init() ;
 	}
 
-	public OBB( final Vector2 _topLeft, final Vector2 _topRight, 
-				final Vector2 _bottomLeft, final Vector2 _bottomRight )
+	public OBB( final Vector2 _topLeft,
+				final Vector2 _topRight, 
+				final Vector2 _bottomLeft,
+				final Vector2 _bottomRight )
 	{
-		points[TOP_LEFT] = _topLeft ;
-		points[TOP_RIGHT] = _topRight ;
-		points[BOTTOM_LEFT] = _bottomLeft ;
-		points[BOTTOM_RIGHT] = _bottomRight ;
+		FloatBuffer.set( points, OBB.TOP_LEFT, _topLeft.x, _topLeft.y ) ;
+		FloatBuffer.set( points, OBB.TOP_RIGHT, _topRight.x, _topRight.y ) ;
+		FloatBuffer.set( points, OBB.BOTTOM_LEFT, _bottomLeft.x, _bottomLeft.y ) ;
+		FloatBuffer.set( points, OBB.BOTTOM_RIGHT, _bottomRight.x, _bottomRight.y ) ;
 		init() ;
 	}
 
 	public void setPosition( final float _x, final float _y )
 	{
-		position.setXY( _x, _y ) ;
+		FloatBuffer.set( position, OBB.POSITION_X, _x, _y ) ;
 	}
 	
 	public void translate( final float _x, final float _y )
 	{
-		position.add( _x, _y ) ;
+		FloatBuffer.add( position, OBB.POSITION_X, _x, _y ) ;
 	}
 
 	public void setOffset( final float _x, final float _y )
 	{
-		offset.setXY( _x, _y ) ;
+		FloatBuffer.set( position, OBB.OFFSET_X, _x, _y ) ;
 	}
 
 	/**
@@ -67,13 +77,8 @@ public class OBB
 	**/
 	public void setFromOBB( final OBB _obb )
 	{
-		position.setXY( _obb.position.x, _obb.position.y ) ;
-		offset.setXY( _obb.offset.x, _obb.offset.y ) ;
-		for( int i = 0; i < points.length; ++i )
-		{
-			points[i].setXY( _obb.points[i].x, _obb.points[i].y ) ;
-			axes[i].setXY( _obb.axes[i].x, _obb.axes[i].y ) ;
-		}
+		FloatBuffer.copy( _obb.position, position ) ;
+		setDimensionsFromOBB( _obb ) ;
 	}
 
 	/**
@@ -82,11 +87,8 @@ public class OBB
 	**/
 	public void setDimensionsFromOBB( final OBB _obb )
 	{
-		for( int i = 0; i < points.length; ++i )
-		{
-			points[i].setXY( _obb.points[i].x, _obb.points[i].y ) ;
-			axes[i].setXY( _obb.axes[i].x, _obb.axes[i].y ) ;
-		}
+		FloatBuffer.copy( points, _obb.points ) ;
+		FloatBuffer.copy( axes, _obb.axes ) ;
 	}
 
 	/**
@@ -96,21 +98,22 @@ public class OBB
 	**/
 	public Vector2 getAbsolutePoint( final int _index )
 	{
-		final float x = position.x + offset.x + points[_index].x ;
-		final float y = position.y + offset.y + points[_index].y ;
-		return new Vector2( x, y ) ;
+		final Vector2 result = FloatBuffer.fill( points, new Vector2(), _index ) ;
+		result.add( position[OBB.POSITION_X] + position[OBB.OFFSET_X],
+					position[OBB.POSITION_Y] + position[OBB.OFFSET_Y] ) ;
+		return result ;
 	}
 
 	public Vector2 getCenter( final Vector2 _center )
 	{
-		_center.setXY( position ) ;
-		_center.add( offset ) ;
+		_center.setXY( position[OBB.POSITION_X], position[OBB.POSITION_Y] ) ;
+		_center.add( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
 		return _center ;
 	}
 
 	public Vector2 getCenter()
 	{
-		return getCenter( new Vector2() ) ;//Vector2.add( position, offset ) ;
+		return getCenter( new Vector2() ) ;
 	}
 
 	/**
@@ -118,47 +121,43 @@ public class OBB
 	**/
 	public final void setRotation( final float _theta )
 	{
-		final float diff = _theta - rotation ;
+		final float diff = _theta - position[OBB.ROTATION] ;
 		final float cosAngle = ( float )Math.cos( diff ) ;
 		final float sinAngle = ( float )Math.sin( diff ) ;
-		rotation = _theta ;
+		position[OBB.ROTATION] = _theta ;
 
-		Vector2 point = null ;
-		for( int i = 0; i < points.length; ++i )
+		for( int i = 0; i < points.length; i += 2 )
 		{
-			point = points[i] ;
-			final float x = point.x + offset.x ;
-			final float y = point.y + offset.y ;
-			
-			final float x2 = ( x * cosAngle ) - ( y * sinAngle ) - offset.x ;
-			final float y2 = ( y * cosAngle ) + ( x * sinAngle ) - offset.y ;
-			point.setXY( x2, y2 ) ;
+			float x = points[i + 0] + position[OBB.OFFSET_X] ;
+			float y = points[i + 1] + position[OBB.OFFSET_Y] ;
+
+			x = ( x * cosAngle ) - ( y * sinAngle ) - position[OBB.OFFSET_X] ;
+			y = ( y * cosAngle ) + ( x * sinAngle ) - position[OBB.OFFSET_Y] ;
+
+			points[i + 0] = x ;
+			points[i + 1] = y ;
 		}
 	}
 
 	public final void updateAxesAndEdges()
 	{
-		axes[0].y = points[TOP_RIGHT].x - points[TOP_LEFT].x ;
-		axes[0].x = -( points[TOP_RIGHT].y - points[TOP_LEFT].y ) ;
-		axes[0].normalise() ;
+		axes[1] = points[OBB.TOP_RIGHT] - points[OBB.TOP_LEFT] ;					// x
+		axes[0] = -( points[OBB.TOP_RIGHT + 1] - points[OBB.TOP_LEFT + 1] ) ;		// y
 
-		axes[1].y = points[TOP_RIGHT].x - points[BOTTOM_RIGHT].x ;
-		axes[1].x = -( points[TOP_RIGHT].y - points[BOTTOM_RIGHT].y ) ;
-		axes[1].normalise() ;
+		float length = Vector2.length( axes[0], axes[1] ) ;
+		axes[0] /= length ;
+		axes[1] /= length ;
+
+		axes[3] = points[OBB.TOP_RIGHT] - points[OBB.BOTTOM_RIGHT] ;				// x
+		axes[2] = -( points[OBB.TOP_RIGHT + 1] - points[OBB.BOTTOM_RIGHT + 1] ) ;	// y
+
+		length = Vector2.length( axes[2], axes[3] ) ;
+		axes[2] /= length ;
+		axes[3] /= length ;
 	}
 
 	private final void init()
 	{
-		final Vector2 point = new Vector2() ;
-
-		point.x = points[TOP_RIGHT].x - points[TOP_LEFT].x ;
-		point.y = points[TOP_RIGHT].y - points[TOP_LEFT].y ;
-		axes[0] = new Vector2( point.y, -point.x ) ;
-		axes[0].normalise() ;
-
-		point.x = points[TOP_RIGHT].x - points[BOTTOM_RIGHT].x ;
-		point.y = points[TOP_RIGHT].y - points[BOTTOM_RIGHT].y ;
-		axes[1] = new Vector2( point.y, -point.x ) ;
-		axes[1].normalise() ;
+		updateAxesAndEdges() ;
 	}
 }

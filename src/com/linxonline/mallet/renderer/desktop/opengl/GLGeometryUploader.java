@@ -169,8 +169,7 @@ public class GLGeometryUploader
 
 			MGL.glUseProgram( glProgram.id[0] ) ;
 
-			final com.linxonline.mallet.util.buffers.FloatBuffer buffer = ( ui == false ) ? _world.matrix : _ui.matrix ;
-			final float[] matrix = buffer.getArray() ;
+			final float[] matrix = ( ui == false ) ? _world.matrix : _ui.matrix ;
 
 			MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
 			glProgram.loadUniforms( program ) ;
@@ -200,7 +199,7 @@ public class GLGeometryUploader
 			final int verticiesLengthBytes = verticies.length * VBO_VAR_BYTE_SIZE ;
 			MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, startBytes, verticiesLengthBytes, vertexBuffer ) ;
 		}
-		
+
 		public abstract void upload( final Location<BufferObject, GLDrawData> _location ) ;
 
 		public void setIndexLength( final int _indexLengthInBytes )
@@ -320,7 +319,12 @@ public class GLGeometryUploader
 		private final Vector2 uv = new Vector2() ;
 		private final Vector3 point = new Vector3() ;
 		private final Vector3 temp = new Vector3() ;
-	
+
+		private final Matrix4 matrix = new Matrix4() ;
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
+		private final Vector3 rotation = new Vector3() ;
+
 		public BasicObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
@@ -333,8 +337,19 @@ public class GLGeometryUploader
 			final GLDrawData draw = _location.getLocationData() ;
 			final Shape shape = draw.getDrawShape() ;
 
+			draw.getPosition( position ) ;
+			draw.getOffset( offset ) ;
+			draw.getRotation( rotation ) ;
+
+			matrix.setIdentity() ;
+			matrix.setTranslate( position.x, position.y, 0.0f ) ;
+			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
+			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
+			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
+			matrix.translate( offset.x, offset.y, offset.z ) ;
+
 			uploadIndex( _location, shape ) ;
-			uploadVBO( _location, shape, draw.getDrawMatrix() ) ;
+			uploadVBO( _location, shape, matrix ) ;
 
 			dirty = true ;
 		}
@@ -417,7 +432,10 @@ public class GLGeometryUploader
 		private final MalletFont.Metrics metrics ;
 		private final GLFont glFont ;
 
-		private final Matrix4 position = new Matrix4() ;
+		private Matrix4 matrix = new Matrix4() ;
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
+		private final Vector3 rotation = new Vector3() ;
 
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
 		{
@@ -436,8 +454,17 @@ public class GLGeometryUploader
 			final GLDrawData draw = _location.getLocationData() ;
 			final BufferObject buffer = _location.getBufferData() ;
 
-			position.setIdentity() ;
-			position.multiply( draw.getDrawMatrix() ) ;
+			draw.getPosition( position ) ;
+			draw.getOffset( offset ) ;
+			draw.getRotation( rotation ) ;
+
+			matrix.setIdentity() ;
+			matrix.setTranslate( position.x, position.y, 0.0f ) ;
+			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
+			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
+			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
+			matrix.translate( offset.x, offset.y, offset.z ) ;
+
 			final MalletColour colour = draw.getColour() ;
 
 			final Location.Range indexRange = _location.getIndex() ;
@@ -494,7 +521,7 @@ public class GLGeometryUploader
 							case POINT  :
 							{
 								shape.getVector3( j, k, point ) ;
-								Matrix4.multiply( point, position, temp ) ;
+								Matrix4.multiply( point, matrix, temp ) ;
 								verticies[vertexInc++] = temp.x ;
 								verticies[vertexInc++] = temp.y ;
 								verticies[vertexInc++] = temp.z ;
@@ -518,7 +545,7 @@ public class GLGeometryUploader
 					}
 				}
 
-				position.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
+				matrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
 			indicies[indexInc++] = PRIMITIVE_RESTART_INDEX ;
@@ -621,7 +648,7 @@ public class GLGeometryUploader
 		}
 	}
  
-	private final Buffers<BufferObject, GLDrawData> buffers = new Buffers<BufferObject, GLDrawData>( 50000, 50000, new BuffersListener() ) ; 
+	private final Buffers<BufferObject, GLDrawData> buffers = new Buffers<BufferObject, GLDrawData>( 50000, 50000, new BuffersListener() ) ;
 
 	private final byte[] abgrTemp = new byte[4] ;
 

@@ -2,46 +2,23 @@ package com.linxonline.mallet.util.buffers ;
 
 public class IntegerBuffer
 {
-	private int[] array ;
+	private IntegerBuffer() {}
 
-	public IntegerBuffer( final int _size )
+	public static int[] allocate( final int _size )
 	{
-		array = new int[_size] ;
+		return new int[_size] ;
 	}
 
-	public IntegerBuffer( final IntegerBuffer _buffer, final int _size )
+	public static int[] expand( final int[] _from, final int _extra )
 	{
-		final int length = _buffer.size() + _size ;
-		array = new int[length] ;
-
-		for( int i = 0; i < _buffer.size(); i++ )
-		{
-			array[i] = _buffer.get( i ) ;
-		}
+		final int length = _from.length + _extra ;
+		final int[] to = new int[length] ;
+		System.arraycopy( _from, 0, to, 0, _from.length ) ;
+		return to ;
 	}
 
-	public static IntegerBuffer allocate( final int _size )
+	public static int set( final int[] _set, final int _index, final int _val )
 	{
-		return new IntegerBuffer( _size ) ;
-	}
-
-	public static IntegerBuffer expand( final IntegerBuffer _buffer, final int _size )
-	{
-		return new IntegerBuffer( _buffer, _size ) ;
-	}
-
-	public int size()
-	{
-		return array.length ;
-	}
-
-	public int set( final int _index, final int _val )
-	{
-		return array[_index] = _val ;
-	}
-
-	public int get( final int _index )
-	{
-		return array[_index] ;
+		return _set[_index] = _val ;
 	}
 }

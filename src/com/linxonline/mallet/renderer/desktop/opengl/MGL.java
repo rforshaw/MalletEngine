@@ -78,6 +78,7 @@ public final class MGL
 	public final static int GL_FALSE = GL3.GL_FALSE ;
 
 	public final static int GL_DYNAMIC_DRAW = GL3.GL_DYNAMIC_DRAW ;
+	public final static int GL_STREAM_DRAW = GL3.GL_STREAM_DRAW ;
 
 	public final static int GL_STENCIL_INDEX8 = GL3.GL_STENCIL_INDEX8 ;
 	public final static int GL_RENDERBUFFER = GL3.GL_RENDERBUFFER ;

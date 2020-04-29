@@ -37,15 +37,14 @@ public class Interpolate
 		return requiresMore ;
 	}
 
-	public static boolean linear( final FloatBuffer _future, final FloatBuffer _past, final FloatBuffer _present, final int _hertz, final int _iteration )
+	public static boolean linear( final float[] _future, final float[] _past, final float[] _present, final int _hertz, final int _iteration )
 	{
 		boolean requiresMore = false ;
 
-		final int size = _future.size() ;
-		for( int i = 0; i < size; ++i )
+		for( int i = 0; i < _future.length; ++i )
 		{
-			final float future = _future.get( i ) ;
-			final float past = _past.get( i ) ;
+			final float future = _future[i] ;
+			final float past = _past[i] ;
 
 			final float diff = ( future - past ) / _hertz ;
 			if( Math.abs( diff ) > 0.001f )
@@ -54,8 +53,8 @@ public class Interpolate
 			}
 
 			final float present = past + ( diff * _iteration ) ;
-			_present.set( i, present ) ;
-			_past.set( i, present ) ;
+			_present[i] = present ;
+			_past[i] = present ;
 		}
 
 		return requiresMore ;

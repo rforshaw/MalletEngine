@@ -150,9 +150,7 @@ public class GLProgram extends ProgramManager.Program
 				case FLOAT32_MAT4 :
 				{
 					final Matrix4 m = ( Matrix4 )_data.getUniform( uniform.getRight() ) ;
-					final FloatBuffer ibuffer = m.matrix ;
-					final FloatBuffer buffer = ( FloatBuffer )ibuffer ;
-					final float[] matrix = buffer.getArray() ;
+					final float[] matrix = m.matrix ;
 
 					MGL.glUniformMatrix4fv( inUniforms[i], 1, true, matrix, 0 ) ;
 					break ;

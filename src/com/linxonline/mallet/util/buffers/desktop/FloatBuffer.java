@@ -5,132 +5,123 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class FloatBuffer
 {
-	private float[] array ;
+	private FloatBuffer() {}
 
-	private FloatBuffer( final int _size )
+	public static float[] allocate( final int _size )
 	{
-		array = new float[_size] ;
+		return new float[_size] ;
 	}
 
-	private FloatBuffer( final FloatBuffer _buffer, final int _size )
+	public static float[] expand( final float[] _from, final int _extra )
 	{
-		final int length = _buffer.size() + _size ;
-		array = new float[length] ;
-
-		for( int i = 0; i < _buffer.size(); i++ )
-		{
-			array[i] = _buffer.get( i ) ;
-		}
+		final int length = _from.length + _extra ;
+		final float[] to = new float[length] ;
+		System.arraycopy( _from, 0, to, 0, _from.length ) ;
+		return to ;
 	}
 
-	public static FloatBuffer allocate( final int _size )
+	public static void copy( final float[] _from, final float[] _to )
 	{
-		return new FloatBuffer( _size ) ;
+		// A copy is an expand without increasing the array size.
+		System.arraycopy( _from, 0, _to, 0, _from.length ) ;
 	}
 
-	public static FloatBuffer expand( final FloatBuffer _buffer, final int _size )
+	public static Vector2 set( final float[] _modify, final int _index, final Vector2 _val )
 	{
-		return new FloatBuffer( _buffer, _size ) ;
-	}
-
-	public static void copy( final FloatBuffer _from, final FloatBuffer _to )
-	{
-		final int size = _from.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			_to.set( i, _from.get( i ) ) ;
-		}
-	}
-
-	public int size()
-	{
-		return array.length ;
-	}
-
-	public float set( final int _index, final float _val )
-	{
-		return array[_index] = _val ;
-	}
-
-	public Vector2 set( final int _index, final Vector2 _val )
-	{
-		array[_index + 0] = _val.x ;
-		array[_index + 1] = _val.y ;
+		_modify[_index + 0] = _val.x ;
+		_modify[_index + 1] = _val.y ;
 		return _val ;
 	}
 
-	public Vector3 set( final int _index, final Vector3 _val )
+	public static Vector3 set( final float[] _modify, final int _index, final Vector3 _val )
 	{
-		array[_index + 0] = _val.x ;
-		array[_index + 1] = _val.y ;
-		array[_index + 2] = _val.z ;
+		_modify[_index + 0] = _val.x ;
+		_modify[_index + 1] = _val.y ;
+		_modify[_index + 2] = _val.z ;
 		return _val ;
 	}
 
-	public void set( final int _index, final float _x, final float _y )
+	public static void set( final float[] _modify, final int _index, final float _val )
 	{
-		array[_index + 0] = _x ;
-		array[_index + 1] = _y ;
+		_modify[_index] = _val ;
+	}
+	
+	public static void set( final float[] _modify,
+							final int _index,
+							final float _x,
+							final float _y )
+	{
+		_modify[_index + 0] = _x ;
+		_modify[_index + 1] = _y ;
 	}
 
-	public void set( final int _index, final float _x, final float _y, final float _z )
+	public static void set( final float[] _modify,
+							final int _index,
+							final float _x,
+							final float _y,
+							final float _z )
 	{
-		array[_index + 0] = _x ;
-		array[_index + 1] = _y ;
-		array[_index + 2] = _z ;
+		_modify[_index + 0] = _x ;
+		_modify[_index + 1] = _y ;
+		_modify[_index + 2] = _z ;
 	}
 
-	public float get( final int _index )
+	public static void add( final float[] _modify,
+							final int _index,
+							final float _x,
+							final float _y )
 	{
-		return array[_index] ;
+		_modify[_index + 0] += _x ;
+		_modify[_index + 1] += _y ;
 	}
 
-	public Vector3 fill( final Vector3 _fill, final int _at )
+	public static float get( final float[] _get, final int _index )
 	{
-		_fill.setXYZ( array[_at], array[_at + 1], array[_at + 2] ) ;
+		return _get[_index] ;
+	}
+
+	public static Vector3 fill( final float[] _get, final Vector3 _fill, final int _at )
+	{
+		_fill.setXYZ( _get[_at], _get[_at + 1], _get[_at + 2] ) ;
 		return _fill ;
 	}
 
-	public Vector2 fill( final Vector2 _fill, final int _at )
+	public static Vector2 fill( final float[] _get, final Vector2 _fill, final int _at )
 	{
-		_fill.setXY( array[_at], array[_at + 1] ) ;
+		_fill.setXY( _get[_at], _get[_at + 1] ) ;
 		return _fill ;
 	}
 
-	public void swap( final int _lhs, final int _rhs )
+	public static void swap( final float[] _set, final int _lhs, final int _rhs )
 	{
-		final float t = array[_lhs] ;
-		array[_lhs] = array[_rhs] ;
-		array[_rhs] = t ;
+		final float t = _set[_lhs] ;
+		_set[_lhs] = _set[_rhs] ;
+		_set[_rhs] = t ;
 	}
 
-	public float multiply( final int _lhs, final float _val )
+	public static float multiply( final float[] _get, final int _lhs, final float _val )
 	{
-		return array[_lhs] * _val ;
+		return _get[_lhs] * _val ;
 	}
 
-	public float multiply( final int _lhs, final int _rhs )
+	public static float multiply( final float[] _get, final int _lhs, final int _rhs )
 	{
-		return array[_lhs] * array[_rhs] ;
+		return _get[_lhs] * _get[_rhs] ;
 	}
 
-	public float multiply( final int _lhs, final int _mhs, final int _rhs )
+	public static float multiply( final float[] _get, final int _lhs, final int _mhs, final int _rhs )
 	{
-		return array[_lhs] * array[_mhs] * array[_rhs] ;
+		return _get[_lhs] * _get[_mhs] * _get[_rhs] ;
 	}
 
-	public float multiply( final int _lhs, final FloatBuffer _buffer, final int _rhs )
+	public static float multiply( final float[] _getLHS, final int _lhs,
+								  final float[] _getRHS, final int _rhs )
 	{
-		return array[_lhs] * _buffer.get( _rhs ) ;
+		return _getLHS[_lhs] * _getRHS[_rhs] ;
 	}
 
-	public void divide( final int _lhs, final float _val )
+	public static void divide( final float[] _set, final int _lhs, final float _val )
 	{
-		array[_lhs] /= _val ;
-	}
-
-	public float[] getArray()
-	{
-		return array ;
+		_set[_lhs] /= _val ;
 	}
 }

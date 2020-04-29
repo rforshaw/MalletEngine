@@ -91,8 +91,8 @@ public abstract class Hull
 
 	public abstract Vector2 getPosition() ;
 
-	public abstract Vector2[] getAxes() ;
-	public abstract Vector2[] getPoints() ;
+	public abstract float[] getAxes() ;
+	public abstract float[] getPoints() ;
 
 	public abstract void getAbsoluteCenter( final Vector2 _center ) ;
 	public abstract float projectToAxis( final Vector2 _axis ) ;

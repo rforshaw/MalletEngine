@@ -350,10 +350,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	private final class GLBasicUpload implements DrawState.IUpload<GLDrawData>
 	{
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 offset = new Vector3() ;
-		private final Vector3 rotation = new Vector3() ;
-
 		public GLBasicUpload() {}
 
 		@Override
@@ -363,19 +359,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 			{
 				return ;
 			}
-
-			_data.getPosition( position ) ;
-			_data.getOffset( offset ) ;
-			_data.getRotation( rotation ) ;
-
-			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
-			positionMatrix.setIdentity() ;
-
-			positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
-			positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
 
 			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
 			uploader.upload( _data ) ;
