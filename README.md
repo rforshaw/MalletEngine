@@ -1,46 +1,54 @@
 MalletEngine
 ============
 
-An Entity-Component based game engine written in Java. Supports Linux, Windows, Mac, Android, &amp; iOS.
+An entity-component based game engine written in Java, supports Linux, Windows, Mac, and Android.
 
-This is the initial commit of Mallet Engine 2.0. I wrote this engine while developing some 
-games in my spare time.
+Can be cross-compiled to support iOS and Web based platforms too, however these are not extensively tested.
+
+Features:
+  Flexible 2D/3D rendering pipeline.
+  Collision Detection system.
+  Entity-component model.
+  UI framework.
+  Audio framework.
+  Animation framework.
+  File management framework.
+  Event messaging system.
 
 COMPILING
 
-Requires Java 6 JDK & Ant
+The majority of development is centred around Linux and Android. We aim to keep 3rd party dependencies to a minimum, currently only requiring JOGL and JSON for desktop. Android provides OpenGL and JSON as part of its platform.
 
-ant clean
-ant -f Build.xml
+Requires Java 8 and Gradle.
 
-or on Linux a bash script is provided:
+Each supported platform has their own building scripts located within their own directory situated at the root.
 
-./compile.sh
+    Android : ./android
+    iOS: ./ios
+    Desktop(Windows, Linux, Mac): ./desktop
+    Web: ./web
 
-The compiled files are located in: ./build/jar/
+The Desktop and Android platforms use gradle as their build-system. Make sure you have Gradle installed.
+
+    On Linux call: ./compile.sh
+
+This will clear the previous build and generate an output within './desktop/target'.
+
+*Note: Building desktop will copy the Mallet-Engine and dependencies to './TemplateProject', this project is intended as the starting basis for your own game.*
+
+The contents of './resources' is copied into each of the targetted platforms and provides the base data.
+
+*Note: TemplateProject also contains a 'resource' directory store your games data within 'resource/base'*
 
 RUNNING
 
-To run the Mallet Engine you will need to copy the jar folder, located in ./lib to ./build/jar/ resulting 
-in a final directory structure: ./build/jar/jar/
+To run the base Mallet-Engine go to './desktop/target'.
 
-Linux &amp; Mac
+    On Linux call: ./run
+    
+This will run the Test program located at: './src/com/linxonline/mallet/core/desktop/DesktopTestMain' and will ensure that the engine successfully compiled.
 
-./run
 
-Windows
+Windows OpenAL support:
 
 You will need to make sure you have openAL installed. You can get it from : http://connect.creativelabs.com/openal/Downloads/oalinst.zip
-
-
-run.bat
-
-
-Android &amp; iOS support?
-
-Android support has been integrated into the Mallet Engine. Android specific code is located within the android folders, and desktop specific code is located within desktop folders. The desktop build ignores Android sources and vice versa. To compile the Android Mallet Engine you will need the Android SDK, compiling Desktop Mallet Engine does not require the Android SDK.
-
-I've yet to decide whether to integrate iOS code into the Mallet Engine codebase or keep it as a separate codebase.
-
-Note:
-The Mallet Engine contains a pre-made entry point located at: ./src/com/linxonline/mallet/main/desktop/DesktopTestMain.java
