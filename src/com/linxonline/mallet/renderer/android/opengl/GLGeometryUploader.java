@@ -11,6 +11,8 @@ import com.linxonline.mallet.renderer.Shape.Swivel ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.ProgramMap ;
+import com.linxonline.mallet.renderer.BasicDraw ;
+import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
 import com.linxonline.mallet.renderer.opengl.Buffers ;
@@ -49,7 +51,7 @@ public class GLGeometryUploader
 		protected final int[] indexID ;
 		protected final int[] vboID ;
 
-		protected final GLDrawData.Mode mode ;
+		protected final GLDraw.Mode mode ;
 		protected Shape.Swivel[] shapeSwivel = null ;
 		protected Shape.Style shapeStyle = null ;
 		protected int shapeSwivelSize = 0 ;
@@ -71,11 +73,12 @@ public class GLGeometryUploader
 		protected final int order ;						// Defines the 2D order the geometry resides on
 		protected final boolean ui ;					// Is the buffer used for UI or world space?
 
-		public BufferObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
+		public BufferObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
-			order = _user.getOrder() ;
 			mode = _user.getMode() ;
-			ui = _user.isUI() ;
+			final BasicDraw basic = _user.getBasicDraw() ;
+			order = basic.getOrder() ;
+			ui = basic.isUI() ;
 
 			final int indexSize = _indexByteSize / IBO_VAR_BYTE_SIZE ;
 			final int vboSize = _vertexByteSize / VBO_VAR_BYTE_SIZE ;
@@ -91,7 +94,7 @@ public class GLGeometryUploader
 			indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 			indexBuffer = indexByteBuffer.asShortBuffer() ;
 			
-			userProgram = new ProgramMap<GLProgram>( ( ProgramMap<GLProgram> )_user.getProgram() ) ;
+			userProgram = new ProgramMap<GLProgram>( basic.getProgram() ) ;
 			final GLProgram glProgram = userProgram.getProgram() ;
 			program = ( glProgram != null ) ? glProgram.buildMap( userProgram ) : null ;
 
@@ -136,8 +139,6 @@ public class GLGeometryUploader
 		*/
 		public void draw( final Matrix4 _world, final Matrix4 _ui )
 		{
-			//System.out.println( "Draw Buffer Object" ) ;
-			//System.out.println( "Draw Buffer: " + sortValue() ) ;
 			if( userProgram == null )
 			{
 				System.out.println( "No program specified..." ) ;
@@ -208,8 +209,8 @@ public class GLGeometryUploader
 			final int verticiesLengthBytes = verticies.length * VBO_VAR_BYTE_SIZE ;
 			MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, startBytes, verticiesLengthBytes, vertexBuffer ) ;
 		}
-		
-		public abstract void upload( final Location<BufferObject, GLDrawData> _location ) ;
+
+		public abstract void upload( final Location<BufferObject, GLDraw> _location ) ;
 
 		public void setIndexLength( final int _indexLengthInBytes )
 		{
@@ -232,7 +233,7 @@ public class GLGeometryUploader
 			They will use layer, texture, shape swivel and style
 			to determine if the buffer can support the data.
 		*/
-		public boolean isSupported( final GLDrawData _user )
+		public boolean isSupported( final GLDraw _user )
 		{
 			if( mode != _user.getMode() )
 			{
@@ -240,25 +241,26 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			if( order != _user.getOrder() )
+			final BasicDraw basic = _user.getBasicDraw() ;
+			if( order != basic.getOrder() )
 			{
 				//System.out.println( "Order: " + order + " " +  _user.getOrder() ) ;
 				return false ;
 			}
 
-			if( ui != _user.isUI() )
+			if( ui != basic.isUI() )
 			{
 				//System.out.println( "UI: " + ui + " " +  _user.isUI() ) ;
 				return false ;
 			}
 
-			if( isProgram( ( ProgramMap<GLProgram> )_user.getProgram() ) == false )
+			if( isProgram( basic.getProgram() ) == false )
 			{
 				//System.out.println( "Programs are different" ) ;
 				return false ;
 			}
 
-			if( mode != GLDrawData.Mode.TEXT )
+			if( mode != GLDraw.Mode.TEXT )
 			{
 				if( isShape( _user.getDrawShape() ) == false )
 				{
@@ -334,21 +336,22 @@ public class GLGeometryUploader
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
 
-		public BasicObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
+		public BasicObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
 			initShape( _user.getDrawShape() ) ;
 		}
 
 		@Override
-		public void upload( final Location<BufferObject, GLDrawData> _location )
+		public void upload( final Location<BufferObject, GLDraw> _location )
 		{
-			final GLDrawData draw = _location.getLocationData() ;
+			final GLDraw draw = _location.getLocationData() ;
+			final BasicDraw basic = draw.getBasicDraw() ;
 			final Shape shape = draw.getDrawShape() ;
 
-			draw.getPosition( position ) ;
-			draw.getOffset( offset ) ;
-			draw.getRotation( rotation ) ;
+			basic.getPosition( position ) ;
+			basic.getOffset( offset ) ;
+			basic.getRotation( rotation ) ;
 
 			matrix.setIdentity() ;
 			matrix.setTranslate( position.x, position.y, 0.0f ) ;
@@ -363,9 +366,9 @@ public class GLGeometryUploader
 			dirty = true ;
 		}
 
-		private void uploadIndex( final Location<BufferObject, GLDrawData> _handler, final Shape _shape )
+		private void uploadIndex( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
 		{
-			final GLDrawData draw = _handler.getLocationData() ;
+			final GLDraw draw = _handler.getLocationData() ;
 			final BufferObject buffer = _handler.getBufferData() ;
 		
 			final Location.Range indexRange = _handler.getIndex() ;
@@ -383,7 +386,7 @@ public class GLGeometryUploader
 			indicies[increment++] = ( short )PRIMITIVE_RESTART_INDEX ;
 		}
 
-		private void uploadVBO( final Location<BufferObject, GLDrawData> _handler, final Shape _shape, final Matrix4 _matrix )
+		private void uploadVBO( final Location<BufferObject, GLDraw> _handler, final Shape _shape, final Matrix4 _matrix )
 		{
 			final BufferObject buffer = _handler.getBufferData() ;
 
@@ -446,7 +449,7 @@ public class GLGeometryUploader
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
 
-		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDrawData _user )
+		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
 			font = userProgram.getUniform( "inTex0", MalletFont.class ) ;
@@ -457,15 +460,17 @@ public class GLGeometryUploader
 		}
 	
 		@Override
-		public void upload( final Location<BufferObject, GLDrawData> _location )
+		public void upload( final Location<BufferObject, GLDraw> _location )
 		{
 			dirty = true ;
-			final GLDrawData draw = _location.getLocationData() ;
+			final GLDraw draw = _location.getLocationData() ;
+			final BasicDraw basic = draw.getBasicDraw() ;
+			final TextDraw txtDraw = draw.getTextDraw() ;
 			final BufferObject buffer = _location.getBufferData() ;
 
-			draw.getPosition( position ) ;
-			draw.getOffset( offset ) ;
-			draw.getRotation( rotation ) ;
+			basic.getPosition( position ) ;
+			basic.getOffset( offset ) ;
+			basic.getRotation( rotation ) ;
 
 			matrix.setIdentity() ;
 			matrix.setTranslate( position.x, position.y, 0.0f ) ;
@@ -474,7 +479,7 @@ public class GLGeometryUploader
 			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 			matrix.translate( offset.x, offset.y, offset.z ) ;
 
-			final MalletColour colour = draw.getColour() ;
+			final MalletColour colour = basic.getColour() ;
 
 			final Location.Range indexRange = _location.getIndex() ;
 			final Location.Range vertRange = _location.getVertex() ;
@@ -484,9 +489,9 @@ public class GLGeometryUploader
 			int indexInc = indexRange.getStart() / IBO_VAR_BYTE_SIZE ;
 			int vertexInc = vertRange.getStart() / VBO_VAR_BYTE_SIZE ;
 
-			final StringBuilder text = draw.getText() ;
-			final int start = draw.getTextStart() ;
-			final int end = draw.getTextEnd() ;
+			final StringBuilder text = txtDraw.getText() ;
+			final int start = txtDraw.getTextStart() ;
+			final int end = txtDraw.getTextEnd() ;
 
 			final int length = end - start ;
 			for( int i = 0; i < length; i++ )
@@ -538,7 +543,7 @@ public class GLGeometryUploader
 							}
 							case COLOUR :
 							{
-								// GLDrawData colour overrides Shapes colour.
+								// GLDraw colour overrides Shapes colour.
 								final MalletColour col = ( colour != null ) ? colour : shape.getColour( j, k, shapeColour ) ;
 								verticies[vertexInc++] = getABGR( col ) ;
 								break ;
@@ -561,16 +566,16 @@ public class GLGeometryUploader
 		}
 	}
 
-	private class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDrawData>
+	private class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDraw>
 	{
 		@Override
-		public boolean isSupported( final BufferObject _buffer, final GLDrawData _user )
+		public boolean isSupported( final BufferObject _buffer, final GLDraw _user )
 		{
 			return _buffer.isSupported( _user ) ;
 		}
 
 		@Override
-		public void allocated( final Location<BufferObject, GLDrawData> _location, final GLDrawData _user )
+		public void allocated( final Location<BufferObject, GLDraw> _location, final GLDraw _user )
 		{
 			_user.setNewLocation( _location ) ;
 			_location.setLocationData( _user ) ;
@@ -581,20 +586,21 @@ public class GLGeometryUploader
 		}
 
 		@Override
-		public void deallocated( final Location<BufferObject, GLDrawData> _location )
+		public void deallocated( final Location<BufferObject, GLDraw> _location )
 		{
 			//System.out.println( "Location deallocated" ) ;
 			_location.getLocationData().setNewLocation( null ) ;
 
 			// Reset the program so it is checked fully 
 			// if the draw is readded to the renderer.
-			final GLDrawData draw = _location.getLocationData() ;
-			final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )draw.getProgram() ;
+			final GLDraw draw = _location.getLocationData() ;
+			final BasicDraw<GLProgram> basic = draw.getBasicDraw() ;
+			final ProgramMap<GLProgram> program = basic.getProgram() ;
 			program.dirty() ;
 		}
 
 		@Override
-		public void shifted( final Location<BufferObject, GLDrawData> _location )
+		public void shifted( final Location<BufferObject, GLDraw> _location )
 		{
 			// The location has been moved to a new location within 
 			// the buffer object and needs to be reuploaded.
@@ -606,42 +612,44 @@ public class GLGeometryUploader
 		}
 
 		@Override
-		public void shiftEnded( final LocationBuffer<BufferObject, GLDrawData> _buffer )
+		public void shiftEnded( final LocationBuffer<BufferObject, GLDraw> _buffer )
 		{
 			final BufferObject buffer = _buffer.getData() ;
 			buffer.setIndexLength( _buffer.getByteIndexLength() ) ;
 		}
 	}
  
-	private class BuffersListener implements Buffers.Listener<BufferObject, GLDrawData>
+	private class BuffersListener implements Buffers.Listener<BufferObject, GLDraw>
 	{
 		@Override
-		public void draw( final Matrix4 _world, final Matrix4 _ui, final LocationBuffer<BufferObject, GLDrawData> _buffer )
+		public void draw( final Matrix4 _world, final Matrix4 _ui, final LocationBuffer<BufferObject, GLDraw> _buffer )
 		{
 			final BufferObject buffer = _buffer.getData() ;
 			buffer.draw( _world, _ui ) ;
 		}
 
 		@Override
-		public int calculateIndexByteSize( final GLDrawData _user )
+		public int calculateIndexByteSize( final GLDraw _user )
 		{
 			return GLGeometryUploader.calculateIndexByteSize( _user ) ;
 		}
 
 		@Override
-		public int calculateVertexByteSize( final GLDrawData _user )
+		public int calculateVertexByteSize( final GLDraw _user )
 		{
 			return GLGeometryUploader.calculateVertexByteSize( _user ) ;
 		}
 
 		@Override
-		public void allocated( final LocationBuffer<BufferObject, GLDrawData> _allocated, final GLDrawData _user )
+		public void allocated( final LocationBuffer<BufferObject, GLDraw> _allocated, final GLDraw _user )
 		{
 			_allocated.setListener( new LocationBufferListener() ) ;
 
 			final int indexSize = buffers.getMaximumByteIndex() ;
 			final int vertexSize = buffers.getMaximumByteVertex() ;
-			_allocated.setOrder( _user.getOrder() ) ;
+
+			final BasicDraw basic = _user.getBasicDraw() ;
+			_allocated.setOrder( basic.getOrder() ) ;
 
 			switch( _user.getMode() )
 			{
@@ -657,7 +665,7 @@ public class GLGeometryUploader
 		}
 	}
  
-	private final Buffers<BufferObject, GLDrawData> buffers = new Buffers<BufferObject, GLDrawData>( 50000, 50000, new BuffersListener() ) ; 
+	private final Buffers<BufferObject, GLDraw> buffers = new Buffers<BufferObject, GLDraw>( 50000, 50000, new BuffersListener() ) ;
 
 	private final byte[] abgrTemp = new byte[4] ;
 
@@ -674,9 +682,9 @@ public class GLGeometryUploader
 	/**
 		Upload geometry and have it prepared for drawing.
 	*/
-	public void upload( final GLDrawData _data )
+	public void upload( final GLDraw _data )
 	{
-		final Location<BufferObject, GLDrawData> location = _data.getNewLocation() ;
+		final Location<BufferObject, GLDraw> location = _data.getNewLocation() ;
 		if( location == null )
 		{
 			buffers.allocate( _data ) ;
@@ -699,9 +707,9 @@ public class GLGeometryUploader
 		Find the GLBuffer/GLGeometry that the GLRenderData resides in.
 		Remove it from the buffers, and pack the index buffer.
 	*/
-	public void remove( final GLDrawData _data )
+	public void remove( final GLDraw _data )
 	{
-		final Location<BufferObject, GLDrawData> location = _data.getNewLocation() ;
+		final Location<BufferObject, GLDraw> location = _data.getNewLocation() ;
 		if( location != null )
 		{
 			location.deallocate() ;
@@ -718,9 +726,9 @@ public class GLGeometryUploader
 	*/
 	public void clean() {}
 
-	private static boolean isLocationValid( final Location<BufferObject, GLDrawData> _location )
+	private static boolean isLocationValid( final Location<BufferObject, GLDraw> _location )
 	{
-		final GLDrawData draw = _location.getLocationData() ;
+		final GLDraw draw = _location.getLocationData() ;
 		final Location.Range indexRange = _location.getIndex() ;
 		if( calculateIndexByteSize( draw ) != indexRange.size() )
 		{
@@ -745,9 +753,9 @@ public class GLGeometryUploader
 		return true ;
 	}
 
-	private static int calculateIndexByteSize( final GLDrawData _user )
+	private static int calculateIndexByteSize( final GLDraw _user )
 	{
-		final GLDrawData.Mode mode = _user.getMode() ;
+		final GLDraw.Mode mode = _user.getMode() ;
 		switch( mode )
 		{
 			case BASIC   : return calculateBasicIndexByteSize( _user ) ;
@@ -758,21 +766,22 @@ public class GLGeometryUploader
 		}
 	}
 
-	private static int calculateBasicIndexByteSize( final GLDrawData _user )
+	private static int calculateBasicIndexByteSize( final GLDraw _user )
 	{
 		final Shape shape = _user.getDrawShape() ;
 		return ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 	}
 
-	private static int calculateTextIndexByteSize( final GLDrawData _user )
+	private static int calculateTextIndexByteSize( final GLDraw _user )
 	{
-		final int length = _user.getTextEnd() - _user.getTextStart() ;
+		final TextDraw text = _user.getTextDraw() ;
+		final int length = text.getTextEnd() - text.getTextStart() ;
 		return ( ( length * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 	}
 
-	private static int calculateVertexByteSize( final GLDrawData _user )
+	private static int calculateVertexByteSize( final GLDraw _user )
 	{
-		final GLDrawData.Mode mode = _user.getMode() ;
+		final GLDraw.Mode mode = _user.getMode() ;
 		switch( mode )
 		{
 			case BASIC   : return calculateBasicVertexByteSize( _user ) ;
@@ -783,20 +792,23 @@ public class GLGeometryUploader
 		}
 	}
 
-	private static int calculateBasicVertexByteSize( final GLDrawData _user )
+	private static int calculateBasicVertexByteSize( final GLDraw _user )
 	{
 		final Shape shape = _user.getDrawShape() ;
 		return ( shape.getVertexSize() * calculateVertexSize( shape.getSwivel() ) ) * VBO_VAR_BYTE_SIZE ;
 	}
 
-	private static int calculateTextVertexByteSize( final GLDrawData _user )
+	private static int calculateTextVertexByteSize( final GLDraw _user )
 	{
-		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_user.getProgram() ;
+		final BasicDraw basic = _user.getBasicDraw() ;
+		final TextDraw text = _user.getTextDraw() ;
+	
+		final ProgramMap<GLProgram> program = basic.getProgram() ;
 		final MalletFont font = program.getUniform( "inTex0", MalletFont.class ) ;
 		final GLFont glFont = GLRenderer.getFont( font ) ;
 		final Shape shape = glFont.getShapeWithChar( '\0' ) ;
 
-		final int length = _user.getTextEnd() - _user.getTextStart() ;
+		final int length = text.getTextEnd() - text.getTextStart() ;
 		return ( ( shape.getVertexSize() * length ) * calculateVertexSize( shape.getSwivel() ) ) * VBO_VAR_BYTE_SIZE ;
 	}
 

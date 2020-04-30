@@ -4,6 +4,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.physics.hulls.Hull ;
+import com.linxonline.mallet.physics.Group ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 import com.linxonline.mallet.physics.primitives.OBB ;
 
@@ -16,6 +17,12 @@ public class Box2D extends Hull
 
 	public Box2D( final AABB _aabb )
 	{
+		this( _aabb, null ) ;
+	}
+
+	public Box2D( final AABB _aabb, final Group.ID[] _collidables )
+	{
+		super( _collidables ) ;
 		aabb = _aabb ;
 		obb = new OBB( aabb ) ;
 	}

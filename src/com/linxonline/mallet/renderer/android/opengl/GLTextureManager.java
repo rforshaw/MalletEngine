@@ -44,7 +44,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
-	protected Worlds<GLDrawData, CameraData, GLWorld> worldState ;
+	protected Worlds<GLDraw, CameraData, GLWorld> worldState ;
 
 	public GLTextureManager()
 	{
@@ -156,7 +156,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
-	public void setWorldState( final Worlds<GLDrawData, CameraData, GLWorld> _worldState )
+	public void setWorldState( final Worlds<GLDraw, CameraData, GLWorld> _worldState )
 	{
 		worldState = _worldState ;
 	}

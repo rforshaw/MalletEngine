@@ -208,8 +208,7 @@ public class QuadTree
 					return insertHull( _hull ) ;
 				}
 
-				nextHull = 0 ;
-				for( int i = 0; i < hulls.length; i++ )
+				for( int i = 0; i < nextHull; i++ )
 				{
 					// Move the existing hulls to its children.
 					insertToQuadrant( hulls[i] ) ;
@@ -544,8 +543,9 @@ public class QuadTree
 			}
 
 			parent = true ;
-			hulls = new Hull[0] ;
+			nextHull = 0 ;
 			check = null ;
+			hulls = new Hull[0] ;
 
 			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, _offset, Quadrant.TOP_LEFT ) ;
 			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, _offset, Quadrant.TOP_RIGHT ) ;

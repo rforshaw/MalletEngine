@@ -52,7 +52,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	private GLWindow canvas ;
-	private final Worlds<GLDrawData, CameraData, GLWorld> worlds = new Worlds<GLDrawData, CameraData, GLWorld>() ;
+	private final Worlds<GLDraw, CameraData, GLWorld> worlds = new Worlds<GLDraw, CameraData, GLWorld>() ;
 
 	private CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
 	private int viewMode = ORTHOGRAPHIC_MODE ;
@@ -107,7 +107,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		return new DrawDelegate()
 		{
-			private final ArrayList<GLDrawData> data = new ArrayList<GLDrawData>() ;
+			private final ArrayList<GLDraw> data = new ArrayList<GLDraw>() ;
 
 			@Override
 			@SuppressWarnings( "unchecked" )
@@ -142,7 +142,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public void addTextDraw( final Draw _draw, final World _world )
 			{
 				final GLWorld world = ( GLWorld )_world ;
-				final GLDrawData draw = ( GLDrawData )_draw ;
+				final GLDraw draw = ( GLDraw )_draw ;
 
 				data.add( draw ) ;
 				worlds.addDraw( draw, world ) ;
@@ -153,7 +153,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public void addBasicDraw( final Draw _draw, final World _world )
 			{
 				final GLWorld world = ( GLWorld )_world ;
-				final GLDrawData draw = ( GLDrawData )_draw ;
+				final GLDraw draw = ( GLDraw )_draw ;
 
 				data.add( draw ) ;
 				worlds.addDraw( draw, world ) ;
@@ -165,7 +165,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				data.ensureCapacity( data.size() + _draws.size() ) ;
 				final GLWorld world = ( GLWorld )_world ;
-				final List<GLDrawData> draws = ( List<GLDrawData> )( Object )_draws ;
+				final List<GLDraw> draws = ( List<GLDraw> )( Object )_draws ;
 
 				data.addAll( draws ) ;
 				worlds.addDraw( draws, world ) ;
@@ -177,7 +177,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				data.ensureCapacity( data.size() + _draws.size() ) ;
 				final GLWorld world = ( GLWorld )_world ;
-				final List<GLDrawData> draws = ( List<GLDrawData> )( Object )_draws ;
+				final List<GLDraw> draws = ( List<GLDraw> )( Object )_draws ;
 
 				data.addAll( draws ) ;
 				worlds.addDraw( draws, world ) ;
@@ -187,7 +187,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@SuppressWarnings( "unchecked" )
 			public void removeDraw( final Draw _draw )
 			{
-				final GLDrawData draw = ( GLDrawData )_draw ;
+				final GLDraw draw = ( GLDraw )_draw ;
 				if( draw != null )
 				{
 					data.remove( draw ) ;
@@ -215,7 +215,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				if( data.isEmpty() == false )
 				{
-					for( final GLDrawData draw : data  )
+					for( final GLDraw draw : data  )
 					{
 						worlds.removeDraw( draw ) ;
 					}
@@ -296,39 +296,44 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				cast( _draw ).setRotation( _x, _y, _z ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setRotation( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				cast( _draw ).setScale( _x, _y, _z ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setScale( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				cast( _draw ).setPosition( _x, _y, _z ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setPosition( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
 			{
-				cast( _draw ).setOffset( _x, _y, _z ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setOffset( _x, _y, _z ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendText( final Draw _draw, final StringBuilder _text )
 			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				final GLDraw draw = cast( _draw ) ;
+				if( draw.getMode() == GLDraw.Mode.TEXT )
 				{
 					// Only a text draw object can have text.
-					draw.setText( _text ) ;
+					final TextDraw text = draw.getTextDraw() ;
+					text.setText( _text ) ;
 				}
 				return _draw ;
 			}
@@ -336,11 +341,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw amendTextStart( final Draw _draw, final int _start )
 			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				final GLDraw draw = cast( _draw ) ;
+				if( draw.getMode() == GLDraw.Mode.TEXT )
 				{
 					// Only a text draw object can have text.
-					draw.setTextStart( _start ) ;
+					final TextDraw text = draw.getTextDraw() ;
+					text.setTextStart( _start ) ;
 				}
 				return _draw ;
 			}
@@ -348,11 +354,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw amendTextEnd( final Draw _draw, final int _end )
 			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				final GLDraw draw = cast( _draw ) ;
+				if( draw.getMode() == GLDraw.Mode.TEXT )
 				{
 					// Only a text draw object can have text.
-					draw.setTextEnd( _end ) ;
+					final TextDraw text = draw.getTextDraw() ;
+					text.setTextEnd( _end ) ;
 				}
 				return _draw ;
 			}
@@ -360,49 +367,56 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw amendUI( final Draw _draw, final boolean _ui )
 			{
-				cast( _draw ).setUI( _ui ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setUI( _ui ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendColour( final Draw _draw, final MalletColour _colour )
 			{
-				cast( _draw ).setColour( _colour ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setColour( _colour ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendOrder( final Draw _draw, final int _order )
 			{
-				cast( _draw ).setOrder( _order ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setOrder( _order ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
 			{
-				cast( _draw ).setInterpolationMode( _interpolation ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setInterpolationMode( _interpolation ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
 			{
-				cast( _draw ).setUpdateType( _type ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setUpdateType( _type ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw attachProgram( final Draw _draw, final Program _program )
 			{
-				cast( _draw ).setProgram( ( ProgramMap<GLProgram> )_program ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.setProgram( ( ProgramMap<GLProgram> )_program ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw forceUpdate( final Draw _draw )
 			{
-				cast( _draw ).forceUpdate() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				basic.forceUpdate() ;
 				return _draw ;
 			}
 
@@ -415,50 +429,58 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Vector3 getRotate( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getRotation( _fill ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getRotation( _fill ) ;
 			}
 
 			@Override
 			public Vector3 getScale( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getScale( _fill ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getScale( _fill ) ;
 			}
 
 			@Override
 			public Vector3 getPosition( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getPosition( _fill ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getPosition( _fill ) ;
 			}
 
 			@Override
 			public Vector3 getOffset( final Draw _draw, final Vector3 _fill )
 			{
-				return cast( _draw ).getOffset( _fill ) ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getOffset( _fill ) ;
 			}
 
 			@Override
 			public StringBuilder getText( final Draw _draw )
 			{
 				// This will return null if not a Text Draw.
-				return cast( _draw ).getText() ;
+				final TextDraw text = cast( _draw ).getTextDraw() ;
+				return text.getText() ;
 			}
 
 			@Override
 			public MalletColour getColour( final Draw _draw )
 			{
-				return cast( _draw ).getColour() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getColour() ;
 			}
 
 			@Override
 			public boolean isUI( final Draw _draw )
 			{
-				return cast( _draw ).isUI() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.isUI() ;
 			}
 
 			@Override
 			public Program getProgram( final Draw _draw )
 			{
-				return cast( _draw ).getProgram() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				return basic.getProgram() ;
 			}
 
 			@Override
@@ -470,14 +492,15 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 										final Vector3 _scale,
 										final int _order )
 			{
-				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
-				draw.setMode( GLDrawData.Mode.TEXT ) ;
+				final GLDraw draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
+				draw.setMode( GLDraw.Mode.TEXT ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
 				ProgramAssist.mapUniform( program, "inTex0", _font ) ;
 
 				attachProgram( draw, program ) ;
-				draw.setText( _text ) ;
+				final TextDraw text = draw.getTextDraw() ;
+				text.setText( _text ) ;
 				return draw ;
 			}
 
@@ -502,8 +525,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 										final int _startOrder,
 										final int _endOrder )
 			{
-				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _startOrder ) ) ;
-				draw.setMode( GLDrawData.Mode.STENCIL ) ;
+				final GLDraw draw = cast( createDraw( _position, _offset, _rotation, _scale, _startOrder ) ) ;
+				draw.setMode( GLDraw.Mode.STENCIL ) ;
 				draw.setEndOrder( _endOrder ) ;
 
 				attachProgram( draw, ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
@@ -517,21 +540,21 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 									final Vector3 _scale,
 									final int _order )
 			{
-				return new GLDrawData( GLDrawData.Mode.BASIC,
-									   UpdateType.ON_DEMAND,
-									   Interpolation.NONE,
-									   _position,
-									   _offset,
-									   _rotation,
-									   _scale,
-									   _order ) ;
+				return new GLDraw( GLDraw.Mode.BASIC,
+									UpdateType.ON_DEMAND,
+									Interpolation.NONE,
+									_position,
+									_offset,
+									_rotation,
+									_scale,
+									_order ) ;
 			}
 
-			private GLDrawData cast( final Draw _draw )
+			private GLDraw cast( final Draw _draw )
 			{
 				assert( _draw != null ) ;
-				assert( !( _draw instanceof GLDrawData ) ) ;
-				return ( GLDrawData )_draw ;
+				assert( !( _draw instanceof GLDraw ) ) ;
+				return ( GLDraw )_draw ;
 			}
 		} ;
 	}
@@ -1195,11 +1218,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		Attempt to acquire a compatible GLProgram from 
 		the ProgramManager. Make sure the GLProgram 
 		requested maps correctly with the ProgramMap 
-		defined in the GLDrawData object.
+		defined in the GLDraw object.
 	*/
-	protected static boolean loadProgram( final GLDrawData _data )
+	protected static boolean loadProgram( final GLDraw _data )
 	{
-		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
+		final BasicDraw<GLProgram> basic = _data.getBasicDraw() ;
+		final ProgramMap<GLProgram> program = basic.getProgram() ;
 		if( program == null )
 		{
 			// If we don't have a program then there is no point progressing further.
@@ -1214,7 +1238,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				// If the GLProgram is yet to exist then 
 				// _data will need to be run through the
 				// rendering cycle again.
-				_data.forceUpdate() ;
+				basic.forceUpdate() ;
 				return false ;
 			}
 

@@ -6,11 +6,11 @@ import java.util.List ;
 import com.linxonline.mallet.util.BufferedList ;
 
 import com.linxonline.mallet.renderer.BasicWorld ;
-import com.linxonline.mallet.renderer.DrawData ;
+import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.CameraData ;
 import com.linxonline.mallet.renderer.WorldState ;
 
-public class Worlds<D extends DrawData,
+public class Worlds<D extends Draw,
 					C extends CameraData,
 					W extends BasicWorld<D, C>> extends WorldState<D, C, W>
 {
@@ -33,7 +33,7 @@ public class Worlds<D extends DrawData,
 
 	/**
 		Iterate over each W and update/upload its GL state.
-		GL state will be updated based on GLDrawData flagged 
+		GL state will be updated based on GLDraw flagged 
 		for updating.
 	*/
 	public void upload( final int _diff, final int _iteration )

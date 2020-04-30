@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 	Implements common requirements for using World.
 	Basic World manages draw object state and Camera state.
 */
-public abstract class BasicWorld<D extends DrawData, C extends CameraData> implements World
+public abstract class BasicWorld<D extends Draw, C extends CameraData> implements World
 {
 	private final Notification<World> renderNotification = new Notification<World>() ;
 	private final Notification<World> displayNotification = new Notification<World>() ;

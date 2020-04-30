@@ -13,7 +13,7 @@ import com.linxonline.mallet.util.Logger ;
 	rendering-system. A default world must be passed when WorldState is 
 	constructed/extended.
 */
-public class WorldState<D extends DrawData,
+public class WorldState<D extends Draw,
 						C extends CameraData,
 						W extends BasicWorld<D, C>>
 {

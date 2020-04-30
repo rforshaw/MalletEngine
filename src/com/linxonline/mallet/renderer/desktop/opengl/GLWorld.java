@@ -11,15 +11,15 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.BasicWorld ;
 import com.linxonline.mallet.renderer.CameraData ;
+import com.linxonline.mallet.renderer.BasicDraw ;
 
-import com.linxonline.mallet.renderer.opengl.DrawState ;
 import com.linxonline.mallet.renderer.opengl.CameraState ;
 
 /**
 	Represents the OpenGL state for a world.
 	A world cannot interact with other worlds.
 */
-public class GLWorld extends BasicWorld<GLDrawData, CameraData>
+public class GLWorld extends BasicWorld<GLDraw, CameraData>
 {
 	protected final static int FRAME_BUFFER    = 0 ;
 	protected final static int COLOUR_BUFFER   = 1 ;
@@ -30,7 +30,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	protected final DrawState<GLDrawData> state;			// Objects to be drawn
+	protected final GLDrawState state;			// Objects to be drawn
 	protected final CameraState<CameraData> cameras ;		// Camera view portals
 
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
@@ -42,7 +42,7 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	private GLWorld( final String _id, final int _order )
 	{
 		super( _id, _order ) ;
-		state = new DrawState<GLDrawData>( new GLBasicUpload(), new GLBasicRemove() ) ;
+		state = new GLDrawState( uploader ) ;
 		cameras = new CameraState<CameraData>( new GLCameraDraw() ) ;
 	}
 
@@ -173,8 +173,8 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	@Override
 	public void clean( final Set<String> _activeKeys )
 	{
-		final List<GLDrawData> list = state.getActiveDraws() ;
-		for( final GLDrawData draw : list )
+		final List<GLDraw> list = state.getActiveDraws() ;
+		for( final GLDraw draw : list )
 		{
 			draw.getUsedResources( _activeKeys ) ;
 		}
@@ -233,19 +233,19 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 	}
 
 	@Override
-	public void addDraw( final GLDrawData _draw )
+	public void addDraw( final GLDraw _draw )
 	{
 		state.add( _draw ) ;
 	}
 
 	@Override
-	public void addDraw( final List<GLDrawData> _draws )
+	public void addDraw( final List<GLDraw> _draws )
 	{
 		state.addAll( _draws ) ;
 	}
 
 	@Override
-	public void removeDraw( final GLDrawData _draw )
+	public void removeDraw( final GLDraw _draw )
 	{
 		state.remove( _draw ) ;
 	}
@@ -287,8 +287,11 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 			MGL.glBindFramebuffer( MGL.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 			MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, 0 ) ;
-			MGL.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
-								   disPosition.x, disPosition.y, display.x, display.y, MGL.GL_COLOR_BUFFER_BIT , MGL.GL_LINEAR ) ;
+			MGL.glBlitFramebuffer( renPosition.x, renPosition.y,
+								   render.x, render.y,
+								   disPosition.x, disPosition.y,
+								   display.x, display.y,
+								   MGL.GL_COLOR_BUFFER_BIT , MGL.GL_LINEAR ) ;
 		}
 	}
 
@@ -333,35 +336,6 @@ public class GLWorld extends BasicWorld<GLDrawData, CameraData>
 
 			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
 			uploader.draw( worldProjection, uiProjection ) ;
-		}
-	}
-
-	private final class GLBasicRemove implements BufferedList.RemoveListener<GLDrawData>
-	{
-		public GLBasicRemove() {}
-
-		@Override
-		public void remove( final GLDrawData _data )
-		{
-			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
-			uploader.remove( _data ) ;
-		}
-	}
-
-	private final class GLBasicUpload implements DrawState.IUpload<GLDrawData>
-	{
-		public GLBasicUpload() {}
-
-		@Override
-		public void upload( final GLDrawData _data )
-		{
-			if( GLRenderer.loadProgram( _data ) == false )
-			{
-				return ;
-			}
-
-			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
-			uploader.upload( _data ) ;
 		}
 	}
 }

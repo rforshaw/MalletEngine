@@ -1,23 +1,20 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cacheable
+public class BasicDraw<P> implements Cacheable
 {
 	private static final int POSITION = 0 ;
-	private static final int ROTATION = 3 ;
-	private static final int SCALE = 6 ;
+	private static final int OFFSET   = 3 ;
+	private static final int ROTATION = 6 ;
+	private static final int SCALE    = 9 ;
 
-	private MalletColour colour   = null ;
-	private StringBuilder text    = null ;
+	private MalletColour colour   = null ;	
 	private ProgramMap<P> program = null ;
 
-	private int textStart = 0 ;
-	private int textEnd = 0 ;
 	private boolean update = true ;
 	private boolean ui     = false ;
 
@@ -25,13 +22,12 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 	private Interpolation interpolation  = Interpolation.NONE ;
 	private UpdateType updateType        = UpdateType.ON_DEMAND ; 
 
-	private Vector3 offset ;
 	// Each contain Position, Rotation, and Scale
-	private final float[] old = FloatBuffer.allocate( 9 ) ;
-	private final float[] present = FloatBuffer.allocate( 9 ) ;
-	private final float[] future = FloatBuffer.allocate( 9 ) ;
+	private final float[] old = FloatBuffer.allocate( 12 ) ;
+	private final float[] present = FloatBuffer.allocate( 12 ) ;
+	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
-	public DrawData()
+	public BasicDraw()
 	{
 		this( UpdateType.ON_DEMAND,
 			  Interpolation.NONE,
@@ -42,21 +38,20 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 			  0 ) ;
 	}
 
-	public DrawData( final UpdateType _type,
-					 final Interpolation _interpolation,
-					 final Vector3 _position,
-					 final Vector3 _offset,
-					 final Vector3 _rotation,
-					 final Vector3 _scale,
-					 final int _order )
+	public BasicDraw( final UpdateType _type,
+					  final Interpolation _interpolation,
+					  final Vector3 _position,
+					  final Vector3 _offset,
+					  final Vector3 _rotation,
+					  final Vector3 _scale,
+					  final int _order )
 	{
 		setOrder( _order ) ;
 		setUpdateType( _type ) ;
 		setInterpolationMode( _interpolation ) ;
 
-		offset   = ( _offset != null )   ? _offset   : new Vector3() ;
-
 		FloatBuffer.set( future, POSITION, ( _position != null ) ? _position : new Vector3()  ) ;
+		FloatBuffer.set( future, OFFSET,   ( _offset != null )   ? _offset   : new Vector3()  ) ;
 		FloatBuffer.set( future, ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
 		FloatBuffer.set( future, SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
 	}
@@ -79,38 +74,6 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 	public MalletColour getColour()
 	{
 		return colour ;
-	}
-
-	public void setText( final StringBuilder _text )
-	{
-		text = _text ;
-		setTextStart( 0 ) ;
-		setTextEnd( text.length() ) ;
-	}
-
-	public void setTextStart( final int _start )
-	{
-		textStart = _start ;
-	}
-
-	public void setTextEnd( final int _end )
-	{
-		textEnd = _end ;
-	}
-
-	public StringBuilder getText()
-	{
-		return text ;
-	}
-
-	public int getTextStart()
-	{
-		return textStart ;
-	}
-
-	public int getTextEnd()
-	{
-		return textEnd ;
 	}
 
 	public void setUI( final boolean _ui )
@@ -140,7 +103,7 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		offset.setXYZ( _x, _y, _z ) ;
+		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
 	}
 
 	public void setRotation( final float _x, final float _y, final float _z )
@@ -185,8 +148,7 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 
 	public Vector3 getOffset( final Vector3 _fill )
 	{
-		_fill.setXYZ( offset ) ;
-		return _fill ;
+		return FloatBuffer.fill( present, _fill, OFFSET ) ;
 	}
 
 	public Vector3 getRotation( final Vector3 _fill )
@@ -223,7 +185,11 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 		}
 	}
 
-	private void interpolate( final float[] _future, final float[] _past, final float[] _present, final int _diff, final int _iteration )
+	private void interpolate( final float[] _future,
+							  final float[] _past,
+							  final float[] _present,
+							  final int _diff,
+							  final int _iteration )
 	{
 		if( Interpolate.linear( _future, _past, _present, _diff, _iteration ) )
 		{
@@ -249,7 +215,6 @@ public abstract class DrawData<T extends DrawData, P> implements Draw<T>, Cachea
 	public void reset()
 	{
 		colour  = null ;
-		text    = null ;
 		program = null ;
 
 		update = true ;

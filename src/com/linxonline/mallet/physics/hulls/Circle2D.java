@@ -1,6 +1,8 @@
 package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+
+import com.linxonline.mallet.physics.Group ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 import com.linxonline.mallet.physics.primitives.Circle ;
 
@@ -10,6 +12,12 @@ public class Circle2D extends Hull
 
 	public Circle2D( final Circle _circle )
 	{
+		this( _circle, null ) ;
+	}
+
+	public Circle2D( final Circle _circle, final Group.ID[] _collidables )
+	{
+		super( _collidables ) ;
 		circle = _circle ;
 	}
 
