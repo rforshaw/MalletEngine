@@ -8,8 +8,8 @@ public class OBB
 {
 	public static final int TOP_LEFT = 0 ;
 	public static final int TOP_RIGHT = 2 ;
-	public static final int BOTTOM_LEFT = 4 ;
-	public static final int BOTTOM_RIGHT = 6 ;
+	public static final int BOTTOM_RIGHT = 4 ;
+	public static final int BOTTOM_LEFT = 6 ;
 
 	public static final int POINT_NUM = 4 ;
 	public static final int AXES_NUM = 2 ;

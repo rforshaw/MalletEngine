@@ -18,6 +18,7 @@ import com.linxonline.mallet.entity.components.* ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
 
+import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
@@ -352,6 +353,7 @@ public final class GameTestLoader implements IGameLoader
 
 				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
 				final List<Draw> draws = MalletList.<Draw>newList( amount ) ;
+				final List<Draw> debugDraws = MalletList.<Draw>newList( amount ) ;
 				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
 					@Override
@@ -363,10 +365,15 @@ public final class GameTestLoader implements IGameLoader
 						{
 							final Hull hull = hulls.get( i ) ;
 							final Draw draw = draws.get( i ) ;
+							final Draw debugDraw = debugDraws.get( i ) ;
+
 							DrawAssist.forceUpdate( draw ) ;
+							DrawAssist.forceUpdate( debugDraw ) ;
 
 							final Vector2 pos = hull.getPosition() ;
 							DrawAssist.amendPosition( draw, pos.x, pos.y, 0.0f ) ;
+
+							Debug.updateDraw( debugDraw, hull ) ;
 						}
 					}
 				} ;
@@ -379,20 +386,19 @@ public final class GameTestLoader implements IGameLoader
 						final int y = 50 + ( j * 50 ) ;
 
 						final CollisionComponent coll = CollisionComponent.generateBox2D( entity,
-																						Entity.AllowEvents.NO,
-																						new Vector2(),
-																						new Vector2( 64, 64 ),
-																						new Vector2( x, y ),
-																						new Vector2( -32, -32 ) ) ;
+																						  Entity.AllowEvents.NO,
+																						  new Vector2(),
+																						  new Vector2( 64, 64 ),
+																						  new Vector2( x, y ),
+																						  new Vector2( -32, -32 ) ) ;
 						final Hull hull = coll.hull ;
 						final Vector2 position = new Vector2( x, y ) ;
 
-						final Vector3 offset = new Vector3( -32, -32, 0 ) ;
 						final Draw draw = DrawAssist.createDraw( new Vector3( position ),
-																offset,
-																new Vector3(),
-																new Vector3( 1, 1, 1 ),
-																10 ) ;
+																 new Vector3(),
+																 new Vector3(),
+																 new Vector3( 1, 1, 1 ),
+																 10 ) ;
 
 						DrawAssist.amendShape( draw, plane ) ;
 						DrawAssist.attachProgram( draw, program ) ;
@@ -400,13 +406,17 @@ public final class GameTestLoader implements IGameLoader
 
 						hulls.add( hull ) ;
 						draws.add( draw ) ;
+						debugDraws.add( Debug.createDraw( hull ) ) ;
 					}
 				}
 
 				render.addBasicDraw( draws, null ) ;
+				render.addBasicDraw( debugDraws, null ) ;
 
 				addEntity( entity ) ;
 			}
+
+
 
 			/**
 				Create an Entity that follows the mouse
@@ -440,7 +450,7 @@ public final class GameTestLoader implements IGameLoader
 																						new Vector2( 32, 32 ),
 																						new Vector2( 0, 0 ),
 																						new Vector2( -16, -16 ) ) ;
-				collision.hull.setPhysical( false ) ;
+				//collision.hull.setPhysical( false ) ;
 
 				final MouseComponent mouse = new MouseComponent( entity )
 				{

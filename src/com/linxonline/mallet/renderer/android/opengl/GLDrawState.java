@@ -3,9 +3,6 @@ package com.linxonline.mallet.renderer.android.opengl ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
-import com.linxonline.mallet.util.Logger ;
-
-import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.BasicDraw ;
 
 public final class GLDrawState
@@ -37,9 +34,11 @@ public final class GLDrawState
 			final GLDraw draw = current.get( i ) ;
 			final BasicDraw<GLProgram> basic = draw.getBasicDraw() ;
 
-			basic.update( _diff, _iteration ) ;
+			// Check to see if the object has been flagged to change.
 			if( basic.toUpdate() == true )
 			{
+				// If it has then we update, if it hasn't we don't update!
+				basic.update( _diff, _iteration ) ;
 				upload( draw ) ;
 			}
 		}

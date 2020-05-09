@@ -34,7 +34,7 @@ public class CollisionSystem extends EventController
 			}
 			case MULTI  :
 			{
-				treeHulls = new QuadTree( new WorkerGroup( "COLLISION", 11 ) ) ;
+				treeHulls = new QuadTree( new WorkerGroup( "COLLISION", 4 ) ) ;
 				break ;
 			}
 		}

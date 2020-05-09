@@ -23,6 +23,7 @@ public class InputSystem implements IInputSystem,
 	private final TimeCache<InputEvent> cache ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
+	private boolean[] keys = new boolean[32767] ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
@@ -34,7 +35,13 @@ public class InputSystem implements IInputSystem,
 		{
 			inputs[i] = new InputEvent() ;
 		}
+
 		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
+
+		for( int i = 0; i < keys.length; ++i )
+		{
+			keys[i] = false ;
+		}
 	}
 
 	public void addInputHandler( final InputHandler _handler )
@@ -93,14 +100,59 @@ public class InputSystem implements IInputSystem,
 
 	/** Recieve Key Events from system **/
 
+	@Override
 	public void keyPressed( final KeyEvent _event )
 	{
-		updateKey( InputType.KEYBOARD_PRESSED, _event ) ;
+		// Sometimes when multiple keys have been pressed 
+		// for a long duration, the next key to be pressed 
+		// is flagged WRONGLY as an auto-repeat.
+		// If the key is considered as released(false) then 
+		// we'll always consider it as a valid pressed action. 
+
+		final int index = ( int )_event.getKeyCode() ;
+		if( keys[index] == false )
+		{
+			keys[index] = true ;
+
+			KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
+			if( keycode == KeyCode.NONE )
+			{
+				keycode = isSpecialKeyDown( _event ) ;
+			}
+
+			final InputEvent input = cache.get() ;
+			input.setID( InputID.KEYBOARD_1 ) ;
+			input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
+			inputs.add( input ) ;
+		}
 	}
 
+	@Override
 	public void keyReleased( final KeyEvent _event )
 	{
-		updateKey( InputType.KEYBOARD_RELEASED, _event ) ;
+		if( _event.isAutoRepeat() == true )
+		{
+			// If the event is an auto-repeat skip it,
+			// we don't want to spam the input-system.
+			return ;
+		}
+
+		final int index = ( int )_event.getKeyCode() ;
+		if( keys[index] == true )
+		{
+			keys[index] = false ;
+
+			KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
+			if( keycode == KeyCode.NONE )
+			{
+				keycode = isSpecialKeyDown( _event ) ;
+			}
+
+			final InputEvent input = cache.get() ;
+			input.setID( InputID.KEYBOARD_1 ) ;
+			input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
+			inputs.add( input ) ;
+		}
 	}
 
 	public void keyTyped( final KeyEvent _event ) {}
@@ -218,25 +270,6 @@ public class InputSystem implements IInputSystem,
 		final InputEvent input = cache.get() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y, _when ) ;
-		inputs.add( input ) ;
-	}
-
-	private synchronized void updateKey( final InputType _inputType, final KeyEvent _event )
-	{
-		if( _event.isAutoRepeat() == true )
-		{
-			return ;
-		}
-
-		KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
-		if( keycode == KeyCode.NONE )
-		{
-			keycode = isSpecialKeyDown( _event ) ;
-		}
-
-		final InputEvent input = cache.get() ;
-		input.setID( InputID.KEYBOARD_1 ) ;
-		input.setInput( _inputType, keycode, _event.getWhen() ) ;
 		inputs.add( input ) ;
 	}
 

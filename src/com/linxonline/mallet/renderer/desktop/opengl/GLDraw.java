@@ -117,7 +117,7 @@ public class GLDraw implements Draw<GLDraw>, Cacheable
 
 	public void getUsedResources( final Set<String> _activeKeys )
 	{
-		final ProgramMap<GLProgram> map = ( ProgramMap<GLProgram> )basic.getProgram() ;
+		final ProgramMap<GLProgram> map = basic.getProgram() ;
 		if( map != null )
 		{
 			final GLProgram program = map.getProgram() ;
