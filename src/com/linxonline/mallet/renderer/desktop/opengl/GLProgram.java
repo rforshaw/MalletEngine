@@ -91,7 +91,7 @@ public class GLProgram extends ProgramManager.Program
 						return null ;
 					}
 
-					map.setUniform( uniform.getRight(), glTexture ) ;
+					map.setUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
 					break ;
 				}
 				case FONT         :
@@ -157,10 +157,17 @@ public class GLProgram extends ProgramManager.Program
 				}
 				case SAMPLER2D    :
 				{
-					final GLImage texture = ( GLImage )_data.getUniform( uniform.getRight() ) ;
+					final Texture texture = ( Texture )_data.getUniform( uniform.getRight() ) ;
+					final GLImage image = texture.image ;
 
 					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, texture.uWrap ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, texture.vWrap ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.maxFilter ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, texture.minFilter ) ;
+
 					textureUnit += 1 ;
 					break ;
 				}
@@ -356,6 +363,45 @@ public class GLProgram extends ProgramManager.Program
 			case GEOMETRY : return MGL.GL_GEOMETRY_SHADER ;
 			case COMPUTE  : return MGL.GL_COMPUTE_SHADER ;
 			default       : return -1 ;
+		}
+	}
+
+	private static class Texture
+	{
+		public final GLImage image ;
+		public int minFilter ;
+		public int maxFilter ;
+		public int uWrap ;
+		public int vWrap ;
+
+		public Texture( GLImage _image, final MalletTexture _texture )
+		{
+			image = _image ;
+			minFilter = calculateFilter( _texture.getMinimumFilter() ) ;
+			maxFilter = calculateFilter( _texture.getMaximumFilter() ) ;
+
+			uWrap = calculateWrap( _texture.getUWrap() ) ;
+			vWrap = calculateWrap( _texture.getVWrap() ) ;
+		}
+
+		private int calculateFilter( MalletTexture.Filter _filter )
+		{
+			switch( _filter )
+			{
+				default      :
+				case LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
+				case NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+			}
+		}
+
+		private int calculateWrap( MalletTexture.Wrap _wrap )
+		{
+			switch( _wrap )
+			{
+				default         :
+				case REPEAT     : return MGL.GL_REPEAT ;
+				case CLAMP_EDGE : return MGL.GL_CLAMP_TO_EDGE ;
+			}
 		}
 	}
 }

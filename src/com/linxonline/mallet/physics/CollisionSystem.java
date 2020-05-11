@@ -69,6 +69,8 @@ public class CollisionSystem extends EventController
 		treeHulls.removeHull( _hull ) ;
 	}
 
+	private CollisionCheck check = new CollisionCheck() ;
+
 	public void update( final float _dt )
 	{
 		update() ;			// Update Event Controller
@@ -85,8 +87,46 @@ public class CollisionSystem extends EventController
 			treeHulls.insertHull( hull ) ;
 		}
 
+		//simpleUpdate( check, hulls ) ;
 		//System.out.println( "Collisions: " + collisions ) ;
 		treeHulls.update( _dt ) ;
+	}
+
+	private static void simpleUpdate( final CollisionCheck _check, final List<Hull> _hulls )
+	{
+		for( final Hull hull1 : _hulls )
+		{
+			if( hull1.isCollidable() == false )
+			{
+				continue ;
+			}
+
+			updateCollisions( _check, hull1, _hulls ) ;
+		}
+	}
+
+	private static void updateCollisions( final CollisionCheck _check, final Hull _hull1, final List<Hull> _hulls )
+	{
+		for( final Hull hull2 : _hulls )
+		{
+			if( _hull1 == hull2 )
+			{
+				continue ;
+			}
+
+			if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
+			{
+				if( _check.generateContactPoint( _hull1, hull2 ) == true )
+				{
+					if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
+					{
+						// No point looking for more contacts if 
+						// we've reached maximum.
+						return ;
+					}
+				}
+			}
+		}
 	}
 
 	private final boolean exists( final Hull _hull )

@@ -13,6 +13,10 @@ import com.linxonline.mallet.maths.IntVector2 ;
 */
 public class MalletTexture
 {
+	private final Filter minFilter ;
+	private final Filter maxFilter ;
+	private final Wrap uWrap ;
+	private final Wrap vWrap ;
 	private final Meta meta ;
 
 	/**
@@ -21,7 +25,21 @@ public class MalletTexture
 	*/
 	public MalletTexture( final String _texturePath )
 	{
-		meta = TextureAssist.createMeta( _texturePath ) ;
+		this( _texturePath, Filter.LINEAR, Wrap.REPEAT ) ;
+	}
+
+	public MalletTexture( final String _texturePath, final Filter _filter, final Wrap _wrap )
+	{
+		this( TextureAssist.createMeta( _texturePath ), _filter, _wrap ) ;
+	}
+
+	public MalletTexture( final String _texturePath,
+						  final Filter _min,
+						  final Filter _max,
+						  final Wrap _u,
+						  final Wrap _v )
+	{
+		this( TextureAssist.createMeta( _texturePath ), _min, _max, _u, _v ) ;
 	}
 
 	/**
@@ -30,9 +48,30 @@ public class MalletTexture
 	*/
 	public MalletTexture( final World _world )
 	{
-		meta = TextureAssist.createMeta( _world ) ;
+		this( TextureAssist.createMeta( _world ), Filter.LINEAR, Wrap.REPEAT ) ;
 	}
 
+	private MalletTexture( final Meta _meta,
+						   final Filter _filter,
+						   final Wrap _wrap )
+	{
+		this( _meta, _filter, _filter, _wrap, _wrap ) ;
+	}
+	
+	private MalletTexture( final Meta _meta,
+						   final Filter _min, 
+						   final Filter _max,
+						   final Wrap _u,
+						   final Wrap _v )
+	{
+		meta = _meta ;
+		minFilter = ( _min == null ) ? Filter.LINEAR : _min ;
+		maxFilter = ( _max == null ) ? Filter.LINEAR : _max ;
+
+		uWrap = ( _u == null ) ? Wrap.REPEAT : _u ;
+		vWrap = ( _v == null ) ? Wrap.REPEAT : _v ;
+	}
+	
 	/**
 		Mallet Textures are considered equal 
 		if they share the same file path.
@@ -52,7 +91,16 @@ public class MalletTexture
 
 		if( _obj instanceof MalletTexture )
 		{
-			return meta.equals( ( ( MalletTexture )_obj ).meta ) ;
+			final MalletTexture rhs = ( MalletTexture )_obj ; 
+			if( uWrap != rhs.uWrap || vWrap != rhs.vWrap )
+			{
+				return false ;
+			}
+			else if( minFilter != rhs.minFilter || maxFilter != rhs.maxFilter )
+			{
+				return false ;
+			}
+			return meta.equals( rhs.meta ) ;
 		}
 
 		return false ;
@@ -114,9 +162,41 @@ public class MalletTexture
 		return meta.ratio ;
 	}
 
+	public Wrap getUWrap()
+	{
+		return uWrap ;
+	}
+
+	public Wrap getVWrap()
+	{
+		return vWrap ;
+	}
+
+	public Filter getMinimumFilter()
+	{
+		return minFilter ;
+	}
+
+	public Filter getMaximumFilter()
+	{
+		return minFilter ;
+	}
+
 	public String toString()
 	{
 		return meta.toString() ;
+	}
+
+	public static enum Wrap
+	{
+		REPEAT,
+		CLAMP_EDGE
+	}
+
+	public static enum Filter
+	{
+		LINEAR,
+		NEAREST
 	}
 
 	public static class Meta

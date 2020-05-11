@@ -18,6 +18,8 @@ public final class MGL
 	public final static int GL_REPEAT = GL3.GL_REPEAT ;
 	public final static int GL_LINEAR = GL3.GL_LINEAR ;
 	public final static int GL_NEAREST = GL3.GL_NEAREST ;
+	public final static int GL_NEAREST_MIPMAP_NEAREST = GL3.GL_NEAREST_MIPMAP_NEAREST ;
+	public final static int GL_LINEAR_MIPMAP_LINEAR = GL3.GL_LINEAR_MIPMAP_LINEAR ;
 
 	public final static int GL_ABGR_EXT = GL2.GL_ABGR_EXT ;
 	public final static int GL_COMPRESSED_RGBA = GL3.GL_COMPRESSED_RGBA ;

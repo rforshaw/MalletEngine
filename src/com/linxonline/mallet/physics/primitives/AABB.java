@@ -57,13 +57,13 @@ public class AABB
 	*/
 	public void setDimensionsFromOBB( final OBB _obb )
 	{
-		final Vector2 point = FloatBuffer.fill( _obb.points, new Vector2(), 0 ) ;
+		final Vector2 point = FloatBuffer.fill( _obb.rotations, new Vector2(), 0 ) ;
 		FloatBuffer.set( range, AABB.MIN_X, point.x, point.y ) ;
 		FloatBuffer.set( range, AABB.MAX_X, point.x, point.y ) ;
 
-		for( int i = 2; i < _obb.points.length; i += 2 )
+		for( int i = 2; i < _obb.rotations.length; i += 2 )
 		{
-			FloatBuffer.fill( _obb.points, point, i ) ;
+			FloatBuffer.fill( _obb.rotations, point, i ) ;
 			if( point.x < range[AABB.MIN_X] )
 			{
 				range[AABB.MIN_X] = point.x ;
@@ -89,9 +89,9 @@ public class AABB
 		FloatBuffer.set( position, AABB.POSITION_X, _x, _y ) ;
 	}
 
-	public void translate( final float _x, final float _y )
+	public void addToPosition( final float _x, final float _y )
 	{
-		FloatBuffer.set( position, AABB.OFFSET_X, _x, _y ) ;
+		FloatBuffer.add( position, AABB.POSITION_X, _x, _y ) ;
 	}
 
 	/**
@@ -101,9 +101,16 @@ public class AABB
 	{
 		final float x = position[AABB.POSITION_X] + position[AABB.OFFSET_X] ;
 		final float y = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] ;
-		if( _x >= x + range[AABB.MIN_X] && _x <= x + range[AABB.MAX_X] )
+
+		final float minX = x + range[AABB.MIN_X] ;
+		final float maxX = x + range[AABB.MAX_X] ;
+
+		if( _x >= minX && _x <= maxX )
 		{
-			if( _y >= y + range[AABB.MIN_Y] && _y <= y + range[AABB.MAX_Y] )
+			final float minY = y + range[AABB.MIN_Y] ;
+			final float maxY = y + range[AABB.MAX_Y] ;
+
+			if( _y >= minY && _y <= maxY )
 			{
 				return true ;
 			}

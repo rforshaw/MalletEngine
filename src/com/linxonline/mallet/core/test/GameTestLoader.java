@@ -385,17 +385,17 @@ public final class GameTestLoader implements IGameLoader
 						final int x = 50 + ( i * 50 ) ;
 						final int y = 50 + ( j * 50 ) ;
 
+						final Vector2 position = new Vector2( x, y ) ;
 						final CollisionComponent coll = CollisionComponent.generateBox2D( entity,
 																						  Entity.AllowEvents.NO,
 																						  new Vector2(),
 																						  new Vector2( 64, 64 ),
-																						  new Vector2( x, y ),
+																						  position,
 																						  new Vector2( -32, -32 ) ) ;
 						final Hull hull = coll.hull ;
-						final Vector2 position = new Vector2( x, y ) ;
 
 						final Draw draw = DrawAssist.createDraw( new Vector3( position ),
-																 new Vector3(),
+																 new Vector3( -32, -32, 0 ),
 																 new Vector3(),
 																 new Vector3( 1, 1, 1 ),
 																 10 ) ;

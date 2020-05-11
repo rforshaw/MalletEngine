@@ -71,9 +71,12 @@ public abstract class Hull
 	}
 
 	public abstract void setPosition( final float _x, final float _y ) ;
+	public abstract void addToPosition( final float _x, final float _y ) ;
 	public abstract void setRotation( final float _theta ) ;
 
 	public abstract Vector2 getPosition() ;
+	public abstract Vector2 getOffset() ;
+	public abstract float getRotation() ;
 
 	public abstract float[] getAxes() ;
 	public abstract float[] getPoints() ;

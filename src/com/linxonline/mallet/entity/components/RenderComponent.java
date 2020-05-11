@@ -33,7 +33,15 @@ public class RenderComponent extends Component
 	public RenderComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
 		super( _parent, _allow ) ;
+		init() ;
 	}
+
+	/**
+		Override when you wish to construct a set of 
+		draw objects and add them directly to the 
+		component without revealing them to others.
+	*/
+	public void init() {}
 
 	public void addBasicDraw( final Draw _draw )
 	{

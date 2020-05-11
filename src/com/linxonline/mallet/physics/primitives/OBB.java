@@ -23,6 +23,7 @@ public class OBB
 
 	public float[] position = new float[( 2 * VECTOR_TYPE ) + 1] ;
 	public float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
+	public float[] rotations = new float[POINT_NUM * VECTOR_TYPE] ;
 	public float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
 
 	public OBB()
@@ -36,11 +37,12 @@ public class OBB
 
 	public OBB( final AABB _aabb )
 	{
-		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],       _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],       _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],       _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],       _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X], _aabb.position[AABB.OFFSET_Y] ) ;
+		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( position, OBB.POSITION_X,   _aabb.position[AABB.POSITION_X], _aabb.position[AABB.POSITION_Y] ) ;
+		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X],   _aabb.position[AABB.OFFSET_Y] ) ;
 		init() ;
 	}
 
@@ -60,7 +62,12 @@ public class OBB
 	{
 		FloatBuffer.set( position, OBB.POSITION_X, _x, _y ) ;
 	}
-	
+
+	public void addToPosition( final float _x, final float _y )
+	{
+		FloatBuffer.add( position, OBB.POSITION_X, _x, _y ) ;
+	}
+
 	public void translate( final float _x, final float _y )
 	{
 		FloatBuffer.add( position, OBB.POSITION_X, _x, _y ) ;
@@ -104,6 +111,23 @@ public class OBB
 		return result ;
 	}
 
+	public Vector2 getPosition( final Vector2 _fill )
+	{
+		_fill.setXY( position[OBB.POSITION_X], position[OBB.POSITION_Y] ) ;
+		return _fill ;
+	}
+
+	public Vector2 getOffset( final Vector2 _fill )
+	{
+		_fill.setXY( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
+		return _fill ;
+	}
+
+	public float getRotation()
+	{
+		return position[OBB.ROTATION] ;
+	}
+	
 	public Vector2 getCenter( final Vector2 _center )
 	{
 		_center.setXY( position[OBB.POSITION_X], position[OBB.POSITION_Y] ) ;
@@ -121,35 +145,62 @@ public class OBB
 	**/
 	public final void setRotation( final float _theta )
 	{
-		final float diff = _theta - position[OBB.ROTATION] ;
-		final float cosAngle = ( float )Math.cos( diff ) ;
-		final float sinAngle = ( float )Math.sin( diff ) ;
 		position[OBB.ROTATION] = _theta ;
+		applyRotations() ;
+	}
+
+	private void applyRotations()
+	{
+		final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
+		final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
+
+		final Vector2 point = new Vector2() ;
+		final Vector2 offset = new Vector2( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
 
 		for( int i = 0; i < points.length; i += 2 )
 		{
-			float x = points[i + 0] + position[OBB.OFFSET_X] ;
-			float y = points[i + 1] + position[OBB.OFFSET_Y] ;
-
-			x = ( x * cosAngle ) - ( y * sinAngle ) - position[OBB.OFFSET_X] ;
-			y = ( y * cosAngle ) + ( x * sinAngle ) - position[OBB.OFFSET_Y] ;
-
-			points[i + 0] = x ;
-			points[i + 1] = y ;
+			FloatBuffer.fill( points, point, i ) ;
+			OBB.rotate( point, offset, sin, cos ) ;
+			FloatBuffer.set( rotations, i, point.x, point.y ) ;
 		}
+	}
+	
+	public static Vector2 rotate( final Vector2 _point, final Vector2 _offset, final float _sin, final float _cos )
+	{
+		_point.x += _offset.x ;
+		_point.y += _offset.y ;
+
+		final float x = ( _point.x * _cos ) - ( _point.y * _sin ) ;
+		final float y = ( _point.x * _sin ) + ( _point.y * _cos ) ;
+
+		_point.x = x - _offset.x ;
+		_point.y = y - _offset.y ;
+		return _point ;
 	}
 
 	public final void updateAxesAndEdges()
 	{
-		axes[1] = points[OBB.TOP_RIGHT] - points[OBB.TOP_LEFT] ;					// x
-		axes[0] = -( points[OBB.TOP_RIGHT + 1] - points[OBB.TOP_LEFT + 1] ) ;		// y
+		final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
+		final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
+
+		final float topRightX = rotations[OBB.TOP_RIGHT] ;
+		final float topRightY = rotations[OBB.TOP_RIGHT + 1] ;
+
+		final float topLeftX = rotations[OBB.TOP_LEFT] ;
+		final float topLeftY = rotations[OBB.TOP_LEFT + 1] ;
+
+		final float bottomRightX = rotations[OBB.BOTTOM_RIGHT] ;
+		final float bottomRightY = rotations[OBB.BOTTOM_RIGHT + 1] ;
+
+		axes[1] = topRightX - topLeftX ;			// x
+		axes[0] = -( topRightY - topLeftY ) ;		// y
 
 		float length = Vector2.length( axes[0], axes[1] ) ;
 		axes[0] /= length ;
 		axes[1] /= length ;
 
-		axes[3] = points[OBB.TOP_RIGHT] - points[OBB.BOTTOM_RIGHT] ;				// x
-		axes[2] = -( points[OBB.TOP_RIGHT + 1] - points[OBB.BOTTOM_RIGHT + 1] ) ;	// y
+		axes[3] = topRightX - bottomRightX ;		// x
+		axes[2] = -( topRightY - bottomRightY ) ;	// y
 
 		length = Vector2.length( axes[2], axes[3] ) ;
 		axes[2] /= length ;
@@ -158,6 +209,7 @@ public class OBB
 
 	private final void init()
 	{
+		applyRotations() ;
 		updateAxesAndEdges() ;
 	}
 }

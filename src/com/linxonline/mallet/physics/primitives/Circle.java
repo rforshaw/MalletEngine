@@ -21,6 +21,11 @@ public class Circle
 		position.setXY( _x, _y ) ;
 	}
 
+	public void addToPosition( final float _x, final float _y )
+	{
+		position.add( _x, _y ) ;
+	}
+
 	public void setRotation( final float _theta ) {}
 
 	public boolean intersectCircle( final Circle _circle )

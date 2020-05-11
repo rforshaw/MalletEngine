@@ -17,11 +17,11 @@ public class Debug
 
 	public static Draw createDraw( final Hull _hull )
 	{
-		final Draw draw = DrawAssist.createDraw( new Vector3(),
-													new Vector3(),
-													new Vector3(),
-													new Vector3( 1, 1, 1 ),
-													10 ) ;
+		final Draw draw = DrawAssist.createDraw( new Vector3( _hull.getPosition() ),
+												 new Vector3( _hull.getOffset() ),
+												 new Vector3(),
+												 new Vector3( 1, 1, 1 ),
+												 10 ) ;
 
 		final Shape.Swivel[] swivel = new Shape.Swivel[2] ;
 		swivel[0] = Shape.Swivel.POINT ;
@@ -43,9 +43,6 @@ public class Debug
 
 		shape.addIndex( 0 ) ;
 
-		final Vector2 pos = _hull.getPosition() ;
-		DrawAssist.amendPosition( draw, pos.x, pos.y, 0.0f ) ;
-
 		DrawAssist.amendShape( draw, shape ) ;
 		DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
@@ -56,7 +53,11 @@ public class Debug
 	public static void updateDraw( final Draw _draw, final Hull _hull )
 	{
 		final Vector2 pos = _hull.getPosition() ;
+		final Vector2 offset = _hull.getOffset() ;
+		final float rotate = _hull.getRotation() ;
+
 		DrawAssist.amendPosition( _draw, pos.x, pos.y, 0.0f ) ;
+		DrawAssist.amendOffset( _draw, offset.x, offset.y, 0.0f ) ;
 
 		final Shape shape = DrawAssist.getDrawShape( _draw ) ;
 
