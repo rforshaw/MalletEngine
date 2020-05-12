@@ -50,8 +50,18 @@ public class BasicDraw<P> implements Cacheable
 		setUpdateType( _type ) ;
 		setInterpolationMode( _interpolation ) ;
 
-		FloatBuffer.set( future, POSITION, ( _position != null ) ? _position : new Vector3()  ) ;
-		FloatBuffer.set( future, OFFSET,   ( _offset != null )   ? _offset   : new Vector3()  ) ;
+		FloatBuffer.set( old, POSITION, ( _position != null ) ? _position : new Vector3() ) ;
+		FloatBuffer.set( old, OFFSET,   ( _offset != null )   ? _offset   : new Vector3() ) ;
+		FloatBuffer.set( old, ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
+		FloatBuffer.set( old, SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
+
+		FloatBuffer.set( present, POSITION, ( _position != null ) ? _position : new Vector3() ) ;
+		FloatBuffer.set( present, OFFSET,   ( _offset != null )   ? _offset   : new Vector3() ) ;
+		FloatBuffer.set( present, ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
+		FloatBuffer.set( present, SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
+
+		FloatBuffer.set( future, POSITION, ( _position != null ) ? _position : new Vector3() ) ;
+		FloatBuffer.set( future, OFFSET,   ( _offset != null )   ? _offset   : new Vector3() ) ;
 		FloatBuffer.set( future, ROTATION, ( _rotation != null ) ? _rotation : new Vector3() ) ;
 		FloatBuffer.set( future, SCALE,    ( _scale != null )    ? _scale    : new Vector3() ) ;
 	}

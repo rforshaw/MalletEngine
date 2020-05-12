@@ -59,7 +59,6 @@ public class CollisionSystem extends EventController
 		if( exists( _hull ) == false )
 		{
 			hulls.add( _hull ) ;
-			treeHulls.insertHull( _hull ) ;
 		}
 	}
 

@@ -186,7 +186,8 @@ public class QuadTree
 			{
 				// We assume the check to see if the 
 				// hull already exists within this node has 
-				// been called. 
+				// been called.
+				//System.out.println( "Inserting hull at " + nextHull + " Hull: " + _hull ) ;
 				hulls[nextHull++] = _hull ;
 				return true ;
 			}
@@ -343,6 +344,7 @@ public class QuadTree
 					continue ;
 				}
 
+				//System.out.println( hull1 ) ;
 				updateCollisions( index, hull1, hulls ) ;
 
 				// We've compared this hull against all the other 
@@ -356,8 +358,9 @@ public class QuadTree
 		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
 		{
 			final int size = _index ;
-			for( int j = 0; j < size; j++ )
+			for( int j = 0; j < size; ++j )
 			{
+				//System.out.println( "Index: " + _index + " J: " + j + " Size: " + size ) ;
 				final Hull hull2 = _hulls[j] ;
 				if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 				{
@@ -529,6 +532,7 @@ public class QuadTree
 
 		private boolean createChildren()
 		{
+			//System.out.println( "Create Children" ) ;
 			return createTier( length / 2.0f ) ;
 		}
 

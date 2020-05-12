@@ -165,6 +165,14 @@ public class RenderComponent extends Component
 		super.passInitialEvents( _events ) ;
 		_events.add( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 		{
+			if( toDestroy != null )
+			{
+				// toDestroy will only be set if the entity 
+				// has been flagged for destruction.
+				_delegate.shutdown() ;
+				return ;
+			}
+
 			drawDelegate = _delegate ;
 			if( toAddBasic.isEmpty() == false )
 			{
