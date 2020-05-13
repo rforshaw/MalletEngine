@@ -140,6 +140,11 @@ public class AnimComponent extends EventComponent implements SourceCallback
 
 	public void callbackRemoved() {}
 
+	public Anim getCurrentAnimation()
+	{
+		return ( currentAnim != null ) ? currentAnim.getLeft() : null ;
+	}
+
 	@Override
 	public void start()
 	{

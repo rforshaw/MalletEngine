@@ -63,6 +63,11 @@ public final class GLDrawState
 	public void add( final GLDraw _draw )
 	{
 		final BasicDraw basic = _draw.getBasicDraw() ;
+		// The objects current position, rotation, and scale 
+		// may not be what's set for its future. Update the to ensure 
+		// it's current state is the latest/future.
+		basic.update( 1, 1 ) ;
+
 		state.insert( _draw, basic.getOrder() ) ;
 	}
 
@@ -71,6 +76,10 @@ public final class GLDrawState
 		for( final GLDraw draw : _draws )
 		{
 			final BasicDraw basic = draw.getBasicDraw() ;
+			// The objects current position, rotation, and scale 
+			// may not be what's set for its future. Update the to ensure 
+			// it's current state is the latest/future.
+			basic.update( 1, 1 ) ;
 			state.insert( draw, basic.getOrder() ) ;
 		}
 	}

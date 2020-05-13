@@ -1127,11 +1127,17 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public void display( final GLAutoDrawable _drawable )
 	{
 		updateExecutions() ;
-
 		getEventController().update() ;
 
-		//System.out.println( "Draw" ) ;
-		worlds.upload( ( int )( getUpdateDeltaTime() / getFrameDeltaTime() ), getFrameIteration() ) ;
+		final float updateDelta = getUpdateDeltaTime() ;
+		final float frameDelta = getFrameDeltaTime() ;
+		final int frameNo = getFrameIteration() ;
+
+		// Expected number of render frames before the next update is triggered.
+		final int difference = ( int )( updateDelta / frameDelta ) ;
+
+		//System.out.println( "Update Delta: " + updateDelta + " Frame Delta: " + frameDelta + " Frame No: " + frameNo + " Diff: " + difference ) ;
+		worlds.upload( difference, frameNo ) ;
 		canvas.swapBuffers() ;
 	}
 

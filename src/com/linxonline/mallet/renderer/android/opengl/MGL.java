@@ -65,6 +65,8 @@ public class MGL
 	public final static int GL_STENCIL_INDEX8 = GLES30.GL_STENCIL_INDEX8 ;
 	public final static int GL_COLOR_ATTACHMENT0 = GLES30.GL_COLOR_ATTACHMENT0 ;
 	public final static int GL_STENCIL_ATTACHMENT = GLES30.GL_STENCIL_ATTACHMENT ;
+	public final static int GL_NEAREST_MIPMAP_NEAREST = GLES30.GL_NEAREST_MIPMAP_NEAREST ;
+	public final static int GL_LINEAR_MIPMAP_LINEAR = GLES30.GL_LINEAR_MIPMAP_LINEAR ;
 
 	public MGL() {}
 
