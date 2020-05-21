@@ -271,9 +271,10 @@ public class GameState extends State
 	{
 		final EventController animationController = animationSystem.getEventController() ;
 		final EventController audioController = audioSystem.getEventController() ;
+		final EventController collisionController = collisionSystem.getEventController() ;
 
 		eventSystem.addHandler( audioController ) ;
-		eventSystem.addHandler( collisionSystem ) ;
+		eventSystem.addHandler( collisionController ) ;
 		eventSystem.addHandler( system.getRenderer().getEventController() ) ;
 		eventSystem.addHandler( animationController ) ;
 
@@ -294,7 +295,7 @@ public class GameState extends State
 	{
 		eventSystem.removeHandler( audioSystem.getEventController() ) ;
 		eventSystem.removeHandler( animationSystem.getEventController() ) ;
-		eventSystem.removeHandler( collisionSystem ) ;
+		eventSystem.removeHandler( collisionSystem.getEventController() ) ;
 		eventSystem.removeHandler( system.getRenderer().getEventController() ) ;
 
 		final IInputSystem input = system.getInput() ;

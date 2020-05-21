@@ -146,7 +146,7 @@ public class Vector2
 	{
 		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) ;
 	}
-	
+
 	public static final float distance( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		final float tmp1 = ( _vec2.x - _vec1.x ) ;

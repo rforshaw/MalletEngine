@@ -36,4 +36,9 @@ public class MalletList
 		System.arraycopy( _rhs, 0, result, _lhs.length, _rhs.length ) ;
 		return result ;
 	}
+
+	public static <T> T[] toArray( final T ... _array )
+	{
+		return _array ;
+	}
 }

@@ -33,7 +33,7 @@ public class EventController implements IEventHandler
 
 	public EventController()
 	{
-		this( 0, 0 ) ;
+		this( 5, 5 ) ;
 	}
 
 	public EventController( final Tuple<String, IProcessor<?>> ... _processors )
@@ -117,7 +117,7 @@ public class EventController implements IEventHandler
 	*/
 	public void update()
 	{
-		final List<Event<?>> events = messenger ;//messenger.swap() ;
+		final List<Event<?>> events = messenger ;
 		if( events.isEmpty() )
 		{
 			return ;

@@ -7,6 +7,7 @@ import com.linxonline.mallet.util.worker.* ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
+import com.linxonline.mallet.physics.primitives.AABB ;
 
 public class QuadTree
 {
@@ -115,6 +116,22 @@ public class QuadTree
 		root.removeHull( _hull ) ;
 	}
 
+	/**
+		Generate contact points on the hull that has been 
+		passed in.
+		The hull will not be added to the Quad Tree but it 
+		will be compared to hulls that have been inserted. 
+	*/
+	public void generateContacts( final Hull _hull )
+	{
+		root.generateContacts( _hull ) ;
+	}
+
+	public Hull getHullWithPoint( final Vector2 _point, final Group.ID[] _filters )
+	{
+		return root.getHullWithPoint( _point, _filters ) ;
+	}
+
 	public boolean exists( final Hull _hull )
 	{
 		return root.exists( _hull ) ;
@@ -167,6 +184,56 @@ public class QuadTree
 			}
 		}
 
+		public void generateContacts( final Hull _hull )
+		{
+			if( parent == true )
+			{
+				generateContactsFromQuadrants( _hull ) ;
+				return ;
+			}
+
+			// nextHull is the current length of hulls 
+			// we want the hull we've passed in to be compared 
+			// against all hulls within this node.
+			updateCollisions( nextHull, _hull, hulls ) ;
+		}
+
+		public Hull getHullWithPoint( final Vector2 _point, final Group.ID[] _filters )
+		{
+			if( parent == true )
+			{
+				switch( findQuadrant( _point, centre ) )
+				{
+					default           : return null ;
+					case TOP_LEFT     : return topLeft.getHullWithPoint( _point, _filters ) ;
+					case TOP_RIGHT    : return topRight.getHullWithPoint( _point, _filters ) ;
+					case BOTTOM_LEFT  : return bottomLeft.getHullWithPoint( _point, _filters ) ;
+					case BOTTOM_RIGHT : return bottomRight.getHullWithPoint( _point, _filters ) ;
+				}
+			}
+
+			Hull best = null ;
+			for( int i = 0; i < nextHull; ++i )
+			{
+				final Hull hull = hulls[i] ;
+				if( Hull.isCollidableWithGroup( hull.getGroupID(), _filters ) == false )
+				{
+					// The client is not interested if this hull intersects 
+					// the ray being cast.
+					continue ;
+				}
+
+				final AABB aabb = hull.getAABB() ;
+				if( aabb.intersectPoint( _point.x, _point.y ) == true )
+				{
+					best = hull ;
+				}
+			}
+
+			return best ;
+		}
+
+		
 		/**
 			Insert the hull into the node or one 
 			of the nodes child nodes.
@@ -334,46 +401,26 @@ public class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
-			while( nextHull > 0 )
+			for( int i = 0; i < nextHull; ++i )
 			{
-				final int index = nextHull - 1 ;
-				final Hull hull1 = hulls[index] ;
+				//final int index = nextHull - 1 ;
+				final Hull hull1 = hulls[i] ;
 				if( hull1.isCollidable() == false )
 				{
-					removeHull( index ) ;
 					continue ;
 				}
 
 				//System.out.println( hull1 ) ;
-				updateCollisions( index, hull1, hulls ) ;
-
-				// We've compared this hull against all the other 
-				// hulls, and generated the needed collision points.
-				// No more can be done, leaving it in will only 
-				// consume valuable resources. 
-				removeHull( index ) ;
+				updateCollisions( i, hull1, hulls ) ;
 			}
 		}
 
 		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
 		{
-			final int size = _index ;
-			for( int j = 0; j < size; ++j )
+			for( int j = _index + 1; j < nextHull; ++j )
 			{
-				//System.out.println( "Index: " + _index + " J: " + j + " Size: " + size ) ;
 				final Hull hull2 = _hulls[j] ;
-				if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
-				{
-					if( check.generateContactPoint( _hull1, hull2 ) == true )
-					{
-						if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
-						{
-							// No point looking for more contacts if 
-							// we've reached maximum.
-							return ;
-						}
-					}
-				}
+				check.generateContactPoint( _hull1, hull2 ) ;
 			}
 		}
 		
@@ -516,6 +563,70 @@ public class QuadTree
 			}
 
 			return added > 0 ;
+		}
+
+		public void generateContactsFromQuadrants( final Hull _hull )
+		{
+			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
+			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
+			// have the hull stored within it once.
+			// Once the hull has been added to the 
+			// appropriate node, then we should not attempt 
+			// to insert the hull again.
+			// Inserting the hull is costly, and should 
+			// only be done, if it isn't there already.
+			boolean usedTopLeft = false ;
+			boolean usedTopRight = false ;
+			boolean usedBottomLeft = false ;
+			boolean usedBottomRight = false ;
+
+			final float[] points = _hull.getPoints() ;
+			for( int i = 0; i < points.length; i += 2 )
+			{
+				absolute.setXY( _hull.getPosition() ) ;
+				absolute.add( points[i], points[i + 1] ) ;
+
+				// Find out what quadrants the hull covers. 
+				switch( findQuadrant( absolute, centre ) )
+				{
+					case TOP_LEFT     :
+					{
+						if( usedTopLeft == false )
+						{
+							usedTopLeft = true ;
+							topLeft.generateContacts( _hull ) ;
+						}
+						break ;
+					}
+					case TOP_RIGHT    :
+					{
+						if( usedTopRight == false )
+						{
+							usedTopRight = true ;
+							topRight.generateContacts( _hull ) ;
+						}
+						break ;
+					}
+					case BOTTOM_LEFT  :
+					{
+						if( usedBottomLeft == false )
+						{
+							usedBottomLeft = true ;
+							bottomLeft.generateContacts( _hull ) ;
+						}
+						break ;
+					}
+					case BOTTOM_RIGHT :
+					{
+						if( usedBottomRight == false )
+						{
+							usedBottomRight = true ;
+							bottomRight.generateContacts( _hull ) ;
+						}
+						break ;
+					}
+				}
+			}
 		}
 
 		/**

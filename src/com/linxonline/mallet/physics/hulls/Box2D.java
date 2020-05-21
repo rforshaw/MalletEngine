@@ -43,6 +43,20 @@ public class Box2D extends Hull
 	}
 
 	@Override
+	public void setOffset( final float _x, final float _y )
+	{
+		aabb.setOffset( _x, _y ) ;
+		obb.setOffset( _x, _y ) ;
+	}
+
+	@Override
+	public void addToOffset( final float _x, final float _y )
+	{
+		aabb.addToOffset( _x, _y ) ;
+		obb.addToOffset( _x, _y ) ;
+	}
+
+	@Override
 	public void setRotation( final float _theta )
 	{
 		obb.setRotation( _theta ) ;

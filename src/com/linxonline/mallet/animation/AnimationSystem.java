@@ -5,15 +5,13 @@ import java.util.Set ;
 import java.util.HashSet ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.event.EventType ;
 import com.linxonline.mallet.event.EventController ;
-import com.linxonline.mallet.event.IAddEvent ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.caches.ObjectCache ;
 
 import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
@@ -29,38 +27,39 @@ public class AnimationSystem
 
 	private final SpriteManager spriteManager = new SpriteManager() ;
 
-	private final EventController controller = new EventController() ;
+	private final EventController controller ;
 	protected DrawDelegate drawDelegate = null ;
 
 	public AnimationSystem()
 	{
-		controller.addProcessor( "ANIMATION_DELEGATE", ( final AnimationDelegateCallback _callback ) ->
-		{
-			_callback.callback( constructAnimationDelegate() ) ;
-		} ) ;
-
-		controller.addProcessor( "ANIMATION_CLEAN", new EventController.IProcessor<Object>()
-		{
-			@Override
-			public void process( final Object _null )
+		controller = new EventController( MalletList.toArray( 
+			Tuple.<String, EventController.IProcessor<?>>build( "ANIMATION_DELEGATE", ( final AnimationDelegateCallback _callback ) ->
 			{
-				final Set<String> activeKeys = new HashSet<String>() ;
-				getActiveKeys( activeKeys, toAddAnim ) ;
-				getActiveKeys( activeKeys, animations ) ;
-
-				spriteManager.clean( activeKeys ) ;
-			}
-
-			private void getActiveKeys( final Set<String> _keys, final List<AnimData> _animations )
+				_callback.callback( constructAnimationDelegate() ) ;
+			} ),
+			Tuple.<String, EventController.IProcessor<?>>build( "ANIMATION_CLEAN", new EventController.IProcessor<Object>()
 			{
-				final int size = _animations.size() ;
-				for( int i = 0; i < size; i++ )
+				@Override
+				public void process( final Object _null )
 				{
-					final AnimData anim = _animations.get( i ) ;
-					_keys.add( anim.getFile() ) ;
+					final Set<String> activeKeys = new HashSet<String>() ;
+					getActiveKeys( activeKeys, toAddAnim ) ;
+					getActiveKeys( activeKeys, animations ) ;
+
+					spriteManager.clean( activeKeys ) ;
 				}
-			}
-		} ) ;
+
+				private void getActiveKeys( final Set<String> _keys, final List<AnimData> _animations )
+				{
+					final int size = _animations.size() ;
+					for( int i = 0; i < size; i++ )
+					{
+						final AnimData anim = _animations.get( i ) ;
+						_keys.add( anim.getFile() ) ;
+					}
+				}
+			} ) )
+		) ;
 
 		/**
 			Animation System requires a handle to the Rendering System.
@@ -135,11 +134,6 @@ public class AnimationSystem
 			anim.removeCallback() ;
 		}
 		animations.clear() ;
-	}
-
-	public String getName()
-	{
-		return "Animation System" ;
 	}
 
 	protected AnimationDelegate constructAnimationDelegate()

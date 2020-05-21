@@ -5,12 +5,15 @@ import java.util.List ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.event.* ;
+import com.linxonline.mallet.maths.Vector2 ;
 
-public class CollisionSystem extends EventController
+public class CollisionSystem
 {
+	private final EventController eventController ;
 	private final List<Hull> hulls = MalletList.<Hull>newList() ;
 	private final QuadTree treeHulls ;
 
@@ -21,8 +24,20 @@ public class CollisionSystem extends EventController
 
 	public CollisionSystem( final IAddEvent _addInterface, Threaded _type )
 	{
-		setAddEventInterface( _addInterface ) ;
-		initEventProcessors() ;
+		eventController = new EventController( MalletList.toArray(
+			Tuple.<String, EventController.IProcessor<?>>build( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
+			{
+				add( _hull ) ;
+			} ),
+			Tuple.<String, EventController.IProcessor<?>>build( "REMOVE_COLLISION_HULL", ( final Hull _hull ) ->
+			{
+				remove( _hull ) ;
+			} ),
+			Tuple.<String, EventController.IProcessor<?>>build( "COLLISION_DELEGATE", ( final ICollisionDelegate.ICallback _callback ) ->
+			{
+				_callback.callback( constructCollisionDelegate() ) ;
+			} )
+		) ) ;
 
 		switch( _type )
 		{
@@ -41,17 +56,9 @@ public class CollisionSystem extends EventController
 		
 	}
 
-	private void initEventProcessors()
+	public EventController getEventController()
 	{
-		addProcessor( "ADD_COLLISION_HULL", ( Hull _hull ) ->
-		{
-			add( _hull ) ;
-		} ) ;
-
-		addProcessor( "REMOVE_COLLISION_HULL", ( Hull _hull ) ->
-		{
-			remove( _hull ) ;
-		} ) ;
+		return eventController ;
 	}
 
 	public void add( final Hull _hull )
@@ -68,11 +75,10 @@ public class CollisionSystem extends EventController
 		treeHulls.removeHull( _hull ) ;
 	}
 
-	private CollisionCheck check = new CollisionCheck() ;
-
 	public void update( final float _dt )
 	{
-		update() ;			// Update Event Controller
+		eventController.update() ;
+		treeHulls.clear() ;
 
 		int collisions = 0 ;
 		final int size = hulls.size() ;
@@ -86,9 +92,63 @@ public class CollisionSystem extends EventController
 			treeHulls.insertHull( hull ) ;
 		}
 
-		//simpleUpdate( check, hulls ) ;
-		//System.out.println( "Collisions: " + collisions ) ;
 		treeHulls.update( _dt ) ;
+	}
+
+	private ICollisionDelegate constructCollisionDelegate()
+	{
+		return new ICollisionDelegate()
+		{
+			private boolean shutdown = false ;
+
+			@Override
+			public Hull generateContacts( final Hull _hull )
+			{
+				if( shutdown == false )
+				{
+					treeHulls.generateContacts( _hull ) ;
+				}
+				return _hull ;
+			}
+
+			@Override
+			public Hull ray( final Vector2 _start, final Vector2 _end )
+			{
+				return ray( _start, _end, null ) ;
+			}
+
+			@Override
+			public Hull ray( final Vector2 _start, final Vector2 _end, final Group.ID[] _filters )
+			{
+				final float step = 1.0f ;
+				final float distance = Vector2.distance( _start, _end ) ;
+
+				final Vector2 direction = new Vector2( _end ) ;
+				direction.subtract( _start ) ;
+				direction.normalise() ;
+
+				final Vector2 point = new Vector2( _start ) ;
+				for( float i = 0.0f; i < distance; i += step )
+				{
+					point.x += direction.x ;
+					point.y += direction.y ;
+
+					final Hull hull = treeHulls.getHullWithPoint( point, _filters ) ;
+					if( hull != null )
+					{
+						return hull ;
+					}
+				}
+
+				return null ;
+			}
+
+			@Override
+			public void shutdown()
+			{
+				shutdown = true ;
+			}
+		} ;
 	}
 
 	private static void simpleUpdate( final CollisionCheck _check, final List<Hull> _hulls )

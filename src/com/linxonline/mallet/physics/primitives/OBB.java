@@ -78,6 +78,11 @@ public class OBB
 		FloatBuffer.set( position, OBB.OFFSET_X, _x, _y ) ;
 	}
 
+	public void addToOffset( final float _x, final float _y )
+	{
+		FloatBuffer.add( position, OBB.OFFSET_X, _x, _y ) ;
+	}
+
 	/**
 		Set the points and axes from the OBB being passed in.
 		This also includes the position & offset.

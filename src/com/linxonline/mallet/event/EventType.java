@@ -39,7 +39,7 @@ public final class EventType
 
 	public String toString()
 	{
-		return type ;
+		return "[Type: " + type + ", id: " + id + "]" ;
 	}
 
 	/**

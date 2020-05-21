@@ -15,20 +15,20 @@ import com.linxonline.mallet.physics.hulls.* ;
 
 public class CollisionComponent extends Component
 {
-	public final Hull hull ;
+	public final Hull[] hulls ;
 	private boolean applyContact = true ;
 
-	public CollisionComponent( final Entity _parent, final Hull _hull )
+	public CollisionComponent( final Entity _parent, final Hull ... _hulls )
 	{
-		this( _parent, Entity.AllowEvents.YES, _hull ) ;
+		this( _parent, Entity.AllowEvents.YES, _hulls ) ;
 	}
 
 	public CollisionComponent( final Entity _parent,
 							   final Entity.AllowEvents _allow,
-							   final Hull _hull )
+							   final Hull ... _hulls )
 	{
 		super( _parent, _allow ) ;
-		hull = _hull ;
+		hulls = _hulls ;
 	}
 
 	/**
@@ -41,21 +41,27 @@ public class CollisionComponent extends Component
 		applyContact = _apply ;
 	}
 
-	public void setCollisionCallback( final CollisionCallback _callback )
+	public void setCollisionCallback( final int _index, final CollisionCallback _callback )
 	{
-		hull.setCollisionCallback( _callback ) ;
+		hulls[_index].setCollisionCallback( _callback ) ;
 	}
 
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<Hull>( "ADD_COLLISION_HULL", hull ) ) ;
+		for( final Hull hull : hulls )
+		{
+			_events.add( new Event<Hull>( "ADD_COLLISION_HULL", hull ) ) ;
+		}
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<Hull>( "REMOVE_COLLISION_HULL", hull ) ) ;
+		for( final Hull hull : hulls )
+		{
+			_events.add( new Event<Hull>( "REMOVE_COLLISION_HULL", hull ) ) ;
+		}
 	}
 
 	@Override
@@ -66,14 +72,18 @@ public class CollisionComponent extends Component
 		if( applyContact == true )
 		{
 			// Shift the hulls position by the penetration depth.
-			final Vector2 accumulated = hull.updateContactData() ;
-			hull.addToPosition( accumulated.x, accumulated.y ) ;
+			for( int i = 0; i < hulls.length; ++i )
+			{
+				final Hull hull = hulls[i] ;
+				final Vector2 accumulated = hull.updateContactData() ;
+				hull.addToPosition( accumulated.x, accumulated.y ) ;
+			}
 		}
 	}
 
-	public void setRotate( final float _theta )
+	public void setRotate( final int _index, final float _theta )
 	{
-		hull.setRotation( _theta ) ;
+		hulls[_index].setRotation( _theta ) ;
 	}
 
 	public static CollisionComponent generateBox2D( final Entity _parent,

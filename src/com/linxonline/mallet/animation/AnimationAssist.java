@@ -45,11 +45,7 @@ public final class AnimationAssist
 										final Vector3 _scale,
 										final int _order )
 	{
-		final Draw draw = DrawAssist.createDraw( _position,
-												 _offset,
-												 _rotation,
-												 _scale,
-												 _order ) ;
+		final Draw draw = DrawAssist.createDraw( _position, _offset, _rotation, _scale, _order ) ;
 		DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_TEXTURE" ) ) ;
 
 		return new AnimData( _file, draw ) ;

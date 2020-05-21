@@ -392,7 +392,7 @@ public final class GameTestLoader implements IGameLoader
 																						  new Vector2( 64, 64 ),
 																						  position,
 																						  new Vector2( -32, -32 ) ) ;
-						final Hull hull = coll.hull ;
+						final Hull hull = coll.hulls[0] ;
 
 						final Draw draw = DrawAssist.createDraw( new Vector3( position ),
 																 new Vector3( -32, -32, 0 ),

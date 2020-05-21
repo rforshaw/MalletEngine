@@ -328,6 +328,7 @@ public class GLGeometryUploader
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
+		private final Vector3 scale = new Vector3() ;
 
 		public BasicObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
@@ -345,6 +346,7 @@ public class GLGeometryUploader
 			basic.getPosition( position ) ;
 			basic.getOffset( offset ) ;
 			basic.getRotation( rotation ) ;
+			basic.getScale( scale ) ;
 
 			matrix.setIdentity() ;
 			matrix.setTranslate( position.x, position.y, 0.0f ) ;
@@ -352,6 +354,7 @@ public class GLGeometryUploader
 			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
 			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
 			matrix.translate( offset.x, offset.y, offset.z ) ;
+			matrix.scale( scale.x, scale.y, scale.z ) ;
 
 			uploadIndex( _location, shape ) ;
 			uploadVBO( _location, shape, matrix ) ;

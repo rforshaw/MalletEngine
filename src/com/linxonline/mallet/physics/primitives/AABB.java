@@ -94,6 +94,16 @@ public class AABB
 		FloatBuffer.add( position, AABB.POSITION_X, _x, _y ) ;
 	}
 
+	public void setOffset( final float _x, final float _y )
+	{
+		FloatBuffer.set( position, AABB.OFFSET_X, _x, _y ) ;
+	}
+
+	public void addToOffset( final float _x, final float _y )
+	{
+		FloatBuffer.add( position, AABB.OFFSET_X, _x, _y ) ;
+	}
+
 	/**
 		Determine if the point defined is located within the AABB.
 	*/
@@ -105,11 +115,13 @@ public class AABB
 		final float minX = x + range[AABB.MIN_X] ;
 		final float maxX = x + range[AABB.MAX_X] ;
 
+		//System.out.println( "X: " + _x + " MIN: " + minX + " MAX: " + maxX ) ;
 		if( _x >= minX && _x <= maxX )
 		{
 			final float minY = y + range[AABB.MIN_Y] ;
 			final float maxY = y + range[AABB.MAX_Y] ;
 
+			//System.out.println( "Y: " + _y + " MIN: " + minY + " MAX: " + maxY ) ;
 			if( _y >= minY && _y <= maxY )
 			{
 				return true ;
@@ -159,6 +171,6 @@ public class AABB
 
 	public String toString()
 	{
-		return "POSITION: " + position + " MIN: " + range[AABB.MIN_X] + " " + range[AABB.MIN_Y] + "\nMAX: " + range[AABB.MAX_X] + " " + range[AABB.MAX_Y] ;
+		return "POSITION: " + position[POSITION_X] + " " + position[POSITION_Y] + "\nOFFSET: " + position[OFFSET_X] + " " + position[OFFSET_Y] + "\nMIN: " + range[AABB.MIN_X] + " " + range[AABB.MIN_Y] + "\nMAX: " + range[AABB.MAX_X] + " " + range[AABB.MAX_Y] ;
 	}
 }

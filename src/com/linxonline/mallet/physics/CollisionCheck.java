@@ -37,6 +37,13 @@ public final class CollisionCheck
 	*/
 	public final boolean generateContactPoint( final Hull _box1, final Hull _box2 )
 	{
+		final boolean box1Interested = _box1.isCollidableWithGroup( _box2.getGroupID() ) ;
+		final boolean box2Interested = _box2.isCollidableWithGroup( _box1.getGroupID() ) ;
+		if( box1Interested == false && box2Interested == false )
+		{
+			return false ;
+		}
+
 		final AABB aabb1 = _box1.getAABB() ;
 		final AABB aabb2 = _box2.getAABB() ; 
 		if( aabb1.intersectAABB( aabb2 ) == false && 
@@ -81,16 +88,30 @@ public final class CollisionCheck
 		// through it.
 		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
 
-		final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
-		if( point1 != null )
+		if( box1Interested == true )
 		{
-			callback( point1, _box1.getCallback() ) ;
+			final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+			if( point1 != null )
+			{
+				callback( point1, _box1.getCallback() ) ;
+			}
+			else
+			{
+				System.out.println( "Reached maximum contacts on hull 1" ) ;
+			}
 		}
 
-		final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
-		if( point2 != null )
+		if( box2Interested == true )
 		{
-			callback( point2, _box2.getCallback() ) ;
+			final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+			if( point2 != null )
+			{
+				callback( point2, _box2.getCallback() ) ;
+			}
+			else
+			{
+				System.out.println( "Reached maximum contacts on hull 2" ) ;
+			}
 		}
 
 		return true ;

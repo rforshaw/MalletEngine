@@ -72,6 +72,10 @@ public abstract class Hull
 
 	public abstract void setPosition( final float _x, final float _y ) ;
 	public abstract void addToPosition( final float _x, final float _y ) ;
+
+	public abstract void setOffset( final float _x, final float _y ) ;
+	public abstract void addToOffset( final float _x, final float _y ) ;
+
 	public abstract void setRotation( final float _theta ) ;
 
 	public abstract Vector2 getPosition() ;
@@ -113,22 +117,7 @@ public abstract class Hull
 
 	public final boolean isCollidableWithGroup( final Group.ID _groupID )
 	{
-		if( collidableGroups == null )
-		{
-			// Groups haven't been specified so it can collide with all
-			return true ;
-		}
-
-		for( int i = 0; i < collidableGroups.length; ++i )
-		{
-			final Group.ID id = collidableGroups[i] ;
-			if( id.equals( _groupID ) == true )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
+		return isCollidableWithGroup( _groupID, collidableGroups ) ;
 	}
 
 	public final CollisionCallback getCallback()
@@ -144,5 +133,25 @@ public abstract class Hull
 	public final Object getParent()
 	{
 		return parent ;
+	}
+
+	public static boolean isCollidableWithGroup( final Group.ID _id, final Group.ID[] _groups )
+	{
+		if( _groups == null )
+		{
+			// Groups haven't been specified so it can collide with all
+			return true ;
+		}
+
+		for( int i = 0; i < _groups.length; ++i )
+		{
+			final Group.ID id = _groups[i] ;
+			if( id.equals( _id ) == true )
+			{
+				return true ;
+			}
+		}
+
+		return false ;
 	}
 }

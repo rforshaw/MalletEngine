@@ -7,7 +7,7 @@ import java.util.List ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
-public final class EventSystem implements IEventSystem
+public class EventSystem implements IEventSystem
 {
 	private static final IEventFilter NO_FILTERING = new IEventFilter()
 	{
