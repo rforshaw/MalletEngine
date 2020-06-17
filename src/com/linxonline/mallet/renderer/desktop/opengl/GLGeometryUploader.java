@@ -931,6 +931,6 @@ public class GLGeometryUploader
 		abgrTemp[2] = _colour.colours[MalletColour.GREEN] ;
 		abgrTemp[3] = _colour.colours[MalletColour.RED] ;
 
-		return ConvertBytes.toFloat( abgrTemp, 0, 4 ) ;
+		return ConvertBytes.toFloat( abgrTemp, 0 ) ;
 	}
 }

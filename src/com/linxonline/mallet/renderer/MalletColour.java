@@ -98,12 +98,12 @@ public class MalletColour
 
 	public int toInt()
 	{
-		return ConvertBytes.toInt( colours, 0, 4 ) ;
+		return ConvertBytes.toInt( colours, 0 ) ;
 	}
 
 	public float toFloat()
 	{
-		return ConvertBytes.toFloat( colours, 0, 4 ) ;
+		return ConvertBytes.toFloat( colours, 0 ) ;
 	}
 
 	@Override

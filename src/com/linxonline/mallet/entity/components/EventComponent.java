@@ -27,7 +27,7 @@ public class EventComponent extends Component
 
 	public EventComponent( final Entity _parent, final Entity.AllowEvents _allow )
 	{
-		this( _parent, _allow, 0, 0 ) ;
+		this( _parent, _allow, 5, 5 ) ;
 	}
 
 	public EventComponent( final Entity _parent,

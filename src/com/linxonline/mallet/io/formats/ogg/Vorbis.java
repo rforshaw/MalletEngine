@@ -102,21 +102,21 @@ public class Vorbis
 		final byte[] stream = _header.page.data ;
 
 		ConvertBytes.flipEndian( stream, pos, 4 ) ;
-		version = ConvertBytes.toInt( stream, pos, 4 ) ;
+		version = ConvertBytes.toInt( stream, pos ) ;
 
 		audioChannels = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] ;	// unsigned byte
 
 		ConvertBytes.flipEndian( stream, pos += 1, 4 ) ;
-		sampleRate = ConvertBytes.toInt( stream, pos, 4 ) ;
+		sampleRate = ConvertBytes.toInt( stream, pos ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		bitrateMax = ConvertBytes.toInt( stream, pos, 4 ) ;
+		bitrateMax = ConvertBytes.toInt( stream, pos ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		bitrateNom = ConvertBytes.toInt( stream, pos, 4 ) ;
+		bitrateNom = ConvertBytes.toInt( stream, pos ) ;
 
 		ConvertBytes.flipEndian( stream, pos += 4, 4 ) ;
-		bitrateMin = ConvertBytes.toInt( stream, pos, 4 ) ;
+		bitrateMin = ConvertBytes.toInt( stream, pos ) ;
 
 		final byte blocksize = ConvertBytes.toBytes( stream, pos += 4, 1 )[0] ; // unsigned byte
 		blocksize0 = ( blocksize & 0x0F ) ;
@@ -140,17 +140,17 @@ public class Vorbis
 		final byte[] stream = _header.page.data ;
 
 		ConvertBytes.flipEndian( stream, pos, 4 ) ;
-		final int vendorLength = ConvertBytes.toInt( stream, pos, 4 ) ;
+		final int vendorLength = ConvertBytes.toInt( stream, pos ) ;
 		vendor = new String( ConvertBytes.toBytes( stream, pos += 4, vendorLength ) ) ;
 
 		ConvertBytes.flipEndian( stream, pos += vendorLength, 4 ) ;
-		final int iterate = ConvertBytes.toInt( stream, pos, 4 ) ;
+		final int iterate = ConvertBytes.toInt( stream, pos ) ;
 
 		int length = 4 ; // Set to 4 to offset the iterate variable
 		for( int i = 0; i < iterate; i++ )
 		{
 			ConvertBytes.flipEndian( stream, pos += length, 4 ) ;
-			length = ConvertBytes.toInt( stream, pos, 4 ) ;
+			length = ConvertBytes.toInt( stream, pos ) ;
 			statements.add( new String( ConvertBytes.toBytes( stream, pos += 4, length ) ) ) ;
 		}
 
@@ -200,7 +200,7 @@ public class Vorbis
 		syncBytes[3] = 0 ;
 
 		ConvertBytes.flipEndian( syncBytes, 0, 4 ) ;
-		final long syncPattern = ConvertBytes.toInt( syncBytes, 0, 4 ) ;
+		final long syncPattern = ConvertBytes.toInt( syncBytes, 0 ) ;
 		if( syncPattern != 5653314 )
 		{
 			throw new Exception( "OGG not in sync, failed to read correct Sync Pattern." ) ;
@@ -209,7 +209,7 @@ public class Vorbis
 		// Dimensions
 		final byte[] dimBytes = ConvertBytes.toBits( _stream, 0, _pos += 24, 16 ) ;
 		ConvertBytes.flipEndian( dimBytes, 0, 2 ) ;
-		final int dimensions = ConvertBytes.toShort( dimBytes, 0, 2 ) & 0xFFFF ;
+		final int dimensions = ConvertBytes.toShort( dimBytes, 0 ) & 0xFFFF ;
 
 		// Entries
 		final byte[] tempEntry = ConvertBytes.toBits( _stream, 0, _pos += 16, 24 ) ;
@@ -220,7 +220,7 @@ public class Vorbis
 		entryBytes[3] = 0 ;
 
 		ConvertBytes.flipEndian( entryBytes, 0, 4 ) ;
-		final long entries = ConvertBytes.toInt( entryBytes, 0, 4 ) & 0xFFFFFFFFL ;
+		final long entries = ConvertBytes.toInt( entryBytes, 0 ) & 0xFFFFFFFFL ;
 
 		_pos += 24 ;
 		final boolean orderedFlag = ConvertBytes.isBitSet( _stream, _pos++ ) ;
@@ -334,7 +334,7 @@ public class Vorbis
 			}
 
 			ConvertBytes.flipEndian( read ) ;
-			final int time = ConvertBytes.toShort( read, 0, 2 ) & 0xFFFF  ;
+			final int time = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
 			if( time != 0 )
 			{
 				throw new Exception( "Failed to sync to time zero: " + time ) ;
@@ -362,7 +362,7 @@ public class Vorbis
 			}
 
 			ConvertBytes.flipEndian( read ) ;
-			floors[i] = ConvertBytes.toShort( read, 0, 2 ) & 0xFFFF  ;
+			floors[i] = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
 			System.out.println( "Floor: " + floors[i] ) ;
 
 			switch( floors[i] )
@@ -395,7 +395,7 @@ public class Vorbis
 	private float unpackFloat( final byte[] _pack )
 	{
 		ConvertBytes.flipEndian( _pack ) ;
-		final int x = ConvertBytes.toInt( _pack, 0, 4 ) ;
+		final int x = ConvertBytes.toInt( _pack, 0 ) ;
 
 		int mantissa = x & 0x1FFFFF ;
 		final int sign = x & 0x80000000 ;
@@ -716,11 +716,11 @@ public class Vorbis
 			int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
 			final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
 			ConvertBytes.flipEndian( readRate ) ;
-			int rate = ConvertBytes.toShort( readRate, 0, 2 ) & 0xFFFF  ;
+			int rate = ConvertBytes.toShort( readRate, 0 ) & 0xFFFF  ;
 
 			final byte[] readbarkMapSize = ConvertBytes.toBits( _stream, 0, _pos += 16, 16 ) ;
 			ConvertBytes.flipEndian( readbarkMapSize ) ;
-			int barkMapSize = ConvertBytes.toShort( readbarkMapSize, 0, 2 ) & 0xFFFF  ;
+			int barkMapSize = ConvertBytes.toShort( readbarkMapSize, 0 ) & 0xFFFF  ;
 
 			amplitudeBits = ( ConvertBytes.toBits( _stream, 0, _pos += 16, 6 )[0] & 0xFF ) ;
 			amplitudeOffset = ( ConvertBytes.toBits( _stream, 0, _pos += 6, 8 )[0] & 0xFF ) ;

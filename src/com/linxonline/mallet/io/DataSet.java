@@ -1,7 +1,4 @@
-package com.linxonline.mallet.io.save.state ;
-
-import com.linxonline.mallet.io.filesystem.ByteOutStream ;
-import com.linxonline.mallet.io.filesystem.ByteInStream ;
+package com.linxonline.mallet.io ;
 
 /**
 	DataSet allows the developer to quickly save and load data.
@@ -29,7 +26,7 @@ public interface DataSet
 		If you implement DataOut you must create an equivalent 
 		DataIn that is able to read DataOut output.
 	*/
-	public static interface DataOut<T extends DataSet>
+	public static interface Out<T extends DataSet>
 	{
 		public boolean write( final T _out ) ;
 	}
@@ -38,10 +35,10 @@ public interface DataSet
 		Implement DataIn for reading in a specific 
 		implementation of DataSet.
 
-		If you implement Datain you must create an equivalent 
-		DataOut that is able to write output DataIn can read.
+		If you implement In you must create an equivalent 
+		Out that is able to write output In can read.
 	*/
-	public static interface DataIn<T extends DataSet>
+	public static interface In<T extends DataSet>
 	{
 		public boolean read( final T _in ) ;
 	}

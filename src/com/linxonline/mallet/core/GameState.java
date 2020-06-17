@@ -41,8 +41,6 @@ import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
 
-import com.linxonline.mallet.io.save.state.DataConverter ;
-
 public class GameState extends State
 {
 	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz

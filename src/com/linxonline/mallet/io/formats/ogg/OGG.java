@@ -45,16 +45,16 @@ public class OGG
 			final byte hType = ConvertBytes.toBytes( _stream, pos += 1, 1 )[0] ;		// unsigned byte
 
 			ConvertBytes.flipEndian( _stream, pos += 1, 8 ) ;							// OGG is stored in little-endian, Java is big-endian.
-			final long gPosition = ConvertBytes.toLong( _stream, pos, 8 ) ;
+			final long gPosition = ConvertBytes.toLong( _stream, pos ) ;
 
 			ConvertBytes.flipEndian( _stream, pos += 8, 4 ) ;
-			final int bSN = ConvertBytes.toInt( _stream, pos, 4 ) ;
+			final int bSN = ConvertBytes.toInt( _stream, pos ) ;
 
 			ConvertBytes.flipEndian( _stream, pos += 4, 4 ) ;
-			final int pSeq = ConvertBytes.toInt( _stream, pos, 4 ) ;
+			final int pSeq = ConvertBytes.toInt( _stream, pos ) ;
 
 			ConvertBytes.flipEndian( _stream, pos += 4, 4 ) ;
-			final int checksum = ConvertBytes.toInt( _stream, pos, 4 ) ;
+			final int checksum = ConvertBytes.toInt( _stream, pos ) ;
 
 			final byte pSeg = ConvertBytes.toBytes( _stream, pos += 4, 1 )[0] ;		// unsigned byte
 			final byte[] segTable = ConvertBytes.toBytes( _stream, pos += 1, pSeg ) ;

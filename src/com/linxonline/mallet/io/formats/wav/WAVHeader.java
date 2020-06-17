@@ -67,7 +67,7 @@ public final class WAVHeader
 	{
 		int pos = getDataStartPoint( _soundBuffer ) - 4 ;
 		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
-		final int size = ConvertBytes.toInt( _soundBuffer, pos, 4 ) ;
+		final int size = ConvertBytes.toInt( _soundBuffer, pos ) ;
 		ConvertBytes.flipEndian( _soundBuffer, pos, 4 ) ;
 		//pos += 4 ;
 
@@ -77,7 +77,7 @@ public final class WAVHeader
 	public static short getBitsPerSample( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 34, 2 ) ;
-		final short bitsPerSample = ConvertBytes.toShort( _soundBuffer, 34, 2 ) ;
+		final short bitsPerSample = ConvertBytes.toShort( _soundBuffer, 34 ) ;
 		ConvertBytes.flipEndian( _soundBuffer, 34, 2 ) ;
 		return bitsPerSample ;
 	}
@@ -85,7 +85,7 @@ public final class WAVHeader
 	public static int getSampleRate( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 24, 4 ) ;
-		final int samplerate = ConvertBytes.toInt( _soundBuffer, 24, 4 ) ;
+		final int samplerate = ConvertBytes.toInt( _soundBuffer, 24 ) ;
 		ConvertBytes.flipEndian( _soundBuffer, 24, 4 ) ;
 		return samplerate ;
 	}
@@ -93,7 +93,7 @@ public final class WAVHeader
 	public static short getChannels( final byte[] _soundBuffer )
 	{
 		ConvertBytes.flipEndian( _soundBuffer, 22, 2 ) ;
-		final short channels = ConvertBytes.toShort( _soundBuffer, 22, 2 ) ;
+		final short channels = ConvertBytes.toShort( _soundBuffer, 22 ) ;
 		ConvertBytes.flipEndian( _soundBuffer, 22, 2 ) ;
 		return channels ;
 	}

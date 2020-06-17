@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 	implementation is ineffecient and generates a new byte array for each 
 	write call.
 */
-public class ByteOutput implements SerialiseOutput
+public class ByteOutput implements Serialise.Out
 {
 	private byte[] stream = new byte[0] ;
 

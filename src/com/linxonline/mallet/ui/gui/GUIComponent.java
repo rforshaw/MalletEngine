@@ -227,7 +227,11 @@ public abstract class GUIComponent extends UIElement.Component
 		UIElement.disconnect( parent, parent.offsetChanged(),   offsetSlot() ) ;
 		UIElement.disconnect( parent, parent.lengthChanged(),   lengthSlot() ) ;
 
-		removeDraws( delegate ) ;
+		if( delegate != null )
+		{
+			removeDraws( delegate ) ;
+		}
+
 		delegate = null ;
 		world = null ;
 	}

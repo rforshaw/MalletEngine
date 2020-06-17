@@ -10,7 +10,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 	ByteInput increments automatically by the amount of bytes read.
 */
-public class ByteInput implements SerialiseInput
+public class ByteInput implements Serialise.In
 {
 	private byte[] stream ;
 	private int position = 0 ;
@@ -30,7 +30,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public int readInt()
 	{
-		return ConvertBytes.toInt( stream, increment( 4 ), 4 ) ;
+		return ConvertBytes.toInt( stream, increment( 4 ) ) ;
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public char readChar()
 	{
-		return ConvertBytes.toChar( stream, increment( 2 ), 2 ) ;
+		return ConvertBytes.toChar( stream, increment( 2 ) ) ;
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public long readLong()
 	{
-		return ConvertBytes.toLong( stream, increment( 8 ), 8 ) ;
+		return ConvertBytes.toLong( stream, increment( 8 ) ) ;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public float readFloat()
 	{
-		return ConvertBytes.toFloat( stream, increment( 4 ), 4 ) ;
+		return ConvertBytes.toFloat( stream, increment( 4 ) ) ;
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public double readDouble()
 	{
-		return ConvertBytes.toDouble( stream, increment( 8 ), 8 ) ;
+		return ConvertBytes.toDouble( stream, increment( 8 ) ) ;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class ByteInput implements SerialiseInput
 	*/
 	public boolean readBoolean()
 	{
-		return ConvertBytes.toBoolean( stream, increment( 1 ), 0 ) ;
+		return ConvertBytes.toBoolean( stream, increment( 1 ) ) ;
 	}
 
 	/**

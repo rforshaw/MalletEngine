@@ -38,8 +38,8 @@ public class XInputLinux implements XInputDevice
 				return ;
 			}
 
-			final long timestamp = ConvertBytes.toInt( ConvertBytes.flipEndian( _stream, 0, 4 ), 0, 4 ) & 0xFFFFFFFFL ;
-			final short value =  ConvertBytes.toShort( ConvertBytes.flipEndian( _stream, 4, 2 ), 4, 2 ) ;
+			final long timestamp = ConvertBytes.toInt( ConvertBytes.flipEndian( _stream, 0, 4 ), 0 ) & 0xFFFFFFFFL ;
+			final short value =  ConvertBytes.toShort( ConvertBytes.flipEndian( _stream, 4, 2 ), 4 ) ;
 
 			XInputDevice.Code axis = null ;
 			switch( _stream[7] )
@@ -65,8 +65,8 @@ public class XInputLinux implements XInputDevice
 				return ;
 			}
 
-			final long timestamp = ConvertBytes.toInt( ConvertBytes.flipEndian( _stream, 0, 4 ), 0, 4 ) & 0xFFFFFFFFL ;
-			final short value =  ConvertBytes.toShort( ConvertBytes.flipEndian( _stream, 4, 2 ), 4, 2 ) ;
+			final long timestamp = ConvertBytes.toInt( ConvertBytes.flipEndian( _stream, 0, 4 ), 0 ) & 0xFFFFFFFFL ;
+			final short value =  ConvertBytes.toShort( ConvertBytes.flipEndian( _stream, 4, 2 ), 4 ) ;
 
 			XInputDevice.Code button = null ;
 			switch( _stream[7] )
