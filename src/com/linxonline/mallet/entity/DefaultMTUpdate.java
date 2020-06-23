@@ -30,7 +30,7 @@ public class DefaultMTUpdate implements IEntityUpdate
 		workers.exec( entityWorker ) ;				// This will block until all entities have been processed
 	}
 
-	private class EntityWorker extends Worker<Entity>
+	private static class EntityWorker extends Worker<Entity>
 	{
 		private float deltaTime = 0.0f ;
 		private List<Entity> entities ;

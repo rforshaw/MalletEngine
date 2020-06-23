@@ -788,6 +788,16 @@ public class Shape
 		return _plane ;
 	}
 
+	public static Shape updatePlaneUV( final Shape _plane, final float[] _uv )
+	{
+		_plane.setVector2( 0, 2, _uv[0], _uv[1] ) ;
+		_plane.setVector2( 1, 2, _uv[2], _uv[3] ) ;
+		_plane.setVector2( 2, 2, _uv[0], _uv[3] ) ;
+		_plane.setVector2( 3, 2, _uv[2], _uv[1] ) ;
+
+		return _plane ;
+	}
+
 	/**
 		Combine an array of shape objects into 1 shape object.
 		Ensure all the shapes being combined have the same style.

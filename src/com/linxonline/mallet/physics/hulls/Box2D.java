@@ -13,9 +13,6 @@ public class Box2D extends Hull
 	public final AABB aabb ;
 	public final OBB obb ;
 
-	private final Vector2 position = new Vector2() ;		// Used to reduce allocations - Android optimisation
-	private final Vector2 offset = new Vector2() ;
-
 	public Box2D( final AABB _aabb )
 	{
 		this( _aabb, null ) ;
@@ -64,15 +61,15 @@ public class Box2D extends Hull
 	}
 
 	@Override
-	public Vector2 getPosition()
+	public Vector2 getPosition( final Vector2 _fill )
 	{
-		return obb.getPosition( position ) ;
+		return obb.getPosition( _fill ) ;
 	}
 
 	@Override
-	public Vector2 getOffset()
+	public Vector2 getOffset( final Vector2 _fill )
 	{
-		return obb.getOffset( offset ) ;
+		return obb.getOffset( _fill ) ;
 	}
 
 	@Override

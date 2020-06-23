@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean ;
 
 import com.linxonline.mallet.util.locks.* ;
 
-public class WorkerThread extends Thread
+public final class WorkerThread extends Thread
 {
 	private boolean stop = false ;								// true == Kill the thread
 	private boolean paused = true ;
@@ -117,7 +117,7 @@ public class WorkerThread extends Thread
 			{
 				//System.out.println( getName() + " request unpause" ) ;
 				paused = false ;
-				block.notify() ;
+				block.notifyAll() ;
 			}
 		}
 	}
@@ -134,8 +134,11 @@ public class WorkerThread extends Thread
 		}
 	}
 
-	public synchronized void end()
+	public void end()
 	{
-		stop = true ;
+		synchronized( block )
+		{
+			stop = true ;
+		}
 	}
 }

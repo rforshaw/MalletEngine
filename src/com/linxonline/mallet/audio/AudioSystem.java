@@ -1,6 +1,7 @@
 package com.linxonline.mallet.audio ;
 
 import java.util.List ;
+import java.util.Map ;
 import java.util.Set ;
 import java.util.HashSet ;
 
@@ -8,6 +9,7 @@ import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.Logger ;
 
@@ -21,6 +23,7 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 public class AudioSystem
 {
+	private final Map<Category, Volume> channelTable = MalletMap.<Category, Volume>newMap() ;
 	private final List<Volume> volumes = MalletList.<Volume>newList() ;
 	private float masterVolume = 1.0f ;
 
@@ -102,6 +105,10 @@ public class AudioSystem
 					if( source != null )
 					{
 						audio.setSource( source ) ;
+
+						final Volume volume = channelTable.get( audio.getCategory() ) ;
+						setVolumeOnSource( volume, source ) ;
+
 						active.add( audio ) ;
 					}
 				}
@@ -144,6 +151,9 @@ public class AudioSystem
 
 					audio.dirty = true ;
 					audio.setSource( source ) ;
+
+					final Volume volume = channelTable.get( audio.getCategory() ) ;
+					setVolumeOnSource( volume, source ) ;
 					active.add( audio ) ;
 				}
 
@@ -218,42 +228,36 @@ public class AudioSystem
 	private void updateVolume( final Volume _volume )
 	{
 		final Category category = _volume.getCategory() ;
+		channelTable.put( category, new Volume( category, _volume.getVolume() ) ) ;
+
 		if( category.getChannel() == Category.Channel.MASTER )
 		{
 			masterVolume = _volume.getVolume() / 100.0f ;
-			updateMasterVolume( masterVolume ) ;
+			for( final AudioData audio : active )
+			{
+				// If master is being updated all 
+				// sources must be changed.
+				setVolumeOnSource( _volume, audio.getSource() ) ;
+			}
 			return ;
 		}
 
-		final int size = active.size() ;
-		for( int i = 0; i < size; i++ )
+		for( final AudioData audio : active )
 		{
-			final AudioData audio = active.get( i ) ;
-			final Volume audioVolume = audio.getVolume() ;
-
-			if( category.equals( audioVolume.getCategory() ) )
+			if( category.equals( audio.getCategory() ) )
 			{
-				audioVolume.setVolume( _volume.getVolume() ) ;
-
-				final AudioSource source = audio.getSource() ;
-				source.setVolume( ( int )( audioVolume.getVolume() * masterVolume ) ) ;
+				// Only change the volumes for sources 
+				// that match out category
+				setVolumeOnSource( _volume, audio.getSource() ) ;
 			}
 		}
 	}
 
-	private void updateMasterVolume( final float _masterVolume )
+	private void setVolumeOnSource( final Volume _volume, final AudioSource _source )
 	{
-		final int size = active.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final AudioData audio = active.get( i ) ;
-			final Volume audioVolume = audio.getVolume() ;
-
-			final AudioSource source = audio.getSource() ;
-			source.setVolume( ( int )( audioVolume.getVolume() * _masterVolume ) ) ;
-		}
+		_source.setVolume( ( int )( _volume.getVolume() * masterVolume ) ) ;
 	}
-	
+
 	public void setAudioGenerator( final AudioGenerator _generator )
 	{
 		sourceGenerator = _generator ;

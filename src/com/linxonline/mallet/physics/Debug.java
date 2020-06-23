@@ -17,8 +17,8 @@ public class Debug
 
 	public static Draw createDraw( final Hull _hull )
 	{
-		final Draw draw = DrawAssist.createDraw( new Vector3( _hull.getPosition() ),
-												 new Vector3( _hull.getOffset() ),
+		final Draw draw = DrawAssist.createDraw( new Vector3( _hull.getPosition( new Vector2() ) ),
+												 new Vector3( _hull.getOffset( new Vector2() ) ),
 												 new Vector3(),
 												 new Vector3( 1, 1, 1 ),
 												 10 ) ;
@@ -52,9 +52,8 @@ public class Debug
 
 	public static void updateDraw( final Draw _draw, final Hull _hull )
 	{
-		final Vector2 pos = _hull.getPosition() ;
-		final Vector2 offset = _hull.getOffset() ;
-		final float rotate = _hull.getRotation() ;
+		final Vector2 pos = _hull.getPosition( new Vector2() ) ;
+		final Vector2 offset = _hull.getOffset( new Vector2() ) ;
 
 		DrawAssist.amendPosition( _draw, pos.x, pos.y, 0.0f ) ;
 		DrawAssist.amendOffset( _draw, offset.x, offset.y, 0.0f ) ;

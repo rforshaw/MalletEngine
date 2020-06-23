@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger ;
 
 import com.linxonline.mallet.util.locks.* ;
 
-public class WorkerGroup
+public final class WorkerGroup
 {
 	private final Stack<WorkerThread> availableWorkers = new Stack<WorkerThread>() ;
 	private final ArrayList<WorkerThread> workers = new ArrayList<WorkerThread>() ;

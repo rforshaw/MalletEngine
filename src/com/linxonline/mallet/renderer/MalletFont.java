@@ -117,7 +117,6 @@ public class MalletFont
 	{
 		float width = 0.0f ;
 
-		final int length = _text.length() ;
 		for( int i = _start; i < _end; ++i )
 		{
 			width += metrics.getGlyphWithChar( _text.charAt( i ) ).getWidth() ;

@@ -173,7 +173,7 @@ public final class Diff
 	{
 		int i = _pos ;
 
-		for( i = _pos; i < _len; ++i )
+		for( ; i < _len; ++i )
 		{
 			if( _increment >= _compare.length )
 			{

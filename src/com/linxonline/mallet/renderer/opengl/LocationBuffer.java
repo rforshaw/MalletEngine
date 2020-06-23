@@ -61,9 +61,6 @@ public class LocationBuffer<T, U> implements ISort
 	private int currentByteIndex = 0 ;
 	private int currentByteVertex = 0 ;
 
-	private int allocatedByteIndex = 0 ;
-	private int allocatedByteVertex = 0 ;
-
 	public LocationBuffer( final int _maxByteIndex,
 						   final int _maxByteVertex )
 	{
@@ -123,9 +120,6 @@ public class LocationBuffer<T, U> implements ISort
 
 		currentByteIndex = endByteIndex ;
 		currentByteVertex = endByteVertex ;
-
-		allocatedByteIndex = currentByteIndex ;
-		allocatedByteIndex = currentByteVertex ;
 
 		listener.allocated( location, _user ) ;
 		return location ;

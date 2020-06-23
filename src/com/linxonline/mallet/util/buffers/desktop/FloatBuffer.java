@@ -75,6 +75,17 @@ public class FloatBuffer
 		_modify[_index + 1] += _y ;
 	}
 
+	public static void add( final float[] _modify,
+							final int _index,
+							final float _x,
+							final float _y,
+							final float _z )
+	{
+		_modify[_index + 0] += _x ;
+		_modify[_index + 1] += _y ;
+		_modify[_index + 2] += _z ;
+	}
+
 	public static float get( final float[] _get, final int _index )
 	{
 		return _get[_index] ;

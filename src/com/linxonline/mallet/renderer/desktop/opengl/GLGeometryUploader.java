@@ -364,7 +364,6 @@ public class GLGeometryUploader
 
 		private void uploadIndex( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
 		{
-			final GLDraw draw = _handler.getLocationData() ;
 			final BufferObject buffer = _handler.getBufferData() ;
 		
 			final Location.Range indexRange = _handler.getIndex() ;
@@ -387,7 +386,7 @@ public class GLGeometryUploader
 			final BufferObject buffer = _handler.getBufferData() ;
 
 			final Shape.Swivel[] swivel = _shape.getSwivel() ;
-			final int vertexSize = buffer.shapeSwivelSize ;
+			//final int vertexSize = buffer.shapeSwivelSize ;
 			final int verticiesSize = _shape.getVertexSize() ;
 
 			final Location.Range vertRange = _handler.getVertex() ;
@@ -509,7 +508,7 @@ public class GLGeometryUploader
 				}
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
-				final int vertexSize = calculateVertexSize( swivel ) ;
+				//final int vertexSize = calculateVertexSize( swivel ) ;
 				final int verticiesSize = shape.getVertexSize() ;
 
 				final int GLYPH_POINTS = 4 ;
@@ -562,7 +561,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	private class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDraw>
+	private static class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDraw>
 	{
 		@Override
 		public boolean isSupported( final BufferObject _buffer, final GLDraw _user )

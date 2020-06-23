@@ -19,6 +19,8 @@ public final class CollisionCheck
 	private final Vector2 boxCenter1 = new Vector2() ;
 	private final Vector2 boxCenter2 = new Vector2() ;
 
+	private final ContactPoint contact = new ContactPoint() ;
+
 	public CollisionCheck() {}
 
 	/**
@@ -90,10 +92,10 @@ public final class CollisionCheck
 
 		if( box1Interested == true )
 		{
-			final ContactPoint point1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
-			if( point1 != null )
+			final int index1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+			if( index1 < ContactData.MAX_COLLISION_POINTS )
 			{
-				callback( point1, _box1.getCallback() ) ;
+				callback( _box1.contactData.get( index1, contact ), _box1.getCallback() ) ;
 			}
 			else
 			{
@@ -103,10 +105,10 @@ public final class CollisionCheck
 
 		if( box2Interested == true )
 		{
-			final ContactPoint point2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
-			if( point2 != null )
+			final int index2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+			if( index2 < ContactData.MAX_COLLISION_POINTS )
 			{
-				callback( point2, _box2.getCallback() ) ;
+				callback( _box2.contactData.get( index2, contact ), _box2.getCallback() ) ;
 			}
 			else
 			{

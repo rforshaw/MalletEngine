@@ -21,7 +21,6 @@ public class EventController implements IEventHandler
 {
 	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) -> {} ;
 
-	private final int processorCapacity ;
 	private final int eventCapacity ;
 
 	private AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
@@ -57,7 +56,6 @@ public class EventController implements IEventHandler
 
 	public EventController( final int _processorCapacity, final int _eventCapacity )
 	{
-		processorCapacity = _processorCapacity ;
 		eventCapacity = _eventCapacity ;
 
 		processors = new EventType.Lookup<IProcessor<?>>( _processorCapacity, PROCESSOR_FALLBACK ) ;

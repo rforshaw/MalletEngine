@@ -5,69 +5,62 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 
 public class ContactData
 {
+	private static final int CONTACT_NORMAL_X = 0 ;
+	private static final int CONTACT_NORMAL_Y = 1 ;
+
 	public static final int MAX_COLLISION_POINTS = 5 ;
 
-	private final ContactPoint[] contacts = new ContactPoint[MAX_COLLISION_POINTS] ;
+	private final Hull[] collidedWith = new Hull[MAX_COLLISION_POINTS] ;
+	private final float[] contactNormal = new float[MAX_COLLISION_POINTS * 2] ;
+	private final float[] penetration = new float[MAX_COLLISION_POINTS] ;
+	private final boolean[] physical = new boolean[MAX_COLLISION_POINTS] ;
+
 	private int usedContacts = 0 ;
-	private int index = 0 ;
 
-	public ContactData()
-	{
-		for( int i = 0; i < MAX_COLLISION_POINTS; ++i )
-		{
-			contacts[i] = new ContactPoint() ;
-		}
-	}
+	public ContactData() {}
 
-	public final ContactPoint addContact( final float _penetration, 
-										  final Vector2 _normal, 
-										  final boolean _physical,
-										  final Hull _collidedWith )
+	public final int addContact( final float _penetration, 
+								  final Vector2 _normal, 
+								  final boolean _physical,
+								  final Hull _collidedWith )
 	{
 		return addContact( _penetration, _normal.x, _normal.y, _physical, _collidedWith ) ;
 	}
 
-	public final synchronized ContactPoint addContact( final float _penetration, 
-														final float _normalX, final float _normalY, 
-														final boolean _physical,
-														final Hull _collidedWith )
+	public final synchronized int addContact( final float _penetration, 
+											  final float _normalX,
+											  final float _normalY, 
+											  final boolean _physical,
+											  final Hull _collidedWith )
 	{
 		if( usedContacts < MAX_COLLISION_POINTS )
 		{
-			final ContactPoint contact = contacts[usedContacts++] ;
-			contact.penetration = _penetration ;
-			contact.contactNormal.setXY( _normalX, _normalY ) ;
-			contact.physical = _physical ;
-			contact.collidedWith = _collidedWith ;
-			return contact ;
+			penetration[usedContacts] = _penetration ;
+			contactNormal[( usedContacts * 2 ) + CONTACT_NORMAL_X] = _normalX ;
+			contactNormal[( usedContacts * 2 ) + CONTACT_NORMAL_Y] = _normalY ;
+			physical[usedContacts] = _physical ;
+			collidedWith[usedContacts] = _collidedWith ;
+			return usedContacts++ ;
 		}
 
-		return null ;
+		return usedContacts ;
 	}
 
-	public ContactPoint next()
+	public final ContactPoint get( final int _i, final ContactPoint _point )
 	{
-		if( index < usedContacts )
-		{
-			return contacts[index++] ;
-		}
-
-		index = 0 ;
-		return null ;
-	}
-	
-	public ContactPoint get( final int _i )
-	{
-		return contacts[_i] ;
+		_point.penetration = penetration[_i] ;
+		_point.contactNormal.setXY( contactNormal[( _i * 2 ) + CONTACT_NORMAL_X], contactNormal[( _i * 2 ) + CONTACT_NORMAL_Y] ) ;
+		_point.physical = physical[_i]  ;
+		_point.collidedWith = collidedWith[_i] ;
+		return _point ;
 	}
 
-	public void reset()
+	public final synchronized void reset()
 	{
 		usedContacts = 0 ;
-		index = 0 ;
 	}
 
-	public int size()
+	public final synchronized int size()
 	{
 		return usedContacts ;
 	}

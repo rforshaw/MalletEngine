@@ -8,7 +8,7 @@ public class Lock implements ILock
 	{
 		synchronized( lock )
 		{
-			lock.notify() ;
+			lock.notifyAll() ;
 		}
 	}
 

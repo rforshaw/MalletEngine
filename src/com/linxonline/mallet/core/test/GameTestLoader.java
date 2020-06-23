@@ -356,6 +356,8 @@ public final class GameTestLoader implements IGameLoader
 				final List<Draw> debugDraws = MalletList.<Draw>newList( amount ) ;
 				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
+					private final Vector2 position = new Vector2() ;
+				
 					@Override
 					public void update( final float _dt )
 					{
@@ -370,8 +372,8 @@ public final class GameTestLoader implements IGameLoader
 							DrawAssist.forceUpdate( draw ) ;
 							DrawAssist.forceUpdate( debugDraw ) ;
 
-							final Vector2 pos = hull.getPosition() ;
-							DrawAssist.amendPosition( draw, pos.x, pos.y, 0.0f ) ;
+							hull.getPosition( position ) ;
+							DrawAssist.amendPosition( draw, position.x, position.y, 0.0f ) ;
 
 							Debug.updateDraw( debugDraw, hull ) ;
 						}

@@ -185,8 +185,8 @@ public class OBB
 
 	public final void updateAxesAndEdges()
 	{
-		final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
-		final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
+		//final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
+		//final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
 
 		final float topRightX = rotations[OBB.TOP_RIGHT] ;
 		final float topRightY = rotations[OBB.TOP_RIGHT + 1] ;

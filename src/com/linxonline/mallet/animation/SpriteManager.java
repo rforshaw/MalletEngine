@@ -36,10 +36,11 @@ public class SpriteManager extends AbstractManager<Sprite>
 				return null ;
 			}
 
-			final int framerate = Integer.parseInt( texts.get( 0 ) ) ;
-			final Sprite sprite = new Sprite( framerate ) ;
-
 			final int length = texts.size() ;
+
+			final int framerate = Integer.parseInt( texts.get( 0 ) ) ;
+			final Sprite sprite = new Sprite( framerate, length - 1 ) ;
+
 			for( int i = 1; i < length; ++i )
 			{
 				final String line = texts.get( i ) ;

@@ -7,6 +7,9 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public class BasicDraw<P> implements Cacheable
 {
+	private static final float PI = ( float )Math.PI ;
+	private static final float PI2 = ( float )Math.PI * 2.0f ;
+
 	private static final int POSITION = 0 ;
 	private static final int OFFSET   = 3 ;
 	private static final int ROTATION = 6 ;
@@ -118,6 +121,29 @@ public class BasicDraw<P> implements Cacheable
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
+		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
+		float oY = FloatBuffer.get( old, ROTATION + 1 ) ;
+		float oZ = FloatBuffer.get( old, ROTATION + 2 ) ;
+
+		final float diffX = Math.abs( _x - oX ) ;
+		if( diffX > PI )
+		{
+			oX += ( _x > oX ) ? PI2 : -PI2 ;
+		}
+
+		final float diffY = Math.abs( _y - oY ) ;
+		if( diffY > PI )
+		{
+			oY += ( _y > oY ) ? PI2 : -PI2 ;
+		}
+
+		final float diffZ = Math.abs( _z - oZ ) ;
+		if( diffZ > PI )
+		{
+			oZ += ( _z > oZ ) ? PI2 : -PI2 ;
+		}
+
+		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
 		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
 	}
 

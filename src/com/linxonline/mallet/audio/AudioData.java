@@ -20,7 +20,7 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 		public void finished() {}
 	} ;
 
-	private Volume volume ;
+	private Category category ;
 	private AudioSource source ;
 
 	private String file ;
@@ -34,7 +34,7 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 	public AudioData( final String _file, final StreamType _type, final Category _cat )
 	{
 		set( _file, _type ) ;
-		volume = new Volume( _cat, 100 ) ;
+		category = _cat ;
 	}
 
 	public void setSource( final AudioSource _source )
@@ -77,9 +77,9 @@ public class AudioData<T extends AudioData> implements Audio<T>, Cacheable
 		return source ;
 	}
 
-	public Volume getVolume()
+	public Category getCategory()
 	{
-		return volume ;
+		return category ;
 	}
 
 	@Override

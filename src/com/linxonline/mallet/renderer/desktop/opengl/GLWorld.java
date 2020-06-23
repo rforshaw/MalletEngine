@@ -94,9 +94,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 		{
 			public void inform( final World _this )
 			{
-				final IntVector2 position = getRenderPosition() ;
 				final IntVector2 dim = getRender() ;
-
 				updateBufferDimensions( dim.x, dim.y ) ;
 			}
 		} ) ;
@@ -142,11 +140,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 	@Override
 	public void draw()
 	{
-		final IntVector2 renPosition = getRenderPosition() ;
 		final IntVector2 render = getRender() ;
-
-		final IntVector2 disPosition = getDisplayPosition() ;
-		final IntVector2 display = getDisplay() ;
 
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		MGL.glClear( MGL.GL_COLOR_BUFFER_BIT | MGL.GL_DEPTH_BUFFER_BIT | MGL.GL_STENCIL_BUFFER_BIT ) ;

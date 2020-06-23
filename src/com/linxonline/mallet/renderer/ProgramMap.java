@@ -22,7 +22,7 @@ public class ProgramMap<U> implements Program<ProgramMap<U>>
 {
 	private final String id ;
 	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
-	private final Map<String, Storage> buffers = MalletMap.<String, Storage>newMap() ;
+	//private final Map<String, Storage> buffers = MalletMap.<String, Storage>newMap() ;
 
 	private WeakReference<U> program = null ;			// Handler to renderer specific program.
 	private boolean dirty = true ;

@@ -10,16 +10,17 @@ import com.linxonline.mallet.maths.Vector2 ;
 public final class Sprite extends Resource
 {
 	public final int framerate ;
-	public final List<Sprite.Frame> frames = MalletList.<Sprite.Frame>newList()  ;
+	public final List<Sprite.Frame> frames  ;
 
 	public Sprite()
 	{
-		this( 30 ) ;
+		this( 30, 5 ) ;
 	}
 
-	public Sprite( final int _framerate )
+	public Sprite( final int _framerate, final int _frames )
 	{
 		framerate = _framerate ;
+		frames = MalletList.<Sprite.Frame>newList( _frames ) ;
 	}
 
 	public void addFrame( final Sprite.Frame _frame )
@@ -57,15 +58,23 @@ public final class Sprite extends Resource
 
 	public static class Frame
 	{
+		public static final int UV_1_U = 0 ;
+		public static final int UV_1_V = 1 ;
+
+		public static final int UV_2_U = 2 ;
+		public static final int UV_2_V = 3 ;
+
 		public final MalletTexture path ;
-		public final Vector2 uv1 = new Vector2() ;
-		public final Vector2 uv2 = new Vector2() ;
+		public final float[] uv = new float[4] ;
 
 		public Frame( final String _frame, final float _u1, final float _v1, final float _u2, final float _v2 )
 		{
 			path = new MalletTexture( _frame ) ;
-			uv1.setXY( _u1, _v1 ) ;
-			uv2.setXY( _u2, _v2 ) ;
+			uv[UV_1_U] = _u1 ;
+			uv[UV_1_V] = _v1 ;
+
+			uv[UV_2_U] = _u2 ;
+			uv[UV_2_V] = _v2 ;
 		}
 	}
 }

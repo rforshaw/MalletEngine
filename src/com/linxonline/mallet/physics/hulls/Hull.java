@@ -36,8 +36,12 @@ public abstract class Hull
 		accumulatedPenetration.x = 0.0f ;
 		accumulatedPenetration.y = 0.0f ;
 
-		for( ContactPoint point = contactData.next(); point != null; point = contactData.next() )
+		final ContactPoint point = new ContactPoint() ;
+
+		final int size = contactData.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			contactData.get( i, point ) ;
 			if( point.physical == true )
 			{
 				accumulatedPenetration.x += point.contactNormal.x * point.penetration ;
@@ -45,6 +49,7 @@ public abstract class Hull
 			}
 		}
 
+		contactData.reset() ;
 		return accumulatedPenetration ;
 	}
 
@@ -78,8 +83,8 @@ public abstract class Hull
 
 	public abstract void setRotation( final float _theta ) ;
 
-	public abstract Vector2 getPosition() ;
-	public abstract Vector2 getOffset() ;
+	public abstract Vector2 getPosition( final Vector2 _fill ) ;
+	public abstract Vector2 getOffset( final Vector2 _fill ) ;
 	public abstract float getRotation() ;
 
 	public abstract float[] getAxes() ;

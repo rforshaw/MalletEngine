@@ -319,7 +319,6 @@ public class UIList extends UILayout
 		return new ILayout()
 		{
 			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
-			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 
 			@Override
@@ -623,12 +622,9 @@ public class UIList extends UILayout
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 length = new Vector3() ;
 
-		private final Vector2 current = new Vector2() ;
 		private final Vector2 last = new Vector2() ;
 		private final Vector2 diff = new Vector2() ;
 
-		private long timestamp = 0L ;
-		private int timeDiff = 0 ;
 		private boolean pressed = false ;
 
 		private final Connect.Slot<UIList> disengagedSlot = new Connect.Slot<UIList>()

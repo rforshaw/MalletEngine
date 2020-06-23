@@ -145,7 +145,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		// UV's too. Or the texture stays the same and the UV 
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
-		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), c.uv1, c.uv2 ) ;
+		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), c.uv ) ;
 		DrawAssist.forceUpdate( _draw ) ;
 	}
 

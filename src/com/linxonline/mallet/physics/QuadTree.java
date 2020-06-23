@@ -154,7 +154,6 @@ public class QuadTree
 
 		private CollisionCheck check = new CollisionCheck() ;
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
-		private Quadrant quadrant ;
 		private float length ;
 
 		private QuadNode topLeft ;
@@ -170,7 +169,6 @@ public class QuadTree
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
 			centre.setXY( _x, _y ) ;
-			quadrant = _quadrant ;
 			length = _length ;
 
 			if( _quadrant == Quadrant.ROOT )
@@ -494,7 +492,7 @@ public class QuadTree
 			final float[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i += 2 )
 			{
-				absolute.setXY( _hull.getPosition() ) ;
+				_hull.getPosition( absolute ) ;
 				absolute.add( points[i], points[i + 1] ) ;
 
 				// It is possible for a hulls points to 
@@ -583,7 +581,7 @@ public class QuadTree
 			final float[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i += 2 )
 			{
-				absolute.setXY( _hull.getPosition() ) ;
+				_hull.getPosition( absolute ) ;
 				absolute.add( points[i], points[i + 1] ) ;
 
 				// Find out what quadrants the hull covers. 
@@ -684,19 +682,15 @@ public class QuadTree
 			tempRoot.createChildren() ;
 
 			tempRoot.topLeft.createChildren() ;
-			topLeft.quadrant = Quadrant.BOTTOM_RIGHT ;
 			tempRoot.topLeft.bottomRight = topLeft ;
 
 			tempRoot.topRight.createChildren() ;
-			topRight.quadrant = Quadrant.BOTTOM_LEFT ;
 			tempRoot.topRight.bottomLeft = topRight ;
 
 			tempRoot.bottomLeft.createChildren() ;
-			bottomLeft.quadrant = Quadrant.TOP_RIGHT ;
 			tempRoot.bottomLeft.topRight = bottomLeft ;
 
 			tempRoot.bottomRight.createChildren() ;
-			bottomRight.quadrant = Quadrant.TOP_LEFT ;
 			tempRoot.bottomRight.topLeft = bottomRight ;
 
 			length = tempRoot.length ;
@@ -743,7 +737,7 @@ public class QuadTree
 		public void update( final float _dt ) ;
 	}
 	
-	private class NodeWorker extends Worker<QuadNode>
+	private static class NodeWorker extends Worker<QuadNode>
 	{
 		private float deltaTime = 0.0f ;
 		private List<QuadNode> nodes ;
