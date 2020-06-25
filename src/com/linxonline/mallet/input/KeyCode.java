@@ -54,9 +54,9 @@ public enum KeyCode
 	/**
 		Returns the keycode that matches _char.
 	**/
-	public static KeyCode getKeyCode( final char _char )
+	public static KeyCode getKeyCode( final int _code )
 	{
-		switch( _char )
+		switch( _code )
 		{
 			/* NUMBERS */
 			case '0' : return NUM0 ;
@@ -71,36 +71,36 @@ public enum KeyCode
 			case '9' : return NUM9 ;
 			/* SPECIAL CHARACTERS */
 			case ' ' : return SPACEBAR ;
-			case '?' : return QUESTION_MARK ;
 			case '!' : return EXCLAMATION_MARK ;
-			case '£' : return POUND_SIGN ;
+			case '\"' : return QUOTATION ;
+			case '#' : return HASH_TAG ;
 			case '$' : return DOLLAR_SIGN ;
 			case '%' : return PERCENTAGE ;
-			case '<' : return LESS_THAN ;
-			case '>' : return GREATER_THAN ;
-			case '~' : return TIDEL;
-			case '\"': return QUOTATION ;
-			case '{' : return CURLY_BRACKET_OPEN ;
-			case '}' : return CURLY_BRACKET_CLOSED ;
-			case '[' : return SQUARE_BRACKET_OPEN ;
-			case ']' : return SQUARE_BRACKET_CLOSED ;
-			case '*' : return ASTERIK ;
-			case '#' : return HASH_TAG ;
-			case '.' : return FULL_STOP ;
-			case ',' : return COMMA ;
-			case '\'': return APOSTRAPHE ;
 			case '&' : return AMPERSAND ;
-			case '@' : return AT ;
-			case ':' : return COLON ;
-			case ';' : return SEMICOLON ;
-			case '^' : return CIRCUMFLEX ;
-			case '=' : return EQUALS ;
-			case '+' : return PLUS ;
-			case '-' : return MINUS ;
-			case '/' : return FORWARD_SLASH ;
-			case '\\': return BACKWARD_SLASH ;
 			case '(' : return BRACKET_OPEN ;
 			case ')' : return BRACKET_CLOSED ;
+			case '*' : return ASTERIK ;
+			case '+' : return PLUS ;
+			case ',' : return COMMA ;
+			case '-' : return MINUS ;
+			case '.' : return FULL_STOP ;
+			case '/' : return FORWARD_SLASH ;
+			case ':' : return COLON ;
+			case ';' : return SEMICOLON ;
+			case '<' : return LESS_THAN ;
+			case '=' : return EQUALS ;
+			case '>' : return GREATER_THAN ;
+			case '?' : return QUESTION_MARK ;
+			case '@' : return AT ;
+			case '[' : return SQUARE_BRACKET_OPEN ;
+			case '\\': return BACKWARD_SLASH ;
+			case ']' : return SQUARE_BRACKET_CLOSED ;
+			case '^' : return CIRCUMFLEX ;
+			case '\'' : return APOSTRAPHE ;
+			case '{' : return CURLY_BRACKET_OPEN ;
+			case '}' : return CURLY_BRACKET_CLOSED ;
+			case '~' : return TIDEL;
+			case '£' : return POUND_SIGN ;
 			/* LOWERCASE LETTERS */
 			case 'a' : return a ;
 			case 'b' : return b ;
@@ -155,8 +155,7 @@ public enum KeyCode
 			case 'X' : return X ;
 			case 'Y' : return Y ;
 			case 'Z' : return Z ;
+			default  : return KeyCode.NONE ;
 		}
-
-		return KeyCode.NONE ;
 	}
 }

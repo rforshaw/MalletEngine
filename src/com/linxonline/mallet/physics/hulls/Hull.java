@@ -28,29 +28,21 @@ public abstract class Hull
 	}
 
 	/**
-		Update the Contact Data points.
-		return the accumulatedPenetration
-	**/
-	public Vector2 updateContactData()
+		Iterate over the contact points and accumulate the overall 
+		penetration depth and direction. 
+	*/
+	public static void calculatePenetrationDepth( final ContactData _contacts, final ContactPoint _point, final Vector2 _accumulatedPenetration )
 	{
-		accumulatedPenetration.x = 0.0f ;
-		accumulatedPenetration.y = 0.0f ;
-
-		final ContactPoint point = new ContactPoint() ;
-
-		final int size = contactData.size() ;
+		final int size = _contacts.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			contactData.get( i, point ) ;
-			if( point.physical == true )
+			_contacts.get( i, _point ) ;
+			if( _point.physical == true )
 			{
-				accumulatedPenetration.x += point.contactNormal.x * point.penetration ;
-				accumulatedPenetration.y += point.contactNormal.y * point.penetration ;
+				_accumulatedPenetration.x += _point.contactNormal.x * _point.penetration ;
+				_accumulatedPenetration.y += _point.contactNormal.y * _point.penetration ;
 			}
 		}
-
-		contactData.reset() ;
-		return accumulatedPenetration ;
 	}
 
 	public final void setGroupID( final int _groupID )

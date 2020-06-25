@@ -34,6 +34,14 @@ public class KeyInputComponent extends InputComponent
 		super( _parent, _allow, _mode ) ;
 	}
 
+	public void registerKeys( final KeyCode[] _keys, final KeyInputListener _listener )
+	{
+		for( final KeyCode key : _keys )
+		{
+			registerKey( key, _listener ) ;
+		}
+	}
+
 	public void registerKey( final KeyCode _key, final KeyInputListener _listener )
 	{
 		final Key key = keys.get( _key ) ;

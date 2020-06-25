@@ -109,16 +109,19 @@ public class InputSystem implements IInputSystem,
 		// If the key is considered as released(false) then 
 		// we'll always consider it as a valid pressed action. 
 
-		final int index = ( int )_event.getKeyCode() ;
+		final int index = ( int )_event.getKeyChar() ;
+		KeyCode keycode = KeyCode.getKeyCode( index ) ;
+		if( keycode == KeyCode.NONE )
+		{
+			keycode = isSpecialKeyDown( index ) ;
+		}
+
+		//System.out.println( "Pressed: " + index ) ;
+		//System.out.println( "Pressed: " + keycode ) ;
+		//System.out.println( "Pressed: " + _event.getKeyChar() ) ;
 		if( keys[index] == false )
 		{
 			keys[index] = true ;
-
-			KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
-			if( keycode == KeyCode.NONE )
-			{
-				keycode = isSpecialKeyDown( _event ) ;
-			}
 
 			final InputEvent input = cache.get() ;
 			input.setID( InputID.KEYBOARD_1 ) ;
@@ -137,16 +140,18 @@ public class InputSystem implements IInputSystem,
 			return ;
 		}
 
-		final int index = ( int )_event.getKeyCode() ;
+		final int index = ( int )_event.getKeyChar() ;
+		KeyCode keycode = KeyCode.getKeyCode( index ) ;
+		if( keycode == KeyCode.NONE )
+		{
+			keycode = isSpecialKeyDown( index ) ;
+		}
+
+		//System.out.println( "Released: " + index ) ;
+		//System.out.println( "Released: " + keycode ) ;
 		if( keys[index] == true )
 		{
 			keys[index] = false ;
-
-			KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
-			if( keycode == KeyCode.NONE )
-			{
-				keycode = isSpecialKeyDown( _event ) ;
-			}
 
 			final InputEvent input = cache.get() ;
 			input.setID( InputID.KEYBOARD_1 ) ;
@@ -297,9 +302,9 @@ public class InputSystem implements IInputSystem,
 		return handlers.contains( _handler ) ;
 	}
 
-	private final KeyCode isSpecialKeyDown( final KeyEvent _event )
+	private final KeyCode isSpecialKeyDown( final int _code )
 	{
-		switch( _event.getKeyCode() )
+		switch( _code )
 		{
 			case KeyEvent.VK_WINDOWS     : return KeyCode.WINDOWS ;
 			case KeyEvent.VK_INSERT      : return KeyCode.INSERT ;

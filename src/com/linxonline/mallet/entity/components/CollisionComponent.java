@@ -18,6 +18,9 @@ public class CollisionComponent extends Component
 	public final Hull[] hulls ;
 	private boolean applyContact = true ;
 
+	private final ContactPoint point = new ContactPoint() ;
+	private final Vector2 penShift = new Vector2() ;
+
 	public CollisionComponent( final Entity _parent, final Hull ... _hulls )
 	{
 		this( _parent, Entity.AllowEvents.YES, _hulls ) ;
@@ -71,12 +74,14 @@ public class CollisionComponent extends Component
 
 		if( applyContact == true )
 		{
+			penShift.setXY( 0.0f, 0.0f ) ;
+
 			// Shift the hulls position by the penetration depth.
 			for( int i = 0; i < hulls.length; ++i )
 			{
 				final Hull hull = hulls[i] ;
-				final Vector2 accumulated = hull.updateContactData() ;
-				hull.addToPosition( accumulated.x, accumulated.y ) ;
+				Hull.calculatePenetrationDepth( hull.contactData, point, penShift ) ;
+				hull.addToPosition( penShift.x, penShift.y ) ;
 			}
 		}
 	}
