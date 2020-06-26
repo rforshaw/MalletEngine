@@ -25,7 +25,7 @@ public class MalletTexture
 	*/
 	public MalletTexture( final String _texturePath )
 	{
-		this( _texturePath, Filter.LINEAR, Wrap.REPEAT ) ;
+		this( _texturePath, Filter.MIP_LINEAR, Wrap.REPEAT ) ;
 	}
 
 	public MalletTexture( final String _texturePath, final Filter _filter, final Wrap _wrap )
@@ -48,7 +48,8 @@ public class MalletTexture
 	*/
 	public MalletTexture( final World _world )
 	{
-		this( TextureAssist.createMeta( _world ), Filter.LINEAR, Wrap.REPEAT ) ;
+		// World backbuffer is set to NEAREST REPEAT.
+		this( TextureAssist.createMeta( _world ), Filter.NEAREST, Wrap.REPEAT ) ;
 	}
 
 	private MalletTexture( final Meta _meta,
@@ -65,8 +66,8 @@ public class MalletTexture
 						   final Wrap _v )
 	{
 		meta = _meta ;
-		minFilter = ( _min == null ) ? Filter.LINEAR : _min ;
-		maxFilter = ( _max == null ) ? Filter.LINEAR : _max ;
+		minFilter = ( _min == null ) ? Filter.MIP_LINEAR : _min ;
+		maxFilter = ( _max == null ) ? Filter.MIP_LINEAR : _max ;
 
 		uWrap = ( _u == null ) ? Wrap.REPEAT : _u ;
 		vWrap = ( _v == null ) ? Wrap.REPEAT : _v ;
@@ -195,6 +196,8 @@ public class MalletTexture
 
 	public static enum Filter
 	{
+		MIP_LINEAR,
+		MIP_NEAREST,
 		LINEAR,
 		NEAREST
 	}

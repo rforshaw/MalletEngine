@@ -49,7 +49,10 @@ public class UIList extends UILayout
 			@Override
 			public void slot( final UIList _this )
 			{
-				externalDelegate.removeDraw( frame.getFrame() ) ;
+				if( externalDelegate != null )
+				{
+					externalDelegate.removeDraw( frame.getFrame() ) ;
+				}
 			}
 		} ) ;
 

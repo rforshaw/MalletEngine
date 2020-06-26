@@ -388,9 +388,11 @@ public class GLProgram extends ProgramManager.Program
 		{
 			switch( _filter )
 			{
-				default      :
-				case LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
-				case NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+				default          :
+				case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
+				case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+				case LINEAR      : return MGL.GL_LINEAR ;
+				case NEAREST     : return MGL.GL_NEAREST ;
 			}
 		}
 
