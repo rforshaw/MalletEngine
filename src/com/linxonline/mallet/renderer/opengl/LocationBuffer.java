@@ -13,8 +13,8 @@ import com.linxonline.mallet.util.ISort ;
 	Prevent allocations from being made that exceed the 
 	maximum requirements.
 	
-	T : Developer data-type associated with this LocationBuffer.
-	U : Developer data-type associated with a Location.
+	T : Developer data-type associated with this LocationBuffer (OpenGL buffer).
+	U : Developer data-type associated with a Location (GLDraw).
 */
 public class LocationBuffer<T, U> implements ISort
 {

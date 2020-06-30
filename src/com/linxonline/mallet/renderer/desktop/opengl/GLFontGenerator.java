@@ -28,14 +28,12 @@ import com.linxonline.mallet.maths.Vector3 ;
 public class GLFontGenerator
 {
 	private final static float PADDING = 4.0f ;
-	private final GLTextureManager manager ;
 
 	private final BufferedImage geometryBuffer = new BufferedImage( 1, 1, BufferedImage.TYPE_BYTE_GRAY ) ;
 	private final Graphics2D gGeom2D ;
 
-	public GLFontGenerator( final GLTextureManager _manager )
+	public GLFontGenerator()
 	{
-		manager = _manager ;
 		gGeom2D = geometryBuffer.createGraphics() ;
 	}
 
@@ -79,7 +77,7 @@ public class GLFontGenerator
 											   metrics.getLeading() ) ;
 	}
 
-	public GLFont generateFont( final MalletFont _font )
+	public Bundle generateFont( final MalletFont _font )
 	{
 		final MalletFont.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
@@ -137,7 +135,7 @@ public class GLFontGenerator
 			}
 		}
 
-		return new GLFont( shapes, manager.bind( textureBuffer, GLTextureManager.InternalFormat.UNCOMPRESSED ) ) ;
+		return new Bundle( shapes, textureBuffer ) ;
 	}
 
 	/**
@@ -156,5 +154,17 @@ public class GLFontGenerator
 			width += glyph != null ? glyph.getWidth() + PADDING : PADDING ;
 		}
 		return width ;
+	}
+	
+	public static class Bundle
+	{
+		public final Shape[] shapes ;
+		public final BufferedImage image ;
+
+		public Bundle( final Shape[] _shapes, final BufferedImage _image )
+		{
+			shapes = _shapes ;
+			image = _image ;
+		}
 	}
 }

@@ -8,6 +8,16 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.OrderedInsert ;
 
+/**
+	When rendering content with OpenGL you want to reduce 
+	the number of state changes - to satisfy this requirement 
+	we bundle geometry/data that is matching(same program, textures, 
+	swivel order, etc) and stick them into 1 LocationBuffer.
+
+	Each Draw object is given a Location within the LocationBuffer.
+	T represents the OpenGL buffer.
+	U represents the user data to be stored within T.
+*/
 public class Buffers<T, U>
 {
 	private final int maxIndex ;
@@ -46,6 +56,13 @@ public class Buffers<T, U>
 	{
 		final int indexBytesSize = listener.calculateIndexByteSize( _user ) ;
 		final int vertexByteSize = listener.calculateVertexByteSize( _user ) ;
+
+		if( indexBytesSize <= 0 ||
+			vertexByteSize <= 0 )
+		{
+			Logger.println( "Exceeds minimum buffer range.", Logger.Verbosity.MINOR ) ;
+			return null ;
+		}
 	
 		if( indexBytesSize >= maxIndex ||
 			vertexByteSize >= maxVertex )

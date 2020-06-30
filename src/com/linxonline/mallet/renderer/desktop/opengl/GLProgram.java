@@ -98,12 +98,7 @@ public class GLProgram extends ProgramManager.Program
 				{
 					final MalletFont font = ( MalletFont )map.getUniform( uniform.getRight() ) ;
 					final GLFont glFont = GLRenderer.getFont( font ) ;
-
 					final GLImage texture = glFont.getTexture() ;
-					if( texture == null )
-					{
-						return null ;
-					}
 
 					map.setUniform( uniform.getRight(), texture ) ;
 					break ;

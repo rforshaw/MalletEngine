@@ -82,7 +82,7 @@ public class GLGeometryUploader
 
 			final int indexSize = _indexByteSize / IBO_VAR_BYTE_SIZE ;
 			final int vboSize = _vertexByteSize / VBO_VAR_BYTE_SIZE ;
-			
+
 			indicies = new int[indexSize] ;
 			verticies = new float[vboSize] ;
 
@@ -190,17 +190,22 @@ public class GLGeometryUploader
 		*/
 		private void uploadBuffers()
 		{
-			final int startBytes = 0 ;
+			final int indiciesLengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
+			final int verticiesLengthBytes = verticies.length * VBO_VAR_BYTE_SIZE ;
+
+			// We can orphan the previous buffer, if any draw commands 
+			// still depend on it they wont trigger a sync.
+			//MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, null, MGL.GL_DYNAMIC_DRAW ) ;
+			//MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, null, MGL.GL_DYNAMIC_DRAW ) ;
 
 			indexBuffer.put( indicies ) ;
 			indexBuffer.position( 0 ) ;
-			final int indiciesLengthBytes = indicies.length * IBO_VAR_BYTE_SIZE ;
-			MGL.glBufferSubData( MGL.GL_ELEMENT_ARRAY_BUFFER, startBytes, indiciesLengthBytes, indexBuffer ) ;
 
 			vertexBuffer.put( verticies ) ;
 			vertexBuffer.position( 0 ) ;
-			final int verticiesLengthBytes = verticies.length * VBO_VAR_BYTE_SIZE ;
-			MGL.glBufferSubData( MGL.GL_ARRAY_BUFFER, startBytes, verticiesLengthBytes, vertexBuffer ) ;
+
+			MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+			MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		}
 
 		public abstract void upload( final Location<BufferObject, GLDraw> _location ) ;
@@ -325,6 +330,8 @@ public class GLGeometryUploader
 		private final Vector3 temp = new Vector3() ;
 
 		private final Matrix4 matrix = new Matrix4() ;
+		private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
+
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
@@ -348,21 +355,15 @@ public class GLGeometryUploader
 			basic.getRotation( rotation ) ;
 			basic.getScale( scale ) ;
 
-			matrix.setIdentity() ;
-			matrix.setTranslate( position.x, position.y, 0.0f ) ;
-			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			matrix.translate( offset.x, offset.y, offset.z ) ;
-			matrix.scale( scale.x, scale.y, scale.z ) ;
+			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
-			uploadIndex( _location, shape ) ;
-			uploadVBO( _location, shape, matrix ) ;
+			uploadIndexToRAM( _location, shape ) ;
+			uploadVBOToRAM( _location, shape, matrix ) ;
 
 			dirty = true ;
 		}
 
-		private void uploadIndex( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
+		private void uploadIndexToRAM( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
 		{
 			final BufferObject buffer = _handler.getBufferData() ;
 		
@@ -381,7 +382,7 @@ public class GLGeometryUploader
 			indicies[increment++] = PRIMITIVE_RESTART_INDEX ;
 		}
 
-		private void uploadVBO( final Location<BufferObject, GLDraw> _handler, final Shape _shape, final Matrix4 _matrix )
+		private void uploadVBOToRAM( final Location<BufferObject, GLDraw> _handler, final Shape _shape, final Matrix4 _matrix )
 		{
 			final BufferObject buffer = _handler.getBufferData() ;
 
@@ -440,9 +441,12 @@ public class GLGeometryUploader
 		private final GLFont glFont ;
 
 		private final Matrix4 matrix = new Matrix4() ;
+		private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
+
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
+		private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
 
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
@@ -467,12 +471,7 @@ public class GLGeometryUploader
 			basic.getOffset( offset ) ;
 			basic.getRotation( rotation ) ;
 
-			matrix.setIdentity() ;
-			matrix.setTranslate( position.x, position.y, 0.0f ) ;
-			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			matrix.translate( offset.x, offset.y, offset.z ) ;
+			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
 			final MalletColour colour = basic.getColour() ;
 
@@ -861,6 +860,34 @@ public class GLGeometryUploader
 		}
 
 		return size ;
+	}
+
+	private static void apply( final Matrix4 _mat4,
+							   final Matrix4 _temp,
+							   final Vector3 _position,
+							   final Vector3 _offset,
+							   final Vector3 _rotation,
+							   final Vector3 _scale )
+	{
+		_mat4.setIdentity() ;
+		_mat4.setTranslate( _position.x, _position.y, 0.0f ) ;
+
+		_temp.setRotateX( _rotation.x ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateY( _rotation.y ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateZ( _rotation.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setScale( _scale.x, _scale.y, _scale.z ) ;
+		_temp.setTranslate( _offset.x, _offset.y, _offset.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
 	}
 
 	public static class VertexAttrib

@@ -325,7 +325,7 @@ public class Matrix4 implements Cacheable
 		matrix[( _row * 4 ) + _col] = _val ;
 	}
 
-	private static Matrix4 createTempIdentity()
+	public static Matrix4 createTempIdentity()
 	{
 		final Matrix4 iden = new Matrix4( false ) ;
 		iden.setIdentity() ;

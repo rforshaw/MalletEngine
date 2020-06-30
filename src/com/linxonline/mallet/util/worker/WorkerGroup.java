@@ -41,11 +41,10 @@ public final class WorkerGroup
 		threads, this function is blocking until 
 		data set has been processed completely.
 	*/
-	public void exec( final Worker<?> _worker )
+	public <T> void exec( final List<T> _dataset, final Worker<T> _worker )
 	{
 		//System.out.println( "Exec Worker Group" ) ;
-		final List<?> dataset = _worker.getDataSet() ;
-		if( dataset.isEmpty() == true )
+		if( _dataset.isEmpty() == true )
 		{
 			// If there is no data to process then we 
 			// might as well return early.
@@ -53,7 +52,7 @@ public final class WorkerGroup
 		}
 
 		int threadLength = availableWorkers.size() ;
-		final int dataSize = dataset.size() ;
+		final int dataSize = _dataset.size() ;
 		if( threadLength > dataSize )
 		{
 			// You should never have more threads than data,
@@ -76,8 +75,74 @@ public final class WorkerGroup
 			final int extra = ( i == 0 ) ? remainder : 0 ;
 
 			thread.setWorkerCondition( lock, condition ) ;
-			thread.setRange( start, start + range + extra ) ;
+			thread.setRange( _dataset, start, start + range + extra ) ;
 			thread.setWorker( _worker ) ;
+
+			start += range + extra ;
+
+			thread.unpause() ;			// Resume data updating
+		}
+
+		//System.out.println( "Lock Group" ) ;
+		// Only continue once all WorkerThreads have finished
+		lock.lock( condition ) ;
+
+		//System.out.println( "Relinquish Group" ) ;
+		relinquishWorkers() ;
+	}
+
+	/**
+		Execute the passed in workers on the available threads.
+		You cannot have more workers than available threads.
+		Each worker is given their own thread to execute on, 
+		allowing a worker to have their own state.
+	*/
+	public <T> void exec( final List<T> _dataset, final Worker<T>[] _workers )
+	{
+		//System.out.println( "Exec Worker Group" ) ;
+		if( _dataset.isEmpty() == true )
+		{
+			// If there is no data to process then we 
+			// might as well return early.
+			return ;
+		}
+
+		int threadLength = availableWorkers.size() ;
+		if( threadLength > _workers.length )
+		{
+			// If the user passes in multiple workers it 
+			// is expected that each worker contains its own 
+			// state which cannot be used across multiple threads.
+			threadLength = _workers.length ;
+		}
+
+		final int dataSize = _dataset.size() ;
+		if( threadLength > dataSize )
+		{
+			// You should never have more threads than data,
+			// Else don't have more threads than data.
+			threadLength = dataSize ;
+		}
+
+		int start = 0 ;
+		final int range = dataSize / threadLength ; 	// Split the entities between the threads.
+		final int remainder = dataSize % threadLength ;
+		condition.reset( threadLength ) ;
+
+		//System.out.println( "Available: " + threadLength + " Amount: " + dataSize + " Divided: " + range + " Remainder: " + remainder  ) ;
+		//System.out.println( "Start Group: " + range ) ;
+		for( int i = 0; i < threadLength; ++i )
+		{
+			final WorkerThread thread = availableWorkers.pop() ;
+			workers.add( thread ) ;
+
+			final Worker<T> worker = _workers[i] ;
+
+			final int extra = ( i == 0 ) ? remainder : 0 ;
+
+			thread.setWorkerCondition( lock, condition ) ;
+			thread.setRange( _dataset, start, start + range + extra ) ;
+			thread.setWorker( worker ) ;
 
 			start += range + extra ;
 

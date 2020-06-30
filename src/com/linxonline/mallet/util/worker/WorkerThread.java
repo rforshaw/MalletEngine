@@ -15,6 +15,7 @@ public final class WorkerThread extends Thread
 	private WorkerGroup.WorkerCondition groupCondition = null ;		// Lock to calling thread
 	
 	private Worker<?> worker = null ;					// Defines execution and data set
+	private List dataset = null ;
 	private int start = 0 ;								// Start of data subset
 	private int end = 0 ;								// End of data subset
 
@@ -41,11 +42,12 @@ public final class WorkerThread extends Thread
 		Define the subset of the Worker DataSet this 
 		worker thread will be processing.
 	*/
-	public void setRange( final int _start, final int _end )
+	public void setRange( final List _dataset, final int _start, final int _end )
 	{
 		synchronized( block )
 		{
 			//System.out.println( "Start: " + _start + " End: " + _end ) ;
+			dataset = _dataset ;
 			start = _start ;
 			end = _end ;
 		}
@@ -85,9 +87,10 @@ public final class WorkerThread extends Thread
 			{
 				// Execute the work specified by the developer
 				//System.out.println( "Exec Worker: " + start + " to: " + end ) ;
-				if( worker.exec( start, end ) == Worker.ExecType.FINISH )
+				if( worker.exec( dataset, start, end ) == Worker.ExecType.FINISH )
 				{
 					setWorker( null ) ;
+					setRange( null, 0, 0 ) ;
 					paused = true ;
 				}
 

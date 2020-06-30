@@ -5,7 +5,7 @@ import java.lang.ref.WeakReference ;
 public class Location<T, U>
 {
 	private final WeakReference<LocationBuffer<T, U>> buffer ;
-	private U data = null ;			// Developer data associated with this location
+	private U data = null ;			// Data associated with this location (GLDraw)
 
 	private Range index ;
 	private Range vertex ;
@@ -19,17 +19,29 @@ public class Location<T, U>
 		vertex = new Range( _vertexStart, _vertexEnd ) ;
 	}
 
+	/**
+		Set the location data this location represents.
+		Location data is most likely a Draw object.
+	*/
 	public U setLocationData( final U _data )
 	{
 		data = _data ;
 		return data ;
 	}
 
+	/**
+		Return the location data.
+		Location data is most likely some for of Draw object.
+	*/
 	public U getLocationData()
 	{
 		return data ;
 	}
 
+	/**
+		Return the buffer the location data resides within.
+		Location data is most likely some for of Draw object.
+	*/
 	public T getBufferData()
 	{
 		final LocationBuffer<T, U> b = buffer.get() ;

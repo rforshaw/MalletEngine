@@ -4,12 +4,11 @@ import java.util.List ;
 
 public abstract class Worker<T>
 {
-	public final ExecType exec( final int _start, final int _end )
+	public final ExecType exec( final List<T> _dataset, final int _start, final int _end )
 	{
-		final List<T> list = getDataSet() ;
 		for( int i = _start; i < _end; i++ )
 		{
-			if( exec( i, list.get( i ) ) == ExecType.FINISH ) 		// Does the hard execution work
+			if( exec( i, _dataset.get( i ) ) == ExecType.FINISH ) 		// Does the hard execution work
 			{
 				return ExecType.FINISH ;
 			}
@@ -27,14 +26,6 @@ public abstract class Worker<T>
 		issues, however class scope upwards will.
 	*/
 	public abstract ExecType exec( final int _index, final T _data ) ;
-
-	/**
-		Return the entire list that the threads 
-		will work on.
-		WorkerThreads will call this function and 
-		loop over a subset.
-	*/
-	public abstract List<T> getDataSet() ;
 
 	public enum ExecType
 	{

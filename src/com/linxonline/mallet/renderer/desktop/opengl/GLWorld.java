@@ -30,7 +30,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	protected final GLDrawState state;			// Objects to be drawn
+	protected final GLDrawState state;						// Objects to be drawn
 	protected final CameraState<CameraData> cameras ;		// Camera view portals
 
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;

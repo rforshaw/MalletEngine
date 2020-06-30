@@ -94,9 +94,8 @@ public class QuadTree
 				if( nodes.isEmpty() == false )
 				{
 					nodeWorker.setDeltaTime( _dt ) ;
-					nodeWorker.setNodes( nodes ) ;
 
-					workers.exec( nodeWorker ) ;
+					workers.exec( nodes, nodeWorker ) ;
 					nodes.clear() ;
 				}
 			}
@@ -740,7 +739,6 @@ public class QuadTree
 	private static class NodeWorker extends Worker<QuadNode>
 	{
 		private float deltaTime = 0.0f ;
-		private List<QuadNode> nodes ;
 
 		public NodeWorker() {}
 
@@ -749,23 +747,12 @@ public class QuadTree
 			deltaTime = _dt ;
 		}
 
-		public void setNodes( final List<QuadNode> _nodes )
-		{
-			nodes = _nodes ;
-		}
-
 		@Override
 		public ExecType exec( final int _index, final QuadNode _node )
 		{
 			//System.out.println( "Node: " + _node.size() ) ;
 			_node.update( deltaTime ) ;
 			return ExecType.CONTINUE ;
-		}
-
-		@Override
-		public List<QuadNode> getDataSet()
-		{
-			return nodes ;
 		}
 	}
 }
