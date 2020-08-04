@@ -5,7 +5,12 @@ public class SArray extends SNode
 	private final SNode contains ;
 	private final int length ;
 
-	public SArray( SNode _contains, final int _length )
+	public SArray( final SNode _contains )
+	{
+		this( _contains, 0 ) ;
+	}
+
+	public SArray( final SNode _contains, final int _length )
 	{
 		contains = _contains ;
 		contains.setParent( this ) ;
@@ -18,6 +23,19 @@ public class SArray extends SNode
 		return contains ;
 	}
 
+	/**
+		An array without a fixed length (a length 
+		greater than 0) is considered dynamic. 
+	*/
+	public boolean isDynamic()
+	{
+		return length == 0 ;
+	}
+
+	/**
+		Return the length of the array, it will return 
+		0, if the array is of an unspecified size.
+	*/
 	public int getLength()
 	{
 		return length ;

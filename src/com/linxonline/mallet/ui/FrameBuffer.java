@@ -69,12 +69,12 @@ public class FrameBuffer
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		DrawAssist.amendPosition( frame, _x, _y, _z ) ;
+		frame.setPosition( _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		DrawAssist.amendOffset( frame, _x, _y, _z ) ;
+		frame.setOffset( _x, _y, _z ) ;
 	}
 
 	public void setLength( final float _x, final float _y, final float _z )
@@ -82,20 +82,20 @@ public class FrameBuffer
 		final int width = ( int )_x ;
 		final int height = ( int )_y ;
 
-		CameraAssist.amendScreenResolution( camera, width, height ) ;
-		CameraAssist.amendDisplayResolution( camera, width, height ) ;
-		CameraAssist.amendOrthographic( camera, 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
+		camera.setScreenResolution( width, height ) ;
+		camera.setDisplayResolution( width, height ) ;
+		camera.setOrthographic( 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
 		WorldAssist.setRenderDimensions( world, 0, 0, width, height ) ;
 		WorldAssist.setDisplayDimensions( world, 0, 0, width, height ) ;
 
-		Shape.updatePlaneGeometry( DrawAssist.getDrawShape( frame ), _x, _y, _z ) ;
+		Shape.updatePlaneGeometry( frame.getShape(), _x, _y, _z ) ;
 		DrawAssist.forceUpdate( frame ) ;
 	}
 
 	public void setLayer( final int _layer )
 	{
-		DrawAssist.amendOrder( frame, _layer ) ;
+		frame.setOrder( _layer ) ;
 	}
 	
 	public DrawDelegate getDrawDelegate()
@@ -194,13 +194,13 @@ public class FrameBuffer
 												 new Vector3( 1, 1, 1 ), _layer ) ;
 
 		DrawAssist.amendUI( pane, true ) ;
-		DrawAssist.amendShape( pane, Shape.constructPlane( new Vector3( _width, _height, 0 ),
-														   new Vector2( 0, 1 ),
-														   new Vector2( 1, 0 ) ) ) ;
+		pane.setShape( Shape.constructPlane( new Vector3( _width, _height, 0 ),
+											 new Vector2( 0, 1 ),
+											 new Vector2( 1, 0 ) ) ) ;
 
 		final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-		ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( _world ) ) ;
-		DrawAssist.attachProgram( pane, program ) ;
+		program.mapUniform( "inTex0", new MalletTexture( _world ) ) ;
+		pane.setProgram( program ) ;
 
 		return pane ;
 	}

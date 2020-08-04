@@ -13,7 +13,7 @@ package com.linxonline.mallet.util ;
 **/
 public final class Logger
 {
-	private static Verbosity verbosity = Verbosity.MINOR ;
+	private static Verbosity verbosity = Verbosity.NORMAL ;
 
 	private Logger() {}
 

@@ -8,6 +8,7 @@ import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -530,8 +531,8 @@ public class GameState extends State
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 				{
 					delegate = _delegate ;
-					final Draw[] draws = showFPS.getDraws() ;
-					for( final Draw draw : draws )
+					final TextDraw[] draws = showFPS.getDraws() ;
+					for( final TextDraw draw : draws )
 					{
 						delegate.addTextDraw( draw ) ;
 					}
@@ -581,14 +582,14 @@ public class GameState extends State
 	private static class ShowFPS
 	{
 		private boolean show = false ;
-		private final Draw[] draws = new Draw[] { DrawAssist.createTextDraw( new StringBuilder( "0" ),
+		private final TextDraw[] draws = new TextDraw[] { DrawAssist.createTextDraw( new StringBuilder( "0" ),
 																	new MalletFont( "Arial" ),
 																	new Vector3(),
 																	new Vector3(),
 																	new Vector3(),
 																	new Vector3( 1.0f, 1.0f, 1.0f ),
 																	200 ),
-												   DrawAssist.createTextDraw( new StringBuilder( "0" ),
+														  DrawAssist.createTextDraw( new StringBuilder( "0" ),
 																	new MalletFont( "Arial" ),
 																	new Vector3( 0.0f, 20.0f, 0.0f ),
 																	new Vector3(),
@@ -621,31 +622,31 @@ public class GameState extends State
 			}
 		}
 
-		private void updateDrawFPS( final Draw _draw, final double _dt )
+		private void updateDrawFPS( final TextDraw _draw, final double _dt )
 		{
-			final StringBuilder txt = DrawAssist.getText( _draw ) ;
+			final StringBuilder txt = _draw.getText() ;
 			txt.setLength( 0 ) ;
 			txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
 			txt.append( "fps" ) ;
 
-			DrawAssist.amendTextStart( _draw, 0 ) ;
-			DrawAssist.amendTextEnd( _draw, txt.length() ) ;
+			_draw.setStart( 0 ) ;
+			_draw.setEnd( txt.length() ) ;
 			DrawAssist.forceUpdate( _draw ) ;
 		}
 
-		private void updateDrawMS( final Draw _draw, final double _dt )
+		private void updateDrawMS( final TextDraw _draw, final double _dt )
 		{
-			final StringBuilder txt = DrawAssist.getText( _draw ) ;
+			final StringBuilder txt = _draw.getText()  ;
 			txt.setLength( 0 ) ;
 			txt.insert( 0, ( int )( _dt * 1000.0 ) ) ;
 			txt.append( "ms" ) ;
 
-			DrawAssist.amendTextStart( _draw, 0 ) ;
-			DrawAssist.amendTextEnd( _draw, txt.length() ) ;
+			_draw.setStart( 0 ) ;
+			_draw.setEnd( txt.length() ) ;
 			DrawAssist.forceUpdate( _draw ) ;
 		}
 
-		public Draw[] getDraws()
+		public TextDraw[] getDraws()
 		{
 			return draws ;
 		}

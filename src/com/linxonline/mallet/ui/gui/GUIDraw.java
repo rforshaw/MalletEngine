@@ -50,7 +50,7 @@ public class GUIDraw extends GUIComponent
 		final Draw draw = getDraw() ;
 		if( draw != null )
 		{
-			final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
+			final Shape shape = getDraw().getShape() ;
 			if( shape != null )
 			{
 				GUI.updateColour( shape, colour ) ;
@@ -72,13 +72,13 @@ public class GUIDraw extends GUIComponent
 										  new Vector3( 1, 1, 1 ),
 										  getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendShape( draw, Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
+			draw.setShape( Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 			setColour( getColour() ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
+			program.mapUniform( "inTex0", sheet ) ;
 
-			DrawAssist.attachProgram( draw, program ) ;
+			draw.setProgram( program ) ;
 		}
 	}
 
@@ -120,12 +120,12 @@ public class GUIDraw extends GUIComponent
 
 		if( draw != null && parent.isVisible() == true )
 		{
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), length ) ;
+			Shape.updatePlaneGeometry( draw.getShape(), length ) ;
 
-			DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
+			draw.setPosition( position.x, position.y, position.z ) ;
+			draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-			DrawAssist.amendOrder( draw, getLayer() ) ;
+			draw.setOrder( getLayer() ) ;
 			DrawAssist.forceUpdate( draw ) ;
 		}
 	}

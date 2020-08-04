@@ -382,7 +382,7 @@ public class UIWrapper extends UIElement
 			final Draw draw = getDraw() ;
 			if( draw != null )
 			{
-				final Shape shape = DrawAssist.getDrawShape( getDraw() ) ;
+				final Shape shape = getDraw().getShape() ;
 				if( shape != null )
 				{
 					GUI.updateColour( shape, colour ) ;
@@ -398,10 +398,10 @@ public class UIWrapper extends UIElement
 										  new Vector3( 1, 1, 1 ),
 										  getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendShape( draw, Shape.constructOutlinePlane( getLength(), colour ) ) ;
+			draw.setShape( Shape.constructOutlinePlane( getLength(), colour ) ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_GEOMETRY" ) ;
-			DrawAssist.attachProgram( draw, program ) ;
+			draw.setProgram( program ) ;
 		}
 
 		@Override
@@ -430,12 +430,12 @@ public class UIWrapper extends UIElement
 				final Vector3 position = getPosition() ;
 				final Vector3 offset = getOffset() ;
 				final Vector3 len = getLength() ;
-				Shape.updatePlaneGeometry( DrawAssist.getDrawShape( draw ), len ) ;
+				Shape.updatePlaneGeometry( draw.getShape(), len ) ;
 
-				DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
-				DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
+				draw.setPosition( position.x, position.y, position.z ) ;
+				draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-				DrawAssist.amendOrder( draw, getLayer() ) ;
+				draw.setOrder( getLayer() ) ;
 				DrawAssist.forceUpdate( draw ) ;
 			}
 		}

@@ -80,6 +80,8 @@ public final class GameTestLoader implements IGameLoader
 													  SStruct.var( "test2", SPrim.flt() ),
 													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
+				final Storage store = StorageAssist.create( "storage1", 3 ) ;
+
 				System.out.println( "Structures 1 and 3: " + struct1.equals( struct3 ) ) ;
 			}
 
@@ -122,13 +124,13 @@ public final class GameTestLoader implements IGameLoader
 				{
 					{
 						final World base = WorldAssist.getDefaultWorld() ;
-						final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
+						final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
 
 						final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
 						CameraAssist.addCamera( cam, null ) ;
 
-						CameraAssist.amendOrthographic( cam, 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
-						CameraAssist.amendScreenResolution( cam, dim.x / 4, dim.y / 4 ) ;
+						cam.setOrthographic( 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
+						cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
 						//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 					}
 
@@ -144,10 +146,10 @@ public final class GameTestLoader implements IGameLoader
 																	10 ) ;
 
 						final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-						ProgramAssist.mapUniform( program, "inTex0", texture ) ;
-						DrawAssist.attachProgram( draw, program ) ;
+						program.mapUniform( "inTex0", texture ) ;
+						draw.setProgram( program ) ;
 
-						DrawAssist.amendShape( draw, Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+						draw.setShape( Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
 						DrawAssist.amendUI( draw, true ) ;
 
 						_delegate.addBasicDraw( draw ) ;
@@ -176,8 +178,8 @@ public final class GameTestLoader implements IGameLoader
 																	new Vector3(),
 																	new Vector3( 1, 1, 1 ),
 																	10 ) ;
-						DrawAssist.amendShape( draw, lines ) ;
-						DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+						draw.setShape( lines ) ;
+						draw.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 						_delegate.addBasicDraw( draw ) ;
 					}
@@ -203,8 +205,8 @@ public final class GameTestLoader implements IGameLoader
 																	new Vector3(),
 																	new Vector3( 1, 1, 1 ),
 																	0 ) ;
-						DrawAssist.amendShape( draw, Shape.triangulate( triangle ) ) ;
-						DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+						draw.setShape( Shape.triangulate( triangle ) ) ;
+						draw.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 						_delegate.addBasicDraw( draw ) ;
 					}
@@ -242,7 +244,7 @@ public final class GameTestLoader implements IGameLoader
 																		 new Vector3( 1, 1, 1 ),
 																		 10 ) ;
 
-				DrawAssist.amendShape( AnimationAssist.getDraw( moombaAnim ), Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+				AnimationAssist.getDraw( moombaAnim ).setShape( Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
 
 				anim.addAnimation( "DEFAULT", moombaAnim ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
@@ -273,14 +275,14 @@ public final class GameTestLoader implements IGameLoader
 			{
 				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
 				{
-					final Draw draw = DrawAssist.createTextDraw( "Hello world!",
-																	new MalletFont( "Arial" ),
-																	new Vector3( 0.0f, -80.0f, 0.0f ),
-																	new Vector3( 0, 0, 0 ),
-																	new Vector3(),
-																	new Vector3( 1, 1, 1 ),
-																	200 ) ;
-					DrawAssist.amendColour( draw, new MalletColour( 144, 195, 212 ) ) ;
+					final TextDraw draw = DrawAssist.createTextDraw( "Hello world!",
+																	 new MalletFont( "Arial" ),
+																	 new Vector3( 0.0f, -80.0f, 0.0f ),
+																	 new Vector3( 0, 0, 0 ),
+																	 new Vector3(),
+																	 new Vector3( 1, 1, 1 ),
+																	 200 ) ;
+					draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
 					_delegate.addTextDraw( draw ) ;
 				} ) ) ;
 			}
@@ -346,8 +348,22 @@ public final class GameTestLoader implements IGameLoader
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
 				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.mapUniform( program, "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				final Storage storage1 = StorageAssist.create( "TestStorage1", 1 ) ;
+				storage1.getBuffer()[0] = 255.0f ;
+
+				final Storage storage2 = StorageAssist.create( "TestStorage2", 1 ) ;
+				storage2.getBuffer()[0] = 0.0f ;
+
+				StorageAssist.update( storage1 ) ;
+				StorageAssist.update( storage2 ) ;
+
+				final Program program = ProgramAssist.create( "SIMPLE_STORAGE_TEXTURE" ) ;
+				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				program.mapStorage( "TestBlock1", storage1 ) ;
+				program.mapStorage( "TestBlock2", storage2 ) ;
+
+				//final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				//program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
 
@@ -373,7 +389,7 @@ public final class GameTestLoader implements IGameLoader
 							DrawAssist.forceUpdate( debugDraw ) ;
 
 							hull.getPosition( position ) ;
-							DrawAssist.amendPosition( draw, position.x, position.y, 0.0f ) ;
+							draw.setPosition( position.x, position.y, 0.0f ) ;
 
 							Debug.updateDraw( debugDraw, hull ) ;
 						}
@@ -402,8 +418,8 @@ public final class GameTestLoader implements IGameLoader
 																 new Vector3( 1, 1, 1 ),
 																 10 ) ;
 
-						DrawAssist.amendShape( draw, plane ) ;
-						DrawAssist.attachProgram( draw, program ) ;
+						draw.setShape( plane ) ;
+						draw.setProgram( program ) ;
 						DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
 						hulls.add( hull ) ;
@@ -426,7 +442,7 @@ public final class GameTestLoader implements IGameLoader
 			public void createMouseAnimExample()
 			{
 				final World base = WorldAssist.getDefaultWorld() ;
-				final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
+				final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
 
 				final Entity entity = new Entity( 4, Entity.AllowEvents.NO ) ;
 				final AnimComponent anim   = new AnimComponent( entity ) ;
@@ -440,7 +456,7 @@ public final class GameTestLoader implements IGameLoader
 																		100 ) ;
 
 				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-				DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+				AnimationAssist.getDraw( animation ).setShape( plane ) ;
 				DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.ON_DEMAND ) ;
 
@@ -461,7 +477,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void applyMousePosition( final Vector2 _mouse )
 					{
-						DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+						draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
 					}
 				} ;
 				
@@ -478,13 +494,13 @@ public final class GameTestLoader implements IGameLoader
 														 new Vector3(),
 														 new Vector3( 1, 1, 1 ),
 														 10 ) ;
-				DrawAssist.amendShape( draw, Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
+				draw.setShape( Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
 				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				ProgramAssist.mapUniform( program, "inTex0", texture ) ;
-				DrawAssist.attachProgram( draw, program ) ;
+				program.mapUniform( "inTex0", texture ) ;
+				draw.setProgram( program ) ;
 
 				final RenderComponent render = new RenderComponent( entity ) ;
 				render.addBasicDraw( draw ) ;
@@ -501,7 +517,7 @@ public final class GameTestLoader implements IGameLoader
 						rotate.y += 2.8f * _dt ;
 						rotate.z += 2.1f * _dt ;
 
-						DrawAssist.amendRotate( draw, rotate.x, rotate.y, rotate.z ) ;
+						draw.setRotation( rotate.x, rotate.y, rotate.z ) ;
 						DrawAssist.forceUpdate( draw ) ;
 					}
 				} ;
@@ -516,13 +532,14 @@ public final class GameTestLoader implements IGameLoader
 					final EventComponent event = new EventComponent( receive )
 					{
 						@Override
-						public void initStateEventProcessors( final EventController _controller )
+						public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
 						{
-							super.initStateEventProcessors( _controller ) ;
-							_controller.addProcessor( "TEST_EVENT", ( final String _message ) ->
-							{
-								System.out.println( "Received: " + _message ) ;
-							} ) ;
+							return super.createStateEventController( MalletList.concat( _processors,
+								Tuple.<String, EventController.IProcessor<?>>build( "TEST_EVENT", ( final String _message ) ->
+								{
+									System.out.println( "Received: " + _message ) ;
+								} ) )
+							) ;
 						}
 					} ;
 

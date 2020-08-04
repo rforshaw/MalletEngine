@@ -136,7 +136,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		{
 			// We only want to remap the programs texture 
 			// if the sprite is not using a spritesheet.
-			ProgramAssist.mapUniform( DrawAssist.getProgram( _draw ), "inTex0", c.path ) ;
+			_draw.getProgram().mapUniform( "inTex0", c.path ) ;
 		}
 
 		// If using a sprite sheet the UV coordinates 
@@ -145,7 +145,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		// UV's too. Or the texture stays the same and the UV 
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
-		Shape.updatePlaneUV( DrawAssist.getDrawShape( _draw ), c.uv ) ;
+		Shape.updatePlaneUV( _draw.getShape(), c.uv ) ;
 		DrawAssist.forceUpdate( _draw ) ;
 	}
 

@@ -32,9 +32,8 @@ public class GUIScrollbar extends GUIComponent
 		final UIList parent = getParentList() ;
 		final int layer = parent.getLayer() ;
 
-		CameraAssist.getUIPosition( parent.getInternalCamera(), offset ) ;
-		updateLengths( parent.getScrollbarLength(),
-						parent.getScrollWidth() ) ;
+		parent.getInternalCamera().getUIPosition( offset ) ;
+		updateLengths( parent.getScrollbarLength(), parent.getScrollWidth() ) ;
 
 		{
 			xBar = DrawAssist.createDraw( parent.getPosition(),
@@ -43,12 +42,12 @@ public class GUIScrollbar extends GUIComponent
 											new Vector3( 1, 1, 1 ),
 											layer ) ;
 			DrawAssist.amendUI( xBar, true ) ;
-			DrawAssist.amendShape( xBar, Shape.constructPlane( xLength, uv.min, uv.max ) ) ;
+			xBar.setShape( Shape.constructPlane( xLength, uv.min, uv.max ) ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
+			program.mapUniform( "inTex0", sheet ) ;
 
-			DrawAssist.attachProgram( xBar, program ) ;
+			xBar.setProgram( program ) ;
 		}
 
 		{
@@ -58,12 +57,12 @@ public class GUIScrollbar extends GUIComponent
 										new Vector3( 1, 1, 1 ),
 										layer ) ;
 			DrawAssist.amendUI( yBar, true ) ;
-			DrawAssist.amendShape( yBar, Shape.constructPlane( yLength, uv.min, uv.max ) ) ;
+			yBar.setShape( Shape.constructPlane( yLength, uv.min, uv.max ) ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
+			program.mapUniform( "inTex0", sheet ) ;
 
-			DrawAssist.attachProgram( yBar, program ) ;
+			yBar.setProgram( program ) ;
 		}
 	}
 
@@ -110,21 +109,21 @@ public class GUIScrollbar extends GUIComponent
 
 		if( xBar != null )
 		{
-			DrawAssist.amendPosition( xBar, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( xBar, offset.x, offset.y, offset.z ) ;
+			xBar.setPosition( position.x, position.y, position.z ) ;
+			xBar.setOffset( offset.x, offset.y, offset.z ) ;
 		
-			DrawAssist.amendOrder( xBar, parent.getLayer() ) ;
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( xBar ), xLength ) ;
+			xBar.setOrder( parent.getLayer() ) ;
+			Shape.updatePlaneGeometry( xBar.getShape(), xLength ) ;
 			DrawAssist.forceUpdate( xBar ) ;
 		}
 
 		if( yBar != null )
 		{
-			DrawAssist.amendPosition( yBar, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( yBar, offset.x, offset.y, offset.z ) ;
+			yBar.setPosition( position.x, position.y, position.z ) ;
+			yBar.setOffset( offset.x, offset.y, offset.z ) ;
 
-			DrawAssist.amendOrder( yBar, parent.getLayer() ) ;
-			Shape.updatePlaneGeometry( DrawAssist.getDrawShape( yBar ), yLength ) ;
+			yBar.setOrder( parent.getLayer() ) ;
+			Shape.updatePlaneGeometry( yBar.getShape(), yLength ) ;
 			DrawAssist.forceUpdate( yBar ) ;
 		}
 	}
@@ -140,7 +139,7 @@ public class GUIScrollbar extends GUIComponent
 		final Vector3 length = parent.getLength() ;
 		final Vector3 absLength = parent.getAbsoluteLength() ;
 
-		CameraAssist.getUIPosition( parent.getInternalCamera(), _position ) ;
+		parent.getInternalCamera().getUIPosition( _position ) ;
 		_position.setXYZ( ( absLength.x > 0.0f ) ? ( _position.x * length.x ) / absLength.x : 0.0f,
 							( absLength.y > 0.0f ) ? ( _position.y * length.y ) / absLength.y : 0.0f,
 							( absLength.z > 0.0f ) ? ( _position.z * length.z ) / absLength.z : 0.0f ) ;

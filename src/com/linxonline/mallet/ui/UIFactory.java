@@ -58,7 +58,7 @@ public final class UIFactory
 	public static UILayout constructWindowLayout( final ILayout.Type _type, final Camera _camera )
 	{
 		final World base = WorldAssist.getDefaultWorld() ;
-		final IntVector2 dim = WorldAssist.getRenderDimensions( base ) ;
+		final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
 
 		final Vector3 dimension = new Vector3( dim.x, dim.y, 0.0f ) ;
 
@@ -69,8 +69,8 @@ public final class UIFactory
 						  ratio.toUnitY( dimension.y ),
 						  ratio.toUnitZ( dimension.z ) ) ;
 
-		CameraAssist.amendOrthographic( _camera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-		CameraAssist.amendScreenResolution( _camera, ( int )dimension.x, ( int )dimension.y ) ;
+		_camera.setOrthographic( 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
+		_camera.setScreenResolution( ( int )dimension.x, ( int )dimension.y ) ;
 
 		new WindowListener( layout, _camera, dimension ) ;
 
@@ -113,11 +113,14 @@ public final class UIFactory
 			_parent.super( _meta ) ;
 			world = WorldAssist.getDefaultWorld() ;
 
-			renderNotify = WorldAssist.attachRenderNotify( world, new Notification.Notify<World>()
+			renderNotify = world.attachRenderNotify( new Notification.Notify<World>()
 			{
+				private final IntVector2 dim = new IntVector2() ;
+
+				@Override
 				public void inform( final World _world )
 				{
-					final IntVector2 dim = WorldAssist.getRenderDimensions( _world ) ;
+					_world.getRenderDimensions( dim ) ;
 					_dimension.x = dim.x ;
 					_dimension.y = dim.y ;
 
@@ -126,17 +129,19 @@ public final class UIFactory
 										ratio.toUnitY( _dimension.y ),
 										ratio.toUnitZ( _dimension.z ) ) ;
 
-					CameraAssist.amendOrthographic( _camera, 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
-					CameraAssist.amendScreenResolution( _camera, ( int )_dimension.x, ( int )_dimension.y ) ;
+					_camera.setOrthographic( 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
+					_camera.setScreenResolution( ( int )_dimension.x, ( int )_dimension.y ) ;
 				}
 			} ) ;
 		}
 
+		@Override
 		public void refresh() {}
 
+		@Override
 		public void shutdown()
 		{
-			WorldAssist.dettachRenderNotify( world, renderNotify ) ;
+			world.dettachRenderNotify( renderNotify ) ;
 		}
 	}
 }

@@ -13,7 +13,7 @@ public class GUIText extends GUIComponent
 	private MalletFont font ;
 	private MalletColour colour = MalletColour.white() ;
 
-	protected Draw drawText = null ;
+	protected TextDraw drawText = null ;
 
 	public GUIText( final Meta _meta, final UIElement _parent )
 	{
@@ -69,9 +69,9 @@ public class GUIText extends GUIComponent
 													new Vector3( 1, 1, 1 ),
 													getLayer()  ) ;
 
-			DrawAssist.amendTextStart( drawText, 0 ) ;
-			DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
-			DrawAssist.amendColour( drawText, colour ) ;
+			drawText.setStart( 0 ) ;
+			drawText.setEnd( font.stringIndexWidth( text, length.x ) ) ;
+			drawText.setColour( colour ) ;
 			DrawAssist.amendUI( drawText, true ) ;
 		}
 	}
@@ -113,12 +113,12 @@ public class GUIText extends GUIComponent
 			offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-			DrawAssist.amendPosition( drawText, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( drawText, offset.x, offset.y, offset.z ) ;
+			drawText.setPosition( position.x, position.y, position.z ) ;
+			drawText.setOffset( offset.x, offset.y, offset.z ) ;
 
-			DrawAssist.amendTextStart( drawText, 0 ) ;
-			DrawAssist.amendTextEnd( drawText, font.stringIndexWidth( text, length.x ) ) ;
-			DrawAssist.amendOrder( drawText, getLayer() ) ;
+			drawText.setStart( 0 ) ;
+			drawText.setEnd( font.stringIndexWidth( text, length.x ) ) ;
+			drawText.setOrder( getLayer() ) ;
 			DrawAssist.forceUpdate( drawText ) ;
 		}
 	}
@@ -138,7 +138,7 @@ public class GUIText extends GUIComponent
 		return drawAlignmentY ;
 	}
 
-	public Draw getDraw()
+	public TextDraw getDraw()
 	{
 		return drawText ;
 	}

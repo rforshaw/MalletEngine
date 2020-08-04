@@ -200,8 +200,8 @@ public class UIList extends UILayout
 				final Vector3 offset = getOffset() ;
 
 				final InputEvent input = new InputEvent( _event ) ;
-				final float x = CameraAssist.convertInputToUICameraX( getCamera(), input.getMouseX() ) - ( position.x + offset.x ) ;
-				final float y = CameraAssist.convertInputToUICameraY( getCamera(), input.getMouseY() ) - ( position.y + offset.y ) ;
+				final float x = getCamera().convertInputToUIX( input.getMouseX() ) - ( position.x + offset.x ) ;
+				final float y = getCamera().convertInputToUIY( input.getMouseY() ) - ( position.y + offset.y ) ;
 				input.setInput( input.getInputType(), ( int )x, ( int )y ) ;
 
 				return processInputEvent( input ) ;
@@ -720,7 +720,7 @@ public class UIList extends UILayout
 		private InputEvent.Action applyScroll( final float _x, final float _y )
 		{
 			final UIList parent = getParentList() ;
-			CameraAssist.getUIPosition( parent.frame.getCamera(), position ) ;
+			parent.frame.getCamera().getUIPosition( position ) ;
 			parent.getLength( length ) ;
 
 			position.add( _x, _y, 0.0f ) ;
@@ -743,7 +743,7 @@ public class UIList extends UILayout
 			position.x = ( position.x > 0.0f ) ? position.x : 0.0f ;
 			position.y = ( position.y > 0.0f ) ? position.y : 0.0f ;
 
-			CameraAssist.amendUIPosition( parent.frame.getCamera(), position.x, position.y, 0.0f ) ;
+			parent.frame.getCamera().setUIPosition( position.x, position.y, 0.0f ) ;
 			parent.makeDirty() ;
 
 			return action ;

@@ -16,7 +16,7 @@ public class GUIPanelDraw extends GUIDraw
 		@Override
 		public void slot( final UIElement _layout )
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+			Shape.updatePlaneUV( getDraw().getShape(), rollover.min, rollover.max ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
@@ -26,7 +26,7 @@ public class GUIPanelDraw extends GUIDraw
 		@Override
 		public void slot( final UIElement _layout )
 		{
-			Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), neutral.min, neutral.max ) ;
+			Shape.updatePlaneUV( getDraw().getShape(), neutral.min, neutral.max ) ;
 			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
@@ -54,7 +54,7 @@ public class GUIPanelDraw extends GUIDraw
 	@Override
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
-		Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), rollover.min, rollover.max ) ;
+		Shape.updatePlaneUV( getDraw().getShape(), rollover.min, rollover.max ) ;
 		DrawAssist.forceUpdate( getDraw() ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}
@@ -68,7 +68,7 @@ public class GUIPanelDraw extends GUIDraw
 	@Override
 	public InputEvent.Action mousePressed( final InputEvent _input )
 	{
-		Shape.updatePlaneUV( DrawAssist.getDrawShape( getDraw() ), clicked.min, clicked.max ) ;
+		Shape.updatePlaneUV( getDraw().getShape(), clicked.min, clicked.max ) ;
 		DrawAssist.forceUpdate( getDraw() ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}

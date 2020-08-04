@@ -255,7 +255,7 @@ public class UIEditorState extends GameState
 																100 ) ;
 
 		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+		AnimationAssist.getDraw( animation ).setShape( plane ) ;
 		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
@@ -269,7 +269,7 @@ public class UIEditorState extends GameState
 			@Override
 			public void applyMousePosition( final Vector2 _mouse )
 			{
-				DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+				draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
 			}
 
 			@Override
@@ -329,7 +329,7 @@ public class UIEditorState extends GameState
 																100 ) ;
 
 		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-		DrawAssist.amendShape( AnimationAssist.getDraw( animation ), plane ) ;
+		AnimationAssist.getDraw( animation ).setShape( plane ) ;
 		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
@@ -343,7 +343,7 @@ public class UIEditorState extends GameState
 			@Override
 			public void applyMousePosition( final Vector2 _mouse )
 			{
-				DrawAssist.amendPosition( draw, _mouse.x, _mouse.y, 0.0f ) ;
+				draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
 			}
 		
 			@Override

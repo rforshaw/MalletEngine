@@ -1,11 +1,11 @@
-#version 100
+#version 300 es
 
 uniform mat4 inMVPMatrix ;
 
-attribute vec4 inVertex ;
-attribute vec4 inColour ;
+in vec4 inVertex ;
+in vec4 inColour ;
 
-varying vec4 outColour ;
+out vec4 outColour ;
 
 void main()
 {

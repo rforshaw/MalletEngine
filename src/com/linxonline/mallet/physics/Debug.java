@@ -43,8 +43,8 @@ public class Debug
 
 		shape.addIndex( 0 ) ;
 
-		DrawAssist.amendShape( draw, shape ) ;
-		DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+		draw.setShape( shape ) ;
+		draw.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 		DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
 		return draw ;
@@ -55,10 +55,10 @@ public class Debug
 		final Vector2 pos = _hull.getPosition( new Vector2() ) ;
 		final Vector2 offset = _hull.getOffset( new Vector2() ) ;
 
-		DrawAssist.amendPosition( _draw, pos.x, pos.y, 0.0f ) ;
-		DrawAssist.amendOffset( _draw, offset.x, offset.y, 0.0f ) ;
+		_draw.setPosition( pos.x, pos.y, 0.0f ) ;
+		_draw.setOffset( offset.x, offset.y, 0.0f ) ;
 
-		final Shape shape = DrawAssist.getDrawShape( _draw ) ;
+		final Shape shape = _draw.getShape() ;
 
 		int index = 0 ;
 		final float[] points = _hull.getPoints() ;

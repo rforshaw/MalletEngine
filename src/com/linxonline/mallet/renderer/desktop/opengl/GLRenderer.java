@@ -25,6 +25,7 @@ import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.schema.SStruct ;
 import com.linxonline.mallet.util.schema.SArray ;
 import com.linxonline.mallet.util.schema.SNode ;
@@ -54,7 +55,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private GLWindow canvas ;
 	private final Worlds<GLDraw, CameraData, GLWorld> worlds = new Worlds<GLDraw, CameraData, GLWorld>() ;
 
-	private CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
+	private CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	private int viewMode = ORTHOGRAPHIC_MODE ;
 
 	public GLRenderer()
@@ -111,7 +112,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			@Override
 			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final Draw _draw )
+			public void addTextDraw( final TextDraw _draw )
 			{
 				addTextDraw( _draw, null ) ;
 			}
@@ -125,7 +126,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			@Override
 			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final List<Draw> _draws )
+			public void addTextDraw( final List<TextDraw> _draws )
 			{
 				addTextDraw( _draws, null ) ;
 			}
@@ -139,7 +140,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			@Override
 			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final Draw _draw, final World _world )
+			public void addTextDraw( final TextDraw _draw, final World _world )
 			{
 				final GLWorld world = ( GLWorld )_world ;
 				final GLDraw draw = ( GLDraw )_draw ;
@@ -161,7 +162,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			@Override
 			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final List<Draw> _draws, final World _world )
+			public void addTextDraw( final List<TextDraw> _draws, final World _world )
 			{
 				data.ensureCapacity( data.size() + _draws.size() ) ;
 				final GLWorld world = ( GLWorld )_world ;
@@ -287,111 +288,17 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public Draw amendShape( final Draw _draw, final Shape _shape )
-			{
-				cast( _draw ).setDrawShape( _shape ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setRotation( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setScale( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setPosition( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setOffset( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendText( final Draw _draw, final StringBuilder _text )
-			{
-				final GLDraw draw = cast( _draw ) ;
-				if( draw.getMode() == GLDraw.Mode.TEXT )
-				{
-					// Only a text draw object can have text.
-					final TextDraw text = draw.getTextDraw() ;
-					text.setText( _text ) ;
-				}
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendTextStart( final Draw _draw, final int _start )
-			{
-				final GLDraw draw = cast( _draw ) ;
-				if( draw.getMode() == GLDraw.Mode.TEXT )
-				{
-					// Only a text draw object can have text.
-					final TextDraw text = draw.getTextDraw() ;
-					text.setTextStart( _start ) ;
-				}
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendTextEnd( final Draw _draw, final int _end )
-			{
-				final GLDraw draw = cast( _draw ) ;
-				if( draw.getMode() == GLDraw.Mode.TEXT )
-				{
-					// Only a text draw object can have text.
-					final TextDraw text = draw.getTextDraw() ;
-					text.setTextEnd( _end ) ;
-				}
-				return _draw ;
-			}
-
-			@Override
 			public Draw amendUI( final Draw _draw, final boolean _ui )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
 				basic.setUI( _ui ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendColour( final Draw _draw, final MalletColour _colour )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setColour( _colour ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendOrder( final Draw _draw, final int _order )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setOrder( _order ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
 				basic.setInterpolationMode( _interpolation ) ;
 				return _draw ;
 			}
@@ -399,137 +306,83 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
 				basic.setUpdateType( _type ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw attachProgram( final Draw _draw, final Program _program )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				basic.setProgram( ( ProgramMap<GLProgram> )_program ) ;
 				return _draw ;
 			}
 
 			@Override
 			public Draw forceUpdate( final Draw _draw )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
 				basic.forceUpdate() ;
 				return _draw ;
 			}
 
 			@Override
-			public Shape getDrawShape( final Draw _draw )
-			{
-				return cast( _draw ).getDrawShape() ;
-			}
-
-			@Override
-			public Vector3 getRotate( final Draw _draw, final Vector3 _fill )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getRotation( _fill ) ;
-			}
-
-			@Override
-			public Vector3 getScale( final Draw _draw, final Vector3 _fill )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getScale( _fill ) ;
-			}
-
-			@Override
-			public Vector3 getPosition( final Draw _draw, final Vector3 _fill )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getPosition( _fill ) ;
-			}
-
-			@Override
-			public Vector3 getOffset( final Draw _draw, final Vector3 _fill )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getOffset( _fill ) ;
-			}
-
-			@Override
-			public StringBuilder getText( final Draw _draw )
-			{
-				// This will return null if not a Text Draw.
-				final TextDraw text = cast( _draw ).getTextDraw() ;
-				return text.getText() ;
-			}
-
-			@Override
-			public MalletColour getColour( final Draw _draw )
-			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getColour() ;
-			}
-
-			@Override
 			public boolean isUI( final Draw _draw )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
+				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
 				return basic.isUI() ;
 			}
 
 			@Override
-			public Program getProgram( final Draw _draw )
+			public TextDraw createTextDraw( final StringBuilder _text,
+											final MalletFont _font,
+											final Vector3 _position,
+											final Vector3 _offset,
+											final Vector3 _rotation,
+											final Vector3 _scale,
+											final int _order )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicDraw() ;
-				return basic.getProgram() ;
-			}
-
-			@Override
-			public Draw createTextDraw( final StringBuilder _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
-			{
-				final GLDraw draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
-				draw.setMode( GLDraw.Mode.TEXT ) ;
+				final GLTextDraw draw = new GLTextDraw( UpdateType.ON_DEMAND,
+														Interpolation.NONE,
+														_position,
+														_offset,
+														_rotation,
+														_scale,
+														_order ) ;
 
 				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
-				ProgramAssist.mapUniform( program, "inTex0", _font ) ;
+				program.mapUniform( "inTex0", _font ) ;
 
-				attachProgram( draw, program ) ;
-				final TextDraw text = draw.getTextDraw() ;
+				draw.setProgram( program ) ;
+				final TextData text = draw.getTextData() ;
 				text.setText( _text ) ;
 				return draw ;
 			}
 
 			@Override
-			public Draw createTextDraw( final String _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
+			public TextDraw createTextDraw( final String _text,
+											final MalletFont _font,
+											final Vector3 _position,
+											final Vector3 _offset,
+											final Vector3 _rotation,
+											final Vector3 _scale,
+											final int _order )
 			{
 				final StringBuilder builder = new StringBuilder( _text ) ;
 				return createTextDraw( builder, _font, _position, _offset, _rotation, _scale, _order ) ;
 			}
 
 			@Override
-			public Draw createClipDraw( final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _startOrder,
-										final int _endOrder )
+			public StencilDraw createClipDraw( final Vector3 _position,
+											   final Vector3 _offset,
+											   final Vector3 _rotation,
+											   final Vector3 _scale,
+											   final int _startOrder,
+											   final int _endOrder )
 			{
-				final GLDraw draw = cast( createDraw( _position, _offset, _rotation, _scale, _startOrder ) ) ;
-				draw.setMode( GLDraw.Mode.STENCIL ) ;
+				final GLStencilDraw draw = new GLStencilDraw( UpdateType.ON_DEMAND,
+															  Interpolation.NONE,
+															  _position,
+															  _offset,
+															  _rotation,
+															  _scale,
+															  _startOrder ) ;
 				draw.setEndOrder( _endOrder ) ;
 
-				attachProgram( draw, ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
+				draw.setProgram( ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
 				return draw ;
 			}
 
@@ -540,14 +393,13 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 									final Vector3 _scale,
 									final int _order )
 			{
-				return new GLDraw( GLDraw.Mode.BASIC,
-									UpdateType.ON_DEMAND,
-									Interpolation.NONE,
-									_position,
-									_offset,
-									_rotation,
-									_scale,
-									_order ) ;
+				return new GLBasicDraw( UpdateType.ON_DEMAND,
+										Interpolation.NONE,
+										_position,
+										_offset,
+										_rotation,
+										_scale,
+										_order ) ;
 			}
 
 			private GLDraw cast( final Draw _draw )
@@ -569,20 +421,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				final Program program = new ProgramMap<GLProgram>( _id ) ;
 				return program ;
-			}
-
-			public Program removeUniform( final Program _program, final String _handler )
-			{
-				final ProgramMap<GLProgram> program = cast( _program ) ;
-				program.removeUniform( _handler ) ;
-				return _program ;
-			}
-
-			public Program mapUniform( final Program _program, final String _handler, final Object _obj )
-			{
-				final ProgramMap<GLProgram> program = cast( _program ) ;
-				program.setUniform( _handler, _obj ) ;
-				return _program ;
 			}
 
 			private ProgramMap<GLProgram> cast( final Program _program )
@@ -661,48 +499,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public IntVector2 getRenderDimensions( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				return new IntVector2( world.getRender() ) ;
-			}
-
-			@Override
-			public IntVector2 getDisplayDimensions( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				return new IntVector2( world.getDisplay() ) ;
-			}
-
-			@Override
-			public Notify<World> attachRenderNotify( final World _world , final Notify<World> _notify )
-			{
-				final GLWorld world = cast( _world ) ;
-				return world.addRenderNotify( _notify ) ;
-			}
-
-			@Override
-			public void dettachRenderNotify( final World _world, final Notify<World> _notify )
-			{
-				final GLWorld world = cast( _world ) ;
-				world.removeRenderNotify( _notify ) ;
-			}
-
-			@Override
-			public Notify<World> attachDisplayNotify( final World _world, final Notify<World> _notify )
-			{
-				final GLWorld world = cast( _world ) ;
-				return world.addDisplayNotify( _notify ) ;
-			}
-
-			@Override
-			public void dettachDisplayNotify( final World _world, final Notify<World> _notify )
-			{
-				final GLWorld world = cast( _world ) ;
-				world.removeDisplayNotify( _notify ) ;
-			}
-
-			@Override
 			public World constructWorld( final String _id, final int _order )
 			{
 				final GLWorld world = GLWorld.create( _id, _order ) ;
@@ -727,155 +523,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public Camera getDefaultCamera()
 			{
 				return defaultCamera ;
-			}
-
-			@Override
-			public Camera amendOrthographic( final Camera _camera,
-											 final float _top,
-											 final float _bottom,
-											 final float _left,
-											 final float _right,
-											 final float _near,
-											 final float _far )
-			{
-				final CameraData camera = cast( _camera ) ;
-				final CameraData.Projection projection = camera.getProjection() ;
-
-				projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
-				projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
-
-				final float invZ = 1.0f / ( _far - _near ) ;
-				final float invY = 1.0f / ( _top - _bottom ) ;
-				final float invX = 1.0f / ( _right - _left ) ;
-
-				final Matrix4 proj = projection.matrix ;
-				proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
-						  0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
-						  0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
-						  0.0f,        0.0f,        0.0f,         1.0f ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
-			{
-				cast( _camera ).setPosition( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z )
-			{
-				cast( _camera ).setRotation( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
-			{
-				cast( _camera ).setScale( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendUIPosition( final Camera _camera, final float _x, final float _y, final float _z )
-			{
-				cast( _camera ).setUIPosition( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
-			{
-				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
-				screen.setDimension( _width, _height ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y )
-			{
-				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
-				screen.setOffset( _x, _y ) ;
-				return _camera ;
-			}
-
-			public Camera amendDisplayResolution( final Camera _camera, final int _width, final int _height )
-			{
-				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
-				screen.setDimension( _width, _height ) ;
-				return _camera ;
-			}
-
-			public Camera amendDisplayOffset( final Camera _camera, final int _x, final int _y )
-			{
-				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
-				screen.setOffset( _x, _y ) ;
-				return _camera ;
-			}
-
-			@Override
-			public boolean getPosition( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getPosition() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getRotation( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getRotation() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getScale( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getScale() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getDimensions( final Camera _camera, final Vector3 _populate )
-			{
-				final CameraData.Projection projection = cast( _camera ).getProjection() ;
-				_populate.setXYZ( projection.nearPlane ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getUIPosition( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getUIPosition() ) ;
-				return true ;
-			}
-
-			@Override
-			public float convertInputToCameraX( final Camera _camera, final float _inputX )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToX( _inputX ) ;
-			}
-
-			@Override
-			public float convertInputToCameraY( final Camera _camera, final float _inputY )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToY( _inputY ) ;
-			}
-
-			@Override
-			public float convertInputToUICameraX( final Camera _camera, final float _inputX )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToUIX( _inputX ) ;
-			}
-
-			@Override
-			public float convertInputToUICameraY( final Camera _camera, final float _inputY )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToUIY( _inputY ) ;
 			}
 
 			@Override
@@ -924,11 +571,18 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public Storage create( final String _id, SNode _var, final int _capacity )
+			public Storage create( final String _id, final int _size )
 			{
-				final int size = calculateSize( _var ) ;
+				final GLStorage storage = new GLStorage( _size ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						MGL.glGenBuffers( 1, storage.id, 0 ) ;
+					}
+				} ) ;
 
-				throw new UnsupportedOperationException() ;
+				return storage ;
 			}
 
 			@Override
@@ -938,42 +592,48 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public int size( final Storage _storage )
+			public Storage update( final Storage _storage )
 			{
-				throw new UnsupportedOperationException() ;
-			}
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLStorage storage = ( GLStorage )_storage ;
+						final float[] buffer = storage.getBuffer() ;
 
-			public void setBool( final Storage _storage, final int _index, final SNode _node, boolean _val )
+						final int lengthInBytes = buffer.length * 4 ;
+
+						final java.nio.ByteBuffer byteBuffer = java.nio.ByteBuffer.allocateDirect( lengthInBytes ) ;
+						byteBuffer.order( java.nio.ByteOrder.nativeOrder() ) ;
+						final java.nio.FloatBuffer floatBuffer = byteBuffer.asFloatBuffer() ;
+
+						floatBuffer.put( buffer ) ;
+						floatBuffer.position( 0 ) ;
+
+						MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, storage.id[0] ) ;
+						MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, floatBuffer​, MGL.GL_DYNAMIC_DRAW ) ;
+					}
+				} ) ;
+
+				return _storage ;
+			}
+			
+			@Override
+			public int calculateSize( SNode _node )
 			{
-				throw new UnsupportedOperationException() ;
+				switch( _node.getType() )
+				{
+					default      : throw new UnsupportedOperationException() ;
+					case STRUCT  : return calculateSStruct( ( SStruct )_node ) ;
+					case ARRAY   : return calculateArray( ( SArray )_node ) ;
+					case BOOL    : return 4 ;
+					case FLOAT   : return 4 ;
+					case INTEGER : return 4 ;
+				}
 			}
-
-			public void setInt( final Storage _storage, final int _index, final SNode _node, int _val )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			public void setFlt( final Storage _storage, final int _index, final SNode _node, float _val )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			public boolean getBool( final Storage _storage, final int _index, final SNode _node )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			public int getInt( final Storage _storage, final int _index, final SNode _node )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			public float getFlt( final Storage _storage, final int _index, final SNode _node )
-			{
-				throw new UnsupportedOperationException() ;
-			}
-
-			private int calculateOffset( SNode _node )
+			
+			@Override
+			public int calculateOffset( SNode _node )
 			{
 				int offset = 0 ;
 				SNode node = _node.getParent() ;
@@ -982,7 +642,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 					default      : throw new UnsupportedOperationException() ;
 					case STRUCT  : offset += calculateSStructOffset( ( SStruct )node, _node ) ; break ;
 					case ARRAY   : offset += calculateArray( ( SArray )node ) ; break ;
-					case BOOL    : offset +=  1 ; break ;
+					case BOOL    : offset +=  4 ; break ;
 					case FLOAT   : offset +=  4 ; break ;
 					case INTEGER : offset +=  4 ; break ;
 				}
@@ -1004,19 +664,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				}
 
 				return size ;
-			}
-
-			private int calculateSize( SNode _node )
-			{
-				switch( _node.getType() )
-				{
-					default      : throw new UnsupportedOperationException() ;
-					case STRUCT  : return calculateSStruct( ( SStruct )_node ) ;
-					case ARRAY   : return calculateArray( ( SArray )_node ) ;
-					case BOOL    : return 1 ;
-					case FLOAT   : return 4 ;
-					case INTEGER : return 4 ;
-				}
 			}
 
 			private int calculateArray( SArray _array )
@@ -1046,7 +693,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private static void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
 		final Camera camera = CameraAssist.getDefaultCamera() ;
-		CameraAssist.amendDisplayResolution( camera, _width, _height ) ;
+		camera.setDisplayResolution( _width, _height ) ;
 
 		final World world = WorldAssist.getDefaultWorld() ;
 		WorldAssist.setDisplayDimensions( world, 0, 0, _width, _height ) ;
@@ -1076,6 +723,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		programs.load( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
 		programs.load( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
 		programs.load( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
+		programs.load( "SIMPLE_STORAGE_TEXTURE",  "base/shaders/desktop/simple_storage_texture.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.
@@ -1102,8 +750,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			// Some users will not want parity, using a larger window 
 			// size but rendering to a smaller size and subsequently being upscaled.
 			final Camera camera = CameraAssist.getDefaultCamera() ;
-			CameraAssist.amendScreenResolution( camera, _width, _height ) ;
-			CameraAssist.amendOrthographic( camera, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+			camera.setScreenResolution( _width, _height ) ;
+			camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
 
 			final World world = WorldAssist.getDefaultWorld() ;
 			WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
@@ -1228,7 +876,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	*/
 	protected static boolean loadProgram( final GLDraw _data )
 	{
-		final BasicDraw<GLProgram> basic = _data.getBasicDraw() ;
+		final BasicDraw<GLProgram> basic = _data.getBasicData() ;
 		final ProgramMap<GLProgram> program = basic.getProgram() ;
 		if( program == null )
 		{

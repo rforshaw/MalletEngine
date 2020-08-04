@@ -32,7 +32,7 @@ public final class GLDrawState
 		for( int i = 0; i < size; i++ )
 		{
 			final GLDraw draw = current.get( i ) ;
-			final BasicDraw<GLProgram> basic = draw.getBasicDraw() ;
+			final BasicDraw<GLProgram> basic = draw.getBasicData() ;
 
 			// Check to see if the object has been flagged to change.
 			if( basic.toUpdate() == true )
@@ -62,7 +62,7 @@ public final class GLDrawState
 
 	public void add( final GLDraw _draw )
 	{
-		final BasicDraw basic = _draw.getBasicDraw() ;
+		final BasicDraw basic = _draw.getBasicData() ;
 		// The objects current position, rotation, and scale 
 		// may not be what's set for its future. Update the to ensure 
 		// it's current state is the latest/future.
@@ -74,7 +74,7 @@ public final class GLDrawState
 	{
 		for( final GLDraw draw : _draws )
 		{
-			final BasicDraw basic = draw.getBasicDraw() ;
+			final BasicDraw basic = draw.getBasicData() ;
 			// The objects current position, rotation, and scale 
 			// may not be what's set for its future. Update the to ensure 
 			// it's current state is the latest/future.

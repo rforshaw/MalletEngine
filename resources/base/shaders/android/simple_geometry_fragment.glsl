@@ -1,8 +1,10 @@
-#version 100
+#version 300 es
 
-varying vec4 outColour ;
+in vec4 outColour ;
+
+out vec4 fragColor ;
 
 void main()
 {
-	gl_FragColor = outColour ;//vec4( outColour.r, outColour.g, outColour.b, 1.0 ) ;
+	fragColor = outColour ;
 }

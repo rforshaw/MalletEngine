@@ -90,7 +90,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 	@Override
 	public void init()
 	{
-		renderNotify = addRenderNotify( new Notify<World>()
+		renderNotify = attachRenderNotify( new Notify<World>()
 		{
 			public void inform( final World _this )
 			{
@@ -99,7 +99,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 			}
 		} ) ;
 
-		displayNotify = addDisplayNotify( new Notify<World>()
+		displayNotify = attachDisplayNotify( new Notify<World>()
 		{
 			public void inform( final World _this )
 			{
@@ -164,6 +164,11 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 		cameras.update( _diff, _iteration ) ;
 	}
 
+	/**
+		Return a list of resources currently being used.
+		Take the opportunity to also clear uploader 
+		of empty buffers.
+	*/
 	@Override
 	public void clean( final Set<String> _activeKeys )
 	{
@@ -191,8 +196,8 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 			backbuffer = null ;
 		}
 
-		removeRenderNotify( renderNotify ) ;
-		removeDisplayNotify( displayNotify ) ;
+		dettachRenderNotify( renderNotify ) ;
+		dettachDisplayNotify( displayNotify ) ;
 
 		MGL.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
 		MGL.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;

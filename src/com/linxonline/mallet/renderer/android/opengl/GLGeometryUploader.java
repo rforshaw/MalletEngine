@@ -12,7 +12,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.BasicDraw ;
-import com.linxonline.mallet.renderer.TextDraw ;
+import com.linxonline.mallet.renderer.TextData ;
 import com.linxonline.mallet.renderer.font.Glyph ;
 
 import com.linxonline.mallet.renderer.opengl.Buffers ;
@@ -76,13 +76,13 @@ public class GLGeometryUploader
 		public BufferObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
 			mode = _user.getMode() ;
-			final BasicDraw basic = _user.getBasicDraw() ;
+			final BasicDraw basic = _user.getBasicData() ;
 			order = basic.getOrder() ;
 			ui = basic.isUI() ;
 
 			final int indexSize = _indexByteSize / IBO_VAR_BYTE_SIZE ;
 			final int vboSize = _vertexByteSize / VBO_VAR_BYTE_SIZE ;
-			
+
 			indicies = new short[indexSize] ;
 			verticies = new float[vboSize] ;
 
@@ -181,6 +181,8 @@ public class GLGeometryUploader
 			MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
 			glProgram.loadUniforms( program ) ;
 
+			glProgram.bindBuffers( program ) ;
+
 			GLGeometryUploader.enableVertexAttributes( attributes ) ;
 
 			GLGeometryUploader.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
@@ -241,7 +243,7 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			final BasicDraw basic = _user.getBasicDraw() ;
+			final BasicDraw basic = _user.getBasicData() ;
 			if( order != basic.getOrder() )
 			{
 				//System.out.println( "Order: " + order + " " +  _user.getOrder() ) ;
@@ -262,7 +264,7 @@ public class GLGeometryUploader
 
 			if( mode != GLDraw.Mode.TEXT )
 			{
-				if( isShape( _user.getDrawShape() ) == false )
+				if( isShape( _user.getShape() ) == false )
 				{
 					return false ;
 				}
@@ -332,6 +334,8 @@ public class GLGeometryUploader
 		private final Vector3 temp = new Vector3() ;
 
 		private final Matrix4 matrix = new Matrix4() ;
+		private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
+
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
@@ -340,38 +344,31 @@ public class GLGeometryUploader
 		public BasicObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
 			super( _indexByteSize, _vertexByteSize, _user ) ;
-			initShape( _user.getDrawShape() ) ;
+			initShape( _user.getShape() ) ;
 		}
 
 		@Override
 		public void upload( final Location<BufferObject, GLDraw> _location )
 		{
 			final GLDraw draw = _location.getLocationData() ;
-			final BasicDraw basic = draw.getBasicDraw() ;
-			final Shape shape = draw.getDrawShape() ;
+			final BasicDraw basic = draw.getBasicData() ;
+			final Shape shape = draw.getShape() ;
 
 			basic.getPosition( position ) ;
 			basic.getOffset( offset ) ;
 			basic.getRotation( rotation ) ;
 			basic.getScale( scale ) ;
 
-			matrix.setIdentity() ;
-			matrix.setTranslate( position.x, position.y, 0.0f ) ;
-			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			matrix.translate( offset.x, offset.y, offset.z ) ;
-			matrix.scale( scale.x, scale.y, scale.z ) ;
+			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
-			uploadIndex( _location, shape ) ;
-			uploadVBO( _location, shape, matrix ) ;
+			uploadIndexToRAM( _location, shape ) ;
+			uploadVBOToRAM( _location, shape, matrix ) ;
 
 			dirty = true ;
 		}
 
-		private void uploadIndex( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
+		private void uploadIndexToRAM( final Location<BufferObject, GLDraw> _handler, final Shape _shape )
 		{
-			final GLDraw draw = _handler.getLocationData() ;
 			final BufferObject buffer = _handler.getBufferData() ;
 		
 			final Location.Range indexRange = _handler.getIndex() ;
@@ -389,12 +386,12 @@ public class GLGeometryUploader
 			indicies[increment++] = ( short )PRIMITIVE_RESTART_INDEX ;
 		}
 
-		private void uploadVBO( final Location<BufferObject, GLDraw> _handler, final Shape _shape, final Matrix4 _matrix )
+		private void uploadVBOToRAM( final Location<BufferObject, GLDraw> _handler, final Shape _shape, final Matrix4 _matrix )
 		{
 			final BufferObject buffer = _handler.getBufferData() ;
 
 			final Shape.Swivel[] swivel = _shape.getSwivel() ;
-			final int vertexSize = buffer.shapeSwivelSize ;
+			//final int vertexSize = buffer.shapeSwivelSize ;
 			final int verticiesSize = _shape.getVertexSize() ;
 
 			final Location.Range vertRange = _handler.getVertex() ;
@@ -448,9 +445,12 @@ public class GLGeometryUploader
 		private final GLFont glFont ;
 
 		private final Matrix4 matrix = new Matrix4() ;
+		private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
+
 		private final Vector3 position = new Vector3() ;
 		private final Vector3 offset = new Vector3() ;
 		private final Vector3 rotation = new Vector3() ;
+		private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
 
 		public TextObject( final int _indexByteSize, final int _vertexByteSize, final GLDraw _user )
 		{
@@ -467,20 +467,15 @@ public class GLGeometryUploader
 		{
 			dirty = true ;
 			final GLDraw draw = _location.getLocationData() ;
-			final BasicDraw basic = draw.getBasicDraw() ;
-			final TextDraw txtDraw = draw.getTextDraw() ;
+			final BasicDraw basic = draw.getBasicData() ;
+			final TextData txtDraw = draw.getTextData() ;
 			final BufferObject buffer = _location.getBufferData() ;
 
 			basic.getPosition( position ) ;
 			basic.getOffset( offset ) ;
 			basic.getRotation( rotation ) ;
 
-			matrix.setIdentity() ;
-			matrix.setTranslate( position.x, position.y, 0.0f ) ;
-			matrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			matrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			matrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			matrix.translate( offset.x, offset.y, offset.z ) ;
+			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
 			final MalletColour colour = basic.getColour() ;
 
@@ -516,7 +511,7 @@ public class GLGeometryUploader
 				}
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
-				final int vertexSize = calculateVertexSize( swivel ) ;
+				//final int vertexSize = calculateVertexSize( swivel ) ;
 				final int verticiesSize = shape.getVertexSize() ;
 
 				final int GLYPH_POINTS = 4 ;
@@ -569,7 +564,7 @@ public class GLGeometryUploader
 		}
 	}
 
-	private class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDraw>
+	private static class LocationBufferListener implements LocationBuffer.Listener<BufferObject, GLDraw>
 	{
 		@Override
 		public boolean isSupported( final BufferObject _buffer, final GLDraw _user )
@@ -597,7 +592,7 @@ public class GLGeometryUploader
 			// Reset the program so it is checked fully 
 			// if the draw is readded to the renderer.
 			final GLDraw draw = _location.getLocationData() ;
-			final BasicDraw<GLProgram> basic = draw.getBasicDraw() ;
+			final BasicDraw<GLProgram> basic = draw.getBasicData() ;
 			final ProgramMap<GLProgram> program = basic.getProgram() ;
 			program.dirty() ;
 		}
@@ -651,7 +646,7 @@ public class GLGeometryUploader
 			final int indexSize = buffers.getMaximumByteIndex() ;
 			final int vertexSize = buffers.getMaximumByteVertex() ;
 
-			final BasicDraw basic = _user.getBasicDraw() ;
+			final BasicDraw basic = _user.getBasicData() ;
 			_allocated.setOrder( basic.getOrder() ) ;
 
 			switch( _user.getMode() )
@@ -771,13 +766,13 @@ public class GLGeometryUploader
 
 	private static int calculateBasicIndexByteSize( final GLDraw _user )
 	{
-		final Shape shape = _user.getDrawShape() ;
+		final Shape shape = _user.getShape() ;
 		return ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 	}
 
 	private static int calculateTextIndexByteSize( final GLDraw _user )
 	{
-		final TextDraw text = _user.getTextDraw() ;
+		final TextData text = _user.getTextData() ;
 		final int length = text.getTextEnd() - text.getTextStart() ;
 		return ( ( length * 6 ) + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 	}
@@ -797,14 +792,14 @@ public class GLGeometryUploader
 
 	private static int calculateBasicVertexByteSize( final GLDraw _user )
 	{
-		final Shape shape = _user.getDrawShape() ;
+		final Shape shape = _user.getShape() ;
 		return ( shape.getVertexSize() * calculateVertexSize( shape.getSwivel() ) ) * VBO_VAR_BYTE_SIZE ;
 	}
 
 	private static int calculateTextVertexByteSize( final GLDraw _user )
 	{
-		final BasicDraw basic = _user.getBasicDraw() ;
-		final TextDraw text = _user.getTextDraw() ;
+		final BasicDraw basic = _user.getBasicData() ;
+		final TextData text = _user.getTextData() ;
 	
 		final ProgramMap<GLProgram> program = basic.getProgram() ;
 		final MalletFont font = program.getUniform( "inTex0", MalletFont.class ) ;
@@ -869,6 +864,34 @@ public class GLGeometryUploader
 		}
 
 		return size ;
+	}
+
+	private static void apply( final Matrix4 _mat4,
+							   final Matrix4 _temp,
+							   final Vector3 _position,
+							   final Vector3 _offset,
+							   final Vector3 _rotation,
+							   final Vector3 _scale )
+	{
+		_mat4.setIdentity() ;
+		_mat4.setTranslate( _position.x, _position.y, 0.0f ) ;
+
+		_temp.setRotateX( _rotation.x ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateY( _rotation.y ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateZ( _rotation.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setScale( _scale.x, _scale.y, _scale.z ) ;
+		_temp.setTranslate( _offset.x, _offset.y, _offset.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
 	}
 
 	public static class VertexAttrib

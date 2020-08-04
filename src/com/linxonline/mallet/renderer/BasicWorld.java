@@ -31,30 +31,35 @@ public abstract class BasicWorld<D extends Draw, C extends CameraData> implement
 		order = _order ;
 	}
 
-	public Notify<World> addRenderNotify( final Notify<World> _notify )
+	@Override
+	public Notify<World> attachRenderNotify( final Notify<World> _notify )
 	{
 		renderNotification.addNotify( _notify ) ;
 		_notify.inform( this ) ;
 		return _notify ;
 	}
 
-	public void removeRenderNotify( final Notify<World> _notify )
+	@Override
+	public void dettachRenderNotify( final Notify<World> _notify )
 	{
 		renderNotification.removeNotify( _notify ) ;
 	}
-	
-	public Notify<World> addDisplayNotify( final Notify<World> _notify )
+
+	@Override
+	public Notify<World> attachDisplayNotify( final Notify<World> _notify )
 	{
 		displayNotification.addNotify( _notify ) ;
 		_notify.inform( this ) ;
 		return _notify ;
 	}
 
-	public void removeDisplayNotify( final Notify<World> _notify )
+	@Override
+	public void dettachDisplayNotify( final Notify<World> _notify )
 	{
 		displayNotification.removeNotify( _notify ) ;
 	}
 
+	//@Override
 	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		renderPosition.setXY( _x, _y ) ;
@@ -63,12 +68,27 @@ public abstract class BasicWorld<D extends Draw, C extends CameraData> implement
 		renderNotification.inform( this ) ;
 	}
 
+	@Override
+	public IntVector2 getRenderDimensions( final IntVector2 _fill )
+	{
+		_fill.setXY( getRender() ) ;
+		return _fill ;
+	}
+
+	//@Override
 	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
 		displayPosition.setXY( _x, _y ) ;
 		display.setXY( _width, _height ) ;
 
 		displayNotification.inform( this ) ;
+	}
+
+	@Override
+	public IntVector2 getDisplayDimensions( final IntVector2 _fill )
+	{
+		_fill.setXY( getDisplay() ) ;
+		return _fill ;
 	}
 
 	/**

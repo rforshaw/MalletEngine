@@ -63,7 +63,7 @@ public class Buffers<T, U>
 			Logger.println( "Exceeds minimum buffer range.", Logger.Verbosity.MINOR ) ;
 			return null ;
 		}
-	
+
 		if( indexBytesSize >= maxIndex ||
 			vertexByteSize >= maxVertex )
 		{

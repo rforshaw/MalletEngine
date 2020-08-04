@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 import com.linxonline.mallet.util.Interpolate ;
 
-public class CameraData<T extends CameraData> implements Camera<T>
+public class CameraData implements Camera
 {
 	private final String id ;
 
@@ -50,6 +50,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		scale = _scale ;
 	}
 
+	@Override
 	public float convertInputToX( final float _x )
 	{
 		final Vector2 render = renderScreen.dimension ;
@@ -66,6 +67,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		return cam ;
 	}
 
+	@Override
 	public float convertInputToY( final float _y )
 	{
 		final Vector2 render = renderScreen.dimension ;
@@ -82,6 +84,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		return cam ;
 	}
 
+	@Override
 	public float convertInputToUIX( final float _x )
 	{
 		final Vector2 render = renderScreen.dimension ;
@@ -94,6 +97,7 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + uiPosition.x ;
 	}
 
+	@Override
 	public float convertInputToUIY( final float _y )
 	{
 		final Vector2 render = renderScreen.dimension ;
@@ -141,29 +145,121 @@ public class CameraData<T extends CameraData> implements Camera<T>
 		return renderScreen ;
 	}
 
+	@Override
 	public String getID()
 	{
 		return id ;
 	}
 
+	@Override
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		position.setXYZ( _x, _y, _z ) ;
 	}
 
+	@Override
+	public Vector3 getPosition( final Vector3 _fill )
+	{
+		_fill.setXYZ( position ) ;
+		return _fill ;
+	}
+
+	@Override
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
 		rotation.setXYZ( _x, _y, _z ) ;
 	}
-	
+
+	@Override
+	public Vector3 getRotation( final Vector3 _fill )
+	{
+		_fill.setXYZ( rotation ) ;
+		return _fill ;
+	}
+
+	@Override
 	public void setScale( final float _x, final float _y, final float _z )
 	{
 		scale.setXYZ( _x, _y, _z ) ;
 	}
 
+	@Override
+	public Vector3 getScale( final Vector3 _fill )
+	{
+		_fill.setXYZ( scale ) ;
+		return _fill ;
+	}
+
+	public void setOrthographic( final float _top,
+								 final float _bottom,
+								 final float _left,
+								 final float _right,
+								 final float _near,
+								 final float _far )
+	{
+		final CameraData.Projection projection = getProjection() ;
+
+		projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
+		projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
+
+		final float invZ = 1.0f / ( _far - _near ) ;
+		final float invY = 1.0f / ( _top - _bottom ) ;
+		final float invX = 1.0f / ( _right - _left ) ;
+
+		final Matrix4 proj = projection.matrix ;
+		proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
+					0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
+					0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
+					0.0f,        0.0f,        0.0f,         1.0f ) ;
+	}
+
+	@Override
 	public void setUIPosition( final float _x, final float _y, final float _z )
 	{
 		uiPosition.setXYZ( _x, _y, _z ) ;
+	}
+
+	@Override
+	public Vector3 getUIPosition( final Vector3 _fill )
+	{
+		_fill.setXYZ( uiPosition ) ;
+		return _fill ;
+	}
+
+	@Override
+	public void setScreenResolution( final int _width, final int _height )
+	{
+		final CameraData.Screen screen = getRenderScreen() ;
+		screen.setDimension( _width, _height ) ;
+	}
+
+	@Override
+	public void setScreenOffset( final int _x, final int _y )
+	{
+		final CameraData.Screen screen = getRenderScreen() ;
+		screen.setOffset( _x, _y ) ;
+	}
+
+	@Override
+	public void setDisplayResolution( final int _width, final int _height )
+	{
+		final CameraData.Screen screen = getDisplayScreen() ;
+		screen.setDimension( _width, _height ) ;
+	}
+	
+	@Override
+	public void setDisplayOffset( final int _x, final int _y )
+	{
+		final CameraData.Screen screen = getDisplayScreen() ;
+		screen.setOffset( _x, _y ) ;
+	}
+
+	@Override
+	public Vector3 getDimensions( final Vector3 _fill )
+	{
+		final CameraData.Projection projection = getProjection() ;
+		_fill.setXYZ( projection.nearPlane ) ;
+		return _fill ;
 	}
 
 	public void update( final int _diff, final int _iteration )

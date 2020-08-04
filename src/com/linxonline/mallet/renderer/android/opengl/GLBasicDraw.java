@@ -1,4 +1,4 @@
-package com.linxonline.mallet.renderer.desktop.opengl ;
+package com.linxonline.mallet.renderer.android.opengl ;
 
 import java.util.List ;
 
@@ -7,7 +7,6 @@ import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.BasicDraw ;
 import com.linxonline.mallet.renderer.TextData ;
 import com.linxonline.mallet.renderer.UpdateType ;
@@ -17,12 +16,12 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public class GLTextDraw extends GLDraw implements TextDraw
+public class GLBasicDraw extends GLDraw
 {
 	private final BasicDraw<GLProgram> basic ;
-	private final TextData text = new TextData() ;
+	
 
-	public GLTextDraw()
+	public GLBasicDraw()
 	{
 		this( UpdateType.ON_DEMAND,
 			  Interpolation.LINEAR,
@@ -32,15 +31,15 @@ public class GLTextDraw extends GLDraw implements TextDraw
 			  new Vector3( 1, 1, 1 ), 0 ) ;
 	}
 
-	public GLTextDraw( final UpdateType _type,
-					   final Interpolation _interpolation,
-					   final Vector3 _position,
-					   final Vector3 _offset,
-					   final Vector3 _rotation,
-					   final Vector3 _scale,
-					   final int _order )
+	public GLBasicDraw( final UpdateType _type,
+				   final Interpolation _interpolation,
+				   final Vector3 _position,
+				   final Vector3 _offset,
+				   final Vector3 _rotation,
+				   final Vector3 _scale,
+				   final int _order )
 	{
-		super( GLDraw.Mode.TEXT ) ;
+		super( GLDraw.Mode.BASIC ) ;
 		basic = new BasicDraw( _type, _interpolation, _position, _offset, _rotation, _scale, _order ) ;
 	}
 
@@ -132,45 +131,6 @@ public class GLTextDraw extends GLDraw implements TextDraw
 	}
 
 	@Override
-	public StringBuilder setText( final StringBuilder _text )
-	{
-		text.setText( _text ) ;
-		return _text ;
-	}
-
-	@Override
-	public StringBuilder getText()
-	{
-		return text.getText() ;
-	}
-
-	@Override
-	public int setStart( final int _start )
-	{
-		text.setTextStart( _start ) ;
-		return _start ;
-	}
-
-	@Override
-	public int getStart()
-	{
-		return text.getTextStart() ;
-	}
-	
-	@Override
-	public int setEnd( final int _end )
-	{
-		text.setTextEnd( _end ) ;
-		return _end ;
-	}
-
-	@Override
-	public int getEnd()
-	{
-		return text.getTextEnd() ;
-	}
-
-	@Override
 	public BasicDraw<GLProgram> getBasicData()
 	{
 		return basic ;
@@ -179,15 +139,13 @@ public class GLTextDraw extends GLDraw implements TextDraw
 	@Override
 	public TextData getTextData()
 	{
-		return text ;
+		return null ;
 	}
 
 	@Override
 	public void reset()
 	{
 		basic.reset() ;
-		text.reset() ;
-
 		setNewLocation( null ) ;
 		setShape( null ) ;
 	}

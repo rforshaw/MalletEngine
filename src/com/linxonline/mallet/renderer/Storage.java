@@ -7,4 +7,8 @@ package com.linxonline.mallet.renderer ;
 	handles. A storage object can be used to store data 
 	that can be later used by a shader.
 */
-public interface Storage<T extends Storage> {}
+public interface Storage
+{
+	public void expand( final int _by ) ;
+	public float[] getBuffer() ;
+}

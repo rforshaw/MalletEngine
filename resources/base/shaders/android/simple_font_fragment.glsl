@@ -1,14 +1,16 @@
-#version 100
+#version 300 es
 
 uniform sampler2D inTex0 ;
 
-varying vec2 outTexCoord0 ;
-varying vec4 outColour ;
+in vec2 outTexCoord0 ;
+in vec4 outColour ;
+
+out vec4 fragColor ;
 
 void main()
 {
-	float mask = texture2D( inTex0, outTexCoord0 ).a ;
+	float mask = texture( inTex0, outTexCoord0 ).a ;
 	mask = smoothstep( 0.1, 0.75, mask ) ;
 
-	gl_FragColor = vec4( outColour.r, outColour.g, outColour.b, mask ) ;
+	fragColor = vec4( outColour.r, outColour.g, outColour.b, mask ) ;
 }

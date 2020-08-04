@@ -10,9 +10,9 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.BasicWorld ;
-import com.linxonline.mallet.renderer.ProgramMap ;
 import com.linxonline.mallet.renderer.CameraData ;
 import com.linxonline.mallet.renderer.BasicDraw ;
+import com.linxonline.mallet.renderer.ProgramMap ;
 
 import com.linxonline.mallet.renderer.opengl.CameraState ;
 
@@ -31,8 +31,8 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 
 	protected final int[] buffers = new int[BUFFER_LENGTH] ;
 
-	private final GLDrawState state ;					// Objects to be drawn
-	private final CameraState<CameraData> cameras ;		// Camera view portals
+	protected final GLDrawState state;						// Objects to be drawn
+	protected final CameraState<CameraData> cameras ;		// Camera view portals
 
 	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
 	protected GLImage backbuffer = null ;
@@ -96,7 +96,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 		{
 			draw.setNewLocation( null ) ;
 
-			final BasicDraw basic = draw.getBasicDraw() ;
+			final BasicDraw basic = draw.getBasicData() ;
 			final ProgramMap<GLProgram> program = basic.getProgram() ;
 			program.setProgram( null ) ;
 
@@ -107,7 +107,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 	@Override
 	public void init()
 	{
-		renderNotify = addRenderNotify( new Notify<World>()
+		renderNotify = attachRenderNotify( new Notify<World>()
 		{
 			public void inform( final World _this )
 			{
@@ -116,7 +116,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 			}
 		} ) ;
 
-		displayNotify = addDisplayNotify( new Notify<World>()
+		displayNotify = attachDisplayNotify( new Notify<World>()
 		{
 			public void inform( final World _this )
 			{
@@ -126,12 +126,12 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 				cameras.setDisplayDimensions( position.x, position.y, dim.x, dim.y ) ;
 			}
 		} ) ;
-	
+
 		// First buffer is the Framebuffer.
 		// Buffers afterwards are Renderbuffers.
 		MGL.glGenTextures( 1, buffers, COLOUR_BUFFER ) ;
 		MGL.glGenRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
-		//GLES30.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
+		//MGL.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
 
 		final IntVector2 render = getRender() ;
 		updateBufferDimensions( render.x, render.y ) ;
@@ -157,11 +157,7 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 	@Override
 	public void draw()
 	{
-		final IntVector2 renPosition = getRenderPosition() ;
 		final IntVector2 render = getRender() ;
-
-		final IntVector2 disPosition = getDisplayPosition() ;
-		final IntVector2 display = getDisplay() ;
 
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		MGL.glClear( MGL.GL_COLOR_BUFFER_BIT | MGL.GL_DEPTH_BUFFER_BIT | MGL.GL_STENCIL_BUFFER_BIT ) ;
@@ -194,7 +190,6 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 	public void clean( final Set<String> _activeKeys )
 	{
 		final List<GLDraw> list = state.getActiveDraws() ;
-
 		for( final GLDraw draw : list )
 		{
 			draw.getUsedResources( _activeKeys ) ;
@@ -218,13 +213,14 @@ public class GLWorld extends BasicWorld<GLDraw, CameraData>
 			backbuffer = null ;
 		}
 
-		removeRenderNotify( renderNotify ) ;
-		removeDisplayNotify( displayNotify ) ;
+		dettachRenderNotify( renderNotify ) ;
+		dettachDisplayNotify( displayNotify ) ;
 
 		MGL.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
 		MGL.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;
 		MGL.glDeleteRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
 		//MGL.glDeleteRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
+
 		uploader.shutdown() ;
 	}
 

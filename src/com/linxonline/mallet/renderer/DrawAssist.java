@@ -52,59 +52,9 @@ public final class DrawAssist
 		return DRAW_CLEAN ;
 	}
 
-	public static Draw amendShape( final Draw _draw, final Shape _shape )
-	{
-		return assist.amendShape( _draw, _shape ) ;
-	}
-
-	public static Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
-	{
-		return assist.amendRotate( _draw, _x, _y, _z ) ;
-	}
-
-	public static Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
-	{
-		return assist.amendScale( _draw, _x, _y, _z ) ;
-	}
-
-	public static Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
-	{
-		return assist.amendPosition( _draw, _x, _y, _z ) ;
-	}
-
-	public static Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
-	{
-		return assist.amendOffset( _draw, _x, _y, _z ) ;
-	}
-
-	public static Draw amendText( final Draw _draw, final StringBuilder _text )
-	{
-		return assist.amendText( _draw, _text ) ;
-	}
-
-	public static Draw amendTextStart( final Draw _draw, final int _start )
-	{
-		return assist.amendTextStart( _draw, _start ) ;
-	}
-
-	public static Draw amendTextEnd( final Draw _draw, final int _end )
-	{
-		return assist.amendTextEnd( _draw, _end ) ;
-	}
-
 	public static Draw amendUI( final Draw _draw, final boolean _ui )
 	{
 		return assist.amendUI( _draw, _ui ) ;
-	}
-
-	public static Draw amendColour( final Draw _draw, final MalletColour _colour )
-	{
-		return assist.amendColour( _draw, _colour ) ;
-	}
-
-	public static Draw amendOrder( final Draw _draw, final int _order )
-	{
-		return assist.amendOrder( _draw, _order ) ;
 	}
 
 	public static Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
@@ -117,49 +67,9 @@ public final class DrawAssist
 		return assist.amendUpdateType( _draw, _type ) ;
 	}
 
-	public static Draw attachProgram( final Draw _draw, final Program _program )
-	{
-		return assist.attachProgram( _draw, _program ) ;
-	}
-
 	public static Draw forceUpdate( final Draw _draw )
 	{
 		return assist.forceUpdate( _draw ) ;
-	}
-
-	public static Shape getDrawShape( final Draw _draw )
-	{
-		return assist.getDrawShape( _draw ) ;
-	}
-
-	public static Vector3 getRotate( final Draw _draw, final Vector3 _fill )
-	{
-		return assist.getRotate( _draw, _fill ) ;
-	}
-
-	public static Vector3 getScale( final Draw _draw, final Vector3 _fill )
-	{
-		return assist.getScale( _draw, _fill ) ;
-	}
-
-	public static Vector3 getPosition( final Draw _draw, final Vector3 _fill )
-	{
-		return assist.getPosition( _draw, _fill ) ;
-	}
-
-	public static Vector3 getOffset( final Draw _draw, final Vector3 _fill )
-	{
-		return assist.getOffset( _draw, _fill ) ;
-	}
-
-	public static StringBuilder getText( final Draw _draw )
-	{
-		return assist.getText( _draw ) ;
-	}
-
-	public static MalletColour getColour( final Draw _draw )
-	{
-		return assist.getColour( _draw ) ;
 	}
 
 	public static boolean isUI( final Draw _draw )
@@ -167,22 +77,17 @@ public final class DrawAssist
 		return assist.isUI( _draw ) ;
 	}
 
-	public static Program getProgram( final Draw _draw )
-	{
-		return assist.getProgram( _draw ) ;
-	}
-
 	/**
 		Create a Text Draw object.
 		Handles the nuances of text rendering and ensures a performant display.
 	*/
-	public static Draw createTextDraw( final StringBuilder _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
+	public static TextDraw createTextDraw( final StringBuilder _text,
+										   final MalletFont _font,
+										   final Vector3 _position,
+										   final Vector3 _offset,
+										   final Vector3 _rotation,
+										   final Vector3 _scale,
+										   final int _order )
 	{
 		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
 	}
@@ -191,13 +96,13 @@ public final class DrawAssist
 		Create a Text Draw object.
 		Handles the nuances of text rendering and ensures a performant display.
 	*/
-	public static Draw createTextDraw( final String _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
+	public static TextDraw createTextDraw( final String _text,
+										   final MalletFont _font,
+										   final Vector3 _position,
+										   final Vector3 _offset,
+										   final Vector3 _rotation,
+										   final Vector3 _scale,
+										   final int _order )
 	{
 		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
 	}
@@ -231,51 +136,30 @@ public final class DrawAssist
 	*/
 	public interface Assist
 	{
-		public Draw amendShape( final Draw _draw, final Shape _shape ) ;
-		public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z ) ;
-		public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z ) ;
-		public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z ) ;
-		public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z ) ;
-		public Draw amendText( final Draw _draw, final StringBuilder _text ) ;
-		public Draw amendTextStart( final Draw _draw, final int _start ) ;
-		public Draw amendTextEnd( final Draw _draw, final int _end ) ;
 		public Draw amendUI( final Draw _draw, final boolean _ui ) ;
-		public Draw amendColour( final Draw _draw, final MalletColour _colour ) ;
-		public Draw amendOrder( final Draw _draw, final int _order ) ;
 
 		public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation ) ;
 		public Draw amendUpdateType( final Draw _draw, final UpdateType _type ) ;
 
-		public Draw attachProgram( final Draw _draw, final Program _program ) ;
 		public Draw forceUpdate( final Draw _draw ) ;
 
-		public Shape getDrawShape( final Draw _draw ) ;
-
-		public Vector3 getRotate( final Draw _draw, final Vector3 _fill ) ;
-		public Vector3 getScale( final Draw _draw, final Vector3 _fill ) ;
-		public Vector3 getPosition( final Draw _draw, final Vector3 _fill ) ;
-		public Vector3 getOffset( final Draw _draw, final Vector3 _fill ) ;
-
-		public StringBuilder getText( final Draw _draw ) ;
-		public MalletColour getColour( final Draw _draw ) ;
 		public boolean isUI( final Draw _draw ) ;
-		public Program getProgram( final Draw _draw ) ;
 
-		public Draw createTextDraw( final StringBuilder _text,
-									final MalletFont _font,
-									final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order ) ;
+		public TextDraw createTextDraw( final StringBuilder _text,
+										final MalletFont _font,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order ) ;
 
-		public Draw createTextDraw( final String _text,
-									final MalletFont _font,
-									final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order ) ;
+		public TextDraw createTextDraw( final String _text,
+										final MalletFont _font,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order ) ;
 
 		public Draw createClipDraw( final Vector3 _position,
 									final Vector3 _offset,

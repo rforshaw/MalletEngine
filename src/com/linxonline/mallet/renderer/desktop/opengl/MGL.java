@@ -102,7 +102,8 @@ public final class MGL
 	public final static int GL_GEOMETRY_SHADER = GL3.GL_GEOMETRY_SHADER ;
 	public final static int GL_FRAGMENT_SHADER = GL3.GL_FRAGMENT_SHADER ;
 	public final static int GL_COMPUTE_SHADER = GL3.GL_COMPUTE_SHADER ;
-	
+
+	public final static int GL_SHADER_STORAGE_BUFFER = GL3.GL_SHADER_STORAGE_BUFFER ;
 	public final static int GL_SHADER_STORAGE_BLOCK = GL3.GL_SHADER_STORAGE_BLOCK ;
 
 	public MGL() {}
@@ -170,6 +171,11 @@ public final class MGL
 	public static void glBindBuffer( final int _target, final int _buffer )
 	{
 		gl.glBindBuffer( _target, _buffer ) ;
+	}
+
+	public static void glBindBufferBase( final int _target, final int _index, final int _buffer )
+	{
+		gl.glBindBufferBase( _target, _index, _buffer ) ;
 	}
 
 	public static void glDrawElements( final int _mode, final int _count, final int _type, final long _offset )

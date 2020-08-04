@@ -32,12 +32,14 @@ public class GLProgram extends ProgramManager.Program
 	public int inMVPMatrix = -1 ;
 	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders  
 	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
+	public final int[] inBuffers ;			// Additional Storage buffers defined in *.jgl and shaders
 
-	public GLProgram( final JSONProgram _program )
+	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
 		inUniforms   = new int[program.getUniforms().size()] ;
 		inAttributes = new int[program.getSwivel().size()] ;
+		inBuffers    = new int[program.getBuffers().size()] ;
 
 		final int length = inAttributes.length ;
 		for( int i = 0; i < length; i++ )
@@ -89,21 +91,16 @@ public class GLProgram extends ProgramManager.Program
 						return null ;
 					}
 
-					map.setUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
+					map.mapUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
 					break ;
 				}
 				case FONT         :
 				{
 					final MalletFont font = ( MalletFont )map.getUniform( uniform.getRight() ) ;
 					final GLFont glFont = GLRenderer.getFont( font ) ;
-
 					final GLImage texture = glFont.getTexture() ;
-					if( texture == null )
-					{
-						return null ;
-					}
 
-					map.setUniform( uniform.getRight(), texture ) ;
+					map.mapUniform( uniform.getRight(), texture ) ;
 					break ;
 				}
 				case UNKNOWN      :
@@ -117,7 +114,10 @@ public class GLProgram extends ProgramManager.Program
 
 	/**
 		A GL Program will have information that it requires 
-		before it can be used effectively. 
+		before it can be used effectively.
+		This information can be loaded in via uniforms.
+		The jgl file defined what uniforms our shader program wants 
+		and the order in-which we should receive them in.
 	*/
 	public boolean loadUniforms( final ProgramMap<GLProgram> _data )
 	{
@@ -184,6 +184,30 @@ public class GLProgram extends ProgramManager.Program
 	}
 
 	/**
+		A GL Program will have information that it requires 
+		before it can be used effectively.
+		This information can be loaded in via storage buffers.
+		The jgl file defined what buffers our shader program wants 
+		and the order in-which we should receive them in.
+	*/
+	public void bindBuffers( final ProgramMap<GLProgram> _data )
+	{
+		final List<String> buffers = program.getBuffers() ;
+
+		for( int i = 0; i < inBuffers.length; ++i )
+		{
+			final String name = buffers.get( i ) ;
+			final GLStorage storage = ( GLStorage )_data.getStorage( name ) ;
+			if( storage == null )
+			{
+				continue ;
+			}
+
+			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], storage.id[0] ) ;
+		}
+	}
+
+	/**
 		Should only be used on a ProgramMap created by the user.
 		Will crash if used with a ProgramMap built using buildMap().
 
@@ -228,14 +252,9 @@ public class GLProgram extends ProgramManager.Program
 		return "GLPROGRAM" ;
 	}
 
-	public static void delete( final GLProgram _program )
-	{
-		// During the build process a programs 
-		// shaders list has already been detached 
-		// and destroyed.
-		MGL.glDeleteProgram( _program.id[0] ) ;
-	}
-
+	/**
+		Call to generate a GLProgram.
+	*/
 	public static GLProgram build( final JSONProgram _program )
 	{
 		final GLProgram program = new GLProgram( _program ) ;
@@ -279,6 +298,19 @@ public class GLProgram extends ProgramManager.Program
 
 		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
+		{
+			final List<String> buffers = _program.getBuffers() ;
+			final int size = buffers.size() ;
+
+			for( int i = 0; i < size; i++ )
+			{
+				final int loc = MGL.glGetProgramResourceIndex( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, buffers.get( i ) ) ;
+				program.inBuffers[i] = loc ;
+				System.out.println( "Storage Block Binding: " + loc ) ;
+				//System.out.println( "Error: " + MGL.glGetError() ) ;
+			}
+		}
+
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
 		// and delete the shaders from memory.
@@ -298,6 +330,14 @@ public class GLProgram extends ProgramManager.Program
 		}
 
 		return program ;
+	}
+
+	public static void delete( final GLProgram _program )
+	{
+		// During the build process a programs 
+		// shaders list has already been detached 
+		// and destroyed.
+		MGL.glDeleteProgram( _program.id[0] ) ;
 	}
 
 	private static boolean compileShader( final JSONProgram.ShaderMap _map, final int _index, final int[] _shaderIDs )

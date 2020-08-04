@@ -1,5 +1,7 @@
 package com.linxonline.mallet.physics ;
 
+import com.linxonline.mallet.util.Logger ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
@@ -99,7 +101,7 @@ public final class CollisionCheck
 			}
 			else
 			{
-				System.out.println( "Reached maximum contacts on hull 1" ) ;
+				Logger.println( "Reached maximum contacts on hull 1", Logger.Verbosity.MINOR ) ;
 			}
 		}
 
@@ -112,7 +114,7 @@ public final class CollisionCheck
 			}
 			else
 			{
-				System.out.println( "Reached maximum contacts on hull 2" ) ;
+				Logger.println( "Reached maximum contacts on hull 2", Logger.Verbosity.MINOR ) ;
 			}
 		}
 

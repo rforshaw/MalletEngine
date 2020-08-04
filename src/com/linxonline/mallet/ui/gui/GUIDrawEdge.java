@@ -32,13 +32,13 @@ public class GUIDrawEdge extends GUIDraw
 													 new Vector3( 1, 1, 1 ),
 													 parent.getLayer() ) ;
 			DrawAssist.amendUI( draw, true ) ;
-			DrawAssist.amendShape( draw, GUI.constructEdge( getLength(), edge ) ) ;
+			draw.setShape( GUI.constructEdge( getLength(), edge ) ) ;
 			setColour( getColour() ) ;
 
 			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			ProgramAssist.mapUniform( program, "inTex0", sheet ) ;
+			program.mapUniform( "inTex0", sheet ) ;
 
-			DrawAssist.attachProgram( draw, program ) ;
+			draw.setProgram( program ) ;
 			setDraw( draw ) ;
 		}
 	}
@@ -58,11 +58,11 @@ public class GUIDrawEdge extends GUIDraw
 		final Draw draw = getDraw() ;
 		if( draw != null && parent.isVisible() == true )
 		{
-			DrawAssist.amendPosition( draw, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( draw, offset.x, offset.y, offset.z ) ;
+			draw.setPosition( position.x, position.y, position.z ) ;
+			draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-			DrawAssist.amendOrder( draw, getLayer() ) ;
-			GUI.updateEdge( DrawAssist.getDrawShape( draw ), getLength(), edge ) ;
+			draw.setOrder( getLayer() ) ;
+			GUI.updateEdge( draw.getShape(), getLength(), edge ) ;
 			DrawAssist.forceUpdate( draw ) ;
 		}
 	}

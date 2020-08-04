@@ -10,7 +10,7 @@ public class GUIEditText extends GUIText
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
 
-	private Draw drawEdit = null ;
+	private TextDraw drawEdit = null ;
 	private Draw drawCursor = null ;
 
 	private int start = 0 ;
@@ -55,7 +55,7 @@ public class GUIEditText extends GUIText
 													layer + 1 ) ;
 
 			updateTextRange() ;
-			DrawAssist.amendColour( drawEdit, colour ) ;
+			drawEdit.setColour( colour ) ;
 			DrawAssist.amendUI( drawEdit, true ) ;
 		}
 
@@ -81,8 +81,8 @@ public class GUIEditText extends GUIText
 												new Vector3( 1, 1, 1 ),
 												layer ) ;
 
-			DrawAssist.amendShape( drawCursor, Shape.triangulate( triangle ) ) ;
-			DrawAssist.attachProgram( drawCursor, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+			drawCursor.setShape( Shape.triangulate( triangle ) ) ;
+			drawCursor.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			DrawAssist.amendUI( drawCursor, true ) ;
 		}
 	}
@@ -151,10 +151,10 @@ public class GUIEditText extends GUIText
 
 			updateTextRange() ;
 
-			DrawAssist.amendPosition( drawEdit, position.x, position.y, position.z ) ;
-			DrawAssist.amendOffset( drawEdit, offset.x, offset.y, offset.z ) ;
+			drawEdit.setPosition( position.x, position.y, position.z ) ;
+			drawEdit.setOffset( offset.x, offset.y, offset.z ) ;
 
-			DrawAssist.amendOrder( drawEdit, layer + 1 ) ;
+			drawEdit.setOrder( layer + 1 ) ;
 			DrawAssist.forceUpdate( drawEdit ) ;
 		}
 
@@ -171,13 +171,13 @@ public class GUIEditText extends GUIText
 		{
 			delegate.addBasicDraw( drawCursor, getWorld() ) ;
 
-			DrawAssist.amendPosition( drawCursor, position.x, position.y, position.z ) ;
+			drawCursor.setPosition( position.x, position.y, position.z ) ;
 			final int index = parent.getCursorIndex() ;
 
 			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
-			DrawAssist.amendOffset( drawCursor, xOffset, offset.y, offset.z ) ;
+			drawCursor.setOffset( xOffset, offset.y, offset.z ) ;
 
-			DrawAssist.amendOrder( drawCursor, layer ) ;
+			drawCursor.setOrder( layer ) ;
 			DrawAssist.forceUpdate( drawCursor ) ;
 		}
 		else
@@ -208,8 +208,8 @@ public class GUIEditText extends GUIText
 		start = ( index < start ) ? index : start ;
 		start = ( start >= 0 ) ? start : 0 ;
 
-		DrawAssist.amendTextStart( drawEdit, start ) ;
-		DrawAssist.amendTextEnd( drawEdit, end ) ;
+		drawEdit.setStart( start ) ;
+		drawEdit.setEnd( end ) ;
 	}
 
 	@Override

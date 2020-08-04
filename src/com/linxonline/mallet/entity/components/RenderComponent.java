@@ -10,6 +10,7 @@ import com.linxonline.mallet.renderer.DrawDelegateCallback ;
 import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.event.Event ;
@@ -20,7 +21,7 @@ import com.linxonline.mallet.util.Tuple ;
 public class RenderComponent extends Component
 {
 	private Map<World, List<Draw>> toAddBasic = new HashMap<World, List<Draw>>() ;
-	private Map<World, List<Draw>> toAddText = new HashMap<World, List<Draw>>() ;
+	private Map<World, List<TextDraw>> toAddText = new HashMap<World, List<TextDraw>>() ;
 
 	private DrawDelegate drawDelegate = null ;
 	private Entity.ReadyCallback toDestroy = null ;
@@ -102,12 +103,12 @@ public class RenderComponent extends Component
 		drawDelegate.addBasicDraw( _draws, _world ) ;
 	}
 
-	public void addTextDraw( final Draw _draw )
+	public void addTextDraw( final TextDraw _draw )
 	{
 		addTextDraw( _draw, null ) ;
 	}
 
-	public void addTextDraw( final Draw _draw, final World _world )
+	public void addTextDraw( final TextDraw _draw, final World _world )
 	{
 		if( toDestroy != null )
 		{
@@ -124,10 +125,10 @@ public class RenderComponent extends Component
 			// If the renderer has yet to give a drawDelegate
 			if( toAddText.containsKey( _world ) == false )
 			{
-				toAddText.put( _world, MalletList.<Draw>newList() ) ;
+				toAddText.put( _world, MalletList.<TextDraw>newList() ) ;
 			}
 
-			final List<Draw> toAdd = toAddText.get( _world ) ;
+			final List<TextDraw> toAdd = toAddText.get( _world ) ;
 			toAdd.add( _draw ) ;
 			return ;
 		}
@@ -187,10 +188,10 @@ public class RenderComponent extends Component
 
 			if( toAddText.isEmpty() == false )
 			{
-				for( Map.Entry<World, List<Draw>> entry : toAddText.entrySet() )
+				for( Map.Entry<World, List<TextDraw>> entry : toAddText.entrySet() )
 				{
 					final World world = entry.getKey() ;
-					List<Draw> draws = entry.getValue() ;
+					List<TextDraw> draws = entry.getValue() ;
 					drawDelegate.addTextDraw( draws, world ) ;
 				}
 				toAddText.clear() ;

@@ -91,7 +91,7 @@ public class GLProgram extends ProgramManager.Program
 						return null ;
 					}
 
-					map.setUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
+					map.mapUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
 					break ;
 				}
 				case FONT         :
@@ -100,7 +100,7 @@ public class GLProgram extends ProgramManager.Program
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage texture = glFont.getTexture() ;
 
-					map.setUniform( uniform.getRight(), texture ) ;
+					map.mapUniform( uniform.getRight(), texture ) ;
 					break ;
 				}
 				case UNKNOWN      :
@@ -181,6 +181,30 @@ public class GLProgram extends ProgramManager.Program
 		}
 
 		return true ;
+	}
+
+	/**
+		A GL Program will have information that it requires 
+		before it can be used effectively.
+		This information can be loaded in via storage buffers.
+		The jgl file defined what buffers our shader program wants 
+		and the order in-which we should receive them in.
+	*/
+	public void bindBuffers( final ProgramMap<GLProgram> _data )
+	{
+		final List<String> buffers = program.getBuffers() ;
+
+		for( int i = 0; i < inBuffers.length; ++i )
+		{
+			final String name = buffers.get( i ) ;
+			final GLStorage storage = ( GLStorage )_data.getStorage( name ) ;
+			if( storage == null )
+			{
+				continue ;
+			}
+
+			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], storage.id[0] ) ;
+		}
 	}
 
 	/**
@@ -282,7 +306,7 @@ public class GLProgram extends ProgramManager.Program
 			{
 				final int loc = MGL.glGetProgramResourceIndex( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, buffers.get( i ) ) ;
 				program.inBuffers[i] = loc ;
-				//System.out.println( "Storage Block Binding: " + loc ) ;
+				System.out.println( "Storage Block Binding: " + loc ) ;
 				//System.out.println( "Error: " + MGL.glGetError() ) ;
 			}
 		}

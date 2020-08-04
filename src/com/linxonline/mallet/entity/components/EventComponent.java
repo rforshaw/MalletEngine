@@ -2,6 +2,7 @@ package com.linxonline.mallet.entity.components ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.event.* ;
 
@@ -36,11 +37,19 @@ public class EventComponent extends Component
 						   final int _backendCapacity )
 	{
 		super( _parent, _allow ) ;
-		stateController = new EventController( _stateCapacity ) ;
-		backendController = new EventController( _backendCapacity ) ;
+		stateController = createStateEventController() ;
+		backendController = createBackendEventController() ;
+	}
 
-		initBackendEventProcessors( backendController ) ;
-		initStateEventProcessors( stateController ) ;
+	/**
+		Override to add Event Processors to the component's
+		State Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		return createController( _processors ) ;
 	}
 
 	/**
@@ -49,15 +58,25 @@ public class EventComponent extends Component
 		Make sure to call super to ensure parents 
 		component Event Processors are added.
 	*/
-	public void initBackendEventProcessors( final EventController _controller ) {}
+	public EventController createBackendEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		return createController( _processors ) ;
+	}
+	
+	private static EventController createController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		if( _processors == null )
+		{
+			return new EventController() ;
+		}
 
-	/**
-		Override to add Event Processors to the component's
-		State Event Controller.
-		Make sure to call super to ensure parents 
-		component Event Processors are added.
-	*/
-	public void initStateEventProcessors( final EventController _controller ) {}
+		if( _processors.length == 0 )
+		{
+			return new EventController() ;
+		}
+
+		return new EventController( _processors ) ;
+	}
 
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )

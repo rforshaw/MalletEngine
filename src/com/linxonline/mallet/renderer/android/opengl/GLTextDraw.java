@@ -1,4 +1,4 @@
-package com.linxonline.mallet.renderer.desktop.opengl ;
+package com.linxonline.mallet.renderer.android.opengl ;
 
 import java.util.List ;
 

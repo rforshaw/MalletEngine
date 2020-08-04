@@ -37,38 +37,10 @@ public final class ProgramAssist
 		return assist.create( _id ) ;
 	}
 
-	/**
-		Remove a previous mapped uniform from the 
-		passed in program.
-	*/
-	public static Program removeUniform( final Program _program, final String _handler )
-	{
-		return assist.removeUniform( _program, _handler ) ;
-	}
-
-	/**
-		Map a uniform to the passed in program.
-
-		Some rendering implementations will not render 
-		the Draw if the Program it is associated to does 
-		not contain valid uniform mappings.
-
-		@param _program to map uniform to.
-		@param _handler uniform name.
-		@param _obj the uniform/value to be mapped.
-	*/
-	public static Program mapUniform( final Program _program, final String _handler, final Object _obj )
-	{
-		return assist.mapUniform( _program, _handler, _obj ) ;
-	}
-
 	public interface Assist
 	{
 		public void load( final String _id, final String _path ) ;
 
 		public Program create( final String _id ) ;
-
-		public Program removeUniform( final Program _program, final String _handler ) ;
-		public Program mapUniform( final Program _program, final String _handler, final Object _obj ) ;
 	}
 }
