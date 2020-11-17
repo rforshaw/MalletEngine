@@ -38,11 +38,14 @@ public class MGL
 	public final static int GL_TEXTURE_2D = GLES31.GL_TEXTURE_2D ;
 	public final static int GL_TEXTURE0 = GLES31.GL_TEXTURE0 ;
 	public final static int GL_LINK_STATUS = GLES31.GL_LINK_STATUS ;
+
 	public final static int GL_FALSE = GLES31.GL_FALSE ;
 	public final static int GL_TRUE = GLES31.GL_TRUE ;
+
 	public final static int GL_COMPILE_STATUS = GLES31.GL_COMPILE_STATUS ;
 	public final static int GL_VERTEX_SHADER = GLES31.GL_VERTEX_SHADER ;
 	public final static int GL_FRAGMENT_SHADER = GLES31.GL_FRAGMENT_SHADER ;
+
 	public final static int GL_TEXTURE_MIN_FILTER = GLES31.GL_TEXTURE_MIN_FILTER ;
 	public final static int GL_TEXTURE_MAG_FILTER = GLES31.GL_TEXTURE_MAG_FILTER ;
 	public final static int GL_UNPACK_ALIGNMENT = GLES31.GL_UNPACK_ALIGNMENT ;
@@ -62,11 +65,17 @@ public class MGL
 	public final static int GL_FRAMEBUFFER_UNDEFINED = GLES31.GL_FRAMEBUFFER_UNDEFINED ;
 	public final static int GL_FRAMEBUFFER_UNSUPPORTED = GLES31.GL_FRAMEBUFFER_UNSUPPORTED ;
 	public final static int GL_RGBA = GLES31.GL_RGBA ;
+	
 	public final static int GL_STENCIL_INDEX8 = GLES31.GL_STENCIL_INDEX8 ;
 	public final static int GL_COLOR_ATTACHMENT0 = GLES31.GL_COLOR_ATTACHMENT0 ;
 	public final static int GL_STENCIL_ATTACHMENT = GLES31.GL_STENCIL_ATTACHMENT ;
+	public final static int GL_DEPTH_ATTACHMENT = GLES31.GL_DEPTH_ATTACHMENT ;
+
 	public final static int GL_NEAREST_MIPMAP_NEAREST = GLES31.GL_NEAREST_MIPMAP_NEAREST ;
 	public final static int GL_LINEAR_MIPMAP_LINEAR = GLES31.GL_LINEAR_MIPMAP_LINEAR ;
+
+	public final static int GL_DEPTH_COMPONENT = GLES31.GL_DEPTH_COMPONENT ;
+	public final static int GL_DEPTH_STENCIL = GLES31.GL_DEPTH_STENCIL ;
 
 	public final static int GL_SHADER_STORAGE_BUFFER = GLES31.GL_SHADER_STORAGE_BUFFER ;
 	public final static int GL_SHADER_STORAGE_BLOCK = GLES31.GL_SHADER_STORAGE_BLOCK ;

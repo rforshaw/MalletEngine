@@ -10,15 +10,10 @@ public class DefaultMTUpdate implements IEntityUpdate
 	private final WorkerGroup workers ;
 	private final EntityWorker entityWorker = new EntityWorker() ;
 
-	public DefaultMTUpdate()
-	{
-		this( 4 ) ;
-	}
-
-	public DefaultMTUpdate( final int _threads )
+	public DefaultMTUpdate( final WorkerGroup _workers )
 	{
 		super() ;
-		workers = new WorkerGroup( "ENTITY UPDATE", _threads ) ; 
+		workers = _workers ; 
 	}
 
 	@Override

@@ -256,7 +256,6 @@ public class UIEditorState extends GameState
 
 		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 		AnimationAssist.getDraw( animation ).setShape( plane ) ;
-		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
 		anim.setDefaultAnim( "DEFAULT" ) ;
@@ -330,7 +329,6 @@ public class UIEditorState extends GameState
 
 		final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 		AnimationAssist.getDraw( animation ).setShape( plane ) ;
-		DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
 
 		anim.addAnimation( "DEFAULT", animation ) ;
 		anim.setDefaultAnim( "DEFAULT" ) ;

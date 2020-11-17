@@ -52,12 +52,12 @@ public class UIChildren implements IChildren
 		return ordered ;
 	}
 
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	public void setWorldAndCamera( final World _world, final Camera _camera )
 	{
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			ordered.get( i ).passDrawDelegate( _delegate, _world, _camera ) ;
+			ordered.get( i ).setWorldAndCamera( _world, _camera ) ;
 		}
 	}
 

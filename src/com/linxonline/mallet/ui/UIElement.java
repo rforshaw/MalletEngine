@@ -39,9 +39,8 @@ public class UIElement implements InputHandler, Connect.Connection
 	private boolean dirty = true ;			// Causes refresh when true
 	private int layer = 0 ;
 
-	private DrawDelegate drawDelegate ;
 	private World world ;
-	private Camera camera = CameraAssist.getDefaultCamera() ;
+	private Camera camera = CameraAssist.getDefault() ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
 
 	private final Vector3 minLength = new Vector3() ;	// In pixels
@@ -86,9 +85,8 @@ public class UIElement implements InputHandler, Connect.Connection
 		Return the Draw objects that this UIElement wishes 
 		to render to the rendering system.
 	*/
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	public void setWorldAndCamera( final World _world, final Camera _camera )
 	{
-		drawDelegate = _delegate ;
 		world = _world ;
 		camera = ( _camera != null ) ? _camera : camera ;
 
@@ -96,7 +94,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			base.get( i ).passDrawDelegate( _delegate, _world ) ;
+			base.get( i ).setWorld( _world ) ;
 		}
 	}
 
@@ -754,18 +752,6 @@ public class UIElement implements InputHandler, Connect.Connection
 	public UIRatio getRatio()
 	{
 		return ratio ;
-	}
-
-	/**
-		Return the draw delegate that the UI is expected 
-		to use to send draw objects for rendering.
-
-		This may return null if the renderer has yet to 
-		provide a draw delegate. 
-	*/
-	public DrawDelegate getDrawDelegate()
-	{
-		return drawDelegate ;
 	}
 
 	/**
@@ -1651,10 +1637,9 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 
 		/**
-			Called when parent UIElement is ready to recieve 
-			draw requests.
+			Called when the parent's World is set.
 		*/
-		public void passDrawDelegate( final DrawDelegate _delegate, final World _world ) {}
+		public void setWorld( final World _world ) {}
 
 		/**
 			Called when parent UIElement is refreshing itself.

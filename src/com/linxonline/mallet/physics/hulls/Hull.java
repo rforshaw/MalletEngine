@@ -10,9 +10,9 @@ public abstract class Hull
 {
 	public static final int NO_GROUP = -1 ;
 
-	private Group.ID groupID = Group.get( -1 ) ;					// Defines what Group the Hull is in.
-	private final Group.ID[] collidableGroups ;						// Defines the Groups the Hull is affected by.
-																	// If no group-specified, collides with everything.
+	private int groupID = NO_GROUP ;					// Defines what Group the Hull is in.
+	private final int[] collidableGroups ;				// Defines the Groups the Hull is affected by.
+														// If no group-specified, collides with everything.
 	private Object parent ;
 
 	private final Vector2 accumulatedPenetration = new Vector2() ;
@@ -22,7 +22,7 @@ public abstract class Hull
 	protected boolean physical = true ; 							// Allows hull to be affected by a Collision
 	protected CollisionCallback callback = null ;					// Allows Owner to be informed of Collisions
 
-	protected Hull( final Group.ID[] _collidables )
+	protected Hull( final int[] _collidables )
 	{
 		collidableGroups = _collidables ;
 	}
@@ -47,19 +47,7 @@ public abstract class Hull
 
 	public final void setGroupID( final int _groupID )
 	{
-		final Group.ID id = Group.get( _groupID ) ;
-		if( id == null )
-		{
-			System.out.println( "Attempted to set collidable group that doesn't exist." ) ;
-			return ;
-		}
-
-		setGroupID( id ) ;
-	}
-
-	public final void setGroupID( final Group.ID _id )
-	{
-		groupID = _id ;
+		groupID = _groupID ;
 	}
 
 	public final void setCollisionCallback( final CollisionCallback _callback )
@@ -97,7 +85,7 @@ public abstract class Hull
 		physical = _physical ;
 	}
 
-	public final Group.ID getGroupID()
+	public final int getGroupID()
 	{
 		return groupID ;
 	}
@@ -112,8 +100,14 @@ public abstract class Hull
 		return collidable ;
 	}
 
-	public final boolean isCollidableWithGroup( final Group.ID _groupID )
+	public final boolean isCollidableWithGroup( final int _groupID )
 	{
+		if( collidableGroups == null )
+		{
+			// Groups haven't been specified so it can collide with all
+			return true ;
+		}
+	
 		return isCollidableWithGroup( _groupID, collidableGroups ) ;
 	}
 
@@ -132,7 +126,7 @@ public abstract class Hull
 		return parent ;
 	}
 
-	public static boolean isCollidableWithGroup( final Group.ID _id, final Group.ID[] _groups )
+	public static boolean isCollidableWithGroup( final int _id, final int[] _groups )
 	{
 		if( _groups == null )
 		{
@@ -142,8 +136,7 @@ public abstract class Hull
 
 		for( int i = 0; i < _groups.length; ++i )
 		{
-			final Group.ID id = _groups[i] ;
-			if( id.equals( _id ) == true )
+			if( _id == _groups[i] )
 			{
 				return true ;
 			}

@@ -4,6 +4,9 @@ import java.util.List ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 
+import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.Camera ;
+
 import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.* ;
@@ -13,30 +16,29 @@ import com.linxonline.mallet.maths.* ;
 public abstract class BasicRenderer implements IRender
 {
 	private final EventController controller = new EventController() ;
-	private final List<Runnable> executions = MalletList.<Runnable>newList() ;
+	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
+
+	private final World world = new World( "DEFAULT" ) ;
+	private final Camera camera = new Camera( "MAIN" ) ;
 
 	private float drawDT   = 1.0f ;
 	private float updateDT = 1.0f ;
 	private int renderIter = 0 ;
 
-	public BasicRenderer() {}
+	public BasicRenderer()
+	{
+		world.addCameras( camera ) ;
+	}
 
 	@Override
 	public void start()
 	{
 		controller.reset() ;
-		controller.addProcessor( "DRAW_DELEGATE", ( final DrawDelegateCallback _delegate ) ->
-		{
-			_delegate.callback( constructDrawDelegate() ) ;
-		} ) ;
-
-		controller.addProcessor( "DRAW_CLEAN", ( final DrawDelegateCallback _delegate ) ->
+		controller.addProcessor( "DRAW_CLEAN", ( final Object _obj ) ->
 		{
 			clean() ;
 		} ) ;
 	}
-
-	protected abstract DrawDelegate constructDrawDelegate() ;
 
 	public void invokeLater( final Runnable _run )
 	{
@@ -48,15 +50,27 @@ public abstract class BasicRenderer implements IRender
 
 	protected void updateExecutions()
 	{
-		if( executions.isEmpty() == false )
+		executions.update() ;
+		final List<Runnable> runnables = executions.getCurrentData() ;
+		if( runnables.isEmpty() == false )
 		{
-			final int size = executions.size() ;
+			final int size = runnables.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				executions.get( i ).run() ;
+				runnables.get( i ).run() ;
 			}
-			executions.clear() ;
+			runnables.clear() ;
 		}
+	}
+
+	public World getDefaultWorld()
+	{
+		return world ;
+	}
+
+	public Camera getDefaultCamera()
+	{
+		return camera ;
 	}
 
 	public float getUpdateDeltaTime()

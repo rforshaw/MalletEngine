@@ -16,7 +16,9 @@ public class GUIDraw extends GUIComponent
 	private final MalletTexture sheet ;
 	private final UIElement.UV uv ;
 
-	protected Draw draw = null ;
+	private DrawUpdater updater ;
+	private final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+	private final Draw draw = new Draw() ;
 
 	public GUIDraw( final Meta _meta, final UIElement _parent )
 	{
@@ -47,14 +49,18 @@ public class GUIDraw extends GUIComponent
 	public void setColour( final MalletColour _colour )
 	{
 		colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+
 		final Draw draw = getDraw() ;
-		if( draw != null )
+		final Shape shape = draw.getShape() ;
+		if( shape != null )
 		{
-			final Shape shape = getDraw().getShape() ;
-			if( shape != null )
-			{
-				GUI.updateColour( shape, colour ) ;
-			}
+			GUI.updateColour( shape, colour ) ;
+		}
+
+		if( updater != null )
+		{
+			draw.makeDirty() ;
+			updater.makeDirty() ;
 		}
 	}
 
@@ -66,43 +72,56 @@ public class GUIDraw extends GUIComponent
 	{
 		if( sheet != null && uv != null )
 		{
-			draw = DrawAssist.createDraw( getPosition(),
-										  getOffset(),
-										  new Vector3(),
-										  new Vector3( 1, 1, 1 ),
-										  getLayer() ) ;
-			DrawAssist.amendUI( draw, true ) ;
+			final Vector3 position = getPosition() ;
+			draw.setPosition( position.x, position.y, position.z ) ;
+
+			final Vector3 offset = getOffset() ;
+			draw.setOffset( offset.x, offset.y, offset.z ) ;
+
 			draw.setShape( Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 			setColour( getColour() ) ;
 
-			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
 			program.mapUniform( "inTex0", sheet ) ;
-
-			draw.setProgram( program ) ;
 		}
 	}
 
-	/**
-		Called when listener receives a valid DrawDelegate
-		and when the parent UIElement is flagged as visible.
-	*/
 	@Override
-	public void addDraws( final DrawDelegate _delegate, final World _world )
+	public void addDraws( final World _world )
 	{
-		if( draw != null )
+		if( updater != null )
 		{
-			_delegate.addBasicDraw( draw, _world ) ;
+			// Remove the draw object from the previous 
+			// updater the draw may have changed significantly.
+			updater.removeDraws( draw ) ;
+		}
+
+		final int layer = getLayer() ;
+		final Shape shape = draw.getShape() ;
+
+		System.out.println( "Add GUI " + _world.getID() ) ;
+		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
+		updater.addDraws( draw ) ;
+	}
+
+	@Override
+	public void removeDraws()
+	{
+		if( updater != null )
+		{
+			updater.removeDraws( draw ) ;
 		}
 	}
 
-	/**
-		Only called if there is a valid DrawDelegate and 
-		when the parent UIElement is flagged as invisible.
-	*/
 	@Override
-	public void removeDraws( final DrawDelegate _delegate )
+	public void layerUpdated( int _layer )
 	{
-		_delegate.removeDraw( draw ) ;
+		if( updater != null )
+		{
+			updater.removeDraws( draw ) ;
+		}
+
+		final Shape shape = draw.getShape() ;
+		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
 	}
 
 	@Override
@@ -118,15 +137,16 @@ public class GUIDraw extends GUIComponent
 		updateLength( parent.getLength(), length ) ;
 		updateOffset( parent.getOffset(), offset ) ;
 
-		if( draw != null && parent.isVisible() == true )
+		if( updater != null && draw != null && parent.isVisible() == true )
 		{
 			Shape.updatePlaneGeometry( draw.getShape(), length ) ;
 
 			draw.setPosition( position.x, position.y, position.z ) ;
 			draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-			draw.setOrder( getLayer() ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			//draw.setOrder( getLayer() ) ;
+			draw.makeDirty() ;
+			updater.makeDirty() ;
 		}
 	}
 
@@ -148,9 +168,14 @@ public class GUIDraw extends GUIComponent
 		_toUpdate.add( _offset ) ;
 	}
 
-	public void setDraw( final Draw _draw )
+	public DrawUpdater getUpdater()
 	{
-		draw = _draw ;
+		return updater ;
+	}
+
+	public Program getProgram()
+	{
+		return program ;
 	}
 
 	public Draw getDraw()

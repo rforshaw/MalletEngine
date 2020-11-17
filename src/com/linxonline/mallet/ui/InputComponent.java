@@ -6,7 +6,6 @@ import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Camera ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
 
 public abstract class InputComponent extends UIElement.Component
 {

@@ -1,9 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
-import com.linxonline.mallet.renderer.UpdateType ;
-
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
 

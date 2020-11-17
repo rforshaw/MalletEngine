@@ -9,11 +9,12 @@ public class GUIText extends GUIComponent
 	protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
 
-	private final StringBuilder text ;
 	private MalletFont font ;
 	private MalletColour colour = MalletColour.white() ;
 
-	protected TextDraw drawText = null ;
+	private IUpdater<TextDraw, TextBuffer> updater ;
+	private final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
+	private final TextDraw drawText ;
 
 	public GUIText( final Meta _meta, final UIElement _parent )
 	{
@@ -27,8 +28,8 @@ public class GUIText extends GUIComponent
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
 
-		text = _text ;
-		text.append( _meta.getText() ) ;
+		drawText = new TextDraw( _text ) ;
+		drawText.getText().append( _meta.getText() ) ;
 
 		font = _meta.getFont() ;
 		colour = _meta.getColour( colour ) ;
@@ -55,24 +56,20 @@ public class GUIText extends GUIComponent
 		if( font != null )
 		{
 			final Vector3 length = getLength() ;
+			final Vector3 position = getPosition() ;
 			final Vector3 offset = getOffset() ;
 
 			final MalletFont.Metrics metrics = font.getMetrics() ;
-			offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
+			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-			drawText = DrawAssist.createTextDraw( text,
-													font,
-													getPosition(),
-													getOffset(),
-													new Vector3(),
-													new Vector3( 1, 1, 1 ),
-													getLayer()  ) ;
+			drawText.setPosition( position.x, position.y, position.z ) ;
+			drawText.setOffset( offset.x, offset.y, offset.z ) ;
 
-			drawText.setStart( 0 ) ;
-			drawText.setEnd( font.stringIndexWidth( text, length.x ) ) ;
+			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
 			drawText.setColour( colour ) ;
-			DrawAssist.amendUI( drawText, true ) ;
+
+			program.mapUniform( "inTex0", font ) ;
 		}
 	}
 
@@ -81,12 +78,17 @@ public class GUIText extends GUIComponent
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate _delegate, final World _world )
+	public void addDraws( final World _world )
 	{
-		if( drawText != null )
+		if( updater != null )
 		{
-			_delegate.addTextDraw( drawText, _world ) ;
+			// Remove the draw object from the previous 
+			// updater the draw may have changed significantly.
+			updater.removeDraws( drawText ) ;
 		}
+
+		updater = TextUpdater.getOrCreate( getWorld(), program, true, getLayer() ) ;
+		updater.addDraws( drawText ) ;
 	}
 
 	/**
@@ -94,9 +96,23 @@ public class GUIText extends GUIComponent
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate _delegate )
+	public void removeDraws()
 	{
-		_delegate.removeDraw( drawText ) ;
+		if( updater != null )
+		{
+			updater.removeDraws( drawText ) ;
+		}
+	}
+
+	@Override
+	public void layerUpdated( final int _layer )
+	{
+		if( updater != null )
+		{
+			updater.removeDraws( drawText ) ;
+		}
+
+		updater = TextUpdater.getOrCreate( getWorld(), program, true, _layer ) ;
 	}
 
 	@Override
@@ -110,22 +126,27 @@ public class GUIText extends GUIComponent
 			final Vector3 offset = getOffset() ;
 
 			final MalletFont.Metrics metrics = font.getMetrics() ;
-			offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x ) ;
+			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
 			drawText.setPosition( position.x, position.y, position.z ) ;
 			drawText.setOffset( offset.x, offset.y, offset.z ) ;
 
-			drawText.setStart( 0 ) ;
-			drawText.setEnd( font.stringIndexWidth( text, length.x ) ) ;
-			drawText.setOrder( getLayer() ) ;
-			DrawAssist.forceUpdate( drawText ) ;
+			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
+
+			drawText.makeDirty() ;
+			updater.makeDirty() ;
 		}
+	}
+
+	public void setRange( final int _start, final int _end )
+	{
+		drawText.setRange( _start, _end ) ;
 	}
 
 	public StringBuilder getText()
 	{
-		return text ;
+		return drawText.getText() ;
 	}
 
 	public UI.Alignment getAlignmentX()
@@ -138,7 +159,17 @@ public class GUIText extends GUIComponent
 		return drawAlignmentY ;
 	}
 
-	public TextDraw getDraw()
+	public IUpdater<TextDraw, TextBuffer> getUpdater()
+	{
+		return updater ;
+	}
+
+	public Program getProgram()
+	{
+		return program ;
+	}
+
+	public TextDraw getTextDraw()
 	{
 		return drawText ;
 	}

@@ -17,7 +17,6 @@ public class GUIPanelEdge extends GUIDrawEdge
 		public void slot( final UIElement _layout )
 		{
 			setColour( rollover ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
@@ -27,7 +26,6 @@ public class GUIPanelEdge extends GUIDrawEdge
 		public void slot( final UIElement _layout )
 		{
 			setColour( neutral ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
 		}
 	} ;
 
@@ -56,7 +54,6 @@ public class GUIPanelEdge extends GUIDrawEdge
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
 		setColour( rollover ) ;
-		DrawAssist.forceUpdate( getDraw() ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}
 
@@ -72,7 +69,6 @@ public class GUIPanelEdge extends GUIDrawEdge
 	public InputEvent.Action mousePressed( final InputEvent _input )
 	{
 		setColour( clicked ) ;
-		DrawAssist.forceUpdate( getDraw() ) ;
 		return InputEvent.Action.PROPAGATE ;
 	}
 

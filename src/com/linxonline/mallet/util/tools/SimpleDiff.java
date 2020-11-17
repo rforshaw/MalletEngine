@@ -60,7 +60,7 @@ public final class SimpleDiff
 
 		// int - Num of changes, int - Position of change, int - Num of bytes - X array of bytes,
 		// repeating from int - Position of change.
-		return ConvertBytes.concat( ConvertBytes.toBytes( changes, ConvertBytes.BIG_ENDIAN ), out.getBytes() ) ;
+		return ConvertBytes.concat( ConvertBytes.toBytes( changes ), out.getBytes() ) ;
 	}
 
 	public static byte[] decode( final byte[] _base, final byte[] _diff )

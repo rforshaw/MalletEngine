@@ -136,26 +136,28 @@ public class AABB
 		final float y = _aabb.position[AABB.POSITION_Y] + _aabb.position[AABB.OFFSET_Y] ;
 
 		final float minX = x + _aabb.range[AABB.MIN_X] ;
-		final float minY = y + _aabb.range[AABB.MIN_Y] ;
-
 		final float maxX = x + _aabb.range[AABB.MAX_X] ;
-		final float maxY = y + _aabb.range[AABB.MAX_Y] ;
 
-		if( intersectPoint( minX, minY ) == true )
+		final float thisX = position[AABB.POSITION_X] + position[AABB.OFFSET_X] ;
+		final float thisY = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] ;
+
+		final float thisMinX = thisX + range[AABB.MIN_X] ;
+		final float thisMaxX = thisX + range[AABB.MAX_X] ;
+
+		if( ( minX >= thisMinX && minX <= thisMaxX ) ||
+			( maxX >= thisMinX && maxX <= thisMaxX ) )
 		{
-			return true ;
-		}
-		else if( intersectPoint( maxX, maxY ) == true )
-		{
-			return true ;
-		}
-		else if( intersectPoint( minX, maxY ) == true )
-		{
-			return true ;
-		}
-		else if( intersectPoint( maxX, minY ) == true )
-		{
-			return true ;
+			final float minY = y + _aabb.range[AABB.MIN_Y] ;
+			final float maxY = y + _aabb.range[AABB.MAX_Y] ;
+		
+			final float thisMinY = thisY + range[AABB.MIN_Y] ;
+			final float thisMaxY = thisY + range[AABB.MAX_Y] ;
+
+			if( ( minY >= thisMinY && minY <= thisMaxY ) ||
+				( maxY >= thisMinY && maxY <= thisMaxY ) )
+			{
+				return true ;
+			}
 		}
 
 		return false ;
@@ -165,8 +167,9 @@ public class AABB
 	{
 		final float centerX = ( range[AABB.MAX_X] + range[AABB.MIN_X] ) * 0.5f ;
 		final float centerY = ( range[AABB.MAX_Y] + range[AABB.MIN_Y] ) * 0.5f ;
-		_center.setXY( position[AABB.POSITION_X] + position[AABB.OFFSET_X] + centerX, 
-					   position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] + centerY ) ;
+
+		_center.x = position[AABB.POSITION_X] + position[AABB.OFFSET_X] + centerX ;
+		_center.y = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] + centerY ;
 	}
 
 	public String toString()

@@ -147,11 +147,13 @@ public class DesktopStarter extends IStarter
 
 	private static void updateRenderDimensions( final int _width, final int _height )
 	{
-		final Camera camera = CameraAssist.getDefaultCamera() ;
+		final Camera camera = CameraAssist.getDefault() ;
 		camera.setScreenResolution( _width, _height ) ;
 		camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
-		
-		final World world = WorldAssist.getDefaultWorld() ;
-		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
+		CameraAssist.update( camera ) ;
+
+		final World world = WorldAssist.getDefault() ;
+		world.setRenderDimensions( 0, 0, _width, _height ) ;
+		WorldAssist.update( world ) ;
 	}
 }

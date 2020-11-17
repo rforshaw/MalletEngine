@@ -6,7 +6,7 @@ import java.util.Set ;
 
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
-import com.linxonline.mallet.renderer.ProgramMap ;
+import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
@@ -58,9 +58,9 @@ public class GLProgram extends ProgramManager.Program
 
 		If we fail to build an efficient map then return null.
 	*/
-	public ProgramMap<GLProgram> buildMap( final ProgramMap<GLProgram> _map )
+	public boolean remap( final Program _map, final Program _remap )
 	{
-		final ProgramMap<GLProgram> map = new ProgramMap<GLProgram>( _map ) ;
+		_remap.copy( _map ) ;
 
 		final List<JSONProgram.UniformMap> uniforms = program.getUniforms() ;
 		final int size = uniforms.size() ;
@@ -79,37 +79,36 @@ public class GLProgram extends ProgramManager.Program
 				case FLOAT32_VEC4 :
 				{
 					Logger.println( "Build uniform type not implemented", Logger.Verbosity.MAJOR ) ;
-					return null ;
+					return false ;
 				}
 				case FLOAT32_MAT4 : break ;
 				case SAMPLER2D    :
 				{
-					final MalletTexture texture = ( MalletTexture )map.getUniform( uniform.getRight() ) ;
-					final GLImage glTexture = GLRenderer.getTexture( texture.getPath() ) ;
+					final MalletTexture texture = ( MalletTexture )_remap.getUniform( uniform.getRight() ) ;
+					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
 					if( glTexture == null )
 					{
-						return null ;
+						return false ;
 					}
 
-					map.mapUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
+					_remap.mapUniform( uniform.getRight(), new Texture( glTexture, texture ) ) ;
 					break ;
 				}
 				case FONT         :
 				{
-					final MalletFont font = ( MalletFont )map.getUniform( uniform.getRight() ) ;
+					final MalletFont font = ( MalletFont )_remap.getUniform( uniform.getRight() ) ;
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage texture = glFont.getTexture() ;
 
-					map.mapUniform( uniform.getRight(), texture ) ;
+					_remap.mapUniform( uniform.getRight(), texture ) ;
 					break ;
 				}
 				case UNKNOWN      :
-				default           : return null ;
+				default           : return false ;
 			}
 		}
 
-		map.setDirty( false ) ;
-		return map ;
+		return true ;
 	}
 
 	/**
@@ -119,7 +118,7 @@ public class GLProgram extends ProgramManager.Program
 		The jgl file defined what uniforms our shader program wants 
 		and the order in-which we should receive them in.
 	*/
-	public boolean loadUniforms( final ProgramMap<GLProgram> _data )
+	public boolean loadUniforms( final Program _data )
 	{
 		final List<JSONProgram.UniformMap> uniforms = program.getUniforms() ;
 		int textureUnit = 0 ;
@@ -190,7 +189,7 @@ public class GLProgram extends ProgramManager.Program
 		The jgl file defined what buffers our shader program wants 
 		and the order in-which we should receive them in.
 	*/
-	public void bindBuffers( final ProgramMap<GLProgram> _data )
+	public void bindBuffers( final Program _data )
 	{
 		final List<String> buffers = program.getBuffers() ;
 
@@ -205,21 +204,6 @@ public class GLProgram extends ProgramManager.Program
 
 			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], storage.id[0] ) ;
 		}
-	}
-
-	/**
-		Should only be used on a ProgramMap created by the user.
-		Will crash if used with a ProgramMap built using buildMap().
-
-		The program map contains the references to resources 
-		that are potential managed by the renderer.
-
-		Using the uniforms loop over the map and record 
-		within _activeKeys the keys for those resources.
-	*/
-	public void getUsedResources( final Set<String> _activeKeys, final ProgramMap<GLProgram> _data )
-	{
-		program.getUsedResources( _activeKeys, _data ) ;
 	}
 
 	/**
@@ -371,13 +355,18 @@ public class GLProgram extends ProgramManager.Program
 
 	private static class Texture
 	{
-		public final GLImage image ;
+		public GLImage image ;
 		public int minFilter ;
 		public int maxFilter ;
 		public int uWrap ;
 		public int vWrap ;
 
 		public Texture( GLImage _image, final MalletTexture _texture )
+		{
+			set( _image, _texture ) ;
+		}
+
+		public void set( GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
 			minFilter = calculateFilter( _texture.getMinimumFilter() ) ;

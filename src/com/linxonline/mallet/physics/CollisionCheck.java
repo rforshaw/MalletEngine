@@ -50,8 +50,7 @@ public final class CollisionCheck
 
 		final AABB aabb1 = _box1.getAABB() ;
 		final AABB aabb2 = _box2.getAABB() ; 
-		if( aabb1.intersectAABB( aabb2 ) == false && 
-			aabb2.intersectAABB( aabb1 ) == false )
+		if( aabb1.intersectAABB( aabb2 ) == false && aabb2.intersectAABB( aabb1 ) == false )
 		{
 			return false ;
 		}
@@ -77,6 +76,13 @@ public final class CollisionCheck
 		}
 
 		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * 0.5f : overlap2 * 0.5f ;		// Get the best overlap overall
+		if( overlap < 0.1f )
+		{
+			// We only want to consider overlaps that are 
+			// significant minor overlaps are not important.
+			return false ;
+		}
+
 		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;							// Set the axis based on best overlap
 
 		if( Vector2.multiply( axis, toCenter ) > 0.0f )

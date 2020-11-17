@@ -2,29 +2,36 @@ package com.linxonline.mallet.animation ;
 
 import java.util.List ;
 
-import java.lang.ref.WeakReference ;
-
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.SourceCallback ;
 
 import com.linxonline.mallet.animation.Sprite ;
 
-import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.IUpdater ;
+import com.linxonline.mallet.renderer.DrawBuffer ;
+import com.linxonline.mallet.renderer.GeometryBuffer ;
+import com.linxonline.mallet.renderer.WorldAssist ;
 import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 
 public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 {
 	private final List<SourceCallback> callbacks = MalletList.<SourceCallback>newList() ;
+	private final Program program ; 
 	private String file   = null ;
 	private Draw draw     = null ;
 
-	private WeakReference<World> world = null ;
+	private World world = null ;
 	private Sprite sprite = null ;
+	private DrawBuffer drawBuffer ;
+	private IUpdater<Draw, GeometryBuffer> updater ;
 
+	private int order         = 0 ;
 	private boolean play      = false ;
 	private float elapsedTime = 0.0f ;
 	private int prevFrame     = 0 ;
@@ -32,17 +39,33 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 	private float frameDelta  = 0.0f ;			// Amount of time that needs to elapse before next frame
 	private int length        = 0 ;				// How many frames
 
-	public AnimData() {}
+	public AnimData()
+	{
+		this( null, null ) ;
+	}
 
 	public AnimData( final String _file, final Draw _draw )
 	{
+		program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 		file = _file ;
 		draw = _draw ;
 	}
 
+	public int setOrder( final int _order )
+	{
+		order = _order ;
+		return order ;
+	}
+	
 	public void setWorld( final World _world )
 	{
-		world = new WeakReference<World>( _world ) ;
+		world = _world ;
+	}
+
+	public void setUpdater( final IUpdater<Draw, GeometryBuffer> _updater, final DrawBuffer _buffer )
+	{
+		updater = _updater ;
+		drawBuffer = _buffer ;
 	}
 
 	public void addCallback( final SourceCallback _callback )
@@ -107,13 +130,15 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		}
 	}
 
-	public void update( final float _dt )
+	public boolean update( final float _dt )
 	{
+		boolean update = false ;
 		if( play == true )
 		{
 			elapsedTime += _dt ;
 			if( elapsedTime >= frameDelta )
 			{
+				update = true ;
 				changeTexture( draw, sprite ) ;
 				elapsedTime -= frameDelta ;
 				prevFrame = currFrame ;
@@ -125,6 +150,7 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 			}
 			updateCallbacks() ;
 		}
+		return update ;
 	}
 
 	private void changeTexture( final Draw _draw, final Sprite _sprite )
@@ -136,7 +162,11 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		{
 			// We only want to remap the programs texture 
 			// if the sprite is not using a spritesheet.
-			_draw.getProgram().mapUniform( "inTex0", c.path ) ;
+			program.mapUniform( "inTex0", c.path ) ;
+			if( drawBuffer != null )
+			{
+				DrawAssist.update( drawBuffer ) ;
+			}
 		}
 
 		// If using a sprite sheet the UV coordinates 
@@ -146,7 +176,6 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 		// coordinates have changed, to simulate a scrolling 
 		// animation, like water.
 		Shape.updatePlaneUV( _draw.getShape(), c.uv ) ;
-		DrawAssist.forceUpdate( _draw ) ;
 	}
 
 	public void setSprite( final Sprite _sprite )
@@ -169,12 +198,27 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	public World getWorld()
 	{
-		return ( world != null ) ? world.get() : null ;
+		return ( world != null ) ? world : WorldAssist.getDefault() ;
+	}
+
+	public Program getProgram()
+	{
+		return program ;
 	}
 
 	public Draw getDraw()
 	{
 		return draw ;
+	}
+
+	public int getOrder()
+	{
+		return order ;
+	}
+
+	public IUpdater<Draw, GeometryBuffer> getUpdater()
+	{
+		return updater ;
 	}
 
 	private void updateCallbacks()

@@ -46,7 +46,7 @@ public final class GameTestLoader implements IGameLoader
 		{
 			public void initGame()			// Called when state is started
 			{
-				//createMeta() ;
+				createMeta() ;
 
 				createUI() ;
 				renderTextureExample() ;
@@ -120,113 +120,88 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderTextureExample()
 			{
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
+				final World world = WorldAssist.getDefault() ;
+				final Program geomProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
+
 				{
-					{
-						final World base = WorldAssist.getDefaultWorld() ;
-						final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
+					final IntVector2 dim = world.getRenderDimensions( new IntVector2() ) ;
 
-						final Camera cam = CameraAssist.createCamera( "OFFSIDE", new Vector3(), new Vector3(), new Vector3( 1, 1, 1 ) ) ;
-						CameraAssist.addCamera( cam, null ) ;
+					final Camera cam = CameraAssist.add( new Camera( "OFFSIDE" ) ) ;
+					cam.setOrthographic( 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
+					cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
+					//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 
-						cam.setOrthographic( 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
-						cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
-						//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
-					}
+					world.addCameras( cam ) ;
+				}
 
-					{
-						final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
-						final int width = texture.getWidth() ;
-						final int height = texture.getHeight() ;
+				{
+					final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
+					final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
+					lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
+					lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
+					lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
+					lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
+					lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
+					lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
 
-						final Draw draw = DrawAssist.createDraw( new Vector3( 415.0f, 385.0f, 0.0f ),
-																	new Vector3( -( width / 2 ), -( height / 2 ), 0.0f ),
-																	new Vector3(),
-																	new Vector3( 1, 1, 1 ),
-																	10 ) ;
+					lines.addIndex( 0 ) ;
+					lines.addIndex( 1 ) ;
+					lines.addIndex( 2 ) ;
+					lines.addIndex( 3 ) ;
+					lines.addIndex( 2 ) ;
+					lines.addIndex( 4 ) ;
+					lines.addIndex( 5 ) ;
 
-						final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-						program.mapUniform( "inTex0", texture ) ;
-						draw.setProgram( program ) ;
+					final Draw draw = new Draw() ;
+					draw.setPosition( 0.0f, 50.0f, 0.0f ) ;
+					draw.setOffset( -100.0f, 0.0f, 0.0f ) ;
+					draw.setShape( lines ) ;
 
-						draw.setShape( Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
-						DrawAssist.amendUI( draw, true ) ;
+					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, lines, false, 10 ) ;
+					updater.addDraws( draw ) ;
+				}
 
-						_delegate.addBasicDraw( draw ) ;
-					}
+				{
+					final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
+					triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
+					triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
+					triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
+					triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
+					triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
+					triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
 
-					{
-						final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
-						final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
-						lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
-						lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
-						lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
-						lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
-						lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
-						lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
+					triangle.addIndex( 0 ) ;
+					triangle.addIndex( 1 ) ;
+					triangle.addIndex( 2 ) ;
+					triangle.addIndex( 3 ) ;
+					triangle.addIndex( 4 ) ;
+					triangle.addIndex( 5 ) ;
 
-						lines.addIndex( 0 ) ;
-						lines.addIndex( 1 ) ;
-						lines.addIndex( 2 ) ;
-						lines.addIndex( 3 ) ;
-						lines.addIndex( 2 ) ;
-						lines.addIndex( 4 ) ;
-						lines.addIndex( 5 ) ;
+					final Draw draw = new Draw() ;
+					draw.setShape( Shape.triangulate( triangle ) ) ;
 
-						final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 50.0f, 0.0f ),
-																	new Vector3( -100.0f, 0.0f, 0.0f ),
-																	new Vector3(),
-																	new Vector3( 1, 1, 1 ),
-																	10 ) ;
-						draw.setShape( lines ) ;
-						draw.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, triangle, false, 0 ) ;
+					updater.addDraws( draw ) ;
+				}
 
-						_delegate.addBasicDraw( draw ) ;
-					}
+				{
+					final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
+					final int width = texture.getWidth() ;
+					final int height = texture.getHeight() ;
 
-					{
-						final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
-						triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
-						triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
-						triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
-						triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
-						triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
-						triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
+					final Shape plane = Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
-						triangle.addIndex( 0 ) ;
-						triangle.addIndex( 1 ) ;
-						triangle.addIndex( 2 ) ;
-						triangle.addIndex( 3 ) ;
-						triangle.addIndex( 4 ) ;
-						triangle.addIndex( 5 ) ;
+					final Draw draw = new Draw() ;
+					draw.setPosition( 415.0f, 385.0f, 0.0f ) ;
+					draw.setOffset( -( width / 2 ), -( height / 2 ), 0.0f ) ;
+					draw.setShape( plane ) ;
 
-						final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, 0.0f, 0.0f ),
-																	new Vector3(),
-																	new Vector3(),
-																	new Vector3( 1, 1, 1 ),
-																	0 ) ;
-						draw.setShape( Shape.triangulate( triangle ) ) ;
-						draw.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
+					final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+					program.mapUniform( "inTex0", texture ) ;
 
-						_delegate.addBasicDraw( draw ) ;
-					}
-
-					/*{
-						final Shape shape = SGeom.load( "base/ui/test.sgeom" ) ;
-						if( shape != null )
-						{
-							final Draw draw = DrawAssist.createDraw( new Vector3( -200.0f, 0.0f, 0.0f ),
-																	new Vector3(),
-																	new Vector3(),
-																	new Vector3( 1, 1, 1 ),
-																	10 ) ;
-							DrawAssist.amendShape( draw, shape ) ;
-							DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-
-							_delegate.addBasicDraw( draw ) ;
-						}
-					}*/
-				} ) ) ;
+					final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, plane, true, 10 ) ;
+					updater.addDraws( draw ) ;
+				}
 			}
 
 			/**
@@ -273,18 +248,17 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderTextExample()
 			{
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
-				{
-					final TextDraw draw = DrawAssist.createTextDraw( "Hello world!",
-																	 new MalletFont( "Arial" ),
-																	 new Vector3( 0.0f, -80.0f, 0.0f ),
-																	 new Vector3( 0, 0, 0 ),
-																	 new Vector3(),
-																	 new Vector3( 1, 1, 1 ),
-																	 200 ) ;
-					draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
-					_delegate.addTextDraw( draw ) ;
-				} ) ) ;
+				final World world = WorldAssist.getDefault() ;
+
+				final TextDraw draw = new TextDraw( "Hello world!" ) ;
+				draw.setPosition( 0.0f, -80.0f, 0.0f ) ;
+				draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
+
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
+				program.mapUniform( "inTex0", new MalletFont( "Arial" ) ) ;
+
+				final TextUpdater updater = TextUpdater.getOrCreate( world, program, false, 200 ) ;
+				updater.addDraws( draw ) ;
 			}
 
 			/**
@@ -348,6 +322,8 @@ public final class GameTestLoader implements IGameLoader
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
 				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
+				/*ProgramAssist.load( "SIMPLE_STORAGE_TEXTURE", "base/shaders/{0}/simple_storage_texture.jgl" ) ;
+
 				final Storage storage1 = StorageAssist.create( "TestStorage1", 1 ) ;
 				storage1.getBuffer()[0] = 255.0f ;
 
@@ -357,45 +333,21 @@ public final class GameTestLoader implements IGameLoader
 				StorageAssist.update( storage1 ) ;
 				StorageAssist.update( storage2 ) ;
 
-				final Program program = ProgramAssist.create( "SIMPLE_STORAGE_TEXTURE" ) ;
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_STORAGE_TEXTURE" ) ) ;
 				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 				program.mapStorage( "TestBlock1", storage1 ) ;
-				program.mapStorage( "TestBlock2", storage2 ) ;
+				program.mapStorage( "TestBlock2", storage2 ) ;*/
 
-				//final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
+				//final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 				//program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
 
 				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
-				final List<Draw> draws = MalletList.<Draw>newList( amount ) ;
-				final List<Draw> debugDraws = MalletList.<Draw>newList( amount ) ;
-				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
-				{
-					private final Vector2 position = new Vector2() ;
-				
-					@Override
-					public void update( final float _dt )
-					{
-						super.update( _dt ) ;
-						final int size = draws.size() ;
-						for( int i = 0; i < size; ++i )
-						{
-							final Hull hull = hulls.get( i ) ;
-							final Draw draw = draws.get( i ) ;
-							final Draw debugDraw = debugDraws.get( i ) ;
+				final Draw[] draws = new Draw[amount] ;
+				final Draw[] debugDraws = new Draw[amount] ;
 
-							DrawAssist.forceUpdate( draw ) ;
-							DrawAssist.forceUpdate( debugDraw ) ;
-
-							hull.getPosition( position ) ;
-							draw.setPosition( position.x, position.y, 0.0f ) ;
-
-							Debug.updateDraw( debugDraw, hull ) ;
-						}
-					}
-				} ;
-
+				int inc = 0 ;
 				for( int i = 0; i < _row; ++i )
 				{
 					for( int j = 0; j < _column; ++j )
@@ -412,36 +364,88 @@ public final class GameTestLoader implements IGameLoader
 																						  new Vector2( -32, -32 ) ) ;
 						final Hull hull = coll.hulls[0] ;
 
-						final Draw draw = DrawAssist.createDraw( new Vector3( position ),
-																 new Vector3( -32, -32, 0 ),
-																 new Vector3(),
-																 new Vector3( 1, 1, 1 ),
-																 10 ) ;
-
+						final Draw draw = new Draw() ;
+						draw.setPosition( position.x, position.y, 0.0f ) ;
+						draw.setOffset( -32.0f, -32.0f, 0.0f ) ;
 						draw.setShape( plane ) ;
-						draw.setProgram( program ) ;
-						DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
 
 						hulls.add( hull ) ;
-						draws.add( draw ) ;
-						debugDraws.add( Debug.createDraw( hull ) ) ;
+						draws[inc] = draw ;
+						debugDraws[inc] = Debug.createDraw( hull ) ;
+						inc += 1 ;
 					}
 				}
 
-				render.addBasicDraw( draws, null ) ;
-				render.addBasicDraw( debugDraws, null ) ;
+				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
+				{
+					private DrawUpdater updater ;
+					private DrawUpdater debugUpdater ;
+					private final Vector2 position = new Vector2() ;
+
+					@Override
+					public void init()
+					{
+						final World world = WorldAssist.getDefault() ;
+
+						{
+							final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+							program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+
+							updater = getUpdater( world, program, draws[0], false, 10 ) ;
+							updater.addDraws( draws ) ;
+						}
+
+						{
+							//final Program program = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
+							//debugUpdater = getUpdater( world, program, debugDraws[0], false, 10 ) ;
+							//debugUpdater.addDraws( debugDraws ) ;
+						}
+					}
+
+					@Override
+					public void shutdown()
+					{
+						updater.removeDraws( draws ) ;
+						//debugUpdater.removeDraws( debugDraws ) ;
+					}
+
+					@Override
+					public void update( final float _dt )
+					{
+						super.update( _dt ) ;
+						boolean updateDraw = false ;
+						
+						for( int i = 0; i < draws.length; ++i )
+						{
+							final Hull hull = hulls.get( i ) ;
+							updateDraw = ( hull.contactData.size() > 0 ) ? true : updateDraw ;
+							
+							final Draw draw = draws[i] ;
+							//final Draw debugDraw = debugDraws[i] ;
+
+							hull.getPosition( position ) ;
+							draw.setPosition( position.x, position.y, 0.0f ) ;
+
+							//Debug.updateDraw( debugDraw, hull ) ;
+						}
+
+						if( updateDraw == true )
+						{
+							updater.makeDirty() ;
+							//debugUpdater.makeDirty() ;
+						}
+					}
+				} ;
 
 				addEntity( entity ) ;
 			}
-
-
 
 			/**
 				Create an Entity that follows the mouse
 			**/
 			public void createMouseAnimExample()
 			{
-				final World base = WorldAssist.getDefaultWorld() ;
+				final World base = WorldAssist.getDefault() ;
 				final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
 
 				final Entity entity = new Entity( 4, Entity.AllowEvents.NO ) ;
@@ -457,8 +461,6 @@ public final class GameTestLoader implements IGameLoader
 
 				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 				AnimationAssist.getDraw( animation ).setShape( plane ) ;
-				DrawAssist.amendInterpolation( AnimationAssist.getDraw( animation ), Interpolation.LINEAR ) ;
-				DrawAssist.amendUpdateType( AnimationAssist.getDraw( animation ), UpdateType.ON_DEMAND ) ;
 
 				anim.addAnimation( "DEFAULT", animation ) ;
 				anim.setDefaultAnim( "DEFAULT" ) ;
@@ -486,28 +488,38 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createSpinningCubeExample()
 			{
-				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
 
-				final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
-				final Draw draw = DrawAssist.createDraw( new Vector3( 0.0f, -200.0f, 0.0f ),
-														 new Vector3( -50.0f, -50.0f, -50.0f ),
-														 new Vector3(),
-														 new Vector3( 1, 1, 1 ),
-														 10 ) ;
-				draw.setShape( Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ) ;
-				DrawAssist.amendInterpolation( draw, Interpolation.LINEAR ) ;
-				DrawAssist.amendUpdateType( draw, UpdateType.ON_DEMAND ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-				program.mapUniform( "inTex0", texture ) ;
-				draw.setProgram( program ) ;
-
-				final RenderComponent render = new RenderComponent( entity ) ;
-				render.addBasicDraw( draw ) ;
-
-				new Component( entity )
+				new RenderComponent( entity )
 				{
+					private IUpdater<Draw, ?> updater ;
+
+					private Draw draw ;
 					private final Vector3 rotate = new Vector3() ;
+
+					@Override
+					public void init()
+					{
+						final World world = WorldAssist.getDefault() ;
+						final Shape shape = Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
+
+						draw = new Draw() ;
+						draw.setPosition( 0.0f, -200.0f, 0.0f ) ;
+						draw.setOffset( -50.0f, -50.0f, -50.0f ) ;
+						draw.setShape( shape ) ;
+
+						final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+						program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+
+						updater = getUpdater( world, program, draw, false, 10 ) ;
+						updater.addDraws( draw ) ;
+					}
+
+					@Override
+					public void shutdown()
+					{
+						updater.removeDraws( draw ) ;
+					}
 
 					@Override
 					public void update( final float _dt )
@@ -518,7 +530,6 @@ public final class GameTestLoader implements IGameLoader
 						rotate.z += 2.1f * _dt ;
 
 						draw.setRotation( rotate.x, rotate.y, rotate.z ) ;
-						DrawAssist.forceUpdate( draw ) ;
 					}
 				} ;
 

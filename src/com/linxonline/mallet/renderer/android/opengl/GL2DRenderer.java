@@ -67,12 +67,14 @@ public class GL2DRenderer implements IRender,
 		}
 
 		setDisplayDimensions( _width, _height ) ;
-		final World world = WorldAssist.getDefaultWorld() ;
-		WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
+		final World world = WorldAssist.getDefault() ;
+		world.setRenderDimensions( 0, 0, _width, _height ) ;
+		WorldAssist.update( world ) ;
 
-		final Camera camera = CameraAssist.getDefaultCamera() ;
+		final Camera camera = CameraAssist.getDefault() ;
 		camera.setScreenResolution( _width, _height ) ;
 		camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+		CameraAssist.update( camera ) ;
 	}
 
 	@Override

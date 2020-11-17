@@ -2,353 +2,361 @@ package com.linxonline.mallet.renderer.android.opengl ;
 
 import java.util.Set ;
 import java.util.List ;
+import java.util.ArrayList ;
 
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.BufferedList ;
-import com.linxonline.mallet.util.notification.Notification.Notify ;
 
+import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.BasicWorld ;
-import com.linxonline.mallet.renderer.CameraData ;
-import com.linxonline.mallet.renderer.BasicDraw ;
-import com.linxonline.mallet.renderer.ProgramMap ;
-
-import com.linxonline.mallet.renderer.opengl.CameraState ;
+import com.linxonline.mallet.renderer.World.AttachmentType ;
+import com.linxonline.mallet.renderer.Camera ;
+import com.linxonline.mallet.renderer.ABuffer ;
 
 /**
 	Represents the OpenGL state for a world.
 	A world cannot interact with other worlds.
 */
-public class GLWorld extends BasicWorld<GLDraw, CameraData>
+public class GLWorld
 {
 	protected final static int FRAME_BUFFER    = 0 ;
-	protected final static int COLOUR_BUFFER   = 1 ;
-	protected final static int STENCIL_BUFFER  = 2 ;
-	protected final static int DEPTH_BUFFER    = 3 ;
 
-	protected final static int BUFFER_LENGTH   = 4 ;
+	protected final int[] buffers ;
+	protected GLImage[] backBuffers ;
 
-	protected final int[] buffers = new int[BUFFER_LENGTH] ;
+	protected String id ;
+	protected final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
+	protected final IntVector2 render = new IntVector2( 0, 0 ) ;
+	protected final IntVector2 displayPosition = new IntVector2( 0, 0 ) ;
+	protected final IntVector2 display = new IntVector2( 1280, 720 ) ;
 
-	protected final GLDrawState state;						// Objects to be drawn
-	protected final CameraState<CameraData> cameras ;		// Camera view portals
+	protected final List<GLCamera> cameras = new ArrayList<GLCamera>() ;
+	protected final List<GLBuffer> drawBuffers = new ArrayList<GLBuffer>() ;
 
-	protected final GLGeometryUploader uploader = new GLGeometryUploader( 10000, 10000 ) ;
-	protected GLImage backbuffer = null ;
-
-	private Notify<World> renderNotify ;
-	private Notify<World> displayNotify ;
-
-	private GLWorld( final String _id, final int _order )
+	public static GLWorld createCore( final World _world,
+									  final AssetLookup<Camera, GLCamera> _cameras,
+									  final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
-		super( _id, _order ) ;
-		state = new GLDrawState( uploader ) ;
-		cameras = new CameraState<CameraData>( new GLCameraDraw() ) ;
+		return new GLCoreWorld( _world, _cameras, _buffers ) ;
 	}
 
-	public static GLWorld createCore( final String _id, final int _order )
+	public GLWorld( final World _world,
+					final AssetLookup<Camera, GLCamera> _cameras,
+					final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
-		return new GLCoreWorld( _id, _order ) ;
+		// The first buffer generated is always the FrameBuffer
+		// the rest is attachment buffers.
+		final AttachmentType[] attachments = _world.getAttachments() ;
+		buffers = new int[1 + attachments.length] ;
+		backBuffers = new GLImage[1 + attachments.length] ;
+
+		MGL.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ;
+		init( _world, _cameras, _buffers ) ;
 	}
 
-	public static GLWorld create( final String _id, final int _order )
+	public GLWorld( final World _world,
+					final AssetLookup<Camera, GLCamera> _cameras,
+					final AssetLookup<ABuffer, GLBuffer> _buffers,
+					final int _frameID )
 	{
-		return new GLWorld( _id, _order ) ;
+		// The first buffer generated is always the FrameBuffer
+		// the rest is attachment buffers.
+		final AttachmentType[] attachments = _world.getAttachments() ;
+		buffers = new int[1 + attachments.length] ;
+		backBuffers = new GLImage[1 + attachments.length] ;
+
+		// The framebuffer is specified by an external source.
+		buffers[FRAME_BUFFER] = _frameID ;
+		init( _world, _cameras, _buffers ) ;
 	}
 
-	public GLImage getImage()
+	private void init( final World _world,
+					   final AssetLookup<Camera, GLCamera> _cameras,
+					   final AssetLookup<ABuffer, GLBuffer> _buffers )
+	{
+		id = _world.getID() ;
+
+		_world.getRenderPosition( renderPosition ) ;
+		_world.getRenderDimensions( render ) ;
+
+		_world.getDisplayPosition( displayPosition ) ;
+		_world.getDisplayDimensions( display ) ;
+	
+		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+
+		_world.getRenderDimensions( render ) ;
+
+		int colourAttachmentOffset = 0 ;
+
+		// Generate framebuffer then attachment buffers
+		final AttachmentType[] attachments = _world.getAttachments() ;
+		for( int i = 0; i < attachments.length; ++i )
+		{
+			final AttachmentType type = attachments[i] ;
+			final int offset = i + 1 ; // add 1 to skip the framebuffer.
+
+			switch( type )
+			{
+				default      :
+				case COLOUR  :
+				{
+					//System.out.println( "Creating colour" ) ;
+					MGL.glGenTextures( 1, buffers, offset ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, render.x, render.y, 0, MGL.GL_RGBA, MGL.GL_UNSIGNED_BYTE, null ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+
+					final int attachment = MGL.GL_COLOR_ATTACHMENT0 + colourAttachmentOffset++ ;
+					MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, attachment, MGL.GL_TEXTURE_2D, buffers[offset], 0 ) ;
+					break ;
+				}
+				case DEPTH   :
+				{
+					//System.out.println( "Creating depth" ) ;
+					MGL.glGenTextures( 1, buffers, offset ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_COMPONENT, render.x, render.y, 0, MGL.GL_DEPTH_COMPONENT, MGL.GL_FLOAT, null ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+
+					MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, MGL.GL_DEPTH_ATTACHMENT, MGL.GL_TEXTURE_2D, buffers[offset], 0 ) ;
+					break ;
+				}
+				case STENCIL :
+				{
+					//System.out.println( "Creating stencil" ) ;
+					MGL.glGenTextures( 1, buffers, offset ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_STENCIL, render.x, render.y, 0, MGL.GL_DEPTH_STENCIL, MGL.GL_FLOAT, null ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+
+					MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, MGL.GL_STENCIL_ATTACHMENT, MGL.GL_TEXTURE_2D, buffers[offset], 0 ) ;
+					break ;
+				}
+			}
+		}
+
+		updateCameras( _world, _cameras ) ;
+		updateDrawBuffers( _world, _buffers ) ;
+
+		final int code = MGL.glCheckFramebufferStatus( MGL.GL_DRAW_FRAMEBUFFER ) ; 
+		switch( code )
+		{
+			case MGL.GL_FRAMEBUFFER_COMPLETE    : break ;
+			case MGL.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( _world.getID() + " framebuffer undefined." ) ; break ;
+			case MGL.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( _world.getID() + " framebuffer unsupported." ) ; break ;
+			default                             : System.out.println( _world.getID() + " framebuffer corrupt: " + code ) ; break ;
+		}
+
+		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, 0 ) ;
+	}
+
+	public GLImage getImage( final int _index )
 	{
 		// We only want to create a back buffer if it ever gets 
 		// used by the developer, else we are allocating space 
 		// for no reason.
-		if( backbuffer == null )
+		if( backBuffers[_index] == null )
 		{
 			final int channel = 3 ;
-			final IntVector2 render = getRender() ;
-
 			final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
-			backbuffer = new GLImage( 0, estimatedConsumption ) ;
+			final GLImage buffer = new GLImage( 0, estimatedConsumption ) ;
 
-			MGL.glGenTextures( 1, backbuffer.textureIDs, 0 ) ;
-			MGL.glBindTexture( MGL.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+			MGL.glGenTextures( 1, buffer.textureIDs, 0 ) ;
+			MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffer.textureIDs[0] ) ;
 
 			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
 			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
 
 			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+			backBuffers[_index] = buffer ;
 		}
 
-		return backbuffer ;
+		return backBuffers[_index] ;
 	}
 
-	public GLGeometryUploader getUploader()
+	public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
-		return uploader ;
+		id = _world.getID() ;
+
+		_world.getRenderPosition( renderPosition ) ;
+		_world.getRenderDimensions( render ) ;
+
+		_world.getDisplayPosition( displayPosition ) ;
+		_world.getDisplayDimensions( display ) ;
+
+		updateBufferDimensions( _world, render.x, render.y ) ;
+
+		updateCameras( _world, _cameras ) ;
+		updateDrawBuffers( _world, _buffers ) ;
 	}
 
-	public void reset()
+	private void updateCameras( final World _world, final AssetLookup<Camera, GLCamera> _cameras )
 	{
-		init() ;
-		final List<GLDraw> active = state.getActiveDraws() ;
-		for( final GLDraw draw : active )
+		cameras.clear() ;
+		for( final Camera camera : _world.getCameras() )
 		{
-			draw.setNewLocation( null ) ;
-
-			final BasicDraw basic = draw.getBasicData() ;
-			final ProgramMap<GLProgram> program = basic.getProgram() ;
-			program.setProgram( null ) ;
-
-			basic.forceUpdate() ;
-		}
-	}
-
-	@Override
-	public void init()
-	{
-		renderNotify = attachRenderNotify( new Notify<World>()
-		{
-			public void inform( final World _this )
+			final GLCamera cam = _cameras.getRHS( camera.index() ) ;
+			if( cam != null )
 			{
-				final IntVector2 dim = getRender() ;
-				updateBufferDimensions( dim.x, dim.y ) ;
+				cameras.add( cam ) ;
 			}
-		} ) ;
-
-		displayNotify = attachDisplayNotify( new Notify<World>()
-		{
-			public void inform( final World _this )
-			{
-				final IntVector2 position = getDisplayPosition() ;
-				final IntVector2 dim = getDisplay() ;
-
-				cameras.setDisplayDimensions( position.x, position.y, dim.x, dim.y ) ;
-			}
-		} ) ;
-
-		// First buffer is the Framebuffer.
-		// Buffers afterwards are Renderbuffers.
-		MGL.glGenTextures( 1, buffers, COLOUR_BUFFER ) ;
-		MGL.glGenRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
-		//MGL.glGenRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
-
-		final IntVector2 render = getRender() ;
-		updateBufferDimensions( render.x, render.y ) ;
-
-		MGL.glGenFramebuffers( 1, buffers, FRAME_BUFFER ) ; 							//GLRenderer.handleError( "Gen Frame Buffers" ) ;
-		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-
-		MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, MGL.GL_COLOR_ATTACHMENT0, MGL.GL_TEXTURE_2D, buffers[COLOUR_BUFFER], 0 ) ; 		//GLRenderer.handleError( "Gen Bind Buffers: " + buffers[FRAME_BUFFER] ) ;
-		MGL.glFramebufferRenderbuffer( MGL.GL_FRAMEBUFFER, MGL.GL_STENCIL_ATTACHMENT, MGL.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Attach Stencil Buffers" ) ;
-		//GLES30.glFramebufferRenderbuffer( MGL.GL_FRAMEBUFFER, GLES30.GL_DEPTH_ATTACHMENT,   MGL.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ; 	//GLRenderer.handleError( "Gen Render Buffers" ) ;
-
-		switch( MGL.glCheckFramebufferStatus( MGL.GL_DRAW_FRAMEBUFFER ) )
-		{
-			case MGL.GL_FRAMEBUFFER_COMPLETE    : break ;
-			case MGL.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( getID() + " framebuffer undefined." ) ; break ;
-			case MGL.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( getID() + " framebuffer unsupported." ) ; break ;
-			default                             : System.out.println( getID() + " framebuffer corrupt." ) ; break ;
 		}
-
-		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, 0 ) ;
 	}
 
-	@Override
+	private void updateDrawBuffers( final World _world, final AssetLookup<ABuffer, GLBuffer> _buffers )
+	{
+		drawBuffers.clear() ;
+		for( final ABuffer buffer : _world.getBuffers() )
+		{
+			switch( buffer.getBufferType() )
+			{
+				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ;
+				case DRAW_BUFFER :
+				{
+					final int index = buffer.index() ;
+					final GLBuffer buff = _buffers.getRHS( index ) ;
+					if( buff == null )
+					{
+						continue ;
+					}
+					drawBuffers.add( buff ) ;
+					break ;
+				}
+				case TEXT_BUFFER :
+				{
+					final int index = buffer.index() ;
+					final GLBuffer buff = _buffers.getRHS( index ) ;
+					if( buff == null )
+					{
+						continue ;
+					}
+					
+					System.out.println( "Update TextBuffer." ) ;
+					drawBuffers.add( buff ) ;
+					break ;
+				}
+			}
+		}
+	}
+	
 	public void draw()
 	{
-		final IntVector2 render = getRender() ;
-
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 		MGL.glClear( MGL.GL_COLOR_BUFFER_BIT | MGL.GL_DEPTH_BUFFER_BIT | MGL.GL_STENCIL_BUFFER_BIT ) ;
+		//MGL.glClearColor( 1.0f, 0.0f, 0.0f, 0.5f ) ;
 
-		cameras.draw() ;
+		for( final GLCamera camera : cameras )
+		{
+			camera.draw( drawBuffers ) ;
+		}
 
-		if( backbuffer != null )
+		if( backBuffers[0] != null )
 		{
 			MGL.glBindFramebuffer( MGL.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-			MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, 0 ) ;
 
-			MGL.glBindTexture( MGL.GL_TEXTURE_2D, backbuffer.textureIDs[0] ) ;
+			MGL.glBindTexture( MGL.GL_TEXTURE_2D, backBuffers[0].textureIDs[0] ) ;
 			MGL.glCopyTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, 0, 0, render.x, render.y, 0 ) ;
 		}
 	}
 
-	@Override
-	public void update( final int _diff, final int _iteration )
-	{
-		state.update( _diff, _iteration ) ;
-		cameras.update( _diff, _iteration ) ;
-	}
-
-	/**
-		Return a list of resources currently being used.
-		Take the opportunity to also clear uploader 
-		of empty buffers.
-	*/
-	@Override
-	public void clean( final Set<String> _activeKeys )
-	{
-		final List<GLDraw> list = state.getActiveDraws() ;
-		for( final GLDraw draw : list )
-		{
-			draw.getUsedResources( _activeKeys ) ;
-		}
-
-		uploader.clean() ;
-	}
-
-	@Override
-	public void clear()
-	{
-		state.clear() ;
-	}
-
-	@Override
 	public void shutdown()
 	{
-		if( backbuffer != null )
+		for( int i = 0; i < backBuffers.length; ++i )
 		{
-			backbuffer.destroy() ;
-			backbuffer = null ;
+			final GLImage buffer = backBuffers[i] ;
+			if( buffer != null )
+			{
+				buffer.destroy() ;
+				backBuffers[i] = null ;
+			}
 		}
 
-		dettachRenderNotify( renderNotify ) ;
-		dettachDisplayNotify( displayNotify ) ;
-
 		MGL.glDeleteFramebuffers( 1, buffers, FRAME_BUFFER ) ;
-		MGL.glDeleteRenderbuffers( 1, buffers, COLOUR_BUFFER ) ;
-		MGL.glDeleteRenderbuffers( 1, buffers, STENCIL_BUFFER ) ;
-		//MGL.glDeleteRenderbuffers( 1, buffers, DEPTH_BUFFER ) ;
-
-		uploader.shutdown() ;
+		MGL.glDeleteTextures( buffers.length - 1, buffers, 1 ) ;
 	}
 
-	@Override
-	public void sort()
+	public String getID()
 	{
-		state.sort() ;
+		return id ;
 	}
 
-	@Override
-	public void addCamera( final CameraData _camera )
+	private void updateBufferDimensions( final World _world, final int _width, final int _height )
 	{
-		cameras.add( _camera ) ;
-	}
+		final AttachmentType[] attachments = _world.getAttachments() ;
+		for( int i = 0; i < attachments.length; ++i )
+		{
+			final AttachmentType type = attachments[i] ;
+			final int offset = i + 1 ; // add 1 to skip the framebuffer.
 
-	@Override
-	public void removeCamera( final CameraData _camera )
-	{
-		cameras.remove( _camera ) ;
-	}
+			switch( type )
+			{
+				default      :
+				case COLOUR  :
+				{
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, _width, _height, 0, MGL.GL_RGBA, MGL.GL_UNSIGNED_BYTE, null ) ;
 
-	@Override
-	public CameraData getCamera( final String _id )
-	{
-		return cameras.getCamera( _id ) ;
-	}
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
 
-	@Override
-	public void addDraw( final GLDraw _draw )
-	{
-		state.add( _draw ) ;
-	}
-
-	@Override
-	public void addDraw( final List<GLDraw> _draws )
-	{
-		state.addAll( _draws ) ;
-	}
-
-	@Override
-	public void removeDraw( final GLDraw _draw )
-	{
-		state.remove( _draw ) ;
-	}
-
-	private void updateBufferDimensions( final int _width, final int _height )
-	{
-		MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[COLOUR_BUFFER] ) ;
-		MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, _width, _height, 0, MGL.GL_RGBA, MGL.GL_UNSIGNED_BYTE, null ) ;
-
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
-
-		MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[STENCIL_BUFFER] ) ; 						//GLRenderer.handleError( "Bind Stencil" ) ;
-		MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_STENCIL_INDEX8, _width, _height ) ; //GLRenderer.handleError( "Storage Stencil" ) ;
-
-		//MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[DEPTH_BUFFER] ) ;
-		//MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_DEPTH_COMPONENT, _width, _height ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+					break ;
+				}
+				case DEPTH   :
+				{
+					MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[offset] ) ;
+					MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_DEPTH_COMPONENT, _width, _height ) ;
+					break ;
+				}
+				case STENCIL :
+				{
+					MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[offset] ) ;
+					MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_STENCIL_INDEX8, _width, _height ) ;
+					break ;
+				}
+			}
+		}
 	}
 
 	private static class GLCoreWorld extends GLWorld
 	{
-		private GLCoreWorld( final String _id, final int _order )
+		private GLCoreWorld( final World _world,
+							 final AssetLookup<Camera, GLCamera> _cameras,
+							 final AssetLookup<ABuffer, GLBuffer> _buffers )
 		{
-			super( _id, _order ) ;
+			super( _world, _cameras, _buffers, 0 ) ;
 		}
 
 		@Override
 		public void draw()
 		{
 			super.draw() ;
-			final IntVector2 renPosition = getRenderPosition() ;
-			final IntVector2 render = getRender() ;
-
-			final IntVector2 disPosition = getDisplayPosition() ;
-			final IntVector2 display = getDisplay() ;
-
 			MGL.glBindFramebuffer( MGL.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 			MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, 0 ) ;
-			MGL.glBlitFramebuffer( renPosition.x, renPosition.y, render.x, render.y,
-									  disPosition.x, disPosition.y, display.x, display.y, MGL.GL_COLOR_BUFFER_BIT , MGL.GL_LINEAR ) ;
-		}
-	}
-
-	private final class GLCameraDraw implements CameraState.IDraw<CameraData>
-	{
-		private final Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
-		private final Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
-
-		private final Matrix4 worldProjection = new Matrix4() ;
-		private final Matrix4 uiProjection = new Matrix4() ;
-
-		public GLCameraDraw() {}
-
-		@Override
-		public void draw( final CameraData _camera )
-		{
-			final CameraData.Projection projection = _camera.getProjection() ;
-			final CameraData.Screen screen = _camera.getRenderScreen() ;
-
-			final int width = ( int )screen.dimension.x ;
-			final int height = ( int )screen.dimension.y ;
-			MGL.glViewport( 0, 0, width, height ) ;
-
-			final Vector3 uiPosition = _camera.getUIPosition() ;
-			final Vector3 position = _camera.getPosition() ;
-			final Vector3 scale = _camera.getScale() ;
-			//final Vector3 rotation = _camera.getRotation() ;
-
-			worldMatrix.setIdentity() ;
-			worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
-			worldMatrix.scale( scale.x, scale.y, scale.z ) ;
-			worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
-
-			uiMatrix.setIdentity() ;
-			uiMatrix.translate( -uiPosition.x, -uiPosition.y, 0.0f ) ;
-
-			worldProjection.setIdentity() ;
-			Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
-
-			uiProjection.setIdentity() ;
-			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
-
-			final GLGeometryUploader uploader = GLWorld.this.getUploader() ;
-			uploader.draw( worldProjection, uiProjection ) ;
+			MGL.glBlitFramebuffer( renderPosition.x, renderPosition.y,
+								   render.x, render.y,
+								   displayPosition.x, displayPosition.y,
+								   display.x, display.y,
+								   MGL.GL_COLOR_BUFFER_BIT , MGL.GL_LINEAR ) ;
 		}
 	}
 }

@@ -176,10 +176,10 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
-		public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+		public void setWorldAndCamera( final World _world, final Camera _camera )
 		{
-			super.passDrawDelegate( _delegate, _world, _camera ) ;
-			dropdown.passDrawDelegate( _delegate, _world, _camera ) ;
+			super.setWorldAndCamera( _world, _camera ) ;
+			dropdown.setWorldAndCamera( _world, _camera ) ;
 		}
 
 		@Override

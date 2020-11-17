@@ -2,7 +2,6 @@ package com.linxonline.mallet.physics ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.worker.* ;
 import com.linxonline.mallet.util.Tuple ;
@@ -19,10 +18,10 @@ public class CollisionSystem
 
 	public CollisionSystem( final IAddEvent _addInterface )
 	{
-		this( _addInterface, Threaded.SINGLE ) ;
+		this( _addInterface, null ) ;
 	}
 
-	public CollisionSystem( final IAddEvent _addInterface, Threaded _type )
+	public CollisionSystem( final IAddEvent _addInterface, final WorkerGroup _workers )
 	{
 		eventController = new EventController( MalletList.toArray(
 			Tuple.<String, EventController.IProcessor<?>>build( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
@@ -39,21 +38,7 @@ public class CollisionSystem
 			} )
 		) ) ;
 
-		switch( _type )
-		{
-			default     :
-			case SINGLE :
-			{
-				treeHulls = new QuadTree() ;
-				break ;
-			}
-			case MULTI  :
-			{
-				treeHulls = new QuadTree( new WorkerGroup( "COLLISION", 4 ) ) ;
-				break ;
-			}
-		}
-		
+		treeHulls = ( _workers == null ) ? new QuadTree() : new QuadTree( _workers ) ;
 	}
 
 	public EventController getEventController()
@@ -118,7 +103,7 @@ public class CollisionSystem
 			}
 
 			@Override
-			public Hull ray( final Vector2 _start, final Vector2 _end, final Group.ID[] _filters )
+			public Hull ray( final Vector2 _start, final Vector2 _end, final int[] _filters )
 			{
 				final float step = 1.0f ;
 				final float distance = Vector2.distance( _start, _end ) ;

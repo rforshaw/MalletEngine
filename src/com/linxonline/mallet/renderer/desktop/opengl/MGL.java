@@ -28,6 +28,8 @@ public final class MGL
 	public final static int GL_RGB = GL3.GL_RGB ;
 	public final static int GL_BGR = GL3.GL_BGR ;
 	public final static int GL_RED = GL3.GL_RED ;
+	public final static int GL_DEPTH_COMPONENT = GL3.GL_DEPTH_COMPONENT ;
+	public final static int GL_DEPTH_STENCIL = GL3.GL_DEPTH_STENCIL ;
 
 	public final static int GL_UNPACK_ALIGNMENT = GL3.GL_UNPACK_ALIGNMENT ;
 
@@ -211,6 +213,11 @@ public final class MGL
 	public static void glClear( final int _target )
 	{
 		gl.glClear( _target ) ;
+	}
+
+	public static void glClearColor( final float _red, final float _green, final float _blue, final float _alpha )
+	{
+		gl.glClearColor( _red, _green, _blue, _alpha ) ;
 	}
 
 	public static void glEnableVertexAttribArray( final int _index )

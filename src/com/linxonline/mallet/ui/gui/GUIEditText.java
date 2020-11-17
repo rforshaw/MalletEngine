@@ -10,8 +10,9 @@ public class GUIEditText extends GUIText
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
 
-	private TextDraw drawEdit = null ;
-	private Draw drawCursor = null ;
+	private final Program cursorProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
+	private final Draw cursorDraw = new Draw() ;
+	private IUpdater<Draw, ?> cursorUpdater ;
 
 	private int start = 0 ;
 	private int end = 0 ;
@@ -28,36 +29,17 @@ public class GUIEditText extends GUIText
 				_textfield.makeDirty() ;
 			}
 		} ) ;
+
 		constructDraws() ;
 	}
 
 	private void constructDraws()
 	{
-		final MalletFont font = getFont() ;
-		final MalletColour colour = getColour() ;
-
 		final UITextField parent = getParent() ;
-		final int layer = parent.getLayer() + 1 ;
 
+		final MalletColour colour = getColour() ;
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
-		final Vector3 length = getLength() ;
-
-		final StringBuilder edit = getText() ;
-
-		{
-			drawEdit = DrawAssist.createTextDraw( edit,
-													font,
-													position,
-													offset,
-													new Vector3(),
-													new Vector3( 1, 1, 1 ),
-													layer + 1 ) ;
-
-			updateTextRange() ;
-			drawEdit.setColour( colour ) ;
-			DrawAssist.amendUI( drawEdit, true ) ;
-		}
 
 		{
 			final UIRatio ratio = parent.getRatio() ;
@@ -75,15 +57,9 @@ public class GUIEditText extends GUIText
 			triangle.addIndex( 2 ) ;
 			triangle.addIndex( 3 ) ;
 
-			drawCursor = DrawAssist.createDraw( position,
-												new Vector3( offset ),
-												new Vector3(),
-												new Vector3( 1, 1, 1 ),
-												layer ) ;
-
-			drawCursor.setShape( Shape.triangulate( triangle ) ) ;
-			drawCursor.setProgram( ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
-			DrawAssist.amendUI( drawCursor, true ) ;
+			cursorDraw.setPosition( position.x, position.y, position.z ) ;
+			cursorDraw.setOffset( offset.x, offset.y, offset.z ) ;
+			cursorDraw.setShape( Shape.triangulate( triangle ) ) ;
 		}
 	}
 
@@ -92,24 +68,17 @@ public class GUIEditText extends GUIText
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate _delegate, final World _world )
+	public void addDraws( final World _world )
 	{
-		super.addDraws( _delegate, _world ) ;
+		super.addDraws( _world ) ;
 		final UITextField parent = getParent() ;
-		final int layer = parent.getLayer() + 1 ;
-
-		_delegate.addTextDraw( drawEdit, _world ) ;
-
-		final StringBuilder edit = getText() ;
-		if( isEditing() == false && edit.length() <= 0 )
-		{
-			_delegate.addTextDraw( getDraw(), _world ) ;
-		}
 
 		if( isEditing() == true )
 		{
-			_delegate.addBasicDraw( drawCursor, _world ) ;
+			cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
+			cursorUpdater.addDraws( cursorDraw ) ;
 		}
+
 		parent.makeDirty() ;
 	}
 
@@ -118,22 +87,34 @@ public class GUIEditText extends GUIText
 		when the parent UIElement is flagged as invisible.
 	*/
 	@Override
-	public void removeDraws( final DrawDelegate _delegate )
+	public void removeDraws()
 	{
-		super.removeDraws( _delegate ) ;
-		_delegate.removeDraw( drawEdit ) ;
-		_delegate.removeDraw( drawCursor ) ;
+		super.removeDraws() ;
+		if( cursorUpdater != null )
+		{
+			cursorUpdater.removeDraws( cursorDraw ) ;
+		}
+	}
+
+	@Override
+	public void layerUpdated( final int _layer )
+	{
+		super.layerUpdated( _layer ) ;
+
+		{
+			if( cursorUpdater != null )
+			{
+				cursorUpdater.removeDraws( cursorDraw ) ;
+			}
+
+			cursorUpdater = DrawUpdater.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
+		}
 	}
 
 	@Override
 	public void refresh()
 	{
 		super.refresh() ;
-		final DrawDelegate delegate = getDrawDelegate() ;
-		if( delegate == null )
-		{
-			return ;
-		}
 
 		final UITextField parent = getParent() ;
 		final int layer = parent.getLayer() + 1 ;
@@ -150,39 +131,27 @@ public class GUIEditText extends GUIText
 			//offset.y = UI.align( getAlignmentY(), metrics.getHeight(), length.y ) ;
 
 			updateTextRange() ;
-
-			drawEdit.setPosition( position.x, position.y, position.z ) ;
-			drawEdit.setOffset( offset.x, offset.y, offset.z ) ;
-
-			drawEdit.setOrder( layer + 1 ) ;
-			DrawAssist.forceUpdate( drawEdit ) ;
-		}
-
-		if( isEditing() == false && edit.length() <= 0 )
-		{
-			delegate.addTextDraw( getDraw(), getWorld() ) ;
-		}
-		else
-		{
-			delegate.removeDraw( getDraw() ) ;
 		}
 
 		if( isEditing() == true )
 		{
-			delegate.addBasicDraw( drawCursor, getWorld() ) ;
-
-			drawCursor.setPosition( position.x, position.y, position.z ) ;
+			cursorDraw.setPosition( position.x, position.y, position.z ) ;
 			final int index = parent.getCursorIndex() ;
 
 			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
-			drawCursor.setOffset( xOffset, offset.y, offset.z ) ;
+			cursorDraw.setOffset( xOffset, offset.y, offset.z ) ;
 
-			drawCursor.setOrder( layer ) ;
-			DrawAssist.forceUpdate( drawCursor ) ;
+			if( cursorUpdater != null )
+			{
+				cursorUpdater.addDraws( cursorDraw ) ;
+			}
 		}
 		else
 		{
-			delegate.removeDraw( drawCursor ) ;
+			if( cursorUpdater != null )
+			{
+				cursorUpdater.removeDraws( cursorDraw ) ;
+			}
 		}
 	}
 
@@ -208,8 +177,8 @@ public class GUIEditText extends GUIText
 		start = ( index < start ) ? index : start ;
 		start = ( start >= 0 ) ? start : 0 ;
 
-		drawEdit.setStart( start ) ;
-		drawEdit.setEnd( end ) ;
+		final TextDraw draw = getTextDraw() ;
+		draw.setRange( start, end ) ;
 	}
 
 	@Override

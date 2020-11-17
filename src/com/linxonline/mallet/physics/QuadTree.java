@@ -126,7 +126,7 @@ public class QuadTree
 		root.generateContacts( _hull ) ;
 	}
 
-	public Hull getHullWithPoint( final Vector2 _point, final Group.ID[] _filters )
+	public Hull getHullWithPoint( final Vector2 _point, final int[] _filters )
 	{
 		return root.getHullWithPoint( _point, _filters ) ;
 	}
@@ -195,7 +195,7 @@ public class QuadTree
 			updateCollisions( nextHull, _hull, hulls ) ;
 		}
 
-		public Hull getHullWithPoint( final Vector2 _point, final Group.ID[] _filters )
+		public Hull getHullWithPoint( final Vector2 _point, final int[] _filters )
 		{
 			if( parent == true )
 			{

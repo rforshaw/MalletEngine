@@ -7,9 +7,9 @@ import com.linxonline.mallet.entity.Entity.Component ;
 import com.linxonline.mallet.event.IEventSystem ;
 import com.linxonline.mallet.event.Event ;
 
-import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.worker.* ;
 
 /**
 	The EntitySystem stores and updates Entities that are being 
@@ -28,34 +28,22 @@ public class EntitySystem implements IEntitySystem
 
 	public EntitySystem( final IEventSystem _eventSystem )
 	{
-		this( _eventSystem, Threaded.SINGLE ) ;
+		this( _eventSystem, null ) ;
 	}
 
-	public EntitySystem( IEventSystem _eventSystem, final Threaded _mode )
+	public EntitySystem( final IEventSystem _eventSystem, final WorkerGroup _workers )
 	{
-		this( _eventSystem, _mode, 100 ) ;
+		this( _eventSystem, _workers, 100 ) ;
 	}
 
-	public EntitySystem( IEventSystem _eventSystem,
-						 final Threaded _mode,
+	public EntitySystem( final IEventSystem _eventSystem,
+						 final WorkerGroup _workers,
 						 final int _initialCapacity )
 	{
 		capacity = _initialCapacity ;
 		eventSystem = _eventSystem ;
-		switch( _mode )
-		{
-			default     :
-			case SINGLE :
-			{
-				updater = new DefaultSTUpdate() ;
-				break ;
-			}
-			case MULTI  :
-			{
-				updater = new DefaultMTUpdate() ;
-				break ;
-			}
-		}
+
+		updater = ( _workers == null ) ? new DefaultSTUpdate() : new DefaultMTUpdate( _workers ) ;
 
 		entitiesToAdd = MalletList.<Entity>newList( capacity ) ;
 		cleanup = MalletList.<Entity>newList( capacity ) ;

@@ -12,41 +12,21 @@ public class GUIDrawEdge extends GUIDraw
 	{
 		super( _meta, _parent ) ;
 		edge = _meta.getEdge() ;
-		constructDraws() ;
-	}
 
-	/**
-		Can be used to construct Draw objects before a 
-		DrawDelegate is provided by the Rendering System.
-	*/
-	private void constructDraws()
-	{
-		final UIElement parent = getParent() ;
+		final Draw draw = getDraw() ;
+		draw.setShape( GUI.constructEdge( getLength(), edge ) ) ;
+		setColour( getColour() ) ;
+
 		final MalletTexture sheet = getTexture() ;
+		final Program program = getProgram() ;
 
-		if( sheet != null )
-		{
-			final Draw draw = DrawAssist.createDraw( getPosition(),
-													 getOffset(),
-													 new Vector3(),
-													 new Vector3( 1, 1, 1 ),
-													 parent.getLayer() ) ;
-			DrawAssist.amendUI( draw, true ) ;
-			draw.setShape( GUI.constructEdge( getLength(), edge ) ) ;
-			setColour( getColour() ) ;
-
-			final Program program = ProgramAssist.create( "SIMPLE_TEXTURE" ) ;
-			program.mapUniform( "inTex0", sheet ) ;
-
-			draw.setProgram( program ) ;
-			setDraw( draw ) ;
-		}
+		program.mapUniform( "inTex0", sheet ) ;
 	}
 
 	@Override
 	public void refresh()
 	{
-		super.refresh() ;
+		//super.refresh() ;
 		final UIElement parent = getParent() ;
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
@@ -55,15 +35,16 @@ public class GUIDrawEdge extends GUIDraw
 		updateLength( parent.getLength(), getLength() ) ;
 		updateOffset( parent.getOffset(), getOffset() ) ;
 
-		final Draw draw = getDraw() ;
-		if( draw != null && parent.isVisible() == true )
+		final DrawUpdater updater = getUpdater() ;
+		if( updater != null && parent.isVisible() == true )
 		{
+			final Draw draw = getDraw() ;
 			draw.setPosition( position.x, position.y, position.z ) ;
 			draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-			draw.setOrder( getLayer() ) ;
 			GUI.updateEdge( draw.getShape(), getLength(), edge ) ;
-			DrawAssist.forceUpdate( draw ) ;
+			draw.makeDirty() ;
+			updater.makeDirty() ;
 		}
 	}
 

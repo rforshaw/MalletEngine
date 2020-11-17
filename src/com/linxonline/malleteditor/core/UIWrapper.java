@@ -146,10 +146,10 @@ public class UIWrapper extends UIElement
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	public void setWorldAndCamera( final World _world, final Camera _camera )
 	{
-		super.passDrawDelegate( _delegate, _world, _camera ) ;
-		element.passDrawDelegate( _delegate, _world, _camera ) ;
+		super.setWorldAndCamera( _world, _camera ) ;
+		element.setWorldAndCamera( _world, _camera ) ;
 	}
 
 	@Override
@@ -362,7 +362,9 @@ public class UIWrapper extends UIElement
 
 		private MalletColour colour = MalletColour.white() ;
 
-		protected Draw draw = null ;
+		private IUpdater<Draw, ?> updater ;
+		private final Program program = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
+		protected Draw draw = new Draw() ;
 
 		public GUILineDraw( final UIElement _parent )
 		{
@@ -379,44 +381,61 @@ public class UIWrapper extends UIElement
 		public void setColour( final MalletColour _colour )
 		{
 			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
-			final Draw draw = getDraw() ;
-			if( draw != null )
+
+			final Shape shape = draw.getShape() ;
+			if( shape != null )
 			{
-				final Shape shape = getDraw().getShape() ;
-				if( shape != null )
-				{
-					GUI.updateColour( shape, colour ) ;
-				}
+				GUI.updateColour( shape, colour ) ;
+			}
+
+			if( updater != null )
+			{
+				updater.makeDirty() ;
 			}
 		}
 
 		private void constructDraws()
 		{
-			draw = DrawAssist.createDraw( getPosition(),
-										  getOffset(),
-										  new Vector3(),
-										  new Vector3( 1, 1, 1 ),
-										  getLayer() ) ;
-			DrawAssist.amendUI( draw, true ) ;
-			draw.setShape( Shape.constructOutlinePlane( getLength(), colour ) ) ;
+			final Vector3 position = getPosition() ;
+			draw.setPosition( position.x, position.y, position.z ) ;
 
-			final Program program = ProgramAssist.create( "SIMPLE_GEOMETRY" ) ;
-			draw.setProgram( program ) ;
+			final Vector3 offset = getOffset() ;
+			draw.setOffset( offset.x, offset.y, offset.z ) ;
+			draw.setShape( Shape.constructOutlinePlane( getLength(), colour ) ) ;
 		}
 
 		@Override
-		public void addDraws( final DrawDelegate _delegate, final World _world )
+		public void addDraws( final World _world )
 		{
-			if( draw != null )
+			if( updater != null )
 			{
-				_delegate.addBasicDraw( draw, _world ) ;
+				// Remove the draw object from the previous 
+				// updater the draw may have changed significantly.
+				updater.removeDraws( draw ) ;
+			}
+
+			updater = DrawUpdater.getOrCreate( _world, program, draw.getShape(), true, getLayer() ) ;
+			updater.addDraws( draw ) ;
+		}
+
+		@Override
+		public void removeDraws()
+		{
+			if( updater != null )
+			{
+				updater.removeDraws( draw ) ;
 			}
 		}
 
 		@Override
-		public void removeDraws( final DrawDelegate _delegate )
+		public void layerUpdated( int _layer )
 		{
-			_delegate.removeDraw( draw ) ;
+			if( updater != null )
+			{
+				updater.removeDraws( draw ) ;
+			}
+
+			updater = DrawUpdater.getOrCreate( getWorld(), program, draw.getShape(), true, _layer ) ;
 		}
 
 		@Override
@@ -435,8 +454,8 @@ public class UIWrapper extends UIElement
 				draw.setPosition( position.x, position.y, position.z ) ;
 				draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-				draw.setOrder( getLayer() ) ;
-				DrawAssist.forceUpdate( draw ) ;
+				draw.makeDirty() ;
+				updater.makeDirty() ;
 			}
 		}
 
@@ -449,11 +468,6 @@ public class UIWrapper extends UIElement
 		{
 			UI.align( drawAlignmentX, drawAlignmentY, _toUpdate, getLength(), getParent().getLength() ) ;
 			_toUpdate.add( _offset ) ;
-		}
-
-		public Draw getDraw()
-		{
-			return draw ;
 		}
 
 		public UI.Alignment getAlignmentX()

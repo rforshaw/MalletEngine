@@ -73,12 +73,37 @@ public class Matrix4 implements Cacheable
 		setRow( _a30, _a31, _a32, _a33, 3 ) ;
 	}
 
+	public void set( final Matrix4 _from )
+	{
+		Matrix4.copy( _from.matrix, matrix ) ;
+	}
+
 	public void setIdentity()
 	{
-		setRow( 1.0f, 0.0f, 0.0f, 0.0f, 0 ) ;
+		matrix[0] = 1.0f ;
+		matrix[1] = 0.0f ;
+		matrix[2] = 0.0f ;
+		matrix[3] = 0.0f ;
+
+		matrix[4] = 0.0f ;
+		matrix[5] = 1.0f ;
+		matrix[6] = 0.0f ;
+		matrix[7] = 0.0f ;
+
+		matrix[8] = 0.0f ;
+		matrix[9] = 0.0f ;
+		matrix[10] = 1.0f ;
+		matrix[11] = 0.0f ;
+
+		matrix[12] = 0.0f ;
+		matrix[13] = 0.0f ;
+		matrix[14] = 0.0f ;
+		matrix[15] = 1.0f ;
+
+		/*setRow( 1.0f, 0.0f, 0.0f, 0.0f, 0 ) ;
 		setRow( 0.0f, 1.0f, 0.0f, 0.0f, 1 ) ;
 		setRow( 0.0f, 0.0f, 1.0f, 0.0f, 2 ) ;
-		setRow( 0.0f, 0.0f, 0.0f, 1.0f, 3 ) ;
+		setRow( 0.0f, 0.0f, 0.0f, 1.0f, 3 ) ;*/
 	}
 
 	public void translate( final float _x, final float _y, final float _z )
@@ -95,9 +120,13 @@ public class Matrix4 implements Cacheable
 
 	public void setTranslate( final float _x, final float _y, final float _z )
 	{
-		set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
-		set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
-		set( _z, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
+		matrix[3] = _x ;
+		matrix[7] = _y ;
+		matrix[11] = _z ;
+	
+		//set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
+		//set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
+		//set( _z, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
 							//	[0 | 0 | 0 |  1]
 	}
 
@@ -120,9 +149,13 @@ public class Matrix4 implements Cacheable
 
 	public void setScale( final float _x, final float _y, final float _z )
 	{
-		set( _x, 0, 0 ) ;	//	[_x |  0 |  0 | 0]
-		set( _y, 1, 1 ) ;	//	[ v | _y |  0 | 0]
-		set( _z, 2, 2 ) ;	//	[ 0 |  0 | _z | 0]
+		matrix[0] = _x ;
+		matrix[5] = _y ;
+		matrix[10] = _z ;
+	
+		//set( _x, 0, 0 ) ;	//	[_x |  0 |  0 | 0]
+		//set( _y, 1, 1 ) ;	//	[ v | _y |  0 | 0]
+		//set( _z, 2, 2 ) ;	//	[ 0 |  0 | _z | 0]
 							//	[ 0 |  0 |  0 | 1]
 	}
 	
@@ -150,76 +183,102 @@ public class Matrix4 implements Cacheable
 	{
 		final float cos = ( float )Math.cos( _theta ) ;
 		final float sin = ( float )Math.sin( _theta ) ;
-		set( cos, 1, 1 ) ; set( -sin, 1, 2 ) ;	//	[cos | -sin |  0]
-		set( sin, 2, 1 ) ; set(  cos, 2, 2 ) ;	//	[sin |  cos |  0]
-												//	[ 0  |   0  |  1]
+
+		matrix[5] = cos ;
+		matrix[6] = -sin ;
+
+		matrix[9] = sin ;
+		matrix[10] = cos ;
+
+		//	[cos | -sin |  0]
+		//	[sin |  cos |  0]
+		//	[ 0  |   0  |  1]
 	}
 
 	public void setRotateY( final float _theta )
 	{
 		final float cos = ( float )Math.cos( _theta ) ;
 		final float sin = ( float )Math.sin( _theta ) ;
-		set( cos, 0, 0 ) ; set( sin, 0, 2 ) ;	//	[cos | -sin |  0]
-		set( -sin, 2, 0 ) ; set(  cos, 2, 2 ) ;	//	[sin |  cos |  0]
-												//	[ 0  |   0  |  1]
+
+		matrix[0] = cos ;
+		matrix[2] = sin ;
+
+		matrix[8] = -sin ;
+		matrix[10] = cos ;
+
+		//	[cos | -sin |  0]
+		//	[sin |  cos |  0]
+		//	[ 0  |   0  |  1]
 	}
 
 	public void setRotateZ( final float _theta )
 	{
 		final float cos = ( float )Math.cos( _theta ) ;
 		final float sin = ( float )Math.sin( _theta ) ;
-		set( cos, 0, 0 ) ; set( -sin, 0, 1 ) ;	//	[cos | -sin |  0]
-		set( sin, 1, 0 ) ; set(  cos, 1, 1 ) ;	//	[sin |  cos |  0]
-												//	[ 0  |   0  |  1]
+
+		matrix[0] = cos ;
+		matrix[1] = -sin ;
+
+		matrix[4] = sin ;
+		matrix[5] = cos ;
+
+		//	[cos | -sin |  0]
+		//	[sin |  cos |  0]
+		//	[ 0  |   0  |  1]
 	}
 
 	public void multiply( final Matrix4 _mat )
 	{
+		final float[] m = this.matrix ;				// Makes it easier to read
 		final float[] x = _mat.matrix ;
-		Matrix4.multiplyStage1( this, x ) ;
-		Matrix4.multiplyStage2( this, x ) ;
-		Matrix4.multiplyStage3( this, x ) ;
-		Matrix4.multiplyStage4( this, x ) ;
-	}
+		
+		{
+			final float a00 = m[0] * x[0] + m[1] * x[4] + m[2] * x[ 8] + m[3] * x[12] ;
+			final float a01 = m[0] * x[1] + m[1] * x[5] + m[2] * x[ 9] + m[3] * x[13] ;
+			final float a02 = m[0] * x[2] + m[1] * x[6] + m[2] * x[10] + m[3] * x[14] ;
+			final float a03 = m[0] * x[3] + m[1] * x[7] + m[2] * x[11] + m[3] * x[15] ;
 
-	private static void multiplyStage1( final Matrix4 _m, final float[] _x )
-	{
-		final float[] m = _m.matrix ;				// Makes it easier to read
-		final float a00 = FloatBuffer.multiply( m, 0, _x, 0 ) + FloatBuffer.multiply( m, 1, _x, 4 ) + FloatBuffer.multiply( m, 2, _x,  8 ) + FloatBuffer.multiply( m, 3, _x, 12 ) ;
-		final float a01 = FloatBuffer.multiply( m, 0, _x, 1 ) + FloatBuffer.multiply( m, 1, _x, 5 ) + FloatBuffer.multiply( m, 2, _x,  9 ) + FloatBuffer.multiply( m, 3, _x, 13 ) ;
-		final float a02 = FloatBuffer.multiply( m, 0, _x, 2 ) + FloatBuffer.multiply( m, 1, _x, 6 ) + FloatBuffer.multiply( m, 2, _x, 10 ) + FloatBuffer.multiply( m, 3, _x, 14 ) ;
-		final float a03 = FloatBuffer.multiply( m, 0, _x, 3 ) + FloatBuffer.multiply( m, 1, _x, 7 ) + FloatBuffer.multiply( m, 2, _x, 11 ) + FloatBuffer.multiply( m, 3, _x, 15 ) ;
-		_m.setRow( a00, a01, a02, a03, 0 ) ;
-	}
+			m[0] = a00 ;
+			m[1] = a01 ;
+			m[2] = a02 ;
+			m[3] = a03 ;
+		}
 
-	private static void multiplyStage2( final Matrix4 _m, final float[] _x )
-	{
-		final float[] m = _m.matrix ;				// Makes it easier to read
-		final float a10 = FloatBuffer.multiply( m, 4, _x, 0 ) + FloatBuffer.multiply( m, 5, _x, 4 ) + FloatBuffer.multiply( m, 6, _x,  8 ) + FloatBuffer.multiply( m, 7, _x, 12 ) ;
-		final float a11 = FloatBuffer.multiply( m, 4, _x, 1 ) + FloatBuffer.multiply( m, 5, _x, 5 ) + FloatBuffer.multiply( m, 6, _x,  9 ) + FloatBuffer.multiply( m, 7, _x, 13 ) ;
-		final float a12 = FloatBuffer.multiply( m, 4, _x, 2 ) + FloatBuffer.multiply( m, 5, _x, 6 ) + FloatBuffer.multiply( m, 6, _x, 10 ) + FloatBuffer.multiply( m, 7, _x, 14 ) ;
-		final float a13 = FloatBuffer.multiply( m, 4, _x, 3 ) + FloatBuffer.multiply( m, 5, _x, 7 ) + FloatBuffer.multiply( m, 6, _x, 11 ) + FloatBuffer.multiply( m, 7, _x, 15 ) ;
-		_m.setRow( a10, a11, a12, a13, 1 ) ;
-	}
+		{
+			final float a10 = m[4] * x[0] + m[5] * x[4] + m[6] * x[ 8] + m[7] * x[12] ;
+			final float a11 = m[4] * x[1] + m[5] * x[5] + m[6] * x[ 9] + m[7] * x[13] ;
+			final float a12 = m[4] * x[2] + m[5] * x[6] + m[6] * x[10] + m[7] * x[14] ;
+			final float a13 = m[4] * x[3] + m[5] * x[7] + m[6] * x[11] + m[7] * x[15] ;
 
-	private static void multiplyStage3( final Matrix4 _m, final float[] _x )
-	{
-		final float[] m = _m.matrix ;				// Makes it easier to read
-		final float a20 = FloatBuffer.multiply( m, 8, _x, 0 ) + FloatBuffer.multiply( m, 9, _x, 4 ) + FloatBuffer.multiply( m, 10, _x,  8 ) + FloatBuffer.multiply( m, 11, _x, 12 ) ;
-		final float a21 = FloatBuffer.multiply( m, 8, _x, 1 ) + FloatBuffer.multiply( m, 9, _x, 5 ) + FloatBuffer.multiply( m, 10, _x,  9 ) + FloatBuffer.multiply( m, 11, _x, 13 ) ;
-		final float a22 = FloatBuffer.multiply( m, 8, _x, 2 ) + FloatBuffer.multiply( m, 9, _x, 6 ) + FloatBuffer.multiply( m, 10, _x, 10 ) + FloatBuffer.multiply( m, 11, _x, 14 ) ;
-		final float a23 = FloatBuffer.multiply( m, 8, _x, 3 ) + FloatBuffer.multiply( m, 9, _x, 7 ) + FloatBuffer.multiply( m, 10, _x, 11 ) + FloatBuffer.multiply( m, 11, _x, 15 ) ;
-		_m.setRow( a20, a21, a22, a23, 2 ) ;
-	}
+			m[4] = a10 ;
+			m[5] = a11 ;
+			m[6] = a12 ;
+			m[7] = a13 ;
+		}
 
-	private static void multiplyStage4( final Matrix4 _m, final float[] _x )
-	{
-		final float[] m = _m.matrix ;				// Makes it easier to read
-		final float a30 = FloatBuffer.multiply( m, 12, _x, 0 ) + FloatBuffer.multiply( m, 13, _x, 4 ) + FloatBuffer.multiply( m, 14, _x,  8 ) + FloatBuffer.multiply( m, 15, _x, 12 ) ;
-		final float a31 = FloatBuffer.multiply( m, 12, _x, 1 ) + FloatBuffer.multiply( m, 13, _x, 5 ) + FloatBuffer.multiply( m, 14, _x,  9 ) + FloatBuffer.multiply( m, 15, _x, 13 ) ;
-		final float a32 = FloatBuffer.multiply( m, 12, _x, 2 ) + FloatBuffer.multiply( m, 13, _x, 6 ) + FloatBuffer.multiply( m, 14, _x, 10 ) + FloatBuffer.multiply( m, 15, _x, 14 ) ;
-		final float a33 = FloatBuffer.multiply( m, 12, _x, 3 ) + FloatBuffer.multiply( m, 13, _x, 7 ) + FloatBuffer.multiply( m, 14, _x, 11 ) + FloatBuffer.multiply( m, 15, _x, 15 ) ;
-		_m.setRow( a30, a31, a32, a33, 3 ) ;
+		{
+			final float a20 = m[8] * x[0] + m[9] * x[4] + m[10] * x[ 8] + m[11] * x[12] ;
+			final float a21 = m[8] * x[1] + m[9] * x[5] + m[10] * x[ 9] + m[11] * x[13] ;
+			final float a22 = m[8] * x[2] + m[9] * x[6] + m[10] * x[10] + m[11] * x[14] ;
+			final float a23 = m[8] * x[3] + m[9] * x[7] + m[10] * x[11] + m[11] * x[15] ;
+
+			m[8]  = a20 ;
+			m[9]  = a21 ;
+			m[10] = a22 ;
+			m[11] = a23 ;
+		}
+
+		{
+			final float a30 = m[12] * x[0] + m[13] * x[4] + m[14] * x[ 8] + m[15] * x[12] ;
+			final float a31 = m[12] * x[1] + m[13] * x[5] + m[14] * x[ 9] + m[15] * x[13] ;
+			final float a32 = m[12] * x[2] + m[13] * x[6] + m[14] * x[10] + m[15] * x[14] ;
+			final float a33 = m[12] * x[3] + m[13] * x[7] + m[14] * x[11] + m[15] * x[15] ;
+
+			m[12] = a30 ;
+			m[13] = a31 ;
+			m[14] = a32 ;
+			m[15] = a33 ;
+		}
 	}
 
 	public void invert()
@@ -366,11 +425,11 @@ public class Matrix4 implements Cacheable
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
 		final float[] m = _b.matrix ;
-		_result.setXYZ( FloatBuffer.multiply( m, 0, _a.x ) + FloatBuffer.multiply( m, 1, _a.y ) + FloatBuffer.multiply( m,  2, _a.z ) + FloatBuffer.multiply( m,  3, 1.0f ),
-						FloatBuffer.multiply( m, 4, _a.x ) + FloatBuffer.multiply( m, 5, _a.y ) + FloatBuffer.multiply( m,  6, _a.z ) + FloatBuffer.multiply( m,  7, 1.0f ),
-						FloatBuffer.multiply( m, 8, _a.x ) + FloatBuffer.multiply( m, 9, _a.y ) + FloatBuffer.multiply( m, 10, _a.z ) + FloatBuffer.multiply( m, 11, 1.0f ) ) ;
+		_result.x = m[0] * _a.x + m[1] * _a.y + m[ 2] * _a.z + m[ 3] ;//* 1.0f ;
+		_result.y = m[4] * _a.x + m[5] * _a.y + m[ 6] * _a.z + m[ 7] ;//* 1.0f ;
+		_result.z = m[8] * _a.x + m[9] * _a.y + m[10] * _a.z + m[11] ;//* 1.0f ;
 
-		final float w = FloatBuffer.multiply( m, 12, _a.x ) + FloatBuffer.multiply( m, 13, _a.y ) + FloatBuffer.multiply( m, 14, _a.z ) + FloatBuffer.multiply( m, 15, 1.0f ) ;
+		final float w = m[12] * _a.x + m[13] * _a.y + m[14] * _a.z + m[15] ;//* 1.0f ;
 		_result.divide( w ) ;
 
 		return _result ;
@@ -382,10 +441,10 @@ public class Matrix4 implements Cacheable
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
 	{
 		final float[] m = _b.matrix ;
-		final float w = FloatBuffer.multiply( m, 12, _a.x ) + FloatBuffer.multiply( m, 13, _a.y ) + FloatBuffer.multiply( m, 14, _a.z ) + FloatBuffer.multiply( m, 15, 1.0f ) ;
-		_a.setXYZ( FloatBuffer.multiply( m, 0, _a.x ) + FloatBuffer.multiply( m, 1, _a.y ) + FloatBuffer.multiply( m,  2, _a.z ) + FloatBuffer.multiply( m,  3, 1.0f ),
-				   FloatBuffer.multiply( m, 4, _a.x ) + FloatBuffer.multiply( m, 5, _a.y ) + FloatBuffer.multiply( m,  6, _a.z ) + FloatBuffer.multiply( m,  7, 1.0f ),
-				   FloatBuffer.multiply( m, 8, _a.x ) + FloatBuffer.multiply( m, 9, _a.y ) + FloatBuffer.multiply( m, 10, _a.z ) + FloatBuffer.multiply( m, 11, 1.0f ) ) ;
+		final float w = m[12] * _a.x + m[13] * _a.y + m[14] * _a.z + m[15] * 1.0f ;
+		_a.x = m[0] * _a.x + m[1] * _a.y + m[ 2] * _a.z + m[ 3] * 1.0f ;
+		_a.y = m[4] * _a.x + m[5] * _a.y + m[ 6] * _a.z + m[ 7] * 1.0f ;
+		_a.z = m[8] * _a.x + m[9] * _a.y + m[10] * _a.z + m[11] * 1.0f ;
 
 		_a.divide( w ) ;
 		return _a ;

@@ -48,8 +48,20 @@ public class MalletTexture
 	*/
 	public MalletTexture( final World _world )
 	{
+		// If no attachment index is specified always use the 
+		// first attachment meta.
 		// World backbuffer is set to NEAREST REPEAT.
-		this( TextureAssist.createMeta( _world ), Filter.NEAREST, Wrap.REPEAT ) ;
+		this( _world, 0 ) ;
+	}
+
+	/**
+		Construct a MalletTexture that uses the World's
+		framebuffer as a texture object.
+	*/
+	public MalletTexture( final World _world, final int _attachmentIndex )
+	{
+		// World backbuffer is set to NEAREST REPEAT.
+		this( _world.getMeta( _attachmentIndex ), Filter.NEAREST, Wrap.REPEAT ) ;
 	}
 
 	private MalletTexture( final Meta _meta,
@@ -58,7 +70,7 @@ public class MalletTexture
 	{
 		this( _meta, _filter, _filter, _wrap, _wrap ) ;
 	}
-	
+
 	private MalletTexture( final Meta _meta,
 						   final Filter _min, 
 						   final Filter _max,
@@ -163,6 +175,11 @@ public class MalletTexture
 		return meta.ratio ;
 	}
 
+	public Meta getMeta()
+	{
+		return meta ;
+	}
+
 	public Wrap getUWrap()
 	{
 		return uWrap ;
@@ -183,6 +200,7 @@ public class MalletTexture
 		return minFilter ;
 	}
 
+	@Override
 	public String toString()
 	{
 		return meta.toString() ;
@@ -207,14 +225,24 @@ public class MalletTexture
 		public final String path ;
 		public final IntVector2 dimensions = new IntVector2() ;
 		public final Ratio ratio ;
+		private final int attachmentIndex ;
 
 		public Meta( final String _path,
+					 final int _height,
+					 final int _width )
+		{
+			this( _path, 0, _height, _width ) ;
+		}
+
+		public Meta( final String _path,
+					 final int _attachmentIndex,
 					 final int _height,
 					 final int _width )
 		{
 			path = _path ;
 			set( _width, _height ) ;
 			ratio = Ratio.calculateRatio( _width, _height ) ;
+			attachmentIndex = _attachmentIndex ;
 		}
 
 		public void set( final int _width, final int _height )
@@ -257,6 +285,11 @@ public class MalletTexture
 		public String getPath()
 		{
 			return path ;
+		}
+
+		public int getAttachmentIndex()
+		{
+			return attachmentIndex ;
 		}
 
 		@Override

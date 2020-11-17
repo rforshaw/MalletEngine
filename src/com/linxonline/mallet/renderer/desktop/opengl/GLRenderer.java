@@ -4,6 +4,7 @@ import java.util.Set ;
 import java.util.HashSet ;
 import java.util.List ;
 import java.util.ArrayList ;
+import java.text.MessageFormat ;
 
 import com.jogamp.newt.opengl.GLWindow ;
 import com.jogamp.opengl.GLAutoDrawable ;
@@ -14,7 +15,6 @@ import com.jogamp.opengl.GLEventListener ;
 
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.MalletList ;
@@ -30,9 +30,10 @@ import com.linxonline.mallet.util.schema.SStruct ;
 import com.linxonline.mallet.util.schema.SArray ;
 import com.linxonline.mallet.util.schema.SNode ;
 
-import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
+
+import com.linxonline.mallet.renderer.* ; ;
 
 public class GLRenderer extends BasicRenderer implements GLEventListener
 {
@@ -53,15 +54,23 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	private GLWindow canvas ;
-	private final Worlds<GLDraw, CameraData, GLWorld> worlds = new Worlds<GLDraw, CameraData, GLWorld>() ;
 
-	private CameraData defaultCamera = new CameraData( "MAIN" ) ;
 	private int viewMode = ORTHOGRAPHIC_MODE ;
+
+	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
+	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
+	private final AssetLookup<ABuffer, GLBuffer> bufferLookup = new AssetLookup<ABuffer, GLBuffer>( "BUFFER" ) ;
+	private final AssetLookup<Program, GLProgram> programLookup = new AssetLookup<Program, GLProgram>( "PROGRAM" ) ;
+
+	private static List<Camera> cameras = new ArrayList<Camera>() ;
+	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
+
+	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
+	private final List<IUpdater<?, ? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<?, ? extends ABuffer>>() ;
 
 	public GLRenderer()
 	{
 		super() ;
-		textures.setWorldState( worlds ) ;
 		initWindow() ;
 	}
 
@@ -82,8 +91,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		CameraAssist.setAssist( createCameraAssist() ) ;
 
 		canvas.addGLEventListener( this ) ;
-		initDefaultWorld() ;
-
 		canvas.setVisible( true ) ;
 	}
 
@@ -95,135 +102,16 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		{
 			clear() ;							// Clear the contents being rendered
 
-			worlds.shutdown() ;
+			for( final GLWorld world : worlds )
+			{
+				world.shutdown() ;
+			}
+
 			programs.shutdown() ;
 			textures.shutdown() ;				// We'll loose all texture and font resources
 			fontManager.shutdown() ;
 			release() ;
 		}
-	}
-
-	@Override
-	protected DrawDelegate constructDrawDelegate()
-	{
-		return new DrawDelegate()
-		{
-			private final ArrayList<GLDraw> data = new ArrayList<GLDraw>() ;
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final TextDraw _draw )
-			{
-				addTextDraw( _draw, null ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addBasicDraw( final Draw _draw )
-			{
-				addBasicDraw( _draw, null ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final List<TextDraw> _draws )
-			{
-				addTextDraw( _draws, null ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addBasicDraw( final List<Draw> _draws )
-			{
-				addBasicDraw( _draws, null ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final TextDraw _draw, final World _world )
-			{
-				final GLWorld world = ( GLWorld )_world ;
-				final GLDraw draw = ( GLDraw )_draw ;
-
-				data.add( draw ) ;
-				worlds.addDraw( draw, world ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addBasicDraw( final Draw _draw, final World _world )
-			{
-				final GLWorld world = ( GLWorld )_world ;
-				final GLDraw draw = ( GLDraw )_draw ;
-
-				data.add( draw ) ;
-				worlds.addDraw( draw, world ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addTextDraw( final List<TextDraw> _draws, final World _world )
-			{
-				data.ensureCapacity( data.size() + _draws.size() ) ;
-				final GLWorld world = ( GLWorld )_world ;
-				final List<GLDraw> draws = ( List<GLDraw> )( Object )_draws ;
-
-				data.addAll( draws ) ;
-				worlds.addDraw( draws, world ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void addBasicDraw( final List<Draw> _draws, final World _world )
-			{
-				data.ensureCapacity( data.size() + _draws.size() ) ;
-				final GLWorld world = ( GLWorld )_world ;
-				final List<GLDraw> draws = ( List<GLDraw> )( Object )_draws ;
-
-				data.addAll( draws ) ;
-				worlds.addDraw( draws, world ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public void removeDraw( final Draw _draw )
-			{
-				final GLDraw draw = ( GLDraw )_draw ;
-				if( draw != null )
-				{
-					data.remove( draw ) ;
-					worlds.removeDraw( draw ) ;
-				}
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public Camera getCamera( final String _id, final World _world )
-			{
-				final GLWorld world = ( GLWorld )_world ;
-				return worlds.getCamera( _id, world ) ;
-			}
-
-			@Override
-			@SuppressWarnings( "unchecked" )
-			public World getWorld( final String _id )
-			{
-				return ( GLWorld )worlds.getWorld( _id ) ;
-			}
-
-			@Override
-			public void shutdown()
-			{
-				if( data.isEmpty() == false )
-				{
-					for( final GLDraw draw : data  )
-					{
-						worlds.removeDraw( draw ) ;
-					}
-					data.clear() ;
-				}
-			}
-		} ;
 	}
 
 	public FontAssist.Assist createFontAssist()
@@ -262,23 +150,9 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public MalletTexture.Meta createMeta( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				return world.getMeta() ;
-			}
-
-			@Override
 			public Vector2 getMaximumTextureSize()
 			{
 				return new Vector2( maxTextureSize ) ;
-			}
-
-			private GLWorld cast( final World _world )
-			{
-				assert( _world != null ) ;
-				assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
 			}
 		} ;
 	}
@@ -288,125 +162,96 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public Draw amendUI( final Draw _draw, final boolean _ui )
+			public <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
-				basic.setUI( _ui ) ;
-				return _draw ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						drawUpdaters.add( _updater ) ;
+					}
+				} ) ;
+				return _updater ;
 			}
 
 			@Override
-			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
+			public <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
-				basic.setInterpolationMode( _interpolation ) ;
-				return _draw ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						drawUpdaters.remove( _updater ) ;
+					}
+				} ) ;
+				return _updater ;
 			}
 
 			@Override
-			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
+			public <T extends ABuffer> T add( final T _buffer )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
-				basic.setUpdateType( _type ) ;
-				return _draw ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLBuffer buff = create( _buffer ) ;
+						bufferLookup.map( _buffer.index(), _buffer, buff ) ;
+						if( updateBuffer( _buffer, buff ) == false )
+						{
+							DrawAssist.update( _buffer ) ;
+						}
+					}
+				} ) ;
+				return _buffer ;
 			}
 
 			@Override
-			public Draw forceUpdate( final Draw _draw )
+			public <T extends ABuffer> T remove( final T _buffer )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
-				basic.forceUpdate() ;
-				return _draw ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final Tuple<ABuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
+						if( tuple != null )
+						{
+							final GLBuffer buff = tuple.getRight() ;
+							buff.shutdown() ;
+						}
+					}
+				} ) ;
+				return _buffer ;
 			}
 
 			@Override
-			public boolean isUI( final Draw _draw )
+			public <T extends ABuffer> T update( final T _buffer )
 			{
-				final BasicDraw<GLProgram> basic = cast( _draw ).getBasicData() ;
-				return basic.isUI() ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
+						if( buff != null )
+						{
+							if( updateBuffer( _buffer, buff ) == false )
+							{
+								DrawAssist.update( _buffer ) ;
+							}
+						}
+					}
+				} ) ;
+				return _buffer ;
 			}
 
-			@Override
-			public TextDraw createTextDraw( final StringBuilder _text,
-											final MalletFont _font,
-											final Vector3 _position,
-											final Vector3 _offset,
-											final Vector3 _rotation,
-											final Vector3 _scale,
-											final int _order )
+			private GLBuffer create( final ABuffer _buffer )
 			{
-				final GLTextDraw draw = new GLTextDraw( UpdateType.ON_DEMAND,
-														Interpolation.NONE,
-														_position,
-														_offset,
-														_rotation,
-														_scale,
-														_order ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
-				program.mapUniform( "inTex0", _font ) ;
-
-				draw.setProgram( program ) ;
-				final TextData text = draw.getTextData() ;
-				text.setText( _text ) ;
-				return draw ;
-			}
-
-			@Override
-			public TextDraw createTextDraw( final String _text,
-											final MalletFont _font,
-											final Vector3 _position,
-											final Vector3 _offset,
-											final Vector3 _rotation,
-											final Vector3 _scale,
-											final int _order )
-			{
-				final StringBuilder builder = new StringBuilder( _text ) ;
-				return createTextDraw( builder, _font, _position, _offset, _rotation, _scale, _order ) ;
-			}
-
-			@Override
-			public StencilDraw createClipDraw( final Vector3 _position,
-											   final Vector3 _offset,
-											   final Vector3 _rotation,
-											   final Vector3 _scale,
-											   final int _startOrder,
-											   final int _endOrder )
-			{
-				final GLStencilDraw draw = new GLStencilDraw( UpdateType.ON_DEMAND,
-															  Interpolation.NONE,
-															  _position,
-															  _offset,
-															  _rotation,
-															  _scale,
-															  _startOrder ) ;
-				draw.setEndOrder( _endOrder ) ;
-
-				draw.setProgram( ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
-				return draw ;
-			}
-
-			@Override
-			public Draw createDraw( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order )
-			{
-				return new GLBasicDraw( UpdateType.ON_DEMAND,
-										Interpolation.NONE,
-										_position,
-										_offset,
-										_rotation,
-										_scale,
-										_order ) ;
-			}
-
-			private GLDraw cast( final Draw _draw )
-			{
-				assert( _draw != null ) ;
-				assert( !( _draw instanceof GLDraw ) ) ;
-				return ( GLDraw )_draw ;
+				switch( _buffer.getBufferType() )
+				{
+					default              : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
+					case GEOMETRY_BUFFER : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
+					case TEXT_BUFFER     : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
+					case DRAW_BUFFER     : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+				}
 			}
 		} ;
 	}
@@ -415,19 +260,55 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		return new ProgramAssist.Assist()
 		{
-			public void load( final String _id, final String _path ) {}
-
-			public Program create( final String _id )
+			@Override
+			public void load( final String _id, final String _path )
 			{
-				final Program program = new ProgramMap<GLProgram>( _id ) ;
-				return program ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						programs.load( _id, MessageFormat.format( _path, "desktop" ) ) ;
+					}
+				} ) ;
 			}
 
-			private ProgramMap<GLProgram> cast( final Program _program )
+			@Override
+			public Program add( final Program _program )
 			{
-				assert( _program != null ) ;
-				assert( !( _program instanceof ProgramMap ) ) ;
-				return ( ProgramMap<GLProgram> )_program ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLProgram glProgram = programs.get( _program.getID() ) ;
+						if( glProgram == null )
+						{
+							add( _program ) ;
+							return ;
+						}
+						programLookup.map( _program.index(), _program, glProgram ) ;
+					}
+				} ) ;
+				return _program ;
+			}
+
+			@Override
+			public Program update( final Program _program )
+			{
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final int index = _program.index() ;
+						final GLProgram glProgram = programLookup.getRHS( index ) ;
+						if( glProgram == null )
+						{
+							update( _program ) ;
+							return ;
+						}
+						programLookup.map( index, _program, glProgram ) ;
+					}
+				} ) ;
+				return _program ;
 			}
 		} ;
 	}
@@ -437,80 +318,66 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new WorldAssist.Assist()
 		{
 			@Override
-			public World getDefaultWorld()
+			public World getDefault()
 			{
-				return worlds.getWorld( ( GLWorld )null ) ;
+				return GLRenderer.this.getDefaultWorld() ;
 			}
 
 			@Override
-			public World getWorld( final String _id )
-			{
-				return worlds.getWorld( _id ) ;
-			}
-
-			@Override
-			public World addWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				worlds.addWorld( world ) ;
-				return _world ;
-			}
-
-			@Override
-			public World removeWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				worlds.removeWorld( world ) ;
-				return _world ;
-			}
-
-			@Override
-			public void destroyWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-			}
-
-			@Override
-			public World setRenderDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
+			public World add( final World _world )
 			{
 				GLRenderer.this.invokeLater( new Runnable()
 				{
 					public void run()
 					{
-						final GLWorld world = cast( _world ) ;
-						world.setRenderDimensions( _x, _y, _width, _height ) ;
+						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
+						worldLookup.map( _world.index(), _world, world ) ;
+						worlds.add( world ) ;
+					}
+				} ) ;
+
+				return _world ;
+			}
+
+			@Override
+			public World remove( final World _world )
+			{
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final Tuple<World, GLWorld> tuple = worldLookup.unmap( _world.index() ) ;
+						if( tuple != null )
+						{
+							final GLWorld world = tuple.getRight() ;
+							worlds.remove( world ) ;
+							world.shutdown() ;
+						}
 					}
 				} ) ;
 				return _world ;
 			}
 
 			@Override
-			public World setDisplayDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
+			public World update( final World _world )
 			{
 				GLRenderer.this.invokeLater( new Runnable()
 				{
 					public void run()
 					{
-						final GLWorld world = cast( _world ) ;
-						world.setDisplayDimensions( _x, _y, _width, _height ) ;
+						final GLWorld world = get( _world ) ;
+						if( world != null )
+						{
+							world.update( _world, cameraLookup, bufferLookup ) ;
+						}
 					}
 				} ) ;
 				return _world ;
 			}
 
-			@Override
-			public World constructWorld( final String _id, final int _order )
+			private GLWorld get( final World _world )
 			{
-				final GLWorld world = GLWorld.create( _id, _order ) ;
-				worlds.addWorld( world ) ;
-				return world ;
-			}
-
-			private GLWorld cast( final World _world )
-			{
-				assert( _world != null ) ;
-				assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
+				return worldLookup.getRHS( _world.index() ) ;
 			}
 		} ;
 	}
@@ -520,48 +387,60 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new CameraAssist.Assist()
 		{
 			@Override
-			public Camera getDefaultCamera()
+			public Camera getDefault()
 			{
-				return defaultCamera ;
+				return GLRenderer.this.getDefaultCamera() ;
 			}
 
 			@Override
-			public Camera addCamera( final Camera _camera, final World _world )
+			public Camera add( final Camera _camera )
 			{
-				final GLWorld temp = cast( _world ) ;
-				final GLWorld world = worlds.getWorld( temp ) ;
-				worlds.addCamera( cast( _camera ), world ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLCamera camera = new GLCamera( _camera ) ;
+						cameraLookup.map( _camera.index(), _camera, camera ) ;
+						cameras.add( _camera ) ;
+					}
+				} ) ;
 				return _camera ;
 			}
 
 			@Override
-			public Camera removeCamera( final Camera _camera, final World _world )
+			public Camera remove( final Camera _camera )
 			{
-				worlds.removeCamera( cast( _camera ) ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						cameras.remove( _camera ) ;
+						cameraLookup.unmap( _camera.index() ) ;
+					}
+				} ) ;
 				return _camera ;
 			}
 
 			@Override
-			public Camera createCamera( final String _id,
-										final Vector3 _position,
-										final Vector3 _rotation,
-										final Vector3 _scale )
+			public Camera update( final Camera _camera ) 
 			{
-				return new CameraData( _id, _position, _rotation, _scale ) ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLCamera camera = get( _camera ) ;
+						if( camera != null )
+						{
+							camera.update( _camera ) ;
+						}
+					}
+				} ) ;
+				return _camera ;
 			}
 
-			private GLWorld cast( final World _world )
+			private GLCamera get( final Camera _camera )
 			{
-				assert( _world != null ) ;
-				assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
-			}
-
-			private CameraData cast( final Camera _camera )
-			{
-				assert( _camera != null ) ;
-				assert( !( _camera instanceof CameraData ) ) ;
-				return ( CameraData )_camera ;
+				return cameraLookup.getRHS( _camera.index() ) ;
 			}
 		} ;
 	}
@@ -690,13 +569,15 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		canvas.setSize( _width, _height ) ;
 	}
 
-	private static void updateCameraAndWorldDisplay( final int _width, final int _height )
+	private void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
-		final Camera camera = CameraAssist.getDefaultCamera() ;
+		final Camera camera = getDefaultCamera() ;
 		camera.setDisplayResolution( _width, _height ) ;
+		CameraAssist.update( camera ) ;
 
-		final World world = WorldAssist.getDefaultWorld() ;
-		WorldAssist.setDisplayDimensions( world, 0, 0, _width, _height ) ;
+		final World world = getDefaultWorld() ;
+		world.setDisplayDimensions( 0, 0, _width, _height ) ;
+		WorldAssist.update( world ) ;
 	}
 	
 	@Override
@@ -709,7 +590,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		MGL.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 
 		MGL.glEnable( MGL.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
-		MGL.glPrimitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+		MGL.glPrimitiveRestartIndex( GLBuffer.PRIMITIVE_RESTART_INDEX ) ;
 
 		MGL.glEnable( MGL.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
 		MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
@@ -718,12 +599,13 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		MGL.glCullFace( MGL.GL_BACK ) ;  
 		MGL.glFrontFace( MGL.GL_CCW ) ;
 
+		initDefaultWorld() ;
+
 		System.out.println( "Building default shaders.." ) ;
 		programs.load( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
 		programs.load( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
 		programs.load( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
 		programs.load( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
-		programs.load( "SIMPLE_STORAGE_TEXTURE",  "base/shaders/desktop/simple_storage_texture.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.
@@ -749,12 +631,14 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			// and render size are meant to be identical.
 			// Some users will not want parity, using a larger window 
 			// size but rendering to a smaller size and subsequently being upscaled.
-			final Camera camera = CameraAssist.getDefaultCamera() ;
+			final Camera camera = getDefaultCamera() ;
 			camera.setScreenResolution( _width, _height ) ;
 			camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+			CameraAssist.update( camera ) ;
 
-			final World world = WorldAssist.getDefaultWorld() ;
-			WorldAssist.setRenderDimensions( world, 0, 0, _width, _height ) ;
+			final World world = getDefaultWorld() ;
+			world.setRenderDimensions( 0, 0, _width, _height ) ;
+			WorldAssist.update( world ) ;
 		}
 	}
 
@@ -774,9 +658,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void display( final GLAutoDrawable _drawable )
 	{
-		updateExecutions() ;
-		getEventController().update() ;
-
 		final float updateDelta = getUpdateDeltaTime() ;
 		final float frameDelta = getFrameDeltaTime() ;
 		final int frameNo = getFrameIteration() ;
@@ -784,21 +665,57 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		// Expected number of render frames before the next update is triggered.
 		final int difference = ( int )( updateDelta / frameDelta ) ;
 
-		//System.out.println( "Update Delta: " + updateDelta + " Frame Delta: " + frameDelta + " Frame No: " + frameNo + " Diff: " + difference ) ;
-		worlds.upload( difference, frameNo ) ;
+		for( final Camera camera : cameras )
+		{
+			camera.update( difference, frameNo ) ;
+			final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
+			glCamera.update( camera ) ;
+		}
+
+		int totalBufferUpdates = 0 ;
+		
+		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
+		{
+			if( updater.isDirty() == false )
+			{
+				continue ;
+			}
+
+			updater.update( buffersToUpdate, difference, frameNo ) ;
+			if( buffersToUpdate.isEmpty() == false )
+			{
+				totalBufferUpdates += buffersToUpdate.size() ;
+				for( final ABuffer buffer : buffersToUpdate )
+				{
+					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
+					{
+						updater.makeDirty() ;
+					}
+				}
+				buffersToUpdate.clear() ;
+			}
+		}
+
+		//System.out.println( totalBufferUpdates ) ;
+
+		updateExecutions() ;
+		getEventController().update() ;
+
+		for( final GLWorld world : worlds )
+		{
+			world.draw() ;
+		}
+
 		canvas.swapBuffers() ;
 	}
 
 	@Override
-	public void sort()
-	{
-		worlds.sort() ;
-	}
+	public void sort() {}
 
 	@Override
 	public void clear()
 	{
-		worlds.clear() ;
+		//worlds.clear() ;
 	}
 
 	/**
@@ -809,12 +726,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void clean()
 	{
-		final Set<String> activeKeys = new HashSet<String>() ;
+		/*final Set<String> activeKeys = new HashSet<String>() ;
 		worlds.clean( activeKeys ) ;
 
 		programs.clean( activeKeys ) ;
 		textures.clean( activeKeys ) ;
-		fontManager.clean( activeKeys ) ;
+		fontManager.clean( activeKeys ) ;*/
 	}
 
 	public GLWindow getCanvas()
@@ -842,9 +759,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			canvas = GLWindow.create( capabilities ) ;
 
-			//final Vector2 display = defaultCamera.getDisplayScreen().dimension ;
-			//canvas.setSize( ( int )display.x, ( int )display.y ) ;
-
 			// We want to be in complete control of any swapBuffer calls
 			canvas.setAutoSwapBufferMode( false ) ;
 		}
@@ -860,64 +774,61 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	*/
 	private void initDefaultWorld()
 	{
-		final GLWorld world = GLWorld.createCore( "DEFAULT", 0 ) ;
+		final Camera defaultCamera = getDefaultCamera() ;
+		cameras.add( defaultCamera ) ;
 
-		worlds.addWorld( world ) ;
-		worlds.setDefault( world ) ;
+		final GLCamera camera = new GLCamera( defaultCamera ) ;
+		cameraLookup.map( defaultCamera.index(), defaultCamera, camera ) ;
 
-		worlds.addCamera( defaultCamera, null ) ;
+		final World defaultWorld = getDefaultWorld() ;
+		final GLWorld world = GLWorld.createCore( defaultWorld, cameraLookup, bufferLookup ) ;
+		worldLookup.map( defaultWorld.index(), defaultWorld, world ) ;
+
+		worlds.add( world ) ;
 	}
 
-	/**
-		Attempt to acquire a compatible GLProgram from 
-		the ProgramManager. Make sure the GLProgram 
-		requested maps correctly with the ProgramMap 
-		defined in the GLDraw object.
-	*/
-	protected static boolean loadProgram( final GLDraw _data )
+	protected static GLImage getTexture( final MalletTexture _texture )
 	{
-		final BasicDraw<GLProgram> basic = _data.getBasicData() ;
-		final ProgramMap<GLProgram> program = basic.getProgram() ;
-		if( program == null )
+		final MalletTexture.Meta meta = _texture.getMeta() ;
+		final String path = meta.getPath() ;
+
+		for( final GLWorld world : worlds )
 		{
-			// If we don't have a program then there is no point progressing further.
-			return false ;
+			if( path.equals( world.getID() ) == true )
+			{
+				return world.getImage( meta.getAttachmentIndex() ) ;
+			}
 		}
 
-		if( program.getProgram() == null )
-		{
-			final GLProgram glProgram = programs.get( program.getID() ) ;
-			if( glProgram == null )
-			{
-				// If the GLProgram is yet to exist then 
-				// _data will need to be run through the
-				// rendering cycle again.
-				basic.forceUpdate() ;
-				return false ;
-			}
-
-			if( glProgram.isValidMap( program.getUniformMap() ) == false )
-			{
-				// If a GLProgram exists but the mappings are 
-				// incompatible return false and prevent _data 
-				// from being rendered.
-				return false ;
-			}
-
-			program.setProgram( glProgram ) ;
-		}
-
-		return true ;
-	}
-
-	protected static GLImage getTexture( final String _path )
-	{
-		return textures.get( _path ) ;
+		return textures.get( path ) ;
 	}
 
 	protected static GLFont getFont( final MalletFont _font )
 	{
 		return fontManager.get( _font ) ;
+	}
+
+	private <T extends ABuffer> boolean updateBuffer( final T _buffer, final GLBuffer _buff )
+	{
+		switch( _buffer.getBufferType() )
+		{
+			default              : return true ;//throw new Exception( "Unknown buffer type specified." ) ;
+			case GEOMETRY_BUFFER :
+			{
+				final GLGeometryBuffer buf = ( GLGeometryBuffer )_buff ;
+				return buf.update( ( GeometryBuffer )_buffer ) ;
+			}
+			case TEXT_BUFFER     :
+			{
+				final GLTextBuffer buf = ( GLTextBuffer )_buff ;
+				return buf.update( ( TextBuffer )_buffer, programLookup ) ;
+			}
+			case DRAW_BUFFER     :
+			{
+				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
+				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup ) ;
+			}
+		}
 	}
 
 	/**

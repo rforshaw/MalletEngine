@@ -13,39 +13,32 @@ public final class CameraAssist
 		assist = _assist ;
 	}
 
-	public static Camera getDefaultCamera()
+	public static Camera getDefault()
 	{
-		return assist.getDefaultCamera() ;
+		return assist.getDefault() ;
 	}
 
-	public static Camera addCamera( final Camera _camera, final World _world )
+	public static Camera add( final Camera _camera )
 	{
-		return assist.addCamera( _camera, _world ) ;
+		return assist.add( _camera ) ;
 	}
 
-	public static Camera removeCamera( final Camera _camera, final World _world )
+	public static Camera remove( final Camera _camera )
 	{
-		return assist.removeCamera( _camera, _world ) ;
+		return assist.remove( _camera ) ;
 	}
 
-	public static Camera createCamera( final String _id,
-									   final Vector3 _position,
-									   final Vector3 _rotation,
-									   final Vector3 _scale )
+	public static Camera update( final Camera _camera )
 	{
-		return assist.createCamera( _id, _position, _rotation, _scale ) ;
+		return assist.update( _camera ) ;
 	}
 
 	public interface Assist
 	{
-		public Camera getDefaultCamera() ;
+		public Camera getDefault() ;
 
-		public Camera addCamera( final Camera _camera, final World _world ) ;
-		public Camera removeCamera( final Camera _camera, final World _world ) ;
-
-		public Camera createCamera( final String _id,
-									final Vector3 _position,
-									final Vector3 _rotation,
-									final Vector3 _scale ) ;
+		public Camera add( final Camera _camera ) ;
+		public Camera remove( final Camera _camera ) ;
+		public Camera update( final Camera _camera ) ;
 	}
 }

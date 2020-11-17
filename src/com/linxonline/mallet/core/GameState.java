@@ -4,12 +4,14 @@ import java.util.List ;
 
 import com.linxonline.mallet.audio.* ;
 
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.TextDraw ;
+import com.linxonline.mallet.renderer.TextUpdater ;
+import com.linxonline.mallet.renderer.WorldAssist ;
 import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.ProgramAssist ;
+import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -41,6 +43,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.worker.* ;
 
 public class GameState extends State
 {
@@ -80,8 +83,23 @@ public class GameState extends State
 	public GameState( final String _name, final Threaded _type )
 	{
 		super( _name ) ;
-		entitySystem = new EntitySystem( eventSystem, _type ) ;
-		collisionSystem = new CollisionSystem( eventSystem, _type ) ; 
+		switch( _type )
+		{
+			default     :
+			case SINGLE :
+			{
+				entitySystem = new EntitySystem( eventSystem ) ;
+				collisionSystem = new CollisionSystem( eventSystem ) ; 
+				break ;
+			}
+			case MULTI  :
+			{
+				final WorkerGroup workers = new WorkerGroup( "SHARED_WORKERS", 4 ) ;
+				entitySystem = new EntitySystem( eventSystem, workers ) ;
+				collisionSystem = new CollisionSystem( eventSystem, workers ) ;
+				break ;
+			}
+		}
 
 		initModes() ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
@@ -292,10 +310,16 @@ public class GameState extends State
 	*/
 	protected void unhookHandlerSystems()
 	{
-		eventSystem.removeHandler( audioSystem.getEventController() ) ;
-		eventSystem.removeHandler( animationSystem.getEventController() ) ;
+		final EventController animationController = animationSystem.getEventController() ;
+		final EventController audioController = audioSystem.getEventController() ;
+
+		eventSystem.removeHandler( audioController ) ;
+		eventSystem.removeHandler( animationController) ;
 		eventSystem.removeHandler( collisionSystem.getEventController() ) ;
 		eventSystem.removeHandler( system.getRenderer().getEventController() ) ;
+
+		animationController.setAddEventInterface( null ) ;
+		audioController.setAddEventInterface( null ) ;
 
 		final IInputSystem input = system.getInput() ;
 		input.removeInputHandler( inputUISystem ) ;
@@ -504,8 +528,6 @@ public class GameState extends State
 
 		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()
 		{
-			private DrawDelegate delegate ;
-
 			public void process( final Boolean _show )
 			{
 				final boolean show = _show ;
@@ -516,27 +538,7 @@ public class GameState extends State
 					return ;
 				}
 
-				if( show == false )
-				{
-					showFPS.setShow( false ) ;
-					if( delegate != null )
-					{
-						delegate.shutdown() ;
-						delegate = null ;
-					}
-					return ;
-				}
-
-				showFPS.setShow( true ) ;
-				eventSystem.addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
-				{
-					delegate = _delegate ;
-					final TextDraw[] draws = showFPS.getDraws() ;
-					for( final TextDraw draw : draws )
-					{
-						delegate.addTextDraw( draw ) ;
-					}
-				} ) ) ;
+				showFPS.setShow( show ) ;
 			}
 		} ) ;
 	}
@@ -582,30 +584,32 @@ public class GameState extends State
 	private static class ShowFPS
 	{
 		private boolean show = false ;
-		private final TextDraw[] draws = new TextDraw[] { DrawAssist.createTextDraw( new StringBuilder( "0" ),
-																	new MalletFont( "Arial" ),
-																	new Vector3(),
-																	new Vector3(),
-																	new Vector3(),
-																	new Vector3( 1.0f, 1.0f, 1.0f ),
-																	200 ),
-														  DrawAssist.createTextDraw( new StringBuilder( "0" ),
-																	new MalletFont( "Arial" ),
-																	new Vector3( 0.0f, 20.0f, 0.0f ),
-																	new Vector3(),
-																	new Vector3(),
-																	new Vector3( 1.0f, 1.0f, 1.0f ),
-																	200 ) } ;
+		private final TextDraw[] draws = new TextDraw[2] ;
+		private final TextUpdater updater ;
 
 		public ShowFPS()
 		{
-			DrawAssist.amendUI( draws[0], true ) ;
-			DrawAssist.amendUI( draws[1], true ) ;
+			final World world = WorldAssist.getDefault() ;
+
+			final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
+			program.mapUniform( "inTex0", new MalletFont( "Arial" ) ) ;
+
+			draws[0] = new TextDraw( "0" ) ;
+			draws[0].setHidden( !show ) ;
+
+			draws[1] = new TextDraw( "0" ) ;
+			draws[1].setPosition( 0.0f, 20.0f, 0.0f ) ;
+			draws[1].setHidden( !show ) ;
+
+			updater = TextUpdater.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;
+			updater.addDraws( draws ) ;
 		}
 
 		public void setShow( final boolean _show )
 		{
 			show = _show ;
+			draws[0].setHidden( !show ) ;
+			draws[1].setHidden( !show ) ;
 		}
 
 		public boolean toShow()
@@ -629,9 +633,9 @@ public class GameState extends State
 			txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
 			txt.append( "fps" ) ;
 
-			_draw.setStart( 0 ) ;
-			_draw.setEnd( txt.length() ) ;
-			DrawAssist.forceUpdate( _draw ) ;
+			_draw.setRange( 0, txt.length() ) ;
+			_draw.makeDirty() ;
+			updater.makeDirty() ;
 		}
 
 		private void updateDrawMS( final TextDraw _draw, final double _dt )
@@ -641,9 +645,9 @@ public class GameState extends State
 			txt.insert( 0, ( int )( _dt * 1000.0 ) ) ;
 			txt.append( "ms" ) ;
 
-			_draw.setStart( 0 ) ;
-			_draw.setEnd( txt.length() ) ;
-			DrawAssist.forceUpdate( _draw ) ;
+			_draw.setRange( 0, txt.length() ) ;
+			_draw.makeDirty() ;
+			updater.makeDirty() ;
 		}
 
 		public TextDraw[] getDraws()

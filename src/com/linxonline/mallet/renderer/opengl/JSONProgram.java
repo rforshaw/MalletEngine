@@ -6,7 +6,7 @@ import java.util.Set ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.ProgramMap ;
+import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.* ;
@@ -61,7 +61,7 @@ public class JSONProgram
 		Used with a ProgramMap created from ProgramAssist.
 		Determine if any of the uniforms data are using resources.
 	*/
-	public void getUsedResources( final Set<String> _activeKeys, final ProgramMap<?> _data )
+	public void getUsedResources( final Set<String> _activeKeys, final Program _program )
 	{
 		_activeKeys.add( getName() ) ;
 
@@ -73,13 +73,13 @@ public class JSONProgram
 			{
 				case SAMPLER2D :
 				{
-					final MalletTexture texture = ( MalletTexture )_data.getUniform( uniform.getRight() ) ;
+					final MalletTexture texture = ( MalletTexture )_program.getUniform( uniform.getRight() ) ;
 					_activeKeys.add( texture.getPath() ) ;
 					break ;
 				}
 				case FONT      :
 				{
-					final MalletFont font = ( MalletFont )_data.getUniform( uniform.getRight() ) ;
+					final MalletFont font = ( MalletFont )_program.getUniform( uniform.getRight() ) ;
 					_activeKeys.add( font.getID() ) ;
 					break ;
 				}

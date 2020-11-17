@@ -160,6 +160,18 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		clear() ;
 	}
 
+	public boolean isKeyNull( final String _key )
+	{
+		if( exists( _key ) == true )
+		{
+			// We want to see if an actual object has 
+			// been assigned to the key.
+			return resources.get( _key ) == null ;
+		}
+
+		return false ;
+	}
+	
 	protected boolean exists( final String _file )
 	{
 		return resources.containsKey( _file ) ;

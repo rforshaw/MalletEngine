@@ -5,6 +5,8 @@ import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.SourceCallback ;
 
 import com.linxonline.mallet.renderer.DrawAssist ;
+import com.linxonline.mallet.renderer.GeometryBuffer ;
+import com.linxonline.mallet.renderer.IUpdater ;
 import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.renderer.ProgramAssist ;
@@ -45,10 +47,15 @@ public final class AnimationAssist
 										final Vector3 _scale,
 										final int _order )
 	{
-		final Draw draw = DrawAssist.createDraw( _position, _offset, _rotation, _scale, _order ) ;
-		draw.setProgram( ProgramAssist.create( "SIMPLE_TEXTURE" ) ) ;
+		final Draw draw = new Draw( _position.x, _position.y, _position.z,
+									_offset.x, _offset.y, _offset.z,
+									_rotation.x, _rotation.y, _rotation.z ) ;
+		draw.setScale( _scale.x, _scale.y, _scale.z ) ;
 
-		return new AnimData( _file, draw ) ;
+		final AnimData anim = new AnimData( _file, draw ) ;
+		anim.setOrder( _order ) ;
+
+		return anim ;
 	}
 
 	public static Draw getDraw( final Anim _anim )
@@ -72,6 +79,11 @@ public final class AnimationAssist
 	{
 		( ( AnimData )_anim ).pause() ;
 		return _anim ;
+	}
+
+	public static IUpdater<Draw, GeometryBuffer> getUpdater( final Anim _anim )
+	{
+		return ( ( AnimData )_anim ).getUpdater() ;
 	}
 
 	public static Anim addCallback( final Anim _anim, final SourceCallback _callback )

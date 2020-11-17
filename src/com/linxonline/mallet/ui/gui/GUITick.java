@@ -12,17 +12,16 @@ public class GUITick extends GUIDraw
 		@Override
 		public void slot( final UICheckbox _box )
 		{
-			final DrawDelegate delegate = getDrawDelegate() ;
-			if( delegate != null )
+			if( _box.isChecked() == true )
 			{
-				if( _box.isChecked() == true )
+				addDraws( getWorld() ) ;
+			}
+			else
+			{
+				final IUpdater<Draw, ?> updater = getUpdater() ;
+				if( updater != null )
 				{
-					DrawAssist.forceUpdate( getDraw() ) ;
-					delegate.addBasicDraw( getDraw(), getWorld() ) ;
-				}
-				else
-				{
-					delegate.removeDraw( getDraw() ) ;
+					updater.removeDraws( getDraw() ) ;
 				}
 			}
 		}
@@ -49,11 +48,11 @@ public class GUITick extends GUIDraw
 		and when the parent UIElement is flagged as visible.
 	*/
 	@Override
-	public void addDraws( final DrawDelegate _delegate, final World _world )
+	public void addDraws( final World _world )
 	{
 		if( getParentCheckbox().isChecked() == true )
 		{
-			super.addDraws( _delegate, _world ) ;
+			super.addDraws( _world ) ;
 		}
 	}
 

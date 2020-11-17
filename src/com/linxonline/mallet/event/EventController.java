@@ -23,7 +23,7 @@ public class EventController implements IEventHandler
 
 	private final int eventCapacity ;
 
-	private AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
+	private final AddEventFallback ADD_EVENT_FALLBACK = new AddEventFallback() ;
 
 	private final List<EventType> wantedTypes ;
 	private final EventType.Lookup<IProcessor<?>> processors ;
@@ -86,11 +86,9 @@ public class EventController implements IEventHandler
 		{
 			addInterface = _addInterface ;
 			ADD_EVENT_FALLBACK.transferEvents( addInterface ) ;
-			ADD_EVENT_FALLBACK = null ;
 		}
 		else
 		{
-			ADD_EVENT_FALLBACK = ( ADD_EVENT_FALLBACK != null ) ? ADD_EVENT_FALLBACK : new AddEventFallback() ;
 			addInterface = ADD_EVENT_FALLBACK ;
 		}
 	}
@@ -156,10 +154,7 @@ public class EventController implements IEventHandler
 	public void clearEvents()
 	{
 		messenger.clear() ;
-		if( ADD_EVENT_FALLBACK != null )
-		{
-			ADD_EVENT_FALLBACK.clear() ;
-		}
+		ADD_EVENT_FALLBACK.clear() ;
 	}
 
 	public IAddEvent getAddEventInterface()
@@ -184,16 +179,18 @@ public class EventController implements IEventHandler
 
 		public void transferEvents( final IAddEvent _addInterface )
 		{
-			if( events.isEmpty() == false )
+			if( events.isEmpty() )
 			{
-				final int size = events.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final Event<?> event = events.get( i ) ;
-					_addInterface.addEvent( event ) ;
-				}
-				clear() ;
+				return ;
 			}
+
+			final int size = events.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final Event<?> event = events.get( i ) ;
+				_addInterface.addEvent( event ) ;
+			}
+			clear() ;
 		}
 
 		public void addEvent( final Event<?> _event )

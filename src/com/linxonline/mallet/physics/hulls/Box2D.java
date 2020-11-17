@@ -13,12 +13,14 @@ public class Box2D extends Hull
 	public final AABB aabb ;
 	public final OBB obb ;
 
+	private final Vector2 point = new Vector2() ;
+
 	public Box2D( final AABB _aabb )
 	{
 		this( _aabb, null ) ;
 	}
 
-	public Box2D( final AABB _aabb, final Group.ID[] _collidables )
+	public Box2D( final AABB _aabb, int[] _collidables )
 	{
 		super( _collidables ) ;
 		aabb = _aabb ;
@@ -100,7 +102,6 @@ public class Box2D extends Hull
 	@Override
 	public float projectToAxis( final Vector2 _axis )
 	{
-		final Vector2 point = new Vector2() ;
 		FloatBuffer.fill( obb.rotations, point, 0 ) ;
 		float dp = Vector2.dot( point, _axis ) ;
 

@@ -14,8 +14,9 @@ import com.linxonline.mallet.maths.* ;
 public class UIList extends UILayout
 {
 	private final FrameBuffer frame ;
-	private Camera externalCamera = CameraAssist.getDefaultCamera() ;
-	private DrawDelegate externalDelegate = null ;
+	private World externalWorld ;
+	private Camera externalCamera = CameraAssist.getDefault() ;
+	private DrawUpdater updater = null ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
 	private final Vector3 scrollbarLength = new Vector3() ;
@@ -41,34 +42,79 @@ public class UIList extends UILayout
 
 		frame = new FrameBuffer( position.x, position.y, position.z,
 								 offset.x,   offset.y,   offset.z,
-								 length.x,   length.y,   getLayer() + 1 ) ;
-		initFrameConnections() ;
+								 length.x,   length.y ) ;
+		UIList.this.setListWorldAndCamera( frame.getWorld(), frame.getCamera() ) ;
 
 		UIElement.connect( this, elementShutdown(), new Connect.Slot<UIList>()
 		{
 			@Override
 			public void slot( final UIList _this )
 			{
-				if( externalDelegate != null )
+				if( updater != null )
 				{
-					externalDelegate.removeDraw( frame.getFrame() ) ;
+					updater.removeDraws( frame.getFrame() ) ;
 				}
+				frame.shutdown() ;
+			}
+		} ) ;
+
+		UIElement.connect( this, layerChanged(), new Connect.Slot<UIElement>()
+		{
+			@Override
+			public void slot( final UIElement _this )
+			{
+				if( updater != null )
+				{
+					updater.removeDraws( frame.getFrame() ) ;
+				}
+
+				if( externalWorld != null )
+				{
+					final int layer = _this.getLayer() + 1 ;
+					final Program program = frame.getProgram() ;
+					final Draw draw = frame.getFrame() ;
+
+					final DrawUpdater updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
+					updater.addDraws( draw ) ;
+				}
+			}
+		} ) ;
+
+		UIElement.connect( this, positionChanged(), new Connect.Slot<UIElement>()
+		{
+			@Override
+			public void slot( final UIElement _this )
+			{
+				final Vector3 position = _this.getPosition() ;
+				frame.setPosition( position.x, position.y, position.z ) ;
+				updater.makeDirty() ;
+			}
+		} ) ;
+
+		UIElement.connect( this, offsetChanged(), new Connect.Slot<UIElement>()
+		{
+			@Override
+			public void slot( final UIElement _this )
+			{
+				final Vector3 offset = _this.getOffset() ;
+				frame.setOffset( offset.x, offset.y, offset.z ) ;
+				updater.makeDirty() ;
+			}
+		} ) ;
+
+		UIElement.connect( this, lengthChanged(), new Connect.Slot<UIElement>()
+		{
+			@Override
+			public void slot( final UIElement _this )
+			{
+				final Vector3 length = _this.getLength() ;
+				frame.setLength( length.x, length.y, length.z ) ;
+				updater.makeDirty() ;
 			}
 		} ) ;
 
 		new ScrollInputComponent( this ) ;
 		setEngageMode( new ScrollSingleEngageComponent( this ) ) ;
-	}
-
-	private void initFrameConnections()
-	{
-		addEvent( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
-		{
-			frame.setDrawDelegate( _delegate ) ;
-			UIList.this.passListDrawDelegate( frame.getDrawDelegate(), frame.getWorld(), frame.getCamera() ) ;
-		} ) ) ;
-
-		FrameBuffer.connect( this, frame ) ;
 	}
 
 	/**
@@ -84,10 +130,7 @@ public class UIList extends UILayout
 			applyLayer( _element, getLayer() ) ;
 			ordered.add( _element ) ;
 
-			if( getInternalDrawDelegate() != null )
-			{
-				_element.passDrawDelegate( getInternalDrawDelegate(), getInternalWorld(), getInternalCamera() ) ;
-			}
+			_element.setWorldAndCamera( getInternalWorld(), getInternalCamera() ) ;
 		}
 		return _element ; 
 	}
@@ -143,38 +186,36 @@ public class UIList extends UILayout
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	public void setWorldAndCamera( final World _world, final Camera _camera )
 	{
+		externalWorld = _world ;
 		externalCamera = ( _camera != null ) ? _camera : externalCamera ;
-		externalDelegate = _delegate ;
 
 		final List<UIElement.Component> base = getComponentUnit().getComponents() ;
 		final int size = base.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			// Listeners to the UIList will be given the 
-			// DrawDelegate passed in - only children 
-			// will be given the lists DrawDelegate.
-			base.get( i ).passDrawDelegate( externalDelegate, _world ) ;
+			base.get( i ).setWorld( externalWorld ) ;
 		}
+
+		final Program program = frame.getProgram() ;
+		final Draw draw = frame.getFrame() ;
 
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
-		externalDelegate.addBasicDraw( frame.getFrame(), _world ) ;
+		updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, getLayer() + 1 ) ;
+		updater.addDraws( draw ) ;
 	}
 
-	private void passListDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	private void setListWorldAndCamera( final World _world, final Camera _camera )
 	{
 		final List<UIElement> ordered = getElements() ;
 
 		final int size = ordered.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			// Pass the DrawDelegate of UIList to the 
-			// lists children instead of the DrawDelegate
-			// that is provided by passDrawDelegate.
-			ordered.get( i ).passDrawDelegate( _delegate, _world, _camera ) ;
+			ordered.get( i ).setWorldAndCamera( _world, _camera ) ;
 		}
 	}
 
@@ -543,15 +584,6 @@ public class UIList extends UILayout
 		scrollbarLength.y = ( absLen.y > len.y ) ? ( len.y * len.y ) / absLen.y : 0.0f ;
 		scrollbarLength.z = ( absLen.z > len.z ) ? ( len.y * len.z ) / absLen.z : 0.0f ;
 		return scrollbarLength ;
-	}
-
-	/**
-		Return the DrawDelegate that this UI is expected to be 
-		displayed on.
-	*/
-	public DrawDelegate getInternalDrawDelegate()
-	{
-		return frame.getDrawDelegate() ;
 	}
 
 	/**

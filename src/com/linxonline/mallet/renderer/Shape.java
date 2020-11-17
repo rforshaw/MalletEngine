@@ -502,6 +502,16 @@ public class Shape
 		return vertexSize ;
 	}
 
+	public int[] getRawIndicies()
+	{
+		return indicies ;
+	}
+
+	public float[] getRawVerticies()
+	{
+		return verticies ;
+	}
+
 	/**
 		Inform the developer whether the Shape 
 		has been correctly populated with data.

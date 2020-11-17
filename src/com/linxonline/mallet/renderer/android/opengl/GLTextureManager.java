@@ -25,7 +25,6 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
-import com.linxonline.mallet.renderer.opengl.Worlds ;
 import com.linxonline.mallet.renderer.* ;
 
 public class GLTextureManager extends AbstractManager<GLImage>
@@ -44,7 +43,6 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
-	protected Worlds<GLDraw, CameraData, GLWorld> worldState ;
 
 	public GLTextureManager()
 	{
@@ -156,11 +154,6 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
-	public void setWorldState( final Worlds<GLDraw, CameraData, GLWorld> _worldState )
-	{
-		worldState = _worldState ;
-	}
-
 	@Override
 	public GLImage get( final String _file )
 	{
@@ -184,20 +177,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 			}
 		}
 
-		final GLImage image = super.get( _file ) ;
-		if( image != null )
-		{
-			//System.out.println( "GLImage: " + _file ) ;
-			return image ;
-		}
-
-		final GLWorld world = worldState.getWorld( _file ) ;
-		if( world != null )
-		{
-			return world.getImage() ;
-		}
-
-		return null ;
+		return super.get( _file ) ;
 	}
 
 	/**

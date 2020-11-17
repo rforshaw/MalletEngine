@@ -16,8 +16,14 @@ public class GUIPanelDraw extends GUIDraw
 		@Override
 		public void slot( final UIElement _layout )
 		{
-			Shape.updatePlaneUV( getDraw().getShape(), rollover.min, rollover.max ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
+			final Draw draw = getDraw() ;
+			Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
+			final IUpdater<Draw, ?> updater = getUpdater() ;
+			if( updater != null )
+			{
+				draw.makeDirty() ;
+				updater.makeDirty() ;
+			}
 		}
 	} ;
 
@@ -26,8 +32,14 @@ public class GUIPanelDraw extends GUIDraw
 		@Override
 		public void slot( final UIElement _layout )
 		{
-			Shape.updatePlaneUV( getDraw().getShape(), neutral.min, neutral.max ) ;
-			DrawAssist.forceUpdate( getDraw() ) ;
+			final Draw draw = getDraw() ;
+			Shape.updatePlaneUV( draw.getShape(), neutral.min, neutral.max ) ;
+			final IUpdater<Draw, ?> updater = getUpdater() ;
+			if( updater != null )
+			{
+				draw.makeDirty() ;
+				updater.makeDirty() ;
+			}
 		}
 	} ;
 
@@ -54,8 +66,15 @@ public class GUIPanelDraw extends GUIDraw
 	@Override
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
-		Shape.updatePlaneUV( getDraw().getShape(), rollover.min, rollover.max ) ;
-		DrawAssist.forceUpdate( getDraw() ) ;
+		final Draw draw = getDraw() ;
+		Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
+		final IUpdater<Draw, ?> updater = getUpdater() ;
+		if( updater != null )
+		{
+			draw.makeDirty() ;
+			updater.makeDirty() ;
+		}
+
 		return InputEvent.Action.PROPAGATE ;
 	}
 
@@ -68,8 +87,15 @@ public class GUIPanelDraw extends GUIDraw
 	@Override
 	public InputEvent.Action mousePressed( final InputEvent _input )
 	{
-		Shape.updatePlaneUV( getDraw().getShape(), clicked.min, clicked.max ) ;
-		DrawAssist.forceUpdate( getDraw() ) ;
+		final Draw draw = getDraw() ;
+		Shape.updatePlaneUV( draw.getShape(), clicked.min, clicked.max ) ;
+		final IUpdater<Draw, ?> updater = getUpdater() ;
+		if( updater != null )
+		{
+			draw.makeDirty() ;
+			updater.makeDirty() ;
+		}
+
 		return InputEvent.Action.PROPAGATE ;
 	}
 

@@ -31,19 +31,6 @@ public final class DrawAssist
 	}
 
 	/**
-		Request a DrawDelegate from the active rendering system.
-		The DrawDelegate allows the user to add/remove Draw objects
-		from being rendered.
-
-		A DrawDelegate is not required for constructing a Draw object, 
-		but is required for displaying it.
-	*/
-	public static Event<DrawDelegateCallback> constructDrawDelegate( final DrawDelegateCallback _callback )
-	{
-		return new Event<DrawDelegateCallback>( "DRAW_DELEGATE", _callback ) ;
-	}
-
-	/**
 		Request the active rendering system to clean-up any 
 		unused resources it may still be referencing.
 	*/
@@ -52,82 +39,29 @@ public final class DrawAssist
 		return DRAW_CLEAN ;
 	}
 
-	public static Draw amendUI( final Draw _draw, final boolean _ui )
+	public static <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater )
 	{
-		return assist.amendUI( _draw, _ui ) ;
+		return assist.add( _updater ) ;
 	}
 
-	public static Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
+	public static <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater )
 	{
-		return assist.amendInterpolation( _draw, _interpolation ) ;
+		return assist.remove( _updater ) ;
 	}
 
-	public static Draw amendUpdateType( final Draw _draw, final UpdateType _type )
+	public static <T extends ABuffer> T add( final T _buffer )
 	{
-		return assist.amendUpdateType( _draw, _type ) ;
+		return assist.add( _buffer ) ;
 	}
 
-	public static Draw forceUpdate( final Draw _draw )
+	public static <T extends ABuffer> T remove( final T _buffer )
 	{
-		return assist.forceUpdate( _draw ) ;
+		return assist.remove( _buffer ) ;
 	}
 
-	public static boolean isUI( final Draw _draw )
+	public static <T extends ABuffer> T update( final T _buffer )
 	{
-		return assist.isUI( _draw ) ;
-	}
-
-	/**
-		Create a Text Draw object.
-		Handles the nuances of text rendering and ensures a performant display.
-	*/
-	public static TextDraw createTextDraw( final StringBuilder _text,
-										   final MalletFont _font,
-										   final Vector3 _position,
-										   final Vector3 _offset,
-										   final Vector3 _rotation,
-										   final Vector3 _scale,
-										   final int _order )
-	{
-		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
-	}
-
-	/**
-		Create a Text Draw object.
-		Handles the nuances of text rendering and ensures a performant display.
-	*/
-	public static TextDraw createTextDraw( final String _text,
-										   final MalletFont _font,
-										   final Vector3 _position,
-										   final Vector3 _offset,
-										   final Vector3 _rotation,
-										   final Vector3 _scale,
-										   final int _order )
-	{
-		return assist.createTextDraw( _text, _font, _position, _offset, _rotation, _scale, _order ) ;
-	}
-
-	public static Draw createClipDraw( final Vector3 _position,
-									   final Vector3 _offset,
-									   final Vector3 _rotation,
-									   final Vector3 _scale,
-									   final int _startOrder,
-									   final int _endOrder )
-	{
-		return assist.createClipDraw( _position, _offset, _rotation, _scale, _startOrder, _endOrder ) ;
-	}
-
-	/**
-		Create a basic Draw object.
-		Can be used for almost anything, except rendering text.
-	*/
-	public static Draw createDraw( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order )
-	{
-		return assist.createDraw( _position, _offset, _rotation, _scale, _order ) ;
+		return assist.update( _buffer ) ;
 	}
 
 	/**
@@ -136,42 +70,11 @@ public final class DrawAssist
 	*/
 	public interface Assist
 	{
-		public Draw amendUI( final Draw _draw, final boolean _ui ) ;
+		public <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater ) ;
+		public <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater ) ;
 
-		public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation ) ;
-		public Draw amendUpdateType( final Draw _draw, final UpdateType _type ) ;
-
-		public Draw forceUpdate( final Draw _draw ) ;
-
-		public boolean isUI( final Draw _draw ) ;
-
-		public TextDraw createTextDraw( final StringBuilder _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order ) ;
-
-		public TextDraw createTextDraw( final String _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order ) ;
-
-		public Draw createClipDraw( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _startOrder,
-									final int _endOrder ) ;
-										
-		public Draw createDraw( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order ) ;
+		public <T extends ABuffer> T add( final T _buffer ) ;
+		public <T extends ABuffer> T remove( final T _buffer ) ;
+		public <T extends ABuffer> T update( final T _buffer ) ;
 	}
 }

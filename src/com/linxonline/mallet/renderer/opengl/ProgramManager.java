@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.opengl ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.io.AbstractManager ;
@@ -95,7 +96,12 @@ public class ProgramManager<T extends ProgramManager.Program> extends AbstractMa
 					final T program = builder.build( toBind.get( i ) ) ;
 					if( program != null )
 					{
-						_manager.put( program.getName(), program ) ;
+						final String id = program.getName() ;
+						if( _manager.isKeyNull( id ) == false )
+						{
+							Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
+						}
+						_manager.put( id, program ) ;
 					}
 				}
 				toBind.clear() ;

@@ -21,7 +21,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeInt( final int _int )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _int, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _int ) ) ;
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeShort( final short _short )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _short, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _short ) ) ;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeByte( final byte _byte )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _byte, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _byte ) ) ;
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeChar( final char _char )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _char, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _char ) ) ;
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeLong( final long _long )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _long, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _long ) ) ;
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeFloat( final float _float )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _float, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _float ) ) ;
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeDouble( final double _double )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _double, ConvertBytes.BIG_ENDIAN ) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _double ) ) ;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class ByteOutput implements Serialise.Out
 	*/
 	public void writeBoolean( final boolean _bool )
 	{
-		stream = concat( stream, ConvertBytes.toBytes( _bool, ConvertBytes.BIG_ENDIAN) ) ;
+		stream = concat( stream, ConvertBytes.toBytes( _bool ) ) ;
 	}
 
 	/**

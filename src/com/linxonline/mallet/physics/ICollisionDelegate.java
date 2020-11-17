@@ -8,7 +8,7 @@ public interface ICollisionDelegate
 	public Hull generateContacts( final Hull _hull ) ;
 
 	public Hull ray( final Vector2 _start, final Vector2 _end ) ;
-	public Hull ray( final Vector2 _start, final Vector2 _end, final Group.ID[] _filters ) ;
+	public Hull ray( final Vector2 _start, final Vector2 _end, final int[] _filters ) ;
 
 	/**
 		Inform the collision-system to ignore further 

@@ -20,7 +20,7 @@ public final class ProgramAssist
 		@param _id unique identifier.
 		@param _path to program definition.
 	*/
-	public void load( final String _id, final String _path )
+	public static void load( final String _id, final String _path )
 	{
 		assist.load( _id, _path ) ;
 	}
@@ -32,15 +32,22 @@ public final class ProgramAssist
 		Use ProgramAssist.remove and ProgramAssist.map 
 		to map/remove uniforms to the create program.
 	*/
-	public static Program create( final String _id )
+	public static Program add( final Program _program )
 	{
-		return assist.create( _id ) ;
+		return assist.add( _program ) ;
+	}
+
+	public static Program update( final Program _program )
+	{
+		return assist.update( _program ) ;
 	}
 
 	public interface Assist
 	{
 		public void load( final String _id, final String _path ) ;
 
-		public Program create( final String _id ) ;
+		public Program add( final Program _program ) ;
+
+		public Program update( final Program _program ) ;
 	}
 }

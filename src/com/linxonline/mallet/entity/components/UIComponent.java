@@ -18,16 +18,12 @@ public class UIComponent extends InputComponent
 	private final List<UIElement> elements = MalletList.<UIElement>newList() ;
 	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;
 
-	private final List<Draw> toAddBasic = MalletList.<Draw>newList() ;
-	private final List<Draw> toAddText = MalletList.<Draw>newList() ;
-
 	private final World world ;
 	private final Camera camera ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	protected final EventController eventController = new EventController() ;
 	private Entity.ReadyCallback toDestroy = null ;
-	private DrawDelegate delegate = null ;
 
 	public UIComponent( final Entity _parent )
 	{
@@ -47,8 +43,8 @@ public class UIComponent extends InputComponent
 		this( _parent,
 			  _allow,
 			  _mode,
-			  WorldAssist.getDefaultWorld(),
-			  CameraAssist.getDefaultCamera() ) ;
+			  WorldAssist.getDefault(),
+			  CameraAssist.getDefault() ) ;
 	}
 
 	public UIComponent( final Entity _parent,
@@ -62,8 +58,8 @@ public class UIComponent extends InputComponent
 		// Allow the developer to specify what world 
 		// this UI should be drawn to - if no world 
 		// is specified we will assume its the default.
-		world = ( _world != null ) ? _world : WorldAssist.getDefaultWorld() ;
-		camera = ( _camera != null ) ? _camera : CameraAssist.getDefaultCamera() ;
+		world = ( _world != null ) ? _world : WorldAssist.getDefault() ;
+		camera = ( _camera != null ) ? _camera : CameraAssist.getDefault() ;
 		initEventProcessor( eventController ) ;
 	}
 
@@ -95,10 +91,7 @@ public class UIComponent extends InputComponent
 		if( elements.contains( _element ) == false )
 		{
 			elements.add( _index, _element ) ;
-			if( delegate != null )
-			{
-				_element.passDrawDelegate( delegate, getWorld(), getCamera() ) ;
-			}
+			_element.setWorldAndCamera( getWorld(), getCamera() ) ;
 		}
 		return _element ;
 	}
@@ -112,11 +105,6 @@ public class UIComponent extends InputComponent
 	@Override
 	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
-		if( delegate != null )
-		{
-			delegate.shutdown() ;
-		}
-
 		for( final UIElement element : elements )
 		{
 			removeElement( element ) ;
@@ -223,24 +211,6 @@ public class UIComponent extends InputComponent
 	{
 		super.passInitialEvents( _events ) ;
 		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
-		_events.add( DrawAssist.constructDrawDelegate( ( final DrawDelegate _delegate ) ->
-		{
-			if( delegate != null )
-			{
-				// Don't call shutdown(), we don't want to 
-				// clean anything except an existing DrawDelegate.
-				delegate.shutdown() ;
-			}
-
-			delegate = _delegate ;
-
-			final int size = elements.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final UIElement element = elements.get( i ) ;
-				element.passDrawDelegate( delegate, world, camera ) ;
-			}
-		} ) ) ;
 	}
 
 	@Override

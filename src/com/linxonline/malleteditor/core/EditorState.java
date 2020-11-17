@@ -31,9 +31,6 @@ import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
-import com.linxonline.mallet.renderer.UpdateType ;
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
 
@@ -54,20 +51,16 @@ public class EditorState extends GameState
 	@Override
 	public void initGame()
 	{
-		/*final World edWorld = WorldAssist.constructWorld( "EDITOR_WORLD", 1 ) ;
-		final World uiWorld = WorldAssist.constructWorld( "UI_EDITOR_WORLD", 2 ) ;
+		final World edWorld = WorldAssist.add( new World( "EDITOR_WORLD" ) ) ;
+		final World uiWorld = WorldAssist.add( new World( "UI_EDITOR_WORLD" ) ) ;
 
-		final Camera edCamera = CameraAssist.createCamera( "EDITOR_CAMERA", new Vector3(),
-																			new Vector3(),
-																			new Vector3( 1, 1, 1 ) ) ;
-		final Camera uiCamera = CameraAssist.createCamera( "UI_EDITOR_CAMERA",  new Vector3(),
-																				new Vector3(),
-																				new Vector3( 1, 1, 1 ) ) ;
+		final Camera edCamera = CameraAssist.add( new Camera( "EDITOR_CAMERA" ) ) ;
+		final Camera uiCamera = CameraAssist.add( new Camera( "UI_EDITOR_CAMERA" ) ) ;
 	
-		CameraAssist.addCamera( edCamera, edWorld ) ;
-		CameraAssist.addCamera( uiCamera, uiWorld ) ;
+		edWorld.addCameras( edCamera ) ;
+		uiWorld.addCameras( uiCamera ) ;
 
-		loadDefaultUILayout() ;*/
+		loadDefaultUILayout() ;
 	}
 
 	@Override

@@ -5,10 +5,6 @@ import java.util.List ;
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
-import com.linxonline.mallet.renderer.DrawDelegateCallback ;
-import com.linxonline.mallet.renderer.DrawDelegate ;
-import com.linxonline.mallet.renderer.UpdateType ;
-
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
@@ -48,7 +44,7 @@ public final class UIFactory
 	*/
 	public static UILayout constructWindowLayout( final ILayout.Type _type )
 	{
-		return constructWindowLayout( _type, CameraAssist.getDefaultCamera() ) ;
+		return constructWindowLayout( _type, CameraAssist.getDefault() ) ;
 	}
 
 	/**
@@ -57,7 +53,7 @@ public final class UIFactory
 	*/
 	public static UILayout constructWindowLayout( final ILayout.Type _type, final Camera _camera )
 	{
-		final World base = WorldAssist.getDefaultWorld() ;
+		final World base = WorldAssist.getDefault() ;
 		final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
 
 		final Vector3 dimension = new Vector3( dim.x, dim.y, 0.0f ) ;
@@ -101,7 +97,10 @@ public final class UIFactory
 			this( new UIElement.MetaComponent()
 			{
 				@Override
-				public String getType() { return "WINDOW_LISTENER" ; }
+				public String getType()
+				{
+					return "WINDOW_LISTENER" ;
+				}
 			}, _parent, _camera, _dimension ) ;
 		}
 
@@ -111,7 +110,7 @@ public final class UIFactory
 							   final Vector3 _dimension )
 		{
 			_parent.super( _meta ) ;
-			world = WorldAssist.getDefaultWorld() ;
+			world = WorldAssist.getDefault() ;
 
 			renderNotify = world.attachRenderNotify( new Notification.Notify<World>()
 			{

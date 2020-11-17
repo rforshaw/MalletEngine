@@ -177,10 +177,10 @@ public class UILayout extends UIElement implements IChildren
 	}
 
 	@Override
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world, final Camera _camera )
+	public void setWorldAndCamera( final World _world, final Camera _camera )
 	{
-		super.passDrawDelegate( _delegate, _world, _camera ) ;
-		children.passDrawDelegate( _delegate, _world, _camera ) ;
+		super.setWorldAndCamera( _world, _camera ) ;
+		children.setWorldAndCamera( _world, _camera ) ;
 	}
 
 	/**
@@ -215,9 +215,11 @@ public class UILayout extends UIElement implements IChildren
 		if( element != null )
 		{
 			applyLayer( element, getLayer() ) ;
-			if( getDrawDelegate() != null )
+
+			final World world = getWorld() ;
+			if( world != null )
 			{
-				element.passDrawDelegate( getDrawDelegate(), getWorld(), getCamera() ) ;
+				element.setWorldAndCamera( world, getCamera() ) ;
 			}
 		}
 		return _element ; 

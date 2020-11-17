@@ -21,7 +21,6 @@ import com.linxonline.mallet.maths.* ;
 */
 public abstract class GUIComponent extends UIElement.Component
 {
-	private DrawDelegate delegate = null ;
 	private World world = null ;
 	private Camera camera = null ;
 
@@ -39,10 +38,7 @@ public abstract class GUIComponent extends UIElement.Component
 		public void slot( final UIElement _parent )
 		{
 			visible = true ;
-			if( delegate != null )
-			{
-				addDraws( delegate, world ) ;
-			}
+			addDraws( world ) ;
 		}
 	} ;
 
@@ -52,10 +48,7 @@ public abstract class GUIComponent extends UIElement.Component
 		public void slot( final UIElement _parent )
 		{
 			visible = false ;
-			if( delegate != null )
-			{
-				removeDraws( delegate ) ;
-			}
+			removeDraws() ;
 		}
 	} ;
 
@@ -86,6 +79,15 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
+	private final Connect.Slot<UIElement> layerSlot = new Connect.Slot<UIElement>()
+	{
+		@Override
+		public void slot( final UIElement _parent )
+		{
+			layerUpdated( getLayer() ) ;
+		}
+	} ;
+
 	public GUIComponent( final UIElement.MetaComponent _meta, final UIElement _parent )
 	{
 		_parent.super( _meta ) ;
@@ -106,24 +108,25 @@ public abstract class GUIComponent extends UIElement.Component
 		Called when component receives a valid DrawDelegate
 		and when the parent UIElement is flagged as visible.
 	*/
-	public abstract void addDraws( final DrawDelegate _delegate, final World _world ) ;
+	public abstract void addDraws( final World _world ) ;
 
 	/**
 		Only called if there is a valid DrawDelegate and 
 		when the parent UIElement is flagged as invisible.
 	*/
-	public abstract void removeDraws( final DrawDelegate _delegate ) ;
+	public abstract void removeDraws() ;
 
+	public abstract void layerUpdated( int _layer ) ;
+	
 	@Override
-	public void passDrawDelegate( final DrawDelegate _delegate, final World _world )
+	public void setWorld( final World _world )
 	{
-		delegate = _delegate ;
 		world = _world ;
 
-		super.passDrawDelegate( _delegate, _world ) ;
+		super.setWorld( _world ) ;
 		if( visible == true )
 		{
-			addDraws( delegate, _world ) ;
+			addDraws( _world ) ;
 		}
 	}
 
@@ -227,18 +230,9 @@ public abstract class GUIComponent extends UIElement.Component
 		UIElement.disconnect( parent, parent.offsetChanged(),   offsetSlot() ) ;
 		UIElement.disconnect( parent, parent.lengthChanged(),   lengthSlot() ) ;
 
-		if( delegate != null )
-		{
-			removeDraws( delegate ) ;
-		}
+		removeDraws() ;
 
-		delegate = null ;
 		world = null ;
-	}
-
-	public DrawDelegate getDrawDelegate()
-	{
-		return delegate ;
 	}
 
 	public World getWorld()
