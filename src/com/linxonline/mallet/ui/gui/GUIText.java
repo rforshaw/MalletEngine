@@ -250,7 +250,7 @@ public class GUIText extends GUIComponent
 		public void setFont( final MalletFont _font )
 		{
 			final MalletFont temp = font.toObject( MalletFont.class ) ;
-			if( font != null && temp.equals( _font ) == false )
+			if( temp.equals( _font ) == false )
 			{
 				font.setObject( new MalletFont( _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ) ;
 				UIElement.signal( this, font.getSignal() ) ;

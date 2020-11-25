@@ -109,9 +109,13 @@ public class GLTextBuffer extends GLBuffer
 				attributes = constructVertexAttrib( shape.getSwivel(), glProgram ) ;
 			}
 
-			final int swivelSize = calculateVertexSize( shape.getSwivel() ) ;
-			vertexStride = swivelSize ;
-			vertexStrideBytes = swivelSize * VBO_VAR_BYTE_SIZE ;
+			if( vertexStride <= 0 )
+			{
+				// Swivel is not expected to change once it is 
+				// set, so we'll only calculate the swivel once.
+				vertexStride = calculateVertexSize( shape.getSwivel() ) ;
+				vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+			}
 
 			switch( shape.getStyle() )
 			{
@@ -229,9 +233,9 @@ public class GLTextBuffer extends GLBuffer
 		vertexBuffer.position( 0 ) ;
 
 		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
-		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
-
 		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
+
+		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 
 		// We successfully updated the buffer, nothing more is need 
@@ -249,7 +253,7 @@ public class GLTextBuffer extends GLBuffer
 			// updated the buffer.
 			return ;
 		}
-	
+
 		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
 		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
 

@@ -17,14 +17,20 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLGeometryBuffer extends GLBuffer
 {
-	private final static int INDEX_BYTE_SIZE = 5 * 1024 ;
-	private final static int VERTEX_BYTE_SIZE = 5 * 1024 ;
+	private final static int MIN_INDEX_BYTE_SIZE = 5 * 1024 * 1024 ;
+	private final static int MIN_VERTEX_BYTE_SIZE = 5 * 1024 * 1024 ;
 
-	private final int indexByteSize ;
-	private final int vertexByteSize ;
+	private final static int MAX_INDEX_BYTE_SIZE = 50 * 1024 * 1024 ;
+	private final static int MAX_VERTEX_BYTE_SIZE = 50 * 1024 * 1024 ;
 
-	private final IntBuffer indexBuffer ;
-	private final FloatBuffer vertexBuffer ;
+	private final int maxIndexByteSize ;
+	private final int maxVertexByteSize ;
+
+	private int indexByteSize ;
+	private int vertexByteSize ;
+
+	private IntBuffer indexBuffer ;
+	private FloatBuffer vertexBuffer ;
 
 	private int[] indexID = new int[1] ;
 	private int[] vboID = new int[1] ;
@@ -52,21 +58,34 @@ public class GLGeometryBuffer extends GLBuffer
 
 	public GLGeometryBuffer( final GeometryBuffer _buffer )
 	{
-		this( _buffer, INDEX_BYTE_SIZE, VERTEX_BYTE_SIZE ) ;
+		this( _buffer, MIN_INDEX_BYTE_SIZE,
+					   MIN_VERTEX_BYTE_SIZE,
+					   MAX_INDEX_BYTE_SIZE,
+					   MAX_VERTEX_BYTE_SIZE ) ;
 	}
 
-	public GLGeometryBuffer( final GeometryBuffer _buffer, final int _indexByteSize, final int _vertexByteSize )
+	public GLGeometryBuffer( final GeometryBuffer _buffer,
+							 final int _indexByteSize,
+							 final int _vertexByteSize,
+							 final int _maxIndexByteSize,
+							 final int _maxVertexByteSize )
 	{
 		super( _buffer.isUI() ) ;
 
 		indexByteSize = _indexByteSize ;
 		vertexByteSize = _vertexByteSize ;
 
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _indexByteSize ) ;
+		maxIndexByteSize = _maxIndexByteSize ;
+		maxVertexByteSize = _maxVertexByteSize ;
+
+		// We'll construct our buffers for the minimum size
+		// but if we need more space we'll expand the size 
+		// until we reach our maximum capacity.
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _vertexByteSize ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
 
@@ -76,9 +95,13 @@ public class GLGeometryBuffer extends GLBuffer
 
 	public boolean update( final GeometryBuffer _buffer )
 	{
-		final int swivelSize = calculateVertexSize( _buffer.getSwivel() ) ;
-		vertexStride = swivelSize ;
-		vertexStrideBytes = swivelSize * VBO_VAR_BYTE_SIZE ;
+		if( vertexStride <= 0 )
+		{
+			// GeometryBuffer swivel is not expected to change once it is 
+			// set, so we'll only calculate the swivel once.
+			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
+			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+		}
 
 		switch( _buffer.getStyle() )
 		{
@@ -92,6 +115,9 @@ public class GLGeometryBuffer extends GLBuffer
 		int usedIndexByteSize = 0 ;
 		int usedVertexByteSize = 0 ;
 
+		indexBuffer.position( 0 ) ;
+		vertexBuffer.position( 0 ) ;
+
 		for( final Draw draw : _buffer.getDraws() )
 		{
 			if( draw.isHidden() == true )
@@ -104,7 +130,19 @@ public class GLGeometryBuffer extends GLBuffer
 			final int shapeVertexByteSize = shape.getVertexSize() * vertexStrideBytes ;
 
 			usedIndexByteSize += shapeIndexByteSize ;
-			usedVertexByteSize  += shapeVertexByteSize ;
+			if(usedIndexByteSize > indexByteSize)
+			{
+				//System.out.println( "Expand Index Buffer" ) ;
+				expandIndexBuffer() ;
+			}
+
+			usedVertexByteSize += shapeVertexByteSize ;
+			if( usedVertexByteSize > vertexByteSize )
+			{
+				//System.out.println( "Expand Vertex Buffer" ) ;
+				expandVertexBuffer() ;
+			}
+
 			if( usedIndexByteSize > indexByteSize || usedVertexByteSize > vertexByteSize )
 			{
 				upload( bufferIndex ) ;
@@ -148,6 +186,15 @@ public class GLGeometryBuffer extends GLBuffer
 		GLGeometryBuffer.enableVertexAttributes( _attributes ) ;
 		for( int i = 0; i < indexLength.length; ++i )
 		{
+			final int length = indexLength[i] ;
+			if( length <= 0 )
+			{
+				// We may have indices and vertices but if they 
+				// current have no data uploaded to them there 
+				// is no point drawing them.
+				continue ;
+			}
+
 			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[i] ) ;
 			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[i] ) ;
 
@@ -167,6 +214,60 @@ public class GLGeometryBuffer extends GLBuffer
 	{
 		MGL.glDeleteBuffers( indexID.length, indexID, 0 ) ;
 		MGL.glDeleteBuffers( vboID.length, vboID, 0 ) ;
+	}
+
+	private void expandIndexBuffer()
+	{
+		if( indexByteSize == maxIndexByteSize )
+		{
+			// We can't expand the buffer any more.
+			return ;
+		}
+	
+		final int doubleCapacity = indexByteSize * 2 ;
+		indexByteSize = (doubleCapacity > maxIndexByteSize) ? maxIndexByteSize : doubleCapacity ;
+	
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
+		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+
+		final IntBuffer old = indexBuffer ;
+		// We need to take the position of the original buffer
+		// when we make a copy it will set the position of the 
+		// new buffer to the size of the original, however our 
+		// data may not have maxed out the full buffer.
+		final int position = old.position() ;
+		old.position( 0 ) ;
+
+		indexBuffer = indexByteBuffer.asIntBuffer() ;
+		indexBuffer.put( old ) ;
+		indexBuffer.position( position ) ;
+	}
+
+	private void expandVertexBuffer()
+	{
+		if( vertexByteSize == maxVertexByteSize )
+		{
+			// We can't expand the buffer any more.
+			return ;
+		}
+	
+		final int doubleCapacity = vertexByteSize * 2 ;
+		vertexByteSize = (doubleCapacity > maxVertexByteSize) ? maxVertexByteSize : doubleCapacity ;
+
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
+		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+
+		final FloatBuffer old = vertexBuffer ;
+		// We need to take the position of the original buffer
+		// when we make a copy it will set the position of the 
+		// new buffer to the size of the original, however our 
+		// data may not have maxed out the full buffer.
+		final int position = old.position() ;
+		old.position( 0 ) ;
+
+		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
+		vertexBuffer.put( old ) ;
+		vertexBuffer.position( position ) ;
 	}
 
 	private int genNewBuffers()
@@ -191,17 +292,24 @@ public class GLGeometryBuffer extends GLBuffer
 	private void upload( final int _index )
 	{
 		//System.out.println( "Upload to Buffer Index: " + _index ) ;
-		indexLength[_index] = indexBuffer.position() ;
-		final int indiciesLengthBytes = indexLength[_index] * IBO_VAR_BYTE_SIZE ;
+		final int length = indexBuffer.position() ;
+		indexLength[_index] = length ;
+
+		if( length <= 0 )
+		{
+			return ;
+		}
+
+		final int indiciesLengthBytes = length * IBO_VAR_BYTE_SIZE ;
 		final int verticiesLengthBytes = vertexBuffer.position() * VBO_VAR_BYTE_SIZE ;
 
 		indexBuffer.position( 0 ) ;
 		vertexBuffer.position( 0 ) ;
 
 		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[_index] ) ;
-		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
-
 		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[_index] ) ;
+
+		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 	

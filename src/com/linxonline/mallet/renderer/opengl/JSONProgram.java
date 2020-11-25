@@ -102,7 +102,7 @@ public class JSONProgram
 			{
 				Logger.println( "Mallet Program contains more uniforms than OpenGL Program expects", Logger.Verbosity.MINOR ) ;
 			}
-			else if( diff < 0 )
+			else //if( diff < 0 )
 			{
 				Logger.println( "Mallet Program contains less uniforms than OpenGL Program expects", Logger.Verbosity.MINOR ) ;
 			}

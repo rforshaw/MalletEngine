@@ -379,7 +379,7 @@ public final class GameTestLoader implements IGameLoader
 				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
 					private DrawUpdater updater ;
-					private DrawUpdater debugUpdater ;
+					//private DrawUpdater debugUpdater ;
 					private final Vector2 position = new Vector2() ;
 
 					@Override

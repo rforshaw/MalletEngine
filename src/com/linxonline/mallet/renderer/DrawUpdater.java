@@ -223,6 +223,11 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 			for( final WeakReference<DrawUpdater> weak : globals )
 			{
 				final DrawUpdater updater = weak.get() ;
+				if( updater == null )
+				{
+					continue ;
+				}
+
 				final DrawBuffer buffer = updater.drawBuffer ;
 				if( buffer == null )
 				{

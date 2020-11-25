@@ -7,12 +7,11 @@ import com.linxonline.mallet.util.locks.* ;
 
 public final class WorkerThread extends Thread
 {
-	private boolean stop = false ;								// true == Kill the thread
+	private boolean stop = false ;									// true == Kill the thread
 	private boolean paused = true ;
 
-	private Object block = new Object() ;						// Block thread while waiting for work
-	private ILock groupLock = null ;
-	private WorkerGroup.WorkerCondition groupCondition = null ;		// Lock to calling thread
+	private Object block = new Object() ;			// Block thread while waiting for work
+	private Condition groupCondition = null ;		// Lock to calling thread
 	
 	private Worker<?> worker = null ;					// Defines execution and data set
 	private List dataset = null ;
@@ -29,12 +28,16 @@ public final class WorkerThread extends Thread
 		super( _name ) ;
 	}
 
-	public void setWorkerCondition( final ILock _lock, final WorkerGroup.WorkerCondition _condition )
+	public void setState( final Condition _condition,
+						  final Worker<?> _worker,
+						  final List _dataset,
+						  final int _start,
+						  final int _end )
 	{
 		synchronized( block )
 		{
-			groupLock = _lock ;
-			groupCondition = _condition ;
+			setWorker( _condition, _worker ) ;
+			setRange( _dataset, _start, _end ) ;
 		}
 	}
 
@@ -42,27 +45,21 @@ public final class WorkerThread extends Thread
 		Define the subset of the Worker DataSet this 
 		worker thread will be processing.
 	*/
-	public void setRange( final List _dataset, final int _start, final int _end )
+	private void setRange( final List _dataset, final int _start, final int _end )
 	{
-		synchronized( block )
-		{
-			//System.out.println( "Start: " + _start + " End: " + _end ) ;
-			dataset = _dataset ;
-			start = _start ;
-			end = _end ;
-		}
+		dataset = _dataset ;
+		start = _start ;
+		end = _end ;
 	}
 
 	/**
 		Set the worker, without this the thread will 
 		not process anything.
 	*/
-	public void setWorker( final Worker<?> _worker )
+	private void setWorker( final Condition _condition,final Worker<?> _worker )
 	{
-		synchronized( block )
-		{
-			worker = _worker ;
-		}
+		worker = _worker ;
+		groupCondition = _condition ;
 	}
 
 	@Override
@@ -74,9 +71,10 @@ public final class WorkerThread extends Thread
 			{
 				synchronized( block )
 				{
+					// Block this thread until another thread resumes it,
+					// this should be the Main thread from a WorkerGroup.
 					while( paused == true )
 					{
-						//System.out.println( getName() + " is inactive " + paused ) ;
 						block.wait() ;
 					}
 				}
@@ -89,19 +87,18 @@ public final class WorkerThread extends Thread
 				//System.out.println( "Exec Worker: " + start + " to: " + end ) ;
 				if( worker.exec( dataset, start, end ) == Worker.ExecType.FINISH )
 				{
-					setWorker( null ) ;
+					setWorker( groupCondition, null ) ;
 					setRange( null, 0, 0 ) ;
 					paused = true ;
 				}
 
-				if( groupLock != null && groupCondition != null )
+				if( groupCondition != null )
 				{
 					// Inform calling WorkerGroup/thread you've finished
 					// Multilock will only be set if calling thread 
 					// is expected to wait for the work to be completed.
 					//System.out.println( "Unregister" ) ;
-					groupCondition.unregister() ;
-					groupLock.unlock() ;
+					groupCondition.met() ;
 				}
 			}
 		}

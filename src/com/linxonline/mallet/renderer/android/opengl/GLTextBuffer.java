@@ -109,9 +109,13 @@ public class GLTextBuffer extends GLBuffer
 				attributes = constructVertexAttrib( shape.getSwivel(), glProgram ) ;
 			}
 
-			final int swivelSize = calculateVertexSize( shape.getSwivel() ) ;
-			vertexStride = swivelSize ;
-			vertexStrideBytes = swivelSize * VBO_VAR_BYTE_SIZE ;
+			if( vertexStride <= 0 )
+			{
+				// Swivel is not expected to change once it is 
+				// set, so we'll only calculate the swivel once.
+				vertexStride = calculateVertexSize( shape.getSwivel() ) ;
+				vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+			}
 
 			switch( shape.getStyle() )
 			{

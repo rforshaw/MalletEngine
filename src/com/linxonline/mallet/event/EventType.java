@@ -4,6 +4,7 @@ import java.util.Map ;
 import java.util.Arrays ;
 import java.util.ArrayList ;
 import java.util.Iterator ;
+import java.util.NoSuchElementException ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -161,6 +162,11 @@ public final class EventType
 		@Override
 		public T next()
 		{
+			if( next == null )
+			{
+				throw new NoSuchElementException() ;
+			}
+
 			return next ;
 		}
 	}

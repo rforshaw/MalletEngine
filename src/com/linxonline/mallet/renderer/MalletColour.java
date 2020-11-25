@@ -178,7 +178,7 @@ public class MalletColour
 
 		return new MalletColour( red, green, blue, alpha ) ;
 	}
-	
+
 	public static MalletColour white()
 	{
 		return new MalletColour( 255, 255, 255 ) ;

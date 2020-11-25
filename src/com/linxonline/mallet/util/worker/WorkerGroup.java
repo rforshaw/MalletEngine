@@ -12,9 +12,9 @@ public final class WorkerGroup
 {
 	private final Stack<WorkerThread> availableWorkers = new Stack<WorkerThread>() ;
 	private final ArrayList<WorkerThread> workers = new ArrayList<WorkerThread>() ;
-	private final WorkerCondition condition ;
 
 	private final ILock lock = new Lock() ;
+	private final Condition condition ;
 
 	public WorkerGroup()
 	{
@@ -25,7 +25,7 @@ public final class WorkerGroup
 	{
 		availableWorkers.ensureCapacity( _threads ) ;
 		workers.ensureCapacity( _threads ) ;
-		condition = new WorkerCondition( _threads ) ;
+		condition = new Condition( lock, _threads ) ;
 
 		for( int i = 0; i < _threads; i++ )
 		{
@@ -43,7 +43,6 @@ public final class WorkerGroup
 	*/
 	public <T> void exec( final List<T> _dataset, final Worker<T> _worker )
 	{
-		//System.out.println( "Exec Worker Group" ) ;
 		if( _dataset.isEmpty() == true )
 		{
 			// If there is no data to process then we 
@@ -65,29 +64,23 @@ public final class WorkerGroup
 		final int remainder = dataSize % threadLength ;
 		condition.reset( threadLength ) ;
 
-		//System.out.println( "Available: " + threadLength + " Amount: " + dataSize + " Divided: " + range + " Remainder: " + remainder  ) ;
-		//System.out.println( "Start Group: " + range ) ;
 		for( int i = 0; i < threadLength; ++i )
 		{
 			final WorkerThread thread = availableWorkers.pop() ;
 			workers.add( thread ) ;
 
 			final int extra = ( i == 0 ) ? remainder : 0 ;
+			final int end = start + range + extra ;
 
-			thread.setWorkerCondition( lock, condition ) ;
-			thread.setRange( _dataset, start, start + range + extra ) ;
-			thread.setWorker( _worker ) ;
-
+			thread.setState( condition, _worker, _dataset, start, end ) ;
 			start += range + extra ;
 
 			thread.unpause() ;			// Resume data updating
 		}
 
-		//System.out.println( "Lock Group" ) ;
 		// Only continue once all WorkerThreads have finished
-		lock.lock( condition ) ;
+		lock.lock() ;
 
-		//System.out.println( "Relinquish Group" ) ;
 		relinquishWorkers() ;
 	}
 
@@ -99,7 +92,6 @@ public final class WorkerGroup
 	*/
 	public <T> void exec( final List<T> _dataset, final Worker<T>[] _workers )
 	{
-		//System.out.println( "Exec Worker Group" ) ;
 		if( _dataset.isEmpty() == true )
 		{
 			// If there is no data to process then we 
@@ -129,8 +121,6 @@ public final class WorkerGroup
 		final int remainder = dataSize % threadLength ;
 		condition.reset( threadLength ) ;
 
-		//System.out.println( "Available: " + threadLength + " Amount: " + dataSize + " Divided: " + range + " Remainder: " + remainder  ) ;
-		//System.out.println( "Start Group: " + range ) ;
 		for( int i = 0; i < threadLength; ++i )
 		{
 			final WorkerThread thread = availableWorkers.pop() ;
@@ -139,21 +129,16 @@ public final class WorkerGroup
 			final Worker<T> worker = _workers[i] ;
 
 			final int extra = ( i == 0 ) ? remainder : 0 ;
+			final int end = start + range + extra ;
 
-			thread.setWorkerCondition( lock, condition ) ;
-			thread.setRange( _dataset, start, start + range + extra ) ;
-			thread.setWorker( worker ) ;
-
+			thread.setState( condition, worker, _dataset, start, end ) ;
 			start += range + extra ;
 
 			thread.unpause() ;			// Resume data updating
 		}
 
-		//System.out.println( "Lock Group" ) ;
 		// Only continue once all WorkerThreads have finished
-		lock.lock( condition ) ;
-
-		//System.out.println( "Relinquish Group" ) ;
+		lock.lock() ;
 		relinquishWorkers() ;
 	}
 
@@ -176,33 +161,5 @@ public final class WorkerGroup
 		}
 
 		return true ;
-	}
-
-	public static class WorkerCondition implements ICondition
-	{
-		private int active ;
-
-		public WorkerCondition( final int _workers )
-		{
-			active = _workers ;
-		}
-
-		public synchronized void reset( final int _workers )
-		{
-			//System.out.println( "Reset: " + _workers ) ;
-			active = _workers  ;
-		}
-
-		public synchronized void unregister()
-		{
-			//System.out.println( "Unregister" ) ;
-			--active ;
-		}
-
-		public synchronized boolean isConditionMet()
-		{
-			//System.out.println( "Group Condition: " + active ) ;
-			return active <= 0 ;
-		}
 	}
 }

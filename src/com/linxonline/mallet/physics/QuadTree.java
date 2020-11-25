@@ -709,25 +709,11 @@ public class QuadTree
 	{
 		if( _point.x >= _centre.x )
 		{
-			if( _point.y >= _centre.y )
-			{
-				return Quadrant.TOP_RIGHT ;
-			}
-			else
-			{
-				return Quadrant.BOTTOM_RIGHT ;
-			}
+			return ( _point.y >= _centre.y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
 		}
 		else
 		{
-			if( _point.y >= _centre.y )
-			{
-				return Quadrant.TOP_LEFT ;
-			}
-			else
-			{
-				return Quadrant.BOTTOM_LEFT ;
-			}
+			return ( _point.y >= _centre.y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
 		}
 	}
 

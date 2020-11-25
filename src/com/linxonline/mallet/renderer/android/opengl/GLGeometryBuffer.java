@@ -76,9 +76,13 @@ public class GLGeometryBuffer extends GLBuffer
 
 	public boolean update( final GeometryBuffer _buffer )
 	{
-		final int swivelSize = calculateVertexSize( _buffer.getSwivel() ) ;
-		vertexStride = swivelSize ;
-		vertexStrideBytes = swivelSize * VBO_VAR_BYTE_SIZE ;
+		if( vertexStride <= 0 )
+		{
+			// GeometryBuffer swivel is not expected to change once it is 
+			// set, so we'll only calculate the swivel once.
+			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
+			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+		}
 
 		switch( _buffer.getStyle() )
 		{

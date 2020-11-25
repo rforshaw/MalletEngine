@@ -3,22 +3,27 @@ package com.linxonline.mallet.util.locks ;
 public class Lock implements ILock
 {
 	private final Object lock = new Object() ;
+	private boolean shouldLock = false ;
 
+	@Override
 	public void unlock()
 	{
 		synchronized( lock )
 		{
+			shouldLock = false ;
 			lock.notifyAll() ;
 		}
 	}
 
-	public void lock( final ICondition _condition )
+	@Override
+	public void lock()
 	{
 		synchronized( lock )
 		{
+			shouldLock = true ;
 			try
 			{
-				while( _condition.isConditionMet() == false )
+				while( shouldLock == true )
 				{
 					lock.wait() ;
 				}

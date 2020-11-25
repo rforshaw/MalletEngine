@@ -4,5 +4,5 @@ public interface ILock
 {
 	public void unlock() ;
 	
-	public void lock( final ICondition _condition ) ;
+	public void lock() ;
 }

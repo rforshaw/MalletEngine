@@ -175,7 +175,7 @@ public class GLWorld
 		if( backBuffers[_index] == null )
 		{
 			final int channel = 3 ;
-			final long estimatedConsumption = render.x * render.y * ( channel * 8 ) ;
+			final long estimatedConsumption = ( long )( render.x * render.y ) * ( long )( channel * 8 ) ;
 			final GLImage buffer = new GLImage( 0, estimatedConsumption ) ;
 
 			MGL.glGenTextures( 1, buffer.textureIDs, 0 ) ;
@@ -228,7 +228,7 @@ public class GLWorld
 		{
 			switch( buffer.getBufferType() )
 			{
-				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ;
+				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
 				case DRAW_BUFFER :
 				case TEXT_BUFFER :
 				{

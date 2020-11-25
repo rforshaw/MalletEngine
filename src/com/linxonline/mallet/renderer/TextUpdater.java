@@ -183,7 +183,11 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 			for( final WeakReference<TextUpdater> weak : globals )
 			{
 				final TextUpdater updater = weak.get() ;
-				
+				if( updater == null )
+				{
+					continue ;
+				}
+
 				final TextBuffer buffer = updater.getBuffers().get( 0 ) ;
 				if( buffer == null )
 				{

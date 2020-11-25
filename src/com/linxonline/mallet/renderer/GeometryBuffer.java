@@ -40,6 +40,13 @@ public class GeometryBuffer extends ABuffer
 		}
 	}
 
+	/**
+		Return the swivel that this geometry class expects 
+		all Draw objects to adhere to.
+		If the draw object's shape does not have an identical 
+		swivel then it will most likely not work. Or simply 
+		work by sheer fluke.
+	*/
 	public Shape.Swivel[] getSwivel()
 	{
 		return swivel ;
