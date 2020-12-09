@@ -84,11 +84,11 @@ public class GUIText extends GUIComponent
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDraws( drawText ) ;
+			updater.removeDynamics( drawText ) ;
 		}
 
 		updater = TextUpdater.getOrCreate( getWorld(), program, true, getLayer() ) ;
-		updater.addDraws( drawText ) ;
+		updater.addDynamics( drawText ) ;
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class GUIText extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDraws( drawText ) ;
+			updater.removeDynamics( drawText ) ;
 		}
 	}
 
@@ -109,7 +109,7 @@ public class GUIText extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDraws( drawText ) ;
+			updater.removeDynamics( drawText ) ;
 		}
 
 		updater = TextUpdater.getOrCreate( getWorld(), program, true, _layer ) ;

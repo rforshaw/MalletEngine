@@ -66,20 +66,20 @@ public class GUIScrollbar extends GUIComponent
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDraws( xBar, yBar ) ;
+			updater.removeDynamics( xBar, yBar ) ;
 		}
 
 		final Shape shape = xBar.getShape() ;
 		final int layer = getLayer() ;
 
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
-		updater.addDraws( xBar, yBar ) ;
+		updater.addDynamics( xBar, yBar ) ;
 	}
 
 	@Override
 	public void removeDraws()
 	{
-		updater.removeDraws( xBar, yBar ) ;
+		updater.removeDynamics( xBar, yBar ) ;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class GUIScrollbar extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDraws( xBar, yBar ) ;
+			updater.removeDynamics( xBar, yBar ) ;
 		}
 
 		final Shape shape = xBar.getShape() ;

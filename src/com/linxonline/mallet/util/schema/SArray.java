@@ -3,7 +3,7 @@ package com.linxonline.mallet.util.schema ;
 public class SArray extends SNode
 {
 	private final SNode contains ;
-	private final int length ;
+	private final int arraylength ;
 
 	public SArray( final SNode _contains )
 	{
@@ -15,7 +15,7 @@ public class SArray extends SNode
 		contains = _contains ;
 		contains.setParent( this ) ;
 
-		length = _length ;
+		arraylength = _length ;
 	}
 
 	public SNode getSupportedType()
@@ -29,16 +29,26 @@ public class SArray extends SNode
 	*/
 	public boolean isDynamic()
 	{
-		return length == 0 ;
+		return arraylength == 0 ;
 	}
 
 	/**
 		Return the length of the array, it will return 
 		0, if the array is of an unspecified size.
 	*/
+	public int getArrayLength()
+	{
+		return arraylength ;
+	}
+	
+	/**
+		Return the length of the array in bytes, it 
+		will return 0, if the array is of an unspecified size.
+	*/
+	@Override
 	public int getLength()
 	{
-		return length ;
+		return arraylength * contains.getLength() ;
 	}
 
 	@Override
@@ -52,7 +62,7 @@ public class SArray extends SNode
 	{
 		int hash = 7 ;
 		hash = 31 * hash + contains.hashCode() ;
-		hash = 31 * hash + length ;
+		hash = 31 * hash + arraylength ;
 		return hash ;
 	}
 
@@ -62,7 +72,7 @@ public class SArray extends SNode
 		if( _obj instanceof SArray )
 		{
 			final SArray array = ( SArray )_obj ;
-			if( length != array.length )
+			if( arraylength != array.arraylength )
 			{
 				return false ;
 			}

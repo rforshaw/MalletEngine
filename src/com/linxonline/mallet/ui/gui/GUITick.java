@@ -21,7 +21,7 @@ public class GUITick extends GUIDraw
 				final IUpdater<Draw, ?> updater = getUpdater() ;
 				if( updater != null )
 				{
-					updater.removeDraws( getDraw() ) ;
+					updater.removeDynamics( getDraw() ) ;
 				}
 			}
 		}

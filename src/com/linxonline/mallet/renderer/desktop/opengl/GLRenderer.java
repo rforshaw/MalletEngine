@@ -15,6 +15,7 @@ import com.jogamp.opengl.GLEventListener ;
 
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.MalletList ;
@@ -32,8 +33,6 @@ import com.linxonline.mallet.util.schema.SNode ;
 
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
-
-import com.linxonline.mallet.renderer.* ; ;
 
 public class GLRenderer extends BasicRenderer implements GLEventListener
 {
@@ -61,12 +60,14 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
 	private final AssetLookup<ABuffer, GLBuffer> bufferLookup = new AssetLookup<ABuffer, GLBuffer>( "BUFFER" ) ;
 	private final AssetLookup<Program, GLProgram> programLookup = new AssetLookup<Program, GLProgram>( "PROGRAM" ) ;
+	private final AssetLookup<Storage, GLStorage> storageLookup = new AssetLookup<Storage, GLStorage>( "STORAGE" ) ;
 
 	private static List<Camera> cameras = new ArrayList<Camera>() ;
 	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
 
 	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
 	private final List<IUpdater<?, ? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<?, ? extends ABuffer>>() ;
+	private final List<IUpdater<?, Storage>> storageUpdaters = new ArrayList<IUpdater<?, Storage>>() ;
 
 	public GLRenderer()
 	{
@@ -450,24 +451,44 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public Storage create( final String _id, final int _size )
+			public <T extends IUpdater<?, Storage>> T add( final T _updater )
 			{
-				final GLStorage storage = new GLStorage( _size ) ;
 				GLRenderer.this.invokeLater( new Runnable()
 				{
 					public void run()
 					{
-						MGL.glGenBuffers( 1, storage.id, 0 ) ;
+						storageUpdaters.add( _updater ) ;
 					}
 				} ) ;
-
-				return storage ;
+				return _updater ;
 			}
 
 			@Override
-			public Storage get( final String _id )
+			public <T extends IUpdater<?, Storage>> T remove( final T _updater )
 			{
-				throw new UnsupportedOperationException() ;
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						storageUpdaters.remove( _updater ) ;
+					}
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public Storage add( Storage _storage )
+			{
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLStorage storage = new GLStorage( _storage ) ;
+						storageLookup.map( _storage.index(), _storage, storage ) ;
+					}
+				} ) ;
+
+				return _storage ;
 			}
 
 			@Override
@@ -477,87 +498,20 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				{
 					public void run()
 					{
-						final GLStorage storage = ( GLStorage )_storage ;
-						final float[] buffer = storage.getBuffer() ;
-
-						final int lengthInBytes = buffer.length * 4 ;
-
-						final java.nio.ByteBuffer byteBuffer = java.nio.ByteBuffer.allocateDirect( lengthInBytes ) ;
-						byteBuffer.order( java.nio.ByteOrder.nativeOrder() ) ;
-						final java.nio.FloatBuffer floatBuffer = byteBuffer.asFloatBuffer() ;
-
-						floatBuffer.put( buffer ) ;
-						floatBuffer.position( 0 ) ;
-
-						MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, storage.id[0] ) ;
-						MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, floatBuffer​, MGL.GL_DYNAMIC_DRAW ) ;
+						final GLStorage storage = get( _storage ) ;
+						if( storage != null )
+						{
+							storage.update( _storage ) ;
+						}
 					}
 				} ) ;
 
 				return _storage ;
 			}
-			
-			@Override
-			public int calculateSize( SNode _node )
+
+			private GLStorage get( final Storage _storage )
 			{
-				switch( _node.getType() )
-				{
-					default      : throw new UnsupportedOperationException() ;
-					case STRUCT  : return calculateSStruct( ( SStruct )_node ) ;
-					case ARRAY   : return calculateArray( ( SArray )_node ) ;
-					case BOOL    : return 4 ;
-					case FLOAT   : return 4 ;
-					case INTEGER : return 4 ;
-				}
-			}
-			
-			@Override
-			public int calculateOffset( SNode _node )
-			{
-				int offset = 0 ;
-				SNode node = _node.getParent() ;
-				switch( _node.getType() )
-				{
-					default      : throw new UnsupportedOperationException() ;
-					case STRUCT  : offset += calculateSStructOffset( ( SStruct )node, _node ) ; break ;
-					case ARRAY   : offset += calculateArray( ( SArray )node ) ; break ;
-					case BOOL    : offset +=  4 ; break ;
-					case FLOAT   : offset +=  4 ; break ;
-					case INTEGER : offset +=  4 ; break ;
-				}
-
-				return offset ;
-			}
-
-			private int calculateSStructOffset( SStruct _parent, SNode _child )
-			{
-				int size = 0 ;
-				for( final Tuple<String, SNode> child : _parent.getChildren() )
-				{
-					if( child.getRight() == _child )
-					{
-						return size ;
-					}
-
-					size += calculateSize( child.getRight() ) ;
-				}
-
-				return size ;
-			}
-
-			private int calculateArray( SArray _array )
-			{
-				return _array.getLength() * calculateSize( _array.getSupportedType() ) ;
-			}
-
-			private int calculateSStruct( SStruct _struct )
-			{
-				int size = 0 ;
-				for( final Tuple<String, SNode> child : _struct.getChildren() )
-				{
-					size += calculateSize( child.getRight() ) ;
-				}
-				return size ;
+				return storageLookup.getRHS( _storage.index() ) ;
 			}
 		} ;
 	}
@@ -673,28 +627,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		}
 
 		int totalBufferUpdates = 0 ;
-		
-		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
-		{
-			if( updater.isDirty() == false )
-			{
-				continue ;
-			}
-
-			updater.update( buffersToUpdate, difference, frameNo ) ;
-			if( buffersToUpdate.isEmpty() == false )
-			{
-				totalBufferUpdates += buffersToUpdate.size() ;
-				for( final ABuffer buffer : buffersToUpdate )
-				{
-					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
-					{
-						updater.makeDirty() ;
-					}
-				}
-				buffersToUpdate.clear() ;
-			}
-		}
+		totalBufferUpdates += updateStorageBuffers( difference, frameNo ) ;
+		totalBufferUpdates += updateBuffers( difference, frameNo ) ;
 
 		//System.out.println( totalBufferUpdates ) ;
 
@@ -808,6 +742,65 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return fontManager.get( _font ) ;
 	}
 
+	private int updateStorageBuffers( final int _difference, final int _frameNo )
+	{
+		int totalBufferUpdates = 0 ;
+
+		for( final IUpdater<?, Storage> updater : storageUpdaters )
+		{
+			if( updater.isDirty() == false )
+			{
+				continue ;
+			}
+
+			updater.update( buffersToUpdate, _difference, _frameNo ) ;
+			if( buffersToUpdate.isEmpty() == false )
+			{
+				totalBufferUpdates += buffersToUpdate.size() ;
+				for( final ABuffer buffer : buffersToUpdate )
+				{
+					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
+					if( storage.update( ( Storage )buffer ) == false )
+					{
+						updater.makeDirty() ;
+					}
+				}
+				buffersToUpdate.clear() ;
+			}
+		}
+
+		return totalBufferUpdates ;
+	}
+
+	private int updateBuffers( final int _difference, final int _frameNo )
+	{
+		int totalBufferUpdates = 0 ;
+
+		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
+		{
+			if( updater.isDirty() == false )
+			{
+				continue ;
+			}
+
+			updater.update( buffersToUpdate, _difference, _frameNo ) ;
+			if( buffersToUpdate.isEmpty() == false )
+			{
+				totalBufferUpdates += buffersToUpdate.size() ;
+				for( final ABuffer buffer : buffersToUpdate )
+				{
+					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
+					{
+						updater.makeDirty() ;
+					}
+				}
+				buffersToUpdate.clear() ;
+			}
+		}
+
+		return totalBufferUpdates ;
+	}
+	
 	private <T extends ABuffer> boolean updateBuffer( final T _buffer, final GLBuffer _buff )
 	{
 		switch( _buffer.getBufferType() )
@@ -821,12 +814,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			case TEXT_BUFFER     :
 			{
 				final GLTextBuffer buf = ( GLTextBuffer )_buff ;
-				return buf.update( ( TextBuffer )_buffer, programLookup ) ;
+				return buf.update( ( TextBuffer )_buffer, programLookup, storageLookup ) ;
 			}
 			case DRAW_BUFFER     :
 			{
 				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
-				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup ) ;
+				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
 			}
 		}
 	}

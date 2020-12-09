@@ -92,7 +92,7 @@ public class GUIDraw extends GUIComponent
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDraws( draw ) ;
+			updater.removeDynamics( draw ) ;
 		}
 
 		final int layer = getLayer() ;
@@ -100,7 +100,7 @@ public class GUIDraw extends GUIComponent
 
 		System.out.println( "Add GUI " + _world.getID() ) ;
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
-		updater.addDraws( draw ) ;
+		updater.addDynamics( draw ) ;
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDraws( draw ) ;
+			updater.removeDynamics( draw ) ;
 		}
 	}
 
@@ -117,7 +117,7 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDraws( draw ) ;
+			updater.removeDynamics( draw ) ;
 		}
 
 		final Shape shape = draw.getShape() ;

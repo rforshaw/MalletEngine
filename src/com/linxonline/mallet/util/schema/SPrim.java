@@ -3,25 +3,37 @@ package com.linxonline.mallet.util.schema ;
 public class SPrim extends SNode
 {
 	private final Type type ;
+	private final int length ;
 
-	private SPrim( final Type _type )
+	/**
+		Specify the type of primitive and the length in bytes
+		of the primitive.
+	*/
+	private SPrim( final Type _type, final int _length )
 	{
 		type = _type ;
+		length = _length ;
 	}
 
 	public static SPrim bool()
 	{
-		return new SPrim( Type.BOOL ) ;
+		return new SPrim( Type.BOOL, 1 ) ;
 	}
 
 	public static SPrim integer()
 	{
-		return new SPrim( Type.INTEGER ) ;
+		return new SPrim( Type.INTEGER, 4 ) ;
 	}
 	
 	public static SPrim flt()
 	{
-		return new SPrim( Type.FLOAT ) ;
+		return new SPrim( Type.FLOAT, 4 ) ;
+	}
+
+	@Override
+	public int getLength()
+	{
+		return length ;
 	}
 
 	@Override

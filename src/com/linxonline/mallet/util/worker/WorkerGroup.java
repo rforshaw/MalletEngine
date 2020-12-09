@@ -13,7 +13,6 @@ public final class WorkerGroup
 	private final Stack<WorkerThread> availableWorkers = new Stack<WorkerThread>() ;
 	private final ArrayList<WorkerThread> workers = new ArrayList<WorkerThread>() ;
 
-	private final ILock lock = new Lock() ;
 	private final Condition condition ;
 
 	public WorkerGroup()
@@ -25,7 +24,7 @@ public final class WorkerGroup
 	{
 		availableWorkers.ensureCapacity( _threads ) ;
 		workers.ensureCapacity( _threads ) ;
-		condition = new Condition( lock, _threads ) ;
+		condition = new Condition( _threads ) ;
 
 		for( int i = 0; i < _threads; i++ )
 		{
@@ -51,6 +50,7 @@ public final class WorkerGroup
 		}
 
 		int threadLength = availableWorkers.size() ;
+		//System.out.println( threadLength ) ;
 		final int dataSize = _dataset.size() ;
 		if( threadLength > dataSize )
 		{
@@ -79,8 +79,7 @@ public final class WorkerGroup
 		}
 
 		// Only continue once all WorkerThreads have finished
-		lock.lock() ;
-
+		waitForCondition( condition ) ;
 		relinquishWorkers() ;
 	}
 
@@ -138,8 +137,23 @@ public final class WorkerGroup
 		}
 
 		// Only continue once all WorkerThreads have finished
-		lock.lock() ;
+		waitForCondition( condition ) ;
 		relinquishWorkers() ;
+	}
+
+	private void waitForCondition( Condition _condition )
+	{
+		try
+		{
+			while( _condition.isMet() == false )
+			{
+				synchronized( this )
+				{
+					wait( 1 ) ;
+				}
+			}
+		}
+		catch( InterruptedException ex ) {}
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.nio.* ;
 import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Program ;
+import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.TextBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -52,6 +53,7 @@ public class GLTextBuffer extends GLBuffer
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
 
+	private AssetLookup<Storage, GLStorage> storages ;
 	private boolean stable = false ;
 
 	public GLTextBuffer( final TextBuffer _buffer )
@@ -75,7 +77,9 @@ public class GLTextBuffer extends GLBuffer
 		MGL.glGenBuffers( 1, vboID, 0 ) ;
 	}
 
-	public boolean update( final TextBuffer _buffer, final AssetLookup<Program, GLProgram> _lookup )
+	public boolean update( final TextBuffer _buffer,
+						   final AssetLookup<Program, GLProgram> _lookup,
+						   final AssetLookup<Storage, GLStorage> _storages )
 	{
 		final Program program = _buffer.getProgram() ;
 
@@ -238,6 +242,8 @@ public class GLTextBuffer extends GLBuffer
 		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 
+		storages = _storages ;
+
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -267,7 +273,7 @@ public class GLTextBuffer extends GLBuffer
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		glProgram.bindBuffers( mapProgram ) ;
+		glProgram.bindBuffers( mapProgram, storages ) ;
 
 		GLGeometryBuffer.enableVertexAttributes( attributes ) ;
 

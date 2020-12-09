@@ -11,7 +11,7 @@ import java.nio.ByteOrder ;
 	When converting a variable to a byte-stream, you must define the endianese. 
 	This will detrmine the byte-order of the returned byte-stream.
 
-	When converting a byte-stream to a variable it doe snot convert it to the 
+	When converting a byte-stream to a variable it does not convert it to the 
 	appropriate endianese of the system.
 
 	Use flipEndian to change the endianese of a byte-stream or sub-set of a byte-stream.
@@ -22,6 +22,14 @@ public class ConvertBytes
 {
 	public static final int LITTLE_ENDIAN = 1 ;
 	public static final int BIG_ENDIAN = 2 ;
+
+	public static final int BYTE_SIZE = 1 ;
+	public static final int BOOLEAN_SIZE = 1 ;
+	public static final int CHAR_SIZE = 2 ;
+	public static final int INT_SIZE = 4 ;
+	public static final int FLOAT_SIZE = 4 ;
+	public static final int DOUBLE_SIZE = 8 ;
+	public static final int LONG_SIZE = 8 ;
 
 	public ConvertBytes() {}
 
@@ -38,69 +46,108 @@ public class ConvertBytes
 
 	public static byte[] toBytes( final int _int, final byte[] _fill )
 	{
+		return toBytes( _int, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final int _int, final int _offset, final byte[] _fill )
+	{
 		// Big Endian
-		_fill[0] = ( byte )( ( _int >> 24 ) & 0xFF ) ;
-		_fill[1] = ( byte )( ( _int >> 16 ) & 0xFF ) ;
-		_fill[2] = ( byte )( ( _int >> 8 ) & 0xFF ) ;
-		_fill[3] = ( byte )( ( _int >> 0 ) & 0xFF ) ;
+		_fill[_offset + 0] = ( byte )( ( _int >> 24 ) & 0xFF ) ;
+		_fill[_offset + 1] = ( byte )( ( _int >> 16 ) & 0xFF ) ;
+		_fill[_offset + 2] = ( byte )( ( _int >> 8 ) & 0xFF ) ;
+		_fill[_offset + 3] = ( byte )( ( _int >> 0 ) & 0xFF ) ;
 
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final byte _byte, final byte[] _fill )
 	{
-		_fill[0] = _byte ;
+		return toBytes( _byte, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final byte _byte, final int _offset, final byte[] _fill )
+	{
+		_fill[_offset + 0] = _byte ;
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final char _char, final byte[] _fill )
 	{
-		_fill[0] = ( byte )( _char >> 8 ) ;
-		_fill[1] = ( byte )_char ;
+		return toBytes( _char, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final char _char, final int _offset, final byte[] _fill )
+	{
+		_fill[_offset + 0] = ( byte )( _char >> 8 ) ;
+		_fill[_offset + 1] = ( byte )_char ;
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final long _long, final byte[] _fill )
 	{
-		_fill[0] = ( byte )( ( _long >> 56 ) & 0xFF ) ;
-		_fill[1] = ( byte )( ( _long >> 48 ) & 0xFF ) ;
-		_fill[2] = ( byte )( ( _long >> 40 ) & 0xFF ) ;
-		_fill[3] = ( byte )( ( _long >> 32 ) & 0xFF ) ;
-		_fill[4] = ( byte )( ( _long >> 24 ) & 0xFF ) ;
-		_fill[5] = ( byte )( ( _long >> 16 ) & 0xFF ) ;
-		_fill[6] = ( byte )( ( _long >> 8 ) & 0xFF ) ;
-		_fill[7] = ( byte )( ( _long >> 0 ) & 0xFF ) ;
+		return toBytes( _long, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final long _long, final int _offset, final byte[] _fill )
+	{
+		_fill[_offset + 0] = ( byte )( ( _long >> 56 ) & 0xFF ) ;
+		_fill[_offset + 1] = ( byte )( ( _long >> 48 ) & 0xFF ) ;
+		_fill[_offset + 2] = ( byte )( ( _long >> 40 ) & 0xFF ) ;
+		_fill[_offset + 3] = ( byte )( ( _long >> 32 ) & 0xFF ) ;
+		_fill[_offset + 4] = ( byte )( ( _long >> 24 ) & 0xFF ) ;
+		_fill[_offset + 5] = ( byte )( ( _long >> 16 ) & 0xFF ) ;
+		_fill[_offset + 6] = ( byte )( ( _long >> 8 ) & 0xFF ) ;
+		_fill[_offset + 7] = ( byte )( ( _long >> 0 ) & 0xFF ) ;
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final short _short, final byte[] _fill )
 	{
-		_fill[0] = ( byte )( ( _short >> 8 ) & 0xFF ) ;
-		_fill[1] = ( byte )( ( _short >> 0 ) & 0xFF ) ;
+		return toBytes( _short, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final short _short, final int _offset, final byte[] _fill )
+	{
+		_fill[_offset + 0] = ( byte )( ( _short >> 8 ) & 0xFF ) ;
+		_fill[_offset + 1] = ( byte )( ( _short >> 0 ) & 0xFF ) ;
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final float _float, final byte[] _fill )
 	{
+		return toBytes( _float, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final float _float, final int _offset, final byte[] _fill )
+	{
 		final int temp = Float.floatToRawIntBits( _float ) ; 
 		// Big Endian
-		_fill[0] = ( byte )( ( temp >> 24 ) & 0xFF ) ;
-		_fill[1] = ( byte )( ( temp >> 16 ) & 0xFF ) ;
-		_fill[2] = ( byte )( ( temp >> 8 ) & 0xFF ) ;
-		_fill[3] = ( byte )( ( temp >> 0 ) & 0xFF ) ;
+		_fill[_offset + 0] = ( byte )( ( temp >> 24 ) & 0xFF ) ;
+		_fill[_offset + 1] = ( byte )( ( temp >> 16 ) & 0xFF ) ;
+		_fill[_offset + 2] = ( byte )( ( temp >> 8 ) & 0xFF ) ;
+		_fill[_offset + 3] = ( byte )( ( temp >> 0 ) & 0xFF ) ;
 		return _fill ;
 	}
 
 	public static byte[] toBytes( final double _double, final byte[] _fill )
 	{
+		return toBytes( _double, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final double _double, final int _offset, final byte[] _fill )
+	{
 		final long temp = Double.doubleToRawLongBits( _double ) ;
-		toBytes( temp, _fill ) ;
-		return _fill ;
+		return toBytes( temp, _offset, _fill ) ;
 	}
 
 	public static byte[] toBytes( final boolean _bool, final byte[] _fill )
 	{
-		_fill[0] = ( byte )( _bool ? 0x01 : 0x00 ) ;
+		return toBytes( _bool, 0, _fill ) ;
+	}
+
+	public static byte[] toBytes( final boolean _bool, final int _offset, final byte[] _fill )
+	{
+		_fill[_offset + 0] = ( byte )( _bool ? 0x01 : 0x00 ) ;
 		return _fill ;
 	}
 

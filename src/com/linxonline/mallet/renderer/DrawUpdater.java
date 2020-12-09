@@ -68,14 +68,14 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	}
 
 	@Override
-	public void addDraws( final Draw ... _draws )
+	public void addDynamics( final Draw ... _draws )
 	{
 		forceUpdate() ;
 		buffers.get( 0 ).addDraws( _draws ) ;
 	}
 
 	@Override
-	public void removeDraws( final Draw ... _draws )
+	public void removeDynamics( final Draw ... _draws )
 	{
 		forceUpdate() ;
 		buffers.get( 0 ).removeDraws( _draws ) ;
@@ -87,7 +87,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	}
 
 	@Override
-	public List<Draw> getDraws()
+	public List<Draw> getDynamics()
 	{
 		return buffers.get( 0 ).getDraws() ;
 	}

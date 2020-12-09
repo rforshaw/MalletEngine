@@ -411,11 +411,11 @@ public class UIWrapper extends UIElement
 			{
 				// Remove the draw object from the previous 
 				// updater the draw may have changed significantly.
-				updater.removeDraws( draw ) ;
+				updater.removeDynamics( draw ) ;
 			}
 
 			updater = DrawUpdater.getOrCreate( _world, program, draw.getShape(), true, getLayer() ) ;
-			updater.addDraws( draw ) ;
+			updater.addDynamics( draw ) ;
 		}
 
 		@Override
@@ -423,7 +423,7 @@ public class UIWrapper extends UIElement
 		{
 			if( updater != null )
 			{
-				updater.removeDraws( draw ) ;
+				updater.removeDynamics( draw ) ;
 			}
 		}
 
@@ -432,7 +432,7 @@ public class UIWrapper extends UIElement
 		{
 			if( updater != null )
 			{
-				updater.removeDraws( draw ) ;
+				updater.removeDynamics( draw ) ;
 			}
 
 			updater = DrawUpdater.getOrCreate( getWorld(), program, draw.getShape(), true, _layer ) ;

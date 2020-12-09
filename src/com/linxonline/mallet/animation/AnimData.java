@@ -46,7 +46,12 @@ public class AnimData<T extends AnimData> implements Anim<T>, Cacheable
 
 	public AnimData( final String _file, final Draw _draw )
 	{
-		program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+		this( _file, ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ), _draw ) ;
+	}
+
+	public AnimData( final String _file, final Program _program, final Draw _draw )
+	{
+		program = _program ;
 		file = _file ;
 		draw = _draw ;
 	}

@@ -126,6 +126,7 @@ public final class WorkerThread extends Thread
 	{
 		synchronized( block )
 		{
+			//System.out.println( getName() + " request pause" ) ;
 			if( paused == false )
 			{
 				//System.out.println( getName() + " request pause" ) ;

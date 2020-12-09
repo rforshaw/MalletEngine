@@ -7,9 +7,12 @@ import java.util.Set ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.Program ;
+import com.linxonline.mallet.renderer.Storage ;
+import com.linxonline.mallet.renderer.AssetLookup ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
+
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
@@ -28,7 +31,8 @@ public class GLProgram extends ProgramManager.Program
 	public final int[] id = new int[1] ;	// GL Program ID
 
 	// Model View Projection Matrix, doesn't need to be defined in *.jgl,
-	// however it must be defined in atleast vertex shader. 
+	// however it must be defined in atleast vertex shader.
+	public int inModelMatrix = -1 ;
 	public int inMVPMatrix = -1 ;
 	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders  
 	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
@@ -189,20 +193,22 @@ public class GLProgram extends ProgramManager.Program
 		The jgl file defined what buffers our shader program wants 
 		and the order in-which we should receive them in.
 	*/
-	public void bindBuffers( final Program _data )
+	public void bindBuffers( final Program _data, final AssetLookup<Storage, GLStorage> _storages  )
 	{
 		final List<String> buffers = program.getBuffers() ;
 
 		for( int i = 0; i < inBuffers.length; ++i )
 		{
 			final String name = buffers.get( i ) ;
-			final GLStorage storage = ( GLStorage )_data.getStorage( name ) ;
+			final Storage storage = _data.getStorage( name ) ;
 			if( storage == null )
 			{
+				System.out.println( "Failed to find storage buffer, skipping..." ) ;
 				continue ;
 			}
 
-			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], storage.id[0] ) ;
+			final GLStorage glStorage = _storages.getRHS( storage.index() ) ;
+			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], glStorage.id[0] ) ;
 		}
 	}
 
@@ -280,6 +286,7 @@ public class GLProgram extends ProgramManager.Program
 
 		MGL.glLinkProgram( program.id[0] ) ;
 
+		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
 		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
 		{
@@ -308,7 +315,7 @@ public class GLProgram extends ProgramManager.Program
 		MGL.glGetProgramiv( program.id[0], MGL.GL_LINK_STATUS, response, 0 ) ;
 		if( response[0] == MGL.GL_FALSE )
 		{
-			System.out.println( "Error linking program: " + MGL.glGetProgramInfoLog( program.id[0] ) ) ;
+			System.out.println( program.getName() + " Error linking program: " + MGL.glGetProgramInfoLog( program.id[0] ) ) ;
 			GLProgram.delete( program ) ;
 			return null ;
 		}

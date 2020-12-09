@@ -86,7 +86,7 @@ public class AnimationSystem
 				DrawUpdater updater = DrawUpdater.get( world, program, shape, false, order ) ;
 				if( updater != null )
 				{
-					updater.removeDraws( draw ) ;
+					updater.removeDynamics( draw ) ;
 					anim.removeCallback() ;
 				}
 			}
@@ -112,7 +112,7 @@ public class AnimationSystem
 					final int order = anim.getOrder() ;
 
 					final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, shape, false, order ) ;
-					updater.addDraws( draw ) ;
+					updater.addDynamics( draw ) ;
 
 					anim.setUpdater( updater, updater.getDrawBuffer() ) ;
 					anim.play() ;
@@ -162,7 +162,7 @@ public class AnimationSystem
 			final int order = anim.getOrder() ;
 
 			final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, shape, true, order ) ;
-			updater.removeDraws( draw ) ;
+			updater.removeDynamics( draw ) ;
 
 			anim.removeCallback() ;
 		}

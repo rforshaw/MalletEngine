@@ -6,17 +6,17 @@ import java.util.ArrayList ;
 import com.linxonline.mallet.util.MalletList ;
 
 /**
-	A draw object can be added to multiple different 
-	buffers with each buffer doing a different task.
-
-	This DrawUpdater is designed to trigger the update 
-	of buffers when the Draw object state is still influx.
+	A dynamic object should only be updated once per draw call.
+	However, the dynamic object could be required for multiple different buffers.
+	
+	Add the dynamics to this updater as well as any buffers that should be 
+	updated, Draw is a dynamic object as it implements IUpdate.
 */
 public class BasicUpdater<D extends IUpdate, B extends ABuffer> implements IUpdater<D, B>
 {
 	private final Interpolation mode ;
 	private final ArrayList<B> buffers = new ArrayList<B>() ;
-	private final ArrayList<D> draws = new ArrayList<D>() ;
+	private final ArrayList<D> dynamics = new ArrayList<D>() ;
 
 	private boolean dirty = true ;
 
@@ -64,31 +64,31 @@ public class BasicUpdater<D extends IUpdate, B extends ABuffer> implements IUpda
 	}
 
 	@Override
-	public void addDraws( final D ... _draws )
+	public void addDynamics( final D ... _dynamics )
 	{
 		makeDirty() ;
-		draws.ensureCapacity( draws.size() + _draws.length ) ;
-		for( final D draw : _draws )
+		dynamics.ensureCapacity( dynamics.size() + _dynamics.length ) ;
+		for( final D dynamic : _dynamics )
 		{
-			draw.update( Interpolation.NONE, 0, 0 ) ;
-			draws.add( draw ) ;
+			dynamic.update( Interpolation.NONE, 0, 0 ) ;
+			dynamics.add( dynamic ) ;
 		}
 	}
 
 	@Override
-	public void removeDraws( final D ... _draws )
+	public void removeDynamics( final D ... _dynamics )
 	{
 		makeDirty() ;
-		for( final D draw : _draws )
+		for( final D dynamic : _dynamics )
 		{
-			draws.remove( draw ) ;
+			dynamics.remove( dynamic ) ;
 		}
 	}
 
 	@Override
-	public List<D> getDraws()
+	public List<D> getDynamics()
 	{
-		return draws ;
+		return dynamics ;
 	}
 
 	@Override
@@ -98,13 +98,13 @@ public class BasicUpdater<D extends IUpdate, B extends ABuffer> implements IUpda
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated,  final int _diff, final int _iteration )
+	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
 	{
 		boolean update = false ;
 
-		for( final D draw : draws )
+		for( final D dynamic : dynamics )
 		{
-			if( draw.update( mode, _diff, _iteration ) == true )
+			if( dynamic.update( mode, _diff, _iteration ) == true )
 			{
 				update = true ;
 			}

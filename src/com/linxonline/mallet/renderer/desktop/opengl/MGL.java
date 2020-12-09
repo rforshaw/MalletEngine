@@ -81,6 +81,7 @@ public final class MGL
 	public final static int GL_TRUE = GL3.GL_TRUE ;
 	public final static int GL_FALSE = GL3.GL_FALSE ;
 
+	public final static int GL_DYNAMIC_COPY = GL3.GL_DYNAMIC_COPY ;
 	public final static int GL_DYNAMIC_DRAW = GL3.GL_DYNAMIC_DRAW ;
 	public final static int GL_STREAM_DRAW = GL3.GL_STREAM_DRAW ;
 
@@ -178,6 +179,11 @@ public final class MGL
 	public static void glBindBufferBase( final int _target, final int _index, final int _buffer )
 	{
 		gl.glBindBufferBase( _target, _index, _buffer ) ;
+	}
+
+	public static void glDrawRangeElements( int _mode, final int _start, final int _end, final int _count, final int _type, final long _offset )
+	{
+		gl.glDrawRangeElements( _mode, _start, _end, _count, _type, _offset ) ;
 	}
 
 	public static void glDrawElements( final int _mode, final int _count, final int _type, final long _offset )

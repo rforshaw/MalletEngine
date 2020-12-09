@@ -11,12 +11,25 @@ package com.linxonline.mallet.util.schema ;
 public abstract class SNode
 {
 	private SNode parent = null ;
+	private int offset = 0 ;
 
 	/**
 		Return the variable's type.
 	*/
 	public abstract Type getType() ;
 
+	public abstract int getLength() ;
+
+	protected void setOffset( final int _offset )
+	{
+		offset = _offset ;
+	}
+
+	public int getOffset()
+	{
+		return offset ;
+	}
+	
 	protected void setParent( SNode _parent )
 	{
 		parent = _parent ;

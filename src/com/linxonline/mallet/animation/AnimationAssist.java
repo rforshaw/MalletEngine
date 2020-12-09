@@ -58,6 +58,25 @@ public final class AnimationAssist
 		return anim ;
 	}
 
+	public static Anim createAnimation( final String _file,
+										final Program _program,
+										final Vector3 _position,
+										final Vector3 _offset,
+										final Vector3 _rotation,
+										final Vector3 _scale,
+										final int _order )
+	{
+		final Draw draw = new Draw( _position.x, _position.y, _position.z,
+									_offset.x, _offset.y, _offset.z,
+									_rotation.x, _rotation.y, _rotation.z ) ;
+		draw.setScale( _scale.x, _scale.y, _scale.z ) ;
+
+		final AnimData anim = new AnimData( _file, _program, draw ) ;
+		anim.setOrder( _order ) ;
+
+		return anim ;
+	}
+
 	public static Draw getDraw( final Anim _anim )
 	{
 		return ( ( AnimData )_anim ).getDraw() ;

@@ -52,7 +52,7 @@ public class UIList extends UILayout
 			{
 				if( updater != null )
 				{
-					updater.removeDraws( frame.getFrame() ) ;
+					updater.removeDynamics( frame.getFrame() ) ;
 				}
 				frame.shutdown() ;
 			}
@@ -65,7 +65,7 @@ public class UIList extends UILayout
 			{
 				if( updater != null )
 				{
-					updater.removeDraws( frame.getFrame() ) ;
+					updater.removeDynamics( frame.getFrame() ) ;
 				}
 
 				if( externalWorld != null )
@@ -75,7 +75,7 @@ public class UIList extends UILayout
 					final Draw draw = frame.getFrame() ;
 
 					final DrawUpdater updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
-					updater.addDraws( draw ) ;
+					updater.addDynamics( draw ) ;
 				}
 			}
 		} ) ;
@@ -205,7 +205,7 @@ public class UIList extends UILayout
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
 		updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, getLayer() + 1 ) ;
-		updater.addDraws( draw ) ;
+		updater.addDynamics( draw ) ;
 	}
 
 	private void setListWorldAndCamera( final World _world, final Camera _camera )

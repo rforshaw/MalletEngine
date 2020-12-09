@@ -4,6 +4,7 @@ import java.util.List ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.renderer.Program ;
+import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
@@ -19,6 +20,7 @@ public class GLDrawBuffer extends GLBuffer
 	private GLProgram glProgram ;
 	private Program mapProgram = new Program() ;
 
+	private AssetLookup<Storage, GLStorage> storages ;
 	private boolean stable = false ;
 
 	public GLDrawBuffer( final DrawBuffer _buffer )
@@ -26,7 +28,10 @@ public class GLDrawBuffer extends GLBuffer
 		super( _buffer.isUI() ) ;
 	}
 
-	public boolean update( final DrawBuffer _buffer, final AssetLookup<Program, GLProgram> _programs, final AssetLookup<?, GLBuffer> _buffers )
+	public boolean update( final DrawBuffer _buffer,
+						   final AssetLookup<Program, GLProgram> _programs,
+						   final AssetLookup<?, GLBuffer> _buffers,
+						   final AssetLookup<Storage, GLStorage> _storages )
 	{
 		final Program program = _buffer.getProgram() ;
 		glProgram = _programs.getRHS( program.index() ) ;
@@ -65,6 +70,8 @@ public class GLDrawBuffer extends GLBuffer
 			}
 		}
 
+		storages = _storages ;
+
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -91,11 +98,11 @@ public class GLDrawBuffer extends GLBuffer
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		glProgram.bindBuffers( mapProgram ) ;
+		glProgram.bindBuffers( mapProgram, storages ) ;
 
 		for( GLGeometryBuffer buffer : buffers )
 		{
-			buffer.draw( attributes ) ;
+			buffer.draw( attributes, glProgram ) ;
 		}
 	}
 

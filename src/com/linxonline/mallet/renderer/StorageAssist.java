@@ -1,8 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.schema.SNode ;
-import com.linxonline.mallet.maths.* ;
-
 public final class StorageAssist
 {
 	private static Assist assist ;
@@ -14,50 +11,36 @@ public final class StorageAssist
 		assist = _assist ;
 	}
 
+	public static <T extends IUpdater<?, Storage>> T add( final T _updater )
+	{
+		return assist.add( _updater ) ;
+	}
+
+	public static <T extends IUpdater<?, Storage>> T remove( final T _updater )
+	{
+		return assist.remove( _updater ) ;
+	}
+
 	/**
 		Create a Storage block in which objects 
 		can be added to.
 	*/
-	public static Storage create( final String _id, final int _size )
+	public static Storage add( final Storage _storage )
 	{
-		return assist.create( _id, _size ) ;
-	}
-
-	/**
-		Return the Storage block with the specified id.
-	*/
-	public static Storage get( final String _id )
-	{
-		return assist.get( _id ) ;
+		return assist.add( _storage ) ;
 	}
 
 	public static Storage update( final Storage _storage )
 	{
 		return assist.update( _storage ) ;
 	}
-	
-	/**
-		Return the absolute size of the node for the 
-		renderer being used, different implementations will 
-		return a size that matches their requirement.
-	*/
-	public static int calculateSize( final SNode _node )
-	{
-		return assist.calculateSize( _node ) ;
-	}
-	
-	public static int calculateOffset( final SNode _node )
-	{
-		return assist.calculateOffset( _node ) ;
-	}
 
 	public interface Assist
 	{
-		public Storage create( final String _id, final int _size ) ;
-		public Storage get( final String _id ) ;
-		public Storage update( final Storage _storage ) ;
+		public <T extends IUpdater<?, Storage>> T add( final T _updater ) ;
+		public <T extends IUpdater<?, Storage>> T remove( final T _updater ) ;
 
-		public int calculateSize( final SNode _node ) ;
-		public int calculateOffset( final SNode _node ) ;
+		public Storage add( final Storage _storage ) ;
+		public Storage update( final Storage _storage ) ;
 	}
 }

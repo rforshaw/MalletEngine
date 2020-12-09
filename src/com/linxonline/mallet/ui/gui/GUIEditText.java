@@ -76,7 +76,7 @@ public class GUIEditText extends GUIText
 		if( isEditing() == true )
 		{
 			cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
-			cursorUpdater.addDraws( cursorDraw ) ;
+			cursorUpdater.addDynamics( cursorDraw ) ;
 		}
 
 		parent.makeDirty() ;
@@ -92,7 +92,7 @@ public class GUIEditText extends GUIText
 		super.removeDraws() ;
 		if( cursorUpdater != null )
 		{
-			cursorUpdater.removeDraws( cursorDraw ) ;
+			cursorUpdater.removeDynamics( cursorDraw ) ;
 		}
 	}
 
@@ -104,7 +104,7 @@ public class GUIEditText extends GUIText
 		{
 			if( cursorUpdater != null )
 			{
-				cursorUpdater.removeDraws( cursorDraw ) ;
+				cursorUpdater.removeDynamics( cursorDraw ) ;
 			}
 
 			cursorUpdater = DrawUpdater.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
@@ -143,14 +143,14 @@ public class GUIEditText extends GUIText
 
 			if( cursorUpdater != null )
 			{
-				cursorUpdater.addDraws( cursorDraw ) ;
+				cursorUpdater.addDynamics( cursorDraw ) ;
 			}
 		}
 		else
 		{
 			if( cursorUpdater != null )
 			{
-				cursorUpdater.removeDraws( cursorDraw ) ;
+				cursorUpdater.removeDynamics( cursorDraw ) ;
 			}
 		}
 	}

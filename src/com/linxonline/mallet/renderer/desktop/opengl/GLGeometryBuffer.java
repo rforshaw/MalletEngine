@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.Arrays ;
+import java.util.List ;
 import java.nio.* ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
@@ -14,6 +15,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.IntVector2 ;
 
 public class GLGeometryBuffer extends GLBuffer
 {
@@ -29,6 +31,8 @@ public class GLGeometryBuffer extends GLBuffer
 	private int indexByteSize ;
 	private int vertexByteSize ;
 
+	private int indexMapSize = 0 ;
+	private IndexMap[] indexMaps ;
 	private IntBuffer indexBuffer ;
 	private FloatBuffer vertexBuffer ;
 
@@ -78,6 +82,9 @@ public class GLGeometryBuffer extends GLBuffer
 		maxIndexByteSize = _maxIndexByteSize ;
 		maxVertexByteSize = _maxVertexByteSize ;
 
+		indexMapSize = 0 ;
+		indexMaps = new IndexMap[0] ;
+
 		// We'll construct our buffers for the minimum size
 		// but if we need more space we'll expand the size 
 		// until we reach our maximum capacity.
@@ -118,8 +125,21 @@ public class GLGeometryBuffer extends GLBuffer
 		indexBuffer.position( 0 ) ;
 		vertexBuffer.position( 0 ) ;
 
-		for( final Draw draw : _buffer.getDraws() )
+		final List<Draw> draws = _buffer.getDraws() ;
+		final int size = draws.size() ;
+		if( indexMaps.length < size )
 		{
+			indexMaps = new IndexMap[size] ;
+			for( int i = 0; i < size; ++i )
+			{
+				indexMaps[i] = new IndexMap() ;
+			}
+		}
+
+		indexMapSize = 0 ;
+		for( int i = 0; i < size; ++i )
+		{
+			final Draw draw = draws.get( i ) ;
 			if( draw.isHidden() == true )
 			{
 				continue ;
@@ -154,15 +174,8 @@ public class GLGeometryBuffer extends GLBuffer
 				usedIndexByteSize = shapeIndexByteSize ;
 				usedVertexByteSize = shapeVertexByteSize ;
 			}
-		
-			draw.getPosition( position ) ;
-			draw.getOffset( offset ) ;
-			draw.getRotation( rotation ) ;
-			draw.getScale( scale ) ;
 
-			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
-
-			uploadIndexToRAM( draw ) ;
+			uploadIndexToRAM( draw, indexMaps[indexMapSize++] ) ;
 			uploadVBOToRAM( draw, matrix ) ;
 		}
 
@@ -174,7 +187,7 @@ public class GLGeometryBuffer extends GLBuffer
 		return stable ;
 	}
 
-	public void draw( final VertexAttrib[] _attributes )
+	public void draw( final VertexAttrib[] _attributes, final GLProgram _program )
 	{
 		if( stable == false )
 		{
@@ -198,13 +211,23 @@ public class GLGeometryBuffer extends GLBuffer
 			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[i] ) ;
 			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[i] ) ;
 
-			
 			GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
 
-			
-			MGL.glDrawElements( style, indexLength[i], MGL.GL_UNSIGNED_INT, 0 ) ;
-			
-			
+			for( int j = 0; j < indexMapSize; ++j )
+			{
+				final IndexMap map = indexMaps[j] ;
+				final Draw draw = map.draw ;
+
+				draw.getPosition( position ) ;
+				draw.getOffset( offset ) ;
+				draw.getRotation( rotation ) ;
+				draw.getScale( scale ) ;
+
+				apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
+
+				MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, true, matrix.matrix, 0 ) ;
+				MGL.glDrawElements( style, map.count, MGL.GL_UNSIGNED_INT, map.start * IBO_VAR_BYTE_SIZE ) ;
+			}
 		}
 		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;
 	}
@@ -313,9 +336,10 @@ public class GLGeometryBuffer extends GLBuffer
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 	
-	private void uploadIndexToRAM( final Draw _draw )
+	private void uploadIndexToRAM( final Draw _draw, final IndexMap _map )
 	{
 		final Shape shape = _draw.getShape() ;
+		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
 		final int[] inds = shape.getRawIndicies() ;
@@ -325,7 +349,7 @@ public class GLGeometryBuffer extends GLBuffer
 			indexBuffer.put( indexOffset + inds[i] ) ;
 		}
 
-		indexBuffer.put( PRIMITIVE_RESTART_INDEX ) ;
+		_map.set( indexStart, size, _draw ) ;
 	}
 
 	private void uploadVBOToRAM( final Draw _draw, final Matrix4 _matrix )
@@ -344,10 +368,9 @@ public class GLGeometryBuffer extends GLBuffer
 					case POINT  :
 					{
 						shape.getVector3( i, j, point ) ;
-						Matrix4.multiply( point, _matrix, temp ) ;
-						vertexBuffer.put( temp.x ) ;
-						vertexBuffer.put( temp.y ) ;
-						vertexBuffer.put( temp.z ) ;
+						vertexBuffer.put( point.x ) ;
+						vertexBuffer.put( point.y ) ;
+						vertexBuffer.put( point.z ) ;
 						break ;
 					}
 					case COLOUR :
@@ -367,4 +390,19 @@ public class GLGeometryBuffer extends GLBuffer
 			}
 		}
 	}
+
+	private static class IndexMap
+	{
+		public int start = 0 ;
+		public int count = 0 ;
+		public Draw draw = null ;
+
+		public void set( final int _start, final int _count, final Draw _draw )
+		{
+			start = _start ;
+			count = _count ;
+			draw = _draw ;
+		}
+	}
 }
+

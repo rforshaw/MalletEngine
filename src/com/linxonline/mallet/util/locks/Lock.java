@@ -6,10 +6,21 @@ public class Lock implements ILock
 	private boolean shouldLock = false ;
 
 	@Override
-	public void unlock()
+	public boolean isLocked()
 	{
 		synchronized( lock )
 		{
+			return shouldLock ;
+		}
+	}
+
+	@Override
+	public void unlock()
+	{
+		System.out.println( "Unlock" ) ;
+		synchronized( lock )
+		{
+			System.out.println( "Notify All: " + shouldLock ) ;
 			shouldLock = false ;
 			lock.notifyAll() ;
 		}
@@ -25,10 +36,14 @@ public class Lock implements ILock
 			{
 				while( shouldLock == true )
 				{
+					System.out.println( "Wait: " + shouldLock ) ;
 					lock.wait() ;
 				}
 			}
-			catch( InterruptedException ex ) {}
+			catch( InterruptedException ex )
+			{
+				System.out.println( ex ) ;
+			}
 		}
 	}
 }

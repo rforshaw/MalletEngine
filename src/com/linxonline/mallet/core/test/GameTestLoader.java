@@ -10,13 +10,14 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
-import com.linxonline.mallet.io.filesystem.* ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
+import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
+import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.hulls.Hull ;
@@ -24,6 +25,7 @@ import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
 import com.linxonline.mallet.util.schema.* ;
+import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -75,14 +77,34 @@ public final class GameTestLoader implements IGameLoader
 													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
 				System.out.println( "Structures 1 and 2: " + struct1.equals( struct2 ) ) ;
+				System.out.println( "Structures 1 and 2: " + struct1.getLength() + " " + struct2.getLength() ) ;
 
 				final SNode struct3 = SStruct.create( SStruct.var( "test1", SPrim.flt() ),
 													  SStruct.var( "test2", SPrim.flt() ),
 													  SStruct.var( "test3", SPrim.integer() ) ) ;
 
-				final Storage store = StorageAssist.create( "storage1", 3 ) ;
+				/*final Storage.IData data = new Storage.IData()
+				{
+					private final Vector3 vec = new Vector3() ;
+
+					@Override
+					public int getLength()
+					{
+						return 3 * 4 ;
+					}
+
+					@Override
+					public void serialise( Serialise.Out _out ) 
+					{
+						_out.writeFloat( vec.x ) ;
+						_out.writeFloat( vec.y ) ;
+						_out.writeFloat( vec.z ) ;
+					}
+				} ;
+				final Storage store = StorageAssist.add( new Storage( data ) ) ;*/
 
 				System.out.println( "Structures 1 and 3: " + struct1.equals( struct3 ) ) ;
+				System.out.println( "Structures 3: " + struct2.getLength() ) ;
 			}
 
 			public void createUI()
@@ -158,7 +180,7 @@ public final class GameTestLoader implements IGameLoader
 					draw.setShape( lines ) ;
 
 					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, lines, false, 10 ) ;
-					updater.addDraws( draw ) ;
+					updater.addDynamics( draw ) ;
 				}
 
 				{
@@ -181,7 +203,7 @@ public final class GameTestLoader implements IGameLoader
 					draw.setShape( Shape.triangulate( triangle ) ) ;
 
 					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, triangle, false, 0 ) ;
-					updater.addDraws( draw ) ;
+					updater.addDynamics( draw ) ;
 				}
 
 				{
@@ -200,7 +222,7 @@ public final class GameTestLoader implements IGameLoader
 					program.mapUniform( "inTex0", texture ) ;
 
 					final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, plane, true, 10 ) ;
-					updater.addDraws( draw ) ;
+					updater.addDynamics( draw ) ;
 				}
 			}
 
@@ -258,7 +280,7 @@ public final class GameTestLoader implements IGameLoader
 				program.mapUniform( "inTex0", new MalletFont( "Arial" ) ) ;
 
 				final TextUpdater updater = TextUpdater.getOrCreate( world, program, false, 200 ) ;
-				updater.addDraws( draw ) ;
+				updater.addDynamics( draw ) ;
 			}
 
 			/**
@@ -324,11 +346,39 @@ public final class GameTestLoader implements IGameLoader
 
 				/*ProgramAssist.load( "SIMPLE_STORAGE_TEXTURE", "base/shaders/{0}/simple_storage_texture.jgl" ) ;
 
-				final Storage storage1 = StorageAssist.create( "TestStorage1", 1 ) ;
-				storage1.getBuffer()[0] = 255.0f ;
+				final Storage storage1 = StorageAssist.add( new Storage( new Storage.IData()
+				{
+					private final int test = 255 ;
 
-				final Storage storage2 = StorageAssist.create( "TestStorage2", 1 ) ;
-				storage2.getBuffer()[0] = 0.0f ;
+					@Override
+					public int getLength()
+					{
+						return 4 ;
+					}
+
+					@Override
+					public void serialise( Serialise.Out _out ) 
+					{
+						_out.writeInt( test ) ;
+					}
+				} ) ) ;
+
+				final Storage storage2 = StorageAssist.add( new Storage( new Storage.IData()
+				{
+					private final int test = 0 ;
+
+					@Override
+					public int getLength()
+					{
+						return 4 ;
+					}
+
+					@Override
+					public void serialise( Serialise.Out _out ) 
+					{
+						_out.writeInt( test ) ;
+					}
+				} ) ) ;
 
 				StorageAssist.update( storage1 ) ;
 				StorageAssist.update( storage2 ) ;
@@ -338,8 +388,8 @@ public final class GameTestLoader implements IGameLoader
 				program.mapStorage( "TestBlock1", storage1 ) ;
 				program.mapStorage( "TestBlock2", storage2 ) ;*/
 
-				//final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-				//program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
 
@@ -388,11 +438,11 @@ public final class GameTestLoader implements IGameLoader
 						final World world = WorldAssist.getDefault() ;
 
 						{
-							final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-							program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+							//final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+							//program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 							updater = getUpdater( world, program, draws[0], false, 10 ) ;
-							updater.addDraws( draws ) ;
+							updater.addDynamics( draws ) ;
 						}
 
 						{
@@ -405,7 +455,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void shutdown()
 					{
-						updater.removeDraws( draws ) ;
+						updater.removeDynamics( draws ) ;
 						//debugUpdater.removeDraws( debugDraws ) ;
 					}
 
@@ -512,13 +562,13 @@ public final class GameTestLoader implements IGameLoader
 						program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 						updater = getUpdater( world, program, draw, false, 10 ) ;
-						updater.addDraws( draw ) ;
+						updater.addDynamics( draw ) ;
 					}
 
 					@Override
 					public void shutdown()
 					{
-						updater.removeDraws( draw ) ;
+						updater.removeDynamics( draw ) ;
 					}
 
 					@Override

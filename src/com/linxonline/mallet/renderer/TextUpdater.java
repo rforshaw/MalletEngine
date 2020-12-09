@@ -72,21 +72,21 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 	}
 
 	@Override
-	public void addDraws( final TextDraw ... _draws )
+	public void addDynamics( final TextDraw ... _draws )
 	{
 		forceUpdate() ;
 		buffers.get( 0 ).addDraws( _draws ) ;
 	}
 
 	@Override
-	public void removeDraws( final TextDraw ... _draws )
+	public void removeDynamics( final TextDraw ... _draws )
 	{
 		forceUpdate() ;
 		buffers.get( 0 ).removeDraws( _draws ) ;
 	}
 
 	@Override
-	public List<TextDraw> getDraws()
+	public List<TextDraw> getDynamics()
 	{
 		return buffers.get( 0 ).getTextDraws() ;
 	}

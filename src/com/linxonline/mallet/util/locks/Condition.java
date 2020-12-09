@@ -2,12 +2,10 @@ package com.linxonline.mallet.util.locks ;
 
 public class Condition
 {
-	private final ILock lock ;
 	private int criteria ;
 
-	public Condition( final ILock _lock, final int _criteria )
+	public Condition( final int _criteria )
 	{
-		lock = _lock ;
 		criteria = _criteria ;
 	}
 
@@ -16,18 +14,13 @@ public class Condition
 		criteria = _criteria  ;
 	}
 
-	public void met()
+	public synchronized boolean isMet()
 	{
-		boolean conditionMet = false ;
-		synchronized( this )
-		{
-			--criteria ;
-			conditionMet = ( criteria <= 0 ) ;
-		}
+		return criteria <= 0 ;
+	}
 
-		if( conditionMet == true )
-		{
-			lock.unlock() ;
-		}
+	public synchronized void met()
+	{
+		--criteria ;
 	}
 }

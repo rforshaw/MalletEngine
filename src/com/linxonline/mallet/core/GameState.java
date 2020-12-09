@@ -602,7 +602,7 @@ public class GameState extends State
 			draws[1].setHidden( !show ) ;
 
 			updater = TextUpdater.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;
-			updater.addDraws( draws ) ;
+			updater.addDynamics( draws ) ;
 		}
 
 		public void setShow( final boolean _show )

@@ -1,6 +1,6 @@
 {
 	NAME: "SIMPLE_FONT",
-	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
+	VERTEX: ["base/shaders/android/simple_font_vertex.glsl"],
 	FRAGMENT: ["base/shaders/android/simple_font_fragment.glsl"],
 
 	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "FONT"}],
