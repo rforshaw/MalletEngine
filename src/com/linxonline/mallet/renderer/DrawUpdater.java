@@ -105,24 +105,17 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 
 		for( final GeometryBuffer buffer : buffers )
 		{
-			boolean bufferUpdate = false ;
-
 			final List<Draw> draws = buffer.getDraws() ;
 			for( final Draw draw : draws )
 			{
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
-					bufferUpdate = true ;
+					update = true ;
 				}
 			}
 
-			// We only want to add the buffer to the update 
-			// list if draw state has changed, or if the Updater 
-			// wants to force an update due to draws being removed 
-			// or added.
-			if( bufferUpdate == true || forceUpdate == true )
+			if( forceUpdate == true )
 			{
-				update = ( bufferUpdate == true ) ? true : update ;
 				_updated.add( buffer ) ;
 			}
 		}

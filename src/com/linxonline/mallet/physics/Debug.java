@@ -37,7 +37,7 @@ public class Debug
 			final float x = points[i + 0] ;
 			final float y = points[i + 1] ;
 
-			shape.addVertex( Shape.Swivel.createVert( new Vector3( x, y, 0.0f ), white ) ) ;
+			shape.copyVertex( Shape.Swivel.createVert( new Vector3( x, y, 0.0f ), white ) ) ;
 			shape.addIndex( index++ ) ;
 		}
 

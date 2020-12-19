@@ -55,6 +55,7 @@ public final class MGL
 	public final static int GL_STENCIL_TEST = GL3.GL_STENCIL_TEST ;
 	public final static int GL_STENCIL_BUFFER_BIT = GL3.GL_STENCIL_BUFFER_BIT ;
 	public final static int GL_COLOR_BUFFER_BIT = GL3.GL_COLOR_BUFFER_BIT ;
+	public final static int GL_DEPTH_TEST = GL3.GL_DEPTH_TEST ;
 	public final static int GL_DEPTH_BUFFER_BIT = GL3.GL_DEPTH_BUFFER_BIT ;
 
 	public final static int GL_FLOAT = GL3.GL_FLOAT ;
@@ -434,6 +435,11 @@ public final class MGL
 	public static void glRenderbufferStorage( final int _target, final int _internalFormat, final int _width, final int _height )
 	{
 		gl.glRenderbufferStorage( _target, _internalFormat, _width, _height ) ;
+	}
+
+	public static void glDrawBuffers( final int _n, final int[] _ids, final int _offset )
+	{
+		gl.glDrawBuffers( _n, _ids, _offset ) ;
 	}
 
 	public static void glBlitFramebuffer( final int _srcX0, final int _srcY0, final int _srcX1, final int _srcY1,

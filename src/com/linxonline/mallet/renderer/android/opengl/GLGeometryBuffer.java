@@ -146,8 +146,8 @@ public class GLGeometryBuffer extends GLBuffer
 			}
 
 			final Shape shape = draw.getShape() ;
-			final int shapeIndexByteSize = shape.getIndexSize() * IBO_VAR_BYTE_SIZE ;
-			final int shapeVertexByteSize = shape.getVertexSize() * vertexStrideBytes ;
+			final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
+			final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
 
 			usedIndexByteSize += shapeIndexByteSize ;
 			if(usedIndexByteSize > indexByteSize)
@@ -342,7 +342,7 @@ public class GLGeometryBuffer extends GLBuffer
 		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-		final int[] inds = shape.getRawIndicies() ;
+		final int[] inds = shape.getRawIndices() ;
 		final int size = inds.length ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -357,7 +357,7 @@ public class GLGeometryBuffer extends GLBuffer
 	{
 		final Shape shape = _draw.getShape() ;
 		final Shape.Swivel[] swivel = shape.getSwivel() ;
-		final int verticiesSize = shape.getVertexSize() ;
+		final int verticiesSize = shape.getVerticesSize() ;
 
 		for( int i = 0; i < verticiesSize; i++ )
 		{

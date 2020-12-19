@@ -159,12 +159,12 @@ public final class GameTestLoader implements IGameLoader
 				{
 					final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
 					final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
-					lines.addVertex( Shape.construct( 0, 10, 0, colour ) ) ;
-					lines.addVertex( Shape.construct( 0, 0, 0, colour ) ) ;
-					lines.addVertex( Shape.construct( 100, 0, 0, colour ) ) ;
-					lines.addVertex( Shape.construct( 100, 5, 0, colour ) ) ;
-					lines.addVertex( Shape.construct( 200, 0, 0, colour ) ) ;
-					lines.addVertex( Shape.construct( 200, 10, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 0, 10, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 0, 0, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 100, 0, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 100, 5, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 200, 0, 0, colour ) ) ;
+					lines.copyVertex( Shape.construct( 200, 10, 0, colour ) ) ;
 
 					lines.addIndex( 0 ) ;
 					lines.addIndex( 1 ) ;
@@ -185,12 +185,12 @@ public final class GameTestLoader implements IGameLoader
 
 				{
 					final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
-					triangle.addVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
-					triangle.addVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
-					triangle.addVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
-					triangle.addVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
-					triangle.addVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
-					triangle.addVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
+					triangle.copyVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
+					triangle.copyVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
+					triangle.copyVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
+					triangle.copyVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
+					triangle.copyVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
+					triangle.copyVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
 
 					triangle.addIndex( 0 ) ;
 					triangle.addIndex( 1 ) ;

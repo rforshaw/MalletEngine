@@ -41,6 +41,7 @@ public class GLGeometryBuffer extends GLBuffer
 	private int[] indexLength = new int[1] ;
 
 	private int order ;
+	private float[] vertex ;
 	private int vertexStride = -1 ;
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
@@ -108,6 +109,7 @@ public class GLGeometryBuffer extends GLBuffer
 			// set, so we'll only calculate the swivel once.
 			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
 			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+			vertex = new float[vertexStride] ;
 		}
 
 		switch( _buffer.getStyle() )
@@ -146,8 +148,8 @@ public class GLGeometryBuffer extends GLBuffer
 			}
 
 			final Shape shape = draw.getShape() ;
-			final int shapeIndexByteSize = shape.getIndexSize() * IBO_VAR_BYTE_SIZE ;
-			final int shapeVertexByteSize = shape.getVertexSize() * vertexStrideBytes ;
+			final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
+			final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
 
 			usedIndexByteSize += shapeIndexByteSize ;
 			if(usedIndexByteSize > indexByteSize)
@@ -342,7 +344,7 @@ public class GLGeometryBuffer extends GLBuffer
 		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-		final int[] inds = shape.getRawIndicies() ;
+		final int[] inds = shape.getRawIndices() ;
 		final int size = inds.length ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -356,7 +358,7 @@ public class GLGeometryBuffer extends GLBuffer
 	{
 		final Shape shape = _draw.getShape() ;
 		final Shape.Swivel[] swivel = shape.getSwivel() ;
-		final int verticiesSize = shape.getVertexSize() ;
+		final int verticiesSize = shape.getVerticesSize() ;
 
 		for( int i = 0; i < verticiesSize; i++ )
 		{

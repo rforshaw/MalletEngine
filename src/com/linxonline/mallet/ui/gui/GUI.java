@@ -10,7 +10,7 @@ public class GUI
 
 	public static Shape updateColour( final Shape _shape, final MalletColour _colour )
 	{
-		final int size = _shape.getVertexSize() ;
+		final int size = _shape.getVerticesSize() ;
 		for( int i = 0; i < size; i++ )
 		{
 			_shape.setColour( i, 1, _colour ) ;
@@ -35,10 +35,10 @@ public class GUI
 		final Shape shape = new Shape( Shape.Style.FILL, swivel, faces * 6, faces * 4 ) ;
 
 		// Top Left Corner
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  0.0f,  0.0f ), white, new Vector2( 0, 0 ) ) ) ;	
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ), white, new Vector2( 1, 0 ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge, 0.0f ), white, new Vector2( 0, 0.3f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ), white, new Vector2( 1, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  0.0f,  0.0f ), white, new Vector2( 0, 0 ) ) ) ;	
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ), white, new Vector2( 1, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge, 0.0f ), white, new Vector2( 0, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ), white, new Vector2( 1, 0.3f ) ) ) ;
 
 		int offset = 0 ;
 		shape.addIndex( offset + 0 ) ;
@@ -50,10 +50,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Top Edge
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ),            white, new Vector2( 0, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, 0.0f,  0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ),            white, new Vector2( 1, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge, 0.0f ), white, new Vector2( 1, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, 0.0f,  0.0f ),            white, new Vector2( 0, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, 0.0f,  0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge, 0.0f ),            white, new Vector2( 1, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge, 0.0f ), white, new Vector2( 1, 0.6f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -65,10 +65,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Top Right Corner
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, 0.0f,  0.0f ),         white, new Vector2( 1, 0  ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, 0.0f,  0.0f ), white, new Vector2( 0, 0 ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge, 0.0f ),         white, new Vector2( 1, 0.3f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge, 0.0f ), white, new Vector2( 0, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, 0.0f,  0.0f ),         white, new Vector2( 1, 0  ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, 0.0f,  0.0f ), white, new Vector2( 0, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge, 0.0f ),         white, new Vector2( 1, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge, 0.0f ), white, new Vector2( 0, 0.3f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -80,10 +80,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Left Edge
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge,  0.0f ),           white, new Vector2( 0, 0.4f ) ) ) ;	
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge,  0.0f ),           white, new Vector2( 1, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y, 0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y, 0.0f ), white, new Vector2( 1, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge,  0.0f ),           white, new Vector2( 0, 0.4f ) ) ) ;	
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge,  0.0f ),           white, new Vector2( 1, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y, 0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y, 0.0f ), white, new Vector2( 1, 0.6f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -95,10 +95,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Bottom Left Corner
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y,  0.0f ),        white, new Vector2( 0, 0.3f ) ) ) ;	
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y,  0.0f ),        white, new Vector2( 1, 0.3f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0 ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2( 1, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y,  0.0f ),        white, new Vector2( 0, 0.3f ) ) ) ;	
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y,  0.0f ),        white, new Vector2( 1, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( 0.0f,  _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2( 1, 0 ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -110,10 +110,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Right Edge
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge,  0.0f ),                  white, new Vector2( 1, 0.4f ) ) ) ;	
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge,  0.0f ),           white, new Vector2( 0, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y, 0.0f ),        white, new Vector2( 1, 0.6f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y, 0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge,  0.0f ),                  white, new Vector2( 1, 0.4f ) ) ) ;	
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge,  0.0f ),           white, new Vector2( 0, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y, 0.0f ),        white, new Vector2( 1, 0.6f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y, 0.0f ), white, new Vector2( 0, 0.6f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -125,10 +125,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Bottom Right Corner
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y,  0.0f ),               white, new Vector2( 1, 0.3f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y,  0.0f ),        white, new Vector2( 0, 0.3f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y + _edge, 0.0f ),        white, new Vector2( 1, 0 ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y,  0.0f ),               white, new Vector2( 1, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y,  0.0f ),        white, new Vector2( 0, 0.3f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x,  _edge + length.y + _edge, 0.0f ),        white, new Vector2( 1, 0 ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x + _edge, _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0 ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -140,10 +140,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Bottom Edge
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y,  0.0f ),                   white, new Vector2( 1, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y,  0.0f ),        white, new Vector2( 1, 0.5f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y + _edge, 0.0f ),            white, new Vector2( 0, 0.4f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0.5f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y,  0.0f ),                   white, new Vector2( 1, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y,  0.0f ),        white, new Vector2( 1, 0.5f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y + _edge, 0.0f ),            white, new Vector2( 0, 0.4f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y + _edge, 0.0f ), white, new Vector2( 0, 0.5f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;
@@ -155,10 +155,10 @@ public class GUI
 		shape.addIndex( offset + 1 ) ;
 
 		// Middle
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge,  0.0f ),                      white, new Vector2( 0.1f, 0.7f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge,  0.0f ),           white, new Vector2( 0.9f, 0.7f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y, 0.0f ),            white, new Vector2( 0.1f, 0.9f ) ) ) ;
-		shape.addVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y, 0.0f ), white, new Vector2( 0.9f, 0.9f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge,  0.0f ),                      white, new Vector2( 0.1f, 0.7f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge,  0.0f ),           white, new Vector2( 0.9f, 0.7f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge, _edge + length.y, 0.0f ),            white, new Vector2( 0.1f, 0.9f ) ) ) ;
+		shape.copyVertex( Shape.Swivel.createVert( new Vector3( _edge + length.x, _edge + length.y, 0.0f ), white, new Vector2( 0.9f, 0.9f ) ) ) ;
 
 		offset += 4 ;
 		shape.addIndex( offset + 0 ) ;

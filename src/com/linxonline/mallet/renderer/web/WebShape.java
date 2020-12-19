@@ -45,20 +45,20 @@ public class WebShape extends Shape
 	{
 		this( _shape.getStyle(),
 			  _shape.getSwivel(),
-			  _shape.getIndexSize(),
-			  _shape.getVertexSize() ) ;
+			  _shape.getIndicesSize,
+			  _shape.getVerticesSize() ) ;
 
 		// We've got all the information we need to make this a clean copy.
 		// This should work even if the implementation was changed 
 		// halfway through.
 		final Swivel[] sw = _shape.getSwivel() ;
-		final int indexSize = _shape.getIndexSize() ;
-		final int vertexSize = _shape.getVertexSize() ;
+		final int indexSize = _shape.getIndicesSize ;
+		final int vertexSize = _shape.getVerticesSize() ;
 
 		final Object[] vertex = Shape.Swivel.constructSwivel( sw ) ;
 		for( int i = 0; i < vertexSize; i++ )
 		{
-			addVertex( _shape.getVertex( vertex, i ) ) ;
+			copyVertex( _shape.getVertex( vertex, i ) ) ;
 		}
 
 		for( int i = 0; i < indexSize; i++ )
@@ -80,7 +80,7 @@ public class WebShape extends Shape
 	}
 
 	@Override
-	public void addVertex( final Object[] _vertex )
+	public void copyVertex( final Object[] _vertex )
 	{
 		for( int i = 0; i < swivel.length; i++ )
 		{
@@ -289,13 +289,13 @@ public class WebShape extends Shape
 	}
 
 	@Override
-	public int getIndexSize()
+	public int getIndicesSize
 	{
 		return indicies.getLength() ;
 	}
 
 	@Override
-	public int getVertexSize()
+	public int getVerticesSize()
 	{
 		return vertexSize ;
 	}
@@ -303,7 +303,7 @@ public class WebShape extends Shape
 	@Override
 	public boolean isComplete()
 	{
-		return indexIncrement == getIndexSize() && vertexIncrement == getVertexSize() ;
+		return indexIncrement == getIndicesSize && vertexIncrement == getVerticesSize() ;
 	}
 
 	public static class Factory implements Shape.Factory

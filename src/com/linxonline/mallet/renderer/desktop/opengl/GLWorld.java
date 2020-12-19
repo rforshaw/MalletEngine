@@ -21,7 +21,7 @@ import com.linxonline.mallet.renderer.ABuffer ;
 */
 public class GLWorld
 {
-	protected final static int FRAME_BUFFER    = 0 ;
+	protected final static int FRAME_BUFFER = 0 ;
 
 	protected final int[] buffers ;
 	protected GLImage[] backBuffers ;
@@ -34,6 +34,10 @@ public class GLWorld
 
 	protected final List<GLCamera> cameras = new ArrayList<GLCamera>() ;
 	protected final List<GLBuffer> drawBuffers = new ArrayList<GLBuffer>() ;
+
+	private int[] colourAttachments ; 	// GL_COLOR_ATTACHMENT0, used by glDrawBuffers
+	private boolean hasDepth = false ;
+	private boolean hasStencil = false ;
 
 	public static GLWorld createCore( final World _world,
 									  final AssetLookup<Camera, GLCamera> _cameras,
@@ -131,6 +135,7 @@ public class GLWorld
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 
 					MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, MGL.GL_DEPTH_ATTACHMENT, MGL.GL_TEXTURE_2D, buffers[offset], 0 ) ;
+					hasDepth = true ;
 					break ;
 				}
 				case STENCIL :
@@ -147,9 +152,16 @@ public class GLWorld
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 
 					MGL.glFramebufferTexture2D( MGL.GL_FRAMEBUFFER, MGL.GL_STENCIL_ATTACHMENT, MGL.GL_TEXTURE_2D, buffers[offset], 0 ) ;
+					hasStencil = true ;
 					break ;
 				}
 			}
+		}
+
+		colourAttachments = new int[colourAttachmentOffset] ;
+		for( int i = 0; i < colourAttachmentOffset; ++i )
+		{
+			colourAttachments[i] = MGL.GL_COLOR_ATTACHMENT0 + i ;
 		}
 
 		updateCameras( _world, _cameras ) ;
@@ -246,9 +258,21 @@ public class GLWorld
 	public void draw()
 	{
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+		if( hasDepth == true )
+		{
+			// Enable Depth Test if the framebuffer contains a depth attachment.
+			MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
+		}
+
 		MGL.glClear( MGL.GL_COLOR_BUFFER_BIT | MGL.GL_DEPTH_BUFFER_BIT | MGL.GL_STENCIL_BUFFER_BIT ) ;
 		//MGL.glClearColor( 1.0f, 0.0f, 0.0f, 0.5f ) ;
 
+		// Allow the shader to access the colour attachments of the framebuffer.
+		// These colour attachments can then be used within a MalletTexture for 
+		// other operations.
+		MGL.glDrawBuffers( colourAttachments.length, colourAttachments, 0 ) ;
+
+		// Draw the buffers from all the camera perspectives.
 		for( final GLCamera camera : cameras )
 		{
 			camera.draw( drawBuffers ) ;
@@ -260,6 +284,11 @@ public class GLWorld
 
 			MGL.glBindTexture( MGL.GL_TEXTURE_2D, backBuffers[0].textureIDs[0] ) ;
 			MGL.glCopyTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
+		}
+
+		if( hasDepth == true )
+		{
+			MGL.glDisable( MGL.GL_DEPTH_TEST ) ;
 		}
 	}
 

@@ -181,7 +181,7 @@ public class GLGeometryUploader
 		int increment = 0 ;
 		int indexStartBytes = _handler.getIndexStart() ;
 
-		final int size = _shape.getIndexSize() ;
+		final int size = _shape.getIndicesSize ;
 		for( int i = 0; i < size; i++ )
 		{
 			indicies.set( increment++, ( short )( indexOffset + _shape.getIndex( i ) ) ) ;
@@ -213,7 +213,7 @@ public class GLGeometryUploader
 	{
 		final Shape.Swivel[] swivel = _shape.getSwivel() ;
 		final int vertexSize = calculateVertexSize( swivel ) ;
-		final int verticiesSize = _shape.getVertexSize() ;
+		final int verticiesSize = _shape.getVerticesSize() ;
 
 		final Uint8Array byteVersion = Uint8Array.create( verticies.getBuffer() ) ;
 
@@ -866,10 +866,10 @@ public class GLGeometryUploader
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
 			final Shape shape = _data.getDrawShape() ;
-			final int shapeIndexBytes = ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
+			final int shapeIndexBytes = ( shape.getIndicesSize + PRIMITIVE_EXPANSION ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
-			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes ;
+			final int shapeVertexBytes = shape.getVerticesSize() * vertexStrideBytes ;
 			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
 
 			expand( indexBytes, vertexBytes ) ;
@@ -885,7 +885,7 @@ public class GLGeometryUploader
 				protected Location findLocation( final GLDrawData _data )
 				{
 					final Shape shape = _data.getDrawShape() ;
-					return findLocation( shape.getIndexSize(), shape.getVertexSize() ) ;
+					return findLocation( shape.getIndicesSize, shape.getVerticesSize() ) ;
 				}
 			} ) ;
 		}
@@ -1027,11 +1027,11 @@ public class GLGeometryUploader
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
 				final int vertexSize = calculateVertexSize( swivel ) ;
-				final int verticiesSize = shape.getVertexSize() ;
+				final int verticiesSize = shape.getVerticesSize() ;
 
 				final int indexOffset = initialIndexOffset + ( i * 4 ) ;
 
-				final int size = shape.getIndexSize() ; 
+				final int size = shape.getIndicesSize ; 
 				for( int j = 0; j < size; j++ )
 				{
 					indicies.set( indexInc++, ( short )( indexOffset + shape.getIndex( j ) ) ) ;
@@ -1145,10 +1145,10 @@ public class GLGeometryUploader
 			// and repeat the finding process.
 			// Increase the buffer size if the geometry is too large.
 			final Shape shape = glFont.getShapeWithChar( '\0' ) ;
-			final int shapeIndexBytes = ( ( shape.getIndexSize() + PRIMITIVE_EXPANSION ) * length ) * IBO_VAR_BYTE_SIZE ;
+			final int shapeIndexBytes = ( ( shape.getIndicesSize + PRIMITIVE_EXPANSION ) * length ) * IBO_VAR_BYTE_SIZE ;
 			final int indexBytes = ( indexLengthBytes > shapeIndexBytes ) ? indexLengthBytes : shapeIndexBytes ;
 
-			final int shapeVertexBytes = shape.getVertexSize() * vertexStrideBytes * length ;
+			final int shapeVertexBytes = shape.getVerticesSize() * vertexStrideBytes * length ;
 			final int vertexBytes =  ( vertexLengthBytes > shapeVertexBytes ) ? vertexLengthBytes : shapeVertexBytes ;
 
 			expand( indexBytes, vertexBytes ) ;

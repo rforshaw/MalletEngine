@@ -126,7 +126,7 @@ public class SGeom
 					return null ;
 				}*/
 
-				shape.addVertex( vertex ) ;
+				shape.copyVertex( vertex ) ;
 			}
 		}
 

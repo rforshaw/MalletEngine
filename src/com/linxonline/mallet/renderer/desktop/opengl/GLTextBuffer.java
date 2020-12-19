@@ -174,12 +174,12 @@ public class GLTextBuffer extends GLBuffer
 				}
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
-				final int verticiesSize = shape.getVertexSize() ;
+				final int verticiesSize = shape.getVerticesSize() ;
 
 				final int GLYPH_POINTS = 4 ;
 				final int indexOffset = initialIndexOffset + ( i * GLYPH_POINTS ) ;
 
-				final int size = shape.getIndexSize() ; 
+				final int size = shape.getIndicesSize() ; 
 				for( int j = 0; j < size; j++ )
 				{
 					indicies[indexIncrement++] = indexOffset + shape.getIndex( j ) ;

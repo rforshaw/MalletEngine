@@ -110,8 +110,6 @@ public class BasicUpdater<D extends IUpdate, B extends ABuffer> implements IUpda
 			}
 		}
 
-		_updated.addAll( buffers ) ;
-
 		dirty = update ;
 	}
 }
