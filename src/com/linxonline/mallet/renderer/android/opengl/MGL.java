@@ -8,6 +8,7 @@ public class MGL
 	public final static int GL_ELEMENT_ARRAY_BUFFER = GLES31.GL_ELEMENT_ARRAY_BUFFER ;
 	public final static int GL_ARRAY_BUFFER = GLES31.GL_ARRAY_BUFFER ;
 
+	public final static int GL_DEPTH_TEST= GLES31.GL_DEPTH_TEST ;
 	public final static int GL_STENCIL_TEST= GLES31.GL_STENCIL_TEST ;
 	public final static int GL_FLOAT = GLES31.GL_FLOAT ;
 	public final static int GL_UNSIGNED_BYTE = GLES31.GL_UNSIGNED_BYTE ;
@@ -376,7 +377,12 @@ public class MGL
 	{
 		GLES31.glRenderbufferStorage( _target, _internalformat, _width, _height ) ;
 	}
-	
+
+	public static void glDrawBuffers( final int _n, final int[] _ids, final int _offset )
+	{
+		GLES31.glDrawBuffers( _n, _ids, _offset ) ;
+	}
+
 	public static void glTexImage2D( final int _target, final int _level, final int _internalformat, final int _width, final int _height, final int _border, final int _format, final int _type, final Buffer _pixels )
 	{
 		GLES31.glTexImage2D( _target, _level, _internalformat, _width, _height, _border, _format, _type, _pixels ) ;

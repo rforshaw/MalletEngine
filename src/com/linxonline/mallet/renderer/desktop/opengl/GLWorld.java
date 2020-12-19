@@ -188,16 +188,7 @@ public class GLWorld
 		{
 			final int channel = 3 ;
 			final long estimatedConsumption = ( long )( render.x * render.y ) * ( long )( channel * 8 ) ;
-			final GLImage buffer = new GLImage( 0, estimatedConsumption ) ;
-
-			MGL.glGenTextures( 1, buffer.textureIDs, 0 ) ;
-			MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffer.textureIDs[0] ) ;
-
-			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
-			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-
-			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
-			MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
+			final GLImage buffer = new GLImage( buffers[_index], estimatedConsumption ) ;
 			backBuffers[_index] = buffer ;
 		}
 
@@ -278,14 +269,6 @@ public class GLWorld
 			camera.draw( drawBuffers ) ;
 		}
 
-		if( backBuffers[0] != null )
-		{
-			MGL.glBindFramebuffer( MGL.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-
-			MGL.glBindTexture( MGL.GL_TEXTURE_2D, backBuffers[0].textureIDs[0] ) ;
-			MGL.glCopyTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGB, 0, 0, render.x, render.y, 0 ) ;
-		}
-
 		if( hasDepth == true )
 		{
 			MGL.glDisable( MGL.GL_DEPTH_TEST ) ;
@@ -338,14 +321,26 @@ public class GLWorld
 				}
 				case DEPTH   :
 				{
-					//MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[offset] ) ;
-					//MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_DEPTH_COMPONENT, _width, _height ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_COMPONENT, _width, _height, 0, MGL.GL_DEPTH_COMPONENT, MGL.GL_FLOAT, null ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 					break ;
 				}
 				case STENCIL :
 				{
-					MGL.glBindRenderbuffer( MGL.GL_RENDERBUFFER, buffers[offset] ) ;
-					MGL.glRenderbufferStorage( MGL.GL_RENDERBUFFER, MGL.GL_STENCIL_INDEX8, _width, _height ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
+					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_STENCIL, _width, _height, 0, MGL.GL_DEPTH_STENCIL, MGL.GL_FLOAT, null ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 					break ;
 				}
 			}
