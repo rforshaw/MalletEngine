@@ -1,7 +1,0 @@
-<map id="com.linxonline.mallet.game.statemachine.StateMachine.pause" name="com.linxonline.mallet.game.statemachine.StateMachine.pause">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html#ac6a79c269cdf7d9e39e33463c3ef6b74" title="com.linxonline.mallet.game.statemachine.\lState.startState" alt="" coords="320,5,587,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html#ab8cae8230539cdc1f64bc16096e9514c" title="com.linxonline.mallet.game.statemachine.\lState.checkTransition" alt="" coords="320,71,587,112"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html#aef164d8832e7e05084128f50caa0d2a6" title="com.linxonline.mallet.game.statemachine.\lState.getTransition" alt="" coords="320,136,587,177"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html#a6a97d8e43f1537b8b6e1f8a691bc4ae8" title="com.linxonline.mallet.game.statemachine.\lState.shutdownState" alt="" coords="320,201,587,243"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1statemachine_1_1_state.html#a988440d42ac38506fb1c9d3d1e4868d0" title="com.linxonline.mallet.game.statemachine.\lState.pauseState" alt="" coords="320,267,587,308"/>
-</map>

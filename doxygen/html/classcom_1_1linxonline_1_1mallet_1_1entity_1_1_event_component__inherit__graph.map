@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_render_component.html" title="com.linxonline.mallet.entity.RenderComponent" alt="" coords="5,160,299,189"/>
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_component.html" title="com.linxonline.mallet.entity.Component" alt="" coords="27,5,277,35"/>
-<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1_sprite_component.html" title="com.linxonline.mallet.entity.SpriteComponent" alt="" coords="9,237,295,267"/>
-</map>

@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['obb',['OBB',['../classcom_1_1linxonline_1_1mallet_1_1physics_1_1_o_b_b.html#ad5448857f4ad34a340c21369b8b8f462',1,'com::linxonline::mallet::physics::OBB.OBB()'],['../classcom_1_1linxonline_1_1mallet_1_1physics_1_1_o_b_b.html#a6f449c3f23f0fc4abbe1405abb645b96',1,'com::linxonline::mallet::physics::OBB.OBB(final AABB _aabb)'],['../classcom_1_1linxonline_1_1mallet_1_1physics_1_1_o_b_b.html#af5f1dec3d7e971da2caeae44d5432ae4',1,'com::linxonline::mallet::physics::OBB.OBB(final Vector2 _topLeft, final Vector2 _topRight, final Vector2 _bottomLeft, final Vector2 _bottomRight)']]],
-  ['objectvariable',['ObjectVariable',['../classcom_1_1linxonline_1_1mallet_1_1util_1_1settings_1_1_object_variable.html#ad49b1ec16ecc4fcd68f942a1c14e7620',1,'com::linxonline::mallet::util::settings::ObjectVariable.ObjectVariable()'],['../classcom_1_1linxonline_1_1mallet_1_1util_1_1settings_1_1_object_variable.html#a38fdf636d666a81d2eac257af5f59015',1,'com::linxonline::mallet::util::settings::ObjectVariable.ObjectVariable(final String _name, final Object _value)']]]
-];

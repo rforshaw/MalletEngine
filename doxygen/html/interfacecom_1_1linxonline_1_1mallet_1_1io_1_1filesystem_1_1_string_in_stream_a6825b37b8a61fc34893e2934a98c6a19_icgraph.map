@@ -1,6 +1,0 @@
-<map id="com.linxonline.mallet.io.filesystem.StringInStream.readLine" name="com.linxonline.mallet.io.filesystem.StringInStream.readLine">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1formats_1_1json_1_1_j_s_o_n_object.html#a76ed0c29fecc11e382a4ed46e602ae01" title="com.linxonline.mallet.io.formats.json.\lJSONObject.construct" alt="" coords="280,5,519,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1reader_1_1_text_reader.html#a2498218e2b50250adf6d31feb7df9053" title="com.linxonline.mallet.io.reader.\lTextReader.getTextAsArray" alt="" coords="298,71,501,112"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1animation_1_1_sprite_manager.html#a721c3c6a899f2f9c20c1dd85fa1c87c6" title="com.linxonline.mallet.animation.\lSpriteManager.SpriteManager" alt="" coords="595,37,803,79"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1resources_1_1language_1_1_language_manager.html#a4d60522fb0e8a0527a66f96e2b10d021" title="com.linxonline.mallet.resources.language.\lLanguageManager.loadLanguageFile" alt="" coords="567,103,832,144"/>
-</map>

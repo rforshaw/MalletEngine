@@ -1,8 +1,0 @@
-<map id="com.linxonline.mallet.system.SystemInterface.getInputInterface" name="com.linxonline.mallet.system.SystemInterface.getInputInterface">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#a1a275c03647c6c2a8e76d6a09b18433d" title="com.linxonline.mallet.game.\lGameState.hookHandlerSystems" alt="" coords="280,5,497,47"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#ad55ddb7da8130efdc919ed3e7d82c34c" title="com.linxonline.mallet.game.\lGameState.unhookHandlerSystems" alt="" coords="273,71,504,112"/>
-<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#a769d3b6b3791fc282c5f345b32017865" title="com.linxonline.mallet.game.\lGameState.initModes" alt="" coords="297,136,481,177"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#adbd40d2b930dda8144830f65ff90c16f" title="com.linxonline.mallet.game.\lGameState.startState" alt="" coords="552,5,736,47"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#a5b9e479a583a5fa81fe8f9a0dcebc867" title="com.linxonline.mallet.game.\lGameState.shutdownState" alt="" coords="552,71,736,112"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_state.html#a68d586bc4f05b5035fd900406098d049" title="com.linxonline.mallet.game.\lGameState.pauseState" alt="" coords="552,136,736,177"/>
-</map>

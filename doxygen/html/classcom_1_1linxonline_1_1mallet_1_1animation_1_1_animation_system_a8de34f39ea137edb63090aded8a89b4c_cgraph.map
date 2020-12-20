@@ -1,7 +1,0 @@
-<map id="com.linxonline.mallet.animation.AnimationSystem.AnimationSystem" name="com.linxonline.mallet.animation.AnimationSystem.AnimationSystem">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html#aae6404531d7c289b1cdffc938b13693a" title="com.linxonline.mallet.event.\lEventController.addEventProcessor" alt="" coords="285,5,516,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html#a361310e787c48c5c0c5b06f7d7a02b43" title="com.linxonline.mallet.event.\lEventController.passEvent" alt="" coords="309,71,493,112"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_assist.html#af79d925f162b4a8f3141c5baf2fcbd74" title="com.linxonline.mallet.renderer.\lDrawAssist.constructDrawDelegate" alt="" coords="285,136,516,177"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html#a5ee8a1da5b58b6974bf469f9a9657986" title="com.linxonline.mallet.event.\lEventController.update" alt="" coords="309,201,493,243"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_messenger.html#a420740e0dc07c7af74bcfe862d3440e2" title="com.linxonline.mallet.event.\lEventMessenger.refreshEvents" alt="" coords="564,201,769,243"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="com.linxonline.mallet.event.EventHandlerMeta" name="com.linxonline.mallet.event.EventHandlerMeta">
-<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1event_1_1_event_handler.html" title="com.linxonline.mallet.event.\lEventHandler" alt="" coords="237,71,421,112"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_controller.html" title="com.linxonline.mallet.event.\lEventController" alt="" coords="491,5,675,47"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1event_1_1_event_updater.html" title="com.linxonline.mallet.event.\lEventUpdater" alt="" coords="491,71,675,112"/>
-<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1android_1_1_android_activity.html" title="com.linxonline.mallet.main.android.\lAndroidActivity" alt="" coords="469,136,696,177"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_system.html" title="com.linxonline.mallet.physics.\lCollisionSystem" alt="" coords="744,5,941,47"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1_system_root.html" title="com.linxonline.mallet.util.\lSystemRoot\&lt; T \&gt;" alt="" coords="758,71,927,112"/>
-</map>

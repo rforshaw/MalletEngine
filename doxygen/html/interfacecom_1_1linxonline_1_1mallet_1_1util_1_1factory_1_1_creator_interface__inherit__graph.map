@@ -1,5 +1,0 @@
-<map id="com.linxonline.mallet.util.factory.CreatorInterface&lt; T, U &gt;" name="com.linxonline.mallet.util.factory.CreatorInterface&lt; T, U &gt;">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1factory_1_1_creator.html" title="com::linxonline::mallet\l::util::factory::Creator\l\&lt; T, U \&gt;" alt="" coords="267,57,419,113"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1factory_1_1creators_1_1_anim_mouse_creator.html" title="com::linxonline::mallet\l::util::factory::creators\l::AnimMouseCreator\&lt; Entity,\l Settings \&gt;" alt="" coords="482,5,674,76"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1factory_1_1creators_1_1_image_creator.html" title="com::linxonline::mallet\l::util::factory::creators\l::ImageCreator\&lt; Entity, Settings \&gt;" alt="" coords="467,101,689,157"/>
-</map>

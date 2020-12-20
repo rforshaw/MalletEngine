@@ -1,4 +1,0 @@
-<map id="com.linxonline.mallet.audio.AudioAssist.constructAudioDelegate" name="com.linxonline.mallet.audio.AudioAssist.constructAudioDelegate">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_sound_component.html#af68ce9f87e8294034c4229070a38029f" title="com.linxonline.mallet.entity.components.\lSoundComponent.stopAudio" alt="" coords="288,5,547,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1test_1_1_game_test_loader.html#a9645fce40a2fcba8392f2c106d1977ff" title="com.linxonline.mallet.game.test.\lGameTestLoader.loadGame" alt="" coords="312,71,523,112"/>
-</map>

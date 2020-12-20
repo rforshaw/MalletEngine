@@ -1,6 +1,0 @@
-<map id="com.linxonline.mallet.renderer.font.Glyph" name="com.linxonline.mallet.renderer.font.Glyph">
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_glyph.html" title="com.linxonline.mallet.renderer.android.\lGL.GLGlyph" alt="" coords="523,5,769,47"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_glyph.html" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGlyph" alt="" coords="521,71,771,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1web_1_1gl_1_1_g_l_glyph.html" title="com.linxonline.mallet.renderer.web.gl.\lGLGlyph" alt="" coords="525,136,767,177"/>
-<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1sort_1_1_sort_interface.html" title="com.linxonline.mallet.util.sort.\lSortInterface" alt="" coords="5,71,200,112"/>
-</map>

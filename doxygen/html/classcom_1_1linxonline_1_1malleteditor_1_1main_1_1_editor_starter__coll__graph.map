@@ -1,6 +1,0 @@
-<map id="com.linxonline.malleteditor.main.EditorStarter" name="com.linxonline.malleteditor.main.EditorStarter">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1desktop_1_1_desktop_starter.html" title="com.linxonline.mallet.main.desktop.\lDesktopStarter" alt="" coords="347,71,577,112"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1main_1_1_starter_interface.html" title="com.linxonline.mallet.main.\lStarterInterface" alt="" coords="13,5,193,47"/>
-<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="5,71,200,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1game_1_1_game_system.html" title="com.linxonline.mallet.game.\lGameSystem" alt="" coords="11,136,195,177"/>
-</map>

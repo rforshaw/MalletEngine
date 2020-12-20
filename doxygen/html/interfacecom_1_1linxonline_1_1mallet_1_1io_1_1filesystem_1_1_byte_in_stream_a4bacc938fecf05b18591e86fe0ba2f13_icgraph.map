@@ -1,5 +1,0 @@
-<map id="com.linxonline.mallet.io.filesystem.ByteInStream.readBytes" name="com.linxonline.mallet.io.filesystem.ByteInStream.readBytes">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1android_1_1_android_file.html#a1b6c291f449d4822450ab35a00f111c9" title="com.linxonline.mallet.io.filesystem.android.\lAndroidFile.copyTo" alt="" coords="282,5,554,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1desktop_1_1_desktop_file.html#a2eea58c26b84e4c59b95754c51b43280" title="com.linxonline.mallet.io.filesystem.desktop.\lDesktopFile.copyTo" alt="" coords="280,71,556,112"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1reader_1_1_byte_reader.html#ab2ca16b062227c5f77c57c8f0d00ba95" title="com.linxonline.mallet.io.reader.\lByteReader.readBytes" alt="" coords="317,136,519,177"/>
-</map>

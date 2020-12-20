@@ -1,4 +1,0 @@
-<map id="com.linxonline.mallet.physics.hulls.Hull" name="com.linxonline.mallet.physics.hulls.Hull">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1hulls_1_1_box2_d.html" title="com.linxonline.mallet.physics.hulls.\lBox2D" alt="" coords="304,5,532,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1hulls_1_1_circle2_d.html" title="com.linxonline.mallet.physics.hulls.\lCircle2D" alt="" coords="304,71,532,112"/>
-</map>

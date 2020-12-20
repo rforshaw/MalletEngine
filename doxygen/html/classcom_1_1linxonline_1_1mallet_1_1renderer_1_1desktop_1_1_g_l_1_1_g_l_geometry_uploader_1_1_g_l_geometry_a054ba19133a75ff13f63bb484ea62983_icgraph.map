@@ -1,6 +1,0 @@
-<map id="com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.GLGeometry.containsGeometry" name="com.linxonline.mallet.renderer.desktop.GL.GLGeometryUploader.GLGeometry.containsGeometry">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader_1_1_g_l_buffer.html#ac7e3ffd6cd26bb365162731383460ca4" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.GLBuffer.isSupported" alt="" coords="353,13,652,54"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader.html#a6f3040e1dd198edb1533283ae3ab7b27" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.upload" alt="" coords="700,13,949,54"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_world.html#a99c106d12cf0602b600f615e9cf6b4f2" title="com.linxonline.mallet.renderer.desktop.\lGL.GLWorld.upload" alt="" coords="997,13,1247,54"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_world_state.html#a5d18245dc3e8628aaefb6614d6723f7d" title="com.linxonline.mallet.renderer.desktop.\lGL.GLWorldState.upload" alt="" coords="1295,13,1544,54"/>
-</map>

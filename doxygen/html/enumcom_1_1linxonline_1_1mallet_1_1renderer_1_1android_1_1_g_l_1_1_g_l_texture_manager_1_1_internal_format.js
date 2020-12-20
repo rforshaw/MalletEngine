@@ -1,5 +1,0 @@
-var enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format =
-[
-    [ "COMPRESSED", "enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format.html#ae4999fc66073af1404adc096f119addd", null ],
-    [ "UNCOMPRESSED", "enumcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_texture_manager_1_1_internal_format.html#afeda4abae25203381616c1f486dc7e41", null ]
-];

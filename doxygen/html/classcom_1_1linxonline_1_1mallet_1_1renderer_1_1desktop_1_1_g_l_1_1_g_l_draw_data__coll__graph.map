@@ -1,5 +1,0 @@
-<map id="com.linxonline.mallet.renderer.desktop.GL.GLDrawData" name="com.linxonline.mallet.renderer.desktop.GL.GLDrawData">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_data.html" title="com.linxonline.mallet.renderer.\lDrawData\&lt; T extends DrawData \&gt;" alt="" coords="268,39,495,80"/>
-<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw.html" title="com.linxonline.mallet.renderer.\lDraw\&lt; T \&gt;" alt="" coords="13,5,212,47"/>
-<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_cacheable.html" title="com.linxonline.mallet.util.caches.\lCacheable" alt="" coords="5,71,220,112"/>
-</map>

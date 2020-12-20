@@ -1,5 +1,0 @@
-<map id="com.linxonline.mallet.input.InputEvent" name="com.linxonline.mallet.input.InputEvent">
-<area shape="rect" id="node2" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_cacheable.html" title="com.linxonline.mallet.util.caches.\lCacheable" alt="" coords="5,5,220,47"/>
-<area shape="rect" id="node3" href="$enumcom_1_1linxonline_1_1mallet_1_1input_1_1_key_code.html" title="com.linxonline.mallet.input.\lKeyCode" alt="" coords="23,71,203,112"/>
-<area shape="rect" id="node4" href="$enumcom_1_1linxonline_1_1mallet_1_1input_1_1_input_type.html" title="com.linxonline.mallet.input.\lInputType" alt="" coords="23,136,203,177"/>
-</map>

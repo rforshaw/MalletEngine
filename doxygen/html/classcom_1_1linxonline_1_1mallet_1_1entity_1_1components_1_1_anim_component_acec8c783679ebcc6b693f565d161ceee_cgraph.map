@@ -1,4 +1,0 @@
-<map id="com.linxonline.mallet.entity.components.AnimComponent.playAnimation" name="com.linxonline.mallet.entity.components.AnimComponent.playAnimation">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1entity_1_1components_1_1_anim_component.html#a5d4ef7bcf1547ddf8c8df0a59b9b1faf" title="com.linxonline.mallet.entity.components.\lAnimComponent.stopAnimation" alt="" coords="312,13,571,54"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1animation_1_1_animation_assist.html#a5e3772b47f6d7fcd08c4c335de0c6f79" title="com.linxonline.mallet.animation.\lAnimationAssist.constructAnimation\lDelegate" alt="" coords="619,5,852,61"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="com.linxonline.mallet.resources.language.LanguageManager.loadLanguageFile" name="com.linxonline.mallet.resources.language.LanguageManager.loadLanguageFile">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1io_1_1reader_1_1_text_reader.html#a2498218e2b50250adf6d31feb7df9053" title="com.linxonline.mallet.io.reader.\lTextReader.getTextAsArray" alt="" coords="319,5,521,47"/>
-<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1io_1_1filesystem_1_1_string_in_stream.html#a6825b37b8a61fc34893e2934a98c6a19" title="com.linxonline.mallet.io.filesystem.\lStringInStream.readLine" alt="" coords="569,5,796,47"/>
-</map>

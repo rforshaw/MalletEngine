@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$interfacecom_1_1linxonline_1_1mallet_1_1system_1_1_system_interface.html" title="com.linxonline.mallet.system.\lSystemInterface" alt="" coords="5,71,200,112"/>
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1_basic_system.html" title="com.linxonline.mallet.system.\lBasicSystem" alt="" coords="248,71,443,112"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1android_1_1gl_1_1_g_l_android_system.html" title="com.linxonline.mallet.system.android.gl.\lGLAndroidSystem" alt="" coords="493,5,747,47"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1desktop_1_1gl_1_1_g_l_default_system.html" title="com.linxonline.mallet.system.desktop.gl.\lGLDefaultSystem" alt="" coords="491,71,749,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1system_1_1web_1_1gl_1_1_g_l_default_system.html" title="com.linxonline.mallet.system.web.gl.\lGLDefaultSystem" alt="" coords="501,136,739,177"/>
-</map>

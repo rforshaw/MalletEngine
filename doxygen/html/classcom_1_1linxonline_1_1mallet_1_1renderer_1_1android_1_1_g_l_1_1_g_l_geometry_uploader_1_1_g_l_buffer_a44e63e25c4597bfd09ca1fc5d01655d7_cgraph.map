@@ -1,7 +1,0 @@
-<map id="com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.GLBuffer.isSupported" name="com.linxonline.mallet.renderer.android.GL.GLGeometryUploader.GLBuffer.isSupported">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_object_cache.html#aab7875e592a30bb9f906c587249d682b" title="com.linxonline.mallet.util.caches.\lObjectCache.get" alt="" coords="395,5,609,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_geometry_uploader.html#a1ddc2b58d95718a37cf6d83dde4649fc" title="com.linxonline.mallet.renderer.android.\lGL.GLGeometryUploader.clean" alt="" coords="379,71,625,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_geometry_uploader_1_1_g_l_geometry.html#ac7268b62343b3acbe98b94a7f3717012" title="com.linxonline.mallet.renderer.android.\lGL.GLGeometryUploader.GLGeometry.contains\lGeometry" alt="" coords="352,135,652,191"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1android_1_1_g_l_1_1_g_l_geometry_uploader_1_1_g_l_buffer.html#afafe0a03b4f1929ec1f4e4763be5698a" title="com.linxonline.mallet.renderer.android.\lGL.GLGeometryUploader.GLBuffer.destroy" alt="" coords="700,71,972,112"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1util_1_1caches_1_1_object_cache.html#a94036b3c7f0d755f38a8e65fcdcaf5c3" title="com.linxonline.mallet.util.caches.\lObjectCache.reclaim" alt="" coords="729,143,943,184"/>
-</map>

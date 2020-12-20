@@ -1,6 +1,0 @@
-<map id="com.linxonline.mallet.renderer.desktop.GL.GLWorld.draw" name="com.linxonline.mallet.renderer.desktop.GL.GLWorld.draw">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader.html#a750f9bef2f7c7acb62b3101b22fff426" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.draw" alt="" coords="303,5,552,47"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader.html#a72ee926a733f96d4e9392ad985a32910" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.clean" alt="" coords="303,71,552,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader.html#aaafa25f923b21428bd3a7cf5f109bfb8" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.shutdown" alt="" coords="303,136,552,177"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1desktop_1_1_g_l_1_1_g_l_geometry_uploader_1_1_g_l_buffer.html#a8d6a4644f64ea59b0fd8c213e2bbc433" title="com.linxonline.mallet.renderer.desktop.\lGL.GLGeometryUploader.GLBuffer.destroy" alt="" coords="600,71,872,112"/>
-</map>

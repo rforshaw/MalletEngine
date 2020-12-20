@@ -1,5 +1,0 @@
-<map id="com.linxonline.mallet.renderer.font.FontMap&lt; T extends ImageInterface &gt;" name="com.linxonline.mallet.renderer.font.FontMap&lt; T extends ImageInterface &gt;">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1font_1_1_glyph.html" title="com.linxonline.mallet.renderer.font.\lGlyph" alt="" coords="258,5,483,47"/>
-<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1util_1_1sort_1_1_sort_interface.html" title="com.linxonline.mallet.util.sort.\lSortInterface" alt="" coords="5,5,200,47"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1texture_1_1_texture.html" title="com.linxonline.mallet.renderer.texture.\lTexture\&lt; T \&gt;" alt="" coords="249,71,492,112"/>
-</map>

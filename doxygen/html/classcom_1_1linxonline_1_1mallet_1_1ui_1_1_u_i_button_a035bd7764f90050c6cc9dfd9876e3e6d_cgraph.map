@@ -1,9 +1,0 @@
-<map id="com.linxonline.mallet.ui.UIButton.UIButton" name="com.linxonline.mallet.ui.UIButton.UIButton">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_assist.html#af79d925f162b4a8f3141c5baf2fcbd74" title="com.linxonline.mallet.renderer.\lDrawAssist.constructDrawDelegate" alt="" coords="216,5,447,47"/>
-<area shape="rect" id="node3" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_delegate.html#a7724784aa2689979d036ca12a8d769fe" title="com.linxonline.mallet.renderer.\lDrawDelegate.addTextDraw" alt="" coords="232,71,431,112"/>
-<area shape="rect" id="node4" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_assist.html#aa7e258689d71766260f912f030d75da3" title="com.linxonline.mallet.renderer.\lDrawAssist.createDraw" alt="" coords="232,136,431,177"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_assist.html#afef7b58ba1eb40a10fc9da0d5fda7f53" title="com.linxonline.mallet.renderer.\lDrawAssist.createTextDraw" alt="" coords="232,201,431,243"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_element.html#a0749f4321b55533cb1a75de64be3e03a" title="com.linxonline.mallet.ui.\lUIElement.refresh" alt="" coords="250,267,413,308"/>
-<area shape="rect" id="node7" href="$classcom_1_1linxonline_1_1mallet_1_1ui_1_1_u_i_element.html#a4c2d8d121ca65ff8816128f40bb2467b" title="com.linxonline.mallet.ui.\lUIElement.shutdown" alt="" coords="250,332,413,373"/>
-<area shape="rect" id="node8" href="$interfacecom_1_1linxonline_1_1mallet_1_1renderer_1_1_draw_delegate.html#a13a068e7055ea7802ba578e528a6c608" title="com.linxonline.mallet.renderer.\lDrawDelegate.shutdown" alt="" coords="232,397,431,439"/>
-</map>

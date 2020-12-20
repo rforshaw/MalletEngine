@@ -1,7 +1,0 @@
-<map id="com.linxonline.mallet.physics.hulls.Circle2D" name="com.linxonline.mallet.physics.hulls.Circle2D">
-<area shape="rect" id="node2" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1hulls_1_1_hull.html" title="com.linxonline.mallet.physics.hulls.Hull" alt="" coords="330,78,581,105"/>
-<area shape="rect" id="node3" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1_contact_data.html" title="com.linxonline.mallet.physics.\lContactData" alt="" coords="5,5,203,47"/>
-<area shape="rect" id="node4" href="$interfacecom_1_1linxonline_1_1mallet_1_1physics_1_1_collision_callback.html" title="com.linxonline.mallet.physics.\lCollisionCallback" alt="" coords="5,71,203,112"/>
-<area shape="rect" id="node5" href="$classcom_1_1linxonline_1_1mallet_1_1physics_1_1primitives_1_1_circle.html" title="com.linxonline.mallet.physics.primitives.\lCircle" alt="" coords="327,132,584,173"/>
-<area shape="rect" id="node6" href="$classcom_1_1linxonline_1_1mallet_1_1maths_1_1_vector2.html" title="com.linxonline.mallet.maths.\lVector2" alt="" coords="10,136,198,177"/>
-</map>
