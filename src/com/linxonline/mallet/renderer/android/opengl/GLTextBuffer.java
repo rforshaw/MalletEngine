@@ -146,7 +146,6 @@ public class GLTextBuffer extends GLBuffer
 			final int start = draw.getStart() ;
 			final int end = draw.getEnd() ;
 
-			System.out.println( "Update TEXT: " + text.toString() ) ;
 			if( end > text.length() )
 			{
 				System.out.println( text ) ;
@@ -261,8 +260,6 @@ public class GLTextBuffer extends GLBuffer
 			return ;
 		}
 
-		System.out.println( "DRAW TEXT" ) ;
-		
 		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
 		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
 

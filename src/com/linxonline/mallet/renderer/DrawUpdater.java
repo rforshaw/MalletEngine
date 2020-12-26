@@ -36,7 +36,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		buffers.add( _geometry ) ;
 	}
 
-	private void forceUpdate()
+	public void forceUpdate()
 	{
 		forceUpdate = true ;
 	}

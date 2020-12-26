@@ -125,20 +125,25 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		return bind( _image, InternalFormat.COMPRESSED ) ;
 	}
 
+	public GLImage bind( final BufferedImage _image, final InternalFormat _format )
+	{
+		return bind( _image, _format, true ) ;
+	}
+	
 	/**
 		Binds the BufferedImage byte-stream into video memory.
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public GLImage bind( final BufferedImage _image, final InternalFormat _format )
+	public GLImage bind( final BufferedImage _image, final InternalFormat _format, final boolean _createMips )
 	{
-		final int textureID = glGenTextures() ;			//GLRenderer.handleError( "Gen Texture", gl ) ;
-		MGL.glBindTexture( MGL.GL_TEXTURE_2D, textureID ) ;	//GLRenderer.handleError( "Bind Texture", gl ) ;
+		final int textureID = glGenTextures() ;
+		MGL.glBindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
 
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;				//GLRenderer.handleError( "Parameter", gl ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;						//GLRenderer.handleError( "Parameter", gl ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;					//GLRenderer.handleError( "Parameter", gl ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;	//GLRenderer.handleError( "Parameter", gl ) ;
+		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
 
 		final int width = _image.getWidth() ;
 		final int height = _image.getHeight() ;
@@ -166,7 +171,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 			}
 		}
 
-		MGL.glPixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;		//GLRenderer.handleError( "Unpack Alignment", gl ) ;
+		MGL.glPixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;
 		MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
 						 0, 
 						 getGLInternalFormat( channels, _format ), 
@@ -175,10 +180,13 @@ public class GLTextureManager extends AbstractManager<GLImage>
 						 0, 
 						 imageFormat, 
 						 MGL.GL_UNSIGNED_BYTE, 
-						 getByteBuffer( _image ) ) ;		//GLRenderer.handleError( "Tex Image", gl ) ;
+						 getByteBuffer( _image ) ) ;
 
-		MGL.glGenerateMipmap( MGL.GL_TEXTURE_2D ) ;			//GLRenderer.handleError( "Gen Mipmap", gl ) ;
-		MGL.glBindTexture( MGL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
+		if( _createMips == true )
+		{
+			MGL.glGenerateMipmap( MGL.GL_TEXTURE_2D ) ;
+		}
+		//MGL.glBindTexture( MGL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
 		final long estimatedConsumption = width * height * ( channels * 8 ) ;
@@ -358,7 +366,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 						// Add additional Meta information to MalletTexture as 
 						// and when it becomes needed. It shouldn't hold too much (RGB, RGBA, Mono, endinese, 32, 24-bit, etc)
 						// data as a game-developer shouldn't need detailed information.
-						return new MalletTexture.Meta( _path, reader.getHeight( 0 ), reader.getWidth( 0 ) ) ;
+						return new MalletTexture.Meta( _path, reader.getWidth( 0 ), reader.getHeight( 0 ) ) ;
 					}
 					finally
 					{

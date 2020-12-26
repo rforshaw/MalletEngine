@@ -37,6 +37,7 @@ public abstract class BasicSystem<F extends FileSystem,
 	private final F fileSystem ;
 
 	private final G gameSystem ;
+	private final Object lock = new Object() ;
 
 	public BasicSystem( final S _shutdown,
 						final R _renderer,
@@ -135,7 +136,7 @@ public abstract class BasicSystem<F extends FileSystem,
 		try
 		{
 			Thread.sleep( _millis ) ;
-			Thread.yield() ;
+			//Thread.yield() ;
 		}
 		catch( InterruptedException ex )
 		{

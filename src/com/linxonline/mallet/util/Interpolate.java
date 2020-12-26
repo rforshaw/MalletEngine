@@ -19,12 +19,13 @@ public class Interpolate
 	*/
 	public static boolean linear( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _hertz, final int _iteration )
 	{
+		final float tolerance = tolerance( _hertz ) ;
 		final float xDiff = ( _future.x - _past.x ) / _hertz ;
 		final float yDiff = ( _future.y - _past.y ) / _hertz ;
 		final float zDiff = ( _future.z - _past.z ) / _hertz ;
 
 		boolean requiresMore = false ;
-		if( Math.abs( xDiff ) > 0.001f || Math.abs( yDiff ) > 0.001f || Math.abs( zDiff ) > 0.001f )
+		if( Math.abs( xDiff ) > tolerance || Math.abs( yDiff ) > tolerance || Math.abs( zDiff ) > tolerance )
 		{
 			// If an object has not reached its final state
 			requiresMore = true ;
@@ -39,6 +40,7 @@ public class Interpolate
 
 	public static boolean linear( final float[] _future, final float[] _past, final float[] _present, final int _hertz, final int _iteration )
 	{
+		final float tolerance = tolerance( _hertz ) ;
 		boolean requiresMore = false ;
 
 		for( int i = 0; i < _future.length; ++i )
@@ -47,7 +49,7 @@ public class Interpolate
 			final float past = _past[i] ;
 
 			final float diff = ( future - past ) / _hertz ;
-			if( Math.abs( diff ) > 0.001f )
+			if( Math.abs( diff ) > tolerance )
 			{
 				requiresMore = true ;
 			}
@@ -58,5 +60,17 @@ public class Interpolate
 		}
 
 		return requiresMore ;
+	}
+
+	/**
+		Calculate the tolerance based on the _hertz.
+		More hertz requires a higher tolerance rating else 
+		the interpolation may stop to soon.
+		Less hertz requires a lower tolerance rating else 
+		the interpolation may 'jump' past the intended limit. 
+	*/
+	private static float tolerance( final int _hertz )
+	{
+		return 1.0f / ( float )Math.pow( 10.0f, _hertz ) ;
 	}
 }

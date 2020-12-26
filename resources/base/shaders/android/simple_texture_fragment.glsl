@@ -5,7 +5,7 @@ uniform sampler2D inTex0 ;
 in vec2 outTexCoord0 ;
 in vec4 outColour ;
 
-out vec4 fragColor;
+layout( location = 0 ) out vec4 fragColor ;
 
 void main()
 {

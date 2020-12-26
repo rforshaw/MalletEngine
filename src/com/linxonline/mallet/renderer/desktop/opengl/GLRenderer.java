@@ -12,6 +12,7 @@ import com.jogamp.opengl.GLProfile ;
 import com.jogamp.opengl.GLCapabilities ;
 import com.jogamp.opengl.GLContext ;
 import com.jogamp.opengl.GLEventListener ;
+import com.jogamp.opengl.GLDebugMessage ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -333,7 +334,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 					{
 						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
 						worldLookup.map( _world.index(), _world, world ) ;
-						worlds.add( world ) ;
+						worlds.add( 0, world ) ;
 					}
 				} ) ;
 
@@ -533,7 +534,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		world.setDisplayDimensions( 0, 0, _width, _height ) ;
 		WorldAssist.update( world ) ;
 	}
-	
+
 	@Override
 	public void init( final GLAutoDrawable _drawable )
 	{
@@ -552,6 +553,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		MGL.glEnable( MGL.GL_CULL_FACE ) ;
 		MGL.glCullFace( MGL.GL_BACK ) ;  
 		MGL.glFrontFace( MGL.GL_CCW ) ;
+
+		MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		initDefaultWorld() ;
 
@@ -621,9 +624,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		for( final Camera camera : cameras )
 		{
-			camera.update( difference, frameNo ) ;
-			final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
-			glCamera.update( camera ) ;
+			if( camera.update( difference, frameNo ) == true )
+			{
+				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
+				glCamera.update( camera ) ;
+			}
 		}
 
 		int totalBufferUpdates = 0 ;

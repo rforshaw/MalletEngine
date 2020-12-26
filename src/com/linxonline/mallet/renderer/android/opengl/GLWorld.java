@@ -35,9 +35,9 @@ public class GLWorld
 	protected final List<GLCamera> cameras = new ArrayList<GLCamera>() ;
 	protected final List<GLBuffer> drawBuffers = new ArrayList<GLBuffer>() ;
 
-	private int[] colourAttachments ; 	// GL_COLOR_ATTACHMENT0, used by glDrawBuffers
-	private boolean hasDepth = false ;
-	private boolean hasStencil = false ;
+	protected int[] colourAttachments ; 	// GL_COLOR_ATTACHMENT0, used by glDrawBuffers
+	protected boolean hasDepth = false ;
+	protected boolean hasStencil = false ;
 
 	public static GLWorld createCore( final World _world,
 									  final AssetLookup<Camera, GLCamera> _cameras,
@@ -76,9 +76,9 @@ public class GLWorld
 		init( _world, _cameras, _buffers ) ;
 	}
 
-	private void init( final World _world,
-					   final AssetLookup<Camera, GLCamera> _cameras,
-					   final AssetLookup<ABuffer, GLBuffer> _buffers )
+	protected void init( final World _world,
+						 final AssetLookup<Camera, GLCamera> _cameras,
+						 final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
 		id = _world.getID() ;
 
@@ -87,10 +87,8 @@ public class GLWorld
 
 		_world.getDisplayPosition( displayPosition ) ;
 		_world.getDisplayDimensions( display ) ;
-	
-		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 
-		_world.getRenderDimensions( render ) ;
+		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 
 		int colourAttachmentOffset = 0 ;
 
@@ -111,9 +109,6 @@ public class GLWorld
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, render.x, render.y, 0, MGL.GL_RGBA, MGL.GL_UNSIGNED_BYTE, null ) ;
 
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 
@@ -128,9 +123,6 @@ public class GLWorld
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_COMPONENT, render.x, render.y, 0, MGL.GL_DEPTH_COMPONENT, MGL.GL_FLOAT, null ) ;
 
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
-
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 
@@ -144,9 +136,6 @@ public class GLWorld
 					MGL.glGenTextures( 1, buffers, offset ) ;
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_STENCIL, render.x, render.y, 0, MGL.GL_DEPTH_STENCIL, MGL.GL_FLOAT, null ) ;
-
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
 
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
@@ -170,7 +159,7 @@ public class GLWorld
 		final int code = MGL.glCheckFramebufferStatus( MGL.GL_DRAW_FRAMEBUFFER ) ; 
 		switch( code )
 		{
-			case MGL.GL_FRAMEBUFFER_COMPLETE    : break ;
+			case MGL.GL_FRAMEBUFFER_COMPLETE    : /*System.out.println( _world.getID() + " framebuffer complete." ) ;*/ break ;
 			case MGL.GL_FRAMEBUFFER_UNDEFINED   : System.out.println( _world.getID() + " framebuffer undefined." ) ; break ;
 			case MGL.GL_FRAMEBUFFER_UNSUPPORTED : System.out.println( _world.getID() + " framebuffer unsupported." ) ; break ;
 			default                             : System.out.println( _world.getID() + " framebuffer corrupt: " + code ) ; break ;
@@ -188,7 +177,8 @@ public class GLWorld
 		{
 			final int channel = 3 ;
 			final long estimatedConsumption = ( long )( render.x * render.y ) * ( long )( channel * 8 ) ;
-			final GLImage buffer = new GLImage( buffers[_index], estimatedConsumption ) ;
+			final int offset = _index + 1 ;		// skip the framebuffer id
+			final GLImage buffer = new GLImage( buffers[offset], estimatedConsumption ) ;
 			backBuffers[_index] = buffer ;
 		}
 
@@ -211,7 +201,7 @@ public class GLWorld
 		updateDrawBuffers( _world, _buffers ) ;
 	}
 
-	private void updateCameras( final World _world, final AssetLookup<Camera, GLCamera> _cameras )
+	protected void updateCameras( final World _world, final AssetLookup<Camera, GLCamera> _cameras )
 	{
 		cameras.clear() ;
 		for( final Camera camera : _world.getCameras() )
@@ -224,37 +214,23 @@ public class GLWorld
 		}
 	}
 
-	private void updateDrawBuffers( final World _world, final AssetLookup<ABuffer, GLBuffer> _buffers )
+	protected void updateDrawBuffers( final World _world, final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
 		drawBuffers.clear() ;
 		for( final ABuffer buffer : _world.getBuffers() )
 		{
 			switch( buffer.getBufferType() )
 			{
-				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ;
+				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
 				case DRAW_BUFFER :
-				{
-					final int index = buffer.index() ;
-					final GLBuffer buff = _buffers.getRHS( index ) ;
-					if( buff == null )
-					{
-						continue ;
-					}
-					drawBuffers.add( buff ) ;
-					break ;
-				}
 				case TEXT_BUFFER :
 				{
 					final int index = buffer.index() ;
 					final GLBuffer buff = _buffers.getRHS( index ) ;
-					if( buff == null )
+					if( buff != null )
 					{
-						continue ;
+						drawBuffers.add( buff ) ;
 					}
-					
-					//System.out.println( "Update TextBuffer." ) ;
-					drawBuffers.add( buff ) ;
-					break ;
 				}
 			}
 		}
@@ -269,8 +245,10 @@ public class GLWorld
 			MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
 		}
 
-		MGL.glClear( MGL.GL_COLOR_BUFFER_BIT | MGL.GL_DEPTH_BUFFER_BIT | MGL.GL_STENCIL_BUFFER_BIT ) ;
-		//MGL.glClearColor( 1.0f, 0.0f, 0.0f, 0.5f ) ;
+		int clearBits = ( colourAttachments.length > 0 ) ? MGL.GL_COLOR_BUFFER_BIT : 0 ;
+		clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
+		clearBits |= ( hasStencil == true ) ? MGL.GL_STENCIL_BUFFER_BIT : 0 ;
+		MGL.glClear( clearBits ) ;
 
 		// Allow the shader to access the colour attachments of the framebuffer.
 		// These colour attachments can then be used within a MalletTexture for 
@@ -326,9 +304,6 @@ public class GLWorld
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_RGBA, _width, _height, 0, MGL.GL_RGBA, MGL.GL_UNSIGNED_BYTE, null ) ;
 
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 					break ;
@@ -338,9 +313,6 @@ public class GLWorld
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_COMPONENT, _width, _height, 0, MGL.GL_DEPTH_COMPONENT, MGL.GL_FLOAT, null ) ;
 
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
-
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
 					break ;
@@ -349,9 +321,6 @@ public class GLWorld
 				{
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, buffers[offset] ) ;
 					MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 0, MGL.GL_DEPTH_STENCIL, _width, _height, 0, MGL.GL_DEPTH_STENCIL, MGL.GL_FLOAT, null ) ;
-
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
 
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_NEAREST ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_NEAREST ) ;
@@ -367,20 +336,69 @@ public class GLWorld
 							 final AssetLookup<Camera, GLCamera> _cameras,
 							 final AssetLookup<ABuffer, GLBuffer> _buffers )
 		{
+			// Default Framebuffer 0
 			super( _world, _cameras, _buffers, 0 ) ;
+		}
+
+		@Override
+		protected void init( final World _world,
+							 final AssetLookup<Camera, GLCamera> _cameras,
+							 final AssetLookup<ABuffer, GLBuffer> _buffers )
+		{
+			id = _world.getID() ;
+
+			_world.getRenderPosition( renderPosition ) ;
+			_world.getRenderDimensions( render ) ;
+
+			_world.getDisplayPosition( displayPosition ) ;
+			_world.getDisplayDimensions( display ) ;
+		
+			MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+
+			updateCameras( _world, _cameras ) ;
+			updateDrawBuffers( _world, _buffers ) ;
+		}
+
+		@Override
+		public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ABuffer, GLBuffer> _buffers )
+		{
+			id = _world.getID() ;
+
+			_world.getRenderPosition( renderPosition ) ;
+			_world.getRenderDimensions( render ) ;
+
+			_world.getDisplayPosition( displayPosition ) ;
+			_world.getDisplayDimensions( display ) ;
+
+			updateCameras( _world, _cameras ) ;
+			updateDrawBuffers( _world, _buffers ) ;
 		}
 
 		@Override
 		public void draw()
 		{
-			super.draw() ;
-			MGL.glBindFramebuffer( MGL.GL_READ_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
-			MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, 0 ) ;
-			MGL.glBlitFramebuffer( renderPosition.x, renderPosition.y,
-								   render.x, render.y,
-								   displayPosition.x, displayPosition.y,
-								   display.x, display.y,
-								   MGL.GL_COLOR_BUFFER_BIT , MGL.GL_LINEAR ) ;
+			MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
+			if( hasDepth == true )
+			{
+				// Enable Depth Test if the framebuffer contains a depth attachment.
+				MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
+			}
+
+			int clearBits = MGL.GL_COLOR_BUFFER_BIT ;
+			clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
+			clearBits |= ( hasStencil == true ) ? MGL.GL_STENCIL_BUFFER_BIT : 0 ;
+			MGL.glClear( clearBits ) ;
+
+			// Draw the buffers from all the camera perspectives.
+			for( final GLCamera camera : cameras )
+			{
+				camera.draw( drawBuffers ) ;
+			}
+
+			if( hasDepth == true )
+			{
+				MGL.glDisable( MGL.GL_DEPTH_TEST ) ;
+			}
 		}
 	}
 }

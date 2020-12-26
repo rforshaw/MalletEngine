@@ -90,7 +90,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				// is not reloaded if another object wishes to use it before 
 				// the texture has fully loaded.
 				// The Renderer should skip the texture, until it is finally 
-				// available to render/
+				// available to render
 				put( _file, null ) ;
 
 				load.start() ;

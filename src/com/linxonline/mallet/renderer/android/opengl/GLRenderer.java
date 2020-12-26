@@ -134,6 +134,7 @@ public class GLRenderer extends BasicRenderer
 		MGL.glEnable( MGL.GL_BLEND ) ;
 		MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;
 		MGL.glEnable( MGL.GL_PRIMITIVE_RESTART_FIXED_INDEX ) ;
+		//MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 		MGL.glEnable( MGL.GL_CULL_FACE ) ;
 		MGL.glCullFace( MGL.GL_BACK ) ;  
@@ -373,7 +374,7 @@ public class GLRenderer extends BasicRenderer
 					{
 						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
 						worldLookup.map( _world.index(), _world, world ) ;
-						worlds.add( world ) ;
+						worlds.add( 0, world ) ;
 					}
 				} ) ;
 
@@ -589,9 +590,11 @@ public class GLRenderer extends BasicRenderer
 
 		for( final Camera camera : cameras )
 		{
-			camera.update( difference, frameNo ) ;
-			final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
-			glCamera.update( camera ) ;
+			if( camera.update( difference, frameNo ) == true )
+			{
+				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
+				glCamera.update( camera ) ;
+			}
 		}
 
 		int totalBufferUpdates = 0 ;

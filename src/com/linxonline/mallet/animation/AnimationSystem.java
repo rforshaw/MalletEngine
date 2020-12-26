@@ -135,7 +135,7 @@ public class AnimationSystem
 
 				final DrawUpdater updater = DrawUpdater.get( world, program, shape, false, order ) ;
 
-				updater.makeDirty() ;
+				updater.forceUpdate() ;
 				anim.setUpdater( updater, updater.getDrawBuffer() ) ;
 			}
 		}

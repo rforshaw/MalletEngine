@@ -41,6 +41,7 @@ public class GLGeometryBuffer extends GLBuffer
 	private int[] indexLength = new int[1] ;
 
 	private int order ;
+	private float[] vertex ;
 	private int vertexStride = -1 ;
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
@@ -88,11 +89,11 @@ public class GLGeometryBuffer extends GLBuffer
 		// We'll construct our buffers for the minimum size
 		// but if we need more space we'll expand the size 
 		// until we reach our maximum capacity.
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( _indexByteSize ) ;
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( _vertexByteSize ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asShortBuffer() ;
 
@@ -108,6 +109,7 @@ public class GLGeometryBuffer extends GLBuffer
 			// set, so we'll only calculate the swivel once.
 			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
 			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
+			vertex = new float[vertexStride] ;
 		}
 
 		switch( _buffer.getStyle() )

@@ -46,8 +46,12 @@ public final class GameTestLoader implements IGameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
+			//private final World exampleWorld = WorldAssist.add( new World( "EXAMPLE_WORLD" ) ) ;
+
 			public void initGame()			// Called when state is started
 			{
+				//exampleWorld.addCameras( CameraAssist.getDefault() ) ;
+
 				createMeta() ;
 
 				createUI() ;
@@ -344,50 +348,6 @@ public final class GameTestLoader implements IGameLoader
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
 				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
-				/*ProgramAssist.load( "SIMPLE_STORAGE_TEXTURE", "base/shaders/{0}/simple_storage_texture.jgl" ) ;
-
-				final Storage storage1 = StorageAssist.add( new Storage( new Storage.IData()
-				{
-					private final int test = 255 ;
-
-					@Override
-					public int getLength()
-					{
-						return 4 ;
-					}
-
-					@Override
-					public void serialise( Serialise.Out _out ) 
-					{
-						_out.writeInt( test ) ;
-					}
-				} ) ) ;
-
-				final Storage storage2 = StorageAssist.add( new Storage( new Storage.IData()
-				{
-					private final int test = 0 ;
-
-					@Override
-					public int getLength()
-					{
-						return 4 ;
-					}
-
-					@Override
-					public void serialise( Serialise.Out _out ) 
-					{
-						_out.writeInt( test ) ;
-					}
-				} ) ) ;
-
-				StorageAssist.update( storage1 ) ;
-				StorageAssist.update( storage2 ) ;
-
-				final Program program = ProgramAssist.add( new Program( "SIMPLE_STORAGE_TEXTURE" ) ) ;
-				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
-				program.mapStorage( "TestBlock1", storage1 ) ;
-				program.mapStorage( "TestBlock2", storage2 ) ;*/
-
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
@@ -435,12 +395,9 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void init()
 					{
-						final World world = WorldAssist.getDefault() ;
+						final World world = WorldAssist.getDefault() ;//exampleWorld ;
 
 						{
-							//final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-							//program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
-
 							updater = getUpdater( world, program, draws[0], false, 10 ) ;
 							updater.addDynamics( draws ) ;
 						}
@@ -450,6 +407,20 @@ public final class GameTestLoader implements IGameLoader
 							//debugUpdater = getUpdater( world, program, debugDraws[0], false, 10 ) ;
 							//debugUpdater.addDraws( debugDraws ) ;
 						}
+
+						/*{
+							final Shape plane = Shape.constructPlane( new Vector3( 1280.0f, 720.0f, 0.0f ), new Vector2( 0, 1 ), new Vector2( 1, 0 ) ) ;
+							final Draw draw = new Draw() ;
+							draw.setPosition( 0.0f, 0.0f, 0.0f ) ;
+							draw.setShape( plane ) ;
+
+							final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+							program.mapUniform( "inTex0", new MalletTexture( exampleWorld ) ) ;
+
+							final World defWorld = WorldAssist.getDefault() ;
+							final DrawUpdater updater = getUpdater( defWorld, program, draw, true, 10 ) ;
+							updater.addDynamics( draw ) ;
+						}*/
 					}
 
 					@Override

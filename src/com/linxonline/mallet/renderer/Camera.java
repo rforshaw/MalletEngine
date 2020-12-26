@@ -229,12 +229,14 @@ public class Camera
 		return _fill ;
 	}
 
-	public void update( final int _diff, final int _iteration )
+	public boolean update( final int _diff, final int _iteration )
 	{
-		interpolate( uiPosition, oldUIPosition, currentUIPosition, _diff, _iteration ) ;
-		interpolate( position,   oldPosition,   currentPosition,   _diff, _iteration ) ;
-		interpolate( scale,      oldScale,      currentScale,      _diff, _iteration ) ;
-		interpolate( rotation,   oldRotation,   currentRotation,   _diff, _iteration ) ;
+		boolean update = false ;
+		update = interpolate( uiPosition, oldUIPosition, currentUIPosition, _diff, _iteration ) ;
+		update |= interpolate( position,   oldPosition,   currentPosition,   _diff, _iteration ) ;
+		update |= interpolate( scale,      oldScale,      currentScale,      _diff, _iteration ) ;
+		update |= interpolate( rotation,   oldRotation,   currentRotation,   _diff, _iteration ) ;
+		return update ;
 	}
 
 	private boolean interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )

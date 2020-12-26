@@ -228,16 +228,16 @@ public class MalletTexture
 		private final int attachmentIndex ;
 
 		public Meta( final String _path,
-					 final int _height,
-					 final int _width )
+					 final int _width,
+					 final int _height )
 		{
-			this( _path, 0, _height, _width ) ;
+			this( _path, 0, _width, _height ) ;
 		}
 
 		public Meta( final String _path,
 					 final int _attachmentIndex,
-					 final int _height,
-					 final int _width )
+					 final int _width,
+					 final int _height )
 		{
 			path = _path ;
 			set( _width, _height ) ;

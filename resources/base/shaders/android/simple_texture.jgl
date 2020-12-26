@@ -1,7 +1,7 @@
 {
-	NAME: "SIMPLE_TEXTURE",
-	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
-	FRAGMENT: ["base/shaders/android/simple_texture_fragment.glsl"],
+	"NAME": "SIMPLE_TEXTURE",
+	"VERTEX": ["base/shaders/android/simple_vertex.glsl"],
+	"FRAGMENT": ["base/shaders/android/simple_texture_fragment.glsl"],
 
 	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
 	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]

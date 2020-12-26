@@ -387,22 +387,9 @@ public class GameState extends State
 					system.draw( DEFAULT_FRAMERATE ) ;
 
 					endTime = ElapsedTimer.nanoTime() ;
-					//deltaTime += endTime - startTime ;
 
 					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
 					renderAccumulator = 0.0 ;
-				}
-
-				final int totalTime = ( int )( ( deltaUpdateTime + deltaRenderTime ) * 1000.0 ) ;
-				final int expectedFramerate = ( int )( DEFAULT_FRAMERATE * 1000.0 ) ;
-				final long sleepRender = ( expectedFramerate - totalTime ) ;
-
-				//System.out.println( "Total: " + totalTime + " Sleep: " + sleepRender ) ;
-
-				if( sleepRender > 0L )
-				{
-					//System.out.println( "Sleep: " + sleepRender ) ;
-					system.sleep( sleepRender ) ;
 				}
 			}
 		} ;

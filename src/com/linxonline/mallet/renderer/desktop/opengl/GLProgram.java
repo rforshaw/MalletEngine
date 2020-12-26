@@ -173,8 +173,8 @@ public class GLProgram extends ProgramManager.Program
 				{
 					final GLImage texture = ( GLImage )_data.getUniform( uniform.getRight() ) ;
 
-					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;			//GLRenderer.handleError( "Activate Texture", _gl ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;	//GLRenderer.handleError( "Bind Texture", _gl ) ;
+					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
 					textureUnit += 1 ;
 					break ;
 				}
@@ -392,18 +392,28 @@ public class GLProgram extends ProgramManager.Program
 		public void set( GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
-			minFilter = calculateFilter( _texture.getMinimumFilter() ) ;
-			maxFilter = calculateFilter( _texture.getMaximumFilter() ) ;
+			minFilter = calculateMinFilter( _texture.getMinimumFilter() ) ;
+			maxFilter = calculateMagFilter( _texture.getMaximumFilter() ) ;
 
 			uWrap = calculateWrap( _texture.getUWrap() ) ;
 			vWrap = calculateWrap( _texture.getVWrap() ) ;
 		}
 
-		private int calculateFilter( MalletTexture.Filter _filter )
+		private int calculateMagFilter( MalletTexture.Filter _filter )
 		{
 			switch( _filter )
 			{
-				default          :
+				default          : return MGL.GL_LINEAR ;
+				case LINEAR      : return MGL.GL_LINEAR ;
+				case NEAREST     : return MGL.GL_NEAREST ;
+			}
+		}
+
+		private int calculateMinFilter( MalletTexture.Filter _filter )
+		{
+			switch( _filter )
+			{
+				default          : return MGL.GL_LINEAR ;
 				case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
 				case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
 				case LINEAR      : return MGL.GL_LINEAR ;
