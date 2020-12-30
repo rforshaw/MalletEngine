@@ -135,6 +135,11 @@ public class GLTextBuffer extends GLBuffer
 
 		for( final TextDraw draw : _buffer.getTextDraws() )
 		{
+			if( draw.isHidden() == true )
+			{
+				continue ;
+			}
+
 			draw.getPosition( position ) ;
 			draw.getOffset( offset ) ;
 			draw.getRotation( rotation ) ;

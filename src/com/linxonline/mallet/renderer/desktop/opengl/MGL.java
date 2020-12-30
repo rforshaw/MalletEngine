@@ -187,9 +187,19 @@ public final class MGL
 		gl.glDrawRangeElements( _mode, _start, _end, _count, _type, _offset ) ;
 	}
 
+	public static void glDrawArraysInstanced( final int _mode, final int _start, final int _count, final int _instanceCount )
+	{
+		gl.glDrawArraysInstanced( _mode, _start, _count, _instanceCount ) ;
+	}
+
 	public static void glDrawElements( final int _mode, final int _count, final int _type, final long _offset )
 	{
 		gl.glDrawElements( _mode, _count, _type, _offset ) ;
+	}
+
+	public static void glDrawElementsInstanced( final int _mode, final int _count, final int _type, final long _offset, final int _instanceCount )
+	{
+		gl.glDrawElementsInstanced( _mode, _count, _type, _offset, _instanceCount ) ;
 	}
 
 	public static void glStencilFunc( final int _func, final int _ref, final int _mask )
@@ -235,6 +245,11 @@ public final class MGL
 	public static void glVertexAttribPointer( final int _index, final int _size, final int _type, final boolean _normalised, final int _stride, final int _offset )
 	{
 		gl.glVertexAttribPointer( _index, _size, _type, _normalised, _stride, _offset ) ;
+	}
+	
+	public static void glVertexAttribDivisor( final int _index, final int _divisor )
+	{
+		gl.glVertexAttribDivisor( _index, _divisor ) ;
 	}
 
 	public static void glDisableVertexAttribArray( final int _index )

@@ -10,13 +10,13 @@ import com.linxonline.mallet.util.MalletList ;
 	A draw object can be added to multiple different 
 	buffers with each buffer doing a different task.
 
-	This DrawUpdater is designed to trigger the update 
-	of geometry buffers when the Draw object state is 
-	still influx.
+	This DrawInstancedUpdater is designed to trigger 
+	the update of DrawInstancedBuffer when the Draw 
+	object state is still influx.
 */
-public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
+public class DrawInstancedUpdater implements IUpdater<Draw, GeometryBuffer>
 {
-	private final static List<WeakReference<DrawUpdater>> globals = new ArrayList<WeakReference<DrawUpdater>>() ;
+	private final static List<WeakReference<DrawInstancedUpdater>> globals = new ArrayList<WeakReference<DrawInstancedUpdater>>() ;
 
 	private final Interpolation mode ;
 	private final DrawBuffer drawBuffer ;
@@ -25,12 +25,12 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
-	public DrawUpdater( final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawInstancedUpdater( final DrawBuffer _draw, final GeometryBuffer _geometry )
 	{
 		this( Interpolation.LINEAR, _draw, _geometry ) ;
 	}
 
-	public DrawUpdater( Interpolation _mode, final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawInstancedUpdater( Interpolation _mode, final DrawBuffer _draw, final GeometryBuffer _geometry )
 	{
 		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
 		drawBuffer = _draw ;
@@ -114,11 +114,11 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 					update = true ;
 				}
 			}
+		}
 
-			if( forceUpdate == true )
-			{
-				_updated.add( buffer ) ;
-			}
+		if( update == true || forceUpdate == true )
+		{
+			_updated.add( drawBuffer ) ;
 		}
 
 		forceUpdate = false ;
@@ -126,40 +126,28 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	}
 
 	/**
-		Create a DrawUpdater with a DrawBuffer and GeometryBuffer
-		precreated with the passed in parameters.
+		Create a DrawInstancedUpdater with a DrawInstancedBuffer 
+		and GeometryBuffer precreated with the passed in parameters.
 
-		If a DrawUpdater already exists with the same parameters 
-		it will return it instead.
+		If a DrawInstancedUpdater already exists with the same 
+		parameters it will return it instead.
 	*/
-	public static DrawUpdater getOrCreate( final World _world,
+	public static DrawInstancedUpdater getOrCreate( final World _world,
 										   final Program _program,
 										   final Shape _shape,
 										   final boolean _ui,
 										   final int _order )
 	{
-		return getOrCreate( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
-	}
-
-	/**
-		Find if a GeometryBuffer has the same signature as passed in.
-		If no buffer exists create a new buffer and add it to 
-		the passed in world.
-	*/
-	public static DrawUpdater getOrCreate( final World _world,
-										   final Program _program,
-										   final Shape.Swivel[] _swivel,
-										   final Shape.Style _style,
-										   final boolean _ui,
-										   final int _order )
-	{
-		DrawUpdater updater = DrawUpdater.get( _world, _program, _swivel, _style, _ui, _order ) ;
+		final Shape.Swivel[] swivel = _shape.getSwivel() ;
+		final Shape.Style style = _shape.getStyle() ;
+	
+		DrawInstancedUpdater updater = DrawInstancedUpdater.get( _world, _program, swivel, style, _ui, _order ) ;
 		if( updater == null )
 		{
-			final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
-			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style, _ui, _order ) ) ;
+			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order ) ) ;
+			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style, _ui, _order ) ) ;
 
-			updater = DrawAssist.add( new DrawUpdater( buffer, geom ) ) ;
+			updater = DrawAssist.add( new DrawInstancedUpdater( buffer, geom ) ) ;
 
 			_world.addBuffers( buffer ) ;
 			WorldAssist.update( _world ) ;
@@ -177,8 +165,8 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	}
 
 	/**
-		When a DrawUpdater is created it is added to the global 
-		pool of available DrawUpdaters.
+		When a DrawInstancedUpdater is created it is added to the global 
+		pool of available DrawInstancedUpdaters.
 
 		This allows other areas of the system to use existing 
 		buffers rather than create their own.
@@ -186,11 +174,11 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public static DrawUpdater get( final World _world,
-								   final Program _program,
-								   final Shape _shape,
-								   final boolean _ui,
-								   final int _order )
+	public static DrawInstancedUpdater get( final World _world,
+											final Program _program,
+											final Shape _shape,
+											final boolean _ui,
+											final int _order )
 	{
 		return get( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
 	}
@@ -205,20 +193,20 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public static DrawUpdater get( final World _world,
-								   final Program _program,
-								   final Shape.Swivel[] _swivel,
-								   final Shape.Style _style,
-								   final boolean _ui,
-								   final int _order )
+	public static DrawInstancedUpdater get( final World _world,
+											final Program _program,
+											final Shape.Swivel[] _swivel,
+											final Shape.Style _style,
+											final boolean _ui,
+											final int _order )
 	{
 		synchronized( globals )
 		{
 			final List<ABuffer> worldBuffers = _world.getBuffers() ;
 
-			for( final WeakReference<DrawUpdater> weak : globals )
+			for( final WeakReference<DrawInstancedUpdater> weak : globals )
 			{
-				final DrawUpdater updater = weak.get() ;
+				final DrawInstancedUpdater updater = weak.get() ;
 				if( updater == null )
 				{
 					continue ;

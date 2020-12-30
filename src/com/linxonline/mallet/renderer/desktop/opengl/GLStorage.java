@@ -54,6 +54,11 @@ public class GLStorage implements Serialise.Out
 		return stable ;
 	}
 
+	public void shutdown()
+	{
+		MGL.glDeleteBuffers( id.length, id, 0 ) ;
+	}
+
 	public void writeInt( final int _int )
 	{
 		buffer[offset] = _int ;
@@ -138,9 +143,9 @@ public class GLStorage implements Serialise.Out
 
 	public void writeFloats( final float[] _float )
 	{
-		//ConvertBytes.toBytes( _float, offset, buffer ) ;
-		//offset += ConvertBytes.INT_SIZE * _float.length ;
-		throw new UnsupportedOperationException() ;
+		final int size = _float.length ;
+		System.arraycopy( _float, 0, buffer, offset, size ) ;
+		offset += size ;
 	}
 
 	public void writeDoubles( final double[] _double )

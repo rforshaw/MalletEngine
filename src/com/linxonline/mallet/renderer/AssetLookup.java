@@ -84,6 +84,12 @@ public class AssetLookup<L, R>
 
 	public Tuple<L, R> unmap( final int _index )
 	{
+		if( assets.length <= _index )
+		{
+			final int diff = _index - assets.length ;
+			expand( diff + 10 ) ;
+		}
+
 		final Tuple<L, R> asset = assets[_index] ;
 		assets[_index] = null ;
 		return asset ;

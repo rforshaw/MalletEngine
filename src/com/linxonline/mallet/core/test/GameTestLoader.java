@@ -348,7 +348,7 @@ public final class GameTestLoader implements IGameLoader
 				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
 				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
-				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
 				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
 				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
@@ -377,7 +377,7 @@ public final class GameTestLoader implements IGameLoader
 						final Draw draw = new Draw() ;
 						draw.setPosition( position.x, position.y, 0.0f ) ;
 						draw.setOffset( -32.0f, -32.0f, 0.0f ) ;
-						draw.setShape( plane ) ;
+						//draw.setShape( plane ) ;
 
 						hulls.add( hull ) ;
 						draws[inc] = draw ;
@@ -388,7 +388,7 @@ public final class GameTestLoader implements IGameLoader
 
 				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
-					private DrawUpdater updater ;
+					private DrawInstancedUpdater updater ;
 					//private DrawUpdater debugUpdater ;
 					private final Vector2 position = new Vector2() ;
 
@@ -398,7 +398,7 @@ public final class GameTestLoader implements IGameLoader
 						final World world = WorldAssist.getDefault() ;//exampleWorld ;
 
 						{
-							updater = getUpdater( world, program, draws[0], false, 10 ) ;
+							updater = getInstancedUpdater( world, program, plane, false, 10 ) ;
 							updater.addDynamics( draws ) ;
 						}
 
@@ -551,6 +551,7 @@ public final class GameTestLoader implements IGameLoader
 						rotate.z += 2.1f * _dt ;
 
 						draw.setRotation( rotate.x, rotate.y, rotate.z ) ;
+						updater.makeDirty() ;
 					}
 				} ;
 

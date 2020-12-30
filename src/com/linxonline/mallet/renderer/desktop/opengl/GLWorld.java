@@ -221,9 +221,10 @@ public class GLWorld
 		{
 			switch( buffer.getBufferType() )
 			{
-				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
-				case DRAW_BUFFER :
-				case TEXT_BUFFER :
+				default                    : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
+				case DRAW_INSTANCED_BUFFER :
+				case DRAW_BUFFER           :
+				case TEXT_BUFFER           :
 				{
 					final int index = buffer.index() ;
 					final GLBuffer buff = _buffers.getRHS( index ) ;

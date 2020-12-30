@@ -249,10 +249,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				switch( _buffer.getBufferType() )
 				{
-					default              : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
-					case GEOMETRY_BUFFER : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
-					case TEXT_BUFFER     : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
-					case DRAW_BUFFER     : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+					default                    : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
+					case GEOMETRY_BUFFER       : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
+					case TEXT_BUFFER           : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
+					case DRAW_BUFFER           : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
 				}
 			}
 		} ;
@@ -564,6 +565,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		programs.load( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
 		programs.load( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
 
+		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/desktop/simple_instance_texture.jgl" ) ;
+
 		{
 			// Query for the Max Texture Size and store the results.
 			// I doubt the size will change during the running of the engine.
@@ -825,6 +828,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
 				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+			}
+			case DRAW_INSTANCED_BUFFER     :
+			{
+				final GLDrawInstancedBuffer buf = ( GLDrawInstancedBuffer )_buff ;
+				return buf.update( ( DrawInstancedBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
 			}
 		}
 	}

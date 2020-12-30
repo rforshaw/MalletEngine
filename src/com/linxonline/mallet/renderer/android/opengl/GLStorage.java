@@ -26,6 +26,11 @@ public class GLStorage implements Serialise.Out
 		byteBuffer.order( java.nio.ByteOrder.nativeOrder() ) ;
 	}
 
+	public void shutdown()
+	{
+		MGL.glDeleteBuffers( id.length, id, 0 ) ;
+	}
+
 	public boolean update( final Storage _storage )
 	{
 		stable = false ;

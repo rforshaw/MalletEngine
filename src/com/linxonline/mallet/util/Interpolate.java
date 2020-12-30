@@ -69,8 +69,9 @@ public class Interpolate
 		Less hertz requires a lower tolerance rating else 
 		the interpolation may 'jump' past the intended limit. 
 	*/
-	private static float tolerance( final int _hertz )
+	private static float tolerance( int _hertz )
 	{
+		_hertz = ( _hertz > 8 ) ? 8 : _hertz ;
 		return 1.0f / ( float )Math.pow( 10.0f, _hertz ) ;
 	}
 }
