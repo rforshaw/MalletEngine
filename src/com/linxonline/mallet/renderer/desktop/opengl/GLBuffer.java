@@ -144,7 +144,6 @@ public class GLBuffer
 		{
 			final VertexAttrib att = _atts[i] ;
 			MGL.glVertexAttribPointer( att.index, att.size, att.type, att.normalised, _stride, att.offset ) ;
-			//MGL.glVertexAttribDivisor( att.index, att.divisor ) ;
 		}
 	}
 
@@ -164,21 +163,14 @@ public class GLBuffer
 		public int type ;				// Specifies the data type ;
 		public boolean normalised ;		// Specifies whether fixed-point data values should be normalized
 		public int offset ;				// Specifies the offset for the first component
-		public int divisor ;			// Specifies the divisor on a per instance basis.
 
 		public VertexAttrib( final int _index, final int _size, final int _type, final boolean _normalised, final int _offset )
-		{
-			this( _index, _size, _type, _normalised, _offset, 0 ) ;
-		}
-
-		public VertexAttrib( final int _index, final int _size, final int _type, final boolean _normalised, final int _offset, final int _divisor )
 		{
 			index = _index ;
 			size = _size ;
 			type = _type ;
 			normalised = _normalised ;
 			offset = _offset ; 
-			divisor = _divisor ;
 		}
 
 		public String toString()

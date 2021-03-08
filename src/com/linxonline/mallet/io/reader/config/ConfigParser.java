@@ -11,7 +11,15 @@ public class ConfigParser
 {
 	private final List<ParseInterface> parsers = MalletList.<ParseInterface>newList() ;
 
-	public ConfigParser() { init() ; }
+	public ConfigParser()
+	{
+		init() ;
+	}
+
+	public ConfigParser( final ParseInterface _parse )
+	{
+		addParser( _parse ) ;
+	}
 
 	/**
 		Allows the developer to extend the config to accept custom settings.

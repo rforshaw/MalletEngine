@@ -162,6 +162,11 @@ public final class MGL
 		gl.glUniformMatrix4fv( _location, _count, _transpose, _value, _offset ) ;
 	}
 
+	public static void glUniform1i( final int _location, final int _v0 )
+	{
+		gl.glUniform1i( _location, _v0 ) ;
+	}
+
 	public static void glViewport( final int _x, final int _y, final int _width, final int _height )
 	{
 		gl.glViewport( _x, _y, _width, _height ) ;

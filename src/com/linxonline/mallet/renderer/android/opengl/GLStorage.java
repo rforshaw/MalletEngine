@@ -9,8 +9,8 @@ public class GLStorage implements Serialise.Out
 {
 	public final int[] id = new int[1] ;
 
-	private java.nio.ByteBuffer byteBuffer ;
-	private byte[] buffer ;
+	private float[] buffer ;
+	private java.nio.FloatBuffer floatBuffer ;
 	private int offset = 0 ;
 	private boolean stable = false ;
 
@@ -21,14 +21,8 @@ public class GLStorage implements Serialise.Out
 
 		MGL.glGenBuffers( 1, id, 0 ) ;
 
-		buffer = new byte[lengthInBytes] ;
-		byteBuffer = java.nio.ByteBuffer.allocateDirect( lengthInBytes ) ;
-		byteBuffer.order( java.nio.ByteOrder.nativeOrder() ) ;
-	}
-
-	public void shutdown()
-	{
-		MGL.glDeleteBuffers( id.length, id, 0 ) ;
+		buffer = new float[lengthInBytes / 4] ;
+		floatBuffer = java.nio.FloatBuffer.wrap( buffer ) ;
 	}
 
 	public boolean update( final Storage _storage )
@@ -38,22 +32,19 @@ public class GLStorage implements Serialise.Out
 		final Storage.IData data = _storage.getData() ;
 		final int lengthInBytes = data.getLength() ;
 
-		offset = 0 ;
-		if( buffer.length < lengthInBytes )
+		if( buffer.length * 4 < lengthInBytes )
 		{
-			buffer = new byte[lengthInBytes] ;
-			byteBuffer = java.nio.ByteBuffer.allocateDirect( lengthInBytes ) ;
-			byteBuffer.order( java.nio.ByteOrder.nativeOrder() ) ;
+			buffer = new float[lengthInBytes / 4] ;
+			floatBuffer = java.nio.FloatBuffer.wrap( buffer ) ;
 		}
 
+		offset = 0 ;
 		data.serialise( this ) ;
-
-		byteBuffer.position( 0 ) ;
-		byteBuffer.put( buffer ) ;
-		byteBuffer.position( 0 ) ;
+		floatBuffer.put( buffer ) ;
+		floatBuffer.position( 0 ) ;
 
 		MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, id[0] ) ;
-		MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, byteBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+		MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, floatBuffer, MGL.GL_DYNAMIC_COPY ) ;
 
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
@@ -61,39 +52,50 @@ public class GLStorage implements Serialise.Out
 		return stable ;
 	}
 
+	public void shutdown()
+	{
+		MGL.glDeleteBuffers( id.length, id, 0 ) ;
+	}
+
 	public void writeInt( final int _int )
 	{
-		ConvertBytes.toBytes( _int, offset, buffer ) ;
-		offset += ConvertBytes.INT_SIZE ;
+		buffer[offset] = _int ;
+		offset += 1 ;
+		//ConvertBytes.toBytes( _int, offset, buffer ) ;
+		//offset += ConvertBytes.INT_SIZE ;
 	}
 
 	public void writeByte( final byte _byte )
 	{
-		ConvertBytes.toBytes( _byte, offset, buffer ) ;
+		//ConvertBytes.toBytes( _byte, offset, buffer ) ;
 		offset += ConvertBytes.BYTE_SIZE ;
 	}
 
 	public void writeChar( final char _char )
 	{
-		ConvertBytes.toBytes( _char, offset, buffer ) ;
+		//ConvertBytes.toBytes( _char, offset, buffer ) ;
 		offset += ConvertBytes.CHAR_SIZE ;
 	}
 
 	public void writeLong( final long _long )
 	{
-		ConvertBytes.toBytes( _long, offset, buffer ) ;
+		//ConvertBytes.toBytes( _long, offset, buffer ) ;
 		offset += ConvertBytes.LONG_SIZE ;
 	}
 
 	public void writeFloat( final float _float )
 	{
-		ConvertBytes.toBytes( _float, offset, buffer ) ;
-		offset += ConvertBytes.FLOAT_SIZE ;
+		//System.out.println( _float + " " + offset ) ;
+		buffer[offset] = _float ;
+		offset += 1 ;
+		//ConvertBytes.toBytes( _float, offset, buffer ) ;
+		//System.out.println( ConvertBytes.toFloat( buffer, offset ) ) ;
+		//offset += ConvertBytes.FLOAT_SIZE ;
 	}
 
 	public void writeDouble( final double _double )
 	{
-		ConvertBytes.toBytes( _double, offset, buffer ) ;
+		//ConvertBytes.toBytes( _double, offset, buffer ) ;
 		offset += ConvertBytes.DOUBLE_SIZE ;
 	}
 
@@ -105,7 +107,7 @@ public class GLStorage implements Serialise.Out
 
 	public void writeBoolean( final boolean _bool )
 	{
-		ConvertBytes.toBytes( _bool, offset, buffer ) ;
+		//ConvertBytes.toBytes( _bool, offset, buffer ) ;
 		offset += ConvertBytes.BOOLEAN_SIZE ;
 	}
 
@@ -139,9 +141,9 @@ public class GLStorage implements Serialise.Out
 
 	public void writeFloats( final float[] _float )
 	{
-		//ConvertBytes.toBytes( _float, offset, buffer ) ;
-		//offset += ConvertBytes.INT_SIZE * _float.length ;
-		throw new UnsupportedOperationException() ;
+		final int size = _float.length ;
+		System.arraycopy( _float, 0, buffer, offset, size ) ;
+		offset += size ;
 	}
 
 	public void writeDoubles( final double[] _double )

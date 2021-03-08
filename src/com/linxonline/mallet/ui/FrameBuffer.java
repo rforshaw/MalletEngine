@@ -80,7 +80,6 @@ public class FrameBuffer
 		camera.setOrthographic( 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
 		world.setRenderDimensions( 0, 0, width, height ) ;
-		world.setDisplayDimensions( 0, 0, width, height ) ;
 
 		CameraAssist.update( camera ) ;
 		WorldAssist.update( world ) ;

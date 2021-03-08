@@ -60,7 +60,7 @@ public class GUIDraw extends GUIComponent
 		if( updater != null )
 		{
 			draw.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 	}
 
@@ -88,17 +88,9 @@ public class GUIDraw extends GUIComponent
 	@Override
 	public void addDraws( final World _world )
 	{
-		if( updater != null )
-		{
-			// Remove the draw object from the previous 
-			// updater the draw may have changed significantly.
-			updater.removeDynamics( draw ) ;
-		}
-
 		final int layer = getLayer() ;
 		final Shape shape = draw.getShape() ;
 
-		System.out.println( "Add GUI " + _world.getID() ) ;
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
 		updater.addDynamics( draw ) ;
 	}
@@ -122,6 +114,7 @@ public class GUIDraw extends GUIComponent
 
 		final Shape shape = draw.getShape() ;
 		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
+		updater.addDynamics( draw ) ;
 	}
 
 	@Override
@@ -137,16 +130,13 @@ public class GUIDraw extends GUIComponent
 		updateLength( parent.getLength(), length ) ;
 		updateOffset( parent.getOffset(), offset ) ;
 
-		if( updater != null && draw != null && parent.isVisible() == true )
+		if( updater != null && parent.isVisible() == true )
 		{
 			Shape.updatePlaneGeometry( draw.getShape(), length ) ;
 
 			draw.setPosition( position.x, position.y, position.z ) ;
 			draw.setOffset( offset.x, offset.y, offset.z ) ;
-
-			//draw.setOrder( getLayer() ) ;
-			draw.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 	}
 

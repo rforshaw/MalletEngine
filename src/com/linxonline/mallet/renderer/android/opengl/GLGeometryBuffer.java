@@ -19,12 +19,6 @@ import com.linxonline.mallet.maths.IntVector2 ;
 
 public class GLGeometryBuffer extends GLBuffer
 {
-	private final static int MIN_INDEX_BYTE_SIZE = 5 * 1024 * 1024 ;
-	private final static int MIN_VERTEX_BYTE_SIZE = 5 * 1024 * 1024 ;
-
-	private final static int MAX_INDEX_BYTE_SIZE = 50 * 1024 * 1024 ;
-	private final static int MAX_VERTEX_BYTE_SIZE = 50 * 1024 * 1024 ;
-
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;
 
@@ -41,15 +35,9 @@ public class GLGeometryBuffer extends GLBuffer
 	private int[] indexLength = new int[1] ;
 
 	private int order ;
-	private float[] vertex ;
 	private int vertexStride = -1 ;
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
-
-	private final MalletColour shapeColour = new MalletColour() ;
-	private final Vector2 uv = new Vector2() ;
-	private final Vector3 point = new Vector3() ;
-	private final Vector3 temp = new Vector3() ;
 
 	private final Matrix4 matrix = new Matrix4() ;
 	private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
@@ -63,10 +51,10 @@ public class GLGeometryBuffer extends GLBuffer
 
 	public GLGeometryBuffer( final GeometryBuffer _buffer )
 	{
-		this( _buffer, MIN_INDEX_BYTE_SIZE,
-					   MIN_VERTEX_BYTE_SIZE,
-					   MAX_INDEX_BYTE_SIZE,
-					   MAX_VERTEX_BYTE_SIZE ) ;
+		this( _buffer, GLUtils.MIN_INDEX_BYTE_SIZE,
+					   GLUtils.MIN_VERTEX_BYTE_SIZE,
+					   GLUtils.MAX_INDEX_BYTE_SIZE,
+					   GLUtils.MAX_VERTEX_BYTE_SIZE ) ;
 	}
 
 	public GLGeometryBuffer( final GeometryBuffer _buffer,
@@ -109,7 +97,6 @@ public class GLGeometryBuffer extends GLBuffer
 			// set, so we'll only calculate the swivel once.
 			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
 			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
-			vertex = new float[vertexStride] ;
 		}
 
 		switch( _buffer.getStyle() )
@@ -148,6 +135,11 @@ public class GLGeometryBuffer extends GLBuffer
 			}
 
 			final Shape shape = draw.getShape() ;
+			if( shape == null )
+			{
+				continue ;
+			}
+
 			final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
 			final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
 
@@ -178,7 +170,7 @@ public class GLGeometryBuffer extends GLBuffer
 			}
 
 			uploadIndexToRAM( draw, indexMaps[indexMapSize++] ) ;
-			uploadVBOToRAM( draw, matrix ) ;
+			uploadVBOToRAM( draw ) ;
 		}
 
 		upload( bufferIndex ) ;
@@ -316,10 +308,8 @@ public class GLGeometryBuffer extends GLBuffer
 	*/
 	private void upload( final int _index )
 	{
-		//System.out.println( "Upload to Buffer Index: " + _index ) ;
 		final int length = indexBuffer.position() ;
 		indexLength[_index] = length ;
-
 		if( length <= 0 )
 		{
 			return ;
@@ -355,43 +345,10 @@ public class GLGeometryBuffer extends GLBuffer
 		_map.set( indexStart, size, _draw ) ;
 	}
 
-	private void uploadVBOToRAM( final Draw _draw, final Matrix4 _matrix )
+	private void uploadVBOToRAM( final Draw _draw )
 	{
 		final Shape shape = _draw.getShape() ;
-		final Shape.Swivel[] swivel = shape.getSwivel() ;
-		final int verticiesSize = shape.getVerticesSize() ;
-
-		for( int i = 0; i < verticiesSize; i++ )
-		{
-			for( int j = 0; j < swivel.length; j++ )
-			{
-				switch( swivel[j] )
-				{
-					case NORMAL :
-					case POINT  :
-					{
-						shape.getVector3( i, j, point ) ;
-						vertexBuffer.put( point.x ) ;
-						vertexBuffer.put( point.y ) ;
-						vertexBuffer.put( point.z ) ;
-						break ;
-					}
-					case COLOUR :
-					{
-						shape.getColour( i, j, shapeColour ) ;
-						vertexBuffer.put( getABGR( shapeColour ) ) ;
-						break ;
-					}
-					case UV     :
-					{
-						shape.getVector2( i, j, uv ) ;
-						vertexBuffer.put( uv.x ) ;
-						vertexBuffer.put( uv.y ) ;
-						break ;
-					}
-				}
-			}
-		}
+		vertexBuffer.put( shape.getRawVertices() ) ;
 	}
 
 	private static class IndexMap

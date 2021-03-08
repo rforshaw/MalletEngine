@@ -25,7 +25,10 @@ public class MGL
 	public final static int GL_REPLACE = GLES31.GL_REPLACE ;
 	public final static int GL_EQUAL = GLES31.GL_EQUAL ;
 	public final static int GL_STENCIL_BUFFER_BIT = GLES31.GL_STENCIL_BUFFER_BIT ;
+
+	public final static int GL_DYNAMIC_COPY = GLES31.GL_DYNAMIC_COPY ;
 	public final static int GL_DYNAMIC_DRAW = GLES31.GL_DYNAMIC_DRAW ;
+
 	public final static int GL_MAX_TEXTURE_SIZE = GLES31.GL_MAX_TEXTURE_SIZE ;
 	public final static int GL_CULL_FACE = GLES31.GL_CULL_FACE ;
 	public final static int GL_BACK = GLES31.GL_BACK ;
@@ -113,6 +116,11 @@ public class MGL
 		GLES31.glUniformMatrix4fv( _location, _count, _transpose, _value, _offset ) ;
 	}
 
+	public static void glUniform1i( final int _location, final int _v0 )
+	{
+		GLES31.glUniform1i( _location, _v0 ) ;
+	}
+
 	public static void glBlendFunc( final int _sfactor, final int _dfactor )
 	{
 		GLES31.glBlendFunc( _sfactor, _dfactor ) ;
@@ -131,6 +139,11 @@ public class MGL
 	public static void glDrawElements( final int _mode, final int _count, final int _type, final int _offset )
 	{
 		GLES31.glDrawElements( _mode, _count, _type, _offset ) ;
+	}
+
+	public static void glDrawElementsInstanced( final int _mode, final int _count, final int _type, final int _offset, final int _instanceCount )
+	{
+		GLES31.glDrawElementsInstanced( _mode, _count, _type, _offset, _instanceCount ) ;
 	}
 
 	public static void glStencilFunc( final int _func, final int _ref, final int _mask )
@@ -161,6 +174,11 @@ public class MGL
 	public static void glClear( final int _mask )
 	{
 		GLES31.glClear( _mask ) ;
+	}
+
+	public static void glClearColor( final float _red, final float _green, final float _blue, final float _alpha )
+	{
+		GLES31.glClearColor( _red, _green, _blue, _alpha ) ;
 	}
 
 	public static void glEnableVertexAttribArray( final int _index )

@@ -61,7 +61,17 @@ public class MalletTexture
 	public MalletTexture( final World _world, final int _attachmentIndex )
 	{
 		// World backbuffer is set to NEAREST REPEAT.
-		this( _world.getMeta( _attachmentIndex ), Filter.NEAREST, Wrap.REPEAT ) ;
+		this( _world, Filter.NEAREST, _attachmentIndex ) ;
+	}
+
+	public MalletTexture( final World _world, final Filter _filter )
+	{
+		this( _world, _filter, 0 ) ;
+	}
+
+	public MalletTexture( final World _world, final Filter _filter, final int _attachmentIndex )
+	{
+		this( _world.getMeta( _attachmentIndex ), _filter, Wrap.REPEAT ) ;
 	}
 
 	private MalletTexture( final Meta _meta,

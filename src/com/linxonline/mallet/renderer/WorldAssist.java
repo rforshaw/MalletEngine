@@ -50,6 +50,7 @@ public final class WorldAssist
 		public World getDefault() ;
 
 		public World add( final World _world ) ;
+
 		public World remove( final World _world ) ;
 		public World update( final World _world ) ;
 	}

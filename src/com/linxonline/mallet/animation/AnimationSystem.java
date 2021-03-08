@@ -1,223 +1,149 @@
 package com.linxonline.mallet.animation ;
 
 import java.util.List ;
-import java.util.Set ;
-import java.util.HashSet ;
 
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Tuple ;
-
-import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.event.EventController ;
-
-import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.renderer.Interpolation ;
-import com.linxonline.mallet.renderer.DrawUpdater ;
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.WorldAssist ;
-import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.Shape ;
-
+/**
+	The Animation-system is updated at the specified framerate 
+	of the game-state.
+	This system allows the developer to update state at the 
+	intended framerate, or close enough, it is not intended 
+	for anything else other than animations that can have leeway 
+	in what is displayed to the screen, for example this should 
+	not be used to update the position of an entity.
+*/
 public class AnimationSystem
 {
-	private final List<AnimData> toAddAnim    = MalletList.<AnimData>newList() ;
-	private final List<AnimData> toRemoveAnim = MalletList.<AnimData>newList() ;
-	private final List<AnimData> animations   = MalletList.<AnimData>newList() ;
+	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
-	private final SpriteManager spriteManager = new SpriteManager() ;
+	private final List<IAnimation> animations = MalletList.<IAnimation>newList() ;
 
-	private final EventController controller ;
-
-	public AnimationSystem()
-	{
-		controller = new EventController( MalletList.toArray( 
-			Tuple.<String, EventController.IProcessor<?>>build( "ANIMATION_DELEGATE", ( final AnimationDelegateCallback _callback ) ->
-			{
-				_callback.callback( constructAnimationDelegate() ) ;
-			} ),
-			Tuple.<String, EventController.IProcessor<?>>build( "ANIMATION_CLEAN", new EventController.IProcessor<Object>()
-			{
-				@Override
-				public void process( final Object _null )
-				{
-					final Set<String> activeKeys = new HashSet<String>() ;
-					getActiveKeys( activeKeys, toAddAnim ) ;
-					getActiveKeys( activeKeys, animations ) ;
-
-					spriteManager.clean( activeKeys ) ;
-				}
-
-				private void getActiveKeys( final Set<String> _keys, final List<AnimData> _animations )
-				{
-					final int size = _animations.size() ;
-					for( int i = 0; i < size; i++ )
-					{
-						final AnimData anim = _animations.get( i ) ;
-						_keys.add( anim.getFile() ) ;
-					}
-				}
-			} ) )
-		) ;
-	}
+	public AnimationSystem() {}
 
 	public void update( final float _dt )
 	{
-		controller.update() ;
-		if( toRemoveAnim.isEmpty() == false )
+		updateExecutions() ;
+		for( final IAnimation animation : animations )
 		{
-			final int size = toRemoveAnim.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final AnimData anim = toRemoveAnim.get( i ) ;
-				anim.stop() ;
-				animations.remove( anim ) ;
-
-				final World world = anim.getWorld() ;
-				final Program program = anim.getProgram() ;
-				final Draw draw = anim.getDraw() ;
-				final Shape shape = draw.getShape() ;
-				final int order = anim.getOrder() ;
-
-				DrawUpdater updater = DrawUpdater.get( world, program, shape, false, order ) ;
-				if( updater != null )
-				{
-					updater.removeDynamics( draw ) ;
-					anim.removeCallback() ;
-				}
-			}
-			toRemoveAnim.clear() ;
-		}
-
-		if( toAddAnim.isEmpty() == false )
-		{
-			final int size = toAddAnim.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final AnimData anim = toAddAnim.get( i ) ;
-				final Sprite sprite = ( Sprite )spriteManager.get( anim.getFile() ) ;
-				if( sprite != null )
-				{
-					anim.setSprite( sprite ) ;
-					animations.add( anim ) ;
-					
-					final World world = anim.getWorld() ;
-					final Program program = anim.getProgram() ;
-					final Draw draw = anim.getDraw() ;
-					final Shape shape = draw.getShape() ;
-					final int order = anim.getOrder() ;
-
-					final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, shape, false, order ) ;
-					updater.addDynamics( draw ) ;
-
-					anim.setUpdater( updater, updater.getDrawBuffer() ) ;
-					anim.play() ;
-				}
-			}
-			toAddAnim.clear() ;
-		}
-
-		final int size = animations.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final AnimData anim = animations.get( i ) ;
-			if( anim.update( _dt ) == true )
-			{
-				final World world = anim.getWorld() ;
-				final Program program = anim.getProgram() ;
-				final Draw draw = anim.getDraw() ;
-				final Shape shape = draw.getShape() ;
-				final int order = anim.getOrder() ;
-
-				final DrawUpdater updater = DrawUpdater.get( world, program, shape, false, order ) ;
-
-				updater.forceUpdate() ;
-				anim.setUpdater( updater, updater.getDrawBuffer() ) ;
-			}
+			animation.update( _dt ) ;
 		}
 	}
 
-	public EventController getEventController()
-	{
-		return controller ;
-	}
-
+	/**
+		Clear all animations from the system.
+		Call removed() to inform users they've been 
+		removed, most likely called at shutdown.
+	*/
 	public void clear()
 	{
-		toAddAnim.clear() ;			// Never added not hooked in
-		toRemoveAnim.clear() ;		// Will be removed from animations anyway
-
-		final int size = animations.size() ;
-		for( int i = 0; i < size; i++ )
+		for( final IAnimation animation : animations )
 		{
-			final AnimData anim = animations.get( i ) ;
-			final World world = anim.getWorld() ;
-			final Program program = anim.getProgram() ;
-			final Draw draw = anim.getDraw() ;
-			final Shape shape = draw.getShape() ;
-			final int order = anim.getOrder() ;
-
-			final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, shape, true, order ) ;
-			updater.removeDynamics( draw ) ;
-
-			anim.removeCallback() ;
+			animation.removed() ;
 		}
 		animations.clear() ;
 	}
 
-	protected AnimationDelegate constructAnimationDelegate()
+	public AnimationAssist.Assist createAnimationAssist()
 	{
-		return new AnimationDelegate()
+		return new AnimationAssist.Assist()
 		{
-			private final List<AnimData> data = MalletList.<AnimData>newList() ;
+			private final List<IAnimation> animations = AnimationSystem.this.animations ;
 
-			@Override
-			public void addAnimation( final Anim _animation, final World _world )
+			/**
+				Add the IAnimation to the buffered-list and during 
+				the animation-systems next update add it to the 
+				animations list.
+			*/
+			public IAnimation add( final IAnimation _animation )
 			{
-				if( _animation != null && _animation instanceof AnimData )
+				AnimationSystem.this.invokeLater( new Runnable()
 				{
-					final AnimData anim = ( AnimData )_animation ;
-					if( data.contains( anim ) == false )
+					public void run()
 					{
-						anim.setWorld( _world ) ;
-						data.add( anim ) ;
-						toAddAnim.add( anim ) ;
-
-						final Draw draw = anim.getDraw() ;
-						draw.update( Interpolation.NONE, 0, 0 ) ;
+						if( _animation != null )
+						{
+							animations.add( _animation ) ;
+							_animation.added() ;
+						}
 					}
-				}
+				} ) ;
+				return _animation ;
 			}
 
-			@Override
-			public void removeAnimation( final Anim _animation )
+			/**
+				Remove the IAnimation on the next update.
+				Removing the IAnimation will trigger a called to 
+				removed(), which is expected to remove any resources 
+				held by the IAnimation.
+			*/
+			public IAnimation remove( final IAnimation _animation )
 			{
-				if( _animation != null && _animation instanceof AnimData )
+				AnimationSystem.this.invokeLater( new Runnable()
 				{
-					final AnimData anim = ( AnimData )_animation ;
-					data.remove( anim ) ;
-					toRemoveAnim.add( anim ) ;
-				}
-			}
-
-			@Override
-			public void start() {}
-
-			@Override
-			public void shutdown()
-			{
-				final int size = data.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final AnimData anim = data.get( i ) ;
-					toRemoveAnim.add( anim ) ;
-				}
-				data.clear() ;
+					public void run()
+					{
+						if( _animation != null )
+						{
+							animations.remove( _animation ) ;
+							_animation.removed() ;
+						}
+					}
+				} ) ;
+				return _animation ;
 			}
 		} ;
+	}
+
+	private void invokeLater( final Runnable _run )
+	{
+		if( _run != null )
+		{
+			executions.add( _run ) ;
+		}
+	}
+
+	private void updateExecutions()
+	{
+		executions.update() ;
+		final List<Runnable> runnables = executions.getCurrentData() ;
+		if( runnables.isEmpty() == false )
+		{
+			final int size = runnables.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				runnables.get( i ).run() ;
+			}
+			runnables.clear() ;
+		}
+	}
+
+	/**
+		Allows the developer to hook into the animation-system,
+		this system allows the developer to update content at 
+		the intended framerate. 
+	*/
+	public interface IAnimation
+	{
+		/**
+			Called during the animation systems 
+			update cycle.
+		*/
+		public void update( final float _dt ) ;
+
+		/**
+			The animation has been added to the 
+			animation-system.
+		*/
+		public void added() ;
+
+		/**
+			The animation has been removed from the 
+			animation-system and all resources are expected 
+			to be removed.
+		*/
+		public void removed() ;
 	}
 }

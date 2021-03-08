@@ -87,7 +87,7 @@ public class UIList extends UILayout
 			{
 				final Vector3 position = _this.getPosition() ;
 				frame.setPosition( position.x, position.y, position.z ) ;
-				updater.makeDirty() ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 
@@ -98,7 +98,7 @@ public class UIList extends UILayout
 			{
 				final Vector3 offset = _this.getOffset() ;
 				frame.setOffset( offset.x, offset.y, offset.z ) ;
-				updater.makeDirty() ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 
@@ -109,7 +109,7 @@ public class UIList extends UILayout
 			{
 				final Vector3 length = _this.getLength() ;
 				frame.setLength( length.x, length.y, length.z ) ;
-				updater.makeDirty() ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 

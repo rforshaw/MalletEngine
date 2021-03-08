@@ -21,6 +21,16 @@ public final class Event<T>
 		variable = _object ;
 	}
 
+	public static <T> Event<T> create( final String _eventType )
+	{
+		return new Event<T>( _eventType ) ;
+	}
+
+	public static <T> Event<T> create( final String _eventType, final T _object )
+	{
+		return new Event<T>( _eventType, _object ) ;
+	}
+
 	public final boolean isEventByType( final EventType _type )
 	{
 		return eventType == _type ;

@@ -289,10 +289,11 @@ public class GLRenderer extends BasicRenderer
 			{
 				switch( _buffer.getBufferType() )
 				{
-					default              : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
-					case GEOMETRY_BUFFER : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
-					case TEXT_BUFFER     : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
-					case DRAW_BUFFER     : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+					default                    : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
+					case GEOMETRY_BUFFER       : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
+					case TEXT_BUFFER           : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
+					case DRAW_BUFFER           : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
 				}
 			}
 		} ;
@@ -334,6 +335,25 @@ public class GLRenderer extends BasicRenderer
 			}
 
 			@Override
+			public Program remove( final Program _program ) 
+			{
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLProgram glProgram = programs.get( _program.getID() ) ;
+						if( glProgram == null )
+						{
+							add( _program ) ;
+							return ;
+						}
+						programLookup.map( _program.index(), _program, glProgram ) ;
+					}
+				} ) ;
+				return _program ;
+			}
+
+			@Override
 			public Program update( final Program _program )
 			{
 				GLRenderer.this.invokeLater( new Runnable()
@@ -344,10 +364,9 @@ public class GLRenderer extends BasicRenderer
 						final GLProgram glProgram = programLookup.getRHS( index ) ;
 						if( glProgram == null )
 						{
-							update( _program ) ;
-							return ;
+							glProgram.destroy() ;
+							programLookup.unmap( index ) ;
 						}
-						programLookup.map( index, _program, glProgram ) ;
 					}
 				} ) ;
 				return _program ;
@@ -374,7 +393,19 @@ public class GLRenderer extends BasicRenderer
 					{
 						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
 						worldLookup.map( _world.index(), _world, world ) ;
-						worlds.add( 0, world ) ;
+
+						final int size = worlds.size() ;
+						for( int i = 0; i < size; ++i )
+						{
+							final GLWorld w = worlds.get( i ) ; 
+							if( _world.getOrder() <= w.getOrder() )
+							{
+								worlds.add( i, world ) ;
+								return ;
+							}
+						}
+
+						worlds.add( world ) ;
 					}
 				} ) ;
 
@@ -567,10 +598,11 @@ public class GLRenderer extends BasicRenderer
 	{
 		final Camera camera = getDefaultCamera() ;
 		camera.setDisplayResolution( _width, _height ) ;
+		camera.setScreenResolution( _width, _height ) ;
 		CameraAssist.update( camera ) ;
 
 		final World world = getDefaultWorld() ;
-		world.setDisplayDimensions( 0, 0, _width, _height ) ;
+		world.setRenderDimensions( 0, 0, _width, _height ) ;
 		WorldAssist.update( world ) ;
 	}
 
@@ -600,8 +632,6 @@ public class GLRenderer extends BasicRenderer
 		int totalBufferUpdates = 0 ;
 		totalBufferUpdates += updateStorageBuffers( difference, frameNo ) ;
 		totalBufferUpdates += updateBuffers( difference, frameNo ) ;
-
-		//System.out.println( totalBufferUpdates ) ;
 
 		updateExecutions() ;
 		getEventController().update() ;
@@ -763,6 +793,11 @@ public class GLRenderer extends BasicRenderer
 			{
 				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
 				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+			}
+			case DRAW_INSTANCED_BUFFER     :
+			{
+				final GLDrawInstancedBuffer buf = ( GLDrawInstancedBuffer )_buff ;
+				return buf.update( ( DrawInstancedBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
 			}
 		}
 	}

@@ -114,11 +114,11 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 					update = true ;
 				}
 			}
+		}
 
-			if( forceUpdate == true )
-			{
-				_updated.add( buffer ) ;
-			}
+		if( forceUpdate == true )
+		{
+			_updated.addAll( buffers ) ;
 		}
 
 		forceUpdate = false ;

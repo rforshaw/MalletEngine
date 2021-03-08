@@ -193,6 +193,7 @@ public class EventController implements IEventHandler
 			clear() ;
 		}
 
+		@Override
 		public void addEvent( final Event<?> _event )
 		{
 			events.add( _event ) ;

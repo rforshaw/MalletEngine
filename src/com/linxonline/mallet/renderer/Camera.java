@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.Interpolate ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -8,25 +9,22 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public class Camera
 {
+	private static final float PI = ( float )Math.PI ;
+	private static final float PI2 = ( float )Math.PI * 2.0f ;
 	private final static Utility utility = new Utility() ;
 
+	private static final int POSITION    = 0 ;
+	private static final int ROTATION    = 3 ;
+	private static final int SCALE       = 6 ;
+	private static final int UI_POSITION = 9 ;
+	
 	private final int index = utility.getGlobalIndex() ;
 	private final String id ;
 
-	private final Vector3 oldUIPosition = new Vector3() ;
-	private final Vector3 oldPosition = new Vector3() ;
-	private final Vector3 oldRotation = new Vector3()  ;
-	private final Vector3 oldScale = new Vector3( 1, 1, 1 ) ;
-
-	private final Vector3 uiPosition = new Vector3() ;
-	private final Vector3 position = new Vector3() ;
-	private final Vector3 rotation = new Vector3() ;
-	private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
-
-	private final Vector3 currentUIPosition = new Vector3() ;
-	private final Vector3 currentPosition = new Vector3() ;
-	private final Vector3 currentRotation = new Vector3()  ;
-	private final Vector3 currentScale = new Vector3( 1, 1, 1 ) ;
+	// Each contain Position, Rotation, and Scale
+	private final float[] old = FloatBuffer.allocate( 12 ) ;
+	private final float[] present = FloatBuffer.allocate( 12 ) ;
+	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
 	private final Projection projection = new Projection() ;
 	private final Screen displayScreen = new Screen() ;
@@ -39,6 +37,9 @@ public class Camera
 	public Camera( final String _id )
 	{
 		id = _id ;
+		FloatBuffer.set( old, SCALE, 1.0f, 1.0f, 1.0f ) ;
+		FloatBuffer.set( present, SCALE, 1.0f, 1.0f, 1.0f ) ;
+		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
 	}
 
 	public float convertInputToX( final float _x )
@@ -51,9 +52,11 @@ public class Camera
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		final float halfRender = render.x * 0.5f ;
+		final float posX = FloatBuffer.get( future, POSITION + 0 ) ;
+		final float scaleX = FloatBuffer.get( future, SCALE + 0 ) ;
 
 		final float t1 = ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) - halfRender ;
-		final float cam = ( t1 / scale.x ) + position.x ;
+		final float cam = ( t1 / scaleX ) + posX ;
 		return cam ;
 	}
 
@@ -67,9 +70,11 @@ public class Camera
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
 		final float halfRender = render.y * 0.5f ;
+		final float posY = FloatBuffer.get( future, POSITION + 1 ) ;
+		final float scaleY = FloatBuffer.get( future, SCALE + 1 ) ;
 
 		final float t1 = ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) - halfRender ;
-		final float cam = ( t1 / scale.y ) + position.y  ;
+		final float cam = ( t1 / scaleY ) + posY ;
 		return cam ;
 	}
 
@@ -82,7 +87,9 @@ public class Camera
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + uiPosition.x ;
+		final float posX = FloatBuffer.get( future, UI_POSITION + 0 ) ;
+
+		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + posX ;
 	}
 
 	public float convertInputToUIY( final float _y )
@@ -94,7 +101,9 @@ public class Camera
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + uiPosition.y ;
+		final float posY = FloatBuffer.get( future, UI_POSITION + 1 ) ;
+
+		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + posY ;
 	}
 
 	public Projection getProjection( final Camera.Projection _fill )
@@ -122,47 +131,55 @@ public class Camera
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		position.x = _x ;
-		position.y = _y ;
-		position.z = _z ;
+		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
 	}
 
 	public Vector3 getPosition( final Vector3 _fill )
 	{
-		_fill.x = currentPosition.x ;
-		_fill.y = currentPosition.y ;
-		_fill.z = currentPosition.z ;
-		return _fill ;
+		return FloatBuffer.fill( present, _fill, POSITION ) ;
 	}
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
-		rotation.x = _x ;
-		rotation.y = _y ; 
-		rotation.z = _z ;
+		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
+		float oY = FloatBuffer.get( old, ROTATION + 1 ) ;
+		float oZ = FloatBuffer.get( old, ROTATION + 2 ) ;
+
+		final float diffX = Math.abs( _x - oX ) ;
+		if( diffX > PI )
+		{
+			oX += ( _x > oX ) ? PI2 : -PI2 ;
+		}
+
+		final float diffY = Math.abs( _y - oY ) ;
+		if( diffY > PI )
+		{
+			oY += ( _y > oY ) ? PI2 : -PI2 ;
+		}
+
+		final float diffZ = Math.abs( _z - oZ ) ;
+		if( diffZ > PI )
+		{
+			oZ += ( _z > oZ ) ? PI2 : -PI2 ;
+		}
+
+		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
+		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
 	}
 
 	public Vector3 getRotation( final Vector3 _fill )
 	{
-		_fill.x = currentRotation.x ;
-		_fill.y = currentRotation.y ;
-		_fill.z = currentRotation.z ;
-		return _fill ;
+		return FloatBuffer.fill( present, _fill, ROTATION ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )
 	{
-		scale.x = _x ;
-		scale.y = _y ;
-		scale.z = _z ;
+		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
 	{
-		_fill.x = currentScale.x ;
-		_fill.y = currentScale.y ;
-		_fill.z = currentScale.z ;
-		return _fill ;
+		return FloatBuffer.fill( present, _fill, SCALE ) ;
 	}
 
 	public void setOrthographic( final float _top,
@@ -186,19 +203,19 @@ public class Camera
 					0.0f,        0.0f,        0.0f,         1.0f ) ;
 	}
 
+	public void setProjection( final Projection _projection )
+	{
+		projection.update( _projection ) ;
+	}
+
 	public void setUIPosition( final float _x, final float _y, final float _z )
 	{
-		uiPosition.x = _x ;
-		uiPosition.y = _y ;
-		uiPosition.z = _z ;
+		FloatBuffer.set( future, UI_POSITION, _x, _y, _z ) ;
 	}
 
 	public Vector3 getUIPosition( final Vector3 _fill )
 	{
-		_fill.x = currentUIPosition.x ;
-		_fill.y = currentUIPosition.y ;
-		_fill.z = currentUIPosition.z ;
-		return _fill ;
+		return FloatBuffer.fill( present, _fill, UI_POSITION ) ;
 	}
 
 	public void setScreenResolution( final int _width, final int _height )
@@ -232,10 +249,7 @@ public class Camera
 	public boolean update( final int _diff, final int _iteration )
 	{
 		boolean update = false ;
-		update = interpolate( uiPosition, oldUIPosition, currentUIPosition, _diff, _iteration ) ;
-		update |= interpolate( position,   oldPosition,   currentPosition,   _diff, _iteration ) ;
-		update |= interpolate( scale,      oldScale,      currentScale,      _diff, _iteration ) ;
-		update |= interpolate( rotation,   oldRotation,   currentRotation,   _diff, _iteration ) ;
+		update |= Interpolate.linear( future, old, present, _diff, _iteration ) ;
 		return update ;
 	}
 

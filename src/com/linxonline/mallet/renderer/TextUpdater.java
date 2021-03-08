@@ -34,7 +34,7 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 		buffers.add( _buffer ) ;
 	}
 
-	private void forceUpdate()
+	public void forceUpdate()
 	{
 		forceUpdate = true ;
 	}

@@ -44,7 +44,7 @@ public class GUIDrawEdge extends GUIDraw
 
 			GUI.updateEdge( draw.getShape(), getLength(), edge ) ;
 			draw.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 	}
 

@@ -33,6 +33,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.CollisionSystem ;
 
 import com.linxonline.mallet.animation.AnimationSystem ;
+import com.linxonline.mallet.animation.AnimationAssist ;
 
 import com.linxonline.mallet.entity.IEntitySystem ;
 import com.linxonline.mallet.entity.EntitySystem ;
@@ -123,6 +124,7 @@ public class GameState extends State
 	@Override
 	public void startState( final Settings _package )
 	{
+		AnimationAssist.setAssist( animationSystem.createAnimationAssist() ) ;
 		hookHandlerSystems() ;
 
 		if( paused == true )
@@ -286,16 +288,13 @@ public class GameState extends State
 	*/
 	protected void hookHandlerSystems()
 	{
-		final EventController animationController = animationSystem.getEventController() ;
 		final EventController audioController = audioSystem.getEventController() ;
 		final EventController collisionController = collisionSystem.getEventController() ;
 
 		eventSystem.addHandler( audioController ) ;
 		eventSystem.addHandler( collisionController ) ;
 		eventSystem.addHandler( system.getRenderer().getEventController() ) ;
-		eventSystem.addHandler( animationController ) ;
 
-		animationController.setAddEventInterface( eventSystem ) ;
 		audioController.setAddEventInterface( eventSystem ) ;
 
 		final IInputSystem input = system.getInput() ;
@@ -310,15 +309,12 @@ public class GameState extends State
 	*/
 	protected void unhookHandlerSystems()
 	{
-		final EventController animationController = animationSystem.getEventController() ;
 		final EventController audioController = audioSystem.getEventController() ;
 
 		eventSystem.removeHandler( audioController ) ;
-		eventSystem.removeHandler( animationController) ;
 		eventSystem.removeHandler( collisionSystem.getEventController() ) ;
 		eventSystem.removeHandler( system.getRenderer().getEventController() ) ;
 
-		animationController.setAddEventInterface( null ) ;
 		audioController.setAddEventInterface( null ) ;
 
 		final IInputSystem input = system.getInput() ;

@@ -93,6 +93,7 @@ public class EventComponent extends Component
 		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getStateEventController() )  ) ;
 	}
 
+	@Override
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;

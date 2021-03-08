@@ -27,10 +27,8 @@ public class GLWorld
 	protected GLImage[] backBuffers ;
 
 	protected String id ;
-	protected final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
+	protected int order ;
 	protected final IntVector2 render = new IntVector2( 0, 0 ) ;
-	protected final IntVector2 displayPosition = new IntVector2( 0, 0 ) ;
-	protected final IntVector2 display = new IntVector2( 1280, 720 ) ;
 
 	protected final List<GLCamera> cameras = new ArrayList<GLCamera>() ;
 	protected final List<GLBuffer> drawBuffers = new ArrayList<GLBuffer>() ;
@@ -81,12 +79,9 @@ public class GLWorld
 						 final AssetLookup<ABuffer, GLBuffer> _buffers )
 	{
 		id = _world.getID() ;
+		order = _world.getOrder() ;
 
-		_world.getRenderPosition( renderPosition ) ;
 		_world.getRenderDimensions( render ) ;
-
-		_world.getDisplayPosition( displayPosition ) ;
-		_world.getDisplayDimensions( display ) ;
 
 		MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 
@@ -178,6 +173,7 @@ public class GLWorld
 			final int channel = 3 ;
 			final long estimatedConsumption = ( long )( render.x * render.y ) * ( long )( channel * 8 ) ;
 			final int offset = _index + 1 ;		// skip the framebuffer id
+			System.out.println( "Buffer ID: " + buffers[offset] ) ;
 			final GLImage buffer = new GLImage( buffers[offset], estimatedConsumption ) ;
 			backBuffers[_index] = buffer ;
 		}
@@ -189,12 +185,7 @@ public class GLWorld
 	{
 		id = _world.getID() ;
 
-		_world.getRenderPosition( renderPosition ) ;
 		_world.getRenderDimensions( render ) ;
-
-		_world.getDisplayPosition( displayPosition ) ;
-		_world.getDisplayDimensions( display ) ;
-
 		updateBufferDimensions( _world, render.x, render.y ) ;
 
 		updateCameras( _world, _cameras ) ;
@@ -221,9 +212,10 @@ public class GLWorld
 		{
 			switch( buffer.getBufferType() )
 			{
-				default          : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
-				case DRAW_BUFFER :
-				case TEXT_BUFFER :
+				default                    : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
+				case DRAW_INSTANCED_BUFFER :
+				case DRAW_BUFFER           :
+				case TEXT_BUFFER           :
 				{
 					final int index = buffer.index() ;
 					final GLBuffer buff = _buffers.getRHS( index ) ;
@@ -245,6 +237,8 @@ public class GLWorld
 			MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
 		}
 
+		MGL.glClearColor( 255.0f, 0.0f, 0.0f, 0.0f ) ;
+		
 		int clearBits = ( colourAttachments.length > 0 ) ? MGL.GL_COLOR_BUFFER_BIT : 0 ;
 		clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
 		clearBits |= ( hasStencil == true ) ? MGL.GL_STENCIL_BUFFER_BIT : 0 ;
@@ -286,6 +280,11 @@ public class GLWorld
 	public String getID()
 	{
 		return id ;
+	}
+
+	public int getOrder()
+	{
+		return order ;
 	}
 
 	private void updateBufferDimensions( final World _world, final int _width, final int _height )
@@ -347,12 +346,7 @@ public class GLWorld
 		{
 			id = _world.getID() ;
 
-			_world.getRenderPosition( renderPosition ) ;
-			_world.getRenderDimensions( render ) ;
-
-			_world.getDisplayPosition( displayPosition ) ;
-			_world.getDisplayDimensions( display ) ;
-		
+			_world.getRenderDimensions( render ) ;		
 			MGL.glBindFramebuffer( MGL.GL_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
 
 			updateCameras( _world, _cameras ) ;
@@ -364,11 +358,7 @@ public class GLWorld
 		{
 			id = _world.getID() ;
 
-			_world.getRenderPosition( renderPosition ) ;
 			_world.getRenderDimensions( render ) ;
-
-			_world.getDisplayPosition( displayPosition ) ;
-			_world.getDisplayDimensions( display ) ;
 
 			updateCameras( _world, _cameras ) ;
 			updateDrawBuffers( _world, _buffers ) ;
@@ -383,6 +373,8 @@ public class GLWorld
 				// Enable Depth Test if the framebuffer contains a depth attachment.
 				MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
 			}
+
+			MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
 			int clearBits = MGL.GL_COLOR_BUFFER_BIT ;
 			clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;

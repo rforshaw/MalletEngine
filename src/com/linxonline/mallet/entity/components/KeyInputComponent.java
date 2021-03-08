@@ -32,7 +32,13 @@ public class KeyInputComponent extends InputComponent
 	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
 	{
 		super( _parent, _allow, _mode ) ;
+		init() ;
 	}
+
+	/**
+		Add custom initialisation logic here.
+	*/
+	public void init() {}
 
 	public void registerKeys( final KeyCode[] _keys, final KeyInputListener _listener )
 	{

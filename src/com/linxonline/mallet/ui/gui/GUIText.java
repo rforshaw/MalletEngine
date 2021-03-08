@@ -12,7 +12,7 @@ public class GUIText extends GUIComponent
 	private MalletFont font ;
 	private MalletColour colour = MalletColour.white() ;
 
-	private IUpdater<TextDraw, TextBuffer> updater ;
+	private TextUpdater updater ;
 	private final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
 	private final TextDraw drawText ;
 
@@ -135,7 +135,7 @@ public class GUIText extends GUIComponent
 			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
 
 			drawText.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 	}
 

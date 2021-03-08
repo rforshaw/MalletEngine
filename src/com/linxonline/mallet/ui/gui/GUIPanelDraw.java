@@ -18,7 +18,7 @@ public class GUIPanelDraw extends GUIDraw
 		{
 			final Draw draw = getDraw() ;
 			Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
-			final IUpdater<Draw, ?> updater = getUpdater() ;
+			final DrawUpdater updater = getUpdater() ;
 			if( updater != null )
 			{
 				draw.makeDirty() ;
@@ -34,7 +34,7 @@ public class GUIPanelDraw extends GUIDraw
 		{
 			final Draw draw = getDraw() ;
 			Shape.updatePlaneUV( draw.getShape(), neutral.min, neutral.max ) ;
-			final IUpdater<Draw, ?> updater = getUpdater() ;
+			final DrawUpdater updater = getUpdater() ;
 			if( updater != null )
 			{
 				draw.makeDirty() ;
@@ -68,7 +68,7 @@ public class GUIPanelDraw extends GUIDraw
 	{
 		final Draw draw = getDraw() ;
 		Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
-		final IUpdater<Draw, ?> updater = getUpdater() ;
+		final DrawUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
 			draw.makeDirty() ;
@@ -89,7 +89,7 @@ public class GUIPanelDraw extends GUIDraw
 	{
 		final Draw draw = getDraw() ;
 		Shape.updatePlaneUV( draw.getShape(), clicked.min, clicked.max ) ;
-		final IUpdater<Draw, ?> updater = getUpdater() ;
+		final DrawUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
 			draw.makeDirty() ;

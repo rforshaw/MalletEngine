@@ -113,7 +113,7 @@ public class GUIScrollbar extends GUIComponent
 		yBar.setOffset( offset.x, offset.y, offset.z ) ;
 		Shape.updatePlaneGeometry( yBar.getShape(), yLength ) ;
 
-		updater.makeDirty() ;
+		updater.forceUpdate() ;
 	}
 
 	UIList getParentList()

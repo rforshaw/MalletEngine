@@ -295,6 +295,25 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
+			public Program remove( final Program _program ) 
+			{
+				GLRenderer.this.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						final GLProgram glProgram = programs.get( _program.getID() ) ;
+						if( glProgram == null )
+						{
+							add( _program ) ;
+							return ;
+						}
+						programLookup.map( _program.index(), _program, glProgram ) ;
+					}
+				} ) ;
+				return _program ;
+			}
+
+			@Override
 			public Program update( final Program _program )
 			{
 				GLRenderer.this.invokeLater( new Runnable()
@@ -305,10 +324,9 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 						final GLProgram glProgram = programLookup.getRHS( index ) ;
 						if( glProgram == null )
 						{
-							update( _program ) ;
-							return ;
+							glProgram.destroy() ;
+							programLookup.unmap( index ) ;
 						}
-						programLookup.map( index, _program, glProgram ) ;
 					}
 				} ) ;
 				return _program ;
@@ -335,7 +353,19 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 					{
 						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
 						worldLookup.map( _world.index(), _world, world ) ;
-						worlds.add( 0, world ) ;
+
+						final int size = worlds.size() ;
+						for( int i = 0; i < size; ++i )
+						{
+							final GLWorld w = worlds.get( i ) ; 
+							if( _world.getOrder() <= w.getOrder() )
+							{
+								worlds.add( i, world ) ;
+								return ;
+							}
+						}
+
+						worlds.add( world ) ;
 					}
 				} ) ;
 
@@ -522,17 +552,18 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
 		updateCameraAndWorldDisplay( _width, _height ) ;
-		canvas.setSize( _width, _height ) ;
+		canvas.setSurfaceSize( _width, _height ) ;
 	}
 
 	private void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
 		final Camera camera = getDefaultCamera() ;
 		camera.setDisplayResolution( _width, _height ) ;
+		camera.setScreenResolution( _width, _height ) ;
 		CameraAssist.update( camera ) ;
 
 		final World world = getDefaultWorld() ;
-		world.setDisplayDimensions( 0, 0, _width, _height ) ;
+		world.setRenderDimensions( 0, 0, _width, _height ) ;
 		WorldAssist.update( world ) ;
 	}
 
@@ -545,11 +576,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
 		MGL.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
 
-		MGL.glEnable( MGL.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
+		MGL.glEnable( MGL.GL_PRIMITIVE_RESTART ) ;
 		MGL.glPrimitiveRestartIndex( GLBuffer.PRIMITIVE_RESTART_INDEX ) ;
 
-		MGL.glEnable( MGL.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-		MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+		MGL.glEnable( MGL.GL_BLEND ) ;
+		MGL.glBlendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;
 
 		MGL.glEnable( MGL.GL_CULL_FACE ) ;
 		MGL.glCullFace( MGL.GL_BACK ) ;  
@@ -587,18 +618,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		updateCameraAndWorldDisplay( _width, _height ) ;
 		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == true )
 		{
-			// Update the render dimensions if the window size 
-			// and render size are meant to be identical.
-			// Some users will not want parity, using a larger window 
-			// size but rendering to a smaller size and subsequently being upscaled.
+			// My default the main framebuffer is the same dimensions 
+			// as the window, the camera projection does not have to align 
+			// with this requirement unless this flag is set to true.
 			final Camera camera = getDefaultCamera() ;
-			camera.setScreenResolution( _width, _height ) ;
 			camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
 			CameraAssist.update( camera ) ;
-
-			final World world = getDefaultWorld() ;
-			world.setRenderDimensions( 0, 0, _width, _height ) ;
-			WorldAssist.update( world ) ;
 		}
 	}
 
@@ -637,8 +662,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		int totalBufferUpdates = 0 ;
 		totalBufferUpdates += updateStorageBuffers( difference, frameNo ) ;
 		totalBufferUpdates += updateBuffers( difference, frameNo ) ;
-
-		//System.out.println( totalBufferUpdates ) ;
 
 		updateExecutions() ;
 		getEventController().update() ;
@@ -703,6 +726,11 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 			// We want to be in complete control of any swapBuffer calls
 			canvas.setAutoSwapBufferMode( false ) ;
+			if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
+			{
+				canvas.setUndecorated( true ) ;
+				canvas.setFullscreen( true ) ;
+			}
 		}
 	}
 

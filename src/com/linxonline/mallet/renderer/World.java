@@ -14,14 +14,10 @@ public class World
 	private final static Utility utility = new Utility() ;
 
 	private final int index = utility.getGlobalIndex() ;
+	private final int order ;
 	private final String id ;
 
 	private final Notification<World> renderNotification = new Notification<World>() ;
-	private final Notification<World> displayNotification = new Notification<World>() ;
-
-	private final IntVector2 renderPosition = new IntVector2( 0, 0 ) ;
-	private final IntVector2 displayPosition = new IntVector2( 0, 0 ) ;
-	private final IntVector2 display = new IntVector2( 1280, 720 ) ;
 
 	private final AttachmentType[] attachments ;
 	private final MalletTexture.Meta[] metas ;
@@ -31,19 +27,25 @@ public class World
 
 	public World( final String _id )
 	{
-		this( _id, new AttachmentType[] { AttachmentType.COLOUR } ) ;
+		this( _id, 0 ) ;
 	}
-	
-	public World( final String _id, final AttachmentType[] _attachments )
+
+	public World( final String _id, final int _order )
+	{
+		this( _id, _order, new AttachmentType[] { AttachmentType.COLOUR } ) ;
+	}
+
+	public World( final String _id, final int _order, final AttachmentType[] _attachments )
 	{
 		id = _id ;
+		order = _order ;
 		attachments = _attachments ;
 
 		final int size = attachments.length ;
 		metas = new MalletTexture.Meta[size] ;
 		for( int i = 0; i < size; ++i )
 		{
-			metas[i] = new MalletTexture.Meta( id, i, display.x, display.y ) ;
+			metas[i] = new MalletTexture.Meta( id, i, 1280, 720 ) ;
 		}
 
 		cameras = MalletList.<Camera>newList() ;
@@ -60,18 +62,6 @@ public class World
 	public void dettachRenderNotify( final Notify<World> _notify )
 	{
 		renderNotification.removeNotify( _notify ) ;
-	}
-
-	public Notify<World> attachDisplayNotify( final Notify<World> _notify )
-	{
-		displayNotification.addNotify( _notify ) ;
-		_notify.inform( this ) ;
-		return _notify ;
-	}
-
-	public void dettachDisplayNotify( final Notify<World> _notify )
-	{
-		displayNotification.removeNotify( _notify ) ;
 	}
 
 	public Camera[] addCameras( final Camera ... _cameras )
@@ -136,7 +126,6 @@ public class World
 
 	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )
 	{
-		renderPosition.setXY( _x, _y ) ;
 		for(int i = 0; i < metas.length; ++i)
 		{
 			metas[i].set( _width, _height ) ;
@@ -145,35 +134,9 @@ public class World
 		renderNotification.inform( this ) ;
 	}
 
-	public IntVector2 getRenderPosition( final IntVector2 _fill )
-	{
-		_fill.setXY( renderPosition ) ;
-		return _fill ;
-	}
-
 	public IntVector2 getRenderDimensions( final IntVector2 _fill )
 	{
 		_fill.setXY( metas[0].dimensions ) ;
-		return _fill ;
-	}
-
-	public void setDisplayDimensions( final int _x, final int _y, final int _width, final int _height )
-	{
-		displayPosition.setXY( _x, _y ) ;
-		display.setXY( _width, _height ) ;
-
-		displayNotification.inform( this ) ;
-	}
-
-	public IntVector2 getDisplayPosition( final IntVector2 _fill )
-	{
-		_fill.setXY( displayPosition ) ;
-		return _fill ;
-	}
-
-	public IntVector2 getDisplayDimensions( final IntVector2 _fill )
-	{
-		_fill.setXY( display ) ;
 		return _fill ;
 	}
 
@@ -190,6 +153,11 @@ public class World
 	public String getID()
 	{
 		return id ;
+	}
+
+	public int getOrder()
+	{
+		return order ;
 	}
 
 	public int index()

@@ -21,6 +21,7 @@ import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.inspect.desktop.DesktopDisplay ;
+import com.linxonline.mallet.util.inspect.Screen ;
 import com.linxonline.mallet.util.inspect.ScreenMode ;
 
 import com.linxonline.mallet.ui.UI ;
@@ -120,40 +121,25 @@ public class DesktopStarter extends IStarter
 		final ISystem main = _starter.getMainSystem() ;
 		final GameSettings game = _starter.getGameLoader().getGameSettings() ;
 
-		int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", game.getWindowWidth() ) ;
-		int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", game.getWindowHeight() ) ;
+		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", game.getWindowWidth() ) ;
+		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", game.getWindowHeight() ) ;
 
 		final DesktopDisplay desktop = new DesktopDisplay() ;
-		if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
-		{
-			final ScreenMode screen = desktop.getScreens()[0].getBestScreenMode() ;
-			displayWidth = screen.getWidth() ;
-			displayHeight = screen.getHeight() ;
-		}
 
 		final IRender render = main.getRenderer() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", game.getRenderWidth() ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", game.getRenderHeight() ) ;
-		updateRenderDimensions( renderWidth, renderHeight ) ;
+
+		final Camera camera = CameraAssist.getDefault() ;
+		camera.setOrthographic( 0.0f, renderHeight, 0.0f, renderWidth, -1000.0f, 1000.0f ) ;
+		CameraAssist.update( camera ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
 
 		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", desktop.getDPI() ) ) ;
 		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", desktop.getDPI() ) ) ;
 		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
-	}
-
-	private static void updateRenderDimensions( final int _width, final int _height )
-	{
-		final Camera camera = CameraAssist.getDefault() ;
-		camera.setScreenResolution( _width, _height ) ;
-		camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
-		CameraAssist.update( camera ) ;
-
-		final World world = WorldAssist.getDefault() ;
-		world.setRenderDimensions( 0, 0, _width, _height ) ;
-		WorldAssist.update( world ) ;
 	}
 }

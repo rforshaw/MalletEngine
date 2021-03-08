@@ -23,7 +23,7 @@ public class DesktopDisplay implements DisplayEnvironment
 		{
 			final DisplayMode[] displayModes = device[i].getDisplayModes() ;
 			final ScreenMode[] screenModes = new ScreenMode[displayModes.length] ;
-
+			
 			for( int j = 0; j < displayModes.length; j++ )
 			{
 				final DisplayMode mode = displayModes[j] ;

@@ -23,7 +23,6 @@ public class InputSystem implements IInputSystem,
 	private final TimeCache<InputEvent> cache ;
 
 	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
-	private boolean[] keys = new boolean[32767] ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
@@ -37,11 +36,6 @@ public class InputSystem implements IInputSystem,
 		}
 
 		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
-
-		for( int i = 0; i < keys.length; ++i )
-		{
-			keys[i] = false ;
-		}
 	}
 
 	public void addInputHandler( final InputHandler _handler )
@@ -103,31 +97,29 @@ public class InputSystem implements IInputSystem,
 	@Override
 	public void keyPressed( final KeyEvent _event )
 	{
+		if( _event.isAutoRepeat() == true )
+		{
+			// If the event is an auto-repeat skip it,
+			// we don't want to spam the input-system.
+			return ;
+		}
+
 		// Sometimes when multiple keys have been pressed 
 		// for a long duration, the next key to be pressed 
 		// is flagged WRONGLY as an auto-repeat.
 		// If the key is considered as released(false) then 
 		// we'll always consider it as a valid pressed action. 
 
-		final int index = ( int )_event.getKeyChar() ;
-		KeyCode keycode = KeyCode.getKeyCode( index ) ;
+		KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
 		if( keycode == KeyCode.NONE )
 		{
-			keycode = isSpecialKeyDown( index ) ;
+			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		//System.out.println( "Pressed: " + index ) ;
-		//System.out.println( "Pressed: " + keycode ) ;
-		//System.out.println( "Pressed: " + _event.getKeyChar() ) ;
-		if( keys[index] == false )
-		{
-			keys[index] = true ;
-
-			final InputEvent input = cache.get() ;
-			input.setID( InputID.KEYBOARD_1 ) ;
-			input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
-			inputs.add( input ) ;
-		}
+		final InputEvent input = cache.get() ;
+		input.setID( InputID.KEYBOARD_1 ) ;
+		input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
+		inputs.add( input ) ;
 	}
 
 	@Override
@@ -140,24 +132,16 @@ public class InputSystem implements IInputSystem,
 			return ;
 		}
 
-		final int index = ( int )_event.getKeyChar() ;
-		KeyCode keycode = KeyCode.getKeyCode( index ) ;
+		KeyCode keycode = KeyCode.getKeyCode( _event.getKeyChar() ) ;
 		if( keycode == KeyCode.NONE )
 		{
-			keycode = isSpecialKeyDown( index ) ;
+			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		//System.out.println( "Released: " + index ) ;
-		//System.out.println( "Released: " + keycode ) ;
-		if( keys[index] == true )
-		{
-			keys[index] = false ;
-
-			final InputEvent input = cache.get() ;
-			input.setID( InputID.KEYBOARD_1 ) ;
-			input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
-			inputs.add( input ) ;
-		}
+		final InputEvent input = cache.get() ;
+		input.setID( InputID.KEYBOARD_1 ) ;
+		input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
+		inputs.add( input ) ;
 	}
 
 	public void keyTyped( final KeyEvent _event ) {}
@@ -300,58 +284,5 @@ public class InputSystem implements IInputSystem,
 	{
 		assert _handler != null ; 
 		return handlers.contains( _handler ) ;
-	}
-
-	private final KeyCode isSpecialKeyDown( final int _code )
-	{
-		switch( _code )
-		{
-			case KeyEvent.VK_WINDOWS     : return KeyCode.WINDOWS ;
-			case KeyEvent.VK_INSERT      : return KeyCode.INSERT ;
-			case KeyEvent.VK_SCROLL_LOCK : return KeyCode.SCROLL_LOCK ;
-			case KeyEvent.VK_PRINTSCREEN : return KeyCode.PRINT_SCREEN ;
-			case KeyEvent.VK_DELETE      : return KeyCode.DELETE ;
-			case KeyEvent.VK_HOME        : return KeyCode.HOME ;
-			case KeyEvent.VK_END         : return KeyCode.END ;
-			case KeyEvent.VK_PAGE_DOWN   : return KeyCode.PAGE_UP ;
-			case KeyEvent.VK_PAGE_UP     : return KeyCode.PAGE_DOWN ;
-			case KeyEvent.VK_TAB         : return KeyCode.TAB ;
-			case KeyEvent.VK_CAPS_LOCK   : return KeyCode.CAPS_LOCK ;
-			case KeyEvent.VK_UP          : return KeyCode.UP ;
-			case KeyEvent.VK_DOWN        : return KeyCode.DOWN ;
-			case KeyEvent.VK_LEFT        : return KeyCode.LEFT ;
-			case KeyEvent.VK_RIGHT       : return KeyCode.RIGHT ;
-			case KeyEvent.VK_ESCAPE      : return KeyCode.ESCAPE ;
-			case KeyEvent.VK_CONTROL     : return KeyCode.CTRL ;
-			case KeyEvent.VK_ALT         : return KeyCode.ALT ;
-			case KeyEvent.VK_SHIFT       : return KeyCode.SHIFT ;
-			case KeyEvent.VK_META        : return KeyCode.META ;
-			case KeyEvent.VK_ALT_GRAPH   : return KeyCode.ALTGROUP ;
-			case KeyEvent.VK_BACK_SPACE  : return KeyCode.BACKSPACE ;
-			case KeyEvent.VK_F1          : return KeyCode.F1 ;
-			case KeyEvent.VK_F2          : return KeyCode.F2 ;
-			case KeyEvent.VK_F3          : return KeyCode.F3 ;
-			case KeyEvent.VK_F4          : return KeyCode.F4 ;
-			case KeyEvent.VK_F5          : return KeyCode.F5 ;
-			case KeyEvent.VK_F6          : return KeyCode.F6 ;
-			case KeyEvent.VK_F7          : return KeyCode.F7 ;
-			case KeyEvent.VK_F8          : return KeyCode.F8 ;
-			case KeyEvent.VK_F9          : return KeyCode.F9 ;
-			case KeyEvent.VK_F10         : return KeyCode.F10 ;
-			case KeyEvent.VK_F11         : return KeyCode.F11 ;
-			case KeyEvent.VK_F12         : return KeyCode.F12 ;
-			case KeyEvent.VK_NUM_LOCK    : return KeyCode.NUM_LOCK ;
-			case KeyEvent.VK_NUMPAD0     : return KeyCode.NUMPAD0 ;
-			case KeyEvent.VK_NUMPAD1     : return KeyCode.NUMPAD1 ;
-			case KeyEvent.VK_NUMPAD2     : return KeyCode.NUMPAD2 ;
-			case KeyEvent.VK_NUMPAD3     : return KeyCode.NUMPAD3 ;
-			case KeyEvent.VK_NUMPAD4     : return KeyCode.NUMPAD4 ;
-			case KeyEvent.VK_NUMPAD5     : return KeyCode.NUMPAD5 ;
-			case KeyEvent.VK_NUMPAD6     : return KeyCode.NUMPAD6 ;
-			case KeyEvent.VK_NUMPAD7     : return KeyCode.NUMPAD7 ;
-			case KeyEvent.VK_NUMPAD8     : return KeyCode.NUMPAD8 ;
-			case KeyEvent.VK_NUMPAD9     : return KeyCode.NUMPAD9 ;
-			default                      : return KeyCode.NONE ;
-		}
 	}
 }

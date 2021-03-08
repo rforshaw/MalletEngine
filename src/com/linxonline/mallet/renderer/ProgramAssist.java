@@ -37,6 +37,15 @@ public final class ProgramAssist
 		return assist.add( _program ) ;
 	}
 
+	/**
+		Remove the program from being used by the renderer.
+		Destroy non-shared resources used by the Program.
+	*/
+	public static Program remove( final Program _program )
+	{
+		return assist.remove( _program ) ;
+	}
+
 	public static Program update( final Program _program )
 	{
 		return assist.update( _program ) ;
@@ -47,6 +56,7 @@ public final class ProgramAssist
 		public void load( final String _id, final String _path ) ;
 
 		public Program add( final Program _program ) ;
+		public Program remove( final Program _program ) ;
 
 		public Program update( final Program _program ) ;
 	}

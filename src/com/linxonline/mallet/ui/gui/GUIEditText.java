@@ -10,10 +10,12 @@ public class GUIEditText extends GUIText
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
 
-	private final Program cursorProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
-	private final Draw cursorDraw = new Draw() ;
-	private IUpdater<Draw, ?> cursorUpdater ;
+	private final static Program cursorProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
+	private Draw cursorDraw = new Draw() ;
+	private DrawUpdater cursorUpdater ;
 
+	private boolean shift = false ;
+	private boolean firstClick = false ;
 	private int start = 0 ;
 	private int end = 0 ;
 
@@ -57,8 +59,8 @@ public class GUIEditText extends GUIText
 			triangle.addIndex( 2 ) ;
 			triangle.addIndex( 3 ) ;
 
-			cursorDraw.setPosition( position.x, position.y, position.z ) ;
-			cursorDraw.setOffset( offset.x, offset.y, offset.z ) ;
+			cursorDraw = new Draw( position.x, position.y, position.z,
+								   offset.x, offset.y, offset.z ) ;
 			cursorDraw.setShape( Shape.triangulate( triangle ) ) ;
 		}
 	}
@@ -71,14 +73,11 @@ public class GUIEditText extends GUIText
 	public void addDraws( final World _world )
 	{
 		super.addDraws( _world ) ;
+
+		cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
+		cursorUpdater.addDynamics( cursorDraw ) ;
+
 		final UITextField parent = getParent() ;
-
-		if( isEditing() == true )
-		{
-			cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
-			cursorUpdater.addDynamics( cursorDraw ) ;
-		}
-
 		parent.makeDirty() ;
 	}
 
@@ -90,25 +89,17 @@ public class GUIEditText extends GUIText
 	public void removeDraws()
 	{
 		super.removeDraws() ;
-		if( cursorUpdater != null )
-		{
-			cursorUpdater.removeDynamics( cursorDraw ) ;
-		}
+		cursorUpdater.removeDynamics( cursorDraw ) ;
 	}
 
 	@Override
 	public void layerUpdated( final int _layer )
 	{
 		super.layerUpdated( _layer ) ;
+		cursorUpdater.removeDynamics( cursorDraw ) ;
 
-		{
-			if( cursorUpdater != null )
-			{
-				cursorUpdater.removeDynamics( cursorDraw ) ;
-			}
-
-			cursorUpdater = DrawUpdater.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
-		}
+		cursorUpdater = DrawUpdater.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
+		cursorUpdater.addDynamics( cursorDraw ) ;
 	}
 
 	@Override
@@ -140,18 +131,13 @@ public class GUIEditText extends GUIText
 
 			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
 			cursorDraw.setOffset( xOffset, offset.y, offset.z ) ;
-
-			if( cursorUpdater != null )
-			{
-				cursorUpdater.addDynamics( cursorDraw ) ;
-			}
+			cursorDraw.setHidden( false ) ;
+			cursorUpdater.forceUpdate() ;
 		}
 		else
 		{
-			if( cursorUpdater != null )
-			{
-				cursorUpdater.removeDynamics( cursorDraw ) ;
-			}
+			cursorDraw.setHidden( true ) ;
+			cursorUpdater.forceUpdate() ;
 		}
 	}
 
@@ -181,6 +167,26 @@ public class GUIEditText extends GUIText
 		draw.setRange( start, end ) ;
 	}
 
+	@Override
+	public InputEvent.Action keyReleased( final InputEvent _input )
+	{
+		if( isEditing() == false )
+		{
+			return InputEvent.Action.PROPAGATE ;
+		}
+
+		switch( _input.getKeyCode() )
+		{
+			case SHIFT        :
+			{
+				shift = false ;
+				break ;
+			}
+		}
+
+		return InputEvent.Action.CONSUME ;
+	}
+	
 	@Override
 	public InputEvent.Action keyPressed( final InputEvent _input )
 	{
@@ -213,7 +219,6 @@ public class GUIEditText extends GUIText
 			case SCROLL_LOCK  :
 			case INSERT       :
 			case ESCAPE       :
-			case SHIFT        :
 			case CTRL         :
 			case ALT          :
 			case ALTGROUP     :
@@ -222,6 +227,11 @@ public class GUIEditText extends GUIText
 			case TAB          :
 			case CAPS_LOCK    :
 			case WINDOWS      : break ;
+			case SHIFT        :
+			{
+				shift = true ;
+				break ;
+			}
 			case LEFT         :
 			{
 				final UITextField parent = getParent() ;
@@ -272,24 +282,25 @@ public class GUIEditText extends GUIText
 				}
 				break ;
 			}
-			default :
-			{
-				final UITextField parent = getParent() ;
-				final int index = parent.getCursorIndex() ;
-				final StringBuilder edit = getText() ;
-				edit.insert( index, _input.getKeyCharacter() ) ;
-
-				parent.setCursorIndex( index + 1 ) ;
-				parent.makeDirty() ;
-
-				UIElement.signal( parent, parent.textChanged() ) ;
-				break ;
-			}
+			default : incrementChar( _input.getKeyCharacter() ) ; break ;
 		}
 
 		return InputEvent.Action.CONSUME ;
 	}
 
+	private void incrementChar( final char _char )
+	{
+		final UITextField parent = getParent() ;
+		final int index = parent.getCursorIndex() ;
+		final StringBuilder edit = getText() ;
+		edit.insert( index, _char ) ;
+
+		parent.setCursorIndex( index + 1 ) ;
+		parent.makeDirty() ;
+
+		UIElement.signal( parent, parent.textChanged() ) ;
+	}
+	
 	@Override
 	public InputEvent.Action touchReleased( final InputEvent _input )
 	{
@@ -300,6 +311,12 @@ public class GUIEditText extends GUIText
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
 		editing = true ;
+		if( firstClick == false )
+		{
+			firstClick = true ;
+			final StringBuilder text = getText() ;
+			text.setLength( 0 ) ;
+		}
 
 		final UITextField parent = getParent() ;
 		final Vector3 position = parent.getPosition() ;

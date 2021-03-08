@@ -31,6 +31,12 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 
+import com.linxonline.mallet.io.net.UDPServer ;
+import com.linxonline.mallet.io.net.UDPClient ;
+import com.linxonline.mallet.io.net.IOutStream ;
+import com.linxonline.mallet.io.net.InStream ;
+import com.linxonline.mallet.io.net.Address ;
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 
@@ -46,11 +52,42 @@ public final class GameTestLoader implements IGameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
-			//private final World exampleWorld = WorldAssist.add( new World( "EXAMPLE_WORLD" ) ) ;
-
 			public void initGame()			// Called when state is started
 			{
-				//exampleWorld.addCameras( CameraAssist.getDefault() ) ;
+				/*boolean run = true ;
+				final InStream stream = new InStream( 100 ) ;
+				final UDPServer server = new UDPServer() ;
+				server.init( 4445, new Address( "localhost" ) ) ;
+				while( run == true )
+				{
+					server.receive( stream ) ;
+					final int size = stream.getDataLength() ;
+					final Serialise.ByteIn serialise = new Serialise.ByteIn( stream.getBuffer(), 0, size ) ;
+
+					System.out.println( size ) ;
+					System.out.println( serialise.readString() ) ;
+				}
+				server.close() ;*/
+
+				/*final UDPClient client = new UDPClient() ;
+				client.init( 4445, new Address( "localhost" ) ) ;
+				client.send( new IOutStream()
+				{
+					private String test = "Hello World!\n" ;
+				
+					@Override
+					public int getLength()
+					{
+						return test.getBytes().length ;
+					}
+
+					@Override
+					public void serialise( Serialise.Out _out )
+					{
+						_out.writeString( test ) ;
+					}
+				} ) ;
+				client.close() ;*/
 
 				createMeta() ;
 
@@ -235,34 +272,40 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void renderAnimationExample()
 			{
-				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
+				final World world = WorldAssist.getDefault() ;
+				final Program program = new Program( "SIMPLE_TEXTURE" ) ;
+				final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
-				final AnimComponent anim = new AnimComponent( entity ) ;
-				final Anim moombaAnim = AnimationAssist.createAnimation( "base/anim/moomba.anim",
-																		 new Vector3( 0.0f, 0.0f, 0.0f ),
-																		 new Vector3( -32, -32, 0 ),
-																		 new Vector3(),
-																		 new Vector3( 1, 1, 1 ),
-																		 10 ) ;
+				final Draw draw = new Draw( 0, 0, 0, -32, -32, 0 ) ;
+				draw.setShape( plane ) ;
 
-				AnimationAssist.getDraw( moombaAnim ).setShape( Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ) ;
+				final SpriteAnimations animations = new SpriteAnimations( new SimpleSpriteListener( world, program, draw, 10 ) ) ;
 
-				anim.addAnimation( "DEFAULT", moombaAnim ) ;
-				anim.setDefaultAnim( "DEFAULT" ) ;
+				AnimationAssist.add( animations ) ;
+				animations.addSprite( "DEFAULT", new MalletSprite( "base/anim/moomba.anim" ) ) ;
+				animations.play( "DEFAULT" ) ;
 
+				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
 				new Component( entity )
 				{
 					private final static float DURATION = 5.0f ;
 					private float elapsed = 0.0f ;
 
+					@Override
 					public void update( final float _dt )
 					{
 						elapsed += _dt ;
 						if( elapsed >= DURATION )
 						{
 							elapsed = 0.0f ;
-							//anim.playAnimation( "DEFAULT" ) ;
 						}
+					}
+
+					@Override
+					public void readyToDestroy( final Entity.ReadyCallback _callback )
+					{
+						AnimationAssist.remove( animations ) ;
+						super.readyToDestroy( _callback ) ;
 					}
 				} ;
 				
@@ -395,7 +438,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void init()
 					{
-						final World world = WorldAssist.getDefault() ;//exampleWorld ;
+						final World world = WorldAssist.getDefault() ;
 
 						{
 							updater = getInstancedUpdater( world, program, plane, false, 10 ) ;
@@ -407,20 +450,6 @@ public final class GameTestLoader implements IGameLoader
 							//debugUpdater = getUpdater( world, program, debugDraws[0], false, 10 ) ;
 							//debugUpdater.addDraws( debugDraws ) ;
 						}
-
-						/*{
-							final Shape plane = Shape.constructPlane( new Vector3( 1280.0f, 720.0f, 0.0f ), new Vector2( 0, 1 ), new Vector2( 1, 0 ) ) ;
-							final Draw draw = new Draw() ;
-							draw.setPosition( 0.0f, 0.0f, 0.0f ) ;
-							draw.setShape( plane ) ;
-
-							final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-							program.mapUniform( "inTex0", new MalletTexture( exampleWorld ) ) ;
-
-							final World defWorld = WorldAssist.getDefault() ;
-							final DrawUpdater updater = getUpdater( defWorld, program, draw, true, 10 ) ;
-							updater.addDynamics( draw ) ;
-						}*/
 					}
 
 					@Override
@@ -466,25 +495,21 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void createMouseAnimExample()
 			{
-				final World base = WorldAssist.getDefault() ;
-				final IntVector2 dim = base.getRenderDimensions( new IntVector2() ) ;
+				final World world = WorldAssist.getDefault() ;
+				final IntVector2 dim = world.getRenderDimensions( new IntVector2() ) ;
 
-				final Entity entity = new Entity( 4, Entity.AllowEvents.NO ) ;
-				final AnimComponent anim   = new AnimComponent( entity ) ;
-				final EventComponent event = new EventComponent( entity ) ;
-
-				final Anim animation = AnimationAssist.createAnimation( "base/anim/moomba.anim",
-																		new Vector3( dim.x / 2, dim.y / 2, 0 ),
-																		new Vector3( -16, -16, 0 ),
-																		new Vector3(),
-																		new Vector3( 1, 1, 1 ),
-																		100 ) ;
-
+				final Program program = new Program( "SIMPLE_TEXTURE" ) ;
 				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
-				AnimationAssist.getDraw( animation ).setShape( plane ) ;
 
-				anim.addAnimation( "DEFAULT", animation ) ;
-				anim.setDefaultAnim( "DEFAULT" ) ;
+				final Draw draw = new Draw( 0, 0, 0, -16, -16, 0 ) ;
+				draw.setShape( plane ) ;
+
+				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
+				final SpriteAnimations animations = new SpriteAnimations( new SimpleSpriteListener( world, program, draw, 100 ) ) ;
+
+				AnimationAssist.add( animations ) ;
+				animations.addSprite( "DEFAULT", new MalletSprite( "base/anim/moomba.anim" ) ) ;
+				animations.play( "DEFAULT" ) ;
 
 				final CollisionComponent collision = CollisionComponent.generateBox2D( entity,
 																						new Vector2(),
@@ -495,12 +520,17 @@ public final class GameTestLoader implements IGameLoader
 
 				final MouseComponent mouse = new MouseComponent( entity )
 				{
-					private final Draw draw = AnimationAssist.getDraw( animation ) ;
-
 					@Override
 					public void applyMousePosition( final Vector2 _mouse )
 					{
 						draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
+					}
+
+					@Override
+					public void readyToDestroy( final Entity.ReadyCallback _callback )
+					{
+						AnimationAssist.remove( animations ) ;
+						super.readyToDestroy( _callback ) ;
 					}
 				} ;
 				

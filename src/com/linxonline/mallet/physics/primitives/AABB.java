@@ -27,18 +27,42 @@ public class AABB
 
 	public AABB( final Vector2 _length,
 				 final Vector2 _pos,
-				 final Vector2 _offset )
+				 final Vector2 _off )
 	{
-		this( new Vector2(), _length, _pos, _offset ) ;
+		this( 0.0f, 0.0f,
+			  _length.x, _length.y,
+			  _pos.x, _pos.y,
+			  _off.x, _off.y ) ;
 	}
 
 	public AABB( final Vector2 _min, final Vector2 _max, 
-				 final Vector2 _pos, final Vector2 _offset )
+				 final Vector2 _pos, final Vector2 _off )
 	{
-		if( _min != null ) { FloatBuffer.set( range, AABB.MIN_X, _min.x, _min.y ) ; }
-		if( _max != null ) { FloatBuffer.set( range, AABB.MAX_X, _max.x, _max.y ) ; }
-		if( _pos != null ) { FloatBuffer.set( position, AABB.POSITION_X, _pos.x, _pos.y ) ; }
-		if( _offset != null ) { FloatBuffer.set( position, AABB.OFFSET_X, _offset.x, _offset.y ) ; }
+		this( _min.x, _min.y,
+			  _max.x, _max.y,
+			  _pos.x, _pos.y,
+			  _off.x, _off.y ) ;
+	}
+
+	public AABB( final float _maxX, final float _maxY,
+				 final float _posX, final float _posY,
+				 final float _offX, final float _offY )
+	{
+		this( 0.0f, 0.0f,
+			  _maxX, _maxY,
+			  _posX, _posY,
+			  _offX, _offY ) ;
+	}
+
+	public AABB( final float _minX, final float _minY,
+				 final float _maxX, final float _maxY,
+				 final float _posX, final float _posY,
+				 final float _offX, final float _offY )
+	{
+		FloatBuffer.set( range, AABB.MIN_X, _minX, _minY ) ;
+		FloatBuffer.set( range, AABB.MAX_X, _maxX, _maxY ) ;
+		FloatBuffer.set( position, AABB.POSITION_X, _posX, _posY ) ;
+		FloatBuffer.set( position, AABB.OFFSET_X, _offX, _offY ) ;
 	}
 
 	/**
@@ -102,6 +126,16 @@ public class AABB
 	public void addToOffset( final float _x, final float _y )
 	{
 		FloatBuffer.add( position, AABB.OFFSET_X, _x, _y ) ;
+	}
+
+	public void setMax( final float _x, final float _y )
+	{
+		FloatBuffer.set( range, AABB.MAX_X, _x, _y ) ;
+	}
+
+	public void setMin( final float _x, final float _y )
+	{
+		FloatBuffer.set( range, AABB.MIN_X, _x, _y ) ;
 	}
 
 	/**

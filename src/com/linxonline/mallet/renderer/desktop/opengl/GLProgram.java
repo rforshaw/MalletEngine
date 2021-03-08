@@ -89,6 +89,11 @@ public class GLProgram extends ProgramManager.Program
 				case SAMPLER2D    :
 				{
 					final MalletTexture texture = ( MalletTexture )_remap.getUniform( uniform.getRight() ) ;
+					if( texture == null )
+					{
+						Logger.println( "Requires texture: " + uniform.getRight(), Logger.Verbosity.MAJOR ) ;
+					}
+
 					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
 					if( glTexture == null )
 					{
@@ -158,6 +163,8 @@ public class GLProgram extends ProgramManager.Program
 					final Texture texture = ( Texture )_data.getUniform( uniform.getRight() ) ;
 					final GLImage image = texture.image ;
 
+					MGL.glUniform1i( inUniforms[i], textureUnit ) ;
+
 					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
 
@@ -173,8 +180,16 @@ public class GLProgram extends ProgramManager.Program
 				{
 					final GLImage texture = ( GLImage )_data.getUniform( uniform.getRight() ) ;
 
+					MGL.glUniform1i( inUniforms[i], textureUnit ) ;
+
 					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
 					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+
 					textureUnit += 1 ;
 					break ;
 				}
@@ -234,7 +249,10 @@ public class GLProgram extends ProgramManager.Program
 	}
 
 	@Override
-	public void destroy() {}
+	public void destroy()
+	{
+		delete( this ) ;
+	}
 
 	@Override
 	public String type()
@@ -289,6 +307,27 @@ public class GLProgram extends ProgramManager.Program
 		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
 		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
+		{
+			final List<JSONProgram.UniformMap> uniforms = _program.getUniforms() ;
+			int textureUnit = 0 ;
+
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
+				switch( uniform.getLeft() )
+				{
+					case FONT         :
+					case SAMPLER2D    :
+					{
+						program.inUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
+						textureUnit += 1 ;
+						break ;
+					}
+				}
+			}
+		}
+		
 		{
 			final List<String> buffers = _program.getBuffers() ;
 			final int size = buffers.size() ;

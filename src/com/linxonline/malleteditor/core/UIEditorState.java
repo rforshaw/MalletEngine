@@ -19,7 +19,6 @@ import com.linxonline.mallet.animation.* ;
 import com.linxonline.mallet.io.filesystem.* ;
 
 import com.linxonline.mallet.entity.* ;
-import com.linxonline.mallet.entity.components.AnimComponent ;
 import com.linxonline.mallet.entity.components.EventComponent ;
 import com.linxonline.mallet.entity.components.MouseComponent ;
 import com.linxonline.mallet.entity.components.UIComponent ;
@@ -195,8 +194,8 @@ public class UIEditorState extends GameState
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
-				final Entity entity = UIEditorState.createUIDropEntity( _class, _input ) ;
-				getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
+				//final Entity entity = UIEditorState.createUIDropEntity( _class, _input ) ;
+				//getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
 		} ;
@@ -236,14 +235,14 @@ public class UIEditorState extends GameState
 			@Override
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
-				final Entity entity = UIEditorState.createCUIDropEntity( _class, _input ) ;
-				getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
+				//final Entity entity = UIEditorState.createCUIDropEntity( _class, _input ) ;
+				//getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
 		} ;
 	}
 
-	private static Entity createCUIDropEntity( final Class<? extends UIElement.MetaComponent> _class, final InputEvent _event )
+	/*private static Entity createCUIDropEntity( final Class<? extends UIElement.MetaComponent> _class, final InputEvent _event )
 	{
 		final Entity entity = new Entity( 3 ) ;
 		final AnimComponent anim = new AnimComponent( entity ) ;
@@ -388,7 +387,7 @@ public class UIEditorState extends GameState
 		} ;
 
 		return entity ;
-	}
+	}*/
 
 	private UIElement createOpenPanel( final int _layer )
 	{
