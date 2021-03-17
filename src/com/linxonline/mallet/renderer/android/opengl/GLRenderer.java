@@ -144,8 +144,8 @@ public class GLRenderer extends BasicRenderer
 		programs.load( "SIMPLE_TEXTURE", "base/shaders/android/simple_texture.jgl" ) ;
 		programs.load( "SIMPLE_FONT", "base/shaders/android/simple_font.jgl" ) ;
 		programs.load( "SIMPLE_GEOMETRY", "base/shaders/android/simple_geometry.jgl" ) ;
-		programs.load( "SIMPLE_STORAGE_TEXTURE", "base/shaders/android/simple_storage_texture.jgl" ) ;
 		//programs.load( "SIMPLE_STENCIL", "base/shaders/android/simple_stencil.jgl" ) ;
+		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/android/simple_instance_texture.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.

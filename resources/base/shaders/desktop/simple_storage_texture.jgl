@@ -1,9 +1,0 @@
-{
-	"NAME": "SIMPLE_STORAGE_TEXTURE",
-	"VERTEX": ["base/shaders/desktop/simple_storage_vertex.glsl"],
-	"FRAGMENT": ["base/shaders/desktop/simple_texture_fragment.glsl"],
-
-	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
-	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"],
-	"BUFFERS": ["TestBlock1", "TestBlock2"]
-}
