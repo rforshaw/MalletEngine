@@ -10,8 +10,17 @@ import com.linxonline.mallet.util.MalletMap ;
 public class UIAbstractModel implements IAbstractModel
 {
 	private final Matrix root = new Matrix( null, -1, -1 ) ;
+	private final Connect connect ;
 
-	public UIAbstractModel() {}
+	public UIAbstractModel()
+	{
+		this( new Connect() ) ;
+	}
+
+	public UIAbstractModel( final Connect _connect )
+	{
+		connect = _connect ;
+	}
 
 	@Override
 	public UIModelIndex root()
@@ -79,6 +88,12 @@ public class UIAbstractModel implements IAbstractModel
 	public boolean hasChildren( final UIModelIndex _index )
 	{
 		return rowCount( _index ) > 0 ;
+	}
+
+	@Override
+	public Connect getConnect()
+	{
+		return connect ;
 	}
 
 	private static class Matrix

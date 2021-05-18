@@ -10,7 +10,7 @@ import java.util.Set ;
 	This can be used in conjunction with com.linxonline.mallet.io.save.state.DataState,
 	allowing for easier loading/saving of data-sets too.
 */
-public interface IAbstractModel
+public interface IAbstractModel extends Connect.Connection
 {
 	public enum ItemFlags
 	{

@@ -129,11 +129,6 @@ public class GLGeometryBuffer extends GLBuffer
 		for( int i = 0; i < size; ++i )
 		{
 			final Draw draw = draws.get( i ) ;
-			if( draw.isHidden() == true )
-			{
-				continue ;
-			}
-
 			final Shape shape = draw.getShape() ;
 			if( shape == null )
 			{
@@ -211,6 +206,10 @@ public class GLGeometryBuffer extends GLBuffer
 			{
 				final IndexMap map = indexMaps[j] ;
 				final Draw draw = map.draw ;
+				if( draw.isHidden() == true )
+				{
+					continue ;
+				}
 
 				draw.getPosition( position ) ;
 				draw.getOffset( offset ) ;

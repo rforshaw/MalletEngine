@@ -170,7 +170,7 @@ public class GLProgram extends ProgramManager.Program
 
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, texture.uWrap ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, texture.vWrap ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.maxFilter ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.magFilter ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, texture.minFilter ) ;
 
 					textureUnit += 1 ;
@@ -403,7 +403,7 @@ public class GLProgram extends ProgramManager.Program
 	{
 		public GLImage image ;
 		public int minFilter ;
-		public int maxFilter ;
+		public int magFilter ;
 		public int uWrap ;
 		public int vWrap ;
 
@@ -415,8 +415,8 @@ public class GLProgram extends ProgramManager.Program
 		public void set( GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
-			minFilter = calculateMinFilter( _texture.getMinimumFilter() ) ;
-			maxFilter = calculateMagFilter( _texture.getMaximumFilter() ) ;
+			minFilter = calculateMinFilter( _texture.getMinificationFilter() ) ;
+			magFilter = calculateMagFilter( _texture.getMaxificationFilter() ) ;
 
 			uWrap = calculateWrap( _texture.getUWrap() ) ;
 			vWrap = calculateWrap( _texture.getVWrap() ) ;

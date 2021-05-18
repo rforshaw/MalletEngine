@@ -36,14 +36,12 @@ public class GLProgram extends ProgramManager.Program
 	public int inMVPMatrix = -1 ;
 	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders  
 	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
-	public final int[] inBuffers ;			// Additional Storage buffers defined in *.jgl and shaders
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
 		inUniforms   = new int[program.getUniforms().size()] ;
 		inAttributes = new int[program.getSwivel().size()] ;
-		inBuffers    = new int[program.getBuffers().size()] ;
 
 		final int length = inAttributes.length ;
 		for( int i = 0; i < length; i++ )
@@ -73,7 +71,6 @@ public class GLProgram extends ProgramManager.Program
 			final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
 			switch( uniform.getLeft() )
 			{
-				case BOOL         :
 				case INT32        :
 				case UINT32       :
 				case FLOAT32      :
@@ -82,9 +79,10 @@ public class GLProgram extends ProgramManager.Program
 				case FLOAT32_VEC3 :
 				case FLOAT32_VEC4 :
 				{
-					Logger.println( "Build uniform type not implemented", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "Build uniform type not implemented: " + uniform.getLeft(), Logger.Verbosity.MAJOR ) ;
 					return false ;
 				}
+				case BOOL         :
 				case FLOAT32_MAT4 : break ;
 				case SAMPLER2D    :
 				{
@@ -138,7 +136,6 @@ public class GLProgram extends ProgramManager.Program
 			final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
 			switch( uniform.getLeft() )
 			{
-				case BOOL         :
 				case INT32        :
 				case UINT32       :
 				case FLOAT32      :
@@ -149,6 +146,13 @@ public class GLProgram extends ProgramManager.Program
 				{
 					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
 					return false ;
+				}
+				case BOOL         :
+				{
+					Logger.println( uniform.getRight(), Logger.Verbosity.MAJOR ) ;
+					final boolean val = ( Boolean )_data.getUniform( uniform.getRight() ) ;
+					MGL.glUniform1i( inUniforms[i], val ? 1 : 0) ;
+					break ;
 				}
 				case FLOAT32_MAT4 :
 				{
@@ -170,7 +174,7 @@ public class GLProgram extends ProgramManager.Program
 
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, texture.uWrap ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, texture.vWrap ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.maxFilter ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.magFilter ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, texture.minFilter ) ;
 
 					textureUnit += 1 ;
@@ -212,7 +216,8 @@ public class GLProgram extends ProgramManager.Program
 	{
 		final List<String> buffers = program.getBuffers() ;
 
-		for( int i = 0; i < inBuffers.length; ++i )
+		final int size = buffers.size() ;
+		for( int i = 0; i < size; ++i )
 		{
 			final String name = buffers.get( i ) ;
 			final Storage storage = _data.getStorage( name ) ;
@@ -223,7 +228,8 @@ public class GLProgram extends ProgramManager.Program
 			}
 
 			final GLStorage glStorage = _storages.getRHS( storage.index() ) ;
-			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], glStorage.id[0] ) ;
+			//System.out.println( name + " BindBase: " + i + " StorageID: " + glStorage.id[0] ) ;
+			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, glStorage.id[0] ) ;
 		}
 	}
 
@@ -327,19 +333,6 @@ public class GLProgram extends ProgramManager.Program
 				}
 			}
 		}
-		
-		{
-			final List<String> buffers = _program.getBuffers() ;
-			final int size = buffers.size() ;
-
-			for( int i = 0; i < size; i++ )
-			{
-				final int loc = MGL.glGetProgramResourceIndex( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, buffers.get( i ) ) ;
-				program.inBuffers[i] = loc ;
-				System.out.println( "Storage Block Binding: " + loc ) ;
-				//System.out.println( "Error: " + MGL.glGetError() ) ;
-			}
-		}
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -419,7 +412,7 @@ public class GLProgram extends ProgramManager.Program
 	{
 		public GLImage image ;
 		public int minFilter ;
-		public int maxFilter ;
+		public int magFilter ;
 		public int uWrap ;
 		public int vWrap ;
 
@@ -431,8 +424,8 @@ public class GLProgram extends ProgramManager.Program
 		public void set( GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
-			minFilter = calculateMinFilter( _texture.getMinimumFilter() ) ;
-			maxFilter = calculateMagFilter( _texture.getMaximumFilter() ) ;
+			minFilter = calculateMinFilter( _texture.getMinificationFilter() ) ;
+			magFilter = calculateMagFilter( _texture.getMaxificationFilter() ) ;
 
 			uWrap = calculateWrap( _texture.getUWrap() ) ;
 			vWrap = calculateWrap( _texture.getVWrap() ) ;

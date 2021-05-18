@@ -2,14 +2,11 @@ package com.linxonline.mallet.io.formats.json ;
 
 import java.util.Iterator ;
 
-import com.linxonline.mallet.io.formats.json.IJSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
-
 import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.StringInStream ;
 import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
-public class JSONObject implements IJSONObject
+public class JSONObject
 {
 	public final org.json.JSONObject object ;
 
@@ -99,7 +96,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public String[] keys()
 	{
 		final int length = object.length() ;
@@ -114,13 +110,11 @@ public class JSONObject implements IJSONObject
 		return keys ;
 	}
 
-	@Override
 	public boolean has( final String _key )
 	{
 		return object.has( _key ) ;
 	}
 
-	@Override
 	public JSONObject put( final String _key, final boolean _value )
 	{
 		try
@@ -135,7 +129,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final int _value )
 	{
 		try
@@ -150,7 +143,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final double _value )
 	{
 		try
@@ -165,7 +157,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final long _value )
 	{
 		try
@@ -180,7 +171,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final String _value )
 	{
 		try
@@ -195,7 +185,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final JSONObject _value )
 	{
 		try
@@ -210,7 +199,6 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public JSONObject put( final String _key, final JSONArray _value )
 	{
 		try
@@ -225,67 +213,56 @@ public class JSONObject implements IJSONObject
 		}
 	}
 
-	@Override
 	public boolean getBoolean( final String _key )
 	{
 		return object.optBoolean( _key ) ;
 	}
 
-	@Override
 	public boolean optBoolean( final String _key, final boolean _default )
 	{
 		return object.optBoolean( _key, _default ) ;
 	}
 
-	@Override
 	public int getInt( final String _key )
 	{
 		return object.optInt( _key ) ;
 	}
 
-	@Override
 	public int optInt( final String _key, final int _default )
 	{
 		return object.optInt( _key, _default ) ;
 	}
 
-	@Override
 	public double getDouble( final String _key )
 	{
 		return object.optDouble( _key ) ;
 	}
 
-	@Override
 	public double optDouble( final String _key, final double _default )
 	{
 		return object.optDouble( _key, _default ) ;
 	}
 
-	@Override
 	public long getLong( final String _key )
 	{
 		return object.optLong( _key ) ;
 	}
 
-	@Override
 	public long optLong( final String _key, final long _default )
 	{
 		return object.optLong( _key, _default ) ;
 	}
 
-	@Override
 	public String getString( final String _key )
 	{
 		return object.optString( _key ) ;
 	}
 
-	@Override
 	public String optString( final String _key, final String _default )
 	{
 		return object.optString( _key, _default ) ;
 	}
 
-	@Override
 	public JSONObject getJSONObject( final String _key )
 	{
 		final org.json.JSONObject obj = object.optJSONObject( _key ) ;
@@ -297,7 +274,6 @@ public class JSONObject implements IJSONObject
 		return new JSONObject( obj ) ;
 	}
 
-	@Override
 	public JSONObject optJSONObject( final String _key, final JSONObject _default )
 	{
 		final org.json.JSONObject obj = object.optJSONObject( _key ) ;
@@ -309,7 +285,6 @@ public class JSONObject implements IJSONObject
 		return new JSONObject( obj ) ;
 	}
 
-	@Override
 	public JSONArray getJSONArray( final String _key )
 	{
 		final org.json.JSONArray array = object.optJSONArray( _key ) ;
@@ -321,7 +296,6 @@ public class JSONObject implements IJSONObject
 		return new JSONArray( array ) ;
 	}
 
-	@Override
 	public JSONArray optJSONArray( final String _key, final JSONArray _default )
 	{
 		final org.json.JSONArray array = object.optJSONArray( _key ) ;
@@ -333,13 +307,11 @@ public class JSONObject implements IJSONObject
 		return new JSONArray( array ) ;
 	}
 
-	@Override
 	public String toString()
 	{
 		return object.toString() ;
 	}
 
-	@Override
 	public String toString( final int _indent )
 	{
 		try
@@ -351,5 +323,10 @@ public class JSONObject implements IJSONObject
 			ex.printStackTrace() ;
 			return "{}" ;
 		}
+	}
+
+	public interface ConstructCallback
+	{
+		public void callback( JSONObject _object ) ;
 	}
 }

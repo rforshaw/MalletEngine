@@ -121,6 +121,13 @@ public class JSONProgram
 			switch( uniform.getLeft() )
 			{
 				case BOOL         :
+				{
+					if( isInstance( Boolean.class, obj ) == false )
+					{
+						return false ;
+					}
+					break ;
+				}
 				case INT32        :
 				case UINT32       :
 				case FLOAT32      :

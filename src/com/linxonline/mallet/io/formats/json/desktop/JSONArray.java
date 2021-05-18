@@ -1,9 +1,6 @@
 package com.linxonline.mallet.io.formats.json ;
 
-import com.linxonline.mallet.io.formats.json.IJSONObject ;
-import com.linxonline.mallet.io.formats.json.IJSONArray ;
-
-public class JSONArray implements IJSONArray
+public class JSONArray
 {
 	public final org.json.JSONArray array ;
 
@@ -40,27 +37,23 @@ public class JSONArray implements IJSONArray
 		}
 	}
 
-	@Override
 	public int length()
 	{
 		return array.length() ;
 	}
 
-	@Override
 	public JSONArray put( final boolean _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final int _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final double _value )
 	{
 		try
@@ -75,95 +68,80 @@ public class JSONArray implements IJSONArray
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final long _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final String _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final JSONObject _value )
 	{
 		array.put( ( ( JSONObject )_value ).object ) ;
 		return this ;
 	}
 
-	@Override
 	public JSONArray put( final JSONArray _value )
 	{
 		array.put( ( ( JSONArray )_value ).array ) ;
 		return this ;
 	}
 
-	@Override
 	public boolean getBoolean( final int _index )
 	{
 		return array.optBoolean( _index ) ;
 	}
 
-	@Override
 	public boolean optBoolean( final int _index, final boolean _default )
 	{
 		return array.optBoolean( _index, _default ) ;
 	}
 
-	@Override
 	public int getInt( final int _index )
 	{
 		return array.optInt( _index ) ;
 	}
 
-	@Override
 	public int optInt( final int _index, final int _default )
 	{
 		return array.optInt( _index, _default ) ;
 	}
 
-	@Override
 	public double getDouble( final int _index )
 	{
 		return array.optDouble( _index ) ;
 	}
 
-	@Override
 	public double optDouble( final int _index, final double _default )
 	{
 		return array.optDouble( _index, _default ) ;
 	}
 
-	@Override
 	public long getLong( final int _index )
 	{
 		return array.optLong( _index ) ;
 	}
 
-	@Override
 	public long optLong( final int _index, final long _default )
 	{
 		return array.optLong( _index, _default ) ;
 	}
 
-	@Override
 	public String getString( final int _index )
 	{
 		return array.optString( _index ) ;
 	}
 
-	@Override
 	public String optString( final int _index, final String _default )
 	{
 		return array.optString( _index, _default ) ;
 	}
 
-	@Override
 	public JSONObject getJSONObject( final int _index )
 	{
 		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
@@ -175,7 +153,6 @@ public class JSONArray implements IJSONArray
 		return new JSONObject( obj ) ;
 	}
 
-	@Override
 	public JSONObject optJSONObject( final int _index, final JSONObject _default )
 	{
 		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
@@ -187,7 +164,6 @@ public class JSONArray implements IJSONArray
 		return new JSONObject( obj ) ;
 	}
 
-	@Override
 	public JSONArray getJSONArray( final int _index )
 	{
 		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
@@ -199,7 +175,6 @@ public class JSONArray implements IJSONArray
 		return new JSONArray( arr ) ;
 	}
 
-	@Override
 	public JSONArray optJSONArray( final int _index, final JSONArray _default )
 	{
 		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
@@ -211,13 +186,11 @@ public class JSONArray implements IJSONArray
 		return new JSONArray( arr ) ;
 	}
 
-	@Override
 	public String toString()
 	{
 		return array.toString() ;
 	}
 
-	@Override
 	public String toString( final int _indent )
 	{
 		try

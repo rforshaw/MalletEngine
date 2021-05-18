@@ -440,6 +440,8 @@ public class UIAbstractView extends UIElement
 	{
 		return new IAbstractModel()
 		{
+			private final Connect connect = new Connect() ;
+
 			public UIModelIndex root()
 			{
 				return new UIModelIndex() ;
@@ -482,6 +484,12 @@ public class UIAbstractView extends UIElement
 			public boolean hasChildren( final UIModelIndex _parent )
 			{
 				return false ;
+			}
+
+			@Override
+			public Connect getConnect()
+			{
+				return connect ;
 			}
 		} ;
 	}
@@ -691,92 +699,118 @@ public class UIAbstractView extends UIElement
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 
-				final UILayout vLayout = ( UILayout )_item ;
-				switch( variant.getType() )
+				try
 				{
-					case AVariable.STRING_TYPE  :
+					final UILayout vLayout = ( UILayout )_item ;
+					switch( variant.getType() )
 					{
-						final StringBuilder text = getText( vLayout, 0 ) ;
-						variant.setString( text.toString() ) ;
-						break ;
-					}
-					case AVariable.BOOLEAN_TYPE :
-					{
-						variant.setBool( toBool( getText( vLayout, 0 ) ) ) ;
-						break ;
-					}
-					case AVariable.INT_TYPE     :
-					{
-						variant.setInt( toInt( getText( vLayout, 0 ) ) ) ;
-						break ;
-					}
-					case AVariable.FLOAT_TYPE   :
-					{
-						variant.setFloat( toFloat( getText( vLayout, 0 ) ) ) ;
-						break ;
-					}
-					case AVariable.OBJECT_TYPE  :
-					{
-						final Object obj = variant.toObject() ;
-						if( obj instanceof Vector2 )
+						case AVariable.STRING_TYPE  :
 						{
-							final float x = toFloat( getText( vLayout, 0 ) ) ;
-							final float y = toFloat( getText( vLayout, 1 ) ) ;
-							variant.setVector2( x, y ) ;
+							final StringBuilder text = getText( vLayout, 0 ) ;
+							variant.setString( text.toString() ) ;
+							signal( _model, variant ) ;
+							break ;
 						}
-						else if( obj instanceof Vector3 )
+						case AVariable.BOOLEAN_TYPE :
 						{
-							final float x = toFloat( getText( vLayout, 0 ) ) ;
-							final float y = toFloat( getText( vLayout, 1 ) ) ;
-							final float z = toFloat( getText( vLayout, 2 ) ) ;
-							variant.setVector3( x, y, z ) ;
+							variant.setBool( toBool( getText( vLayout, 0 ) ) ) ;
+							signal( _model, variant ) ;
+							break ;
 						}
-						else if( obj instanceof MalletColour )
+						case AVariable.INT_TYPE     :
 						{
-							final MalletColour colour = ( MalletColour )obj ;
-							final byte r = ( byte )toInt( getText( vLayout, 0 ) ) ;
-							final byte g = ( byte )toInt( getText( vLayout, 1 ) ) ;
-							final byte b = ( byte )toInt( getText( vLayout, 2 ) ) ;
-							final byte a = ( byte )toInt( getText( vLayout, 3 ) ) ;
-							colour.changeColour( r, g, b, a ) ;
+							variant.setInt( toInt( getText( vLayout, 0 ) ) ) ;
+							signal( _model, variant ) ;
+							break ;
 						}
-						else if( obj instanceof MalletFont )
+						case AVariable.FLOAT_TYPE   :
 						{
-							final String name = getText( vLayout, 0 ).toString() ;
-							final float size = toFloat( getText( vLayout, 1 ) ) ;
-							variant.setObject( new MalletFont( name, 12 ) ) ;
+							variant.setFloat( toFloat( getText( vLayout, 0 ) ) ) ;
+							signal( _model, variant ) ;
+							break ;
 						}
-						else if( obj instanceof UIElement.UV )
+						case AVariable.OBJECT_TYPE  :
 						{
-							final float minx = toFloat( getText( vLayout, 0 ) ) ;
-							final float miny = toFloat( getText( vLayout, 1 ) ) ;
-							final float maxx = toFloat( getText( vLayout, 2 ) ) ;
-							final float maxy = toFloat( getText( vLayout, 3 ) ) ;
+							final Object obj = variant.toObject() ;
+							if( obj instanceof Vector2 )
+							{
+								final float x = toFloat( getText( vLayout, 0 ) ) ;
+								final float y = toFloat( getText( vLayout, 1 ) ) ;
+								variant.setVector2( x, y ) ;
+								signal( _model, variant ) ;
+							}
+							else if( obj instanceof Vector3 )
+							{
+								final float x = toFloat( getText( vLayout, 0 ) ) ;
+								final float y = toFloat( getText( vLayout, 1 ) ) ;
+								final float z = toFloat( getText( vLayout, 2 ) ) ;
+								variant.setVector3( x, y, z ) ;
+								signal( _model, variant ) ;
+							}
+							else if( obj instanceof MalletColour )
+							{
+								final MalletColour colour = ( MalletColour )obj ;
+								final byte r = ( byte )toInt( getText( vLayout, 0 ) ) ;
+								final byte g = ( byte )toInt( getText( vLayout, 1 ) ) ;
+								final byte b = ( byte )toInt( getText( vLayout, 2 ) ) ;
+								final byte a = ( byte )toInt( getText( vLayout, 3 ) ) ;
+								colour.changeColour( r, g, b, a ) ;
+								signal( _model, variant ) ;
+							}
+							else if( obj instanceof MalletFont )
+							{
+								final String name = getText( vLayout, 0 ).toString() ;
+								final float size = toFloat( getText( vLayout, 1 ) ) ;
+								variant.setObject( new MalletFont( name, 12 ) ) ;
+								signal( _model, variant ) ;
+							}
+							else if( obj instanceof UIElement.UV )
+							{
+								final float minx = toFloat( getText( vLayout, 0 ) ) ;
+								final float miny = toFloat( getText( vLayout, 1 ) ) ;
+								final float maxx = toFloat( getText( vLayout, 2 ) ) ;
+								final float maxy = toFloat( getText( vLayout, 3 ) ) ;
 
-							final UIElement.UV uv = ( UIElement.UV )obj ;
-							uv.min.setXY( minx, miny ) ;
-							uv.max.setXY( maxx, maxy ) ;
-						}
-						else if( obj instanceof Enum<?> )
-						{
-							try
-							{
-								final Enum<?> en = ( Enum<?> )obj ;
-								final String val = getText( vLayout, 0 ).toString() ;
-								variant.setObject( en.valueOf( en.getClass(), val ) ) ;
+								final UIElement.UV uv = ( UIElement.UV )obj ;
+								uv.min.setXY( minx, miny ) ;
+								uv.max.setXY( maxx, maxy ) ;
+								signal( _model, variant ) ;
 							}
-							catch( IllegalArgumentException ex )
+							else if( obj instanceof Enum<?> )
 							{
-								System.out.println( "Value not compatible with enum." ) ;
+								try
+								{
+									final Enum<?> en = ( Enum<?> )obj ;
+									final String val = getText( vLayout, 0 ).toString() ;
+									variant.setObject( en.valueOf( en.getClass(), val ) ) ;
+									signal( _model, variant ) ;
+								}
+								catch( IllegalArgumentException ex )
+								{
+									System.out.println( "Value not compatible with enum." ) ;
+								}
 							}
+							else
+							{
+								System.out.println( "Unable to set.." ) ;
+							}
+							break ;
 						}
-						else
-						{
-							System.out.println( "Unable to set.." ) ;
-						}
-						break ;
+						default                             : break ;
 					}
-					default                             : break ;
+				}
+				catch( NumberFormatException ex )
+				{
+					signal( _model, variant ) ;
+				}
+			}
+
+			public void signal( final IAbstractModel _model, final IVariant _variant )
+			{
+				final Connect.Signal signal = _variant.getSignal() ;
+				if( signal != null )
+				{
+					UIElement.signal( _model, signal ) ;
 				}
 			}
 
@@ -797,7 +831,8 @@ public class UIAbstractView extends UIElement
 
 			public float toFloat( final StringBuilder _text )
 			{
-				return Float.parseFloat( _text.toString() ) ;
+				final String trimmed = _text.toString().trim() ;
+				return (trimmed.length() > 0) ? Float.parseFloat( _text.toString() ) : 0.0f ;
 			}
 
 			public StringBuilder getText( final UILayout _layout, final int _index )

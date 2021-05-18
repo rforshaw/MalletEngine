@@ -1676,8 +1676,8 @@ public class UIElement implements InputHandler, Connect.Connection
 	*/
 	public static abstract class MetaComponent extends UIAbstractModel implements Connect.Connection
 	{
-		private final UIVariant name     = new UIVariant( "NAME",     "",    new Connect.Signal() ) ;
-		private final UIVariant group    = new UIVariant( "GROUP",    "",    new Connect.Signal() ) ;
+		private final UIVariant name  = new UIVariant( "NAME",  "", new Connect.Signal() ) ;
+		private final UIVariant group = new UIVariant( "GROUP", "", new Connect.Signal() ) ;
 
 		private final Connect connect = new Connect() ;
 

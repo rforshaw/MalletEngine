@@ -219,8 +219,8 @@ public class GLDrawInstancedBuffer extends GLBuffer
 			boolean foundInstanceBuffer = false ;
 
 			final List<String> buffers = glProgram.program.getBuffers() ;
-			final int[] inBuffers = glProgram.inBuffers ;
-			for( int i = 0; i < inBuffers.length; ++i )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; ++i )
 			{
 				final String name = buffers.get( i ) ;
 				if( name.equals( storageName ) == true ) 
@@ -228,7 +228,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 					// Map the transformation storage to the specified 
 					// name within the program.
 					foundInstanceBuffer = true ;
-					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], glTransStorage.id[0] ) ;
+					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, glTransStorage.id[0] ) ;
 				}
 				else
 				{
@@ -240,7 +240,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 					}
 
 					final GLStorage glStorage = storages.getRHS( storage.index() ) ;
-					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, inBuffers[i], glStorage.id[0] ) ;
+					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, glStorage.id[0] ) ;
 				}
 			}
 

@@ -13,8 +13,8 @@ import com.linxonline.mallet.maths.IntVector2 ;
 */
 public class MalletTexture
 {
-	private final Filter minFilter ;
-	private final Filter maxFilter ;
+	private final Filter minification ;
+	private final Filter magnification ;
 	private final Wrap uWrap ;
 	private final Wrap vWrap ;
 	private final Meta meta ;
@@ -34,12 +34,12 @@ public class MalletTexture
 	}
 
 	public MalletTexture( final String _texturePath,
-						  final Filter _min,
-						  final Filter _max,
+						  final Filter _minification,
+						  final Filter _magnification,
 						  final Wrap _u,
 						  final Wrap _v )
 	{
-		this( TextureAssist.createMeta( _texturePath ), _min, _max, _u, _v ) ;
+		this( TextureAssist.createMeta( _texturePath ), _minification, _magnification, _u, _v ) ;
 	}
 
 	/**
@@ -82,14 +82,14 @@ public class MalletTexture
 	}
 
 	private MalletTexture( final Meta _meta,
-						   final Filter _min, 
-						   final Filter _max,
+						   final Filter _minification, 
+						   final Filter _magnification,
 						   final Wrap _u,
 						   final Wrap _v )
 	{
 		meta = _meta ;
-		minFilter = ( _min == null ) ? Filter.MIP_LINEAR : _min ;
-		maxFilter = ( _max == null ) ? Filter.MIP_LINEAR : _max ;
+		minification = ( _minification == null ) ? Filter.MIP_LINEAR : _minification ;
+		magnification = ( _magnification == null ) ? Filter.MIP_LINEAR : _magnification ;
 
 		uWrap = ( _u == null ) ? Wrap.REPEAT : _u ;
 		vWrap = ( _v == null ) ? Wrap.REPEAT : _v ;
@@ -119,7 +119,7 @@ public class MalletTexture
 			{
 				return false ;
 			}
-			else if( minFilter != rhs.minFilter || maxFilter != rhs.maxFilter )
+			else if( minification != rhs.minification || magnification != rhs.magnification )
 			{
 				return false ;
 			}
@@ -200,14 +200,14 @@ public class MalletTexture
 		return vWrap ;
 	}
 
-	public Filter getMinimumFilter()
+	public Filter getMinificationFilter()
 	{
-		return minFilter ;
+		return minification ;
 	}
 
-	public Filter getMaximumFilter()
+	public Filter getMaxificationFilter()
 	{
-		return minFilter ;
+		return magnification ;
 	}
 
 	@Override

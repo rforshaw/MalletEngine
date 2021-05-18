@@ -15,7 +15,6 @@ public class GUIEditText extends GUIText
 	private DrawUpdater cursorUpdater ;
 
 	private boolean shift = false ;
-	private boolean firstClick = false ;
 	private int start = 0 ;
 	private int end = 0 ;
 
@@ -311,12 +310,6 @@ public class GUIEditText extends GUIText
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
 		editing = true ;
-		if( firstClick == false )
-		{
-			firstClick = true ;
-			final StringBuilder text = getText() ;
-			text.setLength( 0 ) ;
-		}
 
 		final UITextField parent = getParent() ;
 		final Vector3 position = parent.getPosition() ;

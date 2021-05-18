@@ -565,7 +565,29 @@ public class Shape implements IShape
 
 		return plane ;
 	}
-	
+
+	public static Shape constructOutlineCircle( final float _radius, final int _segments, final MalletColour _colour )
+	{
+		final Swivel[] swivel = new Swivel[2] ;
+		swivel[0] = Swivel.POINT ;
+		swivel[1] = Swivel.COLOUR ;
+
+		final Shape circle = new Shape( Shape.Style.LINE_STRIP, swivel, _segments + 1, _segments ) ;
+		for( int i = 0; i < _segments; ++i )
+		{
+			final float theta = 2.0f * ( float )Math.PI * ( float )i / ( float )_segments ;
+
+			final float x = _radius * ( float )Math.cos( theta ) ;
+			final float y = _radius * ( float )Math.sin( theta ) ;
+
+			circle.addIndex( i ) ;
+			circle.copyVertex( new Object[] { new Vector3( x, y, 0.0f ), _colour } ) ;
+		}
+
+		circle.addIndex( 0 ) ;
+		return circle ;
+	}
+
 	/**
 		Construct a basic 3D cube of dimension _width.
 	*/
@@ -685,6 +707,22 @@ public class Shape implements IShape
 		return _plane ;
 	}
 
+	public static Shape updateCircle( final Shape _circle, final float _radius )
+	{
+		final int segments = _circle.getVerticesSize() ;
+		for( int i = 0; i < segments; ++i )
+		{
+			final float theta = 2.0f * ( float )Math.PI * ( float )i / ( float )segments ;
+
+			final float x = _radius * ( float )Math.cos( theta ) ;
+			final float y = _radius * ( float )Math.sin( theta ) ;
+
+			_circle.setVector3( i, 0, x, y, 0.0f ) ;
+		}
+
+		return _circle ;
+	}
+	
 	/**
 		Update the UV co-ordinates of a 2-dimensional quad.
 	*/

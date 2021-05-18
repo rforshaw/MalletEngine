@@ -1,5 +1,6 @@
 package com.linxonline.mallet.ui ;
 
+import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -78,6 +79,17 @@ public class UIVariant implements IVariant
 	public UIVariant( final String _name, final Vector3 _val, Connect.Signal _signal )
 	{
 		variable = new ObjectVariable<Vector3>( _name, _val ) ;
+		signal = _signal ;
+	}
+
+	public UIVariant( final String _name, final MalletColour _val )
+	{
+		this( _name, _val, null ) ;
+	}
+
+	public UIVariant( final String _name, final MalletColour _val, Connect.Signal _signal )
+	{
+		variable = new ObjectVariable<MalletColour>( _name, _val ) ;
 		signal = _signal ;
 	}
 
@@ -186,6 +198,20 @@ public class UIVariant implements IVariant
 	}
 
 	@Override
+	public void setColour( final byte _r, final byte _g, final byte _b, final byte _a )
+	{
+		switch( getType() )
+		{
+			case AVariable.OBJECT_TYPE :
+			{
+				final MalletColour value = ( MalletColour )( ( ObjectVariable )variable ).value ;
+				value.changeColour( _r, _g, _b, _a ) ;
+				break ;
+			}
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		return variable.toString() ;
@@ -197,7 +223,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.BOOLEAN_TYPE : return ( ( BooleanVariable )variable ).value ;
-			default           : return false ;
+			default                     : return false ;
 		}
 	}
 
@@ -207,7 +233,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.FLOAT_TYPE  : return ( ( FloatVariable )variable ).value ;
-			default                            : return 0.0f ;
+			default                    : return 0.0f ;
 		}
 	}
 
@@ -217,7 +243,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.INT_TYPE    : return ( ( IntegerVariable )variable ).value ;
-			default                            : return 0 ;
+			default                    : return 0 ;
 		}
 	}
 
@@ -227,7 +253,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return _class.cast( ( ( ObjectVariable )variable ).value ) ;
-			default                            : return null ;
+			default                    : return null ;
 		}
 	}
 	
@@ -237,7 +263,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return ( ( ObjectVariable )variable ).value ;
-			default                            : return null ;
+			default                    : return null ;
 		}
 	}
 
@@ -247,7 +273,7 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return ( Vector3 )( ( ObjectVariable )variable ).value ;
-			default                            : return null ;
+			default                    : return null ;
 		}
 	}
 
@@ -257,7 +283,17 @@ public class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return ( Vector2 )( ( ObjectVariable )variable ).value ;
-			default                            : return null ;
+			default                    : return null ;
+		}
+	}
+
+	@Override
+	public MalletColour toColour()
+	{
+		switch( getType() )
+		{
+			case AVariable.OBJECT_TYPE : return ( MalletColour )( ( ObjectVariable )variable ).value ;
+			default                    : return null ;
 		}
 	}
 }

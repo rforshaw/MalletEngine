@@ -74,6 +74,11 @@ public class MalletColour
 		colours[ALPHA] = _alpha ;
 	}
 
+	public void changeColour( final MalletColour _colour )
+	{
+		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
+	}
+
 	public int getRed()
 	{
 		return colours[RED] & 0xFF ;
@@ -92,6 +97,26 @@ public class MalletColour
 	public int getAlpha()
 	{
 		return colours[ALPHA] & 0xFF ;
+	}
+
+	public byte getRedAsByte()
+	{
+		return colours[RED] ;
+	}
+
+	public byte getGreenAsByte()
+	{
+		return colours[GREEN] ;
+	}
+
+	public byte getBlueAsByte()
+	{
+		return colours[BLUE] ;
+	}
+
+	public byte getAlphaAsByte()
+	{
+		return colours[ALPHA] ;
 	}
 
 	public int toInt()

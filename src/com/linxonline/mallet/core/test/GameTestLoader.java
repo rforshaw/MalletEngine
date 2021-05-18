@@ -11,12 +11,15 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
 
+import com.linxonline.mallet.renderer.IShape.Swivel ;
+
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
+import com.linxonline.mallet.io.formats.gltf.GLTF ;
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.linxonline.mallet.physics.Debug ;
@@ -24,7 +27,6 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
-import com.linxonline.mallet.util.schema.* ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
@@ -89,8 +91,6 @@ public final class GameTestLoader implements IGameLoader
 				} ) ;
 				client.close() ;*/
 
-				createMeta() ;
-
 				createUI() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
@@ -105,47 +105,6 @@ public final class GameTestLoader implements IGameLoader
 				createEventMessageTest() ;
 
 				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
-			}
-
-			public void createMeta()
-			{
-				final SNode struct1 = SStruct.create( SStruct.var( "test1", SPrim.bool() ),
-													  SStruct.var( "test2", SPrim.flt() ),
-													  SStruct.var( "test3", SPrim.integer() ) ) ;
-
-				final SNode struct2 = SStruct.create( SStruct.var( "test1", SPrim.bool() ),
-													  SStruct.var( "test2", SPrim.flt() ),
-													  SStruct.var( "test3", SPrim.integer() ) ) ;
-
-				System.out.println( "Structures 1 and 2: " + struct1.equals( struct2 ) ) ;
-				System.out.println( "Structures 1 and 2: " + struct1.getLength() + " " + struct2.getLength() ) ;
-
-				final SNode struct3 = SStruct.create( SStruct.var( "test1", SPrim.flt() ),
-													  SStruct.var( "test2", SPrim.flt() ),
-													  SStruct.var( "test3", SPrim.integer() ) ) ;
-
-				/*final Storage.IData data = new Storage.IData()
-				{
-					private final Vector3 vec = new Vector3() ;
-
-					@Override
-					public int getLength()
-					{
-						return 3 * 4 ;
-					}
-
-					@Override
-					public void serialise( Serialise.Out _out ) 
-					{
-						_out.writeFloat( vec.x ) ;
-						_out.writeFloat( vec.y ) ;
-						_out.writeFloat( vec.z ) ;
-					}
-				} ;
-				final Storage store = StorageAssist.add( new Storage( data ) ) ;*/
-
-				System.out.println( "Structures 1 and 3: " + struct1.equals( struct3 ) ) ;
-				System.out.println( "Structures 3: " + struct2.getLength() ) ;
 			}
 
 			public void createUI()
@@ -552,11 +511,19 @@ public final class GameTestLoader implements IGameLoader
 					public void init()
 					{
 						final World world = WorldAssist.getDefault() ;
-						final Shape shape = Shape.constructCube( 100.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
+						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
+						final Shape shape = gltf.createMesh( "Cube", MalletList.<Tuple<String, Swivel>>toArray(
+							Tuple.<String, Swivel>build( "POSITION", Swivel.POINT ),
+							Tuple.<String, Swivel>build( "", Swivel.COLOUR ),
+							Tuple.<String, Swivel>build( "TEXCOORD_0", Swivel.UV )
+						) ) ;
+						System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
+						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
 
 						draw = new Draw() ;
 						draw.setPosition( 0.0f, -200.0f, 0.0f ) ;
-						draw.setOffset( -50.0f, -50.0f, -50.0f ) ;
+						//draw.setOffset( 0.0f, 0.0f, -50.0f ) ;
+						draw.setScale( 100, 100, 100 ) ;
 						draw.setShape( shape ) ;
 
 						final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;

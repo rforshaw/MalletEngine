@@ -73,7 +73,9 @@ public final class MGL
 
 	public final static int GL_CULL_FACE = GL3.GL_CULL_FACE ;
 	public final static int GL_BACK = GL3.GL_BACK ;
+	public final static int GL_FRONT_AND_BACK = GL3.GL_FRONT_AND_BACK ;
 	public final static int GL_CCW = GL3.GL_CCW ;
+	public final static int GL_CW = GL3.GL_CW ;
 
 	public final static int GL_COMPILE_STATUS = GL3.GL_COMPILE_STATUS ;
 	public final static int GL_INFO_LOG_LENGTH = GL3.GL_INFO_LOG_LENGTH ;
