@@ -55,7 +55,7 @@ public class Debug
 		_draw.setPosition( pos.x, pos.y, 0.0f ) ;
 		_draw.setOffset( offset.x, offset.y, 0.0f ) ;
 
-		final Shape shape = _draw.getShape() ;
+		final Shape shape = ( Shape )_draw.getShape() ;
 
 		int index = 0 ;
 		final float[] points = _hull.getPoints() ;

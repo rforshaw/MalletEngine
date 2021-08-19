@@ -7,7 +7,7 @@ import java.nio.* ;
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
 import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -129,48 +129,46 @@ public class GLGeometryBuffer extends GLBuffer
 		for( int i = 0; i < size; ++i )
 		{
 			final Draw draw = draws.get( i ) ;
-			if( draw.isHidden() == true )
+			final IShape[] shapes = draw.getShapes() ;
+			for( final IShape shape : shapes )
 			{
-				continue ;
+				if( shape == null )
+				{
+					continue ;
+				}
+
+				final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
+				final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
+
+				usedIndexByteSize += shapeIndexByteSize ;
+				if(usedIndexByteSize > indexByteSize)
+				{
+					//System.out.println( "Expand Index Buffer" ) ;
+					expandIndexBuffer() ;
+				}
+
+				usedVertexByteSize += shapeVertexByteSize ;
+				if( usedVertexByteSize > vertexByteSize )
+				{
+					//System.out.println( "Expand Vertex Buffer" ) ;
+					expandVertexBuffer() ;
+				}
+
+				if( usedIndexByteSize > indexByteSize || usedVertexByteSize > vertexByteSize )
+				{
+					upload( bufferIndex ) ;
+
+					// If the draw object would exceed our limits
+					// then either create/jump to our next buffer.
+					bufferIndex = ( bufferIndex + 1 == indexID.length ) ? genNewBuffers() : bufferIndex + 1 ;
+					//System.out.println( "Buffer Index: " + bufferIndex ) ;
+					usedIndexByteSize = shapeIndexByteSize ;
+					usedVertexByteSize = shapeVertexByteSize ;
+				}
+
+				uploadIndexToRAM( draw, shape, indexMaps[indexMapSize++] ) ;
+				vertexBuffer.put( shape.getRawVertices() ) ;
 			}
-
-			final Shape shape = draw.getShape() ;
-			if( shape == null )
-			{
-				continue ;
-			}
-
-			final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
-			final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
-
-			usedIndexByteSize += shapeIndexByteSize ;
-			if(usedIndexByteSize > indexByteSize)
-			{
-				//System.out.println( "Expand Index Buffer" ) ;
-				expandIndexBuffer() ;
-			}
-
-			usedVertexByteSize += shapeVertexByteSize ;
-			if( usedVertexByteSize > vertexByteSize )
-			{
-				//System.out.println( "Expand Vertex Buffer" ) ;
-				expandVertexBuffer() ;
-			}
-
-			if( usedIndexByteSize > indexByteSize || usedVertexByteSize > vertexByteSize )
-			{
-				upload( bufferIndex ) ;
-
-				// If the draw object would exceed our limits
-				// then either create/jump to our next buffer.
-				bufferIndex = ( bufferIndex + 1 == indexID.length ) ? genNewBuffers() : bufferIndex + 1 ;
-				//System.out.println( "Buffer Index: " + bufferIndex ) ;
-				usedIndexByteSize = shapeIndexByteSize ;
-				usedVertexByteSize = shapeVertexByteSize ;
-			}
-
-			uploadIndexToRAM( draw, indexMaps[indexMapSize++] ) ;
-			uploadVBOToRAM( draw ) ;
 		}
 
 		upload( bufferIndex ) ;
@@ -211,6 +209,10 @@ public class GLGeometryBuffer extends GLBuffer
 			{
 				final IndexMap map = indexMaps[j] ;
 				final Draw draw = map.draw ;
+				if( draw.isHidden() == true )
+				{
+					continue ;
+				}
 
 				draw.getPosition( position ) ;
 				draw.getOffset( offset ) ;
@@ -328,13 +330,12 @@ public class GLGeometryBuffer extends GLBuffer
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 	
-	private void uploadIndexToRAM( final Draw _draw, final IndexMap _map )
+	private void uploadIndexToRAM( final Draw _draw, final IShape _shape, final IndexMap _map )
 	{
-		final Shape shape = _draw.getShape() ;
 		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-		final int[] inds = shape.getRawIndices() ;
+		final int[] inds = _shape.getRawIndices() ;
 		final int size = inds.length ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -343,12 +344,6 @@ public class GLGeometryBuffer extends GLBuffer
 		}
 
 		_map.set( indexStart, size, _draw ) ;
-	}
-
-	private void uploadVBOToRAM( final Draw _draw )
-	{
-		final Shape shape = _draw.getShape() ;
-		vertexBuffer.put( shape.getRawVertices() ) ;
 	}
 
 	private static class IndexMap

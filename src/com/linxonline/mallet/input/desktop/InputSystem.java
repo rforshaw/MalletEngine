@@ -97,12 +97,12 @@ public class InputSystem implements IInputSystem,
 	@Override
 	public void keyPressed( final KeyEvent _event )
 	{
-		if( _event.isAutoRepeat() == true )
+		/*if( _event.isAutoRepeat() == true )
 		{
 			// If the event is an auto-repeat skip it,
 			// we don't want to spam the input-system.
 			return ;
-		}
+		}*/
 
 		// Sometimes when multiple keys have been pressed 
 		// for a long duration, the next key to be pressed 

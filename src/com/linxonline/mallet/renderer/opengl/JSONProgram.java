@@ -189,24 +189,24 @@ public class JSONProgram
 			_delegate.failed() ;
 		}
 
-		JSONObject.construct( stream, new JSONObject.ConstructCallback()
+		JObject.construct( stream, new JObject.ConstructCallback()
 		{
-			public void callback( final JSONObject _obj )
+			public void callback( final JObject _obj )
 			{
 				generate( _obj, _delegate ) ;
 			}
 		} ) ;
 	}
 
-	private static void generate( final JSONObject _jGL, final Delegate _delegate )
+	private static void generate( final JObject _jGL, final Delegate _delegate )
 	{
 		final JSONProgram program = new JSONProgram( _jGL.optString( "NAME", "undefined" ) ) ;
 		final List<ShaderMap> paths = MalletList.<ShaderMap>newList() ;
 
-		fillShaderPaths( paths, _jGL.getJSONArray( "VERTEX" ), Type.VERTEX ) ;
-		fillShaderPaths( paths, _jGL.getJSONArray( "FRAGMENT" ), Type.FRAGMENT ) ;
-		fillShaderPaths( paths, _jGL.getJSONArray( "GEOMETRY" ), Type.GEOMETRY ) ;
-		fillShaderPaths( paths, _jGL.getJSONArray( "COMPUTE" ),  Type.COMPUTE ) ;
+		fillShaderPaths( paths, _jGL.getJArray( "VERTEX" ), Type.VERTEX ) ;
+		fillShaderPaths( paths, _jGL.getJArray( "FRAGMENT" ), Type.FRAGMENT ) ;
+		fillShaderPaths( paths, _jGL.getJArray( "GEOMETRY" ), Type.GEOMETRY ) ;
+		fillShaderPaths( paths, _jGL.getJArray( "COMPUTE" ),  Type.COMPUTE ) ;
 
 		if( paths.isEmpty() )
 		{
@@ -215,9 +215,9 @@ public class JSONProgram
 			return ;
 		}
 
-		fillUniforms( program.uniforms, _jGL.getJSONArray( "UNIFORMS" ) ) ;
-		fillAttributes( program.swivel, _jGL.getJSONArray( "SWIVEL" ) ) ;
-		fillBuffers( program.buffers, _jGL.getJSONArray( "BUFFERS" ) ) ;
+		fillUniforms( program.uniforms, _jGL.getJArray( "UNIFORMS" ) ) ;
+		fillAttributes( program.swivel, _jGL.getJArray( "SWIVEL" ) ) ;
+		fillBuffers( program.buffers, _jGL.getJArray( "BUFFERS" ) ) ;
 
 		readShaders( paths, program, _delegate ) ;
 	}
@@ -264,7 +264,7 @@ public class JSONProgram
 		}, 1 ) ;
 	}
 
-	private static boolean fillShaderPaths( final List<ShaderMap> _toFill, final JSONArray _base, final Type _type )
+	private static boolean fillShaderPaths( final List<ShaderMap> _toFill, final JArray _base, final Type _type )
 	{
 		if( _base == null )
 		{
@@ -285,7 +285,7 @@ public class JSONProgram
 		return true ;
 	}
 
-	private static void fillUniforms( final List<UniformMap> _toFill, final JSONArray _base )
+	private static void fillUniforms( final List<UniformMap> _toFill, final JArray _base )
 	{
 		if( _base == null )
 		{
@@ -295,7 +295,7 @@ public class JSONProgram
 		final int length = _base.length() ;
 		for( int i = 0; i < length; i++ )
 		{
-			final JSONObject obj = _base.getJSONObject( i ) ;
+			final JObject obj = _base.getJObject( i ) ;
 			final String name = obj.optString( "NAME", null ) ;
 			final Uniform type = Uniform.convert( obj.optString( "TYPE", null ) ) ;
 
@@ -306,7 +306,7 @@ public class JSONProgram
 		}
 	}
 
-	private static void fillAttributes( final List<String> _toFill, final JSONArray _base )
+	private static void fillAttributes( final List<String> _toFill, final JArray _base )
 	{
 		if( _base == null )
 		{
@@ -320,7 +320,7 @@ public class JSONProgram
 		}
 	}
 
-	private static void fillBuffers( final List<String> _toFill, final JSONArray _base )
+	private static void fillBuffers( final List<String> _toFill, final JArray _base )
 	{
 		if( _base == null )
 		{

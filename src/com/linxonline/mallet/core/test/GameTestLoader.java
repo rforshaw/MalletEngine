@@ -184,29 +184,6 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final Shape triangle = new Shape( Shape.Style.FILL, 6, 6 ) ;
-					triangle.copyVertex( Shape.construct( 0, 0, 0,     MalletColour.red() ) ) ;
-					triangle.copyVertex( Shape.construct( 10, 50, 0,   MalletColour.blue() ) ) ;
-					triangle.copyVertex( Shape.construct( 50, 90, 0,   MalletColour.green() ) ) ;
-					triangle.copyVertex( Shape.construct( 100, 40, 0,  MalletColour.red() ) ) ;
-					triangle.copyVertex( Shape.construct( 110, -20, 0, MalletColour.blue() ) ) ;
-					triangle.copyVertex( Shape.construct( 50, -30, 0,  MalletColour.green() ) ) ;
-
-					triangle.addIndex( 0 ) ;
-					triangle.addIndex( 1 ) ;
-					triangle.addIndex( 2 ) ;
-					triangle.addIndex( 3 ) ;
-					triangle.addIndex( 4 ) ;
-					triangle.addIndex( 5 ) ;
-
-					final Draw draw = new Draw() ;
-					draw.setShape( Shape.triangulate( triangle ) ) ;
-
-					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, triangle, false, 0 ) ;
-					updater.addDynamics( draw ) ;
-				}
-
-				{
 					final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
 					final int width = texture.getWidth() ;
 					final int height = texture.getHeight() ;
@@ -512,7 +489,7 @@ public final class GameTestLoader implements IGameLoader
 					{
 						final World world = WorldAssist.getDefault() ;
 						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
-						final Shape shape = gltf.createMesh( "Cube", MalletList.<Tuple<String, Swivel>>toArray(
+						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, Swivel>>toArray(
 							Tuple.<String, Swivel>build( "POSITION", Swivel.POINT ),
 							Tuple.<String, Swivel>build( "", Swivel.COLOUR ),
 							Tuple.<String, Swivel>build( "TEXCOORD_0", Swivel.UV )

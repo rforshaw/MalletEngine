@@ -47,20 +47,23 @@ public class GUIEditText extends GUIText
 			final float width = ratio.toPixelX( 0.05f ) ;
 			final float height = ratio.toPixelY( 0.42f ) ;
 		
-			final Shape triangle = new Shape( Shape.Style.FILL, 4, 4 ) ;
-			triangle.copyVertex( Shape.construct( 0,     0,      0,   colour) ) ;
-			triangle.copyVertex( Shape.construct( 0,     height, 0,   colour ) ) ;
-			triangle.copyVertex( Shape.construct( width, height, 0,   colour ) ) ;
-			triangle.copyVertex( Shape.construct( width, 0,      0,   colour ) ) ;
+			final Shape plane = new Shape( Shape.Style.FILL, 6, 4 ) ;
+			plane.copyVertex( Shape.construct( 0,     0,      0,   colour) ) ;
+			plane.copyVertex( Shape.construct( 0,     height, 0,   colour ) ) ;
+			plane.copyVertex( Shape.construct( width, height, 0,   colour ) ) ;
+			plane.copyVertex( Shape.construct( width, 0,      0,   colour ) ) ;
 
-			triangle.addIndex( 0 ) ;
-			triangle.addIndex( 1 ) ;
-			triangle.addIndex( 2 ) ;
-			triangle.addIndex( 3 ) ;
+			plane.addIndex( 0 ) ;
+			plane.addIndex( 1 ) ;
+			plane.addIndex( 2 ) ;
+
+			plane.addIndex( 0 ) ;
+			plane.addIndex( 2 ) ;
+			plane.addIndex( 3 ) ;
 
 			cursorDraw = new Draw( position.x, position.y, position.z,
 								   offset.x, offset.y, offset.z ) ;
-			cursorDraw.setShape( Shape.triangulate( triangle ) ) ;
+			cursorDraw.setShape( plane ) ;
 		}
 	}
 

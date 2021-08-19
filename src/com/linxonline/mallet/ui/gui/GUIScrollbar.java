@@ -69,7 +69,7 @@ public class GUIScrollbar extends GUIComponent
 			updater.removeDynamics( xBar, yBar ) ;
 		}
 
-		final Shape shape = xBar.getShape() ;
+		final Shape shape = ( Shape )xBar.getShape() ;
 		final int layer = getLayer() ;
 
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
@@ -90,7 +90,7 @@ public class GUIScrollbar extends GUIComponent
 			updater.removeDynamics( xBar, yBar ) ;
 		}
 
-		final Shape shape = xBar.getShape() ;
+		final Shape shape = ( Shape )xBar.getShape() ;
 		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
 	}
 
@@ -107,11 +107,11 @@ public class GUIScrollbar extends GUIComponent
 
 		xBar.setPosition( position.x, position.y, position.z ) ;
 		xBar.setOffset( offset.x, offset.y, offset.z ) ;
-		Shape.updatePlaneGeometry( xBar.getShape(), xLength ) ;
+		Shape.updatePlaneGeometry( ( Shape )xBar.getShape(), xLength ) ;
 
 		yBar.setPosition( position.x, position.y, position.z ) ;
 		yBar.setOffset( offset.x, offset.y, offset.z ) ;
-		Shape.updatePlaneGeometry( yBar.getShape(), yLength ) ;
+		Shape.updatePlaneGeometry( ( Shape )yBar.getShape(), yLength ) ;
 
 		updater.forceUpdate() ;
 	}

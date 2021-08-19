@@ -1,34 +1,34 @@
 package com.linxonline.mallet.io.formats.json ;
 
-public class JSONArray
+public class JArray
 {
-	protected final org.json.JSONArray array ;
+	public final org.json.JSONArray array ;
 
-	protected JSONArray()
+	protected JArray()
 	{
 		array = new org.json.JSONArray() ;
 	}
 
-	protected JSONArray( final String _source ) throws org.json.JSONException
+	protected JArray( final String _source ) throws org.json.JSONException
 	{
 		array = new org.json.JSONArray( _source ) ;
 	}
 
-	protected JSONArray( final org.json.JSONArray _array )
+	protected JArray( final org.json.JSONArray _array )
 	{
 		array = _array ;
 	}
 
-	public static JSONArray construct()
+	public static JArray construct()
 	{
-		return new JSONArray() ;
+		return new JArray() ;
 	}
 
-	public static JSONArray construct( final String _source )
+	public static JArray construct( final String _source )
 	{
 		try
 		{
-			return new JSONArray( _source ) ;
+			return new JArray( _source ) ;
 		}
 		catch( org.json.JSONException ex )
 		{
@@ -42,19 +42,19 @@ public class JSONArray
 		return array.length() ;
 	}
 
-	public JSONArray put( final boolean _value )
+	public JArray put( final boolean _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	public JSONArray put( final int _value )
+	public JArray put( final int _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	public JSONArray put( final double _value )
+	public JArray put( final double _value )
 	{
 		try
 		{
@@ -68,27 +68,27 @@ public class JSONArray
 		return this ;
 	}
 
-	public JSONArray put( final long _value )
+	public JArray put( final long _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	public JSONArray put( final String _value )
+	public JArray put( final String _value )
 	{
 		array.put( _value ) ;
 		return this ;
 	}
 
-	public JSONArray put( final JSONObject _value )
+	public JArray put( final JObject _value )
 	{
-		array.put( ( ( JSONObject )_value ).object ) ;
+		array.put( ( ( JObject )_value ).object ) ;
 		return this ;
 	}
 
-	public JSONArray put( final JSONArray _value )
+	public JArray put( final JArray _value )
 	{
-		array.put( ( ( JSONArray )_value ).array ) ;
+		array.put( ( ( JArray )_value ).array ) ;
 		return this ;
 	}
 
@@ -142,7 +142,7 @@ public class JSONArray
 		return array.optString( _index, _default ) ;
 	}
 
-	public JSONObject getJSONObject( final int _index )
+	public JObject getJObject( final int _index )
 	{
 		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
 		if( obj == null )
@@ -150,10 +150,10 @@ public class JSONArray
 			return null ;
 		}
 
-		return new JSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	public JSONObject optJSONObject( final int _index, final JSONObject _default )
+	public JObject optJObject( final int _index, final JObject _default )
 	{
 		final org.json.JSONObject obj = array.optJSONObject( _index ) ;
 		if( obj == null )
@@ -161,10 +161,10 @@ public class JSONArray
 			return _default ;
 		}
 
-		return new JSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	public JSONArray getJSONArray( final int _index )
+	public JArray getJArray( final int _index )
 	{
 		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
 		if( arr == null )
@@ -172,10 +172,10 @@ public class JSONArray
 			return null ;
 		}
 
-		return new JSONArray( arr ) ;
+		return new JArray( arr ) ;
 	}
 
-	public JSONArray optJSONArray( final int _index, final JSONArray _default )
+	public JArray optJArray( final int _index, final JArray _default )
 	{
 		final org.json.JSONArray arr = array.optJSONArray( _index ) ;
 		if( arr == null )
@@ -183,7 +183,7 @@ public class JSONArray
 			return _default ;
 		}
 
-		return new JSONArray( arr ) ;
+		return new JArray( arr ) ;
 	}
 
 	public String toString()

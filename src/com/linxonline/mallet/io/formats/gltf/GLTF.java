@@ -8,8 +8,8 @@ import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.ByteInStream ;
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.JObject ;
+import com.linxonline.mallet.io.formats.json.JArray ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -31,13 +31,36 @@ public class GLTF
 		bin = _bin ;
 	}
 
-	public Shape createMesh( final String _name, final Tuple<String, Swivel>[] _attributes )
+	/**
+		Return the available meshe names within this gltf file.
+		You can use the index of the name with createMeshByIndex().
+	*/
+	public String[] getMeshNames()
+	{
+		final int size = header.getMeshSize() ;
+		final String[] names = new String[size] ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			final JChunk.Mesh mesh = header.getMesh( i ) ;
+			names[i] = mesh.name ;
+		}
+
+		return names ;
+	}
+
+	public Shape createMeshByIndex( final int _index, final Tuple<String, Swivel>[] _attributes )
+	{
+		final JChunk.Mesh mesh = header.getMesh( _index ) ;
+		return createShapeFromMesh( header, mesh, _attributes ) ;
+	}
+
+	public Shape createMeshByName( final String _name, final Tuple<String, Swivel>[] _attributes )
 	{
 		final int size = header.getMeshSize() ;
 		for( int i = 0; i < size; ++i )
 		{
 			final JChunk.Mesh mesh = header.getMesh( i ) ;
-			System.out.println( mesh.name ) ;
 			if( _name.equals( mesh.name ) == true )
 			{
 				return createShapeFromMesh( header, mesh, _attributes ) ;
@@ -339,13 +362,13 @@ public class GLTF
 		read = _in.readBytes( _data, _offset, length ) ;
 		if( read < length )
 		{
-			Logger.println( "Failed to read chunk data expected " + length + " bytes.", Logger.Verbosity.NORMAL ) ;
+			Logger.println( "Failed to read chunk data expected " + length + " bytes received: " + read + " instead.", Logger.Verbosity.NORMAL ) ;
 			return null ;
 		}
 
 		try
 		{
-			final JSONObject obj = JSONObject.construct( new String( _data, _offset, length, "UTF-8" ) ) ;
+			final JObject obj = JObject.construct( new String( _data, _offset, length, "UTF-8" ) ) ;
 			return new JChunk( _offset, length, type, obj ) ;
 		}
 		catch( UnsupportedEncodingException ex )
@@ -377,11 +400,6 @@ public class GLTF
 
 		_offset += 4 ;
 		read = _in.readBytes( _data, _offset, length ) ;
-		if( read < length )
-		{
-			Logger.println( "Failed to read chunk data expected " + length + " bytes.", Logger.Verbosity.NORMAL ) ;
-			return null ;
-		}
 
 		final byte[] data = ConvertBytes.newBytes( _data, _offset, length ) ;
 		return new BinChunk( _offset, length, type, data ) ;
@@ -393,29 +411,29 @@ public class GLTF
 		public final int length ;
 		public final int type ;
 
-		private final JSONObject obj ;
-		private final JSONArray bufferViews ;
-		private final JSONArray meshes ;
-		private final JSONArray accessors ;
+		private final JObject obj ;
+		private final JArray bufferViews ;
+		private final JArray meshes ;
+		private final JArray accessors ;
 
 		public JChunk( final int _offset,
 					   final int _length,
 					   final int _type,
-					   final JSONObject _obj )
+					   final JObject _obj )
 		{
 			offset = _offset ;
 			length = _length ;
 			type = _type ;
 
 			obj = _obj ;
-			bufferViews = obj.optJSONArray( "bufferViews", null ) ;
-			meshes = obj.optJSONArray( "meshes", null ) ;
-			accessors = obj.optJSONArray( "accessors", null ) ;
+			bufferViews = obj.optJArray( "bufferViews", null ) ;
+			meshes = obj.optJArray( "meshes", null ) ;
+			accessors = obj.optJArray( "accessors", null ) ;
 		}
 
 		public BufferView getBufferView( final int _index )
 		{
-			return new BufferView( bufferViews.optJSONObject( _index, null ) ) ;
+			return new BufferView( bufferViews.optJObject( _index, null ) ) ;
 		}
 
 		public int getBufferViewSize()
@@ -425,7 +443,7 @@ public class GLTF
 
 		public Mesh getMesh( final int _index )
 		{
-			return new Mesh( meshes.optJSONObject( _index, null ) ) ;
+			return new Mesh( meshes.optJObject( _index, null ) ) ;
 		}
 
 		public int getMeshSize()
@@ -435,7 +453,7 @@ public class GLTF
 
 		public Accessor getAccessor( final int _index )
 		{
-			return new Accessor( accessors.optJSONObject( _index, null ) ) ;
+			return new Accessor( accessors.optJObject( _index, null ) ) ;
 		}
 
 		public int getAccessorSize()
@@ -469,7 +487,7 @@ public class GLTF
 			public final int byteLength ;
 			public final int buffer ;
 
-			public BufferView( final JSONObject _obj )
+			public BufferView( final JObject _obj )
 			{
 				byteOffset = _obj.optInt( "byteOffset", -1 ) ;
 				byteLength = _obj.optInt( "byteLength", -1 ) ;
@@ -482,15 +500,15 @@ public class GLTF
 			public final String name ;
 			public final Primitive[] primitives ;
 
-			public Mesh( final JSONObject _obj )
+			public Mesh( final JObject _obj )
 			{
 				name = _obj.optString( "name", null ) ;
 
-				final JSONArray jPrimitives = _obj.optJSONArray( "primitives", null ) ;
+				final JArray jPrimitives = _obj.optJArray( "primitives", null ) ;
 				primitives = new Primitive[jPrimitives.length()] ;
 				for( int i = 0; i < primitives.length; ++i )
 				{
-					primitives[i] = new Primitive( jPrimitives.getJSONObject( i ) ) ;
+					primitives[i] = new Primitive( jPrimitives.getJObject( i ) ) ;
 				}
 			}
 		}
@@ -502,13 +520,13 @@ public class GLTF
 			public final int mode ;
 			public final Attribute[] attributes ;
 
-			public Primitive( final JSONObject _obj )
+			public Primitive( final JObject _obj )
 			{
 				indices = _obj.optInt( "indices", -1 ) ;
 				material = _obj.optInt( "material", -1 ) ;
 				mode = _obj.optInt( "mode", 4 ) ;
 
-				final JSONObject jAttributes = _obj.optJSONObject( "attributes", null ) ;
+				final JObject jAttributes = _obj.optJObject( "attributes", null ) ;
 				final String[] keys = jAttributes.keys() ;
 				attributes = new Attribute[keys.length] ;
 
@@ -553,7 +571,7 @@ public class GLTF
 			public final int count ;
 			public final String type ;
 
-			public Accessor( final JSONObject _obj )
+			public Accessor( final JObject _obj )
 			{
 				componentType = _obj.optInt( "componentType", -1 ) ;
 				bufferView = _obj.optInt( "bufferView", -1 ) ;

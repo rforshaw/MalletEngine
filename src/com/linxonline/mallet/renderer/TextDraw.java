@@ -13,9 +13,6 @@ public class TextDraw implements IUpdate
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;
 
-	private boolean dirty = false ;
-	private boolean hidden = false ;
-
 	public TextDraw()
 	{
 		this( "" ) ;
@@ -119,15 +116,5 @@ public class TextDraw implements IUpdate
 	public int getEnd()
 	{
 		return endIndex ;
-	}
-
-	/**
-		Force the draw objects rendering state to be updated,
-		irrspective of whether the update() thinks the state 
-		needs to be updated.
-	*/
-	public void makeDirty()
-	{
-		draw.makeDirty() ;
 	}
 }

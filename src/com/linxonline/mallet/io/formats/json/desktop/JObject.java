@@ -6,21 +6,21 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.StringInStream ;
 import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
-public class JSONObject
+public class JObject
 {
 	public final org.json.JSONObject object ;
 
-	protected JSONObject()
+	protected JObject()
 	{
 		object = new org.json.JSONObject() ;
 	}
 
-	protected JSONObject( final String _source ) throws org.json.JSONException
+	protected JObject( final String _source ) throws org.json.JSONException
 	{
 		object = new org.json.JSONObject( _source ) ;
 	}
 
-	protected JSONObject( final org.json.JSONObject _object )
+	protected JObject( final org.json.JSONObject _object )
 	{
 		object = _object ;
 	}
@@ -28,20 +28,20 @@ public class JSONObject
 	/**
 		Create a blank JSON Object
 	*/
-	public static JSONObject construct()
+	public static JObject construct()
 	{
-		return new JSONObject() ;
+		return new JObject() ;
 	}
 
 	/**
 		Create a JSON Object/s from file stream.
 	*/
-	public static JSONObject construct( final FileStream _file )
+	public static JObject construct( final FileStream _file )
 	{
 		final StringInStream stream = _file.getStringInStream() ;
 		if( stream == null )
 		{
-			return new JSONObject() ;
+			return new JObject() ;
 		}
 
 		final StringBuilder builder = new StringBuilder() ;
@@ -52,7 +52,7 @@ public class JSONObject
 		}
 
 		stream.close() ;
-		return JSONObject.construct( builder.toString() ) ;
+		return JObject.construct( builder.toString() ) ;
 	}
 
 	public static boolean construct( final FileStream _file, final ConstructCallback _callback )
@@ -75,7 +75,7 @@ public class JSONObject
 
 			public void end()
 			{
-				_callback.callback( JSONObject.construct( builder.toString() ) ) ;
+				_callback.callback( JObject.construct( builder.toString() ) ) ;
 			}
 		}, 1 ) ;
 	}
@@ -83,11 +83,11 @@ public class JSONObject
 	/**
 		Create a JSON Object/s from source.
 	*/
-	public static JSONObject construct( final String _source )
+	public static JObject construct( final String _source )
 	{
 		try
 		{
-			return new JSONObject( _source ) ;
+			return new JObject( _source ) ;
 		}
 		catch( org.json.JSONException ex )
 		{
@@ -115,7 +115,7 @@ public class JSONObject
 		return object.has( _key ) ;
 	}
 
-	public JSONObject put( final String _key, final boolean _value )
+	public JObject put( final String _key, final boolean _value )
 	{
 		try
 		{
@@ -129,7 +129,7 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final int _value )
+	public JObject put( final String _key, final int _value )
 	{
 		try
 		{
@@ -143,7 +143,7 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final double _value )
+	public JObject put( final String _key, final double _value )
 	{
 		try
 		{
@@ -157,7 +157,7 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final long _value )
+	public JObject put( final String _key, final long _value )
 	{
 		try
 		{
@@ -171,7 +171,7 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final String _value )
+	public JObject put( final String _key, final String _value )
 	{
 		try
 		{
@@ -185,11 +185,11 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final JSONObject _value )
+	public JObject put( final String _key, final JObject _value )
 	{
 		try
 		{
-			object.put( _key, ( ( JSONObject )_value ).object ) ;
+			object.put( _key, ( ( JObject )_value ).object ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )
@@ -199,11 +199,11 @@ public class JSONObject
 		}
 	}
 
-	public JSONObject put( final String _key, final JSONArray _value )
+	public JObject put( final String _key, final JArray _value )
 	{
 		try
 		{
-			object.put( _key, ( ( JSONArray )_value ).array ) ;
+			object.put( _key, ( ( JArray )_value ).array ) ;
 			return this ;
 		}
 		catch( org.json.JSONException ex )
@@ -263,7 +263,7 @@ public class JSONObject
 		return object.optString( _key, _default ) ;
 	}
 
-	public JSONObject getJSONObject( final String _key )
+	public JObject getJObject( final String _key )
 	{
 		final org.json.JSONObject obj = object.optJSONObject( _key ) ;
 		if( obj == null )
@@ -271,21 +271,21 @@ public class JSONObject
 			return null ;
 		}
 
-		return new JSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	public JSONObject optJSONObject( final String _key, final JSONObject _default )
+	public JObject optJObject( final String _key, final JObject _default )
 	{
 		final org.json.JSONObject obj = object.optJSONObject( _key ) ;
 		if( obj == null )
 		{
-			return ( JSONObject )_default ;
+			return ( JObject )_default ;
 		}
 
-		return new JSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	public JSONArray getJSONArray( final String _key )
+	public JArray getJArray( final String _key )
 	{
 		final org.json.JSONArray array = object.optJSONArray( _key ) ;
 		if( array == null )
@@ -293,10 +293,10 @@ public class JSONObject
 			return null ;
 		}
 
-		return new JSONArray( array ) ;
+		return new JArray( array ) ;
 	}
 
-	public JSONArray optJSONArray( final String _key, final JSONArray _default )
+	public JArray optJArray( final String _key, final JArray _default )
 	{
 		final org.json.JSONArray array = object.optJSONArray( _key ) ;
 		if( array == null )
@@ -304,7 +304,7 @@ public class JSONObject
 			return _default ;
 		}
 
-		return new JSONArray( array ) ;
+		return new JArray( array ) ;
 	}
 
 	public String toString()
@@ -327,6 +327,6 @@ public class JSONObject
 
 	public interface ConstructCallback
 	{
-		public void callback( JSONObject _object ) ;
+		public void callback( JObject _object ) ;
 	}
 }

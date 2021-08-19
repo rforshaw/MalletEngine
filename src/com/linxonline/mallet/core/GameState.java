@@ -617,8 +617,7 @@ public class GameState extends State
 			txt.append( "fps" ) ;
 
 			_draw.setRange( 0, txt.length() ) ;
-			_draw.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 
 		private void updateDrawMS( final TextDraw _draw, final double _dt )
@@ -629,8 +628,7 @@ public class GameState extends State
 			txt.append( "ms" ) ;
 
 			_draw.setRange( 0, txt.length() ) ;
-			_draw.makeDirty() ;
-			updater.makeDirty() ;
+			updater.forceUpdate() ;
 		}
 
 		public TextDraw[] getDraws()

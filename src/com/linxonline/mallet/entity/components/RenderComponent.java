@@ -12,7 +12,7 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.DrawUpdater ;
 import com.linxonline.mallet.renderer.DrawInstancedUpdater ;
 import com.linxonline.mallet.renderer.ABuffer ;
@@ -51,13 +51,13 @@ public class RenderComponent extends Component
 									final boolean _ui,
 									final int _order )
 	{
-		final Shape shape = _draw.getShape() ;
+		final IShape shape = _draw.getShape() ;
 		return DrawUpdater.getOrCreate( _world, _program, shape, _ui, _order ) ;
 	}
 
 	public DrawInstancedUpdater getInstancedUpdater( final World _world,
 													 final Program _program,
-													 final Shape _shape,
+													 final IShape _shape,
 													 final boolean _ui,
 													 final int _order )
 	{

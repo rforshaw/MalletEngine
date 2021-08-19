@@ -17,11 +17,10 @@ public class GUIPanelDraw extends GUIDraw
 		public void slot( final UIElement _layout )
 		{
 			final Draw draw = getDraw() ;
-			Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
+			Shape.updatePlaneUV( ( Shape )draw.getShape(), rollover.min, rollover.max ) ;
 			final DrawUpdater updater = getUpdater() ;
 			if( updater != null )
 			{
-				draw.makeDirty() ;
 				updater.makeDirty() ;
 			}
 		}
@@ -33,11 +32,10 @@ public class GUIPanelDraw extends GUIDraw
 		public void slot( final UIElement _layout )
 		{
 			final Draw draw = getDraw() ;
-			Shape.updatePlaneUV( draw.getShape(), neutral.min, neutral.max ) ;
+			Shape.updatePlaneUV( ( Shape )draw.getShape(), neutral.min, neutral.max ) ;
 			final DrawUpdater updater = getUpdater() ;
 			if( updater != null )
 			{
-				draw.makeDirty() ;
 				updater.makeDirty() ;
 			}
 		}
@@ -67,11 +65,10 @@ public class GUIPanelDraw extends GUIDraw
 	public InputEvent.Action mouseReleased( final InputEvent _input )
 	{
 		final Draw draw = getDraw() ;
-		Shape.updatePlaneUV( draw.getShape(), rollover.min, rollover.max ) ;
+		Shape.updatePlaneUV( ( Shape )draw.getShape(), rollover.min, rollover.max ) ;
 		final DrawUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
-			draw.makeDirty() ;
 			updater.makeDirty() ;
 		}
 
@@ -88,11 +85,10 @@ public class GUIPanelDraw extends GUIDraw
 	public InputEvent.Action mousePressed( final InputEvent _input )
 	{
 		final Draw draw = getDraw() ;
-		Shape.updatePlaneUV( draw.getShape(), clicked.min, clicked.max ) ;
+		Shape.updatePlaneUV( ( Shape )draw.getShape(), clicked.min, clicked.max ) ;
 		final DrawUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
-			draw.makeDirty() ;
 			updater.makeDirty() ;
 		}
 

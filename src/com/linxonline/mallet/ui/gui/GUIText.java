@@ -133,8 +133,6 @@ public class GUIText extends GUIComponent
 			drawText.setOffset( offset.x, offset.y, offset.z ) ;
 
 			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
-
-			drawText.makeDirty() ;
 			updater.forceUpdate() ;
 		}
 	}

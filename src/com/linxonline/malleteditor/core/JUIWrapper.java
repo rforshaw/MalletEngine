@@ -8,8 +8,8 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.StringOutStream ;
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.JObject ;
+import com.linxonline.mallet.io.formats.json.JArray ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
@@ -30,7 +30,7 @@ public class JUIWrapper
 		}
 
 		final IAbstractModel model = _wrapper.getMeta() ;
-		final JSONObject ui = JUIWrapper.createJSON( _wrapper, model.root() ) ;
+		final JObject ui = JUIWrapper.createJSON( _wrapper, model.root() ) ;
 
 		final StringOutStream stream = file.getStringOutStream() ;
 		stream.writeLine( ui.toString( 2 ) ) ;
@@ -39,9 +39,9 @@ public class JUIWrapper
 		return true ;
 	}
 
-	private static JSONObject createJSON( final UIWrapper _wrapper, final UIModelIndex _index )
+	private static JObject createJSON( final UIWrapper _wrapper, final UIModelIndex _index )
 	{
-		final JSONObject jsonObj = JSONObject.construct() ;
+		final JObject jsonObj = JObject.construct() ;
 
 		final UIElement.Meta meta = _wrapper.getMeta() ;
 		jsonObj.put( "TYPE", meta.getElementType() ) ;
@@ -50,7 +50,7 @@ public class JUIWrapper
 		final List<UIWrapper> children = _wrapper.getChildren() ;
 		if( children != null )
 		{
-			final JSONArray jsonChildren = JSONArray.construct() ;
+			final JArray jsonChildren = JArray.construct() ;
 			for( final UIWrapper child : children )
 			{
 				final IAbstractModel model = child.getMeta() ;
@@ -69,7 +69,7 @@ public class JUIWrapper
 				continue ;
 			}
 
-			final JSONObject jsonComp = JSONObject.construct() ;
+			final JObject jsonComp = JObject.construct() ;
 			jsonObj.put( type, jsonComp ) ;
 			addModelTo( component, component.root(), jsonComp ) ;
 		}
@@ -77,7 +77,7 @@ public class JUIWrapper
 		return jsonObj ;
 	}
 
-	private static void addModelTo( final UIAbstractModel _model, final UIModelIndex _index, final JSONObject _to )
+	private static void addModelTo( final UIAbstractModel _model, final UIModelIndex _index, final JObject _to )
 	{
 		final int rowCount = _model.rowCount( _index ) ;
 		final int columnCount = _model.columnCount( _index ) ;
@@ -93,7 +93,7 @@ public class JUIWrapper
 		}
 	}
 
-	private static void addVariantTo( final IVariant _variant, final JSONObject _to )
+	private static void addVariantTo( final IVariant _variant, final JObject _to )
 	{
 		switch( _variant.getType() )
 		{
@@ -145,7 +145,7 @@ public class JUIWrapper
 				else if( obj instanceof UIElement.UV )
 				{
 					final UIElement.UV uv = ( UIElement.UV )obj ;
-					final JSONObject jsonUV = JSONObject.construct() ;
+					final JObject jsonUV = JObject.construct() ;
 
 					_to.put( _variant.getName(), jsonUV ) ;
 					jsonUV.put( "MIN", uv.min.x + "," + uv.min.y ) ;
@@ -155,10 +155,10 @@ public class JUIWrapper
 				{
 					if( _to.has( "ALIGNMENT" ) == false )
 					{
-						_to.put( "ALIGNMENT", JSONObject.construct() ) ;
+						_to.put( "ALIGNMENT", JObject.construct() ) ;
 					}
 
-					final JSONObject jsonAlign = _to.getJSONObject( "ALIGNMENT" ) ;
+					final JObject jsonAlign = _to.getJObject( "ALIGNMENT" ) ;
 					final UI.Alignment align = ( UI.Alignment )obj ;
 					switch( _variant.getName() )
 					{
@@ -206,10 +206,10 @@ public class JUIWrapper
 			return null ;
 		}
 
-		return createWrapper( JSONObject.construct( stream ) ) ;
+		return createWrapper( JObject.construct( stream ) ) ;
 	}
 
-	public static UIWrapper createWrapper( final JSONObject _ui )
+	public static UIWrapper createWrapper( final JObject _ui )
 	{
 		final UIElement.Meta meta = JUI.createMeta( _ui ) ;
 		if( meta == null )
@@ -218,11 +218,11 @@ public class JUIWrapper
 		}
 	
 		final UIWrapper wrapper = new UIWrapper( meta ) ;
-		addChildren( _ui.optJSONArray( "CHILDREN", null ), wrapper ) ;
+		addChildren( _ui.optJArray( "CHILDREN", null ), wrapper ) ;
 		return wrapper ;
 	}
 
-	private static void addChildren( final JSONArray _children, final UIWrapper _wrapper )
+	private static void addChildren( final JArray _children, final UIWrapper _wrapper )
 	{
 		if( _children == null )
 		{
@@ -232,7 +232,7 @@ public class JUIWrapper
 		final int size = _children.length() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final JSONObject jChild = _children.getJSONObject( i ) ;
+			final JObject jChild = _children.getJObject( i ) ;
 			final UIWrapper child = createWrapper( jChild ) ;
 			if( child != null )
 			{

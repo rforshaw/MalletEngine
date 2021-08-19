@@ -10,7 +10,7 @@ import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawInstancedBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
-import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
@@ -163,7 +163,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 			int usedIndexByteSize = 0 ;
 			int usedVertexByteSize = 0 ;
 
-			final Shape shape = _buffer.getShape() ;
+			final IShape shape = _buffer.getShape() ;
 			final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
 			final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
 
@@ -286,7 +286,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 
-	private int uploadInstanceToRAM( final Shape _shape )
+	private int uploadInstanceToRAM( final IShape _shape )
 	{
 		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;

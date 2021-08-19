@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.io.reader.* ;
-import com.linxonline.mallet.io.formats.json.JSONObject ;
+import com.linxonline.mallet.io.formats.json.JObject ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
 
@@ -32,7 +32,7 @@ public class LanguageManager
 	private static final String LANGUAGE_DEFAULT = "en" ;
 	private static final String EMPTY_STRING = "" ;
 
-	private final Map<String, JSONObject> lookup = MalletMap.<String, JSONObject>newMap() ;
+	private final Map<String, JObject> lookup = MalletMap.<String, JObject>newMap() ;
 	private String languageFolder = "en" ;
 
 	public LanguageManager() {}
@@ -76,7 +76,7 @@ public class LanguageManager
 			return false ;
 		}
 
-		final JSONObject map = JSONObject.construct( stream ) ;
+		final JObject map = JObject.construct( stream ) ;
 		lookup.put( _namespace, map ) ;
 		return true ;
 	}
@@ -92,13 +92,13 @@ public class LanguageManager
 	**/
 	public String get( final String _namespace, final String _keyword )
 	{
-		final JSONObject map = lookup.get( _namespace ) ;
+		final JObject map = lookup.get( _namespace ) ;
 		if( map == null )
 		{
 			return _keyword ;
 		}
 
-		final JSONObject item = map.optJSONObject( _keyword, null ) ;
+		final JObject item = map.optJObject( _keyword, null ) ;
 		if( item == null )
 		{
 			return _keyword ;

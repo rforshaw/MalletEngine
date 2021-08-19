@@ -42,7 +42,7 @@ public class FrameBuffer
 						final int _width,  final int _height )
 	{
 		final String uid = UUID.randomUUID().toString() ;
-		System.out.println( uid ) ;
+		//System.out.println( uid ) ;
 
 		camera = CameraAssist.add( new Camera( uid ) ) ;
 		world = WorldAssist.add( new World( uid ) ) ;
@@ -61,13 +61,11 @@ public class FrameBuffer
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		frame.setPosition( _x, _y, _z ) ;
-		frame.makeDirty() ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		frame.setOffset( _x, _y, _z ) ;
-		frame.makeDirty() ;
 	}
 
 	public void setLength( final float _x, final float _y, final float _z )
@@ -84,8 +82,7 @@ public class FrameBuffer
 		CameraAssist.update( camera ) ;
 		WorldAssist.update( world ) ;
 
-		Shape.updatePlaneGeometry( frame.getShape(), _x, _y, _z ) ;
-		frame.makeDirty() ;
+		Shape.updatePlaneGeometry( ( Shape )frame.getShape(), _x, _y, _z ) ;;
 	}
 
 	public World getWorld()

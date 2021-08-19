@@ -163,20 +163,20 @@ public interface IShape
 	/**
 		Add the index to the shape.
 	*/
-	public void addIndex( final int _index ) ;
-	
+	//public void addIndex( final int _index ) ;
+
 	/**
 		Added the indices to the shape in the order 
 		they were passed in.
 	*/
-	public void addIndices( final int ... _index ) ;
+	//public void addIndices( final int ... _index ) ;
 
 	/**
 		Copy the vertex passed into the shape.
 		It does not retain the vertex object.
 		This allows _vertex to be reused.
 	*/
-	public void copyVertex( final Object[] _vertex ) ;
+	//public void copyVertex( final Object[] _vertex ) ;
 
 	/**
 		Copy the vertices passed into the shape.
@@ -184,7 +184,7 @@ public interface IShape
 		are stored in the order they were passed.
 		This allows _vertex to be reused.
 	*/
-	public void copyVertices( final Object[] ... _vertex ) ;
+	//public void copyVertices( final Object[] ... _vertex ) ;
 
 	/**
 		Copy the vertex specified at _index location, into 
@@ -193,7 +193,7 @@ public interface IShape
 		the correct composition for the operation to succeed.
 		Return null if unable to copy, else return the Object array.
 	*/
-	public Object[] copyVertexTo( final int _index, final Object[] _to ) ;
+	//public Object[] copyVertexTo( final int _index, final Object[] _to ) ;
 
 	/**
 		Copy the vertex specified at _index location, into 
@@ -202,7 +202,7 @@ public interface IShape
 		the correct composition for the operation to succeed.
 		Return null if unable to copy, else return the float array.
 	*/
-	public float[] copyVertexTo( final int _index, final float[] _to ) ;
+	//public float[] copyVertexTo( final int _index, final float[] _to ) ;
 
 	/**
 		Return the raw indices stored by this shape.

@@ -134,12 +134,12 @@ public class DrawInstancedUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawInstancedUpdater getOrCreate( final World _world,
 										   final Program _program,
-										   final Shape _shape,
+										   final IShape _shape,
 										   final boolean _ui,
 										   final int _order )
 	{
-		final Shape.Swivel[] swivel = _shape.getSwivel() ;
-		final Shape.Style style = _shape.getStyle() ;
+		final IShape.Swivel[] swivel = _shape.getSwivel() ;
+		final IShape.Style style = _shape.getStyle() ;
 	
 		DrawInstancedUpdater updater = DrawInstancedUpdater.get( _world, _program, swivel, style, _ui, _order ) ;
 		if( updater == null )
@@ -176,7 +176,7 @@ public class DrawInstancedUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawInstancedUpdater get( final World _world,
 											final Program _program,
-											final Shape _shape,
+											final IShape _shape,
 											final boolean _ui,
 											final int _order )
 	{
@@ -195,8 +195,8 @@ public class DrawInstancedUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawInstancedUpdater get( final World _world,
 											final Program _program,
-											final Shape.Swivel[] _swivel,
-											final Shape.Style _style,
+											final IShape.Swivel[] _swivel,
+											final IShape.Style _style,
 											final boolean _ui,
 											final int _order )
 	{
@@ -257,7 +257,7 @@ public class DrawInstancedUpdater implements IUpdater<Draw, GeometryBuffer>
 		return null ;
 	}
 
-	private static boolean isCompatibleSwivel( final Shape.Swivel[] _a, final Shape.Swivel[] _b )
+	private static boolean isCompatibleSwivel( final IShape.Swivel[] _a, final IShape.Swivel[] _b )
 	{
 		if( _a.length != _b.length )
 		{

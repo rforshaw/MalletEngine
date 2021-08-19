@@ -382,7 +382,7 @@ public class UIWrapper extends UIElement
 		{
 			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
 
-			final Shape shape = draw.getShape() ;
+			final Shape shape = ( Shape )draw.getShape() ;
 			if( shape != null )
 			{
 				GUI.updateColour( shape, colour ) ;
@@ -414,7 +414,7 @@ public class UIWrapper extends UIElement
 				updater.removeDynamics( draw ) ;
 			}
 
-			updater = DrawUpdater.getOrCreate( _world, program, draw.getShape(), true, getLayer() ) ;
+			updater = DrawUpdater.getOrCreate( _world, program, ( Shape )draw.getShape(), true, getLayer() ) ;
 			updater.addDynamics( draw ) ;
 		}
 
@@ -449,12 +449,11 @@ public class UIWrapper extends UIElement
 				final Vector3 position = getPosition() ;
 				final Vector3 offset = getOffset() ;
 				final Vector3 len = getLength() ;
-				Shape.updatePlaneGeometry( draw.getShape(), len ) ;
+				Shape.updatePlaneGeometry( ( Shape )draw.getShape(), len ) ;
 
 				draw.setPosition( position.x, position.y, position.z ) ;
 				draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-				draw.makeDirty() ;
 				updater.makeDirty() ;
 			}
 		}

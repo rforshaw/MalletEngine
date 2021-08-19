@@ -2,8 +2,8 @@ package com.linxonline.mallet.io.formats.sgeom ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.formats.json.JObject ;
+import com.linxonline.mallet.io.formats.json.JArray ;
 
 import com.linxonline.mallet.util.Logger ;
 
@@ -25,25 +25,25 @@ public class SGeom
 			return null ;
 		}
 
-		final JSONObject json = JSONObject.construct( stream ) ;
+		final JObject json = JObject.construct( stream ) ;
 
 		final Shape.Style style = Shape.Style.getStyleByString( json.optString( "style", null ) ) ;
 
-		final Shape.Swivel[] swivel = SGeom.constructSwivelOrder( json.getJSONArray( "swivel" ) ) ;
+		final Shape.Swivel[] swivel = SGeom.constructSwivelOrder( json.getJArray( "swivel" ) ) ;
 		if( swivel == null )
 		{
 			Logger.println( "No swivel order defined.", Logger.Verbosity.NORMAL ) ;
 			return null ;
 		}
 
-		final JSONArray vertices = json.getJSONArray( "vertices" ) ;
+		final JArray vertices = json.getJArray( "vertices" ) ;
 		if( vertices == null )
 		{
 			Logger.println( "No vertices defined.", Logger.Verbosity.NORMAL ) ;
 			return null ;
 		}
 
-		final JSONArray indices = json.getJSONArray( "indices" ) ;
+		final JArray indices = json.getJArray( "indices" ) ;
 		if( indices == null )
 		{
 			Logger.println( "No indices defined.", Logger.Verbosity.NORMAL ) ;
@@ -78,7 +78,7 @@ public class SGeom
 				vertex = new Object[swivel.length] ;
 			}
 
-			final JSONObject jVertex = vertices.getJSONObject( i ) ;
+			final JObject jVertex = vertices.getJObject( i ) ;
 			switch( swivel[swivelIndex] )
 			{
 				case POINT  :
@@ -133,7 +133,7 @@ public class SGeom
 		return shape ;
 	}
 
-	private static Shape.Swivel[] constructSwivelOrder( final JSONArray _swivel )
+	private static Shape.Swivel[] constructSwivelOrder( final JArray _swivel )
 	{
 		if( _swivel == null )
 		{

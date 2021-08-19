@@ -18,7 +18,15 @@ public class AndroidByteIn implements ByteInStream
 	{
 		try
 		{
-			return stream.read( _buffer, _offset, _length ) ;
+			int toRead = _length ;
+			int off = 0 ;
+			while( off < toRead )
+			{
+				final int read = stream.read( _buffer, _offset + off, toRead ) ;
+				off += read ;
+				toRead -= read ;
+			}
+			return _length ;
 		}
 		catch( IOException ex )
 		{

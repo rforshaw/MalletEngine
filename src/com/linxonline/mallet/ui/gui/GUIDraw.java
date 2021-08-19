@@ -51,7 +51,7 @@ public class GUIDraw extends GUIComponent
 		colour = ( _colour != null ) ? _colour : MalletColour.white() ;
 
 		final Draw draw = getDraw() ;
-		final Shape shape = draw.getShape() ;
+		final Shape shape = ( Shape )draw.getShape() ;
 		if( shape != null )
 		{
 			GUI.updateColour( shape, colour ) ;
@@ -59,7 +59,6 @@ public class GUIDraw extends GUIComponent
 
 		if( updater != null )
 		{
-			draw.makeDirty() ;
 			updater.forceUpdate() ;
 		}
 	}
@@ -89,7 +88,7 @@ public class GUIDraw extends GUIComponent
 	public void addDraws( final World _world )
 	{
 		final int layer = getLayer() ;
-		final Shape shape = draw.getShape() ;
+		final Shape shape = ( Shape )draw.getShape() ;
 
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
 		updater.addDynamics( draw ) ;
@@ -112,7 +111,7 @@ public class GUIDraw extends GUIComponent
 			updater.removeDynamics( draw ) ;
 		}
 
-		final Shape shape = draw.getShape() ;
+		final Shape shape = ( Shape )draw.getShape() ;
 		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
 		updater.addDynamics( draw ) ;
 	}
@@ -132,7 +131,7 @@ public class GUIDraw extends GUIComponent
 
 		if( updater != null && parent.isVisible() == true )
 		{
-			Shape.updatePlaneGeometry( draw.getShape(), length ) ;
+			Shape.updatePlaneGeometry( ( Shape )draw.getShape(), length ) ;
 
 			draw.setPosition( position.x, position.y, position.z ) ;
 			draw.setOffset( offset.x, offset.y, offset.z ) ;

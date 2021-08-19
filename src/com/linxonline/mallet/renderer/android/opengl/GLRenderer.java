@@ -20,9 +20,6 @@ import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.schema.SStruct ;
-import com.linxonline.mallet.util.schema.SArray ;
-import com.linxonline.mallet.util.schema.SNode ;
 
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;

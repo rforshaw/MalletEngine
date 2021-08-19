@@ -149,12 +149,15 @@ public class GLTextBuffer extends GLBuffer
 
 			final StringBuilder text = draw.getText() ;
 			final int start = draw.getStart() ;
-			final int end = draw.getEnd() ;
+			int end = draw.getEnd() ;
 
-			if( end > text.length() )
 			{
-				System.out.println( text ) ;
-				continue ;
+				final int length = text.length() ;
+				if( end > length )
+				{
+					System.out.println( "Stated end: " + end + " goes beyond length: " + length + " > " + text ) ;
+					end = length ;
+				}
 			}
 
 			final int initialIndexOffset = vertexIncrement / vertexStride ;

@@ -7,12 +7,11 @@ import java.lang.ref.WeakReference ;
 import com.linxonline.mallet.util.MalletList ;
 
 /**
-	A draw object can be added to multiple different 
-	buffers with each buffer doing a different task.
+	Update the Draw object state stored within the GeometryBuffers
+	attached to a particular DrawBuffer.
 
-	This DrawUpdater is designed to trigger the update 
-	of geometry buffers when the Draw object state is 
-	still influx.
+	NOTE: Don't use this DrawUpdater if you share GeometryBuffers and 
+	Draw objects within multiple DrawBuffers, updating will be incorrect.
 */
 public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 {
@@ -25,16 +24,15 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
-	public DrawUpdater( final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawUpdater( final DrawBuffer _draw )
 	{
-		this( Interpolation.LINEAR, _draw, _geometry ) ;
+		this( Interpolation.LINEAR, _draw ) ;
 	}
 
-	public DrawUpdater( Interpolation _mode, final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawUpdater( Interpolation _mode, final DrawBuffer _draw )
 	{
 		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
 		drawBuffer = _draw ;
-		buffers.add( _geometry ) ;
 	}
 
 	public void forceUpdate()
@@ -72,14 +70,14 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	public void addDynamics( final Draw ... _draws )
 	{
 		forceUpdate() ;
-		buffers.get( 0 ).addDraws( _draws ) ;
+		drawBuffer.getBuffer( 0 ).addDraws( _draws ) ;
 	}
 
 	@Override
 	public void removeDynamics( final Draw ... _draws )
 	{
 		forceUpdate() ;
-		buffers.get( 0 ).removeDraws( _draws ) ;
+		drawBuffer.getBuffer( 0 ).removeDraws( _draws ) ;
 	}
 
 	public DrawBuffer getDrawBuffer()
@@ -90,39 +88,46 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	@Override
 	public List<Draw> getDynamics()
 	{
-		return buffers.get( 0 ).getDraws() ;
+		return drawBuffer.getBuffer( 0 ).getDraws() ;
 	}
 
 	@Override
 	public List<GeometryBuffer> getBuffers()
 	{
-		return buffers ;
+		return drawBuffer.getBuffers() ;
 	}
 
 	@Override
 	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
 	{
-		boolean update = false ;
+		if( forceUpdate == false && dirty == false )
+		{
+			return ;
+		}
 
+		final List<GeometryBuffer> buffers = drawBuffer.getBuffers() ;
 		for( final GeometryBuffer buffer : buffers )
 		{
+			boolean updateBuffer = false ;
 			final List<Draw> draws = buffer.getDraws() ;
 			for( final Draw draw : draws )
 			{
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
-					update = true ;
+					updateBuffer = true ;
 				}
+			}
+
+			if( updateBuffer == true || forceUpdate == true )
+			{
+				// The Geometry Buffer will need to be updated if a 
+				// draw object state has changed, or if it's been forced.
+				_updated.add( buffer ) ;
 			}
 		}
 
-		if( forceUpdate == true )
-		{
-			_updated.addAll( buffers ) ;
-		}
-
 		forceUpdate = false ;
-		dirty = update ;
+		dirty = !_updated.isEmpty() ;
 	}
 
 	/**
@@ -134,7 +139,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawUpdater getOrCreate( final World _world,
 										   final Program _program,
-										   final Shape _shape,
+										   final IShape _shape,
 										   final boolean _ui,
 										   final int _order )
 	{
@@ -148,8 +153,8 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawUpdater getOrCreate( final World _world,
 										   final Program _program,
-										   final Shape.Swivel[] _swivel,
-										   final Shape.Style _style,
+										   final IShape.Swivel[] _swivel,
+										   final IShape.Style _style,
 										   final boolean _ui,
 										   final int _order )
 	{
@@ -159,7 +164,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 			final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
 			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style, _ui, _order ) ) ;
 
-			updater = DrawAssist.add( new DrawUpdater( buffer, geom ) ) ;
+			updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
 
 			_world.addBuffers( buffer ) ;
 			WorldAssist.update( _world ) ;
@@ -188,7 +193,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawUpdater get( final World _world,
 								   final Program _program,
-								   final Shape _shape,
+								   final IShape _shape,
 								   final boolean _ui,
 								   final int _order )
 	{
@@ -207,8 +212,8 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	*/
 	public static DrawUpdater get( final World _world,
 								   final Program _program,
-								   final Shape.Swivel[] _swivel,
-								   final Shape.Style _style,
+								   final IShape.Swivel[] _swivel,
+								   final IShape.Style _style,
 								   final boolean _ui,
 								   final int _order )
 	{
@@ -269,7 +274,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		return null ;
 	}
 
-	private static boolean isCompatibleSwivel( final Shape.Swivel[] _a, final Shape.Swivel[] _b )
+	private static boolean isCompatibleSwivel( final IShape.Swivel[] _a, final IShape.Swivel[] _b )
 	{
 		if( _a.length != _b.length )
 		{

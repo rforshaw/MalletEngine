@@ -72,6 +72,7 @@ public final class Entity
 		}
 
 		Logger.println( "Failed to add " + _component + " to entity.", Logger.Verbosity.MAJOR ) ;
+		throw new RuntimeException( "Failed to add component" ) ;
 	}
 
 	/**

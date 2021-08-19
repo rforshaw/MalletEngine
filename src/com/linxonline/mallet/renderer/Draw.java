@@ -14,9 +14,8 @@ public class Draw implements IUpdate
 	private static final int ROTATION = 6 ;
 	private static final int SCALE    = 9 ;
 
-	private boolean dirty = false ;
 	private boolean hidden = false ;
-	private Shape shape = null ;
+	private final IShape[] shapes ;
 	private MalletColour colour = null ;
 
 	// Each contain Position, Rotation, and Scale
@@ -42,6 +41,18 @@ public class Draw implements IUpdate
 				 final float _offX, final float _offY, final float _offZ,
 				 final float _rotX, final float _rotY, final float _rotZ )
 	{
+		this( new IShape[1],
+			  _posX, _posY, _posZ,
+			  _offX, _offY, _offZ,
+			  _rotX, _rotY, _rotZ ) ;
+	}
+
+	public Draw( final IShape[] _shapes,
+				 final float _posX, final float _posY, final float _posZ,
+				 final float _offX, final float _offY, final float _offZ,
+				 final float _rotX, final float _rotY, final float _rotZ )
+	{
+		shapes = _shapes ;
 		FloatBuffer.set( old, POSITION, _posX, _posY, _posZ ) ;
 		FloatBuffer.set( old, OFFSET, _offX, _offY, _offZ ) ;
 		FloatBuffer.set( old, ROTATION, _rotX, _rotY, _rotZ ) ;
@@ -58,6 +69,30 @@ public class Draw implements IUpdate
 		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
 	}
 
+	public IShape[] getShapes()
+	{
+		return shapes ;
+	}
+
+	/**
+		It's likely that the majority of Draw objects will 
+		contain only one shape.
+	*/
+	public IShape setShape( final Shape _shape )
+	{
+		shapes[0] = _shape ;
+		return _shape ;
+	}
+
+	/**
+		It's likely that the majority of Draw objects will 
+		contain only one shape.
+	*/
+	public IShape getShape()
+	{
+		return shapes[0] ;
+	}
+
 	public void setHidden( final boolean _hide )
 	{
 		hidden = _hide ;
@@ -66,17 +101,6 @@ public class Draw implements IUpdate
 	public boolean isHidden()
 	{
 		return hidden ;
-	}
-
-	public Shape setShape( final Shape _shape )
-	{
-		shape = _shape ;
-		return shape ;
-	}
-
-	public Shape getShape()
-	{
-		return shape ;
 	}
 
 	public MalletColour setColour( final MalletColour _colour )
@@ -153,11 +177,15 @@ public class Draw implements IUpdate
 		return FloatBuffer.fill( present, _fill, SCALE ) ;
 	}
 
+	/**
+		Update the draw object state.
+		Returns true if the state has changed, false if the 
+		state has not changed.
+	*/
 	@Override
 	public boolean update( Interpolation _mode, final int _diff, final int _iteration )
 	{
-		boolean update = dirty ;
-		dirty = false ;
+		boolean update = false ;
 
 		// Position, Rotation, and Scale should always 
 		// be updated even if the data is not being uploaded 
@@ -172,6 +200,7 @@ public class Draw implements IUpdate
 			case NONE   :
 			default     :
 			{
+				update = true ;
 				FloatBuffer.copy( future, old ) ;
 				FloatBuffer.copy( future, present ) ;
 				break ;
@@ -179,15 +208,5 @@ public class Draw implements IUpdate
 		}
 
 		return update ;
-	}
-
-	/**
-		Force the draw objects rendering state to be updated,
-		irrspective of whether the update() thinks the state 
-		needs to be updated.
-	*/
-	public void makeDirty()
-	{
-		dirty = true ;
 	}
 }

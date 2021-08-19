@@ -42,8 +42,7 @@ public class GUIDrawEdge extends GUIDraw
 			draw.setPosition( position.x, position.y, position.z ) ;
 			draw.setOffset( offset.x, offset.y, offset.z ) ;
 
-			GUI.updateEdge( draw.getShape(), getLength(), edge ) ;
-			draw.makeDirty() ;
+			GUI.updateEdge( ( Shape )draw.getShape(), getLength(), edge ) ;
 			updater.forceUpdate() ;
 		}
 	}

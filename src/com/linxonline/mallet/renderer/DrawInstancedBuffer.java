@@ -21,11 +21,11 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public class DrawInstancedBuffer extends DrawBuffer
 {
-	private final Shape shape ;
+	private final IShape shape ;
 	private final String storageName ;
 
 	public DrawInstancedBuffer( final Program _program,
-								final Shape _shape,
+								final IShape _shape,
 								final boolean _ui,
 								final int _order )
 	{
@@ -33,7 +33,7 @@ public class DrawInstancedBuffer extends DrawBuffer
 	}
 
 	public DrawInstancedBuffer( final Program _program,
-								final Shape _shape,
+								final IShape _shape,
 								final boolean _ui,
 								final int _order,
 								final String _storageName )
@@ -43,7 +43,7 @@ public class DrawInstancedBuffer extends DrawBuffer
 		storageName = _storageName ;
 	}
 
-	public Shape getShape()
+	public IShape getShape()
 	{
 		return shape ;
 	}

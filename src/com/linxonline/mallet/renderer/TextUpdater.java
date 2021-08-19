@@ -100,18 +100,20 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 	@Override
 	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
 	{
-		boolean update = false ;
+		if( forceUpdate == false && dirty == false )
+		{
+			return ;
+		}
 
 		for( final TextBuffer buffer : buffers )
 		{
-			boolean bufferUpdate = false ;
-
+			boolean updateBuffer = false ;
 			final List<TextDraw> draws = buffer.getTextDraws() ;
 			for( final TextDraw draw : draws )
 			{
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
-					bufferUpdate = true ;
+					updateBuffer = true ;
 				}
 			}
 
@@ -119,15 +121,14 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 			// list if draw state has changed, or if the Updater 
 			// wants to force an update due to draws being removed 
 			// or added.
-			if( bufferUpdate == true || forceUpdate == true )
+			if( updateBuffer == true || forceUpdate == true )
 			{
-				update = ( bufferUpdate == true ) ? true : update ;
 				_updated.add( buffer ) ;
 			}
 		}
 
 		forceUpdate = false ;
-		dirty = update ;
+		dirty = !_updated.isEmpty() ;
 	}
 
 	/**

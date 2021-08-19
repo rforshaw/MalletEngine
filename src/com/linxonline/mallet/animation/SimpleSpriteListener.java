@@ -66,7 +66,7 @@ public class SimpleSpriteListener implements SpriteAnimations.IListener
 		_next.getMinUV( min ) ;
 		_next.getMaxUV( max ) ;
 
-		Shape.updatePlaneUV( draw.getShape(), min, max ) ;
+		Shape.updatePlaneUV( ( Shape )draw.getShape(), min, max ) ;
 		updater.forceUpdate() ;
 	}
 

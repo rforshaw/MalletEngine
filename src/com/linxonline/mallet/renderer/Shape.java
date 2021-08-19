@@ -53,23 +53,11 @@ public class Shape implements IShape
 				_shape.getIndicesSize(),
 				_shape.getVerticesSize() ) ;
 
-		// We've got all the information we need to make this a clean copy.
-		// This should work even if the implementation was changed 
-		// halfway through.
-		final Swivel[] sw = _shape.getSwivel() ;
-		final int indexSize = _shape.getIndicesSize() ;
-		final int vertexSize = _shape.getVerticesSize() ;
+		final int[] srcIndices = _shape.getRawIndices() ;
+		final float[] srcVertices = _shape.getRawVertices() ;
 
-		final Object[] vertex = Swivel.createVert( sw ) ;
-		for( int i = 0; i < vertexSize; i++ )
-		{
-			copyVertex( _shape.copyVertexTo( i, vertex ) ) ;
-		}
-
-		for( int i = 0; i < indexSize; i++ )
-		{
-			addIndex( _shape.getIndex( i ) ) ;
-		}
+		System.arraycopy( srcIndices, 0, indicies, 0, srcIndices.length ) ;
+		System.arraycopy( srcVertices, 0, verticies, 0, srcVertices.length ) ;
 	}
 
 	/**
@@ -108,7 +96,6 @@ public class Shape implements IShape
 		Adding more vertices than getVerticesSize() will result in 
 		undefined behaviour.
 	*/
-	@Override
 	public void copyVertex( final Object[] _vertex )
 	{
 		for( int i = 0; i < swivel.length; i++ )
@@ -140,7 +127,6 @@ public class Shape implements IShape
 		}
 	}
 
-	@Override
 	public void copyVertices( final Object[] ... _vertices )
 	{
 		for( final Object[] vertex : _vertices )
@@ -154,7 +140,6 @@ public class Shape implements IShape
 		Use Swivel.createVert() to build a valid vertex object 
 		for the Swivel defined by the shape. 
 	*/
-	@Override
 	public Object[] copyVertexTo( final int _index, final Object[] _vertex )
 	{
 		if( _vertex.length != swivel.length )
@@ -192,7 +177,6 @@ public class Shape implements IShape
 		return _vertex ;
 	}
 
-	@Override
 	public float[] copyVertexTo( final int _index, final float[] _to )
 	{
 		int start = _index * swivelFloatSize ;
@@ -744,189 +728,5 @@ public class Shape implements IShape
 		_plane.setVector2( 3, 2, _uv[2], _uv[1] ) ;
 
 		return _plane ;
-	}
-
-	/**
-		Combine an array of shape objects into 1 shape object.
-		Ensure all the shapes being combined have the same style.
-		This is a convience function to improve rendering performance, 
-		instead of multiple draw calls per shape.
-		Constructing multiple shapes and then combining them is slow 
-		and memory intensive.
-	*/
-	public static Shape combine( final Shape ... _shapes )
-	{
-		int totalIndicies = 0 ;
-		int totalPoints = 0 ;
-
-		for( int i = 0; i < _shapes.length; i++ )
-		{
-			totalIndicies += _shapes[i].getIndicesSize() ;
-			totalPoints += _shapes[i].getVerticesSize() ;
-		}
-
-		final Shape combined = new Shape( _shapes[0].getStyle(), _shapes[0].getSwivel(), totalIndicies, totalPoints ) ;
-		int indexOffset = 0 ;
-
-		for( int i = 0; i < _shapes.length; i++ )
-		{
-			final Shape shape = _shapes[i] ;
-
-			final Swivel[] swivel = shape.getSwivel() ;
-			final int indexSize = shape.getIndicesSize() ;
-			for( int j = 0; j < indexSize; j++ )
-			{
-				combined.addIndex( indexOffset + shape.getIndex( j ) ) ;
-			}
-
-			final Object[] vertex = Swivel.createVert( swivel ) ;
-			final int size = shape.getVerticesSize() ;
-
-			for( int j = 0; j < size; j++ )
-			{
-				combined.copyVertex( shape.copyVertexTo( j, vertex ) ) ;
-			}
-
-			indexOffset += size ;
-		}
-
-		return combined ;
-	}
-
-	/**
-		Return a shape object that references the 
-		vertex and colour arrays of _shape.
-	*/
-	public static Shape triangulate( final Shape _shape )
-	{
-		if( _shape.getIndicesSize() <= 3 )
-		{
-			return new Shape( _shape ) ;
-		}
-
-		final Swivel[] swivel = _shape.getSwivel() ;
-		final Style style = _shape.getStyle() ;
-
-		final List<Integer> tempIndicies = constructTriangulatedIndex( _shape ) ;
-		final int indexSize = tempIndicies.size() ;
-		final int vertexSize = _shape.getVerticesSize() ;
-
-		final Shape triangulated = new Shape( style, swivel, indexSize, vertexSize ) ;
-		for( int i = 0; i < indexSize; i++ )
-		{
-			triangulated.addIndex( tempIndicies.get( i ) ) ;
-		}
-
-		final Object[] vertex = Swivel.createVert( swivel ) ;
-		for( int i = 0; i < vertexSize; i++ )
-		{
-			triangulated.copyVertex( _shape.copyVertexTo( i, vertex ) ) ;
-		}
-
-		return triangulated ;
-	}
-
-	/**
-		Construct a new index array that triangulates 
-		the points stored in _shape.points.
-		The point and colour array are not modified.
-	*/
-	private static List<Integer> constructTriangulatedIndex( final Shape _shape )
-	{
-		final Swivel[] swivel = _shape.getSwivel() ;
-	
-		final int indexSize = _shape.getIndicesSize() ;
-		final List<Integer> indicies = MalletList.<Integer>newList( indexSize ) ;
-		for( int i = 0; i < indexSize; i++ )
-		{
-			indicies.add( _shape.getIndex( i ) ) ;
-		}
-
-		final List<Integer> newIndicies = MalletList.<Integer>newList()  ;
-		final int swivelPointIndex = Swivel.getSwivelPointIndex( swivel ) ;
-		int size = indicies.size() ;
-
-		final Vector3 previous = new Vector3() ;
-		final Vector3 current = new Vector3() ;
-		final Vector3 next = new Vector3() ;
-
-		while( size >= 3 )
-		{
-			for( int i = 1; i < size - 1; i++ )
-			{
-				final int previousIndex = indicies.get( i - 1 ) ;
-				final int currentIndex = indicies.get( i ) ;
-				final int nextIndex = indicies.get( i + 1 ) ;
-
-				_shape.getVector3( previousIndex, swivelPointIndex, previous ) ;
-				_shape.getVector3( currentIndex, swivelPointIndex, current ) ;
-				_shape.getVector3( nextIndex, swivelPointIndex, next ) ;
-
-				if( isInteriorVertex( current, previous, next ) == true &&
-					isTriangleEmpty( currentIndex, previousIndex, nextIndex,
-									 current, previous, next, indicies, _shape ) == true )
-				{
-					newIndicies.add( previousIndex ) ;
-					newIndicies.add( currentIndex ) ;
-					newIndicies.add( nextIndex ) ;
-
-					indicies.remove( i ) ;
-					break ;
-				}
-			}
-
-			size = indicies.size() ;
-		}
-
-		return newIndicies ;
-	}
-
-	private static boolean isInteriorVertex( final Vector3 _current, final Vector3 _previous, final Vector3 _next )
-	{
-		//final float area1 = ( _previous.x * _current.y ) - ( _previous.y * _current.x ) ;
-		//final float area2 = ( _next.x * _current.y ) - ( _next.y * _current.x ) ;
-		final Vector3 area1 = Vector3.cross( _previous, _current ) ;
-		final Vector3 area2 = Vector3.cross( _next, _current ) ;
-		return area1.length() >= 0.0f && area2.length() >= 0.0f ;
-	}
-
-	private static boolean isTriangleEmpty( final int _currentIndex,
-											final int _previousIndex,
-											final int _nextIndex,
-											final Vector3 _current,
-											final Vector3 _previous,
-											final Vector3 _next,
-											final List<Integer> _indicies,
-											final Shape _shape )
-	{
-		final Swivel[] swivel = _shape.getSwivel() ;
-
-		final Vector3 point = new Vector3() ;
-		final int swivelPointIndex = Swivel.getSwivelPointIndex( swivel ) ;
-		final int size = _indicies.size() ; 
-
-		for( int i = 0; i < size; i++ )
-		{
-			final int index = _indicies.get( i ) ;
-			if( index != _currentIndex && index != _previousIndex && index != _nextIndex )
-			{
-				_shape.getVector3( index, swivelPointIndex, point ) ;
-				final boolean b1 = sign( point, _current, _previous ) < 0.0f ;
-				final boolean b2 = sign( point, _current, _next ) < 0.0f ;
-				final boolean b3 = sign( point, _previous, _next ) < 0.0f ;
-
-				if( ( b1 == b2 ) && ( b2 == b3 ) )
-				{
-					return false ;
-				}
-			}
-		}
-
-		return true ;
-	}
-
-	private static float sign( final Vector3 _p1, final Vector3 _p2, final Vector3 _p3 )
-	{
-		return ( _p1.x - _p3.x ) * ( _p2.y - _p3.y ) - ( _p2.x - _p3.x ) * ( _p1.y - _p3.y ) ;
 	}
 }
