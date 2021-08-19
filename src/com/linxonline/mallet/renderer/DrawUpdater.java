@@ -35,6 +35,7 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		drawBuffer = _draw ;
 	}
 
+	@Override
 	public void forceUpdate()
 	{
 		forceUpdate = true ;
@@ -105,20 +106,21 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 			return ;
 		}
 
+		dirty = false ;
+
 		final List<GeometryBuffer> buffers = drawBuffer.getBuffers() ;
 		for( final GeometryBuffer buffer : buffers )
 		{
-			boolean updateBuffer = false ;
 			final List<Draw> draws = buffer.getDraws() ;
 			for( final Draw draw : draws )
 			{
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
-					updateBuffer = true ;
+					dirty = true ;
 				}
 			}
 
-			if( updateBuffer == true || forceUpdate == true )
+			if( forceUpdate == true )
 			{
 				// The Geometry Buffer will need to be updated if a 
 				// draw object state has changed, or if it's been forced.
@@ -127,7 +129,6 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		}
 
 		forceUpdate = false ;
-		dirty = !_updated.isEmpty() ;
 	}
 
 	/**

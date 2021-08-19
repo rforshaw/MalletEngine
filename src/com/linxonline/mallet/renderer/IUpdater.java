@@ -4,6 +4,7 @@ import java.util.List ;
 
 public interface IUpdater<D extends IUpdate, B extends ABuffer>
 {
+	public void forceUpdate() ;
 	public void makeDirty() ;
 	public boolean isDirty() ;
 

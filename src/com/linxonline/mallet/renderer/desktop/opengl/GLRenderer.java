@@ -781,11 +781,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		for( final IUpdater<?, Storage> updater : storageUpdaters )
 		{
-			if( updater.isDirty() == false )
-			{
-				continue ;
-			}
-
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
@@ -795,7 +790,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
 					if( storage.update( ( Storage )buffer ) == false )
 					{
-						updater.makeDirty() ;
+						updater.forceUpdate() ;
 					}
 				}
 				buffersToUpdate.clear() ;
@@ -811,11 +806,6 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 
 		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
 		{
-			if( updater.isDirty() == false )
-			{
-				continue ;
-			}
-
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
@@ -824,7 +814,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				{
 					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
 					{
-						updater.makeDirty() ;
+						updater.forceUpdate() ;
 					}
 				}
 				buffersToUpdate.clear() ;
