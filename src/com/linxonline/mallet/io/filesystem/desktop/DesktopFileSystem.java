@@ -136,7 +136,7 @@ public class DesktopFileSystem implements FileSystem
 			builder.append( "share" ) ;
 			builder.append( File.separator ) ;
 		}
-		else if( os.indexOf( "win" ) >= 0 )
+		else if( os.indexOf( "Win" ) >= 0 )
 		{
 			builder.append( "AppData" ) ;
 			builder.append( File.separator ) ;

@@ -20,13 +20,19 @@ public class AndroidByteIn implements ByteInStream
 		{
 			int toRead = _length ;
 			int off = 0 ;
-			while( off < toRead )
+			while( toRead > 0 )
 			{
 				final int read = stream.read( _buffer, _offset + off, toRead ) ;
+				if( read == -1 )
+				{
+					break ;
+				}
+
 				off += read ;
 				toRead -= read ;
 			}
-			return _length ;
+
+			return off ;
 		}
 		catch( IOException ex )
 		{

@@ -140,7 +140,7 @@ public class AndroidFile implements FileStream
 		int length = 0 ;
 		final byte[] buffer = new byte[48] ;
 
-		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
+		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) > 0 )
 		{
 			out.writeBytes( buffer, 0, length ) ;
 		}

@@ -9,6 +9,7 @@ public class Home
 	public Home( final String _projectName )
 	{
 		homeDirectory = GlobalFileSystem.getHomeDirectory( _projectName ) ;
+		System.out.println( "Setting up home: " + homeDirectory ) ;
 	}
 
 	public boolean copy( final Tuple<String, String> ... _paths )
