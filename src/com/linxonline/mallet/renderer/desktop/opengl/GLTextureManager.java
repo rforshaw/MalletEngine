@@ -27,6 +27,14 @@ import com.linxonline.mallet.renderer.* ;
 public class GLTextureManager extends AbstractManager<GLImage>
 {
 	/**
+		Limit the number of textures that can be loaded
+		to the GPU on any one render cycle.
+		This should allow the engine to be responsive
+		if lots of textures are loaded in one go.
+	*/
+	private static final int TEXTURE_BIND_LIMIT = 1 ;
+
+	/**
 		When loading a texture the TextureManager will stream the 
 		image content a-synchronously.
 		To ensure the textures are added safely to resources we 
@@ -45,6 +53,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
 	protected int imageFormat = MGL.GL_RGBA ;
+	private int bindCount = 0 ;
 
 	public GLTextureManager()
 	{
@@ -73,6 +82,11 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
+	public void resetBindCount()
+	{
+		bindCount = 0 ;
+	}
+
 	@Override
 	public GLImage get( final String _file )
 	{
@@ -82,13 +96,10 @@ public class GLTextureManager extends AbstractManager<GLImage>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			if( toBind.isEmpty() == false )
+			while( toBind.isEmpty() == false && bindCount++ < TEXTURE_BIND_LIMIT  )
 			{
-				for( final Tuple<String, BufferedImage> tuple : toBind )
-				{
-					put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
-				}
-				toBind.clear() ;
+				final Tuple<String, BufferedImage> tuple = toBind.remove( toBind.size() - 1 ) ;
+				put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
 			}
 		}
 

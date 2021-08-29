@@ -189,6 +189,11 @@ public class AndroidZipFile implements FileStream
 		return false ;
 	}
 
+	public String[] list()
+	{
+		throw new RuntimeException( "Android Zip File does not implement list()." ) ;
+	}
+
 	/**
 		Return the File size of this FileStream.
 	*/

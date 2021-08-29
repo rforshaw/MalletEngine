@@ -157,6 +157,18 @@ public class AndroidAssetFile implements FileStream
 		return false ;
 	}
 
+	public String[] list()
+	{
+		try
+		{
+			return asset.list( file ) ;
+		}
+		catch( IOException ex )
+		{
+			return new String[0] ;
+		}
+	}
+
 	/**
 		Return the File size of this FileStream.
 	*/

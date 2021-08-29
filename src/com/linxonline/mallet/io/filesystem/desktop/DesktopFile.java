@@ -214,6 +214,11 @@ public class DesktopFile implements FileStream
 		return file.mkdirs() ;
 	}
 
+	public String[] list()
+	{
+		return file.list() ;
+	}
+
 	/**
 		Return the File size of this FileStream.
 	*/

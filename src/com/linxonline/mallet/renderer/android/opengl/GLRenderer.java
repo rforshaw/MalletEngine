@@ -617,6 +617,10 @@ public class GLRenderer extends BasicRenderer
 		// Expected number of render frames before the next update is triggered.
 		final int difference = ( int )( updateDelta / frameDelta ) ;
 
+		// We limit the number of textures that can be bound
+		// each draw call - ensures things still feel responsive.
+		textures.resetBindCount() ;
+
 		for( final Camera camera : cameras )
 		{
 			if( camera.update( difference, frameNo ) == true )
@@ -718,11 +722,6 @@ public class GLRenderer extends BasicRenderer
 
 		for( final IUpdater<?, Storage> updater : storageUpdaters )
 		{
-			if( updater.isDirty() == false )
-			{
-				continue ;
-			}
-
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
@@ -732,7 +731,7 @@ public class GLRenderer extends BasicRenderer
 					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
 					if( storage.update( ( Storage )buffer ) == false )
 					{
-						updater.makeDirty() ;
+						updater.forceUpdate() ;
 					}
 				}
 				buffersToUpdate.clear() ;
@@ -748,11 +747,6 @@ public class GLRenderer extends BasicRenderer
 
 		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
 		{
-			if( updater.isDirty() == false )
-			{
-				continue ;
-			}
-
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
@@ -761,7 +755,7 @@ public class GLRenderer extends BasicRenderer
 				{
 					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
 					{
-						updater.makeDirty() ;
+						updater.forceUpdate() ;
 					}
 				}
 				buffersToUpdate.clear() ;

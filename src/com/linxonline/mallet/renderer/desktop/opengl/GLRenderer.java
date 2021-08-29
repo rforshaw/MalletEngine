@@ -647,6 +647,10 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		// Expected number of render frames before the next update is triggered.
 		final int difference = ( int )( updateDelta / frameDelta ) ;
 
+		// We limit the number of textures that can be bound
+		// each draw call - ensures things still feel responsive.
+		textures.resetBindCount() ;
+
 		for( final Camera camera : cameras )
 		{
 			if( camera.update( difference, frameNo ) == true )

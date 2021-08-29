@@ -40,6 +40,12 @@ public interface FileStream
 	public boolean mkdirs() ;
 
 	/**
+		Return an array of files and directory names contained
+		within the current directory.
+	*/
+	public String[] list() ;
+
+	/**
 		Return the File size of this FileStream.
 	*/
 	public long getSize() ;

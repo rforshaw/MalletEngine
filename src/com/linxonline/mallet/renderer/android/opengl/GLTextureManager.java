@@ -30,6 +30,14 @@ import com.linxonline.mallet.renderer.* ;
 public class GLTextureManager extends AbstractManager<GLImage>
 {
 	/**
+		Limit the number of textures that can be loaded
+		to the GPU on any one render cycle.
+		This should allow the engine to be responsive
+		if lots of textures are loaded in one go.
+	*/
+	private static final int TEXTURE_BIND_LIMIT = 1 ;
+
+	/**
 		When loading a texture the TextureManager will stream the 
 		image content a-synchronously.
 		To ensure the textures are added safely to resources we 
@@ -43,6 +51,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	private final boolean supportedETC1 = ETC1Util.isETC1Supported() ;
+	private int bindCount = 0 ;
 
 	public GLTextureManager()
 	{
@@ -154,6 +163,11 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		} ) ;
 	}
 
+	public void resetBindCount()
+	{
+		bindCount = 0 ;
+	}
+
 	@Override
 	public GLImage get( final String _file )
 	{
@@ -163,17 +177,12 @@ public class GLTextureManager extends AbstractManager<GLImage>
 			// recieves a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			if( toBind.isEmpty() == false )
+			while( toBind.isEmpty() == false && bindCount++ < TEXTURE_BIND_LIMIT  )
 			{
-				final int size = toBind.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final Tuple<String, Bitmap> tuple = toBind.get( i ) ;
-					final Bitmap bitmap = tuple.getRight() ;
-					put( tuple.getLeft(), bind( bitmap ) ) ;
-					bitmap.recycle() ;
-				}
-				toBind.clear() ;
+				final Tuple<String, Bitmap> tuple = toBind.remove( toBind.size() - 1 ) ;
+				final Bitmap bitmap = tuple.getRight() ;
+				put( tuple.getLeft(), bind( bitmap ) ) ;
+				bitmap.recycle() ;
 			}
 		}
 

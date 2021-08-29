@@ -6,6 +6,7 @@ import java.util.* ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.MalletList ;
 
 public class DesktopZipFile implements FileStream
 {
@@ -203,6 +204,20 @@ public class DesktopZipFile implements FileStream
 	public boolean mkdirs()
 	{
 		return false ;
+	}
+
+	public String[] list()
+	{
+		final List<String> names = MalletList.<String>newList() ;
+		final Enumeration<? extends ZipEntry> entries = zipFile.entries() ;
+		while( entries.hasMoreElements() == true )
+		{
+			final ZipEntry entry = entries.nextElement() ;
+			final String name = entry.getName() ;
+			names.add( name ) ;
+		}
+
+		return names.toArray( new String[0] ) ;
 	}
 
 	/**
