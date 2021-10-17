@@ -4,6 +4,8 @@ import com.jogamp.openal.* ;
 
 import com.linxonline.mallet.audio.* ;
 
+import com.linxonline.mallet.util.SourceCallback ;
+
 /**
 	Provides the entry point in manipulating and playing 
 	an audio-stream.
@@ -21,6 +23,8 @@ public class ALSASource implements AudioSource
 	private final int[] freq = new int[1] ;
 	private final int[] bufferOffset = new int[1] ;
 
+	private SourceCallback callback ;
+
 	public ALSASource( final AL _openAL, final AudioBuffer<ALSASound> _buffer, final int[] _source )
 	{
 		openAL = _openAL ;
@@ -28,6 +32,7 @@ public class ALSASource implements AudioSource
 		source = _source ;
 	}
 
+	@Override
 	public void play()
 	{
 		openAL.alSourcePlay( source[0] ) ;
@@ -37,6 +42,7 @@ public class ALSASource implements AudioSource
 		}
 	}
 
+	@Override
 	public void playLoop()
 	{
 		openAL.alSourcei( source[0], AL.AL_LOOPING,  AL.AL_TRUE ) ;
@@ -47,6 +53,7 @@ public class ALSASource implements AudioSource
 		play() ;
 	}
 
+	@Override
 	public void pause()
 	{
 		openAL.alSourcePause( source[0] ) ;
@@ -56,6 +63,7 @@ public class ALSASource implements AudioSource
 		}
 	}
 
+	@Override
 	public void stop()
 	{
 		openAL.alSourceStop( source[0] ) ;
@@ -65,37 +73,75 @@ public class ALSASource implements AudioSource
 		}
 	}
 
-	public boolean isPlaying()
+	@Override
+	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		openAL.alGetSourcei( source[0], AL.AL_SOURCE_STATE, state, 0 ) ;
+		openAL.alSource3f( source[0], AL.AL_POSITION, _x, _y, _z ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
-			System.out.println( "Failed to determine playable state source" ) ;
-			return false ;
+			System.out.println( "Failed to set position" ) ;
 		}
-		return ( state[0] == AL.AL_PLAYING ) ;
 	}
 
+	@Override
+	public void setRelative( final boolean _relative )
+	{
+		openAL.alSourcei( source[0], AL.AL_SOURCE_RELATIVE, ( _relative == true ) ? AL.AL_TRUE : AL.AL_FALSE ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to set relative" ) ;
+		}
+	}
+
+	@Override
+	public State getState()
+	{
+		openAL.alGetSourcei( source[0], AL.AL_SOURCE_STATE, state, 0 ) ;
+		switch( state[0] )
+		{
+			default            : return State.UNKNOWN ;
+			case AL.AL_PLAYING : return State.PLAYING ;
+			case AL.AL_PAUSED  : return State.PAUSED ;
+			case AL.AL_STOPPED : return State.STOPPED ;
+		}
+	}
+
+	@Override
 	public float getCurrentTime()
 	{
 		return getCurrentBufferTime() ;
 	}
 
+	@Override
 	public float getDuration()
 	{
 		return getBufferTime() ;
 	}
 
+	@Override
 	public void setVolume( final int _volume )
 	{
 		final float vol = _volume / 100.0f ;
 		openAL.alSourcef( source[0], AL.AL_GAIN, vol ) ;
 	}
 
+	@Override
+	public void setCallback( final SourceCallback _callback )
+	{
+		callback = _callback ;
+	}
+
+	@Override
+	public SourceCallback getCallback()
+	{
+		return callback ;
+	}
+
 	/**
 		Destory OpenAL source.
 		Doesn't destroy OpenAL buffer.
 	**/
+	@Override
 	public void destroySource()
 	{
 		stop() ;

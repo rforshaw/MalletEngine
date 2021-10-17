@@ -6,6 +6,7 @@ import java.util.Iterator ;
 import java.awt.* ;
 import java.awt.image.* ;
 import java.awt.color.ColorSpace ;
+import java.awt.geom.AffineTransform ;
 import javax.imageio.* ;
 import java.io.* ;
 import javax.imageio.stream.* ;
@@ -21,10 +22,11 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.thread.TaskQueue ;
 
 import com.linxonline.mallet.renderer.* ;
 
-public class GLTextureManager extends AbstractManager<GLImage>
+public class GLTextureManager extends AbstractManager<String, GLImage>
 {
 	/**
 		Limit the number of textures that can be loaded
@@ -44,7 +46,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		binded to OpenGL out of order causing significant performance 
 		degradation.
 	*/
-	private final List<Tuple<String, BufferedImage>> toBind = MalletList.<Tuple<String, BufferedImage>>newList() ;
+	private final List<Tuple<String, BufferedImage[]>> toBind = MalletList.<Tuple<String, BufferedImage[]>>newList() ;
 	private final MetaGenerator metaGenerator = new MetaGenerator() ;
 
 	/**
@@ -57,9 +59,11 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<GLImage> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<GLImage>()
+		final ResourceLoader<String, GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<String, GLImage>()
 		{
+			private final TaskQueue task = new TaskQueue( 2, "TEXTURE_LOADER" ) ; 
+
 			public boolean isLoadable( final String _file )
 			{
 				return true ;
@@ -67,16 +71,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 			public GLImage load( final String _file )
 			{
-				// We want to allocate the key for the resource so the texture 
-				// is not reloaded if another object wishes to use it before 
-				// the texture has fully loaded.
-				// The Renderer should skip the texture, until it is finally 
-				// available to render
-				put( _file, null ) ;
-
-				final TextureThread load = new TextureThread( "LOAD_TEXTURE", _file ) ;
-				load.start() ;
-
+				task.add( new TextureRunner( _file ) ) ;
 				return null ;
 			}
 		} ) ;
@@ -92,13 +87,13 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	{
 		synchronized( toBind )
 		{
-			// GLRenderer will continuosly call get() until it 
-			// recieves a Texture, so we only need to bind 
+			// GLRenderer will continuously call get() until it 
+			// receives a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
 			while( toBind.isEmpty() == false && bindCount++ < TEXTURE_BIND_LIMIT  )
 			{
-				final Tuple<String, BufferedImage> tuple = toBind.remove( toBind.size() - 1 ) ;
+				final Tuple<String, BufferedImage[]> tuple = toBind.remove( toBind.size() - 1 ) ;
 				put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
 			}
 		}
@@ -111,7 +106,7 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		defined by _path.
 		If the meta data has yet to be generated, create it 
 		and store the meta data in imageMetas. This hashmap 
-		is persistant across the runtime of the renderer.
+		is persistent across the runtime of the renderer.
 		If the meta data changes from one call to the next, 
 		the meta data stored is NOT updated.
 		FileStream would need to be updated to support 
@@ -131,22 +126,27 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		imageFormat = _format ;
 	}
 
-	public GLImage bind( final BufferedImage _image )
+	public GLImage bind( final BufferedImage[] _images )
 	{
-		return bind( _image, InternalFormat.COMPRESSED ) ;
+		return bind( _images, InternalFormat.COMPRESSED ) ;
 	}
 
-	public GLImage bind( final BufferedImage _image, final InternalFormat _format )
+	public GLImage bind( final BufferedImage[] _images, final InternalFormat _format )
 	{
-		return bind( _image, _format, true ) ;
+		return bind( _images, _format, true ) ;
 	}
-	
+
+	public GLImage bind( final BufferedImage _image, final InternalFormat _format, final boolean _createMips )
+	{
+		return bind( new BufferedImage[] { _image }, _format, _createMips ) ;
+	}
+
 	/**
 		Binds the BufferedImage byte-stream into video memory.
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public GLImage bind( final BufferedImage _image, final InternalFormat _format, final boolean _createMips )
+	public GLImage bind( final BufferedImage[] _images, final InternalFormat _format, final boolean _createMips )
 	{
 		final int textureID = glGenTextures() ;
 		MGL.glBindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
@@ -156,9 +156,10 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
 		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
 
-		final int width = _image.getWidth() ;
-		final int height = _image.getHeight() ;
-		final int channels = _image.getSampleModel().getNumBands() ;
+		final BufferedImage base = _images[0] ;
+		final int baseWidth = base.getWidth() ;
+		final int baseHeight = base.getHeight() ;
+		final int channels = base.getSampleModel().getNumBands() ;
 		int internalFormat = MGL.GL_RGB ;
 
 		if( MGL.isExtensionAvailable( "GL_EXT_abgr" ) == true )
@@ -186,21 +187,42 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
 						 0, 
 						 getGLInternalFormat( channels, _format ), 
-						 width, 
-						 height, 
+						 baseWidth, 
+						 baseHeight, 
 						 0, 
 						 imageFormat, 
 						 MGL.GL_UNSIGNED_BYTE, 
-						 getByteBuffer( _image ) ) ;
+						 getByteBuffer( base ) ) ;
 
 		if( _createMips == true )
 		{
-			MGL.glGenerateMipmap( MGL.GL_TEXTURE_2D ) ;
+			for( int i = 1; i < _images.length; ++i )
+			{
+				final BufferedImage image = _images[i] ;
+				if( image == null )
+				{
+					System.out.println( "Texture level " + i + " not available skipping." ) ;
+					continue ;
+				}
+
+				final int mipWidth = image.getWidth() ;
+				final int mipHeight = image.getHeight() ;
+
+				MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
+								i, 
+								getGLInternalFormat( channels, _format ), 
+								mipWidth, 
+								mipHeight, 
+								0, 
+								imageFormat, 
+								MGL.GL_UNSIGNED_BYTE, 
+								getByteBuffer( image ) ) ;
+			}
 		}
 		//MGL.glBindTexture( MGL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;
 
-		final long estimatedConsumption = width * height * ( channels * 8 ) ;
+		final long estimatedConsumption = baseWidth * baseHeight * ( channels * 8 ) ;
 		return new GLImage( textureID, estimatedConsumption ) ;
 	}
 
@@ -394,16 +416,31 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		}
 	}
 
-	private class TextureThread extends Thread
+	private class TextureRunner implements Runnable
 	{
 		private final String texturePath ;
 
-		public TextureThread( final String _name, final String _file )
+		public TextureRunner( final String _file )
 		{
-			super( _name ) ;
 			texturePath = _file ;
 		}
 
+		private int calculateMipMapLevels( int _width, int _height )
+		{
+			int levels = 1 ;	// base level
+
+			do
+			{
+				_width /= ( _width > 1 ) ? 2 : 1 ;
+				_height /= ( _height > 1 ) ? 2 : 1 ;
+
+				levels += 1 ;
+			} while( _width > 1 || _height > 1 ) ;
+
+			return levels ;
+		}
+
+		@Override
 		public void run()
 		{
 			final FileStream file = GlobalFileSystem.getFile( texturePath ) ;
@@ -420,11 +457,37 @@ public class GLTextureManager extends AbstractManager<GLImage>
 				final BufferedImage image = ImageIO.read( stream ) ;
 				in.close() ;
 
+				// Generate our own mipmaps.
+				int width = image.getWidth() ;
+				int height = image.getHeight() ;
+
+				final int levels = calculateMipMapLevels( width, height ) ;
+				final BufferedImage[] images = new BufferedImage[levels] ;
+				images[0] = image ;
+
+				final AffineTransform at = new AffineTransform();
+				at.scale( 0.5, 0.5 ) ;
+				final AffineTransformOp operation = new AffineTransformOp( at, AffineTransformOp.TYPE_BICUBIC ) ;
+
+				for( int i = 1; i < levels; ++i )
+				{
+					width /= ( width > 1 ) ? 2 : 1 ;
+					height /= ( height > 1 ) ? 2 : 1 ;
+
+					final BufferedImage source = images[i - 1] ;
+					final BufferedImage destination = new BufferedImage( width, height, source.getType() ) ;
+					images[i] = destination ;
+
+					final Graphics2D g2 = ( Graphics2D )destination.getGraphics() ;
+					g2.drawImage( source, operation, 0, 0 ) ;
+					g2.dispose() ;
+				}
+
 				synchronized( toBind )
 				{
 					// We don't want to bind the BufferedImage now
 					// as that will take control of the OpenGL context.
-					toBind.add( new Tuple<String, BufferedImage>( texturePath, image ) ) ;
+					toBind.add( new Tuple<String, BufferedImage[]>( texturePath, images ) ) ;
 				}
 			}
 			catch( IOException ex )

@@ -25,6 +25,7 @@ public class ALSASourceGenerator implements AudioGenerator
 	/**
 		Generator deals with the construction and deconstruction of the Audio backend 
 	*/
+	@Override
 	public boolean startGenerator()
 	{
 		try
@@ -32,6 +33,8 @@ public class ALSASourceGenerator implements AudioGenerator
 			ALut.alutInit() ;
 			openAL = ALFactory.getAL() ;
 			initStaticLoaders() ;
+
+			openAL.alDistanceModel( AL.AL_LINEAR_DISTANCE_CLAMPED ) ;
 		}
 		catch( ALException ex )
 		{
@@ -44,14 +47,16 @@ public class ALSASourceGenerator implements AudioGenerator
 
 	private void initStaticLoaders()
 	{
-		final ILoader.ResourceLoader<AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ILoader.ResourceDelegate<AudioBuffer<ALSASound>>()
+		final ILoader.ResourceLoader<String, AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<String, AudioBuffer<ALSASound>>()
 		{
+			@Override
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
+			@Override
 			public AudioBuffer<ALSASound> load( final String _file )
 			{
 				final byte[] wav = ByteReader.readBytes( _file ) ;
@@ -116,10 +121,12 @@ public class ALSASourceGenerator implements AudioGenerator
 		} ) ;
 	}
 
+	@Override
 	public boolean shutdownGenerator()
 	{
 		try
 		{
+			System.out.println( "Shutting down audio." ) ;
 			clear() ;
 			ALut.alutExit() ;
 		}
@@ -132,11 +139,22 @@ public class ALSASourceGenerator implements AudioGenerator
 		return true ;
 	}
 
+	@Override
+	public void setListenerPosition( final float _x, final float _y, final float _z )
+	{
+		openAL.alListener3f( AL.AL_POSITION, _x, _y, _z ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to set position" ) ;
+		}
+	}
+
 	/**
 		Creates an AudioSource which can be used to manipulate a Sound buffer.
 		An AudioSource can be created multiple times and use the same 
 		Sound buffer.
 	**/
+	@Override
 	public AudioSource createAudioSource( final String _file, final StreamType _type )
 	{
 		final AudioBuffer<ALSASound> sound = staticSoundManager.get( _file ) ;

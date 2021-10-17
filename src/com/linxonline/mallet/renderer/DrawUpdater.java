@@ -17,10 +17,10 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 {
 	private final static List<WeakReference<DrawUpdater>> globals = new ArrayList<WeakReference<DrawUpdater>>() ;
 
-	private final Interpolation mode ;
 	private final DrawBuffer drawBuffer ;
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 
+	private Interpolation mode ;
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
@@ -129,6 +129,11 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 		}
 
 		forceUpdate = false ;
+	}
+
+	public void setInterpolation( Interpolation _mode )
+	{
+		mode = ( _mode != null ) ? _mode : mode ;
 	}
 
 	/**

@@ -3,6 +3,8 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 import java.util.Arrays ;
 import java.nio.* ;
 
+import com.linxonline.mallet.util.buffers.IntegerBuffer ;
+
 import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Program ;
@@ -19,23 +21,23 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 public class GLTextBuffer extends GLBuffer
 {
-	private final static int INDEX_BYTE_SIZE = 10000 ;
-	private final static int VERTEX_BYTE_SIZE = 10000 ;
+	private final int maxIndexByteSize ;
+	private final int maxVertexByteSize ;
 
-	private final int[] indicies ;
-	private final float[] verticies ;
+	private int indexByteSize ;
+	private int vertexByteSize ;
 
-	private final IntBuffer indexBuffer ;
-	private final FloatBuffer vertexBuffer ;
+	private IntBuffer indexBuffer ;
+	private FloatBuffer vertexBuffer ;
 
-	private final int[] indexID = new int[1] ;
-	private final int[] vboID = new int[1] ;
+	private int[] indexID = new int[1] ;
+	private int[] vboID = new int[1] ;
+	private int[] indexLength = new int[1] ;
 
 	private VertexAttrib[] attributes = null ;
 	private int vertexStride = -1 ;
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
-	private int indexLength = 0 ;
 
 	private GLProgram glProgram ;
 	private Program mapProgram = new Program() ;
@@ -58,18 +60,30 @@ public class GLTextBuffer extends GLBuffer
 
 	public GLTextBuffer( final TextBuffer _buffer )
 	{
+		this( _buffer, GLUtils.MIN_INDEX_BYTE_SIZE,
+					   GLUtils.MIN_VERTEX_BYTE_SIZE,
+					   GLUtils.MAX_INDEX_BYTE_SIZE,
+					   GLUtils.MAX_VERTEX_BYTE_SIZE ) ;
+	}
+
+	public GLTextBuffer( final TextBuffer _buffer,
+						 final int _indexByteSize,
+						 final int _vertexByteSize,
+						 final int _maxIndexByteSize,
+						 final int _maxVertexByteSize )
+	{
 		super( _buffer.isUI() ) ;
-		final int indexSize = INDEX_BYTE_SIZE / IBO_VAR_BYTE_SIZE ;
-		final int vboSize = VERTEX_BYTE_SIZE / VBO_VAR_BYTE_SIZE ;
+		indexByteSize = _indexByteSize ;
+		vertexByteSize = _vertexByteSize ;
 
-		indicies = new int[indexSize] ;
-		verticies = new float[vboSize] ;
+		maxIndexByteSize = _maxIndexByteSize ;
+		maxVertexByteSize = _maxVertexByteSize ;
 
-		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( INDEX_BYTE_SIZE ) ;
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
 		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 
-		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( VERTEX_BYTE_SIZE ) ;
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
 
@@ -130,8 +144,12 @@ public class GLTextBuffer extends GLBuffer
 			}
 		}
 
-		int indexIncrement = 0 ;
-		int vertexIncrement = 0 ;
+		int bufferIndex = 0 ;
+		int usedIndexByteSize = 0 ;
+		int usedVertexByteSize = 0 ;
+
+		indexBuffer.position( 0 ) ;
+		vertexBuffer.position( 0 ) ;
 
 		for( final TextDraw draw : _buffer.getTextDraws() )
 		{
@@ -148,30 +166,30 @@ public class GLTextBuffer extends GLBuffer
 			apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
 			final StringBuilder text = draw.getText() ;
-			final int start = draw.getStart() ;
+			int start = draw.getStart() ;
 			int end = draw.getEnd() ;
 
 			{
 				final int length = text.length() ;
-				if( end > length )
-				{
-					System.out.println( "Stated end: " + end + " goes beyond length: " + length + " > " + text ) ;
-					end = length ;
-				}
+				end = ( end < length ) ? end : length ;
+				end = ( end >= 0 ) ? end : 0 ;
+
+				start = ( start < end ) ? start : end ;
+				start = ( start >= 0 ) ? start : 0 ;
 			}
 
-			final int initialIndexOffset = vertexIncrement / vertexStride ;
+			final int initialIndexOffset = vertexBuffer.position() / vertexStride ;
 
 			final int length = end - start ;
 			for( int i = 0; i < length; i++ )
 			{
 				final char c = text.charAt( start + i ) ;
+				
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
 				if( shape == null )
 				{
-					//System.out.println( "Missing: " + c + " Glyph: " + glyph ) ;
 					// If a shape does not exist then the GLFont 
 					// needs to be recreated as the MalletFont has a 
 					// new glyph that is not yet represented.
@@ -179,6 +197,32 @@ public class GLTextBuffer extends GLBuffer
 					// used by the previously uploaded text will now be wrong.
 					//GLGeometryUploader.this.forceUpdate() ;
 					continue ;
+				}
+
+				final int shapeIndexByteSize = shape.getIndicesSize() * IBO_VAR_BYTE_SIZE ;
+				final int shapeVertexByteSize = shape.getVerticesSize() * vertexStrideBytes ;
+
+				usedIndexByteSize += shapeIndexByteSize ;
+				if(usedIndexByteSize > indexByteSize)
+				{
+					expandIndexBuffer() ;
+				}
+
+				usedVertexByteSize += shapeVertexByteSize ;
+				if( usedVertexByteSize > vertexByteSize )
+				{
+					expandVertexBuffer() ;
+				}
+
+				if( usedIndexByteSize > indexByteSize || usedVertexByteSize > vertexByteSize )
+				{
+					upload( bufferIndex ) ;
+
+					// If the draw object would exceed our limits
+					// then either create/jump to our next buffer.
+					bufferIndex = ( bufferIndex + 1 == indexID.length ) ? genNewBuffers() : bufferIndex + 1 ;
+					usedIndexByteSize = shapeIndexByteSize ;
+					usedVertexByteSize = shapeVertexByteSize ;
 				}
 
 				final Shape.Swivel[] swivel = shape.getSwivel() ;
@@ -190,7 +234,7 @@ public class GLTextBuffer extends GLBuffer
 				final int size = shape.getIndicesSize() ; 
 				for( int j = 0; j < size; j++ )
 				{
-					indicies[indexIncrement++] = indexOffset + shape.getIndex( j ) ;
+					indexBuffer.put( indexOffset + shape.getIndex( j ) ) ;
 				}
 
 				for( int j = 0; j < verticiesSize; j++ )
@@ -204,9 +248,9 @@ public class GLTextBuffer extends GLBuffer
 							{
 								shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, matrix, temp ) ;
-								verticies[vertexIncrement++] = temp.x ;
-								verticies[vertexIncrement++] = temp.y ;
-								verticies[vertexIncrement++] = temp.z ;
+								vertexBuffer.put( temp.x ) ;
+								vertexBuffer.put( temp.y ) ;
+								vertexBuffer.put( temp.z ) ;
 								break ;
 							}
 							case COLOUR :
@@ -214,14 +258,14 @@ public class GLTextBuffer extends GLBuffer
 								// GLDraw colour overrides Shapes colour.
 								final MalletColour colour = draw.getColour() ;
 								final MalletColour col = ( colour != null ) ? colour : shape.getColour( j, k, shapeColour ) ;
-								verticies[vertexIncrement++] = getABGR( col ) ;
+								vertexBuffer.put( getABGR( col ) ) ;
 								break ;
 							}
 							case UV     :
 							{
 								shape.getVector2( j, k, uv ) ;
-								verticies[vertexIncrement++] = uv.x ;
-								verticies[vertexIncrement++] = uv.y ;
+								vertexBuffer.put( uv.x ) ;
+								vertexBuffer.put( uv.y ) ;
 								break ;
 							}
 						}
@@ -231,24 +275,10 @@ public class GLTextBuffer extends GLBuffer
 				matrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
 			}
 
-			indicies[indexIncrement++] = PRIMITIVE_RESTART_INDEX ;
+			indexBuffer.put( PRIMITIVE_RESTART_INDEX ) ;
 		}
 
-		indexLength = indexIncrement ;
-		final int indiciesLengthBytes = indexIncrement * IBO_VAR_BYTE_SIZE ;
-		final int verticiesLengthBytes = vertexIncrement * VBO_VAR_BYTE_SIZE ;
-
-		indexBuffer.put( indicies ) ;
-		indexBuffer.position( 0 ) ;
-
-		vertexBuffer.put( verticies ) ;
-		vertexBuffer.position( 0 ) ;
-
-		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
-		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
-
-		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
-		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+		upload( bufferIndex ) ;
 
 		storages = _storages ;
 
@@ -268,9 +298,7 @@ public class GLTextBuffer extends GLBuffer
 			return ;
 		}
 
-		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[0] ) ;
-		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[0] ) ;
-
+		GLTextBuffer.enableVertexAttributes( attributes ) ;
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
 		final float[] matrix = _projection.matrix ;
@@ -282,12 +310,25 @@ public class GLTextBuffer extends GLBuffer
 		}
 
 		glProgram.bindBuffers( mapProgram, storages ) ;
+		
+		for( int i = 0; i < indexLength.length; ++i )
+		{
+			final int length = indexLength[i] ;
+			if( length <= 0 )
+			{
+				// We may have indices and vertices but if they 
+				// current have no data uploaded to them there 
+				// is no point drawing them.
+				continue ;
+			}
 
-		GLGeometryBuffer.enableVertexAttributes( attributes ) ;
+			MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[i] ) ;
+			MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[i] ) ;
 
-		GLGeometryBuffer.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
-		MGL.glDrawElements( style, indexLength, MGL.GL_UNSIGNED_INT, 0 ) ;
-		GLGeometryBuffer.disableVertexAttributes( attributes ) ;
+			GLTextBuffer.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
+			MGL.glDrawElements( style, length, MGL.GL_UNSIGNED_INT, 0 ) ;
+		}
+		GLTextBuffer.disableVertexAttributes( attributes ) ;
 	}
 
 	@Override
@@ -295,5 +336,99 @@ public class GLTextBuffer extends GLBuffer
 	{
 		MGL.glDeleteBuffers( 1, indexID, 0 ) ;
 		MGL.glDeleteBuffers( 1, vboID, 0 ) ;
+	}
+
+	private void expandIndexBuffer()
+	{
+		if( indexByteSize == maxIndexByteSize )
+		{
+			// We can't expand the buffer any more.
+			return ;
+		}
+	
+		final int doubleCapacity = indexByteSize * 2 ;
+		indexByteSize = ( doubleCapacity > maxIndexByteSize ) ? maxIndexByteSize : doubleCapacity ;
+	
+		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
+		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+
+		final IntBuffer old = indexBuffer ;
+		// We need to take the position of the original buffer
+		// when we make a copy it will set the position of the 
+		// new buffer to the size of the original, however our 
+		// data may not have maxed out the full buffer.
+		final int position = old.position() ;
+		old.position( 0 ) ;
+
+		indexBuffer = indexByteBuffer.asIntBuffer() ;
+		indexBuffer.put( old ) ;
+		indexBuffer.position( position ) ;
+	}
+
+	private void expandVertexBuffer()
+	{
+		if( vertexByteSize == maxVertexByteSize )
+		{
+			// We can't expand the buffer any more.
+			return ;
+		}
+
+		final int doubleCapacity = vertexByteSize * 2 ;
+		vertexByteSize = ( doubleCapacity > maxVertexByteSize ) ? maxVertexByteSize : doubleCapacity ;
+
+		final ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
+		vertexByteBuffer.order( ByteOrder.nativeOrder() ) ;
+
+		final FloatBuffer old = vertexBuffer ;
+		// We need to take the position of the original buffer
+		// when we make a copy it will set the position of the 
+		// new buffer to the size of the original, however our 
+		// data may not have maxed out the full buffer.
+		final int position = old.position() ;
+		old.position( 0 ) ;
+
+		vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
+		vertexBuffer.put( old ) ;
+		vertexBuffer.position( position ) ;
+	}
+
+	private int genNewBuffers()
+	{
+		final int offset = indexID.length ;
+
+		indexID = IntegerBuffer.expand( indexID, 1 ) ;
+		vboID = IntegerBuffer.expand( vboID, 1 ) ;
+		indexLength = IntegerBuffer.expand( indexLength, 1 ) ;
+
+		MGL.glGenBuffers( 1, indexID, offset ) ;
+		MGL.glGenBuffers( 1, vboID, offset ) ;
+
+		return offset ;
+	}
+	
+	/**
+		Upload the data to the specified vbo and ibo
+		specified by the _index location.
+	*/
+	private void upload( final int _index )
+	{
+		final int length = indexBuffer.position() ;
+		indexLength[_index] = length ;
+		if( length <= 0 )
+		{
+			return ;
+		}
+
+		final int indiciesLengthBytes = length * IBO_VAR_BYTE_SIZE ;
+		final int verticiesLengthBytes = vertexBuffer.position() * VBO_VAR_BYTE_SIZE ;
+
+		indexBuffer.position( 0 ) ;
+		vertexBuffer.position( 0 ) ;
+
+		MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[_index] ) ;
+		MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[_index] ) ;
+
+		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 }

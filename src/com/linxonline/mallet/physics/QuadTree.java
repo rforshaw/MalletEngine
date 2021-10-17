@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.thread.* ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;

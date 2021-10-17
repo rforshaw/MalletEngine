@@ -135,6 +135,7 @@ public class EventSystem implements IEventSystem
 		private final int eventCapacity ;
 
 		private final List<WeakReference<IEventHandler>> handlers ;
+		private final List<WeakReference<IEventHandler>> bufferedHandlers ;
 		private List<Event<?>> events ;
 		private IEventFilter filter ;
 
@@ -146,6 +147,8 @@ public class EventSystem implements IEventSystem
 			eventCapacity = _eventCapacity ;
 
 			handlers = MalletList.<WeakReference<IEventHandler>>newList( handlerCapacity ) ;
+			bufferedHandlers = MalletList.<WeakReference<IEventHandler>>newList( handlerCapacity ) ;
+
 			events = MalletList.<Event<?>>newList( eventCapacity ) ;
 			filter = _filter ;
 		}
@@ -188,7 +191,9 @@ public class EventSystem implements IEventSystem
 			}
 
 			final List<Event<?>> optimised = filter.filter( events ) ;
-			final List<WeakReference<IEventHandler>> bufferedHandlers = MalletList.<WeakReference<IEventHandler>>newList( handlers ) ;
+
+			bufferedHandlers.clear() ;
+			bufferedHandlers.addAll( handlers ) ;
 
 			final int handlerSize = bufferedHandlers.size() ;
 			final int eventSize = optimised.size() ;

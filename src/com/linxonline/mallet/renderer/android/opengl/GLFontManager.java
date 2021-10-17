@@ -8,7 +8,7 @@ import com.linxonline.mallet.renderer.font.Glyph ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.MalletMap ;
 
-public class GLFontManager extends AbstractManager<GLFont>
+public class GLFontManager extends AbstractManager<String, GLFont>
 {
 	private final static String CHARACTERS = "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+." ;
 

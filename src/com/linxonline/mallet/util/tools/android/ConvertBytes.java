@@ -471,6 +471,15 @@ public class ConvertBytes
 		System.out.print( "\n" ) ;
 	}
 
+	public static void printBytes( final byte[] _bytes, final int _start, final int _end )
+	{
+		for( int i = _start; i < _end; ++i )
+		{
+			System.out.print( ( isBitSet( _bytes, i ) == true ) ? "1" : "0"  ) ;
+		}
+		System.out.print( "\n" ) ;
+	}
+
 	/**
 		Combine the two byte-arrays passed in.
 		Creates a new array of a.length + b.length long.

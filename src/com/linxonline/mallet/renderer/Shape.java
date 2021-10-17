@@ -353,6 +353,7 @@ public class Shape implements IShape
 
 	/**
 		Defines what a Vertex within the Shape is made from.
+		Should not be modified by external users.
 	*/
 	@Override
 	public Swivel[] getSwivel()

@@ -49,12 +49,18 @@ public final class SwapList<T>
 
 	public int size()
 	{
-		return active.size() + newEvents.size() ;
+		synchronized( newEvents )
+		{
+			return active.size() + newEvents.size() ;
+		}
 	}
 
 	public boolean isEmpty()
 	{
-		return ( active.isEmpty() && newEvents.isEmpty() ) ;
+		synchronized( newEvents )
+		{
+			return ( active.isEmpty() && newEvents.isEmpty() ) ;
+		}
 	}
 
 	/**

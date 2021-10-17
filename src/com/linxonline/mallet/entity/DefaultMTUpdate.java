@@ -2,7 +2,7 @@ package com.linxonline.mallet.entity ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.thread.* ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 public class DefaultMTUpdate implements IEntityUpdate

@@ -208,13 +208,46 @@ public class DesktopZipFile implements FileStream
 
 	public String[] list()
 	{
+		final String currentPath = zipEntry.getName() ;
+
 		final List<String> names = MalletList.<String>newList() ;
 		final Enumeration<? extends ZipEntry> entries = zipFile.entries() ;
 		while( entries.hasMoreElements() == true )
 		{
 			final ZipEntry entry = entries.nextElement() ;
 			final String name = entry.getName() ;
-			names.add( name ) ;
+			if( name.equals( currentPath ) == true )
+			{
+				// Skip you can't be a directory or a file
+				// of yourself.
+				continue ;
+			}
+
+			if( name.startsWith( currentPath ) == false )
+			{
+				// We are only interested in paths that follow
+				// the same hierarchy as our current path.
+				continue ;
+			}
+
+			final int firstIndex = name.indexOf( '/', currentPath.length() ) ;
+			final int lastIndex = name.lastIndexOf( '/' ) ;
+
+			if( firstIndex == -1 )
+			{
+				// It's a file
+				names.add( name.substring( currentPath.length(), name.length() ) ) ;
+				continue ;
+			}
+
+			if( firstIndex == lastIndex &&
+				entry.isDirectory() == true )
+			{
+				// It's a child directory of the current path.
+				// We aren't interested in grand children.
+				names.add( name.substring( currentPath.length(), name.length() - 1 ) ) ;
+				continue ;
+			}
 		}
 
 		return names.toArray( new String[0] ) ;

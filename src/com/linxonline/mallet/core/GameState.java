@@ -44,7 +44,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.thread.* ;
 
 public class GameState extends State
 {
@@ -258,6 +258,12 @@ public class GameState extends State
 	{
 		system = _system ;
 		audioSystem.setAudioGenerator( _system.getAudioGenerator() ) ;
+
+		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
+		shutdown.addShutdownCallback( () ->
+		{
+			audioSystem.clear() ;
+		} ) ;
 	}
 
 	/**

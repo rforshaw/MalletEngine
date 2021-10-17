@@ -17,6 +17,8 @@ public interface AudioGenerator
 	**/
 	public AudioSource createAudioSource( final String _file, final StreamType _type ) ;
 
+	public void setListenerPosition( final float _x, final float _y, final float _z ) ;
+	
 	public void clean( final Set<String> _activeKeys ) ;
 
 	public void clear() ;

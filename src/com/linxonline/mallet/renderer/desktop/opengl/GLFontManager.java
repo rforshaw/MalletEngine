@@ -13,7 +13,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.Tuple ;
 
-public class GLFontManager extends AbstractManager<GLFont>
+public class GLFontManager extends AbstractManager<String, GLFont>
 {
 	private final static String CHARACTERS = "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+." ;
 
@@ -79,7 +79,6 @@ public class GLFontManager extends AbstractManager<GLFont>
 	public Glyph generateGlyph( final MalletFont _font, final int _code )
 	{
 		remove( _font.getID() ) ;
-		//System.out.println( "Create: " + ( char )_code ) ;
 		return gen.generateGlyph( _font.getFontName(),
 								  _font.getStyle(),
 								  _font.getPointSize(),

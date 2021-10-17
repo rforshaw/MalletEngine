@@ -167,6 +167,11 @@ public class EventController implements IEventHandler
 		return wantedTypes ;
 	}
 
+	public static Tuple<String, IProcessor<?>> create( final String _name, final IProcessor<?> _processor )
+	{
+		return Tuple.<String, IProcessor<?>>build( _name, _processor ) ;
+	}
+
 	/**
 		Allows events to be passed to a controller without it 
 		being added to an EventSystem.

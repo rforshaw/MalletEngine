@@ -8,7 +8,7 @@ package com.linxonline.mallet.event ;
 public final class Event<T>
 {
 	private final EventType eventType ;
-	private T variable = null ;							// Event package contains data the reciever is interested in
+	private final T variable ;							// Event package contains data the receiver is interested in
 
 	public Event( final String _eventType )
 	{

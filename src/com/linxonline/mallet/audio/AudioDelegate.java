@@ -2,8 +2,14 @@ package com.linxonline.mallet.audio ;
 
 public interface AudioDelegate
 {
-	public void addAudio( final Audio _audio ) ;
-	public void removeAudio( final Audio _audio ) ;
+	public Emitter add( final Emitter _emitter ) ;
+	public Emitter remove( final Emitter _emitter ) ;
+
+	public Emitter play( final Emitter _emitter ) ;
+	public Emitter stop( final Emitter _emitter ) ;
+	public Emitter pause( final Emitter _emitter ) ;
+
+	public Emitter update( final Emitter _emitter ) ;
 
 	/**
 		Inform the Audio-system to stop accepting requests 

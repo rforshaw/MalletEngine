@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.thread.* ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.physics.hulls.* ;
@@ -24,15 +24,15 @@ public class CollisionSystem
 	public CollisionSystem( final IAddEvent _addInterface, final WorkerGroup _workers )
 	{
 		eventController = new EventController( MalletList.toArray(
-			Tuple.<String, EventController.IProcessor<?>>build( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
+			EventController.create( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
 			{
 				add( _hull ) ;
 			} ),
-			Tuple.<String, EventController.IProcessor<?>>build( "REMOVE_COLLISION_HULL", ( final Hull _hull ) ->
+			EventController.create( "REMOVE_COLLISION_HULL", ( final Hull _hull ) ->
 			{
 				remove( _hull ) ;
 			} ),
-			Tuple.<String, EventController.IProcessor<?>>build( "COLLISION_DELEGATE", ( final ICollisionDelegate.ICallback _callback ) ->
+			EventController.create( "COLLISION_DELEGATE", ( final ICollisionDelegate.ICallback _callback ) ->
 			{
 				_callback.callback( constructCollisionDelegate() ) ;
 			} )

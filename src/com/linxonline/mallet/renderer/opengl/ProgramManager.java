@@ -9,7 +9,7 @@ import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class ProgramManager<T extends ProgramManager.Program> extends AbstractManager<T>
+public class ProgramManager<T extends ProgramManager.Program> extends AbstractManager<String, T>
 {
 	/**
 		When loading a program the ProgramManager will load the 
@@ -23,8 +23,8 @@ public class ProgramManager<T extends ProgramManager.Program> extends AbstractMa
 	{
 		binder = new JSONBind<T>( _builder ) ;
 
-		final ResourceLoader<T> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<T>()
+		final ResourceLoader<String, T> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<String, T>()
 		{
 			public boolean isLoadable( final String _file )
 			{

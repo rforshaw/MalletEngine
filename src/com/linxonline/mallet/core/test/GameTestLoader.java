@@ -271,10 +271,10 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void playAudioExample()
 			{
-				eventSystem.addEvent( AudioAssist.constructAudioDelegate( ( final AudioDelegate _delegate ) ->
+				/*eventSystem.addEvent( AudioAssist.constructAudioDelegate( ( final AudioDelegate _delegate ) ->
 				{
-					final Audio audio = AudioAssist.createAudio( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
-					_delegate.addAudio( AudioAssist.amendCallback( AudioAssist.play( audio ), new SourceCallback()
+					final Emitter emitter = new Emitter( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
+					emitter.setCallback( new SourceCallback()
 					{
 						public void callbackRemoved() {}
 
@@ -302,12 +302,13 @@ public final class GameTestLoader implements IGameLoader
 						{
 							//System.out.println( "Audio Finished." ) ;
 							// Enable to loop test audio.
-							AudioAssist.play( audio ) ;
+							_delegate.play( emitter ) ;
 						}
-					} ) ) ;
-				} ) ) ;
+					} ) ;
+					_delegate.play( _delegate.add( emitter ) ) ;
+				} ) ) ;*/
 
-				/*final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
+				final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
 				//System.out.println( ogg ) ;
 				final Vorbis vorbis = new Vorbis() ;
 				try
@@ -318,7 +319,7 @@ public final class GameTestLoader implements IGameLoader
 				catch( Exception ex )
 				{
 					ex.printStackTrace() ;
-				}*/
+				}
 			}
 
 			public void createEntities( final int _row, final int _column )
@@ -542,7 +543,7 @@ public final class GameTestLoader implements IGameLoader
 						public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
 						{
 							return super.createStateEventController( MalletList.concat( _processors,
-								Tuple.<String, EventController.IProcessor<?>>build( "TEST_EVENT", ( final String _message ) ->
+								EventController.create( "TEST_EVENT", ( final String _message ) ->
 								{
 									System.out.println( "Received: " + _message ) ;
 								} ) )

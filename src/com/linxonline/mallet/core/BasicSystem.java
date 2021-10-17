@@ -83,9 +83,9 @@ public abstract class BasicSystem<F extends FileSystem,
 	@Override
 	public void shutdownSystem()
 	{
+		shutdownDelegate.shutdown() ;
 		audioGenerator.shutdownGenerator() ;
 		renderer.shutdown() ;
-		shutdownDelegate.shutdown() ;
 	}
 
 	@Override

@@ -48,29 +48,9 @@ public final class AudioAssist
 		return new Event<Volume>( "CHANGE_VOLUME", new Volume( new Category( _channel ), _volume ) ) ;
 	}
 
-	public static Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
+	public static void setListenerPosition( final float _x, final float _y, final float _z )
 	{
-		return assist.createAudio( _file, _type, _channel ) ;
-	}
-
-	public static Audio amendCallback( final Audio _audio, final SourceCallback _callback )
-	{
-		return assist.amendCallback( _audio, _callback ) ;
-	}
-
-	public static Audio play( Audio _audio )
-	{
-		return assist.play( _audio ) ;
-	}
-
-	public static Audio stop( Audio _audio )
-	{
-		return assist.stop( _audio ) ;
-	}
-
-	public static Audio pause( Audio _audio )
-	{
-		return assist.pause( _audio ) ;
+		assist.setListenerPosition( _x, _y, _z ) ;
 	}
 
 	/**
@@ -78,11 +58,6 @@ public final class AudioAssist
 	*/
 	public interface Assist
 	{
-		public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _cat ) ;
-		public Audio amendCallback( final Audio _audio, final SourceCallback _callback ) ;
-
-		public Audio play( Audio _audio ) ;
-		public Audio stop( Audio _audio ) ;
-		public Audio pause( Audio _audio ) ;
+		public void setListenerPosition( final float _x, final float _y, final float _z ) ;
 	}
 }

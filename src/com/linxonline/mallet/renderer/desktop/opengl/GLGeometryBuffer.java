@@ -143,14 +143,12 @@ public class GLGeometryBuffer extends GLBuffer
 				usedIndexByteSize += shapeIndexByteSize ;
 				if(usedIndexByteSize > indexByteSize)
 				{
-					//System.out.println( "Expand Index Buffer" ) ;
 					expandIndexBuffer() ;
 				}
 
 				usedVertexByteSize += shapeVertexByteSize ;
 				if( usedVertexByteSize > vertexByteSize )
 				{
-					//System.out.println( "Expand Vertex Buffer" ) ;
 					expandVertexBuffer() ;
 				}
 
@@ -161,7 +159,6 @@ public class GLGeometryBuffer extends GLBuffer
 					// If the draw object would exceed our limits
 					// then either create/jump to our next buffer.
 					bufferIndex = ( bufferIndex + 1 == indexID.length ) ? genNewBuffers() : bufferIndex + 1 ;
-					//System.out.println( "Buffer Index: " + bufferIndex ) ;
 					usedIndexByteSize = shapeIndexByteSize ;
 					usedVertexByteSize = shapeVertexByteSize ;
 				}
@@ -300,7 +297,6 @@ public class GLGeometryBuffer extends GLBuffer
 		MGL.glGenBuffers( 1, indexID, offset ) ;
 		MGL.glGenBuffers( 1, vboID, offset ) ;
 
-		//System.out.println( "Create New Buffer: " + offset ) ;
 		return offset ;
 	}
 

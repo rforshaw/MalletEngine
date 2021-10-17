@@ -6,6 +6,8 @@ import com.linxonline.mallet.io.formats.wav.WAVHeader ;
 import com.linxonline.mallet.audio.android.AndroidSound ; 
 import com.linxonline.mallet.audio.* ;
 
+import com.linxonline.mallet.util.SourceCallback ;
+
 /**
 	Provides the entry point in manipulating and playing 
 	an audio-stream.
@@ -15,6 +17,8 @@ public class AndroidSource implements AudioSource
 	private final WAVHeader header ;
 	private final AudioTrack track ;
 	private final int bufferLength ;
+
+	private SourceCallback callback ;
 
 	public AndroidSource( final byte[] _buffer )
 	{
@@ -43,6 +47,7 @@ public class AndroidSource implements AudioSource
 		track.setPlaybackHeadPosition( 0 ) ;
 	}
 
+	@Override
 	public void play()
 	{
 		pause() ;
@@ -50,6 +55,7 @@ public class AndroidSource implements AudioSource
 		track.play() ;
 	}
 
+	@Override
 	public void playLoop()
 	{
 		pause() ;
@@ -57,6 +63,7 @@ public class AndroidSource implements AudioSource
 		track.play() ;
 	}
 
+	@Override
 	public void pause()
 	{
 		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
@@ -65,6 +72,7 @@ public class AndroidSource implements AudioSource
 		}
 	}
 
+	@Override
 	public void stop()
 	{
 		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
@@ -77,11 +85,31 @@ public class AndroidSource implements AudioSource
 		}
 	}
 
-	public boolean isPlaying()
+	@Override
+	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		return track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING && getCurrentTime() < getDuration() ;
+
 	}
 
+	@Override
+	public void setRelative( final boolean _relative )
+	{
+
+	}
+
+	@Override
+	public State getState()
+	{
+		switch( track.getPlayState() )
+		{
+			default                           : return State.UNKNOWN ;
+			case AudioTrack.PLAYSTATE_PLAYING : return State.PLAYING ; // && getCurrentTime() < getDuration()
+			case AudioTrack.PLAYSTATE_PAUSED  : return State.PAUSED ;
+			case AudioTrack.PLAYSTATE_STOPPED : return State.STOPPED ;
+		}
+	}
+
+	@Override
 	public float getCurrentTime()
 	{
 		final float offset = getBufferFrameOffset() ;
@@ -91,6 +119,7 @@ public class AndroidSource implements AudioSource
 		return offset / channels / freq ;
 	}
 
+	@Override
 	public float getDuration()
 	{
 		final float s = getBufferSize() ;
@@ -100,12 +129,26 @@ public class AndroidSource implements AudioSource
 		return s / c / f / getBytesPerSample() ;
 	}
 
+	@Override
 	public void setVolume( final int _volume )
 	{
 		final float volume = _volume / 100.0f ;
 		track.setStereoVolume( volume, volume ) ;
 	}
 
+	@Override
+	public void setCallback( final SourceCallback _callback )
+	{
+		callback = _callback ;
+	}
+
+	@Override
+	public SourceCallback getCallback()
+	{
+		return callback ;
+	}
+
+	@Override
 	public void destroySource()
 	{
 		track.stop() ;

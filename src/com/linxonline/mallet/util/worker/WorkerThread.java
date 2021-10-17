@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.worker ;
+package com.linxonline.mallet.util.thread ;
 
 import java.util.List ;
 import java.util.concurrent.atomic.AtomicBoolean ;

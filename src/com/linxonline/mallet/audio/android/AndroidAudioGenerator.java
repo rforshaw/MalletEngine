@@ -21,8 +21,8 @@ public class AndroidAudioGenerator implements AudioGenerator
 
 	public boolean startGenerator()
 	{
-		final ILoader.ResourceLoader<AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ILoader.ResourceDelegate<AudioBuffer<AndroidSound>>()
+		final ILoader.ResourceLoader<String, AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<String, AudioBuffer<AndroidSound>>()
 		{
 			public boolean isLoadable( final String _file )
 			{
@@ -48,6 +48,12 @@ public class AndroidAudioGenerator implements AudioGenerator
 	{
 		clear() ;
 		return true ;
+	}
+
+	@Override
+	public void setListenerPosition( final float _x, final float _y, final float _z )
+	{
+
 	}
 
 	/**

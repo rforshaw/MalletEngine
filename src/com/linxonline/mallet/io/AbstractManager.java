@@ -9,16 +9,16 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 
-public abstract class AbstractManager<T extends Resource> implements ILoader<T>
+public abstract class AbstractManager<K, T extends Resource> implements ILoader<K, T>
 {
-	protected final AbstractLoader<T> abstractLoader = new AbstractLoader<T>() ;
-	protected final Map<String, T> resources = MalletMap.<String, T>newMap() ;
-	private final List<String> toRemove = MalletList.<String>newList() ;
+	protected final AbstractLoader<K, T> abstractLoader = new AbstractLoader<K, T>() ;
+	protected final Map<K, T> resources = MalletMap.<K, T>newMap() ;
+	private final List<K> toRemove = MalletList.<K>newList() ;
 
 	public AbstractManager() {}
 
 	@Override
-	public T put( final String _key, final T _value  )
+	public T put( final K _key, final T _value  )
 	{
 		resources.put( _key, _value ) ;
 		return _value ;
@@ -29,7 +29,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		file path as unique key for future reference.
 	*/
 	@Override
-	public T get( final String _file )
+	public T get( final K _file )
 	{
 		clean() ;
 
@@ -45,7 +45,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		return createResource( _file ) ;
 	}
 
-	public void remove( final String _file )
+	public void remove( final K _file )
 	{
 		if( toRemove.contains( _file ) == false )
 		{
@@ -54,7 +54,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 	}
 	
 	@Override
-	public ResourceLoader<T> getResourceLoader()
+	public ResourceLoader<K, T> getResourceLoader()
 	{
 		return abstractLoader ;
 	}
@@ -77,9 +77,16 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		return consumption ;
 	}
 
-	protected T createResource( final String _file )
+	/**
+		Create the resource and add it to the cache.
+		Some loaders may return null and load the resource
+		asynchronously.
+	*/
+	protected T createResource( final K _file )
 	{
-		return abstractLoader.load( _file ) ;
+		final T resource = abstractLoader.load( _file ) ;
+		put( _file, resource ) ;
+		return resource ;
 	}
 
 	/**
@@ -92,10 +99,10 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		therefore should not be cleaned up - at least not yet.
 	**/
 	@Override
-	public void clean( final Set<String> _activeKeys )
+	public void clean( final Set<K> _activeKeys )
 	{
-		final Set<String> available = resources.keySet() ;
-		for( final String key : available )
+		final Set<K> available = resources.keySet() ;
+		for( final K key : available )
 		{
 			if( _activeKeys.contains( key ) == false )
 			{
@@ -113,7 +120,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 	*/
 	protected void clean()
 	{
-		for( final String key : toRemove )
+		for( final K key : toRemove )
 		{
 			final T resource = resources.get( key ) ;
 			if( resource != null )
@@ -160,7 +167,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		clear() ;
 	}
 
-	public boolean isKeyNull( final String _key )
+	public boolean isKeyNull( final K _key )
 	{
 		if( exists( _key ) == true )
 		{
@@ -172,9 +179,9 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		return false ;
 	}
 	
-	protected boolean exists( final String _file )
+	protected boolean exists( final K _key )
 	{
-		return resources.containsKey( _file ) ;
+		return resources.containsKey( _key ) ;
 	}
 
 	@Override
@@ -191,14 +198,14 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		and add the appropriate ResourceDelegate's to it.
 		Checkout GLTextureManager as an example.
 	*/
-	public class AbstractLoader<T extends Resource> implements ResourceLoader<T>
+	public class AbstractLoader<K, T extends Resource> implements ResourceLoader<K, T>
 	{
-		private final List<ResourceDelegate<T>> loaders = MalletList.<ResourceDelegate<T>>newList() ;
+		private final List<ResourceDelegate<K, T>> loaders = MalletList.<ResourceDelegate<K, T>>newList() ;
 
 		public AbstractLoader() {}
 
 		@Override
-		public void add( final ResourceDelegate<T> _delegate )
+		public void add( final ResourceDelegate<K, T> _delegate )
 		{
 			if( loaders.contains( _delegate ) == false )
 			{
@@ -207,7 +214,7 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		}
 
 		@Override
-		public void remove( final ResourceDelegate<T> _delegate )
+		public void remove( final ResourceDelegate<K, T> _delegate )
 		{
 			if( loaders.contains( _delegate ) == true )
 			{
@@ -216,17 +223,17 @@ public abstract class AbstractManager<T extends Resource> implements ILoader<T>
 		}
 
 		@Override
-		public T load( final String _file )
+		public T load( final K _key )
 		{
-			assert _file != null ;			// _file must not be null
+			assert _key != null ;			// _file must not be null
 
 			final int length = loaders.size() ;
 			for( int i = 0; i < length; ++i )
 			{
-				final ResourceDelegate<T> delegate = loaders.get( i ) ;
-				if( delegate.isLoadable( _file ) == true )
+				final ResourceDelegate<K, T> delegate = loaders.get( i ) ;
+				if( delegate.isLoadable( _key ) == true )
 				{
-					return delegate.load( _file ) ;
+					return delegate.load( _key ) ;
 				}
 			}
 

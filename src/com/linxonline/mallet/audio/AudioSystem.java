@@ -7,6 +7,8 @@ import java.util.HashSet ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 
+import com.linxonline.mallet.maths.Vector3 ;
+
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
@@ -24,14 +26,14 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 public class AudioSystem
 {
 	private final Map<Category, Volume> channelTable = MalletMap.<Category, Volume>newMap() ;
-	private final List<Volume> volumes = MalletList.<Volume>newList() ;
 	private float masterVolume = 1.0f ;
 
-	private final List<AudioData> toAddAudio    = MalletList.<AudioData>newList() ;
-	private final List<AudioData> toRemoveAudio = MalletList.<AudioData>newList() ;
+	private final Map<Emitter, AudioSource> sources = MalletMap.<Emitter, AudioSource>newMap() ;
 
-	private final List<AudioData> active        = MalletList.<AudioData>newList() ;
-	private final List<AudioData> paused        = MalletList.<AudioData>newList() ;			// Used when Game-State has been paused, move playing audio to here.
+	private final List<AudioSource> active    = MalletList.<AudioSource>newList() ;
+	private final List<AudioSource> paused    = MalletList.<AudioSource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
+
+	private final Vector3 position = new Vector3() ;
 
 	private final EventController controller = new EventController() ;
 	protected AudioGenerator sourceGenerator = null ;										// Used to create the Source from a Sound Buffer
@@ -49,40 +51,26 @@ public class AudioSystem
 			_callback.callback( constructAudioDelegate() ) ;
 		} ) ;
 
-		controller.addProcessor( "AUDIO_CLEAN", new EventController.IProcessor<Object>()
+		controller.addProcessor( "AUDIO_CLEAN", ( final Object _null ) ->
 		{
-			@Override
-			public void process( final Object _null )
+			if( sourceGenerator == null )
 			{
-				if( sourceGenerator == null )
-				{
-					return ;
-				}
-
-				final Set<String> activeKeys = new HashSet<String>() ;
-				getActiveKeys( activeKeys, toAddAudio ) ;
-				getActiveKeys( activeKeys, active ) ;
-
-				sourceGenerator.clean( activeKeys ) ;
+				return ;
 			}
 
-			private void getActiveKeys( final Set<String> _keys, final List<AudioData> _audio )
+			final Set<String> activeKeys = new HashSet<String>() ;
+			final Set<Emitter> emitters = sources.keySet() ;
+			for( final Emitter emitter : emitters )
 			{
-				final int size = _audio.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final AudioData audio = _audio.get( i ) ;
-					if( audio.stop == false )
-					{
-						_keys.add( audio.getFilePath() ) ;
-					}
-				}
+				activeKeys.add( emitter.getFilepath() ) ;
 			}
+
+			sourceGenerator.clean( activeKeys ) ;
 		} ) ;
 
 		controller.addProcessor( "CHANGE_VOLUME", ( final Volume _volume ) ->
 		{
-			volumes.add( new Volume( _volume ) ) ;
+			updateVolume( _volume ) ;
 		} ) ;
 
 		AudioAssist.setAssist( new Assist() ) ;
@@ -93,135 +81,26 @@ public class AudioSystem
 	public void update( final float _dt )
 	{
 		controller.update() ;
-		if( toAddAudio.isEmpty() == false )
+		if( sourceGenerator == null )
 		{
-			if( sourceGenerator != null )
-			{
-				final int size = toAddAudio.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final AudioData audio = toAddAudio.get( i ) ;
-					final AudioSource source = loadSource( audio ) ;
-					if( source != null )
-					{
-						audio.setSource( source ) ;
-
-						final Volume volume = channelTable.get( audio.getCategory() ) ;
-						setVolumeOnSource( volume, source ) ;
-
-						active.add( audio ) ;
-					}
-				}
-				toAddAudio.clear() ;
-			}
-		}
-
-		if( toRemoveAudio.isEmpty() == false )
-		{
-			final int size = toRemoveAudio.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final AudioData audio = toRemoveAudio.get( i ) ;
-				final AudioSource source = audio.getSource() ;
-				if( source != null )
-				{
-					source.stop() ;
-					source.destroySource() ;
-				}
-				active.remove( audio ) ;
-			}
-			toRemoveAudio.clear() ;
+			Logger.println( "No source-generator set for audio system.", Logger.Verbosity.MAJOR ) ;
+			return ;
 		}
 
 		{
 			final int size = active.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final AudioData audio = active.get( i ) ;
-				AudioSource source = audio.getSource() ;
-				if( source == null )
+				final AudioSource source = active.get( i ) ;
+				final SourceCallback callback = source.getCallback() ;
+
+				switch( source.getState() )
 				{
-					source = loadSource( audio ) ;
-					if( source == null )
-					{
-						// The source has yet to be loaded or 
-						// doesn't exist, we'll keep trying to load.
-						break ;
-					}
-
-					audio.dirty = true ;
-					audio.setSource( source ) ;
-
-					final Volume volume = channelTable.get( audio.getCategory() ) ;
-					setVolumeOnSource( volume, source ) ;
-					active.add( audio ) ;
-				}
-
-				final SourceCallback callback = audio.getCallback() ;
-
-				if( audio.dirty == true )
-				{
-					// We only want to play/pause/stop if 
-					// it has been flagged as dirty.
-					// Dirty signifies the state has been changed.
-					audio.dirty = false ;
-					if( audio.stop == true )
-					{
-						audio.stop = false ;
-
-						source.stop() ;
-						callback.stop() ;
-					}
-
-					final boolean isPlaying = source.isPlaying() ;
-
-					if( audio.play == true )
-					{
-						// Start playing if currently not playing.
-						if( isPlaying == false )
-						{
-							source.play() ;
-							callback.start() ;
-						}
-					}
-					else //if( audio.play == false )
-					{
-						// Pause if current playing
-						if( isPlaying == true )
-						{
-							source.pause() ;
-							callback.pause() ;
-						}
-					}
-				}
-
-				if( source.isPlaying() == true )
-				{
-					// Only call tick if the source is playing.
-					callback.tick( source.getCurrentTime() ) ;
-				}
-				else if( audio.play == true )
-				{
-					// If the source is not playing but play 
-					// is true then we expect it to be playing.
-					// If not the source has finished and we should inform 
-					// the user.
-					source.stop() ;
-					audio.play = false ;
-					callback.finished() ;
+					case PAUSED  : callback.pause() ; break ;
+					case STOPPED : callback.finished() ; break ;
+					case PLAYING : callback.tick( source.getCurrentTime() ) ; break ;
 				}
 			}
-		}
-
-		if( volumes.isEmpty() == false )
-		{
-			final int size = volumes.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				updateVolume( volumes.get( i ) ) ;
-				
-			}
-			volumes.clear() ;
 		}
 	}
 
@@ -233,16 +112,16 @@ public class AudioSystem
 		if( category.getChannel() == Category.Channel.MASTER )
 		{
 			masterVolume = _volume.getVolume() / 100.0f ;
-			for( final AudioData audio : active )
+			for( final AudioSource source : active )
 			{
 				// If master is being updated all 
 				// sources must be changed.
-				setVolumeOnSource( _volume, audio.getSource() ) ;
+				setVolumeOnSource( _volume, source ) ;
 			}
 			return ;
 		}
 
-		for( final AudioData audio : active )
+		/*for( final AudioData audio : active )
 		{
 			if( category.equals( audio.getCategory() ) )
 			{
@@ -250,11 +129,17 @@ public class AudioSystem
 				// that match out category
 				setVolumeOnSource( _volume, audio.getSource() ) ;
 			}
-		}
+		}*/
 	}
 
 	private void setVolumeOnSource( final Volume _volume, final AudioSource _source )
 	{
+		switch( _volume.getCategory().getChannel() )
+		{
+			default    : _source.setRelative( false ) ; break ;
+			case MUSIC : _source.setRelative( true ) ; break ;
+		}
+
 		_source.setVolume( ( int )( _volume.getVolume() * masterVolume ) ) ;
 	}
 
@@ -269,11 +154,8 @@ public class AudioSystem
 	*/
 	public void resumeSystem()
 	{
-		for( final AudioData audio : paused )
+		for( final AudioSource source : paused )
 		{
-			final AudioSource source = audio.getSource() ;
-			//final SourceCallback callback = audio.getCallback() ;
-
 			source.play() ;
 		}
 		paused.clear() ;
@@ -285,24 +167,28 @@ public class AudioSystem
 	*/
 	public void pauseSystem()
 	{
-		for( final AudioData audio : active )
+		for( final AudioSource source : active )
 		{
-			final AudioSource source = audio.getSource() ;
-			//final SourceCallback callback = audio.getCallback() ;
-
-			if( source.isPlaying() == true )
+			switch( source.getState() )
 			{
-				paused.add( audio ) ;
-				source.pause() ;
+				case PLAYING :
+				{
+					paused.add( source ) ;
+					source.pause() ;
+					break ;
+				}
 			}
 		}
 	}
 
 	public void clear()
 	{
-		toAddAudio.clear() ;		// Never added not hooked in
-		toRemoveAudio.clear() ;		// Will be removed from audio anyway
+		for( final AudioSource source : active )
+		{
+			source.destroySource() ;
+		}
 		active.clear() ;
+		sources.clear() ;
 	}
 
 	public EventController getEventController()
@@ -319,42 +205,140 @@ public class AudioSystem
 	{
 		return new AudioDelegate()
 		{
-			private final List<Audio> data = MalletList.<Audio>newList() ;
+			private final List<Emitter> emitters = MalletList.<Emitter>newList() ;
+			private boolean disable = false ;
 
 			@Override
-			public void addAudio( final Audio _audio )
+			public Emitter add( final Emitter _emitter )
 			{
-				if( _audio instanceof AudioData )
+				if( disable == true )
 				{
-					if( data.contains( _audio ) == false )
-					{
-						data.add( _audio ) ;
-						toAddAudio.add( ( AudioData )_audio ) ;
-					}
+					return _emitter ;
 				}
+
+				if( emitters.contains( _emitter ) == false )
+				{
+					emitters.add( _emitter ) ;
+					final AudioSource source = loadSource( _emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Failed to generate source for emitter.", Logger.Verbosity.NORMAL ) ;
+						return _emitter ;
+					}
+
+					sources.put( _emitter, source ) ;
+					update( _emitter ) ;
+
+					active.add( source ) ;
+				}
+				return _emitter ;
 			}
 
 			@Override
-			public void removeAudio( final Audio _audio )
+			public Emitter remove( final Emitter _emitter )
 			{
-				if( _audio != null && _audio instanceof AudioData )
+				if( disable == true )
 				{
-					data.remove( _audio ) ;
-					toRemoveAudio.add( ( AudioData )_audio ) ;
+					return _emitter ;
 				}
+
+				emitters.remove( _emitter ) ;
+				final AudioSource source = sources.get( _emitter ) ;
+				if( source == null )
+				{
+					Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
+					return _emitter ;
+				}
+
+				active.remove( source ) ;
+
+				source.stop() ;
+				source.destroySource() ;
+				return _emitter ;
+			}
+
+			@Override
+			public Emitter play( final Emitter _emitter )
+			{
+				final AudioSource source = sources.get( _emitter ) ;
+				if( source == null )
+				{
+					Logger.println( "Attempting to play emitter with no source.", Logger.Verbosity.NORMAL ) ;
+					return _emitter ;
+				}
+
+				source.play() ;
+				return _emitter ;
+			}
+
+			@Override
+			public Emitter stop( final Emitter _emitter )
+			{
+				final AudioSource source = sources.get( _emitter ) ;
+				if( source == null )
+				{
+					Logger.println( "Attempting to stop emitter with no source.", Logger.Verbosity.NORMAL ) ;
+					return _emitter ;
+				}
+
+				source.stop() ;
+				return _emitter ;
+			}
+
+			@Override
+			public Emitter pause( final Emitter _emitter )
+			{
+				final AudioSource source = sources.get( _emitter ) ;
+				if( source == null )
+				{
+					Logger.println( "Attempting to pause emitter with no source.", Logger.Verbosity.NORMAL ) ;
+					return _emitter ;
+				}
+
+				source.pause() ;
+				return _emitter ;
+			}
+
+			@Override
+			public Emitter update( final Emitter _emitter )
+			{
+				final AudioSource source = sources.get( _emitter ) ;
+				if( source == null )
+				{
+					Logger.println( "Attempting to update emitter with no source.", Logger.Verbosity.NORMAL ) ;
+					return _emitter ;
+				}
+
+				_emitter.getPosition( position ) ;
+				source.setPosition( position.x, position.y, position.z ) ;
+				source.setCallback( _emitter.getCallback() ) ;
+				return _emitter ;
 			}
 
 			@Override
 			public void shutdown()
 			{
-				if( data.isEmpty() == false )
+				if( disable == true )
 				{
-					for( final Audio audio : data  )
-					{
-						toRemoveAudio.add( ( AudioData )audio ) ;
-					}
-					data.clear() ;
+					return ;
 				}
+
+				disable = true ;
+				for( final Emitter emitter : emitters  )
+				{
+					final AudioSource source = sources.get( emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
+						continue ;
+					}
+
+					active.remove( source ) ;
+
+					source.stop() ;
+					source.destroySource() ;
+				}
+				emitters.clear() ;
 			}
 		} ;
 	}
@@ -396,58 +380,28 @@ public class AudioSystem
 	{
 		if( _volume >= 0 )
 		{
-			volumes.add( new Volume( new Category( _channel ), _volume ) ) ;
+			updateVolume( new Volume( new Category( _channel ), _volume ) ) ;
 		}
 	}
 
-	private AudioSource loadSource( final AudioData _audio )
+	private AudioSource loadSource( final Emitter _emitter )
 	{
-		final String path = _audio.getFilePath() ;
-		final StreamType type = _audio.getStreamType() ;
-		return sourceGenerator.createAudioSource( path, type ) ;
+		final String path = _emitter.getFilepath() ;
+		final StreamType type = _emitter.getStreamType() ;
+		final AudioSource source = sourceGenerator.createAudioSource( path, type ) ;
+
+		final Volume volume = channelTable.get( _emitter.getCategory() ) ;
+		setVolumeOnSource( volume, source ) ;
+
+		return source ;
 	}
 
-	private static class Assist implements AudioAssist.Assist
+	private class Assist implements AudioAssist.Assist
 	{
 		@Override
-		public Audio createAudio( final String _file, final StreamType _type, final Category.Channel _channel )
+		public void setListenerPosition( final float _x, final float _y, final float _z )
 		{
-			return new AudioData( _file, _type, new Category( _channel ) ) ;
-		}
-
-		@Override
-		public Audio amendCallback( final Audio _audio, final SourceCallback _callback )
-		{
-			final AudioData audio = ( AudioData )_audio ;
-			audio.amendCallback( _callback ) ;
-			return _audio ;
-		}
-
-		@Override
-		public Audio play( Audio _audio )
-		{
-			final AudioData audio = ( AudioData )_audio ;
-			audio.play = true ;
-			audio.dirty = true ;
-			return _audio ;
-		}
-
-		@Override
-		public Audio stop( Audio _audio )
-		{
-			final AudioData audio = ( AudioData )_audio ;
-			audio.stop = true ;
-			audio.dirty = true ;
-			return _audio ;
-		}
-
-		@Override
-		public Audio pause( Audio _audio )
-		{
-			final AudioData audio = ( AudioData )_audio ;
-			audio.play = false ;
-			audio.dirty = true ;
-			return _audio ;
+			sourceGenerator.setListenerPosition( _x, _y, _z ) ;
 		}
 	}
 }

@@ -42,6 +42,28 @@ public class Vorbis
 
 	public void decode( final OGG _ogg ) throws Exception
 	{
+		final int[] codewordLengths = new int[]
+		{
+			2, 4, 4, 4, 4, 2, 3, 3
+		} ;
+		Huffman.Node root = Huffman.build( codewordLengths, 8 ) ;
+		System.out.println( root.toString() ) ;
+
+		final byte[] codeword = new byte[1] ;
+		ConvertBytes.setBit( codeword, 0, true ) ;
+		ConvertBytes.setBit( codeword, 1, true ) ;
+		ConvertBytes.setBit( codeword, 2, true ) ;
+		ConvertBytes.printBytes( codeword, 0, 3 ) ;
+		System.out.println( root.get( codeword, 0, 3 ) ) ;
+
+		System.out.println( iLog( 0 ) ) ;
+		System.out.println( iLog( 1 ) ) ;
+		System.out.println( iLog( 2 ) ) ;
+		System.out.println( iLog( 3 ) ) ;
+		System.out.println( iLog( 4 ) ) ;
+		System.out.println( iLog( 7 ) ) ;
+		System.out.println( iLog( -2 ) ) ;
+
 		System.out.println( "Reading ogg stream" ) ;
 		for( final Page page : _ogg.pages )
 		{
@@ -313,6 +335,8 @@ public class Vorbis
 		}
 
 		book.entry = codebooks.size() ;
+		book.root = Huffman.build( book.codewordLengths, ( int )book.entries ) ;
+
 		codebooks.add( book ) ;
 		return _pos ;
 	}
@@ -356,10 +380,7 @@ public class Vorbis
 			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
 			_pos += 16 ;
 
-			for( int j = 0; j < read.length; j++ )
-			{
-				ConvertBytes.printByte( read[j] ) ;
-			}
+			ConvertBytes.printBytes( read, 0, 16 ) ;
 
 			ConvertBytes.flipEndian( read ) ;
 			floors[i] = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
@@ -524,6 +545,7 @@ public class Vorbis
 
 		public int decode( int _pos, final byte[] _stream ) throws Exception
 		{
+			System.out.println( "START: " + ( _pos / 8 ) ) ;
 			System.out.println( "Decode Floor Type 1..." ) ;
 			_pos = decodeHeader( _pos, _stream ) ;
 			_pos = decodePacket( _pos, _stream ) ;
@@ -595,12 +617,17 @@ public class Vorbis
 				xListLength += classDimensions[classNumber] ;
 			}
 
+			System.out.println( "xList Length: " + xListLength ) ;
+			if( xListLength > 65 )
+			{
+				throw new RuntimeException( "xList exceeds limit of 65." ) ;
+			}
+
 			xList = new int[xListLength] ;
 			xList[0] = 0 ;
 			xList[1] = 1 << rangeBits ;
 
 			int values = 2 ;
-
 			for( int i = 0; i < partitionClassList.length; i++ )
 			{
 				final int classNumber = partitionClassList[i] ;
@@ -611,13 +638,17 @@ public class Vorbis
 				}
 			}
 
-			System.out.println( "xList: " + isUnique( xList ) ) ;
+			if( isUnique( xList ) == false )
+			{
+				throw new RuntimeException( "xList does not contain only unique values." ) ;
+			}
 
 			return _pos ;
 		}
 
 		private int decodePacket( int _pos, final byte[] _stream )
 		{
+			System.out.println( "Start: " + _pos ) ;
 			if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
 			{
 				System.out.println( "Channel is unused this frame..." ) ;
@@ -626,13 +657,15 @@ public class Vorbis
 			}
 
 			final int range = RANGES[multiplier - 1] ;
-			y = new int[range] ;
-
 			final int bitsToRead = iLog( range - 1 ) ;
 			System.out.println( "Bits to Read: " + bitsToRead ) ;
+
+			y = new int[xList.length] ;
 			y[0] = ( ConvertBytes.toBits( _stream, 0, _pos, bitsToRead )[0] & 0xFF ) ;
 			y[1] = ( ConvertBytes.toBits( _stream, 0, _pos += bitsToRead, bitsToRead )[0] & 0xFF ) ;
 			_pos += bitsToRead ;
+
+			System.out.println( "Y0: " + y[0] + " Y1: " + y[1] ) ;
 
 			int offset = 2 ;
 			for( int i = 0; i < partitionClassList.length; i++ )
@@ -640,7 +673,7 @@ public class Vorbis
 				final int classNumber = partitionClassList[i] ;
 				final int cdim = classDimensions[classNumber] ;
 				final int cbits = subClasses[classNumber] ;
-				final int csub = ( 1 << cbits ) - 1 ; 
+				final int csub = ( 1 << cbits ) - 1 ;
 
 				System.out.println( "Pos: " + i + " Class Number: " + classNumber + " CDIM: " + cdim + " CBITS: " + cbits + " CSUB: " + csub ) ;
 
@@ -648,9 +681,18 @@ public class Vorbis
 				if( cbits > 0 )
 				{
 					final CodebookConfiguration book = codebooks.get( masterbooks[classNumber] ) ;
-					System.out.println( "Masterbooks: " + book.entry ) ;
-					cval = ( ConvertBytes.toBits( _stream, 0, _pos, book.entry )[0] & 0xFF ) ;
-					_pos += book.entry ;
+					int codewordLength = 0 ;
+					int number = -1 ;
+					while( number == -1 )
+					{
+						codewordLength += 1 ;
+						final byte[] codeword = ConvertBytes.toBits( _stream, 0, _pos, codewordLength ) ;
+						number = book.getEntry( codeword, codewordLength ) ;
+					}
+
+					System.out.println( "cval: " + number + " length: " + codewordLength ) ;
+					cval = number ;
+					_pos += codewordLength ;
 				}
 
 				for( int j = 0; j < cdim; j++ )
@@ -661,8 +703,17 @@ public class Vorbis
 					if( bookIndex >= 0 )
 					{
 						final CodebookConfiguration book = codebooks.get( bookIndex ) ;
-						y[j + offset] = ( ConvertBytes.toBits( _stream, 0, _pos, book.entry )[0] & 0xFF ) ;
-						_pos += book.entry ;
+						int codewordLength = 0 ;
+						int number = -1 ;
+						while( number == -1 )
+						{
+							codewordLength += 1 ;
+							final byte[] codeword = ConvertBytes.toBits( _stream, 0, _pos, codewordLength ) ;
+							number = book.getEntry( codeword, codewordLength ) ;
+						}
+
+						y[j + offset] = number ;
+						_pos += codewordLength ;
 					}
 					else
 					{
@@ -673,6 +724,7 @@ public class Vorbis
 				offset += cdim ;
 			}
 
+			System.out.println( "End: " + _pos ) ;
 			return _pos ;
 		}
 	
@@ -773,6 +825,7 @@ public class Vorbis
 		float deltaValue ;
 		boolean sequenceP ;
 		int[] multiplicands = null ;		// Lookup Values is multiplicands length
+		Huffman.Node root = null ;
 
 		public float[] getVQLookupTable()
 		{
@@ -782,6 +835,11 @@ public class Vorbis
 				case EXPLICIT_LOOKUP_TABLE : return getVQLookupTable2() ;
 				default                    : return null ;
 			}
+		}
+
+		public int getEntry( final byte[] _codeword, final int _length )
+		{
+			return root.get( _codeword, 0, _length ) ;
 		}
 
 		private float[] getVQLookupTable1()
@@ -824,6 +882,7 @@ public class Vorbis
 		public String toString()
 		{
 			final StringBuffer buffer = new StringBuffer() ;
+			buffer.append( "Entry: " + entry + "\n" ) ;
 			buffer.append( "Dimensions: " + dimensions + "\n" ) ;
 			buffer.append( "Entries: " + entries + "\n" ) ;
 			if( lookupType != NO_LOOKUP_TABLE )
@@ -834,7 +893,7 @@ public class Vorbis
 				buffer.append( "Multiplicands: " + multiplicands.length + "\n" ) ;
 			}
 
-			/*for( int i = 0; i < entries; ++i )
+			for( int i = 0; i < entries; ++i )
 			{
 				buffer.append( "Entry: " + i + " Codeword Length: " + codewordLengths[i] + "\n" ) ;
 			}
@@ -845,7 +904,7 @@ public class Vorbis
 				{
 					buffer.append( "Index: " + i + " Multiplicands: " + multiplicands[i] + "\n" ) ;
 				}
-			}*/
+			}
 
 			return buffer.toString() ;
 		}

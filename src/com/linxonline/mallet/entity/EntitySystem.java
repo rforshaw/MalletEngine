@@ -9,7 +9,7 @@ import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.worker.* ;
+import com.linxonline.mallet.util.thread.* ;
 
 /**
 	The EntitySystem stores and updates Entities that are being 

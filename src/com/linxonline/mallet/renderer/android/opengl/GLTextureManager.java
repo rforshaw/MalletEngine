@@ -24,10 +24,11 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.thread.TaskQueue ;
 
 import com.linxonline.mallet.renderer.* ;
 
-public class GLTextureManager extends AbstractManager<GLImage>
+public class GLTextureManager extends AbstractManager<String, GLImage>
 {
 	/**
 		Limit the number of textures that can be loaded
@@ -55,8 +56,10 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<GLImage> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<GLImage>()
+		final TaskQueue task = new TaskQueue( 2, "TEXTURE_LOADER" ) ; 
+
+		final ResourceLoader<String, GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<String, GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
@@ -70,44 +73,33 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 			protected GLImage loadTextureASync( final String _file )
 			{
-				final Thread load = new Thread( "LOAD_TEXTURE" )
+				task.add( () ->
 				{
-					public void run()
+					//System.out.println( "Loading Texture: " + _file ) ;
+					final FileStream file = GlobalFileSystem.getFile( _file ) ;
+					if( file.exists() == false )
 					{
-						//System.out.println( "Loading Texture: " + _file ) ;
-						final FileStream file = GlobalFileSystem.getFile( _file ) ;
-						if( file.exists() == false )
-						{
-							Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
-							return ;
-						}
-
-						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
-						in.close() ;
-						
-						synchronized( toBind )
-						{
-							// We don't want to bind the Bitmap now
-							// as that will take control of the OpenGL context.
-							toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
-						}
+						Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
+						return ;
 					}
-				} ;
 
-				// We want to allocate the key for the resource so the texture 
-				// is not reloaded if another object wishes to use it before 
-				// the texture has fully loaded.
-				// The Renderer should skip the texture, until it is finally 
-				// available to render
-				put( _file, null ) ;
+					final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
+					final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
+					in.close() ;
+					
+					synchronized( toBind )
+					{
+						// We don't want to bind the Bitmap now
+						// as that will take control of the OpenGL context.
+						toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+					}
+				} ) ;
 
-				load.start() ;
 				return null ;
 			}
 		} ) ;
 
-		loader.add( new ResourceDelegate<GLImage>()
+		loader.add( new ResourceDelegate<String, GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
@@ -116,48 +108,32 @@ public class GLTextureManager extends AbstractManager<GLImage>
 
 			public GLImage load( final String _file )
 			{
-				return loadTextureASync( _file ) ;
-			}
-
-			protected GLImage loadTextureASync( final String _file )
-			{
-				final Thread load = new Thread( "LOAD_TEXTURE" )
+				task.add( ()->
 				{
-					public void run()
+					final FileStream file = GlobalFileSystem.getFile( _file ) ;
+					if( file.exists() == false )
 					{
-						final FileStream file = GlobalFileSystem.getFile( _file ) ;
-						if( file.exists() == false )
-						{
-							Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
-							return ;
-						}
-
-						// We know Jpegs do not support an alpha channel, 
-						// so we can generate a Bitmap using 2 bytes instead of 4.
-						final BitmapFactory.Options options = new BitmapFactory.Options() ;
-						options.inPreferredConfig = Bitmap.Config.RGB_565 ;
-
-						final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
-						in.close() ;
-
-						synchronized( toBind )
-						{
-							// We don't want to bind the Bitmap now
-							// as that will take control of the OpenGL context.
-							toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
-						}
+						Logger.println( "Failed to create Texture: " + _file, Logger.Verbosity.NORMAL ) ;
+						return ;
 					}
-				} ;
 
-				// We want to allocate the key for the resource so the texture 
-				// is not reloaded if another object wishes to use it before 
-				// the texture has fully loaded.
-				// The Renderer should skip the texture, until it is finally 
-				// available to render/
-				put( _file, null ) ;
+					// We know Jpegs do not support an alpha channel, 
+					// so we can generate a Bitmap using 2 bytes instead of 4.
+					final BitmapFactory.Options options = new BitmapFactory.Options() ;
+					options.inPreferredConfig = Bitmap.Config.RGB_565 ;
 
-				load.start() ;
+					final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
+					final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
+					in.close() ;
+
+					synchronized( toBind )
+					{
+						// We don't want to bind the Bitmap now
+						// as that will take control of the OpenGL context.
+						toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+					}
+				} ) ;
+
 				return null ;
 			}
 		} ) ;
