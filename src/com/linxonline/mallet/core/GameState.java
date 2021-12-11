@@ -154,6 +154,8 @@ public class GameState extends State
 		clear() ;								// Remove all content
 		unhookHandlerSystems() ;				// Prevent system from recieving external events
 		unhookGameStateEventController() ;
+
+		showFPS.setShow( false ) ;
 		return null ;
 	}
 
@@ -172,6 +174,7 @@ public class GameState extends State
 		unhookGameStateEventController() ;
 		audioSystem.pauseSystem() ;
 
+		showFPS.setShow( false ) ;
 		paused = true ;
 		return null ;
 	}
@@ -599,6 +602,7 @@ public class GameState extends State
 			show = _show ;
 			draws[0].setHidden( !show ) ;
 			draws[1].setHidden( !show ) ;
+			updater.forceUpdate() ;
 		}
 
 		public boolean toShow()

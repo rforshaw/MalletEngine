@@ -46,6 +46,12 @@ public final class Volume
 		return category ;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "[" + category.toString() + ", " + volume + "]" ;
+	}
+
 	private static int clamp( final int _val, final int _min, final int _max )
 	{
 		return Math.max( _min, Math.min( _max, _val ) ) ;

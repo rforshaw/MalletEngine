@@ -691,7 +691,7 @@ public class UIList extends UILayout
 			final EngageComponent mode = getParentList().getEngageMode() ;
 			if( mode.isEngaged() == true )
 			{
-				applyScroll( -_input.getMouseX() * 10, -_input.getMouseY() * 10 ) ;
+				applyScroll( -_input.getMouseX() * 50, -_input.getMouseY() * 50 ) ;
 				return InputEvent.Action.CONSUME ;
 			}
 			return InputEvent.Action.PROPAGATE ;

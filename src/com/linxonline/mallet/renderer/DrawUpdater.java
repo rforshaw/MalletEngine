@@ -18,7 +18,6 @@ public class DrawUpdater implements IUpdater<Draw, GeometryBuffer>
 	private final static List<WeakReference<DrawUpdater>> globals = new ArrayList<WeakReference<DrawUpdater>>() ;
 
 	private final DrawBuffer drawBuffer ;
-	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 
 	private Interpolation mode ;
 	private boolean forceUpdate = false ;

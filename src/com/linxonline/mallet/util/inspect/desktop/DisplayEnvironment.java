@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.inspect.desktop ;
+package com.linxonline.mallet.util.inspect ;
 
 import java.awt.GraphicsEnvironment ;
 import java.awt.GraphicsDevice ;
@@ -9,9 +9,9 @@ import java.awt.Toolkit ;
 import com.linxonline.mallet.util.inspect.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class DesktopDisplay implements DisplayEnvironment
+public class DisplayEnvironment
 {
-	public DesktopDisplay() {}
+	public DisplayEnvironment() {}
 
 	public Screen[] getScreens()
 	{
@@ -23,7 +23,7 @@ public class DesktopDisplay implements DisplayEnvironment
 		{
 			final DisplayMode[] displayModes = device[i].getDisplayModes() ;
 			final ScreenMode[] screenModes = new ScreenMode[displayModes.length] ;
-			
+
 			for( int j = 0; j < displayModes.length; j++ )
 			{
 				final DisplayMode mode = displayModes[j] ;
@@ -49,6 +49,7 @@ public class DesktopDisplay implements DisplayEnvironment
 		return 1 ;
 	}
 
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

@@ -4,6 +4,27 @@ public class MathUtil
 {
 	private MathUtil() {}
 
+	public static int clamp( int _val, final int _min, final int _max )
+	{
+		_val = ( _val < _min ) ? _min : _val ;
+		_val = ( _val > _max ) ? _max : _val ;
+		return _val ;
+	}
+
+	public static float clamp( float _val, final float _min, final float _max )
+	{
+		_val = ( _val < _min ) ? _min : _val ;
+		_val = ( _val > _max ) ? _max : _val ;
+		return _val ;
+	}
+
+	public static double clamp( double _val, final double _min, final double _max )
+	{
+		_val = ( _val < _min ) ? _min : _val ;
+		_val = ( _val > _max ) ? _max : _val ;
+		return _val ;
+	}
+
 	public static int toInt( final StringBuilder _builder )
 	{
 		return toInt( _builder, 0, _builder.length() ) ;

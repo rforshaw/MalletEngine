@@ -33,8 +33,6 @@ public class AudioSystem
 	private final List<AudioSource> active    = MalletList.<AudioSource>newList() ;
 	private final List<AudioSource> paused    = MalletList.<AudioSource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
-	private final Vector3 position = new Vector3() ;
-
 	private final EventController controller = new EventController() ;
 	protected AudioGenerator sourceGenerator = null ;										// Used to create the Source from a Sound Buffer
 
@@ -206,6 +204,8 @@ public class AudioSystem
 		return new AudioDelegate()
 		{
 			private final List<Emitter> emitters = MalletList.<Emitter>newList() ;
+			private final Vector3 position = new Vector3() ;
+
 			private boolean disable = false ;
 
 			@Override
@@ -393,6 +393,7 @@ public class AudioSystem
 		final Volume volume = channelTable.get( _emitter.getCategory() ) ;
 		setVolumeOnSource( volume, source ) ;
 
+		//System.out.println( volume.toString() ) ;
 		return source ;
 	}
 

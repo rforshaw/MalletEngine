@@ -64,4 +64,10 @@ public class Category
 	{
 		return channel.hashCode() & subChannel ;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + channel + ", " + subChannel + "]" ; 
+	}
 }

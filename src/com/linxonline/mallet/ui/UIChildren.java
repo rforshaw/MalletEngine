@@ -162,7 +162,7 @@ public class UIChildren implements IChildren
 	public boolean update( final float _dt, final List<Event<?>> _events )
 	{
 		boolean dirtyChildren = false ;
-	
+
 		{
 			final int size = ordered.size() ;
 			for( int i = 0; i < size; i++ )

@@ -20,7 +20,7 @@ import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.inspect.desktop.DesktopDisplay ;
+import com.linxonline.mallet.util.inspect.DisplayEnvironment ;
 import com.linxonline.mallet.util.inspect.Screen ;
 import com.linxonline.mallet.util.inspect.ScreenMode ;
 
@@ -56,6 +56,7 @@ public class DesktopStarter extends IStarter
 		final ShutdownDelegate delegate = main.getShutdownDelegate() ;
 		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
 		{
+			@Override
 			public void shutdown()
 			{
 				stop() ;
@@ -124,7 +125,7 @@ public class DesktopStarter extends IStarter
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", game.getWindowWidth() ) ;
 		final int displayHeight = GlobalConfig.getInteger( "DISPLAYHEIGHT", game.getWindowHeight() ) ;
 
-		final DesktopDisplay desktop = new DesktopDisplay() ;
+		final DisplayEnvironment desktop = new DisplayEnvironment() ;
 
 		final IRender render = main.getRenderer() ;
 		render.setDisplayDimensions( displayWidth, displayHeight ) ;

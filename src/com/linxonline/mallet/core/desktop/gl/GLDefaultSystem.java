@@ -66,6 +66,14 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
 		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 
+		GlobalConfig.addNotify( "CAPTUREMOUSE", ( String _name ) -> {
+			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		} ) ;
+
+		GlobalConfig.addNotify( "FULLSCREEN", ( String _name ) -> {
+			event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN", GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+		} ) ;
+
 		getWindow().addWindowListener( new WindowListener()
 		{
 			public void windowDestroyNotify( final WindowEvent _event )

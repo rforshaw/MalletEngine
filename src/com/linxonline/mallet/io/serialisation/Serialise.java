@@ -87,7 +87,7 @@ public interface Serialise
 			boolean endChar = false ;
 			while( endChar == false )
 			{
-				final int pos = offset + length++ ;
+				final int pos = offset + ++length ;
 				if( in[pos] == '\0' )
 				{
 					endChar = true ;
@@ -103,7 +103,7 @@ public interface Serialise
 			}
 
 			final String temp = new String( in, offset, length ) ;
-			offset += length ;
+			offset += length + 1 ;	// Add one to pass the end char
 			return temp ;
 		}
 
