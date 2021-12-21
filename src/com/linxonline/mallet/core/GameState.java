@@ -27,6 +27,7 @@ import com.linxonline.mallet.input.InputState ;
 import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventSystem ;
 import com.linxonline.mallet.event.EventController ;
+import com.linxonline.mallet.event.InterceptController ;
 import com.linxonline.mallet.event.IEventSystem ;
 
 import com.linxonline.mallet.maths.Vector3 ;
@@ -59,6 +60,7 @@ public class GameState extends State
 	protected final InputState inputUISystem = new InputState() ;				// Internal UI Input System
 	protected final EventSystem eventSystem = new EventSystem() ;				// Internal Event System
 
+	private final InterceptController interceptController = new InterceptController() ;
 	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
 	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
 
@@ -140,7 +142,7 @@ public class GameState extends State
 		
 		// Event processors need to be called last 
 		// in case developer adds more during initGame or resumeGame.
-		initEventProcessors( internalController, externalController ) ;
+		initEventProcessors( internalController, externalController, interceptController ) ;
 		hookGameStateEventController() ;
 	}
 
@@ -278,6 +280,8 @@ public class GameState extends State
 	*/
 	protected void hookGameStateEventController()
 	{
+		eventSystem.setIntercept( interceptController ) ;
+
 		eventSystem.addHandler( internalController ) ;
 		internalController.setAddEventInterface( eventSystem ) ;
 
@@ -287,6 +291,8 @@ public class GameState extends State
 
 	protected void unhookGameStateEventController()
 	{
+		eventSystem.setIntercept( null ) ;
+
 		eventSystem.removeHandler( internalController ) ;
 		system.getEventSystem().removeHandler( externalController ) ;
 	}
@@ -471,7 +477,7 @@ public class GameState extends State
 		} ;
 	}
 
-	protected void initEventProcessors( final EventController _internal, final EventController _external )
+	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
 	{
 		_internal.addProcessor( "ADD_GAME_STATE_UI_INPUT", ( final InputHandler _handler ) ->
 		{

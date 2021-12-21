@@ -121,6 +121,9 @@ public class ConfigParser
 
 			var = _src.getString( "UI_UNIT", "CENTIMETRE" ) ;
 			_dest.addObject( "UI_UNIT", UI.Unit.derive( var ) ) ;
+
+			var = _src.getString( "SHOWFPS", "false" ) ;
+			_dest.addBoolean( "SHOWFPS", Boolean.parseBoolean( var ) ) ;
 		}
 	}
 }

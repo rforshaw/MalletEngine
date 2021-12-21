@@ -32,7 +32,6 @@ public final class Entity
 	private final Component[] components ;
 	private final IEventSystem eventSystem ;		// Component Event System
 
-	//public Vector3 position = new Vector3() ;		// Position of Entity in world space
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 
 	public Entity( final int _capacity )

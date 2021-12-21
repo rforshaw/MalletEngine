@@ -1,29 +1,46 @@
 package com.linxonline.mallet.io.net ;
 
-import java.net.InetAddress ;
-import java.net.UnknownHostException ;
+import java.net.SocketAddress ;
+import java.net.InetSocketAddress ;
 
 public class Address
 {
 	private final String host ;
-	private final InetAddress address ;
+	private final int port ;
 
-	public Address( final String _host )
+	public Address( final String _host, final int _port )
 	{
 		host = _host ;
-		address = null ;
+		port = _port ;
 	}
-	
-	public Address( final InetAddress _address )
+
+	public Address( final SocketAddress _address )
 	{
-		host = null ;
-		address = _address ;
+		if( _address instanceof InetSocketAddress )
+		{
+			final InetSocketAddress add = ( InetSocketAddress )_address ;
+			host = add.getHostName() ;
+			port = add.getPort() ;
+			return ;
+		}
+
+		throw new RuntimeException( "SocketAdress not castable to InetSocketAddress" ) ;
+	}
+
+	public int getPort()
+	{
+		return port ;
+	}
+
+	public String getHost()
+	{
+		return host ;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return ( host != null ) ? host.hashCode() : address.hashCode() ;
+		return host.hashCode() * port ;
 	}
 
 	@Override
@@ -37,19 +54,17 @@ public class Address
 		if( _obj instanceof Address )
 		{
 			final Address addr = ( Address )_obj ;
-			if( host != null )
+			if( host.equals( addr.host ) == false )
 			{
-				return host.equals( addr.host ) ;
+				return false ;
 			}
 
-			return address.equals( addr.address ) ;
+			if( port != addr.port )
+			{
+				return false ;
+			}
 		}
 
-		return false ;
-	}
-
-	public InetAddress createInetAddress() throws UnknownHostException
-	{
-		return ( address != null ) ? address : InetAddress.getByName( host ) ;
+		return true ;
 	}
 }

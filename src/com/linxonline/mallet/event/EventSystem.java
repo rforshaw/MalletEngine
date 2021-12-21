@@ -11,15 +11,27 @@ public class EventSystem implements IEventSystem
 {
 	private static final IEventFilter NO_FILTERING = new IEventFilter()
 	{
+		@Override
 		public List<Event<?>> filter( final List<Event<?>> _events )
 		{
 			return _events ;
+		}
+	} ;
+	
+	private static final IIntercept FALLBACK_INTERCEPT = new IIntercept()
+	{
+		@Override
+		public boolean allow( final Event<?> _event )
+		{
+			return true ;
 		}
 	} ;
 
 	private final int eventCapacity ;
 	private final SwapList<Event<?>> events ;
 	private final EventType.Lookup<EventQueue> queues = new EventType.Lookup<EventQueue>() ;
+
+	private IIntercept intercept = FALLBACK_INTERCEPT ;
 
 	public EventSystem()
 	{
@@ -30,6 +42,12 @@ public class EventSystem implements IEventSystem
 	{
 		eventCapacity = _eventCapacity ;
 		events = new SwapList<Event<?>>( eventCapacity ) ;
+	}
+
+	@Override
+	public void setIntercept( final IIntercept _intercept )
+	{
+		intercept = ( _intercept != null ) ? _intercept : FALLBACK_INTERCEPT ;
 	}
 
 	@Override
@@ -66,7 +84,10 @@ public class EventSystem implements IEventSystem
 	@Override
 	public void addEvent( final Event<?> _event )
 	{
-		events.add( _event ) ;
+		if( intercept.allow( _event ) == true )
+		{
+			events.add( _event ) ;
+		}
 	}
 
 	@Override

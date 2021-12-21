@@ -9,7 +9,7 @@ public class ContactData
 	private static final int CONTACT_NORMAL_Y = 1 ;
 	private static final int CONTACT_PENETRATION = 2 ;
 
-	public static final int MAX_COLLISION_POINTS = 5 ;
+	public static final int MAX_COLLISION_POINTS = 50 ;
 
 	private final Hull[] collidedWith = new Hull[MAX_COLLISION_POINTS] ;
 	private final float[] contacts = new float[MAX_COLLISION_POINTS * 3] ;

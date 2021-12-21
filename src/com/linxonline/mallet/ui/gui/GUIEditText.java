@@ -14,6 +14,8 @@ public class GUIEditText extends GUIText
 	private Draw cursorDraw = new Draw() ;
 	private DrawUpdater cursorUpdater ;
 
+	private final TextDraw drawPlaceholder = new TextDraw() ;
+
 	private boolean shift = false ;
 	private int start = 0 ;
 	private int end = 0 ;
@@ -30,6 +32,8 @@ public class GUIEditText extends GUIText
 				_textfield.makeDirty() ;
 			}
 		} ) ;
+
+		drawPlaceholder.getText().append( _meta.getPlaceholder() ) ;
 
 		constructDraws() ;
 	}
@@ -65,6 +69,23 @@ public class GUIEditText extends GUIText
 								   offset.x, offset.y, offset.z ) ;
 			cursorDraw.setShape( plane ) ;
 		}
+
+		final MalletFont font = getFont() ;
+		if( font != null )
+		{
+			final Vector3 length = getLength() ;
+			final StringBuilder placeholder = drawPlaceholder.getText() ;
+
+			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x ) ;
+			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
+
+			drawPlaceholder.setPosition( position.x, position.y, position.z ) ;
+			drawPlaceholder.setOffset( offsetX, offsetY, 0.0f ) ;
+
+			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x ) ) ;
+			drawPlaceholder.setColour( colour ) ;
+		}
 	}
 
 	/**
@@ -74,10 +95,21 @@ public class GUIEditText extends GUIText
 	@Override
 	public void addDraws( final World _world )
 	{
+		IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		if( updater != null )
+		{
+			// Remove the draw object from the previous 
+			// updater the draw may have changed significantly.
+			updater.removeDynamics( drawPlaceholder ) ;
+		}
+
 		super.addDraws( _world ) ;
 
 		cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
 		cursorUpdater.addDynamics( cursorDraw ) ;
+
+		updater = getUpdater() ;
+		updater.addDynamics( drawPlaceholder ) ;
 
 		final UITextField parent = getParent() ;
 		parent.makeDirty() ;
@@ -91,12 +123,23 @@ public class GUIEditText extends GUIText
 	public void removeDraws()
 	{
 		super.removeDraws() ;
+		final IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		if( updater != null )
+		{
+			updater.removeDynamics( drawPlaceholder ) ;
+		}
 		cursorUpdater.removeDynamics( cursorDraw ) ;
 	}
 
 	@Override
 	public void layerUpdated( final int _layer )
 	{
+		final IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		if( updater != null )
+		{
+			updater.removeDynamics( drawPlaceholder ) ;
+		}
+
 		super.layerUpdated( _layer ) ;
 		cursorUpdater.removeDynamics( cursorDraw ) ;
 
@@ -135,11 +178,28 @@ public class GUIEditText extends GUIText
 			cursorDraw.setOffset( xOffset, offset.y, offset.z ) ;
 			cursorDraw.setHidden( false ) ;
 			cursorUpdater.forceUpdate() ;
+
+			drawPlaceholder.setHidden( true ) ;
+			getUpdater().forceUpdate() ;
 		}
 		else
 		{
 			cursorDraw.setHidden( true ) ;
 			cursorUpdater.forceUpdate() ;
+
+			final StringBuilder text = getText() ;
+			drawPlaceholder.setHidden( text.length() > 0 ) ;
+
+			final StringBuilder placeholder = drawPlaceholder.getText() ;
+			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x ) ;
+			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
+
+			drawPlaceholder.setPosition( position.x, position.y, position.z ) ;
+			drawPlaceholder.setOffset( offsetX, offsetY, 0.0f ) ;
+			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x ) ) ;
+
+			getUpdater().forceUpdate() ;
 		}
 	}
 
@@ -333,6 +393,8 @@ public class GUIEditText extends GUIText
 	
 	public static class Meta extends GUIText.Meta
 	{
+		private final UIVariant placeholder = new UIVariant( "PLACEHOLDER", "", new Connect.Signal() ) ;
+
 		public Meta()
 		{
 			super() ;
@@ -342,6 +404,25 @@ public class GUIEditText extends GUIText
 		public String getType()
 		{
 			return "UITEXTFIELD_GUIEDITTEXT" ;
+		}
+
+		public void setPlaceholder( final String _text )
+		{
+			if( _text != null && placeholder.toString().equals( _text ) == false )
+			{
+				placeholder.setString( _text ) ;
+				UIElement.signal( this, placeholder.getSignal() ) ;
+			}
+		}
+
+		public String getPlaceholder()
+		{
+			return placeholder.toString() ;
+		}
+
+		public Connect.Signal placeholderChanged()
+		{
+			return placeholder.getSignal() ;
 		}
 	}
 }

@@ -4,6 +4,8 @@ import java.util.List ;
 
 public interface IEventSystem extends IAddEvent
 {
+	public void setIntercept( final IIntercept _intercept ) ;
+
 	public void addHandler( final IEventHandler _handler ) ;
 	public void removeHandler( final IEventHandler _handler ) ;
 

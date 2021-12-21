@@ -87,9 +87,9 @@ public class UIEditorState extends GameState
 	}
 
 	@Override
-	protected void initEventProcessors( final EventController _internal, final EventController _external )
+	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
 	{
-		super.initEventProcessors( _internal, _external ) ;
+		super.initEventProcessors( _internal, _external, _intercept ) ;
 
 		_internal.addProcessor( "ADD_ENTITY", ( final Entity _entity ) -> 
 		{

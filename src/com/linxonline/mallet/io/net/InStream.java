@@ -7,7 +7,6 @@ public class InStream
 	private final byte[] buffer ;
 	private int length ;
 
-	private int port ;
 	private Address address ;
 
 	public InStream( final int _length )
@@ -16,18 +15,12 @@ public class InStream
 		length = _length ;
 	}
 
-	public void setSender( final int _port, final Address _address )
+	public void setSender( final Address _address )
 	{
-		port = _port ;
 		address = _address ;
 	}
 
-	public int getSenderPort()
-	{
-		return port ;
-	}
-
-	public Address getSenderAddress()
+	public Address getSender()
 	{
 		return address ;
 	}

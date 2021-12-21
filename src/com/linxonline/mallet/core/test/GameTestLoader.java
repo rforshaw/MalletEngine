@@ -59,24 +59,14 @@ public final class GameTestLoader implements IGameLoader
 				/*boolean run = true ;
 				final InStream stream = new InStream( 100 ) ;
 				final UDPServer server = new UDPServer() ;
-				server.init( 4445, new Address( "localhost" ) ) ;
-				while( run == true )
-				{
-					server.receive( stream ) ;
-					final int size = stream.getDataLength() ;
-					final Serialise.ByteIn serialise = new Serialise.ByteIn( stream.getBuffer(), 0, size ) ;
+				server.init( new Address( "localhost", 4455 ), 30 ) ;
 
-					System.out.println( size ) ;
-					System.out.println( serialise.readString() ) ;
-				}
-				server.close() ;*/
-
-				/*final UDPClient client = new UDPClient() ;
-				client.init( 4445, new Address( "localhost" ) ) ;
+				final UDPClient client = new UDPClient() ;
+				client.init( new Address( "localhost", 4455 ), 30 ) ;
 				client.send( new IOutStream()
 				{
-					private String test = "Hello World!\n" ;
-				
+					private String test = "Hello World!" ;
+
 					@Override
 					public int getLength()
 					{
@@ -89,6 +79,23 @@ public final class GameTestLoader implements IGameLoader
 						_out.writeString( test ) ;
 					}
 				} ) ;
+
+				while( run == true )
+				{
+					server.receive( stream ) ;
+					final int size = stream.getDataLength() ;
+					final Serialise.ByteIn serialise = new Serialise.ByteIn( stream.getBuffer(), 0, size ) ;
+
+					final String response = serialise.readString() ;
+					System.out.println( size ) ;
+					System.out.println( response ) ;
+
+					if( response.equals( "Hello World!" ) )
+					{
+						run = false ;
+					}
+				}
+				server.close() ;
 				client.close() ;*/
 
 				createUI() ;

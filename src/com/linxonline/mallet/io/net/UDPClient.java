@@ -1,8 +1,10 @@
 package com.linxonline.mallet.io.net ;
 
-import java.net.InetAddress ;
+import java.net.SocketAddress ;
+import java.net.InetSocketAddress ;
 import java.net.DatagramSocket ;
-import java.net.DatagramPacket ;
+import java.nio.channels.DatagramChannel ;
+import java.nio.ByteBuffer ;
 import java.net.UnknownHostException ;
 import java.net.SocketException ;
 import java.net.SocketTimeoutException ;
@@ -20,37 +22,34 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 */
 public class UDPClient implements Close
 {
-	private DatagramSocket socket ;
-	private DatagramPacket sendPacket ;
-	private DatagramPacket recvPacket ;
+	private DatagramChannel channel ;
+	private SocketAddress target ;
 
 	private byte[] sendBuffers = new byte[200] ;
-	private byte[] recvBuffers = new byte[200] ;
 
 	public UDPClient() {}
 
-	public boolean init( final int _port, final Address _address, final int _timeout )
+	public boolean init( final Address _target, final int _timeout )
 	{
 		try
 		{
-			if( socket != null )
+			if( channel != null )
 			{
-				socket.close() ;
+				close() ;
 			}
 
-			socket = new DatagramSocket() ;
+			target = new InetSocketAddress( _target.getHost(), _target.getPort() ) ;
+
+			channel = DatagramChannel.open() ;
+			channel.bind( new InetSocketAddress( 0 ) ) ;
+			channel.configureBlocking( false ) ;
+
+			DatagramSocket socket = channel.socket();
 			socket.setSoTimeout( _timeout ) ;
 
-			sendPacket = new DatagramPacket( sendBuffers, 0, sendBuffers.length, _address.createInetAddress(), _port ) ;
-			recvPacket = new DatagramPacket( recvBuffers, 0, recvBuffers.length ) ;
 			return true ;
 		}
-		catch( UnknownHostException ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
-		catch( SocketException ex )
+		catch( IOException ex )
 		{
 			ex.printStackTrace() ;
 			return false ;
@@ -67,10 +66,10 @@ public class UDPClient implements Close
 				sendBuffers = new byte[length] ;
 			}
 
-			sendPacket.setData( sendBuffers, 0, length ) ;
 			_out.serialise( new Serialise.ByteOut( sendBuffers ) ) ;
+			final ByteBuffer buffer = ByteBuffer.wrap( sendBuffers, 0, length ) ;
 
-			socket.send( sendPacket ) ;
+			channel.send( buffer, target ) ;
 			return true ;
 		}
 		catch( IOException ex )
@@ -83,18 +82,17 @@ public class UDPClient implements Close
 	{
 		try
 		{
-			final byte[] buffer = _stream.getBuffer() ;
-			recvPacket.setData( buffer, 0, buffer.length ) ;
+			final ByteBuffer wrap = ByteBuffer.wrap( _stream.getBuffer() ) ;
+			final SocketAddress source = channel.receive( wrap ) ;
+			if( source == null )
+			{
+				return null ;
+			}
 
-			socket.receive( recvPacket ) ;
-			//_stream.setSender( recvPacket.getPort(), new Address( recvPacket.getAddress() ) ) ;
-			_stream.setDataLength( recvPacket.getLength() ) ;
+			_stream.setSender( new Address( source ) ) ;
+			_stream.setDataLength( wrap.position() ) ;
 
 			return _stream ;
-		}
-		catch( SocketTimeoutException ex )
-		{
-			return null ;
 		}
 		catch( IOException ex )
 		{
@@ -105,7 +103,14 @@ public class UDPClient implements Close
 	@Override
 	public boolean close()
 	{
-		socket.close() ;
-		return true ;
+		try
+		{
+			channel.close() ;
+			return true ;
+		}
+		catch( IOException ex )
+		{
+			return false ;
+		}
 	}
 }
