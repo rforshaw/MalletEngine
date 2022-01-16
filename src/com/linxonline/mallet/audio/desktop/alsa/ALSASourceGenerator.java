@@ -214,7 +214,7 @@ public class ALSASourceGenerator implements AudioGenerator
 			case AL.AL_INVALID_VALUE     : return "AL_INVALID_VALUE" ;
 			case AL.AL_INVALID_OPERATION : return "AL_INVALID_OPERATION" ;
 			case AL.AL_OUT_OF_MEMORY     : return "AL_OUT_OF_MEMORY" ;
-			default                        : return "No such error code";
+			default                      : return "No such error code";
 		}
 	}
 }

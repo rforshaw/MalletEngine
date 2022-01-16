@@ -1,6 +1,7 @@
 package com.linxonline.mallet.audio ;
 
 import java.util.List ;
+import java.util.Iterator ;
 import java.util.Map ;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -10,6 +11,8 @@ import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.maths.Vector3 ;
 
 import com.linxonline.mallet.event.* ;
+
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
@@ -30,8 +33,10 @@ public class AudioSystem
 
 	private final Map<Emitter, AudioSource> sources = MalletMap.<Emitter, AudioSource>newMap() ;
 
-	private final List<AudioSource> active    = MalletList.<AudioSource>newList() ;
-	private final List<AudioSource> paused    = MalletList.<AudioSource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
+	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
+
+	private final List<AudioSource> active = MalletList.<AudioSource>newList() ;
+	private final List<AudioSource> paused = MalletList.<AudioSource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
 	protected AudioGenerator sourceGenerator = null ;										// Used to create the Source from a Sound Buffer
@@ -85,20 +90,50 @@ public class AudioSystem
 			return ;
 		}
 
-		{
-			final int size = active.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final AudioSource source = active.get( i ) ;
-				final SourceCallback callback = source.getCallback() ;
+		updateExecutions() ;
 
-				switch( source.getState() )
+		for( AudioSource source : active )
+		{
+			final SourceCallback callback = source.getCallback() ;
+
+			switch( source.getState() )
+			{
+				case UNCHANGED :
 				{
-					case PAUSED  : callback.pause() ; break ;
-					case STOPPED : callback.finished() ; break ;
-					case PLAYING : callback.tick( source.getCurrentTime() ) ; break ;
+					break ;
+				}
+				case PAUSED    :
+				{
+					callback.pause() ;
+					break ;
+				}
+				case STOPPED   :
+				{
+					callback.finished() ;
+					invokeLater( () -> active.remove( source ) ) ;
+					break ;
+				}
+				case PLAYING   :
+				{
+					callback.tick( source.getCurrentTime() ) ;
+					break ;
 				}
 			}
+		}
+	}
+
+	private void updateExecutions()
+	{
+		executions.update() ;
+		final List<Runnable> runnables = executions.getCurrentData() ;
+		if( runnables.isEmpty() == false )
+		{
+			final int size = runnables.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				runnables.get( i ).run() ;
+			}
+			runnables.clear() ;
 		}
 	}
 
@@ -128,6 +163,14 @@ public class AudioSystem
 				setVolumeOnSource( _volume, audio.getSource() ) ;
 			}
 		}*/
+	}
+
+	private void invokeLater( final Runnable _run )
+	{
+		if( _run != null )
+		{
+			executions.add( _run ) ;
+		}
 	}
 
 	private void setVolumeOnSource( final Volume _volume, final AudioSource _source )
@@ -216,21 +259,23 @@ public class AudioSystem
 					return _emitter ;
 				}
 
-				if( emitters.contains( _emitter ) == false )
+				AudioSystem.this.invokeLater( () ->
 				{
-					emitters.add( _emitter ) ;
-					final AudioSource source = loadSource( _emitter ) ;
-					if( source == null )
+					if( emitters.contains( _emitter ) == false )
 					{
-						Logger.println( "Failed to generate source for emitter.", Logger.Verbosity.NORMAL ) ;
-						return _emitter ;
+						emitters.add( _emitter ) ;
+						final AudioSource source = loadSource( _emitter ) ;
+						if( source == null )
+						{
+							Logger.println( "Failed to generate source for emitter.", Logger.Verbosity.NORMAL ) ;
+							return ;
+						}
+
+						sources.put( _emitter, source ) ;
+						update( _emitter ) ;
 					}
+				} ) ;
 
-					sources.put( _emitter, source ) ;
-					update( _emitter ) ;
-
-					active.add( source ) ;
-				}
 				return _emitter ;
 			}
 
@@ -242,60 +287,98 @@ public class AudioSystem
 					return _emitter ;
 				}
 
-				emitters.remove( _emitter ) ;
-				final AudioSource source = sources.get( _emitter ) ;
-				if( source == null )
+				AudioSystem.this.invokeLater( () ->
 				{
-					Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
-					return _emitter ;
-				}
+					emitters.remove( _emitter ) ;
+					final AudioSource source = sources.remove( _emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
+						return ;
+					}
 
-				active.remove( source ) ;
+					active.remove( source ) ;
 
-				source.stop() ;
-				source.destroySource() ;
+					source.stop() ;
+					source.destroySource() ;
+				} ) ;
+
 				return _emitter ;
 			}
 
 			@Override
 			public Emitter play( final Emitter _emitter )
 			{
-				final AudioSource source = sources.get( _emitter ) ;
-				if( source == null )
+				AudioSystem.this.invokeLater( () ->
 				{
-					Logger.println( "Attempting to play emitter with no source.", Logger.Verbosity.NORMAL ) ;
-					return _emitter ;
-				}
+					final AudioSource source = sources.get( _emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Attempting to play emitter with no source.", Logger.Verbosity.NORMAL ) ;
+						return ;
+					}
 
-				source.play() ;
+					if( source.play() == false )
+					{
+						Logger.println( "Failed to play: " + _emitter.getFilepath(), Logger.Verbosity.NORMAL ) ;
+						return ;
+					}
+				
+					if( active.contains( source ) == false )
+					{
+						active.add( source ) ;
+					}
+				} ) ;
+
 				return _emitter ;
 			}
 
 			@Override
 			public Emitter stop( final Emitter _emitter )
 			{
-				final AudioSource source = sources.get( _emitter ) ;
-				if( source == null )
+				AudioSystem.this.invokeLater( () ->
 				{
-					Logger.println( "Attempting to stop emitter with no source.", Logger.Verbosity.NORMAL ) ;
-					return _emitter ;
-				}
+					final AudioSource source = sources.get( _emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Attempting to stop emitter with no source.", Logger.Verbosity.NORMAL ) ;
+						return ;
+					}
 
-				source.stop() ;
+					if( source.stop() == false )
+					{
+						Logger.println( "Failed to stop: " + _emitter.getFilepath(), Logger.Verbosity.NORMAL ) ;
+					}
+
+					active.remove( source ) ;
+				} ) ;
+
 				return _emitter ;
 			}
 
 			@Override
 			public Emitter pause( final Emitter _emitter )
 			{
-				final AudioSource source = sources.get( _emitter ) ;
-				if( source == null )
+				AudioSystem.this.invokeLater( () ->
 				{
-					Logger.println( "Attempting to pause emitter with no source.", Logger.Verbosity.NORMAL ) ;
-					return _emitter ;
-				}
+					final AudioSource source = sources.get( _emitter ) ;
+					if( source == null )
+					{
+						Logger.println( "Attempting to pause emitter with no source.", Logger.Verbosity.NORMAL ) ;
+						return ;
+					}
 
-				source.pause() ;
+					if( source.pause() == false )
+					{
+						Logger.println( "Failed to pause: " + _emitter.getFilepath(), Logger.Verbosity.NORMAL ) ;
+					}
+
+					if( active.contains( source ) == false )
+					{
+						active.add( source ) ;
+					}
+				} ) ;
+
 				return _emitter ;
 			}
 
@@ -310,7 +393,11 @@ public class AudioSystem
 				}
 
 				_emitter.getPosition( position ) ;
-				source.setPosition( position.x, position.y, position.z ) ;
+				if( source.setPosition( position.x, position.y, position.z ) == false )
+				{
+					Logger.println( "Failed to set position: " + _emitter.getFilepath(), Logger.Verbosity.NORMAL ) ;
+				}
+
 				source.setCallback( _emitter.getCallback() ) ;
 				return _emitter ;
 			}
@@ -323,22 +410,26 @@ public class AudioSystem
 					return ;
 				}
 
-				disable = true ;
-				for( final Emitter emitter : emitters  )
+				AudioSystem.this.invokeLater( () ->
 				{
-					final AudioSource source = sources.get( emitter ) ;
-					if( source == null )
+					for( final Emitter emitter : emitters  )
 					{
-						Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
-						continue ;
+						final AudioSource source = sources.remove( emitter ) ;
+						if( source == null )
+						{
+							Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
+							continue ;
+						}
+
+						active.remove( source ) ;
+
+						source.stop() ;
+						source.destroySource() ;
 					}
+					emitters.clear() ;
+				} ) ;
 
-					active.remove( source ) ;
-
-					source.stop() ;
-					source.destroySource() ;
-				}
-				emitters.clear() ;
+				disable = true ;
 			}
 		} ;
 	}
@@ -393,7 +484,6 @@ public class AudioSystem
 		final Volume volume = channelTable.get( _emitter.getCategory() ) ;
 		setVolumeOnSource( volume, source ) ;
 
-		//System.out.println( volume.toString() ) ;
 		return source ;
 	}
 
@@ -402,7 +492,10 @@ public class AudioSystem
 		@Override
 		public void setListenerPosition( final float _x, final float _y, final float _z )
 		{
-			sourceGenerator.setListenerPosition( _x, _y, _z ) ;
+			AudioSystem.this.invokeLater( () ->
+			{
+				sourceGenerator.setListenerPosition( _x, _y, _z ) ;
+			} ) ;
 		}
 	}
 }

@@ -122,9 +122,23 @@ public class OBB
 		return _fill ;
 	}
 
+	public Vector3 getPosition( final Vector3 _fill )
+	{
+		_fill.x = position[OBB.POSITION_X] ;
+		_fill.y = position[OBB.POSITION_Y] ;
+		return _fill ;
+	}
+
 	public Vector2 getOffset( final Vector2 _fill )
 	{
 		_fill.setXY( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
+		return _fill ;
+	}
+
+	public Vector3 getOffset( final Vector3 _fill )
+	{
+		_fill.x = position[OBB.OFFSET_X] ;
+		_fill.y = position[OBB.OFFSET_Y] ;
 		return _fill ;
 	}
 

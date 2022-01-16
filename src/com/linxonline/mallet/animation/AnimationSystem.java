@@ -59,15 +59,12 @@ public class AnimationSystem
 			*/
 			public IAnimation add( final IAnimation _animation )
 			{
-				AnimationSystem.this.invokeLater( new Runnable()
+				AnimationSystem.this.invokeLater( () ->
 				{
-					public void run()
+					if( _animation != null )
 					{
-						if( _animation != null )
-						{
-							animations.add( _animation ) ;
-							_animation.added() ;
-						}
+						animations.add( _animation ) ;
+						_animation.added() ;
 					}
 				} ) ;
 				return _animation ;
@@ -81,15 +78,12 @@ public class AnimationSystem
 			*/
 			public IAnimation remove( final IAnimation _animation )
 			{
-				AnimationSystem.this.invokeLater( new Runnable()
+				AnimationSystem.this.invokeLater( () ->
 				{
-					public void run()
+					if( _animation != null )
 					{
-						if( _animation != null )
-						{
-							animations.remove( _animation ) ;
-							_animation.removed() ;
-						}
+						animations.remove( _animation ) ;
+						_animation.removed() ;
 					}
 				} ) ;
 				return _animation ;

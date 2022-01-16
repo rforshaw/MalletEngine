@@ -267,7 +267,7 @@ public final class GameTestLoader implements IGameLoader
 				draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
-				program.mapUniform( "inTex0", new MalletFont( "Arial" ) ) ;
+				program.mapUniform( "inTex0", new MalletFont( "Arial", 20 ) ) ;
 
 				final TextUpdater updater = TextUpdater.getOrCreate( world, program, false, 200 ) ;
 				updater.addDynamics( draw ) ;

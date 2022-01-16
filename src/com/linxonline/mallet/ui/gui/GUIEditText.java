@@ -161,13 +161,7 @@ public class GUIEditText extends GUIText
 		final Vector3 length = getLength() ;
 		final StringBuilder edit = getText() ;
 
-		{
-			//final MalletFont.Metrics metrics = font.getMetrics() ;
-			//offset.x = UI.align( getAlignmentX(), font.stringWidth( edit ), length.x ) ;
-			//offset.y = UI.align( getAlignmentY(), metrics.getHeight(), length.y ) ;
-
-			updateTextRange() ;
-		}
+		updateTextRange() ;
 
 		if( isEditing() == true )
 		{

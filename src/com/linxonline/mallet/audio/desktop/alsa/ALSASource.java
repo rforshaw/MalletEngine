@@ -23,6 +23,7 @@ public class ALSASource implements AudioSource
 	private final int[] freq = new int[1] ;
 	private final int[] bufferOffset = new int[1] ;
 
+	private State currentState = State.UNKNOWN ;
 	private SourceCallback callback ;
 
 	public ALSASource( final AL _openAL, final AudioBuffer<ALSASound> _buffer, final int[] _source )
@@ -33,77 +34,85 @@ public class ALSASource implements AudioSource
 	}
 
 	@Override
-	public void play()
+	public boolean play()
 	{
 		openAL.alSourcePlay( source[0] ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to play source" ) ;
-		}
+		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
-	public void playLoop()
+	public boolean playLoop()
 	{
 		openAL.alSourcei( source[0], AL.AL_LOOPING,  AL.AL_TRUE ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
-			System.out.println( "Failed to configure source" ) ;
+			return false ;
 		}
-		play() ;
+		return play() ;
 	}
 
 	@Override
-	public void pause()
+	public boolean pause()
 	{
 		openAL.alSourcePause( source[0] ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to pause source" ) ;
-		}
+		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
-	public void stop()
+	public boolean stop()
 	{
 		openAL.alSourceStop( source[0] ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to stop source" ) ;
-		}
+		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
-	public void setPosition( final float _x, final float _y, final float _z )
+	public boolean setPosition( final float _x, final float _y, final float _z )
 	{
 		openAL.alSource3f( source[0], AL.AL_POSITION, _x, _y, _z ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to set position" ) ;
-		}
+		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
-	public void setRelative( final boolean _relative )
+	public boolean setRelative( final boolean _relative )
 	{
 		openAL.alSourcei( source[0], AL.AL_SOURCE_RELATIVE, ( _relative == true ) ? AL.AL_TRUE : AL.AL_FALSE ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to set relative" ) ;
-		}
+		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
 	public State getState()
 	{
 		openAL.alGetSourcei( source[0], AL.AL_SOURCE_STATE, state, 0 ) ;
+		final State temp = currentState ;
+
 		switch( state[0] )
 		{
-			default            : return State.UNKNOWN ;
-			case AL.AL_PLAYING : return State.PLAYING ;
-			case AL.AL_PAUSED  : return State.PAUSED ;
-			case AL.AL_STOPPED : return State.STOPPED ;
+			default            :
+			{
+				currentState = State.UNKNOWN ;
+				break ;
+			}
+			case AL.AL_PLAYING :
+			{
+				currentState = State.PLAYING ;
+				return currentState ;
+			}
+			case AL.AL_PAUSED  :
+			{
+				currentState = State.PAUSED ;
+				break ;
+			}
+			case AL.AL_STOPPED :
+			{
+				currentState = State.STOPPED ;
+				break ;
+			}
 		}
+
+		// If the state hasn't changed from UNKNOWN, PAUSED, or STOPPED
+		// return UNCHANGED, this means the AudioSystem doesn't have to
+		// track the state.
+		return ( temp != currentState ) ? currentState : State.UNCHANGED ;
 	}
 
 	@Override

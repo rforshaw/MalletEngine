@@ -68,6 +68,17 @@ public class UIElement implements InputHandler, Connect.Connection
 	private final Connect.Signal elementClear      = new Connect.Signal() ;
 	private final Connect.Signal elementReset      = new Connect.Signal() ;
 
+	private InputAction scrollAction        = DEFAULT_SCROLL_ACTION ;
+	private InputAction mouseMoveAction     = DEFAULT_MOUSE_MOVE_ACTION ;
+	private InputAction mousePressedAction  = DEFAULT_MOUSE_PRESSED_ACTION ;
+	private InputAction mouseReleasedAction = DEFAULT_MOUSE_RELEASED_ACTION ;
+	private InputAction touchMoveAction     = DEFAULT_TOUCH_MOVE_ACTION ;
+	private InputAction touchPressedAction  = DEFAULT_TOUCH_PRESSED_ACTION ;
+	private InputAction touchReleasedAction = DEFAULT_TOUCH_RELEASED_ACTION ;
+	private InputAction keyReleasedAction   = DEFAULT_KEY_RELEASED_ACTION ;
+	private InputAction keyPressedAction    = DEFAULT_KEY_PRESSED_ACTION ;
+	private InputAction analogueMoveAction  = DEFAULT_ANALOGUE_MOVE_ACTION ;
+
 	public enum State
 	{
 		NEUTRAL,		// Element does not have focus
@@ -585,6 +596,56 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	}
 
+	public void setScrollAction( final InputAction _action )
+	{
+		scrollAction = ( _action != null ) ? _action : DEFAULT_SCROLL_ACTION ;
+	} ;
+
+	public void setMouseMoveAction( final InputAction _action )
+	{
+		mouseMoveAction = ( _action != null ) ? _action : DEFAULT_MOUSE_MOVE_ACTION ;
+	} ;
+
+	public void setMousePressedAction( final InputAction _action )
+	{
+		mousePressedAction = ( _action != null ) ? _action : DEFAULT_MOUSE_PRESSED_ACTION ;
+	} ;
+
+	public void setMouseReleasedAction( final InputAction _action )
+	{
+		mouseReleasedAction = ( _action != null ) ? _action : DEFAULT_MOUSE_RELEASED_ACTION ;
+	} ;
+
+	public void setTouchMoveAction( final InputAction _action )
+	{
+		touchMoveAction = ( _action != null ) ? _action : DEFAULT_TOUCH_MOVE_ACTION ;
+	} ;
+
+	public void setTouchPressedAction( final InputAction _action )
+	{
+		touchPressedAction = ( _action != null ) ? _action : DEFAULT_TOUCH_PRESSED_ACTION ;
+	} ;
+
+	public void setTouchReleasedAction( final InputAction _action )
+	{
+		touchReleasedAction = ( _action != null ) ? _action : DEFAULT_TOUCH_RELEASED_ACTION ;
+	} ;
+
+	public void setKeyReleasedAction( final InputAction _action )
+	{
+		keyReleasedAction = ( _action != null ) ? _action : DEFAULT_KEY_RELEASED_ACTION ;
+	} ;
+
+	public void setKeyPressedAction( final InputAction _action )
+	{
+		keyPressedAction = ( _action != null ) ? _action : DEFAULT_KEY_PRESSED_ACTION ;
+	} ;
+
+	public void setAnalogueMoveAction( InputAction _action )
+	{
+		analogueMoveAction = ( _action != null ) ? _action : DEFAULT_ANALOGUE_MOVE_ACTION ;
+	}
+	
 	/**
 		Returns true if the elements considers itself 
 		requiring a need to be refreshed.
@@ -1063,12 +1124,12 @@ public class UIElement implements InputHandler, Connect.Connection
 		return _element ;
 	}
 
-	private interface InputAction
+	public interface InputAction
 	{
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event ) ;
 	}
 
-	private static final InputAction scrollAction = new InputAction()
+	private static final InputAction DEFAULT_SCROLL_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1077,7 +1138,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction mouseMoveAction = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_MOVE_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1086,7 +1147,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction mousePressedAction = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_PRESSED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1095,7 +1156,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction mouseReleasedAction = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_RELEASED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1104,7 +1165,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction touchMoveAction = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_MOVE_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1113,7 +1174,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction touchPressedAction = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_PRESSED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1122,7 +1183,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction touchReleasedAction = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_RELEASED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1131,7 +1192,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction keyReleasedAction = new InputAction()
+	private static final InputAction DEFAULT_KEY_RELEASED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1140,7 +1201,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction keyPressedAction = new InputAction()
+	private static final InputAction DEFAULT_KEY_PRESSED_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
@@ -1149,7 +1210,7 @@ public class UIElement implements InputHandler, Connect.Connection
 		}
 	} ;
 
-	private static final InputAction analogueMoveAction = new InputAction()
+	private static final InputAction DEFAULT_ANALOGUE_MOVE_ACTION = new InputAction()
 	{
 		@Override
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )

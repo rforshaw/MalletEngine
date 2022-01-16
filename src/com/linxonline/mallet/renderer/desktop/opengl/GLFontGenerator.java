@@ -87,7 +87,7 @@ public class GLFontGenerator
 		// This allows us to render the text at a higher resolution 
 		// than the font has requested - change multiplier to increase 
 		// the base point size .
-		final int multiplier = 1 ;
+		final int multiplier = 2 ;
 		final MalletFont bigger = _font ;//new MalletFont( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
 
 		final MalletFont.Metrics biggerMetrics = bigger.getMetrics() ;
@@ -101,7 +101,8 @@ public class GLFontGenerator
 		final Graphics2D g2D = textureBuffer.createGraphics() ;
 
 		g2D.setFont( font.deriveFont( font.getSize2D() ) ) ;
-		//g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
+		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON ) ;
+		g2D.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP ) ;
 
 		final char[] c = new char[1] ;
 		final double point = 1.0 / width ;

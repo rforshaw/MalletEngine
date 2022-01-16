@@ -1,6 +1,7 @@
 package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.physics.hulls.Hull ;
@@ -70,6 +71,18 @@ public class Box2D extends Hull
 
 	@Override
 	public Vector2 getOffset( final Vector2 _fill )
+	{
+		return obb.getOffset( _fill ) ;
+	}
+
+	@Override
+	public Vector3 getPosition( final Vector3 _fill )
+	{
+		return obb.getPosition( _fill ) ;
+	}
+
+	@Override
+	public Vector3 getOffset( final Vector3 _fill )
 	{
 		return obb.getOffset( _fill ) ;
 	}

@@ -174,6 +174,7 @@ public final class Entity
 	public abstract class Component
 	{
 		protected final EventController componentEvents ;	// Handles events from parent
+		private boolean disabled = false ;
 
 		public Component()
 		{
@@ -260,6 +261,12 @@ public final class Entity
 		public void readyToDestroy( final ReadyCallback _callback )
 		{
 			_callback.ready( this ) ;
+			disabled = true ;
+		}
+
+		public boolean isDisabled()
+		{
+			return disabled ;
 		}
 
 		/**

@@ -53,7 +53,7 @@ public enum KeyCode
 		character = _character ;
 	}
 
-public static KeyCode getKeyCode( final char _char )
+	public static KeyCode getKeyCode( final char _char )
 	{
 		switch( _char )
 		{
@@ -208,6 +208,7 @@ public static KeyCode getKeyCode( final char _char )
 			case KeyEvent.VK_LEFT_BRACE : return CURLY_BRACKET_OPEN ;
 			case KeyEvent.VK_RIGHT_BRACE : return CURLY_BRACKET_CLOSED ;
 			case KeyEvent.VK_TILDE : return TIDEL;
+			case KeyEvent.VK_ENTER : return ENTER ;
 			/* UPPERCASE LETTERS */
 			case KeyEvent.VK_A : return A ;
 			case KeyEvent.VK_B : return B ;

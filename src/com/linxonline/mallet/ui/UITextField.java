@@ -18,6 +18,7 @@ public class UITextField extends UIElement
 
 	private final Connect.Signal cursorIndexChanged = new Connect.Signal() ;
 	private final Connect.Signal textChanged = new Connect.Signal() ;
+	private final Connect.Signal submitChanged = new Connect.Signal() ;
 
 	public UITextField()
 	{
@@ -48,6 +49,24 @@ public class UITextField extends UIElement
 			public void slot( final UITextField _this )
 			{
 				controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+			}
+		} ) ;
+
+		setKeyPressedAction( new InputAction()
+		{
+			@Override
+			public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
+			{
+				switch( _event.getKeyCode() )
+				{
+					case ENTER :
+					{
+						UIElement.signal( UITextField.this, submitChanged() ) ;
+						return InputEvent.Action.CONSUME ;
+					}
+				}
+
+				return _listener.keyPressed( _event ) ;
 			}
 		} ) ;
 	}
@@ -86,6 +105,11 @@ public class UITextField extends UIElement
 	public Connect.Signal textChanged()
 	{
 		return textChanged ;
+	}
+
+	public Connect.Signal submitChanged()
+	{
+		return submitChanged ;
 	}
 
 	public static class Meta extends UIElement.Meta

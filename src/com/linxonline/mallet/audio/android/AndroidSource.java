@@ -18,6 +18,7 @@ public class AndroidSource implements AudioSource
 	private final AudioTrack track ;
 	private final int bufferLength ;
 
+	private State currentState = State.UNKNOWN ;
 	private SourceCallback callback ;
 
 	public AndroidSource( final byte[] _buffer )
@@ -48,32 +49,35 @@ public class AndroidSource implements AudioSource
 	}
 
 	@Override
-	public void play()
+	public boolean play()
 	{
 		pause() ;
 		track.setPlaybackHeadPosition( getBufferFrameOffset() < getBufferSize() ? getBufferFrameOffset() : 0 ) ;
 		track.play() ;
+		return true ;
 	}
 
 	@Override
-	public void playLoop()
+	public boolean playLoop()
 	{
 		pause() ;
 		track.setLoopPoints( getBufferFrameOffset(), getBufferSize(), -1 ) ;
 		track.play() ;
+		return true ;
 	}
 
 	@Override
-	public void pause()
+	public boolean pause()
 	{
 		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
 		{
 			track.pause() ;
 		}
+		return true ;
 	}
 
 	@Override
-	public void stop()
+	public boolean stop()
 	{
 		if( track.getPlayState() == AudioTrack.PLAYSTATE_PLAYING )
 		{
@@ -83,30 +87,55 @@ public class AndroidSource implements AudioSource
 			track.stop() ;
 			track.setPlaybackHeadPosition( 0 ) ;
 		}
+		return true ;
 	}
 
 	@Override
-	public void setPosition( final float _x, final float _y, final float _z )
+	public boolean setPosition( final float _x, final float _y, final float _z )
 	{
-
+		return true ;
 	}
 
 	@Override
-	public void setRelative( final boolean _relative )
+	public boolean setRelative( final boolean _relative )
 	{
-
+		return true ;
 	}
 
 	@Override
 	public State getState()
 	{
-		switch( track.getPlayState() )
+		final int state = track.getPlayState() ;
+		final State temp = currentState ;
+
+		switch( state )
 		{
-			default                           : return State.UNKNOWN ;
-			case AudioTrack.PLAYSTATE_PLAYING : return State.PLAYING ; // && getCurrentTime() < getDuration()
-			case AudioTrack.PLAYSTATE_PAUSED  : return State.PAUSED ;
-			case AudioTrack.PLAYSTATE_STOPPED : return State.STOPPED ;
+			default                           :
+			{
+				currentState = State.UNKNOWN ;
+				break ;
+			}
+			case AudioTrack.PLAYSTATE_PLAYING :
+			{
+				currentState = State.PLAYING ;
+				return currentState ;
+			}
+			case AudioTrack.PLAYSTATE_PAUSED  :
+			{
+				currentState = State.PAUSED ;
+				break ;
+			}
+			case AudioTrack.PLAYSTATE_STOPPED :
+			{
+				currentState = State.STOPPED ;
+				break ;
+			}
 		}
+
+		// If the state hasn't changed from UNKNOWN, PAUSED, or STOPPED
+		// return UNCHANGED, this means the AudioSystem doesn't have to
+		// track the state.
+		return ( temp != currentState ) ? currentState : State.UNCHANGED ;
 	}
 
 	@Override

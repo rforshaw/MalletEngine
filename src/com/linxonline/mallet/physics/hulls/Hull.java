@@ -1,6 +1,7 @@
 package com.linxonline.mallet.physics.hulls ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.entity.Entity ;
 
 import com.linxonline.mallet.physics.* ;
@@ -65,6 +66,10 @@ public abstract class Hull
 
 	public abstract Vector2 getPosition( final Vector2 _fill ) ;
 	public abstract Vector2 getOffset( final Vector2 _fill ) ;
+
+	public abstract Vector3 getPosition( final Vector3 _fill ) ;
+	public abstract Vector3 getOffset( final Vector3 _fill ) ;
+
 	public abstract float getRotation() ;
 
 	public abstract float[] getAxes() ;
