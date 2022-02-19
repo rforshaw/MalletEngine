@@ -2,19 +2,19 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 
 import com.jogamp.openal.* ;
 
-import com.linxonline.mallet.audio.SoundInterface ;
+import com.linxonline.mallet.io.Resource ;
 
 /**
 	Stores the required information to access the audio-buffer
 	and to destroy the it when eventually not in use.
 */
-public class ALSASound implements SoundInterface
+public class ALSABuffer extends Resource
 {
 	private final AL openAL ;			// Used to destroy buffer
 	private final int[] buffer ;		// Buffer id to audio-stream
 	private final int consumption ;		// Buffer size
 
-	public ALSASound( final int[] _buffer, final int _consumption, final AL _openAL )
+	public ALSABuffer( final int[] _buffer, final int _consumption, final AL _openAL )
 	{
 		openAL = _openAL ;
 		buffer = _buffer ;
@@ -39,8 +39,15 @@ public class ALSASound implements SoundInterface
 		Destroy OpenAL buffer.
 		Shouldn't be called if sources are still active.
 	**/
+	@Override
 	public void destroy()
 	{
 		openAL.alDeleteBuffers( 1, buffer, 0 ) ;
+	}
+
+	@Override
+	public String type()
+	{
+		return "SOUND" ;
 	}
 }

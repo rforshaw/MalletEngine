@@ -31,24 +31,24 @@ public class AudioSystem
 	private final Map<Category, Volume> channelTable = MalletMap.<Category, Volume>newMap() ;
 	private float masterVolume = 1.0f ;
 
-	private final Map<Emitter, AudioSource> sources = MalletMap.<Emitter, AudioSource>newMap() ;
+	private final Map<Emitter, ISource> sources = MalletMap.<Emitter, ISource>newMap() ;
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
-	private final List<AudioSource> active = MalletList.<AudioSource>newList() ;
-	private final List<AudioSource> paused = MalletList.<AudioSource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
+	private final List<ISource> active = MalletList.<ISource>newList() ;
+	private final List<ISource> paused = MalletList.<ISource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
-	protected AudioGenerator sourceGenerator = null ;										// Used to create the Source from a Sound Buffer
+	protected IGenerator generator = null ;										// Used to create the Source from a Sound Buffer
 
 	public AudioSystem()
 	{
 		this( null ) ;
 	}
 
-	public AudioSystem( final AudioGenerator _generator )
+	public AudioSystem( final IGenerator _generator )
 	{
-		sourceGenerator = _generator ;
+		generator = _generator ;
 		controller.addProcessor( "AUDIO_DELEGATE", ( final AudioDelegateCallback _callback ) ->
 		{
 			_callback.callback( constructAudioDelegate() ) ;
@@ -56,7 +56,7 @@ public class AudioSystem
 
 		controller.addProcessor( "AUDIO_CLEAN", ( final Object _null ) ->
 		{
-			if( sourceGenerator == null )
+			if( generator == null )
 			{
 				return ;
 			}
@@ -68,7 +68,7 @@ public class AudioSystem
 				activeKeys.add( emitter.getFilepath() ) ;
 			}
 
-			sourceGenerator.clean( activeKeys ) ;
+			generator.clean( activeKeys ) ;
 		} ) ;
 
 		controller.addProcessor( "CHANGE_VOLUME", ( final Volume _volume ) ->
@@ -84,7 +84,7 @@ public class AudioSystem
 	public void update( final float _dt )
 	{
 		controller.update() ;
-		if( sourceGenerator == null )
+		if( generator == null )
 		{
 			Logger.println( "No source-generator set for audio system.", Logger.Verbosity.MAJOR ) ;
 			return ;
@@ -92,7 +92,7 @@ public class AudioSystem
 
 		updateExecutions() ;
 
-		for( AudioSource source : active )
+		for( final ISource source : active )
 		{
 			final SourceCallback callback = source.getCallback() ;
 
@@ -145,7 +145,7 @@ public class AudioSystem
 		if( category.getChannel() == Category.Channel.MASTER )
 		{
 			masterVolume = _volume.getVolume() / 100.0f ;
-			for( final AudioSource source : active )
+			for( final ISource source : active )
 			{
 				// If master is being updated all 
 				// sources must be changed.
@@ -173,7 +173,7 @@ public class AudioSystem
 		}
 	}
 
-	private void setVolumeOnSource( final Volume _volume, final AudioSource _source )
+	private void setVolumeOnSource( final Volume _volume, final ISource _source )
 	{
 		switch( _volume.getCategory().getChannel() )
 		{
@@ -184,9 +184,9 @@ public class AudioSystem
 		_source.setVolume( ( int )( _volume.getVolume() * masterVolume ) ) ;
 	}
 
-	public void setAudioGenerator( final AudioGenerator _generator )
+	public void setGenerator( final IGenerator _generator )
 	{
-		sourceGenerator = _generator ;
+		generator = _generator ;
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class AudioSystem
 	*/
 	public void resumeSystem()
 	{
-		for( final AudioSource source : paused )
+		for( final ISource source : paused )
 		{
 			source.play() ;
 		}
@@ -208,7 +208,7 @@ public class AudioSystem
 	*/
 	public void pauseSystem()
 	{
-		for( final AudioSource source : active )
+		for( final ISource source : active )
 		{
 			switch( source.getState() )
 			{
@@ -224,9 +224,9 @@ public class AudioSystem
 
 	public void clear()
 	{
-		for( final AudioSource source : active )
+		for( final ISource source : active )
 		{
-			source.destroySource() ;
+			source.destroy() ;
 		}
 		active.clear() ;
 		sources.clear() ;
@@ -264,7 +264,7 @@ public class AudioSystem
 					if( emitters.contains( _emitter ) == false )
 					{
 						emitters.add( _emitter ) ;
-						final AudioSource source = loadSource( _emitter ) ;
+						final ISource source = loadSource( _emitter ) ;
 						if( source == null )
 						{
 							Logger.println( "Failed to generate source for emitter.", Logger.Verbosity.NORMAL ) ;
@@ -290,7 +290,7 @@ public class AudioSystem
 				AudioSystem.this.invokeLater( () ->
 				{
 					emitters.remove( _emitter ) ;
-					final AudioSource source = sources.remove( _emitter ) ;
+					final ISource source = sources.remove( _emitter ) ;
 					if( source == null )
 					{
 						Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
@@ -300,7 +300,7 @@ public class AudioSystem
 					active.remove( source ) ;
 
 					source.stop() ;
-					source.destroySource() ;
+					source.destroy() ;
 				} ) ;
 
 				return _emitter ;
@@ -311,7 +311,7 @@ public class AudioSystem
 			{
 				AudioSystem.this.invokeLater( () ->
 				{
-					final AudioSource source = sources.get( _emitter ) ;
+					final ISource source = sources.get( _emitter ) ;
 					if( source == null )
 					{
 						Logger.println( "Attempting to play emitter with no source.", Logger.Verbosity.NORMAL ) ;
@@ -338,7 +338,7 @@ public class AudioSystem
 			{
 				AudioSystem.this.invokeLater( () ->
 				{
-					final AudioSource source = sources.get( _emitter ) ;
+					final ISource source = sources.get( _emitter ) ;
 					if( source == null )
 					{
 						Logger.println( "Attempting to stop emitter with no source.", Logger.Verbosity.NORMAL ) ;
@@ -361,7 +361,7 @@ public class AudioSystem
 			{
 				AudioSystem.this.invokeLater( () ->
 				{
-					final AudioSource source = sources.get( _emitter ) ;
+					final ISource source = sources.get( _emitter ) ;
 					if( source == null )
 					{
 						Logger.println( "Attempting to pause emitter with no source.", Logger.Verbosity.NORMAL ) ;
@@ -385,7 +385,7 @@ public class AudioSystem
 			@Override
 			public Emitter update( final Emitter _emitter )
 			{
-				final AudioSource source = sources.get( _emitter ) ;
+				final ISource source = sources.get( _emitter ) ;
 				if( source == null )
 				{
 					Logger.println( "Attempting to update emitter with no source.", Logger.Verbosity.NORMAL ) ;
@@ -414,7 +414,7 @@ public class AudioSystem
 				{
 					for( final Emitter emitter : emitters  )
 					{
-						final AudioSource source = sources.remove( emitter ) ;
+						final ISource source = sources.remove( emitter ) ;
 						if( source == null )
 						{
 							Logger.println( "Failed to find source for emitter.", Logger.Verbosity.NORMAL ) ;
@@ -424,7 +424,7 @@ public class AudioSystem
 						active.remove( source ) ;
 
 						source.stop() ;
-						source.destroySource() ;
+						source.destroy() ;
 					}
 					emitters.clear() ;
 				} ) ;
@@ -475,11 +475,11 @@ public class AudioSystem
 		}
 	}
 
-	private AudioSource loadSource( final Emitter _emitter )
+	private ISource loadSource( final Emitter _emitter )
 	{
 		final String path = _emitter.getFilepath() ;
 		final StreamType type = _emitter.getStreamType() ;
-		final AudioSource source = sourceGenerator.createAudioSource( path, type ) ;
+		final ISource source = generator.create( path, type ) ;
 
 		final Volume volume = channelTable.get( _emitter.getCategory() ) ;
 		setVolumeOnSource( volume, source ) ;
@@ -494,7 +494,7 @@ public class AudioSystem
 		{
 			AudioSystem.this.invokeLater( () ->
 			{
-				sourceGenerator.setListenerPosition( _x, _y, _z ) ;
+				generator.setListenerPosition( _x, _y, _z ) ;
 			} ) ;
 		}
 	}

@@ -15,18 +15,18 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
-public class ALSASourceGenerator implements AudioGenerator
+public class ALSAGenerator implements IGenerator
 {
-	private final SoundManager<ALSASound> staticSoundManager = new SoundManager<ALSASound>() ;
+	private final SoundManager<ALSABuffer> staticSoundManager = new SoundManager<ALSABuffer>() ;
 	private AL openAL = null ;
 
-	public ALSASourceGenerator() {}
+	public ALSAGenerator() {}
 
 	/**
 		Generator deals with the construction and deconstruction of the Audio backend 
 	*/
 	@Override
-	public boolean startGenerator()
+	public boolean start()
 	{
 		try
 		{
@@ -47,8 +47,8 @@ public class ALSASourceGenerator implements AudioGenerator
 
 	private void initStaticLoaders()
 	{
-		final ILoader.ResourceLoader<String, AudioBuffer<ALSASound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ILoader.ResourceDelegate<String, AudioBuffer<ALSASound>>()
+		final ILoader.ResourceLoader<String, ALSABuffer> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<String, ALSABuffer>()
 		{
 			@Override
 			public boolean isLoadable( final String _file )
@@ -57,7 +57,7 @@ public class ALSASourceGenerator implements AudioGenerator
 			}
 
 			@Override
-			public AudioBuffer<ALSASound> load( final String _file )
+			public ALSABuffer load( final String _file )
 			{
 				final byte[] wav = ByteReader.readBytes( _file ) ;
 				if( wav == null )
@@ -66,7 +66,7 @@ public class ALSASourceGenerator implements AudioGenerator
 					return null ;
 				}
 
-				final AL openAL = ALSASourceGenerator.this.openAL ;
+				final AL openAL = ALSAGenerator.this.openAL ;
 				final int[] buffer = new int[1] ;
 
 				openAL.alGenBuffers( 1, buffer, 0 ) ;
@@ -89,7 +89,7 @@ public class ALSASourceGenerator implements AudioGenerator
 					return null ;
 				}
 
-				return new AudioBuffer<ALSASound>( new ALSASound( buffer, size, openAL ) ) ;
+				return new ALSABuffer( buffer, size, openAL ) ;
 			}
 
 			private int getALFormat( final int _channels, final int _bitsPerSample )
@@ -122,7 +122,7 @@ public class ALSASourceGenerator implements AudioGenerator
 	}
 
 	@Override
-	public boolean shutdownGenerator()
+	public boolean shutdown()
 	{
 		try
 		{
@@ -155,9 +155,9 @@ public class ALSASourceGenerator implements AudioGenerator
 		Sound buffer.
 	**/
 	@Override
-	public AudioSource createAudioSource( final String _file, final StreamType _type )
+	public ISource create( final String _file, final StreamType _type )
 	{
-		final AudioBuffer<ALSASound> sound = staticSoundManager.get( _file ) ;
+		final ALSABuffer sound = staticSoundManager.get( _file ) ;
 		if( sound == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
@@ -173,7 +173,7 @@ public class ALSASourceGenerator implements AudioGenerator
 			return null ;
 		}
 
-		final int[] buffer = sound.getBuffer().getBufferID() ;
+		final int[] buffer = sound.getBufferID() ;
 		openAL.alSourcei( source[0], AL.AL_BUFFER, buffer[0] ) ;		// Bind Buffer to Source
 		openAL.alSourcef( source[0], AL.AL_PITCH, 1.0f ) ;
 		openAL.alSourcef( source[0], AL.AL_GAIN, 1.0f ) ;

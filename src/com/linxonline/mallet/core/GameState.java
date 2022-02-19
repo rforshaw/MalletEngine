@@ -54,7 +54,9 @@ public class GameState extends State
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
 
-	protected IUpdate currentUpdate = null ;												// Current Running Mode
+	private final IUpdate updater ;													// Current Running Mode
+	private final List<IUpdate> mainUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_TIMESTEP
+	private final List<IUpdate> drawUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_FRAMERATE
 
 	protected final InputState inputWorldSystem = new InputState() ;			// Internal World Input System
 	protected final InputState inputUISystem = new InputState() ;				// Internal UI Input System
@@ -80,10 +82,20 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.MULTI ) ;
+		this( _name, Threaded.MULTI, UpdateMode.GAME ) ;
+	}
+
+	public GameState( final String _name, final UpdateMode _mode )
+	{
+		this( _name, Threaded.MULTI, _mode ) ;
 	}
 
 	public GameState( final String _name, final Threaded _type )
+	{
+		this( _name, _type, UpdateMode.GAME ) ;
+	}
+	
+	public GameState( final String _name, final Threaded _type, final UpdateMode _mode )
 	{
 		super( _name ) ;
 		switch( _type )
@@ -104,7 +116,7 @@ public class GameState extends State
 			}
 		}
 
-		initModes() ;
+		updater = createCoreUpdate( _mode ) ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
 	}
 
@@ -186,7 +198,7 @@ public class GameState extends State
 	{
 		if( _dt < DEFAULT_ESCAPE_TIME && system != null )
 		{
-			currentUpdate.update( _dt ) ;
+			updater.update( _dt ) ;
 		}
 	}
 
@@ -262,7 +274,7 @@ public class GameState extends State
 	public final void setSystem( final ISystem _system )
 	{
 		system = _system ;
-		audioSystem.setAudioGenerator( _system.getAudioGenerator() ) ;
+		audioSystem.setGenerator( _system.getAudioGenerator() ) ;
 
 		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
 		shutdown.addShutdownCallback( () ->
@@ -338,18 +350,53 @@ public class GameState extends State
 	}
 
 	/**
-		Initialise the currentUpdate with the mode needed.
-		Game State uses useGameMode by default.
+		Create the intended update mode for the gamestate.
 	*/
-	protected void initModes()
+	protected IUpdate createCoreUpdate( final UpdateMode _mode )
 	{
-		useGameMode() ;
-		//useApplicationMode() ;
+		mainUpdaters.add( ( final double _dt ) ->
+		{
+			system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
+			inputUISystem.update() ;
+			inputWorldSystem.update() ;
+
+			eventSystem.sendEvents() ;
+			internalController.update() ;
+			externalController.update() ;
+
+			collisionSystem.update( DEFAULT_TIMESTEP ) ;
+			entitySystem.update( DEFAULT_TIMESTEP ) ;
+			audioSystem.update( DEFAULT_TIMESTEP ) ;
+		} ) ;
+
+		drawUpdaters.add( ( final double _dt ) ->
+		{
+			system.getInput().update() ;
+			inputUISystem.update() ;
+			inputWorldSystem.update() ;
+
+			animationSystem.update( DEFAULT_FRAMERATE ) ;
+			system.draw( DEFAULT_FRAMERATE ) ;
+		} ) ;
+	
+		createUpdaters( mainUpdaters, drawUpdaters ) ;
+		switch( _mode )
+		{
+			default          :
+			case GAME        : return useGameMode() ;
+			case APPLICATION : return useApplicationMode() ;
+		}
 	}
 
-	protected void useGameMode()
+	/**
+		Allow the user to attach further core systems to the
+		game-states update cycle.
+	*/
+	protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw ) {}
+
+	protected IUpdate useGameMode()
 	{
-		currentUpdate = new IUpdate()
+		return new IUpdate()
 		{
 			private double deltaUpdateTime = 0.0 ;
 			private double deltaRenderTime = 0.0 ;
@@ -361,21 +408,13 @@ public class GameState extends State
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
 
-				while( updateAccumulator > DEFAULT_TIMESTEP )
+				while( updateAccumulator >= DEFAULT_TIMESTEP )
 				{
-					system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
-					inputUISystem.update() ;
-					inputWorldSystem.update() ;
-
-					eventSystem.sendEvents() ;
-					internalController.update() ;
-					externalController.update() ;
-
+					for( IUpdate update : mainUpdaters )
+					{
+						update.update( _dt ) ;
+					}
 					showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
-
-					collisionSystem.update( DEFAULT_TIMESTEP ) ;
-					entitySystem.update( DEFAULT_TIMESTEP ) ;
-					audioSystem.update( DEFAULT_TIMESTEP ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
 
@@ -383,32 +422,45 @@ public class GameState extends State
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
+				deltaUpdateTime += ( endTime - startTime ) * 0.000000001 ;
 
 				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ;
 				if( renderAccumulator >= DEFAULT_FRAMERATE )
 				{
 					startTime = ElapsedTimer.nanoTime() ;
 
-					system.getInput().update() ;
-					inputUISystem.update() ;
-					inputWorldSystem.update() ;
-
-					animationSystem.update( DEFAULT_FRAMERATE ) ;
-					system.draw( DEFAULT_FRAMERATE ) ;
+					for( IUpdate update : drawUpdaters )
+					{
+						update.update( _dt ) ;
+					}
 
 					endTime = ElapsedTimer.nanoTime() ;
 
 					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
 					renderAccumulator = 0.0 ;
+
+					// After rendering see if we have any spare time to sleep.
+					// Let's not waste CPU resources if we can avoid it.
+					final float accumulatedTime = ( float )( deltaUpdateTime + deltaRenderTime ) ;
+					// Ensure that the accumulated time for update and drawing is less than
+					// half our draw rate.
+					if( accumulatedTime < ( DEFAULT_FRAMERATE * 0.5f) )
+					{
+						// Sleep for a quarter of the leftover time, good
+						// chance we don't drop frames.
+						final long sleep = ( long )( ( DEFAULT_FRAMERATE - accumulatedTime ) * 0.25f * 1000.0f ) ;
+						system.sleep( sleep ) ;
+					}
+
+					deltaUpdateTime = 0.0 ;
 				}
 			}
 		} ;
 	}
 
-	protected void useApplicationMode()
+	protected IUpdate useApplicationMode()
 	{
-		currentUpdate = new IUpdate()
+		return new IUpdate()
 		{
 			private float waitDelay = 2.0f ;
 			private float wait = 0.0f ;
@@ -430,16 +482,10 @@ public class GameState extends State
 
 				while( updateAccumulator > DEFAULT_TIMESTEP )
 				{
-					inputUISystem.update() ;
-					inputWorldSystem.update() ;
-					eventSystem.sendEvents() ;
-
-					internalController.update() ;
-					externalController.update() ;
-
-					collisionSystem.update( DEFAULT_TIMESTEP ) ;
-					entitySystem.update( DEFAULT_TIMESTEP ) ;
-					audioSystem.update( DEFAULT_TIMESTEP ) ;
+					for( IUpdate update : mainUpdaters )
+					{
+						update.update( _dt ) ;
+					}
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
 
@@ -456,8 +502,11 @@ public class GameState extends State
 				renderAccumulator += _dt ;
 
 				showFPS.update( _dt, _dt ) ;
-				animationSystem.update( DEFAULT_FRAMERATE ) ;
-				system.draw( DEFAULT_FRAMERATE ) ;
+				for( IUpdate update : drawUpdaters )
+				{
+					update.update( _dt ) ;
+				}
+
 				renderAccumulator -= DEFAULT_FRAMERATE ;
 
 				final long endTime = ElapsedTimer.nanoTime() ;
@@ -570,6 +619,12 @@ public class GameState extends State
 		entitySystem.clear() ;
 		animationSystem.clear() ;
 	}
+
+	public enum UpdateMode
+	{
+		APPLICATION,
+		GAME
+	} ;
 
 	/**
 		Allows the developer to create their own update modes.

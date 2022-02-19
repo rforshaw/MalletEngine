@@ -10,10 +10,10 @@ import com.linxonline.mallet.util.SourceCallback ;
 	Provides the entry point in manipulating and playing 
 	an audio-stream.
 */
-public class ALSASource implements AudioSource
+public class ALSASource implements ISource
 {
 	private final AL openAL ;
-	private final AudioBuffer<ALSASound> buffer ;
+	private final ALSABuffer buffer ;
 	private final int[] source ;
 
 	private final int[] state = new int[1] ;			// Current State of the Audio: Playing, Pause, etc..
@@ -26,7 +26,7 @@ public class ALSASource implements AudioSource
 	private State currentState = State.UNKNOWN ;
 	private SourceCallback callback ;
 
-	public ALSASource( final AL _openAL, final AudioBuffer<ALSASound> _buffer, final int[] _source )
+	public ALSASource( final AL _openAL, final ALSABuffer _buffer, final int[] _source )
 	{
 		openAL = _openAL ;
 		buffer = _buffer ;
@@ -151,7 +151,7 @@ public class ALSASource implements AudioSource
 		Doesn't destroy OpenAL buffer.
 	**/
 	@Override
-	public void destroySource()
+	public void destroy()
 	{
 		stop() ;
 		openAL.alSourcei( source[0], AL.AL_BUFFER,  AL.AL_NONE ) ;
@@ -169,7 +169,7 @@ public class ALSASource implements AudioSource
 
 	private int getBufferSize()
 	{
-		final int[] temp = buffer.getBuffer().getBufferID() ;
+		final int[] temp = buffer.getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_SIZE, size, 0 ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
@@ -190,7 +190,7 @@ public class ALSASource implements AudioSource
 
 	private int getBufferBits()
 	{
-		final int[] temp = buffer.getBuffer().getBufferID() ;
+		final int[] temp = buffer.getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_BITS, bits, 0 ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
@@ -201,7 +201,7 @@ public class ALSASource implements AudioSource
 
 	private int getBufferChannels()
 	{
-		final int[] temp = buffer.getBuffer().getBufferID() ;
+		final int[] temp = buffer.getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_CHANNELS, channels, 0 ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
@@ -212,7 +212,7 @@ public class ALSASource implements AudioSource
 
 	private int getBufferFreq()
 	{
-		final int[] temp = buffer.getBuffer().getBufferID() ;
+		final int[] temp = buffer.getBufferID() ;
 		openAL.alGetBufferi( temp[0], AL.AL_FREQUENCY, freq, 0 ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{

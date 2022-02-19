@@ -1,6 +1,6 @@
 package com.linxonline.mallet.core ;
 
-import com.linxonline.mallet.audio.AudioGenerator ;
+import com.linxonline.mallet.audio.IGenerator ;
 import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.event.IEventSystem ;
 import com.linxonline.mallet.renderer.IRender ;
@@ -16,7 +16,7 @@ import com.linxonline.mallet.io.filesystem.FileSystem ;
 public interface ISystem<F extends FileSystem,
 						 S extends ISystem.ShutdownDelegate,
 						 R extends IRender,
-						 A extends AudioGenerator,
+						 A extends IGenerator,
 						 I extends IInputSystem,
 						 E extends IEventSystem,
 						 G extends IGameSystem>

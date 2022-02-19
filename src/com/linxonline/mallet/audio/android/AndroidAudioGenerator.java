@@ -15,21 +15,21 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
-public class AndroidAudioGenerator implements AudioGenerator
+public class AndroidAudioGenerator implements IGenerator
 {
-	private final SoundManager staticSoundManager = new SoundManager() ;
+	private final SoundManager<AndroidSound> staticSoundManager = new SoundManager<AndroidSound>() ;
 
-	public boolean startGenerator()
+	public boolean start()
 	{
-		final ILoader.ResourceLoader<String, AudioBuffer<AndroidSound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ILoader.ResourceDelegate<String, AudioBuffer<AndroidSound>>()
+		final ILoader.ResourceLoader<String, AndroidSound> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<String, AndroidSound>()
 		{
 			public boolean isLoadable( final String _file )
 			{
 				return GlobalFileSystem.isExtension( _file, ".wav", ".WAV" ) ;
 			}
 
-			public AudioBuffer<AndroidSound> load( final String _file )
+			public AndroidSound load( final String _file )
 			{
 				final byte[] buffer = ByteReader.readBytes( _file ) ;
 				if( buffer == null )
@@ -37,14 +37,14 @@ public class AndroidAudioGenerator implements AudioGenerator
 					return null ;
 				}
 
-				return new AudioBuffer<AndroidSound>( new AndroidSound( buffer ) ) ;
+				return new AndroidSound( buffer ) ;
 			}
 		} ) ;
 
 		return true ;
 	}
 
-	public boolean shutdownGenerator()
+	public boolean shutdown()
 	{
 		clear() ;
 		return true ;
@@ -61,17 +61,16 @@ public class AndroidAudioGenerator implements AudioGenerator
 		An AudioSource can be created multiple times and use the same 
 		Sound buffer.
 	**/
-	public AudioSource createAudioSource( final String _file, final StreamType _type )
+	public ISource create( final String _file, final StreamType _type )
 	{
-		final AudioBuffer<AndroidSound> buffer = ( AudioBuffer<AndroidSound> )staticSoundManager.get( _file ) ;
+		final AndroidSound buffer = staticSoundManager.get( _file ) ;
 		if( buffer == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
 			return null ;
 		}
 
-		final AndroidSound sound = buffer.getBuffer() ;
-		return new AndroidSource( sound.getBuffer() ) ;
+		return new AndroidSource( buffer.getBuffer() ) ;
 	}
 
 	@Override

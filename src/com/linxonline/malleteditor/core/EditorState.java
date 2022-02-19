@@ -45,7 +45,7 @@ public class EditorState extends GameState
 
 	public EditorState( final String _name )
 	{
-		super( _name ) ;
+		super( _name, GameState.UpdateMode.APPLICATION ) ;
 	}
 
 	@Override
@@ -61,12 +61,6 @@ public class EditorState extends GameState
 		uiWorld.addCameras( uiCamera ) ;
 
 		loadDefaultUILayout() ;
-	}
-
-	@Override
-	protected void initModes()
-	{
-		useApplicationMode() ;
 	}
 
 	private void loadDefaultUILayout()

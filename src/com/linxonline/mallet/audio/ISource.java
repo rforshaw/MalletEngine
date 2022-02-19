@@ -5,7 +5,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 /**
 	Defines what the AudioSystem can do to a sound.
 **/
-public interface AudioSource
+public interface ISource
 {
 	/**
 		Play the source from the beginning if stopped,
@@ -65,7 +65,7 @@ public interface AudioSource
 	public void setCallback( final SourceCallback _callback ) ;
 	public SourceCallback getCallback() ;
 
-	public void destroySource() ;
+	public void destroy() ;
 
 	public enum State
 	{

@@ -6,7 +6,7 @@ import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
 
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
-import com.linxonline.mallet.audio.desktop.alsa.ALSASourceGenerator ;
+import com.linxonline.mallet.audio.desktop.alsa.ALSAGenerator ;
 import com.linxonline.mallet.renderer.desktop.opengl.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
 import com.linxonline.mallet.core.* ;
@@ -21,7 +21,7 @@ import com.linxonline.mallet.util.buffers.* ;
 public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 												 DefaultShutdown,
 												 GLRenderer,
-												 ALSASourceGenerator,
+												 ALSAGenerator,
 												 InputSystem,
 												 EventSystem,
 												 GameSystem>
@@ -32,7 +32,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	{
 		super( new DefaultShutdown(),
 			   new GLRenderer(),
-			   new ALSASourceGenerator(),
+			   new ALSAGenerator(),
 			   new EventSystem(),
 			   new InputSystem(),
 			   new DesktopFileSystem(),
@@ -54,7 +54,7 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		final GLRenderer render = getRenderer() ;
 		render.start() ;
 
-		getAudioGenerator().startGenerator() ;
+		getAudioGenerator().start() ;
 
 		final InputSystem input = getInput() ;
 		render.getCanvas().setTitle( GlobalConfig.getString( "APPLICATION_NAME", "Mallet Engine" ) ) ;

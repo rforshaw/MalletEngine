@@ -102,7 +102,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				createEntities( 10, 10 ) ;
 

@@ -22,7 +22,7 @@ import com.linxonline.mallet.util.Logger ;
 public abstract class BasicSystem<F extends FileSystem,
 								  S extends ISystem.ShutdownDelegate,
 								  R extends IRender,
-								  A extends AudioGenerator,
+								  A extends IGenerator,
 								  I extends IInputSystem,
 								  E extends IEventSystem,
 								  G extends IGameSystem> implements ISystem<F, S, R, A, I, E, G>
@@ -84,7 +84,7 @@ public abstract class BasicSystem<F extends FileSystem,
 	public void shutdownSystem()
 	{
 		shutdownDelegate.shutdown() ;
-		audioGenerator.shutdownGenerator() ;
+		audioGenerator.shutdown() ;
 		renderer.shutdown() ;
 	}
 

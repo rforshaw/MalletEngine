@@ -57,7 +57,7 @@ public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
 		initEventProcessors() ;
 
 		activity.addAndroidInputListener( getInput() ) ;
-		getAudioGenerator().startGenerator() ;
+		getAudioGenerator().start() ;
 	}
 
 	protected void initEventProcessors()

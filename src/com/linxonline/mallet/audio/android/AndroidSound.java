@@ -1,8 +1,8 @@
 package com.linxonline.mallet.audio.android ;
 
-import com.linxonline.mallet.audio.SoundInterface ;
+import com.linxonline.mallet.io.Resource ;
 
-public class AndroidSound implements SoundInterface
+public class AndroidSound extends Resource
 {
 	private final byte[] buffer ;
 
@@ -26,4 +26,10 @@ public class AndroidSound implements SoundInterface
 	}
 
 	public void destroy() {}
+
+	@Override
+	public String type()
+	{
+		return "SOUND" ;
+	}
 }
