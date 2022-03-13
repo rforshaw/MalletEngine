@@ -37,6 +37,9 @@ public class Vorbis
 
 	private final List<CodebookConfiguration> codebooks = MalletList.<CodebookConfiguration>newList() ;
 	private final List<FloorConfiguration> floors = MalletList.<FloorConfiguration>newList() ;
+	private final List<ResidueConfiguration> residues = MalletList.<ResidueConfiguration>newList() ;
+	private final List<MappingConfiguration> mappings = MalletList.<MappingConfiguration>newList() ;
+	private final List<ModeConfiguration> modes = MalletList.<ModeConfiguration>newList() ;
 
 	public Vorbis() {}
 
@@ -47,24 +50,7 @@ public class Vorbis
 			2, 4, 4, 4, 4, 2, 3, 3
 		} ;
 		Huffman.Node root = Huffman.build( codewordLengths, 8 ) ;
-		System.out.println( root.toString() ) ;
 
-		final byte[] codeword = new byte[1] ;
-		ConvertBytes.setBit( codeword, 0, true ) ;
-		ConvertBytes.setBit( codeword, 1, true ) ;
-		ConvertBytes.setBit( codeword, 2, true ) ;
-		ConvertBytes.printBytes( codeword, 0, 3 ) ;
-		System.out.println( root.get( codeword, 0, 3 ) ) ;
-
-		System.out.println( iLog( 0 ) ) ;
-		System.out.println( iLog( 1 ) ) ;
-		System.out.println( iLog( 2 ) ) ;
-		System.out.println( iLog( 3 ) ) ;
-		System.out.println( iLog( 4 ) ) ;
-		System.out.println( iLog( 7 ) ) ;
-		System.out.println( iLog( -2 ) ) ;
-
-		System.out.println( "Reading ogg stream" ) ;
 		for( final Page page : _ogg.pages )
 		{
 			if( headers.size() < 3 )
@@ -73,7 +59,8 @@ public class Vorbis
 			}
 			else
 			{
-				//System.out.println( "Audio Page" ) ;
+				System.out.println( "Audio Page" ) ;
+				decodeAudioPacket( page ) ;
 			}
 		}
 	}
@@ -203,11 +190,12 @@ public class Vorbis
 
 		pos = decodeTimeDomain( pos, stream ) ;
 		pos = decodeFloors( pos, stream ) ;
+		pos = decodeResidues( pos, stream ) ;
+		pos = decodeMappings( pos, stream ) ;
+		pos = decodeModes( pos, stream ) ;
 
-		// Residues
-		// Mappings
 		// Modes
-		
+
 		return pos / 8 ;
 	}
 
@@ -344,18 +332,12 @@ public class Vorbis
 	private int decodeTimeDomain( int _pos, final byte[] _stream ) throws Exception
 	{
 		final int timeCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
-		System.out.println( "Time Count: " + timeCount ) ;
 		_pos += 6 ;
 
 		for( int i = 0; i < timeCount; i++ )
 		{
 			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
 			_pos += 16 ;
-
-			for( int j = 0; j < read.length; j++ )
-			{
-				ConvertBytes.printByte( read[j] ) ;
-			}
 
 			ConvertBytes.flipEndian( read ) ;
 			final int time = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
@@ -371,26 +353,21 @@ public class Vorbis
 	private int decodeFloors( int _pos, final byte[] _stream ) throws Exception
 	{
 		final int floorCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
-		System.out.println( "Floor Count: " + floorCount ) ;
 		_pos += 6 ;
 
-		final int[] floors = new int[floorCount] ;
 		for( int i = 0; i < floorCount; i++ )
 		{
 			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
 			_pos += 16 ;
 
-			ConvertBytes.printBytes( read, 0, 16 ) ;
-
 			ConvertBytes.flipEndian( read ) ;
-			floors[i] = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
-			System.out.println( "Floor: " + floors[i] ) ;
+			final int floor = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
 
-			switch( floors[i] )
+			switch( floor )
 			{
 				case 0  : _pos = decodeFloorType0( _pos, _stream ) ; break ;
 				case 1  : _pos = decodeFloorType1( _pos, _stream ) ; break ;
-				default : throw new Exception( "Unknown floor type: " + floors[i] ) ;
+				default : throw new Exception( "Unknown floor type: " + floor ) ;
 			}
 		}
 
@@ -400,7 +377,7 @@ public class Vorbis
 	private int decodeFloorType0( int _pos, final byte[] _stream ) throws Exception
 	{
 		final Floor0Configuration floor = new Floor0Configuration() ;
-		_pos = floor.decode( _pos, _stream ) ;
+		_pos = floor.decodeHeader( _pos, _stream ) ;
 		floors.add( floor ) ;
 		return _pos ;
 	}
@@ -408,9 +385,123 @@ public class Vorbis
 	private int decodeFloorType1( int _pos, final byte[] _stream ) throws Exception
 	{
 		final Floor1Configuration floor = new Floor1Configuration() ;
-		_pos = floor.decode( _pos, _stream ) ;
+		_pos = floor.decodeHeader( _pos, _stream ) ;
 		floors.add( floor ) ;
 		return _pos ;
+	}
+
+	private int decodeResidues( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int residueCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
+		_pos += 6 ;
+
+		final int[] residues = new int[residueCount] ;
+		for( int i = 0; i < residueCount; i++ )
+		{
+			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
+			_pos += 16 ;
+
+			ConvertBytes.flipEndian( read ) ;
+			final int residue = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
+
+			switch( residue )
+			{
+				case 0  : _pos = decodeResidueType0( _pos, _stream ) ; break ;
+				case 1  : _pos = decodeResidueType1( _pos, _stream ) ; break ;
+				case 2  : _pos = decodeResidueType2( _pos, _stream ) ; break ;
+				default : throw new Exception( "Unknown residue type: " + residue ) ;
+			}
+		}
+
+		return _pos ;
+	}
+
+	private int decodeResidueType0( int _pos, final byte[] _stream ) throws Exception
+	{
+		final Residue0Configuration residue = new Residue0Configuration() ;
+		_pos = residue.decodeHeader( _pos, _stream ) ;
+		residues.add( residue ) ;
+		return _pos ;
+	}
+
+	private int decodeResidueType1( int _pos, final byte[] _stream ) throws Exception
+	{
+		final Residue1Configuration residue = new Residue1Configuration() ;
+		_pos = residue.decodeHeader( _pos, _stream ) ;
+		residues.add( residue ) ;
+		return _pos ;
+	}
+
+	private int decodeResidueType2( int _pos, final byte[] _stream ) throws Exception
+	{
+		final Residue2Configuration residue = new Residue2Configuration() ;
+		_pos = residue.decodeHeader( _pos, _stream ) ;
+		residues.add( residue ) ;
+		return _pos ;
+	}
+
+	private int decodeMappings( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int mappingCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
+		_pos += 6 ;
+
+		for( int i = 0; i < mappingCount; i++ )
+		{
+			final byte[] read = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
+			_pos += 16 ;
+
+			ConvertBytes.flipEndian( read ) ;
+			final int mapping = ConvertBytes.toShort( read, 0 ) & 0xFFFF  ;
+
+			switch( mapping )
+			{
+				case 0  : _pos = decodeMappingType0( _pos, _stream ) ; break ;
+				default : throw new Exception( "Unknown mapping type: " + mapping ) ;
+			}
+		}
+
+		return _pos ;
+	}
+
+	private int decodeMappingType0( int _pos, final byte[] _stream ) throws Exception
+	{
+		final Mapping0Configuration mapping = new Mapping0Configuration() ;
+		_pos = mapping.decodeHeader( _pos, _stream ) ;
+		mappings.add( mapping ) ;
+
+		System.out.println( mapping.toString() ) ;
+		return _pos ;
+	}
+
+	private int decodeModes( int _pos, final byte[] _stream ) throws Exception
+	{
+		final int modeCount = ( ConvertBytes.toBits( _stream, 0, _pos, 6 )[0] & 0xFF ) + 1 ;
+		_pos += 6 ;
+
+		System.out.println( "Mode Count: " + modeCount ) ;
+
+		for( int i = 0; i < modeCount; i++ )
+		{
+			final ModeConfiguration mode = new ModeConfiguration() ;
+			_pos = mode.decodeHeader( _pos, _stream ) ;
+			modes.add( mode ) ;
+		}
+
+		if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
+		{
+			throw new Exception( "Mode framing bit not set." ) ;
+		}
+
+		return _pos ;
+	}
+
+	private AudioPacket decodeAudioPacket( final Page _page ) throws Exception
+	{
+		int pos = 0 ;
+		final byte[] stream = _page.data ;
+
+		final AudioPacket packet = new AudioPacket( pos, stream ) ;
+		return packet ;
 	}
 
 	private float unpackFloat( final byte[] _pack )
@@ -518,7 +609,9 @@ public class Vorbis
 			buffer.append( "Statement: " + statement + "\n" ) ;
 		}
 
-		buffer.append( "Codebooks: " + codebooks.size() ) ;
+		buffer.append( "Codebooks: " + codebooks.size() + "\n" ) ;
+		buffer.append( "Floors: " + floors.size() + "\n" ) ;
+		
 		/*for( final CodebookConfiguration book : codebooks )
 		{
 			buffer.append( book.toString() ) ;
@@ -543,17 +636,8 @@ public class Vorbis
 		private int multiplier = 0 ;
 		private int[] y = null ;
 
-		public int decode( int _pos, final byte[] _stream ) throws Exception
-		{
-			System.out.println( "START: " + ( _pos / 8 ) ) ;
-			System.out.println( "Decode Floor Type 1..." ) ;
-			_pos = decodeHeader( _pos, _stream ) ;
-			_pos = decodePacket( _pos, _stream ) ;
-
-			return _pos ;
-		}
-
-		private int decodeHeader( int _pos, final byte[] _stream )
+		@Override
+		public int decodeHeader( int _pos, final byte[] _stream )
 		{
 			partitions = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) ;
 			_pos += 5 ;
@@ -566,7 +650,6 @@ public class Vorbis
 				partitionClassList[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ) ;
 				_pos += 4 ;
 
-				System.out.println( "Partition Class: " + partitionClassList[i] ) ;
 				if( partitionClassList[i] > maximumClass )
 				{
 					maximumClass = partitionClassList[i] ;
@@ -575,7 +658,6 @@ public class Vorbis
 
 			maximumClass += 1 ;
 
-			System.out.println( "Partitions: " + partitions + " Maximum Classes: " + maximumClass ) ;
 			classDimensions = new int[maximumClass] ;
 			subClasses = new int[maximumClass] ;
 			masterbooks = new int[maximumClass] ;
@@ -590,13 +672,11 @@ public class Vorbis
 				if( subClasses[i] != 0 )
 				{
 					masterbooks[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
-					System.out.println( "Masterbooks: " + masterbooks[i] + " at " + i ) ;
 					_pos += 8 ;
 
 				}
 
 				subClassBooks[i] = new int[1 << subClasses[i]] ;
-				System.out.println( "SubClass Length: " + subClassBooks[i].length ) ;
 				for( int j = 0; j < subClassBooks[i].length; j++ )
 				{
 					subClassBooks[i][j] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) - 1 ;
@@ -608,8 +688,6 @@ public class Vorbis
 			final int rangeBits = ( ConvertBytes.toBits( _stream, 0, _pos += 2, 4 )[0] & 0xFF ) ;
 			_pos += 4 ;
 
-			System.out.println( "Multiplier: " + multiplier + " Range Bits: " + rangeBits ) ;
-
 			int xListLength = 2 ;
 			for( int i = 0; i < partitionClassList.length; i++ )
 			{
@@ -617,7 +695,6 @@ public class Vorbis
 				xListLength += classDimensions[classNumber] ;
 			}
 
-			System.out.println( "xList Length: " + xListLength ) ;
 			if( xListLength > 65 )
 			{
 				throw new RuntimeException( "xList exceeds limit of 65." ) ;
@@ -646,26 +723,22 @@ public class Vorbis
 			return _pos ;
 		}
 
-		private int decodePacket( int _pos, final byte[] _stream )
+		@Override
+		public int decodePacket( int _pos, final byte[] _stream )
 		{
-			System.out.println( "Start: " + _pos ) ;
 			if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
 			{
-				System.out.println( "Channel is unused this frame..." ) ;
 				unused = true ;
 				return _pos ;
 			}
 
 			final int range = RANGES[multiplier - 1] ;
 			final int bitsToRead = iLog( range - 1 ) ;
-			System.out.println( "Bits to Read: " + bitsToRead ) ;
 
 			y = new int[xList.length] ;
 			y[0] = ( ConvertBytes.toBits( _stream, 0, _pos, bitsToRead )[0] & 0xFF ) ;
 			y[1] = ( ConvertBytes.toBits( _stream, 0, _pos += bitsToRead, bitsToRead )[0] & 0xFF ) ;
 			_pos += bitsToRead ;
-
-			System.out.println( "Y0: " + y[0] + " Y1: " + y[1] ) ;
 
 			int offset = 2 ;
 			for( int i = 0; i < partitionClassList.length; i++ )
@@ -674,8 +747,6 @@ public class Vorbis
 				final int cdim = classDimensions[classNumber] ;
 				final int cbits = subClasses[classNumber] ;
 				final int csub = ( 1 << cbits ) - 1 ;
-
-				System.out.println( "Pos: " + i + " Class Number: " + classNumber + " CDIM: " + cdim + " CBITS: " + cbits + " CSUB: " + csub ) ;
 
 				int cval = 0 ;
 				if( cbits > 0 )
@@ -690,7 +761,6 @@ public class Vorbis
 						number = book.getEntry( codeword, codewordLength ) ;
 					}
 
-					System.out.println( "cval: " + number + " length: " + codewordLength ) ;
 					cval = number ;
 					_pos += codewordLength ;
 				}
@@ -698,7 +768,7 @@ public class Vorbis
 				for( int j = 0; j < cdim; j++ )
 				{
 					final int bookIndex = subClassBooks[classNumber][cval & csub] ;
-					cval = cval >> cbits ;
+					cval = cval >>>= cbits ;
 
 					if( bookIndex >= 0 )
 					{
@@ -724,7 +794,6 @@ public class Vorbis
 				offset += cdim ;
 			}
 
-			System.out.println( "End: " + _pos ) ;
 			return _pos ;
 		}
 	
@@ -734,7 +803,6 @@ public class Vorbis
 			{
 				for( int j = 0; j < _xList.length; j++ )
 				{
-					//System.out.println( _xList[i] + " : " + _xList[j] ) ;
 					if( _xList[i] == _xList[j] && i != j )
 					{
 						return false ;
@@ -755,15 +823,8 @@ public class Vorbis
 		private int amplitudeOffset = 0 ;
 		private int[] bookList = null ;
 
-		public int decode( int _pos, final byte[] _stream ) throws Exception
-		{
-			System.out.println( "Decode Floor Type 0..." ) ;
-			_pos = decodeHeader( _pos, _stream ) ;
-			_pos = decodePacket( _pos, _stream ) ;
-			return _pos ;
-		}
-
-		private int decodeHeader( int _pos, final byte[] _stream )
+		@Override
+		public int decodeHeader( int _pos, final byte[] _stream )
 		{
 			int order = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
 			final byte[] readRate = ConvertBytes.toBits( _stream, 0, _pos += 8, 16 ) ;
@@ -791,12 +852,11 @@ public class Vorbis
 			return _pos ;
 		}
 
-		private int decodePacket( int _pos, final byte[] _stream )
+		@Override
+		public int decodePacket( int _pos, final byte[] _stream )
 		{
 			final int amplitude = ( ConvertBytes.toBits( _stream, 0, _pos, amplitudeBits )[0] & 0xFF ) ;
 			_pos += amplitudeBits ;
-
-			System.out.println( "Amplitude: " + amplitude + " Bits: " + amplitudeBits ) ;
 
 			if( amplitude > 0 )
 			{
@@ -809,7 +869,297 @@ public class Vorbis
 
 	public interface FloorConfiguration
 	{
-		public int decode( int _pos, final byte[] _stream ) throws Exception ;
+		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception ;
+		public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
+	}
+
+	public class Residue0Configuration extends ResidueConfiguration
+	{
+		@Override
+		public int decodePacket( int _pos, final byte[] _stream )
+		{
+			return _pos ;
+		}
+	}
+
+	public class Residue1Configuration extends ResidueConfiguration
+	{
+		@Override
+		public int decodePacket( int _pos, final byte[] _stream )
+		{
+			return _pos ;
+		}
+	}
+
+	public class Residue2Configuration extends ResidueConfiguration
+	{
+		@Override
+		public int decodePacket( int _pos, final byte[] _stream )
+		{
+			return _pos ;
+		}
+	}
+
+	public abstract class ResidueConfiguration
+	{
+		public long begin ;
+		public long end ;
+		public long partitionSize ;
+		public int classifications ;
+		public int classbook ;
+		public int[][] books ;
+
+		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception
+		{
+			final byte[] tempBegin = ConvertBytes.toBits( _stream, 0, _pos, 24 ) ;
+			final byte[] beginBytes = new byte[4] ;
+			beginBytes[0] = tempBegin[0] ;
+			beginBytes[1] = tempBegin[1] ;
+			beginBytes[2] = tempBegin[2] ;
+			beginBytes[3] = 0 ;
+
+			ConvertBytes.flipEndian( beginBytes, 0, 4 ) ;
+			begin = ConvertBytes.toInt( beginBytes, 0 ) & 0xFFFFFFFFL ;
+
+			final byte[] tempEnd = ConvertBytes.toBits( _stream, 0, _pos += 24, 24 ) ;
+			final byte[] endBytes = new byte[4] ;
+			endBytes[0] = tempEnd[0] ;
+			endBytes[1] = tempEnd[1] ;
+			endBytes[2] = tempEnd[2] ;
+			endBytes[3] = 0 ;
+
+			ConvertBytes.flipEndian( endBytes, 0, 4 ) ;
+			end = ConvertBytes.toInt( endBytes, 0 ) & 0xFFFFFFFFL ;
+
+			final byte[] tempPartition = ConvertBytes.toBits( _stream, 0, _pos += 24, 24 ) ;
+			final byte[] partitionBytes = new byte[4] ;
+			partitionBytes[0] = tempPartition[0] ;
+			partitionBytes[1] = tempPartition[1] ;
+			partitionBytes[2] = tempPartition[2] ;
+			partitionBytes[3] = 0 ;
+
+			ConvertBytes.flipEndian( partitionBytes, 0, 4 ) ;
+			partitionSize = ( ConvertBytes.toInt( partitionBytes, 0 ) & 0xFFFFFFFFL ) + 1L ;
+
+			classifications = ( ConvertBytes.toBits( _stream, 0, _pos += 24, 6 )[0] & 0xFF ) + 1 ;
+			classbook = ( ConvertBytes.toBits( _stream, 0, _pos += 6, 8 )[0] & 0xFF ) ;
+			_pos += 8 ;
+
+			final byte[] cascade = new byte[classifications] ;
+			for( int i = 0; i < classifications; ++i )
+			{
+				int highBits = 0 ;
+				final int lowBits = ( ConvertBytes.toBits( _stream, 0, _pos, 3 )[0] & 0xFF ) ;
+				_pos += 3 ;
+
+				if( ConvertBytes.isBitSet( _stream, _pos++ ) == true )
+				{
+					highBits = ( ConvertBytes.toBits( _stream, 0, _pos, 5 )[0] & 0xFF ) ;
+					_pos += 5 ;
+				}
+
+				cascade[i] = ( byte )( highBits * 8 + lowBits ) ;
+			}
+
+			books = new int[classifications][8] ;
+			for( int i = 0; i < classifications; ++i )
+			{
+				// 8 in Vorbis I, as constrained by the elements of the cascade bitmap being eight bits
+				for( int j = 0; j < 8; ++j )
+				{
+					if( ConvertBytes.isBitSet( cascade[i], j ) == true )
+					{
+						books[i][j] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+						_pos += 8 ;
+					}
+					else
+					{
+						books[i][j] = UNUSED ;
+					}
+				}
+			}
+
+			return _pos ;
+		}
+
+		public abstract int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
+
+		@Override
+		public String toString()
+		{
+			final StringBuffer buffer = new StringBuffer() ;
+			buffer.append( "Begin: " + begin + "\n" ) ;
+			buffer.append( "End: " + end + "\n" ) ;
+			buffer.append( "Partition Size: " + partitionSize + "\n" ) ;
+			buffer.append( "Classifications: " + classifications + "\n" ) ;
+			buffer.append( "Classbook: " + classbook + "\n" ) ;
+
+			for( int i = 0; i < books.length; ++i )
+			{
+				buffer.append( "Book: " + i ) ;
+				final int size = books[i].length ;
+				for( int j = 0; j < size; ++j )
+				{
+					buffer.append( ", " ) ;
+					buffer.append( books[i][j] ) ;
+				}
+
+				buffer.append( "\n" ) ;
+			}
+
+			return buffer.toString() ;
+		}
+	}
+
+	public class Mapping0Configuration implements MappingConfiguration
+	{
+		public int subMaps ;
+		public int couplingSteps ;
+
+		public int[] magnitudes ;
+		public int[] angles ;
+
+		public int[] muxs ;
+
+		public int[] subMapFloors ;
+		public int[] subMapResidues ;
+
+		@Override
+		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception
+		{
+			if( ConvertBytes.isBitSet( _stream, _pos++ ) == true )
+			{
+				subMaps = ( ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ) + 1 ;
+				_pos += 4 ;
+			}
+			else
+			{
+				subMaps = 1 ;
+			}
+
+			if( ConvertBytes.isBitSet( _stream, _pos++ ) == true )
+			{
+				couplingSteps = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) + 1 ;
+				_pos += 8 ;
+				magnitudes = new int[couplingSteps] ;
+				angles = new int[couplingSteps] ;
+
+				for( int i = 0; i < couplingSteps; ++i )
+				{
+					final int toRead = iLog( ( int )( audioChannels - 1 ) ) ;
+
+					magnitudes[i] = ( ConvertBytes.toBits( _stream, 0, _pos, toRead )[0] ) & 0xFF ;
+					_pos += toRead ;
+
+					angles[i] = ( ConvertBytes.toBits( _stream, 0, _pos, toRead )[0] ) & 0xFF ;
+					_pos += toRead ;
+
+					System.out.println( "Magnitude: " + magnitudes[i] ) ;
+					System.out.println( "Angle: " + angles[i] ) ;
+				}
+			}
+			else
+			{
+				couplingSteps = 0 ;
+			}
+
+			final int reserved = ( ConvertBytes.toBits( _stream, 0, _pos, 2 )[0] & 0xFF ) ;
+			_pos += 2 ;
+			if( reserved != 0 )
+			{
+				throw new Exception( "Mapping reserved value is expected to be 0 but got: " + reserved ) ;
+			}
+
+			if( subMaps > 1 )
+			{
+				muxs = new int[audioChannels] ;
+				for( int i = 0; i < audioChannels; ++i )
+				{
+					muxs[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ) ;
+					_pos += 4 ;
+					if( muxs[i] > subMaps )
+					{
+						throw new Exception( "Mapping mux: " + muxs[i] + " is greater than subMap: " + subMaps ) ;
+					}
+				}
+			}
+
+			final int floorSize = floors.size() ;
+			final int residueSize = residues.size() ;
+
+			subMapFloors = new int[subMaps] ;
+			subMapResidues = new int[subMaps] ;
+			for( int i = 0; i < subMaps; ++i )
+			{
+				_pos += 8 ;		// discard 8 bits (the unused time configuration placeholder)
+				subMapFloors[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+				_pos += 8 ;
+				if( subMapFloors[i] > floorSize )
+				{
+					throw new Exception( "Mapping sub map floor exceeds available floors: " + subMapFloors[i] ) ;
+				}
+				
+				subMapResidues[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 8 )[0] & 0xFF ) ;
+				_pos += 8 ;
+				if( subMapResidues[i] > residueSize )
+				{
+					throw new Exception( "Mapping sub map residue exceeds available residues: " + subMapResidues[i] ) ;
+				}
+			}
+
+			return _pos ;
+		}
+	}
+
+	public interface MappingConfiguration
+	{
+		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception ;
+		//public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
+	}
+
+	public class ModeConfiguration
+	{
+		public boolean blockFlag ;
+		public int windowType ;
+		public int transformType ;
+		public int mapping ;
+	
+		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception
+		{
+			blockFlag = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+			System.out.println( "Block Flag: " + blockFlag ) ;
+
+			final byte[] readWindowType = ConvertBytes.toBits( _stream, 0, _pos, 16 ) ;
+			ConvertBytes.printBytes( readWindowType, 0, readWindowType.length * 8 ) ;
+			windowType = ConvertBytes.toShort( readWindowType, 0 ) & 0xFFFF  ;
+
+			if( windowType != 0 )
+			{
+				throw new Exception( "Mode window type is meant to be zero: " + windowType ) ;
+			}
+
+			final byte[] readTransformType = ConvertBytes.toBits( _stream, 0, _pos += 16, 16 ) ;
+			ConvertBytes.printBytes( readTransformType, 0, readTransformType.length * 8 ) ;
+			transformType = ConvertBytes.toShort( readTransformType, 0 ) & 0xFFFF  ;
+
+			if( transformType != 0 )
+			{
+				throw new Exception( "Mode window type is meant to be zero: " + windowType ) ;
+			}
+
+			mapping = ( ConvertBytes.toBits( _stream, 0, _pos += 16, 8 )[0] & 0xFF ) ;
+			_pos += 8 ;
+
+			if( mapping > mappings.size() )
+			{
+				throw new Exception( "Mode mapping: " + mapping + " exceeds available maps: " + mappings.size() ) ;
+			}
+
+			System.out.println( "Mapping: " + mapping ) ;
+			return _pos ;
+		}
+
+		//public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
 	public static class CodebookConfiguration
@@ -910,6 +1260,105 @@ public class Vorbis
 		}
 	}
 
+	public class AudioPacket
+	{
+		private final static double HALF_PI = Math.PI / 2 ;
+
+		private final ModeConfiguration mode ;
+		private final MappingConfiguration mapping ;
+
+		private final int n ;
+
+		private final boolean prevWindowFlag ;
+		private final boolean nextWindowFlag ;
+
+		private final int windowCenter ;
+
+		private final int leftWindowStart ;
+		private final int leftWindowEnd ;
+		private final int leftN ;
+
+		private final int rightWindowStart ;
+		private final int rightWindowEnd ;
+		private final int rightN ;
+
+		private final double[] window ;
+
+		public AudioPacket( int _pos, final byte[] _stream ) throws Exception
+		{
+			final boolean notAudio = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+			if( notAudio == true )
+			{
+				throw new Exception( "Expected Audio Packet, skipping..." ) ;
+			}
+
+			final int toRead = iLog( modes.size() - 1 ) ;
+			final int modeNumber = ( ConvertBytes.toBits( _stream, 0, _pos, toRead )[0] ) & 0xFF ;
+			_pos += toRead ;
+
+			mode = modes.get( modeNumber ) ;
+			mapping = mappings.get( mode.mapping ) ;
+
+			n = ( mode.blockFlag == false ) ? blocksize0 : blocksize1 ;
+
+			// long window
+			prevWindowFlag = ( mode.blockFlag == true ) ? ConvertBytes.isBitSet( _stream, _pos++ ) : false ;
+			nextWindowFlag = ( mode.blockFlag == true ) ? ConvertBytes.isBitSet( _stream, _pos++ ) : false ;
+
+			windowCenter = ( int )( n / 2.0f ) ;
+
+			leftWindowStart = ( mode.blockFlag == true && prevWindowFlag == false ) ? ( int )( n / 4.0f - blocksize0 / 4.0f ) : 0 ;
+			leftWindowEnd   = ( mode.blockFlag == true && prevWindowFlag == false ) ? ( int )( n / 4.0f + blocksize0 / 4.0f ) : windowCenter ;
+			leftN           = ( mode.blockFlag == true && prevWindowFlag == false ) ? ( blocksize0 / 2 ) : ( n / 2 ) ;
+
+			rightWindowStart = ( mode.blockFlag == true && nextWindowFlag == false ) ? ( int )( n * 0.75f - blocksize0 / 4 ) : windowCenter ;
+			rightWindowEnd   = ( mode.blockFlag == true && nextWindowFlag == false ) ? ( int )( n * 0.75f + blocksize0 / 4 ) : n ;
+			rightN           = ( mode.blockFlag == true && nextWindowFlag == false ) ? ( blocksize0 / 2 ) : ( n / 2 ) ;
+
+			window = computeWindow() ;
+		}
+
+		private double[] computeWindow()
+		{
+			final double[] w = new double[n] ;
+
+			for( int i = leftWindowStart; i < leftWindowEnd; ++i )
+			{
+				double x = ( ( i - leftWindowStart ) + 0.5 ) / leftN * HALF_PI ;
+				x = Math.sin( x ) ;
+				x *= x ;
+				x *= HALF_PI ;
+				x = Math.sin( x ) ;
+				w[i] = x ;
+			}
+
+			for( int i = leftWindowEnd; i < rightWindowStart; ++i )
+			{
+				w[i] = 1.0 ;
+			}
+
+			for( int i = rightWindowStart; i < rightWindowEnd; ++i )
+			{
+				double x = ( ( i - rightWindowStart ) + 0.5 ) / rightN * HALF_PI + HALF_PI ;
+				x = Math.sin( x ) ;
+				x *= x ;
+				x *= HALF_PI ;
+				x = Math.sin( x ) ;
+				w[i] = x ;
+			}
+
+			/*final StringBuilder builder = new StringBuilder() ;
+			for( int i = 0; i < w.length; ++i )
+			{
+				builder.append( w[i] ) ;
+				builder.append( ' ' ) ;
+			}
+			
+			System.out.println( builder.toString() ) ;*/
+			return w ;
+		}
+	}
+	
 	/**
 		Contains the information required to quickly decode the headers.
 	**/

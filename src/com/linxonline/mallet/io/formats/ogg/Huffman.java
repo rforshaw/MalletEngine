@@ -6,65 +6,99 @@ public class Huffman
 {
 	public static Node build( final int[] _codewords, final int _entries )
 	{
-		final Node root = new Node( 0 ) ;
+		final Node root = new Node( null ) ;
 		for( int i = 0; i < _entries; ++i )
 		{
-			root.add( _codewords[i], i ) ;
+			final int codeword = _codewords[i] ;
+			if( codeword <= -1 )
+			{
+				continue ;
+			}
+
+			if( root.add( codeword, i ) == false )
+			{
+				throw new RuntimeException( "Failed to build a valid Huffman." ) ;
+			}
 		}
 		return root ;
 	}
 
 	public static class Node
 	{
-		private final int tier ;
+		private final Node parent ;
+		private final int depth ;
 
 		private Node lhs = null ;
 		private Node rhs = null ;
 		private int value = -1 ;
 
-		private Node( final int _tier )
+		private Node( final Node _parent )
 		{
-			tier = _tier ;
+			this( _parent, -1 ) ;
+		}
+
+		private Node( final Node _parent, final int _value )
+		{
+			parent = _parent ;
+			depth = ( parent != null ) ? parent.getDepth() + 1 : 0 ;
+			value = _value ;
+		}
+
+		public boolean isFull()
+		{
+			if( lhs == null && rhs == null && value >= 0 )
+			{
+				return true ;
+			}
+		
+			boolean lhsFull = false ;
+			if( lhs != null )
+			{
+				lhsFull = lhs.isFull() ;
+			}
+
+			boolean rhsFull = false ;
+			if( rhs != null )
+			{
+				rhsFull = rhs.isFull() ;
+			}
+
+			return ( lhsFull == true && rhsFull == true )  ;
 		}
 
 		public boolean add( final int _length, final int _value )
 		{
-			if( tier > _length )
+			//System.out.println( "Length: " + _length + " Value: " + _value ) ;
+			if( isFull() == true )
 			{
 				return false ;
 			}
 
-			if( value > -1 )
+			if( _length == 1 )
 			{
-				return false ;
-			}
-
-			if( _length == tier )
-			{
-				if( lhs != null || rhs != null )
+				if( lhs == null )
 				{
-					return false ;
+					lhs = new Node( this, _value ) ;
+					//System.out.println( "Stored LHS: " + lhs.getDepth() + " Value: " + _value ) ;
+					return true ;
 				}
+				else if( rhs == null )
+				{
+					rhs = new Node( this, _value ) ;
+					//System.out.println( "Stored RHS: " + rhs.getDepth() + " Value: " + _value ) ;
+					return true ;
+				}
+				return false ;
+			}
 
-				value = _value ;
+			lhs = ( lhs == null ) ? new Node( this ) : lhs ;
+			if( lhs.add( _length - 1, _value ) == true )
+			{
 				return true ;
 			}
 
-			if( lhs == null )
-			{
-				lhs = new Node( tier + 1 ) ;
-			}
-			if( lhs.add( _length, _value ) == true )
-			{
-				return true ;
-			}
-
-			if( rhs == null )
-			{
-				rhs = new Node( tier + 1 ) ;
-			}
-
-			if( rhs.add( _length, _value ) == true )
+			rhs = ( rhs == null ) ? new Node( this ) : rhs ;
+			if( rhs.add( _length - 1, _value ) == true )
 			{
 				return true ;
 			}
@@ -84,6 +118,11 @@ public class Huffman
 			return value ;
 		}
 
+		public int getDepth()
+		{
+			return depth ;
+		}
+
 		private String tabs( final int _num )
 		{
 			final StringBuilder builder = new StringBuilder( _num ) ;
@@ -97,29 +136,26 @@ public class Huffman
 		@Override
 		public String toString()
 		{
-			final String tabs = tabs( tier ) ;
+			final String tabs = tabs( depth ) ;
 
 			final StringBuilder builder = new StringBuilder() ;
-			builder.append( tabs ) ;
-			builder.append( "Tier: " ) ;
-			builder.append( tier ) ;
+			builder.append( "Node: " ) ;
+			builder.append( depth ) ;
 			builder.append( '\n' ) ;
-			if( value == -1 )
+
+			if( lhs == null && rhs == null )
 			{
-				builder.append( tabs ) ;
-				builder.append( "Left: " ) ;
-				builder.append( ( lhs != null ) ? lhs.toString() : ( "null " + tier ) ) ;
+				builder.append( "Value: " ) ;
+				builder.append( value ) ;
 				builder.append( '\n' ) ;
-				builder.append( tabs ) ;
-				builder.append( "Right: " ) ;
-				builder.append( ( rhs != null ) ? rhs.toString() : ( "null " + tier ) ) ;
 			}
-			else
-			{
-				builder.append( tabs ) ;
-				builder.append( "Leaf: " + value ) ;
-			}
-			builder.append( '\n' ) ;
+
+			builder.append( "Left: " ) ;
+			builder.append( ( lhs != null ) ? lhs.toString() : "" ) ;
+
+			builder.append( "Right: " ) ;
+			builder.append( ( rhs != null ) ? rhs.toString() : "" ) ;
+
 			return builder.toString() ;
 		}
 	}
