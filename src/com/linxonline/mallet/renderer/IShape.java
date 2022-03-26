@@ -31,10 +31,9 @@ public interface IShape
 	*/
 	public enum Swivel
 	{
-		POINT,		// Vector3
-		COLOUR,		// MalletColour
-		UV,			// Vector2
-		NORMAL ;	// Vector3
+		VEC3,		// Vector3
+		FLOAT,		// MalletColour
+		VEC2 ;		// Vector2
 
 		/**
 			Return a basic vertex structure of two elements.
@@ -43,8 +42,8 @@ public interface IShape
 		public static Swivel[] constructDefault()
 		{
 			final Swivel[] swivel = new Swivel[2] ;
-			swivel[0] = Swivel.POINT ;
-			swivel[1] = Swivel.COLOUR ;
+			swivel[0] = Swivel.VEC3 ;
+			swivel[1] = Swivel.FLOAT ;
 			return swivel ;
 		}
 
@@ -70,23 +69,22 @@ public interface IShape
 		{
 			switch( _text )
 			{
-				case "POINT"  : return POINT ;
-				case "COLOUR" : return COLOUR ;
-				case "UV"     : return UV ;
-				case "NORMAL" : return NORMAL ;
-				default       : return POINT ;
+				case "VEC3"  : return VEC3 ;
+				case "FLOAT" : return FLOAT ;
+				case "VEC2"  : return VEC2 ;
+				default      : return VEC3 ;
 			}
 		}
 
 		/**
-			A Vertex should always contain at least one POINT.
-			If a POINT exists return its index location, else return -1.
+			A Vertex should always contain at least one VEC3.
+			If a VEC3 exists return its index location, else return -1.
 		*/
 		public static int getSwivelPointIndex( final Swivel[] _swivel )
 		{
 			for( int i = 0; i < _swivel.length; i++ )
 			{
-				if( _swivel[i] == Swivel.POINT )
+				if( _swivel[i] == Swivel.VEC3 )
 				{
 					return i ;
 				}
@@ -97,12 +95,11 @@ public interface IShape
 
 		/**
 			Return the amount of floats required to define the Vertex.
-			POINT  = 3 floats
-			COLOUR = 1 float
-			UV     = 2 floats
-			NORMAL = 3 floats
+			VEC3  = 3 floats
+			FLOAT = 1 float
+			VEC2  = 2 floats
 
-			A default swivel would return 4. 3 for POINT, and 1 for COLOUR.
+			A default swivel would return 4. 3 for VEC3, and 1 for FLOAT.
 		*/
 		public static int getSwivelFloatSize( final Swivel[] _swivel, final int _length )
 		{
@@ -111,10 +108,9 @@ public interface IShape
 			{
 				switch( _swivel[i] )
 				{
-					case POINT  : size += 3 ; break ;	// Vector3
-					case COLOUR : size += 1 ; break ;	// MalletColour
-					case UV     : size += 2 ; break ;	// Vector2
-					case NORMAL : size += 3 ; break ;	// Vector3
+					case VEC3  : size += 3 ; break ;	// Vector3
+					case FLOAT : size += 1 ; break ;	// MalletColour
+					case VEC2  : size += 2 ; break ;	// Vector2
 				}
 			}
 
@@ -131,10 +127,9 @@ public interface IShape
 			{
 				switch( _swivel[i] )
 				{
-					case POINT  : obj[i] = new Vector3() ;      break ;
-					case COLOUR : obj[i] = new MalletColour() ; break ;
-					case UV     : obj[i] = new Vector2() ;      break ;
-					case NORMAL : obj[i] = new Vector3() ;      break ;
+					case VEC3  : obj[i] = new Vector3() ;      break ;
+					case FLOAT : obj[i] = new MalletColour() ; break ;
+					case VEC2  : obj[i] = new Vector2() ;      break ;
 				}
 			}
 

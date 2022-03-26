@@ -24,8 +24,8 @@ public class Debug
 									off.x, off.y, 0.0f ) ;
 
 		final Shape.Swivel[] swivel = new Shape.Swivel[2] ;
-		swivel[0] = Shape.Swivel.POINT ;
-		swivel[1] = Shape.Swivel.COLOUR ;
+		swivel[0] = Shape.Swivel.VEC3 ;
+		swivel[1] = Shape.Swivel.FLOAT ;
 
 		final Shape shape = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		final MalletColour white = MalletColour.white() ;

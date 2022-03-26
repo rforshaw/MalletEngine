@@ -17,9 +17,9 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 {
 	private final static List<WeakReference<TextUpdater>> globals = new ArrayList<WeakReference<TextUpdater>>() ;
 
-	private final Interpolation mode ;
 	private final ArrayList<TextBuffer> buffers = new ArrayList<TextBuffer>() ;
 
+	private Interpolation mode ;
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
@@ -129,6 +129,11 @@ public class TextUpdater implements IUpdater<TextDraw, TextBuffer>
 
 		forceUpdate = false ;
 		dirty = !_updated.isEmpty() ;
+	}
+
+	public void setInterpolation( Interpolation _mode )
+	{
+		mode = ( _mode != null ) ? _mode : mode ;
 	}
 
 	/**

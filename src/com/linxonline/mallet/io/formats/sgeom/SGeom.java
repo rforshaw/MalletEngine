@@ -68,10 +68,10 @@ public class SGeom
 			// SGeom format does not group a specific vertex data together
 			// What is associated to a specific vertex is defined by 
 			// the swivel order and order of the vertices array.
-			// swivel: ["POINT", "COLOUR"]
-			// vertices: [{POINT},{COLOUR},  {POINT},{COLOUR}]
-			// The first POINT and COLOUR represent vertex 1, the second 
-			// POINT and COLOUR represent vertex 2.
+			// swivel: ["VEC3", "FLOAT"]
+			// vertices: [{VEC3},{FLOAT},  {VEC3},{FLOAT}]
+			// The first VEC3 and FLOAT represent vertex 1, the second 
+			// VEC3 and FLOAT represent vertex 2.
 			swivelIndex = i % swivel.length ;
 			if( swivelIndex == 0 )
 			{
@@ -81,7 +81,7 @@ public class SGeom
 			final JObject jVertex = vertices.getJObject( i ) ;
 			switch( swivel[swivelIndex] )
 			{
-				case POINT  :
+				case VEC3  :
 				{
 					final float x = ( float )jVertex.getDouble( "x" ) ;
 					final float y = ( float )jVertex.getDouble( "y" ) ;
@@ -90,7 +90,7 @@ public class SGeom
 					//System.out.println( "Adding Point" + vertex[swivelIndex] ) ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					final int r = jVertex.getInt( "r" ) ;
 					final int g = jVertex.getInt( "g" ) ;
@@ -99,21 +99,12 @@ public class SGeom
 					//System.out.println( "Adding Colour" + vertex[swivelIndex] ) ;
 					break ;
 				}
-				case NORMAL :
-				{
-					final float x = ( float )jVertex.getDouble( "x" ) ;
-					final float y = ( float )jVertex.getDouble( "y" ) ;
-					final float z = ( float )jVertex.getDouble( "z" ) ;
-					vertex[swivelIndex] = new Vector3( x, y, z ) ;
-					//System.out.println( "Adding Normal" + vertex[swivelIndex] ) ;
-					break ;
-				}
-				case UV     :
+				case VEC2     :
 				{
 					final float u = ( float )jVertex.getDouble( "u" ) ;
 					final float v = ( float )jVertex.getDouble( "v" ) ;
 					vertex[swivelIndex] = new Vector2( u, v ) ;
-					//System.out.println( "Adding UV: " + vertex[swivelIndex] ) ;
+					//System.out.println( "Adding VEC2: " + vertex[swivelIndex] ) ;
 					break ;
 				}
 			}

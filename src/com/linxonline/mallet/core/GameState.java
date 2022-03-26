@@ -149,6 +149,7 @@ public class GameState extends State
 		}
 		else
 		{
+			createUpdaters( mainUpdaters, drawUpdaters ) ;
 			initGame() ;
 		}
 		
@@ -378,8 +379,7 @@ public class GameState extends State
 			animationSystem.update( DEFAULT_FRAMERATE ) ;
 			system.draw( DEFAULT_FRAMERATE ) ;
 		} ) ;
-	
-		createUpdaters( mainUpdaters, drawUpdaters ) ;
+
 		switch( _mode )
 		{
 			default          :
@@ -412,8 +412,9 @@ public class GameState extends State
 				{
 					for( IUpdate update : mainUpdaters )
 					{
-						update.update( _dt ) ;
+						update.update( DEFAULT_TIMESTEP ) ;
 					}
+
 					showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
 				}
@@ -431,7 +432,7 @@ public class GameState extends State
 
 					for( IUpdate update : drawUpdaters )
 					{
-						update.update( _dt ) ;
+						update.update( DEFAULT_FRAMERATE ) ;
 					}
 
 					endTime = ElapsedTimer.nanoTime() ;
@@ -629,7 +630,7 @@ public class GameState extends State
 	/**
 		Allows the developer to create their own update modes.
 	*/
-	protected interface IUpdate
+	public interface IUpdate
 	{
 		public void update( final double _dt ) ;
 	}

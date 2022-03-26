@@ -20,9 +20,9 @@ public class GUI
 
 	public static Shape constructEdge( final Vector3 _length, final float _edge )
 	{
-		Shape.Swivel[] swivel = Shape.Swivel.constructSwivel( Shape.Swivel.POINT,
-															  Shape.Swivel.COLOUR,
-															  Shape.Swivel.UV ) ;
+		Shape.Swivel[] swivel = Shape.Swivel.constructSwivel( Shape.Swivel.VEC3,
+															  Shape.Swivel.FLOAT,
+															  Shape.Swivel.VEC2 ) ;
 
 		final Vector3 length = new Vector3( _length ) ;
 		length.subtract( _edge * 2, _edge * 2, _edge * 2 ) ;

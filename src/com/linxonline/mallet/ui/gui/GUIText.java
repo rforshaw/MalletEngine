@@ -89,6 +89,7 @@ public class GUIText extends GUIComponent
 
 		updater = TextUpdater.getOrCreate( getWorld(), program, true, getLayer() ) ;
 		updater.addDynamics( drawText ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
 	}
 
 	/**
@@ -113,6 +114,7 @@ public class GUIText extends GUIComponent
 		}
 
 		updater = TextUpdater.getOrCreate( getWorld(), program, true, _layer ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
 	}
 
 	@Override

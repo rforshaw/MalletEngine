@@ -102,21 +102,20 @@ public class Shape implements IShape
 		{
 			switch( swivel[i] )
 			{
-				case POINT  :
-				case NORMAL :
+				case VEC3  :
 				{
 					final Vector3 point = ( Vector3 )_vertex[i] ;
 					FloatBuffer.set( verticies, vertexIncrement, point ) ;
 					vertexIncrement += 3 ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
 					verticies[vertexIncrement++] = colour.toFloat() ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					final Vector2 uv = ( Vector2 )_vertex[i] ;
 					FloatBuffer.set( verticies, vertexIncrement, uv ) ;
@@ -152,20 +151,19 @@ public class Shape implements IShape
 		{
 			switch( swivel[i] )
 			{
-				case POINT  :
-				case NORMAL :
+				case VEC3  :
 				{
 					FloatBuffer.fill( verticies, ( Vector3 )_vertex[i], start ) ;
 					start += 3 ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
 					colour.changeColour( verticies[start++] ) ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					FloatBuffer.fill( verticies, ( Vector2 )_vertex[i], start ) ;
 					start += 2 ;
@@ -396,7 +394,7 @@ public class Shape implements IShape
 
 	/**
 		Construct a vertex with the default swivel format.
-		POINT and COLOUR.
+		VEC3 and FLOAT.
 	*/
 	public static Object[] construct( final float _x, final float _y, final float _z, final MalletColour _colour )
 	{
@@ -411,7 +409,6 @@ public class Shape implements IShape
 		Determine whether the Swivel and Vertex structure are the same.
 		return true if the vertex order is what is expected by the swivel 
 		order, return false if the order is incorrect.
-		Because NORMAL and POINT use Vector3 there is a chance that a false 
 		positive may be made.
 	*/
 	public static boolean isCorrectSwivel( final Swivel[] _swivel, final Object[] _object )
@@ -425,7 +422,7 @@ public class Shape implements IShape
 		{
 			switch( _swivel[i] )
 			{
-				case POINT  :
+				case VEC3  :
 				{
 					if( ( _object[i] instanceof Vector3 ) == false )
 					{
@@ -433,7 +430,7 @@ public class Shape implements IShape
 					}
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					if( ( _object[i] instanceof MalletColour ) == false )
 					{
@@ -441,17 +438,9 @@ public class Shape implements IShape
 					}
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					if( ( _object[i] instanceof Vector2 ) == false )
-					{
-						return false ;
-					}
-					break ;
-				}
-				case NORMAL  :
-				{
-					if( ( _object[i] instanceof Vector3 ) == false )
 					{
 						return false ;
 					}
@@ -468,9 +457,9 @@ public class Shape implements IShape
 										final Vector2 _maxUV )
 	{
 		final Swivel[] swivel = new Swivel[3] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
-		swivel[2] = Swivel.UV ;
+		swivel[0] = Swivel.VEC3 ;
+		swivel[1] = Swivel.FLOAT ;
+		swivel[2] = Swivel.VEC2 ;
 
 		final Vector3 position = new Vector3() ;
 		final MalletColour white = MalletColour.white() ;
@@ -510,8 +499,8 @@ public class Shape implements IShape
 	public static Shape constructPlane( final Vector3 _length, final MalletColour _colour )
 	{
 		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
+		swivel[0] = Swivel.VEC3 ;
+		swivel[1] = Swivel.FLOAT ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
 		plane.copyVertex( new Object[] { new Vector3(), _colour } ) ;
@@ -533,8 +522,8 @@ public class Shape implements IShape
 	public static Shape constructOutlinePlane( final Vector3 _length, final MalletColour _colour )
 	{
 		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
+		swivel[0] = Swivel.VEC3 ;
+		swivel[1] = Swivel.FLOAT ;
 
 		final Shape plane = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		plane.copyVertex( new Object[] { new Vector3(), _colour } ) ;
@@ -554,8 +543,8 @@ public class Shape implements IShape
 	public static Shape constructOutlineCircle( final float _radius, final int _segments, final MalletColour _colour )
 	{
 		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
+		swivel[0] = Swivel.VEC3 ;
+		swivel[1] = Swivel.FLOAT ;
 
 		final Shape circle = new Shape( Shape.Style.LINE_STRIP, swivel, _segments + 1, _segments ) ;
 		for( int i = 0; i < _segments; ++i )
@@ -579,9 +568,9 @@ public class Shape implements IShape
 	public static Shape constructCube( final float _width, final Vector2 _minUV, final Vector2 _maxUV )
 	{
 		final Swivel[] swivel = new Swivel[3] ;
-		swivel[0] = Swivel.POINT ;
-		swivel[1] = Swivel.COLOUR ;
-		swivel[2] = Swivel.UV ;
+		swivel[0] = Swivel.VEC3 ;
+		swivel[1] = Swivel.FLOAT ;
+		swivel[2] = Swivel.VEC2 ;
 
 		final MalletColour white = MalletColour.white() ;
 

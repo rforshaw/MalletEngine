@@ -1,6 +1,7 @@
 package com.linxonline.mallet.ui ;
 
 import java.util.List ;
+import java.util.Iterator ;
 
 import com.linxonline.mallet.util.MalletList ;
 
@@ -41,9 +42,10 @@ public class UIChildren implements IChildren
 	@Override
 	public void removeElement( final UIElement _element )
 	{
-		if( toRemove.contains( _element ) == false )
+		if( ordered.remove( _element ) == true )
 		{
-			toRemove.add( _element ) ;
+			_element.shutdown() ;
+			_element.clear() ;
 		}
 	}
 
@@ -163,43 +165,26 @@ public class UIChildren implements IChildren
 	{
 		boolean dirtyChildren = false ;
 
+		final Iterator<UIElement> iter = ordered.iterator() ;
+		while( iter.hasNext() )
 		{
-			final int size = ordered.size() ;
-			for( int i = 0; i < size; i++ )
+			final UIElement element = iter.next() ;
+			if( element.isDirty() == true )
 			{
-				final UIElement element = ordered.get( i ) ;
-				if( element.isDirty() == true )
-				{
-					// If a Child element is updating we'll 
-					// most likely also want to update the parent.
-					dirtyChildren = true ;
-				}
-
-				element.update( _dt, _events ) ;
-
-				if( element.destroy == true )
-				{
-					// If the child element is flagged for 
-					// destruction add it to the remove list.
-					removeElement( element ) ;
-				}
+				// If a Child element is updating we'll 
+				// most likely also want to update the parent.
+				dirtyChildren = true ;
 			}
-		}
 
-		if( toRemove.isEmpty() == false )
-		{
-			final int size = toRemove.size() ;
-			for( int i = 0; i < size; i++ )
+			element.update( _dt, _events ) ;
+
+			if( element.destroy == true )
 			{
-				final UIElement element = toRemove.get( i ) ;
-				if( ordered.remove( element ) == true )
-				{
-					element.shutdown() ;
-					element.clear() ;
-				}
+				iter.remove() ;
+				element.shutdown() ;
+				element.clear() ;
+				dirtyChildren = true ;		// We'll also want to refresh the UILayout.
 			}
-			toRemove.clear() ;
-			dirtyChildren = true ;		// We'll also want to refresh the UILayout.
 		}
 
 		return dirtyChildren ;

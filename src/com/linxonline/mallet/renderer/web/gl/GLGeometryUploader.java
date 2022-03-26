@@ -226,8 +226,7 @@ public class GLGeometryUploader
 			{
 				switch( swivel[j] )
 				{
-					case NORMAL :
-					case POINT  :
+					case VEC3  :
 					{
 						_shape.getVector3( i, j, point ) ;
 						Matrix4.multiply( point, _matrix, temp ) ;
@@ -236,14 +235,14 @@ public class GLGeometryUploader
 						verticies.set( increment++, temp.z ) ;
 						break ;
 					}
-					case COLOUR :
+					case FLOAT :
 					{
 						//verticies.set( increment++, _shape.getFloat( i, j ) ) ;
 						_shape.getColour( i, j, shapeColour ) ;
 						setColour( increment++, shapeColour, byteVersion ) ;
 						break ;
 					}
-					case UV     :
+					case VEC2     :
 					{
 						_shape.getVector2( i, j, uv ) ;
 						verticies.set( increment++, uv.x ) ;
@@ -338,28 +337,22 @@ public class GLGeometryUploader
 		{
 			switch( _swivel[i] )
 			{
-				case POINT  :
+				case VEC3  :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, GL3.FLOAT, false, offset ) ;
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 4, GL3.UNSIGNED_BYTE, true, offset ) ;
 					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 2, GL3.FLOAT, false, offset ) ;
 					offset += 2 * VBO_VAR_BYTE_SIZE ;
-					break ;
-				}
-				case NORMAL  :
-				{
-					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, GL3.FLOAT, false, offset ) ;
-					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 			}
@@ -375,10 +368,9 @@ public class GLGeometryUploader
 		{
 			switch( _swivel[j] )
 			{
-				case POINT  : size += 3 ; break ;
-				case COLOUR : size += 1 ; break ;
-				case UV     : size += 2 ; break ;
-				case NORMAL : size += 3 ; break ;
+				case VEC3  : size += 3 ; break ;
+				case FLOAT : size += 1 ; break ;
+				case VEC2  : size += 2 ; break ;
 			}
 		}
 
@@ -1051,8 +1043,7 @@ public class GLGeometryUploader
 					{
 						switch( swivel[k] )
 						{
-							case NORMAL :
-							case POINT  :
+							case VEC3  :
 							{
 								shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, positionMatrix, temp ) ;
@@ -1061,14 +1052,14 @@ public class GLGeometryUploader
 								verticies.set( vertexInc++, temp.z ) ;
 								break ;
 							}
-							case COLOUR :
+							case FLOAT :
 							{
 								// GLDrawData colour overrides Shapes colour.
 								final MalletColour col = ( colour != null ) ? colour : shape.getColour( j, k ) ;
 								setColour( vertexInc++, col, byteVersion ) ;
 								break ;
 							}
-							case UV     :
+							case VEC2     :
 							{
 								shape.getVector2( j, k, uv ) ;
 								verticies.set( vertexInc++, uv.x ) ;

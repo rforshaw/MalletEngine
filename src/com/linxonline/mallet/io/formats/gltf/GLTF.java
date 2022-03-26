@@ -181,11 +181,10 @@ public class GLTF
 	{
 		switch( _swivel )
 		{
-			default     : throw new RuntimeException( "Unknown swivel type." ) ;
-			case POINT  : return new PointAccessor() ;
-			case COLOUR : return new ColourAccessor() ;
-			case UV     : return new UVAccessor() ;
-			case NORMAL : return new PointAccessor() ;
+			default    : throw new RuntimeException( "Unknown swivel type." ) ;
+			case VEC3  : return new PointAccessor() ;
+			case FLOAT : return new ColourAccessor() ;
+			case VEC2  : return new UVAccessor() ;
 		}
 	}
 
@@ -241,15 +240,15 @@ public class GLTF
 	{
 		switch( _swivel )
 		{
-			case POINT  :
+			case VEC3  :
 			{
-				if( _accessor.isPoint() == false )
+				if( _accessor.isPoint() == false  )
 				{
-					throw new RuntimeException( "Accessor is not in point format." ) ;
+					throw new RuntimeException( "Accessor is not in vec3 format." ) ;
 				}
 				break;
 			}
-			case COLOUR :
+			case FLOAT :
 			{
 				if( _accessor.isColour() == false )
 				{
@@ -257,19 +256,11 @@ public class GLTF
 				}
 				break ;
 			}
-			case UV     :
+			case VEC2     :
 			{
 				if( _accessor.isUV() == false )
 				{
 					throw new RuntimeException( "Accessor is not in uv format." ) ;
-				}
-				break ;
-			}
-			case NORMAL :
-			{
-				if( _accessor.isNormal() == false )
-				{
-					throw new RuntimeException( "Accessor is not in normal format." ) ;
 				}
 				break ;
 			}

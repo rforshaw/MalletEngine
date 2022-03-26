@@ -86,8 +86,7 @@ public class WebShape extends Shape
 		{
 			switch( swivel[i] )
 			{
-				case POINT  :
-				case NORMAL :
+				case VEC3  :
 				{
 					final Vector3 point = ( Vector3 )_vertex[i] ;
 					verticies.set( vertexIncrement++, point.x ) ;
@@ -95,7 +94,7 @@ public class WebShape extends Shape
 					verticies.set( vertexIncrement++, point.z ) ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
 					int byteIndexIncrement = vertexIncrement++ * 4 ;
@@ -105,7 +104,7 @@ public class WebShape extends Shape
 					facadeVerticies.set( byteIndexIncrement++, ( short )colour.colours[MalletColour.ALPHA] ) ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					final Vector2 uv = ( Vector2 )_vertex[i] ;
 					verticies.set( vertexIncrement++, uv.x ) ;
@@ -129,8 +128,7 @@ public class WebShape extends Shape
 		{
 			switch( swivel[i] )
 			{
-				case POINT  :
-				case NORMAL :
+				case VEC3  :
 				{
 					final Vector3 point = ( Vector3 )_vertex[i] ;
 					point.x = verticies.get( start++ ) ;
@@ -138,7 +136,7 @@ public class WebShape extends Shape
 					point.z = verticies.get( start++ ) ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					final MalletColour colour = ( MalletColour )_vertex[i] ;
 					int byteIndexIncrement = start++ * 4 ;
@@ -148,7 +146,7 @@ public class WebShape extends Shape
 										 ( byte )facadeVerticies.get( byteIndexIncrement++ ) ) ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					final Vector2 uv = ( Vector2 )_vertex[i] ;
 					uv.x = verticies.get( start++ ) ;

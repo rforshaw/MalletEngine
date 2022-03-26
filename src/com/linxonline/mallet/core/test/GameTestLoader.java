@@ -498,9 +498,9 @@ public final class GameTestLoader implements IGameLoader
 						final World world = WorldAssist.getDefault() ;
 						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
 						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, Swivel>>toArray(
-							Tuple.<String, Swivel>build( "POSITION", Swivel.POINT ),
-							Tuple.<String, Swivel>build( "", Swivel.COLOUR ),
-							Tuple.<String, Swivel>build( "TEXCOORD_0", Swivel.UV )
+							Tuple.<String, Swivel>build( "POSITION", Swivel.VEC3 ),
+							Tuple.<String, Swivel>build( "", Swivel.FLOAT ),
+							Tuple.<String, Swivel>build( "TEXCOORD_0", Swivel.VEC2 )
 						) ) ;
 						System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
 						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;

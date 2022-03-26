@@ -196,8 +196,7 @@ public class GLTextBuffer extends GLBuffer
 					{
 						switch( swivel[k] )
 						{
-							case NORMAL :
-							case POINT  :
+							case VEC3  :
 							{
 								shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, matrix, temp ) ;
@@ -206,7 +205,7 @@ public class GLTextBuffer extends GLBuffer
 								verticies[vertexIncrement++] = temp.z ;
 								break ;
 							}
-							case COLOUR :
+							case FLOAT :
 							{
 								// GLDraw colour overrides Shapes colour.
 								final MalletColour colour = draw.getColour() ;
@@ -214,7 +213,7 @@ public class GLTextBuffer extends GLBuffer
 								verticies[vertexIncrement++] = getABGR( col ) ;
 								break ;
 							}
-							case UV     :
+							case VEC2     :
 							{
 								shape.getVector2( j, k, uv ) ;
 								verticies[vertexIncrement++] = uv.x ;

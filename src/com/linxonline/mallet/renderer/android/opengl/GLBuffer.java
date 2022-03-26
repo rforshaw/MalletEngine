@@ -81,28 +81,22 @@ public class GLBuffer
 		{
 			switch( _swivel[i] )
 			{
-				case POINT  :
+				case VEC3  :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, MGL.GL_FLOAT, false, offset ) ;
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
-				case COLOUR :
+				case FLOAT :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 4, MGL.GL_UNSIGNED_BYTE, true, offset ) ;
 					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
-				case UV     :
+				case VEC2     :
 				{
 					attributes[i] = new VertexAttrib( _program.inAttributes[i], 2, MGL.GL_FLOAT, false, offset ) ;
 					offset += 2 * VBO_VAR_BYTE_SIZE ;
-					break ;
-				}
-				case NORMAL  :
-				{
-					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, MGL.GL_FLOAT, false, offset ) ;
-					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 			}
@@ -118,10 +112,9 @@ public class GLBuffer
 		{
 			switch( _swivel[j] )
 			{
-				case POINT  : size += 3 ; break ;
-				case COLOUR : size += 1 ; break ;
-				case UV     : size += 2 ; break ;
-				case NORMAL : size += 3 ; break ;
+				case VEC3  : size += 3 ; break ;
+				case FLOAT : size += 1 ; break ;
+				case VEC2  : size += 2 ; break ;
 			}
 		}
 

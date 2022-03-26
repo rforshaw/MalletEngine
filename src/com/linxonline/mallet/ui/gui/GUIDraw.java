@@ -92,6 +92,7 @@ public class GUIDraw extends GUIComponent
 
 		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
 		updater.addDynamics( draw ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
 	}
 
 	@Override
@@ -114,6 +115,7 @@ public class GUIDraw extends GUIComponent
 		final Shape shape = ( Shape )draw.getShape() ;
 		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
 		updater.addDynamics( draw ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
 	}
 
 	@Override
