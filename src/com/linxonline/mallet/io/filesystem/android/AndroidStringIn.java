@@ -17,6 +17,7 @@ public class AndroidStringIn implements StringInStream
 		reader = new BufferedReader( new InputStreamReader( _input ) ) ;
 	}
 
+	@Override
 	public String readLine()
 	{
 		try
@@ -29,17 +30,9 @@ public class AndroidStringIn implements StringInStream
 		}
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
 	{
-		try
-		{
-			reader.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			System.out.println( "Byte In - Failed to close Input Stream." ) ;
-			return false ;
-		}
+		reader.close() ;
 	}
 }

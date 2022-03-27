@@ -32,11 +32,16 @@ public class JUIWrapper
 		final IAbstractModel model = _wrapper.getMeta() ;
 		final JObject ui = JUIWrapper.createJSON( _wrapper, model.root() ) ;
 
-		final StringOutStream stream = file.getStringOutStream() ;
-		stream.writeLine( ui.toString( 2 ) ) ;
-
-		stream.close() ;
-		return true ;
+		try( final StringOutStream stream = file.getStringOutStream() )
+		{
+			stream.writeLine( ui.toString( 2 ) ) ;
+			return true ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
+		}
 	}
 
 	private static JObject createJSON( final UIWrapper _wrapper, final UIModelIndex _index )

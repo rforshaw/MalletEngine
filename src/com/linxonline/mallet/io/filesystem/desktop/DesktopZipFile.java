@@ -24,26 +24,15 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			final ByteInStream stream = new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
+			return new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
 			{
 				@Override
-				public boolean close()
+				public void close() throws Exception
 				{
-					boolean success = super.close() ;
-					try
-					{
-						zipFile.close() ;
-						return success ;
-					}
-					catch( IOException ex )
-					{
-						ex.printStackTrace() ;
-						return false ;
-					}
+					super.close() ;
+					zipFile.close() ;
 				}
 			} ;
-
-			return stream ;
 		}
 		catch( IOException ex )
 		{
@@ -56,26 +45,15 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			final StringInStream stream = new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
+			return new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
 			{
 				@Override
-				public boolean close()
+				public void close() throws Exception
 				{
-					boolean success = super.close() ;
-					try
-					{
-						zipFile.close() ;
-						return success ;
-					}
-					catch( IOException ex )
-					{
-						ex.printStackTrace() ;
-						return false ;
-					}
+					super.close() ;
+					zipFile.close() ;
 				}
 			} ;
-
-			return stream ;
 		}
 		catch( IOException ex )
 		{
@@ -132,25 +110,28 @@ public class DesktopZipFile implements FileStream
 			return false ;
 		}
 
-		final ByteInStream in = getByteInStream() ;
-		final ByteOutStream out = stream.getByteOutStream() ;
-		if( out == null )
+		try( final ByteInStream in = getByteInStream() ;
+			 final ByteOutStream out = stream.getByteOutStream() )
+		{
+			if( out == null )
+			{
+				return false ;
+			}
+
+			int length = 0 ;
+			final byte[] buffer = new byte[48] ;
+
+			while( ( length = in.readBytes( buffer, 0, buffer.length ) ) > 0 )
+			{
+				out.writeBytes( buffer, 0, length ) ;
+			}
+
+			return true ;
+		}
+		catch( Exception ex )
 		{
 			return false ;
 		}
-
-		int length = 0 ;
-		final byte[] buffer = new byte[48] ;
-
-		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) > 0 )
-		{
-			out.writeBytes( buffer, 0, length ) ;
-		}
-
-		in.close() ;
-		out.close() ;
-
-		return true ;
 	}
 
 	public boolean isFile()

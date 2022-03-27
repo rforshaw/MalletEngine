@@ -23,17 +23,22 @@ public class ByteReader
 			return null ;
 		}
 
-		final ByteInStream in = file.getByteInStream() ;
 		final int size = ( int )file.getSize() ;
 		final byte[] buffer = new byte[size] ;
 
-		int offset = 0 ;
-		while( offset >= 0 && offset < size )
+		try( final ByteInStream in = file.getByteInStream() )
 		{
-			offset += in.readBytes( buffer, offset, size - offset ) ;
+			int offset = 0 ;
+			while( offset >= 0 && offset < size )
+			{
+				offset += in.readBytes( buffer, offset, size - offset ) ;
+			}
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
 		}
 
-		in.close() ;
 		return buffer ;
 	}
 }

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface ByteInStream extends Close
+public interface ByteInStream extends AutoCloseable
 {
 	/**
 		Request to read _length of bytes from the file into 

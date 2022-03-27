@@ -29,18 +29,10 @@ public class DesktopByteOut implements ByteOutStream
 		}
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
 	{
-		try
-		{
-			output.flush() ;
-			output.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
+		output.flush() ;
+		output.close() ;
 	}
 }

@@ -14,7 +14,8 @@ public class AndroidByteOut implements ByteOutStream
 		assert _output != null ;
 		output = _output ;
 	}
-	
+
+	@Override
 	public int writeBytes( final byte[] _stream, final int _offset, final int _length )
 	{
 		try
@@ -29,18 +30,10 @@ public class AndroidByteOut implements ByteOutStream
 		}
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
 	{
-		try
-		{
-			output.flush() ;
-			output.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
+		output.flush() ;
+		output.close() ;
 	}
 }

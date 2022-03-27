@@ -93,23 +93,27 @@ public class AndroidAssetFile implements FileStream
 			return false ;
 		}
 
-		final ByteInStream in = getByteInStream() ;
-		final ByteOutStream out = stream.getByteOutStream() ;
-		if( out == null )
+		try( final ByteInStream in = getByteInStream() ;
+			 final ByteOutStream out = stream.getByteOutStream() )
 		{
+			if( out == null )
+			{
+				return false ;
+			}
+
+			int length = 0 ;
+			final byte[] buffer = new byte[48] ;
+
+			while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
+			{
+				out.writeBytes( buffer, 0, length ) ;
+			}
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
 			return false ;
 		}
-
-		int length = 0 ;
-		final byte[] buffer = new byte[48] ;
-
-		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) != -1 )
-		{
-			out.writeBytes( buffer, 0, length ) ;
-		}
-
-		in.close() ;
-		out.close() ;
 
 		return true ;
 	}

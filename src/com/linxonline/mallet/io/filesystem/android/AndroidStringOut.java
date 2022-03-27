@@ -14,7 +14,8 @@ public class AndroidStringOut implements StringOutStream
 		assert _output != null ;
 		output = _output ;
 	}
-	
+
+	@Override
 	public boolean writeLine( final String _line )
 	{
 		try
@@ -29,18 +30,10 @@ public class AndroidStringOut implements StringOutStream
 		}
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
 	{
-		try
-		{
-			output.flush() ;
-			output.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
+		output.flush() ;
+		output.close() ;
 	}
 }

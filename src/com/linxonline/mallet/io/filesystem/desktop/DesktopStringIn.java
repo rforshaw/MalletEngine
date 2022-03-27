@@ -31,18 +31,9 @@ public class DesktopStringIn implements StringInStream
 	}
 
 	@Override
-	public boolean close()
+	public void close() throws Exception
 	{
-		try
-		{
-			reader.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			System.out.println( "Byte In - Failed to close Input Stream." ) ;
-			return false ;
-		}
+		reader.close() ;
 	}
 
 	@Override

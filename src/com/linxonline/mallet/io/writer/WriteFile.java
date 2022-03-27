@@ -17,13 +17,19 @@ public final class WriteFile
 
 	public static final boolean write( final FileStream _file, final Collection<String> _list )
 	{
-		final StringOutStream stream = _file.getStringOutStream() ;
-		for( final String line : _list )
+		try( final StringOutStream stream = _file.getStringOutStream() )
 		{
-			stream.writeLine( line ) ;
+			for( final String line : _list )
+			{
+				stream.writeLine( line ) ;
+			}
+			return true ;
 		}
-
-		return stream.close() ;
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
+		}
 	}
 
 	public static final boolean write( final String _file, final String _data )
@@ -33,8 +39,15 @@ public final class WriteFile
 
 	public static final boolean write( final FileStream _file, final String _data )
 	{
-		final StringOutStream stream = _file.getStringOutStream() ;
-		stream.writeLine( _data ) ;
-		return stream.close() ;
+		try( final StringOutStream stream = _file.getStringOutStream() )
+		{
+			stream.writeLine( _data ) ;
+			return true ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+			return false ;
+		}
 	}
 }

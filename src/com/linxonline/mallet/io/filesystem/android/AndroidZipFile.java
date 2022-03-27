@@ -11,7 +11,6 @@ import com.linxonline.mallet.util.Logger ;
 
 public class AndroidZipFile implements FileStream
 {
-	private final CloseStreams toClose = new CloseStreams() ;
 	private final AndroidFileSystem.ZipPath path ;
 	private final ZipInputStream stream ;
 	private final ZipEntry zipEntry ;
@@ -30,19 +29,10 @@ public class AndroidZipFile implements FileStream
 		return new AndroidByteIn( stream )
 		{
 			@Override
-			public boolean close()
+			public void close() throws Exception
 			{
-				final boolean success = super.close() ;
-				try
-				{
-					stream.close() ;
-					return success ;
-				}
-				catch( IOException ex )
-				{
-					ex.printStackTrace() ;
-					return false ;
-				}
+				super.close() ;
+				stream.close() ;
 			}
 		} ;
 	}
@@ -52,19 +42,10 @@ public class AndroidZipFile implements FileStream
 		return new AndroidStringIn( stream )
 		{
 			@Override
-			public boolean close()
+			public void close() throws Exception
 			{
-				final boolean success = super.close() ;
-				try
-				{
-					stream.close() ;
-					return success ;
-				}
-				catch( IOException ex )
-				{
-					ex.printStackTrace() ;
-					return false ;
-				}
+				super.close() ;
+				stream.close() ;
 			}
 		} ;
 	}
@@ -115,23 +96,27 @@ public class AndroidZipFile implements FileStream
 			return false ;
 		}
 
-		final ByteInStream in = getByteInStream() ;
-		final ByteOutStream out = stream.getByteOutStream() ;
-		if( out == null )
+		try( final ByteInStream in = getByteInStream() ;
+			 final ByteOutStream out = stream.getByteOutStream() )
 		{
+			if( out == null )
+			{
+				return false ;
+			}
+
+			int length = 0 ;
+			final byte[] buffer = new byte[48] ;
+
+			while( ( length = in.readBytes( buffer, 0, buffer.length ) ) > 0 )
+			{
+				out.writeBytes( buffer, 0, length ) ;
+			}
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
 			return false ;
 		}
-
-		int length = 0 ;
-		final byte[] buffer = new byte[48] ;
-
-		while( ( length = in.readBytes( buffer, 0, buffer.length ) ) > 0 )
-		{
-			out.writeBytes( buffer, 0, length ) ;
-		}
-
-		in.close() ;
-		out.close() ;
 
 		return true ;
 	}

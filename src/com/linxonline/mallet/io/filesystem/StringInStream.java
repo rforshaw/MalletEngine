@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.filesystem ;
 
-public interface StringInStream extends Close
+public interface StringInStream extends AutoCloseable
 {
 	/**
 		Return a line of text from the file.

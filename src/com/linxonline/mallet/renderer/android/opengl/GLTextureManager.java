@@ -83,15 +83,19 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 						return ;
 					}
 
-					final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-					final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
-					in.close() ;
-					
-					synchronized( toBind )
+					try( final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() )
 					{
-						// We don't want to bind the Bitmap now
-						// as that will take control of the OpenGL context.
-						toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream() ) ;
+						synchronized( toBind )
+						{
+							// We don't want to bind the Bitmap now
+							// as that will take control of the OpenGL context.
+							toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+						}
+					}
+					catch( Exception ex )
+					{
+						ex.printStackTrace() ;
 					}
 				} ) ;
 
@@ -122,15 +126,19 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 					final BitmapFactory.Options options = new BitmapFactory.Options() ;
 					options.inPreferredConfig = Bitmap.Config.RGB_565 ;
 
-					final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-					final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
-					in.close() ;
-
-					synchronized( toBind )
+					try( final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() )
 					{
-						// We don't want to bind the Bitmap now
-						// as that will take control of the OpenGL context.
-						toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+						final Bitmap bitmap = BitmapFactory.decodeStream( in.getInputStream(), null, options ) ;
+						synchronized( toBind )
+						{
+							// We don't want to bind the Bitmap now
+							// as that will take control of the OpenGL context.
+							toBind.add( new Tuple<String, Bitmap>( _file, bitmap ) ) ;
+						}
+					}
+					catch( Exception ex )
+					{
+						ex.printStackTrace() ;
 					}
 				} ) ;
 
@@ -264,17 +272,21 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 				return new MalletTexture.Meta( _path, 0, 0 ) ;
 			}
 
-			final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() ;
-			if( in != null )
+			try( final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() )
 			{
-				meta = createMeta( _path, in.getInputStream() ) ;
-				if( meta != null )
+				if( in != null )
 				{
-					imageMetas.put( _path, meta ) ;
-					in.close() ;
-					return meta ;
+					meta = createMeta( _path, in.getInputStream() ) ;
+					if( meta != null )
+					{
+						imageMetas.put( _path, meta ) ;
+						return meta ;
+					}
 				}
-				in.close() ;
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
 			}
 
 			Logger.println( "Unable to create meta data: " + _path, Logger.Verbosity.NORMAL ) ;

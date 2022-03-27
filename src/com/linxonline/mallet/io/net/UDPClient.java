@@ -12,7 +12,6 @@ import java.io.IOException ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.io.filesystem.Close ;
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
 /**
@@ -20,7 +19,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	the specified address and port passed into init().
 	
 */
-public class UDPClient implements Close
+public class UDPClient implements AutoCloseable
 {
 	private DatagramChannel channel ;
 	private SocketAddress target ;
@@ -49,7 +48,7 @@ public class UDPClient implements Close
 
 			return true ;
 		}
-		catch( IOException ex )
+		catch( Exception ex )
 		{
 			ex.printStackTrace() ;
 			return false ;
@@ -101,16 +100,8 @@ public class UDPClient implements Close
 	}
 
 	@Override
-	public boolean close()
+	public void close() throws Exception
 	{
-		try
-		{
-			channel.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			return false ;
-		}
+		channel.close() ;
 	}
 }

@@ -286,47 +286,48 @@ public class GLTF
 
 		final byte[] data = new byte[( int )stream.getSize()] ;
 
-		final ByteInStream in = stream.getByteInStream() ;
-		final int read = in.readBytes( data, 0, 12 ) ;
-
-		if( read != 12 )
+		try( final ByteInStream in = stream.getByteInStream() )
 		{
-			Logger.println( "Failed to read header expected 12 bytes.", Logger.Verbosity.NORMAL ) ;
-			in.close() ;
+			final int read = in.readBytes( data, 0, 12 ) ;
+
+			if( read != 12 )
+			{
+				Logger.println( "Failed to read header expected 12 bytes.", Logger.Verbosity.NORMAL ) ;
+				return null ;
+			}
+
+			final int magic = ConvertBytes.toInt( data, 0 ) ;
+			if( magic == 0x46546C67 )
+			{
+				Logger.println( "Expected glTF at the start of file.", Logger.Verbosity.NORMAL ) ;
+				return null ;
+			}
+
+			ConvertBytes.flipEndian( data, 4, 4 ) ;
+			final long version = Integer.toUnsignedLong( ConvertBytes.toInt( data, 4 ) ) ;
+
+			ConvertBytes.flipEndian( data, 8, 4 ) ;
+			final long length = Integer.toUnsignedLong( ConvertBytes.toInt( data, 8 ) ) ;
+
+			System.out.println( "Magic: " + magic + " Version: " + version + " Length: " + length ) ;
+			final JChunk jChunk = readJChunk( in, data, 12 ) ;
+			if( jChunk == null )
+			{
+				return null ;
+			}
+
+			final BinChunk binChunk = readBinChunk( in, data, jChunk.getEnd() ) ;
+			if( binChunk == null )
+			{
+				return null ;
+			}
+
+			return new GLTF( jChunk, binChunk ) ;
+		}
+		catch( Exception ex )
+		{
 			return null ;
 		}
-
-		final int magic = ConvertBytes.toInt( data, 0 ) ;
-		if( magic == 0x46546C67 )
-		{
-			Logger.println( "Expected glTF at the start of file.", Logger.Verbosity.NORMAL ) ;
-			in.close() ;
-			return null ;
-		}
-
-		ConvertBytes.flipEndian( data, 4, 4 ) ;
-		final long version = Integer.toUnsignedLong( ConvertBytes.toInt( data, 4 ) ) ;
-
-		ConvertBytes.flipEndian( data, 8, 4 ) ;
-		final long length = Integer.toUnsignedLong( ConvertBytes.toInt( data, 8 ) ) ;
-
-		System.out.println( "Magic: " + magic + " Version: " + version + " Length: " + length ) ;
-		final JChunk jChunk = readJChunk( in, data, 12 ) ;
-		if( jChunk == null )
-		{
-			in.close() ;
-			return null ;
-		}
-
-		final BinChunk binChunk = readBinChunk( in, data, jChunk.getEnd() ) ;
-		in.close() ;
-
-		if( binChunk == null )
-		{
-			return null ;
-		}
-
-		return new GLTF( jChunk, binChunk ) ;
 	}
 
 	private static JChunk readJChunk( final ByteInStream _in, final byte[] _data, int _offset )

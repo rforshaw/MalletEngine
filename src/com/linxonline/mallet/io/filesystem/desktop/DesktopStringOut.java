@@ -31,18 +31,9 @@ public class DesktopStringOut implements StringOutStream
 	}
 
 	@Override
-	public boolean close()
+	public void close() throws Exception
 	{
-		try
-		{
-			output.flush() ;
-			output.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
+		output.flush() ;
+		output.close() ;
 	}
 }

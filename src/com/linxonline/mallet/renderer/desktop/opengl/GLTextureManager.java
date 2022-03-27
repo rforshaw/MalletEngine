@@ -379,10 +379,16 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 
 		private MalletTexture.Meta createMeta( final String _path, final FileStream _file )
 		{
-			final DesktopByteIn desktopIn = ( DesktopByteIn )_file.getByteInStream() ;
-			final MalletTexture.Meta meta = createMeta( _path, desktopIn.getInputStream() ) ;
-			desktopIn.close() ;
-			return meta ;
+			MalletTexture.Meta meta = null ; 
+			try( final DesktopByteIn desktopIn = ( DesktopByteIn )_file.getByteInStream() )
+			{
+				meta = createMeta( _path, desktopIn.getInputStream() ) ;
+				return meta ;
+			}
+			catch( Exception ex )
+			{
+				return meta ;
+			}
 		}
 
 		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
@@ -449,13 +455,11 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 				Logger.println( "Failed to create Texture: " + texturePath, Logger.Verbosity.NORMAL ) ;
 				return ;
 			}
-		
-			try
+
+			try( final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() )
 			{
-				final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() ;
 				final InputStream stream = in.getInputStream() ;
 				final BufferedImage image = ImageIO.read( stream ) ;
-				in.close() ;
 
 				// Generate our own mipmaps.
 				int width = image.getWidth() ;
@@ -490,7 +494,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 					toBind.add( new Tuple<String, BufferedImage[]>( texturePath, images ) ) ;
 				}
 			}
-			catch( IOException ex )
+			catch( Exception ex )
 			{
 				ex.printStackTrace() ;
 			}

@@ -50,7 +50,15 @@ public final class ReadFile
 				toReadNum = callback.readBytes( buffer, readNum ) ;
 			}
 
-			stream.close() ;
+			try
+			{
+				stream.close() ;
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
+			}
+
 			callback.end() ;
 		}
 	}
@@ -95,7 +103,15 @@ public final class ReadFile
 				callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
 			}
 
-			stream.close() ;
+			try
+			{
+				stream.close() ;
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
+			}
+
 			callback.end() ;
 		}
 	}

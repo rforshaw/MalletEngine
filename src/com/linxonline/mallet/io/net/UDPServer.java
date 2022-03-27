@@ -15,7 +15,6 @@ import java.io.IOException ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.io.filesystem.Close ;
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
 /**
@@ -24,7 +23,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	It can then send a response to the sender using the 
 	address and port provided by the sender.
 */
-public class UDPServer implements Close
+public class UDPServer implements AutoCloseable
 {
 	private final Map<Address, InetSocketAddress> addresses = MalletMap.<Address, InetSocketAddress>newMap() ;
 
@@ -51,7 +50,7 @@ public class UDPServer implements Close
 
 			return true ;
 		}
-		catch( IOException ex )
+		catch( Exception ex )
 		{
 			ex.printStackTrace() ;
 			return false ;
@@ -116,16 +115,8 @@ public class UDPServer implements Close
 	}
 
 	@Override
-	public boolean close()
+	public void close() throws Exception
 	{
-		try
-		{
-			channel.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			return false ;
-		}
+		channel.close() ;
 	}
 }

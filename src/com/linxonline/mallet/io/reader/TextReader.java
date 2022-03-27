@@ -44,17 +44,23 @@ public class TextReader
 			return buffer.toString() ;
 		}
 
-		final StringInStream in = file.getStringInStream() ;
-		String line = null ;
-
-		while( ( line = in.readLine() ) != null )
+		try( final StringInStream in = file.getStringInStream() )
 		{
-			buffer.append( line ) ;
-			buffer.append( '\n' ) ;
-		}
+			String line = null ;
 
-		in.close() ;
-		return buffer.toString() ;
+			while( ( line = in.readLine() ) != null )
+			{
+				buffer.append( line ) ;
+				buffer.append( '\n' ) ;
+			}
+
+			return buffer.toString() ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+			return buffer.toString() ;
+		}
 	}
 
 	private static List<String> readFileToArray( final String _file )
@@ -72,15 +78,19 @@ public class TextReader
 	private static List<String> readFileToArray( final FileStream _file )
 	{
 		final List<String> lines = MalletList.<String>newList() ;
-		final StringInStream in = _file.getStringInStream() ;
-		String line = null ;
-
-		while( ( line = in.readLine() ) != null )
+		try( final StringInStream in = _file.getStringInStream() )
 		{
-			lines.add( line ) ;
+			String line = null ;
+			while( ( line = in.readLine() ) != null )
+			{
+				lines.add( line ) ;
+			}
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
 		}
 
-		in.close() ;
 		return lines ;
 	}
 }

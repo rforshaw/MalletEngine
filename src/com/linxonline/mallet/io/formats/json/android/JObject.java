@@ -38,21 +38,27 @@ public class JObject
 	*/
 	public static JObject construct( final FileStream _file )
 	{
-		final StringInStream stream = _file.getStringInStream() ;
-		if( stream == null )
+		try( final StringInStream stream = _file.getStringInStream() )
 		{
+			if( stream == null )
+			{
+				return new JObject() ;
+			}
+
+			final StringBuilder builder = new StringBuilder() ;
+			String line = null ;
+			while( ( line = stream.readLine() ) != null )
+			{
+				builder.append( line ) ;
+			}
+
+			return JObject.construct( builder.toString() ) ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
 			return new JObject() ;
 		}
-
-		final StringBuilder builder = new StringBuilder() ;
-		String line = null ;
-		while( ( line = stream.readLine() ) != null )
-		{
-			builder.append( line ) ;
-		}
-
-		stream.close() ;
-		return JObject.construct( builder.toString() ) ;
 	}
 
 	public static boolean construct( final FileStream _file, final ConstructCallback _callback )

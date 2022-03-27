@@ -45,17 +45,9 @@ public class DesktopByteIn implements ByteInStream
 		return stream ;
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
 	{
-		try
-		{
-			stream.close() ;
-			return true ;
-		}
-		catch( IOException ex )
-		{
-			System.out.println( "Byte In - Failed to close Input Stream." ) ;
-			return false ;
-		}
+		stream.close() ;
 	}
 }
