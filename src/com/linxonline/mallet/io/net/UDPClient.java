@@ -25,6 +25,9 @@ public class UDPClient implements AutoCloseable
 	private SocketAddress target ;
 
 	private byte[] sendBuffers = new byte[200] ;
+	private final Address sourceAddress = new Address() ;
+
+	private final Serialise.ByteOut out = new Serialise.ByteOut( null ) ;
 
 	public UDPClient() {}
 
@@ -65,9 +68,10 @@ public class UDPClient implements AutoCloseable
 				sendBuffers = new byte[length] ;
 			}
 
-			_out.serialise( new Serialise.ByteOut( sendBuffers ) ) ;
-			final ByteBuffer buffer = ByteBuffer.wrap( sendBuffers, 0, length ) ;
+			out.set( sendBuffers ) ;
+			_out.serialise( out ) ;
 
+			final ByteBuffer buffer = ByteBuffer.wrap( sendBuffers, 0, length ) ;
 			channel.send( buffer, target ) ;
 			return true ;
 		}
@@ -88,7 +92,9 @@ public class UDPClient implements AutoCloseable
 				return null ;
 			}
 
-			_stream.setSender( new Address( source ) ) ;
+			sourceAddress.set( source ) ;
+
+			_stream.setSender( sourceAddress ) ;
 			_stream.setDataLength( wrap.position() ) ;
 
 			return _stream ;

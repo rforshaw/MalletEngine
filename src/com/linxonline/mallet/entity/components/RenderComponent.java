@@ -45,25 +45,6 @@ public class RenderComponent extends Component
 
 	public void shutdown() {}
 
-	public DrawUpdater getUpdater( final World _world,
-									final Program _program,
-									final Draw _draw,
-									final boolean _ui,
-									final int _order )
-	{
-		final IShape shape = _draw.getShape() ;
-		return DrawUpdater.getOrCreate( _world, _program, shape, _ui, _order ) ;
-	}
-
-	public DrawInstancedUpdater getInstancedUpdater( final World _world,
-													 final Program _program,
-													 final IShape _shape,
-													 final boolean _ui,
-													 final int _order )
-	{
-		return DrawInstancedUpdater.getOrCreate( _world, _program, _shape, _ui, _order ) ;
-	}
-
 	@Override
 	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{

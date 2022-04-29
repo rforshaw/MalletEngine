@@ -8,6 +8,19 @@ public class GUI
 {
 	public GUI() {}
 
+	private static final DrawUpdaterPool drawPool = new DrawUpdaterPool() ;
+	private static final TextUpdaterPool textPool = new TextUpdaterPool() ;
+
+	public static DrawUpdaterPool getDrawUpdaterPool()
+	{
+		return drawPool ;
+	}
+
+	public static TextUpdaterPool getTextUpdaterPool()
+	{
+		return textPool ;
+	}
+
 	public static Shape updateColour( final Shape _shape, final MalletColour _colour )
 	{
 		final int size = _shape.getVerticesSize() ;

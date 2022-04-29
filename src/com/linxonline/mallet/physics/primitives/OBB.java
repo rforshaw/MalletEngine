@@ -37,13 +37,7 @@ public class OBB
 
 	public OBB( final AABB _aabb )
 	{
-		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( position, OBB.POSITION_X,   _aabb.position[AABB.POSITION_X], _aabb.position[AABB.POSITION_Y] ) ;
-		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X],   _aabb.position[AABB.OFFSET_Y] ) ;
-		init() ;
+		setFromAABB( _aabb ) ;
 	}
 
 	public OBB( final Vector2 _topLeft,
@@ -83,6 +77,17 @@ public class OBB
 		FloatBuffer.add( position, OBB.OFFSET_X, _x, _y ) ;
 	}
 
+	public void setFromAABB( final AABB _aabb )
+	{
+		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MIN_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MAX_Y] ) ;
+		FloatBuffer.set( position, OBB.POSITION_X,   _aabb.position[AABB.POSITION_X], _aabb.position[AABB.POSITION_Y] ) ;
+		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X],   _aabb.position[AABB.OFFSET_Y] ) ;
+		init() ;
+	}
+
 	/**
 		Set the points and axes from the OBB being passed in.
 		This also includes the position & offset.
@@ -108,12 +113,12 @@ public class OBB
 		and position of the OBB.
 		returns a new Vector2().
 	**/
-	public Vector2 getAbsolutePoint( final int _index )
+	public Vector2 getAbsolutePoint( final int _index, final Vector2 _fill )
 	{
-		final Vector2 result = FloatBuffer.fill( points, new Vector2(), _index ) ;
-		result.add( position[OBB.POSITION_X] + position[OBB.OFFSET_X],
-					position[OBB.POSITION_Y] + position[OBB.OFFSET_Y] ) ;
-		return result ;
+		FloatBuffer.fill( rotations, _fill, _index ) ;
+		_fill.add( position[OBB.POSITION_X] + position[OBB.OFFSET_X],
+				   position[OBB.POSITION_Y] + position[OBB.OFFSET_Y] ) ;
+		return _fill ;
 	}
 
 	public Vector2 getPosition( final Vector2 _fill )

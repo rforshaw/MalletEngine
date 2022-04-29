@@ -19,7 +19,7 @@ public class InputSystem implements IInputSystem
 {
 	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
 
-	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
+	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
@@ -132,7 +132,7 @@ public class InputSystem implements IInputSystem
 		document.addEventListener( "keyup", keyUp ) ;*/
 	}
 
-	public void addInputHandler( final InputHandler _handler )
+	public void addInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == true )
 		{
@@ -142,7 +142,7 @@ public class InputSystem implements IInputSystem
 		handlers.add( _handler ) ;
 	}
 
-	public void removeInputHandler( final InputHandler _handler )
+	public void removeInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == false )
 		{
@@ -187,7 +187,7 @@ public class InputSystem implements IInputSystem
 		final int handlerSize = handlers.size() ;
 		for( int j = 0; j < handlerSize; ++j )
 		{
-			final InputHandler handler = handlers.get( j ) ;
+			final IInputHandler handler = handlers.get( j ) ;
 			switch( handler.passInputEvent( _input ) )
 			{
 				case PROPAGATE : continue ;
@@ -215,7 +215,7 @@ public class InputSystem implements IInputSystem
 		inputs.clear() ;
 	}
 
-	private final boolean exists( final InputHandler _handler )
+	private final boolean exists( final IInputHandler _handler )
 	{
 		assert _handler != null ; 
 		return handlers.contains( _handler ) ;

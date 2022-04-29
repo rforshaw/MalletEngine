@@ -150,6 +150,7 @@ public final class GameTestLoader implements IGameLoader
 			public void renderTextureExample()
 			{
 				final World world = WorldAssist.getDefault() ;
+				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
 				final Program geomProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
 
 				{
@@ -186,8 +187,10 @@ public final class GameTestLoader implements IGameLoader
 					draw.setOffset( -100.0f, 0.0f, 0.0f ) ;
 					draw.setShape( lines ) ;
 
-					final DrawUpdater updater = DrawUpdater.getOrCreate( world, geomProgram, lines, false, 10 ) ;
-					updater.addDynamics( draw ) ;
+					final DrawUpdater updater = pool.getOrCreate( world, geomProgram, lines, false, 10 ) ;
+
+					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+					geometry.addDraws( draw ) ;
 				}
 
 				{
@@ -205,8 +208,10 @@ public final class GameTestLoader implements IGameLoader
 					final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 					program.mapUniform( "inTex0", texture ) ;
 
-					final DrawUpdater updater = DrawUpdater.getOrCreate( world, program, plane, true, 10 ) ;
-					updater.addDynamics( draw ) ;
+					final DrawUpdater updater = pool.getOrCreate( world, program, plane, true, 10 ) ;
+
+					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+					geometry.addDraws( draw ) ;
 				}
 			}
 
@@ -269,8 +274,11 @@ public final class GameTestLoader implements IGameLoader
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
 				program.mapUniform( "inTex0", new MalletFont( "Arial", 20 ) ) ;
 
-				final TextUpdater updater = TextUpdater.getOrCreate( world, program, false, 200 ) ;
-				updater.addDynamics( draw ) ;
+				final TextUpdaterPool pool = RenderPools.getTextUpdaterPool() ;
+				final TextUpdater updater = pool.getOrCreate( world, program, false, 200 ) ;
+
+				final TextBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.addDraws( draw ) ;
 			}
 
 			/**
@@ -385,8 +393,11 @@ public final class GameTestLoader implements IGameLoader
 						final World world = WorldAssist.getDefault() ;
 
 						{
-							updater = getInstancedUpdater( world, program, plane, false, 10 ) ;
-							updater.addDynamics( draws ) ;
+							final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
+							updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
+
+							final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+							geometry.addDraws( draws ) ;
 						}
 
 						{
@@ -399,7 +410,8 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void shutdown()
 					{
-						updater.removeDynamics( draws ) ;
+						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+						geometry.addDraws( draws ) ;
 						//debugUpdater.removeDraws( debugDraws ) ;
 					}
 
@@ -487,7 +499,7 @@ public final class GameTestLoader implements IGameLoader
 
 				new RenderComponent( entity )
 				{
-					private IUpdater<Draw, ?> updater ;
+					private DrawUpdater updater ;
 
 					private Draw draw ;
 					private final Vector3 rotate = new Vector3() ;
@@ -514,14 +526,18 @@ public final class GameTestLoader implements IGameLoader
 						final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 						program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
-						updater = getUpdater( world, program, draw, false, 10 ) ;
-						updater.addDynamics( draw ) ;
+						final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+						updater = pool.getOrCreate( world, program, draw.getShape(), false, 10 ) ;
+
+						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+						geometry.addDraws( draw ) ;
 					}
 
 					@Override
 					public void shutdown()
 					{
-						updater.removeDynamics( draw ) ;
+						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+						geometry.removeDraws( draw ) ;
 					}
 
 					@Override

@@ -22,13 +22,13 @@ import com.linxonline.mallet.maths.* ;
 	that is delegated to a GUIComponent and the developer is expected 
 	to implement it in whatever way they see fit.
 */
-public class UIElement implements InputHandler, Connect.Connection
+public class UIElement implements IInputHandler, Connect.Connection
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
 	private final ComponentUnit components = new ComponentUnit() ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-	private final Connect connect = new Connect() ;
+	private final static Connect connect = new Connect() ;
 
 	protected State current = State.NEUTRAL ;
 
@@ -850,6 +850,7 @@ public class UIElement implements InputHandler, Connect.Connection
 	{
 		UIElement.signal( this, elementShutdown() ) ;
 		components.shutdown() ;
+		connect.disconnect( this ) ;
 	}
 
 	/**
@@ -871,7 +872,6 @@ public class UIElement implements InputHandler, Connect.Connection
 		Reset the UIElement as if it has just been constructed.
 		This does not remove components or connections.
 	*/
-	@Override
 	public void reset()
 	{
 		UIElement.signal( this, elementReset() ) ;

@@ -28,17 +28,14 @@ public abstract class BasicRenderer implements IRender
 	public BasicRenderer()
 	{
 		world.addCameras( camera ) ;
-	}
-
-	@Override
-	public void start()
-	{
-		controller.reset() ;
 		controller.addProcessor( "DRAW_CLEAN", ( final Object _obj ) ->
 		{
 			clean() ;
 		} ) ;
 	}
+
+	@Override
+	public void start() {}
 
 	public void invokeLater( final Runnable _run )
 	{
@@ -52,15 +49,17 @@ public abstract class BasicRenderer implements IRender
 	{
 		executions.update() ;
 		final List<Runnable> runnables = executions.getCurrentData() ;
-		if( runnables.isEmpty() == false )
+		if( runnables.isEmpty() )
 		{
-			final int size = runnables.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				runnables.get( i ).run() ;
-			}
-			runnables.clear() ;
+			return ;
 		}
+
+		final int size = runnables.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			runnables.get( i ).run() ;
+		}
+		runnables.clear() ;
 	}
 
 	public World getDefaultWorld()

@@ -7,7 +7,7 @@ import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 
 public abstract class InputComponent extends Component
-									 implements InputHandler
+									 implements IInputHandler
 {
 	private Entity.ReadyCallback destroy = null ;
 	protected final InputMode mode ;
@@ -33,6 +33,7 @@ public abstract class InputComponent extends Component
 		mode = _mode ;
 	}
 
+	@Override
 	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
 		destroy = _callback ;
@@ -42,11 +43,11 @@ public abstract class InputComponent extends Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		Event<InputHandler> event ;
+		Event<IInputHandler> event ;
 		switch( mode )
 		{
-			case UI    : event = new Event<InputHandler>( "ADD_GAME_STATE_UI_INPUT", this ) ; break ;
-			case WORLD : event = new Event<InputHandler>( "ADD_GAME_STATE_WORLD_INPUT", this ) ; break ;
+			case UI    : event = new Event<IInputHandler>( "ADD_GAME_STATE_UI_INPUT", this ) ; break ;
+			case WORLD : event = new Event<IInputHandler>( "ADD_GAME_STATE_WORLD_INPUT", this ) ; break ;
 			default    : return ;
 		}
 		_events.add( event ) ;
@@ -58,8 +59,8 @@ public abstract class InputComponent extends Component
 		super.passFinalEvents( _events ) ;
 		switch( mode )
 		{
-			case UI    : _events.add( new Event<InputHandler>( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
-			case WORLD : _events.add( new Event<InputHandler>( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
+			case UI    : _events.add( new Event<IInputHandler>( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
+			case WORLD : _events.add( new Event<IInputHandler>( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
 			default    : return ;
 		}
 	}
@@ -68,7 +69,7 @@ public abstract class InputComponent extends Component
 		Extend function if you wish to determine whether to 
 		Consume or Propagate an Input Event.
 		Consuming an InputEvent is benificial for UIs, is it will 
-		prevent the InputEvent from being processed by other InputHandlers.
+		prevent the InputEvent from being processed by other IInputHandlers.
 	*/
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
@@ -87,9 +88,6 @@ public abstract class InputComponent extends Component
 		visual responsiveness to user demands.
 	*/
 	protected void processInputEvent( final InputEvent _input ) {}
-
-	@Override
-	public void reset() {}
 
 	public static enum InputMode
 	{

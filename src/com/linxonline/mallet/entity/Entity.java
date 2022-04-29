@@ -33,6 +33,7 @@ public final class Entity
 	private final IEventSystem eventSystem ;		// Component Event System
 
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
+	private Entity.ReadyCallback readyDestroy ;
 
 	public Entity( final int _capacity )
 	{
@@ -115,7 +116,12 @@ public final class Entity
 	*/
 	public final void destroy()
 	{
-		final Entity.ReadyCallback readyDestroy = new Entity.ReadyCallback()
+		if( readyDestroy != null )
+		{
+			return ;
+		}
+
+		readyDestroy = new Entity.ReadyCallback()
 		{
 			private final List<Entity.Component> toDestroy = MalletList.<Entity.Component>newList( components ) ;
 

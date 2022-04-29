@@ -11,12 +11,12 @@ public final class StorageAssist
 		assist = _assist ;
 	}
 
-	public static <T extends IUpdater<?, Storage>> T add( final T _updater )
+	public static <T extends IUpdater<Storage>> T add( final T _updater )
 	{
 		return assist.add( _updater ) ;
 	}
 
-	public static <T extends IUpdater<?, Storage>> T remove( final T _updater )
+	public static <T extends IUpdater<Storage>> T remove( final T _updater )
 	{
 		return assist.remove( _updater ) ;
 	}
@@ -37,8 +37,8 @@ public final class StorageAssist
 
 	public interface Assist
 	{
-		public <T extends IUpdater<?, Storage>> T add( final T _updater ) ;
-		public <T extends IUpdater<?, Storage>> T remove( final T _updater ) ;
+		public <T extends IUpdater<Storage>> T add( final T _updater ) ;
+		public <T extends IUpdater<Storage>> T remove( final T _updater ) ;
 
 		public Storage add( final Storage _storage ) ;
 		public Storage update( final Storage _storage ) ;

@@ -113,20 +113,19 @@ public class EventController implements IEventHandler
 	*/
 	public void update()
 	{
-		final List<Event<?>> events = messenger ;
-		if( events.isEmpty() )
+		if( messenger.isEmpty() )
 		{
 			return ;
 		}
 
-		final int size = events.size() ;
+		final int size = messenger.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Event<?> event = events.get( i ) ;
+			final Event<?> event = messenger.get( i ) ;
 			final IProcessor proc = processors.get( event.getEventType() ) ;
 			proc.process( event.getVariable() ) ;
 		}
-		events.clear() ;
+		messenger.clear() ;
 
 		if( size > eventCapacity )
 		{
@@ -142,29 +141,16 @@ public class EventController implements IEventHandler
 		addInterface.addEvent( _event ) ;
 	}
 
-	@Override
-	public void reset()
-	{
-		clearEvents() ;
-		wantedTypes.clear() ;
-		processors.clear() ;
-		setAddEventInterface( null ) ;
-	}
-	
 	public void clearEvents()
 	{
 		messenger.clear() ;
 		ADD_EVENT_FALLBACK.clear() ;
 	}
 
-	public IAddEvent getAddEventInterface()
+	public List<EventType> getWantedEventTypes( List<EventType> _fill )
 	{
-		return addInterface ;
-	}
-
-	public List<EventType> getWantedEventTypes()
-	{
-		return wantedTypes ;
+		_fill.addAll( wantedTypes ) ;
+		return _fill ;
 	}
 
 	public static Tuple<String, IProcessor<?>> create( final String _name, final IProcessor<?> _processor )

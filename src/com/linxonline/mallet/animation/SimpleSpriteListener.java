@@ -1,14 +1,7 @@
 package com.linxonline.mallet.animation ;
 
-import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.DrawUpdater ;
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-
-import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.renderer.* ;
+import com.linxonline.mallet.maths.* ;
 
 public class SimpleSpriteListener implements SpriteAnimations.IListener
 {
@@ -46,7 +39,9 @@ public class SimpleSpriteListener implements SpriteAnimations.IListener
 		ProgramAssist.remove( program ) ;
 		if( updater != null )
 		{
-			updater.removeDynamics( draw ) ;
+			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( draw ) ;
+			updater.forceUpdate() ;
 		}
 	}
 
@@ -84,14 +79,19 @@ public class SimpleSpriteListener implements SpriteAnimations.IListener
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( draw ) ;
+			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( draw ) ;
+			updater.forceUpdate() ;
 		}
 
 		// We only want to remap the programs texture 
 		// if the sprite is not using a spritesheet.
 		program.mapUniform( "inTex0", _texture ) ;
 
-		updater = DrawUpdater.getOrCreate( world, program, draw.getShape(), false, order ) ;
-		updater.addDynamics( draw ) ;
+		final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+		updater = pool.getOrCreate( world, program, draw.getShape(), false, order ) ;
+
+		final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( draw ) ;
 	}
 }

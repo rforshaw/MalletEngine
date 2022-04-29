@@ -20,7 +20,6 @@ import com.linxonline.mallet.maths.* ;
 public class UIChildren implements IChildren
 {
 	private final List<UIElement> ordered = MalletList.<UIElement>newList() ;		// Layouts children
-	private final List<UIElement> toRemove = MalletList.<UIElement>newList() ;		// UIElements to be removed from the layout.
 
 	@Override
 	public <T extends UIElement> T addElement( final T _element )
@@ -28,6 +27,17 @@ public class UIChildren implements IChildren
 		if( ordered.contains( _element ) == false )
 		{
 			ordered.add( _element ) ;
+			return _element ;
+		}
+		return null ; 
+	}
+
+	@Override
+	public <T extends UIElement> T addElement( final int _index, final T _element )
+	{
+		if( ordered.contains( _element ) == false )
+		{
+			ordered.add( _index, _element ) ;
 			return _element ;
 		}
 		return null ; 
@@ -47,6 +57,11 @@ public class UIChildren implements IChildren
 			_element.shutdown() ;
 			_element.clear() ;
 		}
+	}
+
+	public int size()
+	{
+		return ordered.size() ;
 	}
 
 	public List<UIElement> getElements()

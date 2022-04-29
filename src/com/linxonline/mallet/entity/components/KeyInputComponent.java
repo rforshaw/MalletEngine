@@ -8,7 +8,6 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.input.InputEvent ;
-import com.linxonline.mallet.input.KeyInputListener ;
 import com.linxonline.mallet.input.KeyCode ;
 
 /**
@@ -32,41 +31,32 @@ public class KeyInputComponent extends InputComponent
 	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
 	{
 		super( _parent, _allow, _mode ) ;
-		init() ;
 	}
 
-	/**
-		Add custom initialisation logic here.
-	*/
-	public void init() {}
-
-	public void registerKeys( final KeyCode[] _keys, final KeyInputListener _listener )
+	public void registerKeys( final KeyCode[] _keys, final IAction _action )
 	{
-		for( final KeyCode key : _keys )
+		for( int i = 0; i < _keys.length; ++i )
 		{
-			registerKey( key, _listener ) ;
+			registerKey( _keys[i], _action ) ;
 		}
 	}
 
-	public void registerKey( final KeyCode _key, final KeyInputListener _listener )
+	public void registerKey( final KeyCode _key, final IAction _action )
 	{
 		final Key key = keys.get( _key ) ;
 		if( key != null )
 		{
-			key.add( _listener ) ;
+			key.add( _action ) ;
 		}
 		else
 		{
-			keys.put( _key, new Key( _listener ) ) ;
+			keys.put( _key, new Key( _action ) ) ;
 		}
 	}
 
 	public void unregisterKey( final KeyCode _key )
 	{
-		if( keys.containsKey( _key ) == true )
-		{
-			keys.remove( _key ) ;
-		}
+		keys.remove( _key ) ;
 	}
 
 	@Override
@@ -95,35 +85,41 @@ public class KeyInputComponent extends InputComponent
 		}
 	}
 
+	public interface IAction
+	{
+		public void pressed( final InputEvent _input ) ;
+		public void released( final InputEvent _input ) ;
+	}
+
 	private static class Key
 	{
-		public final List<KeyInputListener> listeners = MalletList.<KeyInputListener>newList() ;
+		public final List<IAction> actions = MalletList.<IAction>newList() ;
 
-		public Key( final KeyInputListener _listener )
+		public Key( final IAction _action )
 		{
-			listeners.add( _listener ) ;
+			actions.add( _action ) ;
 		}
 
-		public void add( final KeyInputListener _listener )
+		public void add( final IAction _action )
 		{
-			listeners.add( _listener ) ;
+			actions.add( _action ) ;
 		}
 
 		public void callPressed( final InputEvent _input )
 		{
-			final int size = listeners.size() ;
+			final int size = actions.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				listeners.get( i ).pressed( _input ) ;
+				actions.get( i ).pressed( _input ) ;
 			}
 		}
 
 		public void callReleased( final InputEvent _input )
 		{
-			final int size = listeners.size() ;
+			final int size = actions.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				listeners.get( i ).released( _input ) ;
+				actions.get( i ).released( _input ) ;
 			}
 		}
 	}

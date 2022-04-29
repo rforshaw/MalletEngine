@@ -39,12 +39,12 @@ public final class DrawAssist
 		return DRAW_CLEAN ;
 	}
 
-	public static <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater )
+	public static <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
 	{
 		return assist.add( _updater ) ;
 	}
 
-	public static <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater )
+	public static <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
 	{
 		return assist.remove( _updater ) ;
 	}
@@ -70,8 +70,8 @@ public final class DrawAssist
 	*/
 	public interface Assist
 	{
-		public <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater ) ;
-		public <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater ) ;
+		public <T extends IUpdater<? extends ABuffer>> T add( final T _updater ) ;
+		public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater ) ;
 
 		public <T extends ABuffer> T add( final T _buffer ) ;
 		public <T extends ABuffer> T remove( final T _buffer ) ;

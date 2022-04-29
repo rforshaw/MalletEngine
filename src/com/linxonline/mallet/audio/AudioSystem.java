@@ -33,7 +33,7 @@ public class AudioSystem
 
 	private final Map<Emitter, ISource> sources = MalletMap.<Emitter, ISource>newMap() ;
 
-	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
+	private final BufferedList<Runnable> executions = new BufferedList<Runnable>( 200 ) ;
 
 	private final List<ISource> active = MalletList.<ISource>newList() ;
 	private final List<ISource> paused = MalletList.<ISource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
@@ -126,15 +126,17 @@ public class AudioSystem
 	{
 		executions.update() ;
 		final List<Runnable> runnables = executions.getCurrentData() ;
-		if( runnables.isEmpty() == false )
+		if( runnables.isEmpty() )
 		{
-			final int size = runnables.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				runnables.get( i ).run() ;
-			}
-			runnables.clear() ;
+			return ;
 		}
+
+		final int size = runnables.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			runnables.get( i ).run() ;
+		}
+		runnables.clear() ;
 	}
 
 	private void updateVolume( final Volume _volume )
@@ -230,6 +232,11 @@ public class AudioSystem
 		}
 		active.clear() ;
 		sources.clear() ;
+	}
+
+	public AudioSystem.Assist createAudioAssist()
+	{
+		return new Assist() ;
 	}
 
 	public EventController getEventController()

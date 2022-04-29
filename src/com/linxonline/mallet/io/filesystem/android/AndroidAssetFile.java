@@ -10,7 +10,6 @@ import com.linxonline.mallet.util.Logger ;
 
 public class AndroidAssetFile implements FileStream
 {
-	private final CloseStreams toClose = new CloseStreams() ;
 	private final String file ;
 	private final AssetManager asset ;
 

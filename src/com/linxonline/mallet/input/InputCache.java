@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 public class InputCache
 {
 	private final LinkedList<InputTime> cache = new LinkedList<InputTime>() ;
-	private float reuseTime = 0.0f ;
+	private final float reuseTime ;
 	private int currentPos = 0 ;
 
 	// Reduce temporaries

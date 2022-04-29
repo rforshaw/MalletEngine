@@ -200,7 +200,7 @@ public class Draw implements IUpdate
 			case NONE   :
 			default     :
 			{
-				update = true ;
+				update = false ;
 				FloatBuffer.copy( future, old ) ;
 				FloatBuffer.copy( future, present ) ;
 				break ;

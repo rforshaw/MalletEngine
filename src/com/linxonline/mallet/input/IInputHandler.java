@@ -1,6 +1,6 @@
 package com.linxonline.mallet.input ;
 
-public interface InputHandler
+public interface IInputHandler
 {
 	/**
 		Usually called by either an InputSystem or InputState.
@@ -9,12 +9,4 @@ public interface InputHandler
 		or to consume the InputEvent.
 	*/
 	public InputEvent.Action passInputEvent( final InputEvent _event ) ;
-
-		/**
-		Allow the implementation to clear any references 
-		it may hold.
-		This function is called when the InputHandler is 
-		removed from an Input System or Input State.
-	*/
-	public void reset() ;
 }

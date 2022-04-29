@@ -16,7 +16,9 @@ public class UIList extends UILayout
 	private final FrameBuffer frame ;
 	private World externalWorld ;
 	private Camera externalCamera = CameraAssist.getDefault() ;
+
 	private DrawUpdater updater = null ;
+	private GeometryBuffer geometry = null ;
 
 	private final Vector3 defaultItemSize = new Vector3() ;		// In pixels
 	private final Vector3 scrollbarLength = new Vector3() ;
@@ -52,7 +54,9 @@ public class UIList extends UILayout
 			{
 				if( updater != null )
 				{
-					updater.removeDynamics( frame.getFrame() ) ;
+					final Program program = frame.getProgram() ;
+					final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+					pool.clean( externalWorld, program ) ;
 				}
 				frame.shutdown() ;
 			}
@@ -65,7 +69,7 @@ public class UIList extends UILayout
 			{
 				if( updater != null )
 				{
-					updater.removeDynamics( frame.getFrame() ) ;
+					geometry.removeDraws( frame.getFrame() ) ;
 				}
 
 				if( externalWorld != null )
@@ -74,8 +78,14 @@ public class UIList extends UILayout
 					final Program program = frame.getProgram() ;
 					final Draw draw = frame.getFrame() ;
 
-					final DrawUpdater updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
-					updater.addDynamics( draw ) ;
+					final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+					pool.clean( externalWorld, program ) ;
+
+					final DrawUpdater updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
+					updater.setInterpolation( Interpolation.NONE ) ;
+
+					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+					geometry.addDraws( draw ) ;
 				}
 			}
 		} ) ;
@@ -125,10 +135,17 @@ public class UIList extends UILayout
 	public <T extends UIElement> T addElement( final T _element )
 	{
 		final List<UIElement> ordered = getElements() ;
+		return addElement( ordered.size(), _element ) ;
+	}
+
+	@Override
+	public <T extends UIElement> T addElement( final int _index, final T _element )
+	{
+		final List<UIElement> ordered = getElements() ;
 		if( ordered.contains( _element ) == false )
 		{
 			applyLayer( _element, getLayer() ) ;
-			ordered.add( _element ) ;
+			ordered.add( _index, _element ) ;
 
 			_element.setWorldAndCamera( getInternalWorld(), getInternalCamera() ) ;
 		}
@@ -204,8 +221,13 @@ public class UIList extends UILayout
 		// Though the UIList will give its children its 
 		// own DrawDelegate the UIList will give the 
 		// DrawDelegate passed in here the Draw pane.
-		updater = DrawUpdater.getOrCreate( externalWorld, program, draw.getShape(), true, getLayer() + 1 ) ;
-		updater.addDynamics( draw ) ;
+		final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+		pool.clean( externalWorld, program ) ;
+
+		updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, getLayer() + 1 ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( draw ) ;
 	}
 
 	private void setListWorldAndCamera( final World _world, final Camera _camera )

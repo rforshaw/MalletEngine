@@ -14,10 +14,9 @@ import com.linxonline.mallet.util.MalletList ;
 public class AndroidInputSystem implements IInputSystem, 
 										   AndroidInputListener
 {
-	public InputAdapterInterface inputAdapter = null ;
 	private final TimeCache<InputEvent> cache ;
 
-	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
+	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
@@ -32,7 +31,7 @@ public class AndroidInputSystem implements IInputSystem,
 		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
 	}
 
-	public void addInputHandler( final InputHandler _handler )
+	public void addInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == true )
 		{
@@ -42,10 +41,9 @@ public class AndroidInputSystem implements IInputSystem,
 		handlers.add( _handler ) ;
 	}
 
-	public void removeInputHandler( final InputHandler _handler )
+	public void removeInputHandler( final IInputHandler _handler )
 	{
 		handlers.remove( _handler ) ;
-		_handler.reset() ;
 	}
 
 	@Override
@@ -121,7 +119,7 @@ public class AndroidInputSystem implements IInputSystem,
 	private void passInputEventToHandlers( final InputEvent _input )
 	{
 		final int handlerSize = handlers.size() ;
-		InputHandler handler = null ;
+		IInputHandler handler = null ;
 
 		for( int j = 0; j < handlerSize; ++j )
 		{
@@ -150,11 +148,6 @@ public class AndroidInputSystem implements IInputSystem,
 
 	public void clearHandlers()
 	{
-		final int size = handlers.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			handlers.get( i ).reset() ;
-		}
 		handlers.clear() ;
 	}
 
@@ -163,7 +156,7 @@ public class AndroidInputSystem implements IInputSystem,
 		inputs.clear() ;
 	}
 
-	private boolean exists( final InputHandler _handler )
+	private boolean exists( final IInputHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;

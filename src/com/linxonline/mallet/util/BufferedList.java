@@ -69,6 +69,11 @@ public class BufferedList<T>
 		return current ;
 	}
 
+	public int getTaskSize()
+	{
+		return tasks.size() ;
+	}
+
 	/**
 		Add new values that are in the toAdd list.
 		Remove values that are in the remove list.
@@ -85,7 +90,6 @@ public class BufferedList<T>
 		{
 			tasks.get( i ).execute() ;
 		}
-		tasks.clear() ;
 
 		if( size > capacity )
 		{
@@ -93,7 +97,10 @@ public class BufferedList<T>
 			// we want to resize the array - it's easy for an 
 			// array to expand, it's much harder to shrink it!
 			tasks = MalletList.<Task>newList( capacity ) ;
+			return ;
 		}
+
+		tasks.clear() ;
 	}
 
 	private interface Task

@@ -16,7 +16,9 @@ public class GUIScrollbar extends GUIComponent
 	private final Draw xBar = new Draw() ;
 	private final Draw yBar = new Draw() ;
 	private final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+
 	private DrawUpdater updater ;
+	private GeometryBuffer geometry ;
 
 	public GUIScrollbar( final MalletTexture _sheet, final UIElement.UV _uv, final UIList _parent )
 	{
@@ -66,20 +68,23 @@ public class GUIScrollbar extends GUIComponent
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDynamics( xBar, yBar ) ;
+			geometry.removeDraws( xBar, yBar ) ;
 		}
 
 		final Shape shape = ( Shape )xBar.getShape() ;
 		final int layer = getLayer() ;
 
-		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
-		updater.addDynamics( xBar, yBar ) ;
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		updater = pool.getOrCreate( _world, program, shape, true, layer ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( xBar, yBar ) ;
 	}
 
 	@Override
 	public void removeDraws()
 	{
-		updater.removeDynamics( xBar, yBar ) ;
+		geometry.removeDraws( xBar, yBar ) ;
 	}
 
 	@Override
@@ -87,11 +92,16 @@ public class GUIScrollbar extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( xBar, yBar ) ;
+			geometry.removeDraws( xBar, yBar ) ;
 		}
 
 		final Shape shape = ( Shape )xBar.getShape() ;
-		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
+
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		updater = pool.getOrCreate( getWorld(), program, shape, true, _layer ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( xBar, yBar ) ;
 	}
 
 	@Override

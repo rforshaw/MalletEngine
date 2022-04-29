@@ -28,6 +28,18 @@ public class Box2D extends Hull
 		obb = new OBB( aabb ) ;
 	}
 
+	public Box2D( final OBB _obb )
+	{
+		this( _obb, null ) ;
+	}
+	
+	public Box2D( final OBB _obb, int[] _collidables )
+	{
+		super( _collidables ) ;
+		obb = _obb ;
+		aabb = new AABB( obb ) ;
+	}
+
 	@Override
 	public void setPosition( final float _x, final float _y )
 	{

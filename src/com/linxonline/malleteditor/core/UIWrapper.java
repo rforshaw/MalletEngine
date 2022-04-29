@@ -362,7 +362,7 @@ public class UIWrapper extends UIElement
 
 		private MalletColour colour = MalletColour.white() ;
 
-		private IUpdater<Draw, ?> updater ;
+		private DrawUpdater updater ;
 		private final Program program = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
 		protected Draw draw = new Draw() ;
 
@@ -411,11 +411,15 @@ public class UIWrapper extends UIElement
 			{
 				// Remove the draw object from the previous 
 				// updater the draw may have changed significantly.
-				updater.removeDynamics( draw ) ;
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.removeDraws( draw ) ;
 			}
 
-			updater = DrawUpdater.getOrCreate( _world, program, ( Shape )draw.getShape(), true, getLayer() ) ;
-			updater.addDynamics( draw ) ;
+			final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+			updater = pool.getOrCreate( _world, program, ( Shape )draw.getShape(), true, getLayer() ) ;
+
+			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.addDraws( draw ) ;
 		}
 
 		@Override
@@ -423,7 +427,8 @@ public class UIWrapper extends UIElement
 		{
 			if( updater != null )
 			{
-				updater.removeDynamics( draw ) ;
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.removeDraws( draw ) ;
 			}
 		}
 
@@ -432,10 +437,12 @@ public class UIWrapper extends UIElement
 		{
 			if( updater != null )
 			{
-				updater.removeDynamics( draw ) ;
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.removeDraws( draw ) ;
 			}
 
-			updater = DrawUpdater.getOrCreate( getWorld(), program, draw.getShape(), true, _layer ) ;
+			final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+			updater = pool.getOrCreate( getWorld(), program, draw.getShape(), true, _layer ) ;
 		}
 
 		@Override

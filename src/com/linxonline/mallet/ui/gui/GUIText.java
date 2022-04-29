@@ -13,6 +13,8 @@ public class GUIText extends GUIComponent
 	private MalletColour colour = MalletColour.white() ;
 
 	private TextUpdater updater ;
+	private TextBuffer geometry ;
+
 	private final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
 	private final TextDraw drawText ;
 
@@ -84,12 +86,16 @@ public class GUIText extends GUIComponent
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDynamics( drawText ) ;
+			geometry.removeDraws( drawText ) ;
+			updater.forceUpdate() ;
 		}
 
-		updater = TextUpdater.getOrCreate( getWorld(), program, true, getLayer() ) ;
-		updater.addDynamics( drawText ) ;
+		final TextUpdaterPool pool = GUI.getTextUpdaterPool() ;
+		updater = pool.getOrCreate( getWorld(), program, true, getLayer() ) ;
 		updater.setInterpolation( Interpolation.NONE ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( drawText ) ;
 	}
 
 	/**
@@ -101,7 +107,8 @@ public class GUIText extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( drawText ) ;
+			geometry.removeDraws( drawText ) ;
+			updater.forceUpdate() ;
 		}
 	}
 
@@ -110,11 +117,16 @@ public class GUIText extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( drawText ) ;
+			geometry.removeDraws( drawText ) ;
+			updater.forceUpdate() ;
 		}
 
-		updater = TextUpdater.getOrCreate( getWorld(), program, true, _layer ) ;
+		final TextUpdaterPool pool = GUI.getTextUpdaterPool() ;
+		updater = pool.getOrCreate( getWorld(), program, true, _layer ) ;
 		updater.setInterpolation( Interpolation.NONE ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( drawText ) ;
 	}
 
 	@Override
@@ -159,7 +171,7 @@ public class GUIText extends GUIComponent
 		return drawAlignmentY ;
 	}
 
-	public IUpdater<TextDraw, TextBuffer> getUpdater()
+	public TextUpdater getUpdater()
 	{
 		return updater ;
 	}

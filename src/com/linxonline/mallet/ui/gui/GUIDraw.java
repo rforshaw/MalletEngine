@@ -17,6 +17,8 @@ public class GUIDraw extends GUIComponent
 	private final UIElement.UV uv ;
 
 	private DrawUpdater updater ;
+	private GeometryBuffer geometry = null ;
+
 	private final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 	private final Draw draw = new Draw() ;
 
@@ -90,9 +92,12 @@ public class GUIDraw extends GUIComponent
 		final int layer = getLayer() ;
 		final Shape shape = ( Shape )draw.getShape() ;
 
-		updater = DrawUpdater.getOrCreate( _world, program, shape, true, layer ) ;
-		updater.addDynamics( draw ) ;
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		updater = pool.getOrCreate( _world, program, shape, true, layer ) ;
 		updater.setInterpolation( Interpolation.NONE ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( draw ) ;
 	}
 
 	@Override
@@ -100,7 +105,8 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( draw ) ;
+			geometry.removeDraws( draw ) ;
+			updater.forceUpdate() ;
 		}
 	}
 
@@ -109,13 +115,18 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			updater.removeDynamics( draw ) ;
+			geometry.removeDraws( draw ) ;
+			updater.forceUpdate() ;
 		}
 
 		final Shape shape = ( Shape )draw.getShape() ;
-		updater = DrawUpdater.getOrCreate( getWorld(), program, shape, true, _layer ) ;
-		updater.addDynamics( draw ) ;
+
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		updater = pool.getOrCreate( getWorld(), program, shape, true, _layer ) ;
 		updater.setInterpolation( Interpolation.NONE ) ;
+
+		geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( draw ) ;
 	}
 
 	@Override

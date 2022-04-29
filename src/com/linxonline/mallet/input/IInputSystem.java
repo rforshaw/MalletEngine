@@ -8,8 +8,8 @@ package com.linxonline.mallet.input ;
 **/
 public interface IInputSystem
 {
-	public void addInputHandler( final InputHandler _handler ) ;
-	public void removeInputHandler( final InputHandler _handler ) ;
+	public void addInputHandler( final IInputHandler _handler ) ;
+	public void removeInputHandler( final IInputHandler _handler ) ;
 
 	public void update() ;
 	

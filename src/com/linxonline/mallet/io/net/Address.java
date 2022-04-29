@@ -5,8 +5,13 @@ import java.net.InetSocketAddress ;
 
 public class Address
 {
-	private final String host ;
-	private final int port ;
+	private String host ;
+	private int port ;
+
+	public Address()
+	{
+		this( "", -1 ) ;
+	}
 
 	public Address( final String _host, final int _port )
 	{
@@ -15,6 +20,27 @@ public class Address
 	}
 
 	public Address( final SocketAddress _address )
+	{
+		set( _address ) ;
+	}
+
+	public void setHost( final String _host )
+	{
+		host = _host ;
+	}
+
+	public void setPort( final int _port )
+	{
+		port = _port ;
+	}
+
+	public void set( final Address _address )
+	{
+		host = _address.host ;
+		port = _address.port ;
+	}
+
+	public void set( final SocketAddress _address )
 	{
 		if( _address instanceof InetSocketAddress )
 		{

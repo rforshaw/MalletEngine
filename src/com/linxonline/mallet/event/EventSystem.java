@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
@@ -17,7 +18,7 @@ public class EventSystem implements IEventSystem
 			return _events ;
 		}
 	} ;
-	
+
 	private static final IIntercept FALLBACK_INTERCEPT = new IIntercept()
 	{
 		@Override
@@ -26,6 +27,9 @@ public class EventSystem implements IEventSystem
 			return true ;
 		}
 	} ;
+
+	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
+	private final List<EventType> tempWantedTypes = MalletList.<EventType>newList() ;
 
 	private final int eventCapacity ;
 	private final SwapList<Event<?>> events ;
@@ -45,33 +49,46 @@ public class EventSystem implements IEventSystem
 	}
 
 	@Override
-	public void setIntercept( final IIntercept _intercept )
-	{
-		intercept = ( _intercept != null ) ? _intercept : FALLBACK_INTERCEPT ;
-	}
-
-	@Override
 	public void addHandler( final IEventHandler _handler )
 	{
-		final WeakReference<IEventHandler> weakHandler = new WeakReference<IEventHandler>( _handler ) ;
-		final List<EventType> types = _handler.getWantedEventTypes() ;
-		for( final EventType type : types )
+		executions.add( () ->
 		{
-			final EventQueue que = getQueueByType( type ) ;
-			//System.out.println( "Add Handler" + _handler + " Type: " + type ) ;
-			que.addHandler( weakHandler ) ;
-		}
+			final WeakReference<IEventHandler> weakHandler = new WeakReference<IEventHandler>( _handler ) ;
+			_handler.getWantedEventTypes( tempWantedTypes ) ;
+			for( final EventType type : tempWantedTypes )
+			{
+				final EventQueue que = getQueueByType( type ) ;
+				//System.out.println( "Add Handler" + _handler + " Type: " + type ) ;
+				que.addHandler( weakHandler ) ;
+			}
+			tempWantedTypes.clear() ;
+		} ) ;
 	}
 
 	@Override
 	public void removeHandler( final IEventHandler _handler )
 	{
-		final List<EventType> types = _handler.getWantedEventTypes() ;
-		for( final EventType type : types )
+		executions.add( () ->
 		{
-			final EventQueue que = getQueueByType( type ) ;
-			que.removeHandler( _handler ) ;
-		}
+			_handler.getWantedEventTypes( tempWantedTypes ) ;
+			for( final EventType type : tempWantedTypes )
+			{
+				final EventQueue que = getQueueByType( type ) ;
+				que.removeHandler( _handler ) ;
+			}
+			tempWantedTypes.clear() ;
+		} ) ;
+	}
+
+	/**
+		Intercept an event before it's propagated through.
+		We can prevent an event from being propagated if the
+		intercept returns false.
+	*/
+	@Override
+	public void setIntercept( final IIntercept _intercept )
+	{
+		intercept = ( _intercept != null ) ? _intercept : FALLBACK_INTERCEPT ;
 	}
 
 	@Override
@@ -99,6 +116,7 @@ public class EventSystem implements IEventSystem
 	@Override
 	public void sendEvents()
 	{
+		updateExecutions() ;
 		final List<Event<?>> toSend = events.swap() ;
 		if( toSend.isEmpty() )
 		{
@@ -118,6 +136,23 @@ public class EventSystem implements IEventSystem
 		{
 			que.sendEvents() ;
 		}
+	}
+
+	private void updateExecutions()
+	{
+		executions.update() ;
+		final List<Runnable> runnables = executions.getCurrentData() ;
+		if( runnables.isEmpty() )
+		{
+			return ;
+		}
+
+		final int size = runnables.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			runnables.get( i ).run() ;
+		}
+		runnables.clear() ;
 	}
 
 	@Override
@@ -156,7 +191,6 @@ public class EventSystem implements IEventSystem
 		private final int eventCapacity ;
 
 		private final List<WeakReference<IEventHandler>> handlers ;
-		private final List<WeakReference<IEventHandler>> bufferedHandlers ;
 		private List<Event<?>> events ;
 		private IEventFilter filter ;
 
@@ -168,8 +202,6 @@ public class EventSystem implements IEventSystem
 			eventCapacity = _eventCapacity ;
 
 			handlers = MalletList.<WeakReference<IEventHandler>>newList( handlerCapacity ) ;
-			bufferedHandlers = MalletList.<WeakReference<IEventHandler>>newList( handlerCapacity ) ;
-
 			events = MalletList.<Event<?>>newList( eventCapacity ) ;
 			filter = _filter ;
 		}
@@ -213,14 +245,11 @@ public class EventSystem implements IEventSystem
 
 			final List<Event<?>> optimised = filter.filter( events ) ;
 
-			bufferedHandlers.clear() ;
-			bufferedHandlers.addAll( handlers ) ;
-
-			final int handlerSize = bufferedHandlers.size() ;
+			final int handlerSize = handlers.size() ;
 			final int eventSize = optimised.size() ;
 			for( int i = 0; i < handlerSize; ++i )
 			{
-				final WeakReference<IEventHandler> weak = bufferedHandlers.get( i ) ;
+				final WeakReference<IEventHandler> weak = handlers.get( i ) ;
 				final IEventHandler handler = weak.get() ;
 				if( handler == null )
 				{

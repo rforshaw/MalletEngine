@@ -3,25 +3,14 @@ package com.linxonline.mallet.core ;
 import java.util.List ;
 
 import com.linxonline.mallet.audio.* ;
-
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.TextDraw ;
-import com.linxonline.mallet.renderer.TextUpdater ;
-import com.linxonline.mallet.renderer.WorldAssist ;
-import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Program ;
-
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.* ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.core.ISystem ;
 import com.linxonline.mallet.core.statemachine.State ;
 
 import com.linxonline.mallet.input.IInputSystem ;
-import com.linxonline.mallet.input.InputHandler ;
+import com.linxonline.mallet.input.IInputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
 import com.linxonline.mallet.event.Event ;
@@ -138,6 +127,7 @@ public class GameState extends State
 	@Override
 	public void startState( final Settings _package )
 	{
+		AudioAssist.setAssist( audioSystem.createAudioAssist() ) ;
 		AnimationAssist.setAssist( animationSystem.createAnimationAssist() ) ;
 		hookHandlerSystems() ;
 
@@ -529,22 +519,22 @@ public class GameState extends State
 
 	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
 	{
-		_internal.addProcessor( "ADD_GAME_STATE_UI_INPUT", ( final InputHandler _handler ) ->
+		_internal.addProcessor( "ADD_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputUISystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_GAME_STATE_UI_INPUT", ( final InputHandler _handler ) ->
+		_internal.addProcessor( "REMOVE_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputUISystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_GAME_STATE_WORLD_INPUT", ( final InputHandler _handler ) ->
+		_internal.addProcessor( "ADD_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputWorldSystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_GAME_STATE_WORLD_INPUT", ( final InputHandler _handler ) ->
+		_internal.addProcessor( "REMOVE_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputWorldSystem.removeInputHandler( _handler ) ;
 		} ) ;
@@ -558,6 +548,7 @@ public class GameState extends State
 		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final EventController _controller ) ->
 		{
 			eventSystem.removeHandler( _controller ) ;
+			_controller.setAddEventInterface( null ) ;
 		} ) ;
 
 		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final EventController _controller ) ->
@@ -572,6 +563,7 @@ public class GameState extends State
 		{
 			final IEventSystem eventBackend = system.getEventSystem() ;
 			eventBackend.removeHandler( _controller ) ;
+			_controller.setAddEventInterface( null ) ;
 		} ) ;
 
 		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()
@@ -606,8 +598,12 @@ public class GameState extends State
 	*/
 	protected void clear()
 	{
-		internalController.reset() ;
-		externalController.reset() ;
+		internalController.setAddEventInterface( null ) ;
+		internalController.clearEvents() ;
+
+		externalController.setAddEventInterface( null ) ;
+		externalController.clearEvents() ;
+
 		eventSystem.reset() ;
 
 		inputUISystem.clearInputs() ;
@@ -655,8 +651,11 @@ public class GameState extends State
 			draws[1].setPosition( 0.0f, 20.0f, 0.0f ) ;
 			draws[1].setHidden( !show ) ;
 
-			updater = TextUpdater.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;
-			updater.addDynamics( draws ) ;
+			final TextUpdaterPool pool = RenderPools.getTextUpdaterPool() ;
+			updater = pool.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;
+
+			final TextBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.addDraws( draws ) ;
 		}
 
 		public void setShow( final boolean _show )

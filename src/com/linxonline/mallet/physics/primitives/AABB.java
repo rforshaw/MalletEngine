@@ -65,6 +65,11 @@ public class AABB
 		FloatBuffer.set( position, AABB.OFFSET_X, _offX, _offY ) ;
 	}
 
+	public AABB( final OBB _obb )
+	{
+		setFromOBB( _obb ) ;
+	}
+
 	/**
 		Calculate the dimensions of the AABB from the OBB.
 		Also apply the OBB's position and offset to the AABB.
@@ -197,15 +202,50 @@ public class AABB
 		return false ;
 	}
 
-	public void getAbsoluteCenter( final Vector2 _center )
+	public Vector2 getAbsoluteCenter( final Vector2 _center )
 	{
 		final float centerX = ( range[AABB.MAX_X] + range[AABB.MIN_X] ) * 0.5f ;
 		final float centerY = ( range[AABB.MAX_Y] + range[AABB.MIN_Y] ) * 0.5f ;
 
 		_center.x = position[AABB.POSITION_X] + position[AABB.OFFSET_X] + centerX ;
 		_center.y = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] + centerY ;
+		return _center ;
 	}
 
+	public Vector2 getAbsoluteMin( final Vector2 _min )
+	{
+		final float x = position[AABB.POSITION_X] + position[AABB.OFFSET_X] ;
+		final float y = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] ;
+
+		_min.x = x + range[AABB.MIN_X] ;
+		_min.y = y + range[AABB.MIN_Y] ;
+		return _min ;
+	}
+
+	public Vector2 getAbsoluteMax( final Vector2 _max )
+	{
+		final float x = position[AABB.POSITION_X] + position[AABB.OFFSET_X] ;
+		final float y = position[AABB.POSITION_Y] + position[AABB.OFFSET_Y] ;
+
+		_max.x = x + range[AABB.MAX_X] ;
+		_max.y = y + range[AABB.MAX_Y] ;
+		return _max ;
+	}
+
+	public Vector2 getMin( final Vector2 _min )
+	{
+		_min.x = range[AABB.MIN_X] ;
+		_min.y = range[AABB.MIN_Y] ;
+		return _min ;
+	}
+
+	public Vector2 getMax( final Vector2 _max )
+	{
+		_max.x = range[AABB.MAX_X] ;
+		_max.y = range[AABB.MAX_Y] ;
+		return _max ;
+	}
+	
 	public String toString()
 	{
 		return "POSITION: " + position[POSITION_X] + " " + position[POSITION_Y] + "\nOFFSET: " + position[OFFSET_X] + " " + position[OFFSET_Y] + "\nMIN: " + range[AABB.MIN_X] + " " + range[AABB.MIN_Y] + "\nMAX: " + range[AABB.MAX_X] + " " + range[AABB.MAX_Y] ;

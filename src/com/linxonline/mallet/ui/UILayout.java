@@ -209,9 +209,16 @@ public class UILayout extends UIElement implements IChildren
 		Add the passed in UIElement to the end of the UILayout.
 		Returns the passed in element, allows for further modifications. 
 	*/
+	@Override
 	public <T extends UIElement> T addElement( final T _element )
 	{
-		final UIElement element = children.addElement( _element ) ;
+		return addElement( children.size(), _element ) ;
+	}
+
+	@Override
+	public <T extends UIElement> T addElement( final int _index, final T _element )
+	{
+		final UIElement element = children.addElement( _index, _element ) ;
 		if( element != null )
 		{
 			applyLayer( element, getLayer() ) ;

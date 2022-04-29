@@ -6,7 +6,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 	Serialise.Out and Serialise.In work in tandem.
 
 	If Serialise.Out.writeBytes is called and X bytes is 
-	passed in, then the subsequent Serialise.Inp will return 
+	passed in, then the subsequent Serialise.In will return 
 	the same X bytes.
 
 	Serialise.Out.writeBytes( new byte[10] ) ;
@@ -24,8 +24,8 @@ public interface Serialise
 {
 	public class ByteIn implements In
 	{
-		private final byte[] in ;
-		private final int limit ;
+		private byte[] in ;
+		private int limit ;
 		private int offset ;
 
 		public ByteIn( final byte[] _in )
@@ -34,6 +34,11 @@ public interface Serialise
 		}
 
 		public ByteIn( final byte[] _in, final int _offset, final int _limit )
+		{
+			set( _in, _offset, _limit ) ;
+		}
+
+		public void set( final byte[] _in, final int _offset, final int _limit )
 		{
 			in = _in ;
 			offset = _offset ;
@@ -157,11 +162,17 @@ public interface Serialise
 
 	public class ByteOut implements Out
 	{
-		private final byte[] out ;
+		private byte[] out ;
 		private int offset = 0 ;
 
 		public ByteOut( final byte[] _out )
 		{
+			out = _out ;
+		}
+
+		public void set( final byte[] _out )
+		{
+			offset = 0 ;
 			out = _out ;
 		}
 

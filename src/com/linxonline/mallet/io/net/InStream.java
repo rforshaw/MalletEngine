@@ -7,7 +7,7 @@ public class InStream
 	private final byte[] buffer ;
 	private int length ;
 
-	private Address address ;
+	private Address sender = new Address() ;
 
 	public InStream( final int _length )
 	{
@@ -17,12 +17,18 @@ public class InStream
 
 	public void setSender( final Address _address )
 	{
-		address = _address ;
+		sender.set( _address ) ;
 	}
 
 	public Address getSender()
 	{
-		return address ;
+		return getSender( new Address() ) ;
+	}
+
+	public Address getSender( final Address _fill )
+	{
+		_fill.set( sender ) ;
+		return _fill ;
 	}
 
 	public void setDataLength( final int _length )

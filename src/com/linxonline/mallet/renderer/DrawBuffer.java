@@ -32,6 +32,11 @@ public class DrawBuffer extends ABuffer
 		buffers.ensureCapacity( buffers.size() + _buffers.length ) ;
 		for( final GeometryBuffer buffer : _buffers )
 		{
+			if( isCompatible( this, buffer ) == false )
+			{
+				throw new RuntimeException( "Attempting to add GeometryBuffer that is not compatible with DrawBuffer." ) ;
+			}
+		
 			buffers.add( buffer ) ;
 		}
 	}
@@ -72,6 +77,81 @@ public class DrawBuffer extends ABuffer
 	public boolean isUI()
 	{
 		return ui ;
+	}
+
+	public static boolean isCompatible( final DrawBuffer _lhs, final DrawBuffer _rhs )
+	{
+		if( _lhs.isUI() != _rhs.isUI() )
+		{
+			return false ;
+		}
+
+		if( _lhs.getOrder() != _rhs.getOrder() )
+		{
+			return false ;
+		}
+
+		// Lets check the cheapest value first
+		if( _lhs.getStyle().equals( _rhs.getStyle() ) == false )
+		{
+			return false ;
+		}
+
+		if( isCompatibleSwivel( _lhs.getSwivel(), _rhs.getSwivel() ) == false )
+		{
+			return false ;
+		}
+
+		if( _lhs.getProgram().equals( _rhs.getProgram() ) == false )
+		{
+			return false ;
+		}
+		
+		return true ;
+	}
+
+	public static boolean isCompatible( final DrawBuffer _lhs, final GeometryBuffer _rhs )
+	{
+		if( _lhs.isUI() != _rhs.isUI() )
+		{
+			return false ;
+		}
+
+		if( _lhs.getOrder() != _rhs.getOrder() )
+		{
+			return false ;
+		}
+
+		// Lets check the cheapest value first
+		if( _lhs.getStyle().equals( _rhs.getStyle() ) == false )
+		{
+			return false ;
+		}
+
+		if( isCompatibleSwivel( _lhs.getSwivel(), _rhs.getSwivel() ) == false )
+		{
+			return false ;
+		}
+
+		return true ;
+	}
+
+	private static boolean isCompatibleSwivel( final IShape.Swivel[] _a, final IShape.Swivel[] _b )
+	{
+		if( _a.length != _b.length )
+		{
+			return false ;
+		}
+
+		for( int i = 0; i < _a.length; ++i )
+		{
+			if( _a[i] != _b[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
 	}
 
 	@Override

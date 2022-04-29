@@ -18,10 +18,11 @@ public class GUITick extends GUIDraw
 			}
 			else
 			{
-				final IUpdater<Draw, ?> updater = getUpdater() ;
+				final DrawUpdater updater = getUpdater() ;
 				if( updater != null )
 				{
-					updater.removeDynamics( getDraw() ) ;
+					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+					geometry.removeDraws( getDraw() ) ;
 				}
 			}
 		}

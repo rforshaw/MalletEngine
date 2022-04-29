@@ -149,7 +149,7 @@ public final class InputEvent implements Cacheable
 
 	public enum Action
 	{
-		PROPAGATE,			// Continue passing the InputEvent to the next InputHandler
+		PROPAGATE,			// Continue passing the InputEvent to the next IInputHandler
 		CONSUME				// Do not propagate the InputEvent any further
 	}
 }

@@ -12,16 +12,8 @@ public interface IEventHandler
 	public void passEvent( final Event<?> _event ) ;
 
 	/**
-		Allow the implementation to clear any references 
-		it may hold.
-		This function is called when the EventHandler is 
-		removed from an Event System.
+		Populate the passed in array with the even-types
+		the handler is interested in.
 	*/
-	public void reset() ;
-
-	/**
-		Informs the Event System what Event Types
-		this handler wants passed to it.
-	*/
-	public List<EventType> getWantedEventTypes() ;
+	public List<EventType> getWantedEventTypes( final List<EventType> _fill ) ;
 }

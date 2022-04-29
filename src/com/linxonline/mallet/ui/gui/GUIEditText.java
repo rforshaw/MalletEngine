@@ -12,7 +12,9 @@ public class GUIEditText extends GUIText
 
 	private final static Program cursorProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
 	private Draw cursorDraw = new Draw() ;
+
 	private DrawUpdater cursorUpdater ;
+	private GeometryBuffer cursorGeometry ;
 
 	private final TextDraw drawPlaceholder = new TextDraw() ;
 
@@ -95,21 +97,29 @@ public class GUIEditText extends GUIText
 	@Override
 	public void addDraws( final World _world )
 	{
-		IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		TextUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
-			updater.removeDynamics( drawPlaceholder ) ;
+			final TextBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( drawPlaceholder ) ;
+			updater.forceUpdate() ;
 		}
 
 		super.addDraws( _world ) ;
 
-		cursorUpdater = DrawUpdater.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
-		cursorUpdater.addDynamics( cursorDraw ) ;
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		cursorUpdater = pool.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
+		cursorUpdater.setInterpolation( Interpolation.NONE ) ;
+
+		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
+		cursorGeometry.addDraws( cursorDraw ) ;
 
 		updater = getUpdater() ;
-		updater.addDynamics( drawPlaceholder ) ;
+
+		final TextBuffer geometry = updater.getBuffer( 0 ) ;
+		geometry.addDraws( drawPlaceholder ) ;
 
 		final UITextField parent = getParent() ;
 		parent.makeDirty() ;
@@ -123,28 +133,40 @@ public class GUIEditText extends GUIText
 	public void removeDraws()
 	{
 		super.removeDraws() ;
-		final IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		final TextUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
-			updater.removeDynamics( drawPlaceholder ) ;
+			final TextBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( drawPlaceholder ) ;
+			updater.forceUpdate() ;
 		}
-		cursorUpdater.removeDynamics( cursorDraw ) ;
+
+		cursorGeometry.removeDraws( cursorDraw ) ;
+		cursorUpdater.forceUpdate() ;
 	}
 
 	@Override
 	public void layerUpdated( final int _layer )
 	{
-		final IUpdater<TextDraw, TextBuffer> updater = getUpdater() ;
+		final TextUpdater updater = getUpdater() ;
 		if( updater != null )
 		{
-			updater.removeDynamics( drawPlaceholder ) ;
+			final TextBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( drawPlaceholder ) ;
+			updater.forceUpdate() ;
 		}
 
 		super.layerUpdated( _layer ) ;
-		cursorUpdater.removeDynamics( cursorDraw ) ;
 
-		cursorUpdater = DrawUpdater.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
-		cursorUpdater.addDynamics( cursorDraw ) ;
+		cursorGeometry.removeDraws( cursorDraw ) ;
+		cursorUpdater.forceUpdate() ;
+
+		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
+		cursorUpdater = pool.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
+		cursorUpdater.setInterpolation( Interpolation.NONE ) ;
+
+		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
+		cursorGeometry.addDraws( cursorDraw ) ;
 	}
 
 	@Override

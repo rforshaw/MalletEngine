@@ -16,21 +16,17 @@ import com.linxonline.mallet.input.* ;
 /*==============================================================*/
 
 public class InputState implements IInputSystem,
-								   InputHandler
+								   IInputHandler
 {
-	// Prevents InputState from hording events, if it 
-	// isn't removed from InputSystem
-	private static final int MAX_QUEUE_THRESHOLD = 40 ;
-
-	private final List<InputHandler> handlers = MalletList.<InputHandler>newList() ;
+	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
 	private boolean hasInputs = false ;
-	private InputHandler handler = null ;
+	private IInputHandler handler = null ;
 
 	public InputState() {}
 
 	@Override
-	public final void addInputHandler( final InputHandler _handler )
+	public final void addInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == true )
 		{
@@ -42,7 +38,7 @@ public class InputState implements IInputSystem,
 	}
 
 	@Override
-	public final void removeInputHandler( final InputHandler _handler )
+	public final void removeInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == false )
 		{
@@ -51,7 +47,6 @@ public class InputState implements IInputSystem,
 		}
 
 		handlers.remove( _handler ) ;
-		_handler.reset() ;
 	}
 
 	@Override
@@ -75,9 +70,9 @@ public class InputState implements IInputSystem,
 	public final void update()
 	{
 		// InputState use to retain a collection of inputs
-		// now inputs are directly transfered to InputHandlers.
+		// now inputs are directly transferred to IInputHandlers.
 		// When update is called we reset hasInputs as the 
-		// InputHandlers will be processing the inputs soon.
+		// IInputHandlers will be processing the inputs soon.
 		hasInputs = false ;
 	}
 
@@ -86,29 +81,12 @@ public class InputState implements IInputSystem,
 		return hasInputs ;
 	}
 
-	@Override
-	public void reset()
-	{
-		clearInputs() ;
-		// We don't want to re-add InputHandlers when a 
-		// State transition happens.
-		//clearHandlers() ;
-
-		hasInputs = false ;
-		handler = null ;
-	}
-
 	/**
 		Remove the Input Handlers and reset them.
 	*/
 	@Override
 	public final void clearHandlers()
 	{
-		final int size = handlers.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			handlers.get( i ).reset() ;
-		}
 		handlers.clear() ;
 	}
 
@@ -118,7 +96,7 @@ public class InputState implements IInputSystem,
 		// Input State does not retain inputs anymore.
 	}
 
-	private final boolean exists( final InputHandler _handler )
+	private final boolean exists( final IInputHandler _handler )
 	{
 		assert _handler != null ;
 		return handlers.contains( _handler ) ;

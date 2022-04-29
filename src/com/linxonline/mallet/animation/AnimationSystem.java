@@ -103,15 +103,17 @@ public class AnimationSystem
 	{
 		executions.update() ;
 		final List<Runnable> runnables = executions.getCurrentData() ;
-		if( runnables.isEmpty() == false )
+		if( runnables.isEmpty() )
 		{
-			final int size = runnables.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				runnables.get( i ).run() ;
-			}
-			runnables.clear() ;
+			return ;
 		}
+
+		final int size = runnables.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			runnables.get( i ).run() ;
+		}
+		runnables.clear() ;
 	}
 
 	/**

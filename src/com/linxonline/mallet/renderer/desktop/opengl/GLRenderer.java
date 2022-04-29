@@ -64,8 +64,8 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
 
 	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
-	private final List<IUpdater<?, ? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<?, ? extends ABuffer>>() ;
-	private final List<IUpdater<?, Storage>> storageUpdaters = new ArrayList<IUpdater<?, Storage>>() ;
+	private final List<IUpdater<? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<? extends ABuffer>>() ;
+	private final List<IUpdater<Storage>> storageUpdaters = new ArrayList<IUpdater<Storage>>() ;
 
 	public GLRenderer()
 	{
@@ -161,17 +161,17 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public <T extends IUpdater<?, ? extends ABuffer>> T add( final T _updater )
+			public <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-						drawUpdaters.add( _updater ) ;
+					drawUpdaters.add( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
 
 			@Override
-			public <T extends IUpdater<?, ? extends ABuffer>> T remove( final T _updater )
+			public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -435,7 +435,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public <T extends IUpdater<?, Storage>> T add( final T _updater )
+			public <T extends IUpdater<Storage>> T add( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -445,7 +445,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public <T extends IUpdater<?, Storage>> T remove( final T _updater )
+			public <T extends IUpdater<Storage>> T remove( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -726,7 +726,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		int totalBufferUpdates = 0 ;
 
-		for( final IUpdater<?, Storage> updater : storageUpdaters )
+		for( final IUpdater<Storage> updater : storageUpdaters )
 		{
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
@@ -751,7 +751,7 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		int totalBufferUpdates = 0 ;
 
-		for( final IUpdater<?, ? extends ABuffer> updater : drawUpdaters )
+		for( final IUpdater<? extends ABuffer> updater : drawUpdaters )
 		{
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
