@@ -9,7 +9,6 @@ import java.text.MessageFormat ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
@@ -170,10 +169,10 @@ public class GLRenderer extends BasicRenderer
 			}
 
 			@Override
-			public boolean loadFont( final String _path )
+			public String[] loadFont( final String _path )
 			{
 				assert( true ) ;
-				return false ;
+				return new String[0] ;
 			}
 		} ;
 	}
@@ -192,6 +191,12 @@ public class GLRenderer extends BasicRenderer
 			public Vector2 getMaximumTextureSize()
 			{
 				return new Vector2( maxTextureSize ) ;
+			}
+
+			@Override
+			public boolean texturesLoaded()
+			{
+				return textures.texturesLoaded() ;
 			}
 		} ;
 	}

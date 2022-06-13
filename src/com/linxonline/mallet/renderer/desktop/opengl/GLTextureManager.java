@@ -82,6 +82,11 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		bindCount = 0 ;
 	}
 
+	public boolean texturesLoaded()
+	{
+		return toBind.isEmpty() ;
+	}
+
 	@Override
 	public GLImage get( final String _file )
 	{

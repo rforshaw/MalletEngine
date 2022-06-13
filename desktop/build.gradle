@@ -23,7 +23,7 @@ project( ':MalletEngine' ) {
 	}
 
 	dependencies {
-		compile fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
+		implementation fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
 	}
 
 	clean {
@@ -68,7 +68,7 @@ project( ':MalletEditor' ) {
 	}
 
 	dependencies {
-		compile project(':MalletEngine')
+		implementation project(':MalletEngine')
 	}
 	
 	task copy(type: Copy) {

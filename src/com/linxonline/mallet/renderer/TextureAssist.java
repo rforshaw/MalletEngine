@@ -32,9 +32,14 @@ public final class TextureAssist
 		Return the maximum width and height texture 
 		supported by the active rendering system.
 	*/
-	public Vector2 getMaximumTextureSize()
+	public static Vector2 getMaximumTextureSize()
 	{
 		return assist.getMaximumTextureSize() ;
+	}
+
+	public static boolean texturesLoaded()
+	{
+		return assist.texturesLoaded() ;
 	}
 
 	public static interface Assist
@@ -42,5 +47,7 @@ public final class TextureAssist
 		public MalletTexture.Meta createMeta( final String _path ) ;
 
 		public Vector2 getMaximumTextureSize() ;
+
+		public boolean texturesLoaded() ;
 	}
 }

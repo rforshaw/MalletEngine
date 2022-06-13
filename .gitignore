@@ -1,4 +1,5 @@
 resources/base/music/*
+android/.idea/*
 desktop/*
 build/*
 libs/*

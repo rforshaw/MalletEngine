@@ -1,6 +1,4 @@
-package com.linxonline.mallet.renderer.font ;
-
-import com.linxonline.mallet.renderer.MalletFont ;
+package com.linxonline.mallet.renderer ;
 
 public class FontAssist
 {
@@ -46,7 +44,7 @@ public class FontAssist
 		The default Android implementation will use Android's
 		loading system.
 	*/
-	public static boolean loadFont( final String _path )
+	public static String[] loadFont( final String _path )
 	{
 		return inter.loadFont( _path ) ;
 	}
@@ -55,6 +53,6 @@ public class FontAssist
 	{
 		public MalletFont.Metrics createMetrics( final MalletFont _font ) ;
 		public Glyph createGlyph( final MalletFont _font, final int _code ) ;
-		public boolean loadFont( final String _path ) ;
+		public String[] loadFont( final String _path ) ;
 	}
 }

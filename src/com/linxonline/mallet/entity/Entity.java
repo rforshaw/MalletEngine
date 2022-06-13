@@ -107,6 +107,24 @@ public final class Entity
 		return _components ;
 	}
 
+	/**
+		Return the first component in the entity that matches
+		the requested class type. If no component matches the
+		criteria return null instead.
+	*/
+	public final <T extends Component> T getComponentByType( final Class<T> _clazz )
+	{
+		for( final Component component : components )
+		{
+			if( _clazz.isInstance( component ) == true )
+			{
+				return _clazz.cast( component ) ;
+			}
+		}
+
+		return null ;
+	}
+
 	/** 
 		Call when you wish the Entity to be decalred dead.
 		An Entity decalred destroyed, will be removed by the

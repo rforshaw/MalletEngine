@@ -57,10 +57,18 @@ public class MouseComponent extends InputComponent
 			case MOUSE1_RELEASED : mouse1Pressed = false ;
 								   mouseReleased( _event ) ;
 								   updateMousePosition( _event ) ; break ;
-			case MOUSE2_PRESSED  : mouse2Pressed = true ;          break ;
-			case MOUSE2_RELEASED : mouse2Pressed = false ;         break ;
-			case MOUSE3_PRESSED  : mouse3Pressed = true ;          break ;
-			case MOUSE3_RELEASED : mouse3Pressed = false ;         break ;
+			case MOUSE2_PRESSED  : mouse2Pressed = true ;
+								   mousePressed( _event ) ;
+								   updateMousePosition( _event ) ; break ;
+			case MOUSE2_RELEASED : mouse2Pressed = false ;
+								   mouseReleased( _event ) ;
+								   updateMousePosition( _event ) ; break ;
+			case MOUSE3_PRESSED  : mouse3Pressed = true ;
+								   mousePressed( _event ) ;
+								   updateMousePosition( _event ) ; break ;
+			case MOUSE3_RELEASED : mouse3Pressed = false ;
+								   mouseReleased( _event ) ;
+								   updateMousePosition( _event ) ; break ;
 			default              : break ;
 		}
 	}

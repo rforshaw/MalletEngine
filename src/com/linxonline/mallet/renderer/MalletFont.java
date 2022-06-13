@@ -3,8 +3,8 @@ package com.linxonline.mallet.renderer ;
 import com.linxonline.mallet.util.QuickSort ;
 import com.linxonline.mallet.maths.MathUtil ;
 
-import com.linxonline.mallet.renderer.font.FontAssist ;
-import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.FontAssist ;
+import com.linxonline.mallet.renderer.Glyph ;
 
 public class MalletFont
 {

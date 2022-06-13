@@ -1,9 +1,5 @@
 package com.linxonline.malleteditor.core ;
 
-import com.jogamp.newt.event.WindowListener ;
-import com.jogamp.newt.event.WindowUpdateEvent ;
-import com.jogamp.newt.event.WindowEvent ;
-
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.desktop.DesktopStarter ;
 import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;

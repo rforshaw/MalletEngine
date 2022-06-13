@@ -1,4 +1,4 @@
-package com.linxonline.mallet.renderer.font ;
+package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.ISort ;
 

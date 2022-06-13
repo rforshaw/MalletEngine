@@ -94,7 +94,8 @@ public class IStarter
 			public void shutdown()
 			{
 				Logger.println( "Saving configuration file.", Logger.Verbosity.MINOR ) ;
-				if( ConfigWriter.write( GlobalHome.getFile( _settings.getConfigLocation() ), GlobalConfig.getConfig() ) == false )
+				final String location = _settings.getConfigLocation() ;
+				if( ConfigWriter.write( GlobalHome.getFile( location ), GlobalConfig.getConfig() ) == false )
 				{
 					Logger.println( "Failed to write configuration file.", Logger.Verbosity.MAJOR ) ;
 				}

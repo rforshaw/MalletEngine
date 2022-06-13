@@ -4,6 +4,8 @@ import com.jogamp.newt.opengl.GLWindow ;
 import com.jogamp.newt.event.WindowListener ;
 import com.jogamp.newt.event.WindowUpdateEvent ;
 import com.jogamp.newt.event.WindowEvent ;
+import com.jogamp.newt.event.MouseListener ;
+import com.jogamp.newt.event.MouseEvent ;
 
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 import com.linxonline.mallet.audio.desktop.alsa.ALSAGenerator ;
@@ -11,6 +13,8 @@ import com.linxonline.mallet.renderer.desktop.opengl.GLRenderer ;
 import com.linxonline.mallet.input.desktop.InputSystem ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;
+
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.buffers.* ;
 
 /**
@@ -66,28 +70,20 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
 		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 
+		final WinState window = new WinState() ;
+
 		GlobalConfig.addNotify( "CAPTUREMOUSE", ( String _name ) -> {
-			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+			final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
+			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", capture ) ) ;
 		} ) ;
 
 		GlobalConfig.addNotify( "FULLSCREEN", ( String _name ) -> {
-			event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN", GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+			final boolean fullscreen = GlobalConfig.getBoolean( "FULLSCREEN", false ) ;
+			event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN", fullscreen ) ) ;
 		} ) ;
 
-		getWindow().addWindowListener( new WindowListener()
-		{
-			public void windowDestroyNotify( final WindowEvent _event )
-			{
-				GLDefaultSystem.this.shutdownSystem() ;
-			}
-
-			public void windowGainedFocus( final WindowEvent _event ) {}
-			public void windowLostFocus( final WindowEvent _event ) {}
-			public void windowRepaint( final WindowUpdateEvent _event ) {}
-			public void windowDestroyed( final WindowEvent _event ) {}
-			public void windowMoved( final WindowEvent _event ) {}
-			public void windowResized( final WindowEvent _event ) {}
-		} ) ;
+		getWindow().addWindowListener( window ) ;
+		getWindow().addMouseListener( window ) ;
 	}
 
 	protected void initEventProcessors()
@@ -116,13 +112,13 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	@Override
 	public void startSystem()
 	{
-		System.out.println( "Start System..." ) ;
+		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;
 	}
 
 	@Override
 	public void stopSystem()
 	{
-		System.out.println( "Stop System..." ) ;
+		Logger.println( "Stop System...", Logger.Verbosity.MINOR ) ;
 	}
 
 	@Override
@@ -131,5 +127,67 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		super.update( _dt ) ;
 		eventController.update() ;		// Process the Events this system is interested in
 		return true ;					// Informs the Game System whether to continue updating or not.
+	}
+
+	private class WinState implements WindowListener, MouseListener
+	{
+		private final static int FOCUS_LOST = -1 ;
+		private final static int FOCUS_UNKNOWN = 0 ;
+		private final static int FOCUS_GAINED = 1 ;
+
+		private int focusState = FOCUS_UNKNOWN ;
+
+		@Override
+		public void windowDestroyNotify( final WindowEvent _event )
+		{
+			GLDefaultSystem.this.shutdownSystem() ;
+		}
+
+		@Override
+		public void windowGainedFocus( final WindowEvent _event )
+		{
+			Logger.println( "Main window gained focus.", Logger.Verbosity.MINOR ) ;
+			focusState = FOCUS_GAINED ;
+		}
+
+		@Override
+		public void windowLostFocus( final WindowEvent _event )
+		{
+			Logger.println( "Main window lost focus.", Logger.Verbosity.MINOR ) ;
+			final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
+			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", false ) ) ;
+
+			focusState = FOCUS_LOST ;
+		}
+
+		public void windowRepaint( final WindowUpdateEvent _event ) {}
+		public void windowDestroyed( final WindowEvent _event ) {}
+		public void windowMoved( final WindowEvent _event ) {}
+		public void windowResized( final WindowEvent _event ) {}
+
+		public void mouseClicked( final MouseEvent e ) {}
+		public void mouseDragged( final MouseEvent e ) {}
+
+		@Override
+		public void mouseEntered( final MouseEvent e )
+		{
+			switch( focusState )
+			{
+				default           : break ;
+				case FOCUS_GAINED :
+				{
+				
+					final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
+					event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+					break ;
+				}
+			}
+		}
+
+		public void mouseExited( final MouseEvent e ) {}
+		public void mouseMoved( final MouseEvent e ) {}
+		public void mousePressed( final MouseEvent e ) {}
+		public void mouseReleased( final MouseEvent e ) {}
+		public void mouseWheelMoved( final MouseEvent e ) {}
 	}
 }

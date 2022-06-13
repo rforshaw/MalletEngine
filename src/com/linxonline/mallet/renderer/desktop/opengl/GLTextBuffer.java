@@ -13,7 +13,7 @@ import com.linxonline.mallet.renderer.TextBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.Glyph ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;

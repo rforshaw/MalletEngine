@@ -59,12 +59,13 @@ public class DesktopStarter extends IStarter
 			@Override
 			public void shutdown()
 			{
+				System.out.println( "Shutting down..." ) ;
 				stop() ;
 				System.exit( 0 ) ;
 			}
 		} ) ;
 	}
-	
+
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;

@@ -4,7 +4,7 @@ import java.util.Collection ;
 import java.util.Map ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.MalletMap ;
 

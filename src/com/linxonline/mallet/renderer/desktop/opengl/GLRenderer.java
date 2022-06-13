@@ -17,7 +17,6 @@ import com.jogamp.opengl.GLDebugMessage ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.renderer.font.* ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
@@ -130,10 +129,9 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public boolean loadFont( final String _path )
+			public String[] loadFont( final String _path )
 			{
-				assert( true ) ;
-				return false ;
+				return fontManager.loadFont( _path ) ;
 			}
 		} ;
 	}
@@ -152,6 +150,12 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			public Vector2 getMaximumTextureSize()
 			{
 				return new Vector2( maxTextureSize ) ;
+			}
+
+			@Override
+			public boolean texturesLoaded()
+			{
+				return textures.texturesLoaded() ;
 			}
 		} ;
 	}

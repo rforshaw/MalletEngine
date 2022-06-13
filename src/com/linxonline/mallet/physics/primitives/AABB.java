@@ -143,6 +143,13 @@ public class AABB
 		FloatBuffer.set( range, AABB.MIN_X, _x, _y ) ;
 	}
 
+	public AABB copyTo( final AABB _to )
+	{
+		System.arraycopy( position, 0, _to.position, 0, position.length ) ;
+		System.arraycopy( range, 0, _to.range, 0, range.length ) ;
+		return _to ;
+	}
+
 	/**
 		Determine if the point defined is located within the AABB.
 	*/

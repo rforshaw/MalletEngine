@@ -5,6 +5,8 @@ import java.util.ArrayDeque ;
 import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.ISystem.ShutdownDelegate.Callback ;
 
+import com.linxonline.mallet.util.Logger ;
+
 public class DefaultShutdown implements ISystem.ShutdownDelegate
 {
 	private final ArrayDeque<ShutdownDelegate.Callback> callbacks = new ArrayDeque<ShutdownDelegate.Callback>() ;
@@ -29,8 +31,10 @@ public class DefaultShutdown implements ISystem.ShutdownDelegate
 
 	public void shutdown()
 	{
+		Logger.println( "Total Shutdown procedures: " + callbacks.size(), Logger.Verbosity.MINOR ) ;
 		while( callbacks.isEmpty() == false )
 		{
+			Logger.println( "Shutdown procedure: " + callbacks.size(), Logger.Verbosity.MINOR ) ;
 			callbacks.pop().shutdown() ;
 		}
 	}

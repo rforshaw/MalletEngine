@@ -201,14 +201,13 @@ public class JSONProgram
 	private static void generate( final JObject _jGL, final Delegate _delegate )
 	{
 		final JSONProgram program = new JSONProgram( _jGL.optString( "NAME", "undefined" ) ) ;
-		final List<ShaderMap> paths = MalletList.<ShaderMap>newList() ;
 
-		fillShaderPaths( paths, _jGL.getJArray( "VERTEX" ), Type.VERTEX ) ;
-		fillShaderPaths( paths, _jGL.getJArray( "FRAGMENT" ), Type.FRAGMENT ) ;
-		fillShaderPaths( paths, _jGL.getJArray( "GEOMETRY" ), Type.GEOMETRY ) ;
-		fillShaderPaths( paths, _jGL.getJArray( "COMPUTE" ),  Type.COMPUTE ) ;
+		fillShaderPaths( program, _jGL.getJArray( "VERTEX" ), Type.VERTEX ) ;
+		fillShaderPaths( program, _jGL.getJArray( "FRAGMENT" ), Type.FRAGMENT ) ;
+		fillShaderPaths( program, _jGL.getJArray( "GEOMETRY" ), Type.GEOMETRY ) ;
+		fillShaderPaths( program, _jGL.getJArray( "COMPUTE" ),  Type.COMPUTE ) ;
 
-		if( paths.isEmpty() )
+		if( program.shaders.isEmpty() )
 		{
 			Logger.println( "Program has no shaders specified.", Logger.Verbosity.MAJOR ) ;
 			_delegate.failed() ;
@@ -219,70 +218,52 @@ public class JSONProgram
 		fillAttributes( program.swivel, _jGL.getJArray( "SWIVEL" ) ) ;
 		fillBuffers( program.buffers, _jGL.getJArray( "BUFFERS" ) ) ;
 
-		readShaders( paths, program, _delegate ) ;
+		_delegate.loaded( program ) ;
 	}
 
-	private static void readShaders( final List<ShaderMap> _paths, final JSONProgram _program, final Delegate _delegate )
-	{
-		if( _paths.isEmpty() )
-		{
-			_delegate.loaded( _program ) ;
-			return ;
-		}
-
-		final ShaderMap map = _paths.remove( 0 ) ;
-		final FileStream stream = GlobalFileSystem.getFile( map.getRight() ) ;
-		if( stream.exists() == false )
-		{
-			Logger.println( "Unable to find: " + map.getRight(), Logger.Verbosity.MAJOR ) ;
-			readShaders( _paths, _program, _delegate ) ;
-			return ;
-		}
-
-		stream.getStringInCallback( new StringInCallback()
-		{
-			private final StringBuilder source = new StringBuilder() ;
-
-			public int resourceAsString( final String[] _resource, final int _length )
-			{
-				for( int i = 0; i < _length; i++ )
-				{
-					source.append( _resource[i] ) ;
-					source.append( '\n' ) ;
-				}
-			
-				return 1 ;
-			}
-
-			public void start() {}
-
-			public void end()
-			{
-				_program.shaders.add( new ShaderMap( map.getLeft(), source.toString() ) ) ;
-				readShaders( _paths, _program, _delegate ) ;
-			}
-		}, 1 ) ;
-	}
-
-	private static boolean fillShaderPaths( final List<ShaderMap> _toFill, final JArray _base, final Type _type )
+	private static void fillShaderPaths( final JSONProgram _program, final JArray _base, final Type _type )
 	{
 		if( _base == null )
 		{
-			return false;
+			return ;
 		}
 
 		final int length = _base.length() ;
 		if( length <= 0 )
 		{
-			return false ;
+			return ;
 		}
+
+		final StringBuilder source = new StringBuilder() ;
 
 		for( int i = 0; i < length; i++ )
 		{
-			_toFill.add( new ShaderMap( _type, _base.getString( i ) ) ) ;
+			final String path = _base.getString( i ) ;
+			
+			final FileStream stream = GlobalFileSystem.getFile( path ) ;
+			if( stream.exists() == false )
+			{
+				Logger.println( "Unable to find: " + path, Logger.Verbosity.MAJOR ) ;
+				continue ;
+			}
+
+			try( final StringInStream in = stream.getStringInStream() )
+			{
+				String line = in.readLine() ;
+				while( line != null )
+				{
+					source.append( line ) ;
+					source.append( '\n' ) ;
+					line = in.readLine() ;
+				}
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
+			}
 		}
 
-		return true ;
+		_program.shaders.add( new ShaderMap( _type, source.toString() ) ) ;
 	}
 
 	private static void fillUniforms( final List<UniformMap> _toFill, final JArray _base )
@@ -341,9 +322,9 @@ public class JSONProgram
 
 	public static class ShaderMap extends Tuple<Type, String>
 	{
-		public ShaderMap( final Type _type, final String _path )
+		public ShaderMap( final Type _type, final String _source )
 		{
-			super( _type, _path ) ;
+			super( _type, _source ) ;
 		}
 	}
 

@@ -4,11 +4,6 @@ import java.util.List ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 
-import com.linxonline.mallet.renderer.World ;
-import com.linxonline.mallet.renderer.Camera ;
-
-import com.linxonline.mallet.renderer.font.* ;
-
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;

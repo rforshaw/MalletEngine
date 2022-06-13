@@ -30,6 +30,7 @@ import com.linxonline.mallet.entity.EntitySystem ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.Component ;
 
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
@@ -270,6 +271,7 @@ public class GameState extends State
 		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
 		shutdown.addShutdownCallback( () ->
 		{
+			Logger.println( "Clearing audio from game-state.", Logger.Verbosity.MINOR ) ;
 			audioSystem.clear() ;
 		} ) ;
 	}
