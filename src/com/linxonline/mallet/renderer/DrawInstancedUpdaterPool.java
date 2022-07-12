@@ -30,7 +30,7 @@ public class DrawInstancedUpdaterPool
 		if( updater == null )
 		{
 			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order ) ) ;
-			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style, _ui, _order ) ) ;
+			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style, _ui ) ) ;
 
 			updater = DrawAssist.add( new DrawInstancedUpdater( buffer, geom ) ) ;
 

@@ -60,7 +60,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 		final Bundle bundle = createResource( _font ) ;
 		if( bundle != null )
 		{
-			final GLImage image = manager.bind( bundle.image, GLTextureManager.InternalFormat.UNCOMPRESSED, false ) ;
+			final GLImage image = manager.bind( bundle.image, GLTextureManager.InternalFormat.UNCOMPRESSED ) ;
 			final GLFont font = new GLFont( bundle.shapes, image ) ;
 			put( id, font ) ;
 			return font ;

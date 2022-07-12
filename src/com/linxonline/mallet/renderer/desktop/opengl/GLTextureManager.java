@@ -136,14 +136,9 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		return bind( _images, InternalFormat.COMPRESSED ) ;
 	}
 
-	public GLImage bind( final BufferedImage[] _images, final InternalFormat _format )
+	public GLImage bind( final BufferedImage _image, final InternalFormat _format )
 	{
-		return bind( _images, _format, true ) ;
-	}
-
-	public GLImage bind( final BufferedImage _image, final InternalFormat _format, final boolean _createMips )
-	{
-		return bind( new BufferedImage[] { _image }, _format, _createMips ) ;
+		return bind( new BufferedImage[] { _image }, _format ) ;
 	}
 
 	/**
@@ -151,7 +146,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		BufferedImage must be in 4BYTE_ABGR.
 		4BYTE_ABGR removes endinese problems.
 	*/
-	public GLImage bind( final BufferedImage[] _images, final InternalFormat _format, final boolean _createMips )
+	public GLImage bind( final BufferedImage[] _images, final InternalFormat _format )
 	{
 		final int textureID = glGenTextures() ;
 		MGL.glBindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
@@ -159,7 +154,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
 		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
 		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
-		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+		MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR_MIPMAP_LINEAR ) ;
 
 		final BufferedImage base = _images[0] ;
 		final int baseWidth = base.getWidth() ;
@@ -189,40 +184,28 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		}
 
 		MGL.glPixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;
-		MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
-						 0, 
-						 getGLInternalFormat( channels, _format ), 
-						 baseWidth, 
-						 baseHeight, 
-						 0, 
-						 imageFormat, 
-						 MGL.GL_UNSIGNED_BYTE, 
-						 getByteBuffer( base ) ) ;
 
-		if( _createMips == true )
+		for( int i = 0; i < _images.length; ++i )
 		{
-			for( int i = 1; i < _images.length; ++i )
+			final BufferedImage image = _images[i] ;
+			if( image == null )
 			{
-				final BufferedImage image = _images[i] ;
-				if( image == null )
-				{
-					System.out.println( "Texture level " + i + " not available skipping." ) ;
-					continue ;
-				}
-
-				final int mipWidth = image.getWidth() ;
-				final int mipHeight = image.getHeight() ;
-
-				MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
-								i, 
-								getGLInternalFormat( channels, _format ), 
-								mipWidth, 
-								mipHeight, 
-								0, 
-								imageFormat, 
-								MGL.GL_UNSIGNED_BYTE, 
-								getByteBuffer( image ) ) ;
+				System.out.println( "Texture level " + i + " not available skipping." ) ;
+				continue ;
 			}
+
+			final int mipWidth = image.getWidth() ;
+			final int mipHeight = image.getHeight() ;
+
+			MGL.glTexImage2D( MGL.GL_TEXTURE_2D, 
+							i, 
+							getGLInternalFormat( channels, _format ), 
+							mipWidth, 
+							mipHeight, 
+							0, 
+							imageFormat, 
+							MGL.GL_UNSIGNED_BYTE, 
+							getByteBuffer( image ) ) ;
 		}
 		//MGL.glBindTexture( MGL.GL_TEXTURE_2D, 0 ) ;			// Reset to default texture
 		//GLRenderer.handleError( "Reset Bind Texture", gl ) ;

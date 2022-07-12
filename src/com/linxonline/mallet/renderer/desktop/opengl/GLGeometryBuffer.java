@@ -34,7 +34,6 @@ public class GLGeometryBuffer extends GLBuffer
 	private int[] vboID = new int[1] ;
 	private int[] indexLength = new int[1] ;
 
-	private int order ;
 	private int vertexStride = -1 ;
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,

@@ -10,18 +10,15 @@ public class GeometryBuffer extends ABuffer
 	private final Shape.Swivel[] swivel ;
 	private final Shape.Style style ;
 	private final boolean ui ;
-	private final int order ;
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 
 	public GeometryBuffer( final Shape.Swivel[] _swivel,
 						   final Shape.Style _style,
-						   final boolean _ui,
-						   final int _order )
+						   final boolean _ui )
 	{
 		swivel = _swivel ;
 		style = _style ;
 		ui = _ui ;
-		order = _order ;
 	}
 
 	public void addDraws( final Draw ... _draws )
@@ -65,7 +62,7 @@ public class GeometryBuffer extends ABuffer
 	@Override
 	public int getOrder()
 	{
-		return order ;
+		throw new UnsupportedOperationException( "getOrder() is not intended to be used within GeometryBuffer." ) ;
 	}
 
 	public List<Draw> getDraws()

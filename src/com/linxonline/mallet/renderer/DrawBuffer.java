@@ -110,14 +110,12 @@ public class DrawBuffer extends ABuffer
 		return true ;
 	}
 
+	/**
+		Ensure the GeometryBuffer is compatible with the DrawBuffer.
+	*/
 	public static boolean isCompatible( final DrawBuffer _lhs, final GeometryBuffer _rhs )
 	{
 		if( _lhs.isUI() != _rhs.isUI() )
-		{
-			return false ;
-		}
-
-		if( _lhs.getOrder() != _rhs.getOrder() )
 		{
 			return false ;
 		}

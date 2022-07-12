@@ -1,6 +1,7 @@
 package com.linxonline.mallet.core.test ;
 
 import java.util.List ;
+import java.util.Map ;
 
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.event.* ;
@@ -30,6 +31,7 @@ import com.linxonline.mallet.physics.primitives.AABB ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
 
@@ -47,6 +49,16 @@ import com.linxonline.mallet.io.net.Address ;
 */
 public final class GameTestLoader implements IGameLoader
 {
+	private static final Map<String, MaterialPool.IGenerator<Program>> generators = MalletMap.<String, MaterialPool.IGenerator<Program>>newMap() ;
+	static
+	{
+		// All materials should have a "type" field.
+		generators.put( "simple", new MaterialPool.SimpleGenerator() ) ;
+		generators.put( "simple_instanced", new MaterialPool.SimpleInstancedGenerator() ) ;
+	}
+
+	private static final MaterialPool<Program> materialPool = new MaterialPool<Program>( generators ) ;
+
 	public GameTestLoader() {}
 
 	@Override
@@ -159,7 +171,6 @@ public final class GameTestLoader implements IGameLoader
 					final Camera cam = CameraAssist.add( new Camera( "OFFSIDE" ) ) ;
 					cam.setOrthographic( 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
 					cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
-					//CameraAssist.amendScreenOffset( cam, 200, 200 ) ;
 
 					world.addCameras( cam ) ;
 				}
@@ -194,9 +205,8 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final MalletTexture texture = new MalletTexture( "base/textures/moomba.png" ) ;
-					final int width = texture.getWidth() ;
-					final int height = texture.getHeight() ;
+					final int width = 64 ;
+					final int height = 64 ;
 
 					final Shape plane = Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
@@ -205,9 +215,7 @@ public final class GameTestLoader implements IGameLoader
 					draw.setOffset( -( width / 2 ), -( height / 2 ), 0.0f ) ;
 					draw.setShape( plane ) ;
 
-					final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-					program.mapUniform( "inTex0", texture ) ;
-
+					final Program program = materialPool.create( "base/materials/example.mat" ) ;
 					final DrawUpdater updater = pool.getOrCreate( world, program, plane, true, 10 ) ;
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
@@ -227,11 +235,11 @@ public final class GameTestLoader implements IGameLoader
 				final Draw draw = new Draw( 0, 0, 0, -32, -32, 0 ) ;
 				draw.setShape( plane ) ;
 
-				final SpriteAnimations animations = new SpriteAnimations( new SimpleSpriteListener( world, program, draw, 10 ) ) ;
+				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
-				AnimationAssist.add( animations ) ;
-				animations.addSprite( "DEFAULT", new MalletSprite( "base/anim/moomba.anim" ) ) ;
-				animations.play( "DEFAULT" ) ;
+				AnimationAssist.add( booklet ) ;
+				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() )  ) ;
+				booklet.play( "DEFAULT" ) ;
 
 				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
 				new Component( entity )
@@ -252,7 +260,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void readyToDestroy( final Entity.ReadyCallback _callback )
 					{
-						AnimationAssist.remove( animations ) ;
+						AnimationAssist.remove( booklet ) ;
 						super.readyToDestroy( _callback ) ;
 					}
 				} ;
@@ -461,17 +469,18 @@ public final class GameTestLoader implements IGameLoader
 				draw.setShape( plane ) ;
 
 				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
-				final SpriteAnimations animations = new SpriteAnimations( new SimpleSpriteListener( world, program, draw, 100 ) ) ;
 
-				AnimationAssist.add( animations ) ;
-				animations.addSprite( "DEFAULT", new MalletSprite( "base/anim/moomba.anim" ) ) ;
-				animations.play( "DEFAULT" ) ;
+				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
+
+				AnimationAssist.add( booklet ) ;
+				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() ) ) ;
+				booklet.play( "DEFAULT" ) ;
 
 				final CollisionComponent collision = CollisionComponent.generateBox2D( entity,
-																						new Vector2(),
-																						new Vector2( 32, 32 ),
-																						new Vector2( 0, 0 ),
-																						new Vector2( -16, -16 ) ) ;
+																					   new Vector2(),
+																					   new Vector2( 32, 32 ),
+																					   new Vector2( 0, 0 ),
+																					   new Vector2( -16, -16 ) ) ;
 				//collision.hull.setPhysical( false ) ;
 
 				final MouseComponent mouse = new MouseComponent( entity )
@@ -485,7 +494,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void readyToDestroy( final Entity.ReadyCallback _callback )
 					{
-						AnimationAssist.remove( animations ) ;
+						AnimationAssist.remove( booklet ) ;
 						super.readyToDestroy( _callback ) ;
 					}
 				} ;

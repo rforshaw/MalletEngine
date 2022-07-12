@@ -1,0 +1,9 @@
+{
+	"framerate": 5,
+	"resources": [
+		{ "texture": "base/textures/moomba_sheet.png", "u1": 0.0, "v1": 0.0, "u2": 0.5, "v2": 1.0 },
+		{ "texture": "base/textures/moomba_sheet.png", "u1": 0.5, "v1": 0.0, "u2": 1.0, "v2": 1.0 }
+	],
+	"frames": [[0], [1]],
+	"frame_order": [0, 1]
+}

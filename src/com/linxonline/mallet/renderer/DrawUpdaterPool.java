@@ -110,6 +110,41 @@ public class DrawUpdaterPool
 		}
 	}
 
+	public DrawUpdater create( final World _world,
+							   final Program _program,
+							   final IShape _shape,
+							   final boolean _ui,
+							   final int _order )
+	{
+		return create( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+	}
+
+	public DrawUpdater create( final World _world,
+							   final Program _program,
+							   final IShape.Swivel[] _swivel,
+							   final IShape.Style _style,
+							   final boolean _ui,
+							   final int _order )
+	{
+		final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
+		final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style, _ui ) ) ;
+
+		final DrawUpdater updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
+
+		_world.addBuffers( buffer ) ;
+		WorldAssist.update( _world ) ;
+
+		buffer.addBuffers( geom ) ;
+		DrawAssist.update( buffer ) ;
+
+		synchronized( pool )
+		{
+			pool.add( new WeakReference( updater ) ) ;
+		}
+
+		return updater ;
+	}
+
 	/**
 		Create a DrawUpdater with a DrawBuffer and GeometryBuffer
 		precreated with the passed in parameters.
@@ -138,27 +173,8 @@ public class DrawUpdaterPool
 									final boolean _ui,
 									final int _order )
 	{
-		DrawUpdater updater = get( _world, _program, _swivel, _style, _ui, _order ) ;
-		if( updater == null )
-		{
-			final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
-			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style, _ui, _order ) ) ;
-
-			updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
-
-			_world.addBuffers( buffer ) ;
-			WorldAssist.update( _world ) ;
-
-			buffer.addBuffers( geom ) ;
-			DrawAssist.update( buffer ) ;
-
-			synchronized( pool )
-			{
-				pool.add( new WeakReference( updater ) ) ;
-			}
-		}
-
-		return updater ;
+		final DrawUpdater updater = get( _world, _program, _swivel, _style, _ui, _order ) ;
+		return ( updater != null ) ? updater : create( _world, _program, _swivel, _style, _ui, _order ) ;
 	}
 
 	/**
