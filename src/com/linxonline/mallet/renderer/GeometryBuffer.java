@@ -7,12 +7,12 @@ import com.linxonline.mallet.util.MalletList ;
 
 public class GeometryBuffer extends ABuffer
 {
-	private final Shape.Swivel[] swivel ;
+	private final Shape.Attribute[] swivel ;
 	private final Shape.Style style ;
 	private final boolean ui ;
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 
-	public GeometryBuffer( final Shape.Swivel[] _swivel,
+	public GeometryBuffer( final Shape.Attribute[] _swivel,
 						   final Shape.Style _style,
 						   final boolean _ui )
 	{
@@ -44,7 +44,7 @@ public class GeometryBuffer extends ABuffer
 		swivel then it will most likely not work. Or simply 
 		work by sheer fluke.
 	*/
-	public Shape.Swivel[] getSwivel()
+	public Shape.Attribute[] getAttribute()
 	{
 		return swivel ;
 	}

@@ -116,12 +116,12 @@ public class DrawUpdaterPool
 							   final boolean _ui,
 							   final int _order )
 	{
-		return create( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+		return create( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	public DrawUpdater create( final World _world,
 							   final Program _program,
-							   final IShape.Swivel[] _swivel,
+							   final IShape.Attribute[] _swivel,
 							   final IShape.Style _style,
 							   final boolean _ui,
 							   final int _order )
@@ -158,7 +158,7 @@ public class DrawUpdaterPool
 									final boolean _ui,
 									final int _order )
 	{
-		return getOrCreate( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+		return getOrCreate( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class DrawUpdaterPool
 	*/
 	public DrawUpdater getOrCreate( final World _world,
 									final Program _program,
-									final IShape.Swivel[] _swivel,
+									final IShape.Attribute[] _swivel,
 									final IShape.Style _style,
 									final boolean _ui,
 									final int _order )
@@ -193,7 +193,7 @@ public class DrawUpdaterPool
 							final boolean _ui,
 							final int _order )
 	{
-		return get( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class DrawUpdaterPool
 	*/
 	public DrawUpdater get( final World _world,
 							final Program _program,
-							final IShape.Swivel[] _swivel,
+							final IShape.Attribute[] _swivel,
 							final IShape.Style _style,
 							final boolean _ui,
 							final int _order )
@@ -248,7 +248,7 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				if( isCompatibleSwivel( buffer.getSwivel(), _swivel ) == false )
+				if( isCompatibleAttribute( buffer.getAttribute(), _swivel ) == false )
 				{
 					continue ;
 				}
@@ -270,7 +270,7 @@ public class DrawUpdaterPool
 		return null ;
 	}
 
-	protected static boolean isCompatibleSwivel( final IShape.Swivel[] _a, final IShape.Swivel[] _b )
+	protected static boolean isCompatibleAttribute( final IShape.Attribute[] _a, final IShape.Attribute[] _b )
 	{
 		if( _a.length != _b.length )
 		{

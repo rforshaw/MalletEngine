@@ -23,9 +23,9 @@ public class Debug
 		final Draw draw = new Draw( pos.x, pos.y, 0.0f,
 									off.x, off.y, 0.0f ) ;
 
-		final Shape.Swivel[] swivel = new Shape.Swivel[2] ;
-		swivel[0] = Shape.Swivel.VEC3 ;
-		swivel[1] = Shape.Swivel.FLOAT ;
+		final Shape.Attribute[] swivel = new Shape.Attribute[2] ;
+		swivel[0] = Shape.Attribute.VEC3 ;
+		swivel[1] = Shape.Attribute.FLOAT ;
 
 		final Shape shape = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		final MalletColour white = MalletColour.white() ;
@@ -37,7 +37,7 @@ public class Debug
 			final float x = points[i + 0] ;
 			final float y = points[i + 1] ;
 
-			shape.copyVertex( Shape.Swivel.createVert( new Vector3( x, y, 0.0f ), white ) ) ;
+			shape.copyVertex( Shape.Attribute.createVert( new Vector3( x, y, 0.0f ), white ) ) ;
 			shape.addIndex( index++ ) ;
 		}
 

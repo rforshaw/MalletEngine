@@ -52,7 +52,7 @@ public class JSONProgram
 		return buffers ;
 	}
 
-	public List<String> getSwivel()
+	public List<String> getAttribute()
 	{
 		return swivel ;
 	}
@@ -215,7 +215,7 @@ public class JSONProgram
 		}
 
 		fillUniforms( program.uniforms, _jGL.getJArray( "UNIFORMS" ) ) ;
-		fillAttributes( program.swivel, _jGL.getJArray( "SWIVEL" ) ) ;
+		fillAttributes( program.swivel, _jGL.getJArray( "ATTRIBUTES" ) ) ;
 		fillBuffers( program.buffers, _jGL.getJArray( "BUFFERS" ) ) ;
 
 		_delegate.loaded( program ) ;

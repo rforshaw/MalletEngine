@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
 public class Shape implements IShape
 {
-	private final Swivel[] swivel ;
+	private final Attribute[] swivel ;
 	private final int[] swivelOffset ;
 	
 	private final int swivelFloatSize ;
@@ -22,17 +22,17 @@ public class Shape implements IShape
 	private int indexIncrement = 0 ;
 	private int vertexIncrement = 0 ;
 
-	public Shape( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
+	public Shape( final Style _style, final Attribute[] _swivel, final int _indexSize, final int _pointSize )
 	{
-		swivel = new Swivel[_swivel.length] ;
+		swivel = new Attribute[_swivel.length] ;
 		swivelOffset = new int[_swivel.length] ;
 
 		System.arraycopy( _swivel, 0, swivel, 0, _swivel.length ) ;
 		for( int i = 0; i < _swivel.length; ++i )
 		{
-			swivelOffset[i] = Swivel.getSwivelFloatSize( swivel, i ) ;
+			swivelOffset[i] = Attribute.getAttributeFloatSize( swivel, i ) ;
 		}
-		swivelFloatSize = Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		swivelFloatSize = Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
 
 		verticies = FloatBuffer.allocate( swivelFloatSize * _pointSize ) ;
 		indicies  = IntegerBuffer.allocate( _indexSize ) ;
@@ -43,13 +43,13 @@ public class Shape implements IShape
 
 	public Shape( final Style _style, final int _indexSize, final int _pointSize )
 	{
-		this( _style, Swivel.constructDefault(), _indexSize, _pointSize ) ;
+		this( _style, Attribute.constructDefault(), _indexSize, _pointSize ) ;
 	}
 
 	public Shape( final Shape _shape )
 	{
 		this( _shape.getStyle(),
-				_shape.getSwivel(),
+				_shape.getAttribute(),
 				_shape.getIndicesSize(),
 				_shape.getVerticesSize() ) ;
 
@@ -136,8 +136,8 @@ public class Shape implements IShape
 
 	/**
 		Copy the Vertex at index location into _vertex.
-		Use Swivel.createVert() to build a valid vertex object 
-		for the Swivel defined by the shape. 
+		Use Attribute.createVert() to build a valid vertex object 
+		for the Attribute defined by the shape. 
 	*/
 	public Object[] copyVertexTo( final int _index, final Object[] _vertex )
 	{
@@ -354,7 +354,7 @@ public class Shape implements IShape
 		Should not be modified by external users.
 	*/
 	@Override
-	public Swivel[] getSwivel()
+	public Attribute[] getAttribute()
 	{
 		return swivel ;
 	}
@@ -406,12 +406,12 @@ public class Shape implements IShape
 	}
 
 	/**
-		Determine whether the Swivel and Vertex structure are the same.
+		Determine whether the Attribute and Vertex structure are the same.
 		return true if the vertex order is what is expected by the swivel 
 		order, return false if the order is incorrect.
 		positive may be made.
 	*/
-	public static boolean isCorrectSwivel( final Swivel[] _swivel, final Object[] _object )
+	public static boolean isCorrectAttribute( final Attribute[] _swivel, final Object[] _object )
 	{
 		if( _swivel.length != _object.length )
 		{
@@ -456,10 +456,10 @@ public class Shape implements IShape
 										final Vector2 _minUV,
 										final Vector2 _maxUV )
 	{
-		final Swivel[] swivel = new Swivel[3] ;
-		swivel[0] = Swivel.VEC3 ;
-		swivel[1] = Swivel.FLOAT ;
-		swivel[2] = Swivel.VEC2 ;
+		final Attribute[] swivel = new Attribute[3] ;
+		swivel[0] = Attribute.VEC3 ;
+		swivel[1] = Attribute.FLOAT ;
+		swivel[2] = Attribute.VEC2 ;
 
 		final Vector3 position = new Vector3() ;
 		final MalletColour white = MalletColour.white() ;
@@ -498,9 +498,9 @@ public class Shape implements IShape
 	*/
 	public static Shape constructPlane( final Vector3 _length, final MalletColour _colour )
 	{
-		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.VEC3 ;
-		swivel[1] = Swivel.FLOAT ;
+		final Attribute[] swivel = new Attribute[2] ;
+		swivel[0] = Attribute.VEC3 ;
+		swivel[1] = Attribute.FLOAT ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 6, 4 ) ;
 		plane.copyVertex( new Object[] { new Vector3(), _colour } ) ;
@@ -521,9 +521,9 @@ public class Shape implements IShape
 
 	public static Shape constructOutlinePlane( final Vector3 _length, final MalletColour _colour )
 	{
-		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.VEC3 ;
-		swivel[1] = Swivel.FLOAT ;
+		final Attribute[] swivel = new Attribute[2] ;
+		swivel[0] = Attribute.VEC3 ;
+		swivel[1] = Attribute.FLOAT ;
 
 		final Shape plane = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		plane.copyVertex( new Object[] { new Vector3(), _colour } ) ;
@@ -542,9 +542,9 @@ public class Shape implements IShape
 
 	public static Shape constructOutlineCircle( final float _radius, final int _segments, final MalletColour _colour )
 	{
-		final Swivel[] swivel = new Swivel[2] ;
-		swivel[0] = Swivel.VEC3 ;
-		swivel[1] = Swivel.FLOAT ;
+		final Attribute[] swivel = new Attribute[2] ;
+		swivel[0] = Attribute.VEC3 ;
+		swivel[1] = Attribute.FLOAT ;
 
 		final Shape circle = new Shape( Shape.Style.LINE_STRIP, swivel, _segments + 1, _segments ) ;
 		for( int i = 0; i < _segments; ++i )
@@ -567,43 +567,43 @@ public class Shape implements IShape
 	*/
 	public static Shape constructCube( final float _width, final Vector2 _minUV, final Vector2 _maxUV )
 	{
-		final Swivel[] swivel = new Swivel[3] ;
-		swivel[0] = Swivel.VEC3 ;
-		swivel[1] = Swivel.FLOAT ;
-		swivel[2] = Swivel.VEC2 ;
+		final Attribute[] swivel = new Attribute[3] ;
+		swivel[0] = Attribute.VEC3 ;
+		swivel[1] = Attribute.FLOAT ;
+		swivel[2] = Attribute.VEC2 ;
 
 		final MalletColour white = MalletColour.white() ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 36, 24 ) ;
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) ) ) ;				// 1
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 2
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 3
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV ) ) ) ;				// 1
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 2
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 3
 
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV ) ) ) ;				// 4 Back
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 5
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 6
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 7
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV ) ) ) ;				// 4 Back
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 5
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 6
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 7
 
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 8 Top
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 9
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 10
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 11
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 8 Top
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 9
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 10
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 11
 
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 12 Bottom
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV ) ) ) ;				// 13
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 14
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 15
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 12 Bottom
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV ) ) ) ;				// 13
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 14
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 15
 
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 16 Left
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _maxUV ) ) ) ;				// 17
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 18
-		plane.copyVertex( Swivel.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 19
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 16 Left
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, _width ), white, new Vector2( _maxUV ) ) ) ;				// 17
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 18
+		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 19
 
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 20 Right
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 21
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 22
-		plane.copyVertex( Swivel.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 23
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;				// 20 Right
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, _width ), white, new Vector2( _maxUV ) ) ) ;			// 21
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, _width, 0.0f ), white, new Vector2( _minUV.x, _maxUV.y ) ) ) ;	// 22
+		plane.copyVertex( Attribute.createVert( new Vector3( _width, 0.0f, _width ), white, new Vector2( _maxUV.x, _minUV.y ) ) ) ;	// 23
 
 		plane.addIndex( 0 ) ;	// Front Face
 		plane.addIndex( 2 ) ;

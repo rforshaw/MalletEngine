@@ -9,13 +9,13 @@ public class DrawBuffer extends ABuffer
 {
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 	private final Program program ;
-	private final Shape.Swivel[] swivel ;
+	private final Shape.Attribute[] swivel ;
 	private final Shape.Style style ;
 	private final boolean ui ;
 	private final int order ;
 
 	public DrawBuffer( final Program _program,
-					   final Shape.Swivel[] _swivel,
+					   final Shape.Attribute[] _swivel,
 					   final Shape.Style _style,
 					   final boolean _ui,
 					   final int _order )
@@ -64,7 +64,7 @@ public class DrawBuffer extends ABuffer
 		return program ;
 	}
 
-	public Shape.Swivel[] getSwivel()
+	public Shape.Attribute[] getAttribute()
 	{
 		return swivel ;
 	}
@@ -97,7 +97,7 @@ public class DrawBuffer extends ABuffer
 			return false ;
 		}
 
-		if( isCompatibleSwivel( _lhs.getSwivel(), _rhs.getSwivel() ) == false )
+		if( isCompatibleAttribute( _lhs.getAttribute(), _rhs.getAttribute() ) == false )
 		{
 			return false ;
 		}
@@ -126,7 +126,7 @@ public class DrawBuffer extends ABuffer
 			return false ;
 		}
 
-		if( isCompatibleSwivel( _lhs.getSwivel(), _rhs.getSwivel() ) == false )
+		if( isCompatibleAttribute( _lhs.getAttribute(), _rhs.getAttribute() ) == false )
 		{
 			return false ;
 		}
@@ -134,7 +134,7 @@ public class DrawBuffer extends ABuffer
 		return true ;
 	}
 
-	private static boolean isCompatibleSwivel( final IShape.Swivel[] _a, final IShape.Swivel[] _b )
+	private static boolean isCompatibleAttribute( final IShape.Attribute[] _a, final IShape.Attribute[] _b )
 	{
 		if( _a.length != _b.length )
 		{

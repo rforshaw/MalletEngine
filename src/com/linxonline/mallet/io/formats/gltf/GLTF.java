@@ -15,7 +15,7 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 
-import com.linxonline.mallet.renderer.IShape.Swivel ;
+import com.linxonline.mallet.renderer.IShape.Attribute ;
 import com.linxonline.mallet.renderer.IShape.Style ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.MalletColour ;
@@ -49,13 +49,13 @@ public class GLTF
 		return names ;
 	}
 
-	public Shape createMeshByIndex( final int _index, final Tuple<String, Swivel>[] _attributes )
+	public Shape createMeshByIndex( final int _index, final Tuple<String, Attribute>[] _attributes )
 	{
 		final JChunk.Mesh mesh = header.getMesh( _index ) ;
 		return createShapeFromMesh( header, mesh, _attributes ) ;
 	}
 
-	public Shape createMeshByName( final String _name, final Tuple<String, Swivel>[] _attributes )
+	public Shape createMeshByName( final String _name, final Tuple<String, Attribute>[] _attributes )
 	{
 		final int size = header.getMeshSize() ;
 		for( int i = 0; i < size; ++i )
@@ -70,7 +70,7 @@ public class GLTF
 		throw new RuntimeException( "Failed to find requested mesh: " + _name ) ;
 	}
 
-	private Shape createShapeFromMesh( final JChunk _chunk, final JChunk.Mesh _mesh, final Tuple<String, Swivel>[] _attributes )
+	private Shape createShapeFromMesh( final JChunk _chunk, final JChunk.Mesh _mesh, final Tuple<String, Attribute>[] _attributes )
 	{
 		final JChunk.Primitive gPrimitive = _mesh.primitives[0] ;
 
@@ -78,12 +78,12 @@ public class GLTF
 
 		// The model may contain more attributes than we are interested in, 
 		// pull out the buffers we want to use for our vertices.
-		final Swivel[] swivel = new Swivel[length] ;
+		final Attribute[] swivel = new Attribute[length] ;
 		final JChunk.Accessor[] accessors = new JChunk.Accessor[length] ;
 
 		for( int i = 0; i < length; ++i )
 		{
-			final Tuple<String, Swivel> attribute = _attributes[i] ;
+			final Tuple<String, Attribute> attribute = _attributes[i] ;
 			final String name = attribute.getLeft() ;
 			if( name.length() <= 0 )
 			{
@@ -99,7 +99,7 @@ public class GLTF
 			accessors[i] = _chunk.getAccessor( gAttribute.index ) ;
 			swivel[i] = attribute.getRight() ;
 
-			checkSwivelSanity( swivel[i], accessors[i] ) ;
+			checkAttributeSanity( swivel[i], accessors[i] ) ;
 		}
 
 		final int[] indices = readIndices( _chunk, gPrimitive ) ;
@@ -111,7 +111,7 @@ public class GLTF
 		final Shape shape = new Shape( determinMode( gPrimitive ), swivel, indices.length, count ) ;
 		shape.addIndices( indices ) ;
 
-		final Object[] vertex = Swivel.createVert( swivel ) ;
+		final Object[] vertex = Attribute.createVert( swivel ) ;
 		for( int i = 0; i < count; ++i )
 		{
 			for( int j = 0; j < readers.length; ++j )
@@ -177,7 +177,7 @@ public class GLTF
 		return shape ;
 	}
 
-	private JChunk.Accessor createAccessor( final Swivel _swivel )
+	private JChunk.Accessor createAccessor( final Attribute _swivel )
 	{
 		switch( _swivel )
 		{
@@ -236,7 +236,7 @@ public class GLTF
 		}
 	}
 
-	private void checkSwivelSanity( final Swivel _swivel, final JChunk.Accessor _accessor )
+	private void checkAttributeSanity( final Attribute _swivel, final JChunk.Accessor _accessor )
 	{
 		switch( _swivel )
 		{

@@ -26,10 +26,10 @@ public interface IShape
 	}
 
 	/**
-		Use the Swivel to define the vertex structure.
+		Use the Attribute to define the vertex structure.
 		In the realms of OpenGL this defines the attributes.
 	*/
-	public enum Swivel
+	public enum Attribute
 	{
 		VEC3,		// Vector3
 		FLOAT,		// MalletColour
@@ -39,33 +39,33 @@ public interface IShape
 			Return a basic vertex structure of two elements.
 			Point and Colour.
 		*/
-		public static Swivel[] constructDefault()
+		public static Attribute[] constructDefault()
 		{
-			final Swivel[] swivel = new Swivel[2] ;
-			swivel[0] = Swivel.VEC3 ;
-			swivel[1] = Swivel.FLOAT ;
+			final Attribute[] swivel = new Attribute[2] ;
+			swivel[0] = Attribute.VEC3 ;
+			swivel[1] = Attribute.FLOAT ;
 			return swivel ;
 		}
 
-		public static Swivel[] constructSwivel( final Swivel ... _swivel )
+		public static Attribute[] constructAttribute( final Attribute ... _swivel )
 		{
 			return _swivel ;
 		}
 
-		public static Swivel[] getSwivelByArray( final List<String> _text )
+		public static Attribute[] getAttributeByArray( final List<String> _text )
 		{
 			final int size = _text.size() ;
-			final Swivel[] swivel = new Swivel[size] ;
+			final Attribute[] swivel = new Attribute[size] ;
 
 			for( int i = 0; i < size; i++ )
 			{
-				swivel[i] = getSwivelByString( _text.get( i ) ) ;
+				swivel[i] = getAttributeByString( _text.get( i ) ) ;
 			}
 
 			return swivel ;
 		}
 
-		public static Swivel getSwivelByString( final String _text )
+		public static Attribute getAttributeByString( final String _text )
 		{
 			switch( _text )
 			{
@@ -80,11 +80,11 @@ public interface IShape
 			A Vertex should always contain at least one VEC3.
 			If a VEC3 exists return its index location, else return -1.
 		*/
-		public static int getSwivelPointIndex( final Swivel[] _swivel )
+		public static int getAttributePointIndex( final Attribute[] _swivel )
 		{
 			for( int i = 0; i < _swivel.length; i++ )
 			{
-				if( _swivel[i] == Swivel.VEC3 )
+				if( _swivel[i] == Attribute.VEC3 )
 				{
 					return i ;
 				}
@@ -101,7 +101,7 @@ public interface IShape
 
 			A default swivel would return 4. 3 for VEC3, and 1 for FLOAT.
 		*/
-		public static int getSwivelFloatSize( final Swivel[] _swivel, final int _length )
+		public static int getAttributeFloatSize( final Attribute[] _swivel, final int _length )
 		{
 			int size = 0 ;
 			for( int i = 0; i < _length; i++ )
@@ -120,7 +120,7 @@ public interface IShape
 		/**
 			Construct a vertex based on _swivel.
 		*/
-		public static Object[] createVert( final Swivel[] _swivel )
+		public static Object[] createVert( final Attribute[] _swivel )
 		{
 			final Object[] obj = new Object[_swivel.length] ;
 			for( int i = 0; i < _swivel.length; i++ )
@@ -143,7 +143,7 @@ public interface IShape
 	}
 
 	public Style getStyle() ;
-	public Swivel[] getSwivel() ;
+	public Attribute[] getAttribute() ;
 
 	/**
 		Return the number of vertices stored.

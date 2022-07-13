@@ -4,5 +4,5 @@
 	"FRAGMENT": ["base/shaders/web/simple_font_fragment.glsl"],
 
 	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "FONT"}],
-	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
+	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

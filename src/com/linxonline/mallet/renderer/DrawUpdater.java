@@ -70,9 +70,9 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		return drawBuffer.getProgram() ;
 	}
 
-	public Shape.Swivel[] getSwivel()
+	public Shape.Attribute[] getAttribute()
 	{
-		return drawBuffer.getSwivel() ;
+		return drawBuffer.getAttribute() ;
 	}
 
 	public Shape.Style getStyle()

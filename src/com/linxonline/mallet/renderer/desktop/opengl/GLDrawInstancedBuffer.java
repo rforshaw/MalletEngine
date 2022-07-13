@@ -133,14 +133,14 @@ public class GLDrawInstancedBuffer extends GLBuffer
 			// we know a DrawBuffers program can't be fully 
 			// replaced, they'd have to create a new GeometryBuffer 
 			// to do that.
-			attributes = constructVertexAttrib( _buffer.getSwivel(), glProgram ) ;
+			attributes = constructVertexAttrib( _buffer.getAttribute(), glProgram ) ;
 		}
 
 		if( vertexStride <= 0 )
 		{
 			// GeometryBuffer swivel is not expected to change once it is 
 			// set, so we'll only calculate the swivel once.
-			vertexStride = calculateVertexSize( _buffer.getSwivel() ) ;
+			vertexStride = calculateVertexSize( _buffer.getAttribute() ) ;
 			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
 		}
 

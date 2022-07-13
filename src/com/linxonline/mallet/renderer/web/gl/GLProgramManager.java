@@ -71,7 +71,7 @@ public class GLProgramManager extends AbstractManager<GLProgram>
 				final List<String> swivel = MalletList.<String>newList() ;
 
 				fillUniforms( uniforms, _jGL.getJSONArray( "UNIFORMS" ) ) ;
-				fillAttributes( swivel, _jGL.getJSONArray( "SWIVEL" ) ) ;
+				fillAttributes( swivel, _jGL.getJSONArray( "ATTRIBUTES" ) ) ;
 
 				readShaders( _jGL.optString( "NAME", "undefined" ), paths, shaders, uniforms, swivel ) ;
 			}

@@ -124,14 +124,14 @@ public class GLTextBuffer extends GLBuffer
 				// we know a TextBuffers program can't be fully 
 				// replaced, they'd have to create a new TextBuffer 
 				// to do that.
-				attributes = constructVertexAttrib( shape.getSwivel(), glProgram ) ;
+				attributes = constructVertexAttrib( shape.getAttribute(), glProgram ) ;
 			}
 
 			if( vertexStride <= 0 )
 			{
-				// Swivel is not expected to change once it is 
+				// Attribute is not expected to change once it is 
 				// set, so we'll only calculate the swivel once.
-				vertexStride = calculateVertexSize( shape.getSwivel() ) ;
+				vertexStride = calculateVertexSize( shape.getAttribute() ) ;
 				vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
 			}
 
@@ -225,7 +225,7 @@ public class GLTextBuffer extends GLBuffer
 					usedVertexByteSize = shapeVertexByteSize ;
 				}
 
-				final Shape.Swivel[] swivel = shape.getSwivel() ;
+				final Shape.Attribute[] swivel = shape.getAttribute() ;
 				final int verticiesSize = shape.getVerticesSize() ;
 
 				final int GLYPH_POINTS = 4 ;

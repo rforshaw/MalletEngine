@@ -16,7 +16,7 @@ import org.teavm.jso.typedarrays.Uint8Array ;
 
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.Shape.Swivel ;
+import com.linxonline.mallet.renderer.Shape.Attribute ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.ProgramMap ;
@@ -211,7 +211,7 @@ public class GLGeometryUploader
 
 	protected void uploadVBO( final Location _handler, final Shape _shape, final Matrix4 _matrix )
 	{
-		final Shape.Swivel[] swivel = _shape.getSwivel() ;
+		final Shape.Attribute[] swivel = _shape.getAttribute() ;
 		final int vertexSize = calculateVertexSize( swivel ) ;
 		final int verticiesSize = _shape.getVerticesSize() ;
 
@@ -328,7 +328,7 @@ public class GLGeometryUploader
 		return buffer ;
 	}
 
-	private static VertexAttrib[] constructVertexAttrib( final Shape.Swivel[] _swivel, final GLProgram _program )
+	private static VertexAttrib[] constructVertexAttrib( final Shape.Attribute[] _swivel, final GLProgram _program )
 	{
 		final VertexAttrib[] attributes = new VertexAttrib[_swivel.length] ;
 
@@ -361,7 +361,7 @@ public class GLGeometryUploader
 		return attributes ;
 	}
 
-	private static int calculateVertexSize( final Shape.Swivel[] _swivel )
+	private static int calculateVertexSize( final Shape.Attribute[] _swivel )
 	{
 		int size = 0 ;
 		for( int j = 0; j < _swivel.length; j++ )
@@ -436,7 +436,7 @@ public class GLGeometryUploader
 	public abstract class GLBuffer implements IBuffer
 	{
 		protected final GLDrawData.Mode mode ;
-		protected Shape.Swivel[] shapeSwivel ;
+		protected Shape.Attribute[] shapeAttribute ;
 		protected Shape.Style shapeStyle ;
 
 		protected VertexAttrib[] attributes ;
@@ -501,11 +501,11 @@ public class GLGeometryUploader
 
 		protected void initShape( final Shape _shape )
 		{
-			final Shape.Swivel[] swivel = _shape.getSwivel() ;
-			shapeSwivel = Arrays.copyOf( swivel, swivel.length ) ;
-			attributes = constructVertexAttrib( shapeSwivel, baseProgram.getProgram() ) ;
+			final Shape.Attribute[] swivel = _shape.getAttribute() ;
+			shapeAttribute = Arrays.copyOf( swivel, swivel.length ) ;
+			attributes = constructVertexAttrib( shapeAttribute, baseProgram.getProgram() ) ;
 
-			vertexStrideBytes = calculateVertexSize( shapeSwivel ) * VBO_VAR_BYTE_SIZE ;
+			vertexStrideBytes = calculateVertexSize( shapeAttribute ) * VBO_VAR_BYTE_SIZE ;
 
 			shapeStyle = _shape.getStyle() ;
 			switch( shapeStyle )
@@ -648,15 +648,15 @@ public class GLGeometryUploader
 				return false ;
 			}
 
-			final Shape.Swivel[] sw = _shape.getSwivel() ;
-			if( shapeSwivel.length != sw.length )
+			final Shape.Attribute[] sw = _shape.getAttribute() ;
+			if( shapeAttribute.length != sw.length )
 			{
 				return false ;
 			}
 
 			for( int i = 0; i < sw.length; i++ )
 			{
-				if( shapeSwivel[i] != sw[i] )
+				if( shapeAttribute[i] != sw[i] )
 				{
 					return false ;
 				}
@@ -724,7 +724,7 @@ public class GLGeometryUploader
 		*/
 		public void destroy()
 		{
-			shapeSwivel = null ;
+			shapeAttribute = null ;
 			shapeStyle  = null ;
 			attributes  = null ;
 			baseProgram = null ;
@@ -1017,7 +1017,7 @@ public class GLGeometryUploader
 					continue ;
 				}
 
-				final Shape.Swivel[] swivel = shape.getSwivel() ;
+				final Shape.Attribute[] swivel = shape.getAttribute() ;
 				final int vertexSize = calculateVertexSize( swivel ) ;
 				final int verticiesSize = shape.getVerticesSize() ;
 

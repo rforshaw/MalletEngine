@@ -5,6 +5,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 
 public interface IVariant
 {
+	public void setName( String _name ) ;
 	public String getName() ;
 
 	/**

@@ -57,7 +57,7 @@ public class GLDrawBuffer extends GLBuffer
 			// we know a DrawBuffers program can't be fully 
 			// replaced, they'd have to create a new GeometryBuffer 
 			// to do that.
-			attributes = constructVertexAttrib( _buffer.getSwivel(), glProgram ) ;
+			attributes = constructVertexAttrib( _buffer.getAttribute(), glProgram ) ;
 		}
 
 		buffers.clear() ;

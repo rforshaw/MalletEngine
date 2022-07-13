@@ -41,7 +41,7 @@ public class GLProgram extends ProgramManager.Program
 	{
 		program = _program ;
 		inUniforms   = new int[program.getUniforms().size()] ;
-		inAttributes = new int[program.getSwivel().size()] ;
+		inAttributes = new int[program.getAttribute().size()] ;
 
 		final int length = inAttributes.length ;
 		for( int i = 0; i < length; i++ )
@@ -299,7 +299,7 @@ public class GLProgram extends ProgramManager.Program
 		}
 
 		{
-			final List<String> swivel = _program.getSwivel() ;
+			final List<String> swivel = _program.getAttribute() ;
 			final int size = swivel.size() ;
 
 			for( int i = 0; i < size; i++ )

@@ -12,7 +12,7 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
 
-import com.linxonline.mallet.renderer.IShape.Swivel ;
+import com.linxonline.mallet.renderer.IShape.Attribute ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
@@ -518,10 +518,10 @@ public final class GameTestLoader implements IGameLoader
 					{
 						final World world = WorldAssist.getDefault() ;
 						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
-						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, Swivel>>toArray(
-							Tuple.<String, Swivel>build( "POSITION", Swivel.VEC3 ),
-							Tuple.<String, Swivel>build( "", Swivel.FLOAT ),
-							Tuple.<String, Swivel>build( "TEXCOORD_0", Swivel.VEC2 )
+						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, Attribute>>toArray(
+							Tuple.<String, Attribute>build( "POSITION", Attribute.VEC3 ),
+							Tuple.<String, Attribute>build( "", Attribute.FLOAT ),
+							Tuple.<String, Attribute>build( "TEXCOORD_0", Attribute.VEC2 )
 						) ) ;
 						System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
 						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;

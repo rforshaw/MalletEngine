@@ -105,6 +105,12 @@ public class UIVariant implements IVariant
 	}
 
 	@Override
+	public void setName( final String _name )
+	{
+		variable.setName( _name ) ;
+	}
+
+	@Override
 	public String getName()
 	{
 		return variable.getName() ;

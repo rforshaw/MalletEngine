@@ -20,7 +20,7 @@ import com.linxonline.mallet.maths.* ;
 public class WebShape extends Shape
 {
 	private Shape.Style style ;
-	private Shape.Swivel[] swivel ;
+	private Shape.Attribute[] swivel ;
 	private Int16Array indicies ;
 	private Float32Array verticies ;
 	private Uint8Array facadeVerticies ;
@@ -29,12 +29,12 @@ public class WebShape extends Shape
 	private int indexIncrement = 0 ;
 	private int vertexIncrement = 0 ;
 
-	public WebShape( final Shape.Style _style, final Shape.Swivel[] _swivel, final int _indexSize, final int _pointSize )
+	public WebShape( final Shape.Style _style, final Shape.Attribute[] _swivel, final int _indexSize, final int _pointSize )
 	{
 		swivel = _swivel ;
 
 		indicies = Int16Array.create( _indexSize ) ;
-		verticies = Float32Array.create( Shape.Swivel.getSwivelFloatSize( _swivel, _swivel.length ) * _pointSize ) ;
+		verticies = Float32Array.create( Shape.Attribute.getAttributeFloatSize( _swivel, _swivel.length ) * _pointSize ) ;
 		facadeVerticies = Uint8Array.create( verticies.getBuffer() ) ;
 
 		style = _style ;
@@ -44,18 +44,18 @@ public class WebShape extends Shape
 	public WebShape( final Shape _shape )
 	{
 		this( _shape.getStyle(),
-			  _shape.getSwivel(),
+			  _shape.getAttribute(),
 			  _shape.getIndicesSize,
 			  _shape.getVerticesSize() ) ;
 
 		// We've got all the information we need to make this a clean copy.
 		// This should work even if the implementation was changed 
 		// halfway through.
-		final Swivel[] sw = _shape.getSwivel() ;
+		final Attribute[] sw = _shape.getAttribute() ;
 		final int indexSize = _shape.getIndicesSize ;
 		final int vertexSize = _shape.getVerticesSize() ;
 
-		final Object[] vertex = Shape.Swivel.constructSwivel( sw ) ;
+		final Object[] vertex = Shape.Attribute.constructAttribute( sw ) ;
 		for( int i = 0; i < vertexSize; i++ )
 		{
 			copyVertex( _shape.getVertex( vertex, i ) ) ;
@@ -123,7 +123,7 @@ public class WebShape extends Shape
 			return null ;
 		}
 
-		int start = _index * Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
+		int start = _index * Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
 		for( int i = 0; i < swivel.length; i++ )
 		{
 			switch( swivel[i] )
@@ -168,8 +168,8 @@ public class WebShape extends Shape
 	@Override
 	public void setVector3( final int _index, final int _swivelIndex, final float _x, final float _y, final float _z )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * size ) + offset ;
 
 		verticies.set( start,     _x ) ;
@@ -187,8 +187,8 @@ public class WebShape extends Shape
 	@Override
 	public Vector3 getVector3( final int _index, final int _swivelIndex, final Vector3 _point )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * size ) + offset ;
 
 		_point.setXYZ( verticies.get( start ), verticies.get( start + 1 ), verticies.get( start + 2 ) ) ;
@@ -204,8 +204,8 @@ public class WebShape extends Shape
 	@Override
 	public void setVector2( final int _index, final int _swivelIndex, final float _x, final float _y )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * size ) + offset ;
 
 		verticies.set( start, _x ) ;
@@ -222,8 +222,8 @@ public class WebShape extends Shape
 	@Override
 	public Vector2 getVector2( final int _index, final int _swivelIndex, final Vector2 _uv )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * size ) + offset ;
 
 		_uv.setXY( verticies.get( start ), verticies.get( start + 1 ) ) ;
@@ -233,8 +233,8 @@ public class WebShape extends Shape
 	@Override
 	public float getFloat( final int _index, final int _swivelIndex )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( _index * size ) + offset ;
 
 		return verticies.get( start ) ;
@@ -243,8 +243,8 @@ public class WebShape extends Shape
 	@Override
 	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( ( _index * size ) + offset ) * 4 ;
 
 		facadeVerticies.set( start,     _colour.colours[MalletColour.RED] ) ;
@@ -263,8 +263,8 @@ public class WebShape extends Shape
 	@Override
 	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
 	{
-		final int size = Shape.Swivel.getSwivelFloatSize( swivel, swivel.length ) ;
-		final int offset = Shape.Swivel.getSwivelFloatSize( swivel, _swivelIndex ) ;
+		final int size = Shape.Attribute.getAttributeFloatSize( swivel, swivel.length ) ;
+		final int offset = Shape.Attribute.getAttributeFloatSize( swivel, _swivelIndex ) ;
 		final int start = ( ( _index * size ) + offset ) * 4 ;
 
 		_colour.changeColour( ( byte )facadeVerticies.get( start ),
@@ -281,7 +281,7 @@ public class WebShape extends Shape
 	}
 
 	@Override
-	public Shape.Swivel[] getSwivel()
+	public Shape.Attribute[] getAttribute()
 	{
 		return swivel ;
 	}
@@ -307,7 +307,7 @@ public class WebShape extends Shape
 	public static class Factory implements Shape.Factory
 	{
 		@Override
-		public Shape create( final Style _style, final Swivel[] _swivel, final int _indexSize, final int _pointSize )
+		public Shape create( final Style _style, final Attribute[] _swivel, final int _indexSize, final int _pointSize )
 		{
 			return new WebShape( _style, _swivel, _indexSize, _pointSize ) ;
 		}

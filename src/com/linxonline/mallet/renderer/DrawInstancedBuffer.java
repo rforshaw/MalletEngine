@@ -38,7 +38,7 @@ public class DrawInstancedBuffer extends DrawBuffer
 								final int _order,
 								final String _storageName )
 	{
-		super( _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+		super( _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 		shape = _shape ;
 		storageName = _storageName ;
 	}

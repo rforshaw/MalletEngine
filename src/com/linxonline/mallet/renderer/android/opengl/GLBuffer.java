@@ -72,7 +72,7 @@ public class GLBuffer
 		_temp.setIdentity() ;
 	}
 
-	protected static VertexAttrib[] constructVertexAttrib( final Shape.Swivel[] _swivel, final GLProgram _program )
+	protected static VertexAttrib[] constructVertexAttrib( final Shape.Attribute[] _swivel, final GLProgram _program )
 	{
 		final VertexAttrib[] attributes = new VertexAttrib[_swivel.length] ;
 
@@ -105,7 +105,7 @@ public class GLBuffer
 		return attributes ;
 	}
 
-	protected static int calculateVertexSize( final Shape.Swivel[] _swivel )
+	protected static int calculateVertexSize( final Shape.Attribute[] _swivel )
 	{
 		int size = 0 ;
 		for( int j = 0; j < _swivel.length; j++ )

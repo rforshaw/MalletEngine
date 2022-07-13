@@ -23,7 +23,7 @@ public class DrawInstancedUpdaterPool
 											 final boolean _ui,
 											 final int _order )
 	{
-		final IShape.Swivel[] swivel = _shape.getSwivel() ;
+		final IShape.Attribute[] swivel = _shape.getAttribute() ;
 		final IShape.Style style = _shape.getStyle() ;
 	
 		DrawInstancedUpdater updater = get( _world, _program, swivel, style, _ui, _order ) ;
@@ -65,7 +65,7 @@ public class DrawInstancedUpdaterPool
 									 final boolean _ui,
 									 final int _order )
 	{
-		return get( _world, _program, _shape.getSwivel(), _shape.getStyle(), _ui, _order ) ;
+		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class DrawInstancedUpdaterPool
 	*/
 	public DrawInstancedUpdater get( final World _world,
 									 final Program _program,
-									 final IShape.Swivel[] _swivel,
+									 final IShape.Attribute[] _swivel,
 									 final IShape.Style _style,
 									 final boolean _ui,
 									 final int _order )
@@ -120,7 +120,7 @@ public class DrawInstancedUpdaterPool
 					continue ;
 				}
 
-				if( DrawUpdaterPool.isCompatibleSwivel( buffer.getSwivel(), _swivel ) == false )
+				if( DrawUpdaterPool.isCompatibleAttribute( buffer.getAttribute(), _swivel ) == false )
 				{
 					continue ;
 				}

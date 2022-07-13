@@ -3,5 +3,5 @@
 	"VERTEX": ["base/shaders/desktop/simple_vertex.glsl"],
 
 	"UNIFORMS": [],
-	"SWIVEL": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
+	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

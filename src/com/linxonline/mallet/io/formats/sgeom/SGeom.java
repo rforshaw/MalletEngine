@@ -29,7 +29,7 @@ public class SGeom
 
 		final Shape.Style style = Shape.Style.getStyleByString( json.optString( "style", null ) ) ;
 
-		final Shape.Swivel[] swivel = SGeom.constructSwivelOrder( json.getJArray( "swivel" ) ) ;
+		final Shape.Attribute[] swivel = SGeom.constructAttributeOrder( json.getJArray( "swivel" ) ) ;
 		if( swivel == null )
 		{
 			Logger.println( "No swivel order defined.", Logger.Verbosity.NORMAL ) ;
@@ -111,9 +111,9 @@ public class SGeom
 
 			if( vertex != null && swivelIndex == ( swivel.length - 1 ) )
 			{
-				/*if( Shape.isCorrectSwivel( swivel, vertex ) == false )
+				/*if( Shape.isCorrectAttribute( swivel, vertex ) == false )
 				{
-					Logger.println( "Swivel and vertex are out of sync. Unable to build shape.", Logger.Verbosity.NORMAL ) ;
+					Logger.println( "Attribute and vertex are out of sync. Unable to build shape.", Logger.Verbosity.NORMAL ) ;
 					return null ;
 				}*/
 
@@ -124,7 +124,7 @@ public class SGeom
 		return shape ;
 	}
 
-	private static Shape.Swivel[] constructSwivelOrder( final JArray _swivel )
+	private static Shape.Attribute[] constructAttributeOrder( final JArray _swivel )
 	{
 		if( _swivel == null )
 		{
@@ -132,11 +132,11 @@ public class SGeom
 		}
 
 		final int length = _swivel.length() ;
-		final Shape.Swivel[] swivel = new Shape.Swivel[length] ;
+		final Shape.Attribute[] swivel = new Shape.Attribute[length] ;
 
 		for( int i = 0; i < length; i++ )
 		{
-			swivel[i] = Shape.Swivel.getSwivelByString( _swivel.getString( i ) ) ;
+			swivel[i] = Shape.Attribute.getAttributeByString( _swivel.getString( i ) ) ;
 		}
 
 		return swivel ;
