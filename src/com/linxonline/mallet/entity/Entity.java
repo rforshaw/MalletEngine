@@ -99,7 +99,6 @@ public final class Entity
 
 	/**
 		Returns the List that contains all the Entity's Components.
-		NOTE: the List is NOT a copy.
 	**/
 	public final List<Component> getAllComponents( final List<Component> _components )
 	{
