@@ -296,27 +296,27 @@ public class GUIText extends GUIComponent
 			return font.toObject( MalletFont.class )  ;
 		}
 
-		public Connect.Signal xAlignChanged()
+		public final Connect.Signal xAlignChanged()
 		{
 			return xAlign.getSignal() ;
 		}
 
-		public Connect.Signal yAlignChanged()
+		public final Connect.Signal yAlignChanged()
 		{
 			return yAlign.getSignal() ;
 		}
 
-		public Connect.Signal textChanged()
+		public final Connect.Signal textChanged()
 		{
 			return text.getSignal() ;
 		}
 
-		public Connect.Signal colourChanged()
+		public final Connect.Signal colourChanged()
 		{
 			return colour.getSignal() ;
 		}
 
-		public Connect.Signal fontChanged()
+		public final Connect.Signal fontChanged()
 		{
 			return font.getSignal() ;
 		}

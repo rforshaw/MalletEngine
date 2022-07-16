@@ -18,14 +18,15 @@ public class GameSystem implements IGameSystem
 
 	public void runSystem()
 	{
-		double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
+		// Call to ensure we don't have a massive delta
+		// just before the game-loop actually starts.
+		ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 		running = true ;
 
 		stateMachine.resume() ;
 		while( running == true )
 		{
-			dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-			stateMachine.update( dt ) ;						// Update Game State
+			stateMachine.update( ElapsedTimer.getElapsedTimeInNanoSeconds() ) ;						// Update Game State
 		}
 
 		stateMachine.pause() ;

@@ -97,17 +97,17 @@ public class UITextField extends UIElement
 		return text ;
 	}
 
-	public Connect.Signal cursorIndexChanged()
+	public final Connect.Signal cursorIndexChanged()
 	{
 		return cursorIndexChanged ;
 	}
 
-	public Connect.Signal textChanged()
+	public final Connect.Signal textChanged()
 	{
 		return textChanged ;
 	}
 
-	public Connect.Signal submitChanged()
+	public final Connect.Signal submitChanged()
 	{
 		return submitChanged ;
 	}

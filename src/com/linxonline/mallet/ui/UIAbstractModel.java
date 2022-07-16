@@ -23,7 +23,7 @@ public class UIAbstractModel implements IAbstractModel
 	}
 
 	@Override
-	public UIModelIndex root()
+	public final UIModelIndex root()
 	{
 		return root.getHandler() ;
 	}

@@ -72,7 +72,7 @@ public class UICheckbox extends UIElement
 		return checked ;
 	}
 
-	public Connect.Signal checkChanged()
+	public final Connect.Signal checkChanged()
 	{
 		return checkChanged ;
 	}

@@ -54,7 +54,7 @@ public abstract class AbstractManager<K, T extends Resource> implements ILoader<
 	}
 	
 	@Override
-	public ResourceLoader<K, T> getResourceLoader()
+	public final ResourceLoader<K, T> getResourceLoader()
 	{
 		return abstractLoader ;
 	}

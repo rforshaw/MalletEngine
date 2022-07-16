@@ -4,6 +4,9 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
+/**
+	Update the entities one at a time on the calling thread.
+*/
 public class DefaultSTUpdate implements IEntityUpdate
 {
 	public DefaultSTUpdate() {}

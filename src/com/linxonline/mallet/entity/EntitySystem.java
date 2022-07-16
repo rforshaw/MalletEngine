@@ -99,13 +99,12 @@ public class EntitySystem implements IEntitySystem
 		}
 
 		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-		final List<Component> components = MalletList.<Component>newList() ;
 
 		final int size = entitiesToAdd.size() ;
 		for( int i = 0; i < size; ++i )
 		{
 			final Entity entity = entitiesToAdd.get( i ) ;
-			hookEntity( eventSystem, events, entity, components ) ;
+			hookEntity( eventSystem, events, entity ) ;
 			entities.add( entity ) ;
 		}
 		entitiesToAdd.clear() ;
@@ -127,14 +126,13 @@ public class EntitySystem implements IEntitySystem
 		}
 
 		final List<Event<?>> events = MalletList.<Event<?>>newList() ;
-		final List<Component> components = MalletList.<Component>newList() ;
 
 		final int size = cleanup.size() ;
 		for( int i = 0; i < size; ++i )
 		{
 			final Entity entity = cleanup.get( i ) ;
 
-			unhookEntity( eventSystem, events, entity, components ) ;
+			unhookEntity( eventSystem, events, entity ) ;
 			entities.remove( entity ) ;
 		}
 		cleanup.clear() ;
@@ -172,51 +170,29 @@ public class EntitySystem implements IEntitySystem
 		return _entities ;
 	}
 
-	private void hookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity, final List<Component> _components )
+	private void hookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity )
 	{
-		{
-			// Retrieve component system-registering events.
-			final int size = _entity.getAllComponents( _components ).size() ;
-			for( int i = 0; i < size; ++i )
-			{
-				final Component component = _components.get( i ) ;
-				component.passInitialEvents( _events ) ;
-			}
-		}
+		_entity.passInitialEvents( _events ) ;
 
+		final int size = _events.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int size = _events.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				_eventSystem.addEvent( _events.get( i ) ) ;
-			}
+			_eventSystem.addEvent( _events.get( i ) ) ;
 		}
 
 		_events.clear() ;
-		_components.clear() ;
 	}
 
-	private void unhookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity, final List<Component> _components )
+	private void unhookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity )
 	{
-		{
-			// Retrieve component system-registering events.
-			final int size = _entity.getAllComponents( _components ).size() ;
-			for( int i = 0; i < size; ++i )
-			{
-				final Component component = _components.get( i ) ;
-				component.passFinalEvents( _events ) ;		// Retrieve the Events that will unregister the components
-			}
-		}
+		_entity.passFinalEvents( _events ) ;
 
+		final int size = _events.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			final int size = _events.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				_eventSystem.addEvent( _events.get( i ) ) ;
-			}
+			_eventSystem.addEvent( _events.get( i ) ) ;
 		}
 
 		_events.clear() ;
-		_components.clear() ;
 	}
 }

@@ -5,6 +5,12 @@ import java.util.List ;
 import com.linxonline.mallet.util.thread.* ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
+/**
+	Update the entities using worker threads.
+	Break the list into blocks and have the workers
+	process them.
+	NOTE: This is a multi-threaded approach.
+*/
 public class DefaultMTUpdate implements IEntityUpdate
 {
 	private final WorkerGroup workers ;

@@ -95,12 +95,12 @@ public class UIButton extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public Connect.Signal pressed()
+	public final Connect.Signal pressed()
 	{
 		return pressed ;
 	}
 
-	public Connect.Signal released()
+	public final Connect.Signal released()
 	{
 		return released ;
 	}

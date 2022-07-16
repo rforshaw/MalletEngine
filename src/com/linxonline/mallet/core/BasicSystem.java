@@ -89,43 +89,43 @@ public abstract class BasicSystem<F extends FileSystem,
 	}
 
 	@Override
-	public F getFileSystem()
+	public final F getFileSystem()
 	{
 		return fileSystem ;
 	}
 
 	@Override
-	public S getShutdownDelegate()
+	public final S getShutdownDelegate()
 	{
 		return shutdownDelegate ;
 	}
 
 	@Override
-	public R getRenderer()
+	public final R getRenderer()
 	{
 		return renderer ;
 	}
 
 	@Override
-	public A getAudioGenerator()
+	public final A getAudioGenerator()
 	{
 		return audioGenerator ;
 	}
 
 	@Override
-	public I getInput()
+	public final I getInput()
 	{
 		return inputSystem ;
 	}
 
 	@Override
-	public E getEventSystem()
+	public final E getEventSystem()
 	{
 		return eventSystem ;
 	}
 
 	@Override
-	public G getGameSystem()
+	public final G getGameSystem()
 	{
 		return gameSystem ;
 	}

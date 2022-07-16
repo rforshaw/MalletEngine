@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.Tuple ;
 	processed during the EventSystem update(). And not during an 
 	objects actual update time.
 **/
-public class EventController implements IEventHandler
+public class EventController implements IEventController
 {
 	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) -> {} ;
 
@@ -63,7 +63,7 @@ public class EventController implements IEventHandler
 		messenger = MalletList.<Event<?>>newList( eventCapacity ) ;
 	}
 
-	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
+	public final <T> void addProcessor( final String _type, final IProcessor<T> _processor )
 	{
 		final EventType type = EventType.get( _type ) ;
 		if( wantedTypes.contains( type ) == false )
@@ -80,6 +80,7 @@ public class EventController implements IEventHandler
 		If an EventSystem is added the FALLBACK is removed - if the 
 		addInterface is reset to a null state the FALLBACK is reintroduced.
 	*/
+	@Override
 	public void setAddEventInterface( final IAddEvent _addInterface )
 	{
 		if( _addInterface != null )
@@ -102,6 +103,7 @@ public class EventController implements IEventHandler
 		Should not be overriden.
 		Adds events to messenger and will process them at the appropriate time.
 	**/
+	@Override
 	public void processEvent( final Event<?> _event )
 	{
 		messenger.add( _event ) ;
@@ -111,6 +113,7 @@ public class EventController implements IEventHandler
 		Should be called during an update.
 		Override processEvent() if you wish to use the Events passed in
 	*/
+	@Override
 	public void update()
 	{
 		if( messenger.isEmpty() )
@@ -136,17 +139,20 @@ public class EventController implements IEventHandler
 	/**
 		Pass Event back to an EventSystem defined by addInterface.
 	**/
+	@Override
 	public void passEvent( final Event<?> _event )
 	{
 		addInterface.addEvent( _event ) ;
 	}
 
+	@Override
 	public void clearEvents()
 	{
 		messenger.clear() ;
 		ADD_EVENT_FALLBACK.clear() ;
 	}
 
+	@Override
 	public List<EventType> getWantedEventTypes( List<EventType> _fill )
 	{
 		_fill.addAll( wantedTypes ) ;

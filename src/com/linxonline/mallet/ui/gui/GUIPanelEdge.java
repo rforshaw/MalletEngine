@@ -144,17 +144,17 @@ public class GUIPanelEdge extends GUIDrawEdge
 			return _populate ;
 		}
 
-		public Connect.Signal neutralChanged()
+		public final Connect.Signal neutralChanged()
 		{
 			return uvChanged() ;
 		}
 
-		public Connect.Signal rolloverChanged()
+		public final Connect.Signal rolloverChanged()
 		{
 			return rollover.getSignal() ;
 		}
 		
-		public Connect.Signal clickedChanged()
+		public final Connect.Signal clickedChanged()
 		{
 			return clicked.getSignal() ;
 		}

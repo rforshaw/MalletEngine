@@ -18,6 +18,7 @@ import com.linxonline.mallet.event.EventSystem ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.InterceptController ;
 import com.linxonline.mallet.event.IEventSystem ;
+import com.linxonline.mallet.event.IEventController ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.CollisionSystem ;
@@ -541,19 +542,19 @@ public class GameState extends State
 			inputWorldSystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_GAME_STATE_EVENT", ( final EventController _controller ) ->
+		_internal.addProcessor( "ADD_GAME_STATE_EVENT", ( final IEventController _controller ) ->
 		{
 			_controller.setAddEventInterface( eventSystem ) ;
 			eventSystem.addHandler( _controller ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final EventController _controller ) ->
+		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final IEventController _controller ) ->
 		{
 			eventSystem.removeHandler( _controller ) ;
 			_controller.setAddEventInterface( null ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final EventController _controller ) ->
+		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final IEventController _controller ) ->
 		{
 			final IEventSystem eventBackend = system.getEventSystem() ;
 
@@ -561,7 +562,7 @@ public class GameState extends State
 			eventBackend.addHandler( _controller ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_BACKEND_EVENT", ( final EventController _controller ) ->
+		_internal.addProcessor( "REMOVE_BACKEND_EVENT", ( final IEventController _controller ) ->
 		{
 			final IEventSystem eventBackend = system.getEventSystem() ;
 			eventBackend.removeHandler( _controller ) ;

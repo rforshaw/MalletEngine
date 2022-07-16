@@ -280,12 +280,10 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 				GLRenderer.this.invokeLater( () ->
 				{
 					final GLProgram glProgram = programs.get( _program.getID() ) ;
-					if( glProgram == null )
+					if( glProgram != null )
 					{
-						add( _program ) ;
-						return ;
+						programLookup.unmap( _program.index() ) ;
 					}
-					programLookup.map( _program.index(), _program, glProgram ) ;
 				} ) ;
 				return _program ;
 			}
@@ -293,16 +291,13 @@ public class GLRenderer extends BasicRenderer implements GLEventListener
 			@Override
 			public Program update( final Program _program )
 			{
-				GLRenderer.this.invokeLater( () ->
+				// Not used, you don't update a glProgram.
+				// It gets updated/remapped when you update the draw buffer.
+				/*GLRenderer.this.invokeLater( () ->
 				{
 					final int index = _program.index() ;
 					final GLProgram glProgram = programLookup.getRHS( index ) ;
-					if( glProgram == null )
-					{
-						glProgram.destroy() ;
-						programLookup.unmap( index ) ;
-					}
-				} ) ;
+				} ) ;*/
 				return _program ;
 			}
 		} ;

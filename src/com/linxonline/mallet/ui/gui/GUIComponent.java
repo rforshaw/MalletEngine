@@ -179,7 +179,7 @@ public abstract class GUIComponent extends UIElement.Component
 		This slot is called when the parent element has been made 
 		visible and is expected to display something to the screen.
 	*/
-	public Connect.Slot<UIElement> addDrawSlot()
+	public final Connect.Slot<UIElement> addDrawSlot()
 	{
 		return addDrawSlot ;
 	}
@@ -188,7 +188,7 @@ public abstract class GUIComponent extends UIElement.Component
 		This slot is called when the parent element has been made 
 		invisible and is expected to not display anything to the screen.
 	*/
-	public Connect.Slot<UIElement> removeDrawSlot()
+	public final Connect.Slot<UIElement> removeDrawSlot()
 	{
 		return removeDrawSlot ;
 	}
@@ -197,7 +197,7 @@ public abstract class GUIComponent extends UIElement.Component
 		This slot is called when the parent element has changed 
 		position and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<UIElement> positionSlot()
+	public final Connect.Slot<UIElement> positionSlot()
 	{
 		return positionSlot ;
 	}
@@ -206,7 +206,7 @@ public abstract class GUIComponent extends UIElement.Component
 		This slot is called when the parent element has changed 
 		offset and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<UIElement> offsetSlot()
+	public final Connect.Slot<UIElement> offsetSlot()
 	{
 		return offsetSlot ;
 	}
@@ -215,7 +215,7 @@ public abstract class GUIComponent extends UIElement.Component
 		This slot is called when the parent element has changed 
 		length and the GUI is expected to reflect that.
 	*/
-	public Connect.Slot<UIElement> lengthSlot()
+	public final Connect.Slot<UIElement> lengthSlot()
 	{
 		return lengthSlot ;
 	}

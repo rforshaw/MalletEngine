@@ -249,7 +249,7 @@ public class AudioSystem
 		return "Audio System" ;
 	}
 
-	protected AudioDelegate constructAudioDelegate()
+	private AudioDelegate constructAudioDelegate()
 	{
 		return new AudioDelegate()
 		{

@@ -73,7 +73,7 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 		dynamics.ensureCapacity( dynamics.size() + _dynamics.length ) ;
 		for( final D dynamic : _dynamics )
 		{
-			dynamics.remove( dynamics ) ;
+			dynamics.add( dynamic ) ;
 		}
 	}
 
@@ -82,7 +82,7 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 		forceUpdate() ;
 		for( final D dynamic : _dynamics )
 		{
-			dynamics.remove( dynamics ) ;
+			dynamics.remove( dynamic ) ;
 		}
 	}
 

@@ -616,7 +616,6 @@ public class UILayout extends UIElement implements IChildren
 				final Vector3 margin = reference.getMargin() ;
 
 				final Vector3 layoutLength = UILayout.this.getLength() ;
-				final Vector3 layoutMargin = UILayout.this.getMargin() ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
 				childPosition.setXYZ( layoutPosition ) ;

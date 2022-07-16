@@ -31,6 +31,7 @@ public class InterceptController implements IIntercept
 		processors.add( type, _processor ) ;
 	}
 
+	@Override
 	public boolean allow( final Event<?> _event )
 	{
 		final IProcessor proc = processors.get( _event.getEventType() ) ;

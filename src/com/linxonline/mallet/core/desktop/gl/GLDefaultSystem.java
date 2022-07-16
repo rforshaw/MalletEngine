@@ -41,8 +41,6 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 			   new InputSystem(),
 			   new DesktopFileSystem(),
 			   new GameSystem() ) ;
-
-		getGameSystem().setMainSystem( this ) ;
 	}
 
 	public GLWindow getWindow()
@@ -53,6 +51,8 @@ public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	@Override
 	public void initSystem()
 	{
+		getGameSystem().setMainSystem( this ) ;
+
 		initEventProcessors() ;
 
 		final GLRenderer render = getRenderer() ;

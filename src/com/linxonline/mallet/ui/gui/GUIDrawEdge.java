@@ -92,7 +92,7 @@ public class GUIDrawEdge extends GUIDraw
 			return edge.toFloat() ;
 		}
 
-		public Connect.Signal edgeChanged()
+		public final Connect.Signal edgeChanged()
 		{
 			return edge.getSignal() ;
 		}

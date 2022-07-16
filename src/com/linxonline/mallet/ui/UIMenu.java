@@ -94,7 +94,7 @@ public class UIMenu extends UILayout
 			return thickness.toFloat() ;
 		}
 
-		public Connect.Signal thicknessChanged()
+		public final Connect.Signal thicknessChanged()
 		{
 			return thickness.getSignal() ;
 		}

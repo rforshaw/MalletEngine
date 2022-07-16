@@ -44,7 +44,6 @@ public class DesktopStarter extends IStarter
 	public DesktopStarter( final ISystem _main, final IGameLoader _loader )
 	{
 		super( _main, _loader ) ;
-		init() ;
 	}
 
 	public void init()

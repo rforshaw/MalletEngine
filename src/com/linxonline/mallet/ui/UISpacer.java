@@ -96,7 +96,7 @@ public class UISpacer extends UIElement
 			return axis.toObject( Axis.class ) ;
 		}
 
-		public Connect.Signal axisChanged()
+		public final Connect.Signal axisChanged()
 		{
 			return axis.getSignal() ;
 		}

@@ -11,7 +11,7 @@ import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class UIList extends UILayout
+public final class UIList extends UILayout
 {
 	private final FrameBuffer frame ;
 	private World externalWorld ;

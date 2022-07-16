@@ -11,6 +11,7 @@ public final class DesktopTestMain
 	public static void main( final String _args[] )
 	{
 		final DesktopStarter starter = new DesktopStarter( new GameTestLoader() ) ;
+		starter.init() ;
 		starter.run() ;
 	}
 }

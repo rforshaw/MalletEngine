@@ -9,7 +9,7 @@ import com.linxonline.mallet.event.* ;
 /**
 	Allows a Component to send or recieve Events during runtime.
 	
-	An Event Component recieves Events from the Game State it resides
+	An Event Component receives Events from the Game State it resides
 	within. By overriding processEvent() you can manipulate Events it 
 	is registered to view.
 	
@@ -62,7 +62,7 @@ public class EventComponent extends Component
 	{
 		return createController( _processors ) ;
 	}
-	
+
 	private static EventController createController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
 	{
 		if( _processors == null )

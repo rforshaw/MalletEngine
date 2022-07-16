@@ -904,7 +904,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the position of the element 
 		has been changed using setPosition().
 	*/
-	public Connect.Signal positionChanged()
+	public final Connect.Signal positionChanged()
 	{
 		return positionChanged ;
 	}
@@ -913,7 +913,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the offset of the element 
 		has been changed using setOffset().
 	*/
-	public Connect.Signal offsetChanged()
+	public final Connect.Signal offsetChanged()
 	{
 		return offsetChanged ;
 	}
@@ -922,17 +922,17 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the length of the element 
 		has been changed using setLength().
 	*/
-	public Connect.Signal lengthChanged()
+	public final Connect.Signal lengthChanged()
 	{
 		return lengthChanged ;
 	}
 
-	public Connect.Signal minLengthChanged()
+	public final Connect.Signal minLengthChanged()
 	{
 		return minLengthChanged ;
 	}
 
-	public Connect.Signal maxLengthChanged()
+	public final Connect.Signal maxLengthChanged()
 	{
 		return maxLengthChanged ;
 	}
@@ -941,7 +941,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the margin of the element 
 		has been changed using setMargin().
 	*/
-	public Connect.Signal marginChanged()
+	public final Connect.Signal marginChanged()
 	{
 		return marginChanged ;
 	}
@@ -950,7 +950,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element has been flagged 
 		for destruction and will be destroyed.
 	*/
-	public Connect.Signal elementDestroyed()
+	public final Connect.Signal elementDestroyed()
 	{
 		return elementDestroyed ;
 	}
@@ -959,7 +959,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element has been flagged 
 		to be visible to the user.
 	*/
-	public Connect.Signal elementShown()
+	public final Connect.Signal elementShown()
 	{
 		return elementShown ;
 	}
@@ -968,7 +968,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element has been flagged 
 		to be invisible to the user.
 	*/
-	public Connect.Signal elementHidden()
+	public final Connect.Signal elementHidden()
 	{
 		return elementHidden ;
 	}
@@ -977,7 +977,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element has had its layer 
 		change to a different value.
 	*/
-	public Connect.Signal layerChanged()
+	public final Connect.Signal layerChanged()
 	{
 		return layerChanged ;
 	}
@@ -986,7 +986,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element is considered 
 		engaged with the user.
 	*/
-	public Connect.Signal elementEngaged()
+	public final Connect.Signal elementEngaged()
 	{
 		return elementEngaged ;
 	}
@@ -995,7 +995,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Called when the element is considered 
 		not engaged with the user.
 	*/
-	public Connect.Signal elementDisengaged()
+	public final Connect.Signal elementDisengaged()
 	{
 		return elementDisengaged ;
 	}
@@ -1005,7 +1005,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		by the user.
 		An element that is enabled can be engaged.
 	*/
-	public Connect.Signal elementEnabled()
+	public final Connect.Signal elementEnabled()
 	{
 		return elementEnabled ;
 	}
@@ -1015,7 +1015,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		usable by the user.
 		An element that is disabled cannot be engaged.
 	*/
-	public Connect.Signal elementDisabled()
+	public final Connect.Signal elementDisabled()
 	{
 		return elementDisabled ;
 	}
@@ -1023,7 +1023,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	/**
 		Called when the shutdown operation is initiated.
 	*/
-	public Connect.Signal elementShutdown()
+	public final Connect.Signal elementShutdown()
 	{
 		return elementShutdown ;
 	}
@@ -1031,7 +1031,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	/**
 		Called when the clear operation is initiated.
 	*/
-	public Connect.Signal elementClear()
+	public final Connect.Signal elementClear()
 	{
 		return elementClear ;
 	}
@@ -1039,7 +1039,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	/**
 		Called when the reset operation is initiated.
 	*/
-	public Connect.Signal elementReset()
+	public final Connect.Signal elementReset()
 	{
 		return elementReset ;
 	}
@@ -1512,62 +1512,62 @@ public class UIElement implements IInputHandler, Connect.Connection
 			return connect ;
 		}
 
-		public Connect.Signal nameChanged()
+		public final Connect.Signal nameChanged()
 		{
 			return name.getSignal() ;
 		}
 
-		public Connect.Signal layerChanged()
+		public final Connect.Signal layerChanged()
 		{
 			return layer.getSignal() ;
 		}
 
-		public Connect.Signal disableChanged()
+		public final Connect.Signal disableChanged()
 		{
 			return disabled.getSignal() ;
 		}
 
-		public Connect.Signal visibleChanged()
+		public final Connect.Signal visibleChanged()
 		{
 			return visible.getSignal() ;
 		}
 
-		public Connect.Signal positionChanged()
+		public final Connect.Signal positionChanged()
 		{
 			return position.getSignal() ;
 		}
 
-		public Connect.Signal offsetChanged()
+		public final Connect.Signal offsetChanged()
 		{
 			return offset.getSignal() ;
 		}
 
-		public Connect.Signal marginChanged()
+		public final Connect.Signal marginChanged()
 		{
 			return margin.getSignal() ;
 		}
 
-		public Connect.Signal lengthChanged()
+		public final Connect.Signal lengthChanged()
 		{
 			return length.getSignal() ;
 		}
 
-		public Connect.Signal minimumLengthChanged()
+		public final Connect.Signal minimumLengthChanged()
 		{
 			return minimumLength.getSignal() ;
 		}
 
-		public Connect.Signal maximumLengthChanged()
+		public final Connect.Signal maximumLengthChanged()
 		{
 			return maximumLength.getSignal() ;
 		}
 		
-		public Connect.Signal listenerAdded()
+		public final Connect.Signal listenerAdded()
 		{
 			return listenerAdded ;
 		}
 
-		public Connect.Signal listenerRemoved()
+		public final Connect.Signal listenerRemoved()
 		{
 			return listenerRemoved ;
 		}

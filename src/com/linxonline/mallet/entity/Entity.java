@@ -13,42 +13,105 @@ import com.linxonline.mallet.event.* ;
 	Entity is a container class for Components.
 	By default an Entity should have a name, and a global family name.
 	For example an Entity could be named HENCHMAN, and be in the ENEMY family.
-	
+
 	Entity also allows an internal component to send messages to other components,
 	it operates in a similar basis to the EventSystem.
-	
-	Entity does not have the capabilities to receive Events from a Game State, this 
-	should be done through a component like EventComponent that can then route it 
-	through the Component Event System.
+
+	Entity has the ability to receive and send events to the system and/or
+	game-state if specified. A default construction of an entity will only
+	allow for local communication between components.
 **/
-public final class Entity
+public class Entity
 {
 	public enum AllowEvents
 	{
-		YES,
-		NO
+		LOCAL,			// Allow components to communicate directly with each other.
+		GAMESTATE,		// Allow components to pass events to the game-state
+		SYSTEM,			// Allow components to pass events to the system
+		YES,			// Same as Local
+		NO				// No events can be called without crashing.
 	}
 
 	private final Component[] components ;
-	private final IEventSystem eventSystem ;		// Component Event System
+	private IEventSystem eventSystem = null ;										// Component Event System
+	private IEventController stateController = NullEventController.FALLBACK  ;		// Used to talk to GameState
+	private IEventController systemController = NullEventController.FALLBACK  ;		// Used to talk to GLDefaultSystem
 
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 	private Entity.ReadyCallback readyDestroy ;
 
 	public Entity( final int _capacity )
 	{
-		this( _capacity, AllowEvents.YES ) ;
+		this( _capacity, AllowEvents.LOCAL ) ;
 	}
-	
-	public Entity( final int _capacity, final AllowEvents _allow )
+
+	public Entity( final int _capacity, final AllowEvents ... _allow )
 	{
 		components = new Component[_capacity] ;
-		switch( _allow )
+		for( final AllowEvents allow : _allow )
 		{
-			default  :
-			case YES : eventSystem = new EventSystem( _capacity ) ; break ;
-			case NO  : eventSystem = null ; break ;
+			switch( allow )
+			{
+				default        :
+				case YES       :
+				case LOCAL     : eventSystem = new EventSystem( _capacity ) ; break ;
+				case GAMESTATE : stateController = createStateEventController() ; break ;
+				case SYSTEM    : systemController = createSystemEventController() ; break ;
+			}
 		}
+	}
+
+	/**
+		Override to add Event Processors to the component's
+		State Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		return createController( _processors ) ;
+	}
+
+	/**
+		Override to add Event Processors to the component's
+		Backend Event Controller.
+		Make sure to call super to ensure parents 
+		component Event Processors are added.
+	*/
+	public EventController createSystemEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		return createController( _processors ) ;
+	}
+
+	private static EventController createController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	{
+		if( _processors == null )
+		{
+			return new EventController() ;
+		}
+
+		if( _processors.length == 0 )
+		{
+			return new EventController() ;
+		}
+
+		return new EventController( _processors ) ;
+	}
+
+	/**
+		Convienience method to EventController's passEvent.
+	**/
+	public void passBackendEvent( final Event _event )
+	{
+		systemController.passEvent( _event ) ;
+	}
+
+	/**
+		Convienience method to EventController's passEvent.
+	**/
+	public void passStateEvent( final Event _event )
+	{
+		stateController.passEvent( _event ) ;
 	}
 
 	private void addComponent( Component _component )
@@ -60,7 +123,7 @@ public final class Entity
 				components[i] = _component ;
 				if( eventSystem != null )
 				{
-					final EventController controller = _component.getComponentEventController() ;
+					final IEventController controller = _component.getComponentEventController() ;
 					if( controller != null )
 					{
 						controller.setAddEventInterface( eventSystem ) ;
@@ -76,6 +139,45 @@ public final class Entity
 	}
 
 	/**
+		Create events and add them to _events.
+		The events will be passed to the Event System
+		of the Game State. Use an Event to register the 
+		component or variables it holds to external systems.
+		Can also be used for any other events that may need 
+		to be passed when the component is added to the Entity System. 
+	*/
+	public void passInitialEvents( final List<Event<?>> _events )
+	{
+		_events.add( new Event<IEventController>( "ADD_BACKEND_EVENT", systemController ) ) ;
+		_events.add( new Event<IEventController>( "ADD_GAME_STATE_EVENT", stateController ) ) ;
+
+		for( final Component component : components )
+		{
+			component.passInitialEvents( _events ) ;
+		}
+	}
+
+	/**
+		Create events and add them to _events.
+		The events will be passed to the Event System
+		of the Game State. Use an Event to cleanup the 
+		component or variables it holds to external systems.
+		Can also be used for any other events that may need 
+		to be passed when the component is removed from the Entity System.
+		super.passFinalEvents(), must be called.
+	*/
+	public void passFinalEvents( final List<Event<?>> _events )
+	{
+		_events.add( new Event<IEventController>( "REMOVE_BACKEND_EVENT", systemController )  ) ;
+		_events.add( new Event<IEventController>( "REMOVE_GAME_STATE_EVENT", stateController )  ) ;
+
+		for( final Component component : components )
+		{
+			component.passFinalEvents( _events ) ;
+		}
+	}
+
+	/**
 		Update the message system of the Entity
 		and update the Components
 	**/
@@ -88,6 +190,9 @@ public final class Entity
 			// do not inter-communicate.
 			eventSystem.sendEvents() ;
 		}
+
+		systemController.update() ;
+		stateController.update() ;
 
 		// Update Components
 		final int size = components.length ;
@@ -133,6 +238,14 @@ public final class Entity
 	*/
 	public final void destroy()
 	{
+		if( components.length <= 0 )
+		{
+			// The entity contains no components so
+			// we can destroy the entity straight away.
+			destroy = true ;
+			return ;
+		}
+	
 		if( readyDestroy != null )
 		{
 			return ;
@@ -196,7 +309,7 @@ public final class Entity
 
 	public abstract class Component
 	{
-		protected final EventController componentEvents ;	// Handles events from parent
+		protected final IEventController componentEvents ;	// Handles events from parent
 		private boolean disabled = false ;
 
 		public Component()
@@ -210,7 +323,7 @@ public final class Entity
 			{
 				default :
 				case YES     : componentEvents = createEventController() ; break ;
-				case NO      : componentEvents = null ;
+				case NO      : componentEvents = NullEventController.FALLBACK ;
 			}
 
 			getParent().addComponent( this ) ;
@@ -222,10 +335,7 @@ public final class Entity
 		**/
 		public void update( final float _dt )
 		{
-			if( componentEvents != null )
-			{
-				componentEvents.update() ;
-			}
+			componentEvents.update() ;
 		}
 
 		/**
@@ -268,10 +378,7 @@ public final class Entity
 		*/
 		public void passFinalEvents( final List<Event<?>> _events )
 		{
-			if( componentEvents != null )
-			{
-				componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
-			}
+			componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
 		}
 
 		/**
@@ -296,7 +403,7 @@ public final class Entity
 			Return the internal Event Controller for this component.
 			Passes and Receives event components within the parent Entity. 
 		*/
-		public EventController getComponentEventController()
+		public IEventController getComponentEventController()
 		{
 			return componentEvents ;
 		}

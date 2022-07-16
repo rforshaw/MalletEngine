@@ -149,7 +149,7 @@ public final class GameTestLoader implements IGameLoader
 					button2.setVisible( !button2.isVisible() ) ;
 				} ) ;
 
-				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1 ) ;
 				final UIComponent component = new UIComponent( entity ) ;
 				component.addElement( jUI.getParent() ) ;
 
@@ -241,7 +241,7 @@ public final class GameTestLoader implements IGameLoader
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() )  ) ;
 				booklet.play( "DEFAULT" ) ;
 
-				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1 ) ;
 				new Component( entity )
 				{
 					private final static float DURATION = 5.0f ;
@@ -354,7 +354,7 @@ public final class GameTestLoader implements IGameLoader
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
 				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
 
-				final Entity entity = new Entity( 1 + amount, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1 + amount ) ;
 
 				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
 				final Draw[] draws = new Draw[amount] ;
@@ -389,7 +389,7 @@ public final class GameTestLoader implements IGameLoader
 					}
 				}
 
-				final RenderComponent render = new RenderComponent( entity, Entity.AllowEvents.NO )
+				new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
 					private DrawInstancedUpdater updater ;
 					//private DrawUpdater debugUpdater ;
@@ -460,7 +460,6 @@ public final class GameTestLoader implements IGameLoader
 			public void createMouseAnimExample()
 			{
 				final World world = WorldAssist.getDefault() ;
-				final IntVector2 dim = world.getRenderDimensions( new IntVector2() ) ;
 
 				final Program program = new Program( "SIMPLE_TEXTURE" ) ;
 				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
@@ -468,7 +467,7 @@ public final class GameTestLoader implements IGameLoader
 				final Draw draw = new Draw( 0, 0, 0, -16, -16, 0 ) ;
 				draw.setShape( plane ) ;
 
-				final Entity entity = new Entity( 2, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 2 ) ;
 
 				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
@@ -483,7 +482,7 @@ public final class GameTestLoader implements IGameLoader
 																					   new Vector2( -16, -16 ) ) ;
 				//collision.hull.setPhysical( false ) ;
 
-				final MouseComponent mouse = new MouseComponent( entity )
+				new MouseComponent( entity )
 				{
 					@Override
 					public void applyMousePosition( final Vector2 _mouse )
@@ -504,7 +503,7 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createSpinningCubeExample()
 			{
-				final Entity entity = new Entity( 1, Entity.AllowEvents.NO ) ;
+				final Entity entity = new Entity( 1 ) ;
 
 				new RenderComponent( entity )
 				{
@@ -568,8 +567,7 @@ public final class GameTestLoader implements IGameLoader
 			public void createEventMessageTest()
 			{
 				{
-					final Entity receive = new Entity( 1, Entity.AllowEvents.NO ) ;
-					final EventComponent event = new EventComponent( receive )
+					final Entity receive = new Entity( 0, Entity.AllowEvents.GAMESTATE )
 					{
 						@Override
 						public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
@@ -587,9 +585,8 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final Entity send = new Entity( 1, Entity.AllowEvents.NO ) ;
-					final EventComponent event = new EventComponent( send ) ;
-					event.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
+					final Entity send = new Entity( 0, Entity.AllowEvents.GAMESTATE  ) ;
+					send.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
 
 					addEntity( send ) ;
 				}
