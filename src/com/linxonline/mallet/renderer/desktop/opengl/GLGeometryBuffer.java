@@ -46,6 +46,7 @@ public class GLGeometryBuffer extends GLBuffer
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3() ;
 
+	private GeometryBuffer.IOcclude occluder = GeometryBuffer.OCCLUDER_FALLBACK ;
 	private boolean stable = false ;
 
 	public GLGeometryBuffer( final GeometryBuffer _buffer )
@@ -169,6 +170,8 @@ public class GLGeometryBuffer extends GLBuffer
 
 		upload( bufferIndex ) ;
 
+		occluder = _buffer.getOccluder() ;
+
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -205,7 +208,7 @@ public class GLGeometryBuffer extends GLBuffer
 			{
 				final IndexMap map = indexMaps[j] ;
 				final Draw draw = map.draw ;
-				if( draw.isHidden() == true )
+				if( draw.isHidden() || occluder.occlude( draw ) )
 				{
 					continue ;
 				}
