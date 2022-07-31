@@ -2,13 +2,13 @@ package com.linxonline.mallet.audio.web ;
 
 import org.teavm.jso.dom.html.HTMLSourceElement ;
 
-import com.linxonline.mallet.audio.SoundInterface ;
+import com.linxonline.mallet.io.Resource ;
 
 /**
 	Stores the central audio data.
 	Can be used by multiple WebAudioSource's.
 */
-public class WebSound implements SoundInterface
+public class WebSound extends Resource
 {
 	private HTMLSourceElement source ;
 	private final int consumption ;		// Buffer size
@@ -29,4 +29,10 @@ public class WebSound implements SoundInterface
 	}
 
 	public void destroy() {}
+
+	@Override
+	public String type()
+	{
+		return "SOUND" ;
+	}
 }

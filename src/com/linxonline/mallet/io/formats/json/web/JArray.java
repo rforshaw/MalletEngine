@@ -1,110 +1,90 @@
-package com.linxonline.mallet.io.formats.json.web ;
+package com.linxonline.mallet.io.formats.json ;
 
 import org.teavm.jso.json.JSON ;
 import org.teavm.jso.JSObject ;
 import org.teavm.jso.JSBody ;
 
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
-
-public class WebJSONArray extends JSONArray
+public class JArray
 {
 	protected final JSObject array ;
 
-	public WebJSONArray()
+	protected JArray()
 	{
 		array = JSON.parse( "[]" ) ;
 	}
 
-	public WebJSONArray( final String _source )
+	protected JArray( final String _source )
 	{
 		array = JSON.parse( _source ) ;
 	}
 
-	protected WebJSONArray( final JSObject _array )
+	protected JArray( final JSObject _array )
 	{
 		array = _array ;
 	}
 
-	@Override
-	protected JSONArray create()
+	public static JArray construct()
 	{
-		return new WebJSONArray() ;
+		return new JArray() ;
 	}
 
-	@Override
-	protected JSONArray create( final String _source )
+	public static JArray construct( final String _source )
 	{
-		return new WebJSONArray( _source ) ;
+		return new JArray( _source ) ;
 	}
 
-	public static void init()
-	{
-		setConstructor( new WebJSONArray() ) ;
-	}
-
-	@Override
 	public int length()
 	{
 		return length( array ) ;
 	}
 
-	@Override
-	public JSONArray put( final boolean _value )
+	public JArray put( final boolean _value )
 	{
 		putBoolean( array, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final int _value )
+	public JArray put( final int _value )
 	{
 		putInt( array, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final double _value )
+	public JArray put( final double _value )
 	{
 		putDouble( array, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final long _value )
+	public JArray put( final long _value )
 	{
 		putDouble( array, ( double )_value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final String _value )
+	public JArray put( final String _value )
 	{
 		putString( array, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final JSONObject _value )
+	public JArray put( final JObject _value )
 	{
-		putObject( array, ( ( WebJSONObject )_value ).object ) ;
+		putObject( array, ( ( JObject )_value ).object ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONArray put( final JSONArray _value )
+	public JArray put( final JArray _value )
 	{
-		putArray( array, ( ( WebJSONArray )_value ).array ) ;
+		putArray( array, ( ( JArray )_value ).array ) ;
 		return this ;
 	}
 
-	@Override
 	public boolean getBoolean( final int _index )
 	{
 		return optBoolean( array, _index ) ;
 	}
 
-	@Override
 	public boolean optBoolean( final int _index, final boolean _default )
 	{
 		if( _index > length() )
@@ -115,13 +95,11 @@ public class WebJSONArray extends JSONArray
 		return optBoolean( array, _index ) ;
 	}
 
-	@Override
 	public int getInt( final int _index )
 	{
 		return optInt( array, _index ) ;
 	}
 
-	@Override
 	public int optInt( final int _index, final int _default )
 	{
 		if( _index > length() )
@@ -132,13 +110,11 @@ public class WebJSONArray extends JSONArray
 		return optInt( array, _index ) ;
 	}
 
-	@Override
 	public double getDouble( final int _index )
 	{
 		return optDouble( array, _index ) ;
 	}
 
-	@Override
 	public double optDouble( final int _index, final double _default )
 	{
 		if( _index > length() )
@@ -149,13 +125,11 @@ public class WebJSONArray extends JSONArray
 		return optDouble( array, _index ) ;
 	}
 
-	@Override
 	public long getLong( final int _index )
 	{
 		return ( long )optInt( array, _index ) ;
 	}
 
-	@Override
 	public long optLong( final int _index, final long _default )
 	{
 		if( _index > length() )
@@ -166,13 +140,11 @@ public class WebJSONArray extends JSONArray
 		return ( long )optInt( array, _index ) ;
 	}
 
-	@Override
 	public String getString( final int _index )
 	{
 		return optString( array, _index ) ;
 	}
 
-	@Override
 	public String optString( final int _index, final String _default )
 	{
 		if( _index > length() )
@@ -183,8 +155,7 @@ public class WebJSONArray extends JSONArray
 		return optString( array, _index ) ;
 	}
 
-	@Override
-	public JSONObject getJSONObject( final int _index )
+	public JObject getJObject( final int _index )
 	{
 		final JSObject obj = optJSObject( array, _index ) ;
 		if( obj == null )
@@ -192,11 +163,10 @@ public class WebJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new WebJSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	@Override
-	public JSONObject optJSONObject( final int _index, final JSONObject _default )
+	public JObject optJObject( final int _index, final JObject _default )
 	{
 		final JSObject obj = optJSObject( array, _index ) ;
 		if( obj == null )
@@ -204,11 +174,10 @@ public class WebJSONArray extends JSONArray
 			return _default ;
 		}
 
-		return new WebJSONObject( obj ) ;
+		return new JObject( obj ) ;
 	}
 
-	@Override
-	public JSONArray getJSONArray( final int _index )
+	public JArray getJArray( final int _index )
 	{
 		final JSObject arr = optJSObject( array, _index ) ;
 		if( arr == null )
@@ -216,11 +185,10 @@ public class WebJSONArray extends JSONArray
 			return null ;
 		}
 
-		return new WebJSONArray( arr ) ;
+		return new JArray( arr ) ;
 	}
 
-	@Override
-	public JSONArray optJSONArray( final int _index, final JSONArray _default )
+	public JArray optJArray( final int _index, final JArray _default )
 	{
 		final JSObject arr = optJSObject( array, _index ) ;
 		if( arr == null )
@@ -228,16 +196,14 @@ public class WebJSONArray extends JSONArray
 			return _default ;
 		}
 
-		return new WebJSONArray( arr ) ;
+		return new JArray( arr ) ;
 	}
 
-	@Override
 	public String toString()
 	{
 		return array.toString() ;
 	}
 
-	@Override
 	public String toString( final int _indent )
 	{
 		return array.toString() ;

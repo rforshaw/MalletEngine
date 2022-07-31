@@ -5,12 +5,11 @@ import java.util.List ;
 import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
 import org.teavm.jso.canvas.CanvasRenderingContext2D ;
-import org.teavm.jso.canvas.ImageData ;
 
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.font.Glyph ;
+import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -18,12 +17,10 @@ import com.linxonline.mallet.maths.Vector3 ;
 public class GLFontGenerator
 {
 	private final static float PADDING = 4.0f ;
-	private final GLTextureManager manager ;
 	private final CanvasRenderingContext2D canvas ;
 
-	public GLFontGenerator( final GLTextureManager _manager )
+	public GLFontGenerator()
 	{
-		manager = _manager ;
 		final HTMLDocument doc = HTMLDocument.current() ;
 		final HTMLCanvasElement element = ( HTMLCanvasElement )doc.getElementById( "text-canvas" ) ;
 		canvas = ( CanvasRenderingContext2D )element.getContext( "2d" ) ;
@@ -74,7 +71,7 @@ public class GLFontGenerator
 		return new Glyph( c, width ) ;
 	}
 
-	public GLFont generateFont( final MalletFont _font )
+	public Bundle generateFont( final MalletFont _font )
 	{
 		final MalletFont.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
@@ -120,11 +117,11 @@ public class GLFontGenerator
 				final Vector2 uv2 = new Vector2( x2, 1.0f ) ;
 
 				shapes[i] = Shape.constructPlane( maxPoint, uv1, uv2 ) ;
-				start += advance ;
+				start += advance + PADDING ;
 			}
 		}
 
-		return new GLFont( shapes, manager.bind( canvas.getCanvas() ) ) ;
+		return new Bundle( shapes, canvas.getCanvas() ) ;
 	}
 
 	/**
@@ -158,5 +155,17 @@ public class GLFontGenerator
 		doc.getBody().removeChild( div ) ;
 
 		return height ;
+	}
+
+	public static class Bundle
+	{
+		public final Shape[] shapes ;
+		public final HTMLCanvasElement canvas ;
+
+		public Bundle( final Shape[] _shapes, final HTMLCanvasElement _canvas )
+		{
+			shapes = _shapes ;
+			canvas = _canvas ;
+		}
 	}
 }

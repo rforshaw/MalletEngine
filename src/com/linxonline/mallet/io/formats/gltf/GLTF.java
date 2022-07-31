@@ -304,10 +304,10 @@ public class GLTF
 			}
 
 			ConvertBytes.flipEndian( data, 4, 4 ) ;
-			final long version = Integer.toUnsignedLong( ConvertBytes.toInt( data, 4 ) ) ;
+			final long version = toUnsignedLong( ConvertBytes.toInt( data, 4 ) ) ;
 
 			ConvertBytes.flipEndian( data, 8, 4 ) ;
-			final long length = Integer.toUnsignedLong( ConvertBytes.toInt( data, 8 ) ) ;
+			final long length = toUnsignedLong( ConvertBytes.toInt( data, 8 ) ) ;
 
 			System.out.println( "Magic: " + magic + " Version: " + version + " Length: " + length ) ;
 			final JChunk jChunk = readJChunk( in, data, 12 ) ;
@@ -340,7 +340,7 @@ public class GLTF
 		}
 
 		ConvertBytes.flipEndian( _data, _offset, 4 ) ;
-		final int length = ( int )Integer.toUnsignedLong( ConvertBytes.toInt( _data, _offset ) ) ;
+		final int length = ( int )toUnsignedLong( ConvertBytes.toInt( _data, _offset ) ) ;
 
 		_offset += 4 ;
 		final int type = ConvertBytes.toInt( _data, _offset ) ;
@@ -380,7 +380,7 @@ public class GLTF
 		}
 
 		ConvertBytes.flipEndian( _data, _offset, 4 ) ;
-		final int length = ( int )Integer.toUnsignedLong( ConvertBytes.toInt( _data, _offset ) ) ;
+		final int length = ( int )toUnsignedLong( ConvertBytes.toInt( _data, _offset ) ) ;
 
 		_offset += 4 ;
 		final int type = ConvertBytes.toInt( _data, _offset ) ;
@@ -395,6 +395,15 @@ public class GLTF
 
 		final byte[] data = ConvertBytes.newBytes( _data, _offset, length ) ;
 		return new BinChunk( _offset, length, type, data ) ;
+	}
+
+	/**
+		Not available in TeaVM so we'll implement our own
+		version instead of using Integer.toUnsignedLong().
+	*/
+	private static long toUnsignedLong( final int _val )
+	{
+		return ( ( long ) _val ) & 0xffffffffL ;
 	}
 
 	public static class JChunk

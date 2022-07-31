@@ -227,7 +227,7 @@ public class GLWorld
 			}
 		}
 	}
-	
+
 	public void draw()
 	{
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;

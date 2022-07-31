@@ -22,6 +22,104 @@ public final class MGL
 {
 	private static WebGLRenderingContext gl ;
 
+	public final static int GL_MAX_TEXTURE_SIZE = WebGLRenderingContext.MAX_TEXTURE_SIZE ;
+	public final static int GL_TEXTURE_WRAP_S = WebGLRenderingContext.TEXTURE_WRAP_S ;
+	public final static int GL_TEXTURE_WRAP_T = WebGLRenderingContext.TEXTURE_WRAP_T ;
+	public final static int GL_TEXTURE_MAG_FILTER = WebGLRenderingContext.TEXTURE_MAG_FILTER ;
+	public final static int GL_TEXTURE_MIN_FILTER = WebGLRenderingContext.TEXTURE_MIN_FILTER ;
+	public final static int GL_CLAMP_TO_EDGE = WebGLRenderingContext.CLAMP_TO_EDGE ;
+	public final static int GL_REPEAT = WebGLRenderingContext.REPEAT ;
+	public final static int GL_LINEAR = WebGLRenderingContext.LINEAR ;
+	public final static int GL_NEAREST = WebGLRenderingContext.NEAREST ;
+	public final static int GL_NEAREST_MIPMAP_NEAREST = WebGLRenderingContext.NEAREST_MIPMAP_NEAREST ;
+	public final static int GL_LINEAR_MIPMAP_LINEAR = WebGLRenderingContext.LINEAR_MIPMAP_LINEAR ;
+
+	//public final static int GL_ABGR_EXT = WebGLRenderingContext.ABGR_EXT ;
+	//public final static int GL_COMPRESSED_RGBA = WebGLRenderingContext.COMPRESSED_RGBA ;
+	//public final static int GL_COMPRESSED_RGB = WebGLRenderingContext.COMPRESSED_RGB ;
+	public final static int GL_RGBA = WebGLRenderingContext.RGBA ;
+	public final static int GL_RGB = WebGLRenderingContext.RGB ;
+	//public final static int GL_BGR = WebGLRenderingContext.BGR ;
+	//public final static int GL_RED = WebGLRenderingContext.RED ;
+	public final static int GL_DEPTH_COMPONENT = WebGLRenderingContext.DEPTH_COMPONENT ;
+	public final static int GL_DEPTH_STENCIL = WebGLRenderingContext.DEPTH_STENCIL ;
+
+	public final static int GL_UNPACK_ALIGNMENT = WebGLRenderingContext.UNPACK_ALIGNMENT ;
+
+	public final static int GL_LINES = WebGLRenderingContext.LINES ;
+	public final static int GL_LINE_STRIP = WebGLRenderingContext.LINE_STRIP ;
+	public final static int GL_TRIANGLES = WebGLRenderingContext.TRIANGLES ;
+
+	public final static int GL_TEXTURE_2D = WebGLRenderingContext.TEXTURE_2D ;
+	//public final static int GL_PRIMITIVE_RESTART = WebGLRenderingContext.PRIMITIVE_RESTART ;
+
+	public final static int GL_NO_ERROR = WebGLRenderingContext.NO_ERROR ;
+	public final static int GL_INVALID_ENUM = WebGLRenderingContext.INVALID_ENUM ;
+	public final static int GL_INVALID_VALUE = WebGLRenderingContext.INVALID_VALUE ;
+	public final static int GL_INVALID_OPERATION = WebGLRenderingContext.INVALID_OPERATION ;
+	public final static int GL_INVALID_FRAMEBUFFER_OPERATION = WebGLRenderingContext.INVALID_FRAMEBUFFER_OPERATION ;
+	public final static int GL_OUT_OF_MEMORY = WebGLRenderingContext.OUT_OF_MEMORY ;
+	//public final static int GL_STACK_UNDERFLOW = WebGLRenderingContext.STACK_UNDERFLOW ;
+	//public final static int GL_STACK_OVERFLOW = WebGLRenderingContext.STACK_OVERFLOW ;
+
+	public final static int GL_ELEMENT_ARRAY_BUFFER = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER ;
+	public final static int GL_ARRAY_BUFFER = WebGLRenderingContext.ARRAY_BUFFER ;
+
+	public final static int GL_STENCIL_TEST = WebGLRenderingContext.STENCIL_TEST ;
+	public final static int GL_STENCIL_BUFFER_BIT = WebGLRenderingContext.STENCIL_BUFFER_BIT ;
+	public final static int GL_COLOR_BUFFER_BIT = WebGLRenderingContext.COLOR_BUFFER_BIT ;
+	public final static int GL_DEPTH_TEST = WebGLRenderingContext.DEPTH_TEST ;
+	public final static int GL_DEPTH_BUFFER_BIT = WebGLRenderingContext.DEPTH_BUFFER_BIT ;
+
+	public final static int GL_FLOAT = WebGLRenderingContext.FLOAT ;
+	public final static int GL_UNSIGNED_BYTE = WebGLRenderingContext.UNSIGNED_BYTE ;
+	public final static int GL_UNSIGNED_INT = WebGLRenderingContext.UNSIGNED_INT ;
+
+	public final static int GL_ALWAYS = WebGLRenderingContext.ALWAYS ;
+	public final static int GL_KEEP = WebGLRenderingContext.KEEP ;
+	public final static int GL_REPLACE = WebGLRenderingContext.REPLACE ;
+	public final static int GL_EQUAL = WebGLRenderingContext.EQUAL ;
+
+	public final static int GL_BLEND = WebGLRenderingContext.BLEND ;
+	public final static int GL_SRC_ALPHA = WebGLRenderingContext.SRC_ALPHA ;
+	public final static int GL_ONE_MINUS_SRC_ALPHA = WebGLRenderingContext.ONE_MINUS_SRC_ALPHA ;
+
+	public final static int GL_CULL_FACE = WebGLRenderingContext.CULL_FACE ;
+	public final static int GL_BACK = WebGLRenderingContext.BACK ;
+	public final static int GL_FRONT_AND_BACK = WebGLRenderingContext.FRONT_AND_BACK ;
+	public final static int GL_CCW = WebGLRenderingContext.CCW ;
+	public final static int GL_CW = WebGLRenderingContext.CW ;
+
+	public final static int GL_COMPILE_STATUS = WebGLRenderingContext.COMPILE_STATUS ;
+	public final static int GL_LINK_STATUS = WebGLRenderingContext.LINK_STATUS ;
+
+	//public final static int GL_DYNAMIC_COPY = WebGLRenderingContext.DYNAMIC_COPY ;
+	public final static int GL_DYNAMIC_DRAW = WebGLRenderingContext.DYNAMIC_DRAW ;
+	public final static int GL_STREAM_DRAW = WebGLRenderingContext.STREAM_DRAW ;
+
+	public final static int GL_STENCIL_INDEX8 = WebGLRenderingContext.STENCIL_INDEX8 ;
+	public final static int GL_RENDERBUFFER = WebGLRenderingContext.RENDERBUFFER ;
+	
+	public final static int GL_FRAMEBUFFER = WebGLRenderingContext.FRAMEBUFFER ;
+	//public final static int GL_READ_FRAMEBUFFER = WebGLRenderingContext.READ_FRAMEBUFFER ;
+	//public final static int GL_DRAW_FRAMEBUFFER = WebGLRenderingContext.DRAW_FRAMEBUFFER ;
+	public final static int GL_FRAMEBUFFER_COMPLETE = WebGLRenderingContext.FRAMEBUFFER_COMPLETE ;
+	public final static int GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_ATTACHMENT ;
+	public final static int GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT  = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT  ;
+	public final static int GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS = WebGLRenderingContext.FRAMEBUFFER_INCOMPLETE_DIMENSIONS ;
+	public final static int GL_FRAMEBUFFER_UNSUPPORTED = WebGLRenderingContext.FRAMEBUFFER_UNSUPPORTED ;
+
+	public final static int GL_TEXTURE0 = WebGLRenderingContext.TEXTURE0 ;
+	
+	public final static int GL_COLOR_ATTACHMENT0 = WebGLRenderingContext.COLOR_ATTACHMENT0 ;
+	public final static int GL_STENCIL_ATTACHMENT = WebGLRenderingContext.STENCIL_ATTACHMENT ;
+	public final static int GL_DEPTH_ATTACHMENT = WebGLRenderingContext.DEPTH_ATTACHMENT ;
+
+	public final static int GL_VERTEX_SHADER = WebGLRenderingContext.VERTEX_SHADER ;
+	//public final static int GL_GEOMETRY_SHADER = WebGLRenderingContext.GEOMETRY_SHADER ;
+	public final static int GL_FRAGMENT_SHADER = WebGLRenderingContext.FRAGMENT_SHADER ;
+	//public final static int GL_COMPUTE_SHADER = WebGLRenderingContext.COMPUTE_SHADER ;
+
 	public MGL() {}
 
 	public static void setGL( final WebGLRenderingContext _gl )
@@ -78,7 +176,12 @@ public final class MGL
 	{
 		gl.useProgram( _program ) ;
 	}
-	
+
+	public static void uniform1i( final WebGLUniformLocation _location, final int _value )
+	{
+		gl.uniform1i( _location, _value ) ;
+	}
+
 	public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final float[] _values )
 	{
 		gl.uniformMatrix4fv( _location, _transpose, _values ) ;
@@ -127,11 +230,6 @@ public final class MGL
 	public static void vertexAttribPointer( final int _index, final int _size, final int _type, final boolean _normalized, final int _stride, final int _offset )
 	{
 		gl.vertexAttribPointer( _index, _size, _type, _normalized, _stride, _offset ) ;
-	}
-	
-	public static void uniform1i( final WebGLUniformLocation _location, final int _x )
-	{
-		gl.uniform1i( _location, _x ) ;
 	}
 
 	public static WebGLTexture createTexture()

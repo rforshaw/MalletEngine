@@ -8,8 +8,7 @@ import com.linxonline.mallet.core.web.WebGameSystem ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;
 
-import com.linxonline.mallet.renderer.web.WebShape ;
-import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	Central location for WebGL Applications.
@@ -22,12 +21,6 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 												 EventSystem,
 												 WebGameSystem>
 {
-	static
-	{
-		IntegerBuffer.setBase( new com.linxonline.mallet.util.buffers.web.IntegerBuffer( 0 ) ) ;
-		FloatBuffer.setBase( new com.linxonline.mallet.util.buffers.web.FloatBuffer( 0 ) ) ;
-	}
-
 	// Add Web Document here...
 	protected EventController eventController = new EventController() ;
 
@@ -36,24 +29,23 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 		super( new DefaultShutdown(),
 			   new GLRenderer(),
 			   new AudioSourceGenerator(),
-			   new EventSystem( "ROOT_EVENT_SYSTEM" ),
+			   new EventSystem(),
 			   new InputSystem(),
 			   new WebFileSystem(),
 			   new WebGameSystem() ) ;
-
-		getGameSystem().setMainSystem( this ) ;
 	}
 
 	@Override
 	public void initSystem()
 	{
-		Shape.setFactory( new WebShape.Factory() ) ;
+		getGameSystem().setMainSystem( this ) ;
+
 		initEventProcessors() ;
 
 		final GLRenderer render = getRenderer() ;
 		render.start() ;
 
-		getAudioGenerator().startGenerator() ;
+		getAudioGenerator().start() ;
 
 		final InputSystem input = getInput() ;
 
@@ -65,44 +57,25 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 
 	protected void initEventProcessors()
 	{
-		eventController.addEventProcessor( new EventProcessor<Boolean>( "USE_SYSTEM_MOUSE", "DISPLAY_SYSTEM_MOUSE" )
+		eventController.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
 		{
-			@Override
-			public void processEvent( final Event<Boolean> _event )
-			{
-				final boolean displayMouse = _event.getVariable() ;
-				// Hide or show mouse if possible...
-			}
+			final boolean displayMouse = _displayMouse ;
+			//getWindow().setPointerVisible( displayMouse ) ;
 		} ) ;
 
-		getEventSystem().addEventHandler( eventController ) ;
+		getEventSystem().addHandler( eventController ) ;
 	}
 
 	@Override
 	public void startSystem()
 	{
-		System.out.println( "Start System..." ) ;
+		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;
 	}
 
 	@Override
 	public void stopSystem()
 	{
-		System.out.println( "Stop System..." ) ;
-	}
-
-	@Override
-	public void sleep( final long _millis )
-	{
-		/*try
-		{
-			Thread.sleep( _millis ) ;
-			Thread.yield() ;
-		}
-		catch( InterruptedException ex )
-		{
-			Thread.currentThread().interrupt() ;
-			//ex.printStackTrace() ;
-		}*/
+		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;
 	}
 
 	@Override

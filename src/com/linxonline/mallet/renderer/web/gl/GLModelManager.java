@@ -21,10 +21,4 @@ public class GLModelManager
 
 		return id ;
 	}
-
-	public static void unbind( final GLGeometryUploader.GLGeometry _geometry )
-	{
-		MGL.deleteBuffer( _geometry.vboID[0] ) ;
-		MGL.deleteBuffer( _geometry.indexID[0] ) ;
-	}
 }

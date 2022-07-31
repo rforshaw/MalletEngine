@@ -13,32 +13,33 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.web.* ;
 
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.settings.Settings ;
 
-public class AudioSourceGenerator implements AudioGenerator<WebSound>
+public class AudioSourceGenerator implements IGenerator
 {
 	private static final Window window = Window.current() ;
 	private static final HTMLDocument document = window.getDocument() ;
 
 	private final SoundManager<WebSound> staticSoundManager = new SoundManager<WebSound>() ;
-	private final AudioBuffer<WebSound> PLACEHOLDER = new AudioBuffer<WebSound>( null ) ;
 
 	public AudioSourceGenerator() {}
 
 	/**
 		Generator deals with the construction and deconstruction of the Audio backend 
 	*/
-	public boolean startGenerator()
+	@Override
+	public boolean start()
 	{
-		final ILoader.ResourceLoader<AudioBuffer<WebSound>> loader = staticSoundManager.getResourceLoader() ;
-		loader.add( new ILoader.ResourceDelegate<AudioBuffer<WebSound>>()
+		final ILoader.ResourceLoader<String, WebSound> loader = staticSoundManager.getResourceLoader() ;
+		loader.add( new ILoader.ResourceDelegate<String, WebSound>()
 		{
+			@Override
 			public boolean isLoadable( final String _file )
 			{
 				return true ;
 			}
 
-			public AudioBuffer load( final String _file )
+			@Override
+			public WebSound load( final String _file )
 			{
 				final WebFile file = ( WebFile )GlobalFileSystem.getFile( _file ) ;
 				if( file.exists() == false )
@@ -49,7 +50,6 @@ public class AudioSourceGenerator implements AudioGenerator<WebSound>
 
 				final HTMLSourceElement source = file.getHTMLSource() ;
 				final WebSound sound = new WebSound( source, 0 ) ;
-				final AudioBuffer<WebSound> buffer = new AudioBuffer<WebSound>( sound ) ;
 
 				window.getDocument().getBody().appendChild( source ) ;
 
@@ -64,17 +64,23 @@ public class AudioSourceGenerator implements AudioGenerator<WebSound>
 					}
 				} ) ;
 
-				return buffer ; 
+				return sound ; 
 			}
 		} ) ;
 	
 		return false ;
 	}
 
-	public boolean shutdownGenerator()
+	@Override
+	public boolean shutdown()
 	{
 		clear() ;
 		return true ;
+	}
+
+	@Override
+	public void setListenerPosition( final float _x, final float _y, final float _z )
+	{
 	}
 
 	/**
@@ -82,16 +88,17 @@ public class AudioSourceGenerator implements AudioGenerator<WebSound>
 		An AudioSource can be created multiple times and use the same 
 		Sound buffer.
 	**/
-	public AudioSource createAudioSource( final String _file, final StreamType _type )
+	@Override
+	public ISource create( final String _file, final StreamType _type )
 	{
-		final AudioBuffer<WebSound> sound = staticSoundManager.get( _file ) ;
+		final WebSound sound = staticSoundManager.get( _file ) ;
 		if( sound == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
 			return null ;
 		}
 
-		return null ;
+		return new WebAudioSource( sound ) ;
 	}
 
 	@Override

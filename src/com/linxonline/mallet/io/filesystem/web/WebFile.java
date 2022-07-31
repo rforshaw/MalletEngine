@@ -42,7 +42,8 @@ public class WebFile implements FileStream
 		img.setSrc( path ) ;
 		return img ;
 	}
-	
+
+	@Override
 	public ByteInStream getByteInStream()
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
@@ -60,6 +61,7 @@ public class WebFile implements FileStream
 		return new WebByteIn( data ) ;
 	}
 
+	@Override
 	public StringInStream getStringInStream()
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
@@ -70,6 +72,7 @@ public class WebFile implements FileStream
 		return new WebStringIn( request.getResponseText().getBytes() ) ;
 	}
 
+	@Override
 	public boolean getByteInCallback( final ByteInCallback _callback, final int _length )
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
@@ -111,7 +114,14 @@ public class WebFile implements FileStream
 					toReadNum = _callback.readBytes( buffer, readNum ) ;
 				}
 
-				stream.close() ;
+				try
+				{
+					stream.close() ;
+				}
+				catch( Exception ex )
+				{
+					ex.printStackTrace() ;
+				}
 				_callback.end() ;
 			}
 		} ) ;
@@ -120,6 +130,7 @@ public class WebFile implements FileStream
 		return true ;
 	}
 
+	@Override
 	public boolean getStringInCallback( final StringInCallback _callback, final int _length )
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
@@ -176,7 +187,14 @@ public class WebFile implements FileStream
 					_callback.resourceAsString( strings.toArray( new String[size] ), size ) ;
 				}
 
-				stream.close() ;
+				try
+				{
+					stream.close() ;
+				}
+				catch( Exception ex )
+				{
+					ex.printStackTrace() ;
+				}
 				_callback.end() ;
 			}
 		} ) ;
@@ -185,45 +203,58 @@ public class WebFile implements FileStream
 		return true ;
 	}
 
+	@Override
 	public ByteOutStream getByteOutStream()
 	{
 		return null ;
 	}
 
+	@Override
 	public StringOutStream getStringOutStream()
 	{
 		return null ;
+	}
+
+	public boolean create()
+	{
+		return false ;
 	}
 
 	/**
 		Copy the File Stream to the requested location.
 		This should only work if the File Stream is a file.
 	*/
+	@Override
 	public boolean copyTo( final String _dest )
 	{
 		return false ;
 	}
 
+	@Override
 	public boolean isFile()
 	{
 		return element != null ;
 	}
 
+	@Override
 	public boolean isDirectory()
 	{
 		return false ;
 	}
 
+	@Override
 	public boolean isReadable()
 	{
 		return exists() ;
 	}
 
+	@Override
 	public boolean isWritable()
 	{
 		return false ;
 	}
 
+	@Override
 	public boolean exists()
 	{
 		return element != null ;
@@ -234,6 +265,7 @@ public class WebFile implements FileStream
 		This also includes deleting folders.
 		Not supported on web platform.
 	*/
+	@Override
 	public boolean delete()
 	{
 		return false ;
@@ -244,59 +276,24 @@ public class WebFile implements FileStream
 		by this File Stream.
 		Not supported on web platform.
 	*/
+	@Override
 	public boolean mkdirs()
 	{
 		return false ;
 	}
 
+	@Override
+	public String[] list()
+	{
+		return new String[0] ;
+	}
+
 	/**
 		Return the File size of this FileStream.
 	*/
+	@Override
 	public long getSize()
 	{
 		return 0L ;
-	}
-
-	/**
-		Close a specific stream without closing other 
-		active streams.
-	*/
-	public boolean close( final Close _close )
-	{
-		//return toClose.remove( _close ) ;
-		return true ;
-	}
-
-	/**
-		Close all the stream input/output that has 
-		been returned and close them.
-	*/
-	public boolean close()
-	{
-		return true ;
-	}
-
-	private static class ByteInTransfer
-	{
-		public ByteInStream stream ;
-
-		public ByteInTransfer() {}
-
-		public void set( final ByteInStream _stream )
-		{
-			stream = _stream ;
-		}
-	}
-
-	private static class StringInTransfer
-	{
-		public StringInStream stream ;
-
-		public StringInTransfer() {}
-
-		public void set( final StringInStream _stream )
-		{
-			stream = _stream ;
-		}
 	}
 }

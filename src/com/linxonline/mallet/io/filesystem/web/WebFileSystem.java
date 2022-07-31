@@ -3,20 +3,16 @@ package com.linxonline.mallet.io.filesystem.web ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.io.formats.json.web.* ;
-
 public class WebFileSystem implements FileSystem
 {
-	public WebFileSystem()
-	{
-		initJSONConstructors() ;
-	}
+	public WebFileSystem() {}
 
 	/**
 		Map all of the files contained within _directory.
 		Recursively go through all directories within 
 		_directory and map any files found.
 	*/
+	@Override
 	public boolean mapDirectory( final String _directory )
 	{
 		return false ;
@@ -29,6 +25,7 @@ public class WebFileSystem implements FileSystem
 		directory, or file exists. However you can use 
 		the FileStream to create a directory or file.
 	*/
+	@Override
 	public FileStream getFile( final String _path )
 	{
 		return new WebFile( _path ) ;
@@ -40,16 +37,5 @@ public class WebFileSystem implements FileSystem
 		final StringBuilder builder = new StringBuilder() ;
 		// Need to define a Home Directory for Web implementations.
 		return builder.toString() ;
-	}
-
-	/**
-		Allows reading and parsing JSON formatted files.
-		Mallet Engine provides a wrapper around a platform 
-		JSON library.
-	*/
-	protected void initJSONConstructors()
-	{
-		WebJSONObject.init() ;
-		WebJSONArray.init() ;
 	}
 }

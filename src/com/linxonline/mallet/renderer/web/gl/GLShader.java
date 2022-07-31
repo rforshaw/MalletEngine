@@ -9,7 +9,7 @@ import org.teavm.jso.webgl.WebGLShader ;
 	Once the GLProgram has been linked, all shader data 
 	is removed.
 */
-public class GLShader extends Resource
+public class GLShader
 {
 	public final WebGLShader[] id = new WebGLShader[1] ;
 	public final int type ;

@@ -1,116 +1,149 @@
-package com.linxonline.mallet.io.formats.json.web ;
+package com.linxonline.mallet.io.formats.json ;
 
 import org.teavm.jso.json.JSON ;
 import org.teavm.jso.JSObject ;
 import org.teavm.jso.JSBody ;
 
-import com.linxonline.mallet.io.formats.json.JSONObject ;
-import com.linxonline.mallet.io.formats.json.JSONArray ;
+import com.linxonline.mallet.io.filesystem.FileStream ;
+import com.linxonline.mallet.io.filesystem.StringInStream ;
+import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
-public class WebJSONObject extends JSONObject
+public class JObject
 {
 	protected final JSObject object ;
 
-	public WebJSONObject()
+	protected JObject()
 	{
 		object = JSON.parse( "{}" ) ;
 	}
 
-	public WebJSONObject( final String _source )
+	protected JObject( final String _source )
 	{
 		object = JSON.parse( _source ) ;
 	}
 
-	protected WebJSONObject( final JSObject _object )
+	protected JObject( final JSObject _object )
 	{
 		object = _object ;
 	}
 
-	@Override
-	protected JSONObject create()
+	public static JObject construct()
 	{
-		return new WebJSONObject() ;
+		return new JObject() ;
 	}
 
-	@Override
-	protected JSONObject create( final String _source )
+	public static JObject construct( final FileStream _file )
 	{
-		return new WebJSONObject( _source ) ;
+		try( final StringInStream stream = _file.getStringInStream() )
+		{
+			if( stream == null )
+			{
+				return new JObject() ;
+			}
+
+			final StringBuilder builder = new StringBuilder() ;
+			String line = null ;
+			while( ( line = stream.readLine() ) != null )
+			{
+				builder.append( line ) ;
+			}
+
+			return JObject.construct( builder.toString() ) ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+			return new JObject() ;
+		}
 	}
 
-	public static void init()
+	public static boolean construct( final FileStream _file, final ConstructCallback _callback )
 	{
-		setConstructor( new WebJSONObject() ) ;
+		return _file.getStringInCallback( new StringInCallback()
+		{
+			private final StringBuilder builder = new StringBuilder() ;
+
+			public int resourceAsString( final String[] _resource, final int _length )
+			{
+				for( int i = 0; i < _length; i++ )
+				{
+					builder.append( _resource[i] ) ;
+				}
+			
+				return 1 ;
+			}
+
+			public void start() {}
+
+			public void end()
+			{
+				_callback.callback( JObject.construct( builder.toString() ) ) ;
+			}
+		}, 1 ) ;
 	}
 
-	@Override
+	public static JObject construct( final String _source )
+	{
+		return new JObject( _source ) ;
+	}
+
 	public String[] keys()
 	{
 		return keys( object ) ;
 	}
 
-	@Override
 	public boolean has( final String _key )
 	{
 		return hasKey( object, _key ) ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final boolean _value )
+	public JObject put( final String _key, final boolean _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final int _value )
+	public JObject put( final String _key, final int _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final double _value )
+	public JObject put( final String _key, final double _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final long _value )
+	public JObject put( final String _key, final long _value )
 	{
 		put( object, _key, ( double )_value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final String _value )
+	public JObject put( final String _key, final String _value )
 	{
 		put( object, _key, _value ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final JSONObject _value )
+	public JObject put( final String _key, final JObject _value )
 	{
-		put( object, _key, ( ( WebJSONObject )_value ).object ) ;
+		put( object, _key, _value.object ) ;
 		return this ;
 	}
 
-	@Override
-	public JSONObject put( final String _key, final JSONArray _value )
+	public JObject put( final String _key, final JArray _value )
 	{
-		put( object, _key, ( ( WebJSONArray )_value ).array ) ;
+		put( object, _key, _value.array ) ;
 		return this ;
 	}
 
-	@Override
 	public boolean getBoolean( final String _key )
 	{
 		return optBoolean( object, _key ) ;
 	}
 
-	@Override
 	public boolean optBoolean( final String _key, final boolean _default )
 	{
 		if( has( _key ) )
@@ -121,13 +154,11 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	@Override
 	public int getInt( final String _key )
 	{
 		return optInt( object, _key ) ;
 	}
 
-	@Override
 	public int optInt( final String _key, final int _default )
 	{
 		if( has( _key ) )
@@ -138,13 +169,11 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	@Override
 	public double getDouble( final String _key )
 	{
 		return optDouble( object, _key ) ;
 	}
 
-	@Override
 	public double optDouble( final String _key, final double _default )
 	{
 		if( has( _key ) )
@@ -155,13 +184,11 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	@Override
 	public long getLong( final String _key )
 	{
 		return ( long )optInt( object, _key ) ;
 	}
 
-	@Override
 	public long optLong( final String _key, final long _default )
 	{
 		if( has( _key ) )
@@ -172,13 +199,11 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	@Override
 	public String getString( final String _key )
 	{
 		return optString( _key, null ) ;
 	}
 
-	@Override
 	public String optString( final String _key, final String _default )
 	{
 		if( has( _key ) )
@@ -189,60 +214,59 @@ public class WebJSONObject extends JSONObject
 		return _default ;
 	}
 
-	@Override
-	public JSONObject getJSONObject( final String _key )
+	public JObject getJObject( final String _key )
 	{
 		if( has( _key ) == false )
 		{
 			return null ;
 		}
 
-		return new WebJSONObject( optJSObject( object, _key ) ) ;
+		return new JObject( optJSObject( object, _key ) ) ;
 	}
 
-	@Override
-	public JSONObject optJSONObject( final String _key, final JSONObject _default )
+	public JObject optJObject( final String _key, final JObject _default )
 	{
 		if( has( _key ) == false )
 		{
 			return _default ;
 		}
 
-		return new WebJSONObject( optJSObject( object, _key ) ) ;
+		return new JObject( optJSObject( object, _key ) ) ;
 	}
 
-	@Override
-	public JSONArray getJSONArray( final String _key )
+	public JArray getJArray( final String _key )
 	{
 		if( has( _key ) == false )
 		{
 			return null ;
 		}
 
-		return new WebJSONArray( optJSArray( object, _key ) ) ;
+		return new JArray( optJSArray( object, _key ) ) ;
 	}
 
-	@Override
-	public JSONArray optJSONArray( final String _key, final JSONArray _default )
+	public JArray optJArray( final String _key, final JArray _default )
 	{
 		if( has( _key ) == false )
 		{
 			return _default ;
 		}
 
-		return new WebJSONArray( optJSArray( object, _key ) ) ;
+		return new JArray( optJSArray( object, _key ) ) ;
 	}
 
-	@Override
 	public String toString()
 	{
 		return object.toString() ;
 	}
 
-	@Override
 	public String toString( final int _indent )
 	{
 		return object.toString() ;
+	}
+
+	public interface ConstructCallback
+	{
+		public void callback( JObject _object ) ;
 	}
 
 	@JSBody( params = { "_obj", "_key" }, script = "return _obj.hasOwnProperty( _key ) ;" )

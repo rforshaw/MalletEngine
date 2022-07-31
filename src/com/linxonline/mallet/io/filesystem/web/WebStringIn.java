@@ -6,31 +6,16 @@ import com.linxonline.mallet.io.filesystem.* ;
 
 public class WebStringIn implements StringInStream
 {
-	private BufferedReader reader ;
-
-	public WebStringIn() {}
+	private final BufferedReader reader ;
 
 	public WebStringIn( final byte[] _input )
 	{
 		assert _input != null ;
-		set( _input ) ;
-	}
-
-	public void set( final byte[] _input )
-	{
-		if( reader == null )
-		{
-			reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( _input ) ) ) ;
-		}
+		reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( _input ) ) ) ;
 	}
 
 	public String readLine()
 	{
-		if( reader == null )
-		{
-			return "" ;
-		}
-
 		try
 		{
 			return reader.readLine() ;
@@ -41,17 +26,30 @@ public class WebStringIn implements StringInStream
 		}
 	}
 
-	public boolean close()
+	@Override
+	public void close() throws Exception
+	{
+		reader.close() ;
+	}
+
+	@Override
+	public String toString()
 	{
 		try
 		{
-			reader.close() ;
-			return true ;
+			reader.reset() ;
+			final StringBuilder builder = new StringBuilder() ;
+			String line = null ;
+			while( ( line = readLine() ) != null )
+			{
+				builder.append( line ) ;
+			}
+			return builder.toString() ;
 		}
 		catch( IOException ex )
 		{
-			System.out.println( "Byte In - Failed to close Input Stream." ) ;
-			return false ;
+			ex.printStackTrace() ;
+			return super.toString() ;
 		}
 	}
 }

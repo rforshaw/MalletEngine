@@ -27,10 +27,18 @@ import com.linxonline.mallet.util.MalletMap ;
 
 import com.linxonline.mallet.renderer.* ;
 
-public class GLTextureManager extends AbstractManager<GLImage>
+public class GLTextureManager extends AbstractManager<String, GLImage>
 {
 	private static final Window window = Window.current() ;
 	private static final HTMLDocument document = window.getDocument() ;
+
+	/**
+		Limit the number of textures that can be loaded
+		to the GPU on any one render cycle.
+		This should allow the engine to be responsive
+		if lots of textures are loaded in one go.
+	*/
+	private static final int TEXTURE_BIND_LIMIT = 1 ;
 
 	/**
 		When loading a texture the TextureManager will stream the 
@@ -50,13 +58,13 @@ public class GLTextureManager extends AbstractManager<GLImage>
 		It's set to RGBA by default due to the extension potentially not 
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
-	protected int imageFormat = GL3.RGBA ;
-	protected GLWorldState worldState ;
+	protected int imageFormat = MGL.GL_RGBA ;
+	private int bindCount = 0 ;
 
 	public GLTextureManager()
 	{
-		final ResourceLoader<GLImage> loader = getResourceLoader() ;
-		loader.add( new ResourceDelegate<GLImage>()
+		final ResourceLoader<String, GLImage> loader = getResourceLoader() ;
+		loader.add( new ResourceDelegate<String, GLImage>()
 		{
 			public boolean isLoadable( final String _file )
 			{
@@ -91,15 +99,19 @@ public class GLTextureManager extends AbstractManager<GLImage>
 					}
 				} ) ;
 
-				put( _file, null ) ;
 				return null ; 
 			}
 		} ) ;
 	}
 
-	public void setWorldState( final GLWorldState _worldState )
+	public void resetBindCount()
 	{
-		worldState = _worldState ;
+		bindCount = 0 ;
+	}
+
+	public boolean texturesLoaded()
+	{
+		return toBind.isEmpty() ;
 	}
 
 	@Override
@@ -107,34 +119,18 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	{
 		synchronized( toBind )
 		{
-			// GLRenderer will continuosly call get() until it 
-			// recieves a Texture, so we only need to bind 
+			// GLRenderer will continuously call get() until it 
+			// receives a Texture, so we only need to bind 
 			// textures that are waiting for the OpenGL context 
 			// when the render requests it.
-			if( toBind.isEmpty() == false )
+			while( toBind.isEmpty() == false && bindCount++ < TEXTURE_BIND_LIMIT  )
 			{
-				for( final Tuple<String, HTMLImageElement> tuple : toBind )
-				{
-					put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
-				}
-				toBind.clear() ;
+				final Tuple<String, HTMLImageElement> tuple = toBind.remove( toBind.size() - 1 ) ;
+				put( tuple.getLeft(), bind( tuple.getRight() ) ) ;
 			}
 		}
 
-		final GLImage image = super.get( _file ) ;
-		if( image != null )
-		{
-			//System.out.println( "GLImage: " + _file ) ;
-			return image ;
-		}
-
-		final GLWorld world = worldState.getWorld( _file ) ;
-		if( world != null )
-		{
-			return world.getImage() ;
-		}
-
-		return null ;
+		return super.get( _file ) ;
 	}
 
 	/**
@@ -180,20 +176,20 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	public GLImage bind( final HTMLCanvasElement _image, final InternalFormat _format )
 	{
 		final WebGLTexture textureID = glGenTextures() ;
-		MGL.bindTexture( GL3.TEXTURE_2D, textureID ) ;
+		MGL.bindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
 
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR ) ;
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.CLAMP_TO_EDGE ) ;
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.CLAMP_TO_EDGE ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
 
-		MGL.texImage2D( GL3.TEXTURE_2D, 
+		MGL.texImage2D( MGL.GL_TEXTURE_2D, 
 						 0, 
-						 GL3.RGBA,
-						 GL3.RGBA, 
-						 GL3.UNSIGNED_BYTE, 
+						 MGL.GL_RGBA,
+						 MGL.GL_RGBA, 
+						 MGL.GL_UNSIGNED_BYTE, 
 						 _image ) ;
 
-		MGL.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
+		MGL.bindTexture( MGL.GL_TEXTURE_2D, null ) ;			// Reset to default texture
 		//final long estimatedConsumption = width * height * ( channels * 8 ) ;
 		return new GLImage( textureID, 0L/*estimatedConsumption*/ ) ;
 	}
@@ -206,23 +202,23 @@ public class GLTextureManager extends AbstractManager<GLImage>
 	public GLImage bind( final HTMLImageElement _image, final InternalFormat _format )
 	{
 		final WebGLTexture textureID = glGenTextures() ;
-		MGL.bindTexture( GL3.TEXTURE_2D, textureID ) ;
+		MGL.bindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
 
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_S, GL3.REPEAT ) ;
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_WRAP_T, GL3.REPEAT ) ;
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MAG_FILTER, GL3.LINEAR ) ;
-		MGL.texParameteri( GL3.TEXTURE_2D, GL3.TEXTURE_MIN_FILTER, GL3.LINEAR_MIPMAP_NEAREST ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR_MIPMAP_LINEAR ) ;
 
-		//gl.pixelStorei( GL3.UNPACK_ALIGNMENT, 1 ) ;
-		MGL.texImage2D( GL3.TEXTURE_2D, 
+		//gl.pixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;
+		MGL.texImage2D( MGL.GL_TEXTURE_2D, 
 						 0, 
-						 GL3.RGBA, 
-						 GL3.RGBA, 
-						 GL3.UNSIGNED_BYTE, 
+						 MGL.GL_RGBA, 
+						 MGL.GL_RGBA, 
+						 MGL.GL_UNSIGNED_BYTE, 
 						 _image ) ;
 
-		MGL.generateMipmap( GL3.TEXTURE_2D ) ;
-		MGL.bindTexture( GL3.TEXTURE_2D, null ) ;			// Reset to default texture
+		MGL.generateMipmap( MGL.GL_TEXTURE_2D ) ;
+		MGL.bindTexture( MGL.GL_TEXTURE_2D, null ) ;			// Reset to default texture
 
 		//final long estimatedConsumption = width * height * ( channels * 8 ) ;
 		return new GLImage( textureID, 0L/*estimatedConsumption*/ ) ;

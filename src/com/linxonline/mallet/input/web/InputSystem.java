@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.MalletList ;
 
 public class InputSystem implements IInputSystem
 {
-	private final TimeCache<InputEvent> cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class ) ;
+	private final TimeCache<InputEvent> cache ;
 
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
@@ -124,6 +124,12 @@ public class InputSystem implements IInputSystem
 			}
 		} ;
 
+		final InputEvent[] inputs = new InputEvent[150] ;
+		for( int i = 0; i < inputs.length; i++ )
+		{
+			inputs[i] = new InputEvent() ;
+		}
+		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
 		/*document.addEventListener( "mousedown", mouseDown ) ;
 		document.addEventListener( "mouseup", mouseUp) ;
 		document.addEventListener( "mousemove", mouseMove ) ;
@@ -150,7 +156,6 @@ public class InputSystem implements IInputSystem
 		}
 
 		handlers.remove( _handler ) ;
-		_handler.reset() ;
 	}
 
 	/*private synchronized void updateMouseWheel( MouseWheelEvent _event )
@@ -199,15 +204,7 @@ public class InputSystem implements IInputSystem
 
 	public void clearHandlers()
 	{
-		if( handlers.isEmpty() == false )
-		{
-			final int size = handlers.size() ;
-			for( int i = 0; i < size; ++i )
-			{
-				handlers.get( i ).reset() ;
-			}
-			handlers.clear() ;
-		}
+		handlers.clear() ;
 	}
 
 	public synchronized void clearInputs()

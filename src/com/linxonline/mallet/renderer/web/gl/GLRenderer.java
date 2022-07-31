@@ -2,9 +2,12 @@ package com.linxonline.mallet.renderer.web.gl ;
 
 import java.util.Set ;
 import java.util.HashSet ;
+import java.util.List ;
+import java.util.ArrayList ;
+import java.text.MessageFormat ;
 
 import org.teavm.jso.* ;
-import org.teavm.jso.browser.* ;
+//import org.teavm.jso.browser.* ;
 import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.dom.events.* ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
@@ -15,48 +18,75 @@ import org.teavm.jso.webgl.WebGLTexture ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.renderer.font.* ;
 
+import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.time.DefaultTimer ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
+import com.linxonline.mallet.util.notification.Notification.Notify ;
+import com.linxonline.mallet.util.Tuple ;
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-import com.linxonline.mallet.renderer.web.gl.GLGeometryUploader.VertexAttrib ;
+import com.linxonline.mallet.renderer.opengl.ProgramManager ;
+import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, GLWorldState>
+public class GLRenderer extends BasicRenderer
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
-	protected final static GLProgramManager programs = new GLProgramManager() ;
-	protected final static GLTextureManager textures = new GLTextureManager() ;
-	protected final static GLFontManager fontManager = new GLFontManager( textures ) ;
+	private final static ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder<GLProgram>()
+	{
+		public GLProgram build( final JSONProgram _program )
+		{
+			return GLProgram.build( _program ) ;
+		}
+	} ) ;
+
+	private final static GLTextureManager textures = new GLTextureManager() ;
+	private final static GLFontManager fontManager = new GLFontManager( textures ) ;
 
 	protected final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
 	private final HTMLCanvasElement canvas ;
 
-	protected CameraData<CameraData> defaultCamera = new CameraData<CameraData>( "MAIN" ) ;
-	protected int viewMode = ORTHOGRAPHIC_MODE ;
+	private int viewMode = ORTHOGRAPHIC_MODE ;
+
+	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
+	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
+	private final AssetLookup<ABuffer, GLBuffer> bufferLookup = new AssetLookup<ABuffer, GLBuffer>( "BUFFER" ) ;
+	private final AssetLookup<Program, GLProgram> programLookup = new AssetLookup<Program, GLProgram>( "PROGRAM" ) ;
+	private final AssetLookup<Storage, GLStorage> storageLookup = new AssetLookup<Storage, GLStorage>( "STORAGE" ) ;
+
+	private static List<Camera> cameras = new ArrayList<Camera>() ;
+	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
+
+	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
+	private final List<IUpdater<? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<? extends ABuffer>>() ;
+	private final List<IUpdater<Storage>> storageUpdaters = new ArrayList<IUpdater<Storage>>() ;
 
 	public GLRenderer()
 	{
-		super( new GLWorldState() ) ;
+		super() ;
 
 		final HTMLDocument document = HTMLDocument.current();
 		canvas = ( HTMLCanvasElement )document.getElementById( "mallet-canvas" ) ;
 		MGL.setGL( ( WebGLRenderingContext )canvas.getContext( "webgl" ) ) ;
 
-		//MGL.enable( GL3.PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
-		//MGL.primitiveRestartIndex( GLGeometryUploader.PRIMITIVE_RESTART_INDEX ) ;
+		//MGL.enable( MGL.GL_PRIMITIVE_RESTART ) ;		//GLRenderer.handleError( "Enable Primitive Restart", _gl ) ;
+		//MGL.primitiveRestartIndex( MGL.GL_PRIMITIVE_RESTART_INDEX ) ;
 
-		MGL.enable( GL3.BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
-		MGL.blendFunc( GL3.SRC_ALPHA, GL3.ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
+		MGL.enable( MGL.GL_BLEND ) ;										//GLRenderer.handleError( "Enable Blend", _gl ) ;
+		MGL.blendFunc( MGL.GL_SRC_ALPHA, MGL.GL_ONE_MINUS_SRC_ALPHA ) ;	//GLRenderer.handleError( "Set Blend Func", _gl ) ;
 
-		MGL.enable( GL3.CULL_FACE ) ;
-		MGL.cullFace( GL3.BACK ) ;  
-		MGL.frontFace( GL3.CCW ) ;
+		MGL.enable( MGL.GL_CULL_FACE ) ;
+		MGL.cullFace( MGL.GL_BACK ) ;  
+		MGL.frontFace( MGL.GL_CCW ) ;
+
+		MGL.clearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+
+		initDefaultWorld() ;
 
 		System.out.println( "Building default shaders.." ) ;
 		programs.load( "SIMPLE_TEXTURE", "base/shaders/web/simple_texture.jgl" ) ;
@@ -67,11 +97,9 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		{
 			// Query for the Max Texture Size and store the results.
 			// I doubt the size will change during the running of the engine.
-			final int size = MGL.getParameteri( GL3.MAX_TEXTURE_SIZE ) ;
+			final int size = MGL.getParameteri( MGL.GL_MAX_TEXTURE_SIZE ) ;
 			maxTextureSize.setXY( size, size ) ;
 		}
-
-		textures.setWorldState( getWorldState() ) ;
 	}
 
 	@Override
@@ -79,8 +107,16 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
-		initAssist() ;
-		initDefaultWorld() ;
+
+		FontAssist.setAssist( createFontAssist() ) ;
+		TextureAssist.setAssist( createTextureAssist() ) ;
+
+		DrawAssist.setAssist( createDrawAssist() ) ;
+		ProgramAssist.setAssist( createProgramAssist() ) ;
+		StorageAssist.setAssist( createStorageAssist() ) ;
+
+		WorldAssist.setAssist( createWorldAssist() ) ;
+		CameraAssist.setAssist( createCameraAssist() ) ;
 	}
 
 	@Override
@@ -89,14 +125,18 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
 		clear() ;							// Clear the contents being rendered
 
-		getWorldState().shutdown() ;
+		for( final GLWorld world : worlds )
+		{
+			world.shutdown() ;
+		}
+
 		programs.shutdown() ;
 		textures.shutdown() ;				// We'll loose all texture and font resources
 		fontManager.shutdown() ;
+		//release() ;
 	}
 
-	@Override
-	public FontAssist.Assist getFontAssist()
+	public FontAssist.Assist createFontAssist()
 	{
 		return new FontAssist.Assist()
 		{
@@ -113,16 +153,15 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
-			public boolean loadFont( final String _path )
+			public String[] loadFont( final String _path )
 			{
 				assert( true ) ;
-				return false ;
+				return new String[0] ;
 			}
 		} ;
 	}
 
-	@Override
-	public TextureAssist.Assist getTextureAssist()
+	public TextureAssist.Assist createTextureAssist()
 	{
 		return new TextureAssist.Assist()
 		{
@@ -133,654 +172,412 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 			}
 
 			@Override
-			public MalletTexture.Meta createMeta( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				return world.getMeta() ;
-			}
-
-			@Override
 			public Vector2 getMaximumTextureSize()
 			{
 				return new Vector2( maxTextureSize ) ;
 			}
 
-			private GLWorld cast( final World _world )
+			@Override
+			public boolean texturesLoaded()
 			{
-				//assert( _world != null ) ;
-				//assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
+				return textures.texturesLoaded() ;
 			}
 		} ;
 	}
 
-	@Override
-	public DrawAssist.Assist getDrawAssist()
+	public DrawAssist.Assist createDrawAssist()
 	{
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public Draw amendShape( final Draw _draw, final Shape _shape )
+			public <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
 			{
-				cast( _draw ).setDrawShape( _shape ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendRotate( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				cast( _draw ).setRotation( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendScale( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				cast( _draw ).setScale( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendPosition( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				cast( _draw ).setPosition( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendOffset( final Draw _draw, final float _x, final float _y, final float _z )
-			{
-				cast( _draw ).setOffset( _x, _y, _z ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendText( final Draw _draw, final StringBuilder _text )
-			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				GLRenderer.this.invokeLater( () ->
 				{
-					// Only a text draw object can have text.
-					draw.setText( _text ) ;
-				}
-				return _draw ;
+					drawUpdaters.add( _updater ) ;
+				} ) ;
+				return _updater ;
 			}
 
 			@Override
-			public Draw amendTextStart( final Draw _draw, final int _start )
+			public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
 			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				GLRenderer.this.invokeLater( () ->
 				{
-					// Only a text draw object can have text.
-					draw.setTextStart( _start ) ;
-				}
-				return _draw ;
+					drawUpdaters.remove( _updater ) ;
+				} ) ;
+				return _updater ;
 			}
 
 			@Override
-			public Draw amendTextEnd( final Draw _draw, final int _end )
+			public <T extends ABuffer> T add( final T _buffer )
 			{
-				final GLDrawData draw = cast( _draw ) ;
-				if( draw.getMode() == GLDrawData.Mode.TEXT )
+				GLRenderer.this.invokeLater( () ->
 				{
-					// Only a text draw object can have text.
-					draw.setTextEnd( _end ) ;
+					final GLBuffer buff = create( _buffer ) ;
+					bufferLookup.map( _buffer.index(), _buffer, buff ) ;
+					if( updateBuffer( _buffer, buff ) == false )
+					{
+						DrawAssist.update( _buffer ) ;
+					}
+				} ) ;
+				return _buffer ;
+			}
+
+			@Override
+			public <T extends ABuffer> T remove( final T _buffer )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					final Tuple<ABuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
+					if( tuple != null )
+					{
+						final GLBuffer buff = tuple.getRight() ;
+						buff.shutdown() ;
+					}
+				} ) ;
+				return _buffer ;
+			}
+
+			@Override
+			public <T extends ABuffer> T update( final T _buffer )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
+					if( buff != null )
+					{
+						if( updateBuffer( _buffer, buff ) == false )
+						{
+							DrawAssist.update( _buffer ) ;
+						}
+					}
+				} ) ;
+				return _buffer ;
+			}
+
+			private GLBuffer create( final ABuffer _buffer )
+			{
+				switch( _buffer.getBufferType() )
+				{
+					default                    : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
+					case GEOMETRY_BUFFER       : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
+					case TEXT_BUFFER           : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
+					case DRAW_BUFFER           : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
+					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
 				}
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendUI( final Draw _draw, final boolean _ui )
-			{
-				cast( _draw ).setUI( _ui ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendColour( final Draw _draw, final MalletColour _colour )
-			{
-				cast( _draw ).setColour( _colour ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendOrder( final Draw _draw, final int _order )
-			{
-				cast( _draw ).setOrder( _order ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendInterpolation( final Draw _draw, final Interpolation _interpolation )
-			{
-				cast( _draw ).setInterpolationMode( _interpolation ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw amendUpdateType( final Draw _draw, final UpdateType _type )
-			{
-				cast( _draw ).setUpdateType( _type ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw attachProgram( final Draw _draw, final Program _program )
-			{
-				cast( _draw ).setProgram( _program ) ;
-				return _draw ;
-			}
-
-			@Override
-			public Draw forceUpdate( final Draw _draw )
-			{
-				cast( _draw ).forceUpdate() ;
-				return _draw ;
-			}
-
-			@Override
-			public Shape getDrawShape( final Draw _draw )
-			{
-				return cast( _draw ).getDrawShape() ;
-			}
-
-			@Override
-			public Vector3 getRotate( final Draw _draw )
-			{
-				return cast( _draw ).getRotation() ;
-			}
-
-			@Override
-			public Vector3 getScale( final Draw _draw )
-			{
-				return cast( _draw ).getScale() ;
-			}
-
-			@Override
-			public Vector3 getPosition( final Draw _draw )
-			{
-				return cast( _draw ).getPosition() ;
-			}
-
-			@Override
-			public Vector3 getOffset( final Draw _draw )
-			{
-				return cast( _draw ).getOffset() ;
-			}
-
-			@Override
-			public StringBuilder getText( final Draw _draw )
-			{
-				// This will return null if not a Text Draw.
-				return cast( _draw ).getText() ;
-			}
-
-			@Override
-			public MalletColour getColour( final Draw _draw )
-			{
-				return cast( _draw ).getColour() ;
-			}
-
-			@Override
-			public boolean isUI( final Draw _draw )
-			{
-				return cast( _draw ).isUI() ;
-			}
-
-			@Override
-			public Program getProgram( final Draw _draw )
-			{
-				return cast( _draw ).getProgram() ;
-			}
-
-			@Override
-			public Draw createTextDraw( final StringBuilder _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
-			{
-				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _order ) ) ;
-				draw.setMode( GLDrawData.Mode.TEXT ) ;
-
-				final Program program = ProgramAssist.create( "SIMPLE_FONT" ) ;
-				ProgramAssist.map( program, "inTex0", _font ) ;
-
-				attachProgram( draw, program ) ;
-				draw.setText( _text ) ;
-				return draw ;
-			}
-
-			@Override
-			public Draw createTextDraw( final String _text,
-										final MalletFont _font,
-										final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _order )
-			{
-				final StringBuilder builder = new StringBuilder( _text ) ;
-				return createTextDraw( builder, _font, _position, _offset, _rotation, _scale, _order ) ;
-			}
-
-			@Override
-			public Draw createClipDraw( final Vector3 _position,
-										final Vector3 _offset,
-										final Vector3 _rotation,
-										final Vector3 _scale,
-										final int _startOrder,
-										final int _endOrder )
-			{
-				final GLDrawData draw = cast( createDraw( _position, _offset, _rotation, _scale, _startOrder ) ) ;
-				draw.setMode( GLDrawData.Mode.STENCIL ) ;
-				draw.setEndOrder( _endOrder ) ;
-
-				attachProgram( draw, ProgramAssist.create( "SIMPLE_STENCIL" ) ) ;
-				return draw ;
-			}
-
-			@Override
-			public Draw createDraw( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale,
-									final int _order )
-			{
-				return new GLDrawData( GLDrawData.Mode.BASIC,
-									   UpdateType.ON_DEMAND,
-									   Interpolation.NONE,
-									   _position,
-									   _offset,
-									   _rotation,
-									   _scale,
-									   _order ) ;
-			}
-
-			private GLDrawData cast( final Draw _draw )
-			{
-				//assert( _draw != null ) ;
-				//assert( !( _draw instanceof GLDrawData ) ) ;
-				return ( GLDrawData )_draw ;
 			}
 		} ;
 	}
 
-	@Override
-	public ProgramAssist.Assist getProgramAssist()
+	public ProgramAssist.Assist createProgramAssist()
 	{
 		return new ProgramAssist.Assist()
 		{
-			public void load( final String _id, final String _path ) {}
-
-			public Program create( final String _id )
+			@Override
+			public void load( final String _id, final String _path )
 			{
-				final Program program = new ProgramMap<GLProgram>( _id ) ;
-				return program ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					programs.load( _id, MessageFormat.format( _path, "web" ) ) ;
+				} ) ;
 			}
 
-			public Program remove( final Program _program, final String _handler )
+			@Override
+			public Program add( final Program _program )
 			{
-				final ProgramMap<GLProgram> program = cast( _program ) ;
-				program.remove( _handler ) ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLProgram glProgram = programs.get( _program.getID() ) ;
+					if( glProgram == null )
+					{
+						add( _program ) ;
+						return ;
+					}
+					programLookup.map( _program.index(), _program, glProgram ) ;
+				} ) ;
 				return _program ;
 			}
 
-			public Program map( final Program _program, final String _handler, final Object _obj )
+			@Override
+			public Program remove( final Program _program ) 
 			{
-				final ProgramMap<GLProgram> program = cast( _program ) ;
-				program.set( _handler, _obj ) ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLProgram glProgram = programs.get( _program.getID() ) ;
+					if( glProgram != null )
+					{
+						programLookup.unmap( _program.index() ) ;
+					}
+				} ) ;
 				return _program ;
 			}
 
-			private ProgramMap<GLProgram> cast( final Program _program )
+			@Override
+			public Program update( final Program _program )
 			{
-				//assert( _program != null ) ;
-				//assert( !( _program instanceof ProgramMap ) ) ;
-				return ( ProgramMap<GLProgram> )_program ;
+				// Not used, you don't update a glProgram.
+				// It gets updated/remapped when you update the draw buffer.
+				/*GLRenderer.this.invokeLater( () ->
+				{
+					final int index = _program.index() ;
+					final GLProgram glProgram = programLookup.getRHS( index ) ;
+				} ) ;*/
+				return _program ;
 			}
 		} ;
 	}
 
-	@Override
-	public WorldAssist.Assist getWorldAssist()
+	public WorldAssist.Assist createWorldAssist()
 	{
 		return new WorldAssist.Assist()
 		{
 			@Override
-			public World getDefaultWorld()
+			public World getDefault()
 			{
-				return getWorldState().getWorld( ( GLWorld )null ) ;
+				return GLRenderer.this.getDefaultWorld() ;
 			}
 
 			@Override
-			public World getWorld( final String _id )
+			public World add( final World _world )
 			{
-				return getWorldState().getWorld( _id ) ;
-			}
-
-			@Override
-			public World addWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				getWorldState().addWorld( world ) ;
-				return _world ;
-			}
-
-			@Override
-			public World removeWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-				getWorldState().removeWorld( world ) ;
-				return _world ;
-			}
-
-			@Override
-			public void destroyWorld( final World _world )
-			{
-				final GLWorld world = cast( _world ) ;
-			}
-
-			@Override
-			public World setRenderDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
-			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
+					worldLookup.map( _world.index(), _world, world ) ;
+
+					final int size = worlds.size() ;
+					for( int i = 0; i < size; ++i )
 					{
-						final GLWorld world = cast( _world ) ;
-						world.setRenderDimensions( _x, _y, _width, _height ) ;
+						final GLWorld w = worlds.get( i ) ; 
+						if( _world.getOrder() <= w.getOrder() )
+						{
+							worlds.add( i, world ) ;
+							return ;
+						}
+					}
+
+					worlds.add( world ) ;
+				} ) ;
+
+				return _world ;
+			}
+
+			@Override
+			public World remove( final World _world )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					final Tuple<World, GLWorld> tuple = worldLookup.unmap( _world.index() ) ;
+					if( tuple != null )
+					{
+						final GLWorld world = tuple.getRight() ;
+						worlds.remove( world ) ;
+						world.shutdown() ;
 					}
 				} ) ;
 				return _world ;
 			}
 
 			@Override
-			public World setDisplayDimensions( final World _world, final int _x, final int _y, final int _width, final int _height )
+			public World update( final World _world )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLWorld world = get( _world ) ;
+					if( world != null )
 					{
-						final GLWorld world = cast( _world ) ;
-						world.setDisplayDimensions( _x, _y, _width, _height ) ;
+						world.update( _world, cameraLookup, bufferLookup ) ;
 					}
 				} ) ;
 				return _world ;
 			}
 
-			@Override
-			public World constructWorld( final String _id, final int _order )
+			private GLWorld get( final World _world )
 			{
-				final GLWorld world = new GLWorld( _id, _order ) ;
-				world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-				world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
-				getWorldState().addWorld( world ) ;
-				return world ;
-			}
-
-			private GLWorld cast( final World _world )
-			{
-				//assert( _world != null ) ;
-				//assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
+				return worldLookup.getRHS( _world.index() ) ;
 			}
 		} ;
 	}
 
-	@Override
-	public CameraAssist.Assist getCameraAssist()
+	public CameraAssist.Assist createCameraAssist()
 	{
 		return new CameraAssist.Assist()
 		{
 			@Override
-			public Camera getDefaultCamera()
+			public Camera getDefault()
 			{
-				return defaultCamera ;
+				return GLRenderer.this.getDefaultCamera() ;
 			}
 
 			@Override
-			public Camera amendOrthographic( final Camera _camera,
-											 final float _top,
-											 final float _bottom,
-											 final float _left,
-											 final float _right,
-											 final float _near,
-											 final float _far )
+			public Camera add( final Camera _camera )
 			{
-				final CameraData camera = cast( _camera ) ;
-				final CameraData.Projection projection = camera.getProjection() ;
-
-				projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
-				projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
-
-				final float invZ = 1.0f / ( _far - _near ) ;
-				final float invY = 1.0f / ( _top - _bottom ) ;
-				final float invX = 1.0f / ( _right - _left ) ;
-
-				final Matrix4 proj = projection.matrix ;
-				proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
-						  0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
-						  0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
-						  0.0f,        0.0f,        0.0f,         1.0f ) ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLCamera camera = new GLCamera( _camera ) ;
+					cameraLookup.map( _camera.index(), _camera, camera ) ;
+					cameras.add( _camera ) ;
+				} ) ;
 				return _camera ;
 			}
 
 			@Override
-			public Camera amendPosition( final Camera _camera, final float _x, final float _y, final float _z )
+			public Camera remove( final Camera _camera )
 			{
-				cast( _camera ).setPosition( _x, _y, _z ) ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					cameras.remove( _camera ) ;
+					cameraLookup.unmap( _camera.index() ) ;
+				} ) ;
 				return _camera ;
 			}
 
 			@Override
-			public Camera amendRotation( final Camera _camera, final float _x, final float _y, final float _z )
+			public Camera update( final Camera _camera ) 
 			{
-				cast( _camera ).setRotation( _x, _y, _z ) ;
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLCamera camera = get( _camera ) ;
+					if( camera != null )
+					{
+						camera.update( _camera ) ;
+					}
+				} ) ;
 				return _camera ;
 			}
 
-			@Override
-			public Camera amendScale( final Camera _camera, final float _x, final float _y, final float _z )
+			private GLCamera get( final Camera _camera )
 			{
-				cast( _camera ).setScale( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendUIPosition( final Camera _camera, final float _x, final float _y, final float _z )
-			{
-				cast( _camera ).setUIPosition( _x, _y, _z ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendScreenResolution( final Camera _camera, final int _width, final int _height )
-			{
-				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
-				screen.setDimension( _width, _height ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera amendScreenOffset( final Camera _camera, final int _x, final int _y )
-			{
-				final CameraData.Screen screen = cast( _camera ).getRenderScreen() ;
-				screen.setOffset( _x, _y ) ;
-				return _camera ;
-			}
-
-			public Camera amendDisplayResolution( final Camera _camera, final int _width, final int _height )
-			{
-				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
-				screen.setDimension( _width, _height ) ;
-				return _camera ;
-			}
-
-			public Camera amendDisplayOffset( final Camera _camera, final int _x, final int _y )
-			{
-				final CameraData.Screen screen = cast( _camera ).getDisplayScreen() ;
-				screen.setOffset( _x, _y ) ;
-				return _camera ;
-			}
-
-			@Override
-			public boolean getPosition( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getPosition() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getRotation( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getRotation() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getScale( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getScale() ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getDimensions( final Camera _camera, final Vector3 _populate )
-			{
-				final CameraData.Projection projection = cast( _camera ).getProjection() ;
-				_populate.setXYZ( projection.nearPlane ) ;
-				return true ;
-			}
-
-			@Override
-			public boolean getUIPosition( final Camera _camera, final Vector3 _populate )
-			{
-				_populate.setXYZ( cast( _camera ).getUIPosition() ) ;
-				return true ;
-			}
-
-			@Override
-			public float convertInputToCameraX( final Camera _camera, final float _inputX )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToX( _inputX ) ;
-			}
-
-			@Override
-			public float convertInputToCameraY( final Camera _camera, final float _inputY )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToY( _inputY ) ;
-			}
-
-			@Override
-			public float convertInputToUICameraX( final Camera _camera, final float _inputX )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToUIX( _inputX ) ;
-			}
-
-			@Override
-			public float convertInputToUICameraY( final Camera _camera, final float _inputY )
-			{
-				final CameraData camera = cast( _camera ) ;
-				return camera.convertInputToUIY( _inputY ) ;
-			}
-
-			@Override
-			public Camera addCamera( final Camera _camera, final World _world )
-			{
-				final GLWorld world = getWorldState().getWorld( cast( _world ) ) ;
-				world.getCameraState().setDrawInterface( new GLCameraDraw( world ) ) ;
-				getWorldState().addCamera( cast( _camera ), world ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera removeCamera( final Camera _camera, final World _world )
-			{
-				getWorldState().removeCamera( cast( _camera ) ) ;
-				return _camera ;
-			}
-
-			@Override
-			public Camera createCamera( final String _id,
-										final Vector3 _position,
-										final Vector3 _rotation,
-										final Vector3 _scale )
-			{
-				return new CameraData( _id, _position, _rotation, _scale ) ;
-			}
-
-			private GLWorld cast( final World _world )
-			{
-				//assert( _world != null ) ;
-				//assert( !( _world instanceof GLWorld ) ) ;
-				return ( GLWorld )_world ;
-			}
-
-			private CameraData cast( final Camera _camera )
-			{
-				//assert( _camera != null ) ;
-				//assert( !( _camera instanceof CameraData ) ) ;
-				return ( CameraData )_camera ;
+				return cameraLookup.getRHS( _camera.index() ) ;
 			}
 		} ;
 	}
 
-	@Override
-	public void setRenderDimensions( final int _width, final int _height )
+	public StorageAssist.Assist createStorageAssist()
 	{
-		super.setRenderDimensions( _width, _height ) ;
-		resize() ;
+		return new StorageAssist.Assist()
+		{
+			@Override
+			public <T extends IUpdater<Storage>> T add( final T _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					storageUpdaters.add( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public <T extends IUpdater<Storage>> T remove( final T _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					storageUpdaters.remove( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public Storage add( Storage _storage )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLStorage storage = new GLStorage( _storage ) ;
+					storageLookup.map( _storage.index(), _storage, storage ) ;
+				} ) ;
+
+				return _storage ;
+			}
+
+			@Override
+			public Storage update( final Storage _storage )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					final GLStorage storage = get( _storage ) ;
+					if( storage != null )
+					{
+						storage.update( _storage ) ;
+					}
+				} ) ;
+
+				return _storage ;
+			}
+
+			private GLStorage get( final Storage _storage )
+			{
+				return storageLookup.getRHS( _storage.index() ) ;
+			}
+		} ;
 	}
 
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
-		super.setDisplayDimensions( _width, _height ) ;
+		updateCameraAndWorldDisplay( _width, _height ) ;
 		canvas.setWidth( _width ) ;
 		canvas.setHeight( _height ) ;
-		resize() ;
 	}
 
-	public void setViewMode( final int _mode )
+	private void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
-		viewMode = _mode ;
-	}
+		final Camera camera = getDefaultCamera() ;
+		camera.setDisplayResolution( _width, _height ) ;
+		camera.setScreenResolution( _width, _height ) ;
+		CameraAssist.update( camera ) ;
 
-	protected void resize()
-	{
-		switch( viewMode )
-		{
-			case PERSPECTIVE_MODE  : System.out.println( "Perspective Mode currently not implemented.." ) ; break ;
-			case ORTHOGRAPHIC_MODE : 
-			default                :
-			{
-				final Vector2 dimension = defaultCamera.getRenderScreen().dimension ;
-				CameraAssist.amendOrthographic( defaultCamera, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
-				break ;
-			}
-		}
+		final World world = getDefaultWorld() ;
+		world.setRenderDimensions( 0, 0, _width, _height ) ;
+		WorldAssist.update( world ) ;
 	}
 
 	public void draw( final float _dt )
 	{
 		super.draw( _dt ) ;
-		GLRenderer.handleError( "Previous: " ) ;
-		MGL.clear( GL3.COLOR_BUFFER_BIT | GL3.DEPTH_BUFFER_BIT ) ;	//GLRenderer.handleError( "Clear Buffers: ", gl ) ;
-		MGL.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;					//GLRenderer.handleError( "Clear Colour: ", gl ) ;
+		final float updateDelta = getUpdateDeltaTime() ;
+		final float frameDelta = getFrameDeltaTime() ;
+		final int frameNo = getFrameIteration() ;
 
+		// Expected number of render frames before the next update is triggered.
+		final int difference = ( int )( updateDelta / frameDelta ) ;
+
+		// We limit the number of textures that can be bound
+		// each draw call - ensures things still feel responsive.
+		textures.resetBindCount() ;
+
+		for( final Camera camera : cameras )
+		{
+			if( camera.update( difference, frameNo ) == true )
+			{
+				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
+				glCamera.update( camera ) ;
+			}
+		}
+
+		int totalBufferUpdates = 0 ;
+		totalBufferUpdates += updateStorageBuffers( difference, frameNo ) ;
+		totalBufferUpdates += updateBuffers( difference, frameNo ) ;
+
+		updateExecutions() ;
 		getEventController().update() ;
 
-		getWorldState().upload( ( int )( updateDT / drawDT ), renderIter ) ;
+		for( final GLWorld world : worlds )
+		{
+			world.draw() ;
+		}
 
 		MGL.flush() ;
 		MGL.finish() ;
+	}
+
+	@Override
+	public void sort() {}
+
+	@Override
+	public void clear()
+	{
+		//worlds.clear() ;
 	}
 
 	/**
@@ -789,15 +586,7 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		flagged for use.
 	*/
 	@Override
-	public void clean()
-	{
-		final Set<String> activeKeys = new HashSet<String>() ;
-		getWorldState().clean( activeKeys ) ;
-
-		programs.clean( activeKeys ) ;
-		textures.clean( activeKeys ) ;
-		fontManager.clean( activeKeys ) ;
-	}
+	public void clean() {}
 
 	/**
 		Construct an initial world that will be used 
@@ -809,63 +598,33 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 	*/
 	private void initDefaultWorld()
 	{
-		final GLWorldState worlds = getWorldState() ;
+		final Camera defaultCamera = getDefaultCamera() ;
+		cameras.add( defaultCamera ) ;
 
-		final GLWorld world = GLWorld.createDefaultWorld( "DEFAULT", 0 ) ;
-		world.getDrawState().setUploadInterface( new GLBasicUpload( world ) ) ;
-		world.getDrawState().setRemoveDelegate( new GLBasicRemove( world ) ) ;
+		final GLCamera camera = new GLCamera( defaultCamera ) ;
+		cameraLookup.map( defaultCamera.index(), defaultCamera, camera ) ;
 
-		worlds.addWorld( world ) ;
-		worlds.setDefault( world ) ;
+		final World defaultWorld = getDefaultWorld() ;
+		final GLWorld world = GLWorld.createCore( defaultWorld, cameraLookup, bufferLookup ) ;
+		worldLookup.map( defaultWorld.index(), defaultWorld, world ) ;
 
-		world.getCameraState().setDrawInterface( new GLCameraDraw( world ) ) ;
-		worlds.addCamera( defaultCamera, null ) ;
+		worlds.add( world ) ;
 	}
 
-	/**
-		Attempt to acquire a compatible GLProgram from 
-		the ProgramManager. Make sure the GLProgram 
-		requested maps correctly with the ProgramMap 
-		defined in the GLDrawData object.
-	*/
-	private static boolean loadProgram( final GLDrawData _data )
+	protected static GLImage getTexture( final MalletTexture _texture )
 	{
-		final ProgramMap<GLProgram> program = ( ProgramMap<GLProgram> )_data.getProgram() ;
-		if( program == null )
+		final MalletTexture.Meta meta = _texture.getMeta() ;
+		final String path = meta.getPath() ;
+
+		for( final GLWorld world : worlds )
 		{
-			// If we don't have a program then there is no point progressing further.
-			return false ;
+			if( path.equals( world.getID() ) == true )
+			{
+				return world.getImage( meta.getAttachmentIndex() ) ;
+			}
 		}
 
-		if( program.getProgram() == null )
-		{
-			final GLProgram glProgram = programs.get( program.getID() ) ;
-			if( glProgram == null )
-			{
-				// If the GLProgram is yet to exist then 
-				// _data will need to be run through the
-				// rendering cycle again.
-				_data.forceUpdate() ;
-				return false ;
-			}
-
-			if( glProgram.isValidMap( program.getMaps() ) == false )
-			{
-				// If a GLProgram exists but the mappings are 
-				// incompatible return false and prevent _data 
-				// from being rendered.
-				return false ;
-			}
-
-			program.setProgram( glProgram ) ;
-		}
-
-		return true ;
-	}
-
-	protected static GLImage getTexture( final String _path )
-	{
-		return textures.get( _path ) ;
+		return textures.get( path ) ;
 	}
 
 	protected static GLFont getFont( final MalletFont _font )
@@ -873,125 +632,99 @@ public class GLRenderer extends BasicRenderer<GLDrawData, CameraData, GLWorld, G
 		return fontManager.get( _font ) ;
 	}
 
+	private int updateStorageBuffers( final int _difference, final int _frameNo )
+	{
+		int totalBufferUpdates = 0 ;
+
+		for( final IUpdater<Storage> updater : storageUpdaters )
+		{
+			updater.update( buffersToUpdate, _difference, _frameNo ) ;
+			if( buffersToUpdate.isEmpty() == false )
+			{
+				totalBufferUpdates += buffersToUpdate.size() ;
+				for( final ABuffer buffer : buffersToUpdate )
+				{
+					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
+					if( storage.update( ( Storage )buffer ) == false )
+					{
+						updater.forceUpdate() ;
+					}
+				}
+				buffersToUpdate.clear() ;
+			}
+		}
+
+		return totalBufferUpdates ;
+	}
+
+	private int updateBuffers( final int _difference, final int _frameNo )
+	{
+		int totalBufferUpdates = 0 ;
+
+		for( final IUpdater<? extends ABuffer> updater : drawUpdaters )
+		{
+			updater.update( buffersToUpdate, _difference, _frameNo ) ;
+			if( buffersToUpdate.isEmpty() == false )
+			{
+				totalBufferUpdates += buffersToUpdate.size() ;
+				for( final ABuffer buffer : buffersToUpdate )
+				{
+					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
+					{
+						updater.forceUpdate() ;
+					}
+				}
+				buffersToUpdate.clear() ;
+			}
+		}
+
+		return totalBufferUpdates ;
+	}
+	
+	private <T extends ABuffer> boolean updateBuffer( final T _buffer, final GLBuffer _buff )
+	{
+		switch( _buffer.getBufferType() )
+		{
+			default              : return true ;//throw new Exception( "Unknown buffer type specified." ) ;
+			case GEOMETRY_BUFFER :
+			{
+				final GLGeometryBuffer buf = ( GLGeometryBuffer )_buff ;
+				return buf.update( ( GeometryBuffer )_buffer ) ;
+			}
+			case TEXT_BUFFER     :
+			{
+				final GLTextBuffer buf = ( GLTextBuffer )_buff ;
+				return buf.update( ( TextBuffer )_buffer, programLookup, storageLookup ) ;
+			}
+			case DRAW_BUFFER     :
+			{
+				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
+				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+			}
+			case DRAW_INSTANCED_BUFFER     :
+			{
+				final GLDrawInstancedBuffer buf = ( GLDrawInstancedBuffer )_buff ;
+				return buf.update( ( DrawInstancedBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+			}
+		}
+	}
+
 	public static void handleError( final String _txt )
 	{
 		int error = 0 ;
-		while( ( error = MGL.getError() ) != GL3.NO_ERROR )
+		while( ( error = MGL.getError() ) != MGL.GL_NO_ERROR )
 		{
 			switch( error )
 			{
-				case GL3.NO_ERROR                      : break ;
-				case GL3.INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
-				case GL3.INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
-				case GL3.INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
-				case GL3.INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
-				case GL3.OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
-				//case GL3.STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
-				//case GL3.STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
+				case MGL.GL_NO_ERROR                      : break ;
+				case MGL.GL_INVALID_ENUM                  : System.out.println( _txt + ": GL_INVALID_ENUM" ) ; break ;
+				case MGL.GL_INVALID_VALUE                 : System.out.println( _txt + ": GL_INVALID_VALUE" ) ; break ;
+				case MGL.GL_INVALID_OPERATION             : System.out.println( _txt + ": GL_INVALID_OPERATION" ) ; break ;
+				case MGL.GL_INVALID_FRAMEBUFFER_OPERATION : System.out.println( _txt + ": GL_INVALID_FRAMEBUFFER_OPERATION" ) ; break ;
+				case MGL.GL_OUT_OF_MEMORY                 : System.out.println( _txt + ": GL_OUT_OF_MEMORY" ) ; break ;
+				//case MGL.STACK_UNDERFLOW               : System.out.println( _txt + ": GL_STACK_UNDERFLOW" ) ; break ;
+				//case MGL.STACK_OVERFLOW                : System.out.println( _txt + ": GL_STACK_OVERFLOW" ) ; break ;
 			}
-		}
-	}
-
-	private final static class GLBasicRemove implements DrawState.RemoveDelegate<GLDrawData>
-	{
-		private final GLWorld world ;
-
-		public GLBasicRemove( final GLWorld _world )
-		{
-			world = _world ;
-		}
-
-		@Override
-		public void remove( final GLDrawData _data )
-		{
-			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.remove( _data ) ;
-		}
-	}
-
-	private final static class GLBasicUpload implements DrawState.IUpload<GLDrawData>
-	{
-		private final GLWorld world ;
-
-		public GLBasicUpload( final GLWorld _world )
-		{
-			world = _world ;
-		}
-
-		@Override
-		public void upload( final GLDrawData _data )
-		{
-			if( loadProgram( _data ) == false )
-			{
-				return ;
-			}
-
-			final Vector3 position = _data.getPosition() ;
-			final Vector3 offset   = _data.getOffset() ;
-			final Vector3 rotation = _data.getRotation() ;
-
-			final Matrix4 positionMatrix = _data.getDrawMatrix() ;
-			positionMatrix.setIdentity() ;
-
-			positionMatrix.setTranslate( position.x, position.y, 0.0f ) ;
-			positionMatrix.rotate( rotation.x, 1.0f, 0.0f, 0.0f ) ;
-			positionMatrix.rotate( rotation.y, 0.0f, 1.0f, 0.0f ) ;
-			positionMatrix.rotate( rotation.z, 0.0f, 0.0f, 1.0f ) ;
-			positionMatrix.translate( offset.x, offset.y, offset.z ) ;
-
-			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.upload( _data ) ;
-		}
-	}
-
-	private final static class GLCameraDraw implements CameraState.IDraw<CameraData>
-	{
-		private final GLWorld world ;
-
-		private final static Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
-		private final static Matrix4 worldMatrix = new Matrix4() ;	// Used for moving the camera around the world
-
-		private final Matrix4 worldProjection = new Matrix4() ;
-		private final Matrix4 uiProjection = new Matrix4() ;
-
-		public GLCameraDraw( final GLWorld _world )
-		{
-			world = _world ;
-		}
-
-		@Override
-		public void draw( final CameraData _camera )
-		{
-			final CameraData.Projection projection = _camera.getProjection() ;
-			final CameraData.Screen screen = _camera.getRenderScreen() ;
-
-			final int width = ( int )screen.dimension.x ;
-			final int height = ( int )screen.dimension.y ;
-			MGL.viewport( 0, 0, width, height ) ;
-
-			final Vector3 uiPosition = _camera.getUIPosition() ;
-			final Vector3 position = _camera.getPosition() ;
-			final Vector3 scale = _camera.getScale() ;
-			//final Vector3 rotation = _camera.getRotation() ;
-
-			worldMatrix.setIdentity() ;
-			worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
-			worldMatrix.scale( scale.x, scale.y, scale.z ) ;
-			worldMatrix.translate( -position.x, -position.y, 0.0f ) ;
-
-			uiMatrix.setIdentity() ;
-			uiMatrix.translate( -uiPosition.x, -uiPosition.y, 0.0f ) ;
-
-			worldProjection.setIdentity() ;
-			Matrix4.multiply( projection.matrix, worldMatrix, worldProjection ) ;
-
-			uiProjection.setIdentity() ;
-			Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
-
-			final GLGeometryUploader uploader = world.getUploader() ;
-			uploader.draw( worldProjection, uiProjection ) ;
-
-			//System.out.println( "Camera: " + world.getID() + " Order: " + world.getOrder() ) ;
 		}
 	}
 }

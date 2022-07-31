@@ -12,8 +12,6 @@ import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.renderer.IRender ;
-import com.linxonline.mallet.renderer.WorldAssist ;
-import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
