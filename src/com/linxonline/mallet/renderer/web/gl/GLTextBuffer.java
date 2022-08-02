@@ -328,7 +328,7 @@ public class GLTextBuffer extends GLBuffer
 			MGL.bindBuffer( MGL.GL_ARRAY_BUFFER, vboID[i] ) ;
 
 			GLTextBuffer.prepareVertexAttributes( attributes, vertexStrideBytes ) ;
-			MGL.drawElements( style, length, MGL.GL_UNSIGNED_INT, 0 ) ;
+			MGL.drawElements( style, length, MGL.GL_UNSIGNED_SHORT, 0 ) ;
 		}
 		GLTextBuffer.disableVertexAttributes( attributes ) ;
 	}

@@ -10,7 +10,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 public class GLBuffer
 {
-	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
+	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
 
 	public final static int VBO_VAR_BYTE_SIZE = 4 ;

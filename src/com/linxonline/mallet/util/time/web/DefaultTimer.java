@@ -18,7 +18,7 @@ public class DefaultTimer implements ITimer
 	@Override
 	public final double getElapsedTimeInNanoSeconds()
 	{
-		nanoseconds = ( double )getLongElapsedTime() * 0.000000001 ;
+		nanoseconds = ( double )getLongElapsedTime() * 0.001 ;
 		seconds += nanoseconds ;		// Accumulate the nanoseconds
 		while( seconds >= 1.0f )		// Once it reaches atleast 1 second store it 
 		{

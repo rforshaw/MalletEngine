@@ -7,6 +7,7 @@ import java.util.ArrayList ;
 import java.text.MessageFormat ;
 
 import org.teavm.jso.* ;
+import org.teavm.jso.json.JSON ;
 //import org.teavm.jso.browser.* ;
 import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.dom.events.* ;
@@ -84,7 +85,8 @@ public class GLRenderer extends BasicRenderer
 		MGL.cullFace( MGL.GL_BACK ) ;  
 		MGL.frontFace( MGL.GL_CCW ) ;
 
-		MGL.clearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+		MGL.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;
+		MGL.clear( MGL.GL_COLOR_BUFFER_BIT ) ;
 
 		initDefaultWorld() ;
 
@@ -93,6 +95,8 @@ public class GLRenderer extends BasicRenderer
 		programs.load( "SIMPLE_FONT", "base/shaders/web/simple_font.jgl" ) ;
 		programs.load( "SIMPLE_GEOMETRY", "base/shaders/web/simple_geometry.jgl" ) ;
 		programs.load( "SIMPLE_STENCIL", "base/shaders/web/simple_stencil.jgl" ) ;
+
+		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/web/simple_instance_texture.jgl" ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.

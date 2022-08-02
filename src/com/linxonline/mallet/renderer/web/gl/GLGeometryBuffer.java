@@ -7,7 +7,6 @@ import org.teavm.jso.webgl.WebGLBuffer ;
 import org.teavm.jso.typedarrays.ArrayBuffer ;
 import org.teavm.jso.typedarrays.Int16Array ;
 import org.teavm.jso.typedarrays.Float32Array ;
-import org.teavm.jso.typedarrays.Uint8Array ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
@@ -87,6 +86,8 @@ public class GLGeometryBuffer extends GLBuffer
 		// until we reach our maximum capacity.
 		indexBuffer = Int16Array.create( indexByteSize / IBO_VAR_BYTE_SIZE ) ;
 		vertexBuffer = Float32Array.create( vertexByteSize / VBO_VAR_BYTE_SIZE ) ;
+
+		System.out.println( "Initial Size: " + vertexBuffer.getLength() ) ;
 
 		indexID[0] = MGL.createBuffer() ;
 		vboID[0] = MGL.createBuffer() ;
@@ -229,7 +230,7 @@ public class GLGeometryBuffer extends GLBuffer
 				apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 
 				MGL.uniformMatrix4fv( _program.inModelMatrix, true, matrix.matrix ) ;
-				MGL.drawElements( style, map.count, MGL.GL_UNSIGNED_INT, map.start * IBO_VAR_BYTE_SIZE ) ;
+				MGL.drawElements( style, map.count, MGL.GL_UNSIGNED_SHORT, map.start * IBO_VAR_BYTE_SIZE ) ;
 			}
 		}
 		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;

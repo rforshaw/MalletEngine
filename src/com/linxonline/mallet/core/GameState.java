@@ -73,7 +73,7 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.MULTI, UpdateMode.GAME ) ;
+		this( _name, Threaded.SINGLE, UpdateMode.GAME ) ;
 	}
 
 	public GameState( final String _name, final UpdateMode _mode )
@@ -400,6 +400,7 @@ public class GameState extends State
 				long startTime = ElapsedTimer.nanoTime() ;
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
+				//System.out.println( "Update Game State: " + updateAccumulator ) ;
 
 				while( updateAccumulator >= DEFAULT_TIMESTEP )
 				{
@@ -422,7 +423,6 @@ public class GameState extends State
 				if( renderAccumulator >= DEFAULT_FRAMERATE )
 				{
 					startTime = ElapsedTimer.nanoTime() ;
-
 					for( IUpdate update : drawUpdaters )
 					{
 						update.update( DEFAULT_FRAMERATE ) ;

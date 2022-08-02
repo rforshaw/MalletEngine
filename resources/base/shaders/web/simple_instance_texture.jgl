@@ -1,0 +1,8 @@
+{
+	"NAME": "SIMPLE_INSTANCE_TEXTURE",
+	"VERTEX": ["base/shaders/web/simple_vertex.glsl"],
+	"FRAGMENT": ["base/shaders/web/simple_texture_fragment.glsl"],
+
+	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
+	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
+}

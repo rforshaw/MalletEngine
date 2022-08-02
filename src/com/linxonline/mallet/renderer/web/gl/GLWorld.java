@@ -306,7 +306,7 @@ public class GLWorld
 		return order ;
 	}
 
-	private void updateBufferDimensions( final World _world,  final int _width, final int _height )
+	private void updateBufferDimensions( final World _world, final int _width, final int _height )
 	{
 		final AttachmentType[] attachments = _world.getAttachments() ;
 		for( int i = 0; i < attachments.length; ++i )
@@ -369,7 +369,7 @@ public class GLWorld
 			id = _world.getID() ;
 
 			_world.getRenderDimensions( render ) ;
-			MGL.bindFramebuffer( MGL.GL_FRAMEBUFFER, ( WebGLFramebuffer )buffers[FRAME_BUFFER]  ) ;
+			MGL.bindFramebuffer( MGL.GL_FRAMEBUFFER, null  ) ;
 
 			updateCameras( _world, _cameras ) ;
 			updateDrawBuffers( _world, _buffers ) ;
@@ -389,14 +389,14 @@ public class GLWorld
 		@Override
 		public void draw()
 		{
-			MGL.bindFramebuffer( MGL.GL_FRAMEBUFFER, ( WebGLFramebuffer )buffers[FRAME_BUFFER]  ) ;
+			MGL.bindFramebuffer( MGL.GL_FRAMEBUFFER, null ) ;
 			if( hasDepth == true )
 			{
 				// Enable Depth Test if the framebuffer contains a depth attachment.
 				MGL.enable( MGL.GL_DEPTH_TEST ) ;
 			}
 
-			MGL.clearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
+			MGL.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;
 
 			int clearBits = MGL.GL_COLOR_BUFFER_BIT ;
 			clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;

@@ -18,9 +18,12 @@ import org.teavm.jso.typedarrays.Uint8Array ;
 import org.teavm.jso.dom.html.HTMLImageElement ;
 import org.teavm.jso.dom.html.HTMLCanvasElement ;
 
+import com.linxonline.mallet.util.buffers.FloatBuffer ;
+
 public final class MGL
 {
 	private static WebGLRenderingContext gl ;
+	private final static float[] matrix = FloatBuffer.allocate( 16 ) ;
 
 	public final static int GL_MAX_TEXTURE_SIZE = WebGLRenderingContext.MAX_TEXTURE_SIZE ;
 	public final static int GL_TEXTURE_WRAP_S = WebGLRenderingContext.TEXTURE_WRAP_S ;
@@ -74,6 +77,7 @@ public final class MGL
 	public final static int GL_FLOAT = WebGLRenderingContext.FLOAT ;
 	public final static int GL_UNSIGNED_BYTE = WebGLRenderingContext.UNSIGNED_BYTE ;
 	public final static int GL_UNSIGNED_INT = WebGLRenderingContext.UNSIGNED_INT ;
+	public final static int GL_UNSIGNED_SHORT = WebGLRenderingContext.UNSIGNED_SHORT ;
 
 	public final static int GL_ALWAYS = WebGLRenderingContext.ALWAYS ;
 	public final static int GL_KEEP = WebGLRenderingContext.KEEP ;
@@ -184,14 +188,27 @@ public final class MGL
 
 	public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final float[] _values )
 	{
-		gl.uniformMatrix4fv( _location, _transpose, _values ) ;
+		transpose( _values ) ;
+		gl.uniformMatrix4fv( _location, false, matrix ) ;
 	}
 
-	public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final Float32Array _values )
+	/*public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final Float32Array _values )
 	{
-		gl.uniformMatrix4fv( _location, _transpose, _values ) ;
+		//transpose( _values ) ;
+		gl.uniformMatrix4fv( _location, false, _values ) ;
+	}*/
+
+	private static void transpose( final float[] _source )
+	{
+		FloatBuffer.copy( _source, matrix ) ;
+		FloatBuffer.swap( matrix, 1, 4 ) ;
+		FloatBuffer.swap( matrix, 2, 8 ) ;
+		FloatBuffer.swap( matrix, 3, 12 ) ;
+		FloatBuffer.swap( matrix, 6, 9 ) ;
+		FloatBuffer.swap( matrix, 7, 13 ) ;
+		FloatBuffer.swap( matrix, 11, 14 ) ;
 	}
-	
+
 	public static void stencilFunc( final int _func, final int _ref, final int _mask )
 	{
 		gl.stencilFunc( _func, _ref, _mask ) ;

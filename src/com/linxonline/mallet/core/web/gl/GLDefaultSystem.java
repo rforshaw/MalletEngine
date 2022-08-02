@@ -67,6 +67,9 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 	}
 
 	@Override
+	public void sleep( final long _millis ) {}
+
+	@Override
 	public void startSystem()
 	{
 		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;

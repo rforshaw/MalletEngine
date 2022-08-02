@@ -383,7 +383,7 @@ public class GLProgram extends ProgramManager.Program
 		if( response == false )
 		{
 			final String log = MGL.getShaderInfoLog( shader ) ;
-			//System.out.println( "Error compiling shader: " + _shader.file + "\n" + log ) ;
+			System.out.println( "Error compiling shader: \n" + log ) ;
 			return false ;
 		}
 
@@ -441,8 +441,9 @@ public class GLProgram extends ProgramManager.Program
 			switch( _filter )
 			{
 				default          : return MGL.GL_LINEAR ;
-				case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
-				case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+				// We don't generate mip-maps so fallback to linear.
+				//case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
+				//case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
 				case LINEAR      : return MGL.GL_LINEAR ;
 				case NEAREST     : return MGL.GL_NEAREST ;
 			}

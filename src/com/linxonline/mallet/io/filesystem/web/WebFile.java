@@ -3,6 +3,7 @@ package com.linxonline.mallet.io.filesystem.web ;
 import java.util.List ;
 
 import org.teavm.jso.browser.Window ;
+import org.teavm.jso.browser.Location ;
 import org.teavm.jso.dom.html.HTMLBodyElement ;
 import org.teavm.jso.dom.html.HTMLDocument ;
 import org.teavm.jso.dom.html.HTMLElement ;
@@ -20,7 +21,10 @@ import com.linxonline.mallet.util.MalletList ;
 public class WebFile implements FileStream
 {
 	private static final HTMLDocument document = Window.current().getDocument() ;
+	private static final Location location = Location.current() ;
+	
 	private final String path ;
+	private final String url ;
 	private final HTMLSourceElement element ;
 
 	public WebFile( final String _path )
@@ -29,6 +33,7 @@ public class WebFile implements FileStream
 		element.setSrc( _path ) ;
 
 		path = _path ;
+		url = String.format( "%s%s", location.getFullURL(), path ) ;
 	}
 
 	public HTMLSourceElement getHTMLSource()
@@ -39,7 +44,7 @@ public class WebFile implements FileStream
 	public HTMLImageElement getHTMLImage()
 	{
 		final HTMLImageElement img = document.createElement( "img" ).cast() ;
-		img.setSrc( path ) ;
+		img.setSrc( url ) ;
 		return img ;
 	}
 
@@ -47,7 +52,7 @@ public class WebFile implements FileStream
 	public ByteInStream getByteInStream()
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
-		request.open( "GET", path, false ) ;
+		request.open( "GET", url, false ) ;
 		request.send() ;
 
 		final Int8Array array = Int8Array.create( ( ArrayBuffer )request.getResponse() ) ;
@@ -65,7 +70,7 @@ public class WebFile implements FileStream
 	public StringInStream getStringInStream()
 	{
 		final XMLHttpRequest request = XMLHttpRequest.create() ;
-		request.open( "GET", path, false ) ;
+		request.open( "GET", url, false ) ;
 		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
 		request.send() ;
 
