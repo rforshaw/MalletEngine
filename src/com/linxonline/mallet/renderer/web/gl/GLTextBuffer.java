@@ -187,7 +187,7 @@ public class GLTextBuffer extends GLBuffer
 			for( int i = 0; i < length; i++ )
 			{
 				final char c = text.charAt( start + i ) ;
-				
+				//System.out.println( "Char: " + c ) ;
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
@@ -250,6 +250,7 @@ public class GLTextBuffer extends GLBuffer
 							{
 								shape.getVector3( j, k, point ) ;
 								Matrix4.multiply( point, matrix, temp ) ;
+								//System.out.println( "Vec3: " + temp.toString() ) ;
 								vertexBuffer.set( incrementVertex++, temp.x ) ;
 								vertexBuffer.set( incrementVertex++, temp.y ) ;
 								vertexBuffer.set( incrementVertex++, temp.z ) ;
@@ -265,6 +266,7 @@ public class GLTextBuffer extends GLBuffer
 							}
 							case VEC2     :
 							{
+								//System.out.println( "Vec2: " + uv.toString() ) ;
 								shape.getVector2( j, k, uv ) ;
 								vertexBuffer.set( incrementVertex++, uv.x ) ;
 								vertexBuffer.set( incrementVertex++, uv.y ) ;
@@ -274,7 +276,9 @@ public class GLTextBuffer extends GLBuffer
 					}
 				}
 
+				//System.out.println( "Glyph Width: " + glyph.getWidth() ) ;
 				matrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
+				//System.out.println( "Matrix: " + matrix.toString() ) ;
 			}
 
 			//indexBuffer.put( PRIMITIVE_RESTART_INDEX ) ;

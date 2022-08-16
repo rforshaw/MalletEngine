@@ -44,7 +44,8 @@ public class DefaultTimer implements ITimer
 	@Override
 	public long nanoTime()
 	{
-		return ( long )Performance.now() ;
+		final long nano = ( long )Performance.now() * 1000000 ;
+		return nano ;
 	}
 
 	private final long getLongElapsedTime()

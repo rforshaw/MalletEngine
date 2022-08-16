@@ -87,8 +87,6 @@ public class GLGeometryBuffer extends GLBuffer
 		indexBuffer = Int16Array.create( indexByteSize / IBO_VAR_BYTE_SIZE ) ;
 		vertexBuffer = Float32Array.create( vertexByteSize / VBO_VAR_BYTE_SIZE ) ;
 
-		System.out.println( "Initial Size: " + vertexBuffer.getLength() ) ;
-
 		indexID[0] = MGL.createBuffer() ;
 		vboID[0] = MGL.createBuffer() ;
 	}

@@ -130,12 +130,12 @@ public class InputSystem implements IInputSystem
 			inputs[i] = new InputEvent() ;
 		}
 		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
-		/*document.addEventListener( "mousedown", mouseDown ) ;
+		document.addEventListener( "mousedown", mouseDown ) ;
 		document.addEventListener( "mouseup", mouseUp) ;
 		document.addEventListener( "mousemove", mouseMove ) ;
 
 		document.addEventListener( "keydown", keyDown ) ;
-		document.addEventListener( "keyup", keyUp ) ;*/
+		document.addEventListener( "keyup", keyUp ) ;
 	}
 
 	public void addInputHandler( final IInputHandler _handler )

@@ -52,6 +52,7 @@ public class GLTF
 	public Shape createMeshByIndex( final int _index, final Tuple<String, Attribute>[] _attributes )
 	{
 		final JChunk.Mesh mesh = header.getMesh( _index ) ;
+		System.out.println( "Found Mesh" ) ;
 		return createShapeFromMesh( header, mesh, _attributes ) ;
 	}
 
@@ -72,6 +73,8 @@ public class GLTF
 
 	private Shape createShapeFromMesh( final JChunk _chunk, final JChunk.Mesh _mesh, final Tuple<String, Attribute>[] _attributes )
 	{
+		System.out.println( "Create Shape From Mesh" ) ;
+
 		final JChunk.Primitive gPrimitive = _mesh.primitives[0] ;
 
 		final int length = _attributes.length ;
@@ -284,12 +287,12 @@ public class GLTF
 			return null ;
 		}
 
-		final byte[] data = new byte[( int )stream.getSize()] ;
+		final int size = ( int )stream.getSize() ;
+		final byte[] data = new byte[size] ;
 
 		try( final ByteInStream in = stream.getByteInStream() )
 		{
 			final int read = in.readBytes( data, 0, 12 ) ;
-
 			if( read != 12 )
 			{
 				Logger.println( "Failed to read header expected 12 bytes.", Logger.Verbosity.NORMAL ) ;
@@ -309,7 +312,6 @@ public class GLTF
 			ConvertBytes.flipEndian( data, 8, 4 ) ;
 			final long length = toUnsignedLong( ConvertBytes.toInt( data, 8 ) ) ;
 
-			System.out.println( "Magic: " + magic + " Version: " + version + " Length: " + length ) ;
 			final JChunk jChunk = readJChunk( in, data, 12 ) ;
 			if( jChunk == null )
 			{
@@ -337,6 +339,11 @@ public class GLTF
 		{
 			Logger.println( "Failed to read chunk header from file, expected 8 bytes.", Logger.Verbosity.NORMAL ) ;
 			return null ;
+		}
+
+		for( int i = _offset; i < _offset + 8; ++i )
+		{
+			System.out.println( _data[i] ) ;
 		}
 
 		ConvertBytes.flipEndian( _data, _offset, 4 ) ;

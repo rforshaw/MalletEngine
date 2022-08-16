@@ -33,4 +33,10 @@ public class Glyph implements ISort
 	{
 		return ( int )character ;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Character: " + character + " Width: " + width ;
+	}
 }

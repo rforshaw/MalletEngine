@@ -110,20 +110,20 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
-				//createUI() ;
+				createUI() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
-				//renderTextExample() ;
+				renderTextExample() ;
 				//playAudioExample() ;
 
 				createEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
-				//createSpinningCubeExample() ;
+				createSpinningCubeExample() ;
 
-				//createEventMessageTest() ;
+				createEventMessageTest() ;
 
-				//getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 			}
 
 			public void createUI()

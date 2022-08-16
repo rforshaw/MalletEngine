@@ -430,7 +430,7 @@ public class ConvertBytes
 			_bytes[_offset + _length - i - 1] = _bytes[_offset + i] ;
 			_bytes[_offset + i] = h ;
 		}
-		
+
 		return _bytes ;
 	}
 

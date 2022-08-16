@@ -256,12 +256,12 @@ public class JObject
 
 	public String toString()
 	{
-		return object.toString() ;
+		return JSON.stringify( object ) ;
 	}
 
 	public String toString( final int _indent )
 	{
-		return object.toString() ;
+		return JSON.stringify( object ) ;
 	}
 
 	public interface ConstructCallback
@@ -272,7 +272,7 @@ public class JObject
 	@JSBody( params = { "_obj", "_key" }, script = "return _obj.hasOwnProperty( _key ) ;" )
 	public static native boolean hasKey( final JSObject _obj, String _key ) ;
 
-	@JSBody( params = { "_obj" }, script = "return _obj.keys ;" )
+	@JSBody( params = { "_obj" }, script = "return Object.keys( _obj ) ;" )
 	public static native String[] keys( final JSObject _obj ) ;
 
 	@JSBody( params = { "_obj", "_key", "_val" }, script = "_obj[_key] = _val ;" )

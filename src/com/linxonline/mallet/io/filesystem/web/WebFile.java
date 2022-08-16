@@ -2,6 +2,10 @@ package com.linxonline.mallet.io.filesystem.web ;
 
 import java.util.List ;
 
+import org.teavm.interop.Async;
+import org.teavm.interop.AsyncCallback;
+
+import org.teavm.jso.JSObject ;
 import org.teavm.jso.browser.Window ;
 import org.teavm.jso.browser.Location ;
 import org.teavm.jso.dom.html.HTMLBodyElement ;
@@ -27,6 +31,8 @@ public class WebFile implements FileStream
 	private final String url ;
 	private final HTMLSourceElement element ;
 
+	private final XMLHttpRequest request ; 
+
 	public WebFile( final String _path )
 	{
 		element = document.createElement( "source" ).cast() ;
@@ -34,6 +40,11 @@ public class WebFile implements FileStream
 
 		path = _path ;
 		url = String.format( "%s%s", location.getFullURL(), path ) ;
+
+		request = XMLHttpRequest.create() ;
+		request.open( "get", url, false ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
+		request.send() ;
 	}
 
 	public HTMLSourceElement getHTMLSource()
@@ -51,29 +62,19 @@ public class WebFile implements FileStream
 	@Override
 	public ByteInStream getByteInStream()
 	{
-		final XMLHttpRequest request = XMLHttpRequest.create() ;
-		request.open( "GET", url, false ) ;
-		request.send() ;
-
-		final Int8Array array = Int8Array.create( ( ArrayBuffer )request.getResponse() ) ;
-		final byte[] data = new byte[array.getByteLength()] ;
-
-		for( int i = 0; i < data.length; ++i )
+		final String responseText = request.getResponseText() ;
+		final byte[] result = new byte[responseText.length()] ;
+		for( int i = 0; i < result.length; ++i)
 		{
-			data[i] = array.get( i ) ;
+			result[i] = ( byte )responseText.charAt( i ) ;
 		}
 
-		return new WebByteIn( data ) ;
+		return new WebByteIn( result ) ;
 	}
 
 	@Override
 	public StringInStream getStringInStream()
 	{
-		final XMLHttpRequest request = XMLHttpRequest.create() ;
-		request.open( "GET", url, false ) ;
-		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
-		request.send() ;
-
 		return new WebStringIn( request.getResponseText().getBytes() ) ;
 	}
 
@@ -299,6 +300,7 @@ public class WebFile implements FileStream
 	@Override
 	public long getSize()
 	{
-		return 0L ;
+		final String text = request.getResponseText() ;
+		return text.length() ;
 	}
 }

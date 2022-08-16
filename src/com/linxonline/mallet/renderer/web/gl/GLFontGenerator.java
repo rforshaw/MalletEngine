@@ -68,7 +68,8 @@ public class GLFontGenerator
 
 		final char c = ( char )_code ;
 		final float width = canvas.measureText( String.valueOf( c ) ).getWidth() ;
-		return new Glyph( c, width ) ;
+		final Glyph glyph = new Glyph( c, width ) ;
+		return glyph ;
 	}
 
 	public Bundle generateFont( final MalletFont _font )
@@ -137,7 +138,7 @@ public class GLFontGenerator
 		for( int i = 0; i < _glyphs.length; i++ )
 		{
 			final Glyph glyph = _glyphs[i] ;
-			width += glyph != null ? glyph.getWidth() : 0.0f ;
+			width += glyph != null ? glyph.getWidth() + PADDING : PADDING ;
 		}
 		return width ;
 	}
@@ -148,7 +149,7 @@ public class GLFontGenerator
 		final HTMLElement div = doc.createElement( "div" ) ;
 		final HTMLElement txt = div.withText( _text ) ;
 
-		div.withAttr( "style", _canvas.getFont() + ";position:absolute;top:0;left:0" ) ;
+		div.withAttr( "style", _canvas.getFont() ) ;
 		doc.getBody().withChild( div ) ;
 
 		final int height = div.getClientHeight() ;
