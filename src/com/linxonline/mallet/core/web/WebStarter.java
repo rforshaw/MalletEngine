@@ -56,7 +56,7 @@ public class WebStarter extends IStarter
 			{
 				System.out.println( "Shutting down..." ) ;
 				stop() ;
-				System.exit( 0 ) ;
+				//System.exit( 0 ) ;
 			}
 		} ) ;
 	}

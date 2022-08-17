@@ -28,7 +28,6 @@ public class FrameBuffer
 						final int _width,  final int _height )
 	{
 		final String uid = UUID.randomUUID().toString() ;
-		//System.out.println( uid ) ;
 
 		camera = CameraAssist.add( new Camera( uid ) ) ;
 		world = WorldAssist.add( new World( uid ) ) ;

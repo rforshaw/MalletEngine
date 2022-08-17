@@ -2,10 +2,10 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.linxonline.mallet</groupId>
-  <artifactId>mallet-engine</artifactId>
-  <version>v0</version>
-  <packaging>jar</packaging>
+  <groupId>com.template</groupId>
+  <artifactId>template-game</artifactId>
+  <version>latest</version>
+  <packaging>war</packaging>
 
   <properties>
     <java.version>1.8</java.version>
@@ -36,6 +36,14 @@
       <artifactId>javax.servlet-api</artifactId>
       <version>3.1.0</version>
       <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.linxonline.mallet</groupId>
+      <artifactId>mallet</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/mallet-engine-v0.jar</systemPath>
     </dependency>
   </dependencies>
 
@@ -87,7 +95,7 @@
               <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>
 
               <!-- Main class, containing static void main(String[]) -->
-              <mainClass>com.linxonline.mallet.core.web.Client</mainClass>
+              <mainClass>rg.main.web.Main</mainClass>
 
               <!-- Whether TeaVM should produce minified JavaScript. Can reduce JavaScript file size more than
                    two times -->
