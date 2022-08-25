@@ -4,6 +4,15 @@ import java.util.Map ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
+/**
+	An animation booklet contains a set of animation sequences.
+	An animation sequence can be played by calling play() and
+	passing the key that is associated with a specific sequence.
+	The animation will continue to play until pause() or stop()
+	is called. Attach an IListener to the booklet to find out when
+	the next frame is triggered, or when the animation sequence
+	has changed.
+*/
 public class AnimationBooklet<T extends Animation.Frame> implements AnimationSystem.IAnimation
 {
 	private Animation<T> currentAnim = null ;

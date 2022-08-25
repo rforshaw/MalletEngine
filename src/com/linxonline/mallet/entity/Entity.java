@@ -11,8 +11,6 @@ import com.linxonline.mallet.event.* ;
 
 /**
 	Entity is a container class for Components.
-	By default an Entity should have a name, and a global family name.
-	For example an Entity could be named HENCHMAN, and be in the ENEMY family.
 
 	Entity also allows an internal component to send messages to other components,
 	it operates in a similar basis to the EventSystem.
@@ -57,6 +55,7 @@ public class Entity
 				case LOCAL     : eventSystem = new EventSystem( _capacity ) ; break ;
 				case GAMESTATE : stateController = createStateEventController() ; break ;
 				case SYSTEM    : systemController = createSystemEventController() ; break ;
+				case NO        : break ;
 			}
 		}
 	}

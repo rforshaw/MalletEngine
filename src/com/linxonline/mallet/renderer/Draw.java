@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
+import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
@@ -124,12 +125,22 @@ public class Draw implements IUpdate
 		return FloatBuffer.fill( present, _fill, POSITION ) ;
 	}
 
+	public Vector2 getPosition( final Vector2 _fill )
+	{
+		return FloatBuffer.fill( present, _fill, POSITION ) ;
+	}
+
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )
+	{
+		return FloatBuffer.fill( present, _fill, OFFSET ) ;
+	}
+
+	public Vector2 getOffset( final Vector2 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, OFFSET ) ;
 	}
@@ -173,6 +184,11 @@ public class Draw implements IUpdate
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
+	{
+		return FloatBuffer.fill( present, _fill, SCALE ) ;
+	}
+
+	public Vector2 getScale( final Vector2 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, SCALE ) ;
 	}

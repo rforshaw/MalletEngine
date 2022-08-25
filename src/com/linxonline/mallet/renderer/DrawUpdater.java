@@ -28,11 +28,20 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		drawBuffer = _draw ;
 	}
 
+	/**
+		Force all GeometryBuffers assigned to this updater
+		to be re/uploaded to the GPU.
+	*/
 	public void forceUpdate()
 	{
 		forceUpdate = true ;
 	}
 
+	/**
+		Update the draw objects position, scale, and rotation
+		using the interpolation mode specified.
+		NOTE: This does not trigger an upload to the GPU. 
+	*/
 	public void makeDirty()
 	{
 		dirty = true ;
@@ -116,7 +125,6 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
 					dirty = true ;
-					stateHasChanged = true ;
 				}
 			}
 
