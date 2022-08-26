@@ -110,6 +110,8 @@ public class AudioSystem
 				case STOPPED   :
 				{
 					callback.finished() ;
+					// Once the source state is flagged as STOPPED
+					// remove it from the active list.
 					invokeLater( () -> active.remove( source ) ) ;
 					break ;
 				}
@@ -357,7 +359,8 @@ public class AudioSystem
 						Logger.println( "Failed to stop: " + _emitter.getFilepath(), Logger.Verbosity.NORMAL ) ;
 					}
 
-					active.remove( source ) ;
+					// Don't remove the source from the active pool
+					// As it will get removed on the next getState() call.
 				} ) ;
 
 				return _emitter ;
@@ -428,9 +431,6 @@ public class AudioSystem
 							continue ;
 						}
 
-						active.remove( source ) ;
-
-						source.stop() ;
 						source.destroy() ;
 					}
 					emitters.clear() ;

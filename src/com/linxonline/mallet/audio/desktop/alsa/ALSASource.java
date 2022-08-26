@@ -2,6 +2,7 @@ package com.linxonline.mallet.audio.desktop.alsa ;
 
 import com.jogamp.openal.* ;
 
+import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.audio.* ;
 
 import com.linxonline.mallet.util.SourceCallback ;
@@ -12,9 +13,22 @@ import com.linxonline.mallet.util.SourceCallback ;
 */
 public class ALSASource implements ISource
 {
+	// By default OpenAL only allows for 256 sources.
+	// If we allocate an AL source for each of our ISource's
+	// we run the risk of running out quickly.
+	// To resolve this matter we'll allocate all available AL
+	// sources up front, we'll then share them to our ISource
+	// when play(), playLoop(), pause() operation is called.
+	// stop() will trigger the relinquishing of the AL source ID.
+	private static final int MAX_SOURCE_NUM = 256 ;
+	private static final int[] SOURCES = new int[MAX_SOURCE_NUM] ;					// Pool of all sources.
+	private static final boolean[] SOURCE_USED = new boolean[MAX_SOURCE_NUM] ;		// true == source is currently used.
+	private static int NEXT_SOURCE_INDEX = 0 ;										// Next source to use
+
 	private final AL openAL ;
 	private final ALSABuffer buffer ;
-	private final int[] source ;
+
+	private int sourceIndex = -1 ;
 
 	private final int[] state = new int[1] ;			// Current State of the Audio: Playing, Pause, etc..
 	private final int[] size = new int[1] ;
@@ -23,27 +37,119 @@ public class ALSASource implements ISource
 	private final int[] freq = new int[1] ;
 	private final int[] bufferOffset = new int[1] ;
 
+	private final Vector3 position = new Vector3() ;
+	private boolean relative = false ;
+	private int volume = 100 ;
+
 	private State currentState = State.UNKNOWN ;
 	private SourceCallback callback ;
 
-	public ALSASource( final AL _openAL, final ALSABuffer _buffer, final int[] _source )
+	public ALSASource( final AL _openAL, final ALSABuffer _buffer )
 	{
 		openAL = _openAL ;
 		buffer = _buffer ;
-		source = _source ;
+	}
+
+	public static void initSourceIDs( final AL _openAL )
+	{
+		_openAL.alGenSources( SOURCES.length, SOURCES, 0 ) ;	
+		final int error = _openAL.alGetError() ;
+		if( error != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to Generate Source: " + ALSAGenerator.getALErrorString( error ) ) ;
+			return ;
+		}
+	}
+
+	/**
+		Return the index of the next available source.
+		NOTE: This will crash if no sources are available.
+	*/
+	public static int getNextIndex()
+	{
+		final int index = NEXT_SOURCE_INDEX % MAX_SOURCE_NUM ;
+		if( SOURCE_USED[index] == true )
+		{
+			++NEXT_SOURCE_INDEX ;
+			return getNextIndex() ;
+		}
+
+		++NEXT_SOURCE_INDEX ;
+		SOURCE_USED[index] = true ;
+		return index ;
+	}
+
+	/**
+		Allow the source to claim an AL source ID.
+	*/
+	private static void claimSourceID( final ALSASource _source )
+	{
+		if( _source.sourceIndex >= 0 )
+		{
+			return ;
+		}
+
+		_source.sourceIndex = getNextIndex() ;
+
+		final AL openAL = _source.openAL ;
+		final int[] buffer = _source.buffer.getBufferID() ;
+		final Vector3 position = _source.position ;
+		final int index = _source.sourceIndex ;
+		final float vol = _source.volume / 100.0f ;
+		final boolean relative = _source.relative ;
+
+		openAL.alSourcei( SOURCES[index], AL.AL_BUFFER, buffer[0] ) ;		// Bind Buffer to Source
+		openAL.alSourcef( SOURCES[index], AL.AL_PITCH, 1.0f ) ;
+		openAL.alSourcef( SOURCES[index], AL.AL_GAIN, vol ) ;
+		openAL.alSource3f( SOURCES[index], AL.AL_POSITION, position.x, position.y, position.z ) ;
+		openAL.alSourcei( SOURCES[index], AL.AL_SOURCE_RELATIVE, ( relative == true ) ? AL.AL_TRUE : AL.AL_FALSE ) ;
+
+		// Not looping by default
+		openAL.alSourcei( SOURCES[index], AL.AL_LOOPING, AL.AL_FALSE ) ;
+
+		final int error = openAL.alGetError() ;
+		if( error != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to Configure Source: " + ALSAGenerator.getALErrorString( error ) ) ;
+			return ;
+		}
+	}
+
+	private static void relinquishSourceID( final ALSASource _source )
+	{
+		final int index = _source.sourceIndex ;
+		if( index <= -1 )
+		{
+			return ;
+		}
+
+		final AL openAL = _source.openAL ;
+
+		openAL.alSourcei( SOURCES[index], AL.AL_BUFFER,  AL.AL_NONE ) ;
+		if( openAL.alGetError() != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to reset source" ) ;
+		}
+
+		SOURCE_USED[index] = false ;
+		_source.sourceIndex = -1 ;
 	}
 
 	@Override
 	public boolean play()
 	{
-		openAL.alSourcePlay( source[0] ) ;
+		claimSourceID( this ) ;
+
+		openAL.alSourcePlay( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
 	public boolean playLoop()
 	{
-		openAL.alSourcei( source[0], AL.AL_LOOPING,  AL.AL_TRUE ) ;
+		claimSourceID( this ) ;
+
+		openAL.alSourcei( SOURCES[sourceIndex], AL.AL_LOOPING,  AL.AL_TRUE ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
 			return false ;
@@ -54,37 +160,72 @@ public class ALSASource implements ISource
 	@Override
 	public boolean pause()
 	{
-		openAL.alSourcePause( source[0] ) ;
+		claimSourceID( this ) ;
+
+		openAL.alSourcePause( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
 	public boolean stop()
 	{
-		openAL.alSourceStop( source[0] ) ;
+		claimSourceID( this ) ;
+
+		openAL.alSourceStop( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
 	public boolean setPosition( final float _x, final float _y, final float _z )
 	{
-		openAL.alSource3f( source[0], AL.AL_POSITION, _x, _y, _z ) ;
+		position.setXYZ( _x, _y, _z ) ;
+
+		// We only want to apply if we have already claimed a source.
+		if( sourceIndex >= 0 )
+		{
+			openAL.alSource3f( SOURCES[sourceIndex], AL.AL_POSITION, _x, _y, _z ) ;
+		}
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
 	}
 
 	@Override
 	public boolean setRelative( final boolean _relative )
 	{
-		openAL.alSourcei( source[0], AL.AL_SOURCE_RELATIVE, ( _relative == true ) ? AL.AL_TRUE : AL.AL_FALSE ) ;
+		relative = _relative ;
+
+		// We only want to apply if we have already claimed a source.
+		if( sourceIndex >= 0 )
+		{
+			openAL.alSourcei( SOURCES[sourceIndex], AL.AL_SOURCE_RELATIVE, ( _relative == true ) ? AL.AL_TRUE : AL.AL_FALSE ) ;
+		}
+
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
+	}
+
+	@Override
+	public void setVolume( final int _volume )
+	{
+		volume = _volume ;
+
+		// We only want to apply if we have already claimed a source.
+		if( sourceIndex >= 0 )
+		{
+			final float vol = _volume / 100.0f ;
+			openAL.alSourcef( SOURCES[sourceIndex], AL.AL_GAIN, vol ) ;
+		}
 	}
 
 	@Override
 	public State getState()
 	{
-		openAL.alGetSourcei( source[0], AL.AL_SOURCE_STATE, state, 0 ) ;
 		final State temp = currentState ;
+		if( sourceIndex <= -1 )
+		{
+			currentState = State.UNKNOWN ;
+			return ( temp != currentState ) ? currentState : State.UNCHANGED ;
+		}
 
+		openAL.alGetSourcei( SOURCES[sourceIndex], AL.AL_SOURCE_STATE, state, 0 ) ;
 		switch( state[0] )
 		{
 			default            :
@@ -104,6 +245,7 @@ public class ALSASource implements ISource
 			}
 			case AL.AL_STOPPED :
 			{
+				relinquishSourceID( this ) ;
 				currentState = State.STOPPED ;
 				break ;
 			}
@@ -128,13 +270,6 @@ public class ALSASource implements ISource
 	}
 
 	@Override
-	public void setVolume( final int _volume )
-	{
-		final float vol = _volume / 100.0f ;
-		openAL.alSourcef( source[0], AL.AL_GAIN, vol ) ;
-	}
-
-	@Override
 	public void setCallback( final SourceCallback _callback )
 	{
 		callback = _callback ;
@@ -154,17 +289,6 @@ public class ALSASource implements ISource
 	public void destroy()
 	{
 		stop() ;
-		openAL.alSourcei( source[0], AL.AL_BUFFER,  AL.AL_NONE ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to reset source" ) ;
-		}
-
-		openAL.alDeleteSources( 1, source, 0 ) ;
-		if( openAL.alGetError() != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to delete source" ) ;
-		}
 	}
 
 	private int getBufferSize()
@@ -180,7 +304,7 @@ public class ALSASource implements ISource
 
 	private int getBufferOffset()
 	{
-		openAL.alGetSourcei( source[0], AL.AL_BYTE_OFFSET, bufferOffset, 0 ) ;
+		openAL.alGetSourcei( SOURCES[sourceIndex], AL.AL_BYTE_OFFSET, bufferOffset, 0 ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
 		{
 			System.out.println( "Failed to get buffer offset from source" ) ;

@@ -34,6 +34,8 @@ public class ALSAGenerator implements IGenerator
 			openAL = ALFactory.getAL() ;
 			initStaticLoaders() ;
 
+			ALSASource.initSourceIDs( openAL ) ;
+
 			openAL.alDistanceModel( AL.AL_LINEAR_DISTANCE_CLAMPED ) ;
 		}
 		catch( ALException ex )
@@ -164,32 +166,7 @@ public class ALSAGenerator implements IGenerator
 			return null ;
 		}
 
-		final int[] source = new int[1] ;
-		openAL.alGenSources( 1, source, 0 ) ;	
-		int error = openAL.alGetError() ;
-		if( error != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to Generate Source: " + getALErrorString( error ) ) ;
-			return null ;
-		}
-
-		final int[] buffer = sound.getBufferID() ;
-		openAL.alSourcei( source[0], AL.AL_BUFFER, buffer[0] ) ;		// Bind Buffer to Source
-		openAL.alSourcef( source[0], AL.AL_PITCH, 1.0f ) ;
-		openAL.alSourcef( source[0], AL.AL_GAIN, 1.0f ) ;
-		openAL.alSource3f( source[0], AL.AL_POSITION, 0.0f, 0.0f, 0.0f ) ;
-
-		// Not looping by default
-		openAL.alSourcei( source[0], AL.AL_LOOPING, AL.AL_FALSE ) ;
-
-		error = openAL.alGetError() ;
-		if( error != AL.AL_NO_ERROR )
-		{
-			System.out.println( "Failed to Configure Source: " + getALErrorString( error ) ) ;
-			return null ;
-		}
-
-		return new ALSASource( openAL, sound, source ) ;
+		return new ALSASource( openAL, sound ) ;
 	}
 
 	@Override
@@ -204,7 +181,7 @@ public class ALSAGenerator implements IGenerator
 		staticSoundManager.clear() ;
 	}
 
-	private static String getALErrorString( final int _error )
+	protected static String getALErrorString( final int _error )
 	{
 		switch( _error )
 		{
