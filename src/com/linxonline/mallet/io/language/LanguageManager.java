@@ -47,6 +47,11 @@ public class LanguageManager
 		languageFolder = ( _language != null ) ? _language : LANGUAGE_DEFAULT ;
 	}
 
+	public String getLanguage()
+	{
+		return languageFolder ;
+	}
+
 	/** 
 		Specifies what langauge file you wish to load.
 		If you wish to support multiple langauges,

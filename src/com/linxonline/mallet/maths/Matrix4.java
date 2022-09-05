@@ -123,11 +123,26 @@ public class Matrix4 implements Cacheable
 		matrix[3] = _x ;
 		matrix[7] = _y ;
 		matrix[11] = _z ;
-	
+
 		//set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
 		//set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
 		//set( _z, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
 							//	[0 | 0 | 0 |  1]
+	}
+
+	public void setX( final float _x )
+	{
+		matrix[3] = _x ;
+	}
+
+	public void setY( final float _y )
+	{
+		matrix[7] = _y ;
+	}
+
+	public void setZ( final float _z )
+	{
+		matrix[11] = _z ;
 	}
 
 	public void scale( final float _x, final float _y, final float _z )

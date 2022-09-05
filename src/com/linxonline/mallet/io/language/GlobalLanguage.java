@@ -11,6 +11,11 @@ public final class GlobalLanguage
 		language.setLanguage( _language ) ;
 	}
 
+	public static String getLanguage()
+	{
+		return language.getLanguage() ;
+	}
+	
 	/**
 		Load the language file into the specified namespace.
 	*/

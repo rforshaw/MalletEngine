@@ -163,6 +163,15 @@ public class GLTextBuffer extends GLBuffer
 			for( int i = 0; i < length; i++ )
 			{
 				final char c = text.charAt( start + i ) ;
+				switch( c )
+				{
+					case '\n' :
+					{
+						matrix.setX( position.x + offset.x ) ;
+						matrix.translate( 0.0f, metrics.getHeight(), 0.0f ) ;
+						break ;
+					}
+				}
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
 				final Shape shape = glFont.getShapeWithChar( c ) ;
