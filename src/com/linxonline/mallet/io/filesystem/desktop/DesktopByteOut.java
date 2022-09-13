@@ -5,7 +5,7 @@ import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.ByteOutStream ;
 
-public class DesktopByteOut implements ByteOutStream
+public final class DesktopByteOut implements ByteOutStream
 {
 	private final OutputStream output ;
 

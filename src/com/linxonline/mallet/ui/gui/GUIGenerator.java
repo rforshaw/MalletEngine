@@ -9,7 +9,7 @@ import com.linxonline.mallet.ui.UICheckbox ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 
-public class GUIGenerator
+public final class GUIGenerator
 {
 	private final static Map<String, Generator> creators = MalletMap.<String, Generator>newMap() ;
 	static

@@ -17,7 +17,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 	to define their own material format and handle it for
 	their specific use-case.
 */
-public class MaterialPool<T> extends GeneratePool<T>
+public final class MaterialPool<T> extends GeneratePool<T>
 {
 	public MaterialPool( Map<String, IGenerator<T>> _generators )
 	{

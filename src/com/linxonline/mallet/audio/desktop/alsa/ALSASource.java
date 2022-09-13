@@ -11,7 +11,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 	Provides the entry point in manipulating and playing 
 	an audio-stream.
 */
-public class ALSASource implements ISource
+public final class ALSASource implements ISource
 {
 	// By default OpenAL only allows for 256 sources.
 	// If we allocate an AL source for each of our ISource's

@@ -1,7 +1,6 @@
 package com.linxonline.mallet.audio ;
 
-
-public class Category
+public final class Category
 {
 	public enum Channel
 	{

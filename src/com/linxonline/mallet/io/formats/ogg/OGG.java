@@ -8,7 +8,7 @@ import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.MalletList ;
 
-public class OGG
+public final class OGG
 {
 	public final List<Page> pages = MalletList.<Page>newList() ;
 

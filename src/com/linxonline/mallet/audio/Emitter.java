@@ -4,7 +4,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 
-public class Emitter
+public final class Emitter
 {
 	private final static SourceCallback FALLBACK = new SourceCallback()
 	{

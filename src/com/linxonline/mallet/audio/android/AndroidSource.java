@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.SourceCallback ;
 	Provides the entry point in manipulating and playing 
 	an audio-stream.
 */
-public class AndroidSource implements ISource
+public final class AndroidSource implements ISource
 {
 	private final WAVHeader header ;
 	private final AudioTrack track ;

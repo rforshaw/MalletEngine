@@ -8,7 +8,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.io.formats.json.JObject ;
 import com.linxonline.mallet.io.formats.json.JArray ;
 
-public class SimpleFrame implements Animation.Frame
+public final class SimpleFrame implements Animation.Frame
 {
 	private final String path ; 				// Texture path
 	private final MalletTexture texture ;
@@ -71,7 +71,7 @@ public class SimpleFrame implements Animation.Frame
 		return builder.toString() ;
 	}
 	
-	public static class Generator implements AnimatorGenerator.FrameGenerator<SimpleFrame>
+	public final static class Generator implements AnimatorGenerator.FrameGenerator<SimpleFrame>
 	{
 		public SimpleFrame create( final List<JObject> _resources )
 		{
@@ -88,7 +88,7 @@ public class SimpleFrame implements Animation.Frame
 		}
 	}
 
-	public static class Listener implements AnimationBooklet.IListener<SimpleFrame>
+	public final static class Listener implements AnimationBooklet.IListener<SimpleFrame>
 	{
 		private final World world ;
 		private final Program program ;

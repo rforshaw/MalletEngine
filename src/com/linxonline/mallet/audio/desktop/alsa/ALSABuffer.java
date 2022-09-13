@@ -8,7 +8,7 @@ import com.linxonline.mallet.io.Resource ;
 	Stores the required information to access the audio-buffer
 	and to destroy the it when eventually not in use.
 */
-public class ALSABuffer extends Resource
+public final class ALSABuffer extends Resource
 {
 	private final AL openAL ;			// Used to destroy buffer
 	private final int[] buffer ;		// Buffer id to audio-stream

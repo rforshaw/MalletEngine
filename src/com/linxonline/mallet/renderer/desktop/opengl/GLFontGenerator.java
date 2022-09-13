@@ -25,7 +25,7 @@ import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public class GLFontGenerator
+public final class GLFontGenerator
 {
 	private final static float PADDING = 4.0f ;
 

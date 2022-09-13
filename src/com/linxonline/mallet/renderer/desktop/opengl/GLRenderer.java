@@ -30,7 +30,7 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class GLRenderer extends BasicRenderer implements GLEventListener
+public final class GLRenderer extends BasicRenderer implements GLEventListener
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;

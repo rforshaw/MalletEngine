@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.MalletTexture ;
 
 import com.linxonline.mallet.maths.* ;
 
-public class UI
+public final class UI
 {
 	public enum Unit
 	{

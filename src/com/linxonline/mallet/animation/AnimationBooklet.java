@@ -13,7 +13,7 @@ import com.linxonline.mallet.util.MalletMap ;
 	the next frame is triggered, or when the animation sequence
 	has changed.
 */
-public class AnimationBooklet<T extends Animation.Frame> implements AnimationSystem.IAnimation
+public final class AnimationBooklet<T extends Animation.Frame> implements AnimationSystem.IAnimation
 {
 	private Animation<T> currentAnim = null ;
 	private T currentFrame = null ;

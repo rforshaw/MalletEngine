@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 /**
 	Define a colour with 8888 RGBA
 */
-public class MalletColour
+public final class MalletColour
 {
 	public final static byte RED   = 3 ;
 	public final static byte GREEN = 2 ;

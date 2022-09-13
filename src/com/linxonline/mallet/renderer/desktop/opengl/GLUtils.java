@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-public class GLUtils
+public final class GLUtils
 {
 	public final static int MIN_INDEX_BYTE_SIZE = 5 * 1024 * 1024 ;
 	public final static int MIN_VERTEX_BYTE_SIZE = 5 * 1024 * 1024 ;

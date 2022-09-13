@@ -14,7 +14,7 @@ import com.linxonline.mallet.util.MalletList ;
 	Provides access to the filesystem on desktop platforms.
 	This currently includes: Linux, Windows, & Mac.
 */
-public class DesktopFileSystem implements FileSystem
+public final class DesktopFileSystem implements FileSystem
 {
 	private final Map<String, ZipPath> mapZip = MalletMap.<String, ZipPath>newMap() ;
 

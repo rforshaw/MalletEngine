@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.MathUtil ;
 import com.linxonline.mallet.renderer.FontAssist ;
 import com.linxonline.mallet.renderer.Glyph ;
 
-public class MalletFont
+public final class MalletFont
 {
 	public static final int PLAIN = 5 ;
 

@@ -191,7 +191,7 @@ public class GLTextBuffer extends GLBuffer
 				{
 					case '\n' :
 					{
-						matrix.setX( position.x + offset.x ) ;
+						apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 						matrix.translate( 0.0f, metrics.getHeight(), 0.0f ) ;
 						break ;
 					}

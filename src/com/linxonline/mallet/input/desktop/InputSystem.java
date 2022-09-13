@@ -16,7 +16,7 @@ import com.linxonline.mallet.util.Logger ;
 	Input System is designed to use Java's built in input listeners, 
 	requires to be added to a Window/Jframe to begin recieving input.
 **/
-public class InputSystem implements IInputSystem, 
+public final class InputSystem implements IInputSystem, 
 									KeyListener, 
 									MouseListener
 {

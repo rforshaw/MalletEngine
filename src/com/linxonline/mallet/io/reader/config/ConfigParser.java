@@ -124,6 +124,9 @@ public class ConfigParser
 
 			var = _src.getString( "SHOWFPS", "false" ) ;
 			_dest.addBoolean( "SHOWFPS", Boolean.parseBoolean( var ) ) ;
+
+			var = _src.getString( "LANGUAGE", "en" ) ;
+			_dest.addString( "LANGUAGE", var ) ;
 		}
 	}
 }

@@ -9,7 +9,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.primitives.AABB ;
 
-public class QuadTree
+public final class QuadTree
 {
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
@@ -147,7 +147,7 @@ public class QuadTree
 		root.clear() ;
 	}
 
-	protected class QuadNode
+	protected final class QuadNode
 	{
 		private final Vector2 centre = new Vector2() ;
 
@@ -722,7 +722,7 @@ public class QuadTree
 		public void update( final float _dt ) ;
 	}
 	
-	private static class NodeWorker extends Worker<QuadNode>
+	private final static class NodeWorker extends Worker<QuadNode>
 	{
 		private float deltaTime = 0.0f ;
 

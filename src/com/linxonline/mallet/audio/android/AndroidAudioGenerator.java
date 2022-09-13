@@ -15,7 +15,7 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
-public class AndroidAudioGenerator implements IGenerator
+public final class AndroidAudioGenerator implements IGenerator
 {
 	private final SoundManager<AndroidSound> staticSoundManager = new SoundManager<AndroidSound>() ;
 

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.maths ;
 
-public class Quaternion
+public final class Quaternion
 {
 	public float x ;
 	public float y ;

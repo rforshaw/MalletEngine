@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
-public class Shape implements IShape
+public final class Shape implements IShape
 {
 	private final Attribute[] swivel ;
 	private final int[] swivelOffset ;

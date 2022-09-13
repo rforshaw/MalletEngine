@@ -5,7 +5,7 @@ import java.util.Set ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
-public class Program
+public final class Program
 {
 	private final static Utility utility = new Utility() ;
 

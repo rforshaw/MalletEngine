@@ -11,7 +11,7 @@ import java.io.IOException ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.util.Logger ;
 
-public class DesktopFile implements FileStream
+public final class DesktopFile implements FileStream
 {
 	private final File file ;
 

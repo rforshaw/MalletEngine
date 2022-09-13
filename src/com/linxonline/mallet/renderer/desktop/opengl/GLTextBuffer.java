@@ -19,7 +19,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-public class GLTextBuffer extends GLBuffer
+public final class GLTextBuffer extends GLBuffer
 {
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;
@@ -188,7 +188,7 @@ public class GLTextBuffer extends GLBuffer
 				{
 					case '\n' :
 					{
-						matrix.setX( position.x + offset.x ) ;
+						apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
 						matrix.translate( 0.0f, metrics.getHeight(), 0.0f ) ;
 						break ;
 					}

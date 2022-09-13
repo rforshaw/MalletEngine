@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public class RenderPools
+public final class RenderPools
 {
 	private static final DrawUpdaterPool drawPool = new DrawUpdaterPool() ;
 	private static final DrawInstancedUpdaterPool drawInstancedPool = new DrawInstancedUpdaterPool() ;

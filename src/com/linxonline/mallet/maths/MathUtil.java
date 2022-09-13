@@ -1,6 +1,6 @@
 package com.linxonline.mallet.maths ;
 
-public class MathUtil
+public final class MathUtil
 {
 	private MathUtil() {}
 

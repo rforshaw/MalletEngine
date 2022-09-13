@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
-public class ContactData
+public final class ContactData
 {
 	private static final int CONTACT_NORMAL_X = 0 ;
 	private static final int CONTACT_NORMAL_Y = 1 ;

@@ -8,7 +8,7 @@ import java.util.List ;
 	They are buffered and only added or removed once 
 	update() has been called.
 */
-public class BufferedList<T>
+public final class BufferedList<T>
 {
 	private final AddListener<T> ADD_FALLBACK = new AddListener<T>()
 	{

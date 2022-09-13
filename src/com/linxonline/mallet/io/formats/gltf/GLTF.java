@@ -20,7 +20,7 @@ import com.linxonline.mallet.renderer.IShape.Style ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.MalletColour ;
 
-public class GLTF
+public final class GLTF
 {
 	private final JChunk header ;
 	private final BinChunk bin ;

@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.MalletList ;
 /**
 	Vorbis integer variables are stored in little endian.
 **/
-public class Vorbis
+public final class Vorbis
 {
 	private final static int ID_HEADER_TYPE = 1 ;
 	private final static int COMMENT_HEADER_TYPE = 3 ;
@@ -620,7 +620,7 @@ public class Vorbis
 		return buffer.toString() ;
 	}
 
-	public class Floor1Configuration implements FloorConfiguration
+	public final class Floor1Configuration implements FloorConfiguration
 	{
 		private final int[] RANGES = { 256, 128, 86, 64 } ;
 
@@ -814,7 +814,7 @@ public class Vorbis
 		}
 	}
 
-	public static class Floor0Configuration implements FloorConfiguration
+	public final static class Floor0Configuration implements FloorConfiguration
 	{
 		private int order = 0 ;
 		private int rate = 0 ;
@@ -873,7 +873,7 @@ public class Vorbis
 		public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
-	public class Residue0Configuration extends ResidueConfiguration
+	public final class Residue0Configuration extends ResidueConfiguration
 	{
 		@Override
 		public int decodePacket( int _pos, final byte[] _stream )
@@ -882,7 +882,7 @@ public class Vorbis
 		}
 	}
 
-	public class Residue1Configuration extends ResidueConfiguration
+	public final class Residue1Configuration extends ResidueConfiguration
 	{
 		@Override
 		public int decodePacket( int _pos, final byte[] _stream )
@@ -891,7 +891,7 @@ public class Vorbis
 		}
 	}
 
-	public class Residue2Configuration extends ResidueConfiguration
+	public final class Residue2Configuration extends ResidueConfiguration
 	{
 		@Override
 		public int decodePacket( int _pos, final byte[] _stream )
@@ -1011,7 +1011,7 @@ public class Vorbis
 		}
 	}
 
-	public class Mapping0Configuration implements MappingConfiguration
+	public final class Mapping0Configuration implements MappingConfiguration
 	{
 		public int subMaps ;
 		public int couplingSteps ;
@@ -1117,7 +1117,7 @@ public class Vorbis
 		//public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
-	public class ModeConfiguration
+	public final class ModeConfiguration
 	{
 		public boolean blockFlag ;
 		public int windowType ;
@@ -1162,7 +1162,7 @@ public class Vorbis
 		//public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
-	public static class CodebookConfiguration
+	public final static class CodebookConfiguration
 	{
 		int entry ;							// Denotes the entry of the codebook, for example 
 											// the 5th codebook to be read in
@@ -1260,7 +1260,7 @@ public class Vorbis
 		}
 	}
 
-	public class AudioPacket
+	public final class AudioPacket
 	{
 		private final static double HALF_PI = Math.PI / 2 ;
 
@@ -1362,7 +1362,7 @@ public class Vorbis
 	/**
 		Contains the information required to quickly decode the headers.
 	**/
-	public static class VorbisHeader
+	public final static class VorbisHeader
 	{
 		public final int headerType ;	// ID_HEADER_TYPE, COMMENT_HEADER_TYPE, & SETUP_HEADER_TYPE are valid values
 		public final int start ;		// The start of header information skips default header data

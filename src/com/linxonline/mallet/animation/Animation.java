@@ -1,6 +1,6 @@
 package com.linxonline.mallet.animation ;
 
-public class Animation<T extends Animation.Frame>
+public final class Animation<T extends Animation.Frame>
 {
 	private final String path ;
 	private final int framerate ;

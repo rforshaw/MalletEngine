@@ -7,7 +7,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.jogamp.common.nio.Buffers ;
 
-public class GLStorage implements Serialise.Out
+public final class GLStorage implements Serialise.Out
 {
 	public final int[] id = new int[1] ;
 

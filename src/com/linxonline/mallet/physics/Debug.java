@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
-public class Debug
+public final class Debug
 {
 	private Debug() {}
 

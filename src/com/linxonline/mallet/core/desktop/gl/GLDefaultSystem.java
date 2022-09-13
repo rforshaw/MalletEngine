@@ -22,13 +22,13 @@ import com.linxonline.mallet.util.buffers.* ;
 	Uses ALSA for audio.
 	Handles input events using JFrame.
 */
-public class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
-												 DefaultShutdown,
-												 GLRenderer,
-												 ALSAGenerator,
-												 InputSystem,
-												 EventSystem,
-												 GameSystem>
+public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
+													   DefaultShutdown,
+													   GLRenderer,
+													   ALSAGenerator,
+													   InputSystem,
+													   EventSystem,
+													   GameSystem>
 {
 	protected final EventController eventController = new EventController() ;
 

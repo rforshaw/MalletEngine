@@ -9,7 +9,7 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.formats.json.JObject ;
 import com.linxonline.mallet.io.formats.json.JArray ;
 
-public class AnimatorGenerator
+public final class AnimatorGenerator
 {
 	private final static JArray EMPTY_ARRAY = JArray.construct() ; 
 

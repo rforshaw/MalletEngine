@@ -4,7 +4,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-public class OBB
+public final class OBB
 {
 	public static final int TOP_LEFT = 0 ;
 	public static final int TOP_RIGHT = 2 ;

@@ -9,7 +9,7 @@ import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class ProgramManager<T extends ProgramManager.Program> extends AbstractManager<String, T>
+public final class ProgramManager<T extends ProgramManager.Program> extends AbstractManager<String, T>
 {
 	/**
 		When loading a program the ProgramManager will load the 

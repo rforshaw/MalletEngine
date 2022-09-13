@@ -41,6 +41,9 @@ import com.linxonline.mallet.io.net.IOutStream ;
 import com.linxonline.mallet.io.net.InStream ;
 import com.linxonline.mallet.io.net.Address ;
 
+import com.linxonline.mallet.script.Script ;
+import com.linxonline.mallet.script.ScriptInterface ;
+
 /**
 	Example on how to implement the Game Loader class.
 	Initialise your Game States and add them to the 
@@ -124,6 +127,28 @@ public final class GameTestLoader implements IGameLoader
 				createEventMessageTest() ;
 
 				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+				createScript() ;
+			}
+
+			public void createScript()
+			{
+				final Entity entity = new Entity( 1 ) ;
+
+				final Script script = new Script( "Example", "base/scripts/example-count.js" ) ;
+				final CountComponent count = new CountComponent( entity )
+				{
+					@Override
+					public void readyToDestroy( final Entity.ReadyCallback _callback )
+					{
+						engine.remove( script ) ;
+						super.readyToDestroy( _callback ) ;
+					}
+				} ;
+
+				script.add( entity ) ;
+				engine.add( script ) ;
+
+				addEntity( entity ) ;
 			}
 
 			public void createUI()
@@ -599,5 +624,55 @@ public final class GameTestLoader implements IGameLoader
 	public GameSettings getGameSettings()
 	{
 		return new GameSettings( "Mallet Engine - Test" ) ;
+	}
+
+	// Required for the scripting-system to pick it up.
+	@ScriptInterface
+	public interface ICount
+	{
+		public void count() ;
+		public int getCount() ;
+	}
+
+	// Required for the scripting-system to pick it up.
+	@ScriptInterface
+	public interface IDestroy
+	{
+		public void destroy() ;
+		public boolean isDead() ;
+	}
+
+	public static class CountComponent extends Component implements ICount, IDestroy
+	{
+		private int count = 0 ;
+
+		public CountComponent( final Entity _parent )
+		{
+			super( _parent ) ;
+		}
+
+		@Override
+		public void count()
+		{
+			++count ;
+		}
+
+		@Override
+		public int getCount()
+		{
+			return count ;
+		}
+
+		@Override
+		public void destroy()
+		{
+			getParent().destroy() ;
+		}
+
+		@Override
+		public boolean isDead()
+		{
+			return getParent().isDead() ;
+		}
 	}
 }

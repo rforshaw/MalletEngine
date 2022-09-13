@@ -17,7 +17,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.IntVector2 ;
 
-public class GLGeometryBuffer extends GLBuffer
+public final class GLGeometryBuffer extends GLBuffer
 {
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;

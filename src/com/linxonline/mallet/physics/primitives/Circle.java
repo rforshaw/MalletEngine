@@ -2,7 +2,7 @@ package com.linxonline.mallet.physics.primitives ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 
-public class Circle
+public final class Circle
 {
 	private final Vector2 temp = new Vector2() ;		// Used in intersectCircle
 

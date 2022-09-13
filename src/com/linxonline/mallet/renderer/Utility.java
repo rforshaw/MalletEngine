@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public class Utility
+public final class Utility
 {
 	private int index = 0 ;
 

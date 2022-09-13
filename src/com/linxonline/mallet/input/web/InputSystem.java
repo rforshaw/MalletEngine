@@ -15,7 +15,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-public class InputSystem implements IInputSystem
+public final class InputSystem implements IInputSystem
 {
 	private final TimeCache<InputEvent> cache ;
 

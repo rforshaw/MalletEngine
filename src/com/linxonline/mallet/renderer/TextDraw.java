@@ -6,7 +6,7 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.renderer.MalletColour ;
 
-public class TextDraw implements IUpdate
+public final class TextDraw implements IUpdate
 {
 	private Draw draw = new Draw() ;
 	private StringBuilder text ;

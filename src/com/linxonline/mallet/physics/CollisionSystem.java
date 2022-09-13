@@ -10,7 +10,7 @@ import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.Vector2 ;
 
-public class CollisionSystem
+public final class CollisionSystem
 {
 	private final EventController eventController ;
 	private final List<Hull> hulls = MalletList.<Hull>newList() ;

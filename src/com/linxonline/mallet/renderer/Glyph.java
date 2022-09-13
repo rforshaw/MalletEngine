@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.util.ISort ;
 
-public class Glyph implements ISort
+public final class Glyph implements ISort
 {
 	public final char character ;
 	public final float width ;

@@ -2,7 +2,7 @@ package com.linxonline.mallet.util ;
 
 import java.util.List ;
 
-public class OrderedInsert
+public final class OrderedInsert
 {
 	private OrderedInsert() {}
 

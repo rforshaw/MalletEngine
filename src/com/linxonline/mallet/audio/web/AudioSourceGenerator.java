@@ -14,7 +14,7 @@ import com.linxonline.mallet.io.filesystem.web.* ;
 
 import com.linxonline.mallet.util.Logger ;
 
-public class AudioSourceGenerator implements IGenerator
+public final class AudioSourceGenerator implements IGenerator
 {
 	private static final Window window = Window.current() ;
 	private static final HTMLDocument document = window.getDocument() ;

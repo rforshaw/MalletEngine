@@ -8,7 +8,7 @@ import com.linxonline.mallet.io.filesystem.FileStream ;
 import com.linxonline.mallet.io.filesystem.StringInStream ;
 import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
-public class JObject
+public final class JObject
 {
 	protected final JSObject object ;
 

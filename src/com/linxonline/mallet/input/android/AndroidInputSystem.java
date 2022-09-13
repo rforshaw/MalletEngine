@@ -11,8 +11,7 @@ import com.linxonline.mallet.util.caches.TimeCache ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-public class AndroidInputSystem implements IInputSystem, 
-										   AndroidInputListener
+public final class AndroidInputSystem implements IInputSystem, AndroidInputListener
 {
 	private final TimeCache<InputEvent> cache ;
 

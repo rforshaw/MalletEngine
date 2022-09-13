@@ -329,7 +329,7 @@ public class GLWorld
 		}
 	}
 
-	private static class GLCoreWorld extends GLWorld
+	private final static class GLCoreWorld extends GLWorld
 	{
 		private GLCoreWorld( final World _world,
 							 final AssetLookup<Camera, GLCamera> _cameras,

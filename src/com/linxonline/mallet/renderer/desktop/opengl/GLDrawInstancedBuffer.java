@@ -20,7 +20,7 @@ import com.linxonline.mallet.maths.IntVector2 ;
 
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
-public class GLDrawInstancedBuffer extends GLBuffer
+public final class GLDrawInstancedBuffer extends GLBuffer
 {
 	private static final int INSTANCE_INDEX = 0 ;
 

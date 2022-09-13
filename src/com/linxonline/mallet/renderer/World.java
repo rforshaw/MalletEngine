@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 
-public class World
+public final class World
 {
 	private final static Utility utility = new Utility() ;
 

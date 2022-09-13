@@ -15,7 +15,7 @@ import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
 import com.linxonline.mallet.util.settings.Settings ;
 
-public class ALSAGenerator implements IGenerator
+public final class ALSAGenerator implements IGenerator
 {
 	private final SoundManager<ALSABuffer> staticSoundManager = new SoundManager<ALSABuffer>() ;
 	private AL openAL = null ;

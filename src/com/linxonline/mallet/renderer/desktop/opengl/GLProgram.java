@@ -25,7 +25,7 @@ import com.linxonline.mallet.maths.Matrix4 ;
 	GLProgram retains a collection of GLSL shaders 
 	that are used during the rendering process.
 */
-public class GLProgram extends ProgramManager.Program
+public final class GLProgram extends ProgramManager.Program
 {
 	public final JSONProgram program ;
 	public final int[] id = new int[1] ;	// GL Program ID

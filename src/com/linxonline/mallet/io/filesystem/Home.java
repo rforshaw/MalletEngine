@@ -2,7 +2,7 @@ package com.linxonline.mallet.io.filesystem ;
 
 import com.linxonline.mallet.util.Tuple ;
 
-public class Home
+public final class Home
 {
 	private final String homeDirectory ;
 

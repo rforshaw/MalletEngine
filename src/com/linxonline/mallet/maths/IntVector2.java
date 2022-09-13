@@ -1,6 +1,6 @@
 package com.linxonline.mallet.maths ;
 
-public class IntVector2
+public final class IntVector2
 {
 	public int x ;
 	public int y ;

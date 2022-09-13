@@ -4,7 +4,7 @@ import com.linxonline.mallet.audio.* ;
 
 import com.linxonline.mallet.util.SourceCallback ;
 
-public class WebAudioSource implements ISource
+public final class WebAudioSource implements ISource
 {
 	private SourceCallback callback = null ;
 

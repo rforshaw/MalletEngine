@@ -38,6 +38,9 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.thread.* ;
 
+import com.linxonline.mallet.script.IScriptEngine ;
+import com.linxonline.mallet.script.javascript.JSScriptEngine ;
+
 public class GameState extends State
 {
 	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
@@ -56,6 +59,8 @@ public class GameState extends State
 	private final InterceptController interceptController = new InterceptController() ;
 	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
 	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
+
+	protected IScriptEngine engine ;
 
 	protected ISystem system = null ;																// Provides access to Root systems
 	protected final IEntitySystem entitySystem ;
@@ -142,6 +147,8 @@ public class GameState extends State
 		else
 		{
 			createUpdaters( mainUpdaters, drawUpdaters ) ;
+			engine = new JSScriptEngine( this ) ;
+			engine.init() ;
 			initGame() ;
 		}
 		
@@ -272,6 +279,19 @@ public class GameState extends State
 		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
 		shutdown.addShutdownCallback( () ->
 		{
+			Logger.println( "Shutting down script engine.", Logger.Verbosity.MINOR ) ;
+			try
+			{
+				if( engine != null )
+				{
+					engine.close() ;
+				}
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
+			}
+
 			Logger.println( "Clearing audio from game-state.", Logger.Verbosity.MINOR ) ;
 			audioSystem.clear() ;
 		} ) ;
@@ -357,6 +377,8 @@ public class GameState extends State
 			eventSystem.sendEvents() ;
 			internalController.update() ;
 			externalController.update() ;
+
+			engine.update( DEFAULT_TIMESTEP ) ;
 
 			collisionSystem.update( DEFAULT_TIMESTEP ) ;
 			entitySystem.update( DEFAULT_TIMESTEP ) ;
@@ -594,6 +616,11 @@ public class GameState extends State
 	public EventController getExternalController()
 	{
 		return externalController ;
+	}
+
+	public IEntitySystem getEntitySystem()
+	{
+		return entitySystem ;
 	}
 
 	/**

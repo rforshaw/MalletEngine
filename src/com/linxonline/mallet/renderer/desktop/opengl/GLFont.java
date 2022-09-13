@@ -4,7 +4,7 @@ import com.linxonline.mallet.io.Resource ;
 
 import com.linxonline.mallet.renderer.Shape ;
 
-public class GLFont extends Resource
+public final class GLFont extends Resource
 {
 	private final Shape[] glyphs ;
 	private final GLImage texture ;

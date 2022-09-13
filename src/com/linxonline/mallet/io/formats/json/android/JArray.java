@@ -1,6 +1,6 @@
 package com.linxonline.mallet.io.formats.json ;
 
-public class JArray
+public final class JArray
 {
 	protected final org.json.JSONArray array ;
 

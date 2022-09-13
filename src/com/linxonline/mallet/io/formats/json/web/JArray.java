@@ -4,7 +4,7 @@ import org.teavm.jso.json.JSON ;
 import org.teavm.jso.JSObject ;
 import org.teavm.jso.JSBody ;
 
-public class JArray
+public final class JArray
 {
 	protected final JSObject array ;
 

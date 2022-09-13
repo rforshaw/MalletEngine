@@ -4,9 +4,9 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
-public class GUI
+public final class GUI
 {
-	public GUI() {}
+	private GUI() {}
 
 	private static final DrawUpdaterPool drawPool = new DrawUpdaterPool() ;
 	private static final TextUpdaterPool textPool = new TextUpdaterPool() ;

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public class FontAssist
+public final class FontAssist
 {
 	private static FontAssist.Assist inter ;
 

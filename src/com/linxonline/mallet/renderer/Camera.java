@@ -7,7 +7,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
-public class Camera
+public final class Camera
 {
 	private static final float PI = ( float )Math.PI ;
 	private static final float PI2 = ( float )Math.PI * 2.0f ;

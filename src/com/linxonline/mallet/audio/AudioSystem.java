@@ -26,7 +26,7 @@ import com.linxonline.mallet.util.notification.Notification.Notify ;
 	// Get Sound ID
 // Modify running sound
 
-public class AudioSystem
+public final class AudioSystem
 {
 	private final Map<Category, Volume> channelTable = MalletMap.<Category, Volume>newMap() ;
 	private float masterVolume = 1.0f ;

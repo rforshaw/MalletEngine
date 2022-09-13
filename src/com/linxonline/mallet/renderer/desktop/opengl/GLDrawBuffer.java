@@ -11,7 +11,7 @@ import com.linxonline.mallet.renderer.AssetLookup ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 
-public class GLDrawBuffer extends GLBuffer
+public final class GLDrawBuffer extends GLBuffer
 {
 	private int order ;
 	private VertexAttrib[] attributes = null ;

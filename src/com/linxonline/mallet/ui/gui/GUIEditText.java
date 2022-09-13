@@ -22,18 +22,20 @@ public class GUIEditText extends GUIText
 	private int start = 0 ;
 	private int end = 0 ;
 
+	private final Connect.Slot<UITextField> elementDisengagedSlot =  new Connect.Slot<UITextField>()
+	{
+		@Override
+		public void slot( final UITextField _textfield )
+		{
+			editing = false ;
+			_textfield.makeDirty() ;
+		}
+	} ;
+
 	public GUIEditText( final Meta _meta, final UITextField _parent )
 	{
 		super( _meta, _parent.getText(), _parent ) ;
-		UIElement.connect( _parent, _parent.elementDisengaged(), new Connect.Slot<UITextField>()
-		{
-			@Override
-			public void slot( final UITextField _textfield )
-			{
-				editing = false ;
-				_textfield.makeDirty() ;
-			}
-		} ) ;
+		UIElement.connect( _parent, _parent.elementDisengaged(), elementDisengagedSlot ) ;
 
 		drawPlaceholder.getText().append( _meta.getPlaceholder() ) ;
 
@@ -217,6 +219,14 @@ public class GUIEditText extends GUIText
 
 			getUpdater().forceUpdate() ;
 		}
+	}
+
+	@Override
+	public void shutdown()
+	{
+		final UITextField parent = getParent() ;
+		UITextField.disconnect( parent, parent.elementDisengaged(), elementDisengagedSlot ) ;
+		super.shutdown() ;
 	}
 
 	private boolean isEditing()

@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-public class UIModelIndex
+public final class UIModelIndex
 {
 	private final UIModelIndex parent ;		// null == root node
 	private final int row ;

@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics.primitives ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-public class AABB
+public final class AABB
 {
 	public static final int RANGE_NUM = 2 ;
 	public static final int VECTOR_TYPE = 2 ;

@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class Group
+public final class Group
 {
 	private final static List<ID> ids = MalletList.<ID>newList() ;
 	static

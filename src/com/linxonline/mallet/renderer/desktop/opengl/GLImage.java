@@ -4,7 +4,7 @@ import java.util.Arrays ;
 
 import com.linxonline.mallet.io.Resource ;
 
-public class GLImage extends Resource
+public final class GLImage extends Resource
 {
 	public final int[] textureIDs ;			// Buffer ID for openGL
 	public final long consumption ;

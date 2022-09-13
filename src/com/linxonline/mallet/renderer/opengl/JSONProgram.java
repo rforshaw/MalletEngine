@@ -19,7 +19,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
-public class JSONProgram
+public final class JSONProgram
 {
 	private final String name ;
 	private final List<ShaderMap> shaders   = MalletList.<ShaderMap>newList() ;

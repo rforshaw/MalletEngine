@@ -8,7 +8,7 @@ import com.linxonline.mallet.io.Resource ;
 	Stores the central audio data.
 	Can be used by multiple WebAudioSource's.
 */
-public class WebSound extends Resource
+public final class WebSound extends Resource
 {
 	private HTMLSourceElement source ;
 	private final int consumption ;		// Buffer size

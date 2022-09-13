@@ -6,7 +6,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
-public class InterceptController implements IIntercept
+public final class InterceptController implements IIntercept
 {
 	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) ->
 	{

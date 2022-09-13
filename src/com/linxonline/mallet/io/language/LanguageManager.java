@@ -32,7 +32,7 @@ public class LanguageManager
 	private static final String LANGUAGE_DEFAULT = "en" ;
 	private static final String EMPTY_STRING = "" ;
 
-	private final Map<String, JObject> lookup = MalletMap.<String, JObject>newMap() ;
+	private final Map<String, Meta> lookup = MalletMap.<String, Meta>newMap() ;
 	private String languageFolder = "en" ;
 
 	public LanguageManager() {}
@@ -45,6 +45,12 @@ public class LanguageManager
 	public void setLanguage( final String _language )
 	{
 		languageFolder = ( _language != null ) ? _language : LANGUAGE_DEFAULT ;
+		for( final Map.Entry<String, Meta> entry : lookup.entrySet() )
+		{
+			final String namespace = entry.getKey() ;
+			final Meta meta = entry.getValue() ;
+			replace( namespace, meta.getFile() ) ;
+		}
 	}
 
 	public String getLanguage()
@@ -67,6 +73,11 @@ public class LanguageManager
 			return false ;
 		}
 
+		return replace( _namespace, _file ) ;
+	}
+
+	public boolean replace( final String _namespace, final String _file )
+	{
 		if( GlobalFileSystem.isExtension( _file, ".lang", ".LANG" ) == false )
 		{
 			Logger.println( "File extension is not recognised.", Logger.Verbosity.NORMAL ) ;
@@ -82,7 +93,7 @@ public class LanguageManager
 		}
 
 		final JObject map = JObject.construct( stream ) ;
-		lookup.put( _namespace, map ) ;
+		lookup.put( _namespace, new Meta( _file, map ) ) ;
 		return true ;
 	}
 
@@ -97,12 +108,13 @@ public class LanguageManager
 	**/
 	public String get( final String _namespace, final String _keyword )
 	{
-		final JObject map = lookup.get( _namespace ) ;
-		if( map == null )
+		final Meta meta = lookup.get( _namespace ) ;
+		if( meta == null )
 		{
 			return _keyword ;
 		}
 
+		final JObject map = meta.getMap() ;
 		final JObject item = map.optJObject( _keyword, null ) ;
 		if( item == null )
 		{
@@ -110,5 +122,27 @@ public class LanguageManager
 		}
 
 		return item.optString( "response", _keyword ) ;
+	}
+
+	private static class Meta
+	{
+		private String file ;
+		private JObject map ;
+
+		public Meta( final String _file, final JObject _map )
+		{
+			file = _file ;
+			map = _map ;
+		}
+
+		public String getFile()
+		{
+			return file ;
+		}
+
+		public JObject getMap()
+		{
+			return map ;
+		}
 	}
 }

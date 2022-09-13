@@ -4,7 +4,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
 
-public class UIVariant implements IVariant
+public final class UIVariant implements IVariant
 {
 	private final AVariable variable ;
 	

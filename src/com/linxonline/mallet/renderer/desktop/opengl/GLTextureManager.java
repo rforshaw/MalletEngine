@@ -26,7 +26,7 @@ import com.linxonline.mallet.util.thread.TaskQueue ;
 
 import com.linxonline.mallet.renderer.* ;
 
-public class GLTextureManager extends AbstractManager<String, GLImage>
+public final class GLTextureManager extends AbstractManager<String, GLImage>
 {
 	/**
 		Limit the number of textures that can be loaded

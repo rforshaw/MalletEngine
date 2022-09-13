@@ -5,7 +5,7 @@ import com.linxonline.mallet.util.caches.Cacheable ;
 /**
 	Designed for 2D transformations.
 */
-public class Matrix3 implements Cacheable
+public final class Matrix3 implements Cacheable
 {
 	/**
 		Matrix3 functions are guaranteed to be called hundreds if 

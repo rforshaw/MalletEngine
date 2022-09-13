@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
 
-public class ContactPoint
+public final class ContactPoint
 {
 	public Hull collidedWith = null ;
 	public Vector2 contactNormal = new Vector2( 0.0f, 0.0f ) ;

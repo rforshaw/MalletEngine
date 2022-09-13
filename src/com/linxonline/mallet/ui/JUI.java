@@ -34,7 +34,7 @@ import com.linxonline.mallet.ui.gui.* ;
 	create the actual UI element that will be shown to 
 	the user. 
 */
-public class JUI
+public final class JUI
 {
 	private final static Map<String, Generator> elementCreators = MalletMap.<String, Generator>newMap() ;
 	static

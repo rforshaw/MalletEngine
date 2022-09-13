@@ -7,7 +7,7 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 	Once the GLProgram has been linked, all shader data 
 	is removed.
 */
-public class GLShader
+public final class GLShader
 {
 	public final int[] id = new int[1] ;
 	public final int type ;

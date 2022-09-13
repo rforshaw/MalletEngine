@@ -22,13 +22,13 @@ import com.linxonline.mallet.renderer.android.opengl.* ;
 import com.linxonline.mallet.input.android.* ;
 import com.linxonline.mallet.audio.android.* ;
 
-public class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
-												 DefaultShutdown,
-												 GL2DRenderer,
-												 AndroidAudioGenerator,
-												 AndroidInputSystem,
-												 EventSystem,
-												 GameSystem>
+public final  class GLAndroidSystem extends BasicSystem<AndroidFileSystem,
+														DefaultShutdown,
+														GL2DRenderer,
+														AndroidAudioGenerator,
+														AndroidInputSystem,
+														EventSystem,
+														GameSystem>
 {
 	public final AndroidActivity activity ;
 	public GL2DSurfaceView surface ;

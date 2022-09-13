@@ -2,7 +2,7 @@ package com.linxonline.mallet.audio.android ;
 
 import com.linxonline.mallet.io.Resource ;
 
-public class AndroidSound extends Resource
+public final class AndroidSound extends Resource
 {
 	private final byte[] buffer ;
 

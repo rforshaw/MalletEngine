@@ -5,7 +5,7 @@ import java.text.MessageFormat ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
-public class AssetLookup<L, R>
+public final class AssetLookup<L, R>
 {
 	private final String name ;
 	private Tuple<L, R>[] assets ;

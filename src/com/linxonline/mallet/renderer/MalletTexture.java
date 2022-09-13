@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.IntVector2 ;
 	implementations, or wait for the Renderer to load 
 	the requested texture.
 */
-public class MalletTexture
+public final class MalletTexture
 {
 	private final Filter minification ;
 	private final Filter magnification ;

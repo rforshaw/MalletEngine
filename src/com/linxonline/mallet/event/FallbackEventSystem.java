@@ -2,7 +2,7 @@ package com.linxonline.mallet.event ;
 
 import java.util.List ;
 
-public class FallbackEventSystem implements IEventSystem
+public final class FallbackEventSystem implements IEventSystem
 {
 	@Override
 	public void setIntercept( final IIntercept _intercept ) {}

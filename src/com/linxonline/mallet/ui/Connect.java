@@ -32,7 +32,7 @@ import com.linxonline.mallet.util.MalletList ;
 	A slot that wishes to remove itself from receiving further changes can also 
 	call Connect.disconnect( signal, variable, slot ).
 */
-public class Connect
+public final class Connect
 {
 	private final Map<Object, Map<Signal, List<Slot<Object>>>> connections = MalletMap.<Object, Map<Signal, List<Slot<Object>>>>newMap() ;
 

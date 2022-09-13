@@ -17,7 +17,7 @@ import com.linxonline.mallet.util.MalletList ;
 	format will populate the intended elements meta object and 
 	can then call the UIGenerator to construct the actual element.
 */
-public class UIGenerator
+public final class UIGenerator
 {
 	private final static Map<String, Generator> creators = MalletMap.<String, Generator>newMap() ;
 	static

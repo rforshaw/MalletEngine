@@ -9,7 +9,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	handles. A storage object can be used to store data 
 	that can be later used by a shader.
 */
-public class Storage extends ABuffer
+public final class Storage extends ABuffer
 {
 	private final IData data ;
 

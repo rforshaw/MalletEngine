@@ -22,7 +22,7 @@ import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.Logger ;
 
-public class GLFontManager extends AbstractManager<String, GLFont>
+public final class GLFontManager extends AbstractManager<String, GLFont>
 {
 	private final static String CHARACTERS = "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+." ;
 
