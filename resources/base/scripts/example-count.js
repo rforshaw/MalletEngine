@@ -29,6 +29,9 @@ function create() {
 		},
 		end: () => {
 			logger.println( "End Call: ", logger.NORMAL ) ;
+		},
+		destroyed: () => {
+			logger.println( "Callback has said this is destroyed.", logger.NORMAL ) ;
 		}
 	}
 }

@@ -133,20 +133,7 @@ public final class GameTestLoader implements IGameLoader
 			public void createScript()
 			{
 				final Entity entity = new Entity( 1 ) ;
-
-				final Script script = new Script( "Example", "base/scripts/example-count.js" ) ;
-				final CountComponent count = new CountComponent( entity )
-				{
-					@Override
-					public void readyToDestroy( final Entity.ReadyCallback _callback )
-					{
-						engine.remove( script ) ;
-						super.readyToDestroy( _callback ) ;
-					}
-				} ;
-
-				script.add( entity ) ;
-				engine.add( script ) ;
+				new CountComponent( entity, "base/scripts/example-count.js" ) ;
 
 				addEntity( entity ) ;
 			}
@@ -642,13 +629,18 @@ public final class GameTestLoader implements IGameLoader
 		public boolean isDead() ;
 	}
 
-	public static class CountComponent extends Component implements ICount, IDestroy
+	public static class CountComponent extends ScriptComponent implements ICount, IDestroy
 	{
+		private final Script.Function destroyed ;
+
 		private int count = 0 ;
 
-		public CountComponent( final Entity _parent )
+		public CountComponent( final Entity _parent, final String _scriptPath )
 		{
-			super( _parent ) ;
+			super( _scriptPath, _parent ) ;
+
+			final Script script = getScript() ;
+			destroyed = script.registerFunction( "destroyed" ) ;
 		}
 
 		@Override
@@ -667,6 +659,7 @@ public final class GameTestLoader implements IGameLoader
 		public void destroy()
 		{
 			getParent().destroy() ;
+			destroyed.invoke() ;
 		}
 
 		@Override

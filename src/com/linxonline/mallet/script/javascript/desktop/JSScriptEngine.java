@@ -88,6 +88,17 @@ public final class JSScriptEngine implements IScriptEngine
 			final Function func = context.compileFunction( scope, source, name, 1, null ) ;
 			final Scriptable obj = ( Scriptable )func.call( context, scope, func, FALLBACK_ARGUMENTS ) ;
 
+			final List<Script.Function> functions = _script.getFunctions() ;
+			for( final Script.Function function : functions )
+			{
+				// Allow the Java code to call into the JavaScript.
+				// This should be used mostly for callbacks.
+				function.setEngineCall( () ->
+				{
+					ScriptableObject.callMethod( obj, function.getName(), FALLBACK_ARGUMENTS ) ;
+				} ) ;
+			}
+			
 			final List<Entity> entities = _script.getEntities() ;
 			final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;
 

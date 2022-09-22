@@ -39,6 +39,7 @@ import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.thread.* ;
 
 import com.linxonline.mallet.script.IScriptEngine ;
+import com.linxonline.mallet.script.Script ;
 import com.linxonline.mallet.script.javascript.JSScriptEngine ;
 
 public class GameState extends State
@@ -589,6 +590,16 @@ public class GameState extends State
 			final IEventSystem eventBackend = system.getEventSystem() ;
 			eventBackend.removeHandler( _controller ) ;
 			_controller.setAddEventInterface( null ) ;
+		} ) ;
+
+		_internal.addProcessor( "ADD_SCRIPT_EVENT", ( final Script _script ) ->
+		{
+			engine.add( _script ) ;
+		} ) ;
+
+		_internal.addProcessor( "REMOVE_SCRIPT_EVENT", ( final Script _script ) ->
+		{
+			engine.remove( _script ) ;
 		} ) ;
 
 		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()

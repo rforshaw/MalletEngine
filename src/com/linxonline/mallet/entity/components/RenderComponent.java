@@ -30,7 +30,7 @@ public class RenderComponent extends Component
 		this( _parent, Entity.AllowEvents.YES ) ;
 	}
 
-	public RenderComponent( final Entity _parent, Entity.AllowEvents _allow )
+	public RenderComponent( final Entity _parent, final Entity.AllowEvents _allow )
 	{
 		super( _parent, _allow ) ;
 		init() ;

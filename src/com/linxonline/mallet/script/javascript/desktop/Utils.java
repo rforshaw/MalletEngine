@@ -2,6 +2,8 @@ package com.linxonline.mallet.script.javascript ;
 
 import java.util.Set ;
 
+import java.lang.reflect.Method ;
+
 import com.linxonline.mallet.script.ScriptInterface ;
 
 public final class Utils

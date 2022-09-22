@@ -4,6 +4,8 @@ import java.util.List ;
 import java.util.Set ;
 import java.util.HashSet ;
 
+import java.lang.reflect.Method ;
+
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.entity.Entity ;
@@ -103,8 +105,8 @@ public final class JSEntity
 					// Only added the component if it implements
 					// ScriptInterface interfaces.
 
-					final Class[] array = interfaces.toArray( new Class[0] ) ;
-					components.add( new JSComponent( component, clazz, array ) ) ;
+					final Class[] classArray = interfaces.toArray( new Class[0] ) ;
+					components.add( new JSComponent( component, clazz, classArray ) ) ;
 				}
 				interfaces.clear() ;
 			}
