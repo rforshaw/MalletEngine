@@ -82,6 +82,7 @@ public final class Script
 			name = _name ;
 		}
 
+		// Do not call directly, used by the scripting-engine.
 		public void setEngineCall( final IFunction _function )
 		{
 			engineFunc = _function ;
@@ -89,6 +90,9 @@ public final class Script
 
 		public void invoke()
 		{
+			// This call should never fail, the engine will
+			// provide a fallback function to call if the script
+			// doesn't offer a function to call.
 			engineFunc.invoke() ;
 		}
 

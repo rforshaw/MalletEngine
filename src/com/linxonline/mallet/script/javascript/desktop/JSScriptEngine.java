@@ -28,8 +28,13 @@ import com.linxonline.mallet.script.IScriptEngine ;
 
 public final class JSScriptEngine implements IScriptEngine
 {
-	private final static String FALLBACK_SCRIPT = "function create() { return { start: () => { }, update: ( _dt ) => { }, end: () => { } } } ;" ;
-	private final static Object[] FALLBACK_ARGUMENTS = new Object[0] ; 
+	private final static String FALLBACK_SCRIPT = "function create() { return { start: () => { }, end: () => { } } } ;" ;
+	private final static Object[] FALLBACK_ARGUMENTS = new Object[0] ;
+	private final static Script.IFunction FALLBACK_CALLBACK = new Script.IFunction()
+	{
+		@Override
+		public void invoke() {}
+	} ;
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
@@ -88,31 +93,46 @@ public final class JSScriptEngine implements IScriptEngine
 			final Function func = context.compileFunction( scope, source, name, 1, null ) ;
 			final Scriptable obj = ( Scriptable )func.call( context, scope, func, FALLBACK_ARGUMENTS ) ;
 
-			final List<Script.Function> functions = _script.getFunctions() ;
-			for( final Script.Function function : functions )
-			{
-				// Allow the Java code to call into the JavaScript.
-				// This should be used mostly for callbacks.
-				function.setEngineCall( () ->
-				{
-					ScriptableObject.callMethod( obj, function.getName(), FALLBACK_ARGUMENTS ) ;
-				} ) ;
-			}
-			
 			final List<Entity> entities = _script.getEntities() ;
 			final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;
 
 			for( final Entity entity : entities )
 			{
+				// Wrap the entities with a proxy, we don't
+				// want the script to have direct access.
 				fill.add( new JSEntity( entity ) ) ;
 			}
 
 			final Meta meta = new Meta( _script, obj, Context.javaToJS( fill, scope )  ) ;
 			lookups.put( _script, meta ) ;
-			updates.add( meta ) ;
 
-			ScriptableObject.putProperty( scope, "entities", meta.getEntities() ) ;
-			ScriptableObject.callMethod( obj, "start", FALLBACK_ARGUMENTS ) ;
+			final List<Script.Function> functions = _script.getFunctions() ;
+			for( final Script.Function function : functions )
+			{
+				final String funcName = function.getName() ;
+				if( ScriptableObject.hasProperty( obj, funcName ) == false )
+				{
+					Logger.println( "Attempting to map to non-existent function: " + funcName, Logger.Verbosity.MAJOR ) ;
+					function.setEngineCall( FALLBACK_CALLBACK ) ;
+					continue ;
+				}
+
+				// Allow the Java code to call into the JavaScript.
+				// This should be used mostly for callbacks.
+				function.setEngineCall( () ->
+				{
+					callMethod( scope, obj, meta, funcName, FALLBACK_ARGUMENTS ) ;
+				} ) ;
+			}
+
+			if( ScriptableObject.hasProperty( obj, "update" ) )
+			{
+				// Only add the script to updates if it has an
+				// update(dt) function.
+				updates.add( meta ) ;
+			}
+
+			callMethod( scope, obj, meta, "start", FALLBACK_ARGUMENTS ) ;
 		} ) ;
 	}
 
@@ -127,9 +147,7 @@ public final class JSScriptEngine implements IScriptEngine
 				updates.remove( meta ) ;
 
 				final Scriptable jsObject = meta.getJSObject() ;
-
-				ScriptableObject.putProperty( scope, "entities", meta.getEntities() ) ;
-				ScriptableObject.callMethod( jsObject, "end", FALLBACK_ARGUMENTS ) ;
+				callMethod( scope, jsObject, meta, "end", FALLBACK_ARGUMENTS ) ;
 			}
 		} ) ;
 	}
@@ -148,12 +166,16 @@ public final class JSScriptEngine implements IScriptEngine
 		for( final Meta meta : updates )
 		{
 			final Scriptable jsObject = meta.getJSObject() ;
-
-			ScriptableObject.putProperty( scope, "entities", meta.getEntities() ) ;
-			ScriptableObject.callMethod( jsObject, "update", updateArguments ) ;
+			callMethod( scope, jsObject, meta, "update", updateArguments ) ;
 		}
 	}
 
+	private static void callMethod( final Scriptable _scope, final Scriptable _jsObj, final Meta _meta, final String _name, final Object[] _arguments )
+	{
+		ScriptableObject.putProperty( _scope, "entities", _meta.getEntities() ) ;
+		ScriptableObject.callMethod( _jsObj, _name, _arguments ) ;
+	}
+	
 	private void invokeLater( final Runnable _run )
 	{
 		if( _run != null )
