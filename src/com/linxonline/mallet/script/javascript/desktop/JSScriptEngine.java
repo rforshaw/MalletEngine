@@ -1,8 +1,10 @@
 package com.linxonline.mallet.script.javascript ;
 
 import java.util.List ;
+import java.util.Set ;
 import java.util.ArrayList ;
 import java.util.HashMap ;
+import java.util.HashSet ;
 
 import org.mozilla.javascript.Context ;
 import org.mozilla.javascript.Function ;
@@ -11,6 +13,9 @@ import org.mozilla.javascript.ScriptableObject ;
 import org.mozilla.javascript.annotations.JSConstructor;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.mozilla.javascript.annotations.JSGetter;
+
+import java.lang.reflect.Method ;
+import java.lang.reflect.Proxy ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
@@ -30,11 +35,6 @@ public final class JSScriptEngine implements IScriptEngine
 {
 	private final static String FALLBACK_SCRIPT = "function create() { return { start: () => { }, end: () => { } } } ;" ;
 	private final static Object[] FALLBACK_ARGUMENTS = new Object[0] ;
-	private final static Script.IFunction FALLBACK_CALLBACK = new Script.IFunction()
-	{
-		@Override
-		public void invoke() {}
-	} ;
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
@@ -106,22 +106,22 @@ public final class JSScriptEngine implements IScriptEngine
 			final Meta meta = new Meta( _script, obj, Context.javaToJS( fill, scope )  ) ;
 			lookups.put( _script, meta ) ;
 
-			final List<Script.Function> functions = _script.getFunctions() ;
-			for( final Script.Function function : functions )
+			final Class<?> scriptClass = _script.getScriptFunctions() ;
+			Object proxy = null ;
+			if( scriptClass != null )
 			{
-				final String funcName = function.getName() ;
-				if( ScriptableObject.hasProperty( obj, funcName ) == false )
+				final ClassLoader loader = scriptClass.getClassLoader() ;
+				proxy = Proxy.newProxyInstance( loader, new Class<?>[] { scriptClass }, ( final Object _proxy, final Method _method, final Object[] _args ) ->
 				{
-					Logger.println( "Attempting to map to non-existent function: " + funcName, Logger.Verbosity.MAJOR ) ;
-					function.setEngineCall( FALLBACK_CALLBACK ) ;
-					continue ;
-				}
+					final String methodName = _method.getName() ;
+					if( ScriptableObject.hasProperty( obj, methodName ) == false )
+					{
+						Logger.println( "Javascript function: " + methodName + " does not exist.", Logger.Verbosity.MAJOR ) ;
+						return null ;
+					}
 
-				// Allow the Java code to call into the JavaScript.
-				// This should be used mostly for callbacks.
-				function.setEngineCall( () ->
-				{
-					callMethod( scope, obj, meta, funcName, FALLBACK_ARGUMENTS ) ;
+					final Object response = callMethod( scope, obj, meta, methodName, _args ) ;
+					return null ;
 				} ) ;
 			}
 
@@ -133,6 +133,9 @@ public final class JSScriptEngine implements IScriptEngine
 			}
 
 			callMethod( scope, obj, meta, "start", FALLBACK_ARGUMENTS ) ;
+
+			final Script.IListener listener = _script.getListener() ;
+			listener.added( proxy ) ;
 		} ) ;
 	}
 
@@ -148,6 +151,9 @@ public final class JSScriptEngine implements IScriptEngine
 
 				final Scriptable jsObject = meta.getJSObject() ;
 				callMethod( scope, jsObject, meta, "end", FALLBACK_ARGUMENTS ) ;
+
+				final Script.IListener listener = _script.getListener() ;
+				listener.removed() ;
 			}
 		} ) ;
 	}
@@ -170,10 +176,10 @@ public final class JSScriptEngine implements IScriptEngine
 		}
 	}
 
-	private static void callMethod( final Scriptable _scope, final Scriptable _jsObj, final Meta _meta, final String _name, final Object[] _arguments )
+	private static Object callMethod( final Scriptable _scope, final Scriptable _jsObj, final Meta _meta, final String _name, final Object[] _arguments )
 	{
 		ScriptableObject.putProperty( _scope, "entities", _meta.getEntities() ) ;
-		ScriptableObject.callMethod( _jsObj, _name, _arguments ) ;
+		return ScriptableObject.callMethod( _jsObj, _name, _arguments ) ;
 	}
 	
 	private void invokeLater( final Runnable _run )

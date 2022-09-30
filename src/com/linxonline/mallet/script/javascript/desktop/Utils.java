@@ -4,7 +4,7 @@ import java.util.Set ;
 
 import java.lang.reflect.Method ;
 
-import com.linxonline.mallet.script.ScriptInterface ;
+import com.linxonline.mallet.script.JavaInterface ;
 
 public final class Utils
 {
@@ -65,7 +65,7 @@ public final class Utils
 		final Class[] interfaces = _class.getInterfaces() ;
 		for( final Class inter : interfaces )
 		{
-			if( inter.isAnnotationPresent( ScriptInterface.class ) )
+			if( inter.isAnnotationPresent( JavaInterface.class ) )
 			{
 				_fill.add( inter ) ;
 			}

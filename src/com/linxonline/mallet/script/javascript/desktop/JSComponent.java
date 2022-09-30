@@ -2,9 +2,9 @@ package com.linxonline.mallet.script.javascript ;
 
 import java.util.List ;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.InvocationHandler ;
+import java.lang.reflect.Method ;
+import java.lang.reflect.Proxy ;
 
 import com.linxonline.mallet.util.MalletList ;
 

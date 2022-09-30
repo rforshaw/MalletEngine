@@ -7,13 +7,23 @@ import com.linxonline.mallet.entity.Entity ;
 
 public final class Script
 {
-	private final static Object FALLBACK = new Object() ; 
+	private final static Object FALLBACK = new Object() ;
+	private final static IListener FALLBACK_LISTENER = new IListener()
+	{
+		@Override
+		public void added( final Object _functions ) {}
+
+		@Override
+		public void removed() {}
+	} ;
 
 	private final String name ;
 	private final String scriptPath ;
 
 	private final List<Entity> entities = MalletList.<Entity>newList() ;
-	private final List<Function> functions = MalletList.<Function>newList() ;
+
+	private IListener listener ;
+	private Class<?> scriptFunctions ;
 
 	public Script( final String _path )
 	{
@@ -41,15 +51,44 @@ public final class Script
 		return entities.remove( _entity ) ;
 	}
 
-	// Specify a function name within the script.
-	// The returned function will become executable as soon
-	// as the script is added to the script-engine for processing.
-	// Call invoke() to call into the script.
-	public Function registerFunction( final String _name )
+	/**
+		The passed in interface is used to allow the Java
+		side to access script defined functions.
+
+		When the script is processed by the Scripting Engine
+		a function object will be returned from IListener.added().
+
+		You should cast the Object back to the original interface
+		that was passed into this function.
+	*/
+	public boolean setScriptFunctions( final Class<?> _class )
 	{
-		final Function function = new Function( _name ) ;
-		functions.add( function ) ;
-		return function ;
+		if( _class.isInterface() == false )
+		{
+			return false ;
+		}
+
+		scriptFunctions = _class ;
+		return true ;
+	}
+
+	/**
+		Return the class interface, if specified,
+		that is expected to be mapped to the script functions.
+	*/
+	public Class<?> getScriptFunctions()
+	{
+		return scriptFunctions ;
+	}
+
+	public void setListener( final IListener _listener )
+	{
+		listener = ( _listener != null ) ? _listener : FALLBACK_LISTENER ;
+	}
+
+	public IListener getListener()
+	{
+		return listener ;
 	}
 
 	public String getName()
@@ -67,43 +106,23 @@ public final class Script
 		return entities ;
 	}
 
-	public List<Function> getFunctions()
+	public interface IListener
 	{
-		return functions ;
-	}
+		/**
+			Notify the user that the script has been
+			added the the script-engine and can now be
+			processed.
 
-	public static class Function
-	{
-		private final String name ;
-		private IFunction engineFunc ;
+			Return an object that implements the passed
+			in interface from setScriptFunctions() - this
+			allows a user to call into the script.
+		*/
+		public void added( final Object _functions ) ;
 
-		public Function( final String _name )
-		{
-			name = _name ;
-		}
-
-		// Do not call directly, used by the scripting-engine.
-		public void setEngineCall( final IFunction _function )
-		{
-			engineFunc = _function ;
-		}
-
-		public void invoke()
-		{
-			// This call should never fail, the engine will
-			// provide a fallback function to call if the script
-			// doesn't offer a function to call.
-			engineFunc.invoke() ;
-		}
-
-		public String getName()
-		{
-			return name ;
-		}
-	}
-
-	public interface IFunction
-	{
-		public void invoke() ;
+		/**
+			Notify the user that the script has been removed
+			from the script-engine and is no longer being processed.
+		*/
+		public void removed() ;
 	}
 }

@@ -42,7 +42,7 @@ import com.linxonline.mallet.io.net.InStream ;
 import com.linxonline.mallet.io.net.Address ;
 
 import com.linxonline.mallet.script.Script ;
-import com.linxonline.mallet.script.ScriptInterface ;
+import com.linxonline.mallet.script.JavaInterface ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -614,7 +614,7 @@ public final class GameTestLoader implements IGameLoader
 	}
 
 	// Required for the scripting-system to pick it up.
-	@ScriptInterface
+	@JavaInterface
 	public interface ICount
 	{
 		public void count() ;
@@ -622,25 +622,47 @@ public final class GameTestLoader implements IGameLoader
 	}
 
 	// Required for the scripting-system to pick it up.
-	@ScriptInterface
+	@JavaInterface
 	public interface IDestroy
 	{
 		public void destroy() ;
 		public boolean isDead() ;
 	}
 
+	public interface IDestroyed
+	{
+		public void destroyed() ;
+	}
+
+	public interface IExtension extends IDestroyed
+	{
+		// All functions that call into the script
+		// should return void.
+		public void notAValidFunction() ;
+	}
+
 	public static class CountComponent extends ScriptComponent implements ICount, IDestroy
 	{
-		private final Script.Function destroyed ;
-
 		private int count = 0 ;
+		private IExtension functions ;	// Script functions that can be called from the Java side.
 
 		public CountComponent( final Entity _parent, final String _scriptPath )
 		{
 			super( _scriptPath, _parent ) ;
 
 			final Script script = getScript() ;
-			destroyed = script.registerFunction( "destroyed" ) ;
+			script.setScriptFunctions( IExtension.class ) ;
+
+			script.setListener( new Script.IListener()
+			{
+				@Override
+				public void added( final Object _functions )
+				{
+					functions = ( IExtension )_functions ;
+				}
+
+				public void removed() {}
+			} ) ;
 		}
 
 		@Override
@@ -659,7 +681,8 @@ public final class GameTestLoader implements IGameLoader
 		public void destroy()
 		{
 			getParent().destroy() ;
-			destroyed.invoke() ;
+			functions.destroyed() ;
+			functions.notAValidFunction() ;
 		}
 
 		@Override
