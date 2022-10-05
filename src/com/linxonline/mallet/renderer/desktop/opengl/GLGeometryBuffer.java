@@ -63,7 +63,7 @@ public final class GLGeometryBuffer extends GLBuffer
 							 final int _maxIndexByteSize,
 							 final int _maxVertexByteSize )
 	{
-		super( _buffer.isUI() ) ;
+		super( false ) ;
 
 		indexByteSize = _indexByteSize ;
 		vertexByteSize = _vertexByteSize ;

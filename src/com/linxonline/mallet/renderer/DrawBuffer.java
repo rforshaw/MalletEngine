@@ -115,11 +115,6 @@ public class DrawBuffer extends ABuffer
 	*/
 	public static boolean isCompatible( final DrawBuffer _lhs, final GeometryBuffer _rhs )
 	{
-		if( _lhs.isUI() != _rhs.isUI() )
-		{
-			return false ;
-		}
-
 		// Lets check the cheapest value first
 		if( _lhs.getStyle().equals( _rhs.getStyle() ) == false )
 		{

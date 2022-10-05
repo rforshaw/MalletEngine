@@ -70,8 +70,19 @@ public final class ALSASource implements ISource
 		final int index = NEXT_SOURCE_INDEX % MAX_SOURCE_NUM ;
 		if( SOURCE_USED[index] == true )
 		{
-			++NEXT_SOURCE_INDEX ;
-			return getNextIndex() ;
+			// We've reached a point where the next source is not
+			// the next one in the list. We'll start from 0 and
+			// brute force find an empty source.
+			for( int i = 0; i < MAX_SOURCE_NUM; ++i )
+			{
+				if( SOURCE_USED[i] == false )
+				{
+					NEXT_SOURCE_INDEX = i + 1 ;
+					SOURCE_USED[i] = true ;
+					return i ;
+				}
+			}
+			return -1 ;
 		}
 
 		++NEXT_SOURCE_INDEX ;
@@ -82,14 +93,18 @@ public final class ALSASource implements ISource
 	/**
 		Allow the source to claim an AL source ID.
 	*/
-	private static void claimSourceID( final ALSASource _source )
+	private static boolean claimSourceID( final ALSASource _source )
 	{
 		if( _source.sourceIndex >= 0 )
 		{
-			return ;
+			return true ;
 		}
 
 		_source.sourceIndex = getNextIndex() ;
+		if( _source.sourceIndex <= -1 )
+		{
+			return false ;
+		}
 
 		final AL openAL = _source.openAL ;
 		final int[] buffer = _source.buffer.getBufferID() ;
@@ -111,8 +126,10 @@ public final class ALSASource implements ISource
 		if( error != AL.AL_NO_ERROR )
 		{
 			System.out.println( "Failed to Configure Source: " + ALSAGenerator.getALErrorString( error ) ) ;
-			return ;
+			return false ;
 		}
+
+		return true ;
 	}
 
 	private static void relinquishSourceID( final ALSASource _source )
@@ -135,10 +152,28 @@ public final class ALSASource implements ISource
 		_source.sourceIndex = -1 ;
 	}
 
+	/**
+		Return the number of currently used sources.
+		Mostly used for debugging to determine if there
+		is a 'source' leak.
+	*/
+	private static int getNumOfUsedSources()
+	{
+		int num = 0 ;
+		for( int i = 0; i < SOURCE_USED.length; ++i )
+		{
+			num += ( SOURCE_USED[i] ) ? 1 : 0 ;
+		}
+		return num ;
+	}
+
 	@Override
 	public boolean play()
 	{
-		claimSourceID( this ) ;
+		if( claimSourceID( this ) == false )
+		{
+			return false ;
+		}
 
 		openAL.alSourcePlay( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
@@ -147,7 +182,10 @@ public final class ALSASource implements ISource
 	@Override
 	public boolean playLoop()
 	{
-		claimSourceID( this ) ;
+		if( claimSourceID( this ) == false )
+		{
+			return false ;
+		}
 
 		openAL.alSourcei( SOURCES[sourceIndex], AL.AL_LOOPING,  AL.AL_TRUE ) ;
 		if( openAL.alGetError() != AL.AL_NO_ERROR )
@@ -160,7 +198,10 @@ public final class ALSASource implements ISource
 	@Override
 	public boolean pause()
 	{
-		claimSourceID( this ) ;
+		if( claimSourceID( this ) == false )
+		{
+			return false ;
+		}
 
 		openAL.alSourcePause( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
@@ -169,7 +210,10 @@ public final class ALSASource implements ISource
 	@Override
 	public boolean stop()
 	{
-		claimSourceID( this ) ;
+		if( claimSourceID( this ) == false )
+		{
+			return false ;
+		}
 
 		openAL.alSourceStop( SOURCES[sourceIndex] ) ;
 		return openAL.alGetError() == AL.AL_NO_ERROR ;
@@ -289,6 +333,7 @@ public final class ALSASource implements ISource
 	public void destroy()
 	{
 		stop() ;
+		relinquishSourceID( this ) ;
 	}
 
 	private int getBufferSize()

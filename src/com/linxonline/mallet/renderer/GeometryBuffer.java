@@ -18,7 +18,6 @@ public class GeometryBuffer extends ABuffer
 
 	private final Shape.Attribute[] swivel ;
 	private final Shape.Style style ;
-	private final boolean ui ;
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 
 	private IOcclude occluder = OCCLUDER_FALLBACK ;
@@ -29,7 +28,6 @@ public class GeometryBuffer extends ABuffer
 	{
 		swivel = _swivel ;
 		style = _style ;
-		ui = _ui ;
 	}
 
 	/**
@@ -78,11 +76,6 @@ public class GeometryBuffer extends ABuffer
 	public Shape.Style getStyle()
 	{
 		return style ;
-	}
-
-	public boolean isUI()
-	{
-		return ui ;
 	}
 
 	@Override

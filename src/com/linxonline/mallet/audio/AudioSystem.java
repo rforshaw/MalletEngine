@@ -308,7 +308,7 @@ public final class AudioSystem
 
 					active.remove( source ) ;
 
-					source.stop() ;
+					active.remove( source ) ;
 					source.destroy() ;
 				} ) ;
 
@@ -431,6 +431,7 @@ public final class AudioSystem
 							continue ;
 						}
 
+						active.remove( source ) ;
 						source.destroy() ;
 					}
 					emitters.clear() ;
