@@ -6,6 +6,8 @@ import java.util.ArrayList ;
 import java.util.HashMap ;
 import java.util.HashSet ;
 
+import org.mozilla.javascript.EvaluatorException ;
+import org.mozilla.javascript.ErrorReporter ;
 import org.mozilla.javascript.Context ;
 import org.mozilla.javascript.Function ;
 import org.mozilla.javascript.Scriptable ;
@@ -53,6 +55,29 @@ public final class JSScriptEngine implements IScriptEngine
 	{
 		context = Context.enter() ;
 		context.setLanguageVersion( Context.VERSION_ES6 ) ;
+		context.setErrorReporter( new ErrorReporter()
+		{
+			@Override
+			public void error( final String _message, final String _sourceName, final int _line, final String _lineSource, final int _lineOffset )
+			{
+				Logger.println( "Error in: " + _sourceName, Logger.Verbosity.MAJOR ) ;
+				Logger.println( _message + " at line: " + _line, Logger.Verbosity.MAJOR ) ;
+				Logger.println( _lineSource, Logger.Verbosity.MAJOR ) ;
+			}
+
+			@Override
+			public EvaluatorException runtimeError( final String _message, final String _sourceName, final int _line, String _lineSource, final int _lineOffset )
+			{
+				return new EvaluatorException( _message ) ;
+			}
+
+			@Override
+			public void warning( final String _message, final String _sourceName, int _line, final String _lineSource, final int _lineOffset )
+			{
+				Logger.println( "Warning in: " + _sourceName, Logger.Verbosity.NORMAL ) ;
+				Logger.println( _message + " at line: " + _line, Logger.Verbosity.NORMAL ) ;
+			}
+		} ) ;
 
 		scope = context.initStandardObjects() ;
 
@@ -225,11 +250,14 @@ public final class JSScriptEngine implements IScriptEngine
 				return FALLBACK_SCRIPT ;
 			}
 
-			final StringBuilder builder = new StringBuilder() ;
+			final int capacity = ( int )file.getSize() ;
+
+			final StringBuilder builder = new StringBuilder( capacity ) ;
 			String line = null ;
 			while( ( line = stream.readLine() ) != null )
 			{
 				builder.append( line ) ;
+				builder.append( '\n' ) ;
 			}
 
 			return builder.toString() ;

@@ -10,6 +10,7 @@ public abstract class InputComponent extends Component
 									 implements IInputHandler
 {
 	private Entity.ReadyCallback destroy = null ;
+	private boolean acceptInputs = true ;
 	protected final InputMode mode ;
 
 	public InputComponent( final Entity _parent )
@@ -31,6 +32,11 @@ public abstract class InputComponent extends Component
 	{
 		super( _parent, _allow ) ;
 		mode = _mode ;
+	}
+
+	public void acceptInputs( final boolean _accept )
+	{
+		acceptInputs = _accept ;
 	}
 
 	@Override
@@ -74,7 +80,7 @@ public abstract class InputComponent extends Component
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( destroy == null )
+		if( destroy == null && acceptInputs == true )
 		{
 			processInputEvent( _event ) ;
 		}
