@@ -286,19 +286,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				} ) ;
 				return _program ;
 			}
-
-			@Override
-			public Program update( final Program _program )
-			{
-				// Not used, you don't update a glProgram.
-				// It gets updated/remapped when you update the draw buffer.
-				/*GLRenderer.this.invokeLater( () ->
-				{
-					final int index = _program.index() ;
-					final GLProgram glProgram = programLookup.getRHS( index ) ;
-				} ) ;*/
-				return _program ;
-			}
 		} ;
 	}
 

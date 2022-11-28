@@ -31,6 +31,8 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 	/**
 		Force all GeometryBuffers assigned to this updater
 		to be re/uploaded to the GPU.
+		This should only be called if the Draw objects shapes
+		have changed. 
 	*/
 	public void forceUpdate()
 	{
@@ -122,6 +124,9 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 			final List<Draw> draws = buffer.getDraws() ;
 			for( final Draw draw : draws )
 			{
+				// A draw object does not need the geometry buffer
+				// to be updated if it's just the position, rotation,
+				// or scale that has changed.
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
 					dirty = true ;

@@ -205,6 +205,23 @@ public class UILayout extends UIElement implements IChildren
 		return engageMode ;
 	}
 
+	@Override
+	public boolean continueEngagement( final InputEvent _input )
+	{
+		if( engageMode == null )
+		{
+			return isIntersectInput( _input ) ;
+		}
+
+		final UIElement element = engageMode.getEngaged() ;
+		if( element == null )
+		{
+			return isIntersectInput( _input ) ;
+		}
+
+		return element.continueEngagement( _input ) ;
+	}
+
 	/**
 		Add the passed in UIElement to the end of the UILayout.
 		Returns the passed in element, allows for further modifications. 
@@ -761,7 +778,7 @@ public class UILayout extends UIElement implements IChildren
 					current.isDisabled() == false &&
 					current.destroy == false )
 				{
-					if( current.isIntersectInput( _input ) == true )
+					if( current.continueEngagement( _input ) == true )
 					{
 						return passInput( current, _input ) ;
 					}

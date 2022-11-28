@@ -229,6 +229,18 @@ public class UIElement implements IInputHandler, Connect.Connection
 			   current == State.CHILD_ENGAGED ;
 	}
 
+	/**
+		Used to determine if the element should continue
+		to be engaged.
+		Typically as element is considered engaged when mouse/touch
+		inputs intersect its area, however, this is not always the
+		case particularly elements where key inputs are more important.
+	*/
+	public boolean continueEngagement( final InputEvent _input )
+	{
+		return isIntersectInput( _input ) ;
+	}
+
 	public void update( final float _dt, final List<Event<?>> _events )
 	{
 		if( events.isEmpty() == false )

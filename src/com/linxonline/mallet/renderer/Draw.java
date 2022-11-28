@@ -120,6 +120,11 @@ public final class Draw implements IUpdate
 		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
 	}
 
+	public void addToPosition( final float _x, final float _y, final float _z )
+	{
+		FloatBuffer.add( future, POSITION, _x, _y, _z ) ;
+	}
+
 	public Vector3 getPosition( final Vector3 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, POSITION ) ;
@@ -133,6 +138,11 @@ public final class Draw implements IUpdate
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
+	}
+
+	public void addToOffset( final float _x, final float _y, final float _z )
+	{
+		FloatBuffer.add( future, OFFSET, _x, _y, _z ) ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )

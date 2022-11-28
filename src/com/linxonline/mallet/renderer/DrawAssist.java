@@ -76,5 +76,21 @@ public final class DrawAssist
 		public <T extends ABuffer> T add( final T _buffer ) ;
 		public <T extends ABuffer> T remove( final T _buffer ) ;
 		public <T extends ABuffer> T update( final T _buffer ) ;
+
+		/*public GeometryBuffer add( final GeometryBuffer _buffer ) ;
+		public GeometryBuffer remove( final GeometryBuffer _buffer ) ;
+		public GeometryBuffer update( final GeometryBuffer _buffer ) ;
+
+		public DrawBuffer add( final DrawBuffer _buffer ) ;
+		public DrawBuffer remove( final DrawBuffer _buffer ) ;
+		public DrawBuffer update( final DrawBuffer _buffer ) ;
+
+		public TextBuffer add( final TextBuffer _buffer ) ;
+		public TextBuffer remove( final TextBuffer _buffer ) ;
+		public TextBuffer update( final TextBuffer _buffer ) ;
+
+		public DrawInstancedBuffer add( final DrawInstancedBuffer _buffer ) ;
+		public DrawInstancedBuffer remove( final DrawInstancedBuffer _buffer ) ;
+		public DrawInstancedBuffer update( final DrawInstancedBuffer _buffer ) ;*/
 	}
 }

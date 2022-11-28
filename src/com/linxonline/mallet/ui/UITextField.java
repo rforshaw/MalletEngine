@@ -71,6 +71,21 @@ public class UITextField extends UIElement
 		} ) ;
 	}
 
+	/**
+		A UITextField is only considered unengaged once a mouse-click
+		or touch even is activated outside of its area.
+	*/
+	@Override
+	public boolean continueEngagement( final InputEvent _input )
+	{
+		switch( _input.getInputType() )
+		{
+			default             : return true ;
+			case MOUSE1_PRESSED : return isIntersectInput( _input ) ;
+			case TOUCH_DOWN     : return isIntersectInput( _input ) ;
+		}
+	}
+
 	@Override
 	public void refresh()
 	{

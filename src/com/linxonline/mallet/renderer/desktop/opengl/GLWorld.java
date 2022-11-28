@@ -237,7 +237,7 @@ public class GLWorld
 			MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
 		}
 
-		MGL.glClearColor( 255.0f, 0.0f, 0.0f, 0.0f ) ;
+		MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 		
 		int clearBits = ( colourAttachments.length > 0 ) ? MGL.GL_COLOR_BUFFER_BIT : 0 ;
 		clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
