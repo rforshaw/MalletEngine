@@ -17,11 +17,11 @@ public final class ProgramManager<T extends ProgramManager.Program> extends Abst
 		To ensure the programs are added safely to resources we 
 		temporarily store the program in a queue.
 	*/
-	private final JSONBind<T> binder ;
+	private final JSONBind binder ;
 
-	public ProgramManager( final JSONBuilder<T> _builder )
+	public ProgramManager( final JSONBuilder _builder )
 	{
-		binder = new JSONBind<T>( _builder ) ;
+		binder = new JSONBind( _builder ) ;
 
 		final ResourceLoader<String, T> loader = getResourceLoader() ;
 		loader.add( new ResourceDelegate<String, T>()
@@ -50,73 +50,29 @@ public final class ProgramManager<T extends ProgramManager.Program> extends Abst
 		createResource( _file ) ;
 	}
 
-	@Override
-	public T get( final String _key )
-	{
-		// GLRenderer will continuosly call get() until it 
-		// recieves a GLProgram, so we need to compile Programs
-		// that are waiting for the OpenGL context 
-		// when the render requests it.
-		binder.buildPrograms( this ) ;
-		return super.get( _key ) ;
-	}
-
 	public static abstract class Program extends Resource
 	{
 		public abstract String getName() ;
 	}
 
-	public static interface JSONBuilder<T extends ProgramManager.Program>
+	public static interface JSONBuilder
 	{
-		public T build( final JSONProgram _program ) ;
+		public void build( final JSONProgram _program ) ;
 	}
 
-	private static class JSONBind<T extends ProgramManager.Program> implements JSONProgram.Delegate
+	private static class JSONBind implements JSONProgram.Delegate
 	{
-		private final JSONBuilder<T> builder ;
-		private final List<JSONProgram> toBind = MalletList.<JSONProgram>newList() ;
+		private final JSONBuilder builder ;
 
-		public JSONBind( JSONBuilder<T> _builder )
+		public JSONBind( JSONBuilder _builder )
 		{
 			builder = _builder ;
-		}
-
-		public void buildPrograms( ProgramManager<T> _manager )
-		{
-			synchronized( toBind )
-			{
-				if( toBind.isEmpty() )
-				{
-					return ;
-				}
-
-				final int size = toBind.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final T program = builder.build( toBind.get( i ) ) ;
-					if( program != null )
-					{
-						final String id = program.getName() ;
-						if( _manager.isKeyNull( id ) == false )
-						{
-							Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
-						}
-						_manager.put( id, program ) ;
-					}
-				}
-				toBind.clear() ;
-			}
 		}
 
 		@Override
 		public void loaded( final JSONProgram _program )
 		{
-			synchronized( toBind )
-			{
-				// We don't want to compile the Shaders now
-				// as that will take control of the OpenGL context.
-				toBind.add( _program ) ;
-			}
+			builder.build( _program ) ;
 		}
 
 		@Override

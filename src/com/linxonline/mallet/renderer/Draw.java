@@ -15,6 +15,7 @@ public final class Draw implements IUpdate
 	private static final int ROTATION = 6 ;
 	private static final int SCALE    = 9 ;
 
+	private IMeta meta = null ;
 	private boolean hidden = false ;
 	private final IShape[] shapes ;
 	private MalletColour colour = null ;
@@ -68,6 +69,25 @@ public final class Draw implements IUpdate
 		FloatBuffer.set( future, OFFSET, _offX, _offY, _offZ ) ;
 		FloatBuffer.set( future, ROTATION, _rotX, _rotY, _rotZ ) ;
 		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
+	}
+
+	/**
+		Associate the draw object with further information.
+		This could be used for a variety of purposes specific
+		to the developers own use-cases.
+	*/
+	public void setMeta( final IMeta _meta )
+	{
+		meta = _meta ;
+	}
+
+	/**
+		Return the meta object specified by the developer, or null
+		if nothing has been set.
+	*/
+	public IMeta getMeta()
+	{
+		return meta ;
 	}
 
 	public IShape[] getShapes()
@@ -234,5 +254,22 @@ public final class Draw implements IUpdate
 		}
 
 		return update ;
+	}
+
+	/**
+		Extend the meta interface when you have information
+		you want to bundle along with the Draw object.
+		This meta information could be used for a variety
+		of purposes, such as: occlusion or identify the parent.
+	*/
+	public interface IMeta
+	{
+		/**
+			It's possible the developer will define multiple
+			meta classes for different draw object use-cases.
+			Each class should return a unique int that can be
+			used to cast the object to the correct definition.
+		*/
+		public int getType() ;
 	}
 }

@@ -35,11 +35,22 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
-	private final static ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder<GLProgram>()
+	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder()
 	{
-		public GLProgram build( final JSONProgram _program )
+		public void build( final JSONProgram _program )
 		{
-			return GLProgram.build( _program ) ;
+			GLRenderer.this.invokeLater( () ->
+			{
+				final GLProgram program = GLProgram.build( _program ) ;
+				final String id = program.getName() ;
+				if( programs.isKeyNull( id ) == false )
+				{
+					Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
+				}
+
+				Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.NORMAL ) ;
+				programs.put( id, program ) ;
+			} ) ;
 		}
 	} ) ;
 
