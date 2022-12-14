@@ -39,8 +39,8 @@ public class GUIDrawEdge extends GUIDraw
 		if( updater != null && parent.isVisible() == true )
 		{
 			final Draw draw = getDraw() ;
-			draw.setPosition( position.x, position.y, position.z ) ;
-			draw.setOffset( offset.x, offset.y, offset.z ) ;
+			draw.setPositionInstant( position.x, position.y, position.z ) ;
+			draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			GUI.updateEdge( ( Shape )draw.getShape(), getLength(), edge ) ;
 			updater.forceUpdate() ;

@@ -37,6 +37,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder()
 	{
+		@Override
 		public void build( final JSONProgram _program )
 		{
 			GLRenderer.this.invokeLater( () ->

@@ -108,6 +108,6 @@ public final class AssetLookup<L, R>
 
 	private void notYetMapped( final int _index )
 	{
-		Logger.println( MessageFormat.format( "{0}, attempting to access {1}, asset not yet mapped.", name, _index ), Logger.Verbosity.MAJOR ) ;
+		Logger.println( MessageFormat.format( "{0}, attempting to access {1}, asset not yet mapped.", name, _index ), Logger.Verbosity.MINOR ) ;
 	}
 }

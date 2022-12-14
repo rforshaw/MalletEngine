@@ -8,7 +8,6 @@ import java.text.MessageFormat ;
 
 import org.teavm.jso.* ;
 import org.teavm.jso.json.JSON ;
-//import org.teavm.jso.browser.* ;
 import org.teavm.jso.dom.html.* ;
 import org.teavm.jso.dom.events.* ;
 import org.teavm.jso.webgl.WebGLRenderingContext ;
@@ -37,19 +36,23 @@ public class GLRenderer extends BasicRenderer
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
-	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder<GLProgram>()
+	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder()
 	{
-		public GLProgram build( final JSONProgram _program )
+		@Override
+		public void build( final JSONProgram _program )
 		{
-			final GLProgram program = GLProgram.build( _program ) ;
-			final String id = program.getName() ;
-			if( programs.isKeyNull( id ) == false )
+			GLRenderer.this.invokeLater( () ->
 			{
-				Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
-			}
+				final GLProgram program = GLProgram.build( _program ) ;
+				final String id = program.getName() ;
+				if( programs.isKeyNull( id ) == false )
+				{
+					Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
+				}
 
-			Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.MINOR ) ;
-			programs.put( id, program ) ;
+				Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.MINOR ) ;
+				programs.put( id, program ) ;
+			} ) ;
 		}
 	} ) ;
 
@@ -322,19 +325,6 @@ public class GLRenderer extends BasicRenderer
 						programLookup.unmap( _program.index() ) ;
 					}
 				} ) ;
-				return _program ;
-			}
-
-			@Override
-			public Program update( final Program _program )
-			{
-				// Not used, you don't update a glProgram.
-				// It gets updated/remapped when you update the draw buffer.
-				/*GLRenderer.this.invokeLater( () ->
-				{
-					final int index = _program.index() ;
-					final GLProgram glProgram = programLookup.getRHS( index ) ;
-				} ) ;*/
 				return _program ;
 			}
 		} ;

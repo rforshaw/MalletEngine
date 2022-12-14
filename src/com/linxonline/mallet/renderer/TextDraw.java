@@ -51,6 +51,11 @@ public final class TextDraw implements IUpdate
 		return draw.getColour() ;
 	}
 
+	public void setPositionInstant( final float _x, final float _y, final float _z )
+	{
+		draw.setPositionInstant( _x, _y, _z ) ;
+	}
+
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		draw.setPosition( _x, _y, _z ) ;
@@ -59,6 +64,11 @@ public final class TextDraw implements IUpdate
 	public Vector3 getPosition( final Vector3 _fill )
 	{
 		return draw.getPosition( _fill ) ;
+	}
+
+	public void setOffsetInstant( final float _x, final float _y, final float _z )
+	{
+		draw.setOffsetInstant( _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
@@ -79,6 +89,11 @@ public final class TextDraw implements IUpdate
 	public Vector3 getRotation( final Vector3 _fill )
 	{
 		return draw.getRotation( _fill ) ;
+	}
+
+	public void setScaleInstant( final float _x, final float _y, final float _z )
+	{
+		draw.setScaleInstant( _x, _y, _z ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )

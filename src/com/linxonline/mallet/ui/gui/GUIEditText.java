@@ -84,8 +84,8 @@ public class GUIEditText extends GUIText
 			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x ) ;
 			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-			drawPlaceholder.setPosition( position.x, position.y, position.z ) ;
-			drawPlaceholder.setOffset( offsetX, offsetY, 0.0f ) ;
+			drawPlaceholder.setPositionInstant( position.x, position.y, position.z ) ;
+			drawPlaceholder.setOffsetInstant( offsetX, offsetY, 0.0f ) ;
 
 			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x ) ) ;
 			drawPlaceholder.setColour( colour ) ;
@@ -189,11 +189,11 @@ public class GUIEditText extends GUIText
 
 		if( isEditing() == true )
 		{
-			cursorDraw.setPosition( position.x, position.y, position.z ) ;
+			cursorDraw.setPositionInstant( position.x, position.y, position.z ) ;
 			final int index = parent.getCursorIndex() ;
 
 			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
-			cursorDraw.setOffset( xOffset, offset.y, offset.z ) ;
+			cursorDraw.setOffsetInstant( xOffset, offset.y, offset.z ) ;
 			cursorDraw.setHidden( false ) ;
 			cursorUpdater.forceUpdate() ;
 

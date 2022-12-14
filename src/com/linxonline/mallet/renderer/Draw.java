@@ -15,7 +15,15 @@ public final class Draw implements IUpdate
 	private static final int ROTATION = 6 ;
 	private static final int SCALE    = 9 ;
 
-	private IMeta meta = null ;
+	public static final IMeta EMPTY_META = new IMeta()
+	{
+		public int getType()
+		{
+			return -1 ;
+		}
+	} ;
+
+	private IMeta meta = EMPTY_META ;
 	private boolean hidden = false ;
 	private final IShape[] shapes ;
 	private MalletColour colour = null ;
@@ -78,7 +86,7 @@ public final class Draw implements IUpdate
 	*/
 	public void setMeta( final IMeta _meta )
 	{
-		meta = _meta ;
+		meta = ( _meta != null ) ? _meta : EMPTY_META ;
 	}
 
 	/**
@@ -135,6 +143,13 @@ public final class Draw implements IUpdate
 		return colour ;
 	}
 
+	public void setPositionInstant( final float _x, final float _y, final float _z )
+	{
+		FloatBuffer.set( old, POSITION, _x, _y, _z ) ;
+		FloatBuffer.set( present, POSITION, _x, _y, _z ) ;
+		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
+	}
+
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
@@ -153,6 +168,13 @@ public final class Draw implements IUpdate
 	public Vector2 getPosition( final Vector2 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, POSITION ) ;
+	}
+
+	public void setOffsetInstant( final float _x, final float _y, final float _z )
+	{
+		FloatBuffer.set( old, OFFSET, _x, _y, _z ) ;
+		FloatBuffer.set( present, OFFSET, _x, _y, _z ) ;
+		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
@@ -206,6 +228,13 @@ public final class Draw implements IUpdate
 	public Vector3 getRotation( final Vector3 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, ROTATION ) ;
+	}
+
+	public void setScaleInstant( final float _x, final float _y, final float _z )
+	{
+		FloatBuffer.set( old, SCALE, _x, _y, _z ) ;
+		FloatBuffer.set( present, SCALE, _x, _y, _z ) ;
+		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )

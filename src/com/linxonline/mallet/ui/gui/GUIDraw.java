@@ -74,10 +74,10 @@ public class GUIDraw extends GUIComponent
 		if( sheet != null && uv != null )
 		{
 			final Vector3 position = getPosition() ;
-			draw.setPosition( position.x, position.y, position.z ) ;
+			draw.setPositionInstant( position.x, position.y, position.z ) ;
 
 			final Vector3 offset = getOffset() ;
-			draw.setOffset( offset.x, offset.y, offset.z ) ;
+			draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			draw.setShape( Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 			setColour( getColour() ) ;
@@ -146,8 +146,8 @@ public class GUIDraw extends GUIComponent
 		{
 			Shape.updatePlaneGeometry( ( Shape )draw.getShape(), length ) ;
 
-			draw.setPosition( position.x, position.y, position.z ) ;
-			draw.setOffset( offset.x, offset.y, offset.z ) ;
+			draw.setPositionInstant( position.x, position.y, position.z ) ;
+			draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 			updater.forceUpdate() ;
 		}
 	}

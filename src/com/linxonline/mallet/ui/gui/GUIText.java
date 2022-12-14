@@ -65,8 +65,8 @@ public class GUIText extends GUIComponent
 			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-			drawText.setPosition( position.x, position.y, position.z ) ;
-			drawText.setOffset( offset.x, offset.y, offset.z ) ;
+			drawText.setPositionInstant( position.x, position.y, position.z ) ;
+			drawText.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
 			drawText.setColour( colour ) ;
@@ -143,8 +143,8 @@ public class GUIText extends GUIComponent
 			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
 			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
 
-			drawText.setPosition( position.x, position.y, position.z ) ;
-			drawText.setOffset( offset.x, offset.y, offset.z ) ;
+			drawText.setPositionInstant( position.x, position.y, position.z ) ;
+			drawText.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
 			updater.forceUpdate() ;

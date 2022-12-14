@@ -42,20 +42,20 @@ public class GUIScrollbar extends GUIComponent
 
 		{
 			final Vector3 position = getPosition() ;
-			xBar.setPosition( position.x, position.y, position.z ) ;
+			xBar.setPositionInstant( position.x, position.y, position.z ) ;
 
 			final Vector3 offset = getOffset() ;
-			xBar.setOffset( offset.x, offset.y, offset.z ) ;
+			xBar.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			xBar.setShape( Shape.constructPlane( xLength, uv.min, uv.max ) ) ;
 		}
 
 		{
 			final Vector3 position = getPosition() ;
-			yBar.setPosition( position.x, position.y, position.z ) ;
+			yBar.setPositionInstant( position.x, position.y, position.z ) ;
 
 			final Vector3 offset = getOffset() ;
-			yBar.setOffset( offset.x, offset.y, offset.z ) ;
+			yBar.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 			yBar.setShape( Shape.constructPlane( yLength, uv.min, uv.max ) ) ;
 		}
