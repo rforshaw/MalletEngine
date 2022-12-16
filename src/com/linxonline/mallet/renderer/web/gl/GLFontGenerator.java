@@ -30,8 +30,10 @@ public class GLFontGenerator
 	{
 		final StringBuilder builder = new StringBuilder() ;
 		builder.append( _size ) ;
-		builder.append( "pt;" ) ;
+		builder.append( "pt " ) ;
 		builder.append( _name ) ;
+
+		System.out.println( builder.toString() ) ;
 
 		final String font = builder.toString() ;
 		_canvas.setFont( font ) ;
@@ -40,10 +42,10 @@ public class GLFontGenerator
 	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
 	{
 		setCanvasFont( canvas, _name, _style, _size ) ;
-		return generateMetrics( canvas, _characters ) ;
+		return generateMetrics( canvas, _name, _size, _characters ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final CanvasRenderingContext2D _canvas, final String _characters )
+	public MalletFont.Metrics generateMetrics( final CanvasRenderingContext2D _canvas, final String _name, final int _size, final String _characters )
 	{
 		final int length = _characters.length() ;
 		final Glyph[] glyphs = new Glyph[length] ;
@@ -55,7 +57,7 @@ public class GLFontGenerator
 			glyphs[i] = new Glyph( c, width ) ;
 		}
 
-		final float height = getHeight( _canvas, _characters ) ;
+		final float height = getHeight( _name, _size, _characters ) ;
 		return new MalletFont.Metrics( glyphs, height,
 											   height / 2.0f,
 											   0.0f,
@@ -80,17 +82,14 @@ public class GLFontGenerator
 		final float height = metrics.getHeight() ;
 		final float width = calculateWidth( glyphs ) ;
 
+		System.out.println( "Width: " + width + " Height: " + height ) ;
+
 		final HTMLCanvasElement element = canvas.getCanvas() ;
 		element.setWidth( ( int )width ) ;
 		element.setHeight( ( int )height ) ;
 
-		final StringBuilder builder = new StringBuilder() ;
-		builder.append( _font.getPointSize() ) ;
-		builder.append( "pt;" ) ;
-		builder.append( _font.getFontName() ) ;
-
-		canvas.setFont( builder.toString() ) ;
-		canvas.setFillStyle( "#FFFFFF" ) ;
+		setCanvasFont( canvas, _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ;
+		canvas.setFillStyle( "#FF0000" ) ;
 		canvas.clearRect( 0.0, 0.0, ( double )width, ( double )height ) ;
 
 		final char[] c = new char[1] ;
@@ -143,13 +142,13 @@ public class GLFontGenerator
 		return width ;
 	}
 
-	private int getHeight( final CanvasRenderingContext2D _canvas, final String _text )
+	private int getHeight( final String _name, final int _size, final String _text )
 	{
 		final HTMLDocument doc = HTMLDocument.current() ;
 		final HTMLElement div = doc.createElement( "div" ) ;
 		final HTMLElement txt = div.withText( _text ) ;
 
-		div.withAttr( "style", _canvas.getFont() ) ;
+		div.withAttr( "style", String.format( "font-family:%s;font-size:%dpt;", _name, _size ) ) ;
 		doc.getBody().withChild( div ) ;
 
 		final int height = div.getClientHeight() ;

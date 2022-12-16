@@ -16,14 +16,33 @@ public class Box2D extends Hull
 
 	private final Vector2 point = new Vector2() ;
 
-	public Box2D( final AABB _aabb )
+	public Box2D( final AABB _aabb, final Vector2 _position, final Vector2 _offset )
 	{
-		this( _aabb, null ) ;
+		this( _aabb, null, _position, _offset ) ;
 	}
 
-	public Box2D( final AABB _aabb, int[] _collidables )
+	public Box2D( final AABB _aabb, int[] _collidables, final Vector2 _position, final Vector2 _offset )
 	{
-		super( _collidables ) ;
+		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
+		aabb = _aabb ;
+		obb = new OBB( aabb ) ;
+	}
+
+	public Box2D( final AABB _aabb, int[] _collidables, final Vector3 _position, final Vector3 _offset )
+	{
+		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
+		aabb = _aabb ;
+		obb = new OBB( aabb ) ;
+	}
+
+	public Box2D( final AABB _aabb, final float _x, final float _y, final float _offsetX, final float _offsetY )
+	{
+		this( _aabb, null, _x, _y, _offsetX, _offsetY ) ;
+	}
+
+	public Box2D( final AABB _aabb, int[] _collidables, final float _x, final float _y, final float _offsetX, final float _offsetY )
+	{
+		super( _x, _y, _offsetX, _offsetY, 0.0f, _collidables ) ;
 		aabb = _aabb ;
 		obb = new OBB( aabb ) ;
 	}
@@ -35,74 +54,20 @@ public class Box2D extends Hull
 	
 	public Box2D( final OBB _obb, int[] _collidables )
 	{
-		super( _collidables ) ;
+		super( 0.0f, 0.0f,
+			   0.0f, 0.0f,
+			   0.0f,
+			   _collidables ) ;
 		obb = _obb ;
 		aabb = new AABB( obb ) ;
 	}
 
 	@Override
-	public void setPosition( final float _x, final float _y )
-	{
-		aabb.setPosition( _x, _y ) ;
-		obb.setPosition( _x, _y ) ;
-	}
-
-	@Override
-	public void addToPosition( final float _x, final float _y )
-	{
-		aabb.addToPosition( _x, _y ) ;
-		obb.addToPosition( _x, _y ) ;
-	}
-
-	@Override
-	public void setOffset( final float _x, final float _y )
-	{
-		aabb.setOffset( _x, _y ) ;
-		obb.setOffset( _x, _y ) ;
-	}
-
-	@Override
-	public void addToOffset( final float _x, final float _y )
-	{
-		aabb.addToOffset( _x, _y ) ;
-		obb.addToOffset( _x, _y ) ;
-	}
-
-	@Override
 	public void setRotation( final float _theta )
 	{
-		obb.setRotation( _theta ) ;
-		aabb.setDimensionsFromOBB( obb ) ;
-	}
-
-	@Override
-	public Vector2 getPosition( final Vector2 _fill )
-	{
-		return obb.getPosition( _fill ) ;
-	}
-
-	@Override
-	public Vector2 getOffset( final Vector2 _fill )
-	{
-		return obb.getOffset( _fill ) ;
-	}
-
-	@Override
-	public Vector3 getPosition( final Vector3 _fill )
-	{
-		return obb.getPosition( _fill ) ;
-	}
-
-	@Override
-	public Vector3 getOffset( final Vector3 _fill )
-	{
-		return obb.getOffset( _fill ) ;
-	}
-
-	@Override
-	public float getRotation()
-	{
-		return obb.getRotation() ;
+		super.setRotation( _theta ) ;
+		obb.setRotation( _theta, position[OFFSET_X], position[OFFSET_Y] ) ;
+		aabb.setFromOBB( obb ) ;
 	}
 
 	@Override
@@ -116,12 +81,6 @@ public class Box2D extends Hull
 	public float[] getPoints()
 	{
 		return obb.rotations ;
-	}
-
-	@Override
-	public void getAbsoluteCenter( final Vector2 _center )
-	{
-		aabb.getAbsoluteCenter( _center ) ;
 	}
 
 	@Override
@@ -152,8 +111,16 @@ public class Box2D extends Hull
 	}
 
 	@Override
-	public AABB getAABB()
+	public AABB getAABB( final AABB _fill )
 	{
-		return aabb ;
+		aabb.copyTo( _fill ) ;
+
+		final float x = position[POSITION_X] + position[OFFSET_X] ;
+		final float y = position[POSITION_Y] + position[OFFSET_Y] ;
+
+		_fill.addToMin( x, y ) ;
+		_fill.addToMax( x, y ) ;
+
+		return _fill ;
 	}
 }

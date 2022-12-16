@@ -15,13 +15,6 @@ public final class OBB
 	public static final int AXES_NUM = 2 ;
 	public static final int VECTOR_TYPE = 2 ;
 
-	public static final int POSITION_X = 0 ;
-	public static final int POSITION_Y = 1 ;
-	public static final int OFFSET_X = 2 ;
-	public static final int OFFSET_Y = 3 ;
-	public static final int ROTATION = 4 ;
-
-	public float[] position = new float[( 2 * VECTOR_TYPE ) + 1] ;
 	public float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
 	public float[] rotations = new float[POINT_NUM * VECTOR_TYPE] ;
 	public float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
@@ -52,57 +45,19 @@ public final class OBB
 		init() ;
 	}
 
-	public void setPosition( final float _x, final float _y )
-	{
-		FloatBuffer.set( position, OBB.POSITION_X, _x, _y ) ;
-	}
-
-	public void addToPosition( final float _x, final float _y )
-	{
-		FloatBuffer.add( position, OBB.POSITION_X, _x, _y ) ;
-	}
-
-	public void translate( final float _x, final float _y )
-	{
-		FloatBuffer.add( position, OBB.POSITION_X, _x, _y ) ;
-	}
-
-	public void setOffset( final float _x, final float _y )
-	{
-		FloatBuffer.set( position, OBB.OFFSET_X, _x, _y ) ;
-	}
-
-	public void addToOffset( final float _x, final float _y )
-	{
-		FloatBuffer.add( position, OBB.OFFSET_X, _x, _y ) ;
-	}
-
 	public void setFromAABB( final AABB _aabb )
 	{
 		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MIN_Y] ) ;
 		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MIN_Y] ) ;
 		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MAX_Y] ) ;
 		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( position, OBB.POSITION_X,   _aabb.position[AABB.POSITION_X], _aabb.position[AABB.POSITION_Y] ) ;
-		FloatBuffer.set( position, OBB.OFFSET_X,     _aabb.position[AABB.OFFSET_X],   _aabb.position[AABB.OFFSET_Y] ) ;
 		init() ;
 	}
 
 	/**
 		Set the points and axes from the OBB being passed in.
-		This also includes the position & offset.
 	**/
 	public void setFromOBB( final OBB _obb )
-	{
-		FloatBuffer.copy( _obb.position, position ) ;
-		setDimensionsFromOBB( _obb ) ;
-	}
-
-	/**
-		Set the points and axes from the OBB being passed in.
-		Keep the original position & offset.
-	**/
-	public void setDimensionsFromOBB( final OBB _obb )
 	{
 		FloatBuffer.copy( points, _obb.points ) ;
 		FloatBuffer.copy( axes, _obb.axes ) ;
@@ -113,73 +68,27 @@ public final class OBB
 		and position of the OBB.
 		returns a new Vector2().
 	**/
-	public Vector2 getAbsolutePoint( final int _index, final Vector2 _fill )
+	public Vector2 getPoint( final int _index, final Vector2 _fill )
 	{
 		FloatBuffer.fill( rotations, _fill, _index ) ;
-		_fill.add( position[OBB.POSITION_X] + position[OBB.OFFSET_X],
-				   position[OBB.POSITION_Y] + position[OBB.OFFSET_Y] ) ;
 		return _fill ;
-	}
-
-	public Vector2 getPosition( final Vector2 _fill )
-	{
-		_fill.setXY( position[OBB.POSITION_X], position[OBB.POSITION_Y] ) ;
-		return _fill ;
-	}
-
-	public Vector3 getPosition( final Vector3 _fill )
-	{
-		_fill.x = position[OBB.POSITION_X] ;
-		_fill.y = position[OBB.POSITION_Y] ;
-		return _fill ;
-	}
-
-	public Vector2 getOffset( final Vector2 _fill )
-	{
-		_fill.setXY( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
-		return _fill ;
-	}
-
-	public Vector3 getOffset( final Vector3 _fill )
-	{
-		_fill.x = position[OBB.OFFSET_X] ;
-		_fill.y = position[OBB.OFFSET_Y] ;
-		return _fill ;
-	}
-
-	public float getRotation()
-	{
-		return position[OBB.ROTATION] ;
-	}
-	
-	public Vector2 getCenter( final Vector2 _center )
-	{
-		_center.setXY( position[OBB.POSITION_X], position[OBB.POSITION_Y] ) ;
-		_center.add( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
-		return _center ;
-	}
-
-	public Vector2 getCenter()
-	{
-		return getCenter( new Vector2() ) ;
 	}
 
 	/**
 		NEEDS TO BE REIMPLEMENTED
 	**/
-	public final void setRotation( final float _theta )
+	public final void setRotation( final float _theta, final float _offsetX, final float _offsetY )
 	{
-		position[OBB.ROTATION] = _theta ;
-		applyRotations() ;
+		applyRotations( _theta, _offsetX, _offsetY ) ;
 	}
 
-	private void applyRotations()
+	private void applyRotations( final float _theta, final float _offsetX, final float _offsetY )
 	{
-		final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
-		final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
+		final float sin = ( float )Math.sin( _theta ) ;
+		final float cos = ( float )Math.cos( _theta ) ;
 
 		final Vector2 point = new Vector2() ;
-		final Vector2 offset = new Vector2( position[OBB.OFFSET_X], position[OBB.OFFSET_Y] ) ;
+		final Vector2 offset = new Vector2( _offsetX, _offsetY ) ;
 
 		for( int i = 0; i < points.length; i += 2 )
 		{
@@ -204,9 +113,6 @@ public final class OBB
 
 	public final void updateAxesAndEdges()
 	{
-		//final float sin = ( float )Math.sin( position[OBB.ROTATION] ) ;
-		//final float cos = ( float )Math.cos( position[OBB.ROTATION] ) ;
-
 		final float topRightX = rotations[OBB.TOP_RIGHT] ;
 		final float topRightY = rotations[OBB.TOP_RIGHT + 1] ;
 
@@ -233,7 +139,7 @@ public final class OBB
 
 	private final void init()
 	{
-		applyRotations() ;
+		applyRotations( 0.0f, 0.0f, 0.0f ) ;
 		updateAxesAndEdges() ;
 	}
 }

@@ -150,6 +150,7 @@ public final class QuadTree
 	protected final class QuadNode
 	{
 		private final Vector2 centre = new Vector2() ;
+		private final AABB aabb = new AABB() ;
 
 		private CollisionCheck check = new CollisionCheck() ;
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
@@ -220,7 +221,7 @@ public final class QuadTree
 					continue ;
 				}
 
-				final AABB aabb = hull.getAABB() ;
+				hull.getAABB( aabb ) ;
 				if( aabb.intersectPoint( _point.x, _point.y ) == true )
 				{
 					best = hull ;

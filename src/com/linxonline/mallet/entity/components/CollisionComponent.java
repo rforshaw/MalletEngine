@@ -97,7 +97,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final CollisionComponent comp = new CollisionComponent( _parent, new Box2D( new AABB( _min, _max, _position, _offset ) ) ) ;
+		final CollisionComponent comp = new CollisionComponent( _parent, new Box2D( new AABB( _min, _max ), _position, _offset ) ) ;
 		return comp ;
 	}
 	
@@ -108,7 +108,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final CollisionComponent comp = new CollisionComponent( _parent, _allow, new Box2D( new AABB( _min, _max, _position, _offset ) ) ) ;
+		final CollisionComponent comp = new CollisionComponent( _parent, _allow, new Box2D( new AABB( _min, _max ), _position, _offset ) ) ;
 		return comp ;
 	}
 }

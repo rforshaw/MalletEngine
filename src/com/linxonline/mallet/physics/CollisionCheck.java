@@ -21,6 +21,9 @@ public final class CollisionCheck
 	private final Vector2 boxCenter1 = new Vector2() ;
 	private final Vector2 boxCenter2 = new Vector2() ;
 
+	private final AABB aabb1 = new AABB() ;
+	private final AABB aabb2 = new AABB() ;
+
 	private final ContactPoint contact = new ContactPoint() ;
 
 	public CollisionCheck() {}
@@ -48,15 +51,15 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		final AABB aabb1 = _box1.getAABB() ;
-		final AABB aabb2 = _box2.getAABB() ; 
+		_box1.getAABB( aabb1 ) ;
+		_box2.getAABB( aabb2 ) ; 
 		if( aabb1.intersectAABB( aabb2 ) == false && aabb2.intersectAABB( aabb1 ) == false )
 		{
 			return false ;
 		}
 
-		_box1.getAbsoluteCenter( boxCenter1 ) ;
-		_box2.getAbsoluteCenter( boxCenter2 ) ;
+		aabb1.getCenter( boxCenter1 ) ;
+		aabb2.getCenter( boxCenter2 ) ;
 
 		toCenter.x = boxCenter2.x - boxCenter1.x ;
 		toCenter.y = boxCenter2.y - boxCenter1.y ;
