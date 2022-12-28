@@ -76,6 +76,19 @@ public final class Vector2
 		y /= _scalar ;
 	}
 
+	/**
+		Rotate the vector by angle.
+		_angle is in radians.
+	*/
+	public final void rotate( final float _angle )
+	{
+		final float rx = ( x * ( float )Math.cos( _angle ) ) - ( y * ( float )Math.sin( _angle ) ) ;
+		final float ry = ( x * ( float )Math.sin( _angle ) ) + ( y * ( float )Math.cos( _angle ) ) ;
+
+		x = rx ;
+		y = ry ;
+	}
+
 	public final float length()
 	{
 		return ( float )Math.sqrt( ( x * x ) + ( y * y ) ) ;

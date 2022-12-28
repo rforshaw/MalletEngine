@@ -78,16 +78,7 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * 0.5f : overlap2 * 0.5f ;		// Get the best overlap overall
-		if( overlap < 0.1f )
-		{
-			// We only want to consider overlaps that are 
-			// significant minor overlaps are not important.
-			return false ;
-		}
-
 		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;							// Set the axis based on best overlap
-
 		if( Vector2.multiply( axis, toCenter ) > 0.0f )
 		{
 			axis.x *= -1.0f ;
@@ -100,6 +91,9 @@ public final class CollisionCheck
 		// 'pushed' away - or prevent the other hull from passing 
 		// through it.
 		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
+		final float a = ( physical ) ? 1.0f : 0.5f ;
+
+		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * a : overlap2 * a ;		// Get the best overlap overall
 
 		if( box1Interested == true )
 		{
