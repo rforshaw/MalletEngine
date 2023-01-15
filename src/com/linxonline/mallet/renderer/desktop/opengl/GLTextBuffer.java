@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
+import java.util.List ;
+import java.util.ArrayList ;
 import java.util.Arrays ;
 import java.nio.* ;
 
@@ -14,6 +16,7 @@ import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.Glyph ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -40,7 +43,8 @@ public final class GLTextBuffer extends GLBuffer
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
 
 	private GLProgram glProgram ;
-	private Program mapProgram = new Program() ;
+	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final MalletColour shapeColour = new MalletColour() ;
 	private final Vector2 uv = new Vector2() ;
@@ -55,7 +59,6 @@ public final class GLTextBuffer extends GLBuffer
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3( 1, 1, 1 ) ;
 
-	private AssetLookup<Storage, GLStorage> storages ;
 	private boolean stable = false ;
 
 	public GLTextBuffer( final TextBuffer _buffer )
@@ -103,8 +106,8 @@ public final class GLTextBuffer extends GLBuffer
 			stable = false ;
 			return stable ;
 		}
-		
-		if( glProgram.remap( program, mapProgram ) == false )
+
+		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -112,7 +115,17 @@ public final class GLTextBuffer extends GLBuffer
 			return stable ;
 		}
 
-		final MalletFont font = program.getUniform( "inTex0", MalletFont.class ) ;
+		GLBuffer.generateStorages( glProgram, program, _storages, storages ) ;
+
+		final IUniform uFont = program.getUniform( "inTex0" ) ;
+		if( uFont.getType() != IUniform.Type.FONT )
+		{
+			// The font passed in needs to be a MalletFont.
+			stable = false ;
+			return stable ;
+		}
+
+		final MalletFont font = ( MalletFont )uFont ;
 		final MalletFont.Metrics metrics = font.getMetrics() ;
 		final GLFont glFont = GLRenderer.getFont( font ) ;
 
@@ -287,8 +300,6 @@ public final class GLTextBuffer extends GLBuffer
 
 		upload( bufferIndex ) ;
 
-		storages = _storages ;
-
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -311,13 +322,13 @@ public final class GLTextBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( glProgram.loadUniforms( mapProgram ) == false )
+		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		glProgram.bindBuffers( mapProgram, storages ) ;
-		
+		GLBuffer.bindBuffers( storages ) ;
+
 		for( int i = 0; i < indexLength.length; ++i )
 		{
 			final int length = indexLength[i] ;

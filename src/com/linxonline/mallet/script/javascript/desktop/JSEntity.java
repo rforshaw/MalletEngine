@@ -20,6 +20,18 @@ public final class JSEntity
 		entity = _entity ;
 	}
 
+	public boolean hasComponentByAbsoluteName( final String _name )
+	{
+		final JSComponent component = getByAbsoluteName( _name ) ;
+		return ( component != null ) ? true : false ;
+	}
+
+	public boolean hasComponentBySimpleName( final String _name )
+	{
+		final JSComponent component = getBySimpleName( _name ) ;
+		return ( component != null ) ? true : false ;
+	}
+
 	/**
 		Retrieve a specific component using the components
 		absolute name, for example:
@@ -27,16 +39,8 @@ public final class JSEntity
 	*/
 	public Object getComponentByAbsoluteName( final String _name )
 	{
-		retrieveComponents() ;
-		for( final JSComponent component : components )
-		{
-			if( component.getAbsoluteName().equals( _name ) )
-			{
-				return component.getProxy() ;
-			}
-		}
-
-		return null ;
+		final JSComponent component = getByAbsoluteName( _name ) ;
+		return ( component != null ) ? component.getProxy() : null ;
 	}
 
 	/**
@@ -50,16 +54,8 @@ public final class JSEntity
 	*/
 	public Object getComponentBySimpleName( final String _name )
 	{
-		retrieveComponents() ;
-		for( final JSComponent component : components )
-		{
-			if( component.getSimpleName().equals( _name ) )
-			{
-				return component.getProxy() ;
-			}
-		}
-
-		return null ;
+		final JSComponent component = getBySimpleName( _name ) ;
+		return ( component != null ) ? component.getProxy() : null ;
 	}
 
 	/**
@@ -87,6 +83,34 @@ public final class JSEntity
 	public boolean isDead()
 	{
 		return entity.isDead() ;
+	}
+
+	private JSComponent getBySimpleName( final String _name )
+	{
+		retrieveComponents() ;
+		for( final JSComponent component : components )
+		{
+			if( component.getSimpleName().equals( _name ) )
+			{
+				return component ;
+			}
+		}
+
+		return null ;
+	}
+	
+	private JSComponent getByAbsoluteName( final String _name )
+	{
+		retrieveComponents() ;
+		for( final JSComponent component : components )
+		{
+			if( component.getAbsoluteName().equals( _name ) )
+			{
+				return component ;
+			}
+		}
+
+		return null ;
 	}
 
 	private void retrieveComponents()

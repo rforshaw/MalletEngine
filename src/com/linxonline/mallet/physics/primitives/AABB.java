@@ -78,6 +78,15 @@ public final class AABB
 		}
 	}
 
+	public void set( final float _x1, final float _y1, final float _x2, final float _y2 )
+	{
+		range[AABB.MIN_X] = ( _x1 < _x2 ) ? _x1 : _x2 ;
+		range[AABB.MIN_Y] = ( _y1 < _y2 ) ? _y1 : _y2 ;
+
+		range[AABB.MAX_X] = ( _x1 > _x2 ) ? _x1 : _x2 ;
+		range[AABB.MAX_Y] = ( _y1 > _y2 ) ? _y1 : _y2 ;
+	}
+
 	public void setMax( final float _x, final float _y )
 	{
 		FloatBuffer.set( range, AABB.MAX_X, _x, _y ) ;

@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.MathUtil ;
 import com.linxonline.mallet.renderer.FontAssist ;
 import com.linxonline.mallet.renderer.Glyph ;
 
-public final class MalletFont
+public final class MalletFont implements IUniform
 {
 	public static final int PLAIN = 5 ;
 
@@ -178,6 +178,12 @@ public final class MalletFont
 	public int hashCode()
 	{
 		return id.hashCode() ;
+	}
+
+	@Override
+	public IUniform.Type getType()
+	{
+		return IUniform.Type.FONT ;
 	}
 
 	public static class Metrics

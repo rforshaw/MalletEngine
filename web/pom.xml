@@ -105,6 +105,7 @@
 
               <!-- Optimization level. Valid values are: SIMPLE, ADVANCED, FULL -->
               <optimizationLevel>ADVANCED</optimizationLevel>
+              <targetType>JAVASCRIPT</targetType>
             </configuration>
           </execution>
         </executions>

@@ -8,19 +8,21 @@ import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 
-public class GLDrawBuffer extends GLBuffer
+public final class GLDrawBuffer extends GLBuffer
 {
 	private int order ;
 	private VertexAttrib[] attributes = null ;
 
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;
-	private GLProgram glProgram ;
-	private Program mapProgram = new Program() ;
 
-	private AssetLookup<Storage, GLStorage> storages ;
+	private GLProgram glProgram ;
+	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
+
 	private boolean stable = false ;
 
 	public GLDrawBuffer( final DrawBuffer _buffer )
@@ -43,13 +45,15 @@ public class GLDrawBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( glProgram.remap( program, mapProgram ) == false )
+		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
 			stable = false ;
 			return stable ;
 		}
+
+		GLBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
 		if( attributes == null )
 		{
@@ -69,8 +73,6 @@ public class GLDrawBuffer extends GLBuffer
 				buffers.add( buff ) ;
 			}
 		}
-
-		storages = _storages ;
 
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
@@ -93,12 +95,12 @@ public class GLDrawBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, matrix ) ;
-		if( glProgram.loadUniforms( mapProgram ) == false )
+		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		glProgram.bindBuffers( mapProgram, storages ) ;
+		GLBuffer.bindBuffers( storages ) ;
 
 		for( GLGeometryBuffer buffer : buffers )
 		{

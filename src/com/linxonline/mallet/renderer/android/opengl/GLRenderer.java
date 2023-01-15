@@ -23,24 +23,28 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class GLRenderer extends BasicRenderer
+public final class GLRenderer extends BasicRenderer
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
-	private final static ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder<GLProgram>()
+	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder()
 	{
-		public GLProgram build( final JSONProgram _program )
+		@Override
+		public void build( final JSONProgram _program )
 		{
-			final GLProgram program = GLProgram.build( _program ) ;
-			final String id = program.getName() ;
-			if( programs.isKeyNull( id ) == false )
+			GLRenderer.this.invokeLater( () ->
 			{
-				Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
-			}
+				final GLProgram program = GLProgram.build( _program ) ;
+				final String id = program.getName() ;
+				if( programs.isKeyNull( id ) == false )
+				{
+					Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
+				}
 
-			Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.MINOR ) ;
-			programs.put( id, program ) ;
+				Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.NORMAL ) ;
+				programs.put( id, program ) ;
+			} ) ;
 		}
 	} ) ;
 
@@ -216,12 +220,9 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						drawUpdaters.add( _updater ) ;
-					}
+					drawUpdaters.add( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -229,12 +230,9 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						drawUpdaters.remove( _updater ) ;
-					}
+					drawUpdaters.remove( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -242,16 +240,13 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends ABuffer> T add( final T _buffer )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLBuffer buff = create( _buffer ) ;
+					bufferLookup.map( _buffer.index(), _buffer, buff ) ;
+					if( updateBuffer( _buffer, buff ) == false )
 					{
-						final GLBuffer buff = create( _buffer ) ;
-						bufferLookup.map( _buffer.index(), _buffer, buff ) ;
-						if( updateBuffer( _buffer, buff ) == false )
-						{
-							DrawAssist.update( _buffer ) ;
-						}
+						DrawAssist.update( _buffer ) ;
 					}
 				} ) ;
 				return _buffer ;
@@ -260,16 +255,13 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends ABuffer> T remove( final T _buffer )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final Tuple<ABuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
+					if( tuple != null )
 					{
-						final Tuple<ABuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
-						if( tuple != null )
-						{
-							final GLBuffer buff = tuple.getRight() ;
-							buff.shutdown() ;
-						}
+						final GLBuffer buff = tuple.getRight() ;
+						buff.shutdown() ;
 					}
 				} ) ;
 				return _buffer ;
@@ -278,17 +270,14 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends ABuffer> T update( final T _buffer )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
+					if( buff != null )
 					{
-						final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
-						if( buff != null )
+						if( updateBuffer( _buffer, buff ) == false )
 						{
-							if( updateBuffer( _buffer, buff ) == false )
-							{
-								DrawAssist.update( _buffer ) ;
-							}
+							DrawAssist.update( _buffer ) ;
 						}
 					}
 				} ) ;
@@ -316,30 +305,24 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public void load( final String _id, final String _path )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						programs.load( _id, MessageFormat.format( _path, "android" ) ) ;
-					}
+					programs.load( _id, MessageFormat.format( _path, "android" ) ) ;
 				} ) ;
 			}
 
 			@Override
 			public Program add( final Program _program )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLProgram glProgram = programs.get( _program.getID() ) ;
+					if( glProgram == null )
 					{
-						final GLProgram glProgram = programs.get( _program.getID() ) ;
-						if( glProgram == null )
-						{
-							add( _program ) ;
-							return ;
-						}
-						programLookup.map( _program.index(), _program, glProgram ) ;
+						add( _program ) ;
+						return ;
 					}
+					programLookup.map( _program.index(), _program, glProgram ) ;
 				} ) ;
 				return _program ;
 			}
@@ -347,36 +330,12 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Program remove( final Program _program ) 
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLProgram glProgram = programs.get( _program.getID() ) ;
+					if( glProgram != null )
 					{
-						final GLProgram glProgram = programs.get( _program.getID() ) ;
-						if( glProgram == null )
-						{
-							add( _program ) ;
-							return ;
-						}
-						programLookup.map( _program.index(), _program, glProgram ) ;
-					}
-				} ) ;
-				return _program ;
-			}
-
-			@Override
-			public Program update( final Program _program )
-			{
-				GLRenderer.this.invokeLater( new Runnable()
-				{
-					public void run()
-					{
-						final int index = _program.index() ;
-						final GLProgram glProgram = programLookup.getRHS( index ) ;
-						if( glProgram == null )
-						{
-							glProgram.destroy() ;
-							programLookup.unmap( index ) ;
-						}
+						programLookup.unmap( _program.index() ) ;
 					}
 				} ) ;
 				return _program ;
@@ -397,26 +356,23 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public World add( final World _world )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
+					worldLookup.map( _world.index(), _world, world ) ;
+
+					final int size = worlds.size() ;
+					for( int i = 0; i < size; ++i )
 					{
-						final GLWorld world = new GLWorld( _world, cameraLookup, bufferLookup ) ;
-						worldLookup.map( _world.index(), _world, world ) ;
-
-						final int size = worlds.size() ;
-						for( int i = 0; i < size; ++i )
+						final GLWorld w = worlds.get( i ) ; 
+						if( _world.getOrder() <= w.getOrder() )
 						{
-							final GLWorld w = worlds.get( i ) ; 
-							if( _world.getOrder() <= w.getOrder() )
-							{
-								worlds.add( i, world ) ;
-								return ;
-							}
+							worlds.add( i, world ) ;
+							return ;
 						}
-
-						worlds.add( world ) ;
 					}
+
+					worlds.add( world ) ;
 				} ) ;
 
 				return _world ;
@@ -425,17 +381,14 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public World remove( final World _world )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final Tuple<World, GLWorld> tuple = worldLookup.unmap( _world.index() ) ;
+					if( tuple != null )
 					{
-						final Tuple<World, GLWorld> tuple = worldLookup.unmap( _world.index() ) ;
-						if( tuple != null )
-						{
-							final GLWorld world = tuple.getRight() ;
-							worlds.remove( world ) ;
-							world.shutdown() ;
-						}
+						final GLWorld world = tuple.getRight() ;
+						worlds.remove( world ) ;
+						world.shutdown() ;
 					}
 				} ) ;
 				return _world ;
@@ -444,15 +397,12 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public World update( final World _world )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLWorld world = get( _world ) ;
+					if( world != null )
 					{
-						final GLWorld world = get( _world ) ;
-						if( world != null )
-						{
-							world.update( _world, cameraLookup, bufferLookup ) ;
-						}
+						world.update( _world, cameraLookup, bufferLookup ) ;
 					}
 				} ) ;
 				return _world ;
@@ -478,14 +428,11 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Camera add( final Camera _camera )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						final GLCamera camera = new GLCamera( _camera ) ;
-						cameraLookup.map( _camera.index(), _camera, camera ) ;
-						cameras.add( _camera ) ;
-					}
+					final GLCamera camera = new GLCamera( _camera ) ;
+					cameraLookup.map( _camera.index(), _camera, camera ) ;
+					cameras.add( _camera ) ;
 				} ) ;
 				return _camera ;
 			}
@@ -493,13 +440,10 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Camera remove( final Camera _camera )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						cameras.remove( _camera ) ;
-						cameraLookup.unmap( _camera.index() ) ;
-					}
+					cameras.remove( _camera ) ;
+					cameraLookup.unmap( _camera.index() ) ;
 				} ) ;
 				return _camera ;
 			}
@@ -507,15 +451,12 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Camera update( final Camera _camera ) 
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLCamera camera = get( _camera ) ;
+					if( camera != null )
 					{
-						final GLCamera camera = get( _camera ) ;
-						if( camera != null )
-						{
-							camera.update( _camera ) ;
-						}
+						camera.update( _camera ) ;
 					}
 				} ) ;
 				return _camera ;
@@ -535,12 +476,9 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends IUpdater<Storage>> T add( final T _updater )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						storageUpdaters.add( _updater ) ;
-					}
+					storageUpdaters.add( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -548,12 +486,9 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends IUpdater<Storage>> T remove( final T _updater )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						storageUpdaters.remove( _updater ) ;
-					}
+					storageUpdaters.remove( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -561,13 +496,10 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Storage add( Storage _storage )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
-					{
-						final GLStorage storage = new GLStorage( _storage ) ;
-						storageLookup.map( _storage.index(), _storage, storage ) ;
-					}
+					final GLStorage storage = new GLStorage( _storage ) ;
+					storageLookup.map( _storage.index(), _storage, storage ) ;
 				} ) ;
 
 				return _storage ;
@@ -576,15 +508,12 @@ public class GLRenderer extends BasicRenderer
 			@Override
 			public Storage update( final Storage _storage )
 			{
-				GLRenderer.this.invokeLater( new Runnable()
+				GLRenderer.this.invokeLater( () ->
 				{
-					public void run()
+					final GLStorage storage = get( _storage ) ;
+					if( storage != null )
 					{
-						final GLStorage storage = get( _storage ) ;
-						if( storage != null )
-						{
-							storage.update( _storage ) ;
-						}
+						storage.update( _storage ) ;
 					}
 				} ) ;
 

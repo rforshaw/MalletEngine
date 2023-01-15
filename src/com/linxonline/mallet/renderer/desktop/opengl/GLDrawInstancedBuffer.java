@@ -12,6 +12,7 @@ import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -29,7 +30,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private VertexAttrib[] attributes = null ;
 
 	private GLProgram glProgram ;
-	private Program mapProgram = new Program() ;
+	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;
@@ -52,7 +54,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private final Storage transStorage = new Storage( transformations ) ;
 	private final GLStorage glTransStorage = new GLStorage( transStorage ) ;
 
-	private AssetLookup<Storage, GLStorage> storages ;
 	private boolean instanceLoaded = false ;
 	private boolean stable = false ;
 
@@ -108,13 +109,15 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( glProgram.remap( program, mapProgram ) == false )
+		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
 			stable = false ;
 			return stable ;
 		}
+
+		GLBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
 		// For instanced rendering to work we require a storage buffer 
 		// that contains all matrices of each of the draw objects.
@@ -123,8 +126,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		if( storageName == null )
 		{
 			storageName = _buffer.getStorageName() ;
-			mapProgram.removeStorage( storageName ) ;
-			mapProgram.mapStorage( storageName, transStorage ) ;
 		}
 
 		if( attributes == null )
@@ -187,8 +188,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		transformations.add( _buffer.getBuffers() ) ;
 		glTransStorage.update( transStorage ) ;
 
-		storages = _storages ;
-
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -210,7 +209,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( glProgram.loadUniforms( mapProgram ) == false )
+		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
@@ -219,12 +218,20 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			boolean foundInstanceBuffer = false ;
 
 			final List<String> buffers = glProgram.program.getBuffers() ;
-			final int size = buffers.size() ;
+
+			final int size = storages.size() ;
 			for( int i = 0; i < size; ++i )
 			{
-				final String name = buffers.get( i ) ;
-				if( name.equals( storageName ) == true ) 
+				final GLStorage storage = storages.get( i ) ;
+				if( storage == null )
 				{
+					final String name = buffers.get( i ) ;
+					if( name.equals( storageName ) == false ) 
+					{
+						System.out.println( "Failed to find storage buffer, skipping..." ) ;
+						continue ;
+					}
+
 					// Map the transformation storage to the specified 
 					// name within the program.
 					foundInstanceBuffer = true ;
@@ -232,15 +239,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				}
 				else
 				{
-					final Storage storage = mapProgram.getStorage( name ) ;
-					if( storage == null )
-					{
-						System.out.println( "Failed to find storage buffer, skipping..." ) ;
-						continue ;
-					}
-
-					final GLStorage glStorage = storages.getRHS( storage.index() ) ;
-					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, glStorage.id[0] ) ;
+					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
 				}
 			}
 

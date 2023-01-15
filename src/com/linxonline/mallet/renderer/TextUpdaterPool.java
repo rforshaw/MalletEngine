@@ -126,7 +126,6 @@ public class TextUpdaterPool
 			updater = DrawAssist.add( new TextUpdater( buffer ) ) ;
 
 			updater.addBuffers( buffer ) ;
-			DrawAssist.update( buffer ) ;
 
 			_world.addBuffers( buffer ) ;
 			WorldAssist.update( _world ) ;

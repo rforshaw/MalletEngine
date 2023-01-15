@@ -75,6 +75,17 @@ public class FloatBuffer
 		_modify[_index + 1] += _y ;
 	}
 
+	public static void add( final float[] _modify,
+							final int _index,
+							final float _x,
+							final float _y,
+							final float _z )
+	{
+		_modify[_index + 0] += _x ;
+		_modify[_index + 1] += _y ;
+		_modify[_index + 2] += _z ;
+	}
+
 	public static float get( final float[] _get, final int _index )
 	{
 		return _get[_index] ;
@@ -82,13 +93,16 @@ public class FloatBuffer
 
 	public static Vector3 fill( final float[] _get, final Vector3 _fill, final int _at )
 	{
-		_fill.setXYZ( _get[_at], _get[_at + 1], _get[_at + 2] ) ;
+		_fill.x = _get[_at] ;
+		_fill.y = _get[_at + 1] ;
+		_fill.z = _get[_at + 2] ;
 		return _fill ;
 	}
 
 	public static Vector2 fill( final float[] _get, final Vector2 _fill, final int _at )
 	{
-		_fill.setXY( _get[_at], _get[_at + 1] ) ;
+		_fill.x = _get[_at] ;
+		_fill.y = _get[_at + 1] ;
 		return _fill ;
 	}
 

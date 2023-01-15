@@ -5,7 +5,7 @@ import org.teavm.jso.webgl.WebGLTexture ;
 
 import com.linxonline.mallet.io.Resource ;
 
-public class GLImage extends Resource
+public final class GLImage extends Resource
 {
 	public final WebGLTexture[] textureIDs = new WebGLTexture[1] ;			// Buffer ID for openGL
 	private final long consumption ;

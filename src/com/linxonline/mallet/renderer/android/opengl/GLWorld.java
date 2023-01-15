@@ -227,7 +227,7 @@ public class GLWorld
 			}
 		}
 	}
-	
+
 	public void draw()
 	{
 		MGL.glBindFramebuffer( MGL.GL_DRAW_FRAMEBUFFER, buffers[FRAME_BUFFER] ) ;
@@ -237,7 +237,7 @@ public class GLWorld
 			MGL.glEnable( MGL.GL_DEPTH_TEST ) ;
 		}
 
-		MGL.glClearColor( 255.0f, 0.0f, 0.0f, 0.0f ) ;
+		MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 		
 		int clearBits = ( colourAttachments.length > 0 ) ? MGL.GL_COLOR_BUFFER_BIT : 0 ;
 		clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
@@ -329,7 +329,7 @@ public class GLWorld
 		}
 	}
 
-	private static class GLCoreWorld extends GLWorld
+	private final static class GLCoreWorld extends GLWorld
 	{
 		private GLCoreWorld( final World _world,
 							 final AssetLookup<Camera, GLCamera> _cameras,

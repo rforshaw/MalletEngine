@@ -16,6 +16,7 @@ import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -24,7 +25,7 @@ import com.linxonline.mallet.maths.IntVector2 ;
 
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
-public class GLDrawInstancedBuffer extends GLBuffer
+public final class GLDrawInstancedBuffer extends GLBuffer
 {
 	private static final int INSTANCE_INDEX = 0 ;
 
@@ -34,7 +35,8 @@ public class GLDrawInstancedBuffer extends GLBuffer
 
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 	private GLProgram glProgram ;
-	private Program mapProgram = new Program() ;
+	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;
@@ -114,7 +116,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( glProgram.remap( program, mapProgram ) == false )
+		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -203,7 +205,7 @@ public class GLDrawInstancedBuffer extends GLBuffer
 		final float[] projMatrix = _projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, projMatrix ) ;
-		if( glProgram.loadUniforms( mapProgram ) == false )
+		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}

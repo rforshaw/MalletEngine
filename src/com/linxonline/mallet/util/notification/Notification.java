@@ -2,6 +2,7 @@ package com.linxonline.mallet.util.notification ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Debounce ;
 import com.linxonline.mallet.util.MalletList ;
 
 /**
@@ -14,6 +15,7 @@ import com.linxonline.mallet.util.MalletList ;
 public class Notification<T>
 {
 	private final List<Notify<T>> listeners ;
+	private final Inform informer = new Inform() ;
 
 	public Notification()
 	{
@@ -56,11 +58,8 @@ public class Notification<T>
 
 	public void inform( final T _data )
 	{
-		final int size = listeners.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			listeners.get( i ).inform( _data ) ;
-		}
+		informer.setData( _data ) ;
+		Debounce.debounce( informer ) ;
 	}
 
 	public void clear()
@@ -68,6 +67,26 @@ public class Notification<T>
 		listeners.clear() ;
 	}
 
+	private class Inform implements Runnable
+	{
+		private T data ;
+
+		public void setData( final T _data )
+		{
+			data = _data ;
+		}
+
+		@Override
+		public void run()
+		{
+			final int size = listeners.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				listeners.get( i ).inform( data ) ;
+			}
+		}
+	}
+	
 	public interface Notify<T>
 	{
 		public void inform( final T _data ) ;

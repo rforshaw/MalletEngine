@@ -1,12 +1,24 @@
 package com.linxonline.mallet.renderer.web.gl ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
+import com.linxonline.mallet.renderer.opengl.JSONProgram ;
+
+import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Shape ;
+import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.BoolUniform ;
+import com.linxonline.mallet.renderer.Storage ;
+import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
+import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
@@ -34,6 +46,170 @@ public class GLBuffer
 
 	public void shutdown() {}
 
+	protected static boolean generateUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
+	{
+		_toFill.clear() ;
+		for( JSONProgram.UniformMap tuple : _glProgram.program.getUniforms() )
+		{
+			final IUniform uniform = _program.getUniform( tuple.getRight() ) ;
+			switch( uniform.getType() )
+			{
+				case INT32        :
+				case UINT32       :
+				case FLOAT32      :
+				case FLOAT64      :
+				case FLOAT32_VEC2 :
+				case FLOAT32_VEC3 :
+				case FLOAT32_VEC4 :
+				{
+					Logger.println( "Build uniform type not implemented: " + uniform.getType(), Logger.Verbosity.MAJOR ) ;
+					return false ;
+				}
+				case BOOL         :
+				case FLOAT32_MAT4 :
+				{
+					_toFill.add( uniform ) ;
+					break ;
+				}
+				case SAMPLER2D    :
+				{
+					final MalletTexture texture = ( MalletTexture )uniform ;
+					if( texture == null )
+					{
+						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+					}
+
+					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
+					if( glTexture == null )
+					{
+						return false ;
+					}
+
+					_toFill.add( new Texture( glTexture, texture ) ) ;
+					break ;
+				}
+				case FONT         :
+				{
+					final MalletFont font = ( MalletFont )uniform ;
+					final GLFont glFont = GLRenderer.getFont( font ) ;
+					final GLImage texture = glFont.getTexture() ;
+
+					_toFill.add( new Texture( texture, font ) ) ;
+					break ;
+				}
+				case UNKNOWN      :
+				default           : return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	protected static void generateStorages( final GLProgram _glProgram, final Program _program, final AssetLookup<Storage, GLStorage> _lookup, final List<GLStorage> _toFill )
+	{
+		_toFill.clear() ;
+		for( final String name : _glProgram.program.getBuffers() )
+		{
+			final Storage storage = _program.getStorage( name ) ;
+			if( storage == null )
+			{
+				_toFill.add( null ) ;
+				continue ;
+			}
+
+			final GLStorage glStorage = _lookup.getRHS( storage.index() ) ;
+			_toFill.add( glStorage ) ;
+		}
+	}
+
+	protected static boolean loadUniforms( final GLProgram _program, final List<IUniform> _uniforms )
+	{
+		int textureUnit = 0 ;
+
+		final int size = _uniforms.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final IUniform uniform = _uniforms.get( i ) ;
+			switch( uniform.getType() )
+			{
+				case INT32        :
+				case UINT32       :
+				case FLOAT32      :
+				case FLOAT64      :
+				case FLOAT32_VEC2 :
+				case FLOAT32_VEC3 :
+				case FLOAT32_VEC4 :
+				{
+					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
+					return false ;
+				}
+				case BOOL         :
+				{
+					final BoolUniform val = ( BoolUniform )uniform ;
+					MGL.uniform1i( _program.inUniforms[i], val.getState() ? 1 : 0) ;
+					break ;
+				}
+				case FLOAT32_MAT4 :
+				{
+					final Matrix4 m = ( Matrix4 )uniform ;
+					final float[] matrix = m.matrix ;
+
+					MGL.uniformMatrix4fv( _program.inUniforms[i], true, matrix ) ;
+					break ;
+				}
+				case SAMPLER2D    :
+				{
+					final Texture texture = ( Texture )uniform ;
+					final GLImage image = texture.image ;
+
+					MGL.activeTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
+					MGL.bindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
+					MGL.uniform1i( _program.inUniforms[i], textureUnit ) ;
+
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, texture.uWrap ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, texture.vWrap ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.magFilter ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, texture.minFilter ) ;
+
+					textureUnit += 1 ;
+					break ;
+				}
+				case FONT         :
+				{
+					final Texture texture = ( Texture )uniform ;
+					final GLImage image = texture.image ;
+
+					MGL.activeTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
+					MGL.bindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
+					MGL.uniform1i( _program.inUniforms[i], textureUnit ) ;
+
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+					MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+
+					textureUnit += 1 ;
+					break ;
+				}
+				case UNKNOWN      :
+				default           : return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	public static void bindBuffers( final List<GLStorage> _storages )
+	{
+		/*final int size = _storages.size() ;
+		for( int i = 0; i < size ; ++i )
+		{
+			final GLStorage storage = _storages.get( i ) ;
+			//System.out.println( name + " BindBase: " + i + " StorageID: " + glStorage.id[0] ) ;
+			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
+		}*/
+	}
+	
 	protected float getABGR( final MalletColour _colour )
 	{
 		abgrTemp[0] = _colour.colours[MalletColour.ALPHA] ;
@@ -179,6 +355,80 @@ public class GLBuffer
 			buffer.append( offset ) ;
 
 			return buffer.toString() ;
+		}
+	}
+
+	private static class Texture implements IUniform
+	{
+		private final IUniform.Type type ;
+		public final GLImage image ;
+
+		public final int minFilter ;
+		public final int magFilter ;
+		public final int uWrap ;
+		public final int vWrap ;
+
+		public Texture( final GLImage _image, final MalletTexture _texture )
+		{
+			image = _image ;
+			minFilter = calculateMinFilter( _texture.getMinificationFilter() ) ;
+			magFilter = calculateMagFilter( _texture.getMaxificationFilter() ) ;
+
+			uWrap = calculateWrap( _texture.getUWrap() ) ;
+			vWrap = calculateWrap( _texture.getVWrap() ) ;
+
+			type = IUniform.Type.SAMPLER2D ;
+		}
+
+		public Texture( final GLImage _image, final MalletFont _font )
+		{
+			image = _image ;
+
+			minFilter = -1 ;
+			magFilter = -1 ;
+
+			uWrap = -1 ;
+			vWrap = -1 ;
+
+			type = IUniform.Type.FONT ;
+		}
+
+		private int calculateMagFilter( MalletTexture.Filter _filter )
+		{
+			switch( _filter )
+			{
+				default          : return MGL.GL_LINEAR ;
+				case LINEAR      : return MGL.GL_LINEAR ;
+				case NEAREST     : return MGL.GL_NEAREST ;
+			}
+		}
+
+		private int calculateMinFilter( MalletTexture.Filter _filter )
+		{
+			switch( _filter )
+			{
+				default          : return MGL.GL_LINEAR ;
+				case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
+				case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+				case LINEAR      : return MGL.GL_LINEAR ;
+				case NEAREST     : return MGL.GL_NEAREST ;
+			}
+		}
+
+		private int calculateWrap( MalletTexture.Wrap _wrap )
+		{
+			switch( _wrap )
+			{
+				default         :
+				case REPEAT     : return MGL.GL_REPEAT ;
+				case CLAMP_EDGE : return MGL.GL_CLAMP_TO_EDGE ;
+			}
+		}
+
+		@Override
+		public IUniform.Type getType()
+		{
+			return type ;
 		}
 	}
 }

@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.IntVector2 ;
 	implementations, or wait for the Renderer to load 
 	the requested texture.
 */
-public final class MalletTexture
+public final class MalletTexture implements IUniform
 {
 	private final Filter minification ;
 	private final Filter magnification ;
@@ -208,6 +208,12 @@ public final class MalletTexture
 	public Filter getMaxificationFilter()
 	{
 		return magnification ;
+	}
+
+	@Override
+	public IUniform.Type getType()
+	{
+		return IUniform.Type.SAMPLER2D ;
 	}
 
 	@Override

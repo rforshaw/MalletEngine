@@ -30,7 +30,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 													   EventSystem,
 													   GameSystem>
 {
-	protected final EventController eventController = new EventController() ;
+	protected final EventController controller = new EventController() ;
 
 	public GLDefaultSystem()
 	{
@@ -88,25 +88,25 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 
 	protected void initEventProcessors()
 	{
-		eventController.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
+		controller.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
 		{
 			final boolean displayMouse = _displayMouse ;
 			getWindow().setPointerVisible( displayMouse ) ;
 		} ) ;
 
-		eventController.addProcessor( "CAPTURE_SYSTEM_MOUSE", ( Boolean _confineMouse ) ->
+		controller.addProcessor( "CAPTURE_SYSTEM_MOUSE", ( Boolean _confineMouse ) ->
 		{
 			final boolean confineMouse = _confineMouse ;
 			getWindow().confinePointer( confineMouse ) ;
 		} ) ;
 
-		eventController.addProcessor( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
+		controller.addProcessor( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
 		{
 			final boolean fullscreen = _fullscreen ;
 			getWindow().setFullscreen( fullscreen ) ;
 		} ) ;
 
-		getEventSystem().addHandler( eventController ) ;
+		getEventSystem().addHandler( controller ) ;
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	public boolean update( final float _dt )
 	{
 		super.update( _dt ) ;
-		eventController.update() ;		// Process the Events this system is interested in
+		controller.update() ;		// Process the Events this system is interested in
 		return true ;					// Informs the Game System whether to continue updating or not.
 	}
 

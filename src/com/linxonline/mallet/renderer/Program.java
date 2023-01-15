@@ -12,7 +12,7 @@ public final class Program
 	private int index ;
 	private String id ;
 
-	private final Map<String, Object> uniforms = MalletMap.<String, Object>newMap() ;
+	private final Map<String, IUniform> uniforms = MalletMap.<String, IUniform>newMap() ;
 	private final Map<String, Storage> storages = MalletMap.<String, Storage>newMap() ;
 
 	public Program() {}
@@ -32,18 +32,6 @@ public final class Program
 		storages.putAll( _program.storages ) ;
 	}
 
-	public void copy( final Program _program )
-	{
-		index = _program.index ;
-		id = _program.id ;
-
-		uniforms.clear() ;
-		storages.clear() ;
-
-		uniforms.putAll( _program.uniforms ) ;
-		storages.putAll( _program.storages ) ;
-	}
-
 	public boolean removeUniform( final String _handler )
 	{
 		if( uniforms.remove( _handler ) != null )
@@ -56,42 +44,40 @@ public final class Program
 		return false ;
 	}
 
-	public boolean mapUniform( final String _handler, final Object _obj )
+	public boolean mapUniform( final String _handler, final IUniform _uniform )
 	{
-		if( _handler == null || _obj == null )
+		if( _handler == null || _uniform == null )
 		{
 			// The id or value cannot be null
 			return false ;
 		}
 
-		if( _obj == uniforms.get( _handler ) )
+		if( _uniform == uniforms.get( _handler ) )
 		{
 			// Attempting reassign to the same object. 
 			return false ;
 		}
+		
+		if( IUniform.Type.validate( _uniform ) == false )
+		{
+			// Only certain classes that implement IUniform
+			// are considered valid.
+			return false ;
+		}
 
-		uniforms.put( _handler, _obj ) ;
+		uniforms.put( _handler, _uniform ) ;
 		return true ;
 	}
 
 	/**
 		Return the mapped object associated with _id.
 	*/
-	public Object getUniform( final String _id )
+	public IUniform getUniform( final String _id )
 	{
 		return uniforms.get( _id ) ;
 	}
 
-	/**
-		Return the mapped object associated with _id.
-		Will automatically cast object to _clazz.
-	*/
-	public <T> T getUniform( final String _id, final Class<T> _clazz )
-	{
-		return _clazz.cast( getUniform( _id ) ) ;
-	}
-
-	public Map<String, Object> getUniformMap()
+	public Map<String, IUniform> getUniformMap()
 	{
 		return uniforms ;
 	}
@@ -165,7 +151,7 @@ public final class Program
 				return false ;
 			}
 
-			final Map<String, Object> u = program.uniforms ;
+			final Map<String, IUniform> u = program.uniforms ;
 			if( uniforms.size() != u.size() )
 			{
 				// If the hashmaps are not the same size then 
@@ -180,13 +166,13 @@ public final class Program
 			}
 
 			{
-				final Set<Map.Entry<String, Object>> entries = uniforms.entrySet() ;
+				final Set<Map.Entry<String, IUniform>> entries = uniforms.entrySet() ;
 				if( entries.isEmpty() == false )
 				{
-					for( final Map.Entry<String, Object> entry : entries )
+					for( final Map.Entry<String, IUniform> entry : entries )
 					{
-						final Object obj1 = entry.getValue() ;
-						final Object obj2 = u.get( entry.getKey() ) ;
+						final IUniform obj1 = entry.getValue() ;
+						final IUniform obj2 = u.get( entry.getKey() ) ;
 
 						if( obj1.equals( obj2 ) == false )
 						{

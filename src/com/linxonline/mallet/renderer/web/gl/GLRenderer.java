@@ -31,7 +31,7 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
-public class GLRenderer extends BasicRenderer
+public final class GLRenderer extends BasicRenderer
 {
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
@@ -50,7 +50,7 @@ public class GLRenderer extends BasicRenderer
 					Logger.println( String.format( "Attempting to override existing resource: %s", id ), Logger.Verbosity.MAJOR ) ;
 				}
 
-				Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.MINOR ) ;
+				Logger.println( String.format( "Program: %s has been compiled", id ), Logger.Verbosity.NORMAL ) ;
 				programs.put( id, program ) ;
 			} ) ;
 		}

@@ -1,6 +1,8 @@
 package com.linxonline.mallet.maths ;
 
-public final class Vector2
+import com.linxonline.mallet.renderer.IUniform ;
+
+public final class Vector2 implements IUniform
 {
 	public float x ;
 	public float y ;
@@ -150,6 +152,12 @@ public final class Vector2
 	public String toString()
 	{
 		return "X:" + x + " Y: " + y ;
+	}
+
+	@Override
+	public IUniform.Type getType()
+	{
+		return IUniform.Type.FLOAT32_VEC2 ;
 	}
 
 	/**

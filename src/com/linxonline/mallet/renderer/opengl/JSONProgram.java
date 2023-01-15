@@ -7,6 +7,7 @@ import java.util.Set ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.Program ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.* ;
@@ -88,91 +89,10 @@ public final class JSONProgram
 		}
 	}
 
-	/**
-		Determine if the data-instance mapped to a uniform 
-		is of the correct type for that uniform.
-	*/
-	public boolean isUniformsValid( final Map<String, Object> _map )
+	@Override
+	public String toString()
 	{
-		final int size = uniforms.size() ;
-		final int diff = _map.size() - size ;
-		if( diff != 0 )
-		{
-			if( diff > 0 )
-			{
-				Logger.println( "Mallet Program contains more uniforms than OpenGL Program expects", Logger.Verbosity.MINOR ) ;
-			}
-			else //if( diff < 0 )
-			{
-				Logger.println( "Mallet Program contains less uniforms than OpenGL Program expects", Logger.Verbosity.MINOR ) ;
-			}
-			return false ;
-		}
-
-		for( final JSONProgram.UniformMap uniform : uniforms )
-		{
-			final Object obj = _map.get( uniform.getRight() ) ;
-			if( obj == null )
-			{
-				Logger.println( "OpenGL Program does not contain Map", Logger.Verbosity.MINOR ) ;
-				return false ;
-			}
-
-			switch( uniform.getLeft() )
-			{
-				case BOOL         :
-				{
-					if( isInstance( Boolean.class, obj ) == false )
-					{
-						return false ;
-					}
-					break ;
-				}
-				case INT32        :
-				case UINT32       :
-				case FLOAT32      :
-				case FLOAT64      :
-				case FLOAT32_VEC2 :
-				case FLOAT32_VEC3 :
-				case FLOAT32_VEC4 :
-				{
-					Logger.println( "OpenGL uniform type not implemented", Logger.Verbosity.MAJOR ) ;
-					return false ;
-				}
-				case FLOAT32_MAT4 :
-				{
-					if( isInstance( Matrix4.class, obj ) == false )
-					{
-						return false ;
-					}
-					break ;
-				}
-				case SAMPLER2D    :
-				{
-					if( isInstance( MalletTexture.class, obj ) == false )
-					{
-						return false ;
-					}
-					break ;
-				}
-				case FONT         :
-				{
-					if( isInstance( MalletFont.class, obj ) == false )
-					{
-						return false ;
-					}
-					break ;
-				}
-				case UNKNOWN      :
-				default           :
-				{
-					Logger.println( "OpenGL Program does not align to Mallet Program", Logger.Verbosity.MINOR ) ;
-					return false ;
-				}
-			}
-		}
-
-		return true ;
+		return name ;
 	}
 
 	public static boolean isLoadable( final String _file )
@@ -278,9 +198,9 @@ public final class JSONProgram
 		{
 			final JObject obj = _base.getJObject( i ) ;
 			final String name = obj.optString( "NAME", null ) ;
-			final Uniform type = Uniform.convert( obj.optString( "TYPE", null ) ) ;
+			final IUniform.Type type = IUniform.Type.convert( obj.optString( "TYPE", null ) ) ;
 
-			if( name != null && type != Uniform.UNKNOWN )
+			if( name != null && type != IUniform.Type.UNKNOWN )
 			{
 				_toFill.add( new UniformMap( type, name ) ) ;
 			}
@@ -315,11 +235,6 @@ public final class JSONProgram
 		}
 	}
 
-	private static boolean isInstance( final Class _class, final Object _obj )
-	{
-		return _class.isInstance( _obj ) ;
-	}
-
 	public static class ShaderMap extends Tuple<Type, String>
 	{
 		public ShaderMap( final Type _type, final String _source )
@@ -328,9 +243,9 @@ public final class JSONProgram
 		}
 	}
 
-	public static class UniformMap extends Tuple<Uniform, String>
+	public static class UniformMap extends Tuple<IUniform.Type, String>
 	{
-		public UniformMap( final Uniform _uniform, final String _name )
+		public UniformMap( final IUniform.Type _uniform, final String _name )
 		{
 			super( _uniform, _name ) ;
 		}
@@ -343,41 +258,6 @@ public final class JSONProgram
 		FRAGMENT,
 		COMPUTE,
 		UNKNOWN
-	}
-
-	public enum Uniform
-	{
-		BOOL,
-		INT32,
-		UINT32,
-		FLOAT32,
-		FLOAT64,
-		FLOAT32_VEC2,
-		FLOAT32_VEC3,
-		FLOAT32_VEC4,
-		FLOAT32_MAT4,
-		SAMPLER2D,
-		FONT,
-		UNKNOWN ;
-
-		public static Uniform convert( final String _uniform )
-		{
-			switch( _uniform )
-			{
-				case "BOOL"         : return Uniform.BOOL ;
-				case "INT32"        : return Uniform.INT32 ;
-				case "UINT32"       : return Uniform.UINT32 ;
-				case "FLOAT32"      : return Uniform.FLOAT32 ;
-				case "FLOAT64"      : return Uniform.FLOAT64 ;
-				case "FLOAT32_VEC2" : return Uniform.FLOAT32_VEC2 ;
-				case "FLOAT32_VEC3" : return Uniform.FLOAT32_VEC3 ;
-				case "FLOAT32_VEC4" : return Uniform.FLOAT32_VEC4 ;
-				case "FLOAT32_MAT4" : return Uniform.FLOAT32_MAT4 ;
-				case "SAMPLER2D"    : return Uniform.SAMPLER2D ;
-				case "FONT"         : return Uniform.FONT ;
-				default             : return Uniform.UNKNOWN ;
-			}
-		}
 	}
 
 	public interface Delegate

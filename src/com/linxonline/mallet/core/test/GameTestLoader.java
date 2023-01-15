@@ -377,8 +377,8 @@ public final class GameTestLoader implements IGameLoader
 				{
 					for( int j = 0; j < _column; ++j )
 					{
-						final int x = 50 + ( i * 50 ) ;
-						final int y = 50 + ( j * 50 ) ;
+						final int x = 50 + ( i * 60 ) ;
+						final int y = 50 + ( j * 60 ) ;
 
 						final Vector2 position = new Vector2( x, y ) ;
 						final CollisionComponent coll = CollisionComponent.generateBox2D( entity,

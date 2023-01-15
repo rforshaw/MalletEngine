@@ -4,6 +4,8 @@ desktop/*
 build/*
 libs/*
 web/target
+*/.gradle/*
+.gradle/*
 
 .kateproject.d
 

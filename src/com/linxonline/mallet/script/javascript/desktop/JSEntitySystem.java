@@ -17,6 +17,42 @@ public final class JSEntitySystem
 		system = _system ;
 	}
 
+	public List<JSEntity> getEntitiesByAbsoluteComponentName( final String _name )
+	{
+		final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;
+
+		entities.clear() ;
+		system.getEntities( entities ) ;
+		for( final Entity entity : entities )
+		{
+			final JSEntity jsEntity = new JSEntity( entity ) ;
+			if( jsEntity.hasComponentByAbsoluteName( _name ) )
+			{
+				fill.add( jsEntity ) ;
+			}
+		}
+
+		return fill ;
+	}
+
+	public List<JSEntity> getEntitiesBySimpleComponentName( final String _name )
+	{
+		final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;
+
+		entities.clear() ;
+		system.getEntities( entities ) ;
+		for( final Entity entity : entities )
+		{
+			final JSEntity jsEntity = new JSEntity( entity ) ;
+			if( jsEntity.hasComponentBySimpleName( _name ) )
+			{
+				fill.add( jsEntity ) ;
+			}
+		}
+
+		return fill ;
+	}
+
 	public List<JSEntity> getEntities()
 	{
 		final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;

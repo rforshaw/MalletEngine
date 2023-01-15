@@ -38,7 +38,7 @@ public final class Vorbis
 	private final List<CodebookConfiguration> codebooks = MalletList.<CodebookConfiguration>newList() ;
 	private final List<FloorConfiguration> floors = MalletList.<FloorConfiguration>newList() ;
 	private final List<ResidueConfiguration> residues = MalletList.<ResidueConfiguration>newList() ;
-	private final List<MappingConfiguration> mappings = MalletList.<MappingConfiguration>newList() ;
+	private final List<Mapping0Configuration> mappings = MalletList.<Mapping0Configuration>newList() ;
 	private final List<ModeConfiguration> modes = MalletList.<ModeConfiguration>newList() ;
 
 	public Vorbis() {}
@@ -624,7 +624,6 @@ public final class Vorbis
 	{
 		private final int[] RANGES = { 256, 128, 86, 64 } ;
 
-		private boolean unused = false ;
 		private int partitions = 0 ;
 		private int[] partitionClassList = null ;
 		private int[] classDimensions = null ;
@@ -634,7 +633,6 @@ public final class Vorbis
 		private int[] xList = null ;
 
 		private int multiplier = 0 ;
-		private int[] y = null ;
 
 		@Override
 		public int decodeHeader( int _pos, final byte[] _stream )
@@ -724,20 +722,28 @@ public final class Vorbis
 		}
 
 		@Override
-		public int decodePacket( int _pos, final byte[] _stream )
+		public int type()
 		{
+			return 1 ;
+		}
+
+		public int decode( int _pos, final byte[] _stream, final DecodedFloor1 _floor )
+		{
+			_floor.unused = false ;
+			_floor.y = null ;
+
 			if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
 			{
-				unused = true ;
+				_floor.unused = true ;
 				return _pos ;
 			}
 
 			final int range = RANGES[multiplier - 1] ;
 			final int bitsToRead = iLog( range - 1 ) ;
 
-			y = new int[xList.length] ;
-			y[0] = ( ConvertBytes.toBits( _stream, 0, _pos, bitsToRead )[0] & 0xFF ) ;
-			y[1] = ( ConvertBytes.toBits( _stream, 0, _pos += bitsToRead, bitsToRead )[0] & 0xFF ) ;
+			_floor.y = new int[xList.length] ;
+			_floor.y[0] = ( ConvertBytes.toBits( _stream, 0, _pos, bitsToRead )[0] & 0xFF ) ;
+			_floor.y[1] = ( ConvertBytes.toBits( _stream, 0, _pos += bitsToRead, bitsToRead )[0] & 0xFF ) ;
 			_pos += bitsToRead ;
 
 			int offset = 2 ;
@@ -782,12 +788,12 @@ public final class Vorbis
 							number = book.getEntry( codeword, codewordLength ) ;
 						}
 
-						y[j + offset] = number ;
+						_floor.y[j + offset] = number ;
 						_pos += codewordLength ;
 					}
 					else
 					{
-						y[j + offset] = 0 ;
+						_floor.y[j + offset] = 0 ;
 					}
 				}
 
@@ -853,6 +859,11 @@ public final class Vorbis
 		}
 
 		@Override
+		public int type()
+		{
+			return 0 ;
+		}
+
 		public int decodePacket( int _pos, final byte[] _stream )
 		{
 			final int amplitude = ( ConvertBytes.toBits( _stream, 0, _pos, amplitudeBits )[0] & 0xFF ) ;
@@ -870,33 +881,33 @@ public final class Vorbis
 	public interface FloorConfiguration
 	{
 		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception ;
-		public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
+		public int type() ;
 	}
 
 	public final class Residue0Configuration extends ResidueConfiguration
 	{
 		@Override
-		public int decodePacket( int _pos, final byte[] _stream )
+		public int type()
 		{
-			return _pos ;
+			return 0 ;
 		}
 	}
 
 	public final class Residue1Configuration extends ResidueConfiguration
 	{
 		@Override
-		public int decodePacket( int _pos, final byte[] _stream )
+		public int type()
 		{
-			return _pos ;
+			return 1 ;
 		}
 	}
 
 	public final class Residue2Configuration extends ResidueConfiguration
 	{
 		@Override
-		public int decodePacket( int _pos, final byte[] _stream )
+		public int type()
 		{
-			return _pos ;
+			return 2 ;
 		}
 	}
 
@@ -982,7 +993,96 @@ public final class Vorbis
 			return _pos ;
 		}
 
-		public abstract int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
+		public abstract int type() ;
+
+		public int decode( int _pos, final byte[] _stream, final int _blocksize, final int _ch, final boolean[] _doNotDecode )
+		{
+			int actualSize = _blocksize / 2 ;
+			if( type() == 2 )
+			{
+				actualSize = actualSize * _ch ;
+			}
+
+			final int limitBegin = ( begin < actualSize ) ? ( int )begin : actualSize ;
+			final int limitEnd = ( end < actualSize ) ? ( int )end : actualSize ;
+			final int toRead = limitEnd - limitBegin ;
+
+			final CodebookConfiguration book = codebooks.get( classbook ) ;
+			final int codeword = book.dimensions ;
+			final int partitionsToRead = toRead / ( int )partitionSize ;
+
+			int[][] dClassifications = new int[_ch][toRead] ;
+			if( toRead <= 0 )
+			{
+				return _pos ;
+			}
+
+			for( int pass = 0; pass <= 7; ++pass )
+			{
+				int partitionCount = 0 ;
+				while( partitionCount < toRead )
+				{
+					if( pass == 0 )
+					{
+						for( int j = 0; j < _ch; ++j )
+						{
+							if( _doNotDecode[j] )
+							{
+								continue ;
+							}
+
+							int codewordLength = 0 ;
+							int temp = -1 ;
+							while( temp == -1 )
+							{
+								codewordLength += 1 ;
+								final byte[] t = ConvertBytes.toBits( _stream, 0, _pos, codewordLength ) ;
+								temp = book.getEntry( t, codewordLength ) ;
+							}
+
+							for( int i = codeword - 1; i > 0; --i )
+							{
+								dClassifications[j][i + partitionCount] = temp % classifications ;
+								temp = temp / classifications ;
+							}
+
+							_pos += codewordLength ;
+						}
+					}
+
+					for( int i = 0; i < codeword; ++i )
+					{
+						if( partitionCount >= toRead )
+						{
+							break ;
+						}
+
+						for( int j = 0; j < _ch; ++j )
+						{
+							if( _doNotDecode[j] )
+							{
+								continue ;
+							}
+
+							final int vqClass = dClassifications[j][partitionCount] ;
+							final int vqBook = books[vqClass][pass] ;
+							if( vqBook == -1 )
+							{
+								continue ;
+							}
+
+							// decode partition into output vector number [j]
+							System.out.println( "VQBook: " + vqBook ) ;
+						}
+
+						++partitionCount ;
+					}
+				}
+			}
+
+			System.out.println( "Actual Size: " + actualSize + " Limit Begin: " + limitBegin + " Limit End: " + limitEnd ) ;
+			return _pos ;
+		}
 
 		@Override
 		public String toString()
@@ -1070,9 +1170,9 @@ public final class Vorbis
 				throw new Exception( "Mapping reserved value is expected to be 0 but got: " + reserved ) ;
 			}
 
+			muxs = new int[audioChannels] ;
 			if( subMaps > 1 )
 			{
-				muxs = new int[audioChannels] ;
 				for( int i = 0; i < audioChannels; ++i )
 				{
 					muxs[i] = ( ConvertBytes.toBits( _stream, 0, _pos, 4 )[0] & 0xFF ) ;
@@ -1114,7 +1214,6 @@ public final class Vorbis
 	public interface MappingConfiguration
 	{
 		public int decodeHeader( int _pos, final byte[] _stream ) throws Exception ;
-		//public int decodePacket( int _pos, final byte[] _stream ) throws Exception ;
 	}
 
 	public final class ModeConfiguration
@@ -1164,9 +1263,9 @@ public final class Vorbis
 
 	public final static class CodebookConfiguration
 	{
-		int entry ;							// Denotes the entry of the codebook, for example 
+		private int entry ;					// Denotes the entry of the codebook, for example 
 											// the 5th codebook to be read in
-		int dimensions ;
+		public int dimensions ;
 		long entries ;
 		int[] codewordLengths = null ;		// Codeword Lengths length is the size of entries
 
@@ -1265,7 +1364,7 @@ public final class Vorbis
 		private final static double HALF_PI = Math.PI / 2 ;
 
 		private final ModeConfiguration mode ;
-		private final MappingConfiguration mapping ;
+		private final Mapping0Configuration mapping ;
 
 		private final int n ;
 
@@ -1283,6 +1382,10 @@ public final class Vorbis
 		private final int rightN ;
 
 		private final double[] window ;
+
+		private final DecodedFloor[] decodedFloors = new DecodedFloor[audioChannels] ;
+		private boolean[] noResidue = new boolean[audioChannels] ;
+		private boolean[] doNotDecode = new boolean[audioChannels] ;
 
 		public AudioPacket( int _pos, final byte[] _stream ) throws Exception
 		{
@@ -1316,6 +1419,8 @@ public final class Vorbis
 			rightN           = ( mode.blockFlag == true && nextWindowFlag == false ) ? ( blocksize0 / 2 ) : ( n / 2 ) ;
 
 			window = computeWindow() ;
+			_pos = decodeFloorCurve( _pos, _stream ) ;
+			_pos = decodeResidue( _pos, _stream ) ;
 		}
 
 		private double[] computeWindow()
@@ -1347,18 +1452,115 @@ public final class Vorbis
 				w[i] = x ;
 			}
 
-			/*final StringBuilder builder = new StringBuilder() ;
-			for( int i = 0; i < w.length; ++i )
-			{
-				builder.append( w[i] ) ;
-				builder.append( ' ' ) ;
-			}
-			
-			System.out.println( builder.toString() ) ;*/
 			return w ;
 		}
+
+		private int decodeFloorCurve( int _pos, final byte[] _stream )
+		{
+			for( int i = 0; i < ( int )audioChannels; ++i )
+			{
+				final int subMapNumber = mapping.muxs[i] ;
+				final int floorNumber = mapping.subMapFloors[subMapNumber] ;
+
+				final FloorConfiguration floorConfig = floors.get( floorNumber ) ;
+				switch( floorConfig.type() )
+				{
+					case 0 :
+					{
+						break ;
+					}
+					case 1 :
+					{
+						final DecodedFloor1 floor = new DecodedFloor1() ;
+						decodedFloors[i] = floor ;
+
+						final Floor1Configuration config = ( Floor1Configuration )floorConfig ;
+						_pos = config.decode( _pos, _stream, floor ) ;
+
+						noResidue[i] = ( floor.unused ) ? true : false ;
+						break ;
+					}
+				}
+			}
+
+			// nonzero vector propagate
+			for( int i = 0; i < mapping.couplingSteps; ++i )
+			{
+			
+			}
+
+			return _pos ;
+		}
+
+		private int decodeResidue( int _pos, final byte[] _stream )
+		{
+			for( int i = 0; i < mapping.subMaps; ++i )
+			{
+				int ch = 0 ;
+				for( int j = 0; j < audioChannels; ++j )
+				{
+					if( mapping.muxs[j] == i )
+					{
+						doNotDecode[ch] = ( noResidue[j] ) ? true : false ;
+						++ch ;
+					}
+				}
+
+				final int residueNumber = mapping.subMapResidues[i] ;
+				final ResidueConfiguration residue = residues.get( residueNumber ) ;
+				_pos = residue.decode( _pos, _stream, n, ch, doNotDecode ) ;
+				// 5. decode ch vectors using residue
+
+				ch = 0 ;
+				for( int j = 0; j < audioChannels; ++j )
+				{
+					if( mapping.muxs[j] == i )
+					{
+						// 7. a) i. residue vector for channel [j] is set to decoded residue vector [ch]
+						++ch ;
+					}
+				}
+			}
+
+			return _pos ;
+		}
 	}
-	
+
+	public final class DecodedFloor1 implements DecodedFloor
+	{
+		private boolean unused = false ;
+		private int[] y = null ;
+
+		@Override
+		public int type()
+		{
+			return 1 ;
+		}
+
+		@Override
+		public String toString()
+		{
+			final StringBuilder builder = new StringBuilder() ;
+			builder.append( "Unused: " ) ;
+			builder.append( unused ) ;
+			builder.append( '\n' ) ;
+
+			builder.append( "Y: " ) ;
+			for( int i = 0; i < y.length; ++i )
+			{
+				builder.append( y[i] ) ;
+				builder.append( ", " ) ;
+			}
+
+			return builder.toString() ;
+		}
+	}
+
+	public interface DecodedFloor
+	{
+		public int type() ;
+	}
+
 	/**
 		Contains the information required to quickly decode the headers.
 	**/
