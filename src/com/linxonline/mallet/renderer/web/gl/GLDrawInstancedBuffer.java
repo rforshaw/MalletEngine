@@ -116,7 +116,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
+		if( GLDrawInstancedBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -205,7 +205,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		final float[] projMatrix = _projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, projMatrix ) ;
-		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
+		if( loadProgramUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}

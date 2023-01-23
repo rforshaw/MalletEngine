@@ -8,7 +8,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 
 public final class TextDraw implements IUpdate
 {
-	private Draw draw = new Draw() ;
+	private final Draw draw = new Draw() ;
 	private StringBuilder text ;
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;

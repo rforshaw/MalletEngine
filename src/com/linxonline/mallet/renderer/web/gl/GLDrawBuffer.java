@@ -45,7 +45,7 @@ public final class GLDrawBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
+		if( GLBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -95,12 +95,12 @@ public final class GLDrawBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, matrix ) ;
-		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
+		if( loadProgramUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		GLBuffer.bindBuffers( storages ) ;
+		GLDrawBuffer.bindBuffers( storages ) ;
 
 		for( GLGeometryBuffer buffer : buffers )
 		{

@@ -618,6 +618,11 @@ public final class GLRenderer extends BasicRenderer
 		final MalletTexture.Meta meta = _texture.getMeta() ;
 		final String path = meta.getPath() ;
 
+		if( meta.getAttachmentIndex() < 0 )
+		{
+			return textures.get( path ) ;
+		}
+
 		for( final GLWorld world : worlds )
 		{
 			if( path.equals( world.getID() ) == true )
@@ -626,7 +631,7 @@ public final class GLRenderer extends BasicRenderer
 			}
 		}
 
-		return textures.get( path ) ;
+		return null ;
 	}
 
 	protected static GLFont getFont( final MalletFont _font )

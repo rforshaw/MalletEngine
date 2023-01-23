@@ -238,16 +238,16 @@ public final class MalletTexture implements IUniform
 
 	public static class Meta
 	{
-		public final String path ;
+		private final String path ;
 		public final IntVector2 dimensions = new IntVector2() ;
-		public final Ratio ratio ;
+		private final Ratio ratio ;
 		private final int attachmentIndex ;
 
 		public Meta( final String _path,
 					 final int _width,
 					 final int _height )
 		{
-			this( _path, 0, _width, _height ) ;
+			this( _path, -1, _width, _height ) ;
 		}
 
 		public Meta( final String _path,
@@ -301,6 +301,11 @@ public final class MalletTexture implements IUniform
 		public String getPath()
 		{
 			return path ;
+		}
+
+		public Ratio getRatio()
+		{
+			return ratio ;
 		}
 
 		public int getAttachmentIndex()

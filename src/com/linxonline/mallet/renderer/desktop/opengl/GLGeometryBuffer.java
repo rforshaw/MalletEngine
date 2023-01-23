@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.Arrays ;
 import java.util.List ;
+import java.util.Map ;
 import java.nio.* ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
@@ -11,6 +12,7 @@ import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -19,6 +21,8 @@ import com.linxonline.mallet.maths.IntVector2 ;
 
 public final class GLGeometryBuffer extends GLBuffer
 {
+	private static final IUniform[] EMPTY_UNIFORMS = new IUniform[0] ;
+
 	private final int maxIndexByteSize ;
 	private final int maxVertexByteSize ;
 
@@ -118,10 +122,11 @@ public final class GLGeometryBuffer extends GLBuffer
 		final int size = draws.size() ;
 		if( indexMaps.length < size )
 		{
+			final IndexMap[] oldMaps = indexMaps ;
 			indexMaps = new IndexMap[size] ;
 			for( int i = 0; i < size; ++i )
 			{
-				indexMaps[i] = new IndexMap() ;
+				indexMaps[i] = ( i < oldMaps.length ) ? oldMaps[i] : new IndexMap() ;
 			}
 		}
 
@@ -210,6 +215,12 @@ public final class GLGeometryBuffer extends GLBuffer
 				final Draw draw = map.draw ;
 				if( draw.isHidden() || occluder.occlude( draw ) )
 				{
+					continue ;
+				}
+
+				if( loadDrawUniforms( _program, draw ) == false )
+				{
+					System.out.println( "Failed to load uniforms for draw object." ) ;
 					continue ;
 				}
 
@@ -347,7 +358,7 @@ public final class GLGeometryBuffer extends GLBuffer
 	{
 		public int start = 0 ;
 		public int count = 0 ;
-		public Draw draw = null ;
+		public Draw draw ;
 
 		public void set( final int _start, final int _count, final Draw _draw )
 		{

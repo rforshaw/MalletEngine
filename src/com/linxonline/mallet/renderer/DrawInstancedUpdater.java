@@ -72,26 +72,39 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 	@Override
 	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
 	{
-		boolean update = false ;
+		if( forceUpdate == false && dirty == false )
+		{
+			return ;
+		}
 
+		dirty = false ;
+
+		final List<GeometryBuffer> buffers = drawBuffer.getBuffers() ;
 		for( final GeometryBuffer buffer : buffers )
 		{
+			boolean stateHasChanged = forceUpdate ;
+
 			final List<Draw> draws = buffer.getDraws() ;
 			for( final Draw draw : draws )
 			{
+				// A draw object does not need the geometry buffer
+				// to be updated if it's just the position, rotation,
+				// or scale that has changed.
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
-					update = true ;
+					dirty = true ;
+					stateHasChanged = true ;
 				}
+			}
+
+			if( stateHasChanged == true )
+			{
+				// The Geometry Buffer will need to be updated if a 
+				// draw object state has changed, or if it's been forced.
+				_updated.add( drawBuffer ) ;
 			}
 		}
 
-		if( update == true || forceUpdate == true )
-		{
-			_updated.add( drawBuffer ) ;
-		}
-
 		forceUpdate = false ;
-		dirty = update ;
 	}
 }

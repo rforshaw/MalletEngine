@@ -50,7 +50,8 @@ public final class ContactData
 	public final ContactPoint get( final int _i, final ContactPoint _point )
 	{
 		final int index = _i * 3 ;
-		_point.contactNormal.setXY( contacts[index + CONTACT_NORMAL_X], contacts[index + CONTACT_NORMAL_Y] ) ;
+		_point.contactNormalX = contacts[index + CONTACT_NORMAL_X] ;
+		_point.contactNormalY = contacts[index + CONTACT_NORMAL_Y] ;
 		_point.penetration = contacts[index + CONTACT_PENETRATION] ;
 		_point.physical = physical[_i]  ;
 		_point.collidedWith = collidedWith[_i] ;

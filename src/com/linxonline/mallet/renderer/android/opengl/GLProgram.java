@@ -38,14 +38,16 @@ public final class GLProgram extends ProgramManager.Program
 	// however it must be defined in atleast vertex shader.
 	public int inModelMatrix = -1 ;
 	public int inMVPMatrix = -1 ;
-	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders  
+	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders
+	public final int[] inDrawUniforms ;		// Additional uniforms defined in *.jgl and shaders  
 	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
 	public final int[] inBuffers ;			// Additional Storage buffers defined in *.jgl and shaders
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
-		inUniforms   = new int[program.getUniforms().size()] ;
+		inUniforms = new int[program.getUniforms().size()] ;
+		inDrawUniforms = new int[program.getDrawUniforms().size()] ;
 		inAttributes = new int[program.getAttribute().size()] ;
 		inBuffers    = new int[program.getBuffers().size()] ;
 
@@ -137,7 +139,18 @@ public final class GLProgram extends ProgramManager.Program
 				program.inUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
 			}
 		}
-		
+
+		{
+			final List<JSONProgram.UniformMap> uniforms = _program.getDrawUniforms() ;
+
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
+				program.inDrawUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
+			}
+		}
+
 		{
 			final List<String> buffers = _program.getBuffers() ;
 			final int size = buffers.size() ;

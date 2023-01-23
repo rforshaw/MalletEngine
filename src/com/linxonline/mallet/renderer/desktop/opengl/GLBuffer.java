@@ -16,6 +16,7 @@ import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
+import com.linxonline.mallet.renderer.Draw ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Logger ;
@@ -32,6 +33,8 @@ public class GLBuffer
 
 	private final boolean ui ;
 
+	private int textureUnit = 0 ;	// This needs to be reset, call loadProgramUniforms() first, then loadDrawUniforms().
+
 	public GLBuffer( final boolean _ui )
 	{
 		ui = _ui ;
@@ -46,12 +49,24 @@ public class GLBuffer
 
 	public void shutdown() {}
 
-	protected static boolean generateUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
+	protected static boolean generateProgramUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
 	{
+		final List<JSONProgram.UniformMap> uniforms = _glProgram.program.getUniforms() ;
+		if( uniforms.isEmpty() )
+		{
+			return true ;
+		}
+
 		_toFill.clear() ;
-		for( JSONProgram.UniformMap tuple : _glProgram.program.getUniforms() )
+		for( JSONProgram.UniformMap tuple : uniforms )
 		{
 			final IUniform uniform = _program.getUniform( tuple.getRight() ) ;
+			if( uniform == null )
+			{
+				Logger.println( tuple.getRight() + " not specified on program object.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+			
 			switch( uniform.getType() )
 			{
 				case INT32        :
@@ -122,9 +137,12 @@ public class GLBuffer
 		}
 	}
 
-	protected static boolean loadUniforms( final GLProgram _program, final List<IUniform> _uniforms )
+	/**
+		Load the uniforms expcted to be specified at the program level.
+	*/
+	protected boolean loadProgramUniforms( final GLProgram _program, final List<IUniform> _uniforms )
 	{
-		int textureUnit = 0 ;
+		textureUnit = 0 ;
 
 		final int size = _uniforms.size() ;
 		for( int i = 0; i < size; i++ )
@@ -158,6 +176,7 @@ public class GLBuffer
 					break ;
 				}
 				case SAMPLER2D    :
+				case FONT         :
 				{
 					final Texture texture = ( Texture )uniform ;
 					final GLImage image = texture.image ;
@@ -174,21 +193,104 @@ public class GLBuffer
 					textureUnit += 1 ;
 					break ;
 				}
+				case UNKNOWN      :
+				default           : return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	/**
+		Load the uniforms expcted to be specified at the draw level.
+		Draw object cannot override program level uniforms.
+	*/
+	protected boolean loadDrawUniforms( final GLProgram _program, final Draw _draw )
+	{
+		int textureUnitOffset = textureUnit ;
+		
+		final List<JSONProgram.UniformMap> uniforms = _program.program.getDrawUniforms() ;
+		final int size = uniforms.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final JSONProgram.UniformMap tuple = uniforms.get( i ) ;
+
+			final IUniform uniform = _draw.getUniform( tuple.getRight() ) ;
+			if( uniform == null )
+			{
+				Logger.println( tuple.getRight() + " not specified on draw object.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+
+			switch( uniform.getType() )
+			{
+				case INT32        :
+				case UINT32       :
+				case FLOAT32      :
+				case FLOAT64      :
+				case FLOAT32_VEC2 :
+				case FLOAT32_VEC3 :
+				case FLOAT32_VEC4 :
+				{
+					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
+					return false ;
+				}
+				case BOOL         :
+				{
+					final BoolUniform val = ( BoolUniform )uniform ;
+					MGL.glUniform1i( _program.inDrawUniforms[i], val.getState() ? 1 : 0) ;
+					break ;
+				}
+				case FLOAT32_MAT4 :
+				{
+					final Matrix4 m = ( Matrix4 )uniform ;
+					final float[] matrix = m.matrix ;
+
+					MGL.glUniformMatrix4fv( _program.inDrawUniforms[i], 1, true, matrix, 0 ) ;
+					break ;
+				}
+				case SAMPLER2D    :
+				{
+					final MalletTexture texture = ( MalletTexture )uniform ;
+					if( texture == null )
+					{
+						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+					}
+
+					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
+					if( glTexture == null )
+					{
+						return false ;
+					}
+
+					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnitOffset ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
+					MGL.glUniform1i( _program.inDrawUniforms[i], textureUnitOffset ) ;
+
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, GLImage.calculateWrap( texture.getUWrap() ) ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, GLImage.calculateWrap( texture.getVWrap() ) ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, GLImage.calculateMagFilter( texture.getMaxificationFilter() )  ) ;
+					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, GLImage.calculateMinFilter( texture.getMinificationFilter() ) ) ;
+
+					textureUnitOffset += 1 ;
+					break ;
+				}
 				case FONT         :
 				{
-					final Texture texture = ( Texture )uniform ;
-					final GLImage image = texture.image ;
+					final MalletFont font = ( MalletFont )uniform ;
+					final GLFont glFont = GLRenderer.getFont( font ) ;
+					final GLImage texture = glFont.getTexture() ;
 
-					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-					MGL.glUniform1i( _program.inUniforms[i], textureUnit ) ;
+					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnitOffset ) ;
+					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
+					MGL.glUniform1i( _program.inDrawUniforms[i], textureUnitOffset ) ;
 
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
 					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
 
-					textureUnit += 1 ;
+					textureUnitOffset += 1 ;
 					break ;
 				}
 				case UNKNOWN      :
@@ -221,11 +323,11 @@ public class GLBuffer
 	}
 
 	protected static void apply( final Matrix4 _mat4,
-							   final Matrix4 _temp,
-							   final Vector3 _position,
-							   final Vector3 _offset,
-							   final Vector3 _rotation,
-							   final Vector3 _scale )
+								 final Matrix4 _temp,
+								 final Vector3 _position,
+								 final Vector3 _offset,
+								 final Vector3 _rotation,
+								 final Vector3 _scale )
 	{
 		_mat4.setIdentity() ;
 		_mat4.setTranslate( _position.x, _position.y, 0.0f ) ;
@@ -325,7 +427,7 @@ public class GLBuffer
 		}
 	}
 
-	protected static class VertexAttrib
+	protected static final class VertexAttrib
 	{
 		public int index ;				// Specifies the index of the generic vertex attribute to be modified 
 		public int size ;				// Specifies the number of components per generic vertex attribute
@@ -358,7 +460,7 @@ public class GLBuffer
 		}
 	}
 
-	private static class Texture implements IUniform
+	private static final class Texture implements IUniform
 	{
 		private final IUniform.Type type ;
 		public final GLImage image ;
@@ -371,11 +473,11 @@ public class GLBuffer
 		public Texture( final GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
-			minFilter = calculateMinFilter( _texture.getMinificationFilter() ) ;
-			magFilter = calculateMagFilter( _texture.getMaxificationFilter() ) ;
+			minFilter = GLImage.calculateMinFilter( _texture.getMinificationFilter() ) ;
+			magFilter = GLImage.calculateMagFilter( _texture.getMaxificationFilter() ) ;
 
-			uWrap = calculateWrap( _texture.getUWrap() ) ;
-			vWrap = calculateWrap( _texture.getVWrap() ) ;
+			uWrap = GLImage.calculateWrap( _texture.getUWrap() ) ;
+			vWrap = GLImage.calculateWrap( _texture.getVWrap() ) ;
 
 			type = IUniform.Type.SAMPLER2D ;
 		}
@@ -384,45 +486,13 @@ public class GLBuffer
 		{
 			image = _image ;
 
-			minFilter = -1 ;
-			magFilter = -1 ;
+			minFilter = MGL.GL_LINEAR ;
+			magFilter = MGL.GL_LINEAR ;
 
-			uWrap = -1 ;
-			vWrap = -1 ;
+			uWrap = MGL.GL_CLAMP_TO_EDGE ;
+			vWrap = MGL.GL_REPEAT ;
 
 			type = IUniform.Type.FONT ;
-		}
-
-		private int calculateMagFilter( MalletTexture.Filter _filter )
-		{
-			switch( _filter )
-			{
-				default          : return MGL.GL_LINEAR ;
-				case LINEAR      : return MGL.GL_LINEAR ;
-				case NEAREST     : return MGL.GL_NEAREST ;
-			}
-		}
-
-		private int calculateMinFilter( MalletTexture.Filter _filter )
-		{
-			switch( _filter )
-			{
-				default          : return MGL.GL_LINEAR ;
-				case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
-				case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
-				case LINEAR      : return MGL.GL_LINEAR ;
-				case NEAREST     : return MGL.GL_NEAREST ;
-			}
-		}
-
-		private int calculateWrap( MalletTexture.Wrap _wrap )
-		{
-			switch( _wrap )
-			{
-				default         :
-				case REPEAT     : return MGL.GL_REPEAT ;
-				case CLAMP_EDGE : return MGL.GL_CLAMP_TO_EDGE ;
-			}
 		}
 
 		@Override

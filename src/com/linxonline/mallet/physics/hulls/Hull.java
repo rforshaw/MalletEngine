@@ -55,8 +55,8 @@ public abstract class Hull
 			_contacts.get( i, _point ) ;
 			if( _point.physical == true )
 			{
-				_accumulatedPenetration.x += _point.contactNormal.x * _point.penetration ;
-				_accumulatedPenetration.y += _point.contactNormal.y * _point.penetration ;
+				_accumulatedPenetration.x += _point.contactNormalX * _point.penetration ;
+				_accumulatedPenetration.y += _point.contactNormalY * _point.penetration ;
 			}
 		}
 	}

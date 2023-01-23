@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.Arrays ;
 
+import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.io.Resource ;
 
 public final class GLImage extends Resource
@@ -22,6 +23,38 @@ public final class GLImage extends Resource
 		textureIDs = new int[1] ;
 		textureIDs[0] = _textureID ;
 		consumption = _consumption ;
+	}
+
+	public static int calculateMagFilter( MalletTexture.Filter _filter )
+	{
+		switch( _filter )
+		{
+			default          : return MGL.GL_LINEAR ;
+			case LINEAR      : return MGL.GL_LINEAR ;
+			case NEAREST     : return MGL.GL_NEAREST ;
+		}
+	}
+
+	public static int calculateMinFilter( MalletTexture.Filter _filter )
+	{
+		switch( _filter )
+		{
+			default          : return MGL.GL_LINEAR ;
+			case MIP_LINEAR  : return MGL.GL_LINEAR_MIPMAP_LINEAR ;
+			case MIP_NEAREST : return MGL.GL_NEAREST_MIPMAP_NEAREST ;
+			case LINEAR      : return MGL.GL_LINEAR ;
+			case NEAREST     : return MGL.GL_NEAREST ;
+		}
+	}
+
+	public static int calculateWrap( MalletTexture.Wrap _wrap )
+	{
+		switch( _wrap )
+		{
+			default         :
+			case REPEAT     : return MGL.GL_REPEAT ;
+			case CLAMP_EDGE : return MGL.GL_CLAMP_TO_EDGE ;
+		}
 	}
 
 	@Override

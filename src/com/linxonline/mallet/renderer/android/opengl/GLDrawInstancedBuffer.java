@@ -109,7 +109,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
+		if( GLDrawInstancedBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -117,7 +117,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		GLBuffer.generateStorages( glProgram, program, _storages, storages ) ;
+		GLDrawInstancedBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
 		// For instanced rendering to work we require a storage buffer 
 		// that contains all matrices of each of the draw objects.
@@ -209,7 +209,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
+		if( loadProgramUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}

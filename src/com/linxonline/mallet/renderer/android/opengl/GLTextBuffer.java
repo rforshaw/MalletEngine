@@ -93,7 +93,7 @@ public class GLTextBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateUniforms( glProgram, program, uniforms ) == false )
+		if( GLTextBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
 		{
 			// We've failed to update the buffer something in
 			// the program map is wrong or has yet to be loaded.
@@ -101,7 +101,7 @@ public class GLTextBuffer extends GLBuffer
 			return stable ;
 		}
 
-		GLBuffer.generateStorages( glProgram, program, _storages, storages ) ;
+		GLTextBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
 		final IUniform uFont = program.getUniform( "inTex0" ) ;
 		if( uFont.getType() != IUniform.Type.FONT )
@@ -292,12 +292,12 @@ public class GLTextBuffer extends GLBuffer
 		final float[] matrix = _projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( GLBuffer.loadUniforms( glProgram, uniforms ) == false )
+		if( loadProgramUniforms( glProgram, uniforms ) == false )
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		GLBuffer.bindBuffers( storages ) ;
+		GLTextBuffer.bindBuffers( storages ) ;
 
 		GLGeometryBuffer.enableVertexAttributes( attributes ) ;
 

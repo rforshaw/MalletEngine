@@ -23,10 +23,11 @@ import com.linxonline.mallet.maths.Matrix4 ;
 public final class JSONProgram
 {
 	private final String name ;
-	private final List<ShaderMap> shaders   = MalletList.<ShaderMap>newList() ;
+	private final List<ShaderMap> shaders = MalletList.<ShaderMap>newList() ;
 	private final List<UniformMap> uniforms = MalletList.<UniformMap>newList() ;
-	private final List<String> buffers      = MalletList.<String>newList() ;
-	private final List<String> swivel       = MalletList.<String>newList() ;
+	private final List<UniformMap> drawUniforms = MalletList.<UniformMap>newList() ;
+	private final List<String> buffers = MalletList.<String>newList() ;
+	private final List<String> swivel = MalletList.<String>newList() ;
 
 	public JSONProgram( final String _name )
 	{
@@ -46,6 +47,11 @@ public final class JSONProgram
 	public List<UniformMap> getUniforms()
 	{
 		return uniforms ;
+	}
+
+	public List<UniformMap> getDrawUniforms()
+	{
+		return drawUniforms ;
 	}
 
 	public List<String> getBuffers()
@@ -135,6 +141,7 @@ public final class JSONProgram
 		}
 
 		fillUniforms( program.uniforms, _jGL.getJArray( "UNIFORMS" ) ) ;
+		fillUniforms( program.drawUniforms, _jGL.getJArray( "DRAW_UNIFORMS" ) ) ;
 		fillAttributes( program.swivel, _jGL.getJArray( "ATTRIBUTES" ) ) ;
 		fillBuffers( program.buffers, _jGL.getJArray( "BUFFERS" ) ) ;
 

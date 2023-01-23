@@ -6,7 +6,8 @@ import com.linxonline.mallet.physics.hulls.Hull ;
 public final class ContactPoint
 {
 	public Hull collidedWith = null ;
-	public Vector2 contactNormal = new Vector2( 0.0f, 0.0f ) ;
+	public float contactNormalX = 0.0f ;
+	public float contactNormalY = 0.0f ;
 	public float penetration = 0.0f ;
 	public boolean physical = true ;
 
@@ -15,7 +16,8 @@ public final class ContactPoint
 	public ContactPoint( final float _penetration, 
 						 final Vector2 _contactNormal )
 	{
-		contactNormal = _contactNormal ;
+		contactNormalX = _contactNormal.x ;
+		contactNormalY = _contactNormal.y ;
 		penetration = _penetration ;
 	}
 
@@ -23,8 +25,8 @@ public final class ContactPoint
 						 final Vector2 _contactNormal,
 						 final boolean _physical )
 	{
-		contactNormal = _contactNormal ;
-		penetration = _penetration ;
+		contactNormalX = _contactNormal.x ;
+		contactNormalY = _contactNormal.y ;		penetration = _penetration ;
 		physical = _physical ;
 	}
 
@@ -33,9 +35,17 @@ public final class ContactPoint
 						 final boolean _physical,
 						 final Hull _collidedWith )
 	{
-		contactNormal = _contactNormal ;
+		contactNormalX = _contactNormal.x ;
+		contactNormalY = _contactNormal.y ;
 		penetration = _penetration ;
 		physical = _physical ;
 		collidedWith = _collidedWith ;
+	}
+
+	public Vector2 getContactNormal( final Vector2 _fill )
+	{
+		_fill.x = contactNormalX ;
+		_fill.y = contactNormalY ;
+		return _fill ;
 	}
 }

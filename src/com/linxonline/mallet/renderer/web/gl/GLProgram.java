@@ -16,8 +16,12 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 
+import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.BoolUniform ;
+
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -40,13 +44,15 @@ public final class GLProgram extends ProgramManager.Program
 	// however it must be defined in atleast vertex shader.
 	public WebGLUniformLocation inModelMatrix = null ;
 	public WebGLUniformLocation inMVPMatrix = null ;
-	public final WebGLUniformLocation[] inUniforms ;	// Additional uniforms defined in *.jgl and shaders  
-	public final int[] inAttributes ;					// Vertex swivel order defined in *.jgl
+	public final WebGLUniformLocation[] inUniforms ;		// Additional uniforms defined in *.jgl and shaders
+	public final WebGLUniformLocation[] inDrawUniforms ;	// Additional uniforms defined in *.jgl and shaders  
+	public final int[] inAttributes ;						// Vertex swivel order defined in *.jgl
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
-		inUniforms   = new WebGLUniformLocation[program.getUniforms().size()] ;
+		inUniforms = new WebGLUniformLocation[program.getUniforms().size()] ;
+		inDrawUniforms = new WebGLUniformLocation[program.getDrawUniforms().size()] ;
 		inAttributes = new int[program.getAttribute().size()] ;
 
 		final int length = inAttributes.length ;
@@ -129,22 +135,23 @@ public final class GLProgram extends ProgramManager.Program
 
 		{
 			final List<JSONProgram.UniformMap> uniforms = _program.getUniforms() ;
-			int textureUnit = 0 ;
 
 			final int size = uniforms.size() ;
 			for( int i = 0; i < size; i++ )
 			{
 				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				switch( uniform.getLeft() )
-				{
-					case FONT         :
-					case SAMPLER2D    :
-					{
-						program.inUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getRight() ) ;
-						textureUnit += 1 ;
-						break ;
-					}
-				}
+				program.inUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getRight() ) ;
+			}
+		}
+
+		{
+			final List<JSONProgram.UniformMap> uniforms = _program.getDrawUniforms() ;
+
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; i++ )
+			{
+				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
+				program.inDrawUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getRight() ) ;
 			}
 		}
 

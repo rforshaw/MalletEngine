@@ -9,13 +9,11 @@ public final class Program
 {
 	private final static Utility utility = new Utility() ;
 
-	private int index ;
-	private String id ;
+	private final int index ;
+	private final String id ;
 
 	private final Map<String, IUniform> uniforms = MalletMap.<String, IUniform>newMap() ;
 	private final Map<String, Storage> storages = MalletMap.<String, Storage>newMap() ;
-
-	public Program() {}
 
 	public Program( final String _id )
 	{
@@ -75,11 +73,6 @@ public final class Program
 	public IUniform getUniform( final String _id )
 	{
 		return uniforms.get( _id ) ;
-	}
-
-	public Map<String, IUniform> getUniformMap()
-	{
-		return uniforms ;
 	}
 
 	public boolean removeStorage( final String _handler )

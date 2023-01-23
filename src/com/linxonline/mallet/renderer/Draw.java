@@ -1,9 +1,13 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.Map ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
+import com.linxonline.mallet.util.MalletMap ;
 
 public final class Draw implements IUpdate
 {
@@ -15,18 +19,16 @@ public final class Draw implements IUpdate
 	private static final int ROTATION = 6 ;
 	private static final int SCALE    = 9 ;
 
-	public static final IMeta EMPTY_META = new IMeta()
-	{
-		public int getType()
-		{
-			return -1 ;
-		}
-	} ;
+	public static final EmptyMeta EMPTY_META = new EmptyMeta() ;
 
 	private IMeta meta = EMPTY_META ;
 	private boolean hidden = false ;
 	private final IShape[] shapes ;
 	private MalletColour colour = null ;
+
+	// We don't want to construct a map for uniforms unless the client
+	// has some uniforms for the draw object.
+	private Map<String, IUniform> uniforms = null ;
 
 	// Each contain Position, Rotation, and Scale
 	private final float[] old = FloatBuffer.allocate( 12 ) ;
@@ -96,6 +98,70 @@ public final class Draw implements IUpdate
 	public IMeta getMeta()
 	{
 		return meta ;
+	}
+
+	public boolean removeUniform( final String _handler )
+	{
+		if( uniforms == null )
+		{
+			// Can't remove something when the map
+			// doesn't exist in the first place.
+			return false ;
+		}
+	
+		if( uniforms.remove( _handler ) != null )
+		{
+			return true ;
+		}
+
+		// Failed to remove an object associated with 
+		// the passed in id - most likely never set.
+		return false ;
+	}
+
+	public boolean mapUniform( final String _handler, final IUniform _uniform )
+	{
+		if( _handler == null || _uniform == null )
+		{
+			// The id or value cannot be null
+			return false ;
+		}
+
+		if( _uniform == uniforms.get( _handler ) )
+		{
+			// Attempting reassign to the same object. 
+			return false ;
+		}
+		
+		if( IUniform.Type.validate( _uniform ) == false )
+		{
+			// Only certain classes that implement IUniform
+			// are considered valid.
+			return false ;
+		}
+
+		if( uniforms == null )
+		{
+			// Only construct the uniform map if the user
+			// has a uniform they want to store.
+			uniforms = MalletMap.<String, IUniform>newMap() ;
+		}
+
+		uniforms.put( _handler, _uniform ) ;
+		return true ;
+	}
+
+	/**
+		Return the mapped object associated with _id.
+	*/
+	public IUniform getUniform( final String _id )
+	{
+		if( uniforms == null )
+		{
+			return null ;
+		}
+
+		return uniforms.get( _id ) ;
 	}
 
 	public IShape[] getShapes()
@@ -300,5 +366,14 @@ public final class Draw implements IUpdate
 			used to cast the object to the correct definition.
 		*/
 		public int getType() ;
+	}
+
+	private static final class EmptyMeta implements IMeta
+	{
+		@Override
+		public int getType()
+		{
+			return -1 ;
+		}
 	}
 }
