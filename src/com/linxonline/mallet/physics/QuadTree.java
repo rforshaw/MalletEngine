@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.thread.* ;
+import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.physics.hulls.Hull ;
@@ -17,11 +17,6 @@ public final class QuadTree
 	private float ROOT_LENGTH ;
 
 	private final IUpdate update ;
-
-	// Used when multi-threading
-	private final List<QuadNode> nodes ;
-	private final WorkerGroup workers ;
-	private final NodeWorker nodeWorker ;
 
 	private enum Quadrant
 	{
@@ -39,6 +34,27 @@ public final class QuadTree
 		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100 ) ;
 	}
 
+	/*public QuadTree( final float _x,
+					 final float _y,
+					 final float _size,
+					 final float _nodeAreaLimit,
+					 final int _nodeCapacity )
+	{
+		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
+		NODE_AREA_LIMIT = _nodeAreaLimit ;
+
+		ROOT_LENGTH = root.length ;
+		MAX_HULLS = _nodeCapacity ;
+
+		update = new IUpdate()
+		{
+			public void update( final float _dt )
+			{
+				root.update( _dt ) ;
+			}
+		} ;
+	}*/
+
 	public QuadTree( final float _x,
 					 final float _y,
 					 final float _size,
@@ -51,51 +67,19 @@ public final class QuadTree
 		ROOT_LENGTH = root.length ;
 		MAX_HULLS = _nodeCapacity ;
 
-		nodes = null ;
-		workers = null ;
-		nodeWorker = null ;
-
 		update = new IUpdate()
 		{
-			public void update( final float _dt )
-			{
-				root.update( _dt ) ;
-			}
-		} ;
-	}
-
-	public QuadTree( final WorkerGroup _workers )
-	{
-		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100, _workers ) ;
-	}
-
-	public QuadTree( final float _x,
-					 final float _y,
-					 final float _size,
-					 final float _nodeAreaLimit,
-					 final int _nodeCapacity,
-					 final WorkerGroup _workers )
-	{
-		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
-		NODE_AREA_LIMIT = _nodeAreaLimit ;
-
-		ROOT_LENGTH = root.length ;
-		MAX_HULLS = _nodeCapacity ;
-
-		nodes = MalletList.<QuadNode>newList() ;
-		workers = _workers ;
-		nodeWorker = new NodeWorker() ;
-
-		update = new IUpdate()
-		{
+			// Used when multi-threading
+			private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
+			private final NodeWorker nodeWorker = new NodeWorker() ;
+		
 			public void update( final float _dt )
 			{
 				root.getChildNodes( nodes ) ;
 				if( nodes.isEmpty() == false )
 				{
 					nodeWorker.setDeltaTime( _dt ) ;
-
-					workers.exec( nodes, nodeWorker ) ;
+					Parallel.forEach( nodes, nodeWorker ) ;
 					nodes.clear() ;
 				}
 			}
@@ -722,8 +706,8 @@ public final class QuadTree
 	{
 		public void update( final float _dt ) ;
 	}
-	
-	private final static class NodeWorker extends Worker<QuadNode>
+
+	private final static class NodeWorker implements Parallel.IRangeRun<QuadNode>
 	{
 		private float deltaTime = 0.0f ;
 
@@ -735,11 +719,9 @@ public final class QuadTree
 		}
 
 		@Override
-		public ExecType exec( final int _index, final QuadNode _node )
+		public void run( final int _index, final QuadNode _node )
 		{
-			//System.out.println( "Node: " + _node.size() ) ;
 			_node.update( deltaTime ) ;
-			return ExecType.CONTINUE ;
 		}
 	}
 }

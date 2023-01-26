@@ -82,11 +82,10 @@ public class CollisionComponent extends Component
 			penShift = new Vector2() ;
 		}
 
-		penShift.setXY( 0.0f, 0.0f ) ;
-
 		// Shift the hulls position by the penetration depth.
 		for( int i = 0; i < hulls.length; ++i )
 		{
+			penShift.setXY( 0.0f, 0.0f ) ;
 			final Hull hull = hulls[i] ;
 			Hull.calculatePenetrationDepth( hull.contactData, point, penShift ) ;
 			hull.addToPosition( penShift.x, penShift.y ) ;

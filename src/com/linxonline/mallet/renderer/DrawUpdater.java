@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Parallel ;
+
 /**
 	Update the Draw object state stored within the GeometryBuffers
 	attached to a particular DrawBuffer.
@@ -12,6 +14,8 @@ import java.util.List ;
 public class DrawUpdater implements IUpdater<GeometryBuffer>
 {
 	protected final DrawBuffer drawBuffer ;
+
+	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
 
 	private Interpolation mode ;
 	private boolean forceUpdate = false ;
@@ -119,19 +123,13 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		final List<GeometryBuffer> buffers = drawBuffer.getBuffers() ;
 		for( final GeometryBuffer buffer : buffers )
 		{
-			boolean stateHasChanged = forceUpdate ;
+			parallelUpdater.set( mode, _diff, _iteration, forceUpdate ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
-			for( final Draw draw : draws )
-			{
-				// A draw object does not need the geometry buffer
-				// to be updated if it's just the position, rotation,
-				// or scale that has changed.
-				if( draw.update( mode, _diff, _iteration ) == true )
-				{
-					dirty = true ;
-				}
-			}
+			Parallel.forEach( draws, parallelUpdater ) ;
+
+			final boolean stateHasChanged = parallelUpdater.hasStateChanged() ;
+			dirty = parallelUpdater.isDirty() ;
 
 			if( stateHasChanged == true )
 			{

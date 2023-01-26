@@ -1,4 +1,4 @@
-package com.linxonline.mallet.util.thread ;
+package com.linxonline.mallet.util ;
 
 import java.lang.Thread ;
 import java.lang.StringBuilder ;

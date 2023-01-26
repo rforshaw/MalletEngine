@@ -3,6 +3,8 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.Parallel ;
+
 /**
 	A draw object can be added to multiple different 
 	buffers with each buffer doing a different task.
@@ -16,6 +18,8 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 	private final Interpolation mode ;
 	protected final DrawBuffer drawBuffer ;
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
+
+	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
 
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
@@ -82,20 +86,13 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 		final List<GeometryBuffer> buffers = drawBuffer.getBuffers() ;
 		for( final GeometryBuffer buffer : buffers )
 		{
-			boolean stateHasChanged = forceUpdate ;
+			parallelUpdater.set( mode, _diff, _iteration, forceUpdate ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
-			for( final Draw draw : draws )
-			{
-				// A draw object does not need the geometry buffer
-				// to be updated if it's just the position, rotation,
-				// or scale that has changed.
-				if( draw.update( mode, _diff, _iteration ) == true )
-				{
-					dirty = true ;
-					stateHasChanged = true ;
-				}
-			}
+			Parallel.forEach( draws, parallelUpdater ) ;
+
+			final boolean stateHasChanged = parallelUpdater.hasStateChanged() ;
+			dirty = parallelUpdater.isDirty() ;
 
 			if( stateHasChanged == true )
 			{

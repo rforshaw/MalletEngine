@@ -11,6 +11,7 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
+import com.linxonline.mallet.ecs.* ;
 
 import com.linxonline.mallet.renderer.IShape.Attribute ;
 
@@ -69,6 +70,24 @@ public final class GameTestLoader implements IGameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
+			private ECSEvent ecsEvents ;
+			private ECSCollision ecsCollision ;
+			private final ECSUpdate<ExComponent, ExData> ecsExample = new ECSUpdate<ExComponent, ExData>( ( final ECSEntity _parent, final ExData _data ) ->
+			{
+				return new ExComponent( _parent, _data ) ;
+			} ) ;
+
+			@Override
+			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
+			{
+				ecsCollision = new ECSCollision( collisionSystem ) ;
+				ecsEvents = new ECSEvent( eventSystem, system.getEventSystem() ) ;
+				_main.add( ecsEvents ) ;
+				_main.add( ecsExample ) ;
+				_main.add( ecsCollision ) ;
+			}
+
+			@Override
 			public void initGame()			// Called when state is started
 			{
 				/*boolean run = true ;
@@ -119,7 +138,8 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				createEntities( 10, 10 ) ;
+				//createEntities( 10, 10 ) ;
+				createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -128,6 +148,66 @@ public final class GameTestLoader implements IGameLoader
 
 				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 				createScript() ;
+			}
+
+			public void createECSEntities( final int _row, final int _column )
+			{
+				final World world = WorldAssist.getDefault() ;
+
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
+				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0 ), new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
+
+				final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
+				final DrawInstancedUpdater updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
+
+				final ECSEntity.ICreate create = ( final ECSEntity _parent, final Object _data ) ->
+				{
+					final Hull[] hulls = new Hull[_row * _column] ;
+					for( int i = 0; i < _row; ++i )
+					{
+						for( int j = 0; j < _column; ++j )
+						{
+							final Vector2 position = new Vector2( i * 60, j * 60 ) ;
+							final Vector2 min = new Vector2() ;
+							final Vector2 max = new Vector2( 64, 64 ) ;
+							final Vector2 offset = new Vector2( -32, -32 ) ;
+
+							final int index = ( i * _column ) + j ;
+							hulls[index] = new Box2D( new AABB( min, max ), position, offset ) ;
+						}
+					}
+
+					final ECSCollision.Component collision = ecsCollision.create( _parent, hulls ) ;
+
+					final ECSEvent.Component messenger = ecsEvents.create( _parent, ECSEvent.Type.ENTITY ) ;
+					final ECSEvent.Component processor = ecsEvents.create( _parent,
+						ECSEvent.Type.ENTITY,
+						EventController.create( "KILL_ENTITY", ( final String _message ) ->
+						{
+							System.out.println( "Received: " + _message ) ;
+							_parent.destroy() ;
+						} ) ) ;
+
+					final ExComponent executor = ecsExample.create( _parent, new ExData( messenger, collision, updater ) ) ;
+
+					return new ECSEntity.Component[]
+					{
+						messenger,
+						processor,
+						executor,
+						collision
+					} ;
+				} ;
+
+				final ECSEntity.IDestroy destroy = ( final ECSEntity.Component[] _components ) ->
+				{
+					ecsEvents.remove( ( ECSEvent.Component )_components[0] ) ;
+					ecsEvents.remove( ( ECSEvent.Component )_components[1] ) ;
+					ecsExample.remove( ( ExComponent )_components[2] ) ;
+				} ;
+
+				final ECSEntity entity = new ECSEntity( create, destroy ) ;
 			}
 
 			public void createScript()
@@ -430,7 +510,7 @@ public final class GameTestLoader implements IGameLoader
 					public void shutdown()
 					{
 						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-						geometry.addDraws( draws ) ;
+						geometry.removeDraws( draws ) ;
 						//debugUpdater.removeDraws( debugDraws ) ;
 					}
 
@@ -689,6 +769,93 @@ public final class GameTestLoader implements IGameLoader
 		public boolean isDead()
 		{
 			return getParent().isDead() ;
+		}
+	}
+
+	public static class ExData
+	{
+		public final ECSEvent.Component messenger ;
+		public final ECSCollision.Component collision ;
+		public final DrawInstancedUpdater updater ;
+
+		public ExData( final ECSEvent.Component _messenger, final ECSCollision.Component _collision, final DrawInstancedUpdater _updater )
+		{
+			messenger = _messenger ;
+			collision = _collision ;
+			updater = _updater ;
+		}
+	}
+
+	public static class ExComponent extends ECSUpdate.Component
+	{
+		private final Vector2 position = new Vector2() ;
+		private final DrawInstancedUpdater updater ;
+		private final ECSEvent.Component messenger ;
+		private final ECSCollision.Component collision ;
+		private final Draw[] draws ;
+
+		private float acc = 0 ;
+
+		public ExComponent( final ECSEntity _parent, final ExData _data )
+		{
+			super( _parent ) ;
+			messenger = _data.messenger ;
+			collision = _data.collision ;
+			updater = _data.updater ;
+
+			final Vector2 offset = new Vector2() ;
+			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+
+			final Hull[] hulls = collision.getHulls() ;
+			draws = new Draw[hulls.length] ;
+			for( int i = 0; i < draws.length; ++i )
+			{
+				final Hull hull = hulls[i] ;
+				hull.getPosition( position ) ;
+				hull.getOffset( offset ) ;
+
+				draws[i] = new Draw() ;
+				draws[i].setPosition( position.x, position.y, 0.0f ) ;
+				draws[i].setOffset( offset.x, offset.y, 0.0f ) ;
+			}
+
+			geometry.addDraws( draws ) ;
+		}
+
+		@Override
+		public void update( final float _dt )
+		{
+			boolean updateDraw = false ;
+
+			final Hull[] hulls = collision.getHulls() ;
+			for( int i = 0; i < draws.length; ++i )
+			{
+				final Hull hull = hulls[i] ;
+				updateDraw = ( hull.contactData.size() > 0 ) ? true : updateDraw ;
+
+				final Draw draw = draws[i] ;
+				hull.getPosition( position ) ;
+				draw.setPosition( position.x, position.y, 0.0f ) ;
+			}
+
+			if( updateDraw == true )
+			{
+				updater.makeDirty() ;
+			}
+
+			/*acc += _dt ;
+			if( acc >= 15.0f )
+			{
+				messenger.passEvent( new Event<String>( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
+			}*/
+		}
+
+		@Override
+		public void shutdown()
+		{
+			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+			geometry.removeDraws( draws ) ;
+			updater.forceUpdate() ;
 		}
 	}
 }

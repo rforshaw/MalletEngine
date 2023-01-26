@@ -3,7 +3,6 @@ package com.linxonline.mallet.physics ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.thread.* ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.physics.hulls.* ;
@@ -17,11 +16,6 @@ public final class CollisionSystem
 	private final QuadTree treeHulls ;
 
 	public CollisionSystem( final IAddEvent _addInterface )
-	{
-		this( _addInterface, null ) ;
-	}
-
-	public CollisionSystem( final IAddEvent _addInterface, final WorkerGroup _workers )
 	{
 		eventController = new EventController( MalletList.toArray(
 			EventController.create( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
@@ -38,7 +32,7 @@ public final class CollisionSystem
 			} )
 		) ) ;
 
-		treeHulls = ( _workers == null ) ? new QuadTree() : new QuadTree( _workers ) ;
+		treeHulls = new QuadTree() ;
 	}
 
 	public EventController getEventController()

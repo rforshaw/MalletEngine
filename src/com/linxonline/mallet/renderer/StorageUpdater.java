@@ -5,6 +5,7 @@ import java.util.ArrayList ;
 import java.lang.ref.WeakReference ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Parallel ;
 
 /**
 	A draw object can be added to multiple different 
@@ -19,6 +20,8 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	private final ArrayList<D> dynamics = new ArrayList<D>() ;
 	private final ArrayList<Storage> buffers = new ArrayList<Storage>() ;
 
+	private final ParallelUpdater<D> parallelUpdater = new ParallelUpdater<D>() ;
+	
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
@@ -99,23 +102,24 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	@Override
 	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
 	{
-		boolean update = false ;
-
-		for( final D dynamic : dynamics )
+		if( forceUpdate == false && dirty == false )
 		{
-			boolean bufferUpdate = false ;
-			if( dynamic.update( mode, _diff, _iteration ) == true )
-			{
-				update = true ;
-			}
+			return ;
 		}
 
-		if( update == true || forceUpdate == true )
+		parallelUpdater.set( mode, _diff, _iteration, forceUpdate ) ;
+
+		dirty = false ;
+		Parallel.forEach( dynamics, parallelUpdater ) ;
+
+		final boolean stateHasChanged = parallelUpdater.hasStateChanged() ;
+		dirty = parallelUpdater.isDirty() ;
+
+		if( stateHasChanged == true )
 		{
 			_updated.addAll( buffers ) ;
 		}
 
 		forceUpdate = false ;
-		dirty = update ;
 	}
 }

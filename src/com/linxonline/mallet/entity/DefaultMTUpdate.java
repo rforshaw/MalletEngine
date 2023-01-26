@@ -2,24 +2,16 @@ package com.linxonline.mallet.entity ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.util.thread.* ;
+import com.linxonline.mallet.util.Parallel ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
-/**
-	Update the entities using worker threads.
-	Break the list into blocks and have the workers
-	process them.
-	NOTE: This is a multi-threaded approach.
-*/
 public class DefaultMTUpdate implements IEntityUpdate
 {
-	private final WorkerGroup workers ;
 	private final EntityWorker entityWorker = new EntityWorker() ;
 
-	public DefaultMTUpdate( final WorkerGroup _workers )
+	public DefaultMTUpdate()
 	{
 		super() ;
-		workers = _workers ; 
 	}
 
 	@Override
@@ -27,10 +19,10 @@ public class DefaultMTUpdate implements IEntityUpdate
 	{
 		entityWorker.setDeltaTime( _dt ) ;
 		entityWorker.setCleanup( _cleanup ) ;
-		workers.exec( _update, entityWorker ) ;				// This will block until all entities have been processed
+		Parallel.forEach( _update, entityWorker ) ;
 	}
 
-	private static class EntityWorker extends Worker<Entity>
+	private static class EntityWorker implements Parallel.IRangeRun<Entity>
 	{
 		private float deltaTime = 0.0f ;
 		private List<Entity> cleanup ;
@@ -48,9 +40,8 @@ public class DefaultMTUpdate implements IEntityUpdate
 		}
 
 		@Override
-		public ExecType exec( final int _index, final Entity _entity )
+		public void run( final int _index, final Entity _entity )
 		{
-			//System.out.println( "Updating: " + _entity.id ) ;
 			_entity.update( deltaTime ) ;
 			if( _entity.isDead() == true )
 			{
@@ -59,8 +50,6 @@ public class DefaultMTUpdate implements IEntityUpdate
 					cleanup.add( _entity ) ;
 				}
 			}
-
-			return ExecType.CONTINUE ;
 		}
 	}
 }

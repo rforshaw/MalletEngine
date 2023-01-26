@@ -36,7 +36,6 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
-import com.linxonline.mallet.util.thread.* ;
 
 import com.linxonline.mallet.script.IScriptEngine ;
 import com.linxonline.mallet.script.Script ;
@@ -84,7 +83,7 @@ public class GameState extends State
 
 	public GameState( final String _name, final UpdateMode _mode )
 	{
-		this( _name, Threaded.MULTI, _mode ) ;
+		this( _name, Threaded.SINGLE, _mode ) ;
 	}
 
 	public GameState( final String _name, final Threaded _type )
@@ -95,23 +94,9 @@ public class GameState extends State
 	public GameState( final String _name, final Threaded _type, final UpdateMode _mode )
 	{
 		super( _name ) ;
-		switch( _type )
-		{
-			default     :
-			case SINGLE :
-			{
-				entitySystem = new EntitySystem( eventSystem ) ;
-				collisionSystem = new CollisionSystem( eventSystem ) ; 
-				break ;
-			}
-			case MULTI  :
-			{
-				final WorkerGroup workers = new WorkerGroup( "SHARED_WORKERS", 4 ) ;
-				entitySystem = new EntitySystem( eventSystem, workers ) ;
-				collisionSystem = new CollisionSystem( eventSystem, workers ) ;
-				break ;
-			}
-		}
+
+		entitySystem = new EntitySystem( eventSystem, _type ) ;
+		collisionSystem = new CollisionSystem( eventSystem ) ; 
 
 		updater = createCoreUpdate( _mode ) ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
@@ -414,19 +399,21 @@ public class GameState extends State
 	{
 		return new IUpdate()
 		{
+			private double accUpdateTime = 0.0 ;
 			private double deltaUpdateTime = 0.0 ;
 			private double deltaRenderTime = 0.0 ;
 
 			@Override
 			public void update( final double _dt )
 			{
-				long startTime = ElapsedTimer.nanoTime() ;
+				boolean updated = false ;
+				
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
-				//System.out.println( "Update Game State: " + updateAccumulator ) ;
-
 				while( updateAccumulator >= DEFAULT_TIMESTEP )
 				{
+					long startTime = ElapsedTimer.nanoTime() ;
+
 					for( IUpdate update : mainUpdaters )
 					{
 						update.update( DEFAULT_TIMESTEP ) ;
@@ -434,31 +421,31 @@ public class GameState extends State
 
 					showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
 					updateAccumulator -= DEFAULT_TIMESTEP ;
+
+					long endTime = ElapsedTimer.nanoTime() ;
+					deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
+					accUpdateTime += deltaUpdateTime ;
 				}
 
-				long endTime = ElapsedTimer.nanoTime() ;
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;
-				deltaUpdateTime += ( endTime - startTime ) * 0.000000001 ;
-
-				//System.out.println( "Acc: " + renderAccumulator + " FPS: " + DEFAULT_FRAMERATE ) ;
 				if( renderAccumulator >= DEFAULT_FRAMERATE )
 				{
-					startTime = ElapsedTimer.nanoTime() ;
+					long startTime = ElapsedTimer.nanoTime() ;
 					for( IUpdate update : drawUpdaters )
 					{
 						update.update( DEFAULT_FRAMERATE ) ;
 					}
 
-					endTime = ElapsedTimer.nanoTime() ;
+					long endTime = ElapsedTimer.nanoTime() ;
 
 					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
 					renderAccumulator = 0.0 ;
 
 					// After rendering see if we have any spare time to sleep.
 					// Let's not waste CPU resources if we can avoid it.
-					final float accumulatedTime = ( float )( deltaUpdateTime + deltaRenderTime ) ;
+					final float accumulatedTime = ( float )( accUpdateTime + deltaRenderTime ) ;
 					// Ensure that the accumulated time for update and drawing is less than
 					// half our draw rate.
 					if( accumulatedTime < ( DEFAULT_FRAMERATE * 0.5f) )
@@ -469,7 +456,7 @@ public class GameState extends State
 						system.sleep( sleep ) ;
 					}
 
-					deltaUpdateTime = 0.0 ;
+					accUpdateTime = 0.0 ;
 				}
 			}
 		} ;
