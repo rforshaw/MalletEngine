@@ -4,6 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
+import com.linxonline.mallet.util.Parallel ;
 
 /**
 	A generalised update component-system, sometimes building your
@@ -24,6 +25,8 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 
 	private final List<T> components = MalletList.<T>newList() ;
 	private final ICreate<T, U> create ;
+
+	private final ComponentUpdater updater = new ComponentUpdater() ;
 
 	public ECSUpdate( final ICreate<T, U> _create )
 	{
@@ -62,11 +65,9 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 	public void update( final double _dt )
 	{
 		updateExecutions() ;
-		final float dt = ( float )_dt ;
-		for( final T component : components )
-		{
-			component.update( dt ) ;
-		}
+
+		updater.setDeltaTime( ( float )_dt ) ;
+		Parallel.forEach( components, updater ) ;
 	}
 
 	private void invokeLater( final Runnable _run )
@@ -108,5 +109,23 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 
 		public abstract void update( final float _dt ) ;
 		public abstract void shutdown() ;
+	}
+
+	private class ComponentUpdater implements Parallel.IRangeRun<T>
+	{
+		private float delta = 0.0f ;
+
+		public ComponentUpdater() {}
+
+		public void setDeltaTime( final float _dt )
+		{
+			delta = _dt ;
+		}
+
+		@Override
+		public void run( final int _index, final T _component )
+		{
+			_component.update( delta ) ;
+		}
 	}
 }

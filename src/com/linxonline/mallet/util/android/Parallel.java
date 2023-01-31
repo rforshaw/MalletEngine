@@ -5,7 +5,10 @@ import java.util.concurrent.* ;
 
 public final class Parallel
 {
+	private final static int MINIMUM_DATA_SIZE = 250 ;
+
 	private final static LinkedBlockingQueue<IJob> jobs = new LinkedBlockingQueue<IJob>() ;
+	private volatile static int workerCount = 0 ;
 	static
 	{
 		createWorkers( 6 ) ;
@@ -20,12 +23,17 @@ public final class Parallel
 
 	public static <T> void forEach( final T[] _array, final IRangeRun<T> ... _run )
 	{
-		final int numJobs = calculateJobsRequired( _run.length ) ;
+		forEach( _array, 0, _array.length, _run ) ;
+	}
+
+	public static <T> void forEach( final T[] _array, final int _start, final int _end, final IRangeRun<T> ... _run )
+	{
+		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
 
 		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
 
-		final int size = _array.length / numJobs ;
-		int start = 0 ;
+		final int size = ( _end - _start ) / numJobs ;
+		int start = _start ;
 		int end = size ;
 
 		for( int i = 0; i < numJobs; ++i )
@@ -33,7 +41,7 @@ public final class Parallel
 			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
 			if( i == ( numJobs - 1 ) )
 			{
-				end = _array.length ;
+				end = _end ;
 			}
 
 			jobs.add( new ArrayJob( latch, start, end, _array, _run[runIndex] ) ) ;
@@ -53,12 +61,17 @@ public final class Parallel
 
 	public static <T> void forEach( final List<T> _list, final IRangeRun<T> ... _run )
 	{
-		final int numJobs = calculateJobsRequired( _run.length ) ;
+		forEach( _list, 0, _list.size(), _run ) ;
+	}
+
+	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final IRangeRun<T> ... _run )
+	{
+		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
 
 		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
 
-		final int size = _list.size() / numJobs ;
-		int start = 0 ;
+		final int size = ( _end - _start ) / numJobs ;
+		int start = _start ;
 		int end = size ;
 
 		for( int i = 0; i < numJobs; ++i )
@@ -66,7 +79,7 @@ public final class Parallel
 			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
 			if( i == ( numJobs - 1 ) )
 			{
-				end = _list.size() ;
+				end = _end ;
 			}
 
 			jobs.add( new ListJob( latch, start, end, _list, _run[runIndex] ) ) ;
@@ -84,22 +97,60 @@ public final class Parallel
 		}
 	}
 
-	private static int calculateJobsRequired( final int _size )
+	/**
+		Attempt to figure out how many jobs we need to process the data.
+		This is mostly used to identify the minimum number required.
+		If the data set is not large enough to be shared we don't
+		want to run 4 empty jobs, we want to run 1 'full' job.
+	*/
+	private static int calculateJobsRequired( final int _runSize, final int _dataSize )
 	{
-		return 4 ;
+		int jobs = 4 ;			// We assume 4 jobs will be used by default
+		if( _runSize > 1 )
+		{
+			// More than 1 runner means we
+			// limit ourselves to that many jobs.
+			jobs = _runSize ;
+
+			if( _runSize > workerCount )
+			{
+				// If the number if workers is less than
+				// the number of runners then let's create
+				// more workers.
+				// Add an extra worker just to ensure there
+				// is a worker spare.
+				createWorkers( _runSize - workerCount + 1 ) ;
+			}
+		}
+
+		final int size = _dataSize / jobs ;
+		if( size == 0 || size < MINIMUM_DATA_SIZE )
+		{
+			// If the number of items being processed is 0
+			// then it's likely to be a rounding error.
+			// We likely only need 1 job to process.
+
+			// If there isn't enough data to warrant multiple jobs
+			// then we should also avoid creating more jobs 
+			// than needed.
+			jobs = 1 ;
+		}
+
+		//System.out.println( "Jobs: " + jobs ) ;
+		return jobs ;
 	}
 
 	private static void createWorkers( final int _num )
 	{
 		for( int i = 0; i < _num; ++i )
 		{
-			createWorker() ;
+			createWorker( i ) ;
 		}
 	}
 
-	private static void createWorker()
+	private static void createWorker( final int _num )
 	{
-		final Thread thread = new Thread( new Worker(), "PARALLEL_THREAD" ) ;
+		final Thread thread = new Thread( new Worker(), String.format( "PARALLEL_THREAD_%d", _num ) ) ;
 		thread.start() ;
 	}
 
@@ -237,6 +288,8 @@ public final class Parallel
 		@Override
 		public void run()
 		{
+			++workerCount ;
+
 			while( true )
 			{
 				try
@@ -255,6 +308,8 @@ public final class Parallel
 					ex.printStackTrace() ;
 				}
 			}
+
+			--workerCount ;
 		}
 	}
 }

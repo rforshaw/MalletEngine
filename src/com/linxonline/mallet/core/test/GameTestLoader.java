@@ -181,13 +181,10 @@ public final class GameTestLoader implements IGameLoader
 					final ECSCollision.Component collision = ecsCollision.create( _parent, hulls ) ;
 
 					final ECSEvent.Component messenger = ecsEvents.create( _parent, ECSEvent.Type.ENTITY ) ;
-					final ECSEvent.Component processor = ecsEvents.create( _parent,
-						ECSEvent.Type.ENTITY,
-						EventController.create( "KILL_ENTITY", ( final String _message ) ->
-						{
-							System.out.println( "Received: " + _message ) ;
-							_parent.destroy() ;
-						} ) ) ;
+					final ECSEvent.Component processor = ecsEvents.create( _parent, ECSEvent.Type.ENTITY, EventController.create( "KILL_ENTITY", ( final String _message ) ->
+					{
+						_parent.destroy() ;
+					} ) ) ;
 
 					final ExComponent executor = ecsExample.create( _parent, new ExData( messenger, collision, updater ) ) ;
 
@@ -613,7 +610,7 @@ public final class GameTestLoader implements IGameLoader
 							Tuple.<String, Attribute>build( "", Attribute.FLOAT ),
 							Tuple.<String, Attribute>build( "TEXCOORD_0", Attribute.VEC2 )
 						) ) ;
-						System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
+						//System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
 						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
 
 						draw = new Draw() ;

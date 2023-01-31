@@ -37,6 +37,15 @@ public final class ECSEntity
 		destroy.destroy( components ) ;
 	}
 
+	/**
+		Return true if the entity has been destroyed.
+		Return false if destroy() has yet to be called.
+	*/
+	public boolean isDead()
+	{
+		return dead ;
+	}
+
 	public final <T extends Component> T getComponentByType( final Class<T> _clazz )
 	{
 		for( final Component component : components )

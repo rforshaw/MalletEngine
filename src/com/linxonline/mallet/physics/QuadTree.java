@@ -34,27 +34,6 @@ public final class QuadTree
 		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100 ) ;
 	}
 
-	/*public QuadTree( final float _x,
-					 final float _y,
-					 final float _size,
-					 final float _nodeAreaLimit,
-					 final int _nodeCapacity )
-	{
-		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
-		NODE_AREA_LIMIT = _nodeAreaLimit ;
-
-		ROOT_LENGTH = root.length ;
-		MAX_HULLS = _nodeCapacity ;
-
-		update = new IUpdate()
-		{
-			public void update( final float _dt )
-			{
-				root.update( _dt ) ;
-			}
-		} ;
-	}*/
-
 	public QuadTree( final float _x,
 					 final float _y,
 					 final float _size,
@@ -72,7 +51,7 @@ public final class QuadTree
 			// Used when multi-threading
 			private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
 			private final NodeWorker nodeWorker = new NodeWorker() ;
-		
+
 			public void update( final float _dt )
 			{
 				root.getChildNodes( nodes ) ;

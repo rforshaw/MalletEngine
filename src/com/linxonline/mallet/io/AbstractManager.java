@@ -90,6 +90,39 @@ public abstract class AbstractManager<K, T extends Resource> implements ILoader<
 	}
 
 	/**
+		Return all key set within the manager.
+		A key can have a resource that is still null
+		and is currently in the process of being loaded.
+	*/
+	public Set<K> getAllKeys( final Set<K> _fill )
+	{
+		final Set<K> available = resources.keySet() ;
+		for( final K key : available )
+		{
+			_fill.add( key ) ;
+		}
+		return _fill ;
+	}
+
+	/**
+		Return all keys that have a resource assigned to it.
+		Not all keys within the manager have a resource set,
+		it's likely the resource is in the process of being loaded.
+	*/
+	public Set<K> getLoadedKeys( final Set<K> _fill )
+	{
+		final Set<K> available = resources.keySet() ;
+		for( final K key : available )
+		{
+			if( isKeyNull( key ) == false )
+			{
+				_fill.add( key ) ;
+			}
+		}
+		return _fill ;
+	}
+
+	/**
 		Removes resources that are not used.
 		_activeKeys are resources considered as currently 
 		in use.

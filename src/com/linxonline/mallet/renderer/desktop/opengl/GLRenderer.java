@@ -168,6 +168,18 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				return textures.texturesLoaded() ;
 			}
+
+			@Override
+			public Set<String> getLoadedTextures( final Set _fill )
+			{
+				return textures.getLoadedKeys( _fill ) ;
+			}
+
+			@Override
+			public Set<String> getAllTextures( final Set _fill )
+			{
+				return textures.getAllKeys( _fill ) ;
+			}
 		} ;
 	}
 

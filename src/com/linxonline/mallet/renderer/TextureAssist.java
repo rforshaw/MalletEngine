@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import java.util.Set ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 
 /**
@@ -42,6 +44,24 @@ public final class TextureAssist
 		return assist.texturesLoaded() ;
 	}
 
+	/**
+		Return a list of texture paths that have been loaded.
+		Note: This does not include textures currently in
+		the process of being loaded. 
+	*/
+	public static Set<String> getLoadedTextures( final Set<String> _fill )
+	{
+		return assist.getLoadedTextures( _fill ) ;
+	}
+
+	/**
+		Return all texture paths loaded and in the process of being loaded.
+	*/
+	public static Set<String> getAllTextures( final Set<String> _fill )
+	{
+		return assist.getAllTextures( _fill ) ;
+	}
+
 	public static interface Assist
 	{
 		public MalletTexture.Meta createMeta( final String _path ) ;
@@ -49,5 +69,8 @@ public final class TextureAssist
 		public Vector2 getMaximumTextureSize() ;
 
 		public boolean texturesLoaded() ;
+
+		public Set<String> getLoadedTextures( final Set<String> _fill ) ;
+		public Set<String> getAllTextures( final Set<String> _fill ) ;
 	}
 }

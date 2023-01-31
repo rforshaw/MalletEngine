@@ -13,6 +13,8 @@ import com.linxonline.mallet.util.Parallel ;
 
 public final class ECSCollision implements IECS<ECSCollision.Component>
 {
+	private final static int PARALLEL_HULL_MIN = 250 ;
+
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final CollisionSystem system ;
@@ -24,14 +26,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		new ComponentUpdater(),
 		new ComponentUpdater(),
 		new ComponentUpdater()
-	} ;
-
-	private final HullUpdater[] hullUpdaters = new HullUpdater[]
-	{
-		new HullUpdater(),
-		new HullUpdater(),
-		new HullUpdater(),
-		new HullUpdater()
 	} ;
 
 	public ECSCollision( final CollisionSystem _system )
@@ -116,15 +110,34 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		runnables.clear() ;
 	}
 
+	private static void updateCollision( final Hull _hull, final ContactPoint _point, final Vector2 _penShift )
+	{
+		_penShift.setXY( 0.0f, 0.0f ) ;
+		Hull.calculatePenetrationDepth( _hull.contactData, _point, _penShift ) ;
+		_hull.addToPosition( _penShift.x, _penShift.y ) ;
+	}
+
 	public class Component extends ECSEntity.Component
 	{
 		private final Hull[] hulls ;
 		private boolean applyContact = true ;
 
+		private final HullUpdater[] hullUpdaters ;
+
 		public Component( final ECSEntity _parent, final Hull[] _hulls )
 		{
 			_parent.super() ;
 			hulls = _hulls ;
+
+			// We only want to use the parallel path if there
+			// is enough hulls to warrant it.
+			hullUpdaters = ( hulls.length <= PARALLEL_HULL_MIN ) ? null : new HullUpdater[]
+			{
+				new HullUpdater(),
+				new HullUpdater(),
+				new HullUpdater(),
+				new HullUpdater()
+			} ;
 		}
 
 		/**
@@ -141,28 +154,40 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		{
 			return hulls ;
 		}
-
-		public void update()
-		{
-			if( applyContact == false )
-			{
-				return ;
-			}
-
-			// Shift the hulls position by the penetration depth.
-			Parallel.forEach( hulls, hullUpdaters ) ;
-		}
 	}
 
 	private static class ComponentUpdater implements Parallel.IRangeRun<Component>
 	{
+		private final ContactPoint point = new ContactPoint() ;
+		private final Vector2 penShift = new Vector2() ;
+
 		@Override
 		public void run( final int _index, final Component _component )
 		{
-			_component.update() ;
+			if( _component.applyContact == false )
+			{
+				return ;
+			}
+
+			// If there is enough hulls to warrant updating across
+			// multiple threads.
+			final Hull[] hulls = _component.hulls ;
+			final HullUpdater[] updaters = _component.hullUpdaters ;
+			if( updaters != null )
+			{
+				// Shift the hulls position by the penetration depth.
+				Parallel.forEach( hulls, updaters ) ;
+				return ;
+			}
+
+			// If not fallback to processing on the main thread.
+			for( final Hull hull : hulls )
+			{
+				updateCollision( hull, point, penShift ) ;
+			}
 		}
 	}
-	
+
 	private static class HullUpdater implements Parallel.IRangeRun<Hull>
 	{
 		private final ContactPoint point = new ContactPoint() ;
@@ -171,9 +196,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		@Override
 		public void run( final int _index, final Hull _hull )
 		{
-			penShift.setXY( 0.0f, 0.0f ) ;
-			Hull.calculatePenetrationDepth( _hull.contactData, point, penShift ) ;
-			_hull.addToPosition( penShift.x, penShift.y ) ;
+			ECSCollision.updateCollision( _hull, point, penShift ) ;
 		}
 	}
 }
