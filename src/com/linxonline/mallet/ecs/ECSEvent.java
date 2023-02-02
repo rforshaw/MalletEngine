@@ -78,13 +78,17 @@ public final class ECSEvent implements IECS<ECSEvent.Component>
 	{
 		updateExecutions() ;
 
-		for( final IEventSystem sys : entities )
+		int size = entities.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final IEventSystem sys = entities.get( i ) ;
 			sys.sendEvents() ;
 		}
 
-		for( final Component component : components )
+		size = components.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Component component = components.get( i ) ;
 			component.update() ;
 		}
 	}

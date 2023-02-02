@@ -124,8 +124,10 @@ public final class EventSystem implements IEventSystem
 			return ;
 		}
 
-		for( final Event<?> event : toSend )
+		final int size = toSend.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Event<?> event = toSend.get( i ) ;
 			final EventQueue que = getQueueByEvent( event ) ;
 			que.addEvent( event ) ;
 		}

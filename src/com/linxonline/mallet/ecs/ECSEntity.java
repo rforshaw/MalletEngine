@@ -48,8 +48,10 @@ public final class ECSEntity
 
 	public final <T extends Component> T getComponentByType( final Class<T> _clazz )
 	{
-		for( final Component component : components )
+		final int size = components.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Component component = components[i] ;
 			if( _clazz.isInstance( component ) == true )
 			{
 				return _clazz.cast( component ) ;

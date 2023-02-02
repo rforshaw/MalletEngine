@@ -26,8 +26,10 @@ public class AnimationSystem
 	public void update( final float _dt )
 	{
 		updateExecutions() ;
-		for( final IAnimation animation : animations )
+		final int size = animations.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final IAnimation animation = animations.get( i ) ;
 			animation.update( _dt ) ;
 		}
 	}

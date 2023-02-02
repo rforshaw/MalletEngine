@@ -50,8 +50,10 @@ public class GameSystem implements IGameSystem
 		while( running == true )
 		{
 			final double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-			for( final IUpdate update : updates )
+			final int size = updates.size() ;
+			for( int i = 0; i < size; ++i )
 			{
+				final IUpdate update = updates.get( i ) ;
 				update.update( dt ) ;
 			}
 		}
