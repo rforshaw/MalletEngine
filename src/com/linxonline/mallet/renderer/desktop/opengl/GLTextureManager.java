@@ -64,11 +64,13 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 		{
 			private final TaskQueue task = new TaskQueue( 2, "TEXTURE_LOADER" ) ; 
 
+			@Override
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return GlobalFileSystem.isExtension( _file, ".jpg", ".JPG", ".JPEG", ".jpeg", ".png", ".PNG" ) ;
 			}
 
+			@Override
 			public GLImage load( final String _file )
 			{
 				task.add( new TextureRunner( _file ) ) ;

@@ -29,6 +29,15 @@ public final class Parallel
 	public static <T> void forEach( final T[] _array, final int _start, final int _end, final IRangeRun<T> ... _run )
 	{
 		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
+		if( numJobs <= 1 )
+		{
+			// No point creating a job if only 1 job is being used.
+			for( int i = _start; i < _end; ++i )
+			{
+				_run[0].run( i, _array[i] ) ;
+			}
+			return ;
+		}
 
 		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
 
@@ -67,6 +76,15 @@ public final class Parallel
 	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final IRangeRun<T> ... _run )
 	{
 		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
+		if( numJobs <= 1 )
+		{
+			// No point creating a job if only 1 job is being used.
+			for( int i = _start; i < _end; ++i )
+			{
+				_run[0].run( i, _list.get( i ) ) ;
+			}
+			return ;
+		}
 
 		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
 
@@ -199,7 +217,6 @@ public final class Parallel
 		{
 			for( int i = start; i < end; ++i )
 			{
-				//System.out.println( "start: " + start + " End: " + end + " I: " + i ) ;
 				runner.run( i, array[i] ) ;
 			}
 		}
@@ -240,7 +257,6 @@ public final class Parallel
 		{
 			for( int i = start; i < end; ++i )
 			{
-				//System.out.println( "start: " + start + " End: " + end + " I: " + i ) ;
 				runner.run( i, list.get( i ) ) ;
 			}
 		}

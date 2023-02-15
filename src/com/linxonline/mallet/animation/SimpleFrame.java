@@ -99,18 +99,13 @@ public final class SimpleFrame implements Animation.Frame
 		private final Vector2 min = new Vector2() ;
 		private final Vector2 max = new Vector2() ;
 
-		/**
-			The program passed in is considered to be owned
-			by the listener, and will be removed when the listener 
-			is removed from the animation-system.
-		*/
 		public Listener( final World _world,
 						 final Program _program,
 						 final Draw _draw,
 						 final int _order )
 		{
 			world = _world ;
-			program = ProgramAssist.add( _program ) ;
+			program = _program ;
 			draw = _draw ;
 			order = _order ;
 		}
@@ -121,7 +116,6 @@ public final class SimpleFrame implements Animation.Frame
 		@Override
 		public void shutdown()
 		{
-			ProgramAssist.remove( program ) ;
 			if( updater != null )
 			{
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;

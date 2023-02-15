@@ -95,7 +95,7 @@ public class WebGameSystem implements IGameSystem
 		state.setDefaultState( _name ) ;
 	}
 
-	public final static class StateUpdater implements IUpdate
+	private final static class StateUpdater implements IUpdate
 	{
 		private final StateMachine machine = new StateMachine() ;
 

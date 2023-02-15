@@ -613,8 +613,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		}
 
 		int totalBufferUpdates = 0 ;
-		totalBufferUpdates += updateStorageBuffers( difference, frameNo ) ;
-		totalBufferUpdates += updateBuffers( difference, frameNo ) ;
+		final int storageBuffers = updateStorageBuffers( difference, frameNo ) ;
+		//System.out.println( "Storage Buffers: " + storageBuffers ) ;
+		final int buffers = updateBuffers( difference, frameNo ) ;
+		//System.out.println( "Buffers: " + buffers ) ;
+
+		totalBufferUpdates += storageBuffers ;
+		totalBufferUpdates += buffers ;
 
 		updateExecutions() ;
 		getEventController().update() ;

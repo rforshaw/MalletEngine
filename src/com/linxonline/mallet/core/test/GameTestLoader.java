@@ -318,7 +318,7 @@ public final class GameTestLoader implements IGameLoader
 			public void renderAnimationExample()
 			{
 				final World world = WorldAssist.getDefault() ;
-				final Program program = new Program( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 				final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
 				final Draw draw = new Draw( 0, 0, 0, -32, -32, 0 ) ;
@@ -349,6 +349,7 @@ public final class GameTestLoader implements IGameLoader
 					@Override
 					public void readyToDestroy( final Entity.ReadyCallback _callback )
 					{
+						ProgramAssist.remove( program ) ; 
 						AnimationAssist.remove( booklet ) ;
 						super.readyToDestroy( _callback ) ;
 					}
@@ -549,26 +550,19 @@ public final class GameTestLoader implements IGameLoader
 			{
 				final World world = WorldAssist.getDefault() ;
 
-				final Program program = new Program( "SIMPLE_TEXTURE" ) ;
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 				final Shape plane = Shape.constructPlane( new Vector3( 32, 32, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
 				final Draw draw = new Draw( 0, 0, 0, -16, -16, 0 ) ;
 				draw.setShape( plane ) ;
 
-				final Entity entity = new Entity( 2 ) ;
+				final Entity entity = new Entity( 1 ) ;
 
 				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
 				AnimationAssist.add( booklet ) ;
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() ) ) ;
 				booklet.play( "DEFAULT" ) ;
-
-				final CollisionComponent collision = CollisionComponent.generateBox2D( entity,
-																					   new Vector2(),
-																					   new Vector2( 32, 32 ),
-																					   new Vector2( 0, 0 ),
-																					   new Vector2( -16, -16 ) ) ;
-				//collision.hull.setPhysical( false ) ;
 
 				new MouseComponent( entity )
 				{
@@ -582,6 +576,7 @@ public final class GameTestLoader implements IGameLoader
 					public void readyToDestroy( final Entity.ReadyCallback _callback )
 					{
 						AnimationAssist.remove( booklet ) ;
+						ProgramAssist.remove( program ) ;
 						super.readyToDestroy( _callback ) ;
 					}
 				} ;

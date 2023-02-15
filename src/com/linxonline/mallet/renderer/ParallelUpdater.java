@@ -8,22 +8,15 @@ public final class ParallelUpdater<T extends IUpdate> implements Parallel.IRange
 	private int diff ;
 	private int iteration ;
 
-	private boolean stateHasChanged = false ;
 	private boolean dirty = false ;
 
-	public void set( final Interpolation _mode, final int _diff, final int _iteration, final boolean _state )
+	public void set( final Interpolation _mode, final int _diff, final int _iteration )
 	{
 		mode = _mode ;
 		diff = _diff ;
 		iteration = _iteration ;
 
-		stateHasChanged = _state ;
 		dirty = false ;
-	}
-
-	public boolean hasStateChanged()
-	{
-		return stateHasChanged ;
 	}
 
 	public boolean isDirty()
@@ -40,7 +33,6 @@ public final class ParallelUpdater<T extends IUpdate> implements Parallel.IRange
 		if( _t.update( mode, diff, iteration ) == true )
 		{
 			dirty = true ;
-			stateHasChanged = true ;
 		}
 	}
 }

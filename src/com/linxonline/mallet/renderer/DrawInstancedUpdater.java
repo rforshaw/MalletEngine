@@ -88,15 +88,14 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 		for( int i = 0; i < size; ++i )
 		{
 			final GeometryBuffer buffer = buffers.get( i ) ;
-			parallelUpdater.set( mode, _diff, _iteration, forceUpdate ) ;
+			parallelUpdater.set( mode, _diff, _iteration ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forEach( draws, parallelUpdater ) ;
 
-			final boolean stateHasChanged = parallelUpdater.hasStateChanged() ;
 			dirty = parallelUpdater.isDirty() ;
 
-			if( stateHasChanged == true )
+			if( forceUpdate == true )
 			{
 				// The Geometry Buffer will need to be updated if a 
 				// draw object state has changed, or if it's been forced.

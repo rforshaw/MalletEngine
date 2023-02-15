@@ -186,7 +186,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		// from the draw objects.
 		transformations.clear() ;
 		transformations.add( _buffer.getBuffers() ) ;
-		glTransStorage.update( transStorage ) ;
 
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
@@ -213,6 +212,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		{
 			System.out.println( "Failed to load uniforms." ) ;
 		}
+
+		glTransStorage.update( transStorage ) ;
 
 		{
 			boolean foundInstanceBuffer = false ;

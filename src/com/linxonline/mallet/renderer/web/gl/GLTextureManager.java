@@ -68,7 +68,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		{
 			public boolean isLoadable( final String _file )
 			{
-				return true ;
+				return GlobalFileSystem.isExtension( _file, ".jpg", ".JPG", ".JPEG", ".jpeg", ".png", ".PNG" ) ;
 			}
 
 			public GLImage load( final String _file )

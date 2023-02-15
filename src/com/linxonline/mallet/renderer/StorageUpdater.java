@@ -107,19 +107,17 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 			return ;
 		}
 
-		parallelUpdater.set( mode, _diff, _iteration, forceUpdate ) ;
+		parallelUpdater.set( mode, _diff, _iteration ) ;
 
-		dirty = false ;
 		Parallel.forEach( dynamics, parallelUpdater ) ;
+		final boolean update = parallelUpdater.isDirty() ;
+		dirty = update ;
 
-		final boolean stateHasChanged = parallelUpdater.hasStateChanged() ;
-		dirty = parallelUpdater.isDirty() ;
-
-		if( stateHasChanged == true )
+		if( forceUpdate == true || update == true )
 		{
 			_updated.addAll( buffers ) ;
 		}
 
-		forceUpdate = false ;
+		forceUpdate = update ;
 	}
 }
