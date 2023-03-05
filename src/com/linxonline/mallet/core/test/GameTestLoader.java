@@ -26,8 +26,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.hulls.Hull ;
-import com.linxonline.mallet.physics.hulls.Box2D ;
-import com.linxonline.mallet.physics.primitives.AABB ;
+import com.linxonline.mallet.physics.CollisionAssist ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
@@ -80,7 +79,7 @@ public final class GameTestLoader implements IGameLoader
 			@Override
 			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
 			{
-				ecsCollision = new ECSCollision( collisionSystem ) ;
+				ecsCollision = new ECSCollision() ;
 				ecsEvents = new ECSEvent( eventSystem, system.getEventSystem() ) ;
 				_main.add( ecsEvents ) ;
 				_main.add( ecsExample ) ;
@@ -132,6 +131,8 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
+				createPlaneTest() ;
+				
 				createUI() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
@@ -148,6 +149,14 @@ public final class GameTestLoader implements IGameLoader
 
 				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
 				createScript() ;
+			}
+
+			private void createPlaneTest()
+			{
+				final Plane plane = new Plane( new Vector3( 100, 0, 10 ),
+											   new Vector3( 100, 100, 10 ),
+											   new Vector3( 0, 0, 10 ) ) ;
+				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 150, 150, 100 ) ).toString() ) ;
 			}
 
 			public void createECSEntities( final int _row, final int _column )
@@ -168,13 +177,12 @@ public final class GameTestLoader implements IGameLoader
 					{
 						for( int j = 0; j < _column; ++j )
 						{
-							final Vector2 position = new Vector2( i * 60, j * 60 ) ;
-							final Vector2 min = new Vector2() ;
-							final Vector2 max = new Vector2( 64, 64 ) ;
-							final Vector2 offset = new Vector2( -32, -32 ) ;
+							final Hull hull = CollisionAssist.createBox2D( new AABB( 0, 0, 64, 64 ), null ) ;
+							hull.setPosition( i * 60, j * 60  ) ;
+							hull.setOffset( -32, -32 ) ;
 
 							final int index = ( i * _column ) + j ;
-							hulls[index] = new Box2D( new AABB( min, max ), position, offset ) ;
+							hulls[index] = hull ;
 						}
 					}
 

@@ -19,7 +19,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	the specified address and port passed into init().
 	
 */
-public class UDPClient implements AutoCloseable
+public class UDPClient implements AutoCloseable, IClient
 {
 	private DatagramChannel channel ;
 	private SocketAddress target ;
@@ -58,6 +58,7 @@ public class UDPClient implements AutoCloseable
 		}
 	}
 
+	@Override
 	public boolean send( final IOutStream _out )
 	{
 		try
@@ -81,6 +82,7 @@ public class UDPClient implements AutoCloseable
 		}
 	}
 
+	@Override
 	public InStream receive( final InStream _stream  )
 	{
 		try

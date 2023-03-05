@@ -23,7 +23,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	It can then send a response to the sender using the 
 	address and port provided by the sender.
 */
-public class UDPServer implements AutoCloseable
+public class UDPServer implements AutoCloseable, IServer
 {
 	private final Map<Address, InetSocketAddress> addresses = MalletMap.<Address, InetSocketAddress>newMap() ;
 
@@ -60,6 +60,7 @@ public class UDPServer implements AutoCloseable
 		}
 	}
 
+	@Override
 	public boolean send( final Address _address, final IOutStream _out )
 	{
 		try
@@ -83,6 +84,7 @@ public class UDPServer implements AutoCloseable
 		}
 	}
 
+	@Override
 	public InStream receive( final InStream _stream )
 	{
 		try

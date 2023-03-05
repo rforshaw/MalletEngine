@@ -1,7 +1,5 @@
-package com.linxonline.mallet.physics.primitives ;
+package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class OBB

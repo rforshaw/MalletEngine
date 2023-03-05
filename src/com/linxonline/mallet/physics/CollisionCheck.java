@@ -2,11 +2,8 @@ package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
-import com.linxonline.mallet.physics.primitives.AABB ;
-import com.linxonline.mallet.physics.primitives.OBB ;
 
 import com.linxonline.mallet.physics.hulls.Box2D ;
 import com.linxonline.mallet.physics.hulls.Hull ;

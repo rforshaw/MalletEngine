@@ -22,6 +22,7 @@ import com.linxonline.mallet.event.IEventController ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.CollisionSystem ;
+import com.linxonline.mallet.physics.CollisionAssist ;
 
 import com.linxonline.mallet.animation.AnimationSystem ;
 import com.linxonline.mallet.animation.AnimationAssist ;
@@ -122,6 +123,8 @@ public class GameState extends State
 	{
 		AudioAssist.setAssist( audioSystem.createAudioAssist() ) ;
 		AnimationAssist.setAssist( animationSystem.createAnimationAssist() ) ;
+		CollisionAssist.setAssist( collisionSystem.createCollisionAssist() ) ;
+
 		hookHandlerSystems() ;
 
 		if( paused == true )
@@ -170,7 +173,7 @@ public class GameState extends State
 	@Override
 	public Settings pauseState()
 	{
-		unhookHandlerSystems() ;				// Prevent system from recieving external events
+		unhookHandlerSystems() ;				// Prevent system from receiving external events
 		unhookGameStateEventController() ;
 		audioSystem.pauseSystem() ;
 
@@ -356,7 +359,8 @@ public class GameState extends State
 	{
 		mainUpdaters.add( ( final double _dt ) ->
 		{
-			system.update( DEFAULT_TIMESTEP ) ;			// Update low-level systems
+			final float dt = ( float )_dt ;
+			system.update( dt ) ;			// Update low-level systems
 			inputUISystem.update() ;
 			inputWorldSystem.update() ;
 
@@ -364,11 +368,11 @@ public class GameState extends State
 			internalController.update() ;
 			externalController.update() ;
 
-			engine.update( DEFAULT_TIMESTEP ) ;
+			engine.update( dt ) ;
 
-			collisionSystem.update( DEFAULT_TIMESTEP ) ;
-			entitySystem.update( DEFAULT_TIMESTEP ) ;
-			audioSystem.update( DEFAULT_TIMESTEP ) ;
+			collisionSystem.update( dt ) ;
+			entitySystem.update( dt ) ;
+			audioSystem.update( dt ) ;
 		} ) ;
 
 		drawUpdaters.add( ( final double _dt ) ->
@@ -377,8 +381,9 @@ public class GameState extends State
 			inputUISystem.update() ;
 			inputWorldSystem.update() ;
 
-			animationSystem.update( DEFAULT_FRAMERATE ) ;
-			system.draw( DEFAULT_FRAMERATE ) ;
+			final float dt = ( float )_dt ;
+			animationSystem.update( dt ) ;
+			system.draw( dt ) ;
 		} ) ;
 
 		switch( _mode )
@@ -407,7 +412,7 @@ public class GameState extends State
 			public void update( final double _dt )
 			{
 				boolean updated = false ;
-				
+
 				// Update Default : 15Hz
 				updateAccumulator += _dt ;
 				while( updateAccumulator >= DEFAULT_TIMESTEP )
@@ -426,7 +431,6 @@ public class GameState extends State
 					deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
 					accUpdateTime += deltaUpdateTime ;
 				}
-
 
 				// Render Default : 60Hz
 				renderAccumulator += _dt ;

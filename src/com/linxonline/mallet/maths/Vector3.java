@@ -207,9 +207,29 @@ public final class Vector3 implements IUniform
 	*/
 	public static final Vector3 cross( final Vector3 _vec1, final Vector3 _vec2 )
 	{
-		return new Vector3( ( _vec1.y * _vec2.z ) - ( _vec1.z * _vec2.y ),
-							( _vec1.z * _vec2.x ) - ( _vec1.x * _vec2.z ),
-							( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ) ;
+		return cross( _vec1, _vec2, new Vector3() ) ;
+	}
+
+	public static final Vector3 cross( final Vector3 _vec1, final Vector3 _vec2, final Vector3 _fill )
+	{
+		_fill.x =  ( _vec1.y * _vec2.z ) - ( _vec1.z * _vec2.y ) ;
+		_fill.y =  ( _vec1.z * _vec2.x ) - ( _vec1.x * _vec2.z ) ;
+		_fill.z =  ( _vec1.x * _vec2.y ) - ( _vec1.y * _vec2.x ) ;
+		return _fill ;
+	}
+
+	/**
+		Use this cross-product if you want to avoid creating temporary objects.
+		This can be particularly useful with a process that's called thousands
+		of times within a second.
+	*/
+	public static final Vector3 cross( final float _1x, final float _1y, final float _1z,
+									   final float _2x, final float _2y, final float _2z, final Vector3 _fill )
+	{
+		_fill.x =  ( _1y * _2z ) - ( _1z * _2y ) ;
+		_fill.y =  ( _1z * _2x ) - ( _1x * _2z ) ;
+		_fill.z =  ( _1x * _2y ) - ( _1y * _2x ) ;
+		return _fill ;
 	}
 
 	/**

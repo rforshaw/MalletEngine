@@ -6,15 +6,19 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.AABB ;
+
 import com.linxonline.mallet.physics.hulls.Hull ;
-import com.linxonline.mallet.physics.primitives.AABB ;
 
 public final class QuadTree
 {
+	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
+
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
 
 	private float ROOT_LENGTH ;
+	//private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
 
 	private final IUpdate update ;
 
@@ -49,17 +53,18 @@ public final class QuadTree
 		update = new IUpdate()
 		{
 			// Used when multi-threading
-			private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
+			private final List<QuadNode> children = MalletList.<QuadNode>newList() ;
 			private final NodeWorker nodeWorker = new NodeWorker() ;
 
+			@Override
 			public void update( final float _dt )
 			{
-				root.getChildNodes( nodes ) ;
-				if( nodes.isEmpty() == false )
+				root.getChildNodes( children ) ;
+				if( children.isEmpty() == false )
 				{
 					nodeWorker.setDeltaTime( _dt ) ;
-					Parallel.forEach( nodes, nodeWorker ) ;
-					nodes.clear() ;
+					Parallel.forEach( children, nodeWorker ) ;
+					children.clear() ;
 				}
 			}
 		} ;
@@ -101,7 +106,6 @@ public final class QuadTree
 
 	public void update( final float _dt )
 	{
-		//System.out.println( "Start" ) ;
 		update.update( _dt ) ;
 	}
 
@@ -109,6 +113,13 @@ public final class QuadTree
 	{
 		root.clear() ;
 	}
+
+	/*private int registerNode( final QuadNode _node )
+	{
+		final int index = nodes.size() ;
+		nodes.add( _node ) ;
+		return index ;
+	}*/
 
 	protected final class QuadNode
 	{
@@ -127,12 +138,15 @@ public final class QuadTree
 		private boolean parent = false ;
 		private int nextHull = 0 ;
 
+		//private final int index ;
 		private final Vector2 absolute = new Vector2() ;		// Used by insertToQuadrant() - Android optimisation
 
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
 			centre.setXY( _x, _y ) ;
 			length = _length ;
+
+			//index = QuadTree.this.registerNode( this ) ;
 
 			if( _quadrant == Quadrant.ROOT )
 			{
@@ -235,13 +249,6 @@ public final class QuadTree
 					// the node can contain.
 					expandHullCapacity() ;
 					return insertHull( _hull ) ;
-				}
-
-				for( int i = 0; i < nextHull; i++ )
-				{
-					// Move the existing hulls to its children.
-					insertToQuadrant( hulls[i] ) ;
-					hulls[i] = null ;
 				}
 
 				return true ;
@@ -618,15 +625,21 @@ public final class QuadTree
 				return false ;
 			}
 
-			parent = true ;
-			nextHull = 0 ;
-			check = null ;
-			hulls = new Hull[0] ;
-
 			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, _offset, Quadrant.TOP_LEFT ) ;
 			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
 			bottomLeft = new QuadNode( centre.x - _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
 			bottomRight = new QuadNode( centre.x + _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
+
+			for( int i = 0; i < nextHull; i++ )
+			{
+				// Move the existing hulls to its children.
+				insertToQuadrant( hulls[i] ) ;
+			}
+
+			parent = true ;
+			nextHull = 0 ;
+			check = null ;
+			hulls = EMPTY_HULLS ;
 
 			return true ;
 		}

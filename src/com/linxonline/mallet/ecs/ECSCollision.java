@@ -3,7 +3,6 @@ package com.linxonline.mallet.ecs ;
 import java.util.List ;
 
 import com.linxonline.mallet.physics.* ;
-import com.linxonline.mallet.physics.primitives.* ;
 import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -17,7 +16,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
-	private final CollisionSystem system ;
 	private final List<Component> components = MalletList.<Component>newList() ;
 
 	private final ComponentUpdater[] componentUpdaters = new ComponentUpdater[]
@@ -28,25 +26,12 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		new ComponentUpdater()
 	} ;
 
-	public ECSCollision( final CollisionSystem _system )
-	{
-		system = _system ;
-	}
+	public ECSCollision() {}
 
 	@Override
 	public Component create( final ECSEntity _parent )
 	{
 		return create( _parent, new Hull[0] ) ;
-	}
-
-	public Component create( final ECSEntity _parent,
-							 final Vector2 _min,
-							 final Vector2 _max,
-							 final Vector2 _position,
-							 final Vector2 _offset )
-	{
-		final Box2D box = new Box2D( new AABB( _min, _max ), _position, _offset ) ;
-		return create( _parent, new Hull[] { box } ) ;
 	}
 
 	public Component create( final ECSEntity _parent, final Hull[] _hulls )
@@ -55,10 +40,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		invokeLater( () ->
 		{
 			components.add( component ) ;
-			for( final Hull hull : component.getHulls() )
-			{
-				system.add( hull ) ;
-			}
 		} ) ;
 		return component ;
 	}
@@ -72,7 +53,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 			{
 				for( final Hull hull : _component.getHulls() )
 				{
-					system.remove( hull ) ;
+					CollisionAssist.remove( hull ) ;
 				}
 			}
 		} ) ;

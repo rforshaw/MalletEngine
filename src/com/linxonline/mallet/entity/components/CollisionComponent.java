@@ -7,10 +7,10 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.Event ;
 
+import com.linxonline.mallet.physics.CollisionAssist ;
 import com.linxonline.mallet.physics.CollisionCallback ;
 import com.linxonline.mallet.physics.ContactPoint ;
 
-import com.linxonline.mallet.physics.primitives.* ;
 import com.linxonline.mallet.physics.hulls.* ;
 
 public class CollisionComponent extends Component
@@ -50,21 +50,10 @@ public class CollisionComponent extends Component
 	}
 
 	@Override
-	public void passInitialEvents( final List<Event<?>> _events )
+	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
-		for( final Hull hull : hulls )
-		{
-			_events.add( new Event<Hull>( "ADD_COLLISION_HULL", hull ) ) ;
-		}
-	}
-
-	@Override
-	public void passFinalEvents( final List<Event<?>> _events )
-	{
-		for( final Hull hull : hulls )
-		{
-			_events.add( new Event<Hull>( "REMOVE_COLLISION_HULL", hull ) ) ;
-		}
+		CollisionAssist.remove( hulls ) ;
+		super.readyToDestroy( _callback ) ;
 	}
 
 	@Override
@@ -103,10 +92,14 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final CollisionComponent comp = new CollisionComponent( _parent, new Box2D( new AABB( _min, _max ), _position, _offset ) ) ;
+		final Box2D hull = CollisionAssist.createBox2D( new AABB( _min, _max ), null ) ;
+		hull.setPosition( _position.x, _position.y ) ;
+		hull.setOffset( _offset.x, _offset.y ) ;
+
+		final CollisionComponent comp = new CollisionComponent( _parent, hull ) ;
 		return comp ;
 	}
-	
+
 	public static CollisionComponent generateBox2D( final Entity _parent,
 													final Entity.AllowEvents _allow,
 													final Vector2 _min,
@@ -114,7 +107,11 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final CollisionComponent comp = new CollisionComponent( _parent, _allow, new Box2D( new AABB( _min, _max ), _position, _offset ) ) ;
+		final Box2D hull = CollisionAssist.createBox2D( new AABB( _min, _max ), null ) ;
+		hull.setPosition( _position.x, _position.y ) ;
+		hull.setOffset( _offset.x, _offset.y ) ;
+
+		final CollisionComponent comp = new CollisionComponent( _parent, _allow, hull ) ;
 		return comp ;
 	}
 }

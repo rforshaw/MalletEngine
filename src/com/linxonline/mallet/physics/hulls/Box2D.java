@@ -1,13 +1,9 @@
 package com.linxonline.mallet.physics.hulls ;
 
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-import com.linxonline.mallet.physics.hulls.Hull ;
 import com.linxonline.mallet.physics.Group ;
-import com.linxonline.mallet.physics.primitives.AABB ;
-import com.linxonline.mallet.physics.primitives.OBB ;
 
 public class Box2D extends Hull
 {
@@ -47,9 +43,14 @@ public class Box2D extends Hull
 		obb = new OBB( aabb ) ;
 	}
 
-	public Box2D( final OBB _obb )
+	public Box2D( final AABB _aabb, int[] _collidables )
 	{
-		this( _obb, null ) ;
+		super( 0.0f, 0.0f,
+			   0.0f, 0.0f,
+			   0.0f,
+			   _collidables ) ;
+		aabb = _aabb ;
+		obb = new OBB( aabb ) ;
 	}
 	
 	public Box2D( final OBB _obb, int[] _collidables )

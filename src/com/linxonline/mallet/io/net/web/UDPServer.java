@@ -13,13 +13,8 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	It can then send a response to the sender using the 
 	address and port provided by the sender.
 */
-public class UDPServer implements AutoCloseable
+public class UDPServer implements AutoCloseable, IServer
 {
-	private byte[] sendBuffers = new byte[200] ;
-	private final Address sourceAddress = new Address() ;
-
-	private final Serialise.ByteOut out = new Serialise.ByteOut( null ) ;
-	
 	public UDPServer() {}
 
 	public boolean init( final Address _address, final int _timeout )
@@ -35,11 +30,13 @@ public class UDPServer implements AutoCloseable
 		}
 	}
 
+	@Override
 	public boolean send( final Address _address, final IOutStream _out )
 	{
 		return true ;
 	}
 
+	@Override
 	public InStream receive( final InStream _stream )
 	{
 		return _stream ;

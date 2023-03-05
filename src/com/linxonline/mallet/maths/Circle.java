@@ -1,6 +1,4 @@
-package com.linxonline.mallet.physics.primitives ;
-
-import com.linxonline.mallet.maths.Vector2 ;
+package com.linxonline.mallet.maths ;
 
 public final class Circle
 {

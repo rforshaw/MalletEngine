@@ -9,10 +9,8 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 	the specified address and port passed into init().
 	
 */
-public class UDPClient implements AutoCloseable
+public class UDPClient implements AutoCloseable, IClient
 {
-	private final Serialise.ByteOut out = new Serialise.ByteOut( null ) ;
-
 	public UDPClient() {}
 
 	public boolean init( final Address _target, final int _timeout )
@@ -28,11 +26,13 @@ public class UDPClient implements AutoCloseable
 		}
 	}
 
+	@Override
 	public boolean send( final IOutStream _out )
 	{
 		return true ;
 	}
 
+	@Override
 	public InStream receive( final InStream _stream  )
 	{
 		return _stream ;

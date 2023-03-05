@@ -1,12 +1,9 @@
 package com.linxonline.mallet.physics.hulls ;
 
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.physics.* ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
-import com.linxonline.mallet.physics.* ;
-import com.linxonline.mallet.physics.primitives.AABB ;
 
 public abstract class Hull
 {
