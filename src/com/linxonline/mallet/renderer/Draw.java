@@ -173,7 +173,7 @@ public final class Draw implements IUpdate
 		It's likely that the majority of Draw objects will 
 		contain only one shape.
 	*/
-	public IShape setShape( final Shape _shape )
+	public IShape setShape( final IShape _shape )
 	{
 		shapes[0] = _shape ;
 		return _shape ;

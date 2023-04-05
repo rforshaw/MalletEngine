@@ -132,15 +132,15 @@ public final class GameTestLoader implements IGameLoader
 				client.close() ;*/
 
 				createPlaneTest() ;
-				
-				createUI() ;
+
+				//createUI() ;
 				renderTextureExample() ;
-				renderAnimationExample() ;
-				renderTextExample() ;
+				//renderAnimationExample() ;
+				//renderTextExample() ;
 				//playAudioExample() ;
 
 				//createEntities( 10, 10 ) ;
-				createECSEntities( 10, 10 ) ;
+				//createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -305,7 +305,43 @@ public final class GameTestLoader implements IGameLoader
 					final int width = 64 ;
 					final int height = 64 ;
 
-					final Shape plane = Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+					final IShape.Attribute[] attributes = new IShape.Attribute[3] ;
+					attributes[0] = IShape.Attribute.VEC3 ;
+					attributes[1] = IShape.Attribute.FLOAT ;
+					attributes[2] = IShape.Attribute.VEC2 ;
+
+					final Vector3 position = new Vector3() ;
+					final MalletColour white = MalletColour.white() ;
+					final Vector2 uv = new Vector2() ;
+					final Object[] vertex = new Object[] { position, white, uv } ; 
+
+					final HEShape plane = new HEShape( IShape.Style.FILL, attributes ) ;
+					final HEShape.Vertex v0 = plane.addVertex( vertex ) ;
+
+					position.setXYZ( width, height, 0.0f ) ;
+					uv.setXY( 1.0f, 1.0f ) ;
+					final HEShape.Vertex v1 = plane.addVertex( vertex ) ;
+
+					position.setXYZ( 0.0f, height, 0.0f ) ;
+					uv.setXY( 0.0f, 1.0f ) ;
+					final HEShape.Vertex v2 = plane.addVertex( vertex ) ;
+
+					position.setXYZ( width, 0.0f, 0.0f ) ;
+					uv.setXY( 1.0f, 0.0f ) ;
+					final HEShape.Vertex v3 = plane.addVertex( vertex ) ;
+
+					final HEShape.Edge e1 = plane.addEdge( v0, v2 ) ;
+					final HEShape.Edge e2 = plane.addEdge( v2, v1 ) ;
+					final HEShape.Edge e3 = plane.addEdge( v1, v0 ) ;
+
+					final HEShape.Edge e4 = e3.getPair() ;
+					final HEShape.Edge e5 = plane.addEdge( v1, v3 ) ;
+					final HEShape.Edge e6 = plane.addEdge( v3, v0 ) ;
+
+					final HEShape.Face f1 = plane.connect( null, e1, e2, e3 ) ;
+					final HEShape.Face f2 = plane.connect( null, e4, e5, e6 ) ;
+
+					//final Shape plane = Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
 
 					final Draw draw = new Draw() ;
 					draw.setPosition( 415.0f, 385.0f, 0.0f ) ;
