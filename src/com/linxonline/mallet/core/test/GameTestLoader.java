@@ -315,33 +315,31 @@ public final class GameTestLoader implements IGameLoader
 					final Vector2 uv = new Vector2() ;
 					final Object[] vertex = new Object[] { position, white, uv } ; 
 
-					final HEShape plane = new HEShape( IShape.Style.FILL, attributes ) ;
+					final HEShape plane = new HEShape( attributes ) ;
 					final HEShape.Vertex v0 = plane.addVertex( vertex ) ;
-
-					position.setXYZ( width, height, 0.0f ) ;
-					uv.setXY( 1.0f, 1.0f ) ;
-					final HEShape.Vertex v1 = plane.addVertex( vertex ) ;
 
 					position.setXYZ( 0.0f, height, 0.0f ) ;
 					uv.setXY( 0.0f, 1.0f ) ;
-					final HEShape.Vertex v2 = plane.addVertex( vertex ) ;
+					final HEShape.Vertex v1 = plane.addVertex( vertex ) ;
 
-					position.setXYZ( width, 0.0f, 0.0f ) ;
-					uv.setXY( 1.0f, 0.0f ) ;
-					final HEShape.Vertex v3 = plane.addVertex( vertex ) ;
+					final HEShape.Edge e0 = plane.addEdge( v0, v1 ) ;
 
-					final HEShape.Edge e1 = plane.addEdge( v0, v2 ) ;
-					final HEShape.Edge e2 = plane.addEdge( v2, v1 ) ;
-					final HEShape.Edge e3 = plane.addEdge( v1, v0 ) ;
+					final HEShape.Edge e1 = e0.extrude() ;
+					e1.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
+					e1.translateVector2( 2, 1.0f, 0.0f ) ;
 
-					final HEShape.Edge e4 = e3.getPair() ;
-					final HEShape.Edge e5 = plane.addEdge( v1, v3 ) ;
-					final HEShape.Edge e6 = plane.addEdge( v3, v0 ) ;
+					final HEShape.Edge e2 = e1.getPair().extrude() ;
+					e2.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
+					e2.translateVector2( 2, 1.0f, 0.0f ) ;
 
-					final HEShape.Face f1 = plane.connect( null, e1, e2, e3 ) ;
-					final HEShape.Face f2 = plane.connect( null, e4, e5, e6 ) ;
+					final HEShape.Edge e3 = e2.getPair().extrude() ;
+					e3.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
+					e3.translateVector2( 2, 1.0f, 0.0f ) ;
 
-					//final Shape plane = Shape.constructPlane( new Vector3( width, height, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+					final HEShape.Edge e4 = e3.split( 0.5f ) ;
+					final HEShape.Edge e5 = e4.getPair().extrude() ;
+					e5.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
+					e5.translateVector2( 2, 1.0f, 0.0f ) ;
 
 					final Draw draw = new Draw() ;
 					draw.setPosition( 415.0f, 385.0f, 0.0f ) ;
@@ -353,6 +351,12 @@ public final class GameTestLoader implements IGameLoader
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
 					geometry.addDraws( draw ) ;
+
+					final HEShape.Edge closestEdge = plane.getClosestEdge( 512.0f, 33.0f, 0.0f ) ;
+					System.out.println( "Found Closest Edge: " + closestEdge.getOrigin().getVector3( 0, new Vector3() ) ) ;
+
+					final HEShape.Vertex closestVertex = plane.getClosestVertex( 512.0f, 33.0f, 0.0f ) ;
+					System.out.println( "Found Closest Vertex: " + closestVertex.getVector3( 0, new Vector3() ) ) ;
 				}
 			}
 
