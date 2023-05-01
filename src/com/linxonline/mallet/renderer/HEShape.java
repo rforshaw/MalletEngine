@@ -94,7 +94,9 @@ public class HEShape implements IShape
 		{
 			final Edge edge = _shape.edges.get( i ) ;
 			final Edge copy = edges.get( i ) ;
+
 			copy.next = getMatchingEdge( _shape.edges, edge.next ) ;
+			copy.pair.next = getMatchingEdge( _shape.edges, edge.pair.next ) ;
 		}
 
 		// We now move onto making the faces.
@@ -151,19 +153,15 @@ public class HEShape implements IShape
 	
 	public Vertex addVertex( final Object[] _data )
 	{
-		final Vertex vertex = new Vertex( vertexFloatSize, attributes, _data ) ;
-		vertex.setIndex( vertices.size() ) ;
-
-		vertices.add( vertex ) ;
-
-		makeDirty() ;
-		return vertex ;
+		return addVertex( new Vertex( vertexFloatSize, attributes, _data ) ) ;
 	}
 
 	private Vertex addVertex( final Vertex _vert )
 	{
 		_vert.setIndex( vertices.size() ) ;
 		vertices.add( _vert ) ;
+
+		makeDirty() ;
 		return _vert ;
 	}
 
