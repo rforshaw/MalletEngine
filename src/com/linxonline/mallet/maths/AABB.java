@@ -112,6 +112,12 @@ public final class AABB
 		return _to ;
 	}
 
+	public void addTo( final float _x, final float _y )
+	{
+		// Add x and y to min and max with one call.
+		FloatBuffer.add( range, AABB.MIN_X, _x, _y, _x, _y ) ;
+	}
+
 	/**
 		Determine if the point defined is located within the AABB.
 	*/

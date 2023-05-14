@@ -119,8 +119,7 @@ public class Box2D extends Hull
 		final float x = position[POSITION_X] + position[OFFSET_X] ;
 		final float y = position[POSITION_Y] + position[OFFSET_Y] ;
 
-		_fill.addToMin( x, y ) ;
-		_fill.addToMax( x, y ) ;
+		_fill.addTo( x, y ) ;
 
 		return _fill ;
 	}

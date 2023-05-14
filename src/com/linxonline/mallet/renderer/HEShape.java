@@ -27,6 +27,7 @@ public class HEShape implements IShape
 
 	private boolean dirtyIndices = true ;
 	private boolean dirtyGeometry = true ;
+
 	private int[] indices = null ;
 	private float[] geometry = null ;
 
@@ -160,8 +161,6 @@ public class HEShape implements IShape
 	{
 		_vert.setIndex( vertices.size() ) ;
 		vertices.add( _vert ) ;
-
-		makeDirty() ;
 		return _vert ;
 	}
 
@@ -191,7 +190,6 @@ public class HEShape implements IShape
 		edge1.pair = edge2 ;
 		edge2.pair = edge1 ;
 
-		makeDirty() ;
 		return edge1 ;
 	}
 
@@ -438,6 +436,7 @@ public class HEShape implements IShape
 			}
 		}
 
+		dirtyIndices = false ;
 		indices = new int[offset] ;
 		System.arraycopy( temp, 0, indices, 0, offset ) ;
 		return indices ;
@@ -446,13 +445,16 @@ public class HEShape implements IShape
 	@Override
 	public float[] getRawVertices()
 	{
-		if( dirtyGeometry == false )
+		// Caching the geometry creates problems
+		// when copying, not sure what the problem is.
+		/*if( dirtyGeometry == false )
 		{
 			return geometry ;
-		}
+		}*/
 
 		final int size = vertices.size() ;
-		geometry = new float[size * vertexFloatSize] ;
+		final int totalSize = size * vertexFloatSize ; 
+		geometry = ( geometry != null && geometry.length == totalSize) ? geometry : new float[totalSize] ;
 
 		int offset = 0 ;
 		for( final Vertex vert : vertices )
@@ -462,6 +464,7 @@ public class HEShape implements IShape
 			offset += vertexFloatSize ;
 		}
 
+		dirtyGeometry = false ;
 		return geometry ;
 	}
 
@@ -631,12 +634,13 @@ public class HEShape implements IShape
 
 			index = -1 ;
 			edge = null ;
+			makeDirty() ;
 		}
 
 		private void setIndex( final int _index )
 		{
 			index = _index ;
-			makeIndicesDirty() ;
+			makeDirty() ;
 		}
 
 		public int getIndex()
@@ -714,8 +718,6 @@ public class HEShape implements IShape
 			final Edge e2 = addEdge( v2, v3 ) ;
 
 			final Face f1 = connect( null, e0, e1, e2, e3 ) ;
-
-			makeDirty() ;
 			return e2 ;
 		}
 
@@ -741,6 +743,7 @@ public class HEShape implements IShape
 			edge.pair.next = pair ;
 			pair.origin = middle ;
 
+			makeDirty() ;
 			return edge ;
 		}
 
@@ -843,6 +846,7 @@ public class HEShape implements IShape
 				temp.next = null ;
 			}
 			while( edge != start ) ;
+			makeDirty() ;
 		}
 		
 		public Edge getStart()

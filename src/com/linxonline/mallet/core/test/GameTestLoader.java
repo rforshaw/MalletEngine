@@ -133,14 +133,14 @@ public final class GameTestLoader implements IGameLoader
 
 				createPlaneTest() ;
 
-				//createUI() ;
+				createUI() ;
 				renderTextureExample() ;
-				//renderAnimationExample() ;
-				//renderTextExample() ;
+				renderAnimationExample() ;
+				renderTextExample() ;
 				//playAudioExample() ;
 
 				//createEntities( 10, 10 ) ;
-				//createECSEntities( 10, 10 ) ;
+				createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
