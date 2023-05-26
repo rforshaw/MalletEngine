@@ -10,7 +10,7 @@ function create() {
 			// logger can be usd to print messages to the terminal.
 			// Hooks into MalletEngine Logger implementation.
 			logger.println( "Finding CountComponents: ", logger.NORMAL ) ;
-			
+
 			// Passed in entities can be interrogated for components that
 			// can be called within the script.
 			// Only components flagged to be accessed by the scripting system

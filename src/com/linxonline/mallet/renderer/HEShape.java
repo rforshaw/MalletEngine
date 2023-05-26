@@ -363,10 +363,10 @@ public class HEShape implements IShape
 	@Override
 	public int[] getRawIndices()
 	{
-		if( dirtyIndices == false )
+		/*if( dirtyIndices == false )
 		{
 			return indices ;
-		}
+		}*/
 
 		int[] temp = new int[faces.size() * 4] ;
 		int offset = 0 ;

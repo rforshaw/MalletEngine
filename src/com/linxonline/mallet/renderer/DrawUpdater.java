@@ -58,6 +58,11 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		return dirty || forceUpdate ;
 	}
 
+	public void setOccluder( final IOcclude _occluder )
+	{
+		drawBuffer.setOccluder( _occluder ) ;
+	}
+
 	public void addBuffers( final GeometryBuffer ... _buffers )
 	{
 		makeDirty() ;

@@ -7,12 +7,23 @@ import com.linxonline.mallet.util.MalletList ;
 
 public class DrawBuffer extends ABuffer
 {
+	public static final IOcclude OCCLUDER_FALLBACK = new IOcclude()
+	{
+		@Override
+		public boolean occlude( final Draw _draw )
+		{
+			return false ;
+		}
+	} ;
+
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 	private final Program program ;
 	private final Shape.Attribute[] swivel ;
 	private final Shape.Style style ;
 	private final boolean ui ;
 	private final int order ;
+
+	private IOcclude occluder = OCCLUDER_FALLBACK ;
 
 	public DrawBuffer( final Program _program,
 					   final Shape.Attribute[] _swivel,
@@ -25,6 +36,16 @@ public class DrawBuffer extends ABuffer
 		style = _style ;
 		ui = _ui ;
 		order = _order ;
+	}
+
+	/**
+		Allow the developer to specify their own occluder mechanisim.
+		Before the buffer is drawn determine whether the specific
+		draw object should actually be rendered.
+	*/
+	public void setOccluder( final IOcclude _occluder )
+	{
+		occluder = ( _occluder != null ) ? _occluder : OCCLUDER_FALLBACK ;
 	}
 
 	public void addBuffers( final GeometryBuffer ... _buffers )
@@ -145,6 +166,11 @@ public class DrawBuffer extends ABuffer
 		}
 
 		return true ;
+	}
+
+	public IOcclude getOccluder()
+	{
+		return occluder ;
 	}
 
 	@Override

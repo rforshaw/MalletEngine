@@ -9,6 +9,7 @@ import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.IOcclude ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 
@@ -23,6 +24,7 @@ public final class GLDrawBuffer extends GLBuffer
 	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
+	private IOcclude occluder = DrawBuffer.OCCLUDER_FALLBACK ;
 	private boolean stable = false ;
 
 	public GLDrawBuffer( final DrawBuffer _buffer )
@@ -74,6 +76,8 @@ public final class GLDrawBuffer extends GLBuffer
 			}
 		}
 
+		occluder = _buffer.getOccluder() ;
+
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
@@ -104,7 +108,7 @@ public final class GLDrawBuffer extends GLBuffer
 
 		for( GLGeometryBuffer buffer : buffers )
 		{
-			buffer.draw( attributes, glProgram ) ;
+			buffer.draw( attributes, glProgram, occluder ) ;
 		}
 	}
 

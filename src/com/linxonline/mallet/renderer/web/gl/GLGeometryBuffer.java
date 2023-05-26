@@ -16,6 +16,7 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.IOcclude ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -56,7 +57,6 @@ public final class GLGeometryBuffer extends GLBuffer
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3() ;
 
-	private GeometryBuffer.IOcclude occluder = GeometryBuffer.OCCLUDER_FALLBACK ;
 	private boolean stable = false ;
 
 	public GLGeometryBuffer( final GeometryBuffer _buffer )
@@ -181,15 +181,13 @@ public final class GLGeometryBuffer extends GLBuffer
 
 		upload( bufferIndex ) ;
 
-		occluder = _buffer.getOccluder() ;
-
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
 		stable = true ;
 		return stable ;
 	}
 
-	public void draw( final VertexAttrib[] _attributes, final GLProgram _program )
+	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final IOcclude _occluder )
 	{
 		if( stable == false )
 		{
@@ -219,7 +217,7 @@ public final class GLGeometryBuffer extends GLBuffer
 			{
 				final IndexMap map = indexMaps[j] ;
 				final Draw draw = map.draw ;
-				if( draw.isHidden() || occluder.occlude( draw ) )
+				if( draw.isHidden() || _occluder.occlude( draw ) )
 				{
 					continue ;
 				}
