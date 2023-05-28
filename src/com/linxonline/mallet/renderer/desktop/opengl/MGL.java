@@ -62,10 +62,21 @@ public final class MGL
 	public final static int GL_UNSIGNED_BYTE = GL3.GL_UNSIGNED_BYTE ;
 	public final static int GL_UNSIGNED_INT = GL3.GL_UNSIGNED_INT ;
 
+	public final static int GL_NEVER = GL3.GL_NEVER ;
+	public final static int GL_LESS = GL3.GL_LESS ;
+	public final static int GL_GREATER = GL3.GL_GREATER ;
+	public final static int GL_LEQUAL = GL3.GL_LEQUAL ;
+	public final static int GL_GEQUAL = GL3.GL_GEQUAL ;
 	public final static int GL_ALWAYS = GL3.GL_ALWAYS ;
 	public final static int GL_KEEP = GL3.GL_KEEP ;
 	public final static int GL_REPLACE = GL3.GL_REPLACE ;
 	public final static int GL_EQUAL = GL3.GL_EQUAL ;
+	public final static int GL_NOTEQUAL = GL3.GL_NOTEQUAL ;
+
+	public final static int GL_ZERO = GL3.GL_ZERO ;
+	public final static int GL_DECR = GL3.GL_DECR ;
+	public final static int GL_INCR = GL3.GL_INCR ;
+	public final static int GL_INVERT = GL3.GL_INVERT ;
 
 	public final static int GL_BLEND = GL3.GL_BLEND ;
 	public final static int GL_SRC_ALPHA = GL3.GL_SRC_ALPHA ;

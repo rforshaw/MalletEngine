@@ -15,7 +15,6 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public final class GLDrawBuffer extends GLBuffer
 {
-	private int order ;
 	private VertexAttrib[] attributes = null ;
 
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;

@@ -5,11 +5,9 @@ import java.util.List ;
 import com.linxonline.mallet.util.Parallel ;
 
 /**
-	Update the Draw object state stored within the GeometryBuffers
-	attached to a particular DrawBuffer.
-
-	NOTE: Don't use this DrawUpdater if you share GeometryBuffers and 
-	Draw objects within multiple DrawBuffers, updating will be incorrect.
+	DrawUpdater is designed to interpolate the position, scale,
+	and rotation of Draw objects during draw calls to ensure
+	smooth motion.
 */
 public class DrawUpdater implements IUpdater<GeometryBuffer>
 {
@@ -33,10 +31,8 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 	}
 
 	/**
-		Force all GeometryBuffers assigned to this updater
-		to be re/uploaded to the GPU.
-		This should only be called if the Draw objects shapes
-		have changed. 
+		Convience function to reupload all associated GeometryBuffers.
+		NOTE: This does not reupload the DrawBuffer.
 	*/
 	public void forceUpdate()
 	{
@@ -135,7 +131,7 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forEach( draws, parallelUpdater ) ;
 
-			dirty = parallelUpdater.isDirty() ;
+			dirty |= parallelUpdater.isDirty() ;
 
 			if( forceUpdate == true )
 			{
