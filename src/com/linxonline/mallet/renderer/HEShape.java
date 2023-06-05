@@ -940,9 +940,37 @@ public class HEShape implements IShape
 			return closestEdge ;
 		}
 
+		public Vector3 calculateNormal( final Vector3 _fill )
+		{
+			_fill.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+
+			final Vector3 normal = new Vector3() ;
+			final Vector3 a = new Vector3() ;
+			final Vector3 b = new Vector3() ;
+
+			Edge edge = start ;
+			do
+			{
+				final Vertex start = edge.getOrigin() ;
+				final Vertex end = edge.getDestination() ;
+
+				start.getVector3( positionIndex, a ) ;
+				end.getVector3( positionIndex, b ) ;
+
+				Vector3.cross( a, b, normal ) ;
+				_fill.add( normal ) ;
+
+				edge = edge.next ;
+			}
+			while( edge != start ) ;
+
+			return _fill ;
+		}
+
 		private int[] triangulate()
 		{
 			final List<Vertex> vertices = getOrderedVertices( MalletList.<Vertex>newList() ) ;
+			final Vector3 faceNormal = calculateNormal( new Vector3() ) ;
 
 			final int numTriangles = vertices.size() - 2 ;
 			final int[] indices = new int[numTriangles * 3] ;
@@ -952,7 +980,7 @@ public class HEShape implements IShape
 
 			do
 			{
-				if( populateTriangle( vertices, ear ) == null )
+				if( populateTriangle( faceNormal, vertices, ear ) == null )
 				{
 					// We failed to find a triangle!
 					break ;
@@ -969,7 +997,7 @@ public class HEShape implements IShape
 			return indices ;
 		}
 
-		private Triangle populateTriangle( final List<Vertex> _verts, final Triangle _triangle )
+		private Triangle populateTriangle( final Vector3 _faceNormal, final List<Vertex> _verts, final Triangle _triangle )
 		{
 			final int size = _verts.size() ;
 
@@ -990,8 +1018,13 @@ public class HEShape implements IShape
 					return _triangle ;
 				}
 
-				// We should check the angle of the triangle
-				
+				// Determine if the triangle is convex and adheres
+				// to the expected winding-order (should be CCW).
+				if( _triangle.isConvex( _faceNormal ) == false )
+				{
+					continue ;
+				}
+
 				for( int j = 0; j < size; ++j )
 				{
 					if( j == prevIndex || j == i || j == nextIndex )
@@ -1031,6 +1064,7 @@ public class HEShape implements IShape
 		private final Vector3 a = new Vector3() ;
 		private final Vector3 b = new Vector3() ;
 		private final Vector3 c = new Vector3() ;
+
 		private final Vector3 p = new Vector3() ;
 
 		private Vertex prev ;
@@ -1050,28 +1084,51 @@ public class HEShape implements IShape
 			earTip = _tip ;
 		}
 
+		public boolean isConvex( final Vector3 _normal )
+		{
+			prev.getVector3( positionIndex, a ) ;
+			current.getVector3( positionIndex, b ) ;
+			next.getVector3( positionIndex, c ) ;
+
+			a.subtract( b ) ;
+			c.subtract( b ) ;
+
+			Vector3.cross( c, a, p ) ;
+			//System.out.println( "T: " + p.toString() + " F: " + _normal.toString() ) ;
+
+			return ( signum( p.x ) == signum( _normal.x ) &&
+					 signum( p.y ) == signum( _normal.y ) &&
+					 signum( p.z ) == signum( _normal.z ) ) ;
+		}
+
+		private int signum( final float _val )
+		{
+			return ( int )Math.signum( _val ) ;
+		}
+
 		public boolean isWithin( final Vertex _vertex )
 		{
 			prev.getVector3( positionIndex, a ) ;
 			current.getVector3( positionIndex, b ) ;
 			next.getVector3( positionIndex, c ) ;
+
 			_vertex.getVector3( positionIndex, p ) ;
 
 			a.subtract( p ) ;
 			b.subtract( p ) ;
 			c.subtract( p ) ;
 
-			float ab = Vector3.dot( a, b ) ;
-			float ac = Vector3.dot( a, c ) ;
-			float bc = Vector3.dot( b, c ) ;
-			float cc = Vector3.dot( c, c ) ;
+			final float ab = Vector3.dot( a, b ) ;
+			final float ac = Vector3.dot( a, c ) ;
+			final float bc = Vector3.dot( b, c ) ;
+			final float cc = Vector3.dot( c, c ) ;
 
 			if( bc * ac - cc * ab < 0.0f )
 			{
 				return false ;
 			}
 
-			float bb = Vector3.dot( b, b ) ;
+			final float bb = Vector3.dot( b, b ) ;
 			if( ab * bc - ac * bb < 0.0f )
 			{
 				return false ;

@@ -36,6 +36,8 @@ public final class GLRenderer extends BasicRenderer
 	public final static int ORTHOGRAPHIC_MODE = 1 ;
 	public final static int PERSPECTIVE_MODE  = 2 ;
 
+	private final static int UPDATE_OPERATION = 0 ;		// Used with an invokeLater() call.
+
 	private final ProgramManager<GLProgram> programs = new ProgramManager<GLProgram>( new ProgramManager.JSONBuilder()
 	{
 		@Override
@@ -269,7 +271,7 @@ public final class GLRenderer extends BasicRenderer
 			@Override
 			public <T extends ABuffer> T update( final T _buffer )
 			{
-				GLRenderer.this.invokeLater( () ->
+				GLRenderer.this.invokeLater( _buffer, UPDATE_OPERATION, () ->
 				{
 					final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
 					if( buff != null )
@@ -396,7 +398,7 @@ public final class GLRenderer extends BasicRenderer
 			@Override
 			public World update( final World _world )
 			{
-				GLRenderer.this.invokeLater( () ->
+				GLRenderer.this.invokeLater( _world, UPDATE_OPERATION, () ->
 				{
 					final GLWorld world = get( _world ) ;
 					if( world != null )
@@ -450,7 +452,7 @@ public final class GLRenderer extends BasicRenderer
 			@Override
 			public Camera update( final Camera _camera ) 
 			{
-				GLRenderer.this.invokeLater( () ->
+				GLRenderer.this.invokeLater( _camera, UPDATE_OPERATION, () ->
 				{
 					final GLCamera camera = get( _camera ) ;
 					if( camera != null )
@@ -507,7 +509,7 @@ public final class GLRenderer extends BasicRenderer
 			@Override
 			public Storage update( final Storage _storage )
 			{
-				GLRenderer.this.invokeLater( () ->
+				GLRenderer.this.invokeLater( _storage, UPDATE_OPERATION, () ->
 				{
 					final GLStorage storage = get( _storage ) ;
 					if( storage != null )

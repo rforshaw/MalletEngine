@@ -59,9 +59,19 @@ public final class BufferedList<T>
 		tasks.add( new RemoveTask( _data ) ) ;
 	}
 
+	public synchronized void removeAll( final T _data )
+	{
+		tasks.add( new RemoveAllTask( _data ) ) ;
+	}
+
 	public synchronized void insert( final T _data, final int _index )
 	{
 		tasks.add( new InsertTask( _data, _index ) ) ;
+	}
+
+	public synchronized boolean contains( final T _data )
+	{
+		return tasks.contains( _data ) ;
 	}
 
 	public List<T> getCurrentData()
@@ -103,18 +113,35 @@ public final class BufferedList<T>
 		tasks.clear() ;
 	}
 
-	private interface Task
+	private abstract class Task
 	{
-		public void execute() ;
-	}
+		protected final T data ;
 
-	private class AddTask implements Task
-	{
-		private final T data ;
-
-		public AddTask( final T _data )
+		public Task( final T _data )
 		{
 			data = _data ;
+		}
+
+		public abstract void execute() ;
+
+		@Override
+		public int hashCode()
+		{
+			return data.hashCode() ;
+		}
+
+		@Override
+		public boolean equals( final Object _obj )
+		{
+			return data.equals( _obj ) ;
+		}
+	}
+
+	private class AddTask extends Task
+	{
+		public AddTask( final T _data )
+		{
+			super( _data ) ;
 		}
 
 		@Override
@@ -125,13 +152,11 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class RemoveTask implements Task
+	private class RemoveTask extends Task
 	{
-		private final T data ;
-
 		public RemoveTask( final T _data )
 		{
-			data = _data ;
+			super( _data ) ;
 		}
 
 		@Override
@@ -144,14 +169,30 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class InsertTask implements Task
+	private class RemoveAllTask extends Task
 	{
-		private final T data ;
+		public RemoveAllTask( final T _data )
+		{
+			super( _data ) ;
+		}
+
+		@Override
+		public void execute()
+		{
+			while( current.remove( data ) == true )
+			{
+				removeListener.remove( data ) ;
+			}
+		}
+	}
+
+	private class InsertTask extends Task
+	{
 		private final int index ;
 
 		public InsertTask( final T _data, final int _index )
 		{
-			data = _data ;
+			super( _data ) ;
 			index = _index ;
 		}
 

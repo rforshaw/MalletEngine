@@ -11,7 +11,7 @@ import com.linxonline.mallet.maths.* ;
 public abstract class BasicRenderer implements IRender
 {
 	private final EventController controller = new EventController() ;
-	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
+	private final BufferedList<Invoker> executions = new BufferedList<Invoker>() ;
 
 	private final World world = new World( "DEFAULT" ) ;
 	private final Camera camera = new Camera( "MAIN" ) ;
@@ -32,18 +32,46 @@ public abstract class BasicRenderer implements IRender
 	@Override
 	public void start() {}
 
+	/**
+		Call the passed in runnable the next time the
+		renderer has got focus.
+	*/
 	public void invokeLater( final Runnable _run )
 	{
-		if( _run != null )
+		if( _run == null )
 		{
-			executions.add( _run ) ;
+			return ;
 		}
+
+		executions.add( new Invoker( _run ) ) ;
+	}
+
+	/**
+		Call the passed in runnable the next time the
+		renderer has got focus.
+		Use the passed in _anchor and _operation to remove
+		previous invocations that are identical to the current
+		call, this ensures that something that needs only be executed
+		once is not processed multiple times in one draw call.
+	*/
+	public void invokeLater( final Object _anchor, final int _operation, final Runnable _run )
+	{
+		if( _run == null )
+		{
+			return ;
+		}
+
+		final Invoker invoker = new Invoker( _anchor, _operation, _run ) ;
+		// Remove invokers that match the signature of the
+		// newly created invoker. 
+		executions.removeAll( invoker ) ;
+		executions.add( invoker ) ;
 	}
 
 	protected void updateExecutions()
 	{
 		executions.update() ;
-		final List<Runnable> runnables = executions.getCurrentData() ;
+		final List<Invoker> runnables = executions.getCurrentData() ;
 		if( runnables.isEmpty() )
 		{
 			return ;
@@ -101,5 +129,56 @@ public abstract class BasicRenderer implements IRender
 	{
 		++renderIter ;
 		drawDT = _dt ;
+	}
+
+	private static class Invoker
+	{
+		private final Object anchor ;
+		private final int operation ;
+		private final Runnable run ;
+
+		public Invoker( final Runnable _run )
+		{
+			this( null, -1, _run ) ;
+		}
+
+		public Invoker( final Object _anchor, final int _operation, final Runnable _run )
+		{
+			anchor = _anchor ;
+			operation = _operation ;
+			run = _run ;
+		}
+
+		@Override
+		public boolean equals( final Object _obj )
+		{
+			if( _obj == this )
+			{
+				return true ;
+			}
+
+			if( !( _obj instanceof Invoker ) )
+			{
+				return false ;
+			}
+
+			final Invoker invoker = ( Invoker )_obj ;
+			if( invoker.anchor == null )
+			{
+				return false ;
+			}
+
+			if( invoker.operation <= -1 )
+			{
+				return false ;
+			}
+
+			return anchor == invoker.anchor && operation == invoker.operation ;
+		}
+
+		public void run()
+		{
+			run.run() ;
+		}
 	}
 }
