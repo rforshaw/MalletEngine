@@ -1,6 +1,7 @@
 package com.linxonline.mallet.util ;
 
 import java.util.List ;
+import java.util.Iterator ;
 
 /**
 	Object instances are not directly added to the 
@@ -179,9 +180,16 @@ public final class BufferedList<T>
 		@Override
 		public void execute()
 		{
-			while( current.remove( data ) == true )
+			Iterator<T> iter = current.iterator() ;
+			while( iter.hasNext() )
 			{
-				removeListener.remove( data ) ;
+				final T val = iter.next() ;
+				if( val.equals( data ) )
+				{
+					iter.remove() ;
+					removeListener.remove( data ) ;
+				}
+				
 			}
 		}
 	}

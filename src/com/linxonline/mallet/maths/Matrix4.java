@@ -10,6 +10,29 @@ import com.linxonline.mallet.renderer.IUniform ;
 */
 public final class Matrix4 implements Cacheable, IUniform
 {
+	private static final float[] IDENTITY = new float[]
+	{
+		1.0f,
+		0.0f,
+		0.0f,
+		0.0f,
+
+		0.0f,
+		1.0f,
+		0.0f,
+		0.0f,
+
+		0.0f,
+		0.0f,
+		1.0f,
+		0.0f,
+
+		0.0f,
+		0.0f,
+		0.0f,
+		1.0f
+	} ;
+
 	/**
 		Matrix4 functions are guaranteed to be called hundreds if 
 		not thousands of times a second in a typical game-loop.
@@ -82,30 +105,7 @@ public final class Matrix4 implements Cacheable, IUniform
 
 	public void setIdentity()
 	{
-		matrix[0] = 1.0f ;
-		matrix[1] = 0.0f ;
-		matrix[2] = 0.0f ;
-		matrix[3] = 0.0f ;
-
-		matrix[4] = 0.0f ;
-		matrix[5] = 1.0f ;
-		matrix[6] = 0.0f ;
-		matrix[7] = 0.0f ;
-
-		matrix[8] = 0.0f ;
-		matrix[9] = 0.0f ;
-		matrix[10] = 1.0f ;
-		matrix[11] = 0.0f ;
-
-		matrix[12] = 0.0f ;
-		matrix[13] = 0.0f ;
-		matrix[14] = 0.0f ;
-		matrix[15] = 1.0f ;
-
-		/*setRow( 1.0f, 0.0f, 0.0f, 0.0f, 0 ) ;
-		setRow( 0.0f, 1.0f, 0.0f, 0.0f, 1 ) ;
-		setRow( 0.0f, 0.0f, 1.0f, 0.0f, 2 ) ;
-		setRow( 0.0f, 0.0f, 0.0f, 1.0f, 3 ) ;*/
+		System.arraycopy( IDENTITY, 0, matrix, 0, 16 ) ;
 	}
 
 	public void translate( final float _x, final float _y, final float _z )
@@ -356,12 +356,29 @@ public final class Matrix4 implements Cacheable, IUniform
 
 	public void transpose()
 	{
-		FloatBuffer.swap( matrix, 1, 4 ) ;
-		FloatBuffer.swap( matrix, 2, 8 ) ;
-		FloatBuffer.swap( matrix, 3, 12 ) ;
-		FloatBuffer.swap( matrix, 6, 9 ) ;
-		FloatBuffer.swap( matrix, 7, 13 ) ;
-		FloatBuffer.swap( matrix, 11, 14 ) ;
+		float t = matrix[1] ;
+		matrix[1] = matrix[4] ;
+		matrix[4] = t ;
+
+		t = matrix[2] ;
+		matrix[2] = matrix[8] ;
+		matrix[8] = t ;
+	
+		t = matrix[3] ;
+		matrix[3] = matrix[12] ;
+		matrix[12] = t ;
+
+		t = matrix[6] ;
+		matrix[6] = matrix[9] ;
+		matrix[9] = t ;
+
+		t = matrix[7] ;
+		matrix[7] = matrix[13] ;
+		matrix[13] = t ;
+
+		t = matrix[11] ;
+		matrix[11] = matrix[14] ;
+		matrix[14] = t ;
 	}
 
 	@Override

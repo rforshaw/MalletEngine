@@ -21,7 +21,6 @@ public abstract class Hull
 														// If no group-specified, collides with everything.
 	private Object parent ;
 
-	private final Vector2 accumulatedPenetration = new Vector2() ;
 	public final ContactData contactData = new ContactData() ;
 
 	protected boolean collidable = true ; 							// Allows hull to produce Collision Data.

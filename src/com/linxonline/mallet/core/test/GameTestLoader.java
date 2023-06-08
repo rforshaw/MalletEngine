@@ -161,15 +161,6 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createECSEntities( final int _row, final int _column )
 			{
-				final World world = WorldAssist.getDefault() ;
-
-				final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
-				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
-				final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0 ), new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
-
-				final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
-				final DrawInstancedUpdater updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
-
 				final ECSEntity.ICreate create = ( final ECSEntity _parent, final Object _data ) ->
 				{
 					final Hull[] hulls = new Hull[_row * _column] ;
@@ -194,7 +185,7 @@ public final class GameTestLoader implements IGameLoader
 						_parent.destroy() ;
 					} ) ) ;
 
-					final ExComponent executor = ecsExample.create( _parent, new ExData( messenger, collision, updater ) ) ;
+					final ExComponent executor = ecsExample.create( _parent, new ExData( messenger, collision ) ) ;
 
 					return new ECSEntity.Component[]
 					{
@@ -816,13 +807,11 @@ public final class GameTestLoader implements IGameLoader
 	{
 		public final ECSEvent.Component messenger ;
 		public final ECSCollision.Component collision ;
-		public final DrawInstancedUpdater updater ;
 
-		public ExData( final ECSEvent.Component _messenger, final ECSCollision.Component _collision, final DrawInstancedUpdater _updater )
+		public ExData( final ECSEvent.Component _messenger, final ECSCollision.Component _collision )
 		{
 			messenger = _messenger ;
 			collision = _collision ;
-			updater = _updater ;
 		}
 	}
 
@@ -841,7 +830,15 @@ public final class GameTestLoader implements IGameLoader
 			super( _parent ) ;
 			messenger = _data.messenger ;
 			collision = _data.collision ;
-			updater = _data.updater ;
+
+			final World world = WorldAssist.getDefault() ;
+
+			final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
+			program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+			final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0 ), new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
+
+			final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
+			updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
 
 			final Vector2 offset = new Vector2() ;
 			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
@@ -854,9 +851,11 @@ public final class GameTestLoader implements IGameLoader
 				hull.getPosition( position ) ;
 				hull.getOffset( offset ) ;
 
-				draws[i] = new Draw() ;
-				draws[i].setPosition( position.x, position.y, 0.0f ) ;
-				draws[i].setOffset( offset.x, offset.y, 0.0f ) ;
+				final Draw draw = new Draw() ;
+				draw.setPosition( position.x, position.y, 0.0f ) ;
+				draw.setOffset( offset.x, offset.y, 0.0f ) ;
+
+				draws[i] = draw ;
 			}
 
 			geometry.addDraws( draws ) ;

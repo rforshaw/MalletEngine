@@ -46,16 +46,12 @@ public final class CollisionSystem
 
 	public void add( final Hull _hull )
 	{
-		if( exists( _hull ) == false )
-		{
-			hulls.add( _hull ) ;
-		}
+		hulls.add( _hull ) ;
 	}
 
 	public void remove( final Hull _hull )
 	{
 		hulls.remove( _hull ) ;
-		treeHulls.removeHull( _hull ) ;
 	}
 
 	public void update( final float _dt )

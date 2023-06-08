@@ -54,18 +54,28 @@ public final class QuadTree
 		{
 			// Used when multi-threading
 			private final List<QuadNode> children = MalletList.<QuadNode>newList() ;
-			private final NodeWorker nodeWorker = new NodeWorker() ;
+			private final NodeWorker[] workers = new NodeWorker[]
+			{
+				new NodeWorker(),
+				new NodeWorker()
+			} ;
 
 			@Override
 			public void update( final float _dt )
 			{
 				root.getChildNodes( children ) ;
-				if( children.isEmpty() == false )
+				if( children.isEmpty() )
 				{
-					nodeWorker.setDeltaTime( _dt ) ;
-					Parallel.forEach( children, nodeWorker ) ;
-					children.clear() ;
+					return ;
 				}
+
+				for( int i = 0; i < workers.length; ++i )
+				{
+					workers[i].setDeltaTime( _dt ) ;
+				}
+
+				Parallel.forEach( children, workers ) ;
+				children.clear() ;
 			}
 		} ;
 	}

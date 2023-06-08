@@ -354,10 +354,30 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 					draw.getRotation( rotation ) ;
 					draw.getScale( scale ) ;
 
-					apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
-					matrix.transpose() ;
+					_out.writeFloat( position.x ) ;
+					_out.writeFloat( position.y ) ;
+					_out.writeFloat( position.z ) ;
+					_out.writeFloat( 1.0f ) ;
 
-					_out.writeFloats( matrix.matrix ) ;
+					_out.writeFloat( offset.x ) ;
+					_out.writeFloat( offset.y ) ;
+					_out.writeFloat( offset.z ) ;
+					_out.writeFloat( 1.0f ) ;
+
+					_out.writeFloat( rotation.x ) ;
+					_out.writeFloat( rotation.y ) ;
+					_out.writeFloat( rotation.z ) ;
+					_out.writeFloat( 1.0f ) ;
+
+					_out.writeFloat( scale.x ) ;
+					_out.writeFloat( scale.y ) ;
+					_out.writeFloat( scale.z ) ;
+					_out.writeFloat( 1.0f ) ;
+
+					//apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
+					//matrix.transpose() ;
+
+					//_out.writeFloats( matrix.matrix ) ;
 				}
 			}
 		}

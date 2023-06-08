@@ -5,7 +5,7 @@ import java.util.concurrent.* ;
 
 public final class Parallel
 {
-	private final static int MINIMUM_DATA_SIZE = 250 ;
+	private final static int MINIMUM_DATA_SIZE = 50 ;
 
 	private final static LinkedBlockingQueue<IJob> jobs = new LinkedBlockingQueue<IJob>() ;
 	private volatile static int workerCount = 0 ;
@@ -23,12 +23,12 @@ public final class Parallel
 
 	public static <T> void forEach( final T[] _array, final IRangeRun<T> ... _run )
 	{
-		forEach( _array, 0, _array.length, _run ) ;
+		forEach( _array, 0, _array.length, MINIMUM_DATA_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final int _start, final int _end, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
 	{
-		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
+		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
 		if( numJobs <= 1 )
 		{
 			// No point creating a job if only 1 job is being used.
@@ -70,12 +70,12 @@ public final class Parallel
 
 	public static <T> void forEach( final List<T> _list, final IRangeRun<T> ... _run )
 	{
-		forEach( _list, 0, _list.size(), _run ) ;
+		forEach( _list, 0, _list.size(), MINIMUM_DATA_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
 	{
-		final int numJobs = calculateJobsRequired( _run.length, _end - _start ) ;
+		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
 		if( numJobs <= 1 )
 		{
 			// No point creating a job if only 1 job is being used.
@@ -121,7 +121,7 @@ public final class Parallel
 		If the data set is not large enough to be shared we don't
 		want to run 4 empty jobs, we want to run 1 'full' job.
 	*/
-	private static int calculateJobsRequired( final int _runSize, final int _dataSize )
+	private static int calculateJobsRequired( final int _runSize, final int _dataSize, final int _minimum )
 	{
 		int jobs = 4 ;			// We assume 4 jobs will be used by default
 		if( _runSize > 1 )
@@ -142,7 +142,7 @@ public final class Parallel
 		}
 
 		final int size = _dataSize / jobs ;
-		if( size == 0 || size < MINIMUM_DATA_SIZE )
+		if( size == 0 || size < _minimum )
 		{
 			// If the number of items being processed is 0
 			// then it's likely to be a rounding error.
