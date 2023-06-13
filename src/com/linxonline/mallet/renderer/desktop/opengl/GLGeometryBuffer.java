@@ -44,9 +44,6 @@ public final class GLGeometryBuffer extends GLBuffer
 	private int vertexStrideBytes = -1 ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
 
-	private final Matrix4 matrix = new Matrix4() ;
-	private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
-
 	private final Vector3 position = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 rotation = new Vector3() ;
@@ -228,9 +225,11 @@ public final class GLGeometryBuffer extends GLBuffer
 				draw.getRotation( rotation ) ;
 				draw.getScale( scale ) ;
 
-				apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
+				MGL.glUniform4f( _program.inPosition, position.x, position.y, position.z, 1.0f ) ;
+				MGL.glUniform4f( _program.inOffset, offset.x, offset.y, offset.z, 1.0f ) ;
+				MGL.glUniform4f( _program.inRotation, rotation.x, rotation.y, rotation.z, 1.0f ) ;
+				MGL.glUniform4f( _program.inScale, scale.x, scale.y, scale.z, 1.0f ) ;
 
-				MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, true, matrix.matrix, 0 ) ;
 				MGL.glDrawElements( style, map.count, MGL.GL_UNSIGNED_INT, map.start * IBO_VAR_BYTE_SIZE ) ;
 			}
 		}

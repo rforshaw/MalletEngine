@@ -1,6 +1,11 @@
 {
 	"NAME": "SIMPLE_STENCIL",
-	"VERTEX": ["base/shaders/desktop/simple_vertex.glsl"],
+	"VERTEX": [
+		"base/shaders/desktop/version.glsl",
+		"base/shaders/desktop/engine_structs.glsl",
+		"base/shaders/desktop/engine_utils.glsl",
+		"base/shaders/desktop/simple_vertex.glsl"
+	],
 
 	"UNIFORMS": [],
 	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]

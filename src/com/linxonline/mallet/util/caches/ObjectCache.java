@@ -13,16 +13,18 @@ import java.lang.reflect.InvocationTargetException ;
 public class ObjectCache<T extends Cacheable> implements ICache<T>
 {
 	private final ArrayDeque<T> available = new ArrayDeque<T>() ;	// Pool of objects to retrieve.
-	private final Constructor<T> creator ;							// Allows the creation of new default objects.
+	private final Class<T> clazz ;
 
-	public ObjectCache( final Class<T> _class ) throws NoSuchMethodException
+	private Constructor<T> creator ;					// Allows the creation of new default objects.
+
+	public ObjectCache( final Class<T> _class )
 	{
 		this( _class, 10 ) ;
 	}
 
-	public ObjectCache( final Class<T> _class, final int _size ) throws NoSuchMethodException
+	public ObjectCache( final Class<T> _class, final int _size )
 	{
-		creator = _class.getConstructor() ;
+		clazz = _class ;
 		expandCache( _size ) ;
 	}
 
@@ -66,11 +68,18 @@ public class ObjectCache<T extends Cacheable> implements ICache<T>
 	{
 		try
 		{
+			if( creator == null )
+			{
+				creator = clazz.getConstructor() ;
+				creator.setAccessible( true ) ;
+			}
+
 			return creator.newInstance() ;
 		}
-		catch( InstantiationException ex ) { ex.printStackTrace() ; }
-		catch( IllegalAccessException ex ) { ex.printStackTrace() ; }
-		catch( InvocationTargetException ex ) { ex.printStackTrace() ; }
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
 
 		return null ;
 	}

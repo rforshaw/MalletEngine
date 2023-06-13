@@ -179,6 +179,16 @@ public final class MGL
 	{
 		gl.glUniform1i( _location, _v0 ) ;
 	}
+	
+	public static void glUniform4f( final int _location, final float _v0, final float _v1, final float _v2, final float _v3 )
+	{
+		gl.glUniform4f( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void glUniform4fv( final int _location, final int _count, float[] _values, int _offset )
+	{
+		gl.glUniform4fv( _location, _count, _values, _offset ) ;
+	}
 
 	public static void glViewport( final int _x, final int _y, final int _width, final int _height )
 	{

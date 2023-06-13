@@ -18,11 +18,15 @@ import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Draw ;
 
+import com.linxonline.mallet.util.caches.Cacheable ;
+import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
+	private final static ObjectCache<Texture> TEXTURES = new ObjectCache<Texture>( Texture.class, 50 ) ; 
+
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
 
@@ -55,6 +59,16 @@ public class GLBuffer
 		if( uniforms.isEmpty() )
 		{
 			return true ;
+		}
+
+		for( IUniform uniform : _toFill )
+		{
+			// We don't want to create more texture uniforms
+			// than needed, use a cache.
+			if( uniform.getType() == IUniform.Type.SAMPLER2D )
+			{
+				TEXTURES.reclaim( ( Texture )uniform ) ;
+			}
 		}
 
 		_toFill.clear() ;
@@ -100,7 +114,10 @@ public class GLBuffer
 						return false ;
 					}
 
-					_toFill.add( new Texture( glTexture, texture ) ) ;
+					final Texture tex = TEXTURES.get() ;
+					tex.set( glTexture, texture ) ;
+
+					_toFill.add( tex ) ;
 					break ;
 				}
 				case FONT         :
@@ -109,7 +126,10 @@ public class GLBuffer
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage texture = glFont.getTexture() ;
 
-					_toFill.add( new Texture( texture, font ) ) ;
+					final Texture tex = TEXTURES.get() ;
+					tex.set( texture, font ) ;
+
+					_toFill.add( tex ) ;
 					break ;
 				}
 				case UNKNOWN      :
@@ -460,17 +480,18 @@ public class GLBuffer
 		}
 	}
 
-	private static final class Texture implements IUniform
+	private static final class Texture implements IUniform, Cacheable
 	{
-		private final IUniform.Type type ;
-		public final GLImage image ;
+		public GLImage image ;
 
-		public final int minFilter ;
-		public final int magFilter ;
-		public final int uWrap ;
-		public final int vWrap ;
+		public int minFilter ;
+		public int magFilter ;
+		public int uWrap ;
+		public int vWrap ;
 
-		public Texture( final GLImage _image, final MalletTexture _texture )
+		public Texture() {}
+
+		public void set( final GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
 			minFilter = GLImage.calculateMinFilter( _texture.getMinificationFilter() ) ;
@@ -478,11 +499,9 @@ public class GLBuffer
 
 			uWrap = GLImage.calculateWrap( _texture.getUWrap() ) ;
 			vWrap = GLImage.calculateWrap( _texture.getVWrap() ) ;
-
-			type = IUniform.Type.SAMPLER2D ;
 		}
 
-		public Texture( final GLImage _image, final MalletFont _font )
+		public void set( final GLImage _image, final MalletFont _font )
 		{
 			image = _image ;
 
@@ -491,14 +510,18 @@ public class GLBuffer
 
 			uWrap = MGL.GL_CLAMP_TO_EDGE ;
 			vWrap = MGL.GL_REPEAT ;
-
-			type = IUniform.Type.FONT ;
 		}
 
 		@Override
 		public IUniform.Type getType()
 		{
-			return type ;
+			return IUniform.Type.SAMPLER2D ;
+		}
+
+		@Override
+		public void reset()
+		{
+			image = null ;
 		}
 	}
 }

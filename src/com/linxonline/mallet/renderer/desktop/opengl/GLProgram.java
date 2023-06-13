@@ -36,7 +36,10 @@ public final class GLProgram extends ProgramManager.Program
 
 	// Model View Projection Matrix, doesn't need to be defined in *.jgl,
 	// however it must be defined in atleast vertex shader.
-	public int inModelMatrix = -1 ;
+	public int inPosition = -1 ;
+	public int inOffset = -1 ;
+	public int inRotation = -1 ;
+	public int inScale = -1 ;
 	public int inMVPMatrix = -1 ;
 	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders
 	public final int[] inDrawUniforms ;		// Additional uniforms defined in *.jgl and shaders  
@@ -124,7 +127,10 @@ public final class GLProgram extends ProgramManager.Program
 
 		MGL.glLinkProgram( program.id[0] ) ;
 
-		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
+		program.inPosition = MGL.glGetUniformLocation( program.id[0], "inTransformation.pos" ) ;
+		program.inOffset = MGL.glGetUniformLocation( program.id[0], "inTransformation.off" ) ;
+		program.inRotation = MGL.glGetUniformLocation( program.id[0], "inTransformation.rot" ) ;
+		program.inScale = MGL.glGetUniformLocation( program.id[0], "inTransformation.scale" ) ;
 		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
 		{
@@ -205,6 +211,7 @@ public final class GLProgram extends ProgramManager.Program
 			MGL.glGetShaderInfoLog( _shaderIDs[_index], logLength[0], ( int[] )null, 0, log, 0 ) ;
 
 			System.out.println( "Error compiling shader: " + new String( log ) ) ;
+			System.out.println( "Source: " + source[0] ) ;
 			return false ;
 		}
 

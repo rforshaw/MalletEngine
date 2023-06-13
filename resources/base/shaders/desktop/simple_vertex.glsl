@@ -1,6 +1,5 @@
-#version 430 core
 
-uniform mat4 inModelMatrix ;
+uniform Transformation inTransformation ;
 uniform mat4 inMVPMatrix ;
 
 in vec4 inVertex ;
@@ -13,6 +12,8 @@ out vec4 outColour ;
 
 void main()
 {
+	mat4 inModelMatrix = create_transformation( inTransformation ) ;
+
 	gl_Position = inMVPMatrix * inModelMatrix * inVertex ;
 	outTexCoord0 = inTexCoord0 ;
 	outColour = inColour ;

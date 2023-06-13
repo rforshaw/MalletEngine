@@ -1,6 +1,11 @@
 {
 	"NAME": "SIMPLE_INSTANCE_TEXTURE",
-	"VERTEX": ["base/shaders/desktop/simple_instance_vertex.glsl"],
+	"VERTEX": [
+		"base/shaders/desktop/version.glsl",
+		"base/shaders/desktop/engine_structs.glsl",
+		"base/shaders/desktop/engine_utils.glsl",
+		"base/shaders/desktop/simple_instance_vertex.glsl"
+	],
 	"FRAGMENT": ["base/shaders/desktop/simple_texture_fragment.glsl"],
 
 	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
