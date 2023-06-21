@@ -296,6 +296,28 @@ public final class Draw implements IUpdate
 		return FloatBuffer.fill( present, _fill, ROTATION ) ;
 	}
 
+	public void getTransformations( final Vector3 _position,
+									final Vector3 _offset,
+									final Vector3 _rotation,
+									final Vector3 _scale )
+	{
+		FloatBuffer.fill( present, _position, POSITION ) ;
+		FloatBuffer.fill( present, _offset, OFFSET ) ;
+		FloatBuffer.fill( present, _rotation, ROTATION ) ;
+		FloatBuffer.fill( present, _scale, SCALE ) ;
+	}
+
+	public float[] getTransformations( final float[] _fill )
+	{
+		System.arraycopy( present, 0, _fill, 0, 12 ) ;
+		return _fill ;
+	}
+
+	public float[] getRawTransformations()
+	{
+		return present ;
+	}
+
 	public void setScaleInstant( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( old, SCALE, _x, _y, _z ) ;

@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
+import java.util.Arrays ;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.nio.* ;
@@ -19,7 +20,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.IntVector2 ;
 
-import com.linxonline.mallet.io.serialisation.Serialise ;
+import com.linxonline.mallet.util.Parallel ;
 
 public final class GLDrawInstancedBuffer extends GLBuffer
 {
@@ -305,15 +306,13 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 	private static class Transformations implements Storage.IData
 	{
-		private final Matrix4 matrix = new Matrix4() ;
-		private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
-
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 offset = new Vector3() ;
-		private final Vector3 rotation = new Vector3() ;
-		private final Vector3 scale = new Vector3() ;
-	
 		private final List<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
+		private final TransformationUpdater[] updaters = new TransformationUpdater[]
+		{
+			new TransformationUpdater(),
+			new TransformationUpdater()
+		} ;
+
 		public int drawCount = 0 ;
 
 		private Transformations() {}
@@ -338,48 +337,61 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				final List<Draw> draws = buffer.getDraws() ;
 				drawCount += draws.size() ;
 			}
-			return drawCount * 16 * 4 ;
+			return drawCount * ( 16 * 4 ) ;
 		}
 
 		@Override
-		public void serialise( Serialise.Out _out )
+		public void serialise( Storage.ISerialise _out )
 		{
-			for( final GeometryBuffer buffer : buffers )
+			final int bufferSize = buffers.size() ;
+			for( int i = 0; i < bufferSize; ++i )
 			{
-				final List<Draw> draws = buffer.getDraws() ;
-				for( final Draw draw : draws )
+				final GeometryBuffer buffer = buffers.get( i ) ;
+
+				for( final TransformationUpdater updater : updaters )
 				{
-					draw.getPosition( position ) ;
-					draw.getOffset( offset ) ;
-					draw.getRotation( rotation ) ;
-					draw.getScale( scale ) ;
-
-					_out.writeFloat( position.x ) ;
-					_out.writeFloat( position.y ) ;
-					_out.writeFloat( position.z ) ;
-					_out.writeFloat( 1.0f ) ;
-
-					_out.writeFloat( offset.x ) ;
-					_out.writeFloat( offset.y ) ;
-					_out.writeFloat( offset.z ) ;
-					_out.writeFloat( 1.0f ) ;
-
-					_out.writeFloat( rotation.x ) ;
-					_out.writeFloat( rotation.y ) ;
-					_out.writeFloat( rotation.z ) ;
-					_out.writeFloat( 1.0f ) ;
-
-					_out.writeFloat( scale.x ) ;
-					_out.writeFloat( scale.y ) ;
-					_out.writeFloat( scale.z ) ;
-					_out.writeFloat( 1.0f ) ;
-
-					//apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
-					//matrix.transpose() ;
-
-					//_out.writeFloats( matrix.matrix ) ;
+					updater.set( i, ( 16 * 4 ), _out ) ;
 				}
+
+				//final long startTime = System.currentTimeMillis() ;
+
+				Parallel.forEach( buffer.getDraws(), updaters ) ;
+
+				//final long endTime = System.currentTimeMillis() ;
+				//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
 			}
+		}
+	}
+
+	private static class TransformationUpdater implements Parallel.IRangeRun<Draw>
+	{
+		private final float[] transformations = new float[12] ;
+
+		private int bufferIndex = 0 ;
+		private int objectSize = 0 ;
+		private Storage.ISerialise out ;
+
+		public TransformationUpdater() {}
+
+		public void set( final int _index, final int _objectSize, Storage.ISerialise _out )
+		{
+			bufferIndex = _index ;
+			objectSize = _objectSize ;
+			out = _out ;
+		}
+
+		@Override
+		public void run( final int _index, final Draw _draw )
+		{
+			final float[] transformations = _draw.getRawTransformations() ;
+
+			final int index = ( bufferIndex * _index ) + _index ;
+			int offset = index * objectSize ;
+
+			offset = out.writeVec4( offset, transformations[0], transformations[1], transformations[2], 1.0f ) ;
+			offset = out.writeVec4( offset, transformations[3], transformations[4], transformations[5], 1.0f ) ;
+			offset = out.writeVec4( offset, transformations[6], transformations[7], transformations[8], 1.0f ) ;
+			offset = out.writeVec4( offset, transformations[9], transformations[10], transformations[11], 1.0f ) ;
 		}
 	}
 }

@@ -28,6 +28,8 @@ public final class Parallel
 
 	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
 	{
+		//final long startTime = System.currentTimeMillis() ;
+
 		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
 		if( numJobs <= 1 )
 		{
@@ -45,6 +47,7 @@ public final class Parallel
 		int start = _start ;
 		int end = size ;
 
+		//System.out.println( "Creating: " + numJobs + " jobs." ) ;
 		for( int i = 0; i < numJobs; ++i )
 		{
 			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
@@ -66,6 +69,9 @@ public final class Parallel
 		{
 			ex.printStackTrace() ;
 		}
+
+		//final long endTime = System.currentTimeMillis() ;
+		//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
 	}
 
 	public static <T> void forEach( final List<T> _list, final IRangeRun<T> ... _run )
@@ -75,6 +81,8 @@ public final class Parallel
 
 	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
 	{
+		//final long startTime = System.currentTimeMillis() ;
+
 		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
 		if( numJobs <= 1 )
 		{
@@ -92,6 +100,7 @@ public final class Parallel
 		int start = _start ;
 		int end = size ;
 
+		//System.out.println( "Creating: " + numJobs + " jobs." ) ;
 		for( int i = 0; i < numJobs; ++i )
 		{
 			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
@@ -113,6 +122,9 @@ public final class Parallel
 		{
 			ex.printStackTrace() ;
 		}
+
+		//final long endTime = System.currentTimeMillis() ;
+		//System.out.println( "P Time Taken: " + ( endTime - startTime ) ) ;
 	}
 
 	/**
@@ -169,6 +181,7 @@ public final class Parallel
 	private static void createWorker( final int _num )
 	{
 		final Thread thread = new Thread( new Worker(), String.format( "PARALLEL_THREAD_%d", _num ) ) ;
+		thread.setPriority( 10 ) ;
 		thread.start() ;
 	}
 
@@ -204,6 +217,7 @@ public final class Parallel
 
 			array = _array ;
 			runner = _runner ;
+			//System.out.println( "Runner: " + runner.toString() ) ;
 		}
 
 		@Override
@@ -255,10 +269,17 @@ public final class Parallel
 		@Override
 		public void run()
 		{
+			//System.out.println( "Started" ) ;
+			//final long startTime = System.currentTimeMillis() ;
+
 			for( int i = start; i < end; ++i )
 			{
-				runner.run( i, list.get( i ) ) ;
+				final T t = list.get( i ) ;
+				runner.run( i, t ) ;
 			}
+
+			//final long endTime = System.currentTimeMillis() ;
+			//System.out.println( "J Time Taken: " + ( endTime - startTime ) + " Amount: " + ( end - start ) ) ;
 		}
 	}
 

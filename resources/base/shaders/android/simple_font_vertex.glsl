@@ -5,7 +5,7 @@ uniform mat4 inMVPMatrix ;
 in vec4 inVertex ;
 in vec4 inColour ;
 in vec2 inTexCoord0 ;
-in vec4 inNormal ;
+in vec3 inNormal ;
 
 out vec2 outTexCoord0 ;
 out vec4 outColour ;

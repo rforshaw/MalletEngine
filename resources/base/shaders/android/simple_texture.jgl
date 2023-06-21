@@ -1,6 +1,11 @@
 {
 	"NAME": "SIMPLE_TEXTURE",
-	"VERTEX": ["base/shaders/android/simple_vertex.glsl"],
+	"VERTEX": [
+		"base/shaders/android/version.glsl",
+		"base/shaders/android/engine_structs.glsl",
+		"base/shaders/android/engine_utils.glsl",
+		"base/shaders/android/simple_vertex.glsl"
+	],
 	"FRAGMENT": ["base/shaders/android/simple_texture_fragment.glsl"],
 
 	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],

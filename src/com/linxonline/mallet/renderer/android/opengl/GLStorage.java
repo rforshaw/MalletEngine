@@ -3,26 +3,24 @@ package com.linxonline.mallet.renderer.android.opengl ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.io.serialisation.Serialise ;
 
-public class GLStorage implements Serialise.Out
+public final class GLStorage implements Storage.ISerialise
 {
 	public final int[] id = new int[1] ;
 
-	private float[] buffer ;
-	private java.nio.FloatBuffer floatBuffer ;
-	private int offset = 0 ;
+	private java.nio.FloatBuffer buffer ;
 	private boolean stable = false ;
 
 	public GLStorage( final Storage _storage )
 	{
 		final Storage.IData data = _storage.getData() ;
+
 		final int lengthInBytes = data.getLength() ;
+		final int lengthInFloats = lengthInBytes / 4 ;
 
 		MGL.glGenBuffers( 1, id, 0 ) ;
 
-		buffer = new float[lengthInBytes / 4] ;
-		floatBuffer = java.nio.FloatBuffer.wrap( buffer ) ;
+		buffer = java.nio.FloatBuffer.allocate( lengthInFloats ) ;
 	}
 
 	public boolean update( final Storage _storage )
@@ -30,21 +28,20 @@ public class GLStorage implements Serialise.Out
 		stable = false ;
 
 		final Storage.IData data = _storage.getData() ;
-		final int lengthInBytes = data.getLength() ;
 
-		if( buffer.length * 4 < lengthInBytes )
+		final int lengthInBytes = data.getLength() ;
+		final int lengthInFloats = lengthInBytes / 4 ;
+
+		if( buffer.capacity() < lengthInFloats )
 		{
-			buffer = new float[lengthInBytes / 4] ;
-			floatBuffer = java.nio.FloatBuffer.wrap( buffer ) ;
+			buffer = java.nio.FloatBuffer.allocate( lengthInFloats ) ;
 		}
 
-		offset = 0 ;
 		data.serialise( this ) ;
-		floatBuffer.put( buffer ) ;
-		floatBuffer.position( 0 ) ;
+		buffer.position( 0 ) ;
 
 		MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, id[0] ) ;
-		MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, floatBuffer, MGL.GL_DYNAMIC_COPY ) ;
+		MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, buffer, MGL.GL_DYNAMIC_COPY ) ;
 
 		// We successfully updated the buffer, nothing more is need 
 		// but to inform the trigger.
@@ -57,113 +54,66 @@ public class GLStorage implements Serialise.Out
 		MGL.glDeleteBuffers( id.length, id, 0 ) ;
 	}
 
-	public void writeInt( final int _int )
+	@Override
+	public int writeInt( final int _offset, final int _val )
 	{
-		buffer[offset] = _int ;
-		offset += 1 ;
-		//ConvertBytes.toBytes( _int, offset, buffer ) ;
-		//offset += ConvertBytes.INT_SIZE ;
+		final int index = _offset / 4 ;
+		buffer.put( index, _val ) ;
+		return _offset + 4 ;
 	}
 
-	public void writeByte( final byte _byte )
+	@Override
+	public int writeFloat( final int _offset, final float _val )
 	{
-		//ConvertBytes.toBytes( _byte, offset, buffer ) ;
-		offset += ConvertBytes.BYTE_SIZE ;
+		final int index = _offset / 4 ;
+		buffer.put( index, _val ) ;
+		return _offset + 4 ;
 	}
 
-	public void writeChar( final char _char )
+	@Override
+	public int writeFloats( final int _offset, final float[] _val )
 	{
-		//ConvertBytes.toBytes( _char, offset, buffer ) ;
-		offset += ConvertBytes.CHAR_SIZE ;
+		final int index = _offset / 4 ;
+		for( int i = 0; i < _val.length; ++i )
+		{
+			buffer.put( index + i, _val[i] ) ;
+		}
+		return _offset + ( _val.length * 4 ) ;
 	}
 
-	public void writeLong( final long _long )
+	@Override
+	public int writeVec2( final int _offset, final float _x, final float _y )
 	{
-		//ConvertBytes.toBytes( _long, offset, buffer ) ;
-		offset += ConvertBytes.LONG_SIZE ;
+		int index = _offset / 4 ;
+
+		buffer.put( index, _x ) ;
+		buffer.put( ++index, _y ) ;
+
+		return _offset + 8 ;
 	}
 
-	public void writeFloat( final float _float )
+	@Override
+	public int writeVec3( final int _offset, final float _x, final float _y, final float _z )
 	{
-		//System.out.println( _float + " " + offset ) ;
-		buffer[offset] = _float ;
-		offset += 1 ;
-		//ConvertBytes.toBytes( _float, offset, buffer ) ;
-		//System.out.println( ConvertBytes.toFloat( buffer, offset ) ) ;
-		//offset += ConvertBytes.FLOAT_SIZE ;
+		int index = _offset / 4 ;
+
+		buffer.put( index, _x ) ;
+		buffer.put( ++index, _y ) ;
+		buffer.put( ++index, _z ) ;
+
+		return _offset + 12 ;
 	}
 
-	public void writeDouble( final double _double )
+	@Override
+	public int writeVec4( final int _offset, final float _x, final float _y, final float _z, final float _w )
 	{
-		//ConvertBytes.toBytes( _double, offset, buffer ) ;
-		offset += ConvertBytes.DOUBLE_SIZE ;
-	}
+		int index = _offset / 4 ;
 
-	public void writeString( final String _string )
-	{
-		//ConvertBytes.toBytes( _string, offset, buffer ) ;
-		//offset += ConvertBytes.CHAR_SIZE * _string.length ;
-	}
+		buffer.put( index, _x ) ;
+		buffer.put( ++index, _y ) ;
+		buffer.put( ++index, _z ) ;
+		buffer.put( ++index, _w ) ;
 
-	public void writeBoolean( final boolean _bool )
-	{
-		//ConvertBytes.toBytes( _bool, offset, buffer ) ;
-		offset += ConvertBytes.BOOLEAN_SIZE ;
-	}
-
-	public void writeInts( final int[] _int )
-	{
-		//ConvertBytes.toBytes( _int, offset, buffer ) ;
-		//offset += ConvertBytes.INT_SIZE * _ints.length ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeBytes( final byte[] _byte )
-	{
-		//ConvertBytes.toBytes( _byte, offset, buffer ) ;
-		//offset += ConvertBytes.BYTE_SIZE * _byte.length ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeChars( final char[] _char )
-	{
-		//ConvertBytes.toBytes( _char, offset, buffer ) ;
-		//offset += ConvertBytes.CHAR_SIZE * _char.length ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeLongs( final long[] _long )
-	{
-		//ConvertBytes.toBytes( _long, offset, buffer ) ;
-		//offset += ConvertBytes.LONG_SIZE * _long.length ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeFloats( final float[] _float )
-	{
-		final int size = _float.length ;
-		System.arraycopy( _float, 0, buffer, offset, size ) ;
-		offset += size ;
-	}
-
-	public void writeDoubles( final double[] _double )
-	{
-		//ConvertBytes.toBytes( _double, offset, buffer ) ;
-		//offset += ConvertBytes.DOUBLE_SIZE * _double.length ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeStrings( final String[] _string )
-	{
-		//ConvertBytes.toBytes( _string, offset, buffer ) ;
-		//offset += ConvertBytes.INT_SIZE ;
-		throw new UnsupportedOperationException() ;
-	}
-
-	public void writeBooleans( final boolean[] _bool )
-	{
-		//ConvertBytes.toBytes( _bool, offset, buffer ) ;
-		//offset += ConvertBytes.BOOLEAN_SIZE * _bool.length ;
-		throw new UnsupportedOperationException() ;
+		return _offset + 16 ;
 	}
 }

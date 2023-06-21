@@ -104,18 +104,18 @@ public class FloatBuffer
 		return _get[_index] ;
 	}
 
-	public static Vector3 fill( final float[] _get, final Vector3 _fill, final int _at )
+	public static Vector3 fill( final float[] _get, final Vector3 _fill, int _at )
 	{
 		_fill.x = _get[_at] ;
-		_fill.y = _get[_at + 1] ;
-		_fill.z = _get[_at + 2] ;
+		_fill.y = _get[++_at] ;
+		_fill.z = _get[++_at] ;
 		return _fill ;
 	}
 
-	public static Vector2 fill( final float[] _get, final Vector2 _fill, final int _at )
+	public static Vector2 fill( final float[] _get, final Vector2 _fill, int _at )
 	{
 		_fill.x = _get[_at] ;
-		_fill.y = _get[_at + 1] ;
+		_fill.y = _get[++_at] ;
 		return _fill ;
 	}
 

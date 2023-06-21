@@ -93,7 +93,7 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forEach( draws, parallelUpdater ) ;
 
-			dirty = parallelUpdater.isDirty() ;
+			dirty |= parallelUpdater.isDirty() ;
 
 			if( forceUpdate == true )
 			{

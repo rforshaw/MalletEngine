@@ -1,6 +1,11 @@
 {
-	NAME: "SIMPLE_STENCIL",
-	VERTEX: ["base/shaders/android/simple_vertex.glsl"],
+	"NAME": "SIMPLE_STENCIL",
+	"VERTEX": [
+		"base/shaders/android/version.glsl",
+		"base/shaders/android/engine_structs.glsl",
+		"base/shaders/android/engine_utils.glsl",
+		"base/shaders/android/simple_vertex.glsl"
+	],
 
 	"UNIFORMS": [],
 	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]

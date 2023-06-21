@@ -5,8 +5,6 @@ in vec4 inColour ;
 in vec2 inTexCoord0 ;
 in vec3 inNormal ;
 
-
-
 layout( std140, binding = 0 ) buffer Instances
 {
 	Transformation transformations[] ;
