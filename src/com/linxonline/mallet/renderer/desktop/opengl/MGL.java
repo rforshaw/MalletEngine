@@ -250,6 +250,11 @@ public final class MGL
 		gl.glColorMask( _red, _green, _blue, _alpha ) ;
 	}
 
+	public static void glDepthFunc( final int _op )
+	{
+		gl.glDepthFunc( _op ) ;
+	}
+
 	public static void glDepthMask( final boolean _mask )
 	{
 		gl.glDepthMask( _mask ) ;

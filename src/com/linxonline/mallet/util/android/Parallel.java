@@ -5,13 +5,13 @@ import java.util.concurrent.* ;
 
 public final class Parallel
 {
-	private final static int MINIMUM_DATA_SIZE = 50 ;
+	private final static int MINIMUM_BATCH_SIZE = 50 ;
 
 	private final static LinkedBlockingQueue<IJob> jobs = new LinkedBlockingQueue<IJob>() ;
 	private volatile static int workerCount = 0 ;
 	static
 	{
-		createWorkers( 6 ) ;
+		createWorkers( 4 ) ;
 	}
 
 	private Parallel() {}
@@ -21,44 +21,48 @@ public final class Parallel
 		jobs.add( new Job( _run ) ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final T[] _array, final IRangeRun<T> _run )
 	{
-		forEach( _array, 0, _array.length, MINIMUM_DATA_SIZE, _run ) ;
+		forEach( _array, 0, _array.length, MINIMUM_BATCH_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final T[] _array, final int _batchSize, final IRangeRun<T> _run )
+	{
+		forEach( _array, 0, _array.length, _batchSize, _run ) ;
+	}
+
+	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
 	{
 		//final long startTime = System.currentTimeMillis() ;
 
-		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
-		if( numJobs <= 1 )
+		final int batchSize = _batchSize ;
+		final int totalSize = _end - _start ;
+		final int batchNum = ( totalSize + batchSize - 1 ) / batchSize ;
+
+		if( batchNum <= 1 )
 		{
 			// No point creating a job if only 1 job is being used.
 			for( int i = _start; i < _end; ++i )
 			{
-				_run[0].run( i, _array[i] ) ;
+				_run.run( i, _array[i] ) ;
 			}
 			return ;
 		}
 
-		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
-
-		final int size = ( _end - _start ) / numJobs ;
 		int start = _start ;
-		int end = size ;
+		int numCompleted = 0 ;
 
-		//System.out.println( "Creating: " + numJobs + " jobs." ) ;
-		for( int i = 0; i < numJobs; ++i )
+		final CountDownLatch latch = new CountDownLatch( batchNum ) ;
+
+		while( numCompleted < batchNum )
 		{
-			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
-			if( i == ( numJobs - 1 ) )
-			{
-				end = _end ;
-			}
+			int end = start + batchSize ;
+			end = ( end > _end ) ? _end : end ;
 
-			jobs.add( new ArrayJob( latch, start, end, _array, _run[runIndex] ) ) ;
+			jobs.add( new ArrayJob( latch, start, end, _array, _run ) ) ;
+
 			start = end ;
-			end += size ;
+			++numCompleted ;
 		}
 
 		try
@@ -74,44 +78,48 @@ public final class Parallel
 		//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final List<T> _list, final IRangeRun<T> _run )
 	{
-		forEach( _list, 0, _list.size(), MINIMUM_DATA_SIZE, _run ) ;
+		forEach( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final List<T> _list, final int _batchSize, final IRangeRun<T> _run )
+	{
+		forEach( _list, 0, _list.size(), _batchSize, _run ) ;
+	}
+
+	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
 	{
 		//final long startTime = System.currentTimeMillis() ;
 
-		final int numJobs = calculateJobsRequired( _run.length, _end - _start, _minimum ) ;
-		if( numJobs <= 1 )
+		final int batchSize = _batchSize ;
+		final int totalSize = _end - _start ;
+		final int batchNum = ( totalSize + batchSize - 1 ) / batchSize ;
+
+		if( batchNum <= 1 )
 		{
 			// No point creating a job if only 1 job is being used.
 			for( int i = _start; i < _end; ++i )
 			{
-				_run[0].run( i, _list.get( i ) ) ;
+				_run.run( i, _list.get( i ) ) ;
 			}
 			return ;
 		}
 
-		final CountDownLatch latch = new CountDownLatch( numJobs ) ;
-
-		final int size = ( _end - _start ) / numJobs ;
 		int start = _start ;
-		int end = size ;
+		int numCompleted = 0 ;
 
-		//System.out.println( "Creating: " + numJobs + " jobs." ) ;
-		for( int i = 0; i < numJobs; ++i )
+		final CountDownLatch latch = new CountDownLatch( batchNum ) ;
+
+		while( numCompleted < batchNum )
 		{
-			final int runIndex = ( i < _run.length ) ? i : _run.length - 1 ;
-			if( i == ( numJobs - 1 ) )
-			{
-				end = _end ;
-			}
+			int end = start + batchSize ;
+			end = ( end > _end ) ? _end : end ;
 
-			jobs.add( new ListJob( latch, start, end, _list, _run[runIndex] ) ) ;
+			jobs.add( new ListJob( latch, start, end, _list, _run ) ) ;
+
 			start = end ;
-			end += size ;
+			++numCompleted ;
 		}
 
 		try
@@ -127,47 +135,53 @@ public final class Parallel
 		//System.out.println( "P Time Taken: " + ( endTime - startTime ) ) ;
 	}
 
-	/**
-		Attempt to figure out how many jobs we need to process the data.
-		This is mostly used to identify the minimum number required.
-		If the data set is not large enough to be shared we don't
-		want to run 4 empty jobs, we want to run 1 'full' job.
-	*/
-	private static int calculateJobsRequired( final int _runSize, final int _dataSize, final int _minimum )
+	public static <T> void forBatch( final List<T> _list, final IBatchRun<T> _run )
 	{
-		int jobs = 4 ;			// We assume 4 jobs will be used by default
-		if( _runSize > 1 )
-		{
-			// More than 1 runner means we
-			// limit ourselves to that many jobs.
-			jobs = _runSize ;
+		forBatch( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
+	}
 
-			if( _runSize > workerCount )
-			{
-				// If the number if workers is less than
-				// the number of runners then let's create
-				// more workers.
-				// Add an extra worker just to ensure there
-				// is a worker spare.
-				createWorkers( _runSize - workerCount + 1 ) ;
-			}
+	public static <T> void forBatch( final List<T> _list, final int _batchSize, final IBatchRun<T> _run )
+	{
+		forBatch( _list, 0, _list.size(), _batchSize, _run ) ;
+	}
+
+	public static <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final IBatchRun<T> _run )
+	{
+		final int batchSize = _batchSize ;
+		final int totalSize = _end - _start ;
+		final int batchNum = ( totalSize + batchSize - 1 ) / batchSize ;
+
+		if( batchNum <= 1 )
+		{
+			// No point creating a job if only 1 job is being used.
+			_run.run( _start, _end, _list ) ;
+			return ;
 		}
 
-		final int size = _dataSize / jobs ;
-		if( size == 0 || size < _minimum )
-		{
-			// If the number of items being processed is 0
-			// then it's likely to be a rounding error.
-			// We likely only need 1 job to process.
+		int start = _start ;
+		int numCompleted = 0 ;
 
-			// If there isn't enough data to warrant multiple jobs
-			// then we should also avoid creating more jobs 
-			// than needed.
-			jobs = 1 ;
+		final CountDownLatch latch = new CountDownLatch( batchNum ) ;
+
+		while( numCompleted < batchNum )
+		{
+			int end = start + batchSize ;
+			end = ( end > _end ) ? _end : end ;
+
+			jobs.add( new BatchJob( latch, start, end, _list, _run ) ) ;
+
+			start = end ;
+			++numCompleted ;
 		}
 
-		//System.out.println( "Jobs: " + jobs ) ;
-		return jobs ;
+		try
+		{
+			latch.await() ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
 	}
 
 	private static void createWorkers( final int _num )
@@ -180,9 +194,9 @@ public final class Parallel
 
 	private static void createWorker( final int _num )
 	{
-		final Thread thread = new Thread( new Worker(), String.format( "PARALLEL_THREAD_%d", _num ) ) ;
-		thread.setPriority( 10 ) ;
-		thread.start() ;
+		final Worker worker = new Worker( String.format( "PARALLEL_THREAD_%d", _num ) ) ;
+		//worker.setPriority( 10 ) ;
+		worker.start() ;
 	}
 
 	public interface IRun
@@ -195,20 +209,25 @@ public final class Parallel
 		public void run( final int _index, final T _item ) ;
 	}
 
-	private static class ArrayJob<T> implements IJob
+	public interface IBatchRun<T>
+	{
+		public void run( final int _start, final int _end, final List<T> _batch ) ;
+	}
+
+	private static final class ArrayJob<T> implements IJob
 	{
 		private final CountDownLatch latch ;
 		private final int start ;
 		private final int end ;
 
 		private final T[] array ;
-		private final IRangeRun runner ;
+		private final IRangeRun<T> runner ;
 
 		public ArrayJob( final CountDownLatch _latch,
 						 final int _start,
 						 final int _end,
 						 final T[] _array,
-						 final IRangeRun _runner )
+						 final IRangeRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -217,13 +236,6 @@ public final class Parallel
 
 			array = _array ;
 			runner = _runner ;
-			//System.out.println( "Runner: " + runner.toString() ) ;
-		}
-
-		@Override
-		public void countDown()
-		{
-			latch.countDown() ;
 		}
 
 		@Override
@@ -233,23 +245,25 @@ public final class Parallel
 			{
 				runner.run( i, array[i] ) ;
 			}
+
+			latch.countDown() ;
 		}
 	}
 
-	private static class ListJob<T> implements IJob
+	private static final class ListJob<T> implements IJob
 	{
 		private final CountDownLatch latch ;
 		private final int start ;
 		private final int end ;
 
 		private final List<T> list ;
-		private final IRangeRun runner ;
+		private final IRangeRun<T> runner ;
 
 		public ListJob( final CountDownLatch _latch,
 						final int _start,
 						final int _end,
 						final List<T> _list,
-						final IRangeRun _runner )
+						final IRangeRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -261,9 +275,45 @@ public final class Parallel
 		}
 
 		@Override
-		public void countDown()
+		public void run()
 		{
+			//System.out.println( "Started" ) ;
+			//final long startTime = System.currentTimeMillis() ;
+
+			for( int i = start; i < end; ++i )
+			{
+				runner.run( i, list.get( i ) ) ;
+			}
+
+			//final long endTime = System.currentTimeMillis() ;
 			latch.countDown() ;
+
+			//System.out.println( "J Start: " + start + " End: " + end + " Start Time: " + startTime + " Time Taken: " + ( endTime - startTime ) ) ;
+		}
+	}
+
+	private static final class BatchJob<T> implements IJob
+	{
+		private final CountDownLatch latch ;
+		private final int start ;
+		private final int end ;
+
+		private final List<T> list ;
+		private final IBatchRun<T> runner ;
+
+		public BatchJob( final CountDownLatch _latch,
+						 final int _start,
+						 final int _end,
+						 final List<T> _list,
+						 final IBatchRun<T> _runner )
+		{
+			latch = _latch ;
+
+			start = _start ;
+			end = _end ;
+
+			list = _list ;
+			runner = _runner ;
 		}
 
 		@Override
@@ -272,18 +322,16 @@ public final class Parallel
 			//System.out.println( "Started" ) ;
 			//final long startTime = System.currentTimeMillis() ;
 
-			for( int i = start; i < end; ++i )
-			{
-				final T t = list.get( i ) ;
-				runner.run( i, t ) ;
-			}
+			runner.run( start, end, list ) ;
 
 			//final long endTime = System.currentTimeMillis() ;
-			//System.out.println( "J Time Taken: " + ( endTime - startTime ) + " Amount: " + ( end - start ) ) ;
+			latch.countDown() ;
+
+			//System.out.println( "J Start: " + start + " End: " + end + " Start Time: " + startTime + " Time Taken: " + ( endTime - startTime ) ) ;
 		}
 	}
 
-	private static class Job implements IJob
+	private static final class Job implements IJob
 	{
 		private final IRun runner ;
 
@@ -291,9 +339,6 @@ public final class Parallel
 		{
 			runner = _runner ;
 		}
-
-		@Override
-		public void countDown() {}
 
 		@Override
 		public void run()
@@ -304,21 +349,21 @@ public final class Parallel
 
 	private interface IJob
 	{
-		public void countDown() ;
 		public void run() ;
 	}
 
-	private static class Worker implements Runnable
+	private static final class Worker extends Thread
 	{
 		private final boolean temporary ;
-	
-		public Worker()
+
+		public Worker( final String _name )
 		{
-			this( false ) ;
+			this( _name, false ) ;
 		}
 
-		public Worker( final boolean _temporary )
+		public Worker( final String _name, final boolean _temporary )
 		{
+			super( _name ) ;
 			temporary = _temporary ;
 		}
 
@@ -333,7 +378,6 @@ public final class Parallel
 				{
 					final IJob job = Parallel.jobs.take() ;
 					job.run() ;
-					job.countDown() ;
 
 					if( temporary )
 					{

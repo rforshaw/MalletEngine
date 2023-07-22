@@ -8,7 +8,7 @@ import java.util.List ;
 */
 public final class Parallel
 {
-	private final static int MINIMUM_DATA_SIZE = 50 ;	// Not needed but lets stay inline with android/desktop.
+	private final static int MINIMUM_BATCH_SIZE = 50 ;	// Not needed but lets stay inline with android/desktop.
 
 	private Parallel() {}
 
@@ -17,31 +17,55 @@ public final class Parallel
 		_run.run() ;
 	}
 
-	public static <T> void forEach( final T[] _array, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final T[] _array, final IRangeRun<T> _run )
 	{
-		forEach( _array, 0, _array.length, MINIMUM_DATA_SIZE, _run ) ;
+		forEach( _array, 0, _array.length, MINIMUM_BATCH_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final T[] _array, final int _batchSize, final IRangeRun<T> _run )
+	{
+		forEach( _array, 0, _array.length, _batchSize, _run ) ;
+	}
+
+	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
 	{
 		for( int i = _start; i < _end; ++i )
 		{
-			_run[0].run( i, _array[i] ) ;
+			_run.run( i, _array[i] ) ;
 		}
 	}
 
-	public static <T> void forEach( final List<T> _list, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final List<T> _list, final IRangeRun<T> _run )
 	{
-		final int size = _list.size() ;
-		forEach( _list, 0, size, MINIMUM_DATA_SIZE, _run ) ;
+		forEach( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _minimum, final IRangeRun<T> ... _run )
+	public static <T> void forEach( final List<T> _list, final int _batchSize, final IRangeRun<T> _run )
+	{
+		forEach( _list, 0, _list.size(), _batchSize, _run ) ;
+	}
+
+	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
 	{
 		for( int i = _start; i < _end; ++i )
 		{
-			_run[0].run( i, _list.get( i ) ) ;
+			_run.run( i, _list.get( i ) ) ;
 		}
+	}
+
+	public static <T> void forBatch( final List<T> _list, final IBatchRun<T> _run )
+	{
+		forBatch( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
+	}
+
+	public static <T> void forBatch( final List<T> _list, final int _batchSize, final IBatchRun<T> _run )
+	{
+		forBatch( _list, 0, _list.size(), _batchSize, _run ) ;
+	}
+
+	public static <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final IBatchRun<T> _run )
+	{
+		_run.run( _start, _end, _list ) ;
 	}
 
 	public interface IRun
@@ -52,5 +76,10 @@ public final class Parallel
 	public interface IRangeRun<T>
 	{
 		public void run( final int _index, final T _item ) ;
+	}
+
+	public interface IBatchRun<T>
+	{
+		public void run( final int _start, final int _end, final List<T> _batch ) ;
 	}
 }

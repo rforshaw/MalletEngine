@@ -31,8 +31,10 @@ public final class GLGeometryBuffer extends GLBuffer
 	private int indexByteSize ;
 	private int vertexByteSize ;
 
-	private int indexMapSize = 0 ;
-	private IndexMap[] indexMaps ;
+	private int toDrawSize = 0 ;
+	private Draw[] toDraw ;
+	private int[] drawDimensions ;
+
 	private IntBuffer indexBuffer ;
 	private FloatBuffer vertexBuffer ;
 
@@ -73,8 +75,9 @@ public final class GLGeometryBuffer extends GLBuffer
 		maxIndexByteSize = _maxIndexByteSize ;
 		maxVertexByteSize = _maxVertexByteSize ;
 
-		indexMapSize = 0 ;
-		indexMaps = new IndexMap[0] ;
+		toDrawSize = 0 ;
+		toDraw = new Draw[0] ;
+		drawDimensions = new int[0] ;
 
 		// We'll construct our buffers for the minimum size
 		// but if we need more space we'll expand the size 
@@ -118,20 +121,18 @@ public final class GLGeometryBuffer extends GLBuffer
 
 		final List<Draw> draws = _buffer.getDraws() ;
 		final int size = draws.size() ;
-		if( indexMaps.length < size )
+		if( toDraw.length < size )
 		{
-			final IndexMap[] oldMaps = indexMaps ;
-			indexMaps = new IndexMap[size] ;
-			for( int i = 0; i < size; ++i )
-			{
-				indexMaps[i] = ( i < oldMaps.length ) ? oldMaps[i] : new IndexMap() ;
-			}
+			toDraw = new Draw[size] ;
+			drawDimensions = new int[size * 3] ;
 		}
 
-		indexMapSize = 0 ;
+		toDrawSize = 0 ;
 		for( int i = 0; i < size; ++i )
 		{
 			final Draw draw = draws.get( i ) ;
+			toDraw[i] = draw ;
+
 			final IShape[] shapes = draw.getShapes() ;
 			for( final IShape shape : shapes )
 			{
@@ -166,7 +167,10 @@ public final class GLGeometryBuffer extends GLBuffer
 					usedVertexByteSize = shapeVertexByteSize ;
 				}
 
-				uploadIndexToRAM( draw, shape, indexMaps[indexMapSize++] ) ;
+				final int drawIndex = i ;
+				final int offset = toDrawSize++ * 3 ;
+
+				uploadIndexToRAM( drawIndex, shape, offset ) ;
 				vertexBuffer.put( shape.getRawVertices() ) ;
 			}
 		}
@@ -205,10 +209,14 @@ public final class GLGeometryBuffer extends GLBuffer
 
 			GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
 
-			for( int j = 0; j < indexMapSize; ++j )
+			for( int j = 0; j < toDrawSize; ++j )
 			{
-				final IndexMap map = indexMaps[j] ;
-				final Draw draw = map.draw ;
+				final int drawOffset = j * 3 ;
+				final int drawIndex = drawDimensions[drawOffset] ;
+				final int start = drawDimensions[drawOffset + 1] ;
+				final int count = drawDimensions[drawOffset + 2] ;
+			
+				final Draw draw = toDraw[drawIndex] ;
 				if( draw.isHidden() || _occluder.occlude( draw ) )
 				{
 					continue ;
@@ -230,7 +238,7 @@ public final class GLGeometryBuffer extends GLBuffer
 				MGL.glUniform4f( _program.inRotation, rotation.x, rotation.y, rotation.z, 1.0f ) ;
 				MGL.glUniform4f( _program.inScale, scale.x, scale.y, scale.z, 1.0f ) ;
 
-				MGL.glDrawElements( style, map.count, MGL.GL_UNSIGNED_INT, map.start * IBO_VAR_BYTE_SIZE ) ;
+				MGL.glDrawElements( style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
 			}
 		}
 		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;
@@ -337,7 +345,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 	}
 	
-	private void uploadIndexToRAM( final Draw _draw, final IShape _shape, final IndexMap _map )
+	private void uploadIndexToRAM( final int _drawIndex, final IShape _shape, final int _dimOffset )
 	{
 		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
@@ -349,21 +357,9 @@ public final class GLGeometryBuffer extends GLBuffer
 			indexBuffer.put( indexOffset + inds[i] ) ;
 		}
 
-		_map.set( indexStart, size, _draw ) ;
-	}
-
-	private static class IndexMap
-	{
-		public int start = 0 ;
-		public int count = 0 ;
-		public Draw draw ;
-
-		public void set( final int _start, final int _count, final Draw _draw )
-		{
-			start = _start ;
-			count = _count ;
-			draw = _draw ;
-		}
+		drawDimensions[_dimOffset] = _drawIndex ;
+		drawDimensions[_dimOffset + 1] = indexStart ;
+		drawDimensions[_dimOffset + 2] = size ;
 	}
 }
 

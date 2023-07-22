@@ -4,17 +4,12 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class Stencil extends ABuffer
+public class Depth extends ABuffer
 {
 	private final int order ;
 
-	private final Action stencilFail ;
-	private final Action depthFail ;
-	private final Action depthPass ;
-
 	private final Operation op ;
-	private final int reference ;
-	private final int mask ;
+	private final boolean mask ;
 
 	private boolean clear = false ;
 	private boolean enable = true ;
@@ -29,25 +24,18 @@ public class Stencil extends ABuffer
 
 	private final List<ABuffer> buffers ;
 
-	public Stencil( final int _order,
-					final Action _stencilFail, final Action _depthFail, final Action _depthPass,
-					final Operation _op, final int _reference, final int _mask )
+	public Depth( final int _order, final Operation _op, final boolean _mask )
 	{
 		buffers = MalletList.<ABuffer>newList() ;
 		order = _order ;
 
-		stencilFail = _stencilFail ;
-		depthFail = _depthFail ;
-		depthPass = _depthPass ;
-
 		op = _op ;
-		reference = _reference ;
 		mask = _mask ;
 	}
 
 	/**
 		Determine whether the stencilbuffer should cleared
-		before enacting the specified stencil operations.
+		before enacting the specified depth operations.
 	*/
 	public void setClear( final boolean _clear )
 	{
@@ -55,11 +43,11 @@ public class Stencil extends ABuffer
 	}
 
 	/**
-		Determine whether stencil testing should be enabled.
-		If set to true, this will trigger enabling the stencil tests.
-		If set to false, this will disable the stencil tests.
-		NOTE: Stencil tests will be disabled by the World at the end
-		of the draw call we do not want stencil operations from one world
+		Determine whether depth testing should be enabled.
+		If set to true, this will trigger enabling the depth tests.
+		If set to false, this will disable the depth tests.
+		NOTE: Depth tests will be disabled by the World at the end
+		of the draw call we do not want depth operations from one world
 		impacting another.
 	*/
 	public void setEnable( final boolean _enable )
@@ -123,32 +111,12 @@ public class Stencil extends ABuffer
 		return buffers ;
 	}
 
-	public Action getStencilFail()
-	{
-		return stencilFail ;
-	}
-
-	public Action getDepthFail()
-	{
-		return depthFail ;
-	}
-
-	public Action getDepthPass()
-	{
-		return depthPass ;
-	}
-
 	public Operation getOperation()
 	{
 		return op ;
 	}
 
-	public int getReference()
-	{
-		return reference ;
-	}
-
-	public int getMask()
+	public boolean getMask()
 	{
 		return mask ;
 	}
@@ -161,7 +129,7 @@ public class Stencil extends ABuffer
 	@Override
 	public BufferType getBufferType()
 	{
-		return BufferType.STENCIL ;
+		return BufferType.DEPTH ;
 	}
 
 	@Override

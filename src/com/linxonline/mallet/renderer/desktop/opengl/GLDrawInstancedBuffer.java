@@ -1,5 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
+import java.util.concurrent.atomic.AtomicInteger ;
 import java.util.Arrays ;
 import java.util.List ;
 import java.util.ArrayList ;
@@ -129,6 +130,39 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			storageName = _buffer.getStorageName() ;
 		}
 
+		{
+			boolean foundInstanceBuffer = false ;
+			final List<String> buffers = glProgram.program.getBuffers() ;
+
+			final int size = storages.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final GLStorage storage = storages.get( i ) ;
+				if( storage != null )
+				{
+					continue ;
+				}
+
+				final String name = buffers.get( i ) ;
+				if( name.equals( storageName ) == false ) 
+				{
+					System.out.println( "Failed to find storage buffer, skipping..." ) ;
+					continue ;
+				}
+
+				storages.set( i, glTransStorage ) ;
+				foundInstanceBuffer = true ;
+				break ;
+			}
+
+			if( foundInstanceBuffer == false )
+			{
+				System.out.println( "Instances buffer not specified in program." ) ;
+				stable = false ;
+				return stable ;
+			}
+		}
+
 		if( attributes == null )
 		{
 			// We only want to build the attributes once, 
@@ -217,38 +251,11 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		glTransStorage.update( transStorage ) ;
 
 		{
-			boolean foundInstanceBuffer = false ;
-
-			final List<String> buffers = glProgram.program.getBuffers() ;
-
 			final int size = storages.size() ;
 			for( int i = 0; i < size; ++i )
 			{
 				final GLStorage storage = storages.get( i ) ;
-				if( storage == null )
-				{
-					final String name = buffers.get( i ) ;
-					if( name.equals( storageName ) == false ) 
-					{
-						System.out.println( "Failed to find storage buffer, skipping..." ) ;
-						continue ;
-					}
-
-					// Map the transformation storage to the specified 
-					// name within the program.
-					foundInstanceBuffer = true ;
-					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, glTransStorage.id[0] ) ;
-				}
-				else
-				{
-					MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
-				}
-			}
-
-			if( foundInstanceBuffer == false )
-			{
-				System.out.println( "Instances buffer not specified in program." ) ;
-				return ;
+				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
 			}
 		}
 
@@ -307,11 +314,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private static class Transformations implements Storage.IData
 	{
 		private final List<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
-		private final TransformationUpdater[] updaters = new TransformationUpdater[]
-		{
-			new TransformationUpdater(),
-			new TransformationUpdater()
-		} ;
+		private final TransformationUpdater updater = new TransformationUpdater() ;
 
 		public int drawCount = 0 ;
 
@@ -347,26 +350,28 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			for( int i = 0; i < bufferSize; ++i )
 			{
 				final GeometryBuffer buffer = buffers.get( i ) ;
+				updater.set( i, ( 16 * 4 ), _out ) ;
 
-				for( final TransformationUpdater updater : updaters )
-				{
-					updater.set( i, ( 16 * 4 ), _out ) ;
-				}
-
+				//System.out.println( "Start.." ) ;
 				//final long startTime = System.currentTimeMillis() ;
 
-				Parallel.forEach( buffer.getDraws(), updaters ) ;
+				Parallel.forEach( buffer.getDraws(), 10000, updater ) ;
+
+				/*final List<Draw> draws = buffer.getDraws() ;
+				final int drawSize = draws.size() ;
+				for( int j = 0; j < drawSize; ++j )
+				{
+					updater.run( j, draws.get( j ) ) ;
+				}*/
 
 				//final long endTime = System.currentTimeMillis() ;
-				//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
+				//System.out.println( "GL Time Taken: " + ( endTime - startTime ) ) ;
 			}
 		}
 	}
 
-	private static class TransformationUpdater implements Parallel.IRangeRun<Draw>
+	private static final class TransformationUpdater implements Parallel.IRangeRun<Draw>
 	{
-		private final float[] transformations = new float[12] ;
-
 		private int bufferIndex = 0 ;
 		private int objectSize = 0 ;
 		private Storage.ISerialise out ;

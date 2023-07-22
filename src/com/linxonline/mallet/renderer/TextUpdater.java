@@ -13,7 +13,7 @@ import com.linxonline.mallet.util.MalletList ;
 	This DrawUpdater is designed to trigger the update 
 	of buffers when the Draw object state is still influx.
 */
-public class TextUpdater implements IUpdater<TextBuffer>
+public final class TextUpdater implements IUpdater<TextBuffer>
 {
 	private final ArrayList<TextBuffer> buffers = new ArrayList<TextBuffer>() ;
 

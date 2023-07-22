@@ -138,7 +138,7 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class AddTask extends Task
+	private final class AddTask extends Task
 	{
 		public AddTask( final T _data )
 		{
@@ -153,7 +153,7 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class RemoveTask extends Task
+	private final class RemoveTask extends Task
 	{
 		public RemoveTask( final T _data )
 		{
@@ -170,7 +170,7 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class RemoveAllTask extends Task
+	private final class RemoveAllTask extends Task
 	{
 		public RemoveAllTask( final T _data )
 		{
@@ -194,7 +194,7 @@ public final class BufferedList<T>
 		}
 	}
 
-	private class InsertTask extends Task
+	private final class InsertTask extends Task
 	{
 		private final int index ;
 

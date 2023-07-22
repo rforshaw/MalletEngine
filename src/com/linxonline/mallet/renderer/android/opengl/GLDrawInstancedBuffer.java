@@ -307,11 +307,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private static class Transformations implements Storage.IData
 	{
 		private final List<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
-		private final TransformationUpdater[] updaters = new TransformationUpdater[]
-		{
-			new TransformationUpdater(),
-			new TransformationUpdater()
-		} ;
+		private final TransformationUpdater updater = new TransformationUpdater() ;
 
 		public int drawCount = 0 ;
 
@@ -347,15 +343,11 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			for( int i = 0; i < bufferSize; ++i )
 			{
 				final GeometryBuffer buffer = buffers.get( i ) ;
-
-				for( final TransformationUpdater updater : updaters )
-				{
-					updater.set( i, ( 16 * 4 ), _out ) ;
-				}
+				updater.set( i, ( 16 * 4 ), _out ) ;
 
 				//final long startTime = System.currentTimeMillis() ;
 
-				Parallel.forEach( buffer.getDraws(), updaters ) ;
+				Parallel.forEach( buffer.getDraws(), 10000, updater ) ;
 
 				//final long endTime = System.currentTimeMillis() ;
 				//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
@@ -365,8 +357,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 	private static class TransformationUpdater implements Parallel.IRangeRun<Draw>
 	{
-		private final float[] transformations = new float[12] ;
-
 		private int bufferIndex = 0 ;
 		private int objectSize = 0 ;
 		private Storage.ISerialise out ;

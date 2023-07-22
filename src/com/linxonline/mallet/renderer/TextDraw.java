@@ -13,6 +13,8 @@ public final class TextDraw implements IUpdate
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;
 
+	private MalletColour colour = null ;
+
 	public TextDraw()
 	{
 		this( "" ) ;
@@ -43,12 +45,13 @@ public final class TextDraw implements IUpdate
 
 	public MalletColour setColour( final MalletColour _colour )
 	{
-		return draw.setColour( _colour ) ;
+		colour = _colour ;
+		return colour ;
 	}
 
 	public MalletColour getColour()
 	{
-		return draw.getColour() ;
+		return colour ;
 	}
 
 	public void setPositionInstant( final float _x, final float _y, final float _z )

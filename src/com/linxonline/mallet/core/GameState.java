@@ -669,6 +669,11 @@ public class GameState extends State
 		private final TextDraw[] draws = new TextDraw[2] ;
 		private final TextUpdater updater ;
 
+		private int accumulatedTicks = 0 ;
+		private int accumulatedFPS = 0 ;
+
+		private int averageFPS = 0 ;
+
 		public ShowFPS()
 		{
 			final World world = WorldAssist.getDefault() ;
@@ -714,9 +719,24 @@ public class GameState extends State
 
 		private void updateDrawFPS( final TextDraw _draw, final double _dt )
 		{
+			final int currentFPS = ( int )Math.ceil( 1.0f / _dt ) ;
+
+			accumulatedFPS += currentFPS ;
+			accumulatedTicks += 1 ;
+
+			if( accumulatedTicks >= 10 )
+			{
+				averageFPS = accumulatedFPS / accumulatedTicks ;
+
+				accumulatedFPS = 0 ;
+				accumulatedTicks = 0 ;
+			}
+
 			final StringBuilder txt = _draw.getText() ;
 			txt.setLength( 0 ) ;
-			txt.insert( 0, ( int )Math.ceil( 1.0f / _dt ) ) ;
+			txt.append( averageFPS ) ;
+			txt.append( "fps " ) ;
+			txt.append( currentFPS ) ;
 			txt.append( "fps" ) ;
 
 			_draw.setRange( 0, txt.length() ) ;

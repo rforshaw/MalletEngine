@@ -17,6 +17,8 @@ import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.Operation ;
+import com.linxonline.mallet.renderer.Action ;
 
 import com.linxonline.mallet.util.caches.Cacheable ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
@@ -52,6 +54,36 @@ public class GLBuffer
 	public void draw( final Matrix4 _projection ) {}
 
 	public void shutdown() {}
+
+	public static int getOperation( final Operation _operation )
+	{
+		switch( _operation )
+		{
+			default                 : return MGL.GL_ALWAYS ;
+			case ALWAYS             : return MGL.GL_ALWAYS ;
+			case NEVER              : return MGL.GL_NEVER ;
+			case LESS_THAN          : return MGL.GL_LESS ;
+			case GREATER_THAN       : return MGL.GL_GREATER ;
+			case LESS_THAN_EQUAL    : return MGL.GL_LEQUAL ;
+			case GREATER_THAN_EQUAL : return MGL.GL_GEQUAL ;
+			case EQUAL              : return MGL.GL_EQUAL ;
+			case NOT_EQUAL          : return MGL.GL_NOTEQUAL ;
+		}
+	}
+
+	public static int getAction( final Action _action )
+	{
+		switch( _action )
+		{
+			default        : return MGL.GL_KEEP ;
+			case KEEP      : return MGL.GL_KEEP ;
+			case ZERO      : return MGL.GL_ZERO ;
+			case REPLACE   : return MGL.GL_REPLACE ;
+			case INCREMENT : return MGL.GL_INCR ;
+			case DECREMENT : return MGL.GL_DECR ;
+			case INVERT    : return MGL.GL_INVERT ;
+		}
+	}
 
 	protected static boolean generateProgramUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
 	{

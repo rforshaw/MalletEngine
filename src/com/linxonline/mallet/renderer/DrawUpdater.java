@@ -129,7 +129,7 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 			parallelUpdater.set( mode, _diff, _iteration ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
-			Parallel.forEach( draws, parallelUpdater ) ;
+			Parallel.forBatch( draws, 1000, parallelUpdater ) ;
 
 			dirty |= parallelUpdater.isDirty() ;
 

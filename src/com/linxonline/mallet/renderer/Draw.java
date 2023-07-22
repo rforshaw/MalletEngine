@@ -21,19 +21,18 @@ public final class Draw implements IUpdate
 
 	public static final EmptyMeta EMPTY_META = new EmptyMeta() ;
 
+	// Each contain Position, Rotation, and Scale
+	private final float[] present = FloatBuffer.allocate( 12 ) ;
+	private final float[] old = FloatBuffer.allocate( 12 ) ;
+	private final float[] future = FloatBuffer.allocate( 12 ) ;
+
+	private final IShape[] shapes ;
 	private IMeta meta = EMPTY_META ;
 	private boolean hidden = false ;
-	private final IShape[] shapes ;
-	private MalletColour colour = null ;
 
 	// We don't want to construct a map for uniforms unless the client
 	// has some uniforms for the draw object.
 	private Map<String, IUniform> uniforms = null ;
-
-	// Each contain Position, Rotation, and Scale
-	private final float[] old = FloatBuffer.allocate( 12 ) ;
-	private final float[] present = FloatBuffer.allocate( 12 ) ;
-	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
 	public Draw()
 	{
@@ -196,17 +195,6 @@ public final class Draw implements IUpdate
 	public boolean isHidden()
 	{
 		return hidden ;
-	}
-
-	public MalletColour setColour( final MalletColour _colour )
-	{
-		colour = _colour ;
-		return colour ;
-	}
-
-	public MalletColour getColour()
-	{
-		return colour ;
 	}
 
 	public void setPositionInstant( final float _x, final float _y, final float _z )

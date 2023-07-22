@@ -266,6 +266,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 					case DRAW_BUFFER           : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
 					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
 					case STENCIL               : return new GLStencil( ( Stencil )_buffer ) ;
+					case DEPTH                 : return new GLDepth( ( Depth )_buffer ) ;
 				}
 			}
 		} ;
@@ -822,6 +823,11 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				final GLStencil stencil = ( GLStencil )_buff ;
 				return stencil.update( ( Stencil )_buffer, bufferLookup ) ;
+			}
+			case DEPTH                     :
+			{
+				final GLDepth depth = ( GLDepth )_buff ;
+				return depth.update( ( Depth )_buffer, bufferLookup ) ;
 			}
 		}
 	}

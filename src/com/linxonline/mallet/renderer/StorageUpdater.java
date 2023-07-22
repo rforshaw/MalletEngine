@@ -109,7 +109,7 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 
 		parallelUpdater.set( mode, _diff, _iteration ) ;
 
-		Parallel.forEach( dynamics, parallelUpdater ) ;
+		Parallel.forBatch( dynamics, 1000, parallelUpdater ) ;
 		final boolean update = parallelUpdater.isDirty() ;
 		dirty = update ;
 
