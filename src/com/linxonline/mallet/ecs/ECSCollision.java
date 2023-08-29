@@ -129,19 +129,22 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 			}
 
 			// Shift the hulls position by the penetration depth.
-			Parallel.forEach( _component.hulls, 1000, hullUpdater ) ;
+			Parallel.forBatch( _component.hulls, 1000, hullUpdater ) ;
 		}
 	}
 
-	private static class HullUpdater implements Parallel.IRangeRun<Hull>
+	private static class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
 		@Override
-		public void run( final int _index, final Hull _hull )
+		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{
 			final ContactPoint point = new ContactPoint() ;
 			final Vector2 penShift = new Vector2() ;
 
-			ECSCollision.updateCollision( _hull, point, penShift ) ;
+			for( int i = _start; i < _end; ++i )
+			{
+				ECSCollision.updateCollision( _hulls[i], point, penShift ) ;
+			}
 		}
 	}
 }

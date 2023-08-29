@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean ;
 
 import com.linxonline.mallet.util.Parallel ;
 
-public final class ParallelUpdater<T extends IUpdate> implements Parallel.IBatchRun<T>
+public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListRun<T>
 {
 	private Interpolation mode ;
 	private int diff ;

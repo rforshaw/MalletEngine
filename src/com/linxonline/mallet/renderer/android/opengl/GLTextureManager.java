@@ -24,7 +24,7 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
-import com.linxonline.mallet.util.TaskQueue ;
+import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.renderer.* ;
 
@@ -56,8 +56,6 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 
 	public GLTextureManager()
 	{
-		final TaskQueue task = new TaskQueue( 2, "TEXTURE_LOADER" ) ; 
-
 		final ResourceLoader<String, GLImage> loader = getResourceLoader() ;
 		loader.add( new ResourceDelegate<String, GLImage>()
 		{
@@ -73,7 +71,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 
 			protected GLImage loadTextureASync( final String _file )
 			{
-				task.add( () ->
+				Parallel.run( () ->
 				{
 					//System.out.println( "Loading Texture: " + _file ) ;
 					final FileStream file = GlobalFileSystem.getFile( _file ) ;
@@ -112,7 +110,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 
 			public GLImage load( final String _file )
 			{
-				task.add( ()->
+				Parallel.run( ()->
 				{
 					final FileStream file = GlobalFileSystem.getFile( _file ) ;
 					if( file.exists() == false )

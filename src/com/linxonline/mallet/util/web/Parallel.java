@@ -53,19 +53,34 @@ public final class Parallel
 		}
 	}
 
-	public static <T> void forBatch( final List<T> _list, final IBatchRun<T> _run )
+	public static <T> void forBatch( final List<T> _list, final IListRun<T> _run )
 	{
 		forBatch( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
 	}
 
-	public static <T> void forBatch( final List<T> _list, final int _batchSize, final IBatchRun<T> _run )
+	public static <T> void forBatch( final List<T> _list, final int _batchSize, final IListRun<T> _run )
 	{
 		forBatch( _list, 0, _list.size(), _batchSize, _run ) ;
 	}
 
-	public static <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final IBatchRun<T> _run )
+	public static <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final IListRun<T> _run )
 	{
 		_run.run( _start, _end, _list ) ;
+	}
+
+	public static <T> void forBatch( final T[] _array, final IArrayRun<T> _run )
+	{
+		forBatch( _array, 0, _array.length, MINIMUM_BATCH_SIZE, _run ) ;
+	}
+
+	public static <T> void forBatch( final T[] _array, final int _batchSize, final IArrayRun<T> _run )
+	{
+		forBatch( _array, 0, _array.length, _batchSize, _run ) ;
+	}
+
+	public static <T> void forBatch( final T[] _array, final int _start, final int _end, final int _batchSize, final IArrayRun<T> _run )
+	{
+		_run.run( _start, _end, _array ) ;
 	}
 
 	public interface IRun
@@ -78,8 +93,13 @@ public final class Parallel
 		public void run( final int _index, final T _item ) ;
 	}
 
-	public interface IBatchRun<T>
+	public interface IListRun<T>
 	{
-		public void run( final int _start, final int _end, final List<T> _batch ) ;
+		public void run( final int _start, final int _end, final List<T> _list ) ;
+	}
+
+	public interface IArrayRun<T>
+	{
+		public void run( final int _start, final int _end, final T[] _array ) ;
 	}
 }

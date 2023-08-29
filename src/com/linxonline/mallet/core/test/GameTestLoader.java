@@ -131,6 +131,13 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
+				final Camera camera = CameraAssist.getDefault() ;
+				camera.setPosition( 0, 0, -150 ) ;
+				camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
+				camera.lookAt( 0.0f, 100.0f, 0.0f ) ;
+
+				CameraAssist.update( camera ) ;
+				
 				createPlaneTest() ;
 
 				createUI() ;

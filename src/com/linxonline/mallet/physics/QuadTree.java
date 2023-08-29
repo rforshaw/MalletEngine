@@ -18,7 +18,6 @@ public final class QuadTree
 	private final float NODE_AREA_LIMIT  ;
 
 	private float ROOT_LENGTH ;
-	//private final List<QuadNode> nodes = MalletList.<QuadNode>newList() ;
 
 	private final IUpdate update ;
 
@@ -117,13 +116,6 @@ public final class QuadTree
 		root.clear() ;
 	}
 
-	/*private int registerNode( final QuadNode _node )
-	{
-		final int index = nodes.size() ;
-		nodes.add( _node ) ;
-		return index ;
-	}*/
-
 	protected final class QuadNode
 	{
 		private final Vector2 centre = new Vector2() ;
@@ -141,15 +133,12 @@ public final class QuadTree
 		private boolean parent = false ;
 		private int nextHull = 0 ;
 
-		//private final int index ;
 		private final Vector2 absolute = new Vector2() ;		// Used by insertToQuadrant() - Android optimisation
 
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
 			centre.setXY( _x, _y ) ;
 			length = _length ;
-
-			//index = QuadTree.this.registerNode( this ) ;
 
 			if( _quadrant == Quadrant.ROOT )
 			{

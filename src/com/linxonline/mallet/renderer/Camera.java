@@ -26,6 +26,8 @@ public final class Camera
 	private final float[] present = FloatBuffer.allocate( 12 ) ;
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
+	private final Vector3 up = new Vector3( 0.0f, 1.0f, 0.0f ) ;
+
 	private final Projection projection = new Projection() ;
 	private final Screen displayScreen = new Screen() ;
 	private final Screen renderScreen = new Screen() ;
@@ -144,6 +146,11 @@ public final class Camera
 		return FloatBuffer.fill( present, _fill, POSITION ) ;
 	}
 
+	public Vector3 getFuturePosition( final Vector3 _fill )
+	{
+		return FloatBuffer.fill( future, _fill, POSITION ) ;
+	}
+
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
 		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
@@ -177,6 +184,11 @@ public final class Camera
 		return FloatBuffer.fill( present, _fill, ROTATION ) ;
 	}
 
+	public Vector3 getFutureRotation( final Vector3 _fill )
+	{
+		return FloatBuffer.fill( future, _fill, ROTATION ) ;
+	}
+
 	public void setScale( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
@@ -185,6 +197,26 @@ public final class Camera
 	public Vector3 getScale( final Vector3 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, SCALE ) ;
+	}
+
+	public void lookAt( final float _x, final float _y, final float _z )
+	{
+		final Vector3 position = getFuturePosition( new Vector3() ) ;
+		final Vector3 target = new Vector3( _x, _y, _z ) ;
+
+		final Vector3 dir = Vector3.subtract( target, position ) ;
+		dir.normalise() ;
+
+		final float yaw = ( float )Math.atan2( dir.x, -dir.z ) ;
+		final float pitch = ( float )Math.atan2( dir.y, dir.length() ) ;
+
+		//final Vector3 plane = new Vector3( ( float )Math.sin( yaw ), -( float )Math.cos( yaw ), 0.0f ) ;
+
+		// Roll is the rightward lean of our up vector, computed here using a dot product.
+		//final float roll = ( float )Math.asin( Vector3.dot( plane, up ) ) ;
+		//System.out.println( "Roll: " + roll ) ;
+
+		setRotation( pitch, yaw, 0.0f ) ;
 	}
 
 	public void setOrthographic( final float _top,
@@ -202,10 +234,57 @@ public final class Camera
 		final float invX = 1.0f / ( _right - _left ) ;
 
 		final Matrix4 proj = projection.matrix ;
-		proj.set( 2.0f * invX, 0.0f,        0.0f,         ( -( _right + _left ) * invX ),
-					0.0f,        2.0f * invY, 0.0f,         ( -( _top + _bottom ) * invY ),
-					0.0f,        0.0f,        -2.0f * invZ, ( -( _far + _near ) * invZ ),
-					0.0f,        0.0f,        0.0f,         1.0f ) ;
+		proj.set( 2.0f * invX, 0.0f,        0.0f,        ( -( _right + _left ) * invX ),
+				  0.0f,        2.0f * invY, 0.0f,        ( -( _top + _bottom ) * invY ),
+				  0.0f,        0.0f,       -2.0f * invZ, ( -( _far + _near ) * invZ ),
+				  0.0f,        0.0f,        0.0f,        1.0f ) ;
+	}
+
+	public void setPerspective( final float _fov, final float _near, final float _far )
+	{
+		final float aspectRatio = renderScreen.dimension.x / renderScreen.dimension.y ;
+		setPerspective( _fov, aspectRatio, _near, _far ) ;
+	}
+
+	public void setPerspective( final float _fov, final float _aspectRatio, final float _near, final float _far )
+	{
+		final float scale = ( float )Math.tan( _fov * 0.5f * PI / 180.0f ) * _near ; 
+		final float left = _aspectRatio * scale ;
+		final float right = -left ;
+		 
+		final float bottom = scale ;
+		final float top = -bottom ;
+
+		setPerspective( top, bottom, left, right, _near, _far ) ;
+	}
+
+	public void setPerspective( final float _top,
+								final float _bottom,
+								final float _left,
+								final float _right,
+								final float _near,
+								final float _far )
+	{
+		projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
+		projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
+
+		final float invZ = 1.0f / ( _far - _near ) ;
+		final float invY = 1.0f / ( _top - _bottom ) ;
+		final float invX = 1.0f / ( _right - _left ) ;
+		
+		final float m00 = 2.0f * _near * invX ;
+		final float m11 = 2.0f * _near * invY ;
+		final float m20 = ( _right + _left ) * invX ;
+		final float m21 = ( _top + _bottom ) * invY ;
+
+		final float m22 = -( ( _far + _near ) * invZ ) ;
+		final float m23 = -( ( 2.0f * _far * _near ) * invZ ) ;
+
+		final Matrix4 proj = projection.matrix ;
+		proj.set( m00,  0.0f,  m20, 0.0f,
+				  0.0f, m11,   m21, 0.0f,
+				  0.0f, 0.0f,  m22,  m23,
+				  0.0f, 0.0f, -1.0f, 0.0f ) ;
 	}
 
 	public void setProjection( final Projection _projection )
