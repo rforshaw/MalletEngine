@@ -89,7 +89,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	public UIElement()
 	{
 		final float ratioMargin = DEFAULT_MARGIN_SIZE ;
-		margin = new Vector3( ratioMargin, ratioMargin, ratioMargin ) ;
+		margin = new Vector3( ratioMargin, ratioMargin, 0.0f ) ;
 	}
 
 	/**

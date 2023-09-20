@@ -103,7 +103,9 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		controller.addProcessor( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
 		{
 			final boolean fullscreen = _fullscreen ;
-			getWindow().setFullscreen( fullscreen ) ;
+
+			final GLRenderer render = getRenderer() ;
+			render.setFullscreen( fullscreen ) ;
 		} ) ;
 
 		getEventSystem().addHandler( controller ) ;

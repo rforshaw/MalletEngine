@@ -79,24 +79,14 @@ public class GameState extends State
 
 	public GameState( final String _name )
 	{
-		this( _name, Threaded.SINGLE, UpdateMode.GAME ) ;
+		this( _name, UpdateMode.GAME ) ;
 	}
 
 	public GameState( final String _name, final UpdateMode _mode )
 	{
-		this( _name, Threaded.SINGLE, _mode ) ;
-	}
-
-	public GameState( final String _name, final Threaded _type )
-	{
-		this( _name, _type, UpdateMode.GAME ) ;
-	}
-	
-	public GameState( final String _name, final Threaded _type, final UpdateMode _mode )
-	{
 		super( _name ) ;
 
-		entitySystem = new EntitySystem( eventSystem, _type ) ;
+		entitySystem = new EntitySystem( eventSystem ) ;
 		collisionSystem = new CollisionSystem( eventSystem ) ; 
 
 		updater = createCoreUpdate( _mode ) ;
@@ -683,10 +673,12 @@ public class GameState extends State
 
 			draws[0] = new TextDraw( "0" ) ;
 			draws[0].setHidden( !show ) ;
+			draws[0].setBoundary( 200.0f, 50.0f ) ;
 
 			draws[1] = new TextDraw( "0" ) ;
 			draws[1].setPosition( 0.0f, 20.0f, 0.0f ) ;
 			draws[1].setHidden( !show ) ;
+			draws[1].setBoundary( 200.0f, 50.0f ) ;
 
 			final TextUpdaterPool pool = RenderPools.getTextUpdaterPool() ;
 			updater = pool.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;

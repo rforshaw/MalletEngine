@@ -84,6 +84,12 @@ public final class UI
 		}
 	} ;
 
+	public enum Line
+	{
+		SINGLE,
+		MULTI
+	}
+
 	public static void align( final Alignment _alignX, final Alignment _alignY, final Vector3 _val, final Vector3 _dim, final Vector3 _length )
 	{
 		_val.x = UI.align( _alignX, _dim.x, _length.x ) ;

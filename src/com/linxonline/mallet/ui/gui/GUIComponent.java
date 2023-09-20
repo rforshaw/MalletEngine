@@ -29,6 +29,7 @@ public abstract class GUIComponent extends UIElement.Component
 	private final Vector3 position = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 length = new Vector3() ;
+	private final Vector3 margin = new Vector3() ;
 
 	private boolean visible = true ;
 
@@ -79,6 +80,15 @@ public abstract class GUIComponent extends UIElement.Component
 		}
 	} ;
 
+	private final Connect.Slot<UIElement> marginSlot = new Connect.Slot<UIElement>()
+	{
+		@Override
+		public void slot( final UIElement _parent )
+		{
+			margin.setXYZ( _parent.getMargin() ) ;
+		}
+	} ;
+
 	private final Connect.Slot<UIElement> layerSlot = new Connect.Slot<UIElement>()
 	{
 		@Override
@@ -96,12 +106,14 @@ public abstract class GUIComponent extends UIElement.Component
 		position.setXYZ( _parent.getPosition() ) ;
 		offset.setXYZ( _parent.getOffset() ) ;
 		length.setXYZ( _parent.getLength() ) ;
+		margin.setXYZ( _parent.getMargin() ) ;
 
 		UIElement.connect( _parent, _parent.elementShown(),    addDrawSlot() ) ;
 		UIElement.connect( _parent, _parent.elementHidden(),   removeDrawSlot() ) ;
 		UIElement.connect( _parent, _parent.positionChanged(), positionSlot() ) ;
 		UIElement.connect( _parent, _parent.offsetChanged(),   offsetSlot() ) ;
 		UIElement.connect( _parent, _parent.lengthChanged(),   lengthSlot() ) ;
+		UIElement.connect( _parent, _parent.marginChanged(),   marginSlot() ) ;
 	}
 
 	/**
@@ -175,6 +187,11 @@ public abstract class GUIComponent extends UIElement.Component
 		return length ;
 	}
 
+	public Vector3 getMargin()
+	{
+		return margin ;
+	}
+
 	/**
 		This slot is called when the parent element has been made 
 		visible and is expected to display something to the screen.
@@ -218,6 +235,15 @@ public abstract class GUIComponent extends UIElement.Component
 	public final Connect.Slot<UIElement> lengthSlot()
 	{
 		return lengthSlot ;
+	}
+
+	/**
+		This slot is called when the parent element has changed 
+		margin and the GUI is expected to reflect that.
+	*/
+	public final Connect.Slot<UIElement> marginSlot()
+	{
+		return marginSlot ;
 	}
 
 	@Override

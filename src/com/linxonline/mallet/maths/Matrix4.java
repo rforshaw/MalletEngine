@@ -128,7 +128,7 @@ public final class Matrix4 implements Cacheable, IUniform
 
 		//set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
 		//set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
-		//set( _z, 2, 3 ) ;	//	[0 | 0 | 1 |  0]
+		//set( _z, 2, 3 ) ;	//	[0 | 0 | 1 | _z]
 							//	[0 | 0 | 0 |  1]
 	}
 

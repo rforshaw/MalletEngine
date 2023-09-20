@@ -9,6 +9,8 @@ public class GUIText extends GUIComponent
 	protected UI.Alignment drawAlignmentX = UI.Alignment.CENTRE ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.CENTRE ;
 
+	protected UI.Line lineType = UI.Line.SINGLE ;
+
 	private MalletFont font ;
 	private MalletColour colour = MalletColour.white() ;
 
@@ -30,6 +32,8 @@ public class GUIText extends GUIComponent
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
 
+		lineType = _meta.getLineType() ;
+
 		drawText = new TextDraw( _text ) ;
 		drawText.getText().append( _meta.getText() ) ;
 
@@ -38,10 +42,15 @@ public class GUIText extends GUIComponent
 		constructDraws() ;
 	}
 
+	public void setLineType( final UI.Line _type )
+	{
+		lineType = ( _type == null ) ? lineType : _type ;
+	}
+
 	public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 	{
-		drawAlignmentX = ( _x == null ) ? UI.Alignment.CENTRE : _x ;
-		drawAlignmentY = ( _y == null ) ? UI.Alignment.CENTRE : _y ;
+		drawAlignmentX = ( _x == null ) ? drawAlignmentX : _x ;
+		drawAlignmentY = ( _y == null ) ? drawAlignmentY : _y ;
 	}
 
 	public void setColour( final MalletColour _colour )
@@ -57,20 +66,7 @@ public class GUIText extends GUIComponent
 	{
 		if( font != null )
 		{
-			final Vector3 length = getLength() ;
-			final Vector3 position = getPosition() ;
-			final Vector3 offset = getOffset() ;
-
-			final MalletFont.Metrics metrics = font.getMetrics() ;
-			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
-			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
-
-			drawText.setPositionInstant( position.x, position.y, position.z ) ;
-			drawText.setOffsetInstant( offset.x, offset.y, offset.z ) ;
-
-			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
-			drawText.setColour( colour ) ;
-
+			updateText() ;
 			program.mapUniform( "inTex0", font ) ;
 		}
 	}
@@ -135,20 +131,48 @@ public class GUIText extends GUIComponent
 		super.refresh() ;
 		if( drawText != null && getParent().isVisible() )
 		{
-			final Vector3 position = getPosition() ;
-			final Vector3 length = getLength() ;
-			final Vector3 offset = getOffset() ;
-
-			final MalletFont.Metrics metrics = font.getMetrics() ;
-			offset.x = UI.align( drawAlignmentX, font.stringWidth( getText() ), length.x ) ;
-			offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
-
-			drawText.setPositionInstant( position.x, position.y, position.z ) ;
-			drawText.setOffsetInstant( offset.x, offset.y, offset.z ) ;
-
-			drawText.setRange( 0, font.stringIndexWidth( getText(), length.x ) ) ;
+			updateText() ;
 			updater.forceUpdate() ;
 		}
+	}
+
+	private void updateText()
+	{
+		final Vector3 position = getPosition() ;
+		final Vector3 offset = getOffset() ;
+		final Vector3 length = getLength() ;
+		final Vector3 margin = getMargin() ;
+
+		final StringBuilder text = getText() ;
+
+		int textIndexStart = 0 ;
+		int textIndexEnd = text.length() ;
+
+		final MalletFont.Metrics metrics = font.getMetrics() ;
+		switch( lineType )
+		{
+			default     :
+			case SINGLE :
+			{
+				offset.x = UI.align( drawAlignmentX, font.stringWidth( text ), length.x - margin.x ) ;
+				offset.y = UI.align( drawAlignmentY, metrics.getHeight(), length.y - margin.y ) ;
+
+				// We only want to render the text that will be visible.
+				textIndexEnd = font.stringIndexWidth( text, length.x - margin.x ) ;
+				break ;
+			}
+			case MULTI :
+			{
+				offset.setXYZ( 0.0f, 0.0f, 0.0f ) ;
+				break ;
+			}
+		}
+
+		drawText.setPositionInstant( position.x + margin.x, position.y + margin.y, position.z + margin.z ) ;
+		drawText.setOffsetInstant( offset.x, offset.y, offset.z ) ;
+		drawText.setBoundary( length.x - margin.x, length.y - margin.y ) ;
+
+		drawText.setRange( textIndexStart, textIndexEnd ) ;
 	}
 
 	public void setRange( final int _start, final int _end )
@@ -201,6 +225,8 @@ public class GUIText extends GUIComponent
 		private final UIVariant xAlign = new UIVariant( "ALIGNMENT_X",  UI.Alignment.CENTRE,    new Connect.Signal() ) ;
 		private final UIVariant yAlign = new UIVariant( "ALIGNMENT_Y",  UI.Alignment.CENTRE,    new Connect.Signal() ) ;
 
+		private final UIVariant lineType = new UIVariant( "LINE_TYPE", UI.Line.SINGLE, new Connect.Signal() ) ;
+
 		private final UIVariant text   = new UIVariant( "TEXT",   "",                        new Connect.Signal() ) ;
 		private final UIVariant colour = new UIVariant( "COLOUR", MalletColour.white(),      new Connect.Signal() ) ;
 		private final UIVariant font   = new UIVariant( "FONT",   new MalletFont( "Arial" ), new Connect.Signal() ) ;
@@ -210,10 +236,13 @@ public class GUIText extends GUIComponent
 			super() ;
 
 			int row = rowCount( root() ) ;
-			createData( null, row + 5, 1 ) ;
+			createData( null, row + 6, 1 ) ;
 
 			setData( new UIModelIndex( root(), row++, 0 ), xAlign, UIAbstractModel.Role.User ) ;
 			setData( new UIModelIndex( root(), row++, 0 ), yAlign, UIAbstractModel.Role.User ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), lineType, UIAbstractModel.Role.User ) ;
+
 			setData( new UIModelIndex( root(), row++, 0 ), text, UIAbstractModel.Role.User ) ;
 			setData( new UIModelIndex( root(), row++, 0 ), colour, UIAbstractModel.Role.User ) ;
 			setData( new UIModelIndex( root(), row++, 0 ), font, UIAbstractModel.Role.User ) ;
@@ -223,6 +252,15 @@ public class GUIText extends GUIComponent
 		public String getType()
 		{
 			return "UIELEMENT_GUITEXT" ;
+		}
+
+		public void setLineType( final UI.Line _type )
+		{
+			if( _type != null && _type != lineType.toObject( UI.Line.class ) )
+			{
+				lineType.setObject( _type ) ;
+				UIElement.signal( this, lineType.getSignal() ) ;
+			}
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
@@ -268,7 +306,12 @@ public class GUIText extends GUIComponent
 				UIElement.signal( this, font.getSignal() ) ;
 			}
 		}
-		
+
+		public UI.Line getLineType()
+		{
+			return lineType.toObject( UI.Line.class ) ;
+		}
+
 		public UI.Alignment getAlignmentX()
 		{
 			return xAlign.toObject( UI.Alignment.class ) ;
@@ -294,6 +337,11 @@ public class GUIText extends GUIComponent
 		public MalletFont getFont()
 		{
 			return font.toObject( MalletFont.class )  ;
+		}
+
+		public final Connect.Signal lineTypeChanged()
+		{
+			return lineType.getSignal() ;
 		}
 
 		public final Connect.Signal xAlignChanged()

@@ -64,6 +64,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	private GLWindow canvas ;
 
+	private boolean makeFullScreen = false ;
 	private int viewMode = ORTHOGRAPHIC_MODE ;
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
@@ -501,6 +502,11 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		} ;
 	}
 
+	public void setFullscreen( final boolean _set )
+	{
+		makeFullScreen = _set ;
+	}
+
 	@Override
 	public void setDisplayDimensions( final int _width, final int _height )
 	{
@@ -590,6 +596,12 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		{
 			canvas.setExclusiveContextThread( Thread.currentThread() ) ;
 		}
+
+		if( makeFullScreen != canvas.isFullscreen() )
+		{
+			canvas.setFullscreen( makeFullScreen ) ;
+		}
+
 		canvas.display() ;
 	}
 
@@ -679,6 +691,8 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		if( canvas == null )
 		{
+			System.out.println( "Init Window" ) ;
+		
 			final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
 			final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
 			capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
@@ -688,11 +702,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 			// We want to be in complete control of any swapBuffer calls
 			canvas.setAutoSwapBufferMode( false ) ;
-			if( GlobalConfig.getBoolean( "FULLSCREEN", false ) == true )
-			{
-				canvas.setUndecorated( true ) ;
-				canvas.setFullscreen( true ) ;
-			}
 		}
 	}
 

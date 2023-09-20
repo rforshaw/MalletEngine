@@ -132,12 +132,11 @@ public final class GameTestLoader implements IGameLoader
 				client.close() ;*/
 
 				final Camera camera = CameraAssist.getDefault() ;
-				camera.setPosition( 0, 0, -150 ) ;
-				camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
-				camera.lookAt( 0.0f, 100.0f, 0.0f ) ;
+				//camera.setPosition( 0, 0, -150 ) ;
+				//camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
+				//camera.lookAt( 0.0f, 100.0f, 0.0f ) ;
+				//CameraAssist.update( camera ) ;
 
-				CameraAssist.update( camera ) ;
-				
 				createPlaneTest() ;
 
 				createUI() ;
@@ -414,6 +413,7 @@ public final class GameTestLoader implements IGameLoader
 				final TextDraw draw = new TextDraw( "Hello world!" ) ;
 				draw.setPosition( 0.0f, -80.0f, 0.0f ) ;
 				draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
+				draw.setBoundary( 50.0f, 80.0f ) ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
 				program.mapUniform( "inTex0", new MalletFont( "Arial", 20 ) ) ;

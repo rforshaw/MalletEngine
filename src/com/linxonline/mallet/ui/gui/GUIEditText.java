@@ -78,16 +78,18 @@ public class GUIEditText extends GUIText
 		if( font != null )
 		{
 			final Vector3 length = getLength() ;
+			final Vector3 margin = getMargin() ;
 			final StringBuilder placeholder = drawPlaceholder.getText() ;
 
 			final MalletFont.Metrics metrics = font.getMetrics() ;
-			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x ) ;
-			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
+			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x - margin.x ) ;
+			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y - margin.y ) ;
 
-			drawPlaceholder.setPositionInstant( position.x, position.y, position.z ) ;
+			drawPlaceholder.setPositionInstant( position.x + margin.x, position.y + margin.y, position.z + margin.z ) ;
 			drawPlaceholder.setOffsetInstant( offsetX, offsetY, 0.0f ) ;
+			drawPlaceholder.setBoundary( length.x - margin.x, length.y - margin.y ) ;
 
-			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x ) ) ;
+			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x - margin.x ) ) ;
 			drawPlaceholder.setColour( colour ) ;
 		}
 	}
@@ -183,13 +185,15 @@ public class GUIEditText extends GUIText
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
 		final Vector3 length = getLength() ;
+		final Vector3 margin = getMargin() ;
+
 		final StringBuilder edit = getText() ;
 
 		updateTextRange() ;
 
 		if( isEditing() == true )
 		{
-			cursorDraw.setPositionInstant( position.x, position.y, position.z ) ;
+			cursorDraw.setPositionInstant( position.x + margin.x, position.y + margin.y, position.z + margin.z ) ;
 			final int index = parent.getCursorIndex() ;
 
 			final float xOffset = offset.x + font.stringWidth( edit, start, index ) ;
@@ -210,12 +214,14 @@ public class GUIEditText extends GUIText
 
 			final StringBuilder placeholder = drawPlaceholder.getText() ;
 			final MalletFont.Metrics metrics = font.getMetrics() ;
-			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x ) ;
-			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y ) ;
+			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x - margin.x ) ;
+			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y - margin.y ) ;
 
-			drawPlaceholder.setPosition( position.x, position.y, position.z ) ;
+			drawPlaceholder.setPosition( position.x + margin.x, position.y + margin.y, position.z + margin.z ) ;
 			drawPlaceholder.setOffset( offsetX, offsetY, 0.0f ) ;
-			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x ) ) ;
+			drawPlaceholder.setBoundary( length.x - margin.x, length.y - margin.y ) ;
+
+			drawPlaceholder.setRange( 0, font.stringIndexWidth( placeholder, length.x - margin.x ) ) ;
 
 			getUpdater().forceUpdate() ;
 		}
@@ -238,10 +244,11 @@ public class GUIEditText extends GUIText
 	{
 		final MalletFont font = getFont() ;
 		final Vector3 length = getLength() ;
+		final Vector3 margin = getMargin() ;
 		final StringBuilder edit = getText() ;
 
 		final int index = getParent().getCursorIndex() ;
-		end = font.stringIndexWidth( edit, start, length.x ) ;
+		end = font.stringIndexWidth( edit, start, length.x - margin.x ) ;
 
 		final int temp = end ;
 		end = ( index > end ) ? index : end ;

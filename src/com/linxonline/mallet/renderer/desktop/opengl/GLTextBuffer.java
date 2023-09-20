@@ -18,6 +18,7 @@ import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.IUniform ;
 
+import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -54,6 +55,7 @@ public final class GLTextBuffer extends GLBuffer
 	private final Matrix4 matrix = new Matrix4() ;
 	private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
 
+	private final AABB boundary = new AABB() ;
 	private final Vector3 position = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 rotation = new Vector3() ;
@@ -171,6 +173,8 @@ public final class GLTextBuffer extends GLBuffer
 				continue ;
 			}
 
+			draw.getBoundary( boundary ) ;
+
 			draw.getPosition( position ) ;
 			draw.getOffset( offset ) ;
 			draw.getRotation( rotation ) ;
@@ -193,6 +197,14 @@ public final class GLTextBuffer extends GLBuffer
 
 			final int initialIndexOffset = vertexBuffer.position() / vertexStride ;
 
+			final float metricHeight = metrics.getHeight() ;
+			final float baseX = position.x + offset.x ;
+			final float baseY = position.y + offset.y ;
+
+			int newline = 0 ;
+			float currentX = baseX ;
+			float currentY = baseY ;
+
 			final int length = end - start ;
 			for( int i = 0; i < length; i++ )
 			{
@@ -201,10 +213,47 @@ public final class GLTextBuffer extends GLBuffer
 				{
 					case '\n' :
 					{
+						currentX = position.x + offset.x ;
+						currentY += metricHeight ;
+
 						apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
-						matrix.translate( 0.0f, metrics.getHeight(), 0.0f ) ;
+						matrix.translate( 0.0f, currentY - baseY, 0.0f ) ;
 						break ;
 					}
+				}
+
+				float endWordX = currentX ;
+				if( c != ' ' )
+				{
+					// Determine if we have to jump to the next line
+					// if the word the character resides within cannot
+					// fit on the current line.
+					for( int j = ( start + i + 1 ); j < length; ++j )
+					{
+						final char t = text.charAt( j ) ;
+						if( t == ' ' )
+						{
+							// Consider a space to be the end of a word.
+							break ;
+						}
+
+						final Glyph g = metrics.getGlyphWithChar( t ) ;
+						endWordX += g.getWidth() ;
+					}
+
+					if( boundary.intersectPoint( endWordX, currentY ) == false )
+					{
+						currentX = position.x + offset.x ;
+						currentY += metricHeight ;
+
+						apply( matrix, matrixTemp, position, offset, rotation, scale ) ;
+						matrix.translate( 0.0f, currentY - baseY, 0.0f ) ;
+					}
+				}
+
+				if( boundary.intersectPoint( currentX, currentY ) == false )
+				{
+					continue ;
 				}
 
 				final Glyph glyph = metrics.getGlyphWithChar( c ) ;
@@ -293,6 +342,7 @@ public final class GLTextBuffer extends GLBuffer
 				}
 
 				matrix.translate( glyph.getWidth(), 0.0f, 0.0f ) ;
+				currentX += glyph.getWidth() ;
 			}
 
 			indexBuffer.put( PRIMITIVE_RESTART_INDEX ) ;

@@ -9,7 +9,6 @@ import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.Threaded ;
 
 /**
 	The EntitySystem stores and updates Entities that are being 
@@ -20,7 +19,6 @@ public class EntitySystem implements IEntitySystem
 	public final int capacity ;
 
 	private final IEventSystem eventSystem ;
-	private final IEntityUpdate updater ;							// Entities update protocol
 
 	private List<Entity> entitiesToAdd = null ;
 	private List<Entity> cleanup = null ;
@@ -28,22 +26,13 @@ public class EntitySystem implements IEntitySystem
 
 	public EntitySystem( final IEventSystem _eventSystem )
 	{
-		this( _eventSystem, Threaded.SINGLE ) ;
+		this( _eventSystem, 100 ) ;
 	}
 
-	public EntitySystem( final IEventSystem _eventSystem, Threaded _type )
-	{
-		this( _eventSystem, _type, 100 ) ;
-	}
-
-	public EntitySystem( final IEventSystem _eventSystem,
-						 final Threaded _threaded,
-						 final int _initialCapacity )
+	public EntitySystem( final IEventSystem _eventSystem, final int _initialCapacity )
 	{
 		capacity = _initialCapacity ;
 		eventSystem = _eventSystem ;
-
-		updater = ( _threaded == Threaded.SINGLE ) ? new DefaultSTUpdate() : new DefaultMTUpdate() ;
 
 		entitiesToAdd = MalletList.<Entity>newList( capacity ) ;
 		cleanup = MalletList.<Entity>newList( capacity ) ;
@@ -83,7 +72,20 @@ public class EntitySystem implements IEntitySystem
 	public void update( final float _dt )
 	{
 		toBeAddedEntities() ;
-		updater.update( _dt, entities, cleanup ) ;
+
+		Entity entity = null ;
+		final int entitySize = entities.size() ;
+		for( int i = 0; i < entitySize; ++i )
+		{
+			entity = entities.get( i ) ;
+			entity.update( _dt ) ;
+
+			if( entity.isDead() == true )
+			{
+				cleanup.add( entity ) ;
+			}
+		}
+
 		cleanupEntities() ;
 	}
 

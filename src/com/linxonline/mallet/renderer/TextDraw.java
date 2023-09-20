@@ -1,5 +1,7 @@
 package com.linxonline.mallet.renderer ;
 
+import com.linxonline.mallet.maths.AABB ;
+import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
@@ -9,6 +11,8 @@ import com.linxonline.mallet.renderer.MalletColour ;
 public final class TextDraw implements IUpdate
 {
 	private final Draw draw = new Draw() ;
+	private final Vector2 length = new Vector2() ;
+
 	private StringBuilder text ;
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;
@@ -107,6 +111,39 @@ public final class TextDraw implements IUpdate
 	public Vector3 getScale( final Vector3 _fill )
 	{
 		return draw.getScale( _fill ) ;
+	}
+
+	/**
+		Set the relative boundary dimensions that the text is
+		expected to fill.
+
+		NOTE: This will eventually be replaced with something
+		that will support different boundary shapes. For now,
+		we'll keep it square.
+	*/
+	public void setBoundary( final float _x, final float _y )
+	{
+		length.x = _x ;
+		length.y = _y ;
+	}
+
+	public AABB getBoundary( final AABB _fill )
+	{
+		final Vector2 temp = new Vector2() ;
+		draw.getPosition( temp ) ;
+
+		float minX = temp.x ;
+		float minY = temp.y ;
+
+		draw.getOffset( temp ) ;
+		minX += temp.x ;
+		minY += temp.y ;
+
+		final float maxX = minX + length.x ;
+		final float maxY = minY + length.y ;
+
+		_fill.set( minX, minY, maxX, maxY ) ;
+		return _fill ;
 	}
 
 	@Override

@@ -23,7 +23,6 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.caches.ObjectCache ;
-import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;

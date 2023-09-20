@@ -2,8 +2,6 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.core.GlobalConfig ;
-
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
