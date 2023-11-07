@@ -55,8 +55,10 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	public void addBuffers( final Storage ... _buffers )
 	{
 		makeDirty() ;
-		for( final Storage storage : _buffers )
+		final int size = _buffers.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Storage storage = _buffers[i] ;
 			buffers.add( storage ) ;
 		}
 	}
@@ -64,8 +66,10 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	public void removeBuffers( final Storage ... _buffers )
 	{
 		makeDirty() ;
-		for( final Storage storage : _buffers )
+		final int size = _buffers.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Storage storage = _buffers[i] ;
 			buffers.remove( storage ) ;
 		}
 	}
@@ -74,8 +78,10 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	{
 		forceUpdate() ;
 		dynamics.ensureCapacity( dynamics.size() + _dynamics.length ) ;
-		for( final D dynamic : _dynamics )
+		final int size = _dynamics.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final D dynamic = _dynamics[i] ;
 			dynamics.add( dynamic ) ;
 		}
 	}
@@ -83,8 +89,10 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	public void removeDynamics( final D ... _dynamics )
 	{
 		forceUpdate() ;
-		for( final D dynamic : _dynamics )
+		final int size = _dynamics.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final D dynamic = _dynamics[i] ;
 			dynamics.remove( dynamic ) ;
 		}
 	}

@@ -619,8 +619,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		// each draw call - ensures things still feel responsive.
 		textures.resetBindCount() ;
 
-		for( final Camera camera : cameras )
+		final int cameraSize = cameras.size() ;
+		for( int i = 0; i < cameraSize; ++i )
 		{
+			final Camera camera = cameras.get( i ) ;
 			if( camera.update( difference, frameNo ) == true )
 			{
 				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
@@ -640,8 +642,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		updateExecutions() ;
 		getEventController().update() ;
 
-		for( final GLWorld world : worlds )
+		final int worldSize = worlds.size() ;
+		for( int i = 0; i < worldSize; ++i )
 		{
+			final GLWorld world = worlds.get( i ) ;
 			world.draw() ;
 		}
 
@@ -738,8 +742,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			return textures.get( path ) ;
 		}
 
-		for( final GLWorld world : worlds )
+		final int worldSize = worlds.size() ;
+		for( int i = 0; i < worldSize; ++i )
 		{
+			final GLWorld world = worlds.get( i ) ;
 			if( path.equals( world.getID() ) == true )
 			{
 				return world.getImage( meta.getAttachmentIndex() ) ;
@@ -758,14 +764,18 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		int totalBufferUpdates = 0 ;
 
-		for( final IUpdater<Storage> updater : storageUpdaters )
+		final int sSize = storageUpdaters.size() ;
+		for( int i = 0; i < sSize; ++i )
 		{
+			final IUpdater<Storage> updater = storageUpdaters.get( i ) ;
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
-				totalBufferUpdates += buffersToUpdate.size() ;
-				for( final ABuffer buffer : buffersToUpdate )
+				final int bSize = buffersToUpdate.size() ;
+				totalBufferUpdates += bSize ;
+				for( int j = 0; j < bSize; ++j )
 				{
+					final ABuffer buffer = buffersToUpdate.get( j ) ;
 					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
 					if( storage.update( ( Storage )buffer ) == false )
 					{
@@ -783,14 +793,18 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		int totalBufferUpdates = 0 ;
 
-		for( final IUpdater<? extends ABuffer> updater : drawUpdaters )
+		final int dSize = drawUpdaters.size() ;
+		for( int i = 0; i < dSize; ++i )
 		{
+			final IUpdater<? extends ABuffer> updater = drawUpdaters.get( i ) ;
 			updater.update( buffersToUpdate, _difference, _frameNo ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
-				totalBufferUpdates += buffersToUpdate.size() ;
-				for( final ABuffer buffer : buffersToUpdate )
+				final int bSize = buffersToUpdate.size() ;
+				totalBufferUpdates += bSize ;
+				for( int j = 0; j < bSize; ++j )
 				{
+					final ABuffer buffer = buffersToUpdate.get( j ) ;
 					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
 					{
 						updater.forceUpdate() ;

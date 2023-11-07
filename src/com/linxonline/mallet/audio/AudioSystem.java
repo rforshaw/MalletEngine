@@ -92,8 +92,10 @@ public final class AudioSystem
 
 		updateExecutions() ;
 
-		for( final ISource source : active )
+		final int size = active.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final ISource source = active.get( i ) ;
 			final SourceCallback callback = source.getCallback() ;
 
 			switch( source.getState() )

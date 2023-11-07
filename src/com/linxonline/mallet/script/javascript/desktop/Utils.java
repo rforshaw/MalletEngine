@@ -63,8 +63,10 @@ public final class Utils
 		}
 
 		final Class[] interfaces = _class.getInterfaces() ;
-		for( final Class inter : interfaces )
+		final int size = interfaces.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Class inter = interfaces[i] ;
 			if( inter.isAnnotationPresent( JavaInterface.class ) )
 			{
 				_fill.add( inter ) ;

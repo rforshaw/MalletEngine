@@ -27,8 +27,11 @@ public final class JSEntitySystem
 
 		entities.clear() ;
 		system.getEntities( entities ) ;
-		for( final Entity entity : entities )
+
+		final int size = entities.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Entity entity = entities.get( i ) ;
 			final JSEntity jsEntity = new JSEntity( entity ) ;
 			if( jsEntity.hasComponentByAbsoluteName( _name ) )
 			{
@@ -52,8 +55,11 @@ public final class JSEntitySystem
 
 		entities.clear() ;
 		system.getEntities( entities ) ;
-		for( final Entity entity : entities )
+
+		final int size = entities.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Entity entity = entities.get( i ) ;
 			final JSEntity jsEntity = new JSEntity( entity ) ;
 			if( jsEntity.hasComponentBySimpleName( _name ) )
 			{
@@ -74,8 +80,11 @@ public final class JSEntitySystem
 
 		entities.clear() ;
 		system.getEntities( entities ) ;
-		for( final Entity entity : entities )
+
+		final int size = entities.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Entity entity = entities.get( i ) ;
 			fill.add( new JSEntity( entity ) ) ;
 		}
 

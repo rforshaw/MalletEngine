@@ -46,8 +46,10 @@ public class Entity
 	public Entity( final int _capacity, final AllowEvents ... _allow )
 	{
 		components = new Component[_capacity] ;
-		for( final AllowEvents allow : _allow )
+		final int size = _allow.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final AllowEvents allow = _allow[i] ;
 			switch( allow )
 			{
 				default        :
@@ -150,8 +152,10 @@ public class Entity
 		_events.add( new Event<IEventController>( "ADD_BACKEND_EVENT", systemController ) ) ;
 		_events.add( new Event<IEventController>( "ADD_GAME_STATE_EVENT", stateController ) ) ;
 
-		for( final Component component : components )
+		final int size = components.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Component component = components[i] ;
 			component.passInitialEvents( _events ) ;
 		}
 	}
@@ -170,8 +174,10 @@ public class Entity
 		_events.add( new Event<IEventController>( "REMOVE_BACKEND_EVENT", systemController )  ) ;
 		_events.add( new Event<IEventController>( "REMOVE_GAME_STATE_EVENT", stateController )  ) ;
 
-		for( final Component component : components )
+		final int size = components.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Component component = components[i] ;
 			component.passFinalEvents( _events ) ;
 		}
 	}
@@ -217,8 +223,10 @@ public class Entity
 	*/
 	public final <T extends Component> T getComponentByType( final Class<T> _clazz )
 	{
-		for( final Component component : components )
+		final int size = components.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Component component = components[i] ;
 			if( _clazz.isInstance( component ) == true )
 			{
 				return _clazz.cast( component ) ;

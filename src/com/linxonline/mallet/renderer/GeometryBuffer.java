@@ -21,16 +21,20 @@ public class GeometryBuffer extends ABuffer
 
 	public void addDraws( final Draw ... _draws )
 	{
-		for( final Draw draw : _draws )
+		final int size = _draws.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Draw draw = _draws[i] ;
 			draws.add( draw ) ;
 		}
 	}
 
 	public void removeDraws( final Draw ... _draws )
 	{
-		for( final Draw draw : _draws )
+		final int size = _draws.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Draw draw = _draws[i] ;
 			draws.remove( draw ) ;
 		}
 	}

@@ -72,8 +72,12 @@ public final class Debounce implements IGameSystem.IUpdate
 		{
 			operations.update() ;
 			final float dt = ( float )_dt ;
-			for( final Op op : operations.getCurrentData() )
+
+			final List<Op> current = operations.getCurrentData() ;
+			final int size = current.size() ;
+			for( int i = 0; i < size; ++i  )
 			{
+				final Op op = current.get( i ) ;
 				if( op.shouldExecute( dt ) )
 				{
 					// Remove the operation from the list,

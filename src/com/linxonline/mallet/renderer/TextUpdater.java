@@ -50,8 +50,10 @@ public final class TextUpdater implements IUpdater<TextBuffer>
 	public void addBuffers( final TextBuffer ... _buffers )
 	{
 		forceUpdate() ;
-		for( final TextBuffer buffer : _buffers )
+		final int size = _buffers.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final TextBuffer buffer = _buffers[i] ;
 			buffers.add( buffer ) ;
 		}
 	}
@@ -59,8 +61,10 @@ public final class TextUpdater implements IUpdater<TextBuffer>
 	public void removeBuffers( final TextBuffer ... _buffers )
 	{
 		forceUpdate() ;
-		for( final TextBuffer buffer : _buffers )
+		final int size = _buffers.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final TextBuffer buffer = _buffers[i] ;
 			buffers.remove( buffer ) ;
 		}
 	}
@@ -83,12 +87,18 @@ public final class TextUpdater implements IUpdater<TextBuffer>
 			return ;
 		}
 
-		for( final TextBuffer buffer : buffers )
+		final int bufferSize = buffers.size() ;
+		for( int i = 0; i < bufferSize; ++i )
 		{
+			final TextBuffer buffer = buffers.get( i ) ;
+
 			boolean updateBuffer = false ;
 			final List<TextDraw> draws = buffer.getTextDraws() ;
-			for( final TextDraw draw : draws )
+
+			final int drawSize = draws.size() ;
+			for( int j = 0; j < drawSize; ++j )
 			{
+				final TextDraw draw = draws.get( j ) ;
 				if( draw.update( mode, _diff, _iteration ) == true )
 				{
 					updateBuffer = true ;

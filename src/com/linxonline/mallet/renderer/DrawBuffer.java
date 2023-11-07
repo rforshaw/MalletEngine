@@ -50,9 +50,12 @@ public class DrawBuffer extends ABuffer
 
 	public void addBuffers( final GeometryBuffer ... _buffers )
 	{
-		buffers.ensureCapacity( buffers.size() + _buffers.length ) ;
-		for( final GeometryBuffer buffer : _buffers )
+		final int size = _buffers.length ;
+
+		buffers.ensureCapacity( buffers.size() + size ) ;
+		for( int i = 0; i < size; ++i )
 		{
+			final GeometryBuffer buffer = _buffers[i] ;
 			if( isCompatible( this, buffer ) == false )
 			{
 				throw new RuntimeException( "Attempting to add GeometryBuffer that is not compatible with DrawBuffer." ) ;
@@ -64,8 +67,10 @@ public class DrawBuffer extends ABuffer
 
 	public void removeBuffers( final GeometryBuffer ... _buffers )
 	{
-		for( final GeometryBuffer buffer : _buffers )
+		final int size = _buffers.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final GeometryBuffer buffer = _buffers[i] ;
 			buffers.remove( buffer ) ;
 		}
 	}

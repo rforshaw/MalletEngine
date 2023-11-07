@@ -166,8 +166,11 @@ public final class GLTextBuffer extends GLBuffer
 		indexBuffer.position( 0 ) ;
 		vertexBuffer.position( 0 ) ;
 
-		for( final TextDraw draw : _buffer.getTextDraws() )
+		final List<TextDraw> draws = _buffer.getTextDraws() ;
+		final int drawSize = draws.size() ;
+		for( int l = 0; l < drawSize; ++l )
 		{
+			final TextDraw draw = draws.get( l ) ;
 			if( draw.isHidden() == true )
 			{
 				continue ;

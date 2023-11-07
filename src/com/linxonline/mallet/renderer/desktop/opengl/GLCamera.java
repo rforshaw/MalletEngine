@@ -61,9 +61,10 @@ public final class GLCamera
 		Matrix4.multiply( projection.matrix, uiMatrix, uiProjection ) ;
 
 		// Render all the buffers from the perspective of the camera.
-		for( final GLBuffer buffer : _buffers )
+		final int size = _buffers.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			//worldProjection, uiProjection
+			final GLBuffer buffer = _buffers.get( i ) ;
 			buffer.draw( ( buffer.isUI() ) ? uiProjection : worldProjection ) ;
 		}
 	}

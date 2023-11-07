@@ -335,8 +335,10 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		public int getLength()
 		{
 			drawCount = 0 ;
-			for( final GeometryBuffer buffer : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; ++i )
 			{
+				final GeometryBuffer buffer = buffers.get( i ) ;
 				final List<Draw> draws = buffer.getDraws() ;
 				drawCount += draws.size() ;
 			}

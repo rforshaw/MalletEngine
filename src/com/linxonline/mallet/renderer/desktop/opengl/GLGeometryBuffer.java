@@ -134,8 +134,10 @@ public final class GLGeometryBuffer extends GLBuffer
 			toDraw[i] = draw ;
 
 			final IShape[] shapes = draw.getShapes() ;
-			for( final IShape shape : shapes )
+			final int shapeSize = shapes.length ;
+			for( int j = 0; j < shapeSize; ++j )
 			{
+				final IShape shape = shapes[j] ;
 				if( shape == null )
 				{
 					continue ;

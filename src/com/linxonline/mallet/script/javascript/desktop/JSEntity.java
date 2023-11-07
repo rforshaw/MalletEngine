@@ -67,9 +67,11 @@ public final class JSEntity
 	{
 		retrieveComponents() ;
 
-		final List<Object> fill = MalletList.<Object>newList( components.size() ) ;
-		for( final JSComponent component : components )
+		final int size = components.size() ;
+		final List<Object> fill = MalletList.<Object>newList( size ) ;
+		for( int i = 0; i < size; ++i )
 		{
+			final JSComponent component = components.get( i ) ;
 			fill.add( component.getProxy() ) ;
 		}
 		return fill ;
@@ -88,8 +90,10 @@ public final class JSEntity
 	private JSComponent getBySimpleName( final String _name )
 	{
 		retrieveComponents() ;
-		for( final JSComponent component : components )
+		final int size = components.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final JSComponent component = components.get( i ) ;
 			if( component.getSimpleName().equals( _name ) )
 			{
 				return component ;
@@ -102,8 +106,10 @@ public final class JSEntity
 	private JSComponent getByAbsoluteName( final String _name )
 	{
 		retrieveComponents() ;
-		for( final JSComponent component : components )
+		final int size = components.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final JSComponent component = components.get( i ) ;
 			if( component.getAbsoluteName().equals( _name ) )
 			{
 				return component ;
@@ -120,8 +126,10 @@ public final class JSEntity
 			final Set<Class> interfaces = new HashSet<Class>() ;
 
 			final List<Entity.Component> comps = entity.getAllComponents( MalletList.<Entity.Component>newList() ) ;
-			for( final Entity.Component component : comps )
+			final int size = comps.size() ;
+			for( int i = 0; i < size; ++i )
 			{
+				final Entity.Component component = comps.get( i ) ;
 				final Class clazz = component.getClass() ;
 				Utils.getScriptInterfaces( clazz, interfaces ) ;
 				if( interfaces.size() > 0 )

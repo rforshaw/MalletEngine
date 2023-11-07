@@ -250,8 +250,10 @@ public class GLWorld
 		MGL.glDrawBuffers( colourAttachments.length, colourAttachments, 0 ) ;
 
 		// Draw the buffers from all the camera perspectives.
-		for( final GLCamera camera : cameras )
+		final int cameraSize = cameras.size() ;
+		for( int i = 0; i < cameraSize; ++i )
 		{
+			final GLCamera camera = cameras.get( i ) ;
 			camera.draw( drawBuffers ) ;
 		}
 
@@ -382,8 +384,10 @@ public class GLWorld
 			MGL.glClear( clearBits ) ;
 
 			// Draw the buffers from all the camera perspectives.
-			for( final GLCamera camera : cameras )
+			final int cameraSize = cameras.size() ;
+			for( int i = 0; i < cameraSize; ++i )
 			{
+				final GLCamera camera = cameras.get( i ) ;
 				camera.draw( drawBuffers ) ;
 			}
 

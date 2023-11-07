@@ -24,16 +24,20 @@ public class TextBuffer extends ABuffer
 
 	public void addDraws( final TextDraw ... _draws )
 	{
-		for( final TextDraw draw : _draws )
+		final int size = _draws.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final TextDraw draw = _draws[i] ;
 			draws.add( draw ) ;
 		}
 	}
 
 	public void removeDraws( final TextDraw ... _draws )
 	{
-		for( final TextDraw draw : _draws )
+		final int size = _draws.length ;
+		for( int i = 0; i < size; ++i )
 		{
+			final TextDraw draw = _draws[i] ;
 			draws.remove( draw ) ;
 		}
 	}
