@@ -45,23 +45,27 @@ public final class Vorbis
 
 	public void decode( final OGG _ogg ) throws Exception
 	{
-		final int[] codewordLengths = new int[]
+		final List<Page> pages = _ogg.pages ;
+		for( int i = 0; i < 3; ++i )
 		{
-			2, 4, 4, 4, 4, 2, 3, 3
-		} ;
-		Huffman.Node root = Huffman.build( codewordLengths, 8 ) ;
+			// First 3 pages should be headers.
+			final Page page = pages.get( i ) ;
+			decodeHeaders( page )  ;
+		}
 
-		for( final Page page : _ogg.pages )
+		// All pages afterwards should be audio-packets.
+		final int size = pages.size() ;
+		for( int i = 3; i < size; ++i )
 		{
-			if( headers.size() < 3 )
+			System.out.println( "Audio Page" ) ;
+			final Page page = pages.get( i ) ;
+			final AudioPacket packet = decodeAudioPacket( page ) ;
+			if( packet.isAudioPacket() == false )
 			{
-				decodeHeaders( page )  ;
+				continue ;
 			}
-			else
-			{
-				System.out.println( "Audio Page" ) ;
-				decodeAudioPacket( page ) ;
-			}
+
+			packet.decode() ;
 		}
 	}
 
@@ -727,13 +731,14 @@ public final class Vorbis
 			return 1 ;
 		}
 
-		public int decode( int _pos, final byte[] _stream, final DecodedFloor1 _floor )
+		public int decodePacket( int _pos, final byte[] _stream, final DecodedFloor1 _floor )
 		{
 			_floor.unused = false ;
 			_floor.y = null ;
 
 			if( ConvertBytes.isBitSet( _stream, _pos++ ) == false )
 			{
+				System.out.println( "Floor not used" ) ;
 				_floor.unused = true ;
 				return _pos ;
 			}
@@ -800,6 +805,7 @@ public final class Vorbis
 				offset += cdim ;
 			}
 
+			// TODO: 7.2.4. curve computation 
 			return _pos ;
 		}
 	
@@ -995,10 +1001,11 @@ public final class Vorbis
 
 		public abstract int type() ;
 
-		public int decode( int _pos, final byte[] _stream, final int _blocksize, final int _ch, final boolean[] _doNotDecode )
+		public int decodePacket( int _pos, final byte[] _stream, final int _blocksize, final int _ch, final boolean[] _doNotDecode, final float[][] _values ) throws Exception
 		{
+			final int type = type() ;
 			int actualSize = _blocksize / 2 ;
-			if( type() == 2 )
+			if( type == 2 )
 			{
 				actualSize = actualSize * _ch ;
 			}
@@ -1011,7 +1018,12 @@ public final class Vorbis
 			final int codeword = book.dimensions ;
 			final int partitionsToRead = toRead / ( int )partitionSize ;
 
-			int[][] dClassifications = new int[_ch][toRead] ;
+			final int[][] dClassifications = new int[_ch][codeword * partitionsToRead] ;
+			for( int i = 0; i < _values.length; ++i )
+			{
+				_values[i] = new float[_blocksize] ;
+			}
+
 			if( toRead <= 0 )
 			{
 				return _pos ;
@@ -1020,7 +1032,7 @@ public final class Vorbis
 			for( int pass = 0; pass <= 7; ++pass )
 			{
 				int partitionCount = 0 ;
-				while( partitionCount < toRead )
+				while( partitionCount < partitionsToRead )
 				{
 					if( pass == 0 )
 					{
@@ -1040,39 +1052,68 @@ public final class Vorbis
 								temp = book.getEntry( t, codewordLength ) ;
 							}
 
-							for( int i = codeword - 1; i > 0; --i )
+							_pos += codewordLength ;
+
+							for( int i = codeword - 1; i >= 0; --i )
 							{
 								dClassifications[j][i + partitionCount] = temp % classifications ;
 								temp = temp / classifications ;
 							}
-
-							_pos += codewordLength ;
 						}
 					}
 
 					for( int i = 0; i < codeword; ++i )
 					{
-						if( partitionCount >= toRead )
+						if( partitionCount >= partitionsToRead )
 						{
 							break ;
 						}
 
-						for( int j = 0; j < _ch; ++j )
+						final int offset = ( int )begin + partitionCount * ( int )partitionSize ;
+
+						switch( type )
 						{
-							if( _doNotDecode[j] )
+							case 0 :
+							case 1 :
 							{
-								continue ;
-							}
+								for( int j = 0; j < _ch; ++j )
+								{
+									if( _doNotDecode[j] )
+									{
+										continue ;
+									}
 
-							final int vqClass = dClassifications[j][partitionCount] ;
-							final int vqBook = books[vqClass][pass] ;
-							if( vqBook == -1 )
+									final int vqClass = dClassifications[j][partitionCount] ;
+									final int vqBook = books[vqClass][pass] ;
+									if( vqBook == -1 )
+									{
+										continue ;
+									}
+
+									final CodebookConfiguration cBook = codebooks.get( vqBook ) ;
+
+									switch( type )
+									{
+										case 0 :
+										{
+											_pos = decodeResidue0( _pos, _stream, cBook, offset, _values[j] ) ;
+											break ;
+										}
+										case 1 :
+										{
+											_pos = decodeResidue1( _pos, _stream, cBook, offset, _values[j] ) ;
+											break ;
+										}
+									}
+								}
+								break ;
+							}
+							case 2 :
 							{
-								continue ;
+								final float[] values = new float[_ch * _blocksize] ;
+								_pos = decodeResidue2( _pos, _stream, book, offset, values ) ;
+								break ;
 							}
-
-							// decode partition into output vector number [j]
-							System.out.println( "VQBook: " + vqBook ) ;
 						}
 
 						++partitionCount ;
@@ -1081,6 +1122,74 @@ public final class Vorbis
 			}
 
 			System.out.println( "Actual Size: " + actualSize + " Limit Begin: " + limitBegin + " Limit End: " + limitEnd ) ;
+			return _pos ;
+		}
+
+		private int decodeResidue0( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
+		{
+			//System.out.println( "Decode Residue 0" ) ;
+			//System.out.println( "Values Length: " + _values.length ) ;
+			final float[] temp = new float[_book.dimensions] ;
+
+			final int step = ( int )partitionSize / _book.dimensions ;
+			for( int i = 0; i < step; ++i )
+			{
+				int codewordLength = 0 ;
+				boolean success = false ;
+				while( success == false )
+				{
+					codewordLength += 1 ;
+					final byte[] t = ConvertBytes.toBits( _stream, 0, _pos, codewordLength ) ;
+					success = _book.getVQLookupTable( t, codewordLength, temp ) ;
+				}
+
+				_pos += codewordLength ;
+
+				for( int j = 0; j < _book.dimensions; ++j )
+				{
+					_values[_offset + i + j * step] += temp[j] ;
+					//System.out.println( "Index: " + ( _offset + i + j * step ) + " RV: " + _values[_offset + i + j * step] ) ;
+				}
+			}
+
+			return _pos ;
+		}
+
+		private int decodeResidue1( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
+		{
+			//System.out.println( "Decode Residue 1" ) ;
+			final float[] temp = new float[_book.dimensions] ;
+
+			int i = 0 ;
+
+			while( i < partitionSize )
+			{
+				int codewordLength = 0 ;
+				boolean success = false ;
+				while( success == false )
+				{
+					codewordLength += 1 ;
+					final byte[] t = ConvertBytes.toBits( _stream, 0, _pos, codewordLength ) ;
+					success = _book.getVQLookupTable( t, codewordLength, temp ) ;
+				}
+
+				_pos += codewordLength ;
+
+				for( int j = 0; j < _book.dimensions; ++j )
+				{
+					_values[_offset + i] += temp[j] ;
+					//System.out.println( "Index: " + ( _offset + i ) + " RV: " + _values[_offset + i] ) ;
+					++i ;
+				}
+			}
+
+			return _pos ;
+		}
+
+		private int decodeResidue2( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
+		{
+			//System.out.println( "Decode Residue 2" ) ;
+			_pos = decodeResidue1( _pos, _stream, _book, _offset, _values ) ;
 			return _pos ;
 		}
 
@@ -1276,56 +1385,71 @@ public final class Vorbis
 		int[] multiplicands = null ;		// Lookup Values is multiplicands length
 		Huffman.Node root = null ;
 
-		public float[] getVQLookupTable()
-		{
-			switch( lookupType )
-			{
-				case IMPLICIT_LOOKUP_TABLE : return getVQLookupTable1() ;
-				case EXPLICIT_LOOKUP_TABLE : return getVQLookupTable2() ;
-				default                    : return null ;
-			}
-		}
-
 		public int getEntry( final byte[] _codeword, final int _length )
 		{
 			return root.get( _codeword, 0, _length ) ;
 		}
 
-		private float[] getVQLookupTable1()
+		public boolean getVQLookupTable( final byte[] _codeword, final int _length, final float[] _fill )
 		{
+			return getVQLookupTable( _codeword, _length, 0, _fill ) ;
+		}
+
+		public boolean getVQLookupTable( final byte[] _codeword, final int _length, final int _offset, final float[] _fill )
+		{
+			switch( lookupType )
+			{
+				case IMPLICIT_LOOKUP_TABLE : return getVQLookupTable1( _codeword, _length, _offset, _fill ) ;
+				case EXPLICIT_LOOKUP_TABLE : return getVQLookupTable2( _codeword, _length, _offset, _fill ) ;
+				default                    : return true ;
+			}
+		}
+
+		private boolean getVQLookupTable1( final byte[] _codeword, final int _length, final int _offset, final float[] _vq )
+		{
+			final int lookupOffset = getEntry( _codeword, _length ) ;
+			if( lookupOffset == -1 )
+			{
+				return false ;
+			}
+
 			float last = 0.0f ;
 			int indexDivisor = 1 ;
-			final int lookupOffset = entry ;
 
-			final float[] vq = new float[dimensions] ;
 			for( int i = 0; i < dimensions; ++i )
 			{
+				final int index = _offset + i ;
 				final int multiplicandOffset = ( lookupOffset / indexDivisor ) % multiplicands.length ;
-				vq[i] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
+				_vq[index] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
 
-				last = ( sequenceP == true ) ? vq[i] : last ;
+				last = ( sequenceP == true ) ? _vq[index] : last ;
 				indexDivisor = indexDivisor * multiplicands.length ;
 			}
 
-			return vq ;
+			return true ;
 		}
 
-		private float[] getVQLookupTable2()
+		private boolean getVQLookupTable2( final byte[] _codeword, final int _length, final int _offset, final float[] _vq )
 		{
+			final int lookupOffset = getEntry( _codeword, _length ) ;
+			if( lookupOffset == -1 )
+			{
+				return false ;
+			}
+
 			float last = 0.0f ;
-			final int lookupOffset = entry ;
 			int multiplicandOffset = lookupOffset * dimensions ;
 
-			final float[] vq = new float[dimensions] ;
 			for( int i = 0; i < dimensions; ++i )
 			{
-				vq[i] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
+				final int index = _offset + i ;
+				_vq[index] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
 
-				last = ( sequenceP == true ) ? vq[i] : last ;
+				last = ( sequenceP == true ) ? _vq[index] : last ;
 				++multiplicandOffset ;
 			}
 
-			return vq ;
+			return true ;
 		}
 
 		public String toString()
@@ -1363,6 +1487,10 @@ public final class Vorbis
 	{
 		private final static double HALF_PI = Math.PI / 2 ;
 
+		private boolean notAudio = true ;
+		private final int startPosition ;
+		private final byte[] stream ;
+
 		private final ModeConfiguration mode ;
 		private final Mapping0Configuration mapping ;
 
@@ -1384,15 +1512,41 @@ public final class Vorbis
 		private final double[] window ;
 
 		private final DecodedFloor[] decodedFloors = new DecodedFloor[audioChannels] ;
-		private boolean[] noResidue = new boolean[audioChannels] ;
-		private boolean[] doNotDecode = new boolean[audioChannels] ;
+		private final boolean[] noResidue = new boolean[audioChannels] ;
+		private final boolean[] doNotDecode = new boolean[audioChannels] ;
+		private final float[][][] residueValues ;
 
-		public AudioPacket( int _pos, final byte[] _stream ) throws Exception
+		public AudioPacket( int _pos, final byte[] _stream )
 		{
-			final boolean notAudio = ConvertBytes.isBitSet( _stream, _pos++ ) ;
+			notAudio = ConvertBytes.isBitSet( _stream, _pos++ ) ;
 			if( notAudio == true )
 			{
-				throw new Exception( "Expected Audio Packet, skipping..." ) ;
+				// A well constructed vorbis file is unlikely to have malformed
+				// audio packets, but in case it does we'll not continue any further.
+				startPosition = -1 ;
+				stream = null ;
+
+				mode = null ;
+				mapping = null ;
+				residueValues = null ;
+
+				n = -1 ;
+
+				prevWindowFlag = false ;
+				nextWindowFlag = false ;
+				windowCenter = -1 ;
+
+				leftWindowStart = -1 ;
+				leftWindowEnd = -1 ;
+				leftN = -1 ;
+				
+				rightWindowStart = -1 ;
+				rightWindowEnd = -1 ;
+				rightN = -1 ;
+
+				window = null ;
+
+				return ;
 			}
 
 			final int toRead = iLog( modes.size() - 1 ) ;
@@ -1401,6 +1555,8 @@ public final class Vorbis
 
 			mode = modes.get( modeNumber ) ;
 			mapping = mappings.get( mode.mapping ) ;
+
+			residueValues = new float[mapping.subMaps][][] ;
 
 			n = ( mode.blockFlag == false ) ? blocksize0 : blocksize1 ;
 
@@ -1419,8 +1575,30 @@ public final class Vorbis
 			rightN           = ( mode.blockFlag == true && nextWindowFlag == false ) ? ( blocksize0 / 2 ) : ( n / 2 ) ;
 
 			window = computeWindow() ;
-			_pos = decodeFloorCurve( _pos, _stream ) ;
-			_pos = decodeResidue( _pos, _stream ) ;
+
+			startPosition = _pos ;
+			stream = _stream ;
+		}
+
+		/**
+			It's possible for an Audio Packet to be constructed
+			but malformed, in which case it should not be used.
+			Check to ensure the AudioPacket is safe to decode.
+		*/
+		public boolean isAudioPacket()
+		{
+			return !notAudio ;
+		}
+
+		public void decode() throws Exception
+		{
+			int pos = startPosition ;
+			System.out.println( "SPos: " + pos + " Length: " + ( stream.length * 8 ) ) ;
+
+			pos = decodeFloorCurve( pos, stream ) ;
+			pos = decodeResidue( pos, stream ) ;
+
+			System.out.println( "EPos: " + pos + " Length: " + ( stream.length * 8 ) ) ;
 		}
 
 		private double[] computeWindow()
@@ -1467,6 +1645,7 @@ public final class Vorbis
 				{
 					case 0 :
 					{
+						System.out.println( "Skipping FloorConfig 0..." ) ;
 						break ;
 					}
 					case 1 :
@@ -1475,7 +1654,7 @@ public final class Vorbis
 						decodedFloors[i] = floor ;
 
 						final Floor1Configuration config = ( Floor1Configuration )floorConfig ;
-						_pos = config.decode( _pos, _stream, floor ) ;
+						_pos = config.decodePacket( _pos, _stream, floor ) ;
 
 						noResidue[i] = ( floor.unused ) ? true : false ;
 						break ;
@@ -1486,13 +1665,21 @@ public final class Vorbis
 			// nonzero vector propagate
 			for( int i = 0; i < mapping.couplingSteps; ++i )
 			{
-			
+				final int magnitude = mapping.magnitudes[i] ;
+				final int angle = mapping.angles[i] ;
+
+				if( angle == 0 || magnitude == 0 )
+				{
+					mapping.magnitudes[i] = 0 ;
+					mapping.angles[i] = 0 ;
+				}
 			}
 
+			System.out.println( "Floor pos: " + _pos ) ;
 			return _pos ;
 		}
 
-		private int decodeResidue( int _pos, final byte[] _stream )
+		private int decodeResidue( int _pos, final byte[] _stream ) throws Exception
 		{
 			for( int i = 0; i < mapping.subMaps; ++i )
 			{
@@ -1506,20 +1693,28 @@ public final class Vorbis
 					}
 				}
 
+				// We construct and 2D array of the channels we are going to decode.
+				// This array will be compact and does not retain the channels 'speaker' position.
+				residueValues[i] = new float[ch][] ;
+
 				final int residueNumber = mapping.subMapResidues[i] ;
 				final ResidueConfiguration residue = residues.get( residueNumber ) ;
-				_pos = residue.decode( _pos, _stream, n, ch, doNotDecode ) ;
-				// 5. decode ch vectors using residue
+
+				_pos = residue.decodePacket( _pos, _stream, n, ch, doNotDecode, residueValues[i] ) ;
 
 				ch = 0 ;
+				final float[][] channels = new float[audioChannels][] ;
 				for( int j = 0; j < audioChannels; ++j )
 				{
 					if( mapping.muxs[j] == i )
 					{
-						// 7. a) i. residue vector for channel [j] is set to decoded residue vector [ch]
+						// Stick the channel back into its intended 'speaker' position.
+						channels[j] = residueValues[i][ch] ;
 						++ch ;
 					}
 				}
+
+				residueValues[i] = channels ;
 			}
 
 			return _pos ;

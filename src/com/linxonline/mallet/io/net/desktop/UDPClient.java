@@ -24,7 +24,8 @@ public class UDPClient implements AutoCloseable, IClient
 	private DatagramChannel channel ;
 	private SocketAddress target ;
 
-	private byte[] sendBuffers = new byte[200] ;
+	private ByteBuffer sendBuffer = ByteBuffer.allocate( 200 ) ;
+	private ByteBuffer receiveBuffer = ByteBuffer.allocate( 200 ) ;
 	private final Address sourceAddress = new Address() ;
 
 	private final Serialise.ByteOut out = new Serialise.ByteOut( null ) ;
@@ -64,16 +65,18 @@ public class UDPClient implements AutoCloseable, IClient
 		try
 		{
 			final int length = _out.getLength() ;
-			if( sendBuffers.length < length )
+			if( sendBuffer.capacity() < length )
 			{
-				sendBuffers = new byte[length] ;
+				sendBuffer = ByteBuffer.allocate( length ) ;
 			}
 
-			out.set( sendBuffers ) ;
+			out.set( sendBuffer.array() ) ;
 			_out.serialise( out ) ;
 
-			final ByteBuffer buffer = ByteBuffer.wrap( sendBuffers, 0, length ) ;
-			channel.send( buffer, target ) ;
+			sendBuffer.position( 0 ) ;
+			sendBuffer.limit( length ) ;
+
+			channel.send( sendBuffer, target ) ;
 			return true ;
 		}
 		catch( IOException ex )
@@ -87,17 +90,26 @@ public class UDPClient implements AutoCloseable, IClient
 	{
 		try
 		{
-			final ByteBuffer wrap = ByteBuffer.wrap( _stream.getBuffer() ) ;
-			final SocketAddress source = channel.receive( wrap ) ;
+			final byte[] buffer = _stream.getBuffer() ;
+			if( receiveBuffer.capacity() < buffer.length )
+			{
+				receiveBuffer = ByteBuffer.allocate( buffer.length ) ;
+			}
+
+			receiveBuffer.position( 0 ) ;
+			final SocketAddress source = channel.receive( receiveBuffer ) ;
 			if( source == null )
 			{
 				return null ;
 			}
 
+			final int length = receiveBuffer.position() ;
+			System.arraycopy( receiveBuffer.array(), 0, buffer, 0, length ) ;
+
 			sourceAddress.set( source ) ;
 
 			_stream.setSender( sourceAddress ) ;
-			_stream.setDataLength( wrap.position() ) ;
+			_stream.setDataLength( length ) ;
 
 			return _stream ;
 		}
