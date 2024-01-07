@@ -10,8 +10,8 @@ import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 import com.linxonline.mallet.physics.CollisionCallback ;
 import com.linxonline.mallet.physics.ContactPoint ;
-
-import com.linxonline.mallet.physics.hulls.* ;
+import com.linxonline.mallet.physics.Hull ;
+import com.linxonline.mallet.physics.Box2D ;
 
 public class CollisionComponent extends Component
 {

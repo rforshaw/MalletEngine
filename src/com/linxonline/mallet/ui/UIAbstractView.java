@@ -524,18 +524,33 @@ public class UIAbstractView extends UIElement
 				}
 
 				final UILayout valLayout = layout.addElement( UIGenerator.<UILayout>create( metaLayout ) ) ;
-				addTextFields( valLayout, _model, _index ) ;
+				addElementss( valLayout, _model, _index ) ;
 				return layout ;
 			}
 
-			private void addTextFields( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			private void addElementss( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 				switch( variant.getType() )
 				{
 					default :
 					{
-						hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+						hook( _layout.addElement( createTextField() ), _layout, _model, _index ) ;
+						break ;
+					}
+					case AVariable.BOOLEAN_TYPE :
+					{
+						hook( _layout.addElement( createCheckbox() ), _layout, _model, _index ) ;
+						break ;
+					}
+					case AVariable.INT_TYPE :
+					{
+						hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+						break ;
+					}
+					case AVariable.FLOAT_TYPE :
+					{
+						hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						break ;
 					}
 					case AVariable.OBJECT_TYPE :
@@ -544,45 +559,59 @@ public class UIAbstractView extends UIElement
 						if( obj instanceof Vector2 )
 						{
 							// x, y
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
 						else if( obj instanceof Vector3 )
 						{
 							// x, y, z
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
 						else if( obj instanceof MalletColour )
 						{
 							// r, g, b, a
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
 						else if( obj instanceof MalletFont )
 						{
 							// name, font size
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createTextField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createTextField() ), _layout, _model, _index ) ;
 						}
 						else if( obj instanceof UIElement.UV )
 						{
 							// minx, miny, maxx, maxy
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
 						else
 						{
-							hook( _layout.addElement( create() ), _layout, _model, _index ) ;
+							hook( _layout.addElement( createTextField() ), _layout, _model, _index ) ;
 						}
 						break ;
 					}
 				}
+			}
+
+			private UICheckbox hook( final UICheckbox _check, final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			{
+				UIElement.connect( _check, _check.checkChanged(), new Connect.Slot<UICheckbox>()
+				{
+					@Override
+					public void slot( final UICheckbox _this )
+					{
+						setModelData( _layout, _model, _index ) ;
+					}
+				} ) ;
+
+				return _check ;
 			}
 
 			private UITextField hook( final UITextField _field, final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
@@ -599,7 +628,44 @@ public class UIAbstractView extends UIElement
 				return _field ;
 			}
 
-			private UITextField create()
+			private UICheckbox createCheckbox()
+			{
+				final UICheckbox.Meta meta = new UICheckbox.Meta() ;
+
+				final GUITick.Meta tick = meta.addComponent( new GUITick.Meta() ) ;
+				tick.setUV( 0.5f, 0.0f, 1.0f, 0.5f ) ;
+				tick.setAlignment( UI.Alignment.CENTRE, UI.Alignment.CENTRE ) ;
+				tick.setRetainRatio( true ) ;
+				tick.setSheet( "base/textures/checkbox_sheet.png" ) ;
+
+				final GUIPanelDraw.Meta draw = meta.addComponent( new GUIPanelDraw.Meta() ) ;
+				draw.setNeutralUV( 0.0f, 0.0f, 0.5f, 0.5f ) ;
+				draw.setRolloverUV( 0.0f, 0.5f, 0.5f, 1.0f ) ;
+				draw.setClickedUV( 0.0f, 0.5f, 0.5f, 1.0f ) ;
+				draw.setSheet( "base/textures/checkbox_sheet.png" ) ;
+				draw.setAlignment( UI.Alignment.CENTRE, UI.Alignment.CENTRE ) ;
+				draw.setRetainRatio( true ) ;
+
+				return UIGenerator.<UICheckbox>create( meta ) ;
+			}
+
+			private UITextField createNumberField()
+			{
+				final UITextField.Meta meta = new UITextField.Meta() ;
+				final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
+				edge.setSheet( "base/textures/edge_button.png" ) ;
+
+				final GUIEditText.Meta text = meta.addComponent( new GUIEditText.Meta() ) ;
+				text.setAlignment( UI.Alignment.LEFT, UI.Alignment.CENTRE ) ;
+				text.setOnlyNumbers( true ) ;
+				text.setGroup( "ENGINE" ) ;
+				text.setName( "VALUE" ) ;
+				text.setText( "Test" ) ;
+			
+				return UIGenerator.<UITextField>create( meta ) ;
+			}
+
+			private UITextField createTextField()
 			{
 				final UITextField.Meta meta = new UITextField.Meta() ;
 				final GUIPanelEdge.Meta edge = meta.addComponent( new GUIPanelEdge.Meta() ) ;
@@ -644,6 +710,12 @@ public class UIAbstractView extends UIElement
 						default                             :
 						{
 							setTextTo( getText( vLayout, 0 ), variant.toString() ) ;
+							break ;
+						}
+						case AVariable.BOOLEAN_TYPE :
+						{
+							final UICheckbox value = ( UICheckbox )vLayout.getElements().get( 0 ) ;
+							value.setChecked( variant.toBool() ) ;
 							break ;
 						}
 						case AVariable.OBJECT_TYPE :
@@ -713,7 +785,7 @@ public class UIAbstractView extends UIElement
 						}
 						case AVariable.BOOLEAN_TYPE :
 						{
-							variant.setBool( toBool( getText( vLayout, 0 ) ) ) ;
+							variant.setBool( getBoolean( vLayout, 0 ) ) ;
 							signal( _model, variant ) ;
 							break ;
 						}
@@ -833,6 +905,12 @@ public class UIAbstractView extends UIElement
 			{
 				final String trimmed = _text.toString().trim() ;
 				return (trimmed.length() > 0) ? Float.parseFloat( _text.toString() ) : 0.0f ;
+			}
+
+			public boolean getBoolean( final UILayout _layout, final int _index )
+			{
+				final UICheckbox value = ( UICheckbox )_layout.getElements().get( _index ) ;
+				return value.isChecked() ;
 			}
 
 			public StringBuilder getText( final UILayout _layout, final int _index )

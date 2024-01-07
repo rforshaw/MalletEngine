@@ -5,9 +5,6 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-import com.linxonline.mallet.physics.hulls.Box2D ;
-import com.linxonline.mallet.physics.hulls.Hull ;
-
 public final class CollisionCheck
 {
 	private final Vector2 toCenter = new Vector2() ;

@@ -214,15 +214,42 @@ public final class GLRenderer extends BasicRenderer
 			}
 
 			@Override
-			public Set<String> getLoadedTextures( final Set _fill )
+			public Set<String> getLoadedTextures( final Set<String> _fill )
 			{
 				return textures.getLoadedKeys( _fill ) ;
 			}
 
 			@Override
-			public Set<String> getAllTextures( final Set _fill )
+			public Set<String> getAllTextures( final Set<String> _fill )
 			{
 				return textures.getAllKeys( _fill ) ;
+			}
+
+			@Override
+			public void clean( final Set<String> _active )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					textures.clean( _active ) ;
+
+					// Once we've cleared the textures we need to
+					// refresh the drawbuffers.
+					// This ensures any textures that were removed but
+					// should not have been removed are pulled back in.
+					final int size = bufferLookup.size() ;
+					for( int i = 0; i < size; ++i )
+					{
+						final GLBuffer buff = bufferLookup.getRHS( i ) ;
+						if( buff != null )
+						{
+							final ABuffer buffer = bufferLookup.getLHS( i ) ;
+							if( updateBuffer( buffer, buff ) == false )
+							{
+								DrawAssist.update( buffer ) ;
+							}
+						}
+					}
+				} ) ;
 			}
 		} ;
 	}

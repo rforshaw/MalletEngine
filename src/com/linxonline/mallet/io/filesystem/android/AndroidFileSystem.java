@@ -18,7 +18,7 @@ import com.linxonline.mallet.util.MalletList ;
 */
 public class AndroidFileSystem implements FileSystem
 {
-	private final Map<String, ZipPath> mapZip = MalletMap.<String, ZipPath>newMap() ;
+	private final Map<String, List<ZipPath>> mapZip = MalletMap.<String, List<ZipPath>>newMap() ;
 	private final Map<String, String> mapAssets = MalletMap.<String, String>newMap() ;
 
 	private final Context context ;
@@ -46,6 +46,19 @@ public class AndroidFileSystem implements FileSystem
 		}
 
 		traverseFiles( _directory, _directory + '/' ) ;
+
+		// Sort the resources using their zip-path name
+		// in descending alphabetical order.
+		// A developer can use this to ensure a particular zip
+		// has precedence over another.
+		for( List<ZipPath> paths : mapZip.values() )
+		{
+			paths.sort( Collections.reverseOrder( ( final ZipPath _a, final ZipPath _b ) ->
+			{
+				return _a.getZipPath().compareToIgnoreCase( _b.getZipPath() ) ;
+			} ) ) ;
+		}
+
 		return true ;
 	}
 
@@ -69,12 +82,18 @@ public class AndroidFileSystem implements FileSystem
 				//System.out.println( "IS A FILE: " + _path ) ;
 				if( isZip( _path ) == true )
 				{
-					//System.out.println( "ZIP" ) ;
 					final List<ZipPath> paths = generateZipPaths( _path ) ;
 					for( final ZipPath zip : paths )
 					{
-						final String id = _directory + strip( zip.filePath ) ;
-						mapZip.put( id, zip ) ;
+						final String id = String.format( "%s/%s", _directory, strip( zip.filePath ) ) ;
+						List<ZipPath> zipPaths = mapZip.get( id ) ;
+						if( zipPaths == null )
+						{
+							zipPaths = MalletList.<ZipPath>newList() ;
+							mapZip.put( id, zipPaths ) ;
+						}
+
+						zipPaths.add( zip ) ;
 					}
 				}
 				else
@@ -109,10 +128,7 @@ public class AndroidFileSystem implements FileSystem
 			ZipEntry entry = null ;
 			while( ( entry = stream.getNextEntry() ) != null )
 			{
-				if( entry.isDirectory() == false )
-				{
-					paths.add( new ZipPath( zipName, zipPath, entry.getName() ) ) ;
-				}
+				paths.add( new ZipPath( zipName, zipPath, entry ) ) ;
 			}
 
 			stream.close() ;
@@ -137,14 +153,16 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public FileStream getFile( final String _path )
 	{
-		if( mapZip.containsKey( _path ) == true )
+		final List<ZipPath> zips = mapZip.get( strip( _path ) ) ;
+		if( zips != null )
 		{
 			try
 			{
-				return new AndroidZipFile( mapZip.get( _path ), assetManager ) ;
+				return new AndroidZipFile( _path, zips, assetManager ) ;
 			}
 			catch( final IOException ex )
 			{
+				Logger.println( "Failed retrieve: " + _path + " from zip file.", Logger.Verbosity.MINOR ) ;
 				return null ;
 			}
 		}
@@ -171,14 +189,23 @@ public class AndroidFileSystem implements FileSystem
 
 	private static String strip( final String _val )
 	{
-		final int length = _val.length() ;
+		int length = _val.length() ;
 		if( length < 2 )
 		{
 			return _val ;
 		}
 
+		if( length > 2 )
+		{
+			if( _val.charAt( length - 1 ) == '/' )
+			{
+				length -= 1 ;
+			}
+		}
+
 		final boolean strip = _val.charAt( 0 ) == '.' && _val.charAt( 1 ) == '/' ;
-		return ( strip == true ) ? _val.substring( 2, length ) : _val ;
+		final int start = ( strip ) ? 2 : 0 ;
+		return _val.substring( start, length ) ;
 	}
 
 	public static class ZipPath
@@ -186,12 +213,14 @@ public class AndroidFileSystem implements FileSystem
 		public final String zipName ;			// Name of zip with extension
 		public final String zipPath ;			// Path to zip not including the file itself
 		public final String filePath ;			// Path to file within zip
+		public final boolean isDirectory ;
 
-		public ZipPath( final String _zipName, final String _zipPath, final String _filePath )
+		public ZipPath( final String _zipName, final String _zipPath, final ZipEntry _entry )
 		{
 			zipName = _zipName ;
 			zipPath = _zipPath ;
-			filePath = _filePath ;
+			filePath = _entry.getName() ;
+			isDirectory = _entry.isDirectory() ;
 		}
 
 		public String getZipPath()

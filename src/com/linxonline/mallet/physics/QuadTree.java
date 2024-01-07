@@ -6,9 +6,9 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.AABB ;
-
-import com.linxonline.mallet.physics.hulls.Hull ;
+import com.linxonline.mallet.maths.Intersection ;
 
 public final class QuadTree
 {
@@ -96,9 +96,9 @@ public final class QuadTree
 		root.generateContacts( _hull ) ;
 	}
 
-	public Hull getHullWithPoint( final Vector2 _point, final int[] _filters )
+	public Hull ray( final Ray _ray, final int[] _f )
 	{
-		return root.getHullWithPoint( _point, _filters ) ;
+		return root.ray( _ray, _f ) ;
 	}
 
 	public boolean exists( final Hull _hull )
@@ -119,7 +119,6 @@ public final class QuadTree
 	protected final class QuadNode
 	{
 		private final Vector2 centre = new Vector2() ;
-		private final AABB aabb = new AABB() ;
 
 		private CollisionCheck check = new CollisionCheck() ;
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
@@ -165,35 +164,44 @@ public final class QuadTree
 			updateCollisions( nextHull, _hull, hulls ) ;
 		}
 
-		public Hull getHullWithPoint( final Vector2 _point, final int[] _filters )
+		public Hull ray( final Ray _ray, final int[] _f )
 		{
 			if( parent == true )
 			{
-				switch( findQuadrant( _point, centre ) )
+				switch( findQuadrant( _ray.getPoint(), centre ) )
 				{
 					default           : return null ;
-					case TOP_LEFT     : return topLeft.getHullWithPoint( _point, _filters ) ;
-					case TOP_RIGHT    : return topRight.getHullWithPoint( _point, _filters ) ;
-					case BOTTOM_LEFT  : return bottomLeft.getHullWithPoint( _point, _filters ) ;
-					case BOTTOM_RIGHT : return bottomRight.getHullWithPoint( _point, _filters ) ;
+					case TOP_LEFT     : return topLeft.ray( _ray, _f ) ;
+					case TOP_RIGHT    : return topRight.ray( _ray, _f ) ;
+					case BOTTOM_LEFT  : return bottomLeft.ray( _ray, _f ) ;
+					case BOTTOM_RIGHT : return bottomRight.ray( _ray, _f ) ;
 				}
 			}
 
 			Hull best = null ;
+			float distance = Float.MAX_VALUE ;
+
 			for( int i = 0; i < nextHull; ++i )
 			{
 				final Hull hull = hulls[i] ;
-				if( Hull.isCollidableWithGroup( hull.getGroupID(), _filters ) == false )
+				if( Hull.isCollidableWithGroup( hull.getGroupID(), _f ) == false )
 				{
 					// The client is not interested if this hull intersects 
 					// the ray being cast.
 					continue ;
 				}
 
-				hull.getAABB( aabb ) ;
-				if( aabb.intersectPoint( _point.x, _point.y ) == true )
+				// Loop over the available hulls and using the aabb
+				// return the hull closest to the casting-point.
+				if( hull.ray( _ray ) )
 				{
-					best = hull ;
+					final Intersection intersection = _ray.getIntersection() ;
+					final float dist = intersection.getDistance() ;
+					if( dist < distance )
+					{
+						distance = dist ;
+						best = hull ;
+					}
 				}
 			}
 
@@ -675,6 +683,18 @@ public final class QuadTree
 	}
 
 	protected static Quadrant findQuadrant( final Vector2 _point, final Vector2 _centre )
+	{
+		if( _point.x >= _centre.x )
+		{
+			return ( _point.y >= _centre.y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
+		}
+		else
+		{
+			return ( _point.y >= _centre.y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
+		}
+	}
+
+	protected static Quadrant findQuadrant( final Vector3 _point, final Vector2 _centre )
 	{
 		if( _point.x >= _centre.x )
 		{

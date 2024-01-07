@@ -5,8 +5,6 @@ import java.util.List ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 
-
-import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
@@ -143,6 +141,7 @@ public final class CollisionSystem
 	{
 		return new ICollisionDelegate()
 		{
+			private final Ray ray = new Ray() ;		// Not thread-safe.
 			private boolean shutdown = false ;
 
 			@Override
@@ -164,27 +163,9 @@ public final class CollisionSystem
 			@Override
 			public Hull ray( final Vector2 _start, final Vector2 _end, final int[] _filters )
 			{
-				final float step = 1.0f ;
-				final float distance = Vector2.distance( _start, _end ) ;
-
-				final Vector2 direction = new Vector2( _end ) ;
-				direction.subtract( _start ) ;
-				direction.normalise() ;
-
-				final Vector2 point = new Vector2( _start ) ;
-				for( float i = 0.0f; i < distance; i += step )
-				{
-					point.x += direction.x ;
-					point.y += direction.y ;
-
-					final Hull hull = treeHulls.getHullWithPoint( point, _filters ) ;
-					if( hull != null )
-					{
-						return hull ;
-					}
-				}
-
-				return null ;
+				ray.setFromPoints( _start.x, _start.y, _end.x, _end.y ) ;
+				final Hull hull = treeHulls.ray( ray, _filters ) ;
+				return hull ;
 			}
 
 			@Override

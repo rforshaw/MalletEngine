@@ -3,7 +3,6 @@ package com.linxonline.mallet.ecs ;
 import java.util.List ;
 
 import com.linxonline.mallet.physics.* ;
-import com.linxonline.mallet.physics.hulls.* ;
 import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.util.MalletList ;

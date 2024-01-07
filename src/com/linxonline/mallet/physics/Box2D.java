@@ -1,9 +1,7 @@
-package com.linxonline.mallet.physics.hulls ;
+package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
-import com.linxonline.mallet.physics.Group ;
 
 public class Box2D extends Hull
 {
@@ -122,5 +120,15 @@ public class Box2D extends Hull
 		_fill.addTo( x, y ) ;
 
 		return _fill ;
+	}
+
+	@Override
+	public boolean ray( final Ray _ray )
+	{
+		final AABB temp = getAABB( _ray.getTempAABB() ) ;
+		final Intersection intersection = _ray.getIntersection() ;
+
+		temp.ray( _ray.getPoint(), _ray.getDirection(), intersection ) ;
+		return intersection.isValid() ;
 	}
 }

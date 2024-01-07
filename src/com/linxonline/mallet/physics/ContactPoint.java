@@ -1,7 +1,6 @@
 package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.physics.hulls.Hull ;
 
 public final class ContactPoint
 {

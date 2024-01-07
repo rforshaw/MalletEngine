@@ -25,7 +25,7 @@ import com.linxonline.mallet.io.formats.gltf.GLTF ;
 import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.linxonline.mallet.physics.Debug ;
-import com.linxonline.mallet.physics.hulls.Hull ;
+import com.linxonline.mallet.physics.Hull ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 
 import com.linxonline.mallet.util.tools.ConvertBytes ;
@@ -143,7 +143,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
+				playAudioExample() ;
 
 				//createEntities( 10, 10 ) ;
 				createECSEntities( 10, 10 ) ;
@@ -207,6 +207,7 @@ public final class GameTestLoader implements IGameLoader
 					ecsEvents.remove( ( ECSEvent.Component )_components[0] ) ;
 					ecsEvents.remove( ( ECSEvent.Component )_components[1] ) ;
 					ecsExample.remove( ( ExComponent )_components[2] ) ;
+					ecsCollision.remove( ( ECSCollision.Component )_components[3] ) ;
 				} ;
 
 				final ECSEntity entity = new ECSEntity( create, destroy ) ;

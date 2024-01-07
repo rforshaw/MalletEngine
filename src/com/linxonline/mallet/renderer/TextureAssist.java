@@ -62,6 +62,11 @@ public final class TextureAssist
 		return assist.getAllTextures( _fill ) ;
 	}
 
+	public static void clean( final Set<String> _active )
+	{
+		assist.clean( _active ) ;
+	}
+
 	public static interface Assist
 	{
 		public MalletTexture.Meta createMeta( final String _path ) ;
@@ -72,5 +77,7 @@ public final class TextureAssist
 
 		public Set<String> getLoadedTextures( final Set<String> _fill ) ;
 		public Set<String> getAllTextures( final Set<String> _fill ) ;
+
+		public void clean( final Set<String> _active ) ;
 	}
 }

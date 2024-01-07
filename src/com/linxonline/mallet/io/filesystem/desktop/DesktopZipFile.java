@@ -10,27 +10,41 @@ import com.linxonline.mallet.util.MalletList ;
 
 public class DesktopZipFile implements FileStream
 {
-	private final ZipFile zipFile ;
-	private final ZipEntry zipEntry ;
+	private final String path ;
+	private final ZipFile[] zipFiles ;
+	private final ZipEntry[] zipEntries ;
 
-	public DesktopZipFile( final DesktopFileSystem.ZipPath _path ) throws IOException
+	public DesktopZipFile( final String _path, final List<DesktopFileSystem.ZipPath> _zips ) throws IOException
 	{
-		assert _path != null ;
-		zipFile = new ZipFile( _path.getZipPath() ) ;
-		zipEntry = zipFile.getEntry( _path.filePath ) ;
+		path = _path ;
+
+		// It's possible that there are multiple zip files
+		// that each override the same file or directory.
+		// We are only interested in multiple versions of a directory.
+		final int size = ( _zips.get( 0 ).isDirectory ) ? _zips.size() : 1 ;
+
+		zipFiles = new ZipFile[size] ;
+		zipEntries = new ZipEntry[size] ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			final DesktopFileSystem.ZipPath zip = _zips.get( i ) ;
+			zipFiles[i] = new ZipFile( zip.getZipPath() ) ;
+			zipEntries[i] = zipFiles[i].getEntry( zip.filePath ) ;
+		}
 	}
 
 	public ByteInStream getByteInStream()
 	{
 		try
 		{
-			return new DesktopByteIn( zipFile.getInputStream( zipEntry ) )
+			return new DesktopByteIn( zipFiles[0].getInputStream( zipEntries[0] ) )
 			{
 				@Override
 				public void close() throws Exception
 				{
 					super.close() ;
-					zipFile.close() ;
+					zipFiles[0].close() ;
 				}
 			} ;
 		}
@@ -45,13 +59,13 @@ public class DesktopZipFile implements FileStream
 	{
 		try
 		{
-			return new DesktopStringIn( zipFile.getInputStream( zipEntry ) )
+			return new DesktopStringIn( zipFiles[0].getInputStream( zipEntries[0] ) )
 			{
 				@Override
 				public void close() throws Exception
 				{
 					super.close() ;
-					zipFile.close() ;
+					zipFiles[0].close() ;
 				}
 			} ;
 		}
@@ -136,12 +150,12 @@ public class DesktopZipFile implements FileStream
 
 	public boolean isFile()
 	{
-		return !zipEntry.isDirectory() ;
+		return !isDirectory() ;
 	}
 
 	public boolean isDirectory()
 	{
-		return zipEntry.isDirectory() ;
+		return zipEntries[0].isDirectory() ;
 	}
 
 	/**
@@ -189,45 +203,61 @@ public class DesktopZipFile implements FileStream
 
 	public String[] list()
 	{
-		final String currentPath = zipEntry.getName() ;
+		final HashSet<String> names = new HashSet<String>() ;
 
-		final List<String> names = MalletList.<String>newList() ;
-		final Enumeration<? extends ZipEntry> entries = zipFile.entries() ;
-		while( entries.hasMoreElements() == true )
+		for( final ZipEntry zipEntry : zipEntries )
 		{
-			final ZipEntry entry = entries.nextElement() ;
-			final String name = entry.getName() ;
-			if( name.equals( currentPath ) == true )
+			final String currentPath = zipEntry.getName() ;
+
+			for( final ZipFile zipFile : zipFiles )
 			{
-				// Skip you can't be a directory or a file
-				// of yourself.
-				continue ;
+				final Enumeration<? extends ZipEntry> entries = zipFile.entries() ;
+				while( entries.hasMoreElements() == true )
+				{
+					final ZipEntry entry = entries.nextElement() ;
+					final String name = entry.getName() ;
+					if( name.equals( currentPath ) == true )
+					{
+						// Skip you can't be a directory or a file
+						// of yourself.
+						continue ;
+					}
+
+					if( name.startsWith( currentPath ) == false )
+					{
+						// We are only interested in paths that follow
+						// the same hierarchy as our current path.
+						continue ;
+					}
+
+					final int firstIndex = name.indexOf( '/', currentPath.length() ) ;
+					final int lastIndex = name.lastIndexOf( '/' ) ;
+
+					if( firstIndex == -1 )
+					{
+						// It's a file
+						names.add( name.substring( currentPath.length(), name.length() ) ) ;
+						continue ;
+					}
+
+					if( firstIndex == lastIndex &&
+						entry.isDirectory() == true )
+					{
+						// It's a child directory of the current path.
+						// We aren't interested in grand children.
+						names.add( name.substring( currentPath.length(), name.length() - 1 ) ) ;
+						continue ;
+					}
+				}
 			}
+		}
 
-			if( name.startsWith( currentPath ) == false )
+		final DesktopFile file = new DesktopFile( new File( path ) ) ;
+		if( file.exists() && file.isDirectory() )
+		{
+			for( final String path : file.list() )
 			{
-				// We are only interested in paths that follow
-				// the same hierarchy as our current path.
-				continue ;
-			}
-
-			final int firstIndex = name.indexOf( '/', currentPath.length() ) ;
-			final int lastIndex = name.lastIndexOf( '/' ) ;
-
-			if( firstIndex == -1 )
-			{
-				// It's a file
-				names.add( name.substring( currentPath.length(), name.length() ) ) ;
-				continue ;
-			}
-
-			if( firstIndex == lastIndex &&
-				entry.isDirectory() == true )
-			{
-				// It's a child directory of the current path.
-				// We aren't interested in grand children.
-				names.add( name.substring( currentPath.length(), name.length() - 1 ) ) ;
-				continue ;
+				names.add( path ) ;
 			}
 		}
 
@@ -239,12 +269,12 @@ public class DesktopZipFile implements FileStream
 	*/
 	public long getSize()
 	{
-		return zipEntry.getSize() ;
+		return zipEntries[0].getSize() ;
 	}
 
 	@Override
 	public String toString()
 	{
-		return zipFile.toString() ;
+		return zipFiles[0].toString() ;
 	}
 }

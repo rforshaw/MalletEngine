@@ -95,7 +95,7 @@ public final class OBB
 			FloatBuffer.set( rotations, i, point.x, point.y ) ;
 		}
 	}
-	
+
 	public static Vector2 rotate( final Vector2 _point, final Vector2 _offset, final float _sin, final float _cos )
 	{
 		_point.x += _offset.x ;

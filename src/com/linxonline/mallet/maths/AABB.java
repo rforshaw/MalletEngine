@@ -119,6 +119,115 @@ public final class AABB
 	}
 
 	/**
+		Cast a ray starting from _position, in the _direction,
+		and determine if it intersects the box.
+		If it does intersect populate the _intersection.
+		If it does intersect isValid() on the intersection will return true.
+	*/
+	public Intersection ray( final Vector3 _point, final Vector3 _direction, final Intersection _intersection )
+	{
+		_intersection.reset() ;
+
+		float tmin = 0.0f ;
+		float tmax = Float.MAX_VALUE ;
+
+		// The ray runs parallel, only way it can intersect
+		// is if the point is within the AABB. 
+		if( MathUtil.isZero( _direction.x ) )
+		{
+			if( _point.x < range[AABB.MIN_X] || _point.x > range[AABB.MAX_X] )
+			{
+				return _intersection ;
+			}
+		}
+		else
+		{
+			final float ood = 1.0f / _direction.x ;
+			float t1 = ( range[AABB.MIN_X] - _point.x ) * ood ;
+			float t2 = ( range[AABB.MAX_X] - _point.x ) * ood ;
+			
+			if( t1 > t2 )
+			{
+				final float temp = t1 ;
+				t1 = t2 ;
+				t2 = t1 ;
+			}
+
+			tmin = MathUtil.max( tmin, t1 ) ;
+			tmax = MathUtil.min( tmax, t2 ) ;
+			if( tmin > tmax )
+			{
+				return _intersection ;
+			}
+		}
+
+		if( MathUtil.isZero( _direction.y ) )
+		{
+			if( _point.y < range[AABB.MIN_Y] || _point.y > range[AABB.MAX_Y] )
+			{
+				return _intersection ;
+			}
+		}
+		else
+		{
+			final float ood = 1.0f / _direction.y ;
+			float t1 = ( range[AABB.MIN_Y] - _point.y ) * ood ;
+			float t2 = ( range[AABB.MAX_Y] - _point.y ) * ood ;
+			
+			if( t1 > t2 )
+			{
+				final float temp = t1 ;
+				t1 = t2 ;
+				t2 = t1 ;
+			}
+
+			tmin = MathUtil.max( tmin, t1 ) ;
+			tmax = MathUtil.min( tmax, t2 ) ;
+			if( tmin > tmax )
+			{
+				return _intersection ;
+			}
+		}
+
+		// Only useful if we make AABB 3D.
+		/*if( MathUtil.isZero( _direction.z ) )
+		{
+			if( _point.y < range[AABB.MIN_Z] || _point.y > range[AABB.MAX_Z] )
+			{
+				return _intersection ;
+			}
+		}
+		else
+		{
+			final float ood = 1.0f / _direction.z ;
+			float t1 = ( range[AABB.MIN_Z] - _point.z ) * ood ;
+			float t2 = ( range[AABB.MAX_Z] - _point.z ) * ood ;
+			
+			if( t1 > t2 )
+			{
+				final float temp = t1 ;
+				t1 = t2 ;
+				t2 = t1 ;
+			}
+
+			tmin = MathUtil.max( tmin, t1 ) ;
+			tmax = MathUtil.min( tmax, t2 ) ;
+			if( tmin > tmax )
+			{
+				return _intersection ;
+			}
+		}*/
+
+		final float x = _point.x + ( _direction.x * tmin ) ;
+		final float y = _point.y + ( _direction.y * tmin ) ;
+		//final float z = _point.z + ( _direction.z * tmin ) ;
+		_intersection.setPoint( x, y, 0.0f ) ;
+		_intersection.setDistance( tmin ) ;
+
+		return _intersection ;
+	}
+
+	/**
 		Determine if the point defined is located within the AABB.
 	*/
 	public boolean intersectPoint( final float _x, final float _y )

@@ -11,41 +11,54 @@ import com.linxonline.mallet.util.Logger ;
 
 public class AndroidZipFile implements FileStream
 {
-	private final AndroidFileSystem.ZipPath path ;
-	private final ZipInputStream stream ;
-	private final ZipEntry zipEntry ;
+	private final String path ;
+	private final List<AndroidFileSystem.ZipPath> zips ;
+	private final ZipInputStream[] streams ;
+	private final ZipEntry[] zipEntries ;
 
-	public AndroidZipFile( final AndroidFileSystem.ZipPath _path, final AssetManager _asset ) throws IOException
+	public AndroidZipFile( final String _path, final List<AndroidFileSystem.ZipPath> _zips, final AssetManager _asset ) throws IOException
 	{
-		assert _path != null ;
-
 		path = _path ;
-		stream = new ZipInputStream( _asset.open( path.getZipPath() ) ) ;
-		zipEntry = AndroidZipFile.getZipEntry( path.filePath, stream ) ;
+		zips = _zips ;
+
+		// It's possible that there are multiple zip files
+		// that each override the same file or directory.
+		// We are only interested in multiple versions of a directory.
+		final int size = ( _zips.get( 0 ).isDirectory ) ? _zips.size() : 1 ;
+
+		streams = new ZipInputStream[size] ;
+		zipEntries = new ZipEntry[size] ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			final AndroidFileSystem.ZipPath zip = _zips.get( i ) ;
+			streams[i] = new ZipInputStream( _asset.open( zip.getZipPath() ) ) ;
+			zipEntries[i] = AndroidZipFile.getZipEntry( zip.filePath, streams[i] ) ;
+		}
 	}
 
 	public ByteInStream getByteInStream()
 	{
-		return new AndroidByteIn( stream )
+		return new AndroidByteIn( streams[0] )
 		{
 			@Override
 			public void close() throws Exception
 			{
 				super.close() ;
-				stream.close() ;
+				streams[0].close() ;
 			}
 		} ;
 	}
 
 	public StringInStream getStringInStream()
 	{
-		return new AndroidStringIn( stream )
+		return new AndroidStringIn( streams[0] )
 		{
 			@Override
 			public void close() throws Exception
 			{
 				super.close() ;
-				stream.close() ;
+				streams[0].close() ;
 			}
 		} ;
 	}
@@ -85,14 +98,16 @@ public class AndroidZipFile implements FileStream
 	public boolean copyTo( final String _dest )
 	{
 		final FileStream destination = GlobalFileSystem.getFile( new File( _dest ).getParent() ) ;
-		if( destination.mkdirs() == false )
+		if( destination.exists() == false && destination.mkdirs() == false )
 		{
+			System.out.println( "Failed to create directories." ) ;
 			return false ;
 		}
 
 		final FileStream stream = GlobalFileSystem.getFile( _dest ) ;
 		if( stream == null )
 		{
+			System.out.println( "Unable to acquire file stream for: " + _dest ) ;
 			return false ;
 		}
 
@@ -111,24 +126,23 @@ public class AndroidZipFile implements FileStream
 			{
 				out.writeBytes( buffer, 0, length ) ;
 			}
+
+			return true ;
 		}
 		catch( Exception ex )
 		{
-			ex.printStackTrace() ;
 			return false ;
 		}
-
-		return true ;
 	}
 
 	public boolean isFile()
 	{
-		return !zipEntry.isDirectory() ;
+		return !isDirectory() ;
 	}
 
 	public boolean isDirectory()
 	{
-		return zipEntry.isDirectory() ;
+		return zipEntries[0].isDirectory() ;
 	}
 
 	/**
@@ -157,7 +171,7 @@ public class AndroidZipFile implements FileStream
 	}
 
 	/**
-		Delete the File repreented by this File Stream.
+		Delete the File represented by this File Stream.
 		This also includes deleting folders.
 	*/
 	public boolean delete()
@@ -184,13 +198,13 @@ public class AndroidZipFile implements FileStream
 	*/
 	public long getSize()
 	{
-		return zipEntry.getSize() ;
+		return zipEntries[0].getSize() ;
 	}
 
 	@Override
 	public String toString()
 	{
-		return path.toString() ;
+		return zips.get( 0 ).toString() ;
 	}
 
 	/**

@@ -2,7 +2,29 @@ package com.linxonline.mallet.maths ;
 
 public final class MathUtil
 {
+	public static final float EPSILON = 0.001f ;
+
 	private MathUtil() {}
+
+	public static boolean isZero( final float _val )
+	{
+		return isZero( _val, EPSILON ) ;
+	}
+
+	public static boolean isZero( final float _val, final float _epsilon )
+	{
+		return Math.abs( _val ) < _epsilon ;
+	}
+
+	public static float min( final float _a, final float _b )
+	{
+		return ( _a < _b ) ? _a : _b ;
+	}
+
+	public static float max( final float _a, final float _b )
+	{
+		return ( _a > _b ) ? _a : _b ;
+	}
 
 	public static int clamp( int _val, final int _min, final int _max )
 	{

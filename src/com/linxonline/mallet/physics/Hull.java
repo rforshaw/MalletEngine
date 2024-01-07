@@ -1,7 +1,6 @@
-package com.linxonline.mallet.physics.hulls ;
+package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.physics.* ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
@@ -132,6 +131,13 @@ public abstract class Hull
 	public abstract float projectToAxis( final Vector2 _axis ) ;
 
 	public abstract AABB getAABB( final AABB _fill ) ;
+
+	/**
+		Does the hull interset with the passed in ray.
+		Return true if it does, use getIntersection() on
+		the ray to return intersection details.
+	*/
+	public abstract boolean ray( final Ray _ray ) ;
 
 	public final void setCollidable( final boolean _collidable )
 	{

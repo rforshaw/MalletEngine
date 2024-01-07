@@ -155,16 +155,15 @@ public abstract class AbstractManager<K, T extends Resource> implements ILoader<
 	{
 		for( final K key : toRemove )
 		{
-			final T resource = resources.get( key ) ;
+			final T resource = resources.remove( key ) ;
 			if( resource != null )
 			{
 				resource.destroy() ;
-				resources.remove( key ) ;
 			}
 		}
 		toRemove.clear() ;
 	}
-	
+
 	/**
 		Iterates over all Resource and destroy them.
 		Then clearing the Map

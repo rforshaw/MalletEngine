@@ -21,6 +21,11 @@ public final class AssetLookup<L, R>
 		assets = ( Tuple<L, R>[] )new Tuple<?, ?>[_capacity] ;
 	}
 
+	public int size()
+	{
+		return assets.length ;
+	}
+
 	public Tuple<L, R> get( final int _index )
 	{
 		if( _index >= assets.length )

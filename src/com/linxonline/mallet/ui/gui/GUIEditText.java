@@ -7,6 +7,7 @@ import com.linxonline.mallet.input.* ;
 
 public class GUIEditText extends GUIText
 {
+	private boolean onlyNumbers = false ;
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
 
@@ -38,6 +39,7 @@ public class GUIEditText extends GUIText
 		UIElement.connect( _parent, _parent.elementDisengaged(), elementDisengagedSlot ) ;
 
 		drawPlaceholder.getText().append( _meta.getPlaceholder() ) ;
+		onlyNumbers = _meta.isOnlyNumbers() ;
 
 		constructDraws() ;
 	}
@@ -385,6 +387,14 @@ public class GUIEditText extends GUIText
 
 	private void incrementChar( final char _char )
 	{
+		if( onlyNumbers == true )
+		{
+			if( _char != '.' && Character.isDigit( _char ) == false )
+			{
+				return ;
+			}
+		}
+
 		final UITextField parent = getParent() ;
 		final int index = parent.getCursorIndex() ;
 		final StringBuilder edit = getText() ;
@@ -427,16 +437,42 @@ public class GUIEditText extends GUIText
 	public static class Meta extends GUIText.Meta
 	{
 		private final UIVariant placeholder = new UIVariant( "PLACEHOLDER", "", new Connect.Signal() ) ;
+		private final UIVariant onlyNumbers = new UIVariant( "ONLY_NUMBERS", false, new Connect.Signal() ) ;
 
 		public Meta()
 		{
 			super() ;
+
+			int row = rowCount( root() ) ;
+			createData( null, row + 2, 1 ) ;
+
+			setData( new UIModelIndex( root(), row++, 0 ), placeholder, UIAbstractModel.Role.User ) ;
+			setData( new UIModelIndex( root(), row++, 0 ), onlyNumbers, UIAbstractModel.Role.User ) ;
 		}
 
 		@Override
 		public String getType()
 		{
 			return "UITEXTFIELD_GUIEDITTEXT" ;
+		}
+
+		public void setOnlyNumbers( final boolean _enable )
+		{
+			if( _enable != onlyNumbers.toBool() )
+			{
+				onlyNumbers.setBool( _enable ) ;
+				UIElement.signal( this, onlyNumbers.getSignal() ) ;
+			}
+		}
+
+		public boolean isOnlyNumbers()
+		{
+			return onlyNumbers.toBool() ;
+		}
+
+		public Connect.Signal onlyNumbersChanged()
+		{
+			return placeholder.getSignal() ;
 		}
 
 		public void setPlaceholder( final String _text )

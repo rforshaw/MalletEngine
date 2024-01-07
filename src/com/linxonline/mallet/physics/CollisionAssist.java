@@ -3,10 +3,6 @@ package com.linxonline.mallet.physics ;
 import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.OBB ;
 
-import com.linxonline.mallet.physics.ICollisionDelegate ;
-import com.linxonline.mallet.physics.hulls.Hull ;
-import com.linxonline.mallet.physics.hulls.Box2D ;
-
 public class CollisionAssist
 {
 	private static IAssist assist ;
