@@ -21,7 +21,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final boolean _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final boolean _val, final Connect.Signal _signal )
 	{
 		variable = new BooleanVariable( _name, _val ) ;
 		signal = _signal ;
@@ -32,7 +32,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final int _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final int _val, final Connect.Signal _signal )
 	{
 		variable = new IntegerVariable( _name, _val ) ;
 		signal = _signal ;
@@ -43,7 +43,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final float _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final float _val, final Connect.Signal _signal )
 	{
 		variable = new FloatVariable( _name, _val ) ;
 		signal = _signal ;
@@ -54,7 +54,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final String _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final String _val, final Connect.Signal _signal )
 	{
 		variable = new StringVariable( _name, _val ) ;
 		signal = _signal ;
@@ -65,7 +65,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final Vector2 _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final Vector2 _val, final Connect.Signal _signal )
 	{
 		variable = new ObjectVariable<Vector2>( _name, _val ) ;
 		signal = _signal ;
@@ -76,7 +76,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final Vector3 _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final Vector3 _val, final Connect.Signal _signal )
 	{
 		variable = new ObjectVariable<Vector3>( _name, _val ) ;
 		signal = _signal ;
@@ -87,7 +87,7 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final MalletColour _val, Connect.Signal _signal )
+	public UIVariant( final String _name, final MalletColour _val, final Connect.Signal _signal )
 	{
 		variable = new ObjectVariable<MalletColour>( _name, _val ) ;
 		signal = _signal ;
@@ -98,9 +98,20 @@ public final class UIVariant implements IVariant
 		this( _name, _val, null ) ;
 	}
 	
-	public <T> UIVariant( final String _name, final T _val, Connect.Signal _signal )
+	public <T> UIVariant( final String _name, final T _val, final Connect.Signal _signal )
 	{
 		variable = new ObjectVariable<T>( _name, _val ) ;
+		signal = _signal ;
+	}
+
+	public <E extends Enum<E>> UIVariant( final String _name, final Enum<E> _val )
+	{
+		this( _name, _val, null ) ;
+	}
+
+	public <E extends Enum<E>> UIVariant( final String _name, final Enum<E> _val, final Connect.Signal _signal )
+	{
+		variable = new EnumVariable( _name, _val ) ;
 		signal = _signal ;
 	}
 
@@ -169,7 +180,12 @@ public final class UIVariant implements IVariant
 		{
 			case AVariable.OBJECT_TYPE :
 			{
-				( ( ObjectVariable )variable ).value = _value;
+				( ( ObjectVariable )variable ).value = _value ;
+				break ;
+			}
+			case AVariable.ENUM_TYPE   :
+			{
+				( ( EnumVariable )variable ).value = ( Enum )_value ;
 				break ;
 			}
 		}
@@ -216,7 +232,19 @@ public final class UIVariant implements IVariant
 			}
 		}
 	}
-	
+
+	@Override
+	public void setEnum( final Enum _value )
+	{
+		switch( getType() )
+		{
+			case AVariable.ENUM_TYPE :
+			{
+				( ( EnumVariable )variable ).value = _value ; break ;
+			}
+		}
+	}
+
 	@Override
 	public String toString()
 	{
@@ -249,6 +277,8 @@ public final class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.INT_TYPE    : return ( ( IntegerVariable )variable ).value ;
+			case AVariable.ENUM_TYPE   : return ( ( EnumVariable )variable ).value.ordinal() ;
+			case AVariable.BOOLEAN_TYPE : return ( ( BooleanVariable )variable ).value ? 1 : 0 ;
 			default                    : return 0 ;
 		}
 	}
@@ -259,6 +289,7 @@ public final class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return _class.cast( ( ( ObjectVariable )variable ).value ) ;
+			case AVariable.ENUM_TYPE   : return _class.cast( ( ( EnumVariable )variable ).value ) ;
 			default                    : return null ;
 		}
 	}
@@ -299,6 +330,22 @@ public final class UIVariant implements IVariant
 		switch( getType() )
 		{
 			case AVariable.OBJECT_TYPE : return ( MalletColour )( ( ObjectVariable )variable ).value ;
+			default                    : return null ;
+		}
+	}
+
+	@Override
+	public Enum toEnum()
+	{
+		return toEnum( Enum.class ) ;
+	}
+
+	@Override
+	public <E> E toEnum( final Class<E> _class )
+	{
+		switch( getType() )
+		{
+			case AVariable.ENUM_TYPE   : return _class.cast( ( ( EnumVariable )variable ).value ) ;
 			default                    : return null ;
 		}
 	}

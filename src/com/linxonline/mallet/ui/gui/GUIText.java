@@ -256,24 +256,24 @@ public class GUIText extends GUIComponent
 
 		public void setLineType( final UI.Line _type )
 		{
-			if( _type != null && _type != lineType.toObject( UI.Line.class ) )
+			if( _type != null && _type != lineType.toEnum( UI.Line.class ) )
 			{
-				lineType.setObject( _type ) ;
+				lineType.setEnum( _type ) ;
 				UIElement.signal( this, lineType.getSignal() ) ;
 			}
 		}
 
 		public void setAlignment( final UI.Alignment _x, final UI.Alignment _y )
 		{
-			if( _x != null && _x != xAlign.toObject( UI.Alignment.class ) )
+			if( _x != null && _x != xAlign.toEnum( UI.Alignment.class ) )
 			{
-				xAlign.setObject( _x ) ;
+				xAlign.setEnum( _x ) ;
 				UIElement.signal( this, xAlign.getSignal() ) ;
 			}
 
-			if( _y != null && _y != yAlign.toObject( UI.Alignment.class ) )
+			if( _y != null && _y != yAlign.toEnum( UI.Alignment.class ) )
 			{
-				yAlign.setObject( _y ) ;
+				yAlign.setEnum( _y ) ;
 				UIElement.signal( this, yAlign.getSignal() ) ;
 			}
 		}
@@ -314,12 +314,12 @@ public class GUIText extends GUIComponent
 
 		public UI.Alignment getAlignmentX()
 		{
-			return xAlign.toObject( UI.Alignment.class ) ;
+			return xAlign.toEnum( UI.Alignment.class ) ;
 		}
 
 		public UI.Alignment getAlignmentY()
 		{
-			return yAlign.toObject( UI.Alignment.class ) ;
+			return yAlign.toEnum( UI.Alignment.class ) ;
 		}
 
 		public String getText()

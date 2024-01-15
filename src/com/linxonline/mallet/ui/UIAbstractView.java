@@ -18,6 +18,8 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIAbstractView extends UIElement
 {
+	private final static ItemDelegate FALLBACK_ITEM_DELEGATE = createDefaultItemDelegate() ;
+
 	private ItemDelegate<?> defaultItemDelegate = createDefaultItemDelegate() ;
 	private ItemDelegate<?>[] columnItemDelegate = new ItemDelegate<?>[1] ;
 	private ItemDelegate<?>[] rowItemDelegate = new ItemDelegate<?>[1] ;
@@ -372,7 +374,11 @@ public class UIAbstractView extends UIElement
 		IVariant variant = view.getData( _index, IAbstractModel.Role.Display ) ;
 		if( variant == null )
 		{
-			final UIElement cell = _delegate.createItem( this, model, _index ) ;
+			UIElement cell = _delegate.createItem( this, model, _index ) ;
+			if( cell == null )
+			{
+				cell = FALLBACK_ITEM_DELEGATE.createItem( this, model, _index ) ;
+			}
 
 			variant = new UIVariant( "CELL", cell ) ;
 			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
@@ -381,7 +387,10 @@ public class UIAbstractView extends UIElement
 		}
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
-		_delegate.setItemData( cell, model, _index ) ;
+		if( _delegate.setItemData( cell, model, _index ) == false )
+		{
+			FALLBACK_ITEM_DELEGATE.setItemData( cell, model, _index ) ;
+		}
 		return cell ;
 	}
 
@@ -405,7 +414,10 @@ public class UIAbstractView extends UIElement
 		view.removeData( _index ) ;		// Remove any variants assigned to that index
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
-		_delegate.destroyItem( cell ) ;
+		if( _delegate.destroyItem( cell ) == false )
+		{
+			FALLBACK_ITEM_DELEGATE.destroyItem( cell ) ;
+		}
 	}
 
 	private ItemDelegate<?> getItemDelegate( final UIModelIndex _index )
@@ -524,11 +536,11 @@ public class UIAbstractView extends UIElement
 				}
 
 				final UILayout valLayout = layout.addElement( UIGenerator.<UILayout>create( metaLayout ) ) ;
-				addElementss( valLayout, _model, _index ) ;
+				addElements( valLayout, _model, _index ) ;
 				return layout ;
 			}
 
-			private void addElementss( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
+			private void addElements( final UILayout _layout, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 				switch( variant.getType() )
@@ -681,16 +693,17 @@ public class UIAbstractView extends UIElement
 			}
 
 			@Override
-			public void destroyItem( final UIElement _item )
+			public boolean destroyItem( final UIElement _item )
 			{
 				// We don't need to explicitly remove the item from 
 				// the list, calling destroy will cause it to be removed 
 				// during the lists next update cycle.
 				_item.destroy() ;
+				return true ;
 			}
 
 			@Override
-			public void setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
+			public boolean setItemData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 
@@ -764,10 +777,12 @@ public class UIAbstractView extends UIElement
 						}
 					}
 				}
+
+				return true ;
 			}
 
 			@Override
-			public void setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
+			public boolean setModelData( final UIElement _item, final IAbstractModel _model, final UIModelIndex _index )
 			{
 				final IVariant variant = _model.getData( _index, IAbstractModel.Role.User ) ;
 
@@ -871,13 +886,16 @@ public class UIAbstractView extends UIElement
 						default                             : break ;
 					}
 				}
-				catch( NumberFormatException ex )
+				catch( Exception ex )
 				{
 					signal( _model, variant ) ;
+					return false ;
 				}
+
+				return true ;
 			}
 
-			public void signal( final IAbstractModel _model, final IVariant _variant )
+			private void signal( final IAbstractModel _model, final IVariant _variant )
 			{
 				final Connect.Signal signal = _variant.getSignal() ;
 				if( signal != null )
@@ -886,53 +904,48 @@ public class UIAbstractView extends UIElement
 				}
 			}
 
-			public boolean toBool( final StringBuilder _text )
-			{
-				return Boolean.parseBoolean( _text.toString() ) ;
-			}
-
-			public byte toByte( final StringBuilder _text )
+			private byte toByte( final StringBuilder _text )
 			{
 				return Byte.parseByte( _text.toString() ) ;
 			}
 
-			public int toInt( final StringBuilder _text )
+			private int toInt( final StringBuilder _text )
 			{
 				return Integer.parseInt( _text.toString() ) ;
 			}
 
-			public float toFloat( final StringBuilder _text )
+			private float toFloat( final StringBuilder _text )
 			{
 				final String trimmed = _text.toString().trim() ;
 				return (trimmed.length() > 0) ? Float.parseFloat( _text.toString() ) : 0.0f ;
 			}
 
-			public boolean getBoolean( final UILayout _layout, final int _index )
+			private boolean getBoolean( final UILayout _layout, final int _index )
 			{
 				final UICheckbox value = ( UICheckbox )_layout.getElements().get( _index ) ;
 				return value.isChecked() ;
 			}
 
-			public StringBuilder getText( final UILayout _layout, final int _index )
+			private StringBuilder getText( final UILayout _layout, final int _index )
 			{
 				final UITextField value = ( UITextField )_layout.getElements().get( _index ) ;
 				final GUIText gui = value.getComponent( "ENGINE", "VALUE", GUIEditText.class ) ;
 				return gui.getText() ;
 			}
 
-			public void setTextTo( final StringBuilder _text, final float _value )
+			private void setTextTo( final StringBuilder _text, final float _value )
 			{
 				_text.setLength( 0 ) ;
 				_text.append( Float.toString( _value ) ) ;
 			}
 
-			public void setTextTo( final StringBuilder _text, final int _value )
+			private void setTextTo( final StringBuilder _text, final int _value )
 			{
 				_text.setLength( 0 ) ;
 				_text.append( Integer.toString( _value ) ) ;
 			}
 
-			public void setTextTo( final StringBuilder _text, final String _value )
+			private void setTextTo( final StringBuilder _text, final String _value )
 			{
 				_text.setLength( 0 ) ;
 				_text.append( _value ) ;
@@ -964,16 +977,16 @@ public class UIAbstractView extends UIElement
 		/**
 			Clean up any resources that may have been used by this cell.
 		*/
-		public void destroyItem( final T _item ) ;
+		public boolean destroyItem( final T _item ) ;
 
 		/**
 			Apply any initial data to the item.
 		*/
-		public void setItemData( final T _item, final IAbstractModel _model, final UIModelIndex _index ) ;
+		public boolean setItemData( final T _item, final IAbstractModel _model, final UIModelIndex _index ) ;
 
 		/**
 			Update the model based on the modifications by the item.
 		*/
-		public void setModelData( final T _item, final IAbstractModel _model, final UIModelIndex _index ) ;
+		public boolean setModelData( final T _item, final IAbstractModel _model, final UIModelIndex _index ) ;
 	}
 }

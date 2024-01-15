@@ -22,6 +22,7 @@ public interface IVariant
 	public void setVector3( final float _x, final float _y, final float _z ) ;
 	public void setVector2( final float _x, final float _y ) ;
 	public void setColour( final byte _r, final byte _g, final byte _b, final byte _a ) ;
+	public void setEnum( final Enum _value ) ;
 
 	public String toString() ;
 	public boolean toBool() ;
@@ -32,6 +33,8 @@ public interface IVariant
 	public Vector3 toVector3() ;
 	public Vector2 toVector2() ;
 	public MalletColour toColour() ;
+	public Enum toEnum() ;
+	public <E> E toEnum( final Class<E> _class ) ;
 
 	public Connect.Signal getSignal() ;
 }

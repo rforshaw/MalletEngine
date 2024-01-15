@@ -373,6 +373,7 @@ public class UILayout extends UIElement implements IChildren
 			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
+			private final Vector3 availableLength = new Vector3() ;
 
 			@Override
 			public void update( final float _dt, final IChildren _children )
@@ -380,7 +381,7 @@ public class UILayout extends UIElement implements IChildren
 				ordered.clear() ;
 				_children.getElements( ordered ) ;
 
-				final Vector3 availableLength = new Vector3() ;
+				availableLength.setXYZ( 0, 0, 0 ) ;
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 
@@ -498,6 +499,7 @@ public class UILayout extends UIElement implements IChildren
 			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
+			private final Vector3 availableLength = new Vector3() ;
 
 			@Override
 			public void update( final float _dt, final IChildren _children )
@@ -505,7 +507,7 @@ public class UILayout extends UIElement implements IChildren
 				ordered.clear() ;
 				_children.getElements( ordered ) ;
 
-				final Vector3 availableLength = new Vector3() ;
+				availableLength.setXYZ( 0, 0, 0 ) ;
 				int minNumX = 0 ;
 				int minNumY = 0 ;
 

@@ -9,6 +9,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 */
 public final class MalletColour
 {
+	private final static float FLOAT_CONVERSION = 1.0f / 255.0f ;
 	public final static byte RED   = 3 ;
 	public final static byte GREEN = 2 ;
 	public final static byte BLUE  = 1 ;
@@ -117,6 +118,26 @@ public final class MalletColour
 	public byte getAlphaAsByte()
 	{
 		return colours[ALPHA] ;
+	}
+
+	public float getRedAsFloat()
+	{
+		return getRed() * FLOAT_CONVERSION ;
+	}
+
+	public float getGreenAsFloat()
+	{
+		return getGreen() * FLOAT_CONVERSION ;
+	}
+
+	public float getBlueAsFloat()
+	{
+		return getBlue() * FLOAT_CONVERSION ;
+	}
+
+	public float getAlphaAsFloat()
+	{
+		return getAlpha() * FLOAT_CONVERSION ;
 	}
 
 	public int toInt()

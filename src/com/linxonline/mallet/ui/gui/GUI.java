@@ -187,62 +187,63 @@ public final class GUI
 
 	public static Shape updateEdge( final Shape _shape, final Vector3 _length, final float _edge )
 	{
-		final Vector3 length = new Vector3( _length ) ;
-		length.subtract( _edge * 2, _edge * 2, _edge * 2 ) ;
+		final float lengthX = _length.x - ( _edge * 2 ) ;
+		final float lengthY = _length.y - ( _edge * 2 ) ;
+		final float lengthZ = _length.z - ( _edge * 2 ) ;
 
 		// Top Left Corner
-		_shape.setVector3( 0, 0, new Vector3( 0.0f, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 1, 0, new Vector3( _edge, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 2, 0, new Vector3( 0.0f,  _edge, 0.0f ) ) ;
-		_shape.setVector3( 3, 0, new Vector3( _edge, _edge, 0.0f ) ) ;
+		_shape.setVector3( 0, 0, 0.0f, 0.0f,  0.0f ) ;
+		_shape.setVector3( 1, 0, _edge, 0.0f,  0.0f ) ;
+		_shape.setVector3( 2, 0, 0.0f,  _edge, 0.0f ) ;
+		_shape.setVector3( 3, 0, _edge, _edge, 0.0f ) ;
 
 		// Top Edge
-		_shape.setVector3( 4, 0, new Vector3( _edge, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 5, 0, new Vector3( _edge + length.x, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 6, 0, new Vector3( _edge, _edge, 0.0f ) ) ;
-		_shape.setVector3( 7, 0, new Vector3( _edge + length.x, _edge, 0.0f ) ) ;
+		_shape.setVector3( 4, 0, _edge, 0.0f,  0.0f ) ;
+		_shape.setVector3( 5, 0, _edge + lengthX, 0.0f,  0.0f ) ;
+		_shape.setVector3( 6, 0, _edge, _edge, 0.0f ) ;
+		_shape.setVector3( 7, 0, _edge + lengthX, _edge, 0.0f ) ;
 
 		// Top Right Corner
-		_shape.setVector3( 8, 0, new Vector3( _edge + length.x, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 9, 0, new Vector3( _edge + length.x + _edge, 0.0f,  0.0f ) ) ;
-		_shape.setVector3( 10, 0, new Vector3( _edge + length.x, _edge, 0.0f ) ) ;
-		_shape.setVector3( 11, 0, new Vector3( _edge + length.x + _edge, _edge, 0.0f ) ) ;
+		_shape.setVector3( 8, 0, _edge + lengthX, 0.0f,  0.0f ) ;
+		_shape.setVector3( 9, 0, _edge + lengthX + _edge, 0.0f,  0.0f ) ;
+		_shape.setVector3( 10, 0, _edge + lengthX, _edge, 0.0f ) ;
+		_shape.setVector3( 11, 0, _edge + lengthX + _edge, _edge, 0.0f ) ;
 
 		// Left Edge
-		_shape.setVector3( 12, 0, new Vector3( 0.0f,  _edge,  0.0f ) ) ;	
-		_shape.setVector3( 13, 0, new Vector3( _edge, _edge,  0.0f ) ) ;
-		_shape.setVector3( 14, 0, new Vector3( 0.0f,  _edge + length.y, 0.0f ) ) ;
-		_shape.setVector3( 15, 0, new Vector3( _edge, _edge + length.y, 0.0f ) ) ;
+		_shape.setVector3( 12, 0, 0.0f,  _edge,  0.0f ) ;
+		_shape.setVector3( 13, 0, _edge, _edge,  0.0f ) ;
+		_shape.setVector3( 14, 0, 0.0f,  _edge + lengthY, 0.0f ) ;
+		_shape.setVector3( 15, 0, _edge, _edge + lengthY, 0.0f ) ;
 
 		// Bottom Left Corner
-		_shape.setVector3( 16, 0, new Vector3( 0.0f,  _edge + length.y,  0.0f ) ) ;	
-		_shape.setVector3( 17, 0, new Vector3( _edge, _edge + length.y,  0.0f ) ) ;
-		_shape.setVector3( 18, 0, new Vector3( 0.0f,  _edge + length.y + _edge, 0.0f ) ) ;
-		_shape.setVector3( 19, 0, new Vector3( _edge, _edge + length.y + _edge, 0.0f ) ) ;
+		_shape.setVector3( 16, 0, 0.0f,  _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 17, 0, _edge, _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 18, 0, 0.0f,  _edge + lengthY + _edge, 0.0f ) ;
+		_shape.setVector3( 19, 0, _edge, _edge + lengthY + _edge, 0.0f ) ;
 
 		// Right Edge
-		_shape.setVector3( 20, 0, new Vector3( _edge + length.x,  _edge,  0.0f ) ) ;	
-		_shape.setVector3( 21, 0, new Vector3( _edge + length.x + _edge, _edge,  0.0f ) ) ;
-		_shape.setVector3( 22, 0, new Vector3( _edge + length.x,  _edge + length.y, 0.0f ) ) ;
-		_shape.setVector3( 23, 0, new Vector3( _edge + length.x + _edge, _edge + length.y, 0.0f ) ) ;
+		_shape.setVector3( 20, 0, _edge + lengthX,  _edge,  0.0f ) ;	
+		_shape.setVector3( 21, 0, _edge + lengthX + _edge, _edge,  0.0f ) ;
+		_shape.setVector3( 22, 0, _edge + lengthX,  _edge + lengthY, 0.0f ) ;
+		_shape.setVector3( 23, 0, _edge + lengthX + _edge, _edge + lengthY, 0.0f ) ;
 
 		// Bottom Right Corner
-		_shape.setVector3( 24, 0, new Vector3( _edge + length.x,  _edge + length.y,  0.0f ) ) ;	
-		_shape.setVector3( 25, 0, new Vector3( _edge + length.x + _edge, _edge + length.y,  0.0f ) ) ;
-		_shape.setVector3( 26, 0, new Vector3( _edge + length.x,  _edge + length.y + _edge, 0.0f ) ) ;
-		_shape.setVector3( 27, 0, new Vector3( _edge + length.x + _edge, _edge + length.y + _edge, 0.0f ) ) ;
+		_shape.setVector3( 24, 0, _edge + lengthX,  _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 25, 0, _edge + lengthX + _edge, _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 26, 0, _edge + lengthX,  _edge + lengthY + _edge, 0.0f ) ;
+		_shape.setVector3( 27, 0, _edge + lengthX + _edge, _edge + lengthY + _edge, 0.0f ) ;
 
 		// Bottom Edge
-		_shape.setVector3( 28, 0, new Vector3( _edge, _edge + length.y,  0.0f ) ) ;
-		_shape.setVector3( 29, 0, new Vector3( _edge + length.x, _edge + length.y,  0.0f ) ) ;
-		_shape.setVector3( 30, 0, new Vector3( _edge, _edge + length.y + _edge, 0.0f ) ) ;
-		_shape.setVector3( 31, 0, new Vector3( _edge + length.x, _edge + length.y + _edge, 0.0f ) ) ;
+		_shape.setVector3( 28, 0, _edge, _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 29, 0, _edge + lengthX, _edge + lengthY,  0.0f ) ;
+		_shape.setVector3( 30, 0, _edge, _edge + lengthY + _edge, 0.0f ) ;
+		_shape.setVector3( 31, 0,  _edge + lengthX, _edge + lengthY + _edge, 0.0f ) ;
 
 		// Middle
-		_shape.setVector3( 32, 0, new Vector3( _edge, _edge,  0.0f ) ) ;
-		_shape.setVector3( 33, 0, new Vector3( _edge + length.x, _edge,  0.0f ) ) ;
-		_shape.setVector3( 34, 0, new Vector3( _edge, _edge + length.y, 0.0f ) ) ;
-		_shape.setVector3( 35, 0, new Vector3( _edge + length.x, _edge + length.y, 0.0f ) ) ;
+		_shape.setVector3( 32, 0, _edge, _edge,  0.0f ) ;
+		_shape.setVector3( 33, 0, _edge + lengthX, _edge,  0.0f ) ;
+		_shape.setVector3( 34, 0, _edge, _edge + lengthY, 0.0f ) ;
+		_shape.setVector3( 35, 0, _edge + lengthX, _edge + lengthY, 0.0f ) ;
 
 		return _shape ;
 	}

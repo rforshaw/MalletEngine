@@ -18,6 +18,7 @@ public abstract class AVariable
 	public final static int STRING_TYPE = 3 ;
 	public final static int BOOLEAN_TYPE = 4 ;
 	public final static int OBJECT_TYPE = 5 ;
+	public final static int ENUM_TYPE = 6 ;
 
 	public String name = "NONE" ;
 	protected int type = NONE_TYPE ;

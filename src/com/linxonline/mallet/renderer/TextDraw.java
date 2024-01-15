@@ -129,15 +129,19 @@ public final class TextDraw implements IUpdate
 
 	public AABB getBoundary( final AABB _fill )
 	{
-		final Vector2 temp = new Vector2() ;
-		draw.getPosition( temp ) ;
+		return getBoundary( _fill, new Vector2() ) ;
+	}
 
-		float minX = temp.x ;
-		float minY = temp.y ;
+	public AABB getBoundary( final AABB _fill, final Vector2 _temp )
+	{
+		draw.getPosition( _temp ) ;
 
-		draw.getOffset( temp ) ;
-		minX += temp.x ;
-		minY += temp.y ;
+		float minX = _temp.x ;
+		float minY = _temp.y ;
+
+		draw.getOffset( _temp ) ;
+		minX += _temp.x ;
+		minY += _temp.y ;
 
 		final float maxX = minX + length.x ;
 		final float maxY = minY + length.y ;

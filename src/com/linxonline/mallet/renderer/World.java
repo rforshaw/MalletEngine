@@ -25,6 +25,8 @@ public final class World
 	private final List<Camera> cameras ;
 	private final List<ABuffer> buffers ;
 
+	private MalletColour clearColour = MalletColour.black() ;
+
 	public World( final String _id )
 	{
 		this( _id, 0 ) ;
@@ -122,6 +124,16 @@ public final class World
 	public List<ABuffer> getBuffers()
 	{
 		return buffers ;
+	}
+
+	public void setClearColour( final MalletColour _colour )
+	{
+		clearColour = ( _colour != null ) ? _colour : MalletColour.black() ;
+	}
+
+	public MalletColour getClearColour()
+	{
+		return clearColour ;
 	}
 
 	public void setRenderDimensions( final int _x, final int _y, final int _width, final int _height )

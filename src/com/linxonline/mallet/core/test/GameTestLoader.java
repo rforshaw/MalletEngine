@@ -89,6 +89,8 @@ public final class GameTestLoader implements IGameLoader
 			@Override
 			public void initGame()			// Called when state is started
 			{
+				final UIVariant variant = new UIVariant( "Test", BufferType.DRAW_BUFFER ) ;
+
 				/*boolean run = true ;
 				final InStream stream = new InStream( 100 ) ;
 				final UDPServer server = new UDPServer() ;

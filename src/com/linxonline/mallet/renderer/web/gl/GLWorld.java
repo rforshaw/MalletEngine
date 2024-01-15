@@ -20,6 +20,7 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.World.AttachmentType ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.ABuffer ;
+import com.linxonline.mallet.renderer.MalletColour ;
 
 /**
 	Represents the OpenGL state for a world.
@@ -36,6 +37,7 @@ public class GLWorld
 	protected int order ;
 	protected final IntVector2 render = new IntVector2( 0, 0 ) ;
 
+	protected final float[] clearColour = new float[] { 0.0f, 0.0f, 0.0f, 0.0f } ;
 	protected final List<GLCamera> cameras = new ArrayList<GLCamera>() ;
 	protected final List<GLBuffer> drawBuffers = new ArrayList<GLBuffer>() ;
 
@@ -204,6 +206,12 @@ public class GLWorld
 
 		updateCameras( _world, _cameras ) ;
 		updateDrawBuffers( _world, _buffers ) ;
+
+		final MalletColour clear = _world.getClearColour() ;
+		clearColour[0] = clear.getRedAsFloat() ;
+		clearColour[1] = clear.getGreenAsFloat() ;
+		clearColour[2] = clear.getBlueAsFloat() ;
+		clearColour[3] = clear.getAlphaAsFloat() ;
 	}
 
 	protected void updateCameras( final World _world, final AssetLookup<Camera, GLCamera> _cameras )
@@ -251,7 +259,7 @@ public class GLWorld
 			MGL.enable( MGL.GL_DEPTH_TEST ) ;
 		}
 
-		MGL.clearColor( 255.0f, 0.0f, 0.0f, 0.0f ) ;
+		MGL.clearColor( clearColour[0], clearColour[1], clearColour[2], clearColour[3] ) ;
 
 		int clearBits = ( colourAttachments.length > 0 ) ? MGL.GL_COLOR_BUFFER_BIT : 0 ;
 		clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;
@@ -384,6 +392,12 @@ public class GLWorld
 
 			updateCameras( _world, _cameras ) ;
 			updateDrawBuffers( _world, _buffers ) ;
+
+			final MalletColour clear = _world.getClearColour() ;
+			clearColour[0] = clear.getRedAsFloat() ;
+			clearColour[1] = clear.getGreenAsFloat() ;
+			clearColour[2] = clear.getBlueAsFloat() ;
+			clearColour[3] = clear.getAlphaAsFloat() ;
 		}
 
 		@Override
@@ -396,7 +410,7 @@ public class GLWorld
 				MGL.enable( MGL.GL_DEPTH_TEST ) ;
 			}
 
-			MGL.clearColor( 0.0f, 0.0f, 0.0f, 1.0f ) ;
+			MGL.clearColor( clearColour[0], clearColour[1], clearColour[2], clearColour[3] ) ;
 
 			int clearBits = MGL.GL_COLOR_BUFFER_BIT ;
 			clearBits |= ( hasDepth == true ) ? MGL.GL_DEPTH_BUFFER_BIT : 0 ;

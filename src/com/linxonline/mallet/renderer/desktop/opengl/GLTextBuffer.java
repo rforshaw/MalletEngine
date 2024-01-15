@@ -48,7 +48,7 @@ public final class GLTextBuffer extends GLBuffer
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final MalletColour shapeColour = new MalletColour() ;
-	private final Vector2 uv = new Vector2() ;
+	private final Vector2 vec2 = new Vector2() ;
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
 
@@ -176,7 +176,7 @@ public final class GLTextBuffer extends GLBuffer
 				continue ;
 			}
 
-			draw.getBoundary( boundary ) ;
+			draw.getBoundary( boundary, vec2 ) ;
 
 			draw.getPosition( position ) ;
 			draw.getOffset( offset ) ;
@@ -335,9 +335,9 @@ public final class GLTextBuffer extends GLBuffer
 							}
 							case VEC2     :
 							{
-								shape.getVector2( j, k, uv ) ;
-								vertexBuffer.put( uv.x ) ;
-								vertexBuffer.put( uv.y ) ;
+								shape.getVector2( j, k, vec2 ) ;
+								vertexBuffer.put( vec2.x ) ;
+								vertexBuffer.put( vec2.y ) ;
 								break ;
 							}
 						}
