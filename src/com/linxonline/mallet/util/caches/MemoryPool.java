@@ -29,6 +29,11 @@ public class MemoryPool<E> implements IPool<E>
 		populate() ;
 	}
 
+	public synchronized E takeSync()
+	{
+		return take() ;
+	}
+
 	/**
 		Return an element from the pool.
 		If the pool is empty fill it up with the initial size again.
@@ -42,6 +47,11 @@ public class MemoryPool<E> implements IPool<E>
 		}
 
 		return pool.remove( 0 ) ;
+	}
+
+	public synchronized boolean reclaimSync( final E _element )
+	{
+		return reclaim( _element ) ;
 	}
 
 	/**

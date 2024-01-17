@@ -64,7 +64,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	private GLWindow canvas ;
 
-	private boolean makeFullScreen = false ;
 	private int viewMode = ORTHOGRAPHIC_MODE ;
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
@@ -531,7 +530,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	public void setFullscreen( final boolean _set )
 	{
-		makeFullScreen = _set ;
+		GLRenderer.this.invokeLater( () ->
+		{
+			if( _set != canvas.isFullscreen() )
+			{
+				canvas.setFullscreen( _set ) ;
+			}
+		} ) ;
 	}
 
 	@Override
@@ -622,11 +627,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		if( canvas.getExclusiveContextThread() == null )
 		{
 			canvas.setExclusiveContextThread( Thread.currentThread() ) ;
-		}
-
-		if( makeFullScreen != canvas.isFullscreen() )
-		{
-			canvas.setFullscreen( makeFullScreen ) ;
 		}
 
 		canvas.display() ;

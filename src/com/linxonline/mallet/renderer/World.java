@@ -25,7 +25,7 @@ public final class World
 	private final List<Camera> cameras ;
 	private final List<ABuffer> buffers ;
 
-	private MalletColour clearColour = MalletColour.black() ;
+	private MalletColour clearColour = new MalletColour( 0, 0, 0, 0 ) ;
 
 	public World( final String _id )
 	{

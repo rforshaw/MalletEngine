@@ -5,6 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.physics.* ;
 import com.linxonline.mallet.maths.* ;
 
+import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Parallel ;
@@ -134,16 +135,22 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 
 	private static class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
+		private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
+		private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
+
 		@Override
 		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{
-			final ContactPoint point = new ContactPoint() ;
-			final Vector2 penShift = new Vector2() ;
+			final ContactPoint point = contacts.takeSync() ;
+			final Vector2 penShift = vec2s.takeSync() ;
 
 			for( int i = _start; i < _end; ++i )
 			{
 				ECSCollision.updateCollision( _hulls[i], point, penShift ) ;
 			}
+
+			contacts.reclaimSync( point ) ;
+			vec2s.reclaimSync( penShift ) ;
 		}
 	}
 }
