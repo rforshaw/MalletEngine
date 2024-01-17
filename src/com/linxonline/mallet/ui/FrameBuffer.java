@@ -63,6 +63,7 @@ public class FrameBuffer
 		camera.setOrthographic( 0.0f, height, 0.0f, width, -1000.0f, 1000.0f ) ;
 
 		world.setRenderDimensions( 0, 0, width, height ) ;
+		world.setClearColour( new MalletColour( 0, 0, 0, 0 ) ) ;
 
 		CameraAssist.update( camera ) ;
 		WorldAssist.update( world ) ;
