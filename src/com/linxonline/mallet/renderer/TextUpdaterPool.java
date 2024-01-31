@@ -166,7 +166,8 @@ public class TextUpdaterPool
 					continue ;
 				}
 
-				final TextBuffer buffer = updater.getBuffers().get( 0 ) ;
+				final List<TextBuffer> buffers = updater.getBuffers() ;
+				final TextBuffer buffer = buffers.get( 0 ) ;
 				if( buffer == null )
 				{
 					// Will need to remove buffer from global pool.

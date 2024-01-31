@@ -104,7 +104,7 @@ public class EventController implements IEventController
 		Adds events to messenger and will process them at the appropriate time.
 	**/
 	@Override
-	public void processEvent( final Event<?> _event )
+	public final void processEvent( final Event<?> _event )
 	{
 		messenger.add( _event ) ;
 	}

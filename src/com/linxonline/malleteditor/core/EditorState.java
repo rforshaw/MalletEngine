@@ -45,7 +45,7 @@ public class EditorState extends GameState
 
 	public EditorState( final String _name )
 	{
-		super( _name, GameState.UpdateMode.APPLICATION ) ;
+		super( _name ) ;
 	}
 
 	@Override

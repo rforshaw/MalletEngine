@@ -41,7 +41,7 @@ public class UISpacer extends UIElement
 		axis = _axis ; 
 	}
 
-	public UISpacer.Axis getAxis()
+	public final UISpacer.Axis getAxis()
 	{
 		return axis ;
 	}
@@ -82,7 +82,7 @@ public class UISpacer extends UIElement
 			return "UISPACER" ;
 		}
 
-		public void setAxis( final Axis _axis )
+		public final void setAxis( final Axis _axis )
 		{
 			if( _axis.equals( axis.toObject( Axis.class ) ) == false )
 			{
@@ -91,7 +91,7 @@ public class UISpacer extends UIElement
 			}
 		}
 
-		public Axis getAxis()
+		public final Axis getAxis()
 		{
 			return axis.toObject( Axis.class ) ;
 		}

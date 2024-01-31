@@ -907,7 +907,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	}
 
 	@Override
-	public Connect getConnect()
+	public final Connect getConnect()
 	{
 		return connect ;
 	}
@@ -1251,8 +1251,6 @@ public class UIElement implements IInputHandler, Connect.Connection
 		private final Connect.Signal listenerAdded = new Connect.Signal() ;
 		private final Connect.Signal listenerRemoved = new Connect.Signal() ;
 
-		private final Connect connect = new Connect() ;
-
 		public Meta()
 		{
 			int row = rowCount( root() ) ;
@@ -1271,7 +1269,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			setData( new UIModelIndex( root(), row++, 0 ), maximumLength, UIAbstractModel.Role.User ) ;
 		}
 
-		public void setName( final String _name )
+		public final void setName( final String _name )
 		{
 			if( _name != null && name.toString().equals( _name ) == false )
 			{
@@ -1280,7 +1278,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setLayer( final int _layer )
+		public final void setLayer( final int _layer )
 		{
 			if( layer.toInt() != _layer )
 			{
@@ -1289,7 +1287,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setDisableFlag( final boolean _flag )
+		public final void setDisableFlag( final boolean _flag )
 		{
 			if( disabled.toBool() != _flag )
 			{
@@ -1298,7 +1296,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setVisibleFlag( final boolean _flag )
+		public final void setVisibleFlag( final boolean _flag )
 		{
 			if( visible.toBool() != _flag )
 			{
@@ -1307,27 +1305,27 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public String getName()
+		public final String getName()
 		{
 			return name.toString() ;
 		}
 
-		public int getLayer()
+		public final int getLayer()
 		{
 			return layer.toInt() ;
 		}
 
-		public boolean getDisableFlag()
+		public final boolean getDisableFlag()
 		{
 			return disabled.toBool() ;
 		}
 
-		public boolean getVisibleFlag()
+		public final boolean getVisibleFlag()
 		{
 			return visible.toBool() ;
 		}
 
-		public void setPosition( final Vector3 _val )
+		public final void setPosition( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1335,7 +1333,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setPosition( final float _x, final float _y, final float _z )
+		public final void setPosition( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( position.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1343,7 +1341,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setOffset( final Vector3 _val )
+		public final void setOffset( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1351,7 +1349,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setOffset( final float _x, final float _y, final float _z )
+		public final void setOffset( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( offset.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1359,7 +1357,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMargin( final Vector3 _val )
+		public final void setMargin( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1367,7 +1365,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMargin( final float _x, final float _y, final float _z )
+		public final void setMargin( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( margin.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1375,25 +1373,25 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public Vector3 getPosition( final Vector3 _populate )
+		public final Vector3 getPosition( final Vector3 _populate )
 		{
 			_populate.setXYZ( position.toVector3() ) ;
 			return _populate ;
 		}
 
-		public Vector3 getOffset( final Vector3 _populate )
+		public final Vector3 getOffset( final Vector3 _populate )
 		{
 			_populate.setXYZ( offset.toVector3() ) ;
 			return _populate ;
 		}
 
-		public Vector3 getMargin( final Vector3 _populate )
+		public final Vector3 getMargin( final Vector3 _populate )
 		{
 			_populate.setXYZ( margin.toVector3() ) ;
 			return _populate ;
 		}
 
-		public void setLength( final Vector3 _val )
+		public final void setLength( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1401,7 +1399,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setLength( final float _x, final float _y, final float _z )
+		public final void setLength( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( length.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1409,7 +1407,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMinimumLength( final Vector3 _val )
+		public final void setMinimumLength( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1417,7 +1415,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMinimumLength( final float _x, final float _y, final float _z )
+		public final void setMinimumLength( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( minimumLength.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1425,7 +1423,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMaximumLength( final Vector3 _val )
+		public final void setMaximumLength( final Vector3 _val )
 		{
 			if( _val != null )
 			{
@@ -1433,7 +1431,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public void setMaximumLength( final float _x, final float _y, final float _z )
+		public final void setMaximumLength( final float _x, final float _y, final float _z )
 		{
 			if( UI.applyVec3( maximumLength.toVector3(), _x, _y, _z ) == true )
 			{
@@ -1441,25 +1439,25 @@ public class UIElement implements IInputHandler, Connect.Connection
 			}
 		}
 
-		public Vector3 getLength( final Vector3 _populate )
+		public final Vector3 getLength( final Vector3 _populate )
 		{
 			_populate.setXYZ( length.toVector3() ) ;
 			return _populate ;
 		}
 
-		public Vector3 getMinimumLength( final Vector3 _populate )
+		public final Vector3 getMinimumLength( final Vector3 _populate )
 		{
 			_populate.setXYZ( minimumLength.toVector3() ) ;
 			return _populate ;
 		}
 
-		public Vector3 getMaximumLength( final Vector3 _populate )
+		public final Vector3 getMaximumLength( final Vector3 _populate )
 		{
 			_populate.setXYZ( maximumLength.toVector3() ) ;
 			return _populate ;
 		}
 
-		public <M extends UIElement.MetaComponent> M addComponent( final M _meta )
+		public final <M extends UIElement.MetaComponent> M addComponent( final M _meta )
 		{
 			if( _meta != null && components.contains( _meta ) == false )
 			{
@@ -1469,7 +1467,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			return _meta ;
 		}
 
-		public <M extends UIElement.MetaComponent> M removeComponent( final M _meta )
+		public final <M extends UIElement.MetaComponent> M removeComponent( final M _meta )
 		{
 			if( _meta != null && components.contains( _meta ) == true )
 			{
@@ -1482,7 +1480,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			return null ;
 		}
 
-		public List<UIElement.MetaComponent> getComponents( final List<UIElement.MetaComponent> _components )
+		public final List<UIElement.MetaComponent> getComponents( final List<UIElement.MetaComponent> _components )
 		{
 			_components.addAll( components ) ;
 			return _components ;
@@ -1519,9 +1517,9 @@ public class UIElement implements IInputHandler, Connect.Connection
 		}
 
 		@Override
-		public Connect getConnect()
+		public final Connect getConnect()
 		{
-			return connect ;
+			return UIElement.connect ;
 		}
 
 		public final Connect.Signal nameChanged()
@@ -1752,8 +1750,6 @@ public class UIElement implements IInputHandler, Connect.Connection
 		private final UIVariant name  = new UIVariant( "NAME",  "", new Connect.Signal() ) ;
 		private final UIVariant group = new UIVariant( "GROUP", "", new Connect.Signal() ) ;
 
-		private final Connect connect = new Connect() ;
-
 		public MetaComponent()
 		{
 			int row = rowCount( root() ) ;
@@ -1801,9 +1797,9 @@ public class UIElement implements IInputHandler, Connect.Connection
 		}
 
 		@Override
-		public Connect getConnect()
+		public final Connect getConnect()
 		{
-			return connect ;
+			return UIElement.connect ;
 		}
 
 		public Connect.Signal nameChanged()

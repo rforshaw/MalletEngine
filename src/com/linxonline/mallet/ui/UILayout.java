@@ -249,7 +249,7 @@ public class UILayout extends UIElement implements IChildren
 		return _element ; 
 	}
 
-	public List<UIElement> getElements()
+	public final List<UIElement> getElements()
 	{
 		return children.getElements() ;
 	}
@@ -258,7 +258,7 @@ public class UILayout extends UIElement implements IChildren
 		Populate the list with the UILayout's child elements.
 		The elements returned are not copies.
 	*/
-	public void getElements( final List<UIElement> _elements )
+	public final void getElements( final List<UIElement> _elements )
 	{
 		children.getElements( _elements ) ;
 	}
@@ -267,7 +267,7 @@ public class UILayout extends UIElement implements IChildren
 		Flag an element to be removed from the UILayout.
 		Element will be removed on the next update cycle.
 	*/
-	public void removeElement( final UIElement _element )
+	public final void removeElement( final UIElement _element )
 	{
 		children.removeElement( _element ) ;
 	}
@@ -287,7 +287,7 @@ public class UILayout extends UIElement implements IChildren
 		dirtyChildren = children.update( _dt, _events ) ;
 	}
 
-	public void setType( final ILayout.Type _type )
+	public final void setType( final ILayout.Type _type )
 	{
 		if( type != _type  )
 		{
@@ -346,7 +346,7 @@ public class UILayout extends UIElement implements IChildren
 		return updater ;
 	}
 
-	public ILayout.Type getType()
+	public final ILayout.Type getType()
 	{
 		return type ;
 	}
@@ -356,7 +356,7 @@ public class UILayout extends UIElement implements IChildren
 		has been changed using setType().
 		This defines how child elements are laid out.
 	*/
-	public Connect.Signal typeChanged()
+	public final Connect.Signal typeChanged()
 	{
 		return typeChanged ;
 	}
@@ -925,7 +925,7 @@ public class UILayout extends UIElement implements IChildren
 			return true ;
 		}
 
-		public void setType( final ILayout.Type _type )
+		public final void setType( final ILayout.Type _type )
 		{
 			if( _type.equals( type.toObject() ) == false )
 			{
@@ -934,12 +934,12 @@ public class UILayout extends UIElement implements IChildren
 			}
 		}
 
-		public ILayout.Type getType()
+		public final ILayout.Type getType()
 		{
 			return type.toObject( ILayout.Type.class ) ;
 		}
 
-		public Connect.Signal typeChanged()
+		public final Connect.Signal typeChanged()
 		{
 			return type.getSignal() ;
 		}

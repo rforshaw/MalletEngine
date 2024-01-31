@@ -17,12 +17,8 @@ import com.linxonline.mallet.util.MalletList ;
 
 public final class InputSystem implements IInputSystem
 {
-	private final TimeCache<InputEvent> cache ;
-
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
-
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
-	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
 	public InputSystem()
 	{
@@ -30,6 +26,9 @@ public final class InputSystem implements IInputSystem
 
 		final EventListener<MouseEvent> mouseDown = new EventListener<MouseEvent>()
 		{
+			private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
+
+			@Override
 			public void handleEvent( final MouseEvent _event )
 			{
 				switch( _event.getButton() )
@@ -61,6 +60,9 @@ public final class InputSystem implements IInputSystem
 
 		final EventListener<MouseEvent> mouseUp = new EventListener<MouseEvent>()
 		{
+			private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
+
+			@Override
 			public void handleEvent( final MouseEvent _event )
 			{
 				switch( _event.getButton() )
@@ -92,6 +94,9 @@ public final class InputSystem implements IInputSystem
 
 		final EventListener<MouseEvent> mouseMove = new EventListener<MouseEvent>()
 		{
+			private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
+
+			@Override
 			public void handleEvent( final MouseEvent _event )
 			{
 				mousePosition.x = _event.getClientX() ;
@@ -100,16 +105,19 @@ public final class InputSystem implements IInputSystem
 			}
 		} ;
 
-		final EventListener<MouseEvent> mouseWheel = new EventListener<MouseEvent>()
+		final EventListener<WheelEvent> mouseWheel = new EventListener<WheelEvent>()
 		{
-			public void handleEvent( final MouseEvent _event )
+			@Override
+			public void handleEvent( final WheelEvent _event )
 			{
-			
+				updateMouseWheel( _event ) ;
 			}
 		} ;
 
 		final EventListener<KeyboardEvent> keyDown = new EventListener<KeyboardEvent>()
 		{
+
+			@Override
 			public void handleEvent( final KeyboardEvent _event )
 			{
 			
@@ -118,6 +126,8 @@ public final class InputSystem implements IInputSystem
 
 		final EventListener<KeyboardEvent> keyUp = new EventListener<KeyboardEvent>()
 		{
+
+			@Override
 			public void handleEvent( final KeyboardEvent _event )
 			{
 			
@@ -129,10 +139,11 @@ public final class InputSystem implements IInputSystem
 		{
 			inputs[i] = new InputEvent() ;
 		}
-		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
+
 		document.addEventListener( "mousedown", mouseDown ) ;
 		document.addEventListener( "mouseup", mouseUp) ;
 		document.addEventListener( "mousemove", mouseMove ) ;
+		document.addEventListener( "wheel", mouseWheel ) ;
 
 		document.addEventListener( "keydown", keyDown ) ;
 		document.addEventListener( "keyup", keyUp ) ;
@@ -158,16 +169,18 @@ public final class InputSystem implements IInputSystem
 		handlers.remove( _handler ) ;
 	}
 
-	/*private synchronized void updateMouseWheel( MouseWheelEvent _event )
+	private synchronized void updateMouseWheel( WheelEvent _event )
 	{
-		final int scroll = _event.getWheelRotation() ;
-		final InputEvent input = new InputEvent( InputType.SCROLL_WHEEL, scroll, scroll ) ;
-		mouseInputs.add( input ) ;
-	}*/
+		final int delta = ( _event.getDeltaY() > 0.0 ) ? 1 : -1 ;
+		final InputEvent input = new InputEvent() ;
+		input.setID( InputID.MOUSE_1 ) ;
+		input.setInput( InputType.SCROLL_WHEEL, delta, delta ) ;
+		inputs.add( input ) ;
+	}
 
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition )
 	{
-		final InputEvent input = cache.get() ;
+		final InputEvent input = new InputEvent() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y ) ;
 		inputs.add( input ) ;
@@ -175,16 +188,18 @@ public final class InputSystem implements IInputSystem
 
 	public synchronized void update()
 	{
-		if( inputs.isEmpty() == false )
+		if( inputs.isEmpty() )
 		{
-			final int inputSize = inputs.size() ;
-			for( int i = 0; i < inputSize; ++i )
-			{
-				passInputEventToHandlers( inputs.get( i ) ) ;
-			}
-
-			inputs.clear() ;
+			return ;
 		}
+
+		final int inputSize = inputs.size() ;
+		for( int i = 0; i < inputSize; ++i )
+		{
+			passInputEventToHandlers( inputs.get( i ) ) ;
+		}
+
+		inputs.clear() ;
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )

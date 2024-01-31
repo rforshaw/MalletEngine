@@ -7,7 +7,6 @@ import com.linxonline.mallet.renderer.* ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.core.ISystem ;
-import com.linxonline.mallet.core.statemachine.State ;
 
 import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.input.IInputHandler ;
@@ -34,7 +33,6 @@ import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
-import com.linxonline.mallet.util.Threaded ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
 
@@ -42,14 +40,21 @@ import com.linxonline.mallet.script.IScriptEngine ;
 import com.linxonline.mallet.script.Script ;
 import com.linxonline.mallet.script.javascript.JSScriptEngine ;
 
-public class GameState extends State
+public class GameState
 {
+	public static final int NONE = 0 ;
+	public static final int TRANSIST_SHUTDOWN = 1 ;
+	public static final int TRANSIST_PAUSE = 2 ;
+
+	public final String name ;					// Must be unique
+	protected String transition ;				// State to transition to
+	protected int transitionType = NONE ;
+
 	protected float DEFAULT_TIMESTEP = 1.0f / 15.0f ;					// 15Hz
 	protected float DEFAULT_FRAMERATE = 1.0f / 60.0f ;					// 60Hz
 	protected float DEFAULT_ESCAPE_TIME = 0.25f ;						// Escape threshold, if delta spirals out of control with no way to catchup
 	protected long DEFAULT_SLEEP = 10L ;								// Duration to sleep before continuing update cycle
 
-	private final IUpdate updater ;													// Current Running Mode
 	private final List<IUpdate> mainUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_TIMESTEP
 	private final List<IUpdate> drawUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_FRAMERATE
 
@@ -72,25 +77,36 @@ public class GameState extends State
 
 	protected boolean paused = false ;									// Determine whether state was paused.
 	protected boolean draw = true ;										// Used to force a Draw
-	protected double updateAccumulator = 0.0f ;							// Current dt update
-	protected double renderAccumulator = 0.0f ;							// Current dt render
+	protected double deltaUpdateTime = 0.0 ;
+	protected double deltaRenderTime = 0.0 ;
+	protected double updateAccumulator = 0.0 ;							// Current dt update
+	protected double renderAccumulator = 0.0 ;							// Current dt render
 
 	private final ShowFPS showFPS = new ShowFPS() ;
 
 	public GameState( final String _name )
 	{
-		this( _name, UpdateMode.GAME ) ;
-	}
-
-	public GameState( final String _name, final UpdateMode _mode )
-	{
-		super( _name ) ;
+		name = _name ;
 
 		entitySystem = new EntitySystem( eventSystem ) ;
 		collisionSystem = new CollisionSystem( eventSystem ) ; 
 
-		updater = createCoreUpdate( _mode ) ;
+		createCoreUpdate() ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
+	}
+
+	protected final void setTransition( final String _transition, final int _type )
+	{
+		transition = _transition ;				// Name of other State
+		transitionType = _type ;		// PAUSE or SHUTDOWN
+	}
+
+	/**
+		Return the name of the state to transition to.
+	*/
+	public final String getTransition()
+	{
+		return transition ;
 	}
 
 	/**
@@ -108,7 +124,6 @@ public class GameState extends State
 		The user should not have to override this method.
 		Override initGame and resumeGame instead.
 	*/
-	@Override
 	public void startState( final Settings _package )
 	{
 		AudioAssist.setAssist( audioSystem.createAudioAssist() ) ;
@@ -141,7 +156,6 @@ public class GameState extends State
 		Cleanup state resources and perhaps save 
 		any required persistant data.
 	*/
-	@Override
 	public Settings shutdownState()
 	{
 		clear() ;								// Remove all content
@@ -160,7 +174,6 @@ public class GameState extends State
 		The state shall not recieve any events or inputs 
 		while paused.
 	*/
-	@Override
 	public Settings pauseState()
 	{
 		unhookHandlerSystems() ;				// Prevent system from receiving external events
@@ -172,12 +185,60 @@ public class GameState extends State
 		return null ;
 	}
 
-	@Override
-	public void update( final double _dt )
+	/**
+		Update the main game-logic.
+		Default is expected to be 15Hz
+	*/
+	public int updateMain( final double _dt )
 	{
-		if( _dt < DEFAULT_ESCAPE_TIME && system != null )
+		if( _dt >= DEFAULT_ESCAPE_TIME || system == null )
 		{
-			updater.update( _dt ) ;
+			return NONE ;
+		}
+
+		updateAccumulator += _dt ;
+		while( updateAccumulator >= DEFAULT_TIMESTEP )
+		{
+			final long startTime = ElapsedTimer.nanoTime() ;
+			final int size = mainUpdaters.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final IUpdate update = mainUpdaters.get( i ) ;
+				update.update( DEFAULT_TIMESTEP ) ;
+			}
+
+			showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
+			updateAccumulator -= DEFAULT_TIMESTEP ;
+
+			final long endTime = ElapsedTimer.nanoTime() ;
+			deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
+		}
+
+		final int type = transitionType ;
+		transitionType = NONE ;
+		return type ;
+	}
+
+	/**
+		Render to the screen.
+		Default is expected to be 60Hz.
+	*/
+	public void updateDraw( final double _dt )
+	{
+		renderAccumulator += _dt ;
+		if( renderAccumulator >= DEFAULT_FRAMERATE )
+		{
+			final long startTime = ElapsedTimer.nanoTime() ;
+			final int size = drawUpdaters.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final IUpdate update = drawUpdaters.get( i ) ;
+				update.update( DEFAULT_FRAMERATE ) ;
+			}
+			final long endTime = ElapsedTimer.nanoTime() ;
+
+			deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
+			renderAccumulator = 0.0 ;
 		}
 	}
 
@@ -225,15 +286,6 @@ public class GameState extends State
 	{
 		assert _entity != null ;
 		entitySystem.removeEntity( _entity ) ;
-	}
-
-	/**
-		Force the Game State to call system.draw(), on next update.
-		Not necessarily used by all IUpdate types.
-	*/
-	protected final void forceDraw()
-	{
-		draw = true ;
 	}
 
 	public final void setTimeStep( final int _timestep )
@@ -345,7 +397,7 @@ public class GameState extends State
 	/**
 		Create the intended update mode for the gamestate.
 	*/
-	protected IUpdate createCoreUpdate( final UpdateMode _mode )
+	protected void createCoreUpdate()
 	{
 		mainUpdaters.add( ( final double _dt ) ->
 		{
@@ -375,13 +427,6 @@ public class GameState extends State
 			animationSystem.update( dt ) ;
 			system.draw( dt ) ;
 		} ) ;
-
-		switch( _mode )
-		{
-			default          :
-			case GAME        : return useGameMode() ;
-			case APPLICATION : return useApplicationMode() ;
-		}
 	}
 
 	/**
@@ -389,140 +434,6 @@ public class GameState extends State
 		game-states update cycle.
 	*/
 	protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw ) {}
-
-	protected IUpdate useGameMode()
-	{
-		return new IUpdate()
-		{
-			private double accUpdateTime = 0.0 ;
-			private double deltaUpdateTime = 0.0 ;
-			private double deltaRenderTime = 0.0 ;
-
-			@Override
-			public void update( final double _dt )
-			{
-				boolean updated = false ;
-
-				// Update Default : 15Hz
-				updateAccumulator += _dt ;
-				while( updateAccumulator >= DEFAULT_TIMESTEP )
-				{
-					long startTime = ElapsedTimer.nanoTime() ;
-
-					for( IUpdate update : mainUpdaters )
-					{
-						update.update( DEFAULT_TIMESTEP ) ;
-					}
-
-					showFPS.update( deltaRenderTime, deltaUpdateTime ) ;
-					updateAccumulator -= DEFAULT_TIMESTEP ;
-
-					long endTime = ElapsedTimer.nanoTime() ;
-					deltaUpdateTime = ( endTime - startTime ) * 0.000000001 ;
-					accUpdateTime += deltaUpdateTime ;
-				}
-
-				// Render Default : 60Hz
-				renderAccumulator += _dt ;
-				if( renderAccumulator >= DEFAULT_FRAMERATE )
-				{
-					long startTime = ElapsedTimer.nanoTime() ;
-					for( IUpdate update : drawUpdaters )
-					{
-						update.update( DEFAULT_FRAMERATE ) ;
-					}
-
-					long endTime = ElapsedTimer.nanoTime() ;
-
-					deltaRenderTime = ( endTime - startTime ) * 0.000000001 ;
-					renderAccumulator = 0.0 ;
-
-					// After rendering see if we have any spare time to sleep.
-					// Let's not waste CPU resources if we can avoid it.
-					final float accumulatedTime = ( float )( accUpdateTime + deltaRenderTime ) ;
-					// Ensure that the accumulated time for update and drawing is less than
-					// half our draw rate.
-					if( accumulatedTime < ( DEFAULT_FRAMERATE * 0.5f) )
-					{
-						// Sleep for a quarter of the leftover time, good
-						// chance we don't drop frames.
-						final long sleep = ( long )( ( DEFAULT_FRAMERATE - accumulatedTime ) * 0.25f * 1000.0f ) ;
-						system.sleep( sleep ) ;
-					}
-
-					accUpdateTime = 0.0 ;
-				}
-			}
-		} ;
-	}
-
-	protected IUpdate useApplicationMode()
-	{
-		return new IUpdate()
-		{
-			private float waitDelay = 2.0f ;
-			private float wait = 0.0f ;
-			
-			@Override
-			public void update( final double _dt )
-			{
-				final long startTime = ElapsedTimer.nanoTime() ;
-
-				// Update Default : 15Hz
-				updateAccumulator += _dt ;
-
-				// Update the system to ensure that the state 
-				// has the latest events and inputs.
-				system.update( DEFAULT_TIMESTEP ) ;						// Update low-level systems
-				final boolean hasInputs = inputWorldSystem.hasInputs() || inputUISystem.hasInputs() ;
-				final boolean hasEvents = eventSystem.hasEvents() ;
-				wait += ( hasInputs == true || hasEvents == true ) ? -wait : _dt ;
-
-				while( updateAccumulator > DEFAULT_TIMESTEP )
-				{
-					for( IUpdate update : mainUpdaters )
-					{
-						update.update( _dt ) ;
-					}
-					updateAccumulator -= DEFAULT_TIMESTEP ;
-				}
-
-				if( hasInputs == false && hasEvents == false && wait > waitDelay )
-				{
-					// Rendering consumes the greatest amount of resources 
-					// and processing time, if the user has not interacted 
-					// with the application, and there are no events 
-					// needing passed, then don't refresh the screen.
-					system.sleep( ( long )( DEFAULT_FRAMERATE * 1000.0f ) ) ;
-				}
-
-				// Render Default : 60Hz
-				renderAccumulator += _dt ;
-
-				showFPS.update( _dt, _dt ) ;
-				for( IUpdate update : drawUpdaters )
-				{
-					update.update( _dt ) ;
-				}
-
-				renderAccumulator -= DEFAULT_FRAMERATE ;
-
-				final long endTime = ElapsedTimer.nanoTime() ;
-				final long runTime = endTime - startTime ;		// In nanoseconds
-
-				final float deltaTime = runTime * 0.000000001f ;									// Convert to seconds
-				final long sleepRender = ( long )( ( DEFAULT_FRAMERATE - deltaTime ) * 1000.0f ) ;	// Convert to milliseconds
-
-				if( sleepRender > 0L )
-				{
-					// Even after rendering there is still a chance that 
-					// we can sleep before we need to refresh the screen
-					// again.
-					system.sleep( sleepRender ) ;
-				}
-			}
-		} ;
-	}
 
 	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
 	{
@@ -638,12 +549,6 @@ public class GameState extends State
 		entitySystem.clear() ;
 		animationSystem.clear() ;
 	}
-
-	public enum UpdateMode
-	{
-		APPLICATION,
-		GAME
-	} ;
 
 	/**
 		Allows the developer to create their own update modes.

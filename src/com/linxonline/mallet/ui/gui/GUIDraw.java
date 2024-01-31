@@ -29,7 +29,7 @@ public class GUIDraw extends GUIComponent
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
 		colour         = _meta.getColour( new MalletColour() ) ;
-		sheet          = new MalletTexture( _meta.getSheet() ) ;
+		sheet          = new MalletTexture( _meta.getSheet(), MalletTexture.Filter.LINEAR, MalletTexture.Wrap.CLAMP_EDGE ) ;
 		uv             = _meta.getUV( new UIElement.UV() ) ;
 
 		updateLength( _parent.getLength(), getLength() ) ;

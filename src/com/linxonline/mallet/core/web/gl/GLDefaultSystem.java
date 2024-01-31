@@ -1,5 +1,8 @@
 package com.linxonline.mallet.core.web.gl ;
 
+import org.teavm.jso.browser.Window ;
+import org.teavm.jso.browser.AnimationFrameCallback ;
+
 import com.linxonline.mallet.io.filesystem.web.WebFileSystem ;
 import com.linxonline.mallet.audio.web.AudioSourceGenerator ;
 import com.linxonline.mallet.renderer.web.gl.GLRenderer ;

@@ -13,6 +13,7 @@ import org.teavm.jso.dom.html.HTMLDocument ;
 import org.teavm.jso.dom.html.HTMLImageElement ;
 import org.teavm.jso.dom.html.HTMLCanvasElement ;
 import org.teavm.jso.dom.events.* ;
+import org.teavm.jso.dom.css.* ;
 import org.teavm.jso.canvas.ImageData ;
 
 import com.linxonline.mallet.core.GlobalConfig ;
@@ -80,11 +81,13 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 					return null ;
 				}
 
-				final HTMLImageElement img = file.getHTMLImage() ;
-				window.getDocument().getBody().appendChild( img ) ;
+				final HTMLImageElement img = document.createElement( "img" ).cast() ;
+				img.setSrc( file.getURL() ) ;
+				document.getBody().appendChild( img ) ;
 
-				img.getStyle().setProperty( "display", "none" ) ;
-				img.setSrc( _file ) ;
+				final CSSStyleDeclaration style = img.getStyle() ;
+				style.setProperty( "display", "none" ) ;
+
 				img.addEventListener( "load", new EventListener()
 				{
 					@Override
@@ -98,6 +101,8 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 						}
 					}
 				} ) ;
+				
+				
 
 				return null ; 
 			}
@@ -204,10 +209,10 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		final WebGLTexture textureID = glGenTextures() ;
 		MGL.bindTexture( MGL.GL_TEXTURE_2D, textureID ) ;
 
-		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_REPEAT ) ;
-		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_CLAMP_TO_EDGE ) ;
 		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
-		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR_MIPMAP_LINEAR ) ;
+		MGL.texParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
 
 		//gl.pixelStorei( MGL.GL_UNPACK_ALIGNMENT, 1 ) ;
 		MGL.texImage2D( MGL.GL_TEXTURE_2D, 
@@ -273,7 +278,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 				}
 
 				final HTMLImageElement img = file.getHTMLImage() ;
-				return addMeta( _path, new MalletTexture.Meta( _path, img.getWidth(), img.getHeight() ) ) ; 
+				return addMeta( _path, new MalletTexture.Meta( _path, img.getNaturalWidth(), img.getNaturalHeight() ) ) ; 
 			}
 		}
 

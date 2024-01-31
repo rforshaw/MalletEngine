@@ -6,14 +6,17 @@ import org.teavm.jso.browser.Window ;
 import org.teavm.jso.browser.AnimationFrameCallback ;
 
 import com.linxonline.mallet.core.* ;
-import com.linxonline.mallet.core.statemachine.* ;
+import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.time.* ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Debounce ;
 
 public class WebGameSystem implements IGameSystem
 {
-	private final StateUpdater state = new StateUpdater() ;
+	private final List<GameState> states = MalletList.<GameState>newList() ;
+	private GameState currentState = null ;
+	private GameState defaultState = null ;
+
 	private final List<IUpdate> updates = MalletList.<IUpdate>newList() ;
 
 	private boolean running = false ;
@@ -21,7 +24,7 @@ public class WebGameSystem implements IGameSystem
 
 	public WebGameSystem()
 	{
-		addUpdate( state ) ;
+		addUpdate( this::updateState ) ;
 		// For debounce to work it must be tied into the
 		// main-loop, this allows it to track when the 
 		// runnable can be triggered.
@@ -42,32 +45,43 @@ public class WebGameSystem implements IGameSystem
 	@Override
 	public void runSystem()
 	{
+		if( defaultState == null )
+		{
+			return ;
+		}
+
+		// Call to ensure we don't have a massive delta
+		// just before the game-loop actually starts.
+		ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 		running = true ;
+
+		currentState = defaultState ;
+		currentState.startState( null ) ;
 
 		final AnimationFrameCallback callback = new AnimationFrameCallback()
 		{
-			private double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-
 			@Override
 			public void onAnimationFrame( final double _timestamp )
 			{
-				dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-				for( final IUpdate update : updates )
+				final Thread thread = new Thread( () ->
 				{
-					update.update( dt ) ;
-				}
-
-				if( running == false )
-				{
-					state.pause() ;
-					return ;
-				}
-
+					final double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
+					final int size = updates.size() ;
+					for( int i = 0; i < size; ++i )
+					{
+						final IUpdate update = updates.get( i ) ;
+						update.update( dt ) ;
+					}
+				} ) ;
+				thread.start() ;
 				Window.requestAnimationFrame( this ) ;
 			}
 		} ;
 
-		state.resume() ;
+		if( currentState != null )
+		{
+			currentState.pauseState() ;
+		}
 		Window.requestAnimationFrame( callback ) ;
 	}
 
@@ -82,7 +96,7 @@ public class WebGameSystem implements IGameSystem
 	{
 		assert _state != null ;
 		_state.setSystem( system ) ;
-		state.addState( _state ) ;
+		states.add( _state ) ;
 	}
 
 	/**
@@ -92,37 +106,59 @@ public class WebGameSystem implements IGameSystem
 	@Override
 	public final void setDefaultGameState( final String _name )
 	{
-		state.setDefaultState( _name ) ;
+		for( final GameState state : states )
+		{
+			if( _name.equals( state.name ) == true )
+			{
+				defaultState = state ;
+				return ;
+			}
+		}
 	}
 
-	private final static class StateUpdater implements IUpdate
+	private final void updateState( final double _dt )
 	{
-		private final StateMachine machine = new StateMachine() ;
-
-		public void resume()
+		final int transition = currentState.updateMain( _dt ) ;
+		if( transition == GameState.NONE )
 		{
-			machine.resume() ;
+			currentState.updateDraw( _dt ) ;
+			return ;
 		}
 
-		public void pause()
+		final GameState previous = currentState ;
+		final String name = previous.getTransition() ;
+		currentState = exists( name ) ? getGameState( name ) : defaultState ;
+
+		switch( transition )
 		{
-			machine.pause() ;
+			case GameState.TRANSIST_SHUTDOWN :
+			{
+				currentState.startState( previous.shutdownState() ) ;
+				break ;
+			}
+			case GameState.TRANSIST_PAUSE    :
+			{
+				currentState.startState( previous.pauseState() ) ;
+				break ;
+			}
+		}
+	}
+
+	private final GameState getGameState( final String _name )
+	{
+		for( final GameState state : states )
+		{
+			if( _name.equals( state.name ) == true )
+			{
+				return state ;
+			}
 		}
 
-		public void addState( final GameState _state )
-		{
-			machine.addState( _state ) ;
-		}
+		return null ;
+	}
 
-		public void setDefaultState( final String _name )
-		{
-			machine.setDefaultState( _name ) ;
-		}
-
-		@Override
-		public void update( final double _dt )
-		{
-			machine.update( _dt ) ;		// Update Game State
-		}
+	private final boolean exists( final String _name )
+	{
+		return getGameState( _name ) != null ? true : false ;
 	}
 }

@@ -102,13 +102,16 @@ public final class GLRenderer extends BasicRenderer
 
 		initDefaultWorld() ;
 
-		System.out.println( "Building default shaders.." ) ;
-		programs.load( "SIMPLE_TEXTURE", "base/shaders/web/simple_texture.jgl" ) ;
-		programs.load( "SIMPLE_FONT", "base/shaders/web/simple_font.jgl" ) ;
-		programs.load( "SIMPLE_GEOMETRY", "base/shaders/web/simple_geometry.jgl" ) ;
-		programs.load( "SIMPLE_STENCIL", "base/shaders/web/simple_stencil.jgl" ) ;
+		GLRenderer.this.invokeLater( () ->
+		{
+			System.out.println( "Building default shaders.." ) ;
+			programs.load( "SIMPLE_TEXTURE", "base/shaders/web/simple_texture.jgl" ) ;
+			programs.load( "SIMPLE_FONT", "base/shaders/web/simple_font.jgl" ) ;
+			programs.load( "SIMPLE_GEOMETRY", "base/shaders/web/simple_geometry.jgl" ) ;
+			programs.load( "SIMPLE_STENCIL", "base/shaders/web/simple_stencil.jgl" ) ;
 
-		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/web/simple_instance_texture.jgl" ) ;
+			programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/web/simple_instance_texture.jgl" ) ;
+		} ) ;
 
 		{
 			// Query for the Max Texture Size and store the results.
@@ -200,13 +203,13 @@ public final class GLRenderer extends BasicRenderer
 			}
 
 			@Override
-			public Set<String> getLoadedTextures( final Set _fill )
+			public Set<String> getLoadedTextures( final Set<String> _fill )
 			{
 				return textures.getLoadedKeys( _fill ) ;
 			}
 
 			@Override
-			public Set<String> getAllTextures( final Set _fill )
+			public Set<String> getAllTextures( final Set<String> _fill )
 			{
 				return textures.getAllKeys( _fill ) ;
 			}

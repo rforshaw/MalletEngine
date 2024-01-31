@@ -18,6 +18,9 @@ import com.linxonline.mallet.renderer.IRender ;
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
+import com.linxonline.mallet.event.EventController ;
+import com.linxonline.mallet.event.Event ;
+
 import com.linxonline.mallet.core.web.gl.GLDefaultSystem ;
 
 import com.linxonline.mallet.util.Logger ;
@@ -56,9 +59,14 @@ public class WebStarter extends IStarter
 			{
 				System.out.println( "Shutting down..." ) ;
 				stop() ;
-				//System.exit( 0 ) ;
 			}
 		} ) ;
+
+		// FIXME: For reasons that I've yet to figure out, TeaVM
+		// is removing processEvent from EventController - presumably
+		// it's only be used from the interface. 
+		final EventController fix = new EventController() ;
+		fix.processEvent( new Event( "FIX" ) ) ;
 	}
 
 	public void run()

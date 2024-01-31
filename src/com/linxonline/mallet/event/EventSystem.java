@@ -58,7 +58,6 @@ public final class EventSystem implements IEventSystem
 			for( final EventType type : tempWantedTypes )
 			{
 				final EventQueue que = getQueueByType( type ) ;
-				//System.out.println( "Add Handler" + _handler + " Type: " + type ) ;
 				que.addHandler( weakHandler ) ;
 			}
 			tempWantedTypes.clear() ;

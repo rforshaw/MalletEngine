@@ -84,6 +84,7 @@ public abstract class InputComponent extends Component
 		{
 			processInputEvent( _event ) ;
 		}
+
 		return InputEvent.Action.PROPAGATE ;
 	}
 

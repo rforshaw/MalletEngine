@@ -93,7 +93,7 @@ public class UITextField extends UIElement
 		controller.update() ;
 	}
 
-	public void setCursorIndex( final int _index )
+	public final void setCursorIndex( final int _index )
 	{
 		if( cursorIndex != _index )
 		{
@@ -102,12 +102,12 @@ public class UITextField extends UIElement
 		}
 	}
 
-	public int getCursorIndex()
+	public final int getCursorIndex()
 	{
 		return cursorIndex ;
 	}
 
-	public StringBuilder getText()
+	public final StringBuilder getText()
 	{
 		return text ;
 	}

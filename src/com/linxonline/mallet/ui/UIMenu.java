@@ -80,7 +80,7 @@ public class UIMenu extends UILayout
 			return "UIMENU" ;
 		}
 
-		public void setThickness( final float _thickness )
+		public final void setThickness( final float _thickness )
 		{
 			if( Math.abs( thickness.toFloat() - _thickness ) > 0.001f )
 			{
@@ -89,7 +89,7 @@ public class UIMenu extends UILayout
 			}
 		}
 
-		public float getThickness()
+		public final float getThickness()
 		{
 			return thickness.toFloat() ;
 		}

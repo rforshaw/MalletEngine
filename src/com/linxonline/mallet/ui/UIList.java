@@ -168,7 +168,7 @@ public final class UIList extends UILayout
 		If the UIElement is not overidden the default value, Global UI Ratio 
 		is used.
 	*/
-	public void setDefaultElementSize( final float _x, final float _y, final float _z )
+	public final void setDefaultElementSize( final float _x, final float _y, final float _z )
 	{
 		final UIRatio ratio = getRatio() ;
 		defaultItemSize.x = ( _x <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _x ) ;
@@ -180,7 +180,7 @@ public final class UIList extends UILayout
 	/**
 		Defines the basic dimensions of the scrollbar.
 	*/
-	public void setScrollWidth( final float _width )
+	public final void setScrollWidth( final float _width )
 	{
 		final UIRatio ratio = getRatio() ;
 		scrollWidth.x = ( _width <= 0.0f ) ? ratio.toPixelX( 1.0f ) : ratio.toPixelX( _width ) ;
@@ -193,7 +193,7 @@ public final class UIList extends UILayout
 		Define how long the delay can be between the user 
 		pressing down and moving that could trigger scrolling.
 	*/
-	public void setDragDelay( final int _delay )
+	public final void setDragDelay( final int _delay )
 	{
 		if( dragDelay != _delay )
 		{
@@ -206,7 +206,7 @@ public final class UIList extends UILayout
 		Return how long the delay can be between the user 
 		pressing down and moving that could trigger scrolling.
 	*/
-	public int getDragDelay()
+	public final int getDragDelay()
 	{
 		return dragDelay ;
 	}
@@ -555,7 +555,7 @@ public final class UIList extends UILayout
 		Returns the elements absolute length in pixels.
 		Pass in a Vector3 to retrieve the length in units.
 	*/
-	public Vector3 getAbsoluteLength( final Vector3 _unit )
+	public final Vector3 getAbsoluteLength( final Vector3 _unit )
 	{
 		if( _unit != null )
 		{
@@ -568,7 +568,7 @@ public final class UIList extends UILayout
 	/**
 		Return the element's actual absolute length in pixels.
 	*/
-	public Vector3 getAbsoluteLength()
+	public final Vector3 getAbsoluteLength()
 	{
 		getCurrentUpdater().update( 0.0f, this ) ;
 		return absoluteLength ;
@@ -578,7 +578,7 @@ public final class UIList extends UILayout
 		Returns the elements absolute length in pixels.
 		Pass in a Vector3 to retrieve the length in units.
 	*/
-	public Vector3 getScrollWidth( final Vector3 _unit )
+	public final Vector3 getScrollWidth( final Vector3 _unit )
 	{
 		if( _unit != null )
 		{
@@ -591,12 +591,12 @@ public final class UIList extends UILayout
 	/**
 		Return the element's actual absolute length in pixels.
 	*/
-	public Vector3 getScrollWidth()
+	public final Vector3 getScrollWidth()
 	{
 		return scrollWidth ;
 	}
 
-	public Vector3 getScrollbarLength( final Vector3 _unit )
+	public final Vector3 getScrollbarLength( final Vector3 _unit )
 	{
 		if( _unit != null )
 		{
@@ -606,7 +606,7 @@ public final class UIList extends UILayout
 		return getScrollbarLength() ;
 	}
 
-	public Vector3 getScrollbarLength()
+	public final Vector3 getScrollbarLength()
 	{
 		final Vector3 len = getLength() ;
 		final Vector3 absLen = getAbsoluteLength() ;
@@ -638,17 +638,17 @@ public final class UIList extends UILayout
 		return frame.getCamera() ;
 	}
 
-	public Connect.Signal defaultElementSizeChanged()
+	public final Connect.Signal defaultElementSizeChanged()
 	{
 		return defaultElementSizeChanged ;
 	}
 
-	public Connect.Signal scrollWidthChanged()
+	public final Connect.Signal scrollWidthChanged()
 	{
 		return scrollWidthChanged ;
 	}
 
-	public Connect.Signal dragDelayChanged()
+	public final Connect.Signal dragDelayChanged()
 	{
 		return dragDelayChanged ;
 	}

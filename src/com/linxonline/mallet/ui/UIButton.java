@@ -1,19 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletColour ;
-
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.World ;
-
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Program ;
-
-import com.linxonline.mallet.audio.AudioDelegate ;
-
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;

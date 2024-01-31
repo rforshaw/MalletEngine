@@ -57,7 +57,7 @@ public class UICheckbox extends UIElement
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	public void setChecked( final boolean _checked )
+	public final void setChecked( final boolean _checked )
 	{
 		if( checked != _checked )
 		{
@@ -67,7 +67,7 @@ public class UICheckbox extends UIElement
 		}
 	}
 
-	public boolean isChecked()
+	public final boolean isChecked()
 	{
 		return checked ;
 	}

@@ -53,7 +53,7 @@ public class GLFontGenerator
 		for( int i = 0; i < length; i++ )
 		{
 			final char c = _characters.charAt( i ) ;
-			final float width = _canvas.measureText( String.valueOf( c ) ).getWidth() ;
+			final float width = ( float )_canvas.measureText( String.valueOf( c ) ).getWidth() ;
 			glyphs[i] = new Glyph( c, width ) ;
 		}
 
@@ -69,7 +69,7 @@ public class GLFontGenerator
 		setCanvasFont( canvas, _name, _style, _size ) ;
 
 		final char c = ( char )_code ;
-		final float width = canvas.measureText( String.valueOf( c ) ).getWidth() ;
+		final float width = ( float )canvas.measureText( String.valueOf( c ) ).getWidth() ;
 		final Glyph glyph = new Glyph( c, width ) ;
 		return glyph ;
 	}

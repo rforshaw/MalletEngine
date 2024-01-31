@@ -13,6 +13,7 @@ import org.teavm.jso.dom.html.HTMLDocument ;
 import org.teavm.jso.dom.html.HTMLElement ;
 import org.teavm.jso.dom.html.HTMLImageElement ;
 import org.teavm.jso.dom.html.HTMLSourceElement ;
+import org.teavm.jso.dom.events.* ;
 
 import org.teavm.jso.ajax.XMLHttpRequest ;
 import org.teavm.jso.ajax.ReadyStateChangeHandler ;
@@ -31,8 +32,6 @@ public class WebFile implements FileStream
 	private final String url ;
 	private final HTMLSourceElement element ;
 
-	private final XMLHttpRequest request ; 
-
 	public WebFile( final String _path )
 	{
 		element = document.createElement( "source" ).cast() ;
@@ -40,11 +39,11 @@ public class WebFile implements FileStream
 
 		path = _path ;
 		url = String.format( "%s%s", location.getFullURL(), path ) ;
+	}
 
-		request = XMLHttpRequest.create() ;
-		request.open( "get", url, false ) ;
-		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
-		request.send() ;
+	public String getURL()
+	{
+		return url ;
 	}
 
 	public HTMLSourceElement getHTMLSource()
@@ -54,14 +53,36 @@ public class WebFile implements FileStream
 
 	public HTMLImageElement getHTMLImage()
 	{
+		return get( url ) ;
+	}
+
+	@Async
+	public static native HTMLImageElement get( String _url ) ;
+	private static void get( String _url, AsyncCallback<HTMLImageElement> _callback )
+	{
 		final HTMLImageElement img = document.createElement( "img" ).cast() ;
-		img.setSrc( url ) ;
-		return img ;
+		img.setSrc( _url ) ;
+		document.getBody().appendChild( img ) ;
+
+		img.getStyle().setProperty( "display", "none" ) ;
+		img.addEventListener( "load", new EventListener()
+		{
+			@Override
+			public void handleEvent( final Event _event )
+			{
+				_callback.complete( img ) ;
+			}
+		} ) ;
 	}
 
 	@Override
 	public ByteInStream getByteInStream()
 	{
+		final XMLHttpRequest request = XMLHttpRequest.create() ;
+		request.open( "get", url, false ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
+		request.send() ;
+
 		final String responseText = request.getResponseText() ;
 		final byte[] result = new byte[responseText.length()] ;
 		for( int i = 0; i < result.length; ++i)
@@ -75,6 +96,11 @@ public class WebFile implements FileStream
 	@Override
 	public StringInStream getStringInStream()
 	{
+		final XMLHttpRequest request = XMLHttpRequest.create() ;
+		request.open( "get", url, false ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
+		request.send() ;
+
 		return new WebStringIn( request.getResponseText().getBytes() ) ;
 	}
 
@@ -300,6 +326,11 @@ public class WebFile implements FileStream
 	@Override
 	public long getSize()
 	{
+		final XMLHttpRequest request = XMLHttpRequest.create() ;
+		request.open( "get", url, false ) ;
+		request.overrideMimeType( "text/plain; charset=x-user-defined" ) ;
+		request.send() ;
+
 		final String text = request.getResponseText() ;
 		return text.length() ;
 	}
