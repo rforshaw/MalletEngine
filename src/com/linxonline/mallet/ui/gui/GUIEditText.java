@@ -11,9 +11,7 @@ public class GUIEditText extends GUIText
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
 
-	private final static Program cursorProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
 	private Draw cursorDraw = new Draw() ;
-
 	private DrawUpdater cursorUpdater ;
 	private GeometryBuffer cursorGeometry ;
 
@@ -115,10 +113,7 @@ public class GUIEditText extends GUIText
 
 		super.addDraws( _world ) ;
 
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		cursorUpdater = pool.getOrCreate( _world, cursorProgram, cursorDraw.getShape(), true, getLayer() ) ;
-		cursorUpdater.setInterpolation( Interpolation.NONE ) ;
-
+		cursorUpdater = GUI.getDrawUpdater( _world, ( Shape )cursorDraw.getShape(), getLayer() ) ;
 		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
 		cursorGeometry.addDraws( cursorDraw ) ;
 
@@ -167,10 +162,7 @@ public class GUIEditText extends GUIText
 		cursorGeometry.removeDraws( cursorDraw ) ;
 		cursorUpdater.forceUpdate() ;
 
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		cursorUpdater = pool.getOrCreate( getWorld(), cursorProgram, cursorDraw.getShape(), true, _layer ) ;
-		cursorUpdater.setInterpolation( Interpolation.NONE ) ;
-
+		cursorUpdater = GUI.getDrawUpdater( getWorld(), ( Shape )cursorDraw.getShape(), _layer ) ;
 		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
 		cursorGeometry.addDraws( cursorDraw ) ;
 	}
@@ -234,7 +226,10 @@ public class GUIEditText extends GUIText
 	{
 		final UITextField parent = getParent() ;
 		UITextField.disconnect( parent, parent.elementDisengaged(), elementDisengagedSlot ) ;
+
 		super.shutdown() ;
+		cursorUpdater = null ;
+		cursorGeometry = null ;
 	}
 
 	private boolean isEditing()

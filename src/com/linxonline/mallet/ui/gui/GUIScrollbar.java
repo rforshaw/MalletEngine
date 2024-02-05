@@ -15,7 +15,6 @@ public class GUIScrollbar extends GUIComponent
 
 	private final Draw xBar = new Draw() ;
 	private final Draw yBar = new Draw() ;
-	private final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 
 	private DrawUpdater updater ;
 	private GeometryBuffer geometry ;
@@ -37,8 +36,6 @@ public class GUIScrollbar extends GUIComponent
 
 		parent.getInternalCamera().getUIPosition( offset ) ;
 		updateLengths( parent.getScrollbarLength(), parent.getScrollWidth() ) ;
-
-		program.mapUniform( "inTex0", sheet ) ;
 
 		{
 			final Vector3 position = getPosition() ;
@@ -74,9 +71,7 @@ public class GUIScrollbar extends GUIComponent
 		final Shape shape = ( Shape )xBar.getShape() ;
 		final int layer = getLayer() ;
 
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		updater = pool.getOrCreate( _world, program, shape, true, layer ) ;
-
+		updater = GUI.getDrawUpdater( _world, sheet, shape, layer ) ;
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( xBar, yBar ) ;
 	}
@@ -97,9 +92,7 @@ public class GUIScrollbar extends GUIComponent
 
 		final Shape shape = ( Shape )xBar.getShape() ;
 
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		updater = pool.getOrCreate( getWorld(), program, shape, true, _layer ) ;
-
+		updater = GUI.getDrawUpdater( getWorld(), sheet, shape, _layer ) ;
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( xBar, yBar ) ;
 	}
@@ -129,16 +122,6 @@ public class GUIScrollbar extends GUIComponent
 	UIList getParentList()
 	{
 		return ( UIList )getParent() ;
-	}
-
-	public Program getProgram()
-	{
-		return program ;
-	}
-
-	public DrawUpdater getUpdater()
-	{
-		return updater ;
 	}
 
 	public Draw getXBar()

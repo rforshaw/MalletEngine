@@ -363,7 +363,6 @@ public class UIWrapper extends UIElement
 		private MalletColour colour = MalletColour.white() ;
 
 		private DrawUpdater updater ;
-		private final Program program = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
 		protected Draw draw = new Draw() ;
 
 		public GUILineDraw( final UIElement _parent )
@@ -415,8 +414,7 @@ public class UIWrapper extends UIElement
 				geometry.removeDraws( draw ) ;
 			}
 
-			final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-			updater = pool.getOrCreate( _world, program, ( Shape )draw.getShape(), true, getLayer() ) ;
+			updater = GUI.getDrawUpdater( _world, ( Shape )draw.getShape(), getLayer() ) ;
 
 			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
 			geometry.addDraws( draw ) ;
@@ -441,8 +439,7 @@ public class UIWrapper extends UIElement
 				geometry.removeDraws( draw ) ;
 			}
 
-			final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-			updater = pool.getOrCreate( getWorld(), program, draw.getShape(), true, _layer ) ;
+			updater = GUI.getDrawUpdater( getWorld(), ( Shape )draw.getShape(), _layer ) ;
 		}
 
 		@Override

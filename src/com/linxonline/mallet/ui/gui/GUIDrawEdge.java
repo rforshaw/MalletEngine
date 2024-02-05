@@ -16,11 +16,6 @@ public class GUIDrawEdge extends GUIDraw
 		final Draw draw = getDraw() ;
 		draw.setShape( GUI.constructEdge( getLength(), edge ) ) ;
 		setColour( getColour() ) ;
-
-		final MalletTexture sheet = getTexture() ;
-		final Program program = getProgram() ;
-
-		program.mapUniform( "inTex0", sheet ) ;
 	}
 
 	@Override

@@ -16,8 +16,6 @@ public class GUIText extends GUIComponent
 
 	private TextUpdater updater ;
 	private TextBuffer geometry ;
-
-	private final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
 	private final TextDraw drawText ;
 
 	public GUIText( final Meta _meta, final UIElement _parent )
@@ -67,7 +65,6 @@ public class GUIText extends GUIComponent
 		if( font != null )
 		{
 			updateText() ;
-			program.mapUniform( "inTex0", font ) ;
 		}
 	}
 
@@ -86,9 +83,7 @@ public class GUIText extends GUIComponent
 			updater.forceUpdate() ;
 		}
 
-		final TextUpdaterPool pool = GUI.getTextUpdaterPool() ;
-		updater = pool.getOrCreate( getWorld(), program, true, getLayer() ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater = GUI.getTextUpdater( getWorld(), font, getLayer() ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( drawText ) ;
@@ -117,9 +112,7 @@ public class GUIText extends GUIComponent
 			updater.forceUpdate() ;
 		}
 
-		final TextUpdaterPool pool = GUI.getTextUpdaterPool() ;
-		updater = pool.getOrCreate( getWorld(), program, true, _layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater = GUI.getTextUpdater( getWorld(), font, _layer ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( drawText ) ;
@@ -134,6 +127,14 @@ public class GUIText extends GUIComponent
 			updateText() ;
 			updater.forceUpdate() ;
 		}
+	}
+
+	@Override
+	public void shutdown()
+	{
+		super.shutdown() ;
+		updater = null ;
+		geometry = null ;
 	}
 
 	private void updateText()
@@ -198,11 +199,6 @@ public class GUIText extends GUIComponent
 	public TextUpdater getUpdater()
 	{
 		return updater ;
-	}
-
-	public Program getProgram()
-	{
-		return program ;
 	}
 
 	public TextDraw getTextDraw()

@@ -1,7 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
-import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.Parallel ;
 
@@ -17,23 +16,21 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 {
 	private final Interpolation mode ;
 	protected final DrawBuffer drawBuffer ;
-	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 
 	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
 
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
-	public DrawInstancedUpdater( final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawInstancedUpdater( final DrawBuffer _draw )
 	{
-		this( Interpolation.LINEAR, _draw, _geometry ) ;
+		this( Interpolation.LINEAR, _draw ) ;
 	}
 
-	public DrawInstancedUpdater( Interpolation _mode, final DrawBuffer _draw, final GeometryBuffer _geometry )
+	public DrawInstancedUpdater( Interpolation _mode, final DrawBuffer _draw )
 	{
 		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
 		drawBuffer = _draw ;
-		buffers.add( _geometry ) ;
 	}
 
 	public void forceUpdate()

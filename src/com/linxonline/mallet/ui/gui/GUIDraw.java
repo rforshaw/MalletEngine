@@ -18,19 +18,17 @@ public class GUIDraw extends GUIComponent
 
 	private DrawUpdater updater ;
 	private GeometryBuffer geometry = null ;
-
-	private final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
 	private final Draw draw = new Draw() ;
 
 	public GUIDraw( final Meta _meta, final UIElement _parent )
 	{
 		super( _meta, _parent ) ;
-		retainRatio    = _meta.isRetainRatio() ;
+		retainRatio = _meta.isRetainRatio() ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
-		colour         = _meta.getColour( new MalletColour() ) ;
-		sheet          = new MalletTexture( _meta.getSheet(), MalletTexture.Filter.LINEAR, MalletTexture.Wrap.CLAMP_EDGE ) ;
-		uv             = _meta.getUV( new UIElement.UV() ) ;
+		colour = _meta.getColour( new MalletColour() ) ;
+		sheet = new MalletTexture( _meta.getSheet(), MalletTexture.Filter.LINEAR, MalletTexture.Wrap.CLAMP_EDGE ) ;
+		uv = _meta.getUV( new UIElement.UV() ) ;
 
 		updateLength( _parent.getLength(), getLength() ) ;
 		updateOffset( _parent.getOffset(), getOffset() ) ;
@@ -81,8 +79,6 @@ public class GUIDraw extends GUIComponent
 
 			draw.setShape( Shape.constructPlane( getLength(), uv.min, uv.max ) ) ;
 			setColour( getColour() ) ;
-
-			program.mapUniform( "inTex0", sheet ) ;
 		}
 	}
 
@@ -92,9 +88,7 @@ public class GUIDraw extends GUIComponent
 		final int layer = getLayer() ;
 		final Shape shape = ( Shape )draw.getShape() ;
 
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		updater = pool.getOrCreate( _world, program, shape, true, layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater = GUI.getDrawUpdater( _world, sheet, shape, layer ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( draw ) ;
@@ -120,10 +114,7 @@ public class GUIDraw extends GUIComponent
 		}
 
 		final Shape shape = ( Shape )draw.getShape() ;
-
-		final DrawUpdaterPool pool = GUI.getDrawUpdaterPool() ;
-		updater = pool.getOrCreate( getWorld(), program, shape, true, _layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater = GUI.getDrawUpdater( getWorld(), sheet, shape, _layer ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( draw ) ;
@@ -152,6 +143,14 @@ public class GUIDraw extends GUIComponent
 		}
 	}
 
+	@Override
+	public void shutdown()
+	{
+		super.shutdown() ;
+		updater = null ;
+		geometry = null ;
+	}
+
 	private void updateLength( final Vector3 _length, final Vector3 _toUpdate )
 	{
 		if( uv == null || retainRatio == false )
@@ -173,11 +172,6 @@ public class GUIDraw extends GUIComponent
 	public DrawUpdater getUpdater()
 	{
 		return updater ;
-	}
-
-	public Program getProgram()
-	{
-		return program ;
 	}
 
 	public Draw getDraw()

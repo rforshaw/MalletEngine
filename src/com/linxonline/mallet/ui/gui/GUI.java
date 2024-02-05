@@ -1,24 +1,86 @@
 package com.linxonline.mallet.ui.gui ;
 
+import java.util.Map ;
+
+import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
 public final class GUI
 {
-	private GUI() {}
+	private static Map<MalletFont, Program> fontPrograms = MalletMap.<MalletFont, Program>newMap() ;
+	private static Map<MalletTexture, Program> texturePrograms = MalletMap.<MalletTexture, Program>newMap() ;
+
+	private static final Program geometryProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
 
 	private static final DrawUpdaterPool drawPool = new DrawUpdaterPool() ;
 	private static final TextUpdaterPool textPool = new TextUpdaterPool() ;
+
+	private GUI() {}
 
 	public static DrawUpdaterPool getDrawUpdaterPool()
 	{
 		return drawPool ;
 	}
 
+	public static DrawUpdater getDrawUpdater( final World _world, final Shape _shape, final int _layer )
+	{
+		final DrawUpdater updater = drawPool.getOrCreate( _world, geometryProgram, _shape, true, _layer ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
+
+		return updater ;
+	}
+
+	public static DrawUpdater getDrawUpdater( final World _world, final MalletTexture _texture, final Shape _shape, final int _layer )
+	{
+		final Program program = getProgram( _texture ) ;
+		final DrawUpdater updater = drawPool.getOrCreate( _world, program, _shape, true, _layer ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
+
+		return updater ;
+	}
+
+	private static Program getProgram( final MalletTexture _texture )
+	{
+		Program program = texturePrograms.get( _texture ) ;
+		if( program == null )
+		{
+			program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+			program.mapUniform( "inTex0", _texture ) ;
+
+			texturePrograms.put( _texture, program ) ;
+		}
+
+		return program ;
+	}
+
 	public static TextUpdaterPool getTextUpdaterPool()
 	{
 		return textPool ;
+	}
+
+	public static TextUpdater getTextUpdater( final World _world, final MalletFont _font, final int _layer )
+	{
+		final Program program = getProgram( _font ) ;
+		final TextUpdater updater = textPool.getOrCreate( _world, program, true, _layer ) ;
+		updater.setInterpolation( Interpolation.NONE ) ;
+
+		return updater ;
+	}
+
+	private static Program getProgram( final MalletFont _font )
+	{
+		Program program = fontPrograms.get( _font ) ;
+		if( program == null )
+		{
+			program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
+			program.mapUniform( "inTex0", _font ) ;
+
+			fontPrograms.put( _font, program ) ;
+		}
+
+		return program ;
 	}
 
 	public static Shape updateColour( final Shape _shape, final MalletColour _colour )

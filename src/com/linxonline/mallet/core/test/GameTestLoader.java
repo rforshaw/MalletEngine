@@ -28,12 +28,14 @@ import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.Hull ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 
+import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.settings.Settings ;
+import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.io.net.UDPServer ;
 import com.linxonline.mallet.io.net.UDPClient ;
@@ -827,7 +829,8 @@ public final class GameTestLoader implements IGameLoader
 
 	public static class ExComponent extends ECSUpdate.Component
 	{
-		private final Vector2 position = new Vector2() ;
+		private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
+
 		private final DrawInstancedUpdater updater ;
 		private final ECSEvent.Component messenger ;
 		private final ECSCollision.Component collision ;
@@ -850,6 +853,7 @@ public final class GameTestLoader implements IGameLoader
 			final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
 			updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
 
+			final Vector2 position = new Vector2() ;
 			final Vector2 offset = new Vector2() ;
 			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
 
@@ -874,29 +878,30 @@ public final class GameTestLoader implements IGameLoader
 		@Override
 		public void update( final float _dt )
 		{
-			boolean updateDraw = false ;
-
-			final Hull[] hulls = collision.getHulls() ;
-			for( int i = 0; i < draws.length; ++i )
-			{
-				final Hull hull = hulls[i] ;
-				updateDraw = ( hull.contactData.size() > 0 ) ? true : updateDraw ;
-
-				final Draw draw = draws[i] ;
-				hull.getPosition( position ) ;
-				draw.setPosition( position.x, position.y, 0.0f ) ;
-			}
-
-			if( updateDraw == true )
-			{
-				updater.makeDirty() ;
-			}
+			Parallel.forBatch( collision.getHulls(), 1000, this::updateDraws ) ;
+			updater.makeDirty() ;
 
 			/*acc += _dt ;
 			if( acc >= 15.0f )
 			{
 				messenger.passEvent( new Event<String>( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
 			}*/
+		}
+
+		private void updateDraws( final int _start, final int _end, final Hull[] _hulls )
+		{
+			final Vector2 position = vec2s.takeSync() ;
+
+			for( int i = _start; i < _end; ++i )
+			{
+				final Hull hull = _hulls[i] ;
+				final Draw draw = draws[i] ;
+
+				hull.getPosition( position ) ;
+				draw.setPosition( position.x, position.y, 0.0f ) ;
+			}
+
+			vec2s.reclaimSync( position ) ;
 		}
 
 		@Override
