@@ -186,17 +186,70 @@ public final class MGL
 		gl.uniform1i( _location, _value ) ;
 	}
 
-	public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final float[] _values )
+	public static void uniform2i( final WebGLUniformLocation _location, final int _v0, final int _v1 )
 	{
-		transpose( _values ) ;
-		gl.uniformMatrix4fv( _location, false, matrix ) ;
+		gl.uniform2i( _location, _v0, _v1 ) ;
 	}
 
-	/*public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final Float32Array _values )
+	public static void uniform3i( final WebGLUniformLocation _location, final int _v0, final int _v1, final int _v2 )
 	{
-		//transpose( _values ) ;
-		gl.uniformMatrix4fv( _location, false, _values ) ;
-	}*/
+		gl.uniform3i( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void uniform4i( final WebGLUniformLocation _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		gl.uniform4i( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void uniform1ui( final WebGLUniformLocation _location, final int _value )
+	{
+		gl.uniform1i( _location, _value ) ;
+	}
+
+	public static void uniform2ui( final WebGLUniformLocation _location, final int _v0, final int _v1 )
+	{
+		gl.uniform2i( _location, _v0, _v1 ) ;
+	}
+
+	public static void uniform3ui( final WebGLUniformLocation _location, final int _v0, final int _v1, final int _v2 )
+	{
+		gl.uniform3i( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void uniform4ui( final WebGLUniformLocation _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		gl.uniform4i( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void uniform1f( final WebGLUniformLocation _location, final float _v0 )
+	{
+		gl.uniform1f( _location, _v0 ) ;
+	}
+
+	public static void uniform2f( final WebGLUniformLocation _location, final float _v0, final float _v1 )
+	{
+		gl.uniform2f( _location, _v0, _v1 ) ;
+	}
+
+	public static void uniform3f( final WebGLUniformLocation _location, final float _v0, final float _v1, final float _v2 )
+	{
+		gl.uniform3f( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void uniform4f( final WebGLUniformLocation _location, final float _v0, final float _v1, final float _v2, final float _v3 )
+	{
+		gl.uniform4f( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void uniformMatrix4fv( final WebGLUniformLocation _location, final boolean _transpose, final float[] _values )
+	{
+		if( _transpose )
+		{
+			transpose( _values ) ;
+		}
+
+		gl.uniformMatrix4fv( _location, false, matrix ) ;
+	}
 
 	private static void transpose( final float[] _source )
 	{

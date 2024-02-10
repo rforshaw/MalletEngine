@@ -13,6 +13,9 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.UIntUniform ;
+import com.linxonline.mallet.renderer.IntUniform ;
+import com.linxonline.mallet.renderer.FloatUniform ;
 import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
@@ -27,13 +30,16 @@ import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
-	private final static ObjectCache<Texture> TEXTURES = new ObjectCache<Texture>( Texture.class, 50 ) ; 
+	private final static ObjectCache<Texture> TEXTURES = new ObjectCache<Texture>( Texture.class, 50 ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
 
 	public final static int VBO_VAR_BYTE_SIZE = 4 ;
 	public final static int IBO_VAR_BYTE_SIZE = 4 ;
+
+	private final static float[] floatTemp = new float[16] ;
+	private final static int[] intTemp = new int[16] ;
 
 	private final byte[] abgrTemp = new byte[4] ;
 
@@ -115,19 +121,15 @@ public class GLBuffer
 			
 			switch( uniform.getType() )
 			{
-				case INT32        :
-				case UINT32       :
-				case FLOAT32      :
 				case FLOAT64      :
-				case FLOAT32_VEC2 :
-				case FLOAT32_VEC3 :
-				case FLOAT32_VEC4 :
 				{
 					Logger.println( "Build uniform type not implemented: " + uniform.getType(), Logger.Verbosity.MAJOR ) ;
 					return false ;
 				}
 				case BOOL         :
-				case FLOAT32_MAT4 :
+				case UINT32       :
+				case INT32        :
+				case FLOAT32      :
 				{
 					_toFill.add( uniform ) ;
 					break ;
@@ -202,13 +204,7 @@ public class GLBuffer
 			final IUniform uniform = _uniforms.get( i ) ;
 			switch( uniform.getType() )
 			{
-				case INT32        :
-				case UINT32       :
-				case FLOAT32      :
 				case FLOAT64      :
-				case FLOAT32_VEC2 :
-				case FLOAT32_VEC3 :
-				case FLOAT32_VEC4 :
 				{
 					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
 					return false ;
@@ -219,12 +215,56 @@ public class GLBuffer
 					MGL.glUniform1i( _program.inUniforms[i], val.getState() ? 1 : 0) ;
 					break ;
 				}
-				case FLOAT32_MAT4 :
+				case UINT32       :
 				{
-					final Matrix4 m = ( Matrix4 )uniform ;
-					final float[] matrix = m.matrix ;
-
-					MGL.glUniformMatrix4fv( _program.inUniforms[i], 1, true, matrix, 0 ) ;
+					final UIntUniform vec = ( UIntUniform )uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1ui( _program.inUniforms[i], intTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2ui( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
+					}
+					break ;
+				}
+				case INT32        :
+				{
+					final IntUniform vec = ( IntUniform )uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Int uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1i( _program.inUniforms[i], intTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2i( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
+					}
+					break ;
+				}
+				case FLOAT32      :
+				{
+					final FloatUniform vec = ( FloatUniform )uniform ;
+					final int num = vec.fill( 0, floatTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1f( _program.inUniforms[i], floatTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2f( _program.inUniforms[i], floatTemp[0], floatTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3f( _program.inUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4f( _program.inUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2], floatTemp[3] ) ; break ;
+						case 16 : MGL.glUniformMatrix4fv( _program.inUniforms[i], 1, true, floatTemp, 0 ) ; break ;
+					}
 					break ;
 				}
 				case SAMPLER2D    :
@@ -276,13 +316,7 @@ public class GLBuffer
 
 			switch( uniform.getType() )
 			{
-				case INT32        :
-				case UINT32       :
-				case FLOAT32      :
 				case FLOAT64      :
-				case FLOAT32_VEC2 :
-				case FLOAT32_VEC3 :
-				case FLOAT32_VEC4 :
 				{
 					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
 					return false ;
@@ -293,12 +327,57 @@ public class GLBuffer
 					MGL.glUniform1i( _program.inDrawUniforms[i], val.getState() ? 1 : 0) ;
 					break ;
 				}
-				case FLOAT32_MAT4 :
+				case UINT32       :
 				{
-					final Matrix4 m = ( Matrix4 )uniform ;
-					final float[] matrix = m.matrix ;
+					final UIntUniform vec = ( UIntUniform )uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1ui( _program.inUniforms[i], intTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2ui( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
+					}
+					break ;
+				}
+				case INT32        :
+				{
+					final IntUniform vec = ( IntUniform )uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Int uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1i( _program.inUniforms[i], intTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2i( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
+					}
+					break ;
+				}
+				case FLOAT32      :
+				{
+					final FloatUniform vec = ( FloatUniform )uniform ;
+					final int num = vec.fill( 0, floatTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+						}
+						case 1  : MGL.glUniform1f( _program.inDrawUniforms[i], floatTemp[0] ) ; break ;
+						case 2  : MGL.glUniform2f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1] ) ; break ;
+						case 3  : MGL.glUniform3f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2] ) ; break ;
+						case 4  : MGL.glUniform4f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2], floatTemp[3] ) ; break ;
+						case 16 : MGL.glUniformMatrix4fv( _program.inDrawUniforms[i], 1, true, floatTemp, 0 ) ; break ;
+					}
 
-					MGL.glUniformMatrix4fv( _program.inDrawUniforms[i], 1, true, matrix, 0 ) ;
 					break ;
 				}
 				case SAMPLER2D    :
@@ -359,7 +438,6 @@ public class GLBuffer
 		for( int i = 0; i < size ; ++i )
 		{
 			final GLStorage storage = _storages.get( i ) ;
-			//System.out.println( name + " BindBase: " + i + " StorageID: " + glStorage.id[0] ) ;
 			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
 		}
 	}
@@ -456,7 +534,6 @@ public class GLBuffer
 		for( int i = 0; i < _atts.length; i++ )
 		{
 			final VertexAttrib att = _atts[i] ;
-			//System.out.println( att.toString() ) ;
 			MGL.glEnableVertexAttribArray( att.index ) ;
 		}
 	}

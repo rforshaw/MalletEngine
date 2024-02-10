@@ -20,10 +20,23 @@ public class MGL
 	public final static int GL_BLEND = GLES31.GL_BLEND ;
 	public final static int GL_SRC_ALPHA = GLES31.GL_SRC_ALPHA ;
 	public final static int GL_ONE_MINUS_SRC_ALPHA = GLES31.GL_ONE_MINUS_SRC_ALPHA ;
+
+	public final static int GL_NEVER = GLES31.GL_NEVER ;
+	public final static int GL_LESS = GLES31.GL_LESS ;
+	public final static int GL_GREATER = GLES31.GL_GREATER ;
+	public final static int GL_LEQUAL = GLES31.GL_LEQUAL ;
+	public final static int GL_GEQUAL = GLES31.GL_GEQUAL ;
 	public final static int GL_ALWAYS = GLES31.GL_ALWAYS ;
 	public final static int GL_KEEP = GLES31.GL_KEEP ;
 	public final static int GL_REPLACE = GLES31.GL_REPLACE ;
 	public final static int GL_EQUAL = GLES31.GL_EQUAL ;
+	public final static int GL_NOTEQUAL = GLES31.GL_NOTEQUAL ;
+
+	public final static int GL_ZERO = GLES31.GL_ZERO ;
+	public final static int GL_DECR = GLES31.GL_DECR ;
+	public final static int GL_INCR = GLES31.GL_INCR ;
+	public final static int GL_INVERT = GLES31.GL_INVERT ;
+
 	public final static int GL_STENCIL_BUFFER_BIT = GLES31.GL_STENCIL_BUFFER_BIT ;
 
 	public final static int GL_DYNAMIC_COPY = GLES31.GL_DYNAMIC_COPY ;
@@ -49,6 +62,8 @@ public class MGL
 	public final static int GL_COMPILE_STATUS = GLES31.GL_COMPILE_STATUS ;
 	public final static int GL_VERTEX_SHADER = GLES31.GL_VERTEX_SHADER ;
 	public final static int GL_FRAGMENT_SHADER = GLES31.GL_FRAGMENT_SHADER ;
+
+
 
 	public final static int GL_TEXTURE_MIN_FILTER = GLES31.GL_TEXTURE_MIN_FILTER ;
 	public final static int GL_TEXTURE_MAG_FILTER = GLES31.GL_TEXTURE_MAG_FILTER ;
@@ -111,6 +126,26 @@ public class MGL
 		GLES31.glUseProgram( _program ) ;
 	}
 
+	public static void glUniform1f( final int _location, final float _v0 )
+	{
+		GLES31.glUniform1f( _location, _v0 ) ;
+	}
+
+	public static void glUniform2f( final int _location, final float _v0, final float _v1 )
+	{
+		GLES31.glUniform2f( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3f( final int _location, final float _v0, final float _v1, final float _v2 )
+	{
+		GLES31.glUniform3f( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void glUniform4f( final int _location, final float _v0, final float _v1, final float _v2, final float _v3 )
+	{
+		GLES31.glUniform4f( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
 	public static void glUniformMatrix4fv( final int _location, final int _count, final boolean _transpose, final float[] _value, final int _offset )
 	{
 		GLES31.glUniformMatrix4fv( _location, _count, _transpose, _value, _offset ) ;
@@ -119,6 +154,41 @@ public class MGL
 	public static void glUniform1i( final int _location, final int _v0 )
 	{
 		GLES31.glUniform1i( _location, _v0 ) ;
+	}
+
+	public static void glUniform2i( final int _location, final int _v0, final int _v1 )
+	{
+		GLES31.glUniform2i( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3i( final int _location, final int _v0, final int _v1, final int _v2 )
+	{
+		GLES31.glUniform3i( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void glUniform4i( final int _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		GLES31.glUniform4i( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void glUniform1ui( final int _location, final int _v0 )
+	{
+		GLES31.glUniform1i( _location, _v0 ) ;
+	}
+
+	public static void glUniform2ui( final int _location, final int _v0, final int _v1 )
+	{
+		GLES31.glUniform2ui( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3ui( final int _location, final int _v0, final int _v1, final int _v2 )
+	{
+		GLES31.glUniform3ui( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void glUniform4ui( final int _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		GLES31.glUniform4ui( _location, _v0, _v1, _v2, _v3 ) ;
 	}
 
 	public static void glBlendFunc( final int _sfactor, final int _dfactor )

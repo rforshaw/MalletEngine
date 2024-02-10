@@ -2,17 +2,17 @@ package com.linxonline.mallet.script.javascript ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.entity.IEntitySystem ;
+import com.linxonline.mallet.entity.EntitySystem ;
 import com.linxonline.mallet.entity.Entity ;
 
 import com.linxonline.mallet.util.MalletList ;
 
 public final class JSEntitySystem
 {
-	private final IEntitySystem system ;
+	private final EntitySystem system ;
 	private final List<Entity> entities = MalletList.<Entity>newList() ;
 
-	public JSEntitySystem( final IEntitySystem _system )
+	public JSEntitySystem( final EntitySystem _system )
 	{
 		system = _system ;
 	}

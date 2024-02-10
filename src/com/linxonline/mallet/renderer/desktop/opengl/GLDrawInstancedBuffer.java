@@ -56,6 +56,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private final Storage transStorage = new Storage( transformations ) ;
 	private final GLStorage glTransStorage = new GLStorage( transStorage ) ;
 
+	private boolean isStatic = false ;
+	private boolean denyTransUpdate = false ;
+
 	private boolean instanceLoaded = false ;
 	private boolean stable = false ;
 
@@ -118,6 +121,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			stable = false ;
 			return stable ;
 		}
+
+		isStatic = _buffer.isStatic() ;
+		denyTransUpdate = false ;
 
 		GLDrawInstancedBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
@@ -248,7 +254,14 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			System.out.println( "Failed to load uniforms." ) ;
 		}
 
-		glTransStorage.update( transStorage ) ;
+		if( denyTransUpdate == false )
+		{
+			glTransStorage.update( transStorage ) ;
+			// If the buffer is intended to be static
+			// we only want to load the data once and then
+			// never touch it again.
+			denyTransUpdate = ( isStatic ) ? true : false ;
+		}
 
 		{
 			final int size = storages.size() ;

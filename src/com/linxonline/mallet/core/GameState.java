@@ -26,7 +26,6 @@ import com.linxonline.mallet.physics.CollisionAssist ;
 import com.linxonline.mallet.animation.AnimationSystem ;
 import com.linxonline.mallet.animation.AnimationAssist ;
 
-import com.linxonline.mallet.entity.IEntitySystem ;
 import com.linxonline.mallet.entity.EntitySystem ;
 import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.entity.components.Component ;
@@ -69,8 +68,8 @@ public class GameState
 	protected IScriptEngine engine ;
 
 	protected ISystem system = null ;																// Provides access to Root systems
-	protected final IEntitySystem entitySystem ;
-	protected final CollisionSystem collisionSystem ;
+	protected final EntitySystem entitySystem = new EntitySystem( eventSystem ) ;
+	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
 	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
@@ -87,9 +86,6 @@ public class GameState
 	public GameState( final String _name )
 	{
 		name = _name ;
-
-		entitySystem = new EntitySystem( eventSystem ) ;
-		collisionSystem = new CollisionSystem( eventSystem ) ; 
 
 		createCoreUpdate() ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
@@ -521,7 +517,7 @@ public class GameState
 		return externalController ;
 	}
 
-	public IEntitySystem getEntitySystem()
+	public EntitySystem getEntitySystem()
 	{
 		return entitySystem ;
 	}
@@ -558,7 +554,7 @@ public class GameState
 		public void update( final double _dt ) ;
 	}
 
-	private static class ShowFPS
+	private static final class ShowFPS
 	{
 		private boolean show = false ;
 		private final TextDraw[] draws = new TextDraw[2] ;

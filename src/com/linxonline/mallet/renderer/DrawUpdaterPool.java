@@ -127,7 +127,7 @@ public class DrawUpdaterPool
 							   final int _order )
 	{
 		final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
-		final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style, _ui ) ) ;
+		final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style ) ) ;
 
 		final DrawUpdater updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
 

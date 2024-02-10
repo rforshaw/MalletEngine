@@ -1,8 +1,8 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.FloatUniform ;
 
-public final class Vector3 implements IUniform
+public final class Vector3 extends FloatUniform
 {
 	public float x ;
 	public float y ;
@@ -165,9 +165,12 @@ public final class Vector3 implements IUniform
 	}
 
 	@Override
-	public IUniform.Type getType()
+	public int fill( int _offset, final float[] _fill )
 	{
-		return IUniform.Type.FLOAT32_VEC3 ;
+		_fill[_offset] = x ;
+		_fill[++_offset] = y ;
+		_fill[++_offset] = z ;
+		return 3 ;
 	}
 
 	public static final Vector3 add( final Vector3 _vec1, final Vector3 _vec2 )

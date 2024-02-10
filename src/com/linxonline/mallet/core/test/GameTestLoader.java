@@ -661,7 +661,6 @@ public final class GameTestLoader implements IGameLoader
 
 						draw = new Draw() ;
 						draw.setPosition( 0.0f, -200.0f, 0.0f ) ;
-						//draw.setOffset( 0.0f, 0.0f, -50.0f ) ;
 						draw.setScale( 100, 100, 100 ) ;
 						draw.setShape( shape ) ;
 

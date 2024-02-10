@@ -129,7 +129,7 @@ public abstract class BasicRenderer implements IRender
 		drawDT = _dt ;
 	}
 
-	private static class Invoker
+	private static final class Invoker
 	{
 		private final Object anchor ;
 		private final int operation ;

@@ -179,7 +179,57 @@ public final class MGL
 	{
 		gl.glUniform1i( _location, _v0 ) ;
 	}
-	
+
+	public static void glUniform2i( final int _location, final int _v0, final int _v1 )
+	{
+		gl.glUniform2i( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3i( final int _location, final int _v0, final int _v1, final int _v2 )
+	{
+		gl.glUniform3i( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void glUniform4i( final int _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		gl.glUniform4i( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void glUniform1ui( final int _location, final int _v0 )
+	{
+		gl.glUniform1i( _location, _v0 ) ;
+	}
+
+	public static void glUniform2ui( final int _location, final int _v0, final int _v1 )
+	{
+		gl.glUniform2ui( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3ui( final int _location, final int _v0, final int _v1, final int _v2 )
+	{
+		gl.glUniform3ui( _location, _v0, _v1, _v2 ) ;
+	}
+
+	public static void glUniform4ui( final int _location, final int _v0, final int _v1, final int _v2, final int _v3 )
+	{
+		gl.glUniform4ui( _location, _v0, _v1, _v2, _v3 ) ;
+	}
+
+	public static void glUniform1f( final int _location, final float _v0 )
+	{
+		gl.glUniform1f( _location, _v0 ) ;
+	}
+
+	public static void glUniform2f( final int _location, final float _v0, final float _v1 )
+	{
+		gl.glUniform2f( _location, _v0, _v1 ) ;
+	}
+
+	public static void glUniform3f( final int _location, final float _v0, final float _v1, final float _v2 )
+	{
+		gl.glUniform3f( _location, _v0, _v1, _v2 ) ;
+	}
+
 	public static void glUniform4f( final int _location, final float _v0, final float _v1, final float _v2, final float _v3 )
 	{
 		gl.glUniform4f( _location, _v0, _v1, _v2, _v3 ) ;

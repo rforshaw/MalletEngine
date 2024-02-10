@@ -12,8 +12,7 @@ public class GeometryBuffer extends ABuffer
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 
 	public GeometryBuffer( final Shape.Attribute[] _swivel,
-						   final Shape.Style _style,
-						   final boolean _ui )
+						   final Shape.Style _style )
 	{
 		swivel = _swivel ;
 		style = _style ;

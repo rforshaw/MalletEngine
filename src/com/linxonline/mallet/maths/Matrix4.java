@@ -3,12 +3,12 @@ package com.linxonline.mallet.maths ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.caches.Cacheable ;
 
-import com.linxonline.mallet.renderer.IUniform ;
+import com.linxonline.mallet.renderer.FloatUniform ;
 
 /**
 	Designed for 3D transformations.
 */
-public final class Matrix4 implements Cacheable, IUniform
+public final class Matrix4 extends FloatUniform implements Cacheable
 {
 	private static final float[] IDENTITY = new float[]
 	{
@@ -397,10 +397,10 @@ public final class Matrix4 implements Cacheable, IUniform
 		return row1 + row2 + row3 + row4 ;
 	}
 
-	@Override
-	public IUniform.Type getType()
+	public int fill( final int _offset, final float[] _fill )
 	{
-		return IUniform.Type.FLOAT32_MAT4 ;
+		System.arraycopy( matrix, 0, _fill, _offset, matrix.length ) ;
+		return matrix.length ;
 	}
 
 	private void setRow( final float _val1, final float _val2, final float _val3, final float _val4, final int _row )

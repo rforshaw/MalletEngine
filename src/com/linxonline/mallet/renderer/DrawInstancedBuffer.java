@@ -23,24 +23,41 @@ public class DrawInstancedBuffer extends DrawBuffer
 {
 	private final IShape shape ;
 	private final String storageName ;
+	private final boolean isStatic ;
 
 	public DrawInstancedBuffer( final Program _program,
 								final IShape _shape,
 								final boolean _ui,
 								final int _order )
 	{
-		this( _program, _shape, _ui, _order, "Instances" ) ;
+		this( _program, _shape, _ui, _order, false, "Instances" ) ;
 	}
 
 	public DrawInstancedBuffer( final Program _program,
 								final IShape _shape,
 								final boolean _ui,
 								final int _order,
+								final boolean _static )
+	{
+		this( _program, _shape, _ui, _order, _static, "Instances" ) ;
+	}
+
+	public DrawInstancedBuffer( final Program _program,
+								final IShape _shape,
+								final boolean _ui,
+								final int _order,
+								final boolean _static,
 								final String _storageName )
 	{
 		super( _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 		shape = _shape ;
 		storageName = _storageName ;
+		isStatic = _static ;
+	}
+
+	public boolean isStatic()
+	{
+		return isStatic ;
 	}
 
 	public IShape getShape()

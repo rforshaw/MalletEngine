@@ -15,19 +15,19 @@ import com.linxonline.mallet.util.Parallel ;
 public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 {
 	private final Interpolation mode ;
-	protected final DrawBuffer drawBuffer ;
+	protected final DrawInstancedBuffer drawBuffer ;
 
 	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
 
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
-	public DrawInstancedUpdater( final DrawBuffer _draw )
+	public DrawInstancedUpdater( final DrawInstancedBuffer _draw )
 	{
 		this( Interpolation.LINEAR, _draw ) ;
 	}
 
-	public DrawInstancedUpdater( Interpolation _mode, final DrawBuffer _draw )
+	public DrawInstancedUpdater( Interpolation _mode, final DrawInstancedBuffer _draw )
 	{
 		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
 		drawBuffer = _draw ;
@@ -46,6 +46,11 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 	public boolean isDirty()
 	{
 		return dirty || forceUpdate ;
+	}
+
+	public boolean isStatic()
+	{
+		return drawBuffer.isStatic() ;
 	}
 
 	public void addBuffers( final GeometryBuffer ... _buffers )

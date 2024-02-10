@@ -14,7 +14,7 @@ import com.linxonline.mallet.util.Logger ;
 	The EntitySystem stores and updates Entities that are being 
 	used in the current running Game State.
 **/
-public class EntitySystem implements IEntitySystem
+public final class EntitySystem
 {
 	public final int capacity ;
 
@@ -44,7 +44,6 @@ public class EntitySystem implements IEntitySystem
 		moment. This prevents an Entity from being added during 
 		the update of the EntitySystem.
 	**/
-	@Override
 	public void addEntity( final Entity _entity )
 	{
 		if( _entity == null )
@@ -56,7 +55,6 @@ public class EntitySystem implements IEntitySystem
 		entitiesToAdd.add( _entity ) ;
 	}
 
-	@Override
 	public void removeEntity( final Entity _entity )
 	{
 		if( _entity == null )
@@ -68,7 +66,6 @@ public class EntitySystem implements IEntitySystem
 		cleanup.add( _entity ) ;
 	}
 
-	@Override
 	public void update( final float _dt )
 	{
 		toBeAddedEntities() ;
@@ -148,7 +145,6 @@ public class EntitySystem implements IEntitySystem
 		}
 	}
 
-	@Override
 	public void clear()
 	{
 		for( final Entity entity : entities )
@@ -164,7 +160,6 @@ public class EntitySystem implements IEntitySystem
 		Returns a list of all entities, including those to be added 
 		to the main list.
 	**/
-	@Override
 	public List<Entity> getEntities( final List<Entity> _entities )
 	{
 		_entities.addAll( entities ) ;

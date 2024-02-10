@@ -10,6 +10,15 @@ public class DrawInstancedUpdaterPool
 
 	public DrawInstancedUpdaterPool() {}
 
+	public DrawInstancedUpdater getOrCreate( final World _world,
+											 final Program _program,
+											 final IShape _shape,
+											 final boolean _ui,
+											 final int _order )
+	{
+		return getOrCreate( _world, _program, _shape, _ui, _order, false ) ;
+	}
+
 	/**
 		Create a DrawInstancedUpdater with a DrawInstancedBuffer 
 		and GeometryBuffer precreated with the passed in parameters.
@@ -21,16 +30,17 @@ public class DrawInstancedUpdaterPool
 											 final Program _program,
 											 final IShape _shape,
 											 final boolean _ui,
-											 final int _order )
+											 final int _order,
+											 final boolean _static )
 	{
 		final IShape.Attribute[] swivel = _shape.getAttribute() ;
 		final IShape.Style style = _shape.getStyle() ;
 	
-		DrawInstancedUpdater updater = get( _world, _program, swivel, style, _ui, _order ) ;
+		DrawInstancedUpdater updater = get( _world, _program, swivel, style, _ui, _order, _static ) ;
 		if( updater == null )
 		{
-			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order ) ) ;
-			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style, _ui ) ) ;
+			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order, _static ) ) ;
+			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style ) ) ;
 
 			updater = DrawAssist.add( new DrawInstancedUpdater( buffer ) ) ;
 
@@ -63,9 +73,10 @@ public class DrawInstancedUpdaterPool
 									 final Program _program,
 									 final IShape _shape,
 									 final boolean _ui,
-									 final int _order )
+									 final int _order,
+									 final boolean _static )
 	{
-		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order, _static ) ;
 	}
 
 	/**
@@ -83,7 +94,8 @@ public class DrawInstancedUpdaterPool
 									 final IShape.Attribute[] _swivel,
 									 final IShape.Style _style,
 									 final boolean _ui,
-									 final int _order )
+									 final int _order,
+									 final boolean _static )
 	{
 		synchronized( pool )
 		{
@@ -97,10 +109,15 @@ public class DrawInstancedUpdaterPool
 					continue ;
 				}
 
-				final DrawBuffer buffer = updater.drawBuffer ;
+				final DrawInstancedBuffer buffer = updater.drawBuffer ;
 				if( buffer == null )
 				{
 					// Will need to remove buffer from global pool.
+					continue ;
+				}
+
+				if( buffer.isStatic() != _static )
+				{
 					continue ;
 				}
 
