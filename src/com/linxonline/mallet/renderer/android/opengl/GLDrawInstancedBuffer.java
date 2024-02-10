@@ -195,7 +195,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( stable == false )
 		{
@@ -206,7 +206,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final float[] matrix = _projection.matrix ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
+		final float[] matrix = projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
 		if( loadProgramUniforms( glProgram, uniforms ) == false )
@@ -328,8 +329,10 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		public int getLength()
 		{
 			drawCount = 0 ;
-			for( final GeometryBuffer buffer : buffers )
+			final int size = buffers.size() ;
+			for( int i = 0; i < size; ++i )
 			{
+				final GeometryBuffer buffer = buffers.get( i ) ;
 				final List<Draw> draws = buffer.getDraws() ;
 				drawCount += draws.size() ;
 			}
@@ -350,12 +353,12 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				Parallel.forEach( buffer.getDraws(), 10000, updater ) ;
 
 				//final long endTime = System.currentTimeMillis() ;
-				//System.out.println( "Time Taken: " + ( endTime - startTime ) ) ;
+				//System.out.println( "GL Time Taken: " + ( endTime - startTime ) ) ;
 			}
 		}
 	}
 
-	private static class TransformationUpdater implements Parallel.IRangeRun<Draw>
+	private static final class TransformationUpdater implements Parallel.IRangeRun<Draw>
 	{
 		private int bufferIndex = 0 ;
 		private int objectSize = 0 ;

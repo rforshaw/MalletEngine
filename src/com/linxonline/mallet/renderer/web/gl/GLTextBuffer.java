@@ -311,7 +311,7 @@ public final class GLTextBuffer extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( stable == false )
 		{
@@ -323,7 +323,8 @@ public final class GLTextBuffer extends GLBuffer
 		GLTextBuffer.enableVertexAttributes( attributes ) ;
 		MGL.useProgram( glProgram.id[0] ) ;
 
-		final float[] matrix = _projection.matrix ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
+		final float[] matrix = projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, matrix ) ;
 		if( loadProgramUniforms( glProgram, uniforms ) == false )

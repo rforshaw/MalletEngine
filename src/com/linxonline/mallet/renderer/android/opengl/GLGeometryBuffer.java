@@ -7,6 +7,7 @@ import java.nio.* ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 
+import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.Program ;
@@ -189,7 +190,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		return stable ;
 	}
 
-	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final IOcclude _occluder )
+	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final Camera _camera, final IOcclude _occluder )
 	{
 		if( stable == false )
 		{
@@ -210,7 +211,7 @@ public final class GLGeometryBuffer extends GLBuffer
 			final int count = drawDimensions[drawOffset + 3] ;
 
 			final Draw draw = toDraw[drawIndex] ;
-			if( draw.isHidden() || _occluder.occlude( draw ) )
+			if( draw.isHidden() || _occluder.occlude( _camera, draw ) )
 			{
 				continue ;
 			}

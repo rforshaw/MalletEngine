@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer.android.opengl ;
 import java.util.List ;
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
@@ -15,7 +16,6 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 public final class GLDrawBuffer extends GLBuffer
 {
-	private int order ;
 	private VertexAttrib[] attributes = null ;
 
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;
@@ -85,7 +85,7 @@ public final class GLDrawBuffer extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( stable == false )
 		{
@@ -96,7 +96,8 @@ public final class GLDrawBuffer extends GLBuffer
 
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final float[] matrix = _projection.matrix ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
+		final float[] matrix = projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
 		if( loadProgramUniforms( glProgram, uniforms ) == false )
@@ -106,9 +107,10 @@ public final class GLDrawBuffer extends GLBuffer
 
 		GLDrawBuffer.bindBuffers( storages ) ;
 
+		final Camera camera = _camera.getCamera() ;
 		for( GLGeometryBuffer buffer : buffers )
 		{
-			buffer.draw( attributes, glProgram, occluder ) ;
+			buffer.draw( attributes, glProgram, camera, occluder ) ;
 		}
 	}
 

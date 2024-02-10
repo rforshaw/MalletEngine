@@ -13,13 +13,13 @@ public class TextUpdaterPool
 
 	/**
 		Remove TextUpdaters and associated resources that are
-		used by the passed in World.
+		used by the passed in IManageBuffers.
 	*/
-	public void clean( final World _world )
+	public void clean( final IManageBuffers _anchor )
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<TextUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -43,10 +43,10 @@ public class TextUpdaterPool
 					}
 
 					DrawAssist.remove( buffer ) ;
-					_world.removeBuffers( buffer ) ;
+					_anchor.removeBuffers( buffer ) ;
 				}
 
-				WorldAssist.update( _world ) ;
+				_anchor.requestUpdate() ;
 
 				if( removeUpdater )
 				{
@@ -61,11 +61,11 @@ public class TextUpdaterPool
 		Remove TextUpdaters and associated resources that are used
 		by the passed in program and world.
 	*/
-	public void clean( final World _world, final Program _program )
+	public void clean( final IManageBuffers _anchor, final Program _program )
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<TextUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -95,10 +95,10 @@ public class TextUpdaterPool
 					}
 
 					DrawAssist.remove( buffer ) ;
-					_world.removeBuffers( buffer ) ;
+					_anchor.removeBuffers( buffer ) ;
 				}
 
-				WorldAssist.update( _world ) ;
+				_anchor.requestUpdate() ;
 
 				if( removeUpdater )
 				{
@@ -114,12 +114,12 @@ public class TextUpdaterPool
 		If no buffer exists create a new buffer and add it to 
 		the passed in world.
 	*/
-	public TextUpdater getOrCreate( final World _world,
+	public TextUpdater getOrCreate( final IManageBuffers _anchor,
 									final Program _program,
 									final boolean _ui,
 									final int _order )
 	{
-		TextUpdater updater = get( _world, _program, _ui, _order ) ;
+		TextUpdater updater = get( _anchor, _program, _ui, _order ) ;
 		if( updater == null )
 		{
 			final TextBuffer buffer = DrawAssist.add( new TextBuffer( _program, _ui, _order ) ) ;
@@ -127,8 +127,8 @@ public class TextUpdaterPool
 
 			updater.addBuffers( buffer ) ;
 
-			_world.addBuffers( buffer ) ;
-			WorldAssist.update( _world ) ;
+			_anchor.addBuffers( buffer ) ;
+			_anchor.requestUpdate() ;
 
 			synchronized( pool )
 			{
@@ -149,14 +149,14 @@ public class TextUpdaterPool
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public TextUpdater get( final World _world,
+	public TextUpdater get( final IManageBuffers _anchor,
 							final Program _program,
 							final boolean _ui,
 							final int _order )
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final WeakReference<TextUpdater> weak : pool )
 			{

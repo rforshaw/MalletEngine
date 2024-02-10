@@ -9,5 +9,10 @@ package com.linxonline.mallet.renderer ;
 */
 public interface IOcclude
 {
-	public boolean occlude( final Draw _draw ) ;
+	/**
+		Return true if the draw object should not be rendered.
+		We also pass in the camera, as this will help to determine
+		if the draw object is likely occluded.
+	*/
+	public boolean occlude( final Camera _camera, final Draw _draw ) ;
 }

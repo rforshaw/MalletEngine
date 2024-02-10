@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class Stencil extends ABuffer
+public class Stencil extends ABuffer implements IManageBuffers
 {
 	private final int order ;
 
@@ -75,6 +75,7 @@ public class Stencil extends ABuffer
 		colourMask[3] = _alpha ;
 	}
 
+	@Override
 	public ABuffer[] addBuffers( final ABuffer ... _buffers )
 	{
 		for( final ABuffer buffer : _buffers )
@@ -100,6 +101,7 @@ public class Stencil extends ABuffer
 		_list.add( _insert ) ;
 	}
 
+	@Override
 	public void removeBuffers( final ABuffer ... _buffers )
 	{
 		for( final ABuffer buffer : _buffers )
@@ -118,6 +120,7 @@ public class Stencil extends ABuffer
 		return clear ;
 	}
 
+	@Override
 	public List<ABuffer> getBuffers()
 	{
 		return buffers ;
@@ -168,5 +171,11 @@ public class Stencil extends ABuffer
 	public int getOrder()
 	{
 		return order ;
+	}
+
+	@Override
+	public void requestUpdate()
+	{
+		DrawAssist.update( this ) ;
 	}
 }

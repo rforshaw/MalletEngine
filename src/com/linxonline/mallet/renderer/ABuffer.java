@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public abstract class ABuffer
+public abstract class ABuffer implements IRequestUpdate
 {
 	private final static Utility utility = new Utility() ;
 

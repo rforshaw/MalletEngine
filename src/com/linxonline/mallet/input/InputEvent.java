@@ -1,8 +1,6 @@
 package com.linxonline.mallet.input ;
 
-import com.linxonline.mallet.util.caches.Cacheable ;
-
-public final class InputEvent implements Cacheable
+public final class InputEvent
 {
 	public InputID id ;
 	public InputType inputType ;
@@ -110,17 +108,6 @@ public final class InputEvent implements Cacheable
 		keycode = _input.keycode ;
 		isActionKey = _input.isActionKey ;
 		when = _input.when ;
-	}
-
-	public final void reset()
-	{
-		id = InputID.NONE ;
-		inputType = InputType.NONE ;
-		keycode = KeyCode.NONE ;
-		mouseX = 0 ;
-		mouseY = 0 ;
-		isActionKey = false ;
-		when = 0L ;
 	}
 
 	public String toString()

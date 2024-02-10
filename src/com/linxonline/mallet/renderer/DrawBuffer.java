@@ -10,7 +10,7 @@ public class DrawBuffer extends ABuffer
 	public static final IOcclude OCCLUDER_FALLBACK = new IOcclude()
 	{
 		@Override
-		public boolean occlude( final Draw _draw )
+		public boolean occlude( final Camera _camera, final Draw _draw )
 		{
 			return false ;
 		}
@@ -103,6 +103,12 @@ public class DrawBuffer extends ABuffer
 	public boolean isUI()
 	{
 		return ui ;
+	}
+
+	@Override
+	public void requestUpdate()
+	{
+		DrawAssist.update( this ) ;
 	}
 
 	public static boolean isCompatible( final DrawBuffer _lhs, final DrawBuffer _rhs )

@@ -15,17 +15,17 @@ public class DrawUpdaterPool
 
 	/**
 		Remove DrawUpdaters and associated resources that are
-		used by the passed in World.
+		used by the passed in IManageBuffers.
 
 		Note: Any GeometryBuffers added to the DrawUpdater after it is created
 		will also be removed too. Do not call if your GeometryBuffers are shared
 		with other DrawBuffers.
 	*/
-	public void clean( final World _world )
+	public void clean( final IManageBuffers _anchor )
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<DrawUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -45,8 +45,8 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				_world.removeBuffers( buffer ) ;
-				WorldAssist.update( _world ) ;
+				_anchor.removeBuffers( buffer ) ;
+				_anchor.requestUpdate() ;
 
 				iterator.remove() ;
 				DrawAssist.remove( updater ) ;
@@ -67,11 +67,11 @@ public class DrawUpdaterPool
 		will also be removed too. Do not call if your GeometryBuffers are shared
 		with other DrawBuffers.
 	*/
-	public void clean( final World _world, final Program _program )
+	public void clean( final IManageBuffers _anchor, final Program _program )
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<DrawUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -96,8 +96,8 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				_world.removeBuffers( buffer ) ;
-				WorldAssist.update( _world ) ;
+				_anchor.removeBuffers( buffer ) ;
+				_anchor.requestUpdate() ;
 
 				iterator.remove() ;
 				DrawAssist.remove( updater ) ;
@@ -110,16 +110,16 @@ public class DrawUpdaterPool
 		}
 	}
 
-	public DrawUpdater create( final World _world,
+	public DrawUpdater create( final IManageBuffers _anchor,
 							   final Program _program,
 							   final IShape _shape,
 							   final boolean _ui,
 							   final int _order )
 	{
-		return create( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return create( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
-	public DrawUpdater create( final World _world,
+	public DrawUpdater create( final IManageBuffers _anchor,
 							   final Program _program,
 							   final IShape.Attribute[] _swivel,
 							   final IShape.Style _style,
@@ -131,11 +131,11 @@ public class DrawUpdaterPool
 
 		final DrawUpdater updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
 
-		_world.addBuffers( buffer ) ;
-		WorldAssist.update( _world ) ;
+		_anchor.addBuffers( buffer ) ;
+		_anchor.requestUpdate() ;
 
 		buffer.addBuffers( geom ) ;
-		DrawAssist.update( buffer ) ;
+		buffer.requestUpdate() ;
 
 		synchronized( pool )
 		{
@@ -152,13 +152,13 @@ public class DrawUpdaterPool
 		If a DrawUpdater already exists with the same parameters 
 		it will return it instead.
 	*/
-	public DrawUpdater getOrCreate( final World _world,
+	public DrawUpdater getOrCreate( final IManageBuffers _anchor,
 									final Program _program,
 									final IShape _shape,
 									final boolean _ui,
 									final int _order )
 	{
-		return getOrCreate( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return getOrCreate( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	/**
@@ -166,15 +166,15 @@ public class DrawUpdaterPool
 		If no buffer exists create a new buffer and add it to 
 		the passed in world.
 	*/
-	public DrawUpdater getOrCreate( final World _world,
+	public DrawUpdater getOrCreate( final IManageBuffers _anchor,
 									final Program _program,
 									final IShape.Attribute[] _swivel,
 									final IShape.Style _style,
 									final boolean _ui,
 									final int _order )
 	{
-		final DrawUpdater updater = get( _world, _program, _swivel, _style, _ui, _order ) ;
-		return ( updater != null ) ? updater : create( _world, _program, _swivel, _style, _ui, _order ) ;
+		final DrawUpdater updater = get( _anchor, _program, _swivel, _style, _ui, _order ) ;
+		return ( updater != null ) ? updater : create( _anchor, _program, _swivel, _style, _ui, _order ) ;
 	}
 
 	/**
@@ -187,13 +187,13 @@ public class DrawUpdaterPool
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public DrawUpdater get( final World _world,
+	public DrawUpdater get( final IManageBuffers _anchor,
 							final Program _program,
 							final IShape _shape,
 							final boolean _ui,
 							final int _order )
 	{
-		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return get( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class DrawUpdaterPool
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public DrawUpdater get( final World _world,
+	public DrawUpdater get( final IManageBuffers _anchor,
 							final Program _program,
 							final IShape.Attribute[] _swivel,
 							final IShape.Style _style,
@@ -215,7 +215,7 @@ public class DrawUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final WeakReference<DrawUpdater> weak : pool )
 			{

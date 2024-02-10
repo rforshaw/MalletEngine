@@ -64,7 +64,7 @@ public class GLDepth extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( enable )
 		{
@@ -85,7 +85,7 @@ public class GLDepth extends GLBuffer
 
 		for( final GLBuffer buffer : buffers )
 		{
-			buffer.draw( _projection ) ;
+			buffer.draw( _camera ) ;
 		}
 	}
 

@@ -235,7 +235,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( stable == false )
 		{
@@ -246,7 +246,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final float[] matrix = _projection.matrix ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
+		final float[] matrix = projection.matrix ;
 
 		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
 		if( loadProgramUniforms( glProgram, uniforms ) == false )
@@ -367,7 +368,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				final GeometryBuffer buffer = buffers.get( i ) ;
 				updater.set( i, ( 16 * 4 ), _out ) ;
 
-				//System.out.println( "Start.." ) ;
 				//final long startTime = System.currentTimeMillis() ;
 
 				Parallel.forEach( buffer.getDraws(), 10000, updater ) ;

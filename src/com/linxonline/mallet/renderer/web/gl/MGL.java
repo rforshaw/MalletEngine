@@ -68,6 +68,11 @@ public final class MGL
 	public final static int GL_ELEMENT_ARRAY_BUFFER = WebGLRenderingContext.ELEMENT_ARRAY_BUFFER ;
 	public final static int GL_ARRAY_BUFFER = WebGLRenderingContext.ARRAY_BUFFER ;
 
+	public final static int GL_ZERO = WebGLRenderingContext.ZERO ;
+	public final static int GL_DECR = WebGLRenderingContext.DECR ;
+	public final static int GL_INCR = WebGLRenderingContext.INCR ;
+	public final static int GL_INVERT = WebGLRenderingContext.INVERT ;
+
 	public final static int GL_STENCIL_TEST = WebGLRenderingContext.STENCIL_TEST ;
 	public final static int GL_STENCIL_BUFFER_BIT = WebGLRenderingContext.STENCIL_BUFFER_BIT ;
 	public final static int GL_COLOR_BUFFER_BIT = WebGLRenderingContext.COLOR_BUFFER_BIT ;
@@ -79,10 +84,16 @@ public final class MGL
 	public final static int GL_UNSIGNED_INT = WebGLRenderingContext.UNSIGNED_INT ;
 	public final static int GL_UNSIGNED_SHORT = WebGLRenderingContext.UNSIGNED_SHORT ;
 
+	public final static int GL_NEVER = WebGLRenderingContext.NEVER ;
+	public final static int GL_LESS = WebGLRenderingContext.LESS ;
+	public final static int GL_GREATER = WebGLRenderingContext.GREATER ;
+	public final static int GL_LEQUAL = WebGLRenderingContext.LEQUAL ;
+	public final static int GL_GEQUAL = WebGLRenderingContext.GEQUAL ;
 	public final static int GL_ALWAYS = WebGLRenderingContext.ALWAYS ;
 	public final static int GL_KEEP = WebGLRenderingContext.KEEP ;
 	public final static int GL_REPLACE = WebGLRenderingContext.REPLACE ;
 	public final static int GL_EQUAL = WebGLRenderingContext.EQUAL ;
+	public final static int GL_NOTEQUAL = WebGLRenderingContext.NOTEQUAL ;
 
 	public final static int GL_BLEND = WebGLRenderingContext.BLEND ;
 	public final static int GL_SRC_ALPHA = WebGLRenderingContext.SRC_ALPHA ;

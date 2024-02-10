@@ -21,7 +21,6 @@ import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.caches.ObjectCache ;
 import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 import com.linxonline.mallet.util.Tuple ;
@@ -294,6 +293,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
 					case STENCIL               : return new GLStencil( ( Stencil )_buffer ) ;
 					case DEPTH                 : return new GLDepth( ( Depth )_buffer ) ;
+					case GROUP                 : return new GLGroupBuffer( ( GroupBuffer )_buffer ) ;
 				}
 			}
 		} ;

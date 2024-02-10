@@ -1,11 +1,9 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.util.caches.Cacheable ;
-
 /**
 	Designed for 2D transformations.
 */
-public final class Matrix3 implements Cacheable
+public final class Matrix3
 {
 	/**
 		Matrix3 functions are guaranteed to be called hundreds if 
@@ -219,12 +217,6 @@ public final class Matrix3 implements Cacheable
 	{
 		return ( matrix[0] * matrix[4] * matrix[8] ) - ( matrix[0] * matrix[5] * matrix[7] ) + ( matrix[3] * matrix[7] * matrix[2] ) - 
 			   ( matrix[0] * matrix[1] * matrix[8] ) + ( matrix[6] * matrix[1] * matrix[4] ) - ( matrix[6] * matrix[4] * matrix[2] ) ;
-	}
-
-	@Override
-	public void reset()
-	{
-		setIdentity() ;
 	}
 
 	public float[] toArray()

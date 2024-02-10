@@ -7,28 +7,20 @@ import android.view.MotionEvent ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.util.caches.TimeCache ;
+import com.linxonline.mallet.util.caches.TimePool ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
 public final class AndroidInputSystem implements IInputSystem, AndroidInputListener
 {
-	private final TimeCache<InputEvent> cache ;
+	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 150, 0.25f, () -> new InputEvent() ) ;
 
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 touchPosition = new Vector2( 0, 0 ) ;
 
-	public AndroidInputSystem()
-	{
-		final InputEvent[] inputs = new InputEvent[150] ;
-		for( int i = 0; i < inputs.length; i++ )
-		{
-			inputs[i] = new InputEvent() ;
-		}
-		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
-	}
+	public AndroidInputSystem() {}
 
 	public void addInputHandler( final IInputHandler _handler )
 	{
@@ -93,7 +85,7 @@ public final class AndroidInputSystem implements IInputSystem, AndroidInputListe
 
 		synchronized( inputs )
 		{
-			final InputEvent input = cache.get() ;
+			final InputEvent input = cache.take() ;
 			input.setID( _id ) ;
 			input.setInput( type, ( int )_x, ( int )_y, _when ) ;
 			inputs.add( input ) ;
@@ -139,7 +131,7 @@ public final class AndroidInputSystem implements IInputSystem, AndroidInputListe
 			keycode = isSpecialKeyDown( _event ) ;
 		}
 
-		final InputEvent input = cache.get() ;
+		final InputEvent input = cache.take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( _inputType, keycode, _event.getEventTime() ) ;
 		inputs.add( input ) ;

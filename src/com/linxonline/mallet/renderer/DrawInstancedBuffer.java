@@ -75,4 +75,10 @@ public class DrawInstancedBuffer extends DrawBuffer
 	{
 		return BufferType.DRAW_INSTANCED_BUFFER ;
 	}
+
+	@Override
+	public void requestUpdate()
+	{
+		DrawAssist.update( this ) ;
+	}
 }

@@ -20,11 +20,13 @@ public final class GLCamera
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3() ;
 
+	private final Camera camera ;
 	private final Camera.Screen screen = new Camera.Screen() ;
 	private final Camera.Projection projection = new Camera.Projection() ;
 
 	public GLCamera( final Camera _camera )
 	{
+		camera = _camera ;
 		update( _camera ) ;
 	}
 
@@ -65,7 +67,22 @@ public final class GLCamera
 		for( int i = 0; i < size; ++i )
 		{
 			final GLBuffer buffer = _buffers.get( i ) ;
-			buffer.draw( ( buffer.isUI() ) ? uiProjection : worldProjection ) ;
+			buffer.draw( this ) ;
 		}
+	}
+
+	public Matrix4 getUIProjection()
+	{
+		return uiProjection ;
+	}
+
+	public Matrix4 getWorldProjection()
+	{
+		return worldProjection ;
+	}
+
+	public Camera getCamera()
+	{
+		return camera ;
 	}
 }

@@ -8,5 +8,6 @@ public enum BufferType
 	TEXT_BUFFER,
 	STORAGE_BUFFER,
 	STENCIL,
-	DEPTH
+	DEPTH,
+	GROUP
 }

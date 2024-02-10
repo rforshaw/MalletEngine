@@ -6,7 +6,7 @@ import com.jogamp.newt.event.* ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.input.InputEvent ;
-import com.linxonline.mallet.util.caches.TimeCache ;
+import com.linxonline.mallet.util.caches.TimePool ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
@@ -16,27 +16,16 @@ import com.linxonline.mallet.util.Logger ;
 	Input System is designed to use Java's built in input listeners, 
 	requires to be added to a Window/Jframe to begin recieving input.
 **/
-public final class InputSystem implements IInputSystem, 
-									KeyListener, 
-									MouseListener
+public final class InputSystem implements IInputSystem, KeyListener, MouseListener
 {
-	private final TimeCache<InputEvent> cache ;
+	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 150, 0.25f, () -> new InputEvent() ) ;
 
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
 
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
 	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
-	public InputSystem()
-	{
-		final InputEvent[] inputs = new InputEvent[150] ;
-		for( int i = 0; i < inputs.length; i++ )
-		{
-			inputs[i] = new InputEvent() ;
-		}
-
-		cache = new TimeCache<InputEvent>( 0.25f, InputEvent.class, inputs ) ;
-	}
+	public InputSystem() {}
 
 	public void addInputHandler( final IInputHandler _handler )
 	{
@@ -115,7 +104,7 @@ public final class InputSystem implements IInputSystem,
 			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		final InputEvent input = cache.get() ;
+		final InputEvent input = cache.take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
 		inputs.add( input ) ;
@@ -137,7 +126,7 @@ public final class InputSystem implements IInputSystem,
 			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		final InputEvent input = cache.get() ;
+		final InputEvent input = cache.take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
 		inputs.add( input ) ;
@@ -246,7 +235,7 @@ public final class InputSystem implements IInputSystem,
 
 	private synchronized void updateMouseWheel( final MouseEvent _event )
 	{
-		final InputEvent input = cache.get() ;
+		final InputEvent input = cache.take() ;
 		final int scroll = ( int )_event.getRotation()[1] ;
 
 		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll, _event.getWhen() ) ;
@@ -255,7 +244,7 @@ public final class InputSystem implements IInputSystem,
 
 	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition, final long _when )
 	{
-		final InputEvent input = cache.get() ;
+		final InputEvent input = cache.take() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y, _when ) ;
 		inputs.add( input ) ;

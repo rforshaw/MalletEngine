@@ -557,7 +557,7 @@ public class GameState
 	private static final class ShowFPS
 	{
 		private boolean show = false ;
-		private final TextDraw[] draws = new TextDraw[2] ;
+		private final TextDraw[] draws = new TextDraw[3] ;
 		private final TextUpdater updater ;
 
 		private int accumulatedTicks = 0 ;
@@ -581,6 +581,11 @@ public class GameState
 			draws[1].setHidden( !show ) ;
 			draws[1].setBoundary( 200.0f, 50.0f ) ;
 
+			draws[2] = new TextDraw( "0" ) ;
+			draws[2].setPosition( 0.0f, 40.0f, 0.0f ) ;
+			draws[2].setHidden( !show ) ;
+			draws[2].setBoundary( 200.0f, 50.0f ) ;
+
 			final TextUpdaterPool pool = RenderPools.getTextUpdaterPool() ;
 			updater = pool.getOrCreate( world, program, true, Integer.MAX_VALUE ) ;
 
@@ -591,8 +596,10 @@ public class GameState
 		public void setShow( final boolean _show )
 		{
 			show = _show ;
-			draws[0].setHidden( !show ) ;
-			draws[1].setHidden( !show ) ;
+			for( final TextDraw draw : draws )
+			{
+				draw.setHidden( !show ) ;
+			}
 			updater.forceUpdate() ;
 		}
 
@@ -606,7 +613,8 @@ public class GameState
 			if( show == true )
 			{
 				updateDrawFPS( draws[0], _dtRender ) ;
-				updateDrawMS( draws[1], _dtUpdate ) ;
+				updateMS( draws[1], _dtRender ) ;
+				updateMS( draws[2], _dtUpdate ) ;
 			}
 		}
 
@@ -636,7 +644,7 @@ public class GameState
 			updater.forceUpdate() ;
 		}
 
-		private void updateDrawMS( final TextDraw _draw, final double _dt )
+		private void updateMS( final TextDraw _draw, final double _dt )
 		{
 			final StringBuilder txt = _draw.getText()  ;
 			txt.setLength( 0 ) ;

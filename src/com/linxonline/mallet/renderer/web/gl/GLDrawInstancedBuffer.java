@@ -191,7 +191,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	}
 
 	@Override
-	public void draw( final Matrix4 _projection )
+	public void draw( final GLCamera _camera )
 	{
 		if( stable == false )
 		{
@@ -202,7 +202,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 		MGL.useProgram( glProgram.id[0] ) ;
 
-		final float[] projMatrix = _projection.matrix ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
+		final float[] projMatrix = projection.matrix ;
 
 		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, projMatrix ) ;
 		if( loadProgramUniforms( glProgram, uniforms ) == false )

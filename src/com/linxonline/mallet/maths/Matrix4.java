@@ -1,14 +1,13 @@
 package com.linxonline.mallet.maths ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.caches.Cacheable ;
 
 import com.linxonline.mallet.renderer.FloatUniform ;
 
 /**
 	Designed for 3D transformations.
 */
-public final class Matrix4 extends FloatUniform implements Cacheable
+public final class Matrix4 extends FloatUniform
 {
 	private static final float[] IDENTITY = new float[]
 	{
@@ -379,12 +378,6 @@ public final class Matrix4 extends FloatUniform implements Cacheable
 		t = matrix[11] ;
 		matrix[11] = matrix[14] ;
 		matrix[14] = t ;
-	}
-
-	@Override
-	public void reset()
-	{
-		setIdentity() ;
 	}
 
 	@Override

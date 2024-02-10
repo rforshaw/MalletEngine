@@ -20,12 +20,17 @@ import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.Operation ;
+import com.linxonline.mallet.renderer.Action ;
 
+import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
+	private final static MemoryPool<Texture> TEXTURES = new MemoryPool<Texture>( () -> new Texture() ) ;
+
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
 
@@ -51,9 +56,39 @@ public class GLBuffer
 		return ui ;
 	}
 
-	public void draw( final Matrix4 _projection ) {}
+	public void draw( GLCamera _camera ) {}
 
 	public void shutdown() {}
+
+	public static int getOperation( final Operation _operation )
+	{
+		switch( _operation )
+		{
+			default                 : return MGL.GL_ALWAYS ;
+			case ALWAYS             : return MGL.GL_ALWAYS ;
+			case NEVER              : return MGL.GL_NEVER ;
+			case LESS_THAN          : return MGL.GL_LESS ;
+			case GREATER_THAN       : return MGL.GL_GREATER ;
+			case LESS_THAN_EQUAL    : return MGL.GL_LEQUAL ;
+			case GREATER_THAN_EQUAL : return MGL.GL_GEQUAL ;
+			case EQUAL              : return MGL.GL_EQUAL ;
+			case NOT_EQUAL          : return MGL.GL_NOTEQUAL ;
+		}
+	}
+
+	public static int getAction( final Action _action )
+	{
+		switch( _action )
+		{
+			default        : return MGL.GL_KEEP ;
+			case KEEP      : return MGL.GL_KEEP ;
+			case ZERO      : return MGL.GL_ZERO ;
+			case REPLACE   : return MGL.GL_REPLACE ;
+			case INCREMENT : return MGL.GL_INCR ;
+			case DECREMENT : return MGL.GL_DECR ;
+			case INVERT    : return MGL.GL_INVERT ;
+		}
+	}
 
 	protected static boolean generateProgramUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
 	{
@@ -61,6 +96,19 @@ public class GLBuffer
 		if( uniforms.isEmpty() )
 		{
 			return true ;
+		}
+
+		for( IUniform uniform : _toFill )
+		{
+			// We don't want to create more texture uniforms
+			// than needed, use a cache.
+			if( uniform.getType() == IUniform.Type.SAMPLER2D )
+			{
+				final Texture texture = ( Texture )uniform ;
+				texture.reset() ;
+
+				TEXTURES.reclaim( texture ) ;
+			}
 		}
 
 		_toFill.clear() ;
@@ -81,8 +129,8 @@ public class GLBuffer
 					return false ;
 				}
 				case BOOL         :
-				case INT32        :
 				case UINT32       :
+				case INT32        :
 				case FLOAT32      :
 				{
 					_toFill.add( uniform ) ;
@@ -102,7 +150,10 @@ public class GLBuffer
 						return false ;
 					}
 
-					_toFill.add( new Texture( glTexture, texture ) ) ;
+					final Texture tex = TEXTURES.take() ;
+					tex.set( glTexture, texture ) ;
+
+					_toFill.add( tex ) ;
 					break ;
 				}
 				case FONT         :
@@ -111,7 +162,10 @@ public class GLBuffer
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage texture = glFont.getTexture() ;
 
-					_toFill.add( new Texture( texture, font ) ) ;
+					final Texture tex = TEXTURES.take() ;
+					tex.set( texture, font ) ;
+
+					_toFill.add( tex ) ;
 					break ;
 				}
 				case UNKNOWN      :
@@ -154,7 +208,7 @@ public class GLBuffer
 			{
 				case FLOAT64      :
 				{
-					Logger.println( "Load uniform type not implemented.", Logger.Verbosity.MAJOR ) ;
+					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
 					return false ;
 				}
 				case BOOL         :
@@ -213,7 +267,6 @@ public class GLBuffer
 						case 4  : MGL.uniform4f( _program.inUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2], floatTemp[3] ) ; break ;
 						case 16 : MGL.uniformMatrix4fv( _program.inUniforms[i], true, floatTemp ) ; break ;
 					}
-
 					break ;
 				}
 				case SAMPLER2D    :
@@ -386,7 +439,6 @@ public class GLBuffer
 		for( int i = 0; i < size ; ++i )
 		{
 			final GLStorage storage = _storages.get( i ) ;
-			//System.out.println( name + " BindBase: " + i + " StorageID: " + glStorage.id[0] ) ;
 			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
 		}*/
 	}
@@ -540,15 +592,16 @@ public class GLBuffer
 
 	private static final class Texture implements IUniform
 	{
-		private final IUniform.Type type ;
-		public final GLImage image ;
+		public GLImage image ;
 
-		public final int minFilter ;
-		public final int magFilter ;
-		public final int uWrap ;
-		public final int vWrap ;
+		public int minFilter ;
+		public int magFilter ;
+		public int uWrap ;
+		public int vWrap ;
 
-		public Texture( final GLImage _image, final MalletTexture _texture )
+		public Texture() {}
+
+		public void set( final GLImage _image, final MalletTexture _texture )
 		{
 			image = _image ;
 			minFilter = GLImage.calculateMinFilter( _texture.getMinificationFilter() ) ;
@@ -556,11 +609,9 @@ public class GLBuffer
 
 			uWrap = GLImage.calculateWrap( _texture.getUWrap() ) ;
 			vWrap = GLImage.calculateWrap( _texture.getVWrap() ) ;
-
-			type = IUniform.Type.SAMPLER2D ;
 		}
 
-		public Texture( final GLImage _image, final MalletFont _font )
+		public void set( final GLImage _image, final MalletFont _font )
 		{
 			image = _image ;
 
@@ -568,15 +619,18 @@ public class GLBuffer
 			magFilter = MGL.GL_LINEAR ;
 
 			uWrap = MGL.GL_CLAMP_TO_EDGE ;
-			vWrap = MGL.GL_CLAMP_TO_EDGE ;
-
-			type = IUniform.Type.FONT ;
+			vWrap = MGL.GL_REPEAT ;
 		}
 
 		@Override
 		public IUniform.Type getType()
 		{
-			return type ;
+			return IUniform.Type.SAMPLER2D ;
+		}
+
+		public void reset()
+		{
+			image = null ;
 		}
 	}
 }

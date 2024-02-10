@@ -33,6 +33,12 @@ public final class Storage extends ABuffer
 		return 0 ;
 	}
 
+	@Override
+	public void requestUpdate()
+	{
+		StorageAssist.update( this ) ;
+	}
+
 	public interface ISerialise
 	{
 		public int writeInt( final int _offset, final int _val ) ;

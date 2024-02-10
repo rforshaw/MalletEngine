@@ -68,4 +68,10 @@ public class TextBuffer extends ABuffer
 	{
 		return BufferType.TEXT_BUFFER ;
 	}
+
+	@Override
+	public void requestUpdate()
+	{
+		DrawAssist.update( this ) ;
+	}
 }

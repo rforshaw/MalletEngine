@@ -8,6 +8,6 @@ public interface IGeneratePool<T>
 
 	public interface IGenerator<T>
 	{
-		public T generate( final String _materialPath, final JObject _obj ) ;
+		public T generate( final String _path, final JObject _obj ) ;
 	}
 }

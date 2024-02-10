@@ -10,13 +10,13 @@ public class DrawInstancedUpdaterPool
 
 	public DrawInstancedUpdaterPool() {}
 
-	public DrawInstancedUpdater getOrCreate( final World _world,
+	public DrawInstancedUpdater getOrCreate( final IManageBuffers _anchor,
 											 final Program _program,
 											 final IShape _shape,
 											 final boolean _ui,
 											 final int _order )
 	{
-		return getOrCreate( _world, _program, _shape, _ui, _order, false ) ;
+		return getOrCreate( _anchor, _program, _shape, _ui, _order, false ) ;
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class DrawInstancedUpdaterPool
 		If a DrawInstancedUpdater already exists with the same 
 		parameters it will return it instead.
 	*/
-	public DrawInstancedUpdater getOrCreate( final World _world,
+	public DrawInstancedUpdater getOrCreate( final IManageBuffers _anchor,
 											 final Program _program,
 											 final IShape _shape,
 											 final boolean _ui,
@@ -36,7 +36,7 @@ public class DrawInstancedUpdaterPool
 		final IShape.Attribute[] swivel = _shape.getAttribute() ;
 		final IShape.Style style = _shape.getStyle() ;
 	
-		DrawInstancedUpdater updater = get( _world, _program, swivel, style, _ui, _order, _static ) ;
+		DrawInstancedUpdater updater = get( _anchor, _program, swivel, style, _ui, _order, _static ) ;
 		if( updater == null )
 		{
 			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order, _static ) ) ;
@@ -44,11 +44,11 @@ public class DrawInstancedUpdaterPool
 
 			updater = DrawAssist.add( new DrawInstancedUpdater( buffer ) ) ;
 
-			_world.addBuffers( buffer ) ;
-			WorldAssist.update( _world ) ;
+			_anchor.addBuffers( buffer ) ;
+			_anchor.requestUpdate() ;
 
 			buffer.addBuffers( geom ) ;
-			DrawAssist.update( buffer ) ;
+			buffer.requestUpdate() ;
 
 			synchronized( pool )
 			{
@@ -69,14 +69,14 @@ public class DrawInstancedUpdaterPool
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public DrawInstancedUpdater get( final World _world,
+	public DrawInstancedUpdater get( final IManageBuffers _anchor,
 									 final Program _program,
 									 final IShape _shape,
 									 final boolean _ui,
 									 final int _order,
 									 final boolean _static )
 	{
-		return get( _world, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order, _static ) ;
+		return get( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order, _static ) ;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class DrawInstancedUpdaterPool
 		You should only create a new buffer if a buffer does 
 		not yet exist for the content you want to render.
 	*/
-	public DrawInstancedUpdater get( final World _world,
+	public DrawInstancedUpdater get( final IManageBuffers _anchor,
 									 final Program _program,
 									 final IShape.Attribute[] _swivel,
 									 final IShape.Style _style,
@@ -99,7 +99,7 @@ public class DrawInstancedUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _world.getBuffers() ;
+			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final WeakReference<DrawInstancedUpdater> weak : pool )
 			{

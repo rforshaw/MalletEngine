@@ -23,14 +23,13 @@ import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Operation ;
 import com.linxonline.mallet.renderer.Action ;
 
-import com.linxonline.mallet.util.caches.Cacheable ;
-import com.linxonline.mallet.util.caches.ObjectCache ;
+import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
-	private final static ObjectCache<Texture> TEXTURES = new ObjectCache<Texture>( Texture.class, 50 ) ;
+	private final static MemoryPool<Texture> TEXTURES = new MemoryPool<Texture>( () -> new Texture() ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
@@ -57,7 +56,7 @@ public class GLBuffer
 		return ui ;
 	}
 
-	public void draw( final Matrix4 _projection ) {}
+	public void draw( GLCamera _camera ) {}
 
 	public void shutdown() {}
 
@@ -105,7 +104,10 @@ public class GLBuffer
 			// than needed, use a cache.
 			if( uniform.getType() == IUniform.Type.SAMPLER2D )
 			{
-				TEXTURES.reclaim( ( Texture )uniform ) ;
+				final Texture texture = ( Texture )uniform ;
+				texture.reset() ;
+
+				TEXTURES.reclaim( texture ) ;
 			}
 		}
 
@@ -148,7 +150,7 @@ public class GLBuffer
 						return false ;
 					}
 
-					final Texture tex = TEXTURES.get() ;
+					final Texture tex = TEXTURES.take() ;
 					tex.set( glTexture, texture ) ;
 
 					_toFill.add( tex ) ;
@@ -160,7 +162,7 @@ public class GLBuffer
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage texture = glFont.getTexture() ;
 
-					final Texture tex = TEXTURES.get() ;
+					final Texture tex = TEXTURES.take() ;
 					tex.set( texture, font ) ;
 
 					_toFill.add( tex ) ;
@@ -441,7 +443,7 @@ public class GLBuffer
 			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
 		}
 	}
-	
+
 	protected float getABGR( final MalletColour _colour )
 	{
 		abgrTemp[0] = _colour.colours[MalletColour.ALPHA] ;
@@ -589,7 +591,7 @@ public class GLBuffer
 		}
 	}
 
-	private static final class Texture implements IUniform, Cacheable
+	private static final class Texture implements IUniform
 	{
 		public GLImage image ;
 
@@ -627,7 +629,6 @@ public class GLBuffer
 			return IUniform.Type.SAMPLER2D ;
 		}
 
-		@Override
 		public void reset()
 		{
 			image = null ;

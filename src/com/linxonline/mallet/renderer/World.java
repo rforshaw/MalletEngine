@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 
-public final class World
+public final class World implements IManageBuffers
 {
 	private final static Utility utility = new Utility() ;
 
@@ -88,6 +88,7 @@ public final class World
 		return cameras ;
 	}
 
+	@Override
 	public ABuffer[] addBuffers( final ABuffer ... _buffers )
 	{
 		for( final ABuffer buffer : _buffers )
@@ -113,6 +114,7 @@ public final class World
 		_list.add( _insert ) ;
 	}
 
+	@Override
 	public void removeBuffers( final ABuffer ... _buffers )
 	{
 		for( final ABuffer buffer : _buffers )
@@ -121,9 +123,16 @@ public final class World
 		}
 	}
 
+	@Override
 	public List<ABuffer> getBuffers()
 	{
 		return buffers ;
+	}
+
+	@Override
+	public void requestUpdate()
+	{
+		WorldAssist.update( this ) ;
 	}
 
 	public void setClearColour( final MalletColour _colour )
