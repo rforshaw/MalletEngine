@@ -28,7 +28,9 @@ public final class Camera
 
 	private final Vector3 up = new Vector3( 0.0f, 1.0f, 0.0f ) ;
 
+	private final Projection uiProjection = new Projection() ;
 	private final Projection projection = new Projection() ;
+
 	private final Screen displayScreen = new Screen() ;
 	private final Screen renderScreen = new Screen() ;
 
@@ -106,6 +108,12 @@ public final class Camera
 		final float posY = FloatBuffer.get( future, UI_POSITION + 1 ) ;
 
 		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + posY ;
+	}
+
+	public Projection getUIProjection( final Camera.Projection _fill )
+	{
+		_fill.update( uiProjection ) ;
+		return _fill ;
 	}
 
 	public Projection getProjection( final Camera.Projection _fill )
@@ -226,14 +234,26 @@ public final class Camera
 								 final float _near,
 								 final float _far )
 	{
-		projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
-		projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
+		updateOrtho( uiProjection, _top, _bottom, _left, _right, _near, _far ) ;
+		updateOrtho( projection, _top, _bottom, _left, _right, _near, _far ) ;
+	}
+
+	private static void updateOrtho( final Projection _projection,
+									 final float _top,
+									 final float _bottom,
+									 final float _left,
+									 final float _right,
+									 final float _near,
+									 final float _far )
+	{
+		_projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
+		_projection.farPlane.setXYZ( _projection.nearPlane.x, _projection.nearPlane.y, _far ) ;
 
 		final float invZ = 1.0f / ( _far - _near ) ;
 		final float invY = 1.0f / ( _top - _bottom ) ;
 		final float invX = 1.0f / ( _right - _left ) ;
 
-		final Matrix4 proj = projection.matrix ;
+		final Matrix4 proj = _projection.matrix ;
 		proj.set( 2.0f * invX, 0.0f,        0.0f,        ( -( _right + _left ) * invX ),
 				  0.0f,        2.0f * invY, 0.0f,        ( -( _top + _bottom ) * invY ),
 				  0.0f,        0.0f,       -2.0f * invZ, ( -( _far + _near ) * invZ ),

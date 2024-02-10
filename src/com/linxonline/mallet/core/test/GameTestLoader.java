@@ -135,12 +135,6 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
-				final Camera camera = CameraAssist.getDefault() ;
-				//camera.setPosition( 0, 0, -150 ) ;
-				//camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
-				//camera.lookAt( 0.0f, 100.0f, 0.0f ) ;
-				//CameraAssist.update( camera ) ;
-
 				createPlaneTest() ;
 
 				createUI() ;
@@ -599,6 +593,12 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void createMouseAnimExample()
 			{
+				final Camera camera = CameraAssist.getDefault() ;
+				camera.setPosition( 0, 0, -250 ) ;
+				camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
+				camera.lookAt( 0.0f, 0.0f, 0.0f ) ;
+				CameraAssist.update( camera ) ;
+
 				final World world = WorldAssist.getDefault() ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
@@ -621,6 +621,9 @@ public final class GameTestLoader implements IGameLoader
 					public void applyMousePosition( final Vector2 _mouse )
 					{
 						draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
+
+						camera.lookAt( mouse.x, -mouse.y, 0.0f ) ;
+						CameraAssist.update( camera ) ;
 					}
 
 					@Override
