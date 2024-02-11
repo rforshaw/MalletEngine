@@ -33,15 +33,15 @@ public final class GLCamera
 
 	public void update( final Camera _camera )
 	{
-		_camera.getUIPosition( uiPosition ) ;
+		_camera.getHUDPosition( uiPosition ) ;
 
 		_camera.getPosition( position ) ;
 		_camera.getRotation( rotation ) ;
 		_camera.getScale( scale ) ;
 
 		_camera.getRenderScreen( screen ) ;
-		_camera.getUIProjection( uiProjection ) ;
-		_camera.getProjection( projection ) ;
+		_camera.getProjection( Camera.Mode.HUD, uiProjection ) ;
+		_camera.getProjection( Camera.Mode.WORLD, projection ) ;
 	}
 
 	public void draw( final List<GLBuffer> _buffers )

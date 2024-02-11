@@ -55,7 +55,7 @@ public final class UIFactory
 						  ratio.toUnitY( dimension.y ),
 						  ratio.toUnitZ( dimension.z ) ) ;
 
-		_camera.setOrthographic( 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
+		_camera.setOrthographic( Camera.Mode.HUD, 0.0f, dimension.y, 0.0f, dimension.x, -1000.0f, 1000.0f ) ;
 		_camera.setScreenResolution( ( int )dimension.x, ( int )dimension.y ) ;
 
 		new WindowListener( layout, _camera, dimension ) ;
@@ -118,7 +118,7 @@ public final class UIFactory
 										ratio.toUnitY( _dimension.y ),
 										ratio.toUnitZ( _dimension.z ) ) ;
 
-					_camera.setOrthographic( 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
+					_camera.setOrthographic( Camera.Mode.HUD, 0.0f, _dimension.y, 0.0f, _dimension.x, -1000.0f, 1000.0f ) ;
 					_camera.setScreenResolution( ( int )_dimension.x, ( int )_dimension.y ) ;
 				}
 			} ) ;

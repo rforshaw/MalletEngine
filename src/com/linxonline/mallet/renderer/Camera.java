@@ -16,7 +16,7 @@ public final class Camera
 	private static final int POSITION    = 0 ;
 	private static final int ROTATION    = 3 ;
 	private static final int SCALE       = 6 ;
-	private static final int UI_POSITION = 9 ;
+	private static final int HUD_POSITION = 9 ;
 	
 	private final int index = utility.getGlobalIndex() ;
 	private final String id ;
@@ -28,8 +28,8 @@ public final class Camera
 
 	private final Vector3 up = new Vector3( 0.0f, 1.0f, 0.0f ) ;
 
-	private final Projection uiProjection = new Projection() ;
-	private final Projection projection = new Projection() ;
+	private final Projection hudProjection = new Projection() ;
+	private final Projection worldProjection = new Projection() ;
 
 	private final Screen displayScreen = new Screen() ;
 	private final Screen renderScreen = new Screen() ;
@@ -46,7 +46,7 @@ public final class Camera
 		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
 	}
 
-	public float convertInputToX( final float _x )
+	public float projectXToWorld( final float _x )
 	{
 		final Vector2 render = renderScreen.dimension ;
 		final Vector2 display = displayScreen.dimension ;
@@ -64,7 +64,7 @@ public final class Camera
 		return cam ;
 	}
 
-	public float convertInputToY( final float _y )
+	public float projectYToWorld( final float _y )
 	{
 		final Vector2 render = renderScreen.dimension ;
 		final Vector2 display = displayScreen.dimension ;
@@ -82,7 +82,7 @@ public final class Camera
 		return cam ;
 	}
 
-	public float convertInputToUIX( final float _x )
+	public float projectXToHUD( final float _x )
 	{
 		final Vector2 render = renderScreen.dimension ;
 		final Vector2 display = displayScreen.dimension ;
@@ -91,12 +91,12 @@ public final class Camera
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		final float posX = FloatBuffer.get( future, UI_POSITION + 0 ) ;
+		final float posX = FloatBuffer.get( future, HUD_POSITION + 0 ) ;
 
 		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + posX ;
 	}
 
-	public float convertInputToUIY( final float _y )
+	public float projectYToHUD( final float _y )
 	{
 		final Vector2 render = renderScreen.dimension ;
 		final Vector2 display = displayScreen.dimension ;
@@ -105,20 +105,38 @@ public final class Camera
 		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
 		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
 
-		final float posY = FloatBuffer.get( future, UI_POSITION + 1 ) ;
+		final float posY = FloatBuffer.get( future, HUD_POSITION + 1 ) ;
 
 		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + posY ;
 	}
 
-	public Projection getUIProjection( final Camera.Projection _fill )
+	public float projectXTo( final Camera.Mode _mode, final float _x )
 	{
-		_fill.update( uiProjection ) ;
-		return _fill ;
+		switch( _mode )
+		{
+			default    : return projectXToWorld( _x ) ;
+			case WORLD : return projectXToHUD( _x ) ;
+		}
 	}
 
-	public Projection getProjection( final Camera.Projection _fill )
+	public float projectYTo( final Camera.Mode _mode, final float _y )
 	{
-		_fill.update( projection ) ;
+		switch( _mode )
+		{
+			default    : return projectYToWorld( _y ) ;
+			case WORLD : return projectYToHUD( _y ) ;
+		}
+	}
+
+	public Projection getProjection( final Mode _mode, final Projection _fill )
+	{
+		switch( _mode )
+		{
+			default    :
+			case WORLD : _fill.update( worldProjection ) ; break ;
+			case HUD   : _fill.update( hudProjection ) ; break ;
+		}
+
 		return _fill ;
 	}
 
@@ -227,6 +245,26 @@ public final class Camera
 		setRotation( pitch, yaw, 0.0f ) ;
 	}
 
+	/**
+		Apply the orthographic to both the World,
+		and HUD projections.
+	*/
+	public void setOrthographic( final Mode _mode,
+								 final float _top,
+								 final float _bottom,
+								 final float _left,
+								 final float _right,
+								 final float _near,
+								 final float _far )
+	{
+		switch( _mode )
+		{
+			default    :
+			case WORLD : updateOrtho( worldProjection, _top, _bottom, _left, _right, _near, _far ) ; break ;
+			case HUD   : updateOrtho( hudProjection, _top, _bottom, _left, _right, _near, _far ) ; break ;
+		}
+	}
+
 	public void setOrthographic( final float _top,
 								 final float _bottom,
 								 final float _left,
@@ -234,8 +272,8 @@ public final class Camera
 								 final float _near,
 								 final float _far )
 	{
-		updateOrtho( uiProjection, _top, _bottom, _left, _right, _near, _far ) ;
-		updateOrtho( projection, _top, _bottom, _left, _right, _near, _far ) ;
+		updateOrtho( worldProjection, _top, _bottom, _left, _right, _near, _far ) ;
+		updateOrtho( hudProjection, _top, _bottom, _left, _right, _near, _far ) ;
 	}
 
 	private static void updateOrtho( final Projection _projection,
@@ -260,13 +298,13 @@ public final class Camera
 				  0.0f,        0.0f,        0.0f,        1.0f ) ;
 	}
 
-	public void setPerspective( final float _fov, final float _near, final float _far )
+	public void setPerspective( final Mode _mode, final float _fov, final float _near, final float _far )
 	{
 		final float aspectRatio = renderScreen.dimension.x / renderScreen.dimension.y ;
-		setPerspective( _fov, aspectRatio, _near, _far ) ;
+		setPerspective( _mode, _fov, aspectRatio, _near, _far ) ;
 	}
 
-	public void setPerspective( final float _fov, final float _aspectRatio, final float _near, final float _far )
+	public void setPerspective( final Mode _mode, final float _fov, final float _aspectRatio, final float _near, final float _far )
 	{
 		final float scale = ( float )Math.tan( _fov * 0.5f * PI / 180.0f ) * _near ; 
 		final float left = _aspectRatio * scale ;
@@ -275,18 +313,35 @@ public final class Camera
 		final float bottom = scale ;
 		final float top = -bottom ;
 
-		setPerspective( top, bottom, left, right, _near, _far ) ;
+		setPerspective( _mode, top, bottom, left, right, _near, _far ) ;
 	}
 
-	public void setPerspective( final float _top,
+	public void setPerspective( final Mode _mode,
+								final float _top,
 								final float _bottom,
 								final float _left,
 								final float _right,
 								final float _near,
 								final float _far )
 	{
-		projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
-		projection.farPlane.setXYZ( projection.nearPlane.x, projection.nearPlane.y, _far ) ;
+		switch( _mode )
+		{
+			default    :
+			case WORLD : setPerspective( worldProjection, _top, _bottom, _left, _right, _near, _far ) ; break ;
+			case HUD   : setPerspective( hudProjection, _top, _bottom, _left, _right, _near, _far ) ; break ;
+		}
+	}
+
+	private static void setPerspective( final Projection _projection,
+										final float _top,
+										final float _bottom,
+										final float _left,
+										final float _right,
+										final float _near,
+										final float _far )
+	{
+		_projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
+		_projection.farPlane.setXYZ( _projection.nearPlane.x, _projection.nearPlane.y, _far ) ;
 
 		final float invZ = 1.0f / ( _far - _near ) ;
 		final float invY = 1.0f / ( _top - _bottom ) ;
@@ -300,26 +355,31 @@ public final class Camera
 		final float m22 = -( ( _far + _near ) * invZ ) ;
 		final float m23 = -( ( 2.0f * _far * _near ) * invZ ) ;
 
-		final Matrix4 proj = projection.matrix ;
+		final Matrix4 proj = _projection.matrix ;
 		proj.set( m00,  0.0f,  m20, 0.0f,
 				  0.0f, m11,   m21, 0.0f,
 				  0.0f, 0.0f,  m22,  m23,
 				  0.0f, 0.0f, -1.0f, 0.0f ) ;
 	}
-
-	public void setProjection( final Projection _projection )
+	
+	public void setProjection( final Mode _mode, final Projection _projection )
 	{
-		projection.update( _projection ) ;
+		switch( _mode )
+		{
+			default    :
+			case WORLD : worldProjection.update( _projection ) ; break ;
+			case HUD   : hudProjection.update( _projection ) ; break ;
+		}
 	}
 
-	public void setUIPosition( final float _x, final float _y, final float _z )
+	public void setHUDPosition( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( future, UI_POSITION, _x, _y, _z ) ;
+		FloatBuffer.set( future, HUD_POSITION, _x, _y, _z ) ;
 	}
 
-	public Vector3 getUIPosition( final Vector3 _fill )
+	public Vector3 getHUDPosition( final Vector3 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, UI_POSITION ) ;
+		return FloatBuffer.fill( present, _fill, HUD_POSITION ) ;
 	}
 
 	public void setScreenResolution( final int _width, final int _height )
@@ -342,11 +402,21 @@ public final class Camera
 		displayScreen.setOffset( _x, _y ) ;
 	}
 
-	public Vector3 getDimensions( final Vector3 _fill )
+	public Vector3 getDimensions( final Mode _mode, final Vector3 _fill )
 	{
-		_fill.x = projection.nearPlane.x ;
-		_fill.y = projection.nearPlane.y ;
-		_fill.z = projection.nearPlane.z ;
+		switch( _mode )
+		{
+			default    :
+			case WORLD : return getDimensions( worldProjection, _fill ) ;
+			case HUD   : return getDimensions( hudProjection, _fill ) ;
+		}
+	}
+
+	private static Vector3 getDimensions( final Projection _projection, final Vector3 _fill )
+	{
+		_fill.x = _projection.nearPlane.x ;
+		_fill.y = _projection.nearPlane.y ;
+		_fill.z = _projection.nearPlane.z ;
 		return _fill ;
 	}
 
@@ -387,6 +457,12 @@ public final class Camera
 	public int index()
 	{
 		return index ;
+	}
+
+	public enum Mode
+	{
+		WORLD,
+		HUD
 	}
 
 	public enum Ratio

@@ -341,8 +341,8 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 	protected boolean isIntersectInput( final InputEvent _event, final Camera _camera )
 	{
-		return intersectPoint( _camera.convertInputToUIX( _event.mouseX ),
-							   _camera.convertInputToUIY( _event.mouseY ) ) ;
+		return intersectPoint( _camera.projectXToHUD( _event.mouseX ),
+							   _camera.projectYToHUD( _event.mouseY ) ) ;
 	}
 
 	/**

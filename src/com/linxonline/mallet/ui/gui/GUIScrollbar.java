@@ -34,7 +34,7 @@ public class GUIScrollbar extends GUIComponent
 	{
 		final UIList parent = getParentList() ;
 
-		parent.getInternalCamera().getUIPosition( offset ) ;
+		parent.getInternalCamera().getHUDPosition( offset ) ;
 		updateLengths( parent.getScrollbarLength(), parent.getScrollWidth() ) ;
 
 		{
@@ -140,7 +140,7 @@ public class GUIScrollbar extends GUIComponent
 		final Vector3 length = parent.getLength() ;
 		final Vector3 absLength = parent.getAbsoluteLength() ;
 
-		parent.getInternalCamera().getUIPosition( _position ) ;
+		parent.getInternalCamera().getHUDPosition( _position ) ;
 		_position.setXYZ( ( absLength.x > 0.0f ) ? ( _position.x * length.x ) / absLength.x : 0.0f,
 							( absLength.y > 0.0f ) ? ( _position.y * length.y ) / absLength.y : 0.0f,
 							( absLength.z > 0.0f ) ? ( _position.z * length.z ) / absLength.z : 0.0f ) ;

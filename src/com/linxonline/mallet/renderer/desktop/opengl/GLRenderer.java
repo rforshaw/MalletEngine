@@ -613,7 +613,8 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			// as the window, the camera projection does not have to align 
 			// with this requirement unless this flag is set to true.
 			final Camera camera = getDefaultCamera() ;
-			camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+			camera.setOrthographic( Camera.Mode.HUD, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+			//camera.setOrthographic( Camera.Mode.WORLD, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
 			CameraAssist.update( camera ) ;
 		}
 	}

@@ -70,7 +70,7 @@ public class GL2DRenderer implements IRender,
 
 		final Camera camera = CameraAssist.getDefault() ;
 		camera.setScreenResolution( _width, _height ) ;
-		camera.setOrthographic( 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+		camera.setOrthographic( Camera.Mode.HUD, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
 		CameraAssist.update( camera ) ;
 	}
 

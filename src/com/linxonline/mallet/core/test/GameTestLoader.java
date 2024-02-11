@@ -595,7 +595,7 @@ public final class GameTestLoader implements IGameLoader
 			{
 				final Camera camera = CameraAssist.getDefault() ;
 				camera.setPosition( 0, 0, -250 ) ;
-				camera.setPerspective( 130.0f, 0.1f, 10000.0f ) ;
+				camera.setPerspective( Camera.Mode.WORLD, 130.0f, 0.1f, 10000.0f ) ;
 				camera.lookAt( 0.0f, 0.0f, 0.0f ) ;
 				CameraAssist.update( camera ) ;
 
