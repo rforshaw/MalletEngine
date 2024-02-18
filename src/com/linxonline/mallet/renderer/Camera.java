@@ -17,7 +17,7 @@ public final class Camera
 	private static final int ROTATION    = 3 ;
 	private static final int SCALE       = 6 ;
 	private static final int HUD_POSITION = 9 ;
-	
+
 	private final int index = utility.getGlobalIndex() ;
 	private final String id ;
 
@@ -27,6 +27,9 @@ public final class Camera
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
 	private final Vector3 up = new Vector3( 0.0f, 1.0f, 0.0f ) ;
+
+	private final Vector3 eye = new Vector3() ;
+	private final Vector3 direction = new Vector3() ;
 
 	private final Projection hudProjection = new Projection() ;
 	private final Projection worldProjection = new Projection() ;
@@ -227,22 +230,23 @@ public final class Camera
 
 	public void lookAt( final float _x, final float _y, final float _z )
 	{
-		final Vector3 position = getFuturePosition( new Vector3() ) ;
-		final Vector3 target = new Vector3( _x, _y, _z ) ;
+		direction.setXYZ( _x, _y, _z ) ;
+		direction.subtract( getFuturePosition( eye ) ) ;
+		direction.normalise() ;
 
-		final Vector3 dir = Vector3.subtract( target, position ) ;
-		dir.normalise() ;
+		final float yaw = ( float )Math.atan2( direction.x, -direction.z ) ;
+		final float pitch = ( float )Math.asin( direction.y ) ;
 
-		final float yaw = ( float )Math.atan2( dir.x, -dir.z ) ;
-		final float pitch = ( float )Math.atan2( dir.y, dir.length() ) ;
+		final float leftX = ( float )Math.sin( yaw ) ;
+		final float leftZ = ( float )Math.cos( yaw ) ;
 
-		//final Vector3 plane = new Vector3( ( float )Math.sin( yaw ), -( float )Math.cos( yaw ), 0.0f ) ;
+		float roll = ( float )Math.asin( up.x * leftX + up.z * leftZ ) ;
+		if( up.y < 0.0f )
+		{
+			roll = ( Math.signum( roll ) ) * PI - roll ;
+		}
 
-		// Roll is the rightward lean of our up vector, computed here using a dot product.
-		//final float roll = ( float )Math.asin( Vector3.dot( plane, up ) ) ;
-		//System.out.println( "Roll: " + roll ) ;
-
-		setRotation( pitch, yaw, 0.0f ) ;
+		setRotation( pitch, yaw, roll ) ;
 	}
 
 	/**

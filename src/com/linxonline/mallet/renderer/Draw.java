@@ -26,7 +26,7 @@ public final class Draw implements IUpdate
 	private final float[] old = FloatBuffer.allocate( 12 ) ;
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
-	private final IShape[] shapes ;
+	private IShape[] shapes ;
 	private IMeta meta = EMPTY_META ;
 	private boolean hidden = false ;
 
@@ -52,7 +52,7 @@ public final class Draw implements IUpdate
 				 final float _offX, final float _offY, final float _offZ,
 				 final float _rotX, final float _rotY, final float _rotZ )
 	{
-		this( new IShape[1],
+		this( null,
 			  _posX, _posY, _posZ,
 			  _offX, _offY, _offZ,
 			  _rotX, _rotY, _rotZ ) ;
@@ -174,6 +174,11 @@ public final class Draw implements IUpdate
 	*/
 	public IShape setShape( final IShape _shape )
 	{
+		if( shapes == null )
+		{
+			shapes = new IShape[1] ;
+		}
+
 		shapes[0] = _shape ;
 		return _shape ;
 	}

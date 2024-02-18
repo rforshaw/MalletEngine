@@ -382,25 +382,60 @@ public class GUIEditText extends GUIText
 
 	private void incrementChar( final char _char )
 	{
-		if( onlyNumbers == true )
-		{
-			if( _char != '.' && Character.isDigit( _char ) == false )
-			{
-				return ;
-			}
-		}
-
 		final UITextField parent = getParent() ;
 		final int index = parent.getCursorIndex() ;
 		final StringBuilder edit = getText() ;
 		edit.insert( index, _char ) ;
+
+		if( onlyNumbers )
+		{
+			if( isNumber( edit ) == false )
+			{
+				edit.deleteCharAt( index ) ;
+				return ;
+			}
+		}
 
 		parent.setCursorIndex( index + 1 ) ;
 		parent.makeDirty() ;
 
 		UIElement.signal( parent, parent.textChanged() ) ;
 	}
-	
+
+	private static boolean isNumber( final StringBuilder _builder )
+	{
+		final int length = _builder.length() ;
+		if( length <= 0 )
+		{
+			return false ;
+		}
+
+		final char first = _builder.charAt( 0 ) ;
+		if( first != '-' && Character.isDigit( first ) == false )
+		{
+			return false ;
+		}
+
+		int decimal = 0 ;
+		for( int i = 1; i < length; ++i )
+		{
+			final char c = _builder.charAt( i ) ;
+			decimal += ( c == '.' ) ? 1 : 0 ;
+
+			if( decimal > 1 )
+			{
+				return false ;
+			}
+			
+			if( c != '.' && Character.isDigit( c ) == false )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
 	@Override
 	public InputEvent.Action touchReleased( final InputEvent _input )
 	{
