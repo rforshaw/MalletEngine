@@ -13,12 +13,9 @@ import com.linxonline.mallet.renderer.IShape ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
-import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.IOcclude ;
 
-import com.linxonline.mallet.maths.Matrix4 ;
-import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.IntVector2 ;
 
