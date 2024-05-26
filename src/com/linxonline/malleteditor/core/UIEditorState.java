@@ -24,7 +24,6 @@ import com.linxonline.mallet.entity.components.MouseComponent ;
 import com.linxonline.mallet.entity.components.UIComponent ;
 
 import com.linxonline.mallet.util.* ;
-import com.linxonline.mallet.util.settings.Settings ;
 
 public class UIEditorState extends GameState
 {

@@ -1,7 +1,6 @@
 package com.linxonline.mallet.io.filesystem.web ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Logger ;
 
 public class WebFileSystem implements FileSystem
 {

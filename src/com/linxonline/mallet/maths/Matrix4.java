@@ -11,36 +11,11 @@ public final class Matrix4 extends FloatUniform
 {
 	private static final float[] IDENTITY = new float[]
 	{
-		1.0f,
-		0.0f,
-		0.0f,
-		0.0f,
-
-		0.0f,
-		1.0f,
-		0.0f,
-		0.0f,
-
-		0.0f,
-		0.0f,
-		1.0f,
-		0.0f,
-
-		0.0f,
-		0.0f,
-		0.0f,
-		1.0f
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
 	} ;
-
-	/**
-		Matrix4 functions are guaranteed to be called hundreds if 
-		not thousands of times a second in a typical game-loop.
-		To reduce the amount of temporary objects that would appear 
-		via translate, scale, and rotate calls, temp is used instead.
-		Each Matrix4 will consume double its normal space.
-		If only we could store the float-array on the stack!
-	*/
-	private final Matrix4 temp ;
 
 	/**
 		* Ordered by row, if directly using write it down.
@@ -54,24 +29,12 @@ public final class Matrix4 extends FloatUniform
 
 	public Matrix4()
 	{
-		// Create a matrix that contains a temp Matrix
-		this( true ) ;
-	}
-
-	private Matrix4( final boolean _temp )
-	{
-		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 0 ) ;
-		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 1 ) ;
-		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 2 ) ;
-		setRow( 0.0f, 0.0f, 0.0f, 0.0f, 3 ) ;
-
-		temp = ( _temp == true ) ? Matrix4.createTempIdentity() : null ;
+		setIdentity() ;
 	}
 
 	public Matrix4( final Matrix4 _matrix )
 	{
 		Matrix4.copy( _matrix.matrix, matrix ) ;
-		temp = Matrix4.createTempIdentity() ;
 	}
 
 	public Matrix4( final float _a00, final float _a01, final float _a02, final float _a03,
@@ -83,7 +46,6 @@ public final class Matrix4 extends FloatUniform
 		setRow( _a10, _a11, _a12, _a13, 1 ) ;
 		setRow( _a20, _a21, _a22, _a23, 2 ) ;
 		setRow( _a30, _a31, _a32, _a33, 3 ) ;
-		temp = Matrix4.createTempIdentity() ;
 	}
 
 	public void set( final float _a00, final float _a01, final float _a02, final float _a03,
@@ -91,10 +53,25 @@ public final class Matrix4 extends FloatUniform
 					 final float _a20, final float _a21, final float _a22, final float _a23,
 					 final float _a30, final float _a31, final float _a32, final float _a33 )
 	{
-		setRow( _a00, _a01, _a02, _a03, 0 ) ;
-		setRow( _a10, _a11, _a12, _a13, 1 ) ;
-		setRow( _a20, _a21, _a22, _a23, 2 ) ;
-		setRow( _a30, _a31, _a32, _a33, 3 ) ;
+		matrix[0] = _a00 ;
+		matrix[4] = _a01 ;
+		matrix[8] = _a02 ;
+		matrix[12] = _a03 ;
+
+		matrix[1] = _a10 ;
+		matrix[5] = _a11 ;
+		matrix[9] = _a12 ;
+		matrix[13] = _a13 ;
+
+		matrix[2] = _a20 ;
+		matrix[6] = _a21 ;
+		matrix[10] = _a22 ;
+		matrix[14] = _a23 ;
+
+		matrix[3] = _a30 ;
+		matrix[7] = _a31 ;
+		matrix[11] = _a32 ;
+		matrix[15] = _a33 ;
 	}
 
 	public void set( final Matrix4 _from )
@@ -109,21 +86,21 @@ public final class Matrix4 extends FloatUniform
 
 	public void translate( final float _x, final float _y, final float _z )
 	{
-		temp.setTranslate( _x, _y, _z ) ;
-		multiply( temp ) ;
-		temp.setIdentity() ;
+		matrix[12] += _x ;
+		matrix[13] += _y ;
+		matrix[14] += _z ;
 	}
 
-	public void setTranslate( final Vector3 _vec )
+	public void setPosition( final Vector3 _vec )
 	{
-		setTranslate( _vec.x, _vec.y, _vec.z ) ;
+		setPosition( _vec.x, _vec.y, _vec.z ) ;
 	}
 
-	public void setTranslate( final float _x, final float _y, final float _z )
+	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		matrix[3] = _x ;
-		matrix[7] = _y ;
-		matrix[11] = _z ;
+		matrix[12] = _x ;
+		matrix[13] = _y ;
+		matrix[14] = _z ;
 
 		//set( _x, 0, 3 ) ;	//	[1 | 0 | 0 | _x]
 		//set( _y, 1, 3 ) ;	//	[0 | 1 | 0 | _y]
@@ -131,28 +108,25 @@ public final class Matrix4 extends FloatUniform
 							//	[0 | 0 | 0 |  1]
 	}
 
-	public void setX( final float _x )
-	{
-		matrix[3] = _x ;
-	}
-
-	public void setY( final float _y )
-	{
-		matrix[7] = _y ;
-	}
-
-	public void setZ( final float _z )
-	{
-		matrix[11] = _z ;
-	}
-
 	public void scale( final float _x, final float _y, final float _z )
 	{
-		temp.setScale( _x, _y, _z ) ;
-		multiply( temp ) ;
-		temp.setIdentity() ;
+		matrix[0] *= _x ;
+		matrix[4] *= _y ;
+		matrix[8] *= _z ;
+
+		matrix[1] *= _x ;
+		matrix[5] *= _y ;
+		matrix[9] *= _z ;
+		
+		matrix[2] *= _x ;
+		matrix[6] *= _y ;
+		matrix[10] *= _z ;
+
+		matrix[3] *= _x ;
+		matrix[7] *= _y ;
+		matrix[11] *= _z ;
 	}
-	
+
 	public void setScale( final float _scale )
 	{
 		setScale( _scale, _scale, _scale ) ;
@@ -174,25 +148,32 @@ public final class Matrix4 extends FloatUniform
 		//set( _z, 2, 2 ) ;	//	[ 0 |  0 | _z | 0]
 							//	[ 0 |  0 |  0 | 1]
 	}
-	
-	public void rotate( final float _theta )
+
+	public void setRotate( final float _x, final float _y, final float _z )
 	{
-		rotate( _theta, 1.0f, 1.0f, 1.0f ) ;
-	}
+		final float a = ( float )Math.cos( _x ) ;
+		final float b = ( float )Math.sin( _x ) ;
+		final float c = ( float )Math.cos( _y ) ;
+		final float d = ( float )Math.sin( _y ) ;
+		final float e = ( float )Math.cos( _z ) ;
+		final float f = ( float )Math.sin( _z ) ;
 
-	public void rotate( final float _theta, final float _x, final float _y, final float _z )
-	{
-		temp.setRotateX( _theta * _x ) ;
-		multiply( temp ) ;
-		temp.setIdentity() ;
+		final float ae = a * e ;
+		final float af = a * f ;
+		final float be = b * e ;
+		final float bf = b * f ;
 
-		temp.setRotateY( _theta * _y ) ;
-		multiply( temp ) ;
-		temp.setIdentity() ;
+		matrix[0] = c * e ;
+		matrix[4] = - c * f ;
+		matrix[8] = d ;
 
-		temp.setRotateZ( _theta * _z ) ;
-		multiply( temp ) ;
-		temp.setIdentity() ;
+		matrix[1] = af + be * d ;
+		matrix[5] = ae - bf * d ;
+		matrix[9] = - b * c ;
+
+		matrix[2] = bf - ae * d ;
+		matrix[6] = be + af * d ;
+		matrix[10] = a * c ;
 	}
 
 	public void setRotateX( final float _theta )
@@ -201,9 +182,9 @@ public final class Matrix4 extends FloatUniform
 		final float sin = ( float )Math.sin( _theta ) ;
 
 		matrix[5] = cos ;
-		matrix[6] = -sin ;
+		matrix[9] = -sin ;
 
-		matrix[9] = sin ;
+		matrix[6] = sin ;
 		matrix[10] = cos ;
 
 		//	[cos | -sin |  0]
@@ -217,9 +198,9 @@ public final class Matrix4 extends FloatUniform
 		final float sin = ( float )Math.sin( _theta ) ;
 
 		matrix[0] = cos ;
-		matrix[2] = sin ;
+		matrix[8] = sin ;
 
-		matrix[8] = -sin ;
+		matrix[2] = -sin ;
 		matrix[10] = cos ;
 
 		//	[cos | -sin |  0]
@@ -233,9 +214,9 @@ public final class Matrix4 extends FloatUniform
 		final float sin = ( float )Math.sin( _theta ) ;
 
 		matrix[0] = cos ;
-		matrix[1] = -sin ;
+		matrix[4] = -sin ;
 
-		matrix[4] = sin ;
+		matrix[1] = sin ;
 		matrix[5] = cos ;
 
 		//	[cos | -sin |  0]
@@ -243,114 +224,185 @@ public final class Matrix4 extends FloatUniform
 		//	[ 0  |   0  |  1]
 	}
 
+	public void applyTransformations( final Vector3 _position, final Vector3 _rotation, final Vector3 _scale )
+	{
+		final float c1 = ( float )Math.cos( _rotation.x / 2 ) ;
+		final float c2 = ( float )Math.cos( _rotation.y / 2 ) ;
+		final float c3 = ( float )Math.cos( _rotation.z / 2 ) ;
+
+		final float s1 = ( float )Math.sin( _rotation.x / 2 ) ;
+		final float s2 = ( float )Math.sin( _rotation.y / 2 ) ;
+		final float s3 = ( float )Math.sin( _rotation.z / 2 ) ;
+
+		final float x = s1 * c2 * c3 + c1 * s2 * s3 ;
+		final float y = c1 * s2 * c3 - s1 * c2 * s3 ;
+		final float z = c1 * c2 * s3 + s1 * s2 * c3 ;
+		final float w = c1 * c2 * c3 - s1 * s2 * s3 ;
+
+		final float x2 = x + x ;
+		final float y2 = y + y ;
+		final float z2 = z + z ;
+
+		final float xx = x * x2 ;
+		final float xy = x * y2 ;
+		final float xz = x * z2 ;
+
+		final float yy = y * y2 ;
+		final float yz = y * z2 ;
+		final float zz = z * z2 ;
+
+		final float wx = w * x2 ;
+		final float wy = w * y2 ;
+		final float wz = w * z2 ;
+
+		final float sx = _scale.x ;
+		final float sy = _scale.y ;
+		final float sz = _scale.z ;
+
+		matrix[0] = ( 1.0f - ( yy + zz ) ) * sx ;
+		matrix[1] = ( xy + wz ) * sx ;
+		matrix[2] = ( xz - wy ) * sx ;
+		matrix[3] = 0.0f ;
+
+		matrix[4] = ( xy - wz ) * sy ;
+		matrix[5] = ( 1.0f - ( xx + zz ) ) * sy ;
+		matrix[6] = ( yz + wx ) * sy ;
+		matrix[7] = 0.0f ;
+
+		matrix[8] = ( xz + wy ) * sz ;
+		matrix[9] = ( yz - wx ) * sz ;
+		matrix[10] = ( 1 - ( xx + yy ) ) * sz ;
+		matrix[11] = 0.0f ;
+
+		matrix[12] = _position.x ;
+		matrix[13] = _position.y ;
+		matrix[14] = _position.z ;
+		matrix[15] = 1.0f ;
+	}
+
 	public void multiply( final Matrix4 _mat )
 	{
 		final float[] m = this.matrix ;				// Makes it easier to read
 		final float[] x = _mat.matrix ;
-		
-		{
-			final float a00 = m[0] * x[0] + m[1] * x[4] + m[2] * x[ 8] + m[3] * x[12] ;
-			final float a01 = m[0] * x[1] + m[1] * x[5] + m[2] * x[ 9] + m[3] * x[13] ;
-			final float a02 = m[0] * x[2] + m[1] * x[6] + m[2] * x[10] + m[3] * x[14] ;
-			final float a03 = m[0] * x[3] + m[1] * x[7] + m[2] * x[11] + m[3] * x[15] ;
 
-			m[0] = a00 ;
-			m[1] = a01 ;
-			m[2] = a02 ;
-			m[3] = a03 ;
-		}
+		final float a11 = m[0] ;
+		final float a12 = m[4] ;
+		final float a13 = m[8] ;
+		final float a14 = m[12] ;
 
-		{
-			final float a10 = m[4] * x[0] + m[5] * x[4] + m[6] * x[ 8] + m[7] * x[12] ;
-			final float a11 = m[4] * x[1] + m[5] * x[5] + m[6] * x[ 9] + m[7] * x[13] ;
-			final float a12 = m[4] * x[2] + m[5] * x[6] + m[6] * x[10] + m[7] * x[14] ;
-			final float a13 = m[4] * x[3] + m[5] * x[7] + m[6] * x[11] + m[7] * x[15] ;
+		final float a21 = m[1] ;
+		final float a22 = m[5] ;
+		final float a23 = m[9] ;
+		final float a24 = m[13] ;
 
-			m[4] = a10 ;
-			m[5] = a11 ;
-			m[6] = a12 ;
-			m[7] = a13 ;
-		}
+		final float a31 = m[2] ;
+		final float a32 = m[6] ;
+		final float a33 = m[10] ;
+		final float a34 = m[14] ;
 
-		{
-			final float a20 = m[8] * x[0] + m[9] * x[4] + m[10] * x[ 8] + m[11] * x[12] ;
-			final float a21 = m[8] * x[1] + m[9] * x[5] + m[10] * x[ 9] + m[11] * x[13] ;
-			final float a22 = m[8] * x[2] + m[9] * x[6] + m[10] * x[10] + m[11] * x[14] ;
-			final float a23 = m[8] * x[3] + m[9] * x[7] + m[10] * x[11] + m[11] * x[15] ;
+		final float a41 = m[3] ;
+		final float a42 = m[7] ;
+		final float a43 = m[11] ;
+		final float a44 = m[15] ;
 
-			m[8]  = a20 ;
-			m[9]  = a21 ;
-			m[10] = a22 ;
-			m[11] = a23 ;
-		}
+		final float b11 = x[0] ;
+		final float b12 = x[4] ;
+		final float b13 = x[8] ;
+		final float b14 = x[12] ;
 
-		{
-			final float a30 = m[12] * x[0] + m[13] * x[4] + m[14] * x[ 8] + m[15] * x[12] ;
-			final float a31 = m[12] * x[1] + m[13] * x[5] + m[14] * x[ 9] + m[15] * x[13] ;
-			final float a32 = m[12] * x[2] + m[13] * x[6] + m[14] * x[10] + m[15] * x[14] ;
-			final float a33 = m[12] * x[3] + m[13] * x[7] + m[14] * x[11] + m[15] * x[15] ;
+		final float b21 = x[1] ;
+		final float b22 = x[5] ;
+		final float b23 = x[9] ;
+		final float b24 = x[13] ;
 
-			m[12] = a30 ;
-			m[13] = a31 ;
-			m[14] = a32 ;
-			m[15] = a33 ;
-		}
+		final float b31 = x[2] ;
+		final float b32 = x[6] ;
+		final float b33 = x[10] ;
+		final float b34 = x[14] ;
+
+		final float b41 = x[3] ;
+		final float b42 = x[7] ;
+		final float b43 = x[11] ;
+		final float b44 = x[15] ;
+
+		m[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41 ;
+		m[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42 ;
+		m[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43 ;
+		m[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44 ;
+
+		m[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41 ;
+		m[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42 ;
+		m[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43 ;
+		m[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44 ;
+
+		m[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41 ;
+		m[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42 ;
+		m[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43 ;
+		m[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44 ;
+
+		m[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41 ;
+		m[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42 ;
+		m[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43 ;
+		m[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44 ;
 	}
 
 	public void invert()
 	{
-		final float[] t = temp.matrix ;		// Results stored
-		final float[] m = matrix ;			// Make it easier to read
+		final float[] m = this.matrix ;
 
-		Matrix4.invertStage1( t, m ) ;
-		Matrix4.invertStage2( t, m ) ;
-		Matrix4.invertStage3( t, m ) ;
-		Matrix4.invertStage4( t, m ) ;
-		Matrix4.invertStage5( t, m ) ;
+		final float n11 = m[0] ;
+		final float n21 = m[1] ;
+		final float n31 = m[2] ;
+		final float n41 = m[3] ;
 
-		Matrix4.copy( t, m ) ;
-		temp.setIdentity() ;
-	}
+		final float n12 = m[4] ;
+		final float n22 = m[5] ;
+		final float n32 = m[6] ;
+		final float n42 = m[7] ;
 
-	private static void invertStage1( final float[] _t, final float[] _m )
-	{
-		_t[0] =          FloatBuffer.multiply( _m, 5, 10, 15 ) - FloatBuffer.multiply( _m, 5, 11, 14 ) - FloatBuffer.multiply( _m, 9, 6, 15 ) + FloatBuffer.multiply( _m, 9, 7, 14 ) + FloatBuffer.multiply( _m, 13, 6, 11 ) - FloatBuffer.multiply( _m, 13, 7, 10 ) ;
-		_t[1] = -_m[1] * FloatBuffer.multiply( _m, 10, 15 )    + FloatBuffer.multiply( _m, 1, 11, 14 ) + FloatBuffer.multiply( _m, 9, 2, 15 ) - FloatBuffer.multiply( _m, 9, 3, 14 ) - FloatBuffer.multiply( _m, 13, 2, 11 ) + FloatBuffer.multiply( _m, 13, 3, 10 ) ;
-		_t[2] =          FloatBuffer.multiply( _m, 1, 6, 15 )  - FloatBuffer.multiply( _m, 1,  7, 14 ) - FloatBuffer.multiply( _m, 5, 2, 15 ) + FloatBuffer.multiply( _m, 5, 3, 14 ) + FloatBuffer.multiply( _m, 13, 2,  7 ) - FloatBuffer.multiply( _m, 13, 3,  6 ) ;
-		_t[3] = -_m[1] * FloatBuffer.multiply( _m, 6, 11 )     + FloatBuffer.multiply( _m, 1,  7, 10 ) + FloatBuffer.multiply( _m, 5, 2, 11 ) - FloatBuffer.multiply( _m, 5, 3, 10 ) - FloatBuffer.multiply( _m,  9, 2,  7 ) + FloatBuffer.multiply( _m,  9, 3,  6 ) ;
-	}
+		final float n13 = m[8] ;
+		final float n23 = m[9] ;
+		final float n33 = m[10] ;
+		final float n43 = m[11] ;
 
-	private static void invertStage2( final float[] _t, final float[] _m )
-	{
-		_t[4] = -_m[4] * FloatBuffer.multiply( _m, 10, 15 ) + FloatBuffer.multiply( _m, 4, 11, 14 ) + FloatBuffer.multiply( _m, 8, 6, 15 ) - FloatBuffer.multiply( _m, 8, 7, 14 ) - FloatBuffer.multiply( _m, 12, 6, 11 ) + FloatBuffer.multiply( _m, 12, 7, 10 ) ;
-		_t[5] =  FloatBuffer.multiply( _m, 0, 10, 15 )      - FloatBuffer.multiply( _m, 0, 11, 14 ) - FloatBuffer.multiply( _m, 8, 2, 15 ) + FloatBuffer.multiply( _m, 8, 3, 14 ) + FloatBuffer.multiply( _m, 12, 2, 11 ) - FloatBuffer.multiply( _m, 12, 3, 10 ) ;
-		_t[6] = -_m[0] * FloatBuffer.multiply( _m, 6, 15 )  + FloatBuffer.multiply( _m, 0,  7, 14 ) + FloatBuffer.multiply( _m, 4, 2, 15 ) - FloatBuffer.multiply( _m, 4, 3, 14 ) - FloatBuffer.multiply( _m, 12, 2, 10 ) + FloatBuffer.multiply( _m, 12, 3,  6 ) ;
-		_t[7] = FloatBuffer.multiply( _m, 0, 6, 11 )        - FloatBuffer.multiply( _m, 0, 10, 10 ) - FloatBuffer.multiply( _m, 4, 2, 11 ) + FloatBuffer.multiply( _m, 4, 3, 10 ) + FloatBuffer.multiply( _m,  8, 2, 10 ) - FloatBuffer.multiply( _m,  8, 3,  6 ) ;
-	}
+		final float n14 = m[12] ;
+		final float n24 = m[13] ;
+		final float n34 = m[14] ;
+		final float n44 = m[15] ;
 
-	private static void invertStage3( final float[] _t, final float[] _m )
-	{
-		_t[8]  =          FloatBuffer.multiply( _m, 4, 9, 15 ) - FloatBuffer.multiply( _m, 4, 11, 13 ) - FloatBuffer.multiply( _m, 8, 5, 15 ) + FloatBuffer.multiply( _m, 8, 10, 13 ) + FloatBuffer.multiply( _m, 12, 5, 11 ) - FloatBuffer.multiply( _m, 12, 10, 9 ) ;
-		_t[9]  = -_m[0] * FloatBuffer.multiply( _m, 9, 15 )    + FloatBuffer.multiply( _m, 0, 11, 13 ) + FloatBuffer.multiply( _m, 8, 1, 15 ) - FloatBuffer.multiply( _m, 8,  3, 13 ) - FloatBuffer.multiply( _m, 12, 1, 11 ) + FloatBuffer.multiply( _m, 12,  3, 9 ) ;
-		_t[10] =          FloatBuffer.multiply( _m, 0, 5, 15 ) - FloatBuffer.multiply( _m, 0, 10, 13 ) - FloatBuffer.multiply( _m, 4, 1, 15 ) + FloatBuffer.multiply( _m, 4,  3, 13 ) + FloatBuffer.multiply( _m, 12, 1, 10 ) - FloatBuffer.multiply( _m, 12,  3, 5 ) ;
-		_t[11] = -_m[0] * FloatBuffer.multiply( _m, 5, 11 )    + FloatBuffer.multiply( _m, 0, 10,  9 ) + FloatBuffer.multiply( _m, 4, 1, 11 ) - FloatBuffer.multiply( _m, 4,  3,  9 ) - FloatBuffer.multiply(  _m, 8, 1, 10 ) + FloatBuffer.multiply(  _m, 8,  3, 5 ) ;
-	}
+		final float t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44 ;
+		final float t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44 ;
+		final float t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44 ;
+		final float t14 = n14 * n23 * n32 - n13 * n24 * n32 - n14 * n22 * n33 + n12 * n24 * n33 + n13 * n22 * n34 - n12 * n23 * n34 ;
 
-	private static void invertStage4( final float[] _t, final float[] _m )
-	{
-		_t[12] = -_m[4] * FloatBuffer.multiply( _m, 9, 14 )    + FloatBuffer.multiply( _m, 4, 10, 13 ) + FloatBuffer.multiply( _m, 8, 5, 14 ) - FloatBuffer.multiply( _m, 8, 6, 13 ) - FloatBuffer.multiply( _m, 12, 5, 10 ) + FloatBuffer.multiply( _m, 12, 6, 9 ) ;
-		_t[13] =          FloatBuffer.multiply( _m, 0, 9, 14 ) - FloatBuffer.multiply( _m, 0, 10, 13 ) - FloatBuffer.multiply( _m, 8, 1, 14 ) + FloatBuffer.multiply( _m, 8, 2, 13 ) + FloatBuffer.multiply( _m, 12, 1, 10 ) - FloatBuffer.multiply( _m, 12, 2, 9 ) ;
-		_t[14] = -_m[0] * FloatBuffer.multiply( _m, 5, 14 )    + FloatBuffer.multiply( _m, 0,  6, 13 ) + FloatBuffer.multiply( _m, 4, 1, 14 ) - FloatBuffer.multiply( _m, 4, 2, 13 ) - FloatBuffer.multiply( _m, 12, 1,  6 ) + FloatBuffer.multiply( _m, 12, 2, 5 ) ;
-		_t[15] =          FloatBuffer.multiply( _m, 0, 5, 10 ) - FloatBuffer.multiply( _m, 0,  6,  9 ) - FloatBuffer.multiply( _m, 4, 1, 10 ) + FloatBuffer.multiply( _m, 4, 2,  9 ) + FloatBuffer.multiply( _m,  8, 1,  6 ) - FloatBuffer.multiply( _m,  8, 2, 5 ) ;
-	}
-
-	private static void invertStage5( final float[] _t, final float[] _m )
-	{
-		final float d = FloatBuffer.multiply( _m, 0, _t, 0 ) + FloatBuffer.multiply( _m, 4, _t, 1 ) + FloatBuffer.multiply( _m, 8, _t, 2 ) + FloatBuffer.multiply( _m, 12, _t, 3 ) ;
-		for( int i = 0; i < _t.length; ++i )
+		final float det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
+		if( det == 0 )
 		{
-			FloatBuffer.divide( _t, i, d ) ;
+			setIdentity() ;
 		}
+
+		final float detInv = 1 / det ;
+
+		m[0] = t11 * detInv ;
+		m[1] = ( n24 * n33 * n41 - n23 * n34 * n41 - n24 * n31 * n43 + n21 * n34 * n43 + n23 * n31 * n44 - n21 * n33 * n44 ) * detInv ;
+		m[2] = ( n22 * n34 * n41 - n24 * n32 * n41 + n24 * n31 * n42 - n21 * n34 * n42 - n22 * n31 * n44 + n21 * n32 * n44 ) * detInv ;
+		m[3] = ( n23 * n32 * n41 - n22 * n33 * n41 - n23 * n31 * n42 + n21 * n33 * n42 + n22 * n31 * n43 - n21 * n32 * n43 ) * detInv ;
+
+		m[4] = t12 * detInv ;
+		m[5] = ( n13 * n34 * n41 - n14 * n33 * n41 + n14 * n31 * n43 - n11 * n34 * n43 - n13 * n31 * n44 + n11 * n33 * n44 ) * detInv ;
+		m[6] = ( n14 * n32 * n41 - n12 * n34 * n41 - n14 * n31 * n42 + n11 * n34 * n42 + n12 * n31 * n44 - n11 * n32 * n44 ) * detInv ;
+		m[7] = ( n12 * n33 * n41 - n13 * n32 * n41 + n13 * n31 * n42 - n11 * n33 * n42 - n12 * n31 * n43 + n11 * n32 * n43 ) * detInv ;
+
+		m[8] = t13 * detInv ;
+		m[9] = ( n14 * n23 * n41 - n13 * n24 * n41 - n14 * n21 * n43 + n11 * n24 * n43 + n13 * n21 * n44 - n11 * n23 * n44 ) * detInv ;
+		m[10] = ( n12 * n24 * n41 - n14 * n22 * n41 + n14 * n21 * n42 - n11 * n24 * n42 - n12 * n21 * n44 + n11 * n22 * n44 ) * detInv ;
+		m[11] = ( n13 * n22 * n41 - n12 * n23 * n41 - n13 * n21 * n42 + n11 * n23 * n42 + n12 * n21 * n43 - n11 * n22 * n43 ) * detInv ;
+
+		m[12] = t14 * detInv ;
+		m[13] = ( n13 * n24 * n31 - n14 * n23 * n31 + n14 * n21 * n33 - n11 * n24 * n33 - n13 * n21 * n34 + n11 * n23 * n34 ) * detInv ;
+		m[14] = ( n14 * n22 * n31 - n12 * n24 * n31 - n14 * n21 * n32 + n11 * n24 * n32 + n12 * n21 * n34 - n11 * n22 * n34 ) * detInv ;
+		m[15] = ( n12 * n23 * n31 - n13 * n22 * n31 + n13 * n21 * n32 - n11 * n23 * n32 - n12 * n21 * n33 + n11 * n22 * n33 ) * detInv ;
+
 	}
 
 	public void transpose()
@@ -418,13 +470,6 @@ public final class Matrix4 extends FloatUniform
 		matrix[( _row * 4 ) + _col] = _val ;
 	}
 
-	public static Matrix4 createTempIdentity()
-	{
-		final Matrix4 iden = new Matrix4( false ) ;
-		iden.setIdentity() ;
-		return iden ;
-	}
-
 	public static Matrix4 createIdentity()
 	{
 		final Matrix4 iden = new Matrix4() ;
@@ -459,29 +504,17 @@ public final class Matrix4 extends FloatUniform
 	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b, final Vector3 _result )
 	{
 		final float[] m = _b.matrix ;
-		_result.x = m[0] * _a.x + m[1] * _a.y + m[ 2] * _a.z + m[ 3] ;//* 1.0f ;
-		_result.y = m[4] * _a.x + m[5] * _a.y + m[ 6] * _a.z + m[ 7] ;//* 1.0f ;
-		_result.z = m[8] * _a.x + m[9] * _a.y + m[10] * _a.z + m[11] ;//* 1.0f ;
+		final float x = _a.x ;
+		final float y = _a.y ;
+		final float z = _a.z ;
 
-		final float w = m[12] * _a.x + m[13] * _a.y + m[14] * _a.z + m[15] ;//* 1.0f ;
-		_result.divide( w ) ;
+		final float w = 1 / ( m[3] * x + m[7] * y + m[11] * z + m[15] ) ;
+
+		_result.x = ( m[0] * x + m[4] * y + m[8] * z + m[12] ) * w ;
+		_result.y = ( m[1] * x + m[5] * y + m[9] * z + m[13] ) * w ;
+		_result.z = ( m[2] * x + m[6] * y + m[10] * z + m[14] ) * w ;
 
 		return _result ;
-	}
-
-	/**
-		Stores transformation in original Vector3 - _a
-	*/
-	public static Vector3 multiply( final Vector3 _a, final Matrix4 _b )
-	{
-		final float[] m = _b.matrix ;
-		final float w = m[12] * _a.x + m[13] * _a.y + m[14] * _a.z + m[15] * 1.0f ;
-		_a.x = m[0] * _a.x + m[1] * _a.y + m[ 2] * _a.z + m[ 3] * 1.0f ;
-		_a.y = m[4] * _a.x + m[5] * _a.y + m[ 6] * _a.z + m[ 7] * 1.0f ;
-		_a.z = m[8] * _a.x + m[9] * _a.y + m[10] * _a.z + m[11] * 1.0f ;
-
-		_a.divide( w ) ;
-		return _a ;
 	}
 
 	private static void copy( final float[] _from, final float[] _to )

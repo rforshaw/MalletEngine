@@ -1,23 +1,11 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.util.List ;
-
-import javax.imageio.ImageIO ;
-import java.io.File ;
-import java.io.IOException ;
-
 import java.awt.Font ;
 import java.awt.FontMetrics ;
-import java.awt.font.GlyphVector ;
 
 import java.awt.image.BufferedImage ;
-import java.awt.geom.Rectangle2D ;
 import java.awt.RenderingHints ;
 import java.awt.Graphics2D ;
-import java.awt.Canvas ;
-import java.awt.AlphaComposite ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.Glyph ;

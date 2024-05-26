@@ -21,7 +21,8 @@ public final class GLDrawBuffer extends GLBuffer
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;
 
 	private GLProgram glProgram ;
-	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
+	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private IOcclude occluder = DrawBuffer.OCCLUDER_FALLBACK ;
@@ -47,10 +48,15 @@ public final class GLDrawBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
+		uniforms.clear() ;
+		if( glProgram.buildProgramUniforms( program, uniforms ) == false )
 		{
-			// We've failed to update the buffer something in
-			// the program map is wrong or has yet to be loaded.
+			stable = false ;
+			return stable ;
+		}
+
+		if( glProgram.buildDrawUniforms( program, uniformState ) == false )
+		{
 			stable = false ;
 			return stable ;
 		}
@@ -96,13 +102,23 @@ public final class GLDrawBuffer extends GLBuffer
 
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
-		final float[] matrix = projection.matrix ;
+		final Matrix4 view = ( isUI() ) ? IDENTITY : _camera.getView() ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getProjection() ;
 
-		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( loadProgramUniforms( glProgram, uniforms ) == false )
+		MGL.glUniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
+		MGL.glUniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+
 		{
-			System.out.println( "Failed to load uniforms." ) ;
+			uniformState.reset() ;
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				if( uniforms.get( i ).load( uniformState ) == false )
+				{
+					System.out.println( "Failed to load uniforms." ) ;
+					return ;
+				}
+			}
 		}
 
 		GLDrawBuffer.bindBuffers( storages ) ;
@@ -110,7 +126,7 @@ public final class GLDrawBuffer extends GLBuffer
 		final Camera camera = _camera.getCamera() ;
 		for( GLGeometryBuffer buffer : buffers )
 		{
-			buffer.draw( attributes, glProgram, camera, occluder ) ;
+			buffer.draw( attributes, glProgram, uniformState, camera, occluder ) ;
 		}
 	}
 

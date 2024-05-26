@@ -3,8 +3,6 @@ package com.linxonline.mallet.ui ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.id.ID ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
@@ -42,6 +40,8 @@ public class UIElement implements IInputHandler, Connect.Connection
 	private World world ;
 	private Camera camera = CameraAssist.getDefault() ;
 	private final UIRatio ratio = UIRatio.getGlobalUIRatio() ;	// <pixels:unit>
+
+	protected final Vector3 mouseInput = new Vector3() ;
 
 	private final Vector3 minLength = new Vector3() ;	// In pixels
 	private final Vector3 maxLength = new Vector3() ;	// In pixels
@@ -341,8 +341,11 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 	protected boolean isIntersectInput( final InputEvent _event, final Camera _camera )
 	{
-		return intersectPoint( _camera.projectXToHUD( _event.mouseX ),
-							   _camera.projectYToHUD( _event.mouseY ) ) ;
+		mouseInput.setXYZ( _event.mouseX, _event.mouseY, 1.0f ) ; 
+		camera.inputToNDC( mouseInput, mouseInput ) ;
+		camera.ndcToHUD( mouseInput, mouseInput ) ;
+
+		return intersectPoint( mouseInput.x, mouseInput.y ) ;
 	}
 
 	/**
@@ -1589,22 +1592,24 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public abstract class Component
 	{
-		protected final ID id ;
+		private final String name ;
+		private final String group ;
 
 		public Component( final MetaComponent _meta )
 		{
-			id = new ID( _meta.getName(), _meta.getGroup() ) ;
+			name = _meta.getName() ;
+			group = _meta.getGroup() ;
 			getParent().addComponent( this ) ;
 		}
 
 		public final boolean isName( final String _name )
 		{
-			return id.isName( _name ) ;
+			return name.equals( _name ) ;
 		}
 
 		public final boolean isGroup( final String _group )
 		{
-			return id.isGroup( _group ) ;
+			return group.equals( _group ) ;
 		}
 
 		/**

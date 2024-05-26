@@ -2,7 +2,6 @@ package com.linxonline.mallet.io.net ;
 
 import java.util.Map ;
 
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.io.serialisation.Serialise ;

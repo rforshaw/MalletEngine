@@ -59,6 +59,8 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 
 	public GLTextureManager()
 	{
+		ImageIO.setUseCache( false ) ;
+
 		final ResourceLoader<String, GLImage> loader = getResourceLoader() ;
 		loader.add( new ResourceDelegate<String, GLImage>()
 		{

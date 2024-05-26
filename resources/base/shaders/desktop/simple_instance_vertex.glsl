@@ -1,4 +1,5 @@
-uniform mat4 inMVPMatrix ;
+uniform mat4 inViewMatrix ;
+uniform mat4 inProjectionMatrix ;
 
 in vec4 inVertex ;
 in vec4 inColour ;
@@ -7,7 +8,7 @@ in vec3 inNormal ;
 
 layout( std140, binding = 0 ) buffer Instances
 {
-	Transformation transformations[] ;
+	mat4 modelMatrix[] ;
 } ;
 
 out vec2 outTexCoord0 ;
@@ -15,9 +16,7 @@ out vec4 outColour ;
 
 void main()
 {
-	mat4 inModelMatrix = create_transformation( transformations[gl_InstanceID] ) ;
-
-	gl_Position = inMVPMatrix * inModelMatrix * inVertex ;
+	gl_Position = inProjectionMatrix * inViewMatrix * modelMatrix[gl_InstanceID] * inVertex ;
 
 	outTexCoord0 = inTexCoord0 ;
 	outColour = inColour ;

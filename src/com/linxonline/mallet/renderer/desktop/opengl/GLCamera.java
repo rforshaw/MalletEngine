@@ -10,15 +10,11 @@ import com.linxonline.mallet.maths.Vector3 ;
 public final class GLCamera
 {
 	private final Matrix4 uiMatrix = new Matrix4() ;		// Used for rendering GUI elements not impacted by World/Camera position
-	private final Matrix4 worldMatrix = new Matrix4() ;		// Used for moving the camera around the world
+	private final Matrix4 viewMatrix = new Matrix4() ;		// Used for moving the camera around the world
 
-	private final Matrix4 worldProjectionMatrix = new Matrix4() ;
 	private final Matrix4 uiProjectionMatrix = new Matrix4() ;
 
 	private final Vector3 uiPosition = new Vector3() ;
-	private final Vector3 position = new Vector3() ;
-	private final Vector3 rotation = new Vector3() ;
-	private final Vector3 scale = new Vector3() ;
 
 	private final Camera camera ;
 	private final Camera.Screen screen = new Camera.Screen() ;
@@ -34,10 +30,7 @@ public final class GLCamera
 	public void update( final Camera _camera )
 	{
 		_camera.getHUDPosition( uiPosition ) ;
-
-		_camera.getPosition( position ) ;
-		_camera.getRotation( rotation ) ;
-		_camera.getScale( scale ) ;
+		_camera.getViewMatrix( viewMatrix ) ;
 
 		_camera.getRenderScreen( screen ) ;
 		_camera.getProjection( Camera.Mode.HUD, uiProjection ) ;
@@ -50,17 +43,8 @@ public final class GLCamera
 		final int height = ( int )screen.dimension.y ;
 		MGL.glViewport( 0, 0, width, height ) ;
 
-		worldMatrix.setIdentity() ;
-		worldMatrix.rotate( 1.0f, rotation.x, rotation.y, rotation.z ) ;
-		worldMatrix.translate( projection.nearPlane.x / 2 , projection.nearPlane.y / 2, 0.0f ) ;
-		worldMatrix.scale( scale.x, scale.y, scale.z ) ;
-		worldMatrix.translate( -position.x, -position.y, -position.z ) ;
-
 		uiMatrix.setIdentity() ;
 		uiMatrix.translate( -uiPosition.x, -uiPosition.y, 0.0f ) ;
-
-		worldProjectionMatrix.setIdentity() ;
-		Matrix4.multiply( projection.matrix, worldMatrix, worldProjectionMatrix ) ;
 
 		uiProjectionMatrix.setIdentity() ;
 		Matrix4.multiply( uiProjection.matrix, uiMatrix, uiProjectionMatrix ) ;
@@ -79,9 +63,14 @@ public final class GLCamera
 		return uiProjectionMatrix ;
 	}
 
-	public Matrix4 getWorldProjection()
+	public Matrix4 getView()
 	{
-		return worldProjectionMatrix ;
+		return viewMatrix ;
+	}
+
+	public Matrix4 getProjection()
+	{
+		return projection.matrix ;
 	}
 
 	public Camera getCamera()

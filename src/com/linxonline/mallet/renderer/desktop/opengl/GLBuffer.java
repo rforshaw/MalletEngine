@@ -29,6 +29,8 @@ import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
+	protected final static Matrix4 IDENTITY = new Matrix4() ;
+
 	private final static MemoryPool<Texture> TEXTURES = new MemoryPool<Texture>( () -> new Texture() ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
@@ -90,92 +92,6 @@ public class GLBuffer
 		}
 	}
 
-	protected static boolean generateProgramUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
-	{
-		final List<JSONProgram.UniformMap> uniforms = _glProgram.program.getUniforms() ;
-		if( uniforms.isEmpty() )
-		{
-			return true ;
-		}
-
-		for( IUniform uniform : _toFill )
-		{
-			// We don't want to create more texture uniforms
-			// than needed, use a cache.
-			if( uniform.getType() == IUniform.Type.SAMPLER2D )
-			{
-				final Texture texture = ( Texture )uniform ;
-				texture.reset() ;
-
-				TEXTURES.reclaim( texture ) ;
-			}
-		}
-
-		_toFill.clear() ;
-		for( JSONProgram.UniformMap tuple : uniforms )
-		{
-			final IUniform uniform = _program.getUniform( tuple.getRight() ) ;
-			if( uniform == null )
-			{
-				Logger.println( tuple.getRight() + " not specified on program object.", Logger.Verbosity.MAJOR ) ;
-				return false ;
-			}
-			
-			switch( uniform.getType() )
-			{
-				case FLOAT64      :
-				{
-					Logger.println( "Build uniform type not implemented: " + uniform.getType(), Logger.Verbosity.MAJOR ) ;
-					return false ;
-				}
-				case BOOL         :
-				case UINT32       :
-				case INT32        :
-				case FLOAT32      :
-				{
-					_toFill.add( uniform ) ;
-					break ;
-				}
-				case SAMPLER2D    :
-				{
-					final MalletTexture texture = ( MalletTexture )uniform ;
-					if( texture == null )
-					{
-						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
-					}
-
-					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
-					if( glTexture == null )
-					{
-						return false ;
-					}
-
-					final Texture tex = TEXTURES.take() ;
-					tex.set( glTexture, texture ) ;
-
-					_toFill.add( tex ) ;
-					break ;
-				}
-				case FONT         :
-				{
-					final MalletFont font = ( MalletFont )uniform ;
-					final GLFont glFont = GLRenderer.getFont( font ) ;
-					final GLImage texture = glFont.getTexture() ;
-
-					final Texture tex = TEXTURES.take() ;
-					tex.set( texture, font ) ;
-
-					_toFill.add( tex ) ;
-					break ;
-				}
-				case UNKNOWN      :
-				default           : return false ;
-			}
-		}
-
-		return true ;
-	}
-
 	protected static void generateStorages( final GLProgram _glProgram, final Program _program, final AssetLookup<Storage, GLStorage> _lookup, final List<GLStorage> _toFill )
 	{
 		_toFill.clear() ;
@@ -191,247 +107,6 @@ public class GLBuffer
 			final GLStorage glStorage = _lookup.getRHS( storage.index() ) ;
 			_toFill.add( glStorage ) ;
 		}
-	}
-
-	/**
-		Load the uniforms expcted to be specified at the program level.
-	*/
-	protected boolean loadProgramUniforms( final GLProgram _program, final List<IUniform> _uniforms )
-	{
-		textureUnit = 0 ;
-
-		final int size = _uniforms.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final IUniform uniform = _uniforms.get( i ) ;
-			switch( uniform.getType() )
-			{
-				case FLOAT64      :
-				{
-					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
-					return false ;
-				}
-				case BOOL         :
-				{
-					final BoolUniform val = ( BoolUniform )uniform ;
-					MGL.glUniform1i( _program.inUniforms[i], val.getState() ? 1 : 0) ;
-					break ;
-				}
-				case UINT32       :
-				{
-					final UIntUniform vec = ( UIntUniform )uniform ;
-					final int num = vec.fill( 0, intTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1ui( _program.inUniforms[i], intTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2ui( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
-					}
-					break ;
-				}
-				case INT32        :
-				{
-					final IntUniform vec = ( IntUniform )uniform ;
-					final int num = vec.fill( 0, intTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Int uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1i( _program.inUniforms[i], intTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2i( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
-					}
-					break ;
-				}
-				case FLOAT32      :
-				{
-					final FloatUniform vec = ( FloatUniform )uniform ;
-					final int num = vec.fill( 0, floatTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1f( _program.inUniforms[i], floatTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2f( _program.inUniforms[i], floatTemp[0], floatTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3f( _program.inUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4f( _program.inUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2], floatTemp[3] ) ; break ;
-						case 16 : MGL.glUniformMatrix4fv( _program.inUniforms[i], 1, true, floatTemp, 0 ) ; break ;
-					}
-					break ;
-				}
-				case SAMPLER2D    :
-				case FONT         :
-				{
-					final Texture texture = ( Texture )uniform ;
-					final GLImage image = texture.image ;
-
-					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnit ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, image.textureIDs[0] ) ;
-					MGL.glUniform1i( _program.inUniforms[i], textureUnit ) ;
-
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, texture.uWrap ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, texture.vWrap ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, texture.magFilter ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, texture.minFilter ) ;
-
-					textureUnit += 1 ;
-					break ;
-				}
-				case UNKNOWN      :
-				default           : return false ;
-			}
-		}
-
-		return true ;
-	}
-
-	/**
-		Load the uniforms expcted to be specified at the draw level.
-		Draw object cannot override program level uniforms.
-	*/
-	protected boolean loadDrawUniforms( final GLProgram _program, final Draw _draw )
-	{
-		int textureUnitOffset = textureUnit ;
-		
-		final List<JSONProgram.UniformMap> uniforms = _program.program.getDrawUniforms() ;
-		final int size = uniforms.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			final JSONProgram.UniformMap tuple = uniforms.get( i ) ;
-
-			final IUniform uniform = _draw.getUniform( tuple.getRight() ) ;
-			if( uniform == null )
-			{
-				Logger.println( tuple.getRight() + " not specified on draw object.", Logger.Verbosity.MAJOR ) ;
-				return false ;
-			}
-
-			switch( uniform.getType() )
-			{
-				case FLOAT64      :
-				{
-					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
-					return false ;
-				}
-				case BOOL         :
-				{
-					final BoolUniform val = ( BoolUniform )uniform ;
-					MGL.glUniform1i( _program.inDrawUniforms[i], val.getState() ? 1 : 0) ;
-					break ;
-				}
-				case UINT32       :
-				{
-					final UIntUniform vec = ( UIntUniform )uniform ;
-					final int num = vec.fill( 0, intTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1ui( _program.inUniforms[i], intTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2ui( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4ui( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
-					}
-					break ;
-				}
-				case INT32        :
-				{
-					final IntUniform vec = ( IntUniform )uniform ;
-					final int num = vec.fill( 0, intTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Int uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1i( _program.inUniforms[i], intTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2i( _program.inUniforms[i], intTemp[0], intTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4i( _program.inUniforms[i], intTemp[0], intTemp[1], intTemp[2], intTemp[3] ) ; break ;
-					}
-					break ;
-				}
-				case FLOAT32      :
-				{
-					final FloatUniform vec = ( FloatUniform )uniform ;
-					final int num = vec.fill( 0, floatTemp ) ;
-					switch( num )
-					{
-						default :
-						{
-							Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
-						}
-						case 1  : MGL.glUniform1f( _program.inDrawUniforms[i], floatTemp[0] ) ; break ;
-						case 2  : MGL.glUniform2f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1] ) ; break ;
-						case 3  : MGL.glUniform3f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2] ) ; break ;
-						case 4  : MGL.glUniform4f( _program.inDrawUniforms[i], floatTemp[0], floatTemp[1], floatTemp[2], floatTemp[3] ) ; break ;
-						case 16 : MGL.glUniformMatrix4fv( _program.inDrawUniforms[i], 1, true, floatTemp, 0 ) ; break ;
-					}
-
-					break ;
-				}
-				case SAMPLER2D    :
-				{
-					final MalletTexture texture = ( MalletTexture )uniform ;
-					if( texture == null )
-					{
-						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
-					}
-
-					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
-					if( glTexture == null )
-					{
-						return false ;
-					}
-
-					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnitOffset ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
-					MGL.glUniform1i( _program.inDrawUniforms[i], textureUnitOffset ) ;
-
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, GLImage.calculateWrap( texture.getUWrap() ) ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, GLImage.calculateWrap( texture.getVWrap() ) ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, GLImage.calculateMagFilter( texture.getMaxificationFilter() )  ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, GLImage.calculateMinFilter( texture.getMinificationFilter() ) ) ;
-
-					textureUnitOffset += 1 ;
-					break ;
-				}
-				case FONT         :
-				{
-					final MalletFont font = ( MalletFont )uniform ;
-					final GLFont glFont = GLRenderer.getFont( font ) ;
-					final GLImage texture = glFont.getTexture() ;
-
-					MGL.glActiveTexture( MGL.GL_TEXTURE0 + textureUnitOffset ) ;
-					MGL.glBindTexture( MGL.GL_TEXTURE_2D, texture.textureIDs[0] ) ;
-					MGL.glUniform1i( _program.inDrawUniforms[i], textureUnitOffset ) ;
-
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
-					MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
-
-					textureUnitOffset += 1 ;
-					break ;
-				}
-				case UNKNOWN      :
-				default           : return false ;
-			}
-		}
-
-		return true ;
 	}
 
 	public static void bindBuffers( final List<GLStorage> _storages )
@@ -462,7 +137,7 @@ public class GLBuffer
 								 final Vector3 _scale )
 	{
 		_mat4.setIdentity() ;
-		_mat4.setTranslate( _position.x, _position.y, 0.0f ) ;
+		_mat4.setPosition( _position.x, _position.y, 0.0f ) ;
 
 		_temp.setRotateX( _rotation.x ) ;
 		_mat4.multiply( _temp ) ;
@@ -477,7 +152,7 @@ public class GLBuffer
 		_temp.setIdentity() ;
 
 		_temp.setScale( _scale.x, _scale.y, _scale.z ) ;
-		_temp.setTranslate( _offset.x, _offset.y, _offset.z ) ;
+		_temp.setPosition( _offset.x, _offset.y, _offset.z ) ;
 		_mat4.multiply( _temp ) ;
 		_temp.setIdentity() ;
 	}

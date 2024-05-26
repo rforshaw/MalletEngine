@@ -14,7 +14,7 @@ import com.linxonline.mallet.renderer.CameraAssist ;
 /*==============================================================*/
 public class MouseComponent extends InputComponent
 {
-	protected final Vector2 mouse = new Vector2() ;
+	protected final Vector3 mouse = new Vector3() ;
 	protected boolean mouseMoved    = false ;
 	protected boolean mouse1Pressed = false ;
 	protected boolean mouse2Pressed = false ;
@@ -75,11 +75,7 @@ public class MouseComponent extends InputComponent
 
 	private void updateMousePosition( final InputEvent _event )
 	{
-		mouse.setXY( _event.mouseX, _event.mouseY ) ;
-		final Camera camera = CameraAssist.getDefault() ;
-
-		mouse.x = camera.projectXToWorld( mouse.x ) ;
-		mouse.y = camera.projectYToWorld( mouse.y ) ;
+		mouse.setXYZ( _event.mouseX, _event.mouseY, -1.0f ) ;
 		applyMousePosition( mouse ) ;
 	}
 
@@ -89,5 +85,5 @@ public class MouseComponent extends InputComponent
 
 	public void mouseReleased( final InputEvent _event ) {}
 	
-	public void applyMousePosition( final Vector2 _mouse ) {}
+	public void applyMousePosition( final Vector3 _mouse ) {}
 }

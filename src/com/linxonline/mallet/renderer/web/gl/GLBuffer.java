@@ -92,7 +92,7 @@ public class GLBuffer
 
 	protected static boolean generateProgramUniforms( final GLProgram _glProgram, final Program _program, final List<IUniform> _toFill )
 	{
-		final List<JSONProgram.UniformMap> uniforms = _glProgram.program.getUniforms() ;
+		final List<JSONProgram.Uniform> uniforms = _glProgram.program.getUniforms() ;
 		if( uniforms.isEmpty() )
 		{
 			return true ;
@@ -112,12 +112,12 @@ public class GLBuffer
 		}
 
 		_toFill.clear() ;
-		for( JSONProgram.UniformMap tuple : uniforms )
+		for( JSONProgram.Uniform tuple : uniforms )
 		{
-			final IUniform uniform = _program.getUniform( tuple.getRight() ) ;
+			final IUniform uniform = _program.getUniform( tuple.getName() ) ;
 			if( uniform == null )
 			{
-				Logger.println( tuple.getRight() + " not specified on program object.", Logger.Verbosity.MAJOR ) ;
+				Logger.println( tuple.getName() + " not specified on program object.", Logger.Verbosity.MAJOR ) ;
 				return false ;
 			}
 			
@@ -166,6 +166,14 @@ public class GLBuffer
 					tex.set( texture, font ) ;
 
 					_toFill.add( tex ) ;
+					break ;
+				}
+				case STRUCT       :
+				{
+					break ;
+				}
+				case ARRAY        :
+				{
 					break ;
 				}
 				case UNKNOWN      :
@@ -287,6 +295,14 @@ public class GLBuffer
 					textureUnit += 1 ;
 					break ;
 				}
+				case STRUCT       :
+				{
+					break ;
+				}
+				case ARRAY        :
+				{
+					break ;
+				}
 				case UNKNOWN      :
 				default           : return false ;
 			}
@@ -303,16 +319,16 @@ public class GLBuffer
 	{
 		int textureUnitOffset = textureUnit ;
 		
-		final List<JSONProgram.UniformMap> uniforms = _program.program.getDrawUniforms() ;
+		final List<JSONProgram.Uniform> uniforms = _program.program.getDrawUniforms() ;
 		final int size = uniforms.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			final JSONProgram.UniformMap tuple = uniforms.get( i ) ;
+			final JSONProgram.Uniform tuple = uniforms.get( i ) ;
 
-			final IUniform uniform = _draw.getUniform( tuple.getRight() ) ;
+			final IUniform uniform = _draw.getUniform( tuple.getName() ) ;
 			if( uniform == null )
 			{
-				Logger.println( tuple.getRight() + " not specified on draw object.", Logger.Verbosity.MAJOR ) ;
+				Logger.println( tuple.getName() + " not specified on draw object.", Logger.Verbosity.MAJOR ) ;
 				return false ;
 			}
 

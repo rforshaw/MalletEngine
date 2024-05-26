@@ -7,7 +7,6 @@ import java.util.* ;
 import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Logger ;
 
 public class AndroidZipFile implements FileStream
 {

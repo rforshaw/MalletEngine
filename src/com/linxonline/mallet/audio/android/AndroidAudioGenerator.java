@@ -13,8 +13,6 @@ import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
-import com.linxonline.mallet.util.settings.Settings ;
-
 public final class AndroidAudioGenerator implements IGenerator
 {
 	private final SoundManager<AndroidSound> staticSoundManager = new SoundManager<AndroidSound>() ;

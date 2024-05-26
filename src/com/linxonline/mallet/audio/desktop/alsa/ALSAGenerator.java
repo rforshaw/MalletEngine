@@ -13,8 +13,6 @@ import com.linxonline.mallet.io.reader.ByteReader ;
 import com.linxonline.mallet.io.formats.wav.* ;
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 
-import com.linxonline.mallet.util.settings.Settings ;
-
 public final class ALSAGenerator implements IGenerator
 {
 	private final SoundManager<ALSABuffer> staticSoundManager = new SoundManager<ALSABuffer>() ;

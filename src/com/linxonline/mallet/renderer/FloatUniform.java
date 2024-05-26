@@ -8,7 +8,7 @@ package com.linxonline.mallet.renderer ;
 public abstract class FloatUniform implements IUniform
 {
 	public abstract int fill( int _offset, final float[] _fill ) ;
-	
+
 	@Override
 	public final IUniform.Type getType()
 	{

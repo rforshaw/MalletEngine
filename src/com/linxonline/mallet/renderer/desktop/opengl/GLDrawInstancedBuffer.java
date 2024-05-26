@@ -32,7 +32,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private VertexAttrib[] attributes = null ;
 
 	private GLProgram glProgram ;
-	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
+	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final int maxIndexByteSize ;
@@ -114,10 +115,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLDrawInstancedBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
+		uniforms.clear() ;
+		if( glProgram.buildProgramUniforms( program, uniforms ) == false )
 		{
-			// We've failed to update the buffer something in
-			// the program map is wrong or has yet to be loaded.
 			stable = false ;
 			return stable ;
 		}
@@ -246,13 +246,23 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
-		final float[] matrix = projection.matrix ;
+		final Matrix4 view = ( isUI() ) ? IDENTITY : _camera.getView() ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getProjection() ;
 
-		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( loadProgramUniforms( glProgram, uniforms ) == false )
+		MGL.glUniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
+		MGL.glUniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+
 		{
-			System.out.println( "Failed to load uniforms." ) ;
+			uniformState.reset() ;
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				if( uniforms.get( i ).load( uniformState ) == false )
+				{
+					System.out.println( "Failed to load uniforms." ) ;
+					return ;
+				}
+			}
 		}
 
 		if( denyTransUpdate == false )
@@ -327,8 +337,13 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 	private static class Transformations implements Storage.IData
 	{
+		private final Vector3 position = new Vector3() ;
+		private final Vector3 offset = new Vector3() ;
+		private final Vector3 rotation = new Vector3() ;
+		private final Vector3 scale = new Vector3() ;
+		private final Matrix4 modelMatrix = new Matrix4() ;
+
 		private final List<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
-		private final TransformationUpdater updater = new TransformationUpdater() ;
 
 		public int drawCount = 0 ;
 
@@ -362,49 +377,34 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		@Override
 		public void serialise( Storage.ISerialise _out )
 		{
+			int index = 0 ;
+		
 			final int bufferSize = buffers.size() ;
 			for( int i = 0; i < bufferSize; ++i )
 			{
 				final GeometryBuffer buffer = buffers.get( i ) ;
-				updater.set( i, ( 16 * 4 ), _out ) ;
 
 				//final long startTime = System.currentTimeMillis() ;
+				final List<Draw> draws = buffer.getDraws() ;
+				final int drawSize = draws.size() ;
+				
+				for( int j = 0; j < drawSize; ++j )
+				{
+					final Draw draw = draws.get( j ) ;
 
-				Parallel.forEach( buffer.getDraws(), 10000, updater ) ;
+					draw.getPosition( position ) ;
+					draw.getOffset( offset ) ;
+					draw.getRotation( rotation ) ;
+					draw.getScale( scale ) ;
+
+					position.add( offset ) ;
+					modelMatrix.applyTransformations( position, rotation, scale ) ;
+					index = _out.writeFloats( index, modelMatrix.matrix ) ;
+				}
 
 				//final long endTime = System.currentTimeMillis() ;
 				//System.out.println( "GL Time Taken: " + ( endTime - startTime ) ) ;
 			}
-		}
-	}
-
-	private static final class TransformationUpdater implements Parallel.IRangeRun<Draw>
-	{
-		private int bufferIndex = 0 ;
-		private int objectSize = 0 ;
-		private Storage.ISerialise out ;
-
-		public TransformationUpdater() {}
-
-		public void set( final int _index, final int _objectSize, Storage.ISerialise _out )
-		{
-			bufferIndex = _index ;
-			objectSize = _objectSize ;
-			out = _out ;
-		}
-
-		@Override
-		public void run( final int _index, final Draw _draw )
-		{
-			final float[] transformations = _draw.getRawTransformations() ;
-
-			final int index = ( bufferIndex * _index ) + _index ;
-			int offset = index * objectSize ;
-
-			offset = out.writeVec4( offset, transformations[0], transformations[1], transformations[2], 1.0f ) ;
-			offset = out.writeVec4( offset, transformations[3], transformations[4], transformations[5], 1.0f ) ;
-			offset = out.writeVec4( offset, transformations[6], transformations[7], transformations[8], 1.0f ) ;
-			offset = out.writeVec4( offset, transformations[9], transformations[10], transformations[11], 1.0f ) ;
 		}
 	}
 }

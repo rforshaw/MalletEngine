@@ -16,20 +16,8 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 
-import com.linxonline.mallet.renderer.IUniform ;
-import com.linxonline.mallet.renderer.BoolUniform ;
-
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.MalletList ;
-
-import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
-
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.Matrix4 ;
 
 /**
 	GLProgram retains a collection of GLSL shaders 
@@ -134,24 +122,24 @@ public final class GLProgram extends ProgramManager.Program
 		program.inMVPMatrix = MGL.getUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
 		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getUniforms() ;
+			final List<JSONProgram.Uniform> uniforms = _program.getUniforms() ;
 
 			final int size = uniforms.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getRight() ) ;
+				final JSONProgram.Uniform uniform = uniforms.get( i ) ;
+				program.inUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getName() ) ;
 			}
 		}
 
 		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getDrawUniforms() ;
+			final List<JSONProgram.Uniform> uniforms = _program.getDrawUniforms() ;
 
 			final int size = uniforms.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inDrawUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getRight() ) ;
+				final JSONProgram.Uniform uniform = uniforms.get( i ) ;
+				program.inDrawUniforms[i] = MGL.getUniformLocation( program.id[0], uniform.getName() ) ;
 			}
 		}
 

@@ -7,7 +7,7 @@ package com.linxonline.mallet.util.time ;
 /*==================================================*/
 public abstract class ElapsedTimer
 {
-	private static ITimer time = new DefaultTimer() ;
+	private static final DefaultTimer time = new DefaultTimer() ;
 
 	public ElapsedTimer() {}
 

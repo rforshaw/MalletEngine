@@ -16,6 +16,7 @@ import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.IOcclude ;
 
+import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.IntVector2 ;
 
@@ -49,6 +50,7 @@ public final class GLGeometryBuffer extends GLBuffer
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 rotation = new Vector3() ;
 	private final Vector3 scale = new Vector3() ;
+	private final Matrix4 modelMatrix = new Matrix4() ;
 
 	private boolean stable = false ;
 
@@ -189,7 +191,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		return stable ;
 	}
 
-	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final Camera _camera, final IOcclude _occluder )
+	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
 	{
 		if( stable == false )
 		{
@@ -223,10 +225,13 @@ public final class GLGeometryBuffer extends GLBuffer
 				GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
 			}
 
-			if( loadDrawUniforms( _program, draw ) == false )
+			if( _state.hasDrawUniforms() )
 			{
-				System.out.println( "Failed to load uniforms for draw object." ) ;
-				continue ;
+				if( _program.loadDrawUniforms( _state, draw ) == false )
+				{
+					System.out.println( "Failed to load uniforms for draw object." ) ;
+					continue ;
+				}
 			}
 
 			draw.getPosition( position ) ;
@@ -234,10 +239,10 @@ public final class GLGeometryBuffer extends GLBuffer
 			draw.getRotation( rotation ) ;
 			draw.getScale( scale ) ;
 
-			MGL.glUniform4f( _program.inPosition, position.x, position.y, position.z, 1.0f ) ;
-			MGL.glUniform4f( _program.inOffset, offset.x, offset.y, offset.z, 1.0f ) ;
-			MGL.glUniform4f( _program.inRotation, rotation.x, rotation.y, rotation.z, 1.0f ) ;
-			MGL.glUniform4f( _program.inScale, scale.x, scale.y, scale.z, 1.0f ) ;
+			position.add( offset ) ;
+			modelMatrix.applyTransformations( position, rotation, scale ) ;
+
+			MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, false, modelMatrix.matrix, 0 ) ;
 
 			MGL.glDrawElements( style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
 		}

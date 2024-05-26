@@ -5,7 +5,6 @@ import java.util.Map ;
 import java.util.Set ;
 import java.util.Collection ;
 
-import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 

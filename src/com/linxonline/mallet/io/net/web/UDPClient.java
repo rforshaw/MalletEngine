@@ -1,6 +1,5 @@
 package com.linxonline.mallet.io.net ;
 
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.io.serialisation.Serialise ;
 

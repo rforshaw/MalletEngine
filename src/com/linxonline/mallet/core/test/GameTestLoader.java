@@ -1,5 +1,6 @@
 package com.linxonline.mallet.core.test ;
 
+import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
 
@@ -34,7 +35,6 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.util.settings.Settings ;
 import com.linxonline.mallet.util.Parallel ;
 
 import com.linxonline.mallet.io.net.UDPServer ;
@@ -135,6 +135,7 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
+				createProgramTest() ;
 				createPlaneTest() ;
 
 				createUI() ;
@@ -155,6 +156,33 @@ public final class GameTestLoader implements IGameLoader
 				createScript() ;
 			}
 
+			private void createProgramTest()
+			{
+				final ArrayUniform a = new ArrayUniform( 2 ) ;
+				a.set( 0, new Vector2( 1, 1 ) ) ;
+				a.set( 1, new Vector2( 2, 2 ) ) ;
+
+				final StructUniform s = new StructUniform() ;
+				s.map( "vector2", new Vector2( 3, 3 ) ) ;
+				s.map( "vector3", new Vector3( 4, 4, 4 ) ) ;
+				s.map( "array", a ) ;
+
+				final Program program = new Program( "TEST" ) ;
+				program.mapUniform( "array", a ) ;
+				program.mapUniform( "struct", s ) ;
+				program.mapUniform( "mat4", new Matrix4() ) ;
+
+				final UniformList draw = program.getDrawUniforms() ;
+				draw.add( "draw1" ) ;
+				draw.add( "draw2" ) ;
+
+				program.forEachUniform( ( final String _absoluteName, final IUniform _uniform ) ->
+				{
+					System.out.println( _absoluteName + " : " + _uniform.toString() ) ;
+					return true ;
+				} ) ;
+			}
+			
 			private void createPlaneTest()
 			{
 				final Plane plane = new Plane( new Vector3( 100, 0, 10 ),
@@ -260,9 +288,14 @@ public final class GameTestLoader implements IGameLoader
 
 				{
 					final IntVector2 dim = world.getRenderDimensions( new IntVector2() ) ;
+					final int left = ( int )( -dim.x * 0.5f ) ;
+					final int right = left + dim.x ;
+
+					final int top = ( int )( -dim.y * 0.5f ) ;
+					final int bottom = top + dim.y ;
 
 					final Camera cam = CameraAssist.add( new Camera( "OFFSIDE" ) ) ;
-					cam.setOrthographic( 0.0f, dim.y, 0.0f, dim.x, -1000.0f, 1000.0f ) ;
+					cam.setOrthographic( Camera.Mode.WORLD, top, bottom, left, right, -1000.0f, 1000.0f ) ;
 					cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
 
 					world.addCameras( cam ) ;
@@ -618,11 +651,14 @@ public final class GameTestLoader implements IGameLoader
 				new MouseComponent( entity )
 				{
 					@Override
-					public void applyMousePosition( final Vector2 _mouse )
+					public void applyMousePosition( final Vector3 _mouse )
 					{
-						draw.setPosition( _mouse.x, _mouse.y, 0.0f ) ;
+						camera.inputToNDC( mouse, mouse ) ;
 
-						camera.lookAt( mouse.x, -mouse.y, 0.0f ) ;
+						_mouse.multiply( 200.0f ) ;
+						draw.setPosition( _mouse.x, -_mouse.y, 0.0f ) ;
+
+						camera.lookAt( mouse.x, mouse.y, 0.0f ) ;
 						CameraAssist.update( camera ) ;
 					}
 

@@ -132,7 +132,15 @@ public class DesktopStarter extends IStarter
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", game.getRenderHeight() ) ;
 
 		final Camera camera = CameraAssist.getDefault() ;
-		camera.setOrthographic( 0.0f, renderHeight, 0.0f, renderWidth, -1000.0f, 1000.0f ) ;
+
+		final int left = -renderWidth / 2 ;
+		final int right = left + renderWidth ;
+
+		final int top = -renderHeight / 2 ;
+		final int bottom = top + renderHeight ;
+
+		camera.setOrthographic( Camera.Mode.HUD, 0, renderHeight, 0, renderWidth, -1000.0f, 1000.0f ) ;
+		camera.setOrthographic( Camera.Mode.WORLD, top, bottom, left, right, -1000.0f, 1000.0f ) ;
 		CameraAssist.update( camera ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;

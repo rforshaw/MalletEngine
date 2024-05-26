@@ -12,7 +12,8 @@ public final class Program
 	private final int index ;
 	private final String id ;
 
-	private final Map<String, IUniform> uniforms = MalletMap.<String, IUniform>newMap() ;
+	private final StructUniform uniforms = new StructUniform() ;
+	private final UniformList drawUniforms = new UniformList() ;
 	private final Map<String, Storage> storages = MalletMap.<String, Storage>newMap() ;
 
 	public Program( final String _id )
@@ -21,50 +22,20 @@ public final class Program
 		id = _id ;
 	}
 
-	public Program( final Program _program )
-	{
-		index = _program.index ;
-		id = _program.id ;
-
-		uniforms.putAll( _program.uniforms ) ;
-		storages.putAll( _program.storages ) ;
-	}
-
 	public boolean removeUniform( final String _handler )
 	{
-		if( uniforms.remove( _handler ) != null )
-		{
-			return true ;
-		}
-
-		// Failed to remove an object associated with 
-		// the passed in id - most likely never set.
-		return false ;
+		return uniforms.remove( _handler ) ;
 	}
 
+	/**
+		Map a uniform that the Program is expected
+		to provide.
+		Program uniforms can support hierarchical structures
+		and arrays of structures.
+	*/
 	public boolean mapUniform( final String _handler, final IUniform _uniform )
 	{
-		if( _handler == null || _uniform == null )
-		{
-			// The id or value cannot be null
-			return false ;
-		}
-
-		if( _uniform == uniforms.get( _handler ) )
-		{
-			// Attempting reassign to the same object. 
-			return false ;
-		}
-		
-		if( IUniform.Type.validate( _uniform ) == false )
-		{
-			// Only certain classes that implement IUniform
-			// are considered valid.
-			return false ;
-		}
-
-		uniforms.put( _handler, _uniform ) ;
-		return true ;
+		return uniforms.map( _handler, _uniform ) ;
 	}
 
 	/**
@@ -73,6 +44,16 @@ public final class Program
 	public IUniform getUniform( final String _id )
 	{
 		return uniforms.get( _id ) ;
+	}
+
+	public boolean forEachUniform( IUniform.IEach _func )
+	{
+		return uniforms.forEach( _func ) ;
+	}
+
+	public UniformList getDrawUniforms()
+	{
+		return drawUniforms ;
 	}
 
 	public boolean removeStorage( final String _handler )
@@ -144,8 +125,7 @@ public final class Program
 				return false ;
 			}
 
-			final Map<String, IUniform> u = program.uniforms ;
-			if( uniforms.size() != u.size() )
+			if( uniforms.equals( program.uniforms ) == false )
 			{
 				// If the hashmaps are not the same size then 
 				// no point in continuing.
@@ -156,23 +136,6 @@ public final class Program
 			if( storages.size() != b.size() )
 			{
 				return false ;
-			}
-
-			{
-				final Set<Map.Entry<String, IUniform>> entries = uniforms.entrySet() ;
-				if( entries.isEmpty() == false )
-				{
-					for( final Map.Entry<String, IUniform> entry : entries )
-					{
-						final IUniform obj1 = entry.getValue() ;
-						final IUniform obj2 = u.get( entry.getKey() ) ;
-
-						if( obj1.equals( obj2 ) == false )
-						{
-							return false ;
-						}
-					}
-				}
 			}
 
 			{

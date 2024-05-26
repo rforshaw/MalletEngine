@@ -1,6 +1,5 @@
 package com.linxonline.mallet.util.tools ;
 
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.io.serialisation.ByteOutput ;
 import com.linxonline.mallet.io.serialisation.ByteInput ;
 

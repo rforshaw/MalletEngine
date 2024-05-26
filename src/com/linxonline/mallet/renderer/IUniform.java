@@ -18,6 +18,8 @@ public interface IUniform
 		FLOAT64,
 		SAMPLER2D,
 		FONT,
+		STRUCT,
+		ARRAY,
 		UNKNOWN ;
 
 		public static boolean validate( final IUniform _uniform )
@@ -31,6 +33,8 @@ public interface IUniform
 				case FLOAT32      : return FloatUniform.class.isInstance( _uniform ) ;
 				case SAMPLER2D    : return MalletTexture.class.isInstance( _uniform ) ;
 				case FONT         : return MalletFont.class.isInstance( _uniform ) ;
+				case STRUCT       : return StructUniform.class.isInstance( _uniform ) ;
+				case ARRAY        : return ArrayUniform.class.isInstance( _uniform ) ;
 				case UNKNOWN      : return false ;
 				default           : return false ;
 			}
@@ -50,5 +54,10 @@ public interface IUniform
 				default             : return Type.UNKNOWN ;
 			}
 		}
+	}
+
+	public interface IEach
+	{
+		public boolean each( final String _absoluteName, final IUniform _uniform ) ;
 	}
 }

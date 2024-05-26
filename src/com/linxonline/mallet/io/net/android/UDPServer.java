@@ -12,7 +12,6 @@ import java.net.SocketException ;
 import java.net.SocketTimeoutException ;
 import java.io.IOException ;
 
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.io.serialisation.Serialise ;

@@ -4,7 +4,6 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
 
 /**
 	The Animation-system is updated at the specified framerate 

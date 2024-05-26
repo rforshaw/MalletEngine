@@ -272,8 +272,14 @@ public final class UIList extends UILayout
 				final Vector3 offset = getOffset() ;
 
 				final InputEvent input = new InputEvent( _event ) ;
-				final float x = getCamera().projectXToHUD( input.getMouseX() ) - ( position.x + offset.x ) ;
-				final float y = getCamera().projectYToHUD( input.getMouseY() ) - ( position.y + offset.y ) ;
+				mouseInput.setXYZ( input.getMouseX(), input.getMouseY(), 1.0f ) ;
+
+				final Camera camera = getCamera() ;
+				camera.inputToNDC( mouseInput, mouseInput ) ;
+				camera.ndcToHUD( mouseInput, mouseInput ) ;
+
+				final float x = mouseInput.x - ( position.x + offset.x ) ;
+				final float y = mouseInput.y - ( position.y + offset.y ) ;
 				input.setInput( input.getInputType(), ( int )x, ( int )y ) ;
 
 				return processInputEvent( input ) ;

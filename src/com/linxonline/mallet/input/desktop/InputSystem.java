@@ -10,23 +10,17 @@ import com.linxonline.mallet.util.caches.TimePool ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
 
-/**
-	Input System is designed to use Java's built in input listeners, 
-	requires to be added to a Window/Jframe to begin recieving input.
-**/
 public final class InputSystem implements IInputSystem, KeyListener, MouseListener
 {
 	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 150, 0.25f, () -> new InputEvent() ) ;
 
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
-
 	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
-	private final Vector2 mousePosition = new Vector2( 0, 0 ) ;
 
 	public InputSystem() {}
 
+	@Override
 	public void addInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == true )
@@ -37,6 +31,7 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 		handlers.add( _handler ) ;
 	}
 
+	@Override
 	public void removeInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == false )
@@ -48,7 +43,7 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 	}
 
 	/** Pass InputEvents to the handlers **/
-
+	@Override
 	public synchronized void update()
 	{
 		if( inputs.isEmpty() == true )
@@ -154,23 +149,17 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 			default                 :
 			case MouseEvent.BUTTON1 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE1_PRESSED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE1_PRESSED, _event ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON2 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE2_PRESSED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE2_PRESSED, _event ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON3 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE3_PRESSED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE3_PRESSED, _event ) ;
 				break ;
 			}
 		}
@@ -188,23 +177,17 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 			default                 :
 			case MouseEvent.BUTTON1 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE1_RELEASED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE1_RELEASED, _event ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON2 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE2_RELEASED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE2_RELEASED, _event ) ;
 				break ;
 			}
 			case MouseEvent.BUTTON3 :
 			{
-				mousePosition.x = _event.getX() ;
-				mousePosition.y = _event.getY() ;
-				updateMouse( InputType.MOUSE3_RELEASED, mousePosition, _event.getWhen() ) ;
+				updateMouse( InputType.MOUSE3_RELEASED, _event ) ;
 				break ;
 			}
 		}
@@ -212,18 +195,12 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 
 	public void mouseDragged( final MouseEvent _event )
 	{
-		mousePosition.x = _event.getX() ;
-		mousePosition.y = _event.getY() ;
-
-		updateMouse( InputType.MOUSE_MOVED, mousePosition, _event.getWhen() ) ;
+		updateMouse( InputType.MOUSE_MOVED, _event ) ;
 	}
 
 	public void mouseMoved( final MouseEvent _event )
 	{
-		mousePosition.x = _event.getX() ;
-		mousePosition.y = _event.getY() ;
-
-		updateMouse( InputType.MOUSE_MOVED, mousePosition, _event.getWhen() ) ;
+		updateMouse( InputType.MOUSE_MOVED, _event ) ;
 	}
 
 	/**  Recieve MouseWheelEvents from system **/
@@ -242,19 +219,21 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 		inputs.add( input ) ;
 	}
 
-	private synchronized void updateMouse( final InputType _inputType, final Vector2 _mousePosition, final long _when )
+	private synchronized void updateMouse( final InputType _inputType, final MouseEvent _event )
 	{
 		final InputEvent input = cache.take() ;
 		input.setID( InputID.MOUSE_1 ) ;
-		input.setInput( _inputType, ( int )_mousePosition.x, ( int )_mousePosition.y, _when ) ;
+		input.setInput( _inputType, _event.getX(), _event.getY(), _event.getWhen() ) ;
 		inputs.add( input ) ;
 	}
 
+	@Override
 	public void clearHandlers()
 	{
 		handlers.clear() ;
 	}
 
+	@Override
 	public synchronized void clearInputs()
 	{
 		inputs.clear() ;

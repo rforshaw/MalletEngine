@@ -75,7 +75,6 @@ public class GameState
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 
 	protected boolean paused = false ;									// Determine whether state was paused.
-	protected boolean draw = true ;										// Used to force a Draw
 	protected double deltaUpdateTime = 0.0 ;
 	protected double deltaRenderTime = 0.0 ;
 	protected double updateAccumulator = 0.0 ;							// Current dt update

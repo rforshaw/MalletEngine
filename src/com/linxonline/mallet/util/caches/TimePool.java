@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException ;
 
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
 
 /**
 	Provide a pool of objects that can be taken.

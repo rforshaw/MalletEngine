@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.time ;
 
-public class DefaultTimer implements ITimer
+public final class DefaultTimer
 {
 	private long oldTime = System.nanoTime() ;
 	private long currentTime = System.nanoTime() ;
@@ -10,8 +10,7 @@ public class DefaultTimer implements ITimer
 
 	public DefaultTimer() {}
 
-	@Override
-	public final double getElapsedTimeInNanoSeconds()
+	public double getElapsedTimeInNanoSeconds()
 	{
 		nanoseconds = ( double )getLongElapsedTime() * 0.000000001 ;
 		seconds += nanoseconds ;		// Accumulate the nanoseconds
@@ -24,25 +23,22 @@ public class DefaultTimer implements ITimer
 		return nanoseconds ;
 	}
 
-	@Override
-	public final long getTotalElapsedTimeInSeconds()
+	public long getTotalElapsedTimeInSeconds()
 	{
 		return totalTimeSeconds ;
 	}
 
-	@Override
-	public final double getRemainderInNanoSeconds()
+	public double getRemainderInNanoSeconds()
 	{
 		return seconds ;
 	}
 
-	@Override
 	public long nanoTime()
 	{
 		return System.nanoTime() ;
 	}
 
-	private final long getLongElapsedTime()
+	private long getLongElapsedTime()
 	{
 		oldTime = currentTime ;
 		currentTime = System.nanoTime() ;

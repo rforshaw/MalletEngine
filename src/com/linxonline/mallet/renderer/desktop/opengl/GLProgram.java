@@ -1,29 +1,24 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
 
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
 import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.Storage ;
-import com.linxonline.mallet.renderer.AssetLookup ;
+import com.linxonline.mallet.renderer.Draw ;
 
+import com.linxonline.mallet.renderer.UniformList ;
 import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.BoolUniform ;
+import com.linxonline.mallet.renderer.FloatUniform ;
+import com.linxonline.mallet.renderer.UIntUniform ;
+import com.linxonline.mallet.renderer.IntUniform ;
 
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.MalletList ;
-
-import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.Matrix4 ;
+import com.linxonline.mallet.util.Logger ;
+import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	GLProgram retains a collection of GLSL shaders 
@@ -40,16 +35,18 @@ public final class GLProgram extends ProgramManager.Program
 	public int inOffset = -1 ;
 	public int inRotation = -1 ;
 	public int inScale = -1 ;
-	public int inMVPMatrix = -1 ;
-	public final int[] inUniforms ;			// Additional uniforms defined in *.jgl and shaders
-	public final int[] inDrawUniforms ;		// Additional uniforms defined in *.jgl and shaders  
+
+	public int inModelMatrix = -1 ;
+	public int inViewMatrix = -1 ;
+	public int inProjectionMatrix = -1 ;
+
 	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
+
+	private final static UniformBuilder builder = new UniformBuilder() ;
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
-		inUniforms = new int[program.getUniforms().size()] ;
-		inDrawUniforms = new int[program.getDrawUniforms().size()] ;
 		inAttributes = new int[program.getAttribute().size()] ;
 
 		final int length = inAttributes.length ;
@@ -81,6 +78,40 @@ public final class GLProgram extends ProgramManager.Program
 	public String type()
 	{
 		return "GLPROGRAM" ;
+	}
+
+	public boolean loadDrawUniforms( final UniformState _state, final Draw _draw )
+	{
+		return builder.loadDrawUniforms( _state, _draw ) ;
+	}
+
+	public boolean buildDrawUniforms( final Program _program, final UniformState _state )
+	{
+		final UniformList list = _program.getDrawUniforms() ;
+
+		final int size = list.size() ;
+		final int[] locations = new int[size] ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			final String name = list.get( i ) ;
+			final int location = MGL.glGetUniformLocation( id[0], name ) ;
+			if( location < 0 )
+			{
+				Logger.println( "Unable to find: " + name + " required as a draw uniform.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+
+			locations[i] = location ;
+		}
+
+		_state.drawUniformLocations = locations ;
+		return true ;
+	}
+
+	public boolean buildProgramUniforms( final Program _program, final List<ILoadUniform> _toFill )
+	{
+		return builder.buildProgramUniforms( _program, this, _toFill ) ;
 	}
 
 	/**
@@ -127,33 +158,9 @@ public final class GLProgram extends ProgramManager.Program
 
 		MGL.glLinkProgram( program.id[0] ) ;
 
-		program.inPosition = MGL.glGetUniformLocation( program.id[0], "inTransformation.pos" ) ;
-		program.inOffset = MGL.glGetUniformLocation( program.id[0], "inTransformation.off" ) ;
-		program.inRotation = MGL.glGetUniformLocation( program.id[0], "inTransformation.rot" ) ;
-		program.inScale = MGL.glGetUniformLocation( program.id[0], "inTransformation.scale" ) ;
-		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
-
-		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getUniforms() ;
-
-			final int size = uniforms.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
-			}
-		}
-
-		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getDrawUniforms() ;
-
-			final int size = uniforms.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inDrawUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
-			}
-		}
+		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
+		program.inViewMatrix = MGL.glGetUniformLocation( program.id[0], "inViewMatrix" ) ;
+		program.inProjectionMatrix = MGL.glGetUniformLocation( program.id[0], "inProjectionMatrix" ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -227,6 +234,597 @@ public final class GLProgram extends ProgramManager.Program
 			case GEOMETRY : return MGL.GL_GEOMETRY_SHADER ;
 			case COMPUTE  : return MGL.GL_COMPUTE_SHADER ;
 			default       : return -1 ;
+		}
+	}
+
+	public static final class UniformState
+	{
+		public int[] drawUniformLocations = new int[0] ;
+		public int textureUnit = 0 ;
+
+		public boolean hasDrawUniforms()
+		{
+			return drawUniformLocations.length > 0 ;
+		}
+
+		public void reset()
+		{
+			textureUnit = 0 ;
+		}
+	}
+
+	public interface ILoadUniform
+	{
+		public boolean load( final UniformState _state ) ;
+	}
+
+	private static final class UniformBuilder implements IUniform.IEach
+	{
+		private final float[] floatTemp = new float[16] ;
+		private final int[] intTemp = new int[16] ;
+
+		private int programID = -1 ;
+		private List<ILoadUniform> toFill = null ;
+
+		public void set( final int _id, final List<ILoadUniform> _toFill )
+		{
+			programID = _id ;
+			toFill = _toFill ;
+		}
+
+		public boolean buildProgramUniforms( final Program _program, final GLProgram _glProgram, final List<ILoadUniform> _toFill )
+		{
+			programID = _glProgram.id[0] ;
+			toFill = _toFill ;
+
+			return _program.forEachUniform( builder ) ;
+		}
+
+		@Override
+		public boolean each( final String _absoluteName, final IUniform _uniform )
+		{
+			final int location = MGL.glGetUniformLocation( programID, _absoluteName ) ;
+
+			switch( _uniform.getType() )
+			{
+				case FLOAT64      :
+				{
+					Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
+					return false ;
+				}
+				case BOOL         :
+				{
+					final BoolUniform val = ( BoolUniform )_uniform ;
+					toFill.add( ( final UniformState _state ) ->
+					{
+						MGL.glUniform1i( location, val.getState() ? 1 : 0) ;
+						return true ;
+					} ) ;
+					break ;
+				}
+				case UINT32       :
+				{
+					final UIntUniform vec = ( UIntUniform )_uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+							return false ;
+						}
+						case 1  :
+						{
+							final int x = intTemp[0] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform1ui( location, x ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 2  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform2ui( location, x, y ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 3  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+							final int z = intTemp[2] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform3ui( location, x, y, z ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 4  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+							final int z = intTemp[2] ;
+							final int w = intTemp[3] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform4ui( location, x, y, z, w ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+					}
+
+					break ;
+				}
+				case INT32        :
+				{
+					final IntUniform vec = ( IntUniform )_uniform ;
+					final int num = vec.fill( 0, intTemp ) ;
+
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+							return false ;
+						}
+						case 1  :
+						{
+							final int x = intTemp[0] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform1i( location, x ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 2  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform2i( location, x, y ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 3  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+							final int z = intTemp[2] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform3i( location, x, y, z ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 4  :
+						{
+							final int x = intTemp[0] ;
+							final int y = intTemp[1] ;
+							final int z = intTemp[2] ;
+							final int w = intTemp[3] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform4i( location, x, y, z, w ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+					}
+
+					break ;
+				}
+				case FLOAT32      :
+				{
+					final FloatUniform vec = ( FloatUniform )_uniform ;
+					final int num = vec.fill( 0, floatTemp ) ;
+					switch( num )
+					{
+						default :
+						{
+							Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+							return false ;
+						}
+						case 1  :
+						{
+							final float x = floatTemp[0] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform1f( location, x ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 2  :
+						{
+							final float x = floatTemp[0] ;
+							final float y = floatTemp[1] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform2f( location, x, y ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 3  :
+						{
+							final float x = floatTemp[0] ;
+							final float y = floatTemp[1] ;
+							final float z = floatTemp[2] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform3f( location, x, y, z ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 4  :
+						{
+							final float x = floatTemp[0] ;
+							final float y = floatTemp[1] ;
+							final float z = floatTemp[2] ;
+							final float w = floatTemp[3] ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniform4f( location, x, y, z, w ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+						case 16 :
+						{
+							final float[] mat4 = new float[16] ;
+							System.arraycopy( floatTemp, 0, mat4, 0, floatTemp.length ) ;
+
+							toFill.add( ( final UniformState _state ) ->
+							{
+								MGL.glUniformMatrix4fv( location, 1, false, mat4, 0 ) ;
+								return true ;
+							} ) ;
+
+							break ;
+						}
+					}
+					break ;
+				}
+				case SAMPLER2D    :
+				{
+					final MalletTexture texture = ( MalletTexture )_uniform ;
+					if( texture == null )
+					{
+						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+						return false ;
+					}
+
+					final GLImage glTexture = GLRenderer.getTexture( texture ) ;
+					if( glTexture == null )
+					{
+						return false ;
+					}
+
+					final int minFilter = GLImage.calculateMinFilter( texture.getMinificationFilter() ) ;
+					final int magFilter = GLImage.calculateMagFilter( texture.getMaxificationFilter() ) ;
+
+					final int uWrap = GLImage.calculateWrap( texture.getUWrap() ) ;
+					final int vWrap = GLImage.calculateWrap( texture.getVWrap() ) ;
+
+					toFill.add( ( final UniformState _state ) ->
+					{
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, uWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, vWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, magFilter ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, minFilter ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					} ) ;
+
+					break ;
+				}
+				case FONT         :
+				{
+					final MalletFont font = ( MalletFont )_uniform ;
+					final GLFont glFont = GLRenderer.getFont( font ) ;
+					final GLImage glTexture = glFont.getTexture() ;
+
+					toFill.add( ( final UniformState _state ) ->
+					{
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					} ) ;
+
+					break ;
+				}
+				case UNKNOWN      :
+				default           : return false ;
+			}
+
+			return true ;
+		}
+
+		public boolean loadDrawUniforms( final UniformState _state, final Draw _draw )
+		{
+			final int size = _state.drawUniformLocations.length ;
+			for( int i = 0; i < size; ++i )
+			{
+				final IUniform uniform = _draw.getUniform( i ) ;
+				final int location = _state.drawUniformLocations[i] ;
+				if( location == -1 )
+				{
+					// The uniform is not found in this program, but
+					// that doesn't mean it's not used in another program.
+					return true ;
+				}
+
+				switch( uniform.getType() )
+				{
+					case FLOAT64      :
+					{
+						Logger.println( "Load uniform type not implemented", Logger.Verbosity.MAJOR ) ;
+						return false ;
+					}
+					case BOOL         :
+					{
+						final BoolUniform val = ( BoolUniform )uniform ;
+
+						MGL.glUniform1i( location, val.getState() ? 1 : 0) ;
+						return true ;
+					}
+					case UINT32       :
+					{
+						final UIntUniform vec = ( UIntUniform )uniform ;
+						final int num = vec.fill( 0, intTemp ) ;
+
+						switch( num )
+						{
+							default :
+							{
+								Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+								return false ;
+							}
+							case 1  :
+							{
+								final int x = intTemp[0] ;
+
+								MGL.glUniform1ui( location, x ) ;
+								return true ;
+							}
+							case 2  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+
+								MGL.glUniform2ui( location, x, y ) ;
+								return true ;
+							}
+							case 3  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+								final int z = intTemp[2] ;
+
+								MGL.glUniform3ui( location, x, y, z ) ;
+								return true ;
+							}
+							case 4  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+								final int z = intTemp[2] ;
+								final int w = intTemp[3] ;
+
+								MGL.glUniform4ui( location, x, y, z, w ) ;
+								return true ;
+							}
+						}
+					}
+					case INT32        :
+					{
+						final IntUniform vec = ( IntUniform )uniform ;
+						final int num = vec.fill( 0, intTemp ) ;
+
+						switch( num )
+						{
+							default :
+							{
+								Logger.println( "Uint uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+								return false ;
+							}
+							case 1  :
+							{
+								final int x = intTemp[0] ;
+
+								MGL.glUniform1i( location, x ) ;
+								return true ;
+							}
+							case 2  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+
+								MGL.glUniform2i( location, x, y ) ;
+								return true ;
+							}
+							case 3  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+								final int z = intTemp[2] ;
+
+								MGL.glUniform3i( location, x, y, z ) ;
+								return true ;
+							}
+							case 4  :
+							{
+								final int x = intTemp[0] ;
+								final int y = intTemp[1] ;
+								final int z = intTemp[2] ;
+								final int w = intTemp[3] ;
+
+								MGL.glUniform4i( location, x, y, z, w ) ;
+								return true ;
+							}
+						}
+					}
+					case FLOAT32      :
+					{
+						final FloatUniform vec = ( FloatUniform )uniform ;
+						final int num = vec.fill( 0, floatTemp ) ;
+
+						switch( num )
+						{
+							default :
+							{
+								Logger.println( "Float uniform - unsupported component count.", Logger.Verbosity.MAJOR ) ;
+								return false ;
+							}
+							case 1  :
+							{
+								final float x = floatTemp[0] ;
+
+								MGL.glUniform1f( location, x ) ;
+								return true ;
+							}
+							case 2  :
+							{
+								final float x = floatTemp[0] ;
+								final float y = floatTemp[1] ;
+
+								MGL.glUniform2f( location, x, y ) ;
+								return true ;
+							}
+							case 3  :
+							{
+								final float x = floatTemp[0] ;
+								final float y = floatTemp[1] ;
+								final float z = floatTemp[2] ;
+
+								MGL.glUniform3f( location, x, y, z ) ;
+								return true ;
+							}
+							case 4  :
+							{
+								final float x = floatTemp[0] ;
+								final float y = floatTemp[1] ;
+								final float z = floatTemp[2] ;
+								final float w = floatTemp[3] ;
+
+								MGL.glUniform4f( location, x, y, z, w ) ;
+								return true ;
+							}
+							case 16 :
+							{
+								MGL.glUniformMatrix4fv( location, 1, true, floatTemp, 0 ) ;
+								return true ;
+							}
+						}
+					}
+					case SAMPLER2D    :
+					{
+						final MalletTexture texture = ( MalletTexture )uniform ;
+						if( texture == null )
+						{
+							Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+							return false ;
+						}
+
+						final GLImage glTexture = GLRenderer.getTexture( texture ) ;
+						if( glTexture == null )
+						{
+							return false ;
+						}
+
+						final int minFilter = GLImage.calculateMinFilter( texture.getMinificationFilter() ) ;
+						final int magFilter = GLImage.calculateMagFilter( texture.getMaxificationFilter() ) ;
+
+						final int uWrap = GLImage.calculateWrap( texture.getUWrap() ) ;
+						final int vWrap = GLImage.calculateWrap( texture.getVWrap() ) ;
+
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, uWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, vWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, magFilter ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, minFilter ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					}
+					case FONT         :
+					{
+						final MalletFont font = ( MalletFont )uniform ;
+						final GLFont glFont = GLRenderer.getFont( font ) ;
+						final GLImage glTexture = glFont.getTexture() ;
+
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					}
+					case UNKNOWN      :
+					default           : return false ;
+				}
+			}
+
+			return true ;
 		}
 	}
 }

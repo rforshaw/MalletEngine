@@ -32,7 +32,7 @@ public final class Draw implements IUpdate
 
 	// We don't want to construct a map for uniforms unless the client
 	// has some uniforms for the draw object.
-	private Map<String, IUniform> uniforms = null ;
+	private StructUniform uniforms = null ;
 
 	public Draw()
 	{
@@ -40,6 +40,12 @@ public final class Draw implements IUpdate
 			  0.0f, 0.0f, 0.0f ) ;
 	}
 
+	public Draw( final float _posX, final float _posY, final float _posZ )
+	{
+		this( _posX, _posY, _posZ,
+			  0.0f, 0.0f, 0.0f ) ;
+	}
+	
 	public Draw( final float _posX, final float _posY, final float _posZ,
 				 final float _offX, final float _offY, final float _offZ )
 	{
@@ -108,46 +114,28 @@ public final class Draw implements IUpdate
 			return false ;
 		}
 	
-		if( uniforms.remove( _handler ) != null )
-		{
-			return true ;
-		}
-
-		// Failed to remove an object associated with 
-		// the passed in id - most likely never set.
-		return false ;
+		return uniforms.remove( _handler ) ;
 	}
 
-	public boolean mapUniform( final String _handler, final IUniform _uniform )
+	public boolean addUniform( final String _handler, final IUniform _uniform )
 	{
-		if( _handler == null || _uniform == null )
+		switch( _uniform.getType() )
 		{
-			// The id or value cannot be null
-			return false ;
-		}
-
-		if( _uniform == uniforms.get( _handler ) )
-		{
-			// Attempting reassign to the same object. 
-			return false ;
-		}
-		
-		if( IUniform.Type.validate( _uniform ) == false )
-		{
-			// Only certain classes that implement IUniform
-			// are considered valid.
-			return false ;
+			case STRUCT :
+			case ARRAY  :
+			{
+				// We don't want to support complex structures
+				// while using uniforms on draw objects.
+				return false ;
+			}
 		}
 
 		if( uniforms == null )
 		{
-			// Only construct the uniform map if the user
-			// has a uniform they want to store.
-			uniforms = MalletMap.<String, IUniform>newMap() ;
+			uniforms = new StructUniform() ;
 		}
 
-		uniforms.put( _handler, _uniform ) ;
-		return true ;
+		return uniforms.add( _handler, _uniform ) ;
 	}
 
 	/**
@@ -161,6 +149,21 @@ public final class Draw implements IUpdate
 		}
 
 		return uniforms.get( _id ) ;
+	}
+
+	public IUniform getUniform( final int _index )
+	{
+		return uniforms.get( _index ) ;
+	}
+
+	public int uniformSize()
+	{
+		return ( uniforms == null ) ? 0 : uniforms.size() ;
+	}
+	
+	public boolean isUniformsEmpty()
+	{
+		return uniforms == null || uniforms.isEmpty() ;
 	}
 
 	public IShape[] getShapes()
@@ -287,28 +290,6 @@ public final class Draw implements IUpdate
 	public Vector3 getRotation( final Vector3 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, ROTATION ) ;
-	}
-
-	public void getTransformations( final Vector3 _position,
-									final Vector3 _offset,
-									final Vector3 _rotation,
-									final Vector3 _scale )
-	{
-		FloatBuffer.fill( present, _position, POSITION ) ;
-		FloatBuffer.fill( present, _offset, OFFSET ) ;
-		FloatBuffer.fill( present, _rotation, ROTATION ) ;
-		FloatBuffer.fill( present, _scale, SCALE ) ;
-	}
-
-	public float[] getTransformations( final float[] _fill )
-	{
-		System.arraycopy( present, 0, _fill, 0, 12 ) ;
-		return _fill ;
-	}
-
-	public float[] getRawTransformations()
-	{
-		return present ;
 	}
 
 	public void setScaleInstant( final float _x, final float _y, final float _z )

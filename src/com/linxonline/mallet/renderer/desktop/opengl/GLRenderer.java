@@ -549,6 +549,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	private void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
 		final Camera camera = getDefaultCamera() ;
+
 		camera.setDisplayResolution( _width, _height ) ;
 		camera.setScreenResolution( _width, _height ) ;
 		CameraAssist.update( camera ) ;
@@ -609,12 +610,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		updateCameraAndWorldDisplay( _width, _height ) ;
 		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == true )
 		{
+			
+
 			// My default the main framebuffer is the same dimensions 
 			// as the window, the camera projection does not have to align 
 			// with this requirement unless this flag is set to true.
 			final Camera camera = getDefaultCamera() ;
-			camera.setOrthographic( Camera.Mode.HUD, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
-			//camera.setOrthographic( Camera.Mode.WORLD, 0.0f, _height, 0.0f, _width, -1000.0f, 1000.0f ) ;
+			camera.setOrthographic( Camera.Mode.HUD, 0, _height, 0, _width, -1000.0f, 1000.0f ) ;
 			CameraAssist.update( camera ) ;
 		}
 	}

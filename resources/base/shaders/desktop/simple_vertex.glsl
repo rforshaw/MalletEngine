@@ -1,6 +1,7 @@
 
-uniform Transformation inTransformation ;
-uniform mat4 inMVPMatrix ;
+uniform mat4 inModelMatrix ;
+uniform mat4 inViewMatrix ;
+uniform mat4 inProjectionMatrix ;
 
 in vec4 inVertex ;
 in vec4 inColour ;
@@ -12,9 +13,7 @@ out vec4 outColour ;
 
 void main()
 {
-	mat4 inModelMatrix = create_transformation( inTransformation ) ;
-
-	gl_Position = inMVPMatrix * inModelMatrix * inVertex ;
+	gl_Position = inProjectionMatrix * inViewMatrix * inModelMatrix * inVertex ;
 	outTexCoord0 = inTexCoord0 ;
 	outColour = inColour ;
 }

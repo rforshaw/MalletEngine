@@ -14,7 +14,6 @@ import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.BoolUniform ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.io.Resource ;
@@ -130,24 +129,24 @@ public final class GLProgram extends ProgramManager.Program
 		program.inMVPMatrix = MGL.glGetUniformLocation( program.id[0], "inMVPMatrix" ) ;
 
 		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getUniforms() ;
+			final List<JSONProgram.Uniform> uniforms = _program.getUniforms() ;
 
 			final int size = uniforms.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
+				final JSONProgram.Uniform uniform = uniforms.get( i ) ;
+				program.inUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getName() ) ;
 			}
 		}
 
 		{
-			final List<JSONProgram.UniformMap> uniforms = _program.getDrawUniforms() ;
+			final List<JSONProgram.Uniform> uniforms = _program.getDrawUniforms() ;
 
 			final int size = uniforms.size() ;
 			for( int i = 0; i < size; i++ )
 			{
-				final JSONProgram.UniformMap uniform = uniforms.get( i ) ;
-				program.inDrawUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getRight() ) ;
+				final JSONProgram.Uniform uniform = uniforms.get( i ) ;
+				program.inDrawUniforms[i] = MGL.glGetUniformLocation( program.id[0], uniform.getName() ) ;
 			}
 		}
 

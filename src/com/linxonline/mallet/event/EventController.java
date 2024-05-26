@@ -3,7 +3,6 @@ package com.linxonline.mallet.event ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.Tuple ;
 
 /**

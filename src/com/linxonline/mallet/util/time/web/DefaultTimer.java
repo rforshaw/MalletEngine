@@ -3,9 +3,7 @@ package com.linxonline.mallet.util.time ;
 import org.teavm.jso.* ;
 import org.teavm.jso.browser.* ;
 
-import com.linxonline.mallet.util.time.* ;
-
-public class DefaultTimer implements ITimer
+public final class DefaultTimer
 {
 	private long oldTime = ( long )Performance.now() ;
 	private long currentTime = ( long )Performance.now() ;
@@ -15,8 +13,7 @@ public class DefaultTimer implements ITimer
 
 	public DefaultTimer() {}
 
-	@Override
-	public final double getElapsedTimeInNanoSeconds()
+	public double getElapsedTimeInNanoSeconds()
 	{
 		nanoseconds = ( double )getLongElapsedTime() * 0.001 ;
 		seconds += nanoseconds ;		// Accumulate the nanoseconds
@@ -29,26 +26,23 @@ public class DefaultTimer implements ITimer
 		return nanoseconds ;
 	}
 
-	@Override
-	public final long getTotalElapsedTimeInSeconds()
+	public long getTotalElapsedTimeInSeconds()
 	{
 		return totalTimeSeconds ;
 	}
 
-	@Override
-	public final double getRemainderInNanoSeconds()
+	public double getRemainderInNanoSeconds()
 	{
 		return seconds ;
 	}
 
-	@Override
 	public long nanoTime()
 	{
 		final long nano = ( long )Performance.now() * 1000000 ;
 		return nano ;
 	}
 
-	private final long getLongElapsedTime()
+	private long getLongElapsedTime()
 	{
 		oldTime = currentTime ;
 		currentTime = ( long )Performance.now() ;

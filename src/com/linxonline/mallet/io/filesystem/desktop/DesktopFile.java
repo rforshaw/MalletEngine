@@ -9,7 +9,6 @@ import java.io.FileNotFoundException ;
 import java.io.IOException ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Logger ;
 
 public final class DesktopFile implements FileStream
 {

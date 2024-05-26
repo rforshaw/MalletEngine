@@ -44,7 +44,8 @@ public final class GLTextBuffer extends GLBuffer
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
 
 	private GLProgram glProgram ;
-	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
+	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final MalletColour shapeColour = new MalletColour() ;
@@ -53,7 +54,7 @@ public final class GLTextBuffer extends GLBuffer
 	private final Vector3 temp = new Vector3() ;
 
 	private final Matrix4 matrix = new Matrix4() ;
-	private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
+	private final Matrix4 matrixTemp = Matrix4.createIdentity() ;
 
 	private final AABB boundary = new AABB() ;
 	private final Vector3 position = new Vector3() ;
@@ -109,10 +110,9 @@ public final class GLTextBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLTextBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
+		uniforms.clear() ;
+		if( glProgram.buildProgramUniforms( program, uniforms ) == false )
 		{
-			// We've failed to update the buffer something in
-			// the program map is wrong or has yet to be loaded.
 			stable = false ;
 			return stable ;
 		}
@@ -372,13 +372,23 @@ public final class GLTextBuffer extends GLBuffer
 		GLTextBuffer.enableVertexAttributes( attributes ) ;
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
-		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
-		final float[] matrix = projection.matrix ;
+		final Matrix4 view = ( isUI() ) ? IDENTITY : _camera.getView() ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getProjection() ;
 
-		MGL.glUniformMatrix4fv( glProgram.inMVPMatrix, 1, true, matrix, 0 ) ;
-		if( loadProgramUniforms( glProgram, uniforms ) == false )
+		MGL.glUniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
+		MGL.glUniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+
 		{
-			System.out.println( "Failed to load uniforms." ) ;
+			uniformState.reset() ;
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				if( uniforms.get( i ).load( uniformState ) == false )
+				{
+					System.out.println( "Failed to load uniforms." ) ;
+					return ;
+				}
+			}
 		}
 
 		GLTextBuffer.bindBuffers( storages ) ;

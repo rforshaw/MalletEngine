@@ -26,6 +26,16 @@ public final class Camera
 	private final float[] present = FloatBuffer.allocate( 12 ) ;
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
+	private final Vector3 position = new Vector3() ;
+	private final Vector3 rotation = new Vector3() ;
+	private final Vector3 scale = new Vector3() ;
+
+	private final Matrix4 worldMatrix = new Matrix4() ;
+	private final Matrix4 viewMatrix = new Matrix4() ;
+
+	private final Matrix4 hudWorldMatrix = new Matrix4() ;
+	private final Matrix4 hudViewMatrix = new Matrix4() ;
+
 	private final Vector3 up = new Vector3( 0.0f, 1.0f, 0.0f ) ;
 
 	private final Vector3 eye = new Vector3() ;
@@ -41,6 +51,8 @@ public final class Camera
 	private final Vector2 scaledRender = new Vector2() ;
 	private final Vector2 ratio = new Vector2() ;
 
+	private boolean viewMatrixDirty = true ;
+
 	public Camera( final String _id )
 	{
 		id = _id ;
@@ -49,85 +61,67 @@ public final class Camera
 		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
 	}
 
-	public float projectXToWorld( final float _x )
+	public Vector3 inputToNDC( final Vector3 _input, final Vector3 _ndc )
 	{
 		final Vector2 render = renderScreen.dimension ;
-		final Vector2 display = displayScreen.dimension ;
+		final Vector2 offset = renderScreen.offset ;
 
-		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
-		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
+		_ndc.x = 2.0f * ( ( offset.x + _input.x ) / render.x ) - 1.0f ;
+		_ndc.y = -2.0f * ( ( offset.y + _input.y ) / render.y ) + 1.0f ;
 
-		final float halfRender = render.x * 0.5f ;
-		final float posX = FloatBuffer.get( future, POSITION + 0 ) ;
-		final float scaleX = FloatBuffer.get( future, SCALE + 0 ) ;
-
-		final float t1 = ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) - halfRender ;
-		final float cam = ( t1 / scaleX ) + posX ;
-		return cam ;
+		return _ndc ;
 	}
 
-	public float projectYToWorld( final float _y )
+	public Vector3 worldToNDC( final Vector3 _world, final Vector3 _ndc )
 	{
-		final Vector2 render = renderScreen.dimension ;
-		final Vector2 display = displayScreen.dimension ;
-
-		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
-		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
-
-		final float halfRender = render.y * 0.5f ;
-		final float posY = FloatBuffer.get( future, POSITION + 1 ) ;
-		final float scaleY = FloatBuffer.get( future, SCALE + 1 ) ;
-
-		final float t1 = ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) - halfRender ;
-		final float cam = ( t1 / scaleY ) + posY ;
-		return cam ;
+		return toNDC( Camera.Mode.WORLD, _world, _ndc ) ;
 	}
 
-	public float projectXToHUD( final float _x )
+	public Vector3 toNDC( final Camera.Mode _mode, final Vector3 _space, final Vector3 _ndc )
 	{
-		final Vector2 render = renderScreen.dimension ;
-		final Vector2 display = displayScreen.dimension ;
-
-		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
-		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
-
-		final float posX = FloatBuffer.get( future, HUD_POSITION + 0 ) ;
-
-		return ( ( ( _x - screenOffset.x ) * render.x ) / scaledRender.x ) + posX ;
-	}
-
-	public float projectYToHUD( final float _y )
-	{
-		final Vector2 render = renderScreen.dimension ;
-		final Vector2 display = displayScreen.dimension ;
-
-		Ratio.calculateRatio( ratio, render, display, Ratio.FILL_RATIO ) ;
-		Ratio.calculateScaleRender( scaledRender, render, ratio ) ;
-		Ratio.calculateOffset( screenOffset, renderScreen.offset, displayScreen.offset ) ;
-
-		final float posY = FloatBuffer.get( future, HUD_POSITION + 1 ) ;
-
-		return ( ( ( _y - screenOffset.y ) * render.y ) / scaledRender.y ) + posY ;
-	}
-
-	public float projectXTo( final Camera.Mode _mode, final float _x )
-	{
+		updateViewMatrix() ;
 		switch( _mode )
 		{
-			default    : return projectXToWorld( _x ) ;
-			case WORLD : return projectXToHUD( _x ) ;
+			default    :
+			case WORLD :
+			{
+				Matrix4.multiply( _space, viewMatrix, _ndc ) ;
+				return Matrix4.multiply( _ndc, worldProjection.matrix, _ndc ) ;
+			}
+			case HUD   :
+			{
+				Matrix4.multiply( _space, hudViewMatrix, _ndc ) ;
+				return Matrix4.multiply( _ndc, hudProjection.matrix, _ndc ) ;
+			}
 		}
 	}
 
-	public float projectYTo( final Camera.Mode _mode, final float _y )
+	public Vector3 ndcToWorld( final Vector3 _ndc, final Vector3 _world )
 	{
+		return ndcTo( Camera.Mode.WORLD, _ndc, _world ) ;
+	}
+
+	public Vector3 ndcToHUD( final Vector3 _ndc, final Vector3 _hud )
+	{
+		return ndcTo( Camera.Mode.HUD, _ndc, _hud ) ;
+	}
+
+	public Vector3 ndcTo( final Camera.Mode _mode, final Vector3 _ndc, final Vector3 _space )
+	{
+		updateViewMatrix() ;
 		switch( _mode )
 		{
-			default    : return projectYToWorld( _y ) ;
-			case WORLD : return projectYToHUD( _y ) ;
+			default    :
+			case WORLD :
+			{
+				Matrix4.multiply( _ndc, worldProjection.inverse, _space ) ;
+				return Matrix4.multiply( _space, worldMatrix, _space ) ;
+			}
+			case HUD   :
+			{
+				Matrix4.multiply( _ndc, hudProjection.inverse, _space ) ;
+				return Matrix4.multiply( _space, hudWorldMatrix, _space ) ;
+			}
 		}
 	}
 
@@ -163,11 +157,13 @@ public final class Camera
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
+		viewMatrixDirty = true ;
 	}
 
 	public void addToPosition( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.add( future, POSITION, _x, _y, _z ) ;
+		viewMatrixDirty = true ;
 	}
 
 	public Vector3 getPosition( final Vector3 _fill )
@@ -206,6 +202,8 @@ public final class Camera
 
 		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
 		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
+
+		viewMatrixDirty = true ;
 	}
 
 	public Vector3 getRotation( final Vector3 _fill )
@@ -221,11 +219,17 @@ public final class Camera
 	public void setScale( final float _x, final float _y, final float _z )
 	{
 		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
+		viewMatrixDirty = true ;
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, SCALE ) ;
+	}
+
+	public Vector3 getFutureScale( final Vector3 _fill )
+	{
+		return FloatBuffer.fill( future, _fill, SCALE ) ;
 	}
 
 	public void lookAt( final float _x, final float _y, final float _z )
@@ -246,7 +250,8 @@ public final class Camera
 			roll = ( Math.signum( roll ) ) * PI - roll ;
 		}
 
-		setRotation( pitch, yaw, roll ) ;
+		setRotation( pitch, -yaw, roll ) ;
+		viewMatrixDirty = true ;
 	}
 
 	/**
@@ -280,13 +285,13 @@ public final class Camera
 		updateOrtho( hudProjection, _top, _bottom, _left, _right, _near, _far ) ;
 	}
 
-	private static void updateOrtho( final Projection _projection,
-									 final float _top,
-									 final float _bottom,
-									 final float _left,
-									 final float _right,
-									 final float _near,
-									 final float _far )
+	private void updateOrtho( final Projection _projection,
+							  final float _top,
+							  final float _bottom,
+							  final float _left,
+							  final float _right,
+							  final float _near,
+							  final float _far )
 	{
 		_projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
 		_projection.farPlane.setXYZ( _projection.nearPlane.x, _projection.nearPlane.y, _far ) ;
@@ -296,10 +301,30 @@ public final class Camera
 		final float invX = 1.0f / ( _right - _left ) ;
 
 		final Matrix4 proj = _projection.matrix ;
-		proj.set( 2.0f * invX, 0.0f,        0.0f,        ( -( _right + _left ) * invX ),
-				  0.0f,        2.0f * invY, 0.0f,        ( -( _top + _bottom ) * invY ),
-				  0.0f,        0.0f,       -2.0f * invZ, ( -( _far + _near ) * invZ ),
-				  0.0f,        0.0f,        0.0f,        1.0f ) ;
+		final float[] mat = proj.matrix ; 
+
+		mat[0] = 2.0f * invX ;
+		mat[4] = 0.0f ;
+		mat[8] = 0.0f ;
+		mat[12] = ( -( _right + _left ) * invX ) ;
+
+		mat[1] = 0.0f ;
+		mat[5] = 2.0f * invY ;
+		mat[9] = 0.0f ;
+		mat[13] = ( -( _top + _bottom ) * invY ) ;
+		
+		mat[2] = 0.0f ;
+		mat[6] = 0.0f ;
+		mat[10] = -2.0f * invZ ;
+		mat[14] = ( -( _far + _near ) * invZ ) ;
+
+		mat[3] = 0.0f ;
+		mat[7] = 0.0f ;
+		mat[11] = 0.0f ;
+		mat[15] = 1.0f ;
+
+		_projection.inverse.set( proj ) ;
+		_projection.inverse.invert() ;
 	}
 
 	public void setPerspective( final Mode _mode, final float _fov, final float _near, final float _far )
@@ -336,13 +361,13 @@ public final class Camera
 		}
 	}
 
-	private static void setPerspective( final Projection _projection,
-										final float _top,
-										final float _bottom,
-										final float _left,
-										final float _right,
-										final float _near,
-										final float _far )
+	private void setPerspective( final Projection _projection,
+								 final float _top,
+								 final float _bottom,
+								 final float _left,
+								 final float _right,
+								 final float _near,
+								 final float _far )
 	{
 		_projection.nearPlane.setXYZ( _right - _left, _bottom - _top, _near ) ;
 		_projection.farPlane.setXYZ( _projection.nearPlane.x, _projection.nearPlane.y, _far ) ;
@@ -364,8 +389,11 @@ public final class Camera
 				  0.0f, m11,   m21, 0.0f,
 				  0.0f, 0.0f,  m22,  m23,
 				  0.0f, 0.0f, -1.0f, 0.0f ) ;
+
+		_projection.inverse.set( proj ) ;
+		_projection.inverse.invert() ;
 	}
-	
+
 	public void setProjection( final Mode _mode, final Projection _projection )
 	{
 		switch( _mode )
@@ -424,23 +452,40 @@ public final class Camera
 		return _fill ;
 	}
 
+	public Matrix4 getViewMatrix( final Matrix4 _fill )
+	{
+		updateViewMatrix() ;
+		_fill.set( viewMatrix ) ;
+		return _fill ;
+	}
+
+	private void updateViewMatrix()
+	{
+		if( viewMatrixDirty == false )
+		{
+			return ;
+		}
+
+		worldMatrix.applyTransformations( getPosition( position ), getRotation( rotation ), getScale( scale ) ) ;
+		viewMatrix.set( worldMatrix ) ;
+		viewMatrix.invert() ;
+
+		rotation.setXYZ( 0, 0, 0 ) ;
+		scale.setXYZ( 1, 1, 1 ) ;
+
+		hudWorldMatrix.applyTransformations( getHUDPosition( position ), rotation, scale ) ;
+		hudViewMatrix.set( hudWorldMatrix ) ;
+		hudViewMatrix.invert() ;
+
+		viewMatrixDirty = false ;
+	}
+
 	public boolean update( final int _diff, final int _iteration )
 	{
 		boolean update = false ;
 		update |= Interpolate.linear( future, old, present, _diff, _iteration ) ;
+		viewMatrixDirty = update ;
 		return update ;
-	}
-
-	private boolean interpolate( final Vector3 _future, final Vector3 _past, final Vector3 _present, final int _diff, final int _iteration )
-	{
-		if( Interpolate.linear( _future, _past, _present, _diff, _iteration ) )
-		{
-			// If an object has not reached its final state
-			// then flag it for updating again during the next draw call.
-			return true ;
-		}
-		
-		return false ;
 	}
 
 	@Override
@@ -526,7 +571,9 @@ public final class Camera
 	{
 		public final Vector3 nearPlane = new Vector3() ;	// x = width, y = height, z = near
 		public final Vector3 farPlane = new Vector3() ;		// x = width, y = height, z = far
-		public final Matrix4 matrix = new Matrix4() ;		// Combined Model View and Projection Matrix
+
+		public final Matrix4 matrix = new Matrix4() ;		// Projection matrix
+		public final Matrix4 inverse = new Matrix4() ;		// Inverse Projection matrix
 
 		public Projection() {}
 
@@ -539,7 +586,9 @@ public final class Camera
 		{
 			nearPlane.setXYZ( _projection.nearPlane ) ;
 			farPlane.setXYZ( _projection.farPlane ) ;
+
 			matrix.set( _projection.matrix ) ;
+			inverse.set( _projection.inverse ) ;
 		}
 
 		@Override

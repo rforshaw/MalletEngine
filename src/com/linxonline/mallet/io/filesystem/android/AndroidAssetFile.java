@@ -6,7 +6,6 @@ import java.io.IOException ;
 import android.content.res.AssetManager ;
 
 import com.linxonline.mallet.io.filesystem.* ;
-import com.linxonline.mallet.util.Logger ;
 
 public class AndroidAssetFile implements FileStream
 {
