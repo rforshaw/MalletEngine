@@ -6,8 +6,5 @@
 		"base/shaders/desktop/engine_utils.glsl",
 		"base/shaders/desktop/simple_vertex.glsl"
 	],
-	"FRAGMENT": ["base/shaders/desktop/simple_texture_fragment.glsl"],
-
-	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "SAMPLER2D"}],
-	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
+	"FRAGMENT": ["base/shaders/desktop/simple_texture_fragment.glsl"]
 }

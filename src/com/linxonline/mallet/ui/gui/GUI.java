@@ -12,7 +12,11 @@ public final class GUI
 	private static Map<MalletFont, Program> fontPrograms = MalletMap.<MalletFont, Program>newMap() ;
 	private static Map<MalletTexture, Program> texturePrograms = MalletMap.<MalletTexture, Program>newMap() ;
 
-	private static final Program geometryProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) );
+	private static final Program geometryProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY", IShape.Style.LINE_STRIP, new Attribute[]
+	{
+		new Attribute( "inVertex", IShape.Attribute.VEC3 ),
+		new Attribute( "inColour", IShape.Attribute.FLOAT )
+	}  ) );
 
 	private static final DrawUpdaterPool drawPool = new DrawUpdaterPool() ;
 	private static final TextUpdaterPool textPool = new TextUpdaterPool() ;

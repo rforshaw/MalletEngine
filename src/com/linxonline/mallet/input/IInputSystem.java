@@ -12,7 +12,7 @@ public interface IInputSystem
 	public void removeInputHandler( final IInputHandler _handler ) ;
 
 	public void update() ;
-	
+
 	public void clearHandlers() ;
 	public void clearInputs() ;
 }

@@ -123,6 +123,9 @@ public final class MGL
 	public final static int GL_SHADER_STORAGE_BUFFER = GL3.GL_SHADER_STORAGE_BUFFER ;
 	public final static int GL_SHADER_STORAGE_BLOCK = GL3.GL_SHADER_STORAGE_BLOCK ;
 
+	public final static int GL_ACTIVE_ATTRIBUTES = GL3.GL_ACTIVE_ATTRIBUTES ;
+	public final static int GL_ACTIVE_UNIFORMS = GL3.GL_ACTIVE_UNIFORMS ;
+
 	public MGL() {}
 
 	public static void setGL( final GL3 _gl )
@@ -318,6 +321,16 @@ public final class MGL
 	public static void glClearColor( final float _red, final float _green, final float _blue, final float _alpha )
 	{
 		gl.glClearColor( _red, _green, _blue, _alpha ) ;
+	}
+
+	public static int glGetAttribLocation( final int _program, final String _name )
+	{
+		return gl.glGetAttribLocation( _program, _name ) ;
+	}
+
+	public static void glGetActiveAttrib( final int _program, final int _index, final int _bufSize, final int[] _length, final int _lengthOffset, final int[] _size, final int _sizeOffset, final int[] _type, final int _typeOffset, final byte[] _name, final int _nameOffset )
+	{
+		gl.glGetActiveAttrib( _program, _index, _bufSize, _length, _lengthOffset, _size, _sizeOffset, _type, _typeOffset, _name, _nameOffset ) ;
 	}
 
 	public static void glEnableVertexAttribArray( final int _index )

@@ -214,7 +214,7 @@ public final class StructUniform implements IUniform
 
 		return false ;
 	}
-	
+
 	@Override
 	public final IUniform.Type getType()
 	{

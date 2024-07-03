@@ -105,14 +105,6 @@ public final class GLGeometryBuffer extends GLBuffer
 			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
 		}
 
-		switch( _buffer.getStyle() )
-		{
-			case LINES      : style = MGL.GL_LINES ;      break ;
-			case LINE_STRIP : style = MGL.GL_LINE_STRIP ; break ;
-			case FILL       : style = MGL.GL_TRIANGLES ;  break ;
-			default         : style = MGL.GL_LINES ;      break ;
-		}
-
 		int bufferIndex = 0 ;
 		int usedIndexByteSize = 0 ;
 		int usedVertexByteSize = 0 ;
@@ -191,7 +183,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		return stable ;
 	}
 
-	public void draw( final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
+	public void draw( final int _style, final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
 	{
 		if( stable == false )
 		{
@@ -244,7 +236,7 @@ public final class GLGeometryBuffer extends GLBuffer
 
 			MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, false, modelMatrix.matrix, 0 ) ;
 
-			MGL.glDrawElements( style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
+			MGL.glDrawElements( _style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
 		}
 		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;
 	}

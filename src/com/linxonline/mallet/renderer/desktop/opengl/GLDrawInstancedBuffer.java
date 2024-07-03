@@ -175,18 +175,10 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			// we know a DrawBuffers program can't be fully 
 			// replaced, they'd have to create a new GeometryBuffer 
 			// to do that.
-			attributes = constructVertexAttrib( _buffer.getAttribute(), glProgram ) ;
+			attributes = constructVertexAttrib( program, glProgram ) ;
 		}
 
-		if( vertexStride <= 0 )
-		{
-			// GeometryBuffer swivel is not expected to change once it is 
-			// set, so we'll only calculate the swivel once.
-			vertexStride = calculateVertexSize( _buffer.getAttribute() ) ;
-			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
-		}
-
-		switch( _buffer.getStyle() )
+		switch( program.getStyle() )
 		{
 			case LINES      : style = MGL.GL_LINES ;      break ;
 			case LINE_STRIP : style = MGL.GL_LINE_STRIP ; break ;
@@ -217,6 +209,11 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				stable = false ;
 				return stable ;
 			}
+
+			// GeometryBuffer swivel is not expected to change once it is 
+			// set, so we'll only calculate the swivel once.
+			vertexStride = calculateVertexSize( shape.getAttribute() ) ;
+			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
 
 			indexCount = uploadInstanceToRAM( shape ) ;
 			uploadInstanceToVRAM() ;

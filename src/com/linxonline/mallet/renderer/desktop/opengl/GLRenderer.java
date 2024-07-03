@@ -610,8 +610,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		updateCameraAndWorldDisplay( _width, _height ) ;
 		if( GlobalConfig.getBoolean( "DISPLAYRENDERPARITY", false ) == true )
 		{
-			
-
 			// My default the main framebuffer is the same dimensions 
 			// as the window, the camera projection does not have to align 
 			// with this requirement unless this flag is set to true.

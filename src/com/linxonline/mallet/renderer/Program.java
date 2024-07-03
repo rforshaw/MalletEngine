@@ -7,6 +7,13 @@ import com.linxonline.mallet.util.MalletMap ;
 
 public final class Program
 {
+	private final static Attribute[] DEFAULT_ATTRIBUTES = new Attribute[]
+	{
+		new Attribute( "inVertex", Shape.Attribute.VEC3 ),
+		new Attribute( "inColour", Shape.Attribute.FLOAT ),
+		new Attribute( "inTexCoord0", Shape.Attribute.VEC2 )
+	} ;
+
 	private final static Utility utility = new Utility() ;
 
 	private final int index ;
@@ -16,10 +23,36 @@ public final class Program
 	private final UniformList drawUniforms = new UniformList() ;
 	private final Map<String, Storage> storages = MalletMap.<String, Storage>newMap() ;
 
+	private IShape.Style style = IShape.Style.FILL ;
+	private Attribute[] attributes = DEFAULT_ATTRIBUTES ;
+
 	public Program( final String _id )
 	{
+		this( _id, DEFAULT_ATTRIBUTES ) ;
+	}
+
+	public Program( final String _id, final Attribute[] _attributes )
+	{
+		this( _id, IShape.Style.FILL, _attributes ) ;
+	}
+
+	public Program( final String _id, final IShape.Style _style, final Attribute[] _attributes )
+	{
 		index = utility.getGlobalIndex() ;
+
 		id = _id ;
+		attributes = ( _attributes != null ) ? _attributes : attributes ;
+		style = ( _style != null ) ? _style : style ;
+	}
+
+	public IShape.Style getStyle()
+	{
+		return style ;
+	}
+
+	public Attribute[] getAttributes()
+	{
+		return attributes ;
 	}
 
 	public boolean removeUniform( final String _handler )
@@ -125,6 +158,11 @@ public final class Program
 				return false ;
 			}
 
+			if( style.equals( program.style ) == false )
+			{
+				return false ;
+			}
+
 			if( uniforms.equals( program.uniforms ) == false )
 			{
 				// If the hashmaps are not the same size then 
@@ -134,6 +172,11 @@ public final class Program
 
 			final Map<String, Storage> b = program.storages ;
 			if( storages.size() != b.size() )
+			{
+				return false ;
+			}
+
+			if( isCompatibleAttribute( attributes, program.attributes ) == false )
 			{
 				return false ;
 			}
@@ -153,6 +196,46 @@ public final class Program
 						}
 					}
 				}
+			}
+		}
+
+		return true ;
+	}
+
+	/**
+		Return true if the Geometry contains the
+		same attribute-types as the program requires.
+	*/
+	public boolean isCompatible( final IShape.Attribute[] _b )
+	{
+		if( attributes.length != _b.length )
+		{
+			return false ;
+		}
+
+		for( int i = 0; i < _b.length; ++i )
+		{
+			if( attributes[i].type != _b[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	protected static boolean isCompatibleAttribute( final Attribute[] _a, final Attribute[] _b )
+	{
+		if( _a.length != _b.length )
+		{
+			return false ;
+		}
+
+		for( int i = 0; i < _a.length; ++i )
+		{
+			if( _a[i].isCompatible( _b[i] ) == false )
+			{
+				return false ;
 			}
 		}
 

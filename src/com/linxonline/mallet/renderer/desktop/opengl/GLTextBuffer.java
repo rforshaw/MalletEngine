@@ -11,6 +11,7 @@ import com.linxonline.mallet.renderer.TextDraw ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
+import com.linxonline.mallet.renderer.Attribute ;
 import com.linxonline.mallet.renderer.TextBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.MalletFont ;
@@ -139,7 +140,7 @@ public final class GLTextBuffer extends GLBuffer
 				// we know a TextBuffers program can't be fully 
 				// replaced, they'd have to create a new TextBuffer 
 				// to do that.
-				attributes = constructVertexAttrib( shape.getAttribute(), glProgram ) ;
+				attributes = constructVertexAttrib( program, glProgram ) ;
 			}
 
 			if( vertexStride <= 0 )
@@ -512,5 +513,33 @@ public final class GLTextBuffer extends GLBuffer
 
 		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+	}
+
+	private static void apply( final Matrix4 _mat4,
+							   final Matrix4 _temp,
+							   final Vector3 _position,
+							   final Vector3 _offset,
+							   final Vector3 _rotation,
+							   final Vector3 _scale )
+	{
+		_mat4.setIdentity() ;
+		_mat4.setPosition( _position.x, _position.y, 0.0f ) ;
+
+		_temp.setRotateX( _rotation.x ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateY( _rotation.y ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setRotateZ( _rotation.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
+
+		_temp.setScale( _scale.x, _scale.y, _scale.z ) ;
+		_temp.setPosition( _offset.x, _offset.y, _offset.z ) ;
+		_mat4.multiply( _temp ) ;
+		_temp.setIdentity() ;
 	}
 }

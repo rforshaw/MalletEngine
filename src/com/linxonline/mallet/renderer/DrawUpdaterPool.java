@@ -116,18 +116,17 @@ public class DrawUpdaterPool
 							   final boolean _ui,
 							   final int _order )
 	{
-		return create( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return create( _anchor, _program, _shape.getAttribute(), _ui, _order ) ;
 	}
 
 	public DrawUpdater create( final IManageBuffers _anchor,
 							   final Program _program,
 							   final IShape.Attribute[] _swivel,
-							   final IShape.Style _style,
 							   final boolean _ui,
 							   final int _order )
 	{
-		final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _swivel, _style, _ui, _order ) ) ;
-		final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel, _style ) ) ;
+		final DrawBuffer buffer = DrawAssist.add( new DrawBuffer( _program, _ui, _order ) ) ;
+		final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( _swivel ) ) ;
 
 		final DrawUpdater updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
 
@@ -158,7 +157,7 @@ public class DrawUpdaterPool
 									final boolean _ui,
 									final int _order )
 	{
-		return getOrCreate( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		return getOrCreate( _anchor, _program, _shape.getAttribute(), _ui, _order ) ;
 	}
 
 	/**
@@ -169,31 +168,11 @@ public class DrawUpdaterPool
 	public DrawUpdater getOrCreate( final IManageBuffers _anchor,
 									final Program _program,
 									final IShape.Attribute[] _swivel,
-									final IShape.Style _style,
 									final boolean _ui,
 									final int _order )
 	{
-		final DrawUpdater updater = get( _anchor, _program, _swivel, _style, _ui, _order ) ;
-		return ( updater != null ) ? updater : create( _anchor, _program, _swivel, _style, _ui, _order ) ;
-	}
-
-	/**
-		When a DrawUpdater is created it is added to the global 
-		pool of available DrawUpdaters.
-
-		This allows other areas of the system to use existing 
-		buffers rather than create their own.
-
-		You should only create a new buffer if a buffer does 
-		not yet exist for the content you want to render.
-	*/
-	public DrawUpdater get( final IManageBuffers _anchor,
-							final Program _program,
-							final IShape _shape,
-							final boolean _ui,
-							final int _order )
-	{
-		return get( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		final DrawUpdater updater = get( _anchor, _program, _ui, _order ) ;
+		return ( updater != null ) ? updater : create( _anchor, _program, _swivel, _ui, _order ) ;
 	}
 
 	/**
@@ -208,8 +187,6 @@ public class DrawUpdaterPool
 	*/
 	public DrawUpdater get( final IManageBuffers _anchor,
 							final Program _program,
-							final IShape.Attribute[] _swivel,
-							final IShape.Style _style,
 							final boolean _ui,
 							final int _order )
 	{
@@ -242,17 +219,6 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				// Lets check the cheapest value first
-				if( buffer.getStyle().equals( _style ) == false )
-				{
-					continue ;
-				}
-
-				if( isCompatibleAttribute( buffer.getAttribute(), _swivel ) == false )
-				{
-					continue ;
-				}
-
 				if( _program.equals( buffer.getProgram() ) == false )
 				{
 					continue ;
@@ -268,23 +234,5 @@ public class DrawUpdaterPool
 		}
 
 		return null ;
-	}
-
-	protected static boolean isCompatibleAttribute( final IShape.Attribute[] _a, final IShape.Attribute[] _b )
-	{
-		if( _a.length != _b.length )
-		{
-			return false ;
-		}
-
-		for( int i = 0; i < _a.length; ++i )
-		{
-			if( _a[i] != _b[i] )
-			{
-				return false ;
-			}
-		}
-
-		return true ;
 	}
 }

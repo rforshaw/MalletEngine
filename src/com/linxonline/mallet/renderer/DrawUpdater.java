@@ -86,16 +86,6 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		return drawBuffer.getProgram() ;
 	}
 
-	public Shape.Attribute[] getAttribute()
-	{
-		return drawBuffer.getAttribute() ;
-	}
-
-	public Shape.Style getStyle()
-	{
-		return drawBuffer.getStyle() ;
-	}
-
 	public boolean isUI()
 	{
 		return drawBuffer.isUI() ;

@@ -35,6 +35,24 @@ public interface IShape
 		FLOAT,		// MalletColour
 		VEC2 ;		// Vector2
 
+		public static boolean isCompatible( final Attribute[] _a, final Attribute[] _b )
+		{
+			if( _a.length != _b.length )
+			{
+				return false ;
+			}
+
+			for( int i = 0; i < _a.length; ++i )
+			{
+				if( _a[i] != _b[i] )
+				{
+					return false ;
+				}
+			}
+
+			return true ;
+		}
+
 		/**
 			Return a basic vertex structure of two elements.
 			Point and Colour.

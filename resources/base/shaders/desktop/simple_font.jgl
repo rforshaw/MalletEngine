@@ -2,7 +2,4 @@
 	"NAME": "SIMPLE_FONT",
 	"VERTEX": ["base/shaders/desktop/simple_font_vertex.glsl"],
 	"FRAGMENT": ["base/shaders/desktop/simple_font_fragment.glsl"],
-
-	"UNIFORMS": [{ "NAME": "inTex0", "TYPE": "FONT"}],
-	"ATTRIBUTES": ["inVertex", "inColour", "inTexCoord0", "inNormal"]
 }

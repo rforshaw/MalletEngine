@@ -49,7 +49,7 @@ public class DrawInstancedBuffer extends DrawBuffer
 								final boolean _static,
 								final String _storageName )
 	{
-		super( _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order ) ;
+		super( _program, _ui, _order ) ;
 		shape = _shape ;
 		storageName = _storageName ;
 		isStatic = _static ;

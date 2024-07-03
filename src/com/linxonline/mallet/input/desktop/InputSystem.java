@@ -44,20 +44,23 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 
 	/** Pass InputEvents to the handlers **/
 	@Override
-	public synchronized void update()
+	public void update()
 	{
-		if( inputs.isEmpty() == true )
+		synchronized( inputs )
 		{
-			return ;
-		}
+			if( inputs.isEmpty() == true )
+			{
+				return ;
+			}
 
-		final int inputSize = inputs.size() ;
-		for( int i = 0; i < inputSize; ++i )
-		{
-			passInputEventToHandlers( inputs.get( i ) ) ;
-		}
+			final int inputSize = inputs.size() ;
+			for( int i = 0; i < inputSize; ++i )
+			{
+				passInputEventToHandlers( inputs.get( i ) ) ;
+			}
 
-		inputs.clear() ;
+			inputs.clear() ;
+		}
 	}
 
 	private void passInputEventToHandlers( final InputEvent _input )
@@ -102,7 +105,11 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 		final InputEvent input = cache.take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
-		inputs.add( input ) ;
+
+		synchronized( inputs )
+		{
+			inputs.add( input ) ;
+		}
 	}
 
 	@Override
@@ -124,7 +131,11 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 		final InputEvent input = cache.take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
-		inputs.add( input ) ;
+
+		synchronized( inputs )
+		{
+			inputs.add( input ) ;
+		}
 	}
 
 	public void keyTyped( final KeyEvent _event ) {}
@@ -204,27 +215,35 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 	}
 
 	/**  Recieve MouseWheelEvents from system **/
-	
+
 	public void mouseWheelMoved( final MouseEvent _event )
 	{
 		updateMouseWheel( _event ) ;
 	}
 
-	private synchronized void updateMouseWheel( final MouseEvent _event )
+	private void updateMouseWheel( final MouseEvent _event )
 	{
 		final InputEvent input = cache.take() ;
 		final int scroll = ( int )_event.getRotation()[1] ;
 
 		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll, _event.getWhen() ) ;
-		inputs.add( input ) ;
+		
+		synchronized( inputs )
+		{
+			inputs.add( input ) ;
+		}
 	}
 
-	private synchronized void updateMouse( final InputType _inputType, final MouseEvent _event )
+	private void updateMouse( final InputType _inputType, final MouseEvent _event )
 	{
 		final InputEvent input = cache.take() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, _event.getX(), _event.getY(), _event.getWhen() ) ;
-		inputs.add( input ) ;
+
+		synchronized( inputs )
+		{
+			inputs.add( input ) ;
+		}
 	}
 
 	@Override
@@ -234,9 +253,12 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 	}
 
 	@Override
-	public synchronized void clearInputs()
+	public void clearInputs()
 	{
-		inputs.clear() ;
+		synchronized( inputs )
+		{
+			inputs.clear() ;
+		}
 	}
 
 	private final boolean exists( final IInputHandler _handler )

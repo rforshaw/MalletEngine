@@ -18,22 +18,16 @@ public class DrawBuffer extends ABuffer
 
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 	private final Program program ;
-	private final Shape.Attribute[] swivel ;
-	private final Shape.Style style ;
 	private final boolean ui ;
 	private final int order ;
 
 	private IOcclude occluder = OCCLUDER_FALLBACK ;
 
 	public DrawBuffer( final Program _program,
-					   final Shape.Attribute[] _swivel,
-					   final Shape.Style _style,
 					   final boolean _ui,
 					   final int _order )
 	{
 		program = _program ;
-		swivel = _swivel ;
-		style = _style ;
 		ui = _ui ;
 		order = _order ;
 	}
@@ -56,11 +50,11 @@ public class DrawBuffer extends ABuffer
 		for( int i = 0; i < size; ++i )
 		{
 			final GeometryBuffer buffer = _buffers[i] ;
-			if( isCompatible( this, buffer ) == false )
+			if( program.isCompatible( buffer.getAttribute() ) == false )
 			{
-				throw new RuntimeException( "Attempting to add GeometryBuffer that is not compatible with DrawBuffer." ) ;
+				throw new RuntimeException( String.format( "Incompatible GeometryBuffer to DrawBuffer with program: %s.", program.getID() ) ) ;
 			}
-		
+
 			buffers.add( buffer ) ;
 		}
 	}
@@ -90,16 +84,6 @@ public class DrawBuffer extends ABuffer
 		return program ;
 	}
 
-	public Shape.Attribute[] getAttribute()
-	{
-		return swivel ;
-	}
-
-	public Shape.Style getStyle()
-	{
-		return style ;
-	}
-
 	public boolean isUI()
 	{
 		return ui ;
@@ -113,67 +97,24 @@ public class DrawBuffer extends ABuffer
 
 	public static boolean isCompatible( final DrawBuffer _lhs, final DrawBuffer _rhs )
 	{
-		if( _lhs.isUI() != _rhs.isUI() )
+		if( _lhs.ui != _rhs.ui )
 		{
 			return false ;
 		}
 
-		if( _lhs.getOrder() != _rhs.getOrder() )
+		if( _lhs.order != _rhs.order )
 		{
 			return false ;
 		}
 
-		// Lets check the cheapest value first
-		if( _lhs.getStyle().equals( _rhs.getStyle() ) == false )
+		if( _lhs.occluder != _rhs.occluder )
 		{
 			return false ;
 		}
 
-		if( isCompatibleAttribute( _lhs.getAttribute(), _rhs.getAttribute() ) == false )
+		if( _lhs.program.equals( _rhs.program ) == false )
 		{
 			return false ;
-		}
-
-		if( _lhs.getProgram().equals( _rhs.getProgram() ) == false )
-		{
-			return false ;
-		}
-		
-		return true ;
-	}
-
-	/**
-		Ensure the GeometryBuffer is compatible with the DrawBuffer.
-	*/
-	public static boolean isCompatible( final DrawBuffer _lhs, final GeometryBuffer _rhs )
-	{
-		// Lets check the cheapest value first
-		if( _lhs.getStyle().equals( _rhs.getStyle() ) == false )
-		{
-			return false ;
-		}
-
-		if( isCompatibleAttribute( _lhs.getAttribute(), _rhs.getAttribute() ) == false )
-		{
-			return false ;
-		}
-
-		return true ;
-	}
-
-	private static boolean isCompatibleAttribute( final IShape.Attribute[] _a, final IShape.Attribute[] _b )
-	{
-		if( _a.length != _b.length )
-		{
-			return false ;
-		}
-
-		for( int i = 0; i < _a.length; ++i )
-		{
-			if( _a[i] != _b[i] )
-			{
-				return false ;
-			}
 		}
 
 		return true ;

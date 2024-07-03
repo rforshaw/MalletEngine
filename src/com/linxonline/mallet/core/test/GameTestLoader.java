@@ -14,7 +14,7 @@ import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
 import com.linxonline.mallet.ecs.* ;
 
-import com.linxonline.mallet.renderer.IShape.Attribute ;
+import com.linxonline.mallet.renderer.Attribute ;
 
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
@@ -144,8 +144,8 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				//createEntities( 10, 10 ) ;
-				createECSEntities( 10, 10 ) ;
+				createEntities( 10, 10 ) ;
+				//createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -284,7 +284,12 @@ public final class GameTestLoader implements IGameLoader
 			{
 				final World world = WorldAssist.getDefault() ;
 				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
-				final Program geomProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
+
+				final Program geomProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY", Shape.Style.LINE_STRIP, new Attribute[]
+				{
+					new Attribute( "inVertex", IShape.Attribute.VEC3 ),
+					new Attribute( "inColour", IShape.Attribute.FLOAT )
+				} ) ) ;
 
 				{
 					final IntVector2 dim = world.getRenderDimensions( new IntVector2() ) ;
@@ -334,10 +339,12 @@ public final class GameTestLoader implements IGameLoader
 					final int width = 64 ;
 					final int height = 64 ;
 
-					final IShape.Attribute[] attributes = new IShape.Attribute[3] ;
-					attributes[0] = IShape.Attribute.VEC3 ;
-					attributes[1] = IShape.Attribute.FLOAT ;
-					attributes[2] = IShape.Attribute.VEC2 ;
+					final IShape.Attribute[] attributes = new IShape.Attribute[]
+					{
+						IShape.Attribute.VEC3,
+						IShape.Attribute.FLOAT,
+						IShape.Attribute.VEC2
+					} ;
 
 					final Vector3 position = new Vector3() ;
 					final MalletColour white = MalletColour.white() ;
@@ -526,7 +533,6 @@ public final class GameTestLoader implements IGameLoader
 
 				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
 				final Draw[] draws = new Draw[amount] ;
-				final Draw[] debugDraws = new Draw[amount] ;
 
 				int inc = 0 ;
 				for( int i = 0; i < _row; ++i )
@@ -551,7 +557,6 @@ public final class GameTestLoader implements IGameLoader
 
 						hulls.add( hull ) ;
 						draws[inc] = draw ;
-						debugDraws[inc] = Debug.createDraw( hull ) ;
 						inc += 1 ;
 					}
 				}
@@ -559,7 +564,6 @@ public final class GameTestLoader implements IGameLoader
 				new RenderComponent( entity, Entity.AllowEvents.NO )
 				{
 					private DrawInstancedUpdater updater ;
-					//private DrawUpdater debugUpdater ;
 					private final Vector2 position = new Vector2() ;
 
 					@Override
@@ -567,19 +571,11 @@ public final class GameTestLoader implements IGameLoader
 					{
 						final World world = WorldAssist.getDefault() ;
 
-						{
-							final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
-							updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
+						final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
+						updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
 
-							final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-							geometry.addDraws( draws ) ;
-						}
-
-						{
-							//final Program program = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY" ) ) ;
-							//debugUpdater = getUpdater( world, program, debugDraws[0], false, 10 ) ;
-							//debugUpdater.addDraws( debugDraws ) ;
-						}
+						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+						geometry.addDraws( draws ) ;
 					}
 
 					@Override
@@ -587,7 +583,6 @@ public final class GameTestLoader implements IGameLoader
 					{
 						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
 						geometry.removeDraws( draws ) ;
-						//debugUpdater.removeDraws( debugDraws ) ;
 					}
 
 					@Override
@@ -600,20 +595,16 @@ public final class GameTestLoader implements IGameLoader
 						{
 							final Hull hull = hulls.get( i ) ;
 							updateDraw = ( hull.contactData.size() > 0 ) ? true : updateDraw ;
-							
+
 							final Draw draw = draws[i] ;
-							//final Draw debugDraw = debugDraws[i] ;
 
 							hull.getPosition( position ) ;
 							draw.setPosition( position.x, position.y, 0.0f ) ;
-
-							//Debug.updateDraw( debugDraw, hull ) ;
 						}
 
 						if( updateDraw == true )
 						{
 							updater.makeDirty() ;
-							//debugUpdater.makeDirty() ;
 						}
 					}
 				} ;
@@ -690,11 +681,11 @@ public final class GameTestLoader implements IGameLoader
 					{
 						final World world = WorldAssist.getDefault() ;
 						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
-						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, Attribute>>toArray(
-							Tuple.<String, Attribute>build( "POSITION", Attribute.VEC3 ),
-							Tuple.<String, Attribute>build( "", Attribute.FLOAT ),
-							Tuple.<String, Attribute>build( "TEXCOORD_0", Attribute.VEC2 )
-						) ) ;
+						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, IShape.Attribute>>toArray(
+							Tuple.<String, IShape.Attribute>build( "POSITION", IShape.Attribute.VEC3 ),
+							Tuple.<String, IShape.Attribute>build( "", IShape.Attribute.FLOAT ),
+							Tuple.<String, IShape.Attribute>build( "TEXCOORD_0", IShape.Attribute.VEC2 )
+						) )[0] ;
 						//System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
 						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
 

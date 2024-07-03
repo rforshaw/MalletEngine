@@ -1,6 +1,7 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.List ;
+import java.nio.charset.StandardCharsets ;
 
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 import com.linxonline.mallet.renderer.opengl.ProgramManager ;
@@ -40,20 +41,27 @@ public final class GLProgram extends ProgramManager.Program
 	public int inViewMatrix = -1 ;
 	public int inProjectionMatrix = -1 ;
 
-	public final int[] inAttributes ;		// Vertex swivel order defined in *.jgl
+	public Attribute[] inAttributes ;
 
 	private final static UniformBuilder builder = new UniformBuilder() ;
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
-		inAttributes = new int[program.getAttribute().size()] ;
+	}
 
-		final int length = inAttributes.length ;
-		for( int i = 0; i < length; i++ )
+	public Attribute getAttribute( final String _name )
+	{
+		for( int i = 0; i < inAttributes.length; ++i )
 		{
-			inAttributes[i] = i ;
+			final Attribute attr = inAttributes[i] ;
+			if( attr.isName( _name ) )
+			{
+				return attr ;
+			}
 		}
+
+		return null ;
 	}
 
 	@Override
@@ -146,16 +154,6 @@ public final class GLProgram extends ProgramManager.Program
 			shaders.clear() ;
 		}
 
-		{
-			final List<String> swivel = _program.getAttribute() ;
-			final int size = swivel.size() ;
-
-			for( int i = 0; i < size; i++ )
-			{
-				MGL.glBindAttribLocation( program.id[0], program.inAttributes[i], swivel.get( i ) ) ;
-			}
-		}
-
 		MGL.glLinkProgram( program.id[0] ) ;
 
 		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
@@ -184,6 +182,18 @@ public final class GLProgram extends ProgramManager.Program
 			System.out.println( "Error linking program: " + new String( log ) ) ;
 			GLProgram.delete( program ) ;
 			return null ;
+		}
+
+		{
+			final int[] count = new int[1] ;
+			MGL.glGetProgramiv( program.id[0], MGL.GL_ACTIVE_ATTRIBUTES, count, 0 ) ;
+
+			program.inAttributes = new Attribute[count[0]] ;
+			final int size = program.inAttributes.length ;
+			for( int i = 0; i < size; ++i )
+			{
+				program.inAttributes[i] = new Attribute( program.id[0], i ) ;
+			}
 		}
 
 		return program ;
@@ -234,6 +244,53 @@ public final class GLProgram extends ProgramManager.Program
 			case GEOMETRY : return MGL.GL_GEOMETRY_SHADER ;
 			case COMPUTE  : return MGL.GL_COMPUTE_SHADER ;
 			default       : return -1 ;
+		}
+	}
+
+	public static final class Attribute
+	{
+		private final int index ;
+		private final int location ;
+
+		// 0 - name length, 1 - size, 2 - type
+		private final int[] params = new int[3] ;
+		private final String name ;
+
+		public Attribute( final int _id, final int _index )
+		{
+			index = _index ;
+
+			final byte[] bName = new byte[256] ;
+			MGL.glGetActiveAttrib( _id, _index, bName.length, params, 0, params, 1, params, 2, bName, 0 ) ;
+			name = new String( bName, 0, params[0], StandardCharsets.UTF_8 ) ;
+
+			location = MGL.glGetAttribLocation( _id, name ) ;
+		}
+
+		public int getLocation()
+		{
+			return location ;
+		}
+
+		public int getSize()
+		{
+			return params[1] ;
+		}
+
+		public int getType()
+		{
+			return params[2] ;
+		}
+
+		public boolean isName( final String _name )
+		{
+			return name.equals( _name ) ;
+		}
+
+		@Override
+		public String toString()
+		{
+			return name + " Type: " + getType() + " Size: " + getSize() ;
 		}
 	}
 

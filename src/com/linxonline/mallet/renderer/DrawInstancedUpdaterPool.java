@@ -33,14 +33,13 @@ public class DrawInstancedUpdaterPool
 											 final int _order,
 											 final boolean _static )
 	{
-		final IShape.Attribute[] swivel = _shape.getAttribute() ;
-		final IShape.Style style = _shape.getStyle() ;
+		final IShape.Attribute[] attributes = _shape.getAttribute() ;
 	
-		DrawInstancedUpdater updater = get( _anchor, _program, swivel, style, _ui, _order, _static ) ;
+		DrawInstancedUpdater updater = get( _anchor, _program, _ui, _order, _static ) ;
 		if( updater == null )
 		{
 			final DrawInstancedBuffer buffer = DrawAssist.add( new DrawInstancedBuffer( _program, _shape, _ui, _order, _static ) ) ;
-			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( swivel, style ) ) ;
+			final GeometryBuffer geom = DrawAssist.add( new GeometryBuffer( attributes ) ) ;
 
 			updater = DrawAssist.add( new DrawInstancedUpdater( buffer ) ) ;
 
@@ -60,26 +59,6 @@ public class DrawInstancedUpdaterPool
 	}
 
 	/**
-		When a DrawInstancedUpdater is created it is added to the global 
-		pool of available DrawInstancedUpdaters.
-
-		This allows other areas of the system to use existing 
-		buffers rather than create their own.
-
-		You should only create a new buffer if a buffer does 
-		not yet exist for the content you want to render.
-	*/
-	public DrawInstancedUpdater get( final IManageBuffers _anchor,
-									 final Program _program,
-									 final IShape _shape,
-									 final boolean _ui,
-									 final int _order,
-									 final boolean _static )
-	{
-		return get( _anchor, _program, _shape.getAttribute(), _shape.getStyle(), _ui, _order, _static ) ;
-	}
-
-	/**
 		When a DrawUpdater is created it is added to the global 
 		pool of available DrawBuffers.
 
@@ -91,8 +70,6 @@ public class DrawInstancedUpdaterPool
 	*/
 	public DrawInstancedUpdater get( final IManageBuffers _anchor,
 									 final Program _program,
-									 final IShape.Attribute[] _swivel,
-									 final IShape.Style _style,
 									 final boolean _ui,
 									 final int _order,
 									 final boolean _static )
@@ -127,17 +104,6 @@ public class DrawInstancedUpdaterPool
 				}
 
 				if( buffer.getOrder() != _order )
-				{
-					continue ;
-				}
-
-				// Lets check the cheapest value first
-				if( buffer.getStyle().equals( _style ) == false )
-				{
-					continue ;
-				}
-
-				if( DrawUpdaterPool.isCompatibleAttribute( buffer.getAttribute(), _swivel ) == false )
 				{
 					continue ;
 				}

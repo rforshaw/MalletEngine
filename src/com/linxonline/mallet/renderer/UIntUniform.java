@@ -10,7 +10,7 @@ package com.linxonline.mallet.renderer ;
 public abstract class UIntUniform implements IUniform
 {
 	public abstract int fill( int _offset, final int[] _fill ) ;
-	
+
 	@Override
 	public final IUniform.Type getType()
 	{

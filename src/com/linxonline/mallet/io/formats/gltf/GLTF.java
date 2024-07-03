@@ -49,14 +49,20 @@ public final class GLTF
 		return names ;
 	}
 
-	public Shape createMeshByIndex( final int _index, final Tuple<String, Attribute>[] _attributes )
+	public Shape[] createMeshByIndex( final int _index, final Tuple<String, Attribute>[] _attributes )
 	{
 		final JChunk.Mesh mesh = header.getMesh( _index ) ;
-		System.out.println( "Found Mesh" ) ;
-		return createShapeFromMesh( header, mesh, _attributes ) ;
+		final Shape[] shapes = new Shape[mesh.primitives.length] ;
+		for( int j = 0; j < shapes.length; ++j )
+		{
+			final JChunk.Primitive primitive = mesh.primitives[j] ;
+			shapes[j] = createShape( header, primitive, _attributes ) ;
+		}
+
+		return shapes ;
 	}
 
-	public Shape createMeshByName( final String _name, final Tuple<String, Attribute>[] _attributes )
+	public Shape[] createMeshByName( final String _name, final Tuple<String, Attribute>[] _attributes )
 	{
 		final int size = header.getMeshSize() ;
 		for( int i = 0; i < size; ++i )
@@ -64,19 +70,22 @@ public final class GLTF
 			final JChunk.Mesh mesh = header.getMesh( i ) ;
 			if( _name.equals( mesh.name ) == true )
 			{
-				return createShapeFromMesh( header, mesh, _attributes ) ;
+				final Shape[] shapes = new Shape[mesh.primitives.length] ;
+				for( int j = 0; j < shapes.length; ++j )
+				{
+					final JChunk.Primitive primitive = mesh.primitives[j] ;
+					shapes[j] = createShape( header, primitive, _attributes ) ;
+				}
+
+				return shapes ;
 			}
 		}
 
 		throw new RuntimeException( "Failed to find requested mesh: " + _name ) ;
 	}
 
-	private Shape createShapeFromMesh( final JChunk _chunk, final JChunk.Mesh _mesh, final Tuple<String, Attribute>[] _attributes )
+	private Shape createShape( final JChunk _chunk, JChunk.Primitive _primitive, final Tuple<String, Attribute>[] _attributes )
 	{
-		System.out.println( "Create Shape From Mesh" ) ;
-
-		final JChunk.Primitive gPrimitive = _mesh.primitives[0] ;
-
 		final int length = _attributes.length ;
 
 		// The model may contain more attributes than we are interested in, 
@@ -98,20 +107,20 @@ public final class GLTF
 				continue ;
 			}
 
-			final JChunk.Attribute gAttribute = gPrimitive.getAttributeByName( name ) ;
+			final JChunk.Attribute gAttribute = _primitive.getAttributeByName( name ) ;
 			accessors[i] = _chunk.getAccessor( gAttribute.index ) ;
 			swivel[i] = attribute.getRight() ;
 
 			checkAttributeSanity( swivel[i], accessors[i] ) ;
 		}
 
-		final int[] indices = readIndices( _chunk, gPrimitive ) ;
+		final int[] indices = readIndices( _chunk, _primitive ) ;
 
 		final IReader[] readers = constructVertexReaders( _chunk, accessors ) ;
 		final byte[] temp = new byte[4 * 16] ;	// Store at most a 4x4 matrix
 		final int count = accessors[0].count ;
 
-		final Shape shape = new Shape( determinMode( gPrimitive ), swivel, indices.length, count ) ;
+		final Shape shape = new Shape( determinMode( _primitive ), swivel, indices.length, count ) ;
 		shape.addIndices( indices ) ;
 
 		final Object[] vertex = Attribute.createVert( swivel ) ;
@@ -193,6 +202,13 @@ public final class GLTF
 
 	private int[] readIndices( final JChunk _chunk, final JChunk.Primitive _gPrimitive )
 	{
+		if( _gPrimitive.indices == -1 )
+		{
+			// TODO: The primitive doesn't have an indices array
+			// we need to create one.
+			return new int[0] ;
+		}
+	
 		final byte[] temp = new byte[4] ;	// Store at most an int
 
 		final JChunk.Accessor accessor = _chunk.getAccessor( _gPrimitive.indices ) ;
@@ -341,11 +357,6 @@ public final class GLTF
 			return null ;
 		}
 
-		for( int i = _offset; i < _offset + 8; ++i )
-		{
-			System.out.println( _data[i] ) ;
-		}
-
 		ConvertBytes.flipEndian( _data, _offset, 4 ) ;
 		final int length = ( int )toUnsignedLong( ConvertBytes.toInt( _data, _offset ) ) ;
 
@@ -420,9 +431,20 @@ public final class GLTF
 		public final int type ;
 
 		private final JObject obj ;
+
+		private final int scene ;
+		private final JArray scenes ;
+		private final JArray nodes ;
+
 		private final JArray bufferViews ;
+		private final JArray buffers ;
+
 		private final JArray meshes ;
 		private final JArray accessors ;
+
+		private final JArray materials ;
+		private final JArray textures ;
+		private final JArray images ;
 
 		public JChunk( final int _offset,
 					   final int _length,
@@ -434,9 +456,30 @@ public final class GLTF
 			type = _type ;
 
 			obj = _obj ;
+
+			scene = obj.optInt( "scene", 0 ) ;
+			scenes = obj.optJArray( "scenes", null ) ;
+			nodes = obj.optJArray( "nodes", null ) ;
+
 			bufferViews = obj.optJArray( "bufferViews", null ) ;
+			buffers = obj.optJArray( "buffers", null ) ;
+
 			meshes = obj.optJArray( "meshes", null ) ;
 			accessors = obj.optJArray( "accessors", null ) ;
+
+			materials = obj.optJArray( "materials", null ) ;
+			textures = obj.optJArray( "textures", null ) ;
+			images = obj.optJArray( "images", null ) ;
+		}
+
+		public Buffer getBuffer( final int _index )
+		{
+			return new Buffer( buffers.optJObject( _index, null ) ) ;
+		}
+
+		public int getBufferSize()
+		{
+			return buffers.length() ;
 		}
 
 		public BufferView getBufferView( final int _index )
@@ -487,6 +530,18 @@ public final class GLTF
 			builder.append( " Data : " ) ;
 			builder.append( obj.toString() ) ;
 			return builder.toString() ;
+		}
+
+		public static class Buffer
+		{
+			public final int byteLength ;
+			public final String uri ; 
+
+			public Buffer( final JObject _obj )
+			{
+				byteLength = _obj.optInt( "byteLength", -1 ) ;
+				uri = _obj.optString( "uri", null ) ;
+			}
 		}
 
 		public static class BufferView
@@ -571,7 +626,7 @@ public final class GLTF
 				index = _index ;
 			}
 		}
-		
+
 		public static class Accessor
 		{
 			public final int componentType ;

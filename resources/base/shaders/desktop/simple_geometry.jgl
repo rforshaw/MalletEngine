@@ -6,8 +6,5 @@
 		"base/shaders/desktop/engine_utils.glsl",
 		"base/shaders/desktop/simple_geometry_vertex.glsl"
 	],
-	"FRAGMENT": ["base/shaders/desktop/simple_geometry_fragment.glsl"],
-
-	"UNIFORMS": [],
-	"ATTRIBUTES": ["inVertex", "inColour"]
+	"FRAGMENT": ["base/shaders/desktop/simple_geometry_fragment.glsl"]
 }

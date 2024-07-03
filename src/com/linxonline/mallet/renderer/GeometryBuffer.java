@@ -7,15 +7,12 @@ import com.linxonline.mallet.util.MalletList ;
 
 public class GeometryBuffer extends ABuffer
 {
-	private final Shape.Attribute[] swivel ;
-	private final Shape.Style style ;
+	private final Shape.Attribute[] attributes ;
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 
-	public GeometryBuffer( final Shape.Attribute[] _swivel,
-						   final Shape.Style _style )
+	public GeometryBuffer( final Shape.Attribute[] _attributes )
 	{
-		swivel = _swivel ;
-		style = _style ;
+		attributes = _attributes ;
 	}
 
 	public void addDraws( final Draw ... _draws )
@@ -39,20 +36,15 @@ public class GeometryBuffer extends ABuffer
 	}
 
 	/**
-		Return the swivel that this geometry class expects 
+		Return the attributes that this geometry class expects 
 		all Draw objects to adhere to.
 		If the draw object's shape does not have an identical 
-		swivel then it will most likely not work. Or simply 
+		attributes then it will most likely not work. Or simply 
 		work by sheer fluke.
 	*/
 	public Shape.Attribute[] getAttribute()
 	{
-		return swivel ;
-	}
-
-	public Shape.Style getStyle()
-	{
-		return style ;
+		return attributes ;
 	}
 
 	@Override
@@ -64,6 +56,38 @@ public class GeometryBuffer extends ABuffer
 	public List<Draw> getDraws()
 	{
 		return draws ;
+	}
+
+	/**
+		Determine if the draw object geometry adheres
+		to the same attribute structure as our buffer.
+
+		This can be an expensive operation to do when
+		calling addDraw(), so we'll allow the developer
+		to validate if they are not confidant it's correct.
+
+		Returns true if all geometry adheres to the same
+		attribute structure as our geometry.
+	*/
+	public boolean validate()
+	{
+		final int size = draws.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final Draw draw = draws.get( i ) ;
+			final IShape[] shapes = draw.getShapes() ;
+			
+			for( int j = 0; j < shapes.length; ++j )
+			{
+				final IShape shape = shapes[j] ;
+				if( IShape.Attribute.isCompatible( attributes, shape.getAttribute() ) == false )
+				{
+					return false ;
+				}
+			}
+		}
+
+		return true ;
 	}
 
 	@Override
