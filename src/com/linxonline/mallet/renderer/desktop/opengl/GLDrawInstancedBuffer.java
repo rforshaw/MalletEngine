@@ -137,36 +137,15 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		}
 
 		{
-			boolean foundInstanceBuffer = false ;
-			final List<String> buffers = glProgram.program.getBuffers() ;
-
-			final int size = storages.size() ;
-			for( int i = 0; i < size; ++i )
+			final GLProgram.SSBuffer ssb = glProgram.getSSBuffer( storageName ) ;
+			if( ssb == null )
 			{
-				final GLStorage storage = storages.get( i ) ;
-				if( storage != null )
-				{
-					continue ;
-				}
-
-				final String name = buffers.get( i ) ;
-				if( name.equals( storageName ) == false ) 
-				{
-					System.out.println( "Failed to find storage buffer, skipping..." ) ;
-					continue ;
-				}
-
-				storages.set( i, glTransStorage ) ;
-				foundInstanceBuffer = true ;
-				break ;
-			}
-
-			if( foundInstanceBuffer == false )
-			{
-				System.out.println( "Instances buffer not specified in program." ) ;
+				System.out.println( storageName + " buffer not specified in program." ) ;
 				stable = false ;
 				return stable ;
 			}
+
+			storages.set( ssb.getIndex(), glTransStorage ) ;
 		}
 
 		if( attributes == null )

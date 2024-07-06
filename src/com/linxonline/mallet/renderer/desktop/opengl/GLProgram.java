@@ -30,24 +30,32 @@ public final class GLProgram extends ProgramManager.Program
 	public final JSONProgram program ;
 	public final int[] id = new int[1] ;	// GL Program ID
 
-	// Model View Projection Matrix, doesn't need to be defined in *.jgl,
-	// however it must be defined in atleast vertex shader.
-	public int inPosition = -1 ;
-	public int inOffset = -1 ;
-	public int inRotation = -1 ;
-	public int inScale = -1 ;
-
 	public int inModelMatrix = -1 ;
 	public int inViewMatrix = -1 ;
 	public int inProjectionMatrix = -1 ;
 
 	public Attribute[] inAttributes ;
+	public SSBuffer[] inBuffers ;
 
 	private final static UniformBuilder builder = new UniformBuilder() ;
 
 	private GLProgram( final JSONProgram _program )
 	{
 		program = _program ;
+	}
+
+	public SSBuffer getSSBuffer( final String _name )
+	{
+		for( int i = 0; i < inBuffers.length; ++i )
+		{
+			final SSBuffer buffer = inBuffers[i] ;
+			if( buffer != null && buffer.isName( _name ) )
+			{
+				return buffer ;
+			}
+		}
+
+		return null ;
 	}
 
 	public Attribute getAttribute( final String _name )
@@ -196,6 +204,55 @@ public final class GLProgram extends ProgramManager.Program
 			}
 		}
 
+		{
+			final int[] count = new int[3] ;
+
+			MGL.glGetProgramInterfaceiv( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, MGL.GL_ACTIVE_RESOURCES, count, 0 ) ;
+			MGL.glGetProgramInterfaceiv( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, MGL.GL_MAX_NAME_LENGTH, count, 1 ) ;
+
+			final int ssbCount = count[0] ;
+			final int ssbMaxNameLength = count[1] ;
+
+			final byte[] ssbMaxName = new byte[ssbMaxNameLength] ;
+
+			final int[] props = new int[]
+			{
+				MGL.GL_BUFFER_BINDING
+			} ;
+
+			final int[] lengths = new int[props.length] ;
+			final int[] params = new int[props.length] ;
+
+			program.inBuffers = new SSBuffer[ssbCount] ;
+
+			for( int i = 0; i < ssbCount; ++i )
+			{
+				// Find the name of the resource.
+				MGL.glGetProgramResourceName​( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, i, ssbMaxNameLength, count, 2, ssbMaxName, 0 ) ;
+
+				final int ssbActualNameLength = count[2] ;
+				final byte[] ssbActualName = new byte[ssbActualNameLength] ;
+
+				// Copy the name into a buffer the correct size.
+				System.arraycopy( ssbMaxName, 0, ssbActualName, 0, ssbActualNameLength ) ;
+
+				// Grab the index of the resource
+				final int index = MGL.glGetProgramResourceIndex( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, ssbActualName, 0 ) ;
+				if( index == MGL.GL_INVALID_INDEX )
+				{
+					System.out.println( "Invalid index for: " + program.inBuffers[i].toString() ) ;
+					program.inBuffers[i] = null ;
+					continue ;
+				}
+
+				// Using the index grab the binding point.
+				MGL.glGetProgramResourceiv( program.id[0], MGL.GL_SHADER_STORAGE_BLOCK, index, props.length, props, 0, lengths.length, lengths, 0, params, 0 ) ;
+
+				final int binding = params[0] ;
+				program.inBuffers[i] = new SSBuffer( ssbActualName, index, binding ) ;
+			}
+		}
+
 		return program ;
 	}
 
@@ -244,6 +301,46 @@ public final class GLProgram extends ProgramManager.Program
 			case GEOMETRY : return MGL.GL_GEOMETRY_SHADER ;
 			case COMPUTE  : return MGL.GL_COMPUTE_SHADER ;
 			default       : return -1 ;
+		}
+	}
+
+	public static final class SSBuffer
+	{
+		private final int index ;
+		private final int binding ;
+		private final String name ;
+
+		public SSBuffer( final byte[] _bName, final int _index, final int _binding )
+		{
+			name = new String( _bName, 0, _bName.length, StandardCharsets.UTF_8 ) ;
+			index = _index ;
+			binding = _binding ;
+		}
+
+		public boolean isName( final String _name )
+		{
+			return name.equals( _name ) ;
+		}
+
+		public String getName()
+		{
+			return name ;
+		}
+
+		public int getIndex()
+		{
+			return index ;
+		}
+
+		public int getBinding()
+		{
+			return binding ;
+		}
+
+		@Override
+		public String toString()
+		{
+			return name + " : " + index + " : " + binding ;
 		}
 	}
 

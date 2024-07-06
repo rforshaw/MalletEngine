@@ -13,14 +13,9 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.IUniform ;
-import com.linxonline.mallet.renderer.UIntUniform ;
-import com.linxonline.mallet.renderer.IntUniform ;
-import com.linxonline.mallet.renderer.FloatUniform ;
-import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Attribute ;
-import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Operation ;
 import com.linxonline.mallet.renderer.Action ;
 
@@ -46,8 +41,6 @@ public class GLBuffer
 	private final byte[] abgrTemp = new byte[4] ;
 
 	private final boolean ui ;
-
-	private int textureUnit = 0 ;	// This needs to be reset, call loadProgramUniforms() first, then loadDrawUniforms().
 
 	public GLBuffer( final boolean _ui )
 	{
@@ -96,17 +89,35 @@ public class GLBuffer
 	protected static void generateStorages( final GLProgram _glProgram, final Program _program, final AssetLookup<Storage, GLStorage> _lookup, final List<GLStorage> _toFill )
 	{
 		_toFill.clear() ;
-		for( final String name : _glProgram.program.getBuffers() )
+		for( final GLProgram.SSBuffer ssb : _glProgram.inBuffers )
 		{
+			if( ssb == null )
+			{
+				continue ;
+			}
+
+			final String name = ssb.getName() ;
+			final int binding = ssb.getBinding() ;
+
+			final int size = _toFill.size() ;
+			final int newSize = binding + 1 ;
+			if( size < newSize )
+			{
+				for( int i = size; i < newSize; ++i )
+				{
+					_toFill.add( null ) ;
+				}
+			}
+
 			final Storage storage = _program.getStorage( name ) ;
 			if( storage == null )
 			{
-				_toFill.add( null ) ;
+				System.out.println( "Failed to find storage for: " + name + " for " + _glProgram.getName() ) ;
 				continue ;
 			}
 
 			final GLStorage glStorage = _lookup.getRHS( storage.index() ) ;
-			_toFill.add( glStorage ) ;
+			_toFill.set( binding, glStorage ) ;
 		}
 	}
 
@@ -115,8 +126,13 @@ public class GLBuffer
 		final int size = _storages.size() ;
 		for( int i = 0; i < size ; ++i )
 		{
+			// We store the binding point within the
+			// array index (i).
 			final GLStorage storage = _storages.get( i ) ;
-			MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
+			if( storage != null )
+			{
+				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
+			}
 		}
 	}
 

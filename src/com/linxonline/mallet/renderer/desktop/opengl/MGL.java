@@ -125,6 +125,12 @@ public final class MGL
 
 	public final static int GL_ACTIVE_ATTRIBUTES = GL3.GL_ACTIVE_ATTRIBUTES ;
 	public final static int GL_ACTIVE_UNIFORMS = GL3.GL_ACTIVE_UNIFORMS ;
+	public final static int GL_ACTIVE_RESOURCES = GL3.GL_ACTIVE_RESOURCES ;
+
+	public final static int GL_MAX_NAME_LENGTH = GL3.GL_MAX_NAME_LENGTH ;
+	public final static int GL_BUFFER_BINDING = GL3.GL_BUFFER_BINDING ;
+
+	public final static int GL_INVALID_INDEX = GL3.GL_INVALID_INDEX ;
 
 	public MGL() {}
 
@@ -560,10 +566,29 @@ public final class MGL
 							  _dstX0, _dstY0, _dstX1, _dstY1, _mask, _filter ) ;
 	}
 
-	public static int glGetProgramResourceIndex( int _program, int _programInterface, String _name )
+	public static void glGetProgramInterfaceiv( final int _program, final int _programInterface, final int _pname, final int[] _params, final int _paramsOffset )
 	{
-		final byte[] name = _name.getBytes() ;
-		return gl.glGetProgramResourceIndex( _program, _programInterface, name, 0 ) ;
+		gl.glGetProgramInterfaceiv( _program, _programInterface, _pname, _params, _paramsOffset ) ;
+	}
+
+	public static void glGetProgramResourceName​( final int _program, final int _programInterface, final int _index, final int _bufSize, final int[] _length, final int _lengthOffset, final byte[] _name, final int _nameOffset )
+	{
+		gl.glGetProgramResourceName( _program, _programInterface, _index, _bufSize, _length, _lengthOffset, _name, _nameOffset ) ;
+	}
+
+	public static int glGetProgramResourceIndex( final int _program, final int _programInterface, final byte[] _name, final int _nameOffset )
+	{
+		return gl.glGetProgramResourceIndex( _program, _programInterface, _name, _nameOffset ) ;
+	}
+
+	public static int glGetProgramResourceLocation( final int _program, final int _programInterface, final byte[] _name, final int _nameOffset )
+	{
+		return gl.glGetProgramResourceLocation( _program, _programInterface, _name, _nameOffset ) ;
+	}
+
+	public static void glGetProgramResourceiv​( final int _program, final int _programInterface, final int _index, final int _propCount, final int[] _props, final int _propsOffset, final int _bufSize, final int[] _length, final int _lengthOffset, final int[] _params, final int _paramsOffset )
+	{
+		gl.glGetProgramResourceiv​( _program, _programInterface, _index, _propCount, _props, _propsOffset, _bufSize, _length, _lengthOffset, _params, _paramsOffset ) ;
 	}
 
 	public static int glGetError()
