@@ -27,7 +27,6 @@ public class AndroidFile implements FileStream
 
 	public AndroidFile( final String _file, final StorageType _type )
 	{
-		assert _file != null ;
 		switch( _type )
 		{
 			case Internal : file = new File( _file ) ;                 break ;

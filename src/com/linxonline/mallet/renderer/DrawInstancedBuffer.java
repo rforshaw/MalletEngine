@@ -1,10 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
-import com.linxonline.mallet.util.MalletList ;
-
 /**
 	Draw Instanced Buffer ignores the Draw objects 
 	own shape and renders its shape using the 

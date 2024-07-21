@@ -1,9 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.List ;
-
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 

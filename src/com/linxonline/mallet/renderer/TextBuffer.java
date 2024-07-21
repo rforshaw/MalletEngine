@@ -2,9 +2,6 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 import java.util.ArrayList ;
-import java.lang.ref.WeakReference ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 public class TextBuffer extends ABuffer
 {

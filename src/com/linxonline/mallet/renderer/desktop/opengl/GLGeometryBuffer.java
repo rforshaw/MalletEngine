@@ -1,8 +1,6 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.util.Arrays ;
 import java.util.List ;
-import java.util.Map ;
 import java.nio.* ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
@@ -10,15 +8,12 @@ import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.IShape ;
-import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.IOcclude ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.IntVector2 ;
 
 public final class GLGeometryBuffer extends GLBuffer
 {
@@ -26,7 +21,7 @@ public final class GLGeometryBuffer extends GLBuffer
 	private static final int DRAW_DIMENSIONS_PACKET_SIZE = 4 ;
 
 	private static final int MAX_INT32_SIZE = 2147483647 ;
-	private static final int MAX_INDEX_BUFFER_SIZE = MAX_INT32_SIZE / 2 ;
+	private static final int MAX_INDEX_BUFFER_SIZE = MAX_INT32_SIZE / 4 ;
 
 	private int indexByteSize ;
 
@@ -152,13 +147,16 @@ public final class GLGeometryBuffer extends GLBuffer
 					continue ;
 				}
 
+				final int[] rawIndices = shape.getRawIndices() ;
+				final float[] rawVerts = shape.getRawVertices() ;
+
 				final int count = shape.getIndicesSize() ;
 				final int shapeIndexByteSize = count * IBO_VAR_BYTE_SIZE ;
 
 				usedIndexByteSize += shapeIndexByteSize ;
 				if( usedIndexByteSize > indexByteSize )
 				{
-					expandBuffers() ;
+					expandBuffers( usedIndexByteSize ) ;
 				}
 
 				if( usedIndexByteSize > indexByteSize )
@@ -174,16 +172,12 @@ public final class GLGeometryBuffer extends GLBuffer
 					usedIndexByteSize = shapeIndexByteSize ;
 				}
 
-				final int[] rawIndices = shape.getRawIndices() ;
-				final float[] rawVerts = shape.getRawVertices() ;
-
 				final int drawIndex = i ;
 				final int offset = toDrawSize++ * DRAW_DIMENSIONS_PACKET_SIZE ;
 
 				final int indexStart = indexBuffer.position() ;
 				final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-				
 				for( int k = 0; k < count; ++k )
 				{
 					indexBuffer.put( indexOffset + rawIndices[k] ) ;
@@ -271,7 +265,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		MGL.glDeleteBuffers( vboID.length, vboID, 0 ) ;
 	}
 
-	private void expandBuffers()
+	private void expandBuffers( final int _neededBytes )
 	{
 		final int maxIndexByteSize = MAX_INDEX_BUFFER_SIZE * IBO_VAR_BYTE_SIZE ;
 		if( indexByteSize >= maxIndexByteSize )
@@ -281,7 +275,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		}
 
 		{
-			final int doubleCapacity = indexByteSize * 2 ;
+			final int doubleCapacity = _neededBytes * 2 ;
 			indexByteSize = ( doubleCapacity > maxIndexByteSize ) ? maxIndexByteSize : doubleCapacity ;
 
 			final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
@@ -359,6 +353,9 @@ public final class GLGeometryBuffer extends GLBuffer
 
 		MGL.glBufferData( MGL.GL_ELEMENT_ARRAY_BUFFER, indiciesLengthBytes, indexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
 		MGL.glBufferData( MGL.GL_ARRAY_BUFFER, verticiesLengthBytes, vertexBuffer, MGL.GL_DYNAMIC_DRAW ) ;
+
+		indexBuffer.position( 0 ) ;
+		vertexBuffer.position( 0 ) ;
 	}
 }
 

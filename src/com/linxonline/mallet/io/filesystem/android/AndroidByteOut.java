@@ -11,7 +11,6 @@ public class AndroidByteOut implements ByteOutStream
 
 	public AndroidByteOut( final OutputStream _output )
 	{
-		assert _output != null ;
 		output = _output ;
 	}
 

@@ -84,7 +84,6 @@ public class GameSystem implements IGameSystem
 	@Override
 	public final void addGameState( final GameState _state )
 	{
-		assert _state != null ;
 		_state.setSystem( system ) ;
 		states.add( _state ) ;
 	}

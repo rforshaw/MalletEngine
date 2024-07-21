@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.util.concurrent.atomic.AtomicInteger ;
-import java.util.Arrays ;
 import java.util.List ;
 import java.util.ArrayList ;
 import java.nio.* ;
@@ -13,22 +11,15 @@ import com.linxonline.mallet.renderer.DrawInstancedBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.IShape ;
-import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
-import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.IntVector2 ;
-
-import com.linxonline.mallet.util.Parallel ;
 
 public final class GLDrawInstancedBuffer extends GLBuffer
 {
 	private static final int INSTANCE_INDEX = 0 ;
 
 	private String storageName = null ;
-	private int order ;
 	private VertexAttrib[] attributes = null ;
 
 	private GLProgram glProgram ;
@@ -296,7 +287,6 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 
 	private int uploadInstanceToRAM( final IShape _shape )
 	{
-		final int indexStart = indexBuffer.position() ;
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
 		final int[] inds = _shape.getRawIndices() ;

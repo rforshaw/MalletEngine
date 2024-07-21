@@ -38,7 +38,6 @@ public class AndroidFileSystem implements FileSystem
 	@Override
 	public boolean mapDirectory( final String _directory )
 	{
-		assert _directory != null ;
 		if( context == null )
 		{
 			System.out.println( "Failed TO ACQUIRE CONTEXT" ) ;

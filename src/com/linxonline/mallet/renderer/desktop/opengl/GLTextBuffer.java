@@ -2,7 +2,6 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.List ;
 import java.util.ArrayList ;
-import java.util.Arrays ;
 import java.nio.* ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;

@@ -1,6 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.UUID ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;

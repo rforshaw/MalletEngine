@@ -11,7 +11,6 @@ public final class DesktopByteOut implements ByteOutStream
 
 	public DesktopByteOut( final OutputStream _output )
 	{
-		assert _output != null ;
 		output = _output ;
 	}
 	

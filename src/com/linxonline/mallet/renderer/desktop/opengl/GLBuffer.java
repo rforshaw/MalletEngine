@@ -3,9 +3,6 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
-import com.linxonline.mallet.maths.Vector3 ;
-
-import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -21,7 +18,6 @@ import com.linxonline.mallet.renderer.Action ;
 
 import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
@@ -169,10 +165,19 @@ public class GLBuffer
 	{
 		final Attribute[] swivel = _program.getAttributes() ;
 
-		final VertexAttrib[] attributes = new VertexAttrib[swivel.length] ;
-		int count = 0 ;
+		int active = 0 ;
+		for( int i = 0; i < swivel.length; i++ )
+		{
+			// Figure out which attributes can be ignored.
+			// A Program may use a shader that has fewer attributes
+			// than the geometry we are using.
+			active += ( swivel[i].ignore == false ) ? 1 : 0 ;
+		}
+
+		final VertexAttrib[] attributes = new VertexAttrib[active] ;
 
 		int offset = 0 ;
+		int increment = 0 ;
 		for( int i = 0; i < swivel.length; i++ )
 		{
 			final GLProgram.Attribute glAttribute = _glProgram.getAttribute( swivel[i].name ) ;
@@ -187,19 +192,31 @@ public class GLBuffer
 			{
 				case VEC3  :
 				{
-					attributes[i] = new VertexAttrib( location, 3, MGL.GL_FLOAT, false, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 3, MGL.GL_FLOAT, false, offset ) ;
+					}
+
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case FLOAT :
 				{
-					attributes[i] = new VertexAttrib( location, 4, MGL.GL_UNSIGNED_BYTE, true, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 4, MGL.GL_UNSIGNED_BYTE, true, offset ) ;
+					}
+
 					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case VEC2     :
 				{
-					attributes[i] = new VertexAttrib( location, 2, MGL.GL_FLOAT, false, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 2, MGL.GL_FLOAT, false, offset ) ;
+					}
+
 					offset += 2 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}

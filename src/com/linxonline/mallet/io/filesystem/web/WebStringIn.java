@@ -10,7 +10,6 @@ public class WebStringIn implements StringInStream
 
 	public WebStringIn( final byte[] _input )
 	{
-		assert _input != null ;
 		reader = new BufferedReader( new InputStreamReader( new ByteArrayInputStream( _input ) ) ) ;
 	}
 

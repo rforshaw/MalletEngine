@@ -183,7 +183,6 @@ public final class GLRenderer extends BasicRenderer
 			@Override
 			public String[] loadFont( final String _path )
 			{
-				assert( true ) ;
 				return new String[0] ;
 			}
 		} ;

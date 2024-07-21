@@ -30,7 +30,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 													   EventSystem,
 													   GameSystem>
 {
-	protected final EventController controller = new EventController() ;
+	private final EventController controller = new EventController() ;
 
 	public GLDefaultSystem()
 	{
@@ -131,7 +131,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		return true ;					// Informs the Game System whether to continue updating or not.
 	}
 
-	private class WinState implements WindowListener, MouseListener
+	private final class WinState implements WindowListener, MouseListener
 	{
 		private final static int FOCUS_LOST = -1 ;
 		private final static int FOCUS_UNKNOWN = 0 ;

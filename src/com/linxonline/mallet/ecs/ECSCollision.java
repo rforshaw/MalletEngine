@@ -91,7 +91,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		_hull.addToPosition( _penShift.x, _penShift.y ) ;
 	}
 
-	public class Component extends ECSEntity.Component
+	public static class Component extends ECSEntity.Component
 	{
 		private final Hull[] hulls ;
 		private boolean applyContact = true ;

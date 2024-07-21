@@ -39,7 +39,7 @@ public final class AudioSystem
 	private final List<ISource> paused = MalletList.<ISource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
 	private final EventController controller = new EventController() ;
-	protected IGenerator generator = null ;										// Used to create the Source from a Sound Buffer
+	private IGenerator generator = null ;										// Used to create the Source from a Sound Buffer
 
 	public AudioSystem()
 	{

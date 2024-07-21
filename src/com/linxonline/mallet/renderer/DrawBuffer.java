@@ -3,8 +3,6 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.util.MalletList ;
-
 public class DrawBuffer extends ABuffer
 {
 	public static final IOcclude OCCLUDER_FALLBACK = new IOcclude()

@@ -16,7 +16,6 @@ public final class DesktopFile implements FileStream
 
 	public DesktopFile( final File _file )
 	{
-		assert _file != null ;
 		file = _file ;
 	}
 

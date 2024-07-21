@@ -54,7 +54,7 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 		It's set to GL_RGBA by default due to the extension potentially not 
 		being available, though unlikely. BufferedImage by default orders the channels ABGR.
 	*/
-	protected int imageFormat = MGL.GL_RGBA ;
+	private int imageFormat = MGL.GL_RGBA ;
 	private int bindCount = 0 ;
 
 	public GLTextureManager()

@@ -241,13 +241,6 @@ public final class Matrix3
 		matrix[( _row * 3) + 2] = _val3 ;
 	}
 
-	private void setColumn( final float _val1, final float _val2, final float _val3, final int _col )
-	{
-		matrix[( 0 * 3) + _col] = _val1 ;		// Optimise 0 * 3 = 0
-		matrix[( 1 * 3) + _col] = _val2 ;		// Optimise 1 * 3 = 3
-		matrix[( 2 * 3) + _col] = _val3 ;		// Optimise 2 * 3 = 4
-	}
-
 	private void set( final float _val, final int _row, final int _col )
 	{
 		matrix[( _row * 3) + _col] = _val ;

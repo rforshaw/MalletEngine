@@ -228,7 +228,6 @@ public final class InputSystem implements IInputSystem
 
 	private final boolean exists( final IInputHandler _handler )
 	{
-		assert _handler != null ; 
 		return handlers.contains( _handler ) ;
 	}
 }

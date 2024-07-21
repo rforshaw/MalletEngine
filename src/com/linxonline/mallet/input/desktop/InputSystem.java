@@ -7,8 +7,6 @@ import com.jogamp.newt.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.util.caches.TimePool ;
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
 public final class InputSystem implements IInputSystem, KeyListener, MouseListener
@@ -263,7 +261,6 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 
 	private final boolean exists( final IInputHandler _handler )
 	{
-		assert _handler != null ; 
 		return handlers.contains( _handler ) ;
 	}
 }

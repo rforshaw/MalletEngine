@@ -13,7 +13,6 @@ public class DesktopStringIn implements StringInStream
 
 	public DesktopStringIn( final InputStream _input )
 	{
-		assert _input != null ;
 		reader = new BufferedReader( new InputStreamReader( _input ) ) ;
 	}
 

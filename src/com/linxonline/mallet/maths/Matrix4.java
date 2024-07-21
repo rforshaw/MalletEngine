@@ -457,19 +457,6 @@ public final class Matrix4 extends FloatUniform
 		matrix[offset + 3] = _val4 ;
 	}
 
-	private void setColumn( final float _val1, final float _val2, final float _val3, final float _val4, final int _col )
-	{
-		matrix[( 0 * 4 ) + _col] = _val1 ;		// Optimise 0 * 4 = 0
-		matrix[( 1 * 4 ) + _col] = _val2 ;		// Optimise 1 * 4 = 4
-		matrix[( 2 * 4 ) + _col] = _val3 ;		// Optimise 2 * 4 = 8
-		matrix[( 3 * 4 ) + _col] = _val4 ;		// Optimise 3 * 4 = 12
-	}
-
-	private void set( final float _val, final int _row, final int _col )
-	{
-		matrix[( _row * 4 ) + _col] = _val ;
-	}
-
 	public static Matrix4 createIdentity()
 	{
 		final Matrix4 iden = new Matrix4() ;

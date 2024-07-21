@@ -14,9 +14,6 @@ public class AndroidAssetFile implements FileStream
 
 	public AndroidAssetFile( final String _file, final AssetManager _asset )
 	{
-		assert _file != null ;
-		assert _asset != null ;
-
 		file = _file ;
 		asset = _asset ;
 	}

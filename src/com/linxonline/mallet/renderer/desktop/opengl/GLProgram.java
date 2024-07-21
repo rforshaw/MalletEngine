@@ -19,7 +19,6 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 
 import com.linxonline.mallet.util.Logger ;
-import com.linxonline.mallet.util.MalletMap ;
 
 /**
 	GLProgram retains a collection of GLSL shaders 

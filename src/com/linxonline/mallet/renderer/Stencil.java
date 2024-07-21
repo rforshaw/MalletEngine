@@ -51,7 +51,7 @@ public class Stencil extends ABuffer implements IManageBuffers
 	*/
 	public void setClear( final boolean _clear )
 	{
-		clear = clear ;
+		clear = _clear ;
 	}
 
 	/**

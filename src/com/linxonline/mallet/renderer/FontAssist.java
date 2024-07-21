@@ -11,7 +11,6 @@ public final class FontAssist
 	*/
 	public static void setAssist( final FontAssist.Assist _interface )
 	{
-		assert _interface != null ;
 		inter = _interface ;
 	}
 

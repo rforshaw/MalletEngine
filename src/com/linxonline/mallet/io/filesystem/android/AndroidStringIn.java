@@ -13,7 +13,6 @@ public class AndroidStringIn implements StringInStream
 
 	public AndroidStringIn( final InputStream _input )
 	{
-		assert _input != null ;
 		reader = new BufferedReader( new InputStreamReader( _input ) ) ;
 	}
 

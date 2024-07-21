@@ -11,7 +11,6 @@ public class AndroidStringOut implements StringOutStream
 
 	public AndroidStringOut( final BufferedWriter _output )
 	{
-		assert _output != null ;
 		output = _output ;
 	}
 

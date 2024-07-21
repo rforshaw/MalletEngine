@@ -11,7 +11,6 @@ public class DesktopStringOut implements StringOutStream
 
 	public DesktopStringOut( final Writer _output )
 	{
-		assert _output != null ;
 		output = _output ;
 	}
 

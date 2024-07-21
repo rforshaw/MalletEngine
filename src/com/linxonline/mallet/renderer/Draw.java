@@ -1,13 +1,10 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.Map ;
-
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
-import com.linxonline.mallet.util.MalletMap ;
 
 public final class Draw implements IUpdate
 {

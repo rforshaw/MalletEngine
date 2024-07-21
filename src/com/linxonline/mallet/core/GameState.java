@@ -257,7 +257,6 @@ public class GameState
 	*/
 	public final void addEntity( final Entity _entity )
 	{
-		assert _entity != null ;
 		entitySystem.addEntity( _entity ) ;
 	}
 
@@ -279,7 +278,6 @@ public class GameState
 	*/
 	public final void removeEntity( final Entity _entity )
 	{
-		assert _entity != null ;
 		entitySystem.removeEntity( _entity ) ;
 	}
 

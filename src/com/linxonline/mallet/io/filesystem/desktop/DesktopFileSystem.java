@@ -28,8 +28,6 @@ public final class DesktopFileSystem implements FileSystem
 	@Override
 	public boolean mapDirectory( final String _directory )
 	{
-		assert _directory != null ;
-
 		final File dir = new File( _directory ) ;
 		if( dir.isDirectory() == false )
 		{

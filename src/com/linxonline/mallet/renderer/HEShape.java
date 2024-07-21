@@ -349,12 +349,7 @@ public class HEShape implements IShape
 
 		for( final Face face : faces )
 		{
-			switch( face.getEdgeCount() )
-			{
-				default : break ;
-				case 3  : size += 3 ; break ;
-				case 4  : size += 6 ; break ;
-			}
+			size += face.getIndicesCount() ;
 		}
 
 		return size ;
@@ -866,6 +861,32 @@ public class HEShape implements IShape
 			while( edge != start ) ;
 
 			return count ;
+		}
+
+		public int getVertexCount()
+		{
+			int count = 0 ;
+
+			Edge edge = start ;
+			do
+			{
+				++count ;
+				edge = edge.next ;
+			}
+			while( edge != start ) ;
+
+			return count ;
+		}
+
+		public int getTriangleCount()
+		{
+			final int count = getVertexCount() ;
+			return count - 2 ;
+		}
+
+		public int getIndicesCount()
+		{
+			return getTriangleCount() * 3 ;
 		}
 
 		/**

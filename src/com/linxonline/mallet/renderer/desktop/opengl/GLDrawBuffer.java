@@ -9,7 +9,6 @@ import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
-import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.IOcclude ;
 
 import com.linxonline.mallet.maths.Matrix4 ;

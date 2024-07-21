@@ -1,13 +1,6 @@
 package com.linxonline.mallet.renderer.opengl ;
 
 import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
-
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.json.* ;
@@ -15,10 +8,6 @@ import com.linxonline.mallet.io.formats.json.* ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
-
-import com.linxonline.mallet.maths.Vector2 ;
-import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.Matrix4 ;
 
 public final class JSONProgram
 {

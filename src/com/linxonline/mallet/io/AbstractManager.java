@@ -256,8 +256,6 @@ public abstract class AbstractManager<K, T extends Resource> implements ILoader<
 		@Override
 		public T load( final K _key )
 		{
-			assert _key != null ;			// _file must not be null
-
 			final int length = loaders.size() ;
 			for( int i = 0; i < length; ++i )
 			{

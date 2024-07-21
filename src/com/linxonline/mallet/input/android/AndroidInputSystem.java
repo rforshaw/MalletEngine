@@ -149,7 +149,6 @@ public final class AndroidInputSystem implements IInputSystem, AndroidInputListe
 
 	private boolean exists( final IInputHandler _handler )
 	{
-		assert _handler != null ;
 		return handlers.contains( _handler ) ;
 	}
 

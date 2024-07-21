@@ -27,7 +27,6 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 	public GLFont get( final String _file )
 	{
 		System.out.println( "GLFontManager: get( _file ). Not implemented yet." ) ;
-		assert( true ) ;
 		return null ;
 	}
 
