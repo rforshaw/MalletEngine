@@ -210,14 +210,14 @@ public class UIComponent extends InputComponent
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
-		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", eventController ) ) ;
+		_events.add( Event.<EventController>create( "ADD_GAME_STATE_EVENT", eventController ) ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", eventController )  ) ;
+		_events.add( Event.<EventController>create( "REMOVE_GAME_STATE_EVENT", eventController )  ) ;
 	}
 
 	@Override

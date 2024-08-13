@@ -40,7 +40,8 @@ public final class ECSEvent implements IECS<ECSEvent.Component>
 		return create( _parent, Type.ENTITY ) ;
 	}
 
-	public ECSEvent.Component create( final ECSEntity _parent, final Type _type, final Tuple<String, EventController.IProcessor<?>> ... _processors )
+	@SafeVarargs
+	public final ECSEvent.Component create( final ECSEntity _parent, final Type _type, final Tuple<String, EventController.IProcessor<?>> ... _processors )
 	{
 		final IEventSystem sys = getEventSystem( _type, _parent ) ;
 		final Component component = new Component( _parent, _type, sys, _processors ) ;

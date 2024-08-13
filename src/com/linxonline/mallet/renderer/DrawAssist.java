@@ -15,7 +15,7 @@ import com.linxonline.mallet.event.Event ;
 */
 public final class DrawAssist
 {
-	private static final Event<Object> DRAW_CLEAN = new Event<Object>( "DRAW_CLEAN", null ) ; 
+	private static final Event<Object> DRAW_CLEAN = Event.create( "DRAW_CLEAN" ) ; 
 
 	private static Assist assist ;
 

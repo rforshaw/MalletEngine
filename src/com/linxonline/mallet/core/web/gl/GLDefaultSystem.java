@@ -25,7 +25,6 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 												 WebGameSystem>
 {
 	// Add Web Document here...
-	protected EventController eventController = new EventController() ;
 
 	public GLDefaultSystem()
 	{
@@ -53,24 +52,21 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 		final InputSystem input = getInput() ;
 
 		final EventSystem event = getEventSystem() ;
-		event.addEvent( new Event<Boolean>( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
-		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
-		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 	}
 
 	protected void initEventProcessors()
 	{
-		eventController.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
+		controller.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
 		{
 			final boolean displayMouse = _displayMouse ;
 			//getWindow().setPointerVisible( displayMouse ) ;
 		} ) ;
 
-		getEventSystem().addHandler( eventController ) ;
+		getEventSystem().addHandler( controller ) ;
 	}
-
-	@Override
-	public void sleep( final long _millis ) {}
 
 	@Override
 	public void startSystem()
@@ -82,13 +78,5 @@ public class GLDefaultSystem extends BasicSystem<WebFileSystem,
 	public void stopSystem()
 	{
 		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;
-	}
-
-	@Override
-	public boolean update( final float _dt )
-	{
-		super.update( _dt ) ;
-		eventController.update() ;		// Process the Events this system is interested in
-		return true ;					// Informs the Game System whether to continue updating or not.
 	}
 }

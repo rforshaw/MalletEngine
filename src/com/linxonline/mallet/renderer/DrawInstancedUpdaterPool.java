@@ -51,7 +51,7 @@ public class DrawInstancedUpdaterPool
 
 			synchronized( pool )
 			{
-				pool.add( new WeakReference( updater ) ) ;
+				pool.add( new WeakReference<DrawInstancedUpdater>( updater ) ) ;
 			}
 		}
 

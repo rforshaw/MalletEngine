@@ -3,9 +3,6 @@ package com.linxonline.mallet.renderer.web.gl ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
-import com.linxonline.mallet.maths.Vector3 ;
-
-import com.linxonline.mallet.renderer.opengl.JSONProgram ;
 
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Shape ;
@@ -13,13 +10,9 @@ import com.linxonline.mallet.renderer.MalletFont ;
 import com.linxonline.mallet.renderer.MalletTexture ;
 import com.linxonline.mallet.renderer.MalletColour ;
 import com.linxonline.mallet.renderer.IUniform ;
-import com.linxonline.mallet.renderer.UIntUniform ;
-import com.linxonline.mallet.renderer.IntUniform ;
-import com.linxonline.mallet.renderer.FloatUniform ;
-import com.linxonline.mallet.renderer.BoolUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
-import com.linxonline.mallet.renderer.Draw ;
+import com.linxonline.mallet.renderer.Attribute ;
 import com.linxonline.mallet.renderer.Operation ;
 import com.linxonline.mallet.renderer.Action ;
 
@@ -29,6 +22,8 @@ import com.linxonline.mallet.util.Logger ;
 
 public class GLBuffer
 {
+	protected final static Matrix4 IDENTITY = new Matrix4() ;
+
 	private final static MemoryPool<Texture> TEXTURES = new MemoryPool<Texture>( () -> new Texture() ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFF ;
@@ -43,8 +38,6 @@ public class GLBuffer
 	private final byte[] abgrTemp = new byte[4] ;
 
 	private final boolean ui ;
-
-	private int textureUnit = 0 ;	// This needs to be reset, call loadProgramUniforms() first, then loadDrawUniforms().
 
 	public GLBuffer( final boolean _ui )
 	{
@@ -469,58 +462,81 @@ public class GLBuffer
 		return ConvertBytes.toFloat( abgrTemp, 0 ) ;
 	}
 
-	protected static void apply( final Matrix4 _mat4,
-								 final Matrix4 _temp,
-								 final Vector3 _position,
-								 final Vector3 _offset,
-								 final Vector3 _rotation,
-								 final Vector3 _scale )
+	/**
+		There are three points of vertex attribute information.
+
+		1) The attributes available from the GLProgram.
+		2) The attributes required by the Program.
+		3) The vertex-attributes available in the geometry.
+
+		The geometry is not allowed to be added to a Drawbuffer unless
+		it complies with the Program attributes.
+		The geometry-attributes and Program-attributes must be a 1:1 mapping.
+
+		TODO: It should be possible to allow geometry that provides more
+		attributes than what the Program requires.
+
+		The Program should provide all available attributes defined
+		within GLProgram. The Program can define more attributes not
+		defined by GLProgram, these will be ignored.
+
+	*/
+	protected static VertexAttrib[] constructVertexAttrib( final Program _program, final GLProgram _glProgram )
 	{
-		_mat4.setIdentity() ;
-		_mat4.setTranslate( _position.x, _position.y, 0.0f ) ;
+		final Attribute[] swivel = _program.getAttributes() ;
 
-		_temp.setRotateX( _rotation.x ) ;
-		_mat4.multiply( _temp ) ;
-		_temp.setIdentity() ;
+		int active = 0 ;
+		for( int i = 0; i < swivel.length; i++ )
+		{
+			// Figure out which attributes can be ignored.
+			// A Program may use a shader that has fewer attributes
+			// than the geometry we are using.
+			active += ( swivel[i].ignore == false ) ? 1 : 0 ;
+		}
 
-		_temp.setRotateY( _rotation.y ) ;
-		_mat4.multiply( _temp ) ;
-		_temp.setIdentity() ;
-
-		_temp.setRotateZ( _rotation.z ) ;
-		_mat4.multiply( _temp ) ;
-		_temp.setIdentity() ;
-
-		_temp.setScale( _scale.x, _scale.y, _scale.z ) ;
-		_temp.setTranslate( _offset.x, _offset.y, _offset.z ) ;
-		_mat4.multiply( _temp ) ;
-		_temp.setIdentity() ;
-	}
-
-	protected static VertexAttrib[] constructVertexAttrib( final Shape.Attribute[] _swivel, final GLProgram _program )
-	{
-		final VertexAttrib[] attributes = new VertexAttrib[_swivel.length] ;
+		final VertexAttrib[] attributes = new VertexAttrib[active] ;
 
 		int offset = 0 ;
-		for( int i = 0; i < _swivel.length; i++ )
+		int increment = 0 ;
+		for( int i = 0; i < swivel.length; i++ )
 		{
-			switch( _swivel[i] )
+			final GLProgram.Attribute glAttribute = _glProgram.getAttribute( swivel[i].name ) ;
+
+			// The program may not require all of
+			// our attributes, we'll still set them up but
+			// specify the location as -1, this ensures
+			// the correct vertex offsets are held.
+			final int location = ( glAttribute != null ) ? glAttribute.getLocation() : -1 ;
+
+			switch( swivel[i].type )
 			{
 				case VEC3  :
 				{
-					attributes[i] = new VertexAttrib( _program.inAttributes[i], 3, MGL.GL_FLOAT, false, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 3, MGL.GL_FLOAT, false, offset ) ;
+					}
+
 					offset += 3 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case FLOAT :
 				{
-					attributes[i] = new VertexAttrib( _program.inAttributes[i], 4, MGL.GL_UNSIGNED_BYTE, true, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 4, MGL.GL_UNSIGNED_BYTE, true, offset ) ;
+					}
+
 					offset += 1 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
 				case VEC2     :
 				{
-					attributes[i] = new VertexAttrib( _program.inAttributes[i], 2, MGL.GL_FLOAT, false, offset ) ;
+					if( !swivel[i].ignore )
+					{
+						attributes[increment++] = new VertexAttrib( location, 2, MGL.GL_FLOAT, false, offset ) ;
+					}
+
 					offset += 2 * VBO_VAR_BYTE_SIZE ;
 					break ;
 				}
@@ -590,6 +606,7 @@ public class GLBuffer
 			offset = _offset ; 
 		}
 
+		@Override
 		public String toString()
 		{
 			final StringBuilder buffer = new StringBuilder() ;

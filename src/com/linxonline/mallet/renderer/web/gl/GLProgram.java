@@ -48,6 +48,22 @@ public final class GLProgram extends ProgramManager.Program
 		{
 			inAttributes[i] = i ;
 		}
+
+		return null ;
+	}
+
+	public Attribute getAttribute( final String _name )
+	{
+		for( int i = 0; i < inAttributes.length; ++i )
+		{
+			final Attribute attr = inAttributes[i] ;
+			if( attr.isName( _name ) )
+			{
+				return attr ;
+			}
+		}
+
+		return null ;
 	}
 
 	@Override
@@ -72,6 +88,40 @@ public final class GLProgram extends ProgramManager.Program
 	public String type()
 	{
 		return "GLPROGRAM" ;
+	}
+
+	public boolean loadDrawUniforms( final UniformState _state, final Draw _draw )
+	{
+		return builder.loadDrawUniforms( _state, _draw ) ;
+	}
+
+	public boolean buildDrawUniforms( final Program _program, final UniformState _state )
+	{
+		final UniformList list = _program.getDrawUniforms() ;
+
+		final int size = list.size() ;
+		final int[] locations = new int[size] ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			final String name = list.get( i ) ;
+			final int location = MGL.glGetUniformLocation( id[0], name ) ;
+			if( location < 0 )
+			{
+				Logger.println( "Unable to find: " + name + " required as a draw uniform.", Logger.Verbosity.MAJOR ) ;
+				return false ;
+			}
+
+			locations[i] = location ;
+		}
+
+		_state.drawUniformLocations = locations ;
+		return true ;
+	}
+
+	public boolean buildProgramUniforms( final Program _program, final List<ILoadUniform> _toFill )
+	{
+		return builder.buildProgramUniforms( _program, this, _toFill ) ;
 	}
 
 	/**

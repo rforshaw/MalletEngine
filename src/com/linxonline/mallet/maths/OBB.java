@@ -13,11 +13,11 @@ public final class OBB
 	public static final int AXES_NUM = 2 ;
 	public static final int VECTOR_TYPE = 2 ;
 
-	public float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
-	public float[] rotations = new float[POINT_NUM * VECTOR_TYPE] ;
-	public float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
+	public final float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
+	public final float[] rotations = new float[POINT_NUM * VECTOR_TYPE] ;
+	public final float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
 
-	public OBB()
+	private OBB()
 	{
 		FloatBuffer.set( points, TOP_LEFT, 0.0f, 0.0f ) ;
 		FloatBuffer.set( points, TOP_RIGHT, 0.0f, 0.0f ) ;
@@ -26,21 +26,36 @@ public final class OBB
 		init() ;
 	}
 
-	public OBB( final AABB _aabb )
-	{
-		setFromAABB( _aabb ) ;
-	}
-
-	public OBB( final Vector2 _topLeft,
-				final Vector2 _topRight, 
-				final Vector2 _bottomLeft,
-				final Vector2 _bottomRight )
+	private OBB( final Vector2 _topLeft,
+				 final Vector2 _topRight, 
+				 final Vector2 _bottomLeft,
+				 final Vector2 _bottomRight )
 	{
 		FloatBuffer.set( points, OBB.TOP_LEFT, _topLeft.x, _topLeft.y ) ;
 		FloatBuffer.set( points, OBB.TOP_RIGHT, _topRight.x, _topRight.y ) ;
 		FloatBuffer.set( points, OBB.BOTTOM_LEFT, _bottomLeft.x, _bottomLeft.y ) ;
 		FloatBuffer.set( points, OBB.BOTTOM_RIGHT, _bottomRight.x, _bottomRight.y ) ;
 		init() ;
+	}
+
+	public static OBB create()
+	{
+		return new OBB() ;
+	}
+
+	public static OBB create( final AABB _aabb )
+	{
+		final OBB o = new OBB() ;
+		o.setFromAABB( _aabb ) ;
+		return o ;
+	}
+
+	public static OBB create( final Vector2 _topLeft,
+							  final Vector2 _topRight, 
+							  final Vector2 _bottomLeft,
+							  final Vector2 _bottomRight )
+	{
+		return new OBB( _topLeft, _topRight, _bottomLeft, _bottomRight ) ;
 	}
 
 	public void setFromAABB( final AABB _aabb )
@@ -139,5 +154,45 @@ public final class OBB
 	{
 		applyRotations( 0.0f, 0.0f, 0.0f ) ;
 		updateAxesAndEdges() ;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31 ;
+
+		int result = 1 ;
+		for( int i = 0; i < rotations.length; ++i )
+		{
+			result = prime * result + Float.floatToIntBits( rotations[i] ) ;
+		}
+
+		return result ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( !( _obj instanceof OBB ) )
+		{
+			return false ;
+		}
+
+		final OBB b = ( OBB )_obj ;
+		for( int i = 0; i < rotations.length; ++i )
+		{
+			if( rotations[i] != b.rotations[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "OBB" ;
 	}
 }

@@ -9,7 +9,6 @@ import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
-import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.IOcclude ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
@@ -21,7 +20,10 @@ public final class GLDrawBuffer extends GLBuffer
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;
 
 	private GLProgram glProgram ;
-	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private int style = -1 ; // GL_TRIANGLES, LINES, etc...
+	
+	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
+	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private IOcclude occluder = DrawBuffer.OCCLUDER_FALLBACK ;
@@ -47,10 +49,23 @@ public final class GLDrawBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
+		switch( program.getStyle() )
 		{
-			// We've failed to update the buffer something in
-			// the program map is wrong or has yet to be loaded.
+			case LINES      : style = MGL.GL_LINES ;      break ;
+			case LINE_STRIP : style = MGL.GL_LINE_STRIP ; break ;
+			case FILL       : style = MGL.GL_TRIANGLES ;  break ;
+			default         : style = MGL.GL_LINES ;      break ;
+		}
+
+		uniforms.clear() ;
+		if( glProgram.buildProgramUniforms( program, uniforms ) == false )
+		{
+			stable = false ;
+			return stable ;
+		}
+
+		if( glProgram.buildDrawUniforms( program, uniformState ) == false )
+		{
 			stable = false ;
 			return stable ;
 		}
@@ -63,7 +78,7 @@ public final class GLDrawBuffer extends GLBuffer
 			// we know a DrawBuffers program can't be fully 
 			// replaced, they'd have to create a new GeometryBuffer 
 			// to do that.
-			attributes = constructVertexAttrib( _buffer.getAttribute(), glProgram ) ;
+			attributes = constructVertexAttrib( program, glProgram ) ;
 		}
 
 		buffers.clear() ;
@@ -96,13 +111,23 @@ public final class GLDrawBuffer extends GLBuffer
 
 		MGL.useProgram( glProgram.id[0] ) ;
 
-		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getWorldProjection() ;
-		final float[] matrix = projection.matrix ;
+		final Matrix4 view = ( isUI() ) ? IDENTITY : _camera.getView() ;
+		final Matrix4 projection = ( isUI() ) ? _camera.getUIProjection() : _camera.getProjection() ;
 
-		MGL.uniformMatrix4fv( glProgram.inMVPMatrix, true, matrix ) ;
-		if( loadProgramUniforms( glProgram, uniforms ) == false )
+		MGL.uniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
+		MGL.uniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+
 		{
-			System.out.println( "Failed to load uniforms." ) ;
+			uniformState.reset() ;
+			final int size = uniforms.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				if( uniforms.get( i ).load( uniformState ) == false )
+				{
+					System.out.println( "Failed to load uniforms." ) ;
+					return ;
+				}
+			}
 		}
 
 		GLDrawBuffer.bindBuffers( storages ) ;
@@ -110,7 +135,7 @@ public final class GLDrawBuffer extends GLBuffer
 		final Camera camera = _camera.getCamera() ;
 		for( GLGeometryBuffer buffer : buffers )
 		{
-			buffer.draw( attributes, glProgram, camera, occluder ) ;
+			buffer.draw( style, attributes, glProgram, uniformState, camera, occluder ) ;
 		}
 	}
 

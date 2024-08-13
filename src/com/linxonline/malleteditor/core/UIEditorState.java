@@ -82,7 +82,7 @@ public class UIEditorState extends GameState
 		component.addElement( jui.getParent() ) ;
 		addEntity( entity ) ;
 
-		getInternalController().processEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+		getInternalController().processEvent( Event.<Boolean>create( "SHOW_GAME_STATE_FPS", true ) ) ;
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class UIEditorState extends GameState
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
 				//final Entity entity = UIEditorState.createUIDropEntity( _class, _input ) ;
-				//getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
+				//getParent().addEvent( Event.<Entity>create( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
 		} ;
@@ -235,7 +235,7 @@ public class UIEditorState extends GameState
 			public InputEvent.Action mousePressed( final InputEvent _input )
 			{
 				//final Entity entity = UIEditorState.createCUIDropEntity( _class, _input ) ;
-				//getParent().addEvent( new Event<Entity>( "ADD_ENTITY", entity ) ) ;
+				//getParent().addEvent( Event.<Entity>create( "ADD_ENTITY", entity ) ) ;
 				return InputEvent.Action.CONSUME ;
 			}
 		} ;
@@ -282,7 +282,7 @@ public class UIEditorState extends GameState
 							final UIElement.MetaComponent meta = constructor.newInstance() ;
 							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
 
-							event.passStateEvent( new Event<CUIPacket>( "INSERT_CUIPACKET", new CUIPacket( meta, position ) ) ) ;
+							event.passStateEvent( Event.<CUIPacket>create( "INSERT_CUIPACKET", new CUIPacket( meta, position ) ) ) ;
 						}
 						catch( NoSuchMethodException ex )
 						{
@@ -356,7 +356,7 @@ public class UIEditorState extends GameState
 							final UIWrapper wrapper = new UIWrapper( meta ) ;
 							final Vector2 position = new Vector2( _event.getMouseX(), _event.getMouseY() ) ;
 
-							event.passStateEvent( new Event<UIPacket>( "INSERT_UIPACKET", new UIPacket( wrapper, position ) ) ) ;
+							event.passStateEvent( Event.<UIPacket>create( "INSERT_UIPACKET", new UIPacket( wrapper, position ) ) ) ;
 						}
 						catch( NoSuchMethodException ex )
 						{

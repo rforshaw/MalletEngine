@@ -13,36 +13,58 @@ public final class AABB
 	public static final int MAX_Y = 3 ;
 
 	// min then max
-	public float[] range = new float[RANGE_NUM * VECTOR_TYPE] ;
+	public final float[] range = new float[RANGE_NUM * VECTOR_TYPE] ;
 
-	public AABB() {}
+	private AABB() {}
 
-	public AABB( final Vector2 _length )
-	{
-		this( 0.0f, 0.0f, _length.x, _length.y ) ;
-	}
-
-	public AABB( final Vector2 _min, final Vector2 _max )
-	{
-		this( _min.x, _min.y, _max.x, _max.y ) ;
-	}
-
-	public AABB( final float _maxX, final float _maxY )
-	{
-		this( 0.0f, 0.0f, _maxX, _maxY ) ;
-	}
-
-	public AABB( final float _minX, final float _minY,
-				 final float _maxX, final float _maxY )
+	private AABB( final float _minX, final float _minY,
+				  final float _maxX, final float _maxY )
 	{
 		FloatBuffer.set( range, AABB.MIN_X, _minX, _minY ) ;
 		FloatBuffer.set( range, AABB.MAX_X, _maxX, _maxY ) ;
 	}
 
-	public AABB( final OBB _obb )
+	private AABB( final OBB _obb )
 	{
 		setFromOBB( _obb ) ;
 	}
+
+	public static AABB create()
+	{
+		return new AABB() ;
+	}
+
+	public static AABB create( final Vector2 _length )
+	{
+		return create( 0.0f, 0.0f, _length.x, _length.y ) ;
+	}
+
+	public static AABB create( final Vector2 _min, final Vector2 _max )
+	{
+		return create( _min.x, _min.y, _max.x, _max.y ) ;
+	}
+
+	public static AABB create( final float _maxX, final float _maxY )
+	{
+		return create( 0.0f, 0.0f, _maxX, _maxY ) ;
+	}
+
+	public static AABB create( final float _minX, final float _minY,
+							   final float _maxX, final float _maxY )
+	{
+		return new AABB( _minX, _minY, _maxX, _maxY ) ;
+	}
+
+	public static AABB create( final OBB _obb )
+	{
+		return new AABB( _obb ) ;
+	}
+
+	/*public static AABB create( final Vector2 _area, final Vector2 _position )
+	{
+		return new AABB( _position.x, _position.y,
+						 _position.x + _area.x, _position.y + _area.y ) ;
+	}*/
 
 	/**
 		Calculate the dimensions of the AABB from the OBB.
@@ -301,12 +323,41 @@ public final class AABB
 		return _max ;
 	}
 
-	public static AABB create( final Vector2 _area, final Vector2 _position )
+	@Override
+	public int hashCode()
 	{
-		return new AABB( _position.x, _position.y,
-						 _position.x + _area.x, _position.y + _area.y ) ;
+		final int prime = 31 ;
+
+		int result = 1 ;
+		for( int i = 0; i < range.length; ++i )
+		{
+			result = prime * result + Float.floatToIntBits( range[i] ) ;
+		}
+
+		return result ;
 	}
 
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( !( _obj instanceof AABB ) )
+		{
+			return false ;
+		}
+
+		final AABB b = ( AABB )_obj ;
+		for( int i = 0; i < range.length; ++i )
+		{
+			if( range[i] != b.range[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return "MIN: " + range[AABB.MIN_X] + " " + range[AABB.MIN_Y] + "\nMAX: " + range[AABB.MAX_X] + " " + range[AABB.MAX_Y] ;

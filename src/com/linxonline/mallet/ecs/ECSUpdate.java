@@ -111,7 +111,7 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 		public abstract void shutdown() ;
 	}
 
-	private class ComponentUpdater implements Parallel.IRangeRun<T>
+	private final class ComponentUpdater implements Parallel.IRangeRun<T>
 	{
 		private float delta = 0.0f ;
 

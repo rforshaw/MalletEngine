@@ -25,11 +25,12 @@ public class MalletList
 	
 	public final static <V> List<V> newList( final V[] _array )
 	{
-		final ArrayList<V> list = new ArrayList( _array.length ) ;
+		final ArrayList<V> list = new ArrayList<V>( _array.length ) ;
 		Collections.addAll( list, _array ) ;
 		return list ;
 	}
 
+	@SafeVarargs
 	public static <T> T[] concat( final T[] _lhs, final T ... _rhs )
 	{
 		final T[] result = Arrays.copyOf( _lhs, _lhs.length + _rhs.length ) ;
@@ -37,6 +38,7 @@ public class MalletList
 		return result ;
 	}
 
+	@SafeVarargs
 	public static <T> T[] toArray( final T ... _array )
 	{
 		return _array ;

@@ -114,7 +114,7 @@ public final class EventType
 		@Override
 		public Iterator<T> iterator() 
 		{ 
-			return new LookupIterator( types.iterator() ) ; 
+			return new LookupIterator<T>( types.iterator() ) ; 
 		} 
 
 		private void ensureCapacity( final int _size )

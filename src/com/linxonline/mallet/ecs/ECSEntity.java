@@ -13,7 +13,7 @@ public final class ECSEntity
 
 	private boolean dead = false ;
 
-	public <T> ECSEntity( final ICreate _create, final IDestroy _destroy )
+	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy )
 	{
 		this( _create, _destroy, null ) ;
 	}

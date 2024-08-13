@@ -25,7 +25,7 @@ public final class World implements IManageBuffers
 	private final List<Camera> cameras ;
 	private final List<ABuffer> buffers ;
 
-	private MalletColour clearColour = new MalletColour( 0, 0, 0, 0 ) ;
+	private final MalletColour clearColour = new MalletColour( 0, 0, 0, 0 ) ;
 
 	public World( final String _id )
 	{
@@ -137,7 +137,7 @@ public final class World implements IManageBuffers
 
 	public void setClearColour( final MalletColour _colour )
 	{
-		clearColour = ( _colour != null ) ? _colour : MalletColour.black() ;
+		clearColour.changeColour( ( _colour != null ) ? _colour : MalletColour.black() ) ;
 	}
 
 	public MalletColour getClearColour()
@@ -184,6 +184,50 @@ public final class World implements IManageBuffers
 	public int index()
 	{
 		return index ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( this == _obj )
+		{
+			return true ;
+		}
+
+		if( _obj == null )
+		{
+			return false ;
+		}
+
+		if( !( _obj instanceof World ) )
+		{
+			return false ;
+		}
+
+		final World w = ( World )_obj ;
+		for( int i = 0; i < attachments.length; ++i )
+		{
+			if( attachments[i] != w.attachments[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return index ;
+	}
+	
+	@Override
+	public String toString()
+	{
+		final StringBuilder buffer = new StringBuilder() ;
+		buffer.append( "World: " ) ; buffer.append( id ) ;
+		return buffer.toString() ;
 	}
 
 	public enum AttachmentType

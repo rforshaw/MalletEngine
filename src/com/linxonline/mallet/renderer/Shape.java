@@ -13,9 +13,9 @@ public final class Shape implements IShape
 	private final float[] verticies ;
 	private final int[] indicies ;
 
-	private Style style = Style.LINE_STRIP ;
+	private final Style style ;
 
-	private int vertexSize = 0 ;
+	private final int vertexSize ;
 	private int indexIncrement = 0 ;
 	private int vertexIncrement = 0 ;
 

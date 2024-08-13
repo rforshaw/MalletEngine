@@ -1080,7 +1080,7 @@ public class HEShape implements IShape
 		}
 	}
 
-	private class Triangle
+	private final class Triangle
 	{
 		private final Vector3 a = new Vector3() ;
 		private final Vector3 b = new Vector3() ;

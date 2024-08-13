@@ -81,16 +81,16 @@ public class EventComponent extends Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<EventController>( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
-		_events.add( new Event<EventController>( "ADD_GAME_STATE_EVENT", getStateEventController() ) ) ;
+		_events.add( Event.<EventController>create( "ADD_BACKEND_EVENT", getBackendEventController() ) ) ;
+		_events.add( Event.<EventController>create( "ADD_GAME_STATE_EVENT", getStateEventController() ) ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( new Event<EventController>( "REMOVE_BACKEND_EVENT", getBackendEventController() )  ) ;
-		_events.add( new Event<EventController>( "REMOVE_GAME_STATE_EVENT", getStateEventController() )  ) ;
+		_events.add( Event.<EventController>create( "REMOVE_BACKEND_EVENT", getBackendEventController() )  ) ;
+		_events.add( Event.<EventController>create( "REMOVE_GAME_STATE_EVENT", getStateEventController() )  ) ;
 	}
 
 	@Override

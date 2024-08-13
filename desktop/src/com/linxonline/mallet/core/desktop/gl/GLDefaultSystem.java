@@ -30,8 +30,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 													   EventSystem,
 													   GameSystem>
 {
-	private final EventController controller = new EventController() ;
-
 	public GLDefaultSystem()
 	{
 		super( new DefaultShutdown(),
@@ -66,20 +64,20 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		render.getCanvas().addKeyListener( input ) ;
 
 		final EventSystem event = getEventSystem() ;
-		event.addEvent( new Event<Boolean>( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
-		event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
-		event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+		event.addEvent( Event.<Boolean>create( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
 
 		final WinState window = new WinState() ;
 
 		GlobalConfig.addNotify( "CAPTUREMOUSE", ( String _name ) -> {
 			final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
-			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", capture ) ) ;
+			event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", capture ) ) ;
 		} ) ;
 
 		GlobalConfig.addNotify( "FULLSCREEN", ( String _name ) -> {
 			final boolean fullscreen = GlobalConfig.getBoolean( "FULLSCREEN", false ) ;
-			event.addEvent( new Event<Boolean>( "SYSTEM_FULLSCREEN", fullscreen ) ) ;
+			event.addEvent( Event.<Boolean>create( "SYSTEM_FULLSCREEN", fullscreen ) ) ;
 		} ) ;
 
 		getWindow().addWindowListener( window ) ;
@@ -123,14 +121,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		Logger.println( "Stop System...", Logger.Verbosity.MINOR ) ;
 	}
 
-	@Override
-	public boolean update( final float _dt )
-	{
-		super.update( _dt ) ;
-		controller.update() ;		// Process the Events this system is interested in
-		return true ;					// Informs the Game System whether to continue updating or not.
-	}
-
 	private final class WinState implements WindowListener, MouseListener
 	{
 		private final static int FOCUS_LOST = -1 ;
@@ -157,7 +147,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		{
 			Logger.println( "Main window lost focus.", Logger.Verbosity.MINOR ) ;
 			final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
-			event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", false ) ) ;
+			event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", false ) ) ;
 
 			focusState = FOCUS_LOST ;
 		}
@@ -180,7 +170,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 				{
 				
 					final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
-					event.addEvent( new Event<Boolean>( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+					event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
 					break ;
 				}
 			}

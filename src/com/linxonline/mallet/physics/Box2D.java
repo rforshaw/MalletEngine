@@ -3,7 +3,7 @@ package com.linxonline.mallet.physics ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-public class Box2D extends Hull
+public final class Box2D extends Hull
 {
 	public final AABB aabb ;
 	public final OBB obb ;
@@ -19,14 +19,14 @@ public class Box2D extends Hull
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
 		aabb = _aabb ;
-		obb = new OBB( aabb ) ;
+		obb = OBB.create( aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, int[] _collidables, final Vector3 _position, final Vector3 _offset )
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
 		aabb = _aabb ;
-		obb = new OBB( aabb ) ;
+		obb = OBB.create( aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, final float _x, final float _y, final float _offsetX, final float _offsetY )
@@ -38,7 +38,7 @@ public class Box2D extends Hull
 	{
 		super( _x, _y, _offsetX, _offsetY, 0.0f, _collidables ) ;
 		aabb = _aabb ;
-		obb = new OBB( aabb ) ;
+		obb = OBB.create( aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, int[] _collidables )
@@ -48,7 +48,7 @@ public class Box2D extends Hull
 			   0.0f,
 			   _collidables ) ;
 		aabb = _aabb ;
-		obb = new OBB( aabb ) ;
+		obb = OBB.create( aabb ) ;
 	}
 	
 	public Box2D( final OBB _obb, int[] _collidables )
@@ -58,7 +58,7 @@ public class Box2D extends Hull
 			   0.0f,
 			   _collidables ) ;
 		obb = _obb ;
-		aabb = new AABB( obb ) ;
+		aabb = AABB.create( obb ) ;
 	}
 
 	@Override

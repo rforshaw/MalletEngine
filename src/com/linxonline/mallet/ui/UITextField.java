@@ -23,14 +23,14 @@ public class UITextField extends UIElement
 	public UITextField()
 	{
 		super() ;
-		addEvent( new Event<EventController>( "ADD_BACKEND_EVENT", controller ) ) ;
+		addEvent( Event.<EventController>create( "ADD_BACKEND_EVENT", controller ) ) ;
 
 		UIElement.connect( this, elementDestroyed(), new Connect.Slot<UITextField>()
 		{
 			@Override
 			public void slot( final UITextField _this )
 			{
-				addEvent( new Event<EventController>( "REMOVE_BACKEND_EVENT", controller ) ) ;
+				addEvent( Event.<EventController>create( "REMOVE_BACKEND_EVENT", controller ) ) ;
 			}
 		} ) ;
 
@@ -39,7 +39,7 @@ public class UITextField extends UIElement
 			@Override
 			public void slot( final UITextField _this )
 			{
-				controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
+				controller.passEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
 			}
 		} ) ;
 
@@ -48,7 +48,7 @@ public class UITextField extends UIElement
 			@Override
 			public void slot( final UITextField _this )
 			{
-				controller.passEvent( new Event<Boolean>( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+				controller.passEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
 			}
 		} ) ;
 

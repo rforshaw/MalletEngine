@@ -52,8 +52,8 @@ public abstract class InputComponent extends Component
 		Event<IInputHandler> event ;
 		switch( mode )
 		{
-			case UI    : event = new Event<IInputHandler>( "ADD_GAME_STATE_UI_INPUT", this ) ; break ;
-			case WORLD : event = new Event<IInputHandler>( "ADD_GAME_STATE_WORLD_INPUT", this ) ; break ;
+			case UI    : event = Event.<IInputHandler>create( "ADD_GAME_STATE_UI_INPUT", this ) ; break ;
+			case WORLD : event = Event.<IInputHandler>create( "ADD_GAME_STATE_WORLD_INPUT", this ) ; break ;
 			default    : return ;
 		}
 		_events.add( event ) ;
@@ -65,8 +65,8 @@ public abstract class InputComponent extends Component
 		super.passFinalEvents( _events ) ;
 		switch( mode )
 		{
-			case UI    : _events.add( new Event<IInputHandler>( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
-			case WORLD : _events.add( new Event<IInputHandler>( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
+			case UI    : _events.add( Event.<IInputHandler>create( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
+			case WORLD : _events.add( Event.<IInputHandler>create( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
 			default    : return ;
 		}
 	}

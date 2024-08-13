@@ -132,7 +132,7 @@ public class TextUpdaterPool
 
 			synchronized( pool )
 			{
-				pool.add( new WeakReference( updater ) ) ;
+				pool.add( new WeakReference<TextUpdater>( updater ) ) ;
 			}
 		}
 

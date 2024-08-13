@@ -10,12 +10,12 @@ public final class Event<T>
 	private final EventType eventType ;
 	private final T variable ;							// Event package contains data the receiver is interested in
 
-	public Event( final String _eventType )
+	private Event( final String _eventType )
 	{
 		this( _eventType, null ) ;
 	}
 
-	public Event( final String _eventType, final T _object )
+	private Event( final String _eventType, final T _object )
 	{
 		eventType = EventType.get( _eventType ) ;
 		variable = _object ;
@@ -46,6 +46,30 @@ public final class Event<T>
 		return variable ;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		if( variable == null )
+		{
+			return eventType.hashCode() ;
+		}
+
+		return eventType.hashCode() & variable.hashCode() ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( !( _obj instanceof Event ) )
+		{
+			return false ;
+		}
+
+		final Event<T> b = ( Event<T> )_obj ;
+		return eventType.equals( b.eventType ) && variable.equals( b.variable ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

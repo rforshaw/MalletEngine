@@ -27,6 +27,8 @@ public abstract class BasicSystem<F extends FileSystem,
 								  E extends IEventSystem,
 								  G extends IGameSystem> implements ISystem<F, S, R, A, I, E, G>
 {
+	protected final EventController controller = new EventController() ;
+
 	private final S shutdownDelegate ;
 
 	private final R renderer ;
@@ -87,6 +89,11 @@ public abstract class BasicSystem<F extends FileSystem,
 		renderer.shutdown() ;
 	}
 
+	public final EventController getEventController()
+	{
+		return controller ;
+	}
+
 	@Override
 	public final F getFileSystem()
 	{
@@ -130,31 +137,18 @@ public abstract class BasicSystem<F extends FileSystem,
 	}
 
 	@Override
-	public void sleep( final long _millis )
-	{
-		try
-		{
-			Thread.sleep( _millis ) ;
-			//Thread.yield() ;
-		}
-		catch( InterruptedException ex )
-		{
-			Thread.currentThread().interrupt() ;
-			//ex.printStackTrace() ;
-		}
-	}
-
-	@Override
-	public boolean update( final float _dt )
+	public final boolean update( final float _dt )
 	{
 		renderer.updateState( _dt ) ;
 		inputSystem.update() ;
 		eventSystem.sendEvents() ;		// Pass the Events to the interested Backend Systems
+
+		controller.update() ;		// Process the Events this system is interested in
 		return true ;
 	}
 
 	@Override
-	public void draw( final float _dt )
+	public final void draw( final float _dt )
 	{
 		renderer.draw( _dt ) ;
 	}

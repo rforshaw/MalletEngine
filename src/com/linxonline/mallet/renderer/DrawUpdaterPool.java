@@ -138,7 +138,7 @@ public class DrawUpdaterPool
 
 		synchronized( pool )
 		{
-			pool.add( new WeakReference( updater ) ) ;
+			pool.add( new WeakReference<DrawUpdater>( updater ) ) ;
 		}
 
 		return updater ;

@@ -149,8 +149,8 @@ public class Entity
 	*/
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<IEventController>( "ADD_BACKEND_EVENT", systemController ) ) ;
-		_events.add( new Event<IEventController>( "ADD_GAME_STATE_EVENT", stateController ) ) ;
+		_events.add( Event.<IEventController>create( "ADD_BACKEND_EVENT", systemController ) ) ;
+		_events.add( Event.<IEventController>create( "ADD_GAME_STATE_EVENT", stateController ) ) ;
 
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
@@ -171,8 +171,8 @@ public class Entity
 	*/
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
-		_events.add( new Event<IEventController>( "REMOVE_BACKEND_EVENT", systemController )  ) ;
-		_events.add( new Event<IEventController>( "REMOVE_GAME_STATE_EVENT", stateController )  ) ;
+		_events.add( Event.<IEventController>create( "REMOVE_BACKEND_EVENT", systemController )  ) ;
+		_events.add( Event.<IEventController>create( "REMOVE_GAME_STATE_EVENT", stateController )  ) ;
 
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )

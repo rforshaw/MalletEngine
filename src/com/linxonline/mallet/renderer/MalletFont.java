@@ -181,12 +181,18 @@ public final class MalletFont implements IUniform
 	}
 
 	@Override
+	public String toString()
+	{
+		return "MalletFont: " + name ;
+	}
+
+	@Override
 	public IUniform.Type getType()
 	{
 		return IUniform.Type.FONT ;
 	}
 
-	public static class Metrics
+	public static final class Metrics
 	{
 		private MalletFont parent ;
 

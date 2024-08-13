@@ -1,6 +1,7 @@
 package com.linxonline.mallet.ecs ;
 
 import java.util.List ;
+import java.util.Arrays ;
 
 import com.linxonline.mallet.physics.* ;
 import com.linxonline.mallet.maths.* ;
@@ -91,12 +92,12 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		_hull.addToPosition( _penShift.x, _penShift.y ) ;
 	}
 
-	public static class Component extends ECSEntity.Component
+	public static final class Component extends ECSEntity.Component
 	{
 		private final Hull[] hulls ;
 		private boolean applyContact = true ;
 
-		public Component( final ECSEntity _parent, final Hull[] _hulls )
+		private Component( final ECSEntity _parent, final Hull[] _hulls )
 		{
 			_parent.super() ;
 			hulls = _hulls ;
@@ -116,9 +117,51 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		{
 			return hulls ;
 		}
+
+		@Override
+		public int hashCode()
+		{
+			return Arrays.hashCode( hulls ) ;
+		}
+
+		@Override
+		public boolean equals( final Object _obj )
+		{
+			if( !( _obj instanceof Component ) )
+			{
+				return false ;
+			}
+
+			final Component b = ( Component )_obj ;
+			if( applyContact != b.applyContact )
+			{
+				return false ;
+			}
+
+			if( hulls.length != b.hulls.length )
+			{
+				return false ;
+			}
+
+			for( int i = 0; i < hulls.length; ++i )
+			{
+				if( hulls[i].equals( b.hulls[i] ) == false )
+				{
+					return false ;
+				}
+			}
+
+			return true ;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "Hulls: " + hulls.length ;
+		}
 	}
 
-	private static class ComponentUpdater implements Parallel.IRangeRun<Component>
+	private static final class ComponentUpdater implements Parallel.IRangeRun<Component>
 	{
 		@Override
 		public void run( final int _index, final Component _component )
@@ -133,7 +176,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		}
 	}
 
-	private static class HullUpdater implements Parallel.IArrayRun<Hull>
+	private static final class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
 		private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
 		private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;

@@ -8,15 +8,20 @@ import com.linxonline.mallet.maths.* ;
 	The ray is built to try and reduce the creation of temporary
 	objects, in particular Vectors, and AABB.
 */
-class Ray
+public final class Ray
 {
-	private AABB aabb ;
+	private final AABB aabb = AABB.create() ;
 
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 direction = new Vector3() ;
 	private final Intersection intersection = new Intersection() ;
 
-	public Ray() {}
+	private Ray() {}
+
+	public static Ray create()
+	{
+		return new Ray() ;
+	}
 
 	public void setFromPoints( final float _x1, final float _y1, final float _z1,
 							   final float _x2, final float _y2, final float _z2 )
@@ -61,11 +66,36 @@ class Ray
 
 	public AABB getTempAABB()
 	{
-		if( aabb == null )
+		return aabb ;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31 ;
+
+		int result = 1 ;
+		result = prime * result + point.hashCode() ;
+		result = prime * result + direction.hashCode() ;
+
+		return result ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( !( _obj instanceof Ray ) )
 		{
-			aabb = new AABB() ;
+			return false ;
 		}
 
-		return aabb ;
+		final Ray b = ( Ray )_obj ;
+		return point.equals( b.point ) && direction.equals( b.direction ) ;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "POINT: " + point.toString() + "\nDIRECTION: " + direction.toString() ;
 	}
 }

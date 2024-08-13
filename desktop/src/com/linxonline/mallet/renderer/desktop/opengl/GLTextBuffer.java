@@ -56,7 +56,7 @@ public final class GLTextBuffer extends GLBuffer
 	private final Matrix4 matrix = new Matrix4() ;
 	private final Matrix4 matrixTemp = Matrix4.createIdentity() ;
 
-	private final AABB boundary = new AABB() ;
+	private final AABB boundary = AABB.create() ;
 	private final Vector3 position = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;
 	private final Vector3 rotation = new Vector3() ;

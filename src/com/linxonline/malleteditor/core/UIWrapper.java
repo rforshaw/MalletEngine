@@ -113,7 +113,7 @@ public class UIWrapper extends UIElement
 				}
 
 				final UIWrapper parent = ( UIWrapper )getParent() ;
-				sendEvent( new Event<UIWrapper>( "DISPLAY_META", parent ) ) ;
+				sendEvent( Event.<UIWrapper>create( "DISPLAY_META", parent ) ) ;
 
 				line.setColour( MalletColour.blue() ) ;
 				parent.makeDirty() ;

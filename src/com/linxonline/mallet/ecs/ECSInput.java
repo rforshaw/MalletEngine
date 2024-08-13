@@ -94,11 +94,11 @@ public class ECSInput implements IECS<ECSInput.Component>
 		public InputEvent.Action process( final InputEvent _event ) ;
 	}
 
-	public class Component extends ECSEntity.Component implements IInputHandler
+	public final class Component extends ECSEntity.Component implements IInputHandler
 	{
 		private final IProcess process ;
 		private boolean enable = true ;
-	
+
 		public Component( final ECSEntity _parent, final IProcess _process )
 		{
 			_parent.super() ;

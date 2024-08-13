@@ -15,8 +15,8 @@ public final class CollisionCheck
 	private final Vector2 boxCenter1 = new Vector2() ;
 	private final Vector2 boxCenter2 = new Vector2() ;
 
-	private final AABB aabb1 = new AABB() ;
-	private final AABB aabb2 = new AABB() ;
+	private final AABB aabb1 = AABB.create() ;
+	private final AABB aabb2 = AABB.create() ;
 
 	private final ContactPoint contact = new ContactPoint() ;
 

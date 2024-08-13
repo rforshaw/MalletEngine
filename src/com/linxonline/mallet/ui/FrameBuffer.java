@@ -7,7 +7,7 @@ import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.ui.gui.GUI ;
 
-public class FrameBuffer
+public final class FrameBuffer
 {
 	private final World world ;
 	private final Program program ;

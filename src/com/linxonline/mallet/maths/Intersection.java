@@ -2,7 +2,7 @@ package com.linxonline.mallet.maths ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-public class Intersection
+public final class Intersection
 {
 	private final Vector3 point = new Vector3() ;
 	private float tmin = -1.0f ;
@@ -43,6 +43,7 @@ public class Intersection
 		return tmin ;
 	}
 
+	@Override
 	public String toString()
 	{
 		return "[point: " + point.toString() + " distance: " + tmin + "]" ;

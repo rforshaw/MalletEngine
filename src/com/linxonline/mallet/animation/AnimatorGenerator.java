@@ -32,9 +32,9 @@ public final class AnimatorGenerator
 		final JArray jFrameOorder = jAnimation.optJArray( "frame_order", EMPTY_ARRAY ) ;
 
 		final int[] frameOrder = generateFrameOrder( jFrames, jFrameOorder ) ;
-		final Animation.Frame[] frames = generateFrames( jResources, jFrames, _generator ) ;
+		final var frames = generateFrames( jResources, jFrames, _generator ) ;
 
-		return new Animation( _path, framerate, frameOrder, frames ) ;
+		return new Animation<T>( _path, framerate, frameOrder, frames ) ;
 	}
 
 	private static int[] generateFrameOrder( final JArray _frames, final JArray _order )
@@ -62,11 +62,11 @@ public final class AnimatorGenerator
 		return order ;
 	}
 
-	private static <T extends Animation.Frame> Animation.Frame[] generateFrames( final JArray _resources, final JArray _frames, final FrameGenerator<T> _generator )
+	private static <T extends Animation.Frame> T[] generateFrames( final JArray _resources, final JArray _frames, final FrameGenerator<T> _generator )
 	{
 		final int frameLength = _frames.length() ;
 
-		final Animation.Frame[] frames = new Animation.Frame[frameLength] ;
+		final T[] frames = ( T[] )new Animation.Frame[frameLength] ;
 		final List<JObject> resources = MalletList.<JObject>newList() ; 
 
 		for( int i = 0; i < frameLength; ++i )

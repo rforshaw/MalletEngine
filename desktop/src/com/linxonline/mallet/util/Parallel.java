@@ -76,7 +76,7 @@ public final class Parallel
 
 			synchronized( arrayJobs )
 			{
-				final ArrayJob job = arrayJobs.take() ;
+				final ArrayJob<T> job = arrayJobs.take() ;
 				job.set( latch, start, end, _array, _run ) ;
 				jobs.addFirst( job ) ;
 			}
@@ -134,7 +134,7 @@ public final class Parallel
 
 			synchronized( listJobs )
 			{
-				final ListJob job = listJobs.take() ;
+				final ListJob<T> job = listJobs.take() ;
 				job.set( latch, start, end, _list, _run ) ;
 				jobs.addFirst( job ) ;
 			}
@@ -189,7 +189,7 @@ public final class Parallel
 
 			synchronized( batchListJobs )
 			{
-				final BatchListJob job = batchListJobs.take() ;
+				final BatchListJob<T> job = batchListJobs.take() ;
 				job.set( latch, start, end, _list, _run ) ;
 				jobs.addFirst( job ) ;
 			}
@@ -244,7 +244,7 @@ public final class Parallel
 
 			synchronized( batchArrayJobs )
 			{
-				final BatchArrayJob job = batchArrayJobs.take() ;
+				final BatchArrayJob<T> job = batchArrayJobs.take() ;
 				job.set( latch, start, end, _array, _run ) ;
 				jobs.addFirst( job ) ;
 			}

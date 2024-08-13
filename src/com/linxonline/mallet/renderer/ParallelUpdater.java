@@ -11,7 +11,7 @@ public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListR
 	private int diff ;
 	private int iteration ;
 
-	private AtomicBoolean dirty = new AtomicBoolean( false ) ;
+	private final AtomicBoolean dirty = new AtomicBoolean( false ) ;
 
 	public void set( final Interpolation _mode, final int _diff, final int _iteration )
 	{

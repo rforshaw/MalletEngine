@@ -8,19 +8,21 @@ subprojects {
 	}
 
 	plugins.withType(JavaPlugin).configureEach {
-        java {
-            //modularity.inferModulePath = true
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
-    }
+		java {
+			modularity.inferModulePath = true
+			sourceCompatibility = JavaVersion.VERSION_16
+			targetCompatibility = JavaVersion.VERSION_16
+		}
+	}
 }
 
 project( ':MalletEngine' ) {
 	sourceSets {
 		main {
 			java {
-				srcDir '../../src'
+				srcDirs '../../src'
+				srcDirs '../src'
+
 				exclude '**/web/**'
 				exclude '**/android/**'
 				exclude '**/malleteditor/**'

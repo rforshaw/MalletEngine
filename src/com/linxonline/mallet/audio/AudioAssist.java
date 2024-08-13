@@ -5,7 +5,7 @@ import com.linxonline.mallet.event.Event ;
 
 public final class AudioAssist
 {
-	private static final Event<Object> AUDIO_CLEAN = new Event<Object>( "AUDIO_CLEAN", null ) ;
+	private static final Event<Object> AUDIO_CLEAN = Event.create( "AUDIO_CLEAN" ) ;
 
 	private static Assist assist ;
 	
@@ -31,7 +31,7 @@ public final class AudioAssist
 	*/
 	public static Event<AudioDelegateCallback> constructAudioDelegate( final AudioDelegateCallback _callback )
 	{
-		return new Event<AudioDelegateCallback>( "AUDIO_DELEGATE", _callback ) ;
+		return Event.<AudioDelegateCallback>create( "AUDIO_DELEGATE", _callback ) ;
 	}
 
 	/**
@@ -45,7 +45,7 @@ public final class AudioAssist
 
 	public static Event<Volume> constructVolume( final Category.Channel _channel, final int _volume )
 	{
-		return new Event<Volume>( "CHANGE_VOLUME", new Volume( new Category( _channel ), _volume ) ) ;
+		return Event.<Volume>create( "CHANGE_VOLUME", new Volume( new Category( _channel ), _volume ) ) ;
 	}
 
 	public static void setListenerPosition( final float _x, final float _y, final float _z )

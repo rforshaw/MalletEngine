@@ -31,13 +31,13 @@ public class ScriptComponent extends Component
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
 		super.passInitialEvents( _events ) ;
-		_events.add( new Event<Script>( "ADD_SCRIPT_EVENT", script ) ) ;
+		_events.add( Event.<Script>create( "ADD_SCRIPT_EVENT", script ) ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		_events.add( new Event<Script>( "REMOVE_SCRIPT_EVENT", script )  ) ;
+		_events.add( Event.<Script>create( "REMOVE_SCRIPT_EVENT", script )  ) ;
 	}
 }

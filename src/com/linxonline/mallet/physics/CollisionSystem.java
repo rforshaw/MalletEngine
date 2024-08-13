@@ -141,7 +141,7 @@ public final class CollisionSystem
 	{
 		return new ICollisionDelegate()
 		{
-			private final Ray ray = new Ray() ;		// Not thread-safe.
+			private final Ray ray = Ray.create() ;		// Not thread-safe.
 			private boolean shutdown = false ;
 
 			@Override

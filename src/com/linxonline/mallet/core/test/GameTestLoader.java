@@ -152,7 +152,7 @@ public final class GameTestLoader implements IGameLoader
 
 				createEventMessageTest() ;
 
-				getInternalController().passEvent( new Event<Boolean>( "SHOW_GAME_STATE_FPS", true ) ) ;
+				getInternalController().passEvent( Event.<Boolean>create( "SHOW_GAME_STATE_FPS", true ) ) ;
 				createScript() ;
 			}
 
@@ -193,14 +193,14 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createECSEntities( final int _row, final int _column )
 			{
-				final ECSEntity.ICreate create = ( final ECSEntity _parent, final Object _data ) ->
+				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
 					final Hull[] hulls = new Hull[_row * _column] ;
 					for( int i = 0; i < _row; ++i )
 					{
 						for( int j = 0; j < _column; ++j )
 						{
-							final Hull hull = CollisionAssist.createBox2D( new AABB( 0, 0, 64, 64 ), null ) ;
+							final Hull hull = CollisionAssist.createBox2D( AABB.create( 0, 0, 64, 64 ), null ) ;
 							hull.setPosition( i * 60, j * 60  ) ;
 							hull.setOffset( -32, -32 ) ;
 
@@ -408,7 +408,7 @@ public final class GameTestLoader implements IGameLoader
 				final Draw draw = new Draw( 0, 0, 0, -32, -32, 0 ) ;
 				draw.setShape( plane ) ;
 
-				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
+				final var booklet = new AnimationBooklet<SimpleFrame>( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
 				AnimationAssist.add( booklet ) ;
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() )  ) ;
@@ -633,7 +633,7 @@ public final class GameTestLoader implements IGameLoader
 
 				final Entity entity = new Entity( 1 ) ;
 
-				final AnimationBooklet booklet = new AnimationBooklet( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
+				final var booklet = new AnimationBooklet<SimpleFrame>( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
 				AnimationAssist.add( booklet ) ;
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() ) ) ;
@@ -732,8 +732,9 @@ public final class GameTestLoader implements IGameLoader
 				{
 					final Entity receive = new Entity( 0, Entity.AllowEvents.GAMESTATE )
 					{
+						@SafeVarargs
 						@Override
-						public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+						public final EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
 						{
 							return super.createStateEventController( MalletList.concat( _processors,
 								EventController.create( "TEST_EVENT", ( final String _message ) ->
@@ -749,7 +750,7 @@ public final class GameTestLoader implements IGameLoader
 
 				{
 					final Entity send = new Entity( 0, Entity.AllowEvents.GAMESTATE  ) ;
-					send.passStateEvent( new Event<String>( "TEST_EVENT", "Hello World!" ) ) ;
+					send.passStateEvent( Event.<String>create( "TEST_EVENT", "Hello World!" ) ) ;
 
 					addEntity( send ) ;
 				}
@@ -913,7 +914,7 @@ public final class GameTestLoader implements IGameLoader
 			/*acc += _dt ;
 			if( acc >= 15.0f )
 			{
-				messenger.passEvent( new Event<String>( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
+				messenger.passEvent( Event.<String>create( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
 			}*/
 		}
 

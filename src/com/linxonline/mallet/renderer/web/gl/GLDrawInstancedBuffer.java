@@ -4,10 +4,6 @@ import java.util.List ;
 import java.util.ArrayList ;
 import java.nio.* ;
 
-import org.teavm.jso.webgl.WebGLBuffer ;
-import org.teavm.jso.typedarrays.Int16Array ;
-import org.teavm.jso.typedarrays.Float32Array ;
-
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
@@ -15,27 +11,20 @@ import com.linxonline.mallet.renderer.DrawInstancedBuffer ;
 import com.linxonline.mallet.renderer.GeometryBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.IShape ;
-import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.IUniform ;
 
 import com.linxonline.mallet.maths.Matrix4 ;
-import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.IntVector2 ;
-
-import com.linxonline.mallet.io.serialisation.Serialise ;
 
 public final class GLDrawInstancedBuffer extends GLBuffer
 {
 	private static final int INSTANCE_INDEX = 0 ;
 
 	private String storageName = null ;
-	private int order ;
 	private VertexAttrib[] attributes = null ;
 
-	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
 	private GLProgram glProgram ;
-	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
+	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
+	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
 	private final int maxIndexByteSize ;
@@ -58,13 +47,8 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private int incrementIndex = 0 ;
 	private int incrementVertex = 0 ;
 
-	private final Matrix4 matrix = new Matrix4() ;
-	private final Matrix4 matrixTemp = Matrix4.createTempIdentity() ;
-
-	private final Vector3 position = new Vector3() ;
-	private final Vector3 offset = new Vector3() ;
-	private final Vector3 rotation = new Vector3() ;
-	private final Vector3 scale = new Vector3() ;
+	private boolean isStatic = false ;
+	private boolean denyTransUpdate = false ;
 
 	private boolean instanceLoaded = false ;
 	private boolean stable = false ;
@@ -116,10 +100,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return stable ;
 		}
 
-		if( GLDrawInstancedBuffer.generateProgramUniforms( glProgram, program, uniforms ) == false )
+		uniforms.clear() ;
+		if( glProgram.buildProgramUniforms( program, uniforms ) == false )
 		{
-			// We've failed to update the buffer something in
-			// the program map is wrong or has yet to be loaded.
 			stable = false ;
 			return stable ;
 		}
@@ -130,18 +113,10 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			// we know a DrawBuffers program can't be fully 
 			// replaced, they'd have to create a new GeometryBuffer 
 			// to do that.
-			attributes = constructVertexAttrib( _buffer.getAttribute(), glProgram ) ;
+			attributes = constructVertexAttrib( program, glProgram ) ;
 		}
 
-		if( vertexStride <= 0 )
-		{
-			// GeometryBuffer swivel is not expected to change once it is 
-			// set, so we'll only calculate the swivel once.
-			vertexStride = calculateVertexSize( _buffer.getAttribute() ) ;
-			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
-		}
-
-		switch( _buffer.getStyle() )
+		switch( program.getStyle() )
 		{
 			case LINES      : style = MGL.GL_LINES ;      break ;
 			case LINE_STRIP : style = MGL.GL_LINE_STRIP ; break ;
@@ -178,6 +153,11 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				stable = false ;
 				return stable ;
 			}
+
+			// GeometryBuffer swivel is not expected to change once it is 
+			// set, so we'll only calculate the swivel once.
+			vertexStride = calculateVertexSize( shape.getAttribute() ) ;
+			vertexStrideBytes = vertexStride * VBO_VAR_BYTE_SIZE ;
 
 			indexCount = uploadInstanceToRAM( shape ) ;
 			uploadInstanceToVRAM() ;

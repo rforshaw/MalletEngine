@@ -92,7 +92,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final Box2D hull = CollisionAssist.createBox2D( new AABB( _min, _max ), null ) ;
+		final Box2D hull = CollisionAssist.createBox2D( AABB.create( _min, _max ), null ) ;
 		hull.setPosition( _position.x, _position.y ) ;
 		hull.setOffset( _offset.x, _offset.y ) ;
 
@@ -107,7 +107,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final Box2D hull = CollisionAssist.createBox2D( new AABB( _min, _max ), null ) ;
+		final Box2D hull = CollisionAssist.createBox2D( AABB.create( _min, _max ), null ) ;
 		hull.setPosition( _position.x, _position.y ) ;
 		hull.setOffset( _offset.x, _offset.y ) ;
 
