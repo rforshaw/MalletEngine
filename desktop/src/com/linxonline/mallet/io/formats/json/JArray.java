@@ -2,21 +2,26 @@ package com.linxonline.mallet.io.formats.json ;
 
 public final class JArray
 {
-	public final org.json.JSONArray array ;
+	protected final org.json.JSONArray array ;
 
-	protected JArray()
+	private JArray()
 	{
 		array = new org.json.JSONArray() ;
 	}
 
-	protected JArray( final String _source ) throws org.json.JSONException
+	private JArray( final String _source ) throws org.json.JSONException
 	{
 		array = new org.json.JSONArray( _source ) ;
 	}
 
-	protected JArray( final org.json.JSONArray _array )
+	private JArray( final org.json.JSONArray _array )
 	{
 		array = _array ;
+	}
+
+	protected static JArray wrap( org.json.JSONArray _array )
+	{
+		return new JArray( _array ) ;
 	}
 
 	public static JArray construct()
@@ -150,7 +155,7 @@ public final class JArray
 			return null ;
 		}
 
-		return new JObject( obj ) ;
+		return JObject.wrap( obj ) ;
 	}
 
 	public JObject optJObject( final int _index, final JObject _default )
@@ -161,7 +166,7 @@ public final class JArray
 			return _default ;
 		}
 
-		return new JObject( obj ) ;
+		return JObject.wrap( obj ) ;
 	}
 
 	public JArray getJArray( final int _index )
@@ -172,7 +177,7 @@ public final class JArray
 			return null ;
 		}
 
-		return new JArray( arr ) ;
+		return JArray.wrap( arr ) ;
 	}
 
 	public JArray optJArray( final int _index, final JArray _default )
@@ -183,9 +188,22 @@ public final class JArray
 			return _default ;
 		}
 
-		return new JArray( arr ) ;
+		return JArray.wrap( arr ) ;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		return array.hashCode() ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		return array.equals( _obj ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return array.toString() ;

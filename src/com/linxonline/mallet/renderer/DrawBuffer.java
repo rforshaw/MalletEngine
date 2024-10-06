@@ -14,6 +14,15 @@ public class DrawBuffer extends ABuffer
 		}
 	} ;
 
+	// Ranges and buffers are tightly coupled.
+	// Ranges denotes what draw objects within a GeometryBuffer
+	// and their order are to be drawn out.
+	// A null array represents all draw objects are to be drawn
+	// and in the order the draw objects are within the GeometryBuffer.
+	// We use the DrawBuffer to define this range and order as different
+	// Drawbuffers may wish to use the same GeometryBuffer but render out
+	// a subset, or order in a different way.
+	private final ArrayList<int[]> ranges = new ArrayList<int[]>() ;
 	private final ArrayList<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
 	private final Program program ;
 	private final boolean ui ;
@@ -53,6 +62,7 @@ public class DrawBuffer extends ABuffer
 				throw new RuntimeException( String.format( "Incompatible GeometryBuffer to DrawBuffer with program: %s.", program.getID() ) ) ;
 			}
 
+			ranges.add( null ) ;
 			buffers.add( buffer ) ;
 		}
 	}
@@ -63,8 +73,28 @@ public class DrawBuffer extends ABuffer
 		for( int i = 0; i < size; ++i )
 		{
 			final GeometryBuffer buffer = _buffers[i] ;
-			buffers.remove( buffer ) ;
+
+			final int index = buffers.indexOf( buffer ) ;
+			if( index >= 0 )
+			{
+				ranges.remove( index ) ;
+				buffers.remove( index ) ;
+			}
 		}
+	}
+
+	/**
+		Currently a range requires 3 values.
+		The index of the draw object, the start shape index, and the shape count.
+	*/
+	public void setRange( final int _index, final int[] _range )
+	{
+		ranges.set( _index, _range ) ;
+	}
+
+	public int[] getRange( final int _index )
+	{
+		return ranges.get( _index ) ;
 	}
 
 	public GeometryBuffer getBuffer( final int _index )
@@ -72,6 +102,11 @@ public class DrawBuffer extends ABuffer
 		return buffers.get( _index ) ;
 	}
 
+	public List<int[]> getRanges()
+	{
+		return ranges ;
+	}
+	
 	public List<GeometryBuffer> getBuffers()
 	{
 		return buffers ;

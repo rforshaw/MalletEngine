@@ -18,7 +18,9 @@ import com.linxonline.mallet.maths.Vector3 ;
 public final class GLGeometryBuffer extends GLBuffer
 {
 	private static final IUniform[] EMPTY_UNIFORMS = new IUniform[0] ;
-	private static final int DRAW_DIMENSIONS_PACKET_SIZE = 4 ;
+	private static final int DRAW_DIMENSIONS_PACKET_SIZE = 3 ;
+	private static final int SHAPE_DIMENSIONS_PACKET_SIZE = 3 ;
+	private static final int RANGE_DIMENSIONS_PACKET_SIZE = 3 ;
 
 	private static final int MAX_INT32_SIZE = 2147483647 ;
 	private static final int MAX_INDEX_BUFFER_SIZE = MAX_INT32_SIZE / 4 ;
@@ -28,6 +30,7 @@ public final class GLGeometryBuffer extends GLBuffer
 	private int toDrawSize = 0 ;
 	private Draw[] toDraw ;
 	private int[] drawDimensions ;
+	private int[] shapeDimensions ;
 
 	private IntBuffer indexBuffer ;
 	private FloatBuffer vertexBuffer ;
@@ -62,6 +65,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		toDrawSize = 0 ;
 		toDraw = new Draw[0] ;
 		drawDimensions = new int[0] ;
+		shapeDimensions = new int[0] ;
 
 		// We'll construct our buffers to meet the
 		// requirements of the current draw objects.
@@ -110,24 +114,51 @@ public final class GLGeometryBuffer extends GLBuffer
 		return indexSize ;
 	}
 
+	private int calculateShapeSize( final List<Draw> _draws )
+	{
+		int shapeSize = 0 ;
+	
+		final int size = _draws.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final Draw draw = _draws.get( i ) ;
+			final IShape[] shapes = draw.getShapes() ;
+			if( shapes == null )
+			{
+				continue ;
+			}
+
+			shapeSize += shapes.length ;
+		}
+
+		return shapeSize ;
+	}
+	
 	public boolean update( final GeometryBuffer _buffer )
 	{
 		int bufferIndex = 0 ;
 		int usedIndexByteSize = 0 ;
+		int shapeStart = 0 ;
 
 		indexBuffer.position( 0 ) ;
 		vertexBuffer.position( 0 ) ;
 
 		final List<Draw> draws = _buffer.getDraws() ;
-		final int size = draws.size() ;
-		if( toDraw.length < size )
+		final int totalDrawSize = draws.size() ;
+		if( toDraw.length < totalDrawSize )
 		{
-			toDraw = new Draw[size] ;
-			drawDimensions = new int[size * DRAW_DIMENSIONS_PACKET_SIZE] ;
+			toDraw = new Draw[totalDrawSize] ;
+			drawDimensions = new int[totalDrawSize * DRAW_DIMENSIONS_PACKET_SIZE] ;
+		}
+
+		final int totalShapeSize = calculateShapeSize( draws ) * SHAPE_DIMENSIONS_PACKET_SIZE ;
+		if( totalShapeSize != shapeDimensions.length )
+		{
+			shapeDimensions = new int[totalShapeSize] ;
 		}
 
 		toDrawSize = 0 ;
-		for( int i = 0; i < size; ++i )
+		for( int i = 0; i < totalDrawSize; ++i )
 		{
 			final Draw draw = draws.get( i ) ;
 			toDraw[i] = draw ;
@@ -138,14 +169,22 @@ public final class GLGeometryBuffer extends GLBuffer
 				continue ;
 			}
 
-			final int shapeSize = shapes.length ;
-			for( int j = 0; j < shapeSize; ++j )
+			final int drawIndex = i ;
+			final int drawOffset = toDrawSize++ * DRAW_DIMENSIONS_PACKET_SIZE ;
+			int shapeCount = 0 ;
+
+			drawDimensions[drawOffset] = drawIndex ;
+			drawDimensions[drawOffset + 1] = shapeStart * SHAPE_DIMENSIONS_PACKET_SIZE ;
+
+			for( int j = 0; j < shapes.length; ++j )
 			{
 				final IShape shape = shapes[j] ;
 				if( shape == null )
 				{
 					continue ;
 				}
+
+				shapeCount += 1 ;
 
 				final int[] rawIndices = shape.getRawIndices() ;
 				final float[] rawVerts = shape.getRawVertices() ;
@@ -172,8 +211,7 @@ public final class GLGeometryBuffer extends GLBuffer
 					usedIndexByteSize = shapeIndexByteSize ;
 				}
 
-				final int drawIndex = i ;
-				final int offset = toDrawSize++ * DRAW_DIMENSIONS_PACKET_SIZE ;
+				final int shapeOffset = shapeStart++ * SHAPE_DIMENSIONS_PACKET_SIZE ;
 
 				final int indexStart = indexBuffer.position() ;
 				final int indexOffset = vertexBuffer.position() / vertexStride ;
@@ -183,13 +221,14 @@ public final class GLGeometryBuffer extends GLBuffer
 					indexBuffer.put( indexOffset + rawIndices[k] ) ;
 				}
 
-				drawDimensions[offset] = bufferIndex ;
-				drawDimensions[offset + 1] = drawIndex ;
-				drawDimensions[offset + 2] = indexStart ;
-				drawDimensions[offset + 3] = count ;
+				shapeDimensions[shapeOffset] = bufferIndex ;
+				shapeDimensions[shapeOffset + 1] = indexStart ;
+				shapeDimensions[shapeOffset + 2] = count ;
 
 				vertexBuffer.put( rawVerts ) ;
 			}
+
+			drawDimensions[drawOffset + 2] = shapeCount ;
 		}
 
 		upload( bufferIndex ) ;
@@ -200,7 +239,7 @@ public final class GLGeometryBuffer extends GLBuffer
 		return stable ;
 	}
 
-	public void draw( final int _style, final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
+	public void draw( final int[] _range, final int _style, final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
 	{
 		if( stable == false )
 		{
@@ -212,26 +251,23 @@ public final class GLGeometryBuffer extends GLBuffer
 		GLGeometryBuffer.enableVertexAttributes( _attributes ) ;
 
 		int activeIndex = -1 ;
-		for( int i = 0; i < toDrawSize; ++i )
+
+		final int size = ( _range == null ) ? toDrawSize : _range.length ;
+		for( int i = 0; i < size; ++i )
 		{
-			final int drawOffset = i * DRAW_DIMENSIONS_PACKET_SIZE ;
-			final int bufferIndex = drawDimensions[drawOffset] ;
-			final int drawIndex = drawDimensions[drawOffset + 1] ;
-			final int start = drawDimensions[drawOffset + 2] ;
-			final int count = drawDimensions[drawOffset + 3] ;
+			final int rangeIndex = i * RANGE_DIMENSIONS_PACKET_SIZE ;
+			final int index = ( _range == null ) ? i : _range[rangeIndex] ;
+
+			final int drawOffset = index * DRAW_DIMENSIONS_PACKET_SIZE ;
+
+			final int drawIndex = drawDimensions[drawOffset] ;
+			final int shapeStart = ( _range == null ) ? drawDimensions[drawOffset + 1] : _range[rangeIndex + 1] ;
+			final int shapeCount = ( _range == null ) ? drawDimensions[drawOffset + 2] : _range[rangeIndex + 2] ;
 
 			final Draw draw = toDraw[drawIndex] ;
 			if( draw.isHidden() || _occluder.occlude( _camera, draw ) )
 			{
 				continue ;
-			}
-
-			if( activeIndex != bufferIndex )
-			{
-				activeIndex = bufferIndex ;
-				MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[activeIndex] ) ;
-				MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[activeIndex] ) ;
-				GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
 			}
 
 			if( _state.hasDrawUniforms() )
@@ -250,10 +286,26 @@ public final class GLGeometryBuffer extends GLBuffer
 
 			position.add( offset ) ;
 			modelMatrix.applyTransformations( position, rotation, scale ) ;
-
 			MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, false, modelMatrix.matrix, 0 ) ;
 
-			MGL.glDrawElements( _style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
+			for( int j = 0; j < shapeCount; ++j )
+			{
+				final int shapeOffset = shapeStart + ( j * SHAPE_DIMENSIONS_PACKET_SIZE ) ;
+
+				final int bufferIndex = shapeDimensions[shapeOffset] ;
+				final int start = shapeDimensions[shapeOffset + 1] ;
+				final int count = shapeDimensions[shapeOffset + 2] ;
+
+				if( activeIndex != bufferIndex )
+				{
+					activeIndex = bufferIndex ;
+					MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[activeIndex] ) ;
+					MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[activeIndex] ) ;
+					GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
+				}
+
+				MGL.glDrawElements( _style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
+			}
 		}
 		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;
 	}

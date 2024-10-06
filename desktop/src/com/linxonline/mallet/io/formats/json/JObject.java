@@ -8,21 +8,26 @@ import com.linxonline.mallet.io.filesystem.StringInCallback ;
 
 public final class JObject
 {
-	public final org.json.JSONObject object ;
+	protected final org.json.JSONObject object ;
 
-	protected JObject()
+	private JObject()
 	{
 		object = new org.json.JSONObject() ;
 	}
 
-	protected JObject( final String _source ) throws org.json.JSONException
+	private JObject( final String _source ) throws org.json.JSONException
 	{
 		object = new org.json.JSONObject( _source ) ;
 	}
 
-	protected JObject( final org.json.JSONObject _object )
+	private JObject( final org.json.JSONObject _object )
 	{
 		object = _object ;
+	}
+
+	protected static JObject wrap( final org.json.JSONObject _object )
+	{
+		return new JObject( _object ) ;
 	}
 
 	/**
@@ -277,7 +282,7 @@ public final class JObject
 			return null ;
 		}
 
-		return new JObject( obj ) ;
+		return JObject.wrap( obj ) ;
 	}
 
 	public JObject optJObject( final String _key, final JObject _default )
@@ -288,7 +293,7 @@ public final class JObject
 			return ( JObject )_default ;
 		}
 
-		return new JObject( obj ) ;
+		return JObject.wrap( obj ) ;
 	}
 
 	public JArray getJArray( final String _key )
@@ -299,7 +304,7 @@ public final class JObject
 			return null ;
 		}
 
-		return new JArray( array ) ;
+		return JArray.wrap( array ) ;
 	}
 
 	public JArray optJArray( final String _key, final JArray _default )
@@ -310,9 +315,22 @@ public final class JObject
 			return _default ;
 		}
 
-		return new JArray( array ) ;
+		return JArray.wrap( array ) ;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		return object.hashCode() ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		return object.equals( _obj ) ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return object.toString() ;

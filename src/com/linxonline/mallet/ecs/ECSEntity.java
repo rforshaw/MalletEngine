@@ -5,23 +5,54 @@ package com.linxonline.mallet.ecs ;
 	have a mutual association with each other.
 	The entity itself does nothing other than clearing up
 	the components once destroy() has been called on the entity.
+
+	The container can also be used to save the state of all components
+	allowing for the entity to be recreated.
 */
 public final class ECSEntity
 {
+	private final static ISave SAVE_FALLBACK = new ISave()
+	{
+		@Override
+		public void save( final ECSEntity _toSave ) {}
+	} ;
+
 	private final Component[] components ;
 	private final IDestroy destroy ;
+	private final ISave save ;
 
 	private boolean dead = false ;
 
 	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy )
 	{
-		this( _create, _destroy, null ) ;
+		this( _create, _destroy, null, null ) ;
 	}
 
 	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy, final T _data )
 	{
+		this( _create, _destroy, null, _data ) ;
+	}
+
+	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy, final ISave _save, final T _data )
+	{
 		components = _create.create( this, _data ) ;
 		destroy = _destroy ;
+		save = (_save != null) ? _save : SAVE_FALLBACK ;
+	}
+
+	/**
+		Call save to run the save operation associated with this entity.
+	*/
+	public void save()
+	{
+		if( dead == true )
+		{
+			// Don't trigger the save operation if the entity
+			// is flagged for death.
+			return ;
+		}
+
+		save.save( this ) ;
 	}
 
 	public void destroy()
@@ -59,6 +90,28 @@ public final class ECSEntity
 		}
 
 		return null ;
+	}
+
+	/**
+		The implementation is left mostly to the developer.
+
+		I would recommend populating whatever data structure
+		was used to create the object, then you can decide
+		how you wish to write that data-structure out in whatever
+		format is most appropriate for your circumstances.
+
+		You can implement one save implementation for all
+		your entities, or you can implement a save implementation
+		on each type of entity you create.
+
+		Overall I'd suggest using a MemoryPool to grab the data-structure,
+		populate it with the required data, and then stick it in a queue so
+		it can start to be written out, once written the data-structure
+		can be returned to be used for another entity.
+	*/
+	public interface ISave
+	{
+		public void save( final ECSEntity _toSave ) ;
 	}
 
 	/**

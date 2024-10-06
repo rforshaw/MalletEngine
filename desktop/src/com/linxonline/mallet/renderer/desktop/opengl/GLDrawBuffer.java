@@ -17,6 +17,7 @@ public final class GLDrawBuffer extends GLBuffer
 {
 	private VertexAttrib[] attributes = null ;
 
+	private final ArrayList<int[]> ranges = new ArrayList<int[]>() ;
 	private final ArrayList<GLGeometryBuffer> buffers = new ArrayList<GLGeometryBuffer>() ;
 
 	private GLProgram glProgram ;
@@ -81,6 +82,13 @@ public final class GLDrawBuffer extends GLBuffer
 			attributes = constructVertexAttrib( program, glProgram ) ;
 		}
 
+		ranges.clear() ;
+		for( final int[] range : _buffer.getRanges() )
+		{
+			final int[] clone = ( range != null ) ? range.clone() : null ; 
+			ranges.add( clone ) ;
+		}
+
 		buffers.clear() ;
 		for( final GeometryBuffer buffer : _buffer.getBuffers() )
 		{
@@ -133,9 +141,14 @@ public final class GLDrawBuffer extends GLBuffer
 		GLDrawBuffer.bindBuffers( storages ) ;
 
 		final Camera camera = _camera.getCamera() ;
-		for( GLGeometryBuffer buffer : buffers )
+
+		final int size = buffers.size() ;
+		for( int i = 0; i < size; ++i )
 		{
-			buffer.draw( style, attributes, glProgram, uniformState, camera, occluder ) ;
+			final int[] range = ranges.get( i ) ;
+			final GLGeometryBuffer buffer = buffers.get( i ) ;
+
+			buffer.draw( range, style, attributes, glProgram, uniformState, camera, occluder ) ;
 		}
 	}
 

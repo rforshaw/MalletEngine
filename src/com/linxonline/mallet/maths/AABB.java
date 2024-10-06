@@ -15,8 +15,6 @@ public final class AABB
 	// min then max
 	public final float[] range = new float[RANGE_NUM * VECTOR_TYPE] ;
 
-	private AABB() {}
-
 	private AABB( final float _minX, final float _minY,
 				  final float _maxX, final float _maxY )
 	{
@@ -31,22 +29,22 @@ public final class AABB
 
 	public static AABB create()
 	{
-		return new AABB() ;
+		return new AABB( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 	}
 
 	public static AABB create( final Vector2 _length )
 	{
-		return create( 0.0f, 0.0f, _length.x, _length.y ) ;
+		return new AABB( 0.0f, 0.0f, _length.x, _length.y ) ;
 	}
 
 	public static AABB create( final Vector2 _min, final Vector2 _max )
 	{
-		return create( _min.x, _min.y, _max.x, _max.y ) ;
+		return new AABB( _min.x, _min.y, _max.x, _max.y ) ;
 	}
 
 	public static AABB create( final float _maxX, final float _maxY )
 	{
-		return create( 0.0f, 0.0f, _maxX, _maxY ) ;
+		return new AABB( 0.0f, 0.0f, _maxX, _maxY ) ;
 	}
 
 	public static AABB create( final float _minX, final float _minY,
@@ -59,12 +57,6 @@ public final class AABB
 	{
 		return new AABB( _obb ) ;
 	}
-
-	/*public static AABB create( final Vector2 _area, final Vector2 _position )
-	{
-		return new AABB( _position.x, _position.y,
-						 _position.x + _area.x, _position.y + _area.y ) ;
-	}*/
 
 	/**
 		Calculate the dimensions of the AABB from the OBB.
