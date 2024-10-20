@@ -50,11 +50,8 @@ public final class Shape implements IShape
 				_shape.getIndicesSize(),
 				_shape.getVerticesSize() ) ;
 
-		final int[] srcIndices = _shape.getRawIndices() ;
-		final float[] srcVertices = _shape.getRawVertices() ;
-
-		System.arraycopy( srcIndices, 0, indicies, 0, srcIndices.length ) ;
-		System.arraycopy( srcVertices, 0, verticies, 0, srcVertices.length ) ;
+		System.arraycopy( _shape.indicies, 0, indicies, 0, _shape.indicies.length ) ;
+		System.arraycopy( _shape.verticies, 0, verticies, 0, _shape.verticies.length ) ;
 	}
 
 	/**
@@ -369,12 +366,27 @@ public final class Shape implements IShape
 	}
 
 	@Override
+	public IShape.IIndexWrite writeIndices( final int _indexOffset, final IShape.IIndexWrite _write )
+	{
+		for( int i = 0; i < indicies.length; ++i )
+		{
+			_write.put( _indexOffset + indicies[i] ) ;
+		}
+		return _write ;
+	}
+
+	@Override
+	public IShape.IVertWrite writeVertices( final IShape.IVertWrite _write )
+	{
+		_write.put( verticies ) ;
+		return _write ;
+	}
+
 	public int[] getRawIndices()
 	{
 		return indicies ;
 	}
-
-	@Override
+	
 	public float[] getRawVertices()
 	{
 		return verticies ;

@@ -194,8 +194,10 @@ public final class JSScriptEngine implements IScriptEngine
 
 		updateArguments[0] = Float.valueOf( _dt ) ;
 
-		for( final Meta meta : updates )
+		final int size = updates.size() ;
+		for( int i = 0; i < size; ++i )
 		{
+			final Meta meta = updates.get( i ) ;
 			final Scriptable jsObject = meta.getJSObject() ;
 			callMethod( scope, jsObject, meta, "update", updateArguments ) ;
 		}

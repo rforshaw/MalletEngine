@@ -35,6 +35,9 @@ public final class GLGeometryBuffer extends GLBuffer
 	private IntBuffer indexBuffer ;
 	private FloatBuffer vertexBuffer ;
 
+	private final GLIndexWrite indexWrite ;
+	private final GLVertWrite vertWrite ;
+
 	private int[] indexID = new int[1] ;
 	private int[] vboID = new int[1] ;
 
@@ -76,6 +79,9 @@ public final class GLGeometryBuffer extends GLBuffer
 		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( indexByteSize ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
+
+		indexWrite = new GLIndexWrite( indexBuffer ) ;
+		vertWrite = new GLVertWrite( vertexBuffer ) ;
 
 		MGL.glGenBuffers( 1, indexID, 0 ) ;
 		MGL.glGenBuffers( 1, vboID, 0 ) ;
@@ -186,9 +192,6 @@ public final class GLGeometryBuffer extends GLBuffer
 
 				shapeCount += 1 ;
 
-				final int[] rawIndices = shape.getRawIndices() ;
-				final float[] rawVerts = shape.getRawVertices() ;
-
 				final int count = shape.getIndicesSize() ;
 				final int shapeIndexByteSize = count * IBO_VAR_BYTE_SIZE ;
 
@@ -216,16 +219,13 @@ public final class GLGeometryBuffer extends GLBuffer
 				final int indexStart = indexBuffer.position() ;
 				final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-				for( int k = 0; k < count; ++k )
-				{
-					indexBuffer.put( indexOffset + rawIndices[k] ) ;
-				}
+				shape.writeIndices( indexOffset, indexWrite ) ;
 
 				shapeDimensions[shapeOffset] = bufferIndex ;
 				shapeDimensions[shapeOffset + 1] = indexStart ;
 				shapeDimensions[shapeOffset + 2] = count ;
 
-				vertexBuffer.put( rawVerts ) ;
+				shape.writeVertices( vertWrite ) ;
 			}
 
 			drawDimensions[drawOffset + 2] = shapeCount ;
@@ -344,6 +344,8 @@ public final class GLGeometryBuffer extends GLBuffer
 			indexBuffer = indexByteBuffer.asIntBuffer() ;
 			indexBuffer.put( old ) ;
 			indexBuffer.position( position ) ;
+
+			indexWrite.set( indexBuffer ) ;
 		}
 
 		{
@@ -366,6 +368,8 @@ public final class GLGeometryBuffer extends GLBuffer
 			vertexBuffer = vertexByteBuffer.asFloatBuffer() ;
 			vertexBuffer.put( old ) ;
 			vertexBuffer.position( position ) ;
+
+			vertWrite.set( vertexBuffer ) ;
 		}
 	}
 

@@ -83,15 +83,21 @@ public final class GLDrawBuffer extends GLBuffer
 		}
 
 		ranges.clear() ;
-		for( final int[] range : _buffer.getRanges() )
+		final List<int[]> rRanges = _buffer.getRanges() ;
+		final int rangeSize = rRanges.size() ;
+		for( int i = 0; i < rangeSize; ++i )
 		{
+			final int[] range = rRanges.get( i ) ;
 			final int[] clone = ( range != null ) ? range.clone() : null ; 
 			ranges.add( clone ) ;
 		}
 
 		buffers.clear() ;
-		for( final GeometryBuffer buffer : _buffer.getBuffers() )
+		final List<GeometryBuffer> gBuffers = _buffer.getBuffers() ;
+		final int geomSize = gBuffers.size() ;
+		for( int i = 0; i < geomSize; ++i )
 		{
+			final GeometryBuffer buffer = gBuffers.get( i ) ;
 			final GLGeometryBuffer buff = ( GLGeometryBuffer )_buffers.getRHS( buffer.index() ) ;
 			if( buff != null )
 			{

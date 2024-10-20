@@ -36,6 +36,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	private IntBuffer indexBuffer ;
 	private FloatBuffer vertexBuffer ;
 
+	private final GLIndexWrite indexWrite ;
+	private final GLVertWrite vertWrite ;
+
 	private int[] indexID = new int[1] ;
 	private int[] vboID = new int[1] ;
 
@@ -86,6 +89,9 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		final ByteBuffer indexByteBuffer = ByteBuffer.allocateDirect( vertexByteSize ) ;
 		indexByteBuffer.order( ByteOrder.nativeOrder() ) ;
 		indexBuffer = indexByteBuffer.asIntBuffer() ;
+
+		indexWrite = new GLIndexWrite( indexBuffer ) ;
+		vertWrite = new GLVertWrite( vertexBuffer ) ;
 
 		MGL.glGenBuffers( 1, indexID, 0 ) ;
 		MGL.glGenBuffers( 1, vboID, 0 ) ;
@@ -289,16 +295,10 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 	{
 		final int indexOffset = vertexBuffer.position() / vertexStride ;
 
-		final int[] inds = _shape.getRawIndices() ;
-		final int size = inds.length ;
-		for( int i = 0; i < size; i++ )
-		{
-			indexBuffer.put( indexOffset + inds[i] ) ;
-		}
+		_shape.writeIndices( indexOffset, indexWrite ) ;
+		_shape.writeVertices( vertWrite ) ;
 
-		vertexBuffer.put( _shape.getRawVertices() ) ;
-
-		return size ;
+		return _shape.getIndicesSize() ;
 	}
 
 	private static class Transformations implements Storage.IData

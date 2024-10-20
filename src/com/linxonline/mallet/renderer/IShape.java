@@ -160,6 +160,20 @@ public interface IShape
 		}
 	}
 
+	public interface IIndexWrite
+	{
+		public void put( final int _val ) ;
+		public void put( final int[] _val ) ;
+		public void put( final int[] _val, final int _offset, final int _length ) ;
+	}
+
+	public interface IVertWrite
+	{
+		public void put( final float _val ) ;
+		public void put( final float[] _val ) ;
+		public void put( final float[] _val, final int _offset, final int _length ) ;
+	}
+
 	public Style getStyle() ;
 	public Attribute[] getAttribute() ;
 
@@ -176,10 +190,10 @@ public interface IShape
 	/**
 		Return the raw indices stored by this shape.
 	*/
-	public int[] getRawIndices() ;
+	public IIndexWrite writeIndices( final int _indexOffset, final IIndexWrite _write ) ;
 	
 	/**
 		Return the raw vertices stored by this shape.
 	*/
-	public float[] getRawVertices() ;
+	public IVertWrite writeVertices( final IVertWrite _write ) ;
 }

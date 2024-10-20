@@ -25,12 +25,6 @@ public class HEShape implements IShape
 	private final List<Edge> edges = MalletList.<Edge>newList() ;
 	private final List<Face> faces = MalletList.<Face>newList() ;
 
-	private boolean dirtyIndices = true ;
-	private boolean dirtyGeometry = true ;
-
-	private int[] indices = null ;
-	private float[] geometry = null ;
-
 	public HEShape( final Attribute[] _attributes )
 	{
 		this( _attributes, 0 ) ;
@@ -61,15 +55,6 @@ public class HEShape implements IShape
 
 		vertexFloatSize = _shape.vertexFloatSize ;
 		positionIndex = _shape.positionIndex ;
-
-		dirtyIndices = _shape.dirtyIndices ;
-		dirtyGeometry = _shape.dirtyGeometry ;
-
-		indices = new int[_shape.indices.length] ;
-		geometry = new float[_shape.geometry.length] ;
-
-		System.arraycopy( _shape.indices, 0, indices, 0, _shape.indices.length ) ;
-		System.arraycopy( _shape.geometry, 0, geometry, 0, _shape.geometry.length ) ;
 
 		// Make a copy of all the vertices.
 		for( final Vertex vertex : _shape.vertices )
@@ -244,7 +229,6 @@ public class HEShape implements IShape
 		}
 		_edges[size].next = _edges[0] ;
 
-		makeDirty() ;
 		return _face ;
 	}
 
@@ -356,39 +340,19 @@ public class HEShape implements IShape
 	}
 
 	@Override
-	public int[] getRawIndices()
+	public IShape.IIndexWrite writeIndices( final int _indexOffset, final IShape.IIndexWrite _write )
 	{
-		/*if( dirtyIndices == false )
-		{
-			return indices ;
-		}*/
-
-		int[] temp = new int[faces.size() * 4] ;
-		int offset = 0 ;
-
 		for( final Face face : faces )
 		{
 			switch( face.getEdgeCount() )
 			{
 				default :
 				{
-					final int[] faceI = face.triangulate() ;
-					if( offset + faceI.length >= temp.length )
-					{
-						temp = IntegerBuffer.expand( temp, temp.length + faceI.length ) ;
-					}
-
-					System.arraycopy( faceI, 0, temp, offset, faceI.length ) ;
-					offset += faceI.length ;
+					face.triangulate( _indexOffset, _write ) ;
 					break ;
 				}
 				case 3  :
 				{
-					if( offset + 3 >= temp.length )
-					{
-						temp = IntegerBuffer.expand( temp, temp.length * 2 ) ;
-					}
-
 					final Edge e0 = face.getStart() ;
 					final Edge e1 = e0.next ;
 					final Edge e2 = e1.next ;
@@ -397,9 +361,9 @@ public class HEShape implements IShape
 					final Vertex v1 = e1.getOrigin() ;
 					final Vertex v2 = e2.getOrigin() ;
 
-					temp[offset++] = v0.getIndex() ;
-					temp[offset++] = v1.getIndex() ;
-					temp[offset++] = v2.getIndex() ;
+					_write.put( _indexOffset + v0.getIndex() ) ;
+					_write.put( _indexOffset + v1.getIndex() ) ;
+					_write.put( _indexOffset + v2.getIndex() ) ;
 					break ;
 				}
 				/*case 4  :
@@ -431,52 +395,18 @@ public class HEShape implements IShape
 			}
 		}
 
-		dirtyIndices = false ;
-		indices = new int[offset] ;
-		System.arraycopy( temp, 0, indices, 0, offset ) ;
-		return indices ;
+		return _write ;
 	}
 
 	@Override
-	public float[] getRawVertices()
+	public IShape.IVertWrite writeVertices( final IShape.IVertWrite _write )
 	{
-		// Caching the geometry creates problems
-		// when copying, not sure what the problem is.
-		/*if( dirtyGeometry == false )
-		{
-			return geometry ;
-		}*/
-
-		final int size = vertices.size() ;
-		final int totalSize = size * vertexFloatSize ; 
-		geometry = ( geometry != null && geometry.length == totalSize) ? geometry : new float[totalSize] ;
-
-		int offset = 0 ;
 		for( final Vertex vert : vertices )
 		{
-			final float[] from = vert.data ; 
-			System.arraycopy( from, 0, geometry, offset, from.length ) ;
-			offset += vertexFloatSize ;
+			_write.put( vert.data ) ;
 		}
 
-		dirtyGeometry = false ;
-		return geometry ;
-	}
-
-	private void makeDirty()
-	{
-		dirtyIndices = true ;
-		dirtyGeometry = true ;
-	}
-
-	private void makeIndicesDirty()
-	{
-		dirtyIndices = true ;
-	}
-
-	private void makeGeometryDirty()
-	{
-		dirtyGeometry = true ;
+		return _write ;
 	}
 
 	public final class Vertex
@@ -534,42 +464,36 @@ public class HEShape implements IShape
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.set( data, start, _colour.toFloat() ) ;
-			makeGeometryDirty() ;
 		}
 
 		public void setFloat( final int _attributeIndex, final float _val )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.set( data, start, _val ) ;
-			makeGeometryDirty() ;
 		}
 
 		public void setVector2( final int _attributeIndex, final float _x, final float _y )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.set( data, start, _x, _y ) ;
-			makeGeometryDirty() ;
 		}
 
 		public void translateVector2( final int _attributeIndex, final float _x, final float _y )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.add( data, start, _x, _y ) ;
-			makeGeometryDirty() ;
 		}
 
 		public void setVector3( final int _attributeIndex, final float _x, final float _y, final float _z )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.set( data, start, _x, _y, _z ) ;
-			makeGeometryDirty() ;
 		}
 
 		public void translateVector3( final int _attributeIndex, final float _x, final float _y, final float _z )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.add( data, start, _x, _y, _z ) ;
-			makeGeometryDirty() ;
 		}
 
 		/**
@@ -629,13 +553,11 @@ public class HEShape implements IShape
 
 			index = -1 ;
 			edge = null ;
-			makeDirty() ;
 		}
 
 		private void setIndex( final int _index )
 		{
 			index = _index ;
-			makeDirty() ;
 		}
 
 		public int getIndex()
@@ -738,7 +660,6 @@ public class HEShape implements IShape
 			edge.pair.next = pair ;
 			pair.origin = middle ;
 
-			makeDirty() ;
 			return edge ;
 		}
 
@@ -841,7 +762,6 @@ public class HEShape implements IShape
 				temp.next = null ;
 			}
 			while( edge != start ) ;
-			makeDirty() ;
 		}
 		
 		public Edge getStart()
@@ -988,16 +908,12 @@ public class HEShape implements IShape
 			return _fill ;
 		}
 
-		private int[] triangulate()
+		private IShape.IIndexWrite triangulate( final int _indexOffset, final IShape.IIndexWrite _write )
 		{
 			final List<Vertex> vertices = getOrderedVertices( MalletList.<Vertex>newList() ) ;
 			final Vector3 faceNormal = calculateNormal( new Vector3() ) ;
 
-			final int numTriangles = vertices.size() - 2 ;
-			final int[] indices = new int[numTriangles * 3] ;
 			final Triangle ear = new Triangle() ;
-
-			int index = 0 ;
 
 			do
 			{
@@ -1009,13 +925,13 @@ public class HEShape implements IShape
 
 				vertices.remove( ear.getTip() ) ;
 
-				indices[index++] = ear.getPrevIndex() ;
-				indices[index++] = ear.getCurrentIndex() ;
-				indices[index++] = ear.getNextIndex() ;
+				_write.put( _indexOffset + ear.getPrevIndex() ) ;
+				_write.put( _indexOffset + ear.getCurrentIndex() ) ;
+				_write.put( _indexOffset + ear.getNextIndex() ) ;
 			}
 			while( vertices.size() > 2 ) ;
 
-			return indices ;
+			return _write ;
 		}
 
 		private Triangle populateTriangle( final Vector3 _faceNormal, final List<Vertex> _verts, final Triangle _triangle )
