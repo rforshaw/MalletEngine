@@ -1,25 +1,25 @@
 MalletEngine
 ============
 
-An entity-component based game engine written in Java, supports Linux, Windows, Mac, and Android.
+A flexible game-engine written in Java intended for Desktop (Linux and Windows), Mobile (Android), and Web.
 
-Can be cross-compiled to support iOS and Web based platforms too, however these are not extensively tested.
+**NOTE:** I have not kept the Mobile, or Web sides up to date with the developments on the Desktop side.
 
-Features:
-  Flexible 2D/3D rendering pipeline.
-  Collision Detection system.
-  Entity-component model.
-  UI framework.
-  Audio framework.
-  Animation framework.
-  File management framework.
-  Event messaging system.
+## Features:
+ - Flexible 2D/3D rendering pipeline, using OpenGL 3.2.
+ - Collision Detection system.
+ - Entity/Component model - We provide two implementations of a Component based system.
+ - UI framework.
+ - Audio framework.
+ - Animation framework.
+ - File management framework.
+ - Event messaging system.
 
-COMPILING
+# COMPILING
 
-The majority of development is centred around Linux and Android. We aim to keep 3rd party dependencies to a minimum, currently only requiring JOGL and JSON for desktop. Android provides OpenGL and JSON as part of its platform.
+The majority of development is centred around Linux. We aim to keep 3rd party dependencies to a minimum.
 
-Requires Java 8 and Gradle.
+Desktop dependencies: JOGL, JSON, Rhino.
 
 Each supported platform has their own building scripts located within their own directory situated at the root.
 
@@ -40,7 +40,7 @@ The contents of './resources' is copied into each of the targetted platforms and
 
 *Note: TemplateProject also contains a 'resource' directory store your games data within 'resource/base'*
 
-RUNNING
+# RUNNING
 
 To run the base Mallet-Engine go to './desktop/target'.
 
