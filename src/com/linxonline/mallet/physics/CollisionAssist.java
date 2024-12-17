@@ -24,6 +24,11 @@ public class CollisionAssist
 		return assist.createBox2D( _obb, _collidables ) ;
 	}
 
+	public static void add( final Hull _hull )
+	{
+		assist.add( _hull ) ;
+	}
+
 	public static void remove( final Hull _hull )
 	{
 		assist.remove( _hull ) ;
@@ -48,6 +53,8 @@ public class CollisionAssist
 	{
 		public Box2D createBox2D( final AABB _aabb, final int[] _collidables ) ;
 		public Box2D createBox2D( final OBB _obb, final int[] _collidables ) ;
+
+		public void add( final Hull _hull ) ;
 
 		public void remove( final Hull _hull ) ;
 		public void remove( final Hull[] _hulls ) ;

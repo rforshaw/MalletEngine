@@ -6,41 +6,16 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.util.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
 public final class CollisionSystem
 {
-	private final EventController eventController ;
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final List<Hull> hulls = MalletList.<Hull>newList() ;
-	private final QuadTree treeHulls ;
+	private final QuadTree treeHulls = new QuadTree() ;
 
-	public CollisionSystem( final IAddEvent _addInterface )
-	{
-		eventController = new EventController( MalletList.toArray(
-			EventController.create( "ADD_COLLISION_HULL", ( final Hull _hull ) ->
-			{
-				add( _hull ) ;
-			} ),
-			EventController.create( "REMOVE_COLLISION_HULL", ( final Hull _hull ) ->
-			{
-				remove( _hull ) ;
-			} ),
-			EventController.create( "COLLISION_DELEGATE", ( final ICollisionDelegate.ICallback _callback ) ->
-			{
-				_callback.callback( constructCollisionDelegate() ) ;
-			} )
-		) ) ;
-
-		treeHulls = new QuadTree() ;
-	}
-
-	public EventController getEventController()
-	{
-		return eventController ;
-	}
+	public CollisionSystem() {}
 
 	public void add( final Hull _hull )
 	{
@@ -55,7 +30,6 @@ public final class CollisionSystem
 	public void update( final float _dt )
 	{
 		updateExecutions() ;
-		eventController.update() ;
 
 		treeHulls.clear() ;
 
@@ -100,6 +74,15 @@ public final class CollisionSystem
 				} ) ;
 
 				return hull ;
+			}
+
+			@Override
+			public void add( final Hull _hull )
+			{
+				CollisionSystem.this.invokeLater( () ->
+				{
+					CollisionSystem.this.add( _hull ) ;
+				} ) ;
 			}
 
 			@Override

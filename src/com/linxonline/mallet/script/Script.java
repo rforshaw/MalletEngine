@@ -19,57 +19,58 @@ public final class Script
 
 	private final String name ;
 	private final String scriptPath ;
+	private final Class<?> scriptFunctions ;	// The interface used to call script functions.
 
-	private final List<Entity> entities = MalletList.<Entity>newList() ;
-
+	private final List<Register> objects = MalletList.<Register>newList() ;
 	private IListener listener ;
-	private Class<?> scriptFunctions ;
 
-	public Script( final String _path )
-	{
-		this( _path, _path ) ;
-	}
-
-	public Script( final String _name, final String _path )
+	private Script( final String _name, final String _path, final Class<?> _scriptFuncs )
 	{
 		name = _name ;
 		scriptPath = _path ;
+		scriptFunctions = _scriptFuncs ;
 	}
 
-	public boolean addAll( final List<Entity> _entities )
+	public static Script create( final String _path )
 	{
-		return entities.addAll( _entities ) ;
+		return create( _path, _path, null ) ;
 	}
 
-	public boolean add( final Entity _entity )
+	public static Script create( final String _path, final Class<?> _scriptFuncs )
 	{
-		return entities.add( _entity ) ;
+		return create( _path, _path, _scriptFuncs ) ;
 	}
-
-	public boolean remove( final Entity _entity )
+	
+	public static Script create( final String _name, final String _path, final Class<?> _scriptFuncs )
 	{
-		return entities.remove( _entity ) ;
-	}
-
-	/**
-		The passed in interface is used to allow the Java
-		side to access script defined functions.
-
-		When the script is processed by the Scripting Engine
-		a function object will be returned from IListener.added().
-
-		You should cast the Object back to the original interface
-		that was passed into this function.
-	*/
-	public boolean setScriptFunctions( final Class<?> _class )
-	{
-		if( _class.isInterface() == false )
+		if( _scriptFuncs != null && _scriptFuncs.isInterface() == false )
 		{
-			return false ;
+			return null ;
 		}
 
-		scriptFunctions = _class ;
-		return true ;
+		return new Script( _name, _path, _scriptFuncs ) ;
+	}
+
+	public <T> T register( final String _name, final T _obj )
+	{
+		objects.add( new Register( _name, _obj ) ) ;
+		return _obj ;
+	}
+
+	public boolean unregister( final String _name )
+	{
+		final int size = objects.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final Register register = objects.get( i ) ;
+			if( register.isName( _name ) )
+			{
+				objects.remove( i ) ;
+				return true ;
+			}
+		}
+
+		return false ;
 	}
 
 	/**
@@ -101,9 +102,9 @@ public final class Script
 		return scriptPath ;
 	}
 
-	public List<Entity> getEntities()
+	public List<Register> getRegisteredObjects()
 	{
-		return entities ;
+		return objects ;
 	}
 
 	public interface IListener
@@ -124,5 +125,32 @@ public final class Script
 			from the script-engine and is no longer being processed.
 		*/
 		public void removed() ;
+	}
+
+	public static final class Register
+	{
+		private String name ;
+		private Object object ;
+
+		public Register( final String _name, final Object _object )
+		{
+			name = _name ;
+			object = _object ;
+		}
+
+		public boolean isName( final String _name )
+		{
+			return name.equals( _name ) ;
+		}
+
+		public String getName()
+		{
+			return name ;
+		}
+
+		public Object getObject()
+		{
+			return object ;
+		}
 	}
 }

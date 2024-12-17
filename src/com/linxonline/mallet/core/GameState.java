@@ -65,12 +65,10 @@ public class GameState
 	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
 	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
 
-	protected IScriptEngine engine ;
-
 	protected ISystem system = null ;																// Provides access to Root systems
 	protected final EntitySystem entitySystem = new EntitySystem( eventSystem ) ;
-	protected final CollisionSystem collisionSystem = new CollisionSystem( eventSystem ) ;
 
+	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
 	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 
@@ -136,11 +134,9 @@ public class GameState
 		else
 		{
 			createUpdaters( mainUpdaters, drawUpdaters ) ;
-			engine = new JSScriptEngine( this ) ;
-			engine.init() ;
 			initGame() ;
 		}
-		
+
 		// Event processors need to be called last 
 		// in case developer adds more during initGame or resumeGame.
 		initEventProcessors( internalController, externalController, interceptController ) ;
@@ -303,19 +299,6 @@ public class GameState
 		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
 		shutdown.addShutdownCallback( () ->
 		{
-			Logger.println( "Shutting down script engine.", Logger.Verbosity.MINOR ) ;
-			try
-			{
-				if( engine != null )
-				{
-					engine.close() ;
-				}
-			}
-			catch( Exception ex )
-			{
-				ex.printStackTrace() ;
-			}
-
 			Logger.println( "Clearing audio from game-state.", Logger.Verbosity.MINOR ) ;
 			audioSystem.clear() ;
 		} ) ;
@@ -353,15 +336,6 @@ public class GameState
 	*/
 	protected void hookHandlerSystems()
 	{
-		final EventController audioController = audioSystem.getEventController() ;
-		final EventController collisionController = collisionSystem.getEventController() ;
-
-		eventSystem.addHandler( audioController ) ;
-		eventSystem.addHandler( collisionController ) ;
-		eventSystem.addHandler( system.getRenderer().getEventController() ) ;
-
-		audioController.setAddEventInterface( eventSystem ) ;
-
 		final IInputSystem input = system.getInput() ;
 		input.addInputHandler( inputUISystem ) ;
 		input.addInputHandler( inputWorldSystem ) ;
@@ -374,14 +348,6 @@ public class GameState
 	*/
 	protected void unhookHandlerSystems()
 	{
-		final EventController audioController = audioSystem.getEventController() ;
-
-		eventSystem.removeHandler( audioController ) ;
-		eventSystem.removeHandler( collisionSystem.getEventController() ) ;
-		eventSystem.removeHandler( system.getRenderer().getEventController() ) ;
-
-		audioController.setAddEventInterface( null ) ;
-
 		final IInputSystem input = system.getInput() ;
 		input.removeInputHandler( inputUISystem ) ;
 		input.removeInputHandler( inputWorldSystem ) ;
@@ -395,15 +361,18 @@ public class GameState
 		mainUpdaters.add( ( final double _dt ) ->
 		{
 			final float dt = ( float )_dt ;
-			system.update( dt ) ;			// Update low-level systems
+
+			system.getRenderer().updateState( dt ) ;
+			system.getInput().update() ;
+			system.getEventSystem().sendEvents() ;
+			system.getEventController().update() ;
+
 			inputUISystem.update() ;
 			inputWorldSystem.update() ;
 
 			eventSystem.sendEvents() ;
 			internalController.update() ;
 			externalController.update() ;
-
-			engine.update( dt ) ;
 
 			collisionSystem.update( dt ) ;
 			entitySystem.update( dt ) ;
@@ -413,12 +382,14 @@ public class GameState
 		drawUpdaters.add( ( final double _dt ) ->
 		{
 			system.getInput().update() ;
+
 			inputUISystem.update() ;
 			inputWorldSystem.update() ;
 
 			final float dt = ( float )_dt ;
 			animationSystem.update( dt ) ;
-			system.draw( dt ) ;
+
+			system.getRenderer().draw( dt ) ;
 		} ) ;
 	}
 
@@ -477,30 +448,17 @@ public class GameState
 			_controller.setAddEventInterface( null ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_SCRIPT_EVENT", ( final Script _script ) ->
+		_internal.addProcessor( "SHOW_GAME_STATE_FPS", ( final Boolean _show ) ->
 		{
-			engine.add( _script ) ;
-		} ) ;
-
-		_internal.addProcessor( "REMOVE_SCRIPT_EVENT", ( final Script _script ) ->
-		{
-			engine.remove( _script ) ;
-		} ) ;
-
-		_internal.addProcessor( "SHOW_GAME_STATE_FPS", new EventController.IProcessor<Boolean>()
-		{
-			public void process( final Boolean _show )
+			final boolean show = _show ;
+			if( show == showFPS.toShow() )
 			{
-				final boolean show = _show ;
-				if( show == showFPS.toShow() )
-				{
-					// If they are setting it to the same value it 
-					// currently is don't do anything.
-					return ;
-				}
-
-				showFPS.setShow( show ) ;
+				// If they are setting it to the same value it 
+				// currently is don't do anything.
+				return ;
 			}
+
+			showFPS.setShow( show ) ;
 		} ) ;
 	}
 

@@ -112,12 +112,13 @@ public final class Box2D extends Hull
 	@Override
 	public AABB getAABB( final AABB _fill )
 	{
-		aabb.copyTo( _fill ) ;
-
 		final float x = position[POSITION_X] + position[OFFSET_X] ;
 		final float y = position[POSITION_Y] + position[OFFSET_Y] ;
 
-		_fill.addTo( x, y ) ;
+		_fill.range[0] = aabb.range[0] + x ;
+		_fill.range[1] = aabb.range[1] + y ;
+		_fill.range[2] = aabb.range[2] + x ;
+		_fill.range[3] = aabb.range[3] + y;
 
 		return _fill ;
 	}

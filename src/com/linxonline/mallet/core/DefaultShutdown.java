@@ -32,10 +32,17 @@ public class DefaultShutdown implements ISystem.ShutdownDelegate
 	public void shutdown()
 	{
 		Logger.println( "Total Shutdown procedures: " + callbacks.size(), Logger.Verbosity.MINOR ) ;
-		while( callbacks.isEmpty() == false )
+		try
 		{
-			Logger.println( "Shutdown procedure: " + callbacks.size(), Logger.Verbosity.MINOR ) ;
-			callbacks.pop().shutdown() ;
+			while( callbacks.isEmpty() == false )
+			{
+				Logger.println( "Shutdown procedure: " + callbacks.size(), Logger.Verbosity.MINOR ) ;
+				callbacks.pop().shutdown() ;
+			}
+		}
+		catch( final Exception ex )
+		{
+			ex.printStackTrace() ;
 		}
 	}
 }

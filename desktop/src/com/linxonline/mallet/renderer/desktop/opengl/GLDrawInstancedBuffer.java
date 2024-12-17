@@ -4,6 +4,8 @@ import java.util.List ;
 import java.util.ArrayList ;
 import java.nio.* ;
 
+import com.linxonline.mallet.util.Parallel ;
+
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
@@ -217,6 +219,21 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			return ;
 		}
 
+		if( denyTransUpdate == false )
+		{
+			glTransStorage.update( transStorage ) ;
+			if( glTransStorage.hasValidUpload() == false)
+			{
+				System.out.println( "Does not contain valid state" ) ;
+				return ;
+			}
+
+			// If the buffer is intended to be static
+			// we only want to load the data once and then
+			// never touch it again.
+			denyTransUpdate = ( isStatic ) ? true : false ;
+		}
+
 		MGL.glUseProgram( glProgram.id[0] ) ;
 
 		final Matrix4 view = ( isUI() ) ? IDENTITY : _camera.getView() ;
@@ -238,21 +255,12 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 			}
 		}
 
-		if( denyTransUpdate == false )
-		{
-			glTransStorage.update( transStorage ) ;
-			// If the buffer is intended to be static
-			// we only want to load the data once and then
-			// never touch it again.
-			denyTransUpdate = ( isStatic ) ? true : false ;
-		}
-
 		{
 			final int size = storages.size() ;
 			for( int i = 0; i < size; ++i )
 			{
 				final GLStorage storage = storages.get( i ) ;
-				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
+				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.getID() ) ;
 			}
 		}
 
@@ -301,15 +309,32 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		return _shape.getIndicesSize() ;
 	}
 
+	private static class TransformationUpdater implements Parallel.IListRun<Draw>
+	{
+		private Storage.ISerialise out ;
+
+		public void set( final Storage.ISerialise _out )
+		{
+			out = _out ;
+		}
+
+		@Override
+		public void run( final int _start, final int _end, final List<Draw> _draws )
+		{
+			final Matrix4 mat = new Matrix4() ;
+
+			for( int i = _start; i < _end; ++i )
+			{
+				_draws.get( i ).getTransformation( mat ) ;
+				out.writeFloats( i * 16 * 4, mat.matrix ) ;
+			}
+		}
+	}
+	
 	private static class Transformations implements Storage.IData
 	{
-		private final Vector3 position = new Vector3() ;
-		private final Vector3 offset = new Vector3() ;
-		private final Vector3 rotation = new Vector3() ;
-		private final Vector3 scale = new Vector3() ;
-		private final Matrix4 modelMatrix = new Matrix4() ;
-
 		private final List<GeometryBuffer> buffers = new ArrayList<GeometryBuffer>() ;
+		private final TransformationUpdater updater = new TransformationUpdater() ;
 
 		public int drawCount = 0 ;
 
@@ -343,30 +368,16 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 		@Override
 		public void serialise( Storage.ISerialise _out )
 		{
-			int index = 0 ;
-		
 			final int bufferSize = buffers.size() ;
 			for( int i = 0; i < bufferSize; ++i )
 			{
 				final GeometryBuffer buffer = buffers.get( i ) ;
 
 				//final long startTime = System.currentTimeMillis() ;
-				final List<Draw> draws = buffer.getDraws() ;
-				final int drawSize = draws.size() ;
-				
-				for( int j = 0; j < drawSize; ++j )
-				{
-					final Draw draw = draws.get( j ) ;
 
-					draw.getPosition( position ) ;
-					draw.getOffset( offset ) ;
-					draw.getRotation( rotation ) ;
-					draw.getScale( scale ) ;
-
-					position.add( offset ) ;
-					modelMatrix.applyTransformations( position, rotation, scale ) ;
-					index = _out.writeFloats( index, modelMatrix.matrix ) ;
-				}
+				updater.set( _out ) ;
+				Parallel.forBatch( buffer.getDraws(), 1000, updater ) ;
+				updater.set( null ) ;
 
 				//final long endTime = System.currentTimeMillis() ;
 				//System.out.println( "GL Time Taken: " + ( endTime - startTime ) ) ;

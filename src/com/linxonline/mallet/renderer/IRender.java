@@ -1,8 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.event.EventController ;
-import com.linxonline.mallet.maths.Vector3 ;
-
 public interface IRender
 {
 	/**
@@ -31,8 +28,6 @@ public interface IRender
 		interpolation between frames.
 	*/
 	public void draw( final float _dt ) ;
-
-	public EventController getEventController() ;
 
 	public void sort() ;
 	public void clear() ;

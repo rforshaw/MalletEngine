@@ -89,11 +89,6 @@ public abstract class BasicSystem<F extends FileSystem,
 		renderer.shutdown() ;
 	}
 
-	public final EventController getEventController()
-	{
-		return controller ;
-	}
-
 	@Override
 	public final F getFileSystem()
 	{
@@ -137,19 +132,8 @@ public abstract class BasicSystem<F extends FileSystem,
 	}
 
 	@Override
-	public final boolean update( final float _dt )
+	public final EventController getEventController()
 	{
-		renderer.updateState( _dt ) ;
-		inputSystem.update() ;
-		eventSystem.sendEvents() ;		// Pass the Events to the interested Backend Systems
-
-		controller.update() ;		// Process the Events this system is interested in
-		return true ;
-	}
-
-	@Override
-	public final void draw( final float _dt )
-	{
-		renderer.draw( _dt ) ;
+		return controller ;
 	}
 }

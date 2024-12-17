@@ -3,12 +3,10 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
 public abstract class BasicRenderer implements IRender
 {
-	private final EventController controller = new EventController() ;
 	private final BufferedList<Invoker> executions = new BufferedList<Invoker>() ;
 
 	private final World world = new World( "DEFAULT" ) ;
@@ -21,10 +19,6 @@ public abstract class BasicRenderer implements IRender
 	public BasicRenderer()
 	{
 		world.addCameras( camera ) ;
-		controller.addProcessor( "DRAW_CLEAN", ( final Object _obj ) ->
-		{
-			clean() ;
-		} ) ;
 	}
 
 	@Override
@@ -109,15 +103,8 @@ public abstract class BasicRenderer implements IRender
 	}
 
 	@Override
-	public EventController getEventController()
-	{
-		return controller ;
-	}
-
-	@Override
 	public void updateState( final float _dt )
 	{
-		controller.update() ;
 		updateDT = _dt ;
 		renderIter = 0 ;
 	}

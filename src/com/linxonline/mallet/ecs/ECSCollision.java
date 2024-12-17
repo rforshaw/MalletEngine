@@ -13,6 +13,9 @@ import com.linxonline.mallet.util.Parallel ;
 
 public final class ECSCollision implements IECS<ECSCollision.Component>
 {
+	private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
+	private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
+
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final List<Component> components = MalletList.<Component>newList() ;
@@ -57,7 +60,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	public void update( final double _dt )
 	{
 		updateExecutions() ;
-		Parallel.forEach( components, 1000, componentUpdater ) ;
+		Parallel.forBatch( components, 1000, componentUpdater ) ;
 	}
 
 	private void invokeLater( final Runnable _run )
@@ -161,26 +164,51 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		}
 	}
 
-	private static final class ComponentUpdater implements Parallel.IRangeRun<Component>
+	private static final class ComponentUpdater implements Parallel.IListRun<Component>
 	{
 		@Override
-		public void run( final int _index, final Component _component )
+		public void run( final int _start, final int _end, final List<Component> _components )
 		{
-			if( _component.applyContact == false )
+			final int batchSize = 1000 ;
+
+			final ContactPoint point = contacts.takeSync() ;
+			final Vector2 penShift = vec2s.takeSync() ;
+
+			for( int i = _start; i < _end; ++i )
 			{
-				return ;
+				final Component component = _components.get( i ) ;
+				if( component.applyContact == false )
+				{
+					continue ;
+				}
+
+				// Shift the hulls position by the penetration depth.
+
+				final Hull[] hulls = component.hulls ;
+				final int size = hulls.length ;
+
+				if( size > batchSize )
+				{
+					// If there are enough hulls, update them in parallel.
+					Parallel.forBatch( hulls, batchSize, hullUpdater ) ;
+					continue ;
+				}
+
+				// A component is likely to only have a handful of hulls
+				// so there is no point spinning them onto their own worker.
+				for( int j = 0; j < size; ++j )
+				{
+					ECSCollision.updateCollision( hulls[j], point, penShift ) ;
+				}
 			}
 
-			// Shift the hulls position by the penetration depth.
-			Parallel.forBatch( _component.hulls, 1000, hullUpdater ) ;
+			contacts.reclaimSync( point ) ;
+			vec2s.reclaimSync( penShift ) ;
 		}
 	}
 
 	private static final class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
-		private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
-		private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
-
 		@Override
 		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{

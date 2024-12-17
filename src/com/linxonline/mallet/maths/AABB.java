@@ -122,14 +122,20 @@ public final class AABB
 
 	public AABB copyTo( final AABB _to )
 	{
-		System.arraycopy( range, 0, _to.range, 0, range.length ) ;
+		_to.range[0] = range[0] ;
+		_to.range[1] = range[1] ;
+		_to.range[2] = range[2] ;
+		_to.range[3] = range[3] ;
 		return _to ;
 	}
 
 	public void addTo( final float _x, final float _y )
 	{
 		// Add x and y to min and max with one call.
-		FloatBuffer.add( range, AABB.MIN_X, _x, _y, _x, _y ) ;
+		range[0] += _x ;
+		range[1] += _y ;
+		range[2] += _x ;
+		range[3] += _y ;
 	}
 
 	/**

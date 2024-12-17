@@ -3,6 +3,7 @@ package com.linxonline.mallet.core ;
 import com.linxonline.mallet.audio.IGenerator ;
 import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.event.IEventSystem ;
+import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.renderer.IRender ;
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 
@@ -68,9 +69,7 @@ public interface ISystem<F extends FileSystem,
 
 	public G getGameSystem() ;
 
-	public boolean update( final float _dt ) ;		// Update the System
-
-	public void draw( final float _dt ) ;
+	public EventController getEventController() ;
 
 	/**
 		Implement this interface if DefaultShutdown is 

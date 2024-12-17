@@ -132,6 +132,13 @@ public final class MGL
 
 	public final static int GL_INVALID_INDEX = GL3.GL_INVALID_INDEX ;
 
+	public final static int GL_SYNC_GPU_COMMANDS_COMPLETE = GL3.GL_SYNC_GPU_COMMANDS_COMPLETE ;
+	public final static int GL_SYNC_FLUSH_COMMANDS_BIT = GL3.GL_SYNC_FLUSH_COMMANDS_BIT ;
+	public final static int GL_ALREADY_SIGNALED = GL3.GL_ALREADY_SIGNALED ;
+	public final static int GL_TIMEOUT_EXPIRED = GL3.GL_TIMEOUT_EXPIRED ;
+	public final static int GL_CONDITION_SATISFIED = GL3.GL_CONDITION_SATISFIED ;
+	public final static int GL_WAIT_FAILED = GL3.GL_WAIT_FAILED ;
+
 	public MGL() {}
 
 	public static void setGL( final GL3 _gl )
@@ -589,6 +596,21 @@ public final class MGL
 	public static void glGetProgramResourceiv​( final int _program, final int _programInterface, final int _index, final int _propCount, final int[] _props, final int _propsOffset, final int _bufSize, final int[] _length, final int _lengthOffset, final int[] _params, final int _paramsOffset )
 	{
 		gl.glGetProgramResourceiv​( _program, _programInterface, _index, _propCount, _props, _propsOffset, _bufSize, _length, _lengthOffset, _params, _paramsOffset ) ;
+	}
+
+	public static long glFenceSync( final int _condition, final int _flags )
+	{
+		return gl.glFenceSync( _condition, _flags ) ;
+	}
+
+	public static void glDeleteSync( final long _sync )
+	{
+		gl.glDeleteSync( _sync ) ;
+	}
+
+	public static int glClientWaitSync( final long _sync, final int _flags, final long _timeout )
+	{
+		return gl.glClientWaitSync( _sync, _flags, _timeout ) ;
 	}
 
 	public static int glGetError()

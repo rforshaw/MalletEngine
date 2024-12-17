@@ -28,6 +28,18 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 
 	private final ComponentUpdater updater = new ComponentUpdater() ;
 
+	public ECSUpdate()
+	{
+		this( new ICreate<T, U>()
+		{
+			@Override
+			public T create( final ECSEntity _parent, final U _data )
+			{
+				throw new RuntimeException( "Requires valid ICreate to use this path." ) ;
+			}
+		} ) ;
+	}
+
 	public ECSUpdate( final ICreate<T, U> _create )
 	{
 		create = _create ;
@@ -36,12 +48,22 @@ public final class ECSUpdate<T extends ECSUpdate.Component, U> implements IECS<T
 	@Override
 	public T create( final ECSEntity _parent )
 	{
-		return create( _parent, null ) ;
+		return create( _parent, create, null ) ;
 	}
 
 	public T create( final ECSEntity _parent, final U _data )
 	{
-		final T component = create.create( _parent, _data ) ;
+		return create( _parent, create, _data ) ;
+	}
+
+	public T create( final ECSEntity _parent, final ICreate<T, U> _create )
+	{
+		return create( _parent, _create, null ) ;
+	}
+
+	public T create( final ECSEntity _parent, final ICreate<T, U> _create, final U _data )
+	{
+		final T component = _create.create( _parent, _data ) ;
 		invokeLater( () ->
 		{
 			components.add( component ) ;

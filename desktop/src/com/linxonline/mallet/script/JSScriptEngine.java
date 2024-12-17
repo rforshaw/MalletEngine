@@ -8,6 +8,7 @@ import java.util.HashSet ;
 
 import org.mozilla.javascript.EvaluatorException ;
 import org.mozilla.javascript.ErrorReporter ;
+import org.mozilla.javascript.ContextFactory ;
 import org.mozilla.javascript.Context ;
 import org.mozilla.javascript.Function ;
 import org.mozilla.javascript.Scriptable ;
@@ -35,6 +36,8 @@ import com.linxonline.mallet.script.IScriptEngine ;
 
 public final class JSScriptEngine implements IScriptEngine
 {
+	private final static ContextFactory FACTORY = new ContextFactory() ;
+
 	private final static String FALLBACK_SCRIPT = "function create() { return { start: () => { }, end: () => { } } } ;" ;
 	private final static Object[] FALLBACK_ARGUMENTS = new Object[0] ;
 
@@ -42,18 +45,18 @@ public final class JSScriptEngine implements IScriptEngine
 
 	private final Context context ;
 	private final Scriptable scope ;
+	private final Scriptable state ;
 
 	private HashMap<Script, Meta> lookups = new HashMap<Script, Meta>() ;
 	private final List<Meta> updates = MalletList.<Meta>newList() ;
 
 	private final JSLogger logger = new JSLogger() ;
-	private final JSGameState game ;
 
 	private final Object[] updateArguments = new Object[1] ;
 
-	public JSScriptEngine( final GameState _game )
+	public JSScriptEngine()
 	{
-		context = Context.enter() ;
+		context = FACTORY.enterContext() ;
 		context.setLanguageVersion( Context.VERSION_ES6 ) ;
 		context.setErrorReporter( new ErrorReporter()
 		{
@@ -80,31 +83,10 @@ public final class JSScriptEngine implements IScriptEngine
 		} ) ;
 
 		scope = context.initStandardObjects() ;
+		state = context.newObject( scope ) ;
 
-		final Object wrappedLogger = Context.javaToJS( logger, scope ) ;
-		ScriptableObject.putProperty( scope, "logger", wrappedLogger ) ;
-
-		game = new JSGameState( _game ) ;
-		final Object wrappedGame = Context.javaToJS( game, scope ) ;
-		ScriptableObject.putProperty( scope, "game", wrappedGame ) ;
-	}
-
-	@Override
-	public boolean init()
-	{
-		try
-		{
-			//ScriptableObject.defineClass( scope, JSUpdatePacket.class ) ;
-			//ScriptableObject.defineClass( scope, JSEntity.class ) ;
-
-			// Provide more wrappers for future objects.
-			return true ;
-		}
-		catch( final Exception ex )
-		{
-			ex.printStackTrace() ;
-			return false ;
-		}
+		scope.put( "state", scope, state ) ;
+		scope.put( "logger", scope, Context.javaToJS( logger, scope ) ) ;
 	}
 
 	@Override
@@ -118,17 +100,14 @@ public final class JSScriptEngine implements IScriptEngine
 			final Function func = context.compileFunction( scope, source, name, 1, null ) ;
 			final Scriptable obj = ( Scriptable )func.call( context, scope, func, FALLBACK_ARGUMENTS ) ;
 
-			final List<Entity> entities = _script.getEntities() ;
-			final List<JSEntity> fill = MalletList.<JSEntity>newList( entities.size() ) ;
-
-			for( final Entity entity : entities )
+			final List<Script.Register> toRegister = _script.getRegisteredObjects() ;
+			final List<JSObject> objects = MalletList.<JSObject>newList( toRegister.size() ) ;
+			for( final Script.Register register : toRegister )
 			{
-				// Wrap the entities with a proxy, we don't
-				// want the script to have direct access.
-				fill.add( new JSEntity( entity ) ) ;
+				objects.add( JSObject.create( register ) ) ;
 			}
 
-			final Meta meta = new Meta( _script, obj, Context.javaToJS( fill, scope )  ) ;
+			final Meta meta = new Meta( _script, obj, objects ) ;
 			lookups.put( _script, meta ) ;
 
 			final Class<?> scriptClass = _script.getScriptFunctions() ;
@@ -145,7 +124,7 @@ public final class JSScriptEngine implements IScriptEngine
 						return null ;
 					}
 
-					final Object response = callMethod( scope, obj, meta, methodName, _args ) ;
+					final Object response = callMethod( obj, meta, methodName, _args ) ;
 					return null ;
 				} ) ;
 			}
@@ -157,7 +136,7 @@ public final class JSScriptEngine implements IScriptEngine
 				updates.add( meta ) ;
 			}
 
-			callMethod( scope, obj, meta, "start", FALLBACK_ARGUMENTS ) ;
+			callMethod( obj, meta, "start", FALLBACK_ARGUMENTS ) ;
 
 			final Script.IListener listener = _script.getListener() ;
 			listener.added( proxy ) ;
@@ -175,7 +154,7 @@ public final class JSScriptEngine implements IScriptEngine
 				updates.remove( meta ) ;
 
 				final Scriptable jsObject = meta.getJSObject() ;
-				callMethod( scope, jsObject, meta, "end", FALLBACK_ARGUMENTS ) ;
+				callMethod( jsObject, meta, "end", FALLBACK_ARGUMENTS ) ;
 
 				final Script.IListener listener = _script.getListener() ;
 				listener.removed() ;
@@ -184,7 +163,7 @@ public final class JSScriptEngine implements IScriptEngine
 	}
 
 	@Override
-	public void update( final float _dt )
+	public void update( final double _dt )
 	{
 		updateExecutions() ;
 		if( updates.isEmpty() == true )
@@ -192,23 +171,29 @@ public final class JSScriptEngine implements IScriptEngine
 			return ;
 		}
 
-		updateArguments[0] = Float.valueOf( _dt ) ;
+		updateArguments[0] = Double.valueOf( _dt ) ;
 
 		final int size = updates.size() ;
 		for( int i = 0; i < size; ++i )
 		{
 			final Meta meta = updates.get( i ) ;
 			final Scriptable jsObject = meta.getJSObject() ;
-			callMethod( scope, jsObject, meta, "update", updateArguments ) ;
+			callMethod( jsObject, meta, "update", updateArguments ) ;
 		}
 	}
 
-	private static Object callMethod( final Scriptable _scope, final Scriptable _jsObj, final Meta _meta, final String _name, final Object[] _arguments )
+	private Object callMethod( final Scriptable _jsObj, final Meta _meta, final String _name, final Object[] _arguments )
 	{
-		ScriptableObject.putProperty( _scope, "entities", _meta.getEntities() ) ;
+		scope.put( "script", scope, ( IAccessibleMeta )_meta ) ;
+
+		for( final JSObject obj : _meta.getState() )
+		{
+			state.put( obj.getName(), state, obj.getProxy() ) ;
+		}
+
 		return ScriptableObject.callMethod( _jsObj, _name, _arguments ) ;
 	}
-	
+
 	private void invokeLater( final Runnable _run )
 	{
 		if( _run != null )
@@ -244,7 +229,7 @@ public final class JSScriptEngine implements IScriptEngine
 			Logger.println( "Javascript source: " + path + " doesn't exist.", Logger.Verbosity.MAJOR ) ;
 			return FALLBACK_SCRIPT ;
 		}
-	
+
 		try( final StringInStream stream = file.getStringInStream() )
 		{
 			if( stream == null )
@@ -274,20 +259,39 @@ public final class JSScriptEngine implements IScriptEngine
 	@Override
 	public void close()
 	{
-		context.exit() ;
+		try
+		{
+			context.exit() ;
+		}
+		catch( final Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
 	}
 
-	private static class Meta
+	public interface IAccessibleMeta
+	{
+		public void removeScript() ;
+	}
+
+	private final class Meta implements IAccessibleMeta
 	{
 		private final Script script ;
 		private final Scriptable jsObject ;
-		private final Object entities ;
 
-		public Meta( final Script _script, final Scriptable _jsObject, final Object _entities )
+		private final List<JSObject> state ;
+
+		public Meta( final Script _script, final Scriptable _jsObject, final List<JSObject> _state )
 		{
 			script = _script ;
 			jsObject = _jsObject ;
-			entities = _entities ;
+			state = _state ;
+		}
+
+		@Override
+		public void removeScript()
+		{
+			JSScriptEngine.this.remove( script ) ;
 		}
 
 		public Script getScript()
@@ -300,9 +304,9 @@ public final class JSScriptEngine implements IScriptEngine
 			return jsObject ;
 		}
 
-		public Object getEntities()
+		public List<JSObject> getState()
 		{
-			return entities ;
+			return state ;
 		}
 	}
 }

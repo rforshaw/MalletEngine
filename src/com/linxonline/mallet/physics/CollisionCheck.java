@@ -72,7 +72,7 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;							// Set the axis based on best overlap
+		final Vector2 axis = ( overlap1 < overlap2 ) ? axis1 : axis2 ;			// Set the axis based on best overlap
 		if( Vector2.multiply( axis, toCenter ) > 0.0f )
 		{
 			axis.x *= -1.0f ;

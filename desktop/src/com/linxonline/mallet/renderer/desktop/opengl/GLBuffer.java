@@ -127,7 +127,7 @@ public class GLBuffer
 			final GLStorage storage = _storages.get( i ) ;
 			if( storage != null )
 			{
-				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.id[0] ) ;
+				MGL.glBindBufferBase( MGL.GL_SHADER_STORAGE_BUFFER, i, storage.getID() ) ;
 			}
 		}
 	}

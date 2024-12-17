@@ -224,15 +224,22 @@ public final class Matrix4 extends FloatUniform
 		//	[ 0  |   0  |  1]
 	}
 
-	public void applyTransformations( final Vector3 _position, final Vector3 _rotation, final Vector3 _scale )
+	public void applyTransformations( final Vector3 _pos, final Vector3 _rot, final Vector3 _scale )
 	{
-		final float c1 = ( float )Math.cos( _rotation.x / 2 ) ;
-		final float c2 = ( float )Math.cos( _rotation.y / 2 ) ;
-		final float c3 = ( float )Math.cos( _rotation.z / 2 ) ;
+		applyTransformations( _pos.x, _pos.y, _pos.z, _rot.x, _rot.y, _rot.z, _scale.x, _scale.y, _scale.z ) ;
+	}
 
-		final float s1 = ( float )Math.sin( _rotation.x / 2 ) ;
-		final float s2 = ( float )Math.sin( _rotation.y / 2 ) ;
-		final float s3 = ( float )Math.sin( _rotation.z / 2 ) ;
+	public void applyTransformations( final float _px, final float _py, final float _pz,
+									  final float _rx, final float _ry, final float _rz,
+									  final float _sx, final float _sy, final float _sz )
+	{
+		final float c1 = ( float )Math.cos( _rx * 0.5f ) ;
+		final float c2 = ( float )Math.cos( _ry * 0.5f ) ;
+		final float c3 = ( float )Math.cos( _rz * 0.5f ) ;
+
+		final float s1 = ( float )Math.sin( _rx * 0.5f ) ;
+		final float s2 = ( float )Math.sin( _ry * 0.5f ) ;
+		final float s3 = ( float )Math.sin( _rz * 0.5f ) ;
 
 		final float x = s1 * c2 * c3 + c1 * s2 * s3 ;
 		final float y = c1 * s2 * c3 - s1 * c2 * s3 ;
@@ -255,28 +262,24 @@ public final class Matrix4 extends FloatUniform
 		final float wy = w * y2 ;
 		final float wz = w * z2 ;
 
-		final float sx = _scale.x ;
-		final float sy = _scale.y ;
-		final float sz = _scale.z ;
-
-		matrix[0] = ( 1.0f - ( yy + zz ) ) * sx ;
-		matrix[1] = ( xy + wz ) * sx ;
-		matrix[2] = ( xz - wy ) * sx ;
+		matrix[0] = ( 1.0f - ( yy + zz ) ) * _sx ;
+		matrix[1] = ( xy + wz ) * _sx ;
+		matrix[2] = ( xz - wy ) * _sx ;
 		matrix[3] = 0.0f ;
 
-		matrix[4] = ( xy - wz ) * sy ;
-		matrix[5] = ( 1.0f - ( xx + zz ) ) * sy ;
-		matrix[6] = ( yz + wx ) * sy ;
+		matrix[4] = ( xy - wz ) * _sy ;
+		matrix[5] = ( 1.0f - ( xx + zz ) ) * _sy ;
+		matrix[6] = ( yz + wx ) * _sy ;
 		matrix[7] = 0.0f ;
 
-		matrix[8] = ( xz + wy ) * sz ;
-		matrix[9] = ( yz - wx ) * sz ;
-		matrix[10] = ( 1 - ( xx + yy ) ) * sz ;
+		matrix[8] = ( xz + wy ) * _sz ;
+		matrix[9] = ( yz - wx ) * _sz ;
+		matrix[10] = ( 1 - ( xx + yy ) ) * _sz ;
 		matrix[11] = 0.0f ;
 
-		matrix[12] = _position.x ;
-		matrix[13] = _position.y ;
-		matrix[14] = _position.z ;
+		matrix[12] = _px ;
+		matrix[13] = _py ;
+		matrix[14] = _pz ;
 		matrix[15] = 1.0f ;
 	}
 

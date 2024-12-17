@@ -10,8 +10,6 @@ import com.linxonline.mallet.core.GlobalConfig ;
 
 import com.linxonline.mallet.maths.Vector3 ;
 
-import com.linxonline.mallet.event.* ;
-
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
@@ -38,7 +36,6 @@ public final class AudioSystem
 	private final List<ISource> active = MalletList.<ISource>newList() ;
 	private final List<ISource> paused = MalletList.<ISource>newList() ;			// Used when Game-State has been paused, move playing audio to here.
 
-	private final EventController controller = new EventController() ;
 	private IGenerator generator = null ;										// Used to create the Source from a Sound Buffer
 
 	public AudioSystem()
@@ -49,41 +46,11 @@ public final class AudioSystem
 	public AudioSystem( final IGenerator _generator )
 	{
 		generator = _generator ;
-		controller.addProcessor( "AUDIO_DELEGATE", ( final AudioDelegateCallback _callback ) ->
-		{
-			_callback.callback( constructAudioDelegate() ) ;
-		} ) ;
-
-		controller.addProcessor( "AUDIO_CLEAN", ( final Object _null ) ->
-		{
-			if( generator == null )
-			{
-				return ;
-			}
-
-			final Set<String> activeKeys = new HashSet<String>() ;
-			final Set<Emitter> emitters = sources.keySet() ;
-			for( final Emitter emitter : emitters )
-			{
-				activeKeys.add( emitter.getFilepath() ) ;
-			}
-
-			generator.clean( activeKeys ) ;
-		} ) ;
-
-		controller.addProcessor( "CHANGE_VOLUME", ( final Volume _volume ) ->
-		{
-			updateVolume( _volume ) ;
-		} ) ;
-
-		AudioAssist.setAssist( new Assist() ) ;
-
 		initGlobalConfig() ;
 	}
 
 	public void update( final float _dt )
 	{
-		controller.update() ;
 		if( generator == null )
 		{
 			Logger.println( "No source-generator set for audio system.", Logger.Verbosity.MAJOR ) ;
@@ -238,14 +205,58 @@ public final class AudioSystem
 		sources.clear() ;
 	}
 
-	public AudioSystem.Assist createAudioAssist()
+	public AudioAssist.Assist createAudioAssist()
 	{
-		return new Assist() ;
-	}
+		return new AudioAssist.Assist()
+		{
+			@Override
+			public void getAudioDelegate( final AudioDelegateCallback _callback )
+			{
+				AudioSystem.this.invokeLater( () ->
+				{
+					_callback.callback( constructAudioDelegate() ) ;
+				} ) ;
+			}
 
-	public EventController getEventController()
-	{
-		return controller ;
+			@Override
+			public void changeVolume( final Volume _volume )
+			{
+				AudioSystem.this.invokeLater( () ->
+				{
+					updateVolume( _volume ) ;
+				} ) ;
+			}
+
+			@Override
+			public void setListenerPosition( final float _x, final float _y, final float _z )
+			{
+				AudioSystem.this.invokeLater( () ->
+				{
+					generator.setListenerPosition( _x, _y, _z ) ;
+				} ) ;
+			}
+
+			@Override
+			public void cleanAudio()
+			{
+				if( generator == null )
+				{
+					return ;
+				}
+
+				AudioSystem.this.invokeLater( () ->
+				{
+					final Set<String> activeKeys = new HashSet<String>() ;
+					final Set<Emitter> emitters = sources.keySet() ;
+					for( final Emitter emitter : emitters )
+					{
+						activeKeys.add( emitter.getFilepath() ) ;
+					}
+
+					generator.clean( activeKeys ) ;
+				} ) ;
+			}
+		} ;
 	}
 
 	public String getName()
@@ -495,17 +506,5 @@ public final class AudioSystem
 		setVolumeOnSource( volume, source ) ;
 
 		return source ;
-	}
-
-	private class Assist implements AudioAssist.Assist
-	{
-		@Override
-		public void setListenerPosition( final float _x, final float _y, final float _z )
-		{
-			AudioSystem.this.invokeLater( () ->
-			{
-				generator.setListenerPosition( _x, _y, _z ) ;
-			} ) ;
-		}
 	}
 }

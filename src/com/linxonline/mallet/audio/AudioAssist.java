@@ -29,23 +29,23 @@ public final class AudioAssist
 		An AudioDelegate is not required for constructing an Audio object, 
 		but is required for playing it.
 	*/
-	public static Event<AudioDelegateCallback> constructAudioDelegate( final AudioDelegateCallback _callback )
+	public static void getAudioDelegate( final AudioDelegateCallback _callback )
 	{
-		return Event.<AudioDelegateCallback>create( "AUDIO_DELEGATE", _callback ) ;
+		assist.getAudioDelegate( _callback ) ;
 	}
 
 	/**
 		Request the active audio system to clean-up any 
 		unused resources it may still be referencing.
 	*/
-	public static Event constructAudioClean()
+	public static void cleanAudio()
 	{
-		return AUDIO_CLEAN ;
+		assist.cleanAudio() ;
 	}
 
-	public static Event<Volume> constructVolume( final Category.Channel _channel, final int _volume )
+	public static void changeVolume( final Category.Channel _channel, final int _volume )
 	{
-		return Event.<Volume>create( "CHANGE_VOLUME", new Volume( new Category( _channel ), _volume ) ) ;
+		assist.changeVolume( new Volume( new Category( _channel ), _volume ) ) ;
 	}
 
 	public static void setListenerPosition( final float _x, final float _y, final float _z )
@@ -58,6 +58,12 @@ public final class AudioAssist
 	*/
 	public interface Assist
 	{
+		public void getAudioDelegate( final AudioDelegateCallback _callback ) ;
+
+		public void changeVolume( final Volume _volume ) ;
+
 		public void setListenerPosition( final float _x, final float _y, final float _z ) ;
+
+		public void cleanAudio() ;
 	}
 }

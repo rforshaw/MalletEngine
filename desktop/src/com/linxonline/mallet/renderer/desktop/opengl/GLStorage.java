@@ -8,9 +8,14 @@ import com.jogamp.common.nio.Buffers ;
 
 public final class GLStorage implements Storage.ISerialise
 {
-	public final int[] id = new int[1] ;
+	private final int BACK_BUFFERS_NUM = 2 ;
+
+	private final int[] id = new int[BACK_BUFFERS_NUM] ;
+	private final long[] fences = new long[BACK_BUFFERS_NUM] ;
 
 	private java.nio.FloatBuffer buffer ;
+	private int front = 0 ;
+
 	private boolean stable = false ;
 
 	public GLStorage( final Storage _storage )
@@ -20,15 +25,32 @@ public final class GLStorage implements Storage.ISerialise
 		final int lengthInBytes = data.getLength() ;
 		final int lengthInFloats = lengthInBytes / 4 ;
 
-		MGL.glGenBuffers( 1, id, 0 ) ;
+		MGL.glGenBuffers( id.length, id, 0 ) ;
 
 		buffer = Buffers.newDirectFloatBuffer( lengthInFloats ) ;
+		upload( _storage, front ) ;
 	}
 
 	public boolean update( final Storage _storage )
 	{
-		stable = false ;
+		final int next = ( front + 1 ) % BACK_BUFFERS_NUM ;
 
+		final long sync = fences[next] ;
+		if( sync != 0 )
+		{
+			// We are currently uploading something to the GPU
+			// Return false to inform the caller to try again later.
+			return false ;
+		}
+
+		// The next-buffer is not being used, so we
+		// can now upload new content.
+		upload( _storage, next ) ;
+		return true ;
+	}
+
+	private void upload( final Storage _storage, final int _index )
+	{
 		final Storage.IData data = _storage.getData() ;
 
 		final int lengthInBytes = data.getLength() ;
@@ -42,18 +64,52 @@ public final class GLStorage implements Storage.ISerialise
 		data.serialise( this ) ;
 		buffer.position( 0 ) ;
 
-		MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, id[0] ) ;
+		MGL.glBindBuffer( MGL.GL_SHADER_STORAGE_BUFFER, id[_index] ) ;
 		MGL.glBufferData( MGL.GL_SHADER_STORAGE_BUFFER, lengthInBytes, buffer, MGL.GL_DYNAMIC_COPY ) ;
 
-		// We successfully updated the buffer, nothing more is need 
-		// but to inform the trigger.
-		stable = true ;
-		return stable ;
+		fences[_index] = MGL.glFenceSync( MGL.GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) ;
+	}
+
+	private void makeFront( final int _next )
+	{
+		MGL.glDeleteSync( fences[front] ) ;
+		fences[front] = 0 ;
+		front = _next ;
+	}
+
+	private boolean isCompleted( final long _sync )
+	{
+		return MGL.glClientWaitSync( _sync, 0, 0 ) == MGL.GL_ALREADY_SIGNALED ;
+	}
+
+	public boolean hasValidUpload()
+	{
+		return isCompleted( fences[front] ) ;
+	}
+
+	public int getID()
+	{
+		// Something wants to make use of our buffer, let's
+		// check the next-buffer to see if it has anything.
+		final int next = ( front + 1 ) % BACK_BUFFERS_NUM ;
+		final long sync = fences[next] ;
+		if( sync != 0 && isCompleted( sync ) )
+		{
+			// It's been flagged as having a sync object
+			// We'll flip it to our front buffer now.
+			makeFront( next ) ;
+		}
+
+		return id[front] ;
 	}
 
 	public void shutdown()
 	{
 		MGL.glDeleteBuffers( id.length, id, 0 ) ;
+		for( int i = 0; i < fences.length; ++i )
+		{
+			MGL.glDeleteSync( fences[i] ) ;
+		}
 	}
 
 	@Override

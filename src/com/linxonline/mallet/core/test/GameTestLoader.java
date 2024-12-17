@@ -3,6 +3,7 @@ package com.linxonline.mallet.core.test ;
 import java.util.Iterator ;
 import java.util.List ;
 import java.util.Map ;
+import java.util.ArrayList ;
 
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.event.* ;
@@ -36,6 +37,7 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.Parallel ;
+import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.io.net.UDPServer ;
 import com.linxonline.mallet.io.net.UDPClient ;
@@ -43,8 +45,11 @@ import com.linxonline.mallet.io.net.IOutStream ;
 import com.linxonline.mallet.io.net.InStream ;
 import com.linxonline.mallet.io.net.Address ;
 
+import com.linxonline.mallet.script.IScriptEngine ;
 import com.linxonline.mallet.script.Script ;
 import com.linxonline.mallet.script.JavaInterface ;
+
+import com.linxonline.mallet.script.javascript.JSScriptEngine ;
 
 /**
 	Example on how to implement the Game Loader class.
@@ -71,21 +76,38 @@ public final class GameTestLoader implements IGameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT" )
 		{
+			private IScriptEngine jsEngine ;
 			private ECSEvent ecsEvents ;
-			private ECSCollision ecsCollision ;
+
+			private final ECSInput ecsInput = new ECSInput( inputWorldSystem, inputUISystem ) ;
+			private final ECSCollision ecsCollision = new ECSCollision() ;
+
 			private final ECSUpdate<ExComponent, ExData> ecsExample = new ECSUpdate<ExComponent, ExData>( ( final ECSEntity _parent, final ExData _data ) ->
 			{
 				return new ExComponent( _parent, _data ) ;
 			} ) ;
 
+			private final ECSUpdate<ECSUpdate.Component, Object> ecsGeneral = new ECSUpdate<ECSUpdate.Component, Object>() ;
+
 			@Override
 			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
 			{
-				ecsCollision = new ECSCollision() ;
+				jsEngine = new JSScriptEngine() ;
 				ecsEvents = new ECSEvent( eventSystem, system.getEventSystem() ) ;
+
+				_main.add( ecsInput ) ;
 				_main.add( ecsEvents ) ;
 				_main.add( ecsExample ) ;
+				_main.add( ecsGeneral ) ;
 				_main.add( ecsCollision ) ;
+				_main.add( ( final double _dt ) -> { jsEngine.update( _dt ) ; } ) ;
+
+				final ISystem.ShutdownDelegate shutdown = system.getShutdownDelegate() ;
+				shutdown.addShutdownCallback( () ->
+				{
+					Logger.println( "Shutting down script engine.", Logger.Verbosity.MINOR ) ;
+					jsEngine.close() ;
+				} ) ;
 			}
 
 			@Override
@@ -136,7 +158,7 @@ public final class GameTestLoader implements IGameLoader
 				client.close() ;*/
 
 				createProgramTest() ;
-				createPlaneTest() ;
+				createMathTests() ;
 
 				createUI() ;
 				renderTextureExample() ;
@@ -144,13 +166,10 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				//createEntities( 10, 10 ) ;
 				createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
-
-				createEventMessageTest() ;
 
 				getInternalController().passEvent( Event.<Boolean>create( "SHOW_GAME_STATE_FPS", true ) ) ;
 				createScript() ;
@@ -182,13 +201,35 @@ public final class GameTestLoader implements IGameLoader
 					return true ;
 				} ) ;
 			}
-			
-			private void createPlaneTest()
+
+			private void createMathTests()
 			{
 				final Plane plane = new Plane( new Vector3( 100, 0, 10 ),
 											   new Vector3( 100, 100, 10 ),
 											   new Vector3( 0, 0, 10 ) ) ;
 				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 150, 150, 100 ) ).toString() ) ;
+
+				final Circle circle = new Circle( 0, 0, 5 ) ;
+				if( circle.intersectLine( new Vector2( 5, 5 ), new Vector2( 4, 4 ) ) )
+				{
+					System.out.println( "5, 5, 4, 4, Line intersects." ) ;
+				}
+
+				if( circle.intersectLine( new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) )
+				{
+					// The line goes out infinitely.
+					System.out.println( "0, 0, 1, 1, Line intersects." ) ;
+				}
+
+				if( circle.intersectLine( new Vector2( 10, 10 ), new Vector2( 8, 8 ) ) )
+				{
+					System.out.println( "10, 10, 8, 8, Line intersects." ) ;
+				}
+
+				if( !circle.intersectLine( new Vector2( 6, 6 ), new Vector2( 7, 7 ) ) )
+				{
+					System.out.println( "6, 6, 7, 7, Line does not intersect." ) ;
+				}
 			}
 
 			public void createECSEntities( final int _row, final int _column )
@@ -241,10 +282,25 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createScript()
 			{
-				final Entity entity = new Entity( 1 ) ;
-				new CountComponent( entity, "base/scripts/example-count.js" ) ;
+				final Script script = Script.create( "base/scripts/example-count.js", IExtension.class ) ;
+				final Count count = script.register( "counter", new Count() ) ;
 
-				addEntity( entity ) ;
+				script.setListener( new Script.IListener()
+				{
+					@Override
+					public void added( final Object _functions )
+					{
+						count.setScriptFunctions( ( IExtension )_functions ) ;
+					}
+
+					@Override
+					public void removed()
+					{
+						System.out.println( "Script removed." ) ;
+					}
+				} ) ;
+
+				jsEngine.add( script ) ;
 			}
 
 			public void createUI()
@@ -413,33 +469,19 @@ public final class GameTestLoader implements IGameLoader
 				AnimationAssist.add( booklet ) ;
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() )  ) ;
 				booklet.play( "DEFAULT" ) ;
-
-				final Entity entity = new Entity( 1 ) ;
-				new Component( entity )
+			
+				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
-					private final static float DURATION = 5.0f ;
-					private float elapsed = 0.0f ;
-
-					@Override
-					public void update( final float _dt )
-					{
-						elapsed += _dt ;
-						if( elapsed >= DURATION )
-						{
-							elapsed = 0.0f ;
-						}
-					}
-
-					@Override
-					public void readyToDestroy( final Entity.ReadyCallback _callback )
-					{
-						ProgramAssist.remove( program ) ; 
-						AnimationAssist.remove( booklet ) ;
-						super.readyToDestroy( _callback ) ;
-					}
+					return new ECSEntity.Component[] { } ;
 				} ;
-				
-				addEntity( entity ) ;
+
+				final ECSEntity.IDestroy destroy = ( final ECSEntity.Component[] _components ) ->
+				{
+					ProgramAssist.remove( program ) ; 
+					AnimationAssist.remove( booklet ) ;
+				} ;
+
+				final ECSEntity entity = new ECSEntity( create, destroy ) ;
 			}
 
 			/**
@@ -469,7 +511,7 @@ public final class GameTestLoader implements IGameLoader
 			**/
 			public void playAudioExample()
 			{
-				/*eventSystem.addEvent( AudioAssist.constructAudioDelegate( ( final AudioDelegate _delegate ) ->
+				/*AudioAssist.getAudioDelegate( ( final AudioDelegate _delegate ) ->
 				{
 					final Emitter emitter = new Emitter( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
 					emitter.setCallback( new SourceCallback()
@@ -504,7 +546,7 @@ public final class GameTestLoader implements IGameLoader
 						}
 					} ) ;
 					_delegate.play( _delegate.add( emitter ) ) ;
-				} ) ) ;*/
+				} ) ;*/
 
 				final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
 				//System.out.println( ogg ) ;
@@ -518,98 +560,6 @@ public final class GameTestLoader implements IGameLoader
 				{
 					ex.printStackTrace() ;
 				}
-			}
-
-			public void createEntities( final int _row, final int _column )
-			{
-				final int amount = _row * _column ;
-				final Vector3 dim = new Vector3( 64, 64, 0 ) ;
-				final Shape plane = Shape.constructPlane( dim, new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
-
-				final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
-				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
-
-				final Entity entity = new Entity( 1 + amount ) ;
-
-				final List<Hull> hulls = MalletList.<Hull>newList( amount ) ;
-				final Draw[] draws = new Draw[amount] ;
-
-				int inc = 0 ;
-				for( int i = 0; i < _row; ++i )
-				{
-					for( int j = 0; j < _column; ++j )
-					{
-						final int x = 50 + ( i * 60 ) ;
-						final int y = 50 + ( j * 60 ) ;
-
-						final Vector2 position = new Vector2( x, y ) ;
-						final CollisionComponent coll = CollisionComponent.generateBox2D( entity,
-																						  Entity.AllowEvents.NO,
-																						  new Vector2(),
-																						  new Vector2( 64, 64 ),
-																						  position,
-																						  new Vector2( -32, -32 ) ) ;
-						final Hull hull = coll.hulls[0] ;
-
-						final Draw draw = new Draw() ;
-						draw.setPosition( position.x, position.y, 0.0f ) ;
-						draw.setOffset( -32.0f, -32.0f, 0.0f ) ;
-
-						hulls.add( hull ) ;
-						draws[inc] = draw ;
-						inc += 1 ;
-					}
-				}
-
-				new RenderComponent( entity, Entity.AllowEvents.NO )
-				{
-					private DrawInstancedUpdater updater ;
-					private final Vector2 position = new Vector2() ;
-
-					@Override
-					public void init()
-					{
-						final World world = WorldAssist.getDefault() ;
-
-						final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;
-						updater = pool.getOrCreate( world, program, plane, false, 10 ) ;
-
-						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-						geometry.addDraws( draws ) ;
-					}
-
-					@Override
-					public void shutdown()
-					{
-						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-						geometry.removeDraws( draws ) ;
-					}
-
-					@Override
-					public void update( final float _dt )
-					{
-						super.update( _dt ) ;
-						boolean updateDraw = false ;
-						
-						for( int i = 0; i < draws.length; ++i )
-						{
-							final Hull hull = hulls.get( i ) ;
-							updateDraw = ( hull.contactData.size() > 0 ) ? true : updateDraw ;
-
-							final Draw draw = draws[i] ;
-
-							hull.getPosition( position ) ;
-							draw.setPosition( position.x, position.y, 0.0f ) ;
-						}
-
-						if( updateDraw == true )
-						{
-							updater.makeDirty() ;
-						}
-					}
-				} ;
-
-				addEntity( entity ) ;
 			}
 
 			/**
@@ -631,129 +581,119 @@ public final class GameTestLoader implements IGameLoader
 				final Draw draw = new Draw( 0, 0, 0, -16, -16, 0 ) ;
 				draw.setShape( plane ) ;
 
-				final Entity entity = new Entity( 1 ) ;
-
 				final var booklet = new AnimationBooklet<SimpleFrame>( new SimpleFrame.Listener( world, program, draw, 10 ) ) ;
 
 				AnimationAssist.add( booklet ) ;
 				booklet.addAnimation( "DEFAULT", AnimatorGenerator.load( "base/anim/example.anim", new SimpleFrame.Generator() ) ) ;
 				booklet.play( "DEFAULT" ) ;
 
-				new MouseComponent( entity )
+				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
-					@Override
-					public void applyMousePosition( final Vector3 _mouse )
+					final Vector3 mouse = new Vector3() ;
+
+					return new ECSEntity.Component[]
 					{
-						camera.inputToNDC( mouse, mouse ) ;
+						ecsInput.createWorld( _parent, ( final InputEvent _event ) ->
+						{
+							switch( _event.getInputType() )
+							{
+								case MOUSE_MOVED     : 
+								case TOUCH_MOVE      :
+								{
+									mouse.setXYZ( _event.mouseX, _event.mouseY, -1.0f ) ;
+									camera.inputToNDC( mouse, mouse ) ;
 
-						_mouse.multiply( 200.0f ) ;
-						draw.setPosition( _mouse.x, -_mouse.y, 0.0f ) ;
+									mouse.multiply( 200.0f ) ;
+									draw.setPosition( mouse.x, -mouse.y, 0.0f ) ;
 
-						camera.lookAt( mouse.x, mouse.y, 0.0f ) ;
-						CameraAssist.update( camera ) ;
-					}
+									camera.lookAt( mouse.x, mouse.y, 0.0f ) ;
+									CameraAssist.update( camera ) ;
+									break;
+								}
+								default              : break ;
+							}
 
-					@Override
-					public void readyToDestroy( final Entity.ReadyCallback _callback )
-					{
-						AnimationAssist.remove( booklet ) ;
-						ProgramAssist.remove( program ) ;
-						super.readyToDestroy( _callback ) ;
-					}
+							return InputEvent.Action.PROPAGATE ;
+						} )
+					} ;
 				} ;
-				
-				addEntity( entity ) ;
+
+				final ECSEntity.IDestroy destroy = ( final ECSEntity.Component[] _components ) ->
+				{
+					ecsInput.remove( ( ECSInput.Component )_components[0] ) ;
+
+					AnimationAssist.remove( booklet ) ;
+					ProgramAssist.remove( program ) ;
+				} ;
+
+				final ECSEntity entity = new ECSEntity( create, destroy ) ;
 			}
 
 			public void createSpinningCubeExample()
 			{
-				final Entity entity = new Entity( 1 ) ;
+				final World world = WorldAssist.getDefault() ;
+				final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
+				final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, IShape.Attribute>>toArray(
+					Tuple.<String, IShape.Attribute>build( "POSITION", IShape.Attribute.VEC3 ),
+					Tuple.<String, IShape.Attribute>build( "", IShape.Attribute.FLOAT ),
+					Tuple.<String, IShape.Attribute>build( "TEXCOORD_0", IShape.Attribute.VEC2 )
+				) )[0] ;
+				
+				//System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
+				//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
 
-				new RenderComponent( entity )
+				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
+				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+
+				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+				final DrawUpdater updater = pool.getOrCreate( world, program, shape, false, 10 ) ;
+
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+
+				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
-					private DrawUpdater updater ;
+					final Draw draw = new Draw() ;
+					draw.setPosition( 0.0f, -200.0f, 0.0f ) ;
+					draw.setScale( 100, 100, 100 ) ;
+					draw.setShape( shape ) ;
 
-					private Draw draw ;
-					private final Vector3 rotate = new Vector3() ;
+					geometry.addDraws( draw ) ;
 
-					@Override
-					public void init()
+					return new ECSEntity.Component[]
 					{
-						final World world = WorldAssist.getDefault() ;
-						final GLTF gltf = GLTF.load( "base/models/cube.glb" ) ;
-						final Shape shape = gltf.createMeshByIndex( 0, MalletList.<Tuple<String, IShape.Attribute>>toArray(
-							Tuple.<String, IShape.Attribute>build( "POSITION", IShape.Attribute.VEC3 ),
-							Tuple.<String, IShape.Attribute>build( "", IShape.Attribute.FLOAT ),
-							Tuple.<String, IShape.Attribute>build( "TEXCOORD_0", IShape.Attribute.VEC2 )
-						) )[0] ;
-						//System.out.println( "indices: " + shape.getIndicesSize() + " Vertices: " + shape.getVerticesSize() ) ;
-						//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
+						ecsGeneral.create( _parent, ( final ECSEntity _p, final Object _d ) ->
+						{
+							return new ECSUpdate.Component( _p )
+							{
+								private final Vector3 rotate = new Vector3() ;
 
-						draw = new Draw() ;
-						draw.setPosition( 0.0f, -200.0f, 0.0f ) ;
-						draw.setScale( 100, 100, 100 ) ;
-						draw.setShape( shape ) ;
+								@Override
+								public void update( final float _dt )
+								{
+									rotate.x += 2.5f * _dt ;
+									rotate.y += 2.8f * _dt ;
+									rotate.z += 2.1f * _dt ;
 
-						final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-						program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+									draw.setRotation( rotate.x, rotate.y, rotate.z ) ;
+									updater.makeDirty() ;
+								}
 
-						final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
-						updater = pool.getOrCreate( world, program, draw.getShape(), false, 10 ) ;
-
-						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-						geometry.addDraws( draw ) ;
-					}
-
-					@Override
-					public void shutdown()
-					{
-						final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-						geometry.removeDraws( draw ) ;
-					}
-
-					@Override
-					public void update( final float _dt )
-					{
-						super.update( _dt ) ;
-						rotate.x += 2.5f * _dt ;
-						rotate.y += 2.8f * _dt ;
-						rotate.z += 2.1f * _dt ;
-
-						draw.setRotation( rotate.x, rotate.y, rotate.z ) ;
-						updater.makeDirty() ;
-					}
+								@Override
+								public void shutdown()
+								{
+									geometry.removeDraws( draw ) ;
+								}
+							} ;
+						} )
+					} ;
 				} ;
 
-				addEntity( entity ) ;
-			}
-
-			public void createEventMessageTest()
-			{
+				final ECSEntity.IDestroy destroy = ( final ECSEntity.Component[] _components ) ->
 				{
-					final Entity receive = new Entity( 0, Entity.AllowEvents.GAMESTATE )
-					{
-						@SafeVarargs
-						@Override
-						public final EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
-						{
-							return super.createStateEventController( MalletList.concat( _processors,
-								EventController.create( "TEST_EVENT", ( final String _message ) ->
-								{
-									System.out.println( "Received: " + _message ) ;
-								} ) )
-							) ;
-						}
-					} ;
+					ecsGeneral.remove( ( ECSUpdate.Component )_components[0] ) ;
+				} ;
 
-					addEntity( receive ) ;
-				}
-
-				{
-					final Entity send = new Entity( 0, Entity.AllowEvents.GAMESTATE  ) ;
-					send.passStateEvent( Event.<String>create( "TEST_EVENT", "Hello World!" ) ) ;
-
-					addEntity( send ) ;
-				}
+				final ECSEntity entity = new ECSEntity( create, destroy ) ;
 			}
 		} ) ;
 
@@ -772,50 +712,75 @@ public final class GameTestLoader implements IGameLoader
 	{
 		public void count() ;
 		public int getCount() ;
+		public void reset() ;
+
+		// You can return Java objects but they'll
+		// only be able to access functions defined
+		// with @JavaInterface
+		public IHello create() ;
+		public int[] primitiveArray() ;
+		public IHello[] objectArray() ;
+		public List<IHello> objectList() ;
 	}
 
-	// Required for the scripting-system to pick it up.
 	@JavaInterface
-	public interface IDestroy
+	public interface IHello
 	{
-		public void destroy() ;
-		public boolean isDead() ;
+		public String hello() ;
 	}
 
-	public interface IDestroyed
-	{
-		public void destroyed() ;
-	}
-
-	public interface IExtension extends IDestroyed
+	public interface IExtension
 	{
 		// All functions that call into the script
 		// should return void.
 		public void notAValidFunction() ;
+		public void countReseted() ;
 	}
 
-	public static class CountComponent extends ScriptComponent implements ICount, IDestroy
+	public static class Count implements ICount
 	{
 		private int count = 0 ;
-		private IExtension functions ;	// Script functions that can be called from the Java side.
+		private IExtension jsFunctions ;
 
-		public CountComponent( final Entity _parent, final String _scriptPath )
+		public Count() {}
+
+		public void setScriptFunctions( final IExtension _functions )
 		{
-			super( _scriptPath, _parent ) ;
+			jsFunctions = _functions ;
+		}
 
-			final Script script = getScript() ;
-			script.setScriptFunctions( IExtension.class ) ;
-
-			script.setListener( new Script.IListener()
+		@Override
+		public IHello create()
+		{
+			return () ->
 			{
-				@Override
-				public void added( final Object _functions )
-				{
-					functions = ( IExtension )_functions ;
-				}
+				return " World!" ;
+			} ;
+		}
 
-				public void removed() {}
-			} ) ;
+		@Override
+		public int[] primitiveArray()
+		{
+			return new int[] { 5, 4, 3, 2, 1 } ;
+		}
+
+		@Override
+		public IHello[] objectArray()
+		{
+			return new IHello[]
+			{
+				() -> { return "Hello " ; },
+				() -> { return "World!" ; }
+			} ;
+		}
+
+		@Override
+		public List<IHello> objectList()
+		{
+			List<IHello> list = new ArrayList<IHello>() ;
+			list.add( () -> { return "Hello " ; } ) ;
+			list.add( () -> { return "World!" ; } ) ;
+			return list ;
 		}
 
 		@Override
@@ -831,21 +796,15 @@ public final class GameTestLoader implements IGameLoader
 		}
 
 		@Override
-		public void destroy()
+		public void reset()
 		{
-			getParent().destroy() ;
-			functions.destroyed() ;
-			functions.notAValidFunction() ;
-		}
-
-		@Override
-		public boolean isDead()
-		{
-			return getParent().isDead() ;
+			count = 0 ;
+			jsFunctions.countReseted() ;
+			jsFunctions.notAValidFunction() ;
 		}
 	}
 
-	public static class ExData
+	public static final class ExData
 	{
 		public final ECSEvent.Component messenger ;
 		public final ECSCollision.Component collision ;
@@ -857,7 +816,7 @@ public final class GameTestLoader implements IGameLoader
 		}
 	}
 
-	public static class ExComponent extends ECSUpdate.Component
+	public static final class ExComponent extends ECSUpdate.Component
 	{
 		private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
 

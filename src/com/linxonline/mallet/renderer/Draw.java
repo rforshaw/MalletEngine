@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
+import com.linxonline.mallet.maths.Matrix4 ;
 
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
@@ -309,6 +310,24 @@ public final class Draw implements IUpdate
 	public Vector2 getScale( final Vector2 _fill )
 	{
 		return FloatBuffer.fill( present, _fill, SCALE ) ;
+	}
+
+	public Matrix4 getTransformation( final Matrix4 _mat )
+	{
+		final float px = present[POSITION] + present[OFFSET] ;
+		final float py = present[POSITION + 1] + present[OFFSET + 1] ;
+		final float pz = present[POSITION + 2] + present[OFFSET + 2] ;
+
+		final float rx = present[ROTATION] ;
+		final float ry = present[ROTATION + 1] ;
+		final float rz = present[ROTATION + 2] ;
+
+		final float sx = present[SCALE] ;
+		final float sy = present[SCALE + 1] ;
+		final float sz = present[SCALE + 2] ;
+
+		_mat.applyTransformations( px, py, pz, rx, ry, rz, sx, sy, sz ) ;
+		return _mat ;
 	}
 
 	/**

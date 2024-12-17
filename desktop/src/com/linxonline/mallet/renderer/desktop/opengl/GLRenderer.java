@@ -668,7 +668,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		totalBufferUpdates += buffers ;
 
 		updateExecutions() ;
-		getEventController().update() ;
 
 		final int worldSize = worlds.size() ;
 		for( int i = 0; i < worldSize; ++i )
