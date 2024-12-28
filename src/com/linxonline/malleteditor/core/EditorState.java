@@ -28,8 +28,8 @@ import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Program ;
 
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Font ;
+import com.linxonline.mallet.renderer.Colour ;
 
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.Draw ;
@@ -102,7 +102,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( parent.getLength(), MalletColour.red() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( parent.getLength(), Colour.red() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
@@ -165,7 +165,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, Colour.red() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
@@ -210,8 +210,8 @@ public class EditorState extends GameState
 									   final UILayout _toolbar,
 									   final String _text )
 	{
-		final MalletFont font = new MalletFont( "Arial", 12 ) ;
-		final MalletFont.Metrics metrics = font.getMetrics() ;
+		final Font font = new Font( "Arial", 12 ) ;
+		final Font.Metrics metrics = font.getMetrics() ;
 
 		final float height = metrics.getHeight() ;
 		final float width = font.stringWidth( _text ) ;
@@ -237,7 +237,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() + 1 ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, Colour.blue() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 
 				final Vector3 textOffset = new Vector3( parent.getOffset() ) ;
@@ -333,7 +333,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.red() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, Colour.red() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
@@ -394,7 +394,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.blue() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, Colour.blue() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
@@ -444,7 +444,7 @@ public class EditorState extends GameState
 											  new Vector3(),
 											  new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 				DrawAssist.amendUI( draw, true ) ;
-				DrawAssist.amendShape( draw, Shape.constructPlane( length, MalletColour.white() ) ) ;
+				DrawAssist.amendShape( draw, Shape.constructPlane( length, Colour.white() ) ) ;
 				DrawAssist.attachProgram( draw, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 
@@ -494,7 +494,7 @@ public class EditorState extends GameState
 												new Vector3(),
 												new Vector3( 1, 1, 1 ), parent.getLayer() ) ;
 
-				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), MalletColour.blue() ) ) ;
+				DrawAssist.amendShape( draw1, Shape.constructPlane( new Vector3( 10, 10, 0 ), Colour.blue() ) ) ;
 				DrawAssist.attachProgram( draw1, ProgramAssist.create( "SIMPLE_GEOMETRY" ) ) ;
 			}
 

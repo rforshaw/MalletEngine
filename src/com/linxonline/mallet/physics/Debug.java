@@ -2,7 +2,7 @@ package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 import com.linxonline.mallet.renderer.DrawAssist ;
 import com.linxonline.mallet.renderer.ProgramAssist ;
 import com.linxonline.mallet.renderer.Interpolation ;
@@ -27,7 +27,7 @@ public final class Debug
 		swivel[1] = Shape.Attribute.FLOAT ;
 
 		final Shape shape = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
-		final MalletColour white = MalletColour.white() ;
+		final Colour white = Colour.white() ;
 
 		final float[] points = _hull.getPoints() ;
 		int index = 0 ;

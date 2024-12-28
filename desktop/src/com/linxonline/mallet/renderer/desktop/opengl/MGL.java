@@ -37,7 +37,8 @@ public final class MGL
 	public final static int GL_LINE_STRIP = GL3.GL_LINE_STRIP ;
 	public final static int GL_TRIANGLES = GL3.GL_TRIANGLES ;
 
-	public final static int GL_TEXTURE_2D = GL.GL_TEXTURE_2D ;
+	public final static int GL_TEXTURE_2D = GL3.GL_TEXTURE_2D ;
+	public final static int GL_TEXTURE_2D_ARRAY = GL3.GL_TEXTURE_2D_ARRAY ;
 	public final static int GL_PRIMITIVE_RESTART = GL3.GL_PRIMITIVE_RESTART ;
 
 	public final static int GL_NO_ERROR = GL3.GL_NO_ERROR ;
@@ -529,6 +530,11 @@ public final class MGL
 	public static void glTexImage2D( final int _target, final int _level, final int _internalFormat, final int _width, final int _height, final int _border, final int _format, final int _type, final Buffer _pixels )
 	{
 		gl.glTexImage2D( _target, _level, _internalFormat, _width, _height, _border, _format, _type, _pixels ) ;
+	}
+
+	public static void glTexImage3D( final int _target, final int _level, final int _internalFormat, final int _width, final int _height, final int _depth, final int _border, final int _format, final int _type, final Buffer _pixels )
+	{
+		gl.glTexImage3D( _target, _level, _internalFormat, _width, _height, _depth, _border, _format, _type, _pixels ) ;
 	}
 
 	public static void glGenerateMipmap( final int _target )

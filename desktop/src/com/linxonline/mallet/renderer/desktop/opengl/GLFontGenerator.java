@@ -1,13 +1,10 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.awt.Font ;
-import java.awt.FontMetrics ;
-
 import java.awt.image.BufferedImage ;
 import java.awt.RenderingHints ;
 import java.awt.Graphics2D ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Font ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -25,31 +22,31 @@ public final class GLFontGenerator
 		gGeom2D = geometryBuffer.createGraphics() ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
+	public Font.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
 	{
-		return generateMetrics( new Font( _name, Font.PLAIN, _size ), _characters ) ;
+		return generateMetrics( new java.awt.Font( _name, java.awt.Font.PLAIN, _size ), _characters ) ;
 	}
 
 	public Glyph generateGlyph( final String _name, final int _style, final int _size, final int _code )
 	{
-		return generateGlyph( new Font( _name, _style, _size ), _code ) ;
+		return generateGlyph( new java.awt.Font( _name, _style, _size ), _code ) ;
 	}
 
-	public Glyph generateGlyph( final Font _font, final int _code )
+	public Glyph generateGlyph( final java.awt.Font _font, final int _code )
 	{
 		gGeom2D.setFont( _font ) ;
 
-		final FontMetrics metrics = gGeom2D.getFontMetrics() ;
+		final java.awt.FontMetrics metrics = gGeom2D.getFontMetrics() ;
 		final char c = ( char )_code ;
 		return new Glyph( c, metrics.charWidth( c ) ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final Font _font, final String _characters )
+	public Font.Metrics generateMetrics( final java.awt.Font _font, final String _characters )
 	{
 		// Used to get Metric information for geometry
 		gGeom2D.setFont( _font ) ;
 
-		final FontMetrics metrics = gGeom2D.getFontMetrics() ;
+		final java.awt.FontMetrics metrics = gGeom2D.getFontMetrics() ;
 		final int length = _characters.length() ;
 		final Glyph[] glyphs = new Glyph[length] ;
 
@@ -59,15 +56,15 @@ public final class GLFontGenerator
 			glyphs[i] = new Glyph( c, metrics.charWidth( c ) ) ;
 		}
 
-		return new MalletFont.Metrics( glyphs, metrics.getHeight(),
+		return new Font.Metrics( glyphs, metrics.getHeight(),
 											   metrics.getAscent(),
 											   metrics.getDescent(),
 											   metrics.getLeading() ) ;
 	}
 
-	public Bundle generateFont( final MalletFont _font )
+	public Bundle generateFont( final Font _font )
 	{
-		final MalletFont.Metrics metrics = _font.getMetrics() ;
+		final Font.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
 
 		//System.out.println( "Gen: " + _font + " Length: " + glyphs.length ) ;
@@ -76,15 +73,15 @@ public final class GLFontGenerator
 		// than the font has requested - change multiplier to increase 
 		// the base point size .
 		final int multiplier = 2 ;
-		final MalletFont bigger = _font ;//new MalletFont( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
+		final Font bigger = _font ;//new Font( _font.getFontName(), ( int )( _font.getPointSize() * multiplier ) ) ;
 
-		final MalletFont.Metrics biggerMetrics = bigger.getMetrics() ;
+		final Font.Metrics biggerMetrics = bigger.getMetrics() ;
 		final Glyph[] biggerGlyphs = biggerMetrics.getGlyphs() ;
 		final float height = biggerMetrics.getHeight() ;
 		final float width = calculateWidth( biggerGlyphs ) ;
 
 		// Used to render the texture
-		final Font font = new Font( bigger.getFontName(), Font.PLAIN, bigger.getPointSize() ) ;
+		final java.awt.Font font = new java.awt.Font( bigger.getFontName(), java.awt.Font.PLAIN, bigger.getPointSize() ) ;
 		final BufferedImage textureBuffer = new BufferedImage( ( int )width, ( int )height, BufferedImage.TYPE_BYTE_GRAY ) ;
 		final Graphics2D g2D = textureBuffer.createGraphics() ;
 

@@ -40,7 +40,7 @@ public final class FrameBuffer
 											  new Vector2( 1, 0 ) ) ) ;
 
 		program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-		program.mapUniform( "inTex0", new MalletTexture( world ) ) ;
+		program.mapUniform( "inTex0", new Texture( world ) ) ;
 	}
 
 	public void setPosition( final float _x, final float _y, final float _z )

@@ -149,7 +149,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		FileStream would need to be updated to support 
 		file modification timestamps.
 	*/
-	public MalletTexture.Meta getMeta( final String _path )
+	public Texture.Meta getMeta( final String _path )
 	{
 		return metaGenerator.getMeta( _path ) ;
 	}
@@ -247,7 +247,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 	*/
 	protected static class MetaGenerator
 	{
-		private final Map<String, MalletTexture.Meta> imageMetas = MalletMap.<String, MalletTexture.Meta>newMap() ;
+		private final Map<String, Texture.Meta> imageMetas = MalletMap.<String, Texture.Meta>newMap() ;
 
 		/**
 			Return the meta information associated with an image
@@ -260,11 +260,11 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			FileStream would need to be updated to support 
 			file modification timestamps.
 		*/
-		public MalletTexture.Meta getMeta( final String _path )
+		public Texture.Meta getMeta( final String _path )
 		{
 			synchronized( imageMetas )
 			{
-				final MalletTexture.Meta meta = imageMetas.get( _path ) ;
+				final Texture.Meta meta = imageMetas.get( _path ) ;
 				if( meta != null)
 				{
 					return meta ;
@@ -274,15 +274,15 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 				if( file.exists() == false )
 				{
 					Logger.println( "No Texture found to create Meta: " + _path, Logger.Verbosity.NORMAL ) ;
-					return new MalletTexture.Meta( _path, 0, 0 ) ;
+					return new Texture.Meta( _path, 0, 0 ) ;
 				}
 
 				final HTMLImageElement img = file.getHTMLImage() ;
-				return addMeta( _path, new MalletTexture.Meta( _path, img.getNaturalWidth(), img.getNaturalHeight() ) ) ; 
+				return addMeta( _path, new Texture.Meta( _path, img.getNaturalWidth(), img.getNaturalHeight() ) ) ; 
 			}
 		}
 
-		private MalletTexture.Meta addMeta( final String _path, final MalletTexture.Meta _meta )
+		private Texture.Meta addMeta( final String _path, final Texture.Meta _meta )
 		{
 			if( _meta != null )
 			{
@@ -291,7 +291,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			}
 
 			Logger.println( "Failed to create Texture Meta: " + _path, Logger.Verbosity.NORMAL ) ;
-			return new MalletTexture.Meta( _path, 0, 0 ) ;
+			return new Texture.Meta( _path, 0, 0 ) ;
 		}
 	}
 }

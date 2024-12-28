@@ -29,10 +29,10 @@ public final class AnimatorGenerator
 
 		final JArray jResources = jAnimation.optJArray( "resources", EMPTY_ARRAY ) ;
 		final JArray jFrames = jAnimation.optJArray( "frames", EMPTY_ARRAY ) ;
-		final JArray jFrameOorder = jAnimation.optJArray( "frame_order", EMPTY_ARRAY ) ;
+		final JArray jFrameOrder = jAnimation.optJArray( "frame_order", EMPTY_ARRAY ) ;
 
-		final int[] frameOrder = generateFrameOrder( jFrames, jFrameOorder ) ;
-		final var frames = generateFrames( jResources, jFrames, _generator ) ;
+		final int[] frameOrder = generateFrameOrder( jFrames, jFrameOrder ) ;
+		final var frames = generateFrames( _path, jResources, jFrames, _generator ) ;
 
 		return new Animation<T>( _path, framerate, frameOrder, frames ) ;
 	}
@@ -62,7 +62,7 @@ public final class AnimatorGenerator
 		return order ;
 	}
 
-	private static <T extends Animation.Frame> T[] generateFrames( final JArray _resources, final JArray _frames, final FrameGenerator<T> _generator )
+	private static <T extends Animation.Frame> T[] generateFrames( final String _path, final JArray _resources, final JArray _frames, final FrameGenerator<T> _generator )
 	{
 		final int frameLength = _frames.length() ;
 
@@ -82,7 +82,7 @@ public final class AnimatorGenerator
 				resources.add( _resources.getJObject( index ) ) ;
 			}
 
-			frames[i] = _generator.create( resources ) ;
+			frames[i] = _generator.create( _path, resources ) ;
 		}
 
 		return frames ;
@@ -90,6 +90,6 @@ public final class AnimatorGenerator
 
 	public interface FrameGenerator<T>
 	{
-		public T create( final List<JObject> _resources ) ;
+		public T create( final String _animPath, final List<JObject> _resources ) ;
 	}
 }

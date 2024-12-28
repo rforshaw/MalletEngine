@@ -7,7 +7,7 @@ import com.linxonline.mallet.io.formats.json.JArray ;
 
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 import com.linxonline.mallet.renderer.Shape ;
 
 import com.linxonline.mallet.maths.Vector2 ;
@@ -95,7 +95,7 @@ public class SGeom
 					final int r = jVertex.getInt( "r" ) ;
 					final int g = jVertex.getInt( "g" ) ;
 					final int b = jVertex.getInt( "b" ) ;
-					vertex[swivelIndex] = new MalletColour( r, g, b ) ;
+					vertex[swivelIndex] = new Colour( r, g, b ) ;
 					//System.out.println( "Adding Colour" + vertex[swivelIndex] ) ;
 					break ;
 				}

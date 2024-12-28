@@ -129,13 +129,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new FontAssist.Assist()
 		{
 			@Override
-			public MalletFont.Metrics createMetrics( final MalletFont _font )
+			public Font.Metrics createMetrics( final Font _font )
 			{
 				return fontManager.generateMetrics( _font ) ;
 			}
 
 			@Override
-			public Glyph createGlyph( final MalletFont _font, final int _code )
+			public Glyph createGlyph( final Font _font, final int _code )
 			{
 				return fontManager.generateGlyph( _font, _code ) ;
 			}
@@ -153,7 +153,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new TextureAssist.Assist()
 		{
 			@Override
-			public MalletTexture.Meta createMeta( final String _path )
+			public Texture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
 			}
@@ -583,10 +583,11 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		initDefaultWorld() ;
 
 		System.out.println( "Building default shaders.." ) ;
-		programs.load( "SIMPLE_TEXTURE",  "base/shaders/desktop/simple_texture.jgl" ) ;
-		programs.load( "SIMPLE_FONT",     "base/shaders/desktop/simple_font.jgl" ) ;
-		programs.load( "SIMPLE_GEOMETRY", "base/shaders/desktop/simple_geometry.jgl" ) ;
-		programs.load( "SIMPLE_STENCIL",  "base/shaders/desktop/simple_stencil.jgl" ) ;
+		programs.load( "SIMPLE_TEXTURE",       "base/shaders/desktop/simple_texture.jgl" ) ;
+		programs.load( "SIMPLE_ARRAY_TEXTURE", "base/shaders/desktop/simple_array_texture.jgl" ) ;
+		programs.load( "SIMPLE_FONT",          "base/shaders/desktop/simple_font.jgl" ) ;
+		programs.load( "SIMPLE_GEOMETRY",      "base/shaders/desktop/simple_geometry.jgl" ) ;
+		programs.load( "SIMPLE_STENCIL",       "base/shaders/desktop/simple_stencil.jgl" ) ;
 
 		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/desktop/simple_instance_texture.jgl" ) ;
 
@@ -760,9 +761,9 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		worlds.add( world ) ;
 	}
 
-	protected static GLImage getTexture( final MalletTexture _texture )
+	protected static GLImage getTexture( final Texture _texture )
 	{
-		final MalletTexture.Meta meta = _texture.getMeta() ;
+		final Texture.Meta meta = _texture.getMeta() ;
 		final String path = meta.getPath() ;
 
 		if( meta.getAttachmentIndex() < 0 )
@@ -783,7 +784,12 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return null ;
 	}
 
-	protected static GLFont getFont( final MalletFont _font )
+	protected static GLImage getTextureArray( final TextureArray _texture )
+	{
+		return textures.getByTextureArray( _texture ) ;
+	}
+
+	protected static GLFont getFont( final Font _font )
 	{
 		return fontManager.get( _font ) ;
 	}

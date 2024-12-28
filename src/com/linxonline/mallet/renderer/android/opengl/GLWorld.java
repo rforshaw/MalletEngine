@@ -14,7 +14,7 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.World.AttachmentType ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.ABuffer ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 
 /**
 	Represents the OpenGL state for a world.
@@ -193,7 +193,7 @@ public class GLWorld
 		updateCameras( _world, _cameras ) ;
 		updateDrawBuffers( _world, _buffers ) ;
 
-		final MalletColour clear = _world.getClearColour() ;
+		final Colour clear = _world.getClearColour() ;
 		clearColour[0] = clear.getRedAsFloat() ;
 		clearColour[1] = clear.getGreenAsFloat() ;
 		clearColour[2] = clear.getBlueAsFloat() ;
@@ -253,7 +253,7 @@ public class GLWorld
 		MGL.glClear( clearBits ) ;
 
 		// Allow the shader to access the colour attachments of the framebuffer.
-		// These colour attachments can then be used within a MalletTexture for 
+		// These colour attachments can then be used within a Texture for 
 		// other operations.
 		MGL.glDrawBuffers( colourAttachments.length, colourAttachments, 0 ) ;
 
@@ -371,7 +371,7 @@ public class GLWorld
 			updateCameras( _world, _cameras ) ;
 			updateDrawBuffers( _world, _buffers ) ;
 
-			final MalletColour clear = _world.getClearColour() ;
+			final Colour clear = _world.getClearColour() ;
 			clearColour[0] = clear.getRedAsFloat() ;
 			clearColour[1] = clear.getGreenAsFloat() ;
 			clearColour[2] = clear.getBlueAsFloat() ;

@@ -16,9 +16,6 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.AssetLookup ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-
 /**
 	GLProgram retains a collection of GLSL shaders 
 	that are used during the rendering process.

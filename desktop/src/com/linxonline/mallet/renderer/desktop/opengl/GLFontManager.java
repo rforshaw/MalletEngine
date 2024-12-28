@@ -6,13 +6,12 @@ import java.util.Map ;
 import java.io.InputStream ;
 
 import java.awt.GraphicsEnvironment ;
-import java.awt.Font ;
 
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.filesystem.desktop.* ;
 
 import com.linxonline.mallet.renderer.desktop.opengl.GLFontGenerator.Bundle ;
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Font ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
 
@@ -28,7 +27,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 
 	private final GLFontGenerator gen ;
 	private final GLTextureManager manager ;
-	private final Map<String, MalletFont.Metrics> metrics = MalletMap.<String, MalletFont.Metrics>newMap() ;
+	private final Map<String, Font.Metrics> metrics = MalletMap.<String, Font.Metrics>newMap() ;
 
 	public GLFontManager( final GLTextureManager _manager )
 	{
@@ -47,7 +46,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 		return null ;
 	}
 
-	public GLFont get( final MalletFont _font )
+	public GLFont get( final Font _font )
 	{
 		clean() ;
 
@@ -60,7 +59,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 		final Bundle bundle = createResource( _font ) ;
 		if( bundle != null )
 		{
-			final GLImage image = manager.bind( bundle.image, GLTextureManager.InternalFormat.UNCOMPRESSED ) ;
+			final GLImage image = manager.createGLImage( bundle.image, GLTextureManager.InternalFormat.UNCOMPRESSED ) ;
 			final GLFont font = new GLFont( bundle.shapes, image ) ;
 			put( id, font ) ;
 			return font ;
@@ -81,7 +80,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 		try( final DesktopByteIn in = ( DesktopByteIn )file.getByteInStream() )
 		{
 			final InputStream stream = in.getInputStream() ;
-			final Font font = Font.createFont( Font.TRUETYPE_FONT, stream ) ;
+			final java.awt.Font font = java.awt.Font.createFont( java.awt.Font.TRUETYPE_FONT, stream ) ;
 
 			final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment() ;
 			if( ge.registerFont( font ) == false )
@@ -101,7 +100,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 		}
 	}
 
-	public MalletFont.Metrics generateMetrics( final MalletFont _font )
+	public Font.Metrics generateMetrics( final Font _font )
 	{
 		final String id = _font.getID() ;
 		if( metrics.containsKey( id ) == true )
@@ -109,7 +108,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 			return metrics.get( id ) ;
 		}
 
-		final MalletFont.Metrics met =  gen.generateMetrics( _font.getFontName(),
+		final Font.Metrics met =  gen.generateMetrics( _font.getFontName(),
 															 _font.getStyle(),
 															 _font.getPointSize(),
 															 CHARACTERS ) ;
@@ -117,7 +116,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 		return met ;
 	}
 
-	public Glyph generateGlyph( final MalletFont _font, final int _code )
+	public Glyph generateGlyph( final Font _font, final int _code )
 	{
 		remove( _font.getID() ) ;
 		return gen.generateGlyph( _font.getFontName(),
@@ -126,7 +125,7 @@ public final class GLFontManager extends AbstractManager<String, GLFont>
 								  _code ) ;
 	}
 
-	protected Bundle createResource( final MalletFont _font )
+	protected Bundle createResource( final Font _font )
 	{
 		// Generate the Glyphs for the passed in characters
 		return gen.generateFont( _font ) ;

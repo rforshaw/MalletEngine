@@ -15,8 +15,9 @@ import com.linxonline.mallet.renderer.FloatUniform ;
 import com.linxonline.mallet.renderer.UIntUniform ;
 import com.linxonline.mallet.renderer.IntUniform ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Font ;
+import com.linxonline.mallet.renderer.Texture ;
+import com.linxonline.mallet.renderer.TextureArray ;
 
 import com.linxonline.mallet.util.Logger ;
 
@@ -678,7 +679,7 @@ public final class GLProgram extends ProgramManager.Program
 				}
 				case SAMPLER2D    :
 				{
-					final MalletTexture texture = ( MalletTexture )_uniform ;
+					final Texture texture = ( Texture )_uniform ;
 					if( texture == null )
 					{
 						Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
@@ -714,9 +715,47 @@ public final class GLProgram extends ProgramManager.Program
 
 					break ;
 				}
+				case SAMPLER2D_ARRAY :
+				{
+					final TextureArray texture = ( TextureArray )_uniform ;
+					if( texture == null )
+					{
+						Logger.println( "Requires texture array: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+						return false ;
+					}
+
+					final GLImage glTexture = GLRenderer.getTextureArray( texture ) ;
+					if( glTexture == null )
+					{
+						return false ;
+					}
+
+					final int minFilter = GLImage.calculateMinFilter( texture.getMinificationFilter() ) ;
+					final int magFilter = GLImage.calculateMagFilter( texture.getMagnificationFilter() ) ;
+
+					final int uWrap = GLImage.calculateWrap( texture.getUWrap() ) ;
+					final int vWrap = GLImage.calculateWrap( texture.getVWrap() ) ;
+
+					toFill.add( ( final UniformState _state ) ->
+					{
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D_ARRAY, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, uWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, vWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, magFilter ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, minFilter ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					} ) ;
+
+					break ;
+				}
 				case FONT         :
 				{
-					final MalletFont font = ( MalletFont )_uniform ;
+					final Font font = ( Font )_uniform ;
 					final GLFont glFont = GLRenderer.getFont( font ) ;
 					final GLImage glTexture = glFont.getTexture() ;
 
@@ -923,7 +962,7 @@ public final class GLProgram extends ProgramManager.Program
 					}
 					case SAMPLER2D    :
 					{
-						final MalletTexture texture = ( MalletTexture )uniform ;
+						final Texture texture = ( Texture )uniform ;
 						if( texture == null )
 						{
 							Logger.println( "Requires texture: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
@@ -954,9 +993,42 @@ public final class GLProgram extends ProgramManager.Program
 						_state.textureUnit += 1 ;
 						return true ;
 					}
+					case SAMPLER2D_ARRAY  :
+					{
+						final TextureArray texture = ( TextureArray )uniform ;
+						if( texture == null )
+						{
+							Logger.println( "Requires texture array: " + texture.toString(), Logger.Verbosity.MAJOR ) ;
+							return false ;
+						}
+
+						final GLImage glTexture = GLRenderer.getTextureArray( texture ) ;
+						if( glTexture == null )
+						{
+							return false ;
+						}
+
+						final int minFilter = GLImage.calculateMinFilter( texture.getMinificationFilter() ) ;
+						final int magFilter = GLImage.calculateMagFilter( texture.getMagnificationFilter() ) ;
+
+						final int uWrap = GLImage.calculateWrap( texture.getUWrap() ) ;
+						final int vWrap = GLImage.calculateWrap( texture.getVWrap() ) ;
+
+						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
+						MGL.glBindTexture( MGL.GL_TEXTURE_2D_ARRAY, glTexture.textureIDs[0] ) ;
+						MGL.glUniform1i( location, _state.textureUnit ) ;
+
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, uWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, vWrap ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, magFilter ) ;
+						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, minFilter ) ;
+
+						_state.textureUnit += 1 ;
+						return true ;
+					}
 					case FONT         :
 					{
-						final MalletFont font = ( MalletFont )uniform ;
+						final Font font = ( Font )uniform ;
 						final GLFont glFont = GLRenderer.getFont( font ) ;
 						final GLImage glTexture = glFont.getTexture() ;
 

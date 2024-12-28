@@ -105,7 +105,7 @@ public final class Shape implements IShape
 				}
 				case FLOAT :
 				{
-					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					final Colour colour = ( Colour )_vertex[i] ;
 					verticies[vertexIncrement++] = colour.toFloat() ;
 					break ;
 				}
@@ -153,7 +153,7 @@ public final class Shape implements IShape
 				}
 				case FLOAT :
 				{
-					final MalletColour colour = ( MalletColour )_vertex[i] ;
+					final Colour colour = ( Colour )_vertex[i] ;
 					colour.changeColour( verticies[start++] ) ;
 					break ;
 				}
@@ -296,9 +296,9 @@ public final class Shape implements IShape
 		_swivelIndex defines the MalletCOlour location within the vertex.
 		_colour defines the new value of the float.
 
-		Assumes the caller knows that a MalletColour resides at the location.
+		Assumes the caller knows that a Colour resides at the location.
 	*/
-	public void setColour( final int _index, final int _swivelIndex, final MalletColour _colour )
+	public void setColour( final int _index, final int _swivelIndex, final Colour _colour )
 	{
 		final int start = ( _index * swivelFloatSize ) + swivelOffset[_swivelIndex] ;
 		verticies[start] = _colour.toFloat() ;
@@ -306,25 +306,25 @@ public final class Shape implements IShape
 
 	/**
 		_index defines the vertex location.
-		_swivelIndex defines the MalletColour location within the vertex.
-		Return a copy of the MalletColour.
+		_swivelIndex defines the Colour location within the vertex.
+		Return a copy of the Colour.
 
-		Assumes the caller knows that a MalletColour resides there.
+		Assumes the caller knows that a Colour resides there.
 	*/
-	public MalletColour getColour( final int _index, final int _swivelIndex )
+	public Colour getColour( final int _index, final int _swivelIndex )
 	{
-		final MalletColour colour = new MalletColour() ;
+		final Colour colour = new Colour() ;
 		return getColour( _index, _swivelIndex, colour ) ;
 	}
 
 	/**
 		_index defines the vertex location.
-		_swivelIndex defines the MalletColour location within the vertex.
-		Modify _colour to reflect the MalletColour at the defined location.
+		_swivelIndex defines the Colour location within the vertex.
+		Modify _colour to reflect the Colour at the defined location.
 
-		Assumes the caller knows that a MalletColour resides at the location.
+		Assumes the caller knows that a Colour resides at the location.
 	*/
-	public MalletColour getColour( final int _index, final int _swivelIndex, final MalletColour _colour )
+	public Colour getColour( final int _index, final int _swivelIndex, final Colour _colour )
 	{
 		final int start = ( _index * swivelFloatSize ) + swivelOffset[_swivelIndex] ;
 		_colour.changeColour( verticies[start] ) ;
@@ -405,11 +405,11 @@ public final class Shape implements IShape
 		Construct a vertex with the default swivel format.
 		VEC3 and FLOAT.
 	*/
-	public static Object[] construct( final float _x, final float _y, final float _z, final MalletColour _colour )
+	public static Object[] construct( final float _x, final float _y, final float _z, final Colour _colour )
 	{
 		final Object[] swivel = new Object[2] ;
 		swivel[0] = new Vector3( _x, _y, _z ) ;
-		swivel[1] = new MalletColour( _colour ) ;
+		swivel[1] = new Colour( _colour ) ;
 
 		return swivel ;
 	}
@@ -441,7 +441,7 @@ public final class Shape implements IShape
 				}
 				case FLOAT :
 				{
-					if( ( _object[i] instanceof MalletColour ) == false )
+					if( ( _object[i] instanceof Colour ) == false )
 					{
 						return false ;
 					}
@@ -471,7 +471,7 @@ public final class Shape implements IShape
 		swivel[2] = Attribute.VEC2 ;
 
 		final Vector3 position = new Vector3() ;
-		final MalletColour white = MalletColour.white() ;
+		final Colour white = Colour.white() ;
 		final Vector2 uv = new Vector2( _minUV ) ;
 		final Object[] vertex = new Object[] { position, white, uv } ; 
 
@@ -505,7 +505,7 @@ public final class Shape implements IShape
 		Construct a basic 2-dimensional quad.
 		Se also updatePlaneUV, and updatePlaneGeometry.
 	*/
-	public static Shape constructPlane( final Vector3 _length, final MalletColour _colour )
+	public static Shape constructPlane( final Vector3 _length, final Colour _colour )
 	{
 		final Attribute[] swivel = new Attribute[2] ;
 		swivel[0] = Attribute.VEC3 ;
@@ -528,7 +528,7 @@ public final class Shape implements IShape
 		return plane ;
 	}
 
-	public static Shape constructOutlinePlane( final Vector3 _length, final MalletColour _colour )
+	public static Shape constructOutlinePlane( final Vector3 _length, final Colour _colour )
 	{
 		final Attribute[] swivel = new Attribute[2] ;
 		swivel[0] = Attribute.VEC3 ;
@@ -549,7 +549,7 @@ public final class Shape implements IShape
 		return plane ;
 	}
 
-	public static Shape constructOutlineCircle( final float _radius, final int _segments, final MalletColour _colour )
+	public static Shape constructOutlineCircle( final float _radius, final int _segments, final Colour _colour )
 	{
 		final Attribute[] swivel = new Attribute[2] ;
 		swivel[0] = Attribute.VEC3 ;
@@ -581,7 +581,7 @@ public final class Shape implements IShape
 		swivel[1] = Attribute.FLOAT ;
 		swivel[2] = Attribute.VEC2 ;
 
-		final MalletColour white = MalletColour.white() ;
+		final Colour white = Colour.white() ;
 
 		final Shape plane = new Shape( Shape.Style.FILL, swivel, 36, 24 ) ;
 		plane.copyVertex( Attribute.createVert( new Vector3( 0.0f, 0.0f, 0.0f ), white, new Vector2( _minUV ) ) ) ;					// 0 Front

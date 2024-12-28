@@ -1,0 +1,10 @@
+{
+	"NAME": "SIMPLE_ARRAY_TEXTURE",
+	"VERTEX": [
+		"base/shaders/desktop/version.glsl",
+		"base/shaders/desktop/engine_structs.glsl",
+		"base/shaders/desktop/engine_utils.glsl",
+		"base/shaders/desktop/simple_vertex.glsl"
+	],
+	"FRAGMENT": ["base/shaders/desktop/simple_array_texture_fragment.glsl"]
+}

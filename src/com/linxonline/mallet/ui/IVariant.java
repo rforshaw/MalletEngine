@@ -1,7 +1,7 @@
 package com.linxonline.mallet.ui ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 
 public interface IVariant
 {
@@ -32,7 +32,7 @@ public interface IVariant
 	public Object toObject() ;
 	public Vector3 toVector3() ;
 	public Vector2 toVector2() ;
-	public MalletColour toColour() ;
+	public Colour toColour() ;
 	public Enum toEnum() ;
 	public <E> E toEnum( final Class<E> _class ) ;
 

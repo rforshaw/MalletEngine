@@ -1,0 +1,4 @@
+{
+	"type": "simple_array",
+	"textures": ["base/textures/moomba.png", "base/textures/checkbox_sheet.png"]
+}

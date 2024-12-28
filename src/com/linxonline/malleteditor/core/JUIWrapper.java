@@ -2,8 +2,8 @@ package com.linxonline.malleteditor.core ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Colour ;
+import com.linxonline.mallet.renderer.Font ;
 
 import com.linxonline.mallet.io.filesystem.GlobalFileSystem ;
 import com.linxonline.mallet.io.filesystem.FileStream ;
@@ -135,14 +135,14 @@ public class JUIWrapper
 					final Vector3 vec = ( Vector3 )obj ;
 					_to.put( _variant.getName(), vec.x + "," + vec.y + "," + vec.z ) ;
 				}
-				else if( obj instanceof MalletColour )
+				else if( obj instanceof Colour )
 				{
-					final MalletColour colour = ( MalletColour )obj ;
+					final Colour colour = ( Colour )obj ;
 					_to.put( _variant.getName(), colour.getRed() + "," + colour.getGreen() + "," + colour.getBlue() ) ;
 				}
-				else if( obj instanceof MalletFont )
+				else if( obj instanceof Font )
 				{
-					final MalletFont font = ( MalletFont )obj ;
+					final Font font = ( Font )obj ;
 
 					_to.put( _variant.getName(), font.getFontName() ) ;
 					_to.put( "FONT_SIZE", 0.42f ) ;

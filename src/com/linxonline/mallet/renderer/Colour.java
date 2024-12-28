@@ -7,7 +7,7 @@ import com.linxonline.mallet.util.tools.ConvertBytes ;
 /**
 	Define a colour with 8888 RGBA
 */
-public final class MalletColour
+public final class Colour
 {
 	private final static float FLOAT_CONVERSION = 1.0f / 255.0f ;
 	public final static byte RED   = 3 ;
@@ -17,42 +17,42 @@ public final class MalletColour
 
 	public final byte[] colours = new byte[4] ; 	// red, green, blue, alpha
 
-	public MalletColour()
+	public Colour()
 	{
 		this( 0, 0, 0 ) ;
 	}
 
-	public MalletColour( final int _red, final int _green, final int _blue )
+	public Colour( final int _red, final int _green, final int _blue )
 	{
 		changeColour( ( byte )_red, ( byte )_green, ( byte )_blue, ( byte )255 ) ;
 	}
 
-	public MalletColour( final int _red, final int _green, final int _blue, final int _alpha )
+	public Colour( final int _red, final int _green, final int _blue, final int _alpha )
 	{
 		changeColour( ( byte )_red, ( byte )_green, ( byte )_blue, ( byte )_alpha ) ;
 	}
 
-	public MalletColour( final byte _red, final byte _green, final byte _blue  )
+	public Colour( final byte _red, final byte _green, final byte _blue  )
 	{
 		changeColour( _red, _green, _blue, ( byte )255 ) ;
 	}
 
-	public MalletColour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
+	public Colour( final byte _red, final byte _green, final byte _blue, final byte _alpha )
 	{
 		changeColour( _red, _green, _blue, _alpha ) ;
 	}
 
-	public MalletColour( final int _colour )
+	public Colour( final int _colour )
 	{
 		changeColour( _colour ) ;
 	}
 
-	public MalletColour( final float _colour )
+	public Colour( final float _colour )
 	{
 		changeColour( _colour ) ;
 	}
 
-	public MalletColour( final MalletColour _colour )
+	public Colour( final Colour _colour )
 	{
 		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
 	}
@@ -75,7 +75,7 @@ public final class MalletColour
 		colours[ALPHA] = _alpha ;
 	}
 
-	public void changeColour( final MalletColour _colour )
+	public void changeColour( final Colour _colour )
 	{
 		changeColour( _colour.colours[RED], _colour.colours[GREEN], _colour.colours[BLUE], _colour.colours[ALPHA] ) ;
 	}
@@ -163,9 +163,9 @@ public final class MalletColour
 			return false ;
 		}
 
-		if( _obj instanceof MalletColour )
+		if( _obj instanceof Colour )
 		{
-			final MalletColour col = ( MalletColour )_obj ;
+			final Colour col = ( Colour )_obj ;
 			return colours[RED]   == col.colours[RED]   &&
 				   colours[GREEN] == col.colours[GREEN] &&
 				   colours[BLUE]  == col.colours[BLUE]  &&
@@ -192,7 +192,7 @@ public final class MalletColour
 		return buffer.toString() ;
 	}
 
-	public static final MalletColour parseColour( final String _text )
+	public static final Colour parseColour( final String _text )
 	{
 		if( _text == null )
 		{
@@ -222,31 +222,31 @@ public final class MalletColour
 			alpha = Integer.parseInt( split[3].trim() ) ;
 		}
 
-		return new MalletColour( red, green, blue, alpha ) ;
+		return new Colour( red, green, blue, alpha ) ;
 	}
 
-	public static MalletColour white()
+	public static Colour white()
 	{
-		return new MalletColour( 255, 255, 255 ) ;
+		return new Colour( 255, 255, 255 ) ;
 	}
 
-	public static MalletColour black()
+	public static Colour black()
 	{
-		return new MalletColour( 0, 0, 0 ) ;
+		return new Colour( 0, 0, 0 ) ;
 	}
 
-	public static MalletColour red()
+	public static Colour red()
 	{
-		return new MalletColour( 255, 0, 0 ) ;
+		return new Colour( 255, 0, 0 ) ;
 	}
 
-	public static MalletColour green()
+	public static Colour green()
 	{
-		return new MalletColour( 0, 255, 0 ) ;
+		return new Colour( 0, 255, 0 ) ;
 	}
 
-	public static MalletColour blue()
+	public static Colour blue()
 	{
-		return new MalletColour( 0, 0, 255 ) ;
+		return new Colour( 0, 0, 255 ) ;
 	}
 }

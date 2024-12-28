@@ -9,8 +9,8 @@ import com.linxonline.mallet.ui.* ;
 
 public final class GUI
 {
-	private static Map<MalletFont, Program> fontPrograms = MalletMap.<MalletFont, Program>newMap() ;
-	private static Map<MalletTexture, Program> texturePrograms = MalletMap.<MalletTexture, Program>newMap() ;
+	private static final Map<Font, Program> fontPrograms = MalletMap.<Font, Program>newMap() ;
+	private static final Map<Texture, Program> texturePrograms = MalletMap.<Texture, Program>newMap() ;
 
 	private static final Program geometryProgram = ProgramAssist.add( new Program( "SIMPLE_GEOMETRY", IShape.Style.LINE_STRIP, new Attribute[]
 	{
@@ -36,7 +36,7 @@ public final class GUI
 		return updater ;
 	}
 
-	public static DrawUpdater getDrawUpdater( final World _world, final MalletTexture _texture, final Shape _shape, final int _layer )
+	public static DrawUpdater getDrawUpdater( final World _world, final Texture _texture, final Shape _shape, final int _layer )
 	{
 		final Program program = getProgram( _texture ) ;
 		final DrawUpdater updater = drawPool.getOrCreate( _world, program, _shape, true, _layer ) ;
@@ -45,7 +45,7 @@ public final class GUI
 		return updater ;
 	}
 
-	private static Program getProgram( final MalletTexture _texture )
+	private static Program getProgram( final Texture _texture )
 	{
 		Program program = texturePrograms.get( _texture ) ;
 		if( program == null )
@@ -64,7 +64,7 @@ public final class GUI
 		return textPool ;
 	}
 
-	public static TextUpdater getTextUpdater( final World _world, final MalletFont _font, final int _layer )
+	public static TextUpdater getTextUpdater( final World _world, final Font _font, final int _layer )
 	{
 		final Program program = getProgram( _font ) ;
 		final TextUpdater updater = textPool.getOrCreate( _world, program, true, _layer ) ;
@@ -73,7 +73,7 @@ public final class GUI
 		return updater ;
 	}
 
-	private static Program getProgram( final MalletFont _font )
+	private static Program getProgram( final Font _font )
 	{
 		Program program = fontPrograms.get( _font ) ;
 		if( program == null )
@@ -87,7 +87,7 @@ public final class GUI
 		return program ;
 	}
 
-	public static Shape updateColour( final Shape _shape, final MalletColour _colour )
+	public static Shape updateColour( final Shape _shape, final Colour _colour )
 	{
 		final int size = _shape.getVerticesSize() ;
 		for( int i = 0; i < size; i++ )
@@ -105,7 +105,7 @@ public final class GUI
 
 		final Vector3 length = new Vector3( _length ) ;
 		length.subtract( _edge * 2, _edge * 2, _edge * 2 ) ;
-		final MalletColour white = MalletColour.white() ;
+		final Colour white = Colour.white() ;
 
 		// 9 represents the amount of faces - Top Left Corner, Top Edge, etc..
 		// 4 is the amount of vertices needed for each face

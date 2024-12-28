@@ -11,8 +11,8 @@ public class GUIText extends GUIComponent
 
 	protected UI.Line lineType = UI.Line.SINGLE ;
 
-	private MalletFont font ;
-	private MalletColour colour = MalletColour.white() ;
+	private Font font ;
+	private Colour colour = Colour.white() ;
 
 	private TextUpdater updater ;
 	private TextBuffer geometry ;
@@ -51,9 +51,9 @@ public class GUIText extends GUIComponent
 		drawAlignmentY = ( _y == null ) ? drawAlignmentY : _y ;
 	}
 
-	public void setColour( final MalletColour _colour )
+	public void setColour( final Colour _colour )
 	{
-		colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+		colour = ( _colour != null ) ? _colour : Colour.white() ;
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class GUIText extends GUIComponent
 		int textIndexStart = 0 ;
 		int textIndexEnd = text.length() ;
 
-		final MalletFont.Metrics metrics = font.getMetrics() ;
+		final Font.Metrics metrics = font.getMetrics() ;
 		switch( lineType )
 		{
 			default     :
@@ -206,12 +206,12 @@ public class GUIText extends GUIComponent
 		return drawText ;
 	}
 
-	public MalletFont getFont()
+	public Font getFont()
 	{
 		return font ;
 	}
 
-	public MalletColour getColour()
+	public Colour getColour()
 	{
 		return colour ;
 	}
@@ -224,8 +224,8 @@ public class GUIText extends GUIComponent
 		private final UIVariant lineType = new UIVariant( "LINE_TYPE", UI.Line.SINGLE, new Connect.Signal() ) ;
 
 		private final UIVariant text   = new UIVariant( "TEXT",   "",                        new Connect.Signal() ) ;
-		private final UIVariant colour = new UIVariant( "COLOUR", MalletColour.white(),      new Connect.Signal() ) ;
-		private final UIVariant font   = new UIVariant( "FONT",   new MalletFont( "Arial" ), new Connect.Signal() ) ;
+		private final UIVariant colour = new UIVariant( "COLOUR", Colour.white(),      new Connect.Signal() ) ;
+		private final UIVariant font   = new UIVariant( "FONT",   new Font( "Arial" ), new Connect.Signal() ) ;
 
 		public Meta()
 		{
@@ -283,9 +283,9 @@ public class GUIText extends GUIComponent
 			}
 		}
 
-		public void setColour( final MalletColour _colour )
+		public void setColour( final Colour _colour )
 		{
-			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			final Colour col = colour.toObject( Colour.class ) ;
 			if( _colour != null && col.equals( _colour ) == false )
 			{
 				col.changeColour( _colour.toInt() ) ;
@@ -293,12 +293,12 @@ public class GUIText extends GUIComponent
 			}
 		}
 
-		public void setFont( final MalletFont _font )
+		public void setFont( final Font _font )
 		{
-			final MalletFont temp = font.toObject( MalletFont.class ) ;
+			final Font temp = font.toObject( Font.class ) ;
 			if( temp.equals( _font ) == false )
 			{
-				font.setObject( new MalletFont( _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ) ;
+				font.setObject( new Font( _font.getFontName(), _font.getStyle(), _font.getPointSize() ) ) ;
 				UIElement.signal( this, font.getSignal() ) ;
 			}
 		}
@@ -323,16 +323,16 @@ public class GUIText extends GUIComponent
 			return text.toString() ;
 		}
 
-		public MalletColour getColour( final MalletColour _populate )
+		public Colour getColour( final Colour _populate )
 		{
-			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			final Colour col = colour.toObject( Colour.class ) ;
 			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}
 
-		public MalletFont getFont()
+		public Font getFont()
 		{
-			return font.toObject( MalletFont.class )  ;
+			return font.toObject( Font.class )  ;
 		}
 
 		public final Connect.Signal lineTypeChanged()

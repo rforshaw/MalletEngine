@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.Arrays ;
 
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Texture ;
 import com.linxonline.mallet.io.Resource ;
 
 public final class GLImage extends Resource
@@ -20,12 +20,16 @@ public final class GLImage extends Resource
 	*/
 	public GLImage( final int _textureID, final long _consumption )
 	{
-		textureIDs = new int[1] ;
-		textureIDs[0] = _textureID ;
+		this( new int[] { _textureID }, _consumption ) ;
+	}
+
+	public GLImage( final int[] _ids, final long _consumption )
+	{
+		textureIDs = _ids ;
 		consumption = _consumption ;
 	}
 
-	public static int calculateMagFilter( MalletTexture.Filter _filter )
+	public static int calculateMagFilter( Texture.Filter _filter )
 	{
 		switch( _filter )
 		{
@@ -35,7 +39,7 @@ public final class GLImage extends Resource
 		}
 	}
 
-	public static int calculateMinFilter( MalletTexture.Filter _filter )
+	public static int calculateMinFilter( Texture.Filter _filter )
 	{
 		switch( _filter )
 		{
@@ -47,7 +51,7 @@ public final class GLImage extends Resource
 		}
 	}
 
-	public static int calculateWrap( MalletTexture.Wrap _wrap )
+	public static int calculateWrap( Texture.Wrap _wrap )
 	{
 		switch( _wrap )
 		{

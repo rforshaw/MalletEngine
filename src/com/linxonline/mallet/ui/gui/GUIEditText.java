@@ -46,7 +46,7 @@ public class GUIEditText extends GUIText
 	{
 		final UITextField parent = getParent() ;
 
-		final MalletColour colour = getColour() ;
+		final Colour colour = getColour() ;
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
 
@@ -74,14 +74,14 @@ public class GUIEditText extends GUIText
 			cursorDraw.setShape( plane ) ;
 		}
 
-		final MalletFont font = getFont() ;
+		final Font font = getFont() ;
 		if( font != null )
 		{
 			final Vector3 length = getLength() ;
 			final Vector3 margin = getMargin() ;
 			final StringBuilder placeholder = drawPlaceholder.getText() ;
 
-			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final Font.Metrics metrics = font.getMetrics() ;
 			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x - margin.x ) ;
 			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y - margin.y ) ;
 
@@ -175,7 +175,7 @@ public class GUIEditText extends GUIText
 		final UITextField parent = getParent() ;
 		final int layer = parent.getLayer() + 1 ;
 
-		final MalletFont font = getFont() ;
+		final Font font = getFont() ;
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
 		final Vector3 length = getLength() ;
@@ -207,7 +207,7 @@ public class GUIEditText extends GUIText
 			drawPlaceholder.setHidden( text.length() > 0 ) ;
 
 			final StringBuilder placeholder = drawPlaceholder.getText() ;
-			final MalletFont.Metrics metrics = font.getMetrics() ;
+			final Font.Metrics metrics = font.getMetrics() ;
 			final float offsetX = UI.align( drawAlignmentX, font.stringWidth( placeholder ), length.x - margin.x ) ;
 			final float offsetY = UI.align( drawAlignmentY, metrics.getHeight(), length.y - margin.y ) ;
 
@@ -239,7 +239,7 @@ public class GUIEditText extends GUIText
 
 	private void updateTextRange()
 	{
-		final MalletFont font = getFont() ;
+		final Font font = getFont() ;
 		final Vector3 length = getLength() ;
 		final Vector3 margin = getMargin() ;
 		final StringBuilder edit = getText() ;
@@ -450,7 +450,7 @@ public class GUIEditText extends GUIText
 		final UITextField parent = getParent() ;
 		final Vector3 position = parent.getPosition() ;
 		final StringBuilder text = getText() ;
-		final MalletFont font = getFont() ;
+		final Font font = getFont() ;
 
 		final float width = _input.getMouseX() - position.x ;
 		parent.setCursorIndex( font.stringIndexWidth( text, width ) ) ;

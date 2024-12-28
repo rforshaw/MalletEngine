@@ -18,7 +18,7 @@ import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.renderer.IShape.Attribute ;
 import com.linxonline.mallet.renderer.IShape.Style ;
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 
 public final class GLTF
 {
@@ -171,7 +171,7 @@ public final class GLTF
 							default       : throw new RuntimeException( "Component type not supported for VEC3" ) ;
 							case 5120 :
 							{
-								final MalletColour colour = ( MalletColour )vertex[j] ;
+								final Colour colour = ( Colour )vertex[j] ;
 								colour.changeColour( temp[0], temp[1], temp[2], temp[3] ) ;
 								break ;
 							}// Float

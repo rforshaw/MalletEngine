@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.MathUtil ;
 import com.linxonline.mallet.renderer.FontAssist ;
 import com.linxonline.mallet.renderer.Glyph ;
 
-public final class MalletFont implements IUniform
+public final class Font implements IUniform
 {
 	public static final int PLAIN = 5 ;
 
@@ -16,7 +16,7 @@ public final class MalletFont implements IUniform
 	private final String id ;
 	private final Metrics metrics ;
 
-	public MalletFont( final String _name, final int _style, final int _size )
+	public Font( final String _name, final int _style, final int _size )
 	{
 		name = _name ;
 		style = _style ;
@@ -28,25 +28,25 @@ public final class MalletFont implements IUniform
 		metrics.setParent( this ) ;
 	}
 
-	public MalletFont( final String _name, final int _size )
+	public Font( final String _name, final int _size )
 	{
 		this( _name, PLAIN, _size ) ;
 	}
 
-	public MalletFont( final String _name )
+	public Font( final String _name )
 	{
 		this( _name, 12 ) ;
 	}
 
-	public static MalletFont createByPixel( final String _name, final int _style, final int _pixels )
+	public static Font createByPixel( final String _name, final int _style, final int _pixels )
 	{
 		final int pt = ( int )MathUtil.linear( 6, 12, 8, 16, _pixels ) ;
 		return createByPoint( _name, _style, pt ) ;
 	}
 
-	public static MalletFont createByPoint( final String _name, final int _style, final int _pt )
+	public static Font createByPoint( final String _name, final int _style, final int _pt )
 	{
-		return new MalletFont( _name, _style, _pt ) ;
+		return new Font( _name, _style, _pt ) ;
 	}
 	
 	public String getFontName()
@@ -165,9 +165,9 @@ public final class MalletFont implements IUniform
 			return false ;
 		}
 
-		if( _obj instanceof MalletFont )
+		if( _obj instanceof Font )
 		{
-			final MalletFont font = ( MalletFont )_obj ;
+			final Font font = ( Font )_obj ;
 			return id.equals( font.id ) ;
 		}
 
@@ -183,7 +183,7 @@ public final class MalletFont implements IUniform
 	@Override
 	public String toString()
 	{
-		return "MalletFont: " + name ;
+		return "Font: " + name ;
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public final class MalletFont implements IUniform
 
 	public static final class Metrics
 	{
-		private MalletFont parent ;
+		private Font parent ;
 
 		private Glyph[] glyphs ;
 		private final float height ;
@@ -226,7 +226,7 @@ public final class MalletFont implements IUniform
 			leading = _leading ;
 		}
 
-		private void setParent( final MalletFont _parent )
+		private void setParent( final Font _parent )
 		{
 			parent = _parent ;
 		}

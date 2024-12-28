@@ -12,7 +12,7 @@ import android.graphics.Color ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Font ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -29,7 +29,7 @@ public class GLFontGenerator
 		manager = _manager ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
+	public Font.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
 	{
 		return generateMetrics( Typeface.create( _name, Typeface.NORMAL), _size, _characters ) ;
 	}
@@ -46,7 +46,7 @@ public class GLFontGenerator
 		return new Glyph( c[0], paint.measureText( c, 0, 1 ) ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final Typeface _typeface, final int _size, final String _characters )
+	public Font.Metrics generateMetrics( final Typeface _typeface, final int _size, final String _characters )
 	{
 		paint.setTypeface( _typeface ) ;
 		paint.setTextSize( ( float )_size ) ;
@@ -66,15 +66,15 @@ public class GLFontGenerator
 
 		final Rect bounds = new Rect() ;
 		paint.getTextBounds( _characters, 0, length, bounds ) ;
-		return new MalletFont.Metrics( glyphs, bounds.height(),
+		return new Font.Metrics( glyphs, bounds.height(),
 											   Math.abs( metrics.ascent ),
 											   metrics.descent,
 											   metrics.leading ) ;
 	}
 
-	public GLFont generateFont( final MalletFont _font, final float _spacing )
+	public GLFont generateFont( final Font _font, final float _spacing )
 	{
-		final MalletFont.Metrics metrics = _font.getMetrics() ;
+		final Font.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
 
 		final float height = metrics.getHeight() ;

@@ -64,6 +64,7 @@ public final class GameTestLoader implements IGameLoader
 	{
 		// All materials should have a "type" field.
 		generators.put( "simple", new MaterialPool.SimpleGenerator() ) ;
+		generators.put( "simple_array", new MaterialPool.SimpleArrayGenerator() ) ;
 		generators.put( "simple_instanced", new MaterialPool.SimpleInstancedGenerator() ) ;
 	}
 
@@ -161,6 +162,7 @@ public final class GameTestLoader implements IGameLoader
 				createMathTests() ;
 
 				createUI() ;
+				renderTextureArrayExample() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
@@ -210,25 +212,83 @@ public final class GameTestLoader implements IGameLoader
 				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 150, 150, 100 ) ).toString() ) ;
 
 				final Circle circle = new Circle( 0, 0, 5 ) ;
-				if( circle.intersectLine( new Vector2( 5, 5 ), new Vector2( 4, 4 ) ) )
+				System.out.println( "Ray 5, 5, 0, -1: " ) ;
+				if( circle.ray( 5, 5, 0, -1 ) )
 				{
-					System.out.println( "5, 5, 4, 4, Line intersects." ) ;
+					System.out.println( "\tLine intersects." ) ;
 				}
 
-				if( circle.intersectLine( new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) )
+				System.out.println( "Ray 0, 0, 0, 1: " ) ;
+				if( circle.ray( 0, 0, 0, 1 ) )
 				{
-					// The line goes out infinitely.
-					System.out.println( "0, 0, 1, 1, Line intersects." ) ;
+					System.out.println( "\tLine intersects." ) ;
 				}
 
-				if( circle.intersectLine( new Vector2( 10, 10 ), new Vector2( 8, 8 ) ) )
+				System.out.println( "Ray 10, 10, 1, 1: " ) ;
+				if( !circle.ray( 10, 10, 1, 1 ) )
 				{
-					System.out.println( "10, 10, 8, 8, Line intersects." ) ;
+					System.out.println( "\t Line does not intersect." ) ;
 				}
 
-				if( !circle.intersectLine( new Vector2( 6, 6 ), new Vector2( 7, 7 ) ) )
+				System.out.println( "Ray -10, -10, 1, 1:" ) ;
+				if( circle.ray( -10, -10, 1, 1 ) )
 				{
-					System.out.println( "6, 6, 7, 7, Line does not intersect." ) ;
+					System.out.println( "\tLine intersects." ) ;
+				}
+
+				System.out.println( "Line Segment -10, -10, 10, 10:" ) ;
+				if( circle.intersectLineSegment( -10, -10, 10, 10 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 6, 6, 10, 10:" ) ;
+				if( !circle.intersectLineSegment( 6, 6, 10, 10 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				System.out.println( "Line Segment 6, 6, 0, 6:" ) ;
+				if( !circle.intersectLineSegment( 6, 6, 0, 6 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 5, 0:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 5, 0 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, -5, 0:" ) ;
+				if( circle.intersectLineSegment( 0, 0, -5, 0 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 0, 5:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 0, 5 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 0, -5:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 0, -5 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+				
+				System.out.println( "Line Segment 0, -6, 5, -7:" ) ;
+				if( !circle.intersectLineSegment( 0, -6, 5, -7 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				final Circle circle2 = new Circle( 505, -1206, 100 ) ;
+				System.out.println( "Line Segment 400, -928, 544, -944: " ) ;
+				if( !circle2.intersectLineSegment( 400, -928, 544, -944 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
 				}
 			}
 
@@ -334,8 +394,50 @@ public final class GameTestLoader implements IGameLoader
 			}
 
 			/**
-				Add a texture and render directly to the renderer
+				Add a texture array and render directly to the renderer
 			**/
+			public void renderTextureArrayExample()
+			{
+				final TextureArray ex1 = TextureArray.create( new String[]
+				{
+					"base/textures/moomba.png",
+					"base/textures/moomba1.png"
+				} ) ;
+
+				final TextureArray ex2 = TextureArray.create( new String[]
+				{
+					"base/textures/moomba.png",
+					"base/textures/moomba1.png"
+				} ) ;
+
+				final TextureArray ex3 = TextureArray.create( new String[]
+				{
+					"base/textures/moomba1.png",
+					"base/textures/moomba.png"
+				} ) ;
+
+				System.out.println( "Ex1 same as Ex2: " + ex1.equals( ex2 ) ) ;
+				System.out.println( "Ex1 not same as Ex3: " + ex1.equals( ex3 ) ) ;
+
+				final World world = WorldAssist.getDefault() ;
+				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+
+				{
+					final Shape plane = Shape.constructPlane( new Vector3( 128, 128, 0.0f ), new Vector2(), new Vector2( 1, 1 ) ) ;
+
+					final Draw draw = new Draw() ;
+					draw.setPosition( 415.0f, 485.0f, 0.0f ) ;
+					draw.setOffset( -( 128 / 2 ), -( 128 / 2 ), 0.0f ) ;
+					draw.setShape( plane ) ;
+
+					final Program program = materialPool.create( "base/materials/example_array.mat" ) ;
+					final DrawUpdater updater = pool.getOrCreate( world, program, plane, true, 10 ) ;
+
+					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+					geometry.addDraws( draw ) ;
+				}
+			}
+
 			public void renderTextureExample()
 			{
 				final World world = WorldAssist.getDefault() ;
@@ -363,7 +465,7 @@ public final class GameTestLoader implements IGameLoader
 				}
 
 				{
-					final MalletColour colour = new MalletColour( 255, 255, 255 ) ;
+					final Colour colour = new Colour( 255, 255, 255 ) ;
 					final Shape lines = new Shape( Shape.Style.LINE_STRIP, 7, 6 ) ;
 					lines.copyVertex( Shape.construct( 0, 10, 0, colour ) ) ;
 					lines.copyVertex( Shape.construct( 0, 0, 0, colour ) ) ;
@@ -403,7 +505,7 @@ public final class GameTestLoader implements IGameLoader
 					} ;
 
 					final Vector3 position = new Vector3() ;
-					final MalletColour white = MalletColour.white() ;
+					final Colour white = Colour.white() ;
 					final Vector2 uv = new Vector2() ;
 					final Object[] vertex = new Object[] { position, white, uv } ; 
 
@@ -493,11 +595,11 @@ public final class GameTestLoader implements IGameLoader
 
 				final TextDraw draw = new TextDraw( "Hello world!" ) ;
 				draw.setPosition( 0.0f, -80.0f, 0.0f ) ;
-				draw.setColour( new MalletColour( 144, 195, 212 ) ) ;
+				draw.setColour( new Colour( 144, 195, 212 ) ) ;
 				draw.setBoundary( 50.0f, 80.0f ) ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
-				program.mapUniform( "inTex0", new MalletFont( "Arial", 20 ) ) ;
+				program.mapUniform( "inTex0", new Font( "Arial", 20 ) ) ;
 
 				final TextUpdaterPool pool = RenderPools.getTextUpdaterPool() ;
 				final TextUpdater updater = pool.getOrCreate( world, program, false, 200 ) ;
@@ -643,7 +745,7 @@ public final class GameTestLoader implements IGameLoader
 				//final Shape shape = Shape.constructCube( 1.0f, new Vector2(), new Vector2( 1, 1 ) ) ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
-				program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+				program.mapUniform( "inTex0", new Texture( "base/textures/moomba.png" ) ) ;
 
 				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
 				final DrawUpdater updater = pool.getOrCreate( world, program, shape, false, 10 ) ;
@@ -836,7 +938,7 @@ public final class GameTestLoader implements IGameLoader
 			final World world = WorldAssist.getDefault() ;
 
 			final Program program = ProgramAssist.add( new Program( "SIMPLE_INSTANCE_TEXTURE" ) ) ;
-			program.mapUniform( "inTex0", new MalletTexture( "base/textures/moomba.png" ) ) ;
+			program.mapUniform( "inTex0", new Texture( "base/textures/moomba.png" ) ) ;
 			final Shape plane = Shape.constructPlane( new Vector3( 64, 64, 0 ), new Vector2( 0, 0 ), new Vector2( 1, 1 ) ) ;
 
 			final DrawInstancedUpdaterPool pool = RenderPools.getDrawInstancedUpdaterPool() ;

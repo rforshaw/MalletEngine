@@ -16,8 +16,8 @@ import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.renderer.MalletColour ;
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Colour ;
+import com.linxonline.mallet.renderer.Font ;
 
 import com.linxonline.mallet.ui.gui.* ;
 
@@ -467,9 +467,9 @@ public final class JUI
 		final GUIPanelEdge.Meta meta = new GUIPanelEdge.Meta() ;
 		meta.setEdge( ( float )_ui.optDouble( "EDGE", 5.0 ) ) ;
 		meta.setSheet( _ui.optString( "TEXTURE", "" ) ) ;
-		meta.setNeutralColour( MalletColour.parseColour( _ui.optString( "NEUTRAL", _ui.optString( "COLOUR", null ) ) ) ) ;
-		meta.setRolloverColour( MalletColour.parseColour( _ui.optString( "ROLLOVER", null ) ) ) ;
-		meta.setClickedColour( MalletColour.parseColour( _ui.optString( "CLICKED", null ) ) ) ;
+		meta.setNeutralColour( Colour.parseColour( _ui.optString( "NEUTRAL", _ui.optString( "COLOUR", null ) ) ) ) ;
+		meta.setRolloverColour( Colour.parseColour( _ui.optString( "ROLLOVER", null ) ) ) ;
+		meta.setClickedColour( Colour.parseColour( _ui.optString( "CLICKED", null ) ) ) ;
 
 		return meta ;
 	}
@@ -511,8 +511,8 @@ public final class JUI
 		meta.setName( _ui.getString( "NAME" ) ) ;
 		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setText( _ui.optString( "TEXT", "" ) ) ;
-		meta.setFont( MalletFont.createByPixel( _ui.optString( "FONT", "Arial" ), MalletFont.PLAIN, fontSize ) ) ;
-		meta.setColour( MalletColour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
+		meta.setFont( Font.createByPixel( _ui.optString( "FONT", "Arial" ), Font.PLAIN, fontSize ) ) ;
+		meta.setColour( Colour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
 		
 		final JObject align = _ui.optJObject( "ALIGNMENT", null ) ;
 		if( align != null )
@@ -537,8 +537,8 @@ public final class JUI
 		meta.setName( _ui.getString( "NAME" ) ) ;
 		meta.setGroup( _ui.getString( "GROUP" ) ) ;
 		meta.setText( _ui.optString( "TEXT", "" ) ) ;
-		meta.setFont( MalletFont.createByPixel( _ui.optString( "FONT", "Arial" ), MalletFont.PLAIN, fontSize ) ) ;
-		meta.setColour( MalletColour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
+		meta.setFont( Font.createByPixel( _ui.optString( "FONT", "Arial" ), Font.PLAIN, fontSize ) ) ;
+		meta.setColour( Colour.parseColour( _ui.optString( "COLOUR", null ) ) ) ;
 		
 		final JObject align = _ui.optJObject( "ALIGNMENT", null ) ;
 		if( align != null )

@@ -7,9 +7,9 @@ import com.linxonline.mallet.ui.* ;
 
 public class GUIPanelEdge extends GUIDrawEdge
 {
-	private final MalletColour neutral ;
-	private final MalletColour rollover ;
-	private final MalletColour clicked ;
+	private final Colour neutral ;
+	private final Colour rollover ;
+	private final Colour clicked ;
 
 	private final Connect.Slot<UIElement> engagedSlot = new Connect.Slot<UIElement>()
 	{
@@ -32,9 +32,9 @@ public class GUIPanelEdge extends GUIDrawEdge
 	public GUIPanelEdge( final Meta _meta, final UIElement _parent )
 	{
 		super( _meta, _parent ) ;
-		neutral  = _meta.getNeutralColour( new MalletColour() ) ;
-		rollover = _meta.getRolloverColour( new MalletColour() ) ;
-		clicked  = _meta.getClickedColour( new MalletColour() ) ;
+		neutral  = _meta.getNeutralColour( new Colour() ) ;
+		rollover = _meta.getRolloverColour( new Colour() ) ;
+		clicked  = _meta.getClickedColour( new Colour() ) ;
 		setColour( neutral ) ;
 
 		UIElement.connect( _parent, _parent.elementEngaged(), engagedSlot ) ;
@@ -80,8 +80,8 @@ public class GUIPanelEdge extends GUIDrawEdge
 
 	public static class Meta extends GUIDrawEdge.Meta
 	{
-		private final UIVariant rollover = new UIVariant( "ROLLOVER", MalletColour.white(), new Connect.Signal() ) ;
-		private final UIVariant clicked  = new UIVariant( "CLICKED",  MalletColour.white(), new Connect.Signal() ) ;
+		private final UIVariant rollover = new UIVariant( "ROLLOVER", Colour.white(), new Connect.Signal() ) ;
+		private final UIVariant clicked  = new UIVariant( "CLICKED",  Colour.white(), new Connect.Signal() ) ;
 
 		public Meta()
 		{
@@ -100,14 +100,14 @@ public class GUIPanelEdge extends GUIDrawEdge
 			return "UIELEMENT_GUIPANELEDGE" ;
 		}
 
-		public void setNeutralColour( final MalletColour _colour )
+		public void setNeutralColour( final Colour _colour )
 		{
 			setColour( _colour ) ;
 		}
 
-		public void setRolloverColour( final MalletColour _colour )
+		public void setRolloverColour( final Colour _colour )
 		{
-			final MalletColour col = rollover.toObject( MalletColour.class ) ;
+			final Colour col = rollover.toObject( Colour.class ) ;
 			if( _colour != null && col.equals( _colour ) == false )
 			{
 				col.changeColour( _colour.toInt() ) ;
@@ -115,9 +115,9 @@ public class GUIPanelEdge extends GUIDrawEdge
 			}
 		}
 
-		public void setClickedColour( final MalletColour _colour )
+		public void setClickedColour( final Colour _colour )
 		{
-			final MalletColour col = clicked.toObject( MalletColour.class ) ;
+			final Colour col = clicked.toObject( Colour.class ) ;
 			if( _colour != null && col.equals( _colour ) == false )
 			{
 				col.changeColour( _colour.toInt() ) ;
@@ -125,21 +125,21 @@ public class GUIPanelEdge extends GUIDrawEdge
 			}
 		}
 
-		public MalletColour getNeutralColour( final MalletColour _populate )
+		public Colour getNeutralColour( final Colour _populate )
 		{
 			return getColour( _populate ) ;
 		}
 
-		public MalletColour getRolloverColour( final MalletColour _populate )
+		public Colour getRolloverColour( final Colour _populate )
 		{
-			final MalletColour col = rollover.toObject( MalletColour.class ) ;
+			final Colour col = rollover.toObject( Colour.class ) ;
 			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}
 
-		public MalletColour getClickedColour( final MalletColour _populate )
+		public Colour getClickedColour( final Colour _populate )
 		{
-			final MalletColour col = clicked.toObject( MalletColour.class ) ;
+			final Colour col = clicked.toObject( Colour.class ) ;
 			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}

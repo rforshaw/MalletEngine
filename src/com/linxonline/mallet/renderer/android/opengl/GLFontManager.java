@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer.android.opengl ;
 import java.util.Collection ;
 import java.util.Map ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Font ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.util.MalletMap ;
@@ -13,7 +13,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 	private final static String CHARACTERS = "\0 []{}:;'@~#<>,/?|`-=¬abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!\"£$%^&*()_+." ;
 
 	private final GLFontGenerator gen ;
-	private final Map<String, MalletFont.Metrics> metrics = MalletMap.<String, MalletFont.Metrics>newMap() ;
+	private final Map<String, Font.Metrics> metrics = MalletMap.<String, Font.Metrics>newMap() ;
 
 	public GLFontManager( final GLTextureManager _manager )
 	{
@@ -30,7 +30,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 		return null ;
 	}
 
-	public GLFont get( final MalletFont _font )
+	public GLFont get( final Font _font )
 	{
 		clean() ;
 
@@ -49,7 +49,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 		return resource ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final MalletFont _font )
+	public Font.Metrics generateMetrics( final Font _font )
 	{
 		final String id = _font.getID() ;
 		if( metrics.containsKey( id ) == true )
@@ -57,7 +57,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 			return metrics.get( id ) ;
 		}
 
-		final MalletFont.Metrics met =  gen.generateMetrics( _font.getFontName(),
+		final Font.Metrics met =  gen.generateMetrics( _font.getFontName(),
 															 _font.getStyle(),
 															 _font.getPointSize(),
 															 CHARACTERS ) ;
@@ -65,7 +65,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 		return met ;
 	}
 
-	public Glyph generateGlyph( final MalletFont _font, final int _code )
+	public Glyph generateGlyph( final Font _font, final int _code )
 	{
 		remove( _font.getID() ) ;
 		//System.out.println( "Create: " + ( char )_code ) ;
@@ -75,7 +75,7 @@ public class GLFontManager extends AbstractManager<String, GLFont>
 								  _code ) ;
 	}
 
-	protected GLFont createResource( final MalletFont _font )
+	protected GLFont createResource( final Font _font )
 	{
 		// Generate the Glyphs for the passed in characters
 		return gen.generateFont( _font, 5 ) ;

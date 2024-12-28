@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -82,14 +82,14 @@ public final class UIVariant implements IVariant
 		signal = _signal ;
 	}
 
-	public UIVariant( final String _name, final MalletColour _val )
+	public UIVariant( final String _name, final Colour _val )
 	{
 		this( _name, _val, null ) ;
 	}
 
-	public UIVariant( final String _name, final MalletColour _val, final Connect.Signal _signal )
+	public UIVariant( final String _name, final Colour _val, final Connect.Signal _signal )
 	{
-		variable = new ObjectVariable<MalletColour>( _name, _val ) ;
+		variable = new ObjectVariable<Colour>( _name, _val ) ;
 		signal = _signal ;
 	}
 
@@ -226,7 +226,7 @@ public final class UIVariant implements IVariant
 		{
 			case AVariable.OBJECT_TYPE :
 			{
-				final MalletColour value = ( MalletColour )( ( ObjectVariable )variable ).value ;
+				final Colour value = ( Colour )( ( ObjectVariable )variable ).value ;
 				value.changeColour( _r, _g, _b, _a ) ;
 				break ;
 			}
@@ -325,11 +325,11 @@ public final class UIVariant implements IVariant
 	}
 
 	@Override
-	public MalletColour toColour()
+	public Colour toColour()
 	{
 		switch( getType() )
 		{
-			case AVariable.OBJECT_TYPE : return ( MalletColour )( ( ObjectVariable )variable ).value ;
+			case AVariable.OBJECT_TYPE : return ( Colour )( ( ObjectVariable )variable ).value ;
 			default                    : return null ;
 		}
 	}

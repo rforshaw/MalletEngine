@@ -32,7 +32,7 @@ public interface IShape
 	public enum Attribute
 	{
 		VEC3,		// Vector3
-		FLOAT,		// MalletColour
+		FLOAT,		// Colour
 		VEC2 ;		// Vector2
 
 		public static boolean isCompatible( final Attribute[] _a, final Attribute[] _b )
@@ -127,7 +127,7 @@ public interface IShape
 				switch( _swivel[i] )
 				{
 					case VEC3  : size += 3 ; break ;	// Vector3
-					case FLOAT : size += 1 ; break ;	// MalletColour
+					case FLOAT : size += 1 ; break ;	// Colour
 					case VEC2  : size += 2 ; break ;	// Vector2
 				}
 			}
@@ -146,7 +146,7 @@ public interface IShape
 				switch( _swivel[i] )
 				{
 					case VEC3  : obj[i] = new Vector3() ;      break ;
-					case FLOAT : obj[i] = new MalletColour() ; break ;
+					case FLOAT : obj[i] = new Colour() ; break ;
 					case VEC2  : obj[i] = new Vector2() ;      break ;
 				}
 			}

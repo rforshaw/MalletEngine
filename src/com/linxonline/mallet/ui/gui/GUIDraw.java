@@ -12,8 +12,8 @@ public class GUIDraw extends GUIComponent
 	protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 	protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
-	private MalletColour colour ;
-	private final MalletTexture sheet ;
+	private Colour colour ;
+	private final Texture sheet ;
 	private final UIElement.UV uv ;
 
 	private DrawUpdater updater ;
@@ -26,8 +26,8 @@ public class GUIDraw extends GUIComponent
 		retainRatio = _meta.isRetainRatio() ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;
-		colour = _meta.getColour( new MalletColour() ) ;
-		sheet = new MalletTexture( _meta.getSheet(), MalletTexture.Filter.LINEAR, MalletTexture.Wrap.CLAMP_EDGE ) ;
+		colour = _meta.getColour( new Colour() ) ;
+		sheet = new Texture( _meta.getSheet(), Texture.Filter.LINEAR, Texture.Wrap.CLAMP_EDGE ) ;
 		uv = _meta.getUV( new UIElement.UV() ) ;
 
 		updateLength( _parent.getLength(), getLength() ) ;
@@ -46,9 +46,9 @@ public class GUIDraw extends GUIComponent
 		drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
 	}
 
-	public void setColour( final MalletColour _colour )
+	public void setColour( final Colour _colour )
 	{
-		colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+		colour = ( _colour != null ) ? _colour : Colour.white() ;
 
 		final Draw draw = getDraw() ;
 		final Shape shape = ( Shape )draw.getShape() ;
@@ -189,12 +189,12 @@ public class GUIDraw extends GUIComponent
 		return drawAlignmentY ;
 	}
 
-	public MalletColour getColour()
+	public Colour getColour()
 	{
 		return colour ;
 	}
 
-	public MalletTexture getTexture()
+	public Texture getTexture()
 	{
 		return sheet ;
 	}
@@ -205,7 +205,7 @@ public class GUIDraw extends GUIComponent
 		private final UIVariant xAlign      = new UIVariant( "ALIGNMENT_X",  UI.Alignment.LEFT,    new Connect.Signal() ) ;
 		private final UIVariant yAlign      = new UIVariant( "ALIGNMENT_Y",  UI.Alignment.LEFT,    new Connect.Signal() ) ;
 		private final UIVariant sheet       = new UIVariant( "TEXTURE",      "",                   new Connect.Signal() ) ;
-		private final UIVariant colour      = new UIVariant( "COLOUR",       MalletColour.white(), new Connect.Signal() ) ;
+		private final UIVariant colour      = new UIVariant( "COLOUR",       Colour.white(), new Connect.Signal() ) ;
 		private final UIVariant uv          = new UIVariant( "UV",           new UIElement.UV( 0.0f, 0.0f, 1.0f, 1.0f ), new Connect.Signal() ) ;
 
 		public Meta()
@@ -262,9 +262,9 @@ public class GUIDraw extends GUIComponent
 			}
 		}
 
-		public void setColour( final MalletColour _colour )
+		public void setColour( final Colour _colour )
 		{
-			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			final Colour col = colour.toObject( Colour.class ) ;
 			if( _colour != null && col.equals( _colour ) == false )
 			{
 				col.changeColour( _colour.toInt() ) ;
@@ -310,9 +310,9 @@ public class GUIDraw extends GUIComponent
 			return sheet.toString() ;
 		}
 
-		public MalletColour getColour( final MalletColour _populate )
+		public Colour getColour( final Colour _populate )
 		{
-			final MalletColour col = colour.toObject( MalletColour.class ) ;
+			final Colour col = colour.toObject( Colour.class ) ;
 			_populate.changeColour( col.toInt() ) ;
 			return _populate ;
 		}

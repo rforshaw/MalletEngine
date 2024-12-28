@@ -15,7 +15,7 @@ public final class FontAssist
 	}
 
 	/**
-		Called by MalletFont constructor.
+		Called by Font constructor.
 		Create a valid font that can be used by the active 
 		rendering system.
 		
@@ -23,12 +23,12 @@ public final class FontAssist
 		@param _style Plain, Bold, Italics
 		@param _size point size
 	*/
-	public static MalletFont.Metrics createMetrics( final MalletFont _font )
+	public static Font.Metrics createMetrics( final Font _font )
 	{
 		return inter.createMetrics( _font ) ;
 	}
 
-	public static Glyph createGlyph( final MalletFont _font, final int _code ) 
+	public static Glyph createGlyph( final Font _font, final int _code ) 
 	{
 		return inter.createGlyph( _font, _code ) ;
 	}
@@ -50,8 +50,8 @@ public final class FontAssist
 
 	public interface Assist
 	{
-		public MalletFont.Metrics createMetrics( final MalletFont _font ) ;
-		public Glyph createGlyph( final MalletFont _font, final int _code ) ;
+		public Font.Metrics createMetrics( final Font _font ) ;
+		public Glyph createGlyph( final Font _font, final int _code ) ;
 		public String[] loadFont( final String _path ) ;
 	}
 }

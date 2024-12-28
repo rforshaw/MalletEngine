@@ -18,8 +18,8 @@ import com.linxonline.mallet.renderer.Program ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.TextBuffer ;
 import com.linxonline.mallet.renderer.AssetLookup ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Font ;
+import com.linxonline.mallet.renderer.Colour ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.IUniform ;
 
@@ -54,7 +54,7 @@ public final class GLTextBuffer extends GLBuffer
 	private final List<IUniform> uniforms = new ArrayList<IUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;
 
-	private final MalletColour shapeColour = new MalletColour() ;
+	private final Colour shapeColour = new Colour() ;
 	private final Vector2 uv = new Vector2() ;
 	private final Vector3 point = new Vector3() ;
 	private final Vector3 temp = new Vector3() ;
@@ -123,13 +123,13 @@ public final class GLTextBuffer extends GLBuffer
 		final IUniform uFont = program.getUniform( "inTex0" ) ;
 		if( uFont.getType() != IUniform.Type.FONT )
 		{
-			// The font passed in needs to be a MalletFont.
+			// The font passed in needs to be a Font.
 			stable = false ;
 			return stable ;
 		}
 
-		final MalletFont font = ( MalletFont )uFont ;
-		final MalletFont.Metrics metrics = font.getMetrics() ;
+		final Font font = ( Font )uFont ;
+		final Font.Metrics metrics = font.getMetrics() ;
 		final GLFont glFont = GLRenderer.getFont( font ) ;
 
 		{
@@ -215,7 +215,7 @@ public final class GLTextBuffer extends GLBuffer
 				if( shape == null )
 				{
 					// If a shape does not exist then the GLFont 
-					// needs to be recreated as the MalletFont has a 
+					// needs to be recreated as the Font has a 
 					// new glyph that is not yet represented.
 					// We need to update all text as the texture co-ordinates 
 					// used by the previously uploaded text will now be wrong.
@@ -280,8 +280,8 @@ public final class GLTextBuffer extends GLBuffer
 							case FLOAT :
 							{
 								// GLDraw colour overrides Shapes colour.
-								final MalletColour colour = draw.getColour() ;
-								final MalletColour col = ( colour != null ) ? colour : shape.getColour( j, k, shapeColour ) ;
+								final Colour colour = draw.getColour() ;
+								final Colour col = ( colour != null ) ? colour : shape.getColour( j, k, shapeColour ) ;
 								vertexBuffer.set( incrementVertex++, getABGR( col ) ) ;
 								break ;
 							}

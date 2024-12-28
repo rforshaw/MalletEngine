@@ -41,6 +41,7 @@ public final class GLDrawBuffer extends GLBuffer
 						   final AssetLookup<Storage, GLStorage> _storages )
 	{
 		final Program program = _buffer.getProgram() ;
+
 		glProgram = _programs.getRHS( program.index() ) ;
 		if( glProgram == null )
 		{

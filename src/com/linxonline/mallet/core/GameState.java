@@ -525,7 +525,7 @@ public class GameState
 			final World world = WorldAssist.getDefault() ;
 
 			final Program program = ProgramAssist.add( new Program( "SIMPLE_FONT" ) ) ;
-			program.mapUniform( "inTex0", new MalletFont( "Arial" ) ) ;
+			program.mapUniform( "inTex0", new Font( "Arial" ) ) ;
 
 			draws[0] = new TextDraw( "0" ) ;
 			draws[0].setHidden( !show ) ;

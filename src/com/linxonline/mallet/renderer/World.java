@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Texture ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.notification.Notification ;
@@ -20,12 +20,12 @@ public final class World implements IManageBuffers
 	private final Notification<World> renderNotification = new Notification<World>() ;
 
 	private final AttachmentType[] attachments ;
-	private final MalletTexture.Meta[] metas ;
+	private final Texture.Meta[] metas ;
 
 	private final List<Camera> cameras ;
 	private final List<ABuffer> buffers ;
 
-	private final MalletColour clearColour = new MalletColour( 0, 0, 0, 0 ) ;
+	private final Colour clearColour = new Colour( 0, 0, 0, 0 ) ;
 
 	public World( final String _id )
 	{
@@ -44,10 +44,10 @@ public final class World implements IManageBuffers
 		attachments = _attachments ;
 
 		final int size = attachments.length ;
-		metas = new MalletTexture.Meta[size] ;
+		metas = new Texture.Meta[size] ;
 		for( int i = 0; i < size; ++i )
 		{
-			metas[i] = new MalletTexture.Meta( id, i, 1280, 720 ) ;
+			metas[i] = new Texture.Meta( id, i, 1280, 720 ) ;
 		}
 
 		cameras = MalletList.<Camera>newList() ;
@@ -135,12 +135,12 @@ public final class World implements IManageBuffers
 		WorldAssist.update( this ) ;
 	}
 
-	public void setClearColour( final MalletColour _colour )
+	public void setClearColour( final Colour _colour )
 	{
-		clearColour.changeColour( ( _colour != null ) ? _colour : MalletColour.black() ) ;
+		clearColour.changeColour( ( _colour != null ) ? _colour : Colour.black() ) ;
 	}
 
-	public MalletColour getClearColour()
+	public Colour getClearColour()
 	{
 		return clearColour ;
 	}
@@ -161,7 +161,7 @@ public final class World implements IManageBuffers
 		return _fill ;
 	}
 
-	public MalletTexture.Meta getMeta( final int _index )
+	public Texture.Meta getMeta( final int _index )
 	{
 		return metas[_index] ;
 	}

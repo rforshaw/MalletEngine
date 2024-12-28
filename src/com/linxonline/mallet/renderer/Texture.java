@@ -11,42 +11,43 @@ import com.linxonline.mallet.maths.IntVector2 ;
 	implementations, or wait for the Renderer to load 
 	the requested texture.
 */
-public final class MalletTexture implements IUniform
+public final class Texture implements IUniform
 {
-	private final Filter minification ;
-	private final Filter magnification ;
-	private final Wrap uWrap ;
-	private final Wrap vWrap ;
 	private final Meta meta ;
 
+	private Filter minification ;
+	private Filter magnification ;
+	private Wrap uWrap ;
+	private Wrap vWrap ;
+	
 	/**
-		Construct a MalletTexture that uses a resource 
+		Construct a Texture that uses a resource 
 		from the file-system as a texture object.
 	*/
-	public MalletTexture( final String _texturePath )
+	public Texture( final String _texturePath )
 	{
 		this( _texturePath, Filter.MIP_LINEAR, Wrap.REPEAT ) ;
 	}
 
-	public MalletTexture( final String _texturePath, final Filter _filter, final Wrap _wrap )
+	public Texture( final String _texturePath, final Filter _filter, final Wrap _wrap )
 	{
 		this( TextureAssist.createMeta( _texturePath ), _filter, _wrap ) ;
 	}
 
-	public MalletTexture( final String _texturePath,
-						  final Filter _minification,
-						  final Filter _magnification,
-						  final Wrap _u,
-						  final Wrap _v )
+	public Texture( final String _texturePath,
+					final Filter _minification,
+					final Filter _magnification,
+					final Wrap _u,
+					final Wrap _v )
 	{
 		this( TextureAssist.createMeta( _texturePath ), _minification, _magnification, _u, _v ) ;
 	}
 
 	/**
-		Construct a MalletTexture that uses the World's
+		Construct a Texture that uses the World's
 		framebuffer as a texture object.
 	*/
-	public MalletTexture( final World _world )
+	public Texture( final World _world )
 	{
 		// If no attachment index is specified always use the 
 		// first attachment meta.
@@ -55,37 +56,37 @@ public final class MalletTexture implements IUniform
 	}
 
 	/**
-		Construct a MalletTexture that uses the World's
+		Construct a Texture that uses the World's
 		framebuffer as a texture object.
 	*/
-	public MalletTexture( final World _world, final int _attachmentIndex )
+	public Texture( final World _world, final int _attachmentIndex )
 	{
 		// World backbuffer is set to NEAREST REPEAT.
 		this( _world, Filter.NEAREST, _attachmentIndex ) ;
 	}
 
-	public MalletTexture( final World _world, final Filter _filter )
+	public Texture( final World _world, final Filter _filter )
 	{
 		this( _world, _filter, 0 ) ;
 	}
 
-	public MalletTexture( final World _world, final Filter _filter, final int _attachmentIndex )
+	public Texture( final World _world, final Filter _filter, final int _attachmentIndex )
 	{
 		this( _world.getMeta( _attachmentIndex ), _filter, Wrap.REPEAT ) ;
 	}
 
-	private MalletTexture( final Meta _meta,
-						   final Filter _filter,
-						   final Wrap _wrap )
+	private Texture( final Meta _meta,
+					 final Filter _filter,
+					 final Wrap _wrap )
 	{
 		this( _meta, _filter, _filter, _wrap, _wrap ) ;
 	}
 
-	private MalletTexture( final Meta _meta,
-						   final Filter _minification, 
-						   final Filter _magnification,
-						   final Wrap _u,
-						   final Wrap _v )
+	private Texture( final Meta _meta,
+					 final Filter _minification, 
+					 final Filter _magnification,
+					 final Wrap _u,
+					 final Wrap _v )
 	{
 		meta = _meta ;
 		minification = ( _minification == null ) ? Filter.MIP_LINEAR : _minification ;
@@ -94,7 +95,19 @@ public final class MalletTexture implements IUniform
 		uWrap = ( _u == null ) ? Wrap.REPEAT : _u ;
 		vWrap = ( _v == null ) ? Wrap.REPEAT : _v ;
 	}
-	
+
+	public void setFilter( final Filter _min, final Filter _mag )
+	{
+		minification = ( _min == null ) ? Filter.MIP_LINEAR : _min ;
+		magnification = ( _mag == null ) ? Filter.MIP_LINEAR : _mag ;
+	}
+
+	public void setWrap( final Wrap _u, final Wrap _v )
+	{
+		uWrap = ( _u == null ) ? Wrap.REPEAT : _u ;
+		vWrap = ( _v == null ) ? Wrap.REPEAT : _v ;
+	}
+
 	/**
 		Mallet Textures are considered equal 
 		if they share the same file path.
@@ -112,9 +125,9 @@ public final class MalletTexture implements IUniform
 			return false ;
 		}
 
-		if( _obj instanceof MalletTexture )
+		if( _obj instanceof Texture )
 		{
-			final MalletTexture rhs = ( MalletTexture )_obj ; 
+			final Texture rhs = ( Texture )_obj ; 
 			if( uWrap != rhs.uWrap || vWrap != rhs.vWrap )
 			{
 				return false ;

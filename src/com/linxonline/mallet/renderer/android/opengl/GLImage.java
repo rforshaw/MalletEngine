@@ -2,7 +2,7 @@ package com.linxonline.mallet.renderer.android.opengl ;
 
 import java.util.Arrays ;
 
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Texture ;
 import com.linxonline.mallet.io.Resource ;
 
 public final class GLImage extends Resource
@@ -25,7 +25,7 @@ public final class GLImage extends Resource
 		consumption = _consumption ;
 	}
 
-	public static int calculateMagFilter( MalletTexture.Filter _filter )
+	public static int calculateMagFilter( Texture.Filter _filter )
 	{
 		switch( _filter )
 		{
@@ -35,7 +35,7 @@ public final class GLImage extends Resource
 		}
 	}
 
-	public static int calculateMinFilter( MalletTexture.Filter _filter )
+	public static int calculateMinFilter( Texture.Filter _filter )
 	{
 		switch( _filter )
 		{
@@ -47,7 +47,7 @@ public final class GLImage extends Resource
 		}
 	}
 
-	public static int calculateWrap( MalletTexture.Wrap _wrap )
+	public static int calculateWrap( Texture.Wrap _wrap )
 	{
 		switch( _wrap )
 		{

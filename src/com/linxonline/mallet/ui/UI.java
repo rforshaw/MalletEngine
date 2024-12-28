@@ -1,6 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.renderer.MalletTexture ;
+import com.linxonline.mallet.renderer.Texture ;
 
 import com.linxonline.mallet.maths.* ;
 
@@ -122,7 +122,7 @@ public final class UI
 		Calculate the width and height covered by the uv-coordinates.
 		Apply calculation to _dim.
 	*/
-	public static void calcSubDimension( final Vector3 _dim, final MalletTexture _tex, final UIElement.UV _uv )
+	public static void calcSubDimension( final Vector3 _dim, final Texture _tex, final UIElement.UV _uv )
 	{
 		_dim.x = _tex.getSubWidth( _uv.min.x, _uv.max.x ) ;
 		_dim.y = _tex.getSubHeight( _uv.min.y, _uv.max.y ) ;

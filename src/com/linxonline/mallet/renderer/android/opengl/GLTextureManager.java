@@ -187,7 +187,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 		FileStream would need to be updated to support 
 		file modification timestamps.
 	*/
-	public MalletTexture.Meta getMeta( final String _path )
+	public Texture.Meta getMeta( final String _path )
 	{
 		return metaGenerator.getMeta( _path ) ;
 	}
@@ -247,7 +247,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 	*/
 	protected static class MetaGenerator
 	{
-		private final Map<String, MalletTexture.Meta> imageMetas = MalletMap.<String, MalletTexture.Meta>newMap() ;
+		private final Map<String, Texture.Meta> imageMetas = MalletMap.<String, Texture.Meta>newMap() ;
 
 		/**
 			Return the meta information associated with an image
@@ -260,9 +260,9 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			FileStream would need to be updated to support 
 			file modification timestamps.
 		*/
-		public synchronized MalletTexture.Meta getMeta( final String _path )
+		public synchronized Texture.Meta getMeta( final String _path )
 		{
-			MalletTexture.Meta meta = imageMetas.get( _path ) ;
+			Texture.Meta meta = imageMetas.get( _path ) ;
 			if( meta != null )
 			{
 				return meta ;
@@ -272,7 +272,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			if( file.exists() == false )
 			{
 				Logger.println( "No Texture found to create Meta: " + _path, Logger.Verbosity.NORMAL ) ;
-				return new MalletTexture.Meta( _path, 0, 0 ) ;
+				return new Texture.Meta( _path, 0, 0 ) ;
 			}
 
 			try( final AndroidByteIn in = ( AndroidByteIn )file.getByteInStream() )
@@ -293,10 +293,10 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			}
 
 			Logger.println( "Unable to create meta data: " + _path, Logger.Verbosity.NORMAL ) ;
-			return new MalletTexture.Meta( _path, 0, 0 ) ;
+			return new Texture.Meta( _path, 0, 0 ) ;
 		}
 
-		private static MalletTexture.Meta createMeta( final String _path, final InputStream _stream )
+		private static Texture.Meta createMeta( final String _path, final InputStream _stream )
 		{
 			final BitmapFactory.Options options = new BitmapFactory.Options() ;
 			options.inJustDecodeBounds = true ;
@@ -305,7 +305,7 @@ public class GLTextureManager extends AbstractManager<String, GLImage>
 			final int width = options.outWidth ;
 			final int height = options.outHeight ;
 
-			return new MalletTexture.Meta( _path, height, width ) ;
+			return new Texture.Meta( _path, height, width ) ;
 		}
 	}
 }

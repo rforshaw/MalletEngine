@@ -115,7 +115,7 @@ public class UIWrapper extends UIElement
 				final UIWrapper parent = ( UIWrapper )getParent() ;
 				sendEvent( Event.<UIWrapper>create( "DISPLAY_META", parent ) ) ;
 
-				line.setColour( MalletColour.blue() ) ;
+				line.setColour( Colour.blue() ) ;
 				parent.makeDirty() ;
 				return InputEvent.Action.CONSUME ;
 			}
@@ -126,7 +126,7 @@ public class UIWrapper extends UIElement
 			@Override
 			public void slot( final UIWrapper _parent )
 			{
-				line.setColour( MalletColour.white() ) ;
+				line.setColour( Colour.white() ) ;
 				_parent.makeDirty() ;
 			}
 		} ) ;
@@ -359,7 +359,7 @@ public class UIWrapper extends UIElement
 		protected UI.Alignment drawAlignmentX = UI.Alignment.LEFT ;
 		protected UI.Alignment drawAlignmentY = UI.Alignment.LEFT ;
 
-		private MalletColour colour = MalletColour.white() ;
+		private Colour colour = Colour.white() ;
 
 		private DrawUpdater updater ;
 		protected Draw draw = new Draw() ;
@@ -376,9 +376,9 @@ public class UIWrapper extends UIElement
 			drawAlignmentY = ( _y == null ) ? UI.Alignment.LEFT : _y ;
 		}
 
-		public void setColour( final MalletColour _colour )
+		public void setColour( final Colour _colour )
 		{
-			colour = ( _colour != null ) ? _colour : MalletColour.white() ;
+			colour = ( _colour != null ) ? _colour : Colour.white() ;
 
 			final Shape shape = ( Shape )draw.getShape() ;
 			if( shape != null )
@@ -482,7 +482,7 @@ public class UIWrapper extends UIElement
 			return drawAlignmentY ;
 		}
 
-		public MalletColour getColour()
+		public Colour getColour()
 		{
 			return colour ;
 		}

@@ -506,6 +506,27 @@ public final class ConvertBytes
 		return _b ;
 	}
 
+	public static boolean compare( final byte[] _a, final byte[] _b )
+	{
+		final int aSize = _a.length ;
+		final int bSize = _b.length ;
+
+		if( aSize != bSize )
+		{
+			return false ;
+		}
+
+		for( int i = 0; i < aSize; ++i )
+		{
+			if( _a[i] != _b[i] )
+			{
+				return false ;
+			}
+		}
+
+		return true ;
+	}
+
 	private static ByteBuffer allocate( final int _capacity, final int _endian )
 	{
 		return ByteBuffer.allocate( _capacity ).order( getByteOrder( _endian ) ) ;

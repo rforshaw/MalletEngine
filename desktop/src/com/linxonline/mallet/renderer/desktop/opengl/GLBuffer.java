@@ -6,9 +6,9 @@ import com.linxonline.mallet.maths.Matrix4 ;
 
 import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Shape ;
-import com.linxonline.mallet.renderer.MalletFont ;
-import com.linxonline.mallet.renderer.MalletTexture ;
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Font ;
+import com.linxonline.mallet.renderer.Texture ;
+import com.linxonline.mallet.renderer.Colour ;
 import com.linxonline.mallet.renderer.IUniform ;
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.renderer.Program ;
@@ -23,7 +23,7 @@ public class GLBuffer
 {
 	protected final static Matrix4 IDENTITY = new Matrix4() ;
 
-	private final static MemoryPool<Texture> TEXTURES = new MemoryPool<Texture>( () -> new Texture() ) ;
+	private final static MemoryPool<GLTexture> TEXTURES = new MemoryPool<GLTexture>( () -> new GLTexture() ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
@@ -132,12 +132,12 @@ public class GLBuffer
 		}
 	}
 
-	protected float getABGR( final MalletColour _colour )
+	protected float getABGR( final Colour _colour )
 	{
-		abgrTemp[0] = _colour.colours[MalletColour.ALPHA] ;
-		abgrTemp[1] = _colour.colours[MalletColour.BLUE] ;
-		abgrTemp[2] = _colour.colours[MalletColour.GREEN] ;
-		abgrTemp[3] = _colour.colours[MalletColour.RED] ;
+		abgrTemp[0] = _colour.colours[Colour.ALPHA] ;
+		abgrTemp[1] = _colour.colours[Colour.BLUE] ;
+		abgrTemp[2] = _colour.colours[Colour.GREEN] ;
+		abgrTemp[3] = _colour.colours[Colour.RED] ;
 
 		return ConvertBytes.toFloat( abgrTemp, 0 ) ;
 	}
@@ -303,7 +303,7 @@ public class GLBuffer
 		}
 	}
 
-	private static final class Texture implements IUniform
+	private static final class GLTexture implements IUniform
 	{
 		public GLImage image ;
 
@@ -312,9 +312,9 @@ public class GLBuffer
 		public int uWrap ;
 		public int vWrap ;
 
-		public Texture() {}
+		public GLTexture() {}
 
-		public void set( final GLImage _image, final MalletTexture _texture )
+		public void set( final GLImage _image, final Texture _texture )
 		{
 			image = _image ;
 			minFilter = GLImage.calculateMinFilter( _texture.getMinificationFilter() ) ;
@@ -324,7 +324,7 @@ public class GLBuffer
 			vWrap = GLImage.calculateWrap( _texture.getVWrap() ) ;
 		}
 
-		public void set( final GLImage _image, final MalletFont _font )
+		public void set( final GLImage _image, final Font _font )
 		{
 			image = _image ;
 

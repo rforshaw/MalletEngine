@@ -8,7 +8,7 @@ import org.teavm.jso.canvas.CanvasRenderingContext2D ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.renderer.MalletFont ;
+import com.linxonline.mallet.renderer.Font ;
 import com.linxonline.mallet.renderer.Glyph ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.maths.Vector2 ;
@@ -39,13 +39,13 @@ public class GLFontGenerator
 		_canvas.setFont( font ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
+	public Font.Metrics generateMetrics( final String _name, final int _style, final int _size, final String _characters  )
 	{
 		setCanvasFont( canvas, _name, _style, _size ) ;
 		return generateMetrics( canvas, _name, _size, _characters ) ;
 	}
 
-	public MalletFont.Metrics generateMetrics( final CanvasRenderingContext2D _canvas, final String _name, final int _size, final String _characters )
+	public Font.Metrics generateMetrics( final CanvasRenderingContext2D _canvas, final String _name, final int _size, final String _characters )
 	{
 		final int length = _characters.length() ;
 		final Glyph[] glyphs = new Glyph[length] ;
@@ -58,7 +58,7 @@ public class GLFontGenerator
 		}
 
 		final float height = getHeight( _name, _size, _characters ) ;
-		return new MalletFont.Metrics( glyphs, height,
+		return new Font.Metrics( glyphs, height,
 											   height / 2.0f,
 											   0.0f,
 											   0.0f ) ;
@@ -74,9 +74,9 @@ public class GLFontGenerator
 		return glyph ;
 	}
 
-	public Bundle generateFont( final MalletFont _font )
+	public Bundle generateFont( final Font _font )
 	{
-		final MalletFont.Metrics metrics = _font.getMetrics() ;
+		final Font.Metrics metrics = _font.getMetrics() ;
 		final Glyph[] glyphs = metrics.getGlyphs() ;
 
 		final float height = metrics.getHeight() ;

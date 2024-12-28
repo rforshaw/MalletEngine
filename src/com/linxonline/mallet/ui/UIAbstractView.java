@@ -581,7 +581,7 @@ public class UIAbstractView extends UIElement
 							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
-						else if( obj instanceof MalletColour )
+						else if( obj instanceof Colour )
 						{
 							// r, g, b, a
 							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
@@ -589,7 +589,7 @@ public class UIAbstractView extends UIElement
 							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 							hook( _layout.addElement( createNumberField() ), _layout, _model, _index ) ;
 						}
-						else if( obj instanceof MalletFont )
+						else if( obj instanceof Font )
 						{
 							// name, font size
 							hook( _layout.addElement( createTextField() ), _layout, _model, _index ) ;
@@ -747,17 +747,17 @@ public class UIAbstractView extends UIElement
 								setTextTo( getText( vLayout, 1 ), vec.y ) ;
 								setTextTo( getText( vLayout, 2 ), vec.z ) ;
 							}
-							else if( obj instanceof MalletColour )
+							else if( obj instanceof Colour )
 							{
-								final MalletColour colour = ( MalletColour )obj ;
+								final Colour colour = ( Colour )obj ;
 								setTextTo( getText( vLayout, 0 ), colour.getRed() ) ;
 								setTextTo( getText( vLayout, 1 ), colour.getGreen() ) ;
 								setTextTo( getText( vLayout, 2 ), colour.getBlue() ) ;
 								setTextTo( getText( vLayout, 3 ), colour.getAlpha() ) ;
 							}
-							else if( obj instanceof MalletFont )
+							else if( obj instanceof Font )
 							{
-								final MalletFont font = variant.toObject( MalletFont.class ) ;
+								final Font font = variant.toObject( Font.class ) ;
 								setTextTo( getText( vLayout, 0 ), font.getFontName() ) ;
 								setTextTo( getText( vLayout, 1 ), font.getPointSize() ) ;
 							}
@@ -834,9 +834,9 @@ public class UIAbstractView extends UIElement
 								variant.setVector3( x, y, z ) ;
 								signal( _model, variant ) ;
 							}
-							else if( obj instanceof MalletColour )
+							else if( obj instanceof Colour )
 							{
-								final MalletColour colour = ( MalletColour )obj ;
+								final Colour colour = ( Colour )obj ;
 								final byte r = ( byte )toInt( getText( vLayout, 0 ) ) ;
 								final byte g = ( byte )toInt( getText( vLayout, 1 ) ) ;
 								final byte b = ( byte )toInt( getText( vLayout, 2 ) ) ;
@@ -844,11 +844,11 @@ public class UIAbstractView extends UIElement
 								colour.changeColour( r, g, b, a ) ;
 								signal( _model, variant ) ;
 							}
-							else if( obj instanceof MalletFont )
+							else if( obj instanceof Font )
 							{
 								final String name = getText( vLayout, 0 ).toString() ;
 								final float size = toFloat( getText( vLayout, 1 ) ) ;
-								variant.setObject( new MalletFont( name, 12 ) ) ;
+								variant.setObject( new Font( name, 12 ) ) ;
 								signal( _model, variant ) ;
 							}
 							else if( obj instanceof UIElement.UV )

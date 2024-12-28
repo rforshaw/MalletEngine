@@ -445,7 +445,7 @@ public class HEShape implements IShape
 					}
 					case FLOAT :
 					{
-						final MalletColour colour = ( MalletColour )_data[i] ;
+						final Colour colour = ( Colour )_data[i] ;
 						data[increment++] = colour.toFloat() ;
 						break ;
 					}
@@ -460,7 +460,7 @@ public class HEShape implements IShape
 			}
 		}
 
-		public void setColour( final int _attributeIndex, final MalletColour _colour )
+		public void setColour( final int _attributeIndex, final Colour _colour )
 		{
 			final int start = attributeOffsets[_attributeIndex] ;
 			FloatBuffer.set( data, start, _colour.toFloat() ) ;

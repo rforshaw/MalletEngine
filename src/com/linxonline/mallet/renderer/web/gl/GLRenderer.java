@@ -159,13 +159,13 @@ public final class GLRenderer extends BasicRenderer
 		return new FontAssist.Assist()
 		{
 			@Override
-			public MalletFont.Metrics createMetrics( final MalletFont _font )
+			public Font.Metrics createMetrics( final Font _font )
 			{
 				return fontManager.generateMetrics( _font ) ;
 			}
 
 			@Override
-			public Glyph createGlyph( final MalletFont _font, final int _code )
+			public Glyph createGlyph( final Font _font, final int _code )
 			{
 				return fontManager.generateGlyph( _font, _code ) ;
 			}
@@ -184,7 +184,7 @@ public final class GLRenderer extends BasicRenderer
 		return new TextureAssist.Assist()
 		{
 			@Override
-			public MalletTexture.Meta createMeta( final String _path )
+			public Texture.Meta createMeta( final String _path )
 			{
 				return textures.getMeta( _path ) ;
 			}
@@ -655,9 +655,9 @@ public final class GLRenderer extends BasicRenderer
 		worlds.add( world ) ;
 	}
 
-	protected static GLImage getTexture( final MalletTexture _texture )
+	protected static GLImage getTexture( final Texture _texture )
 	{
-		final MalletTexture.Meta meta = _texture.getMeta() ;
+		final Texture.Meta meta = _texture.getMeta() ;
 		final String path = meta.getPath() ;
 
 		if( meta.getAttachmentIndex() < 0 )
@@ -676,7 +676,7 @@ public final class GLRenderer extends BasicRenderer
 		return null ;
 	}
 
-	protected static GLFont getFont( final MalletFont _font )
+	protected static GLFont getFont( final Font _font )
 	{
 		return fontManager.get( _font ) ;
 	}

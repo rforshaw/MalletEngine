@@ -11,7 +11,7 @@ import com.linxonline.mallet.io.formats.json.JArray ;
 public final class SimpleFrame implements Animation.Frame
 {
 	private final String path ; 				// Texture path
-	private final MalletTexture texture ;
+	private final Texture texture ;
 	private final float[] uv = new float[4] ;	// uv coordinates
 
 	public SimpleFrame( final String _path,
@@ -19,14 +19,14 @@ public final class SimpleFrame implements Animation.Frame
 						final float _u2, final float _v2 )
 	{
 		path = _path ;
-		texture = new MalletTexture( path ) ;
+		texture = new Texture( path ) ;
 		uv[0] = _u1 ;
 		uv[1] = _v1 ;
 		uv[2] = _u2 ;
 		uv[3] = _v2 ;
 	}
 
-	public MalletTexture getTexture()
+	public Texture getTexture()
 	{
 		return texture ;
 	}
@@ -70,10 +70,10 @@ public final class SimpleFrame implements Animation.Frame
 
 		return builder.toString() ;
 	}
-	
+
 	public final static class Generator implements AnimatorGenerator.FrameGenerator<SimpleFrame>
 	{
-		public SimpleFrame create( final List<JObject> _resources )
+		public SimpleFrame create( final String _animPath, final List<JObject> _resources )
 		{
 			final JObject resource = _resources.get( 0 ) ;
 
@@ -154,7 +154,7 @@ public final class SimpleFrame implements Animation.Frame
 			return updater ;
 		}
 
-		private void applyTexture( final MalletTexture _texture )
+		private void applyTexture( final Texture _texture )
 		{
 			if( updater != null )
 			{

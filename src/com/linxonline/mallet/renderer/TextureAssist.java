@@ -12,7 +12,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 */
 public final class TextureAssist
 {
-	private static Assist assist ;			// Platform/Render specific implementation to retreive image meta information
+	private static Assist assist ;			// Platform/Render specific implementation to retrieve image meta information
 
 	private TextureAssist() {}
 
@@ -25,7 +25,7 @@ public final class TextureAssist
 		Return the meta information associated to the 
 		texture defined at file _path.
 	*/
-	public static MalletTexture.Meta createMeta( final String _path )
+	public static Texture.Meta createMeta( final String _path )
 	{
 		return assist.createMeta( _path ) ;
 	}
@@ -69,7 +69,7 @@ public final class TextureAssist
 
 	public static interface Assist
 	{
-		public MalletTexture.Meta createMeta( final String _path ) ;
+		public Texture.Meta createMeta( final String _path ) ;
 
 		public Vector2 getMaximumTextureSize() ;
 

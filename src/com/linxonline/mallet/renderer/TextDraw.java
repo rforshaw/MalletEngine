@@ -6,7 +6,7 @@ import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-import com.linxonline.mallet.renderer.MalletColour ;
+import com.linxonline.mallet.renderer.Colour ;
 
 public final class TextDraw implements IUpdate
 {
@@ -17,7 +17,7 @@ public final class TextDraw implements IUpdate
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;
 
-	private MalletColour colour = null ;
+	private Colour colour = null ;
 
 	public TextDraw()
 	{
@@ -47,13 +47,13 @@ public final class TextDraw implements IUpdate
 		return draw.isHidden() ;
 	}
 
-	public MalletColour setColour( final MalletColour _colour )
+	public Colour setColour( final Colour _colour )
 	{
 		colour = _colour ;
 		return colour ;
 	}
 
-	public MalletColour getColour()
+	public Colour getColour()
 	{
 		return colour ;
 	}

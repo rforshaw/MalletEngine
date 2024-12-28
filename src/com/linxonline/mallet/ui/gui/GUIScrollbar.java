@@ -10,7 +10,7 @@ public class GUIScrollbar extends GUIComponent
 	private final Vector3 yLength = new Vector3() ;
 	private final Vector3 offset = new Vector3() ;			// Offset within the UIElement
 
-	private final MalletTexture sheet ;
+	private final Texture sheet ;
 	private final UIElement.UV uv ;
 
 	private final Draw xBar = new Draw() ;
@@ -19,7 +19,7 @@ public class GUIScrollbar extends GUIComponent
 	private DrawUpdater updater ;
 	private GeometryBuffer geometry ;
 
-	public GUIScrollbar( final MalletTexture _sheet, final UIElement.UV _uv, final UIList _parent )
+	public GUIScrollbar( final Texture _sheet, final UIElement.UV _uv, final UIList _parent )
 	{
 		super( UIFactory.createMeta( "GUISCROLLBAR" ), _parent ) ;
 		sheet = _sheet ;
