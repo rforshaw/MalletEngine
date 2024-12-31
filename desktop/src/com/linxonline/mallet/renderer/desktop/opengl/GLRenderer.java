@@ -850,7 +850,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 		return totalBufferUpdates ;
 	}
-	
+
 	private <T extends ABuffer> boolean updateBuffer( final T _buffer, final GLBuffer _buff )
 	{
 		switch( _buffer.getBufferType() )

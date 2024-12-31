@@ -91,28 +91,12 @@ public final class CollisionCheck
 
 		if( box1Interested == true )
 		{
-			final int index1 = _box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
-			if( index1 < ContactData.MAX_COLLISION_POINTS )
-			{
-				callback( _box1.contactData.get( index1, contact ), _box1.getCallback() ) ;
-			}
-			else
-			{
-				Logger.println( "Reached maximum contacts on hull 1", Logger.Verbosity.MINOR ) ;
-			}
+			_box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
 		}
 
 		if( box2Interested == true )
 		{
-			final int index2 = _box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
-			if( index2 < ContactData.MAX_COLLISION_POINTS )
-			{
-				callback( _box2.contactData.get( index2, contact ), _box2.getCallback() ) ;
-			}
-			else
-			{
-				Logger.println( "Reached maximum contacts on hull 2", Logger.Verbosity.MINOR ) ;
-			}
+			_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
 		}
 
 		return true ;
@@ -161,13 +145,5 @@ public final class CollisionCheck
 		final float distance = Math.abs( Vector2.multiply( _toCenter, _axis ) ) ;
 
 		return projectA + projectB - distance ;
-	}
-
-	private static void callback( final ContactPoint _point, final CollisionCallback _callback )
-	{
-		if( _callback != null )
-		{
-			_callback.collisionCallback( _point ) ;
-		}
 	}
 }

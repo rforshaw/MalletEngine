@@ -22,7 +22,7 @@ public final class GLDrawBuffer extends GLBuffer
 
 	private GLProgram glProgram ;
 	private int style = -1 ; // GL_TRIANGLES, LINES, etc...
-	
+
 	private final GLProgram.UniformState uniformState = new GLProgram.UniformState() ;
 	private final List<GLProgram.ILoadUniform> uniforms = new ArrayList<GLProgram.ILoadUniform>() ;
 	private final List<GLStorage> storages = new ArrayList<GLStorage>() ;

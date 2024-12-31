@@ -2,8 +2,6 @@ package com.linxonline.mallet.maths ;
 
 public final class Circle
 {
-	private final Vector2 temp = new Vector2() ;		// Used in intersectCircle
-
 	public final Vector2 position = new Vector2() ;
 	public float radius = 0.0f ;
 
@@ -38,9 +36,9 @@ public final class Circle
 
 	public boolean intersectCircle( final Circle _circle )
 	{
-		temp.x = Math.abs( position.x - _circle.position.x ) ;
-		temp.y = Math.abs( position.y - _circle.position.y ) ;
-		if( temp.length() <= ( _circle.radius + radius ) )
+		final float x = Math.abs( position.x - _circle.position.x ) ;
+		final float y = Math.abs( position.y - _circle.position.y ) ;
+		if( Vector2.length( x, y ) <= ( _circle.radius + radius ) )
 		{
 			return true ;
 		}
@@ -93,8 +91,6 @@ public final class Circle
 		final float max = MathUtil.max( distOP, distOQ ) ;
 		float min = MathUtil.min( distOP, distOQ ) ;
 
-		//System.out.println( "A: " + a + " B: " + b ) ;
-
 		if( a > 0.0f && b > 0.0f )
 		{
 			final float distQP = ( float )Math.sqrt( ( qpx * qpx ) + ( qpy * qpy ) ) ;
@@ -106,13 +102,10 @@ public final class Circle
 			final float acy = _qy - position.y ;
 
 			final float area = ( ( abx * acy ) - ( aby * acx ) ) / 2.0f ;
-			//final float area = ( ( opx * oqy ) - ( opy * oqx ) ) / 2.0f ;
-			//System.out.println( "Area: " + area + " " + distQP ) ;
 
 			min = 2.0f * area / distQP ;
 		}
 
-		//System.out.println( "Min: " + min + " Max: " + max ) ;
 		return min >= 0.0f && min <= radius && max >= radius ;
 	}
 

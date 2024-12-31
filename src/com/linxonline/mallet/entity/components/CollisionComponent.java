@@ -8,7 +8,6 @@ import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.physics.CollisionAssist ;
-import com.linxonline.mallet.physics.CollisionCallback ;
 import com.linxonline.mallet.physics.ContactPoint ;
 import com.linxonline.mallet.physics.Hull ;
 import com.linxonline.mallet.physics.Box2D ;
@@ -16,10 +15,8 @@ import com.linxonline.mallet.physics.Box2D ;
 public class CollisionComponent extends Component
 {
 	public final Hull[] hulls ;
-	private boolean applyContact = true ;
 
-	private ContactPoint point ;
-	private Vector2 penShift ;
+	protected final ContactPoint point = new ContactPoint() ;
 
 	public CollisionComponent( final Entity _parent, final Hull ... _hulls )
 	{
@@ -34,21 +31,6 @@ public class CollisionComponent extends Component
 		hulls = _hulls ;
 	}
 
-	/**
-		Update the hulls position to take into account 
-		contact data, using the penetration depth shift 
-		the hull so it no longer collides with other objects.
-	*/
-	public void applyContact( final boolean _apply )
-	{
-		applyContact = _apply ;
-	}
-
-	public void setCollisionCallback( final int _index, final CollisionCallback _callback )
-	{
-		hulls[_index].setCollisionCallback( _callback ) ;
-	}
-
 	@Override
 	public void readyToDestroy( final Entity.ReadyCallback _callback )
 	{
@@ -60,30 +42,34 @@ public class CollisionComponent extends Component
 	public void update( final float _dt )
 	{
 		super.update( _dt ) ;
-		if( applyContact == false )
-		{
-			return ;
-		}
-
-		if( point == null )
-		{
-			point = new ContactPoint() ;
-			penShift = new Vector2() ;
-		}
 
 		// Shift the hulls position by the penetration depth.
 		for( int i = 0; i < hulls.length; ++i )
 		{
-			penShift.setXY( 0.0f, 0.0f ) ;
 			final Hull hull = hulls[i] ;
-			Hull.calculatePenetrationDepth( hull.contactData, point, penShift ) ;
-			hull.addToPosition( penShift.x, penShift.y ) ;
+
+			final int size = hull.contactData.size() ;
+			for( int j = 0; j < size; ++j )
+			{
+				hull.contactData.get( j, point ) ;
+				applyContactPoint( hull, point ) ;
+			}
 		}
 	}
 
-	public void setRotate( final int _index, final float _theta )
+	public void applyContactPoint( final Hull _hull, final ContactPoint _point )
 	{
-		hulls[_index].setRotation( _theta ) ;
+		if( point.physical )
+		{
+			final float x = point.contactNormalX * point.penetration ;
+			final float y = point.contactNormalY * point.penetration ;
+			_hull.addToPosition( x, y ) ;
+		}
+	}
+
+	public static CollisionComponent createWithNoShift( final Entity _parent, final Hull ... _hulls )
+	{
+		return new NoShiftCollisionComponent( _parent, _hulls ) ;
 	}
 
 	public static CollisionComponent generateBox2D( final Entity _parent,
@@ -113,5 +99,16 @@ public class CollisionComponent extends Component
 
 		final CollisionComponent comp = new CollisionComponent( _parent, _allow, hull ) ;
 		return comp ;
+	}
+
+	private static final class NoShiftCollisionComponent extends CollisionComponent
+	{
+		public NoShiftCollisionComponent( final Entity _parent, final Hull ... _hulls )
+		{
+			super( _parent, _hulls ) ;
+		}
+
+		@Override
+		public void applyContactPoint( final Hull _hull, final ContactPoint _point ) {}
 	}
 }

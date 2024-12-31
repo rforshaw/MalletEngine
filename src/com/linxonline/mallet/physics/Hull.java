@@ -24,7 +24,6 @@ public abstract class Hull
 
 	protected boolean collidable = true ; 							// Allows hull to produce Collision Data.
 	protected boolean physical = true ; 							// Allows hull to be affected by a Collision
-	protected CollisionCallback callback = null ;					// Allows Owner to be informed of Collisions
 
 	protected final float[] position = new float[( 2 * VECTOR_TYPE ) + 1] ;
 
@@ -38,32 +37,9 @@ public abstract class Hull
 		setOffset( _offsetX, _offsetY ) ;
 	}
 
-	/**
-		Iterate over the contact points and accumulate the overall 
-		penetration depth and direction. 
-	*/
-	public static void calculatePenetrationDepth( final ContactData _contacts, final ContactPoint _point, final Vector2 _accumulatedPenetration )
-	{
-		final int size = _contacts.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			_contacts.get( i, _point ) ;
-			if( _point.physical == true )
-			{
-				_accumulatedPenetration.x += _point.contactNormalX * _point.penetration ;
-				_accumulatedPenetration.y += _point.contactNormalY * _point.penetration ;
-			}
-		}
-	}
-
 	public final void setGroupID( final int _groupID )
 	{
 		groupID = _groupID ;
-	}
-
-	public final void setCollisionCallback( final CollisionCallback _callback )
-	{
-		callback = _callback ;
 	}
 
 	public void setPosition( final float _x, final float _y )
@@ -173,11 +149,6 @@ public abstract class Hull
 		}
 	
 		return isCollidableWithGroup( _groupID, collidableGroups ) ;
-	}
-
-	public final CollisionCallback getCallback()
-	{
-		return callback ;
 	}
 
 	public final void setParent( final Object _parent )

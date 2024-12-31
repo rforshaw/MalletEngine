@@ -165,6 +165,15 @@ public final class TextureArray implements IUniform
 		}
 
 		final TextureArray t = ( TextureArray )_obj ;
+		if( uWrap != t.uWrap || vWrap != t.vWrap )
+		{
+			return false ;
+		}
+		else if( minification != t.minification || magnification != t.magnification )
+		{
+			return false ;
+		}
+
 		return ConvertBytes.compare( checksum, t.checksum ) ;
 	}
 

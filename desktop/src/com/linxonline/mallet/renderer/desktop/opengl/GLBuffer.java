@@ -16,14 +16,11 @@ import com.linxonline.mallet.renderer.Attribute ;
 import com.linxonline.mallet.renderer.Operation ;
 import com.linxonline.mallet.renderer.Action ;
 
-import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 
 public class GLBuffer
 {
 	protected final static Matrix4 IDENTITY = new Matrix4() ;
-
-	private final static MemoryPool<GLTexture> TEXTURES = new MemoryPool<GLTexture>( () -> new GLTexture() ) ;
 
 	public final static int PRIMITIVE_RESTART_INDEX = 0xFFFFFF ;
 	public final static int PRIMITIVE_EXPANSION = 1 ;
@@ -300,50 +297,6 @@ public class GLBuffer
 			buffer.append( offset ) ;
 
 			return buffer.toString() ;
-		}
-	}
-
-	private static final class GLTexture implements IUniform
-	{
-		public GLImage image ;
-
-		public int minFilter ;
-		public int magFilter ;
-		public int uWrap ;
-		public int vWrap ;
-
-		public GLTexture() {}
-
-		public void set( final GLImage _image, final Texture _texture )
-		{
-			image = _image ;
-			minFilter = GLImage.calculateMinFilter( _texture.getMinificationFilter() ) ;
-			magFilter = GLImage.calculateMagFilter( _texture.getMaxificationFilter() ) ;
-
-			uWrap = GLImage.calculateWrap( _texture.getUWrap() ) ;
-			vWrap = GLImage.calculateWrap( _texture.getVWrap() ) ;
-		}
-
-		public void set( final GLImage _image, final Font _font )
-		{
-			image = _image ;
-
-			minFilter = MGL.GL_LINEAR ;
-			magFilter = MGL.GL_LINEAR ;
-
-			uWrap = MGL.GL_CLAMP_TO_EDGE ;
-			vWrap = MGL.GL_REPEAT ;
-		}
-
-		@Override
-		public IUniform.Type getType()
-		{
-			return IUniform.Type.SAMPLER2D ;
-		}
-
-		public void reset()
-		{
-			image = null ;
 		}
 	}
 }

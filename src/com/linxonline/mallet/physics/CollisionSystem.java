@@ -32,19 +32,7 @@ public final class CollisionSystem
 		updateExecutions() ;
 
 		treeHulls.clear() ;
-
-		int collisions = 0 ;
-		final int size = hulls.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final Hull hull = hulls.get( i ) ;
-			final ContactData contact = hull.contactData ;
-			collisions += contact.size() ;
-
-			contact.reset() ;
-			treeHulls.insertHull( hull ) ;
-		}
-
+		treeHulls.insertHulls( hulls ) ;
 		treeHulls.update( _dt ) ;
 	}
 

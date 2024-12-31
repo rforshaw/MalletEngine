@@ -207,7 +207,7 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 							ByteBuffer.wrap( convertToFormat( image, imageFormat ) ) ) ;
 		}
 
-		return new GLImage( id, consumption ) ;
+		return GLImage.create( id, consumption ) ;
 	}
 
 	public GLImage createGLImage( final BufferedImage[][] _images )
@@ -268,7 +268,7 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 							buffer ) ;
 		}
 
-		return new GLImage( id, consumption ) ;
+		return GLImage.create( id, consumption ) ;
 	}
 
 	/**

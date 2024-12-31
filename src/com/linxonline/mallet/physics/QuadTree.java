@@ -4,6 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Parallel ;
+import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
@@ -14,12 +15,13 @@ public final class QuadTree
 {
 	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
 
+	private final List<Hull> failed = MalletList.<Hull>newList() ;
+	private final IUpdate update ;
+
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
 
 	private float ROOT_LENGTH ;
-
-	private final IUpdate update ;
 
 	private enum Quadrant
 	{
@@ -34,7 +36,7 @@ public final class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 2000.0f, 256.0f, 100 ) ;
+		this( 0.0f, 0.0f, 2000.0f, 128.0f, 100 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -64,15 +66,43 @@ public final class QuadTree
 					return ;
 				}
 
+				//System.out.println( "Nodes: " + children.size() ) ;
 				worker.setDeltaTime( _dt ) ;
 
-				Parallel.forEach( children, worker ) ;
+				Parallel.forEach( children, 10, worker ) ;
 				children.clear() ;
 			}
 		} ;
 	}
 
-	public void insertHull( final Hull _hull )
+	public void insertHulls( final List<Hull> _hulls )
+	{
+		Parallel.forBatch( _hulls, 1000, ( final int _start, final int _end, final List<Hull> _h ) ->
+		{
+			for( int i = _start; i < _end; ++i )
+			{
+				final Hull hull = _h.get( i ) ;
+				hull.contactData.reset() ;
+
+				if( !root.insertHullFast( hull ) )
+				{
+					synchronized( failed )
+					{
+						failed.add( hull ) ;
+					}
+				}
+			}
+		} ) ;
+
+		final int size = failed.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			insertHull( failed.get( i ) ) ;
+		}
+		failed.clear() ;
+	}
+
+	private void insertHull( final Hull _hull )
 	{
 		while( root.insertHull( _hull ) == false )
 		{
@@ -118,21 +148,20 @@ public final class QuadTree
 
 	protected final class QuadNode
 	{
+		private final Object lock = new Object() ;
 		private final Vector2 centre = new Vector2() ;
 
 		private CollisionCheck check = new CollisionCheck() ;
 		private Hull[] hulls = new Hull[MAX_HULLS] ;
-		private float length ;
 
 		private QuadNode topLeft ;
 		private QuadNode topRight ;
 		private QuadNode bottomLeft ;
 		private QuadNode bottomRight ;
 
-		private boolean parent = false ;
+		private float length ;
 		private int nextHull = 0 ;
-
-		private final Vector2 absolute = new Vector2() ;		// Used by insertToQuadrant() - Android optimisation
+		private boolean parent = false ;
 
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
@@ -208,7 +237,30 @@ public final class QuadTree
 			return best ;
 		}
 
-		
+		public boolean insertHullFast( final Hull _hull )
+		{
+			if( parent == true )
+			{
+				// A parent node should not contain 
+				// any hulls, only children should.
+				return insertToQuadrantFast( _hull ) ;
+			}
+
+			synchronized( lock )
+			{
+				if( nextHull < hulls.length )
+				{
+					// We assume the check to see if the 
+					// hull already exists within this node has 
+					// been called.
+					hulls[nextHull++] = _hull ;
+					return true ;
+				}
+			}
+
+			return false ;
+		}
+
 		/**
 			Insert the hull into the node or one 
 			of the nodes child nodes.
@@ -229,7 +281,6 @@ public final class QuadTree
 				// We assume the check to see if the 
 				// hull already exists within this node has 
 				// been called.
-				//System.out.println( "Inserting hull at " + nextHull + " Hull: " + _hull ) ;
 				hulls[nextHull++] = _hull ;
 				return true ;
 			}
@@ -244,7 +295,7 @@ public final class QuadTree
 				if( createChildren() == false )
 				{
 					// It will reach a point in which dividing the 
-					// Quad Tree will provide no benifit, and we will 
+					// Quad Tree will provide no benefit, and we will 
 					// just need to increase the maximum amount of hulls
 					// the node can contain.
 					expandHullCapacity() ;
@@ -369,6 +420,7 @@ public final class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
+			//System.out.println( "Hulls: " + nextHull ) ;
 			for( int i = 0; i < nextHull; ++i )
 			{
 				//final int index = nextHull - 1 ;
@@ -459,13 +511,15 @@ public final class QuadTree
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
 
+			final Vector2 absolute = new Vector2() ;
+
 			final float[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i += 2 )
 			{
 				_hull.getPosition( absolute ) ;
 				absolute.add( points[i], points[i + 1] ) ;
 
-				// It is possible for a hulls points to 
+				// It is possible for a hull's points to 
 				// go beyond the current scope of the tree,
 				// in this case we must expand the tree
 				if( needsExpansion( absolute ) == true )
@@ -528,6 +582,109 @@ public final class QuadTree
 						break ;
 					}
 				}
+
+				if( added >= 4 )
+				{
+					return true ;
+				}
+			}
+
+			return added > 0 ;
+		}
+
+		private boolean insertToQuadrantFast( final Hull _hull )
+		{
+			int added = 0 ;
+
+			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
+			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
+			// have the hull stored within it once.
+			// Once the hull has been added to the 
+			// appropriate node, then we should not attempt 
+			// to insert the hull again.
+			// Inserting the hull is costly, and should 
+			// only be done, if it isn't there already.
+			boolean usedTopLeft = false ;
+			boolean usedTopRight = false ;
+			boolean usedBottomLeft = false ;
+			boolean usedBottomRight = false ;
+
+			final Vector2 absolute = new Vector2() ;
+
+			final float[] points = _hull.getPoints() ;
+			for( int i = 0; i < points.length; i += 2 )
+			{
+				_hull.getPosition( absolute ) ;
+				absolute.add( points[i], points[i + 1] ) ;
+
+				// It is possible for a hull's points to 
+				// go beyond the current scope of the tree,
+				// in this case we must expand the tree
+				if( needsExpansion( absolute ) == true )
+				{
+					return false ;
+				}
+
+				// Find out what quadrant the hull should reside in
+				// A hull could potentially be in multiple 
+				// quadrants, as a hulls points may cross 
+				// quadrant boundaries.
+				switch( findQuadrant( absolute, centre ) )
+				{
+					case TOP_LEFT     :
+					{
+						if( usedTopLeft == false )
+						{
+							usedTopLeft = true ;
+							if( topLeft.insertHullFast( _hull ) == true )
+							{
+								++added ;
+							}
+						}
+						break ;
+					}
+					case TOP_RIGHT    :
+					{
+						if( usedTopRight == false )
+						{
+							usedTopRight = true ;
+							if( topRight.insertHullFast( _hull ) == true )
+							{
+								++added ;
+							}
+						}
+						break ;
+					}
+					case BOTTOM_LEFT  :
+					{
+						if( usedBottomLeft == false )
+						{
+							usedBottomLeft = true ;
+							if( bottomLeft.insertHullFast( _hull ) == true )
+							{
+								++added ;
+							}
+						}
+						break ;
+					}
+					case BOTTOM_RIGHT :
+					{
+						if( usedBottomRight == false )
+						{
+							usedBottomRight = true ;
+							if( bottomRight.insertHullFast( _hull ) == true )
+							{
+								++added ;
+							}
+						}
+						break ;
+					}
+				}
+
+				if( added >= 4 )
+				{
+					return true ;
+				}
 			}
 
 			return added > 0 ;
@@ -547,6 +704,8 @@ public final class QuadTree
 			boolean usedTopRight = false ;
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
+
+			final Vector2 absolute = new Vector2() ;
 
 			final float[] points = _hull.getPoints() ;
 			for( int i = 0; i < points.length; i += 2 )

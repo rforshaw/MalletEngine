@@ -5,6 +5,7 @@ import java.util.concurrent.* ;
 import java.util.concurrent.atomic.AtomicInteger ;
 
 import com.linxonline.mallet.util.caches.MemoryPool ;
+import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /**
 	Assist with the processing of large data-sets
@@ -27,7 +28,7 @@ public final class Parallel
 	private static AtomicInteger available = new AtomicInteger( 0 ) ;
 	static
 	{
-		createWorkers( 4 ) ;
+		createWorkers( 6 ) ;
 	}
 
 	private Parallel() {}

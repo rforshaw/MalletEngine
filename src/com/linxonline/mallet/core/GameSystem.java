@@ -10,7 +10,7 @@ import com.linxonline.mallet.util.Debounce ;
 /**
 	Used by Dektop and Android.
 */
-public class GameSystem implements IGameSystem
+public final class GameSystem implements IGameSystem
 {
 	private final List<GameState> states = MalletList.<GameState>newList() ;
 	private GameState currentState = null ;

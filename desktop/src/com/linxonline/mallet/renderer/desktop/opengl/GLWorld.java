@@ -176,7 +176,7 @@ public class GLWorld
 			final long estimatedConsumption = ( long )( render.x * render.y ) * ( long )( channel * 8 ) ;
 			final int offset = _index + 1 ;		// skip the framebuffer id
 			//System.out.println( "Buffer ID: " + buffers[offset] ) ;
-			final GLImage buffer = new GLImage( buffers[offset], estimatedConsumption ) ;
+			final GLImage buffer = GLImage.create( buffers[offset], estimatedConsumption ) ;
 			backBuffers[_index] = buffer ;
 		}
 

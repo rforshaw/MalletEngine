@@ -18,15 +18,20 @@ public final class GLImage extends Resource
 		are most suitable for destruction if memory 
 		availability becomes an issue.
 	*/
-	public GLImage( final int _textureID, final long _consumption )
-	{
-		this( new int[] { _textureID }, _consumption ) ;
-	}
-
-	public GLImage( final int[] _ids, final long _consumption )
+	private GLImage( final int[] _ids, final long _consumption )
 	{
 		textureIDs = _ids ;
 		consumption = _consumption ;
+	}
+
+	public static GLImage create( final int _textureID, final long _consumption )
+	{
+		return create( new int[] { _textureID }, _consumption ) ;
+	}
+
+	public static GLImage create( final int[] _textureIDs, final long _consumption )
+	{
+		return new GLImage( _textureIDs, _consumption ) ;
 	}
 
 	public static int calculateMagFilter( Texture.Filter _filter )

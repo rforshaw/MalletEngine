@@ -14,7 +14,6 @@ import com.linxonline.mallet.util.Parallel ;
 public final class ECSCollision implements IECS<ECSCollision.Component>
 {
 	private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
-	private final static MemoryPool<Vector2> vec2s = new MemoryPool<Vector2>( () -> new Vector2() ) ;
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
@@ -88,11 +87,23 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		runnables.clear() ;
 	}
 
-	private static void updateCollision( final Hull _hull, final ContactPoint _point, final Vector2 _penShift )
+	private static void updateCollision( final Hull _hull, final ContactPoint _point )
 	{
-		_penShift.setXY( 0.0f, 0.0f ) ;
-		Hull.calculatePenetrationDepth( _hull.contactData, _point, _penShift ) ;
-		_hull.addToPosition( _penShift.x, _penShift.y ) ;
+		float x = 0.0f ;
+		float y = 0.0f ;
+
+		final int size = _hull.contactData.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			_hull.contactData.get( i, _point ) ;
+			if( _point.physical == true )
+			{
+				x += _point.contactNormalX * _point.penetration ;
+				y += _point.contactNormalY * _point.penetration ;
+			}
+		}
+
+		_hull.addToPosition( x, y ) ;
 	}
 
 	public static final class Component extends ECSEntity.Component
@@ -172,7 +183,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 			final int batchSize = 1000 ;
 
 			final ContactPoint point = contacts.takeSync() ;
-			final Vector2 penShift = vec2s.takeSync() ;
 
 			for( int i = _start; i < _end; ++i )
 			{
@@ -198,12 +208,11 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 				// so there is no point spinning them onto their own worker.
 				for( int j = 0; j < size; ++j )
 				{
-					ECSCollision.updateCollision( hulls[j], point, penShift ) ;
+					ECSCollision.updateCollision( hulls[j], point ) ;
 				}
 			}
 
 			contacts.reclaimSync( point ) ;
-			vec2s.reclaimSync( penShift ) ;
 		}
 	}
 
@@ -213,15 +222,13 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{
 			final ContactPoint point = contacts.takeSync() ;
-			final Vector2 penShift = vec2s.takeSync() ;
 
 			for( int i = _start; i < _end; ++i )
 			{
-				ECSCollision.updateCollision( _hulls[i], point, penShift ) ;
+				ECSCollision.updateCollision( _hulls[i], point ) ;
 			}
 
 			contacts.reclaimSync( point ) ;
-			vec2s.reclaimSync( penShift ) ;
 		}
 	}
 }

@@ -32,7 +32,7 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 
 	/**
 		Convience function to reupload all associated GeometryBuffers.
-		NOTE: This does not reupload the DrawBuffer.
+		NOTE: This does not re-upload the DrawBuffer.
 	*/
 	public void forceUpdate()
 	{
