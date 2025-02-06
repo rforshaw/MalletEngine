@@ -5,13 +5,17 @@ package com.linxonline.mallet.renderer ;
 	values into a uniform.
 	See Matrix4, Vector2, Vector3 for examples.
 */
-public abstract class FloatUniform implements IUniform
+public final class FloatUniform implements IUniform
 {
-	public abstract int fill( int _offset, final float[] _fill ) ;
+	private float value ;
 
-	@Override
-	public final IUniform.Type getType()
+	public FloatUniform( final float _value )
 	{
-		return IUniform.Type.FLOAT32 ;
+		value = _value ;
+	}
+
+	public float getState()
+	{
+		return value ;
 	}
 }

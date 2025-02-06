@@ -1,8 +1,8 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.renderer.IntUniform ;
+import com.linxonline.mallet.renderer.IUniform ;
 
-public final class IntVector3 extends IntUniform
+public final class IntVector3 implements IUniform
 {
 	public int x ;
 	public int y ;
@@ -165,15 +165,6 @@ public final class IntVector3 extends IntUniform
 	public String toString()
 	{
 		return "X:" + x + " Y: " + y + " Z: " + z ;
-	}
-
-	@Override
-	public int fill( int _offset, final int[] _fill )
-	{
-		_fill[_offset] = x ;
-		_fill[++_offset] = y ;
-		_fill[++_offset] = z ;
-		return 3 ;
 	}
 
 	public static final IntVector3 add( final IntVector3 _vec1, final IntVector3 _vec2 )

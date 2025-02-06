@@ -11,13 +11,6 @@ public final class ArrayUniform implements IUniform
 
 	public boolean set( final int _i, final IUniform _uniform )
 	{
-		if( IUniform.Type.validate( _uniform ) == false )
-		{
-			// Only certain classes that implement IUniform
-			// are considered valid.
-			return false ;
-		}
-
 		uniforms[_i] = _uniform ;
 		return true ;
 	}
@@ -32,7 +25,7 @@ public final class ArrayUniform implements IUniform
 		return uniforms.length ;
 	}
 
-	public void forEach( final String _prefix, final IEach _func )
+	public boolean forEach( final String _prefix, final IEach _func )
 	{
 		final StringBuilder builder = new StringBuilder() ;
 
@@ -47,32 +40,31 @@ public final class ArrayUniform implements IUniform
 
 			final IUniform uniform = uniforms[i] ;
 
-			switch( uniform.getType() )
+			final boolean success = switch( uniform )
 			{
-				default     :
+				case StructUniform su ->
+				{
+					builder.append( '.' ) ;
+					yield su.forEach( builder.toString(), _func ) ;
+				}
+				case ArrayUniform au ->
+				{
+					yield au.forEach( builder.toString(), _func ) ;
+				}
+				default ->
 				{
 					final String absoluteName = builder.toString() ;
 					_func.each( absoluteName, uniform ) ;
-					break ;
+					yield true ;
 				}
-				case STRUCT :
-				{
-					builder.append( '.' ) ;
-					( ( StructUniform )uniform ).forEach( builder.toString(), _func ) ;
-					break ;
-				}
-				case ARRAY  :
-				{
-					( ( ArrayUniform )uniform ).forEach( builder.toString(), _func ) ;
-					break ;
-				}
+			} ;
+
+			if( !success )
+			{
+				return false ;
 			}
 		}
-	}
 
-	@Override
-	public final IUniform.Type getType()
-	{
-		return IUniform.Type.ARRAY ;
+		return true ;
 	}
 }

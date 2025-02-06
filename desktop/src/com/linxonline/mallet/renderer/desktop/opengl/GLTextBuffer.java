@@ -120,7 +120,7 @@ public final class GLTextBuffer extends GLBuffer
 		GLTextBuffer.generateStorages( glProgram, program, _storages, storages ) ;
 
 		final IUniform uFont = program.getUniform( "inTex0" ) ;
-		if( uFont.getType() != IUniform.Type.FONT )
+		if( !( uFont instanceof Font ) )
 		{
 			// The font passed in needs to be a Font.
 			stable = false ;

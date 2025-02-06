@@ -1,6 +1,9 @@
 resources/base/music/*
 android/.idea/*
-desktop/*
+desktop/build/*
+desktop/MalletEditor/*
+desktop/MalletEngine/*
+desktop/target/*
 build/*
 libs/*
 web/target

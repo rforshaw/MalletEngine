@@ -970,7 +970,6 @@ public final class GameTestLoader implements IGameLoader
 		public void update( final float _dt )
 		{
 			Parallel.forBatch( collision.getHulls(), 1000, this::updateDraws ) ;
-			updater.makeDirty() ;
 
 			/*acc += _dt ;
 			if( acc >= 15.0f )
@@ -983,13 +982,31 @@ public final class GameTestLoader implements IGameLoader
 		{
 			final Vector2 position = vec2s.takeSync() ;
 
+			int contact = 0 ;
+
 			for( int i = _start; i < _end; ++i )
 			{
 				final Hull hull = _hulls[i] ;
+				if( hull.contactData.size() <= 0 )
+				{
+					// If there has been no collisions then
+					// they'll be no movement.
+					continue ;
+				}
+
+				++contact ;
 				final Draw draw = draws[i] ;
 
 				hull.getPosition( position ) ;
 				draw.setPosition( position.x, position.y, 0.0f ) ;
+			}
+
+			if( contact > 0 )
+			{
+				synchronized( updater )
+				{
+					updater.makeDirty() ;
+				}
 			}
 
 			vec2s.reclaimSync( position ) ;

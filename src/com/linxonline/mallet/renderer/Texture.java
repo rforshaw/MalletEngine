@@ -224,12 +224,6 @@ public final class Texture implements IUniform
 	}
 
 	@Override
-	public IUniform.Type getType()
-	{
-		return IUniform.Type.SAMPLER2D ;
-	}
-
-	@Override
 	public String toString()
 	{
 		return meta.toString() ;

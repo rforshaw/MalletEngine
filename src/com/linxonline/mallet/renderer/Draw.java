@@ -117,15 +117,18 @@ public final class Draw implements IUpdate
 
 	public boolean addUniform( final String _handler, final IUniform _uniform )
 	{
-		switch( _uniform.getType() )
+		final boolean success = switch( _uniform )
 		{
-			case STRUCT :
-			case ARRAY  :
-			{
-				// We don't want to support complex structures
-				// while using uniforms on draw objects.
-				return false ;
-			}
+			// We don't want to support complex structures
+			// while using uniforms on draw objects.
+			case StructUniform su -> false ;
+			case ArrayUniform au -> false ;
+			default -> true ;
+		} ;
+
+		if( !success )
+		{
+			return false ;
 		}
 
 		if( uniforms == null )

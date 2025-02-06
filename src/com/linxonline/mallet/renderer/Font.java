@@ -186,12 +186,6 @@ public final class Font implements IUniform
 		return "Font: " + name ;
 	}
 
-	@Override
-	public IUniform.Type getType()
-	{
-		return IUniform.Type.FONT ;
-	}
-
 	public static final class Metrics
 	{
 		private Font parent ;

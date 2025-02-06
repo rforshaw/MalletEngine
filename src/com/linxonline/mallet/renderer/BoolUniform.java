@@ -13,10 +13,4 @@ public final class BoolUniform implements IUniform
 	{
 		return bool ;
 	}
-
-	@Override
-	public IUniform.Type getType()
-	{
-		return IUniform.Type.BOOL ;
-	}
 }

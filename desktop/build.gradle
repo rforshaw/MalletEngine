@@ -10,8 +10,8 @@ subprojects {
 	plugins.withType(JavaPlugin).configureEach {
 		java {
 			modularity.inferModulePath = true
-			sourceCompatibility = JavaVersion.VERSION_16
-			targetCompatibility = JavaVersion.VERSION_16
+			sourceCompatibility = JavaVersion.VERSION_21
+			targetCompatibility = JavaVersion.VERSION_21
 		}
 	}
 }
@@ -36,6 +36,15 @@ project( ':MalletEngine' ) {
 
 	clean {
 		delete += fileTree( '../../TemplateProject/desktop' ).include( '**/*' )
+	}
+
+	compileJava {
+		doFirst {
+			options.compilerArgs += [
+					'--module-path', classpath.asPath
+			]
+			classpath = files()
+		}
 	}
 
 	tasks.withType( JavaCompile ) {

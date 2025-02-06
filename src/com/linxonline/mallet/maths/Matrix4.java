@@ -2,12 +2,12 @@ package com.linxonline.mallet.maths ;
 
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
-import com.linxonline.mallet.renderer.FloatUniform ;
+import com.linxonline.mallet.renderer.IUniform ;
 
 /**
 	Designed for 3D transformations.
 */
-public final class Matrix4 extends FloatUniform
+public final class Matrix4 implements IUniform
 {
 	private static final float[] IDENTITY = new float[]
 	{
@@ -443,12 +443,6 @@ public final class Matrix4 extends FloatUniform
 		final String row3 = "[" + matrix[8] +  "|" + matrix[9] +  "|" + matrix[10]  + "|" + matrix[11] + "]\n" ;
 		final String row4 = "[" + matrix[12] + "|" + matrix[13] + "|" + matrix[14]  + "|" + matrix[15] + "]" ;
 		return row1 + row2 + row3 + row4 ;
-	}
-
-	public int fill( final int _offset, final float[] _fill )
-	{
-		System.arraycopy( matrix, 0, _fill, _offset, matrix.length ) ;
-		return matrix.length ;
 	}
 
 	private void setRow( final float _val1, final float _val2, final float _val3, final float _val4, final int _row )

@@ -1,10 +1,11 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
+import java.nio.ByteOrder ;
+import java.nio.ByteBuffer ;
+
 import com.linxonline.mallet.renderer.Storage ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
-
-import com.jogamp.common.nio.Buffers ;
 
 public final class GLStorage implements Storage.ISerialise
 {
@@ -27,7 +28,11 @@ public final class GLStorage implements Storage.ISerialise
 
 		MGL.glGenBuffers( id.length, id, 0 ) ;
 
-		buffer = Buffers.newDirectFloatBuffer( lengthInFloats ) ;
+		final ByteBuffer buf = ByteBuffer.allocateDirect( lengthInBytes ) ;
+		buf.order( ByteOrder.nativeOrder() ) ;
+
+		buffer = buf.asFloatBuffer() ;
+
 		upload( _storage, front ) ;
 	}
 
@@ -58,7 +63,10 @@ public final class GLStorage implements Storage.ISerialise
 
 		if( buffer.capacity() < lengthInFloats )
 		{
-			buffer = Buffers.newDirectFloatBuffer( lengthInFloats ) ;
+			final ByteBuffer buf = ByteBuffer.allocateDirect( lengthInBytes ) ;
+			buf.order( ByteOrder.nativeOrder() ) ;
+
+			buffer = buf.asFloatBuffer() ;
 		}
 
 		data.serialise( this ) ;

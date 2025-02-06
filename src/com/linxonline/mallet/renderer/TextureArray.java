@@ -130,12 +130,6 @@ public final class TextureArray implements IUniform
 		return magnification ;
 	}
 
-	@Override
-	public IUniform.Type getType()
-	{
-		return IUniform.Type.SAMPLER2D_ARRAY ;
-	}
-
 	public int getDepth()
 	{
 		return layers.length ;

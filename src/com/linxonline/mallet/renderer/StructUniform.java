@@ -41,13 +41,6 @@ public final class StructUniform implements IUniform
 			return false ;
 		}
 
-		if( IUniform.Type.validate( _uniform ) == false )
-		{
-			// Only certain classes that implement IUniform
-			// are considered valid.
-			return false ;
-		}
-
 		if( found != null )
 		{
 			found.uniform =_uniform ;
@@ -68,13 +61,6 @@ public final class StructUniform implements IUniform
 		if( _handler == null || _uniform == null )
 		{
 			// The id or value cannot be null
-			return false ;
-		}
-
-		if( IUniform.Type.validate( _uniform ) == false )
-		{
-			// Only certain classes that implement IUniform
-			// are considered valid.
 			return false ;
 		}
 
@@ -117,28 +103,33 @@ public final class StructUniform implements IUniform
 			builder.append( pair.name ) ;
 			final IUniform uniform = pair.uniform ;
 
-			switch( uniform.getType() )
+			final boolean success = switch( uniform )
 			{
-				default     :
+				case StructUniform su ->
+				{
+					builder.append( '.' ) ;
+					yield su.forEach( builder.toString(), _func ) ;
+				}
+				case ArrayUniform au ->
+				{
+					au.forEach( builder.toString(), _func ) ;
+					yield true ;
+				}
+				default ->
 				{
 					final String absoluteName = builder.toString() ;
 					if( _func.each( absoluteName, uniform ) == false )
 					{
-						return false ;
+						yield false ;
 					}
-					break ;
+
+					yield true ;
 				}
-				case STRUCT :
-				{
-					builder.append( '.' ) ;
-					( ( StructUniform )uniform ).forEach( builder.toString(), _func ) ;
-					break ;
-				}
-				case ARRAY  :
-				{
-					( ( ArrayUniform )uniform ).forEach( builder.toString(), _func ) ;
-					break ;
-				}
+			} ;
+
+			if( !success )
+			{
+				return false ;
 			}
 		}
 
@@ -213,12 +204,6 @@ public final class StructUniform implements IUniform
 		}
 
 		return false ;
-	}
-
-	@Override
-	public final IUniform.Type getType()
-	{
-		return IUniform.Type.STRUCT ;
 	}
 
 	private static final class Pair
