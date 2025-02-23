@@ -17,7 +17,7 @@ public class EditorStarter extends DesktopStarter
 	*/
 	public EditorStarter()
 	{
-		super( new GLDefaultSystem(), new EditorLoader() ) ;
+		super( new EditorLoader() ) ;
 	}
 
 	@Override

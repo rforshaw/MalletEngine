@@ -17,32 +17,36 @@ import com.linxonline.mallet.io.reader.config.ConfigReader ;
 import com.linxonline.mallet.io.reader.config.ConfigParser ;
 
 /**
+	The goal of IStarter is to enable a platform specific
+	way of initialising the core sub-systems of a game
+	and hooking them up to the game state.
 	Each platform supported should implement this interface.
 	Allows the developer to define what and how things 
-	should be loaded on start. Direct implementations of this 
-	class should be abstract.
+	should be loaded on start.
 	Example: DesktopStarter.java
 */
-public class IStarter
+public interface IStarter
 {
-	private final ISystem mainSystem  ;
-	private final IGameLoader loader ;
+	/**
+		Provides the main game-loop.
+		This can be implemented on a platform specific basis
+		but it's recommended to use GameSystem if you can get
+		away with it - some platforms such as Web doesn't like it.
+	*/
+	public IGameSystem getGameSystem() ;
 
-	public IStarter( final ISystem _main, final IGameLoader _loader )
-	{
-		mainSystem = _main ;
-		loader = _loader ;
-	}
-	
-	public IGameLoader getGameLoader()
-	{
-		return loader ;
-	}
+	/**
+		The game loader contains all the specific game-state
+		for your game.
+		It will eventually be added to the game-system.
+	*/
+	public IGameLoader getGameLoader() ;
 
-	public ISystem getMainSystem()
-	{
-		return mainSystem ;
-	}
+	/**
+		Defines the core sub-systems for a specific platform.
+		This includes the input, file, and rendering systems.
+	*/
+	public ISystem getMainSystem() ;
 
 	/**
 		Using the passed in IStarter load the default configuration file.
@@ -53,12 +57,13 @@ public class IStarter
 	{
 		final ISystem main = _starter.getMainSystem() ;
 		final IGameLoader loader = _starter.getGameLoader() ;
+		final IGameSystem gameSystem = _starter.getGameSystem() ;
 
 		IStarter.loadConfig( loader.getGameSettings(), main ) ;		// Load the config @ base/config.cfg using the default ConfigParser.
 		main.initSystem() ;										// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
-		if( IStarter.loadGame( main, loader ) == false )
+		if( IStarter.loadGame( loader, gameSystem ) == false )
 		{
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return false ;
@@ -109,13 +114,12 @@ public class IStarter
 		return false if the GameSystem or Game Loader is not 
 		specified.
 	*/
-	public static boolean loadGame( final ISystem _system, final IGameLoader _loader )
+	public static boolean loadGame( final IGameLoader _loader, final IGameSystem _gameSystem )
 	{
 		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
-		if( _system != null && _loader != null )
+		if( _loader != null && _gameSystem != null )
 		{
-			final IGameSystem gameSystem = _system.getGameSystem() ;
-			_loader.loadGame( gameSystem ) ;
+			_loader.loadGame( _gameSystem ) ;
 			return true ;
 		}
 

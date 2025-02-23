@@ -107,10 +107,9 @@ public final class GameSystem implements IGameSystem
 
 	private final void updateState( final double _dt )
 	{
-		final int transition = currentState.updateMain( _dt ) ;
+		final int transition = currentState.update( _dt ) ;
 		if( transition == GameState.NONE )
 		{
-			currentState.updateDraw( _dt ) ;
 			return ;
 		}
 

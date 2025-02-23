@@ -176,11 +176,45 @@ public class GameState
 		return null ;
 	}
 
+	public int update( final double _dt )
+	{
+		final int transition = updateMain( _dt ) ;
+		if( transition == GameState.NONE )
+		{
+			updateDraw( _dt ) ;
+		}
+
+		final double deltaTotalTime = deltaUpdateTime + deltaRenderTime ;
+		if( deltaTotalTime < DEFAULT_FRAMERATE )
+		{
+			final float diff = DEFAULT_FRAMERATE - ( float )deltaTotalTime ;
+			final long wait = ( long )( diff * 1000.0f ) - 5 ;
+			if( wait <= 0 )
+			{
+				return transition ;
+			}
+
+			try
+			{
+				synchronized( this )
+				{
+					wait( wait ) ;
+				}
+			}
+			catch( Exception ex )
+			{
+				ex.printStackTrace() ;
+			}
+		}
+
+		return transition ;
+	}
+
 	/**
 		Update the main game-logic.
 		Default is expected to be 15Hz
 	*/
-	public int updateMain( final double _dt )
+	private int updateMain( final double _dt )
 	{
 		if( _dt >= DEFAULT_ESCAPE_TIME || system == null )
 		{
@@ -214,7 +248,7 @@ public class GameState
 		Render to the screen.
 		Default is expected to be 60Hz.
 	*/
-	public void updateDraw( final double _dt )
+	private void updateDraw( final double _dt )
 	{
 		renderAccumulator += _dt ;
 		if( renderAccumulator >= DEFAULT_FRAMERATE )

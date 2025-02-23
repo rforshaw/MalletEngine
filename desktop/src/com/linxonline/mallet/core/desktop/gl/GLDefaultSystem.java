@@ -27,8 +27,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 													   GLRenderer,
 													   ALSAGenerator,
 													   InputSystem,
-													   EventSystem,
-													   GameSystem>
+													   EventSystem>
 {
 	public GLDefaultSystem()
 	{
@@ -37,8 +36,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 			   new ALSAGenerator(),
 			   new EventSystem(),
 			   new InputSystem(),
-			   new DesktopFileSystem(),
-			   new GameSystem() ) ;
+			   new DesktopFileSystem() ) ;
 	}
 
 	public GLWindow getWindow()
@@ -49,8 +47,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	@Override
 	public void initSystem()
 	{
-		getGameSystem().setMainSystem( this ) ;
-
 		initEventProcessors() ;
 
 		final GLRenderer render = getRenderer() ;

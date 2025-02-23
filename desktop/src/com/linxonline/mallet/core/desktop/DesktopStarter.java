@@ -7,6 +7,8 @@ import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.GameSettings ;
 
+import com.linxonline.mallet.core.GameSystem ;
+
 import com.linxonline.mallet.core.ISystem ;
 import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
@@ -30,8 +32,12 @@ import com.linxonline.mallet.ui.UIRatio ;
 	Handles the initialisation & loading stage for 
 	desktop platforms.
 */
-public class DesktopStarter extends IStarter
+public class DesktopStarter implements IStarter
 {
+	private final GameSystem gameSystem = new GameSystem() ;
+	private final ISystem mainSystem ;
+	private final IGameLoader loader ;
+
 	protected Thread thread ;
 
 	public DesktopStarter( final IGameLoader _loader )
@@ -41,7 +47,10 @@ public class DesktopStarter extends IStarter
 
 	public DesktopStarter( final ISystem _main, final IGameLoader _loader )
 	{
-		super( _main, _loader ) ;
+		mainSystem = _main ;
+		loader = _loader ;
+
+		gameSystem.setMainSystem( _main ) ;
 	}
 
 	public void init()
@@ -66,7 +75,6 @@ public class DesktopStarter extends IStarter
 	public void run()
 	{
 		final ISystem main = getMainSystem() ;
-		final IGameSystem game = main.getGameSystem() ;
 
 		main.startSystem() ;
 		thread = new Thread( "GAME_THREAD" )
@@ -74,7 +82,7 @@ public class DesktopStarter extends IStarter
 			public void run()
 			{
 				Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
-				game.runSystem() ;			// Begin running the game-loop
+				gameSystem.runSystem() ;		// Begin running the game-loop
 				Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
 			}
 		} ;
@@ -89,11 +97,8 @@ public class DesktopStarter extends IStarter
 			return ;
 		}
 
-		final ISystem main = getMainSystem() ;
-		final IGameSystem game = main.getGameSystem() ;
-
 		System.out.println( "Game System slowing.." ) ;
-		game.stopSystem() ;
+		gameSystem.stopSystem() ;
 		if( thread.isAlive() == true )
 		{
 			try
@@ -108,6 +113,7 @@ public class DesktopStarter extends IStarter
 		}
 
 		System.out.println( "Backend stopped.." ) ;
+		final ISystem main = getMainSystem() ;
 		main.stopSystem() ;
 	}
 
@@ -148,5 +154,23 @@ public class DesktopStarter extends IStarter
 		final int xdpu = unit.convert( GlobalConfig.getInteger( "DPIX", desktop.getDPI() ) ) ;
 		final int ydpu = unit.convert( GlobalConfig.getInteger( "DPIY", desktop.getDPI() ) ) ;
 		UIRatio.setGlobalUIRatio( xdpu, ydpu ) ;
+	}
+
+	@Override
+	public IGameSystem getGameSystem()
+	{
+		return gameSystem ;
+	}
+
+	@Override
+	public IGameLoader getGameLoader()
+	{
+		return loader ;
+	}
+
+	@Override
+	public ISystem getMainSystem()
+	{
+		return mainSystem ;
 	}
 }
