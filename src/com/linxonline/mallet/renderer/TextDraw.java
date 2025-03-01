@@ -3,20 +3,19 @@ package com.linxonline.mallet.renderer ;
 import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.util.Interpolate ;
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 import com.linxonline.mallet.renderer.Colour ;
 
 public final class TextDraw implements IUpdate
 {
-	private final Draw draw = new Draw() ;
+	private final Transformation trans = new Transformation() ;
 	private final Vector2 length = new Vector2() ;
 
 	private StringBuilder text ;
 	private int startIndex = 0 ;
 	private int endIndex = 0 ;
 
+	private boolean hidden = false ;
 	private Colour colour = null ;
 
 	public TextDraw()
@@ -39,12 +38,12 @@ public final class TextDraw implements IUpdate
 
 	public void setHidden( final boolean _hide )
 	{
-		draw.setHidden( _hide ) ;
+		hidden = _hide ;
 	}
 
 	public boolean isHidden()
 	{
-		return draw.isHidden() ;
+		return hidden ;
 	}
 
 	public Colour setColour( final Colour _colour )
@@ -60,57 +59,57 @@ public final class TextDraw implements IUpdate
 
 	public void setPositionInstant( final float _x, final float _y, final float _z )
 	{
-		draw.setPositionInstant( _x, _y, _z ) ;
+		trans.setPositionInstant( _x, _y, _z ) ;
 	}
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		draw.setPosition( _x, _y, _z ) ;
+		trans.setPosition( _x, _y, _z ) ;
 	}
 
 	public Vector3 getPosition( final Vector3 _fill )
 	{
-		return draw.getPosition( _fill ) ;
+		return trans.getPosition( _fill ) ;
 	}
 
 	public void setOffsetInstant( final float _x, final float _y, final float _z )
 	{
-		draw.setOffsetInstant( _x, _y, _z ) ;
+		trans.setOffsetInstant( _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		draw.setOffset( _x, _y, _z ) ;
+		trans.setOffset( _x, _y, _z ) ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )
 	{
-		return draw.getOffset( _fill ) ;
+		return trans.getOffset( _fill ) ;
 	}
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
-		draw.setRotation( _x, _y, _z ) ;
+		trans.setRotation( _x, _y, _z ) ;
 	}
 
 	public Vector3 getRotation( final Vector3 _fill )
 	{
-		return draw.getRotation( _fill ) ;
+		return trans.getRotation( _fill ) ;
 	}
 
 	public void setScaleInstant( final float _x, final float _y, final float _z )
 	{
-		draw.setScaleInstant( _x, _y, _z ) ;
+		trans.setScaleInstant( _x, _y, _z ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )
 	{
-		draw.setScale( _x, _y, _z ) ;
+		trans.setScale( _x, _y, _z ) ;
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
 	{
-		return draw.getScale( _fill ) ;
+		return trans.getScale( _fill ) ;
 	}
 
 	/**
@@ -134,12 +133,12 @@ public final class TextDraw implements IUpdate
 
 	public AABB getBoundary( final AABB _fill, final Vector2 _temp )
 	{
-		draw.getPosition( _temp ) ;
+		trans.getPosition( _temp ) ;
 
 		float minX = _temp.x ;
 		float minY = _temp.y ;
 
-		draw.getOffset( _temp ) ;
+		trans.getOffset( _temp ) ;
 		minX += _temp.x ;
 		minY += _temp.y ;
 
@@ -153,7 +152,7 @@ public final class TextDraw implements IUpdate
 	@Override
 	public boolean update( Interpolation _mode, final float _coefficient )
 	{
-		return draw.update( _mode, _coefficient ) ;
+		return trans.update( _mode, _coefficient ) ;
 	}
 
 	public void setRange( final int _startIndex, final int _endIndex )

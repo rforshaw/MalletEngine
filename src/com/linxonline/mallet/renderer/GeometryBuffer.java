@@ -3,8 +3,6 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.util.MalletList ;
-
 public final class GeometryBuffer extends ABuffer
 {
 	private final Shape.Attribute[] attributes ;

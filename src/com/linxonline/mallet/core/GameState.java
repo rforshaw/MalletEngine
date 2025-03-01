@@ -12,14 +12,12 @@ import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.input.IInputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
-import com.linxonline.mallet.event.Event ;
 import com.linxonline.mallet.event.EventSystem ;
 import com.linxonline.mallet.event.EventController ;
 import com.linxonline.mallet.event.InterceptController ;
 import com.linxonline.mallet.event.IEventSystem ;
 import com.linxonline.mallet.event.IEventController ;
 
-import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.physics.CollisionSystem ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 
@@ -28,16 +26,11 @@ import com.linxonline.mallet.animation.AnimationAssist ;
 
 import com.linxonline.mallet.entity.EntitySystem ;
 import com.linxonline.mallet.entity.Entity ;
-import com.linxonline.mallet.entity.components.Component ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.settings.Settings ;
-
-import com.linxonline.mallet.script.IScriptEngine ;
-import com.linxonline.mallet.script.Script ;
-import com.linxonline.mallet.script.javascript.JSScriptEngine ;
 
 public class GameState
 {

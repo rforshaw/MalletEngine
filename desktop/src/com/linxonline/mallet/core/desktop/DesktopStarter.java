@@ -21,8 +21,6 @@ import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.inspect.DisplayEnvironment ;
-import com.linxonline.mallet.util.inspect.Screen ;
-import com.linxonline.mallet.util.inspect.ScreenMode ;
 
 import com.linxonline.mallet.ui.UI ;
 import com.linxonline.mallet.ui.UIRatio ;

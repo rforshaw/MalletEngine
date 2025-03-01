@@ -1,8 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.event.Event ;
-
 /**
 	DrawAssist provides a set of functions to modify a Draw object
 	in the rendering-system in an agnostic way.
@@ -15,8 +12,6 @@ import com.linxonline.mallet.event.Event ;
 */
 public final class DrawAssist
 {
-	private static final Event<Object> DRAW_CLEAN = Event.create( "DRAW_CLEAN" ) ; 
-
 	private static Assist assist ;
 
 	private DrawAssist() {}
@@ -28,15 +23,6 @@ public final class DrawAssist
 	public static void setAssist( final DrawAssist.Assist _assist )
 	{
 		assist = _assist ;
-	}
-
-	/**
-		Request the active rendering system to clean-up any 
-		unused resources it may still be referencing.
-	*/
-	public static Event<Object> constructDrawClean()
-	{
-		return DRAW_CLEAN ;
 	}
 
 	public static DrawUpdater add( final DrawUpdater _updater )
