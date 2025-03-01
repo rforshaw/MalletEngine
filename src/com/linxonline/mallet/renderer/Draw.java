@@ -9,20 +9,10 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class Draw implements IUpdate
 {
-	private static final float PI = ( float )Math.PI ;
-	private static final float PI2 = ( float )Math.PI * 2.0f ;
-
-	private static final int POSITION = 0 ;
-	private static final int OFFSET   = 3 ;
-	private static final int ROTATION = 6 ;
-	private static final int SCALE    = 9 ;
-
 	public static final EmptyMeta EMPTY_META = new EmptyMeta() ;
 
 	// Each contain Position, Rotation, and Scale
-	private final float[] present = FloatBuffer.allocate( 12 ) ;
-	private final float[] old = FloatBuffer.allocate( 12 ) ;
-	private final float[] future = FloatBuffer.allocate( 12 ) ;
+	private final Transformation trans ;
 
 	private IShape[] shapes ;
 	private IMeta meta = EMPTY_META ;
@@ -68,20 +58,9 @@ public final class Draw implements IUpdate
 				 final float _rotX, final float _rotY, final float _rotZ )
 	{
 		shapes = _shapes ;
-		FloatBuffer.set( old, POSITION, _posX, _posY, _posZ ) ;
-		FloatBuffer.set( old, OFFSET, _offX, _offY, _offZ ) ;
-		FloatBuffer.set( old, ROTATION, _rotX, _rotY, _rotZ ) ;
-		FloatBuffer.set( old, SCALE, 1.0f, 1.0f, 1.0f ) ;
-
-		FloatBuffer.set( present, POSITION, _posX, _posY, _posZ ) ;
-		FloatBuffer.set( present, OFFSET, _offX, _offY, _offZ ) ;
-		FloatBuffer.set( present, ROTATION, _rotX, _rotY, _rotZ ) ;
-		FloatBuffer.set( present, SCALE, 1.0f, 1.0f, 1.0f ) ;
-
-		FloatBuffer.set( future, POSITION, _posX, _posY, _posZ ) ;
-		FloatBuffer.set( future, OFFSET, _offX, _offY, _offZ ) ;
-		FloatBuffer.set( future, ROTATION, _rotX, _rotY, _rotZ ) ;
-		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
+		trans = new Transformation( _posX, _posY, _posZ,
+									_offX, _offY, _offZ,
+									_rotX, _rotY, _rotZ ) ;
 	}
 
 	/**
@@ -208,129 +187,87 @@ public final class Draw implements IUpdate
 
 	public void setPositionInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, POSITION, _x, _y, _z ) ;
-		FloatBuffer.set( present, POSITION, _x, _y, _z ) ;
-		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
+		trans.setPositionInstant( _x, _y, _z ) ;
 	}
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
+		trans.setPosition( _x, _y, _z ) ;
 	}
 
 	public void addToPosition( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.add( future, POSITION, _x, _y, _z ) ;
+		trans.addToPosition( _x, _y, _z ) ;
 	}
 
 	public Vector3 getPosition( final Vector3 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, POSITION ) ;
+		return trans.getPosition( _fill ) ;
 	}
 
 	public Vector2 getPosition( final Vector2 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, POSITION ) ;
+		return trans.getPosition( _fill ) ;
 	}
 
 	public void setOffsetInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, OFFSET, _x, _y, _z ) ;
-		FloatBuffer.set( present, OFFSET, _x, _y, _z ) ;
-		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
+		trans.setOffsetInstant( _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
+		trans.setOffset( _x, _y, _z ) ;
 	}
 
 	public void addToOffset( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.add( future, OFFSET, _x, _y, _z ) ;
+		trans.addToOffset( _x, _y, _z ) ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, OFFSET ) ;
+		return trans.getOffset( _fill ) ;
 	}
 
 	public Vector2 getOffset( final Vector2 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, OFFSET ) ;
+		return trans.getOffset( _fill ) ;
 	}
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
-		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
-		float oY = FloatBuffer.get( old, ROTATION + 1 ) ;
-		float oZ = FloatBuffer.get( old, ROTATION + 2 ) ;
-
-		final float diffX = Math.abs( _x - oX ) ;
-		if( diffX > PI )
-		{
-			oX += ( _x > oX ) ? PI2 : -PI2 ;
-		}
-
-		final float diffY = Math.abs( _y - oY ) ;
-		if( diffY > PI )
-		{
-			oY += ( _y > oY ) ? PI2 : -PI2 ;
-		}
-
-		final float diffZ = Math.abs( _z - oZ ) ;
-		if( diffZ > PI )
-		{
-			oZ += ( _z > oZ ) ? PI2 : -PI2 ;
-		}
-
-		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
-		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
+		trans.setRotation( _x, _y, _z ) ;
 	}
 
 	public Vector3 getRotation( final Vector3 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, ROTATION ) ;
+		return trans.getRotation( _fill ) ;
 	}
 
 	public void setScaleInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, SCALE, _x, _y, _z ) ;
-		FloatBuffer.set( present, SCALE, _x, _y, _z ) ;
-		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
+		trans.setScaleInstant( _x, _y, _z ) ;
 	}
 
 	public void setScale( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
+		trans.setScale( _x, _y, _z ) ;
 	}
 
 	public Vector3 getScale( final Vector3 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, SCALE ) ;
+		return trans.getScale( _fill ) ;
 	}
 
 	public Vector2 getScale( final Vector2 _fill )
 	{
-		return FloatBuffer.fill( present, _fill, SCALE ) ;
+		return trans.getScale( _fill ) ;
 	}
 
 	public Matrix4 getTransformation( final Matrix4 _mat )
 	{
-		final float px = present[POSITION] + present[OFFSET] ;
-		final float py = present[POSITION + 1] + present[OFFSET + 1] ;
-		final float pz = present[POSITION + 2] + present[OFFSET + 2] ;
-
-		final float rx = present[ROTATION] ;
-		final float ry = present[ROTATION + 1] ;
-		final float rz = present[ROTATION + 2] ;
-
-		final float sx = present[SCALE] ;
-		final float sy = present[SCALE + 1] ;
-		final float sz = present[SCALE + 2] ;
-
-		_mat.applyTransformations( px, py, pz, rx, ry, rz, sx, sy, sz ) ;
-		return _mat ;
+		return trans.getTransformation( _mat ) ;
 	}
 
 	/**
@@ -339,31 +276,9 @@ public final class Draw implements IUpdate
 		state has not changed.
 	*/
 	@Override
-	public boolean update( Interpolation _mode, final int _diff, final int _iteration )
+	public boolean update( Interpolation _mode, final float _coefficient )
 	{
-		boolean update = false ;
-
-		// Position, Rotation, and Scale should always 
-		// be updated even if the data is not being uploaded 
-		// to the GPU.
-		switch( _mode )
-		{
-			case LINEAR :
-			{
-				update |= Interpolate.linear( future, old, present, _diff, _iteration ) ;
-				break ;
-			}
-			case NONE   :
-			default     :
-			{
-				update = false ;
-				FloatBuffer.copy( future, old ) ;
-				FloatBuffer.copy( future, present ) ;
-				break ;
-			}
-		}
-
-		return update ;
+		return trans.update( _mode, _coefficient ) ;
 	}
 
 	/**

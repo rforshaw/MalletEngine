@@ -19,7 +19,6 @@ public final class GameSystem implements IGameSystem
 	private final List<IUpdate> updates = MalletList.<IUpdate>newList() ;
 
 	private boolean running = false ;
-	private ISystem system ;
 
 	public GameSystem()
 	{
@@ -31,11 +30,6 @@ public final class GameSystem implements IGameSystem
 		addUpdate( new Debounce() ) ;
 	}
 
-	public void setMainSystem( final ISystem _system )
-	{
-		system = _system ;
-	}
-
 	@Override
 	public void addUpdate( final IUpdate _update )
 	{
@@ -43,7 +37,7 @@ public final class GameSystem implements IGameSystem
 	}
 
 	@Override
-	public void runSystem()
+	public void run()
 	{
 		if( defaultState == null )
 		{
@@ -76,7 +70,7 @@ public final class GameSystem implements IGameSystem
 	}
 
 	@Override
-	public void stopSystem()
+	public void stop()
 	{
 		running = false ;
 	}
@@ -84,7 +78,6 @@ public final class GameSystem implements IGameSystem
 	@Override
 	public final void addGameState( final GameState _state )
 	{
-		_state.setSystem( system ) ;
 		states.add( _state ) ;
 	}
 

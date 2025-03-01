@@ -12,7 +12,7 @@ import com.linxonline.mallet.util.Parallel ;
 	the update of DrawInstancedBuffer when the Draw 
 	object state is still influx.
 */
-public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
+public final class DrawInstancedUpdater implements IUpdater
 {
 	private final Interpolation mode ;
 	protected final DrawInstancedBuffer drawBuffer ;
@@ -76,7 +76,7 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
+	public void update( final List<ABuffer> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
@@ -90,7 +90,7 @@ public class DrawInstancedUpdater implements IUpdater<GeometryBuffer>
 		for( int i = 0; i < size; ++i )
 		{
 			final GeometryBuffer buffer = buffers.get( i ) ;
-			parallelUpdater.set( mode, _diff, _iteration ) ;
+			parallelUpdater.set( mode, _coefficient ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forBatch( draws, 1000, parallelUpdater ) ;

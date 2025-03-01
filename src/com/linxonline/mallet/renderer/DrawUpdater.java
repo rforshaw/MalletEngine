@@ -9,7 +9,7 @@ import com.linxonline.mallet.util.Parallel ;
 	and rotation of Draw objects during draw calls to ensure
 	smooth motion.
 */
-public class DrawUpdater implements IUpdater<GeometryBuffer>
+public final class DrawUpdater implements IUpdater
 {
 	protected final DrawBuffer drawBuffer ;
 
@@ -102,7 +102,7 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
+	public void update( final List<ABuffer> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
@@ -116,7 +116,7 @@ public class DrawUpdater implements IUpdater<GeometryBuffer>
 		for( int i = 0; i < size; ++i )
 		{
 			final GeometryBuffer buffer = buffers.get( i ) ;
-			parallelUpdater.set( mode, _diff, _iteration ) ;
+			parallelUpdater.set( mode, _coefficient ) ;
 
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forBatch( draws, 1000, parallelUpdater ) ;

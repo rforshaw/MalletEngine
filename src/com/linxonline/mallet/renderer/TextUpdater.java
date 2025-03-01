@@ -2,9 +2,6 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 import java.util.ArrayList ;
-import java.lang.ref.WeakReference ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 /**
 	A draw object can be added to multiple different 
@@ -13,7 +10,7 @@ import com.linxonline.mallet.util.MalletList ;
 	This DrawUpdater is designed to trigger the update 
 	of buffers when the Draw object state is still influx.
 */
-public final class TextUpdater implements IUpdater<TextBuffer>
+public final class TextUpdater implements IUpdater
 {
 	private final ArrayList<TextBuffer> buffers = new ArrayList<TextBuffer>() ;
 
@@ -80,7 +77,7 @@ public final class TextUpdater implements IUpdater<TextBuffer>
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
+	public void update( final List<ABuffer> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
@@ -99,7 +96,7 @@ public final class TextUpdater implements IUpdater<TextBuffer>
 			for( int j = 0; j < drawSize; ++j )
 			{
 				final TextDraw draw = draws.get( j ) ;
-				if( draw.update( mode, _diff, _iteration ) == true )
+				if( draw.update( mode, _coefficient ) == true )
 				{
 					updateBuffer = true ;
 				}

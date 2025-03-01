@@ -60,10 +60,10 @@ public interface IStarter
 		final IGameSystem gameSystem = _starter.getGameSystem() ;
 
 		IStarter.loadConfig( loader.getGameSettings(), main ) ;		// Load the config @ base/config.cfg using the default ConfigParser.
-		main.initSystem() ;										// Fully init the backend: Input, OpenGL, & OpenAL.
+		main.init() ;										// Fully init the backend: Input, OpenGL, & OpenAL.
 
 		// Load the Game-States into the Game-System
-		if( IStarter.loadGame( loader, gameSystem ) == false )
+		if( IStarter.loadGame( loader, gameSystem, main ) == false )
 		{
 			Logger.println( "Failed to load game..", Logger.Verbosity.MAJOR ) ;
 			return false ;
@@ -114,12 +114,12 @@ public interface IStarter
 		return false if the GameSystem or Game Loader is not 
 		specified.
 	*/
-	public static boolean loadGame( final IGameLoader _loader, final IGameSystem _gameSystem )
+	public static boolean loadGame( final IGameLoader _loader, final IGameSystem _gameSystem, final ISystem _main )
 	{
 		Logger.println( "Loading game states.", Logger.Verbosity.MINOR ) ;
-		if( _loader != null && _gameSystem != null )
+		if( _loader != null && _gameSystem != null && _main != null )
 		{
-			_loader.loadGame( _gameSystem ) ;
+			_loader.loadGame( _main, _gameSystem ) ;
 			return true ;
 		}
 

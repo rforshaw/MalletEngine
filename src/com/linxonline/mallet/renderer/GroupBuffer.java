@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
 /**
 	GroupBuffer allows you to bring together a set of buffers.
@@ -16,7 +17,7 @@ import com.linxonline.mallet.util.MalletList ;
 	Adding them to a GroupBuffer then adding it to the World can
 	remove this problem.
 */
-public class GroupBuffer extends ABuffer implements IManageBuffers
+public final class GroupBuffer extends ABuffer implements IManageBuffers
 {
 	private final int order ;
 	private final List<ABuffer> buffers = MalletList.<ABuffer>newList() ;
@@ -38,18 +39,35 @@ public class GroupBuffer extends ABuffer implements IManageBuffers
 
 	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
 	{
-		final int size = _list.size() ;
-		for( int i = 0; i < size; i++ )
+		switch( _insert )
 		{
-			final ABuffer toCompare = _list.get( i ) ;
-			if( _insert.getOrder() <= toCompare.getOrder() )
+			case Storage s :
 			{
-				_list.add( i, _insert ) ;		// Insert at index location
+				Logger.println( "Storage is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
 				return ;
 			}
-		}
+			case GeometryBuffer b :
+			{
+				Logger.println( "GeometryBuffer is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
+				return ;
+			}
+			default :
+			{
+				final int size = _list.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final ABuffer toCompare = _list.get( i ) ;
+					if( _insert.getOrder() <= toCompare.getOrder() )
+					{
+						_list.add( i, _insert ) ;		// Insert at index location
+						return ;
+					}
+				}
 
-		_list.add( _insert ) ;
+				_list.add( _insert ) ;
+				break ;
+			}
+		} ;
 	}
 
 	@Override
@@ -65,12 +83,6 @@ public class GroupBuffer extends ABuffer implements IManageBuffers
 	public List<ABuffer> getBuffers()
 	{
 		return buffers ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.GROUP ;
 	}
 
 	@Override

@@ -3,8 +3,9 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.Logger ;
 
-public class Stencil extends ABuffer implements IManageBuffers
+public final class Stencil extends ABuffer implements IManageBuffers
 {
 	private final int order ;
 
@@ -87,6 +88,18 @@ public class Stencil extends ABuffer implements IManageBuffers
 
 	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
 	{
+		switch( _insert )
+		{
+			case DrawInstancedBuffer b : break ;
+			case DrawBuffer b          : break ;
+			case TextBuffer b          : break ;
+			default                    :
+			{
+				Logger.println( "Attempting to add incompatible buffer to Stencil, skipping.", Logger.Verbosity.NORMAL ) ;
+				return ;
+			}
+		} ;
+
 		final int size = _list.size() ;
 		for( int i = 0; i < size; i++ )
 		{
@@ -159,12 +172,6 @@ public class Stencil extends ABuffer implements IManageBuffers
 	public boolean[] getColourMask()
 	{
 		return colourMask ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.STENCIL ;
 	}
 
 	@Override

@@ -68,16 +68,10 @@ public abstract class BasicSystem<F extends FileSystem,
 	}
 
 	@Override
-	public abstract void initSystem() ;
+	public abstract void init() ;
 
 	@Override
-	public abstract void startSystem() ;
-
-	@Override
-	public abstract void stopSystem() ;
-
-	@Override
-	public void shutdownSystem()
+	public void shutdown()
 	{
 		shutdownDelegate.shutdown() ;
 		audioGenerator.shutdown() ;

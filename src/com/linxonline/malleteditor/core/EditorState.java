@@ -4,6 +4,7 @@ import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.core.GameState ;
+import com.linxonline.mallet.core.ISystem ;
 
 import com.linxonline.mallet.ui.gui.GUIComponent ;
 import com.linxonline.mallet.ui.UIElement ;
@@ -43,9 +44,9 @@ public class EditorState extends GameState
 	private static final float SEPERATOR = 5.0f ;
 	private static final float EDITOR_LIST_WIDTH = 40.0f ;
 
-	public EditorState( final String _name )
+	public EditorState( final String _name, final ISystem _system )
 	{
-		super( _name ) ;
+		super( _name, _system ) ;
 	}
 
 	@Override

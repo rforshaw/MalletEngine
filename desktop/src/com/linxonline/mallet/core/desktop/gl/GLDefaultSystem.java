@@ -45,7 +45,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	}
 	
 	@Override
-	public void initSystem()
+	public void init()
 	{
 		initEventProcessors() ;
 
@@ -105,18 +105,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		getEventSystem().addHandler( controller ) ;
 	}
 
-	@Override
-	public void startSystem()
-	{
-		Logger.println( "Start System...", Logger.Verbosity.MINOR ) ;
-	}
-
-	@Override
-	public void stopSystem()
-	{
-		Logger.println( "Stop System...", Logger.Verbosity.MINOR ) ;
-	}
-
 	private final class WinState implements WindowListener, MouseListener
 	{
 		private final static int FOCUS_LOST = -1 ;
@@ -128,7 +116,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		@Override
 		public void windowDestroyNotify( final WindowEvent _event )
 		{
-			GLDefaultSystem.this.shutdownSystem() ;
+			GLDefaultSystem.this.shutdown() ;
 		}
 
 		@Override

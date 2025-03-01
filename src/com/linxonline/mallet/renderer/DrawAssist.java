@@ -39,12 +39,32 @@ public final class DrawAssist
 		return DRAW_CLEAN ;
 	}
 
-	public static <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
+	public static DrawUpdater add( final DrawUpdater _updater )
 	{
 		return assist.add( _updater ) ;
 	}
 
-	public static <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
+	public static DrawUpdater remove( final DrawUpdater _updater )
+	{
+		return assist.remove( _updater ) ;
+	}
+
+	public static DrawInstancedUpdater add( final DrawInstancedUpdater _updater )
+	{
+		return assist.add( _updater ) ;
+	}
+
+	public static DrawInstancedUpdater remove( final DrawInstancedUpdater _updater )
+	{
+		return assist.remove( _updater ) ;
+	}
+
+	public static TextUpdater add( final TextUpdater _updater )
+	{
+		return assist.add( _updater ) ;
+	}
+
+	public static TextUpdater remove( final TextUpdater _updater )
 	{
 		return assist.remove( _updater ) ;
 	}
@@ -70,8 +90,14 @@ public final class DrawAssist
 	*/
 	public interface Assist
 	{
-		public <T extends IUpdater<? extends ABuffer>> T add( final T _updater ) ;
-		public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater ) ;
+		public DrawUpdater add( final DrawUpdater _updater ) ;
+		public DrawUpdater remove( final DrawUpdater _updater ) ;
+
+		public DrawInstancedUpdater add( final DrawInstancedUpdater _updater ) ;
+		public DrawInstancedUpdater remove( final DrawInstancedUpdater _updater ) ;
+
+		public TextUpdater add( final TextUpdater _updater ) ;
+		public TextUpdater remove( final TextUpdater _updater ) ;
 
 		public <T extends ABuffer> T add( final T _buffer ) ;
 		public <T extends ABuffer> T remove( final T _buffer ) ;

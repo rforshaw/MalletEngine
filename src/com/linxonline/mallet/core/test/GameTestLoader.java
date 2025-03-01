@@ -15,8 +15,6 @@ import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.animation.* ;
 import com.linxonline.mallet.ecs.* ;
 
-import com.linxonline.mallet.renderer.Attribute ;
-
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
@@ -73,9 +71,9 @@ public final class GameTestLoader implements IGameLoader
 	public GameTestLoader() {}
 
 	@Override
-	public void loadGame( final IGameSystem _system )
+	public void loadGame( final ISystem _main, final IGameSystem _system )
 	{
-		_system.addGameState( new GameState( "DEFAULT" )
+		_system.addGameState( new GameState( "DEFAULT", _main )
 		{
 			private IScriptEngine jsEngine ;
 			private ECSEvent ecsEvents ;
@@ -114,7 +112,7 @@ public final class GameTestLoader implements IGameLoader
 			@Override
 			public void initGame()			// Called when state is started
 			{
-				final UIVariant variant = new UIVariant( "Test", BufferType.DRAW_BUFFER ) ;
+				final UIVariant variant = new UIVariant( "Test", Action.KEEP ) ;
 
 				/*boolean run = true ;
 				final InStream stream = new InStream( 100 ) ;

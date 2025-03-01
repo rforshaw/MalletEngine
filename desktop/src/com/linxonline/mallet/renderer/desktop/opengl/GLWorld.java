@@ -14,6 +14,9 @@ import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.World.AttachmentType ;
 import com.linxonline.mallet.renderer.Camera ;
 import com.linxonline.mallet.renderer.ABuffer ;
+import com.linxonline.mallet.renderer.DrawInstancedBuffer ;
+import com.linxonline.mallet.renderer.DrawBuffer ;
+import com.linxonline.mallet.renderer.TextBuffer ;
 import com.linxonline.mallet.renderer.Colour ;
 
 /**
@@ -218,21 +221,27 @@ public class GLWorld
 		drawBuffers.clear() ;
 		for( final ABuffer buffer : _world.getBuffers() )
 		{
-			switch( buffer.getBufferType() )
+			switch( buffer )
 			{
-				default                    : Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ; break ;
-				case DRAW_INSTANCED_BUFFER :
-				case DRAW_BUFFER           :
-				case TEXT_BUFFER           :
+				case DrawInstancedBuffer b : addToDrawBuffers( b, _buffers ) ; break ;
+				case DrawBuffer b          : addToDrawBuffers( b, _buffers ) ; break ;
+				case TextBuffer b          : addToDrawBuffers( b, _buffers ) ; break ;
+				default                    :
 				{
-					final int index = buffer.index() ;
-					final GLBuffer buff = _buffers.getRHS( index ) ;
-					if( buff != null )
-					{
-						drawBuffers.add( buff ) ;
-					}
+					Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ;
+					break ;
 				}
-			}
+			} ;
+		}
+	}
+
+	private void addToDrawBuffers( final ABuffer _buffer, final AssetLookup<ABuffer, GLBuffer> _buffers )
+	{
+		final int index = _buffer.index() ;
+		final GLBuffer buff = _buffers.getRHS( index ) ;
+		if( buff != null )
+		{
+			drawBuffers.add( buff ) ;
 		}
 	}
 

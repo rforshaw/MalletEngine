@@ -36,9 +36,9 @@ public class UIEditorState extends GameState
 
 	private UIWrapper root = null ;
 
-	public UIEditorState( final String _name )
+	public UIEditorState( final String _name, final ISystem _system )
 	{
-		super( _name ) ;
+		super( _name, _system ) ;
 	}
 
 	@Override

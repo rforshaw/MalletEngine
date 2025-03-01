@@ -1,148 +1,148 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.nio.* ;
-import com.jogamp.opengl.GL ;
+
 import com.jogamp.opengl.GL2 ;
-import com.jogamp.opengl.GL3 ;
+import com.jogamp.opengl.GL4 ;
 
 public final class MGL
 {
-	private static GL3 gl ;
+	private static GL4 gl ;
 
-	public final static int GL_MAX_TEXTURE_SIZE = GL3.GL_MAX_TEXTURE_SIZE ;
-	public final static int GL_TEXTURE_WRAP_S = GL3.GL_TEXTURE_WRAP_S ;
-	public final static int GL_TEXTURE_WRAP_T = GL3.GL_TEXTURE_WRAP_T ;
-	public final static int GL_TEXTURE_MAG_FILTER = GL3.GL_TEXTURE_MAG_FILTER ;
-	public final static int GL_TEXTURE_MIN_FILTER = GL3.GL_TEXTURE_MIN_FILTER ;
-	public final static int GL_CLAMP_TO_EDGE = GL3.GL_CLAMP_TO_EDGE ;
-	public final static int GL_REPEAT = GL3.GL_REPEAT ;
-	public final static int GL_LINEAR = GL3.GL_LINEAR ;
-	public final static int GL_NEAREST = GL3.GL_NEAREST ;
-	public final static int GL_NEAREST_MIPMAP_NEAREST = GL3.GL_NEAREST_MIPMAP_NEAREST ;
-	public final static int GL_LINEAR_MIPMAP_LINEAR = GL3.GL_LINEAR_MIPMAP_LINEAR ;
+	public final static int GL_MAX_TEXTURE_SIZE = GL4.GL_MAX_TEXTURE_SIZE ;
+	public final static int GL_TEXTURE_WRAP_S = GL4.GL_TEXTURE_WRAP_S ;
+	public final static int GL_TEXTURE_WRAP_T = GL4.GL_TEXTURE_WRAP_T ;
+	public final static int GL_TEXTURE_MAG_FILTER = GL4.GL_TEXTURE_MAG_FILTER ;
+	public final static int GL_TEXTURE_MIN_FILTER = GL4.GL_TEXTURE_MIN_FILTER ;
+	public final static int GL_CLAMP_TO_EDGE = GL4.GL_CLAMP_TO_EDGE ;
+	public final static int GL_REPEAT = GL4.GL_REPEAT ;
+	public final static int GL_LINEAR = GL4.GL_LINEAR ;
+	public final static int GL_NEAREST = GL4.GL_NEAREST ;
+	public final static int GL_NEAREST_MIPMAP_NEAREST = GL4.GL_NEAREST_MIPMAP_NEAREST ;
+	public final static int GL_LINEAR_MIPMAP_LINEAR = GL4.GL_LINEAR_MIPMAP_LINEAR ;
 
 	public final static int GL_ABGR_EXT = GL2.GL_ABGR_EXT ;
-	public final static int GL_COMPRESSED_RGBA = GL3.GL_COMPRESSED_RGBA ;
-	public final static int GL_COMPRESSED_RGB = GL3.GL_COMPRESSED_RGB ;
-	public final static int GL_RGBA = GL3.GL_RGBA ;
-	public final static int GL_RGB = GL3.GL_RGB ;
-	public final static int GL_BGR = GL3.GL_BGR ;
-	public final static int GL_RED = GL3.GL_RED ;
-	public final static int GL_DEPTH_COMPONENT = GL3.GL_DEPTH_COMPONENT ;
-	public final static int GL_DEPTH_STENCIL = GL3.GL_DEPTH_STENCIL ;
+	public final static int GL_COMPRESSED_RGBA = GL4.GL_COMPRESSED_RGBA ;
+	public final static int GL_COMPRESSED_RGB = GL4.GL_COMPRESSED_RGB ;
+	public final static int GL_RGBA = GL4.GL_RGBA ;
+	public final static int GL_RGB = GL4.GL_RGB ;
+	public final static int GL_BGR = GL4.GL_BGR ;
+	public final static int GL_RED = GL4.GL_RED ;
+	public final static int GL_DEPTH_COMPONENT = GL4.GL_DEPTH_COMPONENT ;
+	public final static int GL_DEPTH_STENCIL = GL4.GL_DEPTH_STENCIL ;
 
-	public final static int GL_UNPACK_ALIGNMENT = GL3.GL_UNPACK_ALIGNMENT ;
+	public final static int GL_UNPACK_ALIGNMENT = GL4.GL_UNPACK_ALIGNMENT ;
 
-	public final static int GL_LINES = GL3.GL_LINES ;
-	public final static int GL_LINE_STRIP = GL3.GL_LINE_STRIP ;
-	public final static int GL_TRIANGLES = GL3.GL_TRIANGLES ;
+	public final static int GL_LINES = GL4.GL_LINES ;
+	public final static int GL_LINE_STRIP = GL4.GL_LINE_STRIP ;
+	public final static int GL_TRIANGLES = GL4.GL_TRIANGLES ;
 
-	public final static int GL_TEXTURE_2D = GL3.GL_TEXTURE_2D ;
-	public final static int GL_TEXTURE_2D_ARRAY = GL3.GL_TEXTURE_2D_ARRAY ;
-	public final static int GL_PRIMITIVE_RESTART = GL3.GL_PRIMITIVE_RESTART ;
+	public final static int GL_TEXTURE_2D = GL4.GL_TEXTURE_2D ;
+	public final static int GL_TEXTURE_2D_ARRAY = GL4.GL_TEXTURE_2D_ARRAY ;
+	public final static int GL_PRIMITIVE_RESTART = GL4.GL_PRIMITIVE_RESTART ;
 
-	public final static int GL_NO_ERROR = GL3.GL_NO_ERROR ;
-	public final static int GL_INVALID_ENUM = GL3.GL_INVALID_ENUM ;
-	public final static int GL_INVALID_VALUE = GL3.GL_INVALID_VALUE ;
-	public final static int GL_INVALID_OPERATION = GL3.GL_INVALID_OPERATION ;
-	public final static int GL_INVALID_FRAMEBUFFER_OPERATION = GL3.GL_INVALID_FRAMEBUFFER_OPERATION ;
-	public final static int GL_OUT_OF_MEMORY = GL3.GL_OUT_OF_MEMORY ;
-	public final static int GL_STACK_UNDERFLOW = GL3.GL_STACK_UNDERFLOW ;
-	public final static int GL_STACK_OVERFLOW = GL3.GL_STACK_OVERFLOW ;
+	public final static int GL_NO_ERROR = GL4.GL_NO_ERROR ;
+	public final static int GL_INVALID_ENUM = GL4.GL_INVALID_ENUM ;
+	public final static int GL_INVALID_VALUE = GL4.GL_INVALID_VALUE ;
+	public final static int GL_INVALID_OPERATION = GL4.GL_INVALID_OPERATION ;
+	public final static int GL_INVALID_FRAMEBUFFER_OPERATION = GL4.GL_INVALID_FRAMEBUFFER_OPERATION ;
+	public final static int GL_OUT_OF_MEMORY = GL4.GL_OUT_OF_MEMORY ;
+	public final static int GL_STACK_UNDERFLOW = GL4.GL_STACK_UNDERFLOW ;
+	public final static int GL_STACK_OVERFLOW = GL4.GL_STACK_OVERFLOW ;
 
-	public final static int GL_ELEMENT_ARRAY_BUFFER = GL3.GL_ELEMENT_ARRAY_BUFFER ;
-	public final static int GL_ARRAY_BUFFER = GL3.GL_ARRAY_BUFFER ;
+	public final static int GL_ELEMENT_ARRAY_BUFFER = GL4.GL_ELEMENT_ARRAY_BUFFER ;
+	public final static int GL_ARRAY_BUFFER = GL4.GL_ARRAY_BUFFER ;
 
-	public final static int GL_STENCIL_TEST = GL3.GL_STENCIL_TEST ;
-	public final static int GL_STENCIL_BUFFER_BIT = GL3.GL_STENCIL_BUFFER_BIT ;
-	public final static int GL_COLOR_BUFFER_BIT = GL3.GL_COLOR_BUFFER_BIT ;
-	public final static int GL_DEPTH_TEST = GL3.GL_DEPTH_TEST ;
-	public final static int GL_DEPTH_BUFFER_BIT = GL3.GL_DEPTH_BUFFER_BIT ;
+	public final static int GL_STENCIL_TEST = GL4.GL_STENCIL_TEST ;
+	public final static int GL_STENCIL_BUFFER_BIT = GL4.GL_STENCIL_BUFFER_BIT ;
+	public final static int GL_COLOR_BUFFER_BIT = GL4.GL_COLOR_BUFFER_BIT ;
+	public final static int GL_DEPTH_TEST = GL4.GL_DEPTH_TEST ;
+	public final static int GL_DEPTH_BUFFER_BIT = GL4.GL_DEPTH_BUFFER_BIT ;
 
-	public final static int GL_FLOAT = GL3.GL_FLOAT ;
-	public final static int GL_UNSIGNED_BYTE = GL3.GL_UNSIGNED_BYTE ;
-	public final static int GL_UNSIGNED_INT = GL3.GL_UNSIGNED_INT ;
+	public final static int GL_FLOAT = GL4.GL_FLOAT ;
+	public final static int GL_UNSIGNED_BYTE = GL4.GL_UNSIGNED_BYTE ;
+	public final static int GL_UNSIGNED_INT = GL4.GL_UNSIGNED_INT ;
 
-	public final static int GL_NEVER = GL3.GL_NEVER ;
-	public final static int GL_LESS = GL3.GL_LESS ;
-	public final static int GL_GREATER = GL3.GL_GREATER ;
-	public final static int GL_LEQUAL = GL3.GL_LEQUAL ;
-	public final static int GL_GEQUAL = GL3.GL_GEQUAL ;
-	public final static int GL_ALWAYS = GL3.GL_ALWAYS ;
-	public final static int GL_KEEP = GL3.GL_KEEP ;
-	public final static int GL_REPLACE = GL3.GL_REPLACE ;
-	public final static int GL_EQUAL = GL3.GL_EQUAL ;
-	public final static int GL_NOTEQUAL = GL3.GL_NOTEQUAL ;
+	public final static int GL_NEVER = GL4.GL_NEVER ;
+	public final static int GL_LESS = GL4.GL_LESS ;
+	public final static int GL_GREATER = GL4.GL_GREATER ;
+	public final static int GL_LEQUAL = GL4.GL_LEQUAL ;
+	public final static int GL_GEQUAL = GL4.GL_GEQUAL ;
+	public final static int GL_ALWAYS = GL4.GL_ALWAYS ;
+	public final static int GL_KEEP = GL4.GL_KEEP ;
+	public final static int GL_REPLACE = GL4.GL_REPLACE ;
+	public final static int GL_EQUAL = GL4.GL_EQUAL ;
+	public final static int GL_NOTEQUAL = GL4.GL_NOTEQUAL ;
 
-	public final static int GL_ZERO = GL3.GL_ZERO ;
-	public final static int GL_DECR = GL3.GL_DECR ;
-	public final static int GL_INCR = GL3.GL_INCR ;
-	public final static int GL_INVERT = GL3.GL_INVERT ;
+	public final static int GL_ZERO = GL4.GL_ZERO ;
+	public final static int GL_DECR = GL4.GL_DECR ;
+	public final static int GL_INCR = GL4.GL_INCR ;
+	public final static int GL_INVERT = GL4.GL_INVERT ;
 
-	public final static int GL_BLEND = GL3.GL_BLEND ;
-	public final static int GL_SRC_ALPHA = GL3.GL_SRC_ALPHA ;
-	public final static int GL_ONE_MINUS_SRC_ALPHA = GL3.GL_ONE_MINUS_SRC_ALPHA ;
+	public final static int GL_BLEND = GL4.GL_BLEND ;
+	public final static int GL_SRC_ALPHA = GL4.GL_SRC_ALPHA ;
+	public final static int GL_ONE_MINUS_SRC_ALPHA = GL4.GL_ONE_MINUS_SRC_ALPHA ;
 
-	public final static int GL_CULL_FACE = GL3.GL_CULL_FACE ;
-	public final static int GL_BACK = GL3.GL_BACK ;
-	public final static int GL_FRONT_AND_BACK = GL3.GL_FRONT_AND_BACK ;
-	public final static int GL_CCW = GL3.GL_CCW ;
-	public final static int GL_CW = GL3.GL_CW ;
+	public final static int GL_CULL_FACE = GL4.GL_CULL_FACE ;
+	public final static int GL_BACK = GL4.GL_BACK ;
+	public final static int GL_FRONT_AND_BACK = GL4.GL_FRONT_AND_BACK ;
+	public final static int GL_CCW = GL4.GL_CCW ;
+	public final static int GL_CW = GL4.GL_CW ;
 
-	public final static int GL_COMPILE_STATUS = GL3.GL_COMPILE_STATUS ;
-	public final static int GL_INFO_LOG_LENGTH = GL3.GL_INFO_LOG_LENGTH ;
-	public final static int GL_LINK_STATUS = GL3.GL_LINK_STATUS ;
+	public final static int GL_COMPILE_STATUS = GL4.GL_COMPILE_STATUS ;
+	public final static int GL_INFO_LOG_LENGTH = GL4.GL_INFO_LOG_LENGTH ;
+	public final static int GL_LINK_STATUS = GL4.GL_LINK_STATUS ;
 
-	public final static int GL_TRUE = GL3.GL_TRUE ;
-	public final static int GL_FALSE = GL3.GL_FALSE ;
+	public final static int GL_TRUE = GL4.GL_TRUE ;
+	public final static int GL_FALSE = GL4.GL_FALSE ;
 
-	public final static int GL_DYNAMIC_COPY = GL3.GL_DYNAMIC_COPY ;
-	public final static int GL_DYNAMIC_DRAW = GL3.GL_DYNAMIC_DRAW ;
-	public final static int GL_STREAM_DRAW = GL3.GL_STREAM_DRAW ;
+	public final static int GL_DYNAMIC_COPY = GL4.GL_DYNAMIC_COPY ;
+	public final static int GL_DYNAMIC_DRAW = GL4.GL_DYNAMIC_DRAW ;
+	public final static int GL_STREAM_DRAW = GL4.GL_STREAM_DRAW ;
 
-	public final static int GL_STENCIL_INDEX8 = GL3.GL_STENCIL_INDEX8 ;
-	public final static int GL_RENDERBUFFER = GL3.GL_RENDERBUFFER ;
+	public final static int GL_STENCIL_INDEX8 = GL4.GL_STENCIL_INDEX8 ;
+	public final static int GL_RENDERBUFFER = GL4.GL_RENDERBUFFER ;
 	
-	public final static int GL_FRAMEBUFFER = GL3.GL_FRAMEBUFFER ;
-	public final static int GL_READ_FRAMEBUFFER = GL3.GL_READ_FRAMEBUFFER ;
-	public final static int GL_DRAW_FRAMEBUFFER = GL3.GL_DRAW_FRAMEBUFFER ;
-	public final static int GL_FRAMEBUFFER_COMPLETE = GL3.GL_FRAMEBUFFER_COMPLETE ;
-	public final static int GL_FRAMEBUFFER_UNDEFINED = GL3.GL_FRAMEBUFFER_UNDEFINED ;
-	public final static int GL_FRAMEBUFFER_UNSUPPORTED = GL3.GL_FRAMEBUFFER_UNSUPPORTED ;
+	public final static int GL_FRAMEBUFFER = GL4.GL_FRAMEBUFFER ;
+	public final static int GL_READ_FRAMEBUFFER = GL4.GL_READ_FRAMEBUFFER ;
+	public final static int GL_DRAW_FRAMEBUFFER = GL4.GL_DRAW_FRAMEBUFFER ;
+	public final static int GL_FRAMEBUFFER_COMPLETE = GL4.GL_FRAMEBUFFER_COMPLETE ;
+	public final static int GL_FRAMEBUFFER_UNDEFINED = GL4.GL_FRAMEBUFFER_UNDEFINED ;
+	public final static int GL_FRAMEBUFFER_UNSUPPORTED = GL4.GL_FRAMEBUFFER_UNSUPPORTED ;
 
-	public final static int GL_TEXTURE0 = GL3.GL_TEXTURE0 ;
+	public final static int GL_TEXTURE0 = GL4.GL_TEXTURE0 ;
 	
-	public final static int GL_COLOR_ATTACHMENT0 = GL3.GL_COLOR_ATTACHMENT0 ;
-	public final static int GL_STENCIL_ATTACHMENT = GL3.GL_STENCIL_ATTACHMENT ;
-	public final static int GL_DEPTH_ATTACHMENT = GL3.GL_DEPTH_ATTACHMENT ;
+	public final static int GL_COLOR_ATTACHMENT0 = GL4.GL_COLOR_ATTACHMENT0 ;
+	public final static int GL_STENCIL_ATTACHMENT = GL4.GL_STENCIL_ATTACHMENT ;
+	public final static int GL_DEPTH_ATTACHMENT = GL4.GL_DEPTH_ATTACHMENT ;
 
-	public final static int GL_VERTEX_SHADER = GL3.GL_VERTEX_SHADER ;
-	public final static int GL_GEOMETRY_SHADER = GL3.GL_GEOMETRY_SHADER ;
-	public final static int GL_FRAGMENT_SHADER = GL3.GL_FRAGMENT_SHADER ;
-	public final static int GL_COMPUTE_SHADER = GL3.GL_COMPUTE_SHADER ;
+	public final static int GL_VERTEX_SHADER = GL4.GL_VERTEX_SHADER ;
+	public final static int GL_GEOMETRY_SHADER = GL4.GL_GEOMETRY_SHADER ;
+	public final static int GL_FRAGMENT_SHADER = GL4.GL_FRAGMENT_SHADER ;
+	public final static int GL_COMPUTE_SHADER = GL4.GL_COMPUTE_SHADER ;
 
-	public final static int GL_SHADER_STORAGE_BUFFER = GL3.GL_SHADER_STORAGE_BUFFER ;
-	public final static int GL_SHADER_STORAGE_BLOCK = GL3.GL_SHADER_STORAGE_BLOCK ;
+	public final static int GL_SHADER_STORAGE_BUFFER = GL4.GL_SHADER_STORAGE_BUFFER ;
+	public final static int GL_SHADER_STORAGE_BLOCK = GL4.GL_SHADER_STORAGE_BLOCK ;
 
-	public final static int GL_ACTIVE_ATTRIBUTES = GL3.GL_ACTIVE_ATTRIBUTES ;
-	public final static int GL_ACTIVE_UNIFORMS = GL3.GL_ACTIVE_UNIFORMS ;
-	public final static int GL_ACTIVE_RESOURCES = GL3.GL_ACTIVE_RESOURCES ;
+	public final static int GL_ACTIVE_ATTRIBUTES = GL4.GL_ACTIVE_ATTRIBUTES ;
+	public final static int GL_ACTIVE_UNIFORMS = GL4.GL_ACTIVE_UNIFORMS ;
+	public final static int GL_ACTIVE_RESOURCES = GL4.GL_ACTIVE_RESOURCES ;
 
-	public final static int GL_MAX_NAME_LENGTH = GL3.GL_MAX_NAME_LENGTH ;
-	public final static int GL_BUFFER_BINDING = GL3.GL_BUFFER_BINDING ;
+	public final static int GL_MAX_NAME_LENGTH = GL4.GL_MAX_NAME_LENGTH ;
+	public final static int GL_BUFFER_BINDING = GL4.GL_BUFFER_BINDING ;
 
-	public final static int GL_INVALID_INDEX = GL3.GL_INVALID_INDEX ;
+	public final static int GL_INVALID_INDEX = GL4.GL_INVALID_INDEX ;
 
-	public final static int GL_SYNC_GPU_COMMANDS_COMPLETE = GL3.GL_SYNC_GPU_COMMANDS_COMPLETE ;
-	public final static int GL_SYNC_FLUSH_COMMANDS_BIT = GL3.GL_SYNC_FLUSH_COMMANDS_BIT ;
-	public final static int GL_ALREADY_SIGNALED = GL3.GL_ALREADY_SIGNALED ;
-	public final static int GL_TIMEOUT_EXPIRED = GL3.GL_TIMEOUT_EXPIRED ;
-	public final static int GL_CONDITION_SATISFIED = GL3.GL_CONDITION_SATISFIED ;
-	public final static int GL_WAIT_FAILED = GL3.GL_WAIT_FAILED ;
+	public final static int GL_SYNC_GPU_COMMANDS_COMPLETE = GL4.GL_SYNC_GPU_COMMANDS_COMPLETE ;
+	public final static int GL_SYNC_FLUSH_COMMANDS_BIT = GL4.GL_SYNC_FLUSH_COMMANDS_BIT ;
+	public final static int GL_ALREADY_SIGNALED = GL4.GL_ALREADY_SIGNALED ;
+	public final static int GL_TIMEOUT_EXPIRED = GL4.GL_TIMEOUT_EXPIRED ;
+	public final static int GL_CONDITION_SATISFIED = GL4.GL_CONDITION_SATISFIED ;
+	public final static int GL_WAIT_FAILED = GL4.GL_WAIT_FAILED ;
 
 	public MGL() {}
 
-	public static void setGL( final GL3 _gl )
+	public static void setGL( final GL4 _gl )
 	{
 		gl = _gl ;
 	}

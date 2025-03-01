@@ -14,7 +14,7 @@ import com.linxonline.mallet.util.Parallel ;
 	This DrawUpdater is designed to trigger the update 
 	of buffers when the Draw object state is still influx.
 */
-public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
+public final class StorageUpdater<D extends IUpdate> implements IUpdater
 {
 	private final Interpolation mode ;
 	private final ArrayList<D> dynamics = new ArrayList<D>() ;
@@ -108,14 +108,14 @@ public class StorageUpdater<D extends IUpdate> implements IUpdater<Storage>
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final int _diff, final int _iteration )
+	public void update( final List<ABuffer> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
 			return ;
 		}
 
-		parallelUpdater.set( mode, _diff, _iteration ) ;
+		parallelUpdater.set( mode, _coefficient ) ;
 
 		Parallel.forBatch( dynamics, 1000, parallelUpdater ) ;
 		final boolean update = parallelUpdater.isDirty() ;

@@ -480,10 +480,10 @@ public final class Camera
 		viewMatrixDirty = false ;
 	}
 
-	public boolean update( final int _diff, final int _iteration )
+	public boolean update( final float _coefficient )
 	{
 		boolean update = false ;
-		update |= Interpolate.linear( future, old, present, _diff, _iteration ) ;
+		update |= Interpolate.linear( future, old, present, _coefficient ) ;
 		viewMatrixDirty = update ;
 		return update ;
 	}

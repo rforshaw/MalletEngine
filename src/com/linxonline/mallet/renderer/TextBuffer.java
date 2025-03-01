@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-public class TextBuffer extends ABuffer
+public final class TextBuffer extends ABuffer
 {
 	private final Program program ;
 	private final boolean ui ;
@@ -58,12 +58,6 @@ public class TextBuffer extends ABuffer
 	public List<TextDraw> getTextDraws()
 	{
 		return draws ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.TEXT_BUFFER ;
 	}
 
 	@Override

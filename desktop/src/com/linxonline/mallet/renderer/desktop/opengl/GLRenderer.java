@@ -75,8 +75,8 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
 
 	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
-	private final List<IUpdater<? extends ABuffer>> drawUpdaters = new ArrayList<IUpdater<? extends ABuffer>>() ;
-	private final List<IUpdater<Storage>> storageUpdaters = new ArrayList<IUpdater<Storage>>() ;
+
+	private final List<IUpdater> updaters = new ArrayList<IUpdater>() ;
 
 	public GLRenderer()
 	{
@@ -196,14 +196,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 					final int size = bufferLookup.size() ;
 					for( int i = 0; i < size; ++i )
 					{
-						final GLBuffer buff = bufferLookup.getRHS( i ) ;
-						if( buff != null )
+						final ABuffer buffer = bufferLookup.getLHS( i ) ;
+						if( updateBuffer( buffer ) == false )
 						{
-							final ABuffer buffer = bufferLookup.getLHS( i ) ;
-							if( updateBuffer( buffer, buff ) == false )
-							{
-								DrawAssist.update( buffer ) ;
-							}
+							DrawAssist.update( buffer ) ;
 						}
 					}
 				} ) ;
@@ -216,21 +212,61 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public <T extends IUpdater<? extends ABuffer>> T add( final T _updater )
+			public DrawUpdater add( final DrawUpdater _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-					drawUpdaters.add( _updater ) ;
+					updaters.add( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
 
 			@Override
-			public <T extends IUpdater<? extends ABuffer>> T remove( final T _updater )
+			public DrawUpdater remove( final DrawUpdater _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-					drawUpdaters.remove( _updater ) ;
+					updaters.remove( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public DrawInstancedUpdater add( final DrawInstancedUpdater _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					updaters.add( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public DrawInstancedUpdater remove( final DrawInstancedUpdater _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					updaters.remove( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public TextUpdater add( final TextUpdater _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					updaters.add( _updater ) ;
+				} ) ;
+				return _updater ;
+			}
+
+			@Override
+			public TextUpdater remove( final TextUpdater _updater )
+			{
+				GLRenderer.this.invokeLater( () ->
+				{
+					updaters.remove( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -242,7 +278,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				{
 					final GLBuffer buff = create( _buffer ) ;
 					bufferLookup.map( _buffer.index(), _buffer, buff ) ;
-					if( updateBuffer( _buffer, buff ) == false )
+					if( updateBuffer( _buffer ) == false )
 					{
 						DrawAssist.update( _buffer ) ;
 					}
@@ -270,13 +306,9 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				GLRenderer.this.invokeLater( _buffer, UPDATE_OPERATION, () ->
 				{
-					final GLBuffer buff = bufferLookup.getRHS( _buffer.index() ) ;
-					if( buff != null )
+					if( updateBuffer( _buffer ) == false )
 					{
-						if( updateBuffer( _buffer, buff ) == false )
-						{
-							DrawAssist.update( _buffer ) ;
-						}
+						DrawAssist.update( _buffer ) ;
 					}
 				} ) ;
 				return _buffer ;
@@ -284,17 +316,17 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 			private GLBuffer create( final ABuffer _buffer )
 			{
-				switch( _buffer.getBufferType() )
+				return switch( _buffer )
 				{
-					default                    : return null ;//throw new Exception( "Unknown buffer type specified." ) ;
-					case GEOMETRY_BUFFER       : return new GLGeometryBuffer( ( GeometryBuffer )_buffer ) ;
-					case TEXT_BUFFER           : return new GLTextBuffer( ( TextBuffer )_buffer ) ;
-					case DRAW_BUFFER           : return new GLDrawBuffer( ( DrawBuffer )_buffer ) ;
-					case DRAW_INSTANCED_BUFFER : return new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
-					case STENCIL               : return new GLStencil( ( Stencil )_buffer ) ;
-					case DEPTH                 : return new GLDepth( ( Depth )_buffer ) ;
-					case GROUP                 : return new GLGroupBuffer( ( GroupBuffer )_buffer ) ;
-				}
+					case GeometryBuffer b      -> new GLGeometryBuffer( b ) ;
+					case TextBuffer b          -> new GLTextBuffer( b ) ;
+					case DrawInstancedBuffer b -> new GLDrawInstancedBuffer( ( DrawInstancedBuffer )_buffer ) ;
+					case DrawBuffer b          -> new GLDrawBuffer( b ) ;
+					case Stencil b             -> new GLStencil( b ) ;
+					case Depth b               -> new GLDepth( b ) ;
+					case GroupBuffer b         -> new GLGroupBuffer( b ) ;
+					default -> null ;//throw new Exception( "Unknown buffer type specified." ) ;
+				} ;
 			}
 		} ;
 	}
@@ -475,21 +507,21 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public <T extends IUpdater<Storage>> T add( final T _updater )
+			public StorageUpdater add( final StorageUpdater _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-					storageUpdaters.add( _updater ) ;
+					updaters.add( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
 
 			@Override
-			public <T extends IUpdater<Storage>> T remove( final T _updater )
+			public StorageUpdater remove( final StorageUpdater _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-					storageUpdaters.remove( _updater ) ;
+					updaters.remove( _updater ) ;
 				} ) ;
 				return _updater ;
 			}
@@ -563,7 +595,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	public void init( final GLAutoDrawable _drawable )
 	{
 		System.out.println( "GL3 Contex initialised.." ) ;
-		MGL.setGL( _drawable.getGL().getGL3() ) ;
+		MGL.setGL( _drawable.getGL().getGL4() ) ;
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
 		MGL.setSwapInterval( GlobalConfig.getInteger( "VSYNC", 0 ) ) ; // V-Sync 1 = Enabled, 0 = Disabled
@@ -639,10 +671,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		final float updateDelta = getUpdateDeltaTime() ;
 		final float frameDelta = getFrameDeltaTime() ;
-		final int frameNo = getFrameIteration() ;
 
 		// Expected number of render frames before the next update is triggered.
 		final int difference = ( int )( updateDelta / frameDelta ) ;
+		final float coefficient = ( 1.0f / difference ) ;
 
 		// We limit the number of textures that can be bound
 		// each draw call - ensures things still feel responsive.
@@ -652,21 +684,15 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		for( int i = 0; i < cameraSize; ++i )
 		{
 			final Camera camera = cameras.get( i ) ;
-			if( camera.update( difference, frameNo ) == true )
+			if( camera.update( coefficient ) == true )
 			{
 				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
 				glCamera.update( camera ) ;
 			}
 		}
 
-		int totalBufferUpdates = 0 ;
-		final int storageBuffers = updateStorageBuffers( difference, frameNo ) ;
-		//System.out.println( "Storage Buffers: " + storageBuffers ) ;
-		final int buffers = updateBuffers( difference, frameNo ) ;
+		final int buffers = updateBuffers( coefficient ) ;
 		//System.out.println( "Buffers: " + buffers ) ;
-
-		totalBufferUpdates += storageBuffers ;
-		totalBufferUpdates += buffers ;
 
 		updateExecutions() ;
 
@@ -794,44 +820,15 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return fontManager.get( _font ) ;
 	}
 
-	private int updateStorageBuffers( final int _difference, final int _frameNo )
+	private int updateBuffers( final float _coefficient )
 	{
 		int totalBufferUpdates = 0 ;
 
-		final int sSize = storageUpdaters.size() ;
-		for( int i = 0; i < sSize; ++i )
-		{
-			final IUpdater<Storage> updater = storageUpdaters.get( i ) ;
-			updater.update( buffersToUpdate, _difference, _frameNo ) ;
-			if( buffersToUpdate.isEmpty() == false )
-			{
-				final int bSize = buffersToUpdate.size() ;
-				totalBufferUpdates += bSize ;
-				for( int j = 0; j < bSize; ++j )
-				{
-					final ABuffer buffer = buffersToUpdate.get( j ) ;
-					final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
-					if( storage.update( ( Storage )buffer ) == false )
-					{
-						updater.forceUpdate() ;
-					}
-				}
-				buffersToUpdate.clear() ;
-			}
-		}
-
-		return totalBufferUpdates ;
-	}
-
-	private int updateBuffers( final int _difference, final int _frameNo )
-	{
-		int totalBufferUpdates = 0 ;
-
-		final int dSize = drawUpdaters.size() ;
+		final int dSize = updaters.size() ;
 		for( int i = 0; i < dSize; ++i )
 		{
-			final IUpdater<? extends ABuffer> updater = drawUpdaters.get( i ) ;
-			updater.update( buffersToUpdate, _difference, _frameNo ) ;
+			final IUpdater updater = updaters.get( i ) ;
+			updater.update( buffersToUpdate, _coefficient ) ;
 			if( buffersToUpdate.isEmpty() == false )
 			{
 				final int bSize = buffersToUpdate.size() ;
@@ -839,7 +836,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				for( int j = 0; j < bSize; ++j )
 				{
 					final ABuffer buffer = buffersToUpdate.get( j ) ;
-					if( updateBuffer( buffer, bufferLookup.getRHS( buffer.index() ) ) == false )
+					if( updateBuffer( buffer ) == false )
 					{
 						updater.forceUpdate() ;
 					}
@@ -851,42 +848,47 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return totalBufferUpdates ;
 	}
 
-	private <T extends ABuffer> boolean updateBuffer( final T _buffer, final GLBuffer _buff )
+	private <T extends ABuffer> boolean updateBuffer( final T _buffer )
 	{
-		switch( _buffer.getBufferType() )
+		return switch( _buffer )
 		{
-			default              : return true ;//throw new Exception( "Unknown buffer type specified." ) ;
-			case GEOMETRY_BUFFER :
+			case GeometryBuffer buffer ->
 			{
-				final GLGeometryBuffer buf = ( GLGeometryBuffer )_buff ;
-				return buf.update( ( GeometryBuffer )_buffer ) ;
+				final GLGeometryBuffer buf = ( GLGeometryBuffer )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( buf != null ) ? buf.update( buffer ) : true ;
 			}
-			case TEXT_BUFFER     :
+			case TextBuffer buffer ->
 			{
-				final GLTextBuffer buf = ( GLTextBuffer )_buff ;
-				return buf.update( ( TextBuffer )_buffer, programLookup, storageLookup ) ;
+				final GLTextBuffer buf = ( GLTextBuffer )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( buf != null ) ? buf.update( buffer, programLookup, storageLookup ) : true ;
 			}
-			case DRAW_BUFFER     :
+			case DrawInstancedBuffer buffer ->
 			{
-				final GLDrawBuffer buf = ( GLDrawBuffer )_buff ;
-				return buf.update( ( DrawBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+				final GLDrawInstancedBuffer buf = ( GLDrawInstancedBuffer )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( buf != null ) ? buf.update( buffer, programLookup, bufferLookup, storageLookup ) : true ;
 			}
-			case DRAW_INSTANCED_BUFFER     :
+			case DrawBuffer buffer ->
 			{
-				final GLDrawInstancedBuffer buf = ( GLDrawInstancedBuffer )_buff ;
-				return buf.update( ( DrawInstancedBuffer )_buffer, programLookup, bufferLookup, storageLookup ) ;
+				final GLDrawBuffer buf = ( GLDrawBuffer )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( buf != null ) ? buf.update( buffer, programLookup, bufferLookup, storageLookup ) : true ;
 			}
-			case STENCIL                   :
+			case Stencil buffer ->
 			{
-				final GLStencil stencil = ( GLStencil )_buff ;
-				return stencil.update( ( Stencil )_buffer, bufferLookup ) ;
+				final GLStencil stencil = ( GLStencil )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( stencil != null ) ? stencil.update( buffer, bufferLookup ) : true ;
 			}
-			case DEPTH                     :
+			case Depth buffer ->
 			{
-				final GLDepth depth = ( GLDepth )_buff ;
-				return depth.update( ( Depth )_buffer, bufferLookup ) ;
+				final GLDepth depth = ( GLDepth )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( depth != null ) ? depth.update( buffer, bufferLookup ) : true ;
 			}
-		}
+			case Storage buffer ->
+			{
+				final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
+				yield ( storage != null ) ? storage.update( buffer ) : true ;
+			}
+			default -> true ;//throw new Exception( "Unknown buffer type specified." ) ;
+		} ;
 	}
 
 	/**

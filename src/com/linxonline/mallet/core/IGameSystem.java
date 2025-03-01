@@ -2,8 +2,8 @@ package com.linxonline.mallet.core ;
 
 public interface IGameSystem
 {
-	public void runSystem() ;
-	public void stopSystem() ;
+	public void run() ;
+	public void stop() ;
 
 	public void addUpdate( final IUpdate _update ) ;
 

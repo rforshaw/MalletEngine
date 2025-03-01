@@ -34,11 +34,20 @@ import com.linxonline.mallet.ui.UIRatio ;
 */
 public class DesktopStarter implements IStarter
 {
-	private final GameSystem gameSystem = new GameSystem() ;
+	private final GameSystem game = new GameSystem() ;
 	private final ISystem mainSystem ;
 	private final IGameLoader loader ;
 
-	protected Thread thread ;
+	protected final Thread thread = new Thread( "GAME_THREAD" )
+	{
+		@Override
+		public void run()
+		{
+			Logger.println( "Running...", Logger.Verbosity.NORMAL ) ;
+			game.run() ;		// Begin running the game-loop
+			Logger.println( "Stopping...", Logger.Verbosity.NORMAL ) ;
+		}
+	} ;
 
 	public DesktopStarter( final IGameLoader _loader )
 	{
@@ -49,8 +58,6 @@ public class DesktopStarter implements IStarter
 	{
 		mainSystem = _main ;
 		loader = _loader ;
-
-		gameSystem.setMainSystem( _main ) ;
 	}
 
 	public void init()
@@ -65,7 +72,7 @@ public class DesktopStarter implements IStarter
 			@Override
 			public void shutdown()
 			{
-				System.out.println( "Shutting down..." ) ;
+				Logger.println( "Shutting down...", Logger.Verbosity.NORMAL ) ;
 				stop() ;
 				System.exit( 0 ) ;
 			}
@@ -74,37 +81,19 @@ public class DesktopStarter implements IStarter
 
 	public void run()
 	{
-		final ISystem main = getMainSystem() ;
-
-		main.startSystem() ;
-		thread = new Thread( "GAME_THREAD" )
-		{
-			public void run()
-			{
-				Logger.println( "Running...", Logger.Verbosity.MINOR ) ;
-				gameSystem.runSystem() ;		// Begin running the game-loop
-				Logger.println( "Stopping...", Logger.Verbosity.MINOR ) ;
-			}
-		} ;
-
 		thread.start() ;
 	}
 
 	public void stop()
 	{
-		if( thread == null )
-		{
-			return ;
-		}
+		Logger.println( "Game System slowing..", Logger.Verbosity.NORMAL ) ;
 
-		System.out.println( "Game System slowing.." ) ;
-		gameSystem.stopSystem() ;
+		game.stop() ;
 		if( thread.isAlive() == true )
 		{
 			try
 			{
 				thread.join( 10 ) ;
-				thread = null ;
 			}
 			catch( InterruptedException ex )
 			{
@@ -112,9 +101,7 @@ public class DesktopStarter implements IStarter
 			}
 		}
 
-		System.out.println( "Backend stopped.." ) ;
-		final ISystem main = getMainSystem() ;
-		main.stopSystem() ;
+		Logger.println( "Game stopped.", Logger.Verbosity.NORMAL ) ;
 	}
 
 	/**
@@ -159,7 +146,7 @@ public class DesktopStarter implements IStarter
 	@Override
 	public IGameSystem getGameSystem()
 	{
-		return gameSystem ;
+		return game ;
 	}
 
 	@Override

@@ -8,16 +8,14 @@ import com.linxonline.mallet.util.Parallel ;
 public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListRun<T>
 {
 	private Interpolation mode ;
-	private int diff ;
-	private int iteration ;
+	private float coefficient ;
 
 	private final AtomicBoolean dirty = new AtomicBoolean( false ) ;
 
-	public void set( final Interpolation _mode, final int _diff, final int _iteration )
+	public void set( final Interpolation _mode, final float _coefficient )
 	{
 		mode = _mode ;
-		diff = _diff ;
-		iteration = _iteration ;
+		coefficient = _coefficient ;
 
 		dirty.set( false ) ;
 	}
@@ -37,7 +35,7 @@ public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListR
 		// or scale that has changed.
 		for( int i = _start; i < _end; ++i )
 		{
-			if( _list.get( i ).update( mode, diff, iteration ) == true )
+			if( _list.get( i ).update( mode, coefficient ) == true )
 			{
 				d = true ;
 			}

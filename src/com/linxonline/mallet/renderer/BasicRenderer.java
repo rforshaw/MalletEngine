@@ -14,7 +14,6 @@ public abstract class BasicRenderer implements IRender
 
 	private float drawDT   = 1.0f ;
 	private float updateDT = 1.0f ;
-	private int renderIter = 0 ;
 
 	public BasicRenderer()
 	{
@@ -91,11 +90,6 @@ public abstract class BasicRenderer implements IRender
 	{
 		return updateDT ;
 	}
-	
-	public int getFrameIteration()
-	{
-		return renderIter ;
-	}
 
 	public float getFrameDeltaTime()
 	{
@@ -106,13 +100,11 @@ public abstract class BasicRenderer implements IRender
 	public void updateState( final float _dt )
 	{
 		updateDT = _dt ;
-		renderIter = 0 ;
 	}
 
 	@Override
 	public void draw( final float _dt )
 	{
-		++renderIter ;
 		drawDT = _dt ;
 	}
 

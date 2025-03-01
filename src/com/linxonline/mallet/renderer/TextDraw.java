@@ -151,9 +151,9 @@ public final class TextDraw implements IUpdate
 	}
 
 	@Override
-	public boolean update( Interpolation _mode, final int _diff, final int _iteration )
+	public boolean update( Interpolation _mode, final float _coefficient )
 	{
-		return draw.update( _mode, _diff, _iteration ) ;
+		return draw.update( _mode, _coefficient ) ;
 	}
 
 	public void setRange( final int _startIndex, final int _endIndex )

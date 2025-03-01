@@ -22,12 +22,6 @@ public final class Storage extends ABuffer
 	}
 
 	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.STORAGE_BUFFER ;
-	}
-
-	@Override
 	public int getOrder()
 	{
 		return 0 ;

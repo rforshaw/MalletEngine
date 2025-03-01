@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-public class DrawBuffer extends ABuffer
+public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
 {
 	public static final IOcclude OCCLUDER_FALLBACK = new IOcclude()
 	{
@@ -156,12 +156,6 @@ public class DrawBuffer extends ABuffer
 	public IOcclude getOccluder()
 	{
 		return occluder ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.DRAW_BUFFER ;
 	}
 
 	@Override

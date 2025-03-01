@@ -21,10 +21,8 @@ public interface ISystem<F extends FileSystem,
 						 I extends IInputSystem,
 						 E extends IEventSystem>
 {
-	public void initSystem() ;		// Intialise systems
-	public void startSystem() ;		// Run the systems if required
-	public void stopSystem() ;		// Stop any independent systems - threaded for instance
-	public void shutdownSystem() ;	// Shutdown systems and begin the clean-up job
+	public void init() ;		// Intialise systems
+	public void shutdown() ;	// Shutdown systems and begin the clean-up job
 
 	public F getFileSystem() ;
 

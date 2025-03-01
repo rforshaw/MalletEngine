@@ -65,7 +65,7 @@ public class GameState
 	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
 	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
 
-	protected ISystem system = null ;																// Provides access to Root systems
+	protected final ISystem system ;																// Provides access to Root systems
 	protected final EntitySystem entitySystem = new EntitySystem( eventSystem ) ;
 
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
@@ -80,9 +80,19 @@ public class GameState
 
 	private final ShowFPS showFPS = new ShowFPS() ;
 
-	public GameState( final String _name )
+	public GameState( final String _name, final ISystem _system )
 	{
 		name = _name ;
+		system = _system ;
+
+		audioSystem.setGenerator( _system.getAudioGenerator() ) ;
+
+		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
+		shutdown.addShutdownCallback( () ->
+		{
+			Logger.println( "Clearing audio from game-state.", Logger.Verbosity.MINOR ) ;
+			audioSystem.clear() ;
+		} ) ;
 
 		createCoreUpdate() ;
 		setFrameRate( GlobalConfig.getInteger( "MAXFPS", 60 ) ) ;
@@ -319,23 +329,6 @@ public class GameState
 	public final void setFrameRate( final int _framerate )
 	{
 		DEFAULT_FRAMERATE = 1.0f / _framerate ;
-	}
-
-	/**
-		Provides access to the renderer.
-		Audio source generator, inputs and the root event system.
-	*/
-	public final void setSystem( final ISystem _system )
-	{
-		system = _system ;
-		audioSystem.setGenerator( _system.getAudioGenerator() ) ;
-
-		final ISystem.ShutdownDelegate shutdown = _system.getShutdownDelegate() ;
-		shutdown.addShutdownCallback( () ->
-		{
-			Logger.println( "Clearing audio from game-state.", Logger.Verbosity.MINOR ) ;
-			audioSystem.clear() ;
-		} ) ;
 	}
 
 	/**

@@ -14,7 +14,7 @@ package com.linxonline.mallet.renderer ;
 	and managed internally by the renderer, you do 
 	not have to specify a Storage object. 
 */
-public class DrawInstancedBuffer extends DrawBuffer
+public final class DrawInstancedBuffer extends DrawBuffer
 {
 	private final IShape shape ;
 	private final String storageName ;
@@ -63,12 +63,6 @@ public class DrawInstancedBuffer extends DrawBuffer
 	public String getStorageName()
 	{
 		return storageName ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.DRAW_INSTANCED_BUFFER ;
 	}
 
 	@Override

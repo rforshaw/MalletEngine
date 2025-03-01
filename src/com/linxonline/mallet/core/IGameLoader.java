@@ -18,5 +18,5 @@ public interface IGameLoader
 	/**
 		Load the game states into the game-system. 
 	*/
-	public void loadGame( final IGameSystem _system ) ;
+	public void loadGame( final ISystem _main, final IGameSystem _game ) ;
 }

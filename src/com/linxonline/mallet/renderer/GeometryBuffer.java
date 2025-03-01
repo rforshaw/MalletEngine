@@ -5,7 +5,7 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public class GeometryBuffer extends ABuffer
+public final class GeometryBuffer extends ABuffer
 {
 	private final Shape.Attribute[] attributes ;
 	private final ArrayList<Draw> draws = new ArrayList<Draw>() ;
@@ -88,12 +88,6 @@ public class GeometryBuffer extends ABuffer
 		}
 
 		return true ;
-	}
-
-	@Override
-	public BufferType getBufferType()
-	{
-		return BufferType.GEOMETRY_BUFFER ;
 	}
 
 	@Override
