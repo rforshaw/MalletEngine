@@ -4,7 +4,6 @@ import java.util.List ;
 
 import com.linxonline.mallet.entity.Entity.Component ;
 
-import com.linxonline.mallet.event.IEventSystem ;
 import com.linxonline.mallet.event.Event ;
 
 import com.linxonline.mallet.util.MalletList ;
@@ -18,21 +17,18 @@ public final class EntitySystem
 {
 	public final int capacity ;
 
-	private final IEventSystem eventSystem ;
-
 	private List<Entity> entitiesToAdd = null ;
 	private List<Entity> cleanup = null ;
 	private List<Entity> entities = null ;		// Active entities
 
-	public EntitySystem( final IEventSystem _eventSystem )
+	public EntitySystem()
 	{
-		this( _eventSystem, 100 ) ;
+		this( 100 ) ;
 	}
 
-	public EntitySystem( final IEventSystem _eventSystem, final int _initialCapacity )
+	public EntitySystem( final int _initialCapacity )
 	{
 		capacity = _initialCapacity ;
-		eventSystem = _eventSystem ;
 
 		entitiesToAdd = MalletList.<Entity>newList( capacity ) ;
 		cleanup = MalletList.<Entity>newList( capacity ) ;
@@ -103,7 +99,7 @@ public final class EntitySystem
 		for( int i = 0; i < size; ++i )
 		{
 			final Entity entity = entitiesToAdd.get( i ) ;
-			hookEntity( eventSystem, events, entity ) ;
+			hookEntity( events, entity ) ;
 			entities.add( entity ) ;
 		}
 		entitiesToAdd.clear() ;
@@ -131,7 +127,7 @@ public final class EntitySystem
 		{
 			final Entity entity = cleanup.get( i ) ;
 
-			unhookEntity( eventSystem, events, entity ) ;
+			unhookEntity( events, entity ) ;
 			entities.remove( entity ) ;
 		}
 		cleanup.clear() ;
@@ -167,29 +163,19 @@ public final class EntitySystem
 		return _entities ;
 	}
 
-	private void hookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity )
+	private void hookEntity( final List<Event<?>> _events, final Entity _entity )
 	{
 		_entity.passInitialEvents( _events ) ;
 
-		final int size = _events.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			_eventSystem.addEvent( _events.get( i ) ) ;
-		}
-
+		Event.addEvents( _events ) ;
 		_events.clear() ;
 	}
 
-	private void unhookEntity( final IEventSystem _eventSystem, final List<Event<?>> _events, final Entity _entity )
+	private void unhookEntity( final List<Event<?>> _events, final Entity _entity )
 	{
 		_entity.passFinalEvents( _events ) ;
 
-		final int size = _events.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			_eventSystem.addEvent( _events.get( i ) ) ;
-		}
-
+		Event.addEvents( _events ) ;
 		_events.clear() ;
 	}
 }

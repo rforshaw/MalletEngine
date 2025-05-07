@@ -23,31 +23,27 @@ public abstract class BasicSystem<F extends FileSystem,
 								  S extends ISystem.ShutdownDelegate,
 								  R extends IRender,
 								  A extends IGenerator,
-								  I extends IInputSystem,
-								  E extends IEventSystem> implements ISystem<F, S, R, A, I, E>
+								  I extends IInputSystem> implements ISystem<F, S, R, A, I>
 {
-	protected final EventController controller = new EventController() ;
+	protected final EventBlock block = new EventBlock() ;
 
 	private final S shutdownDelegate ;
 
 	private final R renderer ;
 	private final A audioGenerator ;
 
-	private final E eventSystem ;
 	private final I inputSystem ;
 	private final F fileSystem ;
 
 	public BasicSystem( final S _shutdown,
 						final R _renderer,
 						final A _audio,
-						final E _event,
 						final I _input,
 						final F _fileSystem )
 	{
 		shutdownDelegate = _shutdown ;
 		renderer = _renderer ;
 		audioGenerator = _audio ;
-		eventSystem = _event ;
 		inputSystem = _input ;
 		fileSystem = _fileSystem ;
 
@@ -109,14 +105,8 @@ public abstract class BasicSystem<F extends FileSystem,
 	}
 
 	@Override
-	public final E getEventSystem()
+	public final EventBlock getEventBlock()
 	{
-		return eventSystem ;
-	}
-
-	@Override
-	public final EventController getEventController()
-	{
-		return controller ;
+		return block ;
 	}
 }

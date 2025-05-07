@@ -12,11 +12,10 @@ import com.linxonline.mallet.input.IInputSystem ;
 import com.linxonline.mallet.input.IInputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
-import com.linxonline.mallet.event.EventSystem ;
-import com.linxonline.mallet.event.EventController ;
+import com.linxonline.mallet.event.Event ;
+import com.linxonline.mallet.event.EventQueue ;
+import com.linxonline.mallet.event.EventBlock ;
 import com.linxonline.mallet.event.InterceptController ;
-import com.linxonline.mallet.event.IEventSystem ;
-import com.linxonline.mallet.event.IEventController ;
 
 import com.linxonline.mallet.physics.CollisionSystem ;
 import com.linxonline.mallet.physics.CollisionAssist ;
@@ -52,14 +51,12 @@ public class GameState
 
 	protected final InputState inputWorldSystem = new InputState() ;			// Internal World Input System
 	protected final InputState inputUISystem = new InputState() ;				// Internal UI Input System
-	protected final EventSystem eventSystem = new EventSystem() ;				// Internal Event System
 
 	private final InterceptController interceptController = new InterceptController() ;
-	private final EventController internalController = new EventController() ;		// Used to process Events, from internal eventSystem
-	private final EventController externalController = new EventController() ;		// Used to process Events, from external eventSystem
+	private final EventBlock eventBlock = new EventBlock() ;
 
 	protected final ISystem system ;																// Provides access to Root systems
-	protected final EntitySystem entitySystem = new EntitySystem( eventSystem ) ;
+	protected final EntitySystem entitySystem = new EntitySystem() ;
 
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
 	protected final AudioSystem audioSystem = new AudioSystem() ;
@@ -128,6 +125,11 @@ public class GameState
 
 		hookHandlerSystems() ;
 
+		// Event processors need to be called last 
+		// in case developer adds more during initGame or resumeGame.
+		Event.getGlobalState().setIntercept( interceptController ) ;
+		initEventProcessors( eventBlock, interceptController ) ;
+
 		if( paused == true )
 		{
 			paused = false ;
@@ -139,11 +141,6 @@ public class GameState
 			createUpdaters( mainUpdaters, drawUpdaters ) ;
 			initGame() ;
 		}
-
-		// Event processors need to be called last 
-		// in case developer adds more during initGame or resumeGame.
-		initEventProcessors( internalController, externalController, interceptController ) ;
-		hookGameStateEventController() ;
 	}
 
 	/**
@@ -154,7 +151,6 @@ public class GameState
 	{
 		clear() ;								// Remove all content
 		unhookHandlerSystems() ;				// Prevent system from recieving external events
-		unhookGameStateEventController() ;
 
 		showFPS.setShow( false ) ;
 		return null ;
@@ -171,7 +167,6 @@ public class GameState
 	public Settings pauseState()
 	{
 		unhookHandlerSystems() ;				// Prevent system from receiving external events
-		unhookGameStateEventController() ;
 		audioSystem.pauseSystem() ;
 
 		showFPS.setShow( false ) ;
@@ -325,32 +320,6 @@ public class GameState
 	}
 
 	/**
-		Called by startState once the game has been 
-		initialised or resumed.
-		Ensures that any EventProcessors added to 
-		the controller are handled correctly by the 
-		Event Systems.
-	*/
-	protected void hookGameStateEventController()
-	{
-		eventSystem.setIntercept( interceptController ) ;
-
-		eventSystem.addHandler( internalController ) ;
-		internalController.setAddEventInterface( eventSystem ) ;
-
-		system.getEventSystem().addHandler( externalController ) ;
-		externalController.setAddEventInterface( system.getEventSystem() ) ;
-	}
-
-	protected void unhookGameStateEventController()
-	{
-		eventSystem.setIntercept( null ) ;
-
-		eventSystem.removeHandler( internalController ) ;
-		system.getEventSystem().removeHandler( externalController ) ;
-	}
-
-	/**
 		Enable event-based systems to recieve events.
 		Also hooks-up the inputSystem.
 	*/
@@ -384,19 +353,22 @@ public class GameState
 
 			system.getRenderer().updateState( dt ) ;
 			system.getInput().update() ;
-			system.getEventSystem().sendEvents() ;
-			system.getEventController().update() ;
+			system.getEventBlock().update() ;
 
 			inputUISystem.update() ;
 			inputWorldSystem.update() ;
 
-			eventSystem.sendEvents() ;
-			internalController.update() ;
-			externalController.update() ;
+			eventBlock.update() ;
 
 			collisionSystem.update( dt ) ;
 			entitySystem.update( dt ) ;
 			audioSystem.update( dt ) ;
+
+			// The Global EventQueue needs to have its buffers swapped
+			// at the game-state level, the game-system level can trigger
+			// a swap of the buffers before it can be used by the active
+			// game state.
+			Event.getGlobalState().swap() ;
 		} ) ;
 
 		drawUpdaters.add( ( final double _dt ) ->
@@ -419,56 +391,29 @@ public class GameState
 	*/
 	protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw ) {}
 
-	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
+	protected void initEventProcessors( final EventBlock _block, final InterceptController _intercept )
 	{
-		_internal.addProcessor( "ADD_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "ADD_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputUISystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "REMOVE_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputUISystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "ADD_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputWorldSystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "REMOVE_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "REMOVE_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputWorldSystem.removeInputHandler( _handler ) ;
 		} ) ;
 
-		_internal.addProcessor( "ADD_GAME_STATE_EVENT", ( final IEventController _controller ) ->
-		{
-			_controller.setAddEventInterface( eventSystem ) ;
-			eventSystem.addHandler( _controller ) ;
-		} ) ;
-
-		_internal.addProcessor( "REMOVE_GAME_STATE_EVENT", ( final IEventController _controller ) ->
-		{
-			eventSystem.removeHandler( _controller ) ;
-			_controller.setAddEventInterface( null ) ;
-		} ) ;
-
-		_internal.addProcessor( "ADD_BACKEND_EVENT", ( final IEventController _controller ) ->
-		{
-			final IEventSystem eventBackend = system.getEventSystem() ;
-
-			_controller.setAddEventInterface( eventBackend ) ;
-			eventBackend.addHandler( _controller ) ;
-		} ) ;
-
-		_internal.addProcessor( "REMOVE_BACKEND_EVENT", ( final IEventController _controller ) ->
-		{
-			final IEventSystem eventBackend = system.getEventSystem() ;
-			eventBackend.removeHandler( _controller ) ;
-			_controller.setAddEventInterface( null ) ;
-		} ) ;
-
-		_internal.addProcessor( "SHOW_GAME_STATE_FPS", ( final Boolean _show ) ->
+		_block.add( "SHOW_GAME_STATE_FPS", ( final Boolean _show ) ->
 		{
 			final boolean show = _show ;
 			if( show == showFPS.toShow() )
@@ -482,14 +427,9 @@ public class GameState
 		} ) ;
 	}
 
-	public EventController getInternalController()
+	public EventBlock getEventBlock()
 	{
-		return internalController ;
-	}
-
-	public EventController getExternalController()
-	{
-		return externalController ;
+		return eventBlock ;
 	}
 
 	public EntitySystem getEntitySystem()
@@ -502,14 +442,6 @@ public class GameState
 	*/
 	protected void clear()
 	{
-		internalController.setAddEventInterface( null ) ;
-		internalController.clearEvents() ;
-
-		externalController.setAddEventInterface( null ) ;
-		externalController.clearEvents() ;
-
-		eventSystem.reset() ;
-
 		inputUISystem.clearInputs() ;
 		inputUISystem.clearHandlers() ;
 

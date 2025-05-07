@@ -26,15 +26,17 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 													   DefaultShutdown,
 													   GLRenderer,
 													   ALSAGenerator,
-													   InputSystem,
-													   EventSystem>
+													   InputSystem>
 {
+	private final EventQueue<Boolean> DISPLAY_SYSTEM_MOUSE = Event.get( "DISPLAY_SYSTEM_MOUSE" ) ;
+	private final EventQueue<Boolean> CAPTURE_SYSTEM_MOUSE = Event.get( "CAPTURE_SYSTEM_MOUSE" ) ;
+	private final EventQueue<Boolean> SYSTEM_FULLSCREEN = Event.get( "SYSTEM_FULLSCREEN" ) ;
+
 	public GLDefaultSystem()
 	{
 		super( new DefaultShutdown(),
 			   new GLRenderer(),
 			   new ALSAGenerator(),
-			   new EventSystem(),
 			   new InputSystem(),
 			   new DesktopFileSystem() ) ;
 	}
@@ -59,21 +61,20 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		render.getCanvas().addMouseListener( input ) ;
 		render.getCanvas().addKeyListener( input ) ;
 
-		final EventSystem event = getEventSystem() ;
-		event.addEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_MOUSE", GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ) ;
-		event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
-		event.addEvent( Event.<Boolean>create( "SYSTEM_FULLSCREEN",    GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ) ;
+		DISPLAY_SYSTEM_MOUSE.add( GlobalConfig.getBoolean( "DISPLAYMOUSE", false ) ) ;
+		CAPTURE_SYSTEM_MOUSE.add( GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ;
+		SYSTEM_FULLSCREEN.add( GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ;
 
 		final WinState window = new WinState() ;
 
 		GlobalConfig.addNotify( "CAPTUREMOUSE", ( String _name ) -> {
 			final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
-			event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", capture ) ) ;
+			CAPTURE_SYSTEM_MOUSE.add( capture ) ;
 		} ) ;
 
 		GlobalConfig.addNotify( "FULLSCREEN", ( String _name ) -> {
 			final boolean fullscreen = GlobalConfig.getBoolean( "FULLSCREEN", false ) ;
-			event.addEvent( Event.<Boolean>create( "SYSTEM_FULLSCREEN", fullscreen ) ) ;
+			SYSTEM_FULLSCREEN.add( fullscreen ) ;
 		} ) ;
 
 		getWindow().addWindowListener( window ) ;
@@ -82,27 +83,25 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 
 	protected void initEventProcessors()
 	{
-		controller.addProcessor( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
+		block.add( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
 		{
 			final boolean displayMouse = _displayMouse ;
 			getWindow().setPointerVisible( displayMouse ) ;
 		} ) ;
 
-		controller.addProcessor( "CAPTURE_SYSTEM_MOUSE", ( Boolean _confineMouse ) ->
+		block.add( "CAPTURE_SYSTEM_MOUSE", ( Boolean _confineMouse ) ->
 		{
 			final boolean confineMouse = _confineMouse ;
 			getWindow().confinePointer( confineMouse ) ;
 		} ) ;
 
-		controller.addProcessor( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
+		block.add( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
 		{
 			final boolean fullscreen = _fullscreen ;
 
 			final GLRenderer render = getRenderer() ;
 			render.setFullscreen( fullscreen ) ;
 		} ) ;
-
-		getEventSystem().addHandler( controller ) ;
 	}
 
 	private final class WinState implements WindowListener, MouseListener
@@ -130,8 +129,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		public void windowLostFocus( final WindowEvent _event )
 		{
 			Logger.println( "Main window lost focus.", Logger.Verbosity.MINOR ) ;
-			final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
-			event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", false ) ) ;
+			Event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", false ) ) ;
 
 			focusState = FOCUS_LOST ;
 		}
@@ -152,9 +150,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 				default           : break ;
 				case FOCUS_GAINED :
 				{
-				
-					final EventSystem event = GLDefaultSystem.this.getEventSystem() ;
-					event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
+					Event.addEvent( Event.<Boolean>create( "CAPTURE_SYSTEM_MOUSE", GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ) ;
 					break ;
 				}
 			}

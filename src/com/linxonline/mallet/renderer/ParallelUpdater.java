@@ -35,7 +35,7 @@ public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListR
 		// or scale that has changed.
 		for( int i = _start; i < _end; ++i )
 		{
-			if( _list.get( i ).update( mode, coefficient ) == true )
+			if( _list.get( i ).update( mode, coefficient ) )
 			{
 				d = true ;
 			}

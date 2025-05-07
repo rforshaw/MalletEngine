@@ -2,6 +2,7 @@ package com.linxonline.mallet.core ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.event.EventQueue ;
 import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.time.* ;
 import com.linxonline.mallet.util.MalletList ;

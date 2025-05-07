@@ -82,20 +82,21 @@ public class UIEditorState extends GameState
 		component.addElement( jui.getParent() ) ;
 		addEntity( entity ) ;
 
-		getInternalController().processEvent( Event.<Boolean>create( "SHOW_GAME_STATE_FPS", true ) ) ;
+		final EventQueue<Boolean> showFPS = Event.get( "SHOW_GAME_STATE_FPS" ) ;
+		showFPS.add( true ) ;
 	}
 
 	@Override
-	protected void initEventProcessors( final EventController _internal, final EventController _external, final InterceptController _intercept )
+	protected void initEventProcessors( final EventBlock _block, final InterceptController _intercept )
 	{
-		super.initEventProcessors( _internal, _external, _intercept ) ;
+		super.initEventProcessors( _block, _intercept ) ;
 
-		_internal.addProcessor( "ADD_ENTITY", ( final Entity _entity ) -> 
+		_block.add( "ADD_ENTITY", ( final Entity _entity ) -> 
 		{
 			addEntity( _entity ) ;
 		} ) ;
 
-		_internal.addProcessor( "INSERT_UIPACKET", ( final UIPacket _packet ) ->
+		_block.add( "INSERT_UIPACKET", ( final UIPacket _packet ) ->
 		{
 			if( root != null )
 			{
@@ -112,7 +113,7 @@ public class UIEditorState extends GameState
 			}
 		} ) ;
 
-		_internal.addProcessor( "INSERT_CUIPACKET", ( final CUIPacket _packet ) ->
+		_block.add( "INSERT_CUIPACKET", ( final CUIPacket _packet ) ->
 		{
 			if( root != null )
 			{
@@ -120,10 +121,11 @@ public class UIEditorState extends GameState
 			}
 		} ) ;
 
-		_internal.addProcessor( "DISPLAY_META", new EventController.IProcessor<UIWrapper>()
+		_block.add( "DISPLAY_META", new Event.IProcess<UIWrapper>()
 		{
 			UIElement.Meta current = null ;
 
+			@Override
 			public void process( final UIWrapper _wrapper )
 			{
 				final UIElement.Meta meta = _wrapper.getMeta() ;

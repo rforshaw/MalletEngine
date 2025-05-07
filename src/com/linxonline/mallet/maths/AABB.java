@@ -321,7 +321,7 @@ public final class AABB
 		return _max ;
 	}
 
-	@Override
+	/*@Override
 	public int hashCode()
 	{
 		final int prime = 31 ;
@@ -353,7 +353,7 @@ public final class AABB
 		}
 
 		return true ;
-	}
+	}*/
 
 	@Override
 	public String toString()

@@ -1,5 +1,9 @@
 package com.linxonline.mallet.event ;
 
+import java.util.List ;
+
+import com.linxonline.mallet.util.Tuple ;
+
 /*===========================================*/
 // Event
 // Used to store relevant data to pass to 
@@ -7,6 +11,8 @@ package com.linxonline.mallet.event ;
 /*===========================================*/
 public final class Event<T>
 {
+	private static final EventState STATE = new EventState() ;
+
 	private final EventType eventType ;
 	private final T variable ;							// Event package contains data the receiver is interested in
 
@@ -21,6 +27,46 @@ public final class Event<T>
 		variable = _object ;
 	}
 
+	private Event( final EventType _type, final T _object )
+	{
+		eventType = _type ;
+		variable = _object ;
+	}
+
+	public static Tuple<String, IProcess<?>> create( final String _name, final IProcess<?> _processor )
+	{
+		return Tuple.<String, IProcess<?>>build( _name, _processor ) ;
+	}
+
+	public static void addEvent( final Event<?> _event )
+	{
+		STATE.addEvent( _event ) ;
+	}
+
+	public static void addEvents( final List<Event<?>> _events )
+	{
+		STATE.addEvents( _events ) ;
+	}
+
+	public static <T> EventQueue<T> get( final String _type )
+	{
+		return STATE.get( _type ) ;
+	}
+
+	/**
+	 * Get the event-queue associated with the event-type.
+	 * If the event-queue does not exist, create it.
+	 */
+	public static <T> EventQueue<T> get( final EventType _type )
+	{
+		return STATE.get( _type ) ;
+	}
+
+	public static EventState getGlobalState()
+	{
+		return STATE ;
+	}
+
 	public static <T> Event<T> create( final String _eventType )
 	{
 		return new Event<T>( _eventType ) ;
@@ -29,6 +75,11 @@ public final class Event<T>
 	public static <T> Event<T> create( final String _eventType, final T _object )
 	{
 		return new Event<T>( _eventType, _object ) ;
+	}
+
+	public static <T> Event<T> create( final EventType _type, final T _object )
+	{
+		return new Event<T>( _type, _object ) ;
 	}
 
 	public final boolean isEventByType( final EventType _type )
@@ -47,29 +98,6 @@ public final class Event<T>
 	}
 
 	@Override
-	public int hashCode()
-	{
-		if( variable == null )
-		{
-			return eventType.hashCode() ;
-		}
-
-		return eventType.hashCode() & variable.hashCode() ;
-	}
-
-	@Override
-	public boolean equals( final Object _obj )
-	{
-		if( !( _obj instanceof Event ) )
-		{
-			return false ;
-		}
-
-		final Event<T> b = ( Event<T> )_obj ;
-		return eventType.equals( b.eventType ) && variable.equals( b.variable ) ;
-	}
-
-	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
@@ -79,5 +107,11 @@ public final class Event<T>
 		buffer.append( variable.toString() ) ;
 		buffer.append( "]" ) ;
 		return buffer.toString() ;
+	}
+
+	@FunctionalInterface
+	public interface IProcess<T>
+	{
+		public void process( final T _value ) ;
 	}
 }

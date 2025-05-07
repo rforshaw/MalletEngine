@@ -95,7 +95,10 @@ public final class DrawInstancedUpdater implements IUpdater
 			final List<Draw> draws = buffer.getDraws() ;
 			Parallel.forBatch( draws, 1000, parallelUpdater ) ;
 
-			dirty |= parallelUpdater.isDirty() ;
+			if( parallelUpdater.isDirty() )
+			{
+				dirty = true ;
+			}
 
 			if( forceUpdate == true )
 			{

@@ -92,7 +92,7 @@ public final class GameTestLoader implements IGameLoader
 			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
 			{
 				jsEngine = new JSScriptEngine() ;
-				ecsEvents = new ECSEvent( eventSystem, system.getEventSystem() ) ;
+				ecsEvents = new ECSEvent() ;
 
 				_main.add( ecsInput ) ;
 				_main.add( ecsEvents ) ;
@@ -171,7 +171,9 @@ public final class GameTestLoader implements IGameLoader
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
 
-				getInternalController().passEvent( Event.<Boolean>create( "SHOW_GAME_STATE_FPS", true ) ) ;
+				final EventQueue<Boolean> showFPS = Event.get( "SHOW_GAME_STATE_FPS" ) ;
+				showFPS.add( true ) ;
+
 				createScript() ;
 			}
 
@@ -311,7 +313,7 @@ public final class GameTestLoader implements IGameLoader
 					final ECSCollision.Component collision = ecsCollision.create( _parent, hulls ) ;
 
 					final ECSEvent.Component messenger = ecsEvents.create( _parent, ECSEvent.Type.ENTITY ) ;
-					final ECSEvent.Component processor = ecsEvents.create( _parent, ECSEvent.Type.ENTITY, EventController.create( "KILL_ENTITY", ( final String _message ) ->
+					final ECSEvent.Component processor = ecsEvents.create( _parent, ECSEvent.Type.ENTITY, ECSEvent.create( "KILL_ENTITY", ( final String _message ) ->
 					{
 						_parent.destroy() ;
 					} ) ) ;

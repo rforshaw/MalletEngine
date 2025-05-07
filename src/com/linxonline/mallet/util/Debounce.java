@@ -2,7 +2,6 @@ package com.linxonline.mallet.util ;
 
 import java.util.Map ;
 import java.util.List ;
-import java.util.Iterator ;
 
 import com.linxonline.mallet.core.IGameSystem ;
 import com.linxonline.mallet.util.Logger ;

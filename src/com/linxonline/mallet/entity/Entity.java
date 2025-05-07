@@ -24,16 +24,12 @@ public class Entity
 	public enum AllowEvents
 	{
 		LOCAL,			// Allow components to communicate directly with each other.
-		GAMESTATE,		// Allow components to pass events to the game-state
-		SYSTEM,			// Allow components to pass events to the system
 		YES,			// Same as Local
 		NO				// No events can be called without crashing.
 	}
 
 	private final Component[] components ;
-	private IEventSystem eventSystem = null ;										// Component Event System
-	private IEventController stateController = NullEventController.FALLBACK  ;		// Used to talk to GameState
-	private IEventController systemController = NullEventController.FALLBACK  ;		// Used to talk to GLDefaultSystem
+	private EventState eventState = null ;			// Component Event System
 
 	private boolean destroy = false ;				// Is the Entity to be destroyed and subsequently removed?
 	private Entity.ReadyCallback readyDestroy ;
@@ -54,65 +50,10 @@ public class Entity
 			{
 				default        :
 				case YES       :
-				case LOCAL     : eventSystem = new EventSystem( _capacity ) ; break ;
-				case GAMESTATE : stateController = createStateEventController() ; break ;
-				case SYSTEM    : systemController = createSystemEventController() ; break ;
+				case LOCAL     : eventState = new EventState() ; break ;
 				case NO        : break ;
 			}
 		}
-	}
-
-	/**
-		Override to add Event Processors to the component's
-		State Event Controller.
-		Make sure to call super to ensure parents 
-		component Event Processors are added.
-	*/
-	public EventController createStateEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
-	{
-		return createController( _processors ) ;
-	}
-
-	/**
-		Override to add Event Processors to the component's
-		Backend Event Controller.
-		Make sure to call super to ensure parents 
-		component Event Processors are added.
-	*/
-	public EventController createSystemEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
-	{
-		return createController( _processors ) ;
-	}
-
-	private static EventController createController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
-	{
-		if( _processors == null )
-		{
-			return new EventController() ;
-		}
-
-		if( _processors.length == 0 )
-		{
-			return new EventController() ;
-		}
-
-		return new EventController( _processors ) ;
-	}
-
-	/**
-		Convienience method to EventController's passEvent.
-	**/
-	public void passBackendEvent( final Event _event )
-	{
-		systemController.passEvent( _event ) ;
-	}
-
-	/**
-		Convienience method to EventController's passEvent.
-	**/
-	public void passStateEvent( final Event _event )
-	{
-		stateController.passEvent( _event ) ;
 	}
 
 	private void addComponent( Component _component )
@@ -122,21 +63,22 @@ public class Entity
 			if( components[i] == null )
 			{
 				components[i] = _component ;
-				if( eventSystem != null )
-				{
-					final IEventController controller = _component.getComponentEventController() ;
-					if( controller != null )
-					{
-						controller.setAddEventInterface( eventSystem ) ;
-						eventSystem.addHandler( controller ) ;
-					}
-				}
 				return ;
 			}
 		}
 
 		Logger.println( "Failed to add " + _component + " to entity.", Logger.Verbosity.MAJOR ) ;
 		throw new RuntimeException( "Failed to add component" ) ;
+	}
+
+	protected EventState getEventState()
+	{
+		if( eventState == null )
+		{
+			return Event.getGlobalState() ;
+		}
+
+		return eventState ;
 	}
 
 	/**
@@ -149,9 +91,6 @@ public class Entity
 	*/
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		_events.add( Event.<IEventController>create( "ADD_BACKEND_EVENT", systemController ) ) ;
-		_events.add( Event.<IEventController>create( "ADD_GAME_STATE_EVENT", stateController ) ) ;
-
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
 		{
@@ -171,9 +110,6 @@ public class Entity
 	*/
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
-		_events.add( Event.<IEventController>create( "REMOVE_BACKEND_EVENT", systemController )  ) ;
-		_events.add( Event.<IEventController>create( "REMOVE_GAME_STATE_EVENT", stateController )  ) ;
-
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
 		{
@@ -188,22 +124,18 @@ public class Entity
 	**/
 	public final void update( final float _dt )
 	{
-		if( eventSystem != null )
-		{
-			// The entity can be constructed without an EventSystem.
-			// Some entities will be constructed with components that 
-			// do not inter-communicate.
-			eventSystem.sendEvents() ;
-		}
-
-		systemController.update() ;
-		stateController.update() ;
-
 		// Update Components
 		final int size = components.length ;
 		for( int i = 0; i < size; ++i )
 		{
 			components[i].update( _dt ) ;
+		}
+
+		if( eventState != null )
+		{
+			// We need to swap the back buffer with
+			// the front buffer.
+			eventState.swap() ;
 		}
 	}
 
@@ -262,6 +194,7 @@ public class Entity
 		{
 			private final List<Entity.Component> toDestroy = MalletList.<Entity.Component>newList( components ) ;
 
+			@Override
 			public void ready( final Entity.Component _component )
 			{
 				// toDestroy should not need to be synchronised 
@@ -316,7 +249,7 @@ public class Entity
 
 	public abstract class Component
 	{
-		protected final IEventController componentEvents ;	// Handles events from parent
+		private final IEventBlock componentEvents ;	// Handles events from parent
 		private boolean disabled = false ;
 
 		public Component()
@@ -328,9 +261,9 @@ public class Entity
 		{
 			switch( _allow )
 			{
-				default :
-				case YES     : componentEvents = createEventController() ; break ;
-				case NO      : componentEvents = NullEventController.FALLBACK ;
+				default  :
+				case YES : componentEvents = createEventBlock() ; break ;
+				case NO  : componentEvents = NullEventBlock.create() ; break ;
 			}
 
 			getParent().addComponent( this ) ;
@@ -349,19 +282,21 @@ public class Entity
 			If the component requires an Event Controller construct one
 			and add any required Event Processors to it.
 		*/
-		public EventController createEventController( final Tuple<String, EventController.IProcessor<?>> ... _processors )
+		public EventBlock createEventBlock( final Tuple<String, Event.IProcess<?>> ... _processors )
 		{
+			final EventState state = getParent().getEventState() ;
+
 			if( _processors == null )
 			{
-				return new EventController() ;
+				return new EventBlock( state ) ;
 			}
 
 			if( _processors.length == 0 )
 			{
-				return new EventController() ;
+				return new EventBlock( state ) ;
 			}
 
-			return new EventController( _processors ) ;
+			return new EventBlock( state, _processors ) ;
 		}
 
 		/**
@@ -383,10 +318,7 @@ public class Entity
 			to be passed when the component is removed from the Entity System.
 			super.passFinalEvents(), must be called.
 		*/
-		public void passFinalEvents( final List<Event<?>> _events )
-		{
-			componentEvents.clearEvents() ;			// Clear any lingering events that may reside in the buffers.
-		}
+		public void passFinalEvents( final List<Event<?>> _events ) {}
 
 		/**
 			The parent can be flagged for destruction at anytime, a 
@@ -406,11 +338,17 @@ public class Entity
 			return disabled ;
 		}
 
+		public void passComponentEvent( final Event<?> _event )
+		{
+			final EventState state = componentEvents.getEventState() ;
+			state.addEvent( _event ) ;
+		}
+
 		/**
 			Return the internal Event Controller for this component.
 			Passes and Receives event components within the parent Entity. 
 		*/
-		public IEventController getComponentEventController()
+		public IEventBlock getComponentEventBlock()
 		{
 			return componentEvents ;
 		}

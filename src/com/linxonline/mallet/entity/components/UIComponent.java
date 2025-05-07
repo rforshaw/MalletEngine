@@ -22,7 +22,6 @@ public class UIComponent extends InputComponent
 	private final Camera camera ;
 	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
-	protected final EventController eventController = new EventController() ;
 	private Entity.ReadyCallback toDestroy = null ;
 
 	public UIComponent( final Entity _parent )
@@ -60,7 +59,7 @@ public class UIComponent extends InputComponent
 		// is specified we will assume its the default.
 		world = ( _world != null ) ? _world : WorldAssist.getDefault() ;
 		camera = ( _camera != null ) ? _camera : CameraAssist.getDefault() ;
-		initEventProcessor( eventController ) ;
+		initEventProcessor() ;
 	}
 
 	/**
@@ -96,7 +95,7 @@ public class UIComponent extends InputComponent
 		return _element ;
 	}
 
-	protected void initEventProcessor( final EventController _controller ) {}
+	protected void initEventProcessor() {}
 
 	/**
 		Called when parent is flagged for destruction.
@@ -194,30 +193,9 @@ public class UIComponent extends InputComponent
 	{
 		if( events.isEmpty() == false )
 		{
-			final int size = events.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final Event event = events.get( i ) ;
-				eventController.passEvent( event ) ;
-			}
+			Event.addEvents( events ) ;
 			events.clear() ;
 		}
-
-		eventController.update() ;
-	}
-
-	@Override
-	public void passInitialEvents( final List<Event<?>> _events )
-	{
-		super.passInitialEvents( _events ) ;
-		_events.add( Event.<EventController>create( "ADD_GAME_STATE_EVENT", eventController ) ) ;
-	}
-
-	@Override
-	public void passFinalEvents( final List<Event<?>> _events )
-	{
-		super.passFinalEvents( _events ) ;
-		_events.add( Event.<EventController>create( "REMOVE_GAME_STATE_EVENT", eventController )  ) ;
 	}
 
 	@Override

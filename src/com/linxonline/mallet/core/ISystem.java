@@ -2,8 +2,7 @@ package com.linxonline.mallet.core ;
 
 import com.linxonline.mallet.audio.IGenerator ;
 import com.linxonline.mallet.input.IInputSystem ;
-import com.linxonline.mallet.event.IEventSystem ;
-import com.linxonline.mallet.event.EventController ;
+import com.linxonline.mallet.event.EventBlock ;
 import com.linxonline.mallet.renderer.IRender ;
 import com.linxonline.mallet.io.filesystem.FileSystem ;
 
@@ -18,8 +17,7 @@ public interface ISystem<F extends FileSystem,
 						 S extends ISystem.ShutdownDelegate,
 						 R extends IRender,
 						 A extends IGenerator,
-						 I extends IInputSystem,
-						 E extends IEventSystem>
+						 I extends IInputSystem>
 {
 	public void init() ;		// Intialise systems
 	public void shutdown() ;	// Shutdown systems and begin the clean-up job
@@ -53,18 +51,7 @@ public interface ISystem<F extends FileSystem,
 	*/
 	public I getInput() ;
 
-	/**
-		The root Event-system, typically one state will be hooked.
-		Allows the state to be informed of external events. For 
-		example: shutdown, minimise, layout change requests that 
-		the state may be interested in.
-		It also enables the state to make O/S specific requests 
-		that only work on certain implementations. For example:
-		Displaying virtual-keyboard, opening a web browser, etc.
-	*/
-	public E getEventSystem() ;
-
-	public EventController getEventController() ;
+	public EventBlock getEventBlock() ;
 
 	/**
 		Implement this interface if DefaultShutdown is 

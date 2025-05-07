@@ -8,8 +8,6 @@ public final class Box2D extends Hull
 	public final AABB aabb ;
 	public final OBB obb ;
 
-	private final Vector2 point = new Vector2() ;
-
 	public Box2D( final AABB _aabb, final Vector2 _position, final Vector2 _offset )
 	{
 		this( _aabb, null, _position, _offset ) ;
@@ -85,16 +83,19 @@ public final class Box2D extends Hull
 	@Override
 	public float projectToAxis( final Vector2 _axis )
 	{
-		FloatBuffer.fill( obb.rotations, point, 0 ) ;
-		float dp = Vector2.dot( point, _axis ) ;
+		float x = obb.rotations[0] ;
+		float y = obb.rotations[1] ;
+
+		float dp = Vector2.dot( x, y, _axis.x, _axis.y ) ;
 
 		float max = dp ;
 		float min = dp ;
 
 		for( int i = 2; i < obb.rotations.length; i += 2 )
 		{
-			FloatBuffer.fill( obb.rotations, point, i ) ;
-			dp = Vector2.dot( point, _axis ) ;
+			x = obb.rotations[i] ;
+			y = obb.rotations[i + 1] ;
+			dp = Vector2.dot( x, y, _axis.x, _axis.y ) ;
 
 			if( dp > max )
 			{

@@ -28,9 +28,6 @@ public class GLBuffer
 	public final static int VBO_VAR_BYTE_SIZE = 4 ;
 	public final static int IBO_VAR_BYTE_SIZE = 4 ;
 
-	private final static float[] floatTemp = new float[16] ;
-	private final static int[] intTemp = new int[16] ;
-
 	private final byte[] abgrTemp = new byte[4] ;
 
 	private final boolean ui ;

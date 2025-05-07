@@ -155,8 +155,8 @@ public final class OBB
 		applyRotations( 0.0f, 0.0f, 0.0f ) ;
 		updateAxesAndEdges() ;
 	}
-	
-	@Override
+
+	/*@Override
 	public int hashCode()
 	{
 		final int prime = 31 ;
@@ -188,7 +188,7 @@ public final class OBB
 		}
 
 		return true ;
-	}
+	}*/
 
 	@Override
 	public String toString()

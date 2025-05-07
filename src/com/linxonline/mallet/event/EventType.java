@@ -1,7 +1,6 @@
 package com.linxonline.mallet.event ;
 
 import java.util.Map ;
-import java.util.Arrays ;
 import java.util.ArrayList ;
 import java.util.Iterator ;
 import java.util.NoSuchElementException ;
@@ -33,11 +32,17 @@ public final class EventType
 		id = _id ;
 	}
 
+	public String getType()
+	{
+		return type ;
+	}
+
 	public int getID()
 	{
 		return id ;
 	}
 
+	@Override
 	public String toString()
 	{
 		return "[Type: " + type + ", id: " + id + "]" ;

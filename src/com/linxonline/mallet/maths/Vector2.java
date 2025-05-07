@@ -157,6 +157,11 @@ public final class Vector2 implements IUniform
 	/**
 		Dot Product
 	*/
+	public static final float dot( final float _x1, final float _y1, final float _x2, final float _y2 )
+	{
+		return ( _x1 * _x2 ) + ( _y1 * _y2 ) ;
+	}
+
 	public static final float dot( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		return ( _vec1.x * _vec2.x ) + ( _vec1.y * _vec2.y ) ;

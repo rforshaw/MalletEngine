@@ -11,7 +11,7 @@ import com.linxonline.mallet.ui.gui.GUIText ;
 
 public class UITextField extends UIElement
 {
-	private final EventController controller = new EventController() ;
+	private final EventQueue<Boolean> DISPLAY_SYSTEM_KEYBOARD = Event.get( "DISPLAY_SYSTEM_KEYBOARD" ) ;
 	private final StringBuilder text = new StringBuilder() ;
 
 	private int cursorIndex = 0 ;
@@ -23,23 +23,12 @@ public class UITextField extends UIElement
 	public UITextField()
 	{
 		super() ;
-		addEvent( Event.<EventController>create( "ADD_BACKEND_EVENT", controller ) ) ;
-
-		UIElement.connect( this, elementDestroyed(), new Connect.Slot<UITextField>()
-		{
-			@Override
-			public void slot( final UITextField _this )
-			{
-				addEvent( Event.<EventController>create( "REMOVE_BACKEND_EVENT", controller ) ) ;
-			}
-		} ) ;
-
 		UIElement.connect( this, elementEngaged(), new Connect.Slot<UITextField>()
 		{
 			@Override
 			public void slot( final UITextField _this )
 			{
-				controller.passEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_KEYBOARD", true ) ) ;
+				DISPLAY_SYSTEM_KEYBOARD.add( true ) ;
 			}
 		} ) ;
 
@@ -48,7 +37,7 @@ public class UITextField extends UIElement
 			@Override
 			public void slot( final UITextField _this )
 			{
-				controller.passEvent( Event.<Boolean>create( "DISPLAY_SYSTEM_KEYBOARD", false ) ) ;
+				DISPLAY_SYSTEM_KEYBOARD.add( false ) ;
 			}
 		} ) ;
 
@@ -84,13 +73,6 @@ public class UITextField extends UIElement
 			case MOUSE1_PRESSED : return isIntersectInput( _input ) ;
 			case TOUCH_DOWN     : return isIntersectInput( _input ) ;
 		}
-	}
-
-	@Override
-	public void refresh()
-	{
-		super.refresh() ;
-		controller.update() ;
 	}
 
 	public final void setCursorIndex( final int _index )
