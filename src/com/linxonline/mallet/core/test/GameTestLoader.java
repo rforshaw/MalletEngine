@@ -166,7 +166,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				createECSEntities( 10, 10 ) ;
+				createECSEntities( 1000, 1000 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -673,8 +673,9 @@ public final class GameTestLoader implements IGameLoader
 				camera.setPosition( 0, 0, -250 ) ;
 				camera.setPerspective( Camera.Mode.WORLD, 130.0f, 0.1f, 10000.0f ) ;
 				camera.lookAt( 0.0f, 0.0f, 0.0f ) ;
-				CameraAssist.update( camera ) ;
 
+				//System.out.println( "NDC to World: " + camera.ndcToWorld( new Vector3( 1, 1, -1 ), new Vector3() ).toString() ) ;
+				
 				final World world = WorldAssist.getDefault() ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
@@ -709,7 +710,6 @@ public final class GameTestLoader implements IGameLoader
 									draw.setPosition( mouse.x, -mouse.y, 0.0f ) ;
 
 									camera.lookAt( mouse.x, mouse.y, 0.0f ) ;
-									CameraAssist.update( camera ) ;
 									break;
 								}
 								default              : break ;

@@ -1,11 +1,6 @@
 package com.linxonline.malleteditor.core ;
 
-import com.linxonline.mallet.core.IGameLoader ;
 import com.linxonline.mallet.core.desktop.DesktopStarter ;
-import com.linxonline.mallet.core.desktop.gl.GLDefaultSystem ;
-
-import com.linxonline.mallet.renderer.IRender ;
-import com.linxonline.mallet.core.ISystem ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
 public class EditorStarter extends DesktopStarter

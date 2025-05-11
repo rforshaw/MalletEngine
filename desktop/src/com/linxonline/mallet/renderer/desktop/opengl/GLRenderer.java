@@ -61,9 +61,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	private final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
 
-	private GLWindow canvas ;
-
-	private int viewMode = ORTHOGRAPHIC_MODE ;
+	private final GLWindow canvas ;
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
 	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
@@ -75,13 +73,46 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
 
 	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
-
 	private final List<IUpdater> updaters = new ArrayList<IUpdater>() ;
 
-	public GLRenderer()
+	public GLRenderer( final Thread _main )
 	{
 		super() ;
-		initWindow() ;
+		canvas = createWindow( _main ) ;
+
+		// As soon as the renderer is constructed,
+		// we'll set up our basic shader-programs.
+		// They won't be compiled until the first
+		// draw() is made.
+		GLRenderer.this.invokeLater( () ->
+		{
+			initDefaultWorld() ;
+
+			Logger.println( "Building default shaders..", Logger.Verbosity.NORMAL ) ;
+			programs.load( "SIMPLE_TEXTURE",       "base/shaders/desktop/simple_texture.jgl" ) ;
+			programs.load( "SIMPLE_ARRAY_TEXTURE", "base/shaders/desktop/simple_array_texture.jgl" ) ;
+			programs.load( "SIMPLE_FONT",          "base/shaders/desktop/simple_font.jgl" ) ;
+			programs.load( "SIMPLE_GEOMETRY",      "base/shaders/desktop/simple_geometry.jgl" ) ;
+			programs.load( "SIMPLE_STENCIL",       "base/shaders/desktop/simple_stencil.jgl" ) ;
+
+			programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/desktop/simple_instance_texture.jgl" ) ;
+		} ) ;
+	}
+
+	private GLWindow createWindow( final Thread _main )
+	{
+		final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
+		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
+		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
+		capabilities.setDoubleBuffered( GlobalConfig.getBoolean( "DOUBLE_BUFFER", true ) ) ;
+
+		final GLWindow win = GLWindow.create( capabilities ) ;
+		win.setExclusiveContextThread( _main ) ;
+
+		// We want to be in complete control of any swapBuffer calls
+		win.setAutoSwapBufferMode( false ) ;
+		win.setResizable( true ) ;
+		return win ;
 	}
 
 	@Override
@@ -89,6 +120,8 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
+
+		RenderAssist.setAssist( createRenderAssist() ) ;
 
 		FontAssist.setAssist( createFontAssist() ) ;
 		TextureAssist.setAssist( createTextureAssist() ) ;
@@ -107,21 +140,39 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void shutdown()
 	{
-		Logger.println( "Shutting renderer down..", Logger.Verbosity.NORMAL ) ;
-		if( makeCurrent() == true )
+		Logger.println( "Shutting down renderer..", Logger.Verbosity.NORMAL ) ;
+		for( final GLWorld world : worlds )
 		{
-			clear() ;							// Clear the contents being rendered
+			world.shutdown() ;
+		}
 
-			for( final GLWorld world : worlds )
+		programs.shutdown() ;
+		textures.shutdown() ;				// We'll loose all texture and font resources
+		fontManager.shutdown() ;
+
+		canvas.destroy() ;
+	}
+
+	public RenderAssist.Assist createRenderAssist()
+	{
+		return new RenderAssist.Assist()
+		{
+			@Override
+			public void setDisplayDimensions( final int _width, final int _height )
 			{
-				world.shutdown() ;
+				updateCameraAndWorldDisplay( _width, _height ) ;
+				canvas.setSurfaceSize( _width, _height ) ;
 			}
 
-			programs.shutdown() ;
-			textures.shutdown() ;				// We'll loose all texture and font resources
-			fontManager.shutdown() ;
-			release() ;
-		}
+			@Override
+			public void setFullscreen( final boolean _set )
+			{
+				if( _set != canvas.isFullscreen() )
+				{
+					canvas.setFullscreen( _set ) ;
+				}
+			}
+		} ;
 	}
 
 	public FontAssist.Assist createFontAssist()
@@ -481,20 +532,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				return _camera ;
 			}
 
-			@Override
-			public Camera update( final Camera _camera ) 
-			{
-				GLRenderer.this.invokeLater( _camera, UPDATE_OPERATION, () ->
-				{
-					final GLCamera camera = get( _camera ) ;
-					if( camera != null )
-					{
-						camera.update( _camera ) ;
-					}
-				} ) ;
-				return _camera ;
-			}
-
 			private GLCamera get( final Camera _camera )
 			{
 				return cameraLookup.getRHS( _camera.index() ) ;
@@ -560,31 +597,11 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		} ;
 	}
 
-	public void setFullscreen( final boolean _set )
-	{
-		GLRenderer.this.invokeLater( () ->
-		{
-			if( _set != canvas.isFullscreen() )
-			{
-				canvas.setFullscreen( _set ) ;
-			}
-		} ) ;
-	}
-
-	@Override
-	public void setDisplayDimensions( final int _width, final int _height )
-	{
-		updateCameraAndWorldDisplay( _width, _height ) ;
-		canvas.setSurfaceSize( _width, _height ) ;
-	}
-
 	private void updateCameraAndWorldDisplay( final int _width, final int _height )
 	{
 		final Camera camera = getDefaultCamera() ;
-
 		camera.setDisplayResolution( _width, _height ) ;
 		camera.setScreenResolution( _width, _height ) ;
-		CameraAssist.update( camera ) ;
 
 		final World world = getDefaultWorld() ;
 		world.setRenderDimensions( 0, 0, _width, _height ) ;
@@ -594,7 +611,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	@Override
 	public void init( final GLAutoDrawable _drawable )
 	{
-		System.out.println( "GL3 Contex initialised.." ) ;
+		Logger.println( "Initialise render context..", Logger.Verbosity.NORMAL ) ;
 		MGL.setGL( _drawable.getGL().getGL4() ) ;
 
 		//System.out.println( "Vsync: " + GlobalConfig.getInteger( "VSYNC", 0 ) ) ;
@@ -612,17 +629,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 		MGL.glClearColor( 0.0f, 0.0f, 0.0f, 0.0f ) ;
 
-		initDefaultWorld() ;
-
-		System.out.println( "Building default shaders.." ) ;
-		programs.load( "SIMPLE_TEXTURE",       "base/shaders/desktop/simple_texture.jgl" ) ;
-		programs.load( "SIMPLE_ARRAY_TEXTURE", "base/shaders/desktop/simple_array_texture.jgl" ) ;
-		programs.load( "SIMPLE_FONT",          "base/shaders/desktop/simple_font.jgl" ) ;
-		programs.load( "SIMPLE_GEOMETRY",      "base/shaders/desktop/simple_geometry.jgl" ) ;
-		programs.load( "SIMPLE_STENCIL",       "base/shaders/desktop/simple_stencil.jgl" ) ;
-
-		programs.load( "SIMPLE_INSTANCE_TEXTURE",  "base/shaders/desktop/simple_instance_texture.jgl" ) ;
-
 		{
 			// Query for the Max Texture Size and store the results.
 			// I doubt the size will change during the running of the engine.
@@ -630,11 +636,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			MGL.glGetIntegerv( MGL.GL_MAX_TEXTURE_SIZE, size, 0 ) ;
 			maxTextureSize.setXY( size[0], size[0] ) ;
 		}
-	}
-
-	public void setViewMode( final int _mode )
-	{
-		viewMode = _mode ;
 	}
 
 	@Override
@@ -648,21 +649,19 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			// with this requirement unless this flag is set to true.
 			final Camera camera = getDefaultCamera() ;
 			camera.setOrthographic( Camera.Mode.HUD, 0, _height, 0, _width, -1000.0f, 1000.0f ) ;
-			CameraAssist.update( camera ) ;
 		}
 	}
 
 	@Override
-	public void dispose( final GLAutoDrawable _drawable ) {}
+	public void dispose( final GLAutoDrawable _drawable )
+	{
+		Logger.println( "Render context lost..", Logger.Verbosity.MAJOR ) ;
+	}
 
+	@Override
 	public void draw( final float _dt )
 	{
 		super.draw( _dt ) ;
-		if( canvas.getExclusiveContextThread() == null )
-		{
-			canvas.setExclusiveContextThread( Thread.currentThread() ) ;
-		}
-
 		canvas.display() ;
 	}
 
@@ -706,62 +705,9 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		canvas.swapBuffers() ;
 	}
 
-	@Override
-	public void sort() {}
-
-	@Override
-	public void clear()
-	{
-		//worlds.clear() ;
-	}
-
-	/**
-		Remove resources that are not being used.
-		Does not remove resources that are still 
-		flagged for use.
-	*/
-	@Override
-	public void clean()
-	{
-		/*final Set<String> activeKeys = new HashSet<String>() ;
-		worlds.clean( activeKeys ) ;
-
-		programs.clean( activeKeys ) ;
-		textures.clean( activeKeys ) ;
-		fontManager.clean( activeKeys ) ;*/
-	}
-
 	public GLWindow getCanvas()
 	{
 		return canvas ;
-	}
-
-	/**
-		We need to make sure the canvas is constructed 
-		as soon as possible.
-		We set the canvas size to renderInfo display dimensions, 
-		as reshape() is called when GLRenderer is added as 
-		a listener to the canvas.
-		reshape() updates renderInfo and wipes the dimension 
-		settings loaded in by 'base/config.txt' from DesktopStarter.
-	*/
-	private void initWindow()
-	{
-		if( canvas == null )
-		{
-			System.out.println( "Init Window" ) ;
-		
-			final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
-			final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
-			capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
-			capabilities.setDoubleBuffered( GlobalConfig.getBoolean( "DOUBLE_BUFFER", true ) ) ;
-
-			canvas = GLWindow.create( capabilities ) ;
-
-			// We want to be in complete control of any swapBuffer calls
-			canvas.setAutoSwapBufferMode( false ) ;
-			canvas.setResizable( true ) ;
-		}
 	}
 
 	/**
@@ -889,34 +835,6 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 			default -> true ;//throw new Exception( "Unknown buffer type specified." ) ;
 		} ;
-	}
-
-	/**
-		Will grab the GLContext and call makeCurrent() 
-		if it exists in the first place.
-	*/
-	private boolean makeCurrent()
-	{
-		final GLContext context = canvas.getContext() ;
-		if( context == null )
-		{
-			return false ;
-		}
-
-		canvas.setExclusiveContextThread( null ) ;
-		context.makeCurrent() ;
-		return true ;
-	}
-
-	/**
-		Release the GLContext from the current thread.
-		This should only be called if makeCurrent()
-		returns true. 
-	*/
-	private void release()
-	{
-		final GLContext context = canvas.getContext() ;
-		context.release() ;
 	}
 
 	public static void handleError( final String _txt )

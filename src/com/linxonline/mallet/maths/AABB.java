@@ -4,22 +4,16 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class AABB
 {
-	public static final int RANGE_NUM = 2 ;
-	public static final int VECTOR_TYPE = 2 ;
-
-	public static final int MIN_X = 0 ;
-	public static final int MIN_Y = 1 ;
-	public static final int MAX_X = 2 ;
-	public static final int MAX_Y = 3 ;
-
-	// min then max
-	public final float[] range = new float[RANGE_NUM * VECTOR_TYPE] ;
+	public float minX, minY ;
+	public float maxX, maxY ;
 
 	private AABB( final float _minX, final float _minY,
 				  final float _maxX, final float _maxY )
 	{
-		FloatBuffer.set( range, AABB.MIN_X, _minX, _minY ) ;
-		FloatBuffer.set( range, AABB.MAX_X, _maxX, _maxY ) ;
+		minX = _minX ;
+		minY = _minY ;
+		maxX = _maxX ;
+		maxY = _maxY ;
 	}
 
 	private AABB( final OBB _obb )
@@ -64,78 +58,86 @@ public final class AABB
 	*/
 	public void setFromOBB( final OBB _obb )
 	{
-		final Vector2 point = FloatBuffer.fill( _obb.rotations, new Vector2(), 0 ) ;
-		FloatBuffer.set( range, AABB.MIN_X, point.x, point.y ) ;
-		FloatBuffer.set( range, AABB.MAX_X, point.x, point.y ) ;
+		final Vector2 point = _obb.getPoint( 0, new Vector2() ) ;
 
-		for( int i = 2; i < _obb.rotations.length; i += 2 )
+		minX = point.x ;
+		minY = point.y ;
+		maxX = point.x ;
+		maxY = point.y ;
+
+		final int length = _obb.getLength() ;
+		for( int i = 1; i < length; ++i )
 		{
-			FloatBuffer.fill( _obb.rotations, point, i ) ;
-			if( point.x < range[AABB.MIN_X] )
+			_obb.getPoint( i, point ) ;
+			if( point.x < minX )
 			{
-				range[AABB.MIN_X] = point.x ;
+				minX = point.x ;
 			}
-			else if( point.x > range[AABB.MAX_X] )
+			else if( point.x > maxX )
 			{
-				range[AABB.MAX_X] = point.x ;
+				maxX = point.x ;
 			}
 
-			if( point.y < range[AABB.MIN_Y] )
+			if( point.y < minY )
 			{
-				range[AABB.MIN_Y] = point.y ;
+				minY = point.y ;
 			}
-			else if( point.y > range[AABB.MAX_Y] )
+			else if( point.y > maxY )
 			{
-				range[AABB.MAX_Y] = point.y ;
+				maxY = point.y ;
 			}
 		}
 	}
 
 	public void set( final float _x1, final float _y1, final float _x2, final float _y2 )
 	{
-		range[AABB.MIN_X] = ( _x1 < _x2 ) ? _x1 : _x2 ;
-		range[AABB.MIN_Y] = ( _y1 < _y2 ) ? _y1 : _y2 ;
+		minX = ( _x1 < _x2 ) ? _x1 : _x2 ;
+		minY = ( _y1 < _y2 ) ? _y1 : _y2 ;
 
-		range[AABB.MAX_X] = ( _x1 > _x2 ) ? _x1 : _x2 ;
-		range[AABB.MAX_Y] = ( _y1 > _y2 ) ? _y1 : _y2 ;
+		maxX = ( _x1 > _x2 ) ? _x1 : _x2 ;
+		maxY = ( _y1 > _y2 ) ? _y1 : _y2 ;
 	}
 
 	public void setMax( final float _x, final float _y )
 	{
-		FloatBuffer.set( range, AABB.MAX_X, _x, _y ) ;
+		maxX = _x ;
+		maxY = _y ;
 	}
 
 	public void addToMax( final float _x, final float _y )
 	{
-		FloatBuffer.add( range, AABB.MAX_X, _x, _y ) ;
+		maxX += _x ;
+		maxY += _y ;
 	}
 
 	public void setMin( final float _x, final float _y )
 	{
-		FloatBuffer.set( range, AABB.MIN_X, _x, _y ) ;
+		minX = _x ;
+		minY = _y ;
 	}
 
 	public void addToMin( final float _x, final float _y )
 	{
-		FloatBuffer.add( range, AABB.MIN_X, _x, _y ) ;
+		minX += _x ;
+		minY += _y ;
 	}
 
 	public AABB copyTo( final AABB _to )
 	{
-		_to.range[0] = range[0] ;
-		_to.range[1] = range[1] ;
-		_to.range[2] = range[2] ;
-		_to.range[3] = range[3] ;
+		_to.minX = minX ;
+		_to.minY = minY ;
+		_to.maxX = maxX ;
+		_to.maxY = maxY ;
 		return _to ;
 	}
 
 	public void addTo( final float _x, final float _y )
 	{
 		// Add x and y to min and max with one call.
-		range[0] += _x ;
-		range[1] += _y ;
-		range[2] += _x ;
-		range[3] += _y ;
+		minX += _x ;
+		minY += _y ;
+		maxX += _x ;
+		maxY += _y ;
 	}
 
 	/**
@@ -155,7 +157,7 @@ public final class AABB
 		// is if the point is within the AABB. 
 		if( MathUtil.isZero( _direction.x ) )
 		{
-			if( _point.x < range[AABB.MIN_X] || _point.x > range[AABB.MAX_X] )
+			if( _point.x < minX || _point.x > maxX )
 			{
 				return _intersection ;
 			}
@@ -163,8 +165,8 @@ public final class AABB
 		else
 		{
 			final float ood = 1.0f / _direction.x ;
-			float t1 = ( range[AABB.MIN_X] - _point.x ) * ood ;
-			float t2 = ( range[AABB.MAX_X] - _point.x ) * ood ;
+			float t1 = ( minX - _point.x ) * ood ;
+			float t2 = ( maxX - _point.x ) * ood ;
 			
 			if( t1 > t2 )
 			{
@@ -183,7 +185,7 @@ public final class AABB
 
 		if( MathUtil.isZero( _direction.y ) )
 		{
-			if( _point.y < range[AABB.MIN_Y] || _point.y > range[AABB.MAX_Y] )
+			if( _point.y < minY || _point.y > maxY )
 			{
 				return _intersection ;
 			}
@@ -191,8 +193,8 @@ public final class AABB
 		else
 		{
 			final float ood = 1.0f / _direction.y ;
-			float t1 = ( range[AABB.MIN_Y] - _point.y ) * ood ;
-			float t2 = ( range[AABB.MAX_Y] - _point.y ) * ood ;
+			float t1 = ( minY - _point.y ) * ood ;
+			float t2 = ( maxY - _point.y ) * ood ;
 			
 			if( t1 > t2 )
 			{
@@ -252,15 +254,9 @@ public final class AABB
 	*/
 	public boolean intersectPoint( final float _x, final float _y )
 	{
-		final float minX = range[AABB.MIN_X] ;
-		final float maxX = range[AABB.MAX_X] ;
-
 		//System.out.println( "X: " + _x + " MIN: " + minX + " MAX: " + maxX ) ;
 		if( _x >= minX && _x <= maxX )
 		{
-			final float minY = range[AABB.MIN_Y] ;
-			final float maxY = range[AABB.MAX_Y] ;
-
 			//System.out.println( "Y: " + _y + " MIN: " + minY + " MAX: " + maxY ) ;
 			if( _y >= minY && _y <= maxY )
 			{
@@ -272,23 +268,17 @@ public final class AABB
 
 	public boolean intersectAABB( final AABB _aabb )
 	{
-		final float minX = _aabb.range[AABB.MIN_X] ;
-		final float maxX = _aabb.range[AABB.MAX_X] ;
+		final float thatMinX = _aabb.minX ;
+		final float thatMaxX = _aabb.maxX ;
 
-		final float thisMinX = range[AABB.MIN_X] ;
-		final float thisMaxX = range[AABB.MAX_X] ;
-
-		if( ( minX >= thisMinX && minX <= thisMaxX ) ||
-			( maxX >= thisMinX && maxX <= thisMaxX ) )
+		if( ( thatMinX >= minX && thatMinX <= maxX ) ||
+			( thatMaxX >= minX && thatMaxX <= maxX ) )
 		{
-			final float minY = _aabb.range[AABB.MIN_Y] ;
-			final float maxY = _aabb.range[AABB.MAX_Y] ;
+			final float thatMinY = _aabb.minY ;
+			final float thatMaxY = _aabb.maxY ;
 
-			final float thisMinY = range[AABB.MIN_Y] ;
-			final float thisMaxY = range[AABB.MAX_Y] ;
-
-			if( ( minY >= thisMinY && minY <= thisMaxY ) ||
-				( maxY >= thisMinY && maxY <= thisMaxY ) )
+			if( ( thatMinY >= minY && thatMinY <= maxY ) ||
+				( thatMaxY >= minY && thatMaxY <= maxY ) )
 			{
 				return true ;
 			}
@@ -299,8 +289,8 @@ public final class AABB
 
 	public Vector2 getCenter( final Vector2 _center )
 	{
-		final float centerX = ( range[AABB.MAX_X] + range[AABB.MIN_X] ) * 0.5f ;
-		final float centerY = ( range[AABB.MAX_Y] + range[AABB.MIN_Y] ) * 0.5f ;
+		final float centerX = ( maxX + minX ) * 0.5f ;
+		final float centerY = ( maxY + minY ) * 0.5f ;
 
 		_center.x = centerX ;
 		_center.y = centerY ;
@@ -309,55 +299,21 @@ public final class AABB
 
 	public Vector2 getMin( final Vector2 _min )
 	{
-		_min.x = range[AABB.MIN_X] ;
-		_min.y = range[AABB.MIN_Y] ;
+		_min.x = minX ;
+		_min.y = minY ;
 		return _min ;
 	}
 
 	public Vector2 getMax( final Vector2 _max )
 	{
-		_max.x = range[AABB.MAX_X] ;
-		_max.y = range[AABB.MAX_Y] ;
+		_max.x = maxX ;
+		_max.y = maxY ;
 		return _max ;
 	}
-
-	/*@Override
-	public int hashCode()
-	{
-		final int prime = 31 ;
-
-		int result = 1 ;
-		for( int i = 0; i < range.length; ++i )
-		{
-			result = prime * result + Float.floatToIntBits( range[i] ) ;
-		}
-
-		return result ;
-	}
-
-	@Override
-	public boolean equals( final Object _obj )
-	{
-		if( !( _obj instanceof AABB ) )
-		{
-			return false ;
-		}
-
-		final AABB b = ( AABB )_obj ;
-		for( int i = 0; i < range.length; ++i )
-		{
-			if( range[i] != b.range[i] )
-			{
-				return false ;
-			}
-		}
-
-		return true ;
-	}*/
 
 	@Override
 	public String toString()
 	{
-		return "MIN: " + range[AABB.MIN_X] + " " + range[AABB.MIN_Y] + "\nMAX: " + range[AABB.MAX_X] + " " + range[AABB.MAX_Y] ;
+		return "MIN: " + minX + " " + minY + "\nMAX: " + maxX + " " + maxY ;
 	}
 }

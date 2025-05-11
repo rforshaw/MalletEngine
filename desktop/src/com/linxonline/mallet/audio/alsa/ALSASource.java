@@ -61,6 +61,17 @@ public final class ALSASource implements ISource
 		}
 	}
 
+	public static void shutdown( final AL _openAL )
+	{
+		_openAL.alDeleteSources( SOURCES.length, SOURCES, 0 ) ;	
+		final int error = _openAL.alGetError() ;
+		if( error != AL.AL_NO_ERROR )
+		{
+			System.out.println( "Failed to Delete Source: " + ALSAGenerator.getALErrorString( error ) ) ;
+			return ;
+		}
+	}
+
 	/**
 		Return the index of the next available source.
 		NOTE: This will crash if no sources are available.

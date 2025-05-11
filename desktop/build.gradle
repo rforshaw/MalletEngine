@@ -40,9 +40,8 @@ project( ':MalletEngine' ) {
 
 	compileJava {
 		doFirst {
-			options.compilerArgs += [
-					'--module-path', classpath.asPath
-			]
+			options.compilerArgs += ['--module-path', classpath.asPath]
+			//options.compilerArgs += ['-Xlint:unchecked']
 			classpath = files()
 		}
 	}

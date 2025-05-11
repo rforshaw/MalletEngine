@@ -29,14 +29,15 @@ public final class Debug
 		final Shape shape = new Shape( Shape.Style.LINE_STRIP, swivel, 5, 4 ) ;
 		final Colour white = Colour.white() ;
 
-		final float[] points = _hull.getPoints() ;
-		int index = 0 ;
-		for( int i = 0; i < points.length; i += 2 )
-		{
-			final float x = points[i + 0] ;
-			final float y = points[i + 1] ;
+		final Vector2 point = new Vector2() ;
 
-			shape.copyVertex( Shape.Attribute.createVert( new Vector3( x, y, 0.0f ), white ) ) ;
+		final int length = _hull.getPointsLength() ;
+		int index = 0 ;
+		for( int i = 0; i < length; ++i )
+		{
+			_hull.getPoint( i, point ) ;
+
+			shape.copyVertex( Shape.Attribute.createVert( new Vector3( point ), white ) ) ;
 			shape.addIndex( index++ ) ;
 		}
 
@@ -56,14 +57,15 @@ public final class Debug
 
 		final Shape shape = ( Shape )_draw.getShape() ;
 
-		int index = 0 ;
-		final float[] points = _hull.getPoints() ;
-		for( int i = 0; i < points.length; i += 2 )
-		{
-			final float x = points[i + 0] ;
-			final float y = points[i + 1] ;
+		final Vector2 point = new Vector2() ;
 
-			shape.setVector3( index++, 0,  x, y, 0.0f ) ;
+		final int length = _hull.getPointsLength() ;
+		int index = 0 ;
+		for( int i = 0; i < length; ++i )
+		{
+			_hull.getPoint( i, point ) ;
+
+			shape.setVector3( index++, 0,  point.x, point.y, 0.0f ) ;
 		}
 	}
 }

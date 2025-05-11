@@ -62,6 +62,11 @@ public final class Event<T>
 		return STATE.get( _type ) ;
 	}
 
+	public static void clear()
+	{
+		STATE.clear() ;
+	}
+
 	public static EventState getGlobalState()
 	{
 		return STATE ;

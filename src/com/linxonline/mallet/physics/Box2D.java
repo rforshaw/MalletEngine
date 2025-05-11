@@ -63,39 +63,43 @@ public final class Box2D extends Hull
 	public void setRotation( final float _theta )
 	{
 		super.setRotation( _theta ) ;
-		obb.setRotation( _theta, position[OFFSET_X], position[OFFSET_Y] ) ;
+		obb.setRotation( _theta, offsetX, offsetY ) ;
 		aabb.setFromOBB( obb ) ;
 	}
 
 	@Override
-	public float[] getAxes()
+	public int getPointsLength()
 	{
-		obb.updateAxesAndEdges() ;
-		return obb.axes ;
+		return obb.getLength() ;
 	}
 
 	@Override
-	public float[] getPoints()
+	public Vector2 getPoint( final int _index, final Vector2 _fill )
 	{
-		return obb.rotations ;
+		return obb.getPoint( _index, _fill ) ;
+	}
+
+	@Override
+	public float[] calculateAxes( final float[] _axes )
+	{
+		return obb.calculateAxes( _axes ) ;
 	}
 
 	@Override
 	public float projectToAxis( final Vector2 _axis )
 	{
-		float x = obb.rotations[0] ;
-		float y = obb.rotations[1] ;
+		final Vector2 p = obb.getPoint( 0, new Vector2() ) ;
 
-		float dp = Vector2.dot( x, y, _axis.x, _axis.y ) ;
+		float dp = Vector2.dot( p.x, p.y, _axis.x, _axis.y ) ;
 
 		float max = dp ;
 		float min = dp ;
 
-		for( int i = 2; i < obb.rotations.length; i += 2 )
+		final int length = obb.getLength() ;
+		for( int i = 1; i < length; ++i )
 		{
-			x = obb.rotations[i] ;
-			y = obb.rotations[i + 1] ;
-			dp = Vector2.dot( x, y, _axis.x, _axis.y ) ;
+			obb.getPoint( i, p ) ;
+			dp = Vector2.dot( p.x, p.y, _axis.x, _axis.y ) ;
 
 			if( dp > max )
 			{
@@ -113,13 +117,13 @@ public final class Box2D extends Hull
 	@Override
 	public AABB getAABB( final AABB _fill )
 	{
-		final float x = position[POSITION_X] + position[OFFSET_X] ;
-		final float y = position[POSITION_Y] + position[OFFSET_Y] ;
+		final float x = positionX + offsetX ;
+		final float y = positionY + offsetY ;
 
-		_fill.range[0] = aabb.range[0] + x ;
-		_fill.range[1] = aabb.range[1] + y ;
-		_fill.range[2] = aabb.range[2] + x ;
-		_fill.range[3] = aabb.range[3] + y;
+		_fill.minX = aabb.minX + x ;
+		_fill.minY = aabb.minY + y ;
+		_fill.maxX = aabb.maxX + x ;
+		_fill.maxY = aabb.maxY + y ;
 
 		return _fill ;
 	}

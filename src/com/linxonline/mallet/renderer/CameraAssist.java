@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.maths.* ;
-
 public final class CameraAssist
 {
 	private static Assist assist ;
@@ -28,17 +26,11 @@ public final class CameraAssist
 		return assist.remove( _camera ) ;
 	}
 
-	public static Camera update( final Camera _camera )
-	{
-		return assist.update( _camera ) ;
-	}
-
 	public interface Assist
 	{
 		public Camera getDefault() ;
 
 		public Camera add( final Camera _camera ) ;
 		public Camera remove( final Camera _camera ) ;
-		public Camera update( final Camera _camera ) ;
 	}
 }

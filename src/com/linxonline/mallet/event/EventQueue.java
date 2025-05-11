@@ -41,6 +41,12 @@ public final class EventQueue<T>
 		}
 	}
 
+	protected void clear()
+	{
+		front.clear() ;
+		back.clear() ;
+	}
+
 	protected void swap()
 	{
 		if( !front.isEmpty() )
@@ -53,7 +59,7 @@ public final class EventQueue<T>
 			return ;
 		}
 
-		final ArrayList temp = front ;
+		final ArrayList<Event<T>> temp = front ;
 		front = back ;
 		back = temp ;
 	}

@@ -13,7 +13,7 @@ import com.linxonline.mallet.core.ISystem ;
 import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
 import com.linxonline.mallet.core.GlobalConfig ;
 
-import com.linxonline.mallet.renderer.IRender ;
+import com.linxonline.mallet.renderer.RenderAssist ;
 import com.linxonline.mallet.renderer.CameraAssist ;
 import com.linxonline.mallet.renderer.Camera ;
 
@@ -33,10 +33,9 @@ import com.linxonline.mallet.ui.UIRatio ;
 public class DesktopStarter implements IStarter
 {
 	private final GameSystem game = new GameSystem() ;
-	private final ISystem mainSystem ;
 	private final IGameLoader loader ;
 
-	protected final Thread thread = new Thread( "GAME_THREAD" )
+	private final Thread thread = new Thread( "GAME_THREAD" )
 	{
 		@Override
 		public void run()
@@ -47,14 +46,10 @@ public class DesktopStarter implements IStarter
 		}
 	} ;
 
+	private final GLDefaultSystem mainSystem = new GLDefaultSystem( thread ) ;
+
 	public DesktopStarter( final IGameLoader _loader )
 	{
-		this( new GLDefaultSystem(), _loader ) ;
-	}
-
-	public DesktopStarter( final ISystem _main, final IGameLoader _loader )
-	{
-		mainSystem = _main ;
 		loader = _loader ;
 	}
 
@@ -72,7 +67,6 @@ public class DesktopStarter implements IStarter
 			{
 				Logger.println( "Shutting down...", Logger.Verbosity.NORMAL ) ;
 				stop() ;
-				System.exit( 0 ) ;
 			}
 		} ) ;
 	}
@@ -108,7 +102,6 @@ public class DesktopStarter implements IStarter
 	*/
 	public static void setRenderSettings( final IStarter _starter )
 	{
-		final ISystem main = _starter.getMainSystem() ;
 		final GameSettings game = _starter.getGameLoader().getGameSettings() ;
 
 		final int displayWidth = GlobalConfig.getInteger( "DISPLAYWIDTH", game.getWindowWidth() ) ;
@@ -116,8 +109,7 @@ public class DesktopStarter implements IStarter
 
 		final DisplayEnvironment desktop = new DisplayEnvironment() ;
 
-		final IRender render = main.getRenderer() ;
-		render.setDisplayDimensions( displayWidth, displayHeight ) ;
+		RenderAssist.setDisplayDimensions( displayWidth, displayHeight ) ;
 
 		final int renderWidth = GlobalConfig.getInteger( "RENDERWIDTH", game.getRenderWidth() ) ;
 		final int renderHeight = GlobalConfig.getInteger( "RENDERHEIGHT", game.getRenderHeight() ) ;
@@ -132,7 +124,6 @@ public class DesktopStarter implements IStarter
 
 		camera.setOrthographic( Camera.Mode.HUD, 0, renderHeight, 0, renderWidth, -1000.0f, 1000.0f ) ;
 		camera.setOrthographic( Camera.Mode.WORLD, top, bottom, left, right, -1000.0f, 1000.0f ) ;
-		CameraAssist.update( camera ) ;
 
 		final UI.Unit unit = GlobalConfig.<UI.Unit>getObject( "UI_UNIT", UI.Unit.CENTIMETRE ) ;
 

@@ -70,6 +70,7 @@ public abstract class BasicSystem<F extends FileSystem,
 	public void shutdown()
 	{
 		shutdownDelegate.shutdown() ;
+	
 		audioGenerator.shutdown() ;
 		renderer.shutdown() ;
 	}

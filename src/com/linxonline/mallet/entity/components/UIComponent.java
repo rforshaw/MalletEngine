@@ -6,10 +6,7 @@ import com.linxonline.mallet.entity.Entity ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.audio.* ;
-
 import com.linxonline.mallet.ui.* ;
-import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.event.* ;
 

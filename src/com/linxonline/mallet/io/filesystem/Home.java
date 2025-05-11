@@ -12,7 +12,8 @@ public final class Home
 		System.out.println( "Setting up home: " + homeDirectory ) ;
 	}
 
-	public boolean copy( final Tuple<String, String> ... _paths )
+	@SafeVarargs
+	public final boolean copy( final Tuple<String, String> ... _paths )
 	{
 		final FileStream stream = GlobalFileSystem.getFile( getHomeDirectory() ) ;
 		if( stream.exists() == false )

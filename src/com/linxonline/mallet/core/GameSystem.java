@@ -77,7 +77,7 @@ public final class GameSystem implements IGameSystem
 	}
 
 	@Override
-	public final void addGameState( final GameState _state )
+	public void addGameState( final GameState _state )
 	{
 		states.add( _state ) ;
 	}
@@ -87,7 +87,7 @@ public final class GameSystem implements IGameSystem
 		State is not available when called.
 	**/
 	@Override
-	public final void setDefaultGameState( final String _name )
+	public void setDefaultGameState( final String _name )
 	{
 		for( final GameState state : states )
 		{
@@ -99,7 +99,7 @@ public final class GameSystem implements IGameSystem
 		}
 	}
 
-	private final void updateState( final double _dt )
+	private void updateState( final double _dt )
 	{
 		final int transition = currentState.update( _dt ) ;
 		if( transition == GameState.NONE )
@@ -126,7 +126,7 @@ public final class GameSystem implements IGameSystem
 		}
 	}
 
-	private final GameState getGameState( final String _name )
+	private GameState getGameState( final String _name )
 	{
 		for( final GameState state : states )
 		{
@@ -139,7 +139,7 @@ public final class GameSystem implements IGameSystem
 		return null ;
 	}
 
-	private final boolean exists( final String _name )
+	private boolean exists( final String _name )
 	{
 		return getGameState( _name ) != null ? true : false ;
 	}

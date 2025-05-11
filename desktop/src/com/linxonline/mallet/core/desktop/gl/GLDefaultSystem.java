@@ -9,7 +9,10 @@ import com.jogamp.newt.event.MouseEvent ;
 
 import com.linxonline.mallet.io.filesystem.desktop.DesktopFileSystem ;
 import com.linxonline.mallet.audio.desktop.alsa.ALSAGenerator ;
+
+import com.linxonline.mallet.renderer.RenderAssist ;
 import com.linxonline.mallet.renderer.desktop.opengl.GLRenderer ;
+
 import com.linxonline.mallet.input.desktop.InputSystem ;
 import com.linxonline.mallet.core.* ;
 import com.linxonline.mallet.event.* ;
@@ -32,10 +35,10 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	private final EventQueue<Boolean> CAPTURE_SYSTEM_MOUSE = Event.get( "CAPTURE_SYSTEM_MOUSE" ) ;
 	private final EventQueue<Boolean> SYSTEM_FULLSCREEN = Event.get( "SYSTEM_FULLSCREEN" ) ;
 
-	public GLDefaultSystem()
+	public GLDefaultSystem( final Thread _main )
 	{
 		super( new DefaultShutdown(),
-			   new GLRenderer(),
+			   new GLRenderer( _main ),
 			   new ALSAGenerator(),
 			   new InputSystem(),
 			   new DesktopFileSystem() ) ;
@@ -81,6 +84,13 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		getWindow().addMouseListener( window ) ;
 	}
 
+	@Override
+	public void shutdown()
+	{
+		super.shutdown() ;
+		System.exit( 0 ) ;
+	}
+
 	protected void initEventProcessors()
 	{
 		block.add( "DISPLAY_SYSTEM_MOUSE", ( final Boolean _displayMouse ) ->
@@ -98,9 +108,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		block.add( "SYSTEM_FULLSCREEN", ( Boolean _fullscreen ) ->
 		{
 			final boolean fullscreen = _fullscreen ;
-
-			final GLRenderer render = getRenderer() ;
-			render.setFullscreen( fullscreen ) ;
+			RenderAssist.setFullscreen( fullscreen ) ;
 		} ) ;
 	}
 
@@ -111,10 +119,17 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		private final static int FOCUS_GAINED = 1 ;
 
 		private int focusState = FOCUS_UNKNOWN ;
+		private boolean destroy = false ;
 
 		@Override
 		public void windowDestroyNotify( final WindowEvent _event )
 		{
+			if( destroy == true )
+			{
+				return ;
+			}
+
+			destroy = true ;
 			GLDefaultSystem.this.shutdown() ;
 		}
 

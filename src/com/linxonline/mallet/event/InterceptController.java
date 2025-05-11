@@ -7,13 +7,19 @@ import com.linxonline.mallet.util.Tuple ;
 
 public final class InterceptController implements IIntercept
 {
-	private final static IProcessor<Object> PROCESSOR_FALLBACK = ( Object _obj ) ->
+	private final static IProcessor<?> PROCESSOR_FALLBACK = ( Object _obj ) ->
 	{
 		return true ;
 	} ;
 
 	private final EventType.Lookup<IProcessor<?>> processors ;
 
+	public InterceptController()
+	{
+		processors = new EventType.Lookup<IProcessor<?>>( 1, PROCESSOR_FALLBACK ) ;
+	}
+
+	@SafeVarargs
 	public InterceptController( final Tuple<String, IProcessor<?>> ... _processors )
 	{
 		processors = new EventType.Lookup<IProcessor<?>>( _processors.length, PROCESSOR_FALLBACK ) ;

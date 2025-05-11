@@ -8,10 +8,20 @@ import com.linxonline.mallet.util.Tuple ;
 public final class EventBlock implements IEventBlock
 {
 	private final List<Tuple<String, Event.IProcess<?>>> sources = MalletList.<Tuple<String, Event.IProcess<?>>>newList() ;
-	private final List<Tuple<Event.IProcess, EventQueue>> procs = MalletList.<Tuple<Event.IProcess, EventQueue>>newList() ;
+	private final List<Tuple<Event.IProcess<?>, EventQueue<?>>> procs = MalletList.<Tuple<Event.IProcess<?>, EventQueue<?>>>newList() ;
 
 	private final EventState state ;
 
+	public EventBlock()
+	{
+		this( Event.getGlobalState() ) ;
+	}
+
+	public EventBlock( final EventState _state )
+	{
+		state = _state ;
+	}
+	
 	public EventBlock( final Tuple<String, Event.IProcess<?>> ... _processors )
 	{
 		this( Event.getGlobalState(), _processors ) ;
@@ -44,7 +54,7 @@ public final class EventBlock implements IEventBlock
 		final EventQueue queue = state.get( _type ) ;
 
 		sources.add( Tuple.<String, Event.IProcess<?>>build( _type.getType(), _proc ) ) ;
-		procs.add( Tuple.<Event.IProcess, EventQueue>build( _proc, queue ) ) ;
+		procs.add( Tuple.<Event.IProcess<?>, EventQueue<?>>build( _proc, queue ) ) ;
 
 		return _proc ;
 	}
@@ -55,7 +65,7 @@ public final class EventBlock implements IEventBlock
 		final int size = procs.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Tuple<Event.IProcess, EventQueue> tuple = procs.get( i ) ;
+			final Tuple<Event.IProcess<?>, EventQueue<?>> tuple = procs.get( i ) ;
 
 			final Event.IProcess proc = tuple.getLeft() ;
 			final EventQueue queue = tuple.getRight() ;

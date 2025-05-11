@@ -7,6 +7,8 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class CollisionCheck
 {
+	private final float[] axes = new float[2 * 2] ;
+
 	private final Vector2 toCenter = new Vector2() ;
 	private final Vector2 axis = new Vector2() ;
 	private final Vector2 axis1 = new Vector2() ;
@@ -107,7 +109,7 @@ public final class CollisionCheck
 									 final Vector2 _toCenter,
 									 final Vector2 _setAxis )
 	{
-		final float[] axes = _a.getAxes() ;
+		_a.calculateAxes( axes ) ;
 
 		FloatBuffer.fill( axes, axis, 0 ) ;
 		float bestOverlap = penetrationOnAxis( _a, _b, axis, _toCenter ) ;

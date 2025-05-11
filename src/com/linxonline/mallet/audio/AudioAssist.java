@@ -1,14 +1,9 @@
 package com.linxonline.mallet.audio ;
 
-import com.linxonline.mallet.util.SourceCallback ;
-import com.linxonline.mallet.event.Event ;
-
 public final class AudioAssist
 {
-	private static final Event<Object> AUDIO_CLEAN = Event.create( "AUDIO_CLEAN" ) ;
-
 	private static Assist assist ;
-	
+
 	private AudioAssist() {}
 
 	/**

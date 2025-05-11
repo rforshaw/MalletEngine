@@ -35,6 +35,7 @@ public final class GlobalHome
 		Copy the files located within the application's directory 
 		and copy it to the application's home directory.
 	*/
+	@SafeVarargs
 	public static boolean copy( final Tuple<String, String> ... _paths )
 	{
 		if( home != null )

@@ -128,6 +128,7 @@ public final class ALSAGenerator implements IGenerator
 		{
 			System.out.println( "Shutting down audio." ) ;
 			clear() ;
+			ALSASource.shutdown( openAL ) ;
 			ALut.alutExit() ;
 		}
 		catch( ALException ex )
@@ -157,14 +158,14 @@ public final class ALSAGenerator implements IGenerator
 	@Override
 	public ISource create( final String _file, final StreamType _type )
 	{
-		final ALSABuffer sound = staticSoundManager.get( _file ) ;
-		if( sound == null )
+		final ALSABuffer buffer = staticSoundManager.get( _file ) ;
+		if( buffer == null )
 		{
 			System.out.println( "Sound Doesn't exist." ) ;
 			return null ;
 		}
 
-		return new ALSASource( openAL, sound ) ;
+		return new ALSASource( openAL, buffer ) ;
 	}
 
 	@Override

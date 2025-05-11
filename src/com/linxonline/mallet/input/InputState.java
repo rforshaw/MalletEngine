@@ -42,7 +42,7 @@ public class InputState implements IInputSystem,
 	{
 		if( exists( _handler ) == false )
 		{
-			System.out.println( "Input Handler doesn't exist.." ) ;
+			System.out.println( "Input Handler doesn't exist.." + _handler.toString() ) ;
 			return ;
 		}
 

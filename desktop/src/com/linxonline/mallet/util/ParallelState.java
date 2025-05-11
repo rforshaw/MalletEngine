@@ -5,7 +5,6 @@ import java.util.concurrent.* ;
 import java.util.concurrent.atomic.AtomicInteger ;
 
 import com.linxonline.mallet.util.caches.MemoryPool ;
-import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /**
 	Assist with the processing of large data-sets
@@ -13,42 +12,52 @@ import com.linxonline.mallet.util.time.ElapsedTimer ;
 	Note: Avoid calling Parallel within a Parallel
 	operation - as this can result in a stall.
 */
-public final class Parallel
+public final class ParallelState implements AutoCloseable
 {
-	private final static int MINIMUM_BATCH_SIZE = 50 ;
-	private final static int MAX_WORKER_COUNT = 6 ;
+	private final MemoryPool<BatchListJob> batchListJobs = new MemoryPool<BatchListJob>( () -> new BatchListJob() ) ;
+	private final MemoryPool<BatchArrayJob> batchArrayJobs = new MemoryPool<BatchArrayJob>( () -> new BatchArrayJob() ) ;
+	private final MemoryPool<ListJob> listJobs = new MemoryPool<ListJob>( () -> new ListJob() ) ;
+	private final MemoryPool<ArrayJob> arrayJobs = new MemoryPool<ArrayJob>( () -> new ArrayJob() ) ;
 
-	private final static MemoryPool<BatchListJob> batchListJobs = new MemoryPool<BatchListJob>( () -> new BatchListJob() ) ;
-	private final static MemoryPool<BatchArrayJob> batchArrayJobs = new MemoryPool<BatchArrayJob>( () -> new BatchArrayJob() ) ;
-	private final static MemoryPool<ListJob> listJobs = new MemoryPool<ListJob>( () -> new ListJob() ) ;
-	private final static MemoryPool<ArrayJob> arrayJobs = new MemoryPool<ArrayJob>( () -> new ArrayJob() ) ;
+	private final Worker[] workers ;
+	private final LinkedBlockingDeque<IJob> jobs = new LinkedBlockingDeque<IJob>() ;
 
-	private final static LinkedBlockingDeque<IJob> jobs = new LinkedBlockingDeque<IJob>() ;
-	private volatile static int workerCount = 0 ;
-	private static AtomicInteger available = new AtomicInteger( 0 ) ;
-	static
+	private volatile int workerCount = 0 ;
+	private AtomicInteger available = new AtomicInteger( 0 ) ;
+
+	private final String name ;
+	private final int minimumBatchSize ;
+
+	public ParallelState( final String _name, final int _minBatchSize, final int _workerCount )
 	{
-		createWorkers( 6 ) ;
+		name = _name ;
+		minimumBatchSize = _minBatchSize ;
+
+		workers = new Worker[_workerCount] ;
+		for( int i = 0; i < workers.length; ++i )
+		{
+			final int num = i + 1 ;
+			workers[i] = new Worker( String.format( "%s_%d", name, num ) ) ;
+			workers[i].start() ;
+		}
 	}
 
-	private Parallel() {}
-
-	public static void run( final IRun _run )
+	public void run( final Parallel.IRun _run )
 	{
 		jobs.addFirst( new Job( _run ) ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final IRangeRun<T> _run )
+	public <T> void forEach( final T[] _array, final Parallel.IRangeRun<T> _run )
 	{
-		forEach( _array, 0, _array.length, MINIMUM_BATCH_SIZE, _run ) ;
+		forEach( _array, 0, _array.length, minimumBatchSize, _run ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final int _batchSize, final IRangeRun<T> _run )
+	public <T> void forEach( final T[] _array, final int _batchSize, final Parallel.IRangeRun<T> _run )
 	{
 		forEach( _array, 0, _array.length, _batchSize, _run ) ;
 	}
 
-	public static <T> void forEach( final T[] _array, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
+	public <T> void forEach( final T[] _array, final int _start, final int _end, final int _batchSize, final Parallel.IRangeRun<T> _run )
 	{
 		final int batchSize = _batchSize ;
 		final int totalSize = _end - _start ;
@@ -64,7 +73,7 @@ public final class Parallel
 			return ;
 		}
 
-		createTempWorkers( 2 ) ;
+		createTempWorkers( 2, batchNum ) ;
 		int start = _start ;
 		int numCompleted = 0 ;
 
@@ -96,17 +105,17 @@ public final class Parallel
 		}
 	}
 
-	public static <T> void forEach( final List<T> _list, final IRangeRun<T> _run )
+	public <T> void forEach( final List<T> _list, final Parallel.IRangeRun<T> _run )
 	{
-		forEach( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
+		forEach( _list, 0, _list.size(), minimumBatchSize, _run ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final int _batchSize, final IRangeRun<T> _run )
+	public <T> void forEach( final List<T> _list, final int _batchSize, final Parallel.IRangeRun<T> _run )
 	{
 		forEach( _list, 0, _list.size(), _batchSize, _run ) ;
 	}
 
-	public static <T> void forEach( final List<T> _list, final int _start, final int _end, final int _batchSize, final IRangeRun<T> _run )
+	public <T> void forEach( final List<T> _list, final int _start, final int _end, final int _batchSize, final Parallel.IRangeRun<T> _run )
 	{
 		final int batchSize = _batchSize ;
 		final int totalSize = _end - _start ;
@@ -122,7 +131,7 @@ public final class Parallel
 			return ;
 		}
 
-		createTempWorkers( 2 ) ;
+		createTempWorkers( 2, batchNum ) ;
 		int start = _start ;
 		int numCompleted = 0 ;
 
@@ -154,17 +163,17 @@ public final class Parallel
 		}
 	}
 
-	public static <T> void forBatch( final List<T> _list, final IListRun<T> _run )
+	public <T> void forBatch( final List<T> _list, final Parallel.IListRun<T> _run )
 	{
-		forBatch( _list, 0, _list.size(), MINIMUM_BATCH_SIZE, _run ) ;
+		forBatch( _list, 0, _list.size(), minimumBatchSize, _run ) ;
 	}
 
-	public static <T> void forBatch( final List<T> _list, final int _batchSize, final IListRun<T> _run )
+	public <T> void forBatch( final List<T> _list, final int _batchSize, final Parallel.IListRun<T> _run )
 	{
 		forBatch( _list, 0, _list.size(), _batchSize, _run ) ;
 	}
 
-	public static <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final IListRun<T> _run )
+	public <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final Parallel.IListRun<T> _run )
 	{
 		final int batchSize = _batchSize ;
 		final int totalSize = _end - _start ;
@@ -177,7 +186,7 @@ public final class Parallel
 			return ;
 		}
 
-		createTempWorkers( 2 ) ;
+		createTempWorkers( 2, batchNum ) ;
 		int start = _start ;
 		int numCompleted = 0 ;
 
@@ -209,17 +218,17 @@ public final class Parallel
 		}
 	}
 
-	public static <T> void forBatch( final T[] _array, final IArrayRun<T> _run )
+	public <T> void forBatch( final T[] _array, final Parallel.IArrayRun<T> _run )
 	{
-		forBatch( _array, 0, _array.length, MINIMUM_BATCH_SIZE, _run ) ;
+		forBatch( _array, 0, _array.length, minimumBatchSize, _run ) ;
 	}
 
-	public static <T> void forBatch( final T[] _array, final int _batchSize, final IArrayRun<T> _run )
+	public <T> void forBatch( final T[] _array, final int _batchSize, final Parallel.IArrayRun<T> _run )
 	{
 		forBatch( _array, 0, _array.length, _batchSize, _run ) ;
 	}
 
-	public static <T> void forBatch( final T[] _array, final int _start, final int _end, final int _batchSize, final IArrayRun<T> _run )
+	public <T> void forBatch( final T[] _array, final int _start, final int _end, final int _batchSize, final Parallel.IArrayRun<T> _run )
 	{
 		final int batchSize = _batchSize ;
 		final int totalSize = _end - _start ;
@@ -232,7 +241,7 @@ public final class Parallel
 			return ;
 		}
 
-		createTempWorkers( 2 ) ;
+		createTempWorkers( 2, batchNum ) ;
 		int start = _start ;
 		int numCompleted = 0 ;
 
@@ -264,61 +273,44 @@ public final class Parallel
 		}
 	}
 
-	private static void createTempWorkers( final int _num )
+	@Override
+	public void close() throws Exception
+	{
+		for( int i = 0; i < workers.length; ++i )
+		{
+			workers[i].shutdown() ;
+		}
+	}
+
+	private void createTempWorkers( int _num, final int _jobsTocomplete )
 	{
 		if( available.get() > 0 )
 		{
 			return ;
 		}
 
+		// We want to avoid hiring more workers than
+		// we have jobs that need completing.
+		_num = ( _num <= _jobsTocomplete ) ? _num : _jobsTocomplete ;
+		final int shareJobs = _num / _jobsTocomplete ;
+
+		final int count = workerCount + 1 ;
 		for( int i = 0; i < _num; ++i )
 		{
-			createWorker( workerCount + i, Worker.Type.TEMP ) ;
+			final int num = count + i ;
+			final Worker worker = new Worker( String.format( "TEMP_%s_%d", name, num ), shareJobs ) ;
+			worker.start() ;
 		}
 	}
 
-	private static void createWorkers( final int _num )
-	{
-		for( int i = 0; i < _num; ++i )
-		{
-			createWorker( workerCount + i, Worker.Type.FULL_TIME ) ;
-		}
-	}
-
-	private static void createWorker( final int _num, final Worker.Type _type )
-	{
-		final Worker worker = new Worker( String.format( "PARALLEL_THREAD_%d", _num ), _type ) ;
-		worker.start() ;
-	}
-
-	public interface IRun
-	{
-		public void run() ;
-	}
-
-	public interface IRangeRun<T>
-	{
-		public void run( final int _index, final T _item ) ;
-	}
-
-	public interface IListRun<T>
-	{
-		public void run( final int _start, final int _end, final List<T> _batch ) ;
-	}
-
-	public interface IArrayRun<T>
-	{
-		public void run( final int _start, final int _end, final T[] _batch ) ;
-	}
-
-	private static final class ArrayJob<T> implements IJob
+	private final class ArrayJob<T> implements IJob
 	{
 		private CountDownLatch latch ;
 		private int start ;
 		private int end ;
 
 		private T[] array ;
-		private IRangeRun<T> runner ;
+		private Parallel.IRangeRun<T> runner ;
 
 		public ArrayJob() {}
 
@@ -326,7 +318,7 @@ public final class Parallel
 						 final int _start,
 						 final int _end,
 						 final T[] _array,
-						 final IRangeRun<T> _runner )
+						 final Parallel.IRangeRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -353,22 +345,22 @@ public final class Parallel
 			}
 			latch.countDown() ;
 
-			synchronized( arrayJobs )
+			synchronized( ParallelState.this.arrayJobs )
 			{
 				reset() ;
-				arrayJobs.reclaim( this ) ;
+				ParallelState.this.arrayJobs.reclaim( this ) ;
 			}
 		}
 	}
 
-	private static final class ListJob<T> implements IJob
+	private final class ListJob<T> implements IJob
 	{
 		private CountDownLatch latch ;
 		private int start ;
 		private int end ;
 
 		private  List<T> list ;
-		private IRangeRun<T> runner ;
+		private Parallel.IRangeRun<T> runner ;
 
 		public ListJob() {}
 
@@ -376,7 +368,7 @@ public final class Parallel
 						 final int _start,
 						 final int _end,
 						 final List<T> _list,
-						 final IRangeRun<T> _runner )
+						 final Parallel.IRangeRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -403,22 +395,22 @@ public final class Parallel
 			}
 			latch.countDown() ;
 
-			synchronized( listJobs )
+			synchronized( ParallelState.this.listJobs )
 			{
 				reset() ;
-				listJobs.reclaim( this ) ;
+				ParallelState.this.listJobs.reclaim( this ) ;
 			}
 		}
 	}
 
-	private static final class BatchArrayJob<T> implements IJob
+	private final class BatchArrayJob<T> implements IJob
 	{
 		private CountDownLatch latch ;
 		private int start ;
 		private int end ;
 
 		private T[] array ;
-		private IArrayRun<T> runner ;
+		private Parallel.IArrayRun<T> runner ;
 
 		public BatchArrayJob() {}
 
@@ -426,7 +418,7 @@ public final class Parallel
 						 final int _start,
 						 final int _end,
 						 final T[] _array,
-						 final IArrayRun<T> _runner )
+						 final Parallel.IArrayRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -450,22 +442,22 @@ public final class Parallel
 			runner.run( start, end, array ) ;
 			latch.countDown() ;
 
-			synchronized( batchArrayJobs )
+			synchronized( ParallelState.this.batchArrayJobs )
 			{
 				reset() ;
-				batchArrayJobs.reclaim( this ) ;
+				ParallelState.this.batchArrayJobs.reclaim( this ) ;
 			}
 		}
 	}
 
-	private static final class BatchListJob<T> implements IJob
+	private final class BatchListJob<T> implements IJob
 	{
 		private CountDownLatch latch ;
 		private int start ;
 		private int end ;
 
 		private List<T> list ;
-		private IListRun<T> runner ;
+		private Parallel.IListRun<T> runner ;
 
 		public BatchListJob() {}
 
@@ -473,7 +465,7 @@ public final class Parallel
 							 final int _start,
 							 final int _end,
 							 final List<T> _list,
-							 final IListRun<T> _runner )
+							 final Parallel.IListRun<T> _runner )
 		{
 			latch = _latch ;
 
@@ -497,19 +489,19 @@ public final class Parallel
 			runner.run( start, end, list ) ;
 			latch.countDown() ;
 
-			synchronized( batchListJobs )
+			synchronized( ParallelState.this.batchListJobs )
 			{
 				reset() ;
-				batchListJobs.reclaim( this ) ;
+				ParallelState.this.batchListJobs.reclaim( this ) ;
 			}
 		}
 	}
 
-	private static final class Job implements IJob
+	private final class Job implements IJob
 	{
-		private final IRun runner ;
+		private final Parallel.IRun runner ;
 
-		public Job( final IRun _runner )
+		public Job( final Parallel.IRun _runner )
 		{
 			runner = _runner ;
 		}
@@ -521,19 +513,37 @@ public final class Parallel
 		}
 	}
 
-	private interface IJob
+	private sealed interface IJob permits Job, BatchListJob, BatchArrayJob, ListJob, ArrayJob
 	{
 		public void run() ;
 	}
 
-	private static final class Worker extends Thread
+	private final class Worker extends Thread
 	{
-		private final Type type ;
-	
-		public Worker( final String _name, final Type _type )
+		private final boolean isTemp ;
+
+		private int jobsTocomplete = 0 ;
+		private volatile boolean running = true ;
+
+		public Worker( final String _name )
 		{
 			super( _name ) ;
-			type = _type ;
+			isTemp = false ;
+		}
+
+		// A worker introduced only to
+		// complete a fixed number of jobs is
+		// considered a temp-worker.
+		public Worker( final String _name, final int _jobsTocomplete )
+		{
+			super( _name ) ;
+			isTemp = true ;
+			jobsTocomplete = _jobsTocomplete ;
+		}
+
+		public void shutdown()
+		{
+			running = false ;
 		}
 
 		@Override
@@ -541,39 +551,38 @@ public final class Parallel
 		{
 			++workerCount ;
 
-			while( true )
+			while( running )
 			{
 				try
 				{
+					// Our worker thread has yet to retrieve a job
+					// and so we'll flag it as available.
 					final int av = available.incrementAndGet() ;
 
-					switch( type )
+					// Grab a job and decrement our availability.
+					// If our thread has been shutdown it should now fall
+					// through and clean up after itself.
+					final IJob job = ParallelState.this.jobs.poll( 10, TimeUnit.MILLISECONDS ) ;
+
+					// We've got a job -maybe- we are no longer available
+					// while we try to run it.
+					available.decrementAndGet() ;
+					if( job != null )
 					{
-						default :
-						case FULL_TIME :
+						job.run() ;
+					}
+
+					// Jobs were created, but there was no
+					// full-time workers available to process them.
+					// To avoid the possibility of worker exhaustion
+					// a few temp-workers were created to meet
+					// the demand.
+					if( isTemp )
+					{
+						jobsTocomplete -= -1 ;
+						// Whichever comes first.
+						if( jobsTocomplete <= 0 || job == null )
 						{
-							final IJob job = Parallel.jobs.take() ;
-							available.decrementAndGet() ;
-
-							job.run() ;
-							break ;
-						}
-						case TEMP      :
-						{
-							// A temp worker should only exist if Parallel was called
-							// within a Parallel call and there are no full-time workers.
-							// We add jobs at the front of the queue to ensure they
-							// are picked up first. Should prevent indefinite stalling.
-							final IJob job = Parallel.jobs.poll( 10, TimeUnit.MILLISECONDS ) ;
-							available.decrementAndGet() ;
-
-							if( job == null )
-							{
-								--workerCount ;
-								return  ;
-							}
-
-							job.run() ;
 							--workerCount ;
 							return ;
 						}
@@ -584,12 +593,6 @@ public final class Parallel
 					ex.printStackTrace() ;
 				}
 			}
-		}
-
-		private enum Type
-		{
-			FULL_TIME,
-			TEMP
 		}
 	}
 }

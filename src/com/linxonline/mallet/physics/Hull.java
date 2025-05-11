@@ -25,8 +25,14 @@ public abstract class Hull
 	protected boolean collidable = true ; 							// Allows hull to produce Collision Data.
 	protected boolean physical = true ; 							// Allows hull to be affected by a Collision
 
-	protected final float[] position = new float[( 2 * VECTOR_TYPE ) + 1] ;
+	protected float positionX ;
+	protected float positionY ;
 
+	protected float offsetX ;
+	protected float offsetY ;
+	
+	protected float rotation ;
+	
 	protected Hull( final float _x, final float _y,
 					final float _offsetX, final float _offsetY,
 					final float _theta,
@@ -44,66 +50,72 @@ public abstract class Hull
 
 	public void setPosition( final float _x, final float _y )
 	{
-		FloatBuffer.set( position, POSITION_X, _x, _y ) ;
+		positionX = _x ;
+		positionY = _y ;
 	}
 
 	public void addToPosition( final float _x, final float _y )
 	{
-		FloatBuffer.add( position, POSITION_X, _x, _y ) ;
+		positionX += _x ;
+		positionY += _y ;
 	}
 
 	public void setOffset( final float _x, final float _y )
 	{
-		FloatBuffer.set( position, OFFSET_X, _x, _y ) ;
+		offsetX = _x ;
+		offsetY = _y ;
 	}
 
 	public void addToOffset( final float _x, final float _y )
 	{
-		FloatBuffer.add( position, OFFSET_X, _x, _y ) ;
+		offsetX += _x ;
+		offsetY += _y ;
 	}
 
 	public void setRotation( final float _theta )
 	{
-		position[ROTATION] = _theta ;
+		rotation = _theta ;
 	}
 
 	public Vector2 getPosition( final Vector2 _fill )
 	{
-		_fill.x = position[POSITION_X] ;
-		_fill.y = position[POSITION_Y] ;
+		_fill.x = positionX ;
+		_fill.y = positionY ;
 		return _fill ;
 	}
 
 	public Vector2 getOffset( final Vector2 _fill )
 	{
-		_fill.x = position[OFFSET_X] ;
-		_fill.y = position[OFFSET_Y] ;
+		_fill.x = offsetX ;
+		_fill.y = offsetY ;
 		return _fill ;
 	}
 
 	public Vector3 getPosition( final Vector3 _fill )
 	{
-		_fill.x = position[POSITION_X] ;
-		_fill.y = position[POSITION_Y] ;
+		_fill.x = positionX ;
+		_fill.y = positionY ;
 		_fill.z = 0.0f ;
 		return _fill ;
 	}
 
 	public Vector3 getOffset( final Vector3 _fill )
 	{
-		_fill.x = position[OFFSET_X] ;
-		_fill.y = position[OFFSET_Y] ;
+		_fill.x = offsetX ;
+		_fill.y = offsetY ;
 		_fill.z = 0.0f ;
 		return _fill ;
 	}
 
 	public float getRotation()
 	{
-		return position[ROTATION] ;
+		return rotation ;
 	}
 
-	public abstract float[] getAxes() ;
-	public abstract float[] getPoints() ;
+	public abstract int getPointsLength() ;
+	public abstract Vector2 getPoint( final int _index, final Vector2 _fill ) ;
+
+	public abstract float[] calculateAxes( final float[] _axes ) ;
 	public abstract float projectToAxis( final Vector2 _axis ) ;
 
 	public abstract AABB getAABB( final AABB _fill ) ;

@@ -151,6 +151,7 @@ public class GameState
 	{
 		clear() ;								// Remove all content
 		unhookHandlerSystems() ;				// Prevent system from recieving external events
+		Event.clear() ;
 
 		showFPS.setShow( false ) ;
 		return null ;

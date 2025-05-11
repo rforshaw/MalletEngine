@@ -10,13 +10,6 @@ public interface IRender
 	public void shutdown() ;
 
 	/**
-		Defines the window dimensions that the framebuffer will displayed to.
-		The framebuffer and display do not have to be the same dimensions.
-		The framebuffer will be upscaled or downscaled accordingly.
-	*/
-	public void setDisplayDimensions( final int _width, final int _height ) ;
-
-	/**
 		Update the current render state - this operates at 
 		the currently active GameState update rate.
 	*/
@@ -28,8 +21,4 @@ public interface IRender
 		interpolation between frames.
 	*/
 	public void draw( final float _dt ) ;
-
-	public void sort() ;
-	public void clear() ;
-	public void clean() ;
 }

@@ -100,6 +100,21 @@ public final class EventState
 		}
 	}
 
+	public void clear()
+	{
+		// It's deliberately lookup - we use lookup as the
+		// sync point when using either lookup or list.
+		synchronized( lookup )
+		{
+			final int size = list.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final EventQueue q = list.get( i ) ;
+				q.clear() ;
+			}
+		}
+	}
+
 	/**
 		Loop over all EventQueues associated with this
 		state and make their baking buffer the front,

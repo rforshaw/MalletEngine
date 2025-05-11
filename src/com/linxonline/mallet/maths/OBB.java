@@ -4,25 +4,24 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class OBB
 {
-	public static final int TOP_LEFT = 0 ;
-	public static final int TOP_RIGHT = 2 ;
-	public static final int BOTTOM_RIGHT = 4 ;
-	public static final int BOTTOM_LEFT = 6 ;
+	// Contains the original point data
+	// before rotational transformations
+	// are applied.
+	private float tLX, tLY = 0.0f ;	// top left
+	private float tRX, tRY = 0.0f ;	// top right
+	private float bLX, bLY = 0.0f ;	// bottom left
+	private float bRX, bRY = 0.0f ;	// bottom right
 
-	public static final int POINT_NUM = 4 ;
-	public static final int AXES_NUM = 2 ;
-	public static final int VECTOR_TYPE = 2 ;
-
-	public final float[] points = new float[POINT_NUM * VECTOR_TYPE] ;
-	public final float[] rotations = new float[POINT_NUM * VECTOR_TYPE] ;
-	public final float[] axes = new float[AXES_NUM * VECTOR_TYPE] ;
+	// Contains the points after
+	// rotational transformations have
+	// been applied.
+	private float rTLX, rTLY ;	// result top left
+	private float rTRX, rTRY ;
+	private float rBLX, rBLY ;
+	private float rBRX, rBRY ;
 
 	private OBB()
 	{
-		FloatBuffer.set( points, TOP_LEFT, 0.0f, 0.0f ) ;
-		FloatBuffer.set( points, TOP_RIGHT, 0.0f, 0.0f ) ;
-		FloatBuffer.set( points, BOTTOM_LEFT, 0.0f, 0.0f ) ;
-		FloatBuffer.set( points, BOTTOM_RIGHT, 0.0f, 0.0f ) ;
 		init() ;
 	}
 
@@ -31,10 +30,17 @@ public final class OBB
 				 final Vector2 _bottomLeft,
 				 final Vector2 _bottomRight )
 	{
-		FloatBuffer.set( points, OBB.TOP_LEFT, _topLeft.x, _topLeft.y ) ;
-		FloatBuffer.set( points, OBB.TOP_RIGHT, _topRight.x, _topRight.y ) ;
-		FloatBuffer.set( points, OBB.BOTTOM_LEFT, _bottomLeft.x, _bottomLeft.y ) ;
-		FloatBuffer.set( points, OBB.BOTTOM_RIGHT, _bottomRight.x, _bottomRight.y ) ;
+		tLX = _topLeft.x ;
+		tLY = _topLeft.y ;
+
+		tRX = _topRight.x ;
+		tRY = _topRight.y ;
+
+		bLX = _bottomLeft.x ;
+		bLY = _bottomLeft.y ;
+
+		bRX = _bottomRight.x ;
+		bRY = _bottomRight.y ;
 		init() ;
 	}
 
@@ -60,10 +66,17 @@ public final class OBB
 
 	public void setFromAABB( final AABB _aabb )
 	{
-		FloatBuffer.set( points,   OBB.TOP_LEFT,     _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.TOP_RIGHT,    _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MIN_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_LEFT,  _aabb.range[AABB.MIN_X],         _aabb.range[AABB.MAX_Y] ) ;
-		FloatBuffer.set( points,   OBB.BOTTOM_RIGHT, _aabb.range[AABB.MAX_X],         _aabb.range[AABB.MAX_Y] ) ;
+		tLX = _aabb.minX ;
+		tLY = _aabb.minY ;
+
+		tRX = _aabb.maxX ;
+		tRY = _aabb.minY ;
+
+		bLX = _aabb.minX ;
+		bLY = _aabb.maxY ;
+
+		bRX = _aabb.maxX ;
+		bRY = _aabb.maxY ;
 		init() ;
 	}
 
@@ -72,8 +85,34 @@ public final class OBB
 	**/
 	public void setFromOBB( final OBB _obb )
 	{
-		FloatBuffer.copy( points, _obb.points ) ;
-		FloatBuffer.copy( axes, _obb.axes ) ;
+		tLX = _obb.tLX ;
+		tLY = _obb.tLY ;
+
+		tRX = _obb.tRX ;
+		tRY = _obb.tRY ;
+
+		bLX = _obb.bLX ;
+		bLY = _obb.bLY ;
+
+		bRX = _obb.bRX ;
+		bRY = _obb.bRY ;
+
+		rTLX = _obb.rTLX ;
+		rTLY = _obb.rTLY ;
+
+		rTRX = _obb.rTRX ;
+		rTRY = _obb.rTRY ;
+
+		rBLX = _obb.rBLX ;
+		rBLY = _obb.rBLY ;
+
+		rBRX = _obb.rBRX ;
+		rBRY = _obb.rBRY ;
+	}
+
+	public int getLength()
+	{
+		return 4 ;
 	}
 
 	/**
@@ -83,7 +122,28 @@ public final class OBB
 	**/
 	public Vector2 getPoint( final int _index, final Vector2 _fill )
 	{
-		FloatBuffer.fill( rotations, _fill, _index ) ;
+		switch( _index )
+		{
+			case 0 :
+				_fill.x = rTLX ;
+				_fill.y = rTLY ;
+				break ;
+			case 1 :
+				_fill.x = rTRX ;
+				_fill.y = rTRY ;
+				break ;
+
+			case 2 :
+				_fill.x = rBLX ;
+				_fill.y = rBLY ;
+				break ;
+
+			case 3 :
+				_fill.x = rBRX ;
+				_fill.y = rBRY ;
+				break ;
+		}
+
 		return _fill ;
 	}
 
@@ -100,95 +160,70 @@ public final class OBB
 		final float sin = ( float )Math.sin( _theta ) ;
 		final float cos = ( float )Math.cos( _theta ) ;
 
-		final Vector2 point = new Vector2() ;
-		final Vector2 offset = new Vector2( _offsetX, _offsetY ) ;
+		// Top Left
+		rTLX = tLX + _offsetX ;
+		rTLY = tLY + _offsetY ;
 
-		for( int i = 0; i < points.length; i += 2 )
-		{
-			FloatBuffer.fill( points, point, i ) ;
-			OBB.rotate( point, offset, sin, cos ) ;
-			FloatBuffer.set( rotations, i, point.x, point.y ) ;
-		}
+		float x = ( rTLX * cos ) - ( rTLY * sin ) ;
+		float y = ( rTLX * sin ) + ( rTLY * cos ) ;
+
+		rTLX = x - _offsetX ;
+		rTLY = y - _offsetY ;
+
+		// Top Right
+		rTRX = tRX + _offsetX ;
+		rTRY = tRY + _offsetY ;
+
+		x = ( rTRX * cos ) - ( rTRY * sin ) ;
+		y = ( rTRX * sin ) + ( rTRY * cos ) ;
+
+		rTRX = x - _offsetX ;
+		rTRY = y - _offsetY ;
+
+		// Bottom Left
+		rBLX = bLX + _offsetX ;
+		rBLY = bLY + _offsetY ;
+
+		x = ( rBLX * cos ) - ( rBLY * sin ) ;
+		y = ( rBLX * sin ) + ( rBLY * cos ) ;
+
+		rBLX = x - _offsetX ;
+		rBLY = y - _offsetY ;
+
+		// Bottom Right
+		rBRX = bRX + _offsetX ;
+		rBRY = bRY + _offsetY ;
+
+		x = ( rBRX * cos ) - ( rBRY * sin ) ;
+		y = ( rBRX * sin ) + ( rBRY * cos ) ;
+
+		rBRX = x - _offsetX ;
+		rBRY = y - _offsetY ;
 	}
 
-	public static Vector2 rotate( final Vector2 _point, final Vector2 _offset, final float _sin, final float _cos )
+	public final float[] calculateAxes( final float[] _axes )
 	{
-		_point.x += _offset.x ;
-		_point.y += _offset.y ;
+		_axes[1] = rTRX - rTLX ;			// x
+		_axes[0] = -( rTRY - rTLY ) ;		// y
 
-		final float x = ( _point.x * _cos ) - ( _point.y * _sin ) ;
-		final float y = ( _point.x * _sin ) + ( _point.y * _cos ) ;
+		float length = Vector2.length( _axes[0], _axes[1] ) ;
+		_axes[0] /= length ;
+		_axes[1] /= length ;
 
-		_point.x = x - _offset.x ;
-		_point.y = y - _offset.y ;
-		return _point ;
-	}
+		_axes[3] = rTRX - rBRX ;		// x
+		_axes[2] = -( rTRY - rBRY ) ;	// y
 
-	public final void updateAxesAndEdges()
-	{
-		final float topRightX = rotations[OBB.TOP_RIGHT] ;
-		final float topRightY = rotations[OBB.TOP_RIGHT + 1] ;
+		length = Vector2.length( _axes[2], _axes[3] ) ;
+		_axes[2] /= length ;
+		_axes[3] /= length ;
 
-		final float topLeftX = rotations[OBB.TOP_LEFT] ;
-		final float topLeftY = rotations[OBB.TOP_LEFT + 1] ;
-
-		final float bottomRightX = rotations[OBB.BOTTOM_RIGHT] ;
-		final float bottomRightY = rotations[OBB.BOTTOM_RIGHT + 1] ;
-
-		axes[1] = topRightX - topLeftX ;			// x
-		axes[0] = -( topRightY - topLeftY ) ;		// y
-
-		float length = Vector2.length( axes[0], axes[1] ) ;
-		axes[0] /= length ;
-		axes[1] /= length ;
-
-		axes[3] = topRightX - bottomRightX ;		// x
-		axes[2] = -( topRightY - bottomRightY ) ;	// y
-
-		length = Vector2.length( axes[2], axes[3] ) ;
-		axes[2] /= length ;
-		axes[3] /= length ;
+		return _axes ;
 	}
 
 	private final void init()
 	{
 		applyRotations( 0.0f, 0.0f, 0.0f ) ;
-		updateAxesAndEdges() ;
 	}
-
-	/*@Override
-	public int hashCode()
-	{
-		final int prime = 31 ;
-
-		int result = 1 ;
-		for( int i = 0; i < rotations.length; ++i )
-		{
-			result = prime * result + Float.floatToIntBits( rotations[i] ) ;
-		}
-
-		return result ;
-	}
-
-	@Override
-	public boolean equals( final Object _obj )
-	{
-		if( !( _obj instanceof OBB ) )
-		{
-			return false ;
-		}
-
-		final OBB b = ( OBB )_obj ;
-		for( int i = 0; i < rotations.length; ++i )
-		{
-			if( rotations[i] != b.rotations[i] )
-			{
-				return false ;
-			}
-		}
-
-		return true ;
-	}*/
 
 	@Override
 	public String toString()
