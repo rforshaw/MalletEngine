@@ -88,9 +88,14 @@ public final class Box2D extends Hull
 	@Override
 	public float projectToAxis( final Vector2 _axis )
 	{
-		final Vector2 p = obb.getPoint( 0, new Vector2() ) ;
+		final float aX = _axis.x ;
+		final float aY = _axis.y ;
 
-		float dp = Vector2.dot( p.x, p.y, _axis.x, _axis.y ) ;
+		obb.getPoint( 0, _axis ) ;
+		float pX = _axis.x ;
+		float pY = _axis.y ;
+
+		float dp = Vector2.dot( pX, pY, aX, aY ) ;
 
 		float max = dp ;
 		float min = dp ;
@@ -98,8 +103,11 @@ public final class Box2D extends Hull
 		final int length = obb.getLength() ;
 		for( int i = 1; i < length; ++i )
 		{
-			obb.getPoint( i, p ) ;
-			dp = Vector2.dot( p.x, p.y, _axis.x, _axis.y ) ;
+			obb.getPoint( i, _axis ) ;
+			pX = _axis.x ;
+			pY = _axis.y ;
+
+			dp = Vector2.dot( pX, pY, aX, aY ) ;
 
 			if( dp > max )
 			{
@@ -111,6 +119,8 @@ public final class Box2D extends Hull
 			}
 		}
 
+		_axis.x = aX ;
+		_axis.y = aY ;
 		return ( max - min ) * 0.5f ;
 	}
 

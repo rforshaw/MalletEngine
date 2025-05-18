@@ -683,11 +683,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		for( int i = 0; i < cameraSize; ++i )
 		{
 			final Camera camera = cameras.get( i ) ;
-			if( camera.update( coefficient ) == true )
-			{
-				final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
-				glCamera.update( camera ) ;
-			}
+			camera.update( coefficient ) ;
+
+			final GLCamera glCamera = cameraLookup.getRHS( camera.index() ) ;
+			glCamera.update( camera ) ;
 		}
 
 		final int buffers = updateBuffers( coefficient ) ;

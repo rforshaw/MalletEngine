@@ -254,10 +254,8 @@ public final class AABB
 	*/
 	public boolean intersectPoint( final float _x, final float _y )
 	{
-		//System.out.println( "X: " + _x + " MIN: " + minX + " MAX: " + maxX ) ;
 		if( _x >= minX && _x <= maxX )
 		{
-			//System.out.println( "Y: " + _y + " MIN: " + minY + " MAX: " + maxY ) ;
 			if( _y >= minY && _y <= maxY )
 			{
 				return true ;

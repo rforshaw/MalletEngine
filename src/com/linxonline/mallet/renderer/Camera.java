@@ -22,7 +22,6 @@ public final class Camera
 	private final String id ;
 
 	// Each contain Position, Rotation, and Scale
-	private final float[] old = FloatBuffer.allocate( 12 ) ;
 	private final float[] present = FloatBuffer.allocate( 12 ) ;
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
@@ -56,7 +55,6 @@ public final class Camera
 	public Camera( final String _id )
 	{
 		id = _id ;
-		FloatBuffer.set( old, SCALE, 1.0f, 1.0f, 1.0f ) ;
 		FloatBuffer.set( present, SCALE, 1.0f, 1.0f, 1.0f ) ;
 		FloatBuffer.set( future, SCALE, 1.0f, 1.0f, 1.0f ) ;
 	}
@@ -178,9 +176,9 @@ public final class Camera
 
 	public void setRotation( final float _x, final float _y, final float _z )
 	{
-		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
-		float oY = FloatBuffer.get( old, ROTATION + 1 ) ;
-		float oZ = FloatBuffer.get( old, ROTATION + 2 ) ;
+		float oX = FloatBuffer.get( present, ROTATION + 0 ) ;
+		float oY = FloatBuffer.get( present, ROTATION + 1 ) ;
+		float oZ = FloatBuffer.get( present, ROTATION + 2 ) ;
 
 		final float diffX = Math.abs( _x - oX ) ;
 		if( diffX > PI )
@@ -200,7 +198,7 @@ public final class Camera
 			oZ += ( _z > oZ ) ? PI2 : -PI2 ;
 		}
 
-		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
+		FloatBuffer.set( present, ROTATION, oX, oY, oZ ) ;
 		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
 
 		viewMatrixDirty = true ;
@@ -483,7 +481,7 @@ public final class Camera
 	public boolean update( final float _coefficient )
 	{
 		boolean update = false ;
-		update |= Interpolate.linear( future, old, present, _coefficient ) ;
+		update |= Interpolate.linear( future, null, present, _coefficient ) ;
 		viewMatrixDirty = update ;
 		return update ;
 	}

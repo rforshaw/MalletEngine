@@ -11,12 +11,11 @@ public class Interpolate
 		for( int i = 0; i < _future.length; ++i )
 		{
 			final float future = _future[i] ;
-			final float past = _past[i] ;
+			final float past = _present[i] ;
 
 			final float present = past + ( future - past ) * _coefficient ;
 
 			_present[i] = present ;
-			_past[i] = present ;
 
 			if( Math.abs( future - present ) > 0.001f )
 			{

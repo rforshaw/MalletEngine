@@ -45,12 +45,12 @@ public final class FrameBuffer
 
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		frame.setPosition( _x, _y, _z ) ;
+		frame.setPositionInstant( _x, _y, _z ) ;
 	}
 
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		frame.setOffset( _x, _y, _z ) ;
+		frame.setOffsetInstant( _x, _y, _z ) ;
 	}
 
 	public void setLength( final float _x, final float _y, final float _z )

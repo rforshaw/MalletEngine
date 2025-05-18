@@ -132,15 +132,13 @@ public final class OBB
 				_fill.x = rTRX ;
 				_fill.y = rTRY ;
 				break ;
-
 			case 2 :
-				_fill.x = rBLX ;
-				_fill.y = rBLY ;
-				break ;
-
-			case 3 :
 				_fill.x = rBRX ;
 				_fill.y = rBRY ;
+				break ;
+			case 3 :
+				_fill.x = rBLX ;
+				_fill.y = rBLY ;
 				break ;
 		}
 

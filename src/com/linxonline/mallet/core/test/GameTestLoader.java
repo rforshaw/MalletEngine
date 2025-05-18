@@ -166,7 +166,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				createECSEntities( 1000, 1000 ) ;
+				createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;

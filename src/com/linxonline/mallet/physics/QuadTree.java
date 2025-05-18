@@ -511,16 +511,18 @@ public final class QuadTree
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
 
-			final Vector2 point = new Vector2() ;
 			final Vector2 absolute = new Vector2() ;
 
 			final int length = _hull.getPointsLength() ;
 			for( int i = 0; i < length; ++i )
 			{
-				_hull.getPosition( absolute ) ;
-				_hull.getPoint( i, point ) ;
+				_hull.getPoint( i, absolute ) ;
 
-				absolute.add( point ) ;
+				final float x = absolute.x ;
+				final float y = absolute.y ;
+
+				_hull.getPosition( absolute ) ;
+				absolute.add( x, y ) ;
 
 				// It is possible for a hull's points to 
 				// go beyond the current scope of the tree,
@@ -612,16 +614,18 @@ public final class QuadTree
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
 
-			final Vector2 point = new Vector2() ;
 			final Vector2 absolute = new Vector2() ;
 
 			final int length = _hull.getPointsLength() ;
 			for( int i = 0; i < length; ++i )
 			{
-				_hull.getPosition( absolute ) ;
-				_hull.getPoint( i, point ) ;
+				_hull.getPoint( i, absolute ) ;
 
-				absolute.add( point ) ;
+				final float x = absolute.x ;
+				final float y = absolute.y ;
+
+				_hull.getPosition( absolute ) ;
+				absolute.add( x, y ) ;
 
 				// It is possible for a hull's points to 
 				// go beyond the current scope of the tree,
@@ -711,16 +715,18 @@ public final class QuadTree
 			boolean usedBottomLeft = false ;
 			boolean usedBottomRight = false ;
 
-			final Vector2 point = new Vector2() ;
 			final Vector2 absolute = new Vector2() ;
 
 			final int length = _hull.getPointsLength() ;
 			for( int i = 0; i < length; ++i )
 			{
-				_hull.getPosition( absolute ) ;
-				_hull.getPoint( i, point ) ;
+				_hull.getPoint( i, absolute ) ;
 
-				absolute.add( point ) ;
+				final float x = absolute.x ;
+				final float y = absolute.y ;
+
+				_hull.getPosition( absolute ) ;
+				absolute.add( x, y ) ;
 
 				// Find out what quadrants the hull covers. 
 				switch( findQuadrant( absolute, centre ) )

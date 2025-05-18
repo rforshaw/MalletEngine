@@ -19,7 +19,6 @@ public final class Transformation implements IUpdate
 
 	// Each contain Position, Rotation, and Scale
 	private final float[] present = FloatBuffer.allocate( 12 ) ;
-	private final float[] old = FloatBuffer.allocate( 12 ) ;
 	private final float[] future = FloatBuffer.allocate( 12 ) ;
 
 	public Transformation()
@@ -46,11 +45,6 @@ public final class Transformation implements IUpdate
 						   final float _offX, final float _offY, final float _offZ,
 						   final float _rotX, final float _rotY, final float _rotZ )
 	{
-		FloatBuffer.set( old, POSITION, _posX, _posY, _posZ ) ;
-		FloatBuffer.set( old, OFFSET, _offX, _offY, _offZ ) ;
-		FloatBuffer.set( old, ROTATION, _rotX, _rotY, _rotZ ) ;
-		FloatBuffer.set( old, SCALE, 1.0f, 1.0f, 1.0f ) ;
-
 		FloatBuffer.set( present, POSITION, _posX, _posY, _posZ ) ;
 		FloatBuffer.set( present, OFFSET, _offX, _offY, _offZ ) ;
 		FloatBuffer.set( present, ROTATION, _rotX, _rotY, _rotZ ) ;
@@ -64,7 +58,6 @@ public final class Transformation implements IUpdate
 
 	public void setPositionInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, POSITION, _x, _y, _z ) ;
 		FloatBuffer.set( present, POSITION, _x, _y, _z ) ;
 		FloatBuffer.set( future, POSITION, _x, _y, _z ) ;
 	}
@@ -91,7 +84,6 @@ public final class Transformation implements IUpdate
 
 	public void setOffsetInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, OFFSET, _x, _y, _z ) ;
 		FloatBuffer.set( present, OFFSET, _x, _y, _z ) ;
 		FloatBuffer.set( future, OFFSET, _x, _y, _z ) ;
 	}
@@ -116,11 +108,11 @@ public final class Transformation implements IUpdate
 		return FloatBuffer.fill( present, _fill, OFFSET ) ;
 	}
 
-	public void setRotation( final float _x, final float _y, final float _z )
+	public void setRotation( float _x, float _y, float _z )
 	{
-		float oX = FloatBuffer.get( old, ROTATION + 0 ) ;
-		float oY = FloatBuffer.get( old, ROTATION + 1 ) ;
-		float oZ = FloatBuffer.get( old, ROTATION + 2 ) ;
+		float oX = FloatBuffer.get( present, ROTATION + 0 ) ;
+		float oY = FloatBuffer.get( present, ROTATION + 1 ) ;
+		float oZ = FloatBuffer.get( present, ROTATION + 2 ) ;
 
 		final float diffX = Math.abs( _x - oX ) ;
 		if( diffX > PI )
@@ -140,7 +132,7 @@ public final class Transformation implements IUpdate
 			oZ += ( _z > oZ ) ? PI2 : -PI2 ;
 		}
 
-		FloatBuffer.set( old, ROTATION, oX, oY, oZ ) ;
+		FloatBuffer.set( present, ROTATION, oX, oY, oZ ) ;
 		FloatBuffer.set( future, ROTATION, _x, _y, _z ) ;
 	}
 
@@ -151,7 +143,6 @@ public final class Transformation implements IUpdate
 
 	public void setScaleInstant( final float _x, final float _y, final float _z )
 	{
-		FloatBuffer.set( old, SCALE, _x, _y, _z ) ;
 		FloatBuffer.set( present, SCALE, _x, _y, _z ) ;
 		FloatBuffer.set( future, SCALE, _x, _y, _z ) ;
 	}
@@ -206,7 +197,7 @@ public final class Transformation implements IUpdate
 		{
 			case LINEAR :
 			{
-				if(Interpolate.linear( future, old, present, _coefficient ))
+				if(Interpolate.linear( future, null, present, _coefficient ))
 				{
 					update = true ;
 				}
@@ -216,7 +207,6 @@ public final class Transformation implements IUpdate
 			default     :
 			{
 				update = false ;
-				FloatBuffer.copy( future, old ) ;
 				FloatBuffer.copy( future, present ) ;
 				break ;
 			}
