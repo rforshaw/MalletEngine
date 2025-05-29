@@ -481,8 +481,11 @@ public final class Camera
 	public boolean update( final float _coefficient )
 	{
 		boolean update = false ;
-		update |= Interpolate.linear( future, null, present, _coefficient ) ;
-		viewMatrixDirty = update ;
+		if( Interpolate.linear( future, present, _coefficient ) )
+		{
+			update = true ;
+			viewMatrixDirty = true ;
+		}
 		return update ;
 	}
 

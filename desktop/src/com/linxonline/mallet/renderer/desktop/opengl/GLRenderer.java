@@ -673,7 +673,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 		// Expected number of render frames before the next update is triggered.
 		final int difference = ( int )( updateDelta / frameDelta ) ;
-		final float coefficient = ( 1.0f / difference ) ;
+		final float coefficient = 1.0f / difference ;
 
 		// We limit the number of textures that can be bound
 		// each draw call - ensures things still feel responsive.

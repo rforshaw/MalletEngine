@@ -1,5 +1,8 @@
 package com.linxonline.mallet.ui.gui ;
 
+import java.util.Stack ;
+
+import com.linxonline.mallet.io.GlobalClipboard ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
@@ -7,6 +10,8 @@ import com.linxonline.mallet.input.* ;
 
 public class GUIEditText extends GUIText
 {
+	private final Stack<String> undo = new Stack<String>() ; 
+
 	private boolean onlyNumbers = false ;
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
@@ -18,6 +23,7 @@ public class GUIEditText extends GUIText
 	private final TextDraw drawPlaceholder = new TextDraw() ;
 
 	private boolean shift = false ;
+	private boolean ctrl = false ;
 	private int start = 0 ;
 	private int end = 0 ;
 
@@ -269,6 +275,11 @@ public class GUIEditText extends GUIText
 
 		switch( _input.getKeyCode() )
 		{
+			case CTRL        :
+			{
+				ctrl = false ;
+				break ;
+			}
 			case SHIFT        :
 			{
 				shift = false ;
@@ -311,7 +322,6 @@ public class GUIEditText extends GUIText
 			case SCROLL_LOCK  :
 			case INSERT       :
 			case ESCAPE       :
-			case CTRL         :
 			case ALT          :
 			case ALTGROUP     :
 			case META         :
@@ -319,6 +329,11 @@ public class GUIEditText extends GUIText
 			case TAB          :
 			case CAPS_LOCK    :
 			case WINDOWS      : break ;
+			case CTRL         :
+			{
+				ctrl = true ;
+				break ;
+			}
 			case SHIFT        :
 			{
 				shift = true ;
@@ -346,7 +361,10 @@ public class GUIEditText extends GUIText
 			{
 				final UITextField parent = getParent() ;
 				final int index = parent.getCursorIndex() ;
+				
 				final StringBuilder edit = getText() ;
+				undo.push( edit.toString() ) ;
+
 				final int length = edit.length() ;
 				if( index >= 0 && index < length )
 				{
@@ -362,7 +380,10 @@ public class GUIEditText extends GUIText
 			{
 				final UITextField parent = getParent() ;
 				int index = parent.getCursorIndex() ;
+
 				final StringBuilder edit = getText() ;
+				undo.push( edit.toString() ) ;
+
 				if( index > 0 )
 				{
 					index -= 1 ;
@@ -374,24 +395,118 @@ public class GUIEditText extends GUIText
 				}
 				break ;
 			}
-			default : incrementChar( _input.getKeyCharacter() ) ; break ;
+			default :
+			{
+				if( ctrl == true )
+				{
+					handleCtrlOperation( _input.getKeyCharacter() ) ;
+					break ;
+				}
+
+				incrementChar( _input.getKeyCharacter() ) ;
+				break ;
+			}
 		}
 
 		return InputEvent.Action.CONSUME ;
+	}
+
+	private void handleCtrlOperation( final char _char )
+	{
+		switch( _char )
+		{
+			default  : break ;
+			case 'Z' :
+			{
+				undo() ;
+				break ;
+			}
+			case 'C' :
+			{
+				final StringBuilder edit = getText() ;
+				GlobalClipboard.store( edit.toString() ) ;
+				break ;
+			}
+			case 'V' :
+			{
+				incrementString( GlobalClipboard.get() ) ;
+				break ;
+			}
+		}
+	}
+
+	private void undo()
+	{
+		if( undo.empty() )
+		{
+			return ;
+		}
+
+		final UITextField parent = getParent() ;
+		final StringBuilder edit = getText() ;
+
+		edit.setLength( 0 ) ;
+		edit.append( undo.pop() ) ;
+
+		final int index = parent.getCursorIndex() ;
+		final int size = edit.length() ;
+		if( index > size )
+		{
+			parent.setCursorIndex( size ) ;
+		}
+
+		parent.makeDirty() ;
+		UIElement.signal( parent, parent.textChanged() ) ;
+	}
+
+	private void incrementString( final String _txt )
+	{
+		final UITextField parent = getParent() ;
+		final int index = parent.getCursorIndex() ;
+
+		final StringBuilder edit = getText() ;
+		final int initialSize = edit.length() ;
+
+		undo.push( edit.toString() ) ;
+
+		final int size = _txt.length() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final char c = _txt.charAt( i ) ;
+			edit.insert( index + i, c ) ;
+		}
+
+		if( onlyNumbers )
+		{
+			if( isNumber( edit ) == false )
+			{
+				edit.setLength( initialSize ) ;
+				return ;
+			}
+		}
+
+		parent.setCursorIndex( index + size ) ;
+		parent.makeDirty() ;
+
+		UIElement.signal( parent, parent.textChanged() ) ;
 	}
 
 	private void incrementChar( final char _char )
 	{
 		final UITextField parent = getParent() ;
 		final int index = parent.getCursorIndex() ;
+
 		final StringBuilder edit = getText() ;
+		final int initialSize = edit.length() ;
+
+		undo.push( edit.toString() ) ;
 		edit.insert( index, _char ) ;
 
 		if( onlyNumbers )
 		{
 			if( isNumber( edit ) == false )
 			{
-				edit.deleteCharAt( index ) ;
+				edit.setLength( initialSize ) ;
 				return ;
 			}
 		}

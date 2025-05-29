@@ -4,23 +4,22 @@ public class Interpolate
 {
 	private Interpolate() {}
 
-	public static boolean linear( final float[] _future, final float[] _past, final float[] _present, final float _coefficient )
+	public static boolean linear( final float[] _future, final float[] _present, final float _coefficient )
 	{
 		boolean requiresMore = false ;
 
 		for( int i = 0; i < _future.length; ++i )
 		{
 			final float future = _future[i] ;
-			final float past = _present[i] ;
 
-			final float present = past + ( future - past ) * _coefficient ;
-
-			_present[i] = present ;
-
+			float present = _present[i] ;
+			present += ( future - present ) * _coefficient ;
 			if( Math.abs( future - present ) > 0.001f )
 			{
 				requiresMore = true ;
 			}
+
+			_present[i] = present ;
 		}
 
 		return requiresMore ;

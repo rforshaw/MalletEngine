@@ -18,6 +18,7 @@ import com.linxonline.mallet.ecs.* ;
 import com.linxonline.mallet.entity.* ;
 import com.linxonline.mallet.entity.components.* ;
 
+import com.linxonline.mallet.io.GlobalClipboard ;
 import com.linxonline.mallet.io.filesystem.* ;
 import com.linxonline.mallet.io.formats.ogg.OGG ;
 import com.linxonline.mallet.io.formats.ogg.Vorbis ;
@@ -156,6 +157,8 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
+				createClipboardTest() ;
+
 				createProgramTest() ;
 				createMathTests() ;
 
@@ -177,6 +180,12 @@ public final class GameTestLoader implements IGameLoader
 				createScript() ;
 			}
 
+			private void createClipboardTest()
+			{
+				GlobalClipboard.store( "Hello World!" ) ;
+				System.out.println( "We retrieved from clipboard: " + GlobalClipboard.get() ) ;
+			}
+			
 			private void createProgramTest()
 			{
 				final ArrayUniform a = new ArrayUniform( 2 ) ;
