@@ -21,6 +21,8 @@ public class UIComponent extends InputComponent
 
 	private Entity.ReadyCallback toDestroy = null ;
 
+	private boolean ctrl = false ;
+
 	public UIComponent( final Entity _parent )
 	{
 		this( _parent, Entity.AllowEvents.YES ) ;
@@ -201,6 +203,49 @@ public class UIComponent extends InputComponent
 		if( super.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 		{
 			return InputEvent.Action.CONSUME ;
+		}
+
+		// We'll manage the global undo/redo in the UIComponent.
+		// This should probably be moved into a central UI system.
+		switch( _event.getInputType() )
+		{
+			default               : break ;
+			case KEYBOARD_PRESSED :
+			{
+				switch( _event.getKeyCode() )
+				{
+					default   :
+					{
+						if( ctrl == false )
+						{
+							break ;
+						}
+
+						switch( _event.getKeyCharacter() )
+						{
+							default  : break ;
+							case 'Y' :
+								UI.redo() ;
+								return InputEvent.Action.CONSUME ;
+							case 'Z' :
+								UI.undo() ;
+								return InputEvent.Action.CONSUME ;
+						}
+						break ;
+					}
+					case CTRL : ctrl = true ; break ;
+				}
+				break ;
+			}
+			case KEYBOARD_RELEASED :
+			{
+				switch( _event.getKeyCode() )
+				{
+					default   : break ;
+					case CTRL : ctrl = false ; break ;
+				}
+				break ;
+			}
 		}
 
 		final int size = elements.size() ;

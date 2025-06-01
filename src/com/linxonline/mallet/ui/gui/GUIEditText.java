@@ -1,7 +1,5 @@
 package com.linxonline.mallet.ui.gui ;
 
-import java.util.Stack ;
-
 import com.linxonline.mallet.io.GlobalClipboard ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
@@ -10,8 +8,6 @@ import com.linxonline.mallet.input.* ;
 
 public class GUIEditText extends GUIText
 {
-	private final Stack<String> undo = new Stack<String>() ; 
-
 	private boolean onlyNumbers = false ;
 	private boolean editing = false ;
 	private boolean blinkCursor = false ;
@@ -361,38 +357,29 @@ public class GUIEditText extends GUIText
 			{
 				final UITextField parent = getParent() ;
 				final int index = parent.getCursorIndex() ;
-				
+
 				final StringBuilder edit = getText() ;
-				undo.push( edit.toString() ) ;
-
 				final int length = edit.length() ;
-				if( index >= 0 && index < length )
+				if( index < 0 || index >= length )
 				{
-					edit.deleteCharAt( index ) ;
-					parent.setCursorIndex( index ) ;
-					parent.makeDirty() ;
-
-					UIElement.signal( parent, parent.textChanged() ) ;
+					break ;
 				}
+
+				UI.apply( new DeleteCommand( parent, index, edit ) ) ;
 				break ;
 			}
 			case BACKSPACE    :
 			{
 				final UITextField parent = getParent() ;
-				int index = parent.getCursorIndex() ;
+				final int index = parent.getCursorIndex() ;
 
 				final StringBuilder edit = getText() ;
-				undo.push( edit.toString() ) ;
-
-				if( index > 0 )
+				if( index <= 0 )
 				{
-					index -= 1 ;
-					edit.deleteCharAt( index ) ;
-					parent.setCursorIndex( index ) ;
-					parent.makeDirty() ;
-
-					UIElement.signal( parent, parent.textChanged() ) ;
+					break ;
 				}
+
+				UI.apply( new BackspaceCommand( parent, index, edit ) ) ;
 				break ;
 			}
 			default :
@@ -403,7 +390,7 @@ public class GUIEditText extends GUIText
 					break ;
 				}
 
-				incrementChar( _input.getKeyCharacter() ) ;
+				UI.apply( new AddCharCommand( _input.getKeyCharacter() ) ) ;
 				break ;
 			}
 		}
@@ -416,11 +403,6 @@ public class GUIEditText extends GUIText
 		switch( _char )
 		{
 			default  : break ;
-			case 'Z' :
-			{
-				undo() ;
-				break ;
-			}
 			case 'C' :
 			{
 				final StringBuilder edit = getText() ;
@@ -429,92 +411,10 @@ public class GUIEditText extends GUIText
 			}
 			case 'V' :
 			{
-				incrementString( GlobalClipboard.get() ) ;
+				UI.apply( new AddStringCommand( GlobalClipboard.get() ) ) ;
 				break ;
 			}
 		}
-	}
-
-	private void undo()
-	{
-		if( undo.empty() )
-		{
-			return ;
-		}
-
-		final UITextField parent = getParent() ;
-		final StringBuilder edit = getText() ;
-
-		edit.setLength( 0 ) ;
-		edit.append( undo.pop() ) ;
-
-		final int index = parent.getCursorIndex() ;
-		final int size = edit.length() ;
-		if( index > size )
-		{
-			parent.setCursorIndex( size ) ;
-		}
-
-		parent.makeDirty() ;
-		UIElement.signal( parent, parent.textChanged() ) ;
-	}
-
-	private void incrementString( final String _txt )
-	{
-		final UITextField parent = getParent() ;
-		final int index = parent.getCursorIndex() ;
-
-		final StringBuilder edit = getText() ;
-		final int initialSize = edit.length() ;
-
-		undo.push( edit.toString() ) ;
-
-		final int size = _txt.length() ;
-		for( int i = 0; i < size; ++i )
-		{
-			final char c = _txt.charAt( i ) ;
-			edit.insert( index + i, c ) ;
-		}
-
-		if( onlyNumbers )
-		{
-			if( isNumber( edit ) == false )
-			{
-				edit.setLength( initialSize ) ;
-				return ;
-			}
-		}
-
-		parent.setCursorIndex( index + size ) ;
-		parent.makeDirty() ;
-
-		UIElement.signal( parent, parent.textChanged() ) ;
-	}
-
-	private void incrementChar( final char _char )
-	{
-		final UITextField parent = getParent() ;
-		final int index = parent.getCursorIndex() ;
-
-		final StringBuilder edit = getText() ;
-		final int initialSize = edit.length() ;
-
-		undo.push( edit.toString() ) ;
-		edit.insert( index, _char ) ;
-
-		if( onlyNumbers )
-		{
-			if( isNumber( edit ) == false )
-			{
-				edit.setLength( initialSize ) ;
-				return ;
-			}
-		}
-
-		parent.setCursorIndex( index + 1 ) ;
-		parent.makeDirty() ;
-
-		UIElement.signal( parent, parent.textChanged() ) ;
 	}
 
 	private static boolean isNumber( final StringBuilder _builder )
@@ -578,7 +478,156 @@ public class GUIEditText extends GUIText
 	{
 		return ( UITextField )super.getParent() ;
 	}
-	
+
+	private final class AddStringCommand extends EditCommand
+	{
+		private final String toAdd ;
+
+		public AddStringCommand( final String _toAdd )
+		{
+			super( getParent(), getText() ) ;
+			toAdd = _toAdd ;
+		}
+
+		@Override
+		public boolean apply()
+		{
+			final int initialSize = edit.length() ;
+
+			final int size = toAdd.length() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final char c = toAdd.charAt( i ) ;
+				edit.insert( index + i, c ) ;
+			}
+
+			if( onlyNumbers )
+			{
+				if( isNumber( edit ) == false )
+				{
+					edit.setLength( initialSize ) ;
+					return false ;
+				}
+			}
+
+			parent.setCursorIndex( index + size ) ;
+			parent.makeDirty() ;
+
+			UIElement.signal( parent, parent.textChanged() ) ;
+			return true ;
+		}
+	}
+
+	private final class AddCharCommand extends EditCommand
+	{
+		private final char toAdd ;
+
+		public AddCharCommand( final char _toAdd )
+		{
+			super( getParent(), getText() ) ;
+			toAdd = _toAdd ;
+		}
+
+		@Override
+		public boolean apply()
+		{
+			final int initialSize = edit.length() ;
+
+			edit.insert( index, toAdd ) ;
+
+			if( onlyNumbers )
+			{
+				if( isNumber( edit ) == false )
+				{
+					edit.setLength( initialSize ) ;
+					return false ;
+				}
+			}
+
+			parent.setCursorIndex( index + 1 ) ;
+			parent.makeDirty() ;
+
+			UIElement.signal( parent, parent.textChanged() ) ;
+			return true ;
+		}
+	}
+
+	private final static class DeleteCommand extends EditCommand
+	{
+		public DeleteCommand( final UITextField _parent, final int _index, final StringBuilder _edit )
+		{
+			super( _parent, _index, _edit ) ;
+		}
+
+		@Override
+		public boolean apply()
+		{
+			edit.deleteCharAt( index ) ;
+			parent.setCursorIndex( index ) ;
+
+			parent.makeDirty() ;
+			UIElement.signal( parent, parent.textChanged() ) ;
+			return true ;
+		}
+	}
+
+	private final static class BackspaceCommand extends EditCommand
+	{
+		public BackspaceCommand( final UITextField _parent, final int _index, final StringBuilder _edit )
+		{
+			super( _parent, _index, _edit ) ;
+		}
+
+		@Override
+		public boolean apply()
+		{
+			final int i = index - 1 ;
+
+			edit.deleteCharAt( i ) ;
+			parent.setCursorIndex( i ) ;
+
+			parent.makeDirty() ;
+			UIElement.signal( parent, parent.textChanged() ) ;
+			return true ;
+		}
+	}
+
+	private static abstract class EditCommand implements Commands.ICommand
+	{
+		protected final UITextField parent ;
+		protected final int index ;
+
+		protected final StringBuilder edit ;
+		protected final String previous ;
+
+		public EditCommand( final UITextField _parent, final StringBuilder _edit )
+		{
+			this( _parent, _parent.getCursorIndex(), _edit ) ;
+		}
+
+		public EditCommand( final UITextField _parent, final int _index, final StringBuilder _edit )
+		{
+			parent = _parent ;
+			index = _index ;
+
+			edit = _edit ;
+			previous = _edit.toString() ;
+		}
+
+		@Override
+		public final boolean undo()
+		{
+			edit.setLength( 0 ) ;
+			edit.append( previous ) ;
+
+			parent.setCursorIndex( index ) ;
+
+			parent.makeDirty() ;
+			UIElement.signal( parent, parent.textChanged() ) ;
+			return true ;
+		}
+	}
+
 	public static class Meta extends GUIText.Meta
 	{
 		private final UIVariant placeholder = new UIVariant( "PLACEHOLDER", "", new Connect.Signal() ) ;

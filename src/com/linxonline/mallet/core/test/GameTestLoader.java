@@ -29,6 +29,7 @@ import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.Hull ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 
+import com.linxonline.mallet.util.inspect.DisplayEnvironment ;
 import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.tools.ConvertBytes ;
 import com.linxonline.mallet.util.Tuple ;
@@ -157,6 +158,7 @@ public final class GameTestLoader implements IGameLoader
 				server.close() ;
 				client.close() ;*/
 
+				createDisplayEnvironment() ;
 				createClipboardTest() ;
 
 				createProgramTest() ;
@@ -178,6 +180,12 @@ public final class GameTestLoader implements IGameLoader
 				showFPS.add( true ) ;
 
 				createScript() ;
+			}
+
+			private void createDisplayEnvironment()
+			{
+				DisplayEnvironment env = new DisplayEnvironment() ;
+				System.out.println( env.toString() ) ;
 			}
 
 			private void createClipboardTest()

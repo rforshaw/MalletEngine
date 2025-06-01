@@ -292,10 +292,12 @@
 							
 						}
 					],
+					"MIN_LENGTH" : "5.5, 0, 0",
 					"MAX_LENGTH" : "5.5, 0, 0"
 				},
 				{
 					"TYPE" : "UIELEMENT",
+					"MIN_LENGTH" : "0.2, 0, 0",
 					"MAX_LENGTH" : "0.2, 0, 0",
 					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
@@ -312,6 +314,7 @@
 				},
 				{
 					"TYPE" : "UIELEMENT",
+					"MIN_LENGTH" : "0.2, 0, 0",
 					"MAX_LENGTH" : "0.2, 0, 0",
 					"UIDRAW" : {
 						"TEXTURE" : "base/ui/uieditor/dark_grey.png",
@@ -404,7 +407,8 @@
 							"CHILDREN" : []
 						}
 					],
-					"MAX_LENGTH" : "7.5, 0, 0",
+					"MIN_LENGTH" : "5.5, 0, 0",
+					"MAX_LENGTH" : "5.5, 0, 0"
 				}
 			]
 		},

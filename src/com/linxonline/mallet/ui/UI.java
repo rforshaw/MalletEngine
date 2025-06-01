@@ -6,6 +6,8 @@ import com.linxonline.mallet.maths.* ;
 
 public final class UI
 {
+	private final static Commands commands = new Commands( 1000 ) ;
+
 	public enum Unit
 	{
 		CENTIMETRE( 0.393701f ),
@@ -88,6 +90,21 @@ public final class UI
 	{
 		SINGLE,
 		MULTI
+	}
+
+	public static void apply( final Commands.ICommand _com )
+	{
+		commands.apply( _com ) ;
+	}
+
+	public static void undo()
+	{
+		commands.undo() ;
+	}
+
+	public static void redo()
+	{
+		commands.redo() ;
 	}
 
 	public static void align( final Alignment _alignX, final Alignment _alignY, final Vector3 _val, final Vector3 _dim, final Vector3 _length )

@@ -382,8 +382,10 @@ public class UILayout extends UIElement implements IChildren
 				_children.getElements( ordered ) ;
 
 				availableLength.setXYZ( 0, 0, 0 ) ;
-				int minNumX = 0 ;
-				int minNumY = 0 ;
+				int count = 0 ;
+
+				final Vector3[] lengths = new Vector3[ordered.size()] ;
+				final boolean[] skip = new boolean[ordered.size()] ;
 
 				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
@@ -397,23 +399,72 @@ public class UILayout extends UIElement implements IChildren
 					}
 
 					final Vector3 minimum = element.getMinimumLength() ;
-					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
-					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
-
-					// UI elements can specify a minimum length,
-					// we need to accumulate this before we can 
-					// calculate how much actual available length 
-					// we have.
+					count += 1 ;
 
 					availableLength.add( minimum ) ;
 					availableLength.add( element.getMargin() ) ;
+
+					skip[i] = false ;
+					lengths[i] = new Vector3( minimum ) ;
 				}
 
-				availableLength.x = UILayout.this.getLength().x ;
+				// Calculate the amount of space we have to play
+				// with after we've taken into account the minimum.
 				availableLength.y = UILayout.this.getLength().y - availableLength.y ;
+				availableLength.x = UILayout.this.getLength().x ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
 				childPosition.setXYZ( layoutPosition ) ;
+
+				while( availableLength.y > 0.01f )
+				{
+					final float lenY = availableLength.y / count ;
+					int maxed = 0 ;
+
+					for( int i = 0; i < size; ++i )
+					{
+						final UIElement element = ordered.get( i ) ;
+						if( element.isVisible() == false )
+						{
+							// Don't take into account elements that 
+							// are invisible.
+							continue ;
+						}
+
+						if( skip[i] )
+						{
+							continue ;
+						}
+
+						final Vector3 maximum = element.getMaximumLength() ;
+						final Vector3 length = lengths[i] ;
+
+						if( maximum.y > 0.01f )
+						{
+							if( length.y + lenY > maximum.y )
+							{
+								skip[i] = true ;
+								maxed += 1 ;
+
+								// Our current length.y has already been removed
+								// from our available, so we only need to remove
+								// the difference between max and current length.
+								availableLength.y -= ( maximum.y - length.y ) ;
+								length.y = maximum.y ;
+								continue ;
+							}
+						}
+
+						length.y += lenY ;
+						availableLength.y -= lenY ;
+					}
+
+					count -= maxed ;
+					if( count <= 0 )
+					{
+						break ;
+					}
+				}
 
 				for( int i = 0; i < size; i++ )
 				{
@@ -426,61 +477,21 @@ public class UILayout extends UIElement implements IChildren
 					}
 
 					final Vector3 maximum = element.getMaximumLength() ;
+					final Vector3 length = lengths[i] ;
 
-					// If the length allocated to this element is greater 
-					// than the maximum length, then we must remove the 
-					// element from the average minNumY and remove maximum.y 
-					// from available length.
-
-					if( maximum.y > 0.0f )
-					{
-						final float lenY = availableLength.y / minNumY ;
-						if( lenY > maximum.y )
-						{
-							minNumY -= 1 ;
-							availableLength.y -= maximum.y ;
-						}
-					}
-				}
-
-				for( int i = 0; i < size; i++ )
-				{
-					final UIElement element = ordered.get( i ) ;
-					if( element.isVisible() == false )
-					{
-						// Don't take into account elements that 
-						// are invisible.
-						element.setLength( 0.0f, 0.0f, 0.0f ) ;
-						continue ;
-					}
-
-					final Vector3 minimum = element.getMinimumLength() ;
 					final UIRatio ratio = element.getRatio() ;
 
-					float lenX = 0.0f ;
-					float lenY = 0.0f ;
+					length.x = ( maximum.x > 0.01f && maximum.x < availableLength.x ) ? maximum.x : availableLength.x ;
 
-					if( minimum.x <= 0.01f )
-					{
-						// If minimum.x has not been set
-						lenX = availableLength.x ;
-					}
-
-					if( minimum.y <= 0.01f )
-					{
-						// If minimum.y has not been set
-						lenY = availableLength.y / minNumY ;
-					}
-
-					element.setLength( ratio.toUnitX( lenX ),
-									   ratio.toUnitY( lenY ),
+					element.setLength( ratio.toUnitX( length.x ),
+									   ratio.toUnitY( length.y ),
 									   ratio.toUnitZ( 0.0f ) ) ;
-					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
 										 ratio.toUnitY( childPosition.y ),
 										 ratio.toUnitZ( childPosition.z ) ) ;
+
 					childPosition.setXYZ( childPosition.x, childPosition.y + length.y + margin.y, layoutPosition.z ) ;
 				}
 			}
@@ -497,6 +508,7 @@ public class UILayout extends UIElement implements IChildren
 		return new ILayout()
 		{
 			private final List<UIElement> ordered = MalletList.<UIElement>newList() ;
+
 			private final Vector3 layoutPosition = new Vector3() ;
 			private final Vector3 childPosition = new Vector3() ;
 			private final Vector3 availableLength = new Vector3() ;
@@ -508,8 +520,10 @@ public class UILayout extends UIElement implements IChildren
 				_children.getElements( ordered ) ;
 
 				availableLength.setXYZ( 0, 0, 0 ) ;
-				int minNumX = 0 ;
-				int minNumY = 0 ;
+				int count = 0 ;
+
+				final Vector3[] lengths = new Vector3[ordered.size()] ;
+				final boolean[] skip = new boolean[ordered.size()] ;
 
 				final int size = ordered.size() ;
 				for( int i = 0; i < size; i++ )
@@ -523,44 +537,70 @@ public class UILayout extends UIElement implements IChildren
 					}
 
 					final Vector3 minimum = element.getMinimumLength() ;
-					minNumX += ( minimum.x <= 0.01f ) ? 1 : 0 ;
-					minNumY += ( minimum.y <= 0.01f ) ? 1 : 0 ;
+					count += 1 ;
 
 					availableLength.add( minimum ) ;
 					availableLength.add( element.getMargin() ) ;
+
+					skip[i] = false ;
+					lengths[i] = new Vector3( minimum ) ;
 				}
 
+				// Calculate the amount of space we have to play
+				// with after we've taken into account the minimum.
 				availableLength.x = UILayout.this.getLength().x - availableLength.x ;
 				availableLength.y = UILayout.this.getLength().y ;
 
 				calcAbsolutePosition( layoutPosition, UILayout.this ) ;
 				childPosition.setXYZ( layoutPosition ) ;
 
-				for( int i = 0; i < size; i++ )
+				while( availableLength.x > 0.01f )
 				{
-					final UIElement element = ordered.get( i ) ;
-					if( element.isVisible() == false )
+					final float lenX = availableLength.x / count ;
+					int maxed = 0 ;
+
+					for( int i = 0; i < size; ++i )
 					{
-						// Don't take into account elements that 
-						// are invisible.
-						continue ;
+						final UIElement element = ordered.get( i ) ;
+						if( element.isVisible() == false )
+						{
+							// Don't take into account elements that 
+							// are invisible.
+							continue ;
+						}
+
+						if( skip[i] )
+						{
+							continue ;
+						}
+
+						final Vector3 maximum = element.getMaximumLength() ;
+						final Vector3 length = lengths[i] ;
+
+						if( maximum.x > 0.01f )
+						{
+							if( length.x + lenX > maximum.x )
+							{
+								skip[i] = true ;
+								maxed += 1 ;
+
+								// Our current length.x has already been removed
+								// from our available, so we only need to remove
+								// the difference between max and current length.
+								availableLength.x -= ( maximum.x - length.x ) ;
+								length.x = maximum.x ;
+								continue ;
+							}
+						}
+
+						length.x += lenX ;
+						availableLength.x -= lenX ;
 					}
 
-					final Vector3 maximum = element.getMaximumLength() ;
-					
-					// If the length allocated to this element is greater 
-					// than the maximum length, then we must remove the 
-					// element from the average minNumY and remove maximum.y 
-					// from available length.
-
-					if( maximum.x > 0.0f )
+					count -= maxed ;
+					if( count <= 0 )
 					{
-						final float lenX = availableLength.x / minNumX ;
-						if( lenX > maximum.x )
-						{
-							minNumX -= 1 ;
-							availableLength.x -= maximum.x ;
-						}
+						break ;
 					}
 				}
 
@@ -574,32 +614,22 @@ public class UILayout extends UIElement implements IChildren
 						continue ;
 					}
 
-					final Vector3 minimum = element.getMinimumLength() ;
 					final Vector3 maximum = element.getMaximumLength() ;
+					final Vector3 length = lengths[i] ;
+
 					final UIRatio ratio = element.getRatio() ;
 
-					float lenX = 0.0f ;
-					float lenY = 0.0f ;
+					length.y = ( maximum.y > 0.01f && maximum.y < availableLength.y ) ? maximum.y : availableLength.y ;
 
-					if( minimum.x <= 0.01f )
-					{
-						lenX = availableLength.x / minNumX ;
-					}
-
-					if( minimum.y <= 0.01f )
-					{
-						lenY = availableLength.y ;
-					}
-
-					element.setLength( ratio.toUnitX( lenX ),
-									   ratio.toUnitY( lenY ),
+					element.setLength( ratio.toUnitX( length.x ),
+									   ratio.toUnitY( length.y ),
 									   ratio.toUnitZ( 0.0f ) ) ;
-					final Vector3 length = element.getLength() ;
 					final Vector3 margin = element.getMargin() ;
 
 					element.setPosition( ratio.toUnitX( childPosition.x ),
 										 ratio.toUnitY( childPosition.y ),
 										 ratio.toUnitZ( childPosition.z ) ) ;
+
 					childPosition.setXYZ( childPosition.x + length.x + margin.x, childPosition.y, layoutPosition.z ) ;
 				}
 			}
@@ -608,7 +638,7 @@ public class UILayout extends UIElement implements IChildren
 
 	/**
 		Order the UIElements from left to right, setting their size to 
-		the minimum or maximim length of the element with a defined 
+		the minimum or maximum length of the element with a defined 
 		minimum or maximum value.
 	*/
 	protected ILayout getGridUpdater()
