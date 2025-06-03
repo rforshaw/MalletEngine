@@ -1,10 +1,7 @@
 package com.linxonline.mallet.util.settings ;
 
-import java.util.List ;
 import java.util.TreeMap ;
 import java.util.Collection ;
-
-import com.linxonline.mallet.util.MalletList ;
 
 /**
 	Would like to add an Annotation that will switch the String comparison to 
@@ -229,12 +226,14 @@ public final class Settings
 		return variables.values() ;
 	}
 
-	public final List<String> toArrayString()
+	public final String[] toArrayString()
 	{
 		final Collection<AVariable> collection = variables.values() ;
-		final List<String> list = MalletList.<String>newList() ;
+		final String[] list = new String[collection.size()] ;
+
 		final StringBuilder buffer = new StringBuilder() ;
 
+		int i = 0 ;
 		for( final AVariable inter : collection )
 		{
 			buffer.append( inter.name ) ;
@@ -243,7 +242,7 @@ public final class Settings
 			buffer.append( inter.toString() ) ;
 			buffer.append( '\"' ) ;
 
-			list.add( buffer.toString() ) ;
+			list[i++] = buffer.toString() ;
 			buffer.setLength( 0 ) ;
 		}
 
@@ -261,15 +260,13 @@ public final class Settings
 
 	public final String toString()
 	{
-		final List<String> strings = toArrayString() ;
+		final String[] strings = toArrayString() ;
 		final StringBuilder buffer = new StringBuilder() ;
-		final int size = strings.size() ;
-		String value = null ;
 
-		for( int i = 0; i < size; ++i )
+		for( int i = 0; i < strings.length; ++i )
 		{
-			value = strings.get( i ) ;
-			buffer.append( value + "\n" ) ;
+			buffer.append( strings[i] ) ;
+			buffer.append( '\n' ) ;
 		}
 
 		return buffer.toString() ;

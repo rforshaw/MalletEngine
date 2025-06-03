@@ -1,6 +1,5 @@
 package com.linxonline.mallet.core ;
 
-import java.util.List ;
 import java.util.Map ;
 
 import com.linxonline.mallet.util.notification.Notification ;
@@ -132,7 +131,7 @@ public final class GlobalConfig
 		return config.getObject( _name, _default ) ;
 	}
 
-	public static List<String> toArrayString()
+	public static String[] toArrayString()
 	{
 		return config.toArrayString() ;
 	}

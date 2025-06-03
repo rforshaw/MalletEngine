@@ -5,11 +5,11 @@ package com.linxonline.mallet.util.time ;
 // application has been running for. And the delta 
 // time between Elapsed calls.
 /*==================================================*/
-public abstract class ElapsedTimer
+public final class ElapsedTimer
 {
 	private static final DefaultTimer time = new DefaultTimer() ;
 
-	public ElapsedTimer() {}
+	private ElapsedTimer() {}
 
 	/**
 		Must only be called by game loop

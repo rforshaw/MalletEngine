@@ -58,11 +58,11 @@ public final class QuickSort
 			final T s = _contents.get( i ) ;
 			if( s.sortValue() <= pivotPoint )
 			{
-				less.add( ( T )s ) ;
+				less.add( s ) ;
 			}
 			else
 			{
-				greater.add( ( T )s ) ;
+				greater.add( s ) ;
 			}
 		}
 

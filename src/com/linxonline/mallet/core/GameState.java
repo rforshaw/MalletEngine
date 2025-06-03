@@ -275,8 +275,7 @@ public class GameState
 		final int size = _entities.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final Entity entity = _entities.get( i ) ;
-			addEntity( entity ) ;
+			addEntity( _entities.get( i )  ) ;
 		}
 	}
 
@@ -297,8 +296,7 @@ public class GameState
 		final int size = _entities.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final Entity entity = _entities.get( i ) ;
-			removeEntity( entity ) ;
+			removeEntity( _entities.get( i )  ) ;
 		}
 	}
 

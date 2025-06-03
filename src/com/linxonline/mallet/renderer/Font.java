@@ -278,8 +278,7 @@ public final class Font implements IUniform
 				glyphs = new Glyph[_code + 1] ;
 
 				//System.out.println( "Copying Temp Glyphs: " + temp.length + " to: " + glyphs.length ) ;
-				final int size = temp.length ;
-				for( int i = 0; i < size; i++ )
+				for( int i = 0; i < temp.length; i++ )
 				{
 					glyphs[i] = temp[i] ;
 				}

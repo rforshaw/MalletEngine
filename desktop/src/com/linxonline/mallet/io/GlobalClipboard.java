@@ -11,15 +11,14 @@ public class GlobalClipboard
 
 	public static void store( final String _txt )
 	{
-		final Clipboard clipboard = getClipboard() ;
-		clipboard.setContents( new StringSelection( _txt ), null ) ;
+		getClipboard().setContents( new StringSelection( _txt ), null ) ;
 	}
 
 	public static String get()
 	{
 		final Clipboard clipboard = getClipboard() ;
 		final DataFlavor flavour = DataFlavor.stringFlavor ;
-		
+
 		if( clipboard.isDataFlavorAvailable( flavour ) )
 		{
 			try
@@ -38,7 +37,6 @@ public class GlobalClipboard
 
 	private static Clipboard getClipboard()
 	{
-		final Toolkit toolkit = Toolkit.getDefaultToolkit() ;
-		return toolkit.getSystemClipboard() ;
+		return Toolkit.getDefaultToolkit().getSystemClipboard()  ;
 	}
 }

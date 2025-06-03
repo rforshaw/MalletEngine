@@ -353,11 +353,11 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public boolean intersectPoint( final float _x, final float _y, final float _z )
 	{
-		final float zMin = position.z + offset.z ;
-		final float zMax = zMin + length.z ;
-
 		if( intersectPoint( _x, _y ) == true )
 		{
+			final float zMin = position.z + offset.z ;
+			final float zMax = zMin + length.z ;
+
 			if( _z >= zMin && _z <= zMax )
 			{
 				return true ;
@@ -375,11 +375,11 @@ public class UIElement implements IInputHandler, Connect.Connection
 		final float xMin = position.x + offset.x ;
 		final float xMax = xMin + length.x ;
 
-		final float yMin = position.y + offset.y ;
-		final float yMax = yMin + length.y ;
-
 		if( _x >= xMin && _x <= xMax )
 		{
+			final float yMin = position.y + offset.y ;
+			final float yMax = yMin + length.y ;
+
 			if( _y >= yMin && _y <= yMax )
 			{
 				return true ;
@@ -408,9 +408,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		if( visible != _visibility )
 		{
 			visible = _visibility ;
-
-			final Connect.Signal signal = ( visible == true ) ? elementShown() : elementHidden() ;
-			UIElement.signal( this, signal ) ;
+			UIElement.signal( this, ( visible == true ) ? elementShown() : elementHidden() ) ;
 			makeDirty() ;
 		}
 	}

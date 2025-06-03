@@ -9,8 +9,7 @@ import com.linxonline.mallet.util.MalletList ;
 /**
 	This Diff implementation aims to find comparisons 
 	between _base and _compare.
-	It works well on dynamic data sctructures like 
-	text.
+	It works well on data structures like text.
 */
 public final class Diff
 {
@@ -203,7 +202,7 @@ public final class Diff
 
 		return false ;
 	}
-	
+
 	private static class Point
 	{
 		public final int basePos ;
@@ -244,7 +243,7 @@ public final class Diff
 
 			return Math.max( 0, Math.min( max1, max2 ) - Math.max( min1, min2 ) ) ;
 		}
-		
+
 		public String toString()
 		{
 			return "Base Pos: " + basePos + " Pos: " + pos + " Length: " + length ;

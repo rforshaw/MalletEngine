@@ -68,7 +68,7 @@ public final class EventType
 		}
 	}
 
-	public static class Lookup<T> implements Iterable<T>
+	public static class Lookup<T>
 	{
 		private final T fallback ;
 		private final ArrayList<T> types ;
@@ -116,12 +116,6 @@ public final class EventType
 			types.clear() ;
 		}
 
-		@Override
-		public Iterator<T> iterator() 
-		{ 
-			return new LookupIterator<T>( types.iterator() ) ; 
-		} 
-
 		private void ensureCapacity( final int _size )
 		{
 			final int origSize = types.size() ;
@@ -136,43 +130,6 @@ public final class EventType
 			{
 				types.add( fallback ) ;
 			}
-		}
-	}
-	
-	private static class LookupIterator<T> implements Iterator<T>
-	{
-		private final Iterator<T> iter ;
-		private T next = null ;
-
-		public LookupIterator( Iterator<T> _iter )
-		{
-			iter = _iter ;
-		}
-
-		@Override
-		public boolean hasNext()
-		{
-			while( iter.hasNext() )
-			{
-				next = iter.next() ;
-				if( next != null )
-				{
-					return true ;
-				}
-			}
-
-			return false ;
-		}
-
-		@Override
-		public T next()
-		{
-			if( next == null )
-			{
-				throw new NoSuchElementException() ;
-			}
-
-			return next ;
 		}
 	}
 }

@@ -117,7 +117,7 @@ public final class Debounce implements IGameSystem.IUpdate
 
 			return true ;
 		}
-		
+
 		public void execute( final float _dt )
 		{
 			runnable.run() ;

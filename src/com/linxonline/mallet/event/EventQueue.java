@@ -77,8 +77,7 @@ public final class EventQueue<T>
 		final int size = front.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Event<T> event = front.get( i ) ;
-			_process.process( event.getVariable() ) ;
+			_process.process( front.get( i ).getVariable() ) ;
 		}
 	}
 }

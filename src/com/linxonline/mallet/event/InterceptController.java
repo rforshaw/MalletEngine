@@ -25,15 +25,13 @@ public final class InterceptController implements IIntercept
 		processors = new EventType.Lookup<IProcessor<?>>( _processors.length, PROCESSOR_FALLBACK ) ;
 		for( final Tuple<String, IProcessor<?>> processor : _processors )
 		{
-			final EventType type = EventType.get( processor.getLeft() ) ;
-			processors.add( type, processor.getRight() ) ;
+			processors.add( EventType.get( processor.getLeft() ), processor.getRight() ) ;
 		}
 	}
 
 	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
 	{
-		final EventType type = EventType.get( _type ) ;
-		processors.add( type, _processor ) ;
+		processors.add( EventType.get( _type ), _processor ) ;
 	}
 
 	@Override

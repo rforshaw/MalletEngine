@@ -51,10 +51,8 @@ public final class EventBlock implements IEventBlock
 	@Override
 	public <T> Event.IProcess<T> add( final EventType _type, final Event.IProcess<T> _proc )
 	{
-		final EventQueue queue = state.get( _type ) ;
-
 		sources.add( Tuple.<String, Event.IProcess<?>>build( _type.getType(), _proc ) ) ;
-		procs.add( Tuple.<Event.IProcess<?>, EventQueue<?>>build( _proc, queue ) ) ;
+		procs.add( Tuple.<Event.IProcess<?>, EventQueue<?>>build( _proc, state.get( _type ) ) ) ;
 
 		return _proc ;
 	}

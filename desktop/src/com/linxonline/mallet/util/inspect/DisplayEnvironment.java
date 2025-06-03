@@ -23,7 +23,7 @@ public class DisplayEnvironment
 		}
 
 		final Collection<com.jogamp.newt.Screen> newtScreens = com.jogamp.newt.Screen.getAllScreens() ;
-		final Screen[] screens = new Screen[newtScreens.size()] ;
+		screens = new Screen[newtScreens.size()] ;
 
 		int screenIndex = 0 ;
 		for( com.jogamp.newt.Screen s : newtScreens )
@@ -42,22 +42,17 @@ public class DisplayEnvironment
 				for( int j = 0; j < modes.length; ++j )
 				{
 					final MonitorMode mm = ms.get( j ) ;
-
-					final int w = mm.getRotatedWidth() ;
-					final int h = mm.getRotatedHeight() ;
-					final int bpp = mm.getSurfaceSize().getBitsPerPixel() ;
-					final int rr = ( int )mm.getRefreshRate() ;
-
-					modes[j] = new Screen.Monitor.Mode( w, h, bpp, rr ) ;
+					modes[j] = new Screen.Monitor.Mode(
+						mm.getRotatedWidth(),
+						mm.getRotatedHeight(),
+						mm.getSurfaceSize().getBitsPerPixel(),
+						( int )mm.getRefreshRate() ) ;
 				}
-
-				final String name = md.getName() ;
-				final boolean primary = md.isPrimary() ;
 
 				final float[] ppmm = md.getPixelsPerMM( new float[2] ) ;
 				final float dpmm = ( ppmm[0] + ppmm[1] ) * 0.5f ;
 
-				monitors[i] = new Screen.Monitor( name, primary, dpmm, modes ) ;
+				monitors[i] = new Screen.Monitor( md.getName(), md.isPrimary(), dpmm, modes ) ;
 			}
 
 			screens[screenIndex++] = new Screen( s.getFQName(), monitors ) ;
@@ -69,35 +64,14 @@ public class DisplayEnvironment
 	// Return the DPI of the primary monitor.
 	public int getDPI()
 	{
-		final Screen[] screens = getScreens() ;
-		final Screen screen = screens[0] ;
-
-		final Screen.Monitor monitor = screen.getPrimaryMonitor() ;
-		return monitor.getDPI() ;
-	}
-
-	/**
-		A screen represents a virtual space that cane be made up of one
-		or more monitors.
-	*/
-	private final com.jogamp.newt.Screen getActiveScreen()
-	{
-		for( final com.jogamp.newt.Screen screen : com.jogamp.newt.Screen.getAllScreens() )
-		{
-			// We'll return the first screen and assume it's
-			// the active one.
-			return screen ;
-		}
-
-		return null ;
+		return getScreens()[0].getPrimaryMonitor().getDPI() ;
 	}
 
 	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;
-		final Screen[] screens = getScreens() ;
-		for( final Screen screen : screens )
+		for( final Screen screen : getScreens() )
 		{
 			buffer.append( screen.toString() + "\n" ) ;
 		}
