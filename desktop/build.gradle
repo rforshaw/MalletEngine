@@ -1,5 +1,5 @@
 subprojects {
-	apply plugin: 'java'
+	apply plugin: 'java-library'
 
 	compileJava.options.encoding = 'UTF-8'
 
@@ -17,6 +17,21 @@ subprojects {
 }
 
 project( ':MalletEngine' ) {
+	repositories {
+		flatDir {
+			dirs "libs"
+		}
+	}
+
+	dependencies {
+		implementation name: 'org.json'
+		implementation name: 'rhino-1.7.14'
+		implementation name: 'joal'
+		implementation name: 'gluegen-rt'
+		implementation name: 'jogl-all-noawt'
+		implementation name: 'jogl-all-natives-linux-amd64'
+	}
+
 	sourceSets {
 		main {
 			java {
@@ -30,10 +45,6 @@ project( ':MalletEngine' ) {
 		}
 	}
 
-	dependencies {
-		implementation fileTree( dir: 'dependencies/libs', include: ['*.jar'] )
-	}
-
 	clean {
 		delete += fileTree( '../../TemplateProject/desktop' ).include( '**/*' )
 	}
@@ -41,20 +52,16 @@ project( ':MalletEngine' ) {
 	compileJava {
 		doFirst {
 			options.compilerArgs += ['--module-path', classpath.asPath]
+			options.deprecation = true
 			//options.compilerArgs += ['-Xlint:unchecked']
 			classpath = files()
 		}
 	}
 
-	tasks.withType( JavaCompile ) {
-		//options.compilerArgs << '-Xlint:unchecked'
-		options.deprecation = true
-	}
-
 	task copy(dependsOn: [':copy', 'jar'], type: Copy) {
 		into '.'
-		from( 'dependencies' ) {
-			into '../target'
+		from( 'libs' ) {
+			into '../target/libs'
 		}
 		from( 'build/libs' )
 		{
@@ -86,7 +93,7 @@ project( ':MalletEditor' ) {
 	dependencies {
 		implementation project(':MalletEngine')
 	}
-	
+
 	task copy(dependsOn: [':copy', 'jar'], type: Copy) {
 		into '.'
 		from( 'build/libs' )

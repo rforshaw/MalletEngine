@@ -2,8 +2,6 @@ package com.linxonline.mallet.event ;
 
 import java.util.Map ;
 import java.util.ArrayList ;
-import java.util.Iterator ;
-import java.util.NoSuchElementException ;
 
 import com.linxonline.mallet.util.MalletMap ;
 

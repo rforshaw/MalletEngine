@@ -8,20 +8,19 @@ module MalletEngine
 
 	exports com.linxonline.mallet.animation ;
 	exports com.linxonline.mallet.audio ;
-	exports com.linxonline.mallet.audio.desktop.alsa ;
 	exports com.linxonline.mallet.core ;
+	// We should avoid export desktop or other platform
+	// specific implementations. This desktop is revealed
+	// as it contains the DesktopStarter.
 	exports com.linxonline.mallet.core.desktop ;
-	exports com.linxonline.mallet.core.desktop.gl ;
 	exports com.linxonline.mallet.core.test ;
 	exports com.linxonline.mallet.ecs ;
 	exports com.linxonline.mallet.entity ;
 	exports com.linxonline.mallet.entity.components ;
 	exports com.linxonline.mallet.event ;
 	exports com.linxonline.mallet.input ;
-	exports com.linxonline.mallet.input.desktop ;
 	exports com.linxonline.mallet.io ;
 	exports com.linxonline.mallet.io.filesystem ;
-	exports com.linxonline.mallet.io.filesystem.desktop ;
 	exports com.linxonline.mallet.io.formats.gltf ;
 	exports com.linxonline.mallet.io.formats.json ;
 	exports com.linxonline.mallet.io.formats.ogg ;
@@ -37,8 +36,6 @@ module MalletEngine
 	exports com.linxonline.mallet.maths ;
 	exports com.linxonline.mallet.physics ;
 	exports com.linxonline.mallet.renderer ;
-	exports com.linxonline.mallet.renderer.opengl ;
-	exports com.linxonline.mallet.renderer.desktop.opengl ;
 	exports com.linxonline.mallet.script ;
 	exports com.linxonline.mallet.script.javascript ;
 	exports com.linxonline.mallet.ui ;
