@@ -457,7 +457,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public void setPosition( final float _x, final float _y, final float _z )
 	{
-		if( UI.applyVec3( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		if( UI.applyVec3Ceil( position, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			UIElement.signal( this, positionChanged() ) ;
 			makeDirty() ;
@@ -474,7 +474,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public void setOffset( final float _x, final float _y, final float _z )
 	{
-		if( UI.applyVec3( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		if( UI.applyVec3Ceil( offset, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			UIElement.signal( this, offsetChanged() ) ;
 			makeDirty() ;
@@ -496,7 +496,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		_y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
 		_z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
-		if( UI.applyVec3( minLength, _x, _y, _z ) == true )
+		if( UI.applyVec3Ceil( minLength, _x, _y, _z ) == true )
 		{
 			makeDirty() ;
 			UIElement.signal( this, minLengthChanged() ) ;
@@ -523,7 +523,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 		_y = ( _y < 0.0f ) ? 0.0f : ratio.toPixelY( _y ) ;
 		_z = ( _z < 0.0f ) ? 0.0f : ratio.toPixelZ( _z ) ;
 
-		if( UI.applyVec3( maxLength, _x, _y, _z ) == true )
+		if( UI.applyVec3Ceil( maxLength, _x, _y, _z ) == true )
 		{
 			makeDirty() ;
 			UIElement.signal( this, maxLengthChanged() ) ;
@@ -568,7 +568,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 			_z = ( _z > maxLength.z ) ? maxLength.z : _z ;
 		}
 
-		if( UI.applyVec3( length, _x, _y, _z ) == true )
+		if( UI.applyVec3Ceil( length, _x, _y, _z ) == true )
 		{
 			makeDirty() ;
 			UIElement.signal( this, lengthChanged() ) ;
@@ -586,7 +586,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public void setMargin( final float _x, final float _y, final float _z )
 	{
-		if( UI.applyVec3( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
+		if( UI.applyVec3Ceil( margin, ratio.toPixelX( _x ), ratio.toPixelY( _y ), ratio.toPixelZ( _z ) ) == true )
 		{
 			UIElement.signal( this, marginChanged() ) ;
 			makeDirty() ;
@@ -1336,7 +1336,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setPosition( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( position.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( position.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, position.getSignal() ) ;
 			}
@@ -1352,7 +1352,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setOffset( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( offset.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( offset.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, offset.getSignal() ) ;
 			}
@@ -1368,7 +1368,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setMargin( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( margin.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( margin.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, margin.getSignal() ) ;
 			}
@@ -1402,7 +1402,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( length.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( length.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, length.getSignal() ) ;
 			}
@@ -1418,7 +1418,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setMinimumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( minimumLength.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( minimumLength.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, minimumLength.getSignal() ) ;
 			}
@@ -1434,7 +1434,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setMaximumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3( maximumLength.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3Ceil( maximumLength.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, maximumLength.getSignal() ) ;
 			}

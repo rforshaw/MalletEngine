@@ -58,6 +58,16 @@ public final class GLCamera
 		}
 	}
 
+	public float getWidth()
+	{
+		return screen.dimension.x ;
+	}
+
+	public float getHeight()
+	{
+		return screen.dimension.y ;
+	}
+
 	public Matrix4 getUIProjection()
 	{
 		return uiProjectionMatrix ;

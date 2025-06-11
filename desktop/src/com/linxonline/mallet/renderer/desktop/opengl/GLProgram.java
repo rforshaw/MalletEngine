@@ -36,6 +36,8 @@ public final class GLProgram extends ProgramManager.Program
 	public int inViewMatrix = -1 ;
 	public int inProjectionMatrix = -1 ;
 
+	public int inResolution = -1 ;
+
 	public Attribute[] inAttributes ;
 	public SSBuffer[] inBuffers ;
 
@@ -169,6 +171,7 @@ public final class GLProgram extends ProgramManager.Program
 		program.inModelMatrix = MGL.glGetUniformLocation( program.id[0], "inModelMatrix" ) ;
 		program.inViewMatrix = MGL.glGetUniformLocation( program.id[0], "inViewMatrix" ) ;
 		program.inProjectionMatrix = MGL.glGetUniformLocation( program.id[0], "inProjectionMatrix" ) ;
+		program.inResolution = MGL.glGetUniformLocation( program.id[0], "inResolution" ) ;
 
 		// Once all of the shaders have been compiled 
 		// and linked, we can then detach the shader sources
@@ -603,24 +606,6 @@ public final class GLProgram extends ProgramManager.Program
 				}
 				case Font font ->
 				{
-					final GLFont glFont = GLRenderer.getFont( font ) ;
-					final GLImage glTexture = glFont.getTexture() ;
-
-					toFill.add( ( final UniformState _state ) ->
-					{
-						MGL.glActiveTexture( MGL.GL_TEXTURE0 + _state.textureUnit ) ;
-						MGL.glBindTexture( MGL.GL_TEXTURE_2D, glTexture.textureIDs[0] ) ;
-						MGL.glUniform1i( _location, _state.textureUnit ) ;
-
-						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_S, MGL.GL_CLAMP_TO_EDGE ) ;
-						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_WRAP_T, MGL.GL_REPEAT ) ;
-						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MAG_FILTER, MGL.GL_LINEAR ) ;
-						MGL.glTexParameteri( MGL.GL_TEXTURE_2D, MGL.GL_TEXTURE_MIN_FILTER, MGL.GL_LINEAR ) ;
-
-						_state.textureUnit += 1 ;
-						return true ;
-					} ) ;
-
 					yield true ;
 				}
 				default -> false ;

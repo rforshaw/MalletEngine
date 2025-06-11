@@ -20,6 +20,7 @@ public final class MGL
 	public final static int GL_NEAREST = GL4.GL_NEAREST ;
 	public final static int GL_NEAREST_MIPMAP_NEAREST = GL4.GL_NEAREST_MIPMAP_NEAREST ;
 	public final static int GL_LINEAR_MIPMAP_LINEAR = GL4.GL_LINEAR_MIPMAP_LINEAR ;
+	public final static int GL_MULTISAMPLE = GL4.GL_MULTISAMPLE ;
 
 	public final static int GL_ABGR_EXT = GL2.GL_ABGR_EXT ;
 	public final static int GL_COMPRESSED_RGBA = GL4.GL_COMPRESSED_RGBA ;

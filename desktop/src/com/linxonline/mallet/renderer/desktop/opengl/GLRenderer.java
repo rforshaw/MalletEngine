@@ -56,12 +56,12 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		}
 	} ) ;
 
+	private final static GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
+
 	private final static GLTextureManager textures = new GLTextureManager() ;
-	private final static GLFontManager fontManager = new GLFontManager( textures ) ;
+	private final static GLFontManager fontManager = new GLFontManager( glProfile, textures ) ;
 
 	private final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
-
-	private final GLWindow canvas ;
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
 	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
@@ -75,10 +75,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
 	private final List<IUpdater> updaters = new ArrayList<IUpdater>() ;
 
+	private final Thread mainThread ;
+	private GLWindow canvas ;
+
 	public GLRenderer( final Thread _main )
 	{
 		super() ;
-		canvas = createWindow( _main ) ;
+		mainThread = _main ;
 
 		// As soon as the renderer is constructed,
 		// we'll set up our basic shader-programs.
@@ -99,27 +102,13 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		} ) ;
 	}
 
-	private GLWindow createWindow( final Thread _main )
-	{
-		final GLProfile glProfile = GLProfile.get( GLProfile.GL3 ) ;
-		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
-		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
-		capabilities.setDoubleBuffered( GlobalConfig.getBoolean( "DOUBLE_BUFFER", true ) ) ;
-
-		final GLWindow win = GLWindow.create( capabilities ) ;
-		win.setExclusiveContextThread( _main ) ;
-
-		// We want to be in complete control of any swapBuffer calls
-		win.setAutoSwapBufferMode( false ) ;
-		win.setResizable( true ) ;
-		return win ;
-	}
-
 	@Override
 	public void start()
 	{
 		Logger.println( "Starting renderer..", Logger.Verbosity.NORMAL ) ;
 		super.start() ;
+
+		canvas = createWindow( mainThread ) ;
 
 		RenderAssist.setAssist( createRenderAssist() ) ;
 
@@ -135,6 +124,26 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 		canvas.addGLEventListener( this ) ;
 		canvas.setVisible( true ) ;
+	}
+
+	private GLWindow createWindow( final Thread _main )
+	{
+		final GLCapabilities capabilities = new GLCapabilities( glProfile ) ;
+
+		final int samples = GlobalConfig.getInteger( "NUM_SAMPLES", 2 ) ;
+		capabilities.setNumSamples( samples ) ;
+		capabilities.setSampleBuffers( samples > 0 ) ;
+
+		capabilities.setStencilBits( 1 ) ;			// Provide ON/OFF Stencil Buffers
+		capabilities.setDoubleBuffered( GlobalConfig.getBoolean( "DOUBLE_BUFFER", true ) ) ;
+
+		final GLWindow win = GLWindow.create( capabilities ) ;
+		win.setExclusiveContextThread( _main ) ;
+
+		// We want to be in complete control of any swapBuffer calls
+		win.setAutoSwapBufferMode( false ) ;
+		win.setResizable( true ) ;
+		return win ;
 	}
 
 	@Override

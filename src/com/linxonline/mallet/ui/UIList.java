@@ -792,6 +792,7 @@ public final class UIList extends UILayout
 			parent.getLength( length ) ;
 
 			position.add( _x, _y, 0.0f ) ;
+			position.setXYZ( ( int )Math.ceil( position.x ), ( int )Math.ceil( position.y ), 0.0f ) ;
 
 			final Vector3 length = parent.getLength() ;
 			final float width = parent.absoluteLength.x - length.x ;

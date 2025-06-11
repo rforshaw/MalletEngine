@@ -131,6 +131,7 @@ public final class GLDrawBuffer extends GLBuffer
 
 		MGL.glUniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
 		MGL.glUniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+		MGL.glUniform2f( glProgram.inResolution, _camera.getWidth(), _camera.getHeight() ) ;
 
 		{
 			uniformState.reset() ;

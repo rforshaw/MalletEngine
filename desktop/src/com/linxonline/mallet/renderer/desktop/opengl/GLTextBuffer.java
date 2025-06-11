@@ -131,6 +131,9 @@ public final class GLTextBuffer extends GLBuffer
 		final Font.Metrics metrics = font.getMetrics() ;
 		final GLFont glFont = GLRenderer.getFont( font ) ;
 
+		final float fScale = font.getPointSize() ;
+		final float fAscent = metrics.getAscent() ;
+		
 		{
 			final Shape shape = glFont.getShapeWithChar( '\0' ) ;
 			if( attributes == null )
@@ -197,8 +200,6 @@ public final class GLTextBuffer extends GLBuffer
 				start = ( start < end ) ? start : end ;
 				start = ( start >= 0 ) ? start : 0 ;
 			}
-
-			final int initialIndexOffset = vertexBuffer.position() / vertexStride ;
 
 			final float metricHeight = metrics.getHeight() ;
 			final float baseX = position.x + offset.x ;
@@ -301,8 +302,7 @@ public final class GLTextBuffer extends GLBuffer
 				final Shape.Attribute[] swivel = shape.getAttribute() ;
 				final int verticiesSize = shape.getVerticesSize() ;
 
-				final int GLYPH_POINTS = 4 ;
-				final int indexOffset = initialIndexOffset + ( i * GLYPH_POINTS ) ;
+				final int indexOffset = vertexBuffer.position() / vertexStride ;
 
 				final int size = shape.getIndicesSize() ; 
 				for( int j = 0; j < size; j++ )
@@ -319,6 +319,9 @@ public final class GLTextBuffer extends GLBuffer
 							case VEC3  :
 							{
 								shape.getVector3( j, k, point ) ;
+								point.multiply( fScale ) ;
+								point.add( 0, fAscent, 0 ) ;
+
 								Matrix4.multiply( point, matrix, temp ) ;
 								vertexBuffer.put( temp.x ) ;
 								vertexBuffer.put( temp.y ) ;
@@ -377,6 +380,7 @@ public final class GLTextBuffer extends GLBuffer
 
 		MGL.glUniformMatrix4fv( glProgram.inViewMatrix, 1, false, view.matrix, 0 ) ;
 		MGL.glUniformMatrix4fv( glProgram.inProjectionMatrix, 1, false, projection.matrix, 0 ) ;
+		MGL.glUniform2f( glProgram.inResolution, _camera.getWidth(), _camera.getHeight() ) ;
 
 		{
 			uniformState.reset() ;
@@ -390,6 +394,8 @@ public final class GLTextBuffer extends GLBuffer
 				}
 			}
 		}
+
+		MGL.glEnable( MGL.GL_MULTISAMPLE ) ;
 
 		GLTextBuffer.bindBuffers( storages ) ;
 
@@ -411,6 +417,8 @@ public final class GLTextBuffer extends GLBuffer
 			MGL.glDrawElements( style, length, MGL.GL_UNSIGNED_INT, 0 ) ;
 		}
 		GLTextBuffer.disableVertexAttributes( attributes ) ;
+
+		MGL.glDisable( MGL.GL_MULTISAMPLE ) ;
 	}
 
 	@Override

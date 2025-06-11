@@ -7,17 +7,10 @@ import com.linxonline.mallet.renderer.Shape ;
 public final class GLFont extends Resource
 {
 	private final Shape[] glyphs ;
-	private final GLImage texture ;
 
-	public GLFont( final Shape[] _glyphs, final GLImage _texture )
+	public GLFont( final Shape[] _glyphs )
 	{
 		glyphs = _glyphs ;
-		texture = _texture ;
-	}
-
-	public GLImage getTexture()
-	{
-		return texture ;
 	}
 
 	public Shape getShapeWithChar( final char _char )
@@ -38,12 +31,9 @@ public final class GLFont extends Resource
 	@Override
 	public long getMemoryConsumption()
 	{
-		return texture.getMemoryConsumption() ;
+		return 0L ;
 	}
 
 	@Override
-	public void destroy()
-	{
-		texture.destroy() ;
-	}
+	public void destroy() {}
 }

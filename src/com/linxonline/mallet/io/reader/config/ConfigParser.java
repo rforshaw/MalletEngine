@@ -127,6 +127,9 @@ public class ConfigParser
 
 			var = _src.getString( "LANGUAGE", "en" ) ;
 			_dest.addString( "LANGUAGE", var ) ;
+
+			var = _src.getString( "NUM_SAMPLES", "0" ) ;
+			_dest.addInteger( "NUM_SAMPLES", Integer.parseInt( var ) ) ;
 		}
 	}
 }

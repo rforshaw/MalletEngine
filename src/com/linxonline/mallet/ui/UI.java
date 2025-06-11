@@ -179,6 +179,25 @@ public final class UI
 	}
 
 	/**
+		Apply _x, _y and _z to passed in Vector3 _update and round up.
+		Return true if the values are significantly different 
+		from the values current in _update, else return false 
+		if the values have no major difference.
+
+		Used by UIElement to determine if position, offset, 
+		margin and others require makeDirty to be called.
+	*/
+	public static boolean applyVec3Ceil( final Vector3 _update, final float _x, final float _y, final float _z )
+	{
+		final float xDiff = Math.abs( _update.x - _x ) ;
+		final float yDiff = Math.abs( _update.y - _y ) ;
+		final float zDiff = Math.abs( _update.z - _z ) ;
+
+		_update.setXYZ( ( int )Math.ceil( _x ), ( int )Math.ceil( _y ), ( int )Math.ceil( _z ) ) ;
+		return xDiff > 0.001f || yDiff > 0.001f || zDiff > 0.001f ;
+	}
+
+	/**
 		Apply _x, _y and _z to passed in Vector3 _update.
 		Return true if the values are significantly different 
 		from the values current in _update, else return false 
@@ -195,6 +214,24 @@ public final class UI
 
 		_update.setXYZ( _x, _y, _z ) ;
 		return xDiff > 0.001f || yDiff > 0.001f || zDiff > 0.001f ;
+	}
+
+	/**
+		Apply _x, _y to passed in Vector2 _update and round up.
+		Return true if the values are significantly different 
+		from the values current in _update, else return false 
+		if the values have no major difference.
+
+		Used by UIElement to determine if position, offset, 
+		margin and others require makeDirty to be called.
+	*/
+	public static boolean applyVec2Ceil( final Vector2 _update, final float _x, final float _y )
+	{
+		final float xDiff = Math.abs( _update.x - _x ) ;
+		final float yDiff = Math.abs( _update.y - _y ) ;
+
+		_update.setXY( ( int )Math.ceil( _x ), ( int )Math.ceil( _y ) ) ;
+		return xDiff > 0.001f || yDiff > 0.001f ;
 	}
 
 	/**
