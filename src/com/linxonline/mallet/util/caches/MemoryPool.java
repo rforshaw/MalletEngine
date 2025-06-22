@@ -1,6 +1,6 @@
 package com.linxonline.mallet.util.caches ;
 
-import java.util.Vector ;
+import java.util.ArrayList ;
 
 /**
 	Create a pool of elements that can be shared.
@@ -8,10 +8,12 @@ import java.util.Vector ;
 	once taken, if reclaim is not called the Java VM
 	will deal with the element accordingly.
 */
-public class MemoryPool<E> implements IPool<E>
+public class MemoryPool<E> implements IPool<E>, IPoolSync<E>
 {
 	private final IPool.ICreator<E> creator ;
-	private final Vector<E> pool ;
+	private final ArrayList<E> pool ;
+
+	private int capacity ;
 
 	public MemoryPool( final IPool.ICreator<E> _creator )
 	{
@@ -24,14 +26,28 @@ public class MemoryPool<E> implements IPool<E>
 	*/
 	public MemoryPool( final int _initialSize, final IPool.ICreator<E> _creator )
 	{
+		capacity = _initialSize ;
+
 		creator = _creator ;
-		pool = new Vector<E>( _initialSize, _initialSize ) ;
+		pool = new ArrayList<E>( capacity ) ;
 		populate() ;
 	}
 
+	@Override
 	public synchronized E takeSync()
 	{
 		return take() ;
+	}
+
+	@Override
+	public synchronized E[] takeSync( final E[] _fill )
+	{
+		for( int i = 0; i < _fill.length; ++i )
+		{
+			_fill[i] = take() ;
+		}
+
+		return _fill ;
 	}
 
 	/**
@@ -49,9 +65,20 @@ public class MemoryPool<E> implements IPool<E>
 		return pool.remove( 0 ) ;
 	}
 
+	@Override
 	public synchronized boolean reclaimSync( final E _element )
 	{
 		return reclaim( _element ) ;
+	}
+
+	@Override
+	public synchronized boolean reclaimSync( final E[] _elements )
+	{
+		for( int i = 0; i < _elements.length; ++i )
+		{
+			reclaim( _elements[i] ) ;
+		}
+		return true ;
 	}
 
 	/**
@@ -63,11 +90,6 @@ public class MemoryPool<E> implements IPool<E>
 	@Override
 	public boolean reclaim( final E _element )
 	{
-		if( pool.contains( _element ) == true )
-		{
-			return false ;
-		}
-
 		pool.add( _element ) ;
 		return true ;
 	}
@@ -78,7 +100,7 @@ public class MemoryPool<E> implements IPool<E>
 	*/
 	private void populate()
 	{
-		final int size = pool.capacity() ;
+		final int size = capacity ;
 		for( int i = 0; i < size; ++i )
 		{
 			pool.add( creator.create() ) ;

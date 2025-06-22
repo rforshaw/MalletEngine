@@ -269,7 +269,7 @@ public class UIAbstractView extends UIElement
 	@Override
 	public boolean isIntersectInput( final InputEvent _event )
 	{
-		if( super.isIntersectInput( _event ) == true )
+		if( super.isIntersectInput( _event ) )
 		{
 			return true ;
 		}
@@ -281,16 +281,16 @@ public class UIAbstractView extends UIElement
 	}
 
 	@Override
-	public void update( final float _dt, final List<Event<?>> _events )
+	public void update( final float _dt )
 	{
 		final boolean dirty = isDirty() ;
-		super.update( _dt, _events ) ;
-		if( dirty == true )
+		super.update( _dt ) ;
+		if( dirty )
 		{
-			updateView( model.root(), this, _dt, _events ) ;
+			updateView( model.root(), this, _dt ) ;
 		}
 
-		list.update( _dt, _events ) ;
+		list.update( _dt ) ;
 	}
 
 	/**
@@ -302,8 +302,7 @@ public class UIAbstractView extends UIElement
 	*/
 	private void updateView( final UIModelIndex _node,
 							 final UIElement _parent,
-							 final float _dt,
-							 final List<Event<?>> _events )
+							 final float _dt )
 	{
 		final int rowCount = model.rowCount( _node ) ;
 		final int columnCount = model.columnCount( _node ) ;
@@ -320,7 +319,7 @@ public class UIAbstractView extends UIElement
 			{
 				final UIModelIndex index = new UIModelIndex( _node, i, j ) ;
 				final UIElement element = getCellElement( index, getItemDelegate( index ) ) ;
-				updateView( index, element, _dt, _events ) ;
+				updateView( index, element, _dt ) ;
 			}
 		}
 	}

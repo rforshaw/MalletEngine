@@ -27,9 +27,7 @@ public final class Ratio
 	@Override
 	public String toString()
 	{
-		final StringBuffer buffer = new StringBuffer() ;
-		buffer.append( "[" + ratioA + ":" + ratioB + "]" ) ;
-		return buffer.toString() ;
+		return "[" + ratioA + ":" + ratioB + "]" ;
 	}
 
 	/**

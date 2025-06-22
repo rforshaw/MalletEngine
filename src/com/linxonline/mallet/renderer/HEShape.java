@@ -638,7 +638,7 @@ public class HEShape implements IShape
 			return e2 ;
 		}
 
-		public Edge split( final float _ratio )
+		public Edge insert( final float _ratio )
 		{
 			final Vertex v0 = getOrigin() ;
 			final Vertex v1 = getDestination() ;
@@ -649,8 +649,16 @@ public class HEShape implements IShape
 			final Vector3 diff = Vector3.subtract( end, start ) ;
 			diff.multiply( _ratio ) ;
 
+			return insert( start.x + diff.x, start.y + diff.y, start.z + diff.z ) ;
+		}
+
+		public Edge insert( final float _x, final float _y, final float _z )
+		{
+			final Vertex v0 = getOrigin() ;
+			final Vertex v1 = getDestination() ;
+
 			final Vertex middle = addVertex( v0.copy() ) ;
-			middle.translateVector3( positionIndex, diff.x, diff.y, diff.z ) ;
+			middle.setVector3( positionIndex, _x, _y, _z ) ;
 
 			final Edge edge = addEdge( middle, v1 ) ;
 			edge.face = face ;
@@ -662,7 +670,7 @@ public class HEShape implements IShape
 
 			return edge ;
 		}
-
+		
 		public void translateVector2( final int _attributeIndex, final float _x, final float _y )
 		{
 			final Vertex v1 = getOrigin() ;

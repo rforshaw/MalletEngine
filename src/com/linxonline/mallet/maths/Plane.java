@@ -3,7 +3,7 @@ package com.linxonline.mallet.maths ;
 /**
 	A plane represents a surface that extends indefinitely. 
 */
-public class Plane
+public final class Plane
 {
 	private final Vector3 normal = new Vector3() ;
 	private float distance ;

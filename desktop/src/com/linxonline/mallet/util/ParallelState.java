@@ -4,6 +4,7 @@ import java.util.List ;
 import java.util.concurrent.* ;
 import java.util.concurrent.atomic.AtomicInteger ;
 
+import com.linxonline.mallet.util.caches.IPoolSync ;
 import com.linxonline.mallet.util.caches.MemoryPool ;
 
 /**
@@ -14,10 +15,12 @@ import com.linxonline.mallet.util.caches.MemoryPool ;
 */
 public final class ParallelState implements AutoCloseable
 {
-	private final MemoryPool<BatchListJob> batchListJobs = new MemoryPool<BatchListJob>( () -> new BatchListJob() ) ;
-	private final MemoryPool<BatchArrayJob> batchArrayJobs = new MemoryPool<BatchArrayJob>( () -> new BatchArrayJob() ) ;
-	private final MemoryPool<ListJob> listJobs = new MemoryPool<ListJob>( () -> new ListJob() ) ;
-	private final MemoryPool<ArrayJob> arrayJobs = new MemoryPool<ArrayJob>( () -> new ArrayJob() ) ;
+	private final IPoolSync<FactoryArrayJob> factoryArrayJobs = new MemoryPool<FactoryArrayJob>( () -> new FactoryArrayJob() ) ;
+	private final IPoolSync<FactoryListJob> factoryListJobs = new MemoryPool<FactoryListJob>( () -> new FactoryListJob() ) ;
+	private final IPoolSync<BatchListJob> batchListJobs = new MemoryPool<BatchListJob>( () -> new BatchListJob() ) ;
+	private final IPoolSync<BatchArrayJob> batchArrayJobs = new MemoryPool<BatchArrayJob>( () -> new BatchArrayJob() ) ;
+	private final IPoolSync<ListJob> listJobs = new MemoryPool<ListJob>( () -> new ListJob() ) ;
+	private final IPoolSync<ArrayJob> arrayJobs = new MemoryPool<ArrayJob>( () -> new ArrayJob() ) ;
 
 	private final Worker[] workers ;
 	private final LinkedBlockingDeque<IJob> jobs = new LinkedBlockingDeque<IJob>() ;
@@ -84,12 +87,9 @@ public final class ParallelState implements AutoCloseable
 			int end = start + batchSize ;
 			end = ( end > _end ) ? _end : end ;
 
-			synchronized( arrayJobs )
-			{
-				final ArrayJob<T> job = arrayJobs.take() ;
-				job.set( latch, start, end, _array, _run ) ;
-				jobs.addFirst( job ) ;
-			}
+			final ArrayJob<T> job = arrayJobs.takeSync() ;
+			job.set( latch, start, end, _array, _run ) ;
+			jobs.addFirst( job ) ;
 
 			start = end ;
 			++numCompleted ;
@@ -142,12 +142,9 @@ public final class ParallelState implements AutoCloseable
 			int end = start + batchSize ;
 			end = ( end > _end ) ? _end : end ;
 
-			synchronized( listJobs )
-			{
-				final ListJob<T> job = listJobs.take() ;
-				job.set( latch, start, end, _list, _run ) ;
-				jobs.addFirst( job ) ;
-			}
+			final ListJob<T> job = listJobs.takeSync() ;
+			job.set( latch, start, end, _list, _run ) ;
+			jobs.addFirst( job ) ;
 
 			start = end ;
 			++numCompleted ;
@@ -197,12 +194,9 @@ public final class ParallelState implements AutoCloseable
 			int end = start + batchSize ;
 			end = ( end > _end ) ? _end : end ;
 
-			synchronized( batchListJobs )
-			{
-				final BatchListJob<T> job = batchListJobs.take() ;
-				job.set( latch, start, end, _list, _run ) ;
-				jobs.addFirst( job ) ;
-			}
+			final BatchListJob<T> job = batchListJobs.takeSync() ;
+			job.set( latch, start, end, _list, _run ) ;
+			jobs.addFirst( job ) ;
 
 			start = end ;
 			++numCompleted ;
@@ -252,12 +246,103 @@ public final class ParallelState implements AutoCloseable
 			int end = start + batchSize ;
 			end = ( end > _end ) ? _end : end ;
 
-			synchronized( batchArrayJobs )
-			{
-				final BatchArrayJob<T> job = batchArrayJobs.take() ;
-				job.set( latch, start, end, _array, _run ) ;
-				jobs.addFirst( job ) ;
-			}
+			final BatchArrayJob<T> job = batchArrayJobs.takeSync() ;
+			job.set( latch, start, end, _array, _run ) ;
+			jobs.addFirst( job ) ;
+
+			start = end ;
+			++numCompleted ;
+		}
+
+		try
+		{
+			latch.await() ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
+	}
+
+	public <T> void forBatch( final List<T> _list, final Parallel.IListFactory<T> _factory )
+	{
+		forBatch( _list, 0, _list.size(), minimumBatchSize, _factory ) ;
+	}
+
+	public <T> void forBatch( final List<T> _list, final int _batchSize, final Parallel.IListFactory<T> _factory )
+	{
+		forBatch( _list, 0, _list.size(), _batchSize, _factory ) ;
+	}
+
+	public <T> void forBatch( final List<T> _list, final int _start, final int _end, final int _batchSize, final Parallel.IListFactory<T> _factory )
+	{
+		final int batchSize = _batchSize ;
+		final int totalSize = _end - _start ;
+		final int batchNum = ( totalSize + batchSize - 1 ) / batchSize ;
+
+		_factory.required( batchNum ) ;
+
+		createTempWorkers( 2, batchNum ) ;
+		int start = _start ;
+		int numCompleted = 0 ;
+
+		final CountDownLatch latch = new CountDownLatch( batchNum ) ;
+
+		while( numCompleted < batchNum )
+		{
+			int end = start + batchSize ;
+			end = ( end > _end ) ? _end : end ;
+
+			final FactoryListJob<T> job = factoryListJobs.takeSync() ;
+			job.set( latch, start, end, _list, _factory ) ;
+			jobs.addFirst( job ) ;
+
+			start = end ;
+			++numCompleted ;
+		}
+
+		try
+		{
+			latch.await() ;
+		}
+		catch( Exception ex )
+		{
+			ex.printStackTrace() ;
+		}
+	}
+
+	public <T> void forBatch( final T[] _array, final Parallel.IArrayFactory<T> _factory )
+	{
+		forBatch( _array, 0, _array.length, minimumBatchSize, _factory ) ;
+	}
+
+	public <T> void forBatch( final T[] _array, final int _batchSize, final Parallel.IArrayFactory<T> _factory )
+	{
+		forBatch( _array, 0, _array.length, _batchSize, _factory ) ;
+	}
+
+	public <T> void forBatch( final T[] _array, final int _start, final int _end, final int _batchSize, final Parallel.IArrayFactory<T> _factory )
+	{
+		final int batchSize = _batchSize ;
+		final int totalSize = _end - _start ;
+		final int batchNum = ( totalSize + batchSize - 1 ) / batchSize ;
+
+		_factory.required( batchNum ) ;
+
+		createTempWorkers( 2, batchNum ) ;
+		int start = _start ;
+		int numCompleted = 0 ;
+
+		final CountDownLatch latch = new CountDownLatch( batchNum ) ;
+
+		while( numCompleted < batchNum )
+		{
+			int end = start + batchSize ;
+			end = ( end > _end ) ? _end : end ;
+
+			final FactoryArrayJob<T> job = factoryArrayJobs.takeSync() ;
+			job.set( latch, start, end, _array, _factory ) ;
+			jobs.addFirst( job ) ;
 
 			start = end ;
 			++numCompleted ;
@@ -345,11 +430,8 @@ public final class ParallelState implements AutoCloseable
 			}
 			latch.countDown() ;
 
-			synchronized( ParallelState.this.arrayJobs )
-			{
-				reset() ;
-				ParallelState.this.arrayJobs.reclaim( this ) ;
-			}
+			reset() ;
+			ParallelState.this.arrayJobs.reclaimSync( this ) ;
 		}
 	}
 
@@ -395,11 +477,8 @@ public final class ParallelState implements AutoCloseable
 			}
 			latch.countDown() ;
 
-			synchronized( ParallelState.this.listJobs )
-			{
-				reset() ;
-				ParallelState.this.listJobs.reclaim( this ) ;
-			}
+			reset() ;
+			ParallelState.this.listJobs.reclaimSync( this ) ;
 		}
 	}
 
@@ -442,11 +521,8 @@ public final class ParallelState implements AutoCloseable
 			runner.run( start, end, array ) ;
 			latch.countDown() ;
 
-			synchronized( ParallelState.this.batchArrayJobs )
-			{
-				reset() ;
-				ParallelState.this.batchArrayJobs.reclaim( this ) ;
-			}
+			reset() ;
+			ParallelState.this.batchArrayJobs.reclaimSync( this ) ;
 		}
 	}
 
@@ -489,11 +565,100 @@ public final class ParallelState implements AutoCloseable
 			runner.run( start, end, list ) ;
 			latch.countDown() ;
 
-			synchronized( ParallelState.this.batchListJobs )
-			{
-				reset() ;
-				ParallelState.this.batchListJobs.reclaim( this ) ;
-			}
+			reset() ;
+			ParallelState.this.batchListJobs.reclaimSync( this ) ;
+		}
+	}
+
+	private final class FactoryListJob<T> implements IJob
+	{
+		private CountDownLatch latch ;
+		private int start ;
+		private int end ;
+
+		private List<T> list ;
+		private Parallel.IListFactory<T> factory ;
+
+		public FactoryListJob() {}
+
+		public void set( final CountDownLatch _latch,
+							 final int _start,
+							 final int _end,
+							 final List<T> _list,
+							 final Parallel.IListFactory<T> _factory )
+		{
+			latch = _latch ;
+
+			start = _start ;
+			end = _end ;
+
+			list = _list ;
+			factory = _factory ;
+		}
+
+		private void reset()
+		{
+			latch = null ;
+			list = null ;
+			factory = null ;
+		}
+
+		@Override
+		public void run()
+		{
+			final Parallel.IListRun<T> run = factory.create() ;
+			run.run( start, end, list ) ;
+
+			latch.countDown() ;
+
+			reset() ;
+			ParallelState.this.factoryListJobs.reclaimSync( this ) ;
+		}
+	}
+
+	private final class FactoryArrayJob<T> implements IJob
+	{
+		private CountDownLatch latch ;
+		private int start ;
+		private int end ;
+
+		private T[] array ;
+		private Parallel.IArrayFactory<T> factory ;
+
+		public FactoryArrayJob() {}
+
+		public void set( final CountDownLatch _latch,
+							 final int _start,
+							 final int _end,
+							 final T[] _array,
+							 final Parallel.IArrayFactory<T> _factory )
+		{
+			latch = _latch ;
+
+			start = _start ;
+			end = _end ;
+
+			array = _array ;
+			factory = _factory ;
+		}
+
+		private void reset()
+		{
+			latch = null ;
+			array = null ;
+			factory = null ;
+		}
+
+		@Override
+		public void run()
+		{
+			final Parallel.IArrayRun<T> run = factory.create() ;
+			run.run( start, end, array ) ;
+
+			latch.countDown() ;
+
+			reset() ;
+			ParallelState.this.factoryArrayJobs.reclaimSync( this ) ;
 		}
 	}
 
@@ -513,7 +678,7 @@ public final class ParallelState implements AutoCloseable
 		}
 	}
 
-	private sealed interface IJob permits Job, BatchListJob, BatchArrayJob, ListJob, ArrayJob
+	private sealed interface IJob permits Job, BatchListJob, BatchArrayJob, ListJob, ArrayJob, FactoryListJob, FactoryArrayJob
 	{
 		public void run() ;
 	}

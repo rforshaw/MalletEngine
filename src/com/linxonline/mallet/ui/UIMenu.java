@@ -169,10 +169,10 @@ public class UIMenu extends UILayout
 		}
 
 		@Override
-		public void update( final float _dt, final List<Event<?>> _events )
+		public void update( final float _dt )
 		{
-			super.update( _dt, _events ) ;
-			dropdown.update( _dt, _events ) ;
+			super.update( _dt ) ;
+			dropdown.update( _dt ) ;
 		}
 
 		@Override

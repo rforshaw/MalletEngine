@@ -113,7 +113,7 @@ public class UIWrapper extends UIElement
 				}
 
 				final UIWrapper parent = ( UIWrapper )getParent() ;
-				sendEvent( Event.<UIWrapper>create( "DISPLAY_META", parent ) ) ;
+				Event.addEvent( Event.<UIWrapper>create( "DISPLAY_META", parent ) ) ;
 
 				line.setColour( Colour.blue() ) ;
 				parent.makeDirty() ;
@@ -176,10 +176,10 @@ public class UIWrapper extends UIElement
 	}
 
 	@Override
-	public void update( final float _dt, final List<Event<?>> _events )
+	public void update( final float _dt )
 	{
-		super.update( _dt, _events ) ;
-		element.update( _dt, _events ) ;
+		super.update( _dt ) ;
+		element.update( _dt ) ;
 
 		if( meta.supportsChildren() == true )
 		{
@@ -187,7 +187,7 @@ public class UIWrapper extends UIElement
 			for( int i = 0; i < size; i++ )
 			{
 				final UIWrapper wrapper = children.get( i ) ;
-				wrapper.update( _dt, _events ) ;
+				wrapper.update( _dt ) ;
 			}
 		}
 	}

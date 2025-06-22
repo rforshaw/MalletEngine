@@ -8,7 +8,6 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.ui.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.event.* ;
 
 public class UIComponent extends InputComponent
 {
@@ -17,7 +16,6 @@ public class UIComponent extends InputComponent
 
 	private final World world ;
 	private final Camera camera ;
-	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 
 	private Entity.ReadyCallback toDestroy = null ;
 
@@ -131,7 +129,6 @@ public class UIComponent extends InputComponent
 
 		updateElements( _dt ) ;
 		removeElements() ;
-		updateEvents() ;
 
 		if( toDestroy != null )
 		{
@@ -146,17 +143,19 @@ public class UIComponent extends InputComponent
 	*/
 	protected void updateElements( final float _dt )
 	{
-		if( elements.isEmpty() == false )
+		if( elements.isEmpty() )
 		{
-			final int size = elements.size() ;
-			for( int i = 0; i < size; i++ )
+			return ;
+		}
+
+		final int size = elements.size() ;
+		for( int i = 0; i < size; i++ )
+		{
+			final UIElement element = elements.get( i ) ;
+			element.update( _dt ) ;
+			if( element.destroy )
 			{
-				final UIElement element = elements.get( i ) ;
-				element.update( _dt, events ) ;
-				if( element.destroy == true )
-				{
-					removeElement( element ) ;
-				}
+				removeElement( element ) ;
 			}
 		}
 	}
@@ -168,33 +167,22 @@ public class UIComponent extends InputComponent
 	*/
 	protected void removeElements()
 	{
-		if( toRemove.isEmpty() == false )
+		if( toRemove.isEmpty() )
 		{
-			final int size = toRemove.size() ;
-			for( int i = 0; i < size; i++ )
-			{
-				final UIElement element = toRemove.get( i ) ;
-				if( elements.remove( element ) == true )
-				{
-					element.shutdown() ;
-					element.clear() ;
-				}
-			}
-			toRemove.clear() ;
+			return ;
 		}
-	}
 
-	/**
-		Take any events from the elements and pass 
-		them through to the game-state. 
-	*/
-	protected void updateEvents()
-	{
-		if( events.isEmpty() == false )
+		final int size = toRemove.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			Event.addEvents( events ) ;
-			events.clear() ;
+			final UIElement element = toRemove.get( i ) ;
+			if( elements.remove( element ) == true )
+			{
+				element.shutdown() ;
+				element.clear() ;
+			}
 		}
+		toRemove.clear() ;
 	}
 
 	@Override

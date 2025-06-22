@@ -6,7 +6,6 @@ import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
 /**
@@ -25,7 +24,6 @@ public class UIElement implements IInputHandler, Connect.Connection
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
 
 	private final ComponentUnit components = new ComponentUnit() ;
-	private final List<Event<?>> events = MalletList.<Event<?>>newList() ;
 	private final static Connect connect = new Connect() ;
 
 	protected State current = State.NEUTRAL ;
@@ -107,17 +105,6 @@ public class UIElement implements IInputHandler, Connect.Connection
 		{
 			base.get( i ).setWorld( _world ) ;
 		}
-	}
-
-	/**
-		Add an event to the event list.
-		This list will be polled on the next elements 
-		update, the events will eventually find their 
-		way to the Game State event-system if using UIComponent. 
-	*/
-	public void addEvent( final Event<?> _event )
-	{
-		events.add( _event ) ;
 	}
 
 	/**
@@ -208,7 +195,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 	public void setEngage( final boolean _engaged )
 	{
-		if( _engaged == true )
+		if( _engaged )
 		{
 			engage() ;
 		}
@@ -241,15 +228,9 @@ public class UIElement implements IInputHandler, Connect.Connection
 		return isIntersectInput( _input ) ;
 	}
 
-	public void update( final float _dt, final List<Event<?>> _events )
+	public void update( final float _dt )
 	{
-		if( events.isEmpty() == false )
-		{
-			_events.addAll( events ) ;
-			events.clear() ;
-		}
-
-		if( isDirty() == true )
+		if( isDirty() )
 		{
 			refresh() ;
 			dirty = false ;
@@ -270,7 +251,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 	@Override
 	public InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		if( isDisabled() == true )
+		if( isDisabled() )
 		{
 			return InputEvent.Action.PROPAGATE ;
 		}
@@ -871,13 +852,11 @@ public class UIElement implements IInputHandler, Connect.Connection
 		Remove all slots connected to signals.
 		Remove all components - note call shutdown if they have 
 		any resources attached.
-		Remove any events that may be in the event stream.
 	*/
 	public void clear()
 	{
 		UIElement.signal( this, elementClear() ) ;
 		components.clear() ;
-		events.clear() ;
 		UIElement.disconnect( this ) ;
 	}
 
@@ -1619,14 +1598,6 @@ public class UIElement implements IInputHandler, Connect.Connection
 		public UIElement getParent()
 		{
 			return UIElement.this ;
-		}
-
-		/**
-			Send the event back-up the chain.
-		*/
-		public void sendEvent( final Event<?> _event )
-		{
-			getParent().addEvent( _event ) ;
 		}
 
 		/**

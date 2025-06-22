@@ -223,10 +223,10 @@ public final class GameTestLoader implements IGameLoader
 
 			private void createMathTests()
 			{
-				final Plane plane = new Plane( new Vector3( 100, 0, 10 ),
-											   new Vector3( 100, 100, 10 ),
-											   new Vector3( 0, 0, 10 ) ) ;
-				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 150, 150, 100 ) ).toString() ) ;
+				final Plane plane = new Plane( new Vector3( 100, 100, 0 ),
+											   new Vector3( 100, 0, 0 ),
+											   new Vector3( 0, 0, 00 ) ) ;
+				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 50, 50, 100 ) ).toString() ) ;
 
 				final Circle circle = new Circle( 0, 0, 5 ) ;
 				System.out.println( "Ray 5, 5, 0, -1: " ) ;
@@ -547,7 +547,7 @@ public final class GameTestLoader implements IGameLoader
 					e3.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
 					e3.translateVector2( 2, 1.0f, 0.0f ) ;
 
-					final HEShape.Edge e4 = e3.split( 0.5f ) ;
+					final HEShape.Edge e4 = e3.insert( 0.5f ) ;
 					final HEShape.Edge e5 = e4.getPair().extrude() ;
 					e5.translateVector3( 0, 64.0f, 0.0f, 0.0f ) ;
 					e5.translateVector2( 2, 1.0f, 0.0f ) ;

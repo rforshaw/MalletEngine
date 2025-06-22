@@ -578,7 +578,7 @@ public final class GLTextureManager extends AbstractManager<String, GLImage>
 			}
 		}
 	}
-	
+
 	private final class TextureArrayRunner implements Parallel.IRun
 	{
 		private final TextureArray texture ;

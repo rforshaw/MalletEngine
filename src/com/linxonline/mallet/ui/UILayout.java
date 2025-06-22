@@ -273,10 +273,10 @@ public class UILayout extends UIElement implements IChildren
 	}
 
 	@Override
-	public void update( final float _dt, final List<Event<?>> _events )
+	public void update( final float _dt )
 	{
 		final boolean dirt = isDirty() ;
-		super.update( _dt, _events ) ;
+		super.update( _dt ) ;
 
 		if( dirt == true || dirtyChildren == true )
 		{
@@ -284,7 +284,7 @@ public class UILayout extends UIElement implements IChildren
 			updater.update( _dt, this ) ;
 		}
 
-		dirtyChildren = children.update( _dt, _events ) ;
+		dirtyChildren = children.update( _dt ) ;
 	}
 
 	public final void setType( final ILayout.Type _type )

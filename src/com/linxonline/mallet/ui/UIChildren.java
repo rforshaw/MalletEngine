@@ -167,7 +167,7 @@ public class UIChildren implements IChildren
 		for( int i = 0; i < size; i++ )
 		{
 			final UIElement element = ordered.get( i ) ;
-			if( element.isIntersectInput( _event ) == true )
+			if( element.isIntersectInput( _event ) )
 			{
 				return element ;
 			}
@@ -176,7 +176,7 @@ public class UIChildren implements IChildren
 		return null ;
 	}
 
-	public boolean update( final float _dt, final List<Event<?>> _events )
+	public boolean update( final float _dt )
 	{
 		boolean dirtyChildren = false ;
 
@@ -184,16 +184,16 @@ public class UIChildren implements IChildren
 		while( iter.hasNext() )
 		{
 			final UIElement element = iter.next() ;
-			if( element.isDirty() == true )
+			if( element.isDirty() )
 			{
 				// If a Child element is updating we'll 
 				// most likely also want to update the parent.
 				dirtyChildren = true ;
 			}
 
-			element.update( _dt, _events ) ;
+			element.update( _dt ) ;
 
-			if( element.destroy == true )
+			if( element.destroy )
 			{
 				iter.remove() ;
 				element.shutdown() ;

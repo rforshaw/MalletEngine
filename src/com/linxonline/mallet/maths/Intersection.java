@@ -1,17 +1,19 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
 public final class Intersection
 {
-	private final Vector3 point = new Vector3() ;
+	private float x = 0 ;
+	private float y = 0 ;
+	private float z = 0 ;
 	private float tmin = -1.0f ;
 
 	public Intersection() {}
 
 	public void reset()
 	{
-		point.setXYZ( 0, 0, 0 ) ;
+		x = 0.0f ;
+		y = 0.0f ;
+		z = 0.0f ;
 		tmin = -1.0f ;
 	}
 
@@ -22,7 +24,9 @@ public final class Intersection
 
 	public void setPoint( final float _x, final float _y, final float _z )
 	{
-		point.setXYZ( _x, _y, _z ) ;
+		x = _x ;
+		y = _y ;
+		z = _z ;
 	}
 
 	public void setDistance( final float _tmin )
@@ -32,9 +36,9 @@ public final class Intersection
 
 	public Vector3 getPoint( final Vector3 _fill )
 	{
-		_fill.x = point.x ;
-		_fill.y = point.y ;
-		_fill.z = point.z ;
+		_fill.x = x ;
+		_fill.y = y ;
+		_fill.z = z ;
 		return _fill ;
 	}
 
@@ -46,6 +50,6 @@ public final class Intersection
 	@Override
 	public String toString()
 	{
-		return "[point: " + point.toString() + " distance: " + tmin + "]" ;
+		return "[point: X:" + x + " Y: " + y + " Z: " + z + " distance: " + tmin + "]" ;
 	}
 }

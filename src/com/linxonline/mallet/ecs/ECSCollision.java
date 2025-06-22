@@ -6,21 +6,18 @@ import java.util.Arrays ;
 import com.linxonline.mallet.physics.* ;
 import com.linxonline.mallet.maths.* ;
 
-import com.linxonline.mallet.util.caches.MemoryPool ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Parallel ;
 
 public final class ECSCollision implements IECS<ECSCollision.Component>
 {
-	private final static MemoryPool<ContactPoint> contacts = new MemoryPool<ContactPoint>( () -> new ContactPoint() ) ;
-
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final List<Component> components = MalletList.<Component>newList() ;
 
-	private final static ComponentUpdater componentUpdater = new ComponentUpdater() ;
-	private final static HullUpdater hullUpdater = new HullUpdater() ;
+	private final static ComponentFactory componentFactory = new ComponentFactory() ;
+	private final static HullFactory hullFactory = new HullFactory() ;
 
 	public ECSCollision() {}
 
@@ -59,7 +56,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	public void update( final double _dt )
 	{
 		updateExecutions() ;
-		Parallel.forBatch( components, 1000, componentUpdater ) ;
+		Parallel.forBatch( components, 1000, componentFactory ) ;
 	}
 
 	private void invokeLater( final Runnable _run )
@@ -175,14 +172,47 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		}
 	}
 
+	private static final class ComponentFactory implements Parallel.IListFactory<Component>
+	{
+		private final List<ComponentUpdater> updaters = MalletList.<ComponentUpdater>newList() ;
+
+		private int size ;
+		private int current ;
+
+		@Override
+		public void required( final int _size )
+		{
+			size = _size ;
+			current = 0 ;
+
+			final int delta = _size - updaters.size() ;
+			if( delta <= 0 )
+			{
+				return ;
+			}
+
+			System.out.println( "Creating: " + delta ) ;
+			for( int i = 0; i < delta; ++i )
+			{
+				updaters.add( new ComponentUpdater() ) ;
+			}
+		}
+
+		@Override
+		public Parallel.IListRun<Component> create()
+		{
+			return( updaters.get( current++ ) ) ;
+		}
+	}
+
 	private static final class ComponentUpdater implements Parallel.IListRun<Component>
 	{
+		private final ContactPoint point = new ContactPoint() ;
+
 		@Override
 		public void run( final int _start, final int _end, final List<Component> _components )
 		{
 			final int batchSize = 1000 ;
-
-			final ContactPoint point = contacts.takeSync() ;
 
 			for( int i = _start; i < _end; ++i )
 			{
@@ -200,7 +230,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 				if( size > batchSize )
 				{
 					// If there are enough hulls, update them in parallel.
-					Parallel.forBatch( hulls, batchSize, hullUpdater ) ;
+					Parallel.forBatch( hulls, batchSize, hullFactory ) ;
 					continue ;
 				}
 
@@ -211,24 +241,52 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 					ECSCollision.updateCollision( hulls[j], point ) ;
 				}
 			}
+		}
+	}
 
-			contacts.reclaimSync( point ) ;
+	private static final class HullFactory implements Parallel.IArrayFactory<Hull>
+	{
+		private final List<HullUpdater> updaters = MalletList.<HullUpdater>newList() ;
+
+		private int size ;
+		private int current ;
+
+		@Override
+		public void required( final int _size )
+		{
+			size = _size ;
+			current = 0 ;
+
+			final int delta = _size - updaters.size() ;
+			if( delta <= 0 )
+			{
+				return ;
+			}
+
+			for( int i = 0; i < delta; ++i )
+			{
+				updaters.add( new HullUpdater() ) ;
+			}
+		}
+
+		@Override
+		public Parallel.IArrayRun<Hull> create()
+		{
+			return( updaters.get( current++ ) ) ;
 		}
 	}
 
 	private static final class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
+		private final ContactPoint point = new ContactPoint() ;
+
 		@Override
 		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{
-			final ContactPoint point = contacts.takeSync() ;
-
 			for( int i = _start; i < _end; ++i )
 			{
 				ECSCollision.updateCollision( _hulls[i], point ) ;
 			}
-
-			contacts.reclaimSync( point ) ;
 		}
 	}
 }
