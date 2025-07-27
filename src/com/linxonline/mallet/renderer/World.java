@@ -1,10 +1,13 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
+import java.util.Comparator ;
+import java.util.Collections ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
 import com.linxonline.mallet.renderer.Texture ;
 
+import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
@@ -66,21 +69,15 @@ public final class World implements IManageBuffers
 		renderNotification.removeNotify( _notify ) ;
 	}
 
-	public Camera[] addCameras( final Camera ... _cameras )
+	public Camera addCamera( final Camera _camera )
 	{
-		for( final Camera camera : _cameras )
-		{
-			cameras.add( camera ) ;
-		}
-		return _cameras ;
+		cameras.add( _camera ) ;
+		return _camera ;
 	}
 
-	public void removeCameras( final Camera ... _cameras )
+	public void removeCamera( final Camera _camera )
 	{
-		for( final Camera camera : _cameras )
-		{
-			cameras.remove( camera ) ;
-		}
+		cameras.remove( _camera ) ;
 	}
 
 	public List<Camera> getCameras()
@@ -89,38 +86,49 @@ public final class World implements IManageBuffers
 	}
 
 	@Override
-	public ABuffer[] addBuffers( final ABuffer ... _buffers )
+	public <T extends ABuffer> T addBuffer( final T _buffer )
 	{
-		for( final ABuffer buffer : _buffers )
-		{
-			insert( buffer, buffers ) ;
-		}
-		return _buffers ;
+		insert( _buffer, buffers ) ;
+		return _buffer ;
 	}
 
 	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
 	{
-		final int size = _list.size() ;
-		for( int i = 0; i < size; i++ )
+		switch( _insert )
 		{
-			final ABuffer toCompare = _list.get( i ) ;
-			if( _insert.getOrder() <= toCompare.getOrder() )
+			case Storage s :
 			{
-				_list.add( i, _insert ) ;		// Insert at index location
+				Logger.println( "Storage is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
 				return ;
 			}
-		}
+			case GeometryBuffer b :
+			{
+				Logger.println( "GeometryBuffer is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
+				return ;
+			}
+			default :
+			{
+				final int size = _list.size() ;
+				for( int i = 0; i < size; i++ )
+				{
+					final ABuffer toCompare = _list.get( i ) ;
+					if( _insert.getOrder() <= toCompare.getOrder() )
+					{
+						_list.add( i, _insert ) ;		// Insert at index location
+						return ;
+					}
+				}
 
-		_list.add( _insert ) ;
+				_list.add( _insert ) ;
+				break ;
+			}
+		}
 	}
 
 	@Override
-	public void removeBuffers( final ABuffer ... _buffers )
+	public <T extends ABuffer> void removeBuffer( final T _buffer )
 	{
-		for( final ABuffer buffer : _buffers )
-		{
-			buffers.remove( buffer ) ;
-		}
+		buffers.remove( _buffer ) ;
 	}
 
 	@Override
@@ -133,6 +141,28 @@ public final class World implements IManageBuffers
 	public void requestUpdate()
 	{
 		WorldAssist.update( this ) ;
+	}
+
+	/**
+		Trigger a call to sort the order in which
+		the cameras are rendered to.
+		This is the same as if you called:
+		Collections.sort( cameras, ... ) ;
+	*/
+	public void sortCameras( final Comparator<Camera> _c )
+	{
+		Collections.sort( cameras, _c ) ;
+	}
+
+	/**
+		Trigger a call to sort the order in which
+		the buffers are rendered to.
+		This is the same as if you called:
+		Collections.sort( buffers, ... ) ;
+	*/
+	public void sortBuffers( final Comparator<ABuffer> _c )
+	{
+		Collections.sort( buffers, _c ) ;
 	}
 
 	public void setClearColour( final Colour _colour )

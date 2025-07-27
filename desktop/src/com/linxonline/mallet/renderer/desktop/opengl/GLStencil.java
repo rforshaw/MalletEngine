@@ -1,16 +1,9 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
-import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Stencil ;
-import com.linxonline.mallet.renderer.ABuffer ;
 
 public class GLStencil extends GLBuffer
 {
-	private final List<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
-
 	// Stencil function
 	private int func = MGL.GL_ALWAYS ;
 	private int ref = 0 ;
@@ -31,19 +24,8 @@ public class GLStencil extends GLBuffer
 		super( false ) ;
 	}
 
-	public boolean update( final Stencil _stencil, final AssetLookup<?, GLBuffer> _buffers )
+	public boolean update( final Stencil _stencil )
 	{
-		buffers.clear() ;
-		for( final ABuffer buffer : _stencil.getBuffers() )
-		{
-			final int index = buffer.index() ;
-			final GLBuffer buff = _buffers.getRHS( index ) ;
-			if( buff != null )
-			{
-				buffers.add( buff ) ;
-			}
-		}
-
 		func = getOperation( _stencil.getOperation() ) ;
 		ref = _stencil.getReference() ;
 		mask = _stencil.getMask() ;
@@ -80,11 +62,6 @@ public class GLStencil extends GLBuffer
 		MGL.glStencilOp( sFail, zFail, zPass ) ;
 		MGL.glStencilFunc( func, ref, mask ) ;
 		MGL.glStencilMask( mask ) ;
-
-		for( final GLBuffer buffer : buffers )
-		{
-			buffer.draw( _camera ) ;
-		}
 	}
 
 	@Override

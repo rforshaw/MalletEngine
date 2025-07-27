@@ -19,14 +19,23 @@ public final class TextBuffer extends ABuffer
 		order = _order ;
 	}
 
+	public void addDraw( final TextDraw _draw )
+	{
+		draws.add( _draw ) ;
+	}
+
 	public void addDraws( final TextDraw ... _draws )
 	{
 		final int size = _draws.length ;
 		for( int i = 0; i < size; ++i )
 		{
-			final TextDraw draw = _draws[i] ;
-			draws.add( draw ) ;
+			addDraw( _draws[i] ) ;
 		}
+	}
+
+	public void removeDraw( final TextDraw _draw )
+	{
+		draws.remove( _draw ) ;
 	}
 
 	public void removeDraws( final TextDraw ... _draws )
@@ -34,8 +43,7 @@ public final class TextBuffer extends ABuffer
 		final int size = _draws.length ;
 		for( int i = 0; i < size; ++i )
 		{
-			final TextDraw draw = _draws[i] ;
-			draws.remove( draw ) ;
+			removeDraw( _draws[i] ) ;
 		}
 	}
 

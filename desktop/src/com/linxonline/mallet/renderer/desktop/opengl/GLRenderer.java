@@ -829,12 +829,12 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			case Stencil buffer ->
 			{
 				final GLStencil stencil = ( GLStencil )bufferLookup.getRHS( buffer.index() ) ;
-				yield ( stencil != null ) ? stencil.update( buffer, bufferLookup ) : true ;
+				yield ( stencil != null ) ? stencil.update( buffer ) : true ;
 			}
 			case Depth buffer ->
 			{
 				final GLDepth depth = ( GLDepth )bufferLookup.getRHS( buffer.index() ) ;
-				yield ( depth != null ) ? depth.update( buffer, bufferLookup ) : true ;
+				yield ( depth != null ) ? depth.update( buffer ) : true ;
 			}
 			case Storage buffer ->
 			{

@@ -53,16 +53,16 @@ public final class DrawInstancedUpdater implements IUpdater
 		return drawBuffer.isStatic() ;
 	}
 
-	public void addBuffers( final GeometryBuffer ... _buffers )
+	public void addBuffer( final GeometryBuffer _buffer )
 	{
 		makeDirty() ;
-		drawBuffer.addBuffers( _buffers ) ;
+		drawBuffer.addBuffer( _buffer ) ;
 	}
 
-	public void removeBuffers( final GeometryBuffer ... _buffers )
+	public void removeBuffer( final GeometryBuffer _buffer )
 	{
 		makeDirty() ;
-		drawBuffer.removeBuffers( _buffers ) ;
+		drawBuffer.removeBuffer( _buffer ) ;
 	}
 
 	public GeometryBuffer getBuffer( final int _index )
@@ -100,12 +100,12 @@ public final class DrawInstancedUpdater implements IUpdater
 				dirty = true ;
 			}
 
-			if( forceUpdate == true )
+			/*if( forceUpdate == true )
 			{
 				// The Geometry Buffer will need to be updated if a 
 				// draw object state has changed, or if it's been forced.
-				_updated.add( drawBuffer ) ;
-			}
+				//_updated.add( buffer ) ;
+			}*/
 		}
 
 		forceUpdate = false ;

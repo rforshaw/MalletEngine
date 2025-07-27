@@ -43,10 +43,10 @@ public class DrawInstancedUpdaterPool
 
 			updater = DrawAssist.add( new DrawInstancedUpdater( buffer ) ) ;
 
-			_anchor.addBuffers( buffer ) ;
+			_anchor.addBuffer( buffer ) ;
 			_anchor.requestUpdate() ;
 
-			buffer.addBuffers( geom ) ;
+			buffer.addBuffer( geom ) ;
 			buffer.requestUpdate() ;
 
 			synchronized( pool )

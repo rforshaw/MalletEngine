@@ -1,16 +1,9 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
-import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.Depth ;
-import com.linxonline.mallet.renderer.ABuffer ;
 
 public class GLDepth extends GLBuffer
 {
-	private final List<GLBuffer> buffers = new ArrayList<GLBuffer>() ;
-
 	// Depth function
 	private int func = MGL.GL_ALWAYS ;
 	private boolean mask = true ;
@@ -25,19 +18,8 @@ public class GLDepth extends GLBuffer
 		super( false ) ;
 	}
 
-	public boolean update( final Depth _depth, final AssetLookup<?, GLBuffer> _buffers )
+	public boolean update( final Depth _depth )
 	{
-		buffers.clear() ;
-		for( final ABuffer buffer : _depth.getBuffers() )
-		{
-			final int index = buffer.index() ;
-			final GLBuffer buff = _buffers.getRHS( index ) ;
-			if( buff != null )
-			{
-				buffers.add( buff ) ;
-			}
-		}
-
 		func = getOperation( _depth.getOperation() ) ;
 		mask = _depth.getMask() ;
 
@@ -68,11 +50,6 @@ public class GLDepth extends GLBuffer
 
 		MGL.glDepthFunc( func ) ;
 		MGL.glDepthMask( mask ) ;
-
-		for( final GLBuffer buffer : buffers )
-		{
-			buffer.draw( _camera ) ;
-		}
 	}
 
 	@Override

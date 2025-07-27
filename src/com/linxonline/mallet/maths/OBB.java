@@ -1,16 +1,9 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
 public final class OBB
 {
-	// Contains the original point data
-	// before rotational transformations
-	// are applied.
-	private float tLX, tLY = 0.0f ;	// top left
-	private float tRX, tRY = 0.0f ;	// top right
-	private float bLX, bLY = 0.0f ;	// bottom left
-	private float bRX, bRY = 0.0f ;	// bottom right
+	private float x, y = 0.0f ;
+	private float hWidth, hHeight = 0.0f ;
 
 	// Contains the points after
 	// rotational transformations have
@@ -25,23 +18,9 @@ public final class OBB
 		init() ;
 	}
 
-	private OBB( final Vector2 _topLeft,
-				 final Vector2 _topRight, 
-				 final Vector2 _bottomLeft,
-				 final Vector2 _bottomRight )
+	private OBB( final AABB _aabb )
 	{
-		tLX = _topLeft.x ;
-		tLY = _topLeft.y ;
-
-		tRX = _topRight.x ;
-		tRY = _topRight.y ;
-
-		bLX = _bottomLeft.x ;
-		bLY = _bottomLeft.y ;
-
-		bRX = _bottomRight.x ;
-		bRY = _bottomRight.y ;
-		init() ;
+		setFromAABB( _aabb ) ;
 	}
 
 	public static OBB create()
@@ -56,27 +35,13 @@ public final class OBB
 		return o ;
 	}
 
-	public static OBB create( final Vector2 _topLeft,
-							  final Vector2 _topRight, 
-							  final Vector2 _bottomLeft,
-							  final Vector2 _bottomRight )
-	{
-		return new OBB( _topLeft, _topRight, _bottomLeft, _bottomRight ) ;
-	}
-
 	public void setFromAABB( final AABB _aabb )
 	{
-		tLX = _aabb.minX ;
-		tLY = _aabb.minY ;
+		hWidth = ( _aabb.maxX - _aabb.minX ) * 0.5f ;
+		hHeight = ( _aabb.maxY - _aabb.minY ) * 0.5f ;
 
-		tRX = _aabb.maxX ;
-		tRY = _aabb.minY ;
-
-		bLX = _aabb.minX ;
-		bLY = _aabb.maxY ;
-
-		bRX = _aabb.maxX ;
-		bRY = _aabb.maxY ;
+		x = _aabb.minX + hWidth ;
+		y = _aabb.minY + hHeight ;
 		init() ;
 	}
 
@@ -85,17 +50,11 @@ public final class OBB
 	**/
 	public void setFromOBB( final OBB _obb )
 	{
-		tLX = _obb.tLX ;
-		tLY = _obb.tLY ;
+		hWidth = _obb.hWidth ;
+		hHeight = _obb.hHeight ;
 
-		tRX = _obb.tRX ;
-		tRY = _obb.tRY ;
-
-		bLX = _obb.bLX ;
-		bLY = _obb.bLY ;
-
-		bRX = _obb.bRX ;
-		bRY = _obb.bRY ;
+		x = _obb.x ;
+		y = _obb.y ;
 
 		rTLX = _obb.rTLX ;
 		rTLY = _obb.rTLY ;
@@ -113,6 +72,39 @@ public final class OBB
 	public int getLength()
 	{
 		return 4 ;
+	}
+
+	public AABB getAsAABB( final AABB _fill )
+	{
+		float minX = rTLX ;
+		float minY = rTLY ;
+
+		if( minX > rTRX ) { minX = rTRX ; }
+		if( minX > rBLX ) { minX = rBLX ; }
+		if( minX > rBRX ) { minX = rBRX ; }
+
+		if( minY > rTRY ) { minY = rTRY ; }
+		if( minY > rBLY ) { minY = rBLY ; }
+		if( minY > rBRY ) { minY = rBRY ; }
+
+		_fill.minX = minX ;
+		_fill.minY = minY ;
+
+		float maxX = rTLX ;
+		float maxY = rTLY ;
+
+		if( maxX < rTRX ) { maxX = rTRX ; }
+		if( maxX < rBLX ) { maxX = rBLX ; }
+		if( maxX < rBRX ) { minX = rBRX ; }
+
+		if( maxY < rTRY ) { maxY = rTRY ; }
+		if( maxY < rBLY ) { maxY = rBLY ; }
+		if( maxY < rBRY ) { maxY = rBRY ; }
+
+		_fill.maxX = maxX ;
+		_fill.maxY = maxY ;
+
+		return _fill ;
 	}
 
 	/**
@@ -150,59 +142,48 @@ public final class OBB
 	**/
 	public final void setRotation( final float _theta, final float _offsetX, final float _offsetY )
 	{
-		applyRotations( _theta, _offsetX, _offsetY ) ;
-	}
-
-	private void applyRotations( final float _theta, final float _offsetX, final float _offsetY )
-	{
 		final float sin = ( float )Math.sin( _theta ) ;
 		final float cos = ( float )Math.cos( _theta ) ;
 
+		final float lX = x + -hWidth + _offsetX ;
+		final float rX = x + hWidth + _offsetX ;
+
+		final float tY = y + hHeight + _offsetY ;
+		final float bY = y + -hHeight + _offsetY ;
+
+		final float lXC = lX * cos ;
+		final float rXC = rX * cos ;
+
+		final float tYC = tY * cos ;
+		final float bYC = bY * cos ;
+
+		final float lXS = lX * sin ;
+		final float rXS = rX * sin ;
+
+		final float tYS = tY * sin ;
+		final float bYS = bY * sin ;
+
 		// Top Left
-		rTLX = tLX + _offsetX ;
-		rTLY = tLY + _offsetY ;
-
-		float x = ( rTLX * cos ) - ( rTLY * sin ) ;
-		float y = ( rTLX * sin ) + ( rTLY * cos ) ;
-
-		rTLX = x - _offsetX ;
-		rTLY = y - _offsetY ;
+		rTLX = lXC - tYS - _offsetX ;
+		rTLY = lXS + tYC - _offsetY ;
 
 		// Top Right
-		rTRX = tRX + _offsetX ;
-		rTRY = tRY + _offsetY ;
-
-		x = ( rTRX * cos ) - ( rTRY * sin ) ;
-		y = ( rTRX * sin ) + ( rTRY * cos ) ;
-
-		rTRX = x - _offsetX ;
-		rTRY = y - _offsetY ;
+		rTRX = rXC - tYS - _offsetX ;
+		rTRY = rXS + tYC - _offsetY ;
 
 		// Bottom Left
-		rBLX = bLX + _offsetX ;
-		rBLY = bLY + _offsetY ;
-
-		x = ( rBLX * cos ) - ( rBLY * sin ) ;
-		y = ( rBLX * sin ) + ( rBLY * cos ) ;
-
-		rBLX = x - _offsetX ;
-		rBLY = y - _offsetY ;
+		rBLX = lXC - bYS - _offsetX ;
+		rBLY = lXS + bYC - _offsetY ;
 
 		// Bottom Right
-		rBRX = bRX + _offsetX ;
-		rBRY = bRY + _offsetY ;
-
-		x = ( rBRX * cos ) - ( rBRY * sin ) ;
-		y = ( rBRX * sin ) + ( rBRY * cos ) ;
-
-		rBRX = x - _offsetX ;
-		rBRY = y - _offsetY ;
+		rBRX = rXC - bYS - _offsetX ;
+		rBRY = rXS + bYC - _offsetY ;
 	}
 
 	public final float[] calculateAxes( final float[] _axes )
 	{
-		_axes[1] = rTRX - rTLX ;			// x
-		_axes[0] = -( rTRY - rTLY ) ;		// y
+		_axes[1] = rTRX - rTLX ;		// x
+		_axes[0] = -( rTRY - rTLY ) ;	// y
 
 		float length = Vector2.length( _axes[0], _axes[1] ) ;
 		_axes[0] /= length ;
@@ -220,7 +201,7 @@ public final class OBB
 
 	private final void init()
 	{
-		applyRotations( 0.0f, 0.0f, 0.0f ) ;
+		setRotation( 0.0f, 0.0f, 0.0f ) ;
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public final class Box2D extends Hull
 	{
 		super.setRotation( _theta ) ;
 		obb.setRotation( _theta, offsetX, offsetY ) ;
-		aabb.setFromOBB( obb ) ;
+		obb.getAsAABB( aabb ) ;
 	}
 
 	@Override

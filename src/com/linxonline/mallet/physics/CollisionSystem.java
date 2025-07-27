@@ -1,8 +1,8 @@
 package com.linxonline.mallet.physics ;
 
 import java.util.List ;
+import java.util.ArrayList ;
 
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 
 import com.linxonline.mallet.util.* ;
@@ -12,7 +12,7 @@ public final class CollisionSystem
 {
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
-	private final List<Hull> hulls = MalletList.<Hull>newList() ;
+	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
 	private final QuadTree treeHulls = new QuadTree() ;
 
 	public CollisionSystem() {}
@@ -20,6 +20,17 @@ public final class CollisionSystem
 	public void add( final Hull _hull )
 	{
 		hulls.add( _hull ) ;
+	}
+
+	public void add( final Hull[] _hulls )
+	{
+		final int size = _hulls.length ;
+		hulls.ensureCapacity( hulls.size() + size ) ;
+
+		for( int i = 0; i < size; ++i )
+		{
+			hulls.add( _hulls[i] ) ;
+		}
 	}
 
 	public void remove( final Hull _hull )
@@ -41,40 +52,27 @@ public final class CollisionSystem
 		return new CollisionAssist.IAssist()
 		{
 			@Override
-			public Box2D createBox2D( final AABB _aabb, final int[] _collidables )
-			{
-				final Box2D hull = new Box2D( _aabb, _collidables ) ;
-				CollisionSystem.this.invokeLater( () ->
-				{
-					CollisionSystem.this.add( hull ) ;
-				} ) ;
-
-				return hull ;
-			}
-
-			@Override
-			public Box2D createBox2D( final OBB _obb, final int[] _collidables )
-			{
-				final Box2D hull = new Box2D( _obb, _collidables ) ;
-				CollisionSystem.this.invokeLater( () ->
-				{
-					CollisionSystem.this.add( hull ) ;
-				} ) ;
-
-				return hull ;
-			}
-
-			@Override
-			public void add( final Hull _hull )
+			public <T extends Hull> T add( final T _hull )
 			{
 				CollisionSystem.this.invokeLater( () ->
 				{
 					CollisionSystem.this.add( _hull ) ;
 				} ) ;
+
+				return _hull ;
 			}
 
 			@Override
-			public void remove( final Hull _hull )
+			public <T extends Hull> void add( final T[] _hulls )
+			{
+				CollisionSystem.this.invokeLater( () ->
+				{
+					CollisionSystem.this.add( _hulls ) ;
+				} ) ;
+			}
+
+			@Override
+			public <T extends Hull> void remove( final T _hull )
 			{
 				CollisionSystem.this.invokeLater( () ->
 				{
@@ -83,7 +81,7 @@ public final class CollisionSystem
 			}
 
 			@Override
-			public void remove( final Hull[] _hulls )
+			public <T extends Hull> void remove( final T[] _hulls )
 			{
 				CollisionSystem.this.invokeLater( () ->
 				{
@@ -187,6 +185,7 @@ public final class CollisionSystem
 
 	private static void updateCollisions( final CollisionCheck _check, final Hull _hull1, final List<Hull> _hulls )
 	{
+		_check.setBaseHull( _hull1 ) ;
 		for( final Hull hull2 : _hulls )
 		{
 			if( _hull1 == hull2 )
@@ -196,7 +195,7 @@ public final class CollisionSystem
 
 			if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
 			{
-				if( _check.generateContactPoint( _hull1, hull2 ) == true )
+				if( _check.generateContactPoint( hull2 ) == true )
 				{
 					if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
 					{

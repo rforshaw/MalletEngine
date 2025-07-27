@@ -13,14 +13,25 @@ public final class GeometryBuffer extends ABuffer
 		attributes = _attributes ;
 	}
 
+	public void addDraw( final Draw _draw )
+	{
+		draws.add( _draw ) ;
+	}
+
 	public void addDraws( final Draw ... _draws )
 	{
+		draws.ensureCapacity( draws.size() + _draws.length ) ;
+
 		final int size = _draws.length ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Draw draw = _draws[i] ;
-			draws.add( draw ) ;
+			addDraw( _draws[i] ) ;
 		}
+	}
+
+	public void removeDraw( final Draw _draw )
+	{
+		draws.remove( _draw ) ;
 	}
 
 	public void removeDraws( final Draw ... _draws )
@@ -28,8 +39,7 @@ public final class GeometryBuffer extends ABuffer
 		final int size = _draws.length ;
 		for( int i = 0; i < size; ++i )
 		{
-			final Draw draw = _draws[i] ;
-			draws.remove( draw ) ;
+			removeDraw( _draws[i] ) ;
 		}
 	}
 

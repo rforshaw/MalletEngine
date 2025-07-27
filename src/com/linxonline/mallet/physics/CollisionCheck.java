@@ -22,7 +22,17 @@ public final class CollisionCheck
 
 	private final ContactPoint contact = new ContactPoint() ;
 
+	private Hull box1 ;
+
 	public CollisionCheck() {}
+
+	public void setBaseHull( final Hull _hull )
+	{
+		box1 = _hull ;
+
+		box1.getAABB( aabb1 ) ;
+		aabb1.getCenter( boxCenter1 ) ;
+	}
 
 	/**
 		Generate a Contact Point if a collision has occured.
@@ -38,37 +48,36 @@ public final class CollisionCheck
 		can be correctly implemented. Rather than leaving 
 		motion to the game-logic to update.
 	*/
-	public final boolean generateContactPoint( final Hull _box1, final Hull _box2 )
+	public final boolean generateContactPoint( final Hull _box2 )
 	{
-		final boolean box1Interested = _box1.isCollidableWithGroup( _box2.getGroupID() ) ;
-		final boolean box2Interested = _box2.isCollidableWithGroup( _box1.getGroupID() ) ;
+		final boolean box1Interested = box1.isCollidableWithGroup( _box2.getGroupID() ) ;
+		final boolean box2Interested = _box2.isCollidableWithGroup( box1.getGroupID() ) ;
 		if( box1Interested == false && box2Interested == false )
 		{
 			return false ;
 		}
 
-		_box1.getAABB( aabb1 ) ;
+		
 		_box2.getAABB( aabb2 ) ; 
 		if( aabb1.intersectAABB( aabb2 ) == false && aabb2.intersectAABB( aabb1 ) == false )
 		{
 			return false ;
 		}
 
-		aabb1.getCenter( boxCenter1 ) ;
 		aabb2.getCenter( boxCenter2 ) ;
 
 		toCenter.x = boxCenter2.x - boxCenter1.x ;
 		toCenter.y = boxCenter2.y - boxCenter1.y ;
 
-		// Find the best overlap for _box1
-		final float overlap1 = penetration( _box1, _box2, toCenter, axis1 ) ;
+		// Find the best overlap for box1
+		final float overlap1 = penetration( box1, _box2, toCenter, axis1 ) ;
 		if( overlap1 <= 0.0f )
 		{
 			return false ;
 		}
 
 		// Find the best overlap for _box2
-		final float overlap2 = penetration( _box2, _box1, toCenter, axis2 ) ;
+		final float overlap2 = penetration( _box2, box1, toCenter, axis2 ) ;
 		if( overlap2 <= 0.0f )
 		{
 			return false ;
@@ -86,19 +95,19 @@ public final class CollisionCheck
 		// If it did then hulls used for triggers could be 
 		// 'pushed' away - or prevent the other hull from passing 
 		// through it.
-		final boolean physical = _box1.isPhysical() && _box2.isPhysical() ;
+		final boolean physical = box1.isPhysical() && _box2.isPhysical() ;
 		final float a = ( physical ) ? 1.0f : 0.5f ;
 
 		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * a : overlap2 * a ;		// Get the best overlap overall
 
 		if( box1Interested == true )
 		{
-			_box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+			box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
 		}
 
 		if( box2Interested == true )
 		{
-			_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, _box1 ) ;
+			_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, box1 ) ;
 		}
 
 		return true ;

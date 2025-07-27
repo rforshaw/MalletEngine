@@ -174,7 +174,7 @@ public final class Vector2 implements IUniform
 
 		return ( float )Math.sqrt( ( tmp1 * tmp1 ) + ( tmp2 * tmp2 ) ) ;
 	}
-	
+
 	public static final Vector2 add( final Vector2 _vec1, final Vector2 _vec2 )
 	{
 		return new Vector2( _vec1.x + _vec2.x, _vec1.y + _vec2.y ) ;

@@ -3,15 +3,15 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 /**
-	Used by World, Stencil, Depth, and GroupBuffer.
+	Used by World, and GroupBuffer.
 
 	Intended to be used by implementations that manage
-	buffers such as DrawBuffer, DrawInstancedBuffer, GroupBuffer,
-	Stencil, and Depth.
+	buffers such as DrawBuffer, DrawInstancedBuffer, GroupBuffer.
 */
 public interface IManageBuffers extends IRequestUpdate
 {
-	public ABuffer[] addBuffers( final ABuffer ... _buffers ) ;
-	public void removeBuffers( final ABuffer ... _buffers ) ;
+	public <T extends ABuffer> T addBuffer( final T _buffers ) ;
+	public <T extends ABuffer> void removeBuffer( final T _buffers ) ;
+
 	public List<ABuffer> getBuffers() ;
 }

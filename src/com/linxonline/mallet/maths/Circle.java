@@ -63,6 +63,17 @@ public final class Circle
 		return false ;
 	}
 
+	public boolean intersectAABB( final AABB _a )
+	{
+		final Vector2 c = _a.getCenter( new Vector2() ) ;
+		final Vector2 distance = Vector2.subtract( position, c ) ;
+
+		c.x += MathUtil.clamp( distance.x, _a.minX, _a.maxX ) ;
+		c.y += MathUtil.clamp( distance.y, _a.minY, _a.maxY ) ;
+
+		return Vector2.distance( c, position ) <= radius ;
+	}
+
 	public boolean intersectLineSegment( final Vector2 _p, final Vector2 _q )
 	{
 		return intersectLineSegment( _p.x, _p.y, _q.x, _q.y ) ;

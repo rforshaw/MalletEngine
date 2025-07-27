@@ -17,7 +17,7 @@ public abstract class BasicRenderer implements IRender
 
 	public BasicRenderer()
 	{
-		world.addCameras( camera ) ;
+		world.addCamera( camera ) ;
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
+import java.util.Comparator ;
+import java.util.Collections ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
@@ -28,13 +30,10 @@ public final class GroupBuffer extends ABuffer implements IManageBuffers
 	}
 
 	@Override
-	public ABuffer[] addBuffers( final ABuffer ... _buffers )
+	public <T extends ABuffer> T addBuffer( final T _buffer )
 	{
-		for( final ABuffer buffer : _buffers )
-		{
-			insert( buffer, buffers ) ;
-		}
-		return _buffers ;
+		insert( _buffer, buffers ) ;
+		return _buffer ;
 	}
 
 	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
@@ -71,12 +70,9 @@ public final class GroupBuffer extends ABuffer implements IManageBuffers
 	}
 
 	@Override
-	public void removeBuffers( final ABuffer ... _buffers )
+	public <T extends ABuffer> void removeBuffer( final T _buffer )
 	{
-		for( final ABuffer buffer : _buffers )
-		{
-			buffers.remove( buffer ) ;
-		}
+		buffers.remove( _buffer ) ;
 	}
 
 	@Override
@@ -95,5 +91,16 @@ public final class GroupBuffer extends ABuffer implements IManageBuffers
 	public void requestUpdate()
 	{
 		DrawAssist.update( this ) ;
+	}
+
+	/**
+		Trigger a call to sort the order in which
+		the buffers are rendered to.
+		This is the same as if you called:
+		Collections.sort( buffers, ... ) ;
+	*/
+	public void sortBuffers( final Comparator<ABuffer> _c )
+	{
+		Collections.sort( buffers, _c ) ;
 	}
 }

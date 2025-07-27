@@ -27,6 +27,7 @@ import com.linxonline.mallet.io.serialisation.Serialise ;
 
 import com.linxonline.mallet.physics.Debug ;
 import com.linxonline.mallet.physics.Hull ;
+import com.linxonline.mallet.physics.Box2D ;
 import com.linxonline.mallet.physics.CollisionAssist ;
 
 import com.linxonline.mallet.util.inspect.DisplayEnvironment ;
@@ -179,7 +180,7 @@ public final class GameTestLoader implements IGameLoader
 				final EventQueue<Boolean> showFPS = Event.get( "SHOW_GAME_STATE_FPS" ) ;
 				showFPS.add( true ) ;
 
-				createScript() ;
+				//createScript() ;
 			}
 
 			private void createDisplayEnvironment()
@@ -311,14 +312,15 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createECSEntities( final int _row, final int _column )
 			{
+				final Hull[] hulls = new Hull[_row * _column] ;
+
 				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
-					final Hull[] hulls = new Hull[_row * _column] ;
 					for( int i = 0; i < _row; ++i )
 					{
 						for( int j = 0; j < _column; ++j )
 						{
-							final Hull hull = CollisionAssist.createBox2D( AABB.create( 0, 0, 64, 64 ), null ) ;
+							final Hull hull = new Box2D( AABB.create( 0, 0, 64, 64 ), null ) ;
 							hull.setPosition( i * 60, j * 60  ) ;
 							hull.setOffset( -32, -32 ) ;
 
@@ -326,6 +328,8 @@ public final class GameTestLoader implements IGameLoader
 							hulls[index] = hull ;
 						}
 					}
+
+					CollisionAssist.add( hulls ) ;
 
 					final ECSCollision.Component collision = ecsCollision.create( _parent, hulls ) ;
 
@@ -352,6 +356,8 @@ public final class GameTestLoader implements IGameLoader
 					ecsEvents.remove( ( ECSEvent.Component )_components[1] ) ;
 					ecsExample.remove( ( ExComponent )_components[2] ) ;
 					ecsCollision.remove( ( ECSCollision.Component )_components[3] ) ;
+
+					CollisionAssist.remove( hulls ) ;
 				} ;
 
 				final ECSEntity entity = new ECSEntity( create, destroy ) ;
@@ -451,7 +457,7 @@ public final class GameTestLoader implements IGameLoader
 					final DrawUpdater updater = pool.getOrCreate( world, program, plane, true, 10 ) ;
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.addDraws( draw ) ;
+					geometry.addDraw( draw ) ;
 				}
 			}
 
@@ -478,7 +484,7 @@ public final class GameTestLoader implements IGameLoader
 					cam.setOrthographic( Camera.Mode.WORLD, top, bottom, left, right, -1000.0f, 1000.0f ) ;
 					cam.setScreenResolution( dim.x / 4, dim.y / 4 ) ;
 
-					world.addCameras( cam ) ;
+					world.addCamera( cam ) ;
 				}
 
 				{
@@ -507,7 +513,7 @@ public final class GameTestLoader implements IGameLoader
 					final DrawUpdater updater = pool.getOrCreate( world, geomProgram, lines, false, 10 ) ;
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.addDraws( draw ) ;
+					geometry.addDraw( draw ) ;
 				}
 
 				{
@@ -561,7 +567,7 @@ public final class GameTestLoader implements IGameLoader
 					final DrawUpdater updater = pool.getOrCreate( world, program, plane, true, 10 ) ;
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.addDraws( draw ) ;
+					geometry.addDraw( draw ) ;
 
 					final HEShape.Edge closestEdge = plane.getClosestEdge( 512.0f, 33.0f, 0.0f ) ;
 					System.out.println( "Found Closest Edge: " + closestEdge.getOrigin().getVector3( 0, new Vector3() ) ) ;
@@ -622,7 +628,7 @@ public final class GameTestLoader implements IGameLoader
 				final TextUpdater updater = pool.getOrCreate( world, program, false, 200 ) ;
 
 				final TextBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.addDraws( draw ) ;
+				geometry.addDraw( draw ) ;
 			}
 
 			/**
@@ -776,7 +782,7 @@ public final class GameTestLoader implements IGameLoader
 					draw.setScale( 100, 100, 100 ) ;
 					draw.setShape( shape ) ;
 
-					geometry.addDraws( draw ) ;
+					geometry.addDraw( draw ) ;
 
 					return new ECSEntity.Component[]
 					{
@@ -800,7 +806,7 @@ public final class GameTestLoader implements IGameLoader
 								@Override
 								public void shutdown()
 								{
-									geometry.removeDraws( draw ) ;
+									geometry.removeDraw( draw ) ;
 								}
 							} ;
 						} )
@@ -973,11 +979,8 @@ public final class GameTestLoader implements IGameLoader
 				hull.getPosition( position ) ;
 				hull.getOffset( offset ) ;
 
-				final Draw draw = new Draw() ;
-				draw.setPosition( position.x, position.y, 0.0f ) ;
-				draw.setOffset( offset.x, offset.y, 0.0f ) ;
-
-				draws[i] = draw ;
+				draws[i] = new Draw( position.x, position.y, 0.0f,
+									 offset.x, offset.y, 0.0f ) ;
 			}
 
 			geometry.addDraws( draws ) ;

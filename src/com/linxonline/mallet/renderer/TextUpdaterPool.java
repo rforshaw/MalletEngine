@@ -43,7 +43,7 @@ public class TextUpdaterPool
 					}
 
 					DrawAssist.remove( buffer ) ;
-					_anchor.removeBuffers( buffer ) ;
+					_anchor.removeBuffer( buffer ) ;
 				}
 
 				_anchor.requestUpdate() ;
@@ -95,7 +95,7 @@ public class TextUpdaterPool
 					}
 
 					DrawAssist.remove( buffer ) ;
-					_anchor.removeBuffers( buffer ) ;
+					_anchor.removeBuffer( buffer ) ;
 				}
 
 				_anchor.requestUpdate() ;
@@ -125,9 +125,9 @@ public class TextUpdaterPool
 			final TextBuffer buffer = DrawAssist.add( new TextBuffer( _program, _ui, _order ) ) ;
 			updater = DrawAssist.add( new TextUpdater( buffer ) ) ;
 
-			updater.addBuffers( buffer ) ;
+			updater.addBuffer( buffer ) ;
 
-			_anchor.addBuffers( buffer ) ;
+			_anchor.addBuffer( buffer ) ;
 			_anchor.requestUpdate() ;
 
 			synchronized( pool )

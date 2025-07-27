@@ -58,8 +58,8 @@ public class EditorState extends GameState
 		final Camera edCamera = CameraAssist.add( new Camera( "EDITOR_CAMERA" ) ) ;
 		final Camera uiCamera = CameraAssist.add( new Camera( "UI_EDITOR_CAMERA" ) ) ;
 	
-		edWorld.addCameras( edCamera ) ;
-		uiWorld.addCameras( uiCamera ) ;
+		edWorld.addCamera( edCamera ) ;
+		uiWorld.addCamera( uiCamera ) ;
 
 		loadDefaultUILayout() ;
 	}

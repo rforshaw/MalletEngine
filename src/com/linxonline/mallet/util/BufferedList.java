@@ -1,6 +1,7 @@
 package com.linxonline.mallet.util ;
 
 import java.util.List ;
+import java.util.ArrayList ;
 import java.util.Iterator ;
 
 /**
@@ -22,8 +23,10 @@ public final class BufferedList<T>
 	} ;
 
 	private final int capacity ;
-	private List<Task> tasks ;
-	private final List<T> current ;
+	private ArrayList<Task> tasks ;
+
+	private int currentSize = 0 ;
+	private final ArrayList<T> current ;
 
 	private AddListener<T> addListener = ADD_FALLBACK ;
 	private RemoveListener<T> removeListener = REMOVE_FALLBACK ;
@@ -36,8 +39,8 @@ public final class BufferedList<T>
 	public BufferedList( final int _capacity )
 	{
 		capacity = _capacity ;
-		tasks = MalletList.<Task>newList( capacity ) ;
-		current = MalletList.<T>newList( capacity ) ;
+		tasks = new ArrayList( capacity ) ;
+		current = new ArrayList( capacity ) ;
 	}
 
 	public void setAddListener( final AddListener<T> _listener )
@@ -91,23 +94,23 @@ public final class BufferedList<T>
 	*/
 	public void update()
 	{
-		if( tasks.isEmpty() == true )
-		{
-			return ;
-		}
-
-		final int size = tasks.size() ;
-		for( int i = 0; i < size; i++ )
+		final int taskSize = tasks.size() ;
+		for( int i = 0; i < taskSize; i++ )
 		{
 			tasks.get( i ).execute() ;
 		}
 
-		if( size > capacity )
+		if( currentSize > taskSize )
+		{
+			current.trimToSize() ;
+		}
+
+		if( taskSize > capacity )
 		{
 			// If the size of tasks exceeds our capacity then 
 			// we want to resize the array - it's easy for an 
 			// array to expand, it's much harder to shrink it!
-			tasks = MalletList.<Task>newList( capacity ) ;
+			tasks = new ArrayList<Task>( capacity ) ;
 			return ;
 		}
 
@@ -150,6 +153,8 @@ public final class BufferedList<T>
 		{
 			current.add( data ) ;
 			addListener.add( data ) ;
+
+			currentSize = current.size() ;
 		}
 	}
 
@@ -165,6 +170,7 @@ public final class BufferedList<T>
 		{
 			if( current.remove( data ) == true )
 			{
+				currentSize = current.size() ;
 				removeListener.remove( data ) ;
 			}
 		}
@@ -210,10 +216,12 @@ public final class BufferedList<T>
 			if( index < current.size() )
 			{
 				current.add( index, data ) ;
+				currentSize = current.size() ;
 				return ;
 			}
 
 			current.add( data ) ;
+			currentSize = current.size() ;
 		}
 	}
 

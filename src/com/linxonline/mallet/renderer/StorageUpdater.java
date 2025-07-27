@@ -52,26 +52,17 @@ public final class StorageUpdater<D extends IUpdate> implements IUpdater
 		return dirty || forceUpdate ;
 	}
 
-	public void addBuffers( final Storage ... _buffers )
+	public Storage addBuffer( final Storage _storage )
 	{
 		makeDirty() ;
-		final int size = _buffers.length ;
-		for( int i = 0; i < size; ++i )
-		{
-			final Storage storage = _buffers[i] ;
-			buffers.add( storage ) ;
-		}
+		buffers.add( _storage ) ;
+		return _storage ;
 	}
 
-	public void removeBuffers( final Storage ... _buffers )
+	public void removeBuffer( final Storage _storage )
 	{
 		makeDirty() ;
-		final int size = _buffers.length ;
-		for( int i = 0; i < size; ++i )
-		{
-			final Storage storage = _buffers[i] ;
-			buffers.remove( storage ) ;
-		}
+		buffers.remove( _storage ) ;
 	}
 
 	public void addDynamics( final D ... _dynamics )

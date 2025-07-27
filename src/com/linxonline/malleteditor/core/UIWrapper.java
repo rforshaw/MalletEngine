@@ -410,13 +410,13 @@ public class UIWrapper extends UIElement
 				// Remove the draw object from the previous 
 				// updater the draw may have changed significantly.
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraws( draw ) ;
+				geometry.removeDraw( draw ) ;
 			}
 
 			updater = GUI.getDrawUpdater( _world, ( Shape )draw.getShape(), getLayer() ) ;
 
 			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-			geometry.addDraws( draw ) ;
+			geometry.addDraw( draw ) ;
 		}
 
 		@Override
@@ -425,7 +425,7 @@ public class UIWrapper extends UIElement
 			if( updater != null )
 			{
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraws( draw ) ;
+				geometry.removeDraw( draw ) ;
 			}
 		}
 
@@ -435,7 +435,7 @@ public class UIWrapper extends UIElement
 			if( updater != null )
 			{
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraws( draw ) ;
+				geometry.removeDraw( draw ) ;
 			}
 
 			updater = GUI.getDrawUpdater( getWorld(), ( Shape )draw.getShape(), _layer ) ;

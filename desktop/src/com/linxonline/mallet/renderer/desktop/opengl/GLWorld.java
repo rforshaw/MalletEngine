@@ -221,27 +221,12 @@ public class GLWorld
 		drawBuffers.clear() ;
 		for( final ABuffer buffer : _world.getBuffers() )
 		{
-			switch( buffer )
+			final int index = buffer.index() ;
+			final GLBuffer buff = _buffers.getRHS( index ) ;
+			if( buff != null )
 			{
-				case DrawInstancedBuffer b : addToDrawBuffers( b, _buffers ) ; break ;
-				case DrawBuffer b          : addToDrawBuffers( b, _buffers ) ; break ;
-				case TextBuffer b          : addToDrawBuffers( b, _buffers ) ; break ;
-				default                    :
-				{
-					Logger.println( "Attempting to add incompatible buffer to World.", Logger.Verbosity.NORMAL ) ;
-					break ;
-				}
-			} ;
-		}
-	}
-
-	private void addToDrawBuffers( final ABuffer _buffer, final AssetLookup<ABuffer, GLBuffer> _buffers )
-	{
-		final int index = _buffer.index() ;
-		final GLBuffer buff = _buffers.getRHS( index ) ;
-		if( buff != null )
-		{
-			drawBuffers.add( buff ) ;
+				drawBuffers.add( buff ) ;
+			}
 		}
 	}
 

@@ -7,3 +7,7 @@ do
 done
 
 java --module-path $CLASSPATH -XX:MinHeapFreeRatio=1 -XX:MaxHeapFreeRatio=5 -Dsun.awt.noerasebackground=true -Dsun.java2d.noddraw=true --module MalletEngine/com.linxonline.mallet.core.desktop.DesktopTestMain $@
+
+##/opt/graalvm-jdk-21.0.7+8.1/bin/java -agentlib:native-image-agent=config-output-dir=config --module-path $CLASSPATH --module MalletEngine/com.linxonline.mallet.core.desktop.DesktopTestMain $@
+
+##/opt/graalvm-jdk-21.0.7+8.1/bin/native-image --no-fallback -H:ConfigurationFileDirectories=config -Djava.awt.headless=false --module-path $CLASSPATH --module MalletEngine/com.linxonline.mallet.core.desktop.DesktopTestMain $@

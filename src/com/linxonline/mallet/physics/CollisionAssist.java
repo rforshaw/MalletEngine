@@ -14,27 +14,22 @@ public class CollisionAssist
 		assist = _assist ;
 	}
 
-	public static Box2D createBox2D( final AABB _aabb, final int[] _collidables )
+	public static <T extends Hull> T add( T _hull )
 	{
-		return assist.createBox2D( _aabb, _collidables ) ;
+		return assist.add( _hull ) ;
 	}
 
-	public static Box2D createBox2D( final OBB _obb, final int[] _collidables )
+	public static <T extends Hull> void add( final T[] _hulls ) 
 	{
-		return assist.createBox2D( _obb, _collidables ) ;
+		assist.add( _hulls ) ;
 	}
 
-	public static void add( final Hull _hull )
-	{
-		assist.add( _hull ) ;
-	}
-
-	public static void remove( final Hull _hull )
+	public static <T extends Hull> void remove( final T _hull )
 	{
 		assist.remove( _hull ) ;
 	}
 
-	public static void remove( final Hull[] _hulls )
+	public static <T extends Hull> void remove( final T[] _hulls )
 	{
 		assist.remove( _hulls ) ;
 	}
@@ -51,13 +46,11 @@ public class CollisionAssist
 
 	public interface IAssist
 	{
-		public Box2D createBox2D( final AABB _aabb, final int[] _collidables ) ;
-		public Box2D createBox2D( final OBB _obb, final int[] _collidables ) ;
+		public <T extends Hull> T add( final T _hull ) ;
+		public <T extends Hull> void add( final T[] _hulls ) ;
 
-		public void add( final Hull _hull ) ;
-
-		public void remove( final Hull _hull ) ;
-		public void remove( final Hull[] _hulls ) ;
+		public <T extends Hull> void remove( final T _hull ) ;
+		public <T extends Hull> void remove( final T[] _hulls ) ;
 
 		public ICollisionDelegate createCollisionDelegate() ;
 		public void removeCollisionDelegate( ICollisionDelegate _delegate ) ;

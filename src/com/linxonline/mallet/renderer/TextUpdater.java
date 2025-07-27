@@ -44,26 +44,17 @@ public final class TextUpdater implements IUpdater
 		return dirty || forceUpdate ;
 	}
 
-	public void addBuffers( final TextBuffer ... _buffers )
+	public TextBuffer addBuffer( final TextBuffer _buffer )
 	{
 		forceUpdate() ;
-		final int size = _buffers.length ;
-		for( int i = 0; i < size; ++i )
-		{
-			final TextBuffer buffer = _buffers[i] ;
-			buffers.add( buffer ) ;
-		}
+		buffers.add( _buffer ) ;
+		return _buffer ;
 	}
 
-	public void removeBuffers( final TextBuffer ... _buffers )
+	public void removeBuffer( final TextBuffer _buffer )
 	{
 		forceUpdate() ;
-		final int size = _buffers.length ;
-		for( int i = 0; i < size; ++i )
-		{
-			final TextBuffer buffer = _buffers[i] ;
-			buffers.remove( buffer ) ;
-		}
+		buffers.remove( _buffer ) ;
 	}
 
 	public TextBuffer getBuffer( final int _index )

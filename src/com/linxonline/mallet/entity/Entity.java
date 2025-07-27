@@ -39,20 +39,15 @@ public class Entity
 		this( _capacity, AllowEvents.LOCAL ) ;
 	}
 
-	public Entity( final int _capacity, final AllowEvents ... _allow )
+	public Entity( final int _capacity, final AllowEvents _allow )
 	{
 		components = new Component[_capacity] ;
-		final int size = _allow.length ;
-		for( int i = 0; i < size; ++i )
+		switch( _allow )
 		{
-			final AllowEvents allow = _allow[i] ;
-			switch( allow )
-			{
-				default        :
-				case YES       :
-				case LOCAL     : eventState = new EventState() ; break ;
-				case NO        : break ;
-			}
+			default        :
+			case YES       :
+			case LOCAL     : eventState = new EventState() ; break ;
+			case NO        : break ;
 		}
 	}
 

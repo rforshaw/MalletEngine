@@ -1,11 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
-
-public final class Depth extends ABuffer implements IManageBuffers
+public final class Depth extends ABuffer
 {
 	private final int order ;
 
@@ -16,18 +11,15 @@ public final class Depth extends ABuffer implements IManageBuffers
 	private boolean enable = true ;
 
 	/**
-		It's likely that whatever is being rendered as the stencil
+		It's likely that whatever is being rendered as the depth
 		we don't actually want to render to the colour buffer.
 		Assume by default this is the case, and prevent rendering
 		to it.
 	*/
 	private final boolean[] colourMask = new boolean[] { false, false, false, false } ;
 
-	private final List<ABuffer> buffers ;
-
 	public Depth( final int _order, final Operation _op, final boolean _mask )
 	{
-		buffers = MalletList.<ABuffer>newList() ;
 		order = _order ;
 
 		op = _op ;
@@ -35,7 +27,7 @@ public final class Depth extends ABuffer implements IManageBuffers
 	}
 
 	/**
-		Determine whether the stencilbuffer should cleared
+		Determine whether the depth buffer should cleared
 		before enacting the specified depth operations.
 	*/
 	public void setClear( final boolean _clear )
@@ -64,53 +56,6 @@ public final class Depth extends ABuffer implements IManageBuffers
 		colourMask[3] = _alpha ;
 	}
 
-	@Override
-	public ABuffer[] addBuffers( final ABuffer ... _buffers )
-	{
-		for( final ABuffer buffer : _buffers )
-		{
-			insert( buffer, buffers ) ;
-		}
-		return _buffers ;
-	}
-
-	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
-	{
-		switch( _insert )
-		{
-			case DrawInstancedBuffer b : break ;
-			case DrawBuffer b          : break ;
-			case TextBuffer b          : break ;
-			default                    :
-			{
-				Logger.println( "Attempting to add incompatible buffer to Depth, skipping.", Logger.Verbosity.NORMAL ) ;
-				return ;
-			}
-		} ;
-
-		final int size = _list.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final ABuffer toCompare = _list.get( i ) ;
-			if( _insert.getOrder() <= toCompare.getOrder() )
-			{
-				_list.add( i, _insert ) ;		// Insert at index location
-				return ;
-			}
-		}
-
-		_list.add( _insert ) ;
-	}
-
-	@Override
-	public void removeBuffers( final ABuffer ... _buffers )
-	{
-		for( final ABuffer buffer : _buffers )
-		{
-			buffers.remove( buffer ) ;
-		}
-	}
-
 	public boolean isEnabled()
 	{
 		return enable ;
@@ -119,12 +64,6 @@ public final class Depth extends ABuffer implements IManageBuffers
 	public boolean shouldClear()
 	{
 		return clear ;
-	}
-
-	@Override
-	public List<ABuffer> getBuffers()
-	{
-		return buffers ;
 	}
 
 	public Operation getOperation()

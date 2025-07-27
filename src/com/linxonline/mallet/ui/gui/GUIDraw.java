@@ -91,7 +91,7 @@ public class GUIDraw extends GUIComponent
 		updater = GUI.getDrawUpdater( _world, sheet, shape, layer ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
-		geometry.addDraws( draw ) ;
+		geometry.addDraw( draw ) ;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			geometry.removeDraws( draw ) ;
+			geometry.removeDraw( draw ) ;
 			updater.forceUpdate() ;
 		}
 	}
@@ -109,7 +109,7 @@ public class GUIDraw extends GUIComponent
 	{
 		if( updater != null )
 		{
-			geometry.removeDraws( draw ) ;
+			geometry.removeDraw( draw ) ;
 			updater.forceUpdate() ;
 		}
 

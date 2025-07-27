@@ -68,7 +68,7 @@ public final class UIList extends UILayout
 			{
 				if( updater != null )
 				{
-					geometry.removeDraws( frame.getFrame() ) ;
+					geometry.removeDraw( frame.getFrame() ) ;
 				}
 
 				if( externalWorld != null )
@@ -84,7 +84,7 @@ public final class UIList extends UILayout
 					updater.setInterpolation( Interpolation.NONE ) ;
 
 					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.addDraws( draw ) ;
+					geometry.addDraw( draw ) ;
 				}
 			}
 		} ) ;
@@ -235,7 +235,7 @@ public final class UIList extends UILayout
 		updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, getLayer() + 1 ) ;
 
 		geometry = updater.getBuffer( 0 ) ;
-		geometry.addDraws( draw ) ;
+		geometry.addDraw( draw ) ;
 	}
 
 	private void setListWorldAndCamera( final World _world, final Camera _camera )

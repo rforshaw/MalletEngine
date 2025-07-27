@@ -2,6 +2,8 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 import java.util.ArrayList ;
+import java.util.Comparator ;
+import java.util.Collections ;
 
 public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
 {
@@ -49,37 +51,24 @@ public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
 		occluder = ( _occluder != null ) ? _occluder : OCCLUDER_FALLBACK ;
 	}
 
-	public void addBuffers( final GeometryBuffer ... _buffers )
+	public void addBuffer( final GeometryBuffer _buffer )
 	{
-		final int size = _buffers.length ;
-
-		buffers.ensureCapacity( buffers.size() + size ) ;
-		for( int i = 0; i < size; ++i )
+		if( program.isCompatible( _buffer.getAttribute() ) == false )
 		{
-			final GeometryBuffer buffer = _buffers[i] ;
-			if( program.isCompatible( buffer.getAttribute() ) == false )
-			{
-				throw new RuntimeException( String.format( "Incompatible GeometryBuffer to DrawBuffer with program: %s.", program.getID() ) ) ;
-			}
-
-			ranges.add( null ) ;
-			buffers.add( buffer ) ;
+			throw new RuntimeException( String.format( "Incompatible GeometryBuffer to DrawBuffer with program: %s.", program.getID() ) ) ;
 		}
+
+		ranges.add( null ) ;
+		buffers.add( _buffer ) ;
 	}
 
-	public void removeBuffers( final GeometryBuffer ... _buffers )
+	public void removeBuffer( final GeometryBuffer _buffer )
 	{
-		final int size = _buffers.length ;
-		for( int i = 0; i < size; ++i )
+		final int index = buffers.indexOf( _buffer ) ;
+		if( index >= 0 )
 		{
-			final GeometryBuffer buffer = _buffers[i] ;
-
-			final int index = buffers.indexOf( buffer ) ;
-			if( index >= 0 )
-			{
-				ranges.remove( index ) ;
-				buffers.remove( index ) ;
-			}
+			ranges.remove( index ) ;
+			buffers.remove( index ) ;
 		}
 	}
 
@@ -126,6 +115,17 @@ public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
 	public void requestUpdate()
 	{
 		DrawAssist.update( this ) ;
+	}
+
+	/**
+		Trigger a call to sort the order in which
+		the buffers are rendered to.
+		This is the same as if you called:
+		Collections.sort( buffers, ... ) ;
+	*/
+	public void sortBuffers( final Comparator<GeometryBuffer> _c )
+	{
+		Collections.sort( buffers, _c ) ;
 	}
 
 	public static boolean isCompatible( final DrawBuffer _lhs, final DrawBuffer _rhs )

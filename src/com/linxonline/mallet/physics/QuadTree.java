@@ -1,8 +1,8 @@
 package com.linxonline.mallet.physics ;
 
 import java.util.List ;
+import java.util.ArrayList ;
 
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Parallel ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
 
@@ -15,12 +15,13 @@ public final class QuadTree
 {
 	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
 
-	private final List<Hull> failed = MalletList.<Hull>newList() ;
+	private final ArrayList<Hull> failed = new ArrayList<Hull>() ;
 	private final IUpdate update ;
 
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
 
+	private int lastFailedSize = 0 ;
 	private float ROOT_LENGTH ;
 
 	private enum Quadrant
@@ -36,7 +37,7 @@ public final class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 2000.0f, 128.0f, 100 ) ;
+		this( 0.0f, 0.0f, 2000.0f, 128.0f, 20 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -54,8 +55,10 @@ public final class QuadTree
 		update = new IUpdate()
 		{
 			// Used when multi-threading
-			private final List<QuadNode> children = MalletList.<QuadNode>newList() ;
+			private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
 			private final NodeWorker worker = new NodeWorker() ;
+
+			private boolean refreshChildren = true ;
 
 			@Override
 			public void update( final float _dt )
@@ -99,6 +102,13 @@ public final class QuadTree
 		{
 			insertHull( failed.get( i ) ) ;
 		}
+
+		if( size < lastFailedSize )
+		{
+			failed.trimToSize() ;
+		}
+
+		lastFailedSize = size ;
 		failed.clear() ;
 	}
 
@@ -148,11 +158,11 @@ public final class QuadTree
 
 	protected final class QuadNode
 	{
-		private final Object lock = new Object() ;
-		private final Vector2 centre = new Vector2() ;
+		private final float x ;
+		private final float y ;
 
-		private CollisionCheck check = new CollisionCheck() ;
-		private Hull[] hulls = new Hull[MAX_HULLS] ;
+		private CollisionCheck check ;
+		private Hull[] hulls = EMPTY_HULLS ;
 
 		private QuadNode topLeft ;
 		private QuadNode topRight ;
@@ -165,7 +175,8 @@ public final class QuadTree
 
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
-			centre.setXY( _x, _y ) ;
+			x = _x ;
+			y = _y ;
 			length = _length ;
 
 			if( _quadrant == Quadrant.ROOT )
@@ -197,7 +208,7 @@ public final class QuadTree
 		{
 			if( parent == true )
 			{
-				switch( findQuadrant( _ray.getPoint(), centre ) )
+				switch( findQuadrant( _ray.getPoint() ) )
 				{
 					default           : return null ;
 					case TOP_LEFT     : return topLeft.ray( _ray, _f ) ;
@@ -246,8 +257,14 @@ public final class QuadTree
 				return insertToQuadrantFast( _hull ) ;
 			}
 
-			synchronized( lock )
+			synchronized( hulls )
 			{
+				if( hulls.length == 0 )
+				{
+					hulls = new Hull[MAX_HULLS] ;
+					check = new CollisionCheck() ;
+				}
+
 				if( nextHull < hulls.length )
 				{
 					// We assume the check to see if the 
@@ -276,7 +293,14 @@ public final class QuadTree
 				// any hulls, only children should.
 				return insertToQuadrant( _hull ) ;
 			}
-			else if( nextHull < hulls.length )
+
+			if( hulls.length == 0 )
+			{
+				hulls = new Hull[MAX_HULLS] ;
+				check = new CollisionCheck() ;
+			}
+
+			if( nextHull < hulls.length )
 			{
 				// We assume the check to see if the 
 				// hull already exists within this node has 
@@ -437,10 +461,12 @@ public final class QuadTree
 
 		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
 		{
+			check.setBaseHull( _hull1 ) ;
+
 			for( int j = _index + 1; j < nextHull; ++j )
 			{
 				final Hull hull2 = _hulls[j] ;
-				check.generateContactPoint( _hull1, hull2 ) ;
+				check.generateContactPoint( hull2 ) ;
 			}
 		}
 		
@@ -536,7 +562,7 @@ public final class QuadTree
 				// A hull could potentially be in multiple 
 				// quadrants, as a hulls points may cross 
 				// quadrant boundaries.
-				switch( findQuadrant( absolute, centre ) )
+				switch( findQuadrant( absolute ) )
 				{
 					case TOP_LEFT     :
 					{
@@ -639,7 +665,7 @@ public final class QuadTree
 				// A hull could potentially be in multiple 
 				// quadrants, as a hulls points may cross 
 				// quadrant boundaries.
-				switch( findQuadrant( absolute, centre ) )
+				switch( findQuadrant( absolute ) )
 				{
 					case TOP_LEFT     :
 					{
@@ -729,7 +755,7 @@ public final class QuadTree
 				absolute.add( x, y ) ;
 
 				// Find out what quadrants the hull covers. 
-				switch( findQuadrant( absolute, centre ) )
+				switch( findQuadrant( absolute ) )
 				{
 					case TOP_LEFT     :
 					{
@@ -799,10 +825,10 @@ public final class QuadTree
 				return false ;
 			}
 
-			topLeft = new QuadNode( centre.x - _offset, centre.y + _offset, _offset, Quadrant.TOP_LEFT ) ;
-			topRight = new QuadNode( centre.x + _offset, centre.y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
-			bottomLeft = new QuadNode( centre.x - _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
-			bottomRight = new QuadNode( centre.x + _offset, centre.y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
+			topLeft = new QuadNode( x - _offset, y + _offset, _offset, Quadrant.TOP_LEFT ) ;
+			topRight = new QuadNode( x + _offset, y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
+			bottomLeft = new QuadNode( x - _offset, y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
+			bottomRight = new QuadNode( x + _offset, y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
 
 			for( int i = 0; i < nextHull; i++ )
 			{
@@ -828,7 +854,7 @@ public final class QuadTree
 		{
 			ROOT_LENGTH += ROOT_LENGTH ;
 
-			final QuadNode tempRoot = new QuadNode( centre.x, centre.y, ROOT_LENGTH, Quadrant.ROOT ) ;
+			final QuadNode tempRoot = new QuadNode( x, y, ROOT_LENGTH, Quadrant.ROOT ) ;
 			tempRoot.createChildren() ;
 
 			tempRoot.topLeft.createChildren() ;
@@ -854,31 +880,33 @@ public final class QuadTree
 		{
 			return nextHull ;
 		}
+
+		protected Quadrant findQuadrant( final Vector2 _point )
+		{
+			if( _point.x >= x )
+			{
+				return ( _point.y >= y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
+			}
+			else
+			{
+				return ( _point.y >= y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
+			}
+		}
+
+		protected Quadrant findQuadrant( final Vector3 _point )
+		{
+			if( _point.x >= x )
+			{
+				return ( _point.y >= y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
+			}
+			else
+			{
+				return ( _point.y >= y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
+			}
+		}
 	}
 
-	protected static Quadrant findQuadrant( final Vector2 _point, final Vector2 _centre )
-	{
-		if( _point.x >= _centre.x )
-		{
-			return ( _point.y >= _centre.y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
-		}
-		else
-		{
-			return ( _point.y >= _centre.y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
-		}
-	}
 
-	protected static Quadrant findQuadrant( final Vector3 _point, final Vector2 _centre )
-	{
-		if( _point.x >= _centre.x )
-		{
-			return ( _point.y >= _centre.y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
-		}
-		else
-		{
-			return ( _point.y >= _centre.y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
-		}
-	}
 
 	private interface IUpdate
 	{

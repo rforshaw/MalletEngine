@@ -4,13 +4,19 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.maths.* ;
+import com.linxonline.mallet.renderer.World ;
+import com.linxonline.mallet.renderer.CameraAssist ;
+import com.linxonline.mallet.renderer.Camera ;
+
+import com.linxonline.mallet.input.IInputHandler ;
+import com.linxonline.mallet.input.InputEvent ;
+
+import com.linxonline.mallet.maths.Vector2 ;
+import com.linxonline.mallet.maths.Vector3 ;
 
 /**
 	Base class for all UI related systems.
-	It can receive user input and event.
+	It can receive user input.
 
 	The UIElement defines the confines that the developer is restricted to
 	when implementing their custom components.
@@ -22,9 +28,17 @@ import com.linxonline.mallet.maths.* ;
 public class UIElement implements IInputHandler, Connect.Connection
 {
 	private final static float DEFAULT_MARGIN_SIZE = 5.0f ;		// In pixels
+	private final static ComponentUnit UNINIT_UNIT = new ComponentUnit()
+	{
+		@Override
+		public boolean add( final int _index, final UIElement.Component _component )
+		{
+			throw new RuntimeException( "UI failed to construct own component-unit." ) ;
+		}
+	} ;
 
-	private final ComponentUnit components = new ComponentUnit() ;
 	private final static Connect connect = new Connect() ;
+	private ComponentUnit components = UNINIT_UNIT ;
 
 	protected State current = State.NEUTRAL ;
 
@@ -123,6 +137,11 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	private <T extends UIElement.Component> T addComponent( final int _index, final T _component )
 	{
+		if( components == UNINIT_UNIT )
+		{
+			components = new ComponentUnit() ;
+		}
+
 		components.add( _index, _component ) ;
 		return _component ;
 	}
@@ -174,7 +193,12 @@ public class UIElement implements IInputHandler, Connect.Connection
 	*/
 	public void engage()
 	{
-		if( current != State.ENGAGED && isDisabled() == false )
+		if( isDisabled() )
+		{
+			return ;
+		}
+
+		if( current == State.NEUTRAL )
 		{
 			current = State.ENGAGED ;
 			UIElement.signal( this, elementEngaged() ) ;
@@ -1397,7 +1421,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setMinimumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3Ceil( minimumLength.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3( minimumLength.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, minimumLength.getSignal() ) ;
 			}
@@ -1413,7 +1437,7 @@ public class UIElement implements IInputHandler, Connect.Connection
 
 		public final void setMaximumLength( final float _x, final float _y, final float _z )
 		{
-			if( UI.applyVec3Ceil( maximumLength.toVector3(), _x, _y, _z ) == true )
+			if( UI.applyVec3( maximumLength.toVector3(), _x, _y, _z ) == true )
 			{
 				UIElement.signal( this, maximumLength.getSignal() ) ;
 			}

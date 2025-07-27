@@ -4,7 +4,7 @@ import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
 
-public final class ComponentUnit
+public class ComponentUnit
 {
 	private final List<UIElement.Component> components = MalletList.<UIElement.Component>newList() ;
 

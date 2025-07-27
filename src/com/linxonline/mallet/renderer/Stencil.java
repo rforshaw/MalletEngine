@@ -1,11 +1,11 @@
 package com.linxonline.mallet.renderer ;
 
-import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
-
-public final class Stencil extends ABuffer implements IManageBuffers
+/**
+	Stencils should come in pairs, one to set up
+	the stencil then another to dismantel back to
+	the intended state.
+*/
+public final class Stencil extends ABuffer
 {
 	private final int order ;
 
@@ -28,13 +28,10 @@ public final class Stencil extends ABuffer implements IManageBuffers
 	*/
 	private final boolean[] colourMask = new boolean[] { false, false, false, false } ;
 
-	private final List<ABuffer> buffers ;
-
 	public Stencil( final int _order,
 					final Action _stencilFail, final Action _depthFail, final Action _depthPass,
 					final Operation _op, final int _reference, final int _mask )
 	{
-		buffers = MalletList.<ABuffer>newList() ;
 		order = _order ;
 
 		stencilFail = _stencilFail ;
@@ -76,53 +73,6 @@ public final class Stencil extends ABuffer implements IManageBuffers
 		colourMask[3] = _alpha ;
 	}
 
-	@Override
-	public ABuffer[] addBuffers( final ABuffer ... _buffers )
-	{
-		for( final ABuffer buffer : _buffers )
-		{
-			insert( buffer, buffers ) ;
-		}
-		return _buffers ;
-	}
-
-	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
-	{
-		switch( _insert )
-		{
-			case DrawInstancedBuffer b : break ;
-			case DrawBuffer b          : break ;
-			case TextBuffer b          : break ;
-			default                    :
-			{
-				Logger.println( "Attempting to add incompatible buffer to Stencil, skipping.", Logger.Verbosity.NORMAL ) ;
-				return ;
-			}
-		} ;
-
-		final int size = _list.size() ;
-		for( int i = 0; i < size; i++ )
-		{
-			final ABuffer toCompare = _list.get( i ) ;
-			if( _insert.getOrder() <= toCompare.getOrder() )
-			{
-				_list.add( i, _insert ) ;		// Insert at index location
-				return ;
-			}
-		}
-
-		_list.add( _insert ) ;
-	}
-
-	@Override
-	public void removeBuffers( final ABuffer ... _buffers )
-	{
-		for( final ABuffer buffer : _buffers )
-		{
-			buffers.remove( buffer ) ;
-		}
-	}
-
 	public boolean isEnabled()
 	{
 		return enable ;
@@ -131,12 +81,6 @@ public final class Stencil extends ABuffer implements IManageBuffers
 	public boolean shouldClear()
 	{
 		return clear ;
-	}
-
-	@Override
-	public List<ABuffer> getBuffers()
-	{
-		return buffers ;
 	}
 
 	public Action getStencilFail()

@@ -9,13 +9,11 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class Draw implements IUpdate
 {
-	public static final EmptyMeta EMPTY_META = new EmptyMeta() ;
-
 	// Each contain Position, Rotation, and Scale
 	private final Transformation trans ;
 
 	private IShape[] shapes ;
-	private IMeta meta = EMPTY_META ;
+	private IMeta meta = IMeta.EMPTY_META ;
 	private boolean hidden = false ;
 
 	// We don't want to construct a map for uniforms unless the client
@@ -70,7 +68,7 @@ public final class Draw implements IUpdate
 	*/
 	public void setMeta( final IMeta _meta )
 	{
-		meta = ( _meta != null ) ? _meta : EMPTY_META ;
+		meta = ( _meta != null ) ? _meta : IMeta.EMPTY_META ;
 	}
 
 	/**
@@ -279,31 +277,5 @@ public final class Draw implements IUpdate
 	public boolean update( Interpolation _mode, final float _coefficient )
 	{
 		return trans.update( _mode, _coefficient ) ;
-	}
-
-	/**
-		Extend the meta interface when you have information
-		you want to bundle along with the Draw object.
-		This meta information could be used for a variety
-		of purposes, such as: occlusion or identify the parent.
-	*/
-	public interface IMeta
-	{
-		/**
-			It's possible the developer will define multiple
-			meta classes for different draw object use-cases.
-			Each class should return a unique int that can be
-			used to cast the object to the correct definition.
-		*/
-		public int getType() ;
-	}
-
-	private static final class EmptyMeta implements IMeta
-	{
-		@Override
-		public int getType()
-		{
-			return -1 ;
-		}
 	}
 }

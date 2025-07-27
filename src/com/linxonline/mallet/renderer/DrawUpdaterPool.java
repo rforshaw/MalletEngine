@@ -45,7 +45,7 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				_anchor.removeBuffers( buffer ) ;
+				_anchor.removeBuffer( buffer ) ;
 				_anchor.requestUpdate() ;
 
 				iterator.remove() ;
@@ -96,7 +96,7 @@ public class DrawUpdaterPool
 					continue ;
 				}
 
-				_anchor.removeBuffers( buffer ) ;
+				_anchor.removeBuffer( buffer ) ;
 				_anchor.requestUpdate() ;
 
 				iterator.remove() ;
@@ -130,10 +130,10 @@ public class DrawUpdaterPool
 
 		final DrawUpdater updater = DrawAssist.add( new DrawUpdater( buffer ) ) ;
 
-		_anchor.addBuffers( buffer ) ;
+		_anchor.addBuffer( buffer ) ;
 		_anchor.requestUpdate() ;
 
-		buffer.addBuffers( geom ) ;
+		buffer.addBuffer( geom ) ;
 		buffer.requestUpdate() ;
 
 		synchronized( pool )

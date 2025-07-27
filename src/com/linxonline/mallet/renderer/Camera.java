@@ -50,6 +50,7 @@ public final class Camera
 	private final Vector2 scaledRender = new Vector2() ;
 	private final Vector2 ratio = new Vector2() ;
 
+	private IMeta meta = IMeta.EMPTY_META ;
 	private boolean viewMatrixDirty = true ;
 
 	public Camera( final String _id )
@@ -150,6 +151,17 @@ public final class Camera
 	public String getID()
 	{
 		return id ;
+	}
+
+	public IMeta setMeta( final IMeta _meta )
+	{
+		meta = ( _meta != null ) ? _meta : IMeta.EMPTY_META ;
+		return meta ;
+	}
+
+	public IMeta getMeta()
+	{
+		return meta ;
 	}
 
 	public void setPosition( final float _x, final float _y, final float _z )

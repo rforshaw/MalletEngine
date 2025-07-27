@@ -59,16 +59,16 @@ public final class DrawUpdater implements IUpdater
 		drawBuffer.setOccluder( _occluder ) ;
 	}
 
-	public void addBuffers( final GeometryBuffer ... _buffers )
+	public void addBuffer( final GeometryBuffer _buffer )
 	{
 		makeDirty() ;
-		drawBuffer.addBuffers( _buffers ) ;
+		drawBuffer.addBuffer( _buffer ) ;
 	}
 
-	public void removeBuffers( final GeometryBuffer ... _buffers )
+	public void removeBuffer( final GeometryBuffer _buffer )
 	{
 		makeDirty() ;
-		drawBuffer.removeBuffers( _buffers ) ;
+		drawBuffer.removeBuffer( _buffer ) ;
 	}
 
 	public GeometryBuffer getBuffer( final int _index )

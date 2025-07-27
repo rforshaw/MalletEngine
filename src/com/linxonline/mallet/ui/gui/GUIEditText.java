@@ -109,7 +109,7 @@ public class GUIEditText extends GUIText
 			// Remove the draw object from the previous 
 			// updater the draw may have changed significantly.
 			final TextBuffer geometry = updater.getBuffer( 0 ) ;
-			geometry.removeDraws( drawPlaceholder ) ;
+			geometry.removeDraw( drawPlaceholder ) ;
 			updater.forceUpdate() ;
 		}
 
@@ -117,12 +117,12 @@ public class GUIEditText extends GUIText
 
 		cursorUpdater = GUI.getDrawUpdater( _world, ( Shape )cursorDraw.getShape(), getLayer() ) ;
 		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
-		cursorGeometry.addDraws( cursorDraw ) ;
+		cursorGeometry.addDraw( cursorDraw ) ;
 
 		updater = getUpdater() ;
 
 		final TextBuffer geometry = updater.getBuffer( 0 ) ;
-		geometry.addDraws( drawPlaceholder ) ;
+		geometry.addDraw( drawPlaceholder ) ;
 
 		final UITextField parent = getParent() ;
 		parent.makeDirty() ;
@@ -140,11 +140,11 @@ public class GUIEditText extends GUIText
 		if( updater != null )
 		{
 			final TextBuffer geometry = updater.getBuffer( 0 ) ;
-			geometry.removeDraws( drawPlaceholder ) ;
+			geometry.removeDraw( drawPlaceholder ) ;
 			updater.forceUpdate() ;
 		}
 
-		cursorGeometry.removeDraws( cursorDraw ) ;
+		cursorGeometry.removeDraw( cursorDraw ) ;
 		cursorUpdater.forceUpdate() ;
 	}
 
@@ -155,18 +155,18 @@ public class GUIEditText extends GUIText
 		if( updater != null )
 		{
 			final TextBuffer geometry = updater.getBuffer( 0 ) ;
-			geometry.removeDraws( drawPlaceholder ) ;
+			geometry.removeDraw( drawPlaceholder ) ;
 			updater.forceUpdate() ;
 		}
 
 		super.layerUpdated( _layer ) ;
 
-		cursorGeometry.removeDraws( cursorDraw ) ;
+		cursorGeometry.removeDraw( cursorDraw ) ;
 		cursorUpdater.forceUpdate() ;
 
 		cursorUpdater = GUI.getDrawUpdater( getWorld(), ( Shape )cursorDraw.getShape(), _layer ) ;
 		cursorGeometry = cursorUpdater.getBuffer( 0 ) ;
-		cursorGeometry.addDraws( cursorDraw ) ;
+		cursorGeometry.addDraw( cursorDraw ) ;
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public final class FrameBuffer
 
 		camera = CameraAssist.add( new Camera( uid ) ) ;
 		world = WorldAssist.add( new World( uid ) ) ;
-		world.addCameras( camera ) ;
+		world.addCamera( camera ) ;
 
 		frame = new Draw( _posX, _posY, _posZ,
 						  _offX, _offY, _offZ ) ;

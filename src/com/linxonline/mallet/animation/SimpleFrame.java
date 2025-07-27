@@ -119,7 +119,7 @@ public final class SimpleFrame implements Animation.Frame
 			if( updater != null )
 			{
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraws( draw ) ;
+				geometry.removeDraw( draw ) ;
 				updater.forceUpdate() ;
 			}
 		}
@@ -159,7 +159,7 @@ public final class SimpleFrame implements Animation.Frame
 			if( updater != null )
 			{
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraws( draw ) ;
+				geometry.removeDraw( draw ) ;
 				updater.forceUpdate() ;
 			}
 
@@ -171,7 +171,7 @@ public final class SimpleFrame implements Animation.Frame
 			updater = pool.getOrCreate( world, program, draw.getShape(), false, order ) ;
 
 			final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-			geometry.addDraws( draw ) ;
+			geometry.addDraw( draw ) ;
 		}
 	}
 }

@@ -1,11 +1,11 @@
 package com.linxonline.mallet.maths ;
 
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
 public final class AABB
 {
 	public float minX, minY ;
 	public float maxX, maxY ;
+
+	private AABB() {}
 
 	private AABB( final float _minX, final float _minY,
 				  final float _maxX, final float _maxY )
@@ -14,11 +14,6 @@ public final class AABB
 		minY = _minY ;
 		maxX = _maxX ;
 		maxY = _maxY ;
-	}
-
-	private AABB( final OBB _obb )
-	{
-		setFromOBB( _obb ) ;
 	}
 
 	public static AABB create()
@@ -49,7 +44,8 @@ public final class AABB
 
 	public static AABB create( final OBB _obb )
 	{
-		return new AABB( _obb ) ;
+		final AABB a = new AABB() ;
+		return _obb.getAsAABB( a ) ;
 	}
 
 	/**

@@ -31,8 +31,15 @@ public class ConfigParser
 
 	public Settings parseSettings( final Settings _src, Settings _dest )
 	{
-		if( _src == null ) { return _dest ; }
-		if( _dest == null ) { _dest = new Settings() ; }
+		if( _src == null )
+		{
+			return _dest ;
+		}
+
+		if( _dest == null )
+		{
+			_dest = new Settings() ;
+		}
 
 		for( final ParseInterface parse : parsers )
 		{
