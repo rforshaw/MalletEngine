@@ -180,9 +180,8 @@ public final class StructUniform implements IUniform
 			return false ;
 		}
 
-		if( _obj instanceof StructUniform )
+		if( _obj instanceof StructUniform struct )
 		{
-			final StructUniform struct = ( StructUniform )_obj ;
 			final int size = uniforms.size() ;
 			if( size != struct.uniforms.size() )
 			{
@@ -226,9 +225,8 @@ public final class StructUniform implements IUniform
 		@Override
 		public boolean equals( final Object _obj )
 		{
-			if( _obj instanceof Pair )
+			if( _obj instanceof Pair pair )
 			{
-				final Pair pair = ( Pair )_obj ;
 				return uniform.equals( pair.uniform ) ;
 			}
 

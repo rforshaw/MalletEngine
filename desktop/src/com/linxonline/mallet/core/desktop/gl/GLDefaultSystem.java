@@ -35,6 +35,8 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	private final EventQueue<Boolean> CAPTURE_SYSTEM_MOUSE = Event.get( "CAPTURE_SYSTEM_MOUSE" ) ;
 	private final EventQueue<Boolean> SYSTEM_FULLSCREEN = Event.get( "SYSTEM_FULLSCREEN" ) ;
 
+	private boolean destroy = false ;
+
 	public GLDefaultSystem( final Thread _main )
 	{
 		super( new DefaultShutdown(),
@@ -68,8 +70,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		CAPTURE_SYSTEM_MOUSE.add( GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ) ;
 		SYSTEM_FULLSCREEN.add( GlobalConfig.getBoolean( "FULLSCREEN", false ) ) ;
 
-		final WinState window = new WinState() ;
-
 		GlobalConfig.addNotify( "CAPTUREMOUSE", ( String _name ) -> {
 			final boolean capture = GlobalConfig.getBoolean( "CAPTUREMOUSE", false ) ;
 			CAPTURE_SYSTEM_MOUSE.add( capture ) ;
@@ -80,6 +80,8 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 			SYSTEM_FULLSCREEN.add( fullscreen ) ;
 		} ) ;
 
+		final WinState window = new WinState() ;
+
 		getWindow().addWindowListener( window ) ;
 		getWindow().addMouseListener( window ) ;
 	}
@@ -87,6 +89,15 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	@Override
 	public void shutdown()
 	{
+		if( destroy )
+		{
+			// We've already flagged the
+			// system to be shutdown.
+			return ;
+		}
+
+		destroy = true ;
+
 		super.shutdown() ;
 		System.exit( 0 ) ;
 	}
@@ -119,17 +130,10 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		private final static int FOCUS_GAINED = 1 ;
 
 		private int focusState = FOCUS_UNKNOWN ;
-		private boolean destroy = false ;
 
 		@Override
 		public void windowDestroyNotify( final WindowEvent _event )
 		{
-			if( destroy == true )
-			{
-				return ;
-			}
-
-			destroy = true ;
 			GLDefaultSystem.this.shutdown() ;
 		}
 

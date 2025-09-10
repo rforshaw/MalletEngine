@@ -3,7 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-public final class TextBuffer extends ABuffer
+public final class TextBuffer extends ABuffer implements IManageCompatible
 {
 	private final Program program ;
 	private final boolean ui ;
@@ -66,11 +66,5 @@ public final class TextBuffer extends ABuffer
 	public List<TextDraw> getTextDraws()
 	{
 		return draws ;
-	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
 	}
 }

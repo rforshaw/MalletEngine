@@ -64,10 +64,4 @@ public final class DrawInstancedBuffer extends DrawBuffer
 	{
 		return storageName ;
 	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
-	}
 }

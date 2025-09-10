@@ -5,7 +5,7 @@ import java.util.ArrayList ;
 import java.util.Comparator ;
 import java.util.Collections ;
 
-public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
+public sealed class DrawBuffer extends ABuffer implements IManageCompatible permits DrawInstancedBuffer
 {
 	public static final IOcclude OCCLUDER_FALLBACK = new IOcclude()
 	{
@@ -109,12 +109,6 @@ public sealed class DrawBuffer extends ABuffer permits DrawInstancedBuffer
 	public boolean isUI()
 	{
 		return ui ;
-	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
 	}
 
 	/**

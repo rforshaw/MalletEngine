@@ -42,9 +42,8 @@ public class Address
 
 	public void set( final SocketAddress _address )
 	{
-		if( _address instanceof InetSocketAddress )
+		if( _address instanceof InetSocketAddress add )
 		{
-			final InetSocketAddress add = ( InetSocketAddress )_address ;
 			host = add.getHostName() ;
 			port = add.getPort() ;
 			return ;
@@ -77,9 +76,8 @@ public class Address
 			return false ;
 		}
 	
-		if( _obj instanceof Address )
+		if( _obj instanceof Address addr )
 		{
-			final Address addr = ( Address )_obj ;
 			if( host.equals( addr.host ) == false )
 			{
 				return false ;

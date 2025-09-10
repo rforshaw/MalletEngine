@@ -13,7 +13,7 @@ import com.linxonline.mallet.renderer.AssetLookup ;
 import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.World.AttachmentType ;
 import com.linxonline.mallet.renderer.Camera ;
-import com.linxonline.mallet.renderer.ABuffer ;
+import com.linxonline.mallet.renderer.ICompatibleBuffer ;
 import com.linxonline.mallet.renderer.DrawInstancedBuffer ;
 import com.linxonline.mallet.renderer.DrawBuffer ;
 import com.linxonline.mallet.renderer.TextBuffer ;
@@ -44,14 +44,14 @@ public class GLWorld
 
 	public static GLWorld createCore( final World _world,
 									  final AssetLookup<Camera, GLCamera> _cameras,
-									  final AssetLookup<ABuffer, GLBuffer> _buffers )
+									  final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 	{
 		return new GLCoreWorld( _world, _cameras, _buffers ) ;
 	}
 
 	public GLWorld( final World _world,
 					final AssetLookup<Camera, GLCamera> _cameras,
-					final AssetLookup<ABuffer, GLBuffer> _buffers )
+					final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 	{
 		// The first buffer generated is always the FrameBuffer
 		// the rest is attachment buffers.
@@ -65,7 +65,7 @@ public class GLWorld
 
 	public GLWorld( final World _world,
 					final AssetLookup<Camera, GLCamera> _cameras,
-					final AssetLookup<ABuffer, GLBuffer> _buffers,
+					final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers,
 					final int _frameID )
 	{
 		// The first buffer generated is always the FrameBuffer
@@ -81,7 +81,7 @@ public class GLWorld
 
 	protected void init( final World _world,
 						 final AssetLookup<Camera, GLCamera> _cameras,
-						 final AssetLookup<ABuffer, GLBuffer> _buffers )
+						 final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 	{
 		id = _world.getID() ;
 		order = _world.getOrder() ;
@@ -186,7 +186,7 @@ public class GLWorld
 		return backBuffers[_index] ;
 	}
 
-	public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ABuffer, GLBuffer> _buffers )
+	public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 	{
 		id = _world.getID() ;
 
@@ -216,10 +216,10 @@ public class GLWorld
 		}
 	}
 
-	protected void updateDrawBuffers( final World _world, final AssetLookup<ABuffer, GLBuffer> _buffers )
+	protected void updateDrawBuffers( final World _world, final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 	{
 		drawBuffers.clear() ;
-		for( final ABuffer buffer : _world.getBuffers() )
+		for( final ICompatibleBuffer buffer : _world.getBuffers() )
 		{
 			final int index = buffer.index() ;
 			final GLBuffer buff = _buffers.getRHS( index ) ;
@@ -337,7 +337,7 @@ public class GLWorld
 	{
 		private GLCoreWorld( final World _world,
 							 final AssetLookup<Camera, GLCamera> _cameras,
-							 final AssetLookup<ABuffer, GLBuffer> _buffers )
+							 final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 		{
 			// Default Framebuffer 0
 			super( _world, _cameras, _buffers, 0 ) ;
@@ -346,7 +346,7 @@ public class GLWorld
 		@Override
 		protected void init( final World _world,
 							 final AssetLookup<Camera, GLCamera> _cameras,
-							 final AssetLookup<ABuffer, GLBuffer> _buffers )
+							 final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 		{
 			id = _world.getID() ;
 
@@ -358,7 +358,7 @@ public class GLWorld
 		}
 
 		@Override
-		public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ABuffer, GLBuffer> _buffers )
+		public void update( final World _world, final AssetLookup<Camera, GLCamera> _cameras, final AssetLookup<ICompatibleBuffer, GLBuffer> _buffers )
 		{
 			id = _world.getID() ;
 

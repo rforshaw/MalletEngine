@@ -1,6 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-public final class Depth extends ABuffer
+public final class Depth extends ABuffer implements IManageCompatible
 {
 	private final int order ;
 
@@ -85,11 +85,5 @@ public final class Depth extends ABuffer
 	public int getOrder()
 	{
 		return order ;
-	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
 	}
 }

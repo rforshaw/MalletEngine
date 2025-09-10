@@ -163,9 +163,8 @@ public final class Colour
 			return false ;
 		}
 
-		if( _obj instanceof Colour )
+		if( _obj instanceof Colour col )
 		{
-			final Colour col = ( Colour )_obj ;
 			return colours[RED]   == col.colours[RED]   &&
 				   colours[GREEN] == col.colours[GREEN] &&
 				   colours[BLUE]  == col.colours[BLUE]  &&

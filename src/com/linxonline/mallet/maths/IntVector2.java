@@ -118,9 +118,8 @@ public final class IntVector2 implements IUniform
 	{
 		if( _compare != null )
 		{
-			if( _compare instanceof IntVector2 )
+			if( _compare instanceof IntVector2 c )
 			{
-				final IntVector2 c = ( IntVector2 )_compare ;
 				return equals( c.x, c.y ) ;
 			}
 		}

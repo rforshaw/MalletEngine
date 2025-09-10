@@ -47,7 +47,7 @@ public class DrawInstancedUpdaterPool
 			_anchor.requestUpdate() ;
 
 			buffer.addBuffer( geom ) ;
-			buffer.requestUpdate() ;
+			DrawAssist.update( buffer ) ;
 
 			synchronized( pool )
 			{
@@ -76,7 +76,7 @@ public class DrawInstancedUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
+			final List<ICompatibleBuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final WeakReference<DrawInstancedUpdater> weak : pool )
 			{

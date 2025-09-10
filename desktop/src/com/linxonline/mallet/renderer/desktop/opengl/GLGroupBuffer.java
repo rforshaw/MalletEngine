@@ -17,7 +17,7 @@ public class GLGroupBuffer extends GLBuffer
 	public boolean update( final GroupBuffer _group, final AssetLookup<?, GLBuffer> _buffers )
 	{
 		buffers.clear() ;
-		for( final ABuffer buffer : _group.getBuffers() )
+		for( final ICompatibleBuffer buffer : _group.getBuffers() )
 		{
 			final int index = buffer.index() ;
 			final GLBuffer buff = _buffers.getRHS( index ) ;

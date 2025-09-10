@@ -48,9 +48,8 @@ public class Tuple<T, U>
 			return true ;
 		}
 
-		if( _obj instanceof Tuple )
+		if( _obj instanceof Tuple tuple )
 		{
-			final Tuple tuple = ( Tuple )_obj ;
 			return left.equals( tuple.getLeft() ) && right.equals( tuple.getRight() ) ;
 		}
 

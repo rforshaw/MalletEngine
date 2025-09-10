@@ -97,10 +97,4 @@ public final class GeometryBuffer extends ABuffer
 
 		return true ;
 	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
-	}
 }

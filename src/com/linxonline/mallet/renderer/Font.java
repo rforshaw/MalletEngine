@@ -162,9 +162,8 @@ public final class Font implements IUniform
 			return false ;
 		}
 
-		if( _obj instanceof Font )
+		if( _obj instanceof Font font )
 		{
-			final Font font = ( Font )_obj ;
 			return id.equals( font.id ) ;
 		}
 

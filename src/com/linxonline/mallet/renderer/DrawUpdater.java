@@ -34,6 +34,7 @@ public final class DrawUpdater implements IUpdater
 		Convience function to reupload all associated GeometryBuffers.
 		NOTE: This does not re-upload the DrawBuffer.
 	*/
+	@Override
 	public void forceUpdate()
 	{
 		forceUpdate = true ;
@@ -102,7 +103,7 @@ public final class DrawUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final float _coefficient )
+	public void update( final List<IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{

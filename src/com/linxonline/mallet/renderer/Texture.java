@@ -125,9 +125,8 @@ public final class Texture implements IUniform
 			return false ;
 		}
 
-		if( _obj instanceof Texture )
-		{
-			final Texture rhs = ( Texture )_obj ; 
+		if( _obj instanceof Texture rhs )
+		{ 
 			if( uWrap != rhs.uWrap || vWrap != rhs.vWrap )
 			{
 				return false ;
@@ -286,9 +285,8 @@ public final class Texture implements IUniform
 				return false ;
 			}
 
-			if( _obj instanceof Meta )
+			if( _obj instanceof Meta meta )
 			{
-				final Meta meta = ( Meta )_obj ;
 				return path.equals( meta.path ) ;
 			}
 

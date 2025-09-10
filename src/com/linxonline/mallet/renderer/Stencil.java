@@ -5,7 +5,7 @@ package com.linxonline.mallet.renderer ;
 	the stencil then another to dismantel back to
 	the intended state.
 */
-public final class Stencil extends ABuffer
+public final class Stencil extends ABuffer implements IManageCompatible
 {
 	private final int order ;
 
@@ -122,11 +122,5 @@ public final class Stencil extends ABuffer
 	public int getOrder()
 	{
 		return order ;
-	}
-
-	@Override
-	public void requestUpdate()
-	{
-		DrawAssist.update( this ) ;
 	}
 }

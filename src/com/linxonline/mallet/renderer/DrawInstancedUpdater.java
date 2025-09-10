@@ -33,6 +33,7 @@ public final class DrawInstancedUpdater implements IUpdater
 		drawBuffer = _draw ;
 	}
 
+	@Override
 	public void forceUpdate()
 	{
 		forceUpdate = true ;
@@ -76,7 +77,7 @@ public final class DrawInstancedUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final float _coefficient )
+	public void update( final List<IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{

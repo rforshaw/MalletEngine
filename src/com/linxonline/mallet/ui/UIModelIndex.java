@@ -72,9 +72,8 @@ public final class UIModelIndex
 			return false ;
 		}
 		
-		if( _obj instanceof UIModelIndex )
+		if( _obj instanceof UIModelIndex index )
 		{
-			final UIModelIndex index = ( UIModelIndex )_obj ;
 			if( index.row == row && index.column == column )
 			{
 				if( parent == null )

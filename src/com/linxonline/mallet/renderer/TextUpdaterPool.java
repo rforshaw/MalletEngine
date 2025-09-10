@@ -19,7 +19,7 @@ public class TextUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
+			final List<ICompatibleBuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<TextUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -65,7 +65,7 @@ public class TextUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
+			final List<ICompatibleBuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final Iterator<WeakReference<TextUpdater>> iterator = pool.iterator(); iterator.hasNext(); )
 			{
@@ -156,7 +156,7 @@ public class TextUpdaterPool
 	{
 		synchronized( pool )
 		{
-			final List<ABuffer> worldBuffers = _anchor.getBuffers() ;
+			final List<ICompatibleBuffer> worldBuffers = _anchor.getBuffers() ;
 
 			for( final WeakReference<TextUpdater> weak : pool )
 			{

@@ -1018,10 +1018,15 @@ public final class Vorbis
 			final int codeword = book.dimensions ;
 			final int partitionsToRead = toRead / ( int )partitionSize ;
 
+			System.out.println( "Partitions: " + partitionsToRead + " Size: " + partitionSize + " Total Size: " + toRead ) ;
+			
 			final int[][] dClassifications = new int[_ch][codeword * partitionsToRead] ;
 			for( int i = 0; i < _values.length; ++i )
 			{
-				_values[i] = new float[_blocksize] ;
+				// FIXME: This should be partitionSize or blockSize?
+				// Residue 1 and 2 says it should be partition size when
+				// interleaving as n == partitionSize.
+				_values[i] = new float[( int )partitionSize] ;
 			}
 
 			if( toRead <= 0 )
@@ -1069,50 +1074,53 @@ public final class Vorbis
 							break ;
 						}
 
-						final int offset = ( int )begin + partitionCount * ( int )partitionSize ;
+						final int offset = ( int )begin + ( partitionCount * ( int )partitionSize ) ;
 
-						switch( type )
+						for( int j = 0; j < _ch; ++j )
 						{
-							case 0 :
-							case 1 :
+							if( _doNotDecode[j] )
 							{
-								for( int j = 0; j < _ch; ++j )
-								{
-									if( _doNotDecode[j] )
-									{
-										continue ;
-									}
-
-									final int vqClass = dClassifications[j][partitionCount] ;
-									final int vqBook = books[vqClass][pass] ;
-									if( vqBook == -1 )
-									{
-										continue ;
-									}
-
-									final CodebookConfiguration cBook = codebooks.get( vqBook ) ;
-
-									switch( type )
-									{
-										case 0 :
-										{
-											_pos = decodeResidue0( _pos, _stream, cBook, offset, _values[j] ) ;
-											break ;
-										}
-										case 1 :
-										{
-											_pos = decodeResidue1( _pos, _stream, cBook, offset, _values[j] ) ;
-											break ;
-										}
-									}
-								}
-								break ;
+								continue ;
 							}
-							case 2 :
+
+							final int vqClass = dClassifications[j][partitionCount] ;
+							final int vqBook = books[vqClass][pass] ;
+							if( vqBook == -1 )
 							{
-								final float[] values = new float[_ch * _blocksize] ;
-								_pos = decodeResidue2( _pos, _stream, book, offset, values ) ;
-								break ;
+								continue ;
+							}
+
+							final CodebookConfiguration cBook = codebooks.get( vqBook ) ;
+
+							switch( type )
+							{
+								case 0 :
+								{
+									_pos = decodeResidue0( _pos, _stream, cBook, offset, _values[j] ) ;
+									break ;
+								}
+								case 1 :
+								{
+									_pos = decodeResidue1( _pos, _stream, cBook, offset, _values[j] ) ;
+									break ;
+								}
+								case 2 :
+								{
+									int skipCount = 0 ;
+									for( int k = 0; k < _ch; ++k )
+									{
+										if( _doNotDecode[k] )
+										{
+											++skipCount ;
+										}
+									}
+
+									if( skipCount != _ch )
+									{
+										_pos = decodeResidue2( _pos, _stream, cBook, _ch, ( int )partitionSize, offset, _values ) ;
+									}
+									break ;
+								}
 							}
 						}
 
@@ -1127,7 +1135,6 @@ public final class Vorbis
 
 		private int decodeResidue0( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
 		{
-			//System.out.println( "Decode Residue 0" ) ;
 			//System.out.println( "Values Length: " + _values.length ) ;
 			final float[] temp = new float[_book.dimensions] ;
 
@@ -1157,10 +1164,13 @@ public final class Vorbis
 
 		private int decodeResidue1( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
 		{
+			_pos += _offset ;
+
 			//System.out.println( "Decode Residue 1" ) ;
 			final float[] temp = new float[_book.dimensions] ;
 
 			int i = 0 ;
+			System.out.println( "i: " + i + "Partition Size: " + partitionSize + " Book Dimensions: " + temp.length ) ;
 
 			while( i < partitionSize )
 			{
@@ -1177,7 +1187,8 @@ public final class Vorbis
 
 				for( int j = 0; j < _book.dimensions; ++j )
 				{
-					_values[_offset + i] += temp[j] ;
+					System.out.println( "Index: " + ( _offset + i ) ) ;
+					_values[i] += temp[j] ;
 					//System.out.println( "Index: " + ( _offset + i ) + " RV: " + _values[_offset + i] ) ;
 					++i ;
 				}
@@ -1186,10 +1197,20 @@ public final class Vorbis
 			return _pos ;
 		}
 
-		private int decodeResidue2( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _offset, final float[] _values )
+		private int decodeResidue2( int _pos, final byte[] _stream, final CodebookConfiguration _book, final int _ch, final int _partitionSize, final int _offset, final float[][] _values )
 		{
-			//System.out.println( "Decode Residue 2" ) ;
-			_pos = decodeResidue1( _pos, _stream, _book, _offset, _values ) ;
+			System.out.println( "Decode Residue 2" ) ;
+			final float[] values = new float[_ch * ( int )_partitionSize] ;
+			_pos = decodeResidue1( _pos, _stream, _book, _offset, values ) ;
+
+			for( int i = 0; i < _partitionSize; ++i )
+			{
+				for( int j = 0; j < _ch; ++j )
+				{
+					_values[j][i] = values[i * _ch + j] ;
+				}
+			}
+			
 			return _pos ;
 		}
 
@@ -1401,7 +1422,7 @@ public final class Vorbis
 			{
 				case IMPLICIT_LOOKUP_TABLE : return getVQLookupTable1( _codeword, _length, _offset, _fill ) ;
 				case EXPLICIT_LOOKUP_TABLE : return getVQLookupTable2( _codeword, _length, _offset, _fill ) ;
-				default                    : return true ;
+				default                    : throw new RuntimeException( "Codebook has no VQ lookup." ) ;
 			}
 		}
 
@@ -1423,7 +1444,7 @@ public final class Vorbis
 				_vq[index] = multiplicands[multiplicandOffset] * deltaValue + minValue + last ;
 
 				last = ( sequenceP == true ) ? _vq[index] : last ;
-				indexDivisor = indexDivisor * multiplicands.length ;
+				indexDivisor *= multiplicands.length ;
 			}
 
 			return true ;
@@ -1560,6 +1581,8 @@ public final class Vorbis
 
 			n = ( mode.blockFlag == false ) ? blocksize0 : blocksize1 ;
 
+			System.out.println( "Long Window: " + mode.blockFlag ) ;
+			
 			// long window
 			prevWindowFlag = ( mode.blockFlag == true ) ? ConvertBytes.isBitSet( _stream, _pos++ ) : false ;
 			nextWindowFlag = ( mode.blockFlag == true ) ? ConvertBytes.isBitSet( _stream, _pos++ ) : false ;

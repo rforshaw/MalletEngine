@@ -42,9 +42,8 @@ public final class Category
 			return false ;
 		}
 
-		if( _obj instanceof Category )
+		if( _obj instanceof Category cat )
 		{
-			final Category cat = ( Category )_obj ;
 			if( ( cat.channel == channel &&
 				  cat.subChannel == subChannel ) || 
 				  cat.channel == Category.Channel.MASTER )

@@ -1,42 +1,40 @@
 package com.linxonline.mallet.renderer ;
 
 /**
-	ABuffer is a central class that allows us to retain
+	Abstract Buffer is a central class that allows us to retain
 	and manage different buffer types as if they are
 	the same.
-	It's bad to be honest. Certain classes for example
-	GroupBuffer will allow you to add any buffer that
-	extends ABuffer, but it only allows a subset, you are
-	only informed of this at runtime, while it should really
-	be a compile time operation.
+
+	It's a class that defines the minimum amount required to map
+	developer defined render state with it's internal render state.
 */
-public sealed abstract class ABuffer implements IRequestUpdate permits
+public sealed abstract class ABuffer implements IUpdateState, ICompatibleBuffer permits
 	DrawBuffer,
 	GeometryBuffer,
 	TextBuffer,
 	Stencil,
 	Depth,
-	GroupBuffer,
-	Storage
+	GroupBuffer
 {
 	private final static Utility utility = new Utility() ;
 
 	private final int index = utility.getGlobalIndex() ;
 	private IMeta meta = IMeta.EMPTY_META ;
 
-	public abstract int getOrder() ;
-
+	@Override
 	public IMeta setMeta( final IMeta _meta )
 	{
 		meta = ( _meta != null ) ? _meta : IMeta.EMPTY_META ;
 		return meta ;
 	}
 
+	@Override
 	public IMeta getMeta()
 	{
 		return meta ;
 	}
 
+	@Override
 	public int index()
 	{
 		return index ;

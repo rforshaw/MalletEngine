@@ -147,12 +147,11 @@ public final class Program
 			return false ;
 		}
 
-		if( _obj instanceof Program )
+		if( _obj instanceof Program program )
 		{
 			// We don't compare the index as that is unique 
 			// to an instance of program.
 
-			final Program program = ( Program )_obj ;
 			if( id.equals( program.id ) == false )
 			{
 				return false ;

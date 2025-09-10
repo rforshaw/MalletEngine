@@ -19,10 +19,10 @@ import com.linxonline.mallet.util.Logger ;
 	Adding them to a GroupBuffer then adding it to the World can
 	remove this problem.
 */
-public final class GroupBuffer extends ABuffer implements IManageBuffers
+public final class GroupBuffer extends ABuffer implements IManageBuffers, IManageCompatible
 {
 	private final int order ;
-	private final List<ABuffer> buffers = MalletList.<ABuffer>newList() ;
+	private final List<ICompatibleBuffer> buffers = MalletList.<ICompatibleBuffer>newList() ;
 
 	public GroupBuffer( final int _order )
 	{
@@ -30,53 +30,36 @@ public final class GroupBuffer extends ABuffer implements IManageBuffers
 	}
 
 	@Override
-	public <T extends ABuffer> T addBuffer( final T _buffer )
+	public <T extends IManageCompatible> T addBuffer( final T _buffer )
 	{
 		insert( _buffer, buffers ) ;
 		return _buffer ;
 	}
 
-	private static void insert( final ABuffer _insert, final List<ABuffer> _list )
+	private static void insert( final IManageCompatible _insert, final List<ICompatibleBuffer> _list )
 	{
-		switch( _insert )
+		final int size = _list.size() ;
+		for( int i = 0; i < size; i++ )
 		{
-			case Storage s :
+			final ICompatibleBuffer toCompare = _list.get( i ) ;
+			if( _insert.getOrder() <= toCompare.getOrder() )
 			{
-				Logger.println( "Storage is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
+				_list.add( i, _insert ) ;		// Insert at index location
 				return ;
 			}
-			case GeometryBuffer b :
-			{
-				Logger.println( "GeometryBuffer is incompatible with GroupBuffer, skipping.", Logger.Verbosity.NORMAL ) ;
-				return ;
-			}
-			default :
-			{
-				final int size = _list.size() ;
-				for( int i = 0; i < size; i++ )
-				{
-					final ABuffer toCompare = _list.get( i ) ;
-					if( _insert.getOrder() <= toCompare.getOrder() )
-					{
-						_list.add( i, _insert ) ;		// Insert at index location
-						return ;
-					}
-				}
+		}
 
-				_list.add( _insert ) ;
-				break ;
-			}
-		} ;
+		_list.add( _insert ) ;
 	}
 
 	@Override
-	public <T extends ABuffer> void removeBuffer( final T _buffer )
+	public <T extends IManageCompatible> void removeBuffer( final T _buffer )
 	{
 		buffers.remove( _buffer ) ;
 	}
 
 	@Override
-	public List<ABuffer> getBuffers()
+	public List<ICompatibleBuffer> getBuffers()
 	{
 		return buffers ;
 	}
@@ -99,7 +82,7 @@ public final class GroupBuffer extends ABuffer implements IManageBuffers
 		This is the same as if you called:
 		Collections.sort( buffers, ... ) ;
 	*/
-	public void sortBuffers( final Comparator<ABuffer> _c )
+	public void sortBuffers( final Comparator<ICompatibleBuffer> _c )
 	{
 		Collections.sort( buffers, _c ) ;
 	}

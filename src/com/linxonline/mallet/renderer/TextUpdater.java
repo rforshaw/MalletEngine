@@ -29,6 +29,7 @@ public final class TextUpdater implements IUpdater
 		buffers.add( _buffer ) ;
 	}
 
+	@Override
 	public void forceUpdate()
 	{
 		forceUpdate = true ;
@@ -68,7 +69,7 @@ public final class TextUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<ABuffer> _updated, final float _coefficient )
+	public void update( final List<IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{

@@ -65,15 +65,15 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
 	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;
-	private final AssetLookup<ABuffer, GLBuffer> bufferLookup = new AssetLookup<ABuffer, GLBuffer>( "BUFFER" ) ;
+	private final AssetLookup<ICompatibleBuffer, GLBuffer> bufferLookup = new AssetLookup<ICompatibleBuffer, GLBuffer>( "BUFFER" ) ;
 	private final AssetLookup<Program, GLProgram> programLookup = new AssetLookup<Program, GLProgram>( "PROGRAM" ) ;
 	private final AssetLookup<Storage, GLStorage> storageLookup = new AssetLookup<Storage, GLStorage>( "STORAGE" ) ;
 
 	private static List<Camera> cameras = new ArrayList<Camera>() ;
 	private static List<GLWorld> worlds = new ArrayList<GLWorld>() ;
 
-	private final List<ABuffer> buffersToUpdate = new ArrayList<ABuffer>() ;
 	private final List<IUpdater> updaters = new ArrayList<IUpdater>() ;
+	private final List<IUpdateState> buffersToUpdate = new ArrayList<IUpdateState>() ;
 
 	private final Thread mainThread ;
 	private GLWindow canvas ;
@@ -253,15 +253,15 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 					// refresh the drawbuffers.
 					// This ensures any textures that were removed but
 					// should not have been removed are pulled back in.
-					final int size = bufferLookup.size() ;
+					/*final int size = bufferLookup.size() ;
 					for( int i = 0; i < size; ++i )
 					{
-						final ABuffer buffer = bufferLookup.getLHS( i ) ;
+						final ICompatibleBuffer buffer = bufferLookup.getLHS( i ) ;
 						if( updateBuffer( buffer ) == false )
 						{
 							DrawAssist.update( buffer ) ;
 						}
-					}
+					}*/
 				} ) ;
 			}
 		} ;
@@ -272,7 +272,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new DrawAssist.Assist()
 		{
 			@Override
-			public DrawUpdater add( final DrawUpdater _updater )
+			public <T extends IUpdater> T add( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -282,47 +282,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public DrawUpdater remove( final DrawUpdater _updater )
-			{
-				GLRenderer.this.invokeLater( () ->
-				{
-					updaters.remove( _updater ) ;
-				} ) ;
-				return _updater ;
-			}
-
-			@Override
-			public DrawInstancedUpdater add( final DrawInstancedUpdater _updater )
-			{
-				GLRenderer.this.invokeLater( () ->
-				{
-					updaters.add( _updater ) ;
-				} ) ;
-				return _updater ;
-			}
-
-			@Override
-			public DrawInstancedUpdater remove( final DrawInstancedUpdater _updater )
-			{
-				GLRenderer.this.invokeLater( () ->
-				{
-					updaters.remove( _updater ) ;
-				} ) ;
-				return _updater ;
-			}
-
-			@Override
-			public TextUpdater add( final TextUpdater _updater )
-			{
-				GLRenderer.this.invokeLater( () ->
-				{
-					updaters.add( _updater ) ;
-				} ) ;
-				return _updater ;
-			}
-
-			@Override
-			public TextUpdater remove( final TextUpdater _updater )
+			public <T extends IUpdater> T remove( final T _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -351,7 +311,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
-					final Tuple<ABuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
+					final Tuple<ICompatibleBuffer, GLBuffer> tuple = bufferLookup.unmap( _buffer.index() ) ;
 					if( tuple != null )
 					{
 						final GLBuffer buff = tuple.getRight() ;
@@ -362,7 +322,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public <T extends ABuffer> T update( final T _buffer )
+			public <T extends IUpdateState> T update( final T _buffer )
 			{
 				GLRenderer.this.invokeLater( _buffer, UPDATE_OPERATION, () ->
 				{
@@ -374,7 +334,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				return _buffer ;
 			}
 
-			private GLBuffer create( final ABuffer _buffer )
+			private GLBuffer create( final ICompatibleBuffer _buffer )
 			{
 				return switch( _buffer )
 				{
@@ -789,10 +749,10 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				totalBufferUpdates += bSize ;
 				for( int j = 0; j < bSize; ++j )
 				{
-					final ABuffer buffer = buffersToUpdate.get( j ) ;
+					final IUpdateState buffer = buffersToUpdate.get( j ) ;
 					if( updateBuffer( buffer ) == false )
 					{
-						updater.forceUpdate() ;
+						DrawAssist.update( buffer ) ;
 					}
 				}
 				buffersToUpdate.clear() ;
@@ -802,7 +762,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return totalBufferUpdates ;
 	}
 
-	private <T extends ABuffer> boolean updateBuffer( final T _buffer )
+	private <T extends IUpdateState> boolean updateBuffer( final T _buffer )
 	{
 		return switch( _buffer )
 		{
@@ -841,7 +801,11 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 				final GLStorage storage = storageLookup.getRHS( buffer.index() ) ;
 				yield ( storage != null ) ? storage.update( buffer ) : true ;
 			}
-			default -> true ;//throw new Exception( "Unknown buffer type specified." ) ;
+			case GroupBuffer buffer ->
+			{
+				final GLGroupBuffer group = ( GLGroupBuffer )bufferLookup.getRHS( buffer.index() ) ;
+				yield ( group != null ) ? group.update( buffer, bufferLookup ) : true ;
+			}
 		} ;
 	}
 

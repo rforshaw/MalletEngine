@@ -139,9 +139,8 @@ public final class IntVector3 implements IUniform
 	{
 		if( _compare != null )
 		{
-			if( _compare instanceof IntVector3 )
+			if( _compare instanceof IntVector3 c )
 			{
-				final IntVector3 c = ( IntVector3 )_compare ;
 				return equals( c.x, c.y, c.z ) ;
 			}
 		}

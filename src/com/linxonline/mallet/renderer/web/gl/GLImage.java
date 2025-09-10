@@ -70,9 +70,8 @@ public final class GLImage extends Resource
 			return false ;
 		}
 
-		if( _obj instanceof GLImage )
+		if( _obj instanceof GLImage image )
 		{
-			final GLImage image = ( GLImage )_obj ;
 			if( textureIDs.length != image.textureIDs.length )
 			{
 				return false ;

@@ -10,5 +10,5 @@ public sealed interface IUpdater permits
 {
 	public void forceUpdate() ;
 
-	public void update( final List<ABuffer> _updated, final float _coefficient ) ;
+	public void update( final List<IUpdateState> _updated, final float _coefficient ) ;
 }

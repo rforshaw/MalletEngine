@@ -7,8 +7,11 @@ package com.linxonline.mallet.renderer ;
 	handles. A storage object can be used to store data 
 	that can be later used by a shader.
 */
-public final class Storage extends ABuffer
+public final class Storage implements IUpdateState
 {
+	private final static Utility utility = new Utility() ;
+
+	private final int index = utility.getGlobalIndex() ;
 	private final IData data ;
 
 	public Storage( final IData _data )
@@ -21,13 +24,11 @@ public final class Storage extends ABuffer
 		return data ;
 	}
 
-	@Override
-	public int getOrder()
+	public int index()
 	{
-		return 0 ;
+		return index ;
 	}
 
-	@Override
 	public void requestUpdate()
 	{
 		StorageAssist.update( this ) ;

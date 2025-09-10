@@ -733,22 +733,19 @@ public class UIAbstractView extends UIElement
 						case AVariable.OBJECT_TYPE :
 						{
 							final Object obj = variant.toObject() ;
-							if( obj instanceof Vector2 )
+							if( obj instanceof Vector2 vec )
 							{
-								final Vector2 vec = ( Vector2 )obj ;
 								setTextTo( getText( vLayout, 0 ), vec.x ) ;
 								setTextTo( getText( vLayout, 1 ), vec.y ) ;
 							}
-							else if( obj instanceof Vector3 )
+							else if( obj instanceof Vector3 vec )
 							{
-								final Vector3 vec = ( Vector3 )obj ;
 								setTextTo( getText( vLayout, 0 ), vec.x ) ;
 								setTextTo( getText( vLayout, 1 ), vec.y ) ;
 								setTextTo( getText( vLayout, 2 ), vec.z ) ;
 							}
-							else if( obj instanceof Colour )
+							else if( obj instanceof Colour colour )
 							{
-								final Colour colour = ( Colour )obj ;
 								setTextTo( getText( vLayout, 0 ), colour.getRed() ) ;
 								setTextTo( getText( vLayout, 1 ), colour.getGreen() ) ;
 								setTextTo( getText( vLayout, 2 ), colour.getBlue() ) ;
@@ -760,9 +757,8 @@ public class UIAbstractView extends UIElement
 								setTextTo( getText( vLayout, 0 ), font.getFontName() ) ;
 								setTextTo( getText( vLayout, 1 ), font.getPointSize() ) ;
 							}
-							else if( obj instanceof UIElement.UV )
+							else if( obj instanceof UIElement.UV uv )
 							{
-								final UIElement.UV uv = ( UIElement.UV )obj ;
 								setTextTo( getText( vLayout, 0 ), uv.min.x ) ;
 								setTextTo( getText( vLayout, 1 ), uv.min.y ) ;
 								setTextTo( getText( vLayout, 2 ), uv.max.x ) ;
@@ -862,11 +858,10 @@ public class UIAbstractView extends UIElement
 								uv.max.setXY( maxx, maxy ) ;
 								signal( _model, variant ) ;
 							}
-							else if( obj instanceof Enum<?> )
+							else if( obj instanceof Enum<?> en )
 							{
 								try
 								{
-									final Enum<?> en = ( Enum<?> )obj ;
 									final String val = getText( vLayout, 0 ).toString() ;
 									variant.setObject( en.valueOf( en.getClass(), val ) ) ;
 									signal( _model, variant ) ;
