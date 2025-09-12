@@ -81,7 +81,7 @@ public final class GLFontGenerator
 			final char c = glyph.getCharacter() ;
 			final int id = _f.getGlyphID​( c ) ;
 			com.jogamp.graph.font.Font.Glyph g = _f.getGlyph​( id ) ;
-			if( g.isWhiteSpace() || g.isUndefined() )
+			if( g.isWhitespace() || g.isUndefined() )
 			{
 				shapes[i] = new Shape( Shape.Style.FILL, swivel, 0, 0 ) ;
 				continue ;
