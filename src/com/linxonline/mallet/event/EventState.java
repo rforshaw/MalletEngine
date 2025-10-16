@@ -45,22 +45,13 @@ public final class EventState
 	*/
 	public void addEvent( final Event<?> _event )
 	{
-		wLock.lock() ;
-
-		try
+		if( !intercept.allow( _event ) )
 		{
-			if( !intercept.allow( _event ) )
-			{
-				return ;
-			}
+			return ;
+		}
 
-			final EventQueue exists = getRaw( _event.getEventType() ) ;
-			exists.add( _event ) ;
-		}
-		finally
-		{
-			wLock.unlock() ;
-		}
+		final EventQueue exists = getRaw( _event.getEventType() ) ;
+		exists.add( _event ) ;
 	}
 
 	/**
@@ -76,7 +67,7 @@ public final class EventState
 		final int size = _events.size() ;
 		for( int i = 0; i < size; i++ )
 		{
-			final Event event = _events.get( i ) ;
+			final Event<?> event = _events.get( i ) ;
 			if( !intercept.allow( event ) )
 			{
 				continue ;
@@ -107,14 +98,14 @@ public final class EventState
 
 	public void clear()
 	{
-		rLock.lock() ;
-
 		try
 		{
+			rLock.lock() ;
+
 			final int size = list.size() ;
 			for( int i = 0; i < size; ++i )
 			{
-				final EventQueue q = list.get( i ) ;
+				final EventQueue<?> q = list.get( i ) ;
 				q.clear() ;
 			}
 		}
@@ -131,22 +122,31 @@ public final class EventState
 	*/
 	public void swap()
 	{
-		// It's deliberately lookup - we use lookup as the
-		// sync point when using either lookup or list.
-		final int size = list.size() ;
-		for( int i = 0; i < size; ++i )
+		try
 		{
-			final EventQueue q = list.get( i ) ;
-			q.swap() ;
+			rLock.lock() ;
+
+			// It's deliberately lookup - we use lookup as the
+			// sync point when using either lookup or list.
+			final int size = list.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				final EventQueue<?> q = list.get( i ) ;
+				q.swap() ;
+			}
+		}
+		finally
+		{
+			rLock.unlock() ;
 		}
 	}
 
 	private <T> EventQueue<T> getRaw( final EventType _type )
 	{
-		rLock.lock() ;
-
 		try
 		{
+			rLock.lock() ;
+
 			final EventQueue<T> exists = lookup.get( _type ) ;
 			if( exists != null )
 			{
@@ -159,10 +159,11 @@ public final class EventState
 		}
 
 		final EventQueue<T> queue = new EventQueue<T>( _type ) ;
-		wLock.lock() ;
 
 		try
 		{
+			wLock.lock() ;
+
 			lookup.add( _type, queue ) ;
 			list.add( queue ) ;
 		}

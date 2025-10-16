@@ -1,6 +1,7 @@
 package com.linxonline.mallet.event ;
 
 import java.util.ArrayList ;
+import java.util.concurrent.locks.ReentrantReadWriteLock ;
 
 /**
 	Add events of a particular type to the queue.
@@ -19,6 +20,10 @@ public final class EventQueue<T>
 	private ArrayList<Event<T>> back = new ArrayList<Event<T>>() ;
 	private ArrayList<Event<T>> front = new ArrayList<Event<T>>() ;
 
+	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock() ;
+	private final ReentrantReadWriteLock.ReadLock rLock = lock.readLock() ;
+	private final ReentrantReadWriteLock.WriteLock wLock = lock.writeLock() ;
+
 	protected EventQueue( final EventType _type )
 	{
 		type = _type ;
@@ -35,33 +40,56 @@ public final class EventQueue<T>
 	*/
 	public void add( final Event<T> _event )
 	{
-		synchronized( back )
+		try
 		{
+			wLock.lock() ;
 			back.add( _event ) ;
+		}
+		finally
+		{
+			wLock.unlock() ;
 		}
 	}
 
 	protected void clear()
 	{
-		front.clear() ;
-		back.clear() ;
+		try
+		{
+			wLock.lock() ;
+
+			front.clear() ;
+			back.clear() ;
+		}
+		finally
+		{
+			wLock.unlock() ;
+		}
 	}
 
 	protected void swap()
 	{
-		if( !front.isEmpty() )
+		try
 		{
-			front.clear() ;
-		}
+			wLock.lock() ;
 
-		if( back.isEmpty() )
+			if( !front.isEmpty() )
+			{
+				front.clear() ;
+			}
+
+			if( back.isEmpty() )
+			{
+				return ;
+			}
+
+			final ArrayList<Event<T>> temp = front ;
+			front = back ;
+			back = temp ;
+		}
+		finally
 		{
-			return ;
+			wLock.unlock() ;
 		}
-
-		final ArrayList<Event<T>> temp = front ;
-		front = back ;
-		back = temp ;
 	}
 
 	/**
@@ -69,15 +97,24 @@ public final class EventQueue<T>
 	*/
 	public void process( final Event.IProcess<T> _process )
 	{
-		if( front.isEmpty() )
+		try
 		{
-			return ;
-		}
+			rLock.lock() ;
 
-		final int size = front.size() ;
-		for( int i = 0; i < size; ++i )
+			if( front.isEmpty() )
+			{
+				return ;
+			}
+
+			final int size = front.size() ;
+			for( int i = 0; i < size; ++i )
+			{
+				_process.process( front.get( i ).getVariable() ) ;
+			}
+		}
+		finally
 		{
-			_process.process( front.get( i ).getVariable() ) ;
+			rLock.unlock() ;
 		}
 	}
 }
