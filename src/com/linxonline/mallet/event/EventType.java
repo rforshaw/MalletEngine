@@ -2,6 +2,7 @@ package com.linxonline.mallet.event ;
 
 import java.util.Map ;
 import java.util.ArrayList ;
+import java.util.concurrent.locks.ReentrantReadWriteLock ;
 
 import com.linxonline.mallet.util.MalletMap ;
 
@@ -18,6 +19,10 @@ import com.linxonline.mallet.util.MalletMap ;
 */
 public final class EventType
 {
+	private final static ReentrantReadWriteLock lock = new ReentrantReadWriteLock() ;
+	private final static ReentrantReadWriteLock.ReadLock rLock = lock.readLock() ;
+	private final static ReentrantReadWriteLock.WriteLock wLock = lock.writeLock() ;
+
 	private final static Map<String, EventType> eventTypes = MalletMap.<String, EventType>newMap() ;
 	private static int incrementID = 0 ;
 
@@ -41,6 +46,23 @@ public final class EventType
 	}
 
 	@Override
+	public int hashCode()
+	{
+		return id ;
+	}
+
+	@Override
+	public boolean equals( final Object _c )
+	{
+		if( _c instanceof EventType et )
+		{
+			return id == et.id ;
+		}
+
+		return false ;
+	}
+
+	@Override
 	public String toString()
 	{
 		return "[Type: " + type + ", id: " + id + "]" ;
@@ -52,17 +74,32 @@ public final class EventType
 	*/
 	public static EventType get( final String _type )
 	{
-		synchronized( eventTypes )
+		try
 		{
+			rLock.lock() ;
+
 			final EventType type = eventTypes.get( _type ) ;
 			if( type != null )
 			{
 				return type ;
 			}
+		}
+		finally
+		{
+			rLock.unlock() ;
+		}
+
+		try
+		{
+			wLock.lock() ;
 
 			final EventType newType = new EventType( _type, incrementID++ ) ;
 			eventTypes.put( _type, newType ) ;
 			return newType ;
+		}
+		finally
+		{
+			wLock.unlock() ;
 		}
 	}
 

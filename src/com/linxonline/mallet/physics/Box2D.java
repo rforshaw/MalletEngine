@@ -1,12 +1,10 @@
 package com.linxonline.mallet.physics ;
 
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class Box2D extends Hull
 {
-	public final AABB aabb ;
-	public final OBB obb ;
+	private final OBB obb ;
 
 	public Box2D( final AABB _aabb, final Vector2 _position, final Vector2 _offset )
 	{
@@ -16,15 +14,13 @@ public final class Box2D extends Hull
 	public Box2D( final AABB _aabb, int[] _collidables, final Vector2 _position, final Vector2 _offset )
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
-		aabb = _aabb ;
-		obb = OBB.create( aabb ) ;
+		obb = OBB.create( _aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, int[] _collidables, final Vector3 _position, final Vector3 _offset )
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
-		aabb = _aabb ;
-		obb = OBB.create( aabb ) ;
+		obb = OBB.create( _aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, final float _x, final float _y, final float _offsetX, final float _offsetY )
@@ -35,8 +31,7 @@ public final class Box2D extends Hull
 	public Box2D( final AABB _aabb, int[] _collidables, final float _x, final float _y, final float _offsetX, final float _offsetY )
 	{
 		super( _x, _y, _offsetX, _offsetY, 0.0f, _collidables ) ;
-		aabb = _aabb ;
-		obb = OBB.create( aabb ) ;
+		obb = OBB.create( _aabb ) ;
 	}
 
 	public Box2D( final AABB _aabb, int[] _collidables )
@@ -45,8 +40,7 @@ public final class Box2D extends Hull
 			   0.0f, 0.0f,
 			   0.0f,
 			   _collidables ) ;
-		aabb = _aabb ;
-		obb = OBB.create( aabb ) ;
+		obb = OBB.create( _aabb ) ;
 	}
 	
 	public Box2D( final OBB _obb, int[] _collidables )
@@ -56,7 +50,11 @@ public final class Box2D extends Hull
 			   0.0f,
 			   _collidables ) ;
 		obb = _obb ;
-		aabb = AABB.create( obb ) ;
+	}
+
+	public void setFromAABB( final float _minX, final float _minY, final float _maxX, final float _maxY )
+	{
+		obb.setFromAABB( _minX, _minY, _maxX, _maxY ) ;
 	}
 
 	@Override
@@ -64,7 +62,6 @@ public final class Box2D extends Hull
 	{
 		super.setRotation( _theta ) ;
 		obb.setRotation( _theta, offsetX, offsetY ) ;
-		obb.getAsAABB( aabb ) ;
 	}
 
 	@Override
@@ -130,10 +127,11 @@ public final class Box2D extends Hull
 		final float x = positionX + offsetX ;
 		final float y = positionY + offsetY ;
 
-		_fill.minX = aabb.minX + x ;
-		_fill.minY = aabb.minY + y ;
-		_fill.maxX = aabb.maxX + x ;
-		_fill.maxY = aabb.maxY + y ;
+		obb.getAsAABB( _fill ) ;
+		_fill.minX += x ;
+		_fill.minY += y ;
+		_fill.maxX += x ;
+		_fill.maxY += y ;
 
 		return _fill ;
 	}

@@ -45,10 +45,6 @@ public final class GLGeometryBuffer extends GLBuffer
 	private final int vertexStrideBytes ;			// The size in bytes of a vertex
 	private int style = -1 ;						// OpenGL GL_TRIANGLES, GL_LINES,
 
-	private final Vector3 position = new Vector3() ;
-	private final Vector3 offset = new Vector3() ;
-	private final Vector3 rotation = new Vector3() ;
-	private final Vector3 scale = new Vector3() ;
 	private final Matrix4 modelMatrix = new Matrix4() ;
 
 	private boolean stable = false ;
@@ -248,21 +244,31 @@ public final class GLGeometryBuffer extends GLBuffer
 			return ;
 		}
 
+		if( _range == null )
+		{
+			drawAll( _style, _attributes, _program, _state, _camera, _occluder ) ;
+		}
+		else
+		{
+			drawRange( _range, _style, _attributes, _program, _state, _camera, _occluder ) ;
+		}
+
+	}
+
+	private void drawAll( final int _style, final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
+	{
 		GLGeometryBuffer.enableVertexAttributes( _attributes ) ;
 
 		int activeIndex = -1 ;
 
-		final int size = ( _range == null ) ? toDrawSize : _range.length ;
+		final int size = toDrawSize ;
 		for( int i = 0; i < size; ++i )
 		{
-			final int rangeIndex = i * RANGE_DIMENSIONS_PACKET_SIZE ;
-			final int index = ( _range == null ) ? i : _range[rangeIndex] ;
-
-			final int drawOffset = index * DRAW_DIMENSIONS_PACKET_SIZE ;
+			final int drawOffset = i * DRAW_DIMENSIONS_PACKET_SIZE ;
 
 			final int drawIndex = drawDimensions[drawOffset] ;
-			final int shapeStart = ( _range == null ) ? drawDimensions[drawOffset + 1] : _range[rangeIndex + 1] ;
-			final int shapeCount = ( _range == null ) ? drawDimensions[drawOffset + 2] : _range[rangeIndex + 2] ;
+			final int shapeStart = drawDimensions[drawOffset + 1] ;
+			final int shapeCount = drawDimensions[drawOffset + 2] ;
 
 			final Draw draw = toDraw[drawIndex] ;
 			if( draw.isHidden() || _occluder.occlude( _camera, draw ) )
@@ -279,13 +285,65 @@ public final class GLGeometryBuffer extends GLBuffer
 				}
 			}
 
-			draw.getPosition( position ) ;
-			draw.getOffset( offset ) ;
-			draw.getRotation( rotation ) ;
-			draw.getScale( scale ) ;
+			draw.getTransformation( modelMatrix ) ;
+			MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, false, modelMatrix.matrix, 0 ) ;
 
-			position.add( offset ) ;
-			modelMatrix.applyTransformations( position, rotation, scale ) ;
+			for( int j = 0; j < shapeCount; ++j )
+			{
+				final int shapeOffset = shapeStart + ( j * SHAPE_DIMENSIONS_PACKET_SIZE ) ;
+
+				final int bufferIndex = shapeDimensions[shapeOffset] ;
+				final int start = shapeDimensions[shapeOffset + 1] ;
+				final int count = shapeDimensions[shapeOffset + 2] ;
+
+				if( activeIndex != bufferIndex )
+				{
+					activeIndex = bufferIndex ;
+					MGL.glBindBuffer( MGL.GL_ELEMENT_ARRAY_BUFFER, indexID[activeIndex] ) ;
+					MGL.glBindBuffer( MGL.GL_ARRAY_BUFFER, vboID[activeIndex] ) ;
+					GLGeometryBuffer.prepareVertexAttributes( _attributes, vertexStrideBytes ) ;
+				}
+
+				MGL.glDrawElements( _style, count, MGL.GL_UNSIGNED_INT, start * IBO_VAR_BYTE_SIZE ) ;
+			}
+		}
+		GLGeometryBuffer.disableVertexAttributes( _attributes ) ;
+	}
+
+	private void drawRange( final int[] _range, final int _style, final VertexAttrib[] _attributes, final GLProgram _program, final GLProgram.UniformState _state, final Camera _camera, final IOcclude _occluder )
+	{
+		GLGeometryBuffer.enableVertexAttributes( _attributes ) ;
+
+		int activeIndex = -1 ;
+
+		final int size = _range.length / RANGE_DIMENSIONS_PACKET_SIZE ;
+		for( int i = 0; i < size; ++i )
+		{
+			final int rangeIndex = i * RANGE_DIMENSIONS_PACKET_SIZE ;
+			final int index = _range[rangeIndex] ;
+
+			final int drawOffset = index * DRAW_DIMENSIONS_PACKET_SIZE ;
+
+			final int drawIndex = drawDimensions[drawOffset] ;
+			final int shapeStart = _range[rangeIndex + 1] ;
+			final int shapeCount = _range[rangeIndex + 2] ;
+
+			final Draw draw = toDraw[drawIndex] ;
+			if( draw.isHidden() || _occluder.occlude( _camera, draw ) )
+			{
+				continue ;
+			}
+
+			if( _state.hasDrawUniforms() )
+			{
+				if( _program.loadDrawUniforms( _state, draw ) == false )
+				{
+					System.out.println( "Failed to load uniforms for draw object." ) ;
+					continue ;
+				}
+			}
+
+			draw.getTransformation( modelMatrix ) ;
 			MGL.glUniformMatrix4fv( _program.inModelMatrix, 1, false, modelMatrix.matrix, 0 ) ;
 
 			for( int j = 0; j < shapeCount; ++j )

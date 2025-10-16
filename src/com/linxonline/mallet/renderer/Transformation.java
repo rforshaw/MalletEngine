@@ -197,7 +197,7 @@ public final class Transformation implements IUpdate
 		{
 			case LINEAR :
 			{
-				if(Interpolate.linear( future, present, _coefficient ))
+				if( Interpolate.linear( future, present, _coefficient ) )
 				{
 					update = true ;
 				}

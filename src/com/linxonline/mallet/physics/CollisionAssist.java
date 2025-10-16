@@ -1,8 +1,5 @@
 package com.linxonline.mallet.physics ;
 
-import com.linxonline.mallet.maths.AABB ;
-import com.linxonline.mallet.maths.OBB ;
-
 public class CollisionAssist
 {
 	private static IAssist assist ;

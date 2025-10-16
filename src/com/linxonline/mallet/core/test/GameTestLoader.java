@@ -312,15 +312,16 @@ public final class GameTestLoader implements IGameLoader
 
 			public void createECSEntities( final int _row, final int _column )
 			{
-				final Hull[] hulls = new Hull[_row * _column] ;
-
 				final ECSEntity.ICreate<Object> create = ( final ECSEntity _parent, final Object _data ) ->
 				{
+					final AABB aabb = AABB.create( 64, 64 ) ;
+
+					final Hull[] hulls = new Hull[_row * _column] ;
 					for( int i = 0; i < _row; ++i )
 					{
 						for( int j = 0; j < _column; ++j )
 						{
-							final Hull hull = new Box2D( AABB.create( 0, 0, 64, 64 ), null ) ;
+							final Hull hull = new Box2D( aabb, null ) ;
 							hull.setPosition( i * 60, j * 60  ) ;
 							hull.setOffset( -32, -32 ) ;
 
@@ -328,8 +329,6 @@ public final class GameTestLoader implements IGameLoader
 							hulls[index] = hull ;
 						}
 					}
-
-					CollisionAssist.add( hulls ) ;
 
 					final ECSCollision.Component collision = ecsCollision.create( _parent, hulls ) ;
 
@@ -356,8 +355,6 @@ public final class GameTestLoader implements IGameLoader
 					ecsEvents.remove( ( ECSEvent.Component )_components[1] ) ;
 					ecsExample.remove( ( ExComponent )_components[2] ) ;
 					ecsCollision.remove( ( ECSCollision.Component )_components[3] ) ;
-
-					CollisionAssist.remove( hulls ) ;
 				} ;
 
 				final ECSEntity entity = new ECSEntity( create, destroy ) ;

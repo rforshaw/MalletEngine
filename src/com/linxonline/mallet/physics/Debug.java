@@ -3,9 +3,6 @@ package com.linxonline.mallet.physics ;
 import com.linxonline.mallet.renderer.Draw ;
 import com.linxonline.mallet.renderer.Shape ;
 import com.linxonline.mallet.renderer.Colour ;
-import com.linxonline.mallet.renderer.DrawAssist ;
-import com.linxonline.mallet.renderer.ProgramAssist ;
-import com.linxonline.mallet.renderer.Interpolation ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;

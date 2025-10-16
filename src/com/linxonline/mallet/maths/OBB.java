@@ -37,11 +37,16 @@ public final class OBB
 
 	public void setFromAABB( final AABB _aabb )
 	{
-		hWidth = ( _aabb.maxX - _aabb.minX ) * 0.5f ;
-		hHeight = ( _aabb.maxY - _aabb.minY ) * 0.5f ;
+		setFromAABB( _aabb.minX, _aabb.minY, _aabb.maxX, _aabb.maxY ) ;
+	}
 
-		x = _aabb.minX + hWidth ;
-		y = _aabb.minY + hHeight ;
+	public void setFromAABB( final float _minX, final float _minY, final float _maxX, final float _maxY )
+	{
+		hWidth = ( _maxX - _minX ) * 0.5f ;
+		hHeight = ( _maxY - _minY ) * 0.5f ;
+
+		x = _minX + hWidth ;
+		y = _minY + hHeight ;
 		init() ;
 	}
 
@@ -140,7 +145,7 @@ public final class OBB
 	/**
 		NEEDS TO BE REIMPLEMENTED
 	**/
-	public final void setRotation( final float _theta, final float _offsetX, final float _offsetY )
+	public void setRotation( final float _theta, final float _offsetX, final float _offsetY )
 	{
 		final float sin = ( float )Math.sin( _theta ) ;
 		final float cos = ( float )Math.cos( _theta ) ;
@@ -180,7 +185,7 @@ public final class OBB
 		rBRY = rXS + bYC - _offsetY ;
 	}
 
-	public final float[] calculateAxes( final float[] _axes )
+	public float[] calculateAxes( final float[] _axes )
 	{
 		_axes[1] = rTRX - rTLX ;		// x
 		_axes[0] = -( rTRY - rTLY ) ;	// y
@@ -199,14 +204,8 @@ public final class OBB
 		return _axes ;
 	}
 
-	private final void init()
+	private void init()
 	{
 		setRotation( 0.0f, 0.0f, 0.0f ) ;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "OBB" ;
 	}
 }

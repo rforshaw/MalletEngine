@@ -12,7 +12,12 @@ public final class SimpleFrame implements Animation.Frame
 {
 	private final String path ; 				// Texture path
 	private final Texture texture ;
-	private final float[] uv = new float[4] ;	// uv coordinates
+
+	private final float u1 ;
+	private final float v1 ;
+
+	private final float u2 ;
+	private final float v2 ;
 
 	public SimpleFrame( final String _path,
 						final float _u1, final float _v1,
@@ -20,10 +25,10 @@ public final class SimpleFrame implements Animation.Frame
 	{
 		path = _path ;
 		texture = new Texture( path ) ;
-		uv[0] = _u1 ;
-		uv[1] = _v1 ;
-		uv[2] = _u2 ;
-		uv[3] = _v2 ;
+		u1 = _u1 ;
+		v1 = _v1 ;
+		u2 = _u2 ;
+		v2 = _v2 ;
 	}
 
 	public Texture getTexture()
@@ -38,13 +43,13 @@ public final class SimpleFrame implements Animation.Frame
 
 	public Vector2 getMinUV( final Vector2 _populate )
 	{
-		_populate.setXY( uv[0], uv[1] ) ;
+		_populate.setXY( u1, v1 ) ;
 		return _populate ;
 	}
 
 	public Vector2 getMaxUV( final Vector2 _populate )
 	{
-		_populate.setXY( uv[2], uv[3] ) ;
+		_populate.setXY( u2, v2 ) ;
 		return _populate ;
 	}
 
@@ -56,16 +61,16 @@ public final class SimpleFrame implements Animation.Frame
 		builder.append( path ) ;
 		builder.append( ' ' ) ;
 
-		builder.append( uv[0] ) ;
+		builder.append( u1 ) ;
 		builder.append( ' ' ) ;
 
-		builder.append( uv[1] ) ;
+		builder.append( v1 ) ;
 		builder.append( ' ' ) ;
 
-		builder.append( uv[2] ) ;
+		builder.append( u2 ) ;
 		builder.append( ' ' ) ;
 
-		builder.append( uv[3] ) ;
+		builder.append( v2 ) ;
 		builder.append( ' ' ) ;
 
 		return builder.toString() ;

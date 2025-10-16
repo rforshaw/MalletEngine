@@ -2,8 +2,6 @@ package com.linxonline.mallet.core ;
 
 import java.util.List ;
 
-import com.linxonline.mallet.event.EventQueue ;
-import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.util.time.* ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Debounce ;
@@ -53,10 +51,11 @@ public final class GameSystem implements IGameSystem
 		currentState = defaultState ;
 		currentState.startState( null ) ;
 
+		final int size = updates.size() ;
+
 		while( running == true )
 		{
 			final double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-			final int size = updates.size() ;
 			for( int i = 0; i < size; ++i )
 			{
 				final IUpdate update = updates.get( i ) ;

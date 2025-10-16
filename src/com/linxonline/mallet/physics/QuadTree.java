@@ -80,7 +80,7 @@ public final class QuadTree
 
 	public void insertHulls( final List<Hull> _hulls )
 	{
-		Parallel.forBatch( _hulls, 1000, ( final int _start, final int _end, final List<Hull> _h ) ->
+		Parallel.forBatch( _hulls, 5000, ( final int _start, final int _end, final List<Hull> _h ) ->
 		{
 			for( int i = _start; i < _end; ++i )
 			{

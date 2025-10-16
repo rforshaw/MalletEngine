@@ -377,7 +377,7 @@ public final class GLDrawInstancedBuffer extends GLBuffer
 				//final long startTime = System.currentTimeMillis() ;
 
 				updater.set( _out ) ;
-				Parallel.forBatch( buffer.getDraws(), 1000, updater ) ;
+				Parallel.forBatch( buffer.getDraws(), 5000, updater ) ;
 				updater.set( null ) ;
 
 				//final long endTime = System.currentTimeMillis() ;

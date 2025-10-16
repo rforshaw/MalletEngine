@@ -32,6 +32,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		final Component component = new Component( _parent, _hulls ) ;
 		invokeLater( () ->
 		{
+			CollisionAssist.add( _hulls ) ;
 			components.add( component ) ;
 		} ) ;
 		return component ;
@@ -42,13 +43,8 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		invokeLater( () ->
 		{
-			if( components.remove( _component ) )
-			{
-				for( final Hull hull : _component.getHulls() )
-				{
-					CollisionAssist.remove( hull ) ;
-				}
-			}
+			CollisionAssist.remove( _component.getHulls() ) ;
+			components.remove( _component ) ;
 		} ) ;
 	}
 
