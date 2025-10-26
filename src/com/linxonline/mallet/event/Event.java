@@ -103,6 +103,23 @@ public final class Event<T>
 	}
 
 	@Override
+	public int hashCode()
+	{
+		return eventType.hashCode() * variable.hashCode() ;
+	}
+
+	@Override
+	public boolean equals( final Object _obj )
+	{
+		if( _obj instanceof Event e )
+		{
+			return eventType == e.eventType && variable == e.variable ;
+		}
+
+		return false ;
+	}
+
+	@Override
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer() ;

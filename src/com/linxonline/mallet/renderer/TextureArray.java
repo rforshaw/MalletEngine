@@ -143,16 +143,6 @@ public final class TextureArray implements IUniform
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( this == _obj )
-		{
-			return true ;
-		}
-
-		if( _obj == null )
-		{
-			return false ;
-		}
-
 		if( !( _obj instanceof TextureArray ) )
 		{
 			return false ;

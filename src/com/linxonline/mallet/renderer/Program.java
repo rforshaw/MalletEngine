@@ -137,16 +137,6 @@ public final class Program
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( this == _obj )
-		{
-			return true ;
-		}
-
-		if( _obj == null )
-		{
-			return false ;
-		}
-
 		if( _obj instanceof Program program )
 		{
 			// We don't compare the index as that is unique 

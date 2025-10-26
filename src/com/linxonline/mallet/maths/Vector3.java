@@ -134,12 +134,9 @@ public final class Vector3 implements IUniform
 	@Override
 	public boolean equals( final Object _compare )
 	{
-		if( _compare != null )
+		if( _compare instanceof Vector3 c )
 		{
-			if( _compare instanceof Vector3 c )
-			{
-				return equals( c.x, c.y, c.z ) ;
-			}
+			return equals( c.x, c.y, c.z ) ;
 		}
 
 		return false ;

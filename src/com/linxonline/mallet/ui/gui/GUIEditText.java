@@ -588,6 +588,7 @@ public class GUIEditText extends GUIText
 
 			parent.makeDirty() ;
 			UIElement.signal( parent, parent.textChanged() ) ;
+
 			return true ;
 		}
 	}

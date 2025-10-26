@@ -116,12 +116,9 @@ public final class IntVector2 implements IUniform
 	@Override
 	public boolean equals( final Object _compare )
 	{
-		if( _compare != null )
+		if( _compare instanceof IntVector2 c )
 		{
-			if( _compare instanceof IntVector2 c )
-			{
-				return equals( c.x, c.y ) ;
-			}
+			return equals( c.x, c.y ) ;
 		}
 
 		return false ;

@@ -71,11 +71,6 @@ public class Address
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( _obj == null )
-		{
-			return false ;
-		}
-	
 		if( _obj instanceof Address addr )
 		{
 			if( host.equals( addr.host ) == false )

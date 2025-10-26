@@ -187,7 +187,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 				return ;
 			}
 
-			System.out.println( "Creating: " + delta ) ;
 			for( int i = 0; i < delta; ++i )
 			{
 				updaters.add( new ComponentUpdater() ) ;

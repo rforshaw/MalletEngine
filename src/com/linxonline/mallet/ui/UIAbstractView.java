@@ -383,13 +383,17 @@ public class UIAbstractView extends UIElement
 			view.setData( _index, variant, IAbstractModel.Role.Display ) ;
 			list.addElement( cell ) ;
 			list.makeDirty() ;
+
+			// We only want to set the initial data once.
+			// Afterwards setModelData will be used to update
+			// the variants.
+			if( _delegate.setItemData( cell, model, _index ) == false )
+			{
+				FALLBACK_ITEM_DELEGATE.setItemData( cell, model, _index ) ;
+			}
 		}
 
 		final UIElement cell = variant.toObject( UIElement.class )  ;
-		if( _delegate.setItemData( cell, model, _index ) == false )
-		{
-			FALLBACK_ITEM_DELEGATE.setItemData( cell, model, _index ) ;
-		}
 		return cell ;
 	}
 

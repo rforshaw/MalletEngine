@@ -37,11 +37,6 @@ public final class Category
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( _obj == null )
-		{
-			return false ;
-		}
-
 		if( _obj instanceof Category cat )
 		{
 			if( ( cat.channel == channel &&

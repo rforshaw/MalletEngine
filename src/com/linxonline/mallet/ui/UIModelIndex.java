@@ -67,11 +67,6 @@ public final class UIModelIndex
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( _obj == null )
-		{
-			return false ;
-		}
-		
 		if( _obj instanceof UIModelIndex index )
 		{
 			if( index.row == row && index.column == column )

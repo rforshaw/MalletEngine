@@ -4,7 +4,7 @@ public class Tuple<T, U>
 {
 	private final T left ;
 	private final U right ;
-	
+
 	public Tuple( final T _left, final U _right )
 	{
 		left = _left ;
@@ -38,16 +38,6 @@ public class Tuple<T, U>
 	@Override
 	public boolean equals( Object _obj )
 	{
-		if( _obj == null )
-		{
-			return false ;
-		}
-
-		if( _obj == this )
-		{
-			return true ;
-		}
-
 		if( _obj instanceof Tuple tuple )
 		{
 			return left.equals( tuple.getLeft() ) && right.equals( tuple.getRight() ) ;

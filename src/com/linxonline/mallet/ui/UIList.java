@@ -669,7 +669,6 @@ public final class UIList extends UILayout
 		public InputEvent.Action mouseMove( final InputEvent _input )
 		{
 			final InputEvent.Action action = super.mouseMove( _input ) ;
-			//System.out.println( action ) ;
 			return action ;
 		}
 	}

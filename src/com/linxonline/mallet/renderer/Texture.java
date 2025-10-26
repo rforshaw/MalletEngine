@@ -115,16 +115,6 @@ public final class Texture implements IUniform
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( this == _obj )
-		{
-			return true ;
-		}
-
-		if( _obj == null )
-		{
-			return false ;
-		}
-
 		if( _obj instanceof Texture rhs )
 		{ 
 			if( uWrap != rhs.uWrap || vWrap != rhs.vWrap )
@@ -275,16 +265,6 @@ public final class Texture implements IUniform
 		@Override
 		public boolean equals( final Object _obj )
 		{
-			if( this == _obj )
-			{
-				return true ;
-			}
-
-			if( _obj == null )
-			{
-				return false ;
-			}
-
 			if( _obj instanceof Meta meta )
 			{
 				return path.equals( meta.path ) ;
