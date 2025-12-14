@@ -39,8 +39,8 @@ public final class BufferedList<T>
 	public BufferedList( final int _capacity )
 	{
 		capacity = _capacity ;
-		tasks = new ArrayList( capacity ) ;
-		current = new ArrayList( capacity ) ;
+		tasks = new ArrayList<Task>( capacity ) ;
+		current = new ArrayList<T>( capacity ) ;
 	}
 
 	public void setAddListener( final AddListener<T> _listener )

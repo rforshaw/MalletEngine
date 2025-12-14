@@ -33,69 +33,41 @@ public abstract class GUIComponent extends UIElement.Component
 
 	private boolean visible = true ;
 
-	private final Connect.Slot<UIElement> addDrawSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> addDrawSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			visible = true ;
-			addDraws( world ) ;
-		}
+		visible = true ;
+		addDraws( world ) ;
 	} ;
 
-	private final Connect.Slot<UIElement> removeDrawSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> removeDrawSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			visible = false ;
-			removeDraws() ;
-		}
+		visible = false ;
+		removeDraws() ;
 	} ;
 
-	private final Connect.Slot<UIElement> positionSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> positionSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			position.setXYZ( _parent.getPosition() ) ;
-		}
+		position.setXYZ( _parent.getPosition() ) ;
 	} ;
 
-	private final Connect.Slot<UIElement> offsetSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> offsetSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			offset.setXYZ( _parent.getOffset() ) ;
-		}
+		offset.setXYZ( _parent.getOffset() ) ;
 	} ;
 
-	private final Connect.Slot<UIElement> lengthSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> lengthSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			length.setXYZ( _parent.getLength() ) ;
-		}
+		length.setXYZ( _parent.getLength() ) ;
 	} ;
 
-	private final Connect.Slot<UIElement> marginSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> marginSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			margin.setXYZ( _parent.getMargin() ) ;
-		}
+		margin.setXYZ( _parent.getMargin() ) ;
 	} ;
 
-	private final Connect.Slot<UIElement> layerSlot = new Connect.Slot<UIElement>()
+	private final Connect.Slot<UIElement> layerSlot = ( final UIElement _parent ) ->
 	{
-		@Override
-		public void slot( final UIElement _parent )
-		{
-			layerUpdated( getLayer() ) ;
-		}
+		layerUpdated( getLayer() ) ;
 	} ;
 
 	public GUIComponent( final UIElement.MetaComponent _meta, final UIElement _parent )

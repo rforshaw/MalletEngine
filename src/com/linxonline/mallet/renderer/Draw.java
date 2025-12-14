@@ -66,9 +66,10 @@ public final class Draw implements IUpdate
 		This could be used for a variety of purposes specific
 		to the developers own use-cases.
 	*/
-	public void setMeta( final IMeta _meta )
+	public <T extends IMeta> T setMeta( final T _meta )
 	{
 		meta = ( _meta != null ) ? _meta : IMeta.EMPTY_META ;
+		return _meta ;
 	}
 
 	/**
@@ -153,7 +154,7 @@ public final class Draw implements IUpdate
 		It's likely that the majority of Draw objects will 
 		contain only one shape.
 	*/
-	public IShape setShape( final IShape _shape )
+	public <T extends IShape> T setShape( final T _shape )
 	{
 		if( shapes == null )
 		{

@@ -187,7 +187,7 @@ public class UIAbstractModel implements IAbstractModel
 		{
 			if( isHandler( _parent ) == true )
 			{
-				addNewRows( _row ) ;
+				addNewRows( _row, _column ) ;
 				addNewColumns( _column ) ;
 				return true ;
 			}
@@ -412,8 +412,8 @@ public class UIAbstractModel implements IAbstractModel
 		{
 			return _flags ;
 		}
-		
-		private void addNewRows( final int _row )
+
+		private void addNewRows( final int _row, final int _columns )
 		{
 			if( _row >= 0 && rows == null )
 			{
@@ -421,13 +421,13 @@ public class UIAbstractModel implements IAbstractModel
 				// if the developer has specified at least 1 row.
 				// Once rows has been initialised we don't 
 				// want to create it again.
-				rows = MalletList.<List<Matrix>>newList() ;
+				rows = MalletList.<List<Matrix>>newList( _row ) ;
 			}
 		
 			final int rowSize = rows.size() ;
 			for( int i = rowSize; i < _row; i++ )
 			{
-				final List<Matrix> row = MalletList.<Matrix>newList() ;
+				final List<Matrix> row = MalletList.<Matrix>newList( _columns ) ;
 				rows.add( row ) ;
 
 				// Before accessing the first row we will add our 

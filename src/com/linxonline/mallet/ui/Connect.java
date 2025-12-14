@@ -45,7 +45,7 @@ public final class Connect
 
 		Signals or Variables can not be immutable - for example String.
 	*/
-	public <T> boolean connect( final T _element, final Signal _signal, final Slot<T> _slot )
+	public <T> boolean connect( final T _element, final Signal _signal, final Slot<? super T> _slot )
 	{
 		if( _element == null || _signal == null )
 		{
@@ -90,7 +90,7 @@ public final class Connect
 		Disconnect will not work if the signal or variable is 
 		immutable.
 	*/
-	public <T> boolean disconnect( final T _element, final Signal _signal, final Slot<T> _slot )
+	public <T> boolean disconnect( final T _element, final Signal _signal, final Slot<? super T> _slot )
 	{
 		if( _element == null )
 		{

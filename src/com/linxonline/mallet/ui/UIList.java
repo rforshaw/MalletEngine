@@ -89,45 +89,33 @@ public final class UIList extends UILayout
 			}
 		} ) ;
 
-		UIElement.connect( this, positionChanged(), new Connect.Slot<UIElement>()
+		UIElement.connect( this, positionChanged(), ( final UIElement _this ) ->
 		{
-			@Override
-			public void slot( final UIElement _this )
+			if( updater != null )
 			{
-				if( updater != null )
-				{
-					final Vector3 position = _this.getPosition() ;
-					frame.setPosition( position.x, position.y, position.z ) ;
-					updater.forceUpdate() ;
-				}
+				final Vector3 pos = _this.getPosition() ;
+				frame.setPosition( pos.x, pos.y, pos.z ) ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 
-		UIElement.connect( this, offsetChanged(), new Connect.Slot<UIElement>()
+		UIElement.connect( this, offsetChanged(), ( final UIElement _this ) ->
 		{
-			@Override
-			public void slot( final UIElement _this )
+			if( updater != null )
 			{
-				if( updater != null )
-				{
-					final Vector3 offset = _this.getOffset() ;
-					frame.setOffset( offset.x, offset.y, offset.z ) ;
-					updater.forceUpdate() ;
-				}
+				final Vector3 off = _this.getOffset() ;
+				frame.setOffset( off.x, off.y, off.z ) ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 
-		UIElement.connect( this, lengthChanged(), new Connect.Slot<UIElement>()
+		UIElement.connect( this, lengthChanged(), ( final UIElement _this ) ->
 		{
-			@Override
-			public void slot( final UIElement _this )
+			if( updater != null )
 			{
-				if( updater != null )
-				{
-					final Vector3 length = _this.getLength() ;
-					frame.setLength( length.x, length.y, length.z ) ;
-					updater.forceUpdate() ;
-				}
+				final Vector3 len = _this.getLength() ;
+				frame.setLength( len.x, len.y, len.z ) ;
+				updater.forceUpdate() ;
 			}
 		} ) ;
 

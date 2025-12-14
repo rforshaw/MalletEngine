@@ -25,8 +25,8 @@ public final class World implements IManageBuffers
 	private final AttachmentType[] attachments ;
 	private final Texture.Meta[] metas ;
 
-	private final List<Camera> cameras ;
-	private final List<ICompatibleBuffer> buffers ;
+	private final List<Camera> cameras = MalletList.<Camera>newList() ;
+	private final List<ICompatibleBuffer> buffers = MalletList.<ICompatibleBuffer>newList() ;
 
 	private final Colour clearColour = new Colour( 0, 0, 0, 0 ) ;
 
@@ -52,9 +52,6 @@ public final class World implements IManageBuffers
 		{
 			metas[i] = new Texture.Meta( id, i, 1280, 720 ) ;
 		}
-
-		cameras = MalletList.<Camera>newList() ;
-		buffers = MalletList.<ICompatibleBuffer>newList() ;
 	}
 
 	public Notify<World> attachRenderNotify( final Notify<World> _notify )

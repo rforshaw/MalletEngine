@@ -17,13 +17,13 @@ public final class NullEventBlock implements IEventBlock
 	}
 
 	@Override
-	public <T> Event.IProcess<T> add( final String _type, final Event.IProcess<T> _proc )
+	public <T> Event.IProcess<? super T> add( final String _type, final Event.IProcess<? super T> _proc )
 	{
 		return _proc ;
 	}
 
 	@Override
-	public <T> Event.IProcess<T> add( final EventType _type, final Event.IProcess<T> _proc )
+	public <T> Event.IProcess<? super T> add( final EventType _type, final Event.IProcess<? super T> _proc )
 	{
 		return _proc ;
 	}

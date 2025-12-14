@@ -189,11 +189,16 @@ public final class UI
 	*/
 	public static boolean applyVec3Ceil( final Vector3 _update, final float _x, final float _y, final float _z )
 	{
-		final float xDiff = Math.abs( _update.x - _x ) ;
-		final float yDiff = Math.abs( _update.y - _y ) ;
-		final float zDiff = Math.abs( _update.z - _z ) ;
+		final int x = ( int )Math.ceil( _x ) ;
+		final int y = ( int )Math.ceil( _y ) ;
+		final int z = ( int )Math.ceil( _z ) ;
 
-		_update.setXYZ( ( int )Math.ceil( _x ), ( int )Math.ceil( _y ), ( int )Math.ceil( _z ) ) ;
+		final float xDiff = Math.abs( ( int )Math.ceil( _update.x ) - x ) ;
+		final float yDiff = Math.abs( ( int )Math.ceil( _update.y ) - y ) ;
+		final float zDiff = Math.abs( ( int )Math.ceil( _update.z ) - z ) ;
+
+		_update.setXYZ( x, y, z ) ;
+
 		return xDiff > 0.001f || yDiff > 0.001f || zDiff > 0.001f ;
 	}
 

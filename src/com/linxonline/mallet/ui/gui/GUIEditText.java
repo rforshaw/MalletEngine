@@ -23,14 +23,10 @@ public class GUIEditText extends GUIText
 	private int start = 0 ;
 	private int end = 0 ;
 
-	private final Connect.Slot<UITextField> elementDisengagedSlot =  new Connect.Slot<UITextField>()
+	private final Connect.Slot<UITextField> elementDisengagedSlot =  ( final UITextField _textfield ) ->
 	{
-		@Override
-		public void slot( final UITextField _textfield )
-		{
-			editing = false ;
-			_textfield.makeDirty() ;
-		}
+		editing = false ;
+		_textfield.makeDirty() ;
 	} ;
 
 	public GUIEditText( final Meta _meta, final UITextField _parent )

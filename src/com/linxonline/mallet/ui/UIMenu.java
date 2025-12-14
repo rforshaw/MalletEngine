@@ -123,12 +123,9 @@ public class UIMenu extends UILayout
 			dropdown.setVisible( false ) ;
 			originalLayer = dropdown.getLayer() ;
 
-			UIElement.connect( this, layerChanged(), new Connect.Slot<Item>()
+			UIElement.connect( this, layerChanged(), ( final Item _item ) ->
 			{
-				public void slot( final Item _item )
-				{
-					dropdown.setLayer( _item.getLayer() + originalLayer ) ;
-				}
+				dropdown.setLayer( _item.getLayer() + originalLayer ) ;
 			} ) ;
 
 			UIElement.connect( this, elementEngaged(), new Connect.Slot<Item>()
@@ -147,24 +144,16 @@ public class UIMenu extends UILayout
 				}
 			} ) ;
 
-			UIElement.connect( this, elementDisengaged(), new Connect.Slot<Item>()
+			UIElement.connect( this, elementDisengaged(), ( final Item _item ) ->
 			{
-				@Override
-				public void slot( final Item _item )
-				{
-					dropdown.disengage() ;
-					dropdown.setVisible( false ) ;
-				}
+				dropdown.disengage() ;
+				dropdown.setVisible( false ) ;
 			} ) ;
 
-			UIElement.connect( this, released(), new Connect.Slot<Item>()
+			UIElement.connect( this, released(), ( final Item _item ) ->
 			{
-				@Override
-				public void slot( final Item _item )
-				{
-					dropdown.setVisible( !dropdown.isVisible() ) ;
-					dropdown.setEngage( !dropdown.isEngaged() ) ;
-				}
+				dropdown.setVisible( !dropdown.isVisible() ) ;
+				dropdown.setEngage( !dropdown.isEngaged() ) ;
 			} ) ;
 		}
 

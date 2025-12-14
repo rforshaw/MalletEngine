@@ -27,8 +27,8 @@ public final class Settings
 			return ;
 		}
 
-		final BooleanVariable var = new BooleanVariable( _name, _value ) ;
-		variables.put( _name, var ) ;
+		final BooleanVariable variable = new BooleanVariable( _name, _value ) ;
+		variables.put( _name, variable ) ;
 	}
 	
 	public final void addInteger( final String _name, final int _value )
@@ -40,8 +40,8 @@ public final class Settings
 			return ;
 		}
 
-		final IntegerVariable var = new IntegerVariable( _name, _value ) ;
-		variables.put( _name, var ) ;
+		final IntegerVariable variable = new IntegerVariable( _name, _value ) ;
+		variables.put( _name, variable ) ;
 	}
 
 	public final void addFloat( final String _name, final float _value )
@@ -53,8 +53,8 @@ public final class Settings
 			return ;
 		}
 
-		final FloatVariable var = new FloatVariable( _name, _value ) ;
-		variables.put( _name, var ) ;
+		final FloatVariable variable = new FloatVariable( _name, _value ) ;
+		variables.put( _name, variable ) ;
 	}
 
 	public final void addString( final String _name, final String _value )
@@ -66,8 +66,8 @@ public final class Settings
 			return ;
 		}
 
-		final StringVariable var = new StringVariable( _name, _value ) ;
-		variables.put( _name, var ) ;
+		final StringVariable variable = new StringVariable( _name, _value ) ;
+		variables.put( _name, variable ) ;
 	}
 
 	public final <T> void addObject( final String _name, final T _value )
@@ -79,8 +79,8 @@ public final class Settings
 			return ;
 		}
 
-		final ObjectVariable<T> var = new ObjectVariable<T>( _name, _value ) ;
-		variables.put( _name, var ) ;
+		final ObjectVariable<T> variable = new ObjectVariable<T>( _name, _value ) ;
+		variables.put( _name, variable ) ;
 	}
 
 	/* Remove Variable */

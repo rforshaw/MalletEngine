@@ -7,7 +7,6 @@ import com.linxonline.mallet.util.settings.* ;
 import com.linxonline.mallet.ui.gui.* ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.maths.* ;
 
 /**
@@ -18,11 +17,11 @@ import com.linxonline.mallet.maths.* ;
 */
 public class UIAbstractView extends UIElement
 {
-	private final static ItemDelegate FALLBACK_ITEM_DELEGATE = createDefaultItemDelegate() ;
+	private final static IItem<? super UIElement> FALLBACK_ITEM_DELEGATE = createDefaultItemDelegate() ;
 
-	private ItemDelegate<?> defaultItemDelegate = createDefaultItemDelegate() ;
-	private ItemDelegate<?>[] columnItemDelegate = new ItemDelegate<?>[1] ;
-	private ItemDelegate<?>[] rowItemDelegate = new ItemDelegate<?>[1] ;
+	private IItem<? super UIElement> defaultItemDelegate = createDefaultItemDelegate() ;
+	private IItem<? super UIElement>[] columnItemDelegate = new IItem[1] ;
+	private IItem<? super UIElement>[] rowItemDelegate = new IItem[1] ;
 
 	private final UIList list = new UIList( ILayout.Type.VERTICAL ) ;
 
@@ -30,6 +29,7 @@ public class UIAbstractView extends UIElement
 	private IAbstractModel model = UIAbstractView.createEmptyModel() ;
 
 	private final Vector3 cellLength = new Vector3( 1.0f, 1.0f, 0.0f ) ;
+	private boolean requiresViewUpdate = true ;
 
 	public UIAbstractView()
 	{
@@ -44,24 +44,16 @@ public class UIAbstractView extends UIElement
 			You will most likely want to engage a child element 
 			owned by the layout.
 		*/
-		UIElement.connect( this, elementEngaged(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementEngaged(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.engage() ;
-			}
+			_this.list.engage() ;
 		} ) ;
 
-		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementDisengaged(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.disengage() ;
-			}
+			_this.list.disengage() ;
 		} ) ;
-	
+
 		/**
 			Set the layer that the visual elements are 
 			expected to be placed on.
@@ -69,31 +61,19 @@ public class UIAbstractView extends UIElement
 			This also applies to the layouts children.
 			Causes the elements to be flagged as dirty.
 		*/
-		UIElement.connect( this, layerChanged(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, layerChanged(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.setLayer( getLayer() + 1 ) ;
-			}
+			_this.list.setLayer( getLayer() + 1 ) ;
 		} ) ;
 
-		UIElement.connect( this, elementShown(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementShown(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.setVisible( true ) ;
-			}
+			_this.list.setVisible( true ) ;
 		} ) ;
 
-		UIElement.connect( this, elementHidden(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementHidden(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.setVisible( false ) ;
-			}
+			_this.list.setVisible( false ) ;
 		} ) ;
 
 		/**
@@ -103,13 +83,9 @@ public class UIAbstractView extends UIElement
 			Will also call shutdown on all children. Call clear 
 			if you wish to also remove all children from layout.
 		*/
-		UIElement.connect( this, elementShutdown(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementShutdown(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.shutdown() ;
-			}
+			_this.list.shutdown() ;
 		} ) ;
 
 		/**
@@ -119,13 +95,9 @@ public class UIAbstractView extends UIElement
 			any resources attached.
 			Remove any events that may be in the event stream.
 		*/
-		UIElement.connect( this, elementClear(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementClear(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.clear() ;
-			}
+			_this.list.clear() ;
 		} ) ;
 
 		/**
@@ -134,13 +106,9 @@ public class UIAbstractView extends UIElement
 
 			Call reset on all children.
 		*/
-		UIElement.connect( this, elementReset(), new Connect.Slot<UIAbstractView>()
+		UIElement.connect( this, elementReset(), ( final UIAbstractView _this ) ->
 		{
-			@Override
-			public void slot( final UIAbstractView _this )
-			{
-				_this.list.reset() ;
-			}
+			_this.list.reset() ;
 		} ) ;
 
 		UIElement.connect( this, positionChanged(), new Connect.Slot<UIAbstractView>()
@@ -192,26 +160,29 @@ public class UIAbstractView extends UIElement
 		} ) ;
 	}
 
-	public ItemDelegate setDefaultItemDelegate( final ItemDelegate<?> _delegate )
+	public IItem setDefaultItemDelegate( final IItem<? super UIElement> _delegate )
 	{
+		requiresViewUpdate = true ;
 		defaultItemDelegate = ( _delegate != null ) ? _delegate : createDefaultItemDelegate() ;
 		return defaultItemDelegate ;
 	}
 
-	public ItemDelegate setColumnItemDelegate( final int _column, final ItemDelegate<?> _delegate )
+	public IItem setColumnItemDelegate( final int _column, final IItem<? super UIElement> _delegate )
 	{
 		columnItemDelegate = setItemDelegate( _column, columnItemDelegate, _delegate ) ;
 		return _delegate ;
 	}
 
-	public ItemDelegate setRowItemDelegate( final int _row, final ItemDelegate<?> _delegate )
+	public IItem setRowItemDelegate( final int _row, final IItem<? super UIElement> _delegate )
 	{
 		rowItemDelegate = setItemDelegate( _row, rowItemDelegate, _delegate ) ;
 		return _delegate ;
 	}
 
-	private ItemDelegate[] setItemDelegate( final int _index, final ItemDelegate<?>[] _delegates, final ItemDelegate<?> _delegate )
+	private IItem[] setItemDelegate( final int _index, final IItem<? super UIElement>[] _delegates, final IItem<? super UIElement> _delegate )
 	{
+		requiresViewUpdate = true ;
+
 		final int size = _delegates.length ;
 		if( _index < size )
 		{
@@ -219,7 +190,7 @@ public class UIAbstractView extends UIElement
 			return _delegates ;
 		}
 
-		final ItemDelegate<?>[] delegates = new ItemDelegate<?>[_index + 1] ;
+		final IItem<? super UIElement>[] delegates = new IItem[_index + 1] ;
 		System.arraycopy( _delegates, 0, delegates, 0, delegates.length ) ;
 		_delegates[_index] = _delegate ;
 		return delegates ;
@@ -285,9 +256,10 @@ public class UIAbstractView extends UIElement
 	{
 		final boolean dirty = isDirty() ;
 		super.update( _dt ) ;
-		if( dirty )
+		if( requiresViewUpdate )
 		{
 			updateView( model.root(), this, _dt ) ;
+			requiresViewUpdate = false ;
 		}
 
 		list.update( _dt ) ;
@@ -339,6 +311,8 @@ public class UIAbstractView extends UIElement
 				removeCellElement( index, getItemDelegate( index ) ) ;
 			}
 		}
+
+		requiresViewUpdate = true ;
 	}
 
 	public void setModel( final IAbstractModel _model )
@@ -363,7 +337,7 @@ public class UIAbstractView extends UIElement
 		If no cell exist construct one and apply display data from 
 		the model to it.
 	*/
-	private UIElement getCellElement( final UIModelIndex _index, final ItemDelegate _delegate )
+	private UIElement getCellElement( final UIModelIndex _index, final IItem<? super UIElement> _factory )
 	{
 		if( view.exists( _index ) == false )
 		{
@@ -373,7 +347,7 @@ public class UIAbstractView extends UIElement
 		IVariant variant = view.getData( _index, IAbstractModel.Role.Display ) ;
 		if( variant == null )
 		{
-			UIElement cell = _delegate.createItem( this, model, _index ) ;
+			UIElement cell = _factory.createItem( this, model, _index ) ;
 			if( cell == null )
 			{
 				cell = FALLBACK_ITEM_DELEGATE.createItem( this, model, _index ) ;
@@ -387,7 +361,7 @@ public class UIAbstractView extends UIElement
 			// We only want to set the initial data once.
 			// Afterwards setModelData will be used to update
 			// the variants.
-			if( _delegate.setItemData( cell, model, _index ) == false )
+			if( _factory.setItemData( cell, model, _index ) == false )
 			{
 				FALLBACK_ITEM_DELEGATE.setItemData( cell, model, _index ) ;
 			}
@@ -400,7 +374,7 @@ public class UIAbstractView extends UIElement
 	/**
 		Remove a cell that is associated with the passed in index.
 	*/
-	private void removeCellElement( final UIModelIndex _index, final ItemDelegate _delegate )
+	private void removeCellElement( final UIModelIndex _index, final IItem<? super UIElement> _delegate )
 	{
 		if( view.exists( _index ) == false )
 		{
@@ -423,7 +397,7 @@ public class UIAbstractView extends UIElement
 		}
 	}
 
-	private ItemDelegate<?> getItemDelegate( final UIModelIndex _index )
+	private IItem<? super UIElement> getItemDelegate( final UIModelIndex _index )
 	{
 		final int row = _index.getRow() ;
 		if( row < rowItemDelegate.length )
@@ -513,9 +487,9 @@ public class UIAbstractView extends UIElement
 		Not generic - expects the data to be stored in the 
 		format used by UI Meta objects. 
 	*/
-	private static ItemDelegate<?> createDefaultItemDelegate()
+	private static IItem<? super UIElement> createDefaultItemDelegate()
 	{
-		return new ItemDelegate<UIElement>()
+		return new IItem<UIElement>()
 		{
 			@Override
 			public UIElement createItem( final UIAbstractView _parent, final IAbstractModel _model, final UIModelIndex _index )
@@ -965,15 +939,19 @@ public class UIAbstractView extends UIElement
 		}
 	}
 
-	public interface ItemDelegate<T extends UIElement>
+	public interface IItem<T extends UIElement>
 	{
 		/**
 			Create the item that is to be used within the cell.
+			Also hook up any connections between signals and slots.
+			These connections will likely want to call setModelData()
+			when the item state is ready.
 		*/
 		public T createItem( final UIAbstractView _parent, final IAbstractModel _model, final UIModelIndex _index ) ;
 
 		/**
 			Clean up any resources that may have been used by this cell.
+			Make sure to clean up any connections created!
 		*/
 		public boolean destroyItem( final T _item ) ;
 

@@ -26,6 +26,7 @@ public class GUIText extends GUIComponent
 	public GUIText( final Meta _meta, final StringBuilder _text, final UIElement _parent )
 	{
 		super( _meta, _parent ) ;
+
 		setLayerOffset( 1 ) ;
 		drawAlignmentX = _meta.getAlignmentX() ;
 		drawAlignmentY = _meta.getAlignmentY() ;

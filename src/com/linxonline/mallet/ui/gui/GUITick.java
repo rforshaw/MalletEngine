@@ -7,23 +7,19 @@ import com.linxonline.mallet.ui.* ;
 
 public class GUITick extends GUIDraw
 {
-	private final Connect.Slot<UICheckbox> checkSlot = new Connect.Slot<UICheckbox>()
+	private final Connect.Slot<UICheckbox> checkSlot = ( final UICheckbox _box ) ->
 	{
-		@Override
-		public void slot( final UICheckbox _box )
+		if( _box.isChecked() == true )
 		{
-			if( _box.isChecked() == true )
+			addDraws( getWorld() ) ;
+		}
+		else
+		{
+			final DrawUpdater updater = getUpdater() ;
+			if( updater != null )
 			{
-				addDraws( getWorld() ) ;
-			}
-			else
-			{
-				final DrawUpdater updater = getUpdater() ;
-				if( updater != null )
-				{
-					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.removeDraw( getDraw() ) ;
-				}
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.removeDraw( getDraw() ) ;
 			}
 		}
 	} ;

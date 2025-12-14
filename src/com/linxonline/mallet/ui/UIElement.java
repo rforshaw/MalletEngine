@@ -1145,94 +1145,54 @@ public class UIElement implements IInputHandler, Connect.Connection
 		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event ) ;
 	}
 
-	private static final InputAction DEFAULT_SCROLL_ACTION = new InputAction()
+	private static final InputAction DEFAULT_SCROLL_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.scroll( _event ) ;
-		}
+		return _listener.scroll( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_MOUSE_MOVE_ACTION = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_MOVE_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.mouseMove( _event ) ;
-		}
+		return _listener.mouseMove( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_MOUSE_PRESSED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_PRESSED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.mousePressed( _event ) ;
-		}
+		return _listener.mousePressed( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_MOUSE_RELEASED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_MOUSE_RELEASED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.mouseReleased( _event ) ;
-		}
+		return _listener.mouseReleased( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_TOUCH_MOVE_ACTION = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_MOVE_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.touchMove( _event ) ;
-		}
+		return _listener.touchMove( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_TOUCH_PRESSED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_PRESSED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.touchPressed( _event ) ;
-		}
+		return _listener.touchPressed( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_TOUCH_RELEASED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_TOUCH_RELEASED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.touchReleased( _event ) ;
-		}
+		return _listener.touchReleased( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_KEY_RELEASED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_KEY_RELEASED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.keyReleased( _event ) ;
-		}
+		return _listener.keyReleased( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_KEY_PRESSED_ACTION = new InputAction()
+	private static final InputAction DEFAULT_KEY_PRESSED_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.keyPressed( _event ) ;
-		}
+		return _listener.keyPressed( _event ) ;
 	} ;
 
-	private static final InputAction DEFAULT_ANALOGUE_MOVE_ACTION = new InputAction()
+	private static final InputAction DEFAULT_ANALOGUE_MOVE_ACTION = ( final UIElement.Component _listener, final InputEvent _event ) ->
 	{
-		@Override
-		public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
-		{
-			return _listener.analogueMove( _event ) ;
-		}
+		return _listener.analogueMove( _event ) ;
 	} ;
 
 	public static class Meta extends UIAbstractModel implements Connect.Connection

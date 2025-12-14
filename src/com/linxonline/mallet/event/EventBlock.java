@@ -43,13 +43,13 @@ public final class EventBlock implements IEventBlock
 	}
 
 	@Override
-	public <T> Event.IProcess<T> add( final String _type, final Event.IProcess<T> _proc )
+	public <T> Event.IProcess<? super T> add( final String _type, final Event.IProcess<? super T> _proc )
 	{
 		return add( EventType.get( _type ), _proc ) ;
 	}
 
 	@Override
-	public <T> Event.IProcess<T> add( final EventType _type, final Event.IProcess<T> _proc )
+	public <T> Event.IProcess<? super T> add( final EventType _type, final Event.IProcess<? super T> _proc )
 	{
 		sources.add( Tuple.<String, Event.IProcess<?>>build( _type.getType(), _proc ) ) ;
 		procs.add( Tuple.<Event.IProcess<?>, EventQueue<?>>build( _proc, state.get( _type ) ) ) ;

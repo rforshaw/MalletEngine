@@ -78,7 +78,7 @@ public final class JObject
 				{
 					builder.append( _resource[i] ) ;
 				}
-			
+
 				return 1 ;
 			}
 

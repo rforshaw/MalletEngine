@@ -95,7 +95,7 @@ public final class EventQueue<T>
 	/**
 	* Pass the current events to the passed in _process.
 	*/
-	public void process( final Event.IProcess<T> _process )
+	public void process( final Event.IProcess<? super T> _process )
 	{
 		try
 		{
@@ -109,7 +109,8 @@ public final class EventQueue<T>
 			final int size = front.size() ;
 			for( int i = 0; i < size; ++i )
 			{
-				_process.process( front.get( i ).getVariable() ) ;
+				final Event<T> event = front.get( i ) ;
+				_process.process( event.getVariable() ) ;
 			}
 		}
 		finally

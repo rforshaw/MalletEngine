@@ -23,17 +23,17 @@ public final class ECSEntity
 
 	private boolean dead = false ;
 
-	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy )
+	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy )
 	{
 		this( _create, _destroy, null, null ) ;
 	}
 
-	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy, final T _data )
+	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy, final T _data )
 	{
 		this( _create, _destroy, null, _data ) ;
 	}
 
-	public <T> ECSEntity( final ICreate<T> _create, final IDestroy _destroy, final ISave _save, final T _data )
+	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy, final ISave _save, final T _data )
 	{
 		components = _create.create( this, _data ) ;
 		destroy = _destroy ;
