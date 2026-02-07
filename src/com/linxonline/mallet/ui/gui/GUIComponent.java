@@ -58,6 +58,7 @@ public abstract class GUIComponent extends UIElement.Component
 	private final Connect.Slot<UIElement> lengthSlot = ( final UIElement _parent ) ->
 	{
 		length.setXYZ( _parent.getLength() ) ;
+		lengthUpdated() ;
 	} ;
 
 	private final Connect.Slot<UIElement> marginSlot = ( final UIElement _parent ) ->
@@ -89,19 +90,27 @@ public abstract class GUIComponent extends UIElement.Component
 	}
 
 	/**
-		Called when component receives a valid DrawDelegate
-		and when the parent UIElement is flagged as visible.
+		Called when the UIElement is expected to display
+		something for rendering.
 	*/
 	public abstract void addDraws( final World _world ) ;
 
 	/**
-		Only called if there is a valid DrawDelegate and 
-		when the parent UIElement is flagged as invisible.
+		Called when the UIElement has been hidden and
+		expected to display nothing.
 	*/
 	public abstract void removeDraws() ;
 
+	/**
+		Called when the UIElements layer has changed.
+	*/
 	public abstract void layerUpdated( int _layer ) ;
-	
+
+	/**
+		Called when the UIElement's length has changed.
+	*/
+	public void lengthUpdated() {}
+
 	@Override
 	public void setWorld( final World _world )
 	{
@@ -134,7 +143,7 @@ public abstract class GUIComponent extends UIElement.Component
 	public void refresh() {}
 
 	/**
-		Return the a layer that any draw objects 
+		Return the layer that any draw objects 
 		constructed are expected to use.
 	*/
 	public int getLayer()

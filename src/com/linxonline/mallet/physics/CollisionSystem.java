@@ -3,13 +3,12 @@ package com.linxonline.mallet.physics ;
 import java.util.List ;
 import java.util.ArrayList ;
 
-import com.linxonline.mallet.util.Tuple ;
-
 import com.linxonline.mallet.util.* ;
 import com.linxonline.mallet.maths.* ;
 
 public final class CollisionSystem
 {
+	private final CollisionCheck check = new CollisionCheck() ;
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
@@ -45,6 +44,8 @@ public final class CollisionSystem
 		treeHulls.clear() ;
 		treeHulls.insertHulls( hulls ) ;
 		treeHulls.update( _dt ) ;
+
+		//simpleUpdate( check, hulls ) ;
 	}
 
 	public CollisionAssist.IAssist createCollisionAssist()
@@ -172,6 +173,11 @@ public final class CollisionSystem
 
 	private static void simpleUpdate( final CollisionCheck _check, final List<Hull> _hulls )
 	{
+		for( final Hull hull : _hulls )
+		{
+			hull.contactData.reset() ;
+		}
+
 		for( final Hull hull1 : _hulls )
 		{
 			if( hull1.isCollidable() == false )
@@ -193,16 +199,13 @@ public final class CollisionSystem
 				continue ;
 			}
 
-			if( _hull1.isCollidableWithGroup( hull2.getGroupID() ) == true )
+			if( _check.generateContactPoint( hull2 ) == true )
 			{
-				if( _check.generateContactPoint( hull2 ) == true )
+				if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
 				{
-					if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
-					{
-						// No point looking for more contacts if 
-						// we've reached maximum.
-						return ;
-					}
+					// No point looking for more contacts if 
+					// we've reached maximum.
+					return ;
 				}
 			}
 		}

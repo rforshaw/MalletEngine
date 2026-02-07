@@ -19,27 +19,9 @@ public class GUIDrawEdge extends GUIDraw
 	}
 
 	@Override
-	public void refresh()
+	public void updateGeometry( final Shape _geometry )
 	{
-		//super.refresh() ;
-		final UIElement parent = getParent() ;
-		final Vector3 position = getPosition() ;
-		final Vector3 offset = getOffset() ;
-		final Vector3 length = getLength() ;
-
-		updateLength( parent.getLength(), getLength() ) ;
-		updateOffset( parent.getOffset(), getOffset() ) ;
-
-		final DrawUpdater updater = getUpdater() ;
-		if( updater != null && parent.isVisible() == true )
-		{
-			final Draw draw = getDraw() ;
-			draw.setPositionInstant( position.x, position.y, position.z ) ;
-			draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
-
-			GUI.updateEdge( ( Shape )draw.getShape(), getLength(), edge ) ;
-			updater.forceUpdate() ;
-		}
+		GUI.updateEdge( _geometry, getLength(), edge ) ;
 	}
 
 	private void updateLength( final Vector3 _length, final Vector3 _toUpdate )

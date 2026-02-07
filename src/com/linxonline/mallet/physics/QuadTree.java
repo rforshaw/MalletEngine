@@ -466,7 +466,15 @@ public final class QuadTree
 			for( int j = _index + 1; j < nextHull; ++j )
 			{
 				final Hull hull2 = _hulls[j] ;
-				check.generateContactPoint( hull2 ) ;
+				if( check.generateContactPoint( hull2 ) == true )
+				{
+					if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
+					{
+						// No point looking for more contacts if
+						// we've reached maximum.
+						return ;
+					}
+				}
 			}
 		}
 		

@@ -20,6 +20,8 @@ public class GUIDraw extends GUIComponent
 	private GeometryBuffer geometry = null ;
 	private final Draw draw = new Draw() ;
 
+	private boolean geometryChanged = false ;
+
 	public GUIDraw( final Meta _meta, final UIElement _parent )
 	{
 		super( _meta, _parent ) ;
@@ -52,11 +54,12 @@ public class GUIDraw extends GUIComponent
 
 		final Draw draw = getDraw() ;
 		final Shape shape = ( Shape )draw.getShape() ;
-		if( shape != null )
+		if( shape == null )
 		{
-			GUI.updateColour( shape, colour ) ;
+			return ;
 		}
 
+		GUI.updateColour( shape, colour ) ;
 		if( updater != null )
 		{
 			updater.forceUpdate() ;
@@ -92,6 +95,8 @@ public class GUIDraw extends GUIComponent
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraw( draw ) ;
+
+		geometryChanged = true ;
 	}
 
 	@Override
@@ -118,6 +123,14 @@ public class GUIDraw extends GUIComponent
 
 		geometry = updater.getBuffer( 0 ) ;
 		geometry.addDraws( draw ) ;
+
+		geometryChanged = true ;
+	}
+
+	@Override
+	public void lengthUpdated()
+	{
+		geometryChanged = true ;
 	}
 
 	@Override
@@ -128,19 +141,28 @@ public class GUIDraw extends GUIComponent
 
 		final Vector3 position = getPosition() ;
 		final Vector3 offset = getOffset() ;
-		final Vector3 length = getLength() ;
 
-		updateLength( parent.getLength(), length ) ;
+		updateLength( parent.getLength(), getLength() ) ;
 		updateOffset( parent.getOffset(), offset ) ;
+
+		draw.setPositionInstant( position.x, position.y, position.z ) ;
+		draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
 
 		if( updater != null && parent.isVisible() == true )
 		{
-			Shape.updatePlaneGeometry( ( Shape )draw.getShape(), length ) ;
+			if( geometryChanged )
+			{
+				updateGeometry( ( Shape )draw.getShape() ) ;
+				updater.forceUpdate() ;
 
-			draw.setPositionInstant( position.x, position.y, position.z ) ;
-			draw.setOffsetInstant( offset.x, offset.y, offset.z ) ;
-			updater.forceUpdate() ;
+				geometryChanged = false ;
+			}
 		}
+	}
+
+	public void updateGeometry( final Shape _geometry )
+	{
+		Shape.updatePlaneGeometry( _geometry, getLength() ) ;
 	}
 
 	@Override

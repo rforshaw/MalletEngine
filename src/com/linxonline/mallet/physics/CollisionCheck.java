@@ -96,7 +96,7 @@ public final class CollisionCheck
 		// 'pushed' away - or prevent the other hull from passing 
 		// through it.
 		final boolean physical = box1.isPhysical() && _box2.isPhysical() ;
-		final float a = ( physical ) ? 1.0f : 0.5f ;
+		final float a = ( physical ) ? 0.5f : 1.0f ;
 
 		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * a : overlap2 * a ;		// Get the best overlap overall
 

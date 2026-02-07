@@ -15,12 +15,7 @@ public class GUITick extends GUIDraw
 		}
 		else
 		{
-			final DrawUpdater updater = getUpdater() ;
-			if( updater != null )
-			{
-				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-				geometry.removeDraw( getDraw() ) ;
-			}
+			removeDraws() ;
 		}
 	} ;
 

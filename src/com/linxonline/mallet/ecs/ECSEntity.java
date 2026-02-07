@@ -11,39 +11,29 @@ package com.linxonline.mallet.ecs ;
 */
 public final class ECSEntity
 {
-	private final static ISave SAVE_FALLBACK = new ISave()
-	{
-		@Override
-		public void save( final ECSEntity _toSave ) {}
-	} ;
-
 	private final Component[] components ;
 	private final IDestroy destroy ;
-	private final ISave save ;
 
 	private boolean dead = false ;
 
 	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy )
 	{
-		this( _create, _destroy, null, null ) ;
+		this( _create, _destroy, null ) ;
 	}
 
 	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy, final T _data )
 	{
-		this( _create, _destroy, null, _data ) ;
-	}
-
-	public <T> ECSEntity( final ICreate<? super T> _create, final IDestroy _destroy, final ISave _save, final T _data )
-	{
 		components = _create.create( this, _data ) ;
 		destroy = _destroy ;
-		save = (_save != null) ? _save : SAVE_FALLBACK ;
 	}
 
 	/**
-		Call save to run the save operation associated with this entity.
+		Save the entity state using the passed in _save operation.
+		The save operation will likely store the data required to
+		construct T _data when the entity was created, along with
+		an identifier to know what ICreate and IDestroy is needed.
 	*/
-	public void save()
+	public void save( final ISave _save )
 	{
 		if( dead == true )
 		{
@@ -52,7 +42,7 @@ public final class ECSEntity
 			return ;
 		}
 
-		save.save( this ) ;
+		_save.save( this ) ;
 	}
 
 	public void destroy()
