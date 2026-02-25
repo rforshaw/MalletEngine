@@ -78,6 +78,7 @@ public final class SimpleFrame implements Animation.Frame
 
 	public final static class Generator implements AnimatorGenerator.FrameGenerator<SimpleFrame>
 	{
+		@Override
 		public SimpleFrame create( final String _animPath, final List<JObject> _resources )
 		{
 			final JObject resource = _resources.get( 0 ) ;
@@ -130,7 +131,7 @@ public final class SimpleFrame implements Animation.Frame
 		}
 
 		@Override
-		public void animationChanged( final Animation _previous, final Animation _next ) {}
+		public void animationChanged( final Animation<SimpleFrame> _previous, final Animation<SimpleFrame> _next ) {}
 
 		@Override
 		public void frameChanged( final SimpleFrame _previous, final SimpleFrame _next )

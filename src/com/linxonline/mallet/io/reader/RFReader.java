@@ -65,7 +65,7 @@ public abstract class RFReader
 			{
 				if( closedBracket == true && openBracket == false )
 				{
-					System.out.println( "Found closed bracket before closed bracket" ) ;
+					System.out.println( "Found closed bracket before open bracket" ) ;
 					return null ;
 				}
 				else

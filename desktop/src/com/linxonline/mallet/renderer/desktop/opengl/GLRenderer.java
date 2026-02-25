@@ -513,7 +513,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 		return new StorageAssist.Assist()
 		{
 			@Override
-			public StorageUpdater add( final StorageUpdater _updater )
+			public <T extends IUpdate> StorageUpdater<T> add( final StorageUpdater<T> _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{
@@ -523,7 +523,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 			}
 
 			@Override
-			public StorageUpdater remove( final StorageUpdater _updater )
+			public <T extends IUpdate> StorageUpdater<T> remove( final StorageUpdater<T> _updater )
 			{
 				GLRenderer.this.invokeLater( () ->
 				{

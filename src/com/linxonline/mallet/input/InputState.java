@@ -3,7 +3,6 @@ package com.linxonline.mallet.input ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.input.* ;
 
 /*==============================================================*/
 // InputState is used to create a Heirachical structure of      //

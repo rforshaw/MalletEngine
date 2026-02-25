@@ -3,7 +3,6 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.* ;
-import com.linxonline.mallet.maths.* ;
 
 public abstract class BasicRenderer implements IRender
 {

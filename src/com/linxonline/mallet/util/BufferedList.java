@@ -12,15 +12,8 @@ import java.util.Iterator ;
 */
 public final class BufferedList<T>
 {
-	private final AddListener<T> ADD_FALLBACK = new AddListener<T>()
-	{
-		public void add( final T _data ) {}
-	} ;
-
-	private final RemoveListener<T> REMOVE_FALLBACK = new RemoveListener<T>()
-	{
-		public void remove( final T _data ) {}
-	} ;
+	private final AddListener<T> ADD_FALLBACK = ( final T _data ) -> {} ;
+	private final RemoveListener<T> REMOVE_FALLBACK = ( final T _data ) -> {} ;
 
 	private final int capacity ;
 	private ArrayList<Task> tasks ;

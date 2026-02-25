@@ -5,10 +5,7 @@ import java.util.List ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.audio.AudioDelegate ;
-
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -67,22 +64,14 @@ public class UILayout extends UIElement implements IChildren
 			You will most likely want to engage a child element 
 			owned by the layout.
 		*/
-		UIElement.connect( this, elementEngaged(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementEngaged(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				current = State.CHILD_ENGAGED ;
-			}
+			current = State.CHILD_ENGAGED ;
 		} ) ;
 
-		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementDisengaged(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				_this.children.disengage() ;
-			}
+			_this.children.disengage() ;
 		} ) ;
 
 		/**
@@ -92,40 +81,24 @@ public class UILayout extends UIElement implements IChildren
 			This also applies to the layouts children.
 			Causes the elements to be flagged as dirty.
 		*/
-		UIElement.connect( this, layerChanged(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, layerChanged(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				_this.children.setLayer( getLayer() ) ;
-			}
+			_this.children.setLayer( getLayer() ) ;
 		} ) ;
 
-		UIElement.connect( this, elementShown(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementShown(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				_this.children.setVisible( true ) ;
-			}
+			_this.children.setVisible( true ) ;
 		} ) ;
 
-		UIElement.connect( this, elementHidden(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementHidden(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				_this.children.setVisible( false ) ;
-			}
+			_this.children.setVisible( false ) ;
 		} ) ;
 
-		UIElement.connect( this, elementDestroyed(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementDestroyed(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				children.destroy() ;
-			}
+			children.destroy() ;
 		} ) ;
 
 		/**
@@ -135,13 +108,9 @@ public class UILayout extends UIElement implements IChildren
 			Will also call shutdown on all children. Call clear 
 			if you wish to also remove all children from layout.
 		*/
-		UIElement.connect( this, elementShutdown(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementShutdown(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				children.shutdown() ;
-			}
+			children.shutdown() ;
 		} ) ;
 
 		/**
@@ -151,13 +120,9 @@ public class UILayout extends UIElement implements IChildren
 			any resources attached.
 			Remove any events that may be in the event stream.
 		*/
-		UIElement.connect( this, elementClear(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementClear(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				children.clear() ;
-			}
+			children.clear() ;
 		} ) ;
 
 		/**
@@ -166,13 +131,9 @@ public class UILayout extends UIElement implements IChildren
 
 			Call reset on all children.
 		*/
-		UIElement.connect( this, elementReset(), new Connect.Slot<UILayout>()
+		UIElement.connect( this, elementReset(), ( final UILayout _this ) ->
 		{
-			@Override
-			public void slot( final UILayout _this )
-			{
-				children.reset() ;
-			}
+			children.reset() ;
 		} ) ;
 	}
 

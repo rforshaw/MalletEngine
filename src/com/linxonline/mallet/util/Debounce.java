@@ -65,7 +65,7 @@ public final class Debounce implements IGameSystem.IUpdate
 		Called by the main-loop do not call this function manually.
 	*/
 	@Override
-	public void update( final double _dt )
+	public int update( final double _dt )
 	{
 		synchronized( lookup )
 		{
@@ -88,6 +88,8 @@ public final class Debounce implements IGameSystem.IUpdate
 				}
 			}
 		}
+
+		return 0 ;
 	}
 
 	private static final class Op

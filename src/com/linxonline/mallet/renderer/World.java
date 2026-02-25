@@ -5,9 +5,7 @@ import java.util.Comparator ;
 import java.util.Collections ;
 
 import com.linxonline.mallet.maths.IntVector2 ;
-import com.linxonline.mallet.renderer.Texture ;
 
-import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;

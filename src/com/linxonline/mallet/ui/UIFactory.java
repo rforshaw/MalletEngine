@@ -1,8 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.List ;
-
-import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.util.notification.Notification ;
 
 import com.linxonline.mallet.renderer.CameraAssist ;
@@ -12,12 +9,7 @@ import com.linxonline.mallet.renderer.WorldAssist ;
 import com.linxonline.mallet.renderer.World ;
 
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.IntVector2 ;
-
-import com.linxonline.mallet.input.* ;
-
-import com.linxonline.mallet.ui.gui.* ;
 
 /**
 	Contains helper functions for the construction of 

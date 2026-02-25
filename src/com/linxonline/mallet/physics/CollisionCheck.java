@@ -20,8 +20,6 @@ public final class CollisionCheck
 	private final AABB aabb1 = AABB.create() ;
 	private final AABB aabb2 = AABB.create() ;
 
-	private final ContactPoint contact = new ContactPoint() ;
-
 	private Hull box1 ;
 
 	public CollisionCheck() {}
@@ -57,7 +55,6 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		
 		_box2.getAABB( aabb2 ) ; 
 		if( aabb1.intersectAABB( aabb2 ) == false && aabb2.intersectAABB( aabb1 ) == false )
 		{

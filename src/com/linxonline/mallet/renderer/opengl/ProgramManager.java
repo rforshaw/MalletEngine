@@ -1,9 +1,5 @@
 package com.linxonline.mallet.renderer.opengl ;
 
-import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
-
 import com.linxonline.mallet.io.Resource ;
 import com.linxonline.mallet.io.AbstractManager ;
 import com.linxonline.mallet.renderer.opengl.JSONProgram ;

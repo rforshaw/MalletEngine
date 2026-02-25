@@ -4,8 +4,6 @@ import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
-import com.linxonline.mallet.renderer.Colour ;
-
 public final class TextDraw implements IUpdate
 {
 	private final Transformation trans = new Transformation() ;

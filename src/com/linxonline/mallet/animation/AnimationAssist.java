@@ -13,19 +13,19 @@ public final class AnimationAssist
 		assist = _assist ;
 	}
 
-	public static IAnimation add( final IAnimation _animation )
+	public static <T extends IAnimation> T add( final T _animation )
 	{
 		return assist.add( _animation ) ;
 	}
 
-	public static IAnimation remove( final IAnimation _animation )
+	public static <T extends IAnimation> T remove( final T _animation )
 	{
 		return assist.remove( _animation ) ;
 	}
 
 	public interface Assist
 	{
-		public IAnimation add( final IAnimation _animation ) ;
-		public IAnimation remove( final IAnimation _animation ) ;
+		public <T extends IAnimation> T add( final T _animation ) ;
+		public <T extends IAnimation> T remove( final T _animation ) ;
 	}
 }

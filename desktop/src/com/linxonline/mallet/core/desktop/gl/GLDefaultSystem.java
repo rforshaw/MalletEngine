@@ -35,8 +35,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	private final EventQueue<Boolean> CAPTURE_SYSTEM_MOUSE = Event.get( "CAPTURE_SYSTEM_MOUSE" ) ;
 	private final EventQueue<Boolean> SYSTEM_FULLSCREEN = Event.get( "SYSTEM_FULLSCREEN" ) ;
 
-	private boolean destroy = false ;
-
 	public GLDefaultSystem( final Thread _main )
 	{
 		super( new DefaultShutdown(),
@@ -89,15 +87,6 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 	@Override
 	public void shutdown()
 	{
-		if( destroy )
-		{
-			// We've already flagged the
-			// system to be shutdown.
-			return ;
-		}
-
-		destroy = true ;
-
 		super.shutdown() ;
 		System.exit( 0 ) ;
 	}
@@ -134,7 +123,7 @@ public final class GLDefaultSystem extends BasicSystem<DesktopFileSystem,
 		@Override
 		public void windowDestroyNotify( final WindowEvent _event )
 		{
-			GLDefaultSystem.this.shutdown() ;
+			Event.addEvent( Event.<Object>create( "START_SYSTEM_SHUTDOWN" ) ) ;
 		}
 
 		@Override

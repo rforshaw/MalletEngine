@@ -3,7 +3,6 @@ package com.linxonline.mallet.core ;
 public interface IGameSystem
 {
 	public void run() ;
-	public void stop() ;
 
 	public void addUpdate( final IUpdate _update ) ;
 
@@ -12,6 +11,12 @@ public interface IGameSystem
 
 	public interface IUpdate
 	{
-		public void update( final double _dt ) ;
+		/**
+			Add an additional process to the main-loop
+			unbound by the restricted update rate of a GameState.
+			A return of non-zero informs the game-system
+			to begin the shutdown process.
+		*/
+		public int update( final double _dt ) ;
 	}
 }

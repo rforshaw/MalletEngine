@@ -186,7 +186,7 @@ public final class UIGenerator
 		return _element ;
 	}
 
-	public static void addGenerator( final String _id, final Generator _generator )
+	public static void addGenerator( final String _id, final Generator<? super UIElement, ? super UIElement.Meta> _generator )
 	{
 		creators.put( _id, _generator ) ;
 	}

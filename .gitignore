@@ -10,6 +10,9 @@ web/target
 */.gradle/*
 .gradle/*
 
+*/.classpath
+*/.settings
+*/.project
 .kateproject.d
 
 *.jar

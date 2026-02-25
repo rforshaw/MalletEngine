@@ -1,10 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.List ;
-
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.audio.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 

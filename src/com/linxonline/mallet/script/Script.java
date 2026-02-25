@@ -3,7 +3,6 @@ package com.linxonline.mallet.script ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.entity.Entity ;
 
 public final class Script
 {

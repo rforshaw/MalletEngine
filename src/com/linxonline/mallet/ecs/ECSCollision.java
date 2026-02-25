@@ -4,7 +4,6 @@ import java.util.List ;
 import java.util.Arrays ;
 
 import com.linxonline.mallet.physics.* ;
-import com.linxonline.mallet.maths.* ;
 
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
@@ -172,13 +171,11 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		private final List<ComponentUpdater> updaters = MalletList.<ComponentUpdater>newList() ;
 
-		private int size ;
 		private int current ;
 
 		@Override
 		public void required( final int _size )
 		{
-			size = _size ;
 			current = 0 ;
 
 			final int delta = _size - updaters.size() ;
@@ -243,13 +240,11 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		private final List<HullUpdater> updaters = MalletList.<HullUpdater>newList() ;
 
-		private int size ;
 		private int current ;
 
 		@Override
 		public void required( final int _size )
 		{
-			size = _size ;
 			current = 0 ;
 
 			final int delta = _size - updaters.size() ;

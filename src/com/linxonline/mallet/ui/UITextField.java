@@ -23,40 +23,28 @@ public class UITextField extends UIElement
 	public UITextField()
 	{
 		super() ;
-		UIElement.connect( this, elementEngaged(), new Connect.Slot<UITextField>()
+		UIElement.connect( this, elementEngaged(), ( final UITextField _this ) ->
 		{
-			@Override
-			public void slot( final UITextField _this )
-			{
-				DISPLAY_SYSTEM_KEYBOARD.add( true ) ;
-			}
+			DISPLAY_SYSTEM_KEYBOARD.add( true ) ;
 		} ) ;
 
-		UIElement.connect( this, elementDisengaged(), new Connect.Slot<UITextField>()
+		UIElement.connect( this, elementDisengaged(), ( final UITextField _this ) ->
 		{
-			@Override
-			public void slot( final UITextField _this )
-			{
-				DISPLAY_SYSTEM_KEYBOARD.add( false ) ;
-			}
+			DISPLAY_SYSTEM_KEYBOARD.add( false ) ;
 		} ) ;
 
-		setKeyPressedAction( new InputAction()
+		setKeyPressedAction( ( final UIElement.Component _listener, final InputEvent _event ) ->
 		{
-			@Override
-			public InputEvent.Action action( final UIElement.Component _listener, final InputEvent _event )
+			switch( _event.getKeyCode() )
 			{
-				switch( _event.getKeyCode() )
+				case ENTER :
 				{
-					case ENTER :
-					{
-						UIElement.signal( UITextField.this, submitChanged() ) ;
-						return InputEvent.Action.CONSUME ;
-					}
+					UIElement.signal( UITextField.this, submitChanged() ) ;
+					return InputEvent.Action.CONSUME ;
 				}
-
-				return _listener.keyPressed( _event ) ;
 			}
+
+			return _listener.keyPressed( _event ) ;
 		} ) ;
 	}
 

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.io.net ;
 
-import com.linxonline.mallet.io.serialisation.Serialise ;
-
 public class InStream
 {
 	private final byte[] buffer ;

@@ -1,7 +1,5 @@
 package com.linxonline.mallet.util.settings ;
 
-import com.linxonline.mallet.io.serialisation.* ;
-
 /*==============================================================*/
 // VariableInterface Key-Value that manages different 			//
 // variables.													//

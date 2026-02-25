@@ -1,10 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.input.InputEvent ;
-
-import com.linxonline.mallet.renderer.Draw ;
-import com.linxonline.mallet.renderer.World ;
 import com.linxonline.mallet.renderer.Camera ;
 
 public abstract class InputComponent extends UIElement.Component

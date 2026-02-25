@@ -210,9 +210,4 @@ public final class CollisionSystem
 			}
 		}
 	}
-
-	private final boolean exists( final Hull _hull )
-	{
-		return hulls.contains( _hull ) ;
-	}
 }

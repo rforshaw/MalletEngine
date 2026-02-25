@@ -1,8 +1,6 @@
 package com.linxonline.mallet.ui ;
 
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.maths.* ;
 
 public class UISpacer extends UIElement
 {

@@ -1,8 +1,6 @@
 package com.linxonline.mallet.ui ;
 
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.event.* ;
-import com.linxonline.mallet.maths.* ;
 
 /**
 	Used to determine if the user has acted within a UI area.

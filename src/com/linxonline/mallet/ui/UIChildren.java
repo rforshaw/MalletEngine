@@ -6,9 +6,7 @@ import java.util.Iterator ;
 import com.linxonline.mallet.util.MalletList ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
-import com.linxonline.mallet.maths.* ;
 
 /**
 	Extend this class if the implementation is 

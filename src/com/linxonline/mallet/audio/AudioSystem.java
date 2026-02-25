@@ -1,7 +1,6 @@
 package com.linxonline.mallet.audio ;
 
 import java.util.List ;
-import java.util.Iterator ;
 import java.util.Map ;
 import java.util.Set ;
 import java.util.HashSet ;
@@ -16,7 +15,6 @@ import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.util.SourceCallback ;
 import com.linxonline.mallet.util.Logger ;
 
-import com.linxonline.mallet.util.notification.Notification ;
 import com.linxonline.mallet.util.notification.Notification.Notify ;
 
 // Play Sound

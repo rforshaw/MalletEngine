@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.notification.Notification.Notify ;
-
 public final class WorldAssist
 {
 	private static Assist assist ;

@@ -3,7 +3,6 @@ package com.linxonline.mallet.core ;
 import java.util.ArrayDeque ;
 
 import com.linxonline.mallet.core.ISystem.ShutdownDelegate ;
-import com.linxonline.mallet.core.ISystem.ShutdownDelegate.Callback ;
 
 import com.linxonline.mallet.util.Logger ;
 

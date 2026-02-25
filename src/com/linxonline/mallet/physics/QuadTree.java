@@ -4,11 +4,9 @@ import java.util.List ;
 import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.Parallel ;
-import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
-import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Intersection ;
 
 public final class QuadTree
@@ -57,8 +55,6 @@ public final class QuadTree
 			// Used when multi-threading
 			private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
 			private final NodeWorker worker = new NodeWorker() ;
-
-			private boolean refreshChildren = true ;
 
 			@Override
 			public void update( final float _dt )

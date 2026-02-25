@@ -22,7 +22,6 @@ import com.linxonline.mallet.maths.* ;
 public abstract class GUIComponent extends UIElement.Component
 {
 	private World world = null ;
-	private Camera camera = null ;
 
 	private int layerOffset = 0 ;
 

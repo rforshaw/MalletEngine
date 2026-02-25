@@ -1,7 +1,5 @@
 package com.linxonline.mallet.ui ;
 
-import java.util.List ;
-
 public interface ILayout
 {
 	public enum Type

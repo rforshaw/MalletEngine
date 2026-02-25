@@ -5,7 +5,6 @@ import java.util.List ;
 import com.linxonline.mallet.audio.* ;
 import com.linxonline.mallet.renderer.* ;
 
-import com.linxonline.mallet.core.GlobalConfig ;
 import com.linxonline.mallet.core.ISystem ;
 
 import com.linxonline.mallet.input.IInputSystem ;
@@ -13,7 +12,6 @@ import com.linxonline.mallet.input.IInputHandler ;
 import com.linxonline.mallet.input.InputState ;
 
 import com.linxonline.mallet.event.Event ;
-import com.linxonline.mallet.event.EventQueue ;
 import com.linxonline.mallet.event.EventBlock ;
 import com.linxonline.mallet.event.InterceptController ;
 
@@ -36,6 +34,7 @@ public class GameState
 	public static final int NONE = 0 ;
 	public static final int TRANSIST_SHUTDOWN = 1 ;
 	public static final int TRANSIST_PAUSE = 2 ;
+	public static final int SHUTDOWN = 3 ;
 
 	public final String name ;					// Must be unique
 	protected String transition ;				// State to transition to
@@ -90,7 +89,7 @@ public class GameState
 
 	protected final void setTransition( final String _transition, final int _type )
 	{
-		transition = _transition ;				// Name of other State
+		transition = _transition ;		// Name of other State
 		transitionType = _type ;		// PAUSE or SHUTDOWN
 	}
 
@@ -392,6 +391,11 @@ public class GameState
 
 	protected void initEventProcessors( final EventBlock _block, final InterceptController _intercept )
 	{
+		_block.add( "START_SYSTEM_SHUTDOWN", ( final Object _obj ) ->
+		{
+			transitionType = SHUTDOWN ;
+		} ) ;
+
 		_block.add( "ADD_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
 		{
 			inputUISystem.addInputHandler( _handler ) ;

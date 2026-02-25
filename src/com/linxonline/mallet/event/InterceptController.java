@@ -1,8 +1,5 @@
 package com.linxonline.mallet.event ;
 
-import java.util.List ;
-
-import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Tuple ;
 
 public final class InterceptController implements IIntercept
@@ -29,7 +26,7 @@ public final class InterceptController implements IIntercept
 		}
 	}
 
-	public <T> void addProcessor( final String _type, final IProcessor<T> _processor )
+	public void addProcessor( final String _type, final IProcessor<?> _processor )
 	{
 		processors.add( EventType.get( _type ), _processor ) ;
 	}

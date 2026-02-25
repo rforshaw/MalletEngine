@@ -6,7 +6,6 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.event.* ;
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -46,46 +45,38 @@ public final class UIList extends UILayout
 								 length.x,   length.y ) ;
 		UIList.this.setListWorldAndCamera( frame.getWorld(), frame.getCamera() ) ;
 
-		UIElement.connect( this, elementShutdown(), new Connect.Slot<UIList>()
+		UIElement.connect( this, elementShutdown(), ( final UIList _this ) ->
 		{
-			@Override
-			public void slot( final UIList _this )
+			if( updater != null )
 			{
-				if( updater != null )
-				{
-					final Program program = frame.getProgram() ;
-					final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
-					pool.clean( externalWorld, program ) ;
-				}
-				frame.shutdown() ;
+				final Program program = frame.getProgram() ;
+				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+				pool.clean( externalWorld, program ) ;
 			}
+			frame.shutdown() ;
 		} ) ;
 
-		UIElement.connect( this, layerChanged(), new Connect.Slot<UIElement>()
+		UIElement.connect( this, layerChanged(), ( final UIElement _this ) ->
 		{
-			@Override
-			public void slot( final UIElement _this )
+			if( updater != null )
 			{
-				if( updater != null )
-				{
-					geometry.removeDraw( frame.getFrame() ) ;
-				}
+				geometry.removeDraw( frame.getFrame() ) ;
+			}
 
-				if( externalWorld != null )
-				{
-					final int layer = _this.getLayer() + 1 ;
-					final Program program = frame.getProgram() ;
-					final Draw draw = frame.getFrame() ;
+			if( externalWorld != null )
+			{
+				final int layer = _this.getLayer() + 1 ;
+				final Program program = frame.getProgram() ;
+				final Draw draw = frame.getFrame() ;
 
-					final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
-					pool.clean( externalWorld, program ) ;
+				final DrawUpdaterPool pool = RenderPools.getDrawUpdaterPool() ;
+				pool.clean( externalWorld, program ) ;
 
-					final DrawUpdater updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
-					updater.setInterpolation( Interpolation.NONE ) ;
+				final DrawUpdater updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
+				updater.setInterpolation( Interpolation.NONE ) ;
 
-					final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
-					geometry.addDraw( draw ) ;
-				}
+				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
+				geometry.addDraw( draw ) ;
 			}
 		} ) ;
 

@@ -34,6 +34,7 @@ public class DesktopStarter implements IStarter
 {
 	private final GameSystem game = new GameSystem() ;
 	private final IGameLoader loader ;
+	private final GLDefaultSystem mainSystem ;
 
 	private final Thread thread = new Thread( "GAME_THREAD" )
 	{
@@ -43,13 +44,13 @@ public class DesktopStarter implements IStarter
 			Logger.println( "Running...", Logger.Verbosity.NORMAL ) ;
 			game.run() ;		// Begin running the game-loop
 			Logger.println( "Stopping...", Logger.Verbosity.NORMAL ) ;
+			mainSystem.shutdown() ;
 		}
 	} ;
 
-	private final GLDefaultSystem mainSystem = new GLDefaultSystem( thread ) ;
-
 	public DesktopStarter( final IGameLoader _loader )
 	{
+		mainSystem = new GLDefaultSystem( thread ) ;
 		loader = _loader ;
 	}
 
@@ -57,43 +58,11 @@ public class DesktopStarter implements IStarter
 	{
 		IStarter.init( this ) ;
 		DesktopStarter.setRenderSettings( this ) ;
-
-		final ISystem main = getMainSystem() ;
-		final ShutdownDelegate delegate = main.getShutdownDelegate() ;
-		delegate.addShutdownCallback( new ShutdownDelegate.Callback()
-		{
-			@Override
-			public void shutdown()
-			{
-				Logger.println( "Shutting down...", Logger.Verbosity.NORMAL ) ;
-				stop() ;
-			}
-		} ) ;
 	}
 
 	public void run()
 	{
 		thread.start() ;
-	}
-
-	public void stop()
-	{
-		Logger.println( "Game System slowing..", Logger.Verbosity.NORMAL ) ;
-
-		game.stop() ;
-		if( thread.isAlive() == true )
-		{
-			try
-			{
-				thread.join( 10 ) ;
-			}
-			catch( InterruptedException ex )
-			{
-				ex.printStackTrace() ;
-			}
-		}
-
-		Logger.println( "Game stopped.", Logger.Verbosity.NORMAL ) ;
 	}
 
 	/**

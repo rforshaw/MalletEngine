@@ -5,7 +5,6 @@ import java.util.Comparator ;
 import java.util.Collections ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.Logger ;
 
 /**
 	GroupBuffer allows you to bring together a set of buffers.

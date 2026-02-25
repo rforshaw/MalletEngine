@@ -2,7 +2,6 @@ package com.linxonline.mallet.ui.gui ;
 
 import com.linxonline.mallet.input.* ;
 import com.linxonline.mallet.renderer.* ;
-import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.ui.* ;
 
 public class GUIPanelEdge extends GUIDrawEdge

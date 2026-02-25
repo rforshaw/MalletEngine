@@ -38,7 +38,7 @@ public class Tuple<T, U>
 	@Override
 	public boolean equals( Object _obj )
 	{
-		if( _obj instanceof Tuple tuple )
+		if( _obj instanceof Tuple<?, ?> tuple )
 		{
 			return left.equals( tuple.getLeft() ) && right.equals( tuple.getRight() ) ;
 		}

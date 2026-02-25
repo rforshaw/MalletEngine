@@ -5,7 +5,6 @@ import java.util.Map ;
 import com.linxonline.mallet.util.MalletMap ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
-import com.linxonline.mallet.ui.* ;
 
 public final class GUI
 {

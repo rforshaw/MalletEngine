@@ -168,7 +168,7 @@ public final class AABB
 			{
 				final float temp = t1 ;
 				t1 = t2 ;
-				t2 = t1 ;
+				t2 = temp ;
 			}
 
 			tmin = MathUtil.max( tmin, t1 ) ;
@@ -196,7 +196,7 @@ public final class AABB
 			{
 				final float temp = t1 ;
 				t1 = t2 ;
-				t2 = t1 ;
+				t2 = temp ;
 			}
 
 			tmin = MathUtil.max( tmin, t1 ) ;
@@ -225,7 +225,7 @@ public final class AABB
 			{
 				final float temp = t1 ;
 				t1 = t2 ;
-				t2 = t1 ;
+				t2 = temp ;
 			}
 
 			tmin = MathUtil.max( tmin, t1 ) ;

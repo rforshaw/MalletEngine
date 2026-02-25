@@ -1,11 +1,9 @@
 package com.linxonline.mallet.ui ;
 
 import java.util.List ;
-import java.util.Map ;
 import java.util.Set ;
 
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.util.MalletMap ;
 
 public class UIAbstractModel implements IAbstractModel
 {

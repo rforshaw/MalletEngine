@@ -1,7 +1,5 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.maths.* ;
-
 public final class ProgramAssist
 {
 	private static Assist assist ;

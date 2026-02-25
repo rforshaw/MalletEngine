@@ -58,7 +58,8 @@ public class AnimationSystem
 				the animation-systems next update add it to the 
 				animations list.
 			*/
-			public IAnimation add( final IAnimation _animation )
+			@Override
+			public <T extends IAnimation> T add( final T _animation )
 			{
 				AnimationSystem.this.invokeLater( () ->
 				{
@@ -77,7 +78,8 @@ public class AnimationSystem
 				removed(), which is expected to remove any resources 
 				held by the IAnimation.
 			*/
-			public IAnimation remove( final IAnimation _animation )
+			@Override
+			public <T extends IAnimation> T remove( final T _animation )
 			{
 				AnimationSystem.this.invokeLater( () ->
 				{

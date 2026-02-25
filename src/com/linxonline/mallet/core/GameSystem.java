@@ -17,15 +17,11 @@ public final class GameSystem implements IGameSystem
 
 	private final List<IUpdate> updates = MalletList.<IUpdate>newList() ;
 
-	private boolean running = false ;
+	//private boolean running = false ;
 
 	public GameSystem()
 	{
 		addUpdate( this::updateState ) ;
-
-		// For debounce to work it must be tied into the
-		// main-loop, this allows it to track when the 
-		// runnable can be triggered.
 		addUpdate( new Debounce() ) ;
 	}
 
@@ -46,20 +42,22 @@ public final class GameSystem implements IGameSystem
 		// Call to ensure we don't have a massive delta
 		// just before the game-loop actually starts.
 		ElapsedTimer.getElapsedTimeInNanoSeconds() ;
-		running = true ;
 
 		currentState = defaultState ;
 		currentState.startState( null ) ;
 
 		final int size = updates.size() ;
+		int running = 0 ;
 
-		while( running == true )
+		while( running == 0 )
 		{
+			running = 0 ;
+
 			final double dt = ElapsedTimer.getElapsedTimeInNanoSeconds() ;
 			for( int i = 0; i < size; ++i )
 			{
 				final IUpdate update = updates.get( i ) ;
-				update.update( dt ) ;
+				running += update.update( dt ) ;
 			}
 		}
 
@@ -67,12 +65,6 @@ public final class GameSystem implements IGameSystem
 		{
 			currentState.pauseState() ;
 		}
-	}
-
-	@Override
-	public void stop()
-	{
-		running = false ;
 	}
 
 	@Override
@@ -98,12 +90,17 @@ public final class GameSystem implements IGameSystem
 		}
 	}
 
-	private void updateState( final double _dt )
+	private int updateState( final double _dt )
 	{
 		final int transition = currentState.update( _dt ) ;
+		if( transition == GameState.SHUTDOWN )
+		{
+			return 1 ;
+		}
+
 		if( transition == GameState.NONE )
 		{
-			return ;
+			return 0 ;
 		}
 
 		final GameState previous = currentState ;
@@ -117,12 +114,14 @@ public final class GameSystem implements IGameSystem
 				currentState.startState( previous.shutdownState() ) ;
 				break ;
 			}
-			case GameState.TRANSIST_PAUSE    :
+			case GameState.TRANSIST_PAUSE :
 			{
 				currentState.startState( previous.pauseState() ) ;
 				break ;
 			}
 		}
+
+		return 0 ;
 	}
 
 	private GameState getGameState( final String _name )

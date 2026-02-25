@@ -6,7 +6,6 @@ import java.util.Collections;
 import com.linxonline.mallet.util.Tuple ;
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.MalletList ;
-import com.linxonline.mallet.maths.* ;
 import com.linxonline.mallet.event.* ;
 
 /**

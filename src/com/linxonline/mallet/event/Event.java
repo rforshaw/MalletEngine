@@ -111,7 +111,7 @@ public final class Event<T>
 	@Override
 	public boolean equals( final Object _obj )
 	{
-		if( _obj instanceof Event e )
+		if( _obj instanceof Event<?> e )
 		{
 			return eventType == e.eventType && variable == e.variable ;
 		}

@@ -4,6 +4,8 @@ libs/*
 lib/*
 
 .gradle
+.settings
+.project
 .kateproject.d
 
 *.jar
