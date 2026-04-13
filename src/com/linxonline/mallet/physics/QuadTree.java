@@ -132,7 +132,7 @@ public final class QuadTree
 		root.generateContacts( _hull ) ;
 	}
 
-	public Hull ray( final Ray _ray, final int[] _f )
+	public Hull ray( final Ray _ray, final int _f )
 	{
 		return root.ray( _ray, _f ) ;
 	}
@@ -200,7 +200,7 @@ public final class QuadTree
 			updateCollisions( nextHull, _hull, hulls ) ;
 		}
 
-		public Hull ray( final Ray _ray, final int[] _f )
+		public Hull ray( final Ray _ray, final int _f )
 		{
 			if( parent == true )
 			{

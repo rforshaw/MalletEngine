@@ -23,18 +23,16 @@ public final class ContactData
 
 	public ContactData() {}
 
-	public final int addContact( final float _penetration, 
-								  final Vector2 _normal, 
-								  final boolean _physical,
+	public final int addContact( final float _penetration,
+								  final Vector2 _normal,
 								  final Hull _collidedWith )
 	{
-		return addContact( _penetration, _normal.x, _normal.y, _physical, _collidedWith ) ;
+		return addContact( _penetration, _normal.x, _normal.y, _collidedWith ) ;
 	}
 
-	public final synchronized int addContact( final float _penetration, 
+	public final synchronized int addContact( final float _penetration,
 											  final float _normalX,
-											  final float _normalY, 
-											  final boolean _physical,
+											  final float _normalY,
 											  final Hull _collidedWith )
 	{
 		if( usedContacts >= collidedWith.length && usedContacts < MAX_COLLISION_POINTS )
@@ -46,7 +44,6 @@ public final class ContactData
 
 			collidedWith = expand( collidedWith, extra ) ;
 			contacts = FloatBuffer.expand( contacts, extra * 3 ) ;
-			physical = expand( physical, extra ) ;
 		}
 
 		if( usedContacts < collidedWith.length )
@@ -55,7 +52,6 @@ public final class ContactData
 			contacts[index + CONTACT_NORMAL_X] = _normalX ;
 			contacts[index + CONTACT_NORMAL_Y] = _normalY ;
 			contacts[index + CONTACT_PENETRATION] = _penetration ;
-			physical[usedContacts] = _physical ;
 			collidedWith[usedContacts] = _collidedWith ;
 			return usedContacts++ ;
 		}
@@ -69,7 +65,6 @@ public final class ContactData
 		_point.contactNormalX = contacts[index + CONTACT_NORMAL_X] ;
 		_point.contactNormalY = contacts[index + CONTACT_NORMAL_Y] ;
 		_point.penetration = contacts[index + CONTACT_PENETRATION] ;
-		_point.physical = physical[_i]  ;
 		_point.collidedWith = collidedWith[_i] ;
 		return _point ;
 	}
@@ -89,7 +84,6 @@ public final class ContactData
 
 				collidedWith = new Hull[INITIAL_COLLISION_POINTS] ;
 				contacts = new float[INITIAL_COLLISION_POINTS * 3] ;
-				physical = new boolean[INITIAL_COLLISION_POINTS] ;
 				return ;
 			}
 		}

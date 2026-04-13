@@ -127,11 +127,11 @@ public final class CollisionSystem
 			@Override
 			public Hull ray( final Vector2 _start, final Vector2 _end )
 			{
-				return ray( _start, _end, null ) ;
+				return ray( _start, _end, 0 ) ;
 			}
 
 			@Override
-			public Hull ray( final Vector2 _start, final Vector2 _end, final int[] _filters )
+			public Hull ray( final Vector2 _start, final Vector2 _end, final int _filters )
 			{
 				ray.setFromPoints( _start.x, _start.y, _end.x, _end.y ) ;
 				final Hull hull = treeHulls.ray( ray, _filters ) ;

@@ -321,7 +321,7 @@ public final class GameTestLoader implements IGameLoader
 					{
 						for( int j = 0; j < _column; ++j )
 						{
-							final Hull hull = new Box2D( aabb, null ) ;
+							final Hull hull = new Box2D( aabb, 0 ) ;
 							hull.setPosition( i * 60, j * 60  ) ;
 							hull.setOffset( -32, -32 ) ;
 

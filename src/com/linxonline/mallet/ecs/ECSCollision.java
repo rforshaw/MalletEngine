@@ -11,14 +11,44 @@ import com.linxonline.mallet.util.Parallel ;
 
 public final class ECSCollision implements IECS<ECSCollision.Component>
 {
+	private final static ISeparation DEFAULT_SEPARATION = ( final Hull _hull, final ContactPoint _point ) ->
+	{
+		if( _hull.isStatic() )
+		{
+			return ;
+		}
+
+		float x = 0.0f ;
+		float y = 0.0f ;
+
+		final int size = _hull.contactData.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			_hull.contactData.get( i, _point ) ;
+
+			final float u = _point.collidedWith.isStatic() ? 1.0f : 0.25f ;
+			x += ( _point.contactNormalX * _point.penetration ) * u ;
+			y += ( _point.contactNormalY * _point.penetration ) * u ;
+		}
+
+		_hull.addToPosition( x, y ) ;
+	} ;
+
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final List<Component> components = MalletList.<Component>newList() ;
 
-	private final static ComponentFactory componentFactory = new ComponentFactory() ;
-	private final static HullFactory hullFactory = new HullFactory() ;
+	private final ComponentFactory componentFactory ;
 
-	public ECSCollision() {}
+	public ECSCollision()
+	{
+		this( DEFAULT_SEPARATION ) ;
+	}
+
+	public ECSCollision( final ISeparation _separate )
+	{
+		componentFactory = new ComponentFactory( _separate ) ;
+	}
 
 	@Override
 	public Component create( final ECSEntity _parent )
@@ -77,25 +107,6 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 			runnables.get( i ).run() ;
 		}
 		runnables.clear() ;
-	}
-
-	private static void updateCollision( final Hull _hull, final ContactPoint _point )
-	{
-		float x = 0.0f ;
-		float y = 0.0f ;
-
-		final int size = _hull.contactData.size() ;
-		for( int i = 0; i < size; ++i )
-		{
-			_hull.contactData.get( i, _point ) ;
-			if( _point.physical == true )
-			{
-				x += _point.contactNormalX * _point.penetration ;
-				y += _point.contactNormalY * _point.penetration ;
-			}
-		}
-
-		_hull.addToPosition( x, y ) ;
 	}
 
 	public static final class Component extends ECSEntity.Component
@@ -171,7 +182,16 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		private final List<ComponentUpdater> updaters = MalletList.<ComponentUpdater>newList() ;
 
+		private final HullFactory hullFactory ;
+		private final ISeparation separate ;
+
 		private int current ;
+
+		public ComponentFactory( final ISeparation _separate )
+		{
+			separate = _separate ;
+			hullFactory = new HullFactory( _separate ) ;
+		}
 
 		@Override
 		public void required( final int _size )
@@ -186,7 +206,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 
 			for( int i = 0; i < delta; ++i )
 			{
-				updaters.add( new ComponentUpdater() ) ;
+				updaters.add( new ComponentUpdater( hullFactory, separate ) ) ;
 			}
 		}
 
@@ -200,6 +220,15 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	private static final class ComponentUpdater implements Parallel.IListRun<Component>
 	{
 		private final ContactPoint point = new ContactPoint() ;
+
+		private final HullFactory hullFactory ;
+		private final ISeparation separate ;
+
+		public ComponentUpdater( final HullFactory _factory, final ISeparation _separate )
+		{
+			hullFactory = _factory ;
+			separate = _separate ;
+		}
 
 		@Override
 		public void run( final int _start, final int _end, final List<Component> _components )
@@ -230,7 +259,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 				// so there is no point spinning them onto their own worker.
 				for( int j = 0; j < size; ++j )
 				{
-					ECSCollision.updateCollision( hulls[j], point ) ;
+					separate.apply( hulls[j], point ) ;
 				}
 			}
 		}
@@ -239,8 +268,14 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	private static final class HullFactory implements Parallel.IArrayFactory<Hull>
 	{
 		private final List<HullUpdater> updaters = MalletList.<HullUpdater>newList() ;
+		private final ISeparation separate ;
 
 		private int current ;
+
+		public HullFactory( final ISeparation _separate )
+		{
+			separate = _separate ;
+		}
 
 		@Override
 		public void required( final int _size )
@@ -255,7 +290,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 
 			for( int i = 0; i < delta; ++i )
 			{
-				updaters.add( new HullUpdater() ) ;
+				updaters.add( new HullUpdater( separate ) ) ;
 			}
 		}
 
@@ -269,14 +304,25 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	private static final class HullUpdater implements Parallel.IArrayRun<Hull>
 	{
 		private final ContactPoint point = new ContactPoint() ;
+		private final ISeparation separate ;
+
+		public HullUpdater( final ISeparation _separate )
+		{
+			separate = _separate ;
+		}
 
 		@Override
 		public void run( final int _start, final int _end, final Hull[] _hulls )
 		{
 			for( int i = _start; i < _end; ++i )
 			{
-				ECSCollision.updateCollision( _hulls[i], point ) ;
+				separate.apply( _hulls[i], point ) ;
 			}
 		}
+	}
+
+	public interface ISeparation
+	{
+		public void apply( final Hull _hull, final ContactPoint _point ) ;
 	}
 }

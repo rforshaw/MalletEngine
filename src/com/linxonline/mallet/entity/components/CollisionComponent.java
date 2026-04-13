@@ -59,12 +59,15 @@ public class CollisionComponent extends Component
 
 	public void applyContactPoint( final Hull _hull, final ContactPoint _point )
 	{
-		if( point.physical )
-		{
-			final float x = point.contactNormalX * point.penetration ;
-			final float y = point.contactNormalY * point.penetration ;
-			_hull.addToPosition( x, y ) ;
-		}
+		applySeparation( _hull, _point ) ;
+	}
+
+	public final void applySeparation( final Hull _hull, final ContactPoint _point )
+	{
+		final float u = _point.collidedWith.isStatic() ? 1.0f : 0.25f ;
+		final float x = ( point.contactNormalX * point.penetration ) * u ;
+		final float y = ( point.contactNormalY * point.penetration ) * u ;
+		_hull.addToPosition( x, y ) ;
 	}
 
 	public static CollisionComponent createWithNoShift( final Entity _parent, final Hull ... _hulls )
@@ -78,7 +81,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final Box2D hull = CollisionAssist.add( new Box2D( AABB.create( _min, _max ), null ) ) ;
+		final Box2D hull = CollisionAssist.add( new Box2D( AABB.create( _min, _max ), 0 ) ) ;
 		hull.setPosition( _position.x, _position.y ) ;
 		hull.setOffset( _offset.x, _offset.y ) ;
 
@@ -93,7 +96,7 @@ public class CollisionComponent extends Component
 													final Vector2 _position,
 													final Vector2 _offset )
 	{
-		final Box2D hull = CollisionAssist.add( new Box2D( AABB.create( _min, _max ), null ) ) ;
+		final Box2D hull = CollisionAssist.add( new Box2D( AABB.create( _min, _max ), 0 ) ) ;
 		hull.setPosition( _position.x, _position.y ) ;
 		hull.setOffset( _offset.x, _offset.y ) ;
 

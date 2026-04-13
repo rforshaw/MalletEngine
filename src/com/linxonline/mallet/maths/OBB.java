@@ -100,7 +100,7 @@ public final class OBB
 
 		if( maxX < rTRX ) { maxX = rTRX ; }
 		if( maxX < rBLX ) { maxX = rBLX ; }
-		if( maxX < rBRX ) { minX = rBRX ; }
+		if( maxX < rBRX ) { maxX = rBRX ; }
 
 		if( maxY < rTRY ) { maxY = rTRY ; }
 		if( maxY < rBLY ) { maxY = rBLY ; }

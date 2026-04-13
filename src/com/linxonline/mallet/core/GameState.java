@@ -350,11 +350,7 @@ public class GameState
 			final float dt = ( float )_dt ;
 
 			system.getRenderer().updateState( dt ) ;
-			system.getInput().update() ;
 			system.getEventBlock().update() ;
-
-			inputUISystem.update() ;
-			inputWorldSystem.update() ;
 
 			eventBlock.update() ;
 

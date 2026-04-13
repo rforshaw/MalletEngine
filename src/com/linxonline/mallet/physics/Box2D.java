@@ -8,16 +8,16 @@ public final class Box2D extends Hull
 
 	public Box2D( final AABB _aabb, final Vector2 _position, final Vector2 _offset )
 	{
-		this( _aabb, null, _position, _offset ) ;
+		this( _aabb, 0, _position, _offset ) ;
 	}
 
-	public Box2D( final AABB _aabb, int[] _collidables, final Vector2 _position, final Vector2 _offset )
+	public Box2D( final AABB _aabb, final int _collidables, final Vector2 _position, final Vector2 _offset )
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
 		obb = OBB.create( _aabb ) ;
 	}
 
-	public Box2D( final AABB _aabb, int[] _collidables, final Vector3 _position, final Vector3 _offset )
+	public Box2D( final AABB _aabb, final int _collidables, final Vector3 _position, final Vector3 _offset )
 	{
 		super( _position.x, _position.y, _offset.x, _offset.y, 0.0f, _collidables ) ;
 		obb = OBB.create( _aabb ) ;
@@ -25,16 +25,16 @@ public final class Box2D extends Hull
 
 	public Box2D( final AABB _aabb, final float _x, final float _y, final float _offsetX, final float _offsetY )
 	{
-		this( _aabb, null, _x, _y, _offsetX, _offsetY ) ;
+		this( _aabb, 0, _x, _y, _offsetX, _offsetY ) ;
 	}
 
-	public Box2D( final AABB _aabb, int[] _collidables, final float _x, final float _y, final float _offsetX, final float _offsetY )
+	public Box2D( final AABB _aabb, int _collidables, final float _x, final float _y, final float _offsetX, final float _offsetY )
 	{
 		super( _x, _y, _offsetX, _offsetY, 0.0f, _collidables ) ;
 		obb = OBB.create( _aabb ) ;
 	}
 
-	public Box2D( final AABB _aabb, int[] _collidables )
+	public Box2D( final AABB _aabb, final int _collidables )
 	{
 		super( 0.0f, 0.0f,
 			   0.0f, 0.0f,
@@ -43,7 +43,7 @@ public final class Box2D extends Hull
 		obb = OBB.create( _aabb ) ;
 	}
 	
-	public Box2D( final OBB _obb, int[] _collidables )
+	public Box2D( final OBB _obb, final int _collidables )
 	{
 		super( 0.0f, 0.0f,
 			   0.0f, 0.0f,

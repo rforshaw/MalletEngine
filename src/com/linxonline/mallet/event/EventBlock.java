@@ -21,7 +21,7 @@ public final class EventBlock implements IEventBlock
 	{
 		state = _state ;
 	}
-	
+
 	public EventBlock( final Tuple<String, Event.IProcess<?>> ... _processors )
 	{
 		this( Event.getGlobalState(), _processors ) ;

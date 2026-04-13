@@ -87,24 +87,16 @@ public final class CollisionCheck
 			axis.y *= -1.0f ;
 		}
 
-		// If one of the hulls is not physical then it will not 
-		// force the two hulls to push apart from each other.
-		// If it did then hulls used for triggers could be 
-		// 'pushed' away - or prevent the other hull from passing 
-		// through it.
-		final boolean physical = box1.isPhysical() && _box2.isPhysical() ;
-		final float a = ( physical ) ? 0.5f : 1.0f ;
-
-		final float overlap = ( overlap1 < overlap2 ) ? overlap1 * a : overlap2 * a ;		// Get the best overlap overall
+		final float overlap = ( overlap1 < overlap2 ) ? overlap1 : overlap2 ;	// Get the best overlap overall
 
 		if( box1Interested == true )
 		{
-			box1.contactData.addContact( overlap, axis.x, axis.y, physical, _box2 ) ;
+			box1.contactData.addContact( overlap, axis.x, axis.y, _box2 ) ;
 		}
 
 		if( box2Interested == true )
 		{
-			_box2.contactData.addContact( overlap, -axis.x, -axis.y, physical, box1 ) ;
+			_box2.contactData.addContact( overlap, -axis.x, -axis.y, box1 ) ;
 		}
 
 		return true ;
@@ -119,12 +111,13 @@ public final class CollisionCheck
 
 		FloatBuffer.fill( axes, axis, 0 ) ;
 		float bestOverlap = penetrationOnAxis( _a, _b, axis, _toCenter ) ;
+		_setAxis.setXY( axis.x, axis.y ) ;
+
 		if( bestOverlap <= 0.0f )
 		{
 			return bestOverlap ;
 		}
 
-		_setAxis.setXY( axis.x, axis.y ) ;
 		for( int i = 2; i < axes.length; i += 2 )
 		{
 			FloatBuffer.fill( axes, axis, i ) ;

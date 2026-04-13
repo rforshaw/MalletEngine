@@ -8,7 +8,6 @@ public final class ContactPoint
 	public float contactNormalX = 0.0f ;
 	public float contactNormalY = 0.0f ;
 	public float penetration = 0.0f ;
-	public boolean physical = true ;
 
 	public ContactPoint() {}
 

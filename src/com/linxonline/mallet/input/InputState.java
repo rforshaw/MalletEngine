@@ -5,15 +5,14 @@ import java.util.List ;
 import com.linxonline.mallet.util.MalletList ;
 
 /*==============================================================*/
-// InputState is used to create a Heirachical structure of      //
+// InputState is used to create a hierarchical structure of      //
 // inputs.														//
 // It is typically added to the root Input System and 			//
 // Input Handlers are added to the InputState instead of the 	//
 // Input System.												//
-// Thise enables fine control over large groups of Input 		//
+// This enables fine control over large groups of Input 		//
 // Handlers														//
 /*==============================================================*/
-
 public class InputState implements IInputSystem,
 								   IInputHandler
 {

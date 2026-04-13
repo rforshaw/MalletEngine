@@ -16,27 +16,27 @@ public abstract class Hull
 	public static final int ROTATION = 4 ;
 
 	private int groupID = NO_GROUP ;					// Defines what Group the Hull is in.
-	private final int[] collidableGroups ;				// Defines the Groups the Hull is affected by.
+	private final int collidableGroups ;				// Defines the Groups the Hull is affected by.
 														// If no group-specified, collides with everything.
 	private Object parent ;
 
 	public final ContactData contactData = new ContactData() ;
 
 	protected boolean collidable = true ; 							// Allows hull to produce Collision Data.
-	protected boolean physical = true ; 							// Allows hull to be affected by a Collision
+	protected boolean immovable = false ; 							// Allows hull to be affected by a Collision
 
 	protected float positionX ;
 	protected float positionY ;
 
 	protected float offsetX ;
 	protected float offsetY ;
-	
+
 	protected float rotation ;
-	
+
 	protected Hull( final float _x, final float _y,
 					final float _offsetX, final float _offsetY,
 					final float _theta,
-					final int[] _collidables )
+					final int _collidables )
 	{
 		collidableGroups = _collidables ;
 		setPosition( _x, _y ) ;
@@ -132,9 +132,9 @@ public abstract class Hull
 		collidable = _collidable ;
 	}
 
-	public final void setPhysical( final boolean _physical )
+	public final void setStatic( final boolean _static )
 	{
-		physical = _physical ;
+		immovable = _static ;
 	}
 
 	public final int getGroupID()
@@ -142,9 +142,9 @@ public abstract class Hull
 		return groupID ;
 	}
 
-	public final boolean isPhysical()
+	public final boolean isStatic()
 	{
-		return physical ;
+		return immovable ;
 	}
 
 	public final boolean isCollidable()
@@ -154,7 +154,7 @@ public abstract class Hull
 
 	public final boolean isCollidableWithGroup( final int _groupID )
 	{
-		if( collidableGroups == null )
+		if( collidableGroups == 0 )
 		{
 			// Groups haven't been specified so it can collide with all
 			return true ;
@@ -173,22 +173,14 @@ public abstract class Hull
 		return parent ;
 	}
 
-	public static boolean isCollidableWithGroup( final int _id, final int[] _groups )
+	public static boolean isCollidableWithGroup( final int _id, final int _groups )
 	{
-		if( _groups == null )
+		if( _groups == 0 )
 		{
 			// Groups haven't been specified so it can collide with all
 			return true ;
 		}
 
-		for( int i = 0; i < _groups.length; ++i )
-		{
-			if( _id == _groups[i] )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
+		return ( _groups & _id ) == _id ;
 	}
 }
