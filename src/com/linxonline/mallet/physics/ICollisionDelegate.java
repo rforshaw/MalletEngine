@@ -4,7 +4,7 @@ import com.linxonline.mallet.maths.Vector2 ;
 
 public interface ICollisionDelegate
 {
-	public Hull generateContacts( final Hull _hull ) ;
+	public Hull generateContacts( final Hull _hull, final ContactData _cd ) ;
 
 	public Hull ray( final Vector2 _start, final Vector2 _end ) ;
 	public Hull ray( final Vector2 _start, final Vector2 _end, final int _filters ) ;

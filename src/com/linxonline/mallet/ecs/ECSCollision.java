@@ -9,45 +9,47 @@ import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.BufferedList ;
 import com.linxonline.mallet.util.Parallel ;
 
-public final class ECSCollision implements IECS<ECSCollision.Component>
+public class ECSCollision implements IECS<ECSCollision.Component>
 {
-	private final static ISeparation DEFAULT_SEPARATION = ( final Hull _hull, final ContactPoint _point ) ->
+	public final static ICollider DEFAULT_COLLIDER = ( final ContactPoint _point ) ->
 	{
-		if( _hull.isStatic() )
+		final Hull a = _point.a ;
+		final Hull b = _point.b ;
+
+		a.changed( true ) ;
+		if( a.isCollidableWithGroup( b.getGroupID() ) )
 		{
-			return ;
+			a.getCollider().apply( a, b, _point ) ;
 		}
 
-		float x = 0.0f ;
-		float y = 0.0f ;
-
-		final int size = _hull.contactData.size() ;
-		for( int i = 0; i < size; ++i )
+		b.changed( true ) ;
+		if( b.isCollidableWithGroup( a.getGroupID() ) )
 		{
-			_hull.contactData.get( i, _point ) ;
+			_point.contactNormalX *= -1.0f ;
+			_point.contactNormalY *= -1.0f ;
 
-			final float u = _point.collidedWith.isStatic() ? 1.0f : 0.25f ;
-			x += ( _point.contactNormalX * _point.penetration ) * u ;
-			y += ( _point.contactNormalY * _point.penetration ) * u ;
+			b.getCollider().apply( b, a, _point ) ;
 		}
-
-		_hull.addToPosition( x, y ) ;
 	} ;
 
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final List<Component> components = MalletList.<Component>newList() ;
 
-	private final ComponentFactory componentFactory ;
+	private final CollisionSystem cs = new CollisionSystem() ;
+	private final ContactData contacts = new ContactData() ;
+	private final ContactPoint point = new ContactPoint() ;
+
+	private final ICollider collider ;
 
 	public ECSCollision()
 	{
-		this( DEFAULT_SEPARATION ) ;
+		this( DEFAULT_COLLIDER ) ;
 	}
 
-	public ECSCollision( final ISeparation _separate )
+	public ECSCollision( final ICollider _collider )
 	{
-		componentFactory = new ComponentFactory( _separate ) ;
+		collider = _collider ;
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		final Component component = new Component( _parent, _hulls ) ;
 		invokeLater( () ->
 		{
-			CollisionAssist.add( _hulls ) ;
+			cs.add( _hulls ) ;
 			components.add( component ) ;
 		} ) ;
 		return component ;
@@ -72,7 +74,11 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		invokeLater( () ->
 		{
-			CollisionAssist.remove( _component.getHulls() ) ;
+			final Hull[] hulls = _component.getHulls() ;
+			for( int i = 0; i < hulls.length; ++i )
+			{
+				cs.remove( hulls[i] ) ;
+			}
 			components.remove( _component ) ;
 		} ) ;
 	}
@@ -81,7 +87,16 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 	public void update( final double _dt )
 	{
 		updateExecutions() ;
-		Parallel.forBatch( components, 1000, componentFactory ) ;
+
+		contacts.reset() ;
+		cs.update( ( float )_dt, contacts ) ;
+
+		final int size = contacts.size() ;
+		//System.out.println( "Contacts: " + size ) ;
+		for( int i = 0; i < size; ++i )
+		{
+			collider.apply( contacts.get( i, point ) ) ;
+		}
 	}
 
 	private void invokeLater( final Runnable _run )
@@ -109,25 +124,14 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		runnables.clear() ;
 	}
 
-	public static final class Component extends ECSEntity.Component
+	public static class Component extends ECSEntity.Component
 	{
 		private final Hull[] hulls ;
-		private boolean applyContact = true ;
 
 		private Component( final ECSEntity _parent, final Hull[] _hulls )
 		{
 			_parent.super() ;
 			hulls = _hulls ;
-		}
-
-		/**
-			Update the hulls position to take into account 
-			contact data, using the penetration depth shift 
-			the hull so it no longer collides with other objects.
-		*/
-		public void applyContact( final boolean _apply )
-		{
-			applyContact = _apply ;
 		}
 
 		public Hull[] getHulls()
@@ -144,31 +148,25 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		@Override
 		public boolean equals( final Object _obj )
 		{
-			if( !( _obj instanceof Component ) )
+			if( _obj instanceof Component b )
 			{
-				return false ;
-			}
-
-			final Component b = ( Component )_obj ;
-			if( applyContact != b.applyContact )
-			{
-				return false ;
-			}
-
-			if( hulls.length != b.hulls.length )
-			{
-				return false ;
-			}
-
-			for( int i = 0; i < hulls.length; ++i )
-			{
-				if( hulls[i].equals( b.hulls[i] ) == false )
+				if( hulls.length != b.hulls.length )
 				{
 					return false ;
 				}
+
+				for( int i = 0; i < hulls.length; ++i )
+				{
+					if( hulls[i].equals( b.hulls[i] ) == false )
+					{
+						return false ;
+					}
+				}
+
+				return true ;
 			}
 
-			return true ;
+			return false ;
 		}
 
 		@Override
@@ -178,151 +176,8 @@ public final class ECSCollision implements IECS<ECSCollision.Component>
 		}
 	}
 
-	private static final class ComponentFactory implements Parallel.IListFactory<Component>
+	public interface ICollider
 	{
-		private final List<ComponentUpdater> updaters = MalletList.<ComponentUpdater>newList() ;
-
-		private final HullFactory hullFactory ;
-		private final ISeparation separate ;
-
-		private int current ;
-
-		public ComponentFactory( final ISeparation _separate )
-		{
-			separate = _separate ;
-			hullFactory = new HullFactory( _separate ) ;
-		}
-
-		@Override
-		public void required( final int _size )
-		{
-			current = 0 ;
-
-			final int delta = _size - updaters.size() ;
-			if( delta <= 0 )
-			{
-				return ;
-			}
-
-			for( int i = 0; i < delta; ++i )
-			{
-				updaters.add( new ComponentUpdater( hullFactory, separate ) ) ;
-			}
-		}
-
-		@Override
-		public Parallel.IListRun<Component> create()
-		{
-			return( updaters.get( current++ ) ) ;
-		}
-	}
-
-	private static final class ComponentUpdater implements Parallel.IListRun<Component>
-	{
-		private final ContactPoint point = new ContactPoint() ;
-
-		private final HullFactory hullFactory ;
-		private final ISeparation separate ;
-
-		public ComponentUpdater( final HullFactory _factory, final ISeparation _separate )
-		{
-			hullFactory = _factory ;
-			separate = _separate ;
-		}
-
-		@Override
-		public void run( final int _start, final int _end, final List<Component> _components )
-		{
-			final int batchSize = 1000 ;
-
-			for( int i = _start; i < _end; ++i )
-			{
-				final Component component = _components.get( i ) ;
-				if( component.applyContact == false )
-				{
-					continue ;
-				}
-
-				// Shift the hulls position by the penetration depth.
-
-				final Hull[] hulls = component.hulls ;
-				final int size = hulls.length ;
-
-				if( size > batchSize )
-				{
-					// If there are enough hulls, update them in parallel.
-					Parallel.forBatch( hulls, batchSize, hullFactory ) ;
-					continue ;
-				}
-
-				// A component is likely to only have a handful of hulls
-				// so there is no point spinning them onto their own worker.
-				for( int j = 0; j < size; ++j )
-				{
-					separate.apply( hulls[j], point ) ;
-				}
-			}
-		}
-	}
-
-	private static final class HullFactory implements Parallel.IArrayFactory<Hull>
-	{
-		private final List<HullUpdater> updaters = MalletList.<HullUpdater>newList() ;
-		private final ISeparation separate ;
-
-		private int current ;
-
-		public HullFactory( final ISeparation _separate )
-		{
-			separate = _separate ;
-		}
-
-		@Override
-		public void required( final int _size )
-		{
-			current = 0 ;
-
-			final int delta = _size - updaters.size() ;
-			if( delta <= 0 )
-			{
-				return ;
-			}
-
-			for( int i = 0; i < delta; ++i )
-			{
-				updaters.add( new HullUpdater( separate ) ) ;
-			}
-		}
-
-		@Override
-		public Parallel.IArrayRun<Hull> create()
-		{
-			return( updaters.get( current++ ) ) ;
-		}
-	}
-
-	private static final class HullUpdater implements Parallel.IArrayRun<Hull>
-	{
-		private final ContactPoint point = new ContactPoint() ;
-		private final ISeparation separate ;
-
-		public HullUpdater( final ISeparation _separate )
-		{
-			separate = _separate ;
-		}
-
-		@Override
-		public void run( final int _start, final int _end, final Hull[] _hulls )
-		{
-			for( int i = _start; i < _end; ++i )
-			{
-				separate.apply( _hulls[i], point ) ;
-			}
-		}
-	}
-
-	public interface ISeparation
-	{
-		public void apply( final Hull _hull, final ContactPoint _point ) ;
+		public void apply( final ContactPoint _point ) ;
 	}
 }

@@ -1004,12 +1004,12 @@ public final class GameTestLoader implements IGameLoader
 			for( int i = _start; i < _end; ++i )
 			{
 				final Hull hull = _hulls[i] ;
-				if( hull.contactData.size() <= 0 )
+				/*if( hull.contactData.size() <= 0 )
 				{
 					// If there has been no collisions then
 					// they'll be no movement.
 					continue ;
-				}
+				}*/
 
 				++contact ;
 				final Draw draw = draws[i] ;

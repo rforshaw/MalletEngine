@@ -22,6 +22,8 @@ public final class CollisionCheck
 
 	private Hull box1 ;
 
+	private final ContactData contacts = new ContactData() ;
+
 	public CollisionCheck() {}
 
 	public void setBaseHull( final Hull _hull )
@@ -30,6 +32,12 @@ public final class CollisionCheck
 
 		box1.getAABB( aabb1 ) ;
 		aabb1.getCenter( boxCenter1 ) ;
+	}
+
+	public void reset()
+	{
+		box1 = null ;
+		contacts.reset() ;
 	}
 
 	/**
@@ -88,18 +96,19 @@ public final class CollisionCheck
 		}
 
 		final float overlap = ( overlap1 < overlap2 ) ? overlap1 : overlap2 ;	// Get the best overlap overall
-
-		if( box1Interested == true )
+		if( overlap < 0.01f )
 		{
-			box1.contactData.addContact( overlap, axis.x, axis.y, _box2 ) ;
+			return false ;
 		}
 
-		if( box2Interested == true )
-		{
-			_box2.contactData.addContact( overlap, -axis.x, -axis.y, box1 ) ;
-		}
-
+		contacts.addContact( overlap, axis.x, axis.y, box1, _box2 ) ;
 		return true ;
+	}
+
+	public ContactData getContacts( final ContactData _fill )
+	{
+		_fill.addContacts( contacts ) ;
+		return _fill ;
 	}
 
 	private final float penetration( final Hull _a, 

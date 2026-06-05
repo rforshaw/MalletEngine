@@ -57,7 +57,7 @@ public final class QuadTree
 			private final NodeWorker worker = new NodeWorker() ;
 
 			@Override
-			public void update( final float _dt )
+			public void update( final float _dt, final ContactData _contacts )
 			{
 				root.getChildNodes( children ) ;
 				if( children.isEmpty() )
@@ -66,9 +66,17 @@ public final class QuadTree
 				}
 
 				//System.out.println( "Nodes: " + children.size() ) ;
-				worker.setDeltaTime( _dt ) ;
+				worker.set( _dt ) ;
 
 				Parallel.forEach( children, 10, worker ) ;
+
+				final int size = children.size() ;
+				for( int i = 0; i < size; ++i )
+				{
+					final QuadNode child = children.get( i ) ;
+					child.getContacts( _contacts ) ;
+				}
+
 				children.clear() ;
 			}
 		} ;
@@ -81,8 +89,6 @@ public final class QuadTree
 			for( int i = _start; i < _end; ++i )
 			{
 				final Hull hull = _h.get( i ) ;
-				hull.contactData.reset() ;
-
 				if( !root.insertHullFast( hull ) )
 				{
 					synchronized( failed )
@@ -127,9 +133,9 @@ public final class QuadTree
 		The hull will not be added to the Quad Tree but it 
 		will be compared to hulls that have been inserted. 
 	*/
-	public void generateContacts( final Hull _hull )
+	public void generateContacts( final Hull _hull, final ContactData _contacts )
 	{
-		root.generateContacts( _hull ) ;
+		root.generateContacts( _hull, _contacts ) ;
 	}
 
 	public Hull ray( final Ray _ray, final int _f )
@@ -142,9 +148,9 @@ public final class QuadTree
 		return root.exists( _hull ) ;
 	}
 
-	public void update( final float _dt )
+	public void update( final float _dt, final ContactData _contacts )
 	{
-		update.update( _dt ) ;
+		update.update( _dt, _contacts ) ;
 	}
 
 	public void clear()
@@ -186,18 +192,41 @@ public final class QuadTree
 			}
 		}
 
-		public void generateContacts( final Hull _hull )
+		public ContactData generateContacts( final Hull _hull, final ContactData _contacts )
 		{
 			if( parent == true )
 			{
-				generateContactsFromQuadrants( _hull ) ;
-				return ;
+				generateContactsFromQuadrants( _hull, _contacts ) ;
+				return _contacts ;
 			}
+
+			check.reset() ;
 
 			// nextHull is the current length of hulls 
 			// we want the hull we've passed in to be compared 
 			// against all hulls within this node.
-			updateCollisions( nextHull, _hull, hulls ) ;
+			check.setBaseHull( _hull ) ;
+			for( int i = 0; i < nextHull; ++i )
+			{
+				check.generateContactPoint( hulls[i] ) ;
+			}
+			check.getContacts( _contacts ) ;
+
+			return _contacts ;
+		}
+
+		public ContactData getContacts( final ContactData _fill )
+		{
+			if( parent == true )
+			{
+				topLeft.getContacts( _fill ) ;
+				topRight.getContacts( _fill ) ;
+				bottomLeft.getContacts( _fill ) ;
+				bottomRight.getContacts( _fill ) ;
+				return _fill ;
+			}
+
+			return check.getContacts( _fill ) ;
 		}
 
 		public Hull ray( final Ray _ray, final int _f )
@@ -440,6 +469,8 @@ public final class QuadTree
 		*/
 		private void updateThisNode( final float _dt )
 		{
+			check.reset() ;
+
 			//System.out.println( "Hulls: " + nextHull ) ;
 			for( int i = 0; i < nextHull; ++i )
 			{
@@ -458,18 +489,11 @@ public final class QuadTree
 		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
 		{
 			check.setBaseHull( _hull1 ) ;
-
 			for( int j = _index + 1; j < nextHull; ++j )
 			{
-				final Hull hull2 = _hulls[j] ;
-				if( check.generateContactPoint( hull2 ) == true )
+				if( _hulls[j].hasChanged() )
 				{
-					if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
-					{
-						// No point looking for more contacts if
-						// we've reached maximum.
-						return ;
-					}
+					check.generateContactPoint( _hulls[j] ) ;
 				}
 			}
 		}
@@ -480,7 +504,6 @@ public final class QuadTree
 		*/
 		private void updateChildren( final float _dt )
 		{
-			//System.out.println( "Tier: " + tier + " Quadrant: " + quadrant + " is a Parent." ) ;
 			topLeft.update( _dt ) ;
 			topRight.update( _dt ) ;
 			bottomLeft.update( _dt ) ;
@@ -497,6 +520,11 @@ public final class QuadTree
 				bottomRight.clear() ;
 			}
 
+			for( int i = 0; i < nextHull; ++i )
+			{
+				hulls[i].changed( false ) ;
+				hulls[i] = null ;
+			}
 			nextHull = 0 ;
 		}
 
@@ -730,7 +758,7 @@ public final class QuadTree
 			return added > 0 ;
 		}
 
-		public void generateContactsFromQuadrants( final Hull _hull )
+		public void generateContactsFromQuadrants( final Hull _hull, final ContactData _contacts )
 		{
 			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
 			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
@@ -766,7 +794,7 @@ public final class QuadTree
 						if( usedTopLeft == false )
 						{
 							usedTopLeft = true ;
-							topLeft.generateContacts( _hull ) ;
+							topLeft.generateContacts( _hull, _contacts ) ;
 						}
 						break ;
 					}
@@ -775,7 +803,7 @@ public final class QuadTree
 						if( usedTopRight == false )
 						{
 							usedTopRight = true ;
-							topRight.generateContacts( _hull ) ;
+							topRight.generateContacts( _hull, _contacts ) ;
 						}
 						break ;
 					}
@@ -784,7 +812,7 @@ public final class QuadTree
 						if( usedBottomLeft == false )
 						{
 							usedBottomLeft = true ;
-							bottomLeft.generateContacts( _hull ) ;
+							bottomLeft.generateContacts( _hull, _contacts ) ;
 						}
 						break ;
 					}
@@ -793,7 +821,7 @@ public final class QuadTree
 						if( usedBottomRight == false )
 						{
 							usedBottomRight = true ;
-							bottomRight.generateContacts( _hull ) ;
+							bottomRight.generateContacts( _hull, _contacts ) ;
 						}
 						break ;
 					}
@@ -914,7 +942,7 @@ public final class QuadTree
 
 	private interface IUpdate
 	{
-		public void update( final float _dt ) ;
+		public void update( final float _dt, final ContactData _contacts ) ;
 	}
 
 	private final static class NodeWorker implements Parallel.IRangeRun<QuadNode>
@@ -923,7 +951,7 @@ public final class QuadTree
 
 		public NodeWorker() {}
 
-		public void setDeltaTime( final float _dt )
+		public void set( final float _dt )
 		{
 			deltaTime = _dt ;
 		}

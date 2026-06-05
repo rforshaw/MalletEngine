@@ -4,7 +4,9 @@ import com.linxonline.mallet.maths.Vector2 ;
 
 public final class ContactPoint
 {
-	public Hull collidedWith = null ;
+	public Hull a = null ;
+	public Hull b = null ;
+
 	public float contactNormalX = 0.0f ;
 	public float contactNormalY = 0.0f ;
 	public float penetration = 0.0f ;

@@ -16,8 +16,6 @@ public class CollisionComponent extends Component
 {
 	public final Hull[] hulls ;
 
-	protected final ContactPoint point = new ContactPoint() ;
-
 	public CollisionComponent( final Entity _parent, final Hull ... _hulls )
 	{
 		this( _parent, Entity.AllowEvents.YES, _hulls ) ;
@@ -38,41 +36,15 @@ public class CollisionComponent extends Component
 		super.readyToDestroy( _callback ) ;
 	}
 
-	@Override
-	public void update( final float _dt )
-	{
-		super.update( _dt ) ;
-
-		// Shift the hulls position by the penetration depth.
-		for( int i = 0; i < hulls.length; ++i )
-		{
-			final Hull hull = hulls[i] ;
-
-			final int size = hull.contactData.size() ;
-			for( int j = 0; j < size; ++j )
-			{
-				hull.contactData.get( j, point ) ;
-				applyContactPoint( hull, point ) ;
-			}
-		}
-	}
-
-	public void applyContactPoint( final Hull _hull, final ContactPoint _point )
-	{
-		applySeparation( _hull, _point ) ;
-	}
-
-	public final void applySeparation( final Hull _hull, final ContactPoint _point )
-	{
-		final float u = _point.collidedWith.isStatic() ? 1.0f : 0.25f ;
-		final float x = ( point.contactNormalX * point.penetration ) * u ;
-		final float y = ( point.contactNormalY * point.penetration ) * u ;
-		_hull.addToPosition( x, y ) ;
-	}
 
 	public static CollisionComponent createWithNoShift( final Entity _parent, final Hull ... _hulls )
 	{
-		return new NoShiftCollisionComponent( _parent, _hulls ) ;
+		for( final Hull hull : _hulls )
+		{
+			hull.setCollider( Hull.NO_SHIFT_COLLIDER ) ;
+		}
+
+		return new CollisionComponent( _parent, _hulls ) ;
 	}
 
 	public static CollisionComponent generateBox2D( final Entity _parent,
@@ -102,16 +74,5 @@ public class CollisionComponent extends Component
 
 		final CollisionComponent comp = new CollisionComponent( _parent, _allow, hull ) ;
 		return comp ;
-	}
-
-	private static final class NoShiftCollisionComponent extends CollisionComponent
-	{
-		public NoShiftCollisionComponent( final Entity _parent, final Hull ... _hulls )
-		{
-			super( _parent, _hulls ) ;
-		}
-
-		@Override
-		public void applyContactPoint( final Hull _hull, final ContactPoint _point ) {}
 	}
 }

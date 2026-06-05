@@ -1,105 +1,117 @@
 package com.linxonline.mallet.physics ;
 
+import java.util.Arrays ;
+
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public final class ContactData
 {
-	private static final int BELOW_EXCESS_RESIZE_LIMIT = 1000 ;
-
 	private static final int CONTACT_NORMAL_X = 0 ;
 	private static final int CONTACT_NORMAL_Y = 1 ;
 	private static final int CONTACT_PENETRATION = 2 ;
 
-	public static final int INITIAL_COLLISION_POINTS = 10 ;
-	public static final int MAX_COLLISION_POINTS = 50 ;
+	public static final int INITIAL_COLLISION_POINTS = 1000 ;
+	public static final int MAX_COLLISION_POINTS = Integer.MAX_VALUE / 3 ;
 
-	private Hull[] collidedWith = new Hull[INITIAL_COLLISION_POINTS] ;
+	private Hull[] hulls = new Hull[INITIAL_COLLISION_POINTS * 2] ;
 	private float[] contacts = new float[INITIAL_COLLISION_POINTS * 3] ;
-	private boolean[] physical = new boolean[INITIAL_COLLISION_POINTS] ;
 
-	private int belowExcess = 0 ;
 	private int usedContacts = 0 ;
 
 	public ContactData() {}
 
 	public final int addContact( final float _penetration,
-								  final Vector2 _normal,
-								  final Hull _collidedWith )
+								 final Vector2 _normal,
+								 final Hull _a,
+								 final Hull _b )
 	{
-		return addContact( _penetration, _normal.x, _normal.y, _collidedWith ) ;
+		return addContact( _penetration, _normal.x, _normal.y, _a, _b ) ;
 	}
 
-	public final synchronized int addContact( final float _penetration,
+	public final int addContact( final float _penetration,
 											  final float _normalX,
 											  final float _normalY,
-											  final Hull _collidedWith )
+											  final Hull _a,
+											  final Hull _b )
 	{
-		if( usedContacts >= collidedWith.length && usedContacts < MAX_COLLISION_POINTS )
+		int hullSize = hulls.length / 2 ;
+		if( usedContacts >= hullSize && usedContacts < MAX_COLLISION_POINTS )
 		{
-			int extra = INITIAL_COLLISION_POINTS ;
-			final int total = collidedWith.length + extra ;
+			int extra = hullSize ;
+			final int total = hullSize + extra ;
 
 			extra = ( total <= MAX_COLLISION_POINTS ) ? extra : ( extra - ( total - MAX_COLLISION_POINTS ) ) ;
 
-			collidedWith = expand( collidedWith, extra ) ;
+			hulls = expand( hulls, extra * 2 ) ;
 			contacts = FloatBuffer.expand( contacts, extra * 3 ) ;
 		}
 
-		if( usedContacts < collidedWith.length )
+		hullSize = hulls.length / 2 ;
+		if( usedContacts < hullSize )
 		{
-			final int index = usedContacts * 3 ;
-			contacts[index + CONTACT_NORMAL_X] = _normalX ;
-			contacts[index + CONTACT_NORMAL_Y] = _normalY ;
-			contacts[index + CONTACT_PENETRATION] = _penetration ;
-			collidedWith[usedContacts] = _collidedWith ;
+			final int cIndex = usedContacts * 3 ;
+			contacts[cIndex + CONTACT_NORMAL_X] = _normalX ;
+			contacts[cIndex + CONTACT_NORMAL_Y] = _normalY ;
+			contacts[cIndex + CONTACT_PENETRATION] = _penetration ;
+
+			final int hIndex = usedContacts * 2 ;
+			hulls[hIndex] = _a ;
+			hulls[hIndex + 1] = _b ;
+
 			return usedContacts++ ;
 		}
 
 		return usedContacts ;
 	}
 
+	public final int addContacts( final ContactData _contacts )
+	{
+		final int toAddSize = _contacts.size() ;
+		final int futureSize = usedContacts + toAddSize ;
+
+		int hullSize = hulls.length / 2 ;
+		if( futureSize > hullSize )
+		{
+			final int extra = ( toAddSize > hullSize ) ? toAddSize + hullSize : hullSize ;
+
+			hulls = expand( hulls, extra * 2 ) ;
+			contacts = FloatBuffer.expand( contacts, extra * 3 ) ;
+		}
+
+		System.arraycopy( _contacts.hulls, 0, hulls, usedContacts * 2, toAddSize * 2 ) ;
+		System.arraycopy( _contacts.contacts, 0, contacts, usedContacts * 3, toAddSize * 3 ) ;
+
+		usedContacts = futureSize;
+		return usedContacts ;
+	}
+
 	public final ContactPoint get( final int _i, final ContactPoint _point )
 	{
-		final int index = _i * 3 ;
-		_point.contactNormalX = contacts[index + CONTACT_NORMAL_X] ;
-		_point.contactNormalY = contacts[index + CONTACT_NORMAL_Y] ;
-		_point.penetration = contacts[index + CONTACT_PENETRATION] ;
-		_point.collidedWith = collidedWith[_i] ;
+		final int cIndex = _i * 3 ;
+		_point.contactNormalX = contacts[cIndex + CONTACT_NORMAL_X] ;
+		_point.contactNormalY = contacts[cIndex + CONTACT_NORMAL_Y] ;
+		_point.penetration = contacts[cIndex + CONTACT_PENETRATION] ;
+
+		final int hIndex = _i * 2 ;
+		_point.a = hulls[hIndex] ;
+		_point.b = hulls[hIndex + 1] ;
+
 		return _point ;
 	}
 
-	public final synchronized void reset()
+	public final void reset()
 	{
 		// We want to trim the number of contacts
 		// if we are no longer making use of them.
 		// We want to ensure this is indeed the case.
-		if( collidedWith.length > INITIAL_COLLISION_POINTS )
-		{
-			belowExcess = ( usedContacts < INITIAL_COLLISION_POINTS ) ? belowExcess + 1 : 0 ;
-			if( belowExcess > BELOW_EXCESS_RESIZE_LIMIT )
-			{
-				usedContacts = 0 ;
-				belowExcess = 0 ;
-
-				collidedWith = new Hull[INITIAL_COLLISION_POINTS] ;
-				contacts = new float[INITIAL_COLLISION_POINTS * 3] ;
-				return ;
-			}
-		}
-
-		for( int i = 0; i < usedContacts; ++i )
-		{
-			// We want to avoid retaining onto an object
-			// that may have been destroyed.
-			collidedWith[i] = null ;
-		}
+		Arrays.fill( hulls, 0, usedContacts * 2, null ) ;
 
 		usedContacts = 0 ;
 		return ;
 	}
 
-	public final synchronized int size()
+	public final int size()
 	{
 		return usedContacts ;
 	}
@@ -108,14 +120,6 @@ public final class ContactData
 	{
 		final int length = _from.length + _extra ;
 		final Hull[] to = new Hull[length] ;
-		System.arraycopy( _from, 0, to, 0, _from.length ) ;
-		return to ;
-	}
-
-	private static boolean[] expand( final boolean[] _from, final int _extra )
-	{
-		final int length = _from.length + _extra ;
-		final boolean[] to = new boolean[length] ;
 		System.arraycopy( _from, 0, to, 0, _from.length ) ;
 		return to ;
 	}

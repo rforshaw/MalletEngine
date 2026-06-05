@@ -305,6 +305,20 @@ public final class AABB
 		return _max ;
 	}
 
+	/*@Override
+	public boolean equals( final Object _obj )
+	{
+		if( _obj instanceof AABB b )
+		{
+			return minX == b.minX &&
+				   minY == b.minY &&
+				   maxX == b.maxX &&
+				   maxY == b.maxY ;
+		}
+
+		return false ;
+	}*/
+
 	@Override
 	public String toString()
 	{

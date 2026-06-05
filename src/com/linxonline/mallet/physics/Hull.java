@@ -6,6 +6,25 @@ import com.linxonline.mallet.util.buffers.FloatBuffer ;
 
 public abstract class Hull
 {
+	public final static ICollider SHIFT_COLLIDER = ( final Hull _base, final Hull _collideWith, final ContactPoint _point ) ->
+	{
+		if( _base.isStatic() )
+		{
+			return ;
+		}
+
+		final float u = _collideWith.isStatic() ? 1.0f : 0.5f ;
+		final float x = ( _point.contactNormalX * _point.penetration ) * u ;
+		final float y = ( _point.contactNormalY * _point.penetration ) * u ;
+
+		_base.addToPosition( x, y ) ;
+	} ;
+
+	public final static ICollider NO_SHIFT_COLLIDER = ( final Hull _base, final Hull _collideWith, final ContactPoint _point ) ->
+	{
+	
+	} ;
+
 	public static final int NO_GROUP = -1 ;
 	public static final int VECTOR_TYPE = 2 ;
 
@@ -15,15 +34,17 @@ public abstract class Hull
 	public static final int OFFSET_Y = 3 ;
 	public static final int ROTATION = 4 ;
 
+	public static final int COLLIDABLE = 1 << 0 ;
+	public static final int IMMOVABLE = 1 << 1 ;
+	public static final int CHANGED = 1 << 2 ;
+
 	private int groupID = NO_GROUP ;					// Defines what Group the Hull is in.
 	private final int collidableGroups ;				// Defines the Groups the Hull is affected by.
 														// If no group-specified, collides with everything.
 	private Object parent ;
+	private ICollider collider = SHIFT_COLLIDER ;
 
-	public final ContactData contactData = new ContactData() ;
-
-	protected boolean collidable = true ; 							// Allows hull to produce Collision Data.
-	protected boolean immovable = false ; 							// Allows hull to be affected by a Collision
+	protected int flags = COLLIDABLE | CHANGED ;
 
 	protected float positionX ;
 	protected float positionY ;
@@ -43,6 +64,16 @@ public abstract class Hull
 		setOffset( _offsetX, _offsetY ) ;
 	}
 
+	public void setCollider( final ICollider _collider )
+	{
+		collider = ( _collider == null ) ? SHIFT_COLLIDER : _collider ;
+	}
+
+	public ICollider getCollider()
+	{
+		return collider ;
+	}
+
 	public final void setGroupID( final int _groupID )
 	{
 		groupID = _groupID ;
@@ -52,29 +83,34 @@ public abstract class Hull
 	{
 		positionX = _x ;
 		positionY = _y ;
+		changed() ;
 	}
 
 	public void addToPosition( final float _x, final float _y )
 	{
 		positionX += _x ;
 		positionY += _y ;
+		changed() ;
 	}
 
 	public void setOffset( final float _x, final float _y )
 	{
 		offsetX = _x ;
 		offsetY = _y ;
+		changed() ;
 	}
 
 	public void addToOffset( final float _x, final float _y )
 	{
 		offsetX += _x ;
 		offsetY += _y ;
+		changed() ;
 	}
 
 	public void setRotation( final float _theta )
 	{
 		rotation = _theta ;
+		changed() ;
 	}
 
 	public Vector2 getPosition( final Vector2 _fill )
@@ -127,14 +163,24 @@ public abstract class Hull
 	*/
 	public abstract boolean ray( final Ray _ray ) ;
 
+	public final void changed()
+	{
+		changed( true ) ;
+	}
+
+	public final void changed( final boolean _change )
+	{
+		flags = ( _change ) ? flags | CHANGED : flags & ~CHANGED ;
+	}
+
 	public final void setCollidable( final boolean _collidable )
 	{
-		collidable = _collidable ;
+		flags = ( _collidable ) ? flags | COLLIDABLE : flags & ~COLLIDABLE ;
 	}
 
 	public final void setStatic( final boolean _static )
 	{
-		immovable = _static ;
+		flags = ( _static ) ? flags | IMMOVABLE : flags & ~IMMOVABLE ;
 	}
 
 	public final int getGroupID()
@@ -142,14 +188,19 @@ public abstract class Hull
 		return groupID ;
 	}
 
+	public final boolean hasChanged()
+	{
+		return ( flags & CHANGED ) == CHANGED ;
+	}
+
 	public final boolean isStatic()
 	{
-		return immovable ;
+		return ( flags & IMMOVABLE ) == IMMOVABLE ;
 	}
 
 	public final boolean isCollidable()
 	{
-		return collidable ;
+		return ( flags & COLLIDABLE ) == COLLIDABLE ;
 	}
 
 	public final boolean isCollidableWithGroup( final int _groupID )
@@ -182,5 +233,10 @@ public abstract class Hull
 		}
 
 		return ( _groups & _id ) == _id ;
+	}
+
+	public interface ICollider
+	{
+		public void apply( final Hull _base, final Hull _collideWith, final ContactPoint _point ) ;
 	}
 }

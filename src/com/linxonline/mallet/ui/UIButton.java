@@ -20,11 +20,6 @@ public class UIButton extends UIElement
 	public UIButton()
 	{
 		super() ;
-		init() ;
-	}
-
-	private void init()
-	{
 		new InputComponent( this )
 		{
 			@Override

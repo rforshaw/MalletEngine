@@ -145,6 +145,12 @@ public final class Draw implements IUpdate
 		return uniforms == null || uniforms.isEmpty() ;
 	}
 
+	public IShape[] setShapes( final IShape[] _shapes )
+	{
+		shapes = _shapes ;
+		return shapes ;
+	}
+
 	public IShape[] getShapes()
 	{
 		return shapes ;

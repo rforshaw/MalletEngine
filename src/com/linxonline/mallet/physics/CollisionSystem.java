@@ -8,7 +8,6 @@ import com.linxonline.mallet.maths.* ;
 
 public final class CollisionSystem
 {
-	private final CollisionCheck check = new CollisionCheck() ;
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
 	private final ArrayList<Hull> hulls = new ArrayList<Hull>() ;
@@ -37,15 +36,19 @@ public final class CollisionSystem
 		hulls.remove( _hull ) ;
 	}
 
-	public void update( final float _dt )
+	public void update( final float _dt, final ContactData _contacts )
 	{
 		updateExecutions() ;
 
-		treeHulls.clear() ;
-		treeHulls.insertHulls( hulls ) ;
-		treeHulls.update( _dt ) ;
+		treeHulls.update( _dt, _contacts ) ;
 
-		//simpleUpdate( check, hulls ) ;
+		// Clear the hulls and reset their change
+		// flag to false.
+		treeHulls.clear() ;
+
+		// Reinsert the hulls that way there will be hulls
+		// to test against if the collision delegate is used.
+		treeHulls.insertHulls( hulls ) ;
 	}
 
 	public CollisionAssist.IAssist createCollisionAssist()
@@ -115,11 +118,11 @@ public final class CollisionSystem
 			private boolean shutdown = false ;
 
 			@Override
-			public Hull generateContacts( final Hull _hull )
+			public Hull generateContacts( final Hull _hull, final ContactData _contacts )
 			{
 				if( shutdown == false )
 				{
-					treeHulls.generateContacts( _hull ) ;
+					treeHulls.generateContacts( _hull, _contacts ) ;
 				}
 				return _hull ;
 			}
@@ -169,45 +172,5 @@ public final class CollisionSystem
 			runnables.get( i ).run() ;
 		}
 		runnables.clear() ;
-	}
-
-	private static void simpleUpdate( final CollisionCheck _check, final List<Hull> _hulls )
-	{
-		for( final Hull hull : _hulls )
-		{
-			hull.contactData.reset() ;
-		}
-
-		for( final Hull hull1 : _hulls )
-		{
-			if( hull1.isCollidable() == false )
-			{
-				continue ;
-			}
-
-			updateCollisions( _check, hull1, _hulls ) ;
-		}
-	}
-
-	private static void updateCollisions( final CollisionCheck _check, final Hull _hull1, final List<Hull> _hulls )
-	{
-		_check.setBaseHull( _hull1 ) ;
-		for( final Hull hull2 : _hulls )
-		{
-			if( _hull1 == hull2 )
-			{
-				continue ;
-			}
-
-			if( _check.generateContactPoint( hull2 ) == true )
-			{
-				if( _hull1.contactData.size() >= ContactData.MAX_COLLISION_POINTS )
-				{
-					// No point looking for more contacts if 
-					// we've reached maximum.
-					return ;
-				}
-			}
-		}
 	}
 }

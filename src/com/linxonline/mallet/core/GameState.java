@@ -17,12 +17,16 @@ import com.linxonline.mallet.event.InterceptController ;
 
 import com.linxonline.mallet.physics.CollisionSystem ;
 import com.linxonline.mallet.physics.CollisionAssist ;
+import com.linxonline.mallet.physics.ContactData ;
+import com.linxonline.mallet.physics.ContactPoint ;
 
 import com.linxonline.mallet.animation.AnimationSystem ;
 import com.linxonline.mallet.animation.AnimationAssist ;
 
 import com.linxonline.mallet.entity.EntitySystem ;
 import com.linxonline.mallet.entity.Entity ;
+
+import com.linxonline.mallet.ecs.ECSCollision ;
 
 import com.linxonline.mallet.util.Logger ;
 import com.linxonline.mallet.util.time.ElapsedTimer ;
@@ -58,6 +62,9 @@ public class GameState
 	protected final EntitySystem entitySystem = new EntitySystem() ;
 
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
+	protected final ContactData contacts = new ContactData() ;
+	protected final ContactPoint point = new ContactPoint() ;
+
 	protected final AudioSystem audioSystem = new AudioSystem() ;
 	protected final AnimationSystem animationSystem = new AnimationSystem() ;
 
@@ -354,7 +361,16 @@ public class GameState
 
 			eventBlock.update() ;
 
-			collisionSystem.update( dt ) ;
+			{
+				contacts.reset() ;
+				collisionSystem.update( dt, contacts ) ;
+				final int size = contacts.size() ;
+				for( int i = 0; i < size; ++i )
+				{
+					ECSCollision.DEFAULT_COLLIDER.apply( contacts.get( i, point ) ) ;
+				}
+			}
+
 			entitySystem.update( dt ) ;
 			audioSystem.update( dt ) ;
 
