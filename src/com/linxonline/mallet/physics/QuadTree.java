@@ -13,14 +13,19 @@ public final class QuadTree
 {
 	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
 
+	private static int NEXT_ID = 0 ;
+
+	private final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
 	private final ArrayList<Hull> failed = new ArrayList<Hull>() ;
+
+	private final Vector2 absolute = new Vector2() ;
 	private final IUpdate update ;
 
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
 
-	private int lastFailedSize = 0 ;
 	private float ROOT_LENGTH ;
+	private int lastFailedSize = 0 ;
 
 	private enum Quadrant
 	{
@@ -57,7 +62,7 @@ public final class QuadTree
 			private final NodeWorker worker = new NodeWorker() ;
 
 			@Override
-			public void update( final float _dt, final ContactData _contacts )
+			public void update( final float _dt, final List<ContactData> _contacts )
 			{
 				root.getChildNodes( children ) ;
 				if( children.isEmpty() )
@@ -74,7 +79,8 @@ public final class QuadTree
 				for( int i = 0; i < size; ++i )
 				{
 					final QuadNode child = children.get( i ) ;
-					child.getContacts( _contacts ) ;
+					//System.out.println( "Hulls: " + child.size() ) ;
+					child.getContactData( _contacts ) ;
 				}
 
 				children.clear() ;
@@ -84,25 +90,84 @@ public final class QuadTree
 
 	public void insertHulls( final List<Hull> _hulls )
 	{
-		Parallel.forBatch( _hulls, 5000, ( final int _start, final int _end, final List<Hull> _h ) ->
+		Parallel.forBatch( _hulls, 2000, ( final int _start, final int _end, final List<Hull> _h ) ->
 		{
+			final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
+			final Vector2 absolute = new Vector2() ;
+
 			for( int i = _start; i < _end; ++i )
 			{
 				final Hull hull = _h.get( i ) ;
-				if( !root.insertHullFast( hull ) )
+
+				final int length = hull.getPointsLength() ;
+				for( int j = 0; j < length; ++j )
 				{
-					synchronized( failed )
+					hull.getPoint( j, absolute ) ;
+
+					final float x = absolute.x ;
+					final float y = absolute.y ;
+
+					hull.getPosition( absolute ) ;
+					absolute.add( x, y ) ;
+
+					if( needsExpansion( absolute ) )
 					{
-						failed.add( hull ) ;
+						synchronized( failed )
+						{
+							failed.add( hull ) ;
+						}
+						continue ;
+					}
+
+					root.getQuadNodes(absolute, nodes) ;
+				}
+
+				//System.out.println( "Fast Inserted into: " + nodes.size() ) ;
+				for( final QuadNode node : nodes )
+				{
+					if( !node.addSync( hull ) )
+					{
+						synchronized( failed )
+						{
+							failed.add( hull ) ;
+							break ;
+						}
 					}
 				}
+
+				nodes.clear() ;
 			}
 		} ) ;
 
 		final int size = failed.size() ;
 		for( int i = 0; i < size; ++i )
 		{
-			insertHull( failed.get( i ) ) ;
+			final Hull hull = failed.get( i ) ;
+
+			final int length = hull.getPointsLength() ;
+			for( int j = 0; j < length; ++j )
+			{
+				hull.getPoint( j, absolute ) ;
+
+				final float x = absolute.x ;
+				final float y = absolute.y ;
+
+				hull.getPosition( absolute ) ;
+				absolute.add( x, y ) ;
+
+				while( needsExpansion( absolute ) )
+				{
+					root.expand() ;
+				}
+
+				root.getQuadNodes( absolute, nodes ) ;
+			}
+
+			for( final QuadNode node : nodes )
+			{
+				node.add( hull ) ;
+			}
+			nodes.clear() ;
 		}
 
 		if( size < lastFailedSize )
@@ -112,19 +177,6 @@ public final class QuadTree
 
 		lastFailedSize = size ;
 		failed.clear() ;
-	}
-
-	private void insertHull( final Hull _hull )
-	{
-		while( root.insertHull( _hull ) == false )
-		{
-			root.expand() ;
-		}
-	}
-
-	public void removeHull( final Hull _hull )
-	{
-		root.removeHull( _hull ) ;
 	}
 
 	/**
@@ -143,12 +195,7 @@ public final class QuadTree
 		return root.ray( _ray, _f ) ;
 	}
 
-	public boolean exists( final Hull _hull )
-	{
-		return root.exists( _hull ) ;
-	}
-
-	public void update( final float _dt, final ContactData _contacts )
+	public void update( final float _dt, final List<ContactData> _contacts )
 	{
 		update.update( _dt, _contacts ) ;
 	}
@@ -156,6 +203,12 @@ public final class QuadTree
 	public void clear()
 	{
 		root.clear() ;
+	}
+
+	private boolean needsExpansion( final Vector2 _pos )
+	{
+		return Math.abs( _pos.x ) > ROOT_LENGTH || 
+				Math.abs( _pos.y ) > ROOT_LENGTH ;
 	}
 
 	protected final class QuadNode
@@ -215,18 +268,19 @@ public final class QuadTree
 			return _contacts ;
 		}
 
-		public ContactData getContacts( final ContactData _fill )
+		public List<ContactData> getContactData( final List<ContactData> _fill )
 		{
 			if( parent == true )
 			{
-				topLeft.getContacts( _fill ) ;
-				topRight.getContacts( _fill ) ;
-				bottomLeft.getContacts( _fill ) ;
-				bottomRight.getContacts( _fill ) ;
+				topLeft.getContactData( _fill ) ;
+				topRight.getContactData( _fill ) ;
+				bottomLeft.getContactData( _fill ) ;
+				bottomRight.getContactData( _fill ) ;
 				return _fill ;
 			}
 
-			return check.getContacts( _fill ) ;
+			_fill.add( check.getContactData() ) ;
+			return _fill ;
 		}
 
 		public Hull ray( final Ray _ray, final int _f )
@@ -273,50 +327,37 @@ public final class QuadTree
 			return best ;
 		}
 
-		public boolean insertHullFast( final Hull _hull )
+		public void getQuadNodes( final Vector2 _pt, final List<QuadNode> _toAdd )
 		{
-			if( parent == true )
+			if( parent )
 			{
-				// A parent node should not contain 
-				// any hulls, only children should.
-				return insertToQuadrantFast( _hull ) ;
+				switch( findQuadrant( _pt ) )
+				{
+					default           : break ;
+					case TOP_LEFT     : topLeft.getQuadNodes( _pt, _toAdd ) ; break ;
+					case TOP_RIGHT    : topRight.getQuadNodes( _pt, _toAdd ) ; break ;
+					case BOTTOM_LEFT  : bottomLeft.getQuadNodes( _pt, _toAdd ) ; break ;
+					case BOTTOM_RIGHT : bottomRight.getQuadNodes( _pt, _toAdd ) ; break ;
+				}
+				return ;
 			}
 
-			synchronized( hulls )
+			if( !_toAdd.contains( this ) )
 			{
-				if( hulls.length == 0 )
-				{
-					hulls = new Hull[MAX_HULLS] ;
-					check = new CollisionCheck() ;
-				}
-
-				if( nextHull < hulls.length )
-				{
-					// We assume the check to see if the 
-					// hull already exists within this node has 
-					// been called.
-					hulls[nextHull++] = _hull ;
-					return true ;
-				}
+				_toAdd.add( this ) ;
 			}
-
-			return false ;
 		}
 
-		/**
-			Insert the hull into the node or one 
-			of the nodes child nodes.
-			The node will either split to accomodate 
-			the hull, or expand depending on certain 
-			criteria.
-		*/
-		public boolean insertHull( final Hull _hull )
+		public synchronized boolean addSync( final Hull _hull )
 		{
-			if( parent == true )
+			return add( _hull ) ;
+		}
+
+		public boolean add( final Hull _hull )
+		{
+			if( parent )
 			{
-				// A parent node should not contain 
-				// any hulls, only children should.
-				return insertToQuadrant( _hull ) ;
+				return false ;
 			}
 
 			if( hulls.length == 0 )
@@ -325,34 +366,20 @@ public final class QuadTree
 				check = new CollisionCheck() ;
 			}
 
-			if( nextHull < hulls.length )
+			if( nextHull >= hulls.length )
 			{
-				// We assume the check to see if the 
-				// hull already exists within this node has 
-				// been called.
-				hulls[nextHull++] = _hull ;
-				return true ;
-			}
-			else
-			{
-				// We assume the check to see if the 
-				// hull already exists within this node has 
-				// been called.
-
-				// If the node has reached MAX_HULLS
-				// then it needs to be divided.
-				if( createChildren() == false )
+				//System.out.println( "Not enough space: " + hulls.length ) ;
+				if( !createChildren() )
 				{
-					// It will reach a point in which dividing the 
-					// Quad Tree will provide no benefit, and we will 
-					// just need to increase the maximum amount of hulls
-					// the node can contain.
+					// If we can't create child nodes we
+					// must expand our capacity.
 					expandHullCapacity() ;
-					return insertHull( _hull ) ;
 				}
-
-				return true ;
+				return false ;
 			}
+
+			hulls[nextHull++] = _hull ;
+			return true ;
 		}
 
 		/**
@@ -364,48 +391,9 @@ public final class QuadTree
 		*/
 		private void expandHullCapacity()
 		{
-			final Hull[] newHulls = new Hull[hulls.length + MAX_HULLS] ;
+			final Hull[] newHulls = new Hull[hulls.length * 2] ;
 			System.arraycopy( hulls, 0, newHulls, 0, hulls.length ) ;
 			hulls = newHulls ;
-		}
-
-		public void removeHull( final Hull _hull )
-		{
-			if( parent == true )
-			{
-				removeFromChildren( _hull ) ;
-				return ;
-			}
-
-			removeHull( getIndex( _hull ) ) ;
-		}
-
-		private void removeHull( final int _index )
-		{
-			// Shift the hulls to the left by 1
-			// effectively removing the hull 
-			if( _index >= 0 )
-			{
-				// Try and remove things from the top of the hull 
-				// list first - it will avoid the array shift.
-				for( int i = _index + 1; i < nextHull; i++ )
-				{
-					hulls[i - 1] = hulls[i] ;
-				}
-				nextHull -= 1 ;
-			}
-		}
-
-		/**
-			Called by a parent node to its children.
-			Should only ever be called by a parent node.
-		*/
-		private void removeFromChildren( final Hull _hull )
-		{
-			topLeft.removeHull( _hull ) ;
-			topRight.removeHull( _hull ) ;
-			bottomLeft.removeHull( _hull ) ;
-			bottomRight.removeHull( _hull ) ;
 		}
 
 		public void getChildNodes( final List<QuadNode> _nodes )
@@ -426,98 +414,59 @@ public final class QuadTree
 			}
 		}
 
-		public boolean exists( final Hull _hull )
-		{
-			if( parent == true )
-			{
-				return existsInChildren( _hull ) ;
-			}
-
-			return contains( _hull ) ;
-		}
-
-		/**
-			Called by a parent node to its children.
-			Should only ever be called by a parent node.
-		*/
-		private boolean existsInChildren( final Hull _hull )
-		{
-			return topLeft.contains( _hull ) ||
-				   topRight.contains( _hull ) ||
-				   bottomLeft.contains( _hull ) ||
-				   bottomRight.contains( _hull ) ;
-		}
-
 		public void update( final float _dt )
 		{
-			if( parent == false )
+			if( parent )
 			{
-				// If the node isn't a parent then it must
-				// be the node that contains hulls
-				updateThisNode( _dt ) ;
+				// We grab out child nodes upfront, so
+				// we know when update() is called, it will
+				// be on a child.
+				return ;
 			}
-			else
-			{
-				updateChildren( _dt ) ;
-			}
-		}
 
-		/**
-			If the node is a child and is not a parent 
-			node then it will have nodes it must update.
-			We will now check them for collisions.
-		*/
-		private void updateThisNode( final float _dt )
-		{
 			check.reset() ;
 
-			//System.out.println( "Hulls: " + nextHull ) ;
 			for( int i = 0; i < nextHull; ++i )
 			{
-				//final int index = nextHull - 1 ;
 				final Hull hull1 = hulls[i] ;
 				if( hull1.isCollidable() == false )
 				{
 					continue ;
 				}
 
-				//System.out.println( hull1 ) ;
-				updateCollisions( i, hull1, hulls ) ;
-			}
-		}
+				final boolean changed1 = hull1.hasChanged() ;
 
-		private void updateCollisions( final int _index, final Hull _hull1, final Hull[] _hulls )
-		{
-			check.setBaseHull( _hull1 ) ;
-			for( int j = _index + 1; j < nextHull; ++j )
-			{
-				if( _hulls[j].hasChanged() )
+				check.setBaseHull( hull1 ) ;
+				for( int j = i + 1; j < nextHull; ++j )
 				{
-					check.generateContactPoint( _hulls[j] ) ;
+					final Hull hull2 = hulls[j] ;
+					if( !changed1 && !hull2.hasChanged() )
+					{
+						continue ;
+					}
+
+					check.generateContactPoint( hull2 ) ;
 				}
 			}
-		}
-		
-		/**
-			Called by a parent node to its children.
-			Should only ever be called by a parent node.
-		*/
-		private void updateChildren( final float _dt )
-		{
-			topLeft.update( _dt ) ;
-			topRight.update( _dt ) ;
-			bottomLeft.update( _dt ) ;
-			bottomRight.update( _dt ) ;
 		}
 
 		public void clear()
 		{
-			if( parent == true )
+			if( parent )
 			{
 				topLeft.clear() ;
 				topRight.clear() ;
 				bottomLeft.clear() ;
 				bottomRight.clear() ;
+				return ;
+			}
+
+			final int diff = hulls.length - nextHull ;
+			if( diff > 50 )
+			{
+				final Hull[] newHulls = new Hull[nextHull + MAX_HULLS] ;
+				System.arraycopy( hulls, 0, newHulls, 0, nextHull ) ;
+				hulls = newHulls ;
 			}
 
 			for( int i = 0; i < nextHull; ++i )
@@ -525,237 +474,8 @@ public final class QuadTree
 				hulls[i].changed( false ) ;
 				hulls[i] = null ;
 			}
+
 			nextHull = 0 ;
-		}
-
-		private boolean contains( final Hull _hull )
-		{
-			final int index = getIndex( _hull ) ;
-			return index >= 0 && index < nextHull;
-		}
-
-		private int getIndex( final Hull _hull )
-		{
-			for( int i = 0; i < nextHull; i++ )
-			{
-				if( hulls[i] == _hull )
-				{
-					return i ;
-				}
-			}
-
-			return -1 ;
-		}
-
-		/**
-			Figure out what node to stick the hull into.
-			It's possible for a hull to reside in multiple 
-			nodes.
-		*/
-		private boolean insertToQuadrant( final Hull _hull )
-		{
-			int added = 0 ;
-
-			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
-			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
-			// have the hull stored within it once.
-			// Once the hull has been added to the 
-			// appropriate node, then we should not attempt 
-			// to insert the hull again.
-			// Inserting the hull is costly, and should 
-			// only be done, if it isn't there already.
-			boolean usedTopLeft = false ;
-			boolean usedTopRight = false ;
-			boolean usedBottomLeft = false ;
-			boolean usedBottomRight = false ;
-
-			final Vector2 absolute = new Vector2() ;
-
-			final int length = _hull.getPointsLength() ;
-			for( int i = 0; i < length; ++i )
-			{
-				_hull.getPoint( i, absolute ) ;
-
-				final float x = absolute.x ;
-				final float y = absolute.y ;
-
-				_hull.getPosition( absolute ) ;
-				absolute.add( x, y ) ;
-
-				// It is possible for a hull's points to 
-				// go beyond the current scope of the tree,
-				// in this case we must expand the tree
-				if( needsExpansion( absolute ) == true )
-				{
-					return false ;
-				}
-
-				// Find out what quadrant the hull should reside in
-				// A hull could potentially be in multiple 
-				// quadrants, as a hulls points may cross 
-				// quadrant boundaries.
-				switch( findQuadrant( absolute ) )
-				{
-					case TOP_LEFT     :
-					{
-						if( usedTopLeft == false )
-						{
-							usedTopLeft = true ;
-							if( topLeft.insertHull( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case TOP_RIGHT    :
-					{
-						if( usedTopRight == false )
-						{
-							usedTopRight = true ;
-							if( topRight.insertHull( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case BOTTOM_LEFT  :
-					{
-						if( usedBottomLeft == false )
-						{
-							usedBottomLeft = true ;
-							if( bottomLeft.insertHull( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case BOTTOM_RIGHT :
-					{
-						if( usedBottomRight == false )
-						{
-							usedBottomRight = true ;
-							if( bottomRight.insertHull( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-				}
-
-				if( added >= 4 )
-				{
-					return true ;
-				}
-			}
-
-			return added > 0 ;
-		}
-
-		private boolean insertToQuadrantFast( final Hull _hull )
-		{
-			int added = 0 ;
-
-			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
-			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
-			// have the hull stored within it once.
-			// Once the hull has been added to the 
-			// appropriate node, then we should not attempt 
-			// to insert the hull again.
-			// Inserting the hull is costly, and should 
-			// only be done, if it isn't there already.
-			boolean usedTopLeft = false ;
-			boolean usedTopRight = false ;
-			boolean usedBottomLeft = false ;
-			boolean usedBottomRight = false ;
-
-			final Vector2 absolute = new Vector2() ;
-
-			final int length = _hull.getPointsLength() ;
-			for( int i = 0; i < length; ++i )
-			{
-				_hull.getPoint( i, absolute ) ;
-
-				final float x = absolute.x ;
-				final float y = absolute.y ;
-
-				_hull.getPosition( absolute ) ;
-				absolute.add( x, y ) ;
-
-				// It is possible for a hull's points to 
-				// go beyond the current scope of the tree,
-				// in this case we must expand the tree
-				if( needsExpansion( absolute ) == true )
-				{
-					return false ;
-				}
-
-				// Find out what quadrant the hull should reside in
-				// A hull could potentially be in multiple 
-				// quadrants, as a hulls points may cross 
-				// quadrant boundaries.
-				switch( findQuadrant( absolute ) )
-				{
-					case TOP_LEFT     :
-					{
-						if( usedTopLeft == false )
-						{
-							usedTopLeft = true ;
-							if( topLeft.insertHullFast( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case TOP_RIGHT    :
-					{
-						if( usedTopRight == false )
-						{
-							usedTopRight = true ;
-							if( topRight.insertHullFast( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case BOTTOM_LEFT  :
-					{
-						if( usedBottomLeft == false )
-						{
-							usedBottomLeft = true ;
-							if( bottomLeft.insertHullFast( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-					case BOTTOM_RIGHT :
-					{
-						if( usedBottomRight == false )
-						{
-							usedBottomRight = true ;
-							if( bottomRight.insertHullFast( _hull ) == true )
-							{
-								++added ;
-							}
-						}
-						break ;
-					}
-				}
-
-				if( added >= 4 )
-				{
-					return true ;
-				}
-			}
-
-			return added > 0 ;
 		}
 
 		public void generateContactsFromQuadrants( final Hull _hull, final ContactData _contacts )
@@ -829,18 +549,6 @@ public final class QuadTree
 			}
 		}
 
-		/**
-			Check to see if the _pos is contained within 
-			the current scope of the Quad Tree.
-			If it's outside the trees scope expand the 
-			tree until it is inside.
-		*/
-		private boolean needsExpansion( final Vector2 _pos )
-		{
-			return Math.abs( _pos.x ) > ROOT_LENGTH || 
-				   Math.abs( _pos.y ) > ROOT_LENGTH ;
-		}
-
 		private boolean createChildren()
 		{
 			//System.out.println( "Create Children" ) ;
@@ -849,7 +557,7 @@ public final class QuadTree
 
 		private boolean createTier( final float _offset )
 		{
-			if( _offset < NODE_AREA_LIMIT )
+			if( _offset < NODE_AREA_LIMIT || parent )
 			{
 				// At a certain point making the Quad Tree more accurate
 				// becomes futile. A node's scope that is too small 
@@ -861,12 +569,6 @@ public final class QuadTree
 			topRight = new QuadNode( x + _offset, y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
 			bottomLeft = new QuadNode( x - _offset, y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
 			bottomRight = new QuadNode( x + _offset, y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
-
-			for( int i = 0; i < nextHull; i++ )
-			{
-				// Move the existing hulls to its children.
-				insertToQuadrant( hulls[i] ) ;
-			}
 
 			parent = true ;
 			nextHull = 0 ;
@@ -942,7 +644,7 @@ public final class QuadTree
 
 	private interface IUpdate
 	{
-		public void update( final float _dt, final ContactData _contacts ) ;
+		public void update( final float _dt, final List<ContactData> _contacts ) ;
 	}
 
 	private final static class NodeWorker implements Parallel.IRangeRun<QuadNode>

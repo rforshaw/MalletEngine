@@ -1,5 +1,7 @@
 package com.linxonline.mallet.physics ;
 
+import java.util.List ;
+
 import com.linxonline.mallet.util.Logger ;
 
 import com.linxonline.mallet.maths.* ;
@@ -103,6 +105,11 @@ public final class CollisionCheck
 
 		contacts.addContact( overlap, axis.x, axis.y, box1, _box2 ) ;
 		return true ;
+	}
+
+	public ContactData getContactData()
+	{
+		return contacts ;
 	}
 
 	public ContactData getContacts( final ContactData _fill )

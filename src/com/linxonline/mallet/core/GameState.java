@@ -62,7 +62,7 @@ public class GameState
 	protected final EntitySystem entitySystem = new EntitySystem() ;
 
 	protected final CollisionSystem collisionSystem = new CollisionSystem() ;
-	protected final ContactData contacts = new ContactData() ;
+	protected final List<ContactData> contacts = MalletList.<ContactData>newList() ;
 	protected final ContactPoint point = new ContactPoint() ;
 
 	protected final AudioSystem audioSystem = new AudioSystem() ;
@@ -362,12 +362,16 @@ public class GameState
 			eventBlock.update() ;
 
 			{
-				contacts.reset() ;
+				contacts.clear() ;
 				collisionSystem.update( dt, contacts ) ;
-				final int size = contacts.size() ;
-				for( int i = 0; i < size; ++i )
+
+				for( final ContactData data : contacts )
 				{
-					ECSCollision.DEFAULT_COLLIDER.apply( contacts.get( i, point ) ) ;
+					final int size = data.size() ;
+					for( int i = 0; i < size; ++i )
+					{
+						ECSCollision.DEFAULT_COLLIDER.apply( data.get( i, point ) ) ;
+					}
 				}
 			}
 

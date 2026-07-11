@@ -36,7 +36,7 @@ public final class CollisionSystem
 		hulls.remove( _hull ) ;
 	}
 
-	public void update( final float _dt, final ContactData _contacts )
+	public void update( final float _dt, final List<ContactData> _contacts )
 	{
 		updateExecutions() ;
 

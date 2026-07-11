@@ -16,13 +16,11 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 		final Hull a = _point.a ;
 		final Hull b = _point.b ;
 
-		a.changed( true ) ;
 		if( a.isCollidableWithGroup( b.getGroupID() ) )
 		{
 			a.getCollider().apply( a, b, _point ) ;
 		}
 
-		b.changed( true ) ;
 		if( b.isCollidableWithGroup( a.getGroupID() ) )
 		{
 			_point.contactNormalX *= -1.0f ;
@@ -37,7 +35,7 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 	private final List<Component> components = MalletList.<Component>newList() ;
 
 	private final CollisionSystem cs = new CollisionSystem() ;
-	private final ContactData contacts = new ContactData() ;
+	private final List<ContactData> contacts = MalletList.<ContactData>newList() ;
 	private final ContactPoint point = new ContactPoint() ;
 
 	private final ICollider collider ;
@@ -88,14 +86,17 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		updateExecutions() ;
 
-		contacts.reset() ;
+		contacts.clear() ;
 		cs.update( ( float )_dt, contacts ) ;
 
-		final int size = contacts.size() ;
-		//System.out.println( "Contacts: " + size ) ;
-		for( int i = 0; i < size; ++i )
+		for( final ContactData data : contacts )
 		{
-			collider.apply( contacts.get( i, point ) ) ;
+			final int size = data.size() ;
+			//System.out.println( "Contacts: " + size ) ;
+			for( int i = 0; i < size; ++i )
+			{
+				collider.apply( data.get( i, point ) ) ;
+			}
 		}
 	}
 

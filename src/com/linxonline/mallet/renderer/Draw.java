@@ -4,9 +4,6 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
-import com.linxonline.mallet.util.Interpolate ;
-import com.linxonline.mallet.util.buffers.FloatBuffer ;
-
 public final class Draw implements IUpdate
 {
 	// Each contain Position, Rotation, and Scale

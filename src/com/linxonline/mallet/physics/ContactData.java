@@ -11,7 +11,7 @@ public final class ContactData
 	private static final int CONTACT_NORMAL_Y = 1 ;
 	private static final int CONTACT_PENETRATION = 2 ;
 
-	public static final int INITIAL_COLLISION_POINTS = 1000 ;
+	public static final int INITIAL_COLLISION_POINTS = 500 ;
 	public static final int MAX_COLLISION_POINTS = Integer.MAX_VALUE / 3 ;
 
 	private Hull[] hulls = new Hull[INITIAL_COLLISION_POINTS * 2] ;
@@ -38,10 +38,12 @@ public final class ContactData
 		int hullSize = hulls.length / 2 ;
 		if( usedContacts >= hullSize && usedContacts < MAX_COLLISION_POINTS )
 		{
-			int extra = hullSize ;
+			int extra = INITIAL_COLLISION_POINTS ;//hullSize ;
 			final int total = hullSize + extra ;
 
 			extra = ( total <= MAX_COLLISION_POINTS ) ? extra : ( extra - ( total - MAX_COLLISION_POINTS ) ) ;
+
+			//System.out.println( "Extra: " + extra + " " + usedContacts + " " + hullSize ) ;
 
 			hulls = expand( hulls, extra * 2 ) ;
 			contacts = FloatBuffer.expand( contacts, extra * 3 ) ;
@@ -70,7 +72,7 @@ public final class ContactData
 		final int toAddSize = _contacts.size() ;
 		final int futureSize = usedContacts + toAddSize ;
 
-		int hullSize = hulls.length / 2 ;
+		final int hullSize = hulls.length / 2 ;
 		if( futureSize > hullSize )
 		{
 			final int extra = ( toAddSize > hullSize ) ? toAddSize + hullSize : hullSize ;
@@ -105,7 +107,21 @@ public final class ContactData
 		// We want to trim the number of contacts
 		// if we are no longer making use of them.
 		// We want to ensure this is indeed the case.
-		Arrays.fill( hulls, 0, usedContacts * 2, null ) ;
+
+		final int hullSize = hulls.length / 2 ;
+		//System.out.println( ( hullSize - usedContacts ) ) ;
+		if( hullSize > INITIAL_COLLISION_POINTS )
+		{
+			if( usedContacts < INITIAL_COLLISION_POINTS )
+			{
+				hulls = new Hull[INITIAL_COLLISION_POINTS * 2] ;
+				contacts = new float[INITIAL_COLLISION_POINTS * 3] ;
+			}
+		}
+		else
+		{
+			Arrays.fill( hulls, 0, usedContacts * 2, null ) ;
+		}
 
 		usedContacts = 0 ;
 		return ;
