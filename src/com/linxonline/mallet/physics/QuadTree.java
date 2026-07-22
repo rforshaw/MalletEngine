@@ -5,6 +5,7 @@ import java.util.ArrayList ;
 
 import com.linxonline.mallet.util.Parallel ;
 
+import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Intersection ;
@@ -13,13 +14,15 @@ public final class QuadTree
 {
 	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
 
-	private static int NEXT_ID = 0 ;
+	private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
+	private final NodeWorker worker = new NodeWorker() ;
+
+	private final Parallel.IListRun<Hull> insertionWorker ;
 
 	private final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
 	private final ArrayList<Hull> failed = new ArrayList<Hull>() ;
 
-	private final Vector2 absolute = new Vector2() ;
-	private final IUpdate update ;
+	private final AABB aabb = AABB.create() ;
 
 	private final int MAX_HULLS ; 
 	private final float NODE_AREA_LIMIT  ;
@@ -55,112 +58,71 @@ public final class QuadTree
 		ROOT_LENGTH = root.length ;
 		MAX_HULLS = _nodeCapacity ;
 
-		update = new IUpdate()
+		insertionWorker = ( final int _start, final int _end, final List<Hull> _h ) ->
 		{
-			// Used when multi-threading
-			private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
-			private final NodeWorker worker = new NodeWorker() ;
+			final List<Hull> fails = new ArrayList<Hull>() ;
+			final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
+			final AABB aabb = AABB.create() ;
 
-			@Override
-			public void update( final float _dt, final List<ContactData> _contacts )
+			for( int i = _start; i < _end; ++i )
 			{
-				root.getChildNodes( children ) ;
-				if( children.isEmpty() )
+				final Hull hull = _h.get( i ) ;
+				hull.getAABB( aabb ) ;
+
+				root.getQuadNodes( aabb, nodes ) ;
+				if( nodes.isEmpty() )
 				{
-					return ;
+					fails.add( hull ) ;
+					break ;
 				}
 
-				//System.out.println( "Nodes: " + children.size() ) ;
-				worker.set( _dt ) ;
-
-				Parallel.forEach( children, 10, worker ) ;
-
-				final int size = children.size() ;
-				for( int i = 0; i < size; ++i )
+				for( final QuadNode node : nodes )
 				{
-					final QuadNode child = children.get( i ) ;
-					//System.out.println( "Hulls: " + child.size() ) ;
-					child.getContactData( _contacts ) ;
+					if( !node.addSync( hull ) )
+					{
+						fails.add( hull ) ;
+						break ;
+					}
 				}
 
-				children.clear() ;
+				nodes.clear() ;
+			}
+
+			synchronized( failed )
+			{
+				failed.addAll( fails ) ;
 			}
 		} ;
 	}
 
 	public void insertHulls( final List<Hull> _hulls )
 	{
-		Parallel.forBatch( _hulls, 2000, ( final int _start, final int _end, final List<Hull> _h ) ->
+		Parallel.forEach( children, 100, ( final int _index, final QuadNode _node ) ->
 		{
-			final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
-			final Vector2 absolute = new Vector2() ;
-
-			for( int i = _start; i < _end; ++i )
-			{
-				final Hull hull = _h.get( i ) ;
-
-				final int length = hull.getPointsLength() ;
-				for( int j = 0; j < length; ++j )
-				{
-					hull.getPoint( j, absolute ) ;
-
-					final float x = absolute.x ;
-					final float y = absolute.y ;
-
-					hull.getPosition( absolute ) ;
-					absolute.add( x, y ) ;
-
-					if( needsExpansion( absolute ) )
-					{
-						synchronized( failed )
-						{
-							failed.add( hull ) ;
-						}
-						continue ;
-					}
-
-					root.getQuadNodes(absolute, nodes) ;
-				}
-
-				//System.out.println( "Fast Inserted into: " + nodes.size() ) ;
-				for( final QuadNode node : nodes )
-				{
-					if( !node.addSync( hull ) )
-					{
-						synchronized( failed )
-						{
-							failed.add( hull ) ;
-							break ;
-						}
-					}
-				}
-
-				nodes.clear() ;
-			}
+			_node.clear() ;
 		} ) ;
+
+		Parallel.forBatch( _hulls, 500, insertionWorker ) ;
+		if( failed.isEmpty() )
+		{
+			return ;
+		}
 
 		final int size = failed.size() ;
 		for( int i = 0; i < size; ++i )
 		{
 			final Hull hull = failed.get( i ) ;
+			hull.getAABB( aabb ) ;
 
-			final int length = hull.getPointsLength() ;
-			for( int j = 0; j < length; ++j )
+			while( needsExpansion( aabb ) )
 			{
-				hull.getPoint( j, absolute ) ;
+				root.expand() ;
+			}
 
-				final float x = absolute.x ;
-				final float y = absolute.y ;
-
-				hull.getPosition( absolute ) ;
-				absolute.add( x, y ) ;
-
-				while( needsExpansion( absolute ) )
-				{
-					root.expand() ;
-				}
-
-				root.getQuadNodes( absolute, nodes ) ;
+			root.getQuadNodes( aabb, nodes ) ;
+			if( nodes.isEmpty() )
+			{
+				continue ;
 			}
 
 			for( final QuadNode node : nodes )
@@ -187,9 +149,22 @@ public final class QuadTree
 	*/
 	public void generateContacts( final Hull _hull, final ContactData _contacts )
 	{
-		root.generateContacts( _hull, _contacts ) ;
+		final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
+		final AABB aabb = AABB.create() ;
+
+		_hull.getAABB( aabb ) ;
+
+		root.getQuadNodes( aabb, nodes ) ;
+
+		for( final QuadNode node : nodes )
+		{
+			node.generateContacts( _hull, _contacts ) ;
+		}
 	}
 
+	/**
+		Return the first hull the ray collides with.
+	*/
 	public Hull ray( final Ray _ray, final int _f )
 	{
 		return root.ray( _ray, _f ) ;
@@ -197,18 +172,40 @@ public final class QuadTree
 
 	public void update( final float _dt, final List<ContactData> _contacts )
 	{
-		update.update( _dt, _contacts ) ;
+		if( children.isEmpty() )
+		{
+			// There should always be at least 4
+			// child nodes provided by the root.
+			// If we have no children then we need
+			// to go get them.
+			root.getChildNodes( children ) ;
+		}
+
+		worker.set( _dt ) ;
+
+		Parallel.forEach( children, 100, worker ) ;
+
+		final int size = children.size() ;
+		for( int i = 0; i < size; ++i )
+		{
+			final QuadNode child = children.get( i ) ;
+			child.getContactData( _contacts ) ;
+			child.stop() ;
+		}
 	}
 
-	public void clear()
+	/**
+		If a QuadNode expands, or creates child nodes
+		then empty the child array.
+	*/
+	private void emptyChildren()
 	{
-		root.clear() ;
+		children.clear() ;
 	}
 
-	private boolean needsExpansion( final Vector2 _pos )
+	private boolean needsExpansion( final AABB _aabb )
 	{
-		return Math.abs( _pos.x ) > ROOT_LENGTH || 
-				Math.abs( _pos.y ) > ROOT_LENGTH ;
+		return !root.aabb.intersectAABB( _aabb ) ;
 	}
 
 	protected final class QuadNode
@@ -219,11 +216,12 @@ public final class QuadTree
 		private CollisionCheck check ;
 		private Hull[] hulls = EMPTY_HULLS ;
 
-		private QuadNode topLeft ;
-		private QuadNode topRight ;
-		private QuadNode bottomLeft ;
-		private QuadNode bottomRight ;
+		private volatile QuadNode topLeft ;
+		private volatile QuadNode topRight ;
+		private volatile QuadNode bottomLeft ;
+		private volatile QuadNode bottomRight ;
 
+		private AABB aabb ;
 		private float length ;
 		private int nextHull = 0 ;
 		private boolean parent = false ;
@@ -233,6 +231,8 @@ public final class QuadTree
 			x = _x ;
 			y = _y ;
 			length = _length ;
+
+			aabb = AABB.create( x, y, length ) ;
 
 			if( _quadrant == Quadrant.ROOT )
 			{
@@ -249,11 +249,8 @@ public final class QuadTree
 		{
 			if( parent == true )
 			{
-				generateContactsFromQuadrants( _hull, _contacts ) ;
 				return _contacts ;
 			}
-
-			check.reset() ;
 
 			// nextHull is the current length of hulls 
 			// we want the hull we've passed in to be compared 
@@ -261,9 +258,8 @@ public final class QuadTree
 			check.setBaseHull( _hull ) ;
 			for( int i = 0; i < nextHull; ++i )
 			{
-				check.generateContactPoint( hulls[i] ) ;
+				check.generateContactPoint( hulls[i], _contacts ) ;
 			}
-			check.getContacts( _contacts ) ;
 
 			return _contacts ;
 		}
@@ -272,38 +268,68 @@ public final class QuadTree
 		{
 			if( parent == true )
 			{
-				topLeft.getContactData( _fill ) ;
-				topRight.getContactData( _fill ) ;
-				bottomLeft.getContactData( _fill ) ;
-				bottomRight.getContactData( _fill ) ;
 				return _fill ;
 			}
 
-			_fill.add( check.getContactData() ) ;
+			final ContactData contacts = check.getContactData() ;
+			if( contacts.size() > 0 )
+			{
+				_fill.add( contacts ) ;
+			}
+
 			return _fill ;
 		}
 
-		public Hull ray( final Ray _ray, final int _f )
+		public Hull ray( final Ray _ray, final int _filter )
 		{
-			if( parent == true )
+			if( !aabb.ray( _ray.getPoint(), _ray.getDirection(), _ray.getIntersection() ).isValid() )
 			{
-				switch( findQuadrant( _ray.getPoint() ) )
-				{
-					default           : return null ;
-					case TOP_LEFT     : return topLeft.ray( _ray, _f ) ;
-					case TOP_RIGHT    : return topRight.ray( _ray, _f ) ;
-					case BOTTOM_LEFT  : return bottomLeft.ray( _ray, _f ) ;
-					case BOTTOM_RIGHT : return bottomRight.ray( _ray, _f ) ;
-				}
+				return null ;
 			}
+
+			final Intersection inter = _ray.getIntersection() ;
 
 			Hull best = null ;
 			float distance = Float.MAX_VALUE ;
 
+			if( parent == true )
+			{
+				Hull hull = topLeft.ray( _ray, _filter ) ;
+				if( inter.isValid() && inter.getDistance() < distance )
+				{
+					best = hull ;
+					distance = inter.getDistance() ;
+				}
+
+				hull = topRight.ray( _ray, _filter ) ;
+				if( inter.isValid() && inter.getDistance() < distance )
+				{
+					best = hull ;
+					distance = inter.getDistance() ;
+				}
+
+				hull = bottomLeft.ray( _ray, _filter ) ;
+				if( inter.isValid() && inter.getDistance() < distance )
+				{
+					best = hull ;
+					distance = inter.getDistance() ;
+				}
+
+				hull = bottomRight.ray( _ray, _filter ) ;
+				if( inter.isValid() && inter.getDistance() < distance )
+				{
+					best = hull ;
+					distance = inter.getDistance() ;
+				}
+
+				inter.setDistance( distance ) ;
+				return best ;
+			}
+
 			for( int i = 0; i < nextHull; ++i )
 			{
 				final Hull hull = hulls[i] ;
-				if( Hull.isCollidableWithGroup( hull.getGroupID(), _f ) == false )
+				if( Hull.isCollidableWithGroup( hull.getGroupID(), _filter ) == false )
 				{
 					// The client is not interested if this hull intersects 
 					// the ray being cast.
@@ -324,21 +350,23 @@ public final class QuadTree
 				}
 			}
 
+			inter.setDistance( distance ) ;
 			return best ;
 		}
 
-		public void getQuadNodes( final Vector2 _pt, final List<QuadNode> _toAdd )
+		public void getQuadNodes( final AABB _aabb, final List<QuadNode> _toAdd )
 		{
+			if( !aabb.intersectAABB( _aabb ) )
+			{
+				return ;
+			}
+
 			if( parent )
 			{
-				switch( findQuadrant( _pt ) )
-				{
-					default           : break ;
-					case TOP_LEFT     : topLeft.getQuadNodes( _pt, _toAdd ) ; break ;
-					case TOP_RIGHT    : topRight.getQuadNodes( _pt, _toAdd ) ; break ;
-					case BOTTOM_LEFT  : bottomLeft.getQuadNodes( _pt, _toAdd ) ; break ;
-					case BOTTOM_RIGHT : bottomRight.getQuadNodes( _pt, _toAdd ) ; break ;
-				}
+				topLeft.getQuadNodes( _aabb, _toAdd ) ;
+				topRight.getQuadNodes( _aabb, _toAdd ) ;
+				bottomLeft.getQuadNodes( _aabb, _toAdd ) ;
+				bottomRight.getQuadNodes( _aabb, _toAdd ) ;
 				return ;
 			}
 
@@ -348,9 +376,17 @@ public final class QuadTree
 			}
 		}
 
-		public synchronized boolean addSync( final Hull _hull )
+		public boolean addSync( final Hull _hull )
 		{
-			return add( _hull ) ;
+			if( parent )
+			{
+				return false ;
+			}
+
+			synchronized( this )
+			{
+				return add( _hull ) ;
+			}
 		}
 
 		public boolean add( final Hull _hull )
@@ -369,13 +405,14 @@ public final class QuadTree
 			if( nextHull >= hulls.length )
 			{
 				//System.out.println( "Not enough space: " + hulls.length ) ;
-				if( !createChildren() )
+				if( createChildren() )
 				{
-					// If we can't create child nodes we
-					// must expand our capacity.
-					expandHullCapacity() ;
+					return false ;
 				}
-				return false ;
+
+				// If we can't create child nodes we
+				// must expand our capacity.
+				expandHullCapacity() ;
 			}
 
 			hulls[nextHull++] = _hull ;
@@ -396,6 +433,11 @@ public final class QuadTree
 			hulls = newHulls ;
 		}
 
+		/**
+			Should only be called from the root node.
+			Returns all current leaf/child nodes that
+			contain hulls.
+		*/
 		public void getChildNodes( final List<QuadNode> _nodes )
 		{
 			if( parent == true )
@@ -450,108 +492,47 @@ public final class QuadTree
 			}
 		}
 
-		public void clear()
+		public void stop()
 		{
 			if( parent )
 			{
-				topLeft.clear() ;
-				topRight.clear() ;
-				bottomLeft.clear() ;
-				bottomRight.clear() ;
 				return ;
-			}
-
-			final int diff = hulls.length - nextHull ;
-			if( diff > 50 )
-			{
-				final Hull[] newHulls = new Hull[nextHull + MAX_HULLS] ;
-				System.arraycopy( hulls, 0, newHulls, 0, nextHull ) ;
-				hulls = newHulls ;
 			}
 
 			for( int i = 0; i < nextHull; ++i )
 			{
-				hulls[i].changed( false ) ;
+				final Hull hull = hulls[i] ;
+				hull.changed( false ) ;
+			}
+		}
+
+		public void clear()
+		{
+			if( parent )
+			{
+				return ;
+			}
+
+			if( hulls.length > MAX_HULLS )
+			{
+				if( nextHull < MAX_HULLS )
+				{
+					final Hull[] newHulls = new Hull[MAX_HULLS] ;
+					System.arraycopy( hulls, 0, newHulls, 0, nextHull ) ;
+					hulls = newHulls ;
+				}
+			}
+
+			for( int i = 0; i < nextHull; ++i )
+			{
 				hulls[i] = null ;
 			}
 
 			nextHull = 0 ;
 		}
 
-		public void generateContactsFromQuadrants( final Hull _hull, final ContactData _contacts )
-		{
-			// Each Quadrant TOP_LEFT, TOP_RIGHT, 
-			// BOTTOM_LEFT, BOTTOM_RIGHT, should only 
-			// have the hull stored within it once.
-			// Once the hull has been added to the 
-			// appropriate node, then we should not attempt 
-			// to insert the hull again.
-			// Inserting the hull is costly, and should 
-			// only be done, if it isn't there already.
-			boolean usedTopLeft = false ;
-			boolean usedTopRight = false ;
-			boolean usedBottomLeft = false ;
-			boolean usedBottomRight = false ;
-
-			final Vector2 absolute = new Vector2() ;
-
-			final int length = _hull.getPointsLength() ;
-			for( int i = 0; i < length; ++i )
-			{
-				_hull.getPoint( i, absolute ) ;
-
-				final float x = absolute.x ;
-				final float y = absolute.y ;
-
-				_hull.getPosition( absolute ) ;
-				absolute.add( x, y ) ;
-
-				// Find out what quadrants the hull covers. 
-				switch( findQuadrant( absolute ) )
-				{
-					case TOP_LEFT     :
-					{
-						if( usedTopLeft == false )
-						{
-							usedTopLeft = true ;
-							topLeft.generateContacts( _hull, _contacts ) ;
-						}
-						break ;
-					}
-					case TOP_RIGHT    :
-					{
-						if( usedTopRight == false )
-						{
-							usedTopRight = true ;
-							topRight.generateContacts( _hull, _contacts ) ;
-						}
-						break ;
-					}
-					case BOTTOM_LEFT  :
-					{
-						if( usedBottomLeft == false )
-						{
-							usedBottomLeft = true ;
-							bottomLeft.generateContacts( _hull, _contacts ) ;
-						}
-						break ;
-					}
-					case BOTTOM_RIGHT :
-					{
-						if( usedBottomRight == false )
-						{
-							usedBottomRight = true ;
-							bottomRight.generateContacts( _hull, _contacts ) ;
-						}
-						break ;
-					}
-				}
-			}
-		}
-
 		private boolean createChildren()
 		{
-			//System.out.println( "Create Children" ) ;
 			return createTier( length / 2.0f ) ;
 		}
 
@@ -574,6 +555,8 @@ public final class QuadTree
 			nextHull = 0 ;
 			check = null ;
 			hulls = EMPTY_HULLS ;
+
+			QuadTree.this.emptyChildren() ;
 
 			return true ;
 		}
@@ -603,11 +586,15 @@ public final class QuadTree
 			tempRoot.bottomRight.createChildren() ;
 			tempRoot.bottomRight.topLeft = bottomRight ;
 
-			length = tempRoot.length ;
 			topLeft = tempRoot.topLeft ;
 			topRight = tempRoot.topRight ;
 			bottomLeft = tempRoot.bottomLeft ;
 			bottomRight = tempRoot.bottomRight ;
+
+			length = tempRoot.length ;
+			aabb = AABB.create( x, y, length ) ;
+
+			QuadTree.this.emptyChildren() ;
 		}
 
 		public int size()
@@ -638,13 +625,6 @@ public final class QuadTree
 				return ( _point.y >= y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
 			}
 		}
-	}
-
-
-
-	private interface IUpdate
-	{
-		public void update( final float _dt, final List<ContactData> _contacts ) ;
 	}
 
 	private final static class NodeWorker implements Parallel.IRangeRun<QuadNode>

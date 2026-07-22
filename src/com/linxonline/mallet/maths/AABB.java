@@ -36,6 +36,22 @@ public final class AABB
 		return new AABB( 0.0f, 0.0f, _maxX, _maxY ) ;
 	}
 
+	public static AABB create( final float _x, final float _y, final float _length )
+	{
+		final float x1 = _x - _length ;
+		final float x2 = _x + _length ;
+		final float y1 = _y - _length ;
+		final float y2 = _y + _length ;
+
+		final float minX = ( x1 < x2 ) ? x1 : x2 ;
+		final float maxX = ( x1 > x2 ) ? x1 : x2 ;
+
+		final float minY = ( y1 < y2 ) ? y1 : y2 ;
+		final float maxY = ( y1 > y2 ) ? y1 : y2 ;
+
+		return new AABB( minX, minY, maxX, maxY ) ;
+	}
+
 	public static AABB create( final float _minX, final float _minY,
 							   final float _maxX, final float _maxY )
 	{
@@ -303,6 +319,13 @@ public final class AABB
 		_max.x = maxX ;
 		_max.y = maxY ;
 		return _max ;
+	}
+
+	public float getRadius()
+	{
+		final float radX = ( maxX - minX ) ;
+		final float radY = ( maxX - minY ) ;
+		return ( float )Math.sqrt( ( radX * radX ) + ( radY * radY ) ) ;
 	}
 
 	/*@Override

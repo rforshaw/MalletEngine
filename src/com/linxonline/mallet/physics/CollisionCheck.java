@@ -42,6 +42,11 @@ public final class CollisionCheck
 		contacts.reset() ;
 	}
 
+	public final boolean generateContactPoint( final Hull _box2 )
+	{
+		return generateContactPoint( _box2, contacts ) ;
+	}
+
 	/**
 		Generate a Contact Point if a collision has occured.
 		Return true if a contact point was generated.
@@ -56,7 +61,7 @@ public final class CollisionCheck
 		can be correctly implemented. Rather than leaving 
 		motion to the game-logic to update.
 	*/
-	public final boolean generateContactPoint( final Hull _box2 )
+	public final boolean generateContactPoint( final Hull _box2, final ContactData _contacts )
 	{
 		final boolean box1Interested = box1.isCollidableWithGroup( _box2.getGroupID() ) ;
 		final boolean box2Interested = _box2.isCollidableWithGroup( box1.getGroupID() ) ;
@@ -103,7 +108,7 @@ public final class CollisionCheck
 			return false ;
 		}
 
-		contacts.addContact( overlap, axis.x, axis.y, box1, _box2 ) ;
+		_contacts.addContact( overlap, axis.x, axis.y, box1, _box2 ) ;
 		return true ;
 	}
 

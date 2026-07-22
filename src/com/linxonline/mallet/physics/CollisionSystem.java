@@ -39,16 +39,21 @@ public final class CollisionSystem
 	public void update( final float _dt, final List<ContactData> _contacts )
 	{
 		updateExecutions() ;
+		if( hulls.isEmpty() )
+		{
+			return ;
+		}
+
+		//long start = System.nanoTime() ;
+
+		treeHulls.insertHulls( hulls ) ;
+		//System.out.println( "Insert: " + ( ( System.nanoTime() - start ) / 1000000L ) ) ;
+
+		//start = System.nanoTime() ;
 
 		treeHulls.update( _dt, _contacts ) ;
+		//System.out.println( "Update: " + ( ( System.nanoTime() - start ) / 1000000L ) ) ;
 
-		// Clear the hulls and reset their change
-		// flag to false.
-		treeHulls.clear() ;
-
-		// Reinsert the hulls that way there will be hulls
-		// to test against if the collision delegate is used.
-		treeHulls.insertHulls( hulls ) ;
 	}
 
 	public CollisionAssist.IAssist createCollisionAssist()

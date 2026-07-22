@@ -18,7 +18,10 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 
 		if( a.isCollidableWithGroup( b.getGroupID() ) )
 		{
-			a.getCollider().apply( a, b, _point ) ;
+			synchronized( a )
+			{
+				a.getCollider().apply( a, b, _point ) ;
+			}
 		}
 
 		if( b.isCollidableWithGroup( a.getGroupID() ) )
@@ -26,7 +29,10 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 			_point.contactNormalX *= -1.0f ;
 			_point.contactNormalY *= -1.0f ;
 
-			b.getCollider().apply( b, a, _point ) ;
+			synchronized( b )
+			{
+				b.getCollider().apply( b, a, _point ) ;
+			}
 		}
 	} ;
 
@@ -36,7 +42,6 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 
 	private final CollisionSystem cs = new CollisionSystem() ;
 	private final List<ContactData> contacts = MalletList.<ContactData>newList() ;
-	private final ContactPoint point = new ContactPoint() ;
 
 	private final ICollider collider ;
 
@@ -86,18 +91,26 @@ public class ECSCollision implements IECS<ECSCollision.Component>
 	{
 		updateExecutions() ;
 
-		contacts.clear() ;
 		cs.update( ( float )_dt, contacts ) ;
 
-		for( final ContactData data : contacts )
+		//final long start = System.nanoTime() ;
+
+		Parallel.forEach( contacts, 100, ( final int _index, final ContactData _data ) ->
 		{
-			final int size = data.size() ;
+			final ContactPoint point = new ContactPoint() ;
+
+			final int size = _data.size() ;
 			//System.out.println( "Contacts: " + size ) ;
 			for( int i = 0; i < size; ++i )
 			{
-				collider.apply( data.get( i, point ) ) ;
+				collider.apply( _data.get( i, point ) ) ;
 			}
-		}
+		} ) ;
+
+		//final long end = System.nanoTime() ;
+		//System.out.println( "Separation: " + ( ( end - start ) / 1000000L ) ) ;
+
+		contacts.clear() ;
 	}
 
 	private void invokeLater( final Runnable _run )
