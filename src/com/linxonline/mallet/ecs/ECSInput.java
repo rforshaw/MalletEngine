@@ -13,48 +13,35 @@ public class ECSInput implements IECS<ECSInput.Component>
 	} ;
 	private final BufferedList<Runnable> executions = new BufferedList<Runnable>() ;
 
-	private final InputState inputWorld ;
-	private final InputState inputUI ;
+	private final InputState state ;
 
-	public ECSInput( final InputState _inputWorld, final InputState _inputUI )
+	public ECSInput( final InputState _input )
 	{
-		inputWorld = _inputWorld ;
-		inputUI = _inputUI ;
+		state = _input ;
 	}
 
 	@Override
 	public Component create( final ECSEntity _parent )
 	{
-		return createWorld( _parent, EMPTY_PROCESS ) ;
+		return create( _parent, EMPTY_PROCESS ) ;
 	}
 
-	public Component createWorld( final ECSEntity _parent, final IProcess _process )
+	public Component create( final ECSEntity _parent, final IProcess _process )
 	{
 		final Component component = new Component( _parent, _process ) ;
 		invokeLater( () ->
 		{
-			inputWorld.addInputHandler( component ) ;
+			state.addInputHandler( component ) ;
 		} ) ;
 		return component ;
 	}
 
-	public Component createUI( final ECSEntity _parent, final IProcess _process )
-	{
-		final Component component = new Component( _parent, _process ) ;
-		invokeLater( () ->
-		{
-			inputUI.addInputHandler( component ) ;
-		} ) ;
-		return component ;
-	}
-	
 	@Override
 	public void remove( final Component _component )
 	{
 		invokeLater( () ->
 		{
-			inputWorld.removeInputHandler( _component ) ;
-			inputUI.removeInputHandler( _component ) ;
+			state.removeInputHandler( _component ) ;
 		} ) ;
 	}
 

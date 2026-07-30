@@ -25,12 +25,7 @@ public class KeyInputComponent extends InputComponent
 
 	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		this( _parent, _allow, InputMode.WORLD ) ;
-	}
-
-	public KeyInputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
-	{
-		super( _parent, _allow, _mode ) ;
+		super( _parent, _allow ) ;
 	}
 
 	public void registerKeys( final KeyCode[] _keys, final IAction _action )

@@ -11,7 +11,6 @@ public abstract class InputComponent extends Component
 {
 	private Entity.ReadyCallback destroy = null ;
 	private boolean acceptInputs = true ;
-	protected final InputMode mode ;
 
 	public InputComponent( final Entity _parent )
 	{
@@ -20,18 +19,7 @@ public abstract class InputComponent extends Component
 
 	public InputComponent( final Entity _parent, Entity.AllowEvents _allow )
 	{
-		this( _parent, _allow, InputMode.WORLD ) ;
-	}
-
-	public InputComponent( final Entity _parent, final InputMode _mode )
-	{
-		this( _parent, Entity.AllowEvents.YES, _mode ) ;
-	}
-
-	public InputComponent( final Entity _parent, Entity.AllowEvents _allow, final InputMode _mode )
-	{
 		super( _parent, _allow ) ;
-		mode = _mode ;
 	}
 
 	public void acceptInputs( final boolean _accept )
@@ -49,26 +37,15 @@ public abstract class InputComponent extends Component
 	@Override
 	public void passInitialEvents( final List<Event<?>> _events )
 	{
-		Event<IInputHandler> event ;
-		switch( mode )
-		{
-			case UI    : event = Event.<IInputHandler>create( "ADD_GAME_STATE_UI_INPUT", this ) ; break ;
-			case WORLD : event = Event.<IInputHandler>create( "ADD_GAME_STATE_WORLD_INPUT", this ) ; break ;
-			default    : return ;
-		}
-		_events.add( event ) ;
+		super.passInitialEvents( _events ) ;
+		_events.add( Event.<IInputHandler>create( "ADD_GAME_STATE_INPUT", this ) ) ;
 	}
 
 	@Override
 	public void passFinalEvents( final List<Event<?>> _events )
 	{
 		super.passFinalEvents( _events ) ;
-		switch( mode )
-		{
-			case UI    : _events.add( Event.<IInputHandler>create( "REMOVE_GAME_STATE_UI_INPUT", this ) ) ;    break ;
-			case WORLD : _events.add( Event.<IInputHandler>create( "REMOVE_GAME_STATE_WORLD_INPUT", this ) ) ; break ;
-			default    : return ;
-		}
+		_events.add( Event.<IInputHandler>create( "REMOVE_GAME_STATE_INPUT", this ) ) ;
 	}
 
 	/**
@@ -95,10 +72,4 @@ public abstract class InputComponent extends Component
 		visual responsiveness to user demands.
 	*/
 	protected void processInputEvent( final InputEvent _input ) {}
-
-	public static enum InputMode
-	{
-		UI,
-		WORLD
-	}
 }

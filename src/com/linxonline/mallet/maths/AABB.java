@@ -278,23 +278,12 @@ public final class AABB
 
 	public boolean intersectAABB( final AABB _aabb )
 	{
-		final float thatMinX = _aabb.minX ;
-		final float thatMaxX = _aabb.maxX ;
-
-		if( ( thatMinX >= minX && thatMinX <= maxX ) ||
-			( thatMaxX >= minX && thatMaxX <= maxX ) )
-		{
-			final float thatMinY = _aabb.minY ;
-			final float thatMaxY = _aabb.maxY ;
-
-			if( ( thatMinY >= minY && thatMinY <= maxY ) ||
-				( thatMaxY >= minY && thatMaxY <= maxY ) )
-			{
-				return true ;
-			}
-		}
-
-		return false ;
+		return !(
+			maxX < _aabb.minX || 
+			maxY < _aabb.minY || 
+			minX > _aabb.maxX || 
+			minY > _aabb.maxY
+		) ;
 	}
 
 	public Vector2 getCenter( final Vector2 _center )

@@ -14,11 +14,11 @@ public final class QuadTree
 {
 	private static final Hull[] EMPTY_HULLS = new Hull[0] ;
 
-	private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
 	private final NodeWorker worker = new NodeWorker() ;
 
 	private final Parallel.IListRun<Hull> insertionWorker ;
 
+	private final ArrayList<QuadNode> children = new ArrayList<QuadNode>() ;
 	private final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
 	private final ArrayList<Hull> failed = new ArrayList<Hull>() ;
 
@@ -43,7 +43,7 @@ public final class QuadTree
 
 	public QuadTree()
 	{
-		this( 0.0f, 0.0f, 2000.0f, 128.0f, 20 ) ;
+		this( 0.0f, 0.0f, 2000.0f, 250.0f, 20 ) ;
 	}
 
 	public QuadTree( final float _x,
@@ -119,17 +119,10 @@ public final class QuadTree
 				root.expand() ;
 			}
 
-			root.getQuadNodes( aabb, nodes ) ;
-			if( nodes.isEmpty() )
+			while( !insertHull( hull, aabb, nodes ) )
 			{
-				continue ;
+				nodes.clear() ;
 			}
-
-			for( final QuadNode node : nodes )
-			{
-				node.add( hull ) ;
-			}
-			nodes.clear() ;
 		}
 
 		if( size < lastFailedSize )
@@ -139,6 +132,26 @@ public final class QuadTree
 
 		lastFailedSize = size ;
 		failed.clear() ;
+	}
+
+	private boolean insertHull( final Hull _hull, final AABB _aabb, final List<QuadNode> _nodes )
+	{
+		root.getQuadNodes( _aabb, _nodes ) ;
+		if( _nodes.isEmpty() )
+		{
+			return true ;
+		}
+
+		for( final QuadNode node : _nodes )
+		{
+			if( !node.add( _hull ) )
+			{
+				return false ;
+			}
+		}
+
+		_nodes.clear() ;
+		return true ;
 	}
 
 	/**
@@ -182,7 +195,6 @@ public final class QuadTree
 		}
 
 		worker.set( _dt ) ;
-
 		Parallel.forEach( children, 100, worker ) ;
 
 		final int size = children.size() ;
@@ -214,7 +226,7 @@ public final class QuadTree
 		private final float y ;
 
 		private CollisionCheck check ;
-		private Hull[] hulls = EMPTY_HULLS ;
+		private volatile Hull[] hulls = EMPTY_HULLS ;
 
 		private volatile QuadNode topLeft ;
 		private volatile QuadNode topRight ;
@@ -223,8 +235,8 @@ public final class QuadTree
 
 		private AABB aabb ;
 		private float length ;
-		private int nextHull = 0 ;
-		private boolean parent = false ;
+		private volatile int nextHull = 0 ;
+		private volatile boolean parent = false ;
 
 		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
 		{
@@ -247,7 +259,7 @@ public final class QuadTree
 
 		public ContactData generateContacts( final Hull _hull, final ContactData _contacts )
 		{
-			if( parent == true )
+			if( parent )
 			{
 				return _contacts ;
 			}
@@ -266,7 +278,7 @@ public final class QuadTree
 
 		public List<ContactData> getContactData( final List<ContactData> _fill )
 		{
-			if( parent == true )
+			if( parent || hulls.length <= 0 )
 			{
 				return _fill ;
 			}
@@ -292,7 +304,7 @@ public final class QuadTree
 			Hull best = null ;
 			float distance = Float.MAX_VALUE ;
 
-			if( parent == true )
+			if( parent )
 			{
 				Hull hull = topLeft.ray( _ray, _filter ) ;
 				if( inter.isValid() && inter.getDistance() < distance )
@@ -385,7 +397,13 @@ public final class QuadTree
 
 			synchronized( this )
 			{
-				return add( _hull ) ;
+				if( nextHull >= hulls.length )
+				{
+					return false ;
+				}
+
+				hulls[nextHull++] = _hull ;
+				return true ;
 			}
 		}
 
@@ -404,7 +422,6 @@ public final class QuadTree
 
 			if( nextHull >= hulls.length )
 			{
-				//System.out.println( "Not enough space: " + hulls.length ) ;
 				if( createChildren() )
 				{
 					return false ;
@@ -429,7 +446,7 @@ public final class QuadTree
 		private void expandHullCapacity()
 		{
 			final Hull[] newHulls = new Hull[hulls.length * 2] ;
-			System.arraycopy( hulls, 0, newHulls, 0, hulls.length ) ;
+			System.arraycopy( hulls, 0, newHulls, 0, nextHull ) ;
 			hulls = newHulls ;
 		}
 
@@ -440,7 +457,7 @@ public final class QuadTree
 		*/
 		public void getChildNodes( final List<QuadNode> _nodes )
 		{
-			if( parent == true )
+			if( parent )
 			{
 				topLeft.getChildNodes( _nodes ) ;
 				topRight.getChildNodes( _nodes ) ;
@@ -458,9 +475,9 @@ public final class QuadTree
 
 		public void update( final float _dt )
 		{
-			if( parent )
+			if( parent || hulls.length <= 0 )
 			{
-				// We grab out child nodes upfront, so
+				// We grab our child nodes upfront, so
 				// we know when update() is called, it will
 				// be on a child.
 				return ;
@@ -513,7 +530,7 @@ public final class QuadTree
 				return ;
 			}
 
-			if( hulls.length > MAX_HULLS )
+			/*if( hulls.length > MAX_HULLS )
 			{
 				if( nextHull < MAX_HULLS )
 				{
@@ -521,7 +538,7 @@ public final class QuadTree
 					System.arraycopy( hulls, 0, newHulls, 0, nextHull ) ;
 					hulls = newHulls ;
 				}
-			}
+			}*/
 
 			for( int i = 0; i < nextHull; ++i )
 			{
@@ -538,7 +555,12 @@ public final class QuadTree
 
 		private boolean createTier( final float _offset )
 		{
-			if( _offset < NODE_AREA_LIMIT || parent )
+			if( parent )
+			{
+				return false ;
+			}
+
+			if( _offset < NODE_AREA_LIMIT )
 			{
 				// At a certain point making the Quad Tree more accurate
 				// becomes futile. A node's scope that is too small 
@@ -557,7 +579,6 @@ public final class QuadTree
 			hulls = EMPTY_HULLS ;
 
 			QuadTree.this.emptyChildren() ;
-
 			return true ;
 		}
 
@@ -600,30 +621,6 @@ public final class QuadTree
 		public int size()
 		{
 			return nextHull ;
-		}
-
-		protected Quadrant findQuadrant( final Vector2 _point )
-		{
-			if( _point.x >= x )
-			{
-				return ( _point.y >= y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
-			}
-			else
-			{
-				return ( _point.y >= y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
-			}
-		}
-
-		protected Quadrant findQuadrant( final Vector3 _point )
-		{
-			if( _point.x >= x )
-			{
-				return ( _point.y >= y ) ? Quadrant.TOP_RIGHT : Quadrant.BOTTOM_RIGHT ;
-			}
-			else
-			{
-				return ( _point.y >= y ) ? Quadrant.TOP_LEFT : Quadrant.BOTTOM_LEFT ;
-			}
 		}
 	}
 

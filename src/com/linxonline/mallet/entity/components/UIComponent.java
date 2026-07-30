@@ -29,27 +29,18 @@ public class UIComponent extends InputComponent
 	public UIComponent( final Entity _parent,
 						final Entity.AllowEvents _allow )
 	{
-		this( _parent, _allow, InputMode.UI ) ;
-	}
-
-	public UIComponent( final Entity _parent,
-						final Entity.AllowEvents _allow,
-						final InputMode _mode )
-	{
 		this( _parent,
 			  _allow,
-			  _mode,
 			  WorldAssist.getDefault(),
 			  CameraAssist.getDefault() ) ;
 	}
 
 	public UIComponent( final Entity _parent,
 						final Entity.AllowEvents _allow,
-						final InputMode _mode,
 						final World _world,
 						final Camera _camera )
 	{
-		super( _parent, _allow, _mode ) ;
+		super( _parent, _allow ) ;
 
 		// Allow the developer to specify what world 
 		// this UI should be drawn to - if no world 

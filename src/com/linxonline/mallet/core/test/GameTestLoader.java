@@ -81,7 +81,7 @@ public final class GameTestLoader implements IGameLoader
 			private IScriptEngine jsEngine ;
 			private ECSEvent ecsEvents ;
 
-			private final ECSInput ecsInput = new ECSInput( inputWorldSystem, inputUISystem ) ;
+			private final ECSInput ecsInput = new ECSInput( inputSystem ) ;
 			private final ECSCollision ecsCollision = new ECSCollision() ;
 
 			private final ECSUpdate<ExComponent, ExData> ecsExample = new ECSUpdate<ExComponent, ExData>( ( final ECSEntity _parent, final ExData _data ) ->
@@ -172,7 +172,7 @@ public final class GameTestLoader implements IGameLoader
 				renderTextExample() ;
 				//playAudioExample() ;
 
-				createECSEntities( 10, 10 ) ;
+				createECSEntities( 1000, 1000 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
@@ -716,7 +716,7 @@ public final class GameTestLoader implements IGameLoader
 
 					return new ECSEntity.Component[]
 					{
-						ecsInput.createWorld( _parent, ( final InputEvent _event ) ->
+						ecsInput.create( _parent, ( final InputEvent _event ) ->
 						{
 							switch( _event.getInputType() )
 							{

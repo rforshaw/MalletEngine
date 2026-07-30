@@ -27,17 +27,7 @@ public class MouseComponent extends InputComponent
 
 	public MouseComponent( final Entity _parent, final Entity.AllowEvents _allow )
 	{
-		this( _parent, _allow, InputComponent.InputMode.UI ) ;
-	}
-
-	public MouseComponent( final Entity _parent, final InputComponent.InputMode _mode )
-	{
-		this( _parent, Entity.AllowEvents.YES, _mode ) ;
-	}
-
-	public MouseComponent( final Entity _parent, final Entity.AllowEvents _allow, final InputComponent.InputMode _mode )
-	{
-		super( _parent, _allow, _mode ) ;
+		super( _parent, _allow ) ;
 	}
 
 	@Override

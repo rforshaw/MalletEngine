@@ -52,8 +52,7 @@ public class GameState
 	private final List<IUpdate> mainUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_TIMESTEP
 	private final List<IUpdate> drawUpdaters = MalletList.<IUpdate>newList() ;		// Updaters that are triggered on DEFAULT_FRAMERATE
 
-	protected final InputState inputWorldSystem = new InputState() ;			// Internal World Input System
-	protected final InputState inputUISystem = new InputState() ;				// Internal UI Input System
+	protected final InputState inputSystem = new InputState() ;
 
 	private final InterceptController interceptController = new InterceptController() ;
 	private final EventBlock eventBlock = new EventBlock() ;
@@ -331,8 +330,7 @@ public class GameState
 	protected void hookHandlerSystems()
 	{
 		final IInputSystem input = system.getInput() ;
-		input.addInputHandler( inputUISystem ) ;
-		input.addInputHandler( inputWorldSystem ) ;
+		input.addInputHandler( inputSystem ) ;
 	}
 
 	/**
@@ -343,8 +341,7 @@ public class GameState
 	protected void unhookHandlerSystems()
 	{
 		final IInputSystem input = system.getInput() ;
-		input.removeInputHandler( inputUISystem ) ;
-		input.removeInputHandler( inputWorldSystem ) ;
+		input.removeInputHandler( inputSystem ) ;
 	}
 
 	/**
@@ -389,8 +386,7 @@ public class GameState
 		{
 			system.getInput().update() ;
 
-			inputUISystem.update() ;
-			inputWorldSystem.update() ;
+			inputSystem.update() ;
 
 			final float dt = ( float )_dt ;
 			animationSystem.update( dt ) ;
@@ -412,24 +408,14 @@ public class GameState
 			transitionType = SHUTDOWN ;
 		} ) ;
 
-		_block.add( "ADD_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "ADD_GAME_STATE_INPUT", ( final IInputHandler _handler ) ->
 		{
-			inputUISystem.addInputHandler( _handler ) ;
+			inputSystem.addInputHandler( _handler ) ;
 		} ) ;
 
-		_block.add( "REMOVE_GAME_STATE_UI_INPUT", ( final IInputHandler _handler ) ->
+		_block.add( "REMOVE_GAME_STATE_INPUT", ( final IInputHandler _handler ) ->
 		{
-			inputUISystem.removeInputHandler( _handler ) ;
-		} ) ;
-
-		_block.add( "ADD_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
-		{
-			inputWorldSystem.addInputHandler( _handler ) ;
-		} ) ;
-
-		_block.add( "REMOVE_GAME_STATE_WORLD_INPUT", ( final IInputHandler _handler ) ->
-		{
-			inputWorldSystem.removeInputHandler( _handler ) ;
+			inputSystem.removeInputHandler( _handler ) ;
 		} ) ;
 
 		_block.add( "SHOW_GAME_STATE_FPS", ( final Boolean _show ) ->
@@ -461,11 +447,8 @@ public class GameState
 	*/
 	protected void clear()
 	{
-		inputUISystem.clearInputs() ;
-		inputUISystem.clearHandlers() ;
-
-		inputWorldSystem.clearInputs() ;
-		inputWorldSystem.clearHandlers() ;
+		inputSystem.clearInputs() ;
+		inputSystem.clearHandlers() ;
 
 		audioSystem.clear() ;
 		entitySystem.clear() ;
