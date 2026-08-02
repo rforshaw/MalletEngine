@@ -30,15 +30,6 @@ public final class QuadTree
 	private float ROOT_LENGTH ;
 	private int lastFailedSize = 0 ;
 
-	private enum Quadrant
-	{
-		ROOT,
-		TOP_LEFT,
-		TOP_RIGHT,
-		BOTTOM_LEFT,
-		BOTTOM_RIGHT
-	}
-
 	private final QuadNode root ;
 
 	public QuadTree()
@@ -52,7 +43,9 @@ public final class QuadTree
 					 final float _nodeAreaLimit,
 					 final int _nodeCapacity )
 	{
-		root = new QuadNode( _x, _y, _size, Quadrant.ROOT ) ;
+		root = new QuadNode( _x, _y, _size ) ;
+		root.createChildren() ;
+
 		NODE_AREA_LIMIT = _nodeAreaLimit ;
 
 		ROOT_LENGTH = root.length ;
@@ -224,6 +217,7 @@ public final class QuadTree
 	{
 		private final float x ;
 		private final float y ;
+		private final AABB aabb ;
 
 		private CollisionCheck check ;
 		private volatile Hull[] hulls = EMPTY_HULLS ;
@@ -233,28 +227,17 @@ public final class QuadTree
 		private volatile QuadNode bottomLeft ;
 		private volatile QuadNode bottomRight ;
 
-		private AABB aabb ;
 		private float length ;
 		private volatile int nextHull = 0 ;
 		private volatile boolean parent = false ;
 
-		public QuadNode( final float _x, final float _y, final float _length, final Quadrant _quadrant )
+		public QuadNode( final float _x, final float _y, final float _length )
 		{
 			x = _x ;
 			y = _y ;
 			length = _length ;
 
 			aabb = AABB.create( x, y, length ) ;
-
-			if( _quadrant == Quadrant.ROOT )
-			{
-				// Initially the root node was considered a leaf.
-				// Hulls added to it were directly added to hulls.
-				// When you reach node capacity children were created 
-				// and the hulls reinserted - if the hulls were outside 
-				// of the roots boundaries problems arise.
-				createChildren() ;
-			}
 		}
 
 		public ContactData generateContacts( final Hull _hull, final ContactData _contacts )
@@ -568,14 +551,28 @@ public final class QuadTree
 				return false ;
 			}
 
-			topLeft = new QuadNode( x - _offset, y + _offset, _offset, Quadrant.TOP_LEFT ) ;
-			topRight = new QuadNode( x + _offset, y + _offset, _offset, Quadrant.TOP_RIGHT ) ;
-			bottomLeft = new QuadNode( x - _offset, y - _offset, _offset, Quadrant.BOTTOM_LEFT ) ;
-			bottomRight = new QuadNode( x + _offset, y - _offset, _offset, Quadrant.BOTTOM_RIGHT ) ;
+			topLeft = new QuadNode( x - _offset, y + _offset, _offset ) ;
+			topRight = new QuadNode( x + _offset, y + _offset, _offset ) ;
+			bottomLeft = new QuadNode( x - _offset, y - _offset, _offset ) ;
+			bottomRight = new QuadNode( x + _offset, y - _offset, _offset ) ;
 
 			parent = true ;
 			nextHull = 0 ;
 			check = null ;
+
+			final List<QuadNode> nodes = new ArrayList<QuadNode>() ;
+			final AABB temp = AABB.create() ;
+
+			// A parent can't have hulls only children,
+			// so let's re insert them from the root.
+			for( final Hull hull : hulls )
+			{
+				hull.getAABB( temp ) ;
+				while( !QuadTree.this.insertHull( hull, temp, nodes ) )
+				{
+					nodes.clear() ;
+				}
+			}
 			hulls = EMPTY_HULLS ;
 
 			QuadTree.this.emptyChildren() ;
@@ -592,7 +589,7 @@ public final class QuadTree
 		{
 			ROOT_LENGTH += ROOT_LENGTH ;
 
-			final QuadNode tempRoot = new QuadNode( x, y, ROOT_LENGTH, Quadrant.ROOT ) ;
+			final QuadNode tempRoot = new QuadNode( x, y, ROOT_LENGTH ) ;
 			tempRoot.createChildren() ;
 
 			tempRoot.topLeft.createChildren() ;
@@ -613,7 +610,7 @@ public final class QuadTree
 			bottomRight = tempRoot.bottomRight ;
 
 			length = tempRoot.length ;
-			aabb = AABB.create( x, y, length ) ;
+			aabb.set( x, y, length ) ;
 
 			QuadTree.this.emptyChildren() ;
 		}

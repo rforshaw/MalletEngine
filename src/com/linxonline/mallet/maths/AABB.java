@@ -101,6 +101,20 @@ public final class AABB
 		}
 	}
 
+	public void set( final float _x, final float _y, final float _length )
+	{
+		final float x1 = _x - _length ;
+		final float x2 = _x + _length ;
+		final float y1 = _y - _length ;
+		final float y2 = _y + _length ;
+
+		minX = ( x1 < x2 ) ? x1 : x2 ;
+		maxX = ( x1 > x2 ) ? x1 : x2 ;
+
+		minY = ( y1 < y2 ) ? y1 : y2 ;
+		maxY = ( y1 > y2 ) ? y1 : y2 ;
+	}
+
 	public void set( final float _x1, final float _y1, final float _x2, final float _y2 )
 	{
 		minX = ( _x1 < _x2 ) ? _x1 : _x2 ;
@@ -284,6 +298,13 @@ public final class AABB
 			minX > _aabb.maxX || 
 			minY > _aabb.maxY
 		) ;
+	}
+
+	public Vector2 getLength( final Vector2 _length )
+	{
+		_length.x = maxX - minX ;
+		_length.y = maxY - minY ;
+		return _length ;
 	}
 
 	public Vector2 getCenter( final Vector2 _center )

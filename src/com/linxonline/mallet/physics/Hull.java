@@ -13,6 +13,13 @@ public abstract class Hull
 			return ;
 		}
 
+		final AABB a = _base.getAABB( AABB.create() ) ;
+		final AABB b = _base.getAABB( AABB.create() ) ;
+		if( !a.intersectAABB( b ) )
+		{
+			return ;
+		}
+
 		final float u = _collideWith.isStatic() ? 1.0f : 0.5f ;
 		final float x = ( _point.contactNormalX * _point.penetration ) * u ;
 		final float y = ( _point.contactNormalY * _point.penetration ) * u ;
