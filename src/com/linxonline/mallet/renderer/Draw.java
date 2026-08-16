@@ -4,6 +4,8 @@ import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 import com.linxonline.mallet.maths.Matrix4 ;
 
+import com.linxonline.mallet.util.Interpolate ;
+
 public final class Draw implements IUpdate
 {
 	// Each contain Position, Rotation, and Scale
@@ -278,7 +280,7 @@ public final class Draw implements IUpdate
 		state has not changed.
 	*/
 	@Override
-	public boolean update( Interpolation _mode, final float _coefficient )
+	public boolean update( final Interpolate.IMode _mode, final float _coefficient )
 	{
 		return trans.update( _mode, _coefficient ) ;
 	}

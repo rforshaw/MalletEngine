@@ -1,11 +1,19 @@
 package com.linxonline.mallet.input.desktop ;
 
-import java.util.* ;
+import java.util.List ;
 
-import com.jogamp.newt.event.* ;
+import com.jogamp.newt.event.MouseEvent ;
+import com.jogamp.newt.event.KeyEvent ;
+import com.jogamp.newt.event.MouseListener ;
+import com.jogamp.newt.event.KeyListener ;
 
-import com.linxonline.mallet.input.* ;
+import com.linxonline.mallet.input.IInputHandler ;
+import com.linxonline.mallet.input.IInputSystem ;
+import com.linxonline.mallet.input.InputType ;
 import com.linxonline.mallet.input.InputEvent ;
+import com.linxonline.mallet.input.InputID ;
+import com.linxonline.mallet.input.KeyCode ;
+
 import com.linxonline.mallet.util.caches.TimePool ;
 import com.linxonline.mallet.util.MalletList ;
 

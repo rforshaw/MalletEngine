@@ -3,6 +3,8 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.Interpolate ;
+
 /**
 	A draw object can be added to multiple different 
 	buffers with each buffer doing a different task.
@@ -14,18 +16,18 @@ public final class TextUpdater implements IUpdater
 {
 	private final ArrayList<TextBuffer> buffers = new ArrayList<TextBuffer>() ;
 
-	private Interpolation mode ;
+	private Interpolate.IMode mode ;
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
 	public TextUpdater( final TextBuffer _buffer )
 	{
-		this( Interpolation.LINEAR, _buffer ) ;
+		this( Interpolate::linear, _buffer ) ;
 	}
 
-	public TextUpdater( Interpolation _mode, final TextBuffer _buffer )
+	public TextUpdater( Interpolate.IMode _mode, final TextBuffer _buffer )
 	{
-		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
+		mode = ( _mode != null ) ? _mode : Interpolate::linear ;
 		buffers.add( _buffer ) ;
 	}
 
@@ -69,7 +71,7 @@ public final class TextUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<IUpdateState> _updated, final float _coefficient )
+	public void update( final List<? super IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
@@ -108,7 +110,7 @@ public final class TextUpdater implements IUpdater
 		dirty = !_updated.isEmpty() ;
 	}
 
-	public void setInterpolation( Interpolation _mode )
+	public void setInterpolation( Interpolate.IMode _mode )
 	{
 		mode = ( _mode != null ) ? _mode : mode ;
 	}

@@ -3,6 +3,7 @@ package com.linxonline.mallet.ui.gui ;
 import java.util.Map ;
 
 import com.linxonline.mallet.util.MalletMap ;
+import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.renderer.* ;
 import com.linxonline.mallet.maths.* ;
 
@@ -30,7 +31,7 @@ public final class GUI
 	public static DrawUpdater getDrawUpdater( final World _world, final Shape _shape, final int _layer )
 	{
 		final DrawUpdater updater = drawPool.getOrCreate( _world, geometryProgram, _shape, true, _layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater.setInterpolation( Interpolate::none ) ;
 
 		return updater ;
 	}
@@ -39,7 +40,7 @@ public final class GUI
 	{
 		final Program program = getProgram( _texture ) ;
 		final DrawUpdater updater = drawPool.getOrCreate( _world, program, _shape, true, _layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater.setInterpolation( Interpolate::none ) ;
 
 		return updater ;
 	}
@@ -67,7 +68,7 @@ public final class GUI
 	{
 		final Program program = getProgram( _font ) ;
 		final TextUpdater updater = textPool.getOrCreate( _world, program, true, _layer ) ;
-		updater.setInterpolation( Interpolation.NONE ) ;
+		updater.setInterpolation( Interpolate::none ) ;
 
 		return updater ;
 	}

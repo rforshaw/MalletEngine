@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.Parallel ;
+import com.linxonline.mallet.util.Interpolate ;
 
 /**
 	DrawUpdater is designed to interpolate the position, scale,
@@ -15,18 +16,18 @@ public final class DrawUpdater implements IUpdater
 
 	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
 
-	private Interpolation mode ;
+	private Interpolate.IMode mode ;
 	private boolean forceUpdate = false ;
 	private boolean dirty = true ;
 
 	public DrawUpdater( final DrawBuffer _draw )
 	{
-		this( Interpolation.LINEAR, _draw ) ;
+		this( Interpolate::linear, _draw ) ;
 	}
 
-	public DrawUpdater( Interpolation _mode, final DrawBuffer _draw )
+	public DrawUpdater( Interpolate.IMode _mode, final DrawBuffer _draw )
 	{
-		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
+		mode = ( _mode != null ) ? _mode : Interpolate::linear ;
 		drawBuffer = _draw ;
 	}
 
@@ -87,11 +88,6 @@ public final class DrawUpdater implements IUpdater
 		return drawBuffer.getProgram() ;
 	}
 
-	public boolean isUI()
-	{
-		return drawBuffer.isUI() ;
-	}
-
 	public int getOrder()
 	{
 		return drawBuffer.getOrder() ;
@@ -103,7 +99,7 @@ public final class DrawUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<IUpdateState> _updated, final float _coefficient )
+	public void update( final List<? super IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{
@@ -138,7 +134,7 @@ public final class DrawUpdater implements IUpdater
 		forceUpdate = false ;
 	}
 
-	public void setInterpolation( Interpolation _mode )
+	public void setInterpolation( Interpolate.IMode _mode )
 	{
 		mode = ( _mode != null ) ? _mode : mode ;
 	}

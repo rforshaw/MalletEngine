@@ -133,12 +133,11 @@ public abstract class BasicRenderer implements IRender
 				return true ;
 			}
 
-			if( !( _obj instanceof Invoker ) )
+			if( !( _obj instanceof Invoker invoker ) )
 			{
 				return false ;
 			}
 
-			final Invoker invoker = ( Invoker )_obj ;
 			if( invoker.anchor == null )
 			{
 				return false ;

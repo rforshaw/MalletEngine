@@ -93,15 +93,15 @@ public interface Serialise
 			while( endChar == false )
 			{
 				final int pos = offset + ++length ;
-				if( in[pos] == '\0' )
+				if( pos >= limit )
+				{
+					endChar = true ;
+				}
+				else if( in[pos] == '\0' )
 				{
 					endChar = true ;
 				}
 				else if( in[pos] == '\n' )
-				{
-					endChar = true ;
-				}
-				else if( pos + 1 >= limit )
 				{
 					endChar = true ;
 				}

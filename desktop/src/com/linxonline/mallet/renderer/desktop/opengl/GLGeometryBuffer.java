@@ -1,7 +1,11 @@
 package com.linxonline.mallet.renderer.desktop.opengl ;
 
 import java.util.List ;
-import java.nio.* ;
+
+import java.nio.IntBuffer ;
+import java.nio.FloatBuffer ;
+import java.nio.ByteBuffer ;
+import java.nio.ByteOrder ;
 
 import com.linxonline.mallet.util.buffers.IntegerBuffer ;
 

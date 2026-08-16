@@ -42,7 +42,7 @@ public final class Box2D extends Hull
 			   _collidables ) ;
 		obb = OBB.create( _aabb ) ;
 	}
-	
+
 	public Box2D( final OBB _obb, final int _collidables )
 	{
 		super( 0.0f, 0.0f,

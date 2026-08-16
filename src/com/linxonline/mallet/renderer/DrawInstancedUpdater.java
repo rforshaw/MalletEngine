@@ -2,6 +2,7 @@ package com.linxonline.mallet.renderer ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.Parallel ;
 
 /**
@@ -14,7 +15,7 @@ import com.linxonline.mallet.util.Parallel ;
 */
 public final class DrawInstancedUpdater implements IUpdater
 {
-	private final Interpolation mode ;
+	private final Interpolate.IMode mode ;
 	protected final DrawInstancedBuffer drawBuffer ;
 
 	private final ParallelUpdater<Draw> parallelUpdater = new ParallelUpdater<Draw>() ;
@@ -24,12 +25,12 @@ public final class DrawInstancedUpdater implements IUpdater
 
 	public DrawInstancedUpdater( final DrawInstancedBuffer _draw )
 	{
-		this( Interpolation.LINEAR, _draw ) ;
+		this( Interpolate::linear, _draw ) ;
 	}
 
-	public DrawInstancedUpdater( Interpolation _mode, final DrawInstancedBuffer _draw )
+	public DrawInstancedUpdater( Interpolate.IMode _mode, final DrawInstancedBuffer _draw )
 	{
-		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
+		mode = ( _mode != null ) ? _mode : Interpolate::linear ;
 		drawBuffer = _draw ;
 	}
 
@@ -77,7 +78,7 @@ public final class DrawInstancedUpdater implements IUpdater
 	}
 
 	@Override
-	public void update( final List<IUpdateState> _updated, final float _coefficient )
+	public void update( final List<? super IUpdateState> _updated, final float _coefficient )
 	{
 		if( forceUpdate == false && dirty == false )
 		{

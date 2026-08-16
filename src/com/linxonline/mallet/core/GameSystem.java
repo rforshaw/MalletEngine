@@ -17,8 +17,6 @@ public final class GameSystem implements IGameSystem
 
 	private final List<IUpdate> updates = MalletList.<IUpdate>newList() ;
 
-	//private boolean running = false ;
-
 	public GameSystem()
 	{
 		addUpdate( this::updateState ) ;
@@ -68,9 +66,10 @@ public final class GameSystem implements IGameSystem
 	}
 
 	@Override
-	public void addGameState( final GameState _state )
+	public <T extends GameState> T addGameState( final T _state )
 	{
 		states.add( _state ) ;
+		return _state ;
 	}
 
 	/**

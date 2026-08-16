@@ -3,6 +3,7 @@ package com.linxonline.mallet.renderer ;
 import java.util.List ;
 import java.util.ArrayList ;
 
+import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.Parallel ;
 
 /**
@@ -14,23 +15,22 @@ import com.linxonline.mallet.util.Parallel ;
 */
 public final class StorageUpdater<D extends IUpdate> implements IUpdater
 {
-	private final Interpolation mode ;
+	private final Interpolate.IMode mode ;
 	private final ArrayList<D> dynamics = new ArrayList<D>() ;
 	private final ArrayList<Storage> buffers = new ArrayList<Storage>() ;
 
 	private final ParallelUpdater<D> parallelUpdater = new ParallelUpdater<D>() ;
 	
-	private boolean forceUpdate = false ;
-	private boolean dirty = true ;
+	private boolean forceUpdate = true ;
 
 	public StorageUpdater( final D _update, final Storage _storage )
 	{
-		this( Interpolation.LINEAR, _update, _storage ) ;
+		this( Interpolate::linear, _update, _storage ) ;
 	}
 
-	public StorageUpdater( Interpolation _mode, final D _update, final Storage _storage )
+	public StorageUpdater( Interpolate.IMode _mode, final D _update, final Storage _storage )
 	{
-		mode = ( _mode != null ) ? _mode : Interpolation.LINEAR ;
+		mode = ( _mode != null ) ? _mode : Interpolate::linear ;
 		dynamics.add( _update ) ;
 		buffers.add( _storage ) ;
 	}
@@ -41,26 +41,16 @@ public final class StorageUpdater<D extends IUpdate> implements IUpdater
 		forceUpdate = true ;
 	}
 
-	public void makeDirty()
-	{
-		dirty = true ;
-	}
-
-	public boolean isDirty()
-	{
-		return dirty || forceUpdate ;
-	}
-
 	public Storage addBuffer( final Storage _storage )
 	{
-		makeDirty() ;
+		forceUpdate() ;
 		buffers.add( _storage ) ;
 		return _storage ;
 	}
 
 	public void removeBuffer( final Storage _storage )
 	{
-		makeDirty() ;
+		forceUpdate() ;
 		buffers.remove( _storage ) ;
 	}
 
@@ -98,24 +88,22 @@ public final class StorageUpdater<D extends IUpdate> implements IUpdater
 	}
 
 	@Override
-	public void update( final List<IUpdateState> _updated, final float _coefficient )
+	public void update( final List<? super IUpdateState> _updated, final float _coefficient )
 	{
-		if( forceUpdate == false && dirty == false )
+		if( forceUpdate == false )
 		{
 			return ;
 		}
 
+		forceUpdate = false ;
 		parallelUpdater.set( mode, _coefficient ) ;
 
 		Parallel.forBatch( dynamics, 1000, parallelUpdater ) ;
-		final boolean update = parallelUpdater.isDirty() ;
-		dirty = update ;
-
-		if( forceUpdate == true || update == true )
+		if( parallelUpdater.isDirty() )
 		{
-			_updated.addAll( buffers ) ;
+			forceUpdate = true ;
 		}
 
-		forceUpdate = update ;
+		_updated.addAll( buffers ) ;
 	}
 }

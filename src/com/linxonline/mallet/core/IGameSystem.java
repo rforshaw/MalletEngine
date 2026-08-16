@@ -6,7 +6,8 @@ public interface IGameSystem
 
 	public void addUpdate( final IUpdate _update ) ;
 
-	public void addGameState( final GameState _state ) ;
+	public <T extends GameState> T addGameState( final T _state ) ;
+
 	public void setDefaultGameState( final String _name ) ;
 
 	public interface IUpdate

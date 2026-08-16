@@ -4,15 +4,16 @@ import java.util.List ;
 import java.util.concurrent.atomic.AtomicBoolean ;
 
 import com.linxonline.mallet.util.Parallel ;
+import com.linxonline.mallet.util.Interpolate ;
 
 public final class ParallelUpdater<T extends IUpdate> implements Parallel.IListRun<T>
 {
-	private Interpolation mode ;
+	private Interpolate.IMode mode = Interpolate::linear ;
 	private float coefficient ;
 
 	private final AtomicBoolean dirty = new AtomicBoolean( false ) ;
 
-	public void set( final Interpolation _mode, final float _coefficient )
+	public void set( final Interpolate.IMode _mode, final float _coefficient )
 	{
 		mode = _mode ;
 		coefficient = _coefficient ;

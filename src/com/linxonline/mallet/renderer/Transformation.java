@@ -186,32 +186,11 @@ public final class Transformation implements IUpdate
 		state has not changed.
 	*/
 	@Override
-	public boolean update( Interpolation _mode, final float _coefficient )
+	public boolean update( final Interpolate.IMode _mode, final float _coefficient )
 	{
-		boolean update = false ;
-
 		// Position, Rotation, and Scale should always 
 		// be updated even if the data is not being uploaded 
 		// to the GPU.
-		switch( _mode )
-		{
-			case LINEAR :
-			{
-				if( Interpolate.linear( future, present, _coefficient ) )
-				{
-					update = true ;
-				}
-				break ;
-			}
-			case NONE   :
-			default     :
-			{
-				update = false ;
-				FloatBuffer.copy( future, present ) ;
-				break ;
-			}
-		}
-
-		return update ;
+		return _mode.interpolate( future, present, _coefficient ) ;
 	}
 }

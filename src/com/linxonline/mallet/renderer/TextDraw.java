@@ -4,6 +4,8 @@ import com.linxonline.mallet.maths.AABB ;
 import com.linxonline.mallet.maths.Vector2 ;
 import com.linxonline.mallet.maths.Vector3 ;
 
+import com.linxonline.mallet.util.Interpolate ;
+
 public final class TextDraw implements IUpdate
 {
 	private final Transformation trans = new Transformation() ;
@@ -148,7 +150,7 @@ public final class TextDraw implements IUpdate
 	}
 
 	@Override
-	public boolean update( Interpolation _mode, final float _coefficient )
+	public boolean update( final Interpolate.IMode _mode, final float _coefficient )
 	{
 		return trans.update( _mode, _coefficient ) ;
 	}

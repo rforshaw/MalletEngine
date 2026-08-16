@@ -2,6 +2,7 @@ package com.linxonline.mallet.ui ;
 
 import java.util.List ;
 
+import com.linxonline.mallet.util.Interpolate ;
 import com.linxonline.mallet.util.MalletList ;
 import com.linxonline.mallet.util.Logger ;
 
@@ -73,7 +74,7 @@ public final class UIList extends UILayout
 				pool.clean( externalWorld, program ) ;
 
 				final DrawUpdater updater = pool.getOrCreate( externalWorld, program, draw.getShape(), true, layer ) ;
-				updater.setInterpolation( Interpolation.NONE ) ;
+				updater.setInterpolation( Interpolate::none ) ;
 
 				final GeometryBuffer geometry = updater.getBuffer( 0 ) ;
 				geometry.addDraw( draw ) ;

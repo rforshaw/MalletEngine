@@ -78,9 +78,7 @@ public final class GameTestLoader implements IGameLoader
 	{
 		_system.addGameState( new GameState( "DEFAULT", _main )
 		{
-			private IScriptEngine jsEngine ;
-			private ECSEvent ecsEvents ;
-
+			private final ECSEvent ecsEvents = new ECSEvent() ;
 			private final ECSInput ecsInput = new ECSInput( inputSystem ) ;
 			private final ECSCollision ecsCollision = new ECSCollision() ;
 
@@ -94,220 +92,28 @@ public final class GameTestLoader implements IGameLoader
 			@Override
 			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
 			{
-				jsEngine = new JSScriptEngine() ;
-				ecsEvents = new ECSEvent() ;
-
 				_main.add( ecsInput ) ;
 				_main.add( ecsEvents ) ;
 				_main.add( ecsExample ) ;
 				_main.add( ecsGeneral ) ;
 				_main.add( ecsCollision ) ;
-				_main.add( ( final double _dt ) -> { jsEngine.update( _dt ) ; } ) ;
-
-				final ISystem.ShutdownDelegate shutdown = system.getShutdownDelegate() ;
-				shutdown.addShutdownCallback( () ->
-				{
-					Logger.println( "Shutting down script engine.", Logger.Verbosity.MINOR ) ;
-					jsEngine.close() ;
-				} ) ;
 			}
 
 			@Override
 			public void initGame()			// Called when state is started
 			{
-				final UIVariant variant = new UIVariant( "Test", Action.KEEP ) ;
-
-				/*boolean run = true ;
-				final InStream stream = new InStream( 100 ) ;
-				final UDPServer server = new UDPServer() ;
-				server.init( new Address( "localhost", 4455 ), 30 ) ;
-
-				final UDPClient client = new UDPClient() ;
-				client.init( new Address( "localhost", 4455 ), 30 ) ;
-				client.send( new IOutStream()
-				{
-					private String test = "Hello World!" ;
-
-					@Override
-					public int getLength()
-					{
-						return test.getBytes().length ;
-					}
-
-					@Override
-					public void serialise( Serialise.Out _out )
-					{
-						_out.writeString( test ) ;
-					}
-				} ) ;
-
-				while( run == true )
-				{
-					server.receive( stream ) ;
-					final int size = stream.getDataLength() ;
-					final Serialise.ByteIn serialise = new Serialise.ByteIn( stream.getBuffer(), 0, size ) ;
-
-					final String response = serialise.readString() ;
-					System.out.println( size ) ;
-					System.out.println( response ) ;
-
-					if( response.equals( "Hello World!" ) )
-					{
-						run = false ;
-					}
-				}
-				server.close() ;
-				client.close() ;*/
-
-				createDisplayEnvironment() ;
-				createClipboardTest() ;
-
-				createProgramTest() ;
-				createMathTests() ;
-
-				createUI() ;
 				renderTextureArrayExample() ;
 				renderTextureExample() ;
 				renderAnimationExample() ;
 				renderTextExample() ;
-				//playAudioExample() ;
 
-				createECSEntities( 1000, 1000 ) ;
+				createECSEntities( 10, 10 ) ;
 
 				createMouseAnimExample() ;
 				createSpinningCubeExample() ;
 
 				final EventQueue<Boolean> showFPS = Event.get( "SHOW_GAME_STATE_FPS" ) ;
 				showFPS.add( true ) ;
-
-				//createScript() ;
-			}
-
-			private void createDisplayEnvironment()
-			{
-				DisplayEnvironment env = new DisplayEnvironment() ;
-				System.out.println( env.toString() ) ;
-			}
-
-			private void createClipboardTest()
-			{
-				GlobalClipboard.store( "Hello World!" ) ;
-				System.out.println( "We retrieved from clipboard: " + GlobalClipboard.get() ) ;
-			}
-			
-			private void createProgramTest()
-			{
-				final ArrayUniform a = new ArrayUniform( 2 ) ;
-				a.set( 0, new Vector2( 1, 1 ) ) ;
-				a.set( 1, new Vector2( 2, 2 ) ) ;
-
-				final StructUniform s = new StructUniform() ;
-				s.map( "vector2", new Vector2( 3, 3 ) ) ;
-				s.map( "vector3", new Vector3( 4, 4, 4 ) ) ;
-				s.map( "array", a ) ;
-
-				final Program program = new Program( "TEST" ) ;
-				program.mapUniform( "array", a ) ;
-				program.mapUniform( "struct", s ) ;
-				program.mapUniform( "mat4", new Matrix4() ) ;
-
-				final UniformList draw = program.getDrawUniforms() ;
-				draw.add( "draw1" ) ;
-				draw.add( "draw2" ) ;
-
-				program.forEachUniform( ( final String _absoluteName, final IUniform _uniform ) ->
-				{
-					System.out.println( _absoluteName + " : " + _uniform.toString() ) ;
-					return true ;
-				} ) ;
-			}
-
-			private void createMathTests()
-			{
-				final Plane plane = new Plane( new Vector3( 100, 100, 0 ),
-											   new Vector3( 100, 0, 0 ),
-											   new Vector3( 0, 0, 00 ) ) ;
-				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 50, 50, 100 ) ).toString() ) ;
-
-				final Circle circle = new Circle( 0, 0, 5 ) ;
-				System.out.println( "Ray 5, 5, 0, -1: " ) ;
-				if( circle.ray( 5, 5, 0, -1 ) )
-				{
-					System.out.println( "\tLine intersects." ) ;
-				}
-
-				System.out.println( "Ray 0, 0, 0, 1: " ) ;
-				if( circle.ray( 0, 0, 0, 1 ) )
-				{
-					System.out.println( "\tLine intersects." ) ;
-				}
-
-				System.out.println( "Ray 10, 10, 1, 1: " ) ;
-				if( !circle.ray( 10, 10, 1, 1 ) )
-				{
-					System.out.println( "\t Line does not intersect." ) ;
-				}
-
-				System.out.println( "Ray -10, -10, 1, 1:" ) ;
-				if( circle.ray( -10, -10, 1, 1 ) )
-				{
-					System.out.println( "\tLine intersects." ) ;
-				}
-
-				System.out.println( "Line Segment -10, -10, 10, 10:" ) ;
-				if( circle.intersectLineSegment( -10, -10, 10, 10 ) )
-				{
-					System.out.println( "\tLine Segment intersects." ) ;
-				}
-
-				System.out.println( "Line Segment 6, 6, 10, 10:" ) ;
-				if( !circle.intersectLineSegment( 6, 6, 10, 10 ) )
-				{
-					System.out.println( "\tLine Segment does not intersect." ) ;
-				}
-
-				System.out.println( "Line Segment 6, 6, 0, 6:" ) ;
-				if( !circle.intersectLineSegment( 6, 6, 0, 6 ) )
-				{
-					System.out.println( "\tLine Segment does not intersect." ) ;
-				}
-
-				System.out.println( "Line Segment 0, 0, 5, 0:" ) ;
-				if( circle.intersectLineSegment( 0, 0, 5, 0 ) )
-				{
-					System.out.println( "\tLine Segment intersects." ) ;
-				}
-
-				System.out.println( "Line Segment 0, 0, -5, 0:" ) ;
-				if( circle.intersectLineSegment( 0, 0, -5, 0 ) )
-				{
-					System.out.println( "\tLine Segment intersects." ) ;
-				}
-
-				System.out.println( "Line Segment 0, 0, 0, 5:" ) ;
-				if( circle.intersectLineSegment( 0, 0, 0, 5 ) )
-				{
-					System.out.println( "\tLine Segment intersects." ) ;
-				}
-
-				System.out.println( "Line Segment 0, 0, 0, -5:" ) ;
-				if( circle.intersectLineSegment( 0, 0, 0, -5 ) )
-				{
-					System.out.println( "\tLine Segment intersects." ) ;
-				}
-				
-				System.out.println( "Line Segment 0, -6, 5, -7:" ) ;
-				if( !circle.intersectLineSegment( 0, -6, 5, -7 ) )
-				{
-					System.out.println( "\tLine Segment does not intersect." ) ;
-				}
-
-				final Circle circle2 = new Circle( 505, -1206, 100 ) ;
-				System.out.println( "Line Segment 400, -928, 544, -944: " ) ;
-				if( !circle2.intersectLineSegment( 400, -928, 544, -944 ) )
-				{
-					System.out.println( "\tLine Segment does not intersect." ) ;
-				}
 			}
 
 			public void createECSEntities( final int _row, final int _column )
@@ -339,6 +145,18 @@ public final class GameTestLoader implements IGameLoader
 					} ) ) ;
 
 					final ExComponent executor = ecsExample.create( _parent, new ExData( messenger, collision ) ) ;
+					final ECSInput.Component input = ecsInput.create( _parent, ( final InputEvent _input ) ->
+					{
+						switch( _input.getKeyCode() )
+						{
+							default        : return InputEvent.Action.PROPAGATE ;
+							case KeyCode.k :
+							{
+								executor.killCountdown() ;
+								return InputEvent.Action.CONSUME ;
+							}
+						}
+					} ) ;
 
 					return new ECSEntity.Component[]
 					{
@@ -358,59 +176,6 @@ public final class GameTestLoader implements IGameLoader
 				} ;
 
 				final ECSEntity entity = new ECSEntity( create, destroy ) ;
-			}
-
-			public void createScript()
-			{
-				final Script script = Script.create( "base/scripts/example-count.js", IExtension.class ) ;
-				final Count count = script.register( "counter", new Count() ) ;
-
-				script.setListener( new Script.IListener()
-				{
-					@Override
-					public void added( final Object _functions )
-					{
-						count.setScriptFunctions( ( IExtension )_functions ) ;
-					}
-
-					@Override
-					public void removed()
-					{
-						System.out.println( "Script removed." ) ;
-					}
-				} ) ;
-
-				jsEngine.add( script ) ;
-			}
-
-			public void createUI()
-			{
-				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
-				final UIButton button1 = jUI.get( "TestButton1", UIButton.class ) ;
-				final UIButton button2 = jUI.get( "TestButton2", UIButton.class ) ;
-				final UICheckbox checkbox = jUI.get( "TestCheckbox", UICheckbox.class ) ;
-
-				UIElement.connect( button1, button1.released(), ( final UIButton _box ) ->
-				{
-					button2.setVisible( !button2.isVisible() ) ;
-				} ) ;
-
-				UIElement.connect( button2, button2.released(), ( final UIButton _box ) ->
-				{
-					button1.setVisible( !button1.isVisible() ) ;
-				} ) ;
-
-				UIElement.connect( checkbox, checkbox.checkChanged(), ( final UICheckbox _box ) ->
-				{
-					button1.setVisible( !button1.isVisible() ) ;
-					button2.setVisible( !button2.isVisible() ) ;
-				} ) ;
-
-				final Entity entity = new Entity( 1 ) ;
-				final UIComponent component = new UIComponent( entity ) ;
-				component.addElement( jUI.getParent() ) ;
-
-				addEntity( entity ) ;
 			}
 
 			/**
@@ -629,62 +394,6 @@ public final class GameTestLoader implements IGameLoader
 			}
 
 			/**
-				Play audio file directly to the audio system
-			**/
-			public void playAudioExample()
-			{
-				/*AudioAssist.getAudioDelegate( ( final AudioDelegate _delegate ) ->
-				{
-					final Emitter emitter = new Emitter( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
-					emitter.setCallback( new SourceCallback()
-					{
-						public void callbackRemoved() {}
-
-						public void start()
-						{
-							//System.out.println( "Audio start." ) ;
-						}
-
-						public void pause()
-						{
-							//System.out.println( "Audio pause." ) ;
-						}
-
-						public void stop()
-						{
-							//System.out.println( "Audio stop." ) ;
-						}
-
-						public void tick( final float _dt )
-						{
-							//System.out.println( "Audio Tick " + _dt ) ;
-						}
-
-						public void finished()
-						{
-							//System.out.println( "Audio Finished." ) ;
-							// Enable to loop test audio.
-							_delegate.play( emitter ) ;
-						}
-					} ) ;
-					_delegate.play( _delegate.add( emitter ) ) ;
-				} ) ;*/
-
-				final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
-				//System.out.println( ogg ) ;
-				final Vorbis vorbis = new Vorbis() ;
-				try
-				{
-					vorbis.decode( ogg ) ;
-					System.out.println( vorbis ) ;
-				}
-				catch( Exception ex )
-				{
-					ex.printStackTrace() ;
-				}
-			}
-
-			/**
 				Create an Entity that follows the mouse
 			**/
 			public void createMouseAnimExample()
@@ -694,8 +403,6 @@ public final class GameTestLoader implements IGameLoader
 				camera.setPerspective( Camera.Mode.WORLD, 130.0f, 0.1f, 10000.0f ) ;
 				camera.lookAt( 0.0f, 0.0f, 0.0f ) ;
 
-				//System.out.println( "NDC to World: " + camera.ndcToWorld( new Vector3( 1, 1, -1 ), new Vector3() ).toString() ) ;
-				
 				final World world = WorldAssist.getDefault() ;
 
 				final Program program = ProgramAssist.add( new Program( "SIMPLE_TEXTURE" ) ) ;
@@ -819,6 +526,353 @@ public final class GameTestLoader implements IGameLoader
 			}
 		} ) ;
 
+		_system.addGameState( new GameState( "JS_SCRIPT_TEST", _main )
+		{
+			private IScriptEngine jsEngine ;
+
+			@Override
+			protected void createUpdaters( final List<IUpdate> _main, final List<IUpdate> _draw )
+			{
+				jsEngine = new JSScriptEngine() ;
+
+				_main.add( ( final double _dt ) -> { jsEngine.update( _dt ) ; } ) ;
+
+				final ISystem.ShutdownDelegate shutdown = system.getShutdownDelegate() ;
+				shutdown.addShutdownCallback( () ->
+				{
+					Logger.println( "Shutting down script engine.", Logger.Verbosity.MINOR ) ;
+					jsEngine.close() ;
+				} ) ;
+			}
+
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final Script script = Script.create( "base/scripts/example-count.js", IExtension.class ) ;
+				final Count count = script.register( "counter", new Count() ) ;
+
+				script.setListener( new Script.IListener()
+				{
+					@Override
+					public void added( final Object _functions )
+					{
+						count.setScriptFunctions( ( IExtension )_functions ) ;
+					}
+
+					@Override
+					public void removed()
+					{
+						System.out.println( "Script removed." ) ;
+					}
+				} ) ;
+
+				jsEngine.add( script ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "UI_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final UIVariant variant = new UIVariant( "Test", Action.KEEP ) ;
+
+				final JUI jUI = JUI.create( "base/ui/test.jui" ) ;
+				final UIButton button1 = jUI.get( "TestButton1", UIButton.class ) ;
+				final UIButton button2 = jUI.get( "TestButton2", UIButton.class ) ;
+				final UICheckbox checkbox = jUI.get( "TestCheckbox", UICheckbox.class ) ;
+
+				UIElement.connect( button1, button1.released(), ( final UIButton _box ) ->
+				{
+					button2.setVisible( !button2.isVisible() ) ;
+				} ) ;
+
+				UIElement.connect( button2, button2.released(), ( final UIButton _box ) ->
+				{
+					button1.setVisible( !button1.isVisible() ) ;
+				} ) ;
+
+				UIElement.connect( checkbox, checkbox.checkChanged(), ( final UICheckbox _box ) ->
+				{
+					button1.setVisible( !button1.isVisible() ) ;
+					button2.setVisible( !button2.isVisible() ) ;
+				} ) ;
+
+				final Entity entity = new Entity( 1 ) ;
+				final UIComponent component = new UIComponent( entity ) ;
+				component.addElement( jUI.getParent() ) ;
+
+				addEntity( entity ) ;
+
+				final EventQueue<Boolean> showFPS = Event.get( "SHOW_GAME_STATE_FPS" ) ;
+				showFPS.add( true ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "DISPLAY_ENVIRONMENT_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final DisplayEnvironment env = new DisplayEnvironment() ;
+				System.out.println( env.toString() ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "CLIPBOARD_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				GlobalClipboard.store( "Hello World!" ) ;
+				System.out.println( "We retrieved from clipboard: " + GlobalClipboard.get() ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "PROGRAM_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final ArrayUniform a = new ArrayUniform( 2 ) ;
+				a.set( 0, new Vector2( 1, 1 ) ) ;
+				a.set( 1, new Vector2( 2, 2 ) ) ;
+
+				final StructUniform s = new StructUniform() ;
+				s.map( "vector2", new Vector2( 3, 3 ) ) ;
+				s.map( "vector3", new Vector3( 4, 4, 4 ) ) ;
+				s.map( "array", a ) ;
+
+				final Program program = new Program( "TEST" ) ;
+				program.mapUniform( "array", a ) ;
+				program.mapUniform( "struct", s ) ;
+				program.mapUniform( "mat4", new Matrix4() ) ;
+
+				final UniformList draw = program.getDrawUniforms() ;
+				draw.add( "draw1" ) ;
+				draw.add( "draw2" ) ;
+
+				program.forEachUniform( ( final String _absoluteName, final IUniform _uniform ) ->
+				{
+					System.out.println( _absoluteName + " : " + _uniform.toString() ) ;
+					return true ;
+				} ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "GEOMETRY_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final Plane plane = new Plane( new Vector3( 100, 100, 0 ),
+											   new Vector3( 100, 0, 0 ),
+											   new Vector3( 0, 0, 00 ) ) ;
+				System.out.println( "Closest Point: " + plane.projectOnTo( new Vector3( 50, 50, 100 ) ).toString() ) ;
+
+				final Circle circle = new Circle( 0, 0, 5 ) ;
+				System.out.println( "Ray 5, 5, 0, -1: " ) ;
+				if( circle.ray( 5, 5, 0, -1 ) )
+				{
+					System.out.println( "\tLine intersects." ) ;
+				}
+
+				System.out.println( "Ray 0, 0, 0, 1: " ) ;
+				if( circle.ray( 0, 0, 0, 1 ) )
+				{
+					System.out.println( "\tLine intersects." ) ;
+				}
+
+				System.out.println( "Ray 10, 10, 1, 1: " ) ;
+				if( !circle.ray( 10, 10, 1, 1 ) )
+				{
+					System.out.println( "\t Line does not intersect." ) ;
+				}
+
+				System.out.println( "Ray -10, -10, 1, 1:" ) ;
+				if( circle.ray( -10, -10, 1, 1 ) )
+				{
+					System.out.println( "\tLine intersects." ) ;
+				}
+
+				System.out.println( "Line Segment -10, -10, 10, 10:" ) ;
+				if( circle.intersectLineSegment( -10, -10, 10, 10 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 6, 6, 10, 10:" ) ;
+				if( !circle.intersectLineSegment( 6, 6, 10, 10 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				System.out.println( "Line Segment 6, 6, 0, 6:" ) ;
+				if( !circle.intersectLineSegment( 6, 6, 0, 6 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 5, 0:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 5, 0 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, -5, 0:" ) ;
+				if( circle.intersectLineSegment( 0, 0, -5, 0 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 0, 5:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 0, 5 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, 0, 0, -5:" ) ;
+				if( circle.intersectLineSegment( 0, 0, 0, -5 ) )
+				{
+					System.out.println( "\tLine Segment intersects." ) ;
+				}
+
+				System.out.println( "Line Segment 0, -6, 5, -7:" ) ;
+				if( !circle.intersectLineSegment( 0, -6, 5, -7 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+
+				final Circle circle2 = new Circle( 505, -1206, 100 ) ;
+				System.out.println( "Line Segment 400, -928, 544, -944: " ) ;
+				if( !circle2.intersectLineSegment( 400, -928, 544, -944 ) )
+				{
+					System.out.println( "\tLine Segment does not intersect." ) ;
+				}
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "AUDIO_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				AudioAssist.getAudioDelegate( ( final AudioDelegate _delegate ) ->
+				{
+					final Emitter emitter = new Emitter( "base/music/test.wav", StreamType.STATIC, Category.Channel.MUSIC ) ;
+					emitter.setCallback( new SourceCallback()
+					{
+						public void callbackRemoved() {}
+
+						public void start()
+						{
+							System.out.println( "Audio start." ) ;
+						}
+
+						public void pause()
+						{
+							System.out.println( "Audio pause." ) ;
+						}
+
+						public void stop()
+						{
+							System.out.println( "Audio stop." ) ;
+						}
+
+						public void tick( final float _dt )
+						{
+							System.out.println( "Audio Tick " + _dt ) ;
+						}
+
+						public void finished()
+						{
+							System.out.println( "Audio Finished." ) ;
+							// Enable to loop test audio.
+							_delegate.play( emitter ) ;
+						}
+					} ) ;
+					_delegate.play( _delegate.add( emitter ) ) ;
+				} ) ;
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "OGG_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				final OGG ogg = OGG.readOGG( "base/music/test.ogg" ) ;
+				//System.out.println( ogg ) ;
+				final Vorbis vorbis = new Vorbis() ;
+				try
+				{
+					vorbis.decode( ogg ) ;
+					System.out.println( vorbis ) ;
+				}
+				catch( Exception ex )
+				{
+					ex.printStackTrace() ;
+				}
+			}
+		} ) ;
+
+		_system.addGameState( new GameState( "UDP_TEST", _main )
+		{
+			@Override
+			public void initGame()			// Called when state is started
+			{
+				boolean run = true ;
+				final InStream stream = new InStream( 100 ) ;
+				final UDPServer server = new UDPServer() ;
+				server.init( new Address( "localhost", 4455 ), 30 ) ;
+
+				final UDPClient client = new UDPClient() ;
+				client.init( new Address( "localhost", 4455 ), 30 ) ;
+				client.send( new IOutStream()
+				{
+					private String test = "Hello World!" ;
+
+					@Override
+					public int getLength()
+					{
+						return test.getBytes().length ;
+					}
+
+					@Override
+					public void serialise( Serialise.Out _out )
+					{
+						_out.writeString( test ) ;
+					}
+				} ) ;
+
+				while( run == true )
+				{
+					server.receive( stream ) ;
+					final int size = stream.getDataLength() ;
+					final Serialise.ByteIn serialise = new Serialise.ByteIn( stream.getBuffer(), 0, size ) ;
+
+					final String response = serialise.readString() ;
+					System.out.println( size ) ;
+					System.out.println( response ) ;
+
+					if( response.equals( "Hello World!" ) )
+					{
+						run = false ;
+					}
+				}
+
+				try
+				{
+					server.close() ;
+					client.close() ;
+				}
+				catch( Exception ex )
+				{
+					Logger.println( "Failed to close UDP connection/s.", Logger.Verbosity.MAJOR ) ;
+				}
+			}
+		} ) ;
+
 		_system.setDefaultGameState( "DEFAULT" ) ;		// Define what Game State should be run first
 	}
 
@@ -859,7 +913,7 @@ public final class GameTestLoader implements IGameLoader
 		public void countReseted() ;
 	}
 
-	public static class Count implements ICount
+	public static final class Count implements ICount
 	{
 		private int count = 0 ;
 		private IExtension jsFunctions ;
@@ -947,6 +1001,7 @@ public final class GameTestLoader implements IGameLoader
 		private final ECSCollision.Component collision ;
 		private final Draw[] draws ;
 
+		private boolean startDeath = false ;
 		private float acc = 0 ;
 
 		public ExComponent( final ECSEntity _parent, final ExData _data )
@@ -983,16 +1038,24 @@ public final class GameTestLoader implements IGameLoader
 			geometry.addDraws( draws ) ;
 		}
 
+		public void killCountdown()
+		{
+			startDeath = true ;
+		}
+
 		@Override
 		public void update( final float _dt )
 		{
 			Parallel.forBatch( collision.getHulls(), 1000, this::updateDraws ) ;
 
-			/*acc += _dt ;
-			if( acc >= 15.0f )
+			if( startDeath )
 			{
-				messenger.passEvent( Event.<String>create( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
-			}*/
+				acc += _dt ;
+				if( acc >= 5.0f )
+				{
+					messenger.passEvent( Event.<String>create( "KILL_ENTITY", "We are now sending a message to kill the entity." ) ) ;
+				}
+			}
 		}
 
 		private void updateDraws( final int _start, final int _end, final Hull[] _hulls )
@@ -1004,12 +1067,12 @@ public final class GameTestLoader implements IGameLoader
 			for( int i = _start; i < _end; ++i )
 			{
 				final Hull hull = _hulls[i] ;
-				/*if( hull.contactData.size() <= 0 )
+				if( !hull.hasChanged() )
 				{
 					// If there has been no collisions then
 					// they'll be no movement.
 					continue ;
-				}*/
+				}
 
 				++contact ;
 				final Draw draw = draws[i] ;

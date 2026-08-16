@@ -33,13 +33,6 @@ public abstract class Hull
 	} ;
 
 	public static final int NO_GROUP = -1 ;
-	public static final int VECTOR_TYPE = 2 ;
-
-	public static final int POSITION_X = 0 ;
-	public static final int POSITION_Y = 1 ;
-	public static final int OFFSET_X = 2 ;
-	public static final int OFFSET_Y = 3 ;
-	public static final int ROTATION = 4 ;
 
 	public static final int COLLIDABLE = 1 << 0 ;
 	public static final int IMMOVABLE = 1 << 1 ;
