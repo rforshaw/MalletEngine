@@ -1,7 +1,5 @@
 package com.linxonline.mallet.input.desktop ;
 
-import java.util.List ;
-
 import com.jogamp.newt.event.MouseEvent ;
 import com.jogamp.newt.event.KeyEvent ;
 import com.jogamp.newt.event.MouseListener ;
@@ -14,73 +12,76 @@ import com.linxonline.mallet.input.InputEvent ;
 import com.linxonline.mallet.input.InputID ;
 import com.linxonline.mallet.input.KeyCode ;
 
-import com.linxonline.mallet.util.caches.TimePool ;
-import com.linxonline.mallet.util.MalletList ;
-
 public final class InputSystem implements IInputSystem, KeyListener, MouseListener
 {
-	private final TimePool<InputEvent> cache = new TimePool<InputEvent>( 150, 0.25f, () -> new InputEvent() ) ;
+	private final InputEvent[] inputs = new InputEvent[20] ;
+	private int current = 0 ;
+	private int start = 0 ;
+	private int end = 0 ;
 
-	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
-	private final List<InputEvent> inputs = MalletList.<InputEvent>newList() ;
-
-	public InputSystem() {}
-
-	@Override
-	public void addInputHandler( final IInputHandler _handler )
+	public InputSystem()
 	{
-		if( exists( _handler ) == true )
+		for( int i = 0; i < inputs.length; ++i )
 		{
-			return ;
+			inputs[i] = new InputEvent() ;
 		}
-
-		handlers.add( _handler ) ;
 	}
 
-	@Override
-	public void removeInputHandler( final IInputHandler _handler )
-	{
-		if( exists( _handler ) == false )
-		{
-			return ;
-		}
-
-		handlers.remove( _handler ) ;
-	}
-
-	/** Pass InputEvents to the handlers **/
-	@Override
-	public void update()
+	public void passInputs( final long _from, final IInputHandler _handler )
 	{
 		synchronized( inputs )
 		{
-			if( inputs.isEmpty() == true )
+			if( start == end )
 			{
 				return ;
 			}
-
-			final int inputSize = inputs.size() ;
-			for( int i = 0; i < inputSize; ++i )
+			else if( end > start )
 			{
-				passInputEventToHandlers( inputs.get( i ) ) ;
+				for( int i = start; i < end; ++i )
+				{
+					final InputEvent input = inputs[i] ;
+					if( input != null && input.getWhen() >= _from )
+					{
+						passInputEventToHandler( i, _handler ) ;
+					}
+				}
 			}
+			else
+			{
+				for( int i = start; i < inputs.length; ++i )
+				{
+					final InputEvent input = inputs[i] ;
+					if( input != null && input.getWhen() >= _from )
+					{
+						passInputEventToHandler( i, _handler ) ;
+					}
+				}
 
-			inputs.clear() ;
+				for( int i = 0; i < end; ++i )
+				{
+					final InputEvent input = inputs[i] ;
+					if( input != null && input.getWhen() >= _from )
+					{
+						passInputEventToHandler( i, _handler ) ;
+					}
+				}
+			}
 		}
 	}
 
-	private void passInputEventToHandlers( final InputEvent _input )
+	private void passInputEventToHandler( final int _index, final IInputHandler _handler )
 	{
-		final int handlerSize = handlers.size() ;
-		for( int j = 0; j < handlerSize; ++j )
+		final InputEvent input = inputs[_index] ;
+
+		switch( _handler.passInputEvent( input ) )
 		{
-			final IInputHandler handler = handlers.get( j ) ;
-			switch( handler.passInputEvent( _input ) )
+			case CONSUME   :
 			{
-				case PROPAGATE : continue ;
-				case CONSUME   :
-				default        : return ;
+				inputs[_index] = null ;
+				break ;
 			}
+			case PROPAGATE : break ;
+			default        : return ;
 		}
 	}
 
@@ -108,14 +109,9 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		final InputEvent input = cache.take() ;
+		final InputEvent input = take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_PRESSED, keycode, _event.getWhen() ) ;
-
-		synchronized( inputs )
-		{
-			inputs.add( input ) ;
-		}
 	}
 
 	@Override
@@ -134,14 +130,9 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 			keycode = KeyCode.getKeyCode( ( int )_event.getKeyCode() ) ;
 		}
 
-		final InputEvent input = cache.take() ;
+		final InputEvent input = take() ;
 		input.setID( InputID.KEYBOARD_1 ) ;
 		input.setInput( InputType.KEYBOARD_RELEASED, keycode, _event.getWhen() ) ;
-
-		synchronized( inputs )
-		{
-			inputs.add( input ) ;
-		}
 	}
 
 	public void keyTyped( final KeyEvent _event ) {}
@@ -229,33 +220,16 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 
 	private void updateMouseWheel( final MouseEvent _event )
 	{
-		final InputEvent input = cache.take() ;
+		final InputEvent input = take() ;
 		final int scroll = ( int )_event.getRotation()[1] ;
-
 		input.setInput( InputType.SCROLL_WHEEL, scroll, scroll, _event.getWhen() ) ;
-		
-		synchronized( inputs )
-		{
-			inputs.add( input ) ;
-		}
 	}
 
 	private void updateMouse( final InputType _inputType, final MouseEvent _event )
 	{
-		final InputEvent input = cache.take() ;
+		final InputEvent input = take() ;
 		input.setID( InputID.MOUSE_1 ) ;
 		input.setInput( _inputType, _event.getX(), _event.getY(), _event.getWhen() ) ;
-
-		synchronized( inputs )
-		{
-			inputs.add( input ) ;
-		}
-	}
-
-	@Override
-	public void clearHandlers()
-	{
-		handlers.clear() ;
 	}
 
 	@Override
@@ -263,12 +237,28 @@ public final class InputSystem implements IInputSystem, KeyListener, MouseListen
 	{
 		synchronized( inputs )
 		{
-			inputs.clear() ;
+			current = 0 ;
+			start = 0 ;
+			end = 0 ;
 		}
 	}
 
-	private final boolean exists( final IInputHandler _handler )
+	private InputEvent take()
 	{
-		return handlers.contains( _handler ) ;
+		synchronized( inputs )
+		{
+			final int size = inputs.length ;
+
+			end = ++end % size ;
+			if( start == end )
+			{
+				start = ++start % size ;
+			}
+
+			final InputEvent input = inputs[current] ;
+			current = ++current % size ;
+
+			return input ;
+		}
 	}
 }

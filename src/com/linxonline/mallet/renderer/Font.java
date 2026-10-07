@@ -188,15 +188,15 @@ public final class Font implements IUniform
 						final float _descent,
 						final float _leading )
 		{
-			final Glyph[] temp = QuickSort.quicksort( _glyphs ) ;
+			final Glyph[] temp = QuickSort.quicksort( _glyphs, Glyph::compare ) ;
 			final int size = temp.length ;
-			final int largestCode = temp[size - 1].sortValue() ;
+			final int largestCode = temp[size - 1].getCharacter() ;
 
 			// Create a map based on the glyphs char number.
 			glyphs = new Glyph[largestCode + 1] ;
 			for( int i = 0; i < size; ++i)
 			{
-				final int code = temp[i].sortValue() ;
+				final int code = temp[i].getCharacter() ;
 				glyphs[code] = temp[i] ;
 			}
 

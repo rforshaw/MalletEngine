@@ -3,27 +3,21 @@ package com.linxonline.mallet.input ;
 import java.util.List ;
 
 import com.linxonline.mallet.util.MalletList ;
+import com.linxonline.mallet.util.time.ElapsedTimer ;
 
 /*==============================================================*/
-// InputState is used to create a hierarchical structure of      //
+// InputState is used to create a hierarchical structure of     //
 // inputs.														//
-// It is typically added to the root Input System and 			//
-// Input Handlers are added to the InputState instead of the 	//
-// Input System.												//
 // This enables fine control over large groups of Input 		//
 // Handlers														//
 /*==============================================================*/
-public class InputState implements IInputSystem,
-								   IInputHandler
+public class InputState implements IInputHandler
 {
 	private final List<IInputHandler> handlers = MalletList.<IInputHandler>newList() ;
-
-	private boolean hasInputs = false ;
-	private IInputHandler handler = null ;
+	private long timestamp = 0L ;
 
 	public InputState() {}
 
-	@Override
 	public final void addInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == true )
@@ -35,7 +29,6 @@ public class InputState implements IInputSystem,
 		handlers.add( _handler ) ;
 	}
 
-	@Override
 	public final void removeInputHandler( final IInputHandler _handler )
 	{
 		if( exists( _handler ) == false )
@@ -47,14 +40,19 @@ public class InputState implements IInputSystem,
 		handlers.remove( _handler ) ;
 	}
 
+	public void update( final IInputSystem _system )
+	{
+		_system.passInputs( timestamp, this ) ;
+		timestamp = ElapsedTimer.currentTimeMillis() ;
+	}
+
 	@Override
 	public final InputEvent.Action passInputEvent( final InputEvent _event )
 	{
-		hasInputs = true ;
 		final int handlerSize = handlers.size() ;
 		for( int j = 0; j < handlerSize; ++j )
 		{
-			handler = handlers.get( j ) ;
+			final IInputHandler handler = handlers.get( j ) ;
 			if( handler.passInputEvent( _event ) == InputEvent.Action.CONSUME )
 			{
 				return InputEvent.Action.CONSUME ;
@@ -64,34 +62,12 @@ public class InputState implements IInputSystem,
 		return InputEvent.Action.PROPAGATE ;
 	}
 
-	@Override
-	public final void update()
-	{
-		// InputState use to retain a collection of inputs
-		// now inputs are directly transferred to IInputHandlers.
-		// When update is called we reset hasInputs as the 
-		// IInputHandlers will be processing the inputs soon.
-		hasInputs = false ;
-	}
-
-	public final boolean hasInputs()
-	{
-		return hasInputs ;
-	}
-
 	/**
 		Remove the Input Handlers and reset them.
 	*/
-	@Override
 	public final void clearHandlers()
 	{
 		handlers.clear() ;
-	}
-
-	@Override
-	public final void clearInputs()
-	{
-		// Input State does not retain inputs anymore.
 	}
 
 	private final boolean exists( final IInputHandler _handler )

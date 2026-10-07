@@ -8,11 +8,12 @@ package com.linxonline.mallet.input ;
 **/
 public interface IInputSystem
 {
-	public void addInputHandler( final IInputHandler _handler ) ;
-	public void removeInputHandler( final IInputHandler _handler ) ;
+	/**
+		Pass the corresponding inputevents to _handler that are greater
+		than _from.
+		The timestamp _from should be in milliseconds.
+	*/
+	public void passInputs( final long _from, final IInputHandler _handler ) ;
 
-	public void update() ;
-
-	public void clearHandlers() ;
 	public void clearInputs() ;
 }

@@ -128,8 +128,6 @@ public class GameState
 		AnimationAssist.setAssist( animationSystem.createAnimationAssist() ) ;
 		CollisionAssist.setAssist( collisionSystem.createCollisionAssist() ) ;
 
-		hookHandlerSystems() ;
-
 		// Event processors need to be called last 
 		// in case developer adds more during initGame or resumeGame.
 		Event.getGlobalState().setIntercept( interceptController ) ;
@@ -155,7 +153,6 @@ public class GameState
 	public Settings shutdownState()
 	{
 		clear() ;								// Remove all content
-		unhookHandlerSystems() ;				// Prevent system from recieving external events
 		Event.clear() ;
 
 		showFPS.setShow( false ) ;
@@ -172,7 +169,6 @@ public class GameState
 	*/
 	public Settings pauseState()
 	{
-		unhookHandlerSystems() ;				// Prevent system from receiving external events
 		audioSystem.pauseSystem() ;
 
 		showFPS.setShow( false ) ;
@@ -324,27 +320,6 @@ public class GameState
 	}
 
 	/**
-		Enable event-based systems to recieve events.
-		Also hooks-up the inputSystem.
-	*/
-	protected void hookHandlerSystems()
-	{
-		final IInputSystem input = system.getInput() ;
-		input.addInputHandler( inputSystem ) ;
-	}
-
-	/**
-		Prevent event-based system from recieving events.
-		Important when state in not being used.
-		Also unhooks the inputSystem.
-	*/
-	protected void unhookHandlerSystems()
-	{
-		final IInputSystem input = system.getInput() ;
-		input.removeInputHandler( inputSystem ) ;
-	}
-
-	/**
 		Create the intended update mode for the gamestate.
 	*/
 	protected void createCoreUpdate()
@@ -384,9 +359,7 @@ public class GameState
 
 		drawUpdaters.add( ( final double _dt ) ->
 		{
-			system.getInput().update() ;
-
-			inputSystem.update() ;
+			inputSystem.update( system.getInput() ) ;
 
 			final float dt = ( float )_dt ;
 			animationSystem.update( dt ) ;
@@ -447,7 +420,6 @@ public class GameState
 	*/
 	protected void clear()
 	{
-		inputSystem.clearInputs() ;
 		inputSystem.clearHandlers() ;
 
 		audioSystem.clear() ;

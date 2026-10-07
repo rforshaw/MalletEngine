@@ -81,33 +81,11 @@ public final class OBB
 
 	public AABB getAsAABB( final AABB _fill )
 	{
-		float minX = rTLX ;
-		float minY = rTLY ;
+		_fill.minX = Math.min( rTLX, Math.min( rTRX, Math.min( rBLX, rBRX ) ) ) ;
+		_fill.minY = Math.min( rTLY, Math.min( rTRY, Math.min( rBLY, rBRY ) ) ) ; ;
 
-		if( minX > rTRX ) { minX = rTRX ; }
-		if( minX > rBLX ) { minX = rBLX ; }
-		if( minX > rBRX ) { minX = rBRX ; }
-
-		if( minY > rTRY ) { minY = rTRY ; }
-		if( minY > rBLY ) { minY = rBLY ; }
-		if( minY > rBRY ) { minY = rBRY ; }
-
-		_fill.minX = minX ;
-		_fill.minY = minY ;
-
-		float maxX = rTLX ;
-		float maxY = rTLY ;
-
-		if( maxX < rTRX ) { maxX = rTRX ; }
-		if( maxX < rBLX ) { maxX = rBLX ; }
-		if( maxX < rBRX ) { maxX = rBRX ; }
-
-		if( maxY < rTRY ) { maxY = rTRY ; }
-		if( maxY < rBLY ) { maxY = rBLY ; }
-		if( maxY < rBRY ) { maxY = rBRY ; }
-
-		_fill.maxX = maxX ;
-		_fill.maxY = maxY ;
+		_fill.maxX = Math.max( rTLX, Math.max( rTRX, Math.max( rBLX, rBRX ) ) ) ;
+		_fill.maxY = Math.max( rTLY, Math.max( rTRY, Math.max( rBLY, rBRY ) ) ) ; ;
 
 		return _fill ;
 	}

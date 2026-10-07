@@ -61,7 +61,7 @@ public final class GLRenderer extends BasicRenderer implements GLEventListener
 	private final static GLTextureManager textures = new GLTextureManager() ;
 	private final static GLFontManager fontManager = new GLFontManager( glProfile, textures ) ;
 
-	private final static Vector2 maxTextureSize = new Vector2() ;						// Maximum Texture resolution supported by the GPU.
+	private final static Vector2 maxTextureSize = new Vector2() ;				// Maximum Texture resolution supported by the GPU.
 
 	private final AssetLookup<World, GLWorld> worldLookup = new AssetLookup<World, GLWorld>( "WORLD" ) ;
 	private final AssetLookup<Camera, GLCamera> cameraLookup = new AssetLookup<Camera, GLCamera>( "CAMERA" ) ;

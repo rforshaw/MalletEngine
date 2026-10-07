@@ -33,6 +33,11 @@ public final class DefaultTimer
 		return seconds ;
 	}
 
+	public static long currentTimeMillis()
+	{
+		return System.currentTimeMillis() ;
+	}
+
 	public long nanoTime()
 	{
 		return System.nanoTime() ;

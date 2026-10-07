@@ -1,8 +1,6 @@
 package com.linxonline.mallet.renderer ;
 
-import com.linxonline.mallet.util.ISort ;
-
-public final class Glyph implements ISort
+public final class Glyph
 {
 	public final char character ;
 	public final float width ;
@@ -11,6 +9,11 @@ public final class Glyph implements ISort
 	{
 		character = _char ;
 		width = _width ;
+	}
+
+	public static int compare( final Glyph _a, final Glyph _b )
+	{
+		return _a.character - _b.character ;
 	}
 
 	public char getCharacter()
@@ -26,12 +29,6 @@ public final class Glyph implements ISort
 	public float getWidth()
 	{
 		return width ;
-	}
-
-	@Override
-	public int sortValue()
-	{
-		return ( int )character ;
 	}
 
 	@Override

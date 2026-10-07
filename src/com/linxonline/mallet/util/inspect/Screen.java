@@ -2,7 +2,6 @@ package com.linxonline.mallet.util.inspect ;
 
 import com.linxonline.mallet.maths.Ratio ;
 
-import com.linxonline.mallet.util.ISort ;
 import com.linxonline.mallet.util.QuickSort ;
 
 /**
@@ -106,7 +105,7 @@ public class Screen
 
 		public Mode getBestMode()
 		{
-			final Mode[] m = QuickSort.quicksort( getModes() ) ;
+			final Mode[] m = QuickSort.quicksort( getModes(), Mode::compare ) ;
 			return ( m.length > 0 ) ? m[m.length - 1] : null ;
 		}
 
@@ -126,7 +125,7 @@ public class Screen
 			Use a bitDepth of -1 to represent an unknown value.
 			Use a refreshRate of 0 to denote an unknown value.
 		**/
-		public static class Mode implements ISort
+		public static class Mode
 		{
 			private final int width ;
 			private final int height ;
@@ -139,6 +138,11 @@ public class Screen
 				height = _height ;
 				bitDepth = _bitDepth ;
 				refreshRate = _refreshRate ;
+			}
+
+			public static int compare( final Mode _a, final Mode _b )
+			{
+				return ( _a.width * _a.height ) - ( _b.width * _b.height ) ;
 			}
 
 			public int getWidth()
@@ -164,12 +168,6 @@ public class Screen
 			public Ratio getRatio()
 			{
 				return Ratio.calculateRatio( width, height ) ;
-			}
-
-			@Override
-			public int sortValue()
-			{
-				return width * height ;
 			}
 
 			@Override
